@@ -3,7 +3,7 @@ import { Awaited } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
 import { ObservableWallet, StakeKeyStatus, buildTx } from '@cardano-sdk/wallet';
 import { TX_TIMEOUT, firstValueFromTimed, waitForWalletStateSettle } from '../util';
-import { assertTxIsValid, assertTxOutIsValid } from '../../../../wallet/test/util';
+import { assertTxIsValid } from '../../../../wallet/test/util';
 import { env } from '../environment';
 import { getWallet } from '../../../src/factories';
 import { logger } from '@cardano-sdk/util-dev';
@@ -84,7 +84,6 @@ describe('SingleAddressWallet/delegation', () => {
   test('balance & transaction', async () => {
     // source wallet has the highest balance to begin with
     const [sourceWallet, destWallet] = await chooseWallets();
-    const [{ rewardAccount }] = await firstValueFrom(sourceWallet.addresses$);
 
     const protocolParameters = await firstValueFrom(sourceWallet.protocolParameters$);
     const stakeKeyDeposit = BigInt(protocolParameters.stakeKeyDeposit);
@@ -100,11 +99,12 @@ describe('SingleAddressWallet/delegation', () => {
     // Make a 1st tx with key registration (if not already registered) and stake delegation
     // Also send some coin to another wallet
     const destAddresses = (await firstValueFrom(destWallet.addresses$))[0].address;
-    const txBuilder = await buildTx(sourceWallet).delegate(poolId);
-    const maybeValidTxOut = await txBuilder.buildOutput().address(destAddresses).coin(tx1OutputCoins).build();
-    assertTxOutIsValid(maybeValidTxOut);
+    const txBuilder = buildTx({ logger, observableWallet: sourceWallet });
 
-    const tx = await txBuilder.addOutput(maybeValidTxOut.txOut).build();
+    const tx = await txBuilder
+      .addOutput(txBuilder.buildOutput().address(destAddresses).coin(tx1OutputCoins).toTxOut())
+      .delegate(poolId)
+      .build();
     assertTxIsValid(tx);
 
     const signedTx = await tx.sign();
@@ -148,23 +148,18 @@ describe('SingleAddressWallet/delegation', () => {
     }
 
     // Make a 2nd tx with key deregistration
-    const tx2Internals = await sourceWallet.initializeTx({
-      certificates: [
-        {
-          __typename: Cardano.CertificateType.StakeKeyDeregistration,
-          stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccount)
-        }
-      ]
-    });
-    await sourceWallet.submitTx(await sourceWallet.finalizeTx({ tx: tx2Internals }));
-    await waitForTx(sourceWallet, tx2Internals.hash);
+    const txDeregister = await buildTx({ logger, observableWallet: sourceWallet }).delegate().build();
+    assertTxIsValid(txDeregister);
+    const txDeregisterSigned = await txDeregister.sign();
+    await txDeregisterSigned.submit();
+    await waitForTx(sourceWallet, txDeregisterSigned.tx.id);
     const tx2ConfirmedState = await getWalletStateSnapshot(sourceWallet);
 
     // No longer delegating
     expect(tx2ConfirmedState.rewardAccount.delegatee?.nextNextEpoch?.id).toBeUndefined();
 
     // Deposit is returned to wallet balance
-    const expectedCoinsAfterTx2 = expectedCoinsAfterTx1 + stakeKeyDeposit - tx2Internals.body.fee;
+    const expectedCoinsAfterTx2 = expectedCoinsAfterTx1 + stakeKeyDeposit - txDeregisterSigned.tx.body.fee;
     expect(tx2ConfirmedState.balance.total.coins).toBe(expectedCoinsAfterTx2);
     expect(tx2ConfirmedState.balance.total).toEqual(tx2ConfirmedState.balance.available);
     expect(tx2ConfirmedState.balance.deposit).toBe(0n);

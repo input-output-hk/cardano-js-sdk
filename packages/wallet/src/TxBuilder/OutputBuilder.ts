@@ -11,6 +11,14 @@ import {
 import { OutputValidation } from '../types';
 import { OutputValidator } from '../services';
 
+/** Properties needed to construct an {@link ObservableWalletTxOutputBuilder} */
+export interface OutputBuilderProps {
+  /** This validator is normally created and passed as an arg here by the {@link TxBuilder.buildOutput} method */
+  outputValidator: OutputValidator;
+  /** Optional partial transaction output to use for initialization. */
+  txOut?: PartialTxOut;
+}
+
 /** Determines if the `PartialTxOut` arg have at least an address and coins. */
 const isViableTxOut = (txOut: PartialTxOut): txOut is Cardano.TxOut => !!(txOut?.address && txOut?.value?.coins);
 
@@ -18,7 +26,7 @@ const isViableTxOut = (txOut: PartialTxOut): txOut is Cardano.TxOut => !!(txOut?
  * Transforms from `OutputValidation` type emitted by `OutputValidator`, to
  * `OutputValidationMinimumCoinError` | `OutputValidationTokenBundleSizeError`
  */
-export const toOutputValidationError = (
+const toOutputValidationError = (
   txOut: Cardano.TxOut,
   validation: OutputValidation
 ): OutputValidationMinimumCoinError | OutputValidationTokenBundleSizeError | undefined => {
@@ -31,74 +39,79 @@ export const toOutputValidationError = (
 };
 
 /**
- * `OutputBuilder` implementation based on the minimal wallet type.
+ * `OutputBuilder` implementation based on the minimal wallet type: {@link ObservableWalletTxBuilderDependencies}.
  */
 export class ObservableWalletTxOutputBuilder implements OutputBuilder {
-  partialOutput: PartialTxOut;
-
+  /**
+   * Transaction output that is updated by `ObservableWalletTxOutputBuilder` methods.
+   * Every method call recreates the `partialOutput`, thus updating it immutably.
+   */
+  #partialOutput: PartialTxOut;
   #outputValidator: OutputValidator;
 
-  /**
-   *
-   * @param outputValidator this validator is normally created and passed as an arg here, by the TxBuilder
-   * @param txOut optional partial transaction output to use for initialization.
-   */
-  constructor(outputValidator: OutputValidator, txOut?: PartialTxOut) {
-    this.partialOutput = { ...txOut };
+  constructor({ outputValidator, txOut }: OutputBuilderProps) {
+    this.#partialOutput = { ...txOut };
     this.#outputValidator = outputValidator;
   }
 
+  toTxOut(): Cardano.TxOut {
+    if (!isViableTxOut(this.#partialOutput)) {
+      throw new OutputValidationMissingRequiredError(this.#partialOutput);
+    }
+    return { ...this.#partialOutput };
+  }
+
   value(value: Cardano.Value): OutputBuilder {
-    this.partialOutput = { ...this.partialOutput, value: { ...value } };
+    this.#partialOutput = { ...this.#partialOutput, value: { ...value } };
     return this;
   }
 
   coin(coin: Cardano.Lovelace): OutputBuilder {
-    this.partialOutput = { ...this.partialOutput, value: { ...this.partialOutput?.value, coins: coin } };
+    this.#partialOutput = { ...this.#partialOutput, value: { ...this.#partialOutput?.value, coins: coin } };
     return this;
   }
 
   assets(assets: Cardano.TokenMap): OutputBuilder {
-    this.partialOutput = {
-      ...this.partialOutput,
-      value: { ...this.partialOutput?.value, assets }
+    this.#partialOutput = {
+      ...this.#partialOutput,
+      value: { ...this.#partialOutput?.value, assets }
     };
     return this;
   }
 
   asset(assetId: Cardano.AssetId, quantity: bigint): OutputBuilder {
-    const assets: Cardano.TokenMap = new Map(this.partialOutput?.value?.assets);
+    const assets: Cardano.TokenMap = new Map(this.#partialOutput?.value?.assets);
     quantity === 0n ? assets.delete(assetId) : assets.set(assetId, quantity);
 
     return this.assets(assets);
   }
 
   address(address: Cardano.Address): OutputBuilder {
-    this.partialOutput = { ...this.partialOutput, address };
+    this.#partialOutput = { ...this.#partialOutput, address };
     return this;
   }
 
   datum(datum: Cardano.util.Hash32ByteBase16): OutputBuilder {
-    this.partialOutput = { ...this.partialOutput, datum };
+    this.#partialOutput = { ...this.#partialOutput, datum };
     return this;
   }
 
   async build(): Promise<MaybeValidTxOut> {
-    if (!isViableTxOut(this.partialOutput)) {
+    let txOut: Cardano.TxOut;
+    try {
+      txOut = this.toTxOut();
+    } catch (error) {
       return Promise.resolve({
-        errors: [new OutputValidationMissingRequiredError(this.partialOutput)],
+        errors: [error as OutputValidationMissingRequiredError],
         isValid: false
       });
     }
 
-    const outputValidation = toOutputValidationError(
-      this.partialOutput,
-      await this.#outputValidator.validateOutput(this.partialOutput)
-    );
+    const outputValidation = toOutputValidationError(txOut, await this.#outputValidator.validateOutput(txOut));
     if (outputValidation) {
       return { errors: [outputValidation], isValid: false };
     }
 
-    return { isValid: true, txOut: this.partialOutput };
+    return { isValid: true, txOut };
   }
 }

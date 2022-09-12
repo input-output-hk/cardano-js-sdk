@@ -38,7 +38,7 @@ export type TxOutValidationError =
   | OutputValidationMissingRequiredError
   | OutputValidationMinimumCoinError
   | OutputValidationTokenBundleSizeError;
-export type TxBodyValidationError = TxOutValidationError | InputSelectionError;
+export type TxBodyValidationError = TxOutValidationError | InputSelectionError | IncompatibleWalletError;
 
 export type Valid<TValid> = TValid & {
   isValid: true;
@@ -63,17 +63,20 @@ export type MaybeValidTxOut = ValidTxOut | InvalidTxOut;
  */
 export interface OutputBuilder {
   /**
-   * Transaction output that is updated by `OutputBuilder` methods.
-   * It should not be updated directly, but this is not restricted to allow experimental TxOutput changes that are not
-   * yet available in the OutputBuilder interface.
-   * Every method call recreates the `partialOutput`, thus updating it immutably.
+   * Create transaction output snapshot, as it was configured until the point of calling this method.
+   *
+   * @returns {Cardano.TxOut} transaction output snapshot.
+   *  - It can be used in {@link TxBuilder.addOutput}.
+   *  - It will be validated once {@link TxBuilder.build} method is called.
+   * @throws OutputValidationMissingRequiredError {@link OutputValidationMissingRequiredError} if
+   * the mandatory fields 'address' or 'coins' are missing
    */
-  partialOutput: PartialTxOut;
-  /** Sets {@link partialOutput} `value` field. Preexisting `value` is overwritten. */
+  toTxOut(): Cardano.TxOut;
+  /** Sets transaction output `value` field. Preexisting `value` is overwritten. */
   value(value: Cardano.Value): OutputBuilder;
-  /** Sets {@link partialOutput}.value `coins` field. */
+  /** Sets transaction output value `coins` field. */
   coin(coin: Cardano.Lovelace): OutputBuilder;
-  /** Sets {@link partialOutput}.value `assets` field. Preexisting assets are overwritten */
+  /** Sets transaction output value `assets` field. Preexisting assets are overwritten */
   assets(assets: Cardano.TokenMap): OutputBuilder;
   /**
    * Add/Remove/Update asset.
@@ -85,12 +88,12 @@ export interface OutputBuilder {
    * @param quantity To remove an asset, set quantity to 0
    */
   asset(assetId: Cardano.AssetId, quantity: bigint): OutputBuilder;
-  /** Sets {@link partialOutput} `address` field. */
+  /** Sets transaction output `address` field. */
   address(address: Cardano.Address): OutputBuilder;
-  /** Sets {@link partialOutput} `datum` field. */
+  /** Sets transaction output `datum` field. */
   datum(datum: Cardano.util.Hash32ByteBase16): OutputBuilder;
   /**
-   * Checks if the constructed `partialOutput` is complete and valid
+   * Checks if the transaction output is complete and valid
    *
    * @returns {Promise<MaybeValidTxOut>} When it is a `ValidTxOut` it can be used as input in `TxBuilder.addOutput()`.
    * In case of it is an `InvalidTxOut`, it embeds a TxOutValidationError with more details
@@ -141,21 +144,22 @@ export interface TxBuilder {
    */
   removeOutput(txOut: Cardano.TxOut): TxBuilder;
   /**
-   * Does *not* addOutput
+   * Does *not* addOutput.
    *
    * @param txOut optional partial transaction output to use for initialization.
    * @returns {OutputBuilder} {@link OutputBuilder} util for building transaction outputs.
    */
   buildOutput(txOut?: PartialTxOut): OutputBuilder;
   /**
-   * Add StakeDelegation and (if needed) StakeKeyRegistration certificate to {@link partialTxBody}.
-   * If wallet contains multiple reward accounts, it will create certificates for all of them.
-   * The call returns a Promise because it waits for the reward accounts to be returned by the wallet.
+   * Configure transaction to include delegation.
+   * - On `build()`, StakeKeyDeregistration or StakeDelegation and (if needed)
+   *   StakeKeyRegistration certificates are added in the transaction body.
+   * - Stake key deregister is done by not providing the `poolId` parameter: `delegate()`.
+   * - If wallet contains multiple reward accounts, it will create certificates for all of them.
    *
-   * @param poolId Pool Id to delegate to.
-   * @throws `IncompatibleWalletError` if no reward accounts are provided by the wallet.
+   * @param poolId Pool Id to delegate to. If undefined, stake key deregistration will be done.
    */
-  delegate(poolId: Cardano.PoolId): Promise<TxBuilder>;
+  delegate(poolId?: Cardano.PoolId): TxBuilder;
   /** Sets TxMetadata in {@link auxiliaryData} */
   setMetadata(metadata: Cardano.TxMetadata): TxBuilder;
   /** Sets extra signers in {@link extraSigners} */
