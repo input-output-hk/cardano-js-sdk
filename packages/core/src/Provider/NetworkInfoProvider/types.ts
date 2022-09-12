@@ -1,20 +1,6 @@
 import { Cardano, EraSummary, Provider } from '../..';
 
-export type ProtocolParametersRequiredByWallet = Required<
-  Pick<
-    Cardano.ProtocolParametersBabbage,
-    | 'coinsPerUtxoByte'
-    | 'maxTxSize'
-    | 'maxValueSize'
-    | 'stakeKeyDeposit'
-    | 'maxCollateralInputs'
-    | 'minFeeCoefficient'
-    | 'minFeeConstant'
-    | 'minPoolCost'
-    | 'poolDeposit'
-    | 'protocolVersion'
-  >
->;
+export type ProtocolParametersRequiredByWallet = Omit<Cardano.ProtocolParameters, 'costModels'>;
 
 export type SupplySummary = {
   circulating: Cardano.Lovelace;
