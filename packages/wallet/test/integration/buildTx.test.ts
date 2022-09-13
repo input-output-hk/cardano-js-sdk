@@ -1,6 +1,6 @@
 /* eslint-disable func-style */
 /* eslint-disable jsdoc/require-jsdoc */
-import { AssetId, somePartialStakePools } from '@cardano-sdk/util-dev';
+import { AssetId, logger, somePartialStakePools } from '@cardano-sdk/util-dev';
 import { Cardano } from '@cardano-sdk/core';
 import { of } from 'rxjs';
 
@@ -28,19 +28,19 @@ function assertObjectRefsAreDifferent(obj1: unknown, obj2: unknown): void {
 }
 
 describe('buildTx', () => {
-  let wallet: ObservableWallet;
+  let observableWallet: ObservableWallet;
   let txBuilder: TxBuilder;
   let output: Cardano.TxOut;
   let output2: Cardano.TxOut;
 
   beforeEach(async () => {
-    ({ wallet } = await createWallet());
+    ({ wallet: observableWallet } = await createWallet());
     output = mocks.utxo[0][1];
     output2 = mocks.utxo[1][1];
-    txBuilder = buildTx(wallet);
+    txBuilder = buildTx({ logger, observableWallet });
   });
 
-  afterEach(() => wallet.shutdown());
+  afterEach(() => observableWallet.shutdown());
 
   describe('addOutput', () => {
     it('can add output without mutating partialTxBody', () => {
@@ -169,8 +169,8 @@ describe('buildTx', () => {
     });
 
     it('uses signingOptions to finalize transaction when submitting', async () => {
-      const origFinalizeTx = wallet.finalizeTx;
-      wallet.finalizeTx = jest.fn(origFinalizeTx);
+      const origFinalizeTx = observableWallet.finalizeTx;
+      observableWallet.finalizeTx = jest.fn(origFinalizeTx);
 
       const tx = await txBuilder.addOutput(mocks.utxo[0][1]).setSigningOptions(signingOptions).build();
       assertTxIsValid(tx);
@@ -179,7 +179,7 @@ describe('buildTx', () => {
       expect(tx.signingOptions).toEqual(signingOptions);
 
       await (await tx.sign()).submit();
-      expect(wallet.finalizeTx).toHaveBeenLastCalledWith(expect.objectContaining({ signingOptions }));
+      expect(observableWallet.finalizeTx).toHaveBeenLastCalledWith(expect.objectContaining({ signingOptions }));
     });
   });
 
@@ -202,67 +202,66 @@ describe('buildTx', () => {
       output1Coin = 10_000_000n;
       output2Base = mocks.utxo[0][1];
 
-      outputBuilder = txBuilder.buildOutput();
+      outputBuilder = txBuilder.buildOutput().address(address).coin(output1Coin);
     });
 
     it('can create OutputBuilder without initial output', () => {
-      expect(outputBuilder.partialOutput).toBeTruthy();
+      expect(outputBuilder.toTxOut()).toBeTruthy();
     });
 
     it('can create OutputBuilder starting from an existing output', () => {
       const outputBuilderFromExisting = txBuilder.buildOutput(output);
-      expect(outputBuilderFromExisting.partialOutput).toEqual(output);
+      expect(outputBuilderFromExisting.toTxOut()).toEqual(output);
     });
 
-    it('can set partialOutput value overwriting preexisting value', () => {
+    it('can set output value, overwriting preexisting value', () => {
       const outValue = { assets, coins: output1Coin };
       outputBuilder.value(outValue);
-      expect(outputBuilder.partialOutput.value).toEqual(outValue);
+      expect(outputBuilder.toTxOut().value).toEqual(outValue);
 
       // Setting outValueOther will remove previously configured assets
       const outValueOther = { coins: output1Coin + 100n };
       outputBuilder.value(outValueOther);
-      expect(outputBuilder.partialOutput.value).toEqual(outValueOther);
+      expect(outputBuilder.toTxOut().value).toEqual(outValueOther);
     });
 
     it('can set coin value', () => {
-      outputBuilder.coin(output1Coin);
-      expect(outputBuilder.partialOutput.value).toEqual({ coins: output1Coin });
+      expect(outputBuilder.toTxOut().value).toEqual({ coins: output1Coin });
     });
 
-    it('can set partialOutput assets', () => {
+    it('can set assets', () => {
       outputBuilder.assets(assets);
-      expect(outputBuilder.partialOutput.value).toEqual({ assets });
+      expect(outputBuilder.toTxOut().value).toEqual(expect.objectContaining({ assets }));
     });
 
     it('can add assets one by one', () => {
       outputBuilder.asset(AssetId.PXL, 5n).asset(AssetId.TSLA, 10n);
-      expect(outputBuilder.partialOutput.value?.assets?.size).toBe(2);
-      expect(outputBuilder.partialOutput.value?.assets?.get(AssetId.PXL)).toBe(5n);
-      expect(outputBuilder.partialOutput.value?.assets?.get(AssetId.TSLA)).toBe(10n);
+      const txOut = outputBuilder.toTxOut();
+      expect(txOut.value?.assets?.size).toBe(2);
+      expect(txOut.value?.assets?.get(AssetId.PXL)).toBe(5n);
+      expect(txOut.value?.assets?.get(AssetId.TSLA)).toBe(10n);
     });
 
     it('can update asset quantity by assetId', () => {
       outputBuilder.asset(AssetId.PXL, 5n).asset(AssetId.TSLA, 10n);
       outputBuilder.asset(AssetId.PXL, 11n);
-      expect(outputBuilder.partialOutput.value?.assets?.get(AssetId.PXL)).toBe(11n);
+      expect(outputBuilder.toTxOut().value?.assets?.get(AssetId.PXL)).toBe(11n);
     });
 
     it('can remove asset by using quantity 0', () => {
       outputBuilder.assets(assets);
-      expect(outputBuilder.partialOutput.value?.assets?.size).toBe(1);
+      expect(outputBuilder.toTxOut().value?.assets?.size).toBe(1);
       outputBuilder.asset(assetId, 0n);
-      expect(outputBuilder.partialOutput.value?.assets?.size).toBe(0);
+      expect(outputBuilder.toTxOut().value?.assets?.size).toBe(0);
     });
 
     it('can set address', () => {
-      outputBuilder.address(address);
-      expect(outputBuilder.partialOutput.address).toEqual(address);
+      expect(outputBuilder.toTxOut().address).toEqual(address);
     });
 
     it('can set datum', () => {
       outputBuilder.datum(datum);
-      expect(outputBuilder.partialOutput.datum).toEqual(datum);
+      expect(outputBuilder.toTxOut().datum).toEqual(datum);
     });
 
     it('can build a valid output', async () => {
@@ -285,7 +284,7 @@ describe('buildTx', () => {
       });
     });
 
-    describe('can validate', () => {
+    describe('can build and validate', () => {
       it('missing coin field', async () => {
         const builtOutput = await txBuilder.buildOutput().address(address).build();
         const [error] = (!builtOutput.isValid && builtOutput.errors) || [];
@@ -309,6 +308,24 @@ describe('buildTx', () => {
         assertTxOutIsValid(builtOutput);
       });
     });
+
+    describe('can validate required output fields', () => {
+      it('missing coin field', () => {
+        expect(() => txBuilder.buildOutput().address(address).toTxOut()).toThrowError(
+          OutputValidationMissingRequiredError
+        );
+      });
+
+      it('missing address field', () => {
+        expect(() => txBuilder.buildOutput().coin(output1Coin).toTxOut()).toThrowError(
+          OutputValidationMissingRequiredError
+        );
+      });
+
+      it('legit output with valid with address and coin', async () => {
+        expect(() => txBuilder.buildOutput().address(address).coin(output1Coin).toTxOut()).not.toThrow();
+      });
+    });
   });
 
   describe('delegate', () => {
@@ -320,7 +337,7 @@ describe('buildTx', () => {
 
     it('certificates are added to tx.body on build', async () => {
       const address = Cardano.Address('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg');
-      await txBuilder.delegate(poolId);
+      txBuilder.delegate(poolId);
       const maybeValidTxOut = await txBuilder.buildOutput().address(address).coin(10_000_000n).build();
       assertTxOutIsValid(maybeValidTxOut);
       const txBuilt = await txBuilder.addOutput(maybeValidTxOut.txOut).build();
@@ -329,48 +346,41 @@ describe('buildTx', () => {
       expect(txBuilt.body.certificates?.length).toBe(2);
     });
 
-    it('adds both stake key and delegation certificates when reward account was not registered', async () => {
-      const txDelegate = await txBuilder.delegate(poolId);
-      const [stakeKeyCert, delegationCert] = txDelegate.partialTxBody.certificates!;
+    it('adds both stake key and delegation certificates when stake key was not registered', async () => {
+      const txDelegate = await txBuilder.delegate(poolId).build();
+      assertTxIsValid(txDelegate);
+      const [stakeKeyCert, delegationCert] = txDelegate.body.certificates!;
       expect(stakeKeyCert.__typename).toBe(Cardano.CertificateType.StakeKeyRegistration);
 
       if (delegationCert.__typename === Cardano.CertificateType.StakeDelegation) {
         expect(delegationCert.poolId).toBe(poolId);
       }
 
-      expect.assertions(2);
+      expect.assertions(3);
     });
 
     it('delegate again removes previous certificates', async () => {
-      await txBuilder.delegate(poolId);
+      await txBuilder.delegate(poolId).build();
       const poolIdOther = somePartialStakePools[1].id;
-      const secondDelegation = await txBuilder.delegate(poolIdOther);
-      expect(secondDelegation.partialTxBody.certificates?.length).toBe(2);
-      const delegationCert = secondDelegation.partialTxBody.certificates![1] as Cardano.StakeDelegationCertificate;
+      const secondDelegation = await txBuilder.delegate(poolIdOther).build();
+      assertTxIsValid(secondDelegation);
+      expect(secondDelegation.body.certificates?.length).toBe(2);
+      const delegationCert = secondDelegation.body.certificates![1] as Cardano.StakeDelegationCertificate;
       expect(delegationCert.poolId).toBe(poolIdOther);
     });
 
-    it('always recreates partialTxBody', async () => {
-      const txDelegate = await txBuilder.delegate(poolId);
-      const { partialTxBody } = txDelegate;
-
-      const poolIdOther = somePartialStakePools[1].id;
-      const txDelegateOther = await txBuilder.delegate(poolIdOther);
-      assertObjectRefsAreDifferent(txDelegateOther.partialTxBody, partialTxBody);
-    });
-
     it('throws IncompatibleWallet error if no reward accounts were found', async () => {
-      wallet.delegation.rewardAccounts$ = of([]);
-      try {
-        await txBuilder.delegate(poolId);
-      } catch (error) {
-        expect(error instanceof IncompatibleWalletError).toBeTruthy();
+      observableWallet.delegation.rewardAccounts$ = of([]);
+      const txBuilt = await txBuilder.delegate(poolId).build();
+      if (!txBuilt.isValid) {
+        expect(txBuilt.errors?.length).toBe(1);
+        expect(txBuilt.errors[0] instanceof IncompatibleWalletError).toBeTruthy();
       }
-      expect.assertions(1);
+      expect.assertions(2);
     });
 
-    it('adds only delegation certificate with correct poolId when reward account was already registered', async () => {
-      wallet.delegation.rewardAccounts$ = of([
+    it('adds only delegation certificate with correct poolId when stake key was already registered', async () => {
+      observableWallet.delegation.rewardAccounts$ = of([
         {
           address: Cardano.RewardAccount('stake_test1uqu7qkgf00zwqupzqfzdq87dahwntcznklhp3x30t3ukz6gswungn'),
           delegatee: {
@@ -382,18 +392,19 @@ describe('buildTx', () => {
           rewardBalance: 33_333n
         }
       ]);
-      const txDelegate = await txBuilder.delegate(poolId);
-      expect(txDelegate.partialTxBody.certificates?.length).toBe(1);
-      const [delegationCert] = txDelegate.partialTxBody.certificates!;
+      const txDelegate = await txBuilder.delegate(poolId).build();
+      assertTxIsValid(txDelegate);
+      expect(txDelegate.body.certificates?.length).toBe(1);
+      const [delegationCert] = txDelegate.body.certificates!;
       if (delegationCert.__typename === Cardano.CertificateType.StakeDelegation) {
         expect(delegationCert.poolId).toBe(poolId);
       }
 
-      expect.assertions(2);
+      expect.assertions(3);
     });
 
     it('adds multiple certificates when handling multiple reward accounts', async () => {
-      wallet.delegation.rewardAccounts$ = of([
+      observableWallet.delegation.rewardAccounts$ = of([
         {
           address: Cardano.RewardAccount('stake_test1uqu7qkgf00zwqupzqfzdq87dahwntcznklhp3x30t3ukz6gswungn'),
           delegatee: {
@@ -416,13 +427,40 @@ describe('buildTx', () => {
         }
       ]);
 
-      const txDelegate = await txBuilder.delegate(poolId);
-      expect(txDelegate.partialTxBody.certificates?.length).toBe(4);
+      const txDelegate = await txBuilder.delegate(poolId).build();
+      assertTxIsValid(txDelegate);
+      expect(txDelegate.body.certificates?.length).toBe(4);
+    });
+
+    it('undefined poolId adds stake key deregister certificate if already registered', async () => {
+      observableWallet.delegation.rewardAccounts$ = of([
+        {
+          address: Cardano.RewardAccount('stake_test1uqu7qkgf00zwqupzqfzdq87dahwntcznklhp3x30t3ukz6gswungn'),
+          delegatee: {
+            currentEpoch: undefined,
+            nextEpoch: undefined,
+            nextNextEpoch: undefined
+          },
+          keyStatus: StakeKeyStatus.Registered,
+          rewardBalance: 33_333n
+        }
+      ]);
+      const txDeregister = await txBuilder.delegate().build();
+      assertTxIsValid(txDeregister);
+      expect(txDeregister.body.certificates?.length).toBe(1);
+      const [deregisterCert] = txDeregister.body.certificates!;
+      expect(deregisterCert.__typename).toBe(Cardano.CertificateType.StakeKeyDeregistration);
+    });
+
+    it('undefined poolId does NOT add certificate if not registered', async () => {
+      const txDeregister = await txBuilder.delegate().build();
+      assertTxIsValid(txDeregister);
+      expect(txDeregister.body.certificates?.length).toBeFalsy();
     });
   });
 
   it('can be used to build, sign and submit a tx', async () => {
-    const tx = await buildTx(wallet).addOutput(mocks.utxo[0][1]).build();
+    const tx = await buildTx({ logger, observableWallet }).addOutput(mocks.utxo[0][1]).build();
     if (tx.isValid) {
       const signedTx = await tx.sign();
       await signedTx.submit();
@@ -458,19 +496,16 @@ describe('buildTx', () => {
     };
 
     const mockValidator: OutputValidator = {
-      validateOutput: jest.fn(),
-      validateOutputs: jest.fn(() =>
-        Promise.resolve(
-          new Map([
-            [output, coinMissingValidation],
-            [output2, bundleSizeValidation]
-          ])
-        )
-      ),
+      validateOutput: jest
+        .fn()
+        .mockResolvedValueOnce(coinMissingValidation)
+        .mockResolvedValueOnce(bundleSizeValidation),
+      validateOutputs: jest.fn(),
       validateValue: jest.fn(),
       validateValues: jest.fn()
     };
-    const tx = await buildTx(wallet, mockValidator).addOutput(output).addOutput(output2).build();
+    const builder = buildTx({ logger, observableWallet, outputValidator: mockValidator }).addOutput(output);
+    const tx = await builder.addOutput(builder.buildOutput(output2).toTxOut()).build();
 
     expect(tx.isValid).toBeFalsy();
     const [error1, error2] = (!tx.isValid && tx.errors) || [];
