@@ -5,6 +5,7 @@ import { SingleAddressWallet } from '@cardano-sdk/wallet';
 import { combineLatest, filter, firstValueFrom, map } from 'rxjs';
 import { env } from '../environment';
 import { getLogger, getWallet } from '../../../src/factories';
+import { walletReady } from '../util';
 
 const logger = getLogger(env.LOGGER_MIN_SEVERITY);
 
@@ -26,7 +27,7 @@ describe('SingleAddressWallet.assets/nft', () => {
   beforeAll(async () => {
     wallet = (await getWallet({ env, idx: 0, logger, name: 'Minting Wallet', polling: { interval: 50 } })).wallet;
 
-    await firstValueFrom(wallet.syncStatus.isSettled$.pipe(filter((isSettled) => isSettled)));
+    await walletReady(wallet);
 
     const params = await firstValueFrom(wallet.genesisParameters$);
 

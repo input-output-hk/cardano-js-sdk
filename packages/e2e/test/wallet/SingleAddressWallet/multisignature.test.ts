@@ -5,6 +5,7 @@ import { SingleAddressWallet } from '@cardano-sdk/wallet';
 import { env } from '../environment';
 import { filter, firstValueFrom } from 'rxjs';
 import { getLogger, getWallet } from '../../../src/factories';
+import { walletReady } from '../util';
 
 const logger = getLogger(env.LOGGER_MIN_SEVERITY);
 
@@ -35,7 +36,7 @@ describe('SingleAddressWallet/multisignature', () => {
   it('can create a transaction with multiple signatures to mint an asset', async () => {
     wallet = (await getWallet({ env, idx: 0, logger, name: 'Minting Wallet', polling: { interval: 50 } })).wallet;
 
-    await firstValueFrom(wallet.syncStatus.isSettled$.pipe(filter((isSettled) => isSettled)));
+    await walletReady(wallet);
 
     const params = await firstValueFrom(wallet.genesisParameters$);
 

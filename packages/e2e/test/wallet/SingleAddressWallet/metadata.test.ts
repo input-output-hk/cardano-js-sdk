@@ -5,6 +5,7 @@ import { filter, firstValueFrom, map } from 'rxjs';
 import { getWallet } from '../../../src/factories';
 import { isNotNil } from '@cardano-sdk/util';
 import { logger } from '@cardano-sdk/util-dev';
+import { walletReady } from '../util';
 
 describe('SingleAddressWallet/metadata', () => {
   let wallet: SingleAddressWallet;
@@ -13,6 +14,8 @@ describe('SingleAddressWallet/metadata', () => {
   beforeAll(async () => {
     wallet = (await getWallet({ env, logger, name: 'Test Wallet' })).wallet;
     ownAddress = (await firstValueFrom(wallet.addresses$))[0].address;
+
+    await walletReady(wallet);
   });
 
   afterAll(() => wallet.shutdown());
