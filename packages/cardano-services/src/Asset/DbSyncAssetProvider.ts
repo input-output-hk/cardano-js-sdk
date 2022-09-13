@@ -66,8 +66,17 @@ export class DbSyncAssetProvider extends DbSyncProvider implements AssetProvider
     if (extraData?.history) await this.loadHistory(assetInfo);
     if (extraData?.nftMetadata)
       assetInfo.nftMetadata = await this.#dependencies.ntfMetadataService.getNftMetadata(assetInfo);
-    if (extraData?.tokenMetadata)
-      assetInfo.tokenMetadata = (await this.#dependencies.tokenMetadataService.getTokenMetadata([assetId]))[0];
+    if (extraData?.tokenMetadata) {
+      try {
+        assetInfo.tokenMetadata = (await this.#dependencies.tokenMetadataService.getTokenMetadata([assetId]))[0];
+      } catch (error) {
+        if (error instanceof ProviderError && error.reason === ProviderFailure.ConnectionFailure) {
+          assetInfo.tokenMetadata = undefined;
+        } else {
+          throw error;
+        }
+      }
+    }
 
     return assetInfo;
   }
