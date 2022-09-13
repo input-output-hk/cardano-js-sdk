@@ -97,4 +97,22 @@ describe('cslToCore', () => {
   it('newTx', () => {
     expect(cslToCore.newTx(coreToCsl.tx(tx))).toEqual(tx);
   });
+
+  it('txWitnessBootstrap', () => {
+    // values from ogmios.wsp.json
+    const bootstrap: Cardano.BootstrapWitness[] = [
+      {
+        addressAttributes: Cardano.Base64Blob('cA=='),
+        chainCode: Cardano.HexBlob('b6dbf0b03c93afe5696f10d49e8a8304ebfac01deeb8f82f2af5836ebbc1b450'),
+        key: Cardano.Ed25519PublicKey('deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01'),
+        signature: Cardano.Ed25519Signature(
+          Buffer.from(
+            'ZGdic3hnZ3RvZ2hkanB0ZXR2dGtjb2N2eWZpZHFxZ2d1cmpocmhxYWlpc3BxcnVlbGh2eXBxeGVld3ByeWZ2dw==',
+            'base64'
+          ).toString('hex')
+        )
+      }
+    ];
+    expect(cslToCore.txWitnessBootstrap(coreToCsl.txWitnessBootstrap(bootstrap))).toEqual(bootstrap);
+  });
 });

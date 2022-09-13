@@ -83,8 +83,23 @@ export const typedHex = <T>(value: string, length?: number): T => {
   return value as any as T;
 };
 
+/**
+ * https://www.ietf.org/rfc/rfc4648.txt
+ */
+export type Base64Blob = OpaqueString<'Base64Blob'>;
+export const Base64Blob = (target: string): Base64Blob => {
+  // eslint-disable-next-line wrap-regex
+  if (/^(?:[\d+/a-z]{4})*(?:[\d+/a-z]{2}==|[\d+/a-z]{3}=)?$/i.test(target)) {
+    return target as unknown as Base64Blob;
+  }
+  throw new InvalidStringError('expected base64 string');
+};
+Base64Blob.fromBytes = (bytes: Uint8Array) => Buffer.from(bytes).toString('base64') as unknown as Base64Blob;
+
 export type HexBlob = OpaqueString<'HexBlob'>;
 export const HexBlob = (target: string): HexBlob => typedHex(target);
+HexBlob.fromBytes = (bytes: Uint8Array) => Buffer.from(bytes).toString('hex') as unknown as HexBlob;
+
 /**
  * Cast HexBlob it into another OpaqueString type.
  *
