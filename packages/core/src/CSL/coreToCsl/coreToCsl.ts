@@ -6,6 +6,8 @@ import {
   Assets,
   AuxiliaryData,
   BigNum,
+  BootstrapWitness,
+  BootstrapWitnesses,
   Certificates,
   Ed25519KeyHash,
   Ed25519KeyHashes,
@@ -365,6 +367,21 @@ export const txBody = (
   return cslBody;
 };
 
+export const txWitnessBootstrap = (bootstrap: Cardano.BootstrapWitness[]): BootstrapWitnesses => {
+  const witnesses = BootstrapWitnesses.new();
+  for (const coreWitness of bootstrap) {
+    witnesses.add(
+      BootstrapWitness.new(
+        Vkey.new(PublicKey.from_bytes(Buffer.from(coreWitness.key.toString(), 'hex'))),
+        Ed25519Signature.from_hex(coreWitness.signature.toString()),
+        Buffer.from(coreWitness.chainCode || '', 'hex'),
+        Buffer.from(coreWitness.addressAttributes || '', 'base64')
+      )
+    );
+  }
+  return witnesses;
+};
+
 export const witnessSet = (witness: Cardano.Witness): TransactionWitnessSet => {
   const cslWitnessSet = TransactionWitnessSet.new();
   const vkeyWitnesses = Vkeywitnesses.new();
@@ -382,6 +399,10 @@ export const witnessSet = (witness: Cardano.Witness): TransactionWitnessSet => {
     vkeyWitnesses.add(vkeyWitness);
   }
   cslWitnessSet.set_vkeys(vkeyWitnesses);
+
+  if (witness.bootstrap) {
+    cslWitnessSet.set_bootstraps(txWitnessBootstrap(witness.bootstrap));
+  }
 
   return cslWitnessSet;
 };

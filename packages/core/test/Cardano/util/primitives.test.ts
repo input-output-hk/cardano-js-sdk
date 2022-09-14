@@ -1,5 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import {
+  Base64Blob,
   Hash28ByteBase16,
   Hash32ByteBase16,
   HexBlob,
@@ -84,6 +85,29 @@ describe('Cardano.util/primitives', () => {
     it('throws when string has an non base16 character', () => {
       expect(() => HexBlob(' 1234567890abcdef')).toThrowError(InvalidStringError);
       expect(() => HexBlob('1234567890abcdefg')).toThrowError(InvalidStringError);
+    });
+
+    it('fromBytes converts byte array into HexBlob', () => {
+      expect(HexBlob.fromBytes(new Uint8Array([112]))).toEqual('70');
+    });
+  });
+
+  describe('Base64Blob', () => {
+    it('allows an empty string', () => {
+      expect(() => Base64Blob('')).not.toThrow();
+    });
+
+    it('does not throw when asserting a valid base64 encoded string', () => {
+      expect(() => Base64Blob('cA==')).not.toThrowError();
+    });
+
+    it('throws when string doesnt match the base64 pattern defined in IETF RFC4648', () => {
+      expect(() => HexBlob('cA=')).toThrowError(InvalidStringError);
+      expect(() => HexBlob('!cA==')).toThrowError(InvalidStringError);
+    });
+
+    it('fromBytes converts byte array into Base64Blob', () => {
+      expect(Base64Blob.fromBytes(new Uint8Array([112]))).toEqual('cA==');
     });
   });
 

@@ -95,7 +95,9 @@
         }
       },
       "GetAssetRequest": {
-        "required": ["assetId"],
+        "required": [
+          "assetId"
+        ],
         "type": "object",
         "properties": {
           "assetId": {
