@@ -49,6 +49,7 @@ jobs:
     - name: Publish
       if: steps.precondition.outputs.changed > 0
       run: |
+        yarn build
         yarn publish:nightly --loglevel silly
       env:
         YARN_ENABLE_IMMUTABLE_INSTALLS: false
