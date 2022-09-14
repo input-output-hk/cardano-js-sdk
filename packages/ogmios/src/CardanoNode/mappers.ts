@@ -4,7 +4,7 @@ import { Schema } from '@cardano-ogmios/client';
 export const mapEraSummary = (eraSummary: Schema.EraSummary, systemStart: Date): EraSummary => ({
   parameters: {
     epochLength: eraSummary.parameters.epochLength,
-    slotLength: eraSummary.parameters.slotLength
+    slotLength: eraSummary.parameters.slotLength * 1000
   },
   start: {
     slot: eraSummary.start.slot,

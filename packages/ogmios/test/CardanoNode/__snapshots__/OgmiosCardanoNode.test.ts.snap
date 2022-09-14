@@ -5,7 +5,7 @@ Array [
   Object {
     "parameters": Object {
       "epochLength": 21600,
-      "slotLength": 20,
+      "slotLength": 20000,
     },
     "start": Object {
       "slot": 0,
@@ -15,7 +15,7 @@ Array [
   Object {
     "parameters": Object {
       "epochLength": 432000,
-      "slotLength": 1,
+      "slotLength": 1000,
     },
     "start": Object {
       "slot": 1598400,

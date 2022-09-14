@@ -14,7 +14,7 @@ describe('cardano node mappers', () => {
       expect(result).toEqual<EraSummary>({
         parameters: {
           epochLength: 432_000,
-          slotLength: 1
+          slotLength: 1000
         },
         start: {
           slot: 1_598_400,
