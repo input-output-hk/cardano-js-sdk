@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.5.0...@cardano-sdk/util@0.6.0-nightly.0) (2022-09-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* lift deepEquals to util package in preparation for further wallet decomposition
+* hoist hexString utils to util package
+
+### Features
+
+* **util:** typescript DeepPartial utility type ([824e7aa](https://github.com/input-output-hk/cardano-js-sdk/commit/824e7aa8906ad7c3ce5a93770ffc7ed09651da68))
+
+
+### Code Refactoring
+
+* hoist hexString utils to util package ([0c99d9d](https://github.com/input-output-hk/cardano-js-sdk/commit/0c99d9d37f23bb504d1ac2a530fbe78aa045db66))
+* lift deepEquals to util package in preparation for further wallet decomposition ([c935a77](https://github.com/input-output-hk/cardano-js-sdk/commit/c935a77c0bb895ee85b885e8da57ed7de3786e36))
+
+
+
 ## [0.5.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.4.0...@cardano-sdk/util@0.5.0) (2022-08-30)
 
 

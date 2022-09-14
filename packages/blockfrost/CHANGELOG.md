@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/blockfrost@0.5.0...@cardano-sdk/blockfrost@0.6.0-nightly.0) (2022-09-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* rework all provider signatures args from positional to a single object
+
+### Bug Fixes
+
+* remove nullability of Protocol Parameters ([f75859d](https://github.com/input-output-hk/cardano-js-sdk/commit/f75859d644c2a6c4d4844b179357ccab7db537bf))
+
+
+### Code Refactoring
+
+* rework all provider signatures args from positional to a single object ([dee30b5](https://github.com/input-output-hk/cardano-js-sdk/commit/dee30b52af5edc1241142a2c06708266a1ae7fa4))
+
+
+
 ## [0.5.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/blockfrost@0.4.0...@cardano-sdk/blockfrost@0.5.0) (2022-08-30)
 
 
