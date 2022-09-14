@@ -4,7 +4,7 @@ import { env } from '../environment';
 import { filter, firstValueFrom } from 'rxjs';
 import { getWallet } from '../../../src/factories';
 import { logger } from '@cardano-sdk/util-dev';
-import { waitForWalletStateSettle } from '../util';
+import { walletReady } from '../util';
 
 describe('SingleAddressWallet', () => {
   let wallet: ObservableWallet;
@@ -12,7 +12,8 @@ describe('SingleAddressWallet', () => {
   beforeAll(async () => {
     jest.setTimeout(180_000);
     wallet = (await getWallet({ env, logger, name: 'Test Wallet' })).wallet;
-    await waitForWalletStateSettle(wallet);
+
+    await walletReady(wallet);
   });
 
   afterAll(() => {

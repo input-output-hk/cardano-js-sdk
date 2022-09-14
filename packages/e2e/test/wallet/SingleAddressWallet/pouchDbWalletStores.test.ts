@@ -3,7 +3,7 @@ import { filter, firstValueFrom } from 'rxjs';
 import { getWallet } from '../../../src/factories';
 import { logger } from '@cardano-sdk/util-dev';
 import { storage } from '@cardano-sdk/wallet';
-import { waitForWalletStateSettle } from '../util';
+import { waitForWalletStateSettle, walletReady } from '../util';
 import delay from 'delay';
 
 describe('SingleAddressWallet/pouchDbWalletStores', () => {
@@ -16,8 +16,10 @@ describe('SingleAddressWallet/pouchDbWalletStores', () => {
 
   it('stores and restores SingleAddressWallet, continues sync after initial load', async () => {
     const wallet1 = (await getWallet({ env, logger, name: 'Test Wallet', stores: stores1 })).wallet;
+
     // wallet1 fetched all responses from wallet provider
-    await waitForWalletStateSettle(wallet1);
+    await walletReady(wallet1);
+
     // give it a second to store data to PouchDb, this is technically a race condition
     await delay(1000);
     // loading reward accounts involves loading many other pieces (transactions, stake pools etc.)

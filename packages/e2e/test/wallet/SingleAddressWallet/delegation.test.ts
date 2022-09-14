@@ -2,7 +2,7 @@
 import { Awaited } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
 import { ObservableWallet, StakeKeyStatus, buildTx } from '@cardano-sdk/wallet';
-import { TX_TIMEOUT, firstValueFromTimed, waitForWalletStateSettle } from '../util';
+import { TX_TIMEOUT, firstValueFromTimed, waitForWalletStateSettle, walletReady } from '../util';
 import { assertTxIsValid } from '../../../../wallet/test/util';
 import { env } from '../environment';
 import { getWallet } from '../../../src/factories';
@@ -84,6 +84,8 @@ describe('SingleAddressWallet/delegation', () => {
   test('balance & transaction', async () => {
     // source wallet has the highest balance to begin with
     const [sourceWallet, destWallet] = await chooseWallets();
+
+    await walletReady(sourceWallet);
 
     const protocolParameters = await firstValueFrom(sourceWallet.protocolParameters$);
     const stakeKeyDeposit = BigInt(protocolParameters.stakeKeyDeposit);
