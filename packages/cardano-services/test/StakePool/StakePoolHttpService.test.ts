@@ -149,9 +149,9 @@ describe('StakePoolHttpService', () => {
     describe('/search', () => {
       const url = '/search';
       const DB_POLL_QUERIES_COUNT = 1;
-      const cachedSubQueriesCount = 10;
-      const cacheKeysCount = 7;
-      const nonCacheableSubQueriesCount = 2; // queryTotalCount and getLastEpoch
+      const cachedSubQueriesCount = 11;
+      const cacheKeysCount = 8;
+      const nonCacheableSubQueriesCount = 1; // getLastEpoch
       const filerOnePoolOptions: QueryStakePoolsArgs = {
         filters: {
           identifier: {
