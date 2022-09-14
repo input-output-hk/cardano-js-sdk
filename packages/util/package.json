@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/util",
-  "version": "0.6.0-nightly.1",
+  "version": "0.6.0-nightly.2",
   "description": "General, not cardano-specific utils",
   "engines": {
     "node": "^14"
