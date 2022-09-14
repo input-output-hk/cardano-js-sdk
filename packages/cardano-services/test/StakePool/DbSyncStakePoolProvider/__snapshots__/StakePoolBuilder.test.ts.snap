@@ -823,7 +823,7 @@ exports[`StakePoolBuilder queryPoolAPY pagination with limit 1`] = `
 Array [
   Object {
     "apy": 0,
-    "hashId": "15",
+    "hashId": 15,
   },
 ]
 `;
@@ -832,11 +832,11 @@ exports[`StakePoolBuilder queryPoolAPY pagination with startAt 1`] = `
 Array [
   Object {
     "apy": 0,
-    "hashId": "19",
+    "hashId": 19,
   },
   Object {
     "apy": 0,
-    "hashId": "1",
+    "hashId": 1,
   },
 ]
 `;
@@ -845,11 +845,11 @@ exports[`StakePoolBuilder queryPoolAPY sort by APY asc 1`] = `
 Array [
   Object {
     "apy": 0,
-    "hashId": "1",
+    "hashId": 1,
   },
   Object {
     "apy": 0.00186615265931667,
-    "hashId": "14",
+    "hashId": 14,
   },
 ]
 `;
@@ -858,11 +858,11 @@ exports[`StakePoolBuilder queryPoolAPY sort by default sort (APY desc) 1`] = `
 Array [
   Object {
     "apy": 0.00186615265931667,
-    "hashId": "14",
+    "hashId": 14,
   },
   Object {
     "apy": 0,
-    "hashId": "1",
+    "hashId": 1,
   },
 ]
 `;
@@ -1412,68 +1412,68 @@ Array [
 exports[`StakePoolBuilder queryPoolRelays queryPoolRelays 1`] = `
 Array [
   Object {
-    "hashId": "31",
+    "hashId": 31,
     "relay": Object {
       "__typename": "RelayByName",
       "hostname": "www.test2.test",
       "port": null,
     },
-    "updateId": "355",
+    "updateId": 355,
   },
   Object {
-    "hashId": "31",
+    "hashId": 31,
     "relay": Object {
       "__typename": "RelayByNameMultihost",
       "dnsName": "www.test.test",
     },
-    "updateId": "355",
+    "updateId": 355,
   },
   Object {
-    "hashId": "31",
+    "hashId": 31,
     "relay": Object {
       "__typename": "RelayByAddress",
       "ipv4": null,
       "ipv6": "b80d:120:0:a385:2e8a:0:3473:7003",
       "port": 1234,
     },
-    "updateId": "355",
+    "updateId": 355,
   },
   Object {
-    "hashId": "31",
+    "hashId": 31,
     "relay": Object {
       "__typename": "RelayByAddress",
       "ipv4": "192.168.0.1",
       "ipv6": "b80d:120:0:a385:2e8a:0:3473:7003",
       "port": 1234,
     },
-    "updateId": "355",
+    "updateId": 355,
   },
   Object {
-    "hashId": "31",
+    "hashId": 31,
     "relay": Object {
       "__typename": "RelayByAddress",
       "ipv4": "8.8.8.8",
       "ipv6": null,
       "port": 1234,
     },
-    "updateId": "355",
+    "updateId": 355,
   },
   Object {
-    "hashId": "1",
+    "hashId": 1,
     "relay": Object {
       "__typename": "RelayByNameMultihost",
       "dnsName": "relays-new.cardano-testnet.iohkdev.io",
     },
-    "updateId": "1",
+    "updateId": 1,
   },
   Object {
-    "hashId": "19",
+    "hashId": 19,
     "relay": Object {
       "__typename": "RelayByName",
       "hostname": "pool-devtest-a.banderini.net",
       "port": null,
     },
-    "updateId": "20",
+    "updateId": 20,
   },
 ]
 `;

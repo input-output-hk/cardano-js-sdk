@@ -167,8 +167,8 @@ export const toStakePoolResults = (
 };
 
 export const mapPoolUpdate = (poolUpdateModel: PoolUpdateModel): PoolUpdate => ({
-  id: poolUpdateModel.id,
-  updateId: poolUpdateModel.update_id
+  id: Number(poolUpdateModel.id),
+  updateId: Number(poolUpdateModel.update_id)
 });
 
 const metadataKeys = new Set(['ticker', 'name', 'description', 'homepage']);
@@ -182,13 +182,13 @@ export const mapPoolData = (poolDataModel: PoolDataModel): PoolData => {
   const { n: numerator, d: denominator } = new Fraction(poolDataModel.margin);
   const toReturn: PoolData = {
     cost: BigInt(poolDataModel.fixed_cost),
-    hashId: poolDataModel.hash_id,
+    hashId: Number(poolDataModel.hash_id),
     hexId: Cardano.PoolIdHex(bufferToHexString(poolDataModel.pool_hash)),
     id: Cardano.PoolId(poolDataModel.pool_id),
     margin: { denominator, numerator },
     pledge: BigInt(poolDataModel.pledge),
     rewardAccount: Cardano.RewardAccount(poolDataModel.reward_address),
-    updateId: poolDataModel.update_id,
+    updateId: Number(poolDataModel.update_id),
     vrfKeyHash: Cardano.VrfVkHex(vrfAsHexString)
   };
   if (poolDataModel.metadata_hash) {
@@ -221,7 +221,7 @@ export const mapRelay = (relayModel: RelayModel): PoolRelay => {
       port: relayModel.port
     };
 
-  return { hashId: relayModel.hash_id, relay, updateId: relayModel.update_id };
+  return { hashId: Number(relayModel.hash_id), relay, updateId: Number(relayModel.update_id) };
 };
 
 export const mapEpoch = ({ no, pool_optimal_count }: EpochModel): Epoch => ({
@@ -243,23 +243,23 @@ export const mapEpochReward = (epochRewardModel: EpochRewardModel, hashId: numbe
 
 export const mapAddressOwner = (ownerAddressModel: OwnerAddressModel): PoolOwner => ({
   address: Cardano.RewardAccount(ownerAddressModel.address),
-  hashId: ownerAddressModel.hash_id
+  hashId: Number(ownerAddressModel.hash_id)
 });
 
 export const mapPoolRegistration = (poolRegistrationModel: PoolRegistrationModel): PoolRegistration => ({
   activeEpochNo: poolRegistrationModel.active_epoch_no,
-  hashId: poolRegistrationModel.hash_id,
+  hashId: Number(poolRegistrationModel.hash_id),
   transactionId: Cardano.TransactionId(bufferToHexString(poolRegistrationModel.tx_hash))
 });
 
 export const mapPoolRetirement = (poolRetirementModel: PoolRetirementModel): PoolRetirement => ({
-  hashId: poolRetirementModel.hash_id,
+  hashId: Number(poolRetirementModel.hash_id),
   retiringEpoch: poolRetirementModel.retiring_epoch,
   transactionId: Cardano.TransactionId(bufferToHexString(poolRetirementModel.tx_hash))
 });
 
 export const mapPoolMetrics = (poolMetricsModel: PoolMetricsModel): PoolMetrics => ({
-  hashId: poolMetricsModel.pool_hash_id,
+  hashId: Number(poolMetricsModel.pool_hash_id),
   metrics: {
     activeStake: BigInt(poolMetricsModel.active_stake),
     blocksCreated: poolMetricsModel.blocks_created,
@@ -275,5 +275,5 @@ export const mapPoolStats = (poolStats: StakePoolStatsModel): StakePoolStats => 
 
 export const mapPoolAPY = (poolAPYModel: PoolAPYModel): PoolAPY => ({
   apy: poolAPYModel.apy,
-  hashId: poolAPYModel.hash_id
+  hashId: Number(poolAPYModel.hash_id)
 });
