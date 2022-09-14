@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.3...@cardano-sdk/cardano-services@0.6.0-nightly.4) (2022-09-14)
+
+
+### Bug Fixes
+
+* **cardano-services:** handle CardanoTokenRegistry errors ([32a9b1f](https://github.com/input-output-hk/cardano-js-sdk/commit/32a9b1f4714cd556ef3bf2597b52a4d481efcc58))
+
+
+
 ## [0.6.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.2...@cardano-sdk/cardano-services@0.6.0-nightly.3) (2022-09-13)
 
 

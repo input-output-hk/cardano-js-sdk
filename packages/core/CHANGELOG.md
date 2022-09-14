@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0-nightly.2...@cardano-sdk/core@0.6.0-nightly.3) (2022-09-14)
+
+
+### Bug Fixes
+
+* **core:** narrow down BootstrapWitness types & fix CSL conversion ([0e8694b](https://github.com/input-output-hk/cardano-js-sdk/commit/0e8694b6e2b99d09ce8696ca2b88234e78381458))
+
+
+
 ## [0.6.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0-nightly.1...@cardano-sdk/core@0.6.0-nightly.2) (2022-09-13)
 
 
