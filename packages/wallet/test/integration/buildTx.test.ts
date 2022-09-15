@@ -15,6 +15,7 @@ import {
   OutputValidationTokenBundleSizeError,
   OutputValidator,
   StakeKeyStatus,
+  TxAlreadySubmittedError,
   TxBuilder,
   TxOutputFailure,
   buildTx
@@ -459,6 +460,106 @@ describe('buildTx', () => {
     });
   });
 
+  describe('after sign and submit', () => {
+    beforeEach(async () => {
+      const tx = await txBuilder.addOutput(mocks.utxo[0][1]).build();
+      assertTxIsValid(tx);
+      await (await tx.sign()).submit();
+    });
+
+    it('cannot rebuild', async () => {
+      expect(txBuilder.isSubmitted()).toBeTruthy();
+      const tx = await txBuilder.build();
+      expect(tx.isValid).toBeFalsy();
+      if (!tx.isValid) {
+        expect(tx.errors[0] instanceof TxAlreadySubmittedError).toBeTruthy();
+      }
+    });
+
+    it('can rebuild when submit is not successful', async () => {
+      const txBuilder2 = buildTx({ logger, observableWallet });
+      observableWallet.submitTx = jest.fn().mockRejectedValue(null);
+      const tx = await txBuilder2.addOutput(mocks.utxo[1][1]).build();
+      assertTxIsValid(tx);
+
+      // submit fails
+      await expect((await tx.sign()).submit()).rejects.toBe(null);
+      expect(txBuilder2.isSubmitted()).toBeFalsy();
+
+      // can rebuild because submit was not successful
+      const tx2 = await txBuilder2.build();
+      assertTxIsValid(tx2);
+    });
+  });
+
+  describe('error handling', () => {
+    it('can validate multiple outputs before building', async () => {
+      const coinMissingValidation: OutputValidation = {
+        coinMissing: 1n,
+        minimumCoin: 2n,
+        tokenBundleSizeExceedsLimit: false
+      };
+
+      const bundleSizeValidation: OutputValidation = {
+        coinMissing: 0n,
+        minimumCoin: 2n,
+        tokenBundleSizeExceedsLimit: true
+      };
+
+      const mockValidator: OutputValidator = {
+        validateOutput: jest
+          .fn()
+          .mockResolvedValueOnce(coinMissingValidation)
+          .mockResolvedValueOnce(bundleSizeValidation),
+        validateOutputs: jest.fn(),
+        validateValue: jest.fn(),
+        validateValues: jest.fn()
+      };
+      const builder = buildTx({ logger, observableWallet, outputValidator: mockValidator }).addOutput(output);
+      const tx = await builder.addOutput(builder.buildOutput(output2).toTxOut()).build();
+
+      expect(tx.isValid).toBeFalsy();
+      const [error1, error2] = (!tx.isValid && tx.errors) || [];
+
+      expect(error1 instanceof OutputValidationMinimumCoinError).toBeTruthy();
+      if (error1 instanceof OutputValidationMinimumCoinError) {
+        expect(error1.message === TxOutputFailure.MinimumCoin);
+        expect(error1.outputValidation).toEqual(coinMissingValidation);
+        expect(error1.txOut).toEqual(output);
+      }
+
+      expect(error2 instanceof OutputValidationTokenBundleSizeError).toBeTruthy();
+      if (error2 instanceof OutputValidationTokenBundleSizeError) {
+        expect(error2.message === TxOutputFailure.TokenBundleSizeExceedsLimit);
+        expect(error2.outputValidation).toEqual(bundleSizeValidation);
+        expect(error2.txOut).toEqual(output2);
+      }
+    });
+
+    it('rejects if error is encountered during transaction finalization', async () => {
+      const signError = new Error('oh no, signing error');
+
+      const builtTx = await buildTx({ logger, observableWallet }).addOutput(output).build();
+      assertTxIsValid(builtTx);
+
+      observableWallet.finalizeTx = jest.fn().mockRejectedValue(signError);
+
+      await expect(builtTx.sign()).rejects.toBe(signError);
+    });
+
+    it('rejects if error is encountered during submission', async () => {
+      const submitErr = new Cardano.TxSubmissionErrors.AlreadyDelegatingError({
+        alreadyDelegating: 'that is just terrible'
+      });
+      observableWallet.submitTx = jest.fn().mockRejectedValue(submitErr);
+
+      const builtTx = await buildTx({ logger, observableWallet }).addOutput(output).build();
+      assertTxIsValid(builtTx);
+      const signedTx = await builtTx.sign();
+      await expect(signedTx.submit()).rejects.toBe(submitErr);
+    });
+  });
+
   it('can be used to build, sign and submit a tx', async () => {
     const tx = await buildTx({ logger, observableWallet }).addOutput(mocks.utxo[0][1]).build();
     if (tx.isValid) {
@@ -480,48 +581,5 @@ describe('buildTx', () => {
     // First built output was not affected by second build() call
     const outputWithoutChange = builtTxSnapshot1.body.outputs[0];
     expect(outputWithoutChange).toEqual(mocks.utxo[0][1]);
-  });
-
-  it('can validate multiple outputs before building', async () => {
-    const coinMissingValidation: OutputValidation = {
-      coinMissing: 1n,
-      minimumCoin: 2n,
-      tokenBundleSizeExceedsLimit: false
-    };
-
-    const bundleSizeValidation: OutputValidation = {
-      coinMissing: 0n,
-      minimumCoin: 2n,
-      tokenBundleSizeExceedsLimit: true
-    };
-
-    const mockValidator: OutputValidator = {
-      validateOutput: jest
-        .fn()
-        .mockResolvedValueOnce(coinMissingValidation)
-        .mockResolvedValueOnce(bundleSizeValidation),
-      validateOutputs: jest.fn(),
-      validateValue: jest.fn(),
-      validateValues: jest.fn()
-    };
-    const builder = buildTx({ logger, observableWallet, outputValidator: mockValidator }).addOutput(output);
-    const tx = await builder.addOutput(builder.buildOutput(output2).toTxOut()).build();
-
-    expect(tx.isValid).toBeFalsy();
-    const [error1, error2] = (!tx.isValid && tx.errors) || [];
-
-    expect(error1 instanceof OutputValidationMinimumCoinError).toBeTruthy();
-    if (error1 instanceof OutputValidationMinimumCoinError) {
-      expect(error1.message === TxOutputFailure.MinimumCoin);
-      expect(error1.outputValidation).toEqual(coinMissingValidation);
-      expect(error1.txOut).toEqual(output);
-    }
-
-    expect(error2 instanceof OutputValidationTokenBundleSizeError).toBeTruthy();
-    if (error2 instanceof OutputValidationTokenBundleSizeError) {
-      expect(error2.message === TxOutputFailure.TokenBundleSizeExceedsLimit);
-      expect(error2.outputValidation).toEqual(bundleSizeValidation);
-      expect(error2.txOut).toEqual(output2);
-    }
   });
 });
