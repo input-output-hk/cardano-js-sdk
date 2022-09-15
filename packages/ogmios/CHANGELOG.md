@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.6.0-nightly.4...@cardano-sdk/ogmios@0.6.0-nightly.5) (2022-09-15)
+
+
+### Bug Fixes
+
+* **ogmios:** correctly map era summary slotLength ([b3be517](https://github.com/input-output-hk/cardano-js-sdk/commit/b3be5174ca7759c76d64a4923efc5c004275e8df))
+
+
+
 ## [0.6.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.5.0...@cardano-sdk/ogmios@0.6.0-nightly.4) (2022-09-14)
 
 
