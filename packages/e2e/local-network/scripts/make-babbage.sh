@@ -165,7 +165,7 @@ $SED -i "${ROOT}/genesis/shelley/genesis.json" \
     -e 's/"slotLength": 1/"slotLength": 0.1/' \
     -e 's/"activeSlotsCoeff": 5.0e-2/"activeSlotsCoeff": 0.1/' \
     -e 's/"securityParam": 2160/"securityParam": 10/' \
-    -e 's/"epochLength": 432000/"epochLength": 100/' \
+    -e 's/"epochLength": 432000/"epochLength": 500/' \
     -e "s/\"maxLovelaceSupply\": 0/\"maxLovelaceSupply\": ${MAX_SUPPLY}/" \
     -e 's/"minFeeA": 1/"minFeeA": 44/' \
     -e 's/"minFeeB": 0/"minFeeB": 155381/' \
