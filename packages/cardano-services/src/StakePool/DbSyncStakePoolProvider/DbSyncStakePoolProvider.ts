@@ -77,9 +77,9 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
     const sortType = options?.sort?.field ? getStakePoolSortType(options.sort.field) : 'data';
     const orderedResult = await this.getQueryBySortType(sortType, { hashesIds, totalAdaAmount, updatesIds })(options);
     const orderedResultHashIds = (orderedResult as CommonPoolInfo[]).map(({ hashId }) => hashId);
-    const orderedResultUpdateIds = poolUpdates
-      .filter(({ id }) => orderedResultHashIds.includes(id))
-      .map(({ updateId }) => updateId);
+    const orderedResultUpdateIds = orderedResultHashIds.map(
+      (id) => poolUpdates[poolUpdates.findIndex((item) => item.id === id)].updateId
+    );
 
     let poolDatas: PoolData[] = [];
     if (sortType !== 'data') {
@@ -146,21 +146,28 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
     const poolUpdates = await this.#cache.get(queryCacheKey(StakePoolsSubQuery.POOL_HASHES, options), () =>
       this.#builder.queryPoolHashes(query, params)
     );
-    // Get pool total amount of ada
+
+    // Get total amount of ada cached
     const totalAdaAmount = await this.#cache.get(queryCacheKey(StakePoolsSubQuery.TOTAL_ADA_AMOUNT), () =>
       this.#builder.getTotalAmountOfAda()
     );
-    // Get pool total stake pools count
-    const totalCount = await this.#builder.queryTotalCount(query, params);
+
+    // Get total stake pools count cached
+    const totalCount = await this.#cache.get(queryCacheKey(StakePoolsSubQuery.TOTAL_POOLS_COUNT, options), () =>
+      this.#builder.queryTotalCount(query, params)
+    );
+
     // Get last epoch data
     const lastEpoch = await this.#builder.getLastEpochWithData();
     const { poolOptimalCount, no: lastEpochNo } = lastEpoch;
-    // Get stake pools data
+
+    // Get stake pools data cached
     const { orderedResultHashIds, orderedResultUpdateIds, orderedResult, poolDatas, hashesIds, sortType } =
       await this.#cache.get(queryCacheKey(StakePoolsSubQuery.POOLS_DATA_ORDERED, options), () =>
         this.getPoolsDataOrdered(poolUpdates, totalAdaAmount, options)
       );
-    // Get stake pools APYs
+
+    // Get stake pools APYs cached
     const poolAPYs =
       sortType === 'apy'
         ? (orderedResult as PoolAPY[])
@@ -168,9 +175,10 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
             this.#builder.queryPoolAPY(hashesIds, { rewardsHistoryLimit: options?.rewardsHistoryLimit })
           );
 
-    // Get pools' stake distribution
+    // Get stake pools distribution cached
     const stakeDistribution = await this.#cache.get(LIVE_STAKE_CACHE_KEY, () => this.#cardanoNode.stakeDistribution());
 
+    // Get stake pools rewards cached
     const poolRewards = await this.#cache.get(
       queryCacheKey(StakePoolsSubQuery.REWARDS, orderedResultHashIds, options),
       () => this.#builder.queryPoolRewards(orderedResultHashIds, options?.rewardsHistoryLimit),

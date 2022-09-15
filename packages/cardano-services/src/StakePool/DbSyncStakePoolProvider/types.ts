@@ -1,7 +1,7 @@
 import { Cardano, StakePoolSearchResults } from '@cardano-sdk/core';
 export interface PoolUpdateModel {
-  id: number; // pool hash id
-  update_id: number;
+  id: string; // pool hash id
+  update_id: string;
 }
 
 export interface PoolUpdate {
@@ -27,8 +27,8 @@ export interface PoolData extends CommonPoolInfo {
 }
 
 export interface PoolDataModel {
-  hash_id: number;
-  update_id: number;
+  hash_id: string;
+  update_id: string;
   pool_id: string;
   reward_address: string;
   pledge: string;
@@ -43,8 +43,8 @@ export interface PoolDataModel {
 }
 
 export interface RelayModel {
-  hash_id: number;
-  update_id: number;
+  hash_id: string;
+  update_id: string;
   ipv4?: string;
   ipv6?: string;
   port?: number;
@@ -78,12 +78,12 @@ export interface EpochRewardModel {
 
 export interface OwnerAddressModel {
   address: string;
-  hash_id: number;
+  hash_id: string;
 }
 
 interface PoolTransactionModel {
   tx_hash: Buffer;
-  hash_id: number;
+  hash_id: string;
 }
 
 interface PoolTransaction extends CommonPoolInfo {
@@ -133,7 +133,7 @@ export interface PoolMetricsModel {
   saturation: number;
   active_stake_percentage: number;
   live_stake_percentage: number;
-  pool_hash_id: number;
+  pool_hash_id: string;
 }
 
 export interface PoolMetrics extends CommonPoolInfo {
@@ -157,7 +157,7 @@ export interface StakePoolStatsModel {
 }
 
 export interface PoolAPYModel {
-  hash_id: number;
+  hash_id: string;
   apy: number;
 }
 

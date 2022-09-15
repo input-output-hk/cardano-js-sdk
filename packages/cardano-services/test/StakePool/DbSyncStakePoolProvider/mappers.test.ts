@@ -27,8 +27,10 @@ describe('mappers', () => {
     name: 'THE AMSTERDAM NODE',
     ticker: 'AMS'
   };
-  const update_id = 1;
-  const hash_id = 1;
+  const update_id = '1';
+  const hash_id = '1';
+  const hashId = 1;
+
   const poolRetirementModel = {
     hash_id,
     retiring_epoch: 20,
@@ -63,7 +65,7 @@ describe('mappers', () => {
   };
   const poolUpdateModel = {
     id: hash_id,
-    update_id: 1
+    update_id: '1'
   };
   const poolDataModel = {
     fixed_cost: '400000000',
@@ -109,7 +111,7 @@ describe('mappers', () => {
   };
   it('mapPoolRetirement', () => {
     expect(mapPoolRetirement(poolRetirementModel)).toEqual({
-      hashId: poolRetirementModel.hash_id,
+      hashId: Number(poolRetirementModel.hash_id),
       retiringEpoch: poolRetirementModel.retiring_epoch,
       transactionId: Cardano.TransactionId(txHash)
     });
@@ -117,31 +119,31 @@ describe('mappers', () => {
   it('mapPoolRegistration', () => {
     expect(mapPoolRegistration(poolRegistrationModel)).toEqual({
       activeEpochNo: poolRegistrationModel.active_epoch_no,
-      hashId: poolRegistrationModel.hash_id,
+      hashId: Number(poolRegistrationModel.hash_id),
       transactionId: Cardano.TransactionId(txHash)
     });
   });
   it('mapRelay', () => {
     expect(mapRelay(poolRelayByName)).toEqual({
-      hashId: hash_id,
+      hashId: Number(hash_id),
       relay: { __typename: 'RelayByName', hostname: poolRelayByName.hostname, port: poolRelayByName.port },
-      updateId: update_id
+      updateId: Number(update_id)
     });
     expect(mapRelay(poolRelayByNameMultiHost)).toEqual({
-      hashId: hash_id,
+      hashId: Number(hash_id),
       relay: { __typename: 'RelayByNameMultihost', dnsName: poolRelayByNameMultiHost.dns_name },
-      updateId: update_id
+      updateId: Number(update_id)
     });
     expect(mapRelay(poolRelayByAddress)).toEqual({
-      hashId: hash_id,
+      hashId: Number(hash_id),
       relay: { __typename: 'RelayByAddress', ipv4: poolRelayByAddress.ipv4, port: poolRelayByAddress.port },
-      updateId: update_id
+      updateId: Number(update_id)
     });
   });
   it('mapPoolData', () => {
     expect(mapPoolData(poolDataModel)).toEqual({
       cost: BigInt(poolDataModel.fixed_cost),
-      hashId: poolDataModel.hash_id,
+      hashId: Number(poolDataModel.hash_id),
       hexId: Cardano.PoolIdHex(poolHashAsHex),
       id: Cardano.PoolId(poolDataModel.pool_id),
       margin: { denominator: 10_000, numerator: 1 },
@@ -152,24 +154,24 @@ describe('mappers', () => {
       },
       pledge: BigInt(poolDataModel.pledge),
       rewardAccount: Cardano.RewardAccount(poolDataModel.reward_address),
-      updateId: poolDataModel.update_id,
+      updateId: Number(poolDataModel.update_id),
       vrfKeyHash: Cardano.VrfVkHex(vrfKeyHash)
     });
   });
   it('mapPoolUpdate', () => {
     expect(mapPoolUpdate(poolUpdateModel)).toEqual({
-      id: poolUpdateModel.id,
-      updateId: poolUpdateModel.update_id
+      id: Number(poolUpdateModel.id),
+      updateId: Number(poolUpdateModel.update_id)
     });
   });
   it('mapAddressOwner', () => {
     expect(mapAddressOwner(addressOwnerModel)).toEqual({
       address: Cardano.RewardAccount(addressOwnerModel.address),
-      hashId: addressOwnerModel.hash_id
+      hashId: Number(addressOwnerModel.hash_id)
     });
   });
   it('mapEpochReward', () => {
-    expect(mapEpochReward(epochRewardModel, hash_id)).toEqual({
+    expect(mapEpochReward(epochRewardModel, hashId)).toEqual({
       epochReward: {
         activeStake: BigInt(epochRewardModel.active_stake),
         epoch: epochRewardModel.epoch_no,
@@ -178,12 +180,12 @@ describe('mappers', () => {
         operatorFees: BigInt(epochRewardModel.operator_fees),
         totalRewards: BigInt(epochRewardModel.total_rewards)
       },
-      hashId: hash_id
+      hashId
     });
   });
   it('mapPoolMetrics', () => {
     expect(mapPoolMetrics(poolMetricsModel)).toEqual({
-      hashId: poolMetricsModel.pool_hash_id,
+      hashId: Number(poolMetricsModel.pool_hash_id),
       metrics: {
         activeStake: BigInt(poolMetricsModel.active_stake),
         blocksCreated: poolMetricsModel.blocks_created,
@@ -196,7 +198,7 @@ describe('mappers', () => {
   it('mapPoolAPY', () => {
     expect(mapPoolAPY(poolAPYModel)).toEqual({
       apy: poolAPYModel.apy,
-      hashId: poolAPYModel.hash_id
+      hashId
     });
   });
   it('calcNodeMetricsValues', () => {
@@ -231,7 +233,7 @@ describe('mappers', () => {
     const poolRegistrations = [mapPoolRegistration(poolRegistrationModel)];
     const poolRelays = [mapRelay(poolRelayByAddress)];
     const poolRetirements = [mapPoolRetirement(poolRetirementModel)];
-    const poolRewards = [mapEpochReward(epochRewardModel, hash_id)];
+    const poolRewards = [mapEpochReward(epochRewardModel, hashId)];
     const partialMetrics = [mapPoolMetrics(poolMetricsModel)];
     const poolAPYs = [mapPoolAPY(poolAPYModel)];
     const poolMetrics = calcNodeMetricsValues(
@@ -265,7 +267,7 @@ describe('mappers', () => {
 
     it('toStakePoolResults with retiring status', () => {
       expect(
-        toStakePoolResults([poolDataModel.hash_id], fromCache, {
+        toStakePoolResults([hashId], fromCache, {
           lastEpochNo: poolRetirementModel.retiring_epoch - 1,
           nodeMetricsDependencies,
           poolAPYs,
@@ -279,7 +281,7 @@ describe('mappers', () => {
           totalCount
         })
       ).toStrictEqual({
-        poolsToCache: { [poolDataModel.hash_id]: stakePool },
+        poolsToCache: { [hashId]: stakePool },
         results: { pageResults: [stakePool], totalResultCount: totalCount }
       });
     });
@@ -288,7 +290,7 @@ describe('mappers', () => {
       const stakePoolRetired = { ...stakePool, status: Cardano.StakePoolStatus.Retired };
 
       expect(
-        toStakePoolResults([poolDataModel.hash_id], fromCache, {
+        toStakePoolResults([hashId], fromCache, {
           lastEpochNo: poolRetirementModel.retiring_epoch + 1,
           nodeMetricsDependencies,
           poolAPYs,
@@ -323,7 +325,7 @@ describe('mappers', () => {
       };
 
       expect(
-        toStakePoolResults([poolDataModel.hash_id], fromCache, {
+        toStakePoolResults([hashId], fromCache, {
           lastEpochNo: poolRegistrationModel.active_epoch_no - 1,
           nodeMetricsDependencies,
           poolAPYs,
@@ -337,7 +339,7 @@ describe('mappers', () => {
           totalCount
         })
       ).toEqual({
-        poolsToCache: { [poolDataModel.hash_id]: stakePoolActivating },
+        poolsToCache: { [hashId]: stakePoolActivating },
         results: {
           pageResults: [stakePoolActivating],
           totalResultCount: totalCount
@@ -358,7 +360,7 @@ describe('mappers', () => {
       };
 
       expect(
-        toStakePoolResults([poolDataModel.hash_id], fromCache, {
+        toStakePoolResults([hashId], fromCache, {
           lastEpochNo: poolRegistrationModel.active_epoch_no,
           nodeMetricsDependencies,
           poolAPYs,
@@ -372,7 +374,7 @@ describe('mappers', () => {
           totalCount
         })
       ).toEqual({
-        poolsToCache: { [poolDataModel.hash_id]: stakePoolActive },
+        poolsToCache: { [hashId]: stakePoolActive },
         results: {
           pageResults: [stakePoolActive],
           totalResultCount: totalCount
@@ -383,8 +385,8 @@ describe('mappers', () => {
     it('toStakePoolResults with cached pool', () => {
       expect(
         toStakePoolResults(
-          [poolDataModel.hash_id],
-          { [poolDataModel.hash_id]: stakePool },
+          [hashId],
+          { [hashId]: stakePool },
           {
             lastEpochNo: poolRetirementModel.retiring_epoch - 1,
             nodeMetricsDependencies,
