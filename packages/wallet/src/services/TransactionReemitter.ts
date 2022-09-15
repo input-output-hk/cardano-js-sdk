@@ -1,4 +1,4 @@
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, calculateStabilityWindowSlotsCount } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { Observable, filter, from, map, merge, mergeMap, scan, tap, withLatestFrom } from 'rxjs';
 
@@ -24,7 +24,7 @@ interface TransactionReemitterProps {
   submitting$: Observable<Cardano.NewTxAlonzo>;
   store: DocumentStore<NewTxAlonzoWithSlot[]>;
   tipSlot$: Observable<Cardano.Slot>;
-  stabilityWindowSlotsCount?: number;
+  genesisParameters$: Observable<Pick<Cardano.CompactGenesis, 'securityParameter' | 'activeSlotsCoefficient'>>;
   logger: Logger;
 }
 
@@ -34,17 +34,13 @@ enum txSource {
   submitting
 }
 
-// 3k/f (where k is the security parameter in genesis, and f is the active slot co-efficient parameter
-// in genesis that determines the probability for amount of blocks created in an epoch.)
-const kStabilityWindowSlotsCount = 129_600; // 3k/f on current mainnet
-
 export const createTransactionReemitter = ({
   rollback$,
   confirmed$,
   submitting$,
   store,
   tipSlot$,
-  stabilityWindowSlotsCount = kStabilityWindowSlotsCount,
+  genesisParameters$,
   logger
 }: TransactionReemitterProps): Observable<Cardano.NewTxAlonzo> => {
   const volatileTransactions$ = merge(
@@ -56,7 +52,15 @@ export const createTransactionReemitter = ({
     confirmed$.pipe(map((tx) => ({ source: txSource.confirmed, tx }))),
     submitting$.pipe(map((tx) => ({ source: txSource.submitting, tx: { ...tx, slot: null! } })))
   ).pipe(
-    scan((volatiles, { tx, source }) => {
+    mergeMap((vt) =>
+      genesisParameters$.pipe(
+        map(({ securityParameter, activeSlotsCoefficient }) =>
+          calculateStabilityWindowSlotsCount({ activeSlotsCoefficient, securityParameter })
+        ),
+        map((sw) => ({ sw, vt }))
+      )
+    ),
+    scan((volatiles, { vt: { tx, source }, sw: stabilityWindowSlotsCount }) => {
       switch (source) {
         case txSource.store: {
           // Do not calculate stability window for old transactions coming from the store

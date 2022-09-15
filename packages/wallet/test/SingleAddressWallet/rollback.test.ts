@@ -115,7 +115,7 @@ const tx: Cardano.NewTxAlonzo = {
 };
 
 describe('SingleAddressWallet rollback', () => {
-  it('Rollback transaction is resubmitteed', async () => {
+  it('Rollback transaction is resubmitted', async () => {
     const stores = createInMemoryWalletStores();
     const rewardsProvider = mocks.mockRewardsProvider();
     const networkInfoProvider = mocks.mockNetworkInfoProvider();

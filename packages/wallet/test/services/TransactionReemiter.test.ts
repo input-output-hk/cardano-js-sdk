@@ -3,6 +3,7 @@ import { InMemoryVolatileTransactionsStore, WalletStores } from '../../src/persi
 import { Logger, dummyLogger } from 'ts-log';
 import { NewTxAlonzoWithSlot, TransactionReemitErrorCode, createTransactionReemitter } from '../../src';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
+import { genesisParameters } from '../mocks';
 
 describe('TransactionReemiter', () => {
   let store: WalletStores['volatileTransactions'];
@@ -42,11 +43,13 @@ describe('TransactionReemiter', () => {
     createTestScheduler().run(({ hot, cold, expectObservable }) => {
       store.get = jest.fn(() => cold('a|', { a: [storeTransaction] }));
       const tipSlot$ = hot<Cardano.Slot>('-|');
+      const genesisParameters$ = cold<Cardano.CompactGenesis>('-|');
       const confirmed$ = cold<NewTxAlonzoWithSlot>('-|');
       const rollback$ = cold<Cardano.TxAlonzo>('-|');
       const submitting$ = cold<NewTxAlonzoWithSlot>('-|');
       const transactionReemiter = createTransactionReemitter({
         confirmed$,
+        genesisParameters$,
         logger,
         rollback$,
         store,
@@ -63,19 +66,21 @@ describe('TransactionReemiter', () => {
     const storeTransaction = volatileTransactions[0];
     createTestScheduler().run(({ hot, cold, expectObservable }) => {
       store.get = jest.fn(() => cold('a|', { a: [storeTransaction] }));
-      const tipSlot$ = hot<Cardano.Slot>('-|');
-      const confirmed$ = cold<NewTxAlonzoWithSlot>('-bc|', { b: volatileTransactions[1], c: volatileTransactions[2] });
-      const rollback$ = cold<Cardano.TxAlonzo>('--|');
-      const submitting$ = cold<NewTxAlonzoWithSlot>('--|');
+      const tipSlot$ = hot<Cardano.Slot>('----|');
+      const genesisParameters$ = cold<Cardano.CompactGenesis>('a---|', { a: genesisParameters });
+      const confirmed$ = cold<NewTxAlonzoWithSlot>('-b-c|', { b: volatileTransactions[1], c: volatileTransactions[2] });
+      const rollback$ = cold<Cardano.TxAlonzo>('----|');
+      const submitting$ = cold<NewTxAlonzoWithSlot>('----|');
       const transactionReemiter = createTransactionReemitter({
         confirmed$,
+        genesisParameters$,
         logger,
         rollback$,
         store,
         submitting$,
         tipSlot$
       });
-      expectObservable(transactionReemiter).toBe('--|');
+      expectObservable(transactionReemiter).toBe('----|');
     });
     expect(store.set).toHaveBeenCalledTimes(2);
     expect(store.set).toHaveBeenLastCalledWith(volatileTransactions.slice(0, 3));
@@ -86,11 +91,13 @@ describe('TransactionReemiter', () => {
     createTestScheduler().run(({ hot, cold, expectObservable }) => {
       store.get = jest.fn(() => cold('a|', { a: storeTransaction }));
       const tipSlot$ = hot<Cardano.Slot>('--|');
+      const genesisParameters$ = cold<Cardano.CompactGenesis>('a-|', { a: genesisParameters });
       const confirmed$ = cold<NewTxAlonzoWithSlot>('--|');
       const rollback$ = cold<Cardano.TxAlonzo>('--|');
       const submitting$ = cold<NewTxAlonzoWithSlot>('-b|', { b: volatileTransactions[0] });
       const transactionReemiter = createTransactionReemitter({
         confirmed$,
+        genesisParameters$,
         logger,
         rollback$,
         store,
@@ -107,6 +114,9 @@ describe('TransactionReemiter', () => {
     const [volatileSlot100, volatileSlot200, volatileSlot300] = volatileTransactions;
     createTestScheduler().run(({ hot, cold, expectObservable }) => {
       const tipSlot$ = hot<Cardano.Slot>('---|');
+      const genesisParameters$ = cold<Cardano.CompactGenesis>('a--|', {
+        a: { ...genesisParameters, activeSlotsCoefficient: 33 }
+      });
       const confirmed$ = cold<NewTxAlonzoWithSlot>('abc|', {
         a: volatileSlot100,
         b: volatileSlot200,
@@ -116,9 +126,9 @@ describe('TransactionReemiter', () => {
       const submitting$ = cold<NewTxAlonzoWithSlot>('---|');
       const transactionReemiter = createTransactionReemitter({
         confirmed$,
+        genesisParameters$,
         logger,
         rollback$,
-        stabilityWindowSlotsCount: 200,
         store,
         submitting$,
         tipSlot$
@@ -144,6 +154,7 @@ describe('TransactionReemiter', () => {
 
     createTestScheduler().run(({ hot, cold, expectObservable }) => {
       const tipSlot$ = hot<Cardano.Slot>('x--------|', { x: LAST_TIP_SLOT });
+      const genesisParameters$ = cold<Cardano.CompactGenesis>('a--------|', { a: genesisParameters });
       const confirmed$ = cold<NewTxAlonzoWithSlot>('a-b-c-d--|', {
         a: volatileA,
         b: volatileB,
@@ -154,6 +165,7 @@ describe('TransactionReemiter', () => {
       const submitting$ = cold<NewTxAlonzoWithSlot>('---------|');
       const transactionReemiter = createTransactionReemitter({
         confirmed$,
+        genesisParameters$,
         logger,
         rollback$,
         store,
@@ -175,6 +187,7 @@ describe('TransactionReemiter', () => {
 
     createTestScheduler().run(({ hot, cold, expectObservable }) => {
       const tipSlot$ = hot<Cardano.Slot>('x--|', { x: 300 });
+      const genesisParameters$ = cold<Cardano.CompactGenesis>('a--|', { a: genesisParameters });
       const confirmed$ = cold<NewTxAlonzoWithSlot>('ab-|', {
         a: volatileA,
         b: volatileB
@@ -183,6 +196,7 @@ describe('TransactionReemiter', () => {
       const submitting$ = cold<NewTxAlonzoWithSlot>('---|');
       const transactionReemiter = createTransactionReemitter({
         confirmed$,
+        genesisParameters$,
         logger,
         rollback$,
         store,
