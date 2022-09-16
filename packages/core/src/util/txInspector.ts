@@ -1,21 +1,27 @@
 import {
   Address,
+  AssetFingerprint,
+  AssetName,
   Certificate,
   CertificateType,
   Ed25519KeyHash,
   Lovelace,
+  PolicyId,
   RewardAccount,
+  Script,
+  ScriptType,
   StakeAddressCertificate,
   StakeDelegationCertificate,
   TokenMap,
   TxAlonzo,
   TxIn,
-  Value
+  Value,
+  nativeScriptPolicyId,
+  util
 } from '../Cardano';
 import { BigIntMath } from '@cardano-sdk/util';
-import { coalesceValueQuantities, resolveInputValue, subtractValueQuantities } from '../Cardano/util';
+import { assetNameFromAssetId, policyIdFromAssetId, removeNegativesFromTokenMap } from '../Asset/util';
 import { inputsWithAddresses, isAddressWithin } from '../Address/util';
-import { removeNegativesFromTokenMap } from '../Asset/util';
 
 type Inspector<Inspection> = (tx: TxAlonzo) => Inspection;
 type Inspectors = { [k: string]: Inspector<unknown> };
@@ -33,6 +39,16 @@ export interface SentInspection {
   certificates: Certificate[];
 }
 export type SignedCertificatesInspection = Certificate[];
+
+export interface MintedAsset {
+  script?: Script;
+  policyId: PolicyId;
+  fingerprint: AssetFingerprint;
+  assetName: AssetName;
+  quantity: bigint;
+}
+
+export type AssetsMintedInspection = MintedAsset[];
 
 // Inspector types
 interface SentInspectorArgs {
@@ -52,6 +68,7 @@ export type SignedCertificatesInspector = (
   rewardAccounts: RewardAccount[],
   certificateTypes?: CertificateType[]
 ) => Inspector<SignedCertificatesInspection>;
+export type AssetsMintedInspector = Inspector<AssetsMintedInspection>;
 
 /**
  * Inspects a transaction for values (coins + assets) in inputs
@@ -65,10 +82,10 @@ export const totalAddressInputsValueInspector: TotalAddressInputsValueInspector 
   (ownAddresses, getHistoricalTxs) => (tx) => {
     const receivedInputs = tx.body.inputs.filter((input) => isAddressWithin(ownAddresses)(input));
     const receivedInputsValues = receivedInputs
-      .map((input) => resolveInputValue(input, getHistoricalTxs()))
+      .map((input) => util.resolveInputValue(input, getHistoricalTxs()))
       .filter((value): value is Value => !!value);
 
-    return coalesceValueQuantities(receivedInputsValues);
+    return util.coalesceValueQuantities(receivedInputsValues);
   };
 
 /**
@@ -80,7 +97,7 @@ export const totalAddressInputsValueInspector: TotalAddressInputsValueInspector 
  */
 export const totalAddressOutputsValueInspector: SendReceiveValueInspector = (ownAddresses) => (tx) => {
   const receivedOutputs = tx.body.outputs.filter((out) => isAddressWithin(ownAddresses)(out));
-  return coalesceValueQuantities(receivedOutputs.map((output) => output.value));
+  return util.coalesceValueQuantities(receivedOutputs.map((output) => output.value));
 };
 
 /**
@@ -91,7 +108,7 @@ export const totalAddressOutputsValueInspector: SendReceiveValueInspector = (own
  * @param {CertificateType[]} [certificateTypes] certificates of these types will be checked. All if not provided
  */
 export const signedCertificatesInspector: SignedCertificatesInspector =
-  (rewardAccounts: RewardAccount[], certificateTypes?: CertificateType[]) => (tx: TxAlonzo) => {
+  (rewardAccounts: RewardAccount[], certificateTypes?: CertificateType[]) => (tx) => {
     if (!tx.body.certificates || tx.body.certificates.length === 0) return [];
     const stakeKeyHashes = rewardAccounts?.map((account) => Ed25519KeyHash.fromRewardAccount(account));
     const certificates = certificateTypes
@@ -115,7 +132,7 @@ export const signedCertificatesInspector: SignedCertificatesInspector =
  */
 export const sentInspector: SentInspector =
   ({ addresses, rewardAccounts }) =>
-  (tx: TxAlonzo) => ({
+  (tx) => ({
     certificates: rewardAccounts?.length ? signedCertificatesInspector(rewardAccounts)(tx) : [],
     inputs: addresses?.length ? inputsWithAddresses(tx, addresses) : []
   });
@@ -124,6 +141,7 @@ export const sentInspector: SentInspector =
  * Inspects a transaction for net value (coins + assets) sent by the provided addresses.
  *
  * @param {Address[]} ownAddresses own wallet's addresses
+ * @param historicalTxs A list of historical transaction
  * @returns {Value} net value sent
  */
 export const valueSentInspector: TotalAddressInputsValueInspector = (ownAddresses, historicalTxs) => (tx) => {
@@ -131,7 +149,7 @@ export const valueSentInspector: TotalAddressInputsValueInspector = (ownAddresse
   if (sentInspector({ addresses: ownAddresses })(tx).inputs.length === 0) return { coins: 0n };
   const totalOutputValue = totalAddressOutputsValueInspector(ownAddresses)(tx);
   const totalInputValue = totalAddressInputsValueInspector(ownAddresses, historicalTxs)(tx);
-  const diff = subtractValueQuantities([totalInputValue, totalOutputValue]);
+  const diff = util.subtractValueQuantities([totalInputValue, totalOutputValue]);
 
   if (diff.assets) assets = removeNegativesFromTokenMap(diff.assets);
   return {
@@ -144,13 +162,14 @@ export const valueSentInspector: TotalAddressInputsValueInspector = (ownAddresse
  * Inspects a transaction for net value (coins + assets) received by the provided addresses.
  *
  * @param {Address[]} ownAddresses own wallet's addresses
+ * @param historicalTxs A list of historical transaction
  * @returns {Value} net value received
  */
 export const valueReceivedInspector: TotalAddressInputsValueInspector = (ownAddresses, historicalTxs) => (tx) => {
   let assets: TokenMap = new Map();
   const totalOutputValue = totalAddressOutputsValueInspector(ownAddresses)(tx);
   const totalInputValue = totalAddressInputsValueInspector(ownAddresses, historicalTxs)(tx);
-  const diff = subtractValueQuantities([totalOutputValue, totalInputValue]);
+  const diff = util.subtractValueQuantities([totalOutputValue, totalInputValue]);
 
   if (diff.assets) assets = removeNegativesFromTokenMap(diff.assets);
   return {
@@ -165,7 +184,7 @@ export const valueReceivedInspector: TotalAddressInputsValueInspector = (ownAddr
  * @param {TxAlonzo} tx transaction to inspect
  * @returns {DelegationInspection} array of delegation certificates
  */
-export const delegationInspector: DelegationInspector = (tx: TxAlonzo) =>
+export const delegationInspector: DelegationInspector = (tx) =>
   (tx.body.certificates?.filter(
     (cert) => cert.__typename === CertificateType.StakeDelegation
   ) as StakeDelegationCertificate[]) ?? [];
@@ -176,7 +195,7 @@ export const delegationInspector: DelegationInspector = (tx: TxAlonzo) =>
  * @param {TxAlonzo} tx transaction to inspect
  * @returns {StakeKeyRegistrationInspection} array of stake key registration certificates
  */
-export const stakeKeyRegistrationInspector: StakeKeyRegistrationInspector = (tx: TxAlonzo) =>
+export const stakeKeyRegistrationInspector: StakeKeyRegistrationInspector = (tx) =>
   (tx.body.certificates?.filter(
     (cert) => cert.__typename === CertificateType.StakeKeyRegistration
   ) as StakeAddressCertificate[]) ?? [];
@@ -187,7 +206,7 @@ export const stakeKeyRegistrationInspector: StakeKeyRegistrationInspector = (tx:
  * @param {TxAlonzo} tx transaction to inspect
  * @returns {StakeKeyRegistrationInspection} array of stake key deregistration certificates
  */
-export const stakeKeyDeregistrationInspector: StakeKeyRegistrationInspector = (tx: TxAlonzo) =>
+export const stakeKeyDeregistrationInspector: StakeKeyRegistrationInspector = (tx) =>
   (tx.body.certificates?.filter(
     (cert) => cert.__typename === CertificateType.StakeKeyDeregistration
   ) as StakeAddressCertificate[]) ?? [];
@@ -198,8 +217,79 @@ export const stakeKeyDeregistrationInspector: StakeKeyRegistrationInspector = (t
  * @param {TxAlonzo} tx transaction to inspect
  * @returns {WithdrawalInspection} accumulated withdrawal quantities
  */
-export const withdrawalInspector: WithdrawalInspector = (tx: TxAlonzo) =>
+export const withdrawalInspector: WithdrawalInspector = (tx) =>
   tx.body.withdrawals?.length ? BigIntMath.sum(tx.body.withdrawals.map(({ quantity }) => quantity)) : 0n;
+
+/**
+ * Matching criteria functor definition. This functor encodes a selection criteria for minted/burned assets.
+ * For example to get all minted assets the following criteria could be provided:
+ *  (quantity: bigint) => quantity > 0.
+ */
+export interface MatchQuantityCriteria {
+  (quantity: bigint): boolean;
+}
+
+/**
+ * Inspects a transaction for minted/burned assets that match a given quantity criteria.
+ *
+ * @param matchQuantityCriteria A functor that represents a selection criteria for minted/burned assets. Will
+ * return <tt>true</tt> if the given criteria was met; otherwise; <tt>false</tt>.
+ * @returns A collection with the assets that match the given criteria.
+ */
+export const mintInspector =
+  (matchQuantityCriteria: MatchQuantityCriteria): AssetsMintedInspector =>
+  (tx) => {
+    const assets: AssetsMintedInspection = [];
+    const scriptMap = new Map();
+
+    if (!tx.body.mint) return assets;
+
+    // Scripts can be embedded in transaction auxiliary data and/or the transaction witness set. If this transaction
+    // was built by this client the script will be present in the witness set, however, if this transaction was
+    // queried from a remote repository that doesn't fetch the witness data of the transaction we can still check
+    // if the script is present in the auxiliary data.
+    const scripts = [...(tx.auxiliaryData?.body?.scripts || []), ...(tx.witness?.scripts || [])];
+
+    for (const script of scripts) {
+      switch (script.__type) {
+        case ScriptType.Native: {
+          const policyId = nativeScriptPolicyId(script);
+          if (scriptMap.has(policyId)) continue;
+          scriptMap.set(policyId, script);
+          break;
+        }
+        case ScriptType.Plutus: // TODO: Add support for plutus minting scripts.
+        default:
+        // scripts of unknown type will be ignored.
+      }
+    }
+
+    for (const [key, value] of tx.body.mint!.entries()) {
+      const [policyId, assetName] = [policyIdFromAssetId(key), assetNameFromAssetId(key)];
+
+      const mintedAsset: MintedAsset = {
+        assetName,
+        fingerprint: AssetFingerprint.fromParts(policyId, assetName),
+        policyId,
+        quantity: value,
+        script: scriptMap.get(policyId)
+      };
+
+      if (matchQuantityCriteria(mintedAsset.quantity)) assets.push(mintedAsset);
+    }
+
+    return assets;
+  };
+
+/**
+ * Inspect the transaction and retrieves all assets minted (quantity greater than 0).
+ */
+export const assetsMintedInspector: AssetsMintedInspector = mintInspector((quantity: bigint) => quantity > 0);
+
+/**
+ * Inspect the transaction and retrieves all assets burned (quantity less than 0).
+ */
+export const assetsBurnedInspector: AssetsMintedInspector = mintInspector((quantity: bigint) => quantity < 0);
 
 /**
  * Returns a function to convert lower level transaction data to a higher level object, using the provided inspectors.
@@ -208,7 +298,7 @@ export const withdrawalInspector: WithdrawalInspector = (tx: TxAlonzo) =>
  */
 export const createTxInspector =
   <T extends Inspectors>(inspectors: T): TxInspector<T> =>
-  (tx: TxAlonzo) =>
+  (tx) =>
     Object.keys(inspectors).reduce(
       (result, key) => {
         const inspector = inspectors[key];
