@@ -16,7 +16,6 @@ import { Shutdown } from '@cardano-sdk/util';
 export type InitializeTxProps = {
   outputs?: Set<Cardano.TxOut>;
   certificates?: Cardano.Certificate[];
-  withdrawals?: Cardano.Withdrawal[];
   auxiliaryData?: Cardano.AuxiliaryData;
   options?: {
     validityInterval?: Cardano.ValidityInterval;
