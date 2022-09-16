@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0-nightly.4...@cardano-sdk/core@0.6.0-nightly.5) (2022-09-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* **wallet:** compute stability window slots count
+
+### Features
+
+* **wallet:** compute stability window slots count ([34b77d3](https://github.com/input-output-hk/cardano-js-sdk/commit/34b77d3379d41ac701214970e70656296136526e))
+
+
+
 ## [0.6.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.5.0...@cardano-sdk/core@0.6.0-nightly.4) (2022-09-14)
 
 

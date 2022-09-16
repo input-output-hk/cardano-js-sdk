@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.6...@cardano-sdk/cardano-services@0.6.0-nightly.7) (2022-09-16)
+
+
+### Bug Fixes
+
+* **cardano-services:** cache total pools count ([fbd9ac5](https://github.com/input-output-hk/cardano-js-sdk/commit/fbd9ac5ad77f471259089391b8f27077bc924c0a))
+* **cardano-services:** hash/update id model types ([142098c](https://github.com/input-output-hk/cardano-js-sdk/commit/142098ce8cbf74b50230bab85d438bf39b7b045b))
+
+
+
 ## [0.6.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.5...@cardano-sdk/cardano-services@0.6.0-nightly.6) (2022-09-15)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services
