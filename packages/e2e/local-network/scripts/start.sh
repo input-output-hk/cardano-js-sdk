@@ -19,6 +19,7 @@ trap 'kill 0' INT
 echo "Run"
 ./scripts/make-babbage.sh
 ./network-files/run/all.sh &
-CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-spo1/node.sock ./scripts/mint-tokens.sh &
+CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-spo1/node.sock ./scripts/update-pools-certificate.sh
+CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-spo1/node.sock ./scripts/mint-tokens.sh
 CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-spo1/node.sock ./scripts/setup-wallets.sh
 wait

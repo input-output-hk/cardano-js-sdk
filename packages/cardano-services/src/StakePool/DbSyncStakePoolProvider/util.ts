@@ -29,6 +29,7 @@ export enum StakePoolsSubQuery {
   OWNERS = 'owners',
   RETIREMENTS = 'retirements',
   TOTAL_ADA_AMOUNT = 'total_ada_amount',
+  TOTAL_POOLS_COUNT = 'total_stake_pools_count',
   POOL_HASHES = 'pool_hashes',
   POOLS_DATA_ORDERED = 'pools_data_ordered'
 }

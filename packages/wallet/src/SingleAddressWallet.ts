@@ -307,6 +307,7 @@ export class SingleAddressWallet implements ObservableWallet {
 
     this.#resubmitSubscription = createTransactionReemitter({
       confirmed$: this.transactions.outgoing.confirmed$,
+      genesisParameters$: this.genesisParameters$,
       logger: contextLogger(this.#logger, 'transactionsReemitter'),
       rollback$: this.transactions.rollback$,
       store: stores.volatileTransactions,

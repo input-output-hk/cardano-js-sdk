@@ -177,17 +177,23 @@ describe('TxSubmitWorker', () => {
   it('submission is parallelized up to parallelTx Tx simultaneously', async () => {
     const txs = await txsPromise;
     const delays = [5, 2, 1, 3, 3, 4, 4];
+    let resolveSubmissionDelay: (value: unknown) => void;
 
     mock = createMockOgmiosServer({
       healthCheck: { response: { networkSynchronization: 1, success: true } },
       submitTx: { response: { success: true } },
       submitTxHook: async (data) => {
+        // To be sure the transactions are enqueued in the right order,
+        // immediately resolve the submission delay promise
+        resolveSubmissionDelay(null);
+
         const txBody = Buffer.from(data!).toString('hex');
         const txIdx = (() => {
           for (let i = 0; i < txs.length; ++i) if (txBody === txs[i].txBodyHex) return i;
         })();
 
-        // Wait 100ms * the first byte of the Tx before sending the result
+        // To respect the submission plan,
+        // wait the scheduled interval (time unit: 100ms) before sending the result
         // eslint-disable-next-line @typescript-eslint/no-shadow
         await new Promise((resolve) => setTimeout(resolve, 100 * delays[txIdx!]));
       }
@@ -213,9 +219,17 @@ describe('TxSubmitWorker', () => {
     let res: unknown = null;
 
     for (let i = 0; i < 7; ++i) {
+      // To be sure resolveSubmissionDelay is correctly set when the mock runs,
+      // create the promise before the submission
+      // eslint-disable-next-line no-loop-func
+      const submissionDelay = new Promise((resolve) => (resolveSubmissionDelay = resolve));
+
       promises.push(rabbitMqTxSubmitProvider.submitTx({ signedTransaction: txs[i].txBodyHex }));
-      // Wait 10ms to be sure the transactions are enqueued in the right order
-      await new Promise((resolve) => setTimeout(resolve, 10));
+
+      // To be sure the transactions are enqueued in the right order,
+      // wait until the tx is accepted by the mock before proceeding with the next submission
+      // eslint-disable-next-line no-loop-func
+      await submissionDelay;
     }
 
     try {
