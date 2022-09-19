@@ -392,8 +392,8 @@ describe('StakePoolHttpService', () => {
           const response = await provider.queryStakePools(req);
           expect(response.pageResults).toEqual([]);
 
-          const secondRsponseCached = await provider.queryStakePools(req);
-          expect(response).toEqual(secondRsponseCached);
+          const secondResponseCached = await provider.queryStakePools(req);
+          expect(response).toEqual(secondResponseCached);
         });
         it('empty values ignores identifier filter', async () => {
           const req = {
@@ -1018,6 +1018,26 @@ describe('StakePoolHttpService', () => {
           expect(response.qty).toBeDefined();
           expect(response).toMatchSnapshot();
         });
+      });
+    });
+
+    describe('averages', () => {
+      it('/stats Vs /search comparison', async () => {
+        const searchResponse = await provider.queryStakePools({});
+        const statsResponse = await provider.stakePoolStats();
+        let activeCount = 0;
+        let totalApy = 0;
+        let totalMargin = 0;
+
+        for (const { margin, metrics, status } of searchResponse.pageResults)
+          if (status === 'active') {
+            activeCount++;
+            totalApy += metrics.apy!;
+            totalMargin += margin.numerator / margin.denominator;
+          }
+
+        expect(statsResponse.averages.apy).toBe(totalApy / activeCount);
+        expect(statsResponse.averages.margin).toBe(totalMargin / activeCount);
       });
     });
   });
