@@ -10,9 +10,12 @@ import {
   Ed25519KeyHash,
   Ed25519PublicKey,
   Ed25519Signature,
+  Hash32ByteBase16,
   NativeScriptKind,
   PolicyId,
   PoolId,
+  PoolRegistrationCertificate,
+  PoolRetirementCertificate,
   RewardAccount,
   ScriptType,
   StakeAddressCertificate,
@@ -22,6 +25,7 @@ import {
   TxAlonzo,
   TxIn,
   TxOut,
+  VrfVkHex,
   Withdrawal,
   Witness,
   util
@@ -32,6 +36,8 @@ import {
   createTxInspector,
   delegationInspector,
   metadataInspector,
+  poolRegistrationInspector,
+  poolRetirementInspector,
   sentInspector,
   signedCertificatesInspector,
   stakeKeyDeregistrationInspector,
@@ -62,6 +68,36 @@ describe('txInspector', () => {
   const keyRegistrationCert: StakeAddressCertificate = {
     __typename: CertificateType.StakeKeyRegistration,
     stakeKeyHash
+  };
+  const poolRegistrationCert: PoolRegistrationCertificate = {
+    __typename: CertificateType.PoolRegistration,
+    poolParameters: {
+      cost: 35_000_000n,
+      id: poolId,
+      margin: {
+        denominator: 2,
+        numerator: 10
+      },
+      metadataJson: {
+        hash: Hash32ByteBase16('22cf1de98f4cf4ce61bef2c6bc99890cb39f1452f5143189ce3a69ad70fcde72'),
+        url: 'https://pools.iohk.io/IOG1.json'
+      },
+      owners: [rewardAccount],
+      pledge: 100_000_000n,
+      relays: [
+        {
+          __typename: 'RelayByAddress',
+          ipv4: '127.0.0.1'
+        }
+      ],
+      rewardAccount,
+      vrf: VrfVkHex('2e25be7ce97b9be044921ca413b70632aba9a2673061490fef1e89c1880c5476')
+    }
+  };
+  const poolRetirementCert: PoolRetirementCertificate = {
+    __typename: CertificateType.PoolRetirement,
+    epoch: 100,
+    poolId
   };
   const keyDeregistrationCert: StakeAddressCertificate = {
     __typename: CertificateType.StakeKeyDeregistration,
@@ -440,6 +476,60 @@ describe('txInspector', () => {
     });
   });
 
+  describe('pool registration inspector', () => {
+    test(
+      'a transaction containing pool registrations produces an inspection ' +
+        'containing an array with the registration certificates',
+      () => {
+        const tx = buildMockTx({
+          certificates: [poolRegistrationCert]
+        });
+        const inspectTx = createTxInspector({
+          poolRegistration: poolRegistrationInspector
+        });
+        const txProperties = inspectTx(tx);
+        expect(txProperties.poolRegistration[0]).toEqual(poolRegistrationCert);
+      }
+    );
+
+    test('a transaction with no pool registrations produces an inspection containing an empty array', () => {
+      const tx = buildMockTx({ certificates: [] });
+      const inspectTx = createTxInspector({
+        poolRegistration: poolRegistrationInspector
+      });
+      const txProperties = inspectTx(tx);
+
+      expect(txProperties.poolRegistration).toEqual([]);
+    });
+  });
+
+  describe('pool retirement inspector', () => {
+    test(
+      'a transaction containing pool retirements produces an inspection ' +
+        'containing an array with the pool retirements certificates',
+      () => {
+        const tx = buildMockTx({
+          certificates: [poolRetirementCert]
+        });
+        const inspectTx = createTxInspector({
+          poolRetirement: poolRetirementInspector
+        });
+        const txProperties = inspectTx(tx);
+        expect(txProperties.poolRetirement[0]).toEqual(poolRetirementCert);
+      }
+    );
+
+    test('a transaction with no pool retirements produces an inspection containing an empty array', () => {
+      const tx = buildMockTx({ certificates: [] });
+      const inspectTx = createTxInspector({
+        poolRetirement: poolRetirementInspector
+      });
+      const txProperties = inspectTx(tx);
+
+      expect(txProperties.poolRetirement).toEqual([]);
+    });
+  });
+
   describe('withdrawal inspector', () => {
     test('a transaction containing withdrawals produces an inspection containing the accumulated withdrawals', () => {
       const tx = buildMockTx({ withdrawals });
@@ -529,12 +619,20 @@ describe('txInspector', () => {
   });
 
   describe('metadata inspector', () => {
-    it('inspects a transaction with metadata and produces an inspection with the metadatum', () => {
-      const tx = buildMockTx();
+    test('a transaction with metadata produces an inspection with the metadatum', () => {
+      const tx = buildMockTx({ includeAuxData: true });
       const inspectTx = createTxInspector({ metadata: metadataInspector });
       const { metadata } = inspectTx(tx);
 
       expect(metadata).toEqual(txMetadatum);
+    });
+
+    test('a transaction with no metadata  produces an inspection with an empty metadatum', () => {
+      const tx = buildMockTx({ includeAuxData: false });
+      const inspectTx = createTxInspector({ metadata: metadataInspector });
+      const { metadata } = inspectTx(tx);
+
+      expect(metadata).toEqual(new Map());
     });
   });
 });
