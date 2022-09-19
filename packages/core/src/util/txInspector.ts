@@ -6,6 +6,7 @@ import {
   CertificateType,
   Ed25519KeyHash,
   Lovelace,
+  Metadatum,
   PolicyId,
   RewardAccount,
   Script,
@@ -33,6 +34,7 @@ type TxInspector<T extends Inspectors> = (tx: TxAlonzo) => {
 export type SendReceiveValueInspection = Value;
 export type DelegationInspection = StakeDelegationCertificate[];
 export type StakeKeyRegistrationInspection = StakeAddressCertificate[];
+
 export type WithdrawalInspection = Lovelace;
 export interface SentInspection {
   inputs: TxIn[];
@@ -49,6 +51,8 @@ export interface MintedAsset {
 }
 
 export type AssetsMintedInspection = MintedAsset[];
+
+export type MetadataInspection = Metadatum;
 
 // Inspector types
 interface SentInspectorArgs {
@@ -69,6 +73,7 @@ export type SignedCertificatesInspector = (
   certificateTypes?: CertificateType[]
 ) => Inspector<SignedCertificatesInspection>;
 export type AssetsMintedInspector = Inspector<AssetsMintedInspection>;
+export type MetadataInspector = Inspector<MetadataInspection>;
 
 /**
  * Inspects a transaction for values (coins + assets) in inputs
@@ -290,6 +295,13 @@ export const assetsMintedInspector: AssetsMintedInspector = mintInspector((quant
  * Inspect the transaction and retrieves all assets burned (quantity less than 0).
  */
 export const assetsBurnedInspector: AssetsMintedInspector = mintInspector((quantity: bigint) => quantity < 0);
+
+/**
+ * Inspects a transaction for its metadata.
+ *
+ * @param {TxAlonzo} tx transaction to inspect.
+ */
+export const metadataInspector: MetadataInspector = (tx) => tx.auxiliaryData?.body?.blob ?? new Map();
 
 /**
  * Returns a function to convert lower level transaction data to a higher level object, using the provided inspectors.

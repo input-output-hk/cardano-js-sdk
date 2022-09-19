@@ -31,6 +31,7 @@ import {
   assetsMintedInspector,
   createTxInspector,
   delegationInspector,
+  metadataInspector,
   sentInspector,
   signedCertificatesInspector,
   stakeKeyDeregistrationInspector,
@@ -524,6 +525,16 @@ describe('txInspector', () => {
       );
       expect(burned[0].quantity).toEqual(-1n);
       expect(burned[0].script).toBeUndefined();
+    });
+  });
+
+  describe('metadata inspector', () => {
+    it('inspects a transaction with metadata and produces an inspection with the metadatum', () => {
+      const tx = buildMockTx();
+      const inspectTx = createTxInspector({ metadata: metadataInspector });
+      const { metadata } = inspectTx(tx);
+
+      expect(metadata).toEqual(txMetadatum);
     });
   });
 });
