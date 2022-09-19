@@ -1,13 +1,13 @@
 import { Cardano, InvalidStringError } from '../../../src';
 
 // eslint-disable-next-line sonarjs/no-duplicate-string
-jest.mock('../../../src/Address/util', () => {
-  const actual = jest.requireActual('../../../src/Address/util');
+jest.mock('../../../src/Cardano/util/address', () => {
+  const actual = jest.requireActual('../../../src/Cardano/util/address');
   return {
     isAddress: jest.fn().mockImplementation((...args) => actual.isAddress(...args))
   };
 });
-const addressUtilMock = jest.requireMock('../../../src/Address/util');
+const addressUtilMock = jest.requireMock('../../../src/Cardano/util/address');
 
 describe('Cardano/types/Address', () => {
   it('Address() accepts a valid mainnet grouped address and is implemented using "isAddress" util', () => {

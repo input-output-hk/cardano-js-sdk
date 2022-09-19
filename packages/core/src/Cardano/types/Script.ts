@@ -1,5 +1,5 @@
 /* eslint-disable no-use-before-define */
-import * as util from '../util';
+import * as util from '../util/primitives';
 import { Ed25519KeyHash } from './Key';
 import { Slot } from './Block';
 

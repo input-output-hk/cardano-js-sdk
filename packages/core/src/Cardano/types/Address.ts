@@ -1,10 +1,11 @@
-import * as typesUtil from '../util';
 import { InvalidStringError } from '../../errors';
+import { OpaqueString, assertIsBech32WithPrefix } from '../util/primitives';
+import { isAddress } from '../util/address';
 
 /**
  * mainnet or testnet address (Shelley as bech32 string, Byron as base58-encoded string)
  */
-export type Address = typesUtil.OpaqueString<'Address'>;
+export type Address = OpaqueString<'Address'>;
 
 /**
  * @param {string} value mainnet or testnet address
@@ -13,7 +14,7 @@ export type Address = typesUtil.OpaqueString<'Address'>;
 
 const isRewardAccount = (address: string) => {
   try {
-    typesUtil.assertIsBech32WithPrefix(address, ['stake', 'stake_test']);
+    assertIsBech32WithPrefix(address, ['stake', 'stake_test']);
     return true;
   } catch {
     return false;
@@ -21,7 +22,7 @@ const isRewardAccount = (address: string) => {
 };
 
 export const Address = (value: string): Address => {
-  if (typesUtil.isAddress(value) && !isRewardAccount(value)) {
+  if (isAddress(value) && !isRewardAccount(value)) {
     return value as unknown as Address;
   }
   throw new InvalidStringError(`Invalid address: ${value}`);

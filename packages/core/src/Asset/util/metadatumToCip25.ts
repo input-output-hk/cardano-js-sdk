@@ -1,7 +1,8 @@
 import { AssetInfo, ImageMediaType, MediaType, NftMetadata, NftMetadataFile, Uri } from '../types';
 import { CustomError } from 'ts-custom-error';
 import { Logger } from 'ts-log';
-import { Metadatum, MetadatumMap, util } from '../../Cardano';
+import { Metadatum, MetadatumMap } from '../../Cardano/types/AuxiliaryData';
+import { asMetadatumArray, asMetadatumMap } from '../../util/metadatum';
 import difference from 'lodash/difference';
 
 class InvalidFileError extends CustomError {}
@@ -40,7 +41,7 @@ const mapOtherProperties = (metadata: MetadatumMap, primaryProperties: string[])
 const toArray = <T>(value: T | T[]): T[] => (Array.isArray(value) ? value : [value]);
 
 const mapFile = (metadatum: Metadatum): NftMetadataFile => {
-  const file = util.metadatum.asMetadatumMap(metadatum);
+  const file = asMetadatumMap(metadatum);
   if (!file) throw new InvalidFileError();
   const mediaType = asString(file.get('mediaType'));
   const name = asString(file.get('name'));
@@ -49,7 +50,7 @@ const mapFile = (metadatum: Metadatum): NftMetadataFile => {
   const srcAsString = asString(unknownTypeSrc);
   const src = srcAsString
     ? Uri(srcAsString)
-    : util.metadatum.asMetadatumArray(unknownTypeSrc)?.map((fileSrc) => {
+    : asMetadatumArray(unknownTypeSrc)?.map((fileSrc) => {
         const fileSrcAsString = asString(fileSrc);
         if (!fileSrcAsString) throw new InvalidFileError();
         return Uri(fileSrcAsString);
@@ -67,9 +68,7 @@ const mapFile = (metadatum: Metadatum): NftMetadataFile => {
  * Also considers asset name encoded in utf8 within metadata valid
  */
 const getAssetMetadata = (policy: MetadatumMap, asset: Pick<AssetInfo, 'name'>) =>
-  util.metadatum.asMetadatumMap(
-    policy.get(asset.name.toString()) || policy.get(Buffer.from(asset.name, 'hex').toString('utf8'))
-  );
+  asMetadatumMap(policy.get(asset.name.toString()) || policy.get(Buffer.from(asset.name, 'hex').toString('utf8')));
 
 // TODO: consider hoisting this function together with cip25 types to core or a new cip25 package
 /**
@@ -82,9 +81,9 @@ export const metadatumToCip25 = (
 ): NftMetadata | undefined => {
   const cip25Metadata = metadatumMap?.get(721n);
   if (!cip25Metadata) return;
-  const cip25MetadatumMap = util.metadatum.asMetadatumMap(cip25Metadata);
+  const cip25MetadatumMap = asMetadatumMap(cip25Metadata);
   if (!cip25MetadatumMap) return;
-  const policy = util.metadatum.asMetadatumMap(cip25MetadatumMap.get(asset.policyId.toString())!);
+  const policy = asMetadatumMap(cip25MetadatumMap.get(asset.policyId.toString())!);
   if (!policy) return;
   const assetMetadata = getAssetMetadata(policy, asset);
   if (!assetMetadata) return;
@@ -95,7 +94,7 @@ export const metadatumToCip25 = (
     return;
   }
   const mediaType = asString(assetMetadata.get('mediaType'));
-  const files = util.metadatum.asMetadatumArray(assetMetadata.get('files'));
+  const files = asMetadatumArray(assetMetadata.get('files'));
   try {
     return {
       description: asStringArray(assetMetadata.get('description')),

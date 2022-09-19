@@ -6,3 +6,4 @@ export * from './calcStabilityWindow';
 export * from './coalesceValueQuantities';
 export * from './subtractValueQuantities';
 export * from './nativeScript';
+export * as metadatum from './metadatum';

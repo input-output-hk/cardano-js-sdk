@@ -1,3 +1,4 @@
+import * as Cardano from '../../Cardano/types';
 import {
   Address,
   BigNum,
@@ -26,8 +27,7 @@ import {
   UnitInterval,
   VRFKeyHash
 } from '@emurgo/cardano-serialization-lib-nodejs';
-import { Cardano, NotImplementedError } from '../..';
-import { CertificateType } from '../../Cardano';
+import { NotImplementedError } from '../../errors';
 
 export const stakeKeyRegistration = (stakeKeyHash: Cardano.Ed25519KeyHash) =>
   Certificate.new_stake_registration(
@@ -124,15 +124,15 @@ export const stakeDelegation = (stakeKeyHash: Cardano.Ed25519KeyHash, delegatee:
 
 export const create = (certificate: Cardano.Certificate) => {
   switch (certificate.__typename) {
-    case CertificateType.PoolRegistration:
+    case Cardano.CertificateType.PoolRegistration:
       return poolRegistration(certificate.poolParameters);
-    case CertificateType.PoolRetirement:
+    case Cardano.CertificateType.PoolRetirement:
       return poolRetirement(certificate.poolId, certificate.epoch);
-    case CertificateType.StakeDelegation:
+    case Cardano.CertificateType.StakeDelegation:
       return stakeDelegation(certificate.stakeKeyHash, certificate.poolId);
-    case CertificateType.StakeKeyDeregistration:
+    case Cardano.CertificateType.StakeKeyDeregistration:
       return stakeKeyDeregistration(certificate.stakeKeyHash);
-    case CertificateType.StakeKeyRegistration:
+    case Cardano.CertificateType.StakeKeyRegistration:
       return stakeKeyRegistration(certificate.stakeKeyHash);
     default:
       throw new NotImplementedError(`certificate.create ${certificate.__typename}`);

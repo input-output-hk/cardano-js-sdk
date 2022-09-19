@@ -1,5 +1,5 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, nativeScriptPolicyId } from '@cardano-sdk/core';
 import { InMemoryKeyAgent, KeyRole, util } from '@cardano-sdk/key-management';
 import { SingleAddressWallet } from '@cardano-sdk/wallet';
 import { env } from '../environment';
@@ -74,7 +74,7 @@ describe('SingleAddressWallet/multisignature', () => {
       ]
     };
 
-    const policyId = Cardano.util.nativeScriptPolicyId(policyScript);
+    const policyId = nativeScriptPolicyId(policyScript);
     const assetId = Cardano.AssetId(`${policyId}${assetName}`);
     const tokens = new Map([[assetId, 10n]]);
 
