@@ -24,7 +24,7 @@ import {
 import { BigIntMath } from '@cardano-sdk/util';
 import { assetNameFromAssetId, policyIdFromAssetId, removeNegativesFromTokenMap } from '../Asset/util';
 import { coalesceValueQuantities } from './coalesceValueQuantities';
-import { inputsWithAddresses, isAddressWithin } from '../Address/util';
+import { inputsWithAddresses, isAddressWithin } from '../Cardano/util/address';
 import { nativeScriptPolicyId } from './nativeScript';
 import { subtractValueQuantities } from './subtractValueQuantities';
 

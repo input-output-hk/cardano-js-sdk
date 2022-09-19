@@ -1,4 +1,6 @@
-import { Address, Hash32ByteBase16, TransactionId } from '.';
+import { Address } from './Address';
+import { Hash32ByteBase16 } from '../util/primitives';
+import { TransactionId } from './Transaction';
 import { Value } from './Value';
 
 export interface NewTxIn {

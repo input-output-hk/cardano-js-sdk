@@ -1,7 +1,7 @@
 /* eslint-disable no-use-before-define */
-import * as Cardano from './';
 import * as util from '../util';
-import { Slot } from '@cardano-ogmios/schema';
+import { Ed25519KeyHash } from './Key';
+import { Slot } from './Block';
 
 /**
  * Plutus script type.
@@ -39,7 +39,7 @@ export interface RequireSignatureScript {
   /**
    * The hash of a verification key.
    */
-  keyHash: Cardano.Ed25519KeyHash;
+  keyHash: Ed25519KeyHash;
 
   /**
    * The native script kind.

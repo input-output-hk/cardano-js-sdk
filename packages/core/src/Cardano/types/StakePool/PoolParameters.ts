@@ -1,10 +1,9 @@
 import { ExtendedStakePoolMetadata } from './ExtendedStakePoolMetadata';
 import { Hash32ByteBase16, OpaqueString, typedBech32 } from '../../util';
 import { Lovelace } from '../Value';
-import { PoolId } from './primitives';
+import { PoolId, VrfVkHex } from './primitives';
 import { Relay } from './Relay';
 import { RewardAccount } from '../RewardAccount';
-import { VrfVkHex } from '.';
 
 export interface Fraction {
   numerator: number;

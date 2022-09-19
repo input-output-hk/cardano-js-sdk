@@ -1,5 +1,5 @@
-import { Address, NewTxIn, TxAlonzo, TxIn } from '../Cardano';
-import { parseCslAddress } from '../CSL';
+import { Address, NewTxIn, TxAlonzo, TxIn } from '../types';
+import { parseCslAddress } from '../../CSL/parseCslAddress';
 
 /**
  * Validate input as a Cardano Address from all Cardano eras and networks
