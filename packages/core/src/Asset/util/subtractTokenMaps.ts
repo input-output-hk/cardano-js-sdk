@@ -6,7 +6,7 @@ import { isNotNil } from '@cardano-sdk/util';
  */
 export const subtractTokenMaps = (assets: (TokenMap | undefined)[]): TokenMap | undefined => {
   if (assets.length <= 0 || !isNotNil(assets[0])) return undefined;
-  const result: TokenMap = assets[0];
+  const result: TokenMap = new Map(assets[0]);
   const rest: TokenMap[] = assets.slice(1).filter(isNotNil);
   for (const assetTotals of rest) {
     for (const [assetId, assetQuantity] of assetTotals.entries()) {
