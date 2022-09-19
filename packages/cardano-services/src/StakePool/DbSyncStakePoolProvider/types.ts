@@ -1,4 +1,4 @@
-import { Cardano, StakePoolSearchResults } from '@cardano-sdk/core';
+import { Cardano, Paginated } from '@cardano-sdk/core';
 export interface PoolUpdateModel {
   id: string; // pool hash id
   update_id: string;
@@ -182,6 +182,6 @@ export type OrderedResult = PoolMetrics[] | PoolData[] | PoolAPY[];
 export type PoolsToCache = { [hashId: THashId]: Cardano.StakePool };
 
 export type StakePoolResults = {
-  results: StakePoolSearchResults;
+  results: Paginated<Cardano.StakePool>;
   poolsToCache: PoolsToCache;
 };
