@@ -1,4 +1,3 @@
-export * from './coalesceValueQuantities';
 export * from './computeMinUtxoValue';
 export * from './computeImplicitCoin';
 export * from './deserializeTx';
@@ -7,5 +6,3 @@ export * from './primitives';
 export * as metadatum from './metadatum';
 export * from './txSubmissionErrors';
 export * from './resolveInputValue';
-export * from './subtractValueQuantities';
-export * from './nativeScript';
