@@ -1,29 +1,41 @@
-import { CSL, Cardano, NotImplementedError, SerializationError, SerializationFailure } from '../..';
+import { CSL } from '../CSL';
+import {
+  Certificate,
+  CertificateType,
+  Ed25519KeyHash,
+  GenesisKeyDelegationCertificate,
+  PoolId,
+  PoolMetadataJson,
+  PoolRegistrationCertificate,
+  PoolRetirementCertificate,
+  Relay,
+  RewardAccount,
+  StakeAddressCertificate,
+  StakeDelegationCertificate,
+  VrfVkHex
+} from '../../Cardano/types';
+import { Hash32ByteBase16 } from '../../Cardano/util/primitives';
+import { NetworkId } from '../../Cardano/NetworkId';
+import { NotImplementedError, SerializationError, SerializationFailure } from '../../errors';
 
-const stakeRegistration = (certificate: CSL.StakeRegistration): Cardano.StakeAddressCertificate => ({
-  __typename: Cardano.CertificateType.StakeKeyRegistration,
-  stakeKeyHash: Cardano.Ed25519KeyHash(
-    Buffer.from(certificate.stake_credential().to_keyhash()!.to_bytes()).toString('hex')
-  )
+const stakeRegistration = (certificate: CSL.StakeRegistration): StakeAddressCertificate => ({
+  __typename: CertificateType.StakeKeyRegistration,
+  stakeKeyHash: Ed25519KeyHash(Buffer.from(certificate.stake_credential().to_keyhash()!.to_bytes()).toString('hex'))
 });
 
-const stakeDeregistration = (certificate: CSL.StakeDeregistration): Cardano.StakeAddressCertificate => ({
-  __typename: Cardano.CertificateType.StakeKeyDeregistration,
-  stakeKeyHash: Cardano.Ed25519KeyHash(
-    Buffer.from(certificate.stake_credential().to_keyhash()!.to_bytes()).toString('hex')
-  )
+const stakeDeregistration = (certificate: CSL.StakeDeregistration): StakeAddressCertificate => ({
+  __typename: CertificateType.StakeKeyDeregistration,
+  stakeKeyHash: Ed25519KeyHash(Buffer.from(certificate.stake_credential().to_keyhash()!.to_bytes()).toString('hex'))
 });
 
-const stakeDelegation = (certificate: CSL.StakeDelegation): Cardano.StakeDelegationCertificate => ({
-  __typename: Cardano.CertificateType.StakeDelegation,
-  poolId: Cardano.PoolId(certificate.pool_keyhash().to_bech32('pool')),
-  stakeKeyHash: Cardano.Ed25519KeyHash(
-    Buffer.from(certificate.stake_credential().to_keyhash()!.to_bytes()).toString('hex')
-  )
+const stakeDelegation = (certificate: CSL.StakeDelegation): StakeDelegationCertificate => ({
+  __typename: CertificateType.StakeDelegation,
+  poolId: PoolId(certificate.pool_keyhash().to_bech32('pool')),
+  stakeKeyHash: Ed25519KeyHash(Buffer.from(certificate.stake_credential().to_keyhash()!.to_bytes()).toString('hex'))
 });
 
-const createCardanoRelays = (relays: CSL.Relays): Cardano.Relay[] => {
-  const result: Cardano.Relay[] = [];
+const createCardanoRelays = (relays: CSL.Relays): Relay[] => {
+  const result: Relay[] = [];
   for (let i = 0; i < relays.len(); i++) {
     const relay = relays.get(i);
     const relayByAddress = relay.as_single_host_addr();
@@ -58,33 +70,33 @@ const createCardanoRelays = (relays: CSL.Relays): Cardano.Relay[] => {
   return result;
 };
 
-const createCardanoOwners = (owners: CSL.Ed25519KeyHashes, networkId: Cardano.NetworkId): Cardano.RewardAccount[] => {
-  const result: Cardano.RewardAccount[] = [];
+const createCardanoOwners = (owners: CSL.Ed25519KeyHashes, networkId: NetworkId): RewardAccount[] => {
+  const result: RewardAccount[] = [];
   for (let i = 0; i < owners.len(); i++) {
     const keyHash = owners.get(i);
     const stakeCredential = CSL.StakeCredential.from_keyhash(keyHash);
     const rewardAccount = CSL.RewardAddress.new(networkId, stakeCredential);
-    result.push(Cardano.RewardAccount(rewardAccount.to_address().to_bech32()));
+    result.push(RewardAccount(rewardAccount.to_address().to_bech32()));
   }
   return result;
 };
 
-const jsonMetadata = (poolMetadata?: CSL.PoolMetadata): Cardano.PoolMetadataJson | undefined => {
+const jsonMetadata = (poolMetadata?: CSL.PoolMetadata): PoolMetadataJson | undefined => {
   if (!poolMetadata) return;
   return {
-    hash: Cardano.util.Hash32ByteBase16(Buffer.from(poolMetadata.pool_metadata_hash().to_bytes()).toString('hex')),
+    hash: Hash32ByteBase16(Buffer.from(poolMetadata.pool_metadata_hash().to_bytes()).toString('hex')),
     url: poolMetadata.url().url()
   };
 };
 
-export const poolRegistration = (certificate: CSL.PoolRegistration): Cardano.PoolRegistrationCertificate => {
+export const poolRegistration = (certificate: CSL.PoolRegistration): PoolRegistrationCertificate => {
   const poolParams = certificate.pool_params();
   const rewardAccountAddress = poolParams.reward_account().to_address();
   return {
-    __typename: Cardano.CertificateType.PoolRegistration,
+    __typename: CertificateType.PoolRegistration,
     poolParameters: {
       cost: BigInt(poolParams.cost().to_str()),
-      id: Cardano.PoolId(poolParams.operator().to_bech32('pool')),
+      id: PoolId(poolParams.operator().to_bech32('pool')),
       margin: {
         denominator: Number(poolParams.margin().denominator().to_str()),
         numerator: Number(poolParams.margin().numerator().to_str())
@@ -93,28 +105,26 @@ export const poolRegistration = (certificate: CSL.PoolRegistration): Cardano.Poo
       owners: createCardanoOwners(poolParams.pool_owners(), rewardAccountAddress.network_id()),
       pledge: BigInt(poolParams.pledge().to_str()),
       relays: createCardanoRelays(poolParams.relays()),
-      rewardAccount: Cardano.RewardAccount(rewardAccountAddress.to_bech32()),
-      vrf: Cardano.VrfVkHex(Buffer.from(poolParams.vrf_keyhash().to_bytes()).toString('hex'))
+      rewardAccount: RewardAccount(rewardAccountAddress.to_bech32()),
+      vrf: VrfVkHex(Buffer.from(poolParams.vrf_keyhash().to_bytes()).toString('hex'))
     }
-  } as Cardano.PoolRegistrationCertificate;
+  } as PoolRegistrationCertificate;
 };
 
-const poolRetirement = (certificate: CSL.PoolRetirement): Cardano.PoolRetirementCertificate => ({
-  __typename: Cardano.CertificateType.PoolRetirement,
+const poolRetirement = (certificate: CSL.PoolRetirement): PoolRetirementCertificate => ({
+  __typename: CertificateType.PoolRetirement,
   epoch: certificate.epoch(),
-  poolId: Cardano.PoolId(certificate.pool_keyhash().to_bech32('pool'))
+  poolId: PoolId(certificate.pool_keyhash().to_bech32('pool'))
 });
 
-const genesisKeyDelegaation = (certificate: CSL.GenesisKeyDelegation): Cardano.GenesisKeyDelegationCertificate => ({
-  __typename: Cardano.CertificateType.GenesisKeyDelegation,
-  genesisDelegateHash: Cardano.util.Hash32ByteBase16(
-    Buffer.from(certificate.genesis_delegate_hash().to_bytes()).toString()
-  ),
-  genesisHash: Cardano.util.Hash32ByteBase16(Buffer.from(certificate.genesishash().to_bytes()).toString()),
-  vrfKeyHash: Cardano.util.Hash32ByteBase16(Buffer.from(certificate.vrf_keyhash().to_bytes()).toString())
+const genesisKeyDelegaation = (certificate: CSL.GenesisKeyDelegation): GenesisKeyDelegationCertificate => ({
+  __typename: CertificateType.GenesisKeyDelegation,
+  genesisDelegateHash: Hash32ByteBase16(Buffer.from(certificate.genesis_delegate_hash().to_bytes()).toString()),
+  genesisHash: Hash32ByteBase16(Buffer.from(certificate.genesishash().to_bytes()).toString()),
+  vrfKeyHash: Hash32ByteBase16(Buffer.from(certificate.vrf_keyhash().to_bytes()).toString())
 });
 
-export const createCertificate = (cslCertificate: CSL.Certificate): Cardano.Certificate => {
+export const createCertificate = (cslCertificate: CSL.Certificate): Certificate => {
   switch (cslCertificate.kind()) {
     case CSL.CertificateKind.StakeRegistration:
       return stakeRegistration(cslCertificate.as_stake_registration()!);

@@ -23,7 +23,7 @@ export type InitializeTxProps = {
   };
   collaterals?: Set<Cardano.NewTxIn>;
   mint?: Cardano.TokenMap;
-  scriptIntegrityHash?: Cardano.Hash32ByteBase16;
+  scriptIntegrityHash?: Cardano.util.Hash32ByteBase16;
   requiredExtraSignatures?: Cardano.Ed25519KeyHash[];
   extraSigners?: TransactionSigner[];
   signingOptions?: SignTransactionOptions;

@@ -212,6 +212,6 @@ export interface TxBuilder {
   // - setScripts(scripts: Array<{script, datum, redeemer}>)
   // - setValidityInterval
   // TODO: figure out what script_data_hash is used for
-  // - setScriptIntegrityHash(hash: Cardano.Hash32ByteBase16 | null);
+  // - setScriptIntegrityHash(hash: Cardano.util.Hash32ByteBase16 | null);
   // - setRequiredExtraSignatures(keyHashes: Cardano.Ed25519KeyHash[]);
 }

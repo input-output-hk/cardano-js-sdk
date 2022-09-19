@@ -43,7 +43,7 @@ export const blockfrostChainHistoryProvider = (blockfrost: BlockFrostAPI, logger
               return purpose;
           }
         })(),
-        scriptHash: Cardano.Hash28ByteBase16(script_hash)
+        scriptHash: Cardano.util.Hash28ByteBase16(script_hash)
       })
     );
   };

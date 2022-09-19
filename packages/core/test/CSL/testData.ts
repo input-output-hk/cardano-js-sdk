@@ -7,7 +7,7 @@ export const poolId = Cardano.PoolId('pool1mpgg03jxj52qwxvvy7cmj58a96vl9pvxcqqvu
 export const ownerRewardAccount = Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
 export const vrf = Cardano.VrfVkHex('8dd154228946bd12967c12bedb1cb6038b78f8b84a1760b1a788fa72a4af3db0');
 export const metadataJson = {
-  hash: Cardano.Hash32ByteBase16('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'),
+  hash: Cardano.util.Hash32ByteBase16('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'),
   url: 'https://example.com'
 };
 export const poolParameters: Cardano.PoolParameters = {
@@ -71,7 +71,7 @@ export const txOutWithDatum: Cardano.TxOut = {
   address: Cardano.Address(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
-  datum: Cardano.Hash32ByteBase16('4c94610a582b748b8db506abb45ccd48d0d4934942daa87d191645b947a547a7'),
+  datum: Cardano.util.Hash32ByteBase16('4c94610a582b748b8db506abb45ccd48d0d4934942daa87d191645b947a547a7'),
   value: valueWithAssets
 };
 
@@ -89,7 +89,9 @@ export const txBody: Cardano.NewTxBodyAlonzo = {
   mint: mintTokenMap,
   outputs: [txOut],
   requiredExtraSignatures: [Cardano.Ed25519KeyHash('6199186adb51974690d7247d2646097d2c62763b16fb7ed3f9f55d39')],
-  scriptIntegrityHash: Cardano.Hash32ByteBase16('6199186adb51974690d7247d2646097d2c62763b16fb7ed3f9f55d38abc123de'),
+  scriptIntegrityHash: Cardano.util.Hash32ByteBase16(
+    '6199186adb51974690d7247d2646097d2c62763b16fb7ed3f9f55d38abc123de'
+  ),
   validityInterval: {
     invalidBefore: 100,
     invalidHereafter: 1000

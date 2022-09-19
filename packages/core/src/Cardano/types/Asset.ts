@@ -1,5 +1,5 @@
 import * as cip14 from '@emurgo/cip14-js';
-import { Hash28ByteBase16, OpaqueString, assertIsHexString, typedBech32 } from '../util';
+import { Hash28ByteBase16, OpaqueString, assertIsHexString, typedBech32 } from '../util/primitives';
 import { InvalidStringError } from '../../errors';
 
 export type AssetId = OpaqueString<'AssetId'>;

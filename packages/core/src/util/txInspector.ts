@@ -18,14 +18,14 @@ import {
   TokenMap,
   TxAlonzo,
   TxIn,
-  Value,
-  util
-} from '../Cardano';
+  Value
+} from '../Cardano/types';
 import { BigIntMath } from '@cardano-sdk/util';
 import { assetNameFromAssetId, policyIdFromAssetId, removeNegativesFromTokenMap } from '../Asset/util';
 import { coalesceValueQuantities } from './coalesceValueQuantities';
 import { inputsWithAddresses, isAddressWithin } from '../Cardano/util/address';
 import { nativeScriptPolicyId } from './nativeScript';
+import { resolveInputValue } from '../Cardano/util/resolveInputValue';
 import { subtractValueQuantities } from './subtractValueQuantities';
 
 type Inspector<Inspection> = (tx: TxAlonzo) => Inspection;
@@ -95,7 +95,7 @@ export const totalAddressInputsValueInspector: TotalAddressInputsValueInspector 
   (ownAddresses, getHistoricalTxs) => (tx) => {
     const receivedInputs = tx.body.inputs.filter((input) => isAddressWithin(ownAddresses)(input));
     const receivedInputsValues = receivedInputs
-      .map((input) => util.resolveInputValue(input, getHistoricalTxs()))
+      .map((input) => resolveInputValue(input, getHistoricalTxs()))
       .filter((value): value is Value => !!value);
 
     return coalesceValueQuantities(receivedInputsValues);

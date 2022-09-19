@@ -62,7 +62,7 @@ export const txOut = (output: CSL.TransactionOutput): Cardano.TxOut => {
   const dataHashBytes = output.data_hash()?.to_bytes();
   return {
     address: Cardano.Address(output.address().to_bech32()),
-    datum: dataHashBytes ? Cardano.Hash32ByteBase16.fromHexBlob(util.bytesToHex(dataHashBytes)) : undefined,
+    datum: dataHashBytes ? Cardano.util.Hash32ByteBase16.fromHexBlob(util.bytesToHex(dataHashBytes)) : undefined,
     value: value(output.amount())
   };
 };
@@ -146,8 +146,8 @@ export const txWitnessBootstrap = (bootstraps?: CSL.BootstrapWitnesses): Cardano
     const attributes = bootstrap.attributes();
     const chainCode = bootstrap.chain_code();
     result.push({
-      addressAttributes: attributes?.length > 0 ? Cardano.Base64Blob.fromBytes(attributes) : undefined,
-      chainCode: chainCode?.length > 0 ? Cardano.HexBlob.fromBytes(chainCode) : undefined,
+      addressAttributes: attributes?.length > 0 ? Cardano.util.Base64Blob.fromBytes(attributes) : undefined,
+      chainCode: chainCode?.length > 0 ? Cardano.util.HexBlob.fromBytes(chainCode) : undefined,
       key: Cardano.Ed25519PublicKey(Buffer.from(bootstrap.vkey().public_key().as_bytes()).toString('hex')),
       signature: Cardano.Ed25519Signature(bootstrap.signature().to_hex())
     });
@@ -174,7 +174,7 @@ export const txWitnessRedeemers = (redeemers?: CSL.Redeemers): Cardano.Redeemer[
       executionUnits: { memory: Number(exUnits.mem()), steps: Number(exUnits.steps()) },
       index: Number(index),
       purpose: Object.values(Cardano.RedeemerPurpose)[redeemerTagKind],
-      scriptHash: Cardano.Hash28ByteBase16(Buffer.from(data.to_bytes()).toString())
+      scriptHash: Cardano.util.Hash28ByteBase16(Buffer.from(data.to_bytes()).toString())
     });
   }
   return result;

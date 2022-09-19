@@ -10,7 +10,6 @@ import {
   Ed25519KeyHash,
   Ed25519PublicKey,
   Ed25519Signature,
-  Hash32ByteBase16,
   NativeScriptKind,
   PolicyId,
   PoolId,
@@ -27,9 +26,9 @@ import {
   TxOut,
   VrfVkHex,
   Withdrawal,
-  Witness,
-  util
+  Witness
 } from '../../src/Cardano';
+import { Hash32ByteBase16 } from '../../src/Cardano/util';
 import {
   assetsBurnedInspector,
   assetsMintedInspector,
@@ -48,6 +47,7 @@ import {
   valueSentInspector,
   withdrawalInspector
 } from '../../src';
+import { jsonToMetadatum } from '../../src/util/metadatum';
 
 // eslint-disable-next-line max-statements
 describe('txInspector', () => {
@@ -153,7 +153,7 @@ describe('txInspector', () => {
   const txMetadatum = new Map([
     [
       721n,
-      util.metadatum.jsonToMetadatum({
+      jsonToMetadatum({
         b8fdbcbe003cef7e47eb5307d328e10191952bd02901a850699e7e35: {
           'NFT-001': {
             image: ['ipfs://some_hash1'],

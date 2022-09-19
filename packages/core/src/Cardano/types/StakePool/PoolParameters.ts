@@ -1,5 +1,5 @@
 import { ExtendedStakePoolMetadata } from './ExtendedStakePoolMetadata';
-import { Hash32ByteBase16, OpaqueString, typedBech32 } from '../../util';
+import { Hash32ByteBase16, OpaqueString, typedBech32 } from '../../util/primitives';
 import { Lovelace } from '../Value';
 import { PoolId, VrfVkHex } from './primitives';
 import { Relay } from './Relay';
