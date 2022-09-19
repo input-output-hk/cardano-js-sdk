@@ -9,6 +9,7 @@ import {
   BootstrapWitness,
   BootstrapWitnesses,
   Certificates,
+  DataHash,
   Ed25519KeyHash,
   Ed25519KeyHashes,
   Ed25519Signature,
@@ -94,8 +95,15 @@ export const value = ({ coins, assets }: Cardano.Value): Value => {
 export const txIn = (core: Cardano.NewTxIn): TransactionInput =>
   TransactionInput.new(TransactionHash.from_bytes(Buffer.from(core.txId, 'hex')), core.index);
 
-export const txOut = (core: Cardano.TxOut): TransactionOutput =>
-  TransactionOutput.new(parseCslAddress(core.address.toString())!, value(core.value));
+export const txOut = (core: Cardano.TxOut): TransactionOutput => {
+  const cslTxOut = TransactionOutput.new(parseCslAddress(core.address.toString())!, value(core.value));
+
+  if (core.datum !== undefined) {
+    cslTxOut.set_data_hash(DataHash.from_bytes(Buffer.from(core.datum.toString(), 'hex')));
+  }
+
+  return cslTxOut;
+};
 
 export const utxo = (core: Cardano.Utxo[]): TransactionUnspentOutput[] =>
   core.map((item) => TransactionUnspentOutput.new(txIn(item[0]), txOut(item[1])));
