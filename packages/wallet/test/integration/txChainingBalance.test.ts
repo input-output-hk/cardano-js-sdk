@@ -1,4 +1,4 @@
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
 import { SingleAddressWallet } from '../../src';
 import { createWallet } from './util';
 import { firstValueFrom } from 'rxjs';
@@ -26,7 +26,7 @@ describe('integration/txChainingBalance', () => {
     const tx = await wallet.initializeTx({ outputs: new Set([output]) });
     // Precondition
     const coinsSpent = outputCoins + tx.body.fee;
-    const totalOutputCoins = Cardano.util.coalesceValueQuantities(tx.body.outputs.map((txOut) => txOut.value)).coins;
+    const totalOutputCoins = coalesceValueQuantities(tx.body.outputs.map((txOut) => txOut.value)).coins;
     expect(totalOutputCoins).toBeGreaterThan(coinsSpent);
     // Wallet will consider the transaction 'in flight' upon submission,
     // UtxoProvider will not see the new utxo from change outputs.

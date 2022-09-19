@@ -19,12 +19,14 @@ import {
   TxAlonzo,
   TxIn,
   Value,
-  nativeScriptPolicyId,
   util
 } from '../Cardano';
 import { BigIntMath } from '@cardano-sdk/util';
 import { assetNameFromAssetId, policyIdFromAssetId, removeNegativesFromTokenMap } from '../Asset/util';
+import { coalesceValueQuantities } from './coalesceValueQuantities';
 import { inputsWithAddresses, isAddressWithin } from '../Address/util';
+import { nativeScriptPolicyId } from './nativeScript';
+import { subtractValueQuantities } from './subtractValueQuantities';
 
 type Inspector<Inspection> = (tx: TxAlonzo) => Inspection;
 type Inspectors = { [k: string]: Inspector<unknown> };
@@ -96,7 +98,7 @@ export const totalAddressInputsValueInspector: TotalAddressInputsValueInspector 
       .map((input) => util.resolveInputValue(input, getHistoricalTxs()))
       .filter((value): value is Value => !!value);
 
-    return util.coalesceValueQuantities(receivedInputsValues);
+    return coalesceValueQuantities(receivedInputsValues);
   };
 
 /**
@@ -108,7 +110,7 @@ export const totalAddressInputsValueInspector: TotalAddressInputsValueInspector 
  */
 export const totalAddressOutputsValueInspector: SendReceiveValueInspector = (ownAddresses) => (tx) => {
   const receivedOutputs = tx.body.outputs.filter((out) => isAddressWithin(ownAddresses)(out));
-  return util.coalesceValueQuantities(receivedOutputs.map((output) => output.value));
+  return coalesceValueQuantities(receivedOutputs.map((output) => output.value));
 };
 
 /**
@@ -160,7 +162,7 @@ export const valueSentInspector: TotalAddressInputsValueInspector = (ownAddresse
   if (sentInspector({ addresses: ownAddresses })(tx).inputs.length === 0) return { coins: 0n };
   const totalOutputValue = totalAddressOutputsValueInspector(ownAddresses)(tx);
   const totalInputValue = totalAddressInputsValueInspector(ownAddresses, historicalTxs)(tx);
-  const diff = util.subtractValueQuantities([totalInputValue, totalOutputValue]);
+  const diff = subtractValueQuantities([totalInputValue, totalOutputValue]);
 
   if (diff.assets) assets = removeNegativesFromTokenMap(diff.assets);
   return {
@@ -180,7 +182,7 @@ export const valueReceivedInspector: TotalAddressInputsValueInspector = (ownAddr
   let assets: TokenMap = new Map();
   const totalOutputValue = totalAddressOutputsValueInspector(ownAddresses)(tx);
   const totalInputValue = totalAddressInputsValueInspector(ownAddresses, historicalTxs)(tx);
-  const diff = util.subtractValueQuantities([totalOutputValue, totalInputValue]);
+  const diff = subtractValueQuantities([totalOutputValue, totalInputValue]);
 
   if (diff.assets) assets = removeNegativesFromTokenMap(diff.assets);
   return {

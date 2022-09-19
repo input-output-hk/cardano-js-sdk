@@ -1,4 +1,4 @@
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
 import { ComputeMinimumCoinQuantity, TokenBundleSizeExceedsLimit } from '../types';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 import { RequiredImplicitValue, UtxoSelection, assetQuantitySelector, getCoinQuantity, toValues } from './util';
@@ -230,7 +230,7 @@ const coalesceChangeBundlesForMinCoinRequirement = (
 
   while (sortedBundles.length > 1 && !satisfiesMinCoinRequirement(sortedBundles[sortedBundles.length - 1])) {
     const smallestBundle = sortedBundles.pop()!;
-    sortedBundles[sortedBundles.length - 1] = Cardano.util.coalesceValueQuantities([
+    sortedBundles[sortedBundles.length - 1] = coalesceValueQuantities([
       sortedBundles[sortedBundles.length - 1],
       smallestBundle
     ]);

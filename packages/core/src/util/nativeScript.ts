@@ -1,5 +1,5 @@
-import { NativeScript, PolicyId } from '../types';
-import { nativeScript } from '../../CSL/coreToCsl';
+import { NativeScript, PolicyId } from '../Cardano';
+import { nativeScript } from '../CSL/coreToCsl';
 
 /**
  * Gets the policy id of the given native script.
