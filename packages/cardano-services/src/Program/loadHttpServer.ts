@@ -40,6 +40,7 @@ export interface HttpServerOptions extends CommonProgramOptions {
   epochPollInterval: number;
   dbCacheTtl: number;
   useQueue?: boolean;
+  paginationPageSizeLimit?: number;
 }
 
 export interface ProgramArgs {
@@ -102,14 +103,14 @@ const serviceMapFactory = (args: ProgramArgs, logger: Logger, dnsResolver: DnsRe
       (db) => new UtxoHttpService({ logger, utxoProvider: new DbSyncUtxoProvider(db, logger) }),
       ServiceNames.Utxo
     ),
-    [ServiceNames.ChainHistory]: withDb(
-      (db) =>
-        new ChainHistoryHttpService({
-          chainHistoryProvider: new DbSyncChainHistoryProvider(db, createDbSyncMetadataService(db, logger), logger),
-          logger
-        }),
-      ServiceNames.ChainHistory
-    ),
+    [ServiceNames.ChainHistory]: withDb((db) => {
+      const metadataService = createDbSyncMetadataService(db, logger);
+      const chainHistoryProvider = new DbSyncChainHistoryProvider(
+        { paginationPageSizeLimit: args.options!.paginationPageSizeLimit! },
+        { db, logger, metadataService }
+      );
+      return new ChainHistoryHttpService({ chainHistoryProvider, logger });
+    }, ServiceNames.ChainHistory),
     [ServiceNames.Rewards]: withDb(
       (db) => new RewardsHttpService({ logger, rewardsProvider: new DbSyncRewardsProvider(db, logger) }),
       ServiceNames.Rewards

@@ -1,4 +1,10 @@
-import { HealthCheckResponse, Provider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import {
+  HealthCheckResponse,
+  Provider,
+  ProviderError,
+  ProviderFailure,
+  providerFailureToStatusCodeMap
+} from '@cardano-sdk/core';
 import { HttpServer } from './HttpServer';
 import { Logger } from 'ts-log';
 import { ProviderHandler } from '../util';
@@ -58,7 +64,7 @@ export abstract class HttpService extends RunnableModule {
         logger.error(error);
 
         if (error instanceof ProviderError) {
-          const code = error.reason === ProviderFailure.NotFound ? 404 : 500;
+          const code = providerFailureToStatusCodeMap[error.reason];
 
           return HttpServer.sendJSON(res, error, code);
         }

@@ -159,55 +159,58 @@ describe('blockfrostChainHistoryProvider', () => {
 
   describe('transactionsByAddresses', () => {
     it('Shelley address (addr_test1)', async () => {
-      const txs = await chainHistoryProvider.transactionsByAddresses({
-        addresses: [Cardano.Address('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg')]
+      const response = await chainHistoryProvider.transactionsByAddresses({
+        addresses: [Cardano.Address('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg')],
+        pagination: { limit: 20, startAt: 0 }
       });
 
-      expect(txs.length).toBeGreaterThanOrEqual(47);
+      expect(response.totalResultCount).toBeGreaterThanOrEqual(47);
 
       expect(
-        txs.find(
+        response.pageResults.find(
           (tx) => tx.id === Cardano.TransactionId('bedfc2ff545ef1ac3cc4d1a06aa67a6d68a663ffb1092f8764390b8a58ef97b4')
         )
       ).toBeDefined();
 
       expect(
-        txs.find(
+        response.pageResults.find(
           (tx) => tx.id === Cardano.TransactionId('f632b491bb481b4d93fa69e1901ebb623a3af65fde500f1b019eaabd4bb2a980')
         )
       ).toBeDefined();
     });
     it('extended Shelley address (addr_test1)', async () => {
-      const txs = await chainHistoryProvider.transactionsByAddresses({
+      const response = await chainHistoryProvider.transactionsByAddresses({
         addresses: [
           Cardano.Address(
             'addr_test1qph5x6uahxhxyvtqatzj77sjtjmdjycemt5ncjuj2r4e' +
               'yflkdap42xncd6cazjarce6jh8mx52fcf8ugststvyklj70qhzhe9h'
           )
-        ]
+        ],
+        pagination: { limit: 20, startAt: 0 }
       });
-      expect(txs.length).toBeGreaterThanOrEqual(4);
+      expect(response.totalResultCount).toBeGreaterThanOrEqual(4);
 
       expect(
-        txs.find(
+        response.pageResults.find(
           (tx) => tx.id === Cardano.TransactionId('a01623f7e3fc679c9f369e06ac0cd942740cade30367b24cedace20a430af1cf')
         )
       ).toBeDefined();
 
       expect(
-        txs.find(
+        response.pageResults.find(
           (tx) => tx.id === Cardano.TransactionId('667f714ee9d9975ca4fa0f5451e006d3dafcdafb7342fe288ebcaf17c100a996')
         )
       ).toBeDefined();
     });
     it('Icarus Byron address (2c)', async () => {
-      const txs = await chainHistoryProvider.transactionsByAddresses({
-        addresses: [Cardano.Address('2cWKMJemoBai9J7kVvRTukMmdfxtjL9z7c396rTfrrzfAZ6EeQoKLC2y1k34hswwm4SVr')]
+      const response = await chainHistoryProvider.transactionsByAddresses({
+        addresses: [Cardano.Address('2cWKMJemoBai9J7kVvRTukMmdfxtjL9z7c396rTfrrzfAZ6EeQoKLC2y1k34hswwm4SVr')],
+        pagination: { limit: 20, startAt: 0 }
       });
-      expect(txs.length).toBeGreaterThanOrEqual(1);
+      expect(response.totalResultCount).toBeGreaterThanOrEqual(1);
 
       expect(
-        txs.find(
+        response.pageResults.find(
           (tx) => tx.id === Cardano.TransactionId('2822d491a890b40cd2a22003b81a97f63c2b8c373b1b0b8dfa1598739fe34c06')
         )
       ).toBeDefined();
@@ -215,7 +218,7 @@ describe('blockfrostChainHistoryProvider', () => {
     // Failing because returned transactions are grouped by address
     // TODO: update and reenable test when we decide behaviour
     it.skip('multiple address types', async () => {
-      const txs = await chainHistoryProvider.transactionsByAddresses({
+      const response = await chainHistoryProvider.transactionsByAddresses({
         addresses: [
           Cardano.Address('2cWKMJemoBai9J7kVvRTukMmdfxtjL9z7c396rTfrrzfAZ6EeQoKLC2y1k34hswwm4SVr'),
           Cardano.Address('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg'),
@@ -223,34 +226,37 @@ describe('blockfrostChainHistoryProvider', () => {
             'addr_test1qph5x6uahxhxyvtqatzj77sjtjmdjycemt5ncjuj2r4e' +
               'yflkdap42xncd6cazjarce6jh8mx52fcf8ugststvyklj70qhzhe9h'
           )
-        ]
+        ],
+        pagination: { limit: 20, startAt: 0 }
       });
-      expect(txs.length).toBeGreaterThanOrEqual(52);
+      expect(response.totalResultCount).toBeGreaterThanOrEqual(52);
 
       expect(
-        txs.find(
+        response.pageResults.find(
           (tx) => tx.id === Cardano.TransactionId('2822d491a890b40cd2a22003b81a97f63c2b8c373b1b0b8dfa1598739fe34c06')
         )
       ).toBeDefined();
 
       expect(
-        txs.find(
+        response.pageResults.find(
           (tx) => tx.id === Cardano.TransactionId('667f714ee9d9975ca4fa0f5451e006d3dafcdafb7342fe288ebcaf17c100a996')
         )
       ).toBeDefined();
     });
     it('Shelley address not used - no transactions', async () => {
-      const txs = await chainHistoryProvider.transactionsByAddresses({
-        addresses: [Cardano.Address('addr_test1vrfxjeunkc9xu8rpnhgkluptaq0rm8kyxh8m3q9vtcetjwshvpnsm')]
+      const response = await chainHistoryProvider.transactionsByAddresses({
+        addresses: [Cardano.Address('addr_test1vrfxjeunkc9xu8rpnhgkluptaq0rm8kyxh8m3q9vtcetjwshvpnsm')],
+        pagination: { limit: 20, startAt: 0 }
       });
-      expect(txs.length).toBe(0);
+      expect(response.totalResultCount).toBe(0);
     });
     it('queries successfully invalid transaction (script failure)', async () => {
-      const txs = await chainHistoryProvider.transactionsByAddresses({
-        addresses: [Cardano.Address('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg')]
+      const response = await chainHistoryProvider.transactionsByAddresses({
+        addresses: [Cardano.Address('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg')],
+        pagination: { limit: 20, startAt: 0 }
       });
 
-      const invalidTx = txs.find(
+      const invalidTx = response.pageResults.find(
         (tx) => tx.id === Cardano.TransactionId('43149210cbbfbc92bc2b199bb14cb15330414e2288ac31be92a3b5a490f9abfc')
       );
       expect(invalidTx).toBeDefined();
@@ -263,22 +269,23 @@ describe('blockfrostChainHistoryProvider', () => {
       );
     });
 
-    it('returns transactions starting from sinceBlock param', async () => {
+    it('returns transactions starting from blockRange param', async () => {
       const address = Cardano.Address(
         'addr_test1qp88yvfup4eykezr2dytygwyglfzflyn32dh83ftxkzeg4jrdz3th865e0s2cm6xuzc4xkd8desmtu3p5jfmzkazmxwsm2tk5a'
       );
-      const transactions = await chainHistoryProvider.transactionsByAddresses({
+      const response = await chainHistoryProvider.transactionsByAddresses({
         addresses: [address],
-        sinceBlock: 3_348_548
+        blockRange: { lowerBound: 3_348_548 },
+        pagination: { limit: 20, startAt: 0 }
       });
 
       expect(
-        transactions.find(
+        response.pageResults.find(
           (tx) => tx.id === Cardano.TransactionId('264ad5454078db439532e81a5918930779562601b098d6aeae556f785d35e187')
         )
       ).toBeDefined();
 
-      expect(transactions.length).toBeGreaterThanOrEqual(4);
+      expect(response.totalResultCount).toBeGreaterThanOrEqual(4);
     });
   });
 });

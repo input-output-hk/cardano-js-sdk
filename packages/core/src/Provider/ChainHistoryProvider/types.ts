@@ -1,8 +1,10 @@
-import { Cardano, Provider } from '../..';
+/* eslint-disable max-len */
+import { Cardano, Paginated, PaginationArgs, Provider, Range } from '../..';
 
 export type TransactionsByAddressesArgs = {
   addresses: Cardano.Address[];
-  sinceBlock?: Cardano.BlockNo;
+  pagination: PaginationArgs;
+  blockRange?: Range<Cardano.BlockNo>;
 };
 export type TransactionsByIdsArgs = { ids: Cardano.TransactionId[] };
 export type BlocksByIdsArgs = { ids: Cardano.BlockId[] };
@@ -13,10 +15,11 @@ export interface ChainHistoryProvider extends Provider {
    * It's also possible to provide a block number to only look for transactions since that block inclusive
    *
    * @param {Cardano.Address[]} addresses array of addresses
-   * @param {Cardano.BlockNo} [sinceBlock] transactions since which block (inclusive)
+   * @param {Cardano.PaginationArgs} [pagination] pagination args
+   * @param {Range<Cardano.BlockNo>} [blockRange] transactions in specified block ranges (lower and upper bounds inclusive)
    * @returns {Cardano.TxAlonzo[]} an array of transactions involving the addresses
    */
-  transactionsByAddresses: (args: TransactionsByAddressesArgs) => Promise<Cardano.TxAlonzo[]>;
+  transactionsByAddresses: (args: TransactionsByAddressesArgs) => Promise<Paginated<Cardano.TxAlonzo>>;
   /**
    * Gets the transactions matching the provided hashes.
    *

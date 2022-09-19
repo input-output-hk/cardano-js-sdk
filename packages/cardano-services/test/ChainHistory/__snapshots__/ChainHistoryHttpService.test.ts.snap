@@ -44,531 +44,741 @@ Array [
 `;
 
 exports[`ChainHistoryHttpService healthy state /txs/by-addresses server and snapshot testing does not include transactions before indicated block 1`] = `
-Array [
-  Object {
-    "auxiliaryData": undefined,
-    "blockHeader": Object {
-      "blockNo": 1654555,
-      "hash": "469cc6fbcc186de6b12c392ad0cc84a20c4d4774c1f9c3cfd80745de00856f4b",
-      "slot": 2763220,
-    },
-    "body": Object {
-      "certificates": Array [
-        Object {
-          "__typename": "PoolRegistrationCertificate",
-          "poolParameters": null,
-        },
-        Object {
-          "__typename": "StakeDelegationCertificate",
-          "poolId": "pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70",
-          "stakeKeyHash": "45ca75d48381bb91e5cabbdee953ee2ba3ee6490889738a52ac62eb3",
-        },
-      ],
-      "collaterals": Array [],
-      "fee": 197929n,
-      "inputs": Array [],
-      "mint": undefined,
-      "outputs": Array [
-        Object {
-          "address": "addr_test1qr4m502gr9hnaxac5mxjln22jwavf7pcjmh9sw7fujdvgvj9ef6afquphwg7tj4mmm548m3t50hxfyygjuu222kx96eshcathg",
-          "datum": undefined,
-          "value": Object {
-            "assets": undefined,
-            "coins": 999502622402n,
-          },
-        },
-      ],
-      "validityInterval": Object {
-        "invalidBefore": undefined,
-        "invalidHereafter": 2764200,
+Object {
+  "pageResults": Array [
+    Object {
+      "auxiliaryData": undefined,
+      "blockHeader": Object {
+        "blockNo": 1654555,
+        "hash": "469cc6fbcc186de6b12c392ad0cc84a20c4d4774c1f9c3cfd80745de00856f4b",
+        "slot": 2763220,
       },
-      "withdrawals": undefined,
-    },
-    "id": "8fd14baca91c674fafae59701b7dc0eda1266202ec8445bad3244bd8669a7fb5",
-    "index": 0,
-    "txSize": 736,
-    "witness": Object {
-      "redeemers": undefined,
-      "signatures": Map {},
-    },
-  },
-  Object {
-    "auxiliaryData": undefined,
-    "blockHeader": Object {
-      "blockNo": 1912426,
-      "hash": "1c87c4191424d3a3825f7717f327749f08ba5c1a95ca4dffd46b15db518b6876",
-      "slot": 8063200,
-    },
-    "body": Object {
-      "certificates": Array [
-        Object {
-          "__typename": "PoolRegistrationCertificate",
-          "poolParameters": null,
-        },
-      ],
-      "collaterals": Array [],
-      "fee": 205145n,
-      "inputs": Array [],
-      "mint": undefined,
-      "outputs": Array [
-        Object {
-          "address": "addr_test1qr4m502gr9hnaxac5mxjln22jwavf7pcjmh9sw7fujdvgvj9ef6afquphwg7tj4mmm548m3t50hxfyygjuu222kx96eshcathg",
-          "datum": undefined,
-          "value": Object {
-            "assets": undefined,
-            "coins": 10306556787917n,
+      "body": Object {
+        "certificates": Array [
+          Object {
+            "__typename": "PoolRegistrationCertificate",
+            "poolParameters": null,
           },
+          Object {
+            "__typename": "StakeDelegationCertificate",
+            "poolId": "pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70",
+            "stakeKeyHash": "45ca75d48381bb91e5cabbdee953ee2ba3ee6490889738a52ac62eb3",
+          },
+        ],
+        "collaterals": Array [],
+        "fee": 197929n,
+        "inputs": Array [],
+        "mint": undefined,
+        "outputs": Array [
+          Object {
+            "address": "addr_test1qr4m502gr9hnaxac5mxjln22jwavf7pcjmh9sw7fujdvgvj9ef6afquphwg7tj4mmm548m3t50hxfyygjuu222kx96eshcathg",
+            "datum": undefined,
+            "value": Object {
+              "assets": undefined,
+              "coins": 999502622402n,
+            },
+          },
+        ],
+        "validityInterval": Object {
+          "invalidBefore": undefined,
+          "invalidHereafter": 2764200,
         },
-      ],
-      "validityInterval": Object {
-        "invalidBefore": undefined,
-        "invalidHereafter": 8064171,
+        "withdrawals": undefined,
       },
-      "withdrawals": undefined,
+      "id": "8fd14baca91c674fafae59701b7dc0eda1266202ec8445bad3244bd8669a7fb5",
+      "index": 0,
+      "txSize": 736,
+      "witness": Object {
+        "redeemers": undefined,
+        "signatures": Map {},
+      },
     },
-    "id": "3d4cd09885d39673125c3a15f8acb45d92fde137f9effe7a5131f6cc7241d960",
-    "index": 0,
-    "txSize": 780,
-    "witness": Object {
-      "redeemers": undefined,
-      "signatures": Map {},
+    Object {
+      "auxiliaryData": undefined,
+      "blockHeader": Object {
+        "blockNo": 1912426,
+        "hash": "1c87c4191424d3a3825f7717f327749f08ba5c1a95ca4dffd46b15db518b6876",
+        "slot": 8063200,
+      },
+      "body": Object {
+        "certificates": Array [
+          Object {
+            "__typename": "PoolRegistrationCertificate",
+            "poolParameters": null,
+          },
+        ],
+        "collaterals": Array [],
+        "fee": 205145n,
+        "inputs": Array [],
+        "mint": undefined,
+        "outputs": Array [
+          Object {
+            "address": "addr_test1qr4m502gr9hnaxac5mxjln22jwavf7pcjmh9sw7fujdvgvj9ef6afquphwg7tj4mmm548m3t50hxfyygjuu222kx96eshcathg",
+            "datum": undefined,
+            "value": Object {
+              "assets": undefined,
+              "coins": 10306556787917n,
+            },
+          },
+        ],
+        "validityInterval": Object {
+          "invalidBefore": undefined,
+          "invalidHereafter": 8064171,
+        },
+        "withdrawals": undefined,
+      },
+      "id": "3d4cd09885d39673125c3a15f8acb45d92fde137f9effe7a5131f6cc7241d960",
+      "index": 0,
+      "txSize": 780,
+      "witness": Object {
+        "redeemers": undefined,
+        "signatures": Map {},
+      },
     },
-  },
-]
+  ],
+  "totalResultCount": 2,
+}
 `;
 
 exports[`ChainHistoryHttpService healthy state /txs/by-addresses server and snapshot testing finds transactions with address within inputs 1`] = `
-Array [
-  Object {
-    "auxiliaryData": undefined,
-    "blockHeader": Object {
-      "blockNo": 3274726,
-      "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
-      "slot": 49032415,
-    },
-    "body": Object {
-      "certificates": undefined,
-      "collaterals": Array [],
-      "fee": 183761n,
-      "inputs": Array [],
-      "mint": undefined,
-      "outputs": Array [
-        Object {
-          "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
-          "datum": "cd968f149166bfd195c82852cbbed09f3ca9d5b070e669f6c50f4ea9d98164f9",
-          "value": Object {
-            "assets": Map {
-              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 1678546n,
-            },
-            "coins": 254640002n,
-          },
-        },
-        Object {
-          "address": "addr_test1qq7rv7r27wq5nz2q6htul8k55xrcjsz2tpxkhqfk5f6kfgfnqdurhe3e8zlltj63kwh78hg7ykrexmn6jxxn42egzs4skzyvvc",
-          "datum": undefined,
-          "value": Object {
-            "assets": Map {
-              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 661706n,
-            },
-            "coins": 38816239n,
-          },
-        },
-      ],
-      "validityInterval": Object {
-        "invalidBefore": undefined,
-        "invalidHereafter": undefined,
+Object {
+  "pageResults": Array [
+    Object {
+      "auxiliaryData": undefined,
+      "blockHeader": Object {
+        "blockNo": 3274726,
+        "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
+        "slot": 49032415,
       },
-      "withdrawals": undefined,
+      "body": Object {
+        "certificates": undefined,
+        "collaterals": Array [],
+        "fee": 183761n,
+        "inputs": Array [],
+        "mint": undefined,
+        "outputs": Array [
+          Object {
+            "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
+            "datum": "cd968f149166bfd195c82852cbbed09f3ca9d5b070e669f6c50f4ea9d98164f9",
+            "value": Object {
+              "assets": Map {
+                "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 1678546n,
+              },
+              "coins": 254640002n,
+            },
+          },
+          Object {
+            "address": "addr_test1qq7rv7r27wq5nz2q6htul8k55xrcjsz2tpxkhqfk5f6kfgfnqdurhe3e8zlltj63kwh78hg7ykrexmn6jxxn42egzs4skzyvvc",
+            "datum": undefined,
+            "value": Object {
+              "assets": Map {
+                "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 661706n,
+              },
+              "coins": 38816239n,
+            },
+          },
+        ],
+        "validityInterval": Object {
+          "invalidBefore": undefined,
+          "invalidHereafter": undefined,
+        },
+        "withdrawals": undefined,
+      },
+      "id": "6eec4e9691e0fc2442e5c9bf22847998b80a1625b18a882a4e7b9e0cdda48dc3",
+      "index": 11,
+      "txSize": 640,
+      "witness": Object {
+        "redeemers": undefined,
+        "signatures": Map {},
+      },
     },
-    "id": "6eec4e9691e0fc2442e5c9bf22847998b80a1625b18a882a4e7b9e0cdda48dc3",
-    "index": 11,
-    "txSize": 640,
-    "witness": Object {
-      "redeemers": undefined,
-      "signatures": Map {},
-    },
-  },
-]
+  ],
+  "totalResultCount": 1,
+}
 `;
 
 exports[`ChainHistoryHttpService healthy state /txs/by-addresses server and snapshot testing finds transactions with address within outputs 1`] = `
-Array [
-  Object {
-    "auxiliaryData": undefined,
-    "blockHeader": Object {
-      "blockNo": 3274726,
-      "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
-      "slot": 49032415,
-    },
-    "body": Object {
-      "certificates": undefined,
-      "collaterals": Array [],
-      "fee": 181605n,
-      "inputs": Array [],
-      "mint": undefined,
-      "outputs": Array [
-        Object {
-          "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
-          "datum": "7d6dd89f80dfa80dd0a0e334c220df18cfdc11b8e9e0340384ef193b8a09092b",
-          "value": Object {
-            "assets": Map {
-              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e" => 359387n,
+Object {
+  "pageResults": Array [
+    Object {
+      "auxiliaryData": undefined,
+      "blockHeader": Object {
+        "blockNo": 1654555,
+        "hash": "469cc6fbcc186de6b12c392ad0cc84a20c4d4774c1f9c3cfd80745de00856f4b",
+        "slot": 2763220,
+      },
+      "body": Object {
+        "certificates": Array [
+          Object {
+            "__typename": "PoolRegistrationCertificate",
+            "poolParameters": null,
+          },
+          Object {
+            "__typename": "StakeDelegationCertificate",
+            "poolId": "pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70",
+            "stakeKeyHash": "45ca75d48381bb91e5cabbdee953ee2ba3ee6490889738a52ac62eb3",
+          },
+        ],
+        "collaterals": Array [],
+        "fee": 197929n,
+        "inputs": Array [],
+        "mint": undefined,
+        "outputs": Array [
+          Object {
+            "address": "addr_test1qr4m502gr9hnaxac5mxjln22jwavf7pcjmh9sw7fujdvgvj9ef6afquphwg7tj4mmm548m3t50hxfyygjuu222kx96eshcathg",
+            "datum": undefined,
+            "value": Object {
+              "assets": undefined,
+              "coins": 999502622402n,
             },
-            "coins": 201519044n,
           },
+        ],
+        "validityInterval": Object {
+          "invalidBefore": undefined,
+          "invalidHereafter": 2764200,
         },
-        Object {
-          "address": "addr_test1qp64f82kqyn934qtytqf2xhzqnasknqk5f5y88e3jh7s95cmtpwh9z5nwy2egezfnm7eddt4ysfp7tg87attl3ejgjns2qgy69",
-          "datum": undefined,
-          "value": Object {
-            "assets": undefined,
-            "coins": 391939485n,
-          },
-        },
-      ],
-      "validityInterval": Object {
-        "invalidBefore": undefined,
-        "invalidHereafter": undefined,
+        "withdrawals": undefined,
       },
-      "withdrawals": undefined,
-    },
-    "id": "caaada4c53256a9bcba2d006b3f427f089d43372442a550a7349627a46682375",
-    "index": 1,
-    "txSize": 591,
-    "witness": Object {
-      "redeemers": undefined,
-      "signatures": Map {},
-    },
-  },
-  Object {
-    "auxiliaryData": undefined,
-    "blockHeader": Object {
-      "blockNo": 3274726,
-      "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
-      "slot": 49032415,
-    },
-    "body": Object {
-      "certificates": undefined,
-      "collaterals": Array [],
-      "fee": 179977n,
-      "inputs": Array [],
-      "mint": undefined,
-      "outputs": Array [
-        Object {
-          "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
-          "datum": "87d376b58b5c5c6b173694172d980100bf6d383b2755618f139dedc1e58c9bea",
-          "value": Object {
-            "assets": undefined,
-            "coins": 23000000n,
-          },
-        },
-        Object {
-          "address": "addr_test1qr6sape30ttq8zahxmah2wzaqk3ldc0n0cehj8e408ejhwrq5hrg8xmfyakef5awud6g6uew447r6970evl9lzgrak0qgz3ejq",
-          "datum": undefined,
-          "value": Object {
-            "assets": undefined,
-            "coins": 893280136n,
-          },
-        },
-      ],
-      "validityInterval": Object {
-        "invalidBefore": undefined,
-        "invalidHereafter": undefined,
+      "id": "8fd14baca91c674fafae59701b7dc0eda1266202ec8445bad3244bd8669a7fb5",
+      "index": 0,
+      "txSize": 736,
+      "witness": Object {
+        "redeemers": undefined,
+        "signatures": Map {},
       },
-      "withdrawals": undefined,
     },
-    "id": "49fa6b7245674fd11727cfb4d47ec7fad380c198a2a975b0423c5f6c255488f9",
-    "index": 3,
-    "txSize": 554,
-    "witness": Object {
-      "redeemers": undefined,
-      "signatures": Map {},
-    },
-  },
-  Object {
-    "auxiliaryData": undefined,
-    "blockHeader": Object {
-      "blockNo": 3274726,
-      "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
-      "slot": 49032415,
-    },
-    "body": Object {
-      "certificates": undefined,
-      "collaterals": Array [],
-      "fee": 179977n,
-      "inputs": Array [],
-      "mint": undefined,
-      "outputs": Array [
-        Object {
-          "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
-          "datum": "b72256efc2b1cd920d75f769d1ca11433c2890b1ac5ade783de9b536504be618",
-          "value": Object {
-            "assets": undefined,
-            "coins": 154000000n,
-          },
-        },
-        Object {
-          "address": "addr_test1qq75mx8z9sh8aucku2lwjp7c6fe2m3w90aqt9kw4rczjt8lj0rhad28c9f9cmcm64jyqpvths06w4tgwc0vnpx3veqvsj2953n",
-          "datum": undefined,
-          "value": Object {
-            "assets": undefined,
-            "coins": 612159447n,
-          },
-        },
-      ],
-      "validityInterval": Object {
-        "invalidBefore": undefined,
-        "invalidHereafter": undefined,
+    Object {
+      "auxiliaryData": undefined,
+      "blockHeader": Object {
+        "blockNo": 1912426,
+        "hash": "1c87c4191424d3a3825f7717f327749f08ba5c1a95ca4dffd46b15db518b6876",
+        "slot": 8063200,
       },
-      "withdrawals": undefined,
-    },
-    "id": "a7eda535edc983139cc1053d074106aef54b25e9c9ee9de6bf1bf69709dabfd4",
-    "index": 5,
-    "txSize": 554,
-    "witness": Object {
-      "redeemers": undefined,
-      "signatures": Map {},
-    },
-  },
-  Object {
-    "auxiliaryData": undefined,
-    "blockHeader": Object {
-      "blockNo": 3274726,
-      "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
-      "slot": 49032415,
-    },
-    "body": Object {
-      "certificates": undefined,
-      "collaterals": Array [],
-      "fee": 186401n,
-      "inputs": Array [],
-      "mint": undefined,
-      "outputs": Array [
-        Object {
-          "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
-          "datum": "13d75d53a0ebf1d51dc7332634366ee9191dc9c5f371fbdfdd1af382638cd310",
-          "value": Object {
-            "assets": Map {
-              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e" => 30000n,
+      "body": Object {
+        "certificates": Array [
+          Object {
+            "__typename": "PoolRegistrationCertificate",
+            "poolParameters": null,
+          },
+        ],
+        "collaterals": Array [],
+        "fee": 205145n,
+        "inputs": Array [],
+        "mint": undefined,
+        "outputs": Array [
+          Object {
+            "address": "addr_test1qr4m502gr9hnaxac5mxjln22jwavf7pcjmh9sw7fujdvgvj9ef6afquphwg7tj4mmm548m3t50hxfyygjuu222kx96eshcathg",
+            "datum": undefined,
+            "value": Object {
+              "assets": undefined,
+              "coins": 10306556787917n,
             },
-            "coins": 20487995n,
           },
+        ],
+        "validityInterval": Object {
+          "invalidBefore": undefined,
+          "invalidHereafter": 8064171,
         },
-        Object {
-          "address": "addr_test1qry75qe2e5zez3ny5nuu2dsxrrwhxpl7mr7gdwpsgyfsvtgcgddl7qwm2vl7vedf3xp0vy7ya9ag7dqkcqqktv5403nspw962t",
-          "datum": undefined,
-          "value": Object {
-            "assets": Map {
-              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e" => 60704n,
-              "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130cb6de817be83e93a5771e6c98ee305e1012bae70d9eb9dff70e2d71e4b611779" => 194994n,
-            },
-            "coins": 591423467n,
-          },
-        },
-      ],
-      "validityInterval": Object {
-        "invalidBefore": undefined,
-        "invalidHereafter": undefined,
+        "withdrawals": undefined,
       },
-      "withdrawals": undefined,
-    },
-    "id": "b46c48229336aec327a5f537bcbf1ca8fa6a3afbf60aa66880aa6a234e5fce92",
-    "index": 7,
-    "txSize": 700,
-    "witness": Object {
-      "redeemers": undefined,
-      "signatures": Map {},
-    },
-  },
-  Object {
-    "auxiliaryData": undefined,
-    "blockHeader": Object {
-      "blockNo": 3274726,
-      "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
-      "slot": 49032415,
-    },
-    "body": Object {
-      "certificates": undefined,
-      "collaterals": Array [],
-      "fee": 181649n,
-      "inputs": Array [],
-      "mint": undefined,
-      "outputs": Array [
-        Object {
-          "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
-          "datum": "2f859cede222cf63ede95bfb867e3f880a44a4d057b85946b776d947bf094bef",
-          "value": Object {
-            "assets": Map {
-              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7441444158" => 2086814n,
-            },
-            "coins": 56670077n,
-          },
-        },
-        Object {
-          "address": "addr_test1qp2fxvmxlly62thlzmlrtf5tya2kay8lyucz40ns7xesrz2j8m73lvtj885qvfldxhadg5rsh5h79eczh6gu0deu96hqrrcz3e",
-          "datum": undefined,
-          "value": Object {
-            "assets": undefined,
-            "coins": 736788144n,
-          },
-        },
-      ],
-      "validityInterval": Object {
-        "invalidBefore": undefined,
-        "invalidHereafter": undefined,
+      "id": "3d4cd09885d39673125c3a15f8acb45d92fde137f9effe7a5131f6cc7241d960",
+      "index": 0,
+      "txSize": 780,
+      "witness": Object {
+        "redeemers": undefined,
+        "signatures": Map {},
       },
-      "withdrawals": undefined,
     },
-    "id": "56caf0441c4f0e209195b86b95e5304b338ca38ec232252c194153e8a3440c28",
-    "index": 8,
-    "txSize": 592,
-    "witness": Object {
-      "redeemers": undefined,
-      "signatures": Map {},
-    },
-  },
-  Object {
-    "auxiliaryData": undefined,
-    "blockHeader": Object {
-      "blockNo": 3274726,
-      "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
-      "slot": 49032415,
-    },
-    "body": Object {
-      "certificates": undefined,
-      "collaterals": Array [],
-      "fee": 179933n,
-      "inputs": Array [],
-      "mint": undefined,
-      "outputs": Array [
-        Object {
-          "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
-          "datum": "b2513d43d5e275476208b4a88b241fd01cd767e47620547fa50364b3e7648479",
-          "value": Object {
-            "assets": undefined,
-            "coins": 204000000n,
-          },
-        },
-        Object {
-          "address": "addr_test1qquh3j3u2v54pe2t6ntt0lyqnvm38v6prryuk8yhk556yjjkgqwx367r8umqax3slc758afpqsy9fzv45rsvgff8me4qa5md5z",
-          "datum": undefined,
-          "value": Object {
-            "assets": undefined,
-            "coins": 510111262n,
-          },
-        },
-      ],
-      "validityInterval": Object {
-        "invalidBefore": undefined,
-        "invalidHereafter": undefined,
+    Object {
+      "auxiliaryData": undefined,
+      "blockHeader": Object {
+        "blockNo": 2972717,
+        "hash": "05fbc6f8a26c8e16d731dd86880be59b123d17b7ebc7271b8d9dedb4152888c2",
+        "slot": 39224562,
       },
-      "withdrawals": undefined,
-    },
-    "id": "3d8e3e7c6d0929812abc40d29a3b1e4f470f6d04e9d4b3c521f1f87f74f7ab88",
-    "index": 10,
-    "txSize": 553,
-    "witness": Object {
-      "redeemers": undefined,
-      "signatures": Map {},
-    },
-  },
-  Object {
-    "auxiliaryData": undefined,
-    "blockHeader": Object {
-      "blockNo": 3274726,
-      "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
-      "slot": 49032415,
-    },
-    "body": Object {
-      "certificates": undefined,
-      "collaterals": Array [],
-      "fee": 183761n,
-      "inputs": Array [],
-      "mint": undefined,
-      "outputs": Array [
-        Object {
-          "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
-          "datum": "cd968f149166bfd195c82852cbbed09f3ca9d5b070e669f6c50f4ea9d98164f9",
-          "value": Object {
-            "assets": Map {
-              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 1678546n,
-            },
-            "coins": 254640002n,
+      "body": Object {
+        "certificates": Array [
+          Object {
+            "__typename": "PoolRetirementCertificate",
+            "epoch": 179,
+            "poolId": "pool1xv0p9vje3r09tac22mhgnsg08rmfm5qxadggjnfnq3cz52apdew",
           },
-        },
-        Object {
-          "address": "addr_test1qq7rv7r27wq5nz2q6htul8k55xrcjsz2tpxkhqfk5f6kfgfnqdurhe3e8zlltj63kwh78hg7ykrexmn6jxxn42egzs4skzyvvc",
-          "datum": undefined,
-          "value": Object {
-            "assets": Map {
-              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 661706n,
+        ],
+        "collaterals": Array [],
+        "fee": 179493n,
+        "inputs": Array [],
+        "mint": undefined,
+        "outputs": Array [
+          Object {
+            "address": "addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7",
+            "datum": undefined,
+            "value": Object {
+              "assets": undefined,
+              "coins": 1497444361n,
             },
-            "coins": 38816239n,
           },
+        ],
+        "validityInterval": Object {
+          "invalidBefore": undefined,
+          "invalidHereafter": 39233846,
         },
-      ],
-      "validityInterval": Object {
-        "invalidBefore": undefined,
-        "invalidHereafter": undefined,
+        "withdrawals": undefined,
       },
-      "withdrawals": undefined,
-    },
-    "id": "6eec4e9691e0fc2442e5c9bf22847998b80a1625b18a882a4e7b9e0cdda48dc3",
-    "index": 11,
-    "txSize": 640,
-    "witness": Object {
-      "redeemers": undefined,
-      "signatures": Map {},
-    },
-  },
-  Object {
-    "auxiliaryData": undefined,
-    "blockHeader": Object {
-      "blockNo": 3274726,
-      "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
-      "slot": 49032415,
-    },
-    "body": Object {
-      "certificates": undefined,
-      "collaterals": Array [],
-      "fee": 181605n,
-      "inputs": Array [],
-      "mint": undefined,
-      "outputs": Array [
-        Object {
-          "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
-          "datum": "51505ba8a19dbf24510f5a5c1cb1ab9f4572e197d17ae0035b0e563d02c8bdc2",
-          "value": Object {
-            "assets": Map {
-              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e" => 726163n,
-            },
-            "coins": 403099082n,
-          },
-        },
-        Object {
-          "address": "addr_test1qqt9fumrwz43e79rfjznn8nlnc05kdfyv7qrxx9ks2vacq8lxxtya039kqwxltw2q73wrdsvhgqrycllm0tg38c9nnkqxysjz6",
-          "datum": undefined,
-          "value": Object {
-            "assets": undefined,
-            "coins": 194539380n,
-          },
-        },
-      ],
-      "validityInterval": Object {
-        "invalidBefore": undefined,
-        "invalidHereafter": undefined,
+      "id": "face165bd7aa8d0d661cf1ceaa4e35d7611be3b1c7997da378c547aa2464a4fd",
+      "index": 1,
+      "txSize": 361,
+      "witness": Object {
+        "redeemers": undefined,
+        "signatures": Map {},
       },
-      "withdrawals": undefined,
     },
-    "id": "0dbbc0e6d13549a1960476aae42fd492a7a19fba856f9cc9695ecc5c84fe87e9",
-    "index": 13,
-    "txSize": 591,
-    "witness": Object {
-      "redeemers": undefined,
-      "signatures": Map {},
+    Object {
+      "auxiliaryData": undefined,
+      "blockHeader": Object {
+        "blockNo": 3087425,
+        "hash": "2d64f08b80b2f2afffa0887bf6421c3bacf863c70017ef78289340bc45bae1c5",
+        "slot": 43010355,
+      },
+      "body": Object {
+        "certificates": Array [
+          Object {
+            "__typename": "PoolRegistrationCertificate",
+            "poolParameters": null,
+          },
+          Object {
+            "__typename": "StakeDelegationCertificate",
+            "poolId": "pool1xv0p9vje3r09tac22mhgnsg08rmfm5qxadggjnfnq3cz52apdew",
+            "stakeKeyHash": "34ff9be684ca26d2efee39a693fe051d393bb90d567357e6bbdeb2c8",
+          },
+        ],
+        "collaterals": Array [],
+        "fee": 197973n,
+        "inputs": Array [
+          Object {
+            "address": "addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7",
+            "index": 0,
+            "txId": "face165bd7aa8d0d661cf1ceaa4e35d7611be3b1c7997da378c547aa2464a4fd",
+          },
+        ],
+        "mint": undefined,
+        "outputs": Array [
+          Object {
+            "address": "addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7",
+            "datum": undefined,
+            "value": Object {
+              "assets": undefined,
+              "coins": 1497246388n,
+            },
+          },
+        ],
+        "validityInterval": Object {
+          "invalidBefore": undefined,
+          "invalidHereafter": 43018365,
+        },
+        "withdrawals": undefined,
+      },
+      "id": "19251f57476d7af2777252270413c01383d9503110a68b4fde1a239c119c4f5d",
+      "index": 2,
+      "txSize": 737,
+      "witness": Object {
+        "redeemers": undefined,
+        "signatures": Map {},
+      },
     },
-  },
-]
+    Object {
+      "auxiliaryData": undefined,
+      "blockHeader": Object {
+        "blockNo": 3274726,
+        "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
+        "slot": 49032415,
+      },
+      "body": Object {
+        "certificates": undefined,
+        "collaterals": Array [],
+        "fee": 181605n,
+        "inputs": Array [],
+        "mint": undefined,
+        "outputs": Array [
+          Object {
+            "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
+            "datum": "7d6dd89f80dfa80dd0a0e334c220df18cfdc11b8e9e0340384ef193b8a09092b",
+            "value": Object {
+              "assets": Map {
+                "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e" => 359387n,
+              },
+              "coins": 201519044n,
+            },
+          },
+          Object {
+            "address": "addr_test1qp64f82kqyn934qtytqf2xhzqnasknqk5f5y88e3jh7s95cmtpwh9z5nwy2egezfnm7eddt4ysfp7tg87attl3ejgjns2qgy69",
+            "datum": undefined,
+            "value": Object {
+              "assets": undefined,
+              "coins": 391939485n,
+            },
+          },
+        ],
+        "validityInterval": Object {
+          "invalidBefore": undefined,
+          "invalidHereafter": undefined,
+        },
+        "withdrawals": undefined,
+      },
+      "id": "caaada4c53256a9bcba2d006b3f427f089d43372442a550a7349627a46682375",
+      "index": 1,
+      "txSize": 591,
+      "witness": Object {
+        "redeemers": undefined,
+        "signatures": Map {},
+      },
+    },
+  ],
+  "totalResultCount": 12,
+}
+`;
+
+exports[`ChainHistoryHttpService healthy state /txs/by-addresses server and snapshot testing finds transactions with address within outputs 2`] = `
+Object {
+  "pageResults": Array [
+    Object {
+      "auxiliaryData": undefined,
+      "blockHeader": Object {
+        "blockNo": 3274726,
+        "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
+        "slot": 49032415,
+      },
+      "body": Object {
+        "certificates": undefined,
+        "collaterals": Array [],
+        "fee": 179977n,
+        "inputs": Array [],
+        "mint": undefined,
+        "outputs": Array [
+          Object {
+            "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
+            "datum": "87d376b58b5c5c6b173694172d980100bf6d383b2755618f139dedc1e58c9bea",
+            "value": Object {
+              "assets": undefined,
+              "coins": 23000000n,
+            },
+          },
+          Object {
+            "address": "addr_test1qr6sape30ttq8zahxmah2wzaqk3ldc0n0cehj8e408ejhwrq5hrg8xmfyakef5awud6g6uew447r6970evl9lzgrak0qgz3ejq",
+            "datum": undefined,
+            "value": Object {
+              "assets": undefined,
+              "coins": 893280136n,
+            },
+          },
+        ],
+        "validityInterval": Object {
+          "invalidBefore": undefined,
+          "invalidHereafter": undefined,
+        },
+        "withdrawals": undefined,
+      },
+      "id": "49fa6b7245674fd11727cfb4d47ec7fad380c198a2a975b0423c5f6c255488f9",
+      "index": 3,
+      "txSize": 554,
+      "witness": Object {
+        "redeemers": undefined,
+        "signatures": Map {},
+      },
+    },
+    Object {
+      "auxiliaryData": undefined,
+      "blockHeader": Object {
+        "blockNo": 3274726,
+        "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
+        "slot": 49032415,
+      },
+      "body": Object {
+        "certificates": undefined,
+        "collaterals": Array [],
+        "fee": 179977n,
+        "inputs": Array [],
+        "mint": undefined,
+        "outputs": Array [
+          Object {
+            "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
+            "datum": "b72256efc2b1cd920d75f769d1ca11433c2890b1ac5ade783de9b536504be618",
+            "value": Object {
+              "assets": undefined,
+              "coins": 154000000n,
+            },
+          },
+          Object {
+            "address": "addr_test1qq75mx8z9sh8aucku2lwjp7c6fe2m3w90aqt9kw4rczjt8lj0rhad28c9f9cmcm64jyqpvths06w4tgwc0vnpx3veqvsj2953n",
+            "datum": undefined,
+            "value": Object {
+              "assets": undefined,
+              "coins": 612159447n,
+            },
+          },
+        ],
+        "validityInterval": Object {
+          "invalidBefore": undefined,
+          "invalidHereafter": undefined,
+        },
+        "withdrawals": undefined,
+      },
+      "id": "a7eda535edc983139cc1053d074106aef54b25e9c9ee9de6bf1bf69709dabfd4",
+      "index": 5,
+      "txSize": 554,
+      "witness": Object {
+        "redeemers": undefined,
+        "signatures": Map {},
+      },
+    },
+    Object {
+      "auxiliaryData": undefined,
+      "blockHeader": Object {
+        "blockNo": 3274726,
+        "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
+        "slot": 49032415,
+      },
+      "body": Object {
+        "certificates": undefined,
+        "collaterals": Array [],
+        "fee": 186401n,
+        "inputs": Array [],
+        "mint": undefined,
+        "outputs": Array [
+          Object {
+            "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
+            "datum": "13d75d53a0ebf1d51dc7332634366ee9191dc9c5f371fbdfdd1af382638cd310",
+            "value": Object {
+              "assets": Map {
+                "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e" => 30000n,
+              },
+              "coins": 20487995n,
+            },
+          },
+          Object {
+            "address": "addr_test1qry75qe2e5zez3ny5nuu2dsxrrwhxpl7mr7gdwpsgyfsvtgcgddl7qwm2vl7vedf3xp0vy7ya9ag7dqkcqqktv5403nspw962t",
+            "datum": undefined,
+            "value": Object {
+              "assets": Map {
+                "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e" => 60704n,
+                "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130cb6de817be83e93a5771e6c98ee305e1012bae70d9eb9dff70e2d71e4b611779" => 194994n,
+              },
+              "coins": 591423467n,
+            },
+          },
+        ],
+        "validityInterval": Object {
+          "invalidBefore": undefined,
+          "invalidHereafter": undefined,
+        },
+        "withdrawals": undefined,
+      },
+      "id": "b46c48229336aec327a5f537bcbf1ca8fa6a3afbf60aa66880aa6a234e5fce92",
+      "index": 7,
+      "txSize": 700,
+      "witness": Object {
+        "redeemers": undefined,
+        "signatures": Map {},
+      },
+    },
+    Object {
+      "auxiliaryData": undefined,
+      "blockHeader": Object {
+        "blockNo": 3274726,
+        "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
+        "slot": 49032415,
+      },
+      "body": Object {
+        "certificates": undefined,
+        "collaterals": Array [],
+        "fee": 181649n,
+        "inputs": Array [],
+        "mint": undefined,
+        "outputs": Array [
+          Object {
+            "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
+            "datum": "2f859cede222cf63ede95bfb867e3f880a44a4d057b85946b776d947bf094bef",
+            "value": Object {
+              "assets": Map {
+                "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7441444158" => 2086814n,
+              },
+              "coins": 56670077n,
+            },
+          },
+          Object {
+            "address": "addr_test1qp2fxvmxlly62thlzmlrtf5tya2kay8lyucz40ns7xesrz2j8m73lvtj885qvfldxhadg5rsh5h79eczh6gu0deu96hqrrcz3e",
+            "datum": undefined,
+            "value": Object {
+              "assets": undefined,
+              "coins": 736788144n,
+            },
+          },
+        ],
+        "validityInterval": Object {
+          "invalidBefore": undefined,
+          "invalidHereafter": undefined,
+        },
+        "withdrawals": undefined,
+      },
+      "id": "56caf0441c4f0e209195b86b95e5304b338ca38ec232252c194153e8a3440c28",
+      "index": 8,
+      "txSize": 592,
+      "witness": Object {
+        "redeemers": undefined,
+        "signatures": Map {},
+      },
+    },
+    Object {
+      "auxiliaryData": undefined,
+      "blockHeader": Object {
+        "blockNo": 3274726,
+        "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
+        "slot": 49032415,
+      },
+      "body": Object {
+        "certificates": undefined,
+        "collaterals": Array [],
+        "fee": 179933n,
+        "inputs": Array [],
+        "mint": undefined,
+        "outputs": Array [
+          Object {
+            "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
+            "datum": "b2513d43d5e275476208b4a88b241fd01cd767e47620547fa50364b3e7648479",
+            "value": Object {
+              "assets": undefined,
+              "coins": 204000000n,
+            },
+          },
+          Object {
+            "address": "addr_test1qquh3j3u2v54pe2t6ntt0lyqnvm38v6prryuk8yhk556yjjkgqwx367r8umqax3slc758afpqsy9fzv45rsvgff8me4qa5md5z",
+            "datum": undefined,
+            "value": Object {
+              "assets": undefined,
+              "coins": 510111262n,
+            },
+          },
+        ],
+        "validityInterval": Object {
+          "invalidBefore": undefined,
+          "invalidHereafter": undefined,
+        },
+        "withdrawals": undefined,
+      },
+      "id": "3d8e3e7c6d0929812abc40d29a3b1e4f470f6d04e9d4b3c521f1f87f74f7ab88",
+      "index": 10,
+      "txSize": 553,
+      "witness": Object {
+        "redeemers": undefined,
+        "signatures": Map {},
+      },
+    },
+  ],
+  "totalResultCount": 12,
+}
+`;
+
+exports[`ChainHistoryHttpService healthy state /txs/by-addresses server and snapshot testing finds transactions with address within outputs 3`] = `
+Object {
+  "pageResults": Array [
+    Object {
+      "auxiliaryData": undefined,
+      "blockHeader": Object {
+        "blockNo": 3274726,
+        "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
+        "slot": 49032415,
+      },
+      "body": Object {
+        "certificates": undefined,
+        "collaterals": Array [],
+        "fee": 183761n,
+        "inputs": Array [],
+        "mint": undefined,
+        "outputs": Array [
+          Object {
+            "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
+            "datum": "cd968f149166bfd195c82852cbbed09f3ca9d5b070e669f6c50f4ea9d98164f9",
+            "value": Object {
+              "assets": Map {
+                "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 1678546n,
+              },
+              "coins": 254640002n,
+            },
+          },
+          Object {
+            "address": "addr_test1qq7rv7r27wq5nz2q6htul8k55xrcjsz2tpxkhqfk5f6kfgfnqdurhe3e8zlltj63kwh78hg7ykrexmn6jxxn42egzs4skzyvvc",
+            "datum": undefined,
+            "value": Object {
+              "assets": Map {
+                "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 661706n,
+              },
+              "coins": 38816239n,
+            },
+          },
+        ],
+        "validityInterval": Object {
+          "invalidBefore": undefined,
+          "invalidHereafter": undefined,
+        },
+        "withdrawals": undefined,
+      },
+      "id": "6eec4e9691e0fc2442e5c9bf22847998b80a1625b18a882a4e7b9e0cdda48dc3",
+      "index": 11,
+      "txSize": 640,
+      "witness": Object {
+        "redeemers": undefined,
+        "signatures": Map {},
+      },
+    },
+    Object {
+      "auxiliaryData": undefined,
+      "blockHeader": Object {
+        "blockNo": 3274726,
+        "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
+        "slot": 49032415,
+      },
+      "body": Object {
+        "certificates": undefined,
+        "collaterals": Array [],
+        "fee": 181605n,
+        "inputs": Array [],
+        "mint": undefined,
+        "outputs": Array [
+          Object {
+            "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
+            "datum": "51505ba8a19dbf24510f5a5c1cb1ab9f4572e197d17ae0035b0e563d02c8bdc2",
+            "value": Object {
+              "assets": Map {
+                "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e" => 726163n,
+              },
+              "coins": 403099082n,
+            },
+          },
+          Object {
+            "address": "addr_test1qqt9fumrwz43e79rfjznn8nlnc05kdfyv7qrxx9ks2vacq8lxxtya039kqwxltw2q73wrdsvhgqrycllm0tg38c9nnkqxysjz6",
+            "datum": undefined,
+            "value": Object {
+              "assets": undefined,
+              "coins": 194539380n,
+            },
+          },
+        ],
+        "validityInterval": Object {
+          "invalidBefore": undefined,
+          "invalidHereafter": undefined,
+        },
+        "withdrawals": undefined,
+      },
+      "id": "0dbbc0e6d13549a1960476aae42fd492a7a19fba856f9cc9695ecc5c84fe87e9",
+      "index": 13,
+      "txSize": 591,
+      "witness": Object {
+        "redeemers": undefined,
+        "signatures": Map {},
+      },
+    },
+  ],
+  "totalResultCount": 12,
+}
 `;
 
 exports[`ChainHistoryHttpService healthy state /txs/by-hashes server and snapshot testing has auxiliary data 1`] = `

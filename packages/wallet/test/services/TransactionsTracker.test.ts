@@ -1,7 +1,19 @@
+/* eslint-disable max-len */
 import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
-import { ChainHistoryProviderStub, mockChainHistoryProvider, queryTransactionsResult } from '../mocks';
+import {
+  ChainHistoryProviderStub,
+  generateTxAlonzo,
+  mockChainHistoryProvider,
+  queryTransactionsResult
+} from '../mocks';
 import { EMPTY, bufferCount, firstValueFrom, of } from 'rxjs';
-import { FailedTx, TransactionFailure, createAddressTransactionsProvider, createTransactionsTracker } from '../../src';
+import {
+  FailedTx,
+  PAGE_SIZE,
+  TransactionFailure,
+  createAddressTransactionsProvider,
+  createTransactionsTracker
+} from '../../src';
 import { InMemoryInFlightTransactionsStore, InMemoryTransactionsStore, WalletStores } from '../../src/persistence';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
@@ -16,7 +28,7 @@ describe('TransactionsTracker', () => {
     let chainHistoryProvider: ChainHistoryProviderStub;
     const tipBlockHeight$ = of(300);
     const retryBackoffConfig = { initialInterval: 1 }; // not relevant
-    const addresses = [queryTransactionsResult[0].body.inputs[0].address!];
+    const addresses = [queryTransactionsResult.pageResults[0].body.inputs[0].address!];
 
     beforeEach(() => {
       chainHistoryProvider = mockChainHistoryProvider();
@@ -33,13 +45,46 @@ describe('TransactionsTracker', () => {
         store,
         tipBlockHeight$
       }).transactionsSource$;
-      expect(await firstValueFrom(provider$)).toEqual(queryTransactionsResult);
+      expect(await firstValueFrom(provider$)).toEqual(queryTransactionsResult.pageResults);
       expect(store.setAll).toBeCalledTimes(1);
-      expect(store.setAll).toBeCalledWith(queryTransactionsResult);
+      expect(store.setAll).toBeCalledWith(queryTransactionsResult.pageResults);
+    });
+
+    it('emits entire transactions list resolved by ChainHistoryProvider', async () => {
+      const pageSize = PAGE_SIZE;
+      const secondPageSize = 5;
+      const totalTxsCount = pageSize + secondPageSize;
+
+      const firstPageTxs = {
+        pageResults: generateTxAlonzo(pageSize),
+        totalResultCount: totalTxsCount
+      };
+      const secondPageTxs = {
+        pageResults: generateTxAlonzo(secondPageSize),
+        totalResultCount: totalTxsCount
+      };
+      chainHistoryProvider.transactionsByAddresses = jest
+        .fn()
+        .mockResolvedValueOnce(firstPageTxs)
+        .mockResolvedValueOnce(secondPageTxs);
+
+      const provider$ = createAddressTransactionsProvider({
+        addresses$: of(addresses),
+        chainHistoryProvider,
+        logger,
+        retryBackoffConfig,
+        store,
+        tipBlockHeight$
+      }).transactionsSource$;
+
+      const transactionsHistory = await firstValueFrom(provider$);
+      expect(transactionsHistory.length).toEqual(totalTxsCount);
+      expect(transactionsHistory).toEqual([...firstPageTxs.pageResults, ...secondPageTxs.pageResults]);
+      expect(store.setAll).toBeCalledWith([...firstPageTxs.pageResults, ...secondPageTxs.pageResults]);
     });
 
     it('emits existing transactions from store, then transactions resolved by ChainHistoryProvider', async () => {
-      await firstValueFrom(store.setAll([queryTransactionsResult[0]]));
+      await firstValueFrom(store.setAll([queryTransactionsResult.pageResults[0]]));
       chainHistoryProvider.transactionsByAddresses = jest
         .fn()
         .mockImplementation(() => delay(50).then(() => queryTransactionsResult));
@@ -52,24 +97,27 @@ describe('TransactionsTracker', () => {
         tipBlockHeight$
       }).transactionsSource$;
       expect(await firstValueFrom(provider$.pipe(bufferCount(2)))).toEqual([
-        [queryTransactionsResult[0]],
-        queryTransactionsResult
+        [queryTransactionsResult.pageResults[0]],
+        queryTransactionsResult.pageResults
       ]);
       expect(store.setAll).toBeCalledTimes(2);
       expect(chainHistoryProvider.transactionsByAddresses).toBeCalledTimes(1);
       expect(chainHistoryProvider.transactionsByAddresses).toBeCalledWith({
         addresses,
-        sinceBlock: queryTransactionsResult[0].blockHeader.blockNo
+        blockRange: { lowerBound: queryTransactionsResult.pageResults[0].blockHeader.blockNo },
+        pagination: { limit: 25, startAt: 0 }
       });
     });
 
-    it('queries ChainHistoryProvider again with sinceBlock from a previous transaction on rollback', async () => {
-      await firstValueFrom(store.setAll(queryTransactionsResult));
+    it('queries ChainHistoryProvider again with blockRange lower bound from a previous transaction on rollback', async () => {
+      await firstValueFrom(store.setAll(queryTransactionsResult.pageResults));
       chainHistoryProvider.transactionsByAddresses = jest
         .fn()
-        .mockImplementationOnce(() => delay(50).then(() => []))
-        .mockImplementationOnce(() => delay(50).then(() => []))
-        .mockImplementationOnce(() => delay(50).then(() => [queryTransactionsResult[0]]));
+        .mockImplementationOnce(() => delay(50).then(() => ({ pageResults: [], totalResultCount: 0 })))
+        .mockImplementationOnce(() => delay(50).then(() => ({ pageResults: [], totalResultCount: 0 })))
+        .mockImplementationOnce(() =>
+          delay(50).then(() => ({ pageResults: [queryTransactionsResult.pageResults[0]], totalResultCount: 1 }))
+        );
       const { transactionsSource$: provider$, rollback$ } = createAddressTransactionsProvider({
         addresses$: of(addresses),
         chainHistoryProvider,
@@ -83,24 +131,28 @@ describe('TransactionsTracker', () => {
       rollback$.subscribe((tx) => rollbacks.push(tx));
 
       expect(await firstValueFrom(provider$.pipe(bufferCount(2)))).toEqual([
-        queryTransactionsResult, // from store
-        [queryTransactionsResult[0]] // store + chain history
+        queryTransactionsResult.pageResults, // from store
+        [queryTransactionsResult.pageResults[0]] // store + chain history
       ]);
 
-      expect(rollbacks).toEqual([queryTransactionsResult[1], queryTransactionsResult[0]]);
+      expect(rollbacks).toEqual([queryTransactionsResult.pageResults[1], queryTransactionsResult.pageResults[0]]);
 
       expect(store.setAll).toBeCalledTimes(2);
       expect(chainHistoryProvider.transactionsByAddresses).toBeCalledTimes(3);
       expect(chainHistoryProvider.transactionsByAddresses).nthCalledWith(1, {
         addresses,
-        sinceBlock: queryTransactionsResult[1].blockHeader.blockNo
+        blockRange: { lowerBound: queryTransactionsResult.pageResults[1].blockHeader.blockNo },
+        pagination: { limit: 25, startAt: 0 }
       });
       expect(chainHistoryProvider.transactionsByAddresses).nthCalledWith(2, {
         addresses,
-        sinceBlock: queryTransactionsResult[0].blockHeader.blockNo
+        blockRange: { lowerBound: queryTransactionsResult.pageResults[0].blockHeader.blockNo },
+        pagination: { limit: 25, startAt: 0 }
       });
       expect(chainHistoryProvider.transactionsByAddresses).nthCalledWith(3, {
-        addresses
+        addresses,
+        blockRange: { lowerBound: undefined },
+        pagination: { limit: 25, startAt: 0 }
       });
     });
   });
@@ -112,7 +164,7 @@ describe('TransactionsTracker', () => {
     let chainHistoryProvider: ChainHistoryProvider;
     let transactionsStore: WalletStores['transactions'];
     let inFlightTransactionsStore: WalletStores['inFlightTransactions'];
-    const myAddress = queryTransactionsResult[0].body.inputs[0].address;
+    const myAddress = queryTransactionsResult.pageResults[0].body.inputs[0].address;
     const addresses$ = of([myAddress!]);
 
     beforeEach(() => {
@@ -121,8 +173,8 @@ describe('TransactionsTracker', () => {
     });
 
     it('observable properties behave correctly on successful transaction', async () => {
-      const outgoingTx = queryTransactionsResult[0];
-      const incomingTx = queryTransactionsResult[1];
+      const outgoingTx = queryTransactionsResult.pageResults[0];
+      const incomingTx = queryTransactionsResult.pageResults[1];
       createTestScheduler().run(({ hot, expectObservable }) => {
         const failedToSubmit$ = hot<FailedTx>('----|');
         const tip$ = hot<Cardano.Tip>('----|');
@@ -170,7 +222,7 @@ describe('TransactionsTracker', () => {
     });
 
     it('emits at all relevant observable properties on timed out transaction', async () => {
-      const tx = queryTransactionsResult[0];
+      const tx = queryTransactionsResult.pageResults[0];
       createTestScheduler().run(({ hot, expectObservable }) => {
         const tip = { slot: tx.body.validityInterval.invalidHereafter! + 1 } as Cardano.Tip;
         const failedToSubmit$ = hot<FailedTx>('-----|');
@@ -214,7 +266,7 @@ describe('TransactionsTracker', () => {
     });
 
     it('emits at all relevant observable properties on transaction that failed to submit', async () => {
-      const tx = queryTransactionsResult[0];
+      const tx = queryTransactionsResult.pageResults[0];
       createTestScheduler().run(({ cold, hot, expectObservable }) => {
         const tip$ = hot<Cardano.Tip>('----|');
         const submitting$ = cold('-a--|', { a: tx });
@@ -255,7 +307,7 @@ describe('TransactionsTracker', () => {
 
     it('stored inFlight transactions are restored and merged with submitting ones', async () => {
       const storedInFlightTransaction = { body: { validityInterval: { invalidHereafter: 1 } } } as Cardano.NewTxAlonzo;
-      const outgoingTx = queryTransactionsResult[0];
+      const outgoingTx = queryTransactionsResult.pageResults[0];
       createTestScheduler().run(({ hot, expectObservable }) => {
         const inFlight$ = hot<Cardano.NewTxAlonzo[]>('-x|', {
           x: [storedInFlightTransaction]
@@ -310,8 +362,8 @@ describe('TransactionsTracker', () => {
     });
 
     it('inFlight transactions are removed from store on successful transaction', async () => {
-      const outgoingTx = queryTransactionsResult[0];
-      const incomingTx = queryTransactionsResult[1];
+      const outgoingTx = queryTransactionsResult.pageResults[0];
+      const incomingTx = queryTransactionsResult.pageResults[1];
       const storedInFlightTransaction = outgoingTx;
 
       createTestScheduler().run(({ hot, expectObservable }) => {
