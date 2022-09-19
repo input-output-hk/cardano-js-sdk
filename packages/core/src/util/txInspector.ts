@@ -8,6 +8,8 @@ import {
   Lovelace,
   Metadatum,
   PolicyId,
+  PoolRegistrationCertificate,
+  PoolRetirementCertificate,
   RewardAccount,
   Script,
   ScriptType,
@@ -34,6 +36,8 @@ type TxInspector<T extends Inspectors> = (tx: TxAlonzo) => {
 export type SendReceiveValueInspection = Value;
 export type DelegationInspection = StakeDelegationCertificate[];
 export type StakeKeyRegistrationInspection = StakeAddressCertificate[];
+export type PoolRegistrationInspection = PoolRegistrationCertificate[];
+export type PoolRetirementInspection = PoolRetirementCertificate[];
 
 export type WithdrawalInspection = Lovelace;
 export interface SentInspection {
@@ -74,6 +78,8 @@ export type SignedCertificatesInspector = (
 ) => Inspector<SignedCertificatesInspection>;
 export type AssetsMintedInspector = Inspector<AssetsMintedInspection>;
 export type MetadataInspector = Inspector<MetadataInspection>;
+export type PoolRegistrationInspector = Inspector<PoolRegistrationInspection>;
+export type PoolRetirementInspector = Inspector<PoolRetirementInspection>;
 
 /**
  * Inspects a transaction for values (coins + assets) in inputs
@@ -184,26 +190,32 @@ export const valueReceivedInspector: TotalAddressInputsValueInspector = (ownAddr
 };
 
 /**
+ * Generic certificate inspector.
+ *
+ * @param type The type name of the certificate.
+ */
+const certificateInspector =
+  <
+    T extends
+      | DelegationInspection
+      | StakeKeyRegistrationInspection
+      | PoolRegistrationInspection
+      | PoolRetirementInspection
+  >(
+    type: CertificateType
+  ): Inspector<T> =>
+  (tx) =>
+    (tx.body.certificates?.filter((cert) => cert.__typename === type) as T) ?? [];
+
+/**
  * Inspects a transaction for a stake delegation certificate.
  *
  * @param {TxAlonzo} tx transaction to inspect
  * @returns {DelegationInspection} array of delegation certificates
  */
-export const delegationInspector: DelegationInspector = (tx) =>
-  (tx.body.certificates?.filter(
-    (cert) => cert.__typename === CertificateType.StakeDelegation
-  ) as StakeDelegationCertificate[]) ?? [];
-
-/**
- * Inspects a transaction for a stake key registration certificate.
- *
- * @param {TxAlonzo} tx transaction to inspect
- * @returns {StakeKeyRegistrationInspection} array of stake key registration certificates
- */
-export const stakeKeyRegistrationInspector: StakeKeyRegistrationInspector = (tx) =>
-  (tx.body.certificates?.filter(
-    (cert) => cert.__typename === CertificateType.StakeKeyRegistration
-  ) as StakeAddressCertificate[]) ?? [];
+export const delegationInspector: DelegationInspector = certificateInspector<DelegationInspection>(
+  CertificateType.StakeDelegation
+);
 
 /**
  * Inspects a transaction for a stake key deregistration certificate.
@@ -211,10 +223,37 @@ export const stakeKeyRegistrationInspector: StakeKeyRegistrationInspector = (tx)
  * @param {TxAlonzo} tx transaction to inspect
  * @returns {StakeKeyRegistrationInspection} array of stake key deregistration certificates
  */
-export const stakeKeyDeregistrationInspector: StakeKeyRegistrationInspector = (tx) =>
-  (tx.body.certificates?.filter(
-    (cert) => cert.__typename === CertificateType.StakeKeyDeregistration
-  ) as StakeAddressCertificate[]) ?? [];
+export const stakeKeyDeregistrationInspector: StakeKeyRegistrationInspector =
+  certificateInspector<StakeKeyRegistrationInspection>(CertificateType.StakeKeyDeregistration);
+
+/**
+ * Inspects a transaction for a stake key registration certificate.
+ *
+ * @param {TxAlonzo} tx transaction to inspect
+ * @returns {StakeKeyRegistrationInspection} array of stake key registration certificates
+ */
+export const stakeKeyRegistrationInspector: StakeKeyRegistrationInspector =
+  certificateInspector<StakeKeyRegistrationInspection>(CertificateType.StakeKeyRegistration);
+
+/**
+ * Inspects a transaction for pool registration certificates.
+ *
+ * @param {TxAlonzo} tx transaction to inspect.
+ * @returns {PoolRegistrationInspection} array of pool registration certificates.
+ */
+export const poolRegistrationInspector: PoolRegistrationInspector = certificateInspector<PoolRegistrationInspection>(
+  CertificateType.PoolRegistration
+);
+
+/**
+ * Inspects a transaction for pool retirement certificates.
+ *
+ * @param {TxAlonzo} tx transaction to inspect.
+ * @returns {PoolRetirementInspection} array of pool retirement certificates.
+ */
+export const poolRetirementInspector: PoolRetirementInspector = certificateInspector<PoolRetirementInspection>(
+  CertificateType.PoolRetirement
+);
 
 /**
  * Inspects a transaction for withdrawals.
