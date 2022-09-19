@@ -1,6 +1,6 @@
-/* eslint-disable no-use-before-define */
-import { Slot } from '../';
+import { Slot } from './Block';
 
+/* eslint-disable no-use-before-define */
 export interface ProtocolVersion {
   major: number;
   minor: number;

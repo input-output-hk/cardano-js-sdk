@@ -1,6 +1,5 @@
 import * as typesUtil from '../util';
-import { InvalidStringError } from '../..';
-import { util as addressUtil } from '../../Address';
+import { InvalidStringError } from '../../errors';
 
 /**
  * mainnet or testnet address (Shelley as bech32 string, Byron as base58-encoded string)
@@ -22,7 +21,7 @@ const isRewardAccount = (address: string) => {
 };
 
 export const Address = (value: string): Address => {
-  if (addressUtil.isAddress(value) && !isRewardAccount(value)) {
+  if (typesUtil.isAddress(value) && !isRewardAccount(value)) {
     return value as unknown as Address;
   }
   throw new InvalidStringError(`Invalid address: ${value}`);

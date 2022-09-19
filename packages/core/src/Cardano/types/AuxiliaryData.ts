@@ -1,4 +1,5 @@
-import * as Cardano from '.';
+import { Hash32ByteBase16 } from '../util/primitives';
+import { Script } from './Script';
 
 // eslint-disable-next-line no-use-before-define
 export type MetadatumMap = Map<Metadatum, Metadatum>;
@@ -9,10 +10,10 @@ export type TxMetadata = Map<bigint, Metadatum>;
 
 export interface AuxiliaryDataBody {
   blob?: TxMetadata;
-  scripts?: Cardano.Script[];
+  scripts?: Script[];
 }
 
 export interface AuxiliaryData {
-  hash?: Cardano.Hash32ByteBase16;
+  hash?: Hash32ByteBase16;
   body: AuxiliaryDataBody;
 }

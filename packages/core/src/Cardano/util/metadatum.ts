@@ -1,6 +1,4 @@
-import * as fromCore from '../../CSL/coreToCsl';
-import * as toCore from '../../CSL/cslToCore';
-import { CSL } from '../..';
+import { CSL, coreToCsl as fromCore, cslToCore as toCore } from '../../CSL';
 import { Metadatum, MetadatumMap } from '../types';
 
 /**

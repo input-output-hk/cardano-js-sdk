@@ -1,4 +1,4 @@
-import { CSL } from '../../CSL';
+import { CSL } from '../../CSL/CSL';
 import { Hash28ByteBase16, HexBlob, OpaqueString, castHexBlob, typedHex } from '../util';
 import { RewardAccount } from './RewardAccount';
 

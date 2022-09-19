@@ -1,5 +1,9 @@
-import { Cardano } from '../..';
-import { EpochNo, Hash32ByteBase16, Lovelace, PoolId, PoolParameters, RewardAccount } from '.';
+import { Ed25519KeyHash } from './Key';
+import { EpochNo } from './Block';
+import { Hash32ByteBase16 } from '../util/primitives';
+import { Lovelace } from './Value';
+import { PoolId, PoolParameters } from './StakePool';
+import { RewardAccount } from './RewardAccount';
 
 export enum CertificateType {
   StakeKeyRegistration = 'StakeKeyRegistrationCertificate',
@@ -13,7 +17,7 @@ export enum CertificateType {
 
 export interface StakeAddressCertificate {
   __typename: CertificateType.StakeKeyRegistration | CertificateType.StakeKeyDeregistration;
-  stakeKeyHash: Cardano.Ed25519KeyHash;
+  stakeKeyHash: Ed25519KeyHash;
 }
 
 export interface PoolRegistrationCertificate {
@@ -29,7 +33,7 @@ export interface PoolRetirementCertificate {
 
 export interface StakeDelegationCertificate {
   __typename: CertificateType.StakeDelegation;
-  stakeKeyHash: Cardano.Ed25519KeyHash;
+  stakeKeyHash: Ed25519KeyHash;
   poolId: PoolId;
 }
 
