@@ -42,57 +42,21 @@ export const toWalletProtocolParams = ({
   protocol_major,
   protocol_minor,
   min_fee_a,
-  min_fee_b,
-  max_block_size,
-  max_bh_size,
-  optimal_pool_count,
-  influence,
-  monetary_expand_rate,
-  treasury_growth_rate,
-  decentralisation,
-  collateral_percent,
-  price_mem,
-  price_step,
-  max_tx_ex_mem,
-  max_tx_ex_steps,
-  max_block_ex_mem,
-  max_block_ex_steps,
-  max_epoch
+  min_fee_b
 }: WalletProtocolParamsModel): ProtocolParametersRequiredByWallet => ({
   coinsPerUtxoByte: Number(coins_per_utxo_size),
-  collateralPercentage: collateral_percent,
-  decentralizationParameter: String(decentralisation),
-  desiredNumberOfPools: optimal_pool_count,
-  maxBlockBodySize: max_block_size,
-  maxBlockHeaderSize: max_bh_size,
   maxCollateralInputs: max_collateral_inputs,
-  maxExecutionUnitsPerBlock: {
-    memory: Number(max_block_ex_mem),
-    steps: Number(max_block_ex_steps)
-  },
-  maxExecutionUnitsPerTransaction: {
-    memory: Number(max_tx_ex_mem),
-    steps: Number(max_tx_ex_steps)
-  },
   maxTxSize: max_tx_size,
   maxValueSize: Number(max_val_size),
   minFeeCoefficient: min_fee_a,
   minFeeConstant: min_fee_b,
   minPoolCost: Number(min_pool_cost),
-  monetaryExpansion: String(monetary_expand_rate),
   poolDeposit: Number(pool_deposit),
-  poolInfluence: String(influence),
-  poolRetirementEpochBound: max_epoch,
-  prices: {
-    memory: price_mem,
-    steps: price_step
-  },
   protocolVersion: {
     major: protocol_major,
     minor: protocol_minor
   },
-  stakeKeyDeposit: Number(key_deposit),
-  treasuryExpansion: String(treasury_growth_rate)
+  stakeKeyDeposit: Number(key_deposit)
 });
 
 export const toGenesisParams = (genesis: GenesisData): Cardano.CompactGenesis => ({
