@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.1-nightly.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cip2@0.5.1-nightly.8...@cardano-sdk/cip2@0.5.1-nightly.9) (2022-09-20)
+
+**Note:** Version bump only for package @cardano-sdk/cip2
+
+
+
+
+
 ## [0.5.1-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cip2@0.5.1-nightly.7...@cardano-sdk/cip2@0.5.1-nightly.8) (2022-09-16)
 
 **Note:** Version bump only for package @cardano-sdk/cip2

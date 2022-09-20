@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/blockfrost@0.6.0-nightly.5...@cardano-sdk/blockfrost@0.6.0-nightly.6) (2022-09-20)
+
+
+### Bug Fixes
+
+* rollback ProtocolParametersRequiredByWallet type ([0cd8877](https://github.com/input-output-hk/cardano-js-sdk/commit/0cd887737cc5d4f8d920405c803f05f2c47e42f2))
+
+
+
 ## [0.6.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/blockfrost@0.6.0-nightly.4...@cardano-sdk/blockfrost@0.6.0-nightly.5) (2022-09-16)
 
 **Note:** Version bump only for package @cardano-sdk/blockfrost

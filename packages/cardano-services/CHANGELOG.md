@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.7...@cardano-sdk/cardano-services@0.6.0-nightly.8) (2022-09-20)
+
+
+### Features
+
+* **cardano-services:** make search stake pool case insensitive ([7fb42a7](https://github.com/input-output-hk/cardano-js-sdk/commit/7fb42a7941ae7cf721e18719b81858b454cfb6b8))
+
+
+### Bug Fixes
+
+* rollback ProtocolParametersRequiredByWallet type ([0cd8877](https://github.com/input-output-hk/cardano-js-sdk/commit/0cd887737cc5d4f8d920405c803f05f2c47e42f2))
+
+
+
 ## [0.6.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.6...@cardano-sdk/cardano-services@0.6.0-nightly.7) (2022-09-16)
 
 
