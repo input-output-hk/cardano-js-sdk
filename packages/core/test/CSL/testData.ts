@@ -67,6 +67,14 @@ export const txOut: Cardano.TxOut = {
   value: valueWithAssets
 };
 
+export const txOutWithDatum: Cardano.TxOut = {
+  address: Cardano.Address(
+    'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
+  ),
+  datum: Cardano.Hash32ByteBase16('4c94610a582b748b8db506abb45ccd48d0d4934942daa87d191645b947a547a7'),
+  value: valueWithAssets
+};
+
 export const txBody: Cardano.NewTxBodyAlonzo = {
   certificates: [
     {

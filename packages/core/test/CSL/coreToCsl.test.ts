@@ -2,7 +2,18 @@
 import { Asset, CSL, Cardano, SerializationFailure, coreToCsl } from '../../src';
 import { BigNum } from '@emurgo/cardano-serialization-lib-nodejs';
 import { Ed25519KeyHash, NativeScript, NativeScriptKind, ScriptType } from '../../src/Cardano';
-import { signature, tx, txBody, txIn, txInWithAddress, txOut, valueCoinOnly, valueWithAssets, vkey } from './testData';
+import {
+  signature,
+  tx,
+  txBody,
+  txIn,
+  txInWithAddress,
+  txOut,
+  txOutWithDatum,
+  valueCoinOnly,
+  valueWithAssets,
+  vkey
+} from './testData';
 
 const txOutByron = {
   ...txOut,
@@ -15,9 +26,16 @@ describe('coreToCsl', () => {
   it('txIn', () => {
     expect(coreToCsl.txIn(txIn)).toBeInstanceOf(CSL.TransactionInput);
   });
-  it('txOut', () => {
-    expect(coreToCsl.txOut(txOut)).toBeInstanceOf(CSL.TransactionOutput);
-    expect(coreToCsl.txOut(txOutByron)).toBeInstanceOf(CSL.TransactionOutput);
+  describe('txOut', () => {
+    it('converts to CSL.TransactionOutput', () => {
+      expect(coreToCsl.txOut(txOut)).toBeInstanceOf(CSL.TransactionOutput);
+      expect(coreToCsl.txOut(txOutByron)).toBeInstanceOf(CSL.TransactionOutput);
+    });
+    it('converts datum to CSL.DataHash', () => {
+      const cslTxOut = coreToCsl.txOut(txOutWithDatum);
+      expect(cslTxOut.data_hash()).toBeInstanceOf(CSL.DataHash);
+      expect(Buffer.from(cslTxOut.data_hash()!.to_bytes()).toString('hex')).toBe(txOutWithDatum.datum?.toString());
+    });
   });
   it('utxo', () => {
     expect(coreToCsl.utxo([[txInWithAddress, txOut]])[0]).toBeInstanceOf(CSL.TransactionUnspentOutput);
