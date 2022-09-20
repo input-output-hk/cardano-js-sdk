@@ -662,6 +662,8 @@ LEFT JOIN pool_offline_data pod
 WHERE pu.id = ANY($1)
 `;
 
+const toCaseInsensitiveParam = (_array: string[]) => `${_array.join('|')}`;
+
 const toSimilarToString = (_array: string[]) => `%(${_array.join('|')})%`;
 
 export const getIdentifierWhereClause = (
@@ -681,13 +683,13 @@ export const getIdentifierWhereClause = (
   const whereConditions = [];
   const params = [];
   if (names.length > 0) {
-    params.push(toSimilarToString(names));
+    params.push(toCaseInsensitiveParam(names));
     // eslint-disable-next-line quotes
-    whereConditions.push(`(pod."json" ->>'name')::varchar SIMILAR TO $1`);
+    whereConditions.push(`(pod."json" ->>'name')::varchar ~* $1`);
   }
   if (tickers.length > 0) {
-    params.push(toSimilarToString(tickers));
-    whereConditions.push(`pod.ticker_name SIMILAR TO $${params.length}`);
+    params.push(toCaseInsensitiveParam(tickers));
+    whereConditions.push(`pod.ticker_name ~* $${params.length}`);
   }
   if (ids.length > 0) {
     params.push(toSimilarToString(ids));

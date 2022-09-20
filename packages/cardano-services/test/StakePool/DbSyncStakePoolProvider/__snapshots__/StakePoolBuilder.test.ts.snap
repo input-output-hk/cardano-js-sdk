@@ -3,8 +3,8 @@
 exports[`StakePoolBuilder buildAndQuery buildAndQuery, queryPoolHashes & queryTotalCount 1`] = `
 Object {
   "params": Array [
-    "%(CL)%",
-    "%(CLIO)%",
+    "CL",
+    "CLIO",
     "%(pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70)%",
   ],
   "query": "WITH 
@@ -131,7 +131,7 @@ Object {
            WHERE  
     ((COALESCE(o_balance.total_amount,0) +
     COALESCE (r_balance.total_amount, 0)) 
-     >= ph.pledge) AND ((pod.\\"json\\" ->>'name')::varchar SIMILAR TO $1 and pod.ticker_name SIMILAR TO $2 and ph.view SIMILAR TO $3) AND ((COALESCE(pr.retiring_epoch,0) > (SELECT \\"no\\" FROM current_epoch) 
+     >= ph.pledge) AND ((pod.\\"json\\" ->>'name')::varchar ~* $1 and pod.ticker_name ~* $2 and ph.view SIMILAR TO $3) AND ((COALESCE(pr.retiring_epoch,0) > (SELECT \\"no\\" FROM current_epoch) 
           AND COALESCE(pr.retiring_epoch,0) > ph.active_epoch_no) OR (COALESCE(pr.retiring_epoch,0) <= (SELECT \\"no\\" FROM current_epoch) 
           AND COALESCE(pr.retiring_epoch,0) > ph.active_epoch_no) OR (ph.active_epoch_no > (SELECT \\"no\\" FROM current_epoch) 
           AND COALESCE(pr.retiring_epoch,0) <= ph.active_epoch_no) OR (ph.active_epoch_no <= (SELECT \\"no\\" FROM current_epoch) 
@@ -144,8 +144,8 @@ exports[`StakePoolBuilder buildAndQuery buildAndQuery, queryPoolHashes & queryTo
 exports[`StakePoolBuilder buildOrQuery buildOrQuery, queryPoolHashes & queryTotalCount 1`] = `
 Object {
   "params": Array [
-    "%(CL)%",
-    "%(CLIO)%",
+    "CL",
+    "CLIO",
     "%(pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70)%",
   ],
   "query": "
@@ -175,7 +175,7 @@ Object {
     LEFT JOIN pool_offline_data pod 
       ON pod.pool_id = ph.id
     
-    WHERE ((pod.\\"json\\" ->>'name')::varchar SIMILAR TO $1 and pod.ticker_name SIMILAR TO $2 and ph.view SIMILAR TO $3)
+    WHERE ((pod.\\"json\\" ->>'name')::varchar ~* $1 and pod.ticker_name ~* $2 and ph.view SIMILAR TO $3)
     ), pools_by_status AS (
     
     SELECT
@@ -320,8 +320,8 @@ Object {
     "name": "pools_by_identifier",
   },
   "params": Array [
-    "%(CL)%",
-    "%(CLIO)%",
+    "CL",
+    "CLIO",
     "%(pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70)%",
   ],
   "query": "
@@ -344,7 +344,7 @@ Object {
     LEFT JOIN pool_offline_data pod 
       ON pod.pool_id = ph.id
     
-    WHERE ((pod.\\"json\\" ->>'name')::varchar SIMILAR TO $1 and pod.ticker_name SIMILAR TO $2 and ph.view SIMILAR TO $3)
+    WHERE ((pod.\\"json\\" ->>'name')::varchar ~* $1 and pod.ticker_name ~* $2 and ph.view SIMILAR TO $3)
     ",
 }
 `;

@@ -27,36 +27,15 @@ export const BlockfrostToCore = {
     blockfrost: Responses['epoch_param_content']
   ): ProtocolParametersRequiredByWallet => ({
     coinsPerUtxoByte: Number(blockfrost.coins_per_utxo_word),
-    collateralPercentage: Number(blockfrost.collateral_percent),
-    decentralizationParameter: String(blockfrost.decentralisation_param),
-    desiredNumberOfPools: blockfrost.n_opt,
-    maxBlockBodySize: blockfrost.max_block_size,
-    maxBlockHeaderSize: blockfrost.max_block_header_size,
     maxCollateralInputs: Number(blockfrost.max_collateral_inputs),
-    maxExecutionUnitsPerBlock: {
-      memory: Number(blockfrost.max_block_ex_mem),
-      steps: Number(blockfrost.max_block_ex_mem)
-    },
-    maxExecutionUnitsPerTransaction: {
-      memory: Number(blockfrost.max_tx_ex_mem),
-      steps: Number(blockfrost.max_tx_ex_steps)
-    },
     maxTxSize: Number(blockfrost.max_tx_size),
     maxValueSize: Number(blockfrost.max_val_size),
     minFeeCoefficient: blockfrost.min_fee_a,
     minFeeConstant: blockfrost.min_fee_b,
     minPoolCost: Number(blockfrost.min_pool_cost),
-    monetaryExpansion: String(blockfrost.rho),
     poolDeposit: Number(blockfrost.pool_deposit),
-    poolInfluence: String(blockfrost.a0),
-    poolRetirementEpochBound: blockfrost.e_max,
-    prices: {
-      memory: Number(blockfrost.price_mem),
-      steps: Number(blockfrost.price_step)
-    },
     protocolVersion: { major: blockfrost.protocol_major_ver, minor: blockfrost.protocol_minor_ver },
-    stakeKeyDeposit: Number(blockfrost.key_deposit),
-    treasuryExpansion: String(blockfrost.tau)
+    stakeKeyDeposit: Number(blockfrost.key_deposit)
   }),
 
   inputFromUtxo: (address: string, utxo: BlockfrostUtxo): BlockfrostInput => ({

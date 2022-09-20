@@ -365,6 +365,23 @@ describe('StakePoolHttpService', () => {
           expect(responseWithOrCondition).toEqual(responseWithAndConditionCached);
           expect(responseWithAndCondition).toEqual(responseWithAndConditionCached);
         });
+        it('is case insensitive', async () => {
+          const values = [{ name: 'banderini', ticker: 'TEST' }];
+          const insensitiveValues = [{ name: 'bAnDeRiNi', ticker: 'TeSt' }];
+          const req: QueryStakePoolsArgs = {
+            filters: {
+              identifier: { values }
+            }
+          };
+          const reqWithInsensitiveValues: QueryStakePoolsArgs = {
+            filters: {
+              identifier: { values: insensitiveValues }
+            }
+          };
+          const response = await provider.queryStakePools(req);
+          const responseWithInsensitiveValues = await provider.queryStakePools(reqWithInsensitiveValues);
+          expect(response).toEqual(responseWithInsensitiveValues);
+        });
         it('no given condition equals to OR condition', async () => {
           const req: QueryStakePoolsArgs = {
             filters: {

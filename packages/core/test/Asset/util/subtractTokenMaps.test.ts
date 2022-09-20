@@ -48,6 +48,15 @@ describe('Asset', () => {
           ])
         );
       });
+      it('should not change the first element of the array', () => {
+        const asset1 = new Map([[AssetId.PXL, 10n]]);
+
+        const asset2 = new Map([[AssetId.PXL, 5n]]);
+
+        Asset.util.subtractTokenMaps([asset1, asset2]);
+
+        expect(asset1.get(AssetId.PXL)).toBe(10n);
+      });
     });
   });
 });
