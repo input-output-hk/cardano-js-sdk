@@ -5,3 +5,4 @@ export * from './CSL';
 export * from './util';
 export * from './errors';
 export * from './CardanoNode';
+export * from './Ogmios';
