@@ -59,13 +59,16 @@ export const getOnChainAddressBalances = (
               | Ogmios.Schema.BlockShelley
               | Ogmios.Schema.BlockAllegra
               | Ogmios.Schema.BlockMary
-              | Ogmios.Schema.BlockAlonzo;
+              | Ogmios.Schema.BlockAlonzo
+              | Ogmios.Schema.BlockBabbage;
             let blockBody:
+              undefined
               | Ogmios.Schema.StandardBlock['body']['txPayload']
               | Ogmios.Schema.BlockShelley['body']
               | Ogmios.Schema.BlockAllegra['body']
               | Ogmios.Schema.BlockMary['body']
-              | Ogmios.Schema.BlockAlonzo['body'];
+              | Ogmios.Schema.BlockAlonzo['body']
+              | Ogmios.Schema.BlockBabbage['body'];
             if (Ogmios.isByronStandardBlock(block)) {
               b = block.byron as Ogmios.Schema.StandardBlock;
               blockBody = b.body.txPayload;
@@ -81,6 +84,9 @@ export const getOnChainAddressBalances = (
             } else if (Ogmios.isAlonzoBlock(block)) {
               b = block.alonzo as Ogmios.Schema.BlockAlonzo;
               blockBody = b.body;
+            } else if (Ogmios.isBabbageBlock(block)) {
+              b = block.babbage as Ogmios.Schema.BlockBabbage;
+              blockBody = b.body;
             } else if (Ogmios.isByronEpochBoundaryBlock(block)) {
               b = block.byron as Ogmios.Schema.BlockByron;
             } else {
@@ -92,7 +98,7 @@ export const getOnChainAddressBalances = (
                 options.onBlock(currentBlock);
               }
               if (blockBody) {
-                for (const tx of blockBody!) {
+                for (const tx of blockBody) {
                   for (const output of tx.body.outputs) {
                     if (trackedAddressBalances[output.address] !== undefined) {
                       const addressBalance = { ...trackedAddressBalances[output.address] };
