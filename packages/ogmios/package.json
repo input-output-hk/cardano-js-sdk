@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/ogmios",
-  "version": "0.6.0-nightly.7",
+  "version": "0.6.0-nightly.8",
   "description": "Ogmios Providers",
   "engines": {
     "node": "^14"
@@ -62,7 +62,7 @@
   },
   "dependencies": {
     "@cardano-ogmios/client": "5.5.2",
-    "@cardano-sdk/core": "^0.6.0-nightly.6",
+    "@cardano-sdk/core": "^0.6.0-nightly.7",
     "buffer": "5.7.1",
     "ts-log": "^2.2.3"
   },
