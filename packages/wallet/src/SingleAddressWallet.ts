@@ -318,13 +318,11 @@ export class SingleAddressWallet implements ObservableWallet {
     });
 
     this.#resubmitSubscription = createTransactionReemitter({
-      confirmed$: this.transactions.outgoing.confirmed$,
       genesisParameters$: this.genesisParameters$,
       logger: contextLogger(this.#logger, 'transactionsReemitter'),
-      rollback$: this.transactions.rollback$,
       store: stores.volatileTransactions,
-      submitting$: this.transactions.outgoing.submitting$,
-      tipSlot$: this.tip$.pipe(map((tip) => tip.slot))
+      tipSlot$: this.tip$.pipe(map((tip) => tip.slot)),
+      transactions: this.transactions
     })
       .pipe(
         mergeMap((transaction) => from(this.submitTx(transaction))),

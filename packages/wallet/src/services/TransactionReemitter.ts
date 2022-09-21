@@ -4,7 +4,7 @@ import { Observable, filter, from, map, merge, mergeMap, scan, tap, withLatestFr
 
 import { CustomError } from 'ts-custom-error';
 import { DocumentStore } from '../persistence';
-import { NewTxAlonzoWithSlot } from './types';
+import { NewTxAlonzoWithSlot, TransactionsTracker } from './types';
 
 export enum TransactionReemitErrorCode {
   invalidHereafter = 'invalidHereafter',
@@ -19,9 +19,9 @@ class TransactionReemitError extends CustomError {
 }
 
 interface TransactionReemitterProps {
-  rollback$: Observable<Cardano.TxAlonzo>;
-  confirmed$: Observable<NewTxAlonzoWithSlot>;
-  submitting$: Observable<Cardano.NewTxAlonzo>;
+  transactions: Pick<TransactionsTracker, 'rollback$'> & {
+    outgoing: Pick<TransactionsTracker['outgoing'], 'confirmed$' | 'submitting$'>;
+  };
   store: DocumentStore<NewTxAlonzoWithSlot[]>;
   tipSlot$: Observable<Cardano.Slot>;
   genesisParameters$: Observable<Pick<Cardano.CompactGenesis, 'securityParameter' | 'activeSlotsCoefficient'>>;
@@ -35,9 +35,10 @@ enum txSource {
 }
 
 export const createTransactionReemitter = ({
-  rollback$,
-  confirmed$,
-  submitting$,
+  transactions: {
+    rollback$,
+    outgoing: { confirmed$, submitting$ }
+  },
   store,
   tipSlot$,
   genesisParameters$,

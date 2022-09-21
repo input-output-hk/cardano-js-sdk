@@ -48,13 +48,17 @@ describe('TransactionReemiter', () => {
       const rollback$ = cold<Cardano.TxAlonzo>('-|');
       const submitting$ = cold<NewTxAlonzoWithSlot>('-|');
       const transactionReemiter = createTransactionReemitter({
-        confirmed$,
         genesisParameters$,
         logger,
-        rollback$,
         store,
-        submitting$,
-        tipSlot$
+        tipSlot$,
+        transactions: {
+          outgoing: {
+            confirmed$,
+            submitting$
+          },
+          rollback$
+        }
       });
       expectObservable(transactionReemiter).toBe('-|');
     });
@@ -72,13 +76,17 @@ describe('TransactionReemiter', () => {
       const rollback$ = cold<Cardano.TxAlonzo>('----|');
       const submitting$ = cold<NewTxAlonzoWithSlot>('----|');
       const transactionReemiter = createTransactionReemitter({
-        confirmed$,
         genesisParameters$,
         logger,
-        rollback$,
         store,
-        submitting$,
-        tipSlot$
+        tipSlot$,
+        transactions: {
+          outgoing: {
+            confirmed$,
+            submitting$
+          },
+          rollback$
+        }
       });
       expectObservable(transactionReemiter).toBe('----|');
     });
@@ -96,13 +104,17 @@ describe('TransactionReemiter', () => {
       const rollback$ = cold<Cardano.TxAlonzo>('--|');
       const submitting$ = cold<NewTxAlonzoWithSlot>('-b|', { b: volatileTransactions[0] });
       const transactionReemiter = createTransactionReemitter({
-        confirmed$,
         genesisParameters$,
         logger,
-        rollback$,
         store,
-        submitting$,
-        tipSlot$
+        tipSlot$,
+        transactions: {
+          outgoing: {
+            confirmed$,
+            submitting$
+          },
+          rollback$
+        }
       });
       expectObservable(transactionReemiter).toBe('--|');
     });
@@ -125,13 +137,17 @@ describe('TransactionReemiter', () => {
       const rollback$ = cold<Cardano.TxAlonzo>('---|');
       const submitting$ = cold<NewTxAlonzoWithSlot>('---|');
       const transactionReemiter = createTransactionReemitter({
-        confirmed$,
         genesisParameters$,
         logger,
-        rollback$,
         store,
-        submitting$,
-        tipSlot$
+        tipSlot$,
+        transactions: {
+          outgoing: {
+            confirmed$,
+            submitting$
+          },
+          rollback$
+        }
       });
       expectObservable(transactionReemiter).toBe('---|');
     });
@@ -164,13 +180,17 @@ describe('TransactionReemiter', () => {
       const rollback$ = cold<Cardano.TxAlonzo>('--a--c--d|', { a: rollbackA, c: rollbackC, d: rollbackD });
       const submitting$ = cold<NewTxAlonzoWithSlot>('---------|');
       const transactionReemiter = createTransactionReemitter({
-        confirmed$,
         genesisParameters$,
         logger,
-        rollback$,
         store,
-        submitting$,
-        tipSlot$
+        tipSlot$,
+        transactions: {
+          outgoing: {
+            confirmed$,
+            submitting$
+          },
+          rollback$
+        }
       });
       expectObservable(transactionReemiter).toBe('--a-----d|', { a: volatileA, d: volatileD });
     });
@@ -195,13 +215,17 @@ describe('TransactionReemiter', () => {
       const rollback$ = cold<Cardano.TxAlonzo>('--c|', { c: rollbackC });
       const submitting$ = cold<NewTxAlonzoWithSlot>('---|');
       const transactionReemiter = createTransactionReemitter({
-        confirmed$,
         genesisParameters$,
         logger,
-        rollback$,
         store,
-        submitting$,
-        tipSlot$
+        tipSlot$,
+        transactions: {
+          outgoing: {
+            confirmed$,
+            submitting$
+          },
+          rollback$
+        }
       });
       expectObservable(transactionReemiter).toBe('---|');
     });
