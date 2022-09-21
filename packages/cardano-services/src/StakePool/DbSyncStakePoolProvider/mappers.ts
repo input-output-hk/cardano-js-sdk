@@ -265,7 +265,7 @@ export const mapPoolMetrics = (poolMetricsModel: PoolMetricsModel): PoolMetrics 
     blocksCreated: poolMetricsModel.blocks_created,
     delegators: poolMetricsModel.delegators,
     livePledge: BigInt(poolMetricsModel.live_pledge),
-    saturation: poolMetricsModel.saturation
+    saturation: Number.parseFloat(poolMetricsModel.saturation)
   }
 });
 

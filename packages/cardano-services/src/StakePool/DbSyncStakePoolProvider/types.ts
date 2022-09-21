@@ -130,7 +130,7 @@ export interface PoolMetricsModel {
   active_stake: string;
   live_stake: string;
   live_pledge: string;
-  saturation: number;
+  saturation: string;
   active_stake_percentage: number;
   live_stake_percentage: number;
   pool_hash_id: string;

@@ -1320,14 +1320,14 @@ Array [
     "blocksCreated": "0",
     "delegators": "1",
     "livePledge": 999999828559n,
-    "saturation": "0.01189867476975633141",
+    "saturation": 0.011898674769756331,
   },
   Object {
     "activeStake": 2986376991n,
     "blocksCreated": "0",
     "delegators": "1",
     "livePledge": 495463149n,
-    "saturation": "0.000041429290528821850262",
+    "saturation": 0.00004142929052882185,
   },
 ]
 `;
@@ -1339,14 +1339,14 @@ Array [
     "blocksCreated": "0",
     "delegators": "1",
     "livePledge": 495463149n,
-    "saturation": "0.000041429290528821850262",
+    "saturation": 0.00004142929052882185,
   },
   Object {
     "activeStake": 1614945000n,
     "blocksCreated": "0",
     "delegators": "0",
     "livePledge": 497325000n,
-    "saturation": "0.000019215708620404440214",
+    "saturation": 0.00001921570862040444,
   },
 ]
 `;
@@ -1358,21 +1358,21 @@ Array [
     "blocksCreated": "0",
     "delegators": "1",
     "livePledge": 999999828559n,
-    "saturation": "0.01189867476975633141",
+    "saturation": 0.011898674769756331,
   },
   Object {
     "activeStake": 2986376991n,
     "blocksCreated": "0",
     "delegators": "1",
     "livePledge": 495463149n,
-    "saturation": "0.000041429290528821850262",
+    "saturation": 0.00004142929052882185,
   },
   Object {
     "activeStake": 1614945000n,
     "blocksCreated": "0",
     "delegators": "0",
     "livePledge": 497325000n,
-    "saturation": "0.000019215708620404440214",
+    "saturation": 0.00001921570862040444,
   },
 ]
 `;
@@ -1384,21 +1384,21 @@ Array [
     "blocksCreated": "0",
     "delegators": "0",
     "livePledge": 497325000n,
-    "saturation": "0.000019215708620404440214",
+    "saturation": 0.00001921570862040444,
   },
   Object {
     "activeStake": 2986376991n,
     "blocksCreated": "0",
     "delegators": "1",
     "livePledge": 495463149n,
-    "saturation": "0.000041429290528821850262",
+    "saturation": 0.00004142929052882185,
   },
   Object {
     "activeStake": 0n,
     "blocksCreated": "0",
     "delegators": "1",
     "livePledge": 999999828559n,
-    "saturation": "0.01189867476975633141",
+    "saturation": 0.011898674769756331,
   },
 ]
 `;
