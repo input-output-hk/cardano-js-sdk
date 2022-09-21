@@ -1,8 +1,8 @@
 import { AssetId } from '@cardano-sdk/util-dev';
 import { Cardano, NetworkInfoProvider } from '@cardano-sdk/core';
 import { CreateTxInternalsProps, createTransactionInternals } from '../../src/Transaction';
-import { SelectionConstraints } from '../../../cip2/test/util';
-import { SelectionSkeleton, roundRobinRandomImprove } from '@cardano-sdk/cip2';
+import { SelectionConstraints } from '../../../input-selection/test/util';
+import { SelectionSkeleton, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 import { mockNetworkInfoProvider, utxo } from '../mocks';
 
 const address = Cardano.Address(

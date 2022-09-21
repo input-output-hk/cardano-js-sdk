@@ -8,7 +8,7 @@
     "./**/*.ts",
     "../../ogmios/test",
     "../../wallet/test",
-    "../../cip2/test/util"
+    "../../input-selection/test/util"
   ],
   "references": [
     {
@@ -36,7 +36,7 @@
       "path": "../../wallet/src"
     },
     {
-      "path": "../../cip2/src"
+      "path": "../../input-selection/src"
     }
   ]
 }

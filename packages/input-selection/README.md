@@ -1,13 +1,13 @@
-# Cardano JS SDK | CIP2 | Input Selection
+# Cardano JS SDK | Input Selection | CIP-0002
 
 This package implements concepts from the draft specification being developed in [CIP-0002].
 
-Currently there is only 1 input selection algorithm: RoundRobinRandomImprove, which is a [Random-Improve] adaptation that handles asset selection.
+Currently, there is only 1 input selection algorithm: RoundRobinRandomImprove, which is an [Random-Improve] adaptation that handles asset selection.
 
 ## Usage Example
 
 ```typescript
-import { roundRobinRandomImprove, defaultSelectionConstraints, InputSelector, SelectionResult, SelectionSkeleton } from '@cardano-sdk/cip2';
+import { roundRobinRandomImprove, defaultSelectionConstraints, InputSelector, SelectionResult, SelectionSkeleton } from '@cardano-sdk/input-selection';
 import { loadCardanoSerializationLib, CSL, CardanoSerializationLib, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 
 const demo = async (protocolParameters: ProtocolParametersRequiredByWallet): Promise<SelectionResult> => {

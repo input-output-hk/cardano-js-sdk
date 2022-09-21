@@ -84,7 +84,7 @@ import {
   tap
 } from 'rxjs';
 import { Cip30DataSignature } from '@cardano-sdk/cip30';
-import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } from '@cardano-sdk/cip2';
+import { InputSelector, defaultSelectionConstraints, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { Shutdown, bufferToHexString, contextLogger, deepEquals } from '@cardano-sdk/util';

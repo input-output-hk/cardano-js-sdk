@@ -10,7 +10,7 @@ import { BalanceTracker, DelegationTracker, TransactionalObservables, Transactio
 import { Cip30DataSignature } from '@cardano-sdk/cip30';
 import { GroupedAddress, SignTransactionOptions, TransactionSigner, cip8 } from '@cardano-sdk/key-management';
 import { Observable } from 'rxjs';
-import { SelectionSkeleton } from '@cardano-sdk/cip2';
+import { SelectionSkeleton } from '@cardano-sdk/input-selection';
 import { Shutdown } from '@cardano-sdk/util';
 
 export type InitializeTxProps = {
