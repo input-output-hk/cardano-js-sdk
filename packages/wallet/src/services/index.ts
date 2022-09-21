@@ -11,3 +11,4 @@ export * from './EpochTracker';
 export * from './TipTracker';
 export * from './TransactionReemitter';
 export * from './SupplyDistributionTracker';
+export * from './SmartTxSubmitProvider';

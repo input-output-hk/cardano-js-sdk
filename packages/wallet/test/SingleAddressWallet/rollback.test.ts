@@ -97,8 +97,7 @@ const txBody: Cardano.NewTxBodyAlonzo = {
   ],
   outputs: [txOut],
   validityInterval: {
-    invalidBefore: 100,
-    invalidHereafter: 1000
+    invalidHereafter: mocks.ledgerTip.slot + 10
   }
 };
 

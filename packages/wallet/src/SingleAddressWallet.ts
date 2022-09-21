@@ -38,6 +38,7 @@ import {
   FailedTx,
   PersistentDocumentTrackerSubject,
   PollingConfig,
+  SmartTxSubmitProvider,
   TipTracker,
   TrackedAssetProvider,
   TrackedChainHistoryProvider,
@@ -125,10 +126,11 @@ export class SingleAddressWallet implements ObservableWallet {
     submitting$: new Subject<Cardano.NewTxAlonzo>()
   };
   #resubmitSubscription: Subscription;
+  #trackedTxSubmitProvider: TrackedTxSubmitProvider;
 
   readonly keyAgent: AsyncKeyAgent;
   readonly currentEpoch$: TrackerSubject<EpochInfo>;
-  readonly txSubmitProvider: TrackedTxSubmitProvider;
+  readonly txSubmitProvider: TxSubmitProvider;
   readonly utxoProvider: TrackedUtxoProvider;
   readonly networkInfoProvider: TrackedWalletNetworkInfoProvider;
   readonly stakePoolProvider: TrackedStakePoolProvider;
@@ -181,8 +183,8 @@ export class SingleAddressWallet implements ObservableWallet {
     this.#logger = contextLogger(logger, name);
 
     this.#inputSelector = inputSelector;
+    this.#trackedTxSubmitProvider = new TrackedTxSubmitProvider(txSubmitProvider);
 
-    this.txSubmitProvider = new TrackedTxSubmitProvider(txSubmitProvider);
     this.utxoProvider = new TrackedUtxoProvider(utxoProvider);
     this.networkInfoProvider = new TrackedWalletNetworkInfoProvider(networkInfoProvider);
     this.stakePoolProvider = new TrackedStakePoolProvider(stakePoolProvider);
@@ -198,7 +200,7 @@ export class SingleAddressWallet implements ObservableWallet {
         networkInfoProvider: this.networkInfoProvider,
         rewardsProvider: this.rewardsProvider,
         stakePoolProvider: this.stakePoolProvider,
-        txSubmitProvider: this.txSubmitProvider,
+        txSubmitProvider: this.#trackedTxSubmitProvider,
         utxoProvider: this.utxoProvider
       },
       { consideredOutOfSyncAfter }
@@ -246,6 +248,15 @@ export class SingleAddressWallet implements ObservableWallet {
       syncStatus: this.syncStatus
     });
     const tipBlockHeight$ = distinctBlock(this.tip$);
+
+    this.txSubmitProvider = new SmartTxSubmitProvider(
+      { retryBackoffConfig },
+      {
+        connectionStatus$: connectionStatusTracker$,
+        tip$: this.tip$,
+        txSubmitProvider: this.#trackedTxSubmitProvider
+      }
+    );
 
     // Era summaries
     const eraSummariesTrigger = new BehaviorSubject<void>(void 0);
@@ -444,7 +455,7 @@ export class SingleAddressWallet implements ObservableWallet {
     this.#tip$.complete();
     this.addresses$.complete();
     this.assetProvider.stats.shutdown();
-    this.txSubmitProvider.stats.shutdown();
+    this.#trackedTxSubmitProvider.stats.shutdown();
     this.networkInfoProvider.stats.shutdown();
     this.stakePoolProvider.stats.shutdown();
     this.utxoProvider.stats.shutdown();
