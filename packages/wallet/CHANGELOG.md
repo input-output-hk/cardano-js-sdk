@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.6.0-nightly.8...@cardano-sdk/wallet@0.6.0-nightly.9) (2022-09-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* **wallet:** removed `withdrawals` property from `InitializeTxProps`
+
+### Features
+
+* **wallet:** withdraw rewards on every transaction ([45ddc69](https://github.com/input-output-hk/cardano-js-sdk/commit/45ddc69065edea8d1f4681996a356bbe2cc6c400))
+
+
+
 ## [0.6.0-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.6.0-nightly.7...@cardano-sdk/wallet@0.6.0-nightly.8) (2022-09-21)
 
 **Note:** Version bump only for package @cardano-sdk/wallet
