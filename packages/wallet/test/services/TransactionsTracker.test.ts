@@ -1,16 +1,15 @@
 /* eslint-disable max-len */
+/* eslint-disable space-in-parens */
+/* eslint-disable no-multi-spaces */
+/* eslint-disable prettier/prettier */
 import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
-import {
-  ChainHistoryProviderStub,
-  generateTxAlonzo,
-  mockChainHistoryProvider,
-  queryTransactionsResult
-} from '../mocks';
+import { ChainHistoryProviderStub, generateTxAlonzo, mockChainHistoryProvider, queryTransactionsResult } from '../mocks';
 import { EMPTY, bufferCount, firstValueFrom, of } from 'rxjs';
 import {
   FailedTx,
   PAGE_SIZE,
   TransactionFailure,
+  TxInFlight,
   createAddressTransactionsProvider,
   createTransactionsTracker
 } from '../../src';
@@ -209,9 +208,13 @@ describe('TransactionsTracker', () => {
         expectObservable(transactionsTracker.outgoing.submitting$).toBe('-a--|', { a: outgoingTx });
         expectObservable(transactionsTracker.outgoing.pending$).toBe('--a-|', { a: outgoingTx });
         expectObservable(transactionsTracker.outgoing.confirmed$, confirmedSubscription).toBe('---a|', {
-          a: { ...outgoingTx, slot: outgoingTx.blockHeader.slot }
+          a: { confirmedAt: outgoingTx.blockHeader.slot, tx: outgoingTx }
         });
-        expectObservable(transactionsTracker.outgoing.inFlight$).toBe('ab-c|', { a: [], b: [outgoingTx], c: [] });
+        expectObservable(transactionsTracker.outgoing.inFlight$).toBe('ab-c|', {
+          a: [],
+          b: [{ tx: outgoingTx }],
+          c: []
+        });
         expectObservable(transactionsTracker.outgoing.failed$).toBe('----|');
         expectObservable(transactionsTracker.history$).toBe('a-bc|', {
           a: [],
@@ -224,11 +227,12 @@ describe('TransactionsTracker', () => {
     it('emits at all relevant observable properties on timed out transaction', async () => {
       const tx = queryTransactionsResult.pageResults[0];
       createTestScheduler().run(({ hot, expectObservable }) => {
-        const tip = { slot: tx.body.validityInterval.invalidHereafter! + 1 } as Cardano.Tip;
+        const tip1 = { slot: tx.body.validityInterval.invalidHereafter! - 1 } as Cardano.Tip;
+        const tip2 = { slot: tx.body.validityInterval.invalidHereafter! + 1 } as Cardano.Tip;
         const failedToSubmit$ = hot<FailedTx>('-----|');
-        const tip$ = hot<Cardano.Tip>('----a|', { a: tip });
+        const tip$ = hot<Cardano.Tip>('--ab-|', { a: tip1, b: tip2 });
         const submitting$ = hot('-a---|', { a: tx });
-        const pending$ = hot('---a-|', { a: tx });
+        const pending$ = hot('--a--|', { a: tx });
         const transactionsSource$ = hot<Cardano.TxAlonzo[]>('-----|');
         const failedSubscription = '--^---'; // regression: subscribing after submitting$ emits
         const transactionsTracker = createTransactionsTracker(
@@ -252,14 +256,15 @@ describe('TransactionsTracker', () => {
           }
         );
         expectObservable(transactionsTracker.outgoing.submitting$).toBe('-a---|', { a: tx });
-        expectObservable(transactionsTracker.outgoing.pending$).toBe('---a-|', { a: tx });
-        expectObservable(transactionsTracker.outgoing.inFlight$).toBe('ab--c|', {
+        expectObservable(transactionsTracker.outgoing.pending$).toBe('--a--|', { a: tx });
+        expectObservable(transactionsTracker.outgoing.inFlight$).toBe('abcd-|', {
           a: [],
-          b: [tx],
-          c: []
+          b: [{ tx }],
+          c: [{ submittedAt: tip1.slot, tx }],
+          d: []
         });
         expectObservable(transactionsTracker.outgoing.confirmed$).toBe('-----|');
-        expectObservable(transactionsTracker.outgoing.failed$, failedSubscription).toBe('----a|', {
+        expectObservable(transactionsTracker.outgoing.failed$, failedSubscription).toBe('---a-|', {
           a: { reason: TransactionFailure.Timeout, tx }
         });
       });
@@ -297,7 +302,7 @@ describe('TransactionsTracker', () => {
         );
         expectObservable(transactionsTracker.outgoing.submitting$).toBe('-a--|', { a: tx });
         expectObservable(transactionsTracker.outgoing.pending$).toBe('--a-|', { a: tx });
-        expectObservable(transactionsTracker.outgoing.inFlight$).toBe('ab-c|', { a: [], b: [tx], c: [] });
+        expectObservable(transactionsTracker.outgoing.inFlight$).toBe('ab-c|', { a: [], b: [{ tx }], c: [] });
         expectObservable(transactionsTracker.outgoing.confirmed$).toBe('----|');
         expectObservable(transactionsTracker.outgoing.failed$).toBe('---a|', {
           a: { reason: TransactionFailure.FailedToSubmit, tx }
@@ -305,20 +310,167 @@ describe('TransactionsTracker', () => {
       });
     });
 
+    it('does not double-track confirmations of resubmitted transactions', async () => {
+      const tx = queryTransactionsResult.pageResults[0];
+      createTestScheduler().run(({ hot, expectObservable }) => {
+        const submittedAt1 = 123;
+        const submittedAt2 = 124;
+        const tip$ = hot('--a-b-|', {
+          a: { slot: submittedAt1 } as Cardano.Tip,
+          b: { slot: submittedAt2 } as Cardano.Tip
+        });
+        const submitting$ = hot('-a-b--|', { a: tx, b: tx });
+        const pending$ = hot(   '--a-b-|', { a: tx, b: tx });
+        const transactionsSource$ = hot<Cardano.TxAlonzo[]>('-a---b|', {
+          a: [],
+          b: [tx]
+        });
+        const failedToSubmit$ = hot<FailedTx>('------|');
+        const transactionsTracker = createTransactionsTracker(
+          {
+            addresses$,
+            chainHistoryProvider,
+            inFlightTransactionsStore,
+            logger,
+            newTransactions: {
+              failedToSubmit$,
+              pending$,
+              submitting$
+            },
+            retryBackoffConfig,
+            tip$,
+            transactionsHistoryStore: transactionsStore
+          },
+          {
+            rollback$: EMPTY,
+            transactionsSource$
+          }
+        );
+        expectObservable(transactionsTracker.outgoing.submitting$).toBe('-a-b--|', { a: tx, b: tx });
+        expectObservable(transactionsTracker.outgoing.pending$).toBe(   '--a-b-|', { a: tx, b: tx });
+        expectObservable(transactionsTracker.outgoing.inFlight$).toBe(  'abcdef|', {
+          a: [],
+          b: [{ tx }],
+          c: [{ submittedAt: submittedAt1, tx }],
+          d: [{ tx }],
+          e: [{ submittedAt: submittedAt2, tx }],
+          f: []
+        });
+        expectObservable(transactionsTracker.outgoing.confirmed$).toBe('-----a|', {
+          a: { confirmedAt: tx.blockHeader.slot, tx }
+        });
+        expectObservable(transactionsTracker.outgoing.failed$).toBe('------|');
+      });
+    });
+
+    it('does not double-track failures of resubmitted transactions', async () => {
+      const tx = queryTransactionsResult.pageResults[0];
+      createTestScheduler().run(({ hot, expectObservable }) => {
+        const submittedAt1 = 123;
+        const submittedAt2 = 124;
+        const tip$ = hot(                                   '--a-b-|', {
+          a: { slot: submittedAt1 } as Cardano.Tip,
+          b: { slot: submittedAt2 } as Cardano.Tip
+        });
+        const submitting$ = hot(                            '-a-b--|', { a: tx, b: tx });
+        const pending$ = hot<Cardano.NewTxAlonzo>(          '------|');
+        const transactionsSource$ = hot<Cardano.TxAlonzo[]>('a-----|', { a: [] });
+        const failedToSubmit$ = hot<FailedTx>(              '-----a|', {
+          a: { reason: TransactionFailure.FailedToSubmit, tx }
+        });
+        const transactionsTracker = createTransactionsTracker(
+          {
+            addresses$,
+            chainHistoryProvider,
+            inFlightTransactionsStore,
+            logger,
+            newTransactions: {
+              failedToSubmit$,
+              pending$,
+              submitting$
+            },
+            retryBackoffConfig,
+            tip$,
+            transactionsHistoryStore: transactionsStore
+          },
+          {
+            rollback$: EMPTY,
+            transactionsSource$
+          }
+        );
+        expectObservable(transactionsTracker.outgoing.submitting$).toBe('-a-b--|', { a: tx, b: tx });
+        expectObservable(transactionsTracker.outgoing.inFlight$).toBe(  'ab-c-a|', { a: [], b: [{ tx }], c: [{ tx }] });
+        expectObservable(transactionsTracker.outgoing.failed$).toBe(    '-----a|', {
+          a: { reason: TransactionFailure.FailedToSubmit, tx }
+        });
+        expectObservable(transactionsTracker.outgoing.confirmed$).toBe( '------|');
+      });
+    });
+
+    it('pending$ transactions updates inFlight$ with submittedAt from current tip$', async () => {
+      const tx = queryTransactionsResult.pageResults[0];
+      createTestScheduler().run(({ hot, expectObservable }) => {
+        const submittedAt = 123;
+        const tip$ = hot<Cardano.Tip>('--a-|', { a: { slot: submittedAt } as Cardano.Tip });
+        const submitting$ = hot('-a--|', { a: tx });
+        const pending$ = hot('--a-|', { a: tx });
+        const transactionsSource$ = hot<Cardano.TxAlonzo[]>('a--b|', {
+          a: [],
+          b: [tx]
+        });
+        const failedToSubmit$ = hot<FailedTx>('----|');
+        const transactionsTracker = createTransactionsTracker(
+          {
+            addresses$,
+            chainHistoryProvider,
+            inFlightTransactionsStore,
+            logger,
+            newTransactions: {
+              failedToSubmit$,
+              pending$,
+              submitting$
+            },
+            retryBackoffConfig,
+            tip$,
+            transactionsHistoryStore: transactionsStore
+          },
+          {
+            rollback$: EMPTY,
+            transactionsSource$
+          }
+        );
+        expectObservable(transactionsTracker.outgoing.submitting$).toBe('-a--|', { a: tx });
+        expectObservable(transactionsTracker.outgoing.pending$).toBe('--a-|', { a: tx });
+        expectObservable(transactionsTracker.outgoing.inFlight$).toBe('abcd|', {
+          a: [],
+          b: [{ tx }],
+          c: [{ submittedAt, tx }],
+          d: []
+        });
+        expectObservable(transactionsTracker.outgoing.confirmed$).toBe('---a|', {
+          a: { confirmedAt: tx.blockHeader.slot, tx }
+        });
+        expectObservable(transactionsTracker.outgoing.failed$).toBe('----|');
+      });
+    });
+
     it('stored inFlight transactions are restored and merged with submitting ones', async () => {
-      const storedInFlightTransaction = { body: { validityInterval: { invalidHereafter: 1 } } } as Cardano.NewTxAlonzo;
+      const storedInFlightTransaction: TxInFlight = {
+        submittedAt: 1,
+        tx: { body: { validityInterval: { invalidHereafter: 1 } } } as Cardano.NewTxAlonzo
+      };
       const outgoingTx = queryTransactionsResult.pageResults[0];
       createTestScheduler().run(({ hot, expectObservable }) => {
-        const inFlight$ = hot<Cardano.NewTxAlonzo[]>('-x|', {
+        const storedInFlight$ = hot<TxInFlight[]>('-x|', {
           x: [storedInFlightTransaction]
         });
-        inFlightTransactionsStore.get = jest.fn(() => inFlight$);
+        inFlightTransactionsStore.get = jest.fn(() => storedInFlight$);
         inFlightTransactionsStore.set = jest.fn();
 
         const failedToSubmit$ = hot<FailedTx>('|');
         const tip$ = hot<Cardano.Tip>('|');
         const submitting$ = hot('--a|', { a: outgoingTx });
-        const pending$ = hot<Cardano.TxAlonzo>('|');
+        const pending$ = hot<Cardano.NewTxAlonzo>('|');
         const transactionsSource$ = hot<Cardano.TxAlonzo[]>('|');
 
         const transactionsTracker = createTransactionsTracker(
@@ -346,19 +498,18 @@ describe('TransactionsTracker', () => {
         expectObservable(transactionsTracker.outgoing.confirmed$).toBe('---|');
         expectObservable(transactionsTracker.outgoing.failed$).toBe('---|');
 
-        expectObservable(transactionsTracker.outgoing.submitting$).toBe('-ab|', {
-          a: storedInFlightTransaction,
+        expectObservable(transactionsTracker.outgoing.submitting$).toBe('--b|', {
           b: outgoingTx
         });
 
         expectObservable(transactionsTracker.outgoing.inFlight$).toBe('abc|', {
           a: [],
           b: [storedInFlightTransaction],
-          c: [storedInFlightTransaction, outgoingTx]
+          c: [storedInFlightTransaction, { tx: outgoingTx }]
         });
       });
       expect(inFlightTransactionsStore.set).toHaveBeenCalledTimes(2);
-      expect(inFlightTransactionsStore.set).lastCalledWith([storedInFlightTransaction, outgoingTx]);
+      expect(inFlightTransactionsStore.set).lastCalledWith([storedInFlightTransaction, { tx: outgoingTx }]);
     });
 
     it('inFlight transactions are removed from store on successful transaction', async () => {
@@ -367,16 +518,17 @@ describe('TransactionsTracker', () => {
       const storedInFlightTransaction = outgoingTx;
 
       createTestScheduler().run(({ hot, expectObservable }) => {
-        const inFlight$ = hot<Cardano.NewTxAlonzo[]>('-x|', {
-          x: [storedInFlightTransaction]
+        const storedInFlight = { submittedAt: 1, tx: storedInFlightTransaction };
+        const storedInFlight$ = hot<TxInFlight[]>('-x|', {
+          x: [storedInFlight]
         });
-        inFlightTransactionsStore.get = jest.fn(() => inFlight$);
+        inFlightTransactionsStore.get = jest.fn(() => storedInFlight$);
         inFlightTransactionsStore.set = jest.fn();
 
         const failedToSubmit$ = hot<FailedTx>('----|');
         const tip$ = hot<Cardano.Tip>('----|');
         const submitting$ = hot<Cardano.NewTxAlonzo>('----|');
-        const pending$ = hot<Cardano.TxAlonzo>('----|');
+        const pending$ = hot<Cardano.NewTxAlonzo>('----|');
         const transactionsSource$ = hot<Cardano.TxAlonzo[]>('a-bc|', {
           a: [],
           b: [incomingTx],
@@ -403,13 +555,13 @@ describe('TransactionsTracker', () => {
             transactionsSource$
           }
         );
-        expectObservable(transactionsTracker.outgoing.submitting$).toBe('-a--|', { a: storedInFlightTransaction });
+        expectObservable(transactionsTracker.outgoing.submitting$).toBe('----|');
         expectObservable(transactionsTracker.outgoing.confirmed$).toBe('---a|', {
-          a: { ...storedInFlightTransaction, slot: storedInFlightTransaction.blockHeader.slot }
+          a: { confirmedAt: storedInFlightTransaction.blockHeader.slot, tx: storedInFlightTransaction }
         });
         expectObservable(transactionsTracker.outgoing.inFlight$).toBe('ab-a|', {
           a: [],
-          b: [storedInFlightTransaction]
+          b: [storedInFlight]
         });
         expectObservable(transactionsTracker.outgoing.failed$).toBe('----|');
         expectObservable(transactionsTracker.history$).toBe('a-bc|', {
@@ -429,27 +581,30 @@ describe('TransactionsTracker', () => {
         id: Cardano.TransactionId('6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad')
       } as Cardano.NewTxAlonzo;
       const storedInFlightTx = {
-        body: { validityInterval: {} },
-        id: Cardano.TransactionId('6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99caa')
-      } as Cardano.NewTxAlonzo;
+        submittedAt: 1,
+        tx: {
+          body: { validityInterval: {} },
+          id: Cardano.TransactionId('6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99caa')
+        } as Cardano.NewTxAlonzo
+      };
       const incomingTx = {
         blockHeader: { blockNo: 1_000_000 },
         body: { validityInterval: {} },
         // should remove storedInFlightTx from inFlight$ once confirmed
-        id: storedInFlightTx.id
+        id: storedInFlightTx.tx.id
       } as Cardano.TxAlonzo;
 
       createTestScheduler().run(({ hot, expectObservable }) => {
-        const inFlight$ = hot<Cardano.NewTxAlonzo[]>('-a|', {
+        const storedInFlight$ = hot<TxInFlight[]>('-a|', {
           a: [storedInFlightTx]
         });
-        inFlightTransactionsStore.get = jest.fn(() => inFlight$);
+        inFlightTransactionsStore.get = jest.fn(() => storedInFlight$);
         inFlightTransactionsStore.set = jest.fn();
 
         const failedToSubmit$ = hot<FailedTx>('-----|');
         const tip$ = hot<Cardano.Tip>('-----|');
         const submitting$ = hot<Cardano.NewTxAlonzo>('--a--|', { a: outgoingTx });
-        const pending$ = hot<Cardano.TxAlonzo>('-----|');
+        const pending$ = hot<Cardano.NewTxAlonzo>('-----|');
         const transactionsSource$ = hot<Cardano.TxAlonzo[]>('a---b|', {
           a: [],
           b: [incomingTx]
@@ -479,12 +634,12 @@ describe('TransactionsTracker', () => {
         expectObservable(transactionsTracker.outgoing.inFlight$).toBe('abc-d|', {
           a: [],
           b: [storedInFlightTx],
-          c: [storedInFlightTx, outgoingTx],
-          d: [outgoingTx]
+          c: [storedInFlightTx, { tx: outgoingTx }],
+          d: [{ tx: outgoingTx }]
         });
       });
       expect(inFlightTransactionsStore.set).toHaveBeenCalledTimes(3);
-      expect(inFlightTransactionsStore.set).lastCalledWith([outgoingTx]);
+      expect(inFlightTransactionsStore.set).lastCalledWith([{ tx: outgoingTx }]);
     });
   });
 });

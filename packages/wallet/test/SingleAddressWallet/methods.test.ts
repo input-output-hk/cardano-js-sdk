@@ -2,7 +2,7 @@
 import * as mocks from '../mocks';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { InitializeTxProps, SingleAddressWallet, setupWallet } from '../../src';
 import { firstValueFrom, skip } from 'rxjs';
 import { getPassword, testAsyncKeyAgent } from '../../../key-management/test/mocks';
@@ -186,16 +186,38 @@ describe('SingleAddressWallet methods', () => {
       expect(tx.witness.signatures.size).toBe(1);
     });
 
-    it('submitTx', async () => {
-      const tx = await wallet.finalizeTx({ tx: await wallet.initializeTx(props) });
-      const txSubmitting = firstValueFrom(wallet.transactions.outgoing.submitting$);
-      const txPending = firstValueFrom(wallet.transactions.outgoing.pending$);
-      const txInFlight = firstValueFrom(wallet.transactions.outgoing.inFlight$.pipe(skip(1)));
-      await wallet.submitTx(tx);
-      expect(txSubmitProvider.submitTx).toBeCalledTimes(1);
-      expect(await txSubmitting).toBe(tx);
-      expect(await txPending).toBe(tx);
-      expect(await txInFlight).toEqual([tx]);
+    describe('submitTx', () => {
+      it('resolves on success', async () => {
+        const tx = await wallet.finalizeTx({ tx: await wallet.initializeTx(props) });
+        const txSubmitting = firstValueFrom(wallet.transactions.outgoing.submitting$);
+        const txPending = firstValueFrom(wallet.transactions.outgoing.pending$);
+        const txInFlight = firstValueFrom(wallet.transactions.outgoing.inFlight$.pipe(skip(1)));
+        await wallet.submitTx(tx);
+        expect(txSubmitProvider.submitTx).toBeCalledTimes(1);
+        expect(await txSubmitting).toBe(tx);
+        expect(await txPending).toBe(tx);
+        expect(await txInFlight).toEqual([{ tx }]);
+      });
+
+      it('mightBeAlreadySubmitted option interprets ValueNotConservedError as success', async () => {
+        txSubmitProvider.submitTx.mockRejectedValueOnce(
+          new ProviderError(
+            ProviderFailure.BadRequest,
+            new Cardano.TxSubmissionErrors.ValueNotConservedError({
+              valueNotConserved: { consumed: 2, produced: 1 }
+            })
+          )
+        );
+        const tx = await wallet.finalizeTx({ tx: await wallet.initializeTx(props) });
+
+        // rejects when option is not provided
+        await expect(wallet.submitTx(tx)).rejects.toThrow();
+
+        // resolves when option is provided
+        const txPending = firstValueFrom(wallet.transactions.outgoing.pending$);
+        await expect(wallet.submitTx(tx, { mightBeAlreadySubmitted: true })).resolves.not.toThrow();
+        expect(await txPending).toBe(tx);
+      });
     });
   });
 

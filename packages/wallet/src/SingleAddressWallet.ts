@@ -14,6 +14,7 @@ import {
   EpochInfo,
   EraSummary,
   ProtocolParametersRequiredByWallet,
+  ProviderError,
   RewardsProvider,
   StakePoolProvider,
   TxSubmitProvider,
@@ -114,6 +115,10 @@ export interface SingleAddressWalletDependencies {
   readonly stores?: WalletStores;
   readonly logger: Logger;
   readonly connectionStatusTracker$?: ConnectionStatusTracker;
+}
+
+export interface SubmitTxOptions {
+  mightBeAlreadySubmitted?: boolean;
 }
 
 export class SingleAddressWallet implements ObservableWallet {
@@ -320,12 +325,13 @@ export class SingleAddressWallet implements ObservableWallet {
     this.#resubmitSubscription = createTransactionReemitter({
       genesisParameters$: this.genesisParameters$,
       logger: contextLogger(this.#logger, 'transactionsReemitter'),
-      store: stores.volatileTransactions,
+      maxInterval,
+      stores,
       tipSlot$: this.tip$.pipe(map((tip) => tip.slot)),
       transactions: this.transactions
     })
       .pipe(
-        mergeMap((transaction) => from(this.submitTx(transaction))),
+        mergeMap((transaction) => from(this.submitTx(transaction, { mightBeAlreadySubmitted: true }))),
         catchError((err) => {
           this.#logger.error('Failed to resubmit transaction', err);
           return EMPTY;
@@ -420,16 +426,26 @@ export class SingleAddressWallet implements ObservableWallet {
     };
   }
 
-  async submitTx(tx: Cardano.NewTxAlonzo): Promise<void> {
+  async submitTx(tx: Cardano.NewTxAlonzo, { mightBeAlreadySubmitted }: SubmitTxOptions = {}): Promise<void> {
     this.#logger.debug(`Submitting transaction ${tx.id}`);
     this.#newTransactions.submitting$.next(tx);
     try {
       await this.txSubmitProvider.submitTx({
         signedTransaction: bufferToHexString(Buffer.from(coreToCsl.tx(tx).to_bytes()))
       });
-      this.#logger.debug(`Submitted transaction ${tx.id}`);
+      const { slot: submittedAt } = await firstValueFrom(this.tip$);
+      this.#logger.debug(`Submitted transaction ${tx.id} at slot ${submittedAt}`);
       this.#newTransactions.pending$.next(tx);
     } catch (error) {
+      if (
+        mightBeAlreadySubmitted &&
+        error instanceof ProviderError &&
+        error.innerError instanceof Cardano.TxSubmissionErrors.ValueNotConservedError
+      ) {
+        this.#logger.debug(`Transaction ${tx.id} appears to be already submitted...`);
+        this.#newTransactions.pending$.next(tx);
+        return;
+      }
       this.#newTransactions.failedToSubmit$.next({
         error: error as Cardano.TxSubmissionError,
         reason: TransactionFailure.FailedToSubmit,
