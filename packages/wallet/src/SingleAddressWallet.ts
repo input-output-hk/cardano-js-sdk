@@ -67,6 +67,7 @@ import { BehaviorObservable, TrackerSubject } from '@cardano-sdk/util-rxjs';
 import {
   BehaviorSubject,
   EMPTY,
+  Observable,
   Subject,
   Subscription,
   catchError,
@@ -366,7 +367,9 @@ export class SingleAddressWallet implements ObservableWallet {
   }
 
   async initializeTx(props: InitializeTxProps): Promise<InitializeTxResult> {
-    const { constraints, utxo, implicitCoin, validityInterval, changeAddress } = await this.#prepareTx(props);
+    const { constraints, utxo, implicitCoin, validityInterval, changeAddress, withdrawals } = await this.#prepareTx(
+      props
+    );
     const { selection: inputSelection } = await this.#inputSelector.select({
       constraints,
       implicitValue: { coin: implicitCoin, mint: props.mint },
@@ -383,7 +386,7 @@ export class SingleAddressWallet implements ObservableWallet {
       requiredExtraSignatures: props.requiredExtraSignatures,
       scriptIntegrityHash: props.scriptIntegrityHash,
       validityInterval,
-      withdrawals: props.withdrawals
+      withdrawals
     });
     return { body, hash, inputSelection };
   }
@@ -476,14 +479,25 @@ export class SingleAddressWallet implements ObservableWallet {
   }
 
   #prepareTx(props: InitializeTxProps) {
+    const withdrawals$: Observable<Cardano.Withdrawal[] | undefined> = this.delegation.rewardAccounts$.pipe(
+      map((accounts) => accounts.filter((account) => account.rewardBalance)),
+      map((accounts) =>
+        accounts.map((account) => ({ quantity: account.rewardBalance, stakeAddress: account.address }))
+      ),
+      map((withdrawals) => (withdrawals.length > 0 ? withdrawals : undefined))
+    );
+
     return lastValueFrom(
-      combineLatest([this.tip$, this.utxo.available$, this.protocolParameters$, this.addresses$]).pipe(
+      combineLatest([this.tip$, this.utxo.available$, this.protocolParameters$, this.addresses$, withdrawals$]).pipe(
         take(1),
-        map(([tip, utxo, protocolParameters, [{ address: changeAddress }]]) => {
+        map(([tip, utxo, protocolParameters, [{ address: changeAddress }], withdrawals]) => {
           const validityInterval = ensureValidityInterval(tip.slot, props.options?.validityInterval);
           const constraints = defaultSelectionConstraints({
             buildTx: async (inputSelection) => {
               this.#logger.debug('Building TX for selection constraints', inputSelection);
+              if (withdrawals?.length) {
+                this.#logger.debug('Adding rewards withdrawal in the transaction', withdrawals);
+              }
               const txInternals = await createTransactionInternals({
                 auxiliaryData: props.auxiliaryData,
                 certificates: props.certificates,
@@ -494,7 +508,7 @@ export class SingleAddressWallet implements ObservableWallet {
                 requiredExtraSignatures: props.requiredExtraSignatures,
                 scriptIntegrityHash: props.scriptIntegrityHash,
                 validityInterval,
-                withdrawals: props.withdrawals
+                withdrawals
               });
               return coreToCsl.tx(
                 await this.finalizeTx(
@@ -512,7 +526,7 @@ export class SingleAddressWallet implements ObservableWallet {
             protocolParameters
           });
           const implicitCoin = Cardano.util.computeImplicitCoin(protocolParameters, props);
-          return { changeAddress, constraints, implicitCoin, utxo, validityInterval };
+          return { changeAddress, constraints, implicitCoin, utxo, validityInterval, withdrawals };
         })
       )
     );

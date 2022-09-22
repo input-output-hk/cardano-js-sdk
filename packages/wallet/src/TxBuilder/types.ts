@@ -184,6 +184,7 @@ export interface TxBuilder {
 
   /**
    * Builds a `ValidTxBody` based on partialTxBody.
+   * All positive balance found in reward accounts is included in the transaction withdrawal.
    * Performs multiple validations to make sure the transaction body is correct.
    * In case validations fail, it creates a `TxBodyValidationError` instead of `ValidTxBody`.
    *
