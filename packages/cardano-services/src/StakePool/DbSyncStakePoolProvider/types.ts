@@ -54,12 +54,12 @@ export interface RelayModel {
 
 export interface Epoch {
   no: number;
-  poolOptimalCount?: number;
+  optimalPoolCount?: number;
 }
 
 export interface EpochModel {
   no: number;
-  pool_optimal_count?: number;
+  optimal_pool_count?: number;
 }
 
 export interface EpochReward {
@@ -130,7 +130,7 @@ export interface PoolMetricsModel {
   active_stake: string;
   live_stake: string;
   live_pledge: string;
-  saturation: number;
+  saturation: string;
   active_stake_percentage: number;
   live_stake_percentage: number;
   pool_hash_id: string;
