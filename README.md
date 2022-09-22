@@ -6,7 +6,9 @@
   <img width="200" src=".github/images/cardano-logo.png"/>
 </p>
 
-[![CI][img_src_ci]][workflow_ci]
+[![PostIntegration][img_src_post-integration]][workflow_post-integration]
+[![Nightly][img_src_nightly]][workflow_nightly]
+[![Release][img_src_release]][workflow_release]
 
 <hr/>
 
@@ -116,6 +118,10 @@ yarn docs
   <a href="https://input-output-hk.github.io/cardano-js-sdk">:book: Documentation</a>
 </p>
 
-[img_src_ci]: https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/continuous-integration.yaml/badge.svg
-[workflow_ci]: https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/continuous-integration.yaml
+[img_src_post-integration]: https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/post_integration.yml/badge.svg
+[workflow_post-integration]: https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/post_integration.yml
+[img_src_nightly]: https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/nightly.yaml/badge.svg
+[workflow_nightly]: https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/nightly.yaml
+[img_src_release]: https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/release.yaml/badge.svg
+[workflow_release]: https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/release.yaml
 [let us know!]: https://github.com/input-output-hk/cardano-graphql/discussions/new
