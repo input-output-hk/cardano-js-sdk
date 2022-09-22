@@ -1,5 +1,5 @@
-import { Cardano } from '../../src';
 import { Ed25519KeyHash, NativeScript, NativeScriptKind, ScriptType } from '../../src/Cardano';
+import { nativeScriptPolicyId } from '../../src';
 
 describe('nativeScript utils', () => {
   it('can derive the policy id from a NativeScript', () => {
@@ -35,8 +35,6 @@ describe('nativeScript utils', () => {
         }
       ]
     };
-    expect(Cardano.util.nativeScriptPolicyId(script)).toEqual(
-      '8b8370c97ae17eb69a8c97f733888f7485b60fd820c69211c8bbeb56'
-    );
+    expect(nativeScriptPolicyId(script)).toEqual('8b8370c97ae17eb69a8c97f733888f7485b60fd820c69211c8bbeb56');
   });
 });

@@ -1,4 +1,4 @@
-import { Address, Cardano } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { GroupedAddress, SignTransactionOptions, TransactionSigner } from '../types';
 import { deepEquals } from '@cardano-sdk/util';
 import { ownSignatureKeyPaths } from './ownSignatureKeyPaths';
@@ -10,7 +10,7 @@ const randomPublicKey = () => Cardano.Ed25519PublicKey(Array.from({ length: 64 }
 export const stubSignTransaction = async (
   txBody: Cardano.NewTxBodyAlonzo,
   knownAddresses: GroupedAddress[],
-  inputResolver: Address.util.InputResolver,
+  inputResolver: Cardano.util.InputResolver,
   extraSigners?: TransactionSigner[],
   { additionalKeyPaths = [] }: SignTransactionOptions = {}
 ): Promise<Cardano.Signatures> => {

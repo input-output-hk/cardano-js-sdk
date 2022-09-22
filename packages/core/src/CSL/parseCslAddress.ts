@@ -1,4 +1,4 @@
-import { CSL } from '.';
+import { CSL } from './CSL';
 
 /**
  * Parse Cardano address from all Cardano eras and networks

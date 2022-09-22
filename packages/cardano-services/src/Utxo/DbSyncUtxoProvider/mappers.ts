@@ -29,7 +29,7 @@ export const utxosToCore = (utxosModels: UtxoModel[]): Cardano.Utxo[] => {
           coins: BigInt(current.coins)
         }
       };
-      if (current.data_hash) txOut.datum = Cardano.Hash32ByteBase16(current.data_hash);
+      if (current.data_hash) txOut.datum = Cardano.util.Hash32ByteBase16(current.data_hash);
       if (current.asset_name && current.asset_policy && current.asset_quantity) {
         txOut.value.assets = new Map<Cardano.AssetId, bigint>([
           [generateAssetId(current.asset_policy, current.asset_name), BigInt(current.asset_quantity)]

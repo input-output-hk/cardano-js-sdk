@@ -1,6 +1,7 @@
-import { Hash28ByteBase16, Hash32ByteBase16, OpaqueString, typedBech32 } from '../util';
-import { InvalidStringError } from '../..';
-import { Lovelace, PoolId } from '.';
+import { Hash28ByteBase16, Hash32ByteBase16, OpaqueString, typedBech32 } from '../util/primitives';
+import { InvalidStringError } from '../../errors';
+import { Lovelace } from './Value';
+import { PoolId } from './StakePool/primitives';
 
 /**
  * The block size in bytes

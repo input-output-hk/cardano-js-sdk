@@ -1,4 +1,4 @@
-import { Cardano } from '../..';
+import { Percent, StakePoolEpochRewards } from '../types';
 import sum from 'lodash/sum';
 
 const MILLISECONDS_PER_DAY = 1000 * 60 * 60 * 24;
@@ -7,9 +7,9 @@ const MILLISECONDS_PER_DAY = 1000 * 60 * 60 * 24;
  * Estimates annualized percentage yield given past stake pool rewards.
  * Assumes 365 day year, average historical yield "per time" and epoch length of last rewardsHistory data point.
  *
- * @param {Cardano.StakePoolEpochRewards[]} rewardsHistory sorted by epoch in ascending order
+ * @param rewardsHistory sorted by epoch in ascending order
  */
-export const estimateStakePoolAPY = (rewardsHistory: Cardano.StakePoolEpochRewards[]): Cardano.Percent | null => {
+export const estimateStakePoolAPY = (rewardsHistory: StakePoolEpochRewards[]): Percent | null => {
   if (rewardsHistory.length === 0) return null;
   const roisPerDay = rewardsHistory.map(
     ({ epochLength, memberROI }) => memberROI / (epochLength / MILLISECONDS_PER_DAY)

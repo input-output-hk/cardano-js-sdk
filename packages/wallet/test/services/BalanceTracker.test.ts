@@ -3,7 +3,7 @@
 /* eslint-disable no-multi-spaces */
 /* eslint-disable space-in-parens */
 import { BehaviorObservable } from '@cardano-sdk/util-rxjs';
-import { Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
+import { Cardano, ProtocolParametersRequiredByWallet, coalesceValueQuantities } from '@cardano-sdk/core';
 import { DelegationTracker, RewardAccount, StakeKeyStatus, createBalanceTracker } from '../../src/services';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 import { utxo, utxo2 } from '../mocks';
@@ -36,14 +36,14 @@ describe('createBalanceTracker', () => {
         c: 5n
       });
       expectObservable(balanceTracker.utxo.total$).toBe('-a-----', {
-        a: Cardano.util.coalesceValueQuantities(utxo.map((u) => u[1].value))
+        a: coalesceValueQuantities(utxo.map((u) => u[1].value))
       });
       expectObservable(balanceTracker.utxo.available$).toBe('--a-b--', {
-        a: Cardano.util.coalesceValueQuantities(utxo.map((u) => u[1].value)),
-        b: Cardano.util.coalesceValueQuantities(utxo.slice(1).map((u) => u[1].value))
+        a: coalesceValueQuantities(utxo.map((u) => u[1].value)),
+        b: coalesceValueQuantities(utxo.slice(1).map((u) => u[1].value))
       });
       expectObservable(balanceTracker.utxo.unspendable$).toBe('-a-----', {
-        a: Cardano.util.coalesceValueQuantities(utxo2.map((u) => u[1].value))
+        a: coalesceValueQuantities(utxo2.map((u) => u[1].value))
       });
     });
   });

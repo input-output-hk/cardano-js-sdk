@@ -1,5 +1,5 @@
 import * as SelectionConstraints from './selectionConstraints';
-import { Asset, Cardano, cslUtil } from '@cardano-sdk/core';
+import { Asset, Cardano, coalesceValueQuantities, cslUtil } from '@cardano-sdk/core';
 import { AssetId } from '@cardano-sdk/util-dev';
 import { ImplicitValue, SelectionResult } from '../../src/types';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
@@ -25,10 +25,10 @@ const assertExtraChangeProperties = (
 };
 
 const totalOutputsValue = (outputs: Set<Cardano.TxOut>) =>
-  Cardano.util.coalesceValueQuantities([...outputs].map(({ value }) => value));
+  coalesceValueQuantities([...outputs].map(({ value }) => value));
 
 const totalUtxosValue = (results: SelectionResult) =>
-  Cardano.util.coalesceValueQuantities([...results.selection.inputs].map(([_, { value }]) => value));
+  coalesceValueQuantities([...results.selection.inputs].map(([_, { value }]) => value));
 
 const inputSelectionTotals = ({
   results,
@@ -51,7 +51,7 @@ const inputSelectionTotals = ({
     assets: Asset.util.coalesceTokenMaps([vRequestedOutputs.assets, implicitTokensSpend]),
     coins: vRequestedOutputs.coins + BigInt(implicitValue?.coin?.deposit || 0) + vFee
   };
-  const vChange = Cardano.util.coalesceValueQuantities([...results.selection.change]);
+  const vChange = coalesceValueQuantities([...results.selection.change]);
   return { vChange, vRequested, vSelected };
 };
 
@@ -114,12 +114,12 @@ export const assertFailureProperties = ({
   implicitValue?: ImplicitValue;
 }) => {
   const { implicitTokensInput, implicitTokensSpend } = mintToImplicitTokens(implicitValue?.mint);
-  const availableQuantities = Cardano.util.coalesceValueQuantities([
+  const availableQuantities = coalesceValueQuantities([
     ...utxoAmounts,
     { assets: implicitTokensInput, coins: BigInt(implicitValue?.coin?.input || 0) }
   ]);
   const maxPossibleFee = constraints.minimumCostCoefficient * BigInt(utxoAmounts.length);
-  const requestedQuantities = Cardano.util.coalesceValueQuantities([
+  const requestedQuantities = coalesceValueQuantities([
     ...outputsAmounts,
     { assets: implicitTokensSpend, coins: BigInt(implicitValue?.coin?.deposit || 0) + maxPossibleFee }
   ]);
@@ -179,7 +179,7 @@ export const generateSelectionParams = (() => {
       )
       .filter((values) => {
         // sum of coin or any asset can't exceed MAX_U64
-        const { coins, assets } = Cardano.util.coalesceValueQuantities(values);
+        const { coins, assets } = coalesceValueQuantities(values);
         return (
           coins + implicitCoin <= cslUtil.MAX_U64 &&
           (!assets || [...assets.values()].every((quantity) => quantity <= cslUtil.MAX_U64))

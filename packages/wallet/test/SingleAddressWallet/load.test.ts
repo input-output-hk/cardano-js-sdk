@@ -3,7 +3,14 @@
 import * as mocks from '../mocks';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, somePartialStakePools } from '@cardano-sdk/util-dev';
-import { Cardano, ChainHistoryProvider, NetworkInfoProvider, RewardsProvider, UtxoProvider } from '@cardano-sdk/core';
+import {
+  Cardano,
+  ChainHistoryProvider,
+  NetworkInfoProvider,
+  RewardsProvider,
+  UtxoProvider,
+  coalesceValueQuantities
+} from '@cardano-sdk/core';
 import {
   ConnectionStatus,
   ConnectionStatusTracker,
@@ -91,9 +98,7 @@ const assertWalletProperties = async (
   expect(utxoTotal).toEqual(mocks.utxo);
   // balance
   const balanceAvailable = await firstValueFrom(wallet.balance.utxo.available$);
-  expect(balanceAvailable?.coins).toEqual(
-    Cardano.util.coalesceValueQuantities(mocks.utxo.map((utxo) => utxo[1].value)).coins
-  );
+  expect(balanceAvailable?.coins).toEqual(coalesceValueQuantities(mocks.utxo.map((utxo) => utxo[1].value)).coins);
   expect(await firstValueFrom(wallet.balance.rewardAccounts.rewards$)).toBe(mocks.rewardAccountBalance);
   // transactions
   const transactionsHistory = await firstValueFrom(wallet.transactions.history$);
@@ -132,7 +137,7 @@ const assertWalletProperties2 = async (wallet: ObservableWallet) => {
   expect(await firstValueFrom(wallet.utxo.available$)).toEqual(mocks.utxo2);
   expect(await firstValueFrom(wallet.utxo.total$)).toEqual(mocks.utxo2);
   expect((await firstValueFrom(wallet.balance.utxo.available$))?.coins).toEqual(
-    Cardano.util.coalesceValueQuantities(mocks.utxo2.map((utxo) => utxo[1].value)).coins
+    coalesceValueQuantities(mocks.utxo2.map((utxo) => utxo[1].value)).coins
   );
   expect(await firstValueFrom(wallet.balance.rewardAccounts.rewards$)).toBe(mocks.rewardAccountBalance2);
   expect((await firstValueFrom(wallet.transactions.history$))?.length).toEqual(queryTransactionsResult2.length);

@@ -1,5 +1,5 @@
-import { Address, Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { BigIntMath } from '@cardano-sdk/util';
+import { Cardano, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
 import { Observable, firstValueFrom } from 'rxjs';
 import { OutputValidation } from '../types';
 import { computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit } from '@cardano-sdk/cip2';
@@ -105,7 +105,7 @@ export const createOutputValidator = ({ protocolParameters$ }: OutputValidatorCo
   };
 };
 
-export const createInputResolver = ({ utxo }: InputResolverContext): Address.util.InputResolver => ({
+export const createInputResolver = ({ utxo }: InputResolverContext): Cardano.util.InputResolver => ({
   async resolveInputAddress(input: Cardano.NewTxIn) {
     const utxoAvailable = await firstValueFrom(utxo.available$);
     return utxoAvailable?.find(([txIn]) => txInEquals(txIn, input))?.[1].address || null;

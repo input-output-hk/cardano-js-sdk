@@ -1,4 +1,3 @@
-import * as Asset from '../../Asset';
 import * as Cardano from '../../Cardano';
 import {
   Address,
@@ -52,7 +51,8 @@ import {
 } from '@emurgo/cardano-serialization-lib-nodejs';
 
 import * as certificate from './certificate';
-import { SerializationError, SerializationFailure } from '../..';
+import { SerializationError, SerializationFailure } from '../../errors';
+import { assetNameFromAssetId, parseAssetId, policyIdFromAssetId } from '../../Asset/util/assetId';
 import { parseCslAddress } from '../parseCslAddress';
 
 export const tokenMap = (map: Cardano.TokenMap) => {
@@ -60,8 +60,8 @@ export const tokenMap = (map: Cardano.TokenMap) => {
   const policyMap: Map<string, { assetsMap: Map<AssetName, BigNum>; scriptHash: ScriptHash }> = new Map();
 
   for (const assetId of map.keys()) {
-    const { assetName, scriptHash } = Asset.util.parseAssetId(assetId);
-    const policyId = Asset.util.policyIdFromAssetId(assetId).toString();
+    const { assetName, scriptHash } = parseAssetId(assetId);
+    const policyId = policyIdFromAssetId(assetId).toString();
     const amount = BigNum.from_str(map.get(assetId)!.toString());
     if (!policyMap.has(policyId)) {
       policyMap.set(policyId, { assetsMap: new Map([[assetName, amount]]), scriptHash });
@@ -167,8 +167,8 @@ export const txMint = (mint: Cardano.TokenMap) => {
   const cslMint = Mint.new();
   const mintMap = new Map<Cardano.PolicyId, [ScriptHash, MintAssets]>();
   for (const [assetId, quantity] of mint.entries()) {
-    const policyId = Asset.util.policyIdFromAssetId(assetId);
-    const assetName = Asset.util.assetNameFromAssetId(assetId);
+    const policyId = policyIdFromAssetId(assetId);
+    const assetName = assetNameFromAssetId(assetId);
     let [scriptHash, mintAssets] = mintMap.get(policyId) || [];
     if (!scriptHash || !mintAssets) {
       scriptHash = ScriptHash.from_bytes(Buffer.from(policyId, 'hex'));

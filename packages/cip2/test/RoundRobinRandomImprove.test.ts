@@ -1,5 +1,4 @@
 import { AssetId, TxTestUtil } from '@cardano-sdk/util-dev';
-import { Cardano } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../src/InputSelectionError';
 import {
   SelectionConstraints,
@@ -9,6 +8,7 @@ import {
   testInputSelectionFailureMode,
   testInputSelectionProperties
 } from './util';
+import { coalesceValueQuantities } from '@cardano-sdk/core';
 import { roundRobinRandomImprove } from '../src/RoundRobinRandomImprove';
 import fc from 'fast-check';
 
@@ -126,7 +126,7 @@ describe('RoundRobinRandomImprove', () => {
         });
         expect(results.selection.inputs.size).toBe(1);
         expect(results.selection.outputs).toBe(outputs);
-        const totalChange = Cardano.util.coalesceValueQuantities([...results.selection.change.values()]);
+        const totalChange = coalesceValueQuantities([...results.selection.change.values()]);
         expect(totalChange.assets!.get(assetId)).toBe(expectedChangeQuantity);
       });
     });

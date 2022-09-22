@@ -9,12 +9,12 @@ import {
   SignBlobResult,
   SignTransactionOptions
 } from './types';
-import { Address, CSL, Cardano, util } from '@cardano-sdk/core';
+import { CSL, Cardano, util } from '@cardano-sdk/core';
 import { STAKE_KEY_DERIVATION_PATH } from './util';
 
 export abstract class KeyAgentBase implements KeyAgent {
   readonly #serializableData: SerializableKeyAgentData;
-  protected readonly inputResolver: Address.util.InputResolver;
+  protected readonly inputResolver: Cardano.util.InputResolver;
 
   get knownAddresses(): GroupedAddress[] {
     return this.#serializableData.knownAddresses;

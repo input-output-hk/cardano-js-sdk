@@ -1,6 +1,8 @@
-import { EpochNo, Lovelace, TransactionId } from '..';
+import { EpochNo } from '../Block';
+import { Lovelace } from '../Value';
 import { PoolIdHex } from './primitives';
 import { PoolParameters } from './PoolParameters';
+import { TransactionId } from '../Transaction';
 
 /**
  * Within range [0; 1]
