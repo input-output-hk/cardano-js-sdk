@@ -1,5 +1,5 @@
 import { MessengerDependencies, runContentScriptMessageProxy } from '../messaging';
-import { consumeRemoteAuthenticatorApi } from './consumeRemoteAuthenticatorApi ';
+import { consumeRemoteAuthenticatorApi } from './consumeRemoteAuthenticatorApi';
 import { consumeRemoteWalletApi } from './consumeRemoteWalletApi';
 
 export interface InitializeContentScriptProps {

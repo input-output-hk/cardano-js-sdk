@@ -7,7 +7,7 @@ import {
   exposeApi,
   senderOrigin
 } from '../messaging';
-import { RemoteAuthenticatorMethodNames } from './consumeRemoteAuthenticatorApi ';
+import { RemoteAuthenticatorMethodNames } from './consumeRemoteAuthenticatorApi';
 
 export interface ExposeAuthenticatorApiOptions {
   walletName: string;
