@@ -13,10 +13,9 @@ import {
   SigStructure
 } from '@emurgo/cardano-message-signing-nodejs';
 import { AsyncKeyAgent, KeyRole } from '../types';
-import { Cardano, parseCslAddress, util } from '@cardano-sdk/core';
+import { Cardano, ComposableError, parseCslAddress, util } from '@cardano-sdk/core';
 import { Cip30DataSignature } from '@cardano-sdk/cip30';
 import { CoseLabel } from './util';
-import { CustomError } from 'ts-custom-error';
 import { STAKE_KEY_DERIVATION_PATH } from '../util';
 import { firstValueFrom } from 'rxjs';
 
@@ -32,13 +31,9 @@ export enum Cip30DataSignErrorCode {
   UserDeclined = 3
 }
 
-export class Cip30DataSignError extends CustomError {
-  constructor(
-    public readonly code: Cip30DataSignErrorCode,
-    public readonly info: string,
-    public readonly innerError: unknown = null
-  ) {
-    super(`DataSignError code: ${code}`);
+export class Cip30DataSignError<InnerError = unknown> extends ComposableError<InnerError> {
+  constructor(public readonly code: Cip30DataSignErrorCode, public readonly info: string, innerError?: InnerError) {
+    super(`DataSignError code: ${code}`, innerError);
   }
 }
 

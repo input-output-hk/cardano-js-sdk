@@ -1,12 +1,12 @@
-import { CustomError } from 'ts-custom-error';
+import { ComposableError } from '@cardano-sdk/core';
 
 const formatMessage = (detail?: string) => {
   const messageDetail = detail ? `: ${detail}` : '';
   return `Transport failure${messageDetail}`;
 };
 
-export class TransportError extends CustomError {
-  constructor(detail?: string, public innerError?: unknown) {
-    super(formatMessage(detail));
+export class TransportError<InnerError = unknown> extends ComposableError<InnerError> {
+  constructor(detail?: string, innerError?: InnerError) {
+    super(formatMessage(detail), innerError);
   }
 }
