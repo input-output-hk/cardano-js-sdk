@@ -37,4 +37,13 @@ describe('coldObservableProvider', () => {
     }
     expect.assertions(1);
   });
+
+  it('retries using retryBackoff, when underlying provider rejects', async () => {
+    const underlyingProvider = jest.fn().mockRejectedValueOnce(false).mockResolvedValue(true);
+    const retryBackoffConfig: RetryBackoffConfig = { initialInterval: 1 };
+    const provider$ = coldObservableProvider({ provider: underlyingProvider, retryBackoffConfig });
+    const resolvedValue = await firstValueFrom(provider$);
+    expect(underlyingProvider).toBeCalledTimes(2);
+    expect(resolvedValue).toBeTruthy();
+  });
 });
