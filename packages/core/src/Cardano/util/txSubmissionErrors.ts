@@ -1,4 +1,4 @@
-import { TxSubmissionError, TxSubmissionErrors } from '../types';
+import { TxSubmissionError, TxSubmissionErrors } from '../types/TxSubmissionErrors';
 
 /**
  * Tests the provided error for an instanceof match in the TxSubmissionErrors object

@@ -1,8 +1,8 @@
-import * as parseCslAddress from '../../src/CSL/parseCslAddress';
-import { Address, Cardano } from '../../src';
-import { CSL as SerializationLib } from '../../src/CSL';
+import * as parseCslAddress from '../../../src/CSL/parseCslAddress';
+import { Cardano } from '../../../src';
+import { CSL as SerializationLib } from '../../../src/CSL';
 
-describe('Address', () => {
+describe('Cardano.util.address', () => {
   const parseCslAddressSpy = jest.spyOn(parseCslAddress, 'parseCslAddress');
   beforeEach(() => parseCslAddressSpy.mockReset());
   afterAll(() => parseCslAddressSpy.mockRestore());
@@ -20,11 +20,11 @@ describe('Address', () => {
     describe('isAddress', () => {
       it('returns false if parseCslAddress returns null', () => {
         parseCslAddressSpy.mockReturnValueOnce(null);
-        expect(Address.util.isAddress('invalid')).toBe(false);
+        expect(Cardano.util.isAddress('invalid')).toBe(false);
       });
       it('returns true if parseCslAddress returns an Address', () => {
         parseCslAddressSpy.mockReturnValueOnce(new SerializationLib.Address());
-        expect(Address.util.isAddress('valid')).toBe(true);
+        expect(Cardano.util.isAddress('valid')).toBe(true);
       });
     });
 
@@ -33,14 +33,14 @@ describe('Address', () => {
 
       it('returns true if address is within provided addresses', () => {
         const address = addresses[0];
-        expect(Address.util.isAddressWithin(addresses)({ address })).toBe(true);
+        expect(Cardano.util.isAddressWithin(addresses)({ address })).toBe(true);
       });
 
       it('returns false if address is not within provided addresses', () => {
         const address = Cardano.Address(
           'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'
         );
-        expect(Address.util.isAddressWithin(addresses)({ address })).toBe(false);
+        expect(Cardano.util.isAddressWithin(addresses)({ address })).toBe(false);
       });
     });
 
@@ -59,7 +59,7 @@ describe('Address', () => {
       } as Cardano.TxAlonzo;
 
       it('returns the transaction inputs that contain any of the addresses', () => {
-        expect(Address.util.inputsWithAddresses(tx, addresses)).toEqual([
+        expect(Cardano.util.inputsWithAddresses(tx, addresses)).toEqual([
           {
             address: addresses[0],
             index: 0,
@@ -69,7 +69,7 @@ describe('Address', () => {
       });
 
       it('returns an empty array if none of the addresses are in the transaction inputs', () => {
-        expect(Address.util.inputsWithAddresses(tx, [addresses[1]])).toEqual([]);
+        expect(Cardano.util.inputsWithAddresses(tx, [addresses[1]])).toEqual([]);
       });
     });
   });

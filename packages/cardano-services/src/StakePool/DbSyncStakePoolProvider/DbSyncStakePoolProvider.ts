@@ -159,7 +159,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
 
     // Get last epoch data
     const lastEpoch = await this.#builder.getLastEpochWithData();
-    const { poolOptimalCount, no: lastEpochNo } = lastEpoch;
+    const { optimalPoolCount, no: lastEpochNo } = lastEpoch;
 
     // Get stake pools data cached
     const { orderedResultHashIds, orderedResultUpdateIds, orderedResult, poolDatas, hashesIds, sortType } =
@@ -214,7 +214,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
     const { results, poolsToCache } = toStakePoolResults(orderedResultHashIds, fromCache, {
       lastEpochNo,
       nodeMetricsDependencies: {
-        poolOptimalCount,
+        optimalPoolCount,
         stakeDistribution,
         totalAdaAmount: BigInt(totalAdaAmount)
       },

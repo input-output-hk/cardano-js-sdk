@@ -1,4 +1,4 @@
-import { Lovelace } from '.';
+import { Lovelace } from './Value';
 import { NetworkId, NetworkMagic } from '../NetworkId';
 
 /**

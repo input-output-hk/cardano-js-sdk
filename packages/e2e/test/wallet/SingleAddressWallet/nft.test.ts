@@ -1,5 +1,5 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, metadatum, nativeScriptPolicyId } from '@cardano-sdk/core';
 import { InMemoryKeyAgent, KeyRole, TransactionSigner, util } from '@cardano-sdk/key-management';
 import { SingleAddressWallet } from '@cardano-sdk/wallet';
 import { combineLatest, filter, firstValueFrom, map } from 'rxjs';
@@ -64,7 +64,7 @@ describe('SingleAddressWallet.assets/nft', () => {
       ]
     };
 
-    policyId = Cardano.util.nativeScriptPolicyId(policyScript);
+    policyId = nativeScriptPolicyId(policyScript);
 
     assetIds = [
       Cardano.AssetId(`${policyId}${assetNames[TOKEN_METADATA_1_INDEX]}`),
@@ -86,7 +86,7 @@ describe('SingleAddressWallet.assets/nft', () => {
 
     walletAddress = (await firstValueFrom(wallet.addresses$))[0].address;
 
-    const txMetadatum = Cardano.util.metadatum.jsonToMetadatum({
+    const txMetadatum = metadatum.jsonToMetadatum({
       [policyId.toString()]: {
         'NFT-001': {
           image: ['ipfs://some_hash1'],

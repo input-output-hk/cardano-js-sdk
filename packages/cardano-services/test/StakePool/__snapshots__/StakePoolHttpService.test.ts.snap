@@ -36,7 +36,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -110,7 +110,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -183,7 +183,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -247,7 +247,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -313,7 +313,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -378,7 +378,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -451,7 +451,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -515,7 +515,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -649,7 +649,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0,
+        "saturation": 0.003832479766253156,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -714,7 +714,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0,
+        "saturation": 0.0001193079607122087,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -777,7 +777,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -842,7 +842,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -960,7 +960,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0,
+        "saturation": 0.00001922553383396,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -1062,7 +1062,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -1126,7 +1126,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -1192,7 +1192,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0,
+        "saturation": 0.003832479766253156,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -1257,7 +1257,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -1322,7 +1322,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -1395,7 +1395,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -1460,7 +1460,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -1540,7 +1540,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -1604,7 +1604,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -1670,7 +1670,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0,
+        "saturation": 0.003832479766253156,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -1735,7 +1735,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -1800,7 +1800,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -1939,7 +1939,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -2003,7 +2003,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -2069,7 +2069,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0,
+        "saturation": 0.003832479766253156,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -2134,7 +2134,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -2199,7 +2199,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -2272,7 +2272,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -2336,7 +2336,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -2470,7 +2470,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0,
+        "saturation": 0.0001193079607122087,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -2533,7 +2533,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -2598,7 +2598,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -2716,7 +2716,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0,
+        "saturation": 0.00001922553383396,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -2818,7 +2818,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -2882,7 +2882,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -3016,7 +3016,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -3081,7 +3081,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -3213,7 +3213,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -3277,7 +3277,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -3358,7 +3358,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -3422,7 +3422,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -3556,7 +3556,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0,
+        "saturation": 0.003832479766253156,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -3621,7 +3621,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -3686,7 +3686,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -3884,7 +3884,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -3948,7 +3948,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -4082,7 +4082,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -4147,7 +4147,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -4279,7 +4279,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -4343,7 +4343,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -4409,7 +4409,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -4474,7 +4474,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -4547,7 +4547,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -4611,7 +4611,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -4745,7 +4745,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0,
+        "saturation": 0.003832479766253156,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -4810,7 +4810,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0,
+        "saturation": 0.0001193079607122087,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -4873,7 +4873,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -4938,7 +4938,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -5056,7 +5056,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0,
+        "saturation": 0.00001922553383396,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -5217,7 +5217,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -5281,7 +5281,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -5347,7 +5347,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -5412,7 +5412,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -5485,7 +5485,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -5549,7 +5549,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -5615,7 +5615,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -5680,7 +5680,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -5753,7 +5753,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -5817,7 +5817,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -5951,7 +5951,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0,
+        "saturation": 0.0001193079607122087,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -6014,7 +6014,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -6079,7 +6079,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -6197,7 +6197,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0,
+        "saturation": 0.00001922553383396,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -6299,7 +6299,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -6363,7 +6363,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -6429,7 +6429,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0,
+        "saturation": 0.003832479766253156,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -6494,7 +6494,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -6559,7 +6559,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -6698,7 +6698,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -6762,7 +6762,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -6828,7 +6828,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -6893,7 +6893,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -6966,7 +6966,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0,
+        "saturation": 0.003832479766253156,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -7031,7 +7031,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -7096,7 +7096,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -7176,7 +7176,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -7240,7 +7240,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -7374,7 +7374,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0,
+        "saturation": 0.0001193079607122087,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -7437,7 +7437,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -7502,7 +7502,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -7620,7 +7620,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0,
+        "saturation": 0.00001922553383396,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -7715,7 +7715,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0,
+        "saturation": 0.003832479766253156,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -7972,7 +7972,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -8037,7 +8037,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -8102,7 +8102,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -8160,7 +8160,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0,
+        "saturation": 0.00001922553383396,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -8315,7 +8315,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0,
+        "saturation": 0.003832479766253156,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -8380,7 +8380,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0,
+        "saturation": 0.0001193079607122087,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -8443,7 +8443,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -8517,7 +8517,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -8701,7 +8701,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -8766,7 +8766,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -8831,7 +8831,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -8889,7 +8889,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0,
+        "saturation": 0.00001922553383396,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -9044,7 +9044,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0,
+        "saturation": 0.003832479766253156,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -9109,7 +9109,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0,
+        "saturation": 0.0001193079607122087,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -9180,7 +9180,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -9245,7 +9245,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -9310,7 +9310,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -9384,7 +9384,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -9576,7 +9576,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -9641,7 +9641,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -9706,7 +9706,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -9778,7 +9778,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0,
+        "saturation": 0.0001193079607122087,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -9909,7 +9909,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -9973,7 +9973,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -10092,7 +10092,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0,
+        "saturation": 0.00001922553383396,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -10179,7 +10179,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0,
+        "saturation": 0.003832479766253156,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -10244,7 +10244,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -10368,7 +10368,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -10441,7 +10441,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -10565,7 +10565,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -10630,7 +10630,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0,
+        "saturation": 0.003832479766253156,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -10689,7 +10689,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0,
+        "saturation": 0.00001922553383396,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -10835,7 +10835,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -10901,7 +10901,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -10965,7 +10965,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0,
+        "saturation": 0.0001193079607122087,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -11104,7 +11104,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -11170,7 +11170,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -11235,7 +11235,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -11308,7 +11308,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -11432,7 +11432,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -11505,7 +11505,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0,
+        "saturation": 0.003832479766253156,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -11564,7 +11564,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0,
+        "saturation": 0.00001922553383396,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -11718,7 +11718,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -11782,7 +11782,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -11916,7 +11916,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0,
+        "saturation": 0.003832479766253156,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -11981,7 +11981,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0,
+        "saturation": 0.0001193079607122087,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -12044,7 +12044,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -12109,7 +12109,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -12227,7 +12227,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0,
+        "saturation": 0.00001922553383396,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -12381,7 +12381,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -12445,7 +12445,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -12587,7 +12587,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0,
+        "saturation": 0.003832479766253156,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -12652,7 +12652,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0,
+        "saturation": 0.0001193079607122087,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -12715,7 +12715,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -12788,7 +12788,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -12854,7 +12854,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -12919,7 +12919,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -12992,7 +12992,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -13056,7 +13056,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -13190,7 +13190,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0,
+        "saturation": 0.003832479766253156,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -13255,7 +13255,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0,
+        "saturation": 0.0001193079607122087,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -13326,7 +13326,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -13391,7 +13391,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -13509,7 +13509,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0,
+        "saturation": 0.00001922553383396,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -13663,7 +13663,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -13728,7 +13728,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -13793,7 +13793,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0,
+        "saturation": 0.0001193079607122087,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -13856,7 +13856,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0,
+        "saturation": 0.003832479766253156,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -13989,7 +13989,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -14055,7 +14055,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -14172,7 +14172,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0,
+        "saturation": 0.00001922553383396,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -14326,7 +14326,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -14390,7 +14390,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -14524,7 +14524,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0,
+        "saturation": 0.003832479766253156,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -14589,7 +14589,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0,
+        "saturation": 0.0001193079607122087,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -14652,7 +14652,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -14717,7 +14717,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -14835,7 +14835,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0,
+        "saturation": 0.00001922553383396,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -14989,7 +14989,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -15054,7 +15054,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -15119,7 +15119,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -15320,7 +15320,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -15379,7 +15379,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0,
+        "saturation": 0.00001922553383396,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -15466,7 +15466,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -15531,7 +15531,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -15595,7 +15595,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0,
+        "saturation": 0.0001193079607122087,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -15658,7 +15658,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0,
+        "saturation": 0.003832479766253156,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -15782,7 +15782,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -15856,7 +15856,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -15981,7 +15981,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0,
+        "saturation": 0.003832479766253156,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -16046,7 +16046,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0,
+        "saturation": 0.0001193079607122087,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -16109,7 +16109,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -16173,7 +16173,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -16232,7 +16232,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0,
+        "saturation": 0.00001922553383396,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -16319,7 +16319,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -16519,7 +16519,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -16584,7 +16584,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -16649,7 +16649,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0,
+        "saturation": 0.5970642370170973,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -16850,7 +16850,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0,
+        "saturation": 0.00018561353404871592,
         "size": Object {
           "active": 0.08565983586872336,
           "live": 0.9143401641312766,
@@ -16917,7 +16917,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0,
+        "saturation": 0.00001922553383396,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -17004,7 +17004,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0,
+        "saturation": 0.00002975837301809651,
         "size": Object {
           "active": 1,
           "live": 0,
@@ -17069,7 +17069,7 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0,
+        "saturation": 0.00003555210355859188,
         "size": Object {
           "active": 1,
           "live": 0,

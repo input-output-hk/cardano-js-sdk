@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import { CONNECTION_ERROR_EVENT, TX_SUBMISSION_QUEUE, serializeError, waitForPending } from './utils';
-import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
 import { Channel, Connection, Message, connect } from 'amqplib';
 import { EventEmitter } from 'events';
 import { Logger } from 'ts-log';
+import { ProviderError, ProviderFailure, TxSubmitProvider, cslUtil } from '@cardano-sdk/core';
 import { bufferToHexString } from '@cardano-sdk/util';
 
 const moduleName = 'TxSubmitWorker';
@@ -281,7 +281,7 @@ export class TxSubmitWorker extends EventEmitter {
       const txBody = new Uint8Array(content);
 
       // Register the handling of current transaction
-      txId = Cardano.util.deserializeTx(txBody).id.toString();
+      txId = cslUtil.deserializeTx(txBody).id.toString();
 
       this.#dependencies.logger.info(`${moduleName}: submitting tx #${counter} id: ${txId}`);
       this.#dependencies.logger.debug(`${moduleName}: tx #${counter} dump:`, [content.toString('hex')]);

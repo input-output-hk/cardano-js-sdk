@@ -102,8 +102,8 @@ describe('cslToCore', () => {
     // values from ogmios.wsp.json
     const bootstrap: Cardano.BootstrapWitness[] = [
       {
-        addressAttributes: Cardano.Base64Blob('cA=='),
-        chainCode: Cardano.HexBlob('b6dbf0b03c93afe5696f10d49e8a8304ebfac01deeb8f82f2af5836ebbc1b450'),
+        addressAttributes: Cardano.util.Base64Blob('cA=='),
+        chainCode: Cardano.util.HexBlob('b6dbf0b03c93afe5696f10d49e8a8304ebfac01deeb8f82f2af5836ebbc1b450'),
         key: Cardano.Ed25519PublicKey('deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01'),
         signature: Cardano.Ed25519Signature(
           Buffer.from(

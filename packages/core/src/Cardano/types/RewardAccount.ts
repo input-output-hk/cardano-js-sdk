@@ -1,4 +1,4 @@
-import * as util from '../util';
+import * as util from '../util/primitives';
 
 /**
  * mainnet or testnet stake address as bech32 string,

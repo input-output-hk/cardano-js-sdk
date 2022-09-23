@@ -1,11 +1,11 @@
-import { Address, Cardano } from '@cardano-sdk/core';
 import { AsyncKeyAgent, InMemoryKeyAgent, KeyAgent, util } from '../../src';
+import { Cardano } from '@cardano-sdk/core';
 import { firstValueFrom } from 'rxjs';
 
 describe('createAsyncKeyAgent maps KeyAgent to AsyncKeyAgent', () => {
   let keyAgent: KeyAgent;
   let asyncKeyAgent: AsyncKeyAgent;
-  let inputResolver: jest.Mocked<Address.util.InputResolver>;
+  let inputResolver: jest.Mocked<Cardano.util.InputResolver>;
   const addressDerivationPath = { index: 0, type: 0 };
 
   beforeEach(async () => {

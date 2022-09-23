@@ -1,5 +1,5 @@
-import { CSL } from '../../CSL';
-import { Hash28ByteBase16, HexBlob, OpaqueString, castHexBlob, typedHex } from '../util';
+import { CSL } from '../../CSL/CSL';
+import { Hash28ByteBase16, HexBlob, OpaqueString, castHexBlob, typedHex } from '../util/primitives';
 import { RewardAccount } from './RewardAccount';
 
 /**

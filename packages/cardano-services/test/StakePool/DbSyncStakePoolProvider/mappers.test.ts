@@ -1,7 +1,9 @@
 import { Cardano, StakePoolStats } from '@cardano-sdk/core';
 import {
+  Epoch,
   calcNodeMetricsValues,
   mapAddressOwner,
+  mapEpoch,
   mapEpochReward,
   mapPoolAPY,
   mapPoolData,
@@ -98,14 +100,14 @@ describe('mappers', () => {
     live_stake: '100000000',
     live_stake_percentage: 0.5,
     pool_hash_id: hash_id,
-    saturation: 0.000_000_8
+    saturation: '0.000_000_8'
   };
   const poolAPYModel = {
     apy: 0.015,
     hash_id
   };
   const nodeMetricsDependencies = {
-    poolOptimalCount: 10,
+    optimalPoolCount: 10,
     stakeDistribution: mockStakeDistribution,
     totalAdaAmount: BigInt('42000004107749657')
   };
@@ -191,7 +193,7 @@ describe('mappers', () => {
         blocksCreated: poolMetricsModel.blocks_created,
         delegators: poolMetricsModel.delegators,
         livePledge: BigInt(poolMetricsModel.live_pledge),
-        saturation: poolMetricsModel.saturation
+        saturation: Number.parseFloat(poolMetricsModel.saturation)
       }
     });
   });
@@ -411,6 +413,13 @@ describe('mappers', () => {
   it('mapPoolStats', () => {
     expect(mapPoolStats({ active: '20', retired: '0', retiring: '1' })).toEqual<StakePoolStats>({
       qty: { active: 20, retired: 0, retiring: 1 }
+    });
+  });
+
+  it('maps getLastEpochWithData query result to Epoch', () => {
+    expect(mapEpoch({ no: 44, optimal_pool_count: 500 })).toEqual<Epoch>({
+      no: 44,
+      optimalPoolCount: 500
     });
   });
 });

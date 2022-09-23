@@ -45,7 +45,7 @@ const getPoolStatus = (
 interface NodeMetricsDependencies {
   stakeDistribution: StakeDistribution;
   totalAdaAmount: Cardano.Lovelace;
-  poolOptimalCount?: number;
+  optimalPoolCount?: number;
 }
 
 interface ToCoreStakePoolInput {
@@ -69,7 +69,7 @@ interface ToCoreStakePoolInput {
 export const calcNodeMetricsValues = (
   poolId: Cardano.PoolId,
   metrics: PoolMetrics['metrics'],
-  { totalAdaAmount, stakeDistribution, poolOptimalCount = 0 }: NodeMetricsDependencies,
+  { totalAdaAmount, stakeDistribution, optimalPoolCount = 0 }: NodeMetricsDependencies,
   apy: number
 ): Cardano.StakePoolMetrics => {
   const { activeStake, ...rest } = metrics;
@@ -89,7 +89,7 @@ export const calcNodeMetricsValues = (
   };
   stakePoolMetrics.size = size;
   stakePoolMetrics.stake = stake;
-  stakePoolMetrics.saturation = Number(divideBigIntToFloat(totalStake * BigInt(poolOptimalCount), totalAdaAmount));
+  stakePoolMetrics.saturation = Number(divideBigIntToFloat(totalStake * BigInt(optimalPoolCount), totalAdaAmount));
   return stakePoolMetrics;
 };
 
@@ -224,9 +224,9 @@ export const mapRelay = (relayModel: RelayModel): PoolRelay => {
   return { hashId: Number(relayModel.hash_id), relay, updateId: Number(relayModel.update_id) };
 };
 
-export const mapEpoch = ({ no, pool_optimal_count }: EpochModel): Epoch => ({
+export const mapEpoch = ({ no, optimal_pool_count }: EpochModel): Epoch => ({
   no,
-  poolOptimalCount: pool_optimal_count
+  optimalPoolCount: optimal_pool_count
 });
 
 export const mapEpochReward = (epochRewardModel: EpochRewardModel, hashId: number): EpochReward => ({
@@ -265,7 +265,7 @@ export const mapPoolMetrics = (poolMetricsModel: PoolMetricsModel): PoolMetrics 
     blocksCreated: poolMetricsModel.blocks_created,
     delegators: poolMetricsModel.delegators,
     livePledge: BigInt(poolMetricsModel.live_pledge),
-    saturation: poolMetricsModel.saturation
+    saturation: Number.parseFloat(poolMetricsModel.saturation)
   }
 });
 
