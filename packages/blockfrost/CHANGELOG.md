@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/blockfrost@0.6.0-nightly.7...@cardano-sdk/blockfrost@0.6.0-nightly.8) (2022-09-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* hoist Cardano.util.{deserializeTx,metadatum}
+
+### Code Refactoring
+
+* hoist Cardano.util.{deserializeTx,metadatum} ([a1d0754](https://github.com/input-output-hk/cardano-js-sdk/commit/a1d07549e7a5fccd36b9f75b9f713c0def8cb97f))
+
+
+
 ## [0.6.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/blockfrost@0.6.0-nightly.6...@cardano-sdk/blockfrost@0.6.0-nightly.7) (2022-09-21)
 
 **Note:** Version bump only for package @cardano-sdk/blockfrost

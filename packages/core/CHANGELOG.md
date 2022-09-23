@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0-nightly.7...@cardano-sdk/core@0.6.0-nightly.8) (2022-09-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* hoist Cardano.util.{deserializeTx,metadatum}
+* hoist core Address namespace to Cardano.util
+* hoist some core.Cardano.util.* to core.*
+
+### Features
+
+* **core:** added a new inspector for extracting minting and burning information from transactions ([a9289f3](https://github.com/input-output-hk/cardano-js-sdk/commit/a9289f3798e7e8cfc8a46b096414f7e219dd619b))
+* **core:** added a new inspector for extracting pool registration/retirements information from transactions ([e186ba3](https://github.com/input-output-hk/cardano-js-sdk/commit/e186ba360b2d6e55b708f6033a8cd5269d127b66))
+* **core:** added a new inspector for extracting transaction metadata ([d7e1402](https://github.com/input-output-hk/cardano-js-sdk/commit/d7e1402b57cc11b6544c2ecabaf5dcbb46e51525))
+
+
+### Code Refactoring
+
+* hoist Cardano.util.{deserializeTx,metadatum} ([a1d0754](https://github.com/input-output-hk/cardano-js-sdk/commit/a1d07549e7a5fccd36b9f75b9f713c0def8cb97f))
+* hoist core Address namespace to Cardano.util ([c0af6c3](https://github.com/input-output-hk/cardano-js-sdk/commit/c0af6c333420b4305f021a50bbdf25317b85554f))
+* hoist some core.Cardano.util.* to core.* ([5c18c7b](https://github.com/input-output-hk/cardano-js-sdk/commit/5c18c7be146578991753c081ab4da0adae9b3f88))
+
+
+
 ## [0.6.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0-nightly.6...@cardano-sdk/core@0.6.0-nightly.7) (2022-09-21)
 
 

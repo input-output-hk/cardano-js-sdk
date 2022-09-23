@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.9...@cardano-sdk/cardano-services@0.6.0-nightly.10) (2022-09-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* hoist Cardano.util.{deserializeTx,metadatum}
+
+### Bug Fixes
+
+* **cardano-services:** fixed an issue that was causing pool saturation to be always 0 ([82cab4d](https://github.com/input-output-hk/cardano-js-sdk/commit/82cab4dbe8ab3c8df13309770a953b30f957ebe3))
+
+
+### Code Refactoring
+
+* hoist Cardano.util.{deserializeTx,metadatum} ([a1d0754](https://github.com/input-output-hk/cardano-js-sdk/commit/a1d07549e7a5fccd36b9f75b9f713c0def8cb97f))
+
+
+
 ## [0.6.0-nightly.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.8...@cardano-sdk/cardano-services@0.6.0-nightly.9) (2022-09-21)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services
