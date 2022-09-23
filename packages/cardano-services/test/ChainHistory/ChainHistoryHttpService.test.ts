@@ -244,7 +244,7 @@ describe('ChainHistoryHttpService', () => {
           const tx: Cardano.TxAlonzo = response[0];
           expect(response.length).toEqual(1);
           expect(response).toMatchSnapshot();
-          expect(tx.body.collaterals?.length).toBeGreaterThan(0);
+          expect(tx.body.collaterals?.length).toEqual(0);
         });
 
         it('has certificates', async () => {
@@ -337,7 +337,7 @@ describe('ChainHistoryHttpService', () => {
             Cardano.Address('addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg')
           ];
           const response = await provider.transactionsByAddresses({ addresses });
-          expect(response).toHaveLength(11);
+          expect(response).toHaveLength(8);
           expect(response).toMatchSnapshot();
         });
 

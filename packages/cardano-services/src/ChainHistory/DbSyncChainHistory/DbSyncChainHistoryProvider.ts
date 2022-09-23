@@ -1,5 +1,5 @@
 import * as Queries from './queries';
-import { BlockModel, BlockOutputModel, TipModel, TxInOutModel, TxModel } from './types';
+import { BlockModel, BlockOutputModel, TipModel, TxInputModel, TxModel, TxOutputModel } from './types';
 import {
   BlocksByIdsArgs,
   Cardano,
@@ -13,7 +13,7 @@ import { Logger } from 'ts-log';
 import { MetadataService } from '../../Metadata';
 import { Pool, QueryResult } from 'pg';
 import { hexStringToBuffer } from '@cardano-sdk/util';
-import { mapBlock, mapTxAlonzo, mapTxIn, mapTxOut } from './mappers';
+import { mapBlock, mapTxAlonzo, mapTxIn, mapTxInModel, mapTxOut, mapTxOutModel } from './mappers';
 import orderBy from 'lodash/orderBy';
 import uniq from 'lodash/uniq';
 
@@ -34,11 +34,11 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider implements ChainH
     sinceBlock
   }: TransactionsByAddressesArgs): Promise<Cardano.TxAlonzo[]> {
     this.#logger.debug(`About to find transactions of addresses ${addresses} since block ${sinceBlock ?? 0}`);
-    const inputsResults: QueryResult<TxInOutModel> = await this.db.query(Queries.findTxInputsByAddresses, [
+    const inputsResults: QueryResult<TxInputModel> = await this.db.query(Queries.findTxInputsByAddresses, [
       addresses,
       sinceBlock ?? 0
     ]);
-    const outputsResults: QueryResult<TxInOutModel> = await this.db.query(Queries.findTxOutputsByAddresses, [
+    const outputsResults: QueryResult<TxOutputModel> = await this.db.query(Queries.findTxOutputsByAddresses, [
       addresses,
       sinceBlock ?? 0
     ]);
@@ -46,9 +46,10 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider implements ChainH
     if (inputsResults.rows.length === 0 && outputsResults.rows.length === 0) return [];
 
     const ids = uniq([
-      ...inputsResults.rows.map(mapTxIn).flatMap((input) => input.txId),
-      ...outputsResults.rows.map((output) => mapTxOut(output)).flatMap((output) => output.txId)
+      ...inputsResults.rows.map(mapTxInModel).flatMap((input) => input.txInputId),
+      ...outputsResults.rows.map((outputModel) => mapTxOutModel(outputModel)).flatMap((output) => output.txId)
     ]);
+
     return this.transactionsByHashes({ ids });
   }
 
@@ -56,7 +57,9 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider implements ChainH
     const byteIds = ids.map((id) => hexStringToBuffer(id.toString()));
     this.#logger.debug('About to find transactions with hashes:', byteIds);
     const txResults: QueryResult<TxModel> = await this.db.query(Queries.findTransactionsByHashes, [byteIds]);
+
     if (txResults.rows.length === 0) return [];
+
     const [inputs, outputs, mints, withdrawals, redeemers, metadata, collaterals, certificates] = await Promise.all([
       this.#builder.queryTransactionInputsByHashes(ids),
       this.#builder.queryTransactionOutputsByHashes(ids),
@@ -67,20 +70,13 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider implements ChainH
       this.#builder.queryTransactionInputsByHashes(ids, true),
       this.#builder.queryCertificatesByHashes(ids)
     ]);
+
     return txResults.rows.map((tx) => {
       const txId = Cardano.TransactionId(tx.id.toString('hex'));
-      const txInputs = orderBy(
-        inputs.filter((input) => input.txId === txId),
-        ['index']
-      );
-      const txOutputs = orderBy(
-        outputs.filter((output) => output.txId === txId),
-        ['index']
-      );
-      const txCollaterals = orderBy(
-        collaterals.filter((col) => col.txId === txId),
-        ['index']
-      );
+      const txInputs = orderBy(inputs.filter((input) => input.txInputId === txId).map(mapTxIn), ['index']);
+      const txCollaterals = orderBy(collaterals.filter((col) => col.txInputId === txId).map(mapTxIn), ['index']);
+      const txOutputs = orderBy(outputs.filter((output) => output.txId === txId).map(mapTxOut), ['index']);
+
       return mapTxAlonzo(tx, {
         certificates: certificates.get(txId),
         collaterals: txCollaterals,
@@ -109,12 +105,14 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider implements ChainH
     const outputResult: QueryResult<BlockOutputModel> = await this.db.query(Queries.findBlocksOutputByHashes, [
       byteIds
     ]);
+
     return blocksResult.rows.map((block) => {
       const blockOutput = outputResult.rows.find((output) => output.hash === block.hash) ?? {
         fees: '0',
         hash: block.hash,
         output: '0'
       };
+
       return mapBlock(block, blockOutput, tip);
     });
   }

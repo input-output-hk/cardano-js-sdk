@@ -10,9 +10,11 @@ import {
   RedeemerModel,
   StakeCertModel,
   TransactionDataMap,
-  TxInOutModel,
+  TxInput,
+  TxInputModel,
   TxOutMultiAssetModel,
   TxOutTokenMap,
+  TxOutput,
   TxOutputModel,
   TxTokenMap,
   WithCertIndex,
@@ -25,8 +27,8 @@ import { hexStringToBuffer } from '@cardano-sdk/util';
 import {
   mapCertificate,
   mapRedeemer,
-  mapTxIn,
-  mapTxOut,
+  mapTxInModel,
+  mapTxOutModel,
   mapTxOutTokenMap,
   mapTxTokenMap,
   mapWithdrawal
@@ -43,17 +45,14 @@ export class ChainHistoryBuilder {
     this.#logger = logger;
   }
 
-  public async queryTransactionInputsByHashes(
-    hashes: Cardano.TransactionId[],
-    collateral = false
-  ): Promise<Cardano.TxIn[]> {
+  public async queryTransactionInputsByHashes(hashes: Cardano.TransactionId[], collateral = false): Promise<TxInput[]> {
     const byteHashes = hashes.map((hash) => hexStringToBuffer(hash.toString()));
     this.#logger.debug(`About to find inputs (collateral: ${collateral}) for transactions:`, byteHashes);
-    const result: QueryResult<TxInOutModel> = await this.#db.query(
+    const result: QueryResult<TxInputModel> = await this.#db.query(
       collateral ? Queries.findTxCollateralsByHashes : Queries.findTxInputsByHashes,
       [byteHashes]
     );
-    return result.rows.length > 0 ? result.rows.map(mapTxIn) : [];
+    return result.rows.length > 0 ? result.rows.map(mapTxInModel) : [];
   }
 
   public async queryMultiAssetsByTxOut(txOutIds: BigInt[]): Promise<TxOutTokenMap> {
@@ -62,15 +61,15 @@ export class ChainHistoryBuilder {
     return mapTxOutTokenMap(result.rows);
   }
 
-  public async queryTransactionOutputsByHashes(hashes: Cardano.TransactionId[]): Promise<TxOutputModel[]> {
+  public async queryTransactionOutputsByHashes(hashes: Cardano.TransactionId[]): Promise<TxOutput[]> {
     const byteHashes = hashes.map((hash) => hexStringToBuffer(hash.toString()));
     this.#logger.debug('About to find outputs for transactions:', byteHashes);
-    const result: QueryResult<TxInOutModel> = await this.#db.query(Queries.findTxOutputsByHashes, [byteHashes]);
+    const result: QueryResult<TxOutputModel> = await this.#db.query(Queries.findTxOutputsByHashes, [byteHashes]);
     if (result.rows.length === 0) return [];
 
     const txOutIds = result.rows.flatMap((txOut) => BigInt(txOut.id));
     const multiAssets = await this.queryMultiAssetsByTxOut(txOutIds);
-    return result.rows.map((txOut) => mapTxOut(txOut, multiAssets.get(txOut.id)));
+    return result.rows.map((txOut) => mapTxOutModel(txOut, multiAssets.get(txOut.id)));
   }
 
   public async queryTxMintByHashes(hashes: Cardano.TransactionId[]): Promise<TxTokenMap> {

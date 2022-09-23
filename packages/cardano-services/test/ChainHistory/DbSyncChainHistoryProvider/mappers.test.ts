@@ -12,10 +12,12 @@ import {
   RedeemerModel,
   StakeCertModel,
   TipModel,
-  TxInOutModel,
+  TxInput,
+  TxInputModel,
   TxModel,
   TxOutMultiAssetModel,
   TxOutTokenMap,
+  TxOutput,
   TxOutputModel,
   TxTokenMap,
   WithCertIndex,
@@ -30,6 +32,7 @@ const datetime = '2022-05-10T19:22:43.620Z';
 const vrfKey = 'vrf_vk19j362pkr4t9y0m3qxgmrv0365vd7c4ze03ny4jh84q8agjy4ep4s99zvg8';
 const genesisLeaderHash = 'eff1b5b26e65b791d6f236c7c0264012bd1696759d22bdb4dd0f6f56';
 const transactionHash = 'cefd2fcf657e5e5d6c35975f4e052f427819391b153ebb16ad8aa107ba5a3819';
+const sourceTransactionHash = 'cefd2fcf657e5e5d6c35975f4e052f427819391b153ebb16ad8aa107ba5a3812';
 const hash28ByteBase16 = '8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d';
 const hash32ByteBase16 = '3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d';
 const address = 'addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg';
@@ -42,16 +45,38 @@ const baseCertModel: CertificateModel = {
   cert_index: 0,
   tx_id: Buffer.from(transactionHash, 'hex')
 };
-const txInModel: TxInOutModel = {
+
+const txInput: TxInput = {
+  address: Cardano.Address(address),
+  id: '1',
+  index: 1,
+  txInputId: Cardano.TransactionId(transactionHash),
+  txSourceId: Cardano.TransactionId(sourceTransactionHash)
+};
+
+const txInputModel: TxInputModel = {
+  address,
+  id: '1',
+  index: 1,
+  tx_input_id: Buffer.from(transactionHash, 'hex'),
+  tx_source_id: Buffer.from(sourceTransactionHash, 'hex')
+};
+
+const txOutput: TxOutput = {
+  address: Cardano.Address(address),
+  datum: Cardano.util.Hash32ByteBase16(hash32ByteBase16),
+  index: 1,
+  txId: Cardano.TransactionId(transactionHash),
+  value: { coins: 20_000_000n }
+};
+
+const txOutModel: TxOutputModel = {
   address,
   coin_value: '20000000',
+  datum: Buffer.from(hash32ByteBase16, 'hex'),
   id: '1',
   index: 1,
   tx_id: Buffer.from(transactionHash, 'hex')
-};
-const txOutModel: TxInOutModel = {
-  ...txInModel,
-  datum: Buffer.from(hash32ByteBase16, 'hex')
 };
 const assets: Cardano.TokenMap = new Map([
   [AssetId.TSLA, 500n],
@@ -331,20 +356,32 @@ describe('chain history mappers', () => {
       });
     });
   });
-  describe('mapTxIn', () => {
-    test('map TxInOutModel to Cardano.TxIn', () => {
-      const result = mappers.mapTxIn(txInModel);
-      expect(result).toEqual<Cardano.TxIn>({
-        address: Cardano.Address(address),
-        index: 1,
-        txId: Cardano.TransactionId(transactionHash)
+  describe('mapTxInModel', () => {
+    test('map txInputModel to TxInput', () => {
+      const result = mappers.mapTxInModel(txInputModel);
+      expect(result).toEqual<TxInput>({
+        address: Cardano.Address(txInputModel.address),
+        id: txInputModel.id,
+        index: txInputModel.index,
+        txInputId: Cardano.TransactionId(transactionHash),
+        txSourceId: Cardano.TransactionId(sourceTransactionHash)
       });
     });
   });
-  describe('mapTxOut', () => {
-    test('map TxInOutModel with assets to TxOutput', () => {
-      const result = mappers.mapTxOut(txOutModel, assets);
-      expect(result).toEqual<TxOutputModel>({
+  describe('mapTxIn', () => {
+    test('map TxInput to Cardano.TxIn', () => {
+      const result = mappers.mapTxIn(txInput);
+      expect(result).toEqual<Cardano.TxIn>({
+        address: Cardano.Address(address),
+        index: 1,
+        txId: Cardano.TransactionId(sourceTransactionHash)
+      });
+    });
+  });
+  describe('mapTxOutModel', () => {
+    test('map TxOutputModel with assets to TxOutput', () => {
+      const result = mappers.mapTxOutModel(txOutModel, assets);
+      expect(result).toEqual<TxOutput>({
         address: Cardano.Address(address),
         datum: Cardano.util.Hash32ByteBase16(hash32ByteBase16),
         index: 1,
@@ -352,9 +389,9 @@ describe('chain history mappers', () => {
         value: { assets, coins: 20_000_000n }
       });
     });
-    test('map TxInOutModel with no assets to TxOutput', () => {
-      const result = mappers.mapTxOut(txOutModel);
-      expect(result).toEqual<TxOutputModel>({
+    test('map TxOutputModel with no assets to TxOutput', () => {
+      const result = mappers.mapTxOutModel(txOutModel);
+      expect(result).toEqual<TxOutput>({
         address: Cardano.Address(address),
         datum: Cardano.util.Hash32ByteBase16(hash32ByteBase16),
         index: 1,
@@ -362,13 +399,23 @@ describe('chain history mappers', () => {
         value: { coins: 20_000_000n }
       });
     });
-    test('map TxInOutModel with nulls to TxOutput', () => {
-      const result = mappers.mapTxOut({ ...txOutModel, datum: null });
-      expect(result).toEqual<TxOutputModel>({
+    test('map TxOutputModel with nulls to TxOutput', () => {
+      const result = mappers.mapTxOutModel({ ...txOutModel, datum: null });
+      expect(result).toEqual<TxOutput>({
         address: Cardano.Address(address),
         index: 1,
         txId: Cardano.TransactionId(transactionHash),
         value: { coins: 20_000_000n }
+      });
+    });
+  });
+  describe('mapTxOut', () => {
+    test('map TxOutput to Cardano.TxOut', () => {
+      const result = mappers.mapTxOut(txOutput);
+      expect(result).toEqual<Cardano.TxOut>({
+        address: txOutput.address,
+        datum: txOutput.datum,
+        value: txOutput.value
       });
     });
   });
