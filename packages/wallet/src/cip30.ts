@@ -14,7 +14,7 @@ import {
   WalletApi
 } from '@cardano-sdk/cip30';
 import { CSL, Cardano, coreToCsl, cslToCore } from '@cardano-sdk/core';
-import { InputSelectionError } from '@cardano-sdk/cip2';
+import { InputSelectionError } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
 import { ObservableWallet } from './types';
 import { errors } from '@cardano-sdk/key-management';

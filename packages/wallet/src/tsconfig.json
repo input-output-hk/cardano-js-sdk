@@ -5,7 +5,7 @@
   },
   "references": [
     {
-      "path": "../../cip2/src"
+      "path": "../../input-selection/src"
     },
     {
       "path": "../../cip30/src"

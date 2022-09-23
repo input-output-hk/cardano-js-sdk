@@ -5,7 +5,7 @@
   },
   "include": [
     "./**/*.ts",
-    "../../cip2/test/util",
+    "../../input-selection/test/util",
     "../../key-management/test/mocks"
   ],
   "references": [
@@ -25,7 +25,7 @@
       "path": "../../util-dev/src"
     },
     {
-      "path": "../../cip2/src"
+      "path": "../../input-selection/src"
     },
     {
       "path": "../../core/src"
