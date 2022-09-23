@@ -50,7 +50,7 @@ export interface StakePoolMetrics {
   blocksCreated: number;
 
   /**
-   * This can be used to determine the likelihood of the poo meeting it.s pledge at the next snapshot.
+   * This can be used to determine the likelihood of the pool meeting its pledge at the next snapshot.
    */
   livePledge: Lovelace;
 
