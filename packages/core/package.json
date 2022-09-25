@@ -63,8 +63,8 @@
   "dependencies": {
     "@cardano-ogmios/client": "5.5.2",
     "@cardano-sdk/util": "^0.5.0",
-    "@emurgo/cardano-serialization-lib-browser": "11.0.0-rc.6",
-    "@emurgo/cardano-serialization-lib-nodejs": "11.0.0-rc.6",
+    "@emurgo/cardano-serialization-lib-browser": "11.0.5",
+    "@emurgo/cardano-serialization-lib-nodejs": "11.0.5",
     "@emurgo/cip14-js": "^3.0.1",
     "bech32": "^2.0.0",
     "lodash": "^4.17.21",
