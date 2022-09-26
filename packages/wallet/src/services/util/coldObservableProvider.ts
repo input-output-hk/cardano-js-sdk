@@ -1,4 +1,4 @@
-import { NEVER, Observable, distinctUntilChanged, from, of, switchMap, takeUntil } from 'rxjs';
+import { NEVER, Observable, defer, distinctUntilChanged, from, of, switchMap, takeUntil } from 'rxjs';
 import { RetryBackoffConfig, retryBackoff } from 'backoff-rxjs';
 import { strictEquals } from './equals';
 
@@ -22,7 +22,7 @@ export const coldObservableProvider = <T>({
   new Observable<T>((subscriber) => {
     const sub = trigger$
       .pipe(
-        combinator(() => from(provider()).pipe(retryBackoff(retryBackoffConfig))),
+        combinator(() => defer(() => from(provider())).pipe(retryBackoff(retryBackoffConfig))),
         distinctUntilChanged(equals),
         takeUntil(cancel$)
       )
