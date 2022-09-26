@@ -10,7 +10,7 @@ import {
 } from '../../src/services';
 
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { of } from 'rxjs';
+import { from, lastValueFrom, of, tap } from 'rxjs';
 
 describe('createAssetsTracker', () => {
   let assetTsla: Asset.AssetInfo;
@@ -48,7 +48,7 @@ describe('createAssetsTracker', () => {
       } as unknown as TransactionalTracker<BalanceTracker>;
 
       const target$ = createAssetsTracker(
-        { assetProvider, balanceTracker, logger: console, retryBackoffConfig } as unknown as AssetsTrackerProps,
+        { assetProvider, balanceTracker, logger, retryBackoffConfig } as unknown as AssetsTrackerProps,
         {
           assetService
         }
@@ -101,37 +101,33 @@ describe('createAssetsTracker', () => {
     });
   });
 
-  it('polls asset info while metadata is undefined', () => {
-    assetService = jest
-      .fn()
-      .mockReturnValueOnce(of({ ...assetTsla, nftMetadata: undefined }))
-      .mockReturnValueOnce(of({ ...assetTsla, tokenMetadata: undefined }))
-      .mockReturnValueOnce(of(assetTsla));
+  it('polls asset info while metadata is undefined', async () => {
+    assetProvider = {
+      getAsset: jest
+        .fn()
+        .mockResolvedValueOnce({ ...assetTsla, nftMetadata: undefined })
+        .mockResolvedValueOnce({ ...assetTsla, tokenMetadata: undefined })
+        .mockResolvedValueOnce(assetTsla),
+      setStatInitialized: jest.fn(),
+      stats: {}
+    } as unknown as TrackedAssetProvider;
 
-    createTestScheduler().run(({ cold, expectObservable, flush }) => {
-      const balanceTracker = {
-        utxo: {
-          total$: cold('a-b------|', {
-            a: {} as Cardano.Value,
-            b: { assets: new Map([[AssetId.TSLA, 1n]]) } as Cardano.Value
-          })
-        }
-      } as unknown as TransactionalTracker<BalanceTracker>;
+    const balanceTracker = { utxo: { total$: from([{}, { assets: new Map([[AssetId.TSLA, 1n]]) }]) } };
 
-      const target$ = createAssetsTracker(
-        { assetProvider, balanceTracker, logger: console, retryBackoffConfig } as unknown as AssetsTrackerProps,
-        {
-          assetService
-        }
-      );
-      expectObservable(target$).toBe('--b-c---d|', {
-        b: new Map([[AssetId.TSLA, { ...assetTsla, nftMetadata: undefined }]]),
-        c: new Map([[AssetId.TSLA, { ...assetTsla, tokenMetadata: undefined }]]),
-        d: new Map([[AssetId.TSLA, assetTsla]])
-      });
-      flush();
-      expect(assetProvider.setStatInitialized).toBeCalledTimes(1); // only when there are no assets
-      expect(assetService).toHaveBeenCalledTimes(3);
-    });
+    const target$ = createAssetsTracker({
+      assetProvider,
+      balanceTracker,
+      logger,
+      retryBackoffConfig
+    } as unknown as AssetsTrackerProps);
+
+    const assetInfos: Map<Cardano.AssetId, Asset.AssetInfo>[] = [];
+    await lastValueFrom(target$.pipe(tap((ai) => assetInfos.push(ai))));
+    expect(assetInfos).toEqual([
+      new Map([[AssetId.TSLA, { ...assetTsla, nftMetadata: undefined }]]),
+      new Map([[AssetId.TSLA, { ...assetTsla, tokenMetadata: undefined }]]),
+      new Map([[AssetId.TSLA, assetTsla]])
+    ]);
+    expect(assetProvider.getAsset).toBeCalledTimes(3);
   });
 });
