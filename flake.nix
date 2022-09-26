@@ -28,6 +28,27 @@
         ];
       };
       project = pkgs.callPackage ./yarn-project.nix {} {inherit src;};
+
+      replaceLine = regex: replacement: s: let
+        m = builtins.match "(.*\n)${regex}(\n.*)" s;
+      in
+        builtins.concatStringsSep "" [
+          (builtins.elemAt m 0)
+          replacement
+          (builtins.elemAt m 1)
+        ];
+      production-deps = project.overrideAttrs (oldAttrs: {
+        name = "cardano-sdk-production-deps";
+        configurePhase =
+          builtins.replaceStrings
+          ["yarn install --immutable --immutable-cache"]
+          ["yarn workspaces focus --all --production"]
+          oldAttrs.configurePhase;
+        # A bunch of deps build binaries using node-gyp that requires Python
+        PYTHON = "${pkgs.python3}/bin/python3";
+        # node-hid uses pkg-config to find sources
+        buildInputs = oldAttrs.buildInputs ++ [pkgs.pkg-config pkgs.libusb1];
+      });
     in
       project.overrideAttrs (oldAttrs: {
         # A bunch of deps build binaries using node-gyp that requires Python
@@ -39,6 +60,25 @@
         # run actual build
         buildPhase = ''
           yarn build
+        '';
+        # override installPhase to only install what's necessary
+        installPhase = ''
+          runHook preInstall
+
+          mkdir -p $out/libexec/$sourceRoot $out/bin
+
+          cp -r ${production-deps}/libexec/$sourceRoot/node_modules $out/libexec/$sourceRoot/node_modules
+          cp -r scripts $out/libexec/$sourceRoot/scripts
+          for p in cardano-services core ogmios util; do
+            mkdir -p $out/libexec/$sourceRoot/packages/$p
+            cp -r packages/$p/dist $out/libexec/$sourceRoot/packages/$p/dist
+            cp -r packages/$p/package.json $out/libexec/$sourceRoot/packages/$p/package.json
+          done
+          cp -r ${production-deps}/libexec/$sourceRoot/packages/cardano-services/node_modules $out/libexec/$sourceRoot/packages/cardano-services/node_modules
+
+          cd "$out/libexec/$sourceRoot"
+
+          runHook postInstall
         '';
         # add a bin script that should be used to run cardano-services CLI
         postInstall = ''
