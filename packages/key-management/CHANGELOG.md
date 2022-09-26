@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.2.0-nightly.5...@cardano-sdk/key-management@0.2.0-nightly.6) (2022-09-26)
+
+
+### Bug Fixes
+
+* **key-management:** custom errors no longer hide inner error details ([0b80e78](https://github.com/input-output-hk/cardano-js-sdk/commit/0b80e786c3a664ca34bc40af8f69d20ccfefa02e))
+
+
+
 ## [0.2.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.2.0-nightly.4...@cardano-sdk/key-management@0.2.0-nightly.5) (2022-09-23)
 
 

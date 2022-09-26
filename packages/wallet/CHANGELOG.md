@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.6.0-nightly.10...@cardano-sdk/wallet@0.6.0-nightly.11) (2022-09-26)
+
+
+### ⚠ BREAKING CHANGES
+
+* **input-selection:** renamed cip2 package to input-selection
+
+### Code Refactoring
+
+* **input-selection:** renamed cip2 package to input-selection ([f4d6632](https://github.com/input-output-hk/cardano-js-sdk/commit/f4d6632d61c5b63bc15a64ec3962425f9ad2d6eb))
+
+
+
 ## [0.6.0-nightly.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.6.0-nightly.9...@cardano-sdk/wallet@0.6.0-nightly.10) (2022-09-23)
 
 
