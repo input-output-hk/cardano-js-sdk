@@ -37,6 +37,7 @@
     "build:cjs": "tsc --build src && shx chmod +x ./dist/cjs/cli.js",
     "build:copy-assets": "bash ./copy-assets.sh",
     "build": "run-s build:cjs build:copy-assets",
+    "build:test-db": "./test/jest-setup/rebuild-test-db.sh $(cat ./placeholder-secrets/postgres_user) $(cat ./placeholder-secrets/postgres_db)",
     "cleanup:dist": "shx rm -rf dist",
     "cleanup:nm": "shx rm -rf node_modules",
     "cleanup": "run-s cleanup:dist cleanup:nm",

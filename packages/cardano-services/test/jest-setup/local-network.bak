@@ -1,0 +1,5111 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 11.5
+-- Dumped by pg_dump version 11.5
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: addr29type; Type: DOMAIN; Schema: public; Owner: postgres
+--
+
+CREATE DOMAIN public.addr29type AS bytea
+	CONSTRAINT addr29type_check CHECK ((octet_length(VALUE) = 29));
+
+
+ALTER DOMAIN public.addr29type OWNER TO postgres;
+
+--
+-- Name: asset32type; Type: DOMAIN; Schema: public; Owner: postgres
+--
+
+CREATE DOMAIN public.asset32type AS bytea
+	CONSTRAINT asset32type_check CHECK ((octet_length(VALUE) <= 32));
+
+
+ALTER DOMAIN public.asset32type OWNER TO postgres;
+
+--
+-- Name: hash28type; Type: DOMAIN; Schema: public; Owner: postgres
+--
+
+CREATE DOMAIN public.hash28type AS bytea
+	CONSTRAINT hash28type_check CHECK ((octet_length(VALUE) = 28));
+
+
+ALTER DOMAIN public.hash28type OWNER TO postgres;
+
+--
+-- Name: hash32type; Type: DOMAIN; Schema: public; Owner: postgres
+--
+
+CREATE DOMAIN public.hash32type AS bytea
+	CONSTRAINT hash32type_check CHECK ((octet_length(VALUE) = 32));
+
+
+ALTER DOMAIN public.hash32type OWNER TO postgres;
+
+--
+-- Name: int65type; Type: DOMAIN; Schema: public; Owner: postgres
+--
+
+CREATE DOMAIN public.int65type AS numeric(20,0)
+	CONSTRAINT int65type_check CHECK (((VALUE >= '-18446744073709551615'::numeric) AND (VALUE <= '18446744073709551615'::numeric)));
+
+
+ALTER DOMAIN public.int65type OWNER TO postgres;
+
+--
+-- Name: lovelace; Type: DOMAIN; Schema: public; Owner: postgres
+--
+
+CREATE DOMAIN public.lovelace AS numeric(20,0)
+	CONSTRAINT lovelace_check CHECK (((VALUE >= (0)::numeric) AND (VALUE <= '18446744073709551615'::numeric)));
+
+
+ALTER DOMAIN public.lovelace OWNER TO postgres;
+
+--
+-- Name: word128type; Type: DOMAIN; Schema: public; Owner: postgres
+--
+
+CREATE DOMAIN public.word128type AS numeric(39,0)
+	CONSTRAINT word128type_check CHECK (((VALUE >= (0)::numeric) AND (VALUE <= '340282366920938463463374607431768211455'::numeric)));
+
+
+ALTER DOMAIN public.word128type OWNER TO postgres;
+
+--
+-- Name: outsum; Type: DOMAIN; Schema: public; Owner: postgres
+--
+
+CREATE DOMAIN public.outsum AS public.word128type;
+
+
+ALTER DOMAIN public.outsum OWNER TO postgres;
+
+--
+-- Name: rewardtype; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.rewardtype AS ENUM (
+    'leader',
+    'member',
+    'reserves',
+    'treasury',
+    'refund'
+);
+
+
+ALTER TYPE public.rewardtype OWNER TO postgres;
+
+--
+-- Name: scriptpurposetype; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.scriptpurposetype AS ENUM (
+    'spend',
+    'mint',
+    'cert',
+    'reward'
+);
+
+
+ALTER TYPE public.scriptpurposetype OWNER TO postgres;
+
+--
+-- Name: scripttype; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.scripttype AS ENUM (
+    'multisig',
+    'timelock',
+    'plutusV1',
+    'plutusV2'
+);
+
+
+ALTER TYPE public.scripttype OWNER TO postgres;
+
+--
+-- Name: syncstatetype; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.syncstatetype AS ENUM (
+    'lagging',
+    'following'
+);
+
+
+ALTER TYPE public.syncstatetype OWNER TO postgres;
+
+--
+-- Name: txindex; Type: DOMAIN; Schema: public; Owner: postgres
+--
+
+CREATE DOMAIN public.txindex AS smallint
+	CONSTRAINT txindex_check CHECK ((VALUE >= 0));
+
+
+ALTER DOMAIN public.txindex OWNER TO postgres;
+
+--
+-- Name: word31type; Type: DOMAIN; Schema: public; Owner: postgres
+--
+
+CREATE DOMAIN public.word31type AS integer
+	CONSTRAINT word31type_check CHECK ((VALUE >= 0));
+
+
+ALTER DOMAIN public.word31type OWNER TO postgres;
+
+--
+-- Name: word63type; Type: DOMAIN; Schema: public; Owner: postgres
+--
+
+CREATE DOMAIN public.word63type AS bigint
+	CONSTRAINT word63type_check CHECK ((VALUE >= 0));
+
+
+ALTER DOMAIN public.word63type OWNER TO postgres;
+
+--
+-- Name: word64type; Type: DOMAIN; Schema: public; Owner: postgres
+--
+
+CREATE DOMAIN public.word64type AS numeric(20,0)
+	CONSTRAINT word64type_check CHECK (((VALUE >= (0)::numeric) AND (VALUE <= '18446744073709551615'::numeric)));
+
+
+ALTER DOMAIN public.word64type OWNER TO postgres;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: ada_pots; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.ada_pots (
+    id bigint NOT NULL,
+    slot_no public.word63type NOT NULL,
+    epoch_no public.word31type NOT NULL,
+    treasury public.lovelace NOT NULL,
+    reserves public.lovelace NOT NULL,
+    rewards public.lovelace NOT NULL,
+    utxo public.lovelace NOT NULL,
+    deposits public.lovelace NOT NULL,
+    fees public.lovelace NOT NULL,
+    block_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.ada_pots OWNER TO postgres;
+
+--
+-- Name: ada_pots_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.ada_pots_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.ada_pots_id_seq OWNER TO postgres;
+
+--
+-- Name: ada_pots_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.ada_pots_id_seq OWNED BY public.ada_pots.id;
+
+
+--
+-- Name: block; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.block (
+    id bigint NOT NULL,
+    hash public.hash32type NOT NULL,
+    epoch_no public.word31type,
+    slot_no public.word63type,
+    epoch_slot_no public.word31type,
+    block_no public.word31type,
+    previous_id bigint,
+    slot_leader_id bigint NOT NULL,
+    size public.word31type NOT NULL,
+    "time" timestamp without time zone NOT NULL,
+    tx_count bigint NOT NULL,
+    proto_major public.word31type NOT NULL,
+    proto_minor public.word31type NOT NULL,
+    vrf_key character varying,
+    op_cert public.hash32type,
+    op_cert_counter public.word63type
+);
+
+
+ALTER TABLE public.block OWNER TO postgres;
+
+--
+-- Name: block_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.block_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.block_id_seq OWNER TO postgres;
+
+--
+-- Name: block_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.block_id_seq OWNED BY public.block.id;
+
+
+--
+-- Name: collateral_tx_in; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.collateral_tx_in (
+    id bigint NOT NULL,
+    tx_in_id bigint NOT NULL,
+    tx_out_id bigint NOT NULL,
+    tx_out_index public.txindex NOT NULL
+);
+
+
+ALTER TABLE public.collateral_tx_in OWNER TO postgres;
+
+--
+-- Name: collateral_tx_in_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.collateral_tx_in_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.collateral_tx_in_id_seq OWNER TO postgres;
+
+--
+-- Name: collateral_tx_in_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.collateral_tx_in_id_seq OWNED BY public.collateral_tx_in.id;
+
+
+--
+-- Name: collateral_tx_out; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.collateral_tx_out (
+    id bigint NOT NULL,
+    tx_id bigint NOT NULL,
+    index public.txindex NOT NULL,
+    address character varying NOT NULL,
+    address_raw bytea NOT NULL,
+    address_has_script boolean NOT NULL,
+    payment_cred public.hash28type,
+    stake_address_id bigint,
+    value public.lovelace NOT NULL,
+    data_hash public.hash32type,
+    multi_assets_descr character varying NOT NULL,
+    inline_datum_id bigint,
+    reference_script_id bigint
+);
+
+
+ALTER TABLE public.collateral_tx_out OWNER TO postgres;
+
+--
+-- Name: collateral_tx_out_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.collateral_tx_out_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.collateral_tx_out_id_seq OWNER TO postgres;
+
+--
+-- Name: collateral_tx_out_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.collateral_tx_out_id_seq OWNED BY public.collateral_tx_out.id;
+
+
+--
+-- Name: cost_model; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.cost_model (
+    id bigint NOT NULL,
+    costs jsonb NOT NULL,
+    block_id bigint NOT NULL,
+    hash public.hash32type NOT NULL
+);
+
+
+ALTER TABLE public.cost_model OWNER TO postgres;
+
+--
+-- Name: cost_model_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.cost_model_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.cost_model_id_seq OWNER TO postgres;
+
+--
+-- Name: cost_model_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.cost_model_id_seq OWNED BY public.cost_model.id;
+
+
+--
+-- Name: datum; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.datum (
+    id bigint NOT NULL,
+    hash public.hash32type NOT NULL,
+    tx_id bigint NOT NULL,
+    value jsonb,
+    bytes bytea NOT NULL
+);
+
+
+ALTER TABLE public.datum OWNER TO postgres;
+
+--
+-- Name: datum_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.datum_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.datum_id_seq OWNER TO postgres;
+
+--
+-- Name: datum_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.datum_id_seq OWNED BY public.datum.id;
+
+
+--
+-- Name: delegation; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.delegation (
+    id bigint NOT NULL,
+    addr_id bigint NOT NULL,
+    cert_index integer NOT NULL,
+    pool_hash_id bigint NOT NULL,
+    active_epoch_no bigint NOT NULL,
+    tx_id bigint NOT NULL,
+    slot_no public.word63type NOT NULL,
+    redeemer_id bigint
+);
+
+
+ALTER TABLE public.delegation OWNER TO postgres;
+
+--
+-- Name: delegation_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.delegation_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.delegation_id_seq OWNER TO postgres;
+
+--
+-- Name: delegation_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.delegation_id_seq OWNED BY public.delegation.id;
+
+
+--
+-- Name: delisted_pool; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.delisted_pool (
+    id bigint NOT NULL,
+    hash_raw public.hash28type NOT NULL
+);
+
+
+ALTER TABLE public.delisted_pool OWNER TO postgres;
+
+--
+-- Name: delisted_pool_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.delisted_pool_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.delisted_pool_id_seq OWNER TO postgres;
+
+--
+-- Name: delisted_pool_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.delisted_pool_id_seq OWNED BY public.delisted_pool.id;
+
+
+--
+-- Name: epoch; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.epoch (
+    id bigint NOT NULL,
+    out_sum public.word128type NOT NULL,
+    fees public.lovelace NOT NULL,
+    tx_count public.word31type NOT NULL,
+    blk_count public.word31type NOT NULL,
+    no public.word31type NOT NULL,
+    start_time timestamp without time zone NOT NULL,
+    end_time timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.epoch OWNER TO postgres;
+
+--
+-- Name: epoch_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.epoch_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.epoch_id_seq OWNER TO postgres;
+
+--
+-- Name: epoch_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.epoch_id_seq OWNED BY public.epoch.id;
+
+
+--
+-- Name: epoch_param; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.epoch_param (
+    id bigint NOT NULL,
+    epoch_no public.word31type NOT NULL,
+    min_fee_a public.word31type NOT NULL,
+    min_fee_b public.word31type NOT NULL,
+    max_block_size public.word31type NOT NULL,
+    max_tx_size public.word31type NOT NULL,
+    max_bh_size public.word31type NOT NULL,
+    key_deposit public.lovelace NOT NULL,
+    pool_deposit public.lovelace NOT NULL,
+    max_epoch public.word31type NOT NULL,
+    optimal_pool_count public.word31type NOT NULL,
+    influence double precision NOT NULL,
+    monetary_expand_rate double precision NOT NULL,
+    treasury_growth_rate double precision NOT NULL,
+    decentralisation double precision NOT NULL,
+    protocol_major public.word31type NOT NULL,
+    protocol_minor public.word31type NOT NULL,
+    min_utxo_value public.lovelace NOT NULL,
+    min_pool_cost public.lovelace NOT NULL,
+    nonce public.hash32type,
+    cost_model_id bigint,
+    price_mem double precision,
+    price_step double precision,
+    max_tx_ex_mem public.word64type,
+    max_tx_ex_steps public.word64type,
+    max_block_ex_mem public.word64type,
+    max_block_ex_steps public.word64type,
+    max_val_size public.word64type,
+    collateral_percent public.word31type,
+    max_collateral_inputs public.word31type,
+    block_id bigint NOT NULL,
+    extra_entropy public.hash32type,
+    coins_per_utxo_size public.lovelace
+);
+
+
+ALTER TABLE public.epoch_param OWNER TO postgres;
+
+--
+-- Name: epoch_param_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.epoch_param_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.epoch_param_id_seq OWNER TO postgres;
+
+--
+-- Name: epoch_param_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.epoch_param_id_seq OWNED BY public.epoch_param.id;
+
+
+--
+-- Name: epoch_stake; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.epoch_stake (
+    id bigint NOT NULL,
+    addr_id bigint NOT NULL,
+    pool_id bigint NOT NULL,
+    amount public.lovelace NOT NULL,
+    epoch_no public.word31type NOT NULL
+);
+
+
+ALTER TABLE public.epoch_stake OWNER TO postgres;
+
+--
+-- Name: epoch_stake_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.epoch_stake_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.epoch_stake_id_seq OWNER TO postgres;
+
+--
+-- Name: epoch_stake_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.epoch_stake_id_seq OWNED BY public.epoch_stake.id;
+
+
+--
+-- Name: epoch_sync_time; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.epoch_sync_time (
+    id bigint NOT NULL,
+    no bigint NOT NULL,
+    seconds public.word63type NOT NULL,
+    state public.syncstatetype NOT NULL
+);
+
+
+ALTER TABLE public.epoch_sync_time OWNER TO postgres;
+
+--
+-- Name: epoch_sync_time_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.epoch_sync_time_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.epoch_sync_time_id_seq OWNER TO postgres;
+
+--
+-- Name: epoch_sync_time_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.epoch_sync_time_id_seq OWNED BY public.epoch_sync_time.id;
+
+
+--
+-- Name: extra_key_witness; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.extra_key_witness (
+    id bigint NOT NULL,
+    hash public.hash28type NOT NULL,
+    tx_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.extra_key_witness OWNER TO postgres;
+
+--
+-- Name: extra_key_witness_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.extra_key_witness_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.extra_key_witness_id_seq OWNER TO postgres;
+
+--
+-- Name: extra_key_witness_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.extra_key_witness_id_seq OWNED BY public.extra_key_witness.id;
+
+
+--
+-- Name: ma_tx_mint; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.ma_tx_mint (
+    id bigint NOT NULL,
+    quantity public.int65type NOT NULL,
+    tx_id bigint NOT NULL,
+    ident bigint NOT NULL
+);
+
+
+ALTER TABLE public.ma_tx_mint OWNER TO postgres;
+
+--
+-- Name: ma_tx_mint_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.ma_tx_mint_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.ma_tx_mint_id_seq OWNER TO postgres;
+
+--
+-- Name: ma_tx_mint_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.ma_tx_mint_id_seq OWNED BY public.ma_tx_mint.id;
+
+
+--
+-- Name: ma_tx_out; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.ma_tx_out (
+    id bigint NOT NULL,
+    quantity public.word64type NOT NULL,
+    tx_out_id bigint NOT NULL,
+    ident bigint NOT NULL
+);
+
+
+ALTER TABLE public.ma_tx_out OWNER TO postgres;
+
+--
+-- Name: ma_tx_out_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.ma_tx_out_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.ma_tx_out_id_seq OWNER TO postgres;
+
+--
+-- Name: ma_tx_out_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.ma_tx_out_id_seq OWNED BY public.ma_tx_out.id;
+
+
+--
+-- Name: meta; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.meta (
+    id bigint NOT NULL,
+    start_time timestamp without time zone NOT NULL,
+    network_name character varying NOT NULL,
+    version character varying NOT NULL
+);
+
+
+ALTER TABLE public.meta OWNER TO postgres;
+
+--
+-- Name: meta_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.meta_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.meta_id_seq OWNER TO postgres;
+
+--
+-- Name: meta_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.meta_id_seq OWNED BY public.meta.id;
+
+
+--
+-- Name: multi_asset; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.multi_asset (
+    id bigint NOT NULL,
+    policy public.hash28type NOT NULL,
+    name public.asset32type NOT NULL,
+    fingerprint character varying NOT NULL
+);
+
+
+ALTER TABLE public.multi_asset OWNER TO postgres;
+
+--
+-- Name: multi_asset_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.multi_asset_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.multi_asset_id_seq OWNER TO postgres;
+
+--
+-- Name: multi_asset_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.multi_asset_id_seq OWNED BY public.multi_asset.id;
+
+
+--
+-- Name: param_proposal; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.param_proposal (
+    id bigint NOT NULL,
+    epoch_no public.word31type NOT NULL,
+    key public.hash28type NOT NULL,
+    min_fee_a public.word64type,
+    min_fee_b public.word64type,
+    max_block_size public.word64type,
+    max_tx_size public.word64type,
+    max_bh_size public.word64type,
+    key_deposit public.lovelace,
+    pool_deposit public.lovelace,
+    max_epoch public.word64type,
+    optimal_pool_count public.word64type,
+    influence double precision,
+    monetary_expand_rate double precision,
+    treasury_growth_rate double precision,
+    decentralisation double precision,
+    entropy public.hash32type,
+    protocol_major public.word31type,
+    protocol_minor public.word31type,
+    min_utxo_value public.lovelace,
+    min_pool_cost public.lovelace,
+    cost_model_id bigint,
+    price_mem double precision,
+    price_step double precision,
+    max_tx_ex_mem public.word64type,
+    max_tx_ex_steps public.word64type,
+    max_block_ex_mem public.word64type,
+    max_block_ex_steps public.word64type,
+    max_val_size public.word64type,
+    collateral_percent public.word31type,
+    max_collateral_inputs public.word31type,
+    registered_tx_id bigint NOT NULL,
+    coins_per_utxo_size public.lovelace
+);
+
+
+ALTER TABLE public.param_proposal OWNER TO postgres;
+
+--
+-- Name: param_proposal_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.param_proposal_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.param_proposal_id_seq OWNER TO postgres;
+
+--
+-- Name: param_proposal_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.param_proposal_id_seq OWNED BY public.param_proposal.id;
+
+
+--
+-- Name: pool_hash; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pool_hash (
+    id bigint NOT NULL,
+    hash_raw public.hash28type NOT NULL,
+    view character varying NOT NULL
+);
+
+
+ALTER TABLE public.pool_hash OWNER TO postgres;
+
+--
+-- Name: pool_hash_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.pool_hash_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.pool_hash_id_seq OWNER TO postgres;
+
+--
+-- Name: pool_hash_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.pool_hash_id_seq OWNED BY public.pool_hash.id;
+
+
+--
+-- Name: pool_metadata_ref; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pool_metadata_ref (
+    id bigint NOT NULL,
+    pool_id bigint NOT NULL,
+    url character varying NOT NULL,
+    hash public.hash32type NOT NULL,
+    registered_tx_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.pool_metadata_ref OWNER TO postgres;
+
+--
+-- Name: pool_metadata_ref_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.pool_metadata_ref_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.pool_metadata_ref_id_seq OWNER TO postgres;
+
+--
+-- Name: pool_metadata_ref_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.pool_metadata_ref_id_seq OWNED BY public.pool_metadata_ref.id;
+
+
+--
+-- Name: pool_offline_data; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pool_offline_data (
+    id bigint NOT NULL,
+    pool_id bigint NOT NULL,
+    ticker_name character varying NOT NULL,
+    hash public.hash32type NOT NULL,
+    json jsonb NOT NULL,
+    bytes bytea NOT NULL,
+    pmr_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.pool_offline_data OWNER TO postgres;
+
+--
+-- Name: pool_offline_data_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.pool_offline_data_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.pool_offline_data_id_seq OWNER TO postgres;
+
+--
+-- Name: pool_offline_data_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.pool_offline_data_id_seq OWNED BY public.pool_offline_data.id;
+
+
+--
+-- Name: pool_offline_fetch_error; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pool_offline_fetch_error (
+    id bigint NOT NULL,
+    pool_id bigint NOT NULL,
+    fetch_time timestamp without time zone NOT NULL,
+    pmr_id bigint NOT NULL,
+    fetch_error character varying NOT NULL,
+    retry_count public.word31type NOT NULL
+);
+
+
+ALTER TABLE public.pool_offline_fetch_error OWNER TO postgres;
+
+--
+-- Name: pool_offline_fetch_error_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.pool_offline_fetch_error_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.pool_offline_fetch_error_id_seq OWNER TO postgres;
+
+--
+-- Name: pool_offline_fetch_error_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.pool_offline_fetch_error_id_seq OWNED BY public.pool_offline_fetch_error.id;
+
+
+--
+-- Name: pool_owner; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pool_owner (
+    id bigint NOT NULL,
+    addr_id bigint NOT NULL,
+    pool_update_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.pool_owner OWNER TO postgres;
+
+--
+-- Name: pool_owner_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.pool_owner_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.pool_owner_id_seq OWNER TO postgres;
+
+--
+-- Name: pool_owner_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.pool_owner_id_seq OWNED BY public.pool_owner.id;
+
+
+--
+-- Name: pool_relay; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pool_relay (
+    id bigint NOT NULL,
+    update_id bigint NOT NULL,
+    ipv4 character varying,
+    ipv6 character varying,
+    dns_name character varying,
+    dns_srv_name character varying,
+    port integer
+);
+
+
+ALTER TABLE public.pool_relay OWNER TO postgres;
+
+--
+-- Name: pool_relay_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.pool_relay_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.pool_relay_id_seq OWNER TO postgres;
+
+--
+-- Name: pool_relay_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.pool_relay_id_seq OWNED BY public.pool_relay.id;
+
+
+--
+-- Name: pool_retire; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pool_retire (
+    id bigint NOT NULL,
+    hash_id bigint NOT NULL,
+    cert_index integer NOT NULL,
+    announced_tx_id bigint NOT NULL,
+    retiring_epoch public.word31type NOT NULL
+);
+
+
+ALTER TABLE public.pool_retire OWNER TO postgres;
+
+--
+-- Name: pool_retire_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.pool_retire_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.pool_retire_id_seq OWNER TO postgres;
+
+--
+-- Name: pool_retire_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.pool_retire_id_seq OWNED BY public.pool_retire.id;
+
+
+--
+-- Name: pool_update; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pool_update (
+    id bigint NOT NULL,
+    hash_id bigint NOT NULL,
+    cert_index integer NOT NULL,
+    vrf_key_hash public.hash32type NOT NULL,
+    pledge public.lovelace NOT NULL,
+    active_epoch_no bigint NOT NULL,
+    meta_id bigint,
+    margin double precision NOT NULL,
+    fixed_cost public.lovelace NOT NULL,
+    registered_tx_id bigint NOT NULL,
+    reward_addr_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.pool_update OWNER TO postgres;
+
+--
+-- Name: pool_update_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.pool_update_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.pool_update_id_seq OWNER TO postgres;
+
+--
+-- Name: pool_update_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.pool_update_id_seq OWNED BY public.pool_update.id;
+
+
+--
+-- Name: pot_transfer; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pot_transfer (
+    id bigint NOT NULL,
+    cert_index integer NOT NULL,
+    treasury public.int65type NOT NULL,
+    reserves public.int65type NOT NULL,
+    tx_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.pot_transfer OWNER TO postgres;
+
+--
+-- Name: pot_transfer_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.pot_transfer_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.pot_transfer_id_seq OWNER TO postgres;
+
+--
+-- Name: pot_transfer_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.pot_transfer_id_seq OWNED BY public.pot_transfer.id;
+
+
+--
+-- Name: redeemer; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.redeemer (
+    id bigint NOT NULL,
+    tx_id bigint NOT NULL,
+    unit_mem public.word63type NOT NULL,
+    unit_steps public.word63type NOT NULL,
+    fee public.lovelace,
+    purpose public.scriptpurposetype NOT NULL,
+    index public.word31type NOT NULL,
+    script_hash public.hash28type,
+    redeemer_data_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.redeemer OWNER TO postgres;
+
+--
+-- Name: redeemer_data; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.redeemer_data (
+    id bigint NOT NULL,
+    hash public.hash32type NOT NULL,
+    tx_id bigint NOT NULL,
+    value jsonb,
+    bytes bytea NOT NULL
+);
+
+
+ALTER TABLE public.redeemer_data OWNER TO postgres;
+
+--
+-- Name: redeemer_data_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.redeemer_data_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.redeemer_data_id_seq OWNER TO postgres;
+
+--
+-- Name: redeemer_data_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.redeemer_data_id_seq OWNED BY public.redeemer_data.id;
+
+
+--
+-- Name: redeemer_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.redeemer_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.redeemer_id_seq OWNER TO postgres;
+
+--
+-- Name: redeemer_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.redeemer_id_seq OWNED BY public.redeemer.id;
+
+
+--
+-- Name: reference_tx_in; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.reference_tx_in (
+    id bigint NOT NULL,
+    tx_in_id bigint NOT NULL,
+    tx_out_id bigint NOT NULL,
+    tx_out_index public.txindex NOT NULL
+);
+
+
+ALTER TABLE public.reference_tx_in OWNER TO postgres;
+
+--
+-- Name: reference_tx_in_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.reference_tx_in_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.reference_tx_in_id_seq OWNER TO postgres;
+
+--
+-- Name: reference_tx_in_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.reference_tx_in_id_seq OWNED BY public.reference_tx_in.id;
+
+
+--
+-- Name: reserve; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.reserve (
+    id bigint NOT NULL,
+    addr_id bigint NOT NULL,
+    cert_index integer NOT NULL,
+    amount public.int65type NOT NULL,
+    tx_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.reserve OWNER TO postgres;
+
+--
+-- Name: reserve_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.reserve_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.reserve_id_seq OWNER TO postgres;
+
+--
+-- Name: reserve_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.reserve_id_seq OWNED BY public.reserve.id;
+
+
+--
+-- Name: reserved_pool_ticker; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.reserved_pool_ticker (
+    id bigint NOT NULL,
+    name character varying NOT NULL,
+    pool_hash public.hash28type NOT NULL
+);
+
+
+ALTER TABLE public.reserved_pool_ticker OWNER TO postgres;
+
+--
+-- Name: reserved_pool_ticker_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.reserved_pool_ticker_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.reserved_pool_ticker_id_seq OWNER TO postgres;
+
+--
+-- Name: reserved_pool_ticker_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.reserved_pool_ticker_id_seq OWNED BY public.reserved_pool_ticker.id;
+
+
+--
+-- Name: reward; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.reward (
+    id bigint NOT NULL,
+    addr_id bigint NOT NULL,
+    type public.rewardtype NOT NULL,
+    amount public.lovelace NOT NULL,
+    earned_epoch bigint NOT NULL,
+    spendable_epoch bigint NOT NULL,
+    pool_id bigint
+);
+
+
+ALTER TABLE public.reward OWNER TO postgres;
+
+--
+-- Name: reward_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.reward_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.reward_id_seq OWNER TO postgres;
+
+--
+-- Name: reward_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.reward_id_seq OWNED BY public.reward.id;
+
+
+--
+-- Name: schema_version; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.schema_version (
+    id bigint NOT NULL,
+    stage_one bigint NOT NULL,
+    stage_two bigint NOT NULL,
+    stage_three bigint NOT NULL
+);
+
+
+ALTER TABLE public.schema_version OWNER TO postgres;
+
+--
+-- Name: schema_version_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.schema_version_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.schema_version_id_seq OWNER TO postgres;
+
+--
+-- Name: schema_version_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.schema_version_id_seq OWNED BY public.schema_version.id;
+
+
+--
+-- Name: script; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.script (
+    id bigint NOT NULL,
+    tx_id bigint NOT NULL,
+    hash public.hash28type NOT NULL,
+    type public.scripttype NOT NULL,
+    json jsonb,
+    bytes bytea,
+    serialised_size public.word31type
+);
+
+
+ALTER TABLE public.script OWNER TO postgres;
+
+--
+-- Name: script_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.script_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.script_id_seq OWNER TO postgres;
+
+--
+-- Name: script_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.script_id_seq OWNED BY public.script.id;
+
+
+--
+-- Name: slot_leader; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.slot_leader (
+    id bigint NOT NULL,
+    hash public.hash28type NOT NULL,
+    pool_hash_id bigint,
+    description character varying NOT NULL
+);
+
+
+ALTER TABLE public.slot_leader OWNER TO postgres;
+
+--
+-- Name: slot_leader_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.slot_leader_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.slot_leader_id_seq OWNER TO postgres;
+
+--
+-- Name: slot_leader_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.slot_leader_id_seq OWNED BY public.slot_leader.id;
+
+
+--
+-- Name: stake_address; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.stake_address (
+    id bigint NOT NULL,
+    hash_raw public.addr29type NOT NULL,
+    view character varying NOT NULL,
+    script_hash public.hash28type,
+    tx_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.stake_address OWNER TO postgres;
+
+--
+-- Name: stake_address_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.stake_address_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.stake_address_id_seq OWNER TO postgres;
+
+--
+-- Name: stake_address_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.stake_address_id_seq OWNED BY public.stake_address.id;
+
+
+--
+-- Name: stake_deregistration; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.stake_deregistration (
+    id bigint NOT NULL,
+    addr_id bigint NOT NULL,
+    cert_index integer NOT NULL,
+    epoch_no public.word31type NOT NULL,
+    tx_id bigint NOT NULL,
+    redeemer_id bigint
+);
+
+
+ALTER TABLE public.stake_deregistration OWNER TO postgres;
+
+--
+-- Name: stake_deregistration_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.stake_deregistration_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.stake_deregistration_id_seq OWNER TO postgres;
+
+--
+-- Name: stake_deregistration_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.stake_deregistration_id_seq OWNED BY public.stake_deregistration.id;
+
+
+--
+-- Name: stake_registration; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.stake_registration (
+    id bigint NOT NULL,
+    addr_id bigint NOT NULL,
+    cert_index integer NOT NULL,
+    epoch_no public.word31type NOT NULL,
+    tx_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.stake_registration OWNER TO postgres;
+
+--
+-- Name: stake_registration_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.stake_registration_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.stake_registration_id_seq OWNER TO postgres;
+
+--
+-- Name: stake_registration_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.stake_registration_id_seq OWNED BY public.stake_registration.id;
+
+
+--
+-- Name: treasury; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.treasury (
+    id bigint NOT NULL,
+    addr_id bigint NOT NULL,
+    cert_index integer NOT NULL,
+    amount public.int65type NOT NULL,
+    tx_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.treasury OWNER TO postgres;
+
+--
+-- Name: treasury_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.treasury_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.treasury_id_seq OWNER TO postgres;
+
+--
+-- Name: treasury_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.treasury_id_seq OWNED BY public.treasury.id;
+
+
+--
+-- Name: tx; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.tx (
+    id bigint NOT NULL,
+    hash public.hash32type NOT NULL,
+    block_id bigint NOT NULL,
+    block_index public.word31type NOT NULL,
+    out_sum public.lovelace NOT NULL,
+    fee public.lovelace NOT NULL,
+    deposit bigint NOT NULL,
+    size public.word31type NOT NULL,
+    invalid_before public.word64type,
+    invalid_hereafter public.word64type,
+    valid_contract boolean NOT NULL,
+    script_size public.word31type NOT NULL
+);
+
+
+ALTER TABLE public.tx OWNER TO postgres;
+
+--
+-- Name: tx_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.tx_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.tx_id_seq OWNER TO postgres;
+
+--
+-- Name: tx_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.tx_id_seq OWNED BY public.tx.id;
+
+
+--
+-- Name: tx_in; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.tx_in (
+    id bigint NOT NULL,
+    tx_in_id bigint NOT NULL,
+    tx_out_id bigint NOT NULL,
+    tx_out_index public.txindex NOT NULL,
+    redeemer_id bigint
+);
+
+
+ALTER TABLE public.tx_in OWNER TO postgres;
+
+--
+-- Name: tx_in_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.tx_in_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.tx_in_id_seq OWNER TO postgres;
+
+--
+-- Name: tx_in_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.tx_in_id_seq OWNED BY public.tx_in.id;
+
+
+--
+-- Name: tx_metadata; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.tx_metadata (
+    id bigint NOT NULL,
+    key public.word64type NOT NULL,
+    json jsonb,
+    bytes bytea NOT NULL,
+    tx_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.tx_metadata OWNER TO postgres;
+
+--
+-- Name: tx_metadata_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.tx_metadata_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.tx_metadata_id_seq OWNER TO postgres;
+
+--
+-- Name: tx_metadata_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.tx_metadata_id_seq OWNED BY public.tx_metadata.id;
+
+
+--
+-- Name: tx_out; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.tx_out (
+    id bigint NOT NULL,
+    tx_id bigint NOT NULL,
+    index public.txindex NOT NULL,
+    address character varying NOT NULL,
+    address_raw bytea NOT NULL,
+    address_has_script boolean NOT NULL,
+    payment_cred public.hash28type,
+    stake_address_id bigint,
+    value public.lovelace NOT NULL,
+    data_hash public.hash32type,
+    inline_datum_id bigint,
+    reference_script_id bigint
+);
+
+
+ALTER TABLE public.tx_out OWNER TO postgres;
+
+--
+-- Name: tx_out_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.tx_out_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.tx_out_id_seq OWNER TO postgres;
+
+--
+-- Name: tx_out_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.tx_out_id_seq OWNED BY public.tx_out.id;
+
+
+--
+-- Name: utxo_byron_view; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW public.utxo_byron_view AS
+ SELECT tx_out.id,
+    tx_out.tx_id,
+    tx_out.index,
+    tx_out.address,
+    tx_out.address_raw,
+    tx_out.address_has_script,
+    tx_out.payment_cred,
+    tx_out.stake_address_id,
+    tx_out.value,
+    tx_out.data_hash,
+    tx_out.inline_datum_id,
+    tx_out.reference_script_id
+   FROM (public.tx_out
+     LEFT JOIN public.tx_in ON (((tx_out.tx_id = tx_in.tx_out_id) AND ((tx_out.index)::smallint = (tx_in.tx_out_index)::smallint))))
+  WHERE (tx_in.tx_in_id IS NULL);
+
+
+ALTER TABLE public.utxo_byron_view OWNER TO postgres;
+
+--
+-- Name: utxo_view; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW public.utxo_view AS
+ SELECT tx_out.id,
+    tx_out.tx_id,
+    tx_out.index,
+    tx_out.address,
+    tx_out.address_raw,
+    tx_out.address_has_script,
+    tx_out.payment_cred,
+    tx_out.stake_address_id,
+    tx_out.value,
+    tx_out.data_hash,
+    tx_out.inline_datum_id,
+    tx_out.reference_script_id
+   FROM (((public.tx_out
+     LEFT JOIN public.tx_in ON (((tx_out.tx_id = tx_in.tx_out_id) AND ((tx_out.index)::smallint = (tx_in.tx_out_index)::smallint))))
+     LEFT JOIN public.tx ON ((tx.id = tx_out.tx_id)))
+     LEFT JOIN public.block ON ((tx.block_id = block.id)))
+  WHERE ((tx_in.tx_in_id IS NULL) AND (block.epoch_no IS NOT NULL));
+
+
+ALTER TABLE public.utxo_view OWNER TO postgres;
+
+--
+-- Name: withdrawal; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.withdrawal (
+    id bigint NOT NULL,
+    addr_id bigint NOT NULL,
+    amount public.lovelace NOT NULL,
+    redeemer_id bigint,
+    tx_id bigint NOT NULL
+);
+
+
+ALTER TABLE public.withdrawal OWNER TO postgres;
+
+--
+-- Name: withdrawal_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.withdrawal_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.withdrawal_id_seq OWNER TO postgres;
+
+--
+-- Name: withdrawal_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.withdrawal_id_seq OWNED BY public.withdrawal.id;
+
+
+--
+-- Name: ada_pots id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ada_pots ALTER COLUMN id SET DEFAULT nextval('public.ada_pots_id_seq'::regclass);
+
+
+--
+-- Name: block id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.block ALTER COLUMN id SET DEFAULT nextval('public.block_id_seq'::regclass);
+
+
+--
+-- Name: collateral_tx_in id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.collateral_tx_in ALTER COLUMN id SET DEFAULT nextval('public.collateral_tx_in_id_seq'::regclass);
+
+
+--
+-- Name: collateral_tx_out id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.collateral_tx_out ALTER COLUMN id SET DEFAULT nextval('public.collateral_tx_out_id_seq'::regclass);
+
+
+--
+-- Name: cost_model id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.cost_model ALTER COLUMN id SET DEFAULT nextval('public.cost_model_id_seq'::regclass);
+
+
+--
+-- Name: datum id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.datum ALTER COLUMN id SET DEFAULT nextval('public.datum_id_seq'::regclass);
+
+
+--
+-- Name: delegation id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.delegation ALTER COLUMN id SET DEFAULT nextval('public.delegation_id_seq'::regclass);
+
+
+--
+-- Name: delisted_pool id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.delisted_pool ALTER COLUMN id SET DEFAULT nextval('public.delisted_pool_id_seq'::regclass);
+
+
+--
+-- Name: epoch id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.epoch ALTER COLUMN id SET DEFAULT nextval('public.epoch_id_seq'::regclass);
+
+
+--
+-- Name: epoch_param id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.epoch_param ALTER COLUMN id SET DEFAULT nextval('public.epoch_param_id_seq'::regclass);
+
+
+--
+-- Name: epoch_stake id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.epoch_stake ALTER COLUMN id SET DEFAULT nextval('public.epoch_stake_id_seq'::regclass);
+
+
+--
+-- Name: epoch_sync_time id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.epoch_sync_time ALTER COLUMN id SET DEFAULT nextval('public.epoch_sync_time_id_seq'::regclass);
+
+
+--
+-- Name: extra_key_witness id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.extra_key_witness ALTER COLUMN id SET DEFAULT nextval('public.extra_key_witness_id_seq'::regclass);
+
+
+--
+-- Name: ma_tx_mint id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ma_tx_mint ALTER COLUMN id SET DEFAULT nextval('public.ma_tx_mint_id_seq'::regclass);
+
+
+--
+-- Name: ma_tx_out id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ma_tx_out ALTER COLUMN id SET DEFAULT nextval('public.ma_tx_out_id_seq'::regclass);
+
+
+--
+-- Name: meta id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.meta ALTER COLUMN id SET DEFAULT nextval('public.meta_id_seq'::regclass);
+
+
+--
+-- Name: multi_asset id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.multi_asset ALTER COLUMN id SET DEFAULT nextval('public.multi_asset_id_seq'::regclass);
+
+
+--
+-- Name: param_proposal id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.param_proposal ALTER COLUMN id SET DEFAULT nextval('public.param_proposal_id_seq'::regclass);
+
+
+--
+-- Name: pool_hash id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_hash ALTER COLUMN id SET DEFAULT nextval('public.pool_hash_id_seq'::regclass);
+
+
+--
+-- Name: pool_metadata_ref id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_metadata_ref ALTER COLUMN id SET DEFAULT nextval('public.pool_metadata_ref_id_seq'::regclass);
+
+
+--
+-- Name: pool_offline_data id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_offline_data ALTER COLUMN id SET DEFAULT nextval('public.pool_offline_data_id_seq'::regclass);
+
+
+--
+-- Name: pool_offline_fetch_error id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_offline_fetch_error ALTER COLUMN id SET DEFAULT nextval('public.pool_offline_fetch_error_id_seq'::regclass);
+
+
+--
+-- Name: pool_owner id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_owner ALTER COLUMN id SET DEFAULT nextval('public.pool_owner_id_seq'::regclass);
+
+
+--
+-- Name: pool_relay id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_relay ALTER COLUMN id SET DEFAULT nextval('public.pool_relay_id_seq'::regclass);
+
+
+--
+-- Name: pool_retire id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_retire ALTER COLUMN id SET DEFAULT nextval('public.pool_retire_id_seq'::regclass);
+
+
+--
+-- Name: pool_update id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_update ALTER COLUMN id SET DEFAULT nextval('public.pool_update_id_seq'::regclass);
+
+
+--
+-- Name: pot_transfer id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pot_transfer ALTER COLUMN id SET DEFAULT nextval('public.pot_transfer_id_seq'::regclass);
+
+
+--
+-- Name: redeemer id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.redeemer ALTER COLUMN id SET DEFAULT nextval('public.redeemer_id_seq'::regclass);
+
+
+--
+-- Name: redeemer_data id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.redeemer_data ALTER COLUMN id SET DEFAULT nextval('public.redeemer_data_id_seq'::regclass);
+
+
+--
+-- Name: reference_tx_in id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reference_tx_in ALTER COLUMN id SET DEFAULT nextval('public.reference_tx_in_id_seq'::regclass);
+
+
+--
+-- Name: reserve id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reserve ALTER COLUMN id SET DEFAULT nextval('public.reserve_id_seq'::regclass);
+
+
+--
+-- Name: reserved_pool_ticker id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reserved_pool_ticker ALTER COLUMN id SET DEFAULT nextval('public.reserved_pool_ticker_id_seq'::regclass);
+
+
+--
+-- Name: reward id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reward ALTER COLUMN id SET DEFAULT nextval('public.reward_id_seq'::regclass);
+
+
+--
+-- Name: schema_version id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.schema_version ALTER COLUMN id SET DEFAULT nextval('public.schema_version_id_seq'::regclass);
+
+
+--
+-- Name: script id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.script ALTER COLUMN id SET DEFAULT nextval('public.script_id_seq'::regclass);
+
+
+--
+-- Name: slot_leader id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.slot_leader ALTER COLUMN id SET DEFAULT nextval('public.slot_leader_id_seq'::regclass);
+
+
+--
+-- Name: stake_address id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stake_address ALTER COLUMN id SET DEFAULT nextval('public.stake_address_id_seq'::regclass);
+
+
+--
+-- Name: stake_deregistration id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stake_deregistration ALTER COLUMN id SET DEFAULT nextval('public.stake_deregistration_id_seq'::regclass);
+
+
+--
+-- Name: stake_registration id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stake_registration ALTER COLUMN id SET DEFAULT nextval('public.stake_registration_id_seq'::regclass);
+
+
+--
+-- Name: treasury id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.treasury ALTER COLUMN id SET DEFAULT nextval('public.treasury_id_seq'::regclass);
+
+
+--
+-- Name: tx id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tx ALTER COLUMN id SET DEFAULT nextval('public.tx_id_seq'::regclass);
+
+
+--
+-- Name: tx_in id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tx_in ALTER COLUMN id SET DEFAULT nextval('public.tx_in_id_seq'::regclass);
+
+
+--
+-- Name: tx_metadata id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tx_metadata ALTER COLUMN id SET DEFAULT nextval('public.tx_metadata_id_seq'::regclass);
+
+
+--
+-- Name: tx_out id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tx_out ALTER COLUMN id SET DEFAULT nextval('public.tx_out_id_seq'::regclass);
+
+
+--
+-- Name: withdrawal id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.withdrawal ALTER COLUMN id SET DEFAULT nextval('public.withdrawal_id_seq'::regclass);
+
+
+--
+-- Data for Name: ada_pots; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.ada_pots (id, slot_no, epoch_no, treasury, reserves, rewards, utxo, deposits, fees, block_id) FROM stdin;
+1	509	1	0	8999989980000000	0	81000010018014709	0	1985291	42
+3	1003	2	68399924046529	8931590057938762	0	81000010018014709	0	0	89
+\.
+
+
+--
+-- Data for Name: block; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.block (id, hash, epoch_no, slot_no, epoch_slot_no, block_no, previous_id, slot_leader_id, size, "time", tx_count, proto_major, proto_minor, vrf_key, op_cert, op_cert_counter) FROM stdin;
+1	\\x792ed25e9282b2db0bc00490b2d34513d37d4a90b87c112e3d469bf3dbb2e9c8	\N	\N	\N	\N	\N	1	0	2022-09-26 14:46:17	3	0	0	\N	\N	\N
+2	\\x5368656c6c65792047656e6573697320426c6f636b2048617368200000000000	\N	\N	\N	\N	1	2	0	2022-09-26 14:46:17	7	0	0	\N	\N	\N
+3	\\xb8c7bd412bc7dd06b5acaad48db89d5d0eecbd20cf60e1d9bd64b2dd73f3e120	0	19	19	0	1	3	265	2022-09-26 14:46:18.9	1	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+4	\\x5210f9d3ab65b5db4f46a78ab436a24dcd1228b5abfffdce3fd97a0d1eb0f98b	0	22	22	1	3	4	4	2022-09-26 14:46:19.2	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+5	\\x40d7bd513d26a878ae7e32c958aeadb900c78dfb5d26f07ccfed686424489333	0	27	27	2	4	3	4	2022-09-26 14:46:19.7	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+6	\\x34d3360ad1d3517735bce5d983d0079b40d0aace3518d0456e081e89d56e722c	0	30	30	3	5	4	4	2022-09-26 14:46:20	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+7	\\xe61755c626814a7f319dfa134b51bdb5bf2814e25832d50985ca0042956afd6f	0	79	79	4	6	7	363	2022-09-26 14:46:24.9	1	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+8	\\x0d7c70e5ec6af27e282cbafb96fa871d7066205825052a8fd41425befee49a2a	0	93	93	5	7	3	717	2022-09-26 14:46:26.3	1	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+9	\\x5eb5f10ab3a8dde3c3eccce05e0e4367af52c0b5ebdf13d1033bdf3c68531759	0	104	104	6	8	7	4	2022-09-26 14:46:27.4	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+10	\\x50666adc30fa705957ac14bc79bdeb275b0b06b17af0f659f93cf0930e4c417e	0	139	139	7	9	7	265	2022-09-26 14:46:30.9	1	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+11	\\x48a996374be4c6b0d1193b269c0098f70253ce443adae027223e5cc33c2c0a2c	0	150	150	8	10	3	4	2022-09-26 14:46:32	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+12	\\x72bade25e7adc039423e202c16f9eec6d2d3bab5fe4a111ef02e0c52fdf6e5cf	0	177	177	9	11	4	363	2022-09-26 14:46:34.7	1	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+13	\\x32f160fa09777a6693fa9eb2fd00347ccd11d2f9a0f3eea81ac21a583cf8f53d	0	193	193	10	12	3	4	2022-09-26 14:46:36.3	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+14	\\xc9d3f7fb1dd107af466d62a801276a7eea402538608fc4bbc88b21e74ce833cb	0	203	203	11	13	3	717	2022-09-26 14:46:37.3	1	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+15	\\x203828fbcf1a5cfa60d787e5020c541e3217e93f74069179daf9425357fd4809	0	208	208	12	14	7	4	2022-09-26 14:46:37.8	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+17	\\xf26ae121b57129d910a79f5ce85df740d4f1e2e943e3904e199989c51bf040c2	0	214	214	13	15	4	4	2022-09-26 14:46:38.4	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+18	\\xc48d30826ede26b888ae85d9956f8c809c56bb2a1655387c59d348f0622ff7b8	0	228	228	14	17	4	265	2022-09-26 14:46:39.8	1	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+19	\\xf412379ebcd6476bf35b2eab6f1bb56ebb76243db611c7a59439a302c0818c08	0	251	251	15	18	3	363	2022-09-26 14:46:42.1	1	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+20	\\x131c09e60ff77d2a4668445c134a5f78ed61dda9d78dbd396f63df59abecb51c	0	253	253	16	19	3	4	2022-09-26 14:46:42.3	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+21	\\x2e168fee15f82800656ea5ccd411dda45672285c7d3d795df26bf3f7e2e13559	0	283	283	17	20	4	717	2022-09-26 14:46:45.3	1	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+22	\\xabe690feea65f18b46eb4b1047f32fb3ccb0f611563c508b0eda2abd74b67d44	0	292	292	18	21	4	4	2022-09-26 14:46:46.2	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+23	\\x78681cdcf9d09836ad6d6c81fc03ce1bd200e387a099297a746fd4b13f44c3be	0	293	293	19	22	7	4	2022-09-26 14:46:46.3	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+24	\\x6cbeb862a781e4ed643e39e03337404906e899b0d5d8085e2c407b0f0708700e	0	305	305	20	23	4	1046	2022-09-26 14:46:47.5	2	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+25	\\x4d4cfe700123d6e0bb98c94483b752743b542172ba0cfcc4acf041621f565892	0	308	308	21	24	7	4	2022-09-26 14:46:47.8	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+26	\\xed3f1b84c17f718c9f3d0ea48d8835e2243e39aa4bce2f1768aaa982f3329475	0	322	322	22	25	7	4	2022-09-26 14:46:49.2	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+27	\\x948d12e96ff9797c9b34dbe00f3165dec0d8e955d37ecbe96cf14ce01fd7d596	0	323	323	23	26	4	4	2022-09-26 14:46:49.3	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+28	\\xbad922ccfcfd1e759ddedf51de08954a474e6581e8069a272593793913d376a2	0	333	333	24	27	4	4	2022-09-26 14:46:50.3	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+29	\\x85903d71fb582dbe71eafa5a9ff5cc7919c3f940e7ae6982e164975f18cbbd48	0	342	342	25	28	3	4	2022-09-26 14:46:51.2	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+30	\\x87e3efbe6dd2b5cdb9707cc1851dd161edde5af2a3f756d550adf6ace59e9f05	0	353	353	26	29	4	4	2022-09-26 14:46:52.3	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+31	\\xfdb9e7b5e82e18f257c70518f4689c17da5999a30feefd14c644bde8029922ac	0	355	355	27	30	3	4	2022-09-26 14:46:52.5	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+32	\\x212fb096249e50d815b31f388c6a1e4b44a864fd5025ecd299774b5439e93f57	0	361	361	28	31	7	4	2022-09-26 14:46:53.1	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+33	\\xcb34f5f73804509c7bb57bcd6a090180e17cb94d744b03992154f4af7af370e8	0	371	371	29	32	7	4	2022-09-26 14:46:54.1	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+34	\\x595e2163bde05f472d143d9ca5097909ab15e85c489f471713fe421b0ed5e034	0	375	375	30	33	3	4	2022-09-26 14:46:54.5	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+35	\\x4b9277e08f3d32bae3bad585d839b69ebbb476b321896b5b91ae69c23ce061b9	0	382	382	31	34	3	4	2022-09-26 14:46:55.2	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+36	\\xa19f9927adc409f51d6362831dd311811f78d509113e1c5b22bc8ced866194c5	0	393	393	32	35	4	4	2022-09-26 14:46:56.3	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+37	\\x04ca85bbfcefa64fdc5f93def4bb750d04210ee9db0c16a594af84110b4c7d2c	0	409	409	33	36	4	4	2022-09-26 14:46:57.9	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+38	\\xff13964ced1157c940c8f025495f579ad03fe9616be5d2e5ce5b76f3cf91a2d0	0	417	417	34	37	3	4	2022-09-26 14:46:58.7	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+39	\\xa2ed4401bc0475516ecc71a1eaa8d7048362a85af41086305bf4203e940aab3e	0	422	422	35	38	3	4	2022-09-26 14:46:59.2	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+40	\\x8beaae39d730cdb02cff5543838e8c243a99b58938d28ce5e5b71d9865588ace	0	442	442	36	39	4	4	2022-09-26 14:47:01.2	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+41	\\x02d92df0e67a0e086e32976ec1e9fba72ecead7e97f358622e2cf8a5a87fca63	0	446	446	37	40	4	4	2022-09-26 14:47:01.6	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+42	\\x453d715e0630447deb63acb569e0ff4967b8d0c0396c114a4b634bbf64d7c9d5	1	509	9	38	41	4	4	2022-09-26 14:47:07.9	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+43	\\xf9f0e2db97cd0674a8f6138934932e2b53696706f33040f9cc4befa725dfb17b	1	528	28	39	42	3	4	2022-09-26 14:47:09.8	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+44	\\x6c225c32a2de7ce6229bb7b9adf6a784672bcf55b8fc3b3143798c1b708ed84b	1	535	35	40	43	3	4	2022-09-26 14:47:10.5	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+45	\\x8c1a5ff1d769df08d3c05ad345e57d3869e3c3313b969108a85ea3b87909b915	1	544	44	41	44	7	4	2022-09-26 14:47:11.4	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+46	\\x2cb9224aa29067d96af2d3a4c1b3a770c1c732a34423428f07bf6a4988384b12	1	548	48	42	45	3	4	2022-09-26 14:47:11.8	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+47	\\x51e8304a630d341ca789b4358d1d133b875b76723d37f7d7a6c8bb99a0632368	1	550	50	43	46	4	4	2022-09-26 14:47:12	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+48	\\x493156beaa59e99285bf52f51e1dd9a25fc5985fc96fecdffd590bcbff7bca23	1	563	63	44	47	3	4	2022-09-26 14:47:13.3	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+49	\\xcd6cd32cf52178072e1647844ee23140d94ff6b899450a4ae958b3471e435131	1	565	65	45	48	3	4	2022-09-26 14:47:13.5	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+50	\\x8f3d75ec25a52ba3ac1080f77296fcaac5561cf75bec585aa2a6019b2039c6c5	1	566	66	46	49	4	4	2022-09-26 14:47:13.6	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+51	\\x472b4475c9d16c70e42318c4f3acac41796f0600cc394e564a9c9f26cd3d44e4	1	582	82	47	50	4	4	2022-09-26 14:47:15.2	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+52	\\x114a7d0ca667cb3fbb04ff6ed43c534d8f216d45c84a005ce1cad9d7a837b085	1	596	96	48	51	4	4	2022-09-26 14:47:16.6	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+53	\\x13f2221b755ddb4939aef2e83677b55ffccc52461860911eb0de584de32bbc7f	1	601	101	49	52	7	4	2022-09-26 14:47:17.1	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+54	\\x2826e768c571de9c96db0ba4cb01fc76591b078423a82ca5118819de1383d08a	1	636	136	50	53	7	4	2022-09-26 14:47:20.6	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+55	\\x1788e7cbc163082a3caece880f083a7ca7c361db10cd2ddb7b1d181bcd9038d5	1	642	142	51	54	3	4	2022-09-26 14:47:21.2	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+56	\\xdad7dfccd34503594d62630359f620408b4ddda67b5dceb083d7c0c42e67fb62	1	649	149	52	55	3	4	2022-09-26 14:47:21.9	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+57	\\xa4865b3b485449bb870b351c283afee00ac749b339c8652c9960d710b848c999	1	655	155	53	56	7	4	2022-09-26 14:47:22.5	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+58	\\x72c5ca1479be7fdeafbe1921b9c3527306f2480a709cb7a5155ce4b0803c186e	1	679	179	54	57	7	4	2022-09-26 14:47:24.9	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+59	\\x2d21565f624e55e7286a68954e07a76e214708eaa98c58719249e3f32a1e0907	1	695	195	55	58	3	4	2022-09-26 14:47:26.5	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+60	\\x807839c145912d39a992c8139d7bcbe38ff0bdae05e53c6c5693eb2121c988c6	1	707	207	56	59	3	4	2022-09-26 14:47:27.7	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+61	\\x263ac6f68c8503e41f08f28ee226287dda900e94a3f6dc10d1cbe90b62a75025	1	715	215	57	60	7	4	2022-09-26 14:47:28.5	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+62	\\xf167ab93c3df0d216217d62c0e5d4f8af174138a6cfa4b4603ea4969af02c41c	1	717	217	58	61	4	4	2022-09-26 14:47:28.7	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+63	\\x04eae2077e450a4ea36103ec1107068bebdf2afad3e477c11f0e201d1ee47116	1	718	218	59	62	4	4	2022-09-26 14:47:28.8	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+64	\\xeb1304c3e852549d7e1747d6229b383bfed4a18b92b514705b966451ca1e0727	1	750	250	60	63	4	4	2022-09-26 14:47:32	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+65	\\x2e683fb26383881e6df60fb4170d27a8df4b1bfc023cc44edf41eacc7c117bad	1	755	255	61	64	4	4	2022-09-26 14:47:32.5	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+66	\\x96aecb22d17fe224ee6faced8f5d0525cd0ccb2b00eda3b312b95443dc77328f	1	759	259	62	65	3	4	2022-09-26 14:47:32.9	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+67	\\x793edfbf3675b0f3f95312c6fa473fd5000884b35e47bd6e53c34ae06f3d27f5	1	766	266	63	66	3	4	2022-09-26 14:47:33.6	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+68	\\x045cf9734b3647a408c119bd056c7417dc92dc308992de5e1bc4e3296a9643ba	1	793	293	64	67	7	4	2022-09-26 14:47:36.3	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+69	\\x03e878413c3ade9ae41fedfe79023ab61de2011eeea278ce3e195faf67148f49	1	819	319	65	68	7	4	2022-09-26 14:47:38.9	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+70	\\xd54e53d870e788241c39e21dd720b05f63f2686d4032a60186b73a824a2b0522	1	824	324	66	69	4	4	2022-09-26 14:47:39.4	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+71	\\x8b5649dc73dfecf45f75facc7db380b50a81b6780a31cc1feb3a0a2629130983	1	829	329	67	70	4	4	2022-09-26 14:47:39.9	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+72	\\xcaddb7a37ce2ac1a45a1cc4c6e9fa5651f916f21b33ef3d3944de7e0fa383ac8	1	830	330	68	71	3	4	2022-09-26 14:47:40	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+73	\\xa1a8d30fe0001916dc5d80b1da0be1dc10b5629706c8d9da55a818e88fdca713	1	835	335	69	72	3	4	2022-09-26 14:47:40.5	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+74	\\x6ab3cf40ed00da56fb6403f8d1668de7c85efed2a732a4eb2f18897c2ee4ae32	1	840	340	70	73	3	4	2022-09-26 14:47:41	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+75	\\x9c165ffc988c352c73bd36422237a0b0522291adae3181a57a9dc319769adf1d	1	846	346	71	74	4	4	2022-09-26 14:47:41.6	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+76	\\x48c1fb3b071c5116a579512774532498f426197457a6ac9c3bdb5b81b2f51600	1	848	348	72	75	3	4	2022-09-26 14:47:41.8	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+77	\\xe7709ec0f3231fd41689db8647e4eadbdfbb41279e346f24e945f9feaa907395	1	856	356	73	76	4	4	2022-09-26 14:47:42.6	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+78	\\x624f16f79ce4bc3ca3b0fd139b4a8cbb081443de7eee8cb5e2abf65874ba4007	1	860	360	74	77	7	4	2022-09-26 14:47:43	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+79	\\x8c90414f5b5e9cfe8eeef1eed1ef673b6b328c31e9944464d99939db23b8e698	1	871	371	75	78	4	4	2022-09-26 14:47:44.1	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+80	\\xf51b98cfaffba7ca8cfb30aa0ed85dd46db3ef7d5a0a20aebb50e6fb5dfb4a1e	1	894	394	76	79	4	4	2022-09-26 14:47:46.4	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+81	\\x9bf15042d20b5afb49bd20b01c8027fec7e9d7d83f974eceb3a1b661e91e152c	1	916	416	77	80	3	4	2022-09-26 14:47:48.6	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+82	\\x906ff39071621837722e2cd736d34cb3cd911da4e8560d0d764ea5b082a13c15	1	920	420	78	81	7	4	2022-09-26 14:47:49	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+83	\\x7e820b69e6cac8187ee9f5d13390b2a68f0b2da5b4d8a526e389b4d544fcf889	1	922	422	79	82	4	4	2022-09-26 14:47:49.2	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+84	\\xeccbfce1b613de73c21b529fd73c8308962eaf7c14e46ad923ee34bd8a3ba207	1	952	452	80	83	7	4	2022-09-26 14:47:52.2	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+85	\\x4827e46370488eea5c6fb2398b267cf6d9ce163e827b344ef86fea30412b110e	1	970	470	81	84	4	4	2022-09-26 14:47:54	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+86	\\x54ba6bddc928d47c7adb8eee26dc6172746bc6802a4c44536974f69bbb4d3f7e	1	982	482	82	85	7	4	2022-09-26 14:47:55.2	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+87	\\x9da4fc95144a46ee11a6282c8323c3fbc836e0f9fe0123c2acbd49fd21e64866	1	989	489	83	86	3	4	2022-09-26 14:47:55.9	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+89	\\x4bf8a8d635ee3cdba91f71270a78ab89a11e2903bf278f2c6efc56580eab12e5	2	1003	3	84	87	7	4	2022-09-26 14:47:57.3	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+90	\\x1be3db396f48154d8f2c602399ec2f7810cf3436668f18be1a2ec53b34e5f2c6	2	1048	48	85	89	3	4	2022-09-26 14:48:01.8	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+91	\\x866964459688645925371158afa573d408fb5f9c73aab00fcc17317fe261f822	2	1050	50	86	90	4	4	2022-09-26 14:48:02	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+92	\\x9995453f77f5652faac9b876decb0e9595504fe187afc72fde5867c1e583197c	2	1054	54	87	91	3	4	2022-09-26 14:48:02.4	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+93	\\x8fd0bd75e11fd011961484d87cfbfdb339c477e6e168d30408f9d90b085d0804	2	1081	81	88	92	3	4	2022-09-26 14:48:05.1	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+94	\\xae1c49d901f16c85d3c6581828dd565c370477485548e8cd523a7e2973322c70	2	1085	85	89	93	3	4	2022-09-26 14:48:05.5	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+95	\\x4e1a314314c364950a22af5d9e2211c92d06067b1826ad94c55dd3ef1e7002b9	2	1093	93	90	94	7	4	2022-09-26 14:48:06.3	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+96	\\x21335ea3a8302a8a0ff9241d105c3c2920d0e45037fbd012e2421aa39cf971a5	2	1097	97	91	95	4	4	2022-09-26 14:48:06.7	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+97	\\xd9af071f0dc614f927e1ea5c18c287d3b50e5f6859a762c0389abf8ffa06e9a0	2	1103	103	92	96	7	4	2022-09-26 14:48:07.3	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+98	\\x52b765852a8cfb42ce38791041a3c7ac4492476f17b857ff5c768ae5b2a6e5c7	2	1107	107	93	97	3	4	2022-09-26 14:48:07.7	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+99	\\x656aafb7c145f583f37ca5cb3ab4d00337524e44e54a42291f6b0e8d4efe032d	2	1108	108	94	98	3	4	2022-09-26 14:48:07.8	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+100	\\x3b8031a826d46b635fc1294338993fffe8ba7b0665e169cbe4dba102af6cf931	2	1124	124	95	99	7	4	2022-09-26 14:48:09.4	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+101	\\x9e9271a715c49512cdb98f507d777d97506840fc235ab76d36303b1acd8baee5	2	1148	148	96	100	7	4	2022-09-26 14:48:11.8	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+102	\\x14fa3abc4196280a3d3fac83f04d996eb2f8dade9bc3458185fb2d5d22d26251	2	1149	149	97	101	7	4	2022-09-26 14:48:11.9	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+103	\\xd9b099e80d78cb688234febac04a65c71bc15075250fe3175797ae8b378c150f	2	1153	153	98	102	3	4	2022-09-26 14:48:12.3	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+104	\\x05bc6afd628818ae299cfb61145b038236bfe440d823e626ad7af3a3785b6cff	2	1156	156	99	103	3	4	2022-09-26 14:48:12.6	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+105	\\x99cffe7cf8466fd82433a59e20d1f2e7161bc04f2aa9e3195d70f2103b5241d8	2	1172	172	100	104	7	4	2022-09-26 14:48:14.2	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+106	\\xcffd14f2540da47599f729e1d5c84037fbc7b926970399ba2314a4a68d11ad6e	2	1173	173	101	105	3	4	2022-09-26 14:48:14.3	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+107	\\xf9dd236bedd07d7c41bc5884779fb3b411c3e434349e71f3e8f59dad34dff268	2	1175	175	102	106	4	4	2022-09-26 14:48:14.5	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+108	\\x98c88dd7ec1bb5456fed23196109581a5f19f8535e1f971936da3ef9aabaa932	2	1176	176	103	107	3	4	2022-09-26 14:48:14.6	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+109	\\xdaa9da9a3a5c0bf9fc3bb78738a866f1d8e35de7e17435b65bca30aae5ec6ce8	2	1183	183	104	108	4	4	2022-09-26 14:48:15.3	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+110	\\x1dfea357f532b8d33037e1337e1c15ca73b67da9c0eeeeaf30c4848a0242f3df	2	1194	194	105	109	3	494	2022-09-26 14:48:16.4	1	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+111	\\x42a482a86e5da2f9fab9cad94261b4cf393aa6609bba96d4ae17fb3484cdb967	2	1201	201	106	110	4	365	2022-09-26 14:48:17.1	1	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+112	\\x0f96d6229a7165e7e9bc1c1b7bde2004c362d2e90ca71a53de2f86f5afcee55a	2	1206	206	107	111	4	4	2022-09-26 14:48:17.6	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+113	\\xff2e8ef096ce7ba8f493aa8ed15dd1842de68793473241063822a3112d013589	2	1215	215	108	112	7	4	2022-09-26 14:48:18.5	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+114	\\x8577e0cfa73677dcca2bd58b9af1e2693e73726fc8157cd887fb2448360ff9d2	2	1226	226	109	113	4	337	2022-09-26 14:48:19.6	1	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+115	\\x4caa7c19f5a1f89e002f4b553696a4a8f4b003ec9badbafcbca80430b21821b0	2	1247	247	110	114	3	4	2022-09-26 14:48:21.7	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+116	\\x33c56565c1a486ff4b264408bfabe028a3c87ebac9a77ef01575659d7214239f	2	1250	250	111	115	7	4	2022-09-26 14:48:22	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+117	\\xb14db0e30e2adeb8296ad39b047112b96a00c8dce1b08461fc0323bb3ef76540	2	1254	254	112	116	4	4	2022-09-26 14:48:22.4	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+118	\\x0eddcc263538c54ef7668a892bdf01c16576c31ada891daa03d83f9a9a1baf5e	2	1255	255	113	117	7	4	2022-09-26 14:48:22.5	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+119	\\x4872e34aacf4cf68b588026d1625ae8fb5695a2e1eeab44f06b8b995d9ca9c6e	2	1265	265	114	118	3	4	2022-09-26 14:48:23.5	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+120	\\xf97aa2fdb89a60d49bde6e6a3bf22e5dbfaae1cc18062b3d1fc2290417e7c24e	2	1285	285	115	119	4	662	2022-09-26 14:48:25.5	2	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+121	\\xb26f156b0bea7f405865cd98235e62547da2529516e491253bb6b90072ec0b12	2	1296	296	116	120	4	4	2022-09-26 14:48:26.6	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+122	\\x93036be09210044d9816960fbba97a39f918c27f65bb45bb73b5e04f0149459f	2	1301	301	117	121	7	4	2022-09-26 14:48:27.1	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+123	\\x53de13a3c2e5a3cd55a8d3dc56059c3cdd65743106d39b3cb5d5c308f2e8ea00	2	1318	318	118	122	7	4	2022-09-26 14:48:28.8	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+124	\\xa87eb34a4169f89c125c472935b69d90a4ad87589c2bc8a9175dff4a753f9feb	2	1322	322	119	123	7	4	2022-09-26 14:48:29.2	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+125	\\x231c3ab0478fe6f0b344164b2144d49a7155c8798ee9ae79dd00195873049109	2	1323	323	120	124	3	4	2022-09-26 14:48:29.3	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+126	\\x75b0ef65ad84f5d53b125caef7e3315b36a7bdd1a25078df29d5aaa7959bd7d6	2	1327	327	121	125	3	4	2022-09-26 14:48:29.7	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+127	\\xdababccd49a1a5283af38702a7b4fae8528a18354a2ce11173480027e7227741	2	1334	334	122	126	4	4	2022-09-26 14:48:30.4	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+128	\\x4adbe64b32bb1229af629db48e33c607fdbc56a022cc1957e813f30a5895bf23	2	1344	344	123	127	4	1069	2022-09-26 14:48:31.4	1	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+129	\\x55456dee65ada270ea4aef6e1d7b8b7a30973c3cfeb75acbba2460172ec87676	2	1351	351	124	128	7	4	2022-09-26 14:48:32.1	0	7	0	vrf_vk18af9h0ka3hphpcdcfw6q2kvlrxpe5z2punsptgygl9j3lfky43eq7snpsl	\\x5e93d73c739f2ec33ff28a4a8e1be8e2e455de88b5d45b43e8e0923b10587d57	0
+130	\\x05befc9299c9a49bb7acbb2fbc1aee24d4e1b9c0874a3dd4147c93bcea782441	2	1357	357	125	129	4	4	2022-09-26 14:48:32.7	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+131	\\x6e9c166ebe48372d20a4d74692e65ab5ca6925afa94ffbe59652b257ed9f7063	2	1383	383	126	130	4	564	2022-09-26 14:48:35.3	1	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+132	\\xaf5350b73b326d967aa87a8f2de6e321769cc832d24b2a3aec5a85962bc5ce76	2	1390	390	127	131	4	4	2022-09-26 14:48:36	0	7	0	vrf_vk1g4aspzeek8quw0kckdjfsn5lkw8wyf40hrw5uz6jns7vy79n0jjs5h8hq4	\\x74e03e98b147a5889a606713b8a824e627f33552bbbfc1d5ab650d2ed5fdd75f	0
+133	\\x1c8e307530d92f359a839184528accaa6ee34e99d7ea212a9fe94bdb80da2fdd	2	1396	396	128	132	3	4	2022-09-26 14:48:36.6	0	7	0	vrf_vk1vdl6l20y2mydf9fha5f4uln99zlyrhny67k60mdpd69vwut5f8pschqg3r	\\x0c3882f233ad6f10cbea4f564294c4e9172891b27e66b45d376ca43db64eda88	0
+\.
+
+
+--
+-- Data for Name: collateral_tx_in; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.collateral_tx_in (id, tx_in_id, tx_out_id, tx_out_index) FROM stdin;
+\.
+
+
+--
+-- Data for Name: collateral_tx_out; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.collateral_tx_out (id, tx_id, index, address, address_raw, address_has_script, payment_cred, stake_address_id, value, data_hash, multi_assets_descr, inline_datum_id, reference_script_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: cost_model; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.cost_model (id, costs, block_id, hash) FROM stdin;
+1	{"PlutusV1": {"bData-cpu-arguments": 150000, "iData-cpu-arguments": 150000, "trace-cpu-arguments": 150000, "mkCons-cpu-arguments": 150000, "fstPair-cpu-arguments": 150000, "mapData-cpu-arguments": 150000, "sndPair-cpu-arguments": 150000, "unBData-cpu-arguments": 150000, "unIData-cpu-arguments": 150000, "bData-memory-arguments": 32, "cekLamCost-exBudgetCPU": 29773, "cekVarCost-exBudgetCPU": 29773, "headList-cpu-arguments": 150000, "iData-memory-arguments": 32, "listData-cpu-arguments": 150000, "nullList-cpu-arguments": 150000, "tailList-cpu-arguments": 150000, "trace-memory-arguments": 32, "mkCons-memory-arguments": 32, "mkNilData-cpu-arguments": 150000, "unMapData-cpu-arguments": 150000, "cekApplyCost-exBudgetCPU": 29773, "cekConstCost-exBudgetCPU": 29773, "cekDelayCost-exBudgetCPU": 29773, "cekForceCost-exBudgetCPU": 29773, "chooseData-cpu-arguments": 150000, "chooseList-cpu-arguments": 150000, "chooseUnit-cpu-arguments": 150000, "constrData-cpu-arguments": 150000, "fstPair-memory-arguments": 32, "ifThenElse-cpu-arguments": 1, "mapData-memory-arguments": 32, "mkPairData-cpu-arguments": 150000, "sndPair-memory-arguments": 32, "unBData-memory-arguments": 32, "unIData-memory-arguments": 32, "unListData-cpu-arguments": 150000, "cekLamCost-exBudgetMemory": 100, "cekVarCost-exBudgetMemory": 100, "headList-memory-arguments": 32, "listData-memory-arguments": 32, "nullList-memory-arguments": 32, "sha2_256-memory-arguments": 4, "sha3_256-memory-arguments": 4, "tailList-memory-arguments": 32, "cekBuiltinCost-exBudgetCPU": 29773, "cekStartupCost-exBudgetCPU": 100, "mkNilData-memory-arguments": 32, "unConstrData-cpu-arguments": 150000, "unMapData-memory-arguments": 32, "cekApplyCost-exBudgetMemory": 100, "cekConstCost-exBudgetMemory": 100, "cekDelayCost-exBudgetMemory": 100, "cekForceCost-exBudgetMemory": 100, "chooseData-memory-arguments": 32, "chooseList-memory-arguments": 32, "chooseUnit-memory-arguments": 32, "constrData-memory-arguments": 32, "equalsData-memory-arguments": 1, "ifThenElse-memory-arguments": 1, "mkNilPairData-cpu-arguments": 150000, "mkPairData-memory-arguments": 32, "unListData-memory-arguments": 32, "blake2b_256-memory-arguments": 4, "sha2_256-cpu-arguments-slope": 29175, "sha3_256-cpu-arguments-slope": 82363, "cekBuiltinCost-exBudgetMemory": 100, "cekStartupCost-exBudgetMemory": 100, "equalsString-memory-arguments": 1, "indexByteString-cpu-arguments": 150000, "unConstrData-memory-arguments": 32, "addInteger-cpu-arguments-slope": 0, "decodeUtf8-cpu-arguments-slope": 1000, "encodeUtf8-cpu-arguments-slope": 1000, "equalsData-cpu-arguments-slope": 10000, "equalsInteger-memory-arguments": 1, "mkNilPairData-memory-arguments": 32, "blake2b_256-cpu-arguments-slope": 29175, "appendString-cpu-arguments-slope": 1000, "equalsString-cpu-arguments-slope": 1000, "indexByteString-memory-arguments": 1, "lengthOfByteString-cpu-arguments": 150000, "lessThanInteger-memory-arguments": 1, "sha2_256-cpu-arguments-intercept": 2477736, "sha3_256-cpu-arguments-intercept": 0, "addInteger-memory-arguments-slope": 1, "decodeUtf8-memory-arguments-slope": 8, "encodeUtf8-memory-arguments-slope": 8, "equalsByteString-memory-arguments": 1, "equalsInteger-cpu-arguments-slope": 1326, "modInteger-cpu-arguments-constant": 148000, "modInteger-memory-arguments-slope": 1, "addInteger-cpu-arguments-intercept": 197209, "consByteString-cpu-arguments-slope": 1000, "decodeUtf8-cpu-arguments-intercept": 150000, "encodeUtf8-cpu-arguments-intercept": 150000, "equalsData-cpu-arguments-intercept": 150000, "appendString-memory-arguments-slope": 1, "blake2b_256-cpu-arguments-intercept": 2477736, "equalsString-cpu-arguments-constant": 1000, "lengthOfByteString-memory-arguments": 4, "lessThanByteString-memory-arguments": 1, "lessThanInteger-cpu-arguments-slope": 497, "modInteger-memory-arguments-minimum": 1, "multiplyInteger-cpu-arguments-slope": 11218, "sliceByteString-cpu-arguments-slope": 5000, "subtractInteger-cpu-arguments-slope": 0, "appendByteString-cpu-arguments-slope": 621, "appendString-cpu-arguments-intercept": 150000, "divideInteger-cpu-arguments-constant": 148000, "divideInteger-memory-arguments-slope": 1, "equalsByteString-cpu-arguments-slope": 247, "equalsString-cpu-arguments-intercept": 150000, "addInteger-memory-arguments-intercept": 1, "consByteString-memory-arguments-slope": 1, "decodeUtf8-memory-arguments-intercept": 0, "encodeUtf8-memory-arguments-intercept": 0, "equalsInteger-cpu-arguments-intercept": 136542, "modInteger-memory-arguments-intercept": 0, "consByteString-cpu-arguments-intercept": 150000, "divideInteger-memory-arguments-minimum": 1, "lessThanByteString-cpu-arguments-slope": 248, "lessThanEqualsInteger-memory-arguments": 1, "multiplyInteger-memory-arguments-slope": 1, "quotientInteger-cpu-arguments-constant": 148000, "quotientInteger-memory-arguments-slope": 1, "sliceByteString-memory-arguments-slope": 1, "subtractInteger-memory-arguments-slope": 1, "appendByteString-memory-arguments-slope": 1, "appendString-memory-arguments-intercept": 0, "equalsByteString-cpu-arguments-constant": 150000, "lessThanInteger-cpu-arguments-intercept": 179690, "multiplyInteger-cpu-arguments-intercept": 61516, "remainderInteger-cpu-arguments-constant": 148000, "remainderInteger-memory-arguments-slope": 1, "sliceByteString-cpu-arguments-intercept": 150000, "subtractInteger-cpu-arguments-intercept": 197209, "verifyEd25519Signature-memory-arguments": 1, "appendByteString-cpu-arguments-intercept": 396231, "divideInteger-memory-arguments-intercept": 0, "equalsByteString-cpu-arguments-intercept": 112536, "quotientInteger-memory-arguments-minimum": 1, "consByteString-memory-arguments-intercept": 0, "lessThanEqualsByteString-memory-arguments": 1, "lessThanEqualsInteger-cpu-arguments-slope": 1366, "remainderInteger-memory-arguments-minimum": 1, "lessThanByteString-cpu-arguments-intercept": 103599, "multiplyInteger-memory-arguments-intercept": 0, "quotientInteger-memory-arguments-intercept": 0, "sliceByteString-memory-arguments-intercept": 0, "subtractInteger-memory-arguments-intercept": 1, "verifyEd25519Signature-cpu-arguments-slope": 1, "appendByteString-memory-arguments-intercept": 0, "remainderInteger-memory-arguments-intercept": 0, "lessThanEqualsByteString-cpu-arguments-slope": 248, "lessThanEqualsInteger-cpu-arguments-intercept": 145276, "modInteger-cpu-arguments-model-arguments-slope": 118, "verifyEd25519Signature-cpu-arguments-intercept": 3345831, "lessThanEqualsByteString-cpu-arguments-intercept": 103599, "divideInteger-cpu-arguments-model-arguments-slope": 118, "modInteger-cpu-arguments-model-arguments-intercept": 425507, "quotientInteger-cpu-arguments-model-arguments-slope": 118, "remainderInteger-cpu-arguments-model-arguments-slope": 118, "divideInteger-cpu-arguments-model-arguments-intercept": 425507, "quotientInteger-cpu-arguments-model-arguments-intercept": 425507, "remainderInteger-cpu-arguments-model-arguments-intercept": 425507}, "PlutusV2": {"bData-cpu-arguments": 1000, "iData-cpu-arguments": 1000, "trace-cpu-arguments": 212342, "mkCons-cpu-arguments": 65493, "fstPair-cpu-arguments": 80436, "mapData-cpu-arguments": 64832, "sndPair-cpu-arguments": 85931, "unBData-cpu-arguments": 31220, "unIData-cpu-arguments": 43357, "bData-memory-arguments": 32, "cekLamCost-exBudgetCPU": 23000, "cekVarCost-exBudgetCPU": 23000, "headList-cpu-arguments": 43249, "iData-memory-arguments": 32, "listData-cpu-arguments": 52467, "nullList-cpu-arguments": 60091, "tailList-cpu-arguments": 41182, "trace-memory-arguments": 32, "mkCons-memory-arguments": 32, "mkNilData-cpu-arguments": 22558, "unMapData-cpu-arguments": 38314, "cekApplyCost-exBudgetCPU": 23000, "cekConstCost-exBudgetCPU": 23000, "cekDelayCost-exBudgetCPU": 23000, "cekForceCost-exBudgetCPU": 23000, "chooseData-cpu-arguments": 19537, "chooseList-cpu-arguments": 175354, "chooseUnit-cpu-arguments": 46417, "constrData-cpu-arguments": 89141, "fstPair-memory-arguments": 32, "ifThenElse-cpu-arguments": 80556, "mapData-memory-arguments": 32, "mkPairData-cpu-arguments": 76511, "sndPair-memory-arguments": 32, "unBData-memory-arguments": 32, "unIData-memory-arguments": 32, "unListData-cpu-arguments": 32247, "cekLamCost-exBudgetMemory": 100, "cekVarCost-exBudgetMemory": 100, "headList-memory-arguments": 32, "listData-memory-arguments": 32, "nullList-memory-arguments": 32, "sha2_256-memory-arguments": 4, "sha3_256-memory-arguments": 4, "tailList-memory-arguments": 32, "cekBuiltinCost-exBudgetCPU": 23000, "cekStartupCost-exBudgetCPU": 100, "mkNilData-memory-arguments": 32, "unConstrData-cpu-arguments": 32696, "unMapData-memory-arguments": 32, "cekApplyCost-exBudgetMemory": 100, "cekConstCost-exBudgetMemory": 100, "cekDelayCost-exBudgetMemory": 100, "cekForceCost-exBudgetMemory": 100, "chooseData-memory-arguments": 32, "chooseList-memory-arguments": 32, "chooseUnit-memory-arguments": 4, "constrData-memory-arguments": 32, "equalsData-memory-arguments": 1, "ifThenElse-memory-arguments": 1, "mkNilPairData-cpu-arguments": 16563, "mkPairData-memory-arguments": 32, "unListData-memory-arguments": 32, "blake2b_256-memory-arguments": 4, "sha2_256-cpu-arguments-slope": 30482, "sha3_256-cpu-arguments-slope": 82523, "cekBuiltinCost-exBudgetMemory": 100, "cekStartupCost-exBudgetMemory": 100, "equalsString-memory-arguments": 1, "indexByteString-cpu-arguments": 57667, "unConstrData-memory-arguments": 32, "addInteger-cpu-arguments-slope": 812, "decodeUtf8-cpu-arguments-slope": 14068, "encodeUtf8-cpu-arguments-slope": 28662, "equalsData-cpu-arguments-slope": 12586, "equalsInteger-memory-arguments": 1, "mkNilPairData-memory-arguments": 32, "blake2b_256-cpu-arguments-slope": 10475, "appendString-cpu-arguments-slope": 24177, "equalsString-cpu-arguments-slope": 52998, "indexByteString-memory-arguments": 4, "lengthOfByteString-cpu-arguments": 1000, "lessThanInteger-memory-arguments": 1, "sha2_256-cpu-arguments-intercept": 806990, "sha3_256-cpu-arguments-intercept": 1927926, "addInteger-memory-arguments-slope": 1, "decodeUtf8-memory-arguments-slope": 2, "encodeUtf8-memory-arguments-slope": 2, "equalsByteString-memory-arguments": 1, "equalsInteger-cpu-arguments-slope": 421, "modInteger-cpu-arguments-constant": 196500, "modInteger-memory-arguments-slope": 1, "serialiseData-cpu-arguments-slope": 392670, "addInteger-cpu-arguments-intercept": 205665, "consByteString-cpu-arguments-slope": 511, "decodeUtf8-cpu-arguments-intercept": 497525, "encodeUtf8-cpu-arguments-intercept": 1000, "equalsData-cpu-arguments-intercept": 1060367, "appendString-memory-arguments-slope": 1, "blake2b_256-cpu-arguments-intercept": 117366, "equalsString-cpu-arguments-constant": 187000, "lengthOfByteString-memory-arguments": 10, "lessThanByteString-memory-arguments": 1, "lessThanInteger-cpu-arguments-slope": 511, "modInteger-memory-arguments-minimum": 1, "multiplyInteger-cpu-arguments-slope": 11687, "sliceByteString-cpu-arguments-slope": 0, "subtractInteger-cpu-arguments-slope": 812, "appendByteString-cpu-arguments-slope": 571, "appendString-cpu-arguments-intercept": 1000, "divideInteger-cpu-arguments-constant": 196500, "divideInteger-memory-arguments-slope": 1, "equalsByteString-cpu-arguments-slope": 62, "equalsString-cpu-arguments-intercept": 1000, "serialiseData-memory-arguments-slope": 2, "addInteger-memory-arguments-intercept": 1, "consByteString-memory-arguments-slope": 1, "decodeUtf8-memory-arguments-intercept": 4, "encodeUtf8-memory-arguments-intercept": 4, "equalsInteger-cpu-arguments-intercept": 208512, "modInteger-memory-arguments-intercept": 0, "serialiseData-cpu-arguments-intercept": 1159724, "consByteString-cpu-arguments-intercept": 221973, "divideInteger-memory-arguments-minimum": 1, "lessThanByteString-cpu-arguments-slope": 156, "lessThanEqualsInteger-memory-arguments": 1, "multiplyInteger-memory-arguments-slope": 1, "quotientInteger-cpu-arguments-constant": 196500, "quotientInteger-memory-arguments-slope": 1, "sliceByteString-memory-arguments-slope": 0, "subtractInteger-memory-arguments-slope": 1, "appendByteString-memory-arguments-slope": 1, "appendString-memory-arguments-intercept": 4, "equalsByteString-cpu-arguments-constant": 245000, "lessThanInteger-cpu-arguments-intercept": 208896, "multiplyInteger-cpu-arguments-intercept": 69522, "remainderInteger-cpu-arguments-constant": 196500, "remainderInteger-memory-arguments-slope": 1, "sliceByteString-cpu-arguments-intercept": 265318, "subtractInteger-cpu-arguments-intercept": 205665, "verifyEd25519Signature-memory-arguments": 10, "appendByteString-cpu-arguments-intercept": 1000, "divideInteger-memory-arguments-intercept": 0, "equalsByteString-cpu-arguments-intercept": 216773, "quotientInteger-memory-arguments-minimum": 1, "serialiseData-memory-arguments-intercept": 0, "consByteString-memory-arguments-intercept": 0, "lessThanEqualsByteString-memory-arguments": 1, "lessThanEqualsInteger-cpu-arguments-slope": 473, "remainderInteger-memory-arguments-minimum": 1, "lessThanByteString-cpu-arguments-intercept": 197145, "multiplyInteger-memory-arguments-intercept": 0, "quotientInteger-memory-arguments-intercept": 0, "sliceByteString-memory-arguments-intercept": 4, "subtractInteger-memory-arguments-intercept": 1, "verifyEd25519Signature-cpu-arguments-slope": 1021, "appendByteString-memory-arguments-intercept": 0, "remainderInteger-memory-arguments-intercept": 0, "verifyEcdsaSecp256k1Signature-cpu-arguments": 35892428, "lessThanEqualsByteString-cpu-arguments-slope": 156, "lessThanEqualsInteger-cpu-arguments-intercept": 204924, "modInteger-cpu-arguments-model-arguments-slope": 220, "verifyEcdsaSecp256k1Signature-memory-arguments": 10, "verifyEd25519Signature-cpu-arguments-intercept": 9462713, "lessThanEqualsByteString-cpu-arguments-intercept": 197145, "verifySchnorrSecp256k1Signature-memory-arguments": 10, "divideInteger-cpu-arguments-model-arguments-slope": 220, "modInteger-cpu-arguments-model-arguments-intercept": 453240, "quotientInteger-cpu-arguments-model-arguments-slope": 220, "verifySchnorrSecp256k1Signature-cpu-arguments-slope": 32947, "remainderInteger-cpu-arguments-model-arguments-slope": 220, "divideInteger-cpu-arguments-model-arguments-intercept": 453240, "quotientInteger-cpu-arguments-model-arguments-intercept": 453240, "verifySchnorrSecp256k1Signature-cpu-arguments-intercept": 38887044, "remainderInteger-cpu-arguments-model-arguments-intercept": 453240}}	42	\\xecd97ab4baa202a20614368334eb3f30199615cec447ecf386e89ed8191e139a
+\.
+
+
+--
+-- Data for Name: datum; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.datum (id, hash, tx_id, value, bytes) FROM stdin;
+\.
+
+
+--
+-- Data for Name: delegation; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.delegation (id, addr_id, cert_index, pool_hash_id, active_epoch_no, tx_id, slot_no, redeemer_id) FROM stdin;
+1	1	1	3	2	10	0	\N
+2	3	3	1	2	10	0	\N
+3	2	5	2	2	10	0	\N
+4	6	1	3	2	13	93	\N
+5	5	1	2	2	16	203	\N
+6	4	1	1	2	19	283	\N
+7	14	1	1	4	22	1194	\N
+\.
+
+
+--
+-- Data for Name: delisted_pool; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.delisted_pool (id, hash_raw) FROM stdin;
+\.
+
+
+--
+-- Data for Name: epoch; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.epoch (id, out_sum, fees, tx_count, blk_count, no, start_time, end_time) FROM stdin;
+1	67500002996976427	1985291	11	37	0	2022-09-26 14:46:18.9	2022-09-26 14:47:01.2
+3	30000041164014	1242195	7	44	2	2022-09-26 14:47:57.3	2022-09-26 14:48:36
+2	0	0	0	45	1	2022-09-26 14:47:07.9	2022-09-26 14:47:55.2
+\.
+
+
+--
+-- Data for Name: epoch_param; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.epoch_param (id, epoch_no, min_fee_a, min_fee_b, max_block_size, max_tx_size, max_bh_size, key_deposit, pool_deposit, max_epoch, optimal_pool_count, influence, monetary_expand_rate, treasury_growth_rate, decentralisation, protocol_major, protocol_minor, min_utxo_value, min_pool_cost, nonce, cost_model_id, price_mem, price_step, max_tx_ex_mem, max_tx_ex_steps, max_block_ex_mem, max_block_ex_steps, max_val_size, collateral_percent, max_collateral_inputs, block_id, extra_entropy, coins_per_utxo_size) FROM stdin;
+1	1	44	155381	65536	16384	1100	0	0	18	100	0	0.100000000000000006	0.100000000000000006	0	7	0	4310	0	\\x399454ca9d943462378b0beeb8e6701f172bb59d335ed23bd878b17c5db77013	1	0.0577000000000000013	7.21000000000000043e-05	16000000	10000000000	80000000	40000000000	5000	150	3	42	\N	4310
+3	2	44	155381	65536	16384	1100	0	0	18	100	0	0.100000000000000006	0.100000000000000006	0	7	0	4310	0	\\x1528e22ccb7e2537f21660572e47f7d847f00e232fdee69f7c9a53bd769117f6	1	0.0577000000000000013	7.21000000000000043e-05	16000000	10000000000	80000000	40000000000	5000	150	3	89	\N	4310
+\.
+
+
+--
+-- Data for Name: epoch_stake; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.epoch_stake (id, addr_id, pool_id, amount, epoch_no) FROM stdin;
+1	1	3	13500000000000000	1
+2	3	1	13500000000000000	1
+3	2	2	13500000000000000	1
+4	1	3	13500000000000000	2
+5	3	1	13500000000000000	2
+6	2	2	13500000000000000	2
+7	6	3	999624118	2
+8	5	2	999624118	2
+9	4	1	999624118	2
+\.
+
+
+--
+-- Data for Name: epoch_sync_time; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.epoch_sync_time (id, no, seconds, state) FROM stdin;
+1	0	36	following
+2	1	50	following
+\.
+
+
+--
+-- Data for Name: extra_key_witness; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.extra_key_witness (id, hash, tx_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: ma_tx_mint; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.ma_tx_mint (id, quantity, tx_id, ident) FROM stdin;
+1	13500000000000000	20	1
+2	13500000000000000	20	2
+3	13500000000000000	20	3
+4	13500000000000000	20	4
+5	1	27	5
+6	1	27	6
+7	1	27	7
+8	-1	28	6
+\.
+
+
+--
+-- Data for Name: ma_tx_out; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.ma_tx_out (id, quantity, tx_out_id, ident) FROM stdin;
+1	13500000000000000	23	1
+2	13500000000000000	23	2
+3	13500000000000000	23	3
+4	13500000000000000	23	4
+5	1	39	5
+6	1	39	6
+7	1	39	7
+8	1	42	5
+9	1	42	7
+\.
+
+
+--
+-- Data for Name: meta; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.meta (id, start_time, network_name, version) FROM stdin;
+1	2022-09-26 14:46:17	testnet	Version {versionBranch = [13,0,4], versionTags = []}
+\.
+
+
+--
+-- Data for Name: multi_asset; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.multi_asset (id, policy, name, fingerprint) FROM stdin;
+1	\\x91368c4092f604d7973ae1877ccdddfe9037f2bdc35d0680c1b7dc3a	\\x	asset1w2w3jljfnpaxlhe4lpvksprya5k4v5jsff2lcl
+2	\\x91368c4092f604d7973ae1877ccdddfe9037f2bdc35d0680c1b7dc3a	\\x74425443	asset13mqj5hwqs78vqwpewatsnux6rdxxmceqvud66n
+3	\\x91368c4092f604d7973ae1877ccdddfe9037f2bdc35d0680c1b7dc3a	\\x74455448	asset1j3yks93579qtfahvdtm7rer22ddcyprwfm8lf4
+4	\\x91368c4092f604d7973ae1877ccdddfe9037f2bdc35d0680c1b7dc3a	\\x744d494e	asset1g5vkjz0f34l2svuaxusl7zenjtgq6kcqnxpaqy
+5	\\xe6e9a01c4a0d8cc7e67615dc30f74f17408936c816a7d5e6dae65491	\\x4e46542d303031	asset12sc35kvdfmed9fkupscfdmkd8a4ac8epzsldvp
+6	\\xe6e9a01c4a0d8cc7e67615dc30f74f17408936c816a7d5e6dae65491	\\x4e46542d303032	asset1y7a545jeehtttp33nn50xjcv2dh6k9ujedkjcc
+7	\\xe6e9a01c4a0d8cc7e67615dc30f74f17408936c816a7d5e6dae65491	\\x4e46542d66696c6573	asset1vds3643kaygudxch2zqa76mxncv4zwdcsppj8t
+\.
+
+
+--
+-- Data for Name: param_proposal; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.param_proposal (id, epoch_no, key, min_fee_a, min_fee_b, max_block_size, max_tx_size, max_bh_size, key_deposit, pool_deposit, max_epoch, optimal_pool_count, influence, monetary_expand_rate, treasury_growth_rate, decentralisation, entropy, protocol_major, protocol_minor, min_utxo_value, min_pool_cost, cost_model_id, price_mem, price_step, max_tx_ex_mem, max_tx_ex_steps, max_block_ex_mem, max_block_ex_steps, max_val_size, collateral_percent, max_collateral_inputs, registered_tx_id, coins_per_utxo_size) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pool_hash; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pool_hash (id, hash_raw, view) FROM stdin;
+1	\\x424e0283b504a83a909647ad54dad3537554ee003b6990bb796f693a	pool1gf8q9qa4qj5r4yykg7k4fkkn2d64fmsq8d5epwmeda5n5tvqx6n
+2	\\xb1e0e260abdeae0128c99109a02675b4a6d83cf71b39c195bd48ecc2	pool1k8swyc9tm6hqz2xfjyy6qfn4kjnds08hrvuur9dafrkvyl4fpfl
+3	\\xefbb010dd80521b4640c8d8bc8395bfcab092c939e1b5c6e1ececc07	pool1a7aszrwcq5smgeqv3k9usw2mlj4sjtynncd4cms7emxqwhx9hc5
+\.
+
+
+--
+-- Data for Name: pool_metadata_ref; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pool_metadata_ref (id, pool_id, url, hash, registered_tx_id) FROM stdin;
+1	3	https://pools.iohk.io/IOG1.json	\\x22cf1de98f4cf4ce61bef2c6bc99890cb39f1452f5143189ce3a69ad70fcde72	13
+2	2	https://pools.iohk.io/IOG2.json	\\x04faac1dce6c68b6bdf406eb261fbc6f57ce0baa9ab039d8e3bb1de8f903f092	16
+3	1	https://pools.iohk.io/IOG3.json	\\x47d5ad9a718bfd40892ab89eb46b34ef2b1ebce9ebba6f5410a1ab96284771ed	19
+\.
+
+
+--
+-- Data for Name: pool_offline_data; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pool_offline_data (id, pool_id, ticker_name, hash, json, bytes, pmr_id) FROM stdin;
+1	3	IOG1	\\x22cf1de98f4cf4ce61bef2c6bc99890cb39f1452f5143189ce3a69ad70fcde72	{"name": "Input Output Global (IOHK) - 1", "ticker": "IOG1", "homepage": "https://iohk.io", "description": "Our mission is to provide economic identity to the billions of people who lack it. IOHK will not use the IOHK ticker."}	\\x7b0a2020226e616d65223a2022496e707574204f757470757420476c6f62616c2028494f484b29202d2031222c0a2020227469636b6572223a2022494f4731222c0a2020226465736372697074696f6e223a20224f7572206d697373696f6e20697320746f2070726f766964652065636f6e6f6d6963206964656e7469747920746f207468652062696c6c696f6e73206f662070656f706c652077686f206c61636b2069742e20494f484b2077696c6c206e6f74207573652074686520494f484b207469636b65722e222c0a202022686f6d6570616765223a202268747470733a2f2f696f686b2e696f220a7d0a	1
+\.
+
+
+--
+-- Data for Name: pool_offline_fetch_error; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pool_offline_fetch_error (id, pool_id, fetch_time, pmr_id, fetch_error, retry_count) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pool_owner; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pool_owner (id, addr_id, pool_update_id) FROM stdin;
+1	6	4
+2	5	5
+3	4	6
+\.
+
+
+--
+-- Data for Name: pool_relay; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pool_relay (id, update_id, ipv4, ipv6, dns_name, dns_srv_name, port) FROM stdin;
+1	4	127.0.0.1	\N	\N	\N	3001
+2	5	127.0.0.1	\N	\N	\N	3001
+3	6	127.0.0.1	\N	\N	\N	3001
+\.
+
+
+--
+-- Data for Name: pool_retire; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pool_retire (id, hash_id, cert_index, announced_tx_id, retiring_epoch) FROM stdin;
+\.
+
+
+--
+-- Data for Name: pool_update; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pool_update (id, hash_id, cert_index, vrf_key_hash, pledge, active_epoch_no, meta_id, margin, fixed_cost, registered_tx_id, reward_addr_id) FROM stdin;
+1	1	0	\\xa28512f8b8e6b6c66c719930127e81179656c45c9a5cc5b0f9b118393ac0500c	0	2	\N	0	0	10	4
+2	2	1	\\x505a6342915ebf19e207673caea13992c2ee5950eecf6383e19d6aff29a1d8dc	0	2	\N	0	0	10	5
+3	3	2	\\x2518f49e00bf465defd509ba5163939ba6eb118d6d40b2f636e3e6929cdd6194	0	2	\N	0	0	10	6
+4	3	0	\\x2518f49e00bf465defd509ba5163939ba6eb118d6d40b2f636e3e6929cdd6194	500000000	3	1	0.149999999999999994	345000000	13	6
+5	2	0	\\x505a6342915ebf19e207673caea13992c2ee5950eecf6383e19d6aff29a1d8dc	500000000	3	2	0.149999999999999994	345000000	16	5
+6	1	0	\\xa28512f8b8e6b6c66c719930127e81179656c45c9a5cc5b0f9b118393ac0500c	500000000	3	3	0.149999999999999994	345000000	19	4
+\.
+
+
+--
+-- Data for Name: pot_transfer; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pot_transfer (id, cert_index, treasury, reserves, tx_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: redeemer; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.redeemer (id, tx_id, unit_mem, unit_steps, fee, purpose, index, script_hash, redeemer_data_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: redeemer_data; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.redeemer_data (id, hash, tx_id, value, bytes) FROM stdin;
+\.
+
+
+--
+-- Data for Name: reference_tx_in; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.reference_tx_in (id, tx_in_id, tx_out_id, tx_out_index) FROM stdin;
+\.
+
+
+--
+-- Data for Name: reserve; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.reserve (id, addr_id, cert_index, amount, tx_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: reserved_pool_ticker; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.reserved_pool_ticker (id, name, pool_hash) FROM stdin;
+\.
+
+
+--
+-- Data for Name: reward; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.reward (id, addr_id, type, amount, earned_epoch, spendable_epoch, pool_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: schema_version; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.schema_version (id, stage_one, stage_two, stage_three) FROM stdin;
+1	9	19	9
+\.
+
+
+--
+-- Data for Name: script; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.script (id, tx_id, hash, type, json, bytes, serialised_size) FROM stdin;
+1	20	\\x91368c4092f604d7973ae1877ccdddfe9037f2bdc35d0680c1b7dc3a	timelock	{"type": "sig", "keyHash": "d315d4265d278d6283a75283999e066408fb8fe06b76fd468bb7d20d"}	\N	\N
+2	27	\\xe6e9a01c4a0d8cc7e67615dc30f74f17408936c816a7d5e6dae65491	timelock	{"type": "all", "scripts": [{"type": "sig", "keyHash": "07f15f9802e751b054df8dee2f4f9cea90a400cd699033f0e2bc01af"}]}	\N	\N
+\.
+
+
+--
+-- Data for Name: slot_leader; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.slot_leader (id, hash, pool_hash_id, description) FROM stdin;
+1	\\x792ed25e9282b2db0bc00490b2d34513d37d4a90b87c112e3d469bf3	\N	Genesis slot leader
+2	\\x5368656c6c65792047656e6573697320536c6f744c65616465722048	\N	Shelley Genesis slot leader
+7	\\xb1e0e260abdeae0128c99109a02675b4a6d83cf71b39c195bd48ecc2	2	Pool-b1e0e260abdeae01
+4	\\x424e0283b504a83a909647ad54dad3537554ee003b6990bb796f693a	1	Pool-424e0283b504a83a
+3	\\xefbb010dd80521b4640c8d8bc8395bfcab092c939e1b5c6e1ececc07	3	Pool-efbb010dd80521b4
+\.
+
+
+--
+-- Data for Name: stake_address; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.stake_address (id, hash_raw, view, script_hash, tx_id) FROM stdin;
+1	\\xe037b7b4a50fca0044a4a8ae25a8ceb9a436ad027dea556d1b31255fa6	stake_test1uqmm0d99pl9qq39y4zhzt2xwhxjrdtgz0h492mgmxyj4lfsepzuda	\N	4
+3	\\xe037bc4ccd70f09fa5024c779c7ccacdbc20b0f1d23987f220195d0903	stake_test1uqmmcnxdwrcflfgzf3meclx2ek7zpv836guc0u3qr9wsjqcergrak	\N	9
+2	\\xe043d4f7a46823fb623bd07fed4ff0969086ad63b6c8c56bb6dae8de12	stake_test1uppafaaydq3lkc3m6pl76nlsj6ggdttrkmyv26akmt5duys33vx9p	\N	8
+6	\\xe0703f5952ce3557d5975c8355584ffc12eb57b939bb719694b0d7eb1d	stake_test1upcr7k2jec6404vhtjp42kz0lsfwk4ae8xahr955krt7k8g42r0w3	\N	10
+5	\\xe0a28ae90e904ce40ff31df3d87fb593628c9aa2da343a1555ae17afe7	stake_test1uz3g46gwjpxwgrlnrheasla4jd3gex4zmg6r59244ct6lecqmj50j	\N	10
+4	\\xe0d64b5a0548271633eb5b630d38ed4e57155c05a504f59abf9a27ac8f	stake_test1urtykks9fqn3vvlttd3s6w8dfet32hq955z0tx4lngn6erck45nkg	\N	10
+13	\\xe040cfe97e479103d375d23f217c431697b2e9a947d8bbfc1cc13a8542	stake_test1upqvl6t7g7gs85m46gljzlzrz6tm96dfglvthlqucyag2ssrsezzl	\N	20
+15	\\xe01bf1e138f2f8beabc963c94cc28ee8ed4b41744601f2edaf50b21efd	stake_test1uqdlrcfc7tuta27fv0y5es5wark5kst5gcql9md02zepalg9yxxuz	\N	21
+16	\\xe0e0b30dc21735b34227c3c3d7a433865f2835916d5242155f10a08882	stake_test1urstxrwzzu6mxs38c0pa0fpnse0jsdv3d4fyy92lzzsg3qssvrwys	\N	21
+17	\\xe09394c5bb6bc96115c9dc4468d020a99abff4aa2deda81b4bc6665bea	stake_test1uzfef3dmd0ykz9wfm3zx35pq4xdtla929hk6sx6tcen9h6s3vf52j	\N	21
+18	\\xe0a84bacc10de2203d30331255459b8e1736a22134cc554d1ed5789a72	stake_test1uz5yhtxpph3zq0fsxvf923vm3ctndg3pxnx92ng764uf5usnqkg5v	\N	21
+19	\\xe07d169940ca3c8650be89501d931b30929202d1bf5585eee545da89e4	stake_test1up73dx2qeg7gv59739gpmycmxzffyqk3ha2ctmh9ghdgneqmy000q	\N	22
+14	\\xe0f15db05f56035465bf8900a09bdaa16c3d8b8244fea686524408dd80	stake_test1urc4mvzl2cp4gedl3yq2px7659krmzuzgnl2dpjjgsydmqqxgamj7	\N	21
+\.
+
+
+--
+-- Data for Name: stake_deregistration; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.stake_deregistration (id, addr_id, cert_index, epoch_no, tx_id, redeemer_id) FROM stdin;
+1	14	0	2	23	\N
+\.
+
+
+--
+-- Data for Name: stake_registration; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.stake_registration (id, addr_id, cert_index, epoch_no, tx_id) FROM stdin;
+1	1	0	0	10
+2	3	2	0	10
+3	2	4	0	10
+4	6	0	0	12
+5	5	0	0	15
+6	4	0	0	18
+7	14	0	2	22
+\.
+
+
+--
+-- Data for Name: treasury; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.treasury (id, addr_id, cert_index, amount, tx_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: tx; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.tx (id, hash, block_id, block_index, out_sum, fee, deposit, size, invalid_before, invalid_hereafter, valid_contract, script_size) FROM stdin;
+1	\\xd3825609fac97c5d9f989742c7f690b5b9c45ec1dc25d3ee888a63144ad153db	1	0	3340000000	0	0	0	\N	\N	t	0
+2	\\x95ca0730aa7f4060d282df48c49a42df9d99916e9595144a582b6f4a94cfe23d	1	0	3340000000	0	0	0	\N	\N	t	0
+3	\\x9f08033c1a68a4b34b14ff1b166d672dac2958b530623161852b267ade5c6514	1	0	3340000000	0	0	0	\N	\N	t	0
+4	\\x02bac1805ef20ca6217994c1c3f5be4d99ad10ea535127ec84709217c5958b83	2	0	13500000000000000	0	0	0	\N	\N	t	0
+5	\\x81f15eaf9ada76ae73b4087c9a5c8cba0b59a72e8766c32453d504fc57364d8e	2	0	13500000000000000	0	0	0	\N	\N	t	0
+6	\\x9a869f1a6ccee3812885b09a14a130bc0362cd084bcf16a6ac29b0c865a74ee3	2	0	13500000000000000	0	0	0	\N	\N	t	0
+7	\\xe2101b9b12b1daf4faaaaf6f4a41ba224e2cfea566c48d77939a0da881eb1e38	2	0	13500000000000000	0	0	0	\N	\N	t	0
+8	\\xe6d0604bf19a2248fcd1ade37ee4c12aa6e742fa14a23c1ca377e276c3db9a5c	2	0	13500000000000000	0	0	0	\N	\N	t	0
+9	\\xf6ba18a743013baa73e89559c1c83c8cb948316e01342aa90fb9f8b461a6865d	2	0	13500000000000000	0	0	0	\N	\N	t	0
+10	\\x5368656c6c65792047656e65736973205374616b696e67205478204861736820	2	0	0	0	0	0	\N	\N	t	0
+11	\\x7c2cfeb24798082240f3b489e71187e13deddfb9e5031bd15322d25ec8361dd7	3	0	13499999999833047	166953	0	263	\N	\N	t	0
+12	\\xcd79c996c8b163fccc31c783da06b1b25f30c770e787b39c18e7814b984e7aa3	7	0	999820859	179141	0	361	\N	5000000	t	0
+13	\\xf5efb8545340701aa4c0d7cc60dff6600cf6ddc9131573a3dad3e21faa355aa1	8	0	999624118	196741	0	715	\N	500000	t	0
+14	\\x1dccfbc8c45e81da9da99099a5641353ac284bf6e0489dfe97ab3bc4a30db97e	10	0	13499998999666094	166953	0	263	\N	\N	t	0
+15	\\xfafa242e4a1c8256b927bd5d0bc3d9bf2674ba8e4781e4ff1f7957faf889024d	12	0	999820859	179141	0	361	\N	5000000	t	0
+16	\\x6902a9bd51bf060e5e2a12fe7cd7edbd60479eb484aa46eee29dce97baddeb7e	14	0	999624118	196741	0	715	\N	500000	t	0
+17	\\xf5ead0923f6540dcd12c2648564a50595348f2b51b60afabe1652563b99720a0	18	0	13499997999499141	166953	0	263	\N	\N	t	0
+18	\\x07a23daad542e2c9f729d652416012b044f05774e6913d74a5d09f046f698882	19	0	999820859	179141	0	361	\N	5000000	t	0
+19	\\x377feef42fc09036918ac9af0a0f3bd004c8fc2e5b040d4c80c425a8a68582f3	21	0	999624118	196741	0	715	\N	500000	t	0
+20	\\x5d280f59d030965405c167e3e37205b9174c2a7d22c99203c7f8b98e8f76ea06	24	0	13499999999822839	177161	0	495	\N	\N	t	0
+21	\\xac5b1dff87e5579887e1d5bac7caec83a86f4b0f735a9b89def81fef9cafb8de	24	1	13499999999820375	179625	0	551	\N	\N	t	0
+22	\\x7e29d35ae0dbadf99b45befdf6356b4d2d1f118b12ce7456c2799ff3ce32a44c	110	0	4999999822751	177249	0	492	\N	4783	t	0
+23	\\xcca9aa2813a01827a5d90a13ecce512c943f6cf5d9264cd4275ad31a30ec5f64	111	0	4999998651178	171573	0	363	\N	4794	t	0
+24	\\xdd4b9d9b7f167850c0201a12ad2780e464f489b289bca590e865d68704ff7079	114	0	4999998480925	170253	0	333	\N	4815	t	0
+25	\\x11b5c09f511b7d58ca989d198cf1bbf15f47e7e8f120becfa18a88ea43f8b99b	120	0	4999998310760	170165	0	331	\N	4865	t	0
+26	\\x6a6e18b6993e99613b109a1f2b07e1b192490e6a259dc56c6da9ff24028fb7d8	120	1	4999998140595	170165	0	331	\N	4865	t	0
+27	\\x1ae130ff254dddec5db2e0002f5d4e5b381820fa36f95513d091c7634c7aae19	128	0	1999998849579	202461	0	1065	\N	4934	t	0
+28	\\x8c3dc35acaac3c30da76104307ab95cb1aaad9b698a382227972852be5339216	131	0	3000048908226	180329	0	562	\N	4957	t	0
+\.
+
+
+--
+-- Data for Name: tx_in; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.tx_in (id, tx_in_id, tx_out_id, tx_out_index, redeemer_id) FROM stdin;
+1	11	6	0	\N
+2	12	11	1	\N
+3	13	12	0	\N
+4	14	11	0	\N
+5	15	14	1	\N
+6	16	15	0	\N
+7	17	14	0	\N
+8	18	17	1	\N
+9	19	18	0	\N
+10	20	7	0	\N
+11	21	5	0	\N
+12	22	21	1	\N
+13	23	22	1	\N
+14	24	23	0	\N
+15	25	24	0	\N
+16	25	24	1	\N
+17	26	25	0	\N
+18	26	25	1	\N
+19	27	26	1	\N
+20	28	27	0	\N
+21	28	26	0	\N
+\.
+
+
+--
+-- Data for Name: tx_metadata; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.tx_metadata (id, key, json, bytes, tx_id) FROM stdin;
+1	123	"1234"	\\xa1187b6431323334	24
+2	721	{"e6e9a01c4a0d8cc7e67615dc30f74f17408936c816a7d5e6dae65491": {"NFT-001": {"name": "One", "image": ["ipfs://some_hash1"], "version": "1.0"}, "NFT-002": {"name": "Two", "image": ["ipfs://some_hash2"], "version": "1.0"}, "NFT-files": {"id": "1", "name": "NFT with files", "files": [{"src": ["file://some_video_file"], "name": "some name", "mediaType": "video/mp4"}, {"src": ["file://some_audio_file", "file://another_audio_file"], "name": "some name", "mediaType": "audio/mpeg"}], "image": ["ipfs://somehash"], "version": "1.0", "mediaType": "image/png", "description": ["NFT with different types of files"]}}}	\\xa11902d1a178386536653961303163346130643863633765363736313564633330663734663137343038393336633831366137643565366461653635343931a3674e46542d303031a365696d6167658171697066733a2f2f736f6d655f6861736831646e616d65634f6e656776657273696f6e63312e30674e46542d303032a365696d6167658171697066733a2f2f736f6d655f6861736832646e616d656354776f6776657273696f6e63312e30694e46542d66696c6573a76b6465736372697074696f6e8178214e4654207769746820646966666572656e74207479706573206f662066696c65736566696c657382a3696d656469615479706569766964656f2f6d7034646e616d6569736f6d65206e616d6563737263817666696c653a2f2f736f6d655f766964656f5f66696c65a3696d65646961547970656a617564696f2f6d706567646e616d6569736f6d65206e616d6563737263827666696c653a2f2f736f6d655f617564696f5f66696c65781966696c653a2f2f616e6f746865725f617564696f5f66696c65626964613165696d616765816f697066733a2f2f736f6d6568617368696d656469615479706569696d6167652f706e67646e616d656e4e465420776974682066696c65736776657273696f6e63312e30	27
+\.
+
+
+--
+-- Data for Name: tx_out; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.tx_out (id, tx_id, index, address, address_raw, address_has_script, payment_cred, stake_address_id, value, data_hash, inline_datum_id, reference_script_id) FROM stdin;
+1	1	0	5oP9ib6ym3XZwoqKpFVrEFxXS1nBnJ7h5zGBbFak3QiBZgXhuvDUwKzT9gVBtkugoL	\\x82d818582683581c2fb95d1b70431a3ec9352d6dbfa8eeab69bfc8046a829fa3c3d68c89a10243190378001a9201472b	f	\N	\N	3340000000	\N	\N	\N
+2	2	0	5oP9ib6ym3XhKv2CAjqi1jvfNdi8tT3SSTXXT98twpYLXJWR8mvbKWNH7VXdzsJR1j	\\x82d818582683581cc4468b9ed2330f9222be37762069dd952de174a32f2956e072df81dda10243190378001a914801f2	f	\N	\N	3340000000	\N	\N	\N
+3	3	0	5oP9ib6ym3XhQEyZ4Hc7SQHtBcxyCjj8JMmG2QdNaP2JYgicASvs1ahrjk5gUQQfdo	\\x82d818582683581cc5c6e65deb30f39ab9b31ce903db620d466c54c5a8b3d9929504b985a10243190378001a3371ea56	f	\N	\N	3340000000	\N	\N	\N
+4	4	0	addr_test1qz2nq0qarzqrytenzej87mjc703zye52dt6xdye4jj0yvwphk7622r72qpz2f29wyk5vawdyx6ksyl0224k3kvf9t7nqzle8um	\\x0095303c1d1880322f3316647f6e58f3e222668a6af4669335949e463837b7b4a50fca0044a4a8ae25a8ceb9a436ad027dea556d1b31255fa6	f	\\x95303c1d1880322f3316647f6e58f3e222668a6af4669335949e4638	\N	13500000000000000	\N	\N	\N
+5	5	0	addr_test1vpq03cl5tvenyrfsuj256wmcnjx58ju9fem5alk4n5k4uxqefnhp9	\\x6040f8e3f45b33320d30e4954d3b789c8d43cb854e774efed59d2d5e18	f	\\x40f8e3f45b33320d30e4954d3b789c8d43cb854e774efed59d2d5e18	\N	13500000000000000	\N	\N	\N
+6	6	0	addr_test1vq5yy3snfjynnr63tvke8r8vapkqv5vkuy0sgka4tkzrrmg3vypg6	\\x60284246134c89398f515b2d938cece86c065196e11f045bb55d8431ed	f	\\x284246134c89398f515b2d938cece86c065196e11f045bb55d8431ed	\N	13500000000000000	\N	\N	\N
+7	7	0	addr_test1vrf3t4pxt5nc6c5r5afg8xv7qejq37u0up4hdl2x3wmayrgghqc2q	\\x60d315d4265d278d6283a75283999e066408fb8fe06b76fd468bb7d20d	f	\\xd315d4265d278d6283a75283999e066408fb8fe06b76fd468bb7d20d	\N	13500000000000000	\N	\N	\N
+8	8	0	addr_test1qpuw5t5yj274m9qlz6zeyz2u8dw474l7umze6pdfflkvk9zr6nm6g6prld3rh5rla48lp95ss6kk8dkgc44mdkhgmcfqvy399x	\\x0078ea2e8492bd5d941f168592095c3b5d5f57fee6c59d05a94feccb1443d4f7a46823fb623bd07fed4ff0969086ad63b6c8c56bb6dae8de12	f	\\x78ea2e8492bd5d941f168592095c3b5d5f57fee6c59d05a94feccb14	\N	13500000000000000	\N	\N	\N
+9	9	0	addr_test1qz9xzcvwn2aqzfc9h5394s0hfznvg4szwpnhma2fteulfyphh3xv6u8sn7jsynrhn37v4nduyzc0r53eslezqx2apypsed3fy8	\\x008a61618e9aba012705bd225ac1f748a6c4560270677df5495e79f49037bc4ccd70f09fa5024c779c7ccacdbc20b0f1d23987f220195d0903	f	\\x8a61618e9aba012705bd225ac1f748a6c4560270677df5495e79f490	\N	13500000000000000	\N	\N	\N
+10	11	0	addr_test1vq5yy3snfjynnr63tvke8r8vapkqv5vkuy0sgka4tkzrrmg3vypg6	\\x60284246134c89398f515b2d938cece86c065196e11f045bb55d8431ed	f	\\x284246134c89398f515b2d938cece86c065196e11f045bb55d8431ed	\N	13499998999833047	\N	\N	\N
+11	11	1	addr_test1qq5yy3snfjynnr63tvke8r8vapkqv5vkuy0sgka4tkzrrmts8av49n342l2ewhyr24vyllqjadtmjwdmwxtffvxhavws2fgj3c	\\x00284246134c89398f515b2d938cece86c065196e11f045bb55d8431ed703f5952ce3557d5975c8355584ffc12eb57b939bb719694b0d7eb1d	f	\\x284246134c89398f515b2d938cece86c065196e11f045bb55d8431ed	6	1000000000	\N	\N	\N
+12	12	0	addr_test1qq5yy3snfjynnr63tvke8r8vapkqv5vkuy0sgka4tkzrrmts8av49n342l2ewhyr24vyllqjadtmjwdmwxtffvxhavws2fgj3c	\\x00284246134c89398f515b2d938cece86c065196e11f045bb55d8431ed703f5952ce3557d5975c8355584ffc12eb57b939bb719694b0d7eb1d	f	\\x284246134c89398f515b2d938cece86c065196e11f045bb55d8431ed	6	999820859	\N	\N	\N
+13	13	0	addr_test1qq5yy3snfjynnr63tvke8r8vapkqv5vkuy0sgka4tkzrrmts8av49n342l2ewhyr24vyllqjadtmjwdmwxtffvxhavws2fgj3c	\\x00284246134c89398f515b2d938cece86c065196e11f045bb55d8431ed703f5952ce3557d5975c8355584ffc12eb57b939bb719694b0d7eb1d	f	\\x284246134c89398f515b2d938cece86c065196e11f045bb55d8431ed	6	999624118	\N	\N	\N
+14	14	0	addr_test1vq5yy3snfjynnr63tvke8r8vapkqv5vkuy0sgka4tkzrrmg3vypg6	\\x60284246134c89398f515b2d938cece86c065196e11f045bb55d8431ed	f	\\x284246134c89398f515b2d938cece86c065196e11f045bb55d8431ed	\N	13499997999666094	\N	\N	\N
+15	14	1	addr_test1qq5yy3snfjynnr63tvke8r8vapkqv5vkuy0sgka4tkzrrmdz3t5sayzvus8lx80nmplmtymz3jd29k358g24ttsh4lns9qemnt	\\x00284246134c89398f515b2d938cece86c065196e11f045bb55d8431eda28ae90e904ce40ff31df3d87fb593628c9aa2da343a1555ae17afe7	f	\\x284246134c89398f515b2d938cece86c065196e11f045bb55d8431ed	5	1000000000	\N	\N	\N
+16	15	0	addr_test1qq5yy3snfjynnr63tvke8r8vapkqv5vkuy0sgka4tkzrrmdz3t5sayzvus8lx80nmplmtymz3jd29k358g24ttsh4lns9qemnt	\\x00284246134c89398f515b2d938cece86c065196e11f045bb55d8431eda28ae90e904ce40ff31df3d87fb593628c9aa2da343a1555ae17afe7	f	\\x284246134c89398f515b2d938cece86c065196e11f045bb55d8431ed	5	999820859	\N	\N	\N
+17	16	0	addr_test1qq5yy3snfjynnr63tvke8r8vapkqv5vkuy0sgka4tkzrrmdz3t5sayzvus8lx80nmplmtymz3jd29k358g24ttsh4lns9qemnt	\\x00284246134c89398f515b2d938cece86c065196e11f045bb55d8431eda28ae90e904ce40ff31df3d87fb593628c9aa2da343a1555ae17afe7	f	\\x284246134c89398f515b2d938cece86c065196e11f045bb55d8431ed	5	999624118	\N	\N	\N
+18	17	0	addr_test1vq5yy3snfjynnr63tvke8r8vapkqv5vkuy0sgka4tkzrrmg3vypg6	\\x60284246134c89398f515b2d938cece86c065196e11f045bb55d8431ed	f	\\x284246134c89398f515b2d938cece86c065196e11f045bb55d8431ed	\N	13499996999499141	\N	\N	\N
+19	17	1	addr_test1qq5yy3snfjynnr63tvke8r8vapkqv5vkuy0sgka4tkzrrmwkfddq2jp8zce7kkmrp5uw6njhz4wqtfgy7kdtlx384j8sd7wf6x	\\x00284246134c89398f515b2d938cece86c065196e11f045bb55d8431edd64b5a0548271633eb5b630d38ed4e57155c05a504f59abf9a27ac8f	f	\\x284246134c89398f515b2d938cece86c065196e11f045bb55d8431ed	4	1000000000	\N	\N	\N
+20	18	0	addr_test1qq5yy3snfjynnr63tvke8r8vapkqv5vkuy0sgka4tkzrrmwkfddq2jp8zce7kkmrp5uw6njhz4wqtfgy7kdtlx384j8sd7wf6x	\\x00284246134c89398f515b2d938cece86c065196e11f045bb55d8431edd64b5a0548271633eb5b630d38ed4e57155c05a504f59abf9a27ac8f	f	\\x284246134c89398f515b2d938cece86c065196e11f045bb55d8431ed	4	999820859	\N	\N	\N
+21	19	0	addr_test1qq5yy3snfjynnr63tvke8r8vapkqv5vkuy0sgka4tkzrrmwkfddq2jp8zce7kkmrp5uw6njhz4wqtfgy7kdtlx384j8sd7wf6x	\\x00284246134c89398f515b2d938cece86c065196e11f045bb55d8431edd64b5a0548271633eb5b630d38ed4e57155c05a504f59abf9a27ac8f	f	\\x284246134c89398f515b2d938cece86c065196e11f045bb55d8431ed	4	999624118	\N	\N	\N
+22	20	0	addr_test1qqen0wpmhg7fhkus45lyv4wju26cecgu6avplrnm6dgvuk6qel5hu3u3q0fht53ly97yx95hkt56j37ch07pesf6s4pqh5gd4e	\\x003337b83bba3c9bdb90ad3e4655d2e2b58ce11cd7581f8e7bd350ce5b40cfe97e479103d375d23f217c431697b2e9a947d8bbfc1cc13a8542	f	\\x3337b83bba3c9bdb90ad3e4655d2e2b58ce11cd7581f8e7bd350ce5b	13	13499999989822839	\N	\N	\N
+23	20	1	addr_test1qqen0wpmhg7fhkus45lyv4wju26cecgu6avplrnm6dgvuk6qel5hu3u3q0fht53ly97yx95hkt56j37ch07pesf6s4pqh5gd4e	\\x003337b83bba3c9bdb90ad3e4655d2e2b58ce11cd7581f8e7bd350ce5b40cfe97e479103d375d23f217c431697b2e9a947d8bbfc1cc13a8542	f	\\x3337b83bba3c9bdb90ad3e4655d2e2b58ce11cd7581f8e7bd350ce5b	13	10000000	\N	\N	\N
+24	21	0	addr_test1vpq03cl5tvenyrfsuj256wmcnjx58ju9fem5alk4n5k4uxqefnhp9	\\x6040f8e3f45b33320d30e4954d3b789c8d43cb854e774efed59d2d5e18	f	\\x40f8e3f45b33320d30e4954d3b789c8d43cb854e774efed59d2d5e18	\N	13474999999820375	\N	\N	\N
+25	21	1	addr_test1qpw0djgj0x59ngrjvqthn7enhvruxnsavsw5th63la3mjel3tkc974sr23jmlzgq5zda4gtv8k9cy38756r9y3qgmkqqjz6aa7	\\x005cf6c91279a859a072601779fb33bb07c34e1d641d45df51ff63b967f15db05f56035465bf8900a09bdaa16c3d8b8244fea686524408dd80	f	\\x5cf6c91279a859a072601779fb33bb07c34e1d641d45df51ff63b967	14	5000000000000	\N	\N	\N
+26	21	2	addr_test1qrml5hwl9s7ydm2djyup95ud6s74skkl4zzf8zk657s8thgm78sn3uhch64ujc7ffnpga68dfdqhg3sp7tk6759jrm7spy03k9	\\x00f7fa5ddf2c3c46ed4d913812d38dd43d585adfa884938adaa7a075dd1bf1e138f2f8beabc963c94cc28ee8ed4b41744601f2edaf50b21efd	f	\\xf7fa5ddf2c3c46ed4d913812d38dd43d585adfa884938adaa7a075dd	15	5000000000000	\N	\N	\N
+27	21	3	addr_test1qrxhyr2flena4ams5pcx26n0yj4ttpmjq2tmuesu4waw8n0qkvxuy9e4kdpz0s7r67jr8pjl9q6ezm2jgg247y9q3zpqxga37s	\\x00cd720d49fe67daf770a070656a6f24aab587720297be661cabbae3cde0b30dc21735b34227c3c3d7a433865f2835916d5242155f10a08882	f	\\xcd720d49fe67daf770a070656a6f24aab587720297be661cabbae3cd	16	5000000000000	\N	\N	\N
+28	21	4	addr_test1qpv5muwgjmmtqh2ta0kq9pmz0nurg9kmw7dryueqt57mncynjnzmk67fvy2unhzydrgzp2v6hl625t0d4qd5h3nxt04qu0ww7k	\\x00594df1c896f6b05d4bebec0287627cf83416db779a3273205d3db9e09394c5bb6bc96115c9dc4468d020a99abff4aa2deda81b4bc6665bea	f	\\x594df1c896f6b05d4bebec0287627cf83416db779a3273205d3db9e0	17	5000000000000	\N	\N	\N
+29	21	5	addr_test1qr0c3frkem9cqn5f73dnvqpena27k2fgqew6wct9eaka03agfwkvzr0zyq7nqvcj24zehrshx63zzdxv24x3a4tcnfeq9zwmn7	\\x00df88a476cecb804e89f45b3600399f55eb2928065da76165cf6dd7c7a84bacc10de2203d30331255459b8e1736a22134cc554d1ed5789a72	f	\\xdf88a476cecb804e89f45b3600399f55eb2928065da76165cf6dd7c7	18	5000000000000	\N	\N	\N
+30	22	0	addr_test1qqk9y8lt37jk5k4672nefy2ga9l3vxg3xdqgsvpgkq78httaz6v5pj3usegtaz2srkf3kvyjjgpdr064shhw23w638jqs72jll	\\x002c521feb8fa56a5abaf2a7949148e97f1619113340883028b03c7bad7d169940ca3c8650be89501d931b30929202d1bf5585eee545da89e4	f	\\x2c521feb8fa56a5abaf2a7949148e97f1619113340883028b03c7bad	19	1000000	\N	\N	\N
+31	22	1	addr_test1qpw0djgj0x59ngrjvqthn7enhvruxnsavsw5th63la3mjel3tkc974sr23jmlzgq5zda4gtv8k9cy38756r9y3qgmkqqjz6aa7	\\x005cf6c91279a859a072601779fb33bb07c34e1d641d45df51ff63b967f15db05f56035465bf8900a09bdaa16c3d8b8244fea686524408dd80	f	\\x5cf6c91279a859a072601779fb33bb07c34e1d641d45df51ff63b967	14	4999998822751	\N	\N	\N
+32	23	0	addr_test1qpw0djgj0x59ngrjvqthn7enhvruxnsavsw5th63la3mjel3tkc974sr23jmlzgq5zda4gtv8k9cy38756r9y3qgmkqqjz6aa7	\\x005cf6c91279a859a072601779fb33bb07c34e1d641d45df51ff63b967f15db05f56035465bf8900a09bdaa16c3d8b8244fea686524408dd80	f	\\x5cf6c91279a859a072601779fb33bb07c34e1d641d45df51ff63b967	14	4999998651178	\N	\N	\N
+33	24	0	addr_test1qpw0djgj0x59ngrjvqthn7enhvruxnsavsw5th63la3mjel3tkc974sr23jmlzgq5zda4gtv8k9cy38756r9y3qgmkqqjz6aa7	\\x005cf6c91279a859a072601779fb33bb07c34e1d641d45df51ff63b967f15db05f56035465bf8900a09bdaa16c3d8b8244fea686524408dd80	f	\\x5cf6c91279a859a072601779fb33bb07c34e1d641d45df51ff63b967	14	969750	\N	\N	\N
+34	24	1	addr_test1qpw0djgj0x59ngrjvqthn7enhvruxnsavsw5th63la3mjel3tkc974sr23jmlzgq5zda4gtv8k9cy38756r9y3qgmkqqjz6aa7	\\x005cf6c91279a859a072601779fb33bb07c34e1d641d45df51ff63b967f15db05f56035465bf8900a09bdaa16c3d8b8244fea686524408dd80	f	\\x5cf6c91279a859a072601779fb33bb07c34e1d641d45df51ff63b967	14	4999997511175	\N	\N	\N
+35	25	0	addr_test1qpw0djgj0x59ngrjvqthn7enhvruxnsavsw5th63la3mjel3tkc974sr23jmlzgq5zda4gtv8k9cy38756r9y3qgmkqqjz6aa7	\\x005cf6c91279a859a072601779fb33bb07c34e1d641d45df51ff63b967f15db05f56035465bf8900a09bdaa16c3d8b8244fea686524408dd80	f	\\x5cf6c91279a859a072601779fb33bb07c34e1d641d45df51ff63b967	14	2999999088555	\N	\N	\N
+36	25	1	addr_test1qpw0djgj0x59ngrjvqthn7enhvruxnsavsw5th63la3mjel3tkc974sr23jmlzgq5zda4gtv8k9cy38756r9y3qgmkqqjz6aa7	\\x005cf6c91279a859a072601779fb33bb07c34e1d641d45df51ff63b967f15db05f56035465bf8900a09bdaa16c3d8b8244fea686524408dd80	f	\\x5cf6c91279a859a072601779fb33bb07c34e1d641d45df51ff63b967	14	1999999222205	\N	\N	\N
+37	26	0	addr_test1qpw0djgj0x59ngrjvqthn7enhvruxnsavsw5th63la3mjel3tkc974sr23jmlzgq5zda4gtv8k9cy38756r9y3qgmkqqjz6aa7	\\x005cf6c91279a859a072601779fb33bb07c34e1d641d45df51ff63b967f15db05f56035465bf8900a09bdaa16c3d8b8244fea686524408dd80	f	\\x5cf6c91279a859a072601779fb33bb07c34e1d641d45df51ff63b967	14	2999999088555	\N	\N	\N
+38	26	1	addr_test1qpw0djgj0x59ngrjvqthn7enhvruxnsavsw5th63la3mjel3tkc974sr23jmlzgq5zda4gtv8k9cy38756r9y3qgmkqqjz6aa7	\\x005cf6c91279a859a072601779fb33bb07c34e1d641d45df51ff63b967f15db05f56035465bf8900a09bdaa16c3d8b8244fea686524408dd80	f	\\x5cf6c91279a859a072601779fb33bb07c34e1d641d45df51ff63b967	14	1999999052040	\N	\N	\N
+39	27	0	addr_test1qpw0djgj0x59ngrjvqthn7enhvruxnsavsw5th63la3mjel3tkc974sr23jmlzgq5zda4gtv8k9cy38756r9y3qgmkqqjz6aa7	\\x005cf6c91279a859a072601779fb33bb07c34e1d641d45df51ff63b967f15db05f56035465bf8900a09bdaa16c3d8b8244fea686524408dd80	f	\\x5cf6c91279a859a072601779fb33bb07c34e1d641d45df51ff63b967	14	50000000	\N	\N	\N
+40	27	1	addr_test1qpw0djgj0x59ngrjvqthn7enhvruxnsavsw5th63la3mjel3tkc974sr23jmlzgq5zda4gtv8k9cy38756r9y3qgmkqqjz6aa7	\\x005cf6c91279a859a072601779fb33bb07c34e1d641d45df51ff63b967f15db05f56035465bf8900a09bdaa16c3d8b8244fea686524408dd80	f	\\x5cf6c91279a859a072601779fb33bb07c34e1d641d45df51ff63b967	14	1999948849579	\N	\N	\N
+41	28	0	addr_test1qpw0djgj0x59ngrjvqthn7enhvruxnsavsw5th63la3mjel3tkc974sr23jmlzgq5zda4gtv8k9cy38756r9y3qgmkqqjz6aa7	\\x005cf6c91279a859a072601779fb33bb07c34e1d641d45df51ff63b967f15db05f56035465bf8900a09bdaa16c3d8b8244fea686524408dd80	f	\\x5cf6c91279a859a072601779fb33bb07c34e1d641d45df51ff63b967	14	50000000	\N	\N	\N
+42	28	1	addr_test1qpw0djgj0x59ngrjvqthn7enhvruxnsavsw5th63la3mjel3tkc974sr23jmlzgq5zda4gtv8k9cy38756r9y3qgmkqqjz6aa7	\\x005cf6c91279a859a072601779fb33bb07c34e1d641d45df51ff63b967f15db05f56035465bf8900a09bdaa16c3d8b8244fea686524408dd80	f	\\x5cf6c91279a859a072601779fb33bb07c34e1d641d45df51ff63b967	14	2999998908226	\N	\N	\N
+\.
+
+
+--
+-- Data for Name: withdrawal; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.withdrawal (id, addr_id, amount, redeemer_id, tx_id) FROM stdin;
+\.
+
+
+--
+-- Name: ada_pots_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.ada_pots_id_seq', 3, true);
+
+
+--
+-- Name: block_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.block_id_seq', 133, true);
+
+
+--
+-- Name: collateral_tx_in_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.collateral_tx_in_id_seq', 1, false);
+
+
+--
+-- Name: collateral_tx_out_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.collateral_tx_out_id_seq', 1, false);
+
+
+--
+-- Name: cost_model_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.cost_model_id_seq', 3, true);
+
+
+--
+-- Name: datum_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.datum_id_seq', 1, false);
+
+
+--
+-- Name: delegation_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.delegation_id_seq', 7, true);
+
+
+--
+-- Name: delisted_pool_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.delisted_pool_id_seq', 1, false);
+
+
+--
+-- Name: epoch_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.epoch_id_seq', 3, true);
+
+
+--
+-- Name: epoch_param_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.epoch_param_id_seq', 3, true);
+
+
+--
+-- Name: epoch_stake_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.epoch_stake_id_seq', 15, true);
+
+
+--
+-- Name: epoch_sync_time_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.epoch_sync_time_id_seq', 2, true);
+
+
+--
+-- Name: extra_key_witness_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.extra_key_witness_id_seq', 1, false);
+
+
+--
+-- Name: ma_tx_mint_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.ma_tx_mint_id_seq', 8, true);
+
+
+--
+-- Name: ma_tx_out_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.ma_tx_out_id_seq', 9, true);
+
+
+--
+-- Name: meta_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.meta_id_seq', 1, true);
+
+
+--
+-- Name: multi_asset_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.multi_asset_id_seq', 7, true);
+
+
+--
+-- Name: param_proposal_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.param_proposal_id_seq', 1, false);
+
+
+--
+-- Name: pool_hash_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.pool_hash_id_seq', 3, true);
+
+
+--
+-- Name: pool_metadata_ref_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.pool_metadata_ref_id_seq', 3, true);
+
+
+--
+-- Name: pool_offline_data_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.pool_offline_data_id_seq', 1, true);
+
+
+--
+-- Name: pool_offline_fetch_error_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.pool_offline_fetch_error_id_seq', 1, false);
+
+
+--
+-- Name: pool_owner_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.pool_owner_id_seq', 3, true);
+
+
+--
+-- Name: pool_relay_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.pool_relay_id_seq', 3, true);
+
+
+--
+-- Name: pool_retire_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.pool_retire_id_seq', 1, false);
+
+
+--
+-- Name: pool_update_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.pool_update_id_seq', 6, true);
+
+
+--
+-- Name: pot_transfer_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.pot_transfer_id_seq', 1, false);
+
+
+--
+-- Name: redeemer_data_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.redeemer_data_id_seq', 1, false);
+
+
+--
+-- Name: redeemer_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.redeemer_id_seq', 1, false);
+
+
+--
+-- Name: reference_tx_in_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.reference_tx_in_id_seq', 1, false);
+
+
+--
+-- Name: reserve_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.reserve_id_seq', 1, false);
+
+
+--
+-- Name: reserved_pool_ticker_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.reserved_pool_ticker_id_seq', 1, false);
+
+
+--
+-- Name: reward_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.reward_id_seq', 1, false);
+
+
+--
+-- Name: schema_version_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.schema_version_id_seq', 1, true);
+
+
+--
+-- Name: script_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.script_id_seq', 2, true);
+
+
+--
+-- Name: slot_leader_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.slot_leader_id_seq', 133, true);
+
+
+--
+-- Name: stake_address_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.stake_address_id_seq', 20, true);
+
+
+--
+-- Name: stake_deregistration_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.stake_deregistration_id_seq', 1, true);
+
+
+--
+-- Name: stake_registration_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.stake_registration_id_seq', 7, true);
+
+
+--
+-- Name: treasury_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.treasury_id_seq', 1, false);
+
+
+--
+-- Name: tx_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.tx_id_seq', 28, true);
+
+
+--
+-- Name: tx_in_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.tx_in_id_seq', 21, true);
+
+
+--
+-- Name: tx_metadata_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.tx_metadata_id_seq', 2, true);
+
+
+--
+-- Name: tx_out_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.tx_out_id_seq', 42, true);
+
+
+--
+-- Name: withdrawal_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.withdrawal_id_seq', 1, false);
+
+
+--
+-- Name: ada_pots ada_pots_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ada_pots
+    ADD CONSTRAINT ada_pots_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: block block_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.block
+    ADD CONSTRAINT block_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: collateral_tx_in collateral_tx_in_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.collateral_tx_in
+    ADD CONSTRAINT collateral_tx_in_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: collateral_tx_out collateral_tx_out_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.collateral_tx_out
+    ADD CONSTRAINT collateral_tx_out_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: cost_model cost_model_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.cost_model
+    ADD CONSTRAINT cost_model_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: datum datum_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.datum
+    ADD CONSTRAINT datum_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: delegation delegation_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.delegation
+    ADD CONSTRAINT delegation_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: delisted_pool delisted_pool_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.delisted_pool
+    ADD CONSTRAINT delisted_pool_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: epoch_param epoch_param_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.epoch_param
+    ADD CONSTRAINT epoch_param_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: epoch epoch_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.epoch
+    ADD CONSTRAINT epoch_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: epoch_stake epoch_stake_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.epoch_stake
+    ADD CONSTRAINT epoch_stake_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: epoch_sync_time epoch_sync_time_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.epoch_sync_time
+    ADD CONSTRAINT epoch_sync_time_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: extra_key_witness extra_key_witness_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.extra_key_witness
+    ADD CONSTRAINT extra_key_witness_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: ma_tx_mint ma_tx_mint_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ma_tx_mint
+    ADD CONSTRAINT ma_tx_mint_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: ma_tx_out ma_tx_out_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ma_tx_out
+    ADD CONSTRAINT ma_tx_out_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: meta meta_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.meta
+    ADD CONSTRAINT meta_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: multi_asset multi_asset_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.multi_asset
+    ADD CONSTRAINT multi_asset_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: param_proposal param_proposal_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.param_proposal
+    ADD CONSTRAINT param_proposal_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pool_hash pool_hash_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_hash
+    ADD CONSTRAINT pool_hash_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pool_metadata_ref pool_metadata_ref_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_metadata_ref
+    ADD CONSTRAINT pool_metadata_ref_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pool_offline_data pool_offline_data_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_offline_data
+    ADD CONSTRAINT pool_offline_data_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pool_offline_fetch_error pool_offline_fetch_error_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_offline_fetch_error
+    ADD CONSTRAINT pool_offline_fetch_error_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pool_owner pool_owner_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_owner
+    ADD CONSTRAINT pool_owner_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pool_relay pool_relay_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_relay
+    ADD CONSTRAINT pool_relay_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pool_retire pool_retire_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_retire
+    ADD CONSTRAINT pool_retire_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pool_update pool_update_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_update
+    ADD CONSTRAINT pool_update_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pot_transfer pot_transfer_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pot_transfer
+    ADD CONSTRAINT pot_transfer_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: redeemer_data redeemer_data_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.redeemer_data
+    ADD CONSTRAINT redeemer_data_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: redeemer redeemer_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.redeemer
+    ADD CONSTRAINT redeemer_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: reference_tx_in reference_tx_in_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reference_tx_in
+    ADD CONSTRAINT reference_tx_in_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: reserve reserve_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reserve
+    ADD CONSTRAINT reserve_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: reserved_pool_ticker reserved_pool_ticker_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reserved_pool_ticker
+    ADD CONSTRAINT reserved_pool_ticker_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: reward reward_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reward
+    ADD CONSTRAINT reward_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: schema_version schema_version_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.schema_version
+    ADD CONSTRAINT schema_version_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: script script_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.script
+    ADD CONSTRAINT script_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: slot_leader slot_leader_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.slot_leader
+    ADD CONSTRAINT slot_leader_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: stake_address stake_address_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stake_address
+    ADD CONSTRAINT stake_address_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: stake_deregistration stake_deregistration_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stake_deregistration
+    ADD CONSTRAINT stake_deregistration_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: stake_registration stake_registration_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stake_registration
+    ADD CONSTRAINT stake_registration_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: treasury treasury_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.treasury
+    ADD CONSTRAINT treasury_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tx_in tx_in_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tx_in
+    ADD CONSTRAINT tx_in_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tx_metadata tx_metadata_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tx_metadata
+    ADD CONSTRAINT tx_metadata_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tx_out tx_out_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tx_out
+    ADD CONSTRAINT tx_out_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tx tx_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tx
+    ADD CONSTRAINT tx_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: ada_pots unique_ada_pots; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ada_pots
+    ADD CONSTRAINT unique_ada_pots UNIQUE (block_id);
+
+
+--
+-- Name: block unique_block; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.block
+    ADD CONSTRAINT unique_block UNIQUE (hash);
+
+
+--
+-- Name: collateral_tx_in unique_col_txin; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.collateral_tx_in
+    ADD CONSTRAINT unique_col_txin UNIQUE (tx_in_id, tx_out_id, tx_out_index);
+
+
+--
+-- Name: collateral_tx_out unique_col_txout; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.collateral_tx_out
+    ADD CONSTRAINT unique_col_txout UNIQUE (tx_id, index);
+
+
+--
+-- Name: cost_model unique_cost_model; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.cost_model
+    ADD CONSTRAINT unique_cost_model UNIQUE (hash);
+
+
+--
+-- Name: datum unique_datum; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.datum
+    ADD CONSTRAINT unique_datum UNIQUE (hash);
+
+
+--
+-- Name: delegation unique_delegation; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.delegation
+    ADD CONSTRAINT unique_delegation UNIQUE (tx_id, cert_index);
+
+
+--
+-- Name: delisted_pool unique_delisted_pool; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.delisted_pool
+    ADD CONSTRAINT unique_delisted_pool UNIQUE (hash_raw);
+
+
+--
+-- Name: epoch unique_epoch; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.epoch
+    ADD CONSTRAINT unique_epoch UNIQUE (no);
+
+
+--
+-- Name: epoch_param unique_epoch_param; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.epoch_param
+    ADD CONSTRAINT unique_epoch_param UNIQUE (epoch_no, block_id);
+
+
+--
+-- Name: epoch_sync_time unique_epoch_sync_time; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.epoch_sync_time
+    ADD CONSTRAINT unique_epoch_sync_time UNIQUE (no);
+
+
+--
+-- Name: ma_tx_mint unique_ma_tx_mint; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ma_tx_mint
+    ADD CONSTRAINT unique_ma_tx_mint UNIQUE (ident, tx_id);
+
+
+--
+-- Name: ma_tx_out unique_ma_tx_out; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ma_tx_out
+    ADD CONSTRAINT unique_ma_tx_out UNIQUE (ident, tx_out_id);
+
+
+--
+-- Name: meta unique_meta; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.meta
+    ADD CONSTRAINT unique_meta UNIQUE (start_time);
+
+
+--
+-- Name: multi_asset unique_multi_asset; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.multi_asset
+    ADD CONSTRAINT unique_multi_asset UNIQUE (policy, name);
+
+
+--
+-- Name: param_proposal unique_param_proposal; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.param_proposal
+    ADD CONSTRAINT unique_param_proposal UNIQUE (key, registered_tx_id);
+
+
+--
+-- Name: pool_hash unique_pool_hash; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_hash
+    ADD CONSTRAINT unique_pool_hash UNIQUE (hash_raw);
+
+
+--
+-- Name: pool_metadata_ref unique_pool_metadata_ref; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_metadata_ref
+    ADD CONSTRAINT unique_pool_metadata_ref UNIQUE (pool_id, url, hash);
+
+
+--
+-- Name: pool_offline_data unique_pool_offline_data; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_offline_data
+    ADD CONSTRAINT unique_pool_offline_data UNIQUE (pool_id, hash);
+
+
+--
+-- Name: pool_offline_fetch_error unique_pool_offline_fetch_error; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_offline_fetch_error
+    ADD CONSTRAINT unique_pool_offline_fetch_error UNIQUE (pool_id, fetch_time, retry_count);
+
+
+--
+-- Name: pool_owner unique_pool_owner; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_owner
+    ADD CONSTRAINT unique_pool_owner UNIQUE (addr_id, pool_update_id);
+
+
+--
+-- Name: pool_relay unique_pool_relay; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_relay
+    ADD CONSTRAINT unique_pool_relay UNIQUE (update_id, ipv4, ipv6, dns_name);
+
+
+--
+-- Name: pool_retire unique_pool_retiring; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_retire
+    ADD CONSTRAINT unique_pool_retiring UNIQUE (announced_tx_id, cert_index);
+
+
+--
+-- Name: pool_update unique_pool_update; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_update
+    ADD CONSTRAINT unique_pool_update UNIQUE (registered_tx_id, cert_index);
+
+
+--
+-- Name: pot_transfer unique_pot_transfer; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pot_transfer
+    ADD CONSTRAINT unique_pot_transfer UNIQUE (tx_id, cert_index);
+
+
+--
+-- Name: redeemer unique_redeemer; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.redeemer
+    ADD CONSTRAINT unique_redeemer UNIQUE (tx_id, purpose, index);
+
+
+--
+-- Name: redeemer_data unique_redeemer_data; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.redeemer_data
+    ADD CONSTRAINT unique_redeemer_data UNIQUE (hash);
+
+
+--
+-- Name: reference_tx_in unique_ref_txin; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reference_tx_in
+    ADD CONSTRAINT unique_ref_txin UNIQUE (tx_in_id, tx_out_id, tx_out_index);
+
+
+--
+-- Name: reserved_pool_ticker unique_reserved_pool_ticker; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reserved_pool_ticker
+    ADD CONSTRAINT unique_reserved_pool_ticker UNIQUE (name);
+
+
+--
+-- Name: reserve unique_reserves; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reserve
+    ADD CONSTRAINT unique_reserves UNIQUE (addr_id, tx_id, cert_index);
+
+
+--
+-- Name: reward unique_reward; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reward
+    ADD CONSTRAINT unique_reward UNIQUE (addr_id, type, earned_epoch, pool_id);
+
+
+--
+-- Name: script unique_script; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.script
+    ADD CONSTRAINT unique_script UNIQUE (hash);
+
+
+--
+-- Name: slot_leader unique_slot_leader; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.slot_leader
+    ADD CONSTRAINT unique_slot_leader UNIQUE (hash);
+
+
+--
+-- Name: epoch_stake unique_stake; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.epoch_stake
+    ADD CONSTRAINT unique_stake UNIQUE (epoch_no, addr_id, pool_id);
+
+
+--
+-- Name: stake_address unique_stake_address; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stake_address
+    ADD CONSTRAINT unique_stake_address UNIQUE (hash_raw);
+
+
+--
+-- Name: stake_deregistration unique_stake_deregistration; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stake_deregistration
+    ADD CONSTRAINT unique_stake_deregistration UNIQUE (tx_id, cert_index);
+
+
+--
+-- Name: stake_registration unique_stake_registration; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stake_registration
+    ADD CONSTRAINT unique_stake_registration UNIQUE (tx_id, cert_index);
+
+
+--
+-- Name: treasury unique_treasury; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.treasury
+    ADD CONSTRAINT unique_treasury UNIQUE (addr_id, tx_id, cert_index);
+
+
+--
+-- Name: tx unique_tx; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tx
+    ADD CONSTRAINT unique_tx UNIQUE (hash);
+
+
+--
+-- Name: tx_metadata unique_tx_metadata; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tx_metadata
+    ADD CONSTRAINT unique_tx_metadata UNIQUE (key, tx_id);
+
+
+--
+-- Name: tx_in unique_txin; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tx_in
+    ADD CONSTRAINT unique_txin UNIQUE (tx_out_id, tx_out_index);
+
+
+--
+-- Name: tx_out unique_txout; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tx_out
+    ADD CONSTRAINT unique_txout UNIQUE (tx_id, index);
+
+
+--
+-- Name: withdrawal unique_withdrawal; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.withdrawal
+    ADD CONSTRAINT unique_withdrawal UNIQUE (addr_id, tx_id);
+
+
+--
+-- Name: extra_key_witness unique_witness; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.extra_key_witness
+    ADD CONSTRAINT unique_witness UNIQUE (hash);
+
+
+--
+-- Name: withdrawal withdrawal_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.withdrawal
+    ADD CONSTRAINT withdrawal_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: collateral_tx_out_inline_datum_id_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX collateral_tx_out_inline_datum_id_idx ON public.collateral_tx_out USING btree (inline_datum_id);
+
+
+--
+-- Name: collateral_tx_out_reference_script_id_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX collateral_tx_out_reference_script_id_idx ON public.collateral_tx_out USING btree (reference_script_id);
+
+
+--
+-- Name: collateral_tx_out_stake_address_id_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX collateral_tx_out_stake_address_id_idx ON public.collateral_tx_out USING btree (stake_address_id);
+
+
+--
+-- Name: idx_block_block_no; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_block_block_no ON public.block USING btree (block_no);
+
+
+--
+-- Name: idx_block_epoch_no; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_block_epoch_no ON public.block USING btree (epoch_no);
+
+
+--
+-- Name: idx_block_previous_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_block_previous_id ON public.block USING btree (previous_id);
+
+
+--
+-- Name: idx_block_slot_leader_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_block_slot_leader_id ON public.block USING btree (slot_leader_id);
+
+
+--
+-- Name: idx_block_slot_no; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_block_slot_no ON public.block USING btree (slot_no);
+
+
+--
+-- Name: idx_block_time; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_block_time ON public.block USING btree ("time");
+
+
+--
+-- Name: idx_collateral_tx_in_tx_out_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_collateral_tx_in_tx_out_id ON public.collateral_tx_in USING btree (tx_out_id);
+
+
+--
+-- Name: idx_cost_model_block_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_cost_model_block_id ON public.cost_model USING btree (block_id);
+
+
+--
+-- Name: idx_datum_tx_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_datum_tx_id ON public.datum USING btree (tx_id);
+
+
+--
+-- Name: idx_delegation_active_epoch_no; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_delegation_active_epoch_no ON public.delegation USING btree (active_epoch_no);
+
+
+--
+-- Name: idx_delegation_addr_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_delegation_addr_id ON public.delegation USING btree (addr_id);
+
+
+--
+-- Name: idx_delegation_pool_hash_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_delegation_pool_hash_id ON public.delegation USING btree (pool_hash_id);
+
+
+--
+-- Name: idx_delegation_redeemer_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_delegation_redeemer_id ON public.delegation USING btree (redeemer_id);
+
+
+--
+-- Name: idx_delegation_tx_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_delegation_tx_id ON public.delegation USING btree (tx_id);
+
+
+--
+-- Name: idx_epoch_no; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_epoch_no ON public.epoch USING btree (no);
+
+
+--
+-- Name: idx_epoch_param_block_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_epoch_param_block_id ON public.epoch_param USING btree (block_id);
+
+
+--
+-- Name: idx_epoch_param_cost_model_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_epoch_param_cost_model_id ON public.epoch_param USING btree (cost_model_id);
+
+
+--
+-- Name: idx_epoch_stake_addr_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_epoch_stake_addr_id ON public.epoch_stake USING btree (addr_id);
+
+
+--
+-- Name: idx_epoch_stake_epoch_no; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_epoch_stake_epoch_no ON public.epoch_stake USING btree (epoch_no);
+
+
+--
+-- Name: idx_epoch_stake_pool_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_epoch_stake_pool_id ON public.epoch_stake USING btree (pool_id);
+
+
+--
+-- Name: idx_extra_key_witness_tx_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_extra_key_witness_tx_id ON public.extra_key_witness USING btree (tx_id);
+
+
+--
+-- Name: idx_ma_tx_mint_tx_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_ma_tx_mint_tx_id ON public.ma_tx_mint USING btree (tx_id);
+
+
+--
+-- Name: idx_ma_tx_out_tx_out_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_ma_tx_out_tx_out_id ON public.ma_tx_out USING btree (tx_out_id);
+
+
+--
+-- Name: idx_param_proposal_cost_model_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_param_proposal_cost_model_id ON public.param_proposal USING btree (cost_model_id);
+
+
+--
+-- Name: idx_param_proposal_registered_tx_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_param_proposal_registered_tx_id ON public.param_proposal USING btree (registered_tx_id);
+
+
+--
+-- Name: idx_pool_metadata_ref_registered_tx_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_pool_metadata_ref_registered_tx_id ON public.pool_metadata_ref USING btree (registered_tx_id);
+
+
+--
+-- Name: idx_pool_offline_data_pmr_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_pool_offline_data_pmr_id ON public.pool_offline_data USING btree (pmr_id);
+
+
+--
+-- Name: idx_pool_offline_fetch_error_pmr_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_pool_offline_fetch_error_pmr_id ON public.pool_offline_fetch_error USING btree (pmr_id);
+
+
+--
+-- Name: idx_pool_relay_update_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_pool_relay_update_id ON public.pool_relay USING btree (update_id);
+
+
+--
+-- Name: idx_pool_retire_announced_tx_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_pool_retire_announced_tx_id ON public.pool_retire USING btree (announced_tx_id);
+
+
+--
+-- Name: idx_pool_retire_hash_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_pool_retire_hash_id ON public.pool_retire USING btree (hash_id);
+
+
+--
+-- Name: idx_pool_update_active_epoch_no; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_pool_update_active_epoch_no ON public.pool_update USING btree (active_epoch_no);
+
+
+--
+-- Name: idx_pool_update_hash_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_pool_update_hash_id ON public.pool_update USING btree (hash_id);
+
+
+--
+-- Name: idx_pool_update_meta_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_pool_update_meta_id ON public.pool_update USING btree (meta_id);
+
+
+--
+-- Name: idx_pool_update_registered_tx_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_pool_update_registered_tx_id ON public.pool_update USING btree (registered_tx_id);
+
+
+--
+-- Name: idx_pool_update_reward_addr; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_pool_update_reward_addr ON public.pool_update USING btree (reward_addr_id);
+
+
+--
+-- Name: idx_reserve_addr_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_reserve_addr_id ON public.reserve USING btree (addr_id);
+
+
+--
+-- Name: idx_reserve_tx_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_reserve_tx_id ON public.reserve USING btree (tx_id);
+
+
+--
+-- Name: idx_reserved_pool_ticker_pool_hash; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_reserved_pool_ticker_pool_hash ON public.reserved_pool_ticker USING btree (pool_hash);
+
+
+--
+-- Name: idx_reward_addr_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_reward_addr_id ON public.reward USING btree (addr_id);
+
+
+--
+-- Name: idx_reward_earned_epoch; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_reward_earned_epoch ON public.reward USING btree (earned_epoch);
+
+
+--
+-- Name: idx_reward_pool_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_reward_pool_id ON public.reward USING btree (pool_id);
+
+
+--
+-- Name: idx_script_tx_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_script_tx_id ON public.script USING btree (tx_id);
+
+
+--
+-- Name: idx_slot_leader_pool_hash_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_slot_leader_pool_hash_id ON public.slot_leader USING btree (pool_hash_id);
+
+
+--
+-- Name: idx_stake_address_hash_raw; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_stake_address_hash_raw ON public.stake_address USING btree (hash_raw);
+
+
+--
+-- Name: idx_stake_address_registered_tx_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_stake_address_registered_tx_id ON public.stake_address USING btree (tx_id);
+
+
+--
+-- Name: idx_stake_address_view; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_stake_address_view ON public.stake_address USING hash (view);
+
+
+--
+-- Name: idx_stake_deregistration_addr_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_stake_deregistration_addr_id ON public.stake_deregistration USING btree (addr_id);
+
+
+--
+-- Name: idx_stake_deregistration_redeemer_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_stake_deregistration_redeemer_id ON public.stake_deregistration USING btree (redeemer_id);
+
+
+--
+-- Name: idx_stake_deregistration_tx_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_stake_deregistration_tx_id ON public.stake_deregistration USING btree (tx_id);
+
+
+--
+-- Name: idx_stake_registration_addr_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_stake_registration_addr_id ON public.stake_registration USING btree (addr_id);
+
+
+--
+-- Name: idx_stake_registration_tx_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_stake_registration_tx_id ON public.stake_registration USING btree (tx_id);
+
+
+--
+-- Name: idx_treasury_addr_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_treasury_addr_id ON public.treasury USING btree (addr_id);
+
+
+--
+-- Name: idx_treasury_tx_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_treasury_tx_id ON public.treasury USING btree (tx_id);
+
+
+--
+-- Name: idx_tx_block_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_tx_block_id ON public.tx USING btree (block_id);
+
+
+--
+-- Name: idx_tx_in_redeemer_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_tx_in_redeemer_id ON public.tx_in USING btree (redeemer_id);
+
+
+--
+-- Name: idx_tx_in_source_tx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_tx_in_source_tx ON public.tx_in USING btree (tx_in_id);
+
+
+--
+-- Name: idx_tx_in_tx_in_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_tx_in_tx_in_id ON public.tx_in USING btree (tx_in_id);
+
+
+--
+-- Name: idx_tx_in_tx_out_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_tx_in_tx_out_id ON public.tx_in USING btree (tx_out_id);
+
+
+--
+-- Name: idx_tx_metadata_tx_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_tx_metadata_tx_id ON public.tx_metadata USING btree (tx_id);
+
+
+--
+-- Name: idx_tx_out_address; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_tx_out_address ON public.tx_out USING hash (address);
+
+
+--
+-- Name: idx_tx_out_payment_cred; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_tx_out_payment_cred ON public.tx_out USING btree (payment_cred);
+
+
+--
+-- Name: idx_tx_out_stake_address_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_tx_out_stake_address_id ON public.tx_out USING btree (stake_address_id);
+
+
+--
+-- Name: idx_tx_out_tx_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_tx_out_tx_id ON public.tx_out USING btree (tx_id);
+
+
+--
+-- Name: idx_withdrawal_addr_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_withdrawal_addr_id ON public.withdrawal USING btree (addr_id);
+
+
+--
+-- Name: idx_withdrawal_redeemer_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_withdrawal_redeemer_id ON public.withdrawal USING btree (redeemer_id);
+
+
+--
+-- Name: idx_withdrawal_tx_id; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX idx_withdrawal_tx_id ON public.withdrawal USING btree (tx_id);
+
+
+--
+-- Name: pool_owner_pool_update_id_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX pool_owner_pool_update_id_idx ON public.pool_owner USING btree (pool_update_id);
+
+
+--
+-- Name: redeemer_data_tx_id_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX redeemer_data_tx_id_idx ON public.redeemer_data USING btree (tx_id);
+
+
+--
+-- Name: redeemer_redeemer_data_id_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX redeemer_redeemer_data_id_idx ON public.redeemer USING btree (redeemer_data_id);
+
+
+--
+-- Name: reference_tx_in_tx_out_id_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX reference_tx_in_tx_out_id_idx ON public.reference_tx_in USING btree (tx_out_id);
+
+
+--
+-- Name: tx_out_inline_datum_id_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX tx_out_inline_datum_id_idx ON public.tx_out USING btree (inline_datum_id);
+
+
+--
+-- Name: tx_out_reference_script_id_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX tx_out_reference_script_id_idx ON public.tx_out USING btree (reference_script_id);
+
+
+--
+-- Name: ada_pots ada_pots_block_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ada_pots
+    ADD CONSTRAINT ada_pots_block_id_fkey FOREIGN KEY (block_id) REFERENCES public.block(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: block block_previous_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.block
+    ADD CONSTRAINT block_previous_id_fkey FOREIGN KEY (previous_id) REFERENCES public.block(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: block block_slot_leader_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.block
+    ADD CONSTRAINT block_slot_leader_id_fkey FOREIGN KEY (slot_leader_id) REFERENCES public.slot_leader(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: collateral_tx_in collateral_tx_in_tx_in_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.collateral_tx_in
+    ADD CONSTRAINT collateral_tx_in_tx_in_id_fkey FOREIGN KEY (tx_in_id) REFERENCES public.tx(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: collateral_tx_in collateral_tx_in_tx_out_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.collateral_tx_in
+    ADD CONSTRAINT collateral_tx_in_tx_out_id_fkey FOREIGN KEY (tx_out_id) REFERENCES public.tx(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: collateral_tx_out collateral_tx_out_inline_datum_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.collateral_tx_out
+    ADD CONSTRAINT collateral_tx_out_inline_datum_id_fkey FOREIGN KEY (inline_datum_id) REFERENCES public.datum(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: collateral_tx_out collateral_tx_out_reference_script_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.collateral_tx_out
+    ADD CONSTRAINT collateral_tx_out_reference_script_id_fkey FOREIGN KEY (reference_script_id) REFERENCES public.script(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: collateral_tx_out collateral_tx_out_stake_address_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.collateral_tx_out
+    ADD CONSTRAINT collateral_tx_out_stake_address_id_fkey FOREIGN KEY (stake_address_id) REFERENCES public.stake_address(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: collateral_tx_out collateral_tx_out_tx_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.collateral_tx_out
+    ADD CONSTRAINT collateral_tx_out_tx_id_fkey FOREIGN KEY (tx_id) REFERENCES public.tx(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: cost_model cost_model_block_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.cost_model
+    ADD CONSTRAINT cost_model_block_id_fkey FOREIGN KEY (block_id) REFERENCES public.block(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: datum datum_tx_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.datum
+    ADD CONSTRAINT datum_tx_id_fkey FOREIGN KEY (tx_id) REFERENCES public.tx(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: delegation delegation_addr_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.delegation
+    ADD CONSTRAINT delegation_addr_id_fkey FOREIGN KEY (addr_id) REFERENCES public.stake_address(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: delegation delegation_pool_hash_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.delegation
+    ADD CONSTRAINT delegation_pool_hash_id_fkey FOREIGN KEY (pool_hash_id) REFERENCES public.pool_hash(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: delegation delegation_redeemer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.delegation
+    ADD CONSTRAINT delegation_redeemer_id_fkey FOREIGN KEY (redeemer_id) REFERENCES public.redeemer(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: delegation delegation_tx_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.delegation
+    ADD CONSTRAINT delegation_tx_id_fkey FOREIGN KEY (tx_id) REFERENCES public.tx(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: epoch_param epoch_param_block_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.epoch_param
+    ADD CONSTRAINT epoch_param_block_id_fkey FOREIGN KEY (block_id) REFERENCES public.block(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: epoch_param epoch_param_cost_model_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.epoch_param
+    ADD CONSTRAINT epoch_param_cost_model_id_fkey FOREIGN KEY (cost_model_id) REFERENCES public.cost_model(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: epoch_stake epoch_stake_addr_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.epoch_stake
+    ADD CONSTRAINT epoch_stake_addr_id_fkey FOREIGN KEY (addr_id) REFERENCES public.stake_address(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: epoch_stake epoch_stake_pool_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.epoch_stake
+    ADD CONSTRAINT epoch_stake_pool_id_fkey FOREIGN KEY (pool_id) REFERENCES public.pool_hash(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: extra_key_witness extra_key_witness_tx_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.extra_key_witness
+    ADD CONSTRAINT extra_key_witness_tx_id_fkey FOREIGN KEY (tx_id) REFERENCES public.tx(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: ma_tx_mint ma_tx_mint_ident_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ma_tx_mint
+    ADD CONSTRAINT ma_tx_mint_ident_fkey FOREIGN KEY (ident) REFERENCES public.multi_asset(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: ma_tx_mint ma_tx_mint_tx_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ma_tx_mint
+    ADD CONSTRAINT ma_tx_mint_tx_id_fkey FOREIGN KEY (tx_id) REFERENCES public.tx(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: ma_tx_out ma_tx_out_ident_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ma_tx_out
+    ADD CONSTRAINT ma_tx_out_ident_fkey FOREIGN KEY (ident) REFERENCES public.multi_asset(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: ma_tx_out ma_tx_out_tx_out_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ma_tx_out
+    ADD CONSTRAINT ma_tx_out_tx_out_id_fkey FOREIGN KEY (tx_out_id) REFERENCES public.tx_out(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: param_proposal param_proposal_cost_model_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.param_proposal
+    ADD CONSTRAINT param_proposal_cost_model_id_fkey FOREIGN KEY (cost_model_id) REFERENCES public.cost_model(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: param_proposal param_proposal_registered_tx_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.param_proposal
+    ADD CONSTRAINT param_proposal_registered_tx_id_fkey FOREIGN KEY (registered_tx_id) REFERENCES public.tx(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: pool_metadata_ref pool_metadata_ref_pool_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_metadata_ref
+    ADD CONSTRAINT pool_metadata_ref_pool_id_fkey FOREIGN KEY (pool_id) REFERENCES public.pool_hash(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: pool_metadata_ref pool_metadata_ref_registered_tx_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_metadata_ref
+    ADD CONSTRAINT pool_metadata_ref_registered_tx_id_fkey FOREIGN KEY (registered_tx_id) REFERENCES public.tx(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: pool_offline_data pool_offline_data_pmr_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_offline_data
+    ADD CONSTRAINT pool_offline_data_pmr_id_fkey FOREIGN KEY (pmr_id) REFERENCES public.pool_metadata_ref(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: pool_offline_data pool_offline_data_pool_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_offline_data
+    ADD CONSTRAINT pool_offline_data_pool_id_fkey FOREIGN KEY (pool_id) REFERENCES public.pool_hash(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: pool_offline_fetch_error pool_offline_fetch_error_pmr_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_offline_fetch_error
+    ADD CONSTRAINT pool_offline_fetch_error_pmr_id_fkey FOREIGN KEY (pmr_id) REFERENCES public.pool_metadata_ref(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: pool_offline_fetch_error pool_offline_fetch_error_pool_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_offline_fetch_error
+    ADD CONSTRAINT pool_offline_fetch_error_pool_id_fkey FOREIGN KEY (pool_id) REFERENCES public.pool_hash(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: pool_owner pool_owner_addr_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_owner
+    ADD CONSTRAINT pool_owner_addr_id_fkey FOREIGN KEY (addr_id) REFERENCES public.stake_address(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: pool_owner pool_owner_pool_update_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_owner
+    ADD CONSTRAINT pool_owner_pool_update_id_fkey FOREIGN KEY (pool_update_id) REFERENCES public.pool_update(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: pool_relay pool_relay_update_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_relay
+    ADD CONSTRAINT pool_relay_update_id_fkey FOREIGN KEY (update_id) REFERENCES public.pool_update(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: pool_retire pool_retire_announced_tx_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_retire
+    ADD CONSTRAINT pool_retire_announced_tx_id_fkey FOREIGN KEY (announced_tx_id) REFERENCES public.tx(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: pool_retire pool_retire_hash_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_retire
+    ADD CONSTRAINT pool_retire_hash_id_fkey FOREIGN KEY (hash_id) REFERENCES public.pool_hash(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: pool_update pool_update_hash_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_update
+    ADD CONSTRAINT pool_update_hash_id_fkey FOREIGN KEY (hash_id) REFERENCES public.pool_hash(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: pool_update pool_update_meta_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_update
+    ADD CONSTRAINT pool_update_meta_id_fkey FOREIGN KEY (meta_id) REFERENCES public.pool_metadata_ref(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: pool_update pool_update_registered_tx_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_update
+    ADD CONSTRAINT pool_update_registered_tx_id_fkey FOREIGN KEY (registered_tx_id) REFERENCES public.tx(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: pool_update pool_update_reward_addr_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pool_update
+    ADD CONSTRAINT pool_update_reward_addr_id_fkey FOREIGN KEY (reward_addr_id) REFERENCES public.stake_address(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: pot_transfer pot_transfer_tx_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pot_transfer
+    ADD CONSTRAINT pot_transfer_tx_id_fkey FOREIGN KEY (tx_id) REFERENCES public.tx(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: redeemer_data redeemer_data_tx_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.redeemer_data
+    ADD CONSTRAINT redeemer_data_tx_id_fkey FOREIGN KEY (tx_id) REFERENCES public.tx(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: redeemer redeemer_redeemer_data_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.redeemer
+    ADD CONSTRAINT redeemer_redeemer_data_id_fkey FOREIGN KEY (redeemer_data_id) REFERENCES public.redeemer_data(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: redeemer redeemer_tx_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.redeemer
+    ADD CONSTRAINT redeemer_tx_id_fkey FOREIGN KEY (tx_id) REFERENCES public.tx(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: reference_tx_in reference_tx_in_tx_in_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reference_tx_in
+    ADD CONSTRAINT reference_tx_in_tx_in_id_fkey FOREIGN KEY (tx_in_id) REFERENCES public.tx(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: reference_tx_in reference_tx_in_tx_out_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reference_tx_in
+    ADD CONSTRAINT reference_tx_in_tx_out_id_fkey FOREIGN KEY (tx_out_id) REFERENCES public.tx(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: reserve reserve_addr_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reserve
+    ADD CONSTRAINT reserve_addr_id_fkey FOREIGN KEY (addr_id) REFERENCES public.stake_address(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: reserve reserve_tx_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reserve
+    ADD CONSTRAINT reserve_tx_id_fkey FOREIGN KEY (tx_id) REFERENCES public.tx(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: reward reward_addr_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reward
+    ADD CONSTRAINT reward_addr_id_fkey FOREIGN KEY (addr_id) REFERENCES public.stake_address(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: reward reward_pool_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reward
+    ADD CONSTRAINT reward_pool_id_fkey FOREIGN KEY (pool_id) REFERENCES public.pool_hash(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: script script_tx_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.script
+    ADD CONSTRAINT script_tx_id_fkey FOREIGN KEY (tx_id) REFERENCES public.tx(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: slot_leader slot_leader_pool_hash_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.slot_leader
+    ADD CONSTRAINT slot_leader_pool_hash_id_fkey FOREIGN KEY (pool_hash_id) REFERENCES public.pool_hash(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: stake_address stake_address_tx_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stake_address
+    ADD CONSTRAINT stake_address_tx_id_fkey FOREIGN KEY (tx_id) REFERENCES public.tx(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: stake_deregistration stake_deregistration_addr_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stake_deregistration
+    ADD CONSTRAINT stake_deregistration_addr_id_fkey FOREIGN KEY (addr_id) REFERENCES public.stake_address(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: stake_deregistration stake_deregistration_redeemer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stake_deregistration
+    ADD CONSTRAINT stake_deregistration_redeemer_id_fkey FOREIGN KEY (redeemer_id) REFERENCES public.redeemer(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: stake_deregistration stake_deregistration_tx_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stake_deregistration
+    ADD CONSTRAINT stake_deregistration_tx_id_fkey FOREIGN KEY (tx_id) REFERENCES public.tx(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: stake_registration stake_registration_addr_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stake_registration
+    ADD CONSTRAINT stake_registration_addr_id_fkey FOREIGN KEY (addr_id) REFERENCES public.stake_address(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: stake_registration stake_registration_tx_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stake_registration
+    ADD CONSTRAINT stake_registration_tx_id_fkey FOREIGN KEY (tx_id) REFERENCES public.tx(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: treasury treasury_addr_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.treasury
+    ADD CONSTRAINT treasury_addr_id_fkey FOREIGN KEY (addr_id) REFERENCES public.stake_address(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: treasury treasury_tx_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.treasury
+    ADD CONSTRAINT treasury_tx_id_fkey FOREIGN KEY (tx_id) REFERENCES public.tx(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: tx tx_block_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tx
+    ADD CONSTRAINT tx_block_id_fkey FOREIGN KEY (block_id) REFERENCES public.block(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: tx_in tx_in_redeemer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tx_in
+    ADD CONSTRAINT tx_in_redeemer_id_fkey FOREIGN KEY (redeemer_id) REFERENCES public.redeemer(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: tx_in tx_in_tx_in_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tx_in
+    ADD CONSTRAINT tx_in_tx_in_id_fkey FOREIGN KEY (tx_in_id) REFERENCES public.tx(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: tx_in tx_in_tx_out_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tx_in
+    ADD CONSTRAINT tx_in_tx_out_id_fkey FOREIGN KEY (tx_out_id) REFERENCES public.tx(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: tx_metadata tx_metadata_tx_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tx_metadata
+    ADD CONSTRAINT tx_metadata_tx_id_fkey FOREIGN KEY (tx_id) REFERENCES public.tx(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: tx_out tx_out_inline_datum_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tx_out
+    ADD CONSTRAINT tx_out_inline_datum_id_fkey FOREIGN KEY (inline_datum_id) REFERENCES public.datum(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: tx_out tx_out_reference_script_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tx_out
+    ADD CONSTRAINT tx_out_reference_script_id_fkey FOREIGN KEY (reference_script_id) REFERENCES public.script(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: tx_out tx_out_stake_address_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tx_out
+    ADD CONSTRAINT tx_out_stake_address_id_fkey FOREIGN KEY (stake_address_id) REFERENCES public.stake_address(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: tx_out tx_out_tx_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tx_out
+    ADD CONSTRAINT tx_out_tx_id_fkey FOREIGN KEY (tx_id) REFERENCES public.tx(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: withdrawal withdrawal_addr_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.withdrawal
+    ADD CONSTRAINT withdrawal_addr_id_fkey FOREIGN KEY (addr_id) REFERENCES public.stake_address(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: withdrawal withdrawal_redeemer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.withdrawal
+    ADD CONSTRAINT withdrawal_redeemer_id_fkey FOREIGN KEY (redeemer_id) REFERENCES public.redeemer(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- Name: withdrawal withdrawal_tx_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.withdrawal
+    ADD CONSTRAINT withdrawal_tx_id_fkey FOREIGN KEY (tx_id) REFERENCES public.tx(id) ON UPDATE RESTRICT ON DELETE CASCADE;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
