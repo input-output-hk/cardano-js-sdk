@@ -36,14 +36,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -110,14 +110,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -183,14 +183,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -247,14 +247,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -313,14 +313,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -378,14 +378,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -451,14 +451,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -515,14 +515,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -581,14 +581,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 1988240000n,
-        "saturation": 0,
+        "saturation": 0.00000591738037364007,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 497060000n,
         },
       },
       "owners": Array [
@@ -649,14 +649,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0.003832479766253156,
+        "saturation": 0.00002476377610182398,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 154.7615254836226,
+          "live": -153.7615254836226,
         },
         "stake": Object {
           "active": 321928331851n,
-          "live": 0n,
+          "live": 2080157396n,
         },
       },
       "owners": Array [
@@ -714,9 +714,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0.0001193079607122087,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -777,14 +777,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -842,14 +842,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -901,14 +901,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 997623150n,
-        "saturation": 0,
+        "saturation": 0.00001187646490986798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 997623150n,
         },
       },
       "owners": Array [
@@ -960,9 +960,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0.00001922553383396,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -1062,14 +1062,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -1126,14 +1126,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -1192,14 +1192,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0.003832479766253156,
+        "saturation": 0.00002476377610182398,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 154.7615254836226,
+          "live": -153.7615254836226,
         },
         "stake": Object {
           "active": 321928331851n,
-          "live": 0n,
+          "live": 2080157396n,
         },
       },
       "owners": Array [
@@ -1257,14 +1257,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -1322,14 +1322,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -1395,14 +1395,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -1460,14 +1460,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -1540,14 +1540,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -1604,14 +1604,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -1670,14 +1670,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0.003832479766253156,
+        "saturation": 0.00002476377610182398,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 154.7615254836226,
+          "live": -153.7615254836226,
         },
         "stake": Object {
           "active": 321928331851n,
-          "live": 0n,
+          "live": 2080157396n,
         },
       },
       "owners": Array [
@@ -1735,14 +1735,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -1800,14 +1800,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -1859,14 +1859,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 999999828559n,
-        "saturation": 0,
+        "saturation": 0.011904758699469798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 999999828559n,
         },
       },
       "owners": Array [
@@ -1939,14 +1939,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -2003,14 +2003,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -2069,14 +2069,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0.003832479766253156,
+        "saturation": 0.00002476377610182398,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 154.7615254836226,
+          "live": -153.7615254836226,
         },
         "stake": Object {
           "active": 321928331851n,
-          "live": 0n,
+          "live": 2080157396n,
         },
       },
       "owners": Array [
@@ -2134,14 +2134,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -2199,14 +2199,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -2272,14 +2272,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -2336,14 +2336,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -2402,14 +2402,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 1988240000n,
-        "saturation": 0,
+        "saturation": 0.00000591738037364007,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 497060000n,
         },
       },
       "owners": Array [
@@ -2470,9 +2470,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0.0001193079607122087,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -2533,14 +2533,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -2598,14 +2598,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -2657,14 +2657,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 997623150n,
-        "saturation": 0,
+        "saturation": 0.00001187646490986798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 997623150n,
         },
       },
       "owners": Array [
@@ -2716,9 +2716,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0.00001922553383396,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -2818,14 +2818,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -2882,14 +2882,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -2948,14 +2948,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 1988240000n,
-        "saturation": 0,
+        "saturation": 0.00000591738037364007,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 497060000n,
         },
       },
       "owners": Array [
@@ -3016,14 +3016,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -3081,14 +3081,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -3140,14 +3140,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 997623150n,
-        "saturation": 0,
+        "saturation": 0.00001187646490986798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 997623150n,
         },
       },
       "owners": Array [
@@ -3213,14 +3213,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -3277,14 +3277,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -3358,14 +3358,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -3422,14 +3422,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -3488,14 +3488,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 1988240000n,
-        "saturation": 0,
+        "saturation": 0.00000591738037364007,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 497060000n,
         },
       },
       "owners": Array [
@@ -3556,14 +3556,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0.003832479766253156,
+        "saturation": 0.00002476377610182398,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 154.7615254836226,
+          "live": -153.7615254836226,
         },
         "stake": Object {
           "active": 321928331851n,
-          "live": 0n,
+          "live": 2080157396n,
         },
       },
       "owners": Array [
@@ -3621,14 +3621,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -3686,14 +3686,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -3745,14 +3745,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 997623150n,
-        "saturation": 0,
+        "saturation": 0.00001187646490986798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 997623150n,
         },
       },
       "owners": Array [
@@ -3804,14 +3804,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 999999828559n,
-        "saturation": 0,
+        "saturation": 0.011904758699469798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 999999828559n,
         },
       },
       "owners": Array [
@@ -3884,14 +3884,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -3948,14 +3948,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -4014,14 +4014,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 1988240000n,
-        "saturation": 0,
+        "saturation": 0.00000591738037364007,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 497060000n,
         },
       },
       "owners": Array [
@@ -4082,14 +4082,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -4147,14 +4147,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -4206,14 +4206,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 997623150n,
-        "saturation": 0,
+        "saturation": 0.00001187646490986798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 997623150n,
         },
       },
       "owners": Array [
@@ -4279,14 +4279,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -4343,14 +4343,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -4409,14 +4409,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -4474,14 +4474,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -4547,14 +4547,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -4611,14 +4611,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -4677,14 +4677,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 1988240000n,
-        "saturation": 0,
+        "saturation": 0.00000591738037364007,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 497060000n,
         },
       },
       "owners": Array [
@@ -4745,14 +4745,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0.003832479766253156,
+        "saturation": 0.00002476377610182398,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 154.7615254836226,
+          "live": -153.7615254836226,
         },
         "stake": Object {
           "active": 321928331851n,
-          "live": 0n,
+          "live": 2080157396n,
         },
       },
       "owners": Array [
@@ -4810,9 +4810,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0.0001193079607122087,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -4873,14 +4873,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -4938,14 +4938,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -4997,14 +4997,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 997623150n,
-        "saturation": 0,
+        "saturation": 0.00001187646490986798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 997623150n,
         },
       },
       "owners": Array [
@@ -5056,9 +5056,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0.00001922553383396,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -5137,14 +5137,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 999999828559n,
-        "saturation": 0,
+        "saturation": 0.011904758699469798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 999999828559n,
         },
       },
       "owners": Array [
@@ -5217,14 +5217,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -5281,14 +5281,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -5347,14 +5347,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -5412,14 +5412,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -5485,14 +5485,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -5549,14 +5549,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -5615,14 +5615,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -5680,14 +5680,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -5753,14 +5753,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -5817,14 +5817,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -5883,14 +5883,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 1988240000n,
-        "saturation": 0,
+        "saturation": 0.00000591738037364007,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 497060000n,
         },
       },
       "owners": Array [
@@ -5951,9 +5951,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0.0001193079607122087,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -6014,14 +6014,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -6079,14 +6079,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -6138,14 +6138,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 997623150n,
-        "saturation": 0,
+        "saturation": 0.00001187646490986798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 997623150n,
         },
       },
       "owners": Array [
@@ -6197,9 +6197,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0.00001922553383396,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -6299,14 +6299,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -6363,14 +6363,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -6429,14 +6429,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0.003832479766253156,
+        "saturation": 0.00002476377610182398,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 154.7615254836226,
+          "live": -153.7615254836226,
         },
         "stake": Object {
           "active": 321928331851n,
-          "live": 0n,
+          "live": 2080157396n,
         },
       },
       "owners": Array [
@@ -6494,14 +6494,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -6559,14 +6559,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -6618,14 +6618,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 999999828559n,
-        "saturation": 0,
+        "saturation": 0.011904758699469798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 999999828559n,
         },
       },
       "owners": Array [
@@ -6698,14 +6698,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -6762,14 +6762,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -6828,14 +6828,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -6893,14 +6893,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -6966,14 +6966,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0.003832479766253156,
+        "saturation": 0.00002476377610182398,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 154.7615254836226,
+          "live": -153.7615254836226,
         },
         "stake": Object {
           "active": 321928331851n,
-          "live": 0n,
+          "live": 2080157396n,
         },
       },
       "owners": Array [
@@ -7031,14 +7031,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -7096,14 +7096,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -7176,14 +7176,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -7240,14 +7240,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -7306,14 +7306,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 1988240000n,
-        "saturation": 0,
+        "saturation": 0.00000591738037364007,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 497060000n,
         },
       },
       "owners": Array [
@@ -7374,9 +7374,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0.0001193079607122087,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -7437,14 +7437,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -7502,14 +7502,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -7561,14 +7561,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 997623150n,
-        "saturation": 0,
+        "saturation": 0.00001187646490986798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 997623150n,
         },
       },
       "owners": Array [
@@ -7620,9 +7620,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0.00001922553383396,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -7715,14 +7715,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0.003832479766253156,
+        "saturation": 0.00002476377610182398,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 154.7615254836226,
+          "live": -153.7615254836226,
         },
         "stake": Object {
           "active": 321928331851n,
-          "live": 0n,
+          "live": 2080157396n,
         },
       },
       "owners": Array [
@@ -7774,14 +7774,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 999999828559n,
-        "saturation": 0,
+        "saturation": 0.011904758699469798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 999999828559n,
         },
       },
       "owners": Array [
@@ -7848,14 +7848,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 999999828559n,
-        "saturation": 0,
+        "saturation": 0.011904758699469798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 999999828559n,
         },
       },
       "owners": Array [
@@ -7907,14 +7907,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 997623150n,
-        "saturation": 0,
+        "saturation": 0.00001187646490986798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 997623150n,
         },
       },
       "owners": Array [
@@ -7972,14 +7972,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -8037,14 +8037,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -8102,14 +8102,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -8160,9 +8160,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0.00001922553383396,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -8247,14 +8247,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 1988240000n,
-        "saturation": 0,
+        "saturation": 0.00000591738037364007,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 497060000n,
         },
       },
       "owners": Array [
@@ -8315,14 +8315,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0.003832479766253156,
+        "saturation": 0.00002476377610182398,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 154.7615254836226,
+          "live": -153.7615254836226,
         },
         "stake": Object {
           "active": 321928331851n,
-          "live": 0n,
+          "live": 2080157396n,
         },
       },
       "owners": Array [
@@ -8380,9 +8380,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0.0001193079607122087,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -8443,14 +8443,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -8517,14 +8517,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -8577,14 +8577,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 999999828559n,
-        "saturation": 0,
+        "saturation": 0.011904758699469798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 999999828559n,
         },
       },
       "owners": Array [
@@ -8636,14 +8636,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 997623150n,
-        "saturation": 0,
+        "saturation": 0.00001187646490986798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 997623150n,
         },
       },
       "owners": Array [
@@ -8701,14 +8701,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -8766,14 +8766,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -8831,14 +8831,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -8889,9 +8889,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0.00001922553383396,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -8976,14 +8976,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 1988240000n,
-        "saturation": 0,
+        "saturation": 0.00000591738037364007,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 497060000n,
         },
       },
       "owners": Array [
@@ -9044,14 +9044,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0.003832479766253156,
+        "saturation": 0.00002476377610182398,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 154.7615254836226,
+          "live": -153.7615254836226,
         },
         "stake": Object {
           "active": 321928331851n,
-          "live": 0n,
+          "live": 2080157396n,
         },
       },
       "owners": Array [
@@ -9109,9 +9109,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0.0001193079607122087,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -9180,14 +9180,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -9245,14 +9245,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -9310,14 +9310,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -9384,14 +9384,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -9444,14 +9444,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 999999828559n,
-        "saturation": 0,
+        "saturation": 0.011904758699469798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 999999828559n,
         },
       },
       "owners": Array [
@@ -9503,14 +9503,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 997623150n,
-        "saturation": 0,
+        "saturation": 0.00001187646490986798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 997623150n,
         },
       },
       "owners": Array [
@@ -9576,14 +9576,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -9641,14 +9641,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -9706,14 +9706,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -9778,9 +9778,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0.0001193079607122087,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -9841,14 +9841,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 1988240000n,
-        "saturation": 0,
+        "saturation": 0.00000591738037364007,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 497060000n,
         },
       },
       "owners": Array [
@@ -9909,14 +9909,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -9973,14 +9973,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -10033,14 +10033,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 997623150n,
-        "saturation": 0,
+        "saturation": 0.00001187646490986798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 997623150n,
         },
       },
       "owners": Array [
@@ -10092,9 +10092,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0.00001922553383396,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -10179,14 +10179,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0.003832479766253156,
+        "saturation": 0.00002476377610182398,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 154.7615254836226,
+          "live": -153.7615254836226,
         },
         "stake": Object {
           "active": 321928331851n,
-          "live": 0n,
+          "live": 2080157396n,
         },
       },
       "owners": Array [
@@ -10244,14 +10244,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -10303,14 +10303,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 999999828559n,
-        "saturation": 0,
+        "saturation": 0.011904758699469798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 999999828559n,
         },
       },
       "owners": Array [
@@ -10368,14 +10368,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -10441,14 +10441,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -10500,14 +10500,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 999999828559n,
-        "saturation": 0,
+        "saturation": 0.011904758699469798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 999999828559n,
         },
       },
       "owners": Array [
@@ -10565,14 +10565,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -10630,14 +10630,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0.003832479766253156,
+        "saturation": 0.00002476377610182398,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 154.7615254836226,
+          "live": -153.7615254836226,
         },
         "stake": Object {
           "active": 321928331851n,
-          "live": 0n,
+          "live": 2080157396n,
         },
       },
       "owners": Array [
@@ -10689,9 +10689,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0.00001922553383396,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -10770,14 +10770,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 997623150n,
-        "saturation": 0,
+        "saturation": 0.00001187646490986798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 997623150n,
         },
       },
       "owners": Array [
@@ -10835,14 +10835,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -10901,14 +10901,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -10965,9 +10965,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0.0001193079607122087,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -11028,14 +11028,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 1988240000n,
-        "saturation": 0,
+        "saturation": 0.00000591738037364007,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 497060000n,
         },
       },
       "owners": Array [
@@ -11104,14 +11104,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -11170,14 +11170,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -11235,14 +11235,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -11308,14 +11308,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -11367,14 +11367,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 999999828559n,
-        "saturation": 0,
+        "saturation": 0.011904758699469798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 999999828559n,
         },
       },
       "owners": Array [
@@ -11432,14 +11432,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -11505,14 +11505,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0.003832479766253156,
+        "saturation": 0.00002476377610182398,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 154.7615254836226,
+          "live": -153.7615254836226,
         },
         "stake": Object {
           "active": 321928331851n,
-          "live": 0n,
+          "live": 2080157396n,
         },
       },
       "owners": Array [
@@ -11564,9 +11564,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0.00001922553383396,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -11645,14 +11645,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 997623150n,
-        "saturation": 0,
+        "saturation": 0.00001187646490986798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 997623150n,
         },
       },
       "owners": Array [
@@ -11718,14 +11718,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -11782,14 +11782,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -11848,14 +11848,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 1988240000n,
-        "saturation": 0,
+        "saturation": 0.00000591738037364007,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 497060000n,
         },
       },
       "owners": Array [
@@ -11916,14 +11916,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0.003832479766253156,
+        "saturation": 0.00002476377610182398,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 154.7615254836226,
+          "live": -153.7615254836226,
         },
         "stake": Object {
           "active": 321928331851n,
-          "live": 0n,
+          "live": 2080157396n,
         },
       },
       "owners": Array [
@@ -11981,9 +11981,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0.0001193079607122087,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -12044,14 +12044,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -12109,14 +12109,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -12168,14 +12168,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 997623150n,
-        "saturation": 0,
+        "saturation": 0.00001187646490986798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 997623150n,
         },
       },
       "owners": Array [
@@ -12227,9 +12227,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0.00001922553383396,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -12308,14 +12308,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 999999828559n,
-        "saturation": 0,
+        "saturation": 0.011904758699469798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 999999828559n,
         },
       },
       "owners": Array [
@@ -12381,14 +12381,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -12445,14 +12445,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -12511,14 +12511,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 1988240000n,
-        "saturation": 0,
+        "saturation": 0.00000591738037364007,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 497060000n,
         },
       },
       "owners": Array [
@@ -12587,14 +12587,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0.003832479766253156,
+        "saturation": 0.00002476377610182398,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 154.7615254836226,
+          "live": -153.7615254836226,
         },
         "stake": Object {
           "active": 321928331851n,
-          "live": 0n,
+          "live": 2080157396n,
         },
       },
       "owners": Array [
@@ -12652,9 +12652,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0.0001193079607122087,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -12715,14 +12715,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -12788,14 +12788,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -12854,14 +12854,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -12919,14 +12919,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -12992,14 +12992,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -13056,14 +13056,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -13122,14 +13122,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 1988240000n,
-        "saturation": 0,
+        "saturation": 0.00000591738037364007,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 497060000n,
         },
       },
       "owners": Array [
@@ -13190,14 +13190,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0.003832479766253156,
+        "saturation": 0.00002476377610182398,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 154.7615254836226,
+          "live": -153.7615254836226,
         },
         "stake": Object {
           "active": 321928331851n,
-          "live": 0n,
+          "live": 2080157396n,
         },
       },
       "owners": Array [
@@ -13255,9 +13255,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0.0001193079607122087,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -13326,14 +13326,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -13391,14 +13391,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -13450,14 +13450,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 997623150n,
-        "saturation": 0,
+        "saturation": 0.00001187646490986798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 997623150n,
         },
       },
       "owners": Array [
@@ -13509,9 +13509,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0.00001922553383396,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -13590,14 +13590,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 999999828559n,
-        "saturation": 0,
+        "saturation": 0.011904758699469798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 999999828559n,
         },
       },
       "owners": Array [
@@ -13663,14 +13663,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -13728,14 +13728,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -13793,9 +13793,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0.0001193079607122087,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -13856,14 +13856,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0.003832479766253156,
+        "saturation": 0.00002476377610182398,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 154.7615254836226,
+          "live": -153.7615254836226,
         },
         "stake": Object {
           "active": 321928331851n,
-          "live": 0n,
+          "live": 2080157396n,
         },
       },
       "owners": Array [
@@ -13921,14 +13921,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 1988240000n,
-        "saturation": 0,
+        "saturation": 0.00000591738037364007,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 497060000n,
         },
       },
       "owners": Array [
@@ -13989,14 +13989,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -14055,14 +14055,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -14113,14 +14113,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 997623150n,
-        "saturation": 0,
+        "saturation": 0.00001187646490986798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 997623150n,
         },
       },
       "owners": Array [
@@ -14172,9 +14172,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0.00001922553383396,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -14253,14 +14253,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 999999828559n,
-        "saturation": 0,
+        "saturation": 0.011904758699469798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 999999828559n,
         },
       },
       "owners": Array [
@@ -14326,14 +14326,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -14390,14 +14390,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -14456,14 +14456,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 1988240000n,
-        "saturation": 0,
+        "saturation": 0.00000591738037364007,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 497060000n,
         },
       },
       "owners": Array [
@@ -14524,14 +14524,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0.003832479766253156,
+        "saturation": 0.00002476377610182398,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 154.7615254836226,
+          "live": -153.7615254836226,
         },
         "stake": Object {
           "active": 321928331851n,
-          "live": 0n,
+          "live": 2080157396n,
         },
       },
       "owners": Array [
@@ -14589,9 +14589,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0.0001193079607122087,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -14652,14 +14652,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -14717,14 +14717,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -14776,14 +14776,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 997623150n,
-        "saturation": 0,
+        "saturation": 0.00001187646490986798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 997623150n,
         },
       },
       "owners": Array [
@@ -14835,9 +14835,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0.00001922553383396,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -14916,14 +14916,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 999999828559n,
-        "saturation": 0,
+        "saturation": 0.011904758699469798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 999999828559n,
         },
       },
       "owners": Array [
@@ -14989,14 +14989,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -15054,14 +15054,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -15119,14 +15119,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -15193,14 +15193,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 1988240000n,
-        "saturation": 0,
+        "saturation": 0.00000591738037364007,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 497060000n,
         },
       },
       "owners": Array [
@@ -15255,14 +15255,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 997623150n,
-        "saturation": 0,
+        "saturation": 0.00001187646490986798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 997623150n,
         },
       },
       "owners": Array [
@@ -15320,14 +15320,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -15379,9 +15379,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0.00001922553383396,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -15466,14 +15466,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -15531,14 +15531,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -15595,9 +15595,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0.0001193079607122087,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -15658,14 +15658,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0.003832479766253156,
+        "saturation": 0.00002476377610182398,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 154.7615254836226,
+          "live": -153.7615254836226,
         },
         "stake": Object {
           "active": 321928331851n,
-          "live": 0n,
+          "live": 2080157396n,
         },
       },
       "owners": Array [
@@ -15717,14 +15717,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 999999828559n,
-        "saturation": 0,
+        "saturation": 0.011904758699469798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 999999828559n,
         },
       },
       "owners": Array [
@@ -15782,14 +15782,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -15856,14 +15856,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -15916,14 +15916,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 999999828559n,
-        "saturation": 0,
+        "saturation": 0.011904758699469798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 999999828559n,
         },
       },
       "owners": Array [
@@ -15981,14 +15981,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 2080157396n,
-        "saturation": 0.003832479766253156,
+        "saturation": 0.00002476377610182398,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 154.7615254836226,
+          "live": -153.7615254836226,
         },
         "stake": Object {
           "active": 321928331851n,
-          "live": 0n,
+          "live": 2080157396n,
         },
       },
       "owners": Array [
@@ -16046,9 +16046,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 1099603790n,
-        "saturation": 0.0001193079607122087,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -16109,14 +16109,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [
@@ -16173,14 +16173,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -16232,9 +16232,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0.00001922553383396,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -16319,14 +16319,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -16378,14 +16378,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 997623150n,
-        "saturation": 0,
+        "saturation": 0.00001187646490986798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 997623150n,
         },
       },
       "owners": Array [
@@ -16443,14 +16443,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 1988240000n,
-        "saturation": 0,
+        "saturation": 0.00000591738037364007,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 497060000n,
         },
       },
       "owners": Array [
@@ -16519,14 +16519,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -16584,14 +16584,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -16649,14 +16649,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 22623299531669n,
-        "saturation": 0.5970642370170973,
+        "saturation": 0.1347290358867107,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 4.431592886325924,
+          "live": -3.431592886325924,
         },
         "stake": Object {
           "active": 50153400814617n,
-          "live": 0n,
+          "live": 11317240121350n,
         },
       },
       "owners": Array [
@@ -16723,14 +16723,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 1988240000n,
-        "saturation": 0,
+        "saturation": 0.00000591738037364007,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 497060000n,
         },
       },
       "owners": Array [
@@ -16785,14 +16785,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 997623150n,
-        "saturation": 0,
+        "saturation": 0.00001187646490986798,
         "size": Object {
           "active": 0,
-          "live": 0,
+          "live": 1,
         },
         "stake": Object {
           "active": 0n,
-          "live": 0n,
+          "live": 997623150n,
         },
       },
       "owners": Array [
@@ -16850,14 +16850,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 199806239n,
-        "saturation": 0.00018561353404871592,
+        "saturation": 0.00000237864546974095,
         "size": Object {
-          "active": 0.08565983586872336,
-          "live": 0.9143401641312766,
+          "active": 6.68431889656859,
+          "live": -5.68431889656859,
         },
         "stake": Object {
           "active": 1335568619n,
-          "live": 14255969766n,
+          "live": 199806239n,
         },
       },
       "owners": Array [
@@ -16917,9 +16917,9 @@ Object {
         "blocksCreated": "0",
         "delegators": "0",
         "livePledge": 497325000n,
-        "saturation": 0.00001922553383396,
+        "saturation": 0,
         "size": Object {
-          "active": 1,
+          "active": 0,
           "live": 0,
         },
         "stake": Object {
@@ -17004,14 +17004,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 487464117n,
-        "saturation": 0.00002975837301809651,
+        "saturation": 0.00000580314368243187,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 5.127974533559359,
+          "live": -4.127974533559359,
         },
         "stake": Object {
           "active": 2499703578n,
-          "live": 0n,
+          "live": 487464117n,
         },
       },
       "owners": Array [
@@ -17069,14 +17069,14 @@ Object {
         "blocksCreated": "0",
         "delegators": "1",
         "livePledge": 495463149n,
-        "saturation": 0.00003555210355859188,
+        "saturation": 0.00000589837024454694,
         "size": Object {
-          "active": 1,
-          "live": 0,
+          "active": 6.02744522378192,
+          "live": -5.02744522378192,
         },
         "stake": Object {
           "active": 2986376991n,
-          "live": 0n,
+          "live": 495463149n,
         },
       },
       "owners": Array [

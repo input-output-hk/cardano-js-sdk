@@ -1,4 +1,4 @@
-import { Cardano, StakeDistribution, StakePoolStats } from '@cardano-sdk/core';
+import { Cardano, StakePoolStats } from '@cardano-sdk/core';
 import {
   Epoch,
   EpochModel,
@@ -43,7 +43,6 @@ const getPoolStatus = (
 };
 
 interface NodeMetricsDependencies {
-  stakeDistribution: StakeDistribution;
   totalAdaAmount: Cardano.Lovelace;
   optimalPoolCount?: number;
 }
@@ -67,21 +66,16 @@ interface ToCoreStakePoolInput {
  * Since some metrics are obtained from the Node they have to be calculated outside db queries
  */
 export const calcNodeMetricsValues = (
-  poolId: Cardano.PoolId,
   metrics: PoolMetrics['metrics'],
-  { totalAdaAmount, stakeDistribution, optimalPoolCount = 0 }: NodeMetricsDependencies,
+  { totalAdaAmount, optimalPoolCount = 0 }: NodeMetricsDependencies,
   apy: number
 ): Cardano.StakePoolMetrics => {
-  const { activeStake, ...rest } = metrics;
+  const { activeStake, liveStake, activeStakePercentage, ...rest } = metrics;
   const stakePoolMetrics = { ...rest, apy } as unknown as Cardano.StakePoolMetrics;
-  const poolStake = stakeDistribution.get(poolId)?.stake;
-  const liveStake = poolStake ? poolStake.pool : 0n;
-  const totalStake = liveStake + activeStake;
-  const isZeroStake = totalStake === 0n;
-  const activePercentage = !isZeroStake ? Number(divideBigIntToFloat(activeStake, totalStake)) : 0;
+  const isZeroStake = liveStake === 0n;
   const size: Cardano.StakePoolMetricsSize = {
-    active: activePercentage,
-    live: !isZeroStake ? 1 - activePercentage : 0
+    active: activeStakePercentage,
+    live: !isZeroStake ? 1 - activeStakePercentage : 0
   };
   const stake: Cardano.StakePoolMetricsStake = {
     active: activeStake,
@@ -89,7 +83,7 @@ export const calcNodeMetricsValues = (
   };
   stakePoolMetrics.size = size;
   stakePoolMetrics.stake = stake;
-  stakePoolMetrics.saturation = Number(divideBigIntToFloat(totalStake * BigInt(optimalPoolCount), totalAdaAmount));
+  stakePoolMetrics.saturation = Number(divideBigIntToFloat(liveStake * BigInt(optimalPoolCount), totalAdaAmount));
   return stakePoolMetrics;
 };
 
@@ -132,7 +126,7 @@ export const toStakePoolResults = (
           const partialMetrics = poolMetrics.find((metric) => metric.hashId === poolData.hashId)?.metrics;
           let metrics: Cardano.StakePoolMetrics | undefined;
           if (partialMetrics) {
-            metrics = calcNodeMetricsValues(poolData.id, partialMetrics, nodeMetricsDependencies, apy!);
+            metrics = calcNodeMetricsValues(partialMetrics, nodeMetricsDependencies, apy!);
           }
           const coreStakePool: Cardano.StakePool = {
             cost: poolData.cost,
@@ -262,9 +256,11 @@ export const mapPoolMetrics = (poolMetricsModel: PoolMetricsModel): PoolMetrics 
   hashId: Number(poolMetricsModel.pool_hash_id),
   metrics: {
     activeStake: BigInt(poolMetricsModel.active_stake),
+    activeStakePercentage: Number(poolMetricsModel.active_stake_percentage),
     blocksCreated: poolMetricsModel.blocks_created,
     delegators: poolMetricsModel.delegators,
     livePledge: BigInt(poolMetricsModel.live_pledge),
+    liveStake: BigInt(poolMetricsModel.live_stake),
     saturation: Number.parseFloat(poolMetricsModel.saturation)
   }
 });

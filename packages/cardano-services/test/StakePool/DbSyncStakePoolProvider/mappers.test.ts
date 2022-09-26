@@ -92,12 +92,12 @@ describe('mappers', () => {
     total_rewards: '99999'
   };
   const poolMetricsModel = {
-    active_stake: '1000000',
+    active_stake: '100000000',
     active_stake_percentage: 0.5,
     blocks_created: 20,
     delegators: 88,
     live_pledge: '99999',
-    live_stake: '100000000',
+    live_stake: '110000000',
     live_stake_percentage: 0.5,
     pool_hash_id: hash_id,
     saturation: '0.000_000_8'
@@ -190,9 +190,11 @@ describe('mappers', () => {
       hashId: Number(poolMetricsModel.pool_hash_id),
       metrics: {
         activeStake: BigInt(poolMetricsModel.active_stake),
+        activeStakePercentage: Number(poolMetricsModel.active_stake_percentage),
         blocksCreated: poolMetricsModel.blocks_created,
         delegators: poolMetricsModel.delegators,
         livePledge: BigInt(poolMetricsModel.live_pledge),
+        liveStake: BigInt(poolMetricsModel.live_stake),
         saturation: Number.parseFloat(poolMetricsModel.saturation)
       }
     });
@@ -206,26 +208,19 @@ describe('mappers', () => {
   it('calcNodeMetricsValues', () => {
     const metrics = mapPoolMetrics(poolMetricsModel).metrics;
     const apy = poolAPYModel.apy;
-    expect(
-      calcNodeMetricsValues(
-        Cardano.PoolId('pool1la4ghj4w4f8p4yk4qmx0qvqmzv6592ee9rs0vgla5w6lc2nc8w5'),
-        metrics,
-        nodeMetricsDependencies,
-        apy
-      )
-    ).toEqual({
+    expect(calcNodeMetricsValues(metrics, nodeMetricsDependencies, apy)).toEqual({
       apy: 0.015,
       blocksCreated: 20,
       delegators: 88,
       livePledge: 99_999n,
-      saturation: 0.000_002_404_549_647_683_62,
+      saturation: 0.000_000_026_190_473_628_95,
       size: {
-        active: 0.000_099_018_631_217_717_84,
-        live: 0.999_900_981_368_782_2
+        active: 0.5,
+        live: 0.5
       },
       stake: {
-        active: 1_000_000n,
-        live: 10_098_109_508n
+        active: 100_000_000n,
+        live: 110_000_000n
       }
     });
   });
@@ -238,12 +233,7 @@ describe('mappers', () => {
     const poolRewards = [mapEpochReward(epochRewardModel, hashId)];
     const partialMetrics = [mapPoolMetrics(poolMetricsModel)];
     const poolAPYs = [mapPoolAPY(poolAPYModel)];
-    const poolMetrics = calcNodeMetricsValues(
-      poolDatas[0].id,
-      partialMetrics[0].metrics,
-      nodeMetricsDependencies,
-      poolAPYs[0].apy
-    );
+    const poolMetrics = calcNodeMetricsValues(partialMetrics[0].metrics, nodeMetricsDependencies, poolAPYs[0].apy);
     const stakePool = {
       cost: poolDatas[0].cost,
       epochRewards: poolRewards.map((r) => r.epochReward),

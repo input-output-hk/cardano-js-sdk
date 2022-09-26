@@ -11,14 +11,7 @@ import {
 import { CommonPoolInfo, OrderedResult, PoolAPY, PoolData, PoolMetrics, PoolSortType, PoolUpdate } from './types';
 import { DbSyncProvider } from '../../DbSyncProvider';
 import { Disposer, EpochMonitor } from '../../util/polling/types';
-import {
-  IDS_NAMESPACE,
-  LIVE_STAKE_CACHE_KEY,
-  StakePoolsSubQuery,
-  emptyPoolsExtraInfo,
-  getStakePoolSortType,
-  queryCacheKey
-} from './util';
+import { IDS_NAMESPACE, StakePoolsSubQuery, emptyPoolsExtraInfo, getStakePoolSortType, queryCacheKey } from './util';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../InMemoryCache';
 import { Logger } from 'ts-log';
 import { Pool } from 'pg';
@@ -44,19 +37,17 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
   #cache: InMemoryCache;
   #epochMonitor: EpochMonitor;
   #epochRolloverDisposer: Disposer;
-  #cardanoNode: CardanoNode;
   #paginationPageSizeLimit: number;
 
   constructor(
     { paginationPageSizeLimit }: StakePoolProviderProps,
-    { db, cache, cardanoNode, logger, epochMonitor }: StakePoolProviderDependencies
+    { db, cache, logger, epochMonitor }: StakePoolProviderDependencies
   ) {
     super(db);
     this.#logger = logger;
     this.#cache = cache;
     this.#epochMonitor = epochMonitor;
     this.#builder = new StakePoolBuilder(db, logger);
-    this.#cardanoNode = cardanoNode;
     this.#paginationPageSizeLimit = paginationPageSizeLimit;
   }
 
@@ -204,9 +195,6 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
             this.#builder.queryPoolAPY(hashesIds, { rewardsHistoryLimit: options?.rewardsHistoryLimit })
           );
 
-    // Get stake pools distribution cached
-    const stakeDistribution = await this.#cache.get(LIVE_STAKE_CACHE_KEY, () => this.#cardanoNode.stakeDistribution());
-
     // Get stake pools rewards cached
     const poolRewards = await this.#cache.get(
       queryCacheKey(StakePoolsSubQuery.REWARDS, orderedResultHashIds, options),
@@ -244,7 +232,6 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
       lastEpochNo,
       nodeMetricsDependencies: {
         optimalPoolCount,
-        stakeDistribution,
         totalAdaAmount: BigInt(totalAdaAmount)
       },
       poolAPYs,
