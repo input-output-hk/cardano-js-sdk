@@ -1,7 +1,7 @@
 {
-  "name": "@cardano-sdk/cip2",
+  "name": "@cardano-sdk/input-selection",
   "version": "0.6.0-nightly.0",
-  "description": "TypeScript definitions for CIP2 (Coin Selection Algorithms for Cardano)",
+  "description": "TypeScript definitions for input-selection (Coin Selection Algorithms for Cardano)",
   "engines": {
     "node": "^14"
   },

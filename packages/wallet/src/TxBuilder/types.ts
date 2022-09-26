@@ -1,7 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { CustomError } from 'ts-custom-error';
 
-import { InputSelectionError } from '@cardano-sdk/cip2';
+import { InputSelectionError } from '@cardano-sdk/input-selection';
 
 import { OutputValidation } from '../types';
 import { SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';

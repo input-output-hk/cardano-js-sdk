@@ -21,7 +21,7 @@ jobs:
         ref: nightly
         submodules: true
 
-    - name: Merge in master
+    - name: ⏬ Merge in master
       run: |
         git config user.name github-actions
         git config user.email github-actions@github.com
@@ -34,20 +34,19 @@ jobs:
         node-version: 14.17
         registry-url: 'https://registry.npmjs.org'
 
-    - name: Install dependencies
+    - name: 💽 Install dependencies
       run: |
         yarn install --immutable --inline-builds --mode=skip-build
         git checkout yarn-project.nix
 
-    - name: Check if any packages changed
-      id: precondition
-      run: |
-        CHANGED=$(yarn run lerna changed --json | node -e "console.log(JSON.parse(require('fs').readFileSync(0).toString()).length)")
-        echo "$CHANGED packages changed"
-        echo "::set-output name=changed::$(($CHANGED))"
+    - name: 📝 Count changed packages
+      uses: sergeysova/jq-action@v2
+      id: changed
+      with:
+        cmd: yarn run lerna changed --json | jq -ne 'input? // 0 | length'
 
-    - name: Publish
-      if: steps.precondition.outputs.changed > 0
+    - name: 📤 Publish
+      if: steps.changed.outputs.value > 0
       run: |
         yarn build
         yarn publish:nightly --loglevel silly

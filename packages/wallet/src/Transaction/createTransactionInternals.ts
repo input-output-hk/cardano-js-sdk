@@ -1,5 +1,5 @@
 import { CSL, Cardano, coreToCsl, util } from '@cardano-sdk/core';
-import { SelectionResult } from '@cardano-sdk/cip2';
+import { SelectionResult } from '@cardano-sdk/input-selection';
 
 export type CreateTxInternalsProps = {
   changeAddress: Cardano.Address;

@@ -72,9 +72,9 @@
     "webextension-polyfill": "^0.9.0"
   },
   "dependencies": {
-    "@cardano-sdk/cip2": "^0.6.0-nightly.0",
     "@cardano-sdk/cip30": "^0.5.1-nightly.11",
     "@cardano-sdk/core": "^0.6.0-nightly.8",
+    "@cardano-sdk/input-selection": "^0.6.0-nightly.0",
     "@cardano-sdk/key-management": "^0.2.0-nightly.5",
     "@cardano-sdk/util": "^0.6.0-nightly.2",
     "@cardano-sdk/util-rxjs": "^0.4.2-nightly.11",
