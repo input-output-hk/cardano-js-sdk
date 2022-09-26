@@ -1,0 +1,9 @@
+{
+  "Producers": [
+    {
+      "addr": "vasil-dev-node.world.dev.cardano.org",
+      "port": 30001,
+      "valency": 1
+    }
+  ]
+}

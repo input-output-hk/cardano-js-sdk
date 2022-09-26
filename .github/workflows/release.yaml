@@ -16,7 +16,6 @@ jobs:
         # Fetch all history for all tags and branches
         fetch-depth: 0
         ref: master
-        submodules: true
         token: ${{ secrets.BOT_GH_TOKEN }}
 
     - name: 🧰 Setup Node.js
