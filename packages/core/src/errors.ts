@@ -12,9 +12,35 @@ export enum ProviderFailure {
 
 const formatMessage = (reason: string, detail?: string) => reason + (detail ? ` (${detail})` : '');
 
-export class ProviderError<InnerError = unknown> extends CustomError {
-  constructor(public reason: ProviderFailure, public innerError?: InnerError, public detail?: string) {
-    super(formatMessage(reason, detail));
+export class ComposableError<InnerError = unknown> extends CustomError {
+  private static stackDelimiter = '\n    at ';
+
+  constructor(message: string, public innerError?: InnerError) {
+    let firstLineOfInnerErrorStack = '';
+    let innerErrorStack: string[] = [];
+
+    if (innerError instanceof Error && innerError.stack) {
+      [firstLineOfInnerErrorStack, ...innerErrorStack] = innerError.stack.split(ComposableError.stackDelimiter);
+
+      message = `${message} due to\n ${firstLineOfInnerErrorStack}`;
+    }
+
+    super(message);
+
+    if (!this.stack || innerErrorStack.length === 0) return;
+
+    const [firstLineOfStack] = this.stack.split(ComposableError.stackDelimiter);
+
+    Object.defineProperty(this, 'stack', {
+      configurable: true,
+      value: `${firstLineOfStack}${innerErrorStack.join(ComposableError.stackDelimiter)}`
+    });
+  }
+}
+
+export class ProviderError<InnerError = unknown> extends ComposableError<InnerError> {
+  constructor(public reason: ProviderFailure, innerError?: InnerError, public detail?: string) {
+    super(formatMessage(reason, detail), innerError);
   }
 }
 
@@ -27,9 +53,9 @@ export enum SerializationFailure {
   InvalidScriptType = 'INVALID_SCRIPT_TYPE'
 }
 
-export class SerializationError extends CustomError {
-  constructor(public reason: SerializationFailure, public detail?: string, public innerError?: unknown) {
-    super(formatMessage(reason, detail));
+export class SerializationError<InnerError = unknown> extends ComposableError<InnerError> {
+  constructor(public reason: SerializationFailure, public detail?: string, innerError?: InnerError) {
+    super(formatMessage(reason, detail), innerError);
   }
 }
 
@@ -45,8 +71,8 @@ export class NotImplementedError extends CustomError {
   }
 }
 
-export class InvalidStringError extends CustomError {
-  constructor(expectation: string, public innerError?: unknown) {
-    super(`Invalid string: "${expectation}"`);
+export class InvalidStringError<InnerError = unknown> extends ComposableError<InnerError> {
+  constructor(expectation: string, innerError?: InnerError) {
+    super(`Invalid string: "${expectation}"`, innerError);
   }
 }
