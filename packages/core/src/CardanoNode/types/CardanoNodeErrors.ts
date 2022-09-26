@@ -9,11 +9,12 @@ import {
   UnknownResultError,
   WebSocketClosed
 } from '@cardano-ogmios/client';
+import { ComposableError } from '../../errors';
 import { CustomError } from 'ts-custom-error';
 
-export class UnknownCardanoNodeError extends CustomError {
-  constructor(public innerError: unknown) {
-    super('Unknown CardanoNode error. See "innerError".');
+export class UnknownCardanoNodeError<InnerError = unknown> extends ComposableError<InnerError> {
+  constructor(innerError: InnerError) {
+    super('Unknown CardanoNode error', innerError);
   }
 }
 

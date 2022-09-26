@@ -1,9 +1,9 @@
-import { CustomError } from 'ts-custom-error';
+import { ComposableError } from '../../errors';
 import { TxSubmission } from '@cardano-ogmios/client';
 
-export class UnknownTxSubmissionError extends CustomError {
-  constructor(public innerError: unknown) {
-    super('Unknown submission error. See "innerError".');
+export class UnknownTxSubmissionError<InnerError = unknown> extends ComposableError<InnerError> {
+  constructor(innerError: InnerError) {
+    super('Unknown submission error', innerError);
   }
 }
 

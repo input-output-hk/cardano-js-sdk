@@ -217,7 +217,7 @@ describe('CardanoTokenRegistry', () => {
       await expect(tokenRegistry.getTokenMetadata([validAssetId])).rejects.toThrow(
         new ProviderError(
           ProviderFailure.Unknown,
-          undefined,
+          new TypeError("Cannot destructure property 'subject' of 'record' as it is null."),
           "Cannot destructure property 'subject' of 'record' as it is null. while evaluating metatada record null"
         )
       );
