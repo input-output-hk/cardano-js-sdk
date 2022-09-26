@@ -1,10 +1,13 @@
 import { Asset, Cardano } from '@cardano-sdk/core';
 import { BalanceTracker } from './types';
 import { Logger } from 'ts-log';
-import { Observable, forkJoin, map, mergeMap, of, tap } from 'rxjs';
-import { RetryBackoffConfig } from 'backoff-rxjs';
+import { Observable, Subject, combineLatest, map, mergeMap, of, switchMap, takeUntil, tap } from 'rxjs';
+import { RetryBackoffConfig, intervalBackoff } from 'backoff-rxjs';
 import { TrackedAssetProvider } from './ProviderTracker';
 import { coldObservableProvider } from './util';
+
+const isAssetInfoComplete = (assetInfo: Asset.AssetInfo): boolean =>
+  assetInfo.nftMetadata !== undefined && assetInfo.tokenMetadata !== undefined;
 
 export const createAssetService =
   (assetProvider: TrackedAssetProvider, retryBackoffConfig: RetryBackoffConfig) => (assetId: Cardano.AssetId) =>
@@ -47,16 +50,23 @@ export const createAssetsTracker = (
         // Fetch asset metadata only for assets not already present in assetsMap
         map((assetIds) =>
           assetIds.map((assetId) => {
-            if (assetsMap.has(assetId)) {
-              return of(assetsMap.get(assetId));
+            const assetInfo = assetsMap.get(assetId);
+            if (assetInfo && isAssetInfoComplete(assetInfo)) {
+              return of(assetInfo);
             }
-            logger.debug(`Fetching metadata for asset ${assetId}`);
-            return assetService(assetId);
+            const stopPolling = new Subject<void>();
+            return intervalBackoff(retryBackoffConfig).pipe(
+              // It starts right away, as opposed to rxjs interval which waits the interval before emitting
+              tap((iter) => logger.debug(`Fetch metadata for asset ${assetId}`, iter)),
+              takeUntil(stopPolling),
+              switchMap(() => assetService(assetId)),
+              tap((v) => isAssetInfoComplete(v) && stopPolling.next())
+            );
           })
         ),
         // Wait for all asset metadata fetches to complete
-        mergeMap((assetInfos) => forkJoin(assetInfos)),
-        tap((assetInfos) => logger.debug(`Done fetching metadata for ${assetInfos.length} assets`)),
+        mergeMap((assetInfos) => combineLatest(assetInfos)),
+        tap((assetInfos) => logger.debug(`Got metadata for ${assetInfos.length} assets`)),
         map((assetInfos) => new Map(assetInfos.map((assetInfo) => [assetInfo!.assetId, assetInfo!]))),
         tap((v) => (assetsMap = v))
       )
