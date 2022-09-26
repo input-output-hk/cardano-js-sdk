@@ -52,6 +52,7 @@ A Yarn Workspace maintaining a single version across all packages.
 
 - [nvm](https://github.com/nvm-sh/nvm)
 - [yarn](https://classic.yarnpkg.com/lang/en/docs/install)
+- [Docker Desktop] 3.4 or later or a Docker installation that includes Compose V2
 
 #### Clone
 ``` console
@@ -143,4 +144,5 @@ yarn docs
 [workflow_nightly]: https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/nightly.yaml
 [img_src_release]: https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/release.yaml/badge.svg
 [workflow_release]: https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/release.yaml
+[Docker Desktop]: https://docs.docker.com/desktop/
 [let us know!]: https://github.com/input-output-hk/cardano-graphql/discussions/new
