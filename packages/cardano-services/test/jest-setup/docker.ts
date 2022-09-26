@@ -93,6 +93,11 @@ export const setupPostgresContainer = async (user: string, password: string, por
 
   const databaseConfigs = [
     {
+      database: 'local',
+      fixture: false,
+      snapshot: true
+    },
+    {
       database: 'testnet',
       fixture: true,
       snapshot: true
