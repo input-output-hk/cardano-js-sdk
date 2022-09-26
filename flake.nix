@@ -1,9 +1,11 @@
 {
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+  inputs.nix-filter.url = "github:numtide/nix-filter";
 
   outputs = {
     self,
     nixpkgs,
+    nix-filter,
   }: {
     packages.x86_64-linux.default = let
       pkgs = nixpkgs.legacyPackages.x86_64-linux;
@@ -11,8 +13,23 @@
         url = "https://chromedriver.storage.googleapis.com/102.0.5005.61/chromedriver_linux64.zip";
         hash = "sha256-SwB82rvinNOBKT3z8odrHamtMKZZWdUY6nJKst7b9Ts=";
       };
+      src = nix-filter.lib.filter {
+        root = ./.;
+        include = [
+          "build"
+          "packages"
+          "scripts"
+          ".yarn"
+          ".yarnrc.yml"
+          "package.json"
+          "tsconfig.json"
+          "yarn.lock"
+          "yarn-project.nix"
+        ];
+      };
+      project = pkgs.callPackage ./yarn-project.nix {} {inherit src;};
     in
-      (pkgs.callPackage ./yarn-project.nix {} {src = ./.;}).overrideAttrs (oldAttrs: {
+      project.overrideAttrs (oldAttrs: {
         # A bunch of deps build binaries using node-gyp that requires Python
         PYTHON = "${pkgs.python3}/bin/python3";
         # chromedriver wants to download the binary
