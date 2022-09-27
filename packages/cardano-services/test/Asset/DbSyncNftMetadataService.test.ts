@@ -9,7 +9,7 @@ export const oneMintNft: AssetPolicyIdAndName = {
   policyId: Cardano.PolicyId('50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb')
 };
 
-export const unexistingAsset: AssetPolicyIdAndName = {
+export const nonExistentAsset: AssetPolicyIdAndName = {
   name: Cardano.AssetName(''),
   policyId: Cardano.PolicyId('c0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a7')
 };
@@ -33,12 +33,12 @@ describe('DbSyncNftMetadataService', () => {
     await dbConnection.end();
   });
 
-  it('returns undefined for unexisting asset', async () => {
-    expect(await service.getNftMetadata(unexistingAsset)).toBeUndefined();
+  it('returns null for non-existent asset', async () => {
+    expect(await service.getNftMetadata(nonExistentAsset)).toBeNull();
   });
 
-  it('returns undefined for non-nft asset', async () => {
-    expect(await service.getNftMetadata(nonNftAsset)).toBeUndefined();
+  it('returns null for non-nft asset', async () => {
+    expect(await service.getNftMetadata(nonNftAsset)).toBeNull();
   });
 
   it('returns nft metadata when it exists', async () => {

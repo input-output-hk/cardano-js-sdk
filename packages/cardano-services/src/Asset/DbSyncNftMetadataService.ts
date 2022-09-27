@@ -28,11 +28,11 @@ export class DbSyncNftMetadataService implements NftMetadataService {
     this.#metadataService = metadataService;
   }
 
-  async getNftMetadata(assetInfo: AssetPolicyIdAndName): Promise<Asset.NftMetadata | undefined> {
+  async getNftMetadata(assetInfo: AssetPolicyIdAndName): Promise<Asset.NftMetadata | null> {
     // Perf: could query last mint tx metadata in 1 query instead of 2
     const lastMintedTx = await this.#builder.queryLastMintTx(assetInfo.policyId, assetInfo.name);
 
-    if (!lastMintedTx) return;
+    if (!lastMintedTx) return null;
 
     const lastMintedTxId = Cardano.TransactionId(lastMintedTx.tx_hash.toString('hex'));
 

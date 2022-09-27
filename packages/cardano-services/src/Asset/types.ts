@@ -13,9 +13,9 @@ export interface NftMetadataService {
   /**
    * Get CIP-25 NFT metadata for a given asset
    *
-   * @returns CIP-25 NFT metadata for NFTs, `undefined` for assets that are not NFTs
+   * @returns CIP-25 NFT metadata for NFTs, `null` for assets that are not NFTs
    */
-  getNftMetadata(asset: AssetPolicyIdAndName): Promise<Asset.NftMetadata | undefined>;
+  getNftMetadata(asset: AssetPolicyIdAndName): Promise<Asset.NftMetadata | null>;
 }
 
 /**
