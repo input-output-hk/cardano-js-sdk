@@ -175,6 +175,8 @@ export class ObservableWalletTxBuilder implements TxBuilder {
       auxiliaryData: this.auxiliaryData && { ...this.auxiliaryData },
       body: tx.body,
       extraSigners: this.extraSigners && [...this.extraSigners],
+      hash: tx.hash,
+      inputSelection: tx.inputSelection,
       isValid: true,
       sign: () =>
         createSignedTx({
