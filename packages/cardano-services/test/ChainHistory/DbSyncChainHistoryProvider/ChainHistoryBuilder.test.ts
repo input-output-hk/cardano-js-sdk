@@ -19,10 +19,10 @@ describe('ChainHistoryBuilder', () => {
   describe('queryTransactionInputsByHashes', () => {
     test('query transaction inputs by tx hashes', async () => {
       const result = await builder.queryTransactionInputsByHashes([
-        Cardano.TransactionId('cefd2fcf657e5e5d6c35975f4e052f427819391b153ebb16ad8aa107ba5a3819'),
-        Cardano.TransactionId('952dfa431223fd671c5e9e048e016f70fcebd9e41fcb726969415ff692736eeb')
+        Cardano.TransactionId('face165bd7aa8d0d661cf1ceaa4e35d7611be3b1c7997da378c547aa2464a4fd'),
+        Cardano.TransactionId('19251f57476d7af2777252270413c01383d9503110a68b4fde1a239c119c4f5d')
       ]);
-      expect(result).toHaveLength(2);
+      expect(result).toHaveLength(1);
       expect(result).toMatchSnapshot();
     });
     test('query transaction inputs with empty array', async () => {
@@ -45,7 +45,7 @@ describe('ChainHistoryBuilder', () => {
           ],
           true
         );
-        expect(result).toHaveLength(2);
+        expect(result).toHaveLength(0);
         expect(result).toMatchSnapshot();
       });
       test('query transaction collateral inputs when tx not found or does not have any ', async () => {

@@ -163,32 +163,16 @@ Map {
 exports[`ChainHistoryBuilder queryTransactionInputsByHashes query transaction inputs by tx hashes 1`] = `
 Array [
   Object {
-    "address": "addr_test1qr74u5d3d07x53pq37acghulu7wvjt794s53xp2fz343drhx2aghqc4747n2yhu0dht5xz0t5j6n0fju3rs8mfj83tzqly49jr",
+    "address": "addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7",
+    "id": "2791722",
     "index": 0,
-    "txId": "952dfa431223fd671c5e9e048e016f70fcebd9e41fcb726969415ff692736eeb",
-  },
-  Object {
-    "address": "addr_test1qpvl4gf5r5h5w4yjrf58rt8slltem9tqfge36zqhsz5kgc8f2tc4ydn4zz9p0eymajqa4vj87he7yz6ssmh9x9h685hst9rgvk",
-    "index": 0,
-    "txId": "cefd2fcf657e5e5d6c35975f4e052f427819391b153ebb16ad8aa107ba5a3819",
+    "txInputId": "19251f57476d7af2777252270413c01383d9503110a68b4fde1a239c119c4f5d",
+    "txSourceId": "face165bd7aa8d0d661cf1ceaa4e35d7611be3b1c7997da378c547aa2464a4fd",
   },
 ]
 `;
 
-exports[`ChainHistoryBuilder queryTransactionInputsByHashes with collateral true query transaction collateral inputs by tx hashes 1`] = `
-Array [
-  Object {
-    "address": "addr_test1vpmwgcd7xuqr60ej3qnlfeyy5qhaudhmnmxey6str7v4rrcd3t2q4",
-    "index": 0,
-    "txId": "5acd6efb1b66299f1c5a2c4221af4bcaa4ba9929e8e6aa0e3f48707fa1796fc3",
-  },
-  Object {
-    "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
-    "index": 0,
-    "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
-  },
-]
-`;
+exports[`ChainHistoryBuilder queryTransactionInputsByHashes with collateral true query transaction collateral inputs by tx hashes 1`] = `Array []`;
 
 exports[`ChainHistoryBuilder queryTransactionOutputsByHashes query transaction outputs by tx hashes 1`] = `
 Array [

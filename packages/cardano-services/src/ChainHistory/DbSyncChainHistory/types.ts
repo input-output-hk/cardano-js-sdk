@@ -44,7 +44,23 @@ export interface TxModel {
   block_slot_no: number;
 }
 
-export interface TxInOutModel {
+export interface TxInputModel {
+  address: string;
+  id: string;
+  index: number;
+  tx_input_id: Buffer;
+  tx_source_id: Buffer;
+}
+
+export interface TxInput {
+  address: Cardano.Address;
+  id: string;
+  index: number;
+  txInputId: Cardano.TransactionId;
+  txSourceId: Cardano.TransactionId;
+}
+
+export interface TxOutputModel {
   address: string;
   coin_value: string;
   datum?: Buffer | null;
@@ -53,7 +69,7 @@ export interface TxInOutModel {
   tx_id: Buffer;
 }
 
-export interface TxOutputModel extends Cardano.TxOut {
+export interface TxOutput extends Cardano.TxOut {
   txId: Cardano.TransactionId;
   index: number;
 }
