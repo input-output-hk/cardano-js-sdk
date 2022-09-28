@@ -72,26 +72,26 @@ const getAssetMetadata = (policy: MetadatumMap, asset: Pick<AssetInfo, 'name'>) 
 
 // TODO: consider hoisting this function together with cip25 types to core or a new cip25 package
 /**
- * @returns {NftMetadata | undefined} CIP-0025 NFT metadata
+ * @returns {NftMetadata | null} CIP-0025 NFT metadata
  */
 export const metadatumToCip25 = (
   asset: Pick<AssetInfo, 'policyId' | 'name'>,
   metadatumMap: MetadatumMap | undefined,
   logger: Logger
-): NftMetadata | undefined => {
+): NftMetadata | null => {
   const cip25Metadata = metadatumMap?.get(721n);
-  if (!cip25Metadata) return;
+  if (!cip25Metadata) return null;
   const cip25MetadatumMap = asMetadatumMap(cip25Metadata);
-  if (!cip25MetadatumMap) return;
+  if (!cip25MetadatumMap) return null;
   const policy = asMetadatumMap(cip25MetadatumMap.get(asset.policyId.toString())!);
-  if (!policy) return;
+  if (!policy) return null;
   const assetMetadata = getAssetMetadata(policy, asset);
-  if (!assetMetadata) return;
+  if (!assetMetadata) return null;
   const name = asString(assetMetadata.get('name'));
   const image = asStringArray(assetMetadata.get('image'));
   if (!name || !image) {
     logger.warn('Invalid CIP-25 metadata', assetMetadata);
-    return;
+    return null;
   }
   const mediaType = asString(assetMetadata.get('mediaType'));
   const files = asMetadatumArray(assetMetadata.get('files'));
@@ -108,5 +108,6 @@ export const metadatumToCip25 = (
   } catch (error: unknown) {
     // Any error here means metadata was invalid
     logger.warn('Invalid CIP-25 metadata', assetMetadata, error);
+    return null;
   }
 };
