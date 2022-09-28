@@ -49,7 +49,7 @@ export const findLatestCompleteEpoch = `
 export const findLedgerTip = `
     SELECT block_no, slot_no, hash
     FROM block
-    ORDER BY block_no DESC NULLS LAST
+    ORDER BY id DESC
     LIMIT 1;
 `;
 
