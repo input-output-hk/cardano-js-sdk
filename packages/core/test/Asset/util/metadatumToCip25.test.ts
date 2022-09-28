@@ -20,21 +20,21 @@ describe('NftMetadata/metadatumToCip25', () => {
     version: '1.0'
   };
 
-  it('returns undefined for non-cip25 metadatum', () => {
+  it('returns null for non-cip25 metadatum', () => {
     const metadatum: TxMetadata = new Map([[123n, 'metadatum']]);
-    expect(metadatumToCip25(asset, metadatum, logger)).toBeUndefined();
+    expect(metadatumToCip25(asset, metadatum, logger)).toBeNull();
   });
 
-  it('returns undefined for cip25 metadatum with no metadata for given policyId', () => {
+  it('returns null for cip25 metadatum with no metadata for given policyId', () => {
     const metadata: TxMetadata = new Map([[721n, new Map([['other_policy_id', minimalMetadata]])]]);
-    expect(metadatumToCip25(asset, metadata, logger)).toBeUndefined();
+    expect(metadatumToCip25(asset, metadata, logger)).toBeNull();
   });
 
-  it('returns undefined for cip25 metadatum with no metadata for given assetId', () => {
+  it('returns null for cip25 metadatum with no metadata for given assetId', () => {
     const metadatum: TxMetadata = new Map([
       [721n, new Map([[asset.policyId.toString(), new Map([['other_asset_id', minimalMetadata]])]])]
     ]);
-    expect(metadatumToCip25(asset, metadatum, logger)).toBeUndefined();
+    expect(metadatumToCip25(asset, metadatum, logger)).toBeNull();
   });
 
   it('converts minimal metadata', () => {
