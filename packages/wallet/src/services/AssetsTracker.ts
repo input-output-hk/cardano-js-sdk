@@ -1,14 +1,18 @@
 import { Asset, Cardano } from '@cardano-sdk/core';
 import { BalanceTracker } from './types';
 import { Logger } from 'ts-log';
-import { Observable, forkJoin, map, mergeMap, of, tap } from 'rxjs';
+import { Observable, combineLatest, map, mergeMap, of, tap } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackedAssetProvider } from './ProviderTracker';
 import { coldObservableProvider } from './util';
 
+const isAssetInfoComplete = (assetInfo: Asset.AssetInfo): boolean =>
+  assetInfo.nftMetadata !== undefined && assetInfo.tokenMetadata !== undefined;
+
 export const createAssetService =
   (assetProvider: TrackedAssetProvider, retryBackoffConfig: RetryBackoffConfig) => (assetId: Cardano.AssetId) =>
     coldObservableProvider({
+      pollUntil: isAssetInfoComplete,
       provider: () =>
         assetProvider.getAsset({ assetId, extraData: { history: false, nftMetadata: true, tokenMetadata: true } }),
       retryBackoffConfig,
@@ -47,16 +51,17 @@ export const createAssetsTracker = (
         // Fetch asset metadata only for assets not already present in assetsMap
         map((assetIds) =>
           assetIds.map((assetId) => {
-            if (assetsMap.has(assetId)) {
-              return of(assetsMap.get(assetId));
+            const assetInfo = assetsMap.get(assetId);
+            if (assetInfo && isAssetInfoComplete(assetInfo)) {
+              return of(assetInfo);
             }
-            logger.debug(`Fetching metadata for asset ${assetId}`);
+            logger.debug('Fetching asset data for', assetId);
             return assetService(assetId);
           })
         ),
-        // Wait for all asset metadata fetches to complete
-        mergeMap((assetInfos) => forkJoin(assetInfos)),
-        tap((assetInfos) => logger.debug(`Done fetching metadata for ${assetInfos.length} assets`)),
+        // Wait for all asset metadata fetches have a value
+        mergeMap((assetInfos) => combineLatest(assetInfos)),
+        tap((assetInfos) => logger.debug(`Got metadata for ${assetInfos.length} assets`)),
         map((assetInfos) => new Map(assetInfos.map((assetInfo) => [assetInfo!.assetId, assetInfo!]))),
         tap((v) => (assetsMap = v))
       )
