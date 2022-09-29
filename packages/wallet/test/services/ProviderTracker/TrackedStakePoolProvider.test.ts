@@ -48,7 +48,7 @@ describe('TrackedStakePoolProvider', () => {
     test(
       'queryStakePools',
       testFunctionStats(
-        (provider) => provider.queryStakePools({}),
+        (provider) => provider.queryStakePools({ pagination: { limit: 25, startAt: 0 } }),
         (stats) => stats.queryStakePools$
       )
     );

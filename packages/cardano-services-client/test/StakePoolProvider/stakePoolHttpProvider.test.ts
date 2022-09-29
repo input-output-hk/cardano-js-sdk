@@ -21,7 +21,7 @@ describe('stakePoolHttpProvider', () => {
   test('queryStakePools doesnt throw', async () => {
     axiosMock.onPost().replyOnce(200, []);
     const provider = stakePoolHttpProvider(config);
-    await expect(provider.queryStakePools()).resolves.toEqual([]);
+    await expect(provider.queryStakePools({ pagination: { limit: 25, startAt: 1 } })).resolves.toEqual([]);
   });
 
   test('stakePoolStats doesnt throw', async () => {

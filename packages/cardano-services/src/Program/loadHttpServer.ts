@@ -90,13 +90,16 @@ const serviceMapFactory = (args: ProgramArgs, logger: Logger, dnsResolver: DnsRe
     }, ServiceNames.Asset),
     [ServiceNames.StakePool]: withDb(async (db) => {
       const cardanoNode = await getOgmiosCardanoNode(dnsResolver, logger, args.options);
-      const stakePoolProvider = new DbSyncStakePoolProvider({
-        cache: new InMemoryCache(args.options!.dbCacheTtl!),
-        cardanoNode,
-        db,
-        epochMonitor: getEpochMonitor(db),
-        logger
-      });
+      const stakePoolProvider = new DbSyncStakePoolProvider(
+        { paginationPageSizeLimit: args.options!.paginationPageSizeLimit! },
+        {
+          cache: new InMemoryCache(args.options!.dbCacheTtl!),
+          cardanoNode,
+          db,
+          epochMonitor: getEpochMonitor(db),
+          logger
+        }
+      );
       return new StakePoolHttpService({ logger, stakePoolProvider });
     }, ServiceNames.StakePool),
     [ServiceNames.Utxo]: withDb(

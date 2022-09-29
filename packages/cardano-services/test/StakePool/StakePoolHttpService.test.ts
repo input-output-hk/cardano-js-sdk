@@ -27,8 +27,12 @@ const APPLICATION_CBOR = 'application/cbor';
 const APPLICATION_JSON = 'application/json';
 const STAKE_POOL_NAME = 'THE AMSTERDAM NODE';
 
+const pagination = { limit: 10, startAt: 0 };
+const BAD_REQUEST = 'Request failed with status code 400';
+
 const setFilterCondition = (options: QueryStakePoolsArgs, condition: 'and' | 'or'): QueryStakePoolsArgs => ({
-  filters: { ...options.filters, _condition: condition }
+  filters: { ...options.filters, _condition: condition },
+  pagination
 });
 
 const setSortCondition = (
@@ -46,11 +50,13 @@ const setPagination = (options: QueryStakePoolsArgs, startAt: number, limit: num
 });
 
 const addStatusFilter = (options: QueryStakePoolsArgs, status: Cardano.StakePoolStatus): QueryStakePoolsArgs => ({
-  filters: { ...options.filters, status: [status] }
+  filters: { ...options.filters, status: [status] },
+  pagination
 });
 
 const addPledgeMetFilter = (options: QueryStakePoolsArgs, pledgeMet: boolean): QueryStakePoolsArgs => ({
-  filters: { ...options.filters, pledgeMet }
+  filters: { ...options.filters, pledgeMet },
+  pagination
 });
 
 describe('StakePoolHttpService', () => {
@@ -105,7 +111,10 @@ describe('StakePoolHttpService', () => {
 
     beforeAll(async () => {
       cardanoNode = mockCardanoNode();
-      stakePoolProvider = new DbSyncStakePoolProvider({ cache, cardanoNode, db, epochMonitor, logger });
+      stakePoolProvider = new DbSyncStakePoolProvider(
+        { paginationPageSizeLimit: pagination.limit },
+        { cache, cardanoNode, db, epochMonitor, logger }
+      );
       service = new StakePoolHttpService({ logger, stakePoolProvider });
       httpServer = new HttpServer(config, { logger, services: [service] });
       provider = stakePoolHttpProvider(clientConfig);
@@ -157,21 +166,85 @@ describe('StakePoolHttpService', () => {
           identifier: {
             values: [{ id: Cardano.PoolId('pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70') }]
           }
-        }
+        },
+        pagination
       };
 
       describe('with Http Server', () => {
         it('returns a 200 coded response with a well formed HTTP request', async () => {
-          expect((await axios.post(`${baseUrl}${url}`, { args: [] })).status).toEqual(200);
+          expect((await axios.post(`${baseUrl}${url}`, { pagination: { limit: 5, startAt: 0 } })).status).toEqual(200);
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
+          expect.assertions(2);
           try {
-            await axios.post(`${baseUrl}${url}`, undefined, { headers: { 'Content-Type': APPLICATION_CBOR } });
+            await axios.post(
+              `${baseUrl}${url}`,
+              { pagination: { limit: 5, startAt: 0 } },
+              { headers: { 'Content-Type': APPLICATION_CBOR } }
+            );
             throw new Error('fail');
           } catch (error: any) {
             expect(error.response.status).toBe(415);
             expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
+          }
+        });
+
+        it('returns a 400 coded error if pagination argument is not provided', async () => {
+          expect.assertions(2);
+          try {
+            await axios.post(`${baseUrl}${url}`, {}, { headers: { 'Content-Type': APPLICATION_JSON } });
+          } catch (error: any) {
+            expect(error.response.status).toBe(400);
+            expect(error.message).toBe(BAD_REQUEST);
+          }
+        });
+
+        it('returns a 400 coded error if pagination limit is greater than pagination page size limit', async () => {
+          expect.assertions(2);
+          const pageSizeGreaterThanMaxLimit = 30;
+          try {
+            await axios.post(
+              `${baseUrl}${url}`,
+              { pagination: { limit: pageSizeGreaterThanMaxLimit, startAt: 0 } },
+              { headers: { 'Content-Type': APPLICATION_JSON } }
+            );
+          } catch (error: any) {
+            expect(error.response.status).toBe(400);
+            expect(error.message).toBe(BAD_REQUEST);
+          }
+        });
+
+        it('returns a 400 coded error if provided filter identifier values are greater than pagination page size limit', async () => {
+          expect.assertions(2);
+          const filters = {
+            identifier: {
+              _condition: 'or',
+              values: [
+                { name: 'CLI' },
+                { name: 'banderini' },
+                { ticker: 'TEST' },
+                { ticker: 'TEST2' },
+                { ticker: 'TEST3' },
+                { ticker: 'TEST4' },
+                { ticker: 'TEST5' },
+                { ticker: 'TEST6' },
+                { ticker: 'TEST7' },
+                { id: 'pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70' as unknown as Cardano.PoolId },
+                { id: '98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70' as unknown as Cardano.PoolId }
+              ]
+            }
+          };
+
+          try {
+            await axios.post(
+              `${baseUrl}${url}`,
+              { filters, pagination: { limit: 5, startAt: 0 } },
+              { headers: { 'Content-Type': APPLICATION_JSON } }
+            );
+          } catch (error: any) {
+            expect(error.response.status).toBe(400);
+            expect(error.message).toBe(BAD_REQUEST);
           }
         });
       });
@@ -186,7 +259,8 @@ describe('StakePoolHttpService', () => {
                 { id: Cardano.PoolId('pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70') }
               ]
             }
-          }
+          },
+          pagination
         };
         const response = await provider.queryStakePools(options);
         expect(response.pageResults).toHaveLength(2);
@@ -257,7 +331,7 @@ describe('StakePoolHttpService', () => {
 
       describe('pagination', () => {
         it('should paginate response', async () => {
-          const req: QueryStakePoolsArgs = {};
+          const req: QueryStakePoolsArgs = { pagination };
           const reqWithPagination: QueryStakePoolsArgs = { pagination: { limit: 2, startAt: 1 } };
           const responseWithPagination = await provider.queryStakePools(reqWithPagination);
           const response = await provider.queryStakePools(req);
@@ -269,7 +343,7 @@ describe('StakePoolHttpService', () => {
           expect(responseWithPagination.pageResults).toEqual(responseWithPaginationCached.pageResults);
         });
         it('should paginate response with or condition', async () => {
-          const req: QueryStakePoolsArgs = { filters: { _condition: 'or' } };
+          const req: QueryStakePoolsArgs = { filters: { _condition: 'or' }, pagination };
           const reqWithPagination: QueryStakePoolsArgs = { ...req, pagination: { limit: 2, startAt: 1 } };
           const responseWithPagination = await provider.queryStakePools(reqWithPagination);
           const response = await provider.queryStakePools(req);
@@ -336,7 +410,8 @@ describe('StakePoolHttpService', () => {
                   { id: '98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70' as unknown as Cardano.PoolId }
                 ]
               }
-            }
+            },
+            pagination
           };
           const responseWithOrCondition = await provider.queryStakePools(setFilterCondition(req, 'or'));
           const responseWithAndCondition = await provider.queryStakePools(req);
@@ -354,7 +429,8 @@ describe('StakePoolHttpService', () => {
                   { id: 'pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70' as unknown as Cardano.PoolId }
                 ]
               }
-            }
+            },
+            pagination
           };
           const responseWithOrCondition = await provider.queryStakePools(setFilterCondition(req, 'or'));
           const responseWithAndCondition = await provider.queryStakePools(req);
@@ -371,12 +447,14 @@ describe('StakePoolHttpService', () => {
           const req: QueryStakePoolsArgs = {
             filters: {
               identifier: { values }
-            }
+            },
+            pagination
           };
           const reqWithInsensitiveValues: QueryStakePoolsArgs = {
             filters: {
               identifier: { values: insensitiveValues }
-            }
+            },
+            pagination
           };
           const response = await provider.queryStakePools(req);
           const responseWithInsensitiveValues = await provider.queryStakePools(reqWithInsensitiveValues);
@@ -386,7 +464,8 @@ describe('StakePoolHttpService', () => {
           const req: QueryStakePoolsArgs = {
             filters: {
               identifier: { values: [{ name: 'Unknown Name', ticker: 'TEST' }] }
-            }
+            },
+            pagination
           };
           const response = await provider.queryStakePools(req);
           const responseWithOrCondition = await provider.queryStakePools(setFilterCondition(req, 'or'));
@@ -404,7 +483,8 @@ describe('StakePoolHttpService', () => {
                 condition: 'and',
                 values: [{ name: 'Unknown Name' }]
               }
-            }
+            },
+            pagination
           };
           const response = await provider.queryStakePools(req);
           expect(response.pageResults).toEqual([]);
@@ -418,9 +498,10 @@ describe('StakePoolHttpService', () => {
               identifier: {
                 values: []
               }
-            }
+            },
+            pagination
           };
-          const reqWithNoFilters = {};
+          const reqWithNoFilters = { pagination };
           const response = await provider.queryStakePools(req);
           const responseWithNoFilters = await provider.queryStakePools(reqWithNoFilters);
           expect(response).toEqual(responseWithNoFilters);
@@ -431,7 +512,8 @@ describe('StakePoolHttpService', () => {
           const req: QueryStakePoolsArgs = {
             filters: {
               status: [Cardano.StakePoolStatus.Active]
-            }
+            },
+            pagination
           };
           const responseWithOrCondition = await provider.queryStakePools(setFilterCondition(req, 'or'));
           const response = await provider.queryStakePools(req);
@@ -446,7 +528,8 @@ describe('StakePoolHttpService', () => {
             filters: {
               _condition: 'or',
               status: [Cardano.StakePoolStatus.Activating]
-            }
+            },
+            pagination
           };
           const response = await provider.queryStakePools(req);
           expect(response).toMatchSnapshot();
@@ -458,7 +541,8 @@ describe('StakePoolHttpService', () => {
           const req: QueryStakePoolsArgs = {
             filters: {
               status: [Cardano.StakePoolStatus.Retired]
-            }
+            },
+            pagination
           };
           const responseWithOrCondition = await provider.queryStakePools(setFilterCondition(req, 'or'));
           const response = await provider.queryStakePools(req);
@@ -472,7 +556,8 @@ describe('StakePoolHttpService', () => {
           const req: QueryStakePoolsArgs = {
             filters: {
               status: [Cardano.StakePoolStatus.Retiring]
-            }
+            },
+            pagination
           };
           const responseWithOrCondition = await provider.queryStakePools(setFilterCondition(req, 'or'));
           const response = await provider.queryStakePools(req);
@@ -489,7 +574,8 @@ describe('StakePoolHttpService', () => {
           const req: QueryStakePoolsArgs = {
             filters: {
               pledgeMet: true
-            }
+            },
+            pagination
           };
           const responseWithAndCondition = await provider.queryStakePools(req);
           const responseWithOrCondition = await provider.queryStakePools(setFilterCondition(req, 'or'));
@@ -504,7 +590,8 @@ describe('StakePoolHttpService', () => {
           const req = {
             filters: {
               pledgeMet: false
-            }
+            },
+            pagination
           };
           const responseWithOrCondition = await provider.queryStakePools(setFilterCondition(req, 'or'));
           const responseWithAndCondition = await provider.queryStakePools(req);
@@ -529,7 +616,8 @@ describe('StakePoolHttpService', () => {
                 { id: Cardano.PoolId('pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70') }
               ]
             }
-          }
+          },
+          pagination
         };
         const reqWithMultipleFilters: QueryStakePoolsArgs = {
           filters: {
@@ -541,7 +629,8 @@ describe('StakePoolHttpService', () => {
               Cardano.StakePoolStatus.Retired,
               Cardano.StakePoolStatus.Retiring
             ]
-          }
+          },
+          pagination
         };
         describe('identifier & status filters', () => {
           it('active with or condition', async () => {
@@ -749,7 +838,8 @@ describe('StakePoolHttpService', () => {
                 { id: Cardano.PoolId('pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70') }
               ]
             }
-          }
+          },
+          pagination
         };
         const sortByNameThenByPoolId = function (poolA: Cardano.StakePool, poolB: Cardano.StakePool) {
           if (poolA.metadata?.name && !poolB.metadata?.name) return -1;
@@ -762,29 +852,29 @@ describe('StakePoolHttpService', () => {
 
         describe('sort by name', () => {
           it('desc order', async () => {
-            const response = await provider.queryStakePools(setSortCondition({}, 'desc', 'name'));
+            const response = await provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'name'));
             expect(response).toMatchSnapshot();
 
-            const responseCached = await provider.queryStakePools(setSortCondition({}, 'desc', 'name'));
+            const responseCached = await provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'name'));
             expect(response.pageResults).toEqual(responseCached.pageResults);
           });
 
           it('asc order', async () => {
-            const response = await provider.queryStakePools(setSortCondition({}, 'asc', 'name'));
+            const response = await provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'name'));
             expect(response).toMatchSnapshot();
 
-            const responseCached = await provider.queryStakePools(setSortCondition({}, 'asc', 'name'));
+            const responseCached = await provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'name'));
             expect(response.pageResults).toEqual(responseCached.pageResults);
           });
 
           it('if sort not provided, defaults to order by name and then by poolId asc', async () => {
-            const response = await provider.queryStakePools({});
+            const response = await provider.queryStakePools({ pagination });
             const resultSortedCopy = [...response.pageResults].sort(sortByNameThenByPoolId);
 
             expect(response.pageResults).toEqual(resultSortedCopy);
             expect(response).toMatchSnapshot();
 
-            const responseCached = await provider.queryStakePools({});
+            const responseCached = await provider.queryStakePools({ pagination });
             expect(response.pageResults).toEqual(responseCached.pageResults);
           });
 
@@ -805,7 +895,8 @@ describe('StakePoolHttpService', () => {
                     { id: firstNamedPoolId }
                   ]
                 }
-              }
+              },
+              pagination
             };
 
             it('with name ascending', async () => {
@@ -854,8 +945,8 @@ describe('StakePoolHttpService', () => {
           });
 
           it('asc order with applied pagination', async () => {
-            const firstPageReq = setSortCondition(setPagination({}, 0, 3), 'asc', 'name');
-            const secondPageReq = setSortCondition(setPagination({}, 3, 3), 'asc', 'name');
+            const firstPageReq = setSortCondition(setPagination({ pagination }, 0, 3), 'asc', 'name');
+            const secondPageReq = setSortCondition(setPagination({ pagination }, 3, 3), 'asc', 'name');
 
             const firstPageResultSet = await provider.queryStakePools(firstPageReq);
 
@@ -873,11 +964,11 @@ describe('StakePoolHttpService', () => {
 
           it('asc order with applied pagination, with change sort order on next page', async () => {
             const firstPageResponse = await provider.queryStakePools(
-              setSortCondition(setPagination({}, 0, 5), 'asc', 'name')
+              setSortCondition(setPagination({ pagination }, 0, 5), 'asc', 'name')
             );
 
             const secondPageResponse = await provider.queryStakePools(
-              setSortCondition(setPagination({}, 5, 5), 'asc', 'name')
+              setSortCondition(setPagination({ pagination }, 5, 5), 'asc', 'name')
             );
             const firstPageIds = firstPageResponse.pageResults.map(({ id }) => id);
 
@@ -903,11 +994,11 @@ describe('StakePoolHttpService', () => {
 
         describe('sort by saturation', () => {
           it('desc order', async () => {
-            const response = await provider.queryStakePools(setSortCondition({}, 'desc', 'saturation'));
+            const response = await provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'saturation'));
             expect(response).toMatchSnapshot();
           });
           it('asc order', async () => {
-            const response = await provider.queryStakePools(setSortCondition({}, 'asc', 'saturation'));
+            const response = await provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'saturation'));
             expect(response).toMatchSnapshot();
           });
           it('with applied filters', async () => {
@@ -917,8 +1008,8 @@ describe('StakePoolHttpService', () => {
             expect(response).toMatchSnapshot();
           });
           it('with applied pagination', async () => {
-            const firstPageOptions = setSortCondition(setPagination({}, 0, 3), 'asc', 'saturation');
-            const secondPageOptions = setSortCondition(setPagination({}, 3, 3), 'asc', 'saturation');
+            const firstPageOptions = setSortCondition(setPagination({ pagination }, 0, 3), 'asc', 'saturation');
+            const secondPageOptions = setSortCondition(setPagination({ pagination }, 3, 3), 'asc', 'saturation');
 
             const firstPageResultSet = await provider.queryStakePools(firstPageOptions);
             const secondPageResultSet = await provider.queryStakePools(secondPageOptions);
@@ -936,11 +1027,11 @@ describe('StakePoolHttpService', () => {
 
         describe('sort by APY', () => {
           it('desc order', async () => {
-            const response = await provider.queryStakePools(setSortCondition({}, 'desc', 'apy'));
+            const response = await provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'apy'));
             expect(response).toMatchSnapshot();
           });
           it('asc order', async () => {
-            const response = await provider.queryStakePools(setSortCondition({}, 'asc', 'apy'));
+            const response = await provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'apy'));
             expect(response).toMatchSnapshot();
           });
           it('with applied filters', async () => {
@@ -950,8 +1041,8 @@ describe('StakePoolHttpService', () => {
             expect(response).toMatchSnapshot();
           });
           it('with applied pagination', async () => {
-            const firstPageOptions = setSortCondition(setPagination({}, 0, 3), 'desc', 'apy');
-            const secondPageOptions = setSortCondition(setPagination({}, 3, 3), 'desc', 'apy');
+            const firstPageOptions = setSortCondition(setPagination({ pagination }, 0, 3), 'desc', 'apy');
+            const secondPageOptions = setSortCondition(setPagination({ pagination }, 3, 3), 'desc', 'apy');
 
             const firstPageResultSet = await provider.queryStakePools(firstPageOptions);
             const secondPageResultSet = await provider.queryStakePools(secondPageOptions);
@@ -968,11 +1059,11 @@ describe('StakePoolHttpService', () => {
 
         describe('sort by cost and margin', () => {
           it('desc order', async () => {
-            const response = await provider.queryStakePools(setSortCondition({}, 'desc', 'cost'));
+            const response = await provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'cost'));
             expect(response).toMatchSnapshot();
           });
           it('asc order', async () => {
-            const response = await provider.queryStakePools(setSortCondition({}, 'asc', 'cost'));
+            const response = await provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'cost'));
             expect(response).toMatchSnapshot();
           });
           it('with applied filters', async () => {
@@ -982,8 +1073,8 @@ describe('StakePoolHttpService', () => {
             expect(response).toMatchSnapshot();
           });
           it('with applied pagination', async () => {
-            const firstPageOptions = setSortCondition(setPagination({}, 0, 3), 'desc', 'cost');
-            const secondPageOptions = setSortCondition(setPagination({}, 3, 3), 'desc', 'cost');
+            const firstPageOptions = setSortCondition(setPagination({ pagination }, 0, 3), 'desc', 'cost');
+            const secondPageOptions = setSortCondition(setPagination({ pagination }, 3, 3), 'desc', 'cost');
 
             const firstPageResultSet = await provider.queryStakePools(firstPageOptions);
             const secondPageResultSet = await provider.queryStakePools(secondPageOptions);
@@ -1005,12 +1096,12 @@ describe('StakePoolHttpService', () => {
       const url = '/stats';
       describe('with Http Server', () => {
         it('returns a 200 coded response with a well formed HTTP request', async () => {
-          expect((await axios.post(`${baseUrl}${url}`, { args: [] })).status).toEqual(200);
+          expect((await axios.post(`${baseUrl}${url}`, {})).status).toEqual(200);
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
           try {
-            await axios.post(`${baseUrl}${url}`, { args: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
+            await axios.post(`${baseUrl}${url}`, {}, { headers: { 'Content-Type': APPLICATION_CBOR } });
             throw new Error('fail');
           } catch (error: any) {
             expect(error.response.status).toBe(415);

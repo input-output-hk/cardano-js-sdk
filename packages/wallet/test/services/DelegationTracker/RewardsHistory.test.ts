@@ -39,7 +39,7 @@ describe('RewardsHistory', () => {
   });
 
   describe('createRewardsHistoryTracker', () => {
-    it('queries and maps reward history starting from first delgation epoch+3', () => {
+    it('queries and maps reward history starting from first delegation epoch+3', () => {
       createTestScheduler().run(({ cold, expectObservable, flush }) => {
         const accountRewardsHistory = rewardsHistory.get(rewardAccount)!;
         const epoch = accountRewardsHistory[0].epoch;

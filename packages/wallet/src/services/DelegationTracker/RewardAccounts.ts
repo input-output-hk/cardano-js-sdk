@@ -1,6 +1,6 @@
 /* eslint-disable unicorn/no-nested-ternary */
 import { BigIntMath, deepEquals, isNotNil } from '@cardano-sdk/util';
-import { Cardano, RewardsProvider } from '@cardano-sdk/core';
+import { Cardano, RewardsProvider, StakePoolProvider } from '@cardano-sdk/core';
 import { ConfirmedTx, Delegatee, RewardAccount, StakeKeyStatus, TxInFlight } from '../types';
 import {
   EMPTY,
@@ -19,6 +19,7 @@ import {
   tap
 } from 'rxjs';
 import { KeyValueStore } from '../../persistence';
+import { PAGE_SIZE } from '../TransactionsTracker';
 import {
   RegAndDeregCertificateTypes,
   includesAnyCertificate,
@@ -31,6 +32,26 @@ import { coldObservableProvider, shallowArrayEquals } from '../util';
 import findLast from 'lodash/findLast';
 import isEqual from 'lodash/isEqual';
 import uniq from 'lodash/uniq';
+
+const allStakePoolsByPoolIds = async (
+  stakePoolProvider: StakePoolProvider,
+  { poolIds }: { poolIds: Cardano.PoolId[] }
+): Promise<Cardano.StakePool[]> => {
+  let startAt = 0;
+  let response: Cardano.StakePool[] = [];
+  let pageResults: Cardano.StakePool[] = [];
+  do {
+    pageResults = (
+      await stakePoolProvider.queryStakePools({
+        filters: { identifier: { values: poolIds.map((poolId) => ({ id: poolId })) } },
+        pagination: { limit: PAGE_SIZE, startAt }
+      })
+    ).pageResults;
+    startAt += PAGE_SIZE;
+    response = [...response, ...pageResults];
+  } while (pageResults.length === PAGE_SIZE);
+  return response;
+};
 
 export const createQueryStakePoolsProvider =
   (
@@ -46,12 +67,7 @@ export const createQueryStakePoolsProvider =
     return merge(
       store.getValues(poolIds),
       coldObservableProvider({
-        provider: () =>
-          stakePoolProvider
-            .queryStakePools({
-              filters: { identifier: { values: poolIds.map((poolId) => ({ id: poolId })) } }
-            })
-            .then(({ pageResults }) => pageResults),
+        provider: () => allStakePoolsByPoolIds(stakePoolProvider, { poolIds }),
         retryBackoffConfig
       }).pipe(
         tap((pageResults) => {
@@ -62,6 +78,7 @@ export const createQueryStakePoolsProvider =
       )
     );
   };
+
 export type ObservableStakePoolProvider = ReturnType<typeof createQueryStakePoolsProvider>;
 
 const getWithdrawalQuantity = (
