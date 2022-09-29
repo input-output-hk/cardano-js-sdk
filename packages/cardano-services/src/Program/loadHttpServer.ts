@@ -40,6 +40,7 @@ export interface HttpServerOptions extends CommonProgramOptions {
   epochPollInterval: number;
   dbCacheTtl: number;
   useQueue?: boolean;
+  paginationPageSizeLimit?: number;
 }
 
 export interface ProgramArgs {

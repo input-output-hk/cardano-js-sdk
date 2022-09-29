@@ -5,6 +5,16 @@ import { ProviderHandler } from '../util';
 import { RunnableModule } from '../RunnableModule';
 import express from 'express';
 
+export const providerFailureToStatusCodeMap: { [key in ProviderFailure]: number } = {
+  [ProviderFailure.BadRequest]: 400,
+  [ProviderFailure.NotFound]: 404,
+  [ProviderFailure.Unhealthy]: 500,
+  [ProviderFailure.Unknown]: 500,
+  [ProviderFailure.InvalidResponse]: 500,
+  [ProviderFailure.NotImplemented]: 500,
+  [ProviderFailure.ConnectionFailure]: 500
+};
+
 export abstract class HttpService extends RunnableModule {
   public router: express.Router;
   public slug: string;
@@ -58,7 +68,7 @@ export abstract class HttpService extends RunnableModule {
         logger.error(error);
 
         if (error instanceof ProviderError) {
-          const code = error.reason === ProviderFailure.NotFound ? 404 : 500;
+          const code = providerFailureToStatusCodeMap[error.reason];
 
           return HttpServer.sendJSON(res, error, code);
         }
