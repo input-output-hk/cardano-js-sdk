@@ -46,7 +46,14 @@
             }
           },
           "400": {
-            "description": "invalid request"
+            "description": "invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
           }
         }
       }
@@ -56,14 +63,22 @@
         "summary": "stake pool stats",
         "operationId": "stakePoolStats",
         "requestBody": {
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/StakePoolStats_body" } } }
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StakePoolStats_body"
+              }
+            }
+          }
         },
         "responses": {
           "200": {
             "description": "Stake pool stats fetched",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/StakePoolStats" }
+                "schema": {
+                  "$ref": "#/components/schemas/StakePoolStats"
+                }
               }
             }
           },
@@ -77,10 +92,17 @@
   "components": {
     "schemas": {
       "Undefined": {
-        "required": ["__type"],
+        "required": [
+          "__type"
+        ],
         "type": "object",
         "properties": {
-          "__type": { "type": "string", "enum": ["undefined"] }
+          "__type": {
+            "type": "string",
+            "enum": [
+              "undefined"
+            ]
+          }
         }
       },
       "StakePoolStats": {
@@ -89,9 +111,15 @@
           "qty": {
             "type": "object",
             "properties": {
-              "active": { "type": "number" },
-              "retired": { "type": "number" },
-              "retiring": { "type": "number" }
+              "active": {
+                "type": "number"
+              },
+              "retired": {
+                "type": "number"
+              },
+              "retiring": {
+                "type": "number"
+              }
             }
           }
         }
@@ -100,6 +128,9 @@
         "type": "object"
       },
       "SearchStakePoolRequest": {
+        "required": [
+          "pagination"
+        ],
         "type": "object",
         "properties": {
           "filters": {
@@ -115,11 +146,17 @@
         }
       },
       "IdentifierFilter": {
+        "required": [
+          "values"
+        ],
         "type": "object",
         "properties": {
           "_condition": {
             "type": "string",
-            "enum": ["and", "or"]
+            "enum": [
+              "and",
+              "or"
+            ]
           },
           "values": {
             "type": "array",
@@ -130,7 +167,15 @@
         }
       },
       "SearchStakePool": {
-        "required": ["cost", "id", "margin", "owners", "pledge", "relays", "vrf"],
+        "required": [
+          "cost",
+          "id",
+          "margin",
+          "owners",
+          "pledge",
+          "relays",
+          "vrf"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -233,13 +278,37 @@
         "type": "object",
         "properties": {
           "ipv4": {
-            "anyOf": [{ "$ref": "#/components/schemas/Undefined" }, { "type": "string", "nullable": true }]
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Undefined"
+              },
+              {
+                "type": "string",
+                "nullable": true
+              }
+            ]
           },
           "ipv6": {
-            "anyOf": [{ "$ref": "#/components/schemas/Undefined" }, { "type": "string", "nullable": true }]
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Undefined"
+              },
+              {
+                "type": "string",
+                "nullable": true
+              }
+            ]
           },
           "port": {
-            "anyOf": [{ "$ref": "#/components/schemas/Undefined" }, { "type": "number", "nullable": true }]
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Undefined"
+              },
+              {
+                "type": "number",
+                "nullable": true
+              }
+            ]
           },
           "dnsName": {
             "type": "string"
@@ -280,10 +349,18 @@
       },
       "StakePoolStatus": {
         "type": "string",
-        "enum": ["active", "activating", "retired", "retiring"]
+        "enum": [
+          "active",
+          "activating",
+          "retired",
+          "retiring"
+        ]
       },
       "Fraction": {
-        "required": ["denominator", "numerator"],
+        "required": [
+          "denominator",
+          "numerator"
+        ],
         "type": "object",
         "properties": {
           "numerator": {
@@ -306,7 +383,10 @@
         }
       },
       "BigInt": {
-        "required": ["value", "__type"],
+        "required": [
+          "value",
+          "__type"
+        ],
         "type": "object",
         "properties": {
           "value": {
@@ -314,7 +394,9 @@
           },
           "__type": {
             "type": "string",
-            "enum": ["bigint"]
+            "enum": [
+              "bigint"
+            ]
           }
         }
       },
@@ -323,7 +405,10 @@
         "properties": {
           "_condition": {
             "type": "string",
-            "enum": ["and", "or"]
+            "enum": [
+              "and",
+              "or"
+            ]
           },
           "identifier": {
             "$ref": "#/components/schemas/IdentifierFilter"
@@ -340,7 +425,10 @@
         }
       },
       "SearchStakePoolRequest_pagination": {
-        "required": ["limit", "startAt"],
+        "required": [
+          "limit",
+          "startAt"
+        ],
         "type": "object",
         "properties": {
           "startAt": {
@@ -449,7 +537,13 @@
           },
           "status": {
             "type": "string",
-            "enum": ["active", "retired", "offline", "experimental", "private"]
+            "enum": [
+              "active",
+              "retired",
+              "offline",
+              "experimental",
+              "private"
+            ]
           },
           "contact": {
             "$ref": "#/components/schemas/ExtendedMetadataFields_pool_contact"

@@ -1,13 +1,14 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Cardano, QueryStakePoolsArgs } from '@cardano-sdk/core';
+import { PAGINATION_PAGE_SIZE_LIMIT_DEFAULT, StakePoolBuilder } from '../../../src';
 import { Pool } from 'pg';
-import { StakePoolBuilder } from '../../../src';
 import { dummyLogger as logger } from 'ts-log';
 
 describe('StakePoolBuilder', () => {
   const dbConnection = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
   const builder = new StakePoolBuilder(dbConnection, logger);
+  const pagination = { limit: PAGINATION_PAGE_SIZE_LIMIT_DEFAULT, startAt: 0 };
 
   afterAll(async () => {
     await dbConnection.end();
@@ -74,7 +75,10 @@ describe('StakePoolBuilder', () => {
       });
       it('by saturation', async () => {
         const metrics = (
-          await builder.queryPoolMetrics([1, 31, 19], totalAda, { sort: { field: 'saturation', order: 'asc' } })
+          await builder.queryPoolMetrics([1, 31, 19], totalAda, {
+            pagination,
+            sort: { field: 'saturation', order: 'asc' }
+          })
         ).map((m) => m.metrics);
         expect(metrics).toHaveLength(3);
         expect(metrics).toMatchSnapshot();
@@ -108,32 +112,32 @@ describe('StakePoolBuilder', () => {
         expect(pools).toMatchSnapshot();
       });
       it('by name desc', async () => {
-        const pools = (await builder.queryPoolData([14, 15, 20], { sort: { field: 'name', order: 'desc' } })).map(
-          (qR) => {
-            const { hashId: _1, updateId: _2, ...poolData } = qR;
-            return poolData;
-          }
-        );
+        const pools = (
+          await builder.queryPoolData([14, 15, 20], { pagination, sort: { field: 'name', order: 'desc' } })
+        ).map((qR) => {
+          const { hashId: _1, updateId: _2, ...poolData } = qR;
+          return poolData;
+        });
         expect(pools).toHaveLength(3);
         expect(pools).toMatchSnapshot();
       });
       it('by real-world cost considering fixed cost and margin when specifying sort by cost desc', async () => {
-        const pools = (await builder.queryPoolData([14, 15, 20], { sort: { field: 'cost', order: 'desc' } })).map(
-          (qR) => {
-            const { hashId: _1, updateId: _2, ...poolData } = qR;
-            return poolData;
-          }
-        );
+        const pools = (
+          await builder.queryPoolData([14, 15, 20], { pagination, sort: { field: 'cost', order: 'desc' } })
+        ).map((qR) => {
+          const { hashId: _1, updateId: _2, ...poolData } = qR;
+          return poolData;
+        });
         expect(pools).toHaveLength(3);
         expect(pools).toMatchSnapshot();
       });
       it('by real-world cost considering fixed cost and margin when specifying sort by cost asc', async () => {
-        const pools = (await builder.queryPoolData([14, 15, 20], { sort: { field: 'cost', order: 'asc' } })).map(
-          (qR) => {
-            const { hashId: _1, updateId: _2, ...poolData } = qR;
-            return poolData;
-          }
-        );
+        const pools = (
+          await builder.queryPoolData([14, 15, 20], { pagination, sort: { field: 'cost', order: 'asc' } })
+        ).map((qR) => {
+          const { hashId: _1, updateId: _2, ...poolData } = qR;
+          return poolData;
+        });
         expect(pools).toHaveLength(3);
         expect(pools).toMatchSnapshot();
       });

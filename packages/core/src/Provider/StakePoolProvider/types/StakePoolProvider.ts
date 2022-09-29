@@ -49,7 +49,7 @@ export interface QueryStakePoolsArgs {
   /**
    * Will return all stake pools matching the query if not specified
    */
-  pagination?: PaginationArgs;
+  pagination: PaginationArgs;
 }
 
 export interface StakePoolStats {
@@ -66,7 +66,7 @@ export interface StakePoolProvider extends Provider {
    * @returns Stake pools
    * @throws ProviderError
    */
-  queryStakePools: (args?: QueryStakePoolsArgs) => Promise<Paginated<Cardano.StakePool>>;
+  queryStakePools: (args: QueryStakePoolsArgs) => Promise<Paginated<Cardano.StakePool>>;
   /**
    * @returns {StakePoolStats} Stake pool stats
    */
