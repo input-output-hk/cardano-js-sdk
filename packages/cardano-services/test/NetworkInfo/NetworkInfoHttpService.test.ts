@@ -139,16 +139,12 @@ describe('NetworkInfoHttpService', () => {
     describe('/era-summaries', () => {
       describe('with Http Server', () => {
         it('returns a 200 coded response with a well formed HTTP request', async () => {
-          expect((await axios.post(`${baseUrl}/era-summaries`, { args: [] })).status).toEqual(200);
+          expect((await axios.post(`${baseUrl}/era-summaries`, {})).status).toEqual(200);
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
           try {
-            await axios.post(
-              `${baseUrl}/era-summaries`,
-              { args: [] },
-              { headers: { 'Content-Type': APPLICATION_CBOR } }
-            );
+            await axios.post(`${baseUrl}/era-summaries`, {}, { headers: { 'Content-Type': APPLICATION_CBOR } });
           } catch (error: any) {
             expect(error.response.status).toBe(415);
             expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
@@ -170,12 +166,12 @@ describe('NetworkInfoHttpService', () => {
 
       describe('with Http Server', () => {
         it('returns a 200 coded response with a well formed HTTP request', async () => {
-          expect((await axios.post(`${baseUrl}/stake`, { args: [] })).status).toEqual(200);
+          expect((await axios.post(`${baseUrl}/stake`, {})).status).toEqual(200);
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
           try {
-            await axios.post(`${baseUrl}/stake`, { args: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
+            await axios.post(`${baseUrl}/stake`, {}, { headers: { 'Content-Type': APPLICATION_CBOR } });
           } catch (error: any) {
             expect(error.response.status).toBe(415);
             expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
@@ -253,16 +249,12 @@ describe('NetworkInfoHttpService', () => {
 
       describe('with Http Server', () => {
         it('returns a 200 coded response with a well formed HTTP request', async () => {
-          expect((await axios.post(`${baseUrl}/lovelace-supply`, { args: [] })).status).toEqual(200);
+          expect((await axios.post(`${baseUrl}/lovelace-supply`, {})).status).toEqual(200);
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
           try {
-            await axios.post(
-              `${baseUrl}/lovelace-supply`,
-              { args: [] },
-              { headers: { 'Content-Type': APPLICATION_CBOR } }
-            );
+            await axios.post(`${baseUrl}/lovelace-supply`, {}, { headers: { 'Content-Type': APPLICATION_CBOR } });
           } catch (error: any) {
             expect(error.response.status).toBe(415);
             expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
@@ -308,12 +300,12 @@ describe('NetworkInfoHttpService', () => {
     describe('/ledger-tip', () => {
       describe('with Http Server', () => {
         it('returns a 200 coded response with a well formed HTTP request', async () => {
-          expect((await axios.post(`${baseUrl}/ledger-tip`, { args: [] })).status).toEqual(200);
+          expect((await axios.post(`${baseUrl}/ledger-tip`, {})).status).toEqual(200);
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
           try {
-            await axios.post(`${baseUrl}/ledger-tip`, { args: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
+            await axios.post(`${baseUrl}/ledger-tip`, {}, { headers: { 'Content-Type': APPLICATION_CBOR } });
           } catch (error: any) {
             expect(error.response.status).toBe(415);
             expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
@@ -330,14 +322,14 @@ describe('NetworkInfoHttpService', () => {
     describe('/current-wallet-protocol-parameters', () => {
       describe('with Http Server', () => {
         it('returns a 200 coded response with a well formed HTTP request', async () => {
-          expect((await axios.post(`${baseUrl}/current-wallet-protocol-parameters`, { args: [] })).status).toEqual(200);
+          expect((await axios.post(`${baseUrl}/current-wallet-protocol-parameters`, {})).status).toEqual(200);
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
           try {
             await axios.post(
               `${baseUrl}/current-wallet-protocol-parameters`,
-              { args: [] },
+              {},
               { headers: { 'Content-Type': APPLICATION_CBOR } }
             );
           } catch (error: any) {
@@ -356,16 +348,12 @@ describe('NetworkInfoHttpService', () => {
     describe('/genesis-parameters', () => {
       describe('with Http Server', () => {
         it('returns a 200 coded response with a well formed HTTP request', async () => {
-          expect((await axios.post(`${baseUrl}/genesis-parameters`, { args: [] })).status).toEqual(200);
+          expect((await axios.post(`${baseUrl}/genesis-parameters`, {})).status).toEqual(200);
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
           try {
-            await axios.post(
-              `${baseUrl}/genesis-parameters`,
-              { args: [] },
-              { headers: { 'Content-Type': APPLICATION_CBOR } }
-            );
+            await axios.post(`${baseUrl}/genesis-parameters`, {}, { headers: { 'Content-Type': APPLICATION_CBOR } });
           } catch (error: any) {
             expect(error.response.status).toBe(415);
             expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);

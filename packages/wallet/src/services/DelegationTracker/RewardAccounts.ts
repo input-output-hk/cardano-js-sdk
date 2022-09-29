@@ -34,7 +34,8 @@ export const createQueryStakePoolsProvider =
         provider: () =>
           stakePoolProvider
             .queryStakePools({
-              filters: { identifier: { values: poolIds.map((poolId) => ({ id: poolId })) } }
+              filters: { identifier: { values: poolIds.map((poolId) => ({ id: poolId })) } },
+              pagination: { limit: 25, startAt: 0 }
             })
             .then(({ pageResults }) => pageResults),
         retryBackoffConfig
