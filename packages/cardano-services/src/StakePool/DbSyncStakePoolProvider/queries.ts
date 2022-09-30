@@ -266,7 +266,7 @@ pool_rewards_per_epoch AS (
 		SUM(reward.amount) AS total_amount
 	FROM epochs
 	JOIN reward 
-		ON reward.earned_epoch = epochs.epoch_no
+		ON reward.spendable_epoch = epochs.epoch_no
 		AND reward.pool_id = ANY($1)
   WHERE reward.type = 'member'
 	GROUP BY reward.pool_id, epochs.epoch_no
