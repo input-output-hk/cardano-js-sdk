@@ -21,11 +21,11 @@ jobs:
         ref: nightly
         submodules: true
 
-    - name: ⏬ Merge in master
+    - name: ⏬ Merge in lw-dev
       run: |
         git config user.name github-actions
         git config user.email github-actions@github.com
-        git merge origin/master
+        git merge origin/lw-dev
         git push --force
 
     - name: 🧰 Setup Node.js
