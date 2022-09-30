@@ -66,20 +66,12 @@ Array [
       ],
       "collaterals": Array [],
       "fee": 197929n,
-      "inputs": Array [
-        Object {
-          "address": "addr_test1qr4m502gr9hnaxac5mxjln22jwavf7pcjmh9sw7fujdvgvj9ef6afquphwg7tj4mmm548m3t50hxfyygjuu222kx96eshcathg",
-          "index": 0,
-          "txId": "8fd14baca91c674fafae59701b7dc0eda1266202ec8445bad3244bd8669a7fb5",
-        },
-      ],
+      "inputs": Array [],
       "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1qr4m502gr9hnaxac5mxjln22jwavf7pcjmh9sw7fujdvgvj9ef6afquphwg7tj4mmm548m3t50hxfyygjuu222kx96eshcathg",
           "datum": undefined,
-          "index": 0,
-          "txId": "8fd14baca91c674fafae59701b7dc0eda1266202ec8445bad3244bd8669a7fb5",
           "value": Object {
             "assets": undefined,
             "coins": 999502622402n,
@@ -116,35 +108,12 @@ Array [
       ],
       "collaterals": Array [],
       "fee": 205145n,
-      "inputs": Array [
-        Object {
-          "address": "addr_test1qr4m502gr9hnaxac5mxjln22jwavf7pcjmh9sw7fujdvgvj9ef6afquphwg7tj4mmm548m3t50hxfyygjuu222kx96eshcathg",
-          "index": 0,
-          "txId": "3d4cd09885d39673125c3a15f8acb45d92fde137f9effe7a5131f6cc7241d960",
-        },
-        Object {
-          "address": "addr_test1qr4m502gr9hnaxac5mxjln22jwavf7pcjmh9sw7fujdvgvj9ef6afquphwg7tj4mmm548m3t50hxfyygjuu222kx96eshcathg",
-          "index": 0,
-          "txId": "3d4cd09885d39673125c3a15f8acb45d92fde137f9effe7a5131f6cc7241d960",
-        },
-        Object {
-          "address": "addr_test1qr4m502gr9hnaxac5mxjln22jwavf7pcjmh9sw7fujdvgvj9ef6afquphwg7tj4mmm548m3t50hxfyygjuu222kx96eshcathg",
-          "index": 0,
-          "txId": "3d4cd09885d39673125c3a15f8acb45d92fde137f9effe7a5131f6cc7241d960",
-        },
-        Object {
-          "address": "addr_test1qr4m502gr9hnaxac5mxjln22jwavf7pcjmh9sw7fujdvgvj9ef6afquphwg7tj4mmm548m3t50hxfyygjuu222kx96eshcathg",
-          "index": 0,
-          "txId": "3d4cd09885d39673125c3a15f8acb45d92fde137f9effe7a5131f6cc7241d960",
-        },
-      ],
+      "inputs": Array [],
       "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1qr4m502gr9hnaxac5mxjln22jwavf7pcjmh9sw7fujdvgvj9ef6afquphwg7tj4mmm548m3t50hxfyygjuu222kx96eshcathg",
           "datum": undefined,
-          "index": 0,
-          "txId": "3d4cd09885d39673125c3a15f8acb45d92fde137f9effe7a5131f6cc7241d960",
           "value": Object {
             "assets": undefined,
             "coins": 10306556787917n,
@@ -181,25 +150,12 @@ Array [
       "certificates": undefined,
       "collaterals": Array [],
       "fee": 183761n,
-      "inputs": Array [
-        Object {
-          "address": "addr_test1qq7rv7r27wq5nz2q6htul8k55xrcjsz2tpxkhqfk5f6kfgfnqdurhe3e8zlltj63kwh78hg7ykrexmn6jxxn42egzs4skzyvvc",
-          "index": 1,
-          "txId": "6eec4e9691e0fc2442e5c9bf22847998b80a1625b18a882a4e7b9e0cdda48dc3",
-        },
-        Object {
-          "address": "addr_test1qq7rv7r27wq5nz2q6htul8k55xrcjsz2tpxkhqfk5f6kfgfnqdurhe3e8zlltj63kwh78hg7ykrexmn6jxxn42egzs4skzyvvc",
-          "index": 4,
-          "txId": "6eec4e9691e0fc2442e5c9bf22847998b80a1625b18a882a4e7b9e0cdda48dc3",
-        },
-      ],
+      "inputs": Array [],
       "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
           "datum": "cd968f149166bfd195c82852cbbed09f3ca9d5b070e669f6c50f4ea9d98164f9",
-          "index": 0,
-          "txId": "6eec4e9691e0fc2442e5c9bf22847998b80a1625b18a882a4e7b9e0cdda48dc3",
           "value": Object {
             "assets": Map {
               "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 1678546n,
@@ -210,8 +166,6 @@ Array [
         Object {
           "address": "addr_test1qq7rv7r27wq5nz2q6htul8k55xrcjsz2tpxkhqfk5f6kfgfnqdurhe3e8zlltj63kwh78hg7ykrexmn6jxxn42egzs4skzyvvc",
           "datum": undefined,
-          "index": 1,
-          "txId": "6eec4e9691e0fc2442e5c9bf22847998b80a1625b18a882a4e7b9e0cdda48dc3",
           "value": Object {
             "assets": Map {
               "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 661706n,
@@ -250,25 +204,12 @@ Array [
       "certificates": undefined,
       "collaterals": Array [],
       "fee": 181605n,
-      "inputs": Array [
-        Object {
-          "address": "addr_test1qp64f82kqyn934qtytqf2xhzqnasknqk5f5y88e3jh7s95cmtpwh9z5nwy2egezfnm7eddt4ysfp7tg87attl3ejgjns2qgy69",
-          "index": 1,
-          "txId": "caaada4c53256a9bcba2d006b3f427f089d43372442a550a7349627a46682375",
-        },
-        Object {
-          "address": "addr_test1qp64f82kqyn934qtytqf2xhzqnasknqk5f5y88e3jh7s95cmtpwh9z5nwy2egezfnm7eddt4ysfp7tg87attl3ejgjns2qgy69",
-          "index": 4,
-          "txId": "caaada4c53256a9bcba2d006b3f427f089d43372442a550a7349627a46682375",
-        },
-      ],
+      "inputs": Array [],
       "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
           "datum": "7d6dd89f80dfa80dd0a0e334c220df18cfdc11b8e9e0340384ef193b8a09092b",
-          "index": 0,
-          "txId": "caaada4c53256a9bcba2d006b3f427f089d43372442a550a7349627a46682375",
           "value": Object {
             "assets": Map {
               "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e" => 359387n,
@@ -279,8 +220,6 @@ Array [
         Object {
           "address": "addr_test1qp64f82kqyn934qtytqf2xhzqnasknqk5f5y88e3jh7s95cmtpwh9z5nwy2egezfnm7eddt4ysfp7tg87attl3ejgjns2qgy69",
           "datum": undefined,
-          "index": 1,
-          "txId": "caaada4c53256a9bcba2d006b3f427f089d43372442a550a7349627a46682375",
           "value": Object {
             "assets": undefined,
             "coins": 391939485n,
@@ -312,20 +251,12 @@ Array [
       "certificates": undefined,
       "collaterals": Array [],
       "fee": 179977n,
-      "inputs": Array [
-        Object {
-          "address": "addr_test1qr6sape30ttq8zahxmah2wzaqk3ldc0n0cehj8e408ejhwrq5hrg8xmfyakef5awud6g6uew447r6970evl9lzgrak0qgz3ejq",
-          "index": 1,
-          "txId": "49fa6b7245674fd11727cfb4d47ec7fad380c198a2a975b0423c5f6c255488f9",
-        },
-      ],
+      "inputs": Array [],
       "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
           "datum": "87d376b58b5c5c6b173694172d980100bf6d383b2755618f139dedc1e58c9bea",
-          "index": 0,
-          "txId": "49fa6b7245674fd11727cfb4d47ec7fad380c198a2a975b0423c5f6c255488f9",
           "value": Object {
             "assets": undefined,
             "coins": 23000000n,
@@ -334,8 +265,6 @@ Array [
         Object {
           "address": "addr_test1qr6sape30ttq8zahxmah2wzaqk3ldc0n0cehj8e408ejhwrq5hrg8xmfyakef5awud6g6uew447r6970evl9lzgrak0qgz3ejq",
           "datum": undefined,
-          "index": 1,
-          "txId": "49fa6b7245674fd11727cfb4d47ec7fad380c198a2a975b0423c5f6c255488f9",
           "value": Object {
             "assets": undefined,
             "coins": 893280136n,
@@ -367,20 +296,12 @@ Array [
       "certificates": undefined,
       "collaterals": Array [],
       "fee": 179977n,
-      "inputs": Array [
-        Object {
-          "address": "addr_test1qq75mx8z9sh8aucku2lwjp7c6fe2m3w90aqt9kw4rczjt8lj0rhad28c9f9cmcm64jyqpvths06w4tgwc0vnpx3veqvsj2953n",
-          "index": 1,
-          "txId": "a7eda535edc983139cc1053d074106aef54b25e9c9ee9de6bf1bf69709dabfd4",
-        },
-      ],
+      "inputs": Array [],
       "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
           "datum": "b72256efc2b1cd920d75f769d1ca11433c2890b1ac5ade783de9b536504be618",
-          "index": 0,
-          "txId": "a7eda535edc983139cc1053d074106aef54b25e9c9ee9de6bf1bf69709dabfd4",
           "value": Object {
             "assets": undefined,
             "coins": 154000000n,
@@ -389,8 +310,6 @@ Array [
         Object {
           "address": "addr_test1qq75mx8z9sh8aucku2lwjp7c6fe2m3w90aqt9kw4rczjt8lj0rhad28c9f9cmcm64jyqpvths06w4tgwc0vnpx3veqvsj2953n",
           "datum": undefined,
-          "index": 1,
-          "txId": "a7eda535edc983139cc1053d074106aef54b25e9c9ee9de6bf1bf69709dabfd4",
           "value": Object {
             "assets": undefined,
             "coins": 612159447n,
@@ -422,25 +341,12 @@ Array [
       "certificates": undefined,
       "collaterals": Array [],
       "fee": 186401n,
-      "inputs": Array [
-        Object {
-          "address": "addr_test1qry75qe2e5zez3ny5nuu2dsxrrwhxpl7mr7gdwpsgyfsvtgcgddl7qwm2vl7vedf3xp0vy7ya9ag7dqkcqqktv5403nspw962t",
-          "index": 1,
-          "txId": "b46c48229336aec327a5f537bcbf1ca8fa6a3afbf60aa66880aa6a234e5fce92",
-        },
-        Object {
-          "address": "addr_test1qry75qe2e5zez3ny5nuu2dsxrrwhxpl7mr7gdwpsgyfsvtgcgddl7qwm2vl7vedf3xp0vy7ya9ag7dqkcqqktv5403nspw962t",
-          "index": 8,
-          "txId": "b46c48229336aec327a5f537bcbf1ca8fa6a3afbf60aa66880aa6a234e5fce92",
-        },
-      ],
+      "inputs": Array [],
       "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
           "datum": "13d75d53a0ebf1d51dc7332634366ee9191dc9c5f371fbdfdd1af382638cd310",
-          "index": 0,
-          "txId": "b46c48229336aec327a5f537bcbf1ca8fa6a3afbf60aa66880aa6a234e5fce92",
           "value": Object {
             "assets": Map {
               "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e" => 30000n,
@@ -451,8 +357,6 @@ Array [
         Object {
           "address": "addr_test1qry75qe2e5zez3ny5nuu2dsxrrwhxpl7mr7gdwpsgyfsvtgcgddl7qwm2vl7vedf3xp0vy7ya9ag7dqkcqqktv5403nspw962t",
           "datum": undefined,
-          "index": 1,
-          "txId": "b46c48229336aec327a5f537bcbf1ca8fa6a3afbf60aa66880aa6a234e5fce92",
           "value": Object {
             "assets": Map {
               "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e" => 60704n,
@@ -487,25 +391,12 @@ Array [
       "certificates": undefined,
       "collaterals": Array [],
       "fee": 181649n,
-      "inputs": Array [
-        Object {
-          "address": "addr_test1qp2fxvmxlly62thlzmlrtf5tya2kay8lyucz40ns7xesrz2j8m73lvtj885qvfldxhadg5rsh5h79eczh6gu0deu96hqrrcz3e",
-          "index": 1,
-          "txId": "56caf0441c4f0e209195b86b95e5304b338ca38ec232252c194153e8a3440c28",
-        },
-        Object {
-          "address": "addr_test1qp2fxvmxlly62thlzmlrtf5tya2kay8lyucz40ns7xesrz2j8m73lvtj885qvfldxhadg5rsh5h79eczh6gu0deu96hqrrcz3e",
-          "index": 6,
-          "txId": "56caf0441c4f0e209195b86b95e5304b338ca38ec232252c194153e8a3440c28",
-        },
-      ],
+      "inputs": Array [],
       "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
           "datum": "2f859cede222cf63ede95bfb867e3f880a44a4d057b85946b776d947bf094bef",
-          "index": 0,
-          "txId": "56caf0441c4f0e209195b86b95e5304b338ca38ec232252c194153e8a3440c28",
           "value": Object {
             "assets": Map {
               "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7441444158" => 2086814n,
@@ -516,8 +407,6 @@ Array [
         Object {
           "address": "addr_test1qp2fxvmxlly62thlzmlrtf5tya2kay8lyucz40ns7xesrz2j8m73lvtj885qvfldxhadg5rsh5h79eczh6gu0deu96hqrrcz3e",
           "datum": undefined,
-          "index": 1,
-          "txId": "56caf0441c4f0e209195b86b95e5304b338ca38ec232252c194153e8a3440c28",
           "value": Object {
             "assets": undefined,
             "coins": 736788144n,
@@ -549,20 +438,12 @@ Array [
       "certificates": undefined,
       "collaterals": Array [],
       "fee": 179933n,
-      "inputs": Array [
-        Object {
-          "address": "addr_test1qquh3j3u2v54pe2t6ntt0lyqnvm38v6prryuk8yhk556yjjkgqwx367r8umqax3slc758afpqsy9fzv45rsvgff8me4qa5md5z",
-          "index": 1,
-          "txId": "3d8e3e7c6d0929812abc40d29a3b1e4f470f6d04e9d4b3c521f1f87f74f7ab88",
-        },
-      ],
+      "inputs": Array [],
       "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
           "datum": "b2513d43d5e275476208b4a88b241fd01cd767e47620547fa50364b3e7648479",
-          "index": 0,
-          "txId": "3d8e3e7c6d0929812abc40d29a3b1e4f470f6d04e9d4b3c521f1f87f74f7ab88",
           "value": Object {
             "assets": undefined,
             "coins": 204000000n,
@@ -571,8 +452,6 @@ Array [
         Object {
           "address": "addr_test1qquh3j3u2v54pe2t6ntt0lyqnvm38v6prryuk8yhk556yjjkgqwx367r8umqax3slc758afpqsy9fzv45rsvgff8me4qa5md5z",
           "datum": undefined,
-          "index": 1,
-          "txId": "3d8e3e7c6d0929812abc40d29a3b1e4f470f6d04e9d4b3c521f1f87f74f7ab88",
           "value": Object {
             "assets": undefined,
             "coins": 510111262n,
@@ -604,25 +483,12 @@ Array [
       "certificates": undefined,
       "collaterals": Array [],
       "fee": 183761n,
-      "inputs": Array [
-        Object {
-          "address": "addr_test1qq7rv7r27wq5nz2q6htul8k55xrcjsz2tpxkhqfk5f6kfgfnqdurhe3e8zlltj63kwh78hg7ykrexmn6jxxn42egzs4skzyvvc",
-          "index": 1,
-          "txId": "6eec4e9691e0fc2442e5c9bf22847998b80a1625b18a882a4e7b9e0cdda48dc3",
-        },
-        Object {
-          "address": "addr_test1qq7rv7r27wq5nz2q6htul8k55xrcjsz2tpxkhqfk5f6kfgfnqdurhe3e8zlltj63kwh78hg7ykrexmn6jxxn42egzs4skzyvvc",
-          "index": 4,
-          "txId": "6eec4e9691e0fc2442e5c9bf22847998b80a1625b18a882a4e7b9e0cdda48dc3",
-        },
-      ],
+      "inputs": Array [],
       "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
           "datum": "cd968f149166bfd195c82852cbbed09f3ca9d5b070e669f6c50f4ea9d98164f9",
-          "index": 0,
-          "txId": "6eec4e9691e0fc2442e5c9bf22847998b80a1625b18a882a4e7b9e0cdda48dc3",
           "value": Object {
             "assets": Map {
               "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 1678546n,
@@ -633,8 +499,6 @@ Array [
         Object {
           "address": "addr_test1qq7rv7r27wq5nz2q6htul8k55xrcjsz2tpxkhqfk5f6kfgfnqdurhe3e8zlltj63kwh78hg7ykrexmn6jxxn42egzs4skzyvvc",
           "datum": undefined,
-          "index": 1,
-          "txId": "6eec4e9691e0fc2442e5c9bf22847998b80a1625b18a882a4e7b9e0cdda48dc3",
           "value": Object {
             "assets": Map {
               "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 661706n,
@@ -668,25 +532,12 @@ Array [
       "certificates": undefined,
       "collaterals": Array [],
       "fee": 181605n,
-      "inputs": Array [
-        Object {
-          "address": "addr_test1qqt9fumrwz43e79rfjznn8nlnc05kdfyv7qrxx9ks2vacq8lxxtya039kqwxltw2q73wrdsvhgqrycllm0tg38c9nnkqxysjz6",
-          "index": 1,
-          "txId": "0dbbc0e6d13549a1960476aae42fd492a7a19fba856f9cc9695ecc5c84fe87e9",
-        },
-        Object {
-          "address": "addr_test1qqt9fumrwz43e79rfjznn8nlnc05kdfyv7qrxx9ks2vacq8lxxtya039kqwxltw2q73wrdsvhgqrycllm0tg38c9nnkqxysjz6",
-          "index": 2,
-          "txId": "0dbbc0e6d13549a1960476aae42fd492a7a19fba856f9cc9695ecc5c84fe87e9",
-        },
-      ],
+      "inputs": Array [],
       "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
           "datum": "51505ba8a19dbf24510f5a5c1cb1ab9f4572e197d17ae0035b0e563d02c8bdc2",
-          "index": 0,
-          "txId": "0dbbc0e6d13549a1960476aae42fd492a7a19fba856f9cc9695ecc5c84fe87e9",
           "value": Object {
             "assets": Map {
               "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e" => 726163n,
@@ -697,8 +548,6 @@ Array [
         Object {
           "address": "addr_test1qqt9fumrwz43e79rfjznn8nlnc05kdfyv7qrxx9ks2vacq8lxxtya039kqwxltw2q73wrdsvhgqrycllm0tg38c9nnkqxysjz6",
           "datum": undefined,
-          "index": 1,
-          "txId": "0dbbc0e6d13549a1960476aae42fd492a7a19fba856f9cc9695ecc5c84fe87e9",
           "value": Object {
             "assets": undefined,
             "coins": 194539380n,
@@ -716,581 +565,6 @@ Array [
     "txSize": 591,
     "witness": Object {
       "redeemers": undefined,
-      "signatures": Map {},
-    },
-  },
-  Object {
-    "auxiliaryData": undefined,
-    "blockHeader": Object {
-      "blockNo": 3274726,
-      "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
-      "slot": 49032415,
-    },
-    "body": Object {
-      "certificates": undefined,
-      "collaterals": Array [
-        Object {
-          "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
-          "index": 0,
-          "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
-        },
-      ],
-      "fee": 1030338n,
-      "inputs": Array [
-        Object {
-          "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
-          "index": 0,
-          "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
-        },
-        Object {
-          "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
-          "index": 0,
-          "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
-        },
-        Object {
-          "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
-          "index": 0,
-          "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
-        },
-        Object {
-          "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
-          "index": 0,
-          "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
-        },
-        Object {
-          "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
-          "index": 1,
-          "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
-        },
-        Object {
-          "address": "addr_test1wpjduy92cj4dqzs6y5refxphskru3kfgyhchyg7u7nadt8qqfddxd",
-          "index": 4,
-          "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
-        },
-      ],
-      "mint": Map {
-        "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130f32324c10a93fe1962cf7470543932cc064482c3495fe3de7502f9edd84ca114" => 15355454n,
-      },
-      "outputs": Array [
-        Object {
-          "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
-          "datum": undefined,
-          "index": 0,
-          "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
-          "value": Object {
-            "assets": undefined,
-            "coins": 28178818258n,
-          },
-        },
-        Object {
-          "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
-          "datum": undefined,
-          "index": 1,
-          "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
-          "value": Object {
-            "assets": Map {
-              "ccc526143b6d41d56036248dbaa79440d68653f5b6a1919aa2c9e06131363732343139363030303033" => 1n,
-            },
-            "coins": 10000000n,
-          },
-        },
-        Object {
-          "address": "addr_test1qq9gwfwevn5s96jx9xzclntlrd8m0mrs3ezzva7akkvyj9y7yjf2z5h4fealu2rktu38m3mfv68vsjrtrfwuym60dfyq0axz58",
-          "datum": undefined,
-          "index": 2,
-          "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
-          "value": Object {
-            "assets": Map {
-              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 1909n,
-              "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130f32324c10a93fe1962cf7470543932cc064482c3495fe3de7502f9edd84ca114" => 15355454n,
-            },
-            "coins": 2000000n,
-          },
-        },
-        Object {
-          "address": "addr_test1qqfleha26t47j6khuetrsjyxkwl4x2lya5jsmn24h53n6d6akgetsg2jxgxsqglg8k9m74c8uwl8gxen3hvxsupapqasdzvh6n",
-          "datum": undefined,
-          "index": 3,
-          "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
-          "value": Object {
-            "assets": Map {
-              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 333305n,
-            },
-            "coins": 2000000n,
-          },
-        },
-        Object {
-          "address": "addr_test1qqvl0h49qke8yv8r5as3vrt3zaqdygjmfsfj63futhj803s2wkugrs72zdued30dtsce7mwclnd6n49a64q6f4mmcfksqaspe4",
-          "datum": undefined,
-          "index": 4,
-          "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
-          "value": Object {
-            "assets": Map {
-              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 932541n,
-            },
-            "coins": 2000000n,
-          },
-        },
-        Object {
-          "address": "addr_test1wpjduy92cj4dqzs6y5refxphskru3kfgyhchyg7u7nadt8qqfddxd",
-          "datum": "4d43bb04ab5283946e5edc6df728cb3ed891111876039264ae312d61b3207fff",
-          "index": 5,
-          "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
-          "value": Object {
-            "assets": Map {
-              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 1651585768n,
-              "75ac961881fd5d8d0008d54b4f6914eb6a712faa3403dc32097379b0f32324c10a93fe1962cf7470543932cc064482c3495fe3de7502f9edd84ca114" => 1n,
-              "95b7f0bbaa0b327e6b822840b0f7f7ee1c949e618f0aaeb6c5321cc34d494e53574150" => 1n,
-            },
-            "coins": 247344475554n,
-          },
-        },
-      ],
-      "validityInterval": Object {
-        "invalidBefore": undefined,
-        "invalidHereafter": 49033345,
-      },
-      "withdrawals": undefined,
-    },
-    "id": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
-    "index": 14,
-    "txSize": 10662,
-    "witness": Object {
-      "redeemers": Array [
-        Object {
-          "executionUnits": Object {
-            "memory": 4195651,
-            "steps": 1591910324,
-          },
-          "index": 0,
-          "purpose": "spend",
-          "scriptHash": "64de10aac4aad00a1a25079498378587c8d92825f17223dcf4fad59c",
-        },
-        Object {
-          "executionUnits": Object {
-            "memory": 88558,
-            "steps": 46839629,
-          },
-          "index": 1,
-          "purpose": "spend",
-          "scriptHash": "6e4664e3f6acc48e849eacf4e3607ee6ae2758d6d8b80fa9d8fdd761",
-        },
-        Object {
-          "executionUnits": Object {
-            "memory": 88558,
-            "steps": 46839629,
-          },
-          "index": 3,
-          "purpose": "spend",
-          "scriptHash": "6e4664e3f6acc48e849eacf4e3607ee6ae2758d6d8b80fa9d8fdd761",
-        },
-        Object {
-          "executionUnits": Object {
-            "memory": 88558,
-            "steps": 46839629,
-          },
-          "index": 5,
-          "purpose": "spend",
-          "scriptHash": "6e4664e3f6acc48e849eacf4e3607ee6ae2758d6d8b80fa9d8fdd761",
-        },
-        Object {
-          "executionUnits": Object {
-            "memory": 106622,
-            "steps": 55720739,
-          },
-          "index": 0,
-          "purpose": "mint",
-          "scriptHash": "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130",
-        },
-      ],
-      "signatures": Map {},
-    },
-  },
-  Object {
-    "auxiliaryData": undefined,
-    "blockHeader": Object {
-      "blockNo": 3274726,
-      "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
-      "slot": 49032415,
-    },
-    "body": Object {
-      "certificates": undefined,
-      "collaterals": Array [
-        Object {
-          "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
-          "index": 0,
-          "txId": "a08e293256180196de69ff025321be2f7ce5911ce4e3a96406b7c62de0e19bb2",
-        },
-      ],
-      "fee": 1130814n,
-      "inputs": Array [
-        Object {
-          "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
-          "index": 0,
-          "txId": "a08e293256180196de69ff025321be2f7ce5911ce4e3a96406b7c62de0e19bb2",
-        },
-        Object {
-          "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
-          "index": 0,
-          "txId": "a08e293256180196de69ff025321be2f7ce5911ce4e3a96406b7c62de0e19bb2",
-        },
-        Object {
-          "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
-          "index": 0,
-          "txId": "a08e293256180196de69ff025321be2f7ce5911ce4e3a96406b7c62de0e19bb2",
-        },
-        Object {
-          "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
-          "index": 0,
-          "txId": "a08e293256180196de69ff025321be2f7ce5911ce4e3a96406b7c62de0e19bb2",
-        },
-        Object {
-          "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
-          "index": 0,
-          "txId": "a08e293256180196de69ff025321be2f7ce5911ce4e3a96406b7c62de0e19bb2",
-        },
-        Object {
-          "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
-          "index": 1,
-          "txId": "a08e293256180196de69ff025321be2f7ce5911ce4e3a96406b7c62de0e19bb2",
-        },
-        Object {
-          "address": "addr_test1wpjduy92cj4dqzs6y5refxphskru3kfgyhchyg7u7nadt8qqfddxd",
-          "index": 3,
-          "txId": "a08e293256180196de69ff025321be2f7ce5911ce4e3a96406b7c62de0e19bb2",
-        },
-      ],
-      "mint": Map {
-        "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130cb6de817be83e93a5771e6c98ee305e1012bae70d9eb9dff70e2d71e4b611779" => 13542175n,
-      },
-      "outputs": Array [
-        Object {
-          "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
-          "datum": undefined,
-          "index": 0,
-          "txId": "a08e293256180196de69ff025321be2f7ce5911ce4e3a96406b7c62de0e19bb2",
-          "value": Object {
-            "assets": undefined,
-            "coins": 28185687444n,
-          },
-        },
-        Object {
-          "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
-          "datum": undefined,
-          "index": 1,
-          "txId": "a08e293256180196de69ff025321be2f7ce5911ce4e3a96406b7c62de0e19bb2",
-          "value": Object {
-            "assets": Map {
-              "ccc526143b6d41d56036248dbaa79440d68653f5b6a1919aa2c9e06131363732343139363030303033" => 1n,
-            },
-            "coins": 10000000n,
-          },
-        },
-        Object {
-          "address": "addr_test1qp620qa3rqzd5fxj3hy4dughv7xx2dt9gu9de70jf8hagdcvmqt35f2psxv7ajj5jnh4ajlc752rert8f9msffxdl45qyjefw8",
-          "datum": undefined,
-          "index": 2,
-          "txId": "a08e293256180196de69ff025321be2f7ce5911ce4e3a96406b7c62de0e19bb2",
-          "value": Object {
-            "assets": Map {
-              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e" => 70n,
-              "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130cb6de817be83e93a5771e6c98ee305e1012bae70d9eb9dff70e2d71e4b611779" => 780407n,
-            },
-            "coins": 2000000n,
-          },
-        },
-        Object {
-          "address": "addr_test1qryz24mkq35j8s67fdrm44pe8na7n3tqkmyzy3sgnjq3d7szlx56h6fkjl8y3p73zpyce04eku9w943rcr6rgznp8cwq2axy9q",
-          "datum": undefined,
-          "index": 3,
-          "txId": "a08e293256180196de69ff025321be2f7ce5911ce4e3a96406b7c62de0e19bb2",
-          "value": Object {
-            "assets": Map {
-              "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130cb6de817be83e93a5771e6c98ee305e1012bae70d9eb9dff70e2d71e4b611779" => 11598880n,
-            },
-            "coins": 4854535n,
-          },
-        },
-        Object {
-          "address": "addr_test1qq75mx8z9sh8aucku2lwjp7c6fe2m3w90aqt9kw4rczjt8lj0rhad28c9f9cmcm64jyqpvths06w4tgwc0vnpx3veqvsj2953n",
-          "datum": undefined,
-          "index": 4,
-          "txId": "a08e293256180196de69ff025321be2f7ce5911ce4e3a96406b7c62de0e19bb2",
-          "value": Object {
-            "assets": Map {
-              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e" => 90699n,
-            },
-            "coins": 2000000n,
-          },
-        },
-        Object {
-          "address": "addr_test1qpps0d880t3w6q8hu99nudrgrtzmexk9g9czflg4s06rnrwq6k380kzqphzpaj6pfcqaxjqj8ghcxc9cr9qlsp9xa56qu3c9ma",
-          "datum": undefined,
-          "index": 5,
-          "txId": "a08e293256180196de69ff025321be2f7ce5911ce4e3a96406b7c62de0e19bb2",
-          "value": Object {
-            "assets": Map {
-              "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130cb6de817be83e93a5771e6c98ee305e1012bae70d9eb9dff70e2d71e4b611779" => 1162888n,
-            },
-            "coins": 2286437n,
-          },
-        },
-        Object {
-          "address": "addr_test1wpjduy92cj4dqzs6y5refxphskru3kfgyhchyg7u7nadt8qqfddxd",
-          "datum": "1873c06d1be4497e07ed9e3d6e0ac4caca4d17ddc534b5db88fdc563fe75cb48",
-          "index": 6,
-          "txId": "a08e293256180196de69ff025321be2f7ce5911ce4e3a96406b7c62de0e19bb2",
-          "value": Object {
-            "assets": Map {
-              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e" => 3280594639n,
-              "75ac961881fd5d8d0008d54b4f6914eb6a712faa3403dc32097379b0cb6de817be83e93a5771e6c98ee305e1012bae70d9eb9dff70e2d71e4b611779" => 1n,
-              "95b7f0bbaa0b327e6b822840b0f7f7ee1c949e618f0aaeb6c5321cc34d494e53574150" => 1n,
-            },
-            "coins": 1803114201564n,
-          },
-        },
-      ],
-      "validityInterval": Object {
-        "invalidBefore": undefined,
-        "invalidHereafter": 49033345,
-      },
-      "withdrawals": undefined,
-    },
-    "id": "a08e293256180196de69ff025321be2f7ce5911ce4e3a96406b7c62de0e19bb2",
-    "index": 15,
-    "txSize": 11003,
-    "witness": Object {
-      "redeemers": Array [
-        Object {
-          "executionUnits": Object {
-            "memory": 101868,
-            "steps": 54280290,
-          },
-          "index": 0,
-          "purpose": "spend",
-          "scriptHash": "6e4664e3f6acc48e849eacf4e3607ee6ae2758d6d8b80fa9d8fdd761",
-        },
-        Object {
-          "executionUnits": Object {
-            "memory": 5038514,
-            "steps": 1905282571,
-          },
-          "index": 3,
-          "purpose": "spend",
-          "scriptHash": "64de10aac4aad00a1a25079498378587c8d92825f17223dcf4fad59c",
-        },
-        Object {
-          "executionUnits": Object {
-            "memory": 101868,
-            "steps": 54280290,
-          },
-          "index": 4,
-          "purpose": "spend",
-          "scriptHash": "6e4664e3f6acc48e849eacf4e3607ee6ae2758d6d8b80fa9d8fdd761",
-        },
-        Object {
-          "executionUnits": Object {
-            "memory": 101868,
-            "steps": 54280290,
-          },
-          "index": 5,
-          "purpose": "spend",
-          "scriptHash": "6e4664e3f6acc48e849eacf4e3607ee6ae2758d6d8b80fa9d8fdd761",
-        },
-        Object {
-          "executionUnits": Object {
-            "memory": 101868,
-            "steps": 54280290,
-          },
-          "index": 6,
-          "purpose": "spend",
-          "scriptHash": "6e4664e3f6acc48e849eacf4e3607ee6ae2758d6d8b80fa9d8fdd761",
-        },
-        Object {
-          "executionUnits": Object {
-            "memory": 112044,
-            "steps": 58877031,
-          },
-          "index": 0,
-          "purpose": "mint",
-          "scriptHash": "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130",
-        },
-      ],
-      "signatures": Map {},
-    },
-  },
-  Object {
-    "auxiliaryData": undefined,
-    "blockHeader": Object {
-      "blockNo": 3274726,
-      "hash": "5caede44f4a5a775443095159cd42c8a64f35494086957ab3e04624015a6e13c",
-      "slot": 49032415,
-    },
-    "body": Object {
-      "certificates": undefined,
-      "collaterals": Array [
-        Object {
-          "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
-          "index": 0,
-          "txId": "34186a836e81a0852e583a870863535ded787ef63f7d3bc80380d306f8a9fb40",
-        },
-      ],
-      "fee": 979374n,
-      "inputs": Array [
-        Object {
-          "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
-          "index": 0,
-          "txId": "34186a836e81a0852e583a870863535ded787ef63f7d3bc80380d306f8a9fb40",
-        },
-        Object {
-          "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
-          "index": 0,
-          "txId": "34186a836e81a0852e583a870863535ded787ef63f7d3bc80380d306f8a9fb40",
-        },
-        Object {
-          "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
-          "index": 0,
-          "txId": "34186a836e81a0852e583a870863535ded787ef63f7d3bc80380d306f8a9fb40",
-        },
-        Object {
-          "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
-          "index": 0,
-          "txId": "34186a836e81a0852e583a870863535ded787ef63f7d3bc80380d306f8a9fb40",
-        },
-        Object {
-          "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
-          "index": 1,
-          "txId": "34186a836e81a0852e583a870863535ded787ef63f7d3bc80380d306f8a9fb40",
-        },
-        Object {
-          "address": "addr_test1wpjduy92cj4dqzs6y5refxphskru3kfgyhchyg7u7nadt8qqfddxd",
-          "index": 4,
-          "txId": "34186a836e81a0852e583a870863535ded787ef63f7d3bc80380d306f8a9fb40",
-        },
-      ],
-      "mint": undefined,
-      "outputs": Array [
-        Object {
-          "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
-          "datum": undefined,
-          "index": 0,
-          "txId": "34186a836e81a0852e583a870863535ded787ef63f7d3bc80380d306f8a9fb40",
-          "value": Object {
-            "assets": undefined,
-            "coins": 28190708070n,
-          },
-        },
-        Object {
-          "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
-          "datum": undefined,
-          "index": 1,
-          "txId": "34186a836e81a0852e583a870863535ded787ef63f7d3bc80380d306f8a9fb40",
-          "value": Object {
-            "assets": Map {
-              "ccc526143b6d41d56036248dbaa79440d68653f5b6a1919aa2c9e06131363732343139363030303033" => 1n,
-            },
-            "coins": 10000000n,
-          },
-        },
-        Object {
-          "address": "addr_test1qq670vd7x8m3qr0kfzjtrxnzprgkcqu4uhfpznpvs8x9556ewgmuhmsn8nvd5a8ugl4t3wqj4xk63jjyfpqrxmuwklzs42j7cp",
-          "datum": undefined,
-          "index": 2,
-          "txId": "34186a836e81a0852e583a870863535ded787ef63f7d3bc80380d306f8a9fb40",
-          "value": Object {
-            "assets": Map {
-              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744c51" => 64697n,
-            },
-            "coins": 2000000n,
-          },
-        },
-        Object {
-          "address": "addr_test1qpps0d880t3w6q8hu99nudrgrtzmexk9g9czflg4s06rnrwq6k380kzqphzpaj6pfcqaxjqj8ghcxc9cr9qlsp9xa56qu3c9ma",
-          "datum": undefined,
-          "index": 3,
-          "txId": "34186a836e81a0852e583a870863535ded787ef63f7d3bc80380d306f8a9fb40",
-          "value": Object {
-            "assets": Map {
-              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744c51" => 225522n,
-            },
-            "coins": 2000000n,
-          },
-        },
-        Object {
-          "address": "addr_test1qp5jds8hszuh3l84p6vangr702r4da04wmcpqlpcp5u4dqqslc0zqn9k3f5teyhxvwr62gh0waxr5pjm38hn0ct7lsnsezf9n6",
-          "datum": undefined,
-          "index": 4,
-          "txId": "34186a836e81a0852e583a870863535ded787ef63f7d3bc80380d306f8a9fb40",
-          "value": Object {
-            "assets": Map {
-              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744c51" => 55771n,
-            },
-            "coins": 2000000n,
-          },
-        },
-        Object {
-          "address": "addr_test1wpjduy92cj4dqzs6y5refxphskru3kfgyhchyg7u7nadt8qqfddxd",
-          "datum": "50e0ee1b9387d8449d92267e4376ba680bff9ddc6c79a0ee2c012437f5a87444",
-          "index": 5,
-          "txId": "34186a836e81a0852e583a870863535ded787ef63f7d3bc80380d306f8a9fb40",
-          "value": Object {
-            "assets": Map {
-              "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744c51" => 3177821999n,
-              "75ac961881fd5d8d0008d54b4f6914eb6a712faa3403dc32097379b0b2ab12019a6d74df56c8056f6a5fe6f4b6cd5135d99ffe46b9a6b4864018ff6f" => 1n,
-              "95b7f0bbaa0b327e6b822840b0f7f7ee1c949e618f0aaeb6c5321cc34d494e53574150" => 1n,
-            },
-            "coins": 140501471364n,
-          },
-        },
-      ],
-      "validityInterval": Object {
-        "invalidBefore": undefined,
-        "invalidHereafter": 49033345,
-      },
-      "withdrawals": undefined,
-    },
-    "id": "34186a836e81a0852e583a870863535ded787ef63f7d3bc80380d306f8a9fb40",
-    "index": 16,
-    "txSize": 10025,
-    "witness": Object {
-      "redeemers": Array [
-        Object {
-          "executionUnits": Object {
-            "memory": 88558,
-            "steps": 46839629,
-          },
-          "index": 0,
-          "purpose": "spend",
-          "scriptHash": "6e4664e3f6acc48e849eacf4e3607ee6ae2758d6d8b80fa9d8fdd761",
-        },
-        Object {
-          "executionUnits": Object {
-            "memory": 4040765,
-            "steps": 1538798023,
-          },
-          "index": 1,
-          "purpose": "spend",
-          "scriptHash": "64de10aac4aad00a1a25079498378587c8d92825f17223dcf4fad59c",
-        },
-        Object {
-          "executionUnits": Object {
-            "memory": 88558,
-            "steps": 46839629,
-          },
-          "index": 2,
-          "purpose": "spend",
-          "scriptHash": "6e4664e3f6acc48e849eacf4e3607ee6ae2758d6d8b80fa9d8fdd761",
-        },
-        Object {
-          "executionUnits": Object {
-            "memory": 88558,
-            "steps": 46839629,
-          },
-          "index": 3,
-          "purpose": "spend",
-          "scriptHash": "6e4664e3f6acc48e849eacf4e3607ee6ae2758d6d8b80fa9d8fdd761",
-        },
-      ],
       "signatures": Map {},
     },
   },
@@ -1371,20 +645,12 @@ Array [
       "certificates": undefined,
       "collaterals": Array [],
       "fee": 183673n,
-      "inputs": Array [
-        Object {
-          "address": "addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp",
-          "index": 0,
-          "txId": "3d2278e9cef71c79720a11bc3e08acbbd5f2175f7015d358c867fc9b419ae0b2",
-        },
-      ],
+      "inputs": Array [],
       "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp",
           "datum": undefined,
-          "index": 0,
-          "txId": "3d2278e9cef71c79720a11bc3e08acbbd5f2175f7015d358c867fc9b419ae0b2",
           "value": Object {
             "assets": undefined,
             "coins": 1477211770n,
@@ -1427,20 +693,12 @@ Array [
       ],
       "collaterals": Array [],
       "fee": 179493n,
-      "inputs": Array [
-        Object {
-          "address": "addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7",
-          "index": 0,
-          "txId": "face165bd7aa8d0d661cf1ceaa4e35d7611be3b1c7997da378c547aa2464a4fd",
-        },
-      ],
+      "inputs": Array [],
       "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7",
           "datum": undefined,
-          "index": 0,
-          "txId": "face165bd7aa8d0d661cf1ceaa4e35d7611be3b1c7997da378c547aa2464a4fd",
           "value": Object {
             "assets": undefined,
             "coins": 1497444361n,
@@ -1486,7 +744,7 @@ Array [
         Object {
           "address": "addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7",
           "index": 0,
-          "txId": "19251f57476d7af2777252270413c01383d9503110a68b4fde1a239c119c4f5d",
+          "txId": "face165bd7aa8d0d661cf1ceaa4e35d7611be3b1c7997da378c547aa2464a4fd",
         },
       ],
       "mint": undefined,
@@ -1494,8 +752,6 @@ Array [
         Object {
           "address": "addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7",
           "datum": undefined,
-          "index": 0,
-          "txId": "19251f57476d7af2777252270413c01383d9503110a68b4fde1a239c119c4f5d",
           "value": Object {
             "assets": undefined,
             "coins": 1497246388n,
@@ -1530,38 +786,14 @@ Array [
     },
     "body": Object {
       "certificates": undefined,
-      "collaterals": Array [
-        Object {
-          "address": "addr_test1vpmwgcd7xuqr60ej3qnlfeyy5qhaudhmnmxey6str7v4rrcd3t2q4",
-          "index": 0,
-          "txId": "5acd6efb1b66299f1c5a2c4221af4bcaa4ba9929e8e6aa0e3f48707fa1796fc3",
-        },
-      ],
+      "collaterals": Array [],
       "fee": 774103n,
-      "inputs": Array [
-        Object {
-          "address": "addr_test1vpmwgcd7xuqr60ej3qnlfeyy5qhaudhmnmxey6str7v4rrcd3t2q4",
-          "index": 0,
-          "txId": "5acd6efb1b66299f1c5a2c4221af4bcaa4ba9929e8e6aa0e3f48707fa1796fc3",
-        },
-        Object {
-          "address": "addr_test1wz0jgnrycm9guj2lf59vfrcsdgwmmustpqsatx8thngu2lgdcs0nt",
-          "index": 1,
-          "txId": "5acd6efb1b66299f1c5a2c4221af4bcaa4ba9929e8e6aa0e3f48707fa1796fc3",
-        },
-        Object {
-          "address": "addr_test1vpmwgcd7xuqr60ej3qnlfeyy5qhaudhmnmxey6str7v4rrcd3t2q4",
-          "index": 2,
-          "txId": "5acd6efb1b66299f1c5a2c4221af4bcaa4ba9929e8e6aa0e3f48707fa1796fc3",
-        },
-      ],
+      "inputs": Array [],
       "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1vpmwgcd7xuqr60ej3qnlfeyy5qhaudhmnmxey6str7v4rrcd3t2q4",
           "datum": undefined,
-          "index": 0,
-          "txId": "5acd6efb1b66299f1c5a2c4221af4bcaa4ba9929e8e6aa0e3f48707fa1796fc3",
           "value": Object {
             "assets": undefined,
             "coins": 448931056n,
@@ -1570,8 +802,6 @@ Array [
         Object {
           "address": "addr_test1vq6pv6z64ldwflq5zxllfyjzxwdsgajhwg00guhrjmwq2gs0s97am",
           "datum": undefined,
-          "index": 1,
-          "txId": "5acd6efb1b66299f1c5a2c4221af4bcaa4ba9929e8e6aa0e3f48707fa1796fc3",
           "value": Object {
             "assets": undefined,
             "coins": 8000000n,
@@ -1580,8 +810,6 @@ Array [
         Object {
           "address": "addr_test1vpmwgcd7xuqr60ej3qnlfeyy5qhaudhmnmxey6str7v4rrcd3t2q4",
           "datum": undefined,
-          "index": 2,
-          "txId": "5acd6efb1b66299f1c5a2c4221af4bcaa4ba9929e8e6aa0e3f48707fa1796fc3",
           "value": Object {
             "assets": Map {
               "d6cfdbedd242056674c0e51ead01785497e3a48afbbb146dc72ee1e2123456" => 1n,
@@ -1592,8 +820,6 @@ Array [
         Object {
           "address": "addr_test1vzal5wcx2cnfvux84kf8clcj65ej2qklhtahecr5caytrdqr0jl5z",
           "datum": undefined,
-          "index": 3,
-          "txId": "5acd6efb1b66299f1c5a2c4221af4bcaa4ba9929e8e6aa0e3f48707fa1796fc3",
           "value": Object {
             "assets": undefined,
             "coins": 1000000n,
@@ -1602,8 +828,6 @@ Array [
         Object {
           "address": "addr_test1vqfn7fxr9wlraeymtcfvn6nlkyndp4ry0uryyk3vk73wlzsk8y0yd",
           "datum": undefined,
-          "index": 4,
-          "txId": "5acd6efb1b66299f1c5a2c4221af4bcaa4ba9929e8e6aa0e3f48707fa1796fc3",
           "value": Object {
             "assets": undefined,
             "coins": 1000000n,
@@ -1612,8 +836,6 @@ Array [
         Object {
           "address": "addr_test1vpmwgcd7xuqr60ej3qnlfeyy5qhaudhmnmxey6str7v4rrcd3t2q4",
           "datum": undefined,
-          "index": 5,
-          "txId": "5acd6efb1b66299f1c5a2c4221af4bcaa4ba9929e8e6aa0e3f48707fa1796fc3",
           "value": Object {
             "assets": Map {
               "d6cfdbedd242056674c0e51ead01785497e3a48afbbb146dc72ee1e2123456" => 3n,
@@ -1662,13 +884,7 @@ Array [
       "certificates": undefined,
       "collaterals": Array [],
       "fee": 177777n,
-      "inputs": Array [
-        Object {
-          "address": "addr_test1qr74u5d3d07x53pq37acghulu7wvjt794s53xp2fz343drhx2aghqc4747n2yhu0dht5xz0t5j6n0fju3rs8mfj83tzqly49jr",
-          "index": 0,
-          "txId": "952dfa431223fd671c5e9e048e016f70fcebd9e41fcb726969415ff692736eeb",
-        },
-      ],
+      "inputs": Array [],
       "mint": Map {
         "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652243484f43" => 10000000n,
         "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf39165224d494e54" => 5000000000n,
@@ -1680,8 +896,6 @@ Array [
         Object {
           "address": "addr_test1qr74u5d3d07x53pq37acghulu7wvjt794s53xp2fz343drhx2aghqc4747n2yhu0dht5xz0t5j6n0fju3rs8mfj83tzqly49jr",
           "datum": undefined,
-          "index": 0,
-          "txId": "952dfa431223fd671c5e9e048e016f70fcebd9e41fcb726969415ff692736eeb",
           "value": Object {
             "assets": undefined,
             "coins": 5528822746696n,
@@ -1690,8 +904,6 @@ Array [
         Object {
           "address": "addr_test1qzmpmxyl7prdf0pazt0futtrg6k9drcay3ednatxqm5ky854nqdumcu3xny9qu5sk9m0wm0ypyty84kxj0gwd9seppfqzs9z2n",
           "datum": undefined,
-          "index": 1,
-          "txId": "952dfa431223fd671c5e9e048e016f70fcebd9e41fcb726969415ff692736eeb",
           "value": Object {
             "assets": Map {
               "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf391652243484f43" => 10000000n,
@@ -1734,20 +946,12 @@ Array [
       "certificates": undefined,
       "collaterals": Array [],
       "fee": 191109n,
-      "inputs": Array [
-        Object {
-          "address": "addr_test1qpvl4gf5r5h5w4yjrf58rt8slltem9tqfge36zqhsz5kgc8f2tc4ydn4zz9p0eymajqa4vj87he7yz6ssmh9x9h685hst9rgvk",
-          "index": 0,
-          "txId": "cefd2fcf657e5e5d6c35975f4e052f427819391b153ebb16ad8aa107ba5a3819",
-        },
-      ],
+      "inputs": Array [],
       "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1wrsexavz37208qda7mwwu4k7hcpg26cz0ce86f5e9kul3hqzlh22t",
           "datum": "c5dfa8c3cbd5a959829618a7b46e163078cb3f1b39f152514d0c3686d553529a",
-          "index": 0,
-          "txId": "cefd2fcf657e5e5d6c35975f4e052f427819391b153ebb16ad8aa107ba5a3819",
           "value": Object {
             "assets": Map {
               "57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522534245525259" => 10000000n,
@@ -1758,8 +962,6 @@ Array [
         Object {
           "address": "addr_test1qpvl4gf5r5h5w4yjrf58rt8slltem9tqfge36zqhsz5kgc8f2tc4ydn4zz9p0eymajqa4vj87he7yz6ssmh9x9h685hst9rgvk",
           "datum": undefined,
-          "index": 1,
-          "txId": "cefd2fcf657e5e5d6c35975f4e052f427819391b153ebb16ad8aa107ba5a3819",
           "value": Object {
             "assets": Map {
               "22be35160908d953c25b30d1ad59876cbf073a8b31ef7a4f77468355414141" => 4208n,
@@ -1803,46 +1005,9 @@ Array [
     },
     "body": Object {
       "certificates": undefined,
-      "collaterals": Array [
-        Object {
-          "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
-          "index": 0,
-          "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
-        },
-      ],
+      "collaterals": Array [],
       "fee": 1030338n,
-      "inputs": Array [
-        Object {
-          "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
-          "index": 0,
-          "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
-        },
-        Object {
-          "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
-          "index": 0,
-          "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
-        },
-        Object {
-          "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
-          "index": 0,
-          "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
-        },
-        Object {
-          "address": "addr_test1wphyve8r76kvfr5yn6k0fcmq0mn2uf6c6mvtsrafmr7awcg0vnzpg",
-          "index": 0,
-          "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
-        },
-        Object {
-          "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
-          "index": 1,
-          "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
-        },
-        Object {
-          "address": "addr_test1wpjduy92cj4dqzs6y5refxphskru3kfgyhchyg7u7nadt8qqfddxd",
-          "index": 4,
-          "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
-        },
-      ],
+      "inputs": Array [],
       "mint": Map {
         "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130f32324c10a93fe1962cf7470543932cc064482c3495fe3de7502f9edd84ca114" => 15355454n,
       },
@@ -1850,8 +1015,6 @@ Array [
         Object {
           "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
           "datum": undefined,
-          "index": 0,
-          "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
           "value": Object {
             "assets": undefined,
             "coins": 28178818258n,
@@ -1860,8 +1023,6 @@ Array [
         Object {
           "address": "addr_test1qqemvcq8wdt9cv0sxsghv497zjsjzyzkekpw4vlvea44kdgy720vc4ggn5u4y39cc2wctg2u6sgackadnl78lxqq3m9q47wq8e",
           "datum": undefined,
-          "index": 1,
-          "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
           "value": Object {
             "assets": Map {
               "ccc526143b6d41d56036248dbaa79440d68653f5b6a1919aa2c9e06131363732343139363030303033" => 1n,
@@ -1872,8 +1033,6 @@ Array [
         Object {
           "address": "addr_test1qq9gwfwevn5s96jx9xzclntlrd8m0mrs3ezzva7akkvyj9y7yjf2z5h4fealu2rktu38m3mfv68vsjrtrfwuym60dfyq0axz58",
           "datum": undefined,
-          "index": 2,
-          "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
           "value": Object {
             "assets": Map {
               "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 1909n,
@@ -1885,8 +1044,6 @@ Array [
         Object {
           "address": "addr_test1qqfleha26t47j6khuetrsjyxkwl4x2lya5jsmn24h53n6d6akgetsg2jxgxsqglg8k9m74c8uwl8gxen3hvxsupapqasdzvh6n",
           "datum": undefined,
-          "index": 3,
-          "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
           "value": Object {
             "assets": Map {
               "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 333305n,
@@ -1897,8 +1054,6 @@ Array [
         Object {
           "address": "addr_test1qqvl0h49qke8yv8r5as3vrt3zaqdygjmfsfj63futhj803s2wkugrs72zdued30dtsce7mwclnd6n49a64q6f4mmcfksqaspe4",
           "datum": undefined,
-          "index": 4,
-          "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
           "value": Object {
             "assets": Map {
               "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 932541n,
@@ -1909,8 +1064,6 @@ Array [
         Object {
           "address": "addr_test1wpjduy92cj4dqzs6y5refxphskru3kfgyhchyg7u7nadt8qqfddxd",
           "datum": "4d43bb04ab5283946e5edc6df728cb3ed891111876039264ae312d61b3207fff",
-          "index": 5,
-          "txId": "24e75c64a309fd8fb400933795b2522ca818cba80a3838c2ff14cec2cc8ffe4e",
           "value": Object {
             "assets": Map {
               "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f7453554e444145" => 1651585768n,
@@ -2003,20 +1156,12 @@ Array [
       ],
       "collaterals": Array [],
       "fee": 183233n,
-      "inputs": Array [
-        Object {
-          "address": "addr_test1qq8n7qxxlau6dt0v47fya55pyfz42ul86tyuy8al5rg4crgeq9dceusu9snpw8hrugasdcp00akqvtfjfr3hrsv0pa4sxqg7e2",
-          "index": 0,
-          "txId": "cb66e0f5778718f8bfcfd043712f37d9993f4703b254a7a4d954d34225fe2f99",
-        },
-      ],
+      "inputs": Array [],
       "mint": undefined,
       "outputs": Array [
         Object {
           "address": "addr_test1qre8ns5ahywhp3c3y3tx94d3mlefhz5z52gzyl5rhypjfdseq9dceusu9snpw8hrugasdcp00akqvtfjfr3hrsv0pa4scxxqx6",
           "datum": undefined,
-          "index": 0,
-          "txId": "cb66e0f5778718f8bfcfd043712f37d9993f4703b254a7a4d954d34225fe2f99",
           "value": Object {
             "assets": undefined,
             "coins": 489109783n,
@@ -2025,8 +1170,6 @@ Array [
         Object {
           "address": "addr_test1qr66d9smqd69upk9pkkl0ll7pchzfr60zc496xzatln48ewrd7syppw2gqywrvfcdsu2mlqyrngnlxdyhlffjrlm5jkqqw05lr",
           "datum": undefined,
-          "index": 1,
-          "txId": "cb66e0f5778718f8bfcfd043712f37d9993f4703b254a7a4d954d34225fe2f99",
           "value": Object {
             "assets": undefined,
             "coins": 512345678n,

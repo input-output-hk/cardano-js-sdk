@@ -7,10 +7,12 @@ import {
   MultiAssetModel,
   RedeemerModel,
   TipModel,
-  TxInOutModel,
+  TxInput,
+  TxInputModel,
   TxModel,
   TxOutMultiAssetModel,
   TxOutTokenMap,
+  TxOutput,
   TxOutputModel,
   TxTokenMap,
   WithCertIndex,
@@ -57,13 +59,27 @@ export const mapTxOutTokenMap = (multiAssetModels: TxOutMultiAssetModel[]): TxOu
   return txTokenMap;
 };
 
-export const mapTxIn = (txInModel: TxInOutModel): Cardano.TxIn => ({
-  address: Cardano.Address(txInModel.address),
-  index: txInModel.index,
-  txId: Cardano.TransactionId(txInModel.tx_id.toString('hex'))
+export const mapTxIn = (txIn: TxInput): Cardano.TxIn => ({
+  address: txIn.address,
+  index: txIn.index,
+  txId: txIn.txSourceId
 });
 
-export const mapTxOut = (txOutModel: TxInOutModel, assets?: Cardano.TokenMap): TxOutputModel => ({
+export const mapTxInModel = (txInModel: TxInputModel): TxInput => ({
+  address: Cardano.Address(txInModel.address),
+  id: txInModel.id,
+  index: txInModel.index,
+  txInputId: Cardano.TransactionId(txInModel.tx_input_id.toString('hex')),
+  txSourceId: Cardano.TransactionId(txInModel.tx_source_id.toString('hex'))
+});
+
+export const mapTxOut = (txOut: TxOutput): Cardano.TxOut => ({
+  address: txOut.address,
+  datum: txOut.datum,
+  value: txOut.value
+});
+
+export const mapTxOutModel = (txOutModel: TxOutputModel, assets?: Cardano.TokenMap): TxOutput => ({
   address: Cardano.Address(txOutModel.address),
   datum: txOutModel.datum ? Cardano.util.Hash32ByteBase16(txOutModel.datum.toString('hex')) : undefined,
   index: txOutModel.index,

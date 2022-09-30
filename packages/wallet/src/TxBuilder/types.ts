@@ -1,7 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { CustomError } from 'ts-custom-error';
 
-import { InputSelectionError } from '@cardano-sdk/input-selection';
+import { InputSelectionError, SelectionSkeleton } from '@cardano-sdk/input-selection';
 
 import { OutputValidation } from '../types';
 import { SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
@@ -126,6 +126,8 @@ export interface ValidTxBody {
   readonly auxiliaryData?: Cardano.AuxiliaryData;
   readonly extraSigners?: TransactionSigner[];
   readonly signingOptions?: SignTransactionOptions;
+  readonly inputSelection: SelectionSkeleton;
+  readonly hash: Cardano.TransactionId;
 
   sign(): Promise<SignedTx>;
 }

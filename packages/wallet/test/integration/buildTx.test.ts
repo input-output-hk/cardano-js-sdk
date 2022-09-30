@@ -563,7 +563,9 @@ describe('buildTx', () => {
   it('can be used to build, sign and submit a tx', async () => {
     const tx = await buildTx({ logger, observableWallet }).addOutput(mocks.utxo[0][1]).build();
     if (tx.isValid) {
+      expect(tx.inputSelection).toBeTruthy();
       const signedTx = await tx.sign();
+      expect(signedTx.tx.id).toEqual(tx.hash);
       await signedTx.submit();
     } else {
       expect(tx.errors.length).toBeGreaterThan(0);

@@ -2,14 +2,16 @@ const selectTxInput = (collateral?: boolean) => `
 	SELECT
 		tx_in.id AS id,
 		tx_out.address AS address,
-		tx_out.value AS coin_value,
 		tx_in.tx_out_index AS "index",
-		tx.hash AS tx_id
+		tx.hash AS tx_input_id,
+		source_tx.hash AS tx_source_id
 	FROM tx_out
 	JOIN ${collateral ? 'collateral_tx_in' : 'tx_in'} AS tx_in 
 		ON tx_out.tx_id = tx_in.tx_out_id
 	JOIN tx ON tx.id = tx_in.tx_in_id
-	AND tx_in.tx_out_index = tx_out.index`;
+	AND tx_in.tx_out_index = tx_out.index
+	JOIN tx AS source_tx
+  		ON tx_out.tx_id = source_tx.id`;
 
 const selectTxOutput = `
 	SELECT
@@ -57,7 +59,7 @@ export const findTip = `
 		hash,
 		slot_no
 	FROM block
-	ORDER BY block.block_no DESC NULLS LAST
+	ORDER BY block.id DESC
 	LIMIT 1`;
 
 export const findBlocksByHashes = `
@@ -81,7 +83,7 @@ export const findBlocksByHashes = `
 	LEFT JOIN block AS prev_blk ON block.previous_id = prev_blk.id
 	LEFT JOIN pool_hash AS pool ON pool.id = leader.pool_hash_id
 	WHERE block.hash = ANY($1)
-	ORDER BY block.block_no ASC NULLS LAST`;
+	ORDER BY block.id ASC`;
 
 export const findBlocksOutputByHashes = `
 	SELECT
@@ -92,7 +94,7 @@ export const findBlocksOutputByHashes = `
 	JOIN block ON block.id = tx.block_id
 	WHERE block.hash = ANY($1)
 	GROUP BY block.hash, block.id
-	ORDER BY block.block_no ASC NULLS LAST`;
+	ORDER BY block.id ASC`;
 
 export const findMultiAssetByTxOut = `
 	SELECT 

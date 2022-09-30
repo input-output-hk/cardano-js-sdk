@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Cardano } from '@cardano-sdk/core';
 import { Observable, catchError, combineLatest, filter, firstValueFrom, throwError, timeout } from 'rxjs';
 import { ObservableWallet } from '@cardano-sdk/wallet';
 
@@ -43,3 +45,8 @@ export const walletReady = (wallet: ObservableWallet) =>
     'Took too long to be ready',
     SYNC_TIMEOUT
   );
+
+export const normalizeTxBody = (body: Cardano.TxBodyAlonzo | Cardano.NewTxBodyAlonzo) => {
+  body.collaterals ||= [];
+  return body;
+};

@@ -1820,8 +1820,8 @@ __metadata:
   dependencies:
     "@cardano-ogmios/client": 5.5.2
     "@cardano-sdk/util": ^0.6.0-nightly.2
-    "@emurgo/cardano-serialization-lib-browser": 11.0.0-rc.6
-    "@emurgo/cardano-serialization-lib-nodejs": 11.0.0-rc.6
+    "@emurgo/cardano-serialization-lib-browser": 11.0.5
+    "@emurgo/cardano-serialization-lib-nodejs": 11.0.5
     "@emurgo/cip14-js": ^3.0.1
     "@types/lodash": ^4.14.182
     "@types/node": 14.18.12
@@ -2390,17 +2390,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@emurgo/cardano-serialization-lib-browser@npm:11.0.0-rc.6":
-  version: 11.0.0-rc.6
-  resolution: "@emurgo/cardano-serialization-lib-browser@npm:11.0.0-rc.6"
-  checksum: a5f154735a0a4bc9a608bd7dcd431050819dda200ad8824bffb2a49342a83abb0048b5b453ea7090e603df0f883692015eec274921702e4c10e2714f06db363c
+"@emurgo/cardano-serialization-lib-browser@npm:11.0.5":
+  version: 11.0.5
+  resolution: "@emurgo/cardano-serialization-lib-browser@npm:11.0.5"
+  checksum: c7d5df02690653fb93c639583517d8298230d1e535b6bfd8f67601e701cdf9326f8725c8d2da269483336fb28fe63a4987e6087f19f3963a57459bebbdff1c3e
   languageName: node
   linkType: hard
 
-"@emurgo/cardano-serialization-lib-nodejs@npm:11.0.0-rc.6":
-  version: 11.0.0-rc.6
-  resolution: "@emurgo/cardano-serialization-lib-nodejs@npm:11.0.0-rc.6"
-  checksum: 16f1fda7896b9a26a0a450db0e121b99ec7a61c65d8ade998d9082a5aeb0517fb12dade2439321659b62ffe87d15796eee1654080336a5bda79537d623007ab6
+"@emurgo/cardano-serialization-lib-nodejs@npm:11.0.5":
+  version: 11.0.5
+  resolution: "@emurgo/cardano-serialization-lib-nodejs@npm:11.0.5"
+  checksum: 3efc62504890f7eb9117535280807c0566abd6a4752c86f4c154b59b3f441d3e813160c9634d1439475141204fee69448cdc721537a68f7e685aee8cfd03d909
   languageName: node
   linkType: hard
 
