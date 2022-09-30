@@ -12,6 +12,7 @@ export const USE_QUEUE_DEFAULT = false;
 export const ENABLE_METRICS_DEFAULT = false;
 // http-server
 export const API_URL_DEFAULT = 'http://localhost:3000';
+export const PAGINATION_PAGE_SIZE_LIMIT_DEFAULT = 25;
 
 // tx-worker
 export const PARALLEL_MODE_DEFAULT = false;

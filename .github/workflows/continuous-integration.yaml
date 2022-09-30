@@ -48,7 +48,7 @@ jobs:
     - name: 🔬 Test
       run: |
         yarn test:build:verify
-        yarn test
+        yarn test --forceExit
 
     - name: 🔬 Test - e2e
       run: |

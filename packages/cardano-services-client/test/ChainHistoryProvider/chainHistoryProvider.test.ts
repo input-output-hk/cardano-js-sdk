@@ -82,7 +82,9 @@ describe('chainHistoryProvider', () => {
       it('resolves if successful', async () => {
         axiosMock.onPost().replyOnce(200, []);
         const provider = chainHistoryHttpProvider(config);
-        await expect(provider.transactionsByAddresses({ addresses: [] })).resolves.not.toThrow();
+        await expect(
+          provider.transactionsByAddresses({ addresses: [], pagination: { limit: 10, startAt: 0 } })
+        ).resolves.not.toThrow();
       });
 
       describe('errors', () => {
@@ -91,7 +93,9 @@ describe('chainHistoryProvider', () => {
             throw axiosError();
           });
           const provider = chainHistoryHttpProvider(config);
-          await expect(provider.transactionsByAddresses({ addresses: [] })).rejects.toThrow(ProviderFailure.Unknown);
+          await expect(
+            provider.transactionsByAddresses({ addresses: [], pagination: { limit: 10, startAt: 0 } })
+          ).rejects.toThrow(ProviderFailure.Unknown);
         });
       });
     });

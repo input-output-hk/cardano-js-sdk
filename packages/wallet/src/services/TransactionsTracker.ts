@@ -1,4 +1,4 @@
-import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
+import { Cardano, ChainHistoryProvider, Range } from '@cardano-sdk/core';
 import { DocumentStore, OrderedCollectionStore } from '../persistence';
 import {
   EMPTY,
@@ -62,6 +62,31 @@ export interface TransactionsTrackerInternalsProps {
   logger: Logger;
 }
 
+// Temporarily hardcoded. Will be replaced with ChainHistoryProvider 'maxPageSize' value once ADP-2249 is implemented
+export const PAGE_SIZE = 25;
+
+const allTransactionsByAddresses = async (
+  chainHistoryProvider: ChainHistoryProvider,
+  { addresses, blockRange }: { addresses: Cardano.Address[]; blockRange: Range<Cardano.BlockNo> }
+): Promise<Cardano.TxAlonzo[]> => {
+  let startAt = 0;
+  let response: Cardano.TxAlonzo[] = [];
+  let pageResults: Cardano.TxAlonzo[] = [];
+  do {
+    pageResults = (
+      await chainHistoryProvider.transactionsByAddresses({
+        addresses,
+        blockRange,
+        pagination: { limit: PAGE_SIZE, startAt }
+      })
+    ).pageResults;
+
+    startAt += PAGE_SIZE;
+    response = [...response, ...pageResults];
+  } while (pageResults.length === PAGE_SIZE);
+  return response;
+};
+
 export const createAddressTransactionsProvider = ({
   chainHistoryProvider,
   addresses$,
@@ -101,20 +126,21 @@ export const createAddressTransactionsProvider = ({
                     `Last stored tx: ${lastStoredTransaction?.id} block:${lastStoredTransaction?.blockHeader.blockNo}`
                   );
 
-                const sinceBlock = lastStoredTransaction?.blockHeader.blockNo;
-                const newTransactions = await chainHistoryProvider.transactionsByAddresses({
+                const lowerBound = lastStoredTransaction?.blockHeader.blockNo;
+                const newTransactions = await allTransactionsByAddresses(chainHistoryProvider, {
                   addresses,
-                  sinceBlock
+                  blockRange: { lowerBound }
                 });
+
                 logger.debug(
                   `chainHistoryProvider returned ${newTransactions.length} transactions`,
-                  sinceBlock !== undefined && `since block ${sinceBlock}`
+                  lowerBound !== undefined && `since block ${lowerBound}`
                 );
                 const duplicateTransactions =
                   lastStoredTransaction && intersectionBy(localTransactions, newTransactions, (tx) => tx.id);
                 if (typeof duplicateTransactions !== 'undefined' && duplicateTransactions.length === 0) {
                   const rollbackTransactions = localTransactions.filter(
-                    ({ blockHeader: { blockNo } }) => blockNo >= sinceBlock
+                    ({ blockHeader: { blockNo } }) => blockNo >= lowerBound
                   );
 
                   from(rollbackTransactions)
@@ -122,7 +148,7 @@ export const createAddressTransactionsProvider = ({
                     .subscribe((v) => rollback$.next(v));
 
                   // Rollback by 1 block, try again in next loop iteration
-                  localTransactions = localTransactions.filter(({ blockHeader: { blockNo } }) => blockNo < sinceBlock);
+                  localTransactions = localTransactions.filter(({ blockHeader: { blockNo } }) => blockNo < lowerBound);
                 } else {
                   localTransactions = unionBy(localTransactions, newTransactions, (tx) => tx.id);
                   store.setAll(localTransactions);

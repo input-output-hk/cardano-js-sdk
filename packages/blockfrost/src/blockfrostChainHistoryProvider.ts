@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { BlockFrostAPI, Responses } from '@blockfrost/blockfrost-js';
 import { BlockfrostToCore, BlockfrostTransactionContent } from './BlockfrostToCore';
 import { Cardano, ChainHistoryProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
@@ -238,8 +239,12 @@ export const blockfrostChainHistoryProvider = (blockfrost: BlockFrostAPI, logger
 
   const transactionsByAddresses: ChainHistoryProvider['transactionsByAddresses'] = async ({
     addresses,
-    sinceBlock
+    blockRange,
+    pagination
   }) => {
+    // TODO: add pagination support for Blockfrost
+    if (pagination) throw new ProviderError(ProviderFailure.NotImplemented);
+
     const addressTransactions = await Promise.all(
       addresses.map(async (address) =>
         fetchByAddressSequentially<
@@ -247,22 +252,25 @@ export const blockfrostChainHistoryProvider = (blockfrost: BlockFrostAPI, logger
           BlockfrostTransactionContent
         >({
           address,
-          haveEnoughItems: sinceBlock
+          haveEnoughItems: blockRange?.lowerBound
             ? (transactions) =>
-                transactions.length > 0 && transactions[transactions.length - 1].block_height < sinceBlock
+                transactions.length > 0 && transactions[transactions.length - 1].block_height < blockRange!.lowerBound!
             : undefined,
           paginationOptions: { count: 5, order: 'desc' },
-          request: (addr: Cardano.Address, pagination) => blockfrost.addressesTransactions(addr.toString(), pagination)
+          request: (addr: Cardano.Address, paginationOptions) =>
+            blockfrost.addressesTransactions(addr.toString(), paginationOptions)
         })
       )
     );
 
     const allTransactions = orderBy(addressTransactions.flat(1), ['block_height', 'tx_index']);
-    const addressTransactionsSinceBlock = sinceBlock
-      ? allTransactions.filter(({ block_height }) => block_height >= sinceBlock)
+    const addressTransactionsSinceBlock = blockRange?.lowerBound
+      ? allTransactions.filter(({ block_height }) => block_height >= blockRange!.lowerBound!)
       : allTransactions;
     const ids = addressTransactionsSinceBlock.map(({ tx_hash }) => Cardano.TransactionId(tx_hash));
-    return transactionsByHashes({ ids });
+    const pageResults = await transactionsByHashes({ ids });
+
+    return { pageResults, totalResultCount: allTransactions.length };
   };
 
   return {

@@ -140,7 +140,9 @@ const assertWalletProperties2 = async (wallet: ObservableWallet) => {
     coalesceValueQuantities(mocks.utxo2.map((utxo) => utxo[1].value)).coins
   );
   expect(await firstValueFrom(wallet.balance.rewardAccounts.rewards$)).toBe(mocks.rewardAccountBalance2);
-  expect((await firstValueFrom(wallet.transactions.history$))?.length).toEqual(queryTransactionsResult2.length);
+  expect((await firstValueFrom(wallet.transactions.history$))?.length).toEqual(
+    queryTransactionsResult2.pageResults.length
+  );
   const walletTip = await firstValueFrom(wallet.tip$);
   expect(walletTip).toEqual(mocks.ledgerTip2);
 
@@ -191,8 +193,11 @@ describe('SingleAddressWallet load', () => {
     const networkInfoProvider = mocks.mockNetworkInfoProvider();
     const chainHistoryProvider = mocks.mockChainHistoryProvider();
     const utxoProvider = mocks.mockUtxoProvider();
-    const txsWithNoCertificates = queryTransactionsResult.filter((tx) => !tx.body.certificates);
-    chainHistoryProvider.transactionsByAddresses.mockResolvedValue(txsWithNoCertificates);
+    const txsWithNoCertificates = queryTransactionsResult.pageResults.filter((tx) => !tx.body.certificates);
+    chainHistoryProvider.transactionsByAddresses = jest.fn().mockResolvedValueOnce({
+      pageResults: txsWithNoCertificates,
+      totalResultCount: 1
+    });
     const wallet = await createWallet(stores, {
       chainHistoryProvider,
       networkInfoProvider,

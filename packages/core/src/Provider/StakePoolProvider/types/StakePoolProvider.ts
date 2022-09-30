@@ -1,9 +1,12 @@
 import { Cardano, Provider } from '../../..';
+import { Paginated, PaginationArgs } from '../../types/Pagination';
 import { SortFields } from '../util';
 
 type FilterCondition = 'and' | 'or';
 type SortOrder = 'asc' | 'desc';
+
 export type SortField = typeof SortFields[number];
+
 interface StakePoolSortOptions {
   order: SortOrder;
   field: SortField;
@@ -46,15 +49,7 @@ export interface QueryStakePoolsArgs {
   /**
    * Will return all stake pools matching the query if not specified
    */
-  pagination?: {
-    startAt: number;
-    limit: number;
-  };
-}
-
-export interface StakePoolSearchResults {
-  pageResults: Cardano.StakePool[];
-  totalResultCount: number;
+  pagination?: PaginationArgs;
 }
 
 export interface StakePoolStats {
@@ -71,7 +66,7 @@ export interface StakePoolProvider extends Provider {
    * @returns Stake pools
    * @throws ProviderError
    */
-  queryStakePools: (args?: QueryStakePoolsArgs) => Promise<StakePoolSearchResults>;
+  queryStakePools: (args?: QueryStakePoolsArgs) => Promise<Paginated<Cardano.StakePool>>;
   /**
    * @returns {StakePoolStats} Stake pool stats
    */
