@@ -14,7 +14,7 @@ METADATA_URLS=("https://pools.iohk.io/IOG1.json" "https://pools.iohk.io/IOG2.jso
 METADATA_HASHES=("22cf1de98f4cf4ce61bef2c6bc99890cb39f1452f5143189ce3a69ad70fcde72" "04faac1dce6c68b6bdf406eb261fbc6f57ce0baa9ab039d8e3bb1de8f903f092" "47d5ad9a718bfd40892ab89eb46b34ef2b1ebce9ebba6f5410a1ab96284771ed")
 
 SP_NODES=("1" "2" "3")
-AMOUNT_PER_WALLET='1000000000'
+AMOUNT_PER_WALLET='13500000000000000'
 
 clean() {
   rm -rf wallets-tx.raw wallets-tx.signed fullUtxo.out balance.out params.json stake.cert pool.cert deleg.cert tx.tmp tx.raw tx.signed
@@ -54,51 +54,25 @@ for ((i = 0; i < ${#SP_NODES[@]}; ++i)); do
   coldVKey=network-files/pools/cold"${SP_NODES[$i]}".vkey
   coldKey=network-files/pools/cold"${SP_NODES[$i]}".skey
   vrfKey=network-files/pools/vrf"${SP_NODES[$i]}".vkey
-  genesisKey=network-files/utxo-keys/utxo3.vkey
+  delegatorPaymentKey=network-files/stake-delegator-keys/payment"${SP_NODES[$i]}".vkey
+  delegatorStakingKey=network-files/stake-delegator-keys/staking"${SP_NODES[$i]}".vkey
+  delegatorPaymentSKey=network-files/stake-delegator-keys/payment"${SP_NODES[$i]}".skey
+  delegatorStakingSKey=network-files/stake-delegator-keys/staking"${SP_NODES[$i]}".skey
 
-  # create staking payment address
-  paymentAddr=$(cardano-cli address build --payment-verification-key-file "$genesisKey" --stake-verification-key-file "$stakeVKey" --testnet-magic 888)
+  # register delegator stake address
+  echo "Registering delegator stake certificate ${SP_NODES[$i]}..."
 
-  genesisAddr=$(cardano-cli address build --payment-verification-key-file "$genesisKey" --testnet-magic 888)
-  utxo=$(cardano-cli query utxo --address "$genesisAddr" --testnet-magic 888 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
-
-  # funding staking address
-  echo "Funding staking address ${SP_NODES[$i]}..."
-
+  paymentAddr=$(cardano-cli address build --payment-verification-key-file "$delegatorPaymentKey" --stake-verification-key-file "$delegatorStakingKey" --testnet-magic 888)
   currentBalance=$(getAddressBalance "$paymentAddr")
 
-  cardano-cli transaction build \
-    --babbage-era \
-    --change-address "$genesisAddr" \
-    --tx-in "$utxo" \
-    --tx-out "$paymentAddr"+"$AMOUNT_PER_WALLET" \
-    --testnet-magic 888 \
-    --out-file wallets-tx.raw
+  # get pool ID
+  poolId=$(cardano-cli stake-pool id --cold-verification-key-file "$coldVKey" --output-format "hex")
 
-  cardano-cli transaction sign \
-    --tx-body-file wallets-tx.raw \
-    --signing-key-file network-files/utxo-keys/utxo3.skey \
-    --testnet-magic 888 \
-    --out-file wallets-tx.signed
-
-  cardano-cli transaction submit --testnet-magic 888 --tx-file wallets-tx.signed
-
-  updatedBalance=$(getAddressBalance "$paymentAddr")
-
-  while [ "$currentBalance" -eq "$updatedBalance" ]
-  do
-    updatedBalance=$(getAddressBalance "$paymentAddr")
-    sleep 1
-  done
-
-  # register staking address
-  echo "Registering stake certificate ${SP_NODES[$i]}..."
-
-  currentBalance=$(getAddressBalance "$paymentAddr")
-
-  cardano-cli stake-address registration-certificate \
-      --stake-verification-key-file "$stakeVKey" \
-      --out-file stake.cert
+  # create pool delegation certificate
+  cardano-cli stake-address delegation-certificate \
+      --stake-verification-key-file "$delegatorStakingKey" \
+      --stake-pool-id "$poolId" \
+      --out-file deleg.cert
 
   utxo=$(cardano-cli query utxo --address "$paymentAddr" --testnet-magic 888 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
 
@@ -108,7 +82,7 @@ for ((i = 0; i < ${#SP_NODES[@]}; ++i)); do
       --invalid-hereafter 5000000 \
       --fee 0 \
       --out-file tx.tmp \
-      --certificate stake.cert
+      --certificate deleg.cert
 
   fee1=$(cardano-cli transaction calculate-min-fee \
       --tx-body-file tx.tmp \
@@ -126,13 +100,13 @@ for ((i = 0; i < ${#SP_NODES[@]}; ++i)); do
       --tx-out "$paymentAddr"+"$txOut" \
       --invalid-hereafter 5000000 \
       --fee "$fee1" \
-      --certificate-file stake.cert \
+      --certificate-file deleg.cert \
       --out-file tx.raw
 
   cardano-cli transaction sign \
       --tx-body-file tx.raw \
-      --signing-key-file network-files/utxo-keys/utxo3.skey \
-      --signing-key-file "$stakeKey" \
+      --signing-key-file "$delegatorPaymentSKey" \
+      --signing-key-file "$delegatorStakingSKey" \
       --testnet-magic 888 \
       --out-file tx.signed
 
@@ -149,7 +123,7 @@ for ((i = 0; i < ${#SP_NODES[@]}; ++i)); do
   done
 
   # creating certs
-  echo "Registering stake pool ${SP_NODES[$i]}..."
+  echo "Update stake pool ${SP_NODES[$i]}..."
   currentBalance=$(getAddressBalance "$paymentAddr")
 
   cardano-cli stake-pool registration-certificate \
@@ -167,11 +141,6 @@ for ((i = 0; i < ${#SP_NODES[@]}; ++i)); do
       --metadata-hash "${METADATA_HASHES[$i]}" \
       --out-file pool.cert
 
-  cardano-cli stake-address delegation-certificate \
-    --stake-verification-key-file "$stakeVKey" \
-    --cold-verification-key-file "$coldVKey" \
-    --out-file deleg.cert
-
   utxo=$(cardano-cli query utxo --address "$paymentAddr" --testnet-magic 888 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
 
   cardano-cli transaction build-raw \
@@ -180,7 +149,6 @@ for ((i = 0; i < ${#SP_NODES[@]}; ++i)); do
       --invalid-hereafter 500000 \
       --fee 0 \
       --certificate-file pool.cert \
-      --certificate-file deleg.cert \
       --out-file tx.tmp
 
   fee2=$(cardano-cli transaction calculate-min-fee \
@@ -200,12 +168,11 @@ for ((i = 0; i < ${#SP_NODES[@]}; ++i)); do
       --invalid-hereafter 500000 \
       --fee "$fee2" \
       --certificate-file pool.cert \
-      --certificate-file deleg.cert \
       --out-file tx.raw
 
   cardano-cli transaction sign \
       --tx-body-file tx.raw \
-      --signing-key-file network-files/utxo-keys/utxo3.skey \
+      --signing-key-file "$delegatorPaymentSKey" \
       --signing-key-file "$coldKey" \
       --signing-key-file "$stakeKey" \
       --testnet-magic 888 \
