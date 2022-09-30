@@ -2,10 +2,8 @@
 /* eslint-disable no-multi-spaces */
 /* eslint-disable prettier/prettier */
 import { Cardano, RewardsProvider } from '@cardano-sdk/core';
-import { EMPTY, Observable, of } from 'rxjs';
-import { InMemoryStakePoolsStore, KeyValueStore } from '../../../src/persistence';
-import { RetryBackoffConfig } from 'backoff-rxjs';
 import {
+  ConfirmedTx,
   StakeKeyStatus,
   TrackedStakePoolProvider,
   addressKeyStatuses,
@@ -16,6 +14,9 @@ import {
   fetchRewardsTrigger$,
   getStakePoolIdAtEpoch
 } from '../../../src/services';
+import { EMPTY, Observable, of } from 'rxjs';
+import { InMemoryStakePoolsStore, KeyValueStore } from '../../../src/persistence';
+import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxWithEpoch } from '../../../src/services/DelegationTracker/types';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 import { currentEpoch } from '../../mocks';
@@ -96,14 +97,14 @@ describe('RewardAccounts', () => {
       const transactionsInFlight$ = cold('abaca', {
         a: [],
         b: [
-          {
+          { tx: {
             body: { certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration, stakeKeyHash }] }
-          } as Cardano.NewTxAlonzo
+          } as Cardano.NewTxAlonzo }
         ],
         c: [
-          {
+          { tx: {
             body: { certificates: [{ __typename: Cardano.CertificateType.StakeKeyDeregistration, stakeKeyHash }] }
-          } as Cardano.NewTxAlonzo
+          } as Cardano.NewTxAlonzo }
         ]
       });
       const tracker$ = addressKeyStatuses([rewardAccount], transactions$, transactionsInFlight$);
@@ -127,9 +128,9 @@ describe('RewardAccounts', () => {
         const acc1PendingWithdrawalQty = 1_000_000n;
         const transactionsInFlight$ = hot('a-b--c', {
           a: [],
-          b: [{ body: { withdrawals: [{
+          b: [{ tx: { body: { withdrawals: [{
             quantity: acc1PendingWithdrawalQty, stakeAddress: twoRewardAccounts[0] } as Cardano.Withdrawal
-          ] } as Cardano.NewTxBodyAlonzo } as Cardano.NewTxAlonzo],
+          ] } as Cardano.NewTxBodyAlonzo } as Cardano.NewTxAlonzo }],
           c: []
         });
         const rewardsProvider = () => hot('-a--b-', {
@@ -165,12 +166,12 @@ describe('RewardAccounts', () => {
         const tx2 = { body: { withdrawals: [{ quantity: 5n, stakeAddress: rewardAccount }] } } as Cardano.TxAlonzo;
         const epoch$ = cold(      'a-b--', { a: 100, b: 101 });
         const txConfirmed$ = cold('-a--b', {
-          a: { body: {
+          a: { confirmedAt: 1, tx: { body: {
             withdrawals: [{
               quantity: 3n,
               stakeAddress: Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d')
-            }] } } as Cardano.TxAlonzo,
-          b: tx2
+            }] } } as Cardano.TxAlonzo },
+          b: { confirmedAt: 2, tx: tx2 }
         });
         const target$ = fetchRewardsTrigger$(epoch$, txConfirmed$, rewardAccount);
         expectObservable(target$).toBe('a-b-c', {
@@ -184,7 +185,7 @@ describe('RewardAccounts', () => {
     const rewardsProvider = null as unknown as RewardsProvider; // not used in this test
     const config = null as unknown as RetryBackoffConfig; // not used in this test
     const epoch$ = null as unknown as Observable<Cardano.EpochNo>; // not used in this test
-    const txConfirmed$ = EMPTY as Observable<Cardano.NewTxAlonzo>;
+    const txConfirmed$ = EMPTY as Observable<ConfirmedTx>;
     createTestScheduler().run(({ cold, expectObservable, flush }) => {
       coldObservableProviderMock
         .mockReturnValueOnce(

@@ -97,8 +97,7 @@ const txBody: Cardano.NewTxBodyAlonzo = {
   ],
   outputs: [txOut],
   validityInterval: {
-    invalidBefore: 100,
-    invalidHereafter: 1000
+    invalidHereafter: mocks.ledgerTip.slot + 10
   }
 };
 
@@ -148,8 +147,8 @@ describe('SingleAddressWallet rollback', () => {
 
     stores.volatileTransactions.set([
       {
-        ...tx,
-        slot: rollBackTx.blockHeader.slot
+        confirmedAt: rollBackTx.blockHeader.slot,
+        tx
       }
     ]);
 

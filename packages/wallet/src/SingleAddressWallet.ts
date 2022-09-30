@@ -14,6 +14,7 @@ import {
   EpochInfo,
   EraSummary,
   ProtocolParametersRequiredByWallet,
+  ProviderError,
   RewardsProvider,
   StakePoolProvider,
   TxSubmitProvider,
@@ -38,6 +39,7 @@ import {
   FailedTx,
   PersistentDocumentTrackerSubject,
   PollingConfig,
+  SmartTxSubmitProvider,
   TipTracker,
   TrackedAssetProvider,
   TrackedChainHistoryProvider,
@@ -115,6 +117,10 @@ export interface SingleAddressWalletDependencies {
   readonly connectionStatusTracker$?: ConnectionStatusTracker;
 }
 
+export interface SubmitTxOptions {
+  mightBeAlreadySubmitted?: boolean;
+}
+
 export class SingleAddressWallet implements ObservableWallet {
   #inputSelector: InputSelector;
   #logger: Logger;
@@ -125,10 +131,11 @@ export class SingleAddressWallet implements ObservableWallet {
     submitting$: new Subject<Cardano.NewTxAlonzo>()
   };
   #resubmitSubscription: Subscription;
+  #trackedTxSubmitProvider: TrackedTxSubmitProvider;
 
   readonly keyAgent: AsyncKeyAgent;
   readonly currentEpoch$: TrackerSubject<EpochInfo>;
-  readonly txSubmitProvider: TrackedTxSubmitProvider;
+  readonly txSubmitProvider: TxSubmitProvider;
   readonly utxoProvider: TrackedUtxoProvider;
   readonly networkInfoProvider: TrackedWalletNetworkInfoProvider;
   readonly stakePoolProvider: TrackedStakePoolProvider;
@@ -181,8 +188,8 @@ export class SingleAddressWallet implements ObservableWallet {
     this.#logger = contextLogger(logger, name);
 
     this.#inputSelector = inputSelector;
+    this.#trackedTxSubmitProvider = new TrackedTxSubmitProvider(txSubmitProvider);
 
-    this.txSubmitProvider = new TrackedTxSubmitProvider(txSubmitProvider);
     this.utxoProvider = new TrackedUtxoProvider(utxoProvider);
     this.networkInfoProvider = new TrackedWalletNetworkInfoProvider(networkInfoProvider);
     this.stakePoolProvider = new TrackedStakePoolProvider(stakePoolProvider);
@@ -198,7 +205,7 @@ export class SingleAddressWallet implements ObservableWallet {
         networkInfoProvider: this.networkInfoProvider,
         rewardsProvider: this.rewardsProvider,
         stakePoolProvider: this.stakePoolProvider,
-        txSubmitProvider: this.txSubmitProvider,
+        txSubmitProvider: this.#trackedTxSubmitProvider,
         utxoProvider: this.utxoProvider
       },
       { consideredOutOfSyncAfter }
@@ -246,6 +253,15 @@ export class SingleAddressWallet implements ObservableWallet {
       syncStatus: this.syncStatus
     });
     const tipBlockHeight$ = distinctBlock(this.tip$);
+
+    this.txSubmitProvider = new SmartTxSubmitProvider(
+      { retryBackoffConfig },
+      {
+        connectionStatus$: connectionStatusTracker$,
+        tip$: this.tip$,
+        txSubmitProvider: this.#trackedTxSubmitProvider
+      }
+    );
 
     // Era summaries
     const eraSummariesTrigger = new BehaviorSubject<void>(void 0);
@@ -307,16 +323,15 @@ export class SingleAddressWallet implements ObservableWallet {
     });
 
     this.#resubmitSubscription = createTransactionReemitter({
-      confirmed$: this.transactions.outgoing.confirmed$,
       genesisParameters$: this.genesisParameters$,
       logger: contextLogger(this.#logger, 'transactionsReemitter'),
-      rollback$: this.transactions.rollback$,
-      store: stores.volatileTransactions,
-      submitting$: this.transactions.outgoing.submitting$,
-      tipSlot$: this.tip$.pipe(map((tip) => tip.slot))
+      maxInterval,
+      stores,
+      tipSlot$: this.tip$.pipe(map((tip) => tip.slot)),
+      transactions: this.transactions
     })
       .pipe(
-        mergeMap((transaction) => from(this.submitTx(transaction))),
+        mergeMap((transaction) => from(this.submitTx(transaction, { mightBeAlreadySubmitted: true }))),
         catchError((err) => {
           this.#logger.error('Failed to resubmit transaction', err);
           return EMPTY;
@@ -411,16 +426,26 @@ export class SingleAddressWallet implements ObservableWallet {
     };
   }
 
-  async submitTx(tx: Cardano.NewTxAlonzo): Promise<void> {
+  async submitTx(tx: Cardano.NewTxAlonzo, { mightBeAlreadySubmitted }: SubmitTxOptions = {}): Promise<void> {
     this.#logger.debug(`Submitting transaction ${tx.id}`);
     this.#newTransactions.submitting$.next(tx);
     try {
       await this.txSubmitProvider.submitTx({
         signedTransaction: bufferToHexString(Buffer.from(coreToCsl.tx(tx).to_bytes()))
       });
-      this.#logger.debug(`Submitted transaction ${tx.id}`);
+      const { slot: submittedAt } = await firstValueFrom(this.tip$);
+      this.#logger.debug(`Submitted transaction ${tx.id} at slot ${submittedAt}`);
       this.#newTransactions.pending$.next(tx);
     } catch (error) {
+      if (
+        mightBeAlreadySubmitted &&
+        error instanceof ProviderError &&
+        error.innerError instanceof Cardano.TxSubmissionErrors.ValueNotConservedError
+      ) {
+        this.#logger.debug(`Transaction ${tx.id} appears to be already submitted...`);
+        this.#newTransactions.pending$.next(tx);
+        return;
+      }
       this.#newTransactions.failedToSubmit$.next({
         error: error as Cardano.TxSubmissionError,
         reason: TransactionFailure.FailedToSubmit,
@@ -444,7 +469,7 @@ export class SingleAddressWallet implements ObservableWallet {
     this.#tip$.complete();
     this.addresses$.complete();
     this.assetProvider.stats.shutdown();
-    this.txSubmitProvider.stats.shutdown();
+    this.#trackedTxSubmitProvider.stats.shutdown();
     this.networkInfoProvider.stats.shutdown();
     this.stakePoolProvider.stats.shutdown();
     this.utxoProvider.stats.shutdown();

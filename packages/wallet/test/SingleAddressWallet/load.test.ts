@@ -274,8 +274,9 @@ describe('SingleAddressWallet load', () => {
 
     // Auto interval tip$ trigger
     // Don't need to add ONCE_SETTLED_FETCH_AFTER + 1
-    // because it's already awaited in a delay above
-    await delay(AUTO_TRIGGER_AFTER);
+    // because it's already awaited in a delay above.
+    // Failed once without "+ 1"
+    await delay(AUTO_TRIGGER_AFTER + 1);
     expect(networkInfoProvider.ledgerTip).toHaveBeenCalledTimes(3);
 
     // Auto interval tip$ trigger no longer works once offline
