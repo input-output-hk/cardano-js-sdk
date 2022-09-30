@@ -1,4 +1,4 @@
-# Cardano JS SDK | CIP30
+# Cardano JS SDK | Dapp Connector | CIP30
 This package implements concepts from the draft specification being developed in [CIP-0030]. The 
 package defines TypeScript types and interfaces, as well as utilities to implement allow list 
 persistence and set up web extension messaging.

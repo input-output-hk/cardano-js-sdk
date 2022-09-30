@@ -1,4 +1,4 @@
-import { AuthenticatorApi, RemoteAuthenticator } from '@cardano-sdk/cip30';
+import { AuthenticatorApi, RemoteAuthenticator } from '@cardano-sdk/dapp-connector';
 import {
   MessengerDependencies,
   RemoteApiMethod,

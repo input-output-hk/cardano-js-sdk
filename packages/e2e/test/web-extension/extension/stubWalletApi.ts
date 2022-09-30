@@ -1,5 +1,5 @@
 import { Cardano, coreToCsl } from '@cardano-sdk/core';
-import { Cip30DataSignature, WalletApi } from '@cardano-sdk/cip30';
+import { Cip30DataSignature, WalletApi } from '@cardano-sdk/dapp-connector';
 
 const mapUtxos = (utxos: Cardano.Utxo[]) =>
   coreToCsl.utxo(utxos).map((utxo) => Buffer.from(utxo.to_bytes()).toString('hex'));

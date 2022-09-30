@@ -1,4 +1,4 @@
-import { PersistentAuthenticator, createPersistentAuthenticatorStorage } from '@cardano-sdk/cip30';
+import { PersistentAuthenticator, createPersistentAuthenticatorStorage } from '@cardano-sdk/dapp-connector';
 import { logger, walletName } from '../util';
 import { requestAccess } from './requestAccess';
 import { storage } from 'webextension-polyfill';

@@ -1,4 +1,4 @@
-import { APIErrorCode, ApiError, AuthenticatorApi, WalletApi, WalletApiMethodNames } from '@cardano-sdk/cip30';
+import { APIErrorCode, ApiError, AuthenticatorApi, WalletApi, WalletApiMethodNames } from '@cardano-sdk/dapp-connector';
 import {
   MessengerDependencies,
   RemoteApiMethod,
