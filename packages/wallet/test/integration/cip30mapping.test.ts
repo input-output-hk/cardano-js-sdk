@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, sonarjs/no-duplicate-string */
-import { ApiError, DataSignError, TxSendError, TxSignError, WalletApi } from '@cardano-sdk/cip30';
+import { ApiError, DataSignError, TxSendError, TxSignError, WalletApi } from '@cardano-sdk/dapp-connector';
 import { CSL, Cardano, coreToCsl, cslToCore } from '@cardano-sdk/core';
 import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence';
 import { InitializeTxProps, InitializeTxResult, SingleAddressWallet, cip30 } from '../../src';

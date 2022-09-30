@@ -31,7 +31,7 @@
       "path": "../../core/src"
     },
     {
-      "path": "../../cip30/src"
+      "path": "../../dapp-connector/src"
     },
     {
       "path": "../../key-management/src"

@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { Origin } from '@cardano-sdk/cip30';
+import { Origin } from '@cardano-sdk/dapp-connector';
 import { RemoteApiProperties, RemoteApiPropertyType } from '@cardano-sdk/web-extension';
 
 export const extensionId = 'lgehgfkeagjdklnanflcjoipaphegomm';

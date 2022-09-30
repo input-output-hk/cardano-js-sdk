@@ -12,7 +12,7 @@ import {
   TxSignError,
   TxSignErrorCode,
   WalletApi
-} from '@cardano-sdk/cip30';
+} from '@cardano-sdk/dapp-connector';
 import { CSL, Cardano, coreToCsl, cslToCore } from '@cardano-sdk/core';
 import { InputSelectionError } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';

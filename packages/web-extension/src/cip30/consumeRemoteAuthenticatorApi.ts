@@ -1,5 +1,5 @@
 import { MessengerDependencies, RemoteApiProperties, RemoteApiPropertyType, consumeRemoteApi } from '../messaging';
-import { RemoteAuthenticator, RemoteAuthenticatorMethod } from '@cardano-sdk/cip30';
+import { RemoteAuthenticator, RemoteAuthenticatorMethod } from '@cardano-sdk/dapp-connector';
 import { authenticatorChannel } from './util';
 
 export const RemoteAuthenticatorMethodNames: Array<RemoteAuthenticatorMethod> = [

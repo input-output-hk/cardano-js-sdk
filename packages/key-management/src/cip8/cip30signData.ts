@@ -14,7 +14,7 @@ import {
 } from '@emurgo/cardano-message-signing-nodejs';
 import { AsyncKeyAgent, KeyRole } from '../types';
 import { Cardano, ComposableError, parseCslAddress, util } from '@cardano-sdk/core';
-import { Cip30DataSignature } from '@cardano-sdk/cip30';
+import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { CoseLabel } from './util';
 import { STAKE_KEY_DERIVATION_PATH } from '../util';
 import { firstValueFrom } from 'rxjs';
