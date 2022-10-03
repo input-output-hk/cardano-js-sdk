@@ -1,4 +1,13 @@
 export const findAccountBalance = `
+    WITH current_epoch AS (
+        SELECT
+            e."no" AS epoch_no,
+            optimal_pool_count
+        FROM epoch e
+        JOIN epoch_param ep ON
+            ep.epoch_no = e."no"
+        ORDER BY e.no DESC LIMIT 1
+    )
     SELECT 
     (
         SELECT COALESCE(SUM(r.amount),0) 
@@ -6,6 +15,7 @@ export const findAccountBalance = `
         JOIN stake_address ON 
             stake_address.id = r.addr_id
         WHERE stake_address.view = $1
+        AND r.spendable_epoch <= (SELECT epoch_no FROM current_epoch)
     ) - (
         SELECT COALESCE(SUM(w.amount),0) 
         FROM withdrawal w
