@@ -82,6 +82,7 @@ describe('AssetHttpService', () => {
 
     describe('/get-asset', () => {
       it('returns a 415 coded response if the wrong content type header is used', async () => {
+        expect.assertions(2);
         try {
           await axios.post(
             `${apiUrlBase}/get-asset`,
@@ -96,6 +97,7 @@ describe('AssetHttpService', () => {
       });
 
       it('returns 400 coded response if the request is bad formed', async () => {
+        expect.assertions(2);
         try {
           await axios.post(`${apiUrlBase}/get-asset`, { assetId: [['test']] });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -106,11 +108,11 @@ describe('AssetHttpService', () => {
       });
 
       it('returns 404 coded response for not existing existing asset id', async () => {
+        expect.assertions(1);
         try {
-          const res = await axios.post(`${apiUrlBase}/get-asset`, {
+          await axios.post(`${apiUrlBase}/get-asset`, {
             assetId: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
           });
-          expect(res.data[0]).toEqual({});
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
           expect(error.response.status).toBe(404);
