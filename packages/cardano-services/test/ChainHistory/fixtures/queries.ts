@@ -1,0 +1,108 @@
+export const latestDistinctAddresses = `
+  SELECT
+    tx_out.address AS address
+  FROM tx_out
+  JOIN tx ON tx_out.tx_id = tx.id
+  JOIN block ON tx.block_id = block.id
+  ORDER BY block.id DESC
+  LIMIT $1`;
+
+export const latestBlockHashes = `
+  SELECT hash
+  FROM block
+  ORDER BY id DESC
+  LIMIT $1`;
+
+export const latestTxHashes = `
+  SELECT hash
+  FROM tx
+  ORDER BY id DESC
+  LIMIT $1`;
+
+export const beginLatestTxHashes = `
+  SELECT hash FROM tx
+  JOIN tx_out ON tx_out.tx_id = tx.id`;
+
+export const latestTxHashesWithMultiAsset = `
+  JOIN ma_tx_out ON ma_tx_out.tx_out_id = tx_out.id`;
+
+export const latestTxHashesWithAuxiliaryData = `
+  JOIN tx_metadata ON tx_metadata.tx_id = tx.id`;
+
+export const latestTxHashesWithMint = `
+  JOIN ma_tx_mint ON ma_tx_mint.tx_id = tx.id`;
+
+export const latestTxHashesWithRedeemer = `
+  JOIN redeemer ON redeemer.tx_id = tx.id `;
+
+export const latestTxHashesWithCollateral = `
+  JOIN collateral_tx_in ON collateral_tx_in.tx_in_id = tx.id`;
+
+export const latestTxHashesWithPoolRetireCerts = `
+  JOIN pool_retire ON pool_retire.announced_tx_id = tx.id`;
+
+export const latestTxHashesWithPoolUpdateCerts = `
+  JOIN pool_update ON pool_update.registered_tx_id = tx.id`;
+
+export const latestTxHashesWithStakeRegistrationCerts = `
+  JOIN stake_registration ON stake_registration.tx_id = tx.id`;
+
+export const latestTxHashesWithStakeDeregistrationCerts = `
+  JOIN stake_deregistration ON stake_deregistration.tx_id = tx.id`;
+
+export const latestTxHashesWithDelegationCerts = `
+  JOIN delegation ON delegation.tx_id = tx.id`;
+
+export const latestTxHashesWithMirCerts = `
+  JOIN reserve ON reserve.tx_id = tx.id`;
+
+export const latestTxHashesWithWithdrawal = `
+  JOIN withdrawal ON withdrawal.tx_id = tx.id`;
+
+export const endLatestTxHashes = `
+  GROUP BY tx.id
+  ORDER BY tx.id DESC
+  LIMIT $1`;
+
+export const genesisUtxoAddresses = `
+  SELECT
+   address
+  FROM 
+  tx_out WHERE
+    stake_address_id = 1 OR
+    stake_address_id = 2 OR
+    stake_address_id = 3
+  GROUP BY address`;
+
+export const transactionInBlockRange = `
+  SELECT
+    address, block_no, tx_id
+  FROM tx_out
+    JOIN tx ON tx_out.tx_id = tx.id
+    JOIN block ON tx.block_id = block.id
+    AND block.block_no >= $1
+    AND block.block_no <= $2`;
+
+const Queries = {
+  beginLatestTxHashes,
+  endLatestTxHashes,
+  genesisUtxoAddresses,
+  latestBlockHashes,
+  latestDistinctAddresses,
+  latestTxHashes,
+  latestTxHashesWithAuxiliaryData,
+  latestTxHashesWithCollateral,
+  latestTxHashesWithDelegationCerts,
+  latestTxHashesWithMint,
+  latestTxHashesWithMirCerts,
+  latestTxHashesWithMultiAsset,
+  latestTxHashesWithPoolRetireCerts,
+  latestTxHashesWithPoolUpdateCerts,
+  latestTxHashesWithRedeemer,
+  latestTxHashesWithStakeDeregistrationCerts,
+  latestTxHashesWithStakeRegistrationCerts,
+  latestTxHashesWithWithdrawal,
+  transactionInBlockRange
+};
+
+export default Queries;
