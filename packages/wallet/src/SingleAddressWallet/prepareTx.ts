@@ -1,7 +1,7 @@
 import { Cardano, coreToCsl } from '@cardano-sdk/core';
 import { FinalizeTxProps, InitializeTxProps, ObservableWallet } from '../types';
 import { Logger } from 'ts-log';
-import { Observable, combineLatest, firstValueFrom, lastValueFrom, map, take } from 'rxjs';
+import { Observable, combineLatest, filter, firstValueFrom, lastValueFrom, map, take } from 'rxjs';
 import { createTransactionInternals, ensureValidityInterval } from '../Transaction';
 import { defaultSelectionConstraints } from '@cardano-sdk/input-selection';
 
@@ -9,6 +9,7 @@ export interface PrepareTxDependencies {
   wallet: Pick<ObservableWallet, 'tip$' | 'protocolParameters$' | 'addresses$'> & {
     delegation: Pick<ObservableWallet['delegation'], 'rewardAccounts$'>;
     utxo: Pick<ObservableWallet['utxo'], 'available$'>;
+    syncStatus: Pick<ObservableWallet['syncStatus'], 'isSettled$'>;
   };
   signer: {
     stubFinalizeTx(props: FinalizeTxProps): Observable<Cardano.NewTxAlonzo>;
@@ -18,7 +19,8 @@ export interface PrepareTxDependencies {
 
 export const createTxPreparer =
   ({ wallet, signer, logger }: PrepareTxDependencies) =>
-  (props: InitializeTxProps) => {
+  async (props: InitializeTxProps) => {
+    await firstValueFrom(wallet.syncStatus.isSettled$.pipe(filter((isSettled) => isSettled)));
     const withdrawals$: Observable<Cardano.Withdrawal[] | undefined> = wallet.delegation.rewardAccounts$.pipe(
       map((accounts) => accounts.filter((account) => account.rewardBalance)),
       map((accounts) =>
