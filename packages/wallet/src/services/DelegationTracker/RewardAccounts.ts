@@ -275,8 +275,24 @@ export const addressRewards = (
         return EMPTY;
       }
       return of(totalRewards.map((total, i) => total - getWithdrawalQuantity(withdrawalsInFlight, rewardAccounts[i])));
-    }),
-    distinctUntilChanged(deepEquals)
+    })
+    // In order for txPreparer to be able to utilize this, we need to emit rewards
+    // after every epoch change regardless if rewards amount have changed or not.
+    //
+    // If reward accounts have 0 balance, we're currently not distinguishing between:
+    // - it's been re-fetched after epoch rollover (and are still 0)
+    // - it hasn't been re-fetched after epoch rollover (maybe the request hit an outdated instance)
+    //
+    // We should probably include epochNo of when `wallet.delegation.rewardAccounts` were last fetched,
+    // so that we could properly await for rewards update at epoch rollover.
+    // In general this should be a rare edge case and only work incorrectly when:
+    // a) Rewards provider is inconsistent (e.g. there are multiple databases that could have different state)
+    // b) Withdrawal transaction is confirmed right before wallet tracks an epoch rollover
+    //    and it gets a response right after wallet tracks an epoch rollover.
+    // Ideally this should be implemented after ADP-2128 (consistent tip-aware providers),
+    // because it should be a general provider feature that could be also utilized to address this issue.
+    // TODO:
+    // distinctUntilChanged(...)
   );
 };
 

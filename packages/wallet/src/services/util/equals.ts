@@ -1,6 +1,8 @@
 import { Cardano, EpochInfo, EraSummary } from '@cardano-sdk/core';
 import { GroupedAddress } from '@cardano-sdk/key-management';
 
+export type Equals<T> = (a: T, b: T) => boolean;
+
 export const strictEquals = <T>(a: T, b: T) => a === b;
 
 export const arrayEquals = <T>(arrayA: T[], arrayB: T[], itemEquals: (a: T, b: T) => boolean) =>

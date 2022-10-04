@@ -84,10 +84,10 @@ import {
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
-import { PrepareTx, createTxPreparer } from './prepareTx';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { Shutdown, bufferToHexString, contextLogger, deepEquals } from '@cardano-sdk/util';
 import { TrackedUtxoProvider } from '../services/ProviderTracker/TrackedUtxoProvider';
+import { TxPreparer, createTxPreparer } from './txPreparer';
 import { WalletStores, createInMemoryWalletStores } from '../persistence';
 import { createTransactionInternals } from '../Transaction';
 import { createTransactionReemitter } from '../services/TransactionReemitter';
@@ -122,7 +122,7 @@ export class SingleAddressWallet implements ObservableWallet {
   #inputSelector: InputSelector;
   #logger: Logger;
   #tip$: TipTracker;
-  #prepareTx: PrepareTx;
+  #txPreparer: TxPreparer;
   #newTransactions = {
     failedToSubmit$: new Subject<FailedTx>(),
     pending$: new Subject<Cardano.NewTxAlonzo>(),
@@ -372,7 +372,7 @@ export class SingleAddressWallet implements ObservableWallet {
       stores.assets
     );
     this.util = createWalletUtil(this);
-    this.#prepareTx = createTxPreparer({
+    this.#txPreparer = createTxPreparer({
       logger: this.#logger,
       signer: {
         stubFinalizeTx: (finalizeTxProps) => from(this.finalizeTx(finalizeTxProps, true))
@@ -387,9 +387,8 @@ export class SingleAddressWallet implements ObservableWallet {
   }
 
   async initializeTx(props: InitializeTxProps): Promise<InitializeTxResult> {
-    const { constraints, utxo, implicitCoin, validityInterval, changeAddress, withdrawals } = await this.#prepareTx(
-      props
-    );
+    const { constraints, utxo, implicitCoin, validityInterval, changeAddress, withdrawals } =
+      await this.#txPreparer.prepareTx(props);
     const { selection: inputSelection } = await this.#inputSelector.select({
       constraints,
       implicitValue: { coin: implicitCoin, mint: props.mint },
@@ -488,6 +487,7 @@ export class SingleAddressWallet implements ObservableWallet {
     this.#newTransactions.pending$.complete();
     this.#newTransactions.submitting$.complete();
     this.#resubmitSubscription.unsubscribe();
+    this.#txPreparer.shutdown();
     this.#logger.debug('Shutdown');
   }
 

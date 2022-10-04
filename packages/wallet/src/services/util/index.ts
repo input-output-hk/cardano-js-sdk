@@ -3,3 +3,4 @@ export * from './equals';
 export * from './trigger';
 export * from './coldObservableProvider';
 export * from './connectionStatusTracker';
+export * from './oneDistinctAfterTrigger';
