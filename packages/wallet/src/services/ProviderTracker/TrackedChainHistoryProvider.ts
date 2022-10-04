@@ -38,9 +38,9 @@ export class TrackedChainHistoryProvider extends ProviderTracker implements Chai
     chainHistoryProvider = chainHistoryProvider;
 
     this.healthCheck = () => this.trackedCall(() => chainHistoryProvider.healthCheck(), this.stats.healthCheck$);
-    this.transactionsByAddresses = ({ addresses, pagination, blockRange }) =>
+    this.transactionsByAddresses = (addresses) =>
       this.trackedCall(
-        () => chainHistoryProvider.transactionsByAddresses({ addresses, blockRange, pagination }),
+        () => chainHistoryProvider.transactionsByAddresses(addresses),
         this.stats.transactionsByAddresses$
       );
     this.transactionsByHashes = (hashes) =>

@@ -1,4 +1,3 @@
-import { Cardano, PaginationArgs } from '@cardano-sdk/core';
 import {
   CertificateModel,
   DelegationCertModel,
@@ -26,6 +25,3 @@ export const isStakeCertModel = (value: WithCertType<CertificateModel>): value i
 export const isDelegationCertModel = (
   value: WithCertType<CertificateModel>
 ): value is WithCertType<DelegationCertModel> => value.type === 'delegation';
-
-export const applyPagination = (ids: Cardano.TransactionId[], { startAt, limit }: PaginationArgs) =>
-  ids.slice(startAt).slice(0, limit);

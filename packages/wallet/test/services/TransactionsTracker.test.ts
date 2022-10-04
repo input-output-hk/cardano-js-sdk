@@ -3,11 +3,9 @@
 /* eslint-disable no-multi-spaces */
 /* eslint-disable prettier/prettier */
 import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
-import { ChainHistoryProviderStub, generateTxAlonzo, mockChainHistoryProvider, queryTransactionsResult } from '../mocks';
+import { ChainHistoryProviderStub,  mockChainHistoryProvider, queryTransactionsResult } from '../mocks';
 import { EMPTY, bufferCount, firstValueFrom, of } from 'rxjs';
-import {
-  FailedTx,
-  PAGE_SIZE,
+import { FailedTx,
   TransactionFailure,
   TxInFlight,
   createAddressTransactionsProvider,
@@ -27,7 +25,7 @@ describe('TransactionsTracker', () => {
     let chainHistoryProvider: ChainHistoryProviderStub;
     const tipBlockHeight$ = of(300);
     const retryBackoffConfig = { initialInterval: 1 }; // not relevant
-    const addresses = [queryTransactionsResult.pageResults[0].body.inputs[0].address!];
+    const addresses = [queryTransactionsResult[0].body.inputs[0].address!];
 
     beforeEach(() => {
       chainHistoryProvider = mockChainHistoryProvider();
@@ -44,46 +42,13 @@ describe('TransactionsTracker', () => {
         store,
         tipBlockHeight$
       }).transactionsSource$;
-      expect(await firstValueFrom(provider$)).toEqual(queryTransactionsResult.pageResults);
+      expect(await firstValueFrom(provider$)).toEqual(queryTransactionsResult);
       expect(store.setAll).toBeCalledTimes(1);
-      expect(store.setAll).toBeCalledWith(queryTransactionsResult.pageResults);
-    });
-
-    it('emits entire transactions list resolved by ChainHistoryProvider', async () => {
-      const pageSize = PAGE_SIZE;
-      const secondPageSize = 5;
-      const totalTxsCount = pageSize + secondPageSize;
-
-      const firstPageTxs = {
-        pageResults: generateTxAlonzo(pageSize),
-        totalResultCount: totalTxsCount
-      };
-      const secondPageTxs = {
-        pageResults: generateTxAlonzo(secondPageSize),
-        totalResultCount: totalTxsCount
-      };
-      chainHistoryProvider.transactionsByAddresses = jest
-        .fn()
-        .mockResolvedValueOnce(firstPageTxs)
-        .mockResolvedValueOnce(secondPageTxs);
-
-      const provider$ = createAddressTransactionsProvider({
-        addresses$: of(addresses),
-        chainHistoryProvider,
-        logger,
-        retryBackoffConfig,
-        store,
-        tipBlockHeight$
-      }).transactionsSource$;
-
-      const transactionsHistory = await firstValueFrom(provider$);
-      expect(transactionsHistory.length).toEqual(totalTxsCount);
-      expect(transactionsHistory).toEqual([...firstPageTxs.pageResults, ...secondPageTxs.pageResults]);
-      expect(store.setAll).toBeCalledWith([...firstPageTxs.pageResults, ...secondPageTxs.pageResults]);
+      expect(store.setAll).toBeCalledWith(queryTransactionsResult);
     });
 
     it('emits existing transactions from store, then transactions resolved by ChainHistoryProvider', async () => {
-      await firstValueFrom(store.setAll([queryTransactionsResult.pageResults[0]]));
+      await firstValueFrom(store.setAll([queryTransactionsResult[0]]));
       chainHistoryProvider.transactionsByAddresses = jest
         .fn()
         .mockImplementation(() => delay(50).then(() => queryTransactionsResult));
@@ -96,27 +61,24 @@ describe('TransactionsTracker', () => {
         tipBlockHeight$
       }).transactionsSource$;
       expect(await firstValueFrom(provider$.pipe(bufferCount(2)))).toEqual([
-        [queryTransactionsResult.pageResults[0]],
-        queryTransactionsResult.pageResults
+        [queryTransactionsResult[0]],
+        queryTransactionsResult
       ]);
       expect(store.setAll).toBeCalledTimes(2);
       expect(chainHistoryProvider.transactionsByAddresses).toBeCalledTimes(1);
       expect(chainHistoryProvider.transactionsByAddresses).toBeCalledWith({
         addresses,
-        blockRange: { lowerBound: queryTransactionsResult.pageResults[0].blockHeader.blockNo },
-        pagination: { limit: 25, startAt: 0 }
+        sinceBlock: queryTransactionsResult[0].blockHeader.blockNo
       });
     });
 
-    it('queries ChainHistoryProvider again with blockRange lower bound from a previous transaction on rollback', async () => {
-      await firstValueFrom(store.setAll(queryTransactionsResult.pageResults));
+    it('queries ChainHistoryProvider again with sinceBlock from a previous transaction on rollback', async () => {
+      await firstValueFrom(store.setAll(queryTransactionsResult));
       chainHistoryProvider.transactionsByAddresses = jest
         .fn()
-        .mockImplementationOnce(() => delay(50).then(() => ({ pageResults: [], totalResultCount: 0 })))
-        .mockImplementationOnce(() => delay(50).then(() => ({ pageResults: [], totalResultCount: 0 })))
-        .mockImplementationOnce(() =>
-          delay(50).then(() => ({ pageResults: [queryTransactionsResult.pageResults[0]], totalResultCount: 1 }))
-        );
+        .mockImplementationOnce(() => delay(50).then(() => []))
+        .mockImplementationOnce(() => delay(50).then(() => []))
+        .mockImplementationOnce(() => delay(50).then(() => [queryTransactionsResult[0]]));
       const { transactionsSource$: provider$, rollback$ } = createAddressTransactionsProvider({
         addresses$: of(addresses),
         chainHistoryProvider,
@@ -130,28 +92,24 @@ describe('TransactionsTracker', () => {
       rollback$.subscribe((tx) => rollbacks.push(tx));
 
       expect(await firstValueFrom(provider$.pipe(bufferCount(2)))).toEqual([
-        queryTransactionsResult.pageResults, // from store
-        [queryTransactionsResult.pageResults[0]] // store + chain history
+        queryTransactionsResult, // from store
+        [queryTransactionsResult[0]] // store + chain history
       ]);
 
-      expect(rollbacks).toEqual([queryTransactionsResult.pageResults[1], queryTransactionsResult.pageResults[0]]);
+      expect(rollbacks).toEqual([queryTransactionsResult[1], queryTransactionsResult[0]]);
 
       expect(store.setAll).toBeCalledTimes(2);
       expect(chainHistoryProvider.transactionsByAddresses).toBeCalledTimes(3);
       expect(chainHistoryProvider.transactionsByAddresses).nthCalledWith(1, {
         addresses,
-        blockRange: { lowerBound: queryTransactionsResult.pageResults[1].blockHeader.blockNo },
-        pagination: { limit: 25, startAt: 0 }
+        sinceBlock: queryTransactionsResult[1].blockHeader.blockNo
       });
       expect(chainHistoryProvider.transactionsByAddresses).nthCalledWith(2, {
         addresses,
-        blockRange: { lowerBound: queryTransactionsResult.pageResults[0].blockHeader.blockNo },
-        pagination: { limit: 25, startAt: 0 }
+        sinceBlock: queryTransactionsResult[0].blockHeader.blockNo
       });
       expect(chainHistoryProvider.transactionsByAddresses).nthCalledWith(3, {
-        addresses,
-        blockRange: { lowerBound: undefined },
-        pagination: { limit: 25, startAt: 0 }
+        addresses
       });
     });
   });
@@ -163,7 +121,7 @@ describe('TransactionsTracker', () => {
     let chainHistoryProvider: ChainHistoryProvider;
     let transactionsStore: WalletStores['transactions'];
     let inFlightTransactionsStore: WalletStores['inFlightTransactions'];
-    const myAddress = queryTransactionsResult.pageResults[0].body.inputs[0].address;
+    const myAddress = queryTransactionsResult[0].body.inputs[0].address;
     const addresses$ = of([myAddress!]);
 
     beforeEach(() => {
@@ -172,8 +130,8 @@ describe('TransactionsTracker', () => {
     });
 
     it('observable properties behave correctly on successful transaction', async () => {
-      const outgoingTx = queryTransactionsResult.pageResults[0];
-      const incomingTx = queryTransactionsResult.pageResults[1];
+      const outgoingTx = queryTransactionsResult[0];
+      const incomingTx = queryTransactionsResult[1];
       createTestScheduler().run(({ hot, expectObservable }) => {
         const failedToSubmit$ = hot<FailedTx>('----|');
         const tip$ = hot<Cardano.Tip>('----|');
@@ -225,7 +183,7 @@ describe('TransactionsTracker', () => {
     });
 
     it('emits at all relevant observable properties on timed out transaction', async () => {
-      const tx = queryTransactionsResult.pageResults[0];
+      const tx = queryTransactionsResult[0];
       createTestScheduler().run(({ hot, expectObservable }) => {
         const tip1 = { slot: tx.body.validityInterval.invalidHereafter! - 1 } as Cardano.Tip;
         const tip2 = { slot: tx.body.validityInterval.invalidHereafter! + 1 } as Cardano.Tip;
@@ -271,7 +229,7 @@ describe('TransactionsTracker', () => {
     });
 
     it('emits at all relevant observable properties on transaction that failed to submit', async () => {
-      const tx = queryTransactionsResult.pageResults[0];
+      const tx = queryTransactionsResult[0];
       createTestScheduler().run(({ cold, hot, expectObservable }) => {
         const tip$ = hot<Cardano.Tip>('----|');
         const submitting$ = cold('-a--|', { a: tx });
@@ -459,7 +417,7 @@ describe('TransactionsTracker', () => {
         submittedAt: 1,
         tx: { body: { validityInterval: { invalidHereafter: 1 } } } as Cardano.NewTxAlonzo
       };
-      const outgoingTx = queryTransactionsResult.pageResults[0];
+      const outgoingTx = queryTransactionsResult[0];
       createTestScheduler().run(({ hot, expectObservable }) => {
         const storedInFlight$ = hot<TxInFlight[]>('-x|', {
           x: [storedInFlightTransaction]
@@ -513,8 +471,8 @@ describe('TransactionsTracker', () => {
     });
 
     it('inFlight transactions are removed from store on successful transaction', async () => {
-      const outgoingTx = queryTransactionsResult.pageResults[0];
-      const incomingTx = queryTransactionsResult.pageResults[1];
+      const outgoingTx = queryTransactionsResult[0];
+      const incomingTx = queryTransactionsResult[1];
       const storedInFlightTransaction = outgoingTx;
 
       createTestScheduler().run(({ hot, expectObservable }) => {

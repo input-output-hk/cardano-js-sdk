@@ -32,8 +32,7 @@ enum HttpServerOptionDescriptions {
   RabbitMQUrl = 'RabbitMQ URL',
   TokenMetadataCacheTtl = 'Token Metadata API cache TTL in minutes',
   TokenMetadataServerUrl = 'Token Metadata API server URL',
-  UseQueue = 'Enables RabbitMQ',
-  PaginationPageSizeLimit = 'Pagination page size limit shared across all providers'
+  UseQueue = 'Enables RabbitMQ'
 }
 
 export enum TxWorkerOptionDescriptions {

@@ -1,5 +1,3 @@
-export const DB_MAX_SAFE_INTEGER = 2_147_483_647;
-
 const selectTxInput = (collateral?: boolean) => `
 	SELECT
 		tx_in.id AS id,
@@ -41,7 +39,6 @@ export const findTxInputsByAddresses = `
 	JOIN block ON tx.block_id = block.id
   WHERE tx_out.address = ANY($1)
 	AND block.block_no >= $2
-	AND block.block_no <= $3
 	ORDER BY tx_in.id ASC`;
 
 export const findTxOutputsByHashes = `
@@ -54,7 +51,6 @@ export const findTxOutputsByAddresses = `
 	JOIN block ON tx.block_id = block.id
   WHERE tx_out.address = ANY($1)
 	AND block.block_no >= $2
-	AND block.block_no <= $3
 	ORDER BY tx_out.id ASC`;
 
 export const findTip = `

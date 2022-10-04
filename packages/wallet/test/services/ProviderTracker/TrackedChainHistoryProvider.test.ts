@@ -77,7 +77,7 @@ describe('TrackedChainHistoryProvider', () => {
     test(
       'transactionsByAddresses',
       testFunctionStats(
-        (provider) => provider.transactionsByAddresses({ addresses: [], pagination: { limit: 25, startAt: 0 } }),
+        (provider) => provider.transactionsByAddresses({ addresses: [] }),
         (stats) => stats.transactionsByAddresses$,
         (mock) => mock.transactionsByAddresses
       )

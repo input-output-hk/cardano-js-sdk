@@ -1,5 +1,5 @@
 import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
-import { Cardano, EpochRewards, Range, RewardAccountBalanceArgs, RewardsProvider } from '@cardano-sdk/core';
+import { Cardano, EpochRange, EpochRewards, RewardAccountBalanceArgs, RewardsProvider } from '@cardano-sdk/core';
 import { formatBlockfrostError, healthCheck } from './util';
 /**
  * Connect to the [Blockfrost service](https://docs.blockfrost.io/)
@@ -24,7 +24,7 @@ export const blockfrostRewardsProvider = (blockfrost: BlockFrostAPI): RewardsPro
   };
   const accountRewards = async (
     stakeAddress: Cardano.RewardAccount,
-    { lowerBound = 0, upperBound = Number.MAX_SAFE_INTEGER }: Range<Cardano.EpochNo> = {}
+    { lowerBound = 0, upperBound = Number.MAX_SAFE_INTEGER }: EpochRange = {}
   ): Promise<EpochRewards[]> => {
     const result: EpochRewards[] = [];
     const batchSize = 100;
