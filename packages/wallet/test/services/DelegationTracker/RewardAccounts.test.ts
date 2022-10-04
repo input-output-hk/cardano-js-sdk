@@ -6,6 +6,7 @@ import {
   ConfirmedTx,
   StakeKeyStatus,
   TrackedStakePoolProvider,
+  TxInFlight,
   addressKeyStatuses,
   addressRewards,
   createDelegateeTracker,
@@ -119,21 +120,23 @@ describe('RewardAccounts', () => {
 
   describe('addressRewards', () => {
     it(`emits reward account balance for every reward account,
-    starting with stored values and following up with provider, subtracting withdrawals in-flight`, () => {
+    starting with stored values and following up with provider, subtracting withdrawals in-flight
+    and awaiting for rewards update after transaction is confirmed`, () => {
       createTestScheduler().run(({ cold, hot, expectObservable }) => {
         const acc1Balance1 = 10_000_000n;
         const acc1Balance2 = 9_000_000n;
         const acc2Balance = 8_000_000n;
         const storedBalances = [7_000_000n, 6_000_000n];
         const acc1PendingWithdrawalQty = 1_000_000n;
-        const transactionsInFlight$ = hot('a-b--c', {
+        // 'aaa' in the end is to ensure that it's awaiting for rewards update
+        // even if more (unrelated) transactions get confirmed
+        const transactionsInFlight$ = hot('a-b--a--b-aaa', {
           a: [],
           b: [{ tx: { body: { withdrawals: [{
             quantity: acc1PendingWithdrawalQty, stakeAddress: twoRewardAccounts[0] } as Cardano.Withdrawal
-          ] } as Cardano.NewTxBodyAlonzo } as Cardano.NewTxAlonzo }],
-          c: []
+          ] } as Cardano.NewTxBodyAlonzo } as Cardano.NewTxAlonzo }]
         });
-        const rewardsProvider = () => hot('-a--b-', {
+        const rewardsProvider = () => hot('-a--b-a--b---a', {
           a: [acc1Balance1, acc2Balance],
           b: [acc1Balance2, acc2Balance]
         });
@@ -148,12 +151,51 @@ describe('RewardAccounts', () => {
         const addressRewards$ = addressRewards(
           twoRewardAccounts, transactionsInFlight$, rewardsProvider, balancesStore
         );
-        expectObservable(addressRewards$).toBe('abc-de', {
+        expectObservable(addressRewards$).toBe('abc-d-b-cd---b', {
           a: storedBalances,
           b: [acc1Balance1, acc2Balance],
           c: [acc1Balance1 - acc1PendingWithdrawalQty, acc2Balance],
-          d: [acc1Balance2 - acc1PendingWithdrawalQty, acc2Balance],
-          e: [acc1Balance2, acc2Balance]
+          d: [acc1Balance2 - acc1PendingWithdrawalQty, acc2Balance]
+        });
+      });
+    });
+
+    it('emits reward accounts when rewards update before in flight', () => {
+      createTestScheduler().run(({ cold, hot, expectObservable }) => {
+        const accBalance1 = 10_000_000n;
+        const accBalance2 = 9_000_000n;
+
+        const acc1PendingWithdrawalQty = 1_000_000n;
+        const transactionsInFlightEmits = {
+          x: [] as TxInFlight[],
+          y: [{ tx: { body: { withdrawals: [{
+            quantity: acc1PendingWithdrawalQty, stakeAddress: twoRewardAccounts[0] } as Cardano.Withdrawal
+          ] } as Cardano.NewTxBodyAlonzo } } as TxInFlight]
+        };
+        const rewardsProviderEmits = {
+          a: [accBalance1],
+          b: [accBalance2]
+        };
+        const transactionsInFlight$ = hot('y----x--', transactionsInFlightEmits);
+        const rewardsFrames = hot('        -a-b---b', rewardsProviderEmits);
+        const expectedFrames = '           -m-n---p';
+        const rewardsProvider = jest.fn().mockReturnValue(rewardsFrames);
+
+        const balancesStore = {
+          getValues(_: Cardano.RewardAccount[]) {
+            return cold('|') as Observable<bigint[]>;
+          },
+          setValue(_, __) {
+            return of(void 0);
+          }
+        } as KeyValueStore<Cardano.RewardAccount, Cardano.Lovelace>;
+        const addressRewards$ = addressRewards(
+          twoRewardAccounts, transactionsInFlight$, rewardsProvider, balancesStore
+        );
+        expectObservable(addressRewards$).toBe(expectedFrames, {
+          m: [accBalance1 - acc1PendingWithdrawalQty],
+          n: [accBalance2 - acc1PendingWithdrawalQty],
+          p: [accBalance2]
         });
       });
     });
@@ -206,9 +248,10 @@ describe('RewardAccounts', () => {
         rewardsProvider,
         config
       )(twoRewardAccounts);
-      expectObservable(target$).toBe('-ab', {
+      expectObservable(target$).toBe('-ab-c', {
         a: [0n, 3n],
-        b: [5n, 3n]
+        b: [5n, 3n],
+        c: [5n, 3n] // duplicates are filtered in the coldObservable and this one is fake and emits duplicates
       });
       flush();
       expect(coldObservableProviderMock).toBeCalledTimes(2);
