@@ -7,8 +7,8 @@ import {
   StakeSummary,
   SupplySummary
 } from '@cardano-sdk/core';
+import { ConfirmedTx, TxInFlight } from '../services';
 import { GroupedAddress } from '@cardano-sdk/key-management';
-import { NewTxAlonzoWithSlot } from '../services';
 import { Observable } from 'rxjs';
 
 export interface Destroyable {
@@ -81,8 +81,8 @@ export interface WalletStores extends Destroyable {
   utxo: CollectionStore<Cardano.Utxo>;
   unspendableUtxo: CollectionStore<Cardano.Utxo>;
   transactions: OrderedCollectionStore<Cardano.TxAlonzo>;
-  inFlightTransactions: DocumentStore<Cardano.NewTxAlonzo[]>;
-  volatileTransactions: DocumentStore<NewTxAlonzoWithSlot[]>;
+  inFlightTransactions: DocumentStore<TxInFlight[]>;
+  volatileTransactions: DocumentStore<ConfirmedTx[]>;
   rewardsHistory: KeyValueStore<Cardano.RewardAccount, EpochRewards[]>;
   rewardsBalances: KeyValueStore<Cardano.RewardAccount, Cardano.Lovelace>;
   stakePools: KeyValueStore<Cardano.PoolId, Cardano.StakePool>;

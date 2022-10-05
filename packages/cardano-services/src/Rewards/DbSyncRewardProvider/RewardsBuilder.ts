@@ -1,5 +1,5 @@
 import { AccountBalanceModel, RewardEpochModel } from './types';
-import { Cardano, EpochRange } from '@cardano-sdk/core';
+import { Cardano, Range } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { Pool, QueryResult } from 'pg';
 import { findAccountBalance, findRewardsHistory } from './queries';
@@ -18,7 +18,7 @@ export class RewardsBuilder {
     ]);
     return result.rows.length > 0 ? result.rows[0] : undefined;
   }
-  public async getRewardsHistory(rewardAccounts: Cardano.RewardAccount[], epochs?: EpochRange) {
+  public async getRewardsHistory(rewardAccounts: Cardano.RewardAccount[], epochs?: Range<Cardano.EpochNo>) {
     const params: (string[] | number)[] = [rewardAccounts.map((rewardAcc) => rewardAcc.toString())];
     this.#logger.debug('About to run findRewardsHistory query');
     const result: QueryResult<RewardEpochModel> = await this.#db.query(

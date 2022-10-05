@@ -1,16 +1,6 @@
 import { Cardano } from '../..';
 import { Provider } from '../Provider';
-
-export interface EpochRange {
-  /**
-   * Inclusive
-   */
-  lowerBound?: Cardano.EpochNo;
-  /**
-   * Inclusive
-   */
-  upperBound?: Cardano.EpochNo;
-}
+import { Range } from '../types';
 
 export interface EpochRewards {
   epoch: Cardano.EpochNo;
@@ -19,7 +9,7 @@ export interface EpochRewards {
 
 export interface RewardsHistoryArgs {
   rewardAccounts: Cardano.RewardAccount[];
-  epochs?: EpochRange;
+  epochs?: Range<Cardano.EpochNo>;
 }
 export interface RewardAccountBalanceArgs {
   rewardAccount: Cardano.RewardAccount;

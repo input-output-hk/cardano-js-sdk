@@ -2,12 +2,11 @@
 /* eslint-disable no-multi-spaces */
 /* eslint-disable prettier/prettier */
 import { Cardano, RewardsProvider } from '@cardano-sdk/core';
-import { EMPTY, Observable, of } from 'rxjs';
-import { InMemoryStakePoolsStore, KeyValueStore } from '../../../src/persistence';
-import { RetryBackoffConfig } from 'backoff-rxjs';
 import {
+  ConfirmedTx,
   StakeKeyStatus,
   TrackedStakePoolProvider,
+  TxInFlight,
   addressKeyStatuses,
   addressRewards,
   createDelegateeTracker,
@@ -16,6 +15,9 @@ import {
   fetchRewardsTrigger$,
   getStakePoolIdAtEpoch
 } from '../../../src/services';
+import { EMPTY, Observable, of } from 'rxjs';
+import { InMemoryStakePoolsStore, KeyValueStore } from '../../../src/persistence';
+import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxWithEpoch } from '../../../src/services/DelegationTracker/types';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 import { currentEpoch } from '../../mocks';
@@ -96,14 +98,14 @@ describe('RewardAccounts', () => {
       const transactionsInFlight$ = cold('abaca', {
         a: [],
         b: [
-          {
+          { tx: {
             body: { certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration, stakeKeyHash }] }
-          } as Cardano.NewTxAlonzo
+          } as Cardano.NewTxAlonzo }
         ],
         c: [
-          {
+          { tx: {
             body: { certificates: [{ __typename: Cardano.CertificateType.StakeKeyDeregistration, stakeKeyHash }] }
-          } as Cardano.NewTxAlonzo
+          } as Cardano.NewTxAlonzo }
         ]
       });
       const tracker$ = addressKeyStatuses([rewardAccount], transactions$, transactionsInFlight$);
@@ -118,21 +120,23 @@ describe('RewardAccounts', () => {
 
   describe('addressRewards', () => {
     it(`emits reward account balance for every reward account,
-    starting with stored values and following up with provider, subtracting withdrawals in-flight`, () => {
+    starting with stored values and following up with provider, subtracting withdrawals in-flight
+    and awaiting for rewards update after transaction is confirmed`, () => {
       createTestScheduler().run(({ cold, hot, expectObservable }) => {
         const acc1Balance1 = 10_000_000n;
         const acc1Balance2 = 9_000_000n;
         const acc2Balance = 8_000_000n;
         const storedBalances = [7_000_000n, 6_000_000n];
         const acc1PendingWithdrawalQty = 1_000_000n;
-        const transactionsInFlight$ = hot('a-b--c', {
+        // 'aaa' in the end is to ensure that it's awaiting for rewards update
+        // even if more (unrelated) transactions get confirmed
+        const transactionsInFlight$ = hot('a-b--a--b-aaa', {
           a: [],
-          b: [{ body: { withdrawals: [{
+          b: [{ tx: { body: { withdrawals: [{
             quantity: acc1PendingWithdrawalQty, stakeAddress: twoRewardAccounts[0] } as Cardano.Withdrawal
-          ] } as Cardano.NewTxBodyAlonzo } as Cardano.NewTxAlonzo],
-          c: []
+          ] } as Cardano.NewTxBodyAlonzo } as Cardano.NewTxAlonzo }]
         });
-        const rewardsProvider = () => hot('-a--b-', {
+        const rewardsProvider = () => hot('-a--b-a--b---a', {
           a: [acc1Balance1, acc2Balance],
           b: [acc1Balance2, acc2Balance]
         });
@@ -147,12 +151,51 @@ describe('RewardAccounts', () => {
         const addressRewards$ = addressRewards(
           twoRewardAccounts, transactionsInFlight$, rewardsProvider, balancesStore
         );
-        expectObservable(addressRewards$).toBe('abc-de', {
+        expectObservable(addressRewards$).toBe('abc-d-b-cd---b', {
           a: storedBalances,
           b: [acc1Balance1, acc2Balance],
           c: [acc1Balance1 - acc1PendingWithdrawalQty, acc2Balance],
-          d: [acc1Balance2 - acc1PendingWithdrawalQty, acc2Balance],
-          e: [acc1Balance2, acc2Balance]
+          d: [acc1Balance2 - acc1PendingWithdrawalQty, acc2Balance]
+        });
+      });
+    });
+
+    it('emits reward accounts when rewards update before in flight', () => {
+      createTestScheduler().run(({ cold, hot, expectObservable }) => {
+        const accBalance1 = 10_000_000n;
+        const accBalance2 = 9_000_000n;
+
+        const acc1PendingWithdrawalQty = 1_000_000n;
+        const transactionsInFlightEmits = {
+          x: [] as TxInFlight[],
+          y: [{ tx: { body: { withdrawals: [{
+            quantity: acc1PendingWithdrawalQty, stakeAddress: twoRewardAccounts[0] } as Cardano.Withdrawal
+          ] } as Cardano.NewTxBodyAlonzo } } as TxInFlight]
+        };
+        const rewardsProviderEmits = {
+          a: [accBalance1],
+          b: [accBalance2]
+        };
+        const transactionsInFlight$ = hot('y----x--', transactionsInFlightEmits);
+        const rewardsFrames = hot('        -a-b---b', rewardsProviderEmits);
+        const expectedFrames = '           -m-n---p';
+        const rewardsProvider = jest.fn().mockReturnValue(rewardsFrames);
+
+        const balancesStore = {
+          getValues(_: Cardano.RewardAccount[]) {
+            return cold('|') as Observable<bigint[]>;
+          },
+          setValue(_, __) {
+            return of(void 0);
+          }
+        } as KeyValueStore<Cardano.RewardAccount, Cardano.Lovelace>;
+        const addressRewards$ = addressRewards(
+          twoRewardAccounts, transactionsInFlight$, rewardsProvider, balancesStore
+        );
+        expectObservable(addressRewards$).toBe(expectedFrames, {
+          m: [accBalance1 - acc1PendingWithdrawalQty],
+          n: [accBalance2 - acc1PendingWithdrawalQty],
+          p: [accBalance2]
         });
       });
     });
@@ -165,12 +208,12 @@ describe('RewardAccounts', () => {
         const tx2 = { body: { withdrawals: [{ quantity: 5n, stakeAddress: rewardAccount }] } } as Cardano.TxAlonzo;
         const epoch$ = cold(      'a-b--', { a: 100, b: 101 });
         const txConfirmed$ = cold('-a--b', {
-          a: { body: {
+          a: { confirmedAt: 1, tx: { body: {
             withdrawals: [{
               quantity: 3n,
               stakeAddress: Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d')
-            }] } } as Cardano.TxAlonzo,
-          b: tx2
+            }] } } as Cardano.TxAlonzo },
+          b: { confirmedAt: 2, tx: tx2 }
         });
         const target$ = fetchRewardsTrigger$(epoch$, txConfirmed$, rewardAccount);
         expectObservable(target$).toBe('a-b-c', {
@@ -184,7 +227,7 @@ describe('RewardAccounts', () => {
     const rewardsProvider = null as unknown as RewardsProvider; // not used in this test
     const config = null as unknown as RetryBackoffConfig; // not used in this test
     const epoch$ = null as unknown as Observable<Cardano.EpochNo>; // not used in this test
-    const txConfirmed$ = EMPTY as Observable<Cardano.NewTxAlonzo>;
+    const txConfirmed$ = EMPTY as Observable<ConfirmedTx>;
     createTestScheduler().run(({ cold, expectObservable, flush }) => {
       coldObservableProviderMock
         .mockReturnValueOnce(
@@ -205,9 +248,10 @@ describe('RewardAccounts', () => {
         rewardsProvider,
         config
       )(twoRewardAccounts);
-      expectObservable(target$).toBe('-ab', {
+      expectObservable(target$).toBe('-ab-c', {
         a: [0n, 3n],
-        b: [5n, 3n]
+        b: [5n, 3n],
+        c: [5n, 3n] // duplicates are filtered in the coldObservable and this one is fake and emits duplicates
       });
       flush();
       expect(coldObservableProviderMock).toBeCalledTimes(2);

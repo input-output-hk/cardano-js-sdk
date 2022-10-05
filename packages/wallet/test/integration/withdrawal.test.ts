@@ -98,7 +98,7 @@ describe('integration/withdrawal', () => {
 
     expect(tx.body.withdrawals).toEqual([{ quantity: availableRewards, stakeAddress: rewardAccount }]);
 
-    const confirmedSubscription = wallet.transactions.outgoing.confirmed$.subscribe((confirmedTx) => {
+    const confirmedSubscription = wallet.transactions.outgoing.confirmed$.subscribe(({ tx: confirmedTx }) => {
       if (confirmedTx === tx) {
         // Transaction successful
       }

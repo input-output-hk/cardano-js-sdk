@@ -68,8 +68,8 @@ describe('createUtxoTracker', () => {
       } as unknown as Cardano.NewTxAlonzo;
       const transactionsInFlight$ = cold('-a-b-c|', {
         a: [],
-        b: [inFlightTx1],
-        c: [inFlightTx1, inFlightTx2]
+        b: [{ tx: inFlightTx1 }],
+        c: [{ tx: inFlightTx1 }, { tx: inFlightTx2 }]
       });
       const utxoTracker = createUtxoTracker(
         {

@@ -1,5 +1,5 @@
 import { RemoteApiPropertyType, consumeRemoteApi } from '@cardano-sdk/web-extension';
-import { RequestAccess } from '@cardano-sdk/cip30';
+import { RequestAccess } from '@cardano-sdk/dapp-connector';
 import { UserPromptService, logger, userPromptServiceChannel } from '../util';
 import { ensureUiIsOpenAndLoaded } from './windowManager';
 import { runtime } from 'webextension-polyfill';

@@ -6,7 +6,7 @@ import {
   TxSignError,
   WalletApi,
   WalletApiMethodNames
-} from '@cardano-sdk/cip30';
+} from '@cardano-sdk/dapp-connector';
 import { GetErrorPrototype } from '@cardano-sdk/util';
 import { MessengerDependencies, RemoteApiProperties, RemoteApiPropertyType, consumeRemoteApi } from '../messaging';
 import { walletApiChannel } from './util';

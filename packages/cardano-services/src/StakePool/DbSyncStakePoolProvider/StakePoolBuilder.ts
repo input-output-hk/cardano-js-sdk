@@ -109,6 +109,7 @@ export class StakePoolBuilder {
     const result: QueryResult<PoolAPYModel> = await this.#db.query(queryWithSortAndPagination, [hashesIds]);
     return result.rows.map(mapPoolAPY);
   }
+
   public async queryPoolData(updatesIds: number[], options?: QueryStakePoolsArgs) {
     this.#logger.debug('About to query pool data');
     const defaultSort: OrderByOptions[] = [
@@ -129,6 +130,7 @@ export class StakePoolBuilder {
     const result: QueryResult<PoolUpdateModel> = await this.#db.query(query, params);
     return result.rows.length > 0 ? result.rows.map(mapPoolUpdate) : [];
   }
+
   public async queryPoolMetrics(hashesIds: number[], totalAdaAmount: string, options?: QueryStakePoolsArgs) {
     this.#logger.debug('About to query pool metrics');
     const queryWithSortAndPagination = withPagination(
@@ -200,6 +202,7 @@ export class StakePoolBuilder {
     const result: QueryResult<TotalAdaModel> = await this.#db.query(Queries.findTotalAda);
     return result.rows[0].total_ada;
   }
+
   public buildOrQuery(filters: QueryStakePoolsArgs['filters']) {
     const subQueries: SubQuery[] = [];
     const params = [];

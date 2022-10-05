@@ -91,7 +91,7 @@
     "@babel/core": "^7.18.2",
     "@babel/preset-env": "^7.18.2",
     "@babel/preset-typescript": "^7.17.12",
-    "@cardano-sdk/cip30": "^0.5.1-nightly.12",
+    "@cardano-sdk/dapp-connector": "^0.5.1-nightly.12",
     "@cardano-sdk/util-dev": "^0.5.0-nightly.9",
     "@cardano-sdk/web-extension": "^0.6.0-nightly.10",
     "@emurgo/cardano-message-signing-asmjs": "^1.0.1",

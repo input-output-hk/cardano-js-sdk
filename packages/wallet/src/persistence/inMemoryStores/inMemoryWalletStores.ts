@@ -1,11 +1,11 @@
 import { Assets } from '../../types';
 import { Cardano, EpochRewards, EraSummary, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
+import { ConfirmedTx, TxInFlight } from '../../services';
 import { EMPTY, combineLatest, map } from 'rxjs';
 import { GroupedAddress } from '@cardano-sdk/key-management';
 import { InMemoryCollectionStore } from './InMemoryCollectionStore';
 import { InMemoryDocumentStore } from './InMemoryDocumentStore';
 import { InMemoryKeyValueStore } from './InMemoryKeyValueStore';
-import { NewTxAlonzoWithSlot } from '../../services';
 import { WalletStores } from '../types';
 
 export class InMemoryTipStore extends InMemoryDocumentStore<Cardano.Tip> {}
@@ -15,8 +15,8 @@ export class InMemoryEraSummariesStore extends InMemoryDocumentStore<EraSummary[
 
 export class InMemoryAssetsStore extends InMemoryDocumentStore<Assets> {}
 export class InMemoryAddressesStore extends InMemoryDocumentStore<GroupedAddress[]> {}
-export class InMemoryInFlightTransactionsStore extends InMemoryDocumentStore<Cardano.NewTxAlonzo[]> {}
-export class InMemoryVolatileTransactionsStore extends InMemoryDocumentStore<NewTxAlonzoWithSlot[]> {}
+export class InMemoryInFlightTransactionsStore extends InMemoryDocumentStore<TxInFlight[]> {}
+export class InMemoryVolatileTransactionsStore extends InMemoryDocumentStore<ConfirmedTx[]> {}
 
 export class InMemoryTransactionsStore extends InMemoryCollectionStore<Cardano.TxAlonzo> {}
 export class InMemoryUtxoStore extends InMemoryCollectionStore<Cardano.Utxo> {}

@@ -1,9 +1,9 @@
 import {
   Cardano,
   CardanoNode,
+  Paginated,
   QueryStakePoolsArgs,
   StakePoolProvider,
-  StakePoolSearchResults,
   StakePoolStats
 } from '@cardano-sdk/core';
 import { CommonPoolInfo, OrderedResult, PoolAPY, PoolData, PoolMetrics, PoolSortType, PoolUpdate } from './types';
@@ -136,7 +136,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
     return { poolMetrics, poolOwners, poolRegistrations, poolRelays, poolRetirements };
   }
 
-  public async queryStakePools(options?: QueryStakePoolsArgs): Promise<StakePoolSearchResults> {
+  public async queryStakePools(options?: QueryStakePoolsArgs): Promise<Paginated<Cardano.StakePool>> {
     const { params, query } =
       options?.filters?._condition === 'or'
         ? this.#builder.buildOrQuery(options?.filters)

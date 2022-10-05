@@ -5,11 +5,12 @@ import {
   // @ts-ignore
   TxSubmission,
   createConnectionObject,
-  createInteractionContext,
   createTxSubmissionClient,
   getServerHealth
 } from '@cardano-ogmios/client';
 import { Logger } from 'ts-log';
+import { contextLogger } from '@cardano-sdk/util';
+import { createInteractionContextWithLogger } from '../../util';
 
 /**
  * Connect to an [Ogmios](https://ogmios.dev/) instance
@@ -45,17 +46,12 @@ export const ogmiosTxSubmitProvider = (connectionConfig: ConnectionConfig, logge
     // however as the provider interface doesn't include shutdown handling,
     // we're using the one time interaction type for now.
     try {
-      const interactionContext = await createInteractionContext(
-        (error) => {
-          logger.error({ error: error.name, module: 'ogmiosTxSubmitProvider' }, error.message);
-        },
-        logger.info,
-        {
+      const txSubmissionClient = await createTxSubmissionClient(
+        await createInteractionContextWithLogger(contextLogger(logger, 'ogmiosTxSubmitProvider'), {
           connection: connectionConfig,
           interactionType: 'OneTime'
-        }
+        })
       );
-      const txSubmissionClient = await createTxSubmissionClient(interactionContext);
       await txSubmissionClient.submitTx(signedTransaction);
     } catch (error) {
       throw Cardano.util.asTxSubmissionError(error) || new Cardano.UnknownTxSubmissionError(error);

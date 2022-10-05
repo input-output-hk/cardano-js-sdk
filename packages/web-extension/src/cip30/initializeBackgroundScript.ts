@@ -1,4 +1,4 @@
-import { AuthenticatorApi, WalletApi, WalletName } from '@cardano-sdk/cip30';
+import { AuthenticatorApi, WalletApi, WalletName } from '@cardano-sdk/dapp-connector';
 import { Logger } from 'ts-log';
 import { Runtime } from 'webextension-polyfill';
 import { exposeAuthenticatorApi } from './exposeAuthenticatorApi';

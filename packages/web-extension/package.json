@@ -66,8 +66,8 @@
     "util": "^0.12.4"
   },
   "dependencies": {
-    "@cardano-sdk/cip30": "^0.5.1-nightly.12",
     "@cardano-sdk/core": "^0.6.0-nightly.9",
+    "@cardano-sdk/dapp-connector": "^0.5.1-nightly.12",
     "@cardano-sdk/key-management": "^0.2.0-nightly.6",
     "@cardano-sdk/util": "^0.6.0-nightly.2",
     "@cardano-sdk/util-rxjs": "^0.4.2-nightly.12",

@@ -13,11 +13,12 @@ import {
   ConnectionConfig,
   StateQuery,
   createConnectionObject,
-  createInteractionContext,
   createStateQueryClient,
   getServerHealth
 } from '@cardano-ogmios/client';
 import { Logger } from 'ts-log';
+import { contextLogger } from '@cardano-sdk/util';
+import { createInteractionContextWithLogger } from '../util';
 import { mapEraSummary } from './mappers';
 
 type CardanoNodeState = 'initialized' | 'initializing' | null;
@@ -34,7 +35,7 @@ export class OgmiosCardanoNode implements CardanoNode {
   #connectionConfig: ConnectionConfig;
 
   constructor(connectionConfig: ConnectionConfig, logger: Logger) {
-    this.#logger = logger;
+    this.#logger = contextLogger(logger, 'OgmiosCardanoNode');
     this.#state = null;
     this.#connectionConfig = connectionConfig;
   }
@@ -44,13 +45,7 @@ export class OgmiosCardanoNode implements CardanoNode {
     this.#state = 'initializing';
     this.#logger.info('Initializing CardanoNode');
     this.#stateQueryClient = await createStateQueryClient(
-      await createInteractionContext(
-        (error) => {
-          this.#logger.error.bind(this.#logger)({ error: error.name, module: 'CardanoNode' }, error.message);
-        },
-        this.#logger.info.bind(this.#logger),
-        { connection: this.#connectionConfig, interactionType: 'LongRunning' }
-      )
+      await createInteractionContextWithLogger(this.#logger, { connection: this.#connectionConfig })
     );
     this.#state = 'initialized';
     this.#logger.info('CardanoNode initialized');

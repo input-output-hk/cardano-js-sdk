@@ -848,7 +848,7 @@ Array [
     "hashId": 1,
   },
   Object {
-    "apy": 0.00186615265931667,
+    "apy": 0.00227126684541146,
     "hashId": 14,
   },
 ]
@@ -857,7 +857,7 @@ Array [
 exports[`StakePoolBuilder queryPoolAPY sort by default sort (APY desc) 1`] = `
 Array [
   Object {
-    "apy": 0.00186615265931667,
+    "apy": 0.00227126684541146,
     "hashId": 14,
   },
   Object {

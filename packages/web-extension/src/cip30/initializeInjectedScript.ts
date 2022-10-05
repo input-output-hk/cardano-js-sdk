@@ -1,4 +1,4 @@
-import { Cip30Wallet, WalletProperties, injectGlobal } from '@cardano-sdk/cip30';
+import { Cip30Wallet, WalletProperties, injectGlobal } from '@cardano-sdk/dapp-connector';
 import { Logger } from 'ts-log';
 import { MessengerDependencies, injectedRuntime } from '../messaging';
 import { consumeRemoteAuthenticatorApi } from './consumeRemoteAuthenticatorApi';

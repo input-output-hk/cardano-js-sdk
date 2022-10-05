@@ -3,14 +3,14 @@ import { Logger } from 'ts-log';
 import { NEVER, Observable, combineLatest, concat, map, of, switchMap } from 'rxjs';
 import { PersistentCollectionTrackerSubject, coldObservableProvider, txInEquals, utxoEquals } from './util';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { UtxoTracker } from './types';
+import { TxInFlight, UtxoTracker } from './types';
 import { WalletStores } from '../persistence';
 
 export interface UtxoTrackerProps {
   utxoProvider: UtxoProvider;
   addresses$: Observable<Cardano.Address[]>;
   stores: Pick<WalletStores, 'utxo' | 'unspendableUtxo'>;
-  transactionsInFlight$: Observable<Cardano.NewTxAlonzo[]>;
+  transactionsInFlight$: Observable<TxInFlight[]>;
   tipBlockHeight$: Observable<number>;
   retryBackoffConfig: RetryBackoffConfig;
   logger: Logger;
@@ -62,22 +62,32 @@ export const createUtxoTracker = (
   const total$ = combineLatest([utxoSource$, transactionsInFlight$, addresses$]).pipe(
     map(([onChainUtxo, transactionsInFlight, ownAddresses]) => [
       ...onChainUtxo.filter(([utxoTxIn]) => {
-        const utxoIsUsedInFlight = transactionsInFlight.some(({ body: { inputs } }) =>
-          inputs.some((input) => input.txId === utxoTxIn.txId && input.index === utxoTxIn.index)
+        const utxoIsUsedInFlight = transactionsInFlight.some(
+          ({
+            tx: {
+              body: { inputs }
+            }
+          }) => inputs.some((input) => input.txId === utxoTxIn.txId && input.index === utxoTxIn.index)
         );
         utxoIsUsedInFlight &&
           logger.debug('OnChain UTXO is already used in in-flight transaction. Excluding from total$.', utxoTxIn);
         return !utxoIsUsedInFlight;
       }),
-      ...transactionsInFlight.flatMap((tx, txInFlightIndex) =>
+      ...transactionsInFlight.flatMap(({ tx }, txInFlightIndex) =>
         tx.body.outputs
           .filter(
             ({ address }, outputIndex) =>
               ownAddresses.includes(address) &&
               // not already consumed by another tx in flight
               !transactionsInFlight.some(
-                ({ body: { inputs } }, i) =>
-                  txInFlightIndex !== i && inputs.some((txIn) => txIn.txId === tx.id && txIn.index === outputIndex)
+                (
+                  {
+                    tx: {
+                      body: { inputs }
+                    }
+                  },
+                  i
+                ) => txInFlightIndex !== i && inputs.some((txIn) => txIn.txId === tx.id && txIn.index === outputIndex)
               )
           )
           .map((txOut): Cardano.Utxo => {

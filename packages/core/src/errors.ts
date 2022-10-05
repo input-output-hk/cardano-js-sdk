@@ -10,6 +10,16 @@ export enum ProviderFailure {
   BadRequest = 'BAD_REQUEST'
 }
 
+export const providerFailureToStatusCodeMap: { [key in ProviderFailure]: number } = {
+  [ProviderFailure.BadRequest]: 400,
+  [ProviderFailure.NotFound]: 404,
+  [ProviderFailure.Unhealthy]: 500,
+  [ProviderFailure.Unknown]: 500,
+  [ProviderFailure.InvalidResponse]: 500,
+  [ProviderFailure.NotImplemented]: 500,
+  [ProviderFailure.ConnectionFailure]: 500
+};
+
 const formatMessage = (reason: string, detail?: string) => reason + (detail ? ` (${detail})` : '');
 
 export class ComposableError<InnerError = unknown> extends CustomError {

@@ -20,7 +20,7 @@
       "path": "../../../core/src"
     },
     {
-      "path": "../../../cip30/src"
+      "path": "../../../dapp-connector/src"
     },
     {
       "path": "../../../wallet/src"

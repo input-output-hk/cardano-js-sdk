@@ -97,8 +97,7 @@ const txBody: Cardano.NewTxBodyAlonzo = {
   ],
   outputs: [txOut],
   validityInterval: {
-    invalidBefore: 100,
-    invalidHereafter: 1000
+    invalidHereafter: mocks.ledgerTip.slot + 10
   }
 };
 
@@ -131,8 +130,8 @@ describe('SingleAddressWallet rollback', () => {
 
     networkInfoProvider.ledgerTip = jest.fn().mockResolvedValueOnce(mocks.ledgerTip).mockResolvedValueOnce(secondTip);
 
-    const histTx1 = mocks.queryTransactionsResult[0];
-    const rollBackTx = { ...mocks.queryTransactionsResult[1], id: tx.id };
+    const histTx1 = mocks.queryTransactionsResult.pageResults[0];
+    const rollBackTx = { ...mocks.queryTransactionsResult.pageResults[1], id: tx.id };
     rollBackTx.body.validityInterval.invalidHereafter = secondTip.slot + 1;
 
     const newTx = {
@@ -140,15 +139,16 @@ describe('SingleAddressWallet rollback', () => {
       id: Cardano.TransactionId('fff4edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99caa')
     };
 
-    chainHistoryProvider.transactionsByAddresses
-      .mockResolvedValueOnce([histTx1, rollBackTx])
-      .mockResolvedValueOnce([newTx])
-      .mockResolvedValueOnce([histTx1, newTx]);
+    chainHistoryProvider.transactionsByAddresses = jest
+      .fn()
+      .mockResolvedValueOnce({ pageResults: [histTx1, rollBackTx], totalResultCount: 2 })
+      .mockResolvedValueOnce({ pageResults: [newTx], totalResultCount: 1 })
+      .mockResolvedValueOnce({ pageResults: [histTx1, newTx], totalResultCount: 2 });
 
     stores.volatileTransactions.set([
       {
-        ...tx,
-        slot: rollBackTx.blockHeader.slot
+        confirmedAt: rollBackTx.blockHeader.slot,
+        tx
       }
     ]);
 

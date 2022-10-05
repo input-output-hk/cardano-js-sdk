@@ -1,9 +1,24 @@
 /* eslint-disable unicorn/no-nested-ternary */
 import { BigIntMath, deepEquals, isNotNil } from '@cardano-sdk/util';
 import { Cardano, RewardsProvider } from '@cardano-sdk/core';
-import { Delegatee, RewardAccount, StakeKeyStatus } from '../types';
+import { ConfirmedTx, Delegatee, RewardAccount, StakeKeyStatus, TxInFlight } from '../types';
+import {
+  EMPTY,
+  Observable,
+  combineLatest,
+  concat,
+  distinctUntilChanged,
+  filter,
+  map,
+  merge,
+  mergeMap,
+  of,
+  pairwise,
+  startWith,
+  switchMap,
+  tap
+} from 'rxjs';
 import { KeyValueStore } from '../../persistence';
-import { Observable, combineLatest, concat, distinctUntilChanged, filter, map, merge, of, switchMap, tap } from 'rxjs';
 import {
   RegAndDeregCertificateTypes,
   includesAnyCertificate,
@@ -50,7 +65,7 @@ export const createQueryStakePoolsProvider =
 export type ObservableStakePoolProvider = ReturnType<typeof createQueryStakePoolsProvider>;
 
 const getWithdrawalQuantity = (
-  { body: { withdrawals } }: Cardano.NewTxAlonzo,
+  withdrawals: Cardano.TxBodyAlonzo['withdrawals'],
   rewardAccount?: Cardano.RewardAccount
 ): Cardano.Lovelace =>
   BigIntMath.sum(
@@ -59,14 +74,14 @@ const getWithdrawalQuantity = (
 
 export const fetchRewardsTrigger$ = (
   epoch$: Observable<Cardano.EpochNo>,
-  txConfirmed$: Observable<Cardano.NewTxAlonzo>,
+  txConfirmed$: Observable<ConfirmedTx>,
   rewardAccount: Cardano.RewardAccount
 ) =>
   merge(
     // Reload every epoch and after every tx that has withdrawals for this reward account
     epoch$,
     txConfirmed$.pipe(
-      map((tx) => getWithdrawalQuantity(tx, rewardAccount)),
+      map(({ tx }) => getWithdrawalQuantity(tx.body.withdrawals, rewardAccount)),
       filter((withdrawalQty) => withdrawalQty > 0n)
     )
   );
@@ -74,19 +89,19 @@ export const fetchRewardsTrigger$ = (
 export const createRewardsProvider =
   (
     epoch$: Observable<Cardano.EpochNo>,
-    txConfirmed$: Observable<Cardano.NewTxAlonzo>,
+    txConfirmed$: Observable<ConfirmedTx>,
     rewardsProvider: RewardsProvider,
     retryBackoffConfig: RetryBackoffConfig
   ) =>
-  (rewardAccounts: Cardano.RewardAccount[]): Observable<Cardano.Lovelace[]> =>
+  (rewardAccounts: Cardano.RewardAccount[], equals = isEqual): Observable<Cardano.Lovelace[]> =>
     combineLatest(
       rewardAccounts.map((rewardAccount) =>
         coldObservableProvider({
-          equals: isEqual,
+          equals,
           provider: () => rewardsProvider.rewardAccountBalance({ rewardAccount }),
           retryBackoffConfig,
           trigger$: fetchRewardsTrigger$(epoch$, txConfirmed$, rewardAccount)
-        }).pipe(distinctUntilChanged())
+        })
       )
     );
 export type ObservableRewardsProvider = ReturnType<typeof createRewardsProvider>;
@@ -96,8 +111,14 @@ const isDelegationCertificate = (cert: Cardano.Certificate): cert is Cardano.Sta
 
 const getAccountsKeyStatus =
   (addresses: Cardano.RewardAccount[]) =>
-  ([transactions, transactionsInFlight]: [TxWithEpoch[], Cardano.NewTxAlonzo[]]) => {
-    const certificatesInFlight = transactionsInFlight.map(({ body: { certificates } }) => certificates || []);
+  ([transactions, transactionsInFlight]: [TxWithEpoch[], TxInFlight[]]) => {
+    const certificatesInFlight = transactionsInFlight.map(
+      ({
+        tx: {
+          body: { certificates }
+        }
+      }) => certificates || []
+    );
     return addresses.map((address) => {
       const isRegistered = isLastStakeKeyCertOfType(
         transactions.map(
@@ -187,7 +208,7 @@ export const createDelegateeTracker = (
 export const addressKeyStatuses = (
   addresses: Cardano.RewardAccount[],
   transactions$: Observable<TxWithEpoch[]>,
-  transactionsInFlight$: Observable<Cardano.NewTxAlonzo[]>
+  transactionsInFlight$: Observable<TxInFlight[]>
 ) =>
   combineLatest([transactions$, transactionsInFlight$]).pipe(
     map(getAccountsKeyStatus(addresses)),
@@ -208,31 +229,56 @@ export const addressDelegatees = (
 
 export const addressRewards = (
   rewardAccounts: Cardano.RewardAccount[],
-  transactionsInFlight$: Observable<Cardano.NewTxAlonzo[]>,
+  transactionsInFlight$: Observable<TxInFlight[]>,
   rewardsProvider: ObservableRewardsProvider,
   balancesStore: KeyValueStore<Cardano.RewardAccount, Cardano.Lovelace>
-): Observable<Cardano.Lovelace[]> =>
-  combineLatest([
-    concat(
-      balancesStore.getValues(rewardAccounts),
-      rewardsProvider(rewardAccounts).pipe(
-        tap((balances) => {
-          for (const [i, rewardAccount] of rewardAccounts.entries()) {
-            balancesStore.setValue(rewardAccount, balances[i]);
-          }
-        })
-      )
-    ),
-    transactionsInFlight$
-  ]).pipe(
-    map(([totalRewards, transactionsInFlight]) =>
-      totalRewards.map(
-        (total, i) =>
-          total - transactionsInFlight.reduce((sum, tx) => sum + getWithdrawalQuantity(tx, rewardAccounts[i]), 0n)
-      )
+): Observable<Cardano.Lovelace[]> => {
+  // Allow identical rewards$ emits to fix corner case.
+  // Epoch change can trigger rewards fetch before tx is detected as confirmed:
+  // rewards$:             'a-b---b' b:{a-tx.rewards} <-- allow 'b' to emitted twice
+  // withdrawalsInFlight$: 'x---y--' x:[tx], y:[]
+  // combineLatest:        'm-n---p' m:{a-tx.rewards}, n:{b-tx.rewards}, p:{b}
+  const rewards$ = concat(
+    balancesStore.getValues(rewardAccounts),
+    rewardsProvider(rewardAccounts, () => false /* allow identical emits */).pipe(
+      tap((balances) => {
+        for (const [i, rewardAccount] of rewardAccounts.entries()) {
+          balancesStore.setValue(rewardAccount, balances[i]);
+        }
+      })
+    )
+  );
+  const withdrawalsInFlight$ = transactionsInFlight$.pipe(
+    map((txs) =>
+      txs
+        .flatMap(
+          ({
+            tx: {
+              body: { withdrawals }
+            }
+          }) => withdrawals
+        )
+        .filter(isNotNil)
     ),
     distinctUntilChanged(deepEquals)
   );
+  return combineLatest([rewards$, withdrawalsInFlight$]).pipe(
+    startWith([[] as bigint[], [] as Cardano.Withdrawal[]] as const),
+    pairwise(),
+    mergeMap(([[_, prevWithdrawalsInFlight], [totalRewards, withdrawalsInFlight]]) => {
+      // Either rewards$ or withdrawalsInFlight$ can change.
+      // If the change was on withdrawalsInFlight$ AND it's size is smaller (which means a withdrawal tx was confirmed),
+      // then we expect rewards$ to also emit, as it's balance must change after such transaction.
+      // This is coupled with implementation of `rewardsProvider` observable, as it assumes that
+      // rewards re-fetch is triggered by transaction confirmation, therefore must happen AFTER it.
+      if (prevWithdrawalsInFlight.length > withdrawalsInFlight.length) {
+        return EMPTY;
+      }
+      return of(totalRewards.map((total, i) => total - getWithdrawalQuantity(withdrawalsInFlight, rewardAccounts[i])));
+    }),
+    distinctUntilChanged(deepEquals)
+  );
+};
 
 export const toRewardAccounts =
   (addresses: Cardano.RewardAccount[]) =>
@@ -261,7 +307,7 @@ export const createRewardAccountsTracker = ({
   balancesStore: KeyValueStore<Cardano.RewardAccount, Cardano.Lovelace>;
   epoch$: Observable<Cardano.EpochNo>;
   transactions$: Observable<TxWithEpoch[]>;
-  transactionsInFlight$: Observable<Cardano.NewTxAlonzo[]>;
+  transactionsInFlight$: Observable<TxInFlight[]>;
 }) =>
   rewardAccountAddresses$.pipe(
     switchMap((rewardAccounts) =>
