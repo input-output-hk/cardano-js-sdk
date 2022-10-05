@@ -112,6 +112,7 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider implements Network
 
   async close(): Promise<void> {
     this.#cache.shutdown();
+    await this.#genesisDataReady;
     await this.#cardanoNode.shutdown();
     this.#epochRolloverDisposer();
   }
