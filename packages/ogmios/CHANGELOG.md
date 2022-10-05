@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.6.0-nightly.10...@cardano-sdk/ogmios@0.6.0-nightly.11) (2022-10-05)
+
+
+### Features
+
+* **ogmios:** createInteractionContextWithLogger util ([7602718](https://github.com/input-output-hk/cardano-js-sdk/commit/7602718ec65949d2a3dd17d3dfaeba782a6c22c9))
+
+
+### Bug Fixes
+
+* **ogmios:** correctly handle interaction context logging with createInteractionContextWithLogger ([9298ee0](https://github.com/input-output-hk/cardano-js-sdk/commit/9298ee0e6c98bef0c1aa4dc70f349094ec00a5c9))
+
+
+
 ## [0.6.0-nightly.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.6.0-nightly.9...@cardano-sdk/ogmios@0.6.0-nightly.10) (2022-09-26)
 
 **Note:** Version bump only for package @cardano-sdk/ogmios

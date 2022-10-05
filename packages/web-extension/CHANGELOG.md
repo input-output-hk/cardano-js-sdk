@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.6.0-nightly.10...@cardano-sdk/web-extension@0.6.0-nightly.11) (2022-10-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* **dapp-connector:** renamed cip30 package to dapp-connector
+
+### Code Refactoring
+
+* **dapp-connector:** renamed cip30 package to dapp-connector ([cb4411d](https://github.com/input-output-hk/cardano-js-sdk/commit/cb4411da916b263ad8a6d85e0bdaffcfe21646c5))
+
+
+
 ## [0.6.0-nightly.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.6.0-nightly.9...@cardano-sdk/web-extension@0.6.0-nightly.10) (2022-09-26)
 
 **Note:** Version bump only for package @cardano-sdk/web-extension

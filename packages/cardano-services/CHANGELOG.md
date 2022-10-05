@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.11...@cardano-sdk/cardano-services@0.6.0-nightly.12) (2022-10-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* add pagination in 'transactionsByAddresses'
+* **cardano-services:** nftMetadataService returns null instead of
+
+### Features
+
+* add pagination in 'transactionsByAddresses' ([fc88afa](https://github.com/input-output-hk/cardano-js-sdk/commit/fc88afa9f006e9fc7b50b5a98665058a0d563e31))
+* **cardano-services:** nftMetadataService returns null instead of ([7b87d1d](https://github.com/input-output-hk/cardano-js-sdk/commit/7b87d1ded0df482d29dd2b581a3baa9035f32d06))
+
+
+### Bug Fixes
+
+* **cardano-services:** filter available rewards balance by spendable_epoch>=tip ([4da325a](https://github.com/input-output-hk/cardano-js-sdk/commit/4da325ad39a2d7520f8f8c902e41eed916ac7a38))
+* **cardano-services:** total rewards is now being calculated correctly for current epoch ([6d4cf6c](https://github.com/input-output-hk/cardano-js-sdk/commit/6d4cf6c64ffb038b9e9ef56597ed0ce366ac1826))
+* **cardano-services:** wrong source tx input id ([f6efe3b](https://github.com/input-output-hk/cardano-js-sdk/commit/f6efe3b2507761c4ef5ec7c5b9e8ec87ff2c5039))
+
+
+### Performance Improvements
+
+* **cardano-services:** order by block.id in ledger tip queries ([b985d3f](https://github.com/input-output-hk/cardano-js-sdk/commit/b985d3f09a870359e7a463088fd22a8054f2fff0))
+
+
+
 ## [0.6.0-nightly.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.10...@cardano-sdk/cardano-services@0.6.0-nightly.11) (2022-09-26)
 
 

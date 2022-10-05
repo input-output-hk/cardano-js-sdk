@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0-nightly.9...@cardano-sdk/core@0.6.0-nightly.10) (2022-10-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* add pagination in 'transactionsByAddresses'
+* **core:** metadatumToCip25 returns `null` instead of `undefined`
+when metadata does not exist or couldn't be extracted
+
+### Features
+
+* add pagination in 'transactionsByAddresses' ([fc88afa](https://github.com/input-output-hk/cardano-js-sdk/commit/fc88afa9f006e9fc7b50b5a98665058a0d563e31))
+* **core:** return null for no metadata from metadatumToCip25 ([b9343e4](https://github.com/input-output-hk/cardano-js-sdk/commit/b9343e49d2f0fa582be9f150aa42e04a3d3c0bfa))
+
+
+
 ## [0.6.0-nightly.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0-nightly.8...@cardano-sdk/core@0.6.0-nightly.9) (2022-09-26)
 
 

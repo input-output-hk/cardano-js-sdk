@@ -3,6 +3,43 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.6.0-nightly.11...@cardano-sdk/wallet@0.6.0-nightly.12) (2022-10-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* **wallet:** add inFlightTransactions store dependency to TransactionReemitterProps
+
+Resubmit transactions that don't get confirmed for too long:
+* **wallet:** add inFlight$ dependency to TransactionsReemitter
+* **wallet:** group some TransactionReemitter props under TransactionsTracker-compatible obj
+* **dapp-connector:** renamed cip30 package to dapp-connector
+* add pagination in 'transactionsByAddresses'
+
+### Features
+
+* add pagination in 'transactionsByAddresses' ([fc88afa](https://github.com/input-output-hk/cardano-js-sdk/commit/fc88afa9f006e9fc7b50b5a98665058a0d563e31))
+* **wallet:** add SmartTxSubmitProvider ([7739122](https://github.com/input-output-hk/cardano-js-sdk/commit/773912224db6630e4a1e8ae6e2c1c493eb7a7ad8))
+* **wallet:** added polling option in coldObservable ([2800f9c](https://github.com/input-output-hk/cardano-js-sdk/commit/2800f9c26c56ae376bcf1fdc78882e1f760a9bb4))
+* **wallet:** attempt to re-fetch tokenMetadata/nftMetadata if provider returns it as 'undefined' ([760b449](https://github.com/input-output-hk/cardano-js-sdk/commit/760b449d55d4c6db2f27f18aaa9e1c72e8c2762f))
+* **wallet:** resubmit recoverable transactions ([fa8aa85](https://github.com/input-output-hk/cardano-js-sdk/commit/fa8aa850d8afacf5fe1a524c29dd94bc20033a63))
+* **wallet:** tx builder returns inputSelection and hash on build ([466275e](https://github.com/input-output-hk/cardano-js-sdk/commit/466275eb9048099eb6fb4ce4b0402a65e2418aae))
+
+
+### Bug Fixes
+
+* **wallet:** await for updated rewards after tx confirmation ([60bd426](https://github.com/input-output-hk/cardano-js-sdk/commit/60bd42671a6b0913b9a7902ae5b8a76a35c2bc67))
+* **wallet:** await for wallet state to settle before initializeTx ([671be3f](https://github.com/input-output-hk/cardano-js-sdk/commit/671be3fa3aac20ddc36862a955782dd7130adf1f))
+* **wallet:** coldObservable retry backoff should recreate observable ([696e815](https://github.com/input-output-hk/cardano-js-sdk/commit/696e815cac6545a83df1f7b312c0680a82ef54f0))
+
+
+### Code Refactoring
+
+* **dapp-connector:** renamed cip30 package to dapp-connector ([cb4411d](https://github.com/input-output-hk/cardano-js-sdk/commit/cb4411da916b263ad8a6d85e0bdaffcfe21646c5))
+* **wallet:** group some TransactionReemitter props under TransactionsTracker-compatible obj ([8bba3a4](https://github.com/input-output-hk/cardano-js-sdk/commit/8bba3a4c0b947a3812b39310214bf11c90a54ce2))
+
+
+
 ## [0.6.0-nightly.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.6.0-nightly.10...@cardano-sdk/wallet@0.6.0-nightly.11) (2022-09-26)
 
 

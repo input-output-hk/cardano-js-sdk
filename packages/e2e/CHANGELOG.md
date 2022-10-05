@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.0-nightly.15](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.5.0-nightly.14...@cardano-sdk/e2e@0.5.0-nightly.15) (2022-10-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* **wallet:** add inFlightTransactions store dependency to TransactionReemitterProps
+
+Resubmit transactions that don't get confirmed for too long:
+* **wallet:** add inFlight$ dependency to TransactionsReemitter
+* **dapp-connector:** renamed cip30 package to dapp-connector
+* add pagination in 'transactionsByAddresses'
+
+### Features
+
+* add pagination in 'transactionsByAddresses' ([fc88afa](https://github.com/input-output-hk/cardano-js-sdk/commit/fc88afa9f006e9fc7b50b5a98665058a0d563e31))
+* **wallet:** resubmit recoverable transactions ([fa8aa85](https://github.com/input-output-hk/cardano-js-sdk/commit/fa8aa850d8afacf5fe1a524c29dd94bc20033a63))
+
+
+### Code Refactoring
+
+* **dapp-connector:** renamed cip30 package to dapp-connector ([cb4411d](https://github.com/input-output-hk/cardano-js-sdk/commit/cb4411da916b263ad8a6d85e0bdaffcfe21646c5))
+
+
+
 ## [0.5.0-nightly.14](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.5.0-nightly.13...@cardano-sdk/e2e@0.5.0-nightly.14) (2022-09-26)
 
 
