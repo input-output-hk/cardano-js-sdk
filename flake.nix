@@ -1,11 +1,13 @@
 {
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
   inputs.nix-filter.url = "github:numtide/nix-filter";
+  inputs.flake-utils.url = "github:numtide/flake-utils";
 
   outputs = {
     self,
     nixpkgs,
     nix-filter,
+    flake-utils,
   }: {
     packages.x86_64-linux.default = let
       pkgs = nixpkgs.legacyPackages.x86_64-linux;
@@ -90,5 +92,19 @@
         '';
         meta.mainProgram = "cli";
       });
+
+    apps = flake-utils.lib.eachDefaultSystemMap (system: let
+      pkgs = nixpkgs.legacyPackages.${system};
+    in {
+      config-update = flake-utils.lib.mkApp {
+        drv = pkgs.writeShellApplication {
+          name = "config-update";
+          runtimeInputs = with pkgs; [git git-subrepo];
+          text = ''
+            git subrepo pull packages/cardano-services/config --message='chore: git subrepo pull packages/cardano-services/config' "$@"
+          '';
+        };
+      };
+    });
   };
 }
