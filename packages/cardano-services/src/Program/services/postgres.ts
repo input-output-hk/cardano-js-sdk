@@ -11,10 +11,10 @@ import fs from 'fs';
 /**
  * Creates a extended Pool client :
  * - use passed srv service name in order to resolve the port
- * - make dealing with failovers (re-resolving the port) opaque
+ * - make dealing with failover (re-resolving the port) opaque
  * - use exponential backoff retry internally with default timeout and factor
  * - intercept 'query' operation and handle connection errors runtime
- * - all other operations are bind to pool object withoud modifications
+ * - all other operations are bind to pool object without modifications
  *
  * @returns pg.Pool instance
  */
