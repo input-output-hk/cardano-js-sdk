@@ -126,7 +126,6 @@ const commonOptions = (command: Command) =>
     );
 
 const program = new Command('cardano-services');
-
 program.version(packageJson.version);
 
 commonOptions(
