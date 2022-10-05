@@ -12,7 +12,7 @@ import hash from 'object-hash';
 import path from 'path';
 
 const clear = require('clear');
-const packageJson = require('../package.json');
+const packageJson = require('../../package.json');
 
 clear();
 console.log(chalk.blue('Cardano Golden Test Generator'));

@@ -1,7 +1,7 @@
 import { Commit } from 'git-last-commit';
 import { Ogmios } from '@cardano-sdk/ogmios';
 import { getLastCommitPromise } from './util';
-const packageJson = require('../package.json');
+const packageJson = require('../../package.json');
 
 export type Metadata = {
   cardano: {
