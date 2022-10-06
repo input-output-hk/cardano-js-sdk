@@ -1,21 +1,45 @@
 import { DbSyncProvider } from '../../DbSyncProvider';
 import { Logger } from 'ts-log';
 import { Pool } from 'pg';
-import { RewardAccountBalanceArgs, RewardsHistoryArgs, RewardsProvider } from '@cardano-sdk/core';
+import {
+  ProviderError,
+  ProviderFailure,
+  RewardAccountBalanceArgs,
+  RewardsHistoryArgs,
+  RewardsProvider
+} from '@cardano-sdk/core';
 import { RewardsBuilder } from './RewardsBuilder';
 import { rewardsToCore } from './mappers';
 
-export class DbSyncRewardsProvider extends DbSyncProvider implements RewardsProvider {
-  #builder: RewardsBuilder;
-  #logger: Logger;
+export interface RewardsProviderProps {
+  paginationPageSizeLimit: number;
+}
+export interface RewardsProviderDependencies {
+  db: Pool;
+  logger: Logger;
+}
 
-  constructor(db: Pool, logger: Logger) {
+export class DbSyncRewardsProvider extends DbSyncProvider implements RewardsProvider {
+  #logger: Logger;
+  #builder: RewardsBuilder;
+  #paginationPageSizeLimit: number;
+
+  constructor({ paginationPageSizeLimit }: RewardsProviderProps, { db, logger }: RewardsProviderDependencies) {
     super(db);
     this.#builder = new RewardsBuilder(db, logger);
     this.#logger = logger;
+    this.#paginationPageSizeLimit = paginationPageSizeLimit;
   }
 
   public async rewardsHistory({ rewardAccounts, epochs }: RewardsHistoryArgs) {
+    if (rewardAccounts.length > this.#paginationPageSizeLimit) {
+      throw new ProviderError(
+        ProviderFailure.BadRequest,
+        undefined,
+        `Reward accounts count of ${rewardAccounts.length} can not be greater than ${this.#paginationPageSizeLimit}`
+      );
+    }
+
     const rewards = await this.#builder.getRewardsHistory(rewardAccounts, epochs);
     return rewardsToCore(rewards);
   }

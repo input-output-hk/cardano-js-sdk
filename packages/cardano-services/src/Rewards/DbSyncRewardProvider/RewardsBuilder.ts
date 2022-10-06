@@ -7,10 +7,12 @@ import { findAccountBalance, findRewardsHistory } from './queries';
 export class RewardsBuilder {
   #db: Pool;
   #logger: Logger;
+
   constructor(db: Pool, logger: Logger) {
     this.#db = db;
     this.#logger = logger;
   }
+
   public async getAccountBalance(rewardAccount: Cardano.RewardAccount) {
     this.#logger.debug('About to run findAccountBalance query');
     const result: QueryResult<AccountBalanceModel> = await this.#db.query(findAccountBalance, [
@@ -18,6 +20,7 @@ export class RewardsBuilder {
     ]);
     return result.rows.length > 0 ? result.rows[0] : undefined;
   }
+
   public async getRewardsHistory(rewardAccounts: Cardano.RewardAccount[], epochs?: Range<Cardano.EpochNo>) {
     const params: (string[] | number)[] = [rewardAccounts.map((rewardAcc) => rewardAcc.toString())];
     this.#logger.debug('About to run findRewardsHistory query');

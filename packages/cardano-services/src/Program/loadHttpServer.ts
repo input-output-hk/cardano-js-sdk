@@ -112,7 +112,14 @@ const serviceMapFactory = (args: ProgramArgs, logger: Logger, dnsResolver: DnsRe
       return new ChainHistoryHttpService({ chainHistoryProvider, logger });
     }, ServiceNames.ChainHistory),
     [ServiceNames.Rewards]: withDb(
-      (db) => new RewardsHttpService({ logger, rewardsProvider: new DbSyncRewardsProvider(db, logger) }),
+      (db) =>
+        new RewardsHttpService({
+          logger,
+          rewardsProvider: new DbSyncRewardsProvider(
+            { paginationPageSizeLimit: args.options!.paginationPageSizeLimit! },
+            { db, logger }
+          )
+        }),
       ServiceNames.Rewards
     ),
     [ServiceNames.NetworkInfo]: withDb(async (db) => {
