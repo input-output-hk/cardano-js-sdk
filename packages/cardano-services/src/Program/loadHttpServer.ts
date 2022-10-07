@@ -11,12 +11,14 @@ import { DbSyncUtxoProvider, UtxoHttpService } from '../Utxo';
 import { DnsResolver, createDnsResolver } from './utils';
 import { HttpServer, HttpServerConfig, HttpService } from '../Http';
 import { InMemoryCache } from '../InMemoryCache';
+import { Logger } from 'ts-log';
 import { MissingProgramOption, UnknownServiceName } from './errors';
 import { ServiceNames } from './ServiceNames';
+import { SrvRecord } from 'dns';
 import { TxSubmitHttpService } from '../TxSubmit';
 import { createDbSyncMetadataService } from '../Metadata';
+import { createLogger } from 'bunyan';
 import { getOgmiosCardanoNode, getOgmiosTxSubmitProvider, getPool, getRabbitMqTxSubmitProvider } from './services';
-import Logger, { createLogger } from 'bunyan';
 import memoize from 'lodash/memoize';
 import pg from 'pg';
 
@@ -41,6 +43,11 @@ export interface HttpServerOptions extends CommonProgramOptions {
   dbCacheTtl: number;
   useQueue?: boolean;
   paginationPageSizeLimit?: number;
+}
+
+export interface LoadHttpServerDependencies {
+  dnsResolver?: (serviceName: string) => Promise<SrvRecord>;
+  logger?: Logger;
 }
 
 export interface ProgramArgs {
@@ -112,7 +119,14 @@ const serviceMapFactory = (args: ProgramArgs, logger: Logger, dnsResolver: DnsRe
       return new ChainHistoryHttpService({ chainHistoryProvider, logger });
     }, ServiceNames.ChainHistory),
     [ServiceNames.Rewards]: withDb(
-      (db) => new RewardsHttpService({ logger, rewardsProvider: new DbSyncRewardsProvider(db, logger) }),
+      (db) =>
+        new RewardsHttpService({
+          logger,
+          rewardsProvider: new DbSyncRewardsProvider(
+            { paginationPageSizeLimit: args.options!.paginationPageSizeLimit! },
+            { db, logger }
+          )
+        }),
       ServiceNames.Rewards
     ),
     [ServiceNames.NetworkInfo]: withDb(async (db) => {
@@ -142,24 +156,29 @@ const serviceMapFactory = (args: ProgramArgs, logger: Logger, dnsResolver: DnsRe
   };
 };
 
-export const loadHttpServer = async (args: ProgramArgs): Promise<HttpServer> => {
+export const loadHttpServer = async (args: ProgramArgs, deps: LoadHttpServerDependencies = {}): Promise<HttpServer> => {
+  const { apiUrl, options, serviceNames } = args;
   const services: HttpService[] = [];
-  const logger = createLogger({
-    level: args.options?.loggerMinSeverity,
-    name: 'http-server'
-  });
+  const logger =
+    deps?.logger ||
+    createLogger({
+      level: options?.loggerMinSeverity,
+      name: 'http-server'
+    });
 
-  const dnsResolver = createDnsResolver(
-    {
-      factor: args.options?.serviceDiscoveryBackoffFactor,
-      maxRetryTime: args.options?.serviceDiscoveryTimeout
-    },
-    logger
-  );
-  const db = await getPool(dnsResolver, logger, args.options);
+  const dnsResolver =
+    deps?.dnsResolver ||
+    createDnsResolver(
+      {
+        factor: options?.serviceDiscoveryBackoffFactor,
+        maxRetryTime: options?.serviceDiscoveryTimeout
+      },
+      logger
+    );
+  const db = await getPool(dnsResolver, logger, options);
   const serviceMap = serviceMapFactory(args, logger, dnsResolver, db);
 
-  for (const serviceName of args.serviceNames) {
+  for (const serviceName of serviceNames) {
     if (serviceMap[serviceName]) {
       services.push(await serviceMap[serviceName]());
     } else {
@@ -169,12 +188,12 @@ export const loadHttpServer = async (args: ProgramArgs): Promise<HttpServer> => 
 
   const config: HttpServerConfig = {
     listen: {
-      host: args.apiUrl.hostname,
-      port: Number.parseInt(args.apiUrl.port)
+      host: apiUrl.hostname,
+      port: Number.parseInt(apiUrl.port)
     }
   };
-  if (args.options?.enableMetrics) {
-    config.metrics = { enabled: args.options?.enableMetrics };
+  if (options?.enableMetrics) {
+    config.metrics = { enabled: options?.enableMetrics };
   }
   return new HttpServer(config, { logger, services });
 };

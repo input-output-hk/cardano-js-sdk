@@ -103,6 +103,7 @@ describe('ChainHistoryHttpService', () => {
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
+          expect.assertions(2);
           try {
             await axios.post(`${baseUrl}${url}`, { ids: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
             throw new Error('fail');
@@ -132,6 +133,7 @@ describe('ChainHistoryHttpService', () => {
       });
 
       it('returns a 400 coded error if provided block ids are greater than pagination page size limit', async () => {
+        expect.assertions(2);
         const ids: Cardano.BlockId[] = [
           Cardano.BlockId('7a48b034645f51743550bbaf81f8a14771e58856e031eb63844738ca8ad72298'),
           Cardano.BlockId('469cc6fbcc186de6b12c392ad0cc84a20c4d4774c1f9c3cfd80745de00856f4b'),
@@ -169,6 +171,7 @@ describe('ChainHistoryHttpService', () => {
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
+          expect.assertions(2);
           try {
             await axios.post(`${baseUrl}${url}`, { ids: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
             throw new Error('fail');
@@ -201,6 +204,7 @@ describe('ChainHistoryHttpService', () => {
       });
 
       it('returns a 400 coded error if provided transaction ids are greater than pagination page size limit', async () => {
+        expect.assertions(2);
         const ids: Cardano.TransactionId[] = [
           Cardano.TransactionId('cefd2fcf657e5e5d6c35975f4e052f427819391b153ebb16ad8aa107ba5a3819'),
           Cardano.TransactionId('952dfa431223fd671c5e9e048e016f70fcebd9e41fcb726969415ff692736eeb'),
@@ -311,6 +315,7 @@ describe('ChainHistoryHttpService', () => {
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
+          expect.assertions(2);
           try {
             await axios.post(
               `${baseUrl}${url}`,
@@ -408,6 +413,7 @@ describe('ChainHistoryHttpService', () => {
       });
 
       it('returns a 400 coded error if pagination argument is not provided', async () => {
+        expect.assertions(2);
         const addresses: Cardano.Address[] = [
           Cardano.Address(
             'addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7'
@@ -423,6 +429,7 @@ describe('ChainHistoryHttpService', () => {
       });
 
       it('returns a 400 coded error if provided transaction addresses are greater than pagination page size limit', async () => {
+        expect.assertions(2);
         const addresses: Cardano.Address[] = [
           Cardano.Address(
             'addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7'
