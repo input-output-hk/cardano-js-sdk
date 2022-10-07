@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0-nightly.10...@cardano-sdk/core@0.6.0-nightly.11) (2022-10-07)
+
+
+### Features
+
+* **core:** improved custom errors to correctly handle errors from fs package or of type string ([5ea3eac](https://github.com/input-output-hk/cardano-js-sdk/commit/5ea3eac801762a881892ad2267d5a72884c3c1e7))
+
+
+
 ## [0.6.0-nightly.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0-nightly.9...@cardano-sdk/core@0.6.0-nightly.10) (2022-10-05)
 
 

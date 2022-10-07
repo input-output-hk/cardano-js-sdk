@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/blockfrost@0.6.0-nightly.10...@cardano-sdk/blockfrost@0.6.0-nightly.11) (2022-10-07)
+
+**Note:** Version bump only for package @cardano-sdk/blockfrost
+
+
+
+
+
 ## [0.6.0-nightly.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/blockfrost@0.6.0-nightly.9...@cardano-sdk/blockfrost@0.6.0-nightly.10) (2022-10-05)
 
 

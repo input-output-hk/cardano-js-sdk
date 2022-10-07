@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.6.0-nightly.2...@cardano-sdk/util@0.6.0-nightly.3) (2022-10-07)
+
+
+### Bug Fixes
+
+* **util:** a websocket closed error is now correctly handled as a network error ([6aa00a1](https://github.com/input-output-hk/cardano-js-sdk/commit/6aa00a10fc21eac13da557d6c7c1de40c3f30b66))
+
+
+
 ## [0.6.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.5.0...@cardano-sdk/util@0.6.0-nightly.2) (2022-09-14)
 
 

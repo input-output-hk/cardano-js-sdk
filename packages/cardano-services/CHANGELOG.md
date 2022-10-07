@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.12...@cardano-sdk/cardano-services@0.6.0-nightly.13) (2022-10-07)
+
+
+### Features
+
+* **cardano-services:** rewardAccounts limitation ([8ca6917](https://github.com/input-output-hk/cardano-js-sdk/commit/8ca6917f3de646bb9cf6f17c7ac5b4bd1940412d))
+
+
+### Bug Fixes
+
+* **cardano-services:** fix netinf prov possibly causing unhandled rejection on early called shutdown ([1107d4b](https://github.com/input-output-hk/cardano-js-sdk/commit/1107d4b52fc170a86520a4e8b823cfe7ddfc7b5a))
+* **cardano-services:** fix some typos ([303497d](https://github.com/input-output-hk/cardano-js-sdk/commit/303497d4bbc70a2a6ea7566002ad260814284196))
+* **cardano-services:** fixed some not correctly exported symbols ([8c8950a](https://github.com/input-output-hk/cardano-js-sdk/commit/8c8950add7551b6ad4fec4fe50baec40e28b655d))
+
+
+
 ## [0.6.0-nightly.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.11...@cardano-sdk/cardano-services@0.6.0-nightly.12) (2022-10-05)
 
 

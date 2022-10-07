@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/blockfrost",
-  "version": "0.6.0-nightly.10",
+  "version": "0.6.0-nightly.11",
   "description": "Blockfrost provider for Cardano JS SDK",
   "engines": {
     "node": "^14"
@@ -59,8 +59,8 @@
   },
   "dependencies": {
     "@blockfrost/blockfrost-js": "npm:blockfrost-js-ratelimited@2.0.4",
-    "@cardano-sdk/core": "^0.6.0-nightly.10",
-    "@cardano-sdk/util": "^0.6.0-nightly.2",
+    "@cardano-sdk/core": "^0.6.0-nightly.11",
+    "@cardano-sdk/util": "^0.6.0-nightly.3",
     "lodash": "^4.17.21",
     "ts-log": "^2.2.4"
   },
