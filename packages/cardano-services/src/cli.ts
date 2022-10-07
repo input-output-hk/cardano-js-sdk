@@ -29,7 +29,6 @@ import {
   loadSecret
 } from './Program';
 import { Command, Option } from 'commander';
-
 import { DB_CACHE_TTL_DEFAULT } from './InMemoryCache';
 import { DEFAULT_TOKEN_METADATA_CACHE_TTL, DEFAULT_TOKEN_METADATA_SERVER_URL } from './Asset';
 import { EPOCH_POLL_INTERVAL_DEFAULT } from './util';

@@ -1,4 +1,4 @@
-import { Cardano, Paginated } from '@cardano-sdk/core';
+import { Cardano, Paginated, QueryStakePoolsArgs } from '@cardano-sdk/core';
 export interface PoolUpdateModel {
   id: string; // pool hash id
   update_id: string;
@@ -185,3 +185,5 @@ export type StakePoolResults = {
   results: Paginated<Cardano.StakePool>;
   poolsToCache: PoolsToCache;
 };
+
+export type QueryPoolsApyArgs = Partial<QueryStakePoolsArgs>;

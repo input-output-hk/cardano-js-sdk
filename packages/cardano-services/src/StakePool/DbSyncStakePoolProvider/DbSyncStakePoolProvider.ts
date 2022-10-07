@@ -2,6 +2,8 @@ import {
   Cardano,
   CardanoNode,
   Paginated,
+  ProviderError,
+  ProviderFailure,
   QueryStakePoolsArgs,
   StakePoolProvider,
   StakePoolStats
@@ -24,6 +26,10 @@ import { StakePoolBuilder } from './StakePoolBuilder';
 import { isNotNil } from '@cardano-sdk/util';
 import { toStakePoolResults } from './mappers';
 
+export interface StakePoolProviderProps {
+  paginationPageSizeLimit: number;
+}
+
 export interface StakePoolProviderDependencies {
   db: Pool;
   logger: Logger;
@@ -39,14 +45,19 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
   #epochMonitor: EpochMonitor;
   #epochRolloverDisposer: Disposer;
   #cardanoNode: CardanoNode;
+  #paginationPageSizeLimit: number;
 
-  constructor({ db, cache, cardanoNode, logger, epochMonitor }: StakePoolProviderDependencies) {
+  constructor(
+    { paginationPageSizeLimit }: StakePoolProviderProps,
+    { db, cache, cardanoNode, logger, epochMonitor }: StakePoolProviderDependencies
+  ) {
     super(db);
     this.#logger = logger;
     this.#cache = cache;
     this.#epochMonitor = epochMonitor;
     this.#builder = new StakePoolBuilder(db, logger);
     this.#cardanoNode = cardanoNode;
+    this.#paginationPageSizeLimit = paginationPageSizeLimit;
   }
 
   private getQueryBySortType(
@@ -136,11 +147,29 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
     return { poolMetrics, poolOwners, poolRegistrations, poolRelays, poolRetirements };
   }
 
-  public async queryStakePools(options?: QueryStakePoolsArgs): Promise<Paginated<Cardano.StakePool>> {
+  public async queryStakePools(options: QueryStakePoolsArgs): Promise<Paginated<Cardano.StakePool>> {
+    if (options.pagination.limit > this.#paginationPageSizeLimit) {
+      throw new ProviderError(
+        ProviderFailure.BadRequest,
+        undefined,
+        `Page size of ${options.pagination.limit} can not be greater than ${this.#paginationPageSizeLimit}`
+      );
+    }
+
+    if (options.filters?.identifier && options.filters.identifier.values.length > this.#paginationPageSizeLimit) {
+      throw new ProviderError(
+        ProviderFailure.BadRequest,
+        undefined,
+        `Filter identifiers of ${options.filters.identifier.values.length} can not be greater than ${
+          this.#paginationPageSizeLimit
+        }`
+      );
+    }
+
     const { params, query } =
-      options?.filters?._condition === 'or'
-        ? this.#builder.buildOrQuery(options?.filters)
-        : this.#builder.buildAndQuery(options?.filters);
+      options.filters?._condition === 'or'
+        ? this.#builder.buildOrQuery(options.filters)
+        : this.#builder.buildAndQuery(options.filters);
 
     // Get pool updates/hashes cached
     const poolUpdates = await this.#cache.get(queryCacheKey(StakePoolsSubQuery.POOL_HASHES, options), () =>

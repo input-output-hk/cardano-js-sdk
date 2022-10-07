@@ -4,7 +4,7 @@ import { currentEpoch, ledgerTip, stakeKeyHash } from './mockData';
 import { somePartialStakePools } from '@cardano-sdk/util-dev';
 import delay from 'delay';
 
-const getRandomTxId = () =>
+export const getRandomTxId = () =>
   Array.from({ length: 64 })
     .map(() => Math.floor(Math.random() * 16).toString(16))
     .join('');
