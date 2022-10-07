@@ -1,5 +1,5 @@
 import { BAD_CONNECTION_URL, txsPromise } from './utils';
-import { ProviderError, TxSubmitProvider } from '@cardano-sdk/core';
+import { ProviderError } from '@cardano-sdk/core';
 import { RabbitMQContainer } from './docker';
 import { RabbitMqTxSubmitProvider, TxSubmitWorker } from '../../../src';
 import { logger } from '@cardano-sdk/util-dev';
@@ -7,7 +7,7 @@ import { logger } from '@cardano-sdk/util-dev';
 describe('RabbitMqTxSubmitProvider', () => {
   const container = new RabbitMQContainer();
 
-  let provider: TxSubmitProvider | undefined;
+  let provider: RabbitMqTxSubmitProvider | undefined;
   let rabbitmqUrl: URL;
 
   beforeAll(async () => {
@@ -20,7 +20,7 @@ describe('RabbitMqTxSubmitProvider', () => {
 
   afterEach(async () => {
     if (provider) {
-      await provider.close!();
+      await provider.close();
       provider = undefined;
     }
   });

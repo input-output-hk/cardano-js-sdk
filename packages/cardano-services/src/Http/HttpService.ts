@@ -39,17 +39,19 @@ export abstract class HttpService extends RunnableModule {
   }
 
   async initializeImpl(): Promise<void> {
+    if (this.provider instanceof RunnableModule) await this.provider.initialize();
+
     if (!(await this.healthCheck()).ok) {
       throw new ProviderError(ProviderFailure.Unhealthy);
     }
   }
 
   async startImpl(): Promise<void> {
-    await this.provider.start?.();
+    if (this.provider instanceof RunnableModule) await this.provider.start();
   }
 
   async shutdownImpl(): Promise<void> {
-    await this.provider.close?.();
+    if (this.provider instanceof RunnableModule) await this.provider.shutdown();
   }
 
   async healthCheck(): Promise<HealthCheckResponse> {

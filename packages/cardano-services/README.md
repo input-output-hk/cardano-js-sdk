@@ -120,6 +120,10 @@ RABBITMQ_SRV_SERVICE_NAME=some-domain-for-rabbitmq \
 ./dist/cjs/cli.js start-worker
 ```
 
+## Development
+
+See the [development documentation]
+
 ## Tests
 
 See [code coverage report]
@@ -128,6 +132,7 @@ See [code coverage report]
 [Cardano Node]: https://github.com/input-output-hk/cardano-node
 [code coverage report]: https://input-output-hk.github.io/cardano-js-sdk/coverage/cardano-services
 [CLI]: ./src/cli.ts
+[development documentation]: https://github.com/input-output-hk/cardano-js-sdk/tree/master/packages/cardano-services/src#readme
 [Ogmios]: https://ogmios.dev/
 [install and build]: ../../README.md#install-and-build
 [PostgreSQL]: https://www.postgresql.org/

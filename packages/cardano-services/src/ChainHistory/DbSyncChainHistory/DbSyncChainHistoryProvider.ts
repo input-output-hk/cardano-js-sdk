@@ -32,7 +32,7 @@ export interface ChainHistoryProviderDependencies {
   logger: Logger;
 }
 
-export class DbSyncChainHistoryProvider extends DbSyncProvider implements ChainHistoryProvider {
+export class DbSyncChainHistoryProvider extends DbSyncProvider() implements ChainHistoryProvider {
   #paginationPageSizeLimit: number;
   #builder: ChainHistoryBuilder;
   #metadataService: MetadataService;

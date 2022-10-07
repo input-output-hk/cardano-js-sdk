@@ -37,7 +37,7 @@ export class DbSyncEpochPollService implements EpochMonitor {
 
   /**
    * Poll execution to detect a new epoch rollover
-   * Upon the occurrence of rollover event it executes all callbacks by registered dependand services
+   * Upon the occurrence of rollover event it executes all callbacks by registered dependant services
    */
   async #executePoll() {
     const lastEpoch = await this.#queryLastEpoch();

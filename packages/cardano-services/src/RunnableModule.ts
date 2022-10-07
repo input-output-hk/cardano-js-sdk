@@ -14,7 +14,7 @@ export abstract class RunnableModule {
   logger: Logger;
   name: string;
 
-  protected constructor(name: string, logger: Logger) {
+  constructor(name: string, logger: Logger) {
     this.state = null;
     this.logger = contextLogger(logger, name);
     this.name = name;
