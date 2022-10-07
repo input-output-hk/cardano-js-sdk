@@ -19,7 +19,6 @@ jobs:
         # Fetch all history for all tags and branches
         fetch-depth: 0
         ref: nightly
-        submodules: true
 
     - name: ⏬ Merge in master
       run: |
