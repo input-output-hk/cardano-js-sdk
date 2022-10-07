@@ -1,34 +1,37 @@
 # Cardano JS SDK | Cardano GraphQL Services
-Libraries and program entrypoints for services to facilitate remote data and submit access using 
-[Provider] interfaces over HTTP, with _optional_ queue-based transaction submission; The 
+
+Libraries and program entrypoints for services to facilitate remote data and submit access using
+[Provider] interfaces over HTTP, with _optional_ queue-based transaction submission; The
 [TxSubmitHttpService] can be configured to submit directly via [Ogmios], or via a [RabbitMQ] broker,
-with one or more workers handling submission and response job creation. Data is sourced from 
-[Cardano DB Sync], the local [Cardano Node] via [Ogmios] Local State Queries, genesis files, and 
+with one or more workers handling submission and response job creation. Data is sourced from
+[Cardano DB Sync], the local [Cardano Node] via [Ogmios] Local State Queries, genesis files, and
 remote sources.
 
 ## Features
+
 - [CLI] with configuration via command line arguments or environment variables and _optional_ loading of secrets from disk.
 - Service port discovery via DNS resolution, or static configuration.
 - Fault-tolerant transaction submission via persistent queue, or direct submission.
 - _Optional_ [Prometheus] metrics available at `/metrics`
-- Data sourced from Cardano DB Sync PostgreSQL, Local State Queries, genesis files, and remote 
+- Data sourced from Cardano DB Sync PostgreSQL, Local State Queries, genesis files, and remote
   sources.
 
 ## Services
 
-The services require instances of [Cardano Node] and [Ogmios] as a minimum, with 
+The services require instances of [Cardano Node] and [Ogmios] as a minimum, with
 [Cardano DB Sync] and [RabbitMQ] dependent on the run command. Please refer to
-[docker-compose.json](./docker-compose.yml) for the current supported version of each service 
+[docker-compose.json](./docker-compose.yml) for the current supported version of each service
 dependency.
 
 ### HTTP Server
-The HTTP server can be started with one or more provider modules by name, segmented by URL path. 
+
+The HTTP server can be started with one or more provider modules by name, segmented by URL path.
 Run the [CLI] with `start-server --help` to see the full list of options.
 
 ### Worker
+
 A worker must be started when opting for queue-based transaction submission.
 Run the [CLI] with `start-worker --help` to see the full list of options.
-
 
 ## Examples
 
@@ -42,7 +45,8 @@ _The following examples require the [install and build] steps to be completed._
 - HTTP API exposed using a custom API URL
 
 **`start-server` using CLI options:**
-``` console
+
+```console
 ./dist/cjs/cli.js \
   start-server \
     --api-url http://localhost:6000 \
@@ -53,7 +57,8 @@ _The following examples require the [install and build] steps to be completed._
 ```
 
 **`start-server` using env variables:**
-``` console
+
+```console
 SERVICE_NAMES=asset,chain-history,stake-pool,tx-submit,network-info,utxo,rewards \
 API_URL=http://localhost:6000 \
 CARDANO_NODE_CONFIG_PATH=./config/network/preprod/cardano-node/config.json \
@@ -73,7 +78,8 @@ OGMIOS_URL=ws://localhost:1338 \
 - Prometheus metrics exporter enabled at http://localhost:6000/metrics
 
 **`start-server` using CLI options:**
-``` console
+
+```console
 ./dist/cjs/cli.js \
   start-server \
     --api-url http://localhost:6000 \
@@ -90,7 +96,8 @@ OGMIOS_URL=ws://localhost:1338 \
 ```
 
 **`start-server` using env variables:**
-``` console
+
+```console
 SERVICE_NAMES=asset,chain-history,stake-pool,tx-submit,network-info,utxo,rewards \
 API_URL=http://localhost:6000 \
 ENABLE_METRICS=true \
@@ -106,7 +113,8 @@ USE_QUEUE=true \
 ```
 
 **`start-worker` using CLI options:**
-``` console
+
+```console
 ./dist/cjs/cli.js \
   start-worker \
     --ogmios-srv-service-name  some-domain-for-ogmios \
@@ -114,7 +122,8 @@ USE_QUEUE=true \
 ```
 
 **`start-worker` using env variables:**
-``` console
+
+```console
 OGMIOS_SRV_SERVICE_NAME=some-domain-for-ogmios \
 RABBITMQ_SRV_SERVICE_NAME=some-domain-for-rabbitmq \
 ./dist/cjs/cli.js start-worker
@@ -128,15 +137,15 @@ See the [development documentation]
 
 See [code coverage report]
 
-[Cardano DB Sync]: https://github.com/input-output-hk/cardano-db-sync
-[Cardano Node]: https://github.com/input-output-hk/cardano-node
+[cardano db sync]: https://github.com/input-output-hk/cardano-db-sync
+[cardano node]: https://github.com/input-output-hk/cardano-node
+[cli]: ./src/cli.ts
 [code coverage report]: https://input-output-hk.github.io/cardano-js-sdk/coverage/cardano-services
-[CLI]: ./src/cli.ts
 [development documentation]: https://github.com/input-output-hk/cardano-js-sdk/tree/master/packages/cardano-services/src#readme
-[Ogmios]: https://ogmios.dev/
 [install and build]: ../../README.md#install-and-build
-[PostgreSQL]: https://www.postgresql.org/
-[Prometheus]: https://prometheus.io/
-[Provider]: ../core/src/Provider
-[RabbitMQ]: https://www.rabbitmq.com/
-[TxSubmitHttpService]: ./src/TxSubmit/TxSubmitHttpService.ts
+[ogmios]: https://ogmios.dev/
+[postgresql]: https://www.postgresql.org/
+[prometheus]: https://prometheus.io/
+[provider]: ../core/src/Provider
+[rabbitmq]: https://www.rabbitmq.com/
+[txsubmithttpservice]: ./src/TxSubmit/TxSubmitHttpService.ts
