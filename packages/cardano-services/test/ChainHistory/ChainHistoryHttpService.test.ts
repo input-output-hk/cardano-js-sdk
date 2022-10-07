@@ -97,6 +97,7 @@ describe('ChainHistoryHttpService', () => {
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
+          expect.assertions(2);
           try {
             await axios.post(`${baseUrl}${url}`, { ids: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
             throw new Error('fail');
@@ -146,6 +147,7 @@ describe('ChainHistoryHttpService', () => {
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
+          expect.assertions(2);
           try {
             await axios.post(`${baseUrl}${url}`, { ids: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
             throw new Error('fail');
@@ -271,6 +273,7 @@ describe('ChainHistoryHttpService', () => {
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
+          expect.assertions(2);
           try {
             await axios.post(`${baseUrl}${url}`, { addresses: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
             throw new Error('fail');

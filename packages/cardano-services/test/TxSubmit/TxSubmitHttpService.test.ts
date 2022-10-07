@@ -153,6 +153,7 @@ describe('TxSubmitHttpService', () => {
       });
 
       it('returns a 415 coded response if the wrong content type header is used', async () => {
+        expect.assertions(3);
         try {
           await axios.post(`${baseUrl}/submit`, bodyTx, {
             headers: { [CONTENT_TYPE]: APPLICATION_CBOR }

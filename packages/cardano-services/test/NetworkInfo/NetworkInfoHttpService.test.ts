@@ -143,6 +143,7 @@ describe('NetworkInfoHttpService', () => {
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
+          expect.assertions(2);
           try {
             await axios.post(
               `${baseUrl}/era-summaries`,
@@ -174,6 +175,7 @@ describe('NetworkInfoHttpService', () => {
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
+          expect.assertions(2);
           try {
             await axios.post(`${baseUrl}/stake`, { args: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
           } catch (error: any) {
@@ -257,6 +259,7 @@ describe('NetworkInfoHttpService', () => {
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
+          expect.assertions(2);
           try {
             await axios.post(
               `${baseUrl}/lovelace-supply`,
@@ -312,6 +315,7 @@ describe('NetworkInfoHttpService', () => {
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
+          expect.assertions(2);
           try {
             await axios.post(`${baseUrl}/ledger-tip`, { args: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
           } catch (error: any) {
@@ -334,6 +338,7 @@ describe('NetworkInfoHttpService', () => {
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
+          expect.assertions(2);
           try {
             await axios.post(
               `${baseUrl}/current-wallet-protocol-parameters`,
@@ -360,6 +365,7 @@ describe('NetworkInfoHttpService', () => {
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
+          expect.assertions(2);
           try {
             await axios.post(
               `${baseUrl}/genesis-parameters`,
@@ -372,6 +378,7 @@ describe('NetworkInfoHttpService', () => {
           }
         });
       });
+
       it('successful request', async () => {
         const response = await provider.genesisParameters();
         expect(response.networkMagic).toBeDefined();

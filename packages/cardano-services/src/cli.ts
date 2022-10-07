@@ -10,6 +10,7 @@ import {
   ENABLE_METRICS_DEFAULT,
   HttpServerOptions,
   OGMIOS_URL_DEFAULT,
+  PAGINATION_PAGE_SIZE_LIMIT_DEFAULT,
   PARALLEL_MODE_DEFAULT,
   PARALLEL_TXS_DEFAULT,
   POLLING_CYCLE_DEFAULT,
@@ -250,6 +251,15 @@ commonOptions(
       .env('USE_QUEUE')
       .default(USE_QUEUE_DEFAULT)
       .argParser((useQueue) => stringToBoolean(useQueue, Programs.HttpServer, ProgramOptionDescriptions.UseQueue))
+  )
+  .addOption(
+    new Option(
+      '--pagination-page-size-limit <paginationPageSizeLimit>',
+      ProgramOptionDescriptions.PaginationPageSizeLimit
+    )
+      .env('PAGINATION_PAGE_SIZE_LIMIT')
+      .default(PAGINATION_PAGE_SIZE_LIMIT_DEFAULT)
+      .argParser((interval) => Number.parseInt(interval, 10))
   )
   .action(async (serviceNames: ServiceNames[], options: { apiUrl: URL } & HttpServerOptions) => {
     const { apiUrl, ...rest } = options;

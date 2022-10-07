@@ -60,7 +60,7 @@ describe('RewardsHttpService', () => {
 
   describe('healthy state', () => {
     beforeAll(async () => {
-      rewardsProvider = new DbSyncRewardsProvider(dbConnection, logger);
+      rewardsProvider = new DbSyncRewardsProvider({ paginationPageSizeLimit: 5 }, { db: dbConnection, logger });
       service = new RewardsHttpService({ logger, rewardsProvider });
       httpServer = new HttpServer(config, { logger, services: [service] });
       await httpServer.initialize();
@@ -83,6 +83,7 @@ describe('RewardsHttpService', () => {
     describe('/history', () => {
       const historyUrl = '/history';
       const rewardAddress = 'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27';
+
       it('returns a 200 coded response with a well formed HTTP request', async () => {
         expect(
           (
@@ -96,7 +97,9 @@ describe('RewardsHttpService', () => {
           ).status
         ).toEqual(200);
       });
+
       it('returns a 415 coded response if the wrong content type header is used', async () => {
+        expect.assertions(2);
         try {
           await axios.post(
             `${baseUrl}${historyUrl}`,
@@ -111,7 +114,8 @@ describe('RewardsHttpService', () => {
         }
       });
 
-      it('returns 400 coded respons if the request is bad formed', async () => {
+      it('returns 400 coded response if the request is bad formed', async () => {
+        expect.assertions(2);
         try {
           await axios.post(`${baseUrl}${historyUrl}`, { field: 'value' });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -120,11 +124,35 @@ describe('RewardsHttpService', () => {
           expect(error.message).toBe(BAD_REQUEST_STRING);
         }
       });
+
+      it('returns a 400 coded error if reward accounts are greater than pagination page size limit', async () => {
+        expect.assertions(2);
+        try {
+          await axios.post(
+            `${baseUrl}${historyUrl}`,
+            {
+              rewardAccounts: [
+                rewardAddress,
+                'stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d',
+                'stake_test1uqrw9tjymlm8wrwq7jk68n6v7fs9qz8z0tkdkve26dylmfc2ux2hj',
+                'stake_test1uzwd0ng8pw7vvhm4k3s28azx9c6ytug60uh35jvztgg03rge58jf8',
+                'stake_test1urpklgzqsh9yqz8pkyuxcw9dlszpe5flnxjtl55epla6ftqktdyfz',
+                'stake_test1upqykkjq3zhf4085s6n70w8cyp57dl87r0ezduv9rnnj2uqk5zmdv'
+              ]
+            },
+            { headers: { 'Content-Type': APPLICATION_CBOR } }
+          );
+        } catch (error: any) {
+          expect(error.response.status).toBe(415);
+          expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
+        }
+      });
     });
 
     describe('/account-balance', () => {
       const accountBalanceUrl = '/account-balance';
       const rewardAccount = 'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27';
+
       it('returns a 200 coded response with a well formed HTTP request', async () => {
         expect(
           (
@@ -134,7 +162,9 @@ describe('RewardsHttpService', () => {
           ).status
         ).toEqual(200);
       });
+
       it('returns a 415 coded response if the wrong content type header is used', async () => {
+        expect.assertions(2);
         try {
           await axios.post(
             `${baseUrl}${accountBalanceUrl}`,
@@ -146,7 +176,9 @@ describe('RewardsHttpService', () => {
           expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
         }
       });
-      it('returns 400 coded respons if the request is bad formed', async () => {
+
+      it('returns 400 coded response if the request is bad formed', async () => {
+        expect.assertions(2);
         try {
           await axios.post(`${baseUrl}${accountBalanceUrl}`, { address: 'asd' });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any

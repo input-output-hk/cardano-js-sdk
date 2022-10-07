@@ -36,6 +36,15 @@ module.exports = {
       transform: {
         '^.+\\.test.ts?$': 'ts-jest'
       }
+    },
+    {
+      displayName: 'ogmios',
+      preset: 'ts-jest',
+      setupFiles: ['dotenv/config'],
+      testMatch: ['<rootDir>/test/ogmios/**/*.test.ts'],
+      transform: {
+        '^.+\\.test.ts?$': 'ts-jest'
+      }
     }
   ],
   testTimeout: 120_000_000
