@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/cardano-services-client",
-  "version": "0.6.0-nightly.11",
+  "version": "0.6.0-nightly.12",
   "description": "Cardano Services Client",
   "engines": {
     "node": "^14"
@@ -51,7 +51,7 @@
     "test:debug": "DEBUG=true yarn test"
   },
   "devDependencies": {
-    "@cardano-sdk/util-dev": "^0.5.0-nightly.11",
+    "@cardano-sdk/util-dev": "^0.5.0-nightly.12",
     "@types/node": "14.18.12",
     "@types/validator": "^13.7.1",
     "axios-mock-adapter": "^1.20.0",
@@ -65,7 +65,7 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "@cardano-sdk/core": "^0.6.0-nightly.11",
+    "@cardano-sdk/core": "^0.6.0-nightly.12",
     "@cardano-sdk/util": "^0.6.0-nightly.3",
     "axios": "^0.27.2",
     "class-validator": "^0.13.1",

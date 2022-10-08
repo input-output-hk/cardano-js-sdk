@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.6.0-nightly.11...@cardano-sdk/cardano-services-client@0.6.0-nightly.12) (2022-10-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* make stake pools pagination a required arg
+
+### Features
+
+* make stake pools pagination a required arg ([6cf8206](https://github.com/input-output-hk/cardano-js-sdk/commit/6cf8206be2162db7196794f7252e5cbb84b65c77))
+
+
+
 ## [0.6.0-nightly.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.6.0-nightly.10...@cardano-sdk/cardano-services-client@0.6.0-nightly.11) (2022-10-07)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services-client

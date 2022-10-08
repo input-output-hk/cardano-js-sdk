@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.6.0-nightly.3...@cardano-sdk/input-selection@0.6.0-nightly.4) (2022-10-08)
+
+**Note:** Version bump only for package @cardano-sdk/input-selection
+
+
+
+
+
 ## [0.6.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.6.0-nightly.2...@cardano-sdk/input-selection@0.6.0-nightly.3) (2022-10-07)
 
 **Note:** Version bump only for package @cardano-sdk/input-selection
