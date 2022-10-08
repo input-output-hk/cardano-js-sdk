@@ -1,9 +1,11 @@
 /* eslint-disable space-in-parens */
 /* eslint-disable no-multi-spaces */
 /* eslint-disable prettier/prettier */
-import { Cardano, RewardsProvider } from '@cardano-sdk/core';
+/* eslint-disable sonarjs/no-duplicate-string */
+import { Cardano, RewardsProvider, StakePoolProvider } from '@cardano-sdk/core';
 import {
   ConfirmedTx,
+  PAGE_SIZE,
   StakeKeyStatus,
   TrackedStakePoolProvider,
   TxInFlight,
@@ -15,17 +17,21 @@ import {
   fetchRewardsTrigger$,
   getStakePoolIdAtEpoch
 } from '../../../src/services';
-import { EMPTY, Observable, of } from 'rxjs';
+import { EMPTY, Observable, firstValueFrom, of } from 'rxjs';
 import { InMemoryStakePoolsStore, KeyValueStore } from '../../../src/persistence';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxWithEpoch } from '../../../src/services/DelegationTracker/types';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
-import { currentEpoch } from '../../mocks';
+import { currentEpoch, generateStakePools, mockStakePoolsProvider } from '../../mocks';
 
-jest.mock('../../../src/services/util/coldObservableProvider', () => ({ coldObservableProvider: jest.fn() }));
-const coldObservableProviderMock: jest.Mock = jest.requireMock(
-  '../../../src/services/util/coldObservableProvider'
-).coldObservableProvider;
+jest.mock('../../../src/services/util/coldObservableProvider', () => {
+  const actual = jest.requireActual('../../../src/services/util/coldObservableProvider');
+  return {
+    coldObservableProvider: jest.fn().mockImplementation((...args) => actual.coldObservableProvider(...args))
+  };
+});
+const coldObservableProviderMock: jest.Mock =
+  jest.requireMock('../../../src/services/util/coldObservableProvider').coldObservableProvider;
 
 describe('RewardAccounts', () => {
   const poolId1 = Cardano.PoolId('pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh');
@@ -35,7 +41,47 @@ describe('RewardAccounts', () => {
     'stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d'
   ].map(Cardano.RewardAccount);
 
+  let store: InMemoryStakePoolsStore;
+  let stakePoolProviderMock: StakePoolProvider;
+  let stakePoolProviderTracked: TrackedStakePoolProvider;
+  let provider: (poolIds: Cardano.PoolId[]) => Observable<Cardano.StakePool[]>;
+  const retryBackoffConfig = { initialInterval: 1 };
+
+  beforeEach(() => {
+    store = new InMemoryStakePoolsStore();
+    store.getValues = jest.fn().mockImplementation(store.getValues.bind(store));
+    stakePoolProviderMock = mockStakePoolsProvider();
+    stakePoolProviderTracked = new TrackedStakePoolProvider(stakePoolProviderMock);
+    provider = createQueryStakePoolsProvider(stakePoolProviderTracked, store, retryBackoffConfig);
+    coldObservableProviderMock.mockClear();
+  });
+
   test.todo('createQueryStakePoolsProvider emits stored values if they exist, updates storage when provider resolves');
+
+  test('emits entire stake pool list resolved by StakePoolsProvider', async () => {
+    const pageSize = PAGE_SIZE;
+    const secondPageSize = 5;
+    const totalTxsCount = pageSize + secondPageSize;
+
+    const firstPageTxs = {
+      pageResults: generateStakePools(pageSize),
+      totalResultCount: totalTxsCount
+    };
+    const secondPageTxs = {
+      pageResults: generateStakePools(secondPageSize),
+      totalResultCount: totalTxsCount
+    };
+
+    stakePoolProviderMock.queryStakePools = jest
+      .fn()
+      .mockResolvedValueOnce(firstPageTxs)
+      .mockResolvedValueOnce(secondPageTxs);
+
+    const allStakePools = await firstValueFrom(provider([poolId1, poolId2]));
+    expect(allStakePools.length).toEqual(totalTxsCount);
+    expect(allStakePools).toEqual([...firstPageTxs.pageResults, ...secondPageTxs.pageResults]);
+    expect(store.getValues).toHaveBeenCalledWith([poolId1, poolId2]);
+  });
 
   test('getStakePoolIdAtEpoch ', () => {
     const transactions = [
@@ -77,21 +123,33 @@ describe('RewardAccounts', () => {
         a: [],
         b: [
           {
-            tx: { body: { certificates: [{
-              __typename: Cardano.CertificateType.StakeKeyRegistration, stakeKeyHash
-            }] } }
+            tx: {
+              body: {
+                certificates: [{
+                  __typename: Cardano.CertificateType.StakeKeyRegistration, stakeKeyHash
+                }]
+              }
+            }
           } as TxWithEpoch
         ],
         c: [
           {
-            tx: { body: { certificates: [{
-              __typename: Cardano.CertificateType.StakeKeyRegistration, stakeKeyHash
-            }] } }
+            tx: {
+              body: {
+                certificates: [{
+                  __typename: Cardano.CertificateType.StakeKeyRegistration, stakeKeyHash
+                }]
+              }
+            }
           } as TxWithEpoch,
           {
-            tx: { body: { certificates: [{
-              __typename: Cardano.CertificateType.StakeKeyDeregistration, stakeKeyHash
-            }] } }
+            tx: {
+              body: {
+                certificates: [{
+                  __typename: Cardano.CertificateType.StakeKeyDeregistration, stakeKeyHash
+                }]
+              }
+            }
           } as TxWithEpoch
         ]
       });
@@ -200,6 +258,7 @@ describe('RewardAccounts', () => {
       });
     });
   });
+
 
   describe('fetchRewardsTrigger$', () => {
     it('emits every epoch and after making a transaction with withdrawals', () => {

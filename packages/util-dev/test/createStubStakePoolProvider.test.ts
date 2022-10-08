@@ -14,7 +14,8 @@ describe('createStubStakePoolProvider', () => {
     });
     it('matches by id', async () => {
       const stakePools = await provider.queryStakePools({
-        filters: { identifier: { values: [{ id: 'd-to-matc' as unknown as Cardano.PoolId }] } }
+        filters: { identifier: { values: [{ id: 'd-to-matc' as unknown as Cardano.PoolId }] } },
+        pagination: { limit: 25, startAt: 0 }
       });
       expect(stakePools.pageResults).toHaveLength(1);
       expect(stakePools.totalResultCount).toEqual(1);
@@ -23,7 +24,8 @@ describe('createStubStakePoolProvider', () => {
 
     it('matches by name', async () => {
       const stakePools = await provider.queryStakePools({
-        filters: { identifier: { values: [{ name: 'ool1' }] } }
+        filters: { identifier: { values: [{ name: 'ool1' }] } },
+        pagination: { limit: 25, startAt: 0 }
       });
       expect(stakePools.pageResults).toHaveLength(1);
       expect(stakePools.totalResultCount).toEqual(1);
@@ -32,7 +34,8 @@ describe('createStubStakePoolProvider', () => {
 
     it('matches by ticker', async () => {
       const stakePools = await provider.queryStakePools({
-        filters: { identifier: { values: [{ ticker: 'TIC' }] } }
+        filters: { identifier: { values: [{ ticker: 'TIC' }] } },
+        pagination: { limit: 25, startAt: 0 }
       });
       expect(stakePools.pageResults).toHaveLength(1);
       expect(stakePools.totalResultCount).toEqual(1);

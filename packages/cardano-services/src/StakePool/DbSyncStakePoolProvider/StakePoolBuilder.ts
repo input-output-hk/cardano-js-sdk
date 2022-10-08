@@ -19,6 +19,7 @@ import {
   PoolRegistrationModel,
   PoolRetirementModel,
   PoolUpdateModel,
+  QueryPoolsApyArgs,
   RelayModel,
   StakePoolStatsModel,
   SubQuery,
@@ -99,7 +100,7 @@ export class StakePoolBuilder {
       })
     );
   }
-  public async queryPoolAPY(hashesIds: number[], options?: QueryStakePoolsArgs): Promise<PoolAPY[]> {
+  public async queryPoolAPY(hashesIds: number[], options?: QueryPoolsApyArgs): Promise<PoolAPY[]> {
     this.#logger.debug('About to query pools APY');
     const defaultSort: OrderByOptions[] = [{ field: 'apy', order: 'desc' }];
     const queryWithSortAndPagination = withPagination(
