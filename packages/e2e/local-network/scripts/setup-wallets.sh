@@ -23,7 +23,7 @@ while [ ! -S "$CARDANO_NODE_SOCKET_PATH" ]; do
   sleep 2
 done
 
-genesisAddr=$(cardano-cli address build --payment-verification-key-file network-files/utxo-keys/utxo2.vkey --testnet-magic 888)
+genesisAddr=$(cardano-cli address build --payment-verification-key-file network-files/utxo-keys/utxo3.vkey --testnet-magic 888)
 
 walletAddr1="addr_test1qpw0djgj0x59ngrjvqthn7enhvruxnsavsw5th63la3mjel3tkc974sr23jmlzgq5zda4gtv8k9cy38756r9y3qgmkqqjz6aa7"
 walletAddr2="addr_test1qrml5hwl9s7ydm2djyup95ud6s74skkl4zzf8zk657s8thgm78sn3uhch64ujc7ffnpga68dfdqhg3sp7tk6759jrm7spy03k9"
@@ -48,7 +48,7 @@ cardano-cli transaction build \
 
 cardano-cli transaction sign \
   --tx-body-file wallets-tx.raw \
-  --signing-key-file network-files/utxo-keys/utxo2.skey \
+  --signing-key-file network-files/utxo-keys/utxo3.skey \
   --testnet-magic 888 \
   --out-file wallets-tx.signed
 
