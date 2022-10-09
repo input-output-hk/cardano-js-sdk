@@ -129,7 +129,7 @@ for ((i = 0; i < ${#SP_NODES[@]}; ++i)); do
   cardano-cli stake-pool registration-certificate \
       --cold-verification-key-file "$coldVKey" \
       --vrf-verification-key-file "$vrfKey" \
-      --pool-pledge 500000000 \
+      --pool-pledge 0 \
       --pool-cost 345000000 \
       --pool-margin 0.15 \
       --pool-reward-account-verification-key-file "$stakeVKey" \

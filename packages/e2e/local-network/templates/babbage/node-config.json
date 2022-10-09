@@ -16,7 +16,7 @@
   "ApplicationVersion": 1,
   "TurnOnLogging": true,
   "TurnOnLogMetrics": true,
-  "minSeverity": "Debug",
+  "minSeverity": "Info",
   "TracingVerbosity": "MinimalVerbosity",
   "setupBackends": [
     "KatipBK"

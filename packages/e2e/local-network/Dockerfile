@@ -20,8 +20,8 @@ WORKDIR /root
 RUN apt-get update -y && \
   apt-get install -y tzdata ca-certificates jq coreutils
 
-HEALTHCHECK --interval=5s --timeout=1s --retries=120 --start-period=100ms \
-    CMD test -e /root/network-files/node-spo1/node.sock
+HEALTHCHECK --interval=5s --timeout=1s --retries=200 --start-period=100ms \
+  CMD /root/scripts/get-epoch.sh | awk '{ if ($0 >= "3") exit 0; else exit 1}'
 
 STOPSIGNAL SIGINT
 COPY --from=builder /build/bin ./bin
