@@ -81,11 +81,24 @@ program
 program
   .command('chain-sync')
   .description('Dump the requested blocks (rollForward) in their raw structure and simulate rollbacks')
-  .argument('[blockHeights]', 'Comma-separated sorted list of blocks by number, use "-" for rollback to a block, e.g. 10,11,-10,11', (blockHeights) =>
+  .argument('[blockHeights]', `Comma-separated sorted list of blocks by number.
+  Use "-" for rollback to a block, e.g. 10,11,-10,11
+  Use ".." for block ranges (inclusive), e.g. 0..9`, (blockHeights) =>
     blockHeights
       .split(',')
       .filter((b) => b !== '')
-      .map((blockHeight) => Number.parseInt(blockHeight))
+      .flatMap((blockHeightSpec) => {
+        const [from, to] = blockHeightSpec.split('..').map(blockHeight => Number.parseInt(blockHeight));
+        if (!to) { // 0 is not supported, as such range doesn't make sense
+          if (!Number.isNaN(from)) return [from]; // single block
+          throw new Error('blockHeights must be either numbers or ranges, see --help')
+        }
+        const result: number[] = [];
+        for (let blockHeight = from; blockHeight <= to; blockHeight++) {
+          result.push(blockHeight)
+        }
+        return result;
+      })
   )
   .requiredOption('--out-dir [outDir]', 'File path to write results to')
   .option('--log-level [logLevel]', 'Minimum log level', 'info')
