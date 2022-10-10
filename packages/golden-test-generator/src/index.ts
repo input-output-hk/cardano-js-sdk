@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { AddressBalancesResponse, getOnChainAddressBalances } from './AddressBalance';
 import { Command } from 'commander';
-import { GetBlocksResponse, getBlocks } from './Block';
+import { GetBlocksResponse, getBlocks as chainSync } from './ChainSync';
 import { Options, SingleBar } from 'cli-progress';
 import { ensureDir, writeFile } from 'fs-extra';
 import { prepareContent } from './Content';
@@ -79,9 +79,9 @@ program
   });
 
 program
-  .command('get-block')
-  .description('Dump the requested blocks in their raw structure')
-  .argument('[blockHeights]', 'Comma-separated list of blocks by number', (blockHeights) =>
+  .command('chain-sync')
+  .description('Dump the requested blocks (rollForward) in their raw structure and simulate rollbacks')
+  .argument('[blockHeights]', 'Comma-separated sorted list of blocks by number, use "-" for rollback to a block, e.g. 10,11,-10,11', (blockHeights) =>
     blockHeights
       .split(',')
       .filter((b) => b !== '')
@@ -92,13 +92,12 @@ program
   .action(async (blockHeights: number[], { logLevel, outDir }) => {
     try {
       const { ogmiosHost, ogmiosPort, ogmiosTls } = program.opts();
-      const sortedblockHeights = blockHeights.sort((a: number, b: number) => a - b);
-      const lastblockHeight = sortedblockHeights[sortedblockHeights.length - 1];
-      const logger = createLogger({ level: logLevel, name: 'get-block' });
+      const lastblockHeight = blockHeights[blockHeights.length - 1];
+      const logger = createLogger({ level: logLevel, name: 'chain-sync' });
       const progress = createProgressBar(lastblockHeight);
       await ensureDir(outDir);
       progress.start(lastblockHeight, 0);
-      const { blocks, metadata } = await getBlocks(sortedblockHeights, {
+      const { events: data, metadata } = await chainSync(blockHeights, {
         logger,
         ogmiosConnectionConfig: { host: ogmiosHost, port: ogmiosPort, tls: ogmiosTls },
         onBlock: (blockHeight) => {
@@ -106,7 +105,7 @@ program
         }
       });
       progress.stop();
-      const content = await prepareContent<GetBlocksResponse['blocks']>(metadata, blocks);
+      const content = await prepareContent<GetBlocksResponse['events']>(metadata, data);
       const fileName = path.join(outDir, `blocks-${hash(content)}.json`);
 
       logger.info(`Writing ${fileName}`);
