@@ -382,3 +382,5 @@ export const getWallet = async (props: GetWalletProps) => {
 
   return { providers, wallet };
 };
+
+export type TestWallet = Awaited<ReturnType<typeof getWallet>>;

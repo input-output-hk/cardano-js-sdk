@@ -14,7 +14,6 @@
     "test": "shx echo 'test' command not implemented yet",
     "test:blockfrost": "jest -c jest.config.js --selectProjects blockfrost --runInBand --verbose",
     "test:wallet": "jest -c jest.config.js --selectProjects wallet --runInBand --verbose",
-    "test:local-network": "jest -c jest.config.js --selectProjects local-network --runInBand --verbose",
     "test:load-testing": "jest -c jest.config.js --selectProjects load-testing --runInBand --verbose",
     "test:ogmios": "jest -c jest.config.js --selectProjects ogmios --runInBand --verbose",
     "test:web-extension:build": "webpack -c test/web-extension/webpack.config.js",
