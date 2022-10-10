@@ -22,6 +22,7 @@ import {
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../InMemoryCache';
 import { Logger } from 'ts-log';
 import { Pool } from 'pg';
+import { RunnableModule } from '../../RunnableModule';
 import { StakePoolBuilder } from './StakePoolBuilder';
 import { isNotNil } from '@cardano-sdk/util';
 import { toStakePoolResults } from './mappers';
@@ -38,7 +39,7 @@ export interface StakePoolProviderDependencies {
   cardanoNode: CardanoNode;
 }
 
-export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePoolProvider {
+export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) implements StakePoolProvider {
   #builder: StakePoolBuilder;
   #logger: Logger;
   #cache: InMemoryCache;
@@ -51,7 +52,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
     { paginationPageSizeLimit }: StakePoolProviderProps,
     { db, cache, cardanoNode, logger, epochMonitor }: StakePoolProviderDependencies
   ) {
-    super(db);
+    super(db, 'DbSyncStakePoolProvider', logger);
     this.#logger = logger;
     this.#cache = cache;
     this.#epochMonitor = epochMonitor;
@@ -269,11 +270,15 @@ export class DbSyncStakePoolProvider extends DbSyncProvider implements StakePool
     return await this.#cache.get(queryCacheKey(StakePoolsSubQuery.STATS), () => this.#builder.queryPoolStats());
   }
 
-  async start(): Promise<void> {
+  initializeImpl() {
+    return Promise.resolve();
+  }
+
+  async startImpl() {
     this.#epochRolloverDisposer = this.#epochMonitor.onEpochRollover(() => this.#cache.clear());
   }
 
-  async close(): Promise<void> {
+  async shutdownImpl() {
     this.#cache.shutdown();
     this.#epochRolloverDisposer();
   }

@@ -19,7 +19,7 @@ export interface RewardsProviderDependencies {
   logger: Logger;
 }
 
-export class DbSyncRewardsProvider extends DbSyncProvider implements RewardsProvider {
+export class DbSyncRewardsProvider extends DbSyncProvider() implements RewardsProvider {
   #logger: Logger;
   #builder: RewardsBuilder;
   #paginationPageSizeLimit: number;
