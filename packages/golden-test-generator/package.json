@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/golden-test-generator",
-  "version": "0.4.2-nightly.16",
+  "version": "0.4.2-nightly.17",
   "description": "Generate golden test files for a range of Cardano concepts",
   "engines": {
     "node": "^14"
@@ -57,7 +57,7 @@
     "coverage": "shx echo No coverage report for this package"
   },
   "dependencies": {
-    "@cardano-sdk/ogmios": "^0.6.0-nightly.13",
+    "@cardano-sdk/ogmios": "^0.6.0-nightly.14",
     "@cardano-sdk/util": "^0.6.0-nightly.3",
     "bunyan": "^1.8.15",
     "chalk": "^4.1.1",
