@@ -4,7 +4,7 @@ import { Logger } from 'ts-log';
 import { Pool } from 'pg';
 import { UtxoBuilder } from './UtxoBuilder';
 
-export class DbSyncUtxoProvider extends DbSyncProvider implements UtxoProvider {
+export class DbSyncUtxoProvider extends DbSyncProvider() implements UtxoProvider {
   #logger: Logger;
   #builder: UtxoBuilder;
   constructor(db: Pool, logger: Logger) {

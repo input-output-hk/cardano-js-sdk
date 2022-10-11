@@ -1,12 +1,13 @@
 export * from './Asset';
+export * from './ChainHistory';
 export * from './Http';
 export * from './InMemoryCache';
 export * from './Program';
+export * from './Rewards';
 export * from './RunnableModule';
 export * from './StakePool';
 export * from './TxSubmit';
 export * from './Utxo';
-export * from './ChainHistory';
-export * from './Rewards';
+export * from './types';
 export * as errors from './errors';
 export * as util from './util';

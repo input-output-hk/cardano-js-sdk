@@ -3,7 +3,6 @@ import {
   CardanoNode,
   CardanoNodeUtil,
   EraSummary,
-  HealthCheckResponse,
   NetworkInfoProvider,
   ProtocolParametersRequiredByWallet,
   StakeSummary,
@@ -17,6 +16,7 @@ import { Logger } from 'ts-log';
 import { NetworkInfoBuilder } from './NetworkInfoBuilder';
 import { NetworkInfoCacheKey } from '.';
 import { Pool } from 'pg';
+import { RunnableModule } from '../../RunnableModule';
 import { loadGenesisData, toGenesisParams, toLedgerTip, toSupply, toWalletProtocolParams } from './mappers';
 
 export interface NetworkInfoProviderProps {
@@ -29,7 +29,7 @@ export interface NetworkInfoProviderDependencies {
   cardanoNode: CardanoNode;
   epochMonitor: EpochMonitor;
 }
-export class DbSyncNetworkInfoProvider extends DbSyncProvider implements NetworkInfoProvider {
+export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) implements NetworkInfoProvider {
   #logger: Logger;
   #cache: InMemoryCache;
   #builder: NetworkInfoBuilder;
@@ -42,13 +42,22 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider implements Network
     { cardanoNodeConfigPath }: NetworkInfoProviderProps,
     { db, cache, logger, cardanoNode, epochMonitor }: NetworkInfoProviderDependencies
   ) {
-    super(db);
+    super(db, 'DbSyncNetworkInfoProvider', logger);
     this.#logger = logger;
     this.#cache = cache;
     this.#cardanoNode = cardanoNode;
     this.#epochMonitor = epochMonitor;
     this.#builder = new NetworkInfoBuilder(db, logger);
     this.#genesisDataReady = loadGenesisData(cardanoNodeConfigPath);
+
+    this.healthCheck = async () => {
+      const dbHealthCheck = await super.healthCheck();
+      const cardanoNodeHealthCheck = await this.#cardanoNode.healthCheck();
+      return {
+        localNode: cardanoNodeHealthCheck.localNode,
+        ok: dbHealthCheck.ok && cardanoNodeHealthCheck.ok
+      };
+    };
   }
 
   public async ledgerTip(): Promise<Cardano.Tip> {
@@ -105,24 +114,19 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider implements Network
     );
   }
 
-  async start(): Promise<void> {
+  initializeImpl() {
+    return Promise.resolve();
+  }
+
+  async startImpl() {
     await this.#cardanoNode.initialize();
     this.#epochRolloverDisposer = this.#epochMonitor.onEpochRollover(() => this.#cache.clear());
   }
 
-  async close(): Promise<void> {
+  async shutdownImpl() {
     this.#cache.shutdown();
     await this.#genesisDataReady;
     await this.#cardanoNode.shutdown();
     this.#epochRolloverDisposer();
-  }
-
-  public async healthCheck(): Promise<HealthCheckResponse> {
-    const dbHealthCheck = await super.healthCheck();
-    const cardanoNodeHealthCheck = await this.#cardanoNode.healthCheck();
-    return {
-      localNode: cardanoNodeHealthCheck.localNode,
-      ok: dbHealthCheck.ok && cardanoNodeHealthCheck.ok
-    };
   }
 }

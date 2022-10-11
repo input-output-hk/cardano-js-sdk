@@ -18,7 +18,7 @@ import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../src/InMemoryCache';
 import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
 import { ingestDbData, sleep, wrapWithTransaction } from '../util';
-import { dummyLogger as logger } from 'ts-log';
+import { logger } from '@cardano-sdk/util-dev';
 import { mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
 import axios from 'axios';
 

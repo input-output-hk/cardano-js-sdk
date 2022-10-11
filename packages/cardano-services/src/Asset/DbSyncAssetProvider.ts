@@ -35,7 +35,7 @@ export type DbSyncAssetProviderDependencies = {
  * AssetProvider implementation using NftMetadataService, TokenMetadataService
  * and cardano-db-sync database as sources
  */
-export class DbSyncAssetProvider extends DbSyncProvider implements AssetProvider {
+export class DbSyncAssetProvider extends DbSyncProvider() implements AssetProvider {
   #builder: AssetBuilder;
   #dependencies: DbSyncAssetProviderDependencies;
 

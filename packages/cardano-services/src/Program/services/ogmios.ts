@@ -54,11 +54,6 @@ export const ogmiosTxSubmitProviderWithDiscovery = async (
             if (error.innerError && isConnectionError(error.innerError)) {
               const record = await dnsResolver(serviceName!);
               logger.info(`DNS resolution for Ogmios service, resolved with record: ${JSON.stringify(record)}`);
-              await ogmiosProvider
-                .close?.()
-                .catch((error_) =>
-                  logger.warn(`Ogmios tx submit provider failed to close after DNS resolution: ${error_}`)
-                );
               ogmiosProvider = ogmiosTxSubmitProvider({ host: record.name, port: record.port }, logger);
               return await ogmiosProvider.submitTx(submitTxArgs);
             }
