@@ -48,7 +48,7 @@ export const mockStakeDistribution: StakeDistribution = new Map([
   ]
 ]);
 
-const responseWithServiceState: HealthCheckResponse = {
+export const responseWithServiceState: HealthCheckResponse = {
   localNode: {
     ledgerTip: {
       blockNo: 3_391_731,

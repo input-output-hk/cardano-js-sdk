@@ -8,7 +8,7 @@ import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
 import { dummyLogger as logger } from 'ts-log';
-import { mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
+import { mockCardanoNode, responseWithServiceState } from '../../../core/test/CardanoNode/mocks';
 import axios from 'axios';
 
 const APPLICATION_JSON = 'application/json';
@@ -26,6 +26,7 @@ describe('RewardsHttpService', () => {
   let clientConfig: CreateHttpProviderConfig<RewardsProvider>;
   let config: HttpServerConfig;
   let cardanoNode: OgmiosCardanoNode;
+  let provider: RewardsProvider;
 
   beforeAll(async () => {
     port = await getPort();
@@ -33,10 +34,6 @@ describe('RewardsHttpService', () => {
     clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
     config = { listen: { port } };
     dbConnection = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
-  });
-
-  afterEach(async () => {
-    jest.resetAllMocks();
   });
 
   describe('unhealthy RewardsProvider', () => {
@@ -70,6 +67,7 @@ describe('RewardsHttpService', () => {
       );
       service = new RewardsHttpService({ logger, rewardsProvider });
       httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
+      provider = rewardsHttpProvider(clientConfig);
       await httpServer.initialize();
       await httpServer.start();
     });
@@ -80,20 +78,15 @@ describe('RewardsHttpService', () => {
     });
 
     describe('/health', () => {
-      it('forwards the stakePoolSearchProvider health response', async () => {
+      it('forwards the rewardsProvider health response with HTTP request', async () => {
         const res = await axios.post(`${baseUrl}/health`, {}, { headers: { 'Content-Type': APPLICATION_JSON } });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual({
-          localNode: {
-            ledgerTip: {
-              blockNo: 3_391_731,
-              hash: '9ef43ab6e234fcf90d103413096c7da752da2f45b15e1259f43d476afd12932c',
-              slot: 52_819_355
-            },
-            networkSync: 0.999
-          },
-          ok: true
-        });
+        expect(res.data).toEqual(responseWithServiceState);
+      });
+
+      it('forwards the rewardsProvider health response with provider client', async () => {
+        const response = await provider.healthCheck();
+        expect(response).toEqual(responseWithServiceState);
       });
     });
 
@@ -207,16 +200,14 @@ describe('RewardsHttpService', () => {
     });
 
     describe('with rewardsHttpProvider', () => {
-      let provider: RewardsProvider;
-      beforeEach(() => {
-        provider = rewardsHttpProvider(clientConfig);
-      });
       const rewardAccount = Cardano.RewardAccount('stake_test1upd9j9rwxeu44xfxnrl6sqsswf9k60gcdjuy2gz6zyu2jmqyvn80c');
+
       describe('rewardAccountBalance', () => {
         it('returns address balance', async () => {
           const response = await provider.rewardAccountBalance({ rewardAccount });
           expect(response).toMatchSnapshot();
         });
+
         it('returns address balance 0 when it has no rewards', async () => {
           const response = await provider.rewardAccountBalance({
             rewardAccount: Cardano.RewardAccount('stake_test1uzxvhl83q8ujv2yvpy6n2krvpdlqqx28h7e9vsk6re43h3c3kufy6')
@@ -224,6 +215,7 @@ describe('RewardsHttpService', () => {
           expect(response).toMatchSnapshot();
         });
       });
+
       describe('rewardsHistory', () => {
         it('returns rewards address history', async () => {
           const response = await provider.rewardsHistory({
@@ -231,12 +223,14 @@ describe('RewardsHttpService', () => {
           });
           expect(response).toMatchSnapshot();
         });
+
         it('returns no rewards address history for empty reward accounts', async () => {
           const response = await provider.rewardsHistory({
             rewardAccounts: []
           });
           expect(response).toMatchSnapshot();
         });
+
         it('returns address rewards history with epochs ', async () => {
           const accountWithRewardsAtEpoch76 = Cardano.RewardAccount(
             'stake_test1up32f2hrv5ytqk8ad6e4apss5zrrjjlrkjhrksypn5g08fqrqf9gr'
@@ -250,6 +244,7 @@ describe('RewardsHttpService', () => {
           });
           expect(response).toMatchSnapshot();
         });
+
         it('returns rewards address history of the epochs filtered', async () => {
           const response = await provider.rewardsHistory({
             epochs: {
@@ -259,6 +254,7 @@ describe('RewardsHttpService', () => {
           });
           expect(response).toMatchSnapshot();
         });
+
         it('returns rewards address history some of the epochs filter', async () => {
           const response = await provider.rewardsHistory({
             epochs: {

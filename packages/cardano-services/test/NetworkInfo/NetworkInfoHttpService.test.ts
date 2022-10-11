@@ -15,7 +15,7 @@ import { getPort } from 'get-port-please';
 import { ingestDbData, sleep, wrapWithTransaction } from '../util';
 import { loadGenesisData } from '../../src/NetworkInfo/DbSyncNetworkInfoProvider/mappers';
 import { dummyLogger as logger } from 'ts-log';
-import { mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
+import { mockCardanoNode, responseWithServiceState } from '../../../core/test/CardanoNode/mocks';
 import axios from 'axios';
 
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
@@ -118,22 +118,17 @@ describe('NetworkInfoHttpService', () => {
     });
 
     describe('/health', () => {
-      it('forwards the networkInfoProvider health response', async () => {
+      it('forwards the networkInfoProvider health response with HTTP request', async () => {
         const res = await axios.post(`${baseUrl}/health`, {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual({
-          localNode: {
-            ledgerTip: {
-              blockNo: 3_391_731,
-              hash: '9ef43ab6e234fcf90d103413096c7da752da2f45b15e1259f43d476afd12932c',
-              slot: 52_819_355
-            },
-            networkSync: 0.999
-          },
-          ok: true
-        });
+        expect(res.data).toEqual(responseWithServiceState);
+      });
+
+      it('forwards the networkInfoProvider health response with provider client', async () => {
+        const response = await provider.healthCheck();
+        expect(response).toEqual(responseWithServiceState);
       });
     });
 

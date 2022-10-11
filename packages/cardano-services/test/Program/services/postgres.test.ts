@@ -60,9 +60,7 @@ describe('Service dependency abstractions', () => {
         postgresDb: process.env.POSTGRES_DB!,
         postgresPassword: process.env.POSTGRES_PASSWORD!,
         postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,
-        postgresUser: process.env.POSTGRES_USER!,
-        serviceDiscoveryBackoffFactor: 1.1,
-        serviceDiscoveryTimeout: 1000
+        postgresUser: process.env.POSTGRES_USER!
       });
     });
 
@@ -185,9 +183,7 @@ describe('Service dependency abstractions', () => {
         postgresDb: process.env.POSTGRES_DB!,
         postgresPassword: process.env.POSTGRES_PASSWORD!,
         postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,
-        postgresUser: process.env.POSTGRES_USER!,
-        serviceDiscoveryBackoffFactor: 1.1,
-        serviceDiscoveryTimeout: 1000
+        postgresUser: process.env.POSTGRES_USER!
       });
 
       const result = await provider!.query(HEALTH_CHECK_QUERY);
@@ -202,9 +198,7 @@ describe('Service dependency abstractions', () => {
         postgresDb: process.env.POSTGRES_DB!,
         postgresPassword: process.env.POSTGRES_PASSWORD!,
         postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,
-        postgresUser: process.env.POSTGRES_USER!,
-        serviceDiscoveryBackoffFactor: 1.1,
-        serviceDiscoveryTimeout: 1000
+        postgresUser: process.env.POSTGRES_USER!
       });
 
       await expect(provider!.end()).resolves.toBeUndefined();

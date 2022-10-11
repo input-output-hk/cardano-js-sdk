@@ -23,7 +23,6 @@ import { createHealthyMockOgmiosServer, ogmiosServerReady } from '../../util';
 import { createMockOgmiosServer } from '../../../../ogmios/test/mocks/mockOgmiosServer';
 import { getPort, getRandomPort } from 'get-port-please';
 import { dummyLogger as logger } from 'ts-log';
-import { mockCardanoNode } from '../../../../core/test/CardanoNode/mocks';
 import { types } from 'util';
 import axios from 'axios';
 import http from 'http';
@@ -47,7 +46,6 @@ describe('Service dependency abstractions', () => {
   const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
   const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
-  const cardanoNode = mockCardanoNode() as unknown as OgmiosCardanoNode;
   const responseWithServiceState: HealthCheckResponse = {
     localNode: {
       ledgerTip: {
@@ -89,9 +87,7 @@ describe('Service dependency abstractions', () => {
           apiUrlBase = `http://localhost:${port}/tx-submit`;
           config = { listen: { port } };
           txSubmitProvider = await getOgmiosTxSubmitProvider(dnsResolver, logger, {
-            ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME,
-            serviceDiscoveryBackoffFactor: 1.1,
-            serviceDiscoveryTimeout: 1000
+            ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
           });
           httpServer = new HttpServer(config, {
             logger,
@@ -130,24 +126,20 @@ describe('Service dependency abstractions', () => {
             postgresDb: process.env.POSTGRES_DB!,
             postgresPassword: process.env.POSTGRES_PASSWORD!,
             postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,
-            postgresUser: process.env.POSTGRES_USER!,
-            serviceDiscoveryBackoffFactor: 1.1,
-            serviceDiscoveryTimeout: 1000
+            postgresUser: process.env.POSTGRES_USER!
           });
           ogmiosCardanoNode = await getOgmiosCardanoNode(dnsResolver, logger, {
-            ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME,
-            serviceDiscoveryBackoffFactor: 1.1,
-            serviceDiscoveryTimeout: 1000
+            ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
           });
           const epochMonitor = new DbSyncEpochPollService(db!, 10_000);
           const networkInfoProvider = new DbSyncNetworkInfoProvider(
             { cardanoNodeConfigPath },
-            { cache, cardanoNode, db: db!, epochMonitor, logger }
+            { cache, cardanoNode: ogmiosCardanoNode, db: db!, epochMonitor, logger }
           );
 
           httpServer = new HttpServer(config, {
             logger,
-            runnableDependencies: [cardanoNode],
+            runnableDependencies: [ogmiosCardanoNode],
             services: [new NetworkInfoHttpService({ logger, networkInfoProvider })]
           });
           await httpServer.initialize();
@@ -217,7 +209,6 @@ describe('Service dependency abstractions', () => {
 
         afterAll(async () => {
           await httpServer.shutdown();
-          await serverClosePromise(ogmiosServer);
         });
 
         it('txSubmitProvider should not be a instance of Proxy ', () => {
@@ -238,27 +229,24 @@ describe('Service dependency abstractions', () => {
           port = await getPort();
           apiUrlBase = `http://localhost:${port}/network-info`;
           config = { listen: { port } };
+
           db = await getPool(dnsResolver, logger, {
             dbCacheTtl: 10_000,
             epochPollInterval: 1000,
-            postgresConnectionString: process.env.POSTGRES_CONNECTION_STRING!,
-            serviceDiscoveryBackoffFactor: 1.1,
-            serviceDiscoveryTimeout: 1000
+            postgresConnectionString: process.env.POSTGRES_CONNECTION_STRING!
           });
           ogmiosCardanoNode = await getOgmiosCardanoNode(dnsResolver, logger, {
-            ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
-            serviceDiscoveryBackoffFactor: 1.1,
-            serviceDiscoveryTimeout: 1000
+            ogmiosUrl: new URL(ogmiosConnection.address.webSocket)
           });
           const epochMonitor = new DbSyncEpochPollService(db!, 10_000);
           const networkInfoProvider = new DbSyncNetworkInfoProvider(
             { cardanoNodeConfigPath },
-            { cache, cardanoNode, db: db!, epochMonitor, logger }
+            { cache, cardanoNode: ogmiosCardanoNode, db: db!, epochMonitor, logger }
           );
 
           httpServer = new HttpServer(config, {
             logger,
-            runnableDependencies: [cardanoNode],
+            runnableDependencies: [ogmiosCardanoNode],
             services: [new NetworkInfoHttpService({ logger, networkInfoProvider })]
           });
           await httpServer.initialize();
@@ -266,9 +254,11 @@ describe('Service dependency abstractions', () => {
         });
 
         afterAll(async () => {
+          await db!.end();
           await httpServer.shutdown();
           await serverClosePromise(ogmiosServer);
         });
+
         it('ogmiosCardanoNode should not be a instance of Proxy ', () => {
           expect(types.isProxy(ogmiosCardanoNode)).toEqual(false);
         });
@@ -322,9 +312,7 @@ describe('Service dependency abstractions', () => {
       });
 
       provider = await getOgmiosTxSubmitProvider(dnsResolverMock, logger, {
-        ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME,
-        serviceDiscoveryBackoffFactor: 1.1,
-        serviceDiscoveryTimeout: 1000
+        ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
       });
 
       await expect(
@@ -335,9 +323,7 @@ describe('Service dependency abstractions', () => {
 
     it('should execute a provider operation without to intercept it', async () => {
       provider = await getOgmiosTxSubmitProvider(dnsResolver, logger, {
-        ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME,
-        serviceDiscoveryBackoffFactor: 1.1,
-        serviceDiscoveryTimeout: 1000
+        ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
       });
 
       await expect(provider.healthCheck()).resolves.toEqual(responseWithServiceState);
@@ -387,9 +373,7 @@ describe('Service dependency abstractions', () => {
       });
 
       node = await getOgmiosCardanoNode(dnsResolverMock, logger, {
-        ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME,
-        serviceDiscoveryBackoffFactor: 1.1,
-        serviceDiscoveryTimeout: 1000
+        ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
       });
 
       await expect(node.initialize()).resolves.toBeUndefined();
@@ -431,9 +415,7 @@ describe('Service dependency abstractions', () => {
       });
 
       node = await getOgmiosCardanoNode(dnsResolverMock, logger, {
-        ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME,
-        serviceDiscoveryBackoffFactor: 1.1,
-        serviceDiscoveryTimeout: 1000
+        ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
       });
 
       // The Inizialization beforehand is mandatory for the sequential Cardano Node State Query Client's operations
@@ -447,9 +429,7 @@ describe('Service dependency abstractions', () => {
 
     it('should execute a provider operation without to intercept it', async () => {
       node = await getOgmiosCardanoNode(dnsResolver, logger, {
-        ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME,
-        serviceDiscoveryBackoffFactor: 1.1,
-        serviceDiscoveryTimeout: 1000
+        ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
       });
       await node.initialize();
       await expect(node.shutdown()).resolves.toBeUndefined();

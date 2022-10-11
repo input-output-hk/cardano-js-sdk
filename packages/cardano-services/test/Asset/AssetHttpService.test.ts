@@ -16,7 +16,7 @@ import { Pool } from 'pg';
 import { createDbSyncMetadataService } from '../../src/Metadata';
 import { getPort } from 'get-port-please';
 import { dummyLogger as logger } from 'ts-log';
-import { mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
+import { mockCardanoNode, responseWithServiceState } from '../../../core/test/CardanoNode/mocks';
 import { mockTokenRegistry } from './CardanoTokenRegistry.test';
 import axios from 'axios';
 
@@ -46,7 +46,6 @@ describe('AssetHttpService', () => {
     apiUrlBase = `http://localhost:${port}/asset`;
     config = { listen: { port } };
     clientConfig = { baseUrl: apiUrlBase, logger: createLogger({ level: INFO, name: 'unit tests' }) };
-    provider = assetInfoHttpProvider(clientConfig);
   });
 
   describe('healthy state', () => {
@@ -63,7 +62,7 @@ describe('AssetHttpService', () => {
       assetProvider = new DbSyncAssetProvider({ cardanoNode, db, logger, ntfMetadataService, tokenMetadataService });
       service = new AssetHttpService({ assetProvider, logger });
       httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
-
+      provider = assetInfoHttpProvider(clientConfig);
       await httpServer.initialize();
       await httpServer.start();
     });
@@ -76,22 +75,17 @@ describe('AssetHttpService', () => {
     });
 
     describe('/health', () => {
-      it('/health response should be true', async () => {
+      it('forwards the ChainHistoryProvider health response with HTTP request', async () => {
         const res = await axios.post(`${apiUrlBase}/health`, undefined, {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual({
-          localNode: {
-            ledgerTip: {
-              blockNo: 3_391_731,
-              hash: '9ef43ab6e234fcf90d103413096c7da752da2f45b15e1259f43d476afd12932c',
-              slot: 52_819_355
-            },
-            networkSync: 0.999
-          },
-          ok: true
-        });
+        expect(res.data).toEqual(responseWithServiceState);
+      });
+
+      it('forwards the ChainHistoryProvider health response with provider client', async () => {
+        const response = await provider.healthCheck();
+        expect(response).toEqual(responseWithServiceState);
       });
     });
 

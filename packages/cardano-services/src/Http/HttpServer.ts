@@ -150,8 +150,15 @@ export class HttpServer extends RunnableModule {
 
   async shutdownImpl(): Promise<void> {
     this.#healthGauge?.set(0);
-    for (const service of this.#dependencies.services) await service.shutdown();
-    for (const dependency of this.#dependencies.runnableDependencies) await dependency.shutdown();
+
+    for (const service of this.#dependencies.services) {
+      await service.shutdown();
+      this.logger.debug(`Service ${service.name} has been shutdown.`);
+    }
+    for (const dependency of this.#dependencies.runnableDependencies) {
+      await dependency.shutdown();
+      this.logger.debug(`Runnable dependency ${dependency.name} has been shutdown.`);
+    }
 
     return serverClosePromise(this.server);
   }

@@ -13,7 +13,7 @@ import { DnsResolver, createDnsResolver, shouldInitCardanoNode } from './utils';
 import { HttpServer, HttpServerConfig, HttpService } from '../Http';
 import { InMemoryCache } from '../InMemoryCache';
 import { Logger } from 'ts-log';
-import { MissingProgramOption, UnknownServiceName } from './errors';
+import { MissingProgramOption, MissingServiceDependency, RunnableDependencies, UnknownServiceName } from './errors';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { ServiceNames } from './ServiceNames';
 import { SrvRecord } from 'dns';
@@ -87,11 +87,7 @@ const serviceMapFactory = (
           ProgramOptionDescriptions.PostgresServiceDiscoveryArgs
         ]);
 
-      if (!node)
-        throw new MissingProgramOption(serviceName, [
-          ProgramOptionDescriptions.CardanoNodeConfigPath,
-          ProgramOptionDescriptions.PostgresServiceDiscoveryArgs
-        ]);
+      if (!node) throw new MissingServiceDependency(serviceName, RunnableDependencies.CardanoNode);
 
       return factory(dbConnection, node);
     };

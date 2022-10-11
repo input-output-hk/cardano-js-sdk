@@ -41,8 +41,7 @@ const assertServiceHealthy = async (apiUrl: string, serviceName: ServiceNames, u
     },
     ok: true
   };
-  const healthCheckResponse =
-    serviceName === ServiceNames.TxSubmit && usedQueue ? { ok: true } : responseWithServiceState;
+  const healthCheckResponse = usedQueue ? { ok: true } : responseWithServiceState;
 
   expect(res.status).toBe(200);
   expect(res.data).toEqual(healthCheckResponse);

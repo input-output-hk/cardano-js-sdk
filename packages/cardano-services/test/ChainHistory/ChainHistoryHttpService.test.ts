@@ -12,7 +12,7 @@ import { Pool } from 'pg';
 import { createDbSyncMetadataService } from '../../src/Metadata';
 import { getPort } from 'get-port-please';
 import { dummyLogger as logger } from 'ts-log';
-import { mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
+import { mockCardanoNode, responseWithServiceState } from '../../../core/test/CardanoNode/mocks';
 import axios from 'axios';
 
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
@@ -39,11 +39,6 @@ describe('ChainHistoryHttpService', () => {
     clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
     config = { listen: { port } };
     dbConnection = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
-    provider = chainHistoryHttpProvider(clientConfig);
-  });
-
-  afterEach(async () => {
-    jest.resetAllMocks();
   });
 
   describe('unhealthy ChainHistoryProvider', () => {
@@ -78,6 +73,7 @@ describe('ChainHistoryHttpService', () => {
         { cardanoNode, db: dbConnection, logger, metadataService }
       );
       service = new ChainHistoryHttpService({ chainHistoryProvider, logger });
+      provider = chainHistoryHttpProvider(clientConfig);
       httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
       await httpServer.initialize();
       await httpServer.start();
@@ -90,22 +86,17 @@ describe('ChainHistoryHttpService', () => {
 
     describe('/health', () => {
       const url = '/health';
-      it('forwards the ChainHistoryProvider health response', async () => {
+      it('forwards the chainHistoryProvider health response with HTTP request', async () => {
         const res = await axios.post(`${baseUrl}${url}`, undefined, {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual({
-          localNode: {
-            ledgerTip: {
-              blockNo: 3_391_731,
-              hash: '9ef43ab6e234fcf90d103413096c7da752da2f45b15e1259f43d476afd12932c',
-              slot: 52_819_355
-            },
-            networkSync: 0.999
-          },
-          ok: true
-        });
+        expect(res.data).toEqual(responseWithServiceState);
+      });
+
+      it('forwards the chainHistoryProvider health response with provider client', async () => {
+        const response = await provider.healthCheck();
+        expect(response).toEqual(responseWithServiceState);
       });
     });
 
