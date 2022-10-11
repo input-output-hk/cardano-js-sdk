@@ -71,7 +71,10 @@ export const createTxPreparer =
             },
             protocolParameters
           });
-          const implicitCoin = Cardano.util.computeImplicitCoin(protocolParameters, props);
+          const implicitCoin = Cardano.util.computeImplicitCoin(protocolParameters, {
+            certificates: props.certificates,
+            withdrawals
+          });
           return { changeAddress, constraints, implicitCoin, utxo, validityInterval, withdrawals };
         })
       )

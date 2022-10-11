@@ -1,3 +1,4 @@
+import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
 import { SingleAddressWallet } from '../../src';
 import { createWallet } from './util';
@@ -25,7 +26,7 @@ describe('integration/txChainingBalance', () => {
     };
     const tx = await wallet.initializeTx({ outputs: new Set([output]) });
     // Precondition
-    const coinsSpent = outputCoins + tx.body.fee;
+    const coinsSpent = outputCoins + tx.body.fee - BigIntMath.sum((tx.body.withdrawals || []).map((w) => w.quantity));
     const totalOutputCoins = coalesceValueQuantities(tx.body.outputs.map((txOut) => txOut.value)).coins;
     expect(totalOutputCoins).toBeGreaterThan(coinsSpent);
     // Wallet will consider the transaction 'in flight' upon submission,
