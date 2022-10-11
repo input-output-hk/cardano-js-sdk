@@ -183,7 +183,7 @@ describe('SingleAddressWallet methods', () => {
       const tx = await wallet.finalizeTx({ tx: txInternals });
       expect(tx.body).toBe(txInternals.body);
       expect(tx.id).toBe(txInternals.hash);
-      expect(tx.witness.signatures.size).toBe(1);
+      expect(tx.witness.signatures.size).toBe(2); // spending key and stake key for withdrawal
     });
 
     describe('submitTx', () => {
