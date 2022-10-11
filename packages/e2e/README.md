@@ -36,7 +36,7 @@ And you will get the set of mnemonics plus the first derivative address on the c
 ```bash
 $ ts-node ./src/util/mnemonic.ts
 
-  Mnemonic:   toward bridge spell endless tunnel there deputy market scheme ketchup heavy fall fault pudding split desert swear maximum orchard estate match good decorate tribe 
+  Mnemonic:   toward bridge spell endless tunnel there deputy market scheme ketchup heavy fall fault pudding split desert swear maximum orchard estate match good decorate tribe
 
   Address:    addr_test1qzdutxe3exf3vls6cymrs7r28dh8uuvk9gpj0w474zysxpx09lufhes0cfv0p2wkl7lg9g0zh6rfd5plk7d32qztf63qyk5mz5
 
@@ -69,7 +69,7 @@ There are two ways of obtaining tADA on this network, first we have the faucet:
       env.FAUCET_PROVIDER,
       env.FAUCET_PROVIDER_PARAMS,
       getLogger(env.LOGGER_MIN_SEVERITY));
-    
+
     await faucetProvider.request(address, amountFromFaucet, blockConfirmations);
 ```
 
@@ -283,3 +283,13 @@ Then to run the web-extension tests run:
 $ yarn workspace @cardano-sdk/e2e test:web-extension
 ```
 
+## Artillery
+
+**Artillery stress tests** are not exactly _e2e tests_ in the meaning of _jest tests_; the SDK is run through artillery.
+They are not aimed to check if specific functionalities work or not, but to stress test APIs.
+
+Currently only one artillery test is implemented ad it stresses a stake pool search endpoint. To run it against the local-network endpoint
+
+```bash
+$ STAKE_POOL_PROVIDER_URL="http://localhost:4000/stake-pool" yarn artillery:stake-pool-query
+```
