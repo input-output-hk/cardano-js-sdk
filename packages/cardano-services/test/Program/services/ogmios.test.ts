@@ -47,7 +47,7 @@ describe('Service dependency abstractions', () => {
   const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
   const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
-  const cardanoNode = mockCardanoNode();
+  const cardanoNode = mockCardanoNode() as unknown as OgmiosCardanoNode;
   const responseWithServiceState: HealthCheckResponse = {
     localNode: {
       ledgerTip: {
@@ -95,6 +95,7 @@ describe('Service dependency abstractions', () => {
           });
           httpServer = new HttpServer(config, {
             logger,
+            runnableDependencies: [],
             services: [new TxSubmitHttpService({ logger, txSubmitProvider })]
           });
           await httpServer.initialize();
@@ -146,6 +147,7 @@ describe('Service dependency abstractions', () => {
 
           httpServer = new HttpServer(config, {
             logger,
+            runnableDependencies: [cardanoNode],
             services: [new NetworkInfoHttpService({ logger, networkInfoProvider })]
           });
           await httpServer.initialize();
@@ -206,6 +208,7 @@ describe('Service dependency abstractions', () => {
           });
           httpServer = new HttpServer(config, {
             logger,
+            runnableDependencies: [],
             services: [new TxSubmitHttpService({ logger, txSubmitProvider })]
           });
           await httpServer.initialize();
@@ -242,7 +245,6 @@ describe('Service dependency abstractions', () => {
             serviceDiscoveryBackoffFactor: 1.1,
             serviceDiscoveryTimeout: 1000
           });
-          getOgmiosCardanoNode.cache.clear!();
           ogmiosCardanoNode = await getOgmiosCardanoNode(dnsResolver, logger, {
             ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
             serviceDiscoveryBackoffFactor: 1.1,
@@ -256,6 +258,7 @@ describe('Service dependency abstractions', () => {
 
           httpServer = new HttpServer(config, {
             logger,
+            runnableDependencies: [cardanoNode],
             services: [new NetworkInfoHttpService({ logger, networkInfoProvider })]
           });
           await httpServer.initialize();

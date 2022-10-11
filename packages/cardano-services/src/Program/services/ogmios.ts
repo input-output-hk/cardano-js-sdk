@@ -8,7 +8,6 @@ import { MissingCardanoNodeOption } from '../errors';
 import { OgmiosCardanoNode, ogmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmios';
 import { SubmitTxArgs, TxSubmitProvider } from '@cardano-sdk/core';
 import { isConnectionError } from '@cardano-sdk/util';
-import memoize from 'lodash/memoize';
 
 const isCardanoNodeOperation = (prop: string | symbol): prop is 'eraSummaries' | 'systemStart' | 'stakeDistribution' =>
   ['eraSummaries', 'systemStart', 'stakeDistribution'].includes(prop as string);
@@ -135,14 +134,16 @@ export const ogmiosCardanoNodeWithDiscovery = async (
   });
 };
 
-export const getOgmiosCardanoNode = memoize(
-  async (dnsResolver: DnsResolver, logger: Logger, options?: CommonProgramOptions): Promise<OgmiosCardanoNode> => {
-    if (options?.ogmiosSrvServiceName)
-      return ogmiosCardanoNodeWithDiscovery(dnsResolver, logger, options.ogmiosSrvServiceName);
-    if (options?.ogmiosUrl) return new OgmiosCardanoNode(urlToConnectionConfig(options.ogmiosUrl), logger);
-    throw new MissingCardanoNodeOption([
-      CommonOptionDescriptions.OgmiosUrl,
-      CommonOptionDescriptions.OgmiosSrvServiceName
-    ]);
-  }
-);
+export const getOgmiosCardanoNode = async (
+  dnsResolver: DnsResolver,
+  logger: Logger,
+  options?: CommonProgramOptions
+): Promise<OgmiosCardanoNode> => {
+  if (options?.ogmiosSrvServiceName)
+    return ogmiosCardanoNodeWithDiscovery(dnsResolver, logger, options.ogmiosSrvServiceName);
+  if (options?.ogmiosUrl) return new OgmiosCardanoNode(urlToConnectionConfig(options.ogmiosUrl), logger);
+  throw new MissingCardanoNodeOption([
+    CommonOptionDescriptions.OgmiosUrl,
+    CommonOptionDescriptions.OgmiosSrvServiceName
+  ]);
+};

@@ -8,7 +8,7 @@ import {
 import { HttpServer } from './HttpServer';
 import { Logger } from 'ts-log';
 import { ProviderHandler } from '../util';
-import { RunnableModule } from '../RunnableModule';
+import { RunnableModule } from '@cardano-sdk/util';
 import express from 'express';
 
 export abstract class HttpService extends RunnableModule {

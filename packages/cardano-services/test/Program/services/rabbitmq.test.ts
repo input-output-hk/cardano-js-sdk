@@ -77,6 +77,7 @@ describe('Program/services/rabbitmq', () => {
           });
           httpServer = new HttpServer(config, {
             logger,
+            runnableDependencies: [],
             services: [new TxSubmitHttpService({ logger, txSubmitProvider })]
           });
           await httpServer.initialize();
@@ -116,6 +117,7 @@ describe('Program/services/rabbitmq', () => {
           txSubmitProvider = await getRabbitMqTxSubmitProvider(dnsResolver, logger, { rabbitmqUrl });
           httpServer = new HttpServer(config, {
             logger,
+            runnableDependencies: [],
             services: [new TxSubmitHttpService({ logger, txSubmitProvider })]
           });
           await httpServer.initialize();

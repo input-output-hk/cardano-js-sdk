@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { ProviderFailure } from '@cardano-sdk/core';
-import { axiosError } from '../util';
+import { axiosError, healthCheckResponseWithState } from '../util';
 import { chainHistoryHttpProvider } from '../../src';
 import { logger } from '@cardano-sdk/util-dev';
 import MockAdapter from 'axios-mock-adapter';
@@ -29,10 +29,10 @@ describe('chainHistoryProvider', () => {
       axiosMock.restore();
     });
     describe('healthCheck', () => {
-      it('is ok if 200 response body is { ok: true }', async () => {
-        axiosMock.onPost().replyOnce(200, { ok: true });
+      it('is ok if 200 response body is { ok: true, localNode }', async () => {
+        axiosMock.onPost().replyOnce(200, healthCheckResponseWithState);
         const provider = chainHistoryHttpProvider(config);
-        await expect(provider.healthCheck()).resolves.toEqual({ ok: true });
+        await expect(provider.healthCheck()).resolves.toEqual(healthCheckResponseWithState);
       });
 
       it('is not ok if 200 response body is { ok: false }', async () => {

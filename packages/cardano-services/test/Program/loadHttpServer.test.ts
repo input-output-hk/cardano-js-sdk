@@ -133,6 +133,7 @@ describe('loadHttpServer', () => {
               options: {
                 dbCacheTtl,
                 epochPollInterval,
+                ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
                 postgresDb: missingPostgresDb,
                 postgresSrvServiceName,
                 postgresUser,
@@ -156,7 +157,8 @@ describe('loadHttpServer', () => {
               apiUrl,
               options: {
                 dbCacheTtl,
-                epochPollInterval
+                epochPollInterval,
+                ogmiosUrl: new URL(ogmiosConnection.address.webSocket)
               },
               serviceNames: [ServiceNames.StakePool]
             })

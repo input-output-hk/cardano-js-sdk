@@ -4,6 +4,7 @@ import { BlockModel, BlockOutputModel, TipModel, TxInputModel, TxModel, TxOutput
 import {
   BlocksByIdsArgs,
   Cardano,
+  CardanoNode,
   ChainHistoryProvider,
   Paginated,
   ProviderError,
@@ -28,6 +29,7 @@ export interface ChainHistoryProviderProps {
 }
 export interface ChainHistoryProviderDependencies {
   db: Pool;
+  cardanoNode: CardanoNode;
   metadataService: MetadataService;
   logger: Logger;
 }
@@ -40,11 +42,11 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
 
   constructor(
     { paginationPageSizeLimit }: ChainHistoryProviderProps,
-    { db, metadataService, logger }: ChainHistoryProviderDependencies
+    { db, cardanoNode, metadataService, logger }: ChainHistoryProviderDependencies
   ) {
-    super(db);
-    this.#builder = new ChainHistoryBuilder(db, logger);
+    super(db, cardanoNode);
     this.#logger = logger;
+    this.#builder = new ChainHistoryBuilder(db, logger);
     this.#metadataService = metadataService;
     this.#paginationPageSizeLimit = paginationPageSizeLimit;
   }

@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 import { Cardano } from '@cardano-sdk/core';
+import { healthCheckResponseWithState } from '../util';
 import { logger } from '@cardano-sdk/util-dev';
 import { utxoHttpProvider } from '../../src';
 import MockAdapter from 'axios-mock-adapter';
@@ -26,10 +27,10 @@ describe('utxoHttpProvider', () => {
       await expect(provider.healthCheck()).resolves.toEqual({ ok: false });
     });
     describe('mocked', () => {
-      it('is ok if 200 response body is { ok: true }', async () => {
-        axiosMock.onPost().replyOnce(200, { ok: true });
+      it('is ok if 200 response body is { ok: true, localNode }', async () => {
+        axiosMock.onPost().replyOnce(200, healthCheckResponseWithState);
         const provider = utxoHttpProvider(config);
-        await expect(provider.healthCheck()).resolves.toEqual({ ok: true });
+        await expect(provider.healthCheck()).resolves.toEqual(healthCheckResponseWithState);
       });
 
       it('is not ok if 200 response body is { ok: false }', async () => {

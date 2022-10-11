@@ -3,8 +3,7 @@ import { HttpServerConfig, ServiceHealth, ServicesHealthCheckResponse } from './
 import { HttpService } from './HttpService';
 import { Logger } from 'ts-log';
 import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
-import { RunnableModule } from '../RunnableModule';
-import { contextLogger, fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
+import { RunnableModule, contextLogger, fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import { listenPromise, serverClosePromise } from '../util';
 import bodyParser from 'body-parser';
 import express from 'express';
@@ -16,6 +15,7 @@ export const APPLICATION_JSON = 'application/json';
 
 export interface HttpServerDependencies {
   services: HttpService[];
+  runnableDependencies: RunnableModule[];
   logger: Logger;
 }
 
@@ -102,6 +102,11 @@ export class HttpServer extends RunnableModule {
       next();
     });
 
+    for (const dependency of this.#dependencies.runnableDependencies) {
+      await dependency.initialize();
+      this.logger.debug(`Runnable dependency ${dependency.name} has been initialized.`);
+    }
+
     for (const service of this.#dependencies.services) {
       await service.initialize();
       this.app.use(`/${service.slug}`, service.router);
@@ -146,6 +151,7 @@ export class HttpServer extends RunnableModule {
   async shutdownImpl(): Promise<void> {
     this.#healthGauge?.set(0);
     for (const service of this.#dependencies.services) await service.shutdown();
+    for (const dependency of this.#dependencies.runnableDependencies) await dependency.shutdown();
 
     return serverClosePromise(this.server);
   }

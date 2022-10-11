@@ -1,4 +1,12 @@
-import { Asset, AssetProvider, Cardano, GetAssetArgs, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import {
+  Asset,
+  AssetProvider,
+  Cardano,
+  CardanoNode,
+  GetAssetArgs,
+  ProviderError,
+  ProviderFailure
+} from '@cardano-sdk/core';
 import { AssetBuilder } from './AssetBuilder';
 import { DbSyncProvider } from '../DbSyncProvider';
 import { Logger } from 'ts-log';
@@ -13,6 +21,11 @@ export type DbSyncAssetProviderDependencies = {
    * The db-sync database PgPool
    */
   db: Pool;
+
+  /**
+   * The Ogmios Cardano Node
+   */
+  cardanoNode: CardanoNode;
 
   /**
    *
@@ -40,9 +53,9 @@ export class DbSyncAssetProvider extends DbSyncProvider() implements AssetProvid
   #dependencies: DbSyncAssetProviderDependencies;
 
   constructor(dependencies: DbSyncAssetProviderDependencies) {
-    const { db, logger } = dependencies;
+    const { db, cardanoNode, logger } = dependencies;
 
-    super(db);
+    super(db, cardanoNode);
 
     this.#builder = new AssetBuilder(db, logger);
     this.#dependencies = dependencies;

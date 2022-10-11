@@ -64,7 +64,7 @@ export interface CardanoNode {
   /**
    * Performs a health check on the CardanoNode.
    *
-   * @returns {HealthCheckResponse} A promise with the healthcheck reponse.
+   * @returns {HealthCheckResponse} A promise with the health check response.
    */
   healthCheck(): Promise<HealthCheckResponse>;
 }

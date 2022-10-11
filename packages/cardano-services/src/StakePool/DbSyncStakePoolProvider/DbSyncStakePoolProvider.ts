@@ -22,9 +22,8 @@ import {
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../InMemoryCache';
 import { Logger } from 'ts-log';
 import { Pool } from 'pg';
-import { RunnableModule } from '../../RunnableModule';
+import { RunnableModule, isNotNil } from '@cardano-sdk/util';
 import { StakePoolBuilder } from './StakePoolBuilder';
-import { isNotNil } from '@cardano-sdk/util';
 import { toStakePoolResults } from './mappers';
 
 export interface StakePoolProviderProps {
@@ -45,19 +44,17 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
   #cache: InMemoryCache;
   #epochMonitor: EpochMonitor;
   #epochRolloverDisposer: Disposer;
-  #cardanoNode: CardanoNode;
   #paginationPageSizeLimit: number;
 
   constructor(
     { paginationPageSizeLimit }: StakePoolProviderProps,
     { db, cache, cardanoNode, logger, epochMonitor }: StakePoolProviderDependencies
   ) {
-    super(db, 'DbSyncStakePoolProvider', logger);
+    super(db, cardanoNode, 'DbSyncStakePoolProvider', logger);
     this.#logger = logger;
     this.#cache = cache;
     this.#epochMonitor = epochMonitor;
     this.#builder = new StakePoolBuilder(db, logger);
-    this.#cardanoNode = cardanoNode;
     this.#paginationPageSizeLimit = paginationPageSizeLimit;
   }
 
@@ -206,7 +203,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
           );
 
     // Get stake pools distribution cached
-    const stakeDistribution = await this.#cache.get(LIVE_STAKE_CACHE_KEY, () => this.#cardanoNode.stakeDistribution());
+    const stakeDistribution = await this.#cache.get(LIVE_STAKE_CACHE_KEY, () => this.cardanoNode.stakeDistribution());
 
     // Get stake pools rewards cached
     const poolRewards = await this.#cache.get(
@@ -270,7 +267,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
     return await this.#cache.get(queryCacheKey(StakePoolsSubQuery.STATS), () => this.#builder.queryPoolStats());
   }
 
-  initializeImpl() {
+  async initializeImpl() {
     return Promise.resolve();
   }
 

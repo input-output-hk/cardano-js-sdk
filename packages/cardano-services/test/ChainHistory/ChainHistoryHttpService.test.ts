@@ -7,10 +7,12 @@ import { Cardano, ChainHistoryProvider, ProviderError, ProviderFailure } from '@
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider, HttpServer, HttpServerConfig } from '../../src';
 import { CreateHttpProviderConfig, chainHistoryHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { INFO, createLogger } from 'bunyan';
+import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { createDbSyncMetadataService } from '../../src/Metadata';
 import { getPort } from 'get-port-please';
 import { dummyLogger as logger } from 'ts-log';
+import { mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
 import axios from 'axios';
 
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
@@ -29,6 +31,7 @@ describe('ChainHistoryHttpService', () => {
   let clientConfig: CreateHttpProviderConfig<ChainHistoryProvider>;
   let config: HttpServerConfig;
   let provider: ChainHistoryProvider;
+  let cardanoNode: OgmiosCardanoNode;
 
   beforeAll(async () => {
     port = await getPort();
@@ -61,7 +64,7 @@ describe('ChainHistoryHttpService', () => {
 
     it('throws during service initialization if the ChainHistoryProvider is unhealthy', async () => {
       service = new ChainHistoryHttpService({ chainHistoryProvider, logger });
-      httpServer = new HttpServer(config, { logger, services: [service] });
+      httpServer = new HttpServer(config, { logger, runnableDependencies: [], services: [service] });
       await expect(httpServer.initialize()).rejects.toThrow(new ProviderError(ProviderFailure.Unhealthy));
     });
   });
@@ -69,12 +72,13 @@ describe('ChainHistoryHttpService', () => {
   describe('healthy state', () => {
     beforeAll(async () => {
       const metadataService = createDbSyncMetadataService(dbConnection, logger);
+      cardanoNode = mockCardanoNode() as unknown as OgmiosCardanoNode;
       chainHistoryProvider = new DbSyncChainHistoryProvider(
         { paginationPageSizeLimit: PAGINATION_PAGE_SIZE_LIMIT },
-        { db: dbConnection, logger, metadataService }
+        { cardanoNode, db: dbConnection, logger, metadataService }
       );
       service = new ChainHistoryHttpService({ chainHistoryProvider, logger });
-      httpServer = new HttpServer(config, { logger, services: [service] });
+      httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
       await httpServer.initialize();
       await httpServer.start();
     });
@@ -91,7 +95,17 @@ describe('ChainHistoryHttpService', () => {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual({ ok: true });
+        expect(res.data).toEqual({
+          localNode: {
+            ledgerTip: {
+              blockNo: 3_391_731,
+              hash: '9ef43ab6e234fcf90d103413096c7da752da2f45b15e1259f43d476afd12932c',
+              slot: 52_819_355
+            },
+            networkSync: 0.999
+          },
+          ok: true
+        });
       });
     });
 

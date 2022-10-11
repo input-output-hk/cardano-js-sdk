@@ -11,10 +11,12 @@ import {
 import { AssetProvider, Cardano } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, assetInfoHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { INFO, createLogger } from 'bunyan';
+import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { createDbSyncMetadataService } from '../../src/Metadata';
 import { getPort } from 'get-port-please';
 import { dummyLogger as logger } from 'ts-log';
+import { mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
 import { mockTokenRegistry } from './CardanoTokenRegistry.test';
 import axios from 'axios';
 
@@ -37,6 +39,7 @@ describe('AssetHttpService', () => {
   let tokenMetadataService: TokenMetadataService;
   let clientConfig: CreateHttpProviderConfig<AssetProvider>;
   let provider: AssetProvider;
+  let cardanoNode: OgmiosCardanoNode;
 
   beforeAll(async () => {
     port = await getPort();
@@ -55,10 +58,12 @@ describe('AssetHttpService', () => {
         logger,
         metadataService: createDbSyncMetadataService(db, logger)
       });
+      cardanoNode = mockCardanoNode() as unknown as OgmiosCardanoNode;
       tokenMetadataService = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl });
-      assetProvider = new DbSyncAssetProvider({ db, logger, ntfMetadataService, tokenMetadataService });
+      assetProvider = new DbSyncAssetProvider({ cardanoNode, db, logger, ntfMetadataService, tokenMetadataService });
       service = new AssetHttpService({ assetProvider, logger });
-      httpServer = new HttpServer(config, { logger, services: [service] });
+      httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
+
       await httpServer.initialize();
       await httpServer.start();
     });
@@ -76,7 +81,17 @@ describe('AssetHttpService', () => {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual({ ok: true });
+        expect(res.data).toEqual({
+          localNode: {
+            ledgerTip: {
+              blockNo: 3_391_731,
+              hash: '9ef43ab6e234fcf90d103413096c7da752da2f45b15e1259f43d476afd12932c',
+              slot: 52_819_355
+            },
+            networkSync: 0.999
+          },
+          ok: true
+        });
       });
     });
 

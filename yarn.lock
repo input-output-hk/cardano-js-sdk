@@ -2018,6 +2018,7 @@ __metadata:
   dependencies:
     "@cardano-ogmios/client": 5.5.2
     "@cardano-sdk/core": ^0.5.0
+    "@cardano-sdk/util": ^0.5.0
     "@types/node": 14.18.12
     buffer: 5.7.1
     eslint: ^7.32.0
@@ -2071,6 +2072,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/util@workspace:packages/util"
   dependencies:
+    "@cardano-sdk/util-dev": ^0.4.1
     "@types/lodash": ^4.14.182
     "@types/node": 14.18.12
     eslint: ^7.32.0
@@ -2081,6 +2083,7 @@ __metadata:
     shx: ^0.3.3
     ts-custom-error: ^3.2.0
     ts-jest: ^28.0.7
+    ts-log: ^2.2.4
     type-fest: ^2.19.0
     typescript: ^4.7.4
   languageName: unknown

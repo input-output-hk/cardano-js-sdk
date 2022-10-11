@@ -2,21 +2,15 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-empty-function */
 
-import {
-  APPLICATION_JSON,
-  CONTENT_TYPE,
-  DbSyncUtxoProvider,
-  HttpServer,
-  HttpService,
-  RunnableModule,
-  ServiceNames
-} from '../../src';
+import { APPLICATION_JSON, CONTENT_TYPE, DbSyncUtxoProvider, HttpServer, HttpService, ServiceNames } from '../../src';
 import { Logger } from 'ts-log';
+import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { Provider } from '@cardano-sdk/core';
+import { RunnableModule, fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import { createLogger, logger } from '@cardano-sdk/util-dev';
-import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import { getRandomPort } from 'get-port-please';
+import { mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
 import axios from 'axios';
 import express from 'express';
 import net from 'net';
@@ -60,13 +54,14 @@ describe('HttpServer', () => {
   let port: number;
   let apiUrlBase: string;
   let provider: Provider;
+  let cardanoNode: OgmiosCardanoNode;
   const db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
 
   it('Is a runnable module', async () => {
     port = await getRandomPort();
     httpServer = new HttpServer(
       { listen: { host: 'localhost', port } },
-      { logger, services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)] }
+      { logger, runnableDependencies: [], services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)] }
     );
     expect(httpServer).toBeInstanceOf(RunnableModule);
   });
@@ -74,7 +69,8 @@ describe('HttpServer', () => {
   beforeEach(async () => {
     port = await getRandomPort();
     apiUrlBase = `http://localhost:${port}`;
-    provider = new DbSyncUtxoProvider(db, logger);
+    cardanoNode = mockCardanoNode() as unknown as OgmiosCardanoNode;
+    provider = new DbSyncUtxoProvider({ cardanoNode, db, logger });
   });
 
   describe('initialize', () => {
@@ -83,11 +79,16 @@ describe('HttpServer', () => {
     it('initializes the express application', async () => {
       httpServer = new HttpServer(
         { listen: { host: 'localhost', port } },
-        { logger, services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)] }
+        {
+          logger,
+          runnableDependencies: [cardanoNode],
+          services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)]
+        }
       );
       expect(httpServer.app).not.toBeDefined();
       await httpServer.initialize();
       expect(httpServer.app).toBeDefined();
+      expect(cardanoNode.initialize).toHaveBeenCalledTimes(1);
       await httpServer.start();
       await onHttpServer(apiUrlBase);
     });
@@ -98,6 +99,7 @@ describe('HttpServer', () => {
         { listen: { host: 'localhost', port } },
         {
           logger,
+          runnableDependencies: [cardanoNode],
           services: [
             new SomeHttpService(ServiceNames.StakePool, provider, logger, express.Router(), (req: express.Request) =>
               expect(req.body).toEqual(expectedBody)
@@ -126,6 +128,7 @@ describe('HttpServer', () => {
         { listen: { host: 'localhost', port } },
         {
           logger: testLogger,
+          runnableDependencies: [cardanoNode],
           services: [
             new SomeHttpService(ServiceNames.StakePool, provider, logger, express.Router(), (req: express.Request) => {
               if (requestCounter++ === 0) return expect(req.body).toEqual(expectedBody);
@@ -175,7 +178,11 @@ describe('HttpServer', () => {
     beforeEach(async () => {
       httpServer = new HttpServer(
         { listen: { host: 'localhost', port } },
-        { logger, services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)] }
+        {
+          logger,
+          runnableDependencies: [cardanoNode],
+          services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)]
+        }
       );
       await httpServer.initialize();
     });
@@ -200,7 +207,11 @@ describe('HttpServer', () => {
     beforeEach(async () => {
       httpServer = new HttpServer(
         { listen: { host: 'localhost', port } },
-        { logger, services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)] }
+        {
+          logger,
+          runnableDependencies: [cardanoNode],
+          services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)]
+        }
       );
       await httpServer.initialize();
       await httpServer.start();
@@ -212,6 +223,7 @@ describe('HttpServer', () => {
       httpServer.server.on('close', spy);
       await httpServer.shutdown();
       expect(httpServer.state).toBe('initialized');
+      expect(cardanoNode.shutdown).toHaveBeenCalledTimes(1);
       expect(spy).toHaveBeenCalled();
     });
   });
@@ -221,7 +233,11 @@ describe('HttpServer', () => {
     beforeEach(async () => {
       httpServer = new HttpServer(
         { listen: { host: 'localhost', port } },
-        { logger, services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)] }
+        {
+          logger,
+          runnableDependencies: [cardanoNode],
+          services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)]
+        }
       );
       await httpServer.initialize();
       await httpServer.start();
@@ -246,7 +262,11 @@ describe('HttpServer', () => {
     it('is disabled by default', async () => {
       httpServer = new HttpServer(
         { listen: { host: 'localhost', port } },
-        { logger, services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)] }
+        {
+          logger,
+          runnableDependencies: [cardanoNode],
+          services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)]
+        }
       );
       await httpServer.initialize();
       await httpServer.start();
@@ -261,7 +281,11 @@ describe('HttpServer', () => {
     it('can expose Prometheus metrics, at /metrics by default', async () => {
       httpServer = new HttpServer(
         { listen: { host: 'localhost', port }, metrics: { enabled: true } },
-        { logger, services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)] }
+        {
+          logger,
+          runnableDependencies: [cardanoNode],
+          services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)]
+        }
       );
       await httpServer.initialize();
       await httpServer.start();
@@ -275,7 +299,11 @@ describe('HttpServer', () => {
       const metricsPath = '/metrics-custom';
       httpServer = new HttpServer(
         { listen: { host: 'localhost', port }, metrics: { enabled: true, options: { metricsPath } } },
-        { logger, services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)] }
+        {
+          logger,
+          runnableDependencies: [cardanoNode],
+          services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)]
+        }
       );
       await httpServer.initialize();
       await httpServer.start();
@@ -288,7 +316,11 @@ describe('HttpServer', () => {
     it('metrics endpoint with healthy service', async () => {
       httpServer = new HttpServer(
         { listen: { host: 'localhost', port }, metrics: { enabled: true } },
-        { logger, services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)] }
+        {
+          logger,
+          runnableDependencies: [cardanoNode],
+          services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)]
+        }
       );
       await httpServer.initialize();
       await httpServer.start();
@@ -302,7 +334,7 @@ describe('HttpServer', () => {
       const service = new SomeHttpService(ServiceNames.StakePool, provider, logger);
       httpServer = new HttpServer(
         { listen: { host: 'localhost', port }, metrics: { enabled: true } },
-        { logger, services: [service] }
+        { logger, runnableDependencies: [cardanoNode], services: [service] }
       );
       await httpServer.initialize();
       await httpServer.start();
@@ -323,6 +355,7 @@ describe('HttpServer', () => {
         { listen: { host: 'localhost', port } },
         {
           logger,
+          runnableDependencies: [cardanoNode],
           services: [
             new SomeHttpService(ServiceNames.StakePool, provider, logger),
             new SomeHttpService(ServiceNames.NetworkInfo, provider, logger, express.Router(), () => {}, shouldFail)
@@ -365,6 +398,7 @@ describe('HttpServer', () => {
         { listen: { host: 'localhost', port } },
         {
           logger,
+          runnableDependencies: [cardanoNode],
           services: [
             new SomeHttpService(ServiceNames.StakePool, provider, logger),
             new SomeHttpService(ServiceNames.NetworkInfo, provider, logger)
@@ -400,6 +434,7 @@ describe('HttpServer', () => {
         { listen: { host: 'localhost', port } },
         {
           logger,
+          runnableDependencies: [cardanoNode],
           services: [
             new SomeHttpService(ServiceNames.StakePool, provider, logger),
             new SomeHttpService(ServiceNames.NetworkInfo, provider, logger, express.Router(), () => {}, shouldFail)

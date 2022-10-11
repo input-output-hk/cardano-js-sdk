@@ -6,6 +6,7 @@ import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../../src/
 import { HealthCheckResponse } from '@cardano-sdk/core';
 import { HttpServer, HttpServerConfig, createDnsResolver, getPool } from '../../../src';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../../src/InMemoryCache';
+import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { SrvRecord } from 'dns';
 import { getPort, getRandomPort } from 'get-port-please';
@@ -29,7 +30,7 @@ describe('Service dependency abstractions', () => {
   const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
   const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
-  const cardanoNode = mockCardanoNode();
+  const cardanoNode = mockCardanoNode() as unknown as OgmiosCardanoNode;
   const responseWithServiceState: HealthCheckResponse = {
     localNode: {
       ledgerTip: {
@@ -76,7 +77,7 @@ describe('Service dependency abstractions', () => {
           { cache, cardanoNode, db: db!, epochMonitor, logger }
         );
         service = new NetworkInfoHttpService({ logger, networkInfoProvider });
-        httpServer = new HttpServer(config, { logger, services: [service] });
+        httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
 
         await httpServer.initialize();
         await httpServer.start();
@@ -132,7 +133,7 @@ describe('Service dependency abstractions', () => {
           { cache, cardanoNode, db: db!, epochMonitor, logger }
         );
         service = new NetworkInfoHttpService({ logger, networkInfoProvider });
-        httpServer = new HttpServer(config, { logger, services: [service] });
+        httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
 
         await httpServer.initialize();
         await httpServer.start();

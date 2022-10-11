@@ -1,11 +1,11 @@
 /* eslint-disable max-len */
-import { Cardano, ProviderError, ProviderFailure, UtxoProvider } from '@cardano-sdk/core';
-import { CreateHttpProviderConfig, utxoHttpProvider } from '@cardano-sdk/cardano-services-client';
+import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { DbSyncUtxoProvider, HttpServer, HttpServerConfig, UtxoHttpService } from '../../src';
-import { INFO, createLogger } from 'bunyan';
+import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
 import { dummyLogger as logger } from 'ts-log';
+import { mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
 import axios from 'axios';
 
 const APPLICATION_JSON = 'application/json';
@@ -22,14 +22,12 @@ describe('UtxoHttpService', () => {
   let service: UtxoHttpService;
   let port: number;
   let baseUrl: string;
-  let clientConfig: CreateHttpProviderConfig<UtxoProvider>;
   let config: HttpServerConfig;
-  let provider: UtxoProvider;
+  let cardanoNode: OgmiosCardanoNode;
 
   beforeAll(async () => {
     port = await getPort();
     baseUrl = `http://localhost:${port}/utxo`;
-    clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
     config = { listen: { port } };
     dbConnection = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
   });
@@ -54,17 +52,17 @@ describe('UtxoHttpService', () => {
 
     it('throws during service initialization if the UtxoProvider is unhealthy', async () => {
       service = new UtxoHttpService({ logger, utxoProvider });
-      httpServer = new HttpServer(config, { logger, services: [service] });
+      httpServer = new HttpServer(config, { logger, runnableDependencies: [], services: [service] });
       await expect(httpServer.initialize()).rejects.toThrow(new ProviderError(ProviderFailure.Unhealthy));
     });
   });
 
   describe('healthy state', () => {
     beforeAll(async () => {
-      utxoProvider = new DbSyncUtxoProvider(dbConnection, logger);
+      cardanoNode = mockCardanoNode() as unknown as OgmiosCardanoNode;
+      utxoProvider = new DbSyncUtxoProvider({ cardanoNode, db: dbConnection, logger });
       service = new UtxoHttpService({ logger, utxoProvider });
-      httpServer = new HttpServer(config, { logger, services: [service] });
-      provider = utxoHttpProvider(clientConfig);
+      httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
       await httpServer.initialize();
       await httpServer.start();
     });
@@ -80,13 +78,20 @@ describe('UtxoHttpService', () => {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual({ ok: true });
-      });
-      it('with utxoProvider', async () => {
-        const response = await provider.healthCheck();
-        expect(response).toEqual({ ok: true });
+        expect(res.data).toEqual({
+          localNode: {
+            ledgerTip: {
+              blockNo: 3_391_731,
+              hash: '9ef43ab6e234fcf90d103413096c7da752da2f45b15e1259f43d476afd12932c',
+              slot: 52_819_355
+            },
+            networkSync: 0.999
+          },
+          ok: true
+        });
       });
     });
+
     describe('/utxo-by-addresses', () => {
       it('returns a 415 coded response if the wrong content type header is used', async () => {
         try {

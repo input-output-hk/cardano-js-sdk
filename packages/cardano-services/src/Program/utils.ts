@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Logger } from 'ts-log';
+import { ServiceNames } from './ServiceNames';
 import dns, { SrvRecord } from 'dns';
 import pRetry, { FailedAttemptError } from 'p-retry';
 
@@ -46,3 +47,15 @@ export const createDnsResolver = (config: RetryBackoffConfig, logger: Logger) =>
 export type DnsResolver = ReturnType<typeof createDnsResolver>;
 
 export const srvRecordToRabbitmqURL = ({ name, port }: SrvRecord) => new URL(`amqp://${name}:${port}`);
+
+export const cardanoNodeDependantServices = new Set([
+  ServiceNames.NetworkInfo,
+  ServiceNames.StakePool,
+  ServiceNames.Utxo,
+  ServiceNames.Rewards,
+  ServiceNames.Asset,
+  ServiceNames.ChainHistory
+]);
+
+export const shouldInitCardanoNode = (serviceNames: ServiceNames[]) =>
+  serviceNames.some((name) => cardanoNodeDependantServices.has(name));
