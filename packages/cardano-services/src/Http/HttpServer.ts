@@ -3,8 +3,7 @@ import { HttpServerConfig, ServiceHealth, ServicesHealthCheckResponse } from './
 import { HttpService } from './HttpService';
 import { Logger } from 'ts-log';
 import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
-import { RunnableModule } from '../RunnableModule';
-import { contextLogger, fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
+import { RunnableModule, contextLogger, fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import { listenPromise, serverClosePromise } from '../util';
 import bodyParser from 'body-parser';
 import express from 'express';

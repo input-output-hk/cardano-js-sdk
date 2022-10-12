@@ -2,20 +2,12 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-empty-function */
 
-import {
-  APPLICATION_JSON,
-  CONTENT_TYPE,
-  DbSyncUtxoProvider,
-  HttpServer,
-  HttpService,
-  RunnableModule,
-  ServiceNames
-} from '../../src';
+import { APPLICATION_JSON, CONTENT_TYPE, DbSyncUtxoProvider, HttpServer, HttpService, ServiceNames } from '../../src';
 import { Logger } from 'ts-log';
 import { Pool } from 'pg';
 import { Provider } from '@cardano-sdk/core';
+import { RunnableModule, fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import { createLogger, logger } from '@cardano-sdk/util-dev';
-import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import { getRandomPort } from 'get-port-please';
 import axios from 'axios';
 import express from 'express';

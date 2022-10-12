@@ -1,6 +1,5 @@
-import { InvalidModuleState } from '../src/errors';
+import { InvalidModuleState, RunnableModule } from '../src';
 import { Logger, dummyLogger } from 'ts-log';
-import { RunnableModule } from '../src';
 import { createStubLogger } from '@cardano-sdk/util-dev';
 
 class SomeRunnableModule extends RunnableModule {

@@ -15,9 +15,8 @@ import { IDS_NAMESPACE, StakePoolsSubQuery, emptyPoolsExtraInfo, getStakePoolSor
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../InMemoryCache';
 import { Logger } from 'ts-log';
 import { Pool } from 'pg';
-import { RunnableModule } from '../../RunnableModule';
+import { RunnableModule, isNotNil } from '@cardano-sdk/util';
 import { StakePoolBuilder } from './StakePoolBuilder';
-import { isNotNil } from '@cardano-sdk/util';
 import { toStakePoolResults } from './mappers';
 
 export interface StakePoolProviderProps {
