@@ -3,7 +3,6 @@
 /* eslint-disable max-len */
 import {
   Cardano,
-  CardanoNode,
   ProviderError,
   ProviderFailure,
   QueryStakePoolsArgs,
@@ -15,11 +14,12 @@ import { DbSyncEpochPollService } from '../../src/util';
 import { DbSyncStakePoolProvider, HttpServer, HttpServerConfig, StakePoolHttpService } from '../../src';
 import { INFO, createLogger } from 'bunyan';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../src/InMemoryCache';
+import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
 import { ingestDbData, sleep, wrapWithTransaction } from '../util';
 import { logger } from '@cardano-sdk/util-dev';
-import { mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
+import { mockCardanoNode, responseWithServiceState } from '../../../core/test/CardanoNode/mocks';
 import axios from 'axios';
 
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
@@ -68,7 +68,7 @@ describe('StakePoolHttpService', () => {
   let clientConfig: CreateHttpProviderConfig<StakePoolProvider>;
   let config: HttpServerConfig;
   let provider: StakePoolProvider;
-  let cardanoNode: CardanoNode;
+  let cardanoNode: OgmiosCardanoNode;
 
   const epochPollInterval = 2 * 1000;
   const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
@@ -99,7 +99,7 @@ describe('StakePoolHttpService', () => {
 
     it('throws during service initialization if the StakePoolProvider is unhealthy', async () => {
       service = new StakePoolHttpService({ logger, stakePoolProvider });
-      httpServer = new HttpServer(config, { logger, services: [service] });
+      httpServer = new HttpServer(config, { logger, runnableDependencies: [], services: [service] });
       await expect(httpServer.initialize()).rejects.toThrow(new ProviderError(ProviderFailure.Unhealthy));
     });
   });
@@ -110,13 +110,13 @@ describe('StakePoolHttpService', () => {
     const clearCacheSpy = jest.spyOn(cache, 'clear');
 
     beforeAll(async () => {
-      cardanoNode = mockCardanoNode();
+      cardanoNode = mockCardanoNode() as unknown as OgmiosCardanoNode;
       stakePoolProvider = new DbSyncStakePoolProvider(
         { paginationPageSizeLimit: pagination.limit },
         { cache, cardanoNode, db, epochMonitor, logger }
       );
       service = new StakePoolHttpService({ logger, stakePoolProvider });
-      httpServer = new HttpServer(config, { logger, services: [service] });
+      httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
       provider = stakePoolHttpProvider(clientConfig);
       await httpServer.initialize();
       await httpServer.start();
@@ -146,12 +146,17 @@ describe('StakePoolHttpService', () => {
     });
 
     describe('/health', () => {
-      it('forwards the stakePoolProvider health response', async () => {
+      it('forwards the stakePoolProvider health response with HTTP request', async () => {
         const res = await axios.post(`${baseUrl}/health`, {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual({ ok: true });
+        expect(res.data).toEqual(responseWithServiceState);
+      });
+
+      it('forwards the stakePoolProvider health response with provider client', async () => {
+        const response = await provider.healthCheck();
+        expect(response).toEqual(responseWithServiceState);
       });
     });
 

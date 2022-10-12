@@ -48,7 +48,7 @@ export const mockStakeDistribution: StakeDistribution = new Map([
   ]
 ]);
 
-const responseWithServiceState: HealthCheckResponse = {
+export const responseWithServiceState: HealthCheckResponse = {
   localNode: {
     ledgerTip: {
       blockNo: 3_391_731,
@@ -64,7 +64,17 @@ export const mockCardanoNode = () => ({
   eraSummaries: jest.fn(() => Promise.resolve(mockEraSummaries)),
   healthCheck: jest.fn(() => Promise.resolve(responseWithServiceState)),
   initialize: jest.fn(() => Promise.resolve()),
+  initializeAfter: jest.fn(() => Promise.resolve()),
+  initializeBefore: jest.fn(() => Promise.resolve()),
+  initializeImpl: jest.fn(() => Promise.resolve()),
   shutdown: jest.fn(() => Promise.resolve()),
+  shutdownAfter: jest.fn(() => Promise.resolve()),
+  shutdownBefore: jest.fn(() => Promise.resolve()),
+  shutdownImpl: jest.fn(() => Promise.resolve()),
   stakeDistribution: jest.fn(() => Promise.resolve(mockStakeDistribution)),
+  start: jest.fn(() => Promise.resolve()),
+  startAfter: jest.fn(() => Promise.resolve()),
+  startBefore: jest.fn(() => Promise.resolve()),
+  startImpl: jest.fn(() => Promise.resolve()),
   systemStart: jest.fn(() => Promise.resolve(new Date(1_563_999_616_000)))
 });

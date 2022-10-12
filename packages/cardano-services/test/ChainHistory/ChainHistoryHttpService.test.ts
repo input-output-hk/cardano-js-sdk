@@ -7,10 +7,12 @@ import { Cardano, ChainHistoryProvider, ProviderError, ProviderFailure } from '@
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider, HttpServer, HttpServerConfig } from '../../src';
 import { CreateHttpProviderConfig, chainHistoryHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { INFO, createLogger } from 'bunyan';
+import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { createDbSyncMetadataService } from '../../src/Metadata';
 import { getPort } from 'get-port-please';
 import { dummyLogger as logger } from 'ts-log';
+import { mockCardanoNode, responseWithServiceState } from '../../../core/test/CardanoNode/mocks';
 import axios from 'axios';
 
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
@@ -18,7 +20,6 @@ const BAD_REQUEST = 'Request failed with status code 400';
 const APPLICATION_CBOR = 'application/cbor';
 const APPLICATION_JSON = 'application/json';
 const PAGINATION_PAGE_SIZE_LIMIT = 5;
-
 describe('ChainHistoryHttpService', () => {
   let dbConnection: Pool;
   let httpServer: HttpServer;
@@ -29,6 +30,7 @@ describe('ChainHistoryHttpService', () => {
   let clientConfig: CreateHttpProviderConfig<ChainHistoryProvider>;
   let config: HttpServerConfig;
   let provider: ChainHistoryProvider;
+  let cardanoNode: OgmiosCardanoNode;
 
   beforeAll(async () => {
     port = await getPort();
@@ -36,11 +38,6 @@ describe('ChainHistoryHttpService', () => {
     clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
     config = { listen: { port } };
     dbConnection = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
-    provider = chainHistoryHttpProvider(clientConfig);
-  });
-
-  afterEach(async () => {
-    jest.resetAllMocks();
   });
 
   describe('unhealthy ChainHistoryProvider', () => {
@@ -52,7 +49,6 @@ describe('ChainHistoryHttpService', () => {
         transactionsByHashes: jest.fn()
       } as unknown as DbSyncChainHistoryProvider;
     });
-
     it('should not throw during service create if the ChainHistoryProvider is unhealthy', () => {
       expect(() => new ChainHistoryHttpService({ chainHistoryProvider, logger })).not.toThrow(
         new ProviderError(ProviderFailure.Unhealthy)
@@ -61,7 +57,7 @@ describe('ChainHistoryHttpService', () => {
 
     it('throws during service initialization if the ChainHistoryProvider is unhealthy', async () => {
       service = new ChainHistoryHttpService({ chainHistoryProvider, logger });
-      httpServer = new HttpServer(config, { logger, services: [service] });
+      httpServer = new HttpServer(config, { logger, runnableDependencies: [], services: [service] });
       await expect(httpServer.initialize()).rejects.toThrow(new ProviderError(ProviderFailure.Unhealthy));
     });
   });
@@ -69,16 +65,17 @@ describe('ChainHistoryHttpService', () => {
   describe('healthy state', () => {
     beforeAll(async () => {
       const metadataService = createDbSyncMetadataService(dbConnection, logger);
+      cardanoNode = mockCardanoNode() as unknown as OgmiosCardanoNode;
       chainHistoryProvider = new DbSyncChainHistoryProvider(
         { paginationPageSizeLimit: PAGINATION_PAGE_SIZE_LIMIT },
-        { db: dbConnection, logger, metadataService }
+        { cardanoNode, db: dbConnection, logger, metadataService }
       );
       service = new ChainHistoryHttpService({ chainHistoryProvider, logger });
-      httpServer = new HttpServer(config, { logger, services: [service] });
+      provider = chainHistoryHttpProvider(clientConfig);
+      httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
       await httpServer.initialize();
       await httpServer.start();
     });
-
     afterAll(async () => {
       await dbConnection.end();
       await httpServer.shutdown();
@@ -86,12 +83,17 @@ describe('ChainHistoryHttpService', () => {
 
     describe('/health', () => {
       const url = '/health';
-      it('forwards the ChainHistoryProvider health response', async () => {
+      it('forwards the chainHistoryProvider health response with HTTP request', async () => {
         const res = await axios.post(`${baseUrl}${url}`, undefined, {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual({ ok: true });
+        expect(res.data).toEqual(responseWithServiceState);
+      });
+
+      it('forwards the chainHistoryProvider health response with provider client', async () => {
+        const response = await provider.healthCheck();
+        expect(response).toEqual(responseWithServiceState);
       });
     });
 

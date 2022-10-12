@@ -9,12 +9,12 @@ import bodyParser from 'body-parser';
 import express from 'express';
 import expressPromBundle from 'express-prom-bundle';
 import http from 'http';
-
 export const CONTENT_TYPE = 'Content-Type';
 export const APPLICATION_JSON = 'application/json';
 
 export interface HttpServerDependencies {
   services: HttpService[];
+  runnableDependencies: RunnableModule[];
   logger: Logger;
 }
 
@@ -24,13 +24,11 @@ export class HttpServer extends RunnableModule {
   #config: HttpServerConfig;
   #dependencies: HttpServerDependencies;
   #healthGauge: Gauge<string>;
-
   constructor(config: HttpServerConfig, { logger, ...rest }: HttpServerDependencies) {
     super(config.name || 'HttpServer', logger);
     this.#config = config;
     this.#dependencies = { logger, ...rest };
   }
-
   async #getServicesHealth() {
     const servicesHealth: ServiceHealth[] = await Promise.all(
       this.#dependencies.services.map((service) =>
@@ -46,13 +44,11 @@ export class HttpServer extends RunnableModule {
           })
       )
     );
-
     return {
       ok: servicesHealth.every((service) => service.ok),
       services: servicesHealth
     };
   }
-
   async initializeImpl(): Promise<void> {
     this.app = express();
     this.app.use(
@@ -61,7 +57,6 @@ export class HttpServer extends RunnableModule {
         reviver: (key, value) => (key === '' ? fromSerializableObject(value) : value)
       })
     );
-
     if (this.#config?.metrics?.enabled) {
       const promRegistry = new Registry();
       const getServicesHealth = async () => await this.#getServicesHealth();
@@ -76,7 +71,6 @@ export class HttpServer extends RunnableModule {
         name: 'healthcheck',
         registers: [promRegistry]
       });
-
       this.app.use(
         expressPromBundle({
           includeMethod: true,
@@ -84,29 +78,26 @@ export class HttpServer extends RunnableModule {
           ...this.#config.metrics.options
         })
       );
-
       this.logger.info(
         `Prometheus metrics: ${(await promRegistry.getMetricsAsArray()).map(({ name }) => name)} configured at ${
           this.#config.metrics.options?.metricsPath || '/metrics'
         }`
       );
     }
-
     const requestLogger = contextLogger(this.logger, 'request');
-
     this.app.use((req, _res, next) => {
       const { body, method, path, query } = req;
-
       requestLogger.debug({ body, method, path, query });
       next();
     });
+
+    for (const dependency of this.#dependencies.runnableDependencies) await dependency.initialize();
 
     for (const service of this.#dependencies.services) {
       await service.initialize();
       this.app.use(`/${service.slug}`, service.router);
       this.logger.debug(`Using /${service.slug}`);
     }
-
     const servicesHealthCheckHandler = async (req: express.Request, res: express.Response) => {
       this.logger.debug('/health', { ip: req.ip });
       let body: ServicesHealthCheckResponse | Error['message'];
@@ -118,15 +109,12 @@ export class HttpServer extends RunnableModule {
       }
       return HttpServer.sendJSON(res, body);
     };
-
     this.app.use('/health', servicesHealthCheckHandler);
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.app.use((err: any, _req: express.Request, res: express.Response, _n: express.NextFunction) => {
       HttpServer.sendJSON(res, new ProviderError(ProviderFailure.Unhealthy, err), err.status || 500);
     });
   }
-
   static sendJSON<ResponseBody>(
     res: express.Response<ResponseBody | ProviderError>,
     obj: ResponseBody | ProviderError,
@@ -136,7 +124,6 @@ export class HttpServer extends RunnableModule {
     res.header(CONTENT_TYPE, APPLICATION_JSON);
     res.send(toSerializableObject(obj) as ResponseBody);
   }
-
   async startImpl(): Promise<void> {
     for (const service of this.#dependencies.services) await service.start();
     this.server = await listenPromise(this.app, this.#config.listen);
@@ -144,7 +131,9 @@ export class HttpServer extends RunnableModule {
 
   async shutdownImpl(): Promise<void> {
     this.#healthGauge?.set(0);
+
     for (const service of this.#dependencies.services) await service.shutdown();
+    for (const dependency of this.#dependencies.runnableDependencies) await dependency.shutdown();
 
     return serverClosePromise(this.server);
   }

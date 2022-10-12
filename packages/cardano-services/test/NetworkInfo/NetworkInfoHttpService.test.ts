@@ -2,19 +2,20 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable sonarjs/no-identical-functions */
-import { CardanoNode, NetworkInfoProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, networkInfoHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { DbSyncEpochPollService } from '../../src/util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../src/NetworkInfo';
 import { HttpServer, HttpServerConfig } from '../../src';
 import { INFO, createLogger } from 'bunyan';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../src/InMemoryCache';
+import { NetworkInfoProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
 import { ingestDbData, sleep, wrapWithTransaction } from '../util';
 import { loadGenesisData } from '../../src/NetworkInfo/DbSyncNetworkInfoProvider/mappers';
 import { dummyLogger as logger } from 'ts-log';
-import { mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
+import { mockCardanoNode, responseWithServiceState } from '../../../core/test/CardanoNode/mocks';
 import axios from 'axios';
 
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
@@ -31,7 +32,7 @@ describe('NetworkInfoHttpService', () => {
   let baseUrl: string;
   let clientConfig: CreateHttpProviderConfig<NetworkInfoProvider>;
   let config: HttpServerConfig;
-  let cardanoNode: CardanoNode;
+  let cardanoNode: OgmiosCardanoNode;
   let provider: NetworkInfoProvider;
 
   const epochPollInterval = 2 * 1000;
@@ -46,7 +47,7 @@ describe('NetworkInfoHttpService', () => {
       baseUrl = `http://localhost:${port}/network-info`;
       clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
       config = { listen: { port } };
-      cardanoNode = mockCardanoNode();
+      cardanoNode = mockCardanoNode() as unknown as OgmiosCardanoNode;
       networkInfoProvider = {
         currentWalletProtocolParameters: jest.fn(),
         eraSummaries: jest.fn(),
@@ -66,7 +67,7 @@ describe('NetworkInfoHttpService', () => {
 
     it('throws during service initialization if the NetworkInfoProvider is unhealthy', async () => {
       service = new NetworkInfoHttpService({ logger, networkInfoProvider });
-      httpServer = new HttpServer(config, { logger, services: [service] });
+      httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
       await expect(httpServer.initialize()).rejects.toThrow(new ProviderError(ProviderFailure.Unhealthy));
     });
   });
@@ -78,14 +79,14 @@ describe('NetworkInfoHttpService', () => {
     beforeAll(async () => {
       port = await getPort();
       baseUrl = `http://localhost:${port}/network-info`;
-      cardanoNode = mockCardanoNode();
+      cardanoNode = mockCardanoNode() as unknown as OgmiosCardanoNode;
       config = { listen: { port } };
       networkInfoProvider = new DbSyncNetworkInfoProvider(
         { cardanoNodeConfigPath },
         { cache, cardanoNode, db, epochMonitor, logger }
       );
       service = new NetworkInfoHttpService({ logger, networkInfoProvider });
-      httpServer = new HttpServer(config, { logger, services: [service] });
+      httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
       clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
       provider = networkInfoHttpProvider(clientConfig);
 
@@ -117,22 +118,17 @@ describe('NetworkInfoHttpService', () => {
     });
 
     describe('/health', () => {
-      it('forwards the networkInfoProvider health response', async () => {
+      it('forwards the networkInfoProvider health response with HTTP request', async () => {
         const res = await axios.post(`${baseUrl}/health`, {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual({
-          localNode: {
-            ledgerTip: {
-              blockNo: 3_391_731,
-              hash: '9ef43ab6e234fcf90d103413096c7da752da2f45b15e1259f43d476afd12932c',
-              slot: 52_819_355
-            },
-            networkSync: 0.999
-          },
-          ok: true
-        });
+        expect(res.data).toEqual(responseWithServiceState);
+      });
+
+      it('forwards the networkInfoProvider health response with provider client', async () => {
+        const response = await provider.healthCheck();
+        expect(response).toEqual(responseWithServiceState);
       });
     });
 
@@ -380,14 +376,14 @@ describe('NetworkInfoHttpService', () => {
     beforeAll(async () => {
       port = await getPort();
       baseUrl = `http://localhost:${port}/network-info`;
-      cardanoNode = mockCardanoNode();
+      cardanoNode = mockCardanoNode() as unknown as OgmiosCardanoNode;
       config = { listen: { port } };
       networkInfoProvider = new DbSyncNetworkInfoProvider(
         { cardanoNodeConfigPath },
         { cache, cardanoNode, db: dbConnection, epochMonitor, logger }
       );
       service = new NetworkInfoHttpService({ logger, networkInfoProvider });
-      httpServer = new HttpServer(config, { logger, services: [service] });
+      httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
       clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
       provider = networkInfoHttpProvider(clientConfig);
     });

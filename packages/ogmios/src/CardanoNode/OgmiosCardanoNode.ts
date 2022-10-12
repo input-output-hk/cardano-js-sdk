@@ -17,7 +17,7 @@ import {
   getServerHealth
 } from '@cardano-ogmios/client';
 import { Logger } from 'ts-log';
-import { contextLogger } from '@cardano-sdk/util';
+import { RunnableModule, contextLogger } from '@cardano-sdk/util';
 import { createInteractionContextWithLogger } from '../util';
 import { mapEraSummary } from './mappers';
 
@@ -28,13 +28,14 @@ type CardanoNodeState = 'initialized' | 'initializing' | null;
  *
  * @class OgmiosCardanoNode
  */
-export class OgmiosCardanoNode implements CardanoNode {
+export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
   #stateQueryClient: StateQuery.StateQueryClient;
   #logger: Logger;
   #state: CardanoNodeState;
   #connectionConfig: ConnectionConfig;
 
   constructor(connectionConfig: ConnectionConfig, logger: Logger) {
+    super('OgmiosCardanoNode', logger);
     this.#logger = contextLogger(logger, 'OgmiosCardanoNode');
     this.#state = null;
     this.#connectionConfig = connectionConfig;
@@ -125,5 +126,17 @@ export class OgmiosCardanoNode implements CardanoNode {
       }
       throw new ProviderError(ProviderFailure.Unknown, error);
     }
+  }
+
+  async initializeImpl(): Promise<void> {
+    await this.initialize();
+  }
+
+  async shutdownImpl(): Promise<void> {
+    await this.shutdown();
+  }
+
+  async startImpl(): Promise<void> {
+    return Promise.resolve();
   }
 }

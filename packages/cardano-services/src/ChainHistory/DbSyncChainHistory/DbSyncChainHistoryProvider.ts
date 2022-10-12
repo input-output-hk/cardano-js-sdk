@@ -4,6 +4,7 @@ import { BlockModel, BlockOutputModel, TipModel, TxInputModel, TxModel, TxOutput
 import {
   BlocksByIdsArgs,
   Cardano,
+  CardanoNode,
   ChainHistoryProvider,
   Paginated,
   ProviderError,
@@ -22,16 +23,15 @@ import { hexStringToBuffer } from '@cardano-sdk/util';
 import { mapBlock, mapTxAlonzo, mapTxIn, mapTxInModel, mapTxOut, mapTxOutModel } from './mappers';
 import orderBy from 'lodash/orderBy';
 import uniq from 'lodash/uniq';
-
 export interface ChainHistoryProviderProps {
   paginationPageSizeLimit: number;
 }
 export interface ChainHistoryProviderDependencies {
   db: Pool;
+  cardanoNode: CardanoNode;
   metadataService: MetadataService;
   logger: Logger;
 }
-
 export class DbSyncChainHistoryProvider extends DbSyncProvider() implements ChainHistoryProvider {
   #paginationPageSizeLimit: number;
   #builder: ChainHistoryBuilder;
@@ -40,11 +40,11 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
 
   constructor(
     { paginationPageSizeLimit }: ChainHistoryProviderProps,
-    { db, metadataService, logger }: ChainHistoryProviderDependencies
+    { db, cardanoNode, metadataService, logger }: ChainHistoryProviderDependencies
   ) {
-    super(db);
-    this.#builder = new ChainHistoryBuilder(db, logger);
+    super(db, cardanoNode);
     this.#logger = logger;
+    this.#builder = new ChainHistoryBuilder(db, logger);
     this.#metadataService = metadataService;
     this.#paginationPageSizeLimit = paginationPageSizeLimit;
   }

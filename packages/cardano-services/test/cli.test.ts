@@ -25,7 +25,6 @@ const CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE = 'cannot be used with environment 
 const METRICS_ENDPOINT_LABEL_RESPONSE = 'http_request_duration_seconds duration histogram of http responses';
 
 const exePath = path.join(__dirname, '..', 'dist', 'cjs', 'cli.js');
-const cardanoNodeDependantServices = new Set([ServiceNames.NetworkInfo, ServiceNames.TxSubmit]);
 
 const assertServiceHealthy = async (apiUrl: string, serviceName: ServiceNames, usedQueue?: boolean) => {
   await serverReady(apiUrl);
@@ -42,8 +41,7 @@ const assertServiceHealthy = async (apiUrl: string, serviceName: ServiceNames, u
     },
     ok: true
   };
-  const healthCheckResponse =
-    cardanoNodeDependantServices.has(serviceName) && !usedQueue ? responseWithServiceState : { ok: true };
+  const healthCheckResponse = usedQueue ? { ok: true } : responseWithServiceState;
 
   expect(res.status).toBe(200);
   expect(res.data).toEqual(healthCheckResponse);
@@ -416,6 +414,12 @@ describe('CLI', () => {
           });
 
           describe('with provided static config', () => {
+            beforeEach(async () => {
+              ogmiosServer = createHealthyMockOgmiosServer();
+              await listenPromise(ogmiosServer, { port: ogmiosConnection.port });
+              await ogmiosServerReady(ogmiosConnection);
+            });
+
             it('exposes a HTTP server when using CLI options', async () => {
               proc = fork(
                 exePath,
@@ -423,6 +427,8 @@ describe('CLI', () => {
                   ...baseArgs,
                   '--api-url',
                   apiUrl,
+                  '--ogmios-url',
+                  ogmiosConnection.address.webSocket,
                   '--postgres-db',
                   postgresDb,
                   '--postgres-user',
@@ -449,6 +455,7 @@ describe('CLI', () => {
                 env: {
                   API_URL: apiUrl,
                   LOGGER_MIN_SEVERITY: 'error',
+                  OGMIOS_URL: ogmiosConnection.address.webSocket,
                   POSTGRES_DB: postgresDb,
                   POSTGRES_HOST: postgresHost,
                   POSTGRES_PASSWORD: postgresPassword,
@@ -1191,70 +1198,157 @@ describe('CLI', () => {
               );
             });
           });
-        });
 
-        describe('specifying a Token-Registry-dependent service', () => {
-          let closeMock: () => Promise<void> = jest.fn();
-          let tokenMetadataServerUrl = '';
-          const record = {
-            name: { value: 'test' },
-            subject: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65'
-          };
+          describe('specifying ssl ca file path that does not exist', () => {
+            const invalidFilePath = 'this-is-not-a-valid-file-path';
 
-          beforeAll(async () => {
-            ({ closeMock, tokenMetadataServerUrl } = await mockTokenRegistry(() => ({ body: { subjects: [record] } })));
+            it('exits with code 1 when using CLI options', (done) => {
+              callCliAndAssertExit(
+                {
+                  args: [
+                    '--ogmios-url',
+                    ogmiosConnection.address.webSocket,
+                    '--postgres-connection-string',
+                    postgresConnectionString,
+                    '--cardano-node-config-path',
+                    cardanoNodeConfigPath,
+                    '--postgres-ssl-ca-file',
+                    invalidFilePath,
+                    '--service-names',
+                    ServiceNames.NetworkInfo
+                  ],
+                  dataMatchOnError: 'ENOENT: no such file or directory'
+                },
+                done
+              );
+            });
+
+            it('exits with code 1 when using env variables', (done) => {
+              callCliAndAssertExit(
+                {
+                  dataMatchOnError: 'ENOENT: no such file or directory',
+                  env: {
+                    API_URL: apiUrl,
+                    CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
+                    OGMIOS_URL: ogmiosConnection.address.webSocket,
+                    POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                    POSTGRES_SSL_CA_FILE: invalidFilePath,
+                    SERVICE_NAMES: ServiceNames.NetworkInfo
+                  }
+                },
+                done
+              );
+            });
           });
 
-          afterAll(async () => await closeMock());
-
-          it('exposes a HTTP server with healthy state when using CLI options', async () => {
-            proc = fork(
-              exePath,
-              [
-                ...baseArgs,
-                '--api-url',
-                apiUrl,
-                '--postgres-connection-string',
-                postgresConnectionString,
-                '--token-metadata-server-url',
-                tokenMetadataServerUrl,
-                ServiceNames.Asset
-              ],
-              { env: {}, stdio: 'pipe' }
-            );
-
-            await assertServiceHealthy(apiUrl, ServiceNames.Asset);
-
-            const res = await axios.post(`${apiUrl}/asset/get-asset`, {
-              assetId: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65',
-              extraData: { tokenMetadata: true }
+          describe('specifying ssl ca file path to an invalid cert', () => {
+            it('exits with code 1 when using CLI options', (done) => {
+              callCliAndAssertExit(
+                {
+                  args: [
+                    '--postgres-connection-string',
+                    postgresConnectionString,
+                    '--ogmios-url',
+                    ogmiosConnection.address.webSocket,
+                    '--cardano-node-config-path',
+                    cardanoNodeConfigPath,
+                    '--postgres-ssl-ca-file',
+                    postgresSslCaFile,
+                    '--service-names',
+                    ServiceNames.NetworkInfo
+                  ],
+                  dataMatchOnError: 'The server does not support SSL connections'
+                },
+                done
+              );
             });
 
-            const { tokenMetadata } = fromSerializableObject(res.data);
-            expect(tokenMetadata).toStrictEqual({ name: 'test' });
+            it('exits with code 1 when using env variables', (done) => {
+              callCliAndAssertExit(
+                {
+                  dataMatchOnError: 'The server does not support SSL connections',
+                  env: {
+                    API_URL: apiUrl,
+                    CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
+                    OGMIOS_URL: ogmiosConnection.address.webSocket,
+                    POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                    POSTGRES_SSL_CA_FILE: postgresSslCaFile,
+                    SERVICE_NAMES: ServiceNames.NetworkInfo
+                  }
+                },
+                done
+              );
+            });
           });
 
-          it('exposes a HTTP server with healthy state when using env variables', async () => {
-            proc = fork(exePath, ['start-server'], {
-              env: {
-                API_URL: apiUrl,
-                LOGGER_MIN_SEVERITY: 'error',
-                POSTGRES_CONNECTION_STRING: postgresConnectionString,
-                SERVICE_NAMES: ServiceNames.Asset,
-                TOKEN_METADATA_SERVER_URL: tokenMetadataServerUrl
-              },
-              stdio: 'pipe'
+          describe('specifying a Token-Registry-dependent service', () => {
+            let closeMock: () => Promise<void> = jest.fn();
+            let tokenMetadataServerUrl = '';
+            const record = {
+              name: { value: 'test' },
+              subject: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65'
+            };
+
+            beforeAll(async () => {
+              ({ closeMock, tokenMetadataServerUrl } = await mockTokenRegistry(() => ({
+                body: { subjects: [record] }
+              })));
             });
 
-            await assertServiceHealthy(apiUrl, ServiceNames.Asset);
+            afterAll(async () => await closeMock());
 
-            const res = await axios.post(`${apiUrl}/asset/get-asset`, {
-              assetId: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65',
-              extraData: { tokenMetadata: true }
+            it('exposes a HTTP server with healthy state when using CLI options', async () => {
+              proc = fork(
+                exePath,
+                [
+                  ...baseArgs,
+                  '--api-url',
+                  apiUrl,
+                  '--ogmios-url',
+                  ogmiosConnection.address.webSocket,
+                  '--postgres-connection-string',
+                  postgresConnectionString,
+                  '--token-metadata-server-url',
+                  tokenMetadataServerUrl,
+                  ServiceNames.Asset
+                ],
+                { env: {}, stdio: 'pipe' }
+              );
+
+              await assertServiceHealthy(apiUrl, ServiceNames.Asset);
+
+              const res = await axios.post(`${apiUrl}/asset/get-asset`, {
+                assetId: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65',
+                extraData: { tokenMetadata: true }
+              });
+
+              const { tokenMetadata } = fromSerializableObject(res.data);
+              expect(tokenMetadata).toStrictEqual({ name: 'test' });
             });
 
-            const { tokenMetadata } = fromSerializableObject(res.data);
-            expect(tokenMetadata).toStrictEqual({ name: 'test' });
+            it('exposes a HTTP server with healthy state when using env variables', async () => {
+              proc = fork(exePath, ['start-server'], {
+                env: {
+                  API_URL: apiUrl,
+                  LOGGER_MIN_SEVERITY: 'error',
+                  OGMIOS_URL: ogmiosConnection.address.webSocket,
+                  POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                  SERVICE_NAMES: ServiceNames.Asset,
+                  TOKEN_METADATA_SERVER_URL: tokenMetadataServerUrl
+                },
+                stdio: 'pipe'
+              });
+
+              await assertServiceHealthy(apiUrl, ServiceNames.Asset);
+
+              const res = await axios.post(`${apiUrl}/asset/get-asset`, {
+                assetId: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65',
+                extraData: { tokenMetadata: true }
+              });
+
+              const { tokenMetadata } = fromSerializableObject(res.data);
+              expect(tokenMetadata).toStrictEqual({ name: 'test' });
+            });
           });
         });
 
@@ -1460,84 +1554,9 @@ describe('CLI', () => {
           });
         });
       });
-
-      describe('specifying ssl ca file path that does not exist', () => {
-        const invalidFilePath = 'this-is-not-a-valid-file-path';
-
-        it('exits with code 1 when using CLI options', (done) => {
-          callCliAndAssertExit(
-            {
-              args: [
-                '--postgres-connection-string',
-                postgresConnectionString,
-                '--cardano-node-config-path',
-                cardanoNodeConfigPath,
-                '--postgres-ssl-ca-file',
-                invalidFilePath,
-                '--service-names',
-                ServiceNames.NetworkInfo
-              ],
-              dataMatchOnError: 'ENOENT: no such file or directory'
-            },
-            done
-          );
-        });
-
-        it('exits with code 1 when using env variables', (done) => {
-          callCliAndAssertExit(
-            {
-              dataMatchOnError: 'ENOENT: no such file or directory',
-              env: {
-                API_URL: apiUrl,
-                CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
-                POSTGRES_CONNECTION_STRING: postgresConnectionString,
-                POSTGRES_SSL_CA_FILE: invalidFilePath,
-                SERVICE_NAMES: ServiceNames.NetworkInfo
-              }
-            },
-            done
-          );
-        });
-      });
-
-      describe('specifying ssl ca file path to an invalid cert', () => {
-        it('exits with code 1 when using CLI options', (done) => {
-          callCliAndAssertExit(
-            {
-              args: [
-                '--postgres-connection-string',
-                postgresConnectionString,
-                '--cardano-node-config-path',
-                cardanoNodeConfigPath,
-                '--postgres-ssl-ca-file',
-                postgresSslCaFile,
-                '--service-names',
-                ServiceNames.NetworkInfo
-              ],
-              dataMatchOnError: 'The server does not support SSL connections'
-            },
-            done
-          );
-        });
-
-        it('exits with code 1 when using env variables', (done) => {
-          callCliAndAssertExit(
-            {
-              dataMatchOnError: 'The server does not support SSL connections',
-              env: {
-                API_URL: apiUrl,
-                CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
-                POSTGRES_CONNECTION_STRING: postgresConnectionString,
-                POSTGRES_SSL_CA_FILE: postgresSslCaFile,
-                SERVICE_NAMES: ServiceNames.NetworkInfo
-              }
-            },
-            done
-          );
-        });
-      });
     });
   });
+
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('start-worker', () => {
     let commonArgs: string[];
