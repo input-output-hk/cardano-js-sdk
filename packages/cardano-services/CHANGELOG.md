@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.16](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.15...@cardano-sdk/cardano-services@0.6.0-nightly.16) (2022-10-13)
+
+
+### Bug Fixes
+
+* **cardano-services:** fixed an issue that was causing live stake and saturation values to be calculated incorrectly ([5e714e2](https://github.com/input-output-hk/cardano-js-sdk/commit/5e714e2c5af5a2761389cff8ca24b068252216b8))
+
+
+
 ## [0.6.0-nightly.15](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.14...@cardano-sdk/cardano-services@0.6.0-nightly.15) (2022-10-11)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services

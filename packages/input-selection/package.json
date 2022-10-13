@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/input-selection",
-  "version": "0.6.0-nightly.5",
+  "version": "0.6.0-nightly.6",
   "description": "TypeScript definitions for input-selection (Coin Selection Algorithms for Cardano)",
   "engines": {
     "node": "^14"
@@ -51,7 +51,7 @@
     "test:debug": "DEBUG=true yarn test"
   },
   "devDependencies": {
-    "@cardano-sdk/util-dev": "^0.5.0-nightly.13",
+    "@cardano-sdk/util-dev": "^0.5.0-nightly.14",
     "@types/lodash": "^4.14.182",
     "eslint": "^7.32.0",
     "fast-check": "^2.17.0",
@@ -63,7 +63,7 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "@cardano-sdk/core": "^0.6.0-nightly.13",
+    "@cardano-sdk/core": "^0.6.0-nightly.14",
     "@cardano-sdk/util": "^0.6.0-nightly.3",
     "lodash": "^4.17.21",
     "ts-custom-error": "^3.2.0"
