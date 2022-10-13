@@ -1317,16 +1317,20 @@ exports[`StakePoolBuilder queryPoolMetrics pagination with limit 1`] = `
 Array [
   Object {
     "activeStake": 0n,
+    "activeStakePercentage": 0,
     "blocksCreated": "0",
     "delegators": "1",
     "livePledge": 999999828559n,
+    "liveStake": 999999828559n,
     "saturation": 0.011898674769756331,
   },
   Object {
     "activeStake": 2986376991n,
+    "activeStakePercentage": 6.02744522378192,
     "blocksCreated": "0",
     "delegators": "1",
     "livePledge": 495463149n,
+    "liveStake": 495463149n,
     "saturation": 0.00004142929052882185,
   },
 ]
@@ -1336,16 +1340,20 @@ exports[`StakePoolBuilder queryPoolMetrics pagination with startAt 1`] = `
 Array [
   Object {
     "activeStake": 2986376991n,
+    "activeStakePercentage": 6.02744522378192,
     "blocksCreated": "0",
     "delegators": "1",
     "livePledge": 495463149n,
+    "liveStake": 495463149n,
     "saturation": 0.00004142929052882185,
   },
   Object {
     "activeStake": 1614945000n,
+    "activeStakePercentage": 0,
     "blocksCreated": "0",
     "delegators": "0",
     "livePledge": 497325000n,
+    "liveStake": 0n,
     "saturation": 0.00001921570862040444,
   },
 ]
@@ -1355,23 +1363,29 @@ exports[`StakePoolBuilder queryPoolMetrics sort by default sort 1`] = `
 Array [
   Object {
     "activeStake": 0n,
+    "activeStakePercentage": 0,
     "blocksCreated": "0",
     "delegators": "1",
     "livePledge": 999999828559n,
+    "liveStake": 999999828559n,
     "saturation": 0.011898674769756331,
   },
   Object {
     "activeStake": 2986376991n,
+    "activeStakePercentage": 6.02744522378192,
     "blocksCreated": "0",
     "delegators": "1",
     "livePledge": 495463149n,
+    "liveStake": 495463149n,
     "saturation": 0.00004142929052882185,
   },
   Object {
     "activeStake": 1614945000n,
+    "activeStakePercentage": 0,
     "blocksCreated": "0",
     "delegators": "0",
     "livePledge": 497325000n,
+    "liveStake": 0n,
     "saturation": 0.00001921570862040444,
   },
 ]
@@ -1381,23 +1395,29 @@ exports[`StakePoolBuilder queryPoolMetrics sort by saturation 1`] = `
 Array [
   Object {
     "activeStake": 1614945000n,
+    "activeStakePercentage": 0,
     "blocksCreated": "0",
     "delegators": "0",
     "livePledge": 497325000n,
+    "liveStake": 0n,
     "saturation": 0.00001921570862040444,
   },
   Object {
     "activeStake": 2986376991n,
+    "activeStakePercentage": 6.02744522378192,
     "blocksCreated": "0",
     "delegators": "1",
     "livePledge": 495463149n,
+    "liveStake": 495463149n,
     "saturation": 0.00004142929052882185,
   },
   Object {
     "activeStake": 0n,
+    "activeStakePercentage": 0,
     "blocksCreated": "0",
     "delegators": "1",
     "livePledge": 999999828559n,
+    "liveStake": 999999828559n,
     "saturation": 0.011898674769756331,
   },
 ]

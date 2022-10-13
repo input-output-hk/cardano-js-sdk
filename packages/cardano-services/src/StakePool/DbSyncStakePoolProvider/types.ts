@@ -141,6 +141,8 @@ export interface PoolMetrics extends CommonPoolInfo {
     blocksCreated: number;
     livePledge: Cardano.Lovelace;
     activeStake: Cardano.Lovelace;
+    liveStake: Cardano.Lovelace;
+    activeStakePercentage: Cardano.Percent;
     saturation: Cardano.Percent;
     delegators: number;
   };

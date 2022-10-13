@@ -226,10 +226,10 @@ SELECT
       )::numeric
   END AS saturation,
   CASE
-    WHEN (COALESCE(a_stake.active_stake,0)+COALESCE(l_stake.live_stake,0))::numeric = 0::numeric
+    WHEN (COALESCE(l_stake.live_stake,0))::numeric = 0::numeric
     THEN 0::numeric
     ELSE
-    (COALESCE(a_stake.active_stake,0)/(COALESCE(a_stake.active_stake,0)+COALESCE(l_stake.live_stake,0))) 
+    (COALESCE(a_stake.active_stake,0)/COALESCE(l_stake.live_stake,0))
   END AS active_stake_percentage,
   ph.id AS pool_hash_id 
 FROM pool_hash ph
