@@ -1,6 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-len */
+import { BlockNoModel, findLastBlockNo } from '../../src/util/DbSyncProvider';
 import {
   Cardano,
   ProviderError,
@@ -17,9 +18,9 @@ import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../src/InMemoryCache';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
+import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
 import { ingestDbData, sleep, wrapWithTransaction } from '../util';
 import { logger } from '@cardano-sdk/util-dev';
-import { mockCardanoNode, responseWithServiceState } from '../../../core/test/CardanoNode/mocks';
 import axios from 'axios';
 
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
@@ -69,6 +70,7 @@ describe('StakePoolHttpService', () => {
   let config: HttpServerConfig;
   let provider: StakePoolProvider;
   let cardanoNode: OgmiosCardanoNode;
+  let lastBlockNoInDb: Cardano.BlockNo;
 
   const epochPollInterval = 2 * 1000;
   const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
@@ -110,7 +112,10 @@ describe('StakePoolHttpService', () => {
     const clearCacheSpy = jest.spyOn(cache, 'clear');
 
     beforeAll(async () => {
-      cardanoNode = mockCardanoNode() as unknown as OgmiosCardanoNode;
+      lastBlockNoInDb = (await db.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no;
+      cardanoNode = mockCardanoNode(
+        healthCheckResponseMock({ blockNo: lastBlockNoInDb })
+      ) as unknown as OgmiosCardanoNode;
       stakePoolProvider = new DbSyncStakePoolProvider(
         { paginationPageSizeLimit: pagination.limit },
         { cache, cardanoNode, db, epochMonitor, logger }
@@ -151,12 +156,12 @@ describe('StakePoolHttpService', () => {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual(responseWithServiceState);
+        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
       });
 
       it('forwards the stakePoolProvider health response with provider client', async () => {
         const response = await provider.healthCheck();
-        expect(response).toEqual(responseWithServiceState);
+        expect(response).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
       });
     });
 

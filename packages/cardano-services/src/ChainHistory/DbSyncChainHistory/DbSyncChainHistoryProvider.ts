@@ -14,7 +14,7 @@ import {
 } from '@cardano-sdk/core';
 import { ChainHistoryBuilder } from './ChainHistoryBuilder';
 import { DB_MAX_SAFE_INTEGER } from './queries';
-import { DbSyncProvider } from '../../DbSyncProvider';
+import { DbSyncProvider } from '../../util/DbSyncProvider';
 import { Logger } from 'ts-log';
 import { MetadataService } from '../../Metadata';
 import { Pool, QueryResult } from 'pg';

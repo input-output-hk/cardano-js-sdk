@@ -1,5 +1,5 @@
 import { Cardano, CardanoNode, UtxoByAddressesArgs, UtxoProvider } from '@cardano-sdk/core';
-import { DbSyncProvider } from '../../DbSyncProvider';
+import { DbSyncProvider } from '../../util/DbSyncProvider';
 import { Logger } from 'ts-log';
 import { Pool } from 'pg';
 import { UtxoBuilder } from './UtxoBuilder';

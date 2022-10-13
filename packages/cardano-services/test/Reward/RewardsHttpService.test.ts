@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-len */
+import { BlockNoModel, findLastBlockNo } from '../../src/util/DbSyncProvider';
 import { Cardano, ProviderError, ProviderFailure, RewardsProvider } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, rewardsHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { DbSyncRewardsProvider, HttpServer, HttpServerConfig, RewardsHttpService } from '../../src';
@@ -7,8 +8,8 @@ import { INFO, createLogger } from 'bunyan';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
+import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
 import { dummyLogger as logger } from 'ts-log';
-import { mockCardanoNode, responseWithServiceState } from '../../../core/test/CardanoNode/mocks';
 import axios from 'axios';
 
 const APPLICATION_JSON = 'application/json';
@@ -26,6 +27,7 @@ describe('RewardsHttpService', () => {
   let config: HttpServerConfig;
   let cardanoNode: OgmiosCardanoNode;
   let provider: RewardsProvider;
+  let lastBlockNoInDb: Cardano.BlockNo;
 
   beforeAll(async () => {
     port = await getPort();
@@ -58,7 +60,10 @@ describe('RewardsHttpService', () => {
 
   describe('healthy state', () => {
     beforeAll(async () => {
-      cardanoNode = mockCardanoNode() as unknown as OgmiosCardanoNode;
+      lastBlockNoInDb = (await dbConnection.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no;
+      cardanoNode = mockCardanoNode(
+        healthCheckResponseMock({ blockNo: lastBlockNoInDb })
+      ) as unknown as OgmiosCardanoNode;
       rewardsProvider = new DbSyncRewardsProvider(
         { paginationPageSizeLimit: 5 },
         { cardanoNode, db: dbConnection, logger }
@@ -78,12 +83,12 @@ describe('RewardsHttpService', () => {
       it('forwards the rewardsProvider health response with HTTP request', async () => {
         const res = await axios.post(`${baseUrl}/health`, {}, { headers: { 'Content-Type': APPLICATION_JSON } });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual(responseWithServiceState);
+        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
       });
 
       it('forwards the rewardsProvider health response with provider client', async () => {
         const response = await provider.healthCheck();
-        expect(response).toEqual(responseWithServiceState);
+        expect(response).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
       });
     });
 

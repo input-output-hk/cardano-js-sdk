@@ -8,7 +8,7 @@ import {
   StakeSummary,
   SupplySummary
 } from '@cardano-sdk/core';
-import { DbSyncProvider } from '../../DbSyncProvider';
+import { DbSyncProvider } from '../../util/DbSyncProvider';
 import { Disposer, EpochMonitor } from '../../util/polling/types';
 import { GenesisData } from './types';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../InMemoryCache';

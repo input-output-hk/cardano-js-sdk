@@ -3,6 +3,7 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { BlockNoModel, findLastBlockNo } from '../../src/util/DbSyncProvider';
 import { Cardano, ChainHistoryProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider, HttpServer, HttpServerConfig } from '../../src';
 import { CreateHttpProviderConfig, chainHistoryHttpProvider } from '@cardano-sdk/cardano-services-client';
@@ -11,8 +12,8 @@ import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { createDbSyncMetadataService } from '../../src/Metadata';
 import { getPort } from 'get-port-please';
+import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
 import { dummyLogger as logger } from 'ts-log';
-import { mockCardanoNode, responseWithServiceState } from '../../../core/test/CardanoNode/mocks';
 import axios from 'axios';
 
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
@@ -31,6 +32,7 @@ describe('ChainHistoryHttpService', () => {
   let config: HttpServerConfig;
   let provider: ChainHistoryProvider;
   let cardanoNode: OgmiosCardanoNode;
+  let lastBlockNoInDb: Cardano.BlockNo;
 
   beforeAll(async () => {
     port = await getPort();
@@ -65,7 +67,10 @@ describe('ChainHistoryHttpService', () => {
   describe('healthy state', () => {
     beforeAll(async () => {
       const metadataService = createDbSyncMetadataService(dbConnection, logger);
-      cardanoNode = mockCardanoNode() as unknown as OgmiosCardanoNode;
+      lastBlockNoInDb = (await dbConnection.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no;
+      cardanoNode = mockCardanoNode(
+        healthCheckResponseMock({ blockNo: lastBlockNoInDb })
+      ) as unknown as OgmiosCardanoNode;
       chainHistoryProvider = new DbSyncChainHistoryProvider(
         { paginationPageSizeLimit: PAGINATION_PAGE_SIZE_LIMIT },
         { cardanoNode, db: dbConnection, logger, metadataService }
@@ -88,12 +93,12 @@ describe('ChainHistoryHttpService', () => {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual(responseWithServiceState);
+        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
       });
 
       it('forwards the chainHistoryProvider health response with provider client', async () => {
         const response = await provider.healthCheck();
-        expect(response).toEqual(responseWithServiceState);
+        expect(response).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
       });
     });
 

@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable max-len */
-import { Cardano, HealthCheckResponse, TxSubmitProvider } from '@cardano-sdk/core';
+import { Cardano, TxSubmitProvider } from '@cardano-sdk/core';
 import { Connection } from '@cardano-ogmios/client';
 import { DbSyncEpochPollService, listenPromise, serverClosePromise } from '../../../src/util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../../src/NetworkInfo';
@@ -22,6 +22,7 @@ import { bufferToHexString } from '@cardano-sdk/util';
 import { createHealthyMockOgmiosServer, ogmiosServerReady } from '../../util';
 import { createMockOgmiosServer } from '../../../../ogmios/test/mocks/mockOgmiosServer';
 import { getPort, getRandomPort } from 'get-port-please';
+import { healthCheckResponseMock } from '../../../../core/test/CardanoNode/mocks';
 import { dummyLogger as logger } from 'ts-log';
 import { types } from 'util';
 import axios from 'axios';
@@ -46,17 +47,6 @@ describe('Service dependency abstractions', () => {
   const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
   const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
-  const responseWithServiceState: HealthCheckResponse = {
-    localNode: {
-      ledgerTip: {
-        blockNo: 3_391_731,
-        hash: '9ef43ab6e234fcf90d103413096c7da752da2f45b15e1259f43d476afd12932c',
-        slot: 52_819_355
-      },
-      networkSync: 0.999
-    },
-    ok: true
-  };
 
   describe('Ogmios-dependant services with service discovery', () => {
     let apiUrlBase: string;
@@ -111,7 +101,7 @@ describe('Service dependency abstractions', () => {
             headers: { 'Content-Type': APPLICATION_JSON }
           });
           expect(res.status).toBe(200);
-          expect(res.data).toEqual(responseWithServiceState);
+          expect(res.data).toEqual(healthCheckResponseMock());
         });
       });
 
@@ -161,7 +151,7 @@ describe('Service dependency abstractions', () => {
             headers: { 'Content-Type': APPLICATION_JSON }
           });
           expect(res.status).toBe(200);
-          expect(res.data).toEqual(responseWithServiceState);
+          expect(res.data).toEqual(healthCheckResponseMock());
         });
       });
     });
@@ -220,7 +210,7 @@ describe('Service dependency abstractions', () => {
             headers: { 'Content-Type': APPLICATION_JSON }
           });
           expect(res.status).toBe(200);
-          expect(res.data).toEqual(responseWithServiceState);
+          expect(res.data).toEqual(healthCheckResponseMock());
         });
       });
 
@@ -268,7 +258,7 @@ describe('Service dependency abstractions', () => {
             headers: { 'Content-Type': APPLICATION_JSON }
           });
           expect(res.status).toBe(200);
-          expect(res.data).toEqual(responseWithServiceState);
+          expect(res.data).toEqual(healthCheckResponseMock());
         });
       });
     });
@@ -326,7 +316,7 @@ describe('Service dependency abstractions', () => {
         ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
       });
 
-      await expect(provider.healthCheck()).resolves.toEqual(responseWithServiceState);
+      await expect(provider.healthCheck()).resolves.toEqual(healthCheckResponseMock());
     });
   });
 

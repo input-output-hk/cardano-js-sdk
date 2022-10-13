@@ -1,7 +1,7 @@
-import { CardanoNode, HealthCheckResponse, Provider } from '@cardano-sdk/core';
+import { BlockNoModel, DB_BLOCKS_BEHIND_TOLERANCE, DB_MAX_SAFE_INTEGER, findLastBlockNo } from './util';
+import { CardanoNode, HealthCheckResponse, Provider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { Pool } from 'pg';
 
-const HEALTH_CHECK_QUERY = 'SELECT 1';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyArgs = any[];
 export const DbSyncProvider = <
@@ -23,13 +23,23 @@ export const DbSyncProvider = <
     }
 
     public async healthCheck(): Promise<HealthCheckResponse> {
-      // TODO: query block table, get last block minus 5
-      const dbHealthCheck = { ok: !!(await this.db.query(HEALTH_CHECK_QUERY)).rowCount };
-      const cardanoNodeHealthCheck = await this.cardanoNode.healthCheck();
-      return {
-        localNode: cardanoNodeHealthCheck.localNode ?? undefined,
-        ok: dbHealthCheck.ok && cardanoNodeHealthCheck.ok
-      };
+      try {
+        const { ok, localNode } = await this.cardanoNode.healthCheck();
+        const lastBlockNo = (await this.db.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no;
+        const isHealthy =
+          ok && lastBlockNo >= (localNode?.ledgerTip?.blockNo ?? DB_MAX_SAFE_INTEGER) - DB_BLOCKS_BEHIND_TOLERANCE;
+
+        return {
+          localNode,
+          ok: isHealthy
+        };
+      } catch (error) {
+        throw new ProviderError(
+          ProviderFailure.ConnectionFailure,
+          error,
+          'Failed to perform health check against dependencies'
+        );
+      }
     }
   }
 

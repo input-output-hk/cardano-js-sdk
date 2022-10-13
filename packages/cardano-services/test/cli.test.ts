@@ -3,13 +3,13 @@
 /* eslint-disable max-len */
 import { BAD_CONNECTION_URL } from './TxSubmit/rabbitmq/utils';
 import { ChildProcess, fork } from 'child_process';
-import { HealthCheckResponse } from '@cardano-sdk/core';
 import { Ogmios } from '@cardano-sdk/ogmios';
 import { RabbitMQContainer } from './TxSubmit/rabbitmq/docker';
 import { ServiceNames } from '../src';
 import { createHealthyMockOgmiosServer, createUnhealthyMockOgmiosServer, ogmiosServerReady, serverReady } from './util';
 import { fromSerializableObject } from '@cardano-sdk/util';
 import { getRandomPort } from 'get-port-please';
+import { healthCheckResponseMock } from '../../core/test/CardanoNode/mocks';
 import { listenPromise, serverClosePromise } from '../src/util';
 import { logger } from '@cardano-sdk/util-dev';
 import { mockTokenRegistry } from './Asset/CardanoTokenRegistry.test';
@@ -30,18 +30,8 @@ const assertServiceHealthy = async (apiUrl: string, serviceName: ServiceNames, u
   await serverReady(apiUrl);
   const headers = { 'Content-Type': 'application/json' };
   const res = await axios.post(`${apiUrl}/${serviceName}/health`, { headers });
-  const responseWithServiceState: HealthCheckResponse = {
-    localNode: {
-      ledgerTip: {
-        blockNo: 3_391_731,
-        hash: '9ef43ab6e234fcf90d103413096c7da752da2f45b15e1259f43d476afd12932c',
-        slot: 52_819_355
-      },
-      networkSync: 0.999
-    },
-    ok: true
-  };
-  const healthCheckResponse = usedQueue ? { ok: true } : responseWithServiceState;
+
+  const healthCheckResponse = usedQueue ? { ok: true } : healthCheckResponseMock();
 
   expect(res.status).toBe(200);
   expect(res.data).toEqual(healthCheckResponse);

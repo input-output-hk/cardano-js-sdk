@@ -9,7 +9,7 @@ import {
   StakePoolStats
 } from '@cardano-sdk/core';
 import { CommonPoolInfo, OrderedResult, PoolAPY, PoolData, PoolMetrics, PoolSortType, PoolUpdate } from './types';
-import { DbSyncProvider } from '../../DbSyncProvider';
+import { DbSyncProvider } from '../../util/DbSyncProvider';
 import { Disposer, EpochMonitor } from '../../util/polling/types';
 import { IDS_NAMESPACE, StakePoolsSubQuery, emptyPoolsExtraInfo, getStakePoolSortType, queryCacheKey } from './util';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../InMemoryCache';

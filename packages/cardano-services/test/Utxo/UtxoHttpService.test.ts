@@ -1,4 +1,5 @@
 /* eslint-disable max-len */
+import { BlockNoModel, findLastBlockNo } from '../../src/util/DbSyncProvider';
 import { Cardano, ProviderError, ProviderFailure, UtxoProvider } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, utxoHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { DbSyncUtxoProvider, HttpServer, HttpServerConfig, UtxoHttpService } from '../../src';
@@ -6,8 +7,8 @@ import { INFO, createLogger } from 'bunyan';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
+import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
 import { dummyLogger as logger } from 'ts-log';
-import { mockCardanoNode, responseWithServiceState } from '../../../core/test/CardanoNode/mocks';
 import axios from 'axios';
 
 const APPLICATION_JSON = 'application/json';
@@ -26,6 +27,7 @@ describe('UtxoHttpService', () => {
   let config: HttpServerConfig;
   let cardanoNode: OgmiosCardanoNode;
   let provider: UtxoProvider;
+  let lastBlockNoInDb: Cardano.BlockNo;
 
   beforeAll(async () => {
     port = await getPort();
@@ -57,7 +59,10 @@ describe('UtxoHttpService', () => {
 
   describe('healthy state', () => {
     beforeAll(async () => {
-      cardanoNode = mockCardanoNode() as unknown as OgmiosCardanoNode;
+      lastBlockNoInDb = (await dbConnection.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no;
+      cardanoNode = mockCardanoNode(
+        healthCheckResponseMock({ blockNo: lastBlockNoInDb })
+      ) as unknown as OgmiosCardanoNode;
       utxoProvider = new DbSyncUtxoProvider({ cardanoNode, db: dbConnection, logger });
       service = new UtxoHttpService({ logger, utxoProvider });
       provider = utxoHttpProvider(clientConfig);
@@ -71,17 +76,17 @@ describe('UtxoHttpService', () => {
     });
 
     describe('/health', () => {
-      it('forwards the rewardsProvider health response with HTTP request', async () => {
+      it('forwards the utxoProvider health response with HTTP request', async () => {
         const res = await axios.post(`${baseUrl}/health`, undefined, {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual(responseWithServiceState);
+        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
       });
 
-      it('forwards the rewardsProvider health response with provider client', async () => {
+      it('forwards the utxoProvider health response with provider client', async () => {
         const response = await provider.healthCheck();
-        expect(response).toEqual(responseWithServiceState);
+        expect(response).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
       });
     });
 

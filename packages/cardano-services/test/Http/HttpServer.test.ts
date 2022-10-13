@@ -3,14 +3,15 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 
 import { APPLICATION_JSON, CONTENT_TYPE, DbSyncUtxoProvider, HttpServer, HttpService, ServiceNames } from '../../src';
+import { BlockNoModel, findLastBlockNo } from '../../src/util/DbSyncProvider';
+import { Cardano, Provider } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
-import { Provider } from '@cardano-sdk/core';
 import { RunnableModule, fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import { createLogger, logger } from '@cardano-sdk/util-dev';
 import { getRandomPort } from 'get-port-please';
-import { mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
+import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
 import axios from 'axios';
 import express from 'express';
 import net from 'net';
@@ -49,6 +50,7 @@ describe('HttpServer', () => {
   let apiUrlBase: string;
   let provider: Provider;
   let cardanoNode: OgmiosCardanoNode;
+  let lastBlockNoInDb: Cardano.BlockNo;
   const db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
 
   it('Is a runnable module', async () => {
@@ -63,7 +65,10 @@ describe('HttpServer', () => {
   beforeEach(async () => {
     port = await getRandomPort();
     apiUrlBase = `http://localhost:${port}`;
-    cardanoNode = mockCardanoNode() as unknown as OgmiosCardanoNode;
+    lastBlockNoInDb = (await db.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no;
+    cardanoNode = mockCardanoNode(
+      healthCheckResponseMock({ blockNo: lastBlockNoInDb })
+    ) as unknown as OgmiosCardanoNode;
     provider = new DbSyncUtxoProvider({ cardanoNode, db, logger });
   });
 

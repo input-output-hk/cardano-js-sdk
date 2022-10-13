@@ -9,14 +9,15 @@ import {
   TokenMetadataService
 } from '../../src';
 import { AssetProvider, Cardano } from '@cardano-sdk/core';
+import { BlockNoModel, findLastBlockNo } from '../../src/util/DbSyncProvider';
 import { CreateHttpProviderConfig, assetInfoHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { INFO, createLogger } from 'bunyan';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { createDbSyncMetadataService } from '../../src/Metadata';
 import { getPort } from 'get-port-please';
+import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
 import { dummyLogger as logger } from 'ts-log';
-import { mockCardanoNode, responseWithServiceState } from '../../../core/test/CardanoNode/mocks';
 import { mockTokenRegistry } from './CardanoTokenRegistry.test';
 import axios from 'axios';
 
@@ -39,6 +40,7 @@ describe('AssetHttpService', () => {
   let clientConfig: CreateHttpProviderConfig<AssetProvider>;
   let provider: AssetProvider;
   let cardanoNode: OgmiosCardanoNode;
+  let lastBlockNoInDb: Cardano.BlockNo;
 
   beforeAll(async () => {
     port = await getPort();
@@ -56,7 +58,10 @@ describe('AssetHttpService', () => {
         logger,
         metadataService: createDbSyncMetadataService(db, logger)
       });
-      cardanoNode = mockCardanoNode() as unknown as OgmiosCardanoNode;
+      lastBlockNoInDb = (await db.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no;
+      cardanoNode = mockCardanoNode(
+        healthCheckResponseMock({ blockNo: lastBlockNoInDb })
+      ) as unknown as OgmiosCardanoNode;
       tokenMetadataService = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl });
       assetProvider = new DbSyncAssetProvider({ cardanoNode, db, logger, ntfMetadataService, tokenMetadataService });
       service = new AssetHttpService({ assetProvider, logger });
@@ -73,17 +78,17 @@ describe('AssetHttpService', () => {
     });
 
     describe('/health', () => {
-      it('forwards the ChainHistoryProvider health response with HTTP request', async () => {
+      it('forwards the assetProvider health response with HTTP request', async () => {
         const res = await axios.post(`${apiUrlBase}/health`, undefined, {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual(responseWithServiceState);
+        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
       });
 
-      it('forwards the ChainHistoryProvider health response with provider client', async () => {
+      it('forwards the assetProvider health response with provider client', async () => {
         const response = await provider.healthCheck();
-        expect(response).toEqual(responseWithServiceState);
+        expect(response).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
       });
     });
 
