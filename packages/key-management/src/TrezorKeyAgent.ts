@@ -11,6 +11,7 @@ import {
   TrezorConfig
 } from './types';
 import { KeyAgentBase } from './KeyAgentBase';
+import { ManagedFreeableScope } from '@cardano-sdk/util';
 import { txToTrezor } from './util';
 import TrezorConnect, { Features } from 'trezor-connect';
 
@@ -135,9 +136,10 @@ export class TrezorKeyAgent extends KeyAgentBase {
   }
 
   async signTransaction({ body }: Cardano.TxBodyWithHash): Promise<Cardano.Signatures> {
+    const scope = new ManagedFreeableScope();
     try {
       await this.isTrezorInitialized;
-      const cslTxBody = coreToCsl.txBody(body);
+      const cslTxBody = coreToCsl.txBody(scope, body);
       const trezorTxData = await txToTrezor({
         accountIndex: this.accountIndex,
         cslTxBody,
@@ -167,6 +169,8 @@ export class TrezorKeyAgent extends KeyAgentBase {
         throw new AuthenticationError('Transaction signing aborted', error);
       }
       throw transportTypedError(error);
+    } finally {
+      scope.dispose();
     }
   }
 

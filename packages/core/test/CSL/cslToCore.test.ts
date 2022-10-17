@@ -1,23 +1,33 @@
 import { Cardano, coreToCsl, cslToCore } from '../../src';
+import { ManagedFreeableScope } from '@cardano-sdk/util';
 import { NativeScript } from '@emurgo/cardano-serialization-lib-nodejs';
 import { mintTokenMap, tx, txBody, txIn, txInWithAddress, txOut, valueCoinOnly, valueWithAssets } from './testData';
 
 describe('cslToCore', () => {
+  let scope: ManagedFreeableScope;
+
+  beforeEach(() => {
+    scope = new ManagedFreeableScope();
+  });
+
+  afterEach(() => {
+    scope.dispose();
+  });
   describe('value', () => {
     it('coin only', () => {
-      expect(cslToCore.value(coreToCsl.value(valueCoinOnly))).toEqual(valueCoinOnly);
+      expect(cslToCore.value(coreToCsl.value(scope, valueCoinOnly))).toEqual(valueCoinOnly);
     });
     it('cslToCore coin with assets', () => {
-      expect(cslToCore.value(coreToCsl.value(valueWithAssets))).toEqual(valueWithAssets);
+      expect(cslToCore.value(coreToCsl.value(scope, valueWithAssets))).toEqual(valueWithAssets);
     });
   });
 
   describe('txIn', () => {
     it('converts an input', () => {
-      expect(cslToCore.txIn(coreToCsl.txIn(txIn))).toEqual(txIn);
+      expect(cslToCore.txIn(coreToCsl.txIn(scope, txIn))).toEqual(txIn);
     });
     it('doesnt serialize address', () => {
-      expect(cslToCore.txIn(coreToCsl.txIn(txInWithAddress))).toEqual({
+      expect(cslToCore.txIn(coreToCsl.txIn(scope, txInWithAddress))).toEqual({
         ...txInWithAddress,
         address: undefined
       });
@@ -25,25 +35,27 @@ describe('cslToCore', () => {
   });
 
   it('txOut', () => {
-    expect(cslToCore.txOut(coreToCsl.txOut(txOut))).toEqual(txOut);
+    expect(cslToCore.txOut(coreToCsl.txOut(scope, txOut))).toEqual(txOut);
   });
 
   it('utxo', () => {
     const utxo: Cardano.Utxo[] = [[txIn as Cardano.TxIn, txOut]];
-    expect(cslToCore.utxo(coreToCsl.utxo(utxo))).toEqual(utxo);
+    expect(cslToCore.utxo(coreToCsl.utxo(scope, utxo))).toEqual(utxo);
   });
 
   it('txMint', () => {
-    expect(cslToCore.txMint(coreToCsl.txMint(mintTokenMap))).toEqual(mintTokenMap);
+    expect(cslToCore.txMint(coreToCsl.txMint(scope, mintTokenMap))).toEqual(mintTokenMap);
   });
 
   it('NativeScript', () => {
-    const cslScript: NativeScript = NativeScript.from_bytes(
-      Uint8Array.from(
-        Buffer.from(
-          // eslint-disable-next-line max-len
-          '8202828200581cb275b08c999097247f7c17e77007c7010cd19f20cc086ad99d3985388201838205190bb88200581c966e394a544f242081e41d1965137b1bb412ac230d40ed5407821c378204190fa0',
-          'hex'
+    const cslScript: NativeScript = scope.manage(
+      NativeScript.from_bytes(
+        Uint8Array.from(
+          Buffer.from(
+            // eslint-disable-next-line max-len
+            '8202828200581cb275b08c999097247f7c17e77007c7010cd19f20cc086ad99d3985388201838205190bb88200581c966e394a544f242081e41d1965137b1bb412ac230d40ed5407821c378204190fa0',
+            'hex'
+          )
         )
       )
     );
@@ -91,11 +103,11 @@ describe('cslToCore', () => {
   });
 
   it('txBody', () => {
-    expect(cslToCore.txBody(coreToCsl.txBody(txBody))).toEqual(txBody);
+    expect(cslToCore.txBody(scope.manage(coreToCsl.txBody(scope, txBody)))).toEqual(txBody);
   });
 
   it('newTx', () => {
-    expect(cslToCore.newTx(coreToCsl.tx(tx))).toEqual(tx);
+    expect(cslToCore.newTx(scope.manage(coreToCsl.tx(scope, tx)))).toEqual(tx);
   });
 
   it('txWitnessBootstrap', () => {
@@ -113,6 +125,8 @@ describe('cslToCore', () => {
         )
       }
     ];
-    expect(cslToCore.txWitnessBootstrap(coreToCsl.txWitnessBootstrap(bootstrap))).toEqual(bootstrap);
+    expect(cslToCore.txWitnessBootstrap(scope.manage(coreToCsl.txWitnessBootstrap(scope, bootstrap)))).toEqual(
+      bootstrap
+    );
   });
 });
