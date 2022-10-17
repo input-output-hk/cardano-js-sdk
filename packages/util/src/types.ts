@@ -15,3 +15,7 @@ export type DeepPartial<T, O = never> = T extends O | Primitive
   : {
       [P in keyof T]?: DeepPartial<T[P], O>;
     };
+
+export interface Freeable {
+  free: () => void;
+}
