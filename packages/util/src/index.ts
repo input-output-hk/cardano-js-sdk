@@ -1,4 +1,5 @@
 export * from './equals';
+export * from './freeable';
 export * from './types';
 export * from './BigIntMath';
 export * from './hexString';
