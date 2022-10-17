@@ -18,6 +18,7 @@ import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { dummyLogger as logger } from 'ts-log';
 import { of, timer } from 'rxjs';
 import { testAsyncKeyAgent } from '../../../key-management/test/mocks';
+import { usingAutoFree } from '@cardano-sdk/util';
 
 describe('CustomObservableWallet', () => {
   describe('can create an application-specific subset of ObservableWallet interface', () => {
@@ -122,7 +123,7 @@ describe('CustomObservableWallet', () => {
         submitTx(tx: Cardano.NewTxAlonzo) {
           // can use utils from SDK, in this case `coreToCsl.tx`
           // if you want to submit hex-encoded tx, there is also cslToCore.newTx for the reverse
-          const txBytes = Buffer.from(coreToCsl.tx(tx).to_bytes()).toString('hex');
+          const txBytes = Buffer.from(usingAutoFree((scope) => coreToCsl.tx(scope, tx).to_bytes())).toString('hex');
           return submitTxBytesHexString(txBytes);
         }
       };

@@ -18,6 +18,7 @@ import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { CoseLabel } from './util';
 import { STAKE_KEY_DERIVATION_PATH } from '../util';
 import { firstValueFrom } from 'rxjs';
+import { usingAutoFree } from '@cardano-sdk/util';
 
 export interface Cip30SignDataRequest {
   keyAgent: AsyncKeyAgent;
@@ -37,13 +38,14 @@ export class Cip30DataSignError<InnerError = unknown> extends ComposableError<In
   }
 }
 
-const getAddressBytes = (signWith: Cardano.Address | Cardano.RewardAccount) => {
-  const cslAddress = parseCslAddress(signWith.toString());
-  if (!cslAddress) {
-    throw new Cip30DataSignError(Cip30DataSignErrorCode.AddressNotPK, 'Invalid address');
-  }
-  return cslAddress.to_bytes();
-};
+const getAddressBytes = (signWith: Cardano.Address | Cardano.RewardAccount) =>
+  usingAutoFree((scope) => {
+    const cslAddress = parseCslAddress(scope, signWith.toString());
+    if (!cslAddress) {
+      throw new Cip30DataSignError(Cip30DataSignErrorCode.AddressNotPK, 'Invalid address');
+    }
+    return cslAddress.to_bytes();
+  });
 
 const getDerivationPath = async (signWith: Cardano.Address | Cardano.RewardAccount, keyAgent: AsyncKeyAgent) => {
   const isRewardAccount = signWith.startsWith('stake');

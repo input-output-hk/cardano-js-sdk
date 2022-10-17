@@ -1,16 +1,15 @@
 import { CSL } from './CSL';
+import { ManagedFreeableScope } from '@cardano-sdk/util';
 
 /**
  * Parse Cardano address from all Cardano eras and networks
  */
-export const parseCslAddress = (input: string): CSL.Address | null => {
+export const parseCslAddress = (scope: ManagedFreeableScope, input: string): CSL.Address | null => {
   try {
-    return CSL.Address.from_bech32(input);
-  } catch (error: unknown) {
-    // eslint-disable-next-line no-console
-    console.error('CSL failed to parse address', `"${input}"`, error);
+    return scope.manage(CSL.Address.from_bech32(input));
+  } catch {
     try {
-      return CSL.ByronAddress.from_base58(input).to_address();
+      return scope.manage(CSL.ByronAddress.from_base58(input).to_address());
     } catch {
       return null;
     }

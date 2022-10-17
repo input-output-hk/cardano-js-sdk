@@ -16,6 +16,7 @@ import {
 import { CSL, Cardano, coreToCsl, cslToCore } from '@cardano-sdk/core';
 import { InputSelectionError } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
+import { ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
 import { ObservableWallet } from './types';
 import { errors } from '@cardano-sdk/key-management';
 import { firstValueFrom } from 'rxjs';
@@ -83,7 +84,7 @@ export const createWalletApi = (
     try {
       const wallet = await walletReady;
       const value = await firstValueFrom(wallet.balance.utxo.available$);
-      return Buffer.from(coreToCsl.value(value).to_bytes()).toString('hex');
+      return Buffer.from(usingAutoFree((scope) => coreToCsl.value(scope, value).to_bytes())).toString('hex');
     } catch (error) {
       logger.error(error);
       throw error;
@@ -109,40 +110,52 @@ export const createWalletApi = (
       throw new ApiError(500, 'Nope');
     }
   },
+  // eslint-disable-next-line max-statements
   getCollateral: async ({ amount = cslToCbor(MAX_COLLATERAL_AMOUNT) }: { amount?: Cbor } = {}): Promise<
     Cbor[] | null
     // eslint-disable-next-line sonarjs/cognitive-complexity
   > => {
+    const scope = new ManagedFreeableScope();
     logger.debug('getting collateral');
     const wallet = await walletReady;
     let unspendables = (await firstValueFrom(wallet.utxo.unspendable$)).sort(compareUtxos);
-    if (unspendables.some((utxo) => utxo[1].value.assets && utxo[1].value.assets.size > 0))
+    if (unspendables.some((utxo) => utxo[1].value.assets && utxo[1].value.assets.size > 0)) {
+      scope.dispose();
       throw new ApiError(APIErrorCode.Refused, 'unspendable UTxOs must not contain assets when used as collateral');
+    }
     if (amount) {
       try {
-        const filterAmount = CSL.BigNum.from_bytes(Buffer.from(amount, 'hex'));
-        if (filterAmount.compare(MAX_COLLATERAL_AMOUNT) > 0)
+        const filterAmount = scope.manage(CSL.BigNum.from_bytes(Buffer.from(amount, 'hex')));
+        if (filterAmount.compare(MAX_COLLATERAL_AMOUNT) > 0) {
+          scope.dispose();
           throw new ApiError(APIErrorCode.InvalidRequest, 'requested amount is too big');
+        }
+
         const utxos = [];
-        let totalCoins = CSL.BigNum.from_str('0');
+        let totalCoins = scope.manage(CSL.BigNum.from_str('0'));
         for (const utxo of unspendables) {
-          const coin = CSL.BigNum.from_str(utxo[1].value.coins.toString());
+          const coin = scope.manage(CSL.BigNum.from_str(utxo[1].value.coins.toString()));
           totalCoins = totalCoins.checked_add(coin);
           utxos.push(utxo);
           if (totalCoins.compare(filterAmount) !== -1) break;
         }
-        if (totalCoins.compare(filterAmount) === -1)
+        if (totalCoins.compare(filterAmount) === -1) {
+          scope.dispose();
           throw new ApiError(APIErrorCode.Refused, 'not enough coins in configured collateral UTxOs');
+        }
         unspendables = utxos;
       } catch (error) {
         logger.error(error);
+        scope.dispose();
         if (error instanceof ApiError) {
           throw error;
         }
         throw new ApiError(APIErrorCode.InternalError, 'Nope');
       }
     }
-    return coreToCsl.utxo(unspendables).map(cslToCbor);
+    const cbor = coreToCsl.utxo(scope, unspendables).map(cslToCbor);
+    scope.dispose();
+    return cbor;
   },
   getNetworkId: async (): Promise<Cardano.NetworkId> => {
     logger.debug('getting networkId');
@@ -186,11 +199,12 @@ export const createWalletApi = (
     }
   },
   getUtxos: async (amount?: Cbor, paginate?: Paginate): Promise<Cbor[] | undefined> => {
+    const scope = new ManagedFreeableScope();
     const wallet = await walletReady;
     let utxos = await firstValueFrom(wallet.utxo.available$);
     if (amount) {
       try {
-        const filterAmount = CSL.Value.from_bytes(Buffer.from(amount, 'hex'));
+        const filterAmount = scope.manage(CSL.Value.from_bytes(Buffer.from(amount, 'hex')));
         /**
          * Getting UTxOs to meet a required amount is a complex operation,
          * which is handled by input selection capabilities. By initializing
@@ -207,13 +221,16 @@ export const createWalletApi = (
       } catch (error) {
         logger.debug(error);
         const message = error instanceof InputSelectionError ? error.message : 'Nope';
+
+        scope.dispose();
         throw new ApiError(APIErrorCode.Refused, message);
       }
     } else if (paginate) {
       utxos = utxos.slice(paginate.page * paginate.limit, paginate.page * paginate.limit + paginate.limit);
     }
-
-    return coreToCsl.utxo(utxos).map(cslToCbor);
+    const cbor = coreToCsl.utxo(scope, utxos).map(cslToCbor);
+    scope.dispose();
+    return cbor;
   },
   signData: async (addr: Cardano.Address, payload: Bytes): Promise<Cip30DataSignature> => {
     logger.debug('signData');
@@ -238,10 +255,12 @@ export const createWalletApi = (
     throw new DataSignError(DataSignErrorCode.UserDeclined, 'user declined signing');
   },
   signTx: async (tx: Cbor, _partialSign?: Boolean): Promise<Cbor> => {
+    const scope = new ManagedFreeableScope();
     logger.debug('signTx');
-
-    const txDecoded = CSL.TransactionBody.from_bytes(Buffer.from(tx, 'hex'));
-    const hash = Cardano.TransactionId(Buffer.from(CSL.hash_transaction(txDecoded).to_bytes()).toString('hex'));
+    const txDecoded = scope.manage(CSL.TransactionBody.from_bytes(Buffer.from(tx, 'hex')));
+    const hash = Cardano.TransactionId(
+      Buffer.from(scope.manage(CSL.hash_transaction(txDecoded)).to_bytes()).toString('hex')
+    );
     const coreTx = cslToCore.txBody(txDecoded);
     const shouldProceed = await confirmationCallback({
       data: coreTx,
@@ -254,23 +273,27 @@ export const createWalletApi = (
           witness: { signatures }
         } = await wallet.finalizeTx({ tx: { body: coreTx, hash } });
 
-        const cslWitnessSet = coreToCsl.witnessSet({ signatures });
-
-        return Promise.resolve(Buffer.from(cslWitnessSet.to_bytes()).toString('hex'));
+        const cslWitnessSet = scope.manage(coreToCsl.witnessSet(scope, { signatures }));
+        const cbor = Buffer.from(cslWitnessSet.to_bytes()).toString('hex');
+        return Promise.resolve(cbor);
       } catch (error) {
         logger.error(error);
         // TODO: handle ProofGeneration errors?
         const message = error instanceof errors.AuthenticationError ? error.message : 'Nope';
         throw new TxSignError(TxSignErrorCode.UserDeclined, message);
+      } finally {
+        scope.dispose();
       }
     } else {
+      scope.dispose();
       throw new TxSignError(TxSignErrorCode.UserDeclined, 'user declined signing tx');
     }
   },
   submitTx: async (tx: Cbor): Promise<string> => {
     logger.debug('submitting tx');
-    const txDecoded = CSL.Transaction.from_bytes(Buffer.from(tx, 'hex'));
-    const txData: Cardano.NewTxAlonzo = cslToCore.newTx(txDecoded);
+    const txData: Cardano.NewTxAlonzo = usingAutoFree((scope) =>
+      cslToCore.newTx(scope.manage(CSL.Transaction.from_bytes(Buffer.from(tx, 'hex'))))
+    );
     const shouldProceed = await confirmationCallback({
       data: txData,
       type: Cip30ConfirmationCallbackType.SubmitTx

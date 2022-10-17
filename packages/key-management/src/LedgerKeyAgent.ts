@@ -12,6 +12,7 @@ import {
   SignBlobResult
 } from './types';
 import { KeyAgentBase } from './KeyAgentBase';
+import { ManagedFreeableScope } from '@cardano-sdk/util';
 import { txToLedger } from './util';
 import LedgerConnection, { GetVersionResponse, utils } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
@@ -227,8 +228,9 @@ export class LedgerKeyAgent extends KeyAgentBase {
   }
 
   async signTransaction({ body }: Cardano.TxBodyWithHash): Promise<Cardano.Signatures> {
+    const scope = new ManagedFreeableScope();
     try {
-      const cslTxBody = coreToCsl.txBody(body);
+      const cslTxBody = coreToCsl.txBody(scope, body);
       const ledgerTxData = await txToLedger({
         cslTxBody,
         inputResolver: this.inputResolver,
@@ -259,6 +261,8 @@ export class LedgerKeyAgent extends KeyAgentBase {
         throw new AuthenticationError('Transaction signing aborted', error);
       }
       throw transportTypedError(error);
+    } finally {
+      scope.dispose();
     }
   }
 

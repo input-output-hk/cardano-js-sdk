@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 import { CSL, parseCslAddress } from '../../src';
+import { ManagedFreeableScope } from '@cardano-sdk/util';
 
 export const addresses = {
   byron: {
@@ -34,18 +35,27 @@ export const addresses = {
 };
 
 describe('parseCslAddress', () => {
+  let scope: ManagedFreeableScope;
+
+  beforeEach(() => {
+    scope = new ManagedFreeableScope();
+  });
+
+  afterEach(() => {
+    scope.dispose();
+  });
   it('returns true if the input is a valid Shelley or Byron-era address, on either the mainnet or testnets', async () => {
-    expect(parseCslAddress(addresses.shelley.grouped.testnet)).toBeInstanceOf(CSL.Address);
-    expect(parseCslAddress(addresses.shelley.grouped.mainnet)).toBeInstanceOf(CSL.Address);
-    expect(parseCslAddress(addresses.shelley.single.testnet)).toBeInstanceOf(CSL.Address);
-    expect(parseCslAddress(addresses.shelley.single.mainnet)).toBeInstanceOf(CSL.Address);
-    expect(parseCslAddress(addresses.byron.mainnet.daedalus)).toBeInstanceOf(CSL.Address);
-    expect(parseCslAddress(addresses.byron.mainnet.icarus)).toBeInstanceOf(CSL.Address);
-    expect(parseCslAddress(addresses.byron.testnet.daedalus)).toBeInstanceOf(CSL.Address);
-    expect(parseCslAddress(addresses.byron.testnet.icarus)).toBeInstanceOf(CSL.Address);
+    expect(parseCslAddress(scope, addresses.shelley.grouped.testnet)).toBeInstanceOf(CSL.Address);
+    expect(parseCslAddress(scope, addresses.shelley.grouped.mainnet)).toBeInstanceOf(CSL.Address);
+    expect(parseCslAddress(scope, addresses.shelley.single.testnet)).toBeInstanceOf(CSL.Address);
+    expect(parseCslAddress(scope, addresses.shelley.single.mainnet)).toBeInstanceOf(CSL.Address);
+    expect(parseCslAddress(scope, addresses.byron.mainnet.daedalus)).toBeInstanceOf(CSL.Address);
+    expect(parseCslAddress(scope, addresses.byron.mainnet.icarus)).toBeInstanceOf(CSL.Address);
+    expect(parseCslAddress(scope, addresses.byron.testnet.daedalus)).toBeInstanceOf(CSL.Address);
+    expect(parseCslAddress(scope, addresses.byron.testnet.icarus)).toBeInstanceOf(CSL.Address);
   });
   test('returns false if the input is not a Cardano address', async () => {
-    expect(parseCslAddress(addresses.invalid.short)).toBe(null);
-    expect(parseCslAddress(addresses.invalid.networkMagic)).toBe(null);
+    expect(parseCslAddress(scope, addresses.invalid.short)).toBe(null);
+    expect(parseCslAddress(scope, addresses.invalid.networkMagic)).toBe(null);
   });
 });

@@ -3,6 +3,7 @@ import { ApiError, DataSignError, TxSendError, TxSignError, WalletApi } from '@c
 import { CSL, Cardano, coreToCsl, cslToCore } from '@cardano-sdk/core';
 import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence';
 import { InitializeTxProps, InitializeTxResult, SingleAddressWallet, cip30 } from '../../src';
+import { ManagedFreeableScope } from '@cardano-sdk/util';
 import { createWallet } from './util';
 import { firstValueFrom } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
@@ -24,6 +25,7 @@ describe('cip30', () => {
   let wallet: SingleAddressWallet;
   let api: WalletApi;
   let confirmationCallback: jest.Mock;
+  let scope: ManagedFreeableScope;
 
   const simpleTxProps: InitializeTxProps = {
     outputs: new Set([
@@ -39,11 +41,13 @@ describe('cip30', () => {
 
   beforeAll(async () => {
     // CREATE A WALLET
+    scope = new ManagedFreeableScope();
     ({ wallet, api, confirmationCallback } = await createWalletAndApiWithStores([mockedUtxo[2]]));
   });
 
   afterAll(() => {
     wallet.shutdown();
+    scope.dispose();
   });
 
   describe('createWalletApi', () => {
@@ -55,21 +59,26 @@ describe('cip30', () => {
     test('api.getUtxos', async () => {
       const utxos = await api.getUtxos();
       expect(() =>
-        cslToCore.utxo(utxos!.map((utxo) => CSL.TransactionUnspentOutput.from_bytes(Buffer.from(utxo, 'hex'))))
+        cslToCore.utxo(
+          utxos!.map((utxo) => scope.manage(CSL.TransactionUnspentOutput.from_bytes(Buffer.from(utxo, 'hex'))))
+        )
       ).not.toThrow();
     });
 
     test('api.getCollateral', async () => {
       // 1a003d0900 Represents a CSL.BigNum object of 4 ADA
       const utxos = await api.getCollateral({ amount: '1a003d0900' });
+      // eslint-disable-next-line sonarjs/no-identical-functions
       expect(() =>
-        cslToCore.utxo(utxos!.map((utxo) => CSL.TransactionUnspentOutput.from_bytes(Buffer.from(utxo, 'hex'))))
+        cslToCore.utxo(
+          utxos!.map((utxo) => scope.manage(CSL.TransactionUnspentOutput.from_bytes(Buffer.from(utxo, 'hex'))))
+        )
       ).not.toThrow();
     });
 
     test('api.getBalance', async () => {
       const balanceCborBytes = Buffer.from(await api.getBalance(), 'hex');
-      expect(() => CSL.Value.from_bytes(balanceCborBytes)).not.toThrow();
+      expect(() => scope.manage(CSL.Value.from_bytes(balanceCborBytes))).not.toThrow();
     });
 
     test('api.getUsedAddresses', async () => {
@@ -98,11 +107,11 @@ describe('cip30', () => {
     test('api.signTx', async () => {
       const txInternals = await wallet.initializeTx(simpleTxProps);
       const finalizedTx = await wallet.finalizeTx({ tx: txInternals });
-      const hexTxBody = Buffer.from(coreToCsl.tx(finalizedTx).body().to_bytes()).toString('hex');
+      const hexTxBody = Buffer.from(coreToCsl.tx(scope, finalizedTx).body().to_bytes()).toString('hex');
 
       const cip30witnessSet = await api.signTx(hexTxBody);
       const signatures = Buffer.from(cip30witnessSet, 'hex');
-      expect(() => CSL.TransactionWitnessSet.from_bytes(signatures)).not.toThrow();
+      expect(() => scope.manage(CSL.TransactionWitnessSet.from_bytes(signatures))).not.toThrow();
     });
 
     test('api.signData', async () => {
@@ -115,8 +124,7 @@ describe('cip30', () => {
     test('api.submitTx', async () => {
       const txInternals = await wallet.initializeTx(simpleTxProps);
       const finalizedTx = await wallet.finalizeTx({ tx: txInternals });
-
-      const cslTx = coreToCsl.tx(finalizedTx).to_bytes();
+      const cslTx = coreToCsl.tx(scope, finalizedTx).to_bytes();
       await expect(api.submitTx(Buffer.from(cslTx).toString('hex'))).resolves.not.toThrow();
     });
 
@@ -148,7 +156,7 @@ describe('cip30', () => {
       beforeAll(async () => {
         const txInternals = await wallet.initializeTx(simpleTxProps);
         const finalizedTx = await wallet.finalizeTx({ tx: txInternals });
-        hexTxBody = Buffer.from(coreToCsl.tx(finalizedTx).body().to_bytes()).toString('hex');
+        hexTxBody = Buffer.from(coreToCsl.tx(scope, finalizedTx).body().to_bytes()).toString('hex');
       });
 
       test('resolves true', async () => {
@@ -176,7 +184,7 @@ describe('cip30', () => {
         txInternals = await wallet.initializeTx(simpleTxProps);
         finalizedTx = await wallet.finalizeTx({ tx: txInternals });
 
-        cslTx = Buffer.from(coreToCsl.tx(finalizedTx).to_bytes()).toString('hex');
+        cslTx = Buffer.from(coreToCsl.tx(scope, finalizedTx).to_bytes()).toString('hex');
       });
 
       test('resolves true', async () => {
@@ -228,8 +236,11 @@ describe('cip30', () => {
       test('returns multiple UTxOs when more than 1 utxo needed to satisfy amount', async () => {
         // 1a003d0900 Represents a CSL.BigNum object of 4 ADA
         const utxos = await api2.getCollateral({ amount: '1a003d0900' });
+        // eslint-disable-next-line sonarjs/no-identical-functions
         expect(() =>
-          cslToCore.utxo(utxos!.map((utxo) => CSL.TransactionUnspentOutput.from_bytes(Buffer.from(utxo, 'hex'))))
+          cslToCore.utxo(
+            utxos!.map((utxo) => scope.manage(CSL.TransactionUnspentOutput.from_bytes(Buffer.from(utxo, 'hex'))))
+          )
         ).not.toThrow();
         expect(utxos).toHaveLength(2);
       });
@@ -249,14 +260,20 @@ describe('cip30', () => {
       test('returns first UTxO when amount is 0', async () => {
         // 00 Represents a CSL.BigNum object of 0 ADA
         const utxos = await api2.getCollateral({ amount: '00' });
+        // eslint-disable-next-line sonarjs/no-identical-functions
         expect(() =>
-          cslToCore.utxo(utxos!.map((utxo) => CSL.TransactionUnspentOutput.from_bytes(Buffer.from(utxo, 'hex'))))
+          cslToCore.utxo(
+            utxos!.map((utxo) => scope.manage(CSL.TransactionUnspentOutput.from_bytes(Buffer.from(utxo, 'hex'))))
+          )
         ).not.toThrow();
       });
       test('returns all UTxOs when there is no given amount', async () => {
         const utxos = await api.getCollateral();
+        // eslint-disable-next-line sonarjs/no-identical-functions
         expect(() =>
-          cslToCore.utxo(utxos!.map((utxo) => CSL.TransactionUnspentOutput.from_bytes(Buffer.from(utxo, 'hex'))))
+          cslToCore.utxo(
+            utxos!.map((utxo) => scope.manage(CSL.TransactionUnspentOutput.from_bytes(Buffer.from(utxo, 'hex'))))
+          )
         ).not.toThrow();
         expect(utxos).toHaveLength(1);
       });
