@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { ExtendedStakePoolMetadata } from './ExtendedStakePoolMetadata';
 import { Hash32ByteBase16, OpaqueString, typedBech32 } from '../../util/primitives';
 import { Lovelace } from '../Value';
@@ -21,7 +22,7 @@ export type PoolMdVk = OpaqueString<'PoolMdVk'>;
 export const PoolMdVk = (target: string): PoolMdVk => typedBech32(target, 'poolmd_vk', 52);
 
 /**
- * https://github.com/cardano-foundation/CIPs/blob/master/CIP-0006/CIP-0006.md#on-chain-referenced-main-metadata-file
+ * https://github.com/cardano-foundation/CIPs/blob/master/CIP-0006/README.md
  */
 export interface Cip6MetadataFields {
   /**
@@ -41,7 +42,18 @@ export interface Cip6MetadataFields {
   extVkey?: PoolMdVk;
 }
 
-export interface StakePoolMetadataFields {
+/**
+ * https://raw.githubusercontent.com/cardanians/adapools.org/master/example-meta.json
+ */
+export interface APMetadataFields {
+  /**
+   * A URL for extended metadata
+   * 128 Characters Maximum, must be a valid URL
+   */
+  extended?: string;
+}
+
+export interface StakePoolMainMetadataFields {
   /**
    * Pool ticker. uppercase
    * 5 Characters Maximum, Uppercase letters and numbers
@@ -64,13 +76,22 @@ export interface StakePoolMetadataFields {
   homepage: string;
 }
 
-export type StakePoolMetadata = StakePoolMetadataFields &
-  Cip6MetadataFields & {
-    /**
-     * Extended metadata defined by CIP-6
-     */
-    ext?: ExtendedStakePoolMetadata;
-  };
+export interface StakePoolExtendedMetadataFields {
+  /**
+   * Common stake pool extended metadata composed by CIP-6 and AP (AdaPools) formats.
+   *
+   * Evaluated as:
+   * - missing prop if no extended metadata url is found
+   * - `undefined` if a network error has occurred
+   * - `null` if no extended metadata was found
+   */
+  ext?: ExtendedStakePoolMetadata | null | undefined;
+}
+
+export type StakePoolMetadata = Cip6MetadataFields &
+  APMetadataFields &
+  StakePoolMainMetadataFields &
+  StakePoolExtendedMetadataFields;
 
 export interface PoolParameters {
   id: PoolId;
