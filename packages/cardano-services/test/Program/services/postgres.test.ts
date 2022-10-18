@@ -1,16 +1,18 @@
 /* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable max-len */
+import { BlockNoModel, findLastBlockNo } from '../../../src/util/DbSyncProvider';
+import { Cardano } from '@cardano-sdk/core';
 import { DbSyncEpochPollService, EpochMonitor } from '../../../src/util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../../src/NetworkInfo';
-import { HealthCheckResponse } from '@cardano-sdk/core';
 import { HttpServer, HttpServerConfig, createDnsResolver, getPool } from '../../../src';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../../src/InMemoryCache';
+import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { SrvRecord } from 'dns';
 import { getPort, getRandomPort } from 'get-port-please';
+import { healthCheckResponseMock, mockCardanoNode } from '../../../../core/test/CardanoNode/mocks';
 import { dummyLogger as logger } from 'ts-log';
-import { mockCardanoNode } from '../../../../core/test/CardanoNode/mocks';
 import { types } from 'util';
 import axios from 'axios';
 
@@ -29,18 +31,6 @@ describe('Service dependency abstractions', () => {
   const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
   const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
-  const cardanoNode = mockCardanoNode();
-  const responseWithServiceState: HealthCheckResponse = {
-    localNode: {
-      ledgerTip: {
-        blockNo: 3_391_731,
-        hash: '9ef43ab6e234fcf90d103413096c7da752da2f45b15e1259f43d476afd12932c',
-        slot: 52_819_355
-      },
-      networkSync: 0.999
-    },
-    ok: true
-  };
 
   describe('Postgres-dependant service with service discovery', () => {
     let httpServer: HttpServer;
@@ -51,6 +41,8 @@ describe('Service dependency abstractions', () => {
     let service: NetworkInfoHttpService;
     let networkInfoProvider: DbSyncNetworkInfoProvider;
     let epochMonitor: EpochMonitor;
+    let cardanoNode: OgmiosCardanoNode;
+    let lastBlockNoInDb: Cardano.BlockNo;
 
     beforeAll(async () => {
       db = await getPool(dnsResolver, logger, {
@@ -59,9 +51,7 @@ describe('Service dependency abstractions', () => {
         postgresDb: process.env.POSTGRES_DB!,
         postgresPassword: process.env.POSTGRES_PASSWORD!,
         postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,
-        postgresUser: process.env.POSTGRES_USER!,
-        serviceDiscoveryBackoffFactor: 1.1,
-        serviceDiscoveryTimeout: 1000
+        postgresUser: process.env.POSTGRES_USER!
       });
     });
 
@@ -71,12 +61,16 @@ describe('Service dependency abstractions', () => {
         config = { listen: { port } };
         apiUrlBase = `http://localhost:${port}/network-info`;
         epochMonitor = new DbSyncEpochPollService(db!, 10_000);
+        lastBlockNoInDb = (await db!.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no;
+        cardanoNode = mockCardanoNode(
+          healthCheckResponseMock({ blockNo: lastBlockNoInDb })
+        ) as unknown as OgmiosCardanoNode;
         networkInfoProvider = new DbSyncNetworkInfoProvider(
           { cardanoNodeConfigPath },
           { cache, cardanoNode, db: db!, epochMonitor, logger }
         );
         service = new NetworkInfoHttpService({ logger, networkInfoProvider });
-        httpServer = new HttpServer(config, { logger, services: [service] });
+        httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
 
         await httpServer.initialize();
         await httpServer.start();
@@ -98,7 +92,7 @@ describe('Service dependency abstractions', () => {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual(responseWithServiceState);
+        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
       });
     });
   });
@@ -112,6 +106,8 @@ describe('Service dependency abstractions', () => {
     let service: NetworkInfoHttpService;
     let networkInfoProvider: DbSyncNetworkInfoProvider;
     let epochMonitor: EpochMonitor;
+    let cardanoNode: OgmiosCardanoNode;
+    let lastBlockNoInDb: Cardano.BlockNo;
 
     beforeAll(async () => {
       db = await getPool(dnsResolver, logger, {
@@ -127,12 +123,16 @@ describe('Service dependency abstractions', () => {
         config = { listen: { port } };
         apiUrlBase = `http://localhost:${port}/network-info`;
         epochMonitor = new DbSyncEpochPollService(db!, 1000);
+        lastBlockNoInDb = (await db!.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no;
+        cardanoNode = mockCardanoNode(
+          healthCheckResponseMock({ blockNo: lastBlockNoInDb })
+        ) as unknown as OgmiosCardanoNode;
         networkInfoProvider = new DbSyncNetworkInfoProvider(
           { cardanoNodeConfigPath },
           { cache, cardanoNode, db: db!, epochMonitor, logger }
         );
         service = new NetworkInfoHttpService({ logger, networkInfoProvider });
-        httpServer = new HttpServer(config, { logger, services: [service] });
+        httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
 
         await httpServer.initialize();
         await httpServer.start();
@@ -154,7 +154,7 @@ describe('Service dependency abstractions', () => {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual(responseWithServiceState);
+        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
       });
     });
   });
@@ -184,9 +184,7 @@ describe('Service dependency abstractions', () => {
         postgresDb: process.env.POSTGRES_DB!,
         postgresPassword: process.env.POSTGRES_PASSWORD!,
         postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,
-        postgresUser: process.env.POSTGRES_USER!,
-        serviceDiscoveryBackoffFactor: 1.1,
-        serviceDiscoveryTimeout: 1000
+        postgresUser: process.env.POSTGRES_USER!
       });
 
       const result = await provider!.query(HEALTH_CHECK_QUERY);
@@ -201,9 +199,7 @@ describe('Service dependency abstractions', () => {
         postgresDb: process.env.POSTGRES_DB!,
         postgresPassword: process.env.POSTGRES_PASSWORD!,
         postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,
-        postgresUser: process.env.POSTGRES_USER!,
-        serviceDiscoveryBackoffFactor: 1.1,
-        serviceDiscoveryTimeout: 1000
+        postgresUser: process.env.POSTGRES_USER!
       });
 
       await expect(provider!.end()).resolves.toBeUndefined();

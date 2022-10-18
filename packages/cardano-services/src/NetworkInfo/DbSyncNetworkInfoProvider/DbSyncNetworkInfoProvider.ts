@@ -8,7 +8,7 @@ import {
   StakeSummary,
   SupplySummary
 } from '@cardano-sdk/core';
-import { DbSyncProvider } from '../../DbSyncProvider';
+import { DbSyncProvider } from '../../util/DbSyncProvider';
 import { Disposer, EpochMonitor } from '../../util/polling/types';
 import { GenesisData } from './types';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../InMemoryCache';
@@ -16,7 +16,7 @@ import { Logger } from 'ts-log';
 import { NetworkInfoBuilder } from './NetworkInfoBuilder';
 import { NetworkInfoCacheKey } from '.';
 import { Pool } from 'pg';
-import { RunnableModule } from '../../RunnableModule';
+import { RunnableModule } from '@cardano-sdk/util';
 import { loadGenesisData, toGenesisParams, toLedgerTip, toSupply, toWalletProtocolParams } from './mappers';
 
 export interface NetworkInfoProviderProps {
@@ -36,28 +36,17 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) im
   #genesisDataReady: Promise<GenesisData>;
   #epochMonitor: EpochMonitor;
   #epochRolloverDisposer: Disposer;
-  #cardanoNode: CardanoNode;
 
   constructor(
     { cardanoNodeConfigPath }: NetworkInfoProviderProps,
     { db, cache, logger, cardanoNode, epochMonitor }: NetworkInfoProviderDependencies
   ) {
-    super(db, 'DbSyncNetworkInfoProvider', logger);
+    super(db, cardanoNode, 'DbSyncNetworkInfoProvider', logger);
     this.#logger = logger;
     this.#cache = cache;
-    this.#cardanoNode = cardanoNode;
     this.#epochMonitor = epochMonitor;
     this.#builder = new NetworkInfoBuilder(db, logger);
     this.#genesisDataReady = loadGenesisData(cardanoNodeConfigPath);
-
-    this.healthCheck = async () => {
-      const dbHealthCheck = await super.healthCheck();
-      const cardanoNodeHealthCheck = await this.#cardanoNode.healthCheck();
-      return {
-        localNode: cardanoNodeHealthCheck.localNode,
-        ok: dbHealthCheck.ok && cardanoNodeHealthCheck.ok
-      };
-    };
   }
 
   public async ledgerTip(): Promise<Cardano.Tip> {
@@ -95,7 +84,7 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) im
 
     const [live, activeStake] = await Promise.all([
       this.#cache.get(NetworkInfoCacheKey.LIVE_STAKE, () =>
-        this.#cardanoNode.stakeDistribution().then(CardanoNodeUtil.toLiveStake)
+        this.cardanoNode.stakeDistribution().then(CardanoNodeUtil.toLiveStake)
       ),
       this.#cache.get(NetworkInfoCacheKey.ACTIVE_STAKE, () => this.#builder.queryActiveStake(), UNLIMITED_CACHE_TTL)
     ]);
@@ -109,24 +98,22 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) im
   public async eraSummaries(): Promise<EraSummary[]> {
     return await this.#cache.get(
       NetworkInfoCacheKey.ERA_SUMMARIES,
-      () => this.#cardanoNode.eraSummaries(),
+      () => this.cardanoNode.eraSummaries(),
       UNLIMITED_CACHE_TTL
     );
   }
 
-  initializeImpl() {
+  async initializeImpl() {
     return Promise.resolve();
   }
 
   async startImpl() {
-    await this.#cardanoNode.initialize();
     this.#epochRolloverDisposer = this.#epochMonitor.onEpochRollover(() => this.#cache.clear());
   }
 
   async shutdownImpl() {
     this.#cache.shutdown();
     await this.#genesisDataReady;
-    await this.#cardanoNode.shutdown();
     this.#epochRolloverDisposer();
   }
 }

@@ -4,7 +4,6 @@ export * from './Http';
 export * from './InMemoryCache';
 export * from './Program';
 export * from './Rewards';
-export * from './RunnableModule';
 export * from './StakePool';
 export * from './TxSubmit';
 export * from './Utxo';

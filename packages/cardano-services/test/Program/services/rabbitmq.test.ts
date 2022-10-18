@@ -71,12 +71,11 @@ describe('Program/services/rabbitmq', () => {
           apiUrlBase = `http://localhost:${port}/tx-submit`;
           config = { listen: { port } };
           txSubmitProvider = await getRabbitMqTxSubmitProvider(dnsResolver, logger, {
-            rabbitmqSrvServiceName: process.env.RABBITMQ_SRV_SERVICE_NAME,
-            serviceDiscoveryBackoffFactor: 1.1,
-            serviceDiscoveryTimeout: 1000
+            rabbitmqSrvServiceName: process.env.RABBITMQ_SRV_SERVICE_NAME
           });
           httpServer = new HttpServer(config, {
             logger,
+            runnableDependencies: [],
             services: [new TxSubmitHttpService({ logger, txSubmitProvider })]
           });
           await httpServer.initialize();
@@ -116,6 +115,7 @@ describe('Program/services/rabbitmq', () => {
           txSubmitProvider = await getRabbitMqTxSubmitProvider(dnsResolver, logger, { rabbitmqUrl });
           httpServer = new HttpServer(config, {
             logger,
+            runnableDependencies: [],
             services: [new TxSubmitHttpService({ logger, txSubmitProvider })]
           });
           await httpServer.initialize();
@@ -163,9 +163,7 @@ describe('Program/services/rabbitmq', () => {
               loggerMinSeverity: 'error',
               ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME,
               parallel: true,
-              rabbitmqSrvServiceName: process.env.RABBITMQ_SRV_SERVICE_NAME,
-              serviceDiscoveryBackoffFactor: 1.1,
-              serviceDiscoveryTimeout: 1000
+              rabbitmqSrvServiceName: process.env.RABBITMQ_SRV_SERVICE_NAME
             }
           },
           logger
@@ -196,9 +194,7 @@ describe('Program/services/rabbitmq', () => {
         });
 
         provider = await getRabbitMqTxSubmitProvider(dnsResolverMock, logger, {
-          rabbitmqSrvServiceName: process.env.RABBITMQ_SRV_SERVICE_NAME!,
-          serviceDiscoveryBackoffFactor: 1.1,
-          serviceDiscoveryTimeout: 1000
+          rabbitmqSrvServiceName: process.env.RABBITMQ_SRV_SERVICE_NAME!
         });
 
         const txs = await txsPromise;
@@ -210,9 +206,7 @@ describe('Program/services/rabbitmq', () => {
 
       it('should execute a provider operation without to intercept it', async () => {
         provider = await getRabbitMqTxSubmitProvider(dnsResolver, logger, {
-          rabbitmqSrvServiceName: process.env.RABBITMQ_SRV_SERVICE_NAME,
-          serviceDiscoveryBackoffFactor: 1.1,
-          serviceDiscoveryTimeout: 1000
+          rabbitmqSrvServiceName: process.env.RABBITMQ_SRV_SERVICE_NAME
         });
 
         await expect(provider.healthCheck()).resolves.toEqual({ ok: true });
@@ -272,15 +266,11 @@ describe('Program/services/rabbitmq', () => {
         const srvRecord = { name: 'localhost', port: rabbitmqPort, priority: 1, weight: 1 };
         const dnsResolverMock = jest.fn().mockResolvedValueOnce(srvRecord);
         txSubmitProvider = await getOgmiosTxSubmitProvider(dnsResolver, logger, {
-          ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME,
-          serviceDiscoveryBackoffFactor: 1.1,
-          serviceDiscoveryTimeout: 1000
+          ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
         });
 
         txSubmitWorker = await getRunningTxSubmitWorker(dnsResolverMock, txSubmitProvider, logger, {
-          rabbitmqSrvServiceName: process.env.RABBITMQ_SRV_SERVICE_NAME,
-          serviceDiscoveryBackoffFactor: 1.1,
-          serviceDiscoveryTimeout: 1000
+          rabbitmqSrvServiceName: process.env.RABBITMQ_SRV_SERVICE_NAME
         });
 
         expect(dnsResolverMock).toBeCalledTimes(1);
