@@ -312,6 +312,9 @@ $SED -i -E "s/\"ShelleyGenesisHash\": \".*\"/\"ShelleyGenesisHash\": \"${shelley
 $SED -i -E "s/\"AlonzoGenesisHash\": \".*\"/\"AlonzoGenesisHash\": \"${alonzoGenesisHash}\"/" ./config/network/cardano-node/config.json
 
 cp ./templates/babbage/topology.json ./config/network/cardano-node/topology.json
+# docker hostname in topology.json isn't working, so need to specify ip of local network
+CONTAINER_IP=$(hostname -I | xargs)
+$SED -i "s/172.17.0.1/$CONTAINER_IP/g" ./config/network/cardano-node/topology.json
 
 cp "${ROOT}"/genesis/byron/genesis.json ./config/network/cardano-node/genesis/byron.json
 cp "${ROOT}"/genesis/byron/genesis.json ./config/network/genesis/byron.json
