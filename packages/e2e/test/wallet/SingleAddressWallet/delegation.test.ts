@@ -1,5 +1,5 @@
 /* eslint-disable max-statements */
-import { Awaited } from '@cardano-sdk/util';
+import { Awaited, BigIntMath } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
 import { ObservableWallet, StakeKeyStatus, buildTx } from '@cardano-sdk/wallet';
 import { TX_TIMEOUT, firstValueFromTimed, waitForWalletStateSettle, walletReady } from '../util';
@@ -122,7 +122,12 @@ describe('SingleAddressWallet/delegation', () => {
 
     // Updates total and available balance right after tx is submitted
     const coinsSpentOnDeposit = initialState.isStakeKeyRegistered ? 0n : stakeKeyDeposit;
-    const expectedCoinsAfterTx1 = initialState.balance.total.coins - tx1OutputCoins - tx.body.fee - coinsSpentOnDeposit;
+    const expectedCoinsAfterTx1 =
+      initialState.balance.total.coins -
+      tx1OutputCoins -
+      tx.body.fee -
+      coinsSpentOnDeposit +
+      BigIntMath.sum(tx.body.withdrawals?.map((wd) => wd.quantity) || []);
     expect(tx1PendingState.balance.total.coins).toEqual(expectedCoinsAfterTx1);
     expect(tx1PendingState.balance.available.coins).toEqual(expectedCoinsAfterTx1);
     expect(tx1PendingState.balance.deposit).toEqual(stakeKeyDeposit);
