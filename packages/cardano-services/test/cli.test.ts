@@ -1,6 +1,7 @@
 /* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable max-len */
+import { Asset } from '@cardano-sdk/core';
 import { BAD_CONNECTION_URL } from './TxSubmit/rabbitmq/utils';
 import { ChildProcess, fork } from 'child_process';
 import { Ogmios } from '@cardano-sdk/ogmios';
@@ -1312,7 +1313,7 @@ describe('CLI', () => {
                 extraData: { tokenMetadata: true }
               });
 
-              const { tokenMetadata } = fromSerializableObject(res.data);
+              const { tokenMetadata } = fromSerializableObject<Asset.AssetInfo>(res.data);
               expect(tokenMetadata).toStrictEqual({ name: 'test' });
             });
 
@@ -1336,8 +1337,32 @@ describe('CLI', () => {
                 extraData: { tokenMetadata: true }
               });
 
-              const { tokenMetadata } = fromSerializableObject(res.data);
+              const { tokenMetadata } = fromSerializableObject<Asset.AssetInfo>(res.data);
               expect(tokenMetadata).toStrictEqual({ name: 'test' });
+            });
+
+            it('loads a stub asset metadata service when TOKEN_METADATA_SERVER_URL starts with "stub:"', async () => {
+              proc = fork(exePath, ['start-server'], {
+                env: {
+                  API_URL: apiUrl,
+                  LOGGER_MIN_SEVERITY: 'error',
+                  OGMIOS_URL: ogmiosConnection.address.webSocket,
+                  POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                  SERVICE_NAMES: ServiceNames.Asset,
+                  TOKEN_METADATA_SERVER_URL: 'stub://'
+                },
+                stdio: 'pipe'
+              });
+
+              await assertServiceHealthy(apiUrl, ServiceNames.Asset);
+
+              const res = await axios.post(`${apiUrl}/asset/get-asset`, {
+                assetId: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65',
+                extraData: { tokenMetadata: true }
+              });
+
+              const { tokenMetadata } = fromSerializableObject<Asset.AssetInfo>(res.data);
+              expect(tokenMetadata).toBeNull();
             });
           });
         });
