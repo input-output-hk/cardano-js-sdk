@@ -5,14 +5,14 @@ import { SingleAddressWallet } from '@cardano-sdk/wallet';
 import { combineLatest, filter, firstValueFrom, map } from 'rxjs';
 import { env } from '../environment';
 import { getLogger, getWallet } from '../../../src/factories';
-import { walletReady } from '../util';
+import { submitAndConfirm, walletReady } from '../util';
 
 const logger = getLogger(env.LOGGER_MIN_SEVERITY);
 
 describe('SingleAddressWallet.assets/nft', () => {
   const TOKEN_METADATA_1_INDEX = 0;
   const TOKEN_METADATA_2_INDEX = 1;
-  const TOKEN_BRUN_INDEX = 2;
+  const TOKEN_BURN_INDEX = 2;
 
   let wallet: SingleAddressWallet;
   let policySigner: TransactionSigner;
@@ -69,19 +69,19 @@ describe('SingleAddressWallet.assets/nft', () => {
     assetIds = [
       Cardano.AssetId(`${policyId}${assetNames[TOKEN_METADATA_1_INDEX]}`),
       Cardano.AssetId(`${policyId}${assetNames[TOKEN_METADATA_2_INDEX]}`),
-      Cardano.AssetId(`${policyId}${assetNames[TOKEN_BRUN_INDEX]}`)
+      Cardano.AssetId(`${policyId}${assetNames[TOKEN_BURN_INDEX]}`)
     ];
 
     const tokens = new Map([
       [assetIds[TOKEN_METADATA_1_INDEX], 1n],
       [assetIds[TOKEN_METADATA_2_INDEX], 1n],
-      [assetIds[TOKEN_BRUN_INDEX], 1n]
+      [assetIds[TOKEN_BURN_INDEX], 1n]
     ]);
 
     fingerprints = [
       Cardano.AssetFingerprint.fromParts(policyId, Cardano.AssetName(assetNames[TOKEN_METADATA_1_INDEX])),
       Cardano.AssetFingerprint.fromParts(policyId, Cardano.AssetName(assetNames[TOKEN_METADATA_2_INDEX])),
-      Cardano.AssetFingerprint.fromParts(policyId, Cardano.AssetName(assetNames[TOKEN_BRUN_INDEX]))
+      Cardano.AssetFingerprint.fromParts(policyId, Cardano.AssetName(assetNames[TOKEN_BURN_INDEX]))
     ];
 
     walletAddress = (await firstValueFrom(wallet.addresses$))[0].address;
@@ -153,20 +153,21 @@ describe('SingleAddressWallet.assets/nft', () => {
     };
 
     const signedTx = await wallet.finalizeTx(finalizeProps);
-    await wallet.submitTx(signedTx);
+    await submitAndConfirm(wallet, signedTx);
 
     // Wait until wallet is aware of the minted tokens.
     await firstValueFrom(
-      wallet.balance.utxo.total$.pipe(
-        filter(({ assets }) => (assets ? assetIds.every((element) => assets.has(element)) : false))
-      )
-    );
-
-    await firstValueFrom(
       combineLatest([wallet.assets$, wallet.balance.utxo.total$]).pipe(
-        filter(([assets, balance]) => assets.size === balance.assets?.size),
-        map(([assets]) =>
-          [...assets.values()].filter((asset) => (asset ? asset.nftMetadata?.name === 'NFT with files' : false))
+        filter(
+          ([assets, balance]) =>
+            assets &&
+            assets.size === balance.assets?.size &&
+            assetIds.every((element) => {
+              const asset = assets.get(element);
+              // asset info with metadata has loaded
+              if (asset?.tokenMetadata === undefined || asset?.nftMetadata === undefined) return false;
+              return true;
+            })
         )
       )
     );
@@ -244,9 +245,13 @@ describe('SingleAddressWallet.assets/nft', () => {
   });
 
   it('supports burning tokens', async () => {
+    // spend entire balance of test asset
+    const availableBalance = await firstValueFrom(wallet.balance.utxo.available$);
+    const assetBalance = availableBalance.assets!.get(assetIds[TOKEN_BURN_INDEX])!;
+    expect(assetBalance).toBeGreaterThan(0n);
     const txProps = {
       extraSigners: [policySigner],
-      mint: new Map([[assetIds[TOKEN_BRUN_INDEX], -1n]]),
+      mint: new Map([[assetIds[TOKEN_BURN_INDEX], -assetBalance]]),
       outputs: new Set([
         {
           address: walletAddress,
@@ -267,12 +272,12 @@ describe('SingleAddressWallet.assets/nft', () => {
     };
 
     const signedTx = await wallet.finalizeTx(finalizeProps);
-    await wallet.submitTx(signedTx);
+    await submitAndConfirm(wallet, signedTx);
 
     // Wait until wallet is aware of the burned token.
     await firstValueFrom(
       wallet.balance.utxo.total$.pipe(
-        filter(({ assets }) => (assets ? !assets.has(assetIds[TOKEN_BRUN_INDEX]) : false))
+        filter(({ assets }) => (assets ? !assets.has(assetIds[TOKEN_BURN_INDEX]) : false))
       )
     );
 
@@ -283,6 +288,6 @@ describe('SingleAddressWallet.assets/nft', () => {
       )
     );
 
-    expect(nfts.find((nft) => nft.assetId === assetIds[TOKEN_BRUN_INDEX])).toBeUndefined();
+    expect(nfts.find((nft) => nft.assetId === assetIds[TOKEN_BURN_INDEX])).toBeUndefined();
   });
 });

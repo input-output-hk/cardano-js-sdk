@@ -3,6 +3,7 @@ import { FaucetProvider } from '../../src/FaucetProvider';
 import { SingleAddressWallet } from '@cardano-sdk/wallet';
 import { faucetProviderFactory, getLogger, getWallet } from '../../src/factories';
 import { filter, firstValueFrom, map } from 'rxjs';
+import { submitAndConfirm } from '../wallet/util';
 
 // Verify environment.
 export const env = envalid.cleanEnv(process.env, {
@@ -90,7 +91,7 @@ describe('Local Network', () => {
     });
 
     const signedTx = await wallet1.finalizeTx({ tx: unsignedTx });
-    await wallet1.submitTx(signedTx);
+    await submitAndConfirm(wallet1, signedTx);
 
     // Wait until wallet two is aware of the funds.
     await firstValueFrom(wallet2.balance.utxo.total$.pipe(filter(({ coins }) => coins >= tAdaToSend)));
