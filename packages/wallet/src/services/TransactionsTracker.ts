@@ -254,18 +254,27 @@ export const createTransactionsTracker = (
           switchMap(({ tx }) => {
             const invalidHereafter = tx.body.validityInterval.invalidHereafter;
             return race(
-              failedToSubmit$.pipe(
-                filter((failed) => failed.tx === tx),
-                take(1)
+              rollback$.pipe(
+                map((rolledBackTx) => rolledBackTx.id),
+                filter((rolledBackTxId) => tx.body.inputs.some(({ txId }) => txId === rolledBackTxId)),
+                map(
+                  (rolledBackTxId): FailedTx => ({
+                    error: new Error(
+                      `Invalid inputs due to rolled back tx (${rolledBackTxId}}). Try to rebuild and resubmit.`
+                    ),
+                    reason: TransactionFailure.InvalidTransaction,
+                    tx
+                  })
+                )
               ),
+              failedToSubmit$.pipe(filter((failed) => failed.tx === tx)),
               invalidHereafter
                 ? tip$.pipe(
                     filter(({ slot }) => slot > invalidHereafter),
-                    map(() => ({ reason: TransactionFailure.Timeout, tx })),
-                    take(1)
+                    map(() => ({ reason: TransactionFailure.Timeout, tx }))
                   )
                 : EMPTY
-            ).pipe(takeUntil(txConfirmed$(tx)));
+            ).pipe(take(1), takeUntil(txConfirmed$(tx)));
           })
         )
       ),
@@ -282,7 +291,6 @@ export const createTransactionsTracker = (
   const txPending$ = (tx: Cardano.NewTxAlonzo) =>
     pending$.pipe(
       filter((pending) => pending === tx),
-      take(1),
       withLatestFrom(tip$),
       map(([_, { slot }]) => ({ submittedAt: slot, tx }))
     );
@@ -292,10 +300,14 @@ export const createTransactionsTracker = (
       mergeMap((group$) =>
         group$.pipe(
           // Only keep 1 (latest) inner observable per tx id.
-          switchMap(({ tx, submittedAt }) =>
-            merge(
+          switchMap(({ tx, submittedAt }) => {
+            const done$ = race(txConfirmed$(tx), txFailed$(tx)).pipe(
+              map(() => ({ op: 'remove' as const, tx })),
+              share()
+            );
+            return merge(
               of({ op: 'add' as const, submittedAt, tx }),
-              race(txConfirmed$(tx), txFailed$(tx)).pipe(map(() => ({ op: 'remove' as const, tx }))),
+              done$,
               submittedAt
                 ? EMPTY
                 : // NOTE: current implementation might incorrectly update 'submittedAt'
@@ -304,10 +316,11 @@ export const createTransactionsTracker = (
                   // time when transaction got into a mempool - it works more like 'lastAttemptToSubmitAt',
                   // which isn't necessarily bad as it might prevent frequent resubmissions in some cases
                   txPending$(tx).pipe(
-                    map((pending) => ({ op: 'submitted' as const, submittedAt: pending.submittedAt, tx }))
+                    map((pending) => ({ op: 'submitted' as const, submittedAt: pending.submittedAt, tx })),
+                    takeUntil(done$)
                   )
-            )
-          )
+            );
+          })
         )
       ),
       scan((inFlight, props) => {
