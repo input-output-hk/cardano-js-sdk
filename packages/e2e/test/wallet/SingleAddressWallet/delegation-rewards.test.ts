@@ -1,11 +1,11 @@
 import * as envalid from 'envalid';
 import { Cardano, createSlotEpochCalc } from '@cardano-sdk/core';
-import { FaucetProvider, TestWallet, faucetProviderFactory, getWallet } from '../../../src';
 import { SignedTx, SingleAddressWallet, buildTx } from '@cardano-sdk/wallet';
+import { TestWallet, getWallet } from '../../../src';
 import { assertTxIsValid, waitForWalletStateSettle } from '../../../../wallet/test/util';
-import { filter, firstValueFrom, map, take } from 'rxjs';
-import { isNotNil } from '@cardano-sdk/util';
+import { filter, firstValueFrom } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
+import { requestCoins, runningAgainstLocalNetwork, submitAndConfirm, transferCoins, waitForEpoch } from '../util';
 
 // Verify environment.
 export const env = envalid.cleanEnv(process.env, {
@@ -13,8 +13,6 @@ export const env = envalid.cleanEnv(process.env, {
   ASSET_PROVIDER_PARAMS: envalid.json({ default: {} }),
   CHAIN_HISTORY_PROVIDER: envalid.str(),
   CHAIN_HISTORY_PROVIDER_PARAMS: envalid.json({ default: {} }),
-  FAUCET_PROVIDER: envalid.str(),
-  FAUCET_PROVIDER_PARAMS: envalid.json({ default: {} }),
   KEY_MANAGEMENT_PARAMS: envalid.json({ default: {} }),
   KEY_MANAGEMENT_PROVIDER: envalid.str(),
   LOGGER_MIN_SEVERITY: envalid.str({ default: 'info' }),
@@ -31,26 +29,14 @@ export const env = envalid.cleanEnv(process.env, {
 });
 
 describe('delegation rewards', () => {
-  let faucetProvider: FaucetProvider;
   let providers: TestWallet['providers'];
   let wallet1: SingleAddressWallet;
   let wallet2: SingleAddressWallet;
 
-  beforeAll(async () => {
-    faucetProvider = await faucetProviderFactory.create(env.FAUCET_PROVIDER, env.FAUCET_PROVIDER_PARAMS, logger);
+  const initializeWallets = async () => {
+    const amountFromFaucet = 100_000_000_000n;
+    const tAdaToSend = 50_000_000n;
 
-    await faucetProvider.start();
-
-    const healthCheck = await faucetProvider.healthCheck();
-
-    if (!healthCheck.ok) throw new Error('Faucet provider could not be started.');
-  });
-
-  afterAll(async () => {
-    await faucetProvider.close();
-  });
-
-  beforeEach(async () => {
     ({ wallet: wallet1, providers } = await getWallet({
       env,
       logger,
@@ -59,93 +45,40 @@ describe('delegation rewards', () => {
     }));
     ({ wallet: wallet2 } = await getWallet({ env, logger, name: 'Receiving Wallet', polling: { interval: 50 } }));
 
+    await requestCoins({ coins: amountFromFaucet, wallet: wallet1 });
+    await transferCoins({ coins: tAdaToSend, fromWallet: wallet1, toWallet: wallet2 });
+
     await waitForWalletStateSettle(wallet1);
     await waitForWalletStateSettle(wallet2);
-  });
+  };
 
-  afterEach(() => {
-    wallet1.shutdown();
-    wallet2.shutdown();
-  });
-
-  it('will do tADA transfer between two wallets.', async () => {
-    // Arrange
-    const amountFromFaucet = 100_000_000;
-    const tAdaToSend = 50_000_000n;
-
-    const [{ address: sendingAddress }] = await firstValueFrom(wallet1.addresses$);
-    const [{ address: receivingAddress }] = await firstValueFrom(wallet2.addresses$);
-
-    // Act
-
-    logger.info(`Address ${sendingAddress.toString()} will be funded with ${amountFromFaucet} tLovelace.`);
-
-    // Request 100 tADA from faucet. This will block until the transaction is in the ledger,
-    // and has the given amount of confirmation, which means the funds can be used immediately after
-    // this call.
-    await faucetProvider.request(sendingAddress.toString(), amountFromFaucet, 1);
-
-    // Wait until wallet one is aware of the funds.
-    await firstValueFrom(wallet1.balance.utxo.total$.pipe(filter(({ coins }) => coins >= amountFromFaucet)));
-
-    logger.info(
-      `Address ${sendingAddress.toString()} will send ${tAdaToSend} lovelace to address ${receivingAddress.toString()}.`
-    );
-
-    // Send 50 tADA to second wallet.
-    const txBuilder = buildTx({ logger, observableWallet: wallet1 });
-    const txOut = txBuilder.buildOutput().address(receivingAddress).coin(tAdaToSend).toTxOut();
-    const unsignedTx = await txBuilder.addOutput(txOut).build();
-    assertTxIsValid(unsignedTx);
-    const signedTx = await unsignedTx.sign();
-    await signedTx.submit();
-
-    // Wait until wallet two is aware of the funds.
-    await firstValueFrom(wallet2.balance.utxo.total$.pipe(filter(({ coins }) => coins >= tAdaToSend)));
-
-    // Search chain history to see if the transaction is there.
-    const txFoundInHistory = await firstValueFrom(
-      wallet2.transactions.history$.pipe(
-        map((txs) => txs.find((tx) => tx.id === signedTx.tx.id)),
-        filter(isNotNil),
-        take(1)
-      )
-    );
-
-    // Assert
-
-    expect(txFoundInHistory).toBeDefined();
-    expect(txFoundInHistory.id).toEqual(signedTx.tx.id);
+  afterAll(() => {
+    wallet1?.shutdown();
+    wallet2?.shutdown();
   });
 
   it('will receive rewards for delegated tADA and can spend them', async () => {
-    const { epochLength, slotLength } = await providers.networkInfoProvider.genesisParameters();
-
-    // If the estimated test duration (4 times the duration of an epoch) is greater than 5 minutes
-    if (epochLength * slotLength * 4 > 300) {
-      logger.fatal("Skipping test 'will receive rewards for delegated tADA' as it will take more than 5 minutes");
-
-      return;
+    if (!(await runningAgainstLocalNetwork())) {
+      return logger.fatal(
+        "Skipping test 'will receive rewards for delegated tADA' as it should only run with a fast test network"
+      );
     }
 
+    // This has to be done inside the test (instead of beforeAll)
+    // so that it doesn't fail when running against non-local networks
+    await initializeWallets();
+
     // Arrange
-    const amountFromFaucet = 100_000_000_000;
-
-    const [{ address: sendingAddress }] = await firstValueFrom(wallet1.addresses$);
-
-    await faucetProvider.request(sendingAddress.toString(), amountFromFaucet, 1);
-    await firstValueFrom(wallet1.balance.utxo.total$.pipe(filter(({ coins }) => coins >= amountFromFaucet)));
-
     const activePools = await providers.stakePoolProvider.queryStakePools({
       filters: { status: [Cardano.StakePoolStatus.Active] },
-      pagination: { limit: 2, startAt: 0 }
+      pagination: { limit: 1, startAt: 0 }
     });
     expect(activePools.totalResultCount).toBeGreaterThan(0);
     const poolId = activePools.pageResults[0].id;
     expect(poolId).toBeDefined();
     logger.info(`Wallet funds will be staked to pool ${poolId}.`);
 
-    const createDelegationTx = async () => {
+    const submitDelegationTx = async () => {
       logger.info(`Creating delegation tx at epoch #${(await firstValueFrom(wallet1.currentEpoch$)).epochNo}`);
       const tx = await buildTx({ logger, observableWallet: wallet1 }).delegate(poolId).build();
       assertTxIsValid(tx);
@@ -169,12 +102,6 @@ describe('delegation rewards', () => {
       return delegationTxConfirmedAtEpoch;
     };
 
-    const waitForEpoch = (epochNo: number) => {
-      logger.info(`Waiting for epoch #${epochNo}`);
-
-      return firstValueFrom(wallet1.currentEpoch$.pipe(filter((_) => _.epochNo >= epochNo)));
-    };
-
     const generateTxs = async () => {
       logger.info('Sending 100 txs to generate reward fees');
 
@@ -190,42 +117,40 @@ describe('delegation rewards', () => {
       }
     };
 
-    const spendReward = async () => {
+    const buildSpendRewardTx = async () => {
       const tAdaToSend = 5_000_000n;
       const [{ address: receivingAddress }] = await firstValueFrom(wallet2.addresses$);
       const txBuilder = buildTx({ logger, observableWallet: wallet1 });
       const txOut = txBuilder.buildOutput().address(receivingAddress).coin(tAdaToSend).toTxOut();
       const tx = await txBuilder.addOutput(txOut).build();
       assertTxIsValid(tx);
-      logger.info('Body of tx before sign');
+      logger.debug('Body of tx before sign');
       logger.info(tx.body);
       const signedTx = await tx.sign();
-      logger.info('Body of tx after sign');
+      logger.debug('Body of tx after sign');
       logger.info(tx.body);
-      await signedTx.submit();
-      await firstValueFrom(
-        wallet1.transactions.history$.pipe(filter((_) => _.some(({ id }) => id === signedTx.tx.id)))
-      );
 
       return signedTx;
     };
 
     // Stake and wait for reward
 
-    const signedTx = await createDelegationTx();
+    const signedTx = await submitDelegationTx();
     const delegationTxConfirmedAtEpoch = await getTxConfirmationEpoch(signedTx);
-    await waitForEpoch(delegationTxConfirmedAtEpoch + 2);
+    await waitForEpoch(wallet1, delegationTxConfirmedAtEpoch + 2);
     await generateTxs();
-    await waitForEpoch(delegationTxConfirmedAtEpoch + 4);
+    await waitForEpoch(wallet1, delegationTxConfirmedAtEpoch + 4);
 
     // Check reward
+    await waitForWalletStateSettle(wallet1);
+    const rewards = await firstValueFrom(wallet1.balance.rewardAccounts.rewards$);
+    expect(rewards).toBeGreaterThan(0n);
 
-    const reward = await firstValueFrom(wallet1.balance.rewardAccounts.rewards$.pipe(filter((r) => r > 0)));
-    logger.info(`Generated rewards: ${reward} tLovelace`);
-    expect(reward).toBeGreaterThan(0);
+    logger.info(`Generated rewards: ${rewards} tLovelace`);
 
     // Spend reward
-    const tx = await spendReward();
-    logger.info(`TODO: Perform assertions on tx: ${tx.tx.id}`);
+    const spendRewardTx = await buildSpendRewardTx();
+    expect(spendRewardTx.tx.body.withdrawals?.length).toBeGreaterThan(0);
+    await submitAndConfirm(wallet1, spendRewardTx);
   });
 });
