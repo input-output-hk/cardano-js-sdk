@@ -1,6 +1,12 @@
 /* eslint-disable complexity */
 /* eslint-disable sonarjs/cognitive-complexity */
-import { AssetHttpService, CardanoTokenRegistry, DbSyncAssetProvider, DbSyncNftMetadataService } from '../Asset';
+import {
+  AssetHttpService,
+  CardanoTokenRegistry,
+  DbSyncAssetProvider,
+  DbSyncNftMetadataService,
+  StubTokenMetadataService
+} from '../Asset';
 import { CardanoNode } from '@cardano-sdk/core';
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../ChainHistory';
 import { CommonProgramOptions, ProgramOptionDescriptions } from './Options';
@@ -99,7 +105,9 @@ const serviceMapFactory = (
         logger,
         metadataService: createDbSyncMetadataService(db, logger)
       });
-      const tokenMetadataService = new CardanoTokenRegistry({ logger }, args.options);
+      const tokenMetadataService = args.options?.tokenMetadataServerUrl?.startsWith('stub:')
+        ? new StubTokenMetadataService()
+        : new CardanoTokenRegistry({ logger }, args.options);
       const assetProvider = new DbSyncAssetProvider({
         cardanoNode,
         db,

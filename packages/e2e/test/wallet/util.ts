@@ -1,6 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Cardano } from '@cardano-sdk/core';
-import { Observable, catchError, combineLatest, filter, firstValueFrom, throwError, timeout } from 'rxjs';
+import {
+  EMPTY,
+  Observable,
+  catchError,
+  combineLatest,
+  filter,
+  firstValueFrom,
+  merge,
+  mergeMap,
+  throwError,
+  timeout
+} from 'rxjs';
 import { ObservableWallet } from '@cardano-sdk/wallet';
 
 const SECOND = 1000;
@@ -50,3 +61,23 @@ export const normalizeTxBody = (body: Cardano.TxBodyAlonzo | Cardano.NewTxBodyAl
   body.collaterals ||= [];
   return body;
 };
+
+export const txConfirmed = (
+  {
+    transactions: {
+      outgoing: { confirmed$, failed$ }
+    }
+  }: ObservableWallet,
+  { id }: Cardano.NewTxAlonzo
+) =>
+  merge(
+    confirmed$.pipe(filter(({ tx }) => tx.id === id)),
+    failed$.pipe(
+      mergeMap(({ tx, error, reason }) =>
+        tx.id === id ? throwError(() => error || new Error(`Tx failed due to '${reason}': ${id}`)) : EMPTY
+      )
+    )
+  );
+
+export const submitAndConfirm = (wallet: ObservableWallet, tx: Cardano.NewTxAlonzo) =>
+  Promise.all([wallet.submitTx(tx), firstValueFrom(txConfirmed(wallet, tx))]);

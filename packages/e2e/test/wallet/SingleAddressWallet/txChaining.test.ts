@@ -1,10 +1,9 @@
-import { Cardano } from '@cardano-sdk/core';
 import { ObservableWallet } from '@cardano-sdk/wallet';
 import { env } from '../environment';
-import { filter, firstValueFrom } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { getWallet } from '../../../src/factories';
 import { logger } from '@cardano-sdk/util-dev';
-import { walletReady } from '../util';
+import { submitAndConfirm, walletReady } from '../util';
 
 describe('SingleAddressWallet', () => {
   let wallet: ObservableWallet;
@@ -19,9 +18,6 @@ describe('SingleAddressWallet', () => {
   afterAll(() => {
     wallet.shutdown();
   });
-
-  const waitForTxInBlockchain = (txId: Cardano.TransactionId) =>
-    firstValueFrom(wallet.transactions.history$.pipe(filter((txs) => txs.filter((tx) => tx.id === txId).length === 1)));
 
   test('txChaining', async () => {
     const { address } = (await firstValueFrom(wallet.addresses$))[0];
@@ -46,14 +42,7 @@ describe('SingleAddressWallet', () => {
 
     const finalizedTx2 = await wallet.finalizeTx({ tx: tx2 });
 
-    try {
-      await wallet.submitTx(finalizedTx2);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      throw error.innerError ? error.innerError : error;
-    }
-
-    // Wait for txs in the blockchain to increase test consistency with subsequential executions
-    await Promise.all([waitForTxInBlockchain(finalizedTx1.id), waitForTxInBlockchain(finalizedTx2.id)]);
+    // 1st tx must also be confirmed because the 2nd one uses output from the 1st one
+    await submitAndConfirm(wallet, finalizedTx2);
   });
 });

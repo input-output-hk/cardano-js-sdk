@@ -5,7 +5,7 @@ import { SingleAddressWallet } from '@cardano-sdk/wallet';
 import { env } from '../environment';
 import { filter, firstValueFrom } from 'rxjs';
 import { getLogger, getWallet } from '../../../src/factories';
-import { walletReady } from '../util';
+import { submitAndConfirm, walletReady } from '../util';
 
 const logger = getLogger(env.LOGGER_MIN_SEVERITY);
 
@@ -104,7 +104,7 @@ describe('SingleAddressWallet/multisignature', () => {
     };
 
     const signedTx = await wallet.finalizeTx(finalizeProps);
-    await wallet.submitTx(signedTx);
+    await submitAndConfirm(wallet, signedTx);
 
     // Wait until wallet is aware of the minted token.
     const value = await firstValueFrom(

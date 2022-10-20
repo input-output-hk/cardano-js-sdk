@@ -4,7 +4,6 @@
 /* eslint-disable prettier/prettier */
 import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
 import { ChainHistoryProviderStub, generateTxAlonzo, mockChainHistoryProvider, queryTransactionsResult } from '../mocks';
-import { EMPTY, bufferCount, firstValueFrom, of } from 'rxjs';
 import {
   FailedTx,
   PAGE_SIZE,
@@ -14,6 +13,7 @@ import {
   createTransactionsTracker
 } from '../../src';
 import { InMemoryInFlightTransactionsStore, InMemoryTransactionsStore, WalletStores } from '../../src/persistence';
+import { NEVER, bufferCount, firstValueFrom, map, of } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 import { dummyLogger } from 'ts-log';
@@ -201,7 +201,7 @@ describe('TransactionsTracker', () => {
             transactionsHistoryStore: transactionsStore
           },
           {
-            rollback$: EMPTY,
+            rollback$: NEVER,
             transactionsSource$
           }
         );
@@ -251,7 +251,7 @@ describe('TransactionsTracker', () => {
             transactionsHistoryStore: transactionsStore
           },
           {
-            rollback$: EMPTY,
+            rollback$: NEVER,
             transactionsSource$
           }
         );
@@ -267,6 +267,52 @@ describe('TransactionsTracker', () => {
         expectObservable(transactionsTracker.outgoing.failed$, failedSubscription).toBe('---a-|', {
           a: { reason: TransactionFailure.Timeout, tx }
         });
+      });
+    });
+
+    it(`resubmitting (emitting at pending$) a tx that was already confirmed or failed does not re-add the tx to inFlight$;
+        rollback of a transaction of which an output was used in a pending transaction interprets transaction as failed`, async () => {
+      const tx = queryTransactionsResult.pageResults[0];
+      createTestScheduler().run(({ cold, hot, expectObservable }) => {
+        const tip1 = { slot: tx.body.validityInterval.invalidHereafter! - 1 } as Cardano.Tip;
+        const failedToSubmit$ = hot<FailedTx>('-----|');
+        const tip$ = cold('a', { a: tip1 });
+        const submitting$ = hot('-a---|', { a: tx });
+        const pending$ = hot(   '--a-a|', { a: tx }); // second emission must not re-add it to inFlight$
+        const rollback$ = hot(  '---a-|', { a: { id: tx.body.inputs[0].txId } as Cardano.TxAlonzo });
+        const transactionsSource$ = hot<Cardano.TxAlonzo[]>('-----|');
+        const transactionsTracker = createTransactionsTracker(
+          {
+            addresses$,
+            chainHistoryProvider,
+            inFlightTransactionsStore,
+            logger,
+            newTransactions: {
+              failedToSubmit$,
+              pending$,
+              submitting$
+            },
+            retryBackoffConfig,
+            tip$,
+            transactionsHistoryStore: transactionsStore
+          },
+          {
+            rollback$,
+            transactionsSource$
+          }
+        );
+        expectObservable(transactionsTracker.outgoing.submitting$).toBe(                         '-a---|', { a: tx });
+        expectObservable(transactionsTracker.outgoing.pending$).toBe(                            '--a-a|', { a: tx });
+        expectObservable(transactionsTracker.outgoing.failed$.pipe(map(err => err.reason))).toBe('---a-|', {
+          a: TransactionFailure.InvalidTransaction
+        });
+        expectObservable(transactionsTracker.outgoing.inFlight$).toBe('abcd-|', {
+          a: [],
+          b: [{ tx }],
+          c: [{ submittedAt: tip1.slot, tx }],
+          d: []
+        });
+        expectObservable(transactionsTracker.outgoing.confirmed$).toBe('-----|');
       });
     });
 
@@ -296,7 +342,7 @@ describe('TransactionsTracker', () => {
             transactionsHistoryStore: transactionsStore
           },
           {
-            rollback$: EMPTY,
+            rollback$: NEVER,
             transactionsSource$
           }
         );
@@ -342,7 +388,7 @@ describe('TransactionsTracker', () => {
             transactionsHistoryStore: transactionsStore
           },
           {
-            rollback$: EMPTY,
+            rollback$: NEVER,
             transactionsSource$
           }
         );
@@ -394,7 +440,7 @@ describe('TransactionsTracker', () => {
             transactionsHistoryStore: transactionsStore
           },
           {
-            rollback$: EMPTY,
+            rollback$: NEVER,
             transactionsSource$
           }
         );
@@ -435,7 +481,7 @@ describe('TransactionsTracker', () => {
             transactionsHistoryStore: transactionsStore
           },
           {
-            rollback$: EMPTY,
+            rollback$: NEVER,
             transactionsSource$
           }
         );
@@ -489,7 +535,7 @@ describe('TransactionsTracker', () => {
             transactionsHistoryStore: transactionsStore
           },
           {
-            rollback$: EMPTY,
+            rollback$: NEVER,
             transactionsSource$
           }
         );
@@ -551,7 +597,7 @@ describe('TransactionsTracker', () => {
             transactionsHistoryStore: transactionsStore
           },
           {
-            rollback$: EMPTY,
+            rollback$: NEVER,
             transactionsSource$
           }
         );
@@ -626,7 +672,7 @@ describe('TransactionsTracker', () => {
             transactionsHistoryStore: transactionsStore
           },
           {
-            rollback$: EMPTY,
+            rollback$: NEVER,
             transactionsSource$
           }
         );

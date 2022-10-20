@@ -24,9 +24,6 @@ services:
       - postgres_user
     shm_size: '2gb'
     restart: on-failure
-    depends_on:
-      cardano-node-ogmios:
-        condition: service_healthy
     healthcheck:
       # Use pg_isready to check postgres is running. Substitute different
       # user `postgres` if you've setup differently to config/pgpass-mainnet
@@ -73,18 +70,25 @@ services:
     depends_on:
       cardano-node-ogmios:
         condition: service_healthy
+      postgres:
+        condition: service_healthy
     secrets:
       - postgres_password
       - postgres_user
       - postgres_db
     volumes:
       - ./local-network/config/network:/config
+      - ./local-network/scripts:/scripts
       - db-sync-data:/var/lib/cexplorer
       - node-ipc:/node-ipc
     restart: on-failure
     stop_signal: SIGINT
     healthcheck:
-      retries: 200
+      test: ["CMD", "/scripts/is-db-synced.sh"]
+      interval: 5s
+      timeout: 1s
+      retries: 120
+      start_period: 100ms
     logging:
       driver: "json-file"
       options:
@@ -104,7 +108,7 @@ services:
       CMD: "cardano-wallet serve --node-socket /ipc/node.socket --database /wallet-db --listen-address 0.0.0.0"
       NETWORK:
     depends_on:
-      cardano-node-ogmios:
+      cardano-db-sync:
         condition: service_healthy
     restart: on-failure
     logging:
@@ -141,7 +145,8 @@ services:
       target: http-server
     environment:
       - DB_CACHE_TTL=${DB_CACHE_TTL:-120}
-      - EPOCH_POLL_INTERVAL=${EPOCH_POLL_INTERVAL:-10000}
+      - EPOCH_POLL_INTERVAL=${EPOCH_POLL_INTERVAL:-500}
+      - TOKEN_METADATA_SERVER_URL=stub://
       - ENABLE_METRICS=${ENABLE_METRICS:-false}
       - LOGGER_MIN_SEVERITY=${LOGGER_MIN_SEVERITY:-info}
       - OGMIOS_URL=ws://cardano-node-ogmios:1337
@@ -152,7 +157,7 @@ services:
       - ${API_PORT:-4000}:3000
     restart: on-failure
     depends_on:
-      cardano-node-ogmios:
+      cardano-db-sync:
         condition: service_healthy
     volumes:
       - ./local-network/config/network:/config
@@ -178,7 +183,7 @@ services:
       - RABBITMQ_URL=amqp://rabbitmq:5672
     restart: on-failure
     depends_on:
-      cardano-node-ogmios:
+      cardano-db-sync:
         condition: service_healthy
     logging:
       driver: "json-file"
