@@ -7,7 +7,6 @@ import {
   TrackedChainHistoryProvider,
   TrackedRewardsProvider,
   TrackedStakePoolProvider,
-  TrackedTxSubmitProvider,
   TrackedUtxoProvider,
   TrackedWalletNetworkInfoProvider,
   createProviderStatusTracker
@@ -19,7 +18,6 @@ import {
   mockChainHistoryProvider,
   mockNetworkInfoProvider,
   mockRewardsProvider,
-  mockTxSubmitProvider,
   mockUtxoProvider
 } from '../../mocks';
 
@@ -65,7 +63,6 @@ const providerFnStats = {
 describe('createProviderStatusTracker', () => {
   let stakePoolProvider: TrackedStakePoolProvider;
   let networkInfoProvider: TrackedWalletNetworkInfoProvider;
-  let txSubmitProvider: TrackedTxSubmitProvider;
   let assetProvider: TrackedAssetProvider;
   let utxoProvider: TrackedUtxoProvider;
   let chainHistoryProvider: TrackedChainHistoryProvider;
@@ -77,7 +74,6 @@ describe('createProviderStatusTracker', () => {
     utxoProvider = new TrackedUtxoProvider(mockUtxoProvider());
     stakePoolProvider = new TrackedStakePoolProvider(createStubStakePoolProvider());
     networkInfoProvider = new TrackedWalletNetworkInfoProvider(mockNetworkInfoProvider());
-    txSubmitProvider = new TrackedTxSubmitProvider(mockTxSubmitProvider());
     assetProvider = new TrackedAssetProvider(mockAssetProvider());
     chainHistoryProvider = new TrackedChainHistoryProvider(mockChainHistoryProvider());
     rewardsProvider = new TrackedRewardsProvider(mockRewardsProvider());
@@ -96,7 +92,6 @@ describe('createProviderStatusTracker', () => {
           networkInfoProvider,
           rewardsProvider,
           stakePoolProvider,
-          txSubmitProvider,
           utxoProvider
         },
         { consideredOutOfSyncAfter: timeout },
@@ -128,7 +123,6 @@ describe('createProviderStatusTracker', () => {
           networkInfoProvider,
           rewardsProvider,
           stakePoolProvider,
-          txSubmitProvider,
           utxoProvider
         },
         { consideredOutOfSyncAfter: timeout },
@@ -157,7 +151,6 @@ describe('createProviderStatusTracker', () => {
           networkInfoProvider,
           rewardsProvider,
           stakePoolProvider,
-          txSubmitProvider,
           utxoProvider
         },
         { consideredOutOfSyncAfter: timeout },
@@ -186,7 +179,6 @@ describe('createProviderStatusTracker', () => {
           networkInfoProvider,
           rewardsProvider,
           stakePoolProvider,
-          txSubmitProvider,
           utxoProvider
         },
         { consideredOutOfSyncAfter: timeout },

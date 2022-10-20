@@ -23,7 +23,6 @@ import { TrackedAssetProvider } from './TrackedAssetProvider';
 import { TrackedChainHistoryProvider } from './TrackedChainHistoryProvider';
 import { TrackedRewardsProvider } from './TrackedRewardsProvider';
 import { TrackedStakePoolProvider } from './TrackedStakePoolProvider';
-import { TrackedTxSubmitProvider } from './TrackedTxSubmitProvider';
 import { TrackedUtxoProvider } from './TrackedUtxoProvider';
 import { TrackedWalletNetworkInfoProvider } from './TrackedWalletNetworkInfoProvider';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
@@ -35,7 +34,6 @@ export interface ProviderStatusTrackerProps {
 export interface ProviderStatusTrackerDependencies {
   stakePoolProvider: TrackedStakePoolProvider;
   networkInfoProvider: TrackedWalletNetworkInfoProvider;
-  txSubmitProvider: TrackedTxSubmitProvider;
   assetProvider: TrackedAssetProvider;
   utxoProvider: TrackedUtxoProvider;
   chainHistoryProvider: TrackedChainHistoryProvider;
@@ -46,7 +44,6 @@ export interface ProviderStatusTrackerDependencies {
 const getDefaultProviderSyncRelevantStats = ({
   stakePoolProvider,
   networkInfoProvider,
-  txSubmitProvider,
   assetProvider,
   utxoProvider,
   chainHistoryProvider,
@@ -58,7 +55,6 @@ const getDefaultProviderSyncRelevantStats = ({
     networkInfoProvider.stats.genesisParameters$,
     networkInfoProvider.stats.eraSummaries$,
     assetProvider.stats.getAsset$,
-    txSubmitProvider.stats.submitTx$,
     stakePoolProvider.stats.queryStakePools$,
     utxoProvider.stats.utxoByAddresses$,
     chainHistoryProvider.stats.transactionsByAddresses$,
