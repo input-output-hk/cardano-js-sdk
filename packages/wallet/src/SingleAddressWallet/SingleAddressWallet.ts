@@ -203,7 +203,6 @@ export class SingleAddressWallet implements ObservableWallet {
         networkInfoProvider: this.networkInfoProvider,
         rewardsProvider: this.rewardsProvider,
         stakePoolProvider: this.stakePoolProvider,
-        txSubmitProvider: this.#trackedTxSubmitProvider,
         utxoProvider: this.utxoProvider
       },
       { consideredOutOfSyncAfter }
