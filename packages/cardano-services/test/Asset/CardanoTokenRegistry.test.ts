@@ -218,7 +218,7 @@ describe('CardanoTokenRegistry', () => {
         new ProviderError(
           ProviderFailure.Unknown,
           new TypeError("Cannot destructure property 'subject' of 'record' as it is null."),
-          "Cannot destructure property 'subject' of 'record' as it is null. while evaluating metatada record null"
+          "Cannot destructure property 'subject' of 'record' as it is null. while evaluating metadata record null"
         )
       );
     });
@@ -265,7 +265,7 @@ describe('CardanoTokenRegistry', () => {
         new ProviderError(
           ProviderFailure.ConnectionFailure,
           null,
-          'CardanoTokenRegistry failed to fetch asset metatada from the token registry server'
+          'CardanoTokenRegistry failed to fetch asset metadata from the token registry server'
         )
       );
     });
