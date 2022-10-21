@@ -1,11 +1,11 @@
 import { Cardano } from '@cardano-sdk/core';
-import { MetadataService, createDbSyncMetadataService } from '../../src/Metadata';
 import { Pool } from 'pg';
 import { dummyLogger } from 'ts-log';
+import { TxMetadataService, createDbSyncMetadataService } from '../../src/Metadata';
 
 describe('createDbSyncMetadataService', () => {
   let dbConnection: Pool;
-  let service: MetadataService;
+  let service: TxMetadataService;
 
   beforeAll(() => {
     dbConnection = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });

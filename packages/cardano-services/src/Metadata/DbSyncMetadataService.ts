@@ -1,12 +1,12 @@
 import * as Queries from './queries';
 import { Cardano } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
-import { MetadataService, TxMetadataModel } from './types';
 import { Pool, QueryResult } from 'pg';
+import { TxMetadataModel, TxMetadataService } from './types';
 import { hexStringToBuffer } from '@cardano-sdk/util';
 import { mapTxMetadata } from './mappers';
 
-export const createDbSyncMetadataService = (db: Pool, logger: Logger): MetadataService => ({
+export const createDbSyncMetadataService = (db: Pool, logger: Logger): TxMetadataService => ({
   async queryTxMetadataByHashes(
     hashes: Cardano.TransactionId[]
   ): Promise<Map<Cardano.TransactionId, Cardano.TxMetadata>> {
