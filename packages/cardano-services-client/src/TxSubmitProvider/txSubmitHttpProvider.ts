@@ -14,10 +14,15 @@ const paths: HttpProviderConfigPaths<TxSubmitProvider> = {
 const toTxSubmissionError = (error: any): Cardano.TxSubmissionError | null => {
   if (typeof error === 'object' && typeof error?.name === 'string' && typeof error?.message === 'string') {
     const rawError = error as Cardano.TxSubmissionError;
+
     const txSubmissionErrorName = rawError.name as keyof typeof Cardano.TxSubmissionErrors;
     const ErrorClass = Cardano.TxSubmissionErrors[txSubmissionErrorName];
     if (ErrorClass) {
       Object.setPrototypeOf(error, ErrorClass.prototype);
+      return error;
+    }
+    if (rawError.name === Cardano.UnknownTxSubmissionError.name) {
+      Object.setPrototypeOf(error, Cardano.UnknownTxSubmissionError.prototype);
       return error;
     }
     return new Cardano.UnknownTxSubmissionError(error);
@@ -45,7 +50,11 @@ export const txSubmitHttpProvider = (config: CreateHttpProviderConfig<TxSubmitPr
           if (typeof error === 'object' && typeof error.innerError === 'object') {
             const txSubmissionError = toTxSubmissionError(error.innerError);
             if (txSubmissionError) {
-              throw new ProviderError(ProviderFailure.BadRequest, txSubmissionError);
+              const failure =
+                txSubmissionError instanceof Cardano.UnknownTxSubmissionError
+                  ? ProviderFailure.Unknown
+                  : ProviderFailure.BadRequest;
+              throw new ProviderError(failure, txSubmissionError);
             }
           }
         }
