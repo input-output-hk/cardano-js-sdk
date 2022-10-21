@@ -28,9 +28,17 @@ import {
   blockfrostUtxoProvider
 } from '@cardano-sdk/blockfrost';
 import { CardanoWalletFaucetProvider, FaucetProvider } from './FaucetProvider';
+import {
+  DEFAULT_POLLING_CONFIG,
+  Milliseconds,
+  ObservableWallet,
+  PollingConfig,
+  SingleAddressWallet,
+  setupWallet,
+  storage
+} from '@cardano-sdk/wallet';
 import { LogLevel, createLogger } from 'bunyan';
 import { Logger, dummyLogger } from 'ts-log';
-import { PollingConfig, SingleAddressWallet, setupWallet, storage } from '@cardano-sdk/wallet';
 import {
   assetInfoHttpProvider,
   chainHistoryHttpProvider,
@@ -42,6 +50,7 @@ import {
 } from '@cardano-sdk/cardano-services-client';
 import { createConnectionObject } from '@cardano-ogmios/client';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
+import { filter, firstValueFrom } from 'rxjs';
 import { ogmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import memoize from 'lodash/memoize';
@@ -341,6 +350,25 @@ export type GetWalletProps = {
 };
 
 /**
+ * Delays initializing tx when nearing the epoch boundary.
+ * Relies on system clock being accurate.
+ */
+const patchInitializeTxToRespectEpochBoundary = <T extends ObservableWallet>(
+  wallet: T,
+  maxPollInterval: Milliseconds
+) => {
+  const originalInitializeTx = wallet.initializeTx.bind(wallet);
+  wallet.initializeTx = async function (...props) {
+    const { lastSlot, epochNo } = await firstValueFrom(wallet.currentEpoch$);
+    const waitForNextEpoch = Date.now() + maxPollInterval * 1.5 - lastSlot.date.getTime() >= 0;
+    if (waitForNextEpoch)
+      await firstValueFrom(wallet.currentEpoch$.pipe(filter((nextEpoch) => nextEpoch.epochNo > epochNo)));
+    return originalInitializeTx(...props);
+  };
+  return wallet;
+};
+
+/**
  * Create a single wallet instance given the environment variables.
  *
  * @param props Wallet configuration parameters.
@@ -380,7 +408,14 @@ export const getWallet = async (props: GetWalletProps) => {
       new SingleAddressWallet({ name, polling }, { ...providers, keyAgent, logger, stores })
   });
 
-  return { providers, wallet };
+  const [{ address, rewardAccount }] = await firstValueFrom(wallet.addresses$);
+  logger.info(`Created wallet "${wallet.name}": ${address}/${rewardAccount}`);
+
+  const maxInterval =
+    polling?.maxInterval ||
+    (polling?.interval && polling.interval * DEFAULT_POLLING_CONFIG.maxIntervalMultiplier) ||
+    DEFAULT_POLLING_CONFIG.maxInterval;
+  return { providers, wallet: patchInitializeTxToRespectEpochBoundary(wallet, maxInterval) };
 };
 
 export type TestWallet = Awaited<ReturnType<typeof getWallet>>;
