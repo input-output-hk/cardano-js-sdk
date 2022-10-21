@@ -17,7 +17,7 @@ import { Pool } from 'pg';
 import { createDbSyncMetadataService } from '../../src/Metadata';
 import { getPort } from 'get-port-please';
 import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
-import { dummyLogger as logger } from 'ts-log';
+import { logger } from '@cardano-sdk/util-dev';
 import { mockTokenRegistry } from './CardanoTokenRegistry.test';
 import axios from 'axios';
 

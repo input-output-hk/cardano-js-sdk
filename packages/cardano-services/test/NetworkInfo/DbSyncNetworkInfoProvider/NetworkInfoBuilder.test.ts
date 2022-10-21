@@ -1,6 +1,6 @@
 import { NetworkInfoBuilder } from '../../../src/NetworkInfo/DbSyncNetworkInfoProvider/NetworkInfoBuilder';
 import { Pool } from 'pg';
-import { dummyLogger as logger } from 'ts-log';
+import { logger } from '@cardano-sdk/util-dev';
 
 describe('NetworkInfoBuilder', () => {
   let dbConnection: Pool;

@@ -1,7 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Pool } from 'pg';
 import { RewardsBuilder } from '../../../src';
-import { dummyLogger as logger } from 'ts-log';
+import { logger } from '@cardano-sdk/util-dev';
 
 describe('RewardsBuilder', () => {
   const dbConnection = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });

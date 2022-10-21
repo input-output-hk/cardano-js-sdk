@@ -10,7 +10,7 @@ import {
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { createDbSyncMetadataService } from '../../src/Metadata';
-import { dummyLogger as logger } from 'ts-log';
+import { logger } from '@cardano-sdk/util-dev';
 import { mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
 import { mockTokenRegistry } from './CardanoTokenRegistry.test';
 

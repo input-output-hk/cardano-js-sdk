@@ -1,7 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Pool } from 'pg';
-import { dummyLogger } from 'ts-log';
 import { TxMetadataService, createDbSyncMetadataService } from '../../src/Metadata';
+import { logger } from '@cardano-sdk/util-dev';
 
 describe('createDbSyncMetadataService', () => {
   let dbConnection: Pool;
@@ -9,7 +9,7 @@ describe('createDbSyncMetadataService', () => {
 
   beforeAll(() => {
     dbConnection = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
-    service = createDbSyncMetadataService(dbConnection, dummyLogger);
+    service = createDbSyncMetadataService(dbConnection, logger);
   });
 
   test('query transaction metadata by tx hashes', async () => {

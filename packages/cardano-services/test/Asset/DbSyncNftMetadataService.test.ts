@@ -2,7 +2,7 @@ import { Asset, Cardano } from '@cardano-sdk/core';
 import { AssetPolicyIdAndName, DbSyncNftMetadataService, NftMetadataService } from '../../src/Asset';
 import { Pool } from 'pg';
 import { createDbSyncMetadataService } from '../../src/Metadata';
-import { dummyLogger as logger } from 'ts-log';
+import { logger } from '@cardano-sdk/util-dev';
 
 export const oneMintNft: AssetPolicyIdAndName = {
   name: Cardano.AssetName('6d616361726f6e2d63616b65'),

@@ -2,7 +2,6 @@ import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { CardanoTokenRegistry, toCoreTokenMetadata } from '../../src/Asset';
 import { InMemoryCache, Key } from '../../src/InMemoryCache';
 import { createGenericMockServer, logger } from '@cardano-sdk/util-dev';
-import { dummyLogger } from 'ts-log';
 
 const mockResults: Record<string, unknown> = {
   '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65': {
@@ -87,11 +86,11 @@ describe('CardanoTokenRegistry', () => {
   describe('return value', () => {
     let closeMock: () => Promise<void> = jest.fn();
     let serverUrl = '';
-    let tokenRegistry = new CardanoTokenRegistry({ logger: dummyLogger });
+    let tokenRegistry = new CardanoTokenRegistry({ logger });
 
     beforeAll(async () => {
       ({ closeMock, serverUrl } = await mockTokenRegistry(() => ({})));
-      tokenRegistry = new CardanoTokenRegistry({ logger: dummyLogger }, { tokenMetadataServerUrl: serverUrl });
+      tokenRegistry = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl: serverUrl });
     });
 
     afterAll(async () => {
@@ -146,12 +145,12 @@ describe('CardanoTokenRegistry', () => {
 
     let closeMock: () => Promise<void> = jest.fn();
     let serverUrl = '';
-    let tokenRegistry = new CardanoTokenRegistry({ logger: dummyLogger });
+    let tokenRegistry = new CardanoTokenRegistry({ logger });
 
     beforeAll(async () => {
       ({ closeMock, serverUrl } = await mockTokenRegistry(() => ({})));
       tokenRegistry = new CardanoTokenRegistry(
-        { cache: new TestInMemoryCache(60), logger: dummyLogger },
+        { cache: new TestInMemoryCache(60), logger },
         { tokenMetadataServerUrl: serverUrl }
       );
     });

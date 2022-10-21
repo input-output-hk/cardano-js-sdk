@@ -6,7 +6,7 @@ import { CreateHttpProviderConfig, txSubmitHttpProvider } from '@cardano-sdk/car
 import { FATAL, createLogger } from 'bunyan';
 import { bufferToHexString, fromSerializableObject } from '@cardano-sdk/util';
 import { getPort } from 'get-port-please';
-import { dummyLogger as logger } from 'ts-log';
+import { logger } from '@cardano-sdk/util-dev';
 import axios from 'axios';
 import cbor from 'cbor';
 
