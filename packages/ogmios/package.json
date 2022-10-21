@@ -61,7 +61,7 @@
     "ws": "^8.5.0"
   },
   "dependencies": {
-    "@cardano-ogmios/client": "5.5.2",
+    "@cardano-ogmios/client": "5.5.5",
     "@cardano-sdk/core": "^0.5.0",
     "@cardano-sdk/util": "^0.5.0",
     "buffer": "5.7.1",
