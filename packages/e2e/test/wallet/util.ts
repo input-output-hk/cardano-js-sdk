@@ -20,6 +20,7 @@ import { ObservableWallet, SignedTx, buildTx } from '@cardano-sdk/wallet';
 import { assertTxIsValid } from '../../../wallet/test/util';
 import { faucetProviderFactory } from '../../src';
 import { logger } from '@cardano-sdk/util-dev';
+import sortBy from 'lodash/sortBy';
 
 const SECOND = 1000;
 const MINUTE = 60 * SECOND;
@@ -66,6 +67,9 @@ export const walletReady = (wallet: ObservableWallet) =>
 
 export const normalizeTxBody = (body: Cardano.TxBodyAlonzo | Cardano.NewTxBodyAlonzo) => {
   body.collaterals ||= [];
+  // TODO: inputs should be a Set since they're unordered.
+  // Then Jest should correctly compare it with toEqual.
+  body.inputs = sortBy(body.inputs, 'txId');
   return body;
 };
 
