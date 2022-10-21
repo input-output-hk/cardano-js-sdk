@@ -18,11 +18,13 @@ const getWalletStateSnapshot = async (wallet: ObservableWallet) => {
   const epoch = await firstValueFrom(wallet.currentEpoch$);
   const utxoTotal = await firstValueFrom(wallet.utxo.total$);
   const utxoAvailable = await firstValueFrom(wallet.utxo.available$);
+  const rewardsBalance = await firstValueFrom(wallet.balance.rewardAccounts.rewards$);
   return {
     balance: { available: balanceAvailable, deposit, total: balanceTotal },
     epoch: epoch.epochNo,
     isStakeKeyRegistered: rewardAccount.keyStatus === StakeKeyStatus.Registered,
     rewardAccount,
+    rewardsBalance,
     utxo: { available: utxoTotal, total: utxoAvailable }
   };
 };
@@ -122,12 +124,14 @@ describe('SingleAddressWallet/delegation', () => {
 
     // Updates total and available balance right after tx is submitted
     const coinsSpentOnDeposit = initialState.isStakeKeyRegistered ? 0n : stakeKeyDeposit;
+    const newRewardsWhileSigningAndSubmitting = tx1PendingState.rewardsBalance;
     const expectedCoinsAfterTx1 =
       initialState.balance.total.coins -
       tx1OutputCoins -
       tx.body.fee -
       coinsSpentOnDeposit +
-      BigIntMath.sum(tx.body.withdrawals?.map((wd) => wd.quantity) || []);
+      BigIntMath.sum(tx.body.withdrawals?.map((wd) => wd.quantity) || []) +
+      newRewardsWhileSigningAndSubmitting;
     expect(tx1PendingState.balance.total.coins).toEqual(expectedCoinsAfterTx1);
     expect(tx1PendingState.balance.available.coins).toEqual(expectedCoinsAfterTx1);
     expect(tx1PendingState.balance.deposit).toEqual(stakeKeyDeposit);
