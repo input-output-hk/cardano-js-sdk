@@ -78,7 +78,9 @@ export class SmartTxSubmitProvider implements TxSubmitProvider {
           ...this.#retryBackoffConfig,
           shouldRetry: (error) =>
             error instanceof ProviderError &&
-            [ProviderFailure.Unhealthy, ProviderFailure.ConnectionFailure].includes(error.reason)
+            [ProviderFailure.Unhealthy, ProviderFailure.ConnectionFailure, ProviderFailure.Unknown].includes(
+              error.reason
+            )
         })
       )
     );

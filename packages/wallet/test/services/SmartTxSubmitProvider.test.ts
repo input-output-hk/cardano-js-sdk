@@ -73,9 +73,10 @@ describe('SmartTxSubmitProvider', () => {
       it('re-submits transactions that failed to submit due to a recoverable provider failure', async () => {
         underlyingProvider.submitTx
           .mockRejectedValueOnce(new ProviderError(ProviderFailure.ConnectionFailure))
-          .mockRejectedValueOnce(new ProviderError(ProviderFailure.Unhealthy));
+          .mockRejectedValueOnce(new ProviderError(ProviderFailure.Unhealthy))
+          .mockRejectedValueOnce(new ProviderError(ProviderFailure.Unknown));
         await provider.submitTx({ signedTransaction: txWithValidityIntervalHex });
-        expect(underlyingProvider.submitTx).toBeCalledTimes(3);
+        expect(underlyingProvider.submitTx).toBeCalledTimes(4);
       });
 
       it('rejects with any non-recoverable provider error', async () => {

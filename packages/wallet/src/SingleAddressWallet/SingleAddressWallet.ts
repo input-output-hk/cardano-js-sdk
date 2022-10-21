@@ -444,7 +444,11 @@ export class SingleAddressWallet implements ObservableWallet {
       if (
         mightBeAlreadySubmitted &&
         error instanceof ProviderError &&
-        error.innerError instanceof Cardano.TxSubmissionErrors.ValueNotConservedError
+        // This could be improved by further parsing the error and:
+        // - checking if ValueNotConservedError produced === 0 (all utxos invalid)
+        // - check if UnknownOrIncompleteWithdrawalsError available withdrawal amount === wallet's reward acc balance
+        (error.innerError instanceof Cardano.TxSubmissionErrors.ValueNotConservedError ||
+          error.innerError instanceof Cardano.TxSubmissionErrors.UnknownOrIncompleteWithdrawalsError)
       ) {
         this.#logger.debug(`Transaction ${tx.id} appears to be already submitted...`);
         this.#newTransactions.pending$.next(tx);
