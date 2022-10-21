@@ -4,6 +4,7 @@ import { ConnectionStatus, SmartTxSubmitProvider, TipSlot } from '../../src';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { flushPromises } from '@cardano-sdk/util-dev';
 import { mockTxSubmitProvider } from '../mocks';
+import { usingAutoFree } from '@cardano-sdk/util';
 
 describe('SmartTxSubmitProvider', () => {
   let underlyingProvider: jest.Mocked<TxSubmitProvider>;
@@ -35,17 +36,21 @@ describe('SmartTxSubmitProvider', () => {
       witness: { signatures: new Map() }
     };
     const validityInterval = { invalidBefore: 5, invalidHereafter: 10 };
-    const txWithoutValidityIntervalHex = util.bytesToHex(coreToCsl.tx(txWithoutValidityInterval).to_bytes());
+    const txWithoutValidityIntervalHex = util.bytesToHex(
+      usingAutoFree((scope) => coreToCsl.tx(scope, txWithoutValidityInterval).to_bytes())
+    );
     const txWithValidityIntervalHex = util.bytesToHex(
-      coreToCsl
-        .tx({
-          ...txWithoutValidityInterval,
-          body: {
-            ...txWithoutValidityInterval.body,
-            validityInterval
-          }
-        })
-        .to_bytes()
+      usingAutoFree((scope) =>
+        coreToCsl
+          .tx(scope, {
+            ...txWithoutValidityInterval,
+            body: {
+              ...txWithoutValidityInterval.body,
+              validityInterval
+            }
+          })
+          .to_bytes()
+      )
     );
 
     describe('all preconditions are met', () => {

@@ -1,5 +1,6 @@
 import { CSL, Cardano, coreToCsl, util } from '@cardano-sdk/core';
 import { SelectionResult } from '@cardano-sdk/input-selection';
+import { usingAutoFree } from '@cardano-sdk/util';
 
 export type CreateTxInternalsProps = {
   changeAddress: Cardano.Address;
@@ -25,30 +26,31 @@ export const createTransactionInternals = async ({
   mint,
   scriptIntegrityHash,
   requiredExtraSignatures
-}: CreateTxInternalsProps): Promise<Cardano.TxBodyWithHash> => {
-  const outputs = [...inputSelection.outputs];
-  for (const value of inputSelection.change) {
-    outputs.push({
-      address: changeAddress,
-      value
-    });
-  }
-  const body: Cardano.NewTxBodyAlonzo = {
-    certificates,
-    fee: inputSelection.fee,
-    inputs: [...inputSelection.inputs].map(([txIn]) => txIn),
-    mint,
-    outputs,
-    requiredExtraSignatures,
-    scriptIntegrityHash,
-    validityInterval,
-    withdrawals
-  };
-  if (collaterals) body.collaterals = [...collaterals];
-  const cslBody = coreToCsl.txBody(body, auxiliaryData);
+}: CreateTxInternalsProps): Promise<Cardano.TxBodyWithHash> =>
+  usingAutoFree((scope) => {
+    const outputs = [...inputSelection.outputs];
+    for (const value of inputSelection.change) {
+      outputs.push({
+        address: changeAddress,
+        value
+      });
+    }
+    const body: Cardano.NewTxBodyAlonzo = {
+      certificates,
+      fee: inputSelection.fee,
+      inputs: [...inputSelection.inputs].map(([txIn]) => txIn),
+      mint,
+      outputs,
+      requiredExtraSignatures,
+      scriptIntegrityHash,
+      validityInterval,
+      withdrawals
+    };
+    if (collaterals) body.collaterals = [...collaterals];
+    const cslBody = coreToCsl.txBody(scope, body, auxiliaryData);
 
-  return {
-    body,
-    hash: Cardano.TransactionId.fromHexBlob(util.bytesToHex(CSL.hash_transaction(cslBody).to_bytes()))
-  };
-};
+    return {
+      body,
+      hash: Cardano.TransactionId.fromHexBlob(util.bytesToHex(scope.manage(CSL.hash_transaction(cslBody)).to_bytes()))
+    };
+  });

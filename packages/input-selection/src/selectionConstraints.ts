@@ -9,6 +9,7 @@ import {
   TokenBundleSizeExceedsLimit
 } from './types';
 import { ProtocolParametersRequiredByInputSelection } from '.';
+import { usingAutoFree } from '@cardano-sdk/util';
 
 export type BuildTx = (selection: SelectionSkeleton) => Promise<CSL.Transaction>;
 
@@ -27,25 +28,28 @@ export const computeMinimumCost =
   ): EstimateTxFee =>
   async (selection) => {
     const tx = await buildTx(selection);
-    return BigInt(
-      CSL.min_fee(
-        tx,
+    return usingAutoFree((scope) => {
+      const linearFee = scope.manage(
         CSL.LinearFee.new(
-          CSL.BigNum.from_str(minFeeCoefficient.toString()),
-          CSL.BigNum.from_str(minFeeConstant.toString())
+          scope.manage(CSL.BigNum.from_str(minFeeCoefficient.toString())),
+          scope.manage(CSL.BigNum.from_str(minFeeConstant.toString()))
         )
-      ).to_str()
-    );
+      );
+      const minFee = scope.manage(CSL.min_fee(tx, linearFee));
+      return BigInt(minFee.to_str());
+    });
   };
 
 export const computeMinimumCoinQuantity =
   (coinsPerUtxoByte: ProtocolParametersRequiredByInputSelection['coinsPerUtxoByte']): ComputeMinimumCoinQuantity =>
   (output) =>
-    BigInt(
-      CSL.min_ada_for_output(
-        coreToCsl.txOut(output),
-        CSL.DataCost.new_coins_per_byte(CSL.BigNum.from_str(coinsPerUtxoByte.toString()))
-      ).to_str()
+    usingAutoFree((scope) =>
+      BigInt(
+        CSL.min_ada_for_output(
+          coreToCsl.txOut(scope, output),
+          scope.manage(CSL.DataCost.new_coins_per_byte(scope.manage(CSL.BigNum.from_str(coinsPerUtxoByte.toString()))))
+        ).to_str()
+      )
     );
 
 export const tokenBundleSizeExceedsLimit =
@@ -54,9 +58,11 @@ export const tokenBundleSizeExceedsLimit =
     if (!tokenBundle) {
       return false;
     }
-    const value = CSL.Value.new(cslUtil.maxBigNum);
-    value.set_multiasset(coreToCsl.tokenMap(tokenBundle));
-    return value.to_bytes().length > maxValueSize;
+    return usingAutoFree((scope) => {
+      const value = scope.manage(CSL.Value.new(cslUtil.maxBigNum));
+      value.set_multiasset(coreToCsl.tokenMap(scope, tokenBundle));
+      return value.to_bytes().length > maxValueSize;
+    });
   };
 
 const getTxSize = (tx: CSL.Transaction) => tx.to_bytes().length;

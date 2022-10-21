@@ -2,6 +2,7 @@
 import { Asset, CSL, Cardano, SerializationFailure, coreToCsl } from '../../src';
 import { BigNum } from '@emurgo/cardano-serialization-lib-nodejs';
 import { Ed25519KeyHash, NativeScript, NativeScriptKind, ScriptType } from '../../src/Cardano';
+import { ManagedFreeableScope } from '@cardano-sdk/util';
 import {
   signature,
   tx,
@@ -23,37 +24,49 @@ const txOutByron = {
 };
 
 describe('coreToCsl', () => {
+  let scope: ManagedFreeableScope;
+
+  beforeEach(() => {
+    scope = new ManagedFreeableScope();
+  });
+
+  afterEach(() => {
+    scope.dispose();
+  });
+
   it('txIn', () => {
-    expect(coreToCsl.txIn(txIn)).toBeInstanceOf(CSL.TransactionInput);
+    expect(coreToCsl.txIn(scope, txIn)).toBeInstanceOf(CSL.TransactionInput);
   });
   describe('txOut', () => {
     it('converts to CSL.TransactionOutput', () => {
-      expect(coreToCsl.txOut(txOut)).toBeInstanceOf(CSL.TransactionOutput);
-      expect(coreToCsl.txOut(txOutByron)).toBeInstanceOf(CSL.TransactionOutput);
+      expect(coreToCsl.txOut(scope, txOut)).toBeInstanceOf(CSL.TransactionOutput);
+      expect(coreToCsl.txOut(scope, txOutByron)).toBeInstanceOf(CSL.TransactionOutput);
     });
     it('converts datum to CSL.DataHash', () => {
-      const cslTxOut = coreToCsl.txOut(txOutWithDatum);
-      expect(cslTxOut.data_hash()).toBeInstanceOf(CSL.DataHash);
-      expect(Buffer.from(cslTxOut.data_hash()!.to_bytes()).toString('hex')).toBe(txOutWithDatum.datum?.toString());
+      const cslTxOut = coreToCsl.txOut(scope, txOutWithDatum);
+      const dataHash = scope.manage(cslTxOut.data_hash());
+      expect(dataHash).toBeInstanceOf(CSL.DataHash);
+      expect(Buffer.from(dataHash!.to_bytes()).toString('hex')).toBe(txOutWithDatum.datum?.toString());
     });
   });
   it('utxo', () => {
-    expect(coreToCsl.utxo([[txInWithAddress, txOut]])[0]).toBeInstanceOf(CSL.TransactionUnspentOutput);
+    expect(coreToCsl.utxo(scope, [[txInWithAddress, txOut]])[0]).toBeInstanceOf(CSL.TransactionUnspentOutput);
   });
   describe('value', () => {
     it('coin only', () => {
-      const value = coreToCsl.value(valueCoinOnly);
-      expect(value.coin().to_str()).toEqual(valueCoinOnly.coins.toString());
-      expect(value.multiasset()).toBeUndefined();
+      const value = coreToCsl.value(scope, valueCoinOnly);
+      expect(scope.manage(value.coin()).to_str()).toEqual(valueCoinOnly.coins.toString());
+      expect(scope.manage(value.multiasset())).toBeUndefined();
     });
     it('coin with assets', () => {
-      const value = coreToCsl.value(valueWithAssets);
-      expect(value.coin().to_str()).toEqual(valueWithAssets.coins.toString());
-      const multiasset = value.multiasset()!;
+      const value = coreToCsl.value(scope, valueWithAssets);
+      expect(scope.manage(value.coin()).to_str()).toEqual(valueWithAssets.coins.toString());
+      const multiasset = scope.manage(value.multiasset())!;
       expect(multiasset.len()).toBe(3);
       for (const [assetId, expectedAssetQuantity] of valueWithAssets.assets!.entries()) {
         const { scriptHash, assetName } = Asset.util.parseAssetId(assetId);
-        const assetQuantity = BigInt(multiasset.get(scriptHash)!.get(assetName)!.to_str());
+        const multiAsset = scope.manage(multiasset.get(scriptHash)!);
+        const assetQuantity = BigInt(scope.manage(multiAsset.get(assetName)!).to_str());
         expect(assetQuantity).toBe(expectedAssetQuantity);
       }
       expect(value).toBeInstanceOf(CSL.Value);
@@ -61,48 +74,70 @@ describe('coreToCsl', () => {
   });
   describe('tokenMap', () => {
     it('inserts a single multiasset per asset policy', () => {
-      const multiasset = coreToCsl.tokenMap(txOut.value.assets!);
+      const multiasset = coreToCsl.tokenMap(scope, txOut.value.assets!);
       expect(multiasset).toBeInstanceOf(CSL.MultiAsset);
-      const scriptHashes = multiasset.keys();
+      const scriptHashes = scope.manage(multiasset.keys());
       expect(scriptHashes.len()).toBe(3);
       for (const [assetId, expectedAssetQuantity] of txOut.value.assets!.entries()) {
         const { scriptHash, assetName } = Asset.util.parseAssetId(assetId);
-        const assetQuantity = BigInt(multiasset.get(scriptHash)!.get(assetName)!.to_str());
+        const multiAsset = scope.manage(multiasset.get(scriptHash)!);
+        const assetQuantity = BigInt(scope.manage(multiAsset.get(assetName)!).to_str());
         expect(assetQuantity).toBe(expectedAssetQuantity);
       }
     });
   });
+  // eslint-disable-next-line max-statements
   it('txBody', () => {
-    const cslBody = coreToCsl.txBody(txBody);
-    expect(cslBody.certs()?.get(0).as_pool_retirement()?.epoch()).toBe(500);
-    expect(cslBody.fee().to_str()).toBe(txBody.fee.toString());
-    expect(Buffer.from(cslBody.inputs().get(0).transaction_id().to_bytes()).toString('hex')).toBe(
-      txBody.inputs[0].txId
-    );
-    expect(cslBody.outputs().get(0).amount().coin().to_str()).toBe(txBody.outputs[0].value.coins.toString());
+    const cslBody = coreToCsl.txBody(scope, txBody);
+    const certs = scope.manage(cslBody.certs());
+    const cert = scope.manage(certs?.get(0));
+    const poolRetirement = cert?.as_pool_retirement();
+    const fee = scope.manage(cslBody.fee());
+    const inputs = scope.manage(cslBody.inputs());
+    const outputs = scope.manage(cslBody.outputs());
+    const input0 = scope.manage(inputs.get(0));
+    const output0 = scope.manage(outputs.get(0));
+    const output0Amount = scope.manage(output0.amount());
+    const output0AmountCoin = scope.manage(output0Amount.coin());
+    const withdrawals = scope.manage(cslBody.withdrawals());
+    const withdrawalKeys = scope.manage(withdrawals!.keys());
+    const withdrawalKeys0 = scope.manage(withdrawalKeys.get(0));
+    const withdrawal0 = scope.manage(cslBody.withdrawals()?.get(withdrawalKeys0));
+    expect(poolRetirement?.epoch()).toBe(500);
+    expect(fee.to_str()).toBe(txBody.fee.toString());
+    expect(Buffer.from(scope.manage(input0.transaction_id()).to_bytes()).toString('hex')).toBe(txBody.inputs[0].txId);
+    expect(output0AmountCoin.to_str()).toBe(txBody.outputs[0].value.coins.toString());
     expect(cslBody.validity_start_interval()).toBe(txBody.validityInterval.invalidBefore);
     expect(cslBody.ttl()).toBe(txBody.validityInterval.invalidHereafter);
-    expect(cslBody.withdrawals()?.get(cslBody.withdrawals()!.keys().get(0)!)?.to_str()).toBe(
-      txBody.withdrawals![0].quantity.toString()
-    );
+    expect(withdrawal0!.to_str()).toBe(txBody.withdrawals![0].quantity.toString());
+    const mint = scope.manage(cslBody.multiassets())!;
+    const scriptHashes = scope.manage(mint.keys());
+    const mintAssets1 = scope.manage(mint.get(scope.manage(scriptHashes.get(0)))!);
+    const mintAssets1Keys = scope.manage(mintAssets1.keys());
+    const mintAssets1Keys0 = scope.manage(mintAssets1Keys.get(0));
+    const mintAssets1Amount = scope.manage(mintAssets1.get(mintAssets1Keys0)!);
+    const mintAssets2 = scope.manage(mint.get(scope.manage(scriptHashes.get(1)))!);
+    const mintAssets2Keys = scope.manage(mintAssets2.keys());
+    const mintAssets2Keys0 = scope.manage(mintAssets2Keys.get(0));
+    const mintAssets2Amount = scope.manage(mintAssets2.get(mintAssets2Keys0)!);
 
-    const mint = cslBody.multiassets()!;
-    const scriptHashes = mint.keys();
-    const mintAssets1 = mint.get(scriptHashes.get(0))!;
-    const mintAssets2 = mint.get(scriptHashes.get(1))!;
-    expect(mintAssets1.get(mintAssets1.keys().get(0))!.as_positive()!.to_str()).toBe('20');
-    expect(mintAssets2.get(mintAssets2.keys().get(0))!.as_negative()!.to_str()).toBe('50');
-
-    expect(cslBody.collateral()!.len()).toBe(1);
-    expect(cslBody.required_signers()!.len()).toBe(1);
-    expect(cslBody.script_data_hash()).toBeTruthy();
+    expect(scope.manage(mintAssets1Amount.as_positive())!.to_str()).toBe('20');
+    expect(scope.manage(mintAssets2Amount.as_negative())!.to_str()).toBe('50');
+    expect(scope.manage(cslBody.collateral())!.len()).toBe(1);
+    expect(scope.manage(cslBody.required_signers())!.len()).toBe(1);
+    expect(scope.manage(cslBody.script_data_hash())).toBeTruthy();
   });
   it('tx', () => {
-    const cslTx = coreToCsl.tx(tx);
+    const cslTx = coreToCsl.tx(scope, tx);
     expect(cslTx.body()).toBeInstanceOf(CSL.TransactionBody);
-    const witness = cslTx.witness_set().vkeys()!.get(0)!;
-    expect(Buffer.from(witness.vkey().public_key().as_bytes()).toString('hex')).toBe(vkey);
-    expect(witness.signature().to_hex()).toBe(signature);
+    const witnessSet = scope.manage(cslTx.witness_set());
+    const vKeys = scope.manage(witnessSet.vkeys());
+    const witness = scope.manage(vKeys!.get(0)!);
+    const witnessSignature = scope.manage(witness.signature());
+    const vKey = scope.manage(witness.vkey());
+    const vKeyPublicKey = scope.manage(vKey.public_key());
+    expect(Buffer.from(vKeyPublicKey.as_bytes()).toString('hex')).toBe(vkey);
+    expect(witnessSignature.to_hex()).toBe(signature);
   });
   it('nativeScript', () => {
     const script: NativeScript = {
@@ -138,30 +173,43 @@ describe('coreToCsl', () => {
       ]
     };
 
-    const baseScript = coreToCsl.nativeScript(script);
-    const firstSubScript = baseScript.as_script_any()?.native_scripts().get(0).as_script_pubkey();
-    const secondSubScript = baseScript.as_script_any()?.native_scripts().get(1).as_script_all();
+    const baseScript = coreToCsl.nativeScript(scope, script);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+    const scriptAny = scope.manage(baseScript.as_script_any());
+    const nativeScripts = scope.manage(scriptAny?.native_scripts());
+    const firstSubScript = scope.manage(nativeScripts?.get(0));
+    const firstSubScriptPubKey = scope.manage(firstSubScript?.as_script_pubkey());
+    const secondSubScript = scope.manage(nativeScripts?.get(1));
+    const secondSubScriptScriptAll = scope.manage(secondSubScript?.as_script_all());
+    const secondSubScriptScriptAllNativeScripts = scope.manage(secondSubScriptScriptAll?.native_scripts());
+    const secondSubScriptScriptAllNativeScripts0 = scope.manage(secondSubScriptScriptAllNativeScripts!.get(0));
+    const secondSubScriptScriptAllNativeScripts1 = scope.manage(secondSubScriptScriptAllNativeScripts!.get(1));
+    const secondSubScriptScriptAllNativeScripts2 = scope.manage(secondSubScriptScriptAllNativeScripts!.get(2));
+    const secondSubScriptScriptAllNativeScripts1PubKey = scope.manage(
+      secondSubScriptScriptAllNativeScripts1.as_script_pubkey()
+    );
 
-    expect(baseScript.as_script_any()?.native_scripts().len()).toBe(2);
-    expect(firstSubScript?.addr_keyhash()?.to_bytes()).toStrictEqual(
+    expect(nativeScripts?.len()).toBe(2);
+    expect(scope.manage(firstSubScriptPubKey?.addr_keyhash())?.to_bytes()).toStrictEqual(
       Uint8Array.from(Buffer.from('b275b08c999097247f7c17e77007c7010cd19f20cc086ad99d398538', 'hex'))
     );
-    expect(secondSubScript?.native_scripts()?.len()).toEqual(3);
-    expect(secondSubScript?.native_scripts()?.get(0).as_timelock_expiry()?.slot()).toEqual(3000);
-    expect(secondSubScript?.native_scripts()?.get(1).as_script_pubkey()?.addr_keyhash().to_bytes()).toStrictEqual(
+    expect(secondSubScriptScriptAllNativeScripts!.len()).toEqual(3);
+    expect(scope.manage(secondSubScriptScriptAllNativeScripts0.as_timelock_expiry())?.slot()).toEqual(3000);
+    expect(scope.manage(secondSubScriptScriptAllNativeScripts1PubKey!.addr_keyhash()).to_bytes()).toStrictEqual(
       Uint8Array.from(Buffer.from('966e394a544f242081e41d1965137b1bb412ac230d40ed5407821c37', 'hex'))
     );
-    expect(secondSubScript?.native_scripts()?.get(2).as_timelock_start()?.slot()).toEqual(4000);
+    expect(scope.manage(secondSubScriptScriptAllNativeScripts2.as_timelock_start())?.slot()).toEqual(4000);
   });
   describe('txAuxiliaryData', () => {
-    it('returns undefined for undefined data', () => expect(coreToCsl.txAuxiliaryData()).toBeUndefined());
+    it('returns undefined for undefined data', () => expect(coreToCsl.txAuxiliaryData(scope)).toBeUndefined());
 
     describe('txMetadata', () => {
       // eslint-disable-next-line unicorn/consistent-function-scoping, @typescript-eslint/no-explicit-any
       const convertMetadatum = (metadatum: any) => {
         const label = 123n;
-        const auxiliaryData = coreToCsl.txAuxiliaryData({ body: { blob: new Map([[label, metadatum]]) } });
-        return auxiliaryData?.metadata()?.get(BigNum.from_str(label.toString()));
+        const auxiliaryData = coreToCsl.txAuxiliaryData(scope, { body: { blob: new Map([[label, metadatum]]) } });
+        const metadata = scope.manage(auxiliaryData?.metadata());
+        return scope.manage(metadata?.get(scope.manage(BigNum.from_str(label.toString()))));
       };
 
       const str64Len = 'looooooooooooooooooooooooooooooooooooooooooooooooooooooooooogstr';
@@ -170,7 +218,8 @@ describe('coreToCsl', () => {
       it('converts number', () => {
         const number = 1234n;
         const metadatum = convertMetadatum(number);
-        expect(metadatum?.as_int().as_positive()?.to_str()).toBe(number.toString());
+        const metadatumAsInt = scope.manage(metadatum?.as_int());
+        expect(scope.manage(metadatumAsInt!.as_positive())?.to_str()).toBe(number.toString());
       });
 
       it('converts text', () => {
@@ -182,10 +231,10 @@ describe('coreToCsl', () => {
       it('converts list', () => {
         const list = [str64Len, 'str2'];
         const metadatum = convertMetadatum(list);
-        const cslList = metadatum?.as_list();
+        const cslList = scope.manage(metadatum?.as_list());
         expect(cslList?.len()).toBe(list.length);
-        expect(cslList?.get(0).as_text()).toBe(list[0]);
-        expect(cslList?.get(1).as_text()).toBe(list[1]);
+        expect(scope.manage(cslList?.get(0))!.as_text()).toBe(list[0]);
+        expect(scope.manage(cslList?.get(1))!.as_text()).toBe(list[1]);
       });
 
       test('converts bytes', () => {
@@ -202,11 +251,16 @@ describe('coreToCsl', () => {
           [key, new Map<Cardano.Metadatum, Cardano.Metadatum>([[666n, 'cake']])]
         ]);
         const metadatum = convertMetadatum(map);
-        const cslMap = metadatum?.as_map();
+        const cslMap = scope.manage(metadatum?.as_map());
+        const metadatum1 = scope.manage(cslMap?.get(convertMetadatum(123n)!));
+        const metadatum2 = scope.manage(cslMap?.get(convertMetadatum('key')!));
+        const metadatum3 = scope.manage(cslMap?.get(convertMetadatum(key)!));
+        const metadatum1AsInt = scope.manage(metadatum1!.as_int());
+        const metadatum3AsMap = scope.manage(metadatum3!.as_map());
         expect(cslMap?.len()).toBe(map.size);
-        expect(cslMap?.get(convertMetadatum(123n)!).as_int().as_positive()?.to_str()).toBe('1234');
-        expect(cslMap?.get(convertMetadatum('key')!).as_text()).toBe('value');
-        expect(cslMap?.get(convertMetadatum(key)!).as_map().get_i32(666).as_text()).toBe('cake');
+        expect(scope.manage(metadatum1AsInt.as_positive())?.to_str()).toBe('1234');
+        expect(metadatum2!.as_text()).toBe('value');
+        expect(scope.manage(metadatum3AsMap.get_i32(666)).as_text()).toBe('cake');
       });
 
       test('bytes too long throws error', () => {

@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
 import { CSL, Cardano, coreToCsl } from '@cardano-sdk/core';
 import { cip36 } from '../src';
+import { usingAutoFree } from '@cardano-sdk/util';
 import delay from 'delay';
 
 describe('cip36', () => {
@@ -42,7 +43,11 @@ describe('cip36', () => {
         rewardAccount: Cardano.RewardAccount('stake_test1uzhr5zn6akj2affzua8ylcm8t872spuf5cf6tzjrvnmwemcehgcjm'),
         stakeKey: Cardano.Ed25519PublicKey('86870efc99c453a873a16492ce87738ec79a0ebd064379a62e2c9cf4e119219e')
       });
-      expect(Buffer.from(coreToCsl.txMetadata(votingRegistrationMetadata).to_bytes()).toString('hex')).toEqual(
+      expect(
+        Buffer.from(
+          usingAutoFree((scope) => coreToCsl.txMetadata(scope, votingRegistrationMetadata).to_bytes())
+        ).toString('hex')
+      ).toEqual(
         'a119ef64a50182825820a6a3c0447aeb9cc54cf6422ba32b294e5e1c3ef6d782f2acff4a70694c4d16630182582000588e8e1d18cba576a4d35758069fe94e53f638b6faf7c07b8abd2bc5c5cdee0302582086870efc99c453a873a16492ce87738ec79a0ebd064379a62e2c9cf4e119219e03581de0ae3a0a7aeda4aea522e74e4fe36759fca80789a613a58a4364f6ecef041904d20500'
       );
       const signedCip36Metadata = await cip36.metadataBuilder.signVotingRegistration(votingRegistrationMetadata, {

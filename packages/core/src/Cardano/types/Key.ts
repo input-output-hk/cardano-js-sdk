@@ -1,6 +1,7 @@
 import { CSL } from '../../CSL/CSL';
 import { Hash28ByteBase16, HexBlob, OpaqueString, castHexBlob, typedHex } from '../util/primitives';
 import { RewardAccount } from './RewardAccount';
+import { usingAutoFree } from '@cardano-sdk/util';
 
 /**
  * BIP32 public key as hex string
@@ -46,18 +47,19 @@ Ed25519PrivateKey.fromHexBlob = (value: HexBlob) => castHexBlob<Ed25519PrivateKe
 export type Ed25519KeyHash = OpaqueString<'Ed25519KeyHash'>;
 export const Ed25519KeyHash = (value: string): Ed25519KeyHash => Hash28ByteBase16(value);
 Ed25519KeyHash.fromRewardAccount = (rewardAccount: RewardAccount): Ed25519KeyHash =>
-  Ed25519KeyHash(
-    Buffer.from(
-      CSL.RewardAddress.from_address(CSL.Address.from_bech32(rewardAccount.toString()))!
-        .payment_cred()!
-        .to_keyhash()!
-        .to_bytes()
-    ).toString('hex')
-  );
+  usingAutoFree((scope) => {
+    const bech32 = scope.manage(CSL.Address.from_bech32(rewardAccount.toString()));
+    const rewardAddress = scope.manage(CSL.RewardAddress.from_address(bech32)!);
+    const paymentCred = scope.manage(rewardAddress.payment_cred()!);
+    const keyHash = scope.manage(paymentCred.to_keyhash()!);
 
-Ed25519KeyHash.fromKey = (pubKey: Ed25519PublicKey): Ed25519KeyHash => {
-  const cslPubKey = CSL.PublicKey.from_bytes(Buffer.from(pubKey, 'hex'));
-  const keyHash = cslPubKey.hash().to_bytes();
+    return Ed25519KeyHash(Buffer.from(keyHash.to_bytes()).toString('hex'));
+  });
 
-  return Ed25519KeyHash(Buffer.from(keyHash!).toString('hex'));
-};
+Ed25519KeyHash.fromKey = (pubKey: Ed25519PublicKey): Ed25519KeyHash =>
+  usingAutoFree((scope) => {
+    const cslPubKey = scope.manage(CSL.PublicKey.from_bytes(Buffer.from(pubKey, 'hex')));
+    const keyHash = scope.manage(cslPubKey.hash()).to_bytes();
+
+    return Ed25519KeyHash(Buffer.from(keyHash!).toString('hex'));
+  });
