@@ -46,6 +46,7 @@ jobs:
       run: |
         yarn workspace @cardano-sdk/e2e build
         yarn workspace @cardano-sdk/e2e wait-for-network
+        yarn workspace @cardano-sdk/e2e wait-for-faucet
         yarn workspace @cardano-sdk/e2e test:wallet
       env:
         FAUCET_PROVIDER: 'cardano-wallet'
