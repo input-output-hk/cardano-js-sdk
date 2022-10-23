@@ -42,10 +42,17 @@ jobs:
         OGMIOS_PORT: '1340'
         OGMIOS_URL: 'ws://cardano-node-ogmios:1340'
 
+    - name: Wait for some epochs
+      run: |
+        yarn workspace @cardano-sdk/e2e wait-for-network
+        yarn workspace @cardano-sdk/e2e wait-for-faucet
+      env:
+        FAUCET_PROVIDER: 'cardano-wallet'
+        FAUCET_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:8090/v2","mnemonic":"fire method repair aware foot tray accuse brother popular olive find account sick rocket next"}'
+        DB_SYNC_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/cexplorer'
+
     - name: 🔬 Test - e2e
       run: |
-        yarn workspace @cardano-sdk/e2e build
-        yarn workspace @cardano-sdk/e2e wait-for-network
         yarn workspace @cardano-sdk/e2e test:wallet
       env:
         FAUCET_PROVIDER: 'cardano-wallet'
