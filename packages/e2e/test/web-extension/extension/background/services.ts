@@ -13,7 +13,7 @@ const priceService: BackgroundServices = {
 
 exposeApi(
   {
-    api: priceService,
+    api$: of(priceService),
     baseChannel: adaPriceServiceChannel,
     properties: adaPriceProperties
   },

@@ -113,7 +113,7 @@ export type RemoteApiProperties<T> = {
 };
 
 export interface ExposeApiProps<API extends object> {
-  api: API;
+  api$: Observable<API | null>;
   properties: RemoteApiProperties<API>;
 }
 

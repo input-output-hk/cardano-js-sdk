@@ -18,7 +18,7 @@ import {
   exposeApi,
   exposeKeyAgent
 } from '@cardano-sdk/web-extension';
-import { combineLatest, firstValueFrom } from 'rxjs';
+import { combineLatest, firstValueFrom, of } from 'rxjs';
 import { runtime } from 'webextension-polyfill';
 import { setupWallet } from '@cardano-sdk/wallet';
 
@@ -46,7 +46,7 @@ const api: UserPromptService = {
 
 exposeApi<UserPromptService>(
   {
-    api,
+    api$: of(api),
     baseChannel: userPromptServiceChannel,
     properties: { allowOrigin: RemoteApiPropertyType.MethodReturningPromise }
   },
