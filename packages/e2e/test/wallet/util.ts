@@ -12,6 +12,7 @@ import {
   map,
   merge,
   mergeMap,
+  switchMap,
   tap,
   throwError,
   timeout
@@ -76,16 +77,27 @@ export const normalizeTxBody = (body: Cardano.TxBodyAlonzo | Cardano.NewTxBodyAl
 
 export const txConfirmed = (
   {
+    tip$,
     transactions: {
       history$,
       outgoing: { failed$ }
     }
   }: ObservableWallet,
-  { id }: Pick<Cardano.NewTxAlonzo, 'id'>
+  { id }: Pick<Cardano.NewTxAlonzo, 'id'>,
+  numConfirmations = 3
 ) =>
   firstValueFrom(
     merge(
-      history$.pipe(filter((txs) => txs.some((tx) => tx.id === id))),
+      history$.pipe(
+        switchMap((txs) => {
+          const tx = txs.find((historyTx) => historyTx.id === id);
+          if (!tx) return EMPTY;
+          return tip$.pipe(
+            filter(({ blockNo }) => blockNo >= tx.blockHeader.blockNo + numConfirmations),
+            map(() => tx)
+          );
+        })
+      ),
       failed$.pipe(
         mergeMap(({ tx, error, reason }) =>
           tx.id === id ? throwError(() => error || new Error(`Tx failed due to '${reason}': ${id}`)) : EMPTY
