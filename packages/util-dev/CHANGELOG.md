@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.0-nightly.15](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.5.0-nightly.14...@cardano-sdk/util-dev@0.5.0-nightly.15) (2022-10-24)
+
+**Note:** Version bump only for package @cardano-sdk/util-dev
+
+
+
+
+
 ## [0.5.0-nightly.14](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.5.0-nightly.13...@cardano-sdk/util-dev@0.5.0-nightly.14) (2022-10-13)
 
 **Note:** Version bump only for package @cardano-sdk/util-dev

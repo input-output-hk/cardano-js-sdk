@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/util-rxjs",
-  "version": "0.4.2-nightly.17",
+  "version": "0.4.2-nightly.18",
   "description": "RxJS extensions",
   "engines": {
     "node": "^14"
@@ -54,7 +54,7 @@
     "rxjs": "^7.4.0"
   },
   "devDependencies": {
-    "@cardano-sdk/util-dev": "^0.5.0-nightly.14",
+    "@cardano-sdk/util-dev": "^0.5.0-nightly.15",
     "eslint": "^7.32.0",
     "jest": "^28.1.3",
     "npm-run-all": "^4.1.5",

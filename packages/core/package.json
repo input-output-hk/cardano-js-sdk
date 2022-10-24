@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/core",
-  "version": "0.6.0-nightly.14",
+  "version": "0.6.0-nightly.15",
   "description": "Core types and libraries for Cardano",
   "engines": {
     "node": "^14"
@@ -62,7 +62,7 @@
   },
   "dependencies": {
     "@cardano-ogmios/client": "5.5.5",
-    "@cardano-sdk/util": "^0.6.0-nightly.3",
+    "@cardano-sdk/util": "^0.6.0-nightly.4",
     "@emurgo/cardano-serialization-lib-browser": "11.0.5",
     "@emurgo/cardano-serialization-lib-nodejs": "11.0.5",
     "@emurgo/cip14-js": "^3.0.1",
