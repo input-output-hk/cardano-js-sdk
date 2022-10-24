@@ -80,7 +80,7 @@ export class DbSyncEpochPollService implements EpochMonitor {
   }
 
   /**
-   * Get current epoch
+   * Epoch Rollover event - subscription-based mechanism to manage starting and stopping of epoch poll service
    */
   onEpochRollover(cb: Function) {
     this.#callbacks.push(cb);

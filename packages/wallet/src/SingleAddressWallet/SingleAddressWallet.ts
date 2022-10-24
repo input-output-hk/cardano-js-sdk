@@ -84,9 +84,16 @@ import {
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
+import {
+  ManagedFreeableScope,
+  Shutdown,
+  bufferToHexString,
+  contextLogger,
+  deepEquals,
+  usingAutoFree
+} from '@cardano-sdk/util';
 import { PrepareTx, createTxPreparer } from './prepareTx';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { Shutdown, bufferToHexString, contextLogger, deepEquals } from '@cardano-sdk/util';
 import { TrackedUtxoProvider } from '../services/ProviderTracker/TrackedUtxoProvider';
 import { WalletStores, createInMemoryWalletStores } from '../persistence';
 import { createTransactionInternals } from '../Transaction';
@@ -203,7 +210,6 @@ export class SingleAddressWallet implements ObservableWallet {
         networkInfoProvider: this.networkInfoProvider,
         rewardsProvider: this.rewardsProvider,
         stakePoolProvider: this.stakePoolProvider,
-        txSubmitProvider: this.#trackedTxSubmitProvider,
         utxoProvider: this.utxoProvider
       },
       { consideredOutOfSyncAfter }
@@ -387,8 +393,10 @@ export class SingleAddressWallet implements ObservableWallet {
   }
 
   async initializeTx(props: InitializeTxProps): Promise<InitializeTxResult> {
+    const scope = new ManagedFreeableScope();
     const { constraints, utxo, implicitCoin, validityInterval, changeAddress, withdrawals } = await this.#prepareTx(
-      props
+      props,
+      scope
     );
     const { selection: inputSelection } = await this.#inputSelector.select({
       constraints,
@@ -408,6 +416,8 @@ export class SingleAddressWallet implements ObservableWallet {
       validityInterval,
       withdrawals
     });
+
+    scope.dispose();
     return { body, hash, inputSelection };
   }
 
@@ -436,7 +446,7 @@ export class SingleAddressWallet implements ObservableWallet {
     this.#newTransactions.submitting$.next(tx);
     try {
       await this.txSubmitProvider.submitTx({
-        signedTransaction: bufferToHexString(Buffer.from(coreToCsl.tx(tx).to_bytes()))
+        signedTransaction: bufferToHexString(Buffer.from(usingAutoFree((scope) => coreToCsl.tx(scope, tx).to_bytes())))
       });
       const { slot: submittedAt } = await firstValueFrom(this.tip$);
       this.#logger.debug(`Submitted transaction ${tx.id} at slot ${submittedAt}`);

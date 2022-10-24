@@ -26,7 +26,7 @@ export const ownSignatureKeyPaths = async (
   ).map(({ type, index }) => ({ index, role: Number(type) }));
 
   const isStakingKeySignatureRequired = txBody.certificates?.length;
-  if (isStakingKeySignatureRequired) {
+  if (isStakingKeySignatureRequired || txBody.withdrawals?.length) {
     return [...paymentKeyPaths, { index: 0, role: KeyRole.Stake }];
   }
   return paymentKeyPaths;

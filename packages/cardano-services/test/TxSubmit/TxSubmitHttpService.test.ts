@@ -65,6 +65,7 @@ describe('TxSubmitHttpService', () => {
       txSubmitProvider = { healthCheck: jest.fn(() => Promise.resolve({ ok: isOk() })), submitTx: jest.fn() };
       httpServer = new HttpServer(config, {
         logger,
+        runnableDependencies: [],
         services: [new TxSubmitHttpService({ logger, txSubmitProvider })]
       });
       await httpServer.initialize();
@@ -106,6 +107,7 @@ describe('TxSubmitHttpService', () => {
       txSubmitProvider = { healthCheck: jest.fn(() => Promise.resolve({ ok: true })), submitTx: jest.fn() };
       httpServer = new HttpServer(config, {
         logger,
+        runnableDependencies: [],
         services: [new TxSubmitHttpService({ logger, txSubmitProvider })]
       });
       await httpServer.initialize();
@@ -179,6 +181,7 @@ describe('TxSubmitHttpService', () => {
         };
         httpServer = new HttpServer(config, {
           logger,
+          runnableDependencies: [],
           services: [new TxSubmitHttpService({ logger, txSubmitProvider })]
         });
         await httpServer.initialize();

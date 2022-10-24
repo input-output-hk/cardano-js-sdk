@@ -61,6 +61,7 @@
   },
   "dependencies": {
     "@cardano-sdk/core": "^0.6.0-nightly.14",
+    "@cardano-sdk/util": "0.6.0-nightly.3",
     "delay": "^5.0.0",
     "envalid": "^7.3.1",
     "json-bigint": "^1.0.0",

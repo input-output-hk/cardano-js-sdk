@@ -48,23 +48,38 @@ export const mockStakeDistribution: StakeDistribution = new Map([
   ]
 ]);
 
-const responseWithServiceState: HealthCheckResponse = {
+export const healthCheckResponseMock = (opts?: {
+  blockNo?: number;
+  slot?: number;
+  hash?: string;
+  networkSync?: number;
+}) => ({
   localNode: {
     ledgerTip: {
-      blockNo: 3_391_731,
-      hash: '9ef43ab6e234fcf90d103413096c7da752da2f45b15e1259f43d476afd12932c',
-      slot: 52_819_355
+      blockNo: opts?.blockNo ?? 3_391_731,
+      hash: opts?.hash ?? '9ef43ab6e234fcf90d103413096c7da752da2f45b15e1259f43d476afd12932c',
+      slot: opts?.slot ?? 52_819_355
     },
-    networkSync: 0.999
+    networkSync: opts?.networkSync ?? 0.999
   },
   ok: true
-};
+});
 
-export const mockCardanoNode = () => ({
+export const mockCardanoNode = (healthCheck?: HealthCheckResponse) => ({
   eraSummaries: jest.fn(() => Promise.resolve(mockEraSummaries)),
-  healthCheck: jest.fn(() => Promise.resolve(responseWithServiceState)),
+  healthCheck: jest.fn(() => Promise.resolve(healthCheck ?? healthCheckResponseMock())),
   initialize: jest.fn(() => Promise.resolve()),
+  initializeAfter: jest.fn(() => Promise.resolve()),
+  initializeBefore: jest.fn(() => Promise.resolve()),
+  initializeImpl: jest.fn(() => Promise.resolve()),
   shutdown: jest.fn(() => Promise.resolve()),
+  shutdownAfter: jest.fn(() => Promise.resolve()),
+  shutdownBefore: jest.fn(() => Promise.resolve()),
+  shutdownImpl: jest.fn(() => Promise.resolve()),
   stakeDistribution: jest.fn(() => Promise.resolve(mockStakeDistribution)),
+  start: jest.fn(() => Promise.resolve()),
+  startAfter: jest.fn(() => Promise.resolve()),
+  startBefore: jest.fn(() => Promise.resolve()),
+  startImpl: jest.fn(() => Promise.resolve()),
   systemStart: jest.fn(() => Promise.resolve(new Date(1_563_999_616_000)))
 });

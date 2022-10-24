@@ -1,6 +1,7 @@
 import { Cardano, coreToCsl } from '@cardano-sdk/core';
 import { FinalizeTxProps, InitializeTxProps, ObservableWallet } from '../types';
 import { Logger } from 'ts-log';
+import { ManagedFreeableScope } from '@cardano-sdk/util';
 import { Observable, combineLatest, filter, firstValueFrom, lastValueFrom, map, take } from 'rxjs';
 import { createTransactionInternals, ensureValidityInterval } from '../Transaction';
 import { defaultSelectionConstraints } from '@cardano-sdk/input-selection';
@@ -19,7 +20,7 @@ export interface PrepareTxDependencies {
 
 export const createTxPreparer =
   ({ wallet, signer, logger }: PrepareTxDependencies) =>
-  async (props: InitializeTxProps) => {
+  async (props: InitializeTxProps, scope: ManagedFreeableScope) => {
     await firstValueFrom(wallet.syncStatus.isSettled$.pipe(filter((isSettled) => isSettled)));
     const withdrawals$: Observable<Cardano.Withdrawal[] | undefined> = wallet.delegation.rewardAccounts$.pipe(
       map((accounts) => accounts.filter((account) => account.rewardBalance)),
@@ -57,7 +58,9 @@ export const createTxPreparer =
                 validityInterval,
                 withdrawals
               });
+
               return coreToCsl.tx(
+                scope,
                 await firstValueFrom(
                   signer.stubFinalizeTx({
                     auxiliaryData: props.auxiliaryData,
@@ -71,7 +74,10 @@ export const createTxPreparer =
             },
             protocolParameters
           });
-          const implicitCoin = Cardano.util.computeImplicitCoin(protocolParameters, props);
+          const implicitCoin = Cardano.util.computeImplicitCoin(protocolParameters, {
+            certificates: props.certificates,
+            withdrawals
+          });
           return { changeAddress, constraints, implicitCoin, utxo, validityInterval, withdrawals };
         })
       )

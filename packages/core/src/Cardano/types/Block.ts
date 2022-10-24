@@ -1,3 +1,5 @@
+import { CSL } from '../..';
+import { Ed25519PublicKey } from '.';
 import { Hash28ByteBase16, Hash32ByteBase16, OpaqueString, typedBech32 } from '../util/primitives';
 import { InvalidStringError } from '../../errors';
 import { Lovelace } from './Value';
@@ -31,6 +33,7 @@ export type BlockId = Hash32ByteBase16<'BlockId'>;
 export interface PartialBlockHeader {
   blockNo: BlockNo;
   slot: Slot;
+  /** Block header hash */
   hash: BlockId;
 }
 
@@ -74,18 +77,46 @@ export const SlotLeader = (value: string): SlotLeader => {
   }
 };
 
-export interface Block {
+/**
+ * Get Bech32 encoded VRF verification key from base64 encoded string
+ *
+ * @param value is a Base64 string
+ * @returns Bech32 encoded vrf_vk
+ */
+export const VrfVkBech32FromBase64 = (value: string) =>
+  VrfVkBech32(CSL.VRFVKey.from_bytes(Buffer.from(value, 'base64')).to_bech32('vrf_vk'));
+
+/** Minimal Block type meant as a base for the more complete version `Block`  */
+// TODO: optionals (except previousBlock) are there because they are not calculated for Byron yet.
+// Remove them once calculation is done and remove the Required<BlockMinimal> from interface Block
+export interface BlockMinimal {
   header: PartialBlockHeader;
+  /** Byron blocks fee not calculated yet */
+  fees?: Lovelace;
+  totalOutput: Lovelace;
+  txCount: number;
+  /** Byron blocks size not calculated yet */
+  size?: BlockSize;
+  previousBlock?: BlockId;
+  vrf?: VrfVkBech32;
+  /**
+   * This is the operational cold verification key of the stake pool
+   * Leaving as undefined for Byron blocks until we figure out how/if we can use the genesisKey field
+   */
+  issuerVk?: Ed25519PublicKey;
+}
+
+export interface Block
+  extends Required<Omit<BlockMinimal, 'issuerVk' | 'previousBlock'>>,
+    Pick<BlockMinimal, 'previousBlock'> {
+  /**
+   * In case of blocks produced by BFT nodes, the SlotLeader the issuerVk hash
+   * For blocks produced by stake pools, it is the Bech32 encoded value of issuerVk hash
+   */
+  slotLeader: SlotLeader;
   date: Date;
   epoch: EpochNo;
   epochSlot: number;
-  slotLeader: SlotLeader;
-  size: BlockSize;
-  txCount: number;
-  totalOutput: Lovelace;
-  fees: Lovelace;
-  vrf: VrfVkBech32;
-  previousBlock?: BlockId;
   nextBlock?: BlockId;
   confirmations: number;
 }

@@ -4,6 +4,7 @@ import { CSL } from './CSL';
 import { HexBlob } from '../Cardano/util/primitives';
 import { NewTxAlonzo, NewTxBodyAlonzo } from '../Cardano/types';
 import { newTx } from './cslToCore';
+import { usingAutoFree } from '@cardano-sdk/util';
 
 export const MAX_U64 = 18_446_744_073_709_551_615n;
 
@@ -27,15 +28,15 @@ export const bytewiseEquals = (obj1: CslObject, obj2: CslObject) => {
   return obj1Bytes.every((byte, idx) => obj2Bytes[idx] === byte);
 };
 
-export const deserializeTx = ((txBody: Buffer | Uint8Array | string) => {
-  const buffer =
-    txBody instanceof Buffer
-      ? txBody
-      : (txBody instanceof Uint8Array
-      ? Buffer.from(txBody)
-      : Buffer.from(HexBlob(txBody).toString(), 'hex'));
+export const deserializeTx = ((txBody: Buffer | Uint8Array | string) => usingAutoFree((scope) => {
+    const buffer =
+      txBody instanceof Buffer
+        ? txBody
+        : (txBody instanceof Uint8Array
+          ? Buffer.from(txBody)
+          : Buffer.from(HexBlob(txBody).toString(), 'hex'));
 
-  const txDecoded = CSL.Transaction.from_bytes(buffer);
+    const txDecoded = scope.manage(CSL.Transaction.from_bytes(buffer));
 
-  return newTx(txDecoded);
-}) as (txBody: HexBlob | Buffer | Uint8Array | string) => NewTxAlonzo<NewTxBodyAlonzo>;
+    return newTx(txDecoded);
+  })) as (txBody: HexBlob | Buffer | Uint8Array | string) => NewTxAlonzo<NewTxBodyAlonzo>;

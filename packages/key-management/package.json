@@ -69,7 +69,7 @@
     "lodash": "^4.17.21",
     "pbkdf2": "^3.1.2",
     "rxjs": "^7.4.0",
-    "trezor-connect": "^8.2.11"
+    "trezor-connect": "8.2.11-extended"
   },
   "files": [
     "dist/*",

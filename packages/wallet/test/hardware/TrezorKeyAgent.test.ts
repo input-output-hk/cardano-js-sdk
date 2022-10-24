@@ -139,7 +139,7 @@ describe('TrezorKeyAgent', () => {
       body: txInternals.body,
       hash: txInternals.hash
     });
-    expect(signatures.size).toBe(1);
+    expect(signatures.size).toBe(2);
   });
 
   describe('serializableData', () => {

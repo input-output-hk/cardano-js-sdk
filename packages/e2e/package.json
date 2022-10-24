@@ -24,8 +24,8 @@
     "test:web-extension:watch:run": "yarn test:web-extension:run --watch",
     "test:web-extension:watch": "run-s test:web-extension:build test:web-extension:watch:bg",
     "test:web-extension:watch:bg": "run-p test:web-extension:watch:build test:web-extension:watch:run",
-    "local-network:up": "DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker-compose -p local-network-e2e up",
-    "local-network:down": "DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker-compose -p local-network-e2e down -v --remove-orphans  && docker rmi local-network-e2e_local-testnet",
+    "local-network:up": "DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker compose -p local-network-e2e up",
+    "local-network:down": "DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker compose -p local-network-e2e down -v --remove-orphans",
     "cardano-services:up": "ts-node --transpile-only ../cardano-services/src/cli.ts start-server",
     "cardano-services:up:debug": "npx nodemon --legacy-watch --exec 'node -r ts-node/register --inspect=0.0.0.0:9229 ../cardano-services/src/cli.ts start-server'",
     "build:esm": "tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020",
@@ -42,7 +42,8 @@
     "prepack": "yarn build",
     "test:build:verify": "tsc --build ./test && tsc --build ./test/web-extension",
     "test:debug": "DEBUG=true yarn test",
-    "generate-mnemonics": "ts-node src/util/mnemonic.ts"
+    "generate-mnemonics": "ts-node src/util/mnemonic.ts",
+    "wait-for-network": "ts-node src/util/is-local-network-ready.ts"
   },
   "repository": "https://github.com/input-output-hk/cardano-js-sdk",
   "contributors": [
@@ -65,7 +66,7 @@
   },
   "dependencies": {
     "@cardano-foundation/ledgerjs-hw-app-cardano": "5.0.0",
-    "@cardano-ogmios/client": "^5.5.2",
+    "@cardano-ogmios/client": "^5.5.5",
     "@cardano-sdk/blockfrost": "^0.6.0-nightly.14",
     "@cardano-sdk/cardano-services": "^0.6.0-nightly.16",
     "@cardano-sdk/cardano-services-client": "^0.6.0-nightly.14",

@@ -1,5 +1,6 @@
 import { CSL, Cardano, coreToCsl, util } from '@cardano-sdk/core';
 import { util as keyManagementUtil } from '@cardano-sdk/key-management';
+import { usingAutoFree } from '@cardano-sdk/util';
 import blake2b from 'blake2b';
 
 /**
@@ -91,9 +92,11 @@ export const metadataBuilder = {
     votingRegistrationMetadata: Cardano.TxMetadata,
     stakeKeyBlobSigner: BlobSigner
   ): Promise<Cardano.TxMetadata> {
-    const cslVotingRegistrationMetadata = coreToCsl.txMetadata(votingRegistrationMetadata);
+    const votingRegistrationMetadataBytes = usingAutoFree((scope) =>
+      coreToCsl.txMetadata(scope, votingRegistrationMetadata).to_bytes()
+    );
     const hashedMetadata = blake2b(256 / 8)
-      .update(cslVotingRegistrationMetadata.to_bytes())
+      .update(votingRegistrationMetadataBytes)
       .digest('binary');
     const signature = await stakeKeyBlobSigner.signBlob(util.bytesToHex(hashedMetadata));
     return new Map([

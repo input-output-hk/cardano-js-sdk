@@ -136,7 +136,7 @@ describe('LedgerKeyAgent', () => {
       body: txInternals.body,
       hash: txInternals.hash
     });
-    expect(signatures.size).toBe(1);
+    expect(signatures.size).toBe(2);
   });
 
   describe('establish, check and re-establish device connection', () => {

@@ -1,5 +1,6 @@
 import { NativeScript, PolicyId } from '../Cardano';
 import { nativeScript } from '../CSL/coreToCsl';
+import { usingAutoFree } from '@cardano-sdk/util';
 
 /**
  * Gets the policy id of the given native script.
@@ -8,4 +9,7 @@ import { nativeScript } from '../CSL/coreToCsl';
  * @returns the policy Id.
  */
 export const nativeScriptPolicyId = (script: NativeScript): PolicyId =>
-  PolicyId(Buffer.from(nativeScript(script).hash().to_bytes()).toString('hex'));
+  usingAutoFree((scope) => {
+    const managedScript = nativeScript(scope, script);
+    return PolicyId(Buffer.from(scope.manage(managedScript.hash()).to_bytes()).toString('hex'));
+  });

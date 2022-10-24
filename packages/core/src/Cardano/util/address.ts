@@ -1,10 +1,16 @@
 import { Address, NewTxIn, TxAlonzo, TxIn } from '../types';
 import { parseCslAddress } from '../../CSL/parseCslAddress';
+import { usingAutoFree } from '@cardano-sdk/util';
 
 /**
  * Validate input as a Cardano Address from all Cardano eras and networks
  */
-export const isAddress = (input: string): boolean => !!parseCslAddress(input);
+export const isAddress = (input: string): boolean =>
+  usingAutoFree((scope) => {
+    const address = parseCslAddress(scope, input);
+    if (address !== null) address;
+    return !!address;
+  });
 
 /**
  * Checks that an object containing an address (e.g., output, input) is within a set of provided addresses

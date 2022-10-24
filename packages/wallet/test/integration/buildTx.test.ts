@@ -145,7 +145,7 @@ describe('buildTx', () => {
       expect(tx.extraSigners).toEqual(signers);
 
       const signedTx = await tx.sign();
-      expect(signedTx.tx.witness.signatures).toEqual(new Map([[pubKey, signature]]));
+      expect(signedTx.tx.witness.signatures.get(pubKey)).toEqual(signature);
     });
   });
 

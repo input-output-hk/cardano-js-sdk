@@ -27,24 +27,41 @@ import {
   UnitInterval,
   VRFKeyHash
 } from '@emurgo/cardano-serialization-lib-nodejs';
+import { ManagedFreeableScope } from '@cardano-sdk/util';
 import { NotImplementedError } from '../../errors';
 
-export const stakeKeyRegistration = (stakeKeyHash: Cardano.Ed25519KeyHash) =>
-  Certificate.new_stake_registration(
-    StakeRegistration.new(
-      StakeCredential.from_keyhash(Ed25519KeyHash.from_bytes(Buffer.from(stakeKeyHash.toString(), 'hex')))
+export const stakeKeyRegistration = (scope: ManagedFreeableScope, stakeKeyHash: Cardano.Ed25519KeyHash) =>
+  scope.manage(
+    Certificate.new_stake_registration(
+      scope.manage(
+        StakeRegistration.new(
+          scope.manage(
+            StakeCredential.from_keyhash(
+              scope.manage(Ed25519KeyHash.from_bytes(Buffer.from(stakeKeyHash.toString(), 'hex')))
+            )
+          )
+        )
+      )
     )
   );
 
-export const stakeKeyDeregistration = (stakeKeyHash: Cardano.Ed25519KeyHash) =>
-  Certificate.new_stake_deregistration(
-    StakeDeregistration.new(
-      StakeCredential.from_keyhash(Ed25519KeyHash.from_bytes(Buffer.from(stakeKeyHash.toString(), 'hex')))
+export const stakeKeyDeregistration = (scope: ManagedFreeableScope, stakeKeyHash: Cardano.Ed25519KeyHash) =>
+  scope.manage(
+    Certificate.new_stake_deregistration(
+      scope.manage(
+        StakeDeregistration.new(
+          scope.manage(
+            StakeCredential.from_keyhash(
+              scope.manage(Ed25519KeyHash.from_bytes(Buffer.from(stakeKeyHash.toString(), 'hex')))
+            )
+          )
+        )
+      )
     )
   );
 
-const createCslRelays = (relays: Cardano.Relay[]) => {
-  const cslRelays = Relays.new();
+const createCslRelays = (scope: ManagedFreeableScope, relays: Cardano.Relay[]) => {
+  const cslRelays = scope.manage(Relays.new());
   for (const relay of relays) {
     switch (relay.__typename) {
       case 'RelayByAddress':
@@ -52,23 +69,39 @@ const createCslRelays = (relays: Cardano.Relay[]) => {
           throw new NotImplementedError('Parse IPv6 to byte array');
         }
         cslRelays.add(
-          Relay.new_single_host_addr(
-            SingleHostAddr.new(
-              relay.port,
-              relay.ipv4
-                ? Ipv4.new(new Uint8Array(relay.ipv4.split('.').map((segment) => Number.parseInt(segment))))
-                : undefined
+          scope.manage(
+            Relay.new_single_host_addr(
+              scope.manage(
+                SingleHostAddr.new(
+                  relay.port,
+                  relay.ipv4
+                    ? scope.manage(
+                        Ipv4.new(new Uint8Array(relay.ipv4.split('.').map((segment) => Number.parseInt(segment))))
+                      )
+                    : undefined
+                )
+              )
             )
           )
         );
         break;
       case 'RelayByName':
         cslRelays.add(
-          Relay.new_single_host_name(SingleHostName.new(relay.port || undefined, DNSRecordAorAAAA.new(relay.hostname)))
+          scope.manage(
+            Relay.new_single_host_name(
+              scope.manage(
+                SingleHostName.new(relay.port || undefined, scope.manage(DNSRecordAorAAAA.new(relay.hostname)))
+              )
+            )
+          )
         );
         break;
       case 'RelayByNameMultihost':
-        cslRelays.add(Relay.new_multi_host_name(MultiHostName.new(DNSRecordSRV.new(relay.dnsName))));
+        cslRelays.add(
+          scope.manage(
+            Relay.new_multi_host_name(scope.manage(MultiHostName.new(scope.manage(DNSRecordSRV.new(relay.dnsName)))))
+          )
+        );
         break;
       default:
         throw new NotImplementedError('Relay type');
@@ -77,63 +110,90 @@ const createCslRelays = (relays: Cardano.Relay[]) => {
   return cslRelays;
 };
 
-export const poolRegistration = ({
-  id,
-  vrf,
-  pledge,
-  cost,
-  margin,
-  rewardAccount,
-  owners,
-  relays,
-  metadataJson
-}: Cardano.PoolParameters) => {
-  const cslOwners = Ed25519KeyHashes.new();
+export const poolRegistration = (
+  scope: ManagedFreeableScope,
+  { id, vrf, pledge, cost, margin, rewardAccount, owners, relays, metadataJson }: Cardano.PoolParameters
+) => {
+  const cslOwners = scope.manage(Ed25519KeyHashes.new());
   for (const owner of owners) {
-    const hash = RewardAddress.from_address(Address.from_bech32(owner.toString()))!.payment_cred().to_keyhash()!;
+    const hash = scope.manage(
+      scope
+        .manage(
+          scope.manage(RewardAddress.from_address(scope.manage(Address.from_bech32(owner.toString()))))!.payment_cred()
+        )
+        .to_keyhash()
+    )!;
     cslOwners.add(hash);
   }
-  const cslRelays = createCslRelays(relays);
-  const poolParams = PoolParams.new(
-    Ed25519KeyHash.from_bech32(id.toString()),
-    VRFKeyHash.from_bytes(Buffer.from(vrf, 'hex')),
-    BigNum.from_str(pledge.toString()),
-    BigNum.from_str(cost.toString()),
-    UnitInterval.new(BigNum.from_str(margin.numerator.toString()), BigNum.from_str(margin.denominator.toString())),
-    RewardAddress.from_address(Address.from_bech32(rewardAccount.toString()))!,
-    cslOwners,
-    cslRelays,
-    metadataJson
-      ? PoolMetadata.new(URL.new(metadataJson.url), PoolMetadataHash.from_bytes(Buffer.from(metadataJson.hash, 'hex')))
-      : undefined
+  const cslRelays = createCslRelays(scope, relays);
+  const poolParams = scope.manage(
+    PoolParams.new(
+      scope.manage(Ed25519KeyHash.from_bech32(id.toString())),
+      scope.manage(VRFKeyHash.from_bytes(Buffer.from(vrf, 'hex'))),
+      scope.manage(BigNum.from_str(pledge.toString())),
+      scope.manage(BigNum.from_str(cost.toString())),
+      scope.manage(
+        UnitInterval.new(
+          scope.manage(BigNum.from_str(margin.numerator.toString())),
+          scope.manage(BigNum.from_str(margin.denominator.toString()))
+        )
+      ),
+      scope.manage(RewardAddress.from_address(scope.manage(Address.from_bech32(rewardAccount.toString())))!),
+      cslOwners,
+      cslRelays,
+      metadataJson
+        ? scope.manage(
+            PoolMetadata.new(
+              scope.manage(URL.new(metadataJson.url)),
+              scope.manage(PoolMetadataHash.from_bytes(Buffer.from(metadataJson.hash, 'hex')))
+            )
+          )
+        : undefined
+    )
   );
-  return Certificate.new_pool_registration(PoolRegistration.new(poolParams));
+  return scope.manage(Certificate.new_pool_registration(scope.manage(PoolRegistration.new(poolParams))));
 };
 
-export const poolRetirement = (poolId: Cardano.PoolId, epoch: number) =>
-  Certificate.new_pool_retirement(PoolRetirement.new(Ed25519KeyHash.from_bech32(poolId.toString()), epoch));
-
-export const stakeDelegation = (stakeKeyHash: Cardano.Ed25519KeyHash, delegatee: Cardano.PoolId) =>
-  Certificate.new_stake_delegation(
-    // TODO: add coreToCsl support for genesis pool IDs
-    StakeDelegation.new(
-      StakeCredential.from_keyhash(Ed25519KeyHash.from_bytes(Buffer.from(stakeKeyHash.toString(), 'hex'))),
-      Ed25519KeyHash.from_bech32(delegatee.toString())
+export const poolRetirement = (scope: ManagedFreeableScope, poolId: Cardano.PoolId, epoch: number) =>
+  scope.manage(
+    Certificate.new_pool_retirement(
+      scope.manage(PoolRetirement.new(scope.manage(Ed25519KeyHash.from_bech32(poolId.toString())), epoch))
     )
   );
 
-export const create = (certificate: Cardano.Certificate) => {
+export const stakeDelegation = (
+  scope: ManagedFreeableScope,
+  stakeKeyHash: Cardano.Ed25519KeyHash,
+  delegatee: Cardano.PoolId
+) =>
+  scope.manage(
+    Certificate.new_stake_delegation(
+      // TODO: add coreToCsl support for genesis pool IDs
+      scope.manage(
+        StakeDelegation.new(
+          scope.manage(
+            StakeCredential.from_keyhash(
+              scope.manage(Ed25519KeyHash.from_bytes(Buffer.from(stakeKeyHash.toString(), 'hex')))
+            )
+          ),
+          scope.manage(Ed25519KeyHash.from_bech32(delegatee.toString()))
+        )
+      )
+    )
+  );
+
+export const create = (scope: ManagedFreeableScope, certificate: Cardano.Certificate) => {
   switch (certificate.__typename) {
     case Cardano.CertificateType.PoolRegistration:
-      return poolRegistration(certificate.poolParameters);
+      return poolRegistration(scope, certificate.poolParameters);
     case Cardano.CertificateType.PoolRetirement:
-      return poolRetirement(certificate.poolId, certificate.epoch);
+      return poolRetirement(scope, certificate.poolId, certificate.epoch);
     case Cardano.CertificateType.StakeDelegation:
-      return stakeDelegation(certificate.stakeKeyHash, certificate.poolId);
+      return stakeDelegation(scope, certificate.stakeKeyHash, certificate.poolId);
     case Cardano.CertificateType.StakeKeyDeregistration:
-      return stakeKeyDeregistration(certificate.stakeKeyHash);
+      return stakeKeyDeregistration(scope, certificate.stakeKeyHash);
     case Cardano.CertificateType.StakeKeyRegistration:
-      return stakeKeyRegistration(certificate.stakeKeyHash);
+      return stakeKeyRegistration(scope, certificate.stakeKeyHash);
     default:
       throw new NotImplementedError(`certificate.create ${certificate.__typename}`);
   }

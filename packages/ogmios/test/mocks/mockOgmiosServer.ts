@@ -40,6 +40,7 @@ export interface MockOgmiosServerConfig {
     response: {
       success: boolean;
       failWith?: Error;
+      blockNo?: number;
       networkSynchronization?: number;
     };
   };
@@ -189,7 +190,11 @@ export const createMockOgmiosServer = (config: MockOgmiosServerConfig): Server =
     res.end(
       JSON.stringify({
         ...HEALTH_RESPONSE_BODY,
-        networkSynchronization: config.healthCheck?.response.networkSynchronization
+        lastKnownTip: config.healthCheck?.response.blockNo
+          ? { ...HEALTH_RESPONSE_BODY.lastKnownTip, blockNo: config.healthCheck.response.blockNo }
+          : HEALTH_RESPONSE_BODY.lastKnownTip,
+        networkSynchronization:
+          config.healthCheck?.response.networkSynchronization ?? HEALTH_RESPONSE_BODY.networkSynchronization
       })
     );
   });

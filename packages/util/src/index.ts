@@ -1,4 +1,5 @@
 export * from './equals';
+export * from './freeable';
 export * from './types';
 export * from './BigIntMath';
 export * from './hexString';
@@ -7,3 +8,4 @@ export * from './replaceNullsToUndefineds';
 export * from './serializableObject';
 export * from './network';
 export * from './logging';
+export * from './RunnableModule';
