@@ -8,6 +8,7 @@ import {
   senderOrigin
 } from '../messaging';
 import { RemoteAuthenticatorMethodNames } from './consumeRemoteAuthenticatorApi';
+import { of } from 'rxjs';
 
 export interface ExposeAuthenticatorApiOptions {
   walletName: string;
@@ -26,7 +27,7 @@ export const exposeAuthenticatorApi = (
 ) =>
   exposeApi(
     {
-      api: dependencies.authenticator,
+      api$: of(dependencies.authenticator),
       baseChannel: authenticatorChannel(walletName),
       properties: Object.fromEntries(
         RemoteAuthenticatorMethodNames.map((prop) => [

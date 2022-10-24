@@ -1,6 +1,7 @@
 import { MessengerDependencies, exposeApi } from '../messaging';
 import { ObservableWallet } from '@cardano-sdk/wallet';
 import { observableWalletChannel, observableWalletProperties } from './util';
+import { of } from 'rxjs';
 
 export interface ExposeObservableWalletProps {
   wallet: ObservableWallet;
@@ -13,7 +14,7 @@ export const exposeObservableWallet = (
 ) =>
   exposeApi(
     {
-      api: wallet,
+      api$: of(wallet),
       baseChannel: observableWalletChannel(walletName),
       properties: observableWalletProperties
     },

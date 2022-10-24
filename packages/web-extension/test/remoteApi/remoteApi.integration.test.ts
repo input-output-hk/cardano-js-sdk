@@ -87,8 +87,11 @@ const setUp = (someNumbers$: Observable<bigint> = of(0n), nestedSomeNumbers$ = o
     nonExposedObservable$: throwError(() => new Error('Shouldnt be called')),
     someNumbers$
   };
+
   type FullApi = typeof api;
   type ExposedApi = Omit<FullApi, 'nonExposedMethod' | 'nonExposedObservable$' | 'nestedNonExposed'>;
+  const api$ = new Subject<FullApi>();
+
   const properties: RemoteApiProperties<ExposedApi> = {
     addOne: RemoteApiPropertyType.MethodReturningPromise,
     addOneTransformedToAddTwo: {
@@ -118,7 +121,7 @@ const setUp = (someNumbers$: Observable<bigint> = of(0n), nestedSomeNumbers$ = o
   const hostMessenger = createMessenger(baseChannel, true);
   const hostSubscription = exposeMessengerApi(
     {
-      api,
+      api$,
       properties
     },
     {
@@ -139,14 +142,19 @@ const setUp = (someNumbers$: Observable<bigint> = of(0n), nestedSomeNumbers$ = o
     },
     { logger, messenger: createMessenger(baseChannel, false) }
   );
+
   jest.spyOn(api.nonExposedObservable$, 'subscribe');
   return {
     api,
+    api$,
     cleanup() {
       hostSubscription.shutdown();
       consumer.shutdown();
     },
     consumer,
+    emitInitial() {
+      api$.next(api);
+    },
     hostMessenger,
     hostSubscription
   };
@@ -154,8 +162,31 @@ const setUp = (someNumbers$: Observable<bigint> = of(0n), nestedSomeNumbers$ = o
 
 type SUT = ReturnType<typeof setUp>;
 
-describe('remoteApi', () => {
+describe('remoteApi integration', () => {
   let sut: SUT;
+
+  let otherApi: typeof sut.api;
+  let someOtherNumbersSource$: Subject<bigint>;
+  let nestedOtherSomeNumbers$: Subject<bigint>;
+
+  beforeEach(() => {
+    someOtherNumbersSource$ = new Subject<bigint>();
+    nestedOtherSomeNumbers$ = new Subject<bigint>();
+    otherApi = {
+      addOne,
+      addOneTransformedToAddTwo: addOne,
+      nested: {
+        addOneNoZero: addOne,
+        nestedSomeNumbers$: nestedOtherSomeNumbers$
+      },
+      nestedNonExposed: {
+        nestedNonExposed$: of(true)
+      },
+      nonExposedMethod: jest.fn(async () => true),
+      nonExposedObservable$: throwError(() => new Error('Shouldnt be called')),
+      someNumbers$: someOtherNumbersSource$
+    };
+  });
 
   afterEach(() => {
     sut.cleanup();
@@ -191,7 +222,9 @@ describe('remoteApi', () => {
       });
 
       it('calls remote method and resolves result', async () => {
-        expect(await sut.consumer.nested.addOneNoZero(2n)).toBe(3n);
+        const resolved = sut.consumer.nested.addOneNoZero(2n);
+        sut.emitInitial();
+        expect(await resolved).toBe(3n);
       });
       test('requestOptions | validate', async () => {
         await expect(() => sut.consumer.nested.addOneNoZero(0n)).rejects.toThrowError();
@@ -199,12 +232,27 @@ describe('remoteApi', () => {
     });
 
     describe('top-level property', () => {
+      beforeEach(() => sut.emitInitial());
+
       it('calls remote method and resolves result', async () => {
         expect(await sut.consumer.addOne(2n)).toBe(3n);
       });
 
       test('requestOptions | transform', async () => {
         expect(await sut.consumer.addOneTransformedToAddTwo(1n)).toBe(3n);
+      });
+
+      it('calls remote method multiple times and resolves result', async () => {
+        expect(await sut.consumer.addOne(2n)).toBe(3n);
+        expect(await sut.consumer.addOne(2n)).toBe(3n);
+      });
+
+      it('calls remote method from new source and resolves result', async () => {
+        expect(await sut.consumer.addOne(2n)).toBe(3n);
+        // add 11 instead of 1 to differentiate from original api object
+        otherApi.addOne = async (arg: bigint) => arg + 11n;
+        sut.api$.next(otherApi);
+        expect(await sut.consumer.addOne(2n)).toBe(13n);
       });
 
       // TODO: this fails in CI
@@ -237,6 +285,7 @@ describe('remoteApi', () => {
       someNumbersSource$ = new Subject();
       nestedSomeNumbersSource$ = new Subject();
       sut = setUp(someNumbersSource$, nestedSomeNumbersSource$);
+      sut.emitInitial();
     });
 
     afterEach(() => {
@@ -255,7 +304,7 @@ describe('remoteApi', () => {
           setTimeout(async () => {
             someNumbersSource$.next(0n);
             someNumbersSource$.next(1n);
-            someNumbersSource$.complete();
+            setTimeout(() => sut.hostSubscription.shutdown());
             expect(await emitted).toEqual([0n, 1n]);
             done();
           }, 1);
@@ -271,7 +320,7 @@ describe('remoteApi', () => {
               const emittedFromSubscriptionAfterConnect = firstValueFrom(sut.consumer.someNumbers$.pipe(toArray()));
               setTimeout(async () => {
                 someNumbersSource$.next(1n);
-                someNumbersSource$.complete();
+                setTimeout(() => sut.hostSubscription.shutdown());
                 expect(await emittedFromSubscriptionBeforeConnect).toEqual([0n, 1n]);
                 expect(await emittedFromSubscriptionBeforeConnect).toEqual(await emittedFromSubscriptionAfterConnect);
                 done();
@@ -309,10 +358,92 @@ describe('remoteApi', () => {
       setTimeout(async () => {
         nestedSomeNumbersSource$.next(0n);
         nestedSomeNumbersSource$.next(1n);
-        nestedSomeNumbersSource$.complete();
+        setTimeout(() => sut.hostSubscription.shutdown());
         expect(await emitted).toEqual([0n, 1n]);
         done();
       }, 1);
+    });
+
+    describe('changing source', () => {
+      describe('top level property', () => {
+        it('mirrors values emitted from original source, then from new source', (done) => {
+          const emitted = firstValueFrom(sut.consumer.someNumbers$.pipe(toArray()));
+          setTimeout(async () => {
+            // Emit from first api object
+            someNumbersSource$.next(0n);
+            // Switch to otherApi
+            sut.api$.next(otherApi);
+            // Emit from otherApi
+            someOtherNumbersSource$.next(1n);
+            setTimeout(() => sut.hostSubscription.shutdown());
+            expect(await emitted).toEqual([0n, 1n]);
+            done();
+          }, 1);
+        });
+
+        it('replays 1 last value emitted by new source before subscription', (done) => {
+          someNumbersSource$.next(-1n);
+          sut.api$.next(otherApi);
+          someOtherNumbersSource$.next(0n);
+          setTimeout(() => {
+            const emittedFromSubscriptionBeforeConnect = firstValueFrom(sut.consumer.someNumbers$.pipe(toArray()));
+            sut.hostMessenger.connect();
+            setTimeout(() => {
+              const emittedFromSubscriptionAfterConnect = firstValueFrom(sut.consumer.someNumbers$.pipe(toArray()));
+              setTimeout(async () => {
+                someOtherNumbersSource$.next(1n);
+                setTimeout(() => sut.hostSubscription.shutdown());
+                expect(await emittedFromSubscriptionBeforeConnect).toEqual([0n, 1n]);
+                expect(await emittedFromSubscriptionBeforeConnect).toEqual(await emittedFromSubscriptionAfterConnect);
+                done();
+              }, 1);
+            }, 1);
+          }, 1);
+        });
+
+        it('mirrors new source errors', (done) => {
+          sut.consumer.someNumbers$.subscribe({
+            error: (error) => {
+              expect(error instanceof Error).toBe(true);
+              expect(error.message).toBe('err');
+              done();
+            }
+          });
+          sut.api$.next(otherApi);
+          someOtherNumbersSource$.error(new Error('err'));
+          expect.assertions(2);
+        });
+
+        it('nested property | mirrors new source emissions and completion for values emitted', (done) => {
+          const emitted = firstValueFrom(sut.consumer.nested.nestedSomeNumbers$.pipe(toArray()));
+          setTimeout(async () => {
+            nestedSomeNumbersSource$.next(0n);
+            sut.api$.next(otherApi);
+            nestedOtherSomeNumbers$.next(1n);
+            setTimeout(() => sut.hostSubscription.shutdown());
+            expect(await emitted).toEqual([0n, 1n]);
+            done();
+          }, 1);
+        });
+
+        it('ignores old source emissions', (done) => {
+          const emitted = firstValueFrom(sut.consumer.someNumbers$.pipe(toArray()));
+          setTimeout(async () => {
+            sut.api$.next(otherApi);
+            someNumbersSource$.next(0n); // ignored because source has changed
+            someOtherNumbersSource$.next(1n);
+            setTimeout(() => sut.hostMessenger.shutdown());
+            expect(await emitted).toEqual([1n]);
+            done();
+          }, 1);
+        });
+
+        it('rejects new api object with missing properties', async () => {
+          otherApi.someNumbers$ = null as unknown as typeof otherApi['someNumbers$'];
+          sut.api$.next(otherApi);
+          await expect(firstValueFrom(sut.consumer.someNumbers$)).rejects.toThrowError();
+        });
+      });
     });
   });
 });

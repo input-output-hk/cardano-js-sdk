@@ -7,6 +7,7 @@ import {
   exposeApi,
   senderOrigin
 } from '../messaging';
+import { of } from 'rxjs';
 import { walletApiChannel } from './util';
 
 export interface BackgroundWalletApiOptions {
@@ -25,7 +26,7 @@ export const exposeWalletApi = (
 ) =>
   exposeApi(
     {
-      api: dependencies.walletApi,
+      api$: of(dependencies.walletApi),
       baseChannel: walletApiChannel(walletName),
       properties: Object.fromEntries(
         WalletApiMethodNames.map((prop) => [

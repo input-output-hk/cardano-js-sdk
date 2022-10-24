@@ -18,7 +18,9 @@ import { CustomError } from 'ts-custom-error';
 import {
   EMPTY,
   EmptyError,
+  NEVER,
   Observable,
+  concat,
   filter,
   firstValueFrom,
   isObservable,
@@ -26,6 +28,7 @@ import {
   merge,
   mergeMap,
   shareReplay,
+  switchMap,
   takeUntil,
   tap
 } from 'rxjs';
@@ -175,21 +178,29 @@ const isRemoteApiMethod = (prop: unknown): prop is RemoteApiMethod =>
   typeof prop === 'object' && prop !== null && 'propType' in prop;
 
 export const bindNestedObjChannels = <API extends object>(
-  { api, properties }: ExposeApiProps<API>,
+  { api$, properties }: ExposeApiProps<API>,
   { messenger, logger }: MessengerApiDependencies
 ): Shutdown => {
   const subscriptions = Object.entries(properties)
     .filter(([_, type]) => typeof type === 'object' && !isRemoteApiMethod(type))
-    .map(([prop]) => {
-      if (typeof (api as any)[prop] !== 'object' || isObservable((api as any)[prop])) {
-        throw new NotImplementedError(`Trying to expose non-implemented nested object ${prop}`);
-      }
+    .map(([prop]) =>
       // eslint-disable-next-line no-use-before-define
-      return exposeMessengerApi(
-        { api: (api as any)[prop], properties: (properties as any)[prop] },
+      exposeMessengerApi(
+        {
+          api$: api$.pipe(
+            tap((api) => {
+              // Do not stop for null api. We must unsubscribe the existing subscriptions from nested props
+              if (api && (typeof (api as any)[prop] !== 'object' || isObservable((api as any)[prop]))) {
+                throw new NotImplementedError(`Trying to expose non-implemented nested object ${prop}`);
+              }
+            }),
+            map((api) => (api ? (api as any)[prop] : api))
+          ),
+          properties: (properties as any)[prop]
+        },
         { logger, messenger: messenger.deriveChannel(prop) }
-      );
-    });
+      )
+    );
   return {
     shutdown: () => {
       for (const subscription of subscriptions) {
@@ -200,16 +211,25 @@ export const bindNestedObjChannels = <API extends object>(
 };
 
 export const bindObservableChannels = <API extends object>(
-  { api, properties }: ExposeApiProps<API>,
+  { api$, properties }: ExposeApiProps<API>,
   { messenger }: MessengerApiDependencies
 ): Shutdown => {
   const subscriptions = Object.entries(properties)
     .filter(([, propType]) => propType === RemoteApiPropertyType.HotObservable)
     .map(([observableProperty]) => {
-      if (!isObservable(api[observableProperty as keyof API])) {
-        throw new NotImplementedError(`Trying to expose non-implemented observable ${observableProperty}`);
-      }
-      const observable$ = new TrackerSubject((api as any)[observableProperty] as Observable<unknown>);
+      const observable$ = new TrackerSubject(
+        api$.pipe(
+          tap((api) => {
+            if (api && !isObservable(api[observableProperty as keyof API])) {
+              throw new NotImplementedError(`Trying to expose non-implemented observable ${observableProperty}`);
+            }
+          }),
+          // Null api (aka stop using the object).
+          // Unsubscribe its properties but leave the wrapping subscription open, waiting for a new api object
+          switchMap((api) => (api ? ((api as any)[observableProperty] as Observable<unknown>) : NEVER))
+        )
+      );
+
       const observableMessenger = messenger.deriveChannel(observableProperty);
       const connectSubscription = observableMessenger.connect$.subscribe((port) => {
         if (observable$.value !== null) {
@@ -229,9 +249,9 @@ export const bindObservableChannels = <API extends object>(
         next: (emit: unknown) => broadcastMessage({ emit })
       });
       return () => {
+        observable$.complete();
         connectSubscription.unsubscribe();
         observableSubscription.unsubscribe();
-        observable$.complete();
       };
     });
   return {
@@ -242,10 +262,16 @@ export const bindObservableChannels = <API extends object>(
 };
 
 /**
- * Bind an API object to handle messages from other parts of the extension.
- * This can only used once per channelName per process.
+ * Bind an API object emitted by `api$` observable to handle messages from other parts of the extension.
+ * - This can only used once per channelName per process.
+ * - Changing source `api` object is possible by emitting it from the `api$` observable.
+ * - Before destroying/disabling an exposed `api` object, emit a `null` on api$ to stop monitoring it.
+ * - Methods returning `Promises` will await until the first `api` object is emitted.
+ * - Subscriptions to observable properties are kept active until `shutdown()` method is called.
+ *   This allows changing the observed `api` object without having to resubscribe the properties.
+ * - Observable properties are completed only on calling `shutdown()`.
  *
- * NOTE: All Observables are subscribed when this function is called.
+ * NOTE: All Observables are subscribed when this function is called and an `api` object is emitted by `api$`.
  * Caches and replays (1) last emission upon remote subscription (unless item === null).
  *
  * In addition to errors thrown by the underlying API, methods can throw TypeError
@@ -253,11 +279,13 @@ export const bindObservableChannels = <API extends object>(
  * @returns object that can be used to shutdown all ports (shuts down 'messenger' dependency)
  */
 export const exposeMessengerApi = <API extends object>(
-  { api, properties }: ExposeApiProps<API>,
+  { api$, properties }: ExposeApiProps<API>,
   dependencies: MessengerApiDependencies
 ): Shutdown => {
-  const observableChannelsSubscription = bindObservableChannels({ api, properties }, dependencies);
-  const nestedObjChannelsSubscription = bindNestedObjChannels({ api, properties }, dependencies);
+  // keep apiTracker$ alive even if api$ completes. Only shutdown() can complete it
+  const apiTracker$ = new TrackerSubject(concat(api$, NEVER));
+  const observableChannelsSubscription = bindObservableChannels({ api$: apiTracker$, properties }, dependencies);
+  const nestedObjChannelsSubscription = bindNestedObjChannels({ api$: apiTracker$, properties }, dependencies);
   const methodHandlerSubscription = bindMessengerRequestHandler(
     {
       handler: async (originalRequest, sender) => {
@@ -275,7 +303,10 @@ export const exposeMessengerApi = <API extends object>(
           : ({} as MethodRequestOptions);
         await validate(originalRequest, sender);
         const { args, method } = transform(originalRequest, sender);
-        const apiTarget: unknown = method in api && (api as any)[method];
+        // Calling the promise method after `null` api was emitted (aka stop using the object),
+        // awaits for a new valid api object.
+        const api = await firstValueFrom(apiTracker$.pipe(filter((v) => !!v)));
+        const apiTarget: unknown = method in api! && (api as any)[method];
         if (typeof apiTarget !== 'function') {
           throw new TypeError(`No such API method: ${method}`);
         }
@@ -286,6 +317,7 @@ export const exposeMessengerApi = <API extends object>(
   );
   return {
     shutdown: () => {
+      apiTracker$.complete();
       nestedObjChannelsSubscription.shutdown();
       observableChannelsSubscription.shutdown();
       methodHandlerSubscription.shutdown();
