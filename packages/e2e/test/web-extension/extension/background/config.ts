@@ -30,9 +30,14 @@ const env = envalid.cleanEnv(process.env, {
   CHAIN_HISTORY_PROVIDER: envalid.str({ choices: chainHistoryProviderOptions }),
   CHAIN_HISTORY_PROVIDER_PARAMS: envalid.json({ default: {} }),
   LOGGER_MIN_SEVERITY: envalid.str({ default: 'info' }),
-  MNEMONIC_WORDS: envalid.makeValidator<string[]>((input) => {
+  MNEMONIC_WORDS_WALLET1: envalid.makeValidator<string[]>((input) => {
     const words = input.split(' ');
-    if (words.length === 0) throw new Error('MNEMONIC_WORDS not set');
+    if (words.length === 0) throw new Error('MNEMONIC_WORDS_WALLET1 not set');
+    return words;
+  })(),
+  MNEMONIC_WORDS_WALLET2: envalid.makeValidator<string[]>((input) => {
+    const words = input.split(' ');
+    if (words.length === 0) throw new Error('MNEMONIC_WORDS_WALLET2 not set');
     return words;
   })(),
   NETWORK_ID: envalid.num({ choices: networkIdOptions }),
