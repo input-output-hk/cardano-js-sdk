@@ -1898,7 +1898,7 @@ __metadata:
     "@cardano-sdk/util-dev": ^0.5.0-nightly.15
     "@cardano-sdk/util-rxjs": ^0.4.2-nightly.18
     "@cardano-sdk/wallet": ^0.6.0-nightly.17
-    "@cardano-sdk/web-extension": ^0.6.0-nightly.16
+    "@cardano-sdk/web-extension": ^0.6.0-nightly.17
     "@emurgo/cardano-message-signing-asmjs": ^1.0.1
     "@emurgo/cardano-serialization-lib-asmjs": 11.0.0-rc.6
     "@types/bunyan": ^1.8.8
@@ -2194,7 +2194,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cardano-sdk/web-extension@^0.6.0-nightly.16, @cardano-sdk/web-extension@workspace:packages/web-extension":
+"@cardano-sdk/web-extension@^0.6.0-nightly.17, @cardano-sdk/web-extension@workspace:packages/web-extension":
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/web-extension@workspace:packages/web-extension"
   dependencies:

@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.17](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.6.0-nightly.16...@cardano-sdk/web-extension@0.6.0-nightly.17) (2022-10-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* **web-extension:** `ExposeApiProps` `api` has changed to observable `api$`.
+Users can use rxjs `of` function to create an observable: `api$: of(api)` to
+adapt existing code to this change.
+
+### Features
+
+* **web-extension:** enhance remoteApi to allow changing observed api object ([6245b90](https://github.com/input-output-hk/cardano-js-sdk/commit/6245b908d33aa14a2736f110add4605d3ce3ab4e))
+
+
+
 ## [0.6.0-nightly.16](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.6.0-nightly.15...@cardano-sdk/web-extension@0.6.0-nightly.16) (2022-10-24)
 
 **Note:** Version bump only for package @cardano-sdk/web-extension
