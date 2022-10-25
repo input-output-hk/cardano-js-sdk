@@ -42,7 +42,11 @@ describe('tx chain history', () => {
     await signedTx.submit();
 
     logger.info(
-      `Submitted transaction id: ${signedTx.tx.id}, inputs: ${signedTx.tx.body.inputs} and outputs:${signedTx.tx.body.outputs}.`
+      `Submitted transaction id: ${signedTx.tx.id}, inputs: ${JSON.stringify(
+        signedTx.tx.body.inputs.map((txIn) => [txIn.txId, txIn.index])
+      )} and outputs:${JSON.stringify(
+        signedTx.tx.body.outputs.map((txOut) => [txOut.address, Number.parseInt(txOut.value.coins.toString())])
+      )}.`
     );
 
     // Search chain history to see if the transaction is there.
@@ -54,13 +58,11 @@ describe('tx chain history', () => {
       )
     );
 
-    logger.info(
-      `Found transaction id in chain history: ${txFoundInHistory.id}, inputs: ${txFoundInHistory.body.inputs} and outputs:${txFoundInHistory.body.outputs}.`
-    );
+    logger.info(`Found transaction id in chain history: ${txFoundInHistory.id}`);
 
     // Assert
     expect(txFoundInHistory).toBeDefined();
     expect(txFoundInHistory.id).toEqual(signedTx.tx.id);
-    expect(normalizeTxBody(signedTx.tx.body)).toEqual(txFoundInHistory.body);
+    expect(normalizeTxBody(txFoundInHistory.body)).toEqual(normalizeTxBody(signedTx.tx.body));
   });
 });

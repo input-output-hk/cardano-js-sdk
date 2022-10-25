@@ -17,6 +17,7 @@ describe('txSubmitHttpProvider', () => {
       await expect(provider.healthCheck()).resolves.toEqual({ ok: false });
     });
   });
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('mocked', () => {
     let axiosMock: MockAdapter;
     beforeAll(() => {
@@ -53,37 +54,55 @@ describe('txSubmitHttpProvider', () => {
       });
 
       describe('errors', () => {
-        const testError = (bodyError: Error, providerErrorType: unknown) => async () => {
-          try {
-            axiosMock.onPost().replyOnce(() => {
-              throw axiosError(bodyError);
-            });
-            const provider = txSubmitHttpProvider(config);
-            await provider.submitTx({ signedTransaction: emptyUintArrayAsHexString });
-            throw new Error('Expected to throw');
-          } catch (error) {
-            if (error instanceof ProviderError) {
-              expect(error.reason).toBe(ProviderFailure.BadRequest);
-              const innerError = error.innerError as Cardano.TxSubmissionError;
-              expect(innerError).toBeInstanceOf(providerErrorType);
-            } else {
-              throw new TypeError('Expected ProviderError');
+        const testError =
+          (bodyError: Error, providerFailure: ProviderFailure, providerErrorType: unknown) => async () => {
+            try {
+              axiosMock.onPost().replyOnce(() => {
+                throw axiosError(bodyError);
+              });
+              const provider = txSubmitHttpProvider(config);
+              await provider.submitTx({ signedTransaction: emptyUintArrayAsHexString });
+              throw new Error('Expected to throw');
+            } catch (error) {
+              if (error instanceof ProviderError) {
+                expect(error.reason).toBe(providerFailure);
+                const innerError = error.innerError as Cardano.TxSubmissionError;
+                expect(innerError).toBeInstanceOf(providerErrorType);
+              } else {
+                throw new TypeError('Expected ProviderError');
+              }
             }
-          }
-        };
+          };
 
         it(
           'rehydrates errors',
           testError(
             new Cardano.TxSubmissionErrors.BadInputsError({ badInputs: [] }),
+            ProviderFailure.BadRequest,
             Cardano.TxSubmissionErrors.BadInputsError
           )
         );
 
         it(
           'maps unrecognized errors to UnknownTxSubmissionError',
-          testError(new Error('Unknown error'), Cardano.UnknownTxSubmissionError)
+          testError(new Error('Unknown error'), ProviderFailure.Unknown, Cardano.UnknownTxSubmissionError)
         );
+
+        it('does not re-wrap UnknownTxSubmissionError', async () => {
+          expect.assertions(3);
+          axiosMock.onPost().replyOnce(() => {
+            throw axiosError(new Cardano.UnknownTxSubmissionError('Unknown error'));
+          });
+          const provider = txSubmitHttpProvider(config);
+          try {
+            await provider.submitTx({ signedTransaction: emptyUintArrayAsHexString });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          } catch (error: any) {
+            expect(error).toBeInstanceOf(ProviderError);
+            expect(error.innerError).toBeInstanceOf(Cardano.UnknownTxSubmissionError);
+            expect(error.innerError.innerError.name).not.toBe(Cardano.UnknownTxSubmissionError.name);
+          }
+        });
       });
     });
   });

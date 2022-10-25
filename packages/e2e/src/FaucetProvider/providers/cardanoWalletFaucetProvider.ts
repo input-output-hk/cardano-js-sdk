@@ -132,6 +132,16 @@ export class CardanoWalletFaucetProvider implements FaucetProvider {
   }
 
   /**
+   * Gets the remaining balance on the faucet.
+   */
+  public async getBalance(): Promise<number> {
+    if (this.#faucetWalletId === undefined) throw new Error('Faucet is not running.');
+
+    const axiosResponse = await this.#walletServer.walletsApi.getWallet(this.#faucetWalletId);
+    return axiosResponse.data.balance.total.quantity;
+  }
+
+  /**
    * Closes the provider.
    */
   public async close(): Promise<void> {
@@ -149,7 +159,8 @@ export class CardanoWalletFaucetProvider implements FaucetProvider {
     return {
       ok:
         networkInfo.sync_progress.status === ApiNetworkInformationSyncProgressStatusEnum.Ready &&
-        this.#faucetWalletId !== ''
+        this.#faucetWalletId !== '' &&
+        (await this.getBalance()) > 100_000_000 // Faucet must have more than 100 tADA to be considered healthy
     };
   }
 

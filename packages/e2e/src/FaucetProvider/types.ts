@@ -81,6 +81,11 @@ export interface FaucetProvider extends Provider {
   close(): Promise<void>;
 
   /**
+   * Gets the remaining balance on the faucet.
+   */
+  getBalance(): Promise<number>;
+
+  /**
    * Performs a health check on the provider.
    *
    * @returns A promise with the healthcheck reponse.

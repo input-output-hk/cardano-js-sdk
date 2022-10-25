@@ -25,8 +25,13 @@ export const ownSignatureKeyPaths = async (
     ).filter(isNotNil)
   ).map(({ type, index }) => ({ index, role: Number(type) }));
 
+  const rewardAccounts = new Set(knownAddresses.map(({ rewardAccount }) => rewardAccount));
+
   const isStakingKeySignatureRequired = txBody.certificates?.length;
-  if (isStakingKeySignatureRequired || txBody.withdrawals?.length) {
+  if (
+    isStakingKeySignatureRequired ||
+    txBody.withdrawals?.some((withdrawal) => rewardAccounts.has(withdrawal.stakeAddress))
+  ) {
     return [...paymentKeyPaths, { index: 0, role: KeyRole.Stake }];
   }
   return paymentKeyPaths;
