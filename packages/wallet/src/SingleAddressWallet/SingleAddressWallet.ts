@@ -125,6 +125,12 @@ export interface SubmitTxOptions {
   mightBeAlreadySubmitted?: boolean;
 }
 
+export const DEFAULT_POLLING_CONFIG = {
+  maxInterval: 5000 * 20,
+  maxIntervalMultiplier: 20,
+  pollInterval: 5000
+};
+
 export class SingleAddressWallet implements ObservableWallet {
   #inputSelector: InputSelector;
   #logger: Logger;
@@ -166,8 +172,8 @@ export class SingleAddressWallet implements ObservableWallet {
     {
       name,
       polling: {
-        interval: pollInterval = 5000,
-        maxInterval = pollInterval * 20,
+        interval: pollInterval = DEFAULT_POLLING_CONFIG.pollInterval,
+        maxInterval = pollInterval * DEFAULT_POLLING_CONFIG.maxIntervalMultiplier,
         consideredOutOfSyncAfter = 1000 * 60 * 3
       } = {},
       retryBackoffConfig = {
@@ -455,7 +461,11 @@ export class SingleAddressWallet implements ObservableWallet {
       if (
         mightBeAlreadySubmitted &&
         error instanceof ProviderError &&
-        error.innerError instanceof Cardano.TxSubmissionErrors.ValueNotConservedError
+        // This could be improved by further parsing the error and:
+        // - checking if ValueNotConservedError produced === 0 (all utxos invalid)
+        // - check if UnknownOrIncompleteWithdrawalsError available withdrawal amount === wallet's reward acc balance
+        (error.innerError instanceof Cardano.TxSubmissionErrors.ValueNotConservedError ||
+          error.innerError instanceof Cardano.TxSubmissionErrors.UnknownOrIncompleteWithdrawalsError)
       ) {
         this.#logger.debug(`Transaction ${tx.id} appears to be already submitted...`);
         this.#newTransactions.pending$.next(tx);

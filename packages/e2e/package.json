@@ -13,8 +13,7 @@
   "scripts": {
     "test": "shx echo 'test' command not implemented yet",
     "test:blockfrost": "jest -c jest.config.js --selectProjects blockfrost --runInBand --verbose",
-    "test:wallet": "jest -c jest.config.js --selectProjects wallet --runInBand --verbose",
-    "test:local-network": "jest -c jest.config.js --selectProjects local-network --runInBand --verbose",
+    "test:wallet": "jest -c jest.config.js --forceExit --selectProjects wallet --runInBand --verbose",
     "test:load-testing": "jest -c jest.config.js --selectProjects load-testing --runInBand --verbose",
     "test:ogmios": "jest -c jest.config.js --selectProjects ogmios --runInBand --verbose",
     "test:web-extension:build": "webpack -c test/web-extension/webpack.config.js",
@@ -43,7 +42,8 @@
     "test:build:verify": "tsc --build ./test && tsc --build ./test/web-extension",
     "test:debug": "DEBUG=true yarn test",
     "generate-mnemonics": "ts-node src/util/mnemonic.ts",
-    "wait-for-network": "ts-node src/util/is-local-network-ready.ts"
+    "wait-for-network": "ts-node src/util/is-local-network-ready.ts",
+    "wait-for-faucet": "ts-node src/util/is-faucet-ready.ts"
   },
   "repository": "https://github.com/input-output-hk/cardano-js-sdk",
   "contributors": [

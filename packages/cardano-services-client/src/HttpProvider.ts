@@ -102,7 +102,6 @@ export const createHttpProvider = <T extends object>({
           const response = (await axiosInstance.request(req)).data;
           return !isEmptyResponse(response) ? response : undefined;
         } catch (error) {
-          logger.error(error);
           if (axios.isAxiosError(error)) {
             if (error.response) {
               const typedError = fromSerializableObject(error.response.data, {
@@ -116,6 +115,7 @@ export const createHttpProvider = <T extends object>({
               throw new ProviderError(ProviderFailure.ConnectionFailure, error, error.code);
             }
           }
+          logger.error(error);
           throw new ProviderError(ProviderFailure.Unknown, error);
         }
       };
