@@ -45,6 +45,15 @@ module.exports = {
       transform: {
         '^.+\\.test.ts?$': 'ts-jest'
       }
+    },
+    {
+      displayName: 'providers',
+      preset: 'ts-jest',
+      setupFiles: ['dotenv/config'],
+      testMatch: ['<rootDir>/test/providers/**/*.test.ts'],
+      transform: {
+        '^.+\\.test.ts?$': 'ts-jest'
+      }
     }
   ],
   testTimeout: 1000 * 60 * 25
