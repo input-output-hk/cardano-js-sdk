@@ -1005,11 +1005,13 @@ describe('StakePoolHttpService', () => {
         describe('sort by saturation', () => {
           it('desc order', async () => {
             const response = await provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'saturation'));
-            expect(response).toMatchSnapshot();
+            const saturations = response.pageResults.map((x) => x.metrics.saturation);
+            expect(saturations).toEqual([...saturations].sort().reverse());
           });
           it('asc order', async () => {
             const response = await provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'saturation'));
-            expect(response).toMatchSnapshot();
+            const saturations = response.pageResults.map((x) => x.metrics.saturation);
+            expect(saturations).toEqual([...saturations].sort());
           });
           it('with applied filters', async () => {
             const response = await provider.queryStakePools(
