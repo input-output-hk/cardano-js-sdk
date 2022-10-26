@@ -120,6 +120,33 @@
         }
       }
     },
+    "/network-info/protocol-parameters": {
+      "post": {
+        "summary": "fetch protocol params",
+        "description": "Fetch Protocol Params",
+        "operationId": "protocolParams",
+        "requestBody": {
+          "content": {
+            "application/json": {}
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "protocol params fetched",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProtocolParametersResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid request"
+          }
+        }
+      }
+    },
     "/network-info/current-wallet-protocol-parameters": {
       "post": {
         "summary": "fetch current wallet protocol params",
@@ -136,7 +163,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CurrentWalletProtocolParametersResponse"
+                  "$ref": "#/components/schemas/ProtocolParametersResponse"
                 }
               }
             }
@@ -308,7 +335,7 @@
           }
         }
       },
-      "CurrentWalletProtocolParametersResponse": {
+      "ProtocolParametersResponse": {
         "type": "object",
         "required": [
           "minFeeCoefficient",

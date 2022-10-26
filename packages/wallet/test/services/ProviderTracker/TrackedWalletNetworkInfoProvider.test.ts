@@ -51,10 +51,10 @@ describe('TrackedNetworkInfoProvider', () => {
     );
 
     test(
-      'currentWalletProtocolParameters',
+      'protocolParameters',
       testFunctionStats(
-        (wp) => wp.currentWalletProtocolParameters(),
-        (stats) => stats.currentWalletProtocolParameters$
+        (wp) => wp.protocolParameters(),
+        (stats) => stats.protocolParameters$
       )
     );
 

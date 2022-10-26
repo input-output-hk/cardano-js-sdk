@@ -50,9 +50,9 @@ describe('networkInfoHttpProvider', () => {
     await expect(provider.genesisParameters()).resolves.toEqual({});
   });
 
-  test('currentWalletProtocolParameters does not throw', async () => {
+  test('protocolParameters does not throw', async () => {
     axiosMock.onPost().replyOnce(200, {});
     const provider = networkInfoHttpProvider(config);
-    await expect(provider.currentWalletProtocolParameters()).resolves.toEqual({});
+    await expect(provider.protocolParameters()).resolves.toEqual({});
   });
 });

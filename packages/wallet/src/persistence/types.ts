@@ -1,12 +1,5 @@
 import { Assets } from '../types';
-import {
-  Cardano,
-  EpochRewards,
-  EraSummary,
-  ProtocolParametersRequiredByWallet,
-  StakeSummary,
-  SupplySummary
-} from '@cardano-sdk/core';
+import { Cardano, EpochRewards, EraSummary, StakeSummary, SupplySummary } from '@cardano-sdk/core';
 import { ConfirmedTx, TxInFlight } from '../services';
 import { GroupedAddress } from '@cardano-sdk/key-management';
 import { Observable } from 'rxjs';
@@ -86,7 +79,7 @@ export interface WalletStores extends Destroyable {
   rewardsHistory: KeyValueStore<Cardano.RewardAccount, EpochRewards[]>;
   rewardsBalances: KeyValueStore<Cardano.RewardAccount, Cardano.Lovelace>;
   stakePools: KeyValueStore<Cardano.PoolId, Cardano.StakePool>;
-  protocolParameters: DocumentStore<ProtocolParametersRequiredByWallet>;
+  protocolParameters: DocumentStore<Cardano.ProtocolParameters>;
   genesisParameters: DocumentStore<Cardano.CompactGenesis>;
   eraSummaries: DocumentStore<EraSummary[]>;
   assets: DocumentStore<Assets>;
