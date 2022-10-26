@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { CSL, Cardano } from '../../../src';
+import { CML, Cardano } from '../../../src';
 import { Ed25519KeyHash } from '../../../src/Cardano';
 
 describe('Cardano/types/Key', () => {
@@ -36,7 +36,7 @@ describe('Cardano/types/Key', () => {
 
     it('is of same length as in CSL', () => {
       expect(() =>
-        CSL.Ed25519KeyHash.from_bytes(
+        CML.Ed25519KeyHash.from_bytes(
           Buffer.from(Cardano.Ed25519KeyHash('6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed5'), 'hex')
         )
       ).not.toThrow();

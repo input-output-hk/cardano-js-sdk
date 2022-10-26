@@ -1,4 +1,4 @@
-import { Cardano, coreToCsl } from '@cardano-sdk/core';
+import { Cardano, coreToCml } from '@cardano-sdk/core';
 import { Cip30DataSignature, WalletApi, WalletProperties } from '../src/WalletApi';
 import { RemoteAuthenticator } from '../src';
 import { usingAutoFree } from '@cardano-sdk/util';
@@ -13,7 +13,7 @@ export const api = <WalletApi>{
   getUsedAddresses: async () => ['used-address-1', 'used-address-2', 'used-address-3'],
   getUtxos: async (_amount) =>
     usingAutoFree((scope) =>
-      coreToCsl
+      coreToCml
         .utxo(scope, [
           [
             {

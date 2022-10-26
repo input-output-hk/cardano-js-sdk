@@ -1,9 +1,9 @@
 /* eslint-disable prettier/prettier */
-import { BigNum } from '@emurgo/cardano-serialization-lib-nodejs';
-import { CSL } from './CSL';
+import { BigNum } from '@dcspark/cardano-multiplatform-lib-nodejs';
+import { CML } from './CML';
 import { HexBlob } from '../Cardano/util/primitives';
 import { NewTxAlonzo, NewTxBodyAlonzo } from '../Cardano/types';
-import { newTx } from './cslToCore';
+import { newTx } from './cmlToCore';
 import { usingAutoFree } from '@cardano-sdk/util';
 
 export const MAX_U64 = 18_446_744_073_709_551_615n;
@@ -36,7 +36,7 @@ export const deserializeTx = ((txBody: Buffer | Uint8Array | string) => usingAut
           ? Buffer.from(txBody)
           : Buffer.from(HexBlob(txBody).toString(), 'hex'));
 
-    const txDecoded = scope.manage(CSL.Transaction.from_bytes(buffer));
+    const txDecoded = scope.manage(CML.Transaction.from_bytes(buffer));
 
     return newTx(txDecoded);
   })) as (txBody: HexBlob | Buffer | Uint8Array | string) => NewTxAlonzo<NewTxBodyAlonzo>;

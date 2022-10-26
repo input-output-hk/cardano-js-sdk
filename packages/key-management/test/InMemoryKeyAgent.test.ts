@@ -1,5 +1,5 @@
 import { AddressType, InMemoryKeyAgent, KeyRole, SerializableInMemoryKeyAgentData, util } from '../src';
-import { CSL, Cardano } from '@cardano-sdk/core';
+import { CML, Cardano } from '@cardano-sdk/core';
 
 jest.mock('../src/util/ownSignatureKeyPaths');
 const { ownSignatureKeyPaths } = jest.requireMock('../src/util/ownSignatureKeyPaths');
@@ -152,7 +152,7 @@ describe('InMemoryKeyAgent', () => {
               util
                 .deriveAccountPrivateKey({
                   accountIndex: 0,
-                  rootPrivateKey: CSL.Bip32PrivateKey.from_bytes(Buffer.from(yoroiRootPrivateKeyHex, 'hex'))
+                  rootPrivateKey: CML.Bip32PrivateKey.from_bytes(Buffer.from(yoroiRootPrivateKeyHex, 'hex'))
                 })
                 .to_public()
                 .as_bytes()
@@ -226,7 +226,7 @@ describe('InMemoryKeyAgent', () => {
               util
                 .deriveAccountPrivateKey({
                   accountIndex: 0,
-                  rootPrivateKey: CSL.Bip32PrivateKey.from_bytes(Buffer.from(daedalusRootPrivateKeyHex, 'hex'))
+                  rootPrivateKey: CML.Bip32PrivateKey.from_bytes(Buffer.from(daedalusRootPrivateKeyHex, 'hex'))
                 })
                 .to_public()
                 .as_bytes()

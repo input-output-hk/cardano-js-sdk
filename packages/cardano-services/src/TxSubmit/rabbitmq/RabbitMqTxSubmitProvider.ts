@@ -5,7 +5,7 @@ import {
   ProviderFailure,
   SubmitTxArgs,
   TxSubmitProvider,
-  cslUtil
+  cmlUtil
 } from '@cardano-sdk/core';
 import { Channel, Connection, connect } from 'amqplib';
 import { Logger } from 'ts-log';
@@ -171,7 +171,7 @@ export class RabbitMqTxSubmitProvider implements TxSubmitProvider {
       };
 
       try {
-        txId = cslUtil.deserializeTx(signedTransaction).id.toString();
+        txId = cmlUtil.deserializeTx(signedTransaction).id.toString();
 
         this.#dependencies.logger.info(`${moduleName}: queuing tx id: ${txId}`);
 

@@ -1,9 +1,9 @@
-import { Cardano, coreToCsl, cslToCore } from '../../src';
+import { Cardano, cmlToCore, coreToCml } from '../../src';
 import { ManagedFreeableScope } from '@cardano-sdk/util';
-import { NativeScript } from '@emurgo/cardano-serialization-lib-nodejs';
+import { NativeScript } from '@dcspark/cardano-multiplatform-lib-nodejs';
 import { mintTokenMap, tx, txBody, txIn, txInWithAddress, txOut, valueCoinOnly, valueWithAssets } from './testData';
 
-describe('cslToCore', () => {
+describe('cmlToCore', () => {
   let scope: ManagedFreeableScope;
 
   beforeEach(() => {
@@ -15,19 +15,19 @@ describe('cslToCore', () => {
   });
   describe('value', () => {
     it('coin only', () => {
-      expect(cslToCore.value(coreToCsl.value(scope, valueCoinOnly))).toEqual(valueCoinOnly);
+      expect(cmlToCore.value(coreToCml.value(scope, valueCoinOnly))).toEqual(valueCoinOnly);
     });
-    it('cslToCore coin with assets', () => {
-      expect(cslToCore.value(coreToCsl.value(scope, valueWithAssets))).toEqual(valueWithAssets);
+    it('cmlToCore coin with assets', () => {
+      expect(cmlToCore.value(coreToCml.value(scope, valueWithAssets))).toEqual(valueWithAssets);
     });
   });
 
   describe('txIn', () => {
     it('converts an input', () => {
-      expect(cslToCore.txIn(coreToCsl.txIn(scope, txIn))).toEqual(txIn);
+      expect(cmlToCore.txIn(coreToCml.txIn(scope, txIn))).toEqual(txIn);
     });
     it('doesnt serialize address', () => {
-      expect(cslToCore.txIn(coreToCsl.txIn(scope, txInWithAddress))).toEqual({
+      expect(cmlToCore.txIn(coreToCml.txIn(scope, txInWithAddress))).toEqual({
         ...txInWithAddress,
         address: undefined
       });
@@ -35,20 +35,20 @@ describe('cslToCore', () => {
   });
 
   it('txOut', () => {
-    expect(cslToCore.txOut(coreToCsl.txOut(scope, txOut))).toEqual(txOut);
+    expect(cmlToCore.txOut(coreToCml.txOut(scope, txOut))).toEqual(txOut);
   });
 
   it('utxo', () => {
     const utxo: Cardano.Utxo[] = [[txIn as Cardano.TxIn, txOut]];
-    expect(cslToCore.utxo(coreToCsl.utxo(scope, utxo))).toEqual(utxo);
+    expect(cmlToCore.utxo(coreToCml.utxo(scope, utxo))).toEqual(utxo);
   });
 
   it('txMint', () => {
-    expect(cslToCore.txMint(coreToCsl.txMint(scope, mintTokenMap))).toEqual(mintTokenMap);
+    expect(cmlToCore.txMint(coreToCml.txMint(scope, mintTokenMap))).toEqual(mintTokenMap);
   });
 
   it('NativeScript', () => {
-    const cslScript: NativeScript = scope.manage(
+    const cmlScript: NativeScript = scope.manage(
       NativeScript.from_bytes(
         Uint8Array.from(
           Buffer.from(
@@ -93,7 +93,7 @@ describe('cslToCore', () => {
       ]
     };
 
-    expect(cslToCore.nativeScript(cslScript)).toStrictEqual(coreScript);
+    expect(cmlToCore.nativeScript(cmlScript)).toStrictEqual(coreScript);
   });
 
   describe('txAuxiliaryData', () => {
@@ -103,18 +103,18 @@ describe('cslToCore', () => {
   });
 
   it('txBody', () => {
-    expect(cslToCore.txBody(scope.manage(coreToCsl.txBody(scope, txBody)))).toEqual(txBody);
+    expect(cmlToCore.txBody(scope.manage(coreToCml.txBody(scope, txBody)))).toEqual(txBody);
   });
 
   it('newTx', () => {
-    expect(cslToCore.newTx(scope.manage(coreToCsl.tx(scope, tx)))).toEqual(tx);
+    expect(cmlToCore.newTx(scope.manage(coreToCml.tx(scope, tx)))).toEqual(tx);
   });
 
   it('txWitnessBootstrap', () => {
     // values from ogmios.wsp.json
     const bootstrap: Cardano.BootstrapWitness[] = [
       {
-        addressAttributes: Cardano.util.Base64Blob('cA=='),
+        addressAttributes: Cardano.util.Base64Blob('oA=='),
         chainCode: Cardano.util.HexBlob('b6dbf0b03c93afe5696f10d49e8a8304ebfac01deeb8f82f2af5836ebbc1b450'),
         key: Cardano.Ed25519PublicKey('deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01'),
         signature: Cardano.Ed25519Signature(
@@ -125,7 +125,7 @@ describe('cslToCore', () => {
         )
       }
     ];
-    expect(cslToCore.txWitnessBootstrap(scope.manage(coreToCsl.txWitnessBootstrap(scope, bootstrap)))).toEqual(
+    expect(cmlToCore.txWitnessBootstrap(scope.manage(coreToCml.txWitnessBootstrap(scope, bootstrap)))).toEqual(
       bootstrap
     );
   });

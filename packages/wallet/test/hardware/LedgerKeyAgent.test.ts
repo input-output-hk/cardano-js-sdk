@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as mocks from '../mocks';
 import {
   AddressType,

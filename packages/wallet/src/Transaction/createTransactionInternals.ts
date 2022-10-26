@@ -1,4 +1,4 @@
-import { CSL, Cardano, coreToCsl, util } from '@cardano-sdk/core';
+import { CML, Cardano, coreToCml, util } from '@cardano-sdk/core';
 import { SelectionResult } from '@cardano-sdk/input-selection';
 import { usingAutoFree } from '@cardano-sdk/util';
 
@@ -47,10 +47,10 @@ export const createTransactionInternals = async ({
       withdrawals
     };
     if (collaterals) body.collaterals = [...collaterals];
-    const cslBody = coreToCsl.txBody(scope, body, auxiliaryData);
+    const cslBody = coreToCml.txBody(scope, body, auxiliaryData);
 
     return {
       body,
-      hash: Cardano.TransactionId.fromHexBlob(util.bytesToHex(scope.manage(CSL.hash_transaction(cslBody)).to_bytes()))
+      hash: Cardano.TransactionId.fromHexBlob(util.bytesToHex(scope.manage(CML.hash_transaction(cslBody)).to_bytes()))
     };
   });

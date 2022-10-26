@@ -5,7 +5,7 @@ import {
   ProviderFailure,
   SubmitTxArgs,
   TxSubmitProvider,
-  cslUtil
+  cmlUtil
 } from '@cardano-sdk/core';
 import { ConnectionStatus, ConnectionStatusTracker } from './util';
 import { Observable, combineLatest, filter, firstValueFrom, from, mergeMap, take, tap } from 'rxjs';
@@ -52,7 +52,7 @@ export class SmartTxSubmitProvider implements TxSubmitProvider {
       body: {
         validityInterval: { invalidBefore, invalidHereafter }
       }
-    } = cslUtil.deserializeTx(args.signedTransaction);
+    } = cmlUtil.deserializeTx(args.signedTransaction);
     const onlineAndWithinValidityInterval$ = combineLatest([this.#connectionStatus$, this.#tip$]).pipe(
       tap(([_, { slot }]) => {
         if (slot >= (invalidHereafter || Number.POSITIVE_INFINITY))

@@ -1,4 +1,4 @@
-import { CSL, Cardano, coreToCsl } from '@cardano-sdk/core';
+import { CML, Cardano, coreToCml } from '@cardano-sdk/core';
 import { ManagedFreeableScope } from '@cardano-sdk/util';
 
 export const createTxInput = (() => {
@@ -9,7 +9,10 @@ export const createTxInput = (() => {
     index?: number
   ) =>
     scope.manage(
-      CSL.TransactionInput.new(scope.manage(CSL.TransactionHash.from_bech32(bech32TxHash)), index || defaultIdx++)
+      CML.TransactionInput.new(
+        scope.manage(CML.TransactionHash.from_bech32(bech32TxHash)),
+        scope.manage(CML.BigNum.from_str((index || defaultIdx++).toString()))
+      )
     );
 })();
 
@@ -17,11 +20,11 @@ export const createUnspentTxOutput = (
   scope: ManagedFreeableScope,
   valueQuantities: Cardano.Value,
   bech32Addr = 'addr1vy36kffjf87vzkuyqc5g0ys3fe3pez5zvqg9r5z9q9kfrkg2cs093'
-): CSL.TransactionUnspentOutput => {
-  const address = scope.manage(CSL.Address.from_bech32(bech32Addr));
-  const amount = coreToCsl.value(scope, valueQuantities);
+): CML.TransactionUnspentOutput => {
+  const address = scope.manage(CML.Address.from_bech32(bech32Addr));
+  const amount = coreToCml.value(scope, valueQuantities);
   return scope.manage(
-    CSL.TransactionUnspentOutput.new(createTxInput(scope), scope.manage(CSL.TransactionOutput.new(address, amount)))
+    CML.TransactionUnspentOutput.new(createTxInput(scope), scope.manage(CML.TransactionOutput.new(address, amount)))
   );
 };
 
@@ -29,10 +32,10 @@ export const createOutput = (
   scope: ManagedFreeableScope,
   valueQuantities: Cardano.Value,
   bech32Addr = 'addr1vyeljkh3vr4h9s3lyxe7g2meushk3m4nwyzdgtlg96e6mrgg8fnle'
-): CSL.TransactionOutput =>
+): CML.TransactionOutput =>
   scope.manage(
-    CSL.TransactionOutput.new(
-      scope.manage(CSL.Address.from_bech32(bech32Addr)),
-      coreToCsl.value(scope, valueQuantities)
+    CML.TransactionOutput.new(
+      scope.manage(CML.Address.from_bech32(bech32Addr)),
+      coreToCml.value(scope, valueQuantities)
     )
   );

@@ -1,5 +1,6 @@
 import * as Cardano from '../../Cardano';
 import {
+  AddrAttributes,
   Address,
   AssetName,
   Assets,
@@ -9,6 +10,7 @@ import {
   BootstrapWitnesses,
   Certificates,
   DataHash,
+  Datum,
   Ed25519KeyHash,
   Ed25519KeyHashes,
   Ed25519Signature,
@@ -21,7 +23,8 @@ import {
   MultiAsset,
   NativeScript,
   NativeScripts,
-  PlutusScripts,
+  PlutusV1Scripts,
+  PlutusV2Scripts,
   PublicKey,
   RewardAddress,
   ScriptAll,
@@ -48,13 +51,13 @@ import {
   Vkeywitnesses,
   Withdrawals,
   hash_auxiliary_data
-} from '@emurgo/cardano-serialization-lib-nodejs';
+} from '@dcspark/cardano-multiplatform-lib-nodejs';
 
 import * as certificate from './certificate';
 import { ManagedFreeableScope } from '@cardano-sdk/util';
 import { SerializationError, SerializationFailure } from '../../errors';
 import { assetNameFromAssetId, parseAssetId, policyIdFromAssetId } from '../../Asset/util/assetId';
-import { parseCslAddress } from '../parseCslAddress';
+import { parseCmlAddress } from '../parseCmlAddress';
 
 export const tokenMap = (scope: ManagedFreeableScope, map: Cardano.TokenMap) => {
   const multiasset = scope.manage(MultiAsset.new());
@@ -98,16 +101,21 @@ export const value = (scope: ManagedFreeableScope, { coins, assets }: Cardano.Va
 
 export const txIn = (scope: ManagedFreeableScope, core: Cardano.NewTxIn): TransactionInput =>
   scope.manage(
-    TransactionInput.new(scope.manage(TransactionHash.from_bytes(Buffer.from(core.txId, 'hex'))), core.index)
+    TransactionInput.new(
+      scope.manage(TransactionHash.from_bytes(Buffer.from(core.txId, 'hex'))),
+      scope.manage(BigNum.from_str(core.index.toString()))
+    )
   );
 
 export const txOut = (scope: ManagedFreeableScope, core: Cardano.TxOut): TransactionOutput => {
   const cslTxOut = scope.manage(
-    TransactionOutput.new(parseCslAddress(scope, core.address.toString())!, value(scope, core.value))
+    TransactionOutput.new(parseCmlAddress(scope, core.address.toString())!, value(scope, core.value))
   );
 
   if (core.datum !== undefined) {
-    cslTxOut.set_data_hash(scope.manage(DataHash.from_bytes(Buffer.from(core.datum.toString(), 'hex'))));
+    cslTxOut.set_datum(
+      scope.manage(Datum.new_data_hash(scope.manage(DataHash.from_bytes(Buffer.from(core.datum.toString(), 'hex')))))
+    );
   }
 
   return cslTxOut;
@@ -241,7 +249,7 @@ export const nativeScript = (scope: ManagedFreeableScope, script: Cardano.Native
     case Cardano.NativeScriptKind.RequireTimeBefore: {
       cslScript = scope.manage(
         NativeScript.new_timelock_expiry(
-          scope.manage(TimelockExpiry.new_timelockexpiry(scope.manage(BigNum.from_str(script.slot.toString()))))
+          scope.manage(TimelockExpiry.new(scope.manage(BigNum.from_str(script.slot.toString()))))
         )
       );
       break;
@@ -249,7 +257,7 @@ export const nativeScript = (scope: ManagedFreeableScope, script: Cardano.Native
     case Cardano.NativeScriptKind.RequireTimeAfter: {
       cslScript = scope.manage(
         NativeScript.new_timelock_start(
-          scope.manage(TimelockStart.new_timelockstart(scope.manage(BigNum.from_str(script.slot.toString()))))
+          scope.manage(TimelockStart.new(scope.manage(BigNum.from_str(script.slot.toString()))))
         )
       );
       break;
@@ -267,16 +275,17 @@ export const nativeScript = (scope: ManagedFreeableScope, script: Cardano.Native
 export const getScripts = (
   scope: ManagedFreeableScope,
   scripts: Cardano.Script[]
-): { nativeScripts: NativeScripts; plutusScripts: PlutusScripts } => {
+): { nativeScripts: NativeScripts; plutusV1Scripts: PlutusV1Scripts; plutusV2Scripts: PlutusV2Scripts } => {
   const nativeScripts: NativeScripts = scope.manage(NativeScripts.new());
-  const plutusScripts: PlutusScripts = scope.manage(PlutusScripts.new());
+  const plutusV1Scripts: PlutusV1Scripts = scope.manage(PlutusV1Scripts.new());
+  const plutusV2Scripts: PlutusV2Scripts = scope.manage(PlutusV2Scripts.new());
 
   for (const script of scripts) {
     switch (script.__type) {
       case Cardano.ScriptType.Native:
         nativeScripts.add(nativeScript(scope, script));
         break;
-      // TODO: add support for Plutus scripts.
+      // TODO: add support for Plutus scripts. Use script.version to add as V1 or V2.
       case Cardano.ScriptType.Plutus:
       default:
         throw new SerializationError(
@@ -286,7 +295,7 @@ export const getScripts = (
     }
   }
 
-  return { nativeScripts, plutusScripts };
+  return { nativeScripts, plutusV1Scripts, plutusV2Scripts };
 };
 
 export const txAuxiliaryData = (
@@ -302,10 +311,11 @@ export const txAuxiliaryData = (
   }
 
   if (scripts) {
-    const { nativeScripts, plutusScripts } = getScripts(scope, scripts);
+    const { nativeScripts, plutusV1Scripts, plutusV2Scripts } = getScripts(scope, scripts);
 
     result.set_native_scripts(nativeScripts);
-    result.set_plutus_scripts(plutusScripts);
+    result.set_plutus_v1_scripts(plutusV1Scripts);
+    result.set_plutus_v2_scripts(plutusV2Scripts);
   }
 
   return result;
@@ -365,12 +375,14 @@ export const txBody = (
       txInputs(scope, inputs),
       cslOutputs,
       scope.manage(BigNum.from_str(fee.toString())),
-      validityInterval.invalidHereafter
+      BigNum.from_str(validityInterval.invalidHereafter ? validityInterval.invalidHereafter.toString() : '0')
     )
   );
 
   if (validityInterval.invalidBefore) {
-    cslBody.set_validity_start_interval(validityInterval.invalidBefore);
+    cslBody.set_validity_start_interval(
+      BigNum.from_str(validityInterval.invalidBefore ? validityInterval.invalidBefore.toString() : '0')
+    );
   }
   if (mint) {
     cslBody.set_mint(txMint(scope, mint));
@@ -414,7 +426,7 @@ export const txWitnessBootstrap = (
           scope.manage(Vkey.new(scope.manage(PublicKey.from_bytes(Buffer.from(coreWitness.key.toString(), 'hex'))))),
           scope.manage(Ed25519Signature.from_hex(coreWitness.signature.toString())),
           Buffer.from(coreWitness.chainCode || '', 'hex'),
-          Buffer.from(coreWitness.addressAttributes || '', 'base64')
+          scope.manage(AddrAttributes.from_bytes(Buffer.from(coreWitness.addressAttributes || '', 'base64')))
         )
       )
     );
@@ -427,10 +439,11 @@ export const witnessSet = (scope: ManagedFreeableScope, witness: Cardano.Witness
   const vkeyWitnesses = scope.manage(Vkeywitnesses.new());
 
   if (witness.scripts) {
-    const { nativeScripts, plutusScripts } = getScripts(scope, witness.scripts);
+    const { nativeScripts, plutusV1Scripts, plutusV2Scripts } = getScripts(scope, witness.scripts);
 
     cslWitnessSet.set_native_scripts(nativeScripts);
-    cslWitnessSet.set_plutus_scripts(plutusScripts);
+    cslWitnessSet.set_plutus_v1_scripts(plutusV1Scripts);
+    cslWitnessSet.set_plutus_v2_scripts(plutusV2Scripts);
   }
 
   for (const [vkey, signature] of witness.signatures.entries()) {

@@ -4,7 +4,7 @@
 import * as ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import * as trezor from 'trezor-connect';
 import { BIP32Path, CardanoKeyConst, GroupedAddress } from '../types';
-import { CSL, Cardano, cslToCore } from '@cardano-sdk/core';
+import { CML, Cardano, cmlToCore } from '@cardano-sdk/core';
 import { HwMappingError } from '../errors';
 import { ManagedFreeableScope, isNotNil, usingAutoFree } from '@cardano-sdk/util';
 import { STAKE_KEY_DERIVATION_PATH, harden } from './key';
@@ -12,7 +12,7 @@ import concat from 'lodash/concat';
 import uniq from 'lodash/uniq';
 
 export interface TxToLedgerProps {
-  cslTxBody: CSL.TransactionBody;
+  cslTxBody: CML.TransactionBody;
   networkId: Cardano.NetworkId;
   inputResolver: Cardano.util.InputResolver;
   knownAddresses: GroupedAddress[];
@@ -20,7 +20,7 @@ export interface TxToLedgerProps {
 }
 
 export interface TxToTrezorProps {
-  cslTxBody: CSL.TransactionBody;
+  cslTxBody: CML.TransactionBody;
   networkId: Cardano.NetworkId;
   accountIndex: number;
   inputResolver: Cardano.util.InputResolver;
@@ -61,8 +61,8 @@ const sortTokensCanonically = (tokens: trezor.CardanoToken[] | ledger.Token[]) =
 
 const getRewardAccountKeyHash = (rewardAccount: Cardano.RewardAccount) =>
   usingAutoFree((scope) => {
-    const address = scope.manage(CSL.Address.from_bech32(rewardAccount.toString()));
-    const rewardAddress = scope.manage(CSL.RewardAddress.from_address(address));
+    const address = scope.manage(CML.Address.from_bech32(rewardAccount.toString()));
+    const rewardAddress = scope.manage(CML.RewardAddress.from_address(address));
     const paymentCred = scope.manage(rewardAddress!.payment_cred());
     const keyHash = scope.manage(paymentCred.to_keyhash());
     return Buffer.from(keyHash!.to_bytes()).toString('hex');
@@ -89,7 +89,7 @@ const matchGroupedAddress = (knownAddresses: GroupedAddress[], outputAddress: Bu
 };
 
 const prepareTrezorInputs = async (
-  inputs: CSL.TransactionInputs,
+  inputs: CML.TransactionInputs,
   inputResolver: Cardano.util.InputResolver,
   knownAddresses: GroupedAddress[]
 ): Promise<trezor.CardanoInput[]> => {
@@ -98,12 +98,12 @@ const prepareTrezorInputs = async (
   for (let i = 0; i < inputs.len(); i++) {
     const input = scope.manage(inputs.get(i));
     const inputTxId = scope.manage(input.transaction_id());
-    const coreInput = cslToCore.txIn(input);
+    const coreInput = cmlToCore.txIn(input);
     const paymentAddress = await inputResolver.resolveInputAddress(coreInput);
 
     let trezorInput = {
       prev_hash: Buffer.from(inputTxId.to_bytes()).toString('hex'),
-      prev_index: input.index()
+      prev_index: Number(scope.manage(input.index()).to_str())
     } as trezor.CardanoInput;
 
     let paymentKeyPath = null;
@@ -130,7 +130,7 @@ const prepareTrezorInputs = async (
 };
 
 const prepareTrezorOutputs = (
-  outputs: CSL.TransactionOutputs,
+  outputs: CML.TransactionOutputs,
   knownAddresses: GroupedAddress[]
 ): trezor.CardanoOutput[] =>
   usingAutoFree((scope) => {
@@ -194,7 +194,7 @@ const prepareTrezorOutputs = (
   });
 
 const prepareTrezorCertificates = (
-  certificates: CSL.Certificates,
+  certificates: CML.Certificates,
   rewardAccountKeyPath: BIP32Path,
   rewardAccountKeyHash: string
 ): TrezorCertificates =>
@@ -352,7 +352,7 @@ const prepareTrezorCertificates = (
   });
 
 const prepareTrezorWithdrawals = (
-  withdrawals: CSL.Withdrawals,
+  withdrawals: CML.Withdrawals,
   rewardAccountKeyPath: BIP32Path
 ): trezor.CardanoWithdrawal[] =>
   usingAutoFree((scope) => {
@@ -379,7 +379,7 @@ const prepareTrezorWithdrawals = (
   });
 
 const prepareTrezorMintBundle = (
-  mint: CSL.Mint,
+  mint: CML.Mint,
   paymentKeyPaths: (string | number[])[],
   rewardAccountKeyPath: BIP32Path
 ): TrezorMintBundle =>
@@ -424,7 +424,7 @@ const prepareTrezorMintBundle = (
   });
 
 const prepareLedgerInputs = async (
-  inputs: CSL.TransactionInputs,
+  inputs: CML.TransactionInputs,
   inputResolver: Cardano.util.InputResolver,
   knownAddresses: GroupedAddress[]
 ): Promise<ledger.TxInput[]> => {
@@ -432,7 +432,7 @@ const prepareLedgerInputs = async (
   const ledgerInputs = [];
   for (let i = 0; i < inputs.len(); i++) {
     const input = scope.manage(inputs.get(i));
-    const coreInput = cslToCore.txIn(input);
+    const coreInput = cmlToCore.txIn(input);
     const paymentAddress = await inputResolver.resolveInputAddress(coreInput);
 
     let paymentKeyPath = null;
@@ -449,7 +449,7 @@ const prepareLedgerInputs = async (
       }
     }
     ledgerInputs.push({
-      outputIndex: input.index(),
+      outputIndex: Number(scope.manage(input.index()).to_str()),
       path: paymentKeyPath,
       txHashHex: Buffer.from(scope.manage(input.transaction_id()).to_bytes()).toString('hex')
     });
@@ -458,7 +458,7 @@ const prepareLedgerInputs = async (
   return ledgerInputs;
 };
 
-const prepareLedgerOutputs = (outputs: CSL.TransactionOutputs, knownAddresses: GroupedAddress[]): ledger.TxOutput[] =>
+const prepareLedgerOutputs = (outputs: CML.TransactionOutputs, knownAddresses: GroupedAddress[]): ledger.TxOutput[] =>
   usingAutoFree((scope) => {
     const ledgerOutputs = [];
     for (let i = 0; i < outputs.len(); i++) {
@@ -523,7 +523,7 @@ const prepareLedgerOutputs = (outputs: CSL.TransactionOutputs, knownAddresses: G
             },
             type: ledger.TxOutputDestinationType.THIRD_PARTY
           };
-      const outputDataHash = scope.manage(output.data_hash());
+      const outputDataHash = scope.manage(scope.manage(output.datum())?.as_data_hash());
       const datumHashHex = outputDataHash ? Buffer.from(outputDataHash.to_bytes()).toString('hex') : null;
       const outputRes = {
         amount: scope.manage(outputAmount.coin()).to_str(),
@@ -537,7 +537,7 @@ const prepareLedgerOutputs = (outputs: CSL.TransactionOutputs, knownAddresses: G
   });
 
 const prepareLedgerCertificates = (
-  certificates: CSL.Certificates,
+  certificates: CML.Certificates,
   knownAddresses: GroupedAddress[],
   rewardAccountKeyPath: BIP32Path,
   rewardAccountKeyHash: string
@@ -757,7 +757,7 @@ const prepareLedgerCertificates = (
     };
   });
 
-const prepareLedgerWithdrawals = (withdrawals: CSL.Withdrawals, rewardAccountKeyPath: BIP32Path): ledger.Withdrawal[] =>
+const prepareLedgerWithdrawals = (withdrawals: CML.Withdrawals, rewardAccountKeyPath: BIP32Path): ledger.Withdrawal[] =>
   usingAutoFree((scope) => {
     const ledgerWithdrawals = [];
     const withdrawalsKeys = scope.manage(withdrawals.keys());
@@ -792,7 +792,7 @@ const prepareLedgerWithdrawals = (withdrawals: CSL.Withdrawals, rewardAccountKey
   });
 
 const prepareLedgerMintBundle = (
-  mint: CSL.Mint,
+  mint: CML.Mint,
   paymentKeyPaths: BIP32Path[],
   rewardAccountKeyPath: BIP32Path
 ): LedgerMintBundle =>
@@ -881,10 +881,10 @@ export const txToLedger = async ({
   const fee = scope.manage(cslTxBody.fee()).to_str();
 
   // TX - TTL
-  const ttl = cslTxBody.ttl();
+  const ttl = Number(scope.manage(cslTxBody.ttl())?.to_str());
 
   // TX - validityStartInterval
-  const validityStartInterval = cslTxBody.validity_start_interval();
+  const validityStartInterval = Number(scope.manage(cslTxBody.validity_start_interval())?.to_str());
 
   // TX  - auxiliaryData
   const txBodyAuxDataHash = scope.manage(cslTxBody.auxiliary_data_hash());

@@ -1,5 +1,5 @@
 import { AssetId, AssetName, PolicyId } from '../../Cardano/types';
-import { CSL } from '../../CSL/CSL';
+import { CML } from '../../CML/CML';
 import { bytesToHex } from '../../util/misc/bytesToHex';
 
 export const policyIdFromAssetId = (assetId: AssetId): PolicyId => PolicyId(assetId.slice(0, 56));
@@ -8,7 +8,7 @@ export const assetNameFromAssetId = (assetId: AssetId): AssetName => AssetName(a
 /**
  * @returns {string} concatenated hex-encoded policy id and asset name
  */
-export const createAssetId = (scriptHash: CSL.ScriptHash, assetName: CSL.AssetName): AssetId =>
+export const createAssetId = (scriptHash: CML.ScriptHash, assetName: CML.AssetName): AssetId =>
   AssetId(bytesToHex(scriptHash.to_bytes()) + bytesToHex(assetName.name()).toString());
 
 /**
@@ -21,7 +21,7 @@ export const parseAssetId = (assetId: AssetId) => {
   const policyId = policyIdFromAssetId(assetId);
   const assetName = assetNameFromAssetId(assetId);
   return {
-    assetName: CSL.AssetName.new(Buffer.from(assetName, 'hex')),
-    scriptHash: CSL.ScriptHash.from_bytes(Buffer.from(policyId, 'hex'))
+    assetName: CML.AssetName.new(Buffer.from(assetName, 'hex')),
+    scriptHash: CML.ScriptHash.from_bytes(Buffer.from(policyId, 'hex'))
   };
 };

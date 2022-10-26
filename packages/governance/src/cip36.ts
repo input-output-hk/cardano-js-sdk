@@ -1,4 +1,4 @@
-import { CSL, Cardano, coreToCsl, util } from '@cardano-sdk/core';
+import { CML, Cardano, coreToCml, util } from '@cardano-sdk/core';
 import { util as keyManagementUtil } from '@cardano-sdk/key-management';
 import { usingAutoFree } from '@cardano-sdk/util';
 import blake2b from 'blake2b';
@@ -71,11 +71,11 @@ export const metadataBuilder = {
     rewardAccount,
     nonce = Date.now()
   }: BuildVotingRegistrationProps): Cardano.TxMetadata {
-    const cslRewardAddress = CSL.Address.from_bech32(rewardAccount.toString());
+    const cmlRewardAddress = CML.Address.from_bech32(rewardAccount.toString());
     const votingRegistration = new Map<bigint, Cardano.Metadatum>([
       [1n, delegations.map(({ votingKey, weight }) => [Buffer.from(votingKey, 'hex'), BigInt(weight)])],
       [2n, Buffer.from(stakeKey, 'hex')],
-      [3n, Buffer.from(cslRewardAddress.to_bytes())],
+      [3n, Buffer.from(cmlRewardAddress.to_bytes())],
       [4n, BigInt(nonce)],
       [5n, BigInt(purpose)]
     ]);
@@ -93,7 +93,7 @@ export const metadataBuilder = {
     stakeKeyBlobSigner: BlobSigner
   ): Promise<Cardano.TxMetadata> {
     const votingRegistrationMetadataBytes = usingAutoFree((scope) =>
-      coreToCsl.txMetadata(scope, votingRegistrationMetadata).to_bytes()
+      coreToCml.txMetadata(scope, votingRegistrationMetadata).to_bytes()
     );
     const hashedMetadata = blake2b(256 / 8)
       .update(votingRegistrationMetadataBytes)

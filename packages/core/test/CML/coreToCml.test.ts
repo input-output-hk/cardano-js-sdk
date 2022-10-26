@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
-import { Asset, CSL, Cardano, SerializationFailure, coreToCsl } from '../../src';
-import { BigNum } from '@emurgo/cardano-serialization-lib-nodejs';
+import { Asset, CML, Cardano, SerializationFailure, coreToCml } from '../../src';
+import { BigNum } from '@dcspark/cardano-multiplatform-lib-nodejs';
 import { Ed25519KeyHash, NativeScript, NativeScriptKind, ScriptType } from '../../src/Cardano';
 import { ManagedFreeableScope } from '@cardano-sdk/util';
 import {
@@ -23,7 +23,7 @@ const txOutByron = {
   )
 };
 
-describe('coreToCsl', () => {
+describe('coreToCml', () => {
   let scope: ManagedFreeableScope;
 
   beforeEach(() => {
@@ -35,31 +35,31 @@ describe('coreToCsl', () => {
   });
 
   it('txIn', () => {
-    expect(coreToCsl.txIn(scope, txIn)).toBeInstanceOf(CSL.TransactionInput);
+    expect(coreToCml.txIn(scope, txIn)).toBeInstanceOf(CML.TransactionInput);
   });
   describe('txOut', () => {
-    it('converts to CSL.TransactionOutput', () => {
-      expect(coreToCsl.txOut(scope, txOut)).toBeInstanceOf(CSL.TransactionOutput);
-      expect(coreToCsl.txOut(scope, txOutByron)).toBeInstanceOf(CSL.TransactionOutput);
+    it('converts to CML.TransactionOutput', () => {
+      expect(coreToCml.txOut(scope, txOut)).toBeInstanceOf(CML.TransactionOutput);
+      expect(coreToCml.txOut(scope, txOutByron)).toBeInstanceOf(CML.TransactionOutput);
     });
-    it('converts datum to CSL.DataHash', () => {
-      const cslTxOut = coreToCsl.txOut(scope, txOutWithDatum);
-      const dataHash = scope.manage(cslTxOut.data_hash());
-      expect(dataHash).toBeInstanceOf(CSL.DataHash);
+    it('converts datum to CML.DataHash', () => {
+      const cmlTxOut = coreToCml.txOut(scope, txOutWithDatum);
+      const dataHash = scope.manage(scope.manage(cmlTxOut.datum())?.as_data_hash());
+      expect(dataHash).toBeInstanceOf(CML.DataHash);
       expect(Buffer.from(dataHash!.to_bytes()).toString('hex')).toBe(txOutWithDatum.datum?.toString());
     });
   });
   it('utxo', () => {
-    expect(coreToCsl.utxo(scope, [[txInWithAddress, txOut]])[0]).toBeInstanceOf(CSL.TransactionUnspentOutput);
+    expect(coreToCml.utxo(scope, [[txInWithAddress, txOut]])[0]).toBeInstanceOf(CML.TransactionUnspentOutput);
   });
   describe('value', () => {
     it('coin only', () => {
-      const value = coreToCsl.value(scope, valueCoinOnly);
+      const value = coreToCml.value(scope, valueCoinOnly);
       expect(scope.manage(value.coin()).to_str()).toEqual(valueCoinOnly.coins.toString());
       expect(scope.manage(value.multiasset())).toBeUndefined();
     });
     it('coin with assets', () => {
-      const value = coreToCsl.value(scope, valueWithAssets);
+      const value = coreToCml.value(scope, valueWithAssets);
       expect(scope.manage(value.coin()).to_str()).toEqual(valueWithAssets.coins.toString());
       const multiasset = scope.manage(value.multiasset())!;
       expect(multiasset.len()).toBe(3);
@@ -69,13 +69,13 @@ describe('coreToCsl', () => {
         const assetQuantity = BigInt(scope.manage(multiAsset.get(assetName)!).to_str());
         expect(assetQuantity).toBe(expectedAssetQuantity);
       }
-      expect(value).toBeInstanceOf(CSL.Value);
+      expect(value).toBeInstanceOf(CML.Value);
     });
   });
   describe('tokenMap', () => {
     it('inserts a single multiasset per asset policy', () => {
-      const multiasset = coreToCsl.tokenMap(scope, txOut.value.assets!);
-      expect(multiasset).toBeInstanceOf(CSL.MultiAsset);
+      const multiasset = coreToCml.tokenMap(scope, txOut.value.assets!);
+      expect(multiasset).toBeInstanceOf(CML.MultiAsset);
       const scriptHashes = scope.manage(multiasset.keys());
       expect(scriptHashes.len()).toBe(3);
       for (const [assetId, expectedAssetQuantity] of txOut.value.assets!.entries()) {
@@ -88,29 +88,31 @@ describe('coreToCsl', () => {
   });
   // eslint-disable-next-line max-statements
   it('txBody', () => {
-    const cslBody = coreToCsl.txBody(scope, txBody);
-    const certs = scope.manage(cslBody.certs());
+    const cmlBody = coreToCml.txBody(scope, txBody);
+    const certs = scope.manage(cmlBody.certs());
     const cert = scope.manage(certs?.get(0));
     const poolRetirement = cert?.as_pool_retirement();
-    const fee = scope.manage(cslBody.fee());
-    const inputs = scope.manage(cslBody.inputs());
-    const outputs = scope.manage(cslBody.outputs());
+    const fee = scope.manage(cmlBody.fee());
+    const inputs = scope.manage(cmlBody.inputs());
+    const outputs = scope.manage(cmlBody.outputs());
     const input0 = scope.manage(inputs.get(0));
     const output0 = scope.manage(outputs.get(0));
     const output0Amount = scope.manage(output0.amount());
     const output0AmountCoin = scope.manage(output0Amount.coin());
-    const withdrawals = scope.manage(cslBody.withdrawals());
+    const withdrawals = scope.manage(cmlBody.withdrawals());
     const withdrawalKeys = scope.manage(withdrawals!.keys());
     const withdrawalKeys0 = scope.manage(withdrawalKeys.get(0));
-    const withdrawal0 = scope.manage(cslBody.withdrawals()?.get(withdrawalKeys0));
+    const withdrawal0 = scope.manage(cmlBody.withdrawals()?.get(withdrawalKeys0));
     expect(poolRetirement?.epoch()).toBe(500);
     expect(fee.to_str()).toBe(txBody.fee.toString());
     expect(Buffer.from(scope.manage(input0.transaction_id()).to_bytes()).toString('hex')).toBe(txBody.inputs[0].txId);
     expect(output0AmountCoin.to_str()).toBe(txBody.outputs[0].value.coins.toString());
-    expect(cslBody.validity_start_interval()).toBe(txBody.validityInterval.invalidBefore);
-    expect(cslBody.ttl()).toBe(txBody.validityInterval.invalidHereafter);
+    expect(Number(scope.manage(cmlBody.validity_start_interval())?.to_str())).toBe(
+      txBody.validityInterval.invalidBefore
+    );
+    expect(Number(scope.manage(cmlBody.ttl())?.to_str())).toBe(txBody.validityInterval.invalidHereafter);
     expect(withdrawal0!.to_str()).toBe(txBody.withdrawals![0].quantity.toString());
-    const mint = scope.manage(cslBody.multiassets())!;
+    const mint = scope.manage(cmlBody.multiassets())!;
     const scriptHashes = scope.manage(mint.keys());
     const mintAssets1 = scope.manage(mint.get(scope.manage(scriptHashes.get(0)))!);
     const mintAssets1Keys = scope.manage(mintAssets1.keys());
@@ -123,14 +125,14 @@ describe('coreToCsl', () => {
 
     expect(scope.manage(mintAssets1Amount.as_positive())!.to_str()).toBe('20');
     expect(scope.manage(mintAssets2Amount.as_negative())!.to_str()).toBe('50');
-    expect(scope.manage(cslBody.collateral())!.len()).toBe(1);
-    expect(scope.manage(cslBody.required_signers())!.len()).toBe(1);
-    expect(scope.manage(cslBody.script_data_hash())).toBeTruthy();
+    expect(scope.manage(cmlBody.collateral())!.len()).toBe(1);
+    expect(scope.manage(cmlBody.required_signers())!.len()).toBe(1);
+    expect(scope.manage(cmlBody.script_data_hash())).toBeTruthy();
   });
   it('tx', () => {
-    const cslTx = coreToCsl.tx(scope, tx);
-    expect(cslTx.body()).toBeInstanceOf(CSL.TransactionBody);
-    const witnessSet = scope.manage(cslTx.witness_set());
+    const cmlTx = coreToCml.tx(scope, tx);
+    expect(cmlTx.body()).toBeInstanceOf(CML.TransactionBody);
+    const witnessSet = scope.manage(cmlTx.witness_set());
     const vKeys = scope.manage(witnessSet.vkeys());
     const witness = scope.manage(vKeys!.get(0)!);
     const witnessSignature = scope.manage(witness.signature());
@@ -173,7 +175,7 @@ describe('coreToCsl', () => {
       ]
     };
 
-    const baseScript = coreToCsl.nativeScript(scope, script);
+    const baseScript = coreToCml.nativeScript(scope, script);
     // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
     const scriptAny = scope.manage(baseScript.as_script_any());
     const nativeScripts = scope.manage(scriptAny?.native_scripts());
@@ -194,20 +196,24 @@ describe('coreToCsl', () => {
       Uint8Array.from(Buffer.from('b275b08c999097247f7c17e77007c7010cd19f20cc086ad99d398538', 'hex'))
     );
     expect(secondSubScriptScriptAllNativeScripts!.len()).toEqual(3);
-    expect(scope.manage(secondSubScriptScriptAllNativeScripts0.as_timelock_expiry())?.slot()).toEqual(3000);
+    expect(
+      Number(scope.manage(scope.manage(secondSubScriptScriptAllNativeScripts0.as_timelock_expiry())?.slot())?.to_str())
+    ).toEqual(3000);
     expect(scope.manage(secondSubScriptScriptAllNativeScripts1PubKey!.addr_keyhash()).to_bytes()).toStrictEqual(
       Uint8Array.from(Buffer.from('966e394a544f242081e41d1965137b1bb412ac230d40ed5407821c37', 'hex'))
     );
-    expect(scope.manage(secondSubScriptScriptAllNativeScripts2.as_timelock_start())?.slot()).toEqual(4000);
+    expect(
+      Number(scope.manage(scope.manage(secondSubScriptScriptAllNativeScripts2.as_timelock_start())?.slot())?.to_str())
+    ).toEqual(4000);
   });
   describe('txAuxiliaryData', () => {
-    it('returns undefined for undefined data', () => expect(coreToCsl.txAuxiliaryData(scope)).toBeUndefined());
+    it('returns undefined for undefined data', () => expect(coreToCml.txAuxiliaryData(scope)).toBeUndefined());
 
     describe('txMetadata', () => {
       // eslint-disable-next-line unicorn/consistent-function-scoping, @typescript-eslint/no-explicit-any
       const convertMetadatum = (metadatum: any) => {
         const label = 123n;
-        const auxiliaryData = coreToCsl.txAuxiliaryData(scope, { body: { blob: new Map([[label, metadatum]]) } });
+        const auxiliaryData = coreToCml.txAuxiliaryData(scope, { body: { blob: new Map([[label, metadatum]]) } });
         const metadata = scope.manage(auxiliaryData?.metadata());
         return scope.manage(metadata?.get(scope.manage(BigNum.from_str(label.toString()))));
       };
@@ -231,10 +237,10 @@ describe('coreToCsl', () => {
       it('converts list', () => {
         const list = [str64Len, 'str2'];
         const metadatum = convertMetadatum(list);
-        const cslList = scope.manage(metadatum?.as_list());
-        expect(cslList?.len()).toBe(list.length);
-        expect(scope.manage(cslList?.get(0))!.as_text()).toBe(list[0]);
-        expect(scope.manage(cslList?.get(1))!.as_text()).toBe(list[1]);
+        const cmlList = scope.manage(metadatum?.as_list());
+        expect(cmlList?.len()).toBe(list.length);
+        expect(scope.manage(cmlList?.get(0))!.as_text()).toBe(list[0]);
+        expect(scope.manage(cmlList?.get(1))!.as_text()).toBe(list[1]);
       });
 
       test('converts bytes', () => {
@@ -251,13 +257,13 @@ describe('coreToCsl', () => {
           [key, new Map<Cardano.Metadatum, Cardano.Metadatum>([[666n, 'cake']])]
         ]);
         const metadatum = convertMetadatum(map);
-        const cslMap = scope.manage(metadatum?.as_map());
-        const metadatum1 = scope.manage(cslMap?.get(convertMetadatum(123n)!));
-        const metadatum2 = scope.manage(cslMap?.get(convertMetadatum('key')!));
-        const metadatum3 = scope.manage(cslMap?.get(convertMetadatum(key)!));
+        const cmlMap = scope.manage(metadatum?.as_map());
+        const metadatum1 = scope.manage(cmlMap?.get(convertMetadatum(123n)!));
+        const metadatum2 = scope.manage(cmlMap?.get(convertMetadatum('key')!));
+        const metadatum3 = scope.manage(cmlMap?.get(convertMetadatum(key)!));
         const metadatum1AsInt = scope.manage(metadatum1!.as_int());
         const metadatum3AsMap = scope.manage(metadatum3!.as_map());
-        expect(cslMap?.len()).toBe(map.size);
+        expect(cmlMap?.len()).toBe(map.size);
         expect(scope.manage(metadatum1AsInt.as_positive())?.to_str()).toBe('1234');
         expect(metadatum2!.as_text()).toBe('value');
         expect(scope.manage(metadatum3AsMap.get_i32(666)).as_text()).toBe('cake');
