@@ -1,5 +1,5 @@
 import { BehaviorSubject, EMPTY, of } from 'rxjs';
-import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider, coreToCsl, util } from '@cardano-sdk/core';
+import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider, coreToCml, util } from '@cardano-sdk/core';
 import { ConnectionStatus, SmartTxSubmitProvider, TipSlot } from '../../src';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { flushPromises } from '@cardano-sdk/util-dev';
@@ -37,11 +37,11 @@ describe('SmartTxSubmitProvider', () => {
     };
     const validityInterval = { invalidBefore: 5, invalidHereafter: 10 };
     const txWithoutValidityIntervalHex = util.bytesToHex(
-      usingAutoFree((scope) => coreToCsl.tx(scope, txWithoutValidityInterval).to_bytes())
+      usingAutoFree((scope) => coreToCml.tx(scope, txWithoutValidityInterval).to_bytes())
     );
     const txWithValidityIntervalHex = util.bytesToHex(
       usingAutoFree((scope) =>
-        coreToCsl
+        coreToCml
           .tx(scope, {
             ...txWithoutValidityInterval,
             body: {

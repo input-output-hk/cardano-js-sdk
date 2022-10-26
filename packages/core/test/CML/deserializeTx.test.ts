@@ -1,5 +1,5 @@
 import { Cardano, InvalidStringError } from '../../src';
-import { deserializeTx } from '../../src/CSL/util';
+import { deserializeTx } from '../../src/CML/util';
 
 const txId = '9580dbb57df0e160902a942aa4a03ec0090a44bf7c485b2a8fdb8be67127fbf7';
 const txBody =

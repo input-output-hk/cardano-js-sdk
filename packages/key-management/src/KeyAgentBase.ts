@@ -9,7 +9,7 @@ import {
   SignBlobResult,
   SignTransactionOptions
 } from './types';
-import { CSL, Cardano, util } from '@cardano-sdk/core';
+import { CML, Cardano, util } from '@cardano-sdk/core';
 import { STAKE_KEY_DERIVATION_PATH } from './util';
 
 export abstract class KeyAgentBase implements KeyAgent {
@@ -52,22 +52,22 @@ export abstract class KeyAgentBase implements KeyAgent {
   async deriveAddress({ index, type }: AccountAddressDerivationPath): Promise<GroupedAddress> {
     const knownAddress = this.knownAddresses.find((addr) => addr.type === type && addr.index === index);
     if (knownAddress) return knownAddress;
-    const derivedPublicPaymentKey = await this.deriveCslPublicKey({
+    const derivedPublicPaymentKey = await this.deriveCmlPublicKey({
       index,
       role: type as unknown as KeyRole
     });
 
     // Possible optimization: memoize/cache stakeKeyCredential, because it's always the same
-    const publicStakeKey = await this.deriveCslPublicKey(STAKE_KEY_DERIVATION_PATH);
-    const stakeKeyCredential = CSL.StakeCredential.from_keyhash(publicStakeKey.hash());
+    const publicStakeKey = await this.deriveCmlPublicKey(STAKE_KEY_DERIVATION_PATH);
+    const stakeKeyCredential = CML.StakeCredential.from_keyhash(publicStakeKey.hash());
 
-    const address = CSL.BaseAddress.new(
+    const address = CML.BaseAddress.new(
       this.networkId,
-      CSL.StakeCredential.from_keyhash(derivedPublicPaymentKey.hash()),
+      CML.StakeCredential.from_keyhash(derivedPublicPaymentKey.hash()),
       stakeKeyCredential
     ).to_address();
 
-    const rewardAccount = CSL.RewardAddress.new(this.networkId, stakeKeyCredential).to_address();
+    const rewardAccount = CML.RewardAddress.new(this.networkId, stakeKeyCredential).to_address();
     const groupedAddress = {
       accountIndex: this.accountIndex,
       address: Cardano.Address(address.to_bech32()),
@@ -81,13 +81,13 @@ export abstract class KeyAgentBase implements KeyAgent {
   }
 
   async derivePublicKey(derivationPath: AccountKeyDerivationPath): Promise<Cardano.Ed25519PublicKey> {
-    const cslPublicKey = await this.deriveCslPublicKey(derivationPath);
+    const cslPublicKey = await this.deriveCmlPublicKey(derivationPath);
     return Cardano.Ed25519PublicKey.fromHexBlob(util.bytesToHex(cslPublicKey.as_bytes()));
   }
 
-  protected async deriveCslPublicKey({ index, role: type }: AccountKeyDerivationPath): Promise<CSL.PublicKey> {
+  protected async deriveCmlPublicKey({ index, role: type }: AccountKeyDerivationPath): Promise<CML.PublicKey> {
     const accountPublicKeyBytes = Buffer.from(this.extendedAccountPublicKey, 'hex');
-    const accountPublicKey = CSL.Bip32PublicKey.from_bytes(accountPublicKeyBytes);
+    const accountPublicKey = CML.Bip32PublicKey.from_bytes(accountPublicKeyBytes);
     return accountPublicKey.derive(type).derive(index).to_raw_key();
   }
 }

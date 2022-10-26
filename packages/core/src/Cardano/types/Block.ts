@@ -1,4 +1,4 @@
-import { CSL } from '../..';
+import { CML } from '../..';
 import { Ed25519PublicKey } from '.';
 import { Hash28ByteBase16, Hash32ByteBase16, OpaqueString, typedBech32 } from '../util/primitives';
 import { InvalidStringError } from '../../errors';
@@ -84,7 +84,7 @@ export const SlotLeader = (value: string): SlotLeader => {
  * @returns Bech32 encoded vrf_vk
  */
 export const VrfVkBech32FromBase64 = (value: string) =>
-  VrfVkBech32(CSL.VRFVKey.from_bytes(Buffer.from(value, 'base64')).to_bech32('vrf_vk'));
+  VrfVkBech32(CML.VRFVKey.from_bytes(Buffer.from(value, 'base64')).to_bech32('vrf_vk'));
 
 /** Minimal Block type meant as a base for the more complete version `Block`  */
 // TODO: optionals (except previousBlock) are there because they are not calculated for Byron yet.

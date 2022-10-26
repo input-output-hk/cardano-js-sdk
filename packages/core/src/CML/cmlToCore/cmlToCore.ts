@@ -1,10 +1,10 @@
-import { Asset, CSL, Cardano, SerializationFailure, util } from '../..';
+import { Asset, CML, Cardano, SerializationFailure, util } from '../..';
 import { SerializationError } from '../../errors';
 import { createCertificate } from './certificate';
 import { usingAutoFree } from '@cardano-sdk/util';
 
 export const txRequiredExtraSignatures = (
-  signatures: CSL.Ed25519KeyHashes | undefined
+  signatures: CML.Ed25519KeyHashes | undefined
 ): Cardano.Ed25519KeyHash[] | undefined =>
   usingAutoFree((scope) => {
     if (!signatures) return;
@@ -17,7 +17,7 @@ export const txRequiredExtraSignatures = (
     return requiredSignatures;
   });
 
-export const txWithdrawals = (withdrawals?: CSL.Withdrawals): Cardano.Withdrawal[] | undefined =>
+export const txWithdrawals = (withdrawals?: CML.Withdrawals): Cardano.Withdrawal[] | undefined =>
   usingAutoFree((scope) => {
     if (!withdrawals) return;
     const result: Cardano.Withdrawal[] = [];
@@ -31,7 +31,7 @@ export const txWithdrawals = (withdrawals?: CSL.Withdrawals): Cardano.Withdrawal
     return result;
   });
 
-export const value = (cslValue: CSL.Value): Cardano.Value =>
+export const value = (cslValue: CML.Value): Cardano.Value =>
   usingAutoFree((scope) => {
     const result: Cardano.Value = {
       coins: BigInt(scope.manage(cslValue.coin()).to_str())
@@ -57,15 +57,15 @@ export const value = (cslValue: CSL.Value): Cardano.Value =>
     return result;
   });
 
-export const txIn = (input: CSL.TransactionInput): Cardano.NewTxIn =>
+export const txIn = (input: CML.TransactionInput): Cardano.NewTxIn =>
   usingAutoFree((scope) => ({
-    index: input.index(),
+    index: Number(scope.manage(input.index()).to_str()),
     txId: Cardano.TransactionId.fromHexBlob(util.bytesToHex(scope.manage(input.transaction_id()).to_bytes()))
   }));
 
-export const txOut = (output: CSL.TransactionOutput): Cardano.TxOut =>
+export const txOut = (output: CML.TransactionOutput): Cardano.TxOut =>
   usingAutoFree((scope) => {
-    const dataHashBytes = scope.manage(output.data_hash())?.to_bytes();
+    const dataHashBytes = scope.manage(scope.manage(output.datum())?.as_data_hash())?.to_bytes();
     return {
       address: Cardano.Address(scope.manage(output.address()).to_bech32()),
       datum: dataHashBytes ? Cardano.util.Hash32ByteBase16.fromHexBlob(util.bytesToHex(dataHashBytes)) : undefined,
@@ -73,7 +73,7 @@ export const txOut = (output: CSL.TransactionOutput): Cardano.TxOut =>
     };
   });
 
-export const txOutputs = (outputs: CSL.TransactionOutputs): Cardano.TxOut[] =>
+export const txOutputs = (outputs: CML.TransactionOutputs): Cardano.TxOut[] =>
   usingAutoFree((scope) => {
     const result: Cardano.TxOut[] = [];
     for (let i = 0; i < outputs.len(); i++) {
@@ -82,7 +82,7 @@ export const txOutputs = (outputs: CSL.TransactionOutputs): Cardano.TxOut[] =>
     return result;
   });
 
-export const txInputs = (inputs: CSL.TransactionInputs): Cardano.NewTxIn[] =>
+export const txInputs = (inputs: CML.TransactionInputs): Cardano.NewTxIn[] =>
   usingAutoFree((scope) => {
     const result: Cardano.NewTxIn[] = [];
     for (let i = 0; i < inputs.len(); i++) {
@@ -91,7 +91,7 @@ export const txInputs = (inputs: CSL.TransactionInputs): Cardano.NewTxIn[] =>
     return result;
   });
 
-export const txCertificates = (certificates?: CSL.Certificates): Cardano.Certificate[] | undefined =>
+export const txCertificates = (certificates?: CML.Certificates): Cardano.Certificate[] | undefined =>
   usingAutoFree((scope) => {
     if (!certificates) return;
     const result: Cardano.Certificate[] = [];
@@ -102,7 +102,7 @@ export const txCertificates = (certificates?: CSL.Certificates): Cardano.Certifi
     return result;
   });
 
-export const txMint = (assets?: CSL.Mint): Cardano.TokenMap | undefined =>
+export const txMint = (assets?: CML.Mint): Cardano.TokenMap | undefined =>
   usingAutoFree((scope) => {
     if (!assets) return;
     const assetMap: Cardano.TokenMap = new Map();
@@ -126,7 +126,7 @@ export const txMint = (assets?: CSL.Mint): Cardano.TokenMap | undefined =>
     return assetMap;
   });
 
-export const txBody = (body: CSL.TransactionBody): Cardano.NewTxBodyAlonzo =>
+export const txBody = (body: CML.TransactionBody): Cardano.NewTxBodyAlonzo =>
   usingAutoFree((scope) => {
     const cslScriptDataHash = scope.manage(body.script_data_hash());
     const cslCollaterals = scope.manage(body.collateral());
@@ -142,20 +142,20 @@ export const txBody = (body: CSL.TransactionBody): Cardano.NewTxBodyAlonzo =>
       scriptIntegrityHash:
         cslScriptDataHash && Cardano.util.Hash32ByteBase16(Buffer.from(cslScriptDataHash.to_bytes()).toString('hex')),
       validityInterval: {
-        invalidBefore: body.validity_start_interval(),
-        invalidHereafter: body.ttl()
+        invalidBefore: Number(scope.manage(body.validity_start_interval())?.to_str()),
+        invalidHereafter: Number(scope.manage(body.ttl())?.to_str())
       },
       withdrawals: txWithdrawals(scope.manage(body.withdrawals()))
     };
   });
 
-export const txWitnessBootstrap = (bootstraps?: CSL.BootstrapWitnesses): Cardano.BootstrapWitness[] | undefined =>
+export const txWitnessBootstrap = (bootstraps?: CML.BootstrapWitnesses): Cardano.BootstrapWitness[] | undefined =>
   usingAutoFree((scope) => {
     if (!bootstraps) return;
     const result: Cardano.BootstrapWitness[] = [];
     for (let i = 0; i < bootstraps.len(); i++) {
       const bootstrap = scope.manage(bootstraps.get(i));
-      const attributes = bootstrap.attributes();
+      const attributes = scope.manage(bootstrap.attributes()).to_bytes();
       const chainCode = bootstrap.chain_code();
       result.push({
         addressAttributes: attributes?.length > 0 ? Cardano.util.Base64Blob.fromBytes(attributes) : undefined,
@@ -169,7 +169,7 @@ export const txWitnessBootstrap = (bootstraps?: CSL.BootstrapWitnesses): Cardano
     return result;
   });
 
-export const txWitnessRedeemers = (redeemers?: CSL.Redeemers): Cardano.Redeemer[] | undefined =>
+export const txWitnessRedeemers = (redeemers?: CML.Redeemers): Cardano.Redeemer[] | undefined =>
   usingAutoFree((scope) => {
     if (!redeemers) return;
     const result: Cardano.Redeemer[] = [];
@@ -180,7 +180,7 @@ export const txWitnessRedeemers = (redeemers?: CSL.Redeemers): Cardano.Redeemer[
       const exUnits = scope.manage(reedeemer.ex_units());
 
       /**
-       * CSL.RedeemerTagKind = Spend, Mint, Cert, Reward
+       * CML.RedeemerTagKind = Spend, Mint, Cert, Reward
        * should we modify Cardano.Redeemer.purpose to match or just map reward to withdrawal ??
        */
       const redeemerTagKind = scope.manage(reedeemer.tag()).kind();
@@ -195,11 +195,11 @@ export const txWitnessRedeemers = (redeemers?: CSL.Redeemers): Cardano.Redeemer[
     return result;
   });
 
-export const txWitnessSet = (witnessSet: CSL.TransactionWitnessSet): Cardano.Witness =>
+export const txWitnessSet = (witnessSet: CML.TransactionWitnessSet): Cardano.Witness =>
   usingAutoFree((scope) => {
-    const vkeys: CSL.Vkeywitnesses | undefined = scope.manage(witnessSet.vkeys())!;
-    const redeemers: CSL.Redeemers | undefined = scope.manage(witnessSet.redeemers());
-    const bootstraps: CSL.BootstrapWitnesses | undefined = scope.manage(witnessSet.bootstraps());
+    const vkeys: CML.Vkeywitnesses | undefined = scope.manage(witnessSet.vkeys())!;
+    const redeemers: CML.Redeemers | undefined = scope.manage(witnessSet.redeemers());
+    const bootstraps: CML.BootstrapWitnesses | undefined = scope.manage(witnessSet.bootstraps());
 
     const txSignatures: Cardano.Signatures = new Map();
     if (vkeys) {
@@ -223,17 +223,17 @@ export const txWitnessSet = (witnessSet: CSL.TransactionWitnessSet): Cardano.Wit
     };
   });
 
-export const txMetadatum = (transactionMetadatum: CSL.TransactionMetadatum): Cardano.Metadatum =>
+export const txMetadatum = (transactionMetadatum: CML.TransactionMetadatum): Cardano.Metadatum =>
   usingAutoFree((scope) => {
     switch (transactionMetadatum.kind()) {
-      case CSL.TransactionMetadatumKind.Bytes:
+      case CML.TransactionMetadatumKind.Bytes:
         return transactionMetadatum.as_bytes();
-      case CSL.TransactionMetadatumKind.Int: {
+      case CML.TransactionMetadatumKind.Int: {
         const int = scope.manage(transactionMetadatum.as_int())!;
         if (int.is_positive()) return BigInt(scope.manage(int.as_positive())!.to_str());
         return BigInt(scope.manage(int.as_negative())!.to_str()) * -1n;
       }
-      case CSL.TransactionMetadatumKind.MetadataList: {
+      case CML.TransactionMetadatumKind.MetadataList: {
         const list = scope.manage(transactionMetadatum.as_list());
         const metaDatumList: Cardano.Metadatum[] = [];
         for (let j = 0; j < list.len(); j++) {
@@ -242,7 +242,7 @@ export const txMetadatum = (transactionMetadatum: CSL.TransactionMetadatum): Car
         }
         return metaDatumList;
       }
-      case CSL.TransactionMetadatumKind.MetadataMap: {
+      case CML.TransactionMetadatumKind.MetadataMap: {
         const txMap = scope.manage(transactionMetadatum.as_map());
         const metdatumMap = new Map<Cardano.Metadatum, Cardano.Metadatum>();
         for (let i = 0; i < scope.manage(txMap.keys()).len(); i++) {
@@ -252,14 +252,14 @@ export const txMetadatum = (transactionMetadatum: CSL.TransactionMetadatum): Car
         }
         return metdatumMap;
       }
-      case CSL.TransactionMetadatumKind.Text:
+      case CML.TransactionMetadatumKind.Text:
         return transactionMetadatum.as_text();
       default:
         throw new SerializationError(SerializationFailure.InvalidType);
     }
   });
 
-export const txMetadata = (auxiliaryMetadata?: CSL.GeneralTransactionMetadata): Cardano.TxMetadata | undefined =>
+export const txMetadata = (auxiliaryMetadata?: CML.GeneralTransactionMetadata): Cardano.TxMetadata | undefined =>
   usingAutoFree((scope) => {
     if (!auxiliaryMetadata) return;
     const auxiliaryMetadataMap: Cardano.TxMetadata = new Map();
@@ -275,7 +275,7 @@ export const txMetadata = (auxiliaryMetadata?: CSL.GeneralTransactionMetadata): 
     return auxiliaryMetadataMap;
   });
 
-export const txAuxiliaryData = (auxiliaryData?: CSL.AuxiliaryData): Cardano.AuxiliaryData | undefined =>
+export const txAuxiliaryData = (auxiliaryData?: CML.AuxiliaryData): Cardano.AuxiliaryData | undefined =>
   usingAutoFree((scope) => {
     if (!auxiliaryData) return;
     // TODO: create hash
@@ -287,15 +287,15 @@ export const txAuxiliaryData = (auxiliaryData?: CSL.AuxiliaryData): Cardano.Auxi
     };
   });
 
-export const utxo = (cslUtxos: CSL.TransactionUnspentOutput[]) =>
+export const utxo = (cslUtxos: CML.TransactionUnspentOutput[]) =>
   usingAutoFree((scope) =>
     cslUtxos.map((cslUtxo) => [txIn(scope.manage(cslUtxo.input())), txOut(scope.manage(cslUtxo.output()))])
   );
 
-export const newTx = (cslTx: CSL.Transaction): Cardano.NewTxAlonzo =>
+export const newTx = (cslTx: CML.Transaction): Cardano.NewTxAlonzo =>
   usingAutoFree((scope) => {
     const transactionHash = Cardano.TransactionId.fromHexBlob(
-      util.bytesToHex(scope.manage(CSL.hash_transaction(scope.manage(cslTx.body()))).to_bytes())
+      util.bytesToHex(scope.manage(CML.hash_transaction(scope.manage(cslTx.body()))).to_bytes())
     );
     const auxiliary_data = scope.manage(cslTx.auxiliary_data());
 
@@ -309,7 +309,7 @@ export const newTx = (cslTx: CSL.Transaction): Cardano.NewTxAlonzo =>
     };
   });
 
-export const nativeScript = (script: CSL.NativeScript): Cardano.NativeScript =>
+export const nativeScript = (script: CML.NativeScript): Cardano.NativeScript =>
   usingAutoFree((scope) => {
     let coreScript: Cardano.NativeScript;
     const scriptKind = script.kind();
@@ -367,7 +367,7 @@ export const nativeScript = (script: CSL.NativeScript): Cardano.NativeScript =>
         coreScript = {
           __type: Cardano.ScriptType.Native,
           kind: Cardano.NativeScriptKind.RequireTimeBefore,
-          slot: scope.manage(script.as_timelock_expiry())!.slot()
+          slot: Number(scope.manage(scope.manage(script.as_timelock_expiry())!.slot()).to_str())
         };
         break;
       }
@@ -375,7 +375,7 @@ export const nativeScript = (script: CSL.NativeScript): Cardano.NativeScript =>
         coreScript = {
           __type: Cardano.ScriptType.Native,
           kind: Cardano.NativeScriptKind.RequireTimeAfter,
-          slot: scope.manage(script.as_timelock_start())!.slot()
+          slot: Number(scope.manage(scope.manage(script.as_timelock_start())!.slot()).to_str())
         };
         break;
       }

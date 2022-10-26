@@ -1,11 +1,11 @@
-import * as parseCslAddress from '../../../src/CSL/parseCslAddress';
+import * as parseCmlAddress from '../../../src/CML/parseCmlAddress';
 import { Cardano } from '../../../src';
-import { CSL as SerializationLib } from '../../../src/CSL';
+import { CML as SerializationLib } from '../../../src/CML';
 
 describe('Cardano.util.address', () => {
-  const parseCslAddressSpy = jest.spyOn(parseCslAddress, 'parseCslAddress');
-  beforeEach(() => parseCslAddressSpy.mockReset());
-  afterAll(() => parseCslAddressSpy.mockRestore());
+  const parseCmlAddressSpy = jest.spyOn(parseCmlAddress, 'parseCmlAddress');
+  beforeEach(() => parseCmlAddressSpy.mockReset());
+  afterAll(() => parseCmlAddressSpy.mockRestore());
 
   describe('util', () => {
     const addresses = [
@@ -18,18 +18,18 @@ describe('Cardano.util.address', () => {
     ];
 
     describe('isAddress', () => {
-      it('returns false if parseCslAddress returns null', () => {
-        parseCslAddressSpy.mockReturnValueOnce(null);
+      it('returns false if parseCmlAddress returns null', () => {
+        parseCmlAddressSpy.mockReturnValueOnce(null);
         expect(Cardano.util.isAddress('invalid')).toBe(false);
       });
-      it('returns true if parseCslAddress returns an Address', () => {
-        parseCslAddressSpy.mockReturnValueOnce(new SerializationLib.Address());
+      it('returns true if parseCmlAddress returns an Address', () => {
+        parseCmlAddressSpy.mockReturnValueOnce(new SerializationLib.Address());
         expect(Cardano.util.isAddress('valid')).toBe(true);
       });
     });
 
     describe('isAddressWithin', () => {
-      beforeAll(() => parseCslAddressSpy.mockRestore());
+      beforeAll(() => parseCmlAddressSpy.mockRestore());
 
       it('returns true if address is within provided addresses', () => {
         const address = addresses[0];
@@ -45,7 +45,7 @@ describe('Cardano.util.address', () => {
     });
 
     describe('inputsWithAddresses', () => {
-      beforeAll(() => parseCslAddressSpy.mockRestore());
+      beforeAll(() => parseCmlAddressSpy.mockRestore());
       const tx = {
         body: {
           inputs: [

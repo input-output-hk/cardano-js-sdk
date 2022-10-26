@@ -7,7 +7,7 @@ import {
   KeyRole,
   SerializableInMemoryKeyAgentData
 } from '../src';
-import { CSL, Cardano } from '@cardano-sdk/core';
+import { CML, Cardano } from '@cardano-sdk/core';
 
 const NETWORK_ID = Cardano.NetworkId.testnet;
 const ACCOUNT_INDEX = 1;
@@ -23,8 +23,8 @@ class MockKeyAgent extends KeyAgentBase {
   signTransaction = jest.fn();
   signVotingMetadata = jest.fn();
   exportExtendedKeyPair = jest.fn();
-  deriveCslPublicKeyPublic(derivationPath: AccountKeyDerivationPath) {
-    return this.deriveCslPublicKey(derivationPath);
+  deriveCmlPublicKeyPublic(derivationPath: AccountKeyDerivationPath) {
+    return this.deriveCmlPublicKey(derivationPath);
   }
 }
 
@@ -80,7 +80,7 @@ describe('KeyAgentBase', () => {
     expect(typeof stakePublicKey).toBe('string');
   });
 
-  test('deriveCslPublicKey', async () => {
-    expect(await keyAgent.deriveCslPublicKeyPublic({ index: 0, role: KeyRole.External })).toBeInstanceOf(CSL.PublicKey);
+  test('deriveCMLPublicKey', async () => {
+    expect(await keyAgent.deriveCmlPublicKeyPublic({ index: 0, role: KeyRole.External })).toBeInstanceOf(CML.PublicKey);
   });
 });
