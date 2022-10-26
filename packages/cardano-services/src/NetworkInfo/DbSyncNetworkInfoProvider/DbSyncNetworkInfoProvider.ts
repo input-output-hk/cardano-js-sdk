@@ -4,7 +4,6 @@ import {
   CardanoNodeUtil,
   EraSummary,
   NetworkInfoProvider,
-  ProtocolParametersRequiredByWallet,
   StakeSummary,
   SupplySummary
 } from '@cardano-sdk/core';
@@ -17,7 +16,7 @@ import { NetworkInfoBuilder } from './NetworkInfoBuilder';
 import { NetworkInfoCacheKey } from '.';
 import { Pool } from 'pg';
 import { RunnableModule } from '@cardano-sdk/util';
-import { loadGenesisData, toGenesisParams, toLedgerTip, toSupply, toWalletProtocolParams } from './mappers';
+import { loadGenesisData, toGenesisParams, toLedgerTip, toProtocolParams, toSupply } from './mappers';
 
 export interface NetworkInfoProviderProps {
   cardanoNodeConfigPath: string;
@@ -54,9 +53,9 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) im
     return toLedgerTip(tip);
   }
 
-  public async currentWalletProtocolParameters(): Promise<ProtocolParametersRequiredByWallet> {
-    const currentProtocolParams = await this.#builder.queryCurrentWalletProtocolParams();
-    return toWalletProtocolParams(currentProtocolParams);
+  public async protocolParameters(): Promise<Cardano.ProtocolParameters> {
+    const currentProtocolParams = await this.#builder.queryProtocolParams();
+    return toProtocolParams(currentProtocolParams);
   }
 
   public async genesisParameters(): Promise<Cardano.CompactGenesis> {

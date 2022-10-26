@@ -36,12 +36,12 @@ export const blockfrostNetworkInfoProvider = (blockfrost: BlockFrostAPI): Networ
     return BlockfrostToCore.blockToTip(block);
   };
 
-  const currentWalletProtocolParameters: NetworkInfoProvider['currentWalletProtocolParameters'] = async () => {
+  const protocolParameters: NetworkInfoProvider['protocolParameters'] = async () => {
     const response = await blockfrost.axiosInstance({
       url: `${blockfrost.apiUrl}/epochs/latest/parameters`
     });
 
-    return BlockfrostToCore.currentWalletProtocolParameters(response.data);
+    return BlockfrostToCore.protocolParameters(response.data);
   };
 
   const genesisParameters: NetworkInfoProvider['genesisParameters'] = async () => {
@@ -62,12 +62,12 @@ export const blockfrostNetworkInfoProvider = (blockfrost: BlockFrostAPI): Networ
   };
 
   return {
-    currentWalletProtocolParameters,
     eraSummaries,
     genesisParameters,
     healthCheck: healthCheck.bind(undefined, blockfrost),
     ledgerTip,
     lovelaceSupply,
+    protocolParameters,
     stake
   };
 };

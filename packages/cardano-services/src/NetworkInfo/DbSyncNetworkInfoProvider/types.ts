@@ -26,7 +26,12 @@ export interface LedgerTipModel {
   hash: Buffer;
 }
 
-export interface WalletProtocolParamsModel {
+export interface CostModelsParamModel {
+  PlutusV1?: Cardano.CostModel;
+  PlutusV2?: Cardano.CostModel;
+}
+
+export interface ProtocolParamsModel {
   coins_per_utxo_size: string;
   max_tx_size: number;
   max_val_size: string;
@@ -53,6 +58,7 @@ export interface WalletProtocolParamsModel {
   max_block_ex_mem: string;
   max_block_ex_steps: string;
   max_epoch: number;
+  costs: CostModelsParamModel | null;
 }
 
 export interface GenesisData {

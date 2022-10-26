@@ -110,7 +110,7 @@ describe('blockfrostNetworkInfoProvider', () => {
     } as Cardano.CompactGenesis);
   });
 
-  test('currentWalletProtocolParameters', async () => {
+  test('protocolParameters', async () => {
     const mockedResponse = {
       data: {
         coins_per_utxo_word: '0',
@@ -130,7 +130,7 @@ describe('blockfrostNetworkInfoProvider', () => {
 
     const blockfrost = new BlockFrostAPI({ isTestnet: true, projectId: apiKey });
     const client = blockfrostNetworkInfoProvider(blockfrost);
-    const response = await client.currentWalletProtocolParameters();
+    const response = await client.protocolParameters();
 
     expect(response).toMatchObject({
       coinsPerUtxoByte: 0,

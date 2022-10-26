@@ -1,5 +1,5 @@
 import { BalanceTracker, DelegationTracker, StakeKeyStatus, TransactionalObservables } from './types';
-import { Cardano, ProtocolParametersRequiredByWallet, coalesceValueQuantities } from '@cardano-sdk/core';
+import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
 
 import { Observable, combineLatest, distinctUntilChanged, map } from 'rxjs';
 
@@ -8,7 +8,7 @@ const mapUtxoValue = map<Cardano.Utxo[], Cardano.Value>((utxo) =>
 );
 
 const computeDepositCoin = (
-  protocolParameters$: Observable<ProtocolParametersRequiredByWallet>,
+  protocolParameters$: Observable<Cardano.ProtocolParameters>,
   numDeposits$: Observable<number>
 ) =>
   combineLatest([numDeposits$, protocolParameters$]).pipe(
@@ -22,7 +22,7 @@ const numRewardAccountsWithKeyStatus = (delegationTracker: DelegationTracker, ke
   );
 
 export const createBalanceTracker = (
-  protocolParameters$: Observable<ProtocolParametersRequiredByWallet>,
+  protocolParameters$: Observable<Cardano.ProtocolParameters>,
   utxoTracker: TransactionalObservables<Cardano.Utxo[]>,
   delegationTracker: DelegationTracker
 ): BalanceTracker => ({

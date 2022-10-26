@@ -4,10 +4,27 @@ exports[`NetworkInfoBuilder queryActiveStake query active stake 1`] = `"15039823
 
 exports[`NetworkInfoBuilder queryCirculatingSupply query circulating supply 1`] = `"42022749185221758"`;
 
-exports[`NetworkInfoBuilder queryCurrentWalletProtocolParams query wallet protocol params from current epoch 1`] = `
+exports[`NetworkInfoBuilder queryLatestEpoch query latest epoch 1`] = `205`;
+
+exports[`NetworkInfoBuilder queryLedgerTip query ledger tip 1`] = `
+Object {
+  "block_no": 3556390,
+  "hash": "332340bfcf47951b4bc8eca51c4e9190d29e2fd6dae30be231ebcdadb2d8c399",
+  "slot_no": "58336266",
+}
+`;
+
+exports[`NetworkInfoBuilder queryProtocolParams query wallet protocol params from current epoch 1`] = `
 Object {
   "coins_per_utxo_size": "34482",
   "collateral_percent": 150,
+  "costs": Object {
+    "PlutusV1": Object {
+      "bData-cpu-arguments": 150000,
+      "equalsString-memory-arguments": 1,
+      "iData-cpu-arguments": 150000,
+    },
+  },
   "decentralisation": 0,
   "influence": 0.3,
   "key_deposit": "2000000",
@@ -32,16 +49,6 @@ Object {
   "protocol_major": 6,
   "protocol_minor": 0,
   "treasury_growth_rate": 0.2,
-}
-`;
-
-exports[`NetworkInfoBuilder queryLatestEpoch query latest epoch 1`] = `205`;
-
-exports[`NetworkInfoBuilder queryLedgerTip query ledger tip 1`] = `
-Object {
-  "block_no": 3556390,
-  "hash": "332340bfcf47951b4bc8eca51c4e9190d29e2fd6dae30be231ebcdadb2d8c399",
-  "slot_no": "58336266",
 }
 `;
 

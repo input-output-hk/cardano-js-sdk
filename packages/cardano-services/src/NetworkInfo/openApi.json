@@ -120,7 +120,7 @@
         }
       }
     },
-    "/network-info/current-wallet-protocol-parameters": {
+    "/network-info/protocol-parameters": {
       "post": {
         "summary": "fetch current wallet protocol params",
         "description": "Fetch current Wallet Protocol Params",
@@ -136,7 +136,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CurrentWalletProtocolParametersResponse"
+                  "$ref": "#/components/schemas/ProtocolParametersResponse"
                 }
               }
             }
@@ -308,7 +308,7 @@
           }
         }
       },
-      "CurrentWalletProtocolParametersResponse": {
+      "ProtocolParametersResponse": {
         "type": "object",
         "required": [
           "minFeeCoefficient",

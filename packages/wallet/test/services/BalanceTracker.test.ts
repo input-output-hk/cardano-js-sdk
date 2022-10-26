@@ -3,7 +3,7 @@
 /* eslint-disable no-multi-spaces */
 /* eslint-disable space-in-parens */
 import { BehaviorObservable } from '@cardano-sdk/util-rxjs';
-import { Cardano, ProtocolParametersRequiredByWallet, coalesceValueQuantities } from '@cardano-sdk/core';
+import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
 import { DelegationTracker, RewardAccount, StakeKeyStatus, createBalanceTracker } from '../../src/services';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 import { utxo, utxo2 } from '../mocks';
@@ -11,7 +11,7 @@ import { utxo, utxo2 } from '../mocks';
 describe('createBalanceTracker', () => {
   it('combines data from rewardsTracker & utxoTracker', () => {
     createTestScheduler().run(({ hot, expectObservable }) => {
-      const protocolParameters$ = hot( 'a------', { a: { stakeKeyDeposit: 2 } as ProtocolParametersRequiredByWallet });
+      const protocolParameters$ = hot( 'a------', { a: { stakeKeyDeposit: 2 } as Cardano.ProtocolParameters });
       const utxoAvailable = hot(       '--a-b--', { a: utxo, b: utxo.slice(1) }) as unknown as BehaviorObservable<Cardano.Utxo[]>;
       const utxoTotal = hot(           '-a-----', { a: utxo }) as unknown as BehaviorObservable<Cardano.Utxo[]>;
       const utxoUnspendable = hot(     '-a-----', { a: utxo2 }) as unknown as BehaviorObservable<Cardano.Utxo[]>;

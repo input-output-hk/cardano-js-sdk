@@ -54,12 +54,12 @@ describe('NetworkInfoHttpService', () => {
         healthCheckResponseMock({ blockNo: lastBlockNoInDb })
       ) as unknown as OgmiosCardanoNode;
       networkInfoProvider = {
-        currentWalletProtocolParameters: jest.fn(),
         eraSummaries: jest.fn(),
         genesisParameters: jest.fn(),
         healthCheck: jest.fn(() => Promise.resolve({ ok: false })),
         ledgerTip: jest.fn(),
         lovelaceSupply: jest.fn(),
+        protocolParameters: jest.fn(),
         stake: jest.fn()
       } as unknown as DbSyncNetworkInfoProvider;
     });
@@ -327,20 +327,16 @@ describe('NetworkInfoHttpService', () => {
       });
     });
 
-    describe('/current-wallet-protocol-parameters', () => {
+    describe('/protocol-parameters', () => {
       describe('with Http Server', () => {
         it('returns a 200 coded response with a well formed HTTP request', async () => {
-          expect((await axios.post(`${baseUrl}/current-wallet-protocol-parameters`, {})).status).toEqual(200);
+          expect((await axios.post(`${baseUrl}/protocol-parameters`, {})).status).toEqual(200);
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
           expect.assertions(2);
           try {
-            await axios.post(
-              `${baseUrl}/current-wallet-protocol-parameters`,
-              {},
-              { headers: { 'Content-Type': APPLICATION_CBOR } }
-            );
+            await axios.post(`${baseUrl}/protocol-parameters`, {}, { headers: { 'Content-Type': APPLICATION_CBOR } });
           } catch (error: any) {
             expect(error.response.status).toBe(415);
             expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
@@ -349,7 +345,7 @@ describe('NetworkInfoHttpService', () => {
       });
 
       it('successful request', async () => {
-        const response = await provider.currentWalletProtocolParameters();
+        const response = await provider.protocolParameters();
         expect(response.maxTxSize).toBeDefined();
       });
     });

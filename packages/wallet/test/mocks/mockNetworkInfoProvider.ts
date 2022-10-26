@@ -21,12 +21,12 @@ export const networkInfo = {
  * Provider stub for testing
  */
 export const mockNetworkInfoProvider = () => ({
-  currentWalletProtocolParameters: jest.fn().mockResolvedValue(protocolParameters),
   eraSummaries: jest.fn().mockResolvedValue(networkInfo.network.eraSummaries),
   genesisParameters: jest.fn().mockResolvedValue(genesisParameters),
   healthCheck: jest.fn().mockResolvedValue({ ok: true }),
   ledgerTip: jest.fn().mockResolvedValue(ledgerTip),
   lovelaceSupply: jest.fn().mockResolvedValue(networkInfo.lovelaceSupply),
+  protocolParameters: jest.fn().mockResolvedValue(protocolParameters),
   stake: jest.fn().mockResolvedValue(networkInfo.stake)
 });
 
