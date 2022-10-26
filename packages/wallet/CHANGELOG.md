@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.18](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.6.0-nightly.17...@cardano-sdk/wallet@0.6.0-nightly.18) (2022-10-26)
+
+
+### Features
+
+* **wallet:** export default polling interval ([b33c3de](https://github.com/input-output-hk/cardano-js-sdk/commit/b33c3dec145cc9c68aa0b62cabae3b77778b97f7))
+
+
+### Bug Fixes
+
+* **wallet:** re-submit 'Unknown' tx submission errors ([0d1447f](https://github.com/input-output-hk/cardano-js-sdk/commit/0d1447f5838368f7da223cfb532f2b040bb162f1))
+
+
+
 ## [0.6.0-nightly.17](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.6.0-nightly.16...@cardano-sdk/wallet@0.6.0-nightly.17) (2022-10-24)
 
 **Note:** Version bump only for package @cardano-sdk/wallet

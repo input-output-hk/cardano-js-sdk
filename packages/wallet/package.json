@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/wallet",
-  "version": "0.6.0-nightly.17",
+  "version": "0.6.0-nightly.18",
   "description": "Wallet modules",
   "engines": {
     "node": "^14"
@@ -75,7 +75,7 @@
     "@cardano-sdk/core": "^0.6.0-nightly.15",
     "@cardano-sdk/dapp-connector": "^0.6.0-nightly.5",
     "@cardano-sdk/input-selection": "^0.6.0-nightly.7",
-    "@cardano-sdk/key-management": "^0.2.0-nightly.12",
+    "@cardano-sdk/key-management": "^0.2.0-nightly.13",
     "@cardano-sdk/util": "^0.6.0-nightly.4",
     "@cardano-sdk/util-rxjs": "^0.4.2-nightly.18",
     "backoff-rxjs": "^7.0.0",

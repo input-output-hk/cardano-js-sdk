@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.0-nightly.22](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.5.0-nightly.21...@cardano-sdk/e2e@0.5.0-nightly.22) (2022-10-26)
+
+
+### Bug Fixes
+
+* **e2e:** patch wallet to respect epoch boundary ([6fe2bfe](https://github.com/input-output-hk/cardano-js-sdk/commit/6fe2bfe59fdbbd29671e9bc55e43405844a10fd6))
+
+
+
 ## [0.5.0-nightly.21](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.5.0-nightly.20...@cardano-sdk/e2e@0.5.0-nightly.21) (2022-10-25)
 
 

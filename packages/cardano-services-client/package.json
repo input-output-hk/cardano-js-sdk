@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/cardano-services-client",
-  "version": "0.6.0-nightly.15",
+  "version": "0.6.0-nightly.16",
   "description": "Cardano Services Client",
   "engines": {
     "node": "^14"
