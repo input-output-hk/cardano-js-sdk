@@ -126,24 +126,22 @@ export const castHexBlob = <T>(target: HexBlob, expectedLength?: number) => {
 /**
  * 32 byte hash as hex string
  */
-export type Hash32ByteBase16<T extends string = 'Hash32ByteBase16'> = OpaqueString<T>;
+export type Hash32ByteBase16 = OpaqueString<'Hash32ByteBase16'>;
 
 /**
  * @param {string} value 32 byte hash as hex string
  * @throws InvalidStringError
  */
-export const Hash32ByteBase16 = <T extends string = 'Hash32ByteBase16'>(value: string): Hash32ByteBase16<T> =>
-  typedHex<Hash32ByteBase16<T>>(value, 64);
+export const Hash32ByteBase16 = (value: string): Hash32ByteBase16 => typedHex<Hash32ByteBase16>(value, 64);
 Hash32ByteBase16.fromHexBlob = <T>(value: HexBlob) => castHexBlob<T>(value, 64);
 
 /**
  * 28 byte hash as hex string
  */
-export type Hash28ByteBase16<T extends string = 'Hash28ByteBase16'> = OpaqueString<T>;
+export type Hash28ByteBase16 = OpaqueString<'Hash28ByteBase16'>;
 
 /**
  * @param {string} value 28 byte hash as hex string
  * @throws InvalidStringError
  */
-export const Hash28ByteBase16 = <T extends string = 'Hash28ByteBase16'>(value: string): Hash28ByteBase16<T> =>
-  typedHex<Hash32ByteBase16<T>>(value, 56);
+export const Hash28ByteBase16 = (value: string): Hash28ByteBase16 => typedHex<Hash28ByteBase16>(value, 56);

@@ -24,13 +24,13 @@ PoolId.fromKeyHash = (value: Ed25519KeyHash): PoolId =>
 /**
  * pool operator verification key hash as hex string
  */
-export type PoolIdHex = Hash28ByteBase16<'PoolIdHex'>;
+export type PoolIdHex = OpaqueString<'PoolIdHex'>;
 
 /**
  * @param {string} value operator verification key hash as hex string
  * @throws InvalidStringError
  */
-export const PoolIdHex = (value: string): PoolIdHex => Hash28ByteBase16(value);
+export const PoolIdHex = (value: string): PoolIdHex => Hash28ByteBase16(value) as unknown as PoolIdHex;
 
 /**
  * 32 byte VRF verification key as hex string

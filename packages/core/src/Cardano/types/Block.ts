@@ -28,7 +28,7 @@ export type Slot = number;
 /**
  * block hash as hex string
  */
-export type BlockId = Hash32ByteBase16<'BlockId'>;
+export type BlockId = OpaqueString<'BlockId'>;
 
 export interface PartialBlockHeader {
   blockNo: BlockNo;
@@ -43,7 +43,7 @@ export type Tip = PartialBlockHeader;
  * @param {string} value block hash as hex string
  * @throws InvalidStringError
  */
-export const BlockId = (value: string): BlockId => Hash32ByteBase16<'BlockId'>(value);
+export const BlockId = (value: string): BlockId => Hash32ByteBase16(value) as unknown as BlockId;
 
 /**
  * 32 byte ed25519 verification key as bech32 string.
@@ -61,7 +61,7 @@ export const GenesisDelegate = (value: string): GenesisDelegate => {
   if (/ShelleyGenesis-[\da-f]{16}/.test(value)) {
     return value as unknown as GenesisDelegate;
   }
-  return Hash28ByteBase16(value);
+  return Hash28ByteBase16(value) as unknown as GenesisDelegate;
 };
 
 export type SlotLeader = PoolId | GenesisDelegate;
