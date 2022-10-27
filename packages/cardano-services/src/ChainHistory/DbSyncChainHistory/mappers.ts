@@ -204,7 +204,11 @@ export const mapTxAlonzo = (
   }
 });
 
-export const mapBlock = (blockModel: BlockModel, blockOutputModel: BlockOutputModel, tip: TipModel): Cardano.Block => ({
+export const mapBlock = (
+  blockModel: BlockModel,
+  blockOutputModel: BlockOutputModel,
+  tip: TipModel
+): Cardano.ExtendedBlockInfo => ({
   confirmations: tip.block_no - blockModel.block_no,
   date: new Date(blockModel.time),
   epoch: blockModel.epoch_no,

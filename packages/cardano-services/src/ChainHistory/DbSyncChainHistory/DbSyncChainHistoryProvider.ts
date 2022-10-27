@@ -148,7 +148,7 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
     });
   }
 
-  public async blocksByHashes({ ids }: BlocksByIdsArgs): Promise<Cardano.Block[]> {
+  public async blocksByHashes({ ids }: BlocksByIdsArgs): Promise<Cardano.ExtendedBlockInfo[]> {
     if (ids.length > this.#paginationPageSizeLimit) {
       throw new ProviderError(
         ProviderFailure.BadRequest,

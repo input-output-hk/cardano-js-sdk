@@ -1,39 +1,18 @@
 import { BigIntMath } from '@cardano-sdk/util';
-import { Schema, isByronStandardBlock } from '@cardano-ogmios/client';
+import {
+  Schema,
+  isAllegraBlock,
+  isAlonzoBlock,
+  isBabbageBlock,
+  isByronBlock,
+  isByronStandardBlock,
+  isMaryBlock,
+  isShelleyBlock
+} from '@cardano-ogmios/client';
 
-import { Cardano, Ogmios } from '../..';
-
-type KeysOfUnion<T> = T extends T ? keyof T : never;
-/**
- * Ogmios has actual block under a property named like the era (e.g. `block.alonzo`).
- * This type creates a union with all the properties. It is later used in
- * [exhaustive switches](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#exhaustiveness-checking)
- * to make sure all block types are handled and future blocks types will generate compile time errors.
- */
-type BlockKind = KeysOfUnion<Schema.Block>;
-type OgmiosBlockType =
-  | Schema.BlockAllegra
-  | Schema.BlockAlonzo
-  | Schema.BlockBabbage
-  | Schema.StandardBlock
-  | Schema.BlockMary
-  | Schema.BlockShelley;
-
-type CommonBlock = Exclude<OgmiosBlockType, Schema.StandardBlock>;
-
-interface Block<B extends OgmiosBlockType, T extends BlockKind> {
-  block: B;
-  kind: T;
-}
-
-type BlockAndKind =
-  | Block<Schema.BlockAllegra, 'allegra'>
-  | Block<Schema.BlockAlonzo, 'alonzo'>
-  | Block<Schema.BlockBabbage, 'babbage'>
-  | Block<Schema.StandardBlock, 'byron'>
-  | Block<Schema.BlockMary, 'mary'>
-  | Block<Schema.BlockShelley, 'shelley'>;
-
+import { BlockAndKind, BlockKind, CommonBlock, OgmiosBlockType } from './types';
+import { Cardano } from '@cardano-sdk/core';
+import { mapByronBlockBody, mapCommonBlockBody } from './tx';
 /**
  * @returns
  *   - {BlockAndKind} that unlocks type narrowing in switch statements based on `kind`.
@@ -44,12 +23,12 @@ type BlockAndKind =
 // eslint-disable-next-line complexity
 const getBlockAndKind = (block: Schema.Block): BlockAndKind | null => {
   let propName: BlockKind = 'alonzo';
-  if (Ogmios.isAllegraBlock(block)) propName = 'allegra';
-  if (Ogmios.isAlonzoBlock(block)) propName = 'alonzo';
-  if (Ogmios.isBabbageBlock(block)) propName = 'babbage';
-  if (Ogmios.isByronBlock(block)) propName = 'byron';
-  if (Ogmios.isMaryBlock(block)) propName = 'mary';
-  if (Ogmios.isShelleyBlock(block)) propName = 'shelley';
+  if (isAllegraBlock(block)) propName = 'allegra';
+  if (isAlonzoBlock(block)) propName = 'alonzo';
+  if (isBabbageBlock(block)) propName = 'babbage';
+  if (isByronBlock(block)) propName = 'byron';
+  if (isMaryBlock(block)) propName = 'mary';
+  if (isShelleyBlock(block)) propName = 'shelley';
 
   // If it complains because a branch is not handled, please add logic for the new block type.
   switch (propName) {
@@ -105,8 +84,11 @@ const mapCommonVrf = (block: CommonBlock): Cardano.VrfVkBech32 => Cardano.VrfVkB
 const mapCommonSlotLeader = (block: CommonBlock): Cardano.Ed25519PublicKey =>
   Cardano.Ed25519PublicKey(block.header.issuerVk);
 
-export const mapByronBlock = (block: Schema.StandardBlock): Cardano.BlockMinimal => ({
-  fees: undefined, // TODO: figure out how to calculate fees
+const mapByronBlock = (block: Schema.StandardBlock): Cardano.Block => ({
+  body: mapByronBlockBody(block),
+  fees: undefined,
+
+  // TODO: figure out how to calculate fees
   header: {
     blockNo: mapBlockHeight(block),
     hash: mapByronHash(block),
@@ -114,6 +96,7 @@ export const mapByronBlock = (block: Schema.StandardBlock): Cardano.BlockMinimal
   },
   // TODO: use the genesisKey to provide a value here, but it needs more work. Leaving as undefined for now
   issuerVk: undefined,
+
   previousBlock: mapPreviousBlock(block),
   // TODO: calculate byron blocksize by transforming into CSL Block object
   size: undefined,
@@ -122,7 +105,8 @@ export const mapByronBlock = (block: Schema.StandardBlock): Cardano.BlockMinimal
   vrf: undefined // no vrf key for byron. DbSync doesn't have one either
 });
 
-export const mapCommonBlock = (block: CommonBlock): Cardano.BlockMinimal => ({
+const mapCommonBlock = (block: CommonBlock): Cardano.Block => ({
+  body: mapCommonBlockBody(block),
   fees: mapCommonFees(block),
   header: {
     blockNo: mapBlockHeight(block),
@@ -145,7 +129,7 @@ export const mapCommonBlock = (block: CommonBlock): Cardano.BlockMinimal => ({
  *   - {Cardano.BlockMinimal} a minimal block type encompassing information extracted from Ogmios block type.
  *   - `null` if `block` is the ByronEpochBoundaryBlock. This block can be skipped.
  */
-export const getBlock = (ogmiosBlock: Schema.Block): Cardano.BlockMinimal | null => {
+export const block = (ogmiosBlock: Schema.Block): Cardano.Block | null => {
   const b = getBlockAndKind(ogmiosBlock);
   if (!b) return null;
 

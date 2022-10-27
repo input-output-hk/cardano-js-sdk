@@ -154,7 +154,7 @@ export const createCertificate = (cmlCertificate: CML.Certificate): Certificate 
       case CML.CertificateKind.PoolRetirement:
         return poolRetirement(scope.manage(cmlCertificate.as_pool_retirement()!));
       case CML.CertificateKind.GenesisKeyDelegation:
-        return genesisKeyDelegaation(scope.manage(cmlCertificate.as_genesis_key_delegation()!));
+        return genesisKeyDelegation(scope.manage(cmlCertificate.as_genesis_key_delegation()!));
       case CML.CertificateKind.MoveInstantaneousRewardsCert:
         throw new NotImplementedError('MIR certificate conversion'); // TODO: support this certificate type
       default:

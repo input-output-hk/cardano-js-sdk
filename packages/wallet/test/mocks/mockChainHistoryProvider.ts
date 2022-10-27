@@ -156,7 +156,7 @@ export const queryTransactionsResult2: Paginated<Cardano.TxAlonzo> = {
 
 const queryTransactions = () => jest.fn().mockResolvedValueOnce(queryTransactionsResult);
 
-export const blocksByHashes = [{ epoch: currentEpoch.number - 3 } as Cardano.Block];
+export const blocksByHashes = [{ epoch: currentEpoch.number - 3 } as Cardano.ExtendedBlockInfo];
 
 /**
  * Provider stub for testing

@@ -1,9 +1,10 @@
 import { CML } from '../..';
-import { Ed25519PublicKey } from '.';
+import { Ed25519PublicKey } from './Key';
 import { Hash28ByteBase16, Hash32ByteBase16, OpaqueString, typedBech32 } from '../util/primitives';
 import { InvalidStringError } from '../../errors';
 import { Lovelace } from './Value';
 import { PoolId } from './StakePool/primitives';
+import { TxAlonzo } from './Transaction';
 
 /**
  * The block size in bytes
@@ -89,7 +90,7 @@ export const VrfVkBech32FromBase64 = (value: string) =>
 /** Minimal Block type meant as a base for the more complete version `Block`  */
 // TODO: optionals (except previousBlock) are there because they are not calculated for Byron yet.
 // Remove them once calculation is done and remove the Required<BlockMinimal> from interface Block
-export interface BlockMinimal {
+export interface BlockInfo {
   header: PartialBlockHeader;
   /** Byron blocks fee not calculated yet */
   fees?: Lovelace;
@@ -106,14 +107,18 @@ export interface BlockMinimal {
   issuerVk?: Ed25519PublicKey;
 }
 
-export interface Block
-  extends Required<Omit<BlockMinimal, 'issuerVk' | 'previousBlock'>>,
-    Pick<BlockMinimal, 'previousBlock'> {
+export interface Block extends BlockInfo {
+  body: TxAlonzo[];
+}
+
+export interface ExtendedBlockInfo
+  extends Required<Omit<BlockInfo, 'issuerVk' | 'previousBlock'>>,
+    Pick<BlockInfo, 'previousBlock'> {
   /**
    * In case of blocks produced by BFT nodes, the SlotLeader the issuerVk hash
    * For blocks produced by stake pools, it is the Bech32 encoded value of issuerVk hash
    */
-  slotLeader: SlotLeader;
+  slotLeader: SlotLeader; // TODO: move to CompactBlockInfo and make nullable
   date: Date;
   epoch: EpochNo;
   epochSlot: number;

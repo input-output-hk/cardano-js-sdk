@@ -79,7 +79,30 @@ export const mockAlonzoBlock: Ogmios.Schema.Alonzo = {
     body: [
       {
         body: {
-          certificates: [],
+          certificates: [
+            {
+              stakeDelegation: {
+                delegatee: 'pool15erywju02scjv9gxkmp885c8catf5n4ke9459h2299fq57u9c3e',
+                delegator: 'f2f6381fa7a3dcc144939b47dffb7dad677856dfbbee4c4b7e426049'
+              }
+            },
+            {
+              stakeKeyDeregistration: 'f2f6381fa7a3dcc144939b47dffb7dad677856dfbbee4c4b7e426049'
+            },
+            {
+              poolRetirement: {
+                poolId: 'pool15erywju02scjv9gxkmp885c8catf5n4ke9459h2299fq57u9c3e',
+                retirementEpoch: 123
+              }
+            },
+            {
+              genesisDelegation: {
+                delegateKeyHash: 'e0a714319812c3f773ba04ec5d6b3ffcd5aad85006805b047b082541',
+                verificationKeyHash: 'b16b56f5ec064be6ac3cab6035efae86b366cc3dc4a0d571603d70e5',
+                vrfVerificationKeyHash: '95c3003a78585e0db8c9496f6deef4de0ff000994b8534cd66d4fe96bb21ddd3'
+              }
+            }
+          ],
           collaterals: [],
           fee: 202_549n,
           inputs: [
@@ -545,7 +568,10 @@ export const mockBabbageBlock: Ogmios.Schema.Babbage = {
                 cost: 290n,
                 id: 'pool1kkhxvw4w4rjsq9tmma964lt0twsvu46e7lx5zq0uzvh4ge9n0hc',
                 margin: '1/2',
-                metadata: { hash: '62797465737472696e67', url: 'text' },
+                metadata: {
+                  hash: '2738e2233800ab7f82bd2212a9a55f52d4851f9147f161684c63e6655bedb562',
+                  url: 'https://public.bladepool.com/metadata.json'
+                },
                 owners: [],
                 pledge: 229n,
                 relays: [
