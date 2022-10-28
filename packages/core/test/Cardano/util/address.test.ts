@@ -1,6 +1,5 @@
 import * as parseCmlAddress from '../../../src/CML/parseCmlAddress';
 import { Cardano } from '../../../src';
-import { CML as SerializationLib } from '../../../src/CML';
 
 describe('Cardano.util.address', () => {
   const parseCmlAddressSpy = jest.spyOn(parseCmlAddress, 'parseCmlAddress');
@@ -18,13 +17,28 @@ describe('Cardano.util.address', () => {
     ];
 
     describe('isAddress', () => {
-      it('returns false if parseCmlAddress returns null', () => {
+      it('returns false if the address is invalid', () => {
         parseCmlAddressSpy.mockReturnValueOnce(null);
         expect(Cardano.util.isAddress('invalid')).toBe(false);
       });
-      it('returns true if parseCmlAddress returns an Address', () => {
-        parseCmlAddressSpy.mockReturnValueOnce(new SerializationLib.Address());
-        expect(Cardano.util.isAddress('valid')).toBe(true);
+      it('returns true if the address is a valid shelley address', () => {
+        expect(
+          Cardano.util.isAddress(
+            // eslint-disable-next-line max-len
+            'addr_test1qpfhhfy2qgls50r9u4yh0l7z67xpg0a5rrhkmvzcuqrd0znuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q9gw0lz'
+          )
+        ).toBe(true);
+      });
+      it('returns true if the address is a valid stake address', () => {
+        expect(Cardano.util.isAddress('stake1vpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5egfu2p0u')).toBe(true);
+      });
+      it('returns true if the address is a valid byron address', () => {
+        expect(
+          Cardano.util.isAddress(
+            // eslint-disable-next-line max-len
+            '37btjrVyb4KDXBNC4haBVPCrro8AQPHwvCMp3RFhhSVWwfFmZ6wwzSK6JK1hY6wHNmtrpTf1kdbva8TCneM2YsiXT7mrzT21EacHnPpz5YyUdj64na'
+          )
+        ).toBe(true);
       });
     });
 
