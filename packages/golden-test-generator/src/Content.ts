@@ -15,7 +15,7 @@ export type Metadata = {
   };
 };
 
-export type GeneratorMetadata = { metadata: { cardano: Metadata['cardano'] } };
+export type GeneratorMetadata = { metadata: { cardano: Metadata['cardano']; options?: { blockHeights: string } } };
 
 export const prepareContent = async <Body>(
   metadata: Omit<Metadata, 'software'>,

@@ -6,13 +6,16 @@ export type RollForward = { type: 'rollForward'; block: Ogmios.Schema.Block };
 export type RollBackward = { type: 'rollBackward'; rollback: Ogmios.Schema.TipOrOrigin };
 export type ChainSyncEvent = RollForward | RollBackward;
 
-export type GetBlocksResponse = GeneratorMetadata & {
+type CardanoMetadata = Pick<GeneratorMetadata['metadata'], 'cardano'>;
+
+export type GetBlocksResponse = {
   events: ChainSyncEvent[];
+  metadata: CardanoMetadata
 };
 
 type RequestedBlocks = { [blockHeight: number]: Ogmios.Schema.Block };
 
-const getBlockHeaderAndHash = (block: Ogmios.Schema.Block) => {
+export const getBlockHeaderAndHash = (block: Ogmios.Schema.Block) => {
   let header:
     | (Ogmios.Schema.StandardBlock
     | Ogmios.Schema.BlockShelley
@@ -78,14 +81,15 @@ export const getBlocks = async (
     let currentBlock: number;
     // Required to ensure existing messages in the pipe are not processed after the completion condition is met
     let draining = false;
-    const metadata: GeneratorMetadata['metadata'] = {
+    const metadata: CardanoMetadata = {
       cardano: {
         compactGenesis: await Ogmios.StateQuery.genesisConfig(
           await Ogmios.createInteractionContext(reject, logger.info, { connection: options.ogmiosConnectionConfig })
         ),
         intersection: undefined as unknown as Ogmios.ChainSync.Intersection
-      }
+      },
     };
+    const maxHeight = Math.max(...blockHeights);
     try {
       const syncClient = await Ogmios.createChainSyncClient(
         await Ogmios.createInteractionContext(reject, logger.info, { connection: options.ogmiosConnectionConfig }),
@@ -103,7 +107,7 @@ export const getBlocks = async (
             }
             if (blockHeights.includes(currentBlock)) {
               requestedBlocks[currentBlock] = block;
-              if (blockHeights[blockHeights.length - 1] === currentBlock) {
+              if (maxHeight === currentBlock) {
                 draining = true;
                 await syncClient.shutdown();
                 return resolve({
