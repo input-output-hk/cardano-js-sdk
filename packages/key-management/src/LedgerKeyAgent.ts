@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AuthenticationError, TransportError } from './errors';
-import { Cardano, NotImplementedError, coreToCsl } from '@cardano-sdk/core';
+import { Cardano, NotImplementedError, coreToCml } from '@cardano-sdk/core';
 import {
   CardanoKeyConst,
   Cip1852PathLevelIndexes,
@@ -230,7 +230,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
   async signTransaction({ body }: Cardano.TxBodyWithHash): Promise<Cardano.Signatures> {
     const scope = new ManagedFreeableScope();
     try {
-      const cslTxBody = coreToCsl.txBody(scope, body);
+      const cslTxBody = coreToCml.txBody(scope, body);
       const ledgerTxData = await txToLedger({
         cslTxBody,
         inputResolver: this.inputResolver,

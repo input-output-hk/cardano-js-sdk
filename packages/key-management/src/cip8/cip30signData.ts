@@ -13,7 +13,7 @@ import {
   SigStructure
 } from '@emurgo/cardano-message-signing-nodejs';
 import { AsyncKeyAgent, KeyRole } from '../types';
-import { Cardano, ComposableError, parseCslAddress, util } from '@cardano-sdk/core';
+import { Cardano, ComposableError, parseCmlAddress, util } from '@cardano-sdk/core';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { CoseLabel } from './util';
 import { STAKE_KEY_DERIVATION_PATH } from '../util';
@@ -40,7 +40,7 @@ export class Cip30DataSignError<InnerError = unknown> extends ComposableError<In
 
 const getAddressBytes = (signWith: Cardano.Address | Cardano.RewardAccount) =>
   usingAutoFree((scope) => {
-    const cslAddress = parseCslAddress(scope, signWith.toString());
+    const cslAddress = parseCmlAddress(scope, signWith.toString());
     if (!cslAddress) {
       throw new Cip30DataSignError(Cip30DataSignErrorCode.AddressNotPK, 'Invalid address');
     }

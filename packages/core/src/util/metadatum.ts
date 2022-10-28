@@ -1,7 +1,7 @@
-import { CSL } from '../CSL/CSL';
+import { CML } from '../CML/CML';
 import { Metadatum, MetadatumMap } from '../Cardano/types/AuxiliaryData';
-import { txMetadatum as txMetadatumToCSL } from '../CSL/coreToCsl';
-import { txMetadatum as txMetadatumToCore } from '../CSL/cslToCore';
+import { txMetadatum as txMetadatumToCML } from '../CML/coreToCml';
+import { txMetadatum as txMetadatumToCore } from '../CML/cmlToCore';
 import { usingAutoFree } from '@cardano-sdk/util';
 
 /**
@@ -32,7 +32,7 @@ export const asMetadatumArray = (metadatum: Metadatum | undefined): Metadatum[] 
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const jsonToMetadatum = (json: any): Metadatum =>
-  txMetadatumToCore(CSL.encode_json_str_to_metadatum(JSON.stringify(json), CSL.MetadataJsonSchema.NoConversions));
+  txMetadatumToCore(CML.encode_json_str_to_metadatum(JSON.stringify(json), CML.MetadataJsonSchema.NoConversions));
 
 /**
  * Converts any Metadatum object to json.
@@ -44,6 +44,6 @@ export const jsonToMetadatum = (json: any): Metadatum =>
 export const metadatumToJson = (metadatum: Metadatum): any =>
   usingAutoFree((scope) =>
     JSON.parse(
-      CSL.decode_metadatum_to_json_str(txMetadatumToCSL(scope, metadatum), CSL.MetadataJsonSchema.NoConversions)
+      CML.decode_metadatum_to_json_str(txMetadatumToCML(scope, metadatum), CML.MetadataJsonSchema.NoConversions)
     )
   );

@@ -26,7 +26,7 @@ import {
   URL,
   UnitInterval,
   VRFKeyHash
-} from '@emurgo/cardano-serialization-lib-nodejs';
+} from '@dcspark/cardano-multiplatform-lib-nodejs';
 import { ManagedFreeableScope } from '@cardano-sdk/util';
 import { NotImplementedError } from '../../errors';
 

@@ -1,4 +1,4 @@
-import { CSL } from '../CSL';
+import { CML } from '../CML';
 import {
   Certificate,
   CertificateType,
@@ -19,7 +19,7 @@ import { NetworkId } from '../../Cardano/NetworkId';
 import { NotImplementedError, SerializationError, SerializationFailure } from '../../errors';
 import { usingAutoFree } from '@cardano-sdk/util';
 
-const stakeRegistration = (certificate: CSL.StakeRegistration): StakeAddressCertificate =>
+const stakeRegistration = (certificate: CML.StakeRegistration): StakeAddressCertificate =>
   usingAutoFree((scope) => ({
     __typename: CertificateType.StakeKeyRegistration,
     stakeKeyHash: Ed25519KeyHash(
@@ -27,7 +27,7 @@ const stakeRegistration = (certificate: CSL.StakeRegistration): StakeAddressCert
     )
   }));
 
-const stakeDeregistration = (certificate: CSL.StakeDeregistration): StakeAddressCertificate =>
+const stakeDeregistration = (certificate: CML.StakeDeregistration): StakeAddressCertificate =>
   usingAutoFree((scope) => ({
     __typename: CertificateType.StakeKeyDeregistration,
     stakeKeyHash: Ed25519KeyHash(
@@ -35,7 +35,7 @@ const stakeDeregistration = (certificate: CSL.StakeDeregistration): StakeAddress
     )
   }));
 
-const stakeDelegation = (certificate: CSL.StakeDelegation): StakeDelegationCertificate =>
+const stakeDelegation = (certificate: CML.StakeDelegation): StakeDelegationCertificate =>
   usingAutoFree((scope) => ({
     __typename: CertificateType.StakeDelegation,
     poolId: PoolId(scope.manage(certificate.pool_keyhash()).to_bech32('pool')),
@@ -44,7 +44,7 @@ const stakeDelegation = (certificate: CSL.StakeDelegation): StakeDelegationCerti
     )
   }));
 
-const createCardanoRelays = (relays: CSL.Relays): Relay[] =>
+const createCardanoRelays = (relays: CML.Relays): Relay[] =>
   usingAutoFree((scope) => {
     const result: Relay[] = [];
     for (let i = 0; i < relays.len(); i++) {
@@ -81,19 +81,19 @@ const createCardanoRelays = (relays: CSL.Relays): Relay[] =>
     return result;
   });
 
-const createCardanoOwners = (owners: CSL.Ed25519KeyHashes, networkId: NetworkId): RewardAccount[] =>
+const createCardanoOwners = (owners: CML.Ed25519KeyHashes, networkId: NetworkId): RewardAccount[] =>
   usingAutoFree((scope) => {
     const result: RewardAccount[] = [];
     for (let i = 0; i < owners.len(); i++) {
       const keyHash = scope.manage(owners.get(i));
-      const stakeCredential = scope.manage(CSL.StakeCredential.from_keyhash(keyHash));
-      const rewardAccount = scope.manage(CSL.RewardAddress.new(networkId, stakeCredential));
+      const stakeCredential = scope.manage(CML.StakeCredential.from_keyhash(keyHash));
+      const rewardAccount = scope.manage(CML.RewardAddress.new(networkId, stakeCredential));
       result.push(RewardAccount(scope.manage(rewardAccount.to_address()).to_bech32()));
     }
     return result;
   });
 
-const jsonMetadata = (poolMetadata?: CSL.PoolMetadata): PoolMetadataJson | undefined =>
+const jsonMetadata = (poolMetadata?: CML.PoolMetadata): PoolMetadataJson | undefined =>
   usingAutoFree((scope) => {
     if (!poolMetadata) return;
     return {
@@ -102,7 +102,7 @@ const jsonMetadata = (poolMetadata?: CSL.PoolMetadata): PoolMetadataJson | undef
     };
   });
 
-export const poolRegistration = (certificate: CSL.PoolRegistration): PoolRegistrationCertificate =>
+export const poolRegistration = (certificate: CML.PoolRegistration): PoolRegistrationCertificate =>
   usingAutoFree((scope) => {
     const poolParams = scope.manage(certificate.pool_params());
     const rewardAccountAddress = scope.manage(scope.manage(poolParams.reward_account()).to_address());
@@ -125,14 +125,14 @@ export const poolRegistration = (certificate: CSL.PoolRegistration): PoolRegistr
     } as PoolRegistrationCertificate;
   });
 
-const poolRetirement = (certificate: CSL.PoolRetirement): PoolRetirementCertificate =>
+const poolRetirement = (certificate: CML.PoolRetirement): PoolRetirementCertificate =>
   usingAutoFree((scope) => ({
     __typename: CertificateType.PoolRetirement,
     epoch: certificate.epoch(),
     poolId: PoolId(scope.manage(certificate.pool_keyhash()).to_bech32('pool'))
   }));
 
-const genesisKeyDelegaation = (certificate: CSL.GenesisKeyDelegation): GenesisKeyDelegationCertificate =>
+const genesisKeyDelegaation = (certificate: CML.GenesisKeyDelegation): GenesisKeyDelegationCertificate =>
   usingAutoFree((scope) => ({
     __typename: CertificateType.GenesisKeyDelegation,
     genesisDelegateHash: Hash32ByteBase16(
@@ -142,22 +142,22 @@ const genesisKeyDelegaation = (certificate: CSL.GenesisKeyDelegation): GenesisKe
     vrfKeyHash: Hash32ByteBase16(Buffer.from(scope.manage(certificate.vrf_keyhash()).to_bytes()).toString())
   }));
 
-export const createCertificate = (cslCertificate: CSL.Certificate): Certificate =>
+export const createCertificate = (cmlCertificate: CML.Certificate): Certificate =>
   usingAutoFree((scope) => {
-    switch (cslCertificate.kind()) {
-      case CSL.CertificateKind.StakeRegistration:
-        return stakeRegistration(scope.manage(cslCertificate.as_stake_registration()!));
-      case CSL.CertificateKind.StakeDeregistration:
-        return stakeDeregistration(scope.manage(cslCertificate.as_stake_deregistration()!));
-      case CSL.CertificateKind.StakeDelegation:
-        return stakeDelegation(scope.manage(cslCertificate.as_stake_delegation()!));
-      case CSL.CertificateKind.PoolRegistration:
-        return poolRegistration(scope.manage(cslCertificate.as_pool_registration()!));
-      case CSL.CertificateKind.PoolRetirement:
-        return poolRetirement(scope.manage(cslCertificate.as_pool_retirement()!));
-      case CSL.CertificateKind.GenesisKeyDelegation:
-        return genesisKeyDelegaation(scope.manage(cslCertificate.as_genesis_key_delegation()!));
-      case CSL.CertificateKind.MoveInstantaneousRewardsCert:
+    switch (cmlCertificate.kind()) {
+      case CML.CertificateKind.StakeRegistration:
+        return stakeRegistration(scope.manage(cmlCertificate.as_stake_registration()!));
+      case CML.CertificateKind.StakeDeregistration:
+        return stakeDeregistration(scope.manage(cmlCertificate.as_stake_deregistration()!));
+      case CML.CertificateKind.StakeDelegation:
+        return stakeDelegation(scope.manage(cmlCertificate.as_stake_delegation()!));
+      case CML.CertificateKind.PoolRegistration:
+        return poolRegistration(scope.manage(cmlCertificate.as_pool_registration()!));
+      case CML.CertificateKind.PoolRetirement:
+        return poolRetirement(scope.manage(cmlCertificate.as_pool_retirement()!));
+      case CML.CertificateKind.GenesisKeyDelegation:
+        return genesisKeyDelegaation(scope.manage(cmlCertificate.as_genesis_key_delegation()!));
+      case CML.CertificateKind.MoveInstantaneousRewardsCert:
         throw new NotImplementedError('MIR certificate conversion'); // TODO: support this certificate type
       default:
         throw new SerializationError(SerializationFailure.InvalidType);

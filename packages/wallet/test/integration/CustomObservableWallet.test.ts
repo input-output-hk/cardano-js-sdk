@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-extra-arguments */
 /* eslint-disable unicorn/consistent-function-scoping */
 import * as mocks from '../mocks';
-import { Cardano, coreToCsl } from '@cardano-sdk/core';
+import { Cardano, coreToCml } from '@cardano-sdk/core';
 import { GroupedAddress } from '@cardano-sdk/key-management';
 import {
   ObservableWallet,
@@ -121,9 +121,9 @@ describe('CustomObservableWallet', () => {
           })
         },
         submitTx(tx: Cardano.NewTxAlonzo) {
-          // can use utils from SDK, in this case `coreToCsl.tx`
+          // can use utils from SDK, in this case `coreToCml.tx`
           // if you want to submit hex-encoded tx, there is also cslToCore.newTx for the reverse
-          const txBytes = Buffer.from(usingAutoFree((scope) => coreToCsl.tx(scope, tx).to_bytes())).toString('hex');
+          const txBytes = Buffer.from(usingAutoFree((scope) => coreToCml.tx(scope, tx).to_bytes())).toString('hex');
           return submitTxBytesHexString(txBytes);
         }
       };

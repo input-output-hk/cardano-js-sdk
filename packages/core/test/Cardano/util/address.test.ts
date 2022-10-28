@@ -1,11 +1,10 @@
-import * as parseCslAddress from '../../../src/CSL/parseCslAddress';
+import * as parseCmlAddress from '../../../src/CML/parseCmlAddress';
 import { Cardano } from '../../../src';
-import { CSL as SerializationLib } from '../../../src/CSL';
 
 describe('Cardano.util.address', () => {
-  const parseCslAddressSpy = jest.spyOn(parseCslAddress, 'parseCslAddress');
-  beforeEach(() => parseCslAddressSpy.mockReset());
-  afterAll(() => parseCslAddressSpy.mockRestore());
+  const parseCmlAddressSpy = jest.spyOn(parseCmlAddress, 'parseCmlAddress');
+  beforeEach(() => parseCmlAddressSpy.mockReset());
+  afterAll(() => parseCmlAddressSpy.mockRestore());
 
   describe('util', () => {
     const addresses = [
@@ -18,18 +17,33 @@ describe('Cardano.util.address', () => {
     ];
 
     describe('isAddress', () => {
-      it('returns false if parseCslAddress returns null', () => {
-        parseCslAddressSpy.mockReturnValueOnce(null);
+      it('returns false if the address is invalid', () => {
+        parseCmlAddressSpy.mockReturnValueOnce(null);
         expect(Cardano.util.isAddress('invalid')).toBe(false);
       });
-      it('returns true if parseCslAddress returns an Address', () => {
-        parseCslAddressSpy.mockReturnValueOnce(new SerializationLib.Address());
-        expect(Cardano.util.isAddress('valid')).toBe(true);
+      it('returns true if the address is a valid shelley address', () => {
+        expect(
+          Cardano.util.isAddress(
+            // eslint-disable-next-line max-len
+            'addr_test1qpfhhfy2qgls50r9u4yh0l7z67xpg0a5rrhkmvzcuqrd0znuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q9gw0lz'
+          )
+        ).toBe(true);
+      });
+      it('returns true if the address is a valid stake address', () => {
+        expect(Cardano.util.isAddress('stake1vpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5egfu2p0u')).toBe(true);
+      });
+      it('returns true if the address is a valid byron address', () => {
+        expect(
+          Cardano.util.isAddress(
+            // eslint-disable-next-line max-len
+            '37btjrVyb4KDXBNC4haBVPCrro8AQPHwvCMp3RFhhSVWwfFmZ6wwzSK6JK1hY6wHNmtrpTf1kdbva8TCneM2YsiXT7mrzT21EacHnPpz5YyUdj64na'
+          )
+        ).toBe(true);
       });
     });
 
     describe('isAddressWithin', () => {
-      beforeAll(() => parseCslAddressSpy.mockRestore());
+      beforeAll(() => parseCmlAddressSpy.mockRestore());
 
       it('returns true if address is within provided addresses', () => {
         const address = addresses[0];
@@ -45,7 +59,7 @@ describe('Cardano.util.address', () => {
     });
 
     describe('inputsWithAddresses', () => {
-      beforeAll(() => parseCslAddressSpy.mockRestore());
+      beforeAll(() => parseCmlAddressSpy.mockRestore());
       const tx = {
         body: {
           inputs: [

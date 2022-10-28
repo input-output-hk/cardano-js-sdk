@@ -1,8 +1,8 @@
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 import { InputSelectionParameters, InputSelector, SelectionResult } from '../types';
 import { assertIsBalanceSufficient, preProcessArgs, toValues } from './util';
+import { cmlUtil } from '@cardano-sdk/core';
 import { computeChangeAndAdjustForFee } from './change';
-import { cslUtil } from '@cardano-sdk/core';
 import { roundRobinSelection } from './roundRobin';
 
 interface RoundRobinRandomImproveOptions {
@@ -35,7 +35,7 @@ export const roundRobinRandomImprove = ({
       estimateTxFee: (utxos, changeValues) =>
         computeMinimumCost({
           change: new Set(changeValues),
-          fee: cslUtil.MAX_U64,
+          fee: cmlUtil.MAX_U64,
           inputs: new Set(utxos),
           outputs: outputSet
         }),

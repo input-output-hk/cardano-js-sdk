@@ -1,4 +1,4 @@
-import { CSL, InvalidProtocolParametersError, coreToCsl, cslUtil } from '@cardano-sdk/core';
+import { CML, InvalidProtocolParametersError, cmlUtil, coreToCml } from '@cardano-sdk/core';
 import {
   ComputeMinimumCoinQuantity,
   ComputeSelectionLimit,
@@ -11,7 +11,7 @@ import {
 import { ProtocolParametersRequiredByInputSelection } from '.';
 import { usingAutoFree } from '@cardano-sdk/util';
 
-export type BuildTx = (selection: SelectionSkeleton) => Promise<CSL.Transaction>;
+export type BuildTx = (selection: SelectionSkeleton) => Promise<CML.Transaction>;
 
 export interface DefaultSelectionConstraintsProps {
   protocolParameters: ProtocolParametersForInputSelection;
@@ -28,14 +28,24 @@ export const computeMinimumCost =
   ): EstimateTxFee =>
   async (selection) => {
     const tx = await buildTx(selection);
+
     return usingAutoFree((scope) => {
+      // TODO: Get this from cardano-services
+      const priceMem = scope.manage(
+        CML.UnitInterval.new(scope.manage(CML.BigNum.from_str('577')), scope.manage(CML.BigNum.from_str('10000')))
+      );
+      const priceStep = scope.manage(
+        CML.UnitInterval.new(scope.manage(CML.BigNum.from_str('721')), scope.manage(CML.BigNum.from_str('100000000')))
+      );
+      const exInitPrices = scope.manage(CML.ExUnitPrices.new(priceMem, priceStep));
+
       const linearFee = scope.manage(
-        CSL.LinearFee.new(
-          scope.manage(CSL.BigNum.from_str(minFeeCoefficient.toString())),
-          scope.manage(CSL.BigNum.from_str(minFeeConstant.toString()))
+        CML.LinearFee.new(
+          scope.manage(CML.BigNum.from_str(minFeeCoefficient.toString())),
+          scope.manage(CML.BigNum.from_str(minFeeConstant.toString()))
         )
       );
-      const minFee = scope.manage(CSL.min_fee(tx, linearFee));
+      const minFee = scope.manage(CML.min_fee(tx, linearFee, exInitPrices));
       return BigInt(minFee.to_str());
     });
   };
@@ -45,9 +55,9 @@ export const computeMinimumCoinQuantity =
   (output) =>
     usingAutoFree((scope) =>
       BigInt(
-        CSL.min_ada_for_output(
-          coreToCsl.txOut(scope, output),
-          scope.manage(CSL.DataCost.new_coins_per_byte(scope.manage(CSL.BigNum.from_str(coinsPerUtxoByte.toString()))))
+        CML.min_ada_required(
+          coreToCml.txOut(scope, output),
+          scope.manage(CML.BigNum.from_str(coinsPerUtxoByte.toString()))
         ).to_str()
       )
     );
@@ -59,13 +69,14 @@ export const tokenBundleSizeExceedsLimit =
       return false;
     }
     return usingAutoFree((scope) => {
-      const value = scope.manage(CSL.Value.new(cslUtil.maxBigNum));
-      value.set_multiasset(coreToCsl.tokenMap(scope, tokenBundle));
+      const value = scope.manage(CML.Value.new(cmlUtil.maxBigNum));
+      value.set_multiasset(coreToCml.tokenMap(scope, tokenBundle));
+
       return value.to_bytes().length > maxValueSize;
     });
   };
 
-const getTxSize = (tx: CSL.Transaction) => tx.to_bytes().length;
+const getTxSize = (tx: CML.Transaction) => tx.to_bytes().length;
 
 /**
  * This constraint implementation is not intended to used by selection algorithms

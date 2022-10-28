@@ -1,4 +1,4 @@
-import { Cardano, coreToCsl } from '@cardano-sdk/core';
+import { Cardano, coreToCml } from '@cardano-sdk/core';
 import { FinalizeTxProps, InitializeTxProps, ObservableWallet } from '../types';
 import { Logger } from 'ts-log';
 import { ManagedFreeableScope } from '@cardano-sdk/util';
@@ -59,7 +59,7 @@ export const createTxPreparer =
                 withdrawals
               });
 
-              return coreToCsl.tx(
+              return coreToCml.tx(
                 scope,
                 await firstValueFrom(
                   signer.stubFinalizeTx({

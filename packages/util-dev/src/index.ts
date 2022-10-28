@@ -1,5 +1,5 @@
 export * as AssetId from './assetId';
-export * as CslTestUtil from './cslTestUtil';
+export * as CmlTestUtil from './cmlTestUtil';
 export * as TxTestUtil from './txTestUtil';
 export * from './TestLogger';
 export * from './util';
