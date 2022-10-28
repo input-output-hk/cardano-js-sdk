@@ -333,7 +333,7 @@ export const nativeScript = (script: CML.NativeScript): Cardano.NativeScript =>
         };
         const scriptAll = scope.manage(script.as_script_all());
         for (let i = 0; i < scope.manage(scriptAll!.native_scripts()).len(); ++i) {
-          coreScript.scripts.push(nativeScript(scope.manage(scriptAll!.native_scripts().get(i))));
+          coreScript.scripts.push(nativeScript(scope.manage(scope.manage(scriptAll!.native_scripts()).get(i))));
         }
         break;
       }
@@ -345,7 +345,7 @@ export const nativeScript = (script: CML.NativeScript): Cardano.NativeScript =>
         };
         const scriptAny = scope.manage(script.as_script_any());
         for (let i = 0; i < scope.manage(scriptAny!.native_scripts()).len(); ++i) {
-          coreScript.scripts.push(nativeScript(scope.manage(scriptAny!.native_scripts().get(i))));
+          coreScript.scripts.push(nativeScript(scope.manage(scope.manage(scriptAny!.native_scripts()).get(i))));
         }
         break;
       }
@@ -359,7 +359,7 @@ export const nativeScript = (script: CML.NativeScript): Cardano.NativeScript =>
         };
 
         for (let i = 0; i < scope.manage(scriptMofK!.native_scripts()).len(); ++i) {
-          coreScript.scripts.push(nativeScript(scope.manage(scriptMofK!.native_scripts().get(i))));
+          coreScript.scripts.push(nativeScript(scope.manage(scope.manage(scriptMofK!.native_scripts()).get(i))));
         }
         break;
       }
