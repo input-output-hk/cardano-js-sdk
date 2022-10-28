@@ -670,7 +670,7 @@ export const mockBabbageBlock: Ogmios.Schema.Babbage = {
         kesPeriod: 2,
         sigma: 'xoYNFRrDJscAfzn8fQee5chdcKOTNuWyxB2YpYcR5RVJa2WqlRDz45dl52pxhF5EhZVU8d+8bOX8tsE9GHYNzw=='
       },
-      prevHash: 'ee155ace9c40292074cb6aff8c9ccdd273c81648ff1149ef36bcea6ebb8a3e25',
+      prevHash: 'genesis',
       protocolVersion: { major: 589, minor: 287 },
       signature:
         'o/4wLT96VPSLAtgCnKwTVtzj/Y60RVI+UyiB0YlDgR9FEubrCBs5Vr5V1fHQjqLQxa3wOSZut68V/hOPkjkGBkzbFMFzyaA6/603+koIYbf1rU9oYIYDMjk4QlGlqAI8GuYHTy4K7XSIJ5FyJAXBNNvLhbHBky/v3RBNPSupMfGJjEgW0VYpBvbDlV7V+UidY+bhLInuHFflQYlMWCD8xsYihqnZ1fCyMmQQ2hxQ6HusMCMnkGps3kG8hlrd8/4SqoD8B8y/TsHBy0/4rZGaVq+xLvo+kmEcLDAPhenkCZBAx8OJIth9ZFsvL0Az8HOBzwPLrhMOHuzoFZkgEZnY1jt3tu26XE9bNfyRWxqUUlB8/595HjBH9LLoEHrVqQsjjR2qJZEXLRkRslnQjdArMAM2NmyJWFQlkIbP2tjC9XYxRHQguDIcTZWETHki6WlqtqveKhCExbVBt43Yr8RlI6p2r4fwgI57tASpY8PU+KQI/p96i29tH0WhrK2tpqkpNm1YlnJPkYZhlVAEMaafmEp8BkTZ29/AVAnSrHgMGYp+2kLbFfUTuvFQVAAydem0bgLIjD4mm+fomvDIO8b8Rw==',

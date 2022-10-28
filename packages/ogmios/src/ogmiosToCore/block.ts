@@ -57,7 +57,8 @@ const getBlockAndKind = (block: Schema.Block): BlockAndKind | null => {
 // Mappers that apply to all Block types
 const mapBlockHeight = (block: OgmiosBlockType): number => block.header.blockHeight;
 const mapBlockSlot = (block: OgmiosBlockType): number => block.header.slot;
-const mapPreviousBlock = (block: OgmiosBlockType): Cardano.BlockId => Cardano.BlockId(block.header.prevHash);
+const mapPreviousBlock = (block: OgmiosBlockType): Cardano.BlockId | undefined =>
+  block.header.prevHash !== 'genesis' ? Cardano.BlockId(block.header.prevHash) : undefined;
 
 // Mappers specific to Byron block properties
 const mapByronHash = (block: Schema.StandardBlock): Cardano.BlockId => Cardano.BlockId(block.hash);

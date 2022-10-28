@@ -248,7 +248,6 @@ describe('ogmiosToCore', () => {
         slot: ogmiosBlock.header.slot
       },
       issuerVk: Cardano.Ed25519PublicKey(ogmiosBlock.header.issuerVk),
-      previousBlock: Cardano.BlockId(ogmiosBlock.header.prevHash),
       size: ogmiosBlock.header.blockSize,
       totalOutput: ogmiosBlock.body[0].body.outputs[0].value.coins,
       txCount: ogmiosBlock.body.length,
