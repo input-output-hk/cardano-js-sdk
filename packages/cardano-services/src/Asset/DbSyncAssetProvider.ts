@@ -42,6 +42,7 @@ export type DbSyncAssetProviderDependencies = {
   tokenMetadataService: TokenMetadataService;
 };
 
+
 /**
  * AssetProvider implementation using NftMetadataService, TokenMetadataService
  * and cardano-db-sync database as sources
