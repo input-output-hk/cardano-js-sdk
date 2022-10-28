@@ -50,6 +50,6 @@ module.exports = {
             'chromedriver'
         ],
         specs: ['./**/*.spec.ts'],
-        waitforTimeout: 10000
+        waitforTimeout: 30000
     }
 };
