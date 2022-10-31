@@ -2,15 +2,6 @@
 module.exports = {
   projects: [
     {
-      displayName: 'blockfrost',
-      preset: 'ts-jest',
-      setupFiles: ['dotenv/config'],
-      testMatch: ['<rootDir>/test/blockfrost/*.test.ts'],
-      transform: {
-        '^.+\\.tsx?$': 'ts-jest'
-      }
-    },
-    {
       displayName: 'wallet',
       preset: 'ts-jest',
       setupFiles: ['dotenv/config'],
