@@ -3,15 +3,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as envalid from 'envalid';
 import {
-  BlockFrostAPI,
-  blockfrostAssetProvider,
-  blockfrostChainHistoryProvider,
-  blockfrostNetworkInfoProvider,
-  blockfrostRewardsProvider,
-  blockfrostTxSubmitProvider,
-  blockfrostUtxoProvider
-} from '@cardano-sdk/blockfrost';
-import {
   assetInfoHttpProvider,
   chainHistoryHttpProvider,
   networkInfoHttpProvider,
@@ -26,17 +17,16 @@ import axiosFetchAdapter from '@vespaiach/axios-fetch-adapter';
 
 const networkIdOptions = [0, 1];
 const stakePoolProviderOptions = ['stub', 'http'];
-const networkInfoProviderOptions = ['blockfrost', 'http'];
-const txSubmitProviderOptions = ['blockfrost', 'http'];
-const assetProviderOptions = ['blockfrost', 'http'];
-const utxoProviderOptions = ['blockfrost', 'http'];
-const rewardsProviderOptions = ['blockfrost', 'http'];
-const chainHistoryProviderOptions = ['blockfrost', 'http'];
+const networkInfoProviderOptions = ['http'];
+const txSubmitProviderOptions = ['http'];
+const assetProviderOptions = ['http'];
+const utxoProviderOptions = ['http'];
+const rewardsProviderOptions = ['http'];
+const chainHistoryProviderOptions = ['http'];
 
 const env = envalid.cleanEnv(process.env, {
   ASSET_PROVIDER: envalid.str({ choices: assetProviderOptions }),
   ASSET_PROVIDER_PARAMS: envalid.json({ default: {} }),
-  BLOCKFROST_API_KEY: envalid.str(),
   CHAIN_HISTORY_PROVIDER: envalid.str({ choices: chainHistoryProviderOptions }),
   CHAIN_HISTORY_PROVIDER_PARAMS: envalid.json({ default: {} }),
   LOGGER_MIN_SEVERITY: envalid.str({ default: 'info' }),
@@ -60,36 +50,11 @@ const env = envalid.cleanEnv(process.env, {
 
 const logger = console;
 
-const isTestnet = env.NETWORK_ID === 0;
 const networkId = Number.parseInt(process.env.NETWORK_ID || '');
 if (Number.isNaN(networkId)) throw new Error('NETWORK_ID not set');
 
-// Sharing a single BlockFrostAPI object ensures rate limiting is shared across all blockfrost providers
-const blockfrostApi = [
-  env.TX_SUBMIT_PROVIDER,
-  env.ASSET_PROVIDER,
-  env.NETWORK_INFO_PROVIDER,
-  env.UTXO_PROVIDER,
-  env.CHAIN_HISTORY_PROVIDER
-].includes('blockfrost')
-  ? (async () => {
-      logger.debug('WalletProvider:blockfrost - Initializing');
-      const blockfrost = new BlockFrostAPI({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        adapter: axiosFetchAdapter as any, // type mismatch: adapter uses axios 0.26, while blockfrost-js uses 0.21
-        isTestnet,
-        projectId: env.BLOCKFROST_API_KEY
-      });
-      logger.debug('WalletProvider:blockfrost - Responding');
-      return blockfrost;
-    })()
-  : null;
-
 export const utxoProvider = (async () => {
   switch (env.UTXO_PROVIDER) {
-    case 'blockfrost': {
-      return blockfrostUtxoProvider(await blockfrostApi!);
-    }
     case 'http': {
       return utxoHttpProvider({ adapter: axiosFetchAdapter, baseUrl: env.UTXO_PROVIDER_PARAMS.baseUrl, logger });
     }
@@ -101,9 +66,6 @@ export const utxoProvider = (async () => {
 
 export const assetProvider = (async () => {
   switch (env.ASSET_PROVIDER) {
-    case 'blockfrost': {
-      return blockfrostAssetProvider(await blockfrostApi!);
-    }
     case 'http': {
       return assetInfoHttpProvider({ adapter: axiosFetchAdapter, baseUrl: env.ASSET_PROVIDER_PARAMS.baseUrl, logger });
     }
@@ -115,9 +77,6 @@ export const assetProvider = (async () => {
 
 export const txSubmitProvider = (async () => {
   switch (env.TX_SUBMIT_PROVIDER) {
-    case 'blockfrost': {
-      return blockfrostTxSubmitProvider(await blockfrostApi!);
-    }
     case 'http': {
       return txSubmitHttpProvider({
         adapter: axiosFetchAdapter,
@@ -144,9 +103,6 @@ export const txSubmitProvider = (async () => {
 
 export const rewardsProvider = (async () => {
   switch (env.REWARDS_PROVIDER) {
-    case 'blockfrost': {
-      return blockfrostRewardsProvider(await blockfrostApi!);
-    }
     case 'http': {
       return rewardsHttpProvider({ adapter: axiosFetchAdapter, baseUrl: env.REWARDS_PROVIDER_PARAMS.baseUrl, logger });
     }
@@ -165,9 +121,6 @@ export const stakePoolProvider = (async () => {
 
 export const networkInfoProvider = (async () => {
   switch (env.NETWORK_INFO_PROVIDER) {
-    case 'blockfrost': {
-      return blockfrostNetworkInfoProvider(await blockfrostApi!);
-    }
     case 'http': {
       return networkInfoHttpProvider({
         adapter: axiosFetchAdapter,
@@ -183,9 +136,6 @@ export const networkInfoProvider = (async () => {
 
 export const chainHistoryProvider = (async () => {
   switch (env.CHAIN_HISTORY_PROVIDER) {
-    case 'blockfrost': {
-      return blockfrostChainHistoryProvider(await blockfrostApi!, logger);
-    }
     case 'http': {
       return chainHistoryHttpProvider({
         adapter: axiosFetchAdapter,

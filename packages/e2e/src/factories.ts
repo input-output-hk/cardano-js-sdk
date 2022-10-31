@@ -18,15 +18,6 @@ import {
   TrezorKeyAgent,
   util
 } from '@cardano-sdk/key-management';
-import {
-  BlockFrostAPI,
-  blockfrostAssetProvider,
-  blockfrostChainHistoryProvider,
-  blockfrostNetworkInfoProvider,
-  blockfrostRewardsProvider,
-  blockfrostTxSubmitProvider,
-  blockfrostUtxoProvider
-} from '@cardano-sdk/blockfrost';
 import { CardanoWalletFaucetProvider, FaucetProvider } from './FaucetProvider';
 import {
   DEFAULT_POLLING_CONFIG,
@@ -56,8 +47,6 @@ import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import memoize from 'lodash/memoize';
 
 // CONSTANTS
-const BLOCKFROST_PROVIDER = 'blockfrost';
-const BLOCKFROST_MISSING_PROJECT_ID = 'Missing project id';
 const HTTP_PROVIDER = 'http';
 const OGMIOS_PROVIDER = 'ogmios';
 const STUB_PROVIDER = 'stub';
@@ -65,22 +54,6 @@ const KEY_AGENT_MISSING_PASSWORD = 'Missing wallet password';
 const KEY_AGENT_MISSING_NETWORK_ID = 'Missing network id';
 const KEY_AGENT_MISSING_ACCOUNT_INDEX = 'Missing account index';
 const MISSING_URL_PARAM = 'Missing URL';
-
-// Sharing a single BlockFrostAPI object ensures rate limiting is shared across all blockfrost providers
-let blockfrostApi: BlockFrostAPI;
-
-/**
- * Gets the singleton blockfrost API instance.
- *
- * @returns The blockfrost API instance, this function always returns the same instance.
- */
-const getBlockfrostApi = async () => {
-  if (blockfrostApi !== undefined) return blockfrostApi;
-
-  if (process.env.BLOCKFROST_API_KEY === undefined) throw new Error(BLOCKFROST_MISSING_PROJECT_ID);
-
-  return new BlockFrostAPI({ isTestnet: true, projectId: process.env.BLOCKFROST_API_KEY });
-};
 
 export const faucetProviderFactory = new ProviderFactory<FaucetProvider>();
 export type CreateKeyAgent = (dependencies: KeyAgentDependencies) => Promise<AsyncKeyAgent>;
@@ -106,23 +79,6 @@ assetProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger)
   });
 });
 
-assetProviderFactory.register(
-  BLOCKFROST_PROVIDER,
-  async (): Promise<AssetProvider> =>
-    new Promise<AssetProvider>(async (resolve) => {
-      resolve(blockfrostAssetProvider(await getBlockfrostApi()));
-    })
-);
-
-// Chain history providers
-chainHistoryProviderFactory.register(
-  BLOCKFROST_PROVIDER,
-  async (_params: any, logger: Logger): Promise<ChainHistoryProvider> =>
-    new Promise<ChainHistoryProvider>(async (resolve) => {
-      resolve(blockfrostChainHistoryProvider(await getBlockfrostApi(), logger));
-    })
-);
-
 chainHistoryProviderFactory.register(
   HTTP_PROVIDER,
   async (params: any, logger: Logger): Promise<ChainHistoryProvider> => {
@@ -132,15 +88,6 @@ chainHistoryProviderFactory.register(
       resolve(chainHistoryHttpProvider({ baseUrl: params.baseUrl, logger }));
     });
   }
-);
-
-// Network info providers
-networkInfoProviderFactory.register(
-  BLOCKFROST_PROVIDER,
-  async (): Promise<NetworkInfoProvider> =>
-    new Promise<NetworkInfoProvider>(async (resolve) => {
-      resolve(blockfrostNetworkInfoProvider(await getBlockfrostApi()));
-    })
 );
 
 networkInfoProviderFactory.register(
@@ -154,15 +101,6 @@ networkInfoProviderFactory.register(
   }
 );
 
-// Rewards providers
-rewardsProviderFactory.register(
-  BLOCKFROST_PROVIDER,
-  async (): Promise<RewardsProvider> =>
-    new Promise<RewardsProvider>(async (resolve) => {
-      resolve(blockfrostRewardsProvider(await getBlockfrostApi()));
-    })
-);
-
 rewardsProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger): Promise<RewardsProvider> => {
   if (params.baseUrl === undefined) throw new Error(`${rewardsHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
@@ -170,15 +108,6 @@ rewardsProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logge
     resolve(rewardsHttpProvider({ baseUrl: params.baseUrl, logger }));
   });
 });
-
-// Tx submit providers
-txSubmitProviderFactory.register(
-  BLOCKFROST_PROVIDER,
-  async (): Promise<TxSubmitProvider> =>
-    new Promise<TxSubmitProvider>(async (resolve) => {
-      resolve(blockfrostTxSubmitProvider(await getBlockfrostApi()));
-    })
-);
 
 txSubmitProviderFactory.register(OGMIOS_PROVIDER, async (params: any, logger: Logger): Promise<TxSubmitProvider> => {
   if (params.baseUrl === undefined) throw new Error(`${ogmiosTxSubmitProvider.name}: ${MISSING_URL_PARAM}`);
@@ -201,15 +130,6 @@ txSubmitProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logg
     resolve(txSubmitHttpProvider({ baseUrl: params.baseUrl, logger }));
   });
 });
-
-// Utxo providers
-utxoProviderFactory.register(
-  BLOCKFROST_PROVIDER,
-  async (): Promise<UtxoProvider> =>
-    new Promise<UtxoProvider>(async (resolve) => {
-      resolve(blockfrostUtxoProvider(await getBlockfrostApi()));
-    })
-);
 
 utxoProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger): Promise<UtxoProvider> => {
   if (params.baseUrl === undefined) throw new Error(`${utxoHttpProvider.name}: ${MISSING_URL_PARAM}`);

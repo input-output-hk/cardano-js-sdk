@@ -12,7 +12,6 @@
   },
   "scripts": {
     "test": "shx echo 'test' command not implemented yet",
-    "test:blockfrost": "jest -c jest.config.js --selectProjects blockfrost --runInBand --verbose",
     "test:wallet": "jest -c jest.config.js --forceExit --selectProjects wallet --runInBand --verbose",
     "test:load-testing": "jest -c jest.config.js --selectProjects load-testing --runInBand --verbose",
     "test:ogmios": "jest -c jest.config.js --selectProjects ogmios --runInBand --verbose",
@@ -67,7 +66,6 @@
   "dependencies": {
     "@cardano-foundation/ledgerjs-hw-app-cardano": "^5.0.0",
     "@cardano-ogmios/client": "^5.5.5",
-    "@cardano-sdk/blockfrost": "^0.5.0",
     "@cardano-sdk/cardano-services": "^0.5.0",
     "@cardano-sdk/cardano-services-client": "^0.5.0",
     "@cardano-sdk/core": "^0.5.0",

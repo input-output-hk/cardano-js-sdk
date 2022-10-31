@@ -9,7 +9,7 @@
     "unlimitedStorage"
   ],
   "content_security_policy": {
-    "extension_pages": "default-src 'self' http://localhost:3000; script-src 'self'; object-src 'self'; connect-src data: http://localhost:8080 https://cardano-testnet.blockfrost.io https://api.coingecko.com http://localhost:3000 ws://localhost:3000 wss://localhost:3000 http://localhost:4000 ws://localhost:4000 wss://localhost:4000 http://testnet-dev-backend.dev.lw.iog.io:80 https://testnet-dev-backend.dev.lw.iog.io:443; style-src * 'unsafe-inline'; img-src * data:; font-src https://fonts.gstatic.com;"
+    "extension_pages": "default-src 'self' http://localhost:3000; script-src 'self'; object-src 'self'; connect-src data: http://localhost:8080 https://api.coingecko.com http://localhost:3000 ws://localhost:3000 wss://localhost:3000 http://localhost:4000 ws://localhost:4000 wss://localhost:4000 http://testnet-dev-backend.dev.lw.iog.io:80 https://testnet-dev-backend.dev.lw.iog.io:443; style-src * 'unsafe-inline'; img-src * data:; font-src https://fonts.gstatic.com;"
   },
   "web_accessible_resources": [
     {
