@@ -1123,7 +1123,6 @@ cacheEntries = {
 "@types/ssh2@npm:1.11.6" = { filename = "@types-ssh2-npm-1.11.6-8669bc5e40-4812694de5.zip"; sha512 = "4812694de5444802f7386da7882da9072a6d63b5b634eb59fdca39e8f7ad4964bcefe7844d375d594cb979a0804e24aea273098bdbb84e7e23a9d3b5698d3936"; };
 "whatwg-url@npm:11.0.0" = { filename = "whatwg-url-npm-11.0.0-073529d93a-ed4826aaa5.zip"; sha512 = "ed4826aaa57e66bb3488a4b25c9cd476c46ba96052747388b5801f137dd740b73fde91ad207d96baf9f17fbcc80fc1a477ad65181b5eb5fa718d27c69501d7af"; };
 "@emurgo/cardano-message-signing-asmjs@npm:1.0.1" = { filename = "@emurgo-cardano-message-signing-asmjs-npm-1.0.1-acb89efd8d-2cdb4c2fbf.zip"; sha512 = "2cdb4c2fbf78632b6256e2300dab6cab0bdbae7c9e80d3f619e1f09fc53b3ec7ab659ae4c9094dac3e1cbdb756d0bc0d2927f4619b34b1766e97a7d198aa9e3a"; };
-"@emurgo/cardano-serialization-lib-asmjs@npm:11.0.0-rc.6" = { filename = "@emurgo-cardano-serialization-lib-asmjs-npm-11.0.0-rc.6-4b4d43d3c2-c4149ef1ce.zip"; sha512 = "c4149ef1ce87ef413f82918bbf8dc55a5778ea786553abdf7576673d81ffbfd02c3afc66f10c717204452cc371e4ce097c536484ba224ac50d860e3a3cf5c999"; };
 "@vespaiach/axios-fetch-adapter@npm:0.3.1" = { filename = "@vespaiach-axios-fetch-adapter-npm-0.3.1-217a961524-976a7f920e.zip"; sha512 = "976a7f920ec2eddeb08fcced2980139f046f72df767e693440a2b727afef65e5664e24a1e8d4c9cf053db717a6fe2395f7e53ac56c3fb1cc6d2d6a90203cb1cf"; };
 "ts-stopwatch@npm:0.0.4" = { filename = "ts-stopwatch-npm-0.0.4-c27e630553-2f48476016.zip"; sha512 = "2f48476016356bf0fd25ae19d51d7aea5492ea5d85ff78ddd4a8bf818e207131c29ddaf6b469ac387060ae2d9b5f5d5585546dbd570868dbfe931bb54adbb622"; };
 "cliui@npm:7.0.4" = { filename = "cliui-npm-7.0.4-d6b8a9edb6-ce2e8f578a.zip"; sha512 = "ce2e8f578a4813806788ac399b9e866297740eecd4ad1823c27fd344d78b22c5f8597d548adbcc46f0573e43e21e751f39446c5a5e804a12aace402b7a315d7f"; };
@@ -2043,6 +2042,7 @@ cacheEntries = {
 "jsesc@npm:0.5.0" = { filename = "jsesc-npm-0.5.0-6827074492-b8b44cbfc9.zip"; sha512 = "b8b44cbfc92f198ad972fba706ee6a1dfa7485321ee8c0b25f5cedd538dcb20cde3197de16a7265430fce8277a12db066219369e3d51055038946039f6e20e17"; };
 "unicode-canonical-property-names-ecmascript@npm:2.0.0" = { filename = "unicode-canonical-property-names-ecmascript-npm-2.0.0-d2d8554a14-39be078afd.zip"; sha512 = "39be078afd014c14dcd957a7a46a60061bc37c4508ba146517f85f60361acf4c7539552645ece25de840e17e293baa5556268d091ca6762747fdd0c705001a45"; };
 "unicode-property-aliases-ecmascript@npm:2.1.0" = { filename = "unicode-property-aliases-ecmascript-npm-2.1.0-46779595f4-2435244318.zip"; sha512 = "243524431893649b62cc674d877bd64ef292d6071dd2fd01ab4d5ad26efbc104ffcd064f93f8a06b7e4ec54c172bf03f6417921a0d8c3a9994161fe1f88f815b"; };
+"@dcspark/cardano-multiplatform-lib-asmjs@npm:3.1.0" = { filename = "@dcspark-cardano-multiplatform-lib-asmjs-npm-3.1.0-925050949c-6ad3f6330f.zip"; sha512 = "6ad3f6330fcf5141b1df15d88b5f1918e6e886526d4fb82c856a8b576a504902aed1b3284e577f29e700aaa2b87b6b86743b7b0687e6c42db23f3a350eaae39c"; };
 };
 
 in optionalOverride overrideAttrs project

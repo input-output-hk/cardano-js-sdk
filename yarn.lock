@@ -1630,8 +1630,8 @@ __metadata:
     "@cardano-sdk/util-rxjs": ^0.4.1
     "@cardano-sdk/wallet": ^0.5.0
     "@cardano-sdk/web-extension": ^0.5.0
+    "@dcspark/cardano-multiplatform-lib-asmjs": ^3.1.0
     "@emurgo/cardano-message-signing-asmjs": ^1.0.1
-    "@emurgo/cardano-serialization-lib-asmjs": 11.0.0-rc.6
     "@types/bunyan": ^1.8.8
     "@types/jest": ^28.1.2
     "@types/lodash": ^4.14.182
@@ -2123,6 +2123,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@dcspark/cardano-multiplatform-lib-asmjs@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "@dcspark/cardano-multiplatform-lib-asmjs@npm:3.1.0"
+  checksum: 6ad3f6330fcf5141b1df15d88b5f1918e6e886526d4fb82c856a8b576a504902aed1b3284e577f29e700aaa2b87b6b86743b7b0687e6c42db23f3a350eaae39c
+  languageName: node
+  linkType: hard
+
 "@dcspark/cardano-multiplatform-lib-browser@npm:^3.1.0":
   version: 3.1.0
   resolution: "@dcspark/cardano-multiplatform-lib-browser@npm:3.1.0"
@@ -2155,13 +2162,6 @@ __metadata:
   version: 1.0.1
   resolution: "@emurgo/cardano-message-signing-nodejs@npm:1.0.1"
   checksum: 0849d3cc4dc3d33072afeaa44c7316f62d2cde1e2f7449cf24ac8b2a65a89ff17f301572c89a6890433054098084a57c01013c4a37d956ef7bc33bce90fc048f
-  languageName: node
-  linkType: hard
-
-"@emurgo/cardano-serialization-lib-asmjs@npm:11.0.0-rc.6":
-  version: 11.0.0-rc.6
-  resolution: "@emurgo/cardano-serialization-lib-asmjs@npm:11.0.0-rc.6"
-  checksum: c4149ef1ce87ef413f82918bbf8dc55a5778ea786553abdf7576673d81ffbfd02c3afc66f10c717204452cc371e4ce097c536484ba224ac50d860e3a3cf5c999
   languageName: node
   linkType: hard
 
