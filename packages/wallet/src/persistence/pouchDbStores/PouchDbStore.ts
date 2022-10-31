@@ -3,7 +3,7 @@ import { Logger } from 'ts-log';
 import { toPouchDbDoc } from './util';
 import PouchDB from 'pouchdb';
 
-export abstract class PouchDbStore<T> {
+export abstract class PouchDbStore<T extends {}> {
   destroyed = false;
   protected idle: Promise<void> = Promise.resolve();
   protected readonly logger: Logger;

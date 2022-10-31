@@ -34,7 +34,7 @@ export type RecursivelyReplaceNullWithUndefined<T> = T extends null
  * Recursively replaces all nulls with undefineds.
  * Skips object classes (that have a `.__proto__.constructor`).
  */
-export const replaceNullsWithUndefineds = <T>(obj: T): RecursivelyReplaceNullWithUndefined<T> => {
+export const replaceNullsWithUndefineds = <T extends {}>(obj: T): RecursivelyReplaceNullWithUndefined<T> => {
   const newObj: any = {};
   for (const k of Object.keys(obj)) {
     const v: any = (obj as any)[k];
