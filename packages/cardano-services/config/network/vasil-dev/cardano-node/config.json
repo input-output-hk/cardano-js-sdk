@@ -21,7 +21,6 @@
   "TestAllegraHardForkAtEpoch": 0,
   "TestAlonzoHardForkAtEpoch": 0,
   "TestEnableDevelopmentHardForkEras": true,
-  "TestEnableDevelopmentNetworkProtocols": true,
   "TestMaryHardForkAtEpoch": 0,
   "TestShelleyHardForkAtEpoch": 0,
   "TraceAcceptPolicy": true,
