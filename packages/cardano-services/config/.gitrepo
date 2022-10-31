@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/input-output-hk/cardano-configurations.git
 	branch = master
-	commit = 303f3a3035c52eb753b533d53ef439c6b4cde9c9
-	parent = dfedd4e604efb1013d25ac6ffa63b9ce069f13c1
+	commit = 3744acb128f3db846fb754627d22e41589595290
+	parent = cd6ff0c54dd41f66e7bb69c3dea4f3b4670cdd19
 	method = merge
-	cmdver = 0.4.1
+	cmdver = 0.4.5

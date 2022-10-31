@@ -12,7 +12,7 @@
   "Protocol": "Cardano",
   "RequiresNetworkMagic": "RequiresMagic",
   "ShelleyGenesisFile": "../genesis/shelley.json",
-  "ShelleyGenesisHash": "90c8bae45d3cb34ef25d84171a74f6e8a4a8f4615fbe289d5a1b21eb6896ac0b",
+  "ShelleyGenesisHash": "162d29c4e1cf6b8a84f2d692e67a3ac6bc7851bc3e6e4afe64d15778bed8bd86",
   "TargetNumberOfActivePeers": 20,
   "TargetNumberOfEstablishedPeers": 50,
   "TargetNumberOfKnownPeers": 100,
