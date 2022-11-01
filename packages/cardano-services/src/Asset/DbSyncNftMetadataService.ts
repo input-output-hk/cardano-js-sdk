@@ -2,14 +2,14 @@ import { Asset, Cardano } from '@cardano-sdk/core';
 import { AssetBuilder } from './AssetBuilder';
 import { AssetPolicyIdAndName, NftMetadataService } from './types';
 import { Logger } from 'ts-log';
-import { MetadataService } from '../Metadata';
 import { Pool } from 'pg';
+import { TxMetadataService } from '../Metadata';
 
 /**
  * Dependencies that are need to create DbSyncNftMetadataService
  */
 export interface DbSyncNftMetadataServiceDependencies {
-  metadataService: MetadataService;
+  metadataService: TxMetadataService;
   db: Pool;
   logger: Logger;
 }
@@ -20,7 +20,7 @@ export interface DbSyncNftMetadataServiceDependencies {
 export class DbSyncNftMetadataService implements NftMetadataService {
   #builder: AssetBuilder;
   #logger: Logger;
-  #metadataService: MetadataService;
+  #metadataService: TxMetadataService;
 
   constructor({ db, logger, metadataService }: DbSyncNftMetadataServiceDependencies) {
     this.#builder = new AssetBuilder(db, logger);

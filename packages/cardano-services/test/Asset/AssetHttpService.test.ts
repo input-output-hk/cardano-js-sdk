@@ -17,7 +17,7 @@ import { Pool } from 'pg';
 import { createDbSyncMetadataService } from '../../src/Metadata';
 import { getPort } from 'get-port-please';
 import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
-import { dummyLogger as logger } from 'ts-log';
+import { logger } from '@cardano-sdk/util-dev';
 import { mockTokenRegistry } from './CardanoTokenRegistry.test';
 import axios from 'axios';
 
@@ -35,7 +35,7 @@ describe('AssetHttpService', () => {
   let ntfMetadataService: NftMetadataService;
   let service: AssetHttpService;
   let port: number;
-  let tokenMetadataServerUrl = '';
+  let serverUrl = '';
   let tokenMetadataService: TokenMetadataService;
   let clientConfig: CreateHttpProviderConfig<AssetProvider>;
   let provider: AssetProvider;
@@ -51,7 +51,7 @@ describe('AssetHttpService', () => {
 
   describe('healthy state', () => {
     beforeAll(async () => {
-      ({ closeMock, tokenMetadataServerUrl } = await mockTokenRegistry(() => ({})));
+      ({ closeMock, serverUrl } = await mockTokenRegistry(() => ({})));
       db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
       ntfMetadataService = new DbSyncNftMetadataService({
         db,
@@ -62,7 +62,7 @@ describe('AssetHttpService', () => {
       cardanoNode = mockCardanoNode(
         healthCheckResponseMock({ blockNo: lastBlockNoInDb })
       ) as unknown as OgmiosCardanoNode;
-      tokenMetadataService = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl });
+      tokenMetadataService = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl: serverUrl });
       assetProvider = new DbSyncAssetProvider({ cardanoNode, db, logger, ntfMetadataService, tokenMetadataService });
       service = new AssetHttpService({ assetProvider, logger });
       httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });

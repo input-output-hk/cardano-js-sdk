@@ -1,0 +1,170 @@
+{
+  "$id": "https://a.adapools.org/extended-example",
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "default": {},
+  "description": "Additional information for Cardano Stake Pools in Ada Pools format",
+  "examples": [
+    {
+      "info": {
+        "url_png_icon_64x64": "http(s) url to pool icon; png format; not animated; max 40kb",
+        "url_png_logo": "http(s) url to pool logo; png format; not animated; max 50kb",
+        "location": "London, England",
+        "social": {
+          "twitter_handle": "adapools_org",
+          "telegram_handle": "adapools_ops",
+          "facebook_handle": "",
+          "youtube_handle": "",
+          "twitch_handle": "",
+          "discord_handle": "",
+          "github_handle": ""
+        },
+        "company": {
+          "name": "Company Name",
+          "addr": "Street, Number",
+          "city": "London",
+          "country": "England",
+          "company_id": "123456789",
+          "vat_id": "GB123456789"
+        },
+        "about": {
+          "me": "...",
+          "server": "Raspberry Pi Hosted at my Home in London 100MB up/down, solar energy.",
+          "company": "..."
+        }
+      }
+    }
+  ],
+  "maxLength": 4096,
+  "required": [
+    "info"
+  ],
+  "title": "Extended stake pool metadata",
+  "type": "object",
+  "properties": {
+    "info": {
+      "$id": "#/properties/info",
+      "default": {},
+      "title": "Info object",
+      "type": "object",
+      "properties": {
+        "url_png_icon_64x64": {
+          "$id": "#/properties/info/properties/url_png_icon_64x64",
+          "type": "string",
+          "title": "PNG image with exact 64x64 pixel size"
+        },
+        "url_png_logo": {
+          "$id": "#/properties/info/properties/url_png_logo",
+          "type": "string",
+          "title": "Pool Logo in PNG file format"
+        },
+        "location": {
+          "$id": "#/properties/info/properties/location",
+          "type": "string",
+          "title": "Stake Pool location"
+        },
+        "social": {
+          "$id": "#/properties/info/properties/social",
+          "title": "Pool social data",
+          "type": "object",
+          "properties": {
+            "twitter_handle": {
+              "$id": "#/properties/info/properties/social/properties/twitter_handle",
+              "title": "twitter account",
+              "type": "string"
+            },
+            "telegram_handle": {
+              "$id": "#/properties/info/properties/social/properties/telegram_handle",
+              "title": "telegram account",
+              "type": "string"
+            },
+            "facebook_handle": {
+              "$id": "#/properties/info/properties/social/properties/facebook_handle",
+              "title": "facebook account",
+              "type": "string"
+            },
+            "youtube_handle": {
+              "$id": "#/properties/info/properties/social/properties/youtube_handle",
+              "title": "youtube account",
+              "type": "string"
+            },
+            "twitch_handle": {
+              "$id": "#/properties/info/properties/social/properties/twitch_handle",
+              "title": "twitch account",
+              "type": "string"
+            },
+            "discord_handle": {
+              "$id": "#/properties/info/properties/social/properties/discord_handle",
+              "title": "discord account",
+              "type": "string"
+            },
+            "github_handle": {
+              "$id": "#/properties/info/properties/social/properties/github_handle",
+              "title": "github account",
+              "type": "string"
+            }
+          }
+        },
+        "company": {
+          "$id": "#/properties/info/properties/company",
+          "type": "object",
+          "title": "Company information",
+          "properties": {
+            "name": {
+              "$id": "#/properties/info/properties/company/properties/name",
+              "type": "string",
+              "title": "The company name"
+            },
+            "addr": {
+              "$id": "#/properties/info/properties/company/properties/addr",
+              "type": "string",
+              "title": "The company address"
+            },
+            "city": {
+              "$id": "#/properties/info/properties/company/properties/city",
+              "type": "string",
+              "title": "The company city"
+            },
+            "country": {
+              "$id": "#/properties/info/properties/company/properties/country",
+              "type": "string",
+              "title": "The company country"
+            },
+            "company_id": {
+              "$id": "#/properties/info/properties/company/properties/company_id",
+              "type": "string",
+              "title": "The company ID"
+            },
+            "vat_id": {
+              "$id": "#/properties/info/properties/company/properties/vat_id",
+              "type": "string",
+              "title": "The company VAT ID"
+            }
+          }
+        },
+        "about": {
+          "$id": "#/properties/info/properties/about",
+          "type": "object",
+          "title": "Stake pool about information",
+          "description": "A proof of ownership for an established ITN pool brand.",
+          "properties": {
+            "me": {
+              "$id": "#/properties/info/properties/about/properties/me",
+              "type": "string",
+              "title": "Stake pool about info"
+            },
+            "server": {
+              "$id": "#/properties/info/properties/about/properties/server",
+              "type": "string",
+              "title": "Stake pool server about information"
+            },
+            "company": {
+              "$id": "#/properties/info/properties/about/properties/company",
+              "type": "string",
+              "title": "Stake pool company about info"
+            }
+          }
+        }
+      }
+    }
+  }
+}

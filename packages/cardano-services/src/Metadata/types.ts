@@ -1,6 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
 
-export interface MetadataService {
+export interface TxMetadataService {
   queryTxMetadataByHashes(hashes: Cardano.TransactionId[]): Promise<Map<Cardano.TransactionId, Cardano.TxMetadata>>;
 }
 

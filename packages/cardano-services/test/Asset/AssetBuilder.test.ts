@@ -1,7 +1,7 @@
 import { AssetBuilder } from '../../src/Asset';
 import { Cardano } from '@cardano-sdk/core';
 import { Pool } from 'pg';
-import { dummyLogger } from 'ts-log';
+import { logger } from '@cardano-sdk/util-dev';
 
 const notValidAssetName = Cardano.AssetName('89abcdef');
 const notValidPolicyId = Cardano.PolicyId('0123456789abcdef0123456789abcdef0123456789abcdef01234567');
@@ -14,7 +14,7 @@ describe('AssetBuilder', () => {
 
   beforeAll(async () => {
     db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
-    builder = new AssetBuilder(db, dummyLogger);
+    builder = new AssetBuilder(db, logger);
   });
 
   afterAll(async () => {

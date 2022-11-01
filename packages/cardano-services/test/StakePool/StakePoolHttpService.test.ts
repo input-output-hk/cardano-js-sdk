@@ -12,7 +12,13 @@ import {
 } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, stakePoolHttpProvider } from '../../../cardano-services-client';
 import { DbSyncEpochPollService } from '../../src/util';
-import { DbSyncStakePoolProvider, HttpServer, HttpServerConfig, StakePoolHttpService } from '../../src';
+import {
+  DbSyncStakePoolProvider,
+  HttpServer,
+  HttpServerConfig,
+  StakePoolHttpService,
+  createHttpStakePoolExtMetadataService
+} from '../../src';
 import { INFO, createLogger } from 'bunyan';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../src/InMemoryCache';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
@@ -118,7 +124,7 @@ describe('StakePoolHttpService', () => {
       ) as unknown as OgmiosCardanoNode;
       stakePoolProvider = new DbSyncStakePoolProvider(
         { paginationPageSizeLimit: pagination.limit },
-        { cache, cardanoNode, db, epochMonitor, logger }
+        { cache, cardanoNode, db, epochMonitor, logger, metadataService: createHttpStakePoolExtMetadataService(logger) }
       );
       service = new StakePoolHttpService({ logger, stakePoolProvider });
       httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });

@@ -23,7 +23,7 @@ import { createHealthyMockOgmiosServer, ogmiosServerReady } from '../../util';
 import { createMockOgmiosServer } from '../../../../ogmios/test/mocks/mockOgmiosServer';
 import { getPort, getRandomPort } from 'get-port-please';
 import { healthCheckResponseMock } from '../../../../core/test/CardanoNode/mocks';
-import { dummyLogger as logger } from 'ts-log';
+import { logger } from '@cardano-sdk/util-dev';
 import { types } from 'util';
 import axios from 'axios';
 import http from 'http';

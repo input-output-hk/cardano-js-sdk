@@ -17,6 +17,7 @@ import { Logger } from 'ts-log';
 import { Pool } from 'pg';
 import { RunnableModule, isNotNil } from '@cardano-sdk/util';
 import { StakePoolBuilder } from './StakePoolBuilder';
+import { StakePoolExtMetadataService } from '../types';
 import { toStakePoolResults } from './mappers';
 
 export interface StakePoolProviderProps {
@@ -28,6 +29,7 @@ export interface StakePoolProviderDependencies {
   cache: InMemoryCache;
   epochMonitor: EpochMonitor;
   cardanoNode: CardanoNode;
+  metadataService: StakePoolExtMetadataService;
 }
 export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) implements StakePoolProvider {
   #builder: StakePoolBuilder;
@@ -36,10 +38,11 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
   #epochMonitor: EpochMonitor;
   #epochRolloverDisposer: Disposer;
   #paginationPageSizeLimit: number;
+  #metadataService: StakePoolExtMetadataService;
 
   constructor(
     { paginationPageSizeLimit }: StakePoolProviderProps,
-    { db, cardanoNode, cache, logger, epochMonitor }: StakePoolProviderDependencies
+    { db, cardanoNode, metadataService, cache, logger, epochMonitor }: StakePoolProviderDependencies
   ) {
     super(db, cardanoNode, 'DbSyncStakePoolProvider', logger);
     this.#logger = logger;
@@ -47,6 +50,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
     this.#epochMonitor = epochMonitor;
     this.#builder = new StakePoolBuilder(db, logger);
     this.#paginationPageSizeLimit = paginationPageSizeLimit;
+    this.#metadataService = metadataService;
   }
 
   private getQueryBySortType(
@@ -67,6 +71,25 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
         return (options?: QueryStakePoolsArgs) => this.#builder.queryPoolData(updatesIds, options);
     }
   }
+
+  private async attachExtendedMetadata(poolData: PoolData[]): Promise<void> {
+    for (const pool of poolData) {
+      if (pool.metadata?.extDataUrl || pool.metadata?.extended) {
+        try {
+          pool.metadata.ext = await this.#metadataService.getStakePoolExtendedMetadata(pool.metadata);
+        } catch (error) {
+          if (error instanceof ProviderError && error.reason === ProviderFailure.ConnectionFailure) {
+            pool.metadata.ext = undefined;
+          } else if (error instanceof ProviderError && error.reason === ProviderFailure.NotFound) {
+            pool.metadata.ext = null;
+          } else {
+            throw error;
+          }
+        }
+      }
+    }
+  }
+
   private async getPoolsDataOrdered(poolUpdates: PoolUpdate[], totalAdaAmount: string, options?: QueryStakePoolsArgs) {
     const hashesIds = poolUpdates.map(({ id }) => id);
     const updatesIds = poolUpdates.map(({ updateId }) => updateId);
@@ -97,12 +120,16 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
     } else {
       poolDatas = orderedResult as PoolData[];
     }
+
+    await this.attachExtendedMetadata(poolDatas);
     return { hashesIds, orderedResult, orderedResultHashIds, orderedResultUpdateIds, poolDatas, sortType };
   }
+
   private cacheStakePools(itemsToCache: { [hashId: number]: Cardano.StakePool }) {
     for (const [hashId, pool] of Object.entries(itemsToCache))
       this.#cache.set(`${IDS_NAMESPACE}/${hashId}`, pool, UNLIMITED_CACHE_TTL);
   }
+
   private async queryExtraPoolsData(
     idsToFetch: PoolUpdate[],
     sortType: PoolSortType,
@@ -223,6 +250,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
     this.cacheStakePools(poolsToCache);
     return results;
   }
+
   public async stakePoolStats(): Promise<StakePoolStats> {
     this.#logger.debug('About to query pool stats');
     return await this.#cache.get(queryCacheKey(StakePoolsSubQuery.STATS), () => this.#builder.queryPoolStats());

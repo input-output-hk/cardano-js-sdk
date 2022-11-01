@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { dummyLogger } from 'ts-log';
+import { logger } from '@cardano-sdk/util-dev';
 import { providerHandler } from '../../src/util';
 
 describe('util/provider', () => {
@@ -15,7 +15,7 @@ describe('util/provider', () => {
       const req = { body };
       const res = { send: jest.fn(), status: jest.fn() };
       const next = {} as any;
-      providerHandler(fn)(handler, dummyLogger)(req as any, res as any, next);
+      providerHandler(fn)(handler, logger)(req as any, res as any, next);
       expect(handler).toBeCalledTimes(1);
       expect(handler).toBeCalledWith(body, req, res, next, fn);
       expect(res.send).not.toBeCalled();
@@ -30,7 +30,7 @@ describe('util/provider', () => {
         status: jest.fn().mockImplementation(() => res)
       };
       const next = {} as any;
-      providerHandler(jest.fn())(handler, dummyLogger)(req as any, res as any, next);
+      providerHandler(jest.fn())(handler, logger)(req as any, res as any, next);
       expect(handler).not.toBeCalled();
       expect(res.status).toBeCalledTimes(1);
       expect(res.status).toBeCalledWith(400);

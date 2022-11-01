@@ -1,7 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { ChainHistoryBuilder } from '../../../src';
 import { Pool } from 'pg';
-import { dummyLogger as logger } from 'ts-log';
+import { logger } from '@cardano-sdk/util-dev';
 
 describe('ChainHistoryBuilder', () => {
   let dbConnection: Pool;

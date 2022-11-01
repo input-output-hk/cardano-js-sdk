@@ -21,11 +21,10 @@ import { Ogmios } from '@cardano-sdk/ogmios';
 import { RabbitMQContainer } from '../../TxSubmit/rabbitmq/docker';
 import { SrvRecord } from 'dns';
 import { bufferToHexString } from '@cardano-sdk/util';
-import { createLogger } from 'bunyan';
 import { createMockOgmiosServer } from '../../../../ogmios/test/mocks/mockOgmiosServer';
-import { dummyLogger } from 'ts-log';
 import { getPort, getRandomPort } from 'get-port-please';
 import { listenPromise, serverClosePromise } from '../../../src/util';
+import { logger } from '@cardano-sdk/util-dev';
 import { ogmiosServerReady } from '../../util';
 import { txsPromise } from '../../TxSubmit/rabbitmq/utils';
 import { types } from 'util';
@@ -53,7 +52,6 @@ describe('Program/services/rabbitmq', () => {
   describe('http-server', () => {
     const APPLICATION_JSON = 'application/json';
     const container = new RabbitMQContainer();
-    const logger = dummyLogger;
     const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
 
     beforeAll(async () => ({ rabbitmqPort, rabbitmqUrl } = await container.load()));
@@ -216,8 +214,6 @@ describe('Program/services/rabbitmq', () => {
   });
 
   describe('tx-worker', () => {
-    const logger = createLogger({ level: 'error', name: 'test' });
-
     beforeAll(async () => {
       const container = new RabbitMQContainer();
 

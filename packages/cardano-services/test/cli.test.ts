@@ -1275,15 +1275,17 @@ describe('CLI', () => {
           describe('specifying a Token-Registry-dependent service', () => {
             let closeMock: () => Promise<void> = jest.fn();
             let tokenMetadataServerUrl = '';
+            let serverUrl = ';';
             const record = {
               name: { value: 'test' },
               subject: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65'
             };
 
             beforeAll(async () => {
-              ({ closeMock, tokenMetadataServerUrl } = await mockTokenRegistry(() => ({
+              ({ closeMock, serverUrl } = await mockTokenRegistry(() => ({
                 body: { subjects: [record] }
               })));
+              tokenMetadataServerUrl = serverUrl;
             });
 
             afterAll(async () => await closeMock());

@@ -112,14 +112,14 @@ export class CardanoTokenRegistry implements TokenMetadataService {
   }
 
   async getTokenMetadata(assetIds: Cardano.AssetId[]) {
-    this.#logger.debug(`Requested asset metatada for "${assetIds}"`);
+    this.#logger.debug(`Requested asset metadata for "${assetIds}"`);
 
     const [assetIdsToRequest, tokenMetadata] = this.getTokenMetadataFromCache(assetIds);
 
     // All metadata was taken from cache
     if (assetIdsToRequest.length === 0) return tokenMetadata;
 
-    this.#logger.debug(`Fetching asset metatada for "${assetIdsToRequest}"`);
+    this.#logger.debug(`Fetching asset metadata for "${assetIdsToRequest}"`);
 
     try {
       const response = await this.#axiosClient.post<{ subjects: TokenMetadataServiceRecord[] }>('metadata/query', {
@@ -144,7 +144,7 @@ export class CardanoTokenRegistry implements TokenMetadataService {
               `Missing 'subject' property in metadata record ${JSON.stringify(record)}`
             );
         } catch (error) {
-          throw toProviderError(error, `while evaluating metatada record ${JSON.stringify(record)}`);
+          throw toProviderError(error, `while evaluating metadata record ${JSON.stringify(record)}`);
         }
       }
     } catch (error) {
@@ -152,7 +152,7 @@ export class CardanoTokenRegistry implements TokenMetadataService {
         throw new ProviderError(
           ProviderFailure.ConnectionFailure,
           error,
-          'CardanoTokenRegistry failed to fetch asset metatada from the token registry server'
+          'CardanoTokenRegistry failed to fetch asset metadata from the token registry server'
         );
       }
 
@@ -173,7 +173,7 @@ export class CardanoTokenRegistry implements TokenMetadataService {
       const cachedMetadata = this.#cache.getVal<Asset.TokenMetadata>(stringAssetId);
 
       if (cachedMetadata) {
-        this.#logger.debug(`Using cached asset metatada value for "${stringAssetId}"`);
+        this.#logger.debug(`Using cached asset metadata value for "${stringAssetId}"`);
         cachedTokenMetadata[i] = cachedMetadata;
       } else assetIdsToRequest.push(assetId);
     }
