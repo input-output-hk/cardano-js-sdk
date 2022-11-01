@@ -5,7 +5,7 @@ import { TestWallet, getWallet } from '../../../src';
 import { assertTxIsValid, waitForWalletStateSettle } from '../../../../wallet/test/util';
 import { filter, firstValueFrom } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
-import { requestCoins, runningAgainstLocalNetwork, submitAndConfirm, transferCoins, waitForEpoch } from '../util';
+import { requestCoins, runningAgainstLocalNetwork, submitAndConfirm, transferCoins, waitForEpoch } from '../../util';
 
 // Verify environment.
 export const env = envalid.cleanEnv(process.env, {

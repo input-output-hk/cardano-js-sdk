@@ -7,7 +7,7 @@ import WebSocket from 'ws';
 import axios from 'axios';
 import path from 'path';
 
-import { env, getEnv } from '../wallet/environment';
+import { env, getEnv } from '../environment';
 import { networkInfoProviderFactory } from '../../src';
 
 const cardanoNodeConfigPath = path.join(

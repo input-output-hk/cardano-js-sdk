@@ -2,9 +2,9 @@
 import { Awaited, BigIntMath } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
 import { ObservableWallet, StakeKeyStatus, buildTx } from '@cardano-sdk/wallet';
-import { TX_TIMEOUT, firstValueFromTimed, waitForWalletStateSettle, walletReady } from '../util';
+import { TX_TIMEOUT, firstValueFromTimed, waitForWalletStateSettle, walletReady } from '../../util';
 import { assertTxIsValid } from '../../../../wallet/test/util';
-import { env } from '../environment';
+import { env } from '../../environment';
 import { getWallet } from '../../../src/factories';
 import { logger } from '@cardano-sdk/util-dev';
 
