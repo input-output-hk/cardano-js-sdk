@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AuthenticationError, TransportError } from './errors';
-import { Cardano, NotImplementedError, coreToCsl } from '@cardano-sdk/core';
+import { Cardano, NotImplementedError, coreToCml } from '@cardano-sdk/core';
 import {
   CardanoKeyConst,
   CommunicationType,
@@ -139,7 +139,7 @@ export class TrezorKeyAgent extends KeyAgentBase {
     const scope = new ManagedFreeableScope();
     try {
       await this.isTrezorInitialized;
-      const cslTxBody = coreToCsl.txBody(scope, body);
+      const cslTxBody = coreToCml.txBody(scope, body);
       const trezorTxData = await txToTrezor({
         accountIndex: this.accountIndex,
         cslTxBody,

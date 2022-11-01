@@ -13,7 +13,7 @@ import {
   TxSignErrorCode,
   WalletApi
 } from '@cardano-sdk/dapp-connector';
-import { CSL, Cardano, coreToCsl, cslToCore } from '@cardano-sdk/core';
+import { CML, Cardano, cmlToCore, coreToCml } from '@cardano-sdk/core';
 import { InputSelectionError } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
 import { ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
@@ -62,7 +62,7 @@ const mapCallbackFailure = (err: unknown, logger: Logger) => {
   return false;
 };
 
-const MAX_COLLATERAL_AMOUNT = CSL.BigNum.from_str('5000000');
+const MAX_COLLATERAL_AMOUNT = CML.BigNum.from_str('5000000');
 
 const cslToCbor = (csl: CslInterface) => Buffer.from(csl.to_bytes()).toString('hex');
 
@@ -84,7 +84,7 @@ export const createWalletApi = (
     try {
       const wallet = await walletReady;
       const value = await firstValueFrom(wallet.balance.utxo.available$);
-      return Buffer.from(usingAutoFree((scope) => coreToCsl.value(scope, value).to_bytes())).toString('hex');
+      return Buffer.from(usingAutoFree((scope) => coreToCml.value(scope, value).to_bytes())).toString('hex');
     } catch (error) {
       logger.error(error);
       throw error;
@@ -125,16 +125,16 @@ export const createWalletApi = (
     }
     if (amount) {
       try {
-        const filterAmount = scope.manage(CSL.BigNum.from_bytes(Buffer.from(amount, 'hex')));
+        const filterAmount = scope.manage(CML.BigNum.from_bytes(Buffer.from(amount, 'hex')));
         if (filterAmount.compare(MAX_COLLATERAL_AMOUNT) > 0) {
           scope.dispose();
           throw new ApiError(APIErrorCode.InvalidRequest, 'requested amount is too big');
         }
 
         const utxos = [];
-        let totalCoins = scope.manage(CSL.BigNum.from_str('0'));
+        let totalCoins = scope.manage(CML.BigNum.from_str('0'));
         for (const utxo of unspendables) {
-          const coin = scope.manage(CSL.BigNum.from_str(utxo[1].value.coins.toString()));
+          const coin = scope.manage(CML.BigNum.from_str(utxo[1].value.coins.toString()));
           totalCoins = totalCoins.checked_add(coin);
           utxos.push(utxo);
           if (totalCoins.compare(filterAmount) !== -1) break;
@@ -153,7 +153,7 @@ export const createWalletApi = (
         throw new ApiError(APIErrorCode.InternalError, 'Nope');
       }
     }
-    const cbor = coreToCsl.utxo(scope, unspendables).map(cslToCbor);
+    const cbor = coreToCml.utxo(scope, unspendables).map(cslToCbor);
     scope.dispose();
     return cbor;
   },
@@ -204,7 +204,7 @@ export const createWalletApi = (
     let utxos = await firstValueFrom(wallet.utxo.available$);
     if (amount) {
       try {
-        const filterAmount = scope.manage(CSL.Value.from_bytes(Buffer.from(amount, 'hex')));
+        const filterAmount = scope.manage(CML.Value.from_bytes(Buffer.from(amount, 'hex')));
         /**
          * Getting UTxOs to meet a required amount is a complex operation,
          * which is handled by input selection capabilities. By initializing
@@ -214,7 +214,7 @@ export const createWalletApi = (
          */
         const addresses = await firstValueFrom(wallet.addresses$);
         const { inputSelection } = await wallet.initializeTx({
-          outputs: new Set([{ address: addresses[0].address, value: cslToCore.value(filterAmount) }])
+          outputs: new Set([{ address: addresses[0].address, value: cmlToCore.value(filterAmount) }])
         });
 
         utxos = [...inputSelection.inputs];
@@ -228,7 +228,7 @@ export const createWalletApi = (
     } else if (paginate) {
       utxos = utxos.slice(paginate.page * paginate.limit, paginate.page * paginate.limit + paginate.limit);
     }
-    const cbor = coreToCsl.utxo(scope, utxos).map(cslToCbor);
+    const cbor = coreToCml.utxo(scope, utxos).map(cslToCbor);
     scope.dispose();
     return cbor;
   },
@@ -257,11 +257,11 @@ export const createWalletApi = (
   signTx: async (tx: Cbor, _partialSign?: Boolean): Promise<Cbor> => {
     const scope = new ManagedFreeableScope();
     logger.debug('signTx');
-    const txDecoded = scope.manage(CSL.TransactionBody.from_bytes(Buffer.from(tx, 'hex')));
+    const txDecoded = scope.manage(CML.TransactionBody.from_bytes(Buffer.from(tx, 'hex')));
     const hash = Cardano.TransactionId(
-      Buffer.from(scope.manage(CSL.hash_transaction(txDecoded)).to_bytes()).toString('hex')
+      Buffer.from(scope.manage(CML.hash_transaction(txDecoded)).to_bytes()).toString('hex')
     );
-    const coreTx = cslToCore.txBody(txDecoded);
+    const coreTx = cmlToCore.txBody(txDecoded);
     const shouldProceed = await confirmationCallback({
       data: coreTx,
       type: Cip30ConfirmationCallbackType.SignTx
@@ -273,7 +273,7 @@ export const createWalletApi = (
           witness: { signatures }
         } = await wallet.finalizeTx({ tx: { body: coreTx, hash } });
 
-        const cslWitnessSet = scope.manage(coreToCsl.witnessSet(scope, { signatures }));
+        const cslWitnessSet = scope.manage(coreToCml.witnessSet(scope, { signatures }));
         const cbor = Buffer.from(cslWitnessSet.to_bytes()).toString('hex');
         return Promise.resolve(cbor);
       } catch (error) {
@@ -292,7 +292,7 @@ export const createWalletApi = (
   submitTx: async (tx: Cbor): Promise<string> => {
     logger.debug('submitting tx');
     const txData: Cardano.NewTxAlonzo = usingAutoFree((scope) =>
-      cslToCore.newTx(scope.manage(CSL.Transaction.from_bytes(Buffer.from(tx, 'hex'))))
+      cmlToCore.newTx(scope.manage(CML.Transaction.from_bytes(Buffer.from(tx, 'hex'))))
     );
     const shouldProceed = await confirmationCallback({
       data: txData,

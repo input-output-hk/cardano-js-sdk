@@ -52,8 +52,8 @@ module.exports = {
             'process.env': JSON.stringify(process.env)
         }),
         new NormalModuleReplacementPlugin(
-            /@emurgo\/cardano-serialization-lib-nodejs/,
-            '@emurgo/cardano-serialization-lib-asmjs'
+            /@dcspark\/cardano-multiplatform-lib-nodejs/,
+            '@dcspark/cardano-multiplatform-lib-asmjs'
         ),
         new NormalModuleReplacementPlugin(/blake2b$/, 'blake2b-no-wasm'),
         new NormalModuleReplacementPlugin(

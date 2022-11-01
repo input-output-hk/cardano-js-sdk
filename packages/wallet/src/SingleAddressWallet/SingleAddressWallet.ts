@@ -19,7 +19,7 @@ import {
   StakePoolProvider,
   TxSubmitProvider,
   UtxoProvider,
-  coreToCsl
+  coreToCml
 } from '@cardano-sdk/core';
 import {
   Assets,
@@ -452,7 +452,7 @@ export class SingleAddressWallet implements ObservableWallet {
     this.#newTransactions.submitting$.next(tx);
     try {
       await this.txSubmitProvider.submitTx({
-        signedTransaction: bufferToHexString(Buffer.from(usingAutoFree((scope) => coreToCsl.tx(scope, tx).to_bytes())))
+        signedTransaction: bufferToHexString(Buffer.from(usingAutoFree((scope) => coreToCml.tx(scope, tx).to_bytes())))
       });
       const { slot: submittedAt } = await firstValueFrom(this.tip$);
       this.#logger.debug(`Submitted transaction ${tx.id} at slot ${submittedAt}`);

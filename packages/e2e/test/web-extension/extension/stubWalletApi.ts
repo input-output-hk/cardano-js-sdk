@@ -1,9 +1,9 @@
-import { Cardano, coreToCsl } from '@cardano-sdk/core';
+import { Cardano, coreToCml } from '@cardano-sdk/core';
 import { Cip30DataSignature, WalletApi } from '@cardano-sdk/dapp-connector';
 import { usingAutoFree } from '@cardano-sdk/util';
 
 const mapUtxos = (utxos: Cardano.Utxo[]) =>
-  usingAutoFree((scope) => coreToCsl.utxo(scope, utxos).map((utxo) => Buffer.from(utxo.to_bytes()).toString('hex')));
+  usingAutoFree((scope) => coreToCml.utxo(scope, utxos).map((utxo) => Buffer.from(utxo.to_bytes()).toString('hex')));
 
 export const stubWalletApi: WalletApi = {
   getBalance: async () => '100',

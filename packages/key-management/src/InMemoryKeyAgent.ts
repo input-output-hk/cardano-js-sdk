@@ -10,7 +10,7 @@ import {
   SignBlobResult,
   SignTransactionOptions
 } from './types';
-import { CSL, Cardano, util } from '@cardano-sdk/core';
+import { CML, Cardano, util } from '@cardano-sdk/core';
 import { KeyAgentBase } from './KeyAgentBase';
 import {
   deriveAccountPrivateKey,
@@ -64,7 +64,7 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
   }
 
   // To export mnemonic, get entropy by reversing this:
-  // rootPrivateKey = CSL.Bip32PrivateKey.from_bip39_entropy(entropy, EMPTY_PASSWORD);
+  // rootPrivateKey = CML.Bip32PrivateKey.from_bip39_entropy(entropy, EMPTY_PASSWORD);
   // eslint-disable-next-line max-len
   // https://github.com/Emurgo/cardano-serialization-lib/blob/f817a033ade7a2255591d7c6444fa4f9ffbcf061/rust/src/chain_crypto/derive.rs#L30-L38
   async exportRootPrivateKey(): Promise<Cardano.Bip32PrivateKey> {
@@ -89,7 +89,7 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
     const validMnemonic = validateMnemonic(mnemonic);
     if (!validMnemonic) throw new errors.InvalidMnemonicError();
     const entropy = Buffer.from(mnemonicWordsToEntropy(mnemonicWords), 'hex');
-    const rootPrivateKey = CSL.Bip32PrivateKey.from_bip39_entropy(entropy, mnemonic2ndFactorPassphrase);
+    const rootPrivateKey = CML.Bip32PrivateKey.from_bip39_entropy(entropy, mnemonic2ndFactorPassphrase);
     const password = await getPasswordRethrowTypedError(getPassword);
     const encryptedRootPrivateKey = await emip3encrypt(rootPrivateKey.as_bytes(), password);
     const accountPrivateKey = deriveAccountPrivateKey({
@@ -139,7 +139,7 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
    */
   async exportExtendedKeyPair(derivationPath: number[]): Promise<KeyPair> {
     const rootPrivateKey = await this.exportRootPrivateKey();
-    const cslRootPrivateKey = CSL.Bip32PrivateKey.from_bytes(Buffer.from(rootPrivateKey, 'hex'));
+    const cslRootPrivateKey = CML.Bip32PrivateKey.from_bytes(Buffer.from(rootPrivateKey, 'hex'));
     let cslPrivateKey = cslRootPrivateKey;
     for (const val of derivationPath) {
       cslPrivateKey = cslPrivateKey.derive(harden(val));
@@ -161,6 +161,6 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
     } catch (error) {
       throw new errors.AuthenticationError('Failed to decrypt root private key', error);
     }
-    return CSL.Bip32PrivateKey.from_bytes(decryptedRootKeyBytes);
+    return CML.Bip32PrivateKey.from_bytes(decryptedRootKeyBytes);
   }
 }

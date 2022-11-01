@@ -1,5 +1,5 @@
 import { NativeScript, PolicyId } from '../Cardano';
-import { nativeScript } from '../CSL/coreToCsl';
+import { nativeScript } from '../CML/coreToCml';
 import { usingAutoFree } from '@cardano-sdk/util';
 
 /**

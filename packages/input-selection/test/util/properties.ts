@@ -1,5 +1,5 @@
 import * as SelectionConstraints from './selectionConstraints';
-import { Asset, Cardano, coalesceValueQuantities, cslUtil } from '@cardano-sdk/core';
+import { Asset, Cardano, cmlUtil, coalesceValueQuantities } from '@cardano-sdk/core';
 import { AssetId } from '@cardano-sdk/util-dev';
 import { ImplicitValue, SelectionResult } from '../../src/types';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
@@ -172,8 +172,8 @@ export const generateSelectionParams = (() => {
     fc
       .array(
         fc.record<Cardano.Value>({
-          assets: fc.oneof(generateTokenMap(1n, cslUtil.MAX_U64), fc.constant(void 0)),
-          coins: fc.bigInt(1n, cslUtil.MAX_U64 - implicitCoin)
+          assets: fc.oneof(generateTokenMap(1n, cmlUtil.MAX_U64), fc.constant(void 0)),
+          coins: fc.bigInt(1n, cmlUtil.MAX_U64 - implicitCoin)
         }),
         { maxLength: 11 }
       )
@@ -181,8 +181,8 @@ export const generateSelectionParams = (() => {
         // sum of coin or any asset can't exceed MAX_U64
         const { coins, assets } = coalesceValueQuantities(values);
         return (
-          coins + implicitCoin <= cslUtil.MAX_U64 &&
-          (!assets || [...assets.values()].every((quantity) => quantity <= cslUtil.MAX_U64))
+          coins + implicitCoin <= cmlUtil.MAX_U64 &&
+          (!assets || [...assets.values()].every((quantity) => quantity <= cmlUtil.MAX_U64))
         );
       });
 
@@ -212,7 +212,7 @@ export const generateSelectionParams = (() => {
     fc.constant(void 0),
     fc.record<ImplicitValue>({
       coin: fc.oneof(fc.constant(void 0), generateImplicitCoin),
-      mint: fc.oneof(fc.constant(void 0), generateTokenMap(cslUtil.MIN_I64, cslUtil.MAX_I64))
+      mint: fc.oneof(fc.constant(void 0), generateTokenMap(cmlUtil.MIN_I64, cmlUtil.MAX_I64))
     })
   );
 
