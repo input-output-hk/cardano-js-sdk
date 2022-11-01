@@ -13,7 +13,6 @@ import {
   ChainHistoryProvider,
   EpochInfo,
   EraSummary,
-  ProtocolParametersRequiredByWallet,
   ProviderError,
   RewardsProvider,
   StakePoolProvider,
@@ -159,7 +158,7 @@ export class SingleAddressWallet implements ObservableWallet {
   readonly tip$: BehaviorObservable<Cardano.Tip>;
   readonly eraSummaries$: TrackerSubject<EraSummary[]>;
   readonly addresses$: TrackerSubject<GroupedAddress[]>;
-  readonly protocolParameters$: TrackerSubject<ProtocolParametersRequiredByWallet>;
+  readonly protocolParameters$: TrackerSubject<Cardano.ProtocolParameters>;
   readonly genesisParameters$: TrackerSubject<Cardano.CompactGenesis>;
   readonly assets$: TrackerSubject<Assets>;
   readonly syncStatus: SyncStatus;
@@ -301,7 +300,7 @@ export class SingleAddressWallet implements ObservableWallet {
       coldObservableProvider({
         cancel$,
         equals: isEqual,
-        provider: this.networkInfoProvider.currentWalletProtocolParameters,
+        provider: this.networkInfoProvider.protocolParameters,
         retryBackoffConfig,
         trigger$: epoch$
       }),

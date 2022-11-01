@@ -1,5 +1,5 @@
 import { Assets } from '../../types';
-import { Cardano, EpochRewards, EraSummary, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
+import { Cardano, EpochRewards, EraSummary } from '@cardano-sdk/core';
 import { ConfirmedTx, TxInFlight } from '../../services';
 import { EMPTY, combineLatest, map } from 'rxjs';
 import { GroupedAddress } from '@cardano-sdk/key-management';
@@ -9,7 +9,7 @@ import { InMemoryKeyValueStore } from './InMemoryKeyValueStore';
 import { WalletStores } from '../types';
 
 export class InMemoryTipStore extends InMemoryDocumentStore<Cardano.Tip> {}
-export class InMemoryProtocolParametersStore extends InMemoryDocumentStore<ProtocolParametersRequiredByWallet> {}
+export class InMemoryProtocolParametersStore extends InMemoryDocumentStore<Cardano.ProtocolParameters> {}
 export class InMemoryGenesisParametersStore extends InMemoryDocumentStore<Cardano.CompactGenesis> {}
 export class InMemoryEraSummariesStore extends InMemoryDocumentStore<EraSummary[]> {}
 

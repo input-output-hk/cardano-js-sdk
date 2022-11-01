@@ -51,7 +51,7 @@ const getDefaultProviderSyncRelevantStats = ({
 }: ProviderStatusTrackerDependencies): Observable<ProviderFnStats[]> =>
   combineLatest([
     networkInfoProvider.stats.ledgerTip$,
-    networkInfoProvider.stats.currentWalletProtocolParameters$,
+    networkInfoProvider.stats.protocolParameters$,
     networkInfoProvider.stats.genesisParameters$,
     networkInfoProvider.stats.eraSummaries$,
     assetProvider.stats.getAsset$,

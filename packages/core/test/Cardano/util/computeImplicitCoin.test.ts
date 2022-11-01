@@ -1,8 +1,8 @@
-import { Cardano, ProtocolParametersRequiredByWallet } from '../../../src';
+import { Cardano } from '../../../src';
 
 describe('Cardano.util.computeImplicitCoin', () => {
   it('sums registrations for deposit, withdrawals and deregistrations for input', async () => {
-    const protocolParameters = { poolDeposit: 3, stakeKeyDeposit: 2 } as ProtocolParametersRequiredByWallet;
+    const protocolParameters = { poolDeposit: 3, stakeKeyDeposit: 2 } as Cardano.ProtocolParameters;
     const rewardAccount = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
     const stakeKeyHash = Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccount);
     const certificates: Cardano.Certificate[] = [

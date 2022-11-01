@@ -1,5 +1,5 @@
 import { Assets } from '../../types';
-import { Cardano, EpochRewards, EraSummary, ProtocolParametersRequiredByWallet } from '@cardano-sdk/core';
+import { Cardano, EpochRewards, EraSummary } from '@cardano-sdk/core';
 import { ConfirmedTx, TxInFlight } from '../../services';
 import { CreatePouchDbStoresDependencies } from './types';
 import { EMPTY, combineLatest, map } from 'rxjs';
@@ -10,7 +10,7 @@ import { PouchDbKeyValueStore } from './PouchDbKeyValueStore';
 import { WalletStores } from '../types';
 
 export class PouchDbTipStore extends PouchDbDocumentStore<Cardano.Tip> {}
-export class PouchDbProtocolParametersStore extends PouchDbDocumentStore<ProtocolParametersRequiredByWallet> {}
+export class PouchDbProtocolParametersStore extends PouchDbDocumentStore<Cardano.ProtocolParameters> {}
 export class PouchDbGenesisParametersStore extends PouchDbDocumentStore<Cardano.CompactGenesis> {}
 export class PouchDbEraSummariesStore extends PouchDbDocumentStore<EraSummary[]> {}
 

@@ -55,9 +55,9 @@ describe('NetworkInfoBuilder', () => {
     });
   });
 
-  describe('queryCurrentWalletProtocolParams', () => {
+  describe('queryProtocolParams', () => {
     test('query wallet protocol params from current epoch', async () => {
-      const result = await builder.queryCurrentWalletProtocolParams();
+      const result = await builder.queryProtocolParams();
       expect(result).toMatchSnapshot();
     });
   });
