@@ -14,7 +14,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - name: 📥 Checkout repository
-      uses: actions/checkout@v2.3.3
+      uses: actions/checkout@v3
       with:
         # Fetch all history for all tags and branches
         fetch-depth: 0
@@ -28,7 +28,7 @@ jobs:
         git push --force
 
     - name: 🧰 Setup Node.js
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v3
       with:
         node-version: 18.12.0
         registry-url: 'https://registry.npmjs.org'
