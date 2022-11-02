@@ -3,7 +3,7 @@
 import { Cardano, QueryStakePoolsArgs } from '@cardano-sdk/core';
 import { PAGINATION_PAGE_SIZE_LIMIT_DEFAULT, StakePoolBuilder } from '../../../src';
 import { Pool } from 'pg';
-import { dummyLogger as logger } from 'ts-log';
+import { logger } from '@cardano-sdk/util-dev';
 
 describe('StakePoolBuilder', () => {
   const dbConnection = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });

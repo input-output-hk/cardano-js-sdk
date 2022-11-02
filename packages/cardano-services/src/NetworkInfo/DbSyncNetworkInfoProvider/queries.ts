@@ -53,7 +53,7 @@ export const findLedgerTip = `
     LIMIT 1;
 `;
 
-export const findCurrentWalletProtocolParams = `
+export const findProtocolParams = `
     SELECT 
     min_fee_a, 
     min_fee_b, 
@@ -80,8 +80,11 @@ export const findCurrentWalletProtocolParams = `
     max_tx_ex_steps,
     max_block_ex_mem,
     max_block_ex_steps,
-    max_epoch
-    FROM public.epoch_param
+    max_epoch,
+    cost_model.costs
+    FROM epoch_param
+    LEFT JOIN cost_model
+        ON cost_model.id = epoch_param.cost_model_id
     ORDER BY epoch_no DESC NULLS LAST
     LIMIT 1;
 `;
@@ -89,9 +92,9 @@ export const findCurrentWalletProtocolParams = `
 const Queries = {
   findActiveStake,
   findCirculatingSupply,
-  findCurrentWalletProtocolParams,
   findLatestCompleteEpoch,
   findLedgerTip,
+  findProtocolParams,
   findTotalSupply
 };
 

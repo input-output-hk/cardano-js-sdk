@@ -3,8 +3,8 @@ import {
   CirculatingSupplyModel,
   EpochModel,
   LedgerTipModel,
-  TotalSupplyModel,
-  WalletProtocolParamsModel
+  ProtocolParamsModel,
+  TotalSupplyModel
 } from './types';
 import { Cardano } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
@@ -49,11 +49,9 @@ export class NetworkInfoBuilder {
     return result.rows[0];
   }
 
-  public async queryCurrentWalletProtocolParams() {
-    this.#logger.debug('About to query current wallet protocol params');
-    const result: QueryResult<WalletProtocolParamsModel> = await this.#db.query(
-      Queries.findCurrentWalletProtocolParams
-    );
+  public async queryProtocolParams() {
+    this.#logger.debug('About to query protocol params');
+    const result: QueryResult<ProtocolParamsModel> = await this.#db.query(Queries.findProtocolParams);
     return result.rows[0];
   }
 }

@@ -13,7 +13,7 @@ import { CommonProgramOptions, ProgramOptionDescriptions } from './Options';
 import { DbSyncEpochPollService } from '../util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../NetworkInfo';
 import { DbSyncRewardsProvider, RewardsHttpService } from '../Rewards';
-import { DbSyncStakePoolProvider, StakePoolHttpService } from '../StakePool';
+import { DbSyncStakePoolProvider, StakePoolHttpService, createHttpStakePoolExtMetadataService } from '../StakePool';
 import { DbSyncUtxoProvider, UtxoHttpService } from '../Utxo';
 import { DnsResolver, createDnsResolver, shouldInitCardanoNode } from './utils';
 import { HttpServer, HttpServerConfig, HttpService } from '../Http';
@@ -126,7 +126,8 @@ const serviceMapFactory = (
           cardanoNode,
           db,
           epochMonitor: getEpochMonitor(db),
-          logger
+          logger,
+          metadataService: createHttpStakePoolExtMetadataService(logger)
         }
       );
       return new StakePoolHttpService({ logger, stakePoolProvider });

@@ -341,9 +341,6 @@
           },
           "extVkey": {
             "type": "string"
-          },
-          "ext": {
-            "$ref": "#/components/schemas/ExtendedMetadataFields"
           }
         }
       },
@@ -368,17 +365,6 @@
           },
           "denominator": {
             "type": "number"
-          }
-        }
-      },
-      "ExtendedMetadataFields": {
-        "type": "object",
-        "properties": {
-          "serial": {
-            "type": "number"
-          },
-          "pool": {
-            "$ref": "#/components/schemas/ExtendedMetadataFields_pool"
           }
         }
       },
@@ -466,93 +452,6 @@
           },
           "url": {
             "type": "string"
-          }
-        }
-      },
-      "ExtendedMetadataFields_pool_contact": {
-        "type": "object",
-        "properties": {
-          "primary": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          },
-          "facebook": {
-            "type": "string"
-          },
-          "github": {
-            "type": "string"
-          },
-          "feed": {
-            "type": "string"
-          },
-          "telegram": {
-            "type": "string"
-          },
-          "twitter": {
-            "type": "string"
-          }
-        }
-      },
-      "ExtendedMetadataFields_pool_media_assets": {
-        "type": "object",
-        "properties": {
-          "icon_png_64x64": {
-            "type": "string"
-          },
-          "logo_png": {
-            "type": "string"
-          },
-          "logo_svg": {
-            "type": "string"
-          },
-          "color_fg": {
-            "type": "string"
-          },
-          "color_bg": {
-            "type": "string"
-          }
-        }
-      },
-      "ExtendedMetadataFields_pool_itn": {
-        "type": "object",
-        "properties": {
-          "owner": {
-            "type": "string"
-          },
-          "witness": {
-            "type": "string"
-          }
-        }
-      },
-      "ExtendedMetadataFields_pool": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "country": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "active",
-              "retired",
-              "offline",
-              "experimental",
-              "private"
-            ]
-          },
-          "contact": {
-            "$ref": "#/components/schemas/ExtendedMetadataFields_pool_contact"
-          },
-          "media_assets": {
-            "$ref": "#/components/schemas/ExtendedMetadataFields_pool_media_assets"
-          },
-          "itn": {
-            "$ref": "#/components/schemas/ExtendedMetadataFields_pool_itn"
           }
         }
       }

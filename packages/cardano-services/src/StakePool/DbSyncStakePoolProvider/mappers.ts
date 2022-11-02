@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Cardano, StakePoolStats } from '@cardano-sdk/core';
 import {
   Epoch,
@@ -165,10 +166,20 @@ export const mapPoolUpdate = (poolUpdateModel: PoolUpdateModel): PoolUpdate => (
   updateId: Number(poolUpdateModel.update_id)
 });
 
-const metadataKeys = new Set(['ticker', 'name', 'description', 'homepage']);
+const metadataKeys = new Set([
+  'ticker',
+  'name',
+  'description',
+  'homepage',
+  'extended',
+  'extDataUrl',
+  'extSigUrl',
+  'extVkey'
+]);
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const isOfflineMetadata = (_object: any): _object is Cardano.StakePoolMetadataFields =>
+const isOfflineMetadata = (
+  _object: any
+): _object is Cardano.StakePoolMainMetadataFields & Cardano.Cip6MetadataFields & Cardano.APMetadataFields =>
   Object.keys(_object).every((k) => metadataKeys.has(k) && typeof _object[k] === 'string');
 
 export const mapPoolData = (poolDataModel: PoolDataModel): PoolData => {

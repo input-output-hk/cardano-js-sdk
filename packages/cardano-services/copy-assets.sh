@@ -11,6 +11,7 @@ cp ./src/Rewards/openApi.json ./dist/cjs/Rewards/openApi.json
 cp ./src/StakePool/openApi.json ./dist/cjs/StakePool/openApi.json
 cp ./src/TxSubmit/openApi.json ./dist/cjs/TxSubmit/openApi.json
 cp ./src/Utxo/openApi.json ./dist/cjs/Utxo/openApi.json
+cp -R ./src/StakePool/HttpStakePoolMetadata/schemas ./dist/cjs/StakePool/HttpStakePoolMetadata/schemas
 
 # TODO: uncomment when ESM builds are enabled for this package
 # cp ./src/StakePool/openApi.json ./dist/esm/StakePool/openApi.json

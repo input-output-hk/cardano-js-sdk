@@ -1,6 +1,6 @@
 import { NetworkInfoBuilder } from '../../../src/NetworkInfo/DbSyncNetworkInfoProvider/NetworkInfoBuilder';
 import { Pool } from 'pg';
-import { dummyLogger as logger } from 'ts-log';
+import { logger } from '@cardano-sdk/util-dev';
 
 describe('NetworkInfoBuilder', () => {
   let dbConnection: Pool;
@@ -55,9 +55,9 @@ describe('NetworkInfoBuilder', () => {
     });
   });
 
-  describe('queryCurrentWalletProtocolParams', () => {
+  describe('queryProtocolParams', () => {
     test('query wallet protocol params from current epoch', async () => {
-      const result = await builder.queryCurrentWalletProtocolParams();
+      const result = await builder.queryProtocolParams();
       expect(result).toMatchSnapshot();
     });
   });

@@ -10,7 +10,7 @@ import {
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { createDbSyncMetadataService } from '../../src/Metadata';
-import { dummyLogger as logger } from 'ts-log';
+import { logger } from '@cardano-sdk/util-dev';
 import { mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
 import { mockTokenRegistry } from './CardanoTokenRegistry.test';
 
@@ -23,12 +23,12 @@ describe('DbSyncAssetProvider', () => {
   let db: Pool;
   let ntfMetadataService: NftMetadataService;
   let provider: DbSyncAssetProvider;
-  let tokenMetadataServerUrl = '';
+  let serverUrl = '';
   let tokenMetadataService: TokenMetadataService;
   let cardanoNode: OgmiosCardanoNode;
 
   beforeAll(async () => {
-    ({ closeMock, tokenMetadataServerUrl } = await mockTokenRegistry(() => ({})));
+    ({ closeMock, serverUrl } = await mockTokenRegistry(() => ({})));
     db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
     cardanoNode = mockCardanoNode() as unknown as OgmiosCardanoNode;
     ntfMetadataService = new DbSyncNftMetadataService({
@@ -36,7 +36,7 @@ describe('DbSyncAssetProvider', () => {
       logger,
       metadataService: createDbSyncMetadataService(db, logger)
     });
-    tokenMetadataService = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl });
+    tokenMetadataService = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl: serverUrl });
     provider = new DbSyncAssetProvider({ cardanoNode, db, logger, ntfMetadataService, tokenMetadataService });
   });
 
@@ -83,8 +83,8 @@ describe('DbSyncAssetProvider', () => {
     });
   });
   it('returns undefined asset token metadata if the token registry throws a network error', async () => {
-    const { tokenMetadataServerUrl, closeMock } = await mockTokenRegistry(() => ({ body: {}, code: 500 }));
-    const tokenMetadataService = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl });
+    const { serverUrl, closeMock } = await mockTokenRegistry(() => ({ body: {}, code: 500 }));
+    const tokenMetadataService = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl: serverUrl });
 
     provider = new DbSyncAssetProvider({ cardanoNode, db, logger, ntfMetadataService, tokenMetadataService });
 

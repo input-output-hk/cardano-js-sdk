@@ -1,3 +1,5 @@
+/* eslint-disable max-len */
+
 import { Cardano, Paginated, QueryStakePoolsArgs } from '@cardano-sdk/core';
 export interface PoolUpdateModel {
   id: string; // pool hash id
@@ -21,7 +23,7 @@ export interface PoolData extends CommonPoolInfo {
   cost: bigint;
   margin: Cardano.Fraction;
   metadataJson?: Cardano.PoolMetadataJson;
-  metadata?: Cardano.StakePoolMetadataFields; // TODO: check for Cip6MetadataFields & ExtendedStakePoolMetadata
+  metadata?: Cardano.StakePoolMetadata;
   updateId: number;
   vrfKeyHash: Cardano.VrfVkHex;
 }
@@ -37,8 +39,8 @@ export interface PoolDataModel {
   vrf_key_hash: Buffer;
   metadata_url: string;
   metadata_hash: Buffer;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  offline_data: any;
+  // Extended metadata is attached at a later stage after it has been fetched from ext data url. It could be CIP-6 or AP format
+  offline_data: Omit<Cardano.StakePoolMetadata, 'ext'>;
   pool_hash: Buffer;
 }
 

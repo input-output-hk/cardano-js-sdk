@@ -10,13 +10,12 @@ import { ChainHistoryHttpService, DbSyncChainHistoryProvider, HttpServer, HttpSe
 import { CreateHttpProviderConfig, chainHistoryHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { DB_MAX_SAFE_INTEGER } from '../../src/ChainHistory/DbSyncChainHistory/queries';
 import { DataMocks } from '../data-mocks';
-import { INFO, createLogger } from 'bunyan';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { createDbSyncMetadataService } from '../../src/Metadata';
-import { dummyLogger } from 'ts-log';
 import { getPort } from 'get-port-please';
 import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
+import { logger } from '@cardano-sdk/util-dev';
 import axios from 'axios';
 
 require('json-bigint-patch');
@@ -26,6 +25,7 @@ const BAD_REQUEST = 'Request failed with status code 400';
 const APPLICATION_CBOR = 'application/cbor';
 const APPLICATION_JSON = 'application/json';
 const PAGINATION_PAGE_SIZE_LIMIT = 5;
+
 describe('ChainHistoryHttpService', () => {
   let dbConnection: Pool;
   let httpServer: HttpServer;
@@ -43,7 +43,6 @@ describe('ChainHistoryHttpService', () => {
   beforeAll(async () => {
     port = await getPort();
     baseUrl = `http://localhost:${port}/chain-history`;
-    const logger = createLogger({ level: INFO, name: 'unit tests' });
     clientConfig = { baseUrl, logger };
     config = { listen: { port } };
     dbConnection = new Pool({ connectionString: process.env.LOCALNETWORK_INTEGRAION_TESTS_POSTGRES_CONNECTION_STRING });
@@ -60,33 +59,33 @@ describe('ChainHistoryHttpService', () => {
       } as unknown as DbSyncChainHistoryProvider;
     });
     it('should not throw during service create if the ChainHistoryProvider is unhealthy', () => {
-      expect(() => new ChainHistoryHttpService({ chainHistoryProvider, logger: dummyLogger })).not.toThrow(
+      expect(() => new ChainHistoryHttpService({ chainHistoryProvider, logger })).not.toThrow(
         new ProviderError(ProviderFailure.Unhealthy)
       );
     });
 
     it('throws during service initialization if the ChainHistoryProvider is unhealthy', async () => {
-      service = new ChainHistoryHttpService({ chainHistoryProvider, logger: dummyLogger });
-      httpServer = new HttpServer(config, { logger: dummyLogger, runnableDependencies: [], services: [service] });
+      service = new ChainHistoryHttpService({ chainHistoryProvider, logger });
+      httpServer = new HttpServer(config, { logger, runnableDependencies: [], services: [service] });
       await expect(httpServer.initialize()).rejects.toThrow(new ProviderError(ProviderFailure.Unhealthy));
     });
   });
 
   describe('healthy state', () => {
     beforeAll(async () => {
-      const metadataService = createDbSyncMetadataService(dbConnection, dummyLogger);
+      const metadataService = createDbSyncMetadataService(dbConnection, logger);
       lastBlockNoInDb = (await dbConnection.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no;
       cardanoNode = mockCardanoNode(
         healthCheckResponseMock({ blockNo: lastBlockNoInDb })
       ) as unknown as OgmiosCardanoNode;
       chainHistoryProvider = new DbSyncChainHistoryProvider(
         { paginationPageSizeLimit: PAGINATION_PAGE_SIZE_LIMIT },
-        { cardanoNode, db: dbConnection, logger: dummyLogger, metadataService }
+        { cardanoNode, db: dbConnection, logger, metadataService }
       );
-      service = new ChainHistoryHttpService({ chainHistoryProvider, logger: dummyLogger });
+      service = new ChainHistoryHttpService({ chainHistoryProvider, logger });
       provider = chainHistoryHttpProvider(clientConfig);
       httpServer = new HttpServer(config, {
-        logger: dummyLogger,
+        logger,
         runnableDependencies: [cardanoNode],
         services: [service]
       });

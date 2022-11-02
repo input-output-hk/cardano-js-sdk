@@ -52,8 +52,15 @@ export class NetworkInfoHttpService extends HttpService {
       providerHandler(networkInfoProvider.ledgerTip.bind(networkInfoProvider))(HttpService.routeHandler(logger), logger)
     );
     router.post(
+      '/protocol-parameters',
+      providerHandler(networkInfoProvider.protocolParameters.bind(networkInfoProvider))(
+        HttpService.routeHandler(logger),
+        logger
+      )
+    );
+    router.post(
       '/current-wallet-protocol-parameters',
-      providerHandler(networkInfoProvider.currentWalletProtocolParameters.bind(networkInfoProvider))(
+      providerHandler(networkInfoProvider.protocolParameters.bind(networkInfoProvider))(
         HttpService.routeHandler(logger),
         logger
       )

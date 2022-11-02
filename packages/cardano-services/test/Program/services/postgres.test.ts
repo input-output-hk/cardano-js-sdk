@@ -12,7 +12,7 @@ import { Pool } from 'pg';
 import { SrvRecord } from 'dns';
 import { getPort, getRandomPort } from 'get-port-please';
 import { healthCheckResponseMock, mockCardanoNode } from '../../../../core/test/CardanoNode/mocks';
-import { dummyLogger as logger } from 'ts-log';
+import { logger } from '@cardano-sdk/util-dev';
 import { types } from 'util';
 import axios from 'axios';
 

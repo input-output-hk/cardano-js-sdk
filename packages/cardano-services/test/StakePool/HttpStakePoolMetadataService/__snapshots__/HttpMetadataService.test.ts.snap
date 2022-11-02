@@ -1,0 +1,66 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`StakePoolExtMetadataService healthy state returns CIP-6 format when extDataUrl is present in the metadata 1`] = `
+Object {
+  "pool": Object {
+    "contact": Object {
+      "email": "help@pooldomain.org",
+      "facebook": "demopool",
+      "feed": "https://demopool.com/xml/poolrss.xml",
+      "github": "demopool",
+      "primary": "email",
+      "telegram": "demopool",
+      "twitter": "demopool",
+    },
+    "id": "4a2e3b7f4a78ff1452b91329a7673c77c98ca96dece7b55c37869502",
+    "itn": Object {
+      "owner": "ed25519_pk1...",
+      "witness": "ed25519_sig1...",
+    },
+    "location": "DE",
+    "media_assets": Object {
+      "color_bg": "#RRGGBB",
+      "color_fg": "#RRGGBB",
+      "icon_png_64x64": "https://mydemopool.com/icon.png",
+      "logo_png": "https://mydemopool.com/logo.png",
+      "logo_svg": "https://mydemopool.com/logo.svg",
+    },
+    "status": "active",
+  },
+  "serial": 2020072001,
+}
+`;
+
+exports[`StakePoolExtMetadataService healthy state returns ada pools format when extended key is present in the metadata 1`] = `
+Object {
+  "pool": Object {
+    "about": Object {
+      "company": "IOHK",
+      "me": "Cardano",
+      "server": "Raspberry Pi Hosted at my Home",
+    },
+    "company": Object {
+      "addr": "Street, Number",
+      "city": "London",
+      "company_id": "123456789",
+      "country": "England",
+      "name": "Company Name",
+      "vat_id": "GB123456789",
+    },
+    "contact": Object {
+      "discord": "",
+      "facebook": "",
+      "github": "",
+      "telegram": "adapools_ops",
+      "twitch": "",
+      "twitter": "adapools_org",
+      "youtube": "",
+    },
+    "location": "London, England",
+    "media_assets": Object {
+      "icon_png_64x64": "http(s) url to pool icon; png format; not animated; max 40kb",
+      "logo_png": "http(s) url to pool logo; png format; not animated; max 50kb",
+    },
+  },
+}
+`;

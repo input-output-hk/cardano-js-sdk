@@ -1,11 +1,4 @@
-import {
-  Asset,
-  Cardano,
-  EpochInfo,
-  EraSummary,
-  NetworkInfoProvider,
-  ProtocolParametersRequiredByWallet
-} from '@cardano-sdk/core';
+import { Asset, Cardano, EpochInfo, EraSummary, NetworkInfoProvider } from '@cardano-sdk/core';
 import { BalanceTracker, DelegationTracker, TransactionalObservables, TransactionsTracker } from './services';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { GroupedAddress, SignTransactionOptions, TransactionSigner, cip8 } from '@cardano-sdk/key-management';
@@ -86,7 +79,7 @@ export interface ObservableWallet {
   readonly genesisParameters$: Observable<Cardano.CompactGenesis>;
   readonly eraSummaries$: Observable<EraSummary[]>;
   readonly currentEpoch$: Observable<EpochInfo>;
-  readonly protocolParameters$: Observable<ProtocolParametersRequiredByWallet>;
+  readonly protocolParameters$: Observable<Cardano.ProtocolParameters>;
   readonly addresses$: Observable<GroupedAddress[]>;
   readonly assets$: Observable<Assets>;
   readonly syncStatus: SyncStatus;
@@ -110,5 +103,5 @@ export interface ObservableWallet {
 
 export type WalletNetworkInfoProvider = Pick<
   NetworkInfoProvider,
-  'currentWalletProtocolParameters' | 'ledgerTip' | 'genesisParameters' | 'eraSummaries'
+  'protocolParameters' | 'ledgerTip' | 'genesisParameters' | 'eraSummaries'
 >;
