@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.0-nightly.15](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.2.0-nightly.14...@cardano-sdk/key-management@0.2.0-nightly.15) (2022-11-02)
+
+**Note:** Version bump only for package @cardano-sdk/key-management
+
 ## [0.2.0-nightly.14](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.2.0-nightly.13...@cardano-sdk/key-management@0.2.0-nightly.14) (2022-11-01)
 
 **Note:** Version bump only for package @cardano-sdk/key-management

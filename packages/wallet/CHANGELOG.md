@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.20](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.6.0-nightly.19...@cardano-sdk/wallet@0.6.0-nightly.20) (2022-11-02)
+
+### ⚠ BREAKING CHANGES
+
+- support the complete set of protocol parameters
+
+### Features
+
+- support the complete set of protocol parameters ([46d7aa9](https://github.com/input-output-hk/cardano-js-sdk/commit/46d7aa97230a666ca119c7de5ed0cf70b742d2a2))
+
 ## [0.6.0-nightly.19](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.6.0-nightly.18...@cardano-sdk/wallet@0.6.0-nightly.19) (2022-11-01)
 
 ### Bug Fixes

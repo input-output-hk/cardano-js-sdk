@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.20](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.19...@cardano-sdk/cardano-services@0.6.0-nightly.20) (2022-11-02)
+
+### ⚠ BREAKING CHANGES
+
+- **cardano-services:** support pools ext metadata
+- support the complete set of protocol parameters
+
+### Features
+
+- **cardano-services:** support pools ext metadata ([0ac5451](https://github.com/input-output-hk/cardano-js-sdk/commit/0ac545179dac74101f978d62c968cc05898da08b))
+- create common mock server util ([53bd4f7](https://github.com/input-output-hk/cardano-js-sdk/commit/53bd4f7de87406a8d3623c903847268e57d0ddeb))
+- support the complete set of protocol parameters ([46d7aa9](https://github.com/input-output-hk/cardano-js-sdk/commit/46d7aa97230a666ca119c7de5ed0cf70b742d2a2))
+
+### Bug Fixes
+
+- **cardano-services:** correct spelling mistakes ([a7b098f](https://github.com/input-output-hk/cardano-js-sdk/commit/a7b098ffa1fa2d47ba01e5dc15bc2c702013c835))
+
 ## [0.6.0-nightly.19](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.18...@cardano-sdk/cardano-services@0.6.0-nightly.19) (2022-11-01)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services

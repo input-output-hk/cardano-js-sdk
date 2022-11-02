@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.17](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0-nightly.16...@cardano-sdk/core@0.6.0-nightly.17) (2022-11-02)
+
+### ⚠ BREAKING CHANGES
+
+- support the complete set of protocol parameters
+
+### Features
+
+- **core:** define extended metadata types ([dad253d](https://github.com/input-output-hk/cardano-js-sdk/commit/dad253dbc5e83699061f0dbff22839a515de2aa5))
+- support the complete set of protocol parameters ([46d7aa9](https://github.com/input-output-hk/cardano-js-sdk/commit/46d7aa97230a666ca119c7de5ed0cf70b742d2a2))
+
 ## [0.6.0-nightly.16](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0-nightly.15...@cardano-sdk/core@0.6.0-nightly.16) (2022-11-01)
 
 ### Bug Fixes
