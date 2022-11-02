@@ -4,7 +4,7 @@
   "private": true,
   "description": "An SDK for interacting with the Cardano blockchain",
   "engines": {
-    "node": ">=14.15.0 <15.0.0"
+    "node": ">=14.20.1"
   },
   "workspaces": [
     "packages/*"
@@ -67,7 +67,7 @@
     "@commitlint/cli": "^13.1.0",
     "@commitlint/config-conventional": "^13.1.0",
     "@types/jest": "^26.0.24",
-    "@types/node": "14.18.12",
+    "@types/node": "^18.11.8",
     "@typescript-eslint/eslint-plugin": "^5.27.1",
     "@typescript-eslint/parser": "^5.27.1",
     "conventional-changelog-conventionalcommits": "^5.0.0",

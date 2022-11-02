@@ -33,7 +33,7 @@ A suite of TypeScript packages suitable for both Node.js and browser-based devel
 
 Packages are distributed as both CommonJS and ESM modules.
 
-- Node.js >=14.15.0 <15.0.0
+- Node.js >=14.20.1
   - using with `type="module"` requires `--experimental-specifier-resolution=node` flag
 - Browser via bundlers (see [example webpack config](./packages/web-extension/e2e/webpack.config.js))
 

@@ -203,7 +203,11 @@ describe('HttpServer', () => {
       expect(httpServer.server).toBeDefined();
       const addressInfo = httpServer.server.address() as net.AddressInfo;
       expect(addressInfo.port).toBe(port);
-      expect(addressInfo.address).toBe('127.0.0.1');
+      if (addressInfo.family === 'IPv6') {
+        expect(addressInfo.address).toBe('::1');
+      } else {
+        expect(addressInfo.address).toBe('127.0.0.1');
+      }
     });
   });
   describe('shutdown', () => {
