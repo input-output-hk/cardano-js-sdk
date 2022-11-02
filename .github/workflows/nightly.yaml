@@ -11,6 +11,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-20.04 ]
+        nodejs: [ 14, 16, 18.12.0, latest ]
     runs-on: ${{ matrix.os }}
     steps:
     - name: 📥 Checkout repository
@@ -30,7 +31,8 @@ jobs:
     - name: 🧰 Setup Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: 18.12.0
+        check-latest: true
+        node-version: ${{ matrix.nodejs }}
         registry-url: 'https://registry.npmjs.org'
 
     - name: 💽 Install dependencies
@@ -38,7 +40,19 @@ jobs:
         yarn install --immutable --inline-builds --mode=skip-build
         git checkout yarn-project.nix
 
+    - name: 🔨 Build
+      run: |
+        yarn install --immutable --inline-builds
+        yarn build
+        yarn lint
+
+    - name: 🔬 Test
+      run: |
+        yarn test:build:verify
+        yarn test --forceExit    
+
     - name: 📝 Count changed packages
+      if: matrix.node.js == '18.12.0'
       id: precondition
       run: |
         CHANGED=$(yarn run lerna changed --json | jq -ne 'input? // 0 | length')
@@ -46,7 +60,7 @@ jobs:
         echo "::set-output name=changed::$(($CHANGED))"
 
     - name: 📤 Publish
-      if: steps.precondition.outputs.changed > 0
+      if: matrix.node.js == '18.12.0' && steps.precondition.outputs.changed > 0
       run: |
         yarn build
         yarn publish:nightly --loglevel silly
