@@ -1,23 +1,22 @@
 /* eslint-disable @typescript-eslint/no-shadow */
-import { Asset, Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { AssetFixtureBuilder, AssetWith } from './fixtures/FixtureBuilder';
+import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import {
   CardanoTokenRegistry,
   DbSyncAssetProvider,
   DbSyncNftMetadataService,
   NftMetadataService,
   TokenMetadataService
-} from '../../src/Asset';
+} from '../../src';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { createDbSyncMetadataService } from '../../src/Metadata';
 import { logger } from '@cardano-sdk/util-dev';
 import { mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
-import { mockTokenRegistry } from './CardanoTokenRegistry.test';
+import { mockTokenRegistry } from './fixtures/mocks';
 
 export const notValidAssetId = Cardano.AssetId('0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef');
-export const validAssetId = Cardano.AssetId(
-  '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65'
-);
+
 describe('DbSyncAssetProvider', () => {
   let closeMock: () => Promise<void> = jest.fn();
   let db: Pool;
@@ -26,10 +25,11 @@ describe('DbSyncAssetProvider', () => {
   let serverUrl = '';
   let tokenMetadataService: TokenMetadataService;
   let cardanoNode: OgmiosCardanoNode;
+  let fixtureBuilder: AssetFixtureBuilder;
 
   beforeAll(async () => {
     ({ closeMock, serverUrl } = await mockTokenRegistry(() => ({})));
-    db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
+    db = new Pool({ connectionString: process.env.LOCALNETWORK_INTEGRAION_TESTS_POSTGRES_CONNECTION_STRING });
     cardanoNode = mockCardanoNode() as unknown as OgmiosCardanoNode;
     ntfMetadataService = new DbSyncNftMetadataService({
       db,
@@ -38,6 +38,7 @@ describe('DbSyncAssetProvider', () => {
     });
     tokenMetadataService = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl: serverUrl });
     provider = new DbSyncAssetProvider({ cardanoNode, db, logger, ntfMetadataService, tokenMetadataService });
+    fixtureBuilder = new AssetFixtureBuilder(db, logger);
   });
 
   afterAll(async () => {
@@ -51,7 +52,8 @@ describe('DbSyncAssetProvider', () => {
     );
   });
   it('returns an AssetInfo without extra data', async () => {
-    expect(await provider.getAsset({ assetId: validAssetId })).toEqual({
+    const assets = await fixtureBuilder.getAssets(1, { with: [AssetWith.CIP25Metadata] });
+    expect(await provider.getAsset({ assetId: assets[0].id })).toMatchShapeOf({
       assetId: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65',
       fingerprint: 'asset1f0azzptnr8dghzjh7egqvdjmt33e3lz5uy59th',
       mintOrBurnCount: 1,
@@ -61,22 +63,15 @@ describe('DbSyncAssetProvider', () => {
     });
   });
   it('returns an AssetInfo with extra data', async () => {
+    const assets = await fixtureBuilder.getAssets(1, { with: [AssetWith.CIP25Metadata] });
     const asset = await provider.getAsset({
-      assetId: validAssetId,
+      assetId: assets[0].id,
       extraData: { history: true, nftMetadata: true, tokenMetadata: true }
     });
-    expect(asset.history).toEqual([
-      { quantity: BigInt(1), transactionId: 'f66791a0354c43d8c5a93671eb96d94633e3419f3ccbb0a00c00a152d3b6ca06' }
-    ]);
-    expect(asset.nftMetadata).toStrictEqual({
-      description: ['This is my first NFT of the macaron cake'],
-      files: undefined,
-      image: [Asset.Uri('ipfs://QmcDAmZubQig7tGUgEwbWcgdvz4Aoa2EiRZyFoX3fXTVmr')],
-      mediaType: undefined,
-      name: 'macaron cake token',
-      otherProperties: new Map([['id', 1n]]),
-      version: '1.0'
-    });
+    const history = await fixtureBuilder.getHistory(assets[0].policyId, assets[0].name);
+
+    expect(asset.history).toEqual(history);
+    expect(asset.nftMetadata).toStrictEqual(assets[0].metadata);
     expect(asset.tokenMetadata).toStrictEqual({
       desc: 'This is my first NFT of the macaron cake',
       name: 'macaron cake token'
@@ -88,8 +83,9 @@ describe('DbSyncAssetProvider', () => {
 
     provider = new DbSyncAssetProvider({ cardanoNode, db, logger, ntfMetadataService, tokenMetadataService });
 
+    const assets = await fixtureBuilder.getAssets(1, { with: [AssetWith.CIP25Metadata] });
     const asset = await provider.getAsset({
-      assetId: validAssetId,
+      assetId: assets[0].id,
       extraData: { tokenMetadata: true }
     });
     expect(asset.tokenMetadata).toBeUndefined();
