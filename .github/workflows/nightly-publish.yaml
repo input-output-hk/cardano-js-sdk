@@ -1,0 +1,45 @@
+name: nightly-publish
+
+on:
+  workflow_run:
+    workflows: [nightly-test]
+    types:
+      - completed
+
+jobs:
+  publish:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v3
+      with:
+        # Fetch all history for all tags and branches
+        fetch-depth: 0
+        ref: nightly
+
+    - name: 🧰 Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18.12.0
+        registry-url: 'https://registry.npmjs.org'
+
+    - name: 💽 Install dependencies
+      run: |
+        yarn install --immutable --inline-builds --mode=skip-build
+        git checkout yarn-project.nix
+
+    - name: 📝 Count changed packages
+      id: precondition
+      run: |
+        CHANGED=$(yarn run lerna changed --json | jq -ne 'input? // 0 | length')
+        echo "$CHANGED packages changed"
+        echo "::set-output name=changed::$(($CHANGED))"
+
+    - name: 📤 Publish
+      if: steps.precondition.outputs.changed > 0
+      run: |
+        yarn build
+        yarn publish:nightly --loglevel silly
+      env:
+        YARN_ENABLE_IMMUTABLE_INSTALLS: false
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_REGISTRY_TOKEN }}
