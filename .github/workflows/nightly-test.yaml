@@ -1,6 +1,7 @@
 name: nightly-test
 
 on:
+  workflow_dispatch:
   workflow_run:
     workflows: [nightly-merge]
     types:
@@ -9,7 +10,7 @@ on:
 jobs:
   cancel-self-run:
     name: "Cancel the self workflow run"
-    if: ${{ github.event.workflow_run.conclusion != 'success' }} 
+    if: ${{ github.event_name != 'workflow_dispatch' && github.event.workflow_run.conclusion != 'success' }} 
     runs-on: ubuntu-20.04
     steps:
       - name: "Cancel the self workflow run"
@@ -25,7 +26,7 @@ jobs:
         os: [ ubuntu-20.04 ]
         nodejs: [ 14, 16, 18.12.0, latest ]
     runs-on: ${{ matrix.os }}
-    if: ${{ github.event.workflow_run.conclusion == 'success' }} 
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }} 
     steps:
     - name: 📥 Checkout repository
       uses: actions/checkout@v3

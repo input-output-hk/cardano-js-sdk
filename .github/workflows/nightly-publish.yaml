@@ -1,6 +1,7 @@
 name: nightly-publish
 
 on:
+  workflow_dispatch:
   workflow_run:
     workflows: [nightly-test]
     types:
@@ -9,7 +10,7 @@ on:
 jobs:
   cancel-self-run:
     name: "Cancel the self workflow run"
-    if: ${{ github.event.workflow_run.conclusion != 'success' }} 
+    if: ${{ github.event_name != 'workflow_dispatch' && github.event.workflow_run.conclusion != 'success' }} 
     runs-on: ubuntu-20.04
     steps:
       - name: "Cancel the self workflow run"
@@ -21,7 +22,7 @@ jobs:
     
   publish:
     runs-on: ubuntu-20.04
-    if: ${{ github.event.workflow_run.conclusion == 'success' }} 
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }} 
     steps:
     - name: 📥 Checkout repository
       uses: actions/checkout@v3
