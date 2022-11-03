@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.0-nightly.25](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.5.0-nightly.24...@cardano-sdk/e2e@0.5.0-nightly.25) (2022-11-03)
+
+**Note:** Version bump only for package @cardano-sdk/e2e
+
 ## [0.5.0-nightly.24](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.5.0-nightly.23...@cardano-sdk/e2e@0.5.0-nightly.24) (2022-11-02)
 
 **Note:** Version bump only for package @cardano-sdk/e2e

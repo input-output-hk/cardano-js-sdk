@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.21](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.20...@cardano-sdk/cardano-services@0.6.0-nightly.21) (2022-11-03)
+
+### Features
+
+- **cardano-services:** Add '/meta' endpoint for deployment information ([872bf9c](https://github.com/input-output-hk/cardano-js-sdk/commit/872bf9ca629e0d5a6289bd18b0deadad7c0d8cc9))
+
 ## [0.6.0-nightly.20](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.19...@cardano-sdk/cardano-services@0.6.0-nightly.20) (2022-11-02)
 
 ### ⚠ BREAKING CHANGES
