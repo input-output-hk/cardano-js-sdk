@@ -7,7 +7,7 @@ on:
     - cron:  '0 0 * * *'
 
 jobs:
-  publish:
+  merge:
     runs-on: ubuntu-20.04
     steps:
     - name: 📥 Checkout repository
