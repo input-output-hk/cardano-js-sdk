@@ -1,0 +1,41 @@
+name: nightly-test
+
+on:
+  workflow_run:
+    workflows: [nightly-merge]
+    types:
+      - completed
+
+jobs:
+  publish:
+    strategy:
+      matrix:
+        os: [ ubuntu-20.04 ]
+        nodejs: [ 14, 16, 18.12.0, latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v3
+      with:
+        ref: nightly
+
+    - name: 🧰 Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        check-latest: true
+        node-version: ${{ matrix.nodejs }}
+        registry-url: 'https://registry.npmjs.org'
+
+    - name: 💽 Install dependencies
+      run: |
+        yarn install --immutable --inline-builds --mode=skip-build
+
+    - name: 🔨 Build
+      run: |
+        yarn build
+
+    - name: 🔬 Test
+      run: |
+        yarn lint
+        yarn test:build:verify
+        yarn test --forceExit    
