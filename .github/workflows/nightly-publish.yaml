@@ -1,14 +1,28 @@
 name: nightly-publish
 
 on:
+  workflow_dispatch:
   workflow_run:
     workflows: [nightly-test]
     types:
       - completed
 
 jobs:
+  cancel-self-run:
+    name: "Cancel the self workflow run"
+    if: ${{ github.event_name != 'workflow_dispatch' && github.event.workflow_run.conclusion != 'success' }} 
+    runs-on: ubuntu-20.04
+    steps:
+      - name: "Cancel the self workflow run"
+        uses: potiuk/cancel-workflow-runs@master
+        with:
+          cancelMode: self
+          token: ${{ secrets.BOT_GH_TOKEN }}
+          notifyPRCancel: false
+    
   publish:
     runs-on: ubuntu-20.04
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }} 
     steps:
     - name: 📥 Checkout repository
       uses: actions/checkout@v3
@@ -38,6 +52,8 @@ jobs:
     - name: 📤 Publish
       if: steps.precondition.outputs.changed > 0
       run: |
+        git config user.name github-actions
+        git config user.email github-actions@github.com
         yarn build
         yarn publish:nightly --loglevel silly
       env:
