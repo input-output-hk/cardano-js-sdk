@@ -1,14 +1,18 @@
+import { DataMocks } from '../../data-mocks';
 import { NetworkInfoBuilder } from '../../../src/NetworkInfo/DbSyncNetworkInfoProvider/NetworkInfoBuilder';
+import { NetworkInfoFixtureBuilder } from '../fixtures/FixtureBuilder';
 import { Pool } from 'pg';
 import { logger } from '@cardano-sdk/util-dev';
 
 describe('NetworkInfoBuilder', () => {
   let dbConnection: Pool;
   let builder: NetworkInfoBuilder;
+  let fixtureBuilder: NetworkInfoFixtureBuilder;
 
   beforeAll(async () => {
-    dbConnection = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
+    dbConnection = new Pool({ connectionString: process.env.LOCALNETWORK_INTEGRAION_TESTS_POSTGRES_CONNECTION_STRING });
     builder = new NetworkInfoBuilder(dbConnection, logger);
+    fixtureBuilder = new NetworkInfoFixtureBuilder(dbConnection, logger);
   });
 
   afterAll(async () => {
@@ -19,16 +23,14 @@ describe('NetworkInfoBuilder', () => {
     test('query circulating supply', async () => {
       const result = await builder.queryCirculatingSupply();
       expect(BigInt(result)).toBeGreaterThan(0n);
-      expect(result).toMatchSnapshot();
     });
   });
 
   describe('queryTotalSupply', () => {
     test('query total supply', async () => {
-      const maxSupply = 45_000_000_000_000_000n;
+      const maxSupply = await fixtureBuilder.getMaxSupply();
       const result = await builder.queryTotalSupply(maxSupply);
       expect(BigInt(result)).toBeGreaterThan(0n);
-      expect(result).toMatchSnapshot();
     });
   });
 
@@ -36,7 +38,6 @@ describe('NetworkInfoBuilder', () => {
     test('query active stake', async () => {
       const result = await builder.queryActiveStake();
       expect(BigInt(result)).toBeGreaterThan(0n);
-      expect(result).toMatchSnapshot();
     });
   });
 
@@ -44,21 +45,20 @@ describe('NetworkInfoBuilder', () => {
     test('query latest epoch', async () => {
       const result = await builder.queryLatestEpoch();
       expect(result).toBeGreaterThan(0);
-      expect(result).toMatchSnapshot();
     });
   });
 
   describe('queryLedgerTip', () => {
     test('query ledger tip', async () => {
       const result = await builder.queryLedgerTip();
-      expect({ ...result, hash: result.hash.toString('hex') }).toMatchSnapshot();
+      expect({ ...result, hash: result.hash.toString('hex') }).toMatchShapeOf(DataMocks.Ledger.tip);
     });
   });
 
   describe('queryProtocolParams', () => {
     test('query wallet protocol params from current epoch', async () => {
       const result = await builder.queryProtocolParams();
-      expect(result).toMatchSnapshot();
+      expect(result).toMatchShapeOf(DataMocks.Ledger.parameters);
     });
   });
 });
