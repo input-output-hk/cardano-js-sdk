@@ -7,8 +7,21 @@ on:
       - completed
 
 jobs:
+  cancel-self-run:
+    name: "Cancel the self workflow run"
+    if: ${{ github.event.workflow_run.conclusion != 'success' }} 
+    runs-on: ubuntu-20.04
+    steps:
+      - name: "Cancel the self workflow run"
+        uses: potiuk/cancel-workflow-runs@master
+        with:
+          cancelMode: self
+          token: ${{ secrets.BOT_GH_TOKEN }}
+          notifyPRCancel: false
+    
   publish:
     runs-on: ubuntu-20.04
+    if: ${{ github.event.workflow_run.conclusion == 'success' }} 
     steps:
     - name: 📥 Checkout repository
       uses: actions/checkout@v3
