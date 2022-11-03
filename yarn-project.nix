@@ -2036,13 +2036,6 @@ cacheEntries = {
 "jsesc@npm:0.5.0" = { filename = "jsesc-npm-0.5.0-6827074492-b8b44cbfc9.zip"; sha512 = "b8b44cbfc92f198ad972fba706ee6a1dfa7485321ee8c0b25f5cedd538dcb20cde3197de16a7265430fce8277a12db066219369e3d51055038946039f6e20e17"; };
 "unicode-canonical-property-names-ecmascript@npm:2.0.0" = { filename = "unicode-canonical-property-names-ecmascript-npm-2.0.0-d2d8554a14-39be078afd.zip"; sha512 = "39be078afd014c14dcd957a7a46a60061bc37c4508ba146517f85f60361acf4c7539552645ece25de840e17e293baa5556268d091ca6762747fdd0c705001a45"; };
 "unicode-property-aliases-ecmascript@npm:2.1.0" = { filename = "unicode-property-aliases-ecmascript-npm-2.1.0-46779595f4-2435244318.zip"; sha512 = "243524431893649b62cc674d877bd64ef292d6071dd2fd01ab4d5ad26efbc104ffcd064f93f8a06b7e4ec54c172bf03f6417921a0d8c3a9994161fe1f88f815b"; };
-"@cardano-sdk/util-dev@npm:0.4.1" = { filename = "@cardano-sdk-util-dev-npm-0.4.1-6845f1be71-05d0ad82fc.zip"; sha512 = "05d0ad82fccc0466301ff76f2f23fc948ae93cef51392bf6cfe896dd382ad60745582f8c67e0adf749a2bc0ddd4193ad8214a8b9113aa6d944afac582bc374b3"; };
-"@cardano-sdk/core@npm:0.5.0" = { filename = "@cardano-sdk-core-npm-0.5.0-3788cc892c-7fd5eaa990.zip"; sha512 = "7fd5eaa99022985e128a57d2578ffdc9188938a196594d2f352f4964c5bad981eaa9c1997218b6d9d5b922810112db4ff46e5b46bec95c44def4a8174d53aa8a"; };
-"@cardano-sdk/util@npm:0.5.0" = { filename = "@cardano-sdk-util-npm-0.5.0-9d97f6a218-cc2fb2f0d5.zip"; sha512 = "cc2fb2f0d521cfc37f4edf6165415ac266095017f1c79e56c6c4788e959da1f802a076bbfa71b55c1ae5dcddb64cd9704e7e1d975315f9f270de704ffca966f5"; };
-"@cardano-ogmios/client@npm:5.5.2" = { filename = "@cardano-ogmios-client-npm-5.5.2-6798ed531e-717db95079.zip"; sha512 = "717db950795dbaa3915c71270ade7a3531d29807e27f152d03221e3ecc435819853cbf9d77b7ca18e39a7a5a60bac1e9fc675a8452209b315461ae8bd5fbdc6b"; };
-"@emurgo/cardano-serialization-lib-nodejs@npm:11.0.0-rc.6" = { filename = "@emurgo-cardano-serialization-lib-nodejs-npm-11.0.0-rc.6-41e5ab1765-16f1fda789.zip"; sha512 = "16f1fda7896b9a26a0a450db0e121b99ec7a61c65d8ade998d9082a5aeb0517fb12dade2439321659b62ffe87d15796eee1654080336a5bda79537d623007ab6"; };
-"@emurgo/cardano-serialization-lib-browser@npm:11.0.0-rc.6" = { filename = "@emurgo-cardano-serialization-lib-browser-npm-11.0.0-rc.6-f8fcee633c-a5f154735a.zip"; sha512 = "a5f154735a0a4bc9a608bd7dcd431050819dda200ad8824bffb2a49342a83abb0048b5b453ea7090e603df0f883692015eec274921702e4c10e2714f06db363c"; };
-"@cardano-ogmios/schema@npm:5.5.2" = { filename = "@cardano-ogmios-schema-npm-5.5.2-67e8a157c7-4536856e83.zip"; sha512 = "4536856e83f1b9821a62bcaa6238373494290db2e2d1736acbce5be3c6188ab0d94efc949d0e22f9cd8f20b0433261e48a19e6654b0dd71478fb2600885c64aa"; };
 };
 
 in optionalOverride overrideAttrs project
