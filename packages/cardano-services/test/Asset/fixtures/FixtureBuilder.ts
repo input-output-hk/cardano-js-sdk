@@ -1,0 +1,88 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import * as Queries from './queries';
+import { Asset, Cardano, ProviderUtil } from '@cardano-sdk/core';
+import { LastMintTxModel } from '../../../src';
+import { Logger } from 'ts-log';
+import { Pool, QueryResult } from 'pg';
+import { bufferToHexString } from '@cardano-sdk/util';
+
+export enum AssetWith {
+  CIP25Metadata = 'CIP25Metadata'
+}
+
+export class AssetData {
+  id: Cardano.AssetId;
+  name: Cardano.AssetName;
+  policyId: Cardano.PolicyId;
+  metadata: any;
+}
+
+export class AssetFixtureBuilder {
+  #db: Pool;
+  #logger: Logger;
+
+  constructor(db: Pool, logger: Logger) {
+    this.#db = db;
+    this.#logger = logger;
+  }
+
+  public async queryLastMintTx(policyId: Cardano.PolicyId, name: Cardano.AssetName) {
+    this.#logger.debug('About to query last nft mint tx for asset', { name, policyId });
+    const result: QueryResult<LastMintTxModel> = await this.#db.query(Queries.findLastNftMintTx, [
+      Buffer.from(policyId, 'hex'),
+      Buffer.from(name, 'hex')
+    ]);
+    return result.rows[0];
+  }
+
+  public async getHistory(policyId: Cardano.PolicyId, name: Cardano.AssetName) {
+    this.#logger.debug('About to query multi asset history', { name, policyId });
+    const result: QueryResult<{
+      hash: Buffer;
+      quantity: string;
+    }> = await this.#db.query(Queries.findMultiAssetHistory, [Buffer.from(policyId, 'hex'), Buffer.from(name, 'hex')]);
+
+    return result.rows.map(({ hash, quantity }) => ({
+      quantity: BigInt(quantity),
+      transactionId: bufferToHexString(hash)
+    }));
+  }
+
+  public async getAssets(desiredQty: number, options?: { with?: AssetWith[] }): Promise<AssetData[]> {
+    this.#logger.debug(`About to fetch up to ${desiredQty} assets`);
+
+    let query = Queries.withoutMetadata;
+    if (options?.with?.includes(AssetWith.CIP25Metadata)) {
+      query = Queries.withCIP25Metadata;
+    }
+
+    const result: QueryResult<{ policy: Buffer; name: Buffer; json: any }> = await this.#db.query(query, [desiredQty]);
+
+    const resultsQty = result.rows.length;
+    if (result.rows.length === 0) {
+      throw new Error('No assets found');
+    } else if (resultsQty < desiredQty) {
+      this.#logger.warn(`${desiredQty} assets desired, only ${resultsQty} results found`);
+    }
+
+    return result.rows.map(({ policy, name, json }) => {
+      const hexPolicy = bufferToHexString(policy);
+      const hexName = bufferToHexString(name);
+      const policyId = Cardano.PolicyId(hexPolicy);
+      const assetName = Cardano.AssetName(hexName);
+
+      return {
+        id: Cardano.AssetId(`${hexPolicy}${hexName}`),
+        metadata: json
+          ? Asset.util.metadatumToCip25(
+              { name: assetName, policyId },
+              new Map<bigint, Cardano.Metadatum>([[721n, ProviderUtil.jsonToMetadatum(json)]]),
+              this.#logger
+            )
+          : null,
+        name: assetName,
+        policyId
+      };
+    });
+  }
+}

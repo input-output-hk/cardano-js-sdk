@@ -1,3 +1,4 @@
+import { AssetFixtureBuilder, AssetWith } from './fixtures/FixtureBuilder';
 import {
   AssetHttpService,
   CardanoTokenRegistry,
@@ -18,7 +19,7 @@ import { createDbSyncMetadataService } from '../../src/Metadata';
 import { getPort } from 'get-port-please';
 import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
 import { logger } from '@cardano-sdk/util-dev';
-import { mockTokenRegistry } from './CardanoTokenRegistry.test';
+import { mockTokenRegistry } from './fixtures/mocks';
 import axios from 'axios';
 
 const APPLICATION_JSON = 'application/json';
@@ -41,6 +42,7 @@ describe('AssetHttpService', () => {
   let provider: AssetProvider;
   let cardanoNode: OgmiosCardanoNode;
   let lastBlockNoInDb: Cardano.BlockNo;
+  let fixtureBuilder: AssetFixtureBuilder;
 
   beforeAll(async () => {
     port = await getPort();
@@ -52,7 +54,7 @@ describe('AssetHttpService', () => {
   describe('healthy state', () => {
     beforeAll(async () => {
       ({ closeMock, serverUrl } = await mockTokenRegistry(() => ({})));
-      db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
+      db = new Pool({ connectionString: process.env.LOCALNETWORK_INTEGRAION_TESTS_POSTGRES_CONNECTION_STRING });
       ntfMetadataService = new DbSyncNftMetadataService({
         db,
         logger,
@@ -67,6 +69,7 @@ describe('AssetHttpService', () => {
       service = new AssetHttpService({ assetProvider, logger });
       httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
       provider = assetInfoHttpProvider(clientConfig);
+      fixtureBuilder = new AssetFixtureBuilder(db, logger);
       await httpServer.initialize();
       await httpServer.start();
     });
@@ -131,22 +134,24 @@ describe('AssetHttpService', () => {
         }
       });
       it('returns asset info for existing asset id', async () => {
+        const assets = await fixtureBuilder.getAssets(1);
         const res = await provider.getAsset({
-          assetId: Cardano.AssetId('50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65')
+          assetId: assets[0].id
         });
-        expect(res).toMatchSnapshot();
+        expect(res.name).toEqual(assets[0].name);
       });
 
       it('returns asset info with extra data when requested', async () => {
+        const assets = await fixtureBuilder.getAssets(1, { with: [AssetWith.CIP25Metadata] });
         const res = await provider.getAsset({
-          assetId: Cardano.AssetId('50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65'),
+          assetId: assets[0].id,
           extraData: { history: true, nftMetadata: true, tokenMetadata: true }
         });
+        const expectedHistory = await fixtureBuilder.getHistory(assets[0].policyId, assets[0].name);
         const { history, nftMetadata, tokenMetadata } = res;
 
-        expect(res).toMatchSnapshot();
-        expect(history).toHaveLength(1);
-        expect(nftMetadata).toBeDefined();
+        expect(history).toEqual(expectedHistory);
+        expect(nftMetadata).toEqual(assets[0].metadata);
         expect(tokenMetadata).toBeDefined();
       });
     });

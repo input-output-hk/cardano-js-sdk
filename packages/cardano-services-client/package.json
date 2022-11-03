@@ -3,7 +3,7 @@
   "version": "0.6.0-nightly.18",
   "description": "Cardano Services Client",
   "engines": {
-    "node": "^14"
+    "node": ">=14.20.1"
   },
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -52,7 +52,6 @@
   },
   "devDependencies": {
     "@cardano-sdk/util-dev": "^0.5.0-nightly.17",
-    "@types/node": "14.18.12",
     "@types/validator": "^13.7.1",
     "axios-mock-adapter": "^1.20.0",
     "eslint": "^7.32.0",

@@ -3,7 +3,7 @@
   "version": "0.2.0-nightly.15",
   "description": "Governance types and utilities for Cardano",
   "engines": {
-    "node": "^14"
+    "node": ">=14.20.1"
   },
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -46,7 +46,6 @@
     "prepack": "yarn build"
   },
   "devDependencies": {
-    "@types/node": "14.18.12",
     "delay": "^5.0.0",
     "eslint": "^7.32.0",
     "jest": "^28.1.3",
