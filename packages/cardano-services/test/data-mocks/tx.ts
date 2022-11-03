@@ -144,24 +144,24 @@ export const witnessRedeemers = {
   signatures: {}
 };
 
-export const inputs = [
-  {
-    address:
-      'addr_test1qpcncempf4svkpw0salztrsxzrfpr5ll323q5whw7lv94vyw0kz5rxvdaq6u6tslwfrrgz6l4n4lpcpnawn87yl9k6dsu4hhg2',
-    index: 0,
-    txId: '5293c1165896ab6bed6f7e969792fe4ac2202ddac5a5186d941ae2c9310b7056'
-  }
-];
+export const input = {
+  address:
+    'addr_test1qpcncempf4svkpw0salztrsxzrfpr5ll323q5whw7lv94vyw0kz5rxvdaq6u6tslwfrrgz6l4n4lpcpnawn87yl9k6dsu4hhg2',
+  index: 0,
+  txId: '5293c1165896ab6bed6f7e969792fe4ac2202ddac5a5186d941ae2c9310b7056'
+};
 
-export const outputs = [
-  {
-    address:
-      'addr_test1qpcncempf4svkpw0salztrsxzrfpr5ll323q5whw7lv94vyw0kz5rxvdaq6u6tslwfrrgz6l4n4lpcpnawn87yl9k6dsu4hhg2',
-    value: {
-      coins: 13_499_999_999_819_540n
-    }
+export const inputs = [input];
+
+export const output = {
+  address:
+    'addr_test1qpcncempf4svkpw0salztrsxzrfpr5ll323q5whw7lv94vyw0kz5rxvdaq6u6tslwfrrgz6l4n4lpcpnawn87yl9k6dsu4hhg2',
+  value: {
+    coins: 13_499_999_999_819_540n
   }
-];
+};
+
+export const outputs = [output];
 
 export const blockHeader: Cardano.TxAlonzo['blockHeader'] = {
   blockNo: 3_157_934,
