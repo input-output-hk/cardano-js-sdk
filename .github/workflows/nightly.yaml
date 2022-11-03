@@ -30,10 +30,12 @@ jobs:
         git checkout origin/master -- yarn.lock
         git commit -m "chore: checkout yarn-project.nix and yarn.lock from master" || echo "No changes in yarn-project.nix"
         git merge origin/master
-        yarn
+        yarn --mode=skip-build
         git add .
         git commit -m "chore: regenerate yarn-project.nix and yarn.lock" || echo "No changes in yarn-project.nix"
         git push --force
+      env:
+        YARN_ENABLE_IMMUTABLE_INSTALLS: false
 
     - name: 🧰 Setup Node.js
       uses: actions/setup-node@v3
