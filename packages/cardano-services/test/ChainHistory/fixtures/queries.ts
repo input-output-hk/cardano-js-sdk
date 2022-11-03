@@ -83,9 +83,20 @@ export const transactionInBlockRange = `
     AND block.block_no >= $1
     AND block.block_no <= $2`;
 
+export const findMultiAssetTxOut = `
+	SELECT 
+		tx_out.id AS tx_out_id
+	FROM ma_tx_out AS ma_out
+	JOIN multi_asset AS ma_id ON ma_out.ident = ma_id.id
+	JOIN tx_out ON tx_out.id = ma_out.tx_out_id
+	JOIN tx ON tx_out.tx_id = tx.id
+	ORDER BY ma_out.id ASC
+  LIMIT $1`;
+
 const Queries = {
   beginLatestTxHashes,
   endLatestTxHashes,
+  findMultiAssetTxOut,
   genesisUtxoAddresses,
   latestBlockHashes,
   latestDistinctAddresses,
