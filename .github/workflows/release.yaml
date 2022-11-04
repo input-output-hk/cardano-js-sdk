@@ -47,7 +47,8 @@ jobs:
         # Base on nightly branch versions
         git merge --squash nightly
         # Omit nighly release CHANGELOG changes
-        git checkout HEAD packages/*/CHANGELOG.md
+        git restore --source master packages/*/CHANGELOG.md
+        git add .
         # Publish
         yarn publish:release --sign-git-commit --loglevel silly
         # Merge package.json/yarn.lock/CHANGELOG back to nightly
