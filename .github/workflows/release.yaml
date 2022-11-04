@@ -49,6 +49,8 @@ jobs:
         # Omit nighly release CHANGELOG changes
         git restore --source master packages/*/CHANGELOG.md
         git add .
+        # Test build to reduce chance of failure after creating a GH Release
+        yarn build
         # Publish
         yarn publish:release --sign-git-commit --loglevel silly
         # Merge package.json/yarn.lock/CHANGELOG back to nightly
