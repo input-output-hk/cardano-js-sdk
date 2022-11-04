@@ -59,4 +59,4 @@ jobs:
         YARN_ENABLE_IMMUTABLE_INSTALLS: false
         NODE_AUTH_TOKEN: ${{ secrets.NPM_REGISTRY_TOKEN }}
         # Used for making a release
-        GH_TOKEN: ${{ github.token }}
+        GH_TOKEN: ${{ secrets.BOT_GH_TOKEN }}
