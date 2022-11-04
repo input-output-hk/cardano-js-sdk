@@ -3,9 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.6.0-nightly.19](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.6.0-nightly.18...@cardano-sdk/ogmios@0.6.0-nightly.19) (2022-11-03)
-
-**Note:** Version bump only for package @cardano-sdk/ogmios
+## [0.6.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.5.0...@cardano-sdk/ogmios@0.6.0) (2022-11-04)
 
 ## [0.6.0-nightly.18](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.6.0-nightly.17...@cardano-sdk/ogmios@0.6.0-nightly.18) (2022-11-02)
 
@@ -31,64 +29,18 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 **Note:** Version bump only for package @cardano-sdk/ogmios
 
-## [0.6.0-nightly.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.6.0-nightly.11...@cardano-sdk/ogmios@0.6.0-nightly.12) (2022-10-07)
-
-**Note:** Version bump only for package @cardano-sdk/ogmios
-
-## [0.6.0-nightly.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.6.0-nightly.10...@cardano-sdk/ogmios@0.6.0-nightly.11) (2022-10-05)
+- rework TxSubmitProvider to submit transactions as hex string instead of Buffer
+- rework all provider signatures args from positional to a single object
 
 ### Features
 
+- improve db health check query ([1595350](https://github.com/input-output-hk/cardano-js-sdk/commit/159535092033a745664c399ee1273da436fd3374))
 - **ogmios:** createInteractionContextWithLogger util ([7602718](https://github.com/input-output-hk/cardano-js-sdk/commit/7602718ec65949d2a3dd17d3dfaeba782a6c22c9))
 
 ### Bug Fixes
 
 - **ogmios:** correctly handle interaction context logging with createInteractionContextWithLogger ([9298ee0](https://github.com/input-output-hk/cardano-js-sdk/commit/9298ee0e6c98bef0c1aa4dc70f349094ec00a5c9))
-
-## [0.6.0-nightly.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.6.0-nightly.9...@cardano-sdk/ogmios@0.6.0-nightly.10) (2022-09-26)
-
-**Note:** Version bump only for package @cardano-sdk/ogmios
-
-## [0.6.0-nightly.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.6.0-nightly.8...@cardano-sdk/ogmios@0.6.0-nightly.9) (2022-09-23)
-
-**Note:** Version bump only for package @cardano-sdk/ogmios
-
-## [0.6.0-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.6.0-nightly.7...@cardano-sdk/ogmios@0.6.0-nightly.8) (2022-09-21)
-
-**Note:** Version bump only for package @cardano-sdk/ogmios
-
-## [0.6.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.6.0-nightly.6...@cardano-sdk/ogmios@0.6.0-nightly.7) (2022-09-20)
-
-**Note:** Version bump only for package @cardano-sdk/ogmios
-
-## [0.6.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.6.0-nightly.5...@cardano-sdk/ogmios@0.6.0-nightly.6) (2022-09-16)
-
-**Note:** Version bump only for package @cardano-sdk/ogmios
-
-## [0.6.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.6.0-nightly.4...@cardano-sdk/ogmios@0.6.0-nightly.5) (2022-09-15)
-
-### Bug Fixes
-
 - **ogmios:** correctly map era summary slotLength ([b3be517](https://github.com/input-output-hk/cardano-js-sdk/commit/b3be5174ca7759c76d64a4923efc5c004275e8df))
-
-## [0.6.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.5.0...@cardano-sdk/ogmios@0.6.0-nightly.4) (2022-09-14)
-
-### ⚠ BREAKING CHANGES
-
-- rework TxSubmitProvider to submit transactions as hex string instead of Buffer
-- rework all provider signatures args from positional to a single object
-
-### Code Refactoring
-
-- rework all provider signatures args from positional to a single object ([dee30b5](https://github.com/input-output-hk/cardano-js-sdk/commit/dee30b52af5edc1241142a2c06708266a1ae7fa4))
-- rework TxSubmitProvider to submit transactions as hex string instead of Buffer ([032a1b7](https://github.com/input-output-hk/cardano-js-sdk/commit/032a1b7a11941d52b5baf0d447b615c58a294068))
-
-## [0.6.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.5.0...@cardano-sdk/ogmios@0.6.0-nightly.0) (2022-09-14)
-
-### ⚠ BREAKING CHANGES
-
-- rework TxSubmitProvider to submit transactions as hex string instead of Buffer
-- rework all provider signatures args from positional to a single object
 
 ### Code Refactoring
 

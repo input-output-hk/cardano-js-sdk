@@ -3,199 +3,67 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.6.0-nightly.21](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.20...@cardano-sdk/cardano-services@0.6.0-nightly.21) (2022-11-03)
-
-### Features
-
-- **cardano-services:** Add '/meta' endpoint for deployment information ([872bf9c](https://github.com/input-output-hk/cardano-js-sdk/commit/872bf9ca629e0d5a6289bd18b0deadad7c0d8cc9))
-
-## [0.6.0-nightly.20](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.19...@cardano-sdk/cardano-services@0.6.0-nightly.20) (2022-11-02)
+## [0.6.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.0...@cardano-sdk/cardano-services@0.6.0) (2022-11-04)
 
 ### ⚠ BREAKING CHANGES
 
 - **cardano-services:** support pools ext metadata
 - support the complete set of protocol parameters
-
-### Features
-
-- **cardano-services:** support pools ext metadata ([0ac5451](https://github.com/input-output-hk/cardano-js-sdk/commit/0ac545179dac74101f978d62c968cc05898da08b))
-- create common mock server util ([53bd4f7](https://github.com/input-output-hk/cardano-js-sdk/commit/53bd4f7de87406a8d3623c903847268e57d0ddeb))
-- support the complete set of protocol parameters ([46d7aa9](https://github.com/input-output-hk/cardano-js-sdk/commit/46d7aa97230a666ca119c7de5ed0cf70b742d2a2))
-
-### Bug Fixes
-
-- **cardano-services:** correct spelling mistakes ([a7b098f](https://github.com/input-output-hk/cardano-js-sdk/commit/a7b098ffa1fa2d47ba01e5dc15bc2c702013c835))
-
-## [0.6.0-nightly.19](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.18...@cardano-sdk/cardano-services@0.6.0-nightly.19) (2022-11-01)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services
-
-## [0.6.0-nightly.18](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.17...@cardano-sdk/cardano-services@0.6.0-nightly.18) (2022-10-26)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services
-
-## [0.6.0-nightly.17](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.16...@cardano-sdk/cardano-services@0.6.0-nightly.17) (2022-10-24)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services
-
-## [0.6.0-nightly.16](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.15...@cardano-sdk/cardano-services@0.6.0-nightly.16) (2022-10-13)
-
-### Bug Fixes
-
-- **cardano-services:** fixed an issue that was causing live stake and saturation values to be calculated incorrectly ([5e714e2](https://github.com/input-output-hk/cardano-js-sdk/commit/5e714e2c5af5a2761389cff8ca24b068252216b8))
-
-## [0.6.0-nightly.15](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.14...@cardano-sdk/cardano-services@0.6.0-nightly.15) (2022-10-11)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services
-
-## [0.6.0-nightly.14](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.13...@cardano-sdk/cardano-services@0.6.0-nightly.14) (2022-10-08)
-
-### ⚠ BREAKING CHANGES
-
 - make stake pools pagination a required arg
-
-### Features
-
-- make stake pools pagination a required arg ([6cf8206](https://github.com/input-output-hk/cardano-js-sdk/commit/6cf8206be2162db7196794f7252e5cbb84b65c77))
-
-## [0.6.0-nightly.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.12...@cardano-sdk/cardano-services@0.6.0-nightly.13) (2022-10-07)
-
-### Features
-
-- **cardano-services:** rewardAccounts limitation ([8ca6917](https://github.com/input-output-hk/cardano-js-sdk/commit/8ca6917f3de646bb9cf6f17c7ac5b4bd1940412d))
-
-### Bug Fixes
-
-- **cardano-services:** fix netinf prov possibly causing unhandled rejection on early called shutdown ([1107d4b](https://github.com/input-output-hk/cardano-js-sdk/commit/1107d4b52fc170a86520a4e8b823cfe7ddfc7b5a))
-- **cardano-services:** fix some typos ([303497d](https://github.com/input-output-hk/cardano-js-sdk/commit/303497d4bbc70a2a6ea7566002ad260814284196))
-- **cardano-services:** fixed some not correctly exported symbols ([8c8950a](https://github.com/input-output-hk/cardano-js-sdk/commit/8c8950add7551b6ad4fec4fe50baec40e28b655d))
-
-## [0.6.0-nightly.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.11...@cardano-sdk/cardano-services@0.6.0-nightly.12) (2022-10-05)
-
-### ⚠ BREAKING CHANGES
-
 - add pagination in 'transactionsByAddresses'
 - **cardano-services:** nftMetadataService returns null instead of
+- **input-selection:** renamed cip2 package to input-selection
+- hoist Cardano.util.{deserializeTx,metadatum}
+- rework TxSubmitProvider to submit transactions as hex string instead of Buffer
+- rework all provider signatures args from positional to a single object
+- convert boolean args to support ENV counterparts, parse as booleans
+- hoist hexString utils to util package
 
 ### Features
 
 - add pagination in 'transactionsByAddresses' ([fc88afa](https://github.com/input-output-hk/cardano-js-sdk/commit/fc88afa9f006e9fc7b50b5a98665058a0d563e31))
-- **cardano-services:** nftMetadataService returns null instead of ([7b87d1d](https://github.com/input-output-hk/cardano-js-sdk/commit/7b87d1ded0df482d29dd2b581a3baa9035f32d06))
-
-### Bug Fixes
-
-- **cardano-services:** filter available rewards balance by spendable_epoch>=tip ([4da325a](https://github.com/input-output-hk/cardano-js-sdk/commit/4da325ad39a2d7520f8f8c902e41eed916ac7a38))
-- **cardano-services:** total rewards is now being calculated correctly for current epoch ([6d4cf6c](https://github.com/input-output-hk/cardano-js-sdk/commit/6d4cf6c64ffb038b9e9ef56597ed0ce366ac1826))
-- **cardano-services:** wrong source tx input id ([f6efe3b](https://github.com/input-output-hk/cardano-js-sdk/commit/f6efe3b2507761c4ef5ec7c5b9e8ec87ff2c5039))
-
-### Performance Improvements
-
-- **cardano-services:** order by block.id in ledger tip queries ([b985d3f](https://github.com/input-output-hk/cardano-js-sdk/commit/b985d3f09a870359e7a463088fd22a8054f2fff0))
-
-## [0.6.0-nightly.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.10...@cardano-sdk/cardano-services@0.6.0-nightly.11) (2022-09-26)
-
-### ⚠ BREAKING CHANGES
-
-- **input-selection:** renamed cip2 package to input-selection
-
-### Bug Fixes
-
-- **core:** custom errors no longer hide inner error details ([9d0f51f](https://github.com/input-output-hk/cardano-js-sdk/commit/9d0f51fe4a3b8ae20c8e83b9209397cd99cc044b))
-
-### Code Refactoring
-
-- **input-selection:** renamed cip2 package to input-selection ([f4d6632](https://github.com/input-output-hk/cardano-js-sdk/commit/f4d6632d61c5b63bc15a64ec3962425f9ad2d6eb))
-
-## [0.6.0-nightly.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.9...@cardano-sdk/cardano-services@0.6.0-nightly.10) (2022-09-23)
-
-### ⚠ BREAKING CHANGES
-
-- hoist Cardano.util.{deserializeTx,metadatum}
-
-### Bug Fixes
-
-- **cardano-services:** fixed an issue that was causing pool saturation to be always 0 ([82cab4d](https://github.com/input-output-hk/cardano-js-sdk/commit/82cab4dbe8ab3c8df13309770a953b30f957ebe3))
-
-### Code Refactoring
-
-- hoist Cardano.util.{deserializeTx,metadatum} ([a1d0754](https://github.com/input-output-hk/cardano-js-sdk/commit/a1d07549e7a5fccd36b9f75b9f713c0def8cb97f))
-
-## [0.6.0-nightly.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.8...@cardano-sdk/cardano-services@0.6.0-nightly.9) (2022-09-21)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services
-
-## [0.6.0-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.7...@cardano-sdk/cardano-services@0.6.0-nightly.8) (2022-09-20)
-
-### Features
-
+- **cardano-services:** Add '/meta' endpoint for deployment information ([872bf9c](https://github.com/input-output-hk/cardano-js-sdk/commit/872bf9ca629e0d5a6289bd18b0deadad7c0d8cc9))
+- **cardano-services:** add support for using a stub token metadata service ([6975156](https://github.com/input-output-hk/cardano-js-sdk/commit/6975156724ee0c3d35bccf28e5820bc4a81a5b87))
+- **cardano-services:** adds log of incoming requests ([f302f9c](https://github.com/input-output-hk/cardano-js-sdk/commit/f302f9c656b9026b3b19a63a4ce818acea841a77))
+- **cardano-services:** enhance metrics endpoint ([0fdbb85](https://github.com/input-output-hk/cardano-js-sdk/commit/0fdbb85777d1d8c79189843ad8c7936a42e22380))
 - **cardano-services:** make search stake pool case insensitive ([7fb42a7](https://github.com/input-output-hk/cardano-js-sdk/commit/7fb42a7941ae7cf721e18719b81858b454cfb6b8))
-
-### Bug Fixes
-
-- rollback ProtocolParametersRequiredByWallet type ([0cd8877](https://github.com/input-output-hk/cardano-js-sdk/commit/0cd887737cc5d4f8d920405c803f05f2c47e42f2))
-
-## [0.6.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.6...@cardano-sdk/cardano-services@0.6.0-nightly.7) (2022-09-16)
+- **cardano-services:** nftMetadataService returns null instead of ([7b87d1d](https://github.com/input-output-hk/cardano-js-sdk/commit/7b87d1ded0df482d29dd2b581a3baa9035f32d06))
+- **cardano-services:** rewardAccounts limitation ([8ca6917](https://github.com/input-output-hk/cardano-js-sdk/commit/8ca6917f3de646bb9cf6f17c7ac5b4bd1940412d))
+- **cardano-services:** support pools ext metadata ([0ac5451](https://github.com/input-output-hk/cardano-js-sdk/commit/0ac545179dac74101f978d62c968cc05898da08b))
+- create common mock server util ([53bd4f7](https://github.com/input-output-hk/cardano-js-sdk/commit/53bd4f7de87406a8d3623c903847268e57d0ddeb))
+- improve db health check query ([1595350](https://github.com/input-output-hk/cardano-js-sdk/commit/159535092033a745664c399ee1273da436fd3374))
+- make stake pools pagination a required arg ([6cf8206](https://github.com/input-output-hk/cardano-js-sdk/commit/6cf8206be2162db7196794f7252e5cbb84b65c77))
+- support the complete set of protocol parameters ([46d7aa9](https://github.com/input-output-hk/cardano-js-sdk/commit/46d7aa97230a666ca119c7de5ed0cf70b742d2a2))
 
 ### Bug Fixes
 
 - **cardano-services:** cache total pools count ([fbd9ac5](https://github.com/input-output-hk/cardano-js-sdk/commit/fbd9ac5ad77f471259089391b8f27077bc924c0a))
+- **cardano-services:** correct interval type and only clear if defined ([a23f384](https://github.com/input-output-hk/cardano-js-sdk/commit/a23f3846d85740675b57c14988ac08e35ee133b9))
+- **cardano-services:** correct spelling mistakes ([a7b098f](https://github.com/input-output-hk/cardano-js-sdk/commit/a7b098ffa1fa2d47ba01e5dc15bc2c702013c835))
+- **cardano-services:** filter available rewards balance by spendable_epoch>=tip ([4da325a](https://github.com/input-output-hk/cardano-js-sdk/commit/4da325ad39a2d7520f8f8c902e41eed916ac7a38))
+- **cardano-services:** fix netinf prov possibly causing unhandled rejection on early called shutdown ([1107d4b](https://github.com/input-output-hk/cardano-js-sdk/commit/1107d4b52fc170a86520a4e8b823cfe7ddfc7b5a))
+- **cardano-services:** fix some typos ([303497d](https://github.com/input-output-hk/cardano-js-sdk/commit/303497d4bbc70a2a6ea7566002ad260814284196))
+- **cardano-services:** fixed an issue that was causing live stake and saturation values to be calculated incorrectly ([5e714e2](https://github.com/input-output-hk/cardano-js-sdk/commit/5e714e2c5af5a2761389cff8ca24b068252216b8))
+- **cardano-services:** fixed an issue that was causing pool saturation to be always 0 ([82cab4d](https://github.com/input-output-hk/cardano-js-sdk/commit/82cab4dbe8ab3c8df13309770a953b30f957ebe3))
+- **cardano-services:** fixed some not correctly exported symbols ([8c8950a](https://github.com/input-output-hk/cardano-js-sdk/commit/8c8950add7551b6ad4fec4fe50baec40e28b655d))
+- **cardano-services:** handle CardanoTokenRegistry errors ([32a9b1f](https://github.com/input-output-hk/cardano-js-sdk/commit/32a9b1f4714cd556ef3bf2597b52a4d481efcc58))
 - **cardano-services:** hash/update id model types ([142098c](https://github.com/input-output-hk/cardano-js-sdk/commit/142098ce8cbf74b50230bab85d438bf39b7b045b))
-
-## [0.6.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.5...@cardano-sdk/cardano-services@0.6.0-nightly.6) (2022-09-15)
+- **cardano-services:** total rewards is now being calculated correctly for current epoch ([6d4cf6c](https://github.com/input-output-hk/cardano-js-sdk/commit/6d4cf6c64ffb038b9e9ef56597ed0ce366ac1826))
+- **cardano-services:** wrong source tx input id ([f6efe3b](https://github.com/input-output-hk/cardano-js-sdk/commit/f6efe3b2507761c4ef5ec7c5b9e8ec87ff2c5039))
+- convert boolean args to support ENV counterparts, parse as booleans ([d14bd9d](https://github.com/input-output-hk/cardano-js-sdk/commit/d14bd9d8aeec64f04aab094e0aceb8dc5b803926))
+- **core:** custom errors no longer hide inner error details ([9d0f51f](https://github.com/input-output-hk/cardano-js-sdk/commit/9d0f51fe4a3b8ae20c8e83b9209397cd99cc044b))
+- remove nullability of Protocol Parameters ([f75859d](https://github.com/input-output-hk/cardano-js-sdk/commit/f75859d644c2a6c4d4844b179357ccab7db537bf))
+- rollback ProtocolParametersRequiredByWallet type ([0cd8877](https://github.com/input-output-hk/cardano-js-sdk/commit/0cd887737cc5d4f8d920405c803f05f2c47e42f2))
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services
 
-## [0.6.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.0...@cardano-sdk/cardano-services@0.6.0-nightly.5) (2022-09-14)
+- **cardano-services:** order by block.id in ledger tip queries ([b985d3f](https://github.com/input-output-hk/cardano-js-sdk/commit/b985d3f09a870359e7a463088fd22a8054f2fff0))
 
-### ⚠ BREAKING CHANGES
+## [0.6.0-nightly.17](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.16...@cardano-sdk/cardano-services@0.6.0-nightly.17) (2022-10-24)
 
-- rework TxSubmitProvider to submit transactions as hex string instead of Buffer
-- rework all provider signatures args from positional to a single object
-- convert boolean args to support ENV counterparts, parse as booleans
-- hoist hexString utils to util package
-
-### Features
-
-- **cardano-services:** adds log of incoming requests ([f302f9c](https://github.com/input-output-hk/cardano-js-sdk/commit/f302f9c656b9026b3b19a63a4ce818acea841a77))
-- **cardano-services:** enhance metrics endpoint ([0fdbb85](https://github.com/input-output-hk/cardano-js-sdk/commit/0fdbb85777d1d8c79189843ad8c7936a42e22380))
-
-### Bug Fixes
-
-- **cardano-services:** correct interval type and only clear if defined ([a23f384](https://github.com/input-output-hk/cardano-js-sdk/commit/a23f3846d85740675b57c14988ac08e35ee133b9))
-- **cardano-services:** handle CardanoTokenRegistry errors ([32a9b1f](https://github.com/input-output-hk/cardano-js-sdk/commit/32a9b1f4714cd556ef3bf2597b52a4d481efcc58))
-- convert boolean args to support ENV counterparts, parse as booleans ([d14bd9d](https://github.com/input-output-hk/cardano-js-sdk/commit/d14bd9d8aeec64f04aab094e0aceb8dc5b803926))
-- remove nullability of Protocol Parameters ([f75859d](https://github.com/input-output-hk/cardano-js-sdk/commit/f75859d644c2a6c4d4844b179357ccab7db537bf))
-
-### Code Refactoring
-
+- hoist Cardano.util.{deserializeTx,metadatum} ([a1d0754](https://github.com/input-output-hk/cardano-js-sdk/commit/a1d07549e7a5fccd36b9f75b9f713c0def8cb97f))
 - hoist hexString utils to util package ([0c99d9d](https://github.com/input-output-hk/cardano-js-sdk/commit/0c99d9d37f23bb504d1ac2a530fbe78aa045db66))
-- rework all provider signatures args from positional to a single object ([dee30b5](https://github.com/input-output-hk/cardano-js-sdk/commit/dee30b52af5edc1241142a2c06708266a1ae7fa4))
-- rework TxSubmitProvider to submit transactions as hex string instead of Buffer ([032a1b7](https://github.com/input-output-hk/cardano-js-sdk/commit/032a1b7a11941d52b5baf0d447b615c58a294068))
-
-## [0.6.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.5.0...@cardano-sdk/cardano-services@0.6.0-nightly.0) (2022-09-14)
-
-### ⚠ BREAKING CHANGES
-
-- rework TxSubmitProvider to submit transactions as hex string instead of Buffer
-- rework all provider signatures args from positional to a single object
-- convert boolean args to support ENV counterparts, parse as booleans
-- hoist hexString utils to util package
-
-### Features
-
-- **cardano-services:** adds log of incoming requests ([f302f9c](https://github.com/input-output-hk/cardano-js-sdk/commit/f302f9c656b9026b3b19a63a4ce818acea841a77))
-- **cardano-services:** enhance metrics endpoint ([0fdbb85](https://github.com/input-output-hk/cardano-js-sdk/commit/0fdbb85777d1d8c79189843ad8c7936a42e22380))
-
-### Bug Fixes
-
-- **cardano-services:** correct interval type and only clear if defined ([a23f384](https://github.com/input-output-hk/cardano-js-sdk/commit/a23f3846d85740675b57c14988ac08e35ee133b9))
-- **cardano-services:** handle CardanoTokenRegistry errors ([32a9b1f](https://github.com/input-output-hk/cardano-js-sdk/commit/32a9b1f4714cd556ef3bf2597b52a4d481efcc58))
-- convert boolean args to support ENV counterparts, parse as booleans ([d14bd9d](https://github.com/input-output-hk/cardano-js-sdk/commit/d14bd9d8aeec64f04aab094e0aceb8dc5b803926))
-- remove nullability of Protocol Parameters ([f75859d](https://github.com/input-output-hk/cardano-js-sdk/commit/f75859d644c2a6c4d4844b179357ccab7db537bf))
-
-### Code Refactoring
-
-- hoist hexString utils to util package ([0c99d9d](https://github.com/input-output-hk/cardano-js-sdk/commit/0c99d9d37f23bb504d1ac2a530fbe78aa045db66))
+- **input-selection:** renamed cip2 package to input-selection ([f4d6632](https://github.com/input-output-hk/cardano-js-sdk/commit/f4d6632d61c5b63bc15a64ec3962425f9ad2d6eb))
 - rework all provider signatures args from positional to a single object ([dee30b5](https://github.com/input-output-hk/cardano-js-sdk/commit/dee30b52af5edc1241142a2c06708266a1ae7fa4))
 - rework TxSubmitProvider to submit transactions as hex string instead of Buffer ([032a1b7](https://github.com/input-output-hk/cardano-js-sdk/commit/032a1b7a11941d52b5baf0d447b615c58a294068))
 
@@ -282,7 +150,44 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 - **cardano-services:** remove static create ([7eddc2b](https://github.com/input-output-hk/cardano-js-sdk/commit/7eddc2b5aa44ba96b9fe50d599bc10fa80c0bff8))
 - **cardano-services:** service improvements ([6eda4aa](https://github.com/input-output-hk/cardano-js-sdk/commit/6eda4aa5776db6658c3526e0a17a2554bf01c6b0))
 
-## 0.3.0 (2022-06-24)
+## [0.6.0-nightly.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.9...@cardano-sdk/cardano-services@0.6.0-nightly.10) (2022-09-23)
+
+### ⚠ BREAKING CHANGES
+
+- hoist Cardano.util.{deserializeTx,metadatum}
+
+### Bug Fixes
+
+- **cardano-services:** fixed an issue that was causing pool saturation to be always 0 ([82cab4d](https://github.com/input-output-hk/cardano-js-sdk/commit/82cab4dbe8ab3c8df13309770a953b30f957ebe3))
+
+### Code Refactoring
+
+- hoist Cardano.util.{deserializeTx,metadatum} ([a1d0754](https://github.com/input-output-hk/cardano-js-sdk/commit/a1d07549e7a5fccd36b9f75b9f713c0def8cb97f))
+
+## [0.6.0-nightly.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.8...@cardano-sdk/cardano-services@0.6.0-nightly.9) (2022-09-21)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services
+
+## [0.6.0-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.7...@cardano-sdk/cardano-services@0.6.0-nightly.8) (2022-09-20)
+
+### Features
+
+- **cardano-services:** make search stake pool case insensitive ([7fb42a7](https://github.com/input-output-hk/cardano-js-sdk/commit/7fb42a7941ae7cf721e18719b81858b454cfb6b8))
+
+### Bug Fixes
+
+- rollback ProtocolParametersRequiredByWallet type ([0cd8877](https://github.com/input-output-hk/cardano-js-sdk/commit/0cd887737cc5d4f8d920405c803f05f2c47e42f2))
+
+## [0.6.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.6...@cardano-sdk/cardano-services@0.6.0-nightly.7) (2022-09-16)
+
+### Bug Fixes
+
+- **cardano-services:** cache total pools count ([fbd9ac5](https://github.com/input-output-hk/cardano-js-sdk/commit/fbd9ac5ad77f471259089391b8f27077bc924c0a))
+- **cardano-services:** hash/update id model types ([142098c](https://github.com/input-output-hk/cardano-js-sdk/commit/142098ce8cbf74b50230bab85d438bf39b7b045b))
+
+## [0.6.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0-nightly.5...@cardano-sdk/cardano-services@0.6.0-nightly.6) (2022-09-15)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services
 
 ### ⚠ BREAKING CHANGES
 
@@ -332,7 +237,9 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 - **cardano-services:** enhance cache get method ([99b2b9d](https://github.com/input-output-hk/cardano-js-sdk/commit/99b2b9db0e0f0a5e1171690ab519f1424e46c283))
 
-### Miscellaneous Chores
+## [0.4.0](https://github.com/input-output-hk/cardano-js-sdk/compare/0.3.0...@cardano-sdk/cardano-services@0.4.0) (2022-07-25)
+
+### ⚠ BREAKING CHANGES
 
 - **cardano-graphql-services:** remove graphql concerns from services package, rename ([71a939b](https://github.com/input-output-hk/cardano-js-sdk/commit/71a939b874296d86183d89fce7877c565630e921))
 

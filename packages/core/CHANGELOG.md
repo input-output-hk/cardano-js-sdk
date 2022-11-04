@@ -3,173 +3,63 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.6.0-nightly.18](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0-nightly.17...@cardano-sdk/core@0.6.0-nightly.18) (2022-11-03)
-
-**Note:** Version bump only for package @cardano-sdk/core
-
-## [0.6.0-nightly.17](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0-nightly.16...@cardano-sdk/core@0.6.0-nightly.17) (2022-11-02)
+## [0.6.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.5.0...@cardano-sdk/core@0.6.0) (2022-11-04)
 
 ### ⚠ BREAKING CHANGES
 
 - support the complete set of protocol parameters
+- free CSL resources using freeable util
+- make stake pools pagination a required arg
+- add pagination in 'transactionsByAddresses'
+- **core:** metadatumToCip25 returns `null` instead of `undefined`
+  when metadata does not exist or couldn't be extracted
+- hoist Cardano.util.{deserializeTx,metadatum}
+- hoist core Address namespace to Cardano.util
+- hoist some core.Cardano.util._ to core._
+- **wallet:** compute stability window slots count
+- rename `TxInternals` to `TxBodyWithHash`
+- hoist InputResolver types to core package, in preparation for lifting key management
+- hoist TxInternals to core package, in preparation for lifting key management
+- rework TxSubmitProvider to submit transactions as hex string instead of Buffer
+- rework all provider signatures args from positional to a single object
 
 ### Features
 
+- add pagination in 'transactionsByAddresses' ([fc88afa](https://github.com/input-output-hk/cardano-js-sdk/commit/fc88afa9f006e9fc7b50b5a98665058a0d563e31))
+- added signing options with extra signers to the transaction finalize method ([514b718](https://github.com/input-output-hk/cardano-js-sdk/commit/514b718825af93965739ec5f890f6be2aacf4f48))
+- **core:** added a new inspector for extracting minting and burning information from transactions ([a9289f3](https://github.com/input-output-hk/cardano-js-sdk/commit/a9289f3798e7e8cfc8a46b096414f7e219dd619b))
+- **core:** added a new inspector for extracting pool registration/retirements information from transactions ([e186ba3](https://github.com/input-output-hk/cardano-js-sdk/commit/e186ba360b2d6e55b708f6033a8cd5269d127b66))
+- **core:** added a new inspector for extracting transaction metadata ([d7e1402](https://github.com/input-output-hk/cardano-js-sdk/commit/d7e1402b57cc11b6544c2ecabaf5dcbb46e51525))
+- **core:** added several utility functions to derive some of the information requiered for the use of native scripts native scripts: ([3b757ba](https://github.com/input-output-hk/cardano-js-sdk/commit/3b757ba77e163b44136227ae2a8fa59600b4474f))
 - **core:** define extended metadata types ([dad253d](https://github.com/input-output-hk/cardano-js-sdk/commit/dad253dbc5e83699061f0dbff22839a515de2aa5))
+- **core:** improved custom errors to correctly handle errors from fs package or of type string ([5ea3eac](https://github.com/input-output-hk/cardano-js-sdk/commit/5ea3eac801762a881892ad2267d5a72884c3c1e7))
+- **core:** ogmios to core translation of block type ([b077cb7](https://github.com/input-output-hk/cardano-js-sdk/commit/b077cb71ea77bebf50629066e86825db8e519af0))
+- **core:** return null for no metadata from metadatumToCip25 ([b9343e4](https://github.com/input-output-hk/cardano-js-sdk/commit/b9343e49d2f0fa582be9f150aa42e04a3d3c0bfa))
+- improve db health check query ([1595350](https://github.com/input-output-hk/cardano-js-sdk/commit/159535092033a745664c399ee1273da436fd3374))
+- make stake pools pagination a required arg ([6cf8206](https://github.com/input-output-hk/cardano-js-sdk/commit/6cf8206be2162db7196794f7252e5cbb84b65c77))
 - support the complete set of protocol parameters ([46d7aa9](https://github.com/input-output-hk/cardano-js-sdk/commit/46d7aa97230a666ca119c7de5ed0cf70b742d2a2))
-
-## [0.6.0-nightly.16](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0-nightly.15...@cardano-sdk/core@0.6.0-nightly.16) (2022-11-01)
+- **wallet:** compute stability window slots count ([34b77d3](https://github.com/input-output-hk/cardano-js-sdk/commit/34b77d3379d41ac701214970e70656296136526e))
 
 ### Bug Fixes
 
 - added missing contraints ([7b351ca](https://github.com/input-output-hk/cardano-js-sdk/commit/7b351cada06b9c5ae2f379d02614e05259f7147a))
 - **core:** cleaned up several CSL objects that were leaking ([a99610b](https://github.com/input-output-hk/cardano-js-sdk/commit/a99610bbccaecf3834fe0132309e0379bbf78cd7))
-
-## [0.6.0-nightly.15](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0-nightly.14...@cardano-sdk/core@0.6.0-nightly.15) (2022-10-24)
-
-**Note:** Version bump only for package @cardano-sdk/core
-
-## [0.6.0-nightly.14](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0-nightly.13...@cardano-sdk/core@0.6.0-nightly.14) (2022-10-13)
-
-**Note:** Version bump only for package @cardano-sdk/core
-
-## [0.6.0-nightly.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0-nightly.12...@cardano-sdk/core@0.6.0-nightly.13) (2022-10-11)
-
-**Note:** Version bump only for package @cardano-sdk/core
-
-## [0.6.0-nightly.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0-nightly.11...@cardano-sdk/core@0.6.0-nightly.12) (2022-10-08)
-
-### ⚠ BREAKING CHANGES
-
-- make stake pools pagination a required arg
-
-### Features
-
-- make stake pools pagination a required arg ([6cf8206](https://github.com/input-output-hk/cardano-js-sdk/commit/6cf8206be2162db7196794f7252e5cbb84b65c77))
-
-## [0.6.0-nightly.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0-nightly.10...@cardano-sdk/core@0.6.0-nightly.11) (2022-10-07)
-
-### Features
-
-- **core:** improved custom errors to correctly handle errors from fs package or of type string ([5ea3eac](https://github.com/input-output-hk/cardano-js-sdk/commit/5ea3eac801762a881892ad2267d5a72884c3c1e7))
-
-## [0.6.0-nightly.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0-nightly.9...@cardano-sdk/core@0.6.0-nightly.10) (2022-10-05)
-
-### ⚠ BREAKING CHANGES
-
-- add pagination in 'transactionsByAddresses'
-- **core:** metadatumToCip25 returns `null` instead of `undefined`
-  when metadata does not exist or couldn't be extracted
-
-### Features
-
-- add pagination in 'transactionsByAddresses' ([fc88afa](https://github.com/input-output-hk/cardano-js-sdk/commit/fc88afa9f006e9fc7b50b5a98665058a0d563e31))
-- **core:** return null for no metadata from metadatumToCip25 ([b9343e4](https://github.com/input-output-hk/cardano-js-sdk/commit/b9343e49d2f0fa582be9f150aa42e04a3d3c0bfa))
-
-## [0.6.0-nightly.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0-nightly.8...@cardano-sdk/core@0.6.0-nightly.9) (2022-09-26)
-
-### Bug Fixes
-
+- **core:** coreToCsl converts datum in txOut function ([cc62055](https://github.com/input-output-hk/cardano-js-sdk/commit/cc62055bd667e9da9b5b7abf8da322d5313a1b73))
 - **core:** custom errors no longer hide inner error details ([9d0f51f](https://github.com/input-output-hk/cardano-js-sdk/commit/9d0f51fe4a3b8ae20c8e83b9209397cd99cc044b))
-
-## [0.6.0-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0-nightly.7...@cardano-sdk/core@0.6.0-nightly.8) (2022-09-23)
-
-### ⚠ BREAKING CHANGES
-
-- hoist Cardano.util.{deserializeTx,metadatum}
-- hoist core Address namespace to Cardano.util
-- hoist some core.Cardano.util._ to core._
-
-### Features
-
-- **core:** added a new inspector for extracting minting and burning information from transactions ([a9289f3](https://github.com/input-output-hk/cardano-js-sdk/commit/a9289f3798e7e8cfc8a46b096414f7e219dd619b))
-- **core:** added a new inspector for extracting pool registration/retirements information from transactions ([e186ba3](https://github.com/input-output-hk/cardano-js-sdk/commit/e186ba360b2d6e55b708f6033a8cd5269d127b66))
-- **core:** added a new inspector for extracting transaction metadata ([d7e1402](https://github.com/input-output-hk/cardano-js-sdk/commit/d7e1402b57cc11b6544c2ecabaf5dcbb46e51525))
+- **core:** handle skipped testnet eras when configured for auto-upgrade ([47fe7c1](https://github.com/input-output-hk/cardano-js-sdk/commit/47fe7c1d33576359175db1000a67ae08736254a7))
+- **core:** narrow down BootstrapWitness types & fix CSL conversion ([0e8694b](https://github.com/input-output-hk/cardano-js-sdk/commit/0e8694b6e2b99d09ce8696ca2b88234e78381458))
+- **core:** subtractTokenMaps shouldn't change first element ([3851166](https://github.com/input-output-hk/cardano-js-sdk/commit/38511660fa1fa9f28f7d5eddcce57310dc4b913e))
+- **core:** update hardcoded testnetEraSummaries with correct start of shelley era ([8489da9](https://github.com/input-output-hk/cardano-js-sdk/commit/8489da9da98e90e9e3a2198ee19b662ed3475772))
+- free CSL resources using freeable util ([5ce0056](https://github.com/input-output-hk/cardano-js-sdk/commit/5ce0056fb108f7bccfbd9f8ef562b82277f3c613))
+- remove nullability of Protocol Parameters ([f75859d](https://github.com/input-output-hk/cardano-js-sdk/commit/f75859d644c2a6c4d4844b179357ccab7db537bf))
+- rollback ProtocolParametersRequiredByWallet type ([0cd8877](https://github.com/input-output-hk/cardano-js-sdk/commit/0cd887737cc5d4f8d920405c803f05f2c47e42f2))
 
 ### Code Refactoring
 
 - hoist Cardano.util.{deserializeTx,metadatum} ([a1d0754](https://github.com/input-output-hk/cardano-js-sdk/commit/a1d07549e7a5fccd36b9f75b9f713c0def8cb97f))
 - hoist core Address namespace to Cardano.util ([c0af6c3](https://github.com/input-output-hk/cardano-js-sdk/commit/c0af6c333420b4305f021a50bbdf25317b85554f))
+- hoist InputResolver types to core package, in preparation for lifting key management ([aaf430e](https://github.com/input-output-hk/cardano-js-sdk/commit/aaf430efefcc5c87f1acfaf227f4aec11fc8db8a))
 - hoist some core.Cardano.util._ to core._ ([5c18c7b](https://github.com/input-output-hk/cardano-js-sdk/commit/5c18c7be146578991753c081ab4da0adae9b3f88))
-
-## [0.6.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0-nightly.6...@cardano-sdk/core@0.6.0-nightly.7) (2022-09-21)
-
-### Bug Fixes
-
-- **core:** coreToCsl converts datum in txOut function ([cc62055](https://github.com/input-output-hk/cardano-js-sdk/commit/cc62055bd667e9da9b5b7abf8da322d5313a1b73))
-
-## [0.6.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0-nightly.5...@cardano-sdk/core@0.6.0-nightly.6) (2022-09-20)
-
-### Bug Fixes
-
-- **core:** subtractTokenMaps shouldn't change first element ([3851166](https://github.com/input-output-hk/cardano-js-sdk/commit/38511660fa1fa9f28f7d5eddcce57310dc4b913e))
-- rollback ProtocolParametersRequiredByWallet type ([0cd8877](https://github.com/input-output-hk/cardano-js-sdk/commit/0cd887737cc5d4f8d920405c803f05f2c47e42f2))
-
-## [0.6.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0-nightly.4...@cardano-sdk/core@0.6.0-nightly.5) (2022-09-16)
-
-### ⚠ BREAKING CHANGES
-
-- **wallet:** compute stability window slots count
-
-### Features
-
-- **wallet:** compute stability window slots count ([34b77d3](https://github.com/input-output-hk/cardano-js-sdk/commit/34b77d3379d41ac701214970e70656296136526e))
-
-## [0.6.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.5.0...@cardano-sdk/core@0.6.0-nightly.4) (2022-09-14)
-
-### ⚠ BREAKING CHANGES
-
-- rename `TxInternals` to `TxBodyWithHash`
-- hoist InputResolver types to core package, in preparation for lifting key management
-- hoist TxInternals to core package, in preparation for lifting key management
-- rework TxSubmitProvider to submit transactions as hex string instead of Buffer
-- rework all provider signatures args from positional to a single object
-
-### Features
-
-- added signing options with extra signers to the transaction finalize method ([514b718](https://github.com/input-output-hk/cardano-js-sdk/commit/514b718825af93965739ec5f890f6be2aacf4f48))
-- **core:** added several utility functions to derive some of the information requiered for the use of native scripts native scripts: ([3b757ba](https://github.com/input-output-hk/cardano-js-sdk/commit/3b757ba77e163b44136227ae2a8fa59600b4474f))
-
-### Bug Fixes
-
-- **core:** handle skipped testnet eras when configured for auto-upgrade ([47fe7c1](https://github.com/input-output-hk/cardano-js-sdk/commit/47fe7c1d33576359175db1000a67ae08736254a7))
-- **core:** narrow down BootstrapWitness types & fix CSL conversion ([0e8694b](https://github.com/input-output-hk/cardano-js-sdk/commit/0e8694b6e2b99d09ce8696ca2b88234e78381458))
-- **core:** update hardcoded testnetEraSummaries with correct start of shelley era ([8489da9](https://github.com/input-output-hk/cardano-js-sdk/commit/8489da9da98e90e9e3a2198ee19b662ed3475772))
-- remove nullability of Protocol Parameters ([f75859d](https://github.com/input-output-hk/cardano-js-sdk/commit/f75859d644c2a6c4d4844b179357ccab7db537bf))
-
-### Code Refactoring
-
-- hoist InputResolver types to core package, in preparation for lifting key management ([aaf430e](https://github.com/input-output-hk/cardano-js-sdk/commit/aaf430efefcc5c87f1acfaf227f4aec11fc8db8a))
-- hoist TxInternals to core package, in preparation for lifting key management ([f5510f3](https://github.com/input-output-hk/cardano-js-sdk/commit/f5510f340d592998b3194dd303bd14b184a0a3e3))
-- rename `TxInternals` to `TxBodyWithHash` ([77567aa](https://github.com/input-output-hk/cardano-js-sdk/commit/77567aab56395ded6d9b0ba7488aacc2d3f856a0))
-- rework all provider signatures args from positional to a single object ([dee30b5](https://github.com/input-output-hk/cardano-js-sdk/commit/dee30b52af5edc1241142a2c06708266a1ae7fa4))
-- rework TxSubmitProvider to submit transactions as hex string instead of Buffer ([032a1b7](https://github.com/input-output-hk/cardano-js-sdk/commit/032a1b7a11941d52b5baf0d447b615c58a294068))
-
-## [0.6.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.5.0...@cardano-sdk/core@0.6.0-nightly.0) (2022-09-14)
-
-### ⚠ BREAKING CHANGES
-
-- rename `TxInternals` to `TxBodyWithHash`
-- hoist InputResolver types to core package, in preparation for lifting key management
-- hoist TxInternals to core package, in preparation for lifting key management
-- rework TxSubmitProvider to submit transactions as hex string instead of Buffer
-- rework all provider signatures args from positional to a single object
-
-### Features
-
-- added signing options with extra signers to the transaction finalize method ([514b718](https://github.com/input-output-hk/cardano-js-sdk/commit/514b718825af93965739ec5f890f6be2aacf4f48))
-- **core:** added several utility functions to derive some of the information requiered for the use of native scripts native scripts: ([3b757ba](https://github.com/input-output-hk/cardano-js-sdk/commit/3b757ba77e163b44136227ae2a8fa59600b4474f))
-
-### Bug Fixes
-
-- **core:** handle skipped testnet eras when configured for auto-upgrade ([47fe7c1](https://github.com/input-output-hk/cardano-js-sdk/commit/47fe7c1d33576359175db1000a67ae08736254a7))
-- **core:** narrow down BootstrapWitness types & fix CSL conversion ([0e8694b](https://github.com/input-output-hk/cardano-js-sdk/commit/0e8694b6e2b99d09ce8696ca2b88234e78381458))
-- **core:** update hardcoded testnetEraSummaries with correct start of shelley era ([8489da9](https://github.com/input-output-hk/cardano-js-sdk/commit/8489da9da98e90e9e3a2198ee19b662ed3475772))
-- remove nullability of Protocol Parameters ([f75859d](https://github.com/input-output-hk/cardano-js-sdk/commit/f75859d644c2a6c4d4844b179357ccab7db537bf))
-
-### Code Refactoring
-
-- hoist InputResolver types to core package, in preparation for lifting key management ([aaf430e](https://github.com/input-output-hk/cardano-js-sdk/commit/aaf430efefcc5c87f1acfaf227f4aec11fc8db8a))
 - hoist TxInternals to core package, in preparation for lifting key management ([f5510f3](https://github.com/input-output-hk/cardano-js-sdk/commit/f5510f340d592998b3194dd303bd14b184a0a3e3))
 - rename `TxInternals` to `TxBodyWithHash` ([77567aa](https://github.com/input-output-hk/cardano-js-sdk/commit/77567aab56395ded6d9b0ba7488aacc2d3f856a0))
 - rework all provider signatures args from positional to a single object ([dee30b5](https://github.com/input-output-hk/cardano-js-sdk/commit/dee30b52af5edc1241142a2c06708266a1ae7fa4))
@@ -222,7 +112,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 - update min utxo computation to be Babbage-compatible ([51ca1d5](https://github.com/input-output-hk/cardano-js-sdk/commit/51ca1d5716b62b47d211475aba1be4a6d5782397))
 
-## 0.3.0 (2022-06-24)
+### Code Refactoring
 
 ### ⚠ BREAKING CHANGES
 
@@ -335,7 +225,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 - rm imports from @cardano-sdk/_/src/_ ([3fdead3](https://github.com/input-output-hk/cardano-js-sdk/commit/3fdead3ae381a3efb98299b9881c6a964461b7db))
 - validate the correct Ed25519KeyHash length (28 bytes) ([0e0b592](https://github.com/input-output-hk/cardano-js-sdk/commit/0e0b592e2b4b0689f592076cd79dfaac88b43c57))
 
-### Miscellaneous Chores
+### ⚠ BREAKING CHANGES
 
 - update ogmios to 5.1.0 ([973bf9e](https://github.com/input-output-hk/cardano-js-sdk/commit/973bf9e6b74f51167f8a1c45560eaabd37bb8525))
 

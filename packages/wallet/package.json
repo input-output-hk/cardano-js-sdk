@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/wallet",
-  "version": "0.6.0-nightly.21",
+  "version": "0.6.0",
   "description": "Wallet modules",
   "engines": {
     "node": ">=14.20.1"
@@ -53,8 +53,8 @@
   },
   "devDependencies": {
     "@cardano-ogmios/client": "5.5.5",
-    "@cardano-sdk/ogmios": "^0.6.0-nightly.19",
-    "@cardano-sdk/util-dev": "^0.5.0-nightly.18",
+    "@cardano-sdk/ogmios": "^0.6.0",
+    "@cardano-sdk/util-dev": "^0.5.0",
     "@types/node-hid": "^1.3.1",
     "@types/pouchdb": "^6.4.0",
     "bunyan": "^1.8.15",
@@ -71,12 +71,12 @@
     "webextension-polyfill": "^0.9.0"
   },
   "dependencies": {
-    "@cardano-sdk/core": "^0.6.0-nightly.18",
-    "@cardano-sdk/dapp-connector": "^0.6.0-nightly.8",
-    "@cardano-sdk/input-selection": "^0.6.0-nightly.10",
-    "@cardano-sdk/key-management": "^0.2.0-nightly.16",
-    "@cardano-sdk/util": "^0.6.0-nightly.6",
-    "@cardano-sdk/util-rxjs": "^0.4.2-nightly.21",
+    "@cardano-sdk/core": "^0.6.0",
+    "@cardano-sdk/dapp-connector": "^0.6.0",
+    "@cardano-sdk/input-selection": "^0.6.0",
+    "@cardano-sdk/key-management": "^0.2.0",
+    "@cardano-sdk/util": "^0.6.0",
+    "@cardano-sdk/util-rxjs": "^0.4.2",
     "backoff-rxjs": "^7.0.0",
     "delay": "^5.0.0",
     "emittery": "^0.10.0",

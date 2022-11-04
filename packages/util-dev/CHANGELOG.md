@@ -3,85 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.5.0-nightly.18](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.5.0-nightly.17...@cardano-sdk/util-dev@0.5.0-nightly.18) (2022-11-03)
+## [0.5.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.4.1...@cardano-sdk/util-dev@0.5.0) (2022-11-04)
 
-**Note:** Version bump only for package @cardano-sdk/util-dev
+### ⚠ BREAKING CHANGES
 
-## [0.5.0-nightly.17](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.5.0-nightly.16...@cardano-sdk/util-dev@0.5.0-nightly.17) (2022-11-02)
+- free CSL resources using freeable util
+- make stake pools pagination a required arg
+- rework all provider signatures args from positional to a single object
 
 ### Features
 
 - create common mock server util ([53bd4f7](https://github.com/input-output-hk/cardano-js-sdk/commit/53bd4f7de87406a8d3623c903847268e57d0ddeb))
-
-## [0.5.0-nightly.16](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.5.0-nightly.15...@cardano-sdk/util-dev@0.5.0-nightly.16) (2022-11-01)
-
-**Note:** Version bump only for package @cardano-sdk/util-dev
-
-## [0.5.0-nightly.15](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.5.0-nightly.14...@cardano-sdk/util-dev@0.5.0-nightly.15) (2022-10-24)
-
-**Note:** Version bump only for package @cardano-sdk/util-dev
-
-## [0.5.0-nightly.14](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.5.0-nightly.13...@cardano-sdk/util-dev@0.5.0-nightly.14) (2022-10-13)
-
-**Note:** Version bump only for package @cardano-sdk/util-dev
-
-## [0.5.0-nightly.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.5.0-nightly.12...@cardano-sdk/util-dev@0.5.0-nightly.13) (2022-10-11)
-
-**Note:** Version bump only for package @cardano-sdk/util-dev
-
-## [0.5.0-nightly.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.5.0-nightly.11...@cardano-sdk/util-dev@0.5.0-nightly.12) (2022-10-08)
-
-### ⚠ BREAKING CHANGES
-
-- make stake pools pagination a required arg
-
-### Features
-
 - make stake pools pagination a required arg ([6cf8206](https://github.com/input-output-hk/cardano-js-sdk/commit/6cf8206be2162db7196794f7252e5cbb84b65c77))
 
-## [0.5.0-nightly.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.5.0-nightly.10...@cardano-sdk/util-dev@0.5.0-nightly.11) (2022-10-07)
-
 **Note:** Version bump only for package @cardano-sdk/util-dev
 
-## [0.5.0-nightly.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.5.0-nightly.9...@cardano-sdk/util-dev@0.5.0-nightly.10) (2022-10-05)
-
-**Note:** Version bump only for package @cardano-sdk/util-dev
-
-## [0.5.0-nightly.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.5.0-nightly.8...@cardano-sdk/util-dev@0.5.0-nightly.9) (2022-09-26)
-
-**Note:** Version bump only for package @cardano-sdk/util-dev
-
-## [0.5.0-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.5.0-nightly.7...@cardano-sdk/util-dev@0.5.0-nightly.8) (2022-09-23)
-
-**Note:** Version bump only for package @cardano-sdk/util-dev
-
-## [0.5.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.5.0-nightly.6...@cardano-sdk/util-dev@0.5.0-nightly.7) (2022-09-21)
-
-**Note:** Version bump only for package @cardano-sdk/util-dev
-
-## [0.5.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.5.0-nightly.5...@cardano-sdk/util-dev@0.5.0-nightly.6) (2022-09-20)
-
-**Note:** Version bump only for package @cardano-sdk/util-dev
-
-## [0.5.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.5.0-nightly.4...@cardano-sdk/util-dev@0.5.0-nightly.5) (2022-09-16)
-
-**Note:** Version bump only for package @cardano-sdk/util-dev
-
-## [0.5.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.4.1...@cardano-sdk/util-dev@0.5.0-nightly.4) (2022-09-14)
-
-### ⚠ BREAKING CHANGES
-
-- rework all provider signatures args from positional to a single object
-
-### Code Refactoring
-
-- rework all provider signatures args from positional to a single object ([dee30b5](https://github.com/input-output-hk/cardano-js-sdk/commit/dee30b52af5edc1241142a2c06708266a1ae7fa4))
-
-## [0.5.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.4.1...@cardano-sdk/util-dev@0.5.0-nightly.0) (2022-09-14)
-
-### ⚠ BREAKING CHANGES
-
-- rework all provider signatures args from positional to a single object
+- free CSL resources using freeable util ([5ce0056](https://github.com/input-output-hk/cardano-js-sdk/commit/5ce0056fb108f7bccfbd9f8ef562b82277f3c613))
 
 ### Code Refactoring
 
@@ -97,9 +34,11 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 - **util-dev:** rm TestLogger dependency on 'stream' for browser compat ([297a27e](https://github.com/input-output-hk/cardano-js-sdk/commit/297a27e089dff5a8dd0dfa33835d4982db370801))
 
-## [0.4.0](https://github.com/input-output-hk/cardano-js-sdk/compare/0.3.0...@cardano-sdk/util-dev@0.4.0) (2022-07-25)
+**Note:** Version bump only for package @cardano-sdk/util-dev
 
-## 0.3.0 (2022-06-24)
+## [0.5.0-nightly.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.5.0-nightly.12...@cardano-sdk/util-dev@0.5.0-nightly.13) (2022-10-11)
+
+**Note:** Version bump only for package @cardano-sdk/util-dev
 
 ### ⚠ BREAKING CHANGES
 

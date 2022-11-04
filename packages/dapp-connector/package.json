@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/dapp-connector",
-  "version": "0.6.0-nightly.8",
+  "version": "0.6.0",
   "description": "TypeScript definitions for the dApp Connector standard CIP30",
   "engines": {
     "node": ">=14.20.1"
@@ -63,7 +63,7 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "@cardano-sdk/core": "^0.6.0-nightly.18",
+    "@cardano-sdk/core": "^0.6.0",
     "ts-custom-error": "^3.2.0",
     "ts-log": "^2.2.3",
     "webextension-polyfill": "^0.8.0"

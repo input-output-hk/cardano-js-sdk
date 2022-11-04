@@ -3,35 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.6.0-nightly.21](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.6.0-nightly.20...@cardano-sdk/web-extension@0.6.0-nightly.21) (2022-11-03)
-
-**Note:** Version bump only for package @cardano-sdk/web-extension
-
-## [0.6.0-nightly.20](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.6.0-nightly.19...@cardano-sdk/web-extension@0.6.0-nightly.20) (2022-11-02)
-
-**Note:** Version bump only for package @cardano-sdk/web-extension
-
-## [0.6.0-nightly.19](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.6.0-nightly.18...@cardano-sdk/web-extension@0.6.0-nightly.19) (2022-11-01)
-
-**Note:** Version bump only for package @cardano-sdk/web-extension
-
-## [0.6.0-nightly.18](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.6.0-nightly.17...@cardano-sdk/web-extension@0.6.0-nightly.18) (2022-10-26)
-
-**Note:** Version bump only for package @cardano-sdk/web-extension
-
-## [0.6.0-nightly.17](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.6.0-nightly.16...@cardano-sdk/web-extension@0.6.0-nightly.17) (2022-10-25)
+## [0.6.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.5.0...@cardano-sdk/web-extension@0.6.0) (2022-11-04)
 
 ### ⚠ BREAKING CHANGES
 
 - **web-extension:** `ExposeApiProps` `api` has changed to observable `api$`.
   Users can use rxjs `of` function to create an observable: `api$: of(api)` to
   adapt existing code to this change.
+- **dapp-connector:** renamed cip30 package to dapp-connector
+- lift key management and governance concepts to new packages
+- **web-extension:** rename messaging destroy->shutdown for consistent naming
 
 ### Features
 
 - **web-extension:** enhance remoteApi to allow changing observed api object ([6245b90](https://github.com/input-output-hk/cardano-js-sdk/commit/6245b908d33aa14a2736f110add4605d3ce3ab4e))
-
-## [0.6.0-nightly.16](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.6.0-nightly.15...@cardano-sdk/web-extension@0.6.0-nightly.16) (2022-10-24)
 
 **Note:** Version bump only for package @cardano-sdk/web-extension
 
@@ -51,77 +36,13 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 **Note:** Version bump only for package @cardano-sdk/web-extension
 
-## [0.6.0-nightly.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.6.0-nightly.10...@cardano-sdk/web-extension@0.6.0-nightly.11) (2022-10-05)
-
-### ⚠ BREAKING CHANGES
-
-- **dapp-connector:** renamed cip30 package to dapp-connector
+- **web-extension:** destroy messenger ports upon unsubscribing exposed object ([905087b](https://github.com/input-output-hk/cardano-js-sdk/commit/905087b54218e061ae1e19a6377f1a262f8b47d2))
+- **web-extension:** encapsulate potential EmptyError with a new RemoteApiShutdownError ([7819453](https://github.com/input-output-hk/cardano-js-sdk/commit/7819453a60c863c5f21168e2084bad7d928f59e9))
+- **web-extension:** un-exposing an object in background process doesn't destroy the entire messaging ([8178a13](https://github.com/input-output-hk/cardano-js-sdk/commit/8178a13a40c709e11f1209fd0fe00e7f9f481716))
 
 ### Code Refactoring
 
 - **dapp-connector:** renamed cip30 package to dapp-connector ([cb4411d](https://github.com/input-output-hk/cardano-js-sdk/commit/cb4411da916b263ad8a6d85e0bdaffcfe21646c5))
-
-## [0.6.0-nightly.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.6.0-nightly.9...@cardano-sdk/web-extension@0.6.0-nightly.10) (2022-09-26)
-
-**Note:** Version bump only for package @cardano-sdk/web-extension
-
-## [0.6.0-nightly.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.6.0-nightly.8...@cardano-sdk/web-extension@0.6.0-nightly.9) (2022-09-23)
-
-**Note:** Version bump only for package @cardano-sdk/web-extension
-
-## [0.6.0-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.6.0-nightly.7...@cardano-sdk/web-extension@0.6.0-nightly.8) (2022-09-22)
-
-**Note:** Version bump only for package @cardano-sdk/web-extension
-
-## [0.6.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.6.0-nightly.6...@cardano-sdk/web-extension@0.6.0-nightly.7) (2022-09-21)
-
-**Note:** Version bump only for package @cardano-sdk/web-extension
-
-## [0.6.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.6.0-nightly.5...@cardano-sdk/web-extension@0.6.0-nightly.6) (2022-09-20)
-
-**Note:** Version bump only for package @cardano-sdk/web-extension
-
-## [0.6.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.6.0-nightly.4...@cardano-sdk/web-extension@0.6.0-nightly.5) (2022-09-16)
-
-**Note:** Version bump only for package @cardano-sdk/web-extension
-
-## [0.6.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.6.0-nightly.3...@cardano-sdk/web-extension@0.6.0-nightly.4) (2022-09-15)
-
-**Note:** Version bump only for package @cardano-sdk/web-extension
-
-## [0.6.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.5.0...@cardano-sdk/web-extension@0.6.0-nightly.3) (2022-09-14)
-
-### ⚠ BREAKING CHANGES
-
-- lift key management and governance concepts to new packages
-- **web-extension:** rename messaging destroy->shutdown for consistent naming
-
-### Bug Fixes
-
-- **web-extension:** destroy messenger ports upon unsubscribing exposed object ([905087b](https://github.com/input-output-hk/cardano-js-sdk/commit/905087b54218e061ae1e19a6377f1a262f8b47d2))
-- **web-extension:** encapsulate potential EmptyError with a new RemoteApiShutdownError ([7819453](https://github.com/input-output-hk/cardano-js-sdk/commit/7819453a60c863c5f21168e2084bad7d928f59e9))
-- **web-extension:** un-exposing an object in background process doesn't destroy the entire messaging ([8178a13](https://github.com/input-output-hk/cardano-js-sdk/commit/8178a13a40c709e11f1209fd0fe00e7f9f481716))
-
-### Code Refactoring
-
-- lift key management and governance concepts to new packages ([15cde5f](https://github.com/input-output-hk/cardano-js-sdk/commit/15cde5f9becff94dac17278cb45e3adcaac763b5))
-- **web-extension:** rename messaging destroy->shutdown for consistent naming ([fa0ae48](https://github.com/input-output-hk/cardano-js-sdk/commit/fa0ae480881c12109a99f51cce346505b0105c0e))
-
-## [0.6.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.5.0...@cardano-sdk/web-extension@0.6.0-nightly.0) (2022-09-14)
-
-### ⚠ BREAKING CHANGES
-
-- lift key management and governance concepts to new packages
-- **web-extension:** rename messaging destroy->shutdown for consistent naming
-
-### Bug Fixes
-
-- **web-extension:** destroy messenger ports upon unsubscribing exposed object ([905087b](https://github.com/input-output-hk/cardano-js-sdk/commit/905087b54218e061ae1e19a6377f1a262f8b47d2))
-- **web-extension:** encapsulate potential EmptyError with a new RemoteApiShutdownError ([7819453](https://github.com/input-output-hk/cardano-js-sdk/commit/7819453a60c863c5f21168e2084bad7d928f59e9))
-- **web-extension:** un-exposing an object in background process doesn't destroy the entire messaging ([8178a13](https://github.com/input-output-hk/cardano-js-sdk/commit/8178a13a40c709e11f1209fd0fe00e7f9f481716))
-
-### Code Refactoring
-
 - lift key management and governance concepts to new packages ([15cde5f](https://github.com/input-output-hk/cardano-js-sdk/commit/15cde5f9becff94dac17278cb45e3adcaac763b5))
 - **web-extension:** rename messaging destroy->shutdown for consistent naming ([fa0ae48](https://github.com/input-output-hk/cardano-js-sdk/commit/fa0ae480881c12109a99f51cce346505b0105c0e))
 
@@ -166,7 +87,11 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 - update min utxo computation to be Babbage-compatible
 
-### Features
+### Bug Fixes
+
+- **web-extension:** destroy messenger ports upon unsubscribing exposed object ([905087b](https://github.com/input-output-hk/cardano-js-sdk/commit/905087b54218e061ae1e19a6377f1a262f8b47d2))
+- **web-extension:** encapsulate potential EmptyError with a new RemoteApiShutdownError ([7819453](https://github.com/input-output-hk/cardano-js-sdk/commit/7819453a60c863c5f21168e2084bad7d928f59e9))
+- **web-extension:** un-exposing an object in background process doesn't destroy the entire messaging ([8178a13](https://github.com/input-output-hk/cardano-js-sdk/commit/8178a13a40c709e11f1209fd0fe00e7f9f481716))
 
 - add cip36 metadataBuilder ([0632dc5](https://github.com/input-output-hk/cardano-js-sdk/commit/0632dc508e6be7bc37024e5f8128337ba64a9f47))
 
@@ -174,7 +99,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 - update min utxo computation to be Babbage-compatible ([51ca1d5](https://github.com/input-output-hk/cardano-js-sdk/commit/51ca1d5716b62b47d211475aba1be4a6d5782397))
 
-## 0.3.0 (2022-06-24)
+### Code Refactoring
 
 ### ⚠ BREAKING CHANGES
 

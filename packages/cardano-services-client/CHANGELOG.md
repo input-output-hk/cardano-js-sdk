@@ -3,104 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.6.0-nightly.19](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.6.0-nightly.18...@cardano-sdk/cardano-services-client@0.6.0-nightly.19) (2022-11-03)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-## [0.6.0-nightly.18](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.6.0-nightly.17...@cardano-sdk/cardano-services-client@0.6.0-nightly.18) (2022-11-02)
+## [0.6.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.5.0...@cardano-sdk/cardano-services-client@0.6.0) (2022-11-04)
 
 ### ⚠ BREAKING CHANGES
 
 - support the complete set of protocol parameters
-
-### Features
-
-- support the complete set of protocol parameters ([46d7aa9](https://github.com/input-output-hk/cardano-js-sdk/commit/46d7aa97230a666ca119c7de5ed0cf70b742d2a2))
-
-## [0.6.0-nightly.17](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.6.0-nightly.16...@cardano-sdk/cardano-services-client@0.6.0-nightly.17) (2022-11-01)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-## [0.6.0-nightly.16](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.6.0-nightly.15...@cardano-sdk/cardano-services-client@0.6.0-nightly.16) (2022-10-26)
-
-### Bug Fixes
-
-- **cardano-services-client:** do not re-wrap UnknownTxSubmissionError ([a51c9e8](https://github.com/input-output-hk/cardano-js-sdk/commit/a51c9e870e19acf5a36ca4e7f2da0001c998f95a))
-
-## [0.6.0-nightly.15](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.6.0-nightly.14...@cardano-sdk/cardano-services-client@0.6.0-nightly.15) (2022-10-24)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-## [0.6.0-nightly.14](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.6.0-nightly.13...@cardano-sdk/cardano-services-client@0.6.0-nightly.14) (2022-10-13)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-## [0.6.0-nightly.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.6.0-nightly.12...@cardano-sdk/cardano-services-client@0.6.0-nightly.13) (2022-10-11)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-## [0.6.0-nightly.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.6.0-nightly.11...@cardano-sdk/cardano-services-client@0.6.0-nightly.12) (2022-10-08)
-
-### ⚠ BREAKING CHANGES
-
 - make stake pools pagination a required arg
-
-### Features
-
-- make stake pools pagination a required arg ([6cf8206](https://github.com/input-output-hk/cardano-js-sdk/commit/6cf8206be2162db7196794f7252e5cbb84b65c77))
-
-## [0.6.0-nightly.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.6.0-nightly.10...@cardano-sdk/cardano-services-client@0.6.0-nightly.11) (2022-10-07)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-## [0.6.0-nightly.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.6.0-nightly.9...@cardano-sdk/cardano-services-client@0.6.0-nightly.10) (2022-10-05)
-
-### ⚠ BREAKING CHANGES
-
 - add pagination in 'transactionsByAddresses'
+- rework TxSubmitProvider to submit transactions as hex string instead of Buffer
+- rework all provider signatures args from positional to a single object
 
 ### Features
 
 - add pagination in 'transactionsByAddresses' ([fc88afa](https://github.com/input-output-hk/cardano-js-sdk/commit/fc88afa9f006e9fc7b50b5a98665058a0d563e31))
+- make stake pools pagination a required arg ([6cf8206](https://github.com/input-output-hk/cardano-js-sdk/commit/6cf8206be2162db7196794f7252e5cbb84b65c77))
+- support the complete set of protocol parameters ([46d7aa9](https://github.com/input-output-hk/cardano-js-sdk/commit/46d7aa97230a666ca119c7de5ed0cf70b742d2a2))
 
-## [0.6.0-nightly.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.6.0-nightly.8...@cardano-sdk/cardano-services-client@0.6.0-nightly.9) (2022-09-26)
+### Bug Fixes
 
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-## [0.6.0-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.6.0-nightly.7...@cardano-sdk/cardano-services-client@0.6.0-nightly.8) (2022-09-23)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-## [0.6.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.6.0-nightly.6...@cardano-sdk/cardano-services-client@0.6.0-nightly.7) (2022-09-21)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-## [0.6.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.6.0-nightly.5...@cardano-sdk/cardano-services-client@0.6.0-nightly.6) (2022-09-20)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-## [0.6.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.6.0-nightly.4...@cardano-sdk/cardano-services-client@0.6.0-nightly.5) (2022-09-16)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-## [0.6.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.5.0...@cardano-sdk/cardano-services-client@0.6.0-nightly.4) (2022-09-14)
-
-### ⚠ BREAKING CHANGES
-
-- rework TxSubmitProvider to submit transactions as hex string instead of Buffer
-- rework all provider signatures args from positional to a single object
-
-### Code Refactoring
-
-- rework all provider signatures args from positional to a single object ([dee30b5](https://github.com/input-output-hk/cardano-js-sdk/commit/dee30b52af5edc1241142a2c06708266a1ae7fa4))
-- rework TxSubmitProvider to submit transactions as hex string instead of Buffer ([032a1b7](https://github.com/input-output-hk/cardano-js-sdk/commit/032a1b7a11941d52b5baf0d447b615c58a294068))
-
-## [0.6.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.5.0...@cardano-sdk/cardano-services-client@0.6.0-nightly.0) (2022-09-14)
-
-### ⚠ BREAKING CHANGES
-
-- rework TxSubmitProvider to submit transactions as hex string instead of Buffer
-- rework all provider signatures args from positional to a single object
+- **cardano-services-client:** do not re-wrap UnknownTxSubmissionError ([a51c9e8](https://github.com/input-output-hk/cardano-js-sdk/commit/a51c9e870e19acf5a36ca4e7f2da0001c998f95a))
 
 ### Code Refactoring
 
@@ -153,7 +74,15 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 - **cardano-services-client:** http provider can now be the return value of an async function ([e732f5d](https://github.com/input-output-hk/cardano-js-sdk/commit/e732f5d7fcacd75cfecda3e1c21f387d21f46bed))
 - **cardano-services-client:** update test URL and reword docblock ([4bfe001](https://github.com/input-output-hk/cardano-js-sdk/commit/4bfe0017a48146c81f571967299d360b8efc6732))
 
-### Miscellaneous Chores
+## 0.3.0 (2022-06-24)
+
+### ⚠ BREAKING CHANGES
+
+- move stakePoolStats from wallet provider to stake pool provider
+- rename `StakePoolSearchProvider` to `StakePoolProvider`
+- add serializable object key transformation support
+- **cardano-services-client:** reimplement txSubmitHttpProvider using createHttpProvider
+- **cardano-graphql:** remove graphql concerns from services client package, rename
 
 - **cardano-graphql:** remove graphql concerns from services client package, rename ([f197e46](https://github.com/input-output-hk/cardano-js-sdk/commit/f197e46254f7f56b6461239a12f213c0e34ccc5c))
 
