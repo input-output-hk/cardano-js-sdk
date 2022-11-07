@@ -8,6 +8,9 @@
       "path": "../../core/src"
     },
     {
+      "path": "../../ogmios/src"
+    },
+    {
       "path": "../../util/src"
     }
   ]

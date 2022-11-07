@@ -58,6 +58,7 @@
   "dependencies": {
     "@cardano-sdk/core": "^0.6.0",
     "@cardano-sdk/key-management": "^0.2.0",
+    "@cardano-sdk/util": "^0.6.0",
     "blake2b": "^2.1.4"
   },
   "files": [

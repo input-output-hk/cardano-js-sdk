@@ -50,6 +50,7 @@
     "prepack": "yarn build"
   },
   "devDependencies": {
+    "@cardano-sdk/util-dev": "^0.5.0",
     "eslint": "^7.32.0",
     "get-port-please": "^2.5.0",
     "jest": "^28.1.3",

@@ -61,6 +61,7 @@
     "tscNoEmit": "shx echo typescript --noEmit command not implemented yet"
   },
   "devDependencies": {
+    "@cardano-ogmios/client": "5.5.5",
     "@cardano-sdk/cardano-services-client": "^0.6.0",
     "@cardano-sdk/util-dev": "^0.5.0",
     "@types/amqplib": "^0.8.2",
@@ -73,7 +74,6 @@
     "@types/lodash": "^4.14.182",
     "@types/pg": "^8.6.5",
     "@types/wait-on": "^5.3.1",
-    "axios": "^0.27.2",
     "cbor": "^8.1.0",
     "dockerode": "^3.3.1",
     "dockerode-utils": "^0.0.7",
@@ -95,6 +95,8 @@
     "@cardano-sdk/ogmios": "^0.6.0",
     "@cardano-sdk/util": "^0.6.0",
     "amqplib": "^0.10.0",
+    "axios": "^0.27.2",
+    "bignumber.js": "^9.1.0",
     "body-parser": "^1.19.2",
     "bunyan": "^1.8.15",
     "clear": "^0.1.0",

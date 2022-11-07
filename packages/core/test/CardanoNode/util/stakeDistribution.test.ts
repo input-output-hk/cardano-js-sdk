@@ -1,4 +1,4 @@
-import { Cardano, CardanoNodeUtil } from '@cardano-sdk/core';
+import { Cardano, CardanoNodeUtil } from '../../../src';
 import { mockStakeDistribution } from '../mocks';
 
 describe('stakeDistribution', () => {
