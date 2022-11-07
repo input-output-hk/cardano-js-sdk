@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable max-len */
-import { Cardano, TxSubmitProvider } from '@cardano-sdk/core';
+import { CardanoNodeErrors, TxSubmitProvider } from '@cardano-sdk/core';
 import { Connection } from '@cardano-ogmios/client';
 import {
   HttpServer,
@@ -199,7 +199,7 @@ describe('Program/services/rabbitmq', () => {
         const txs = await txsPromise;
         await expect(
           provider.submitTx({ signedTransaction: bufferToHexString(Buffer.from(txs[0].txBodyUint8Array)) })
-        ).rejects.toBeInstanceOf(Cardano.TxSubmissionErrors.EraMismatchError);
+        ).rejects.toBeInstanceOf(CardanoNodeErrors.TxSubmissionErrors.EraMismatchError);
         expect(dnsResolverMock).toBeCalledTimes(2);
       });
 

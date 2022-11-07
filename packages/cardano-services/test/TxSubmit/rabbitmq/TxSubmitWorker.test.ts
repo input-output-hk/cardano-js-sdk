@@ -1,5 +1,5 @@
 import { BAD_CONNECTION_URL, txsPromise } from './utils';
-import { Cardano, ProviderError } from '@cardano-sdk/core';
+import { CardanoNodeErrors, ProviderError } from '@cardano-sdk/core';
 import { OgmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmios';
 import { RabbitMQContainer } from './docker';
 import { RabbitMqTxSubmitProvider, TxSubmitWorker } from '../../../src';
@@ -134,7 +134,7 @@ describe('TxSubmitWorker', () => {
 
         // Tx submission by RabbitMqTxSubmitProvider must reject with the same error got by TxSubmitWorker
         await expect(container.enqueueTx(logger, 0)).rejects.toBeInstanceOf(
-          Cardano.TxSubmissionErrors.EraMismatchError
+          CardanoNodeErrors.TxSubmissionErrors.EraMismatchError
         );
       };
 

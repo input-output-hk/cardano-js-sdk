@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable max-len */
-import { Cardano, CardanoNodeErrors, TxSubmitProvider } from '@cardano-sdk/core';
+import { CardanoNodeErrors, TxSubmitProvider } from '@cardano-sdk/core';
 import { Connection } from '@cardano-ogmios/client';
 import { DbSyncEpochPollService, listenPromise, serverClosePromise } from '../../../src/util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../../src/NetworkInfo';
@@ -336,7 +336,7 @@ describe('Service dependency abstractions', () => {
       await provider.start();
       await expect(
         provider.submitTx({ signedTransaction: bufferToHexString(Buffer.from(new Uint8Array([]))) })
-      ).rejects.toBeInstanceOf(Cardano.TxSubmissionErrors.EraMismatchError);
+      ).rejects.toBeInstanceOf(CardanoNodeErrors.TxSubmissionErrors.EraMismatchError);
       expect(dnsResolverMock).toBeCalledTimes(2);
       await provider.shutdown();
     });

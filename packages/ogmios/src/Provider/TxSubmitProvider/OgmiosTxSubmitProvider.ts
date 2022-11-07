@@ -62,7 +62,7 @@ export class OgmiosTxSubmitProvider extends RunnableModule implements TxSubmitPr
 
   async submitTx({ signedTransaction }: SubmitTxArgs): Promise<void> {
     if (this.state !== 'running') {
-      throw new CardanoNodeErrors.CardanoNodeNotInitializedError('submitTx');
+      throw new CardanoNodeErrors.NotInitializedError('submitTx', this.name);
     }
     try {
       this.#txSubmissionClient = await createTxSubmissionClient(
@@ -74,7 +74,7 @@ export class OgmiosTxSubmitProvider extends RunnableModule implements TxSubmitPr
       );
       await this.#txSubmissionClient.submitTx(signedTransaction);
     } catch (error) {
-      throw Cardano.util.asTxSubmissionError(error) || new Cardano.UnknownTxSubmissionError(error);
+      throw Cardano.util.asTxSubmissionError(error) || new CardanoNodeErrors.UnknownTxSubmissionError(error);
     }
   }
 

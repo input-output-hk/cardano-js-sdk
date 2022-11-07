@@ -95,7 +95,7 @@ export interface ObservableWallet {
    */
   signData(props: SignDataProps): Promise<Cip30DataSignature>;
   /**
-   * @throws {Cardano.TxSubmissionError}
+   * @throws CardanoNodeErrors.TxSubmissionError
    */
   submitTx(tx: Cardano.NewTxAlonzo): Promise<void>;
   shutdown(): void;

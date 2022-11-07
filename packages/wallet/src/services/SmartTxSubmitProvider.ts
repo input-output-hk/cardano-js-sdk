@@ -1,5 +1,6 @@
 import {
   Cardano,
+  CardanoNodeErrors,
   HealthCheckResponse,
   ProviderError,
   ProviderFailure,
@@ -58,7 +59,7 @@ export class SmartTxSubmitProvider implements TxSubmitProvider {
         if (slot >= (invalidHereafter || Number.POSITIVE_INFINITY))
           throw new ProviderError(
             ProviderFailure.BadRequest,
-            new Cardano.TxSubmissionErrors.OutsideOfValidityIntervalError({
+            new CardanoNodeErrors.TxSubmissionErrors.OutsideOfValidityIntervalError({
               outsideOfValidityInterval: {
                 currentSlot: slot,
                 interval: { invalidBefore: invalidBefore || null, invalidHereafter: invalidHereafter || null }

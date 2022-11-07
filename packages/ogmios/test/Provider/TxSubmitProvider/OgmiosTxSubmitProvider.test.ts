@@ -1,4 +1,4 @@
-import { Cardano, CardanoNodeErrors, HealthCheckResponse, ProviderError } from '@cardano-sdk/core';
+import { CardanoNodeErrors, HealthCheckResponse, ProviderError } from '@cardano-sdk/core';
 import { Connection, createConnectionObject } from '@cardano-ogmios/client';
 import { OgmiosTxSubmitProvider } from '../../../src';
 import { bufferToHexString } from '@cardano-sdk/util';
@@ -106,7 +106,7 @@ describe('OgmiosTxSubmitProvider', () => {
       await provider.start();
 
       await expect(provider.submitTx({ signedTransaction: emptyUintArrayAsHexString })).rejects.toThrowError(
-        Cardano.TxSubmissionErrors.EraMismatchError
+        CardanoNodeErrors.TxSubmissionErrors.EraMismatchError
       );
     });
   });
@@ -134,7 +134,7 @@ describe('OgmiosTxSubmitProvider', () => {
     it('throws when querying after shutting down', async () => {
       await provider.shutdown();
       await expect(provider.submitTx({ signedTransaction: emptyUintArrayAsHexString })).rejects.toThrowError(
-        CardanoNodeErrors.CardanoNodeNotInitializedError
+        CardanoNodeErrors.NotInitializedError
       );
     });
   });

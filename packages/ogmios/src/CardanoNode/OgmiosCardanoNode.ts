@@ -20,7 +20,6 @@ import { Logger } from 'ts-log';
 import { RunnableModule, contextLogger } from '@cardano-sdk/util';
 import { createInteractionContextWithLogger } from '../util';
 import { mapEraSummary } from './mappers';
-
 /**
  * Access cardano-node APIs via Ogmios
  *
@@ -30,13 +29,11 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
   #stateQueryClient: StateQuery.StateQueryClient;
   #logger: Logger;
   #connectionConfig: ConnectionConfig;
-
   constructor(connectionConfig: ConnectionConfig, logger: Logger) {
     super('OgmiosCardanoNode', logger);
     this.#logger = contextLogger(logger, 'OgmiosCardanoNode');
     this.#connectionConfig = connectionConfig;
   }
-
   public async initializeImpl(): Promise<void> {
     this.#logger.info('Initializing CardanoNode');
     this.#stateQueryClient = await createStateQueryClient(
@@ -44,7 +41,6 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
     );
     this.#logger.info('CardanoNode initialized');
   }
-
   public async shutdownImpl(): Promise<void> {
     this.#logger.info('Shutting down CardanoNode');
     await this.#stateQueryClient.shutdown();
@@ -52,7 +48,7 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
 
   public async eraSummaries(): Promise<EraSummary[]> {
     if (this.state !== 'running') {
-      throw new CardanoNodeErrors.CardanoNodeNotInitializedError('eraSummaries');
+      throw new CardanoNodeErrors.NotInitializedError('eraSummaries', this.name);
     }
     try {
       this.#logger.info('Getting era summaries');
@@ -66,7 +62,7 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
 
   public async systemStart(): Promise<Date> {
     if (this.state !== 'running') {
-      throw new CardanoNodeErrors.CardanoNodeNotInitializedError('systemStart');
+      throw new CardanoNodeErrors.NotInitializedError('systemStart', this.name);
     }
     try {
       this.#logger.info('Getting system start');
@@ -78,7 +74,7 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
 
   public async stakeDistribution(): Promise<StakeDistribution> {
     if (this.state !== 'running') {
-      throw new CardanoNodeErrors.CardanoNodeNotInitializedError('stakeDistribution');
+      throw new CardanoNodeErrors.NotInitializedError('stakeDistribution', this.name);
     }
     try {
       this.#logger.info('Getting stake distribution');
@@ -116,7 +112,6 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
       throw new ProviderError(ProviderFailure.Unknown, error);
     }
   }
-
   async startImpl(): Promise<void> {
     return Promise.resolve();
   }

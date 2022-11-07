@@ -1,5 +1,6 @@
 import {
   Cardano,
+  CardanoNodeErrors,
   HealthCheckResponse,
   ProviderError,
   ProviderFailure,
@@ -219,7 +220,7 @@ export class RabbitMqTxSubmitProvider implements TxSubmitProvider {
       } catch (error) {
         this.#dependencies.logger.error(`${moduleName}: while queuing transaction: ${txId}`);
         this.#dependencies.logger.error(error);
-        done(Cardano.util.asTxSubmissionError(error) || new Cardano.UnknownTxSubmissionError(error));
+        done(Cardano.util.asTxSubmissionError(error) || new CardanoNodeErrors.UnknownTxSubmissionError(error));
       }
     });
   }

@@ -2,7 +2,7 @@
 import * as mocks from '../mocks';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
-import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { Cardano, CardanoNodeErrors, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { InitializeTxProps, SingleAddressWallet, setupWallet } from '../../src';
 import { firstValueFrom, skip } from 'rxjs';
 import { getPassword, testAsyncKeyAgent } from '../../../key-management/test/mocks';
@@ -203,7 +203,7 @@ describe('SingleAddressWallet methods', () => {
         txSubmitProvider.submitTx.mockRejectedValueOnce(
           new ProviderError(
             ProviderFailure.BadRequest,
-            new Cardano.TxSubmissionErrors.ValueNotConservedError({
+            new CardanoNodeErrors.TxSubmissionErrors.ValueNotConservedError({
               valueNotConserved: { consumed: 2, produced: 1 }
             })
           )

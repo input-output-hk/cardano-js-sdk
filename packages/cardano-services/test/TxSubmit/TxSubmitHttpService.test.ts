@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-len */
 import { APPLICATION_JSON, CONTENT_TYPE, HttpServer, HttpServerConfig, TxSubmitHttpService } from '../../src';
-import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
+import { CardanoNodeErrors, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, txSubmitHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { FATAL, createLogger } from 'bunyan';
 import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
@@ -182,7 +182,7 @@ describe('TxSubmitHttpService', () => {
 
   describe('healthy but failing submission', () => {
     describe('/submit', () => {
-      const stubErrors = [new Cardano.TxSubmissionErrors.BadInputsError({ badInputs: [] })];
+      const stubErrors = [new CardanoNodeErrors.TxSubmissionErrors.BadInputsError({ badInputs: [] })];
 
       beforeAll(async () => {
         txSubmitProvider = txSubmitProviderMock(
@@ -209,8 +209,8 @@ describe('TxSubmitHttpService', () => {
           await clientProvider.submitTx({ signedTransaction: emptyUintArrayAsHexString });
         } catch (error: any) {
           if (error instanceof ProviderError) {
-            const innerError = error.innerError as Cardano.TxSubmissionError;
-            expect(innerError).toBeInstanceOf(Cardano.TxSubmissionErrors.BadInputsError);
+            const innerError = error.innerError as CardanoNodeErrors.TxSubmissionError;
+            expect(innerError).toBeInstanceOf(CardanoNodeErrors.TxSubmissionErrors.BadInputsError);
             expect(innerError.message).toBe(stubErrors[0].message);
           }
         }

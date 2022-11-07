@@ -1,4 +1,4 @@
-import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { CardanoNodeErrors, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { axiosError, healthCheckResponseWithState } from '../util';
 import { bufferToHexString } from '@cardano-sdk/util';
 import { logger } from '@cardano-sdk/util-dev';
@@ -66,7 +66,7 @@ describe('txSubmitHttpProvider', () => {
             } catch (error) {
               if (error instanceof ProviderError) {
                 expect(error.reason).toBe(providerFailure);
-                const innerError = error.innerError as Cardano.TxSubmissionError;
+                const innerError = error.innerError as CardanoNodeErrors.TxSubmissionError;
                 expect(innerError).toBeInstanceOf(providerErrorType);
               } else {
                 throw new TypeError('Expected ProviderError');
@@ -77,21 +77,21 @@ describe('txSubmitHttpProvider', () => {
         it(
           'rehydrates errors',
           testError(
-            new Cardano.TxSubmissionErrors.BadInputsError({ badInputs: [] }),
+            new CardanoNodeErrors.TxSubmissionErrors.BadInputsError({ badInputs: [] }),
             ProviderFailure.BadRequest,
-            Cardano.TxSubmissionErrors.BadInputsError
+            CardanoNodeErrors.TxSubmissionErrors.BadInputsError
           )
         );
 
         it(
           'maps unrecognized errors to UnknownTxSubmissionError',
-          testError(new Error('Unknown error'), ProviderFailure.Unknown, Cardano.UnknownTxSubmissionError)
+          testError(new Error('Unknown error'), ProviderFailure.Unknown, CardanoNodeErrors.UnknownTxSubmissionError)
         );
 
         it('does not re-wrap UnknownTxSubmissionError', async () => {
           expect.assertions(3);
           axiosMock.onPost().replyOnce(() => {
-            throw axiosError(new Cardano.UnknownTxSubmissionError('Unknown error'));
+            throw axiosError(new CardanoNodeErrors.UnknownTxSubmissionError('Unknown error'));
           });
           const provider = txSubmitHttpProvider(config);
           try {
@@ -99,8 +99,8 @@ describe('txSubmitHttpProvider', () => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } catch (error: any) {
             expect(error).toBeInstanceOf(ProviderError);
-            expect(error.innerError).toBeInstanceOf(Cardano.UnknownTxSubmissionError);
-            expect(error.innerError.innerError.name).not.toBe(Cardano.UnknownTxSubmissionError.name);
+            expect(error.innerError).toBeInstanceOf(CardanoNodeErrors.UnknownTxSubmissionError);
+            expect(error.innerError.innerError.name).not.toBe(CardanoNodeErrors.UnknownTxSubmissionError.name);
           }
         });
       });

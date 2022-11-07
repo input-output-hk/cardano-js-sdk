@@ -12,11 +12,9 @@ describe('cardanoNodeErros', () => {
     it('is true if the value is a cardano node error', () => {
       expect(CardanoNodeUtil.isCardanoNodeError(unavailableQueryError)).toBe(true);
     });
-
     it('is false if a single generic error is not a cardano node error', () => {
       expect(CardanoNodeUtil.isCardanoNodeError(someOtherError)).toBe(false);
     });
-
     it('is false if a non-error value is passed', () => {
       expect(CardanoNodeUtil.isCardanoNodeError(someString)).toBe(false);
     });
@@ -32,7 +30,6 @@ describe('cardanoNodeErros', () => {
     it('returns null if error is not a cardano node error', () => {
       expect(CardanoNodeUtil.asCardanoNodeError(someOtherError)).toBeNull();
     });
-
     it('returns null if a non-error value is passed', () => {
       expect(CardanoNodeUtil.asCardanoNodeError(someString)).toBeNull();
     });
