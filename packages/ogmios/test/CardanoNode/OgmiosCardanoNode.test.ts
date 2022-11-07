@@ -1,6 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { CardanoNode, CardanoNodeErrors } from '@cardano-sdk/core';
+import { CardanoNodeErrors } from '@cardano-sdk/core';
 import { Connection, createConnectionObject } from '@cardano-ogmios/client';
+import { InvalidModuleState } from '@cardano-sdk/util';
 import { OgmiosCardanoNode } from '../../src';
 import { createMockOgmiosServer, listenPromise, serverClosePromise } from '../mocks/mockOgmiosServer';
 import { getRandomPort } from 'get-port-please';
@@ -10,19 +11,19 @@ import http from 'http';
 describe('OgmiosCardanoNode', () => {
   let mockServer: http.Server;
   let connection: Connection;
-  let node: CardanoNode;
+  let node: OgmiosCardanoNode;
 
   beforeAll(async () => {
     connection = createConnectionObject({ port: await getRandomPort() });
   });
 
-  describe('not initialized', () => {
+  describe('not initialized and started', () => {
     beforeAll(async () => {
       mockServer = createMockOgmiosServer({
         stateQuery: { eraSummaries: { response: { success: true } }, systemStart: { response: { success: true } } }
       });
-      node = new OgmiosCardanoNode(connection, logger);
       await listenPromise(mockServer, connection.port);
+      node = new OgmiosCardanoNode(connection, logger);
     });
     afterAll(async () => {
       await serverClosePromise(mockServer);
@@ -44,13 +45,11 @@ describe('OgmiosCardanoNode', () => {
       );
     });
     it('shutdown rejects with not initialized error', async () => {
-      await expect(node.shutdown()).rejects.toThrowError(
-        new CardanoNodeErrors.CardanoNodeNotInitializedError('shutdown')
-      );
+      await expect(node.shutdown()).rejects.toThrowError(InvalidModuleState);
     });
   });
 
-  describe('initialized', () => {
+  describe('initialized and started', () => {
     describe('eraSummaries', () => {
       describe('success', () => {
         beforeAll(async () => {
@@ -60,6 +59,7 @@ describe('OgmiosCardanoNode', () => {
           await listenPromise(mockServer, connection.port);
           node = new OgmiosCardanoNode(connection, logger);
           await node.initialize();
+          await node.start();
         });
         afterAll(async () => {
           await node.shutdown();
@@ -83,6 +83,7 @@ describe('OgmiosCardanoNode', () => {
           await listenPromise(mockServer, connection.port);
           node = new OgmiosCardanoNode(connection, logger);
           await node.initialize();
+          await node.start();
         });
         afterAll(async () => {
           await node.shutdown();
@@ -104,6 +105,7 @@ describe('OgmiosCardanoNode', () => {
           await listenPromise(mockServer, connection.port);
           node = new OgmiosCardanoNode(connection, logger);
           await node.initialize();
+          await node.start();
         });
         afterAll(async () => {
           await node.shutdown();
@@ -124,6 +126,7 @@ describe('OgmiosCardanoNode', () => {
           await listenPromise(mockServer, connection.port);
           node = new OgmiosCardanoNode(connection, logger);
           await node.initialize();
+          await node.start();
         });
         afterAll(async () => {
           await node.shutdown();
@@ -147,6 +150,7 @@ describe('OgmiosCardanoNode', () => {
           await listenPromise(mockServer, connection.port);
           node = new OgmiosCardanoNode(connection, logger);
           await node.initialize();
+          await node.start();
         });
         afterAll(async () => {
           await node.shutdown();
@@ -170,6 +174,7 @@ describe('OgmiosCardanoNode', () => {
           await listenPromise(mockServer, connection.port);
           node = new OgmiosCardanoNode(connection, logger);
           await node.initialize();
+          await node.start();
         });
         afterAll(async () => {
           await node.shutdown();
@@ -188,19 +193,22 @@ describe('OgmiosCardanoNode', () => {
       beforeAll(async () => {
         mockServer = createMockOgmiosServer({ stateQuery: { systemStart: { response: { success: true } } } });
         await listenPromise(mockServer, connection.port);
-        node = new OgmiosCardanoNode(connection, logger);
       });
+
       afterAll(async () => {
         await serverClosePromise(mockServer);
       });
 
       beforeEach(async () => {
+        node = new OgmiosCardanoNode(connection, logger);
         await node.initialize();
+        await node.start();
       });
 
       it('shuts down successfully', async () => {
         await expect(node.shutdown()).resolves.not.toThrow();
       });
+
       it('throws when querying after shutting down', async () => {
         await node.shutdown();
         await expect(node.systemStart()).rejects.toThrow(CardanoNodeErrors.CardanoNodeNotInitializedError);

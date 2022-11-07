@@ -4,11 +4,24 @@ import { APPLICATION_JSON, CONTENT_TYPE, HttpServer, HttpServerConfig, TxSubmitH
 import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, txSubmitHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { FATAL, createLogger } from 'bunyan';
+import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import { bufferToHexString, fromSerializableObject } from '@cardano-sdk/util';
 import { getPort } from 'get-port-please';
 import { logger } from '@cardano-sdk/util-dev';
 import axios from 'axios';
 import cbor from 'cbor';
+
+const txSubmitProviderMock = (
+  healthCheckImpl = async () => Promise.resolve({ ok: true }),
+  submitTxImpl = async () => Promise.resolve([])
+) =>
+  ({
+    healthCheck: jest.fn(healthCheckImpl),
+    initialize: jest.fn(),
+    shutdown: jest.fn(),
+    start: jest.fn(),
+    submitTx: jest.fn(submitTxImpl)
+  } as unknown as OgmiosTxSubmitProvider);
 
 const serializeProviderArg = (arg: unknown) => ({ signedTransaction: arg });
 const bodyTx = serializeProviderArg(cbor.encode('#####').toString('hex'));
@@ -17,7 +30,7 @@ const APPLICATION_CBOR = 'application/cbor';
 const emptyUintArrayAsHexString = bufferToHexString(Buffer.from(new Uint8Array()));
 
 describe('TxSubmitHttpService', () => {
-  let txSubmitProvider: TxSubmitProvider;
+  let txSubmitProvider: OgmiosTxSubmitProvider;
   let httpServer: HttpServer;
   let port: number;
   let baseUrl: string;
@@ -37,10 +50,7 @@ describe('TxSubmitHttpService', () => {
 
   describe('unhealthy TxSubmitProvider', () => {
     beforeAll(async () => {
-      txSubmitProvider = {
-        healthCheck: jest.fn(() => Promise.resolve({ ok: false })),
-        submitTx: jest.fn()
-      };
+      txSubmitProvider = txSubmitProviderMock(() => Promise.resolve({ ok: false }));
     });
 
     it('should not throw during initialization if the TxSubmitProvider is unhealthy', () => {
@@ -62,7 +72,7 @@ describe('TxSubmitHttpService', () => {
 
     beforeAll(async () => {
       isOk = () => true;
-      txSubmitProvider = { healthCheck: jest.fn(() => Promise.resolve({ ok: isOk() })), submitTx: jest.fn() };
+      txSubmitProvider = txSubmitProviderMock(() => Promise.resolve({ ok: isOk() }));
       httpServer = new HttpServer(config, {
         logger,
         runnableDependencies: [],
@@ -104,7 +114,7 @@ describe('TxSubmitHttpService', () => {
 
   describe('healthy and successful submission', () => {
     beforeAll(async () => {
-      txSubmitProvider = { healthCheck: jest.fn(() => Promise.resolve({ ok: true })), submitTx: jest.fn() };
+      txSubmitProvider = txSubmitProviderMock();
       httpServer = new HttpServer(config, {
         logger,
         runnableDependencies: [],
@@ -175,10 +185,10 @@ describe('TxSubmitHttpService', () => {
       const stubErrors = [new Cardano.TxSubmissionErrors.BadInputsError({ badInputs: [] })];
 
       beforeAll(async () => {
-        txSubmitProvider = {
-          healthCheck: jest.fn(() => Promise.resolve({ ok: true })),
-          submitTx: jest.fn(() => Promise.reject(stubErrors))
-        };
+        txSubmitProvider = txSubmitProviderMock(
+          () => Promise.resolve({ ok: true }),
+          () => Promise.reject(stubErrors)
+        );
         httpServer = new HttpServer(config, {
           logger,
           runnableDependencies: [],

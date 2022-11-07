@@ -1,5 +1,6 @@
 import { BAD_CONNECTION_URL, txsPromise } from './utils';
-import { Cardano, ProviderError, TxSubmitProvider } from '@cardano-sdk/core';
+import { Cardano, ProviderError } from '@cardano-sdk/core';
+import { OgmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmios';
 import { RabbitMQContainer } from './docker';
 import { RabbitMqTxSubmitProvider, TxSubmitWorker } from '../../../src';
 import { TestLogger, createLogger } from '@cardano-sdk/util-dev';
@@ -9,7 +10,6 @@ import {
   serverClosePromise
 } from '../../../../ogmios/test/mocks/mockOgmiosServer';
 import { getRandomPort } from 'get-port-please';
-import { ogmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmios';
 import http from 'http';
 
 describe('TxSubmitWorker', () => {
@@ -19,7 +19,7 @@ describe('TxSubmitWorker', () => {
   let mock: http.Server | undefined;
   let port: number;
   let rabbitmqUrl: URL;
-  let txSubmitProvider: TxSubmitProvider;
+  let txSubmitProvider: OgmiosTxSubmitProvider;
   let worker: TxSubmitWorker | undefined;
 
   beforeAll(async () => {
@@ -30,18 +30,18 @@ describe('TxSubmitWorker', () => {
   beforeEach(async () => {
     await container.removeQueues();
     logger = createLogger({ record: true });
-    txSubmitProvider = ogmiosTxSubmitProvider(urlToConnectionConfig(new URL(`http://localhost:${port}/`)), logger);
+    txSubmitProvider = new OgmiosTxSubmitProvider(urlToConnectionConfig(new URL(`http://localhost:${port}/`)), logger);
   });
 
   afterEach(async () => {
+    if (worker) {
+      await worker.shutdown();
+      worker = undefined;
+    }
+
     if (mock) {
       await serverClosePromise(mock);
       mock = undefined;
-    }
-
-    if (worker) {
-      await worker.stop();
-      worker = undefined;
     }
 
     // Uncomment this to have evidence of all the log messages
@@ -53,7 +53,7 @@ describe('TxSubmitWorker', () => {
 
     expect(worker).toBeInstanceOf(TxSubmitWorker);
     expect(worker.getStatus()).toEqual('idle');
-    expect(await worker.stop()).toBeUndefined();
+    expect(await worker.shutdown()).toBeUndefined();
     expect(worker.getStatus()).toEqual('idle');
   });
 
@@ -64,9 +64,7 @@ describe('TxSubmitWorker', () => {
     });
 
     await listenPromise(mock, port);
-
     worker = new TxSubmitWorker({ rabbitmqUrl }, { logger, txSubmitProvider });
-
     await expect(worker.start()).rejects.toBeInstanceOf(ProviderError);
   });
 
@@ -91,57 +89,28 @@ describe('TxSubmitWorker', () => {
       // eslint-disable-next-line unicorn/consistent-function-scoping
       const performTest = async (options: { parallel: boolean }) => {
         const spy = jest.fn();
-        let hookAlreadyCalled = false;
-        let successMockListenPromise = Promise.resolve<http.Server>(new http.Server());
-        let successMock = new http.Server();
 
-        const failMock = createMockOgmiosServer({
+        // We mock ogmios server to fail at the first call, then to answer with success at second
+        mock = createMockOgmiosServer({
           healthCheck: { response: { networkSynchronization: 1, success: true } },
-          submitTx: { response: { failWith: { type: 'beforeValidityInterval' }, success: false } },
+          submitTx: { response: [{ failWith: { type: 'beforeValidityInterval' }, success: false }, { success: true }] },
           submitTxHook: () => {
-            // eslint-disable-next-line @typescript-eslint/no-floating-promises
-            (async () => {
-              if (hookAlreadyCalled) return;
-
-              // This hook may be called multiple times... ensure the core is executed only once
-              hookAlreadyCalled = true;
-
-              // Stop the failing mock and start the success one
-              await serverClosePromise(failMock);
-              successMockListenPromise = listenPromise(successMock, port);
-            })();
+            spy();
           }
         });
 
         // Start a failing ogmios server
-        await listenPromise(failMock, port);
-
-        // Enqueue a tx
-        const providerClosePromise = container.enqueueTx(logger);
+        await listenPromise(mock, port);
 
         // Actually create the TxSubmitWorker
         worker = new TxSubmitWorker({ rabbitmqUrl, ...options }, { logger, txSubmitProvider });
         await worker.start();
 
-        await new Promise<void>((resolve) => {
-          successMock = createMockOgmiosServer({
-            healthCheck: { response: { networkSynchronization: 1, success: true } },
-            submitTx: { response: { success: true } },
-            submitTxHook: () => {
-              spy();
-              // Once the transaction is submitted with success we can stop the worker
-              // We wait half a second to be sure the tx is submitted only once
-              setTimeout(() => {
-                resolve();
-              }, 500);
-            }
-          });
-        });
+        // Enqueue a tx
+        await container.enqueueTx(logger);
 
-        // All these Promises are the return value of async functions called in a not async context,
-        // we need to await for them to perform a correct test teardown
-        await Promise.all([successMockListenPromise, providerClosePromise, serverClosePromise(successMock)]);
-        expect(spy).toBeCalledTimes(1);
+        // We assert that tx submission is invoked two times if the error is retryable
+        expect(spy).toBeCalledTimes(2);
       };
 
       it('when configured to process jobs serially', async () => performTest({ parallel: false }));
@@ -174,6 +143,7 @@ describe('TxSubmitWorker', () => {
     });
   });
 
+  // This test is failing with "Long running" Ogmios client connection.
   it('submission is parallelized up to parallelTx Tx simultaneously', async () => {
     const txs = await txsPromise;
     const delays = [5, 2, 1, 3, 3, 4, 4];

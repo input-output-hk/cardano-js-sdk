@@ -30,6 +30,7 @@ import {
 } from '@cardano-sdk/wallet';
 import { LogLevel, createLogger } from 'bunyan';
 import { Logger, dummyLogger } from 'ts-log';
+import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import {
   assetInfoHttpProvider,
   chainHistoryHttpProvider,
@@ -42,7 +43,6 @@ import {
 import { createConnectionObject } from '@cardano-ogmios/client';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom } from 'rxjs';
-import { ogmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import memoize from 'lodash/memoize';
 
@@ -110,7 +110,7 @@ rewardsProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logge
 });
 
 txSubmitProviderFactory.register(OGMIOS_PROVIDER, async (params: any, logger: Logger): Promise<TxSubmitProvider> => {
-  if (params.baseUrl === undefined) throw new Error(`${ogmiosTxSubmitProvider.name}: ${MISSING_URL_PARAM}`);
+  if (params.baseUrl === undefined) throw new Error(`${OgmiosTxSubmitProvider.name}: ${MISSING_URL_PARAM}`);
 
   const connectionConfig = {
     host: params.baseUrl.hostname,
@@ -119,7 +119,7 @@ txSubmitProviderFactory.register(OGMIOS_PROVIDER, async (params: any, logger: Lo
   };
 
   return new Promise<TxSubmitProvider>(async (resolve) => {
-    resolve(ogmiosTxSubmitProvider(createConnectionObject(connectionConfig), logger));
+    resolve(new OgmiosTxSubmitProvider(createConnectionObject(connectionConfig), logger));
   });
 });
 
