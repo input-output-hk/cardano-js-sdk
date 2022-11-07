@@ -1,104 +1,75 @@
 /* eslint-disable sonarjs/no-duplicate-string */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  EraSummariesResponse,
+  HealthCheckResponse,
+  InvocationState,
+  StakeDistributionResponse,
+  SystemStartResponse,
+  TxSubmitResponse
+} from './types';
+import { HEALTH_RESPONSE_BODY } from './util';
 import { Schema, UnknownResultError } from '@cardano-ogmios/client';
 import { Server, createServer } from 'http';
 import WebSocket from 'ws';
 
-const HEALTH_RESPONSE_BODY = {
-  connectionStatus: 'connected',
-  currentEpoch: 192,
-  currentEra: 'Alonzo',
-  lastKnownTip: {
-    blockNo: 3_391_731,
-    hash: '9ef43ab6e234fcf90d103413096c7da752da2f45b15e1259f43d476afd12932c',
-    slot: 52_819_355
-  },
-  lastTipUpdate: '2022-03-13T16:22:51.423778138Z',
-  metrics: {
-    activeConnections: 0,
-    runtimeStats: {
-      cpuTime: 1_346_462_892,
-      currentHeapSize: 331,
-      gcCpuTime: 1_217_193_590,
-      maxHeapSize: 367
-    },
-    sessionDurations: {
-      max: 0,
-      mean: 0,
-      min: 0
-    },
-    totalConnections: 0,
-    totalMessages: 0,
-    totalUnrouted: 0
-  },
-  networkSynchronization: 1,
-  slotInEpoch: 244_955,
-  startTime: '2022-03-13T16:18:59.932519677Z'
-};
-
 export interface MockOgmiosServerConfig {
   healthCheck?: {
-    response: {
-      success: boolean;
-      failWith?: Error;
-      blockNo?: number;
-      networkSynchronization?: number;
-    };
+    response: HealthCheckResponse;
   };
   submitTx?: {
-    response: {
-      success: boolean;
-      failWith?: {
-        type: 'eraMismatch' | 'beforeValidityInterval';
-      };
-    };
+    response: TxSubmitResponse | TxSubmitResponse[];
   };
   stateQuery?: {
     eraSummaries?: {
-      response: {
-        success: boolean;
-        failWith?: {
-          type: 'unknownResultError' | 'connectionError';
-        };
-      };
+      response: EraSummariesResponse;
     };
     systemStart?: {
-      response: {
-        success: boolean;
-        failWith?: {
-          type: 'queryUnavailableInEra';
-        };
-      };
+      response: SystemStartResponse;
     };
     stakeDistribution?: {
-      response: {
-        success: boolean;
-        failWith?: {
-          type: 'queryUnavailableInEra';
-        };
-      };
+      response: StakeDistributionResponse;
     };
   };
   submitTxHook?: (data?: Uint8Array) => void;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const handleSubmitTx = async (config: MockOgmiosServerConfig, args: any, send: (result: unknown) => void) => {
+const handleSubmitTx = async (
+  invocations: InvocationState,
+  config: MockOgmiosServerConfig,
+  args: any,
+  send: (result: unknown) => void
+) => {
+  const { submitTx, submitTxHook } = config;
+  if (!submitTx) throw new Error('Missing submitTx in mock config');
+
+  let { response } = submitTx;
+  if (!Array.isArray(response)) response = [response];
+
   let result: Schema.SubmitSuccess | Schema.SubmitFail;
 
-  if (config.submitTx?.response.success) {
+  if (invocations.txSubmit >= response.length) {
+    invocations.txSubmit = response.length - 1;
+  }
+
+  if (response[invocations.txSubmit].success) {
     result = { SubmitSuccess: { txId: '###' } };
-  } else if (config.submitTx?.response.failWith?.type === 'eraMismatch') {
+    ++invocations.txSubmit;
+  } else if (response[invocations.txSubmit].failWith?.type === 'eraMismatch') {
+    ++invocations.txSubmit;
     result = { SubmitFail: [{ eraMismatch: { ledgerEra: 'Shelley', queryEra: 'Alonzo' } }] };
-  } else if (config.submitTx?.response.failWith?.type === 'beforeValidityInterval') {
+  } else if (response[invocations.txSubmit].failWith?.type === 'beforeValidityInterval') {
     result = {
       SubmitFail: [
         { outsideOfValidityInterval: { currentSlot: 23, interval: { invalidBefore: 42, invalidHereafter: null } } }
       ]
     };
+    ++invocations.txSubmit;
   } else {
     throw new Error('Unknown mock response');
   }
-  if (config.submitTxHook) await config.submitTxHook(Uint8Array.from(Buffer.from(args.submit, 'hex')));
+  if (submitTxHook) await submitTxHook(Uint8Array.from(Buffer.from(args.submit, 'hex')));
   send(result);
 };
 
@@ -174,6 +145,10 @@ const handleQuery = async (query: string, config: MockOgmiosServerConfig, send: 
 };
 
 export const createMockOgmiosServer = (config: MockOgmiosServerConfig): Server => {
+  const invocations: InvocationState = {
+    txSubmit: 0
+  };
+
   const server = createServer((req, res) => {
     if (config.healthCheck?.response.success === false) {
       res.statusCode = 500;
@@ -217,7 +192,7 @@ export const createMockOgmiosServer = (config: MockOgmiosServerConfig): Server =
         );
       switch (methodname) {
         case 'SubmitTx':
-          await handleSubmitTx(config, args, send);
+          await handleSubmitTx(invocations, config, args, send);
           break;
         case 'Query':
           await handleQuery(args.query, config, send);
