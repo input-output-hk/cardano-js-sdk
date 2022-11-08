@@ -47,7 +47,10 @@ jobs:
         # Base on nightly branch versions
         git merge --squash nightly
         # Omit nighly release CHANGELOG changes
-        git checkout HEAD packages/*/CHANGELOG.md
+        git restore --source master packages/*/CHANGELOG.md
+        git add .
+        # Test build to reduce chance of failure after creating a GH Release
+        yarn build
         # Publish
         yarn publish:release --sign-git-commit --loglevel silly
         # Merge package.json/yarn.lock/CHANGELOG back to nightly
@@ -58,4 +61,4 @@ jobs:
         YARN_ENABLE_IMMUTABLE_INSTALLS: false
         NODE_AUTH_TOKEN: ${{ secrets.NPM_REGISTRY_TOKEN }}
         # Used for making a release
-        GH_TOKEN: ${{ github.token }}
+        GH_TOKEN: ${{ secrets.BOT_GH_TOKEN }}
