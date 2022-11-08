@@ -7,6 +7,7 @@ import { DbSyncRewardsProvider, HttpServer, HttpServerConfig, RewardsHttpService
 import { INFO, createLogger } from 'bunyan';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
+import { RewardsFixtureBuilder } from './fixtures/FixtureBuilder';
 import { getPort } from 'get-port-please';
 import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
 import { logger } from '@cardano-sdk/util-dev';
@@ -28,13 +29,16 @@ describe('RewardsHttpService', () => {
   let cardanoNode: OgmiosCardanoNode;
   let provider: RewardsProvider;
   let lastBlockNoInDb: Cardano.BlockNo;
-
+  let fixtureBuilder: RewardsFixtureBuilder;
   beforeAll(async () => {
     port = await getPort();
     baseUrl = `http://localhost:${port}/rewards`;
     clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
     config = { listen: { port } };
-    dbConnection = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
+    dbConnection = new Pool({
+      connectionString: process.env.LOCALNETWORK_INTEGRATION_TESTS_POSTGRES_CONNECTION_STRING
+    });
+    fixtureBuilder = new RewardsFixtureBuilder(dbConnection, logger);
   });
 
   describe('unhealthy RewardsProvider', () => {
@@ -58,6 +62,7 @@ describe('RewardsHttpService', () => {
     });
   });
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('healthy state', () => {
     beforeAll(async () => {
       lastBlockNoInDb = (await dbConnection.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no;
@@ -194,69 +199,98 @@ describe('RewardsHttpService', () => {
     });
 
     describe('with rewardsHttpProvider', () => {
-      const rewardAccount = Cardano.RewardAccount('stake_test1upd9j9rwxeu44xfxnrl6sqsswf9k60gcdjuy2gz6zyu2jmqyvn80c');
-
       describe('rewardAccountBalance', () => {
         it('returns address balance', async () => {
+          const rewardAccount = (await fixtureBuilder.getRewardAccounts(1))[0];
           const response = await provider.rewardAccountBalance({ rewardAccount });
-          expect(response).toMatchSnapshot();
+          expect(response).toBeGreaterThan(0);
         });
 
         it('returns address balance 0 when it has no rewards', async () => {
           const response = await provider.rewardAccountBalance({
             rewardAccount: Cardano.RewardAccount('stake_test1uzxvhl83q8ujv2yvpy6n2krvpdlqqx28h7e9vsk6re43h3c3kufy6')
           });
-          expect(response).toMatchSnapshot();
+          expect(response).toBe(0n);
         });
       });
 
       describe('rewardsHistory', () => {
         it('returns rewards address history', async () => {
+          const rewardAccount = (await fixtureBuilder.getRewardAccounts(1))[0];
           const response = await provider.rewardsHistory({
             rewardAccounts: [rewardAccount]
           });
-          expect(response).toMatchSnapshot();
+          expect(response.get(rewardAccount)!.length).toBeGreaterThan(0);
+          expect(response.get(rewardAccount)![0]).toMatchShapeOf({ epoch: '0', rewards: 0n });
         });
 
         it('returns no rewards address history for empty reward accounts', async () => {
           const response = await provider.rewardsHistory({
             rewardAccounts: []
           });
-          expect(response).toMatchSnapshot();
+          expect(response.size).toBe(0);
         });
 
         it('returns address rewards history with epochs ', async () => {
-          const accountWithRewardsAtEpoch76 = Cardano.RewardAccount(
-            'stake_test1up32f2hrv5ytqk8ad6e4apss5zrrjjlrkjhrksypn5g08fqrqf9gr'
-          );
+          const rewardAccount = (await fixtureBuilder.getRewardAccounts(1))[0];
           const response = await provider.rewardsHistory({
             epochs: {
-              lowerBound: 75,
-              upperBound: 76
-            },
-            rewardAccounts: [accountWithRewardsAtEpoch76]
-          });
-          expect(response).toMatchSnapshot();
-        });
-
-        it('returns rewards address history of the epochs filtered', async () => {
-          const response = await provider.rewardsHistory({
-            epochs: {
-              lowerBound: 10
+              lowerBound: 5,
+              upperBound: 6
             },
             rewardAccounts: [rewardAccount]
           });
-          expect(response).toMatchSnapshot();
+
+          expect(response.get(rewardAccount)!.length).toBe(2);
+
+          let lowestEpoch = Number.MAX_SAFE_INTEGER;
+          let highestEpoch = 0;
+          for (const result of response.get(rewardAccount)!) {
+            lowestEpoch = Math.min(lowestEpoch, result.epoch);
+            highestEpoch = Math.max(highestEpoch, result.epoch);
+          }
+
+          expect(lowestEpoch).toBeGreaterThanOrEqual(5);
+          expect(highestEpoch).toBeLessThanOrEqual(6);
+          expect(response.get(rewardAccount)![0]).toMatchShapeOf({ epoch: '0', rewards: 0n });
+        });
+
+        it('returns rewards address history of the epochs filtered', async () => {
+          const rewardAccount = (await fixtureBuilder.getRewardAccounts(1))[0];
+          const response = await provider.rewardsHistory({
+            epochs: {
+              lowerBound: 5
+            },
+            rewardAccounts: [rewardAccount]
+          });
+          expect(response.get(rewardAccount)!.length).toBeGreaterThan(0);
+
+          let lowestEpoch = Number.MAX_SAFE_INTEGER;
+          for (const result of response.get(rewardAccount)!) {
+            lowestEpoch = Math.min(lowestEpoch, result.epoch);
+          }
+
+          expect(lowestEpoch).toBeGreaterThanOrEqual(5);
+          expect(response.get(rewardAccount)![0]).toMatchShapeOf({ epoch: '0', rewards: 0n });
         });
 
         it('returns rewards address history some of the epochs filter', async () => {
+          const rewardAccount = (await fixtureBuilder.getRewardAccounts(1))[0];
           const response = await provider.rewardsHistory({
             epochs: {
               upperBound: 10
             },
             rewardAccounts: [rewardAccount]
           });
-          expect(response).toMatchSnapshot();
+          expect(response.get(rewardAccount)!.length).toBeGreaterThan(0);
+
+          let highestEpoch = Number.MAX_SAFE_INTEGER;
+          for (const result of response.get(rewardAccount)!) {
+            highestEpoch = Math.min(highestEpoch, result.epoch);
+          }
+
+          expect(highestEpoch).toBeLessThanOrEqual(10);
+          expect(response.get(rewardAccount)![0]).toMatchShapeOf({ epoch: '0', rewards: 0n });
         });
       });
     });
