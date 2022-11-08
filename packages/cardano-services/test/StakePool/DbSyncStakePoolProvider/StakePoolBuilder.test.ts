@@ -1,180 +1,200 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Cardano, QueryStakePoolsArgs } from '@cardano-sdk/core';
+import { DataMocks } from '../../data-mocks';
 import { PAGINATION_PAGE_SIZE_LIMIT_DEFAULT, StakePoolBuilder } from '../../../src';
 import { Pool } from 'pg';
+import { PoolInfo, PoolWith, StakePoolFixtureBuilder } from '../fixtures/FixtureBuilder';
 import { logger } from '@cardano-sdk/util-dev';
 
 describe('StakePoolBuilder', () => {
-  const dbConnection = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
-  const builder = new StakePoolBuilder(dbConnection, logger);
+  const dbConnection = new Pool({
+    connectionString: process.env.LOCALNETWORK_INTEGRATION_TESTS_POSTGRES_CONNECTION_STRING
+  });
   const pagination = { limit: PAGINATION_PAGE_SIZE_LIMIT_DEFAULT, startAt: 0 };
+  const builder = new StakePoolBuilder(dbConnection, logger);
+  let fixtureBuilder: StakePoolFixtureBuilder;
+  let poolsInfo: PoolInfo[];
+  let hashIds: number[];
+  let updateIds: number[];
+  let filters: QueryStakePoolsArgs['filters'];
+
+  beforeAll(async () => {
+    fixtureBuilder = new StakePoolFixtureBuilder(dbConnection, logger);
+    poolsInfo = await fixtureBuilder.getPools(3, { with: [PoolWith.Metadata] });
+    hashIds = poolsInfo.map((info) => info.hashId);
+    updateIds = poolsInfo.map((info) => info.updateId);
+    filters = {
+      _condition: 'or',
+      identifier: {
+        _condition: 'and',
+        values: [{ name: `${poolsInfo[0]!.name}` }, { ticker: poolsInfo[0]!.ticker }, { id: poolsInfo[0]!.id }]
+      },
+      pledgeMet: true,
+      status: Object.values(Cardano.StakePoolStatus)
+    };
+  });
 
   afterAll(async () => {
     await dbConnection.end();
   });
 
-  const filters: QueryStakePoolsArgs['filters'] = {
-    _condition: 'or',
-    identifier: {
-      _condition: 'and',
-      values: [
-        { name: 'CL' },
-        { ticker: 'CLIO' },
-        { id: Cardano.PoolId('pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70') }
-      ]
-    },
-    pledgeMet: true,
-    status: Object.values(Cardano.StakePoolStatus)
-  };
-
   describe('queryRetirements', () => {
     it('queryRetirements', async () => {
-      const retirements = (await builder.queryRetirements([1, 2, 3])).map((r) => {
+      const retiredPool = await fixtureBuilder.getPools(2, { with: [PoolWith.RetiredState] });
+      const retiredHashes = retiredPool.map((info) => info.hashId);
+      const retirements = (await builder.queryRetirements(retiredHashes)).map((r) => {
         const { hashId, ...rest } = r;
         return rest;
       });
-      expect(retirements).toMatchSnapshot();
+      expect(retirements.length).toBeGreaterThan(0);
+      expect(retirements[0]).toMatchShapeOf(DataMocks.Pool.retirement);
     });
   });
   describe('queryRegistrations', () => {
     it('queryRegistrations', async () => {
-      const registrations = (await builder.queryRegistrations([1, 2, 3])).map((r) => {
+      const registrations = (await builder.queryRegistrations(hashIds)).map((r) => {
         const { hashId, ...rest } = r;
         return rest;
       });
-      expect(registrations).toMatchSnapshot();
+      expect(registrations.length).toBeGreaterThan(0);
+      expect(registrations[0]).toMatchShapeOf(DataMocks.Pool.registration);
     });
   });
   describe('queryPoolRewards', () => {
     it('queryPoolRewards', async () => {
-      const epochRewards = await builder.queryPoolRewards([1, 6, 15]);
+      const epochRewards = await builder.queryPoolRewards(hashIds);
       expect(epochRewards).toHaveLength(3);
-      expect(epochRewards).toMatchSnapshot();
+
+      expect(epochRewards[0]).toMatchShapeOf(DataMocks.Pool.epochReward);
     });
   });
   describe('queryPoolRelays', () => {
     it('queryPoolRelays', async () => {
-      const relays = await builder.queryPoolRelays([1, 20, 355]);
-      expect(relays).toMatchSnapshot();
+      const relays = await builder.queryPoolRelays(updateIds);
+      expect(relays.length).toBeGreaterThan(0);
+      expect(relays[0]).toMatchShapeOf(DataMocks.Pool.relay);
     });
   });
   describe('queryPoolOwners', () => {
     it('queryPoolOwners', async () => {
-      const ownersAddresses = (await builder.queryPoolOwners([1, 2, 3])).map((o) => o.address);
-      expect(ownersAddresses).toMatchSnapshot();
+      const ownersAddresses = (await builder.queryPoolOwners(updateIds)).map((o) => o.address);
+      expect(ownersAddresses.length).toBeGreaterThan(0);
+      expect(ownersAddresses[0]).toMatchShapeOf('stake_test1urryfvusd49ej55gvf3cxtje4pqmtcdswwqxw37g6uclhnsqj7d5w');
     });
   });
   describe('queryPoolMetrics', () => {
     const totalAda = '42021479194505231';
     describe('sort', () => {
       it('by default sort', async () => {
-        const metrics = (await builder.queryPoolMetrics([1, 31, 19], totalAda)).map((m) => m.metrics);
+        const metrics = (await builder.queryPoolMetrics(hashIds, totalAda)).map((m) => m.metrics);
         expect(metrics).toHaveLength(3);
-        expect(metrics).toMatchSnapshot();
+
+        expect(metrics).toHaveLength(3);
+        expect(metrics[0]).toMatchShapeOf(DataMocks.Pool.metrics);
       });
       it('by saturation', async () => {
         const metrics = (
-          await builder.queryPoolMetrics([1, 31, 19], totalAda, {
+          await builder.queryPoolMetrics(hashIds, totalAda, {
             pagination,
             sort: { field: 'saturation', order: 'asc' }
           })
         ).map((m) => m.metrics);
+
         expect(metrics).toHaveLength(3);
-        expect(metrics).toMatchSnapshot();
+        expect(metrics[0]).toMatchShapeOf(DataMocks.Pool.metrics);
       });
     });
     describe('pagination', () => {
       it('with limit', async () => {
         const metrics = (
-          await builder.queryPoolMetrics([1, 31, 19], totalAda, { pagination: { limit: 2, startAt: 0 } })
+          await builder.queryPoolMetrics(hashIds, totalAda, { pagination: { limit: 2, startAt: 0 } })
         ).map((m) => m.metrics);
         expect(metrics).toHaveLength(2);
-        expect(metrics).toMatchSnapshot();
+
+        expect(metrics[0]).toMatchShapeOf(DataMocks.Pool.metrics);
       });
       it('with startAt', async () => {
         const metrics = (
-          await builder.queryPoolMetrics([1, 31, 19], totalAda, { pagination: { limit: 3, startAt: 1 } })
+          await builder.queryPoolMetrics(hashIds, totalAda, { pagination: { limit: 3, startAt: 1 } })
         ).map((m) => m.metrics);
         expect(metrics).toHaveLength(2);
-        expect(metrics).toMatchSnapshot();
+
+        expect(metrics[0]).toMatchShapeOf(DataMocks.Pool.metrics);
       });
     });
   });
   describe('queryPoolData', () => {
     describe('sort', () => {
       it('by default sort (name asc)', async () => {
-        const pools = (await builder.queryPoolData([1, 6, 14, 15, 20])).map((qR) => {
+        const pools = (await builder.queryPoolData(hashIds)).map((qR) => {
           const { hashId, updateId, ...poolData } = qR;
           return poolData;
         });
-        expect(pools).toHaveLength(5);
-        expect(pools).toMatchSnapshot();
+        expect(pools).toHaveLength(hashIds.length);
+        expect(pools[0]).toMatchShapeOf(DataMocks.Pool.info);
       });
       it('by name desc', async () => {
         const pools = (
-          await builder.queryPoolData([14, 15, 20], { pagination, sort: { field: 'name', order: 'desc' } })
+          await builder.queryPoolData(hashIds, { pagination, sort: { field: 'name', order: 'desc' } })
         ).map((qR) => {
           const { hashId: _1, updateId: _2, ...poolData } = qR;
           return poolData;
         });
         expect(pools).toHaveLength(3);
-        expect(pools).toMatchSnapshot();
+        expect(pools[0]).toMatchShapeOf(DataMocks.Pool.info);
       });
       it('by real-world cost considering fixed cost and margin when specifying sort by cost desc', async () => {
         const pools = (
-          await builder.queryPoolData([14, 15, 20], { pagination, sort: { field: 'cost', order: 'desc' } })
+          await builder.queryPoolData(hashIds, { pagination, sort: { field: 'cost', order: 'desc' } })
         ).map((qR) => {
           const { hashId: _1, updateId: _2, ...poolData } = qR;
           return poolData;
         });
         expect(pools).toHaveLength(3);
-        expect(pools).toMatchSnapshot();
+        expect(pools[0]).toMatchShapeOf(DataMocks.Pool.info);
       });
       it('by real-world cost considering fixed cost and margin when specifying sort by cost asc', async () => {
-        const pools = (
-          await builder.queryPoolData([14, 15, 20], { pagination, sort: { field: 'cost', order: 'asc' } })
-        ).map((qR) => {
-          const { hashId: _1, updateId: _2, ...poolData } = qR;
-          return poolData;
-        });
+        const pools = (await builder.queryPoolData(hashIds, { pagination, sort: { field: 'cost', order: 'asc' } })).map(
+          (qR) => {
+            const { hashId: _1, updateId: _2, ...poolData } = qR;
+            return poolData;
+          }
+        );
+
         expect(pools).toHaveLength(3);
-        expect(pools).toMatchSnapshot();
+        expect(pools[0]).toMatchShapeOf(DataMocks.Pool.info);
       });
     });
     describe('pagination', () => {
       it('with limit', async () => {
-        const pools = (await builder.queryPoolData([1, 6, 14, 15, 20], { pagination: { limit: 3, startAt: 0 } })).map(
-          (qR) => {
-            const { hashId, updateId, ...poolData } = qR;
-            return poolData;
-          }
-        );
-        expect(pools).toHaveLength(3);
-        expect(pools).toMatchSnapshot();
+        const pools = (await builder.queryPoolData(hashIds, { pagination: { limit: 3, startAt: 0 } })).map((qR) => {
+          const { hashId, updateId, ...poolData } = qR;
+          return poolData;
+        });
+        expect(pools.length).toBeGreaterThan(0);
+        expect(pools[0]).toMatchShapeOf(DataMocks.Pool.info);
       });
       it('with startAt', async () => {
-        const pools = (await builder.queryPoolData([1, 6, 14, 15, 20], { pagination: { limit: 5, startAt: 2 } })).map(
-          (qR) => {
-            const { hashId, updateId, ...poolData } = qR;
-            return poolData;
-          }
-        );
-        expect(pools).toHaveLength(3);
-        expect(pools).toMatchSnapshot();
+        const pools = (await builder.queryPoolData(hashIds, { pagination: { limit: 5, startAt: 2 } })).map((qR) => {
+          const { hashId, updateId, ...poolData } = qR;
+          return poolData;
+        });
+        expect(pools.length).toBeGreaterThan(0);
+        expect(pools[0]).toMatchShapeOf(DataMocks.Pool.info);
       });
     });
   });
   describe('getTotalAmountOfAda', () => {
     it('getTotalAmountOfAda', async () => {
-      const totalAdaAmount = await builder.getTotalAmountOfAda();
-      expect(totalAdaAmount).toMatchSnapshot();
+      const totalAdaAmount = Number(await builder.getTotalAmountOfAda());
+      expect(totalAdaAmount).toBeGreaterThan(0);
     });
   });
   describe('getLastEpoch', () => {
     it('getLastEpoch', async () => {
       const lastEpoch = await builder.getLastEpoch();
-      expect(lastEpoch).toMatchSnapshot();
+      expect(lastEpoch).toBeGreaterThan(0);
     });
   });
   describe('buildPoolsByStatusQuery', () => {
@@ -193,8 +213,7 @@ describe('StakePoolBuilder', () => {
       const poolHashes = await builder.queryPoolHashes(builtQuery.query, builtQuery.params);
       expect(buildPoolsByStatusQuerySpy).toHaveBeenCalledTimes(2);
       expect(buildPoolsByStatusQuerySpy).toHaveReturnedWith(poolsByStatusQuery);
-      expect(poolsByStatusQuery).toMatchSnapshot();
-      expect(poolHashes).toHaveLength(0);
+      expect(poolHashes).toBeDefined();
     });
     it('active', async () => {
       const activeStatus = [Cardano.StakePoolStatus.Active];
@@ -207,8 +226,7 @@ describe('StakePoolBuilder', () => {
       const poolHashes = await builder.queryPoolHashes(builtQuery.query, builtQuery.params);
       expect(buildPoolsByStatusQuerySpy).toHaveBeenCalledTimes(2);
       expect(buildPoolsByStatusQuerySpy).toHaveReturnedWith(poolsByStatusQuery);
-      expect(poolsByStatusQuery).toMatchSnapshot();
-      expect(poolHashes).toHaveLength(8);
+      expect(poolHashes).toBeDefined();
     });
     it('retiring', async () => {
       const retiringStatus = [Cardano.StakePoolStatus.Retiring];
@@ -221,8 +239,7 @@ describe('StakePoolBuilder', () => {
       const poolHashes = await builder.queryPoolHashes(builtQuery.query, builtQuery.params);
       expect(buildPoolsByStatusQuerySpy).toHaveBeenCalledTimes(2);
       expect(buildPoolsByStatusQuerySpy).toHaveReturnedWith(poolsByStatusQuery);
-      expect(poolsByStatusQuery).toMatchSnapshot();
-      expect(poolHashes).toHaveLength(0);
+      expect(poolHashes).toBeDefined();
     });
     it('retired', async () => {
       const retiredStatus = [Cardano.StakePoolStatus.Retired];
@@ -235,8 +252,7 @@ describe('StakePoolBuilder', () => {
       const poolHashes = await builder.queryPoolHashes(builtQuery.query, builtQuery.params);
       expect(buildPoolsByStatusQuerySpy).toHaveBeenCalledTimes(2);
       expect(buildPoolsByStatusQuerySpy).toHaveReturnedWith(poolsByStatusQuery);
-      expect(poolsByStatusQuery).toMatchSnapshot();
-      expect(poolHashes).toHaveLength(2);
+      expect(poolHashes).toBeDefined();
     });
     it('active,activating,retiring,retired', async () => {
       const poolStatus = Object.values(Cardano.StakePoolStatus);
@@ -249,31 +265,7 @@ describe('StakePoolBuilder', () => {
       const poolHashes = await builder.queryPoolHashes(builtQuery.query, builtQuery.params);
       expect(buildPoolsByStatusQuerySpy).toHaveBeenCalledTimes(2);
       expect(buildPoolsByStatusQuerySpy).toHaveReturnedWith(poolsByStatusQuery);
-      expect(poolsByStatusQuery).toMatchSnapshot();
-      expect(poolHashes).toHaveLength(10);
-    });
-  });
-  describe('buildPoolsByPledgeMetQuery', () => {
-    it('pledgeMet true', async () => {
-      const poolsByPledgeQuery = await builder.buildPoolsByPledgeMetQuery(true);
-      expect(poolsByPledgeQuery).toMatchSnapshot();
-    });
-    it('pledgeMet false', async () => {
-      const poolsByPledgeQuery = await builder.buildPoolsByPledgeMetQuery(false);
-      expect(poolsByPledgeQuery).toMatchSnapshot();
-    });
-  });
-  describe('buildPoolsByIdentifierQuery', () => {
-    it('buildPoolsByIdentifierQuery', async () => {
-      const poolsByIdentifierQuery = await builder.buildPoolsByIdentifierQuery({
-        _condition: 'and',
-        values: [
-          { name: 'CL' },
-          { ticker: 'CLIO' },
-          { id: Cardano.PoolId('pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70') }
-        ]
-      });
-      expect(poolsByIdentifierQuery).toMatchSnapshot();
+      expect(poolHashes).toBeDefined();
     });
   });
   describe('buildOrQuery', () => {
@@ -281,10 +273,9 @@ describe('StakePoolBuilder', () => {
       const builtQuery = builder.buildOrQuery(filters);
       const { query, params } = builtQuery;
       const poolHashes = await builder.queryPoolHashes(query, params);
-      const totalCount = await builder.queryTotalCount(query, params);
-      expect(builtQuery).toMatchSnapshot();
-      expect(poolHashes).toHaveLength(10);
-      expect(totalCount).toMatchSnapshot();
+      const totalCount = Number(await builder.queryTotalCount(query, params));
+      expect(poolHashes.length).toBeGreaterThan(0);
+      expect(totalCount).toBeGreaterThan(0);
     });
   });
   describe('buildAndQuery', () => {
@@ -292,44 +283,43 @@ describe('StakePoolBuilder', () => {
       const builtQuery = builder.buildAndQuery(filters);
       const { query, params } = builtQuery;
       const poolHashes = await builder.queryPoolHashes(query, params);
-      const totalCount = await builder.queryTotalCount(query, params);
-      expect(builtQuery).toMatchSnapshot();
+      const totalCount = Number(await builder.queryTotalCount(query, params));
       expect(poolHashes).toHaveLength(1);
-      expect(totalCount).toMatchSnapshot();
+      expect(totalCount).toBeGreaterThan(0);
     });
   });
   describe('queryPoolStats', () => {
     it('returns active, retired and retiring pools count', async () => {
       const result = await builder.queryPoolStats();
       expect(result.qty).toBeDefined();
-      expect(result).toMatchSnapshot();
+      expect(result).toMatchShapeOf({ qty: { active: 0, retired: 0, retiring: 0 } });
     });
   });
   describe('queryPoolAPY', () => {
     describe('sort', () => {
       it('by default sort (APY desc)', async () => {
-        const result = await builder.queryPoolAPY([1, 14]);
-        expect(result).toHaveLength(2);
+        const result = await builder.queryPoolAPY(hashIds);
+        expect(result.length).toBeGreaterThan(0);
         expect(result[0].apy).toBeGreaterThan(result[1].apy);
-        expect(result).toMatchSnapshot();
+        expect(result[0]).toMatchShapeOf({ apy: 0, hashId: 0 });
       });
       it('by APY asc', async () => {
-        const result = await builder.queryPoolAPY([1, 14], { sort: { field: 'apy', order: 'asc' } });
-        expect(result).toHaveLength(2);
+        const result = await builder.queryPoolAPY(hashIds, { sort: { field: 'apy', order: 'asc' } });
+        expect(result.length).toBeGreaterThan(0);
         expect(result[0].apy).toBeLessThan(result[1].apy);
-        expect(result).toMatchSnapshot();
+        expect(result[0]).toMatchShapeOf({ apy: 0, hashId: 0 });
       });
     });
     describe('pagination', () => {
       it('with limit', async () => {
-        const result = await builder.queryPoolAPY([1, 15, 19], { pagination: { limit: 1, startAt: 0 } });
-        expect(result).toHaveLength(1);
-        expect(result).toMatchSnapshot();
+        const result = await builder.queryPoolAPY(hashIds, { pagination: { limit: 1, startAt: 0 } });
+        expect(result.length).toBeGreaterThan(0);
+        expect(result[0]).toMatchShapeOf({ apy: 0, hashId: 0 });
       });
       it('with startAt', async () => {
-        const result = await builder.queryPoolAPY([1, 15, 19], { pagination: { limit: 5, startAt: 1 } });
-        expect(result).toHaveLength(2);
-        expect(result).toMatchSnapshot();
+        const result = await builder.queryPoolAPY(hashIds, { pagination: { limit: 5, startAt: 1 } });
+        expect(result.length).toBeGreaterThan(0);
+        expect(result[0]).toMatchShapeOf({ apy: 0, hashId: 0 });
       });
     });
   });
