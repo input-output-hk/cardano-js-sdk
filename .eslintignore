@@ -2,3 +2,4 @@
 node_modules
 dist
 packages/golden-test-generator
+.yarn

@@ -59,16 +59,20 @@
   "dependencies": {
     "@cardano-foundation/ledgerjs-hw-app-cardano": "^5.0.0",
     "@cardano-sdk/core": "^0.6.0",
+    "@cardano-sdk/dapp-connector": "^0.6.0",
+    "@cardano-sdk/util": "^0.6.0",
     "@emurgo/cardano-message-signing-nodejs": "^1.0.1",
     "@ledgerhq/hw-transport": "^6.27.2",
     "@ledgerhq/hw-transport-node-hid-noevents": "^6.27.2",
     "@ledgerhq/hw-transport-webhid": "^6.27.2",
+    "bip39": "^3.0.4",
     "chacha": "^2.1.0",
     "get-random-values": "^2.0.0",
     "lodash": "^4.17.21",
     "pbkdf2": "^3.1.2",
     "rxjs": "^7.4.0",
-    "trezor-connect": "8.2.11-extended"
+    "trezor-connect": "8.2.11-extended",
+    "ts-custom-error": "^3.2.0"
   },
   "files": [
     "dist/*",

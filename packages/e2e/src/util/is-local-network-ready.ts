@@ -1,6 +1,8 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import * as Process from 'process';
+// This disable may not be require once https://github.com/import-js/eslint-plugin-import/pull/2543 is released.
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { Pool, QueryResult } from 'pg';
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
