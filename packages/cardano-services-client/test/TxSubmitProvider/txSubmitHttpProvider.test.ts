@@ -14,7 +14,7 @@ describe('txSubmitHttpProvider', () => {
   describe('healthCheck', () => {
     it('is not ok if cannot connect', async () => {
       const provider = txSubmitHttpProvider(config);
-      await expect(provider.healthCheck()).resolves.toEqual({ ok: false });
+      await expect(() => provider.healthCheck()).rejects.toThrow();
     });
   });
   // eslint-disable-next-line sonarjs/cognitive-complexity
