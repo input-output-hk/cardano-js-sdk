@@ -7,6 +7,7 @@ export const extensionId = 'lgehgfkeagjdklnanflcjoipaphegomm';
 export const ownOrigin = globalThis.location.origin;
 
 export const walletName = 'ccvault';
+export const observableWalletNames = ['UserCreatedWallet1', 'UserCreatedWallet2'];
 
 export const userPromptServiceChannel = `user-prompt-${walletName}`;
 

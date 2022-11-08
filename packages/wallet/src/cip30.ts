@@ -17,9 +17,9 @@ import { CML, Cardano, cmlToCore, coreToCml } from '@cardano-sdk/core';
 import { InputSelectionError } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
 import { ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
+import { Observable, firstValueFrom } from 'rxjs';
 import { ObservableWallet } from './types';
 import { errors } from '@cardano-sdk/key-management';
-import { firstValueFrom } from 'rxjs';
 
 export type Cip30WalletDependencies = {
   logger: Logger;
@@ -75,14 +75,14 @@ const compareUtxos = (utxo: Cardano.Utxo, comparedTo: Cardano.Utxo) => {
 };
 
 export const createWalletApi = (
-  walletReady: Promise<ObservableWallet>,
+  wallet$: Observable<ObservableWallet>,
   confirmationCallback: CallbackConfirmation,
   { logger }: Cip30WalletDependencies
 ): WalletApi => ({
   getBalance: async (): Promise<Cbor> => {
     logger.debug('getting balance');
     try {
-      const wallet = await walletReady;
+      const wallet = await firstValueFrom(wallet$);
       const value = await firstValueFrom(wallet.balance.utxo.available$);
       return Buffer.from(usingAutoFree((scope) => coreToCml.value(scope, value).to_bytes())).toString('hex');
     } catch (error) {
@@ -93,7 +93,7 @@ export const createWalletApi = (
   getChangeAddress: async (): Promise<Cbor> => {
     logger.debug('getting changeAddress');
     try {
-      const wallet = await walletReady;
+      const wallet = await firstValueFrom(wallet$);
       const [{ address }] = await firstValueFrom(wallet.addresses$);
 
       if (!address) {
@@ -117,7 +117,7 @@ export const createWalletApi = (
   > => {
     const scope = new ManagedFreeableScope();
     logger.debug('getting collateral');
-    const wallet = await walletReady;
+    const wallet = await firstValueFrom(wallet$);
     let unspendables = (await firstValueFrom(wallet.utxo.unspendable$)).sort(compareUtxos);
     if (unspendables.some((utxo) => utxo[1].value.assets && utxo[1].value.assets.size > 0)) {
       scope.dispose();
@@ -159,14 +159,14 @@ export const createWalletApi = (
   },
   getNetworkId: async (): Promise<Cardano.NetworkId> => {
     logger.debug('getting networkId');
-    const wallet = await walletReady;
+    const wallet = await firstValueFrom(wallet$);
     const genesisParameters = await firstValueFrom(wallet.genesisParameters$);
     return genesisParameters.networkId;
   },
   getRewardAddresses: async (): Promise<Cbor[]> => {
     logger.debug('getting reward addresses');
     try {
-      const wallet = await walletReady;
+      const wallet = await firstValueFrom(wallet$);
       const [{ rewardAccount }] = await firstValueFrom(wallet.addresses$);
 
       if (!rewardAccount) {
@@ -189,7 +189,7 @@ export const createWalletApi = (
   getUsedAddresses: async (_paginate?: Paginate): Promise<Cbor[]> => {
     logger.debug('getting changeAddress');
 
-    const wallet = await walletReady;
+    const wallet = await firstValueFrom(wallet$);
     const [{ address }] = await firstValueFrom(wallet.addresses$);
 
     if (!address) {
@@ -200,7 +200,7 @@ export const createWalletApi = (
   },
   getUtxos: async (amount?: Cbor, paginate?: Paginate): Promise<Cbor[] | undefined> => {
     const scope = new ManagedFreeableScope();
-    const wallet = await walletReady;
+    const wallet = await firstValueFrom(wallet$);
     let utxos = await firstValueFrom(wallet.utxo.available$);
     if (amount) {
       try {
@@ -245,7 +245,7 @@ export const createWalletApi = (
     }).catch((error) => mapCallbackFailure(error, logger));
 
     if (shouldProceed) {
-      const wallet = await walletReady;
+      const wallet = await firstValueFrom(wallet$);
       return wallet.signData({
         payload: hexBlobPayload,
         signWith: addr
@@ -267,7 +267,7 @@ export const createWalletApi = (
       type: Cip30ConfirmationCallbackType.SignTx
     }).catch((error) => mapCallbackFailure(error, logger));
     if (shouldProceed) {
-      const wallet = await walletReady;
+      const wallet = await firstValueFrom(wallet$);
       try {
         const {
           witness: { signatures }
@@ -301,7 +301,7 @@ export const createWalletApi = (
 
     if (shouldProceed) {
       try {
-        const wallet = await walletReady;
+        const wallet = await firstValueFrom(wallet$);
         await wallet.submitTx(txData);
         return txData.id.toString();
       } catch (error) {

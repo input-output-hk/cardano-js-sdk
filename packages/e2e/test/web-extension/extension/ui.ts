@@ -5,6 +5,7 @@ import {
   adaPriceProperties,
   adaPriceServiceChannel,
   logger,
+  observableWalletNames,
   userPromptServiceChannel,
   walletName
 } from './util';
@@ -12,12 +13,12 @@ import { Cardano } from '@cardano-sdk/core';
 import { InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
 import {
   RemoteApiPropertyType,
-  consumeObservableWallet,
+  WalletManagerUi,
   consumeRemoteApi,
   consumeSupplyDistributionTracker,
-  exposeApi,
-  exposeKeyAgent
+  exposeApi
 } from '@cardano-sdk/web-extension';
+
 import { combineLatest, firstValueFrom, of } from 'rxjs';
 import { runtime } from 'webextension-polyfill';
 import { setupWallet } from '@cardano-sdk/wallet';
@@ -66,20 +67,61 @@ document
   .querySelector<HTMLButtonElement>('#clearAllowList')!
   .addEventListener('click', backgroundServices.clearAllowList);
 
+// SupplyDistributionTracker is used only for extension messaging demo purposes testing purposes.
+// It will not switch when the wallet is changed
 const supplyDistribution = consumeSupplyDistributionTracker({ walletName }, { logger, runtime });
 combineLatest([supplyDistribution.lovelaceSupply$, supplyDistribution.stake$]).subscribe(
   ([lovelaceSupply, stake]) =>
     (document.querySelector('#supplyDistribution')!.textContent = `${stake.live} out of ${lovelaceSupply.total}`)
 );
 
-// Use observable wallet from UI:
-const wallet = consumeObservableWallet({ walletName }, { logger, runtime });
-wallet.addresses$.subscribe(([{ address }]) => (document.querySelector('#address')!.textContent = address.toString()));
-wallet.balance.utxo.available$.subscribe(
-  ({ coins }) => (document.querySelector('#balance')!.textContent = coins.toString())
-);
+const setAddress = (text: string): void => {
+  document.querySelector('#address')!.textContent = text;
+};
 
-document.querySelector('#createKeyAgent')!.addEventListener('click', async () => {
+const setBalance = (text: string): void => {
+  document.querySelector('#balance')!.textContent = text;
+};
+
+const setSignature = (text: string): void => {
+  document.querySelector('#signature')!.textContent = text;
+};
+
+const setName = (text: string): void => {
+  document.querySelector('#observableWalletName')!.textContent = text;
+};
+
+const clearWalletValues = (): void => {
+  setName('-');
+  setAddress('-');
+  setBalance('-');
+  setSignature('-');
+};
+
+const destroyWallets = async (): Promise<void> => {
+  await walletManager.deactivate();
+  clearWalletValues();
+  await walletManager.clearStore(observableWalletNames[0]);
+  await walletManager.clearStore(observableWalletNames[1]);
+};
+
+const walletManager = new WalletManagerUi({ walletName }, { logger, runtime });
+// Wallet object does not change when wallets are activated/deactivated.
+// Instead, it's observable properties emit from the currently active wallet.
+const wallet = walletManager.wallet;
+
+// Wallet can be subscribed can be used even before it is actually created.
+wallet.addresses$.subscribe(([{ address }]) => setAddress(address.toString()));
+wallet.balance.utxo.available$.subscribe(({ coins }) => setBalance(coins.toString()));
+
+const getEnvMnemonics = (name: string) =>
+  (name === observableWalletNames[0] ? process.env.MNEMONIC_WORDS_WALLET1! : process.env.MNEMONIC_WORDS_WALLET2!).split(
+    ' '
+  );
+
+const createWallet = async (name: string) => {
+  clearWalletValues();
+
   // setupWallet call is required to provide context (InputResolver) to the key agent
   const { keyAgent } = await setupWallet({
     createKeyAgent: async (dependencies) =>
@@ -88,7 +130,7 @@ document.querySelector('#createKeyAgent')!.addEventListener('click', async () =>
           {
             accountIndex: 0,
             getPassword: async () => Buffer.from(''),
-            mnemonicWords: process.env.MNEMONIC_WORDS!.split(' '),
+            mnemonicWords: getEnvMnemonics(name),
             networkId: 0
           },
           dependencies
@@ -96,15 +138,21 @@ document.querySelector('#createKeyAgent')!.addEventListener('click', async () =>
       ),
     createWallet: async () => wallet
   });
-  // restoreKeyAgent or create a new one and expose it
-  exposeKeyAgent(
-    {
-      keyAgent,
-      walletName
-    },
-    { logger, runtime }
-  );
-});
+
+  await walletManager.activate({ keyAgent, observableWalletName: name });
+
+  // Same wallet object will return different names, based on which wallet is active
+  // Calling this method before any wallet is active, will resolve only once a wallet becomes active
+  setName(await wallet.getName());
+};
+
+document
+  .querySelector('#activateWallet1')!
+  .addEventListener('click', async () => await createWallet(observableWalletNames[0]));
+document
+  .querySelector('#activateWallet2')!
+  .addEventListener('click', async () => await createWallet(observableWalletNames[1]));
+document.querySelector('#destroyWallets')!.addEventListener('click', async () => await destroyWallets());
 
 document.querySelector('#buildAndSignTx')!.addEventListener('click', async () => {
   const [{ address: ownAddress }] = await firstValueFrom(wallet.addresses$);
@@ -117,5 +165,5 @@ document.querySelector('#buildAndSignTx')!.addEventListener('click', async () =>
     ])
   });
   const signedTx = await wallet.finalizeTx({ tx });
-  document.querySelector('#signature')!.textContent = signedTx.witness.signatures.values().next().value;
+  setSignature(signedTx.witness.signatures.values().next().value);
 });
