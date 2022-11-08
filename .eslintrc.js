@@ -24,6 +24,7 @@ module.exports = {
     'consistent-return': 0,
     // eslint compains about TS enums hence disable here and enable @typescript-eslint/no-shadow
     'import/no-unresolved': 0,
+    'import/no-extraneous-dependencies': ['error', { devDependencies: ['**/test/**/*.ts'] }],
     'jsdoc/require-param': 0,
     'jsdoc/require-param-type': 0,
     'jsdoc/require-returns': 0,

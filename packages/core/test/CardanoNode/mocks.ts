@@ -1,4 +1,4 @@
-import { Cardano, EraSummary, HealthCheckResponse, StakeDistribution } from '@cardano-sdk/core';
+import { Cardano, EraSummary, HealthCheckResponse, StakeDistribution } from '../../src';
 
 const mockEraSummaries: EraSummary[] = [
   { parameters: { epochLength: 21_600, slotLength: 20_000 }, start: { slot: 0, time: new Date(1_563_999_616_000) } },

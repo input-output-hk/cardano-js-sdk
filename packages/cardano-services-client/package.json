@@ -68,7 +68,8 @@
     "@cardano-sdk/util": "^0.6.0",
     "axios": "^0.27.2",
     "class-validator": "^0.13.1",
-    "json-bigint": "~1.0.0"
+    "json-bigint": "~1.0.0",
+    "ts-log": "^2.2.4"
   },
   "files": [
     "dist/*",
