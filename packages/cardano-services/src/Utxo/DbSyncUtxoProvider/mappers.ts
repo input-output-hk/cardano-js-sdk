@@ -1,6 +1,7 @@
 import { Cardano, createUtxoId } from '@cardano-sdk/core';
 import { UtxoModel } from './types';
 import { generateAssetId } from './util';
+import { isNotNil } from '@cardano-sdk/util';
 
 /**
  * Transform DB results into indexed core UTxO
@@ -15,7 +16,7 @@ export const utxosToCore = (utxosModels: UtxoModel[]): Cardano.Utxo[] => {
     if (utxo) {
       const txIn = utxo[0];
       const txOut = utxo[1];
-      if (current.asset_name && current.asset_policy && current.asset_quantity) {
+      if (isNotNil(current.asset_name) && current.asset_policy && current.asset_quantity) {
         const newAssets = txOut.value.assets || new Map<Cardano.AssetId, bigint>();
         newAssets.set(generateAssetId(current.asset_policy, current.asset_name), BigInt(current.asset_quantity));
         txOut.value.assets = newAssets;
@@ -30,7 +31,7 @@ export const utxosToCore = (utxosModels: UtxoModel[]): Cardano.Utxo[] => {
         }
       };
       if (current.data_hash) txOut.datum = Cardano.util.Hash32ByteBase16(current.data_hash);
-      if (current.asset_name && current.asset_policy && current.asset_quantity) {
+      if (isNotNil(current.asset_name) && current.asset_policy && current.asset_quantity) {
         txOut.value.assets = new Map<Cardano.AssetId, bigint>([
           [generateAssetId(current.asset_policy, current.asset_name), BigInt(current.asset_quantity)]
         ]);
