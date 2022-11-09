@@ -9,12 +9,22 @@ cd "$root"
 
 export PATH=$PWD/bin:$PATH
 
-# Pool metadata
-METADATA_URLS=("https://pools.iohk.io/IOG1.json" "https://pools.iohk.io/IOG2.json" "https://pools.iohk.io/IOG3.json")
-METADATA_HASHES=("22cf1de98f4cf4ce61bef2c6bc99890cb39f1452f5143189ce3a69ad70fcde72" "04faac1dce6c68b6bdf406eb261fbc6f57ce0baa9ab039d8e3bb1de8f903f092" "47d5ad9a718bfd40892ab89eb46b34ef2b1ebce9ebba6f5410a1ab96284771ed")
-
 SP_NODES=("1" "2" "3")
 AMOUNT_PER_WALLET='13500000000000000'
+
+# Pool metadata
+METADATA_URLS=("http://file-server/SP1.json" "http://file-server/SP2.json" "http://file-server/SP3.json")
+METADATA_HASHES=()
+
+for ((i = 0; i < ${#METADATA_URLS[@]}; ++i)); do
+  echo "Calculating hash for metadata at ${METADATA_URLS[$i]}..."
+
+  hash=$(cardano-cli stake-pool metadata-hash --pool-metadata-file <(curl -s -L -k "${METADATA_URLS[$i]}"))
+
+  echo "${hash}"
+
+  METADATA_HASHES[${#METADATA_HASHES[@]}]="${hash}"
+done
 
 clean() {
   rm -rf wallets-tx.raw wallets-tx.signed fullUtxo.out balance.out params.json stake.cert pool.cert deleg.cert tx.tmp tx.raw tx.signed
