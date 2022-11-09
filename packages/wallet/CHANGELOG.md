@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.6.1-nightly.0...@cardano-sdk/wallet@0.7.0-nightly.0) (2022-11-09)
+
+### ⚠ BREAKING CHANGES
+
+- remote api wallet manager
+
+### Features
+
+- remote api wallet manager ([043f1df](https://github.com/input-output-hk/cardano-js-sdk/commit/043f1dff7ed85b43e489d972dc5158712c43ee68))
+
 ## [0.6.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.6.0...@cardano-sdk/wallet@0.6.1-nightly.0) (2022-11-08)
 
 **Note:** Version bump only for package @cardano-sdk/wallet

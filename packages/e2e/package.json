@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/e2e",
-  "version": "0.5.1-nightly.0",
+  "version": "0.6.0-nightly.0",
   "description": "End to end tests for the cardano-js-sdk packages.",
   "engines": {
     "node": ">=14.20.1"
@@ -77,7 +77,7 @@
     "@cardano-sdk/util": "^0.6.1-nightly.0",
     "@cardano-sdk/util-dev": "^0.5.1-nightly.0",
     "@cardano-sdk/util-rxjs": "^0.4.3-nightly.0",
-    "@cardano-sdk/wallet": "^0.6.1-nightly.0",
+    "@cardano-sdk/wallet": "^0.7.0-nightly.0",
     "axios": "^0.27.2",
     "bunyan": "^1.8.15",
     "cardano-wallet-js": "^1.4.0",
@@ -99,7 +99,7 @@
     "@babel/preset-env": "^7.18.2",
     "@babel/preset-typescript": "^7.17.12",
     "@cardano-sdk/dapp-connector": "^0.6.1-nightly.0",
-    "@cardano-sdk/web-extension": "^0.6.1-nightly.0",
+    "@cardano-sdk/web-extension": "^0.7.0-nightly.0",
     "@dcspark/cardano-multiplatform-lib-asmjs": "^3.1.0",
     "@emurgo/cardano-message-signing-asmjs": "^1.0.1",
     "@types/bunyan": "^1.8.8",
