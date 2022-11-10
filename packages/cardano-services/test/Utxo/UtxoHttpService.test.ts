@@ -104,6 +104,7 @@ describe('UtxoHttpService', () => {
           expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
         }
       });
+
       it('returns 400 coded respons if the request is bad formed', async () => {
         try {
           await axios.post(`${baseUrl}/utxo-by-addresses`, { addresses: ['asd'] });
@@ -113,11 +114,13 @@ describe('UtxoHttpService', () => {
           expect(error.message).toBe(BAD_REQUEST_STRING);
         }
       });
+
       it('valid request should pass OpenApi schema validations', async () => {
         const addresses = ['asd'];
         const res = await axios.post(`${baseUrl}/utxo-by-addresses`, { addresses });
         expect(res.status).toEqual(200);
       });
+
       it('return UTxOs for a single address', async () => {
         const res = await provider.utxoByAddresses({
           addresses: [
@@ -128,6 +131,7 @@ describe('UtxoHttpService', () => {
         });
         expect(res).toMatchSnapshot();
       });
+
       it('return UTxOs for multiple addresses', async () => {
         const addresses = [
           'addr_test1qp620qa3rqzd5fxj3hy4dughv7xx2dt9gu9de70jf8hagdcvmqt35f2psxv7ajj5jnh4ajlc752rert8f9msffxdl45qyjefw8',
@@ -137,6 +141,7 @@ describe('UtxoHttpService', () => {
         const res = await provider.utxoByAddresses({ addresses: toCardanoAddresses(addresses) });
         expect(res).toMatchSnapshot();
       });
+
       it('returns UTxOs containing multiple assets', async () => {
         const addresses = [
           'addr_test1qp620qa3rqzd5fxj3hy4dughv7xx2dt9gu9de70jf8hagdcvmqt35f2psxv7ajj5jnh4ajlc752rert8f9msffxdl45qyjefw8',
@@ -144,6 +149,18 @@ describe('UtxoHttpService', () => {
         ];
         const res = await provider.utxoByAddresses({ addresses: toCardanoAddresses(addresses) });
         expect(res).toMatchSnapshot();
+      });
+
+      it('returns UTxOs containing multiple assets and one of the assets has no name', async () => {
+        const addressAssociatedWithUTxOWithNoAssetName =
+          'addr_test1qp620qa3rqzd5fxj3hy4dughv7xx2dt9gu9de70jf8hagdcvmqt35f2psxv7ajj5jnh4ajlc752rert8f9msffxdl45qyjefw8';
+        const assetWithNoNameId = '126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f';
+        const addresses = [addressAssociatedWithUTxOWithNoAssetName];
+        const res = await provider.utxoByAddresses({ addresses: toCardanoAddresses(addresses) });
+        const txOut: Cardano.TxOut = res[0][1];
+
+        expect(txOut.value.assets!.get(Cardano.AssetId(assetWithNoNameId))).toBeDefined();
+        expect(txOut.value.assets!.size).toEqual(2);
       });
     });
   });

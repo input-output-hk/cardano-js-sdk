@@ -43,7 +43,7 @@ Array [
       "address": "addr_test1qp620qa3rqzd5fxj3hy4dughv7xx2dt9gu9de70jf8hagdcvmqt35f2psxv7ajj5jnh4ajlc752rert8f9msffxdl45qyjefw8",
       "value": Object {
         "assets": Map {
-          "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e" => 70n,
+          "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f" => 70n,
           "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130cb6de817be83e93a5771e6c98ee305e1012bae70d9eb9dff70e2d71e4b611779" => 780407n,
         },
         "coins": 2000000n,
@@ -81,7 +81,7 @@ Array [
       "address": "addr_test1qp620qa3rqzd5fxj3hy4dughv7xx2dt9gu9de70jf8hagdcvmqt35f2psxv7ajj5jnh4ajlc752rert8f9msffxdl45qyjefw8",
       "value": Object {
         "assets": Map {
-          "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f744d494e" => 70n,
+          "126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f" => 70n,
           "22c3b86a5b88a78b5de52f4aed2831d1483b3b7681f1ee2569538130cb6de817be83e93a5771e6c98ee305e1012bae70d9eb9dff70e2d71e4b611779" => 780407n,
         },
         "coins": 2000000n,
