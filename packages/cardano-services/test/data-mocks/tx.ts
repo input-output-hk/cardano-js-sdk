@@ -116,10 +116,16 @@ export const withValidityInterval: Cardano.TxAlonzo = merge(withAssets, {
   }
 });
 
+export const withdrawals = [
+  {
+    quantity: 1_834_170_201n,
+    stakeAddress: 'stake_test1uzfef3dmd0ykz9wfm3zx35pq4xdtla929hk6sx6tcen9h6s3vf52j'
+  }
+];
+
 export const withWithdrawals: Cardano.TxAlonzo = merge(withAssets, {
   body: {
-    // Todo: add withdrawal
-    withdrawals: []
+    withdrawals
   }
 });
 
@@ -138,24 +144,24 @@ export const witnessRedeemers = {
   signatures: {}
 };
 
-export const inputs = [
-  {
-    address:
-      'addr_test1qpcncempf4svkpw0salztrsxzrfpr5ll323q5whw7lv94vyw0kz5rxvdaq6u6tslwfrrgz6l4n4lpcpnawn87yl9k6dsu4hhg2',
-    index: 0,
-    txId: '5293c1165896ab6bed6f7e969792fe4ac2202ddac5a5186d941ae2c9310b7056'
-  }
-];
+export const input = {
+  address:
+    'addr_test1qpcncempf4svkpw0salztrsxzrfpr5ll323q5whw7lv94vyw0kz5rxvdaq6u6tslwfrrgz6l4n4lpcpnawn87yl9k6dsu4hhg2',
+  index: 0,
+  txId: '5293c1165896ab6bed6f7e969792fe4ac2202ddac5a5186d941ae2c9310b7056'
+};
 
-export const outputs = [
-  {
-    address:
-      'addr_test1qpcncempf4svkpw0salztrsxzrfpr5ll323q5whw7lv94vyw0kz5rxvdaq6u6tslwfrrgz6l4n4lpcpnawn87yl9k6dsu4hhg2',
-    value: {
-      coins: 13_499_999_999_819_540n
-    }
+export const inputs = [input];
+
+export const output = {
+  address:
+    'addr_test1qpcncempf4svkpw0salztrsxzrfpr5ll323q5whw7lv94vyw0kz5rxvdaq6u6tslwfrrgz6l4n4lpcpnawn87yl9k6dsu4hhg2',
+  value: {
+    coins: 13_499_999_999_819_540n
   }
-];
+};
+
+export const outputs = [output];
 
 export const blockHeader: Cardano.TxAlonzo['blockHeader'] = {
   blockNo: 3_157_934,
@@ -163,8 +169,54 @@ export const blockHeader: Cardano.TxAlonzo['blockHeader'] = {
   slot: 45_286_016
 };
 
+export const txInput = {
+  address:
+    // eslint-disable-next-line max-len
+    'addr_test1qpv5muwgjmmtqh2ta0kq9pmz0nurg9kmw7dryueqt57mncynjnzmk67fvy2unhzydrgzp2v6hl625t0d4qd5h3nxt04qu0ww7k',
+  id: '0',
+  index: 0,
+  txInputId: '0000000000000000000000000000000000000000000000000000000000000000',
+  txSourceId: '0000000000000000000000000000000000000000000000000000000000000000'
+};
+
+export const txOut = {
+  address:
+    // eslint-disable-next-line max-len
+    'addr_test1qpv5muwgjmmtqh2ta0kq9pmz0nurg9kmw7dryueqt57mncynjnzmk67fvy2unhzydrgzp2v6hl625t0d4qd5h3nxt04qu0ww7k',
+  datum: undefined,
+  index: 0,
+  txId: '59f3ea1bb67b39447aad523f35daa1950c833472bf9232b6c0abac968f45bad9',
+  value: { assets: undefined, coins: 3_061_089_499_500n }
+};
+
+export const txTokenMap = new Map<string, bigint>([
+  ['ea53552348385c7421003f315b43271aee7e65ad900c195ce57fa0903030303030', 10n]
+]);
+
+export const withdrawal = {
+  quantity: 1_834_170_201n,
+  stakeAddress: 'stake_test1uzfef3dmd0ykz9wfm3zx35pq4xdtla929hk6sx6tcen9h6s3vf52j'
+};
+
+export const certificate = {
+  __typename: 'StakeDelegationCertificate',
+  poolId: 'pool19yv4rswp06fdnwg5zq0uk876gttewt86kytqrlt3ermnq3reky0',
+  stakeKeyHash: '9394c5bb6bc96115c9dc4468d020a99abff4aa2deda81b4bc6665bea'
+};
+
+export const redeemer = {
+  executionUnits: {
+    memory: 0,
+    steps: 0
+  },
+  index: 0,
+  purpose: 'spend',
+  scriptHash: '67f33146617a5e61936081db3b2117cbf59bd2123748f58ac9678656'
+};
+
 export const tx = [
   base,
+  certificate,
   withAssets,
   withAuxiliaryData,
   delegationCertificate,
@@ -174,7 +226,14 @@ export const tx = [
   witnessRedeemers,
   withValidityInterval,
   withWithdrawals,
+  withdrawal,
   inputs,
   outputs,
-  blockHeader
+  blockHeader,
+  txInput,
+  txOut,
+  txTokenMap,
+  redeemer,
+  input,
+  withdrawals
 ];

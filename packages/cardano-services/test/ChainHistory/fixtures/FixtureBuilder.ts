@@ -131,6 +131,12 @@ export class ChainHistoryFixtureBuilder {
     return result.rows.map(({ hash }) => Cardano.TransactionId(bufferToHexString(hash)));
   }
 
+  public async getMultiAssetTxOutIds(desiredQty: number) {
+    this.#logger.debug('About to fetch genesis multiasset tx out ids');
+    const result: QueryResult<{ tx_out_id: string }> = await this.#db.query(Queries.findMultiAssetTxOut, [desiredQty]);
+    return result.rows.map(({ tx_out_id }) => BigInt(tx_out_id));
+  }
+
   public async getGenesisAddresses() {
     this.#logger.debug('About to fetch genesis addresses');
     const result: QueryResult<{ address: string }> = await this.#db.query(Queries.genesisUtxoAddresses);

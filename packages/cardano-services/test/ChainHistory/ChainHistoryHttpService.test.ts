@@ -45,7 +45,9 @@ describe('ChainHistoryHttpService', () => {
     baseUrl = `http://localhost:${port}/chain-history`;
     clientConfig = { baseUrl, logger };
     config = { listen: { port } };
-    dbConnection = new Pool({ connectionString: process.env.LOCALNETWORK_INTEGRAION_TESTS_POSTGRES_CONNECTION_STRING });
+    dbConnection = new Pool({
+      connectionString: process.env.LOCALNETWORK_INTEGRATION_TESTS_POSTGRES_CONNECTION_STRING
+    });
     fixtureBuilder = new ChainHistoryFixtureBuilder(dbConnection, logger);
   });
 
@@ -244,14 +246,13 @@ describe('ChainHistoryHttpService', () => {
           expect(tx.body.mint?.size).toBeGreaterThan(0);
         });
 
-        // Wait for the rewards withdrawal e2e to be completed.
-        it.skip('has withdrawals', async () => {
+        it('has withdrawals', async () => {
           const response = await provider.transactionsByHashes({
             ids: await fixtureBuilder.getTxHashes(1, { with: [TxWith.Withdrawal] })
           });
           const tx: Cardano.TxAlonzo = response[0];
           expect(response.length).toEqual(1);
-          expect(tx).toMatchShapeOf(DataMocks.Tx.withWithdrawals);
+          expect(tx.body.withdrawals!).toMatchShapeOf(DataMocks.Tx.withdrawals);
           expect(tx.body.withdrawals?.length).toBeGreaterThan(0);
         });
 
