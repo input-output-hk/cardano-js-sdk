@@ -109,6 +109,20 @@ Address:    addr_test1qr0c3frkem9cqn5f73dnvqpena27k2fgqew6wct9eaka03agfwkvzr0zyq
 
 You can configure any of these five wallets in your test and use any amount of tADA you need.
 
+## Local file server
+
+The end-to-end environment runs a Nginx instance that allows us to serve files directly to the local-network.
+
+Any file added to the `file-server` folder will be served to the docker cluster via `http://file-server/`, for example, `http://file-server/SP1.json`. The contents of this folder can be altered dynamically, and the files will be available instantly to the docker images (no need to restart the container).
+
+It is also possible to access the file server from outside the docker cluster as the instance binds to port `7890` on the host by default:
+
+`http://localhost:7890/SP1.json`
+
+You can override this port mapping by setting the `FILE_SERVER_PORT` environment variable when starting to containers:
+
+`FILE_SERVER_PORT=9874 docker compose -p local-network-e2e up`
+
 ## Load Testing
 
 Cardano services end to end load tests. Please note that you must have several services up before executing the test, to start the environment(from the root):
@@ -268,3 +282,4 @@ Then to run the web-extension tests run:
 ```bash
 $ yarn workspace @cardano-sdk/e2e test:web-extension
 ```
+
