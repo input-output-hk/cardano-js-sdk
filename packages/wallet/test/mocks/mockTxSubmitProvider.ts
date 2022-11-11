@@ -1,13 +1,15 @@
+import { ObservableProvider } from '@cardano-sdk/util-rxjs';
 import { TxSubmitProvider } from '@cardano-sdk/core';
+import { of } from 'rxjs';
 
 /**
  * Provider stub for testing
  *
  * returns TxSubmitProvider-compatible object
  */
-export const mockTxSubmitProvider = (): jest.Mocked<TxSubmitProvider> => ({
-  healthCheck: jest.fn().mockResolvedValue(true),
-  submitTx: jest.fn().mockResolvedValue(void 0)
+export const mockTxSubmitProvider = (): jest.Mocked<ObservableProvider<TxSubmitProvider>> => ({
+  healthCheck: jest.fn().mockReturnValue(of(true)),
+  submitTx: jest.fn().mockReturnValue(of())
 });
 
 export type TxSubmitProviderStub = ReturnType<typeof mockTxSubmitProvider>;

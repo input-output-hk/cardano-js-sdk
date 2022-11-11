@@ -65,17 +65,19 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
       return new SingleAddressWallet(
         { name, polling: pollingConfig },
         {
-          assetProvider,
-          chainHistoryProvider,
           connectionStatusTracker$,
           keyAgent,
           logger,
-          networkInfoProvider,
-          rewardsProvider,
-          stakePoolProvider,
-          stores,
-          txSubmitProvider,
-          utxoProvider
+          providers: {
+            assetProvider,
+            chainHistoryProvider,
+            networkInfoProvider,
+            rewardsProvider,
+            stakePoolProvider,
+            txSubmitProvider,
+            utxoProvider
+          },
+          stores
         }
       );
     }

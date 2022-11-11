@@ -1,13 +1,14 @@
 import { BehaviorSubject, EMPTY, of } from 'rxjs';
 import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider, coreToCml, util } from '@cardano-sdk/core';
 import { ConnectionStatus, SmartTxSubmitProvider, TipSlot } from '../../src';
+import { ObservableProvider } from '@cardano-sdk/util-rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { flushPromises } from '@cardano-sdk/util-dev';
 import { mockTxSubmitProvider } from '../mocks';
 import { usingAutoFree } from '@cardano-sdk/util';
 
 describe('SmartTxSubmitProvider', () => {
-  let underlyingProvider: jest.Mocked<TxSubmitProvider>;
+  let underlyingProvider: jest.Mocked<ObservableProvider<TxSubmitProvider>>;
   let provider: SmartTxSubmitProvider;
   const retryBackoffConfig: RetryBackoffConfig = { initialInterval: 1 };
 
@@ -77,9 +78,9 @@ describe('SmartTxSubmitProvider', () => {
 
       it('re-submits transactions that failed to submit due to a recoverable provider failure', async () => {
         underlyingProvider.submitTx
-          .mockRejectedValueOnce(new ProviderError(ProviderFailure.ConnectionFailure))
-          .mockRejectedValueOnce(new ProviderError(ProviderFailure.Unhealthy))
-          .mockRejectedValueOnce(new ProviderError(ProviderFailure.Unknown));
+          .mockReturnedValueOnce(new ProviderError(ProviderFailure.ConnectionFailure))
+          .mockReturnedValueOnce(new ProviderError(ProviderFailure.Unhealthy))
+          .mockReturnedValueOnce(new ProviderError(ProviderFailure.Unknown));
         await provider.submitTx({ signedTransaction: txWithValidityIntervalHex });
         expect(underlyingProvider.submitTx).toBeCalledTimes(4);
       });

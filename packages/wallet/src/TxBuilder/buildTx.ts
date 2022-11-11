@@ -77,7 +77,7 @@ const createSignedTx = async ({
 }): Promise<SignedTx> => {
   const finalizedTx = await wallet.finalizeTx({ auxiliaryData, extraSigners, signingOptions, tx });
   return {
-    submit: () => wallet.submitTx(finalizedTx).then(() => afterSubmitCb()),
+    submit: () => firstValueFrom(wallet.submitTx(finalizedTx)).then(() => afterSubmitCb()),
     tx: finalizedTx
   };
 };

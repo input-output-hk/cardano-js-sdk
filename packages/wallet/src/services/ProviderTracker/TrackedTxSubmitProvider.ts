@@ -1,5 +1,6 @@
 import { BehaviorSubject } from 'rxjs';
 import { CLEAN_FN_STATS, ProviderFnStats, ProviderTracker } from './ProviderTracker';
+import { ObservableProvider } from '@cardano-sdk/util-rxjs';
 import { TxSubmitProvider } from '@cardano-sdk/core';
 
 export const CLEAN_TX_SUBMIT_STATS: ProviderFnStats = { ...CLEAN_FN_STATS, initialized: true };
@@ -22,18 +23,18 @@ export class TxSubmitProviderStats {
 /**
  * Wraps a TxSubmitProvider, tracking # of calls of each function
  */
-export class TrackedTxSubmitProvider extends ProviderTracker implements TxSubmitProvider {
+export class TrackedTxSubmitProvider extends ProviderTracker implements ObservableProvider<TxSubmitProvider> {
   readonly stats = new TxSubmitProviderStats();
-  readonly healthCheck: TxSubmitProvider['healthCheck'];
-  readonly submitTx: TxSubmitProvider['submitTx'];
+  readonly healthCheck: ObservableProvider<TxSubmitProvider>['healthCheck'];
+  readonly submitTx: ObservableProvider<TxSubmitProvider>['submitTx'];
 
-  constructor(txSubmitProvider: TxSubmitProvider) {
+  constructor(txSubmitProvider: ObservableProvider<TxSubmitProvider>) {
     super();
     txSubmitProvider = txSubmitProvider;
 
-    this.healthCheck = () => this.trackedCall(() => txSubmitProvider.healthCheck(), this.stats.healthCheck$);
+    this.healthCheck = () => this.trackedObservableCall(() => txSubmitProvider.healthCheck(), this.stats.healthCheck$);
 
     this.submitTx = (signedTransaction) =>
-      this.trackedCall(() => txSubmitProvider.submitTx(signedTransaction), this.stats.submitTx$);
+      this.trackedObservableCall(() => txSubmitProvider.submitTx(signedTransaction), this.stats.submitTx$);
   }
 }

@@ -1,11 +1,12 @@
 import { BehaviorSubject } from 'rxjs';
 import { CLEAN_TX_SUBMIT_STATS, ProviderFnStats, TrackedTxSubmitProvider, TxSubmitProviderStats } from '../../../src';
+import { ObservableProvider } from '@cardano-sdk/util-rxjs';
 import { TxSubmitProvider } from '@cardano-sdk/core';
 import { bufferToHexString } from '@cardano-sdk/util';
 import { mockTxSubmitProvider } from '../../mocks';
 
 describe('TrackedTxSubmitProvider', () => {
-  let txSubmitProvider: TxSubmitProvider;
+  let txSubmitProvider: ObservableProvider<TxSubmitProvider>;
   let trackedTxSubmitProvider: TrackedTxSubmitProvider;
   beforeEach(() => {
     txSubmitProvider = mockTxSubmitProvider();

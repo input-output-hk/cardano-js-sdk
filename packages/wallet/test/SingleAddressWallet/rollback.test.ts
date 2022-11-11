@@ -13,6 +13,7 @@ import { dummyLogger as logger } from 'ts-log';
 import * as mocks from '../mocks';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
 import { ConnectionStatusTracker, PollingConfig, SingleAddressWallet, setupWallet } from '../../src';
+import { ObservableProvider } from '@cardano-sdk/util-rxjs';
 import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
 import { testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { waitForWalletStateSettle } from '../util';
@@ -27,7 +28,7 @@ interface Providers {
   chainHistoryProvider: ChainHistoryProvider;
   networkInfoProvider: NetworkInfoProvider;
   connectionStatusTracker$?: ConnectionStatusTracker;
-  txSubmitProvider: TxSubmitProvider;
+  txSubmitProvider: ObservableProvider<TxSubmitProvider>;
 }
 
 const createWallet = async (stores: WalletStores, providers: Providers, pollingConfig?: PollingConfig) => {
@@ -60,17 +61,19 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
       return new SingleAddressWallet(
         { name, polling: pollingConfig },
         {
-          assetProvider,
-          chainHistoryProvider,
           connectionStatusTracker$,
           keyAgent,
           logger,
-          networkInfoProvider,
-          rewardsProvider,
-          stakePoolProvider,
-          stores,
-          txSubmitProvider,
-          utxoProvider
+          providers: {
+            assetProvider,
+            chainHistoryProvider,
+            networkInfoProvider,
+            rewardsProvider,
+            stakePoolProvider,
+            txSubmitProvider,
+            utxoProvider
+          },
+          stores
         }
       );
     }

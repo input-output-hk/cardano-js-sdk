@@ -1,4 +1,4 @@
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, tap } from 'rxjs';
 
 export interface ProviderFnStats {
   numCalls: number;
@@ -39,6 +39,33 @@ export abstract class ProviderTracker {
       });
       throw error;
     }
+  }
+
+  protected trackedObservableCall<T>(call: () => Observable<T>, tracker: BehaviorSubject<ProviderFnStats>) {
+    return new Observable<T>((observer) => {
+      tracker.next({ ...tracker.value, numCalls: tracker.value.numCalls + 1 });
+      return call()
+        .pipe(
+          tap(() => {
+            const numResponses = tracker.value.numResponses + 1;
+            tracker.next({
+              ...tracker.value,
+              didLastRequestFail: false,
+              initialized: true,
+              numResponses
+            });
+          }),
+          catchError((error) => {
+            tracker.next({
+              ...tracker.value,
+              didLastRequestFail: true,
+              numFailures: tracker.value.numFailures + 1
+            });
+            throw error;
+          })
+        )
+        .subscribe(observer);
+    });
   }
 
   setStatInitialized(tracker: BehaviorSubject<ProviderFnStats>) {

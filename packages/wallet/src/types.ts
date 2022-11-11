@@ -97,7 +97,7 @@ export interface ObservableWallet {
   /**
    * @throws {Cardano.TxSubmissionError}
    */
-  submitTx(tx: Cardano.NewTxAlonzo): Promise<void>;
+  submitTx(tx: Cardano.NewTxAlonzo): Observable<void>;
   shutdown(): void;
 }
 

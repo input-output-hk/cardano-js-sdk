@@ -26,16 +26,18 @@ export const createWallet = async (stores?: WalletStores) =>
       return new SingleAddressWallet(
         { name: 'Test Wallet' },
         {
-          assetProvider,
-          chainHistoryProvider,
           keyAgent,
           logger,
-          networkInfoProvider,
-          rewardsProvider,
-          stakePoolProvider,
-          stores,
-          txSubmitProvider,
-          utxoProvider
+          providers: {
+            assetProvider,
+            chainHistoryProvider,
+            networkInfoProvider,
+            rewardsProvider,
+            stakePoolProvider,
+            txSubmitProvider,
+            utxoProvider
+          },
+          stores
         }
       );
     }

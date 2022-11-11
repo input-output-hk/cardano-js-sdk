@@ -4,7 +4,7 @@ import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { InitializeTxProps, SingleAddressWallet, setupWallet } from '../../src';
-import { firstValueFrom, skip } from 'rxjs';
+import { firstValueFrom, skip, throwError } from 'rxjs';
 import { getPassword, testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { dummyLogger as logger } from 'ts-log';
 import { mockChainHistoryProvider, mockRewardsProvider, utxo } from '../mocks';
@@ -61,15 +61,17 @@ describe('SingleAddressWallet methods', () => {
         new SingleAddressWallet(
           { name: 'Test Wallet' },
           {
-            assetProvider,
-            chainHistoryProvider,
             keyAgent,
             logger,
-            networkInfoProvider,
-            rewardsProvider,
-            stakePoolProvider,
-            txSubmitProvider,
-            utxoProvider
+            providers: {
+              assetProvider,
+              chainHistoryProvider,
+              networkInfoProvider,
+              rewardsProvider,
+              stakePoolProvider,
+              txSubmitProvider,
+              utxoProvider
+            }
           }
         )
     }));
@@ -200,12 +202,15 @@ describe('SingleAddressWallet methods', () => {
       });
 
       it('mightBeAlreadySubmitted option interprets ValueNotConservedError as success', async () => {
-        txSubmitProvider.submitTx.mockRejectedValueOnce(
-          new ProviderError(
-            ProviderFailure.BadRequest,
-            new Cardano.TxSubmissionErrors.ValueNotConservedError({
-              valueNotConserved: { consumed: 2, produced: 1 }
-            })
+        txSubmitProvider.submitTx.mockReturnValueOnce(
+          throwError(
+            () =>
+              new ProviderError(
+                ProviderFailure.BadRequest,
+                new Cardano.TxSubmissionErrors.ValueNotConservedError({
+                  valueNotConserved: { consumed: 2, produced: 1 }
+                })
+              )
           )
         );
         const tx = await wallet.finalizeTx({ tx: await wallet.initializeTx(props) });

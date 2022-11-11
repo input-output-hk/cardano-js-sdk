@@ -49,15 +49,17 @@ describe('CustomObservableWallet', () => {
       const extensionWallet: LaceObservableWallet = new SingleAddressWallet(
         { name: 'Extension Wallet' },
         {
-          assetProvider: mocks.mockAssetProvider(),
-          chainHistoryProvider: mocks.mockChainHistoryProvider(),
           keyAgent: await testAsyncKeyAgent(),
           logger,
-          networkInfoProvider: mocks.mockNetworkInfoProvider(),
-          rewardsProvider: mocks.mockRewardsProvider(),
-          stakePoolProvider: createStubStakePoolProvider(),
-          txSubmitProvider: mocks.mockTxSubmitProvider(),
-          utxoProvider: mocks.mockUtxoProvider()
+          providers: {
+            assetProvider: mocks.mockAssetProvider(),
+            chainHistoryProvider: mocks.mockChainHistoryProvider(),
+            networkInfoProvider: mocks.mockNetworkInfoProvider(),
+            rewardsProvider: mocks.mockRewardsProvider(),
+            stakePoolProvider: createStubStakePoolProvider(),
+            txSubmitProvider: mocks.mockTxSubmitProvider(),
+            utxoProvider: mocks.mockUtxoProvider()
+          }
         }
       );
       extensionWallet;

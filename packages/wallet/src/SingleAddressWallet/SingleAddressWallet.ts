@@ -64,10 +64,11 @@ import {
   distinctEraSummaries,
   groupedAddressesEquals
 } from '../services';
-import { BehaviorObservable, TrackerSubject } from '@cardano-sdk/util-rxjs';
+import { BehaviorObservable, ObservableProvider, TrackerSubject } from '@cardano-sdk/util-rxjs';
 import {
   BehaviorSubject,
   EMPTY,
+  Observable,
   Subject,
   Subscription,
   catchError,
@@ -78,6 +79,8 @@ import {
   from,
   map,
   mergeMap,
+  switchMap,
+  take,
   tap
 } from 'rxjs';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
@@ -105,16 +108,20 @@ export interface SingleAddressWalletProps {
   readonly retryBackoffConfig?: RetryBackoffConfig;
 }
 
-export interface SingleAddressWalletDependencies {
-  readonly keyAgent: AsyncKeyAgent;
-  readonly txSubmitProvider: TxSubmitProvider;
+export interface SingleAddressWalletProviders {
+  readonly txSubmitProvider: ObservableProvider<TxSubmitProvider>;
   readonly stakePoolProvider: StakePoolProvider;
   readonly assetProvider: AssetProvider;
   readonly networkInfoProvider: WalletNetworkInfoProvider;
   readonly utxoProvider: UtxoProvider;
   readonly chainHistoryProvider: ChainHistoryProvider;
   readonly rewardsProvider: RewardsProvider;
+}
+
+export interface SingleAddressWalletDependencies {
+  readonly providers: SingleAddressWalletProviders;
   readonly inputSelector?: InputSelector;
+  readonly keyAgent: AsyncKeyAgent;
   readonly stores?: WalletStores;
   readonly logger: Logger;
   readonly connectionStatusTracker$?: ConnectionStatusTracker;
@@ -145,7 +152,7 @@ export class SingleAddressWallet implements ObservableWallet {
 
   readonly keyAgent: AsyncKeyAgent;
   readonly currentEpoch$: TrackerSubject<EpochInfo>;
-  readonly txSubmitProvider: TxSubmitProvider;
+  readonly txSubmitProvider: ObservableProvider<TxSubmitProvider>;
   readonly utxoProvider: TrackedUtxoProvider;
   readonly networkInfoProvider: TrackedWalletNetworkInfoProvider;
   readonly stakePoolProvider: TrackedStakePoolProvider;
@@ -181,14 +188,16 @@ export class SingleAddressWallet implements ObservableWallet {
       }
     }: SingleAddressWalletProps,
     {
-      txSubmitProvider,
-      stakePoolProvider,
+      providers: {
+        txSubmitProvider,
+        stakePoolProvider,
+        assetProvider,
+        networkInfoProvider,
+        utxoProvider,
+        chainHistoryProvider,
+        rewardsProvider
+      },
       keyAgent,
-      assetProvider,
-      networkInfoProvider,
-      utxoProvider,
-      chainHistoryProvider,
-      rewardsProvider,
       logger,
       inputSelector = roundRobinRandomImprove(),
       stores = createInMemoryWalletStores(),
@@ -340,7 +349,7 @@ export class SingleAddressWallet implements ObservableWallet {
       transactions: this.transactions
     })
       .pipe(
-        mergeMap((transaction) => from(this.submitTx(transaction, { mightBeAlreadySubmitted: true }))),
+        mergeMap((transaction) => this.submitTx(transaction, { mightBeAlreadySubmitted: true })),
         catchError((err) => {
           this.#logger.error('Failed to resubmit transaction', err);
           return EMPTY;
@@ -446,38 +455,52 @@ export class SingleAddressWallet implements ObservableWallet {
     };
   }
 
-  async submitTx(tx: Cardano.NewTxAlonzo, { mightBeAlreadySubmitted }: SubmitTxOptions = {}): Promise<void> {
-    this.#logger.debug(`Submitting transaction ${tx.id}`);
-    this.#newTransactions.submitting$.next(tx);
-    try {
-      await this.txSubmitProvider.submitTx({
-        signedTransaction: bufferToHexString(Buffer.from(usingAutoFree((scope) => coreToCml.tx(scope, tx).to_bytes())))
-      });
-      const { slot: submittedAt } = await firstValueFrom(this.tip$);
-      this.#logger.debug(`Submitted transaction ${tx.id} at slot ${submittedAt}`);
-      this.#newTransactions.pending$.next(tx);
-    } catch (error) {
-      if (
-        mightBeAlreadySubmitted &&
-        error instanceof ProviderError &&
-        // This could be improved by further parsing the error and:
-        // - checking if ValueNotConservedError produced === 0 (all utxos invalid)
-        // - check if UnknownOrIncompleteWithdrawalsError available withdrawal amount === wallet's reward acc balance
-        (error.innerError instanceof Cardano.TxSubmissionErrors.ValueNotConservedError ||
-          error.innerError instanceof Cardano.TxSubmissionErrors.UnknownOrIncompleteWithdrawalsError)
-      ) {
-        this.#logger.debug(`Transaction ${tx.id} appears to be already submitted...`);
-        this.#newTransactions.pending$.next(tx);
-        return;
-      }
-      this.#newTransactions.failedToSubmit$.next({
-        error: error as Cardano.TxSubmissionError,
-        reason: TransactionFailure.FailedToSubmit,
-        tx
-      });
-      throw error;
-    }
+  submitTx(tx: Cardano.NewTxAlonzo, { mightBeAlreadySubmitted }: SubmitTxOptions = {}): Observable<void> {
+    return new Observable((observer) => {
+      this.#logger.debug(`Submitting transaction ${tx.id}`);
+      this.#newTransactions.submitting$.next(tx);
+
+      return this.txSubmitProvider
+        .submitTx({
+          signedTransaction: bufferToHexString(
+            Buffer.from(usingAutoFree((scope) => coreToCml.tx(scope, tx).to_bytes()))
+          )
+        })
+        .pipe(
+          take(1 /* We expect a single response */),
+          switchMap(() => this.tip$.pipe(take(1) /* Close tip$ subscription once we have a value */)),
+          tap(({ slot: submittedAt }) => {
+            this.#logger.debug(`Submitted transaction ${tx.id} at slot ${submittedAt}`);
+            this.#newTransactions.pending$.next(tx);
+          }),
+          map(() => void 0 /* Do not emit the tip$ value because the submitTx method emits void */),
+          catchError((error) => {
+            if (
+              mightBeAlreadySubmitted &&
+              error instanceof ProviderError &&
+              // This could be improved by further parsing the error and:
+              // - checking if ValueNotConservedError produced === 0 (all utxos invalid)
+              // - check if UnknownOrIncompleteWithdrawalsError available withdrawal amount === wallet's
+              //   reward acc balance
+              (error.innerError instanceof Cardano.TxSubmissionErrors.ValueNotConservedError ||
+                error.innerError instanceof Cardano.TxSubmissionErrors.UnknownOrIncompleteWithdrawalsError)
+            ) {
+              this.#logger.debug(`Transaction ${tx.id} appears to be already submitted...`);
+              this.#newTransactions.pending$.next(tx);
+              return EMPTY;
+            }
+            this.#newTransactions.failedToSubmit$.next({
+              error: error as Cardano.TxSubmissionError,
+              reason: TransactionFailure.FailedToSubmit,
+              tx
+            });
+            throw error;
+          })
+        )
+        .subscribe(observer);
+    });
   }
+
   signData(props: SignDataProps): Promise<Cip30DataSignature> {
     return cip8.cip30signData({ keyAgent: this.keyAgent, ...props });
   }
