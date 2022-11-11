@@ -1,0 +1,29 @@
+{
+  "extends": "../../../test/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "."
+  },
+  "include": [
+    "../../golden-test-generator/src"
+  ],
+  "references": [
+    {
+      "path": "../src"
+    },
+    {
+      "path": "../../core/src"
+    },
+    {
+      "path": "../../util-dev/src"
+    },
+    {
+      "path": "../../util/src"
+    },
+    {
+      "path": "../../util-rxjs/src"
+    },
+    {
+      "path": "../../ogmios/src"
+    }
+  ]
+}
