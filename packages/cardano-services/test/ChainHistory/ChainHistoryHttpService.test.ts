@@ -45,7 +45,9 @@ describe('ChainHistoryHttpService', () => {
     baseUrl = `http://localhost:${port}/chain-history`;
     clientConfig = { baseUrl, logger };
     config = { listen: { port } };
-    dbConnection = new Pool({ connectionString: process.env.LOCALNETWORK_INTEGRAION_TESTS_POSTGRES_CONNECTION_STRING });
+    dbConnection = new Pool({
+      connectionString: process.env.LOCALNETWORK_INTEGRATION_TESTS_POSTGRES_CONNECTION_STRING
+    });
     fixtureBuilder = new ChainHistoryFixtureBuilder(dbConnection, logger);
   });
 

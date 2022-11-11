@@ -11,7 +11,9 @@ describe('ChainHistoryBuilder', () => {
   let fixtureBuilder: ChainHistoryFixtureBuilder;
 
   beforeAll(async () => {
-    dbConnection = new Pool({ connectionString: process.env.LOCALNETWORK_INTEGRAION_TESTS_POSTGRES_CONNECTION_STRING });
+    dbConnection = new Pool({
+      connectionString: process.env.LOCALNETWORK_INTEGRATION_TESTS_POSTGRES_CONNECTION_STRING
+    });
     builder = new ChainHistoryBuilder(dbConnection, logger);
     fixtureBuilder = new ChainHistoryFixtureBuilder(dbConnection, logger);
   });

@@ -37,7 +37,9 @@ describe('UtxoHttpService', () => {
     baseUrl = `http://localhost:${port}/utxo`;
     clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
     config = { listen: { port } };
-    dbConnection = new Pool({ connectionString: process.env.LOCALNETWORK_INTEGRAION_TESTS_POSTGRES_CONNECTION_STRING });
+    dbConnection = new Pool({
+      connectionString: process.env.LOCALNETWORK_INTEGRATION_TESTS_POSTGRES_CONNECTION_STRING
+    });
     fixtureBuilder = new UtxoFixtureBuilder(dbConnection, logger);
   });
 

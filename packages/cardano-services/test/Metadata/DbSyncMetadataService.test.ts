@@ -9,7 +9,9 @@ describe('createDbSyncMetadataService', () => {
   let service: TxMetadataService;
   let fixtureBuilder: MetadataFixtureBuilder;
   beforeAll(() => {
-    dbConnection = new Pool({ connectionString: process.env.LOCALNETWORK_INTEGRAION_TESTS_POSTGRES_CONNECTION_STRING });
+    dbConnection = new Pool({
+      connectionString: process.env.LOCALNETWORK_INTEGRATION_TESTS_POSTGRES_CONNECTION_STRING
+    });
     service = createDbSyncMetadataService(dbConnection, logger);
     fixtureBuilder = new MetadataFixtureBuilder(dbConnection, logger);
   });

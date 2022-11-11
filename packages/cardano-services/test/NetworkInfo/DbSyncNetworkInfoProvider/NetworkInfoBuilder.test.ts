@@ -10,7 +10,9 @@ describe('NetworkInfoBuilder', () => {
   let fixtureBuilder: NetworkInfoFixtureBuilder;
 
   beforeAll(async () => {
-    dbConnection = new Pool({ connectionString: process.env.LOCALNETWORK_INTEGRAION_TESTS_POSTGRES_CONNECTION_STRING });
+    dbConnection = new Pool({
+      connectionString: process.env.LOCALNETWORK_INTEGRATION_TESTS_POSTGRES_CONNECTION_STRING
+    });
     builder = new NetworkInfoBuilder(dbConnection, logger);
     fixtureBuilder = new NetworkInfoFixtureBuilder(dbConnection, logger);
   });
