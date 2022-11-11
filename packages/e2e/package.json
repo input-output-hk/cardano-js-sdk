@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/e2e",
-  "version": "0.6.0-nightly.0",
+  "version": "0.6.0-nightly.1",
   "description": "End to end tests for the cardano-js-sdk packages.",
   "engines": {
     "node": ">=14.20.1"
@@ -69,7 +69,7 @@
   "dependencies": {
     "@cardano-foundation/ledgerjs-hw-app-cardano": "^5.0.0",
     "@cardano-ogmios/client": "^5.5.5",
-    "@cardano-sdk/cardano-services": "^0.6.1-nightly.0",
+    "@cardano-sdk/cardano-services": "^0.6.1-nightly.1",
     "@cardano-sdk/cardano-services-client": "^0.6.1-nightly.0",
     "@cardano-sdk/core": "^0.6.1-nightly.0",
     "@cardano-sdk/key-management": "^0.2.1-nightly.0",
