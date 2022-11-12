@@ -2358,7 +2358,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cardano-sdk/cardano-services@^0.6.1-nightly.1, @cardano-sdk/cardano-services@workspace:packages/cardano-services":
+"@cardano-sdk/cardano-services@^0.6.1-nightly.2, @cardano-sdk/cardano-services@workspace:packages/cardano-services":
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/cardano-services@workspace:packages/cardano-services"
   dependencies:
@@ -2493,7 +2493,7 @@ __metadata:
     "@babel/preset-typescript": ^7.17.12
     "@cardano-foundation/ledgerjs-hw-app-cardano": ^5.0.0
     "@cardano-ogmios/client": ^5.5.5
-    "@cardano-sdk/cardano-services": ^0.6.1-nightly.1
+    "@cardano-sdk/cardano-services": ^0.6.1-nightly.2
     "@cardano-sdk/cardano-services-client": ^0.6.1-nightly.0
     "@cardano-sdk/core": ^0.6.1-nightly.0
     "@cardano-sdk/dapp-connector": ^0.6.1-nightly.0

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.6.0-nightly.1...@cardano-sdk/e2e@0.6.0-nightly.2) (2022-11-12)
+
+### Features
+
+- **e2e:** add artillery to perform stress tests ([0fd40cb](https://github.com/input-output-hk/cardano-js-sdk/commit/0fd40cbf154a8b900720a800dd5436ffc8540cd0))
+
 ## [0.6.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.6.0-nightly.0...@cardano-sdk/e2e@0.6.0-nightly.1) (2022-11-11)
 
 **Note:** Version bump only for package @cardano-sdk/e2e
