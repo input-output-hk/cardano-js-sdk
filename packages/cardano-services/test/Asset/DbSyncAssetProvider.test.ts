@@ -29,7 +29,7 @@ describe('DbSyncAssetProvider', () => {
 
   beforeAll(async () => {
     ({ closeMock, serverUrl } = await mockTokenRegistry(() => ({})));
-    db = new Pool({ connectionString: process.env.LOCALNETWORK_INTEGRAION_TESTS_POSTGRES_CONNECTION_STRING });
+    db = new Pool({ connectionString: process.env.LOCALNETWORK_INTEGRATION_TESTS_POSTGRES_CONNECTION_STRING });
     cardanoNode = mockCardanoNode() as unknown as OgmiosCardanoNode;
     ntfMetadataService = new DbSyncNftMetadataService({
       db,

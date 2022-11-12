@@ -3,7 +3,7 @@
   "version": "0.6.0-nightly.1",
   "description": "End to end tests for the cardano-js-sdk packages.",
   "engines": {
-    "node": ">=14.20.1"
+    "node": ">=16.0"
   },
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -14,6 +14,7 @@
     }
   },
   "scripts": {
+    "artillery:stake-pool-query": "WORKERS=1 node -r ts-node/register ../../node_modules/.bin/artillery run test/artillery/StakePoolSearch.yml",
     "test": "shx echo 'test' command not implemented yet",
     "test:wallet": "jest -c jest.config.js --forceExit --selectProjects wallet --runInBand --verbose",
     "test:load-testing": "jest -c jest.config.js --selectProjects load-testing --runInBand --verbose",
@@ -44,8 +45,7 @@
     "test:build:verify": "yarn test:web-extension:build",
     "test:debug": "DEBUG=true yarn test",
     "generate-mnemonics": "ts-node src/util/mnemonic.ts",
-    "wait-for-network": "ts-node src/util/is-local-network-ready.ts",
-    "wait-for-faucet": "ts-node src/util/is-faucet-ready.ts"
+    "wait-for-network": "ts-node src/util/is-local-network-ready.ts"
   },
   "repository": "https://github.com/input-output-hk/cardano-js-sdk",
   "contributors": [
@@ -113,6 +113,7 @@
     "@wdio/mocha-framework": "^7.19.5",
     "@wdio/spec-reporter": "^7.19.5",
     "@wdio/static-server-service": "^7.19.5",
+    "artillery": "^2.0.0-24",
     "babel-loader": "^8.2.5",
     "blake2b-no-wasm": "2.1.4",
     "buffer": "^6.0.3",

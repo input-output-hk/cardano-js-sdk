@@ -1,0 +1,24 @@
+config:
+  # target is a required field for artillery, but it is actually
+  # ignored since we are not using artillery to perform the HTTP requests.
+  target: 'http://localhost'
+  http:
+    timeout: 180
+  phases:
+    - name: 'Stake Pool Search'
+      duration: 10
+      arrivalRate: 1
+    - name: 'Stake Pool Search Queries'
+      duration: 90
+      arrivalRate: 1
+      rampTo: 100
+  processor: './StakePoolSearch.ts'
+
+scenarios:
+  - name: 'Browse'
+    flow:
+      - function: 'healthCheck'
+      # Loop over result pages
+      - loop:
+          - function: 'performQuery'
+        whileTrue: 'moreResults'

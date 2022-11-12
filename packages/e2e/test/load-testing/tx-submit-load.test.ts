@@ -161,7 +161,7 @@ describe('load', () => {
 
     logger.info('Preparing wallets...');
 
-    for (let i = 0; i <= env.TRANSACTIONS_NUMBER; ++i) promises.push(prepareWallet(i));
+    for (let i = 0; i < env.TRANSACTIONS_NUMBER; ++i) promises.push(prepareWallet(i));
 
     await Promise.all(promises);
 
@@ -182,7 +182,6 @@ describe('load', () => {
     const toRefill: Cardano.Address[] = [];
     const { wallet } = testWallets[0];
 
-    // Skip the last one as it is the target wallet, so it don't need coins enough
     for (let i = 0; i < env.TRANSACTIONS_NUMBER; ++i)
       if (testWallets[i].coins < 2_000_000n) toRefill.push(testWallets[i].address);
 
@@ -278,70 +277,61 @@ describe('load', () => {
     let timeAfterWorkerStarted = 0;
     let timeBeforeSubmitTxs = 0;
 
-    try {
-      logger.info(`Starting test with options: ${JSON.stringify({ directlyToOgmios, parallel, withRunningWorker })}`);
+    logger.info(`Starting test with options: ${JSON.stringify({ directlyToOgmios, parallel, withRunningWorker })}`);
 
-      await fragmentWhenRequired(options);
+    await fragmentWhenRequired(options);
 
-      const startWorkerForTest = async () => {
-        if (!directlyToOgmios) await startWorker(options);
-        timeAfterWorkerStarted = Date.now();
-      };
+    const startWorkerForTest = async () => {
+      if (!directlyToOgmios) await startWorker(options);
+      timeAfterWorkerStarted = Date.now();
+    };
 
-      const finalizeAndSubmit = async (wallet: ObservableWallet, tx: InitializeTxResult) => {
-        try {
-          await wallet.submitTx(await wallet.finalizeTx({ tx }));
-          logger.info(`Submitted tx: ${tx.hash}`);
-        } catch (error) {
-          logger.error(JSONBig.stringify(tx), error);
-          throw error;
-        }
-      };
-
-      const submitTransactions = async () => {
-        const { address } = testWallets[env.TRANSACTIONS_NUMBER];
-
-        timeBeforeSubmitTxs = Date.now();
-
-        for (let i = 0; i < env.TRANSACTIONS_NUMBER; ++i) {
-          const { wallet } = testWallets[i];
-          const coins = 1_000_000n + 1000n * BigInt(i);
-          const tx = await wallet.initializeTx({ outputs: new Set([{ address, value: { coins } }]) });
-          logger.info(`Initializing tx idx ${i}: ${tx.hash}`);
-
-          submitPromises.push(finalizeAndSubmit(wallet, tx));
-          txIds.push(tx.hash);
-        }
-      };
-
-      if (withRunningWorker) {
-        await startWorkerForTest();
-        await submitTransactions();
-      } else {
-        await submitTransactions();
-        await startWorkerForTest();
+    const finalizeAndSubmit = async (wallet: ObservableWallet, tx: InitializeTxResult) => {
+      try {
+        await wallet.submitTx(await wallet.finalizeTx({ tx }));
+        logger.info(`Submitted tx: ${tx.hash}`);
+      } catch (error) {
+        logger.error(JSONBig.stringify(tx), error);
+        throw error;
       }
+    };
 
-      await expect(Promise.all(submitPromises)).resolves.not.toThrow();
-      const timeAfterTxsInMempool = Date.now();
+    const submitTransactions = async () => {
+      timeBeforeSubmitTxs = Date.now();
 
-      await Promise.all(txIds.map((txId, i) => waitForTxInBlockchain(testWallets[i].wallet, txId)));
+      for (let i = 0; i < env.TRANSACTIONS_NUMBER; ++i) {
+        const { address, wallet } = testWallets[i];
+        const coins = 1_000_000n + BigInt(i);
+        const tx = await wallet.initializeTx({ outputs: new Set([{ address, value: { coins } }]) });
+        logger.info(`Initializing tx idx ${i}: ${tx.hash}`);
 
-      testReports.push({
-        ...options,
-        timeAfterTxsInBlockchain: Date.now(),
-        timeAfterTxsInMempool,
-        timeAfterWorkerStarted,
-        timeBeforeSubmitTxs
-      });
+        submitPromises.push(finalizeAndSubmit(wallet, tx));
+        txIds.push(tx.hash);
+      }
+    };
 
-      logger.info(`Completed test with options: ${JSON.stringify({ directlyToOgmios, parallel, withRunningWorker })}`);
-    } catch (error) {
-      logger.error(
-        `Failed test with options: ${JSON.stringify({ directlyToOgmios, parallel, withRunningWorker })}`,
-        error
-      );
+    if (withRunningWorker) {
+      await startWorkerForTest();
+      await submitTransactions();
+    } else {
+      await submitTransactions();
+      await startWorkerForTest();
     }
+
+    await expect(Promise.all(submitPromises)).resolves.not.toThrow();
+    const timeAfterTxsInMempool = Date.now();
+
+    await Promise.all(txIds.map((txId, i) => waitForTxInBlockchain(testWallets[i].wallet, txId)));
+
+    testReports.push({
+      ...options,
+      timeAfterTxsInBlockchain: Date.now(),
+      timeAfterTxsInMempool,
+      timeAfterWorkerStarted,
+      timeBeforeSubmitTxs
+    });
+
+    logger.info(`Completed test with options: ${JSON.stringify({ directlyToOgmios, parallel, withRunningWorker })}`);
   };
 
   describe('directly to ogmios', () => {

@@ -8,6 +8,7 @@ import {
 import { Cardano, HealthCheckResponse } from '@cardano-sdk/core';
 import { FaucetProvider, FaucetRequestResult, FaucetRequestTransactionStatus } from '../types';
 import { Stopwatch } from 'ts-stopwatch';
+import Process from 'process';
 
 // Constants
 const FAUCET_PASSPHRASE = 'passphrase';
@@ -17,6 +18,8 @@ const DEFAULT_TIMEOUT = 10_000;
 const DEFAULT_CONFIRMATIONS = 0;
 const PARAM_NAME_URL = 'baseUrl';
 const PARAM_NAME_MNEMONICS = 'mnemonic';
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
  * Cardano Wallet implementation of the faucet provider. This provider utlizes the Cardano Wallet HTTP service
@@ -129,6 +132,26 @@ export class CardanoWalletFaucetProvider implements FaucetProvider {
     });
 
     if (axiosResponse) this.#faucetWalletId = axiosResponse.data.id;
+
+    const start = Date.now() / 1000;
+    const waitTime = Process.env.LOCAL_NETWORK_READY_WAIT_TIME ? Process.env.LOCAL_NETWORK_READY_WAIT_TIME : 1200;
+    let isReady = false;
+    let currentElapsed = 0;
+
+    while (!isReady && currentElapsed < waitTime) {
+      try {
+        isReady = (await this.healthCheck()).ok;
+      } catch {
+        // continue
+      } finally {
+        currentElapsed = Date.now() / 1000 - start;
+        await sleep(5000);
+      }
+    }
+
+    if (currentElapsed > waitTime) {
+      throw new Error('Wait time expired. The faucet was not ready on time.');
+    }
   }
 
   /**

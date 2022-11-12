@@ -1,7 +1,9 @@
 /* eslint-disable max-len */
+import { AddressWith, UtxoFixtureBuilder } from './fixtures/FixtureBuilder';
+import { Asset, Cardano, ProviderError, ProviderFailure, UtxoProvider } from '@cardano-sdk/core';
 import { BlockNoModel, findLastBlockNo } from '../../src/util/DbSyncProvider';
-import { Cardano, ProviderError, ProviderFailure, UtxoProvider } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, utxoHttpProvider } from '@cardano-sdk/cardano-services-client';
+import { DataMocks } from '../data-mocks';
 import { DbSyncUtxoProvider, HttpServer, HttpServerConfig, UtxoHttpService } from '../../src';
 import { INFO, createLogger } from 'bunyan';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
@@ -15,7 +17,7 @@ const APPLICATION_JSON = 'application/json';
 const APPLICATION_CBOR = 'application/cbor';
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
 const BAD_REQUEST_STRING = 'Request failed with status code 400';
-const toCardanoAddresses = (addresses: string[]) => addresses.map((a) => Cardano.Address(a));
+
 describe('UtxoHttpService', () => {
   let dbConnection: Pool;
   let httpServer: HttpServer;
@@ -28,13 +30,17 @@ describe('UtxoHttpService', () => {
   let cardanoNode: OgmiosCardanoNode;
   let provider: UtxoProvider;
   let lastBlockNoInDb: Cardano.BlockNo;
+  let fixtureBuilder: UtxoFixtureBuilder;
 
   beforeAll(async () => {
     port = await getPort();
     baseUrl = `http://localhost:${port}/utxo`;
     clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
     config = { listen: { port } };
-    dbConnection = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
+    dbConnection = new Pool({
+      connectionString: process.env.LOCALNETWORK_INTEGRATION_TESTS_POSTGRES_CONNECTION_STRING
+    });
+    fixtureBuilder = new UtxoFixtureBuilder(dbConnection, logger);
   });
 
   describe('unhealthy UtxoProvider', () => {
@@ -57,6 +63,7 @@ describe('UtxoHttpService', () => {
     });
   });
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('healthy state', () => {
     beforeAll(async () => {
       lastBlockNoInDb = (await dbConnection.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no;
@@ -122,45 +129,46 @@ describe('UtxoHttpService', () => {
       });
 
       it('return UTxOs for a single address', async () => {
-        const res = await provider.utxoByAddresses({
-          addresses: [
-            Cardano.Address(
-              'addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7'
-            )
-          ]
-        });
-        expect(res).toMatchSnapshot();
+        const addresses = await fixtureBuilder.getAddresses(1);
+        const res = await provider.utxoByAddresses({ addresses });
+        expect(res.length).toBeGreaterThan(0);
+        expect(res[0]).toMatchShapeOf([DataMocks.Tx.input, DataMocks.Tx.output]);
       });
 
       it('return UTxOs for multiple addresses', async () => {
-        const addresses = [
-          'addr_test1qp620qa3rqzd5fxj3hy4dughv7xx2dt9gu9de70jf8hagdcvmqt35f2psxv7ajj5jnh4ajlc752rert8f9msffxdl45qyjefw8',
-          'addr_test1qryz24mkq35j8s67fdrm44pe8na7n3tqkmyzy3sgnjq3d7szlx56h6fkjl8y3p73zpyce04eku9w943rcr6rgznp8cwq2axy9q',
-          'addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7'
-        ];
-        const res = await provider.utxoByAddresses({ addresses: toCardanoAddresses(addresses) });
-        expect(res).toMatchSnapshot();
+        const addresses = await fixtureBuilder.getAddresses(3);
+        const res = await provider.utxoByAddresses({ addresses });
+        expect(res.length).toBeGreaterThan(0);
+        expect(res[0]).toMatchShapeOf([DataMocks.Tx.input, DataMocks.Tx.output]);
       });
 
       it('returns UTxOs containing multiple assets', async () => {
-        const addresses = [
-          'addr_test1qp620qa3rqzd5fxj3hy4dughv7xx2dt9gu9de70jf8hagdcvmqt35f2psxv7ajj5jnh4ajlc752rert8f9msffxdl45qyjefw8',
-          'addr_test1qryz24mkq35j8s67fdrm44pe8na7n3tqkmyzy3sgnjq3d7szlx56h6fkjl8y3p73zpyce04eku9w943rcr6rgznp8cwq2axy9q'
-        ];
-        const res = await provider.utxoByAddresses({ addresses: toCardanoAddresses(addresses) });
-        expect(res).toMatchSnapshot();
+        const addresses = await fixtureBuilder.getAddresses(2, { with: [AddressWith.MultiAsset] });
+        const res = await provider.utxoByAddresses({ addresses });
+        expect(res.length).toBeGreaterThan(0);
+        expect(res[0]).toMatchShapeOf([DataMocks.Tx.input, DataMocks.Tx.output]);
       });
 
       it('returns UTxOs containing multiple assets and one of the assets has no name', async () => {
-        const addressAssociatedWithUTxOWithNoAssetName =
-          'addr_test1qp620qa3rqzd5fxj3hy4dughv7xx2dt9gu9de70jf8hagdcvmqt35f2psxv7ajj5jnh4ajlc752rert8f9msffxdl45qyjefw8';
-        const assetWithNoNameId = '126b8676446c84a5cd6e3259223b16a2314c5676b88ae1c1f8579a8f';
-        const addresses = [addressAssociatedWithUTxOWithNoAssetName];
-        const res = await provider.utxoByAddresses({ addresses: toCardanoAddresses(addresses) });
-        const txOut: Cardano.TxOut = res[0][1];
+        const addresses = await fixtureBuilder.getAddresses(1, {
+          with: [AddressWith.MultiAsset, AddressWith.AssetWithoutName]
+        });
+        const res = await provider.utxoByAddresses({ addresses });
+        let txOut: Cardano.TxOut;
 
-        expect(txOut.value.assets!.get(Cardano.AssetId(assetWithNoNameId))).toBeDefined();
-        expect(txOut.value.assets!.size).toEqual(2);
+        for (const outputs of res) {
+          const assets = outputs[1].value.assets;
+          if (!assets) continue;
+
+          for (const id of Cardano.AssetId(outputs[1].value.assets!.keys())) {
+            if (Asset.util.assetNameFromAssetId(Cardano.AssetId(id)).toString() === '') {
+              txOut = outputs[1];
+            }
+          }
+        }
+
+        expect(txOut!).toBeDefined();
+        expect(txOut!.value.assets!.size).toBeGreaterThan(0);
       });
     });
   });

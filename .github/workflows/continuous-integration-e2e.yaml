@@ -39,7 +39,6 @@ jobs:
     - name: Wait for some epochs
       run: |
         yarn workspace @cardano-sdk/e2e wait-for-network
-        yarn workspace @cardano-sdk/e2e wait-for-faucet
       env:
         FAUCET_PROVIDER: 'cardano-wallet'
         FAUCET_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:8090/v2","mnemonic":"fire method repair aware foot tray accuse brother popular olive find account sick rocket next"}'
