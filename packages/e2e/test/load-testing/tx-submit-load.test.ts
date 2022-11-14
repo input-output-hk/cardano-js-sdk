@@ -8,7 +8,7 @@ import { ServiceNames } from '@cardano-sdk/cardano-services';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom } from 'rxjs';
 import { getWallet } from '../../src/factories';
-import { submitAndConfirm } from '../wallet/util';
+import { submitAndConfirm } from '../util';
 import JSONBig from 'json-bigint';
 import path from 'path';
 

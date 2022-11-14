@@ -44,7 +44,7 @@ jobs:
         FAUCET_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:8090/v2","mnemonic":"fire method repair aware foot tray accuse brother popular olive find account sick rocket next"}'
         DB_SYNC_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/cexplorer'
 
-    - name: 🔬 Test - e2e
+    - name: 🔬 Test - e2e - wallet
       run: |
         yarn workspace @cardano-sdk/e2e test:wallet
       env:

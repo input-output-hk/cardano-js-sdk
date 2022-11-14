@@ -36,6 +36,15 @@ module.exports = {
       transform: {
         '^.+\\.test.ts?$': 'ts-jest'
       }
+    },
+    {
+      displayName: 'long-running',
+      preset: 'ts-jest',
+      setupFiles: ['dotenv/config'],
+      testMatch: ['<rootDir>/test/long-running/**/*.test.ts'],
+      transform: {
+        '^.+\\.test.ts?$': 'ts-jest'
+      }
     }
   ],
   testTimeout: 1000 * 60 * 25

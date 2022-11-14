@@ -1,8 +1,8 @@
 import * as envalid from 'envalid';
 import { Cardano, createSlotEpochCalc } from '@cardano-sdk/core';
 import { SignedTx, SingleAddressWallet, buildTx } from '@cardano-sdk/wallet';
-import { TestWallet, getWallet } from '../../../src';
-import { assertTxIsValid, waitForWalletStateSettle } from '../../../../wallet/test/util';
+import { TestWallet, getWallet } from '../../src';
+import { assertTxIsValid, waitForWalletStateSettle } from '../../../wallet/test/util';
 import { filter, firstValueFrom } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 import { requestCoins, runningAgainstLocalNetwork, submitAndConfirm, transferCoins, waitForEpoch } from '../util';

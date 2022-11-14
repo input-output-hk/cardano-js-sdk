@@ -1,11 +1,11 @@
 import { Cardano } from '@cardano-sdk/core';
 import { SingleAddressWallet, buildTx, createWalletUtil } from '@cardano-sdk/wallet';
-import { env } from '../environment';
+import { env } from '../../environment';
 import { filter, firstValueFrom, map } from 'rxjs';
 import { getWallet } from '../../../src/factories';
 import { isNotNil } from '@cardano-sdk/util';
 import { logger } from '@cardano-sdk/util-dev';
-import { walletReady } from '../util';
+import { walletReady } from '../../util';
 
 describe('SingleAddressWallet/metadata', () => {
   let wallet: SingleAddressWallet;

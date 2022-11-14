@@ -18,9 +18,9 @@ import {
   timeout
 } from 'rxjs';
 import { ObservableWallet, SignedTx, buildTx } from '@cardano-sdk/wallet';
-import { assertTxIsValid } from '../../../wallet/test/util';
+import { assertTxIsValid } from '../../wallet/test/util';
 import { env } from './environment';
-import { faucetProviderFactory, networkInfoProviderFactory } from '../../src';
+import { faucetProviderFactory, networkInfoProviderFactory } from '../src';
 import { logger } from '@cardano-sdk/util-dev';
 import sortBy from 'lodash/sortBy';
 
