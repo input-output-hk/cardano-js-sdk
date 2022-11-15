@@ -1,53 +1,16 @@
 import { GeneratorMetadata } from '../Content';
 import { Logger } from 'ts-log';
-import { Ogmios } from '@cardano-sdk/ogmios';
-
-export type RollForward = { type: 'rollForward'; block: Ogmios.Schema.Block };
-export type RollBackward = { type: 'rollBackward'; rollback: Ogmios.Schema.TipOrOrigin };
-export type ChainSyncEvent = RollForward | RollBackward;
+import { Ogmios, ogmiosToCore } from '@cardano-sdk/ogmios';
+import { ChainSyncEvent, ChainSyncEventType, Intersection } from '@cardano-sdk/core';
 
 type CardanoMetadata = Pick<GeneratorMetadata['metadata'], 'cardano'>;
 
-export type GetBlocksResponse = {
+export type GetChainSyncEventsResponse = {
   events: ChainSyncEvent[];
   metadata: CardanoMetadata
 };
 
 type RequestedBlocks = { [blockHeight: number]: Ogmios.Schema.Block };
-
-export const getBlockHeaderAndHash = (block: Ogmios.Schema.Block) => {
-  let header:
-    | (Ogmios.Schema.StandardBlock
-    | Ogmios.Schema.BlockShelley
-    | Ogmios.Schema.BlockAllegra
-    | Ogmios.Schema.BlockMary
-    | Ogmios.Schema.BlockAlonzo
-    | Ogmios.Schema.BlockBabbage)['header'];
-  let hash: string | undefined;
-  if (Ogmios.isByronStandardBlock(block)) {
-    header = block.byron.header;
-    hash = block.byron.hash;
-  } else if (Ogmios.isShelleyBlock(block)) {
-    header = block.shelley.header;
-    hash = block.shelley.headerHash;
-  } else if (Ogmios.isAllegraBlock(block)) {
-    header = block.allegra.header;
-    hash = block.allegra.headerHash;
-  } else if (Ogmios.isMaryBlock(block)) {
-    header = block.mary.header;
-    hash = block.mary.headerHash;
-  } else if (Ogmios.isAlonzoBlock(block)) {
-    header = block.alonzo.header;
-    hash = block.alonzo.headerHash;
-  } else if (Ogmios.isBabbageBlock(block)) {
-    header = block.babbage.header;
-    hash = block.babbage.headerHash;
-  } else {
-    throw new Error('No support for block');
-  }
-  if (!header || !hash) throw new Error('Header or hash not found for block');
-  return {header, hash};
-}
 
 const blocksWithRollbacks = (blockHeights: number[], requestedBlocks: RequestedBlocks): ChainSyncEvent[] => {
   const result: ChainSyncEvent[] = [];
@@ -55,26 +18,27 @@ const blocksWithRollbacks = (blockHeights: number[], requestedBlocks: RequestedB
     if (blockHeight >= 0) {
       const requestedBlock = requestedBlocks[blockHeight];
       if (!requestedBlock) throw new Error(`Block not found: ${blockHeight}`);
-      result.push({type: 'rollForward', block: requestedBlock});
+      const block = ogmiosToCore.block(requestedBlock);
+      block && result.push({ eventType: ChainSyncEventType.RollForward, block, tip: block.header });
     } else {
       const blockNo = -blockHeight;
       const requestedBlock = requestedBlocks[blockNo];
       if (!requestedBlock) throw new Error(`Cannot rollback to a non-requested block: ${blockHeight}`);
-      const {header: {slot}, hash} = getBlockHeaderAndHash(requestedBlock);
-      result.push(({type: 'rollBackward', rollback: {blockNo, hash, slot }}));
+      const header = ogmiosToCore.blockHeader(requestedBlock);
+      header && result.push(({eventType: ChainSyncEventType.RollBackward, tip: header}));
     }
   }
   return result;
 }
 
-export const getBlocks = async (
+export const getChainSyncEvents = async (
   blockHeights: number[],
   options: {
     logger: Logger;
     ogmiosConnectionConfig: Ogmios.ConnectionConfig;
     onBlock?: (slot: number) => void;
   }
-): Promise<GetBlocksResponse> => {
+): Promise<GetChainSyncEventsResponse> => {
   const { logger } = options;
   const requestedBlocks: RequestedBlocks = {};
   return new Promise(async (resolve, reject) => {
@@ -83,10 +47,10 @@ export const getBlocks = async (
     let draining = false;
     const metadata: CardanoMetadata = {
       cardano: {
-        compactGenesis: await Ogmios.StateQuery.genesisConfig(
+        compactGenesis: ogmiosToCore.genesis(await Ogmios.StateQuery.genesisConfig(
           await Ogmios.createInteractionContext(reject, logger.info, { connection: options.ogmiosConnectionConfig })
-        ),
-        intersection: undefined as unknown as Ogmios.ChainSync.Intersection
+        )),
+        intersection: undefined as unknown as Intersection
       },
     };
     const maxHeight = Math.max(...blockHeights);
@@ -97,11 +61,11 @@ export const getBlocks = async (
           rollBackward: async (_res, requestNext) => {
             requestNext();
           },
-          // eslint-disable-next-line complexity
           rollForward: async ({ block }, requestNext) => {
             if (draining) return;
-            const {header} = getBlockHeaderAndHash(block);
-            currentBlock = header.blockHeight;
+            const header = ogmiosToCore.blockHeader(block);
+            if (!header) return;
+            currentBlock = header.blockNo;
             if (options?.onBlock !== undefined) {
               options.onBlock(currentBlock);
             }
@@ -120,7 +84,7 @@ export const getBlocks = async (
           }
         }
       );
-      metadata.cardano.intersection = await syncClient.startSync(['origin']);
+      metadata.cardano.intersection = await syncClient.startSync(['origin']) as Intersection;
     } catch (error) {
       logger.error(error);
       return reject(error);

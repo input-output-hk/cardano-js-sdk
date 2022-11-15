@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { AddressBalancesResponse, getOnChainAddressBalances } from './AddressBalance';
 import { Command } from 'commander';
-import { GetBlocksResponse, getBlocks as chainSync } from './ChainSync';
+import { GetChainSyncEventsResponse, getChainSyncEvents as chainSync } from './ChainSyncEvents';
 import { Options, SingleBar } from 'cli-progress';
 import { ensureDir, writeFile } from 'fs-extra';
 import { GeneratorMetadata, prepareContent } from './Content';
@@ -96,7 +96,7 @@ const mapBlockHeights = (blockHeights: string) =>
       });
 
 program
-  .command('chain-sync')
+  .command('chain-sync-events')
   .description('Dump the requested blocks (rollForward) in their raw structure and simulate rollbacks')
   .argument('[blockHeights]', `Comma-separated sorted list of blocks by number.
   Use "-" for rollback to a block, e.g. 10,11,-10,11
@@ -108,7 +108,7 @@ program
       const { ogmiosHost, ogmiosPort, ogmiosTls } = program.opts();
       const blockHeights = mapBlockHeights(blockHeightsInput);
       const lastblockHeight = blockHeights[blockHeights.length - 1];
-      const logger = createLogger({ level: logLevel, name: 'chain-sync' });
+      const logger = createLogger({ level: logLevel, name: 'chain-sync-events' });
       const progress = createProgressBar(lastblockHeight);
       await ensureDir(outDir);
       progress.start(lastblockHeight, 0);
@@ -126,7 +126,7 @@ program
         }
       }
       progress.stop();
-      const content = await prepareContent<GetBlocksResponse['events']>(fullMetadata, data);
+      const content = await prepareContent<GetChainSyncEventsResponse['events']>(fullMetadata, data);
       const fileName = path.join(outDir, `blocks-${hash(content)}.json`);
 
       logger.info(`Writing ${fileName}`);
@@ -148,3 +148,6 @@ if (process.argv.slice(2).length === 0) {
     process.exit(0);
   });
 }
+
+type PromiseType<P> = P extends Promise<infer T> ? T : never;
+export type ChainSyncData = PromiseType<ReturnType<typeof prepareContent<GetChainSyncEventsResponse['events']>>>;

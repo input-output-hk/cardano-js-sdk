@@ -1,8 +1,9 @@
 /* eslint-disable complexity */
 import { GeneratorMetadata } from '../Content';
 import { Logger } from 'ts-log';
-import { Ogmios } from '@cardano-sdk/ogmios';
+import { Ogmios, ogmiosToCore } from '@cardano-sdk/ogmios';
 import { applyValue } from './applyValue';
+import { Intersection } from '@cardano-sdk/core';
 
 export type AddressBalances = {
   [address: string]: Ogmios.Schema.Value;
@@ -36,10 +37,10 @@ export const getOnChainAddressBalances = (
       balances: {},
       metadata: {
         cardano: {
-          compactGenesis: await Ogmios.StateQuery.genesisConfig(
+          compactGenesis: ogmiosToCore.genesis(await Ogmios.StateQuery.genesisConfig(
             await Ogmios.createInteractionContext(reject, logger.info, { connection: options.ogmiosConnectionConfig })
-          ),
-          intersection: undefined as unknown as Ogmios.ChainSync.Intersection
+          )),
+          intersection: undefined as unknown as Intersection
         }
       }
     };
@@ -132,7 +133,7 @@ export const getOnChainAddressBalances = (
           }
         }
       );
-      response.metadata.cardano.intersection = await syncClient.startSync(['origin']);
+      response.metadata.cardano.intersection = await syncClient.startSync(['origin']) as Intersection;
     } catch (error) {
       logger.error(error);
       return reject(error);
