@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Cardano } from '@cardano-sdk/core';
+import { CardanoNodeErrors } from '@cardano-sdk/core';
 import { Ogmios } from '@cardano-sdk/ogmios';
 import { toSerializableObject } from '@cardano-sdk/util';
 
@@ -14,11 +14,11 @@ export const TX_SUBMISSION_QUEUE = 'cardano-tx-submit';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getErrorPrototype = (error: unknown) => {
   if (typeof error === 'object') {
-    const rawError = error as Cardano.TxSubmissionError;
+    const rawError = error as CardanoNodeErrors.TxSubmissionError;
 
     if (typeof rawError.name === 'string' && typeof rawError.message === 'string') {
-      const txSubmissionErrorName = rawError.name as keyof typeof Cardano.TxSubmissionErrors;
-      const ErrorClass = Cardano.TxSubmissionErrors[txSubmissionErrorName];
+      const txSubmissionErrorName = rawError.name as keyof typeof CardanoNodeErrors.TxSubmissionErrors;
+      const ErrorClass = CardanoNodeErrors.TxSubmissionErrors[txSubmissionErrorName];
 
       if (ErrorClass) return ErrorClass.prototype;
     }
@@ -37,7 +37,7 @@ export const serializeError = (err: unknown) => {
 
   const serializableError = toSerializableObject(err);
 
-  if (err instanceof Cardano.TxSubmissionErrors.OutsideOfValidityIntervalError) {
+  if (err instanceof CardanoNodeErrors.TxSubmissionErrors.OutsideOfValidityIntervalError) {
     const details = JSON.parse(err.message) as Ogmios.Schema.OutsideOfValidityInterval['outsideOfValidityInterval'];
 
     if (details.interval.invalidBefore && details.currentSlot <= details.interval.invalidBefore) isRetryable = true;

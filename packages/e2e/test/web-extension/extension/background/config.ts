@@ -2,6 +2,7 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as envalid from 'envalid';
+import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import {
   assetInfoHttpProvider,
   chainHistoryHttpProvider,
@@ -12,7 +13,6 @@ import {
 } from '@cardano-sdk/cardano-services-client';
 import { createConnectionObject } from '@cardano-ogmios/client';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
-import { ogmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import axiosFetchAdapter from '@vespaiach/axios-fetch-adapter';
 
 const networkIdOptions = [0, 1];
@@ -98,7 +98,7 @@ export const txSubmitProvider = (async () => {
         tls: env.TX_SUBMIT_PROVIDER_PARAMS.baseUrl?.protocol === 'wss'
       };
 
-      return ogmiosTxSubmitProvider(createConnectionObject(connectionConfig), logger);
+      return new OgmiosTxSubmitProvider(createConnectionObject(connectionConfig), logger);
     }
     default: {
       throw new Error(`TX_SUBMIT_PROVIDER unsupported: ${env.TX_SUBMIT_PROVIDER}`);

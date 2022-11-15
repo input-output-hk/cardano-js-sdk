@@ -1,4 +1,4 @@
-import { Cardano, EpochRewards } from '@cardano-sdk/core';
+import { Cardano, CardanoNodeErrors, EpochRewards } from '@cardano-sdk/core';
 import { Observable } from 'rxjs';
 
 export enum TransactionFailure {
@@ -48,7 +48,7 @@ export interface PollingConfig {
 export interface FailedTx {
   tx: Cardano.NewTxAlonzo;
   reason: TransactionFailure;
-  error?: Cardano.TxSubmissionError;
+  error?: CardanoNodeErrors.TxSubmissionError;
 }
 
 export type ConfirmedTx = { tx: Cardano.NewTxAlonzo; confirmedAt: Cardano.PartialBlockHeader['slot'] };

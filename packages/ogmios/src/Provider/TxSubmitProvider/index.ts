@@ -1,1 +1,1 @@
-export * from './ogmiosTxSubmitProvider';
+export * from './OgmiosTxSubmitProvider';

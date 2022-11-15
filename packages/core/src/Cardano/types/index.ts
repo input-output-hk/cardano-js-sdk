@@ -12,5 +12,4 @@ export * from './Asset';
 export * from './AuxiliaryData';
 export * from './Key';
 export * from './Script';
-export * from './TxSubmissionErrors';
 export * from './ProtocolParameters';

@@ -3,7 +3,8 @@ import { CONNECTION_ERROR_EVENT, TX_SUBMISSION_QUEUE, serializeError, waitForPen
 import { Channel, Connection, Message, connect } from 'amqplib';
 import { EventEmitter } from 'events';
 import { Logger } from 'ts-log';
-import { ProviderError, ProviderFailure, TxSubmitProvider, cmlUtil } from '@cardano-sdk/core';
+import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
+import { ProviderError, ProviderFailure, cmlUtil } from '@cardano-sdk/core';
 import { bufferToHexString } from '@cardano-sdk/util';
 
 const moduleName = 'TxSubmitWorker';
@@ -48,7 +49,7 @@ export interface TxSubmitWorkerDependencies {
   /**
    * The provider to use to submit tx
    */
-  txSubmitProvider: TxSubmitProvider;
+  txSubmitProvider: OgmiosTxSubmitProvider;
 }
 
 /**
@@ -148,6 +149,11 @@ export class TxSubmitWorker extends EventEmitter {
    * https://amqp-node.github.io/amqplib/channel_api.html#model_events
    */
   async start() {
+    if (this.#dependencies.txSubmitProvider.state === null) {
+      this.#dependencies.logger.info(`${moduleName} init: initialize and start tx submission provider`);
+      await this.#dependencies.txSubmitProvider.initialize();
+      await this.#dependencies.txSubmitProvider.start();
+    }
     this.#dependencies.logger.info(`${moduleName} init: checking tx submission provider health status`);
 
     const { ok } = await this.#dependencies.txSubmitProvider.healthCheck();
@@ -187,10 +193,17 @@ export class TxSubmitWorker extends EventEmitter {
     }
   }
 
+  async shutdown() {
+    if (this.#dependencies.txSubmitProvider.state === 'running') {
+      this.#dependencies.logger.info(`${moduleName} shutdown: shutdown tx submission provider`);
+      await this.#dependencies.txSubmitProvider.shutdown();
+    }
+    await this.stop();
+  }
   /**
    * Stops the worker.
    */
-  async stop() {
+  private async stop() {
     this.#dependencies.logger.info(`${moduleName} shutdown: closing RabbitMQ channel`);
 
     // In case of parallel worker; first of all cancel the consumer

@@ -135,6 +135,7 @@ export class HttpServer extends RunnableModule {
   }
 
   async startImpl(): Promise<void> {
+    for (const dependency of this.#dependencies.runnableDependencies) await dependency.start();
     for (const service of this.#dependencies.services) await service.start();
     this.server = await listenPromise(this.app, this.#config.listen);
   }

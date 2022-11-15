@@ -3,11 +3,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable max-len */
-import { Cardano, TxSubmitProvider } from '@cardano-sdk/core';
+import { CardanoNodeErrors, TxSubmitProvider } from '@cardano-sdk/core';
 import { Connection } from '@cardano-ogmios/client';
 import {
   HttpServer,
   HttpServerConfig,
+  RabbitMqTxSubmitProvider,
   RunningTxSubmitWorker,
   TxSubmitHttpService,
   createDnsResolver,
@@ -17,7 +18,7 @@ import {
   loadAndStartTxWorker,
   startTxSubmitWorkerWithDiscovery
 } from '../../../src';
-import { Ogmios } from '@cardano-sdk/ogmios';
+import { Ogmios, OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import { RabbitMQContainer } from '../../TxSubmit/rabbitmq/docker';
 import { SrvRecord } from 'dns';
 import { bufferToHexString } from '@cardano-sdk/util';
@@ -141,7 +142,7 @@ describe('Program/services/rabbitmq', () => {
     describe('TxSubmitProvider with service discovery and RabbitMQ server failover', () => {
       let mockServer: http.Server;
       let connection: Connection;
-      let provider: TxSubmitProvider;
+      let provider: RabbitMqTxSubmitProvider;
       let txSubmitWorker: RunningTxSubmitWorker;
       const ogmiosPortDefault = 1337;
 
@@ -169,11 +170,11 @@ describe('Program/services/rabbitmq', () => {
       });
 
       afterEach(async () => {
+        if (txSubmitWorker !== undefined) {
+          await txSubmitWorker.shutdown();
+        }
         if (mockServer !== undefined) {
           await serverClosePromise(mockServer);
-        }
-        if (txSubmitWorker !== undefined) {
-          await txSubmitWorker.stop();
         }
       });
 
@@ -198,7 +199,7 @@ describe('Program/services/rabbitmq', () => {
         const txs = await txsPromise;
         await expect(
           provider.submitTx({ signedTransaction: bufferToHexString(Buffer.from(txs[0].txBodyUint8Array)) })
-        ).rejects.toBeInstanceOf(Cardano.TxSubmissionErrors.EraMismatchError);
+        ).rejects.toBeInstanceOf(CardanoNodeErrors.TxSubmissionErrors.EraMismatchError);
         expect(dnsResolverMock).toBeCalledTimes(2);
       });
 
@@ -224,7 +225,7 @@ describe('Program/services/rabbitmq', () => {
       let mockServer: http.Server;
       let connection: Connection;
       let txSubmitWorker: RunningTxSubmitWorker;
-      let txSubmitProvider: TxSubmitProvider;
+      let txSubmitProvider: OgmiosTxSubmitProvider;
       const ogmiosPortDefault = 1337;
       const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
 
@@ -238,11 +239,11 @@ describe('Program/services/rabbitmq', () => {
       });
 
       afterEach(async () => {
+        await txSubmitWorker.shutdown();
+
         if (mockServer !== undefined) {
           await serverClosePromise(mockServer);
         }
-
-        await txSubmitWorker.stop();
       });
 
       it('should instantiate a running worker without service discovery', async () => {
@@ -277,18 +278,18 @@ describe('Program/services/rabbitmq', () => {
     describe('startTxSubmitWorkerWithDiscovery', () => {
       it('returns a started worker, which can then be stopped', async () => {
         const start = jest.fn().mockResolvedValueOnce(void 0);
-        const stop = jest.fn().mockResolvedValueOnce(void 0);
+        const shutdown = jest.fn().mockResolvedValueOnce(void 0);
         const workerFactory = jest.fn().mockImplementation(async () => ({
           on(_: string, __: any) {},
-          start,
-          stop
+          shutdown,
+          start
         }));
 
         const runnableWorker = await startTxSubmitWorkerWithDiscovery(workerFactory);
-        await runnableWorker.stop();
+        await runnableWorker.shutdown();
 
         expect(start).toBeCalledTimes(1);
-        expect(stop).toBeCalledTimes(1);
+        expect(shutdown).toBeCalledTimes(1);
         expect(workerFactory).toBeCalledTimes(1);
       });
 
@@ -335,8 +336,8 @@ describe('Program/services/rabbitmq', () => {
         }))
         .mockImplementationOnce(async () => ({
           on(__: string, ___: any) {},
-          start: jest.fn().mockResolvedValueOnce(void 0),
-          stop: stopSecondWorker
+          shutdown: stopSecondWorker,
+          start: jest.fn().mockResolvedValueOnce(void 0)
         }));
 
       const runningTxSubmitWorker = await startTxSubmitWorkerWithDiscovery(workerFactory);
@@ -346,7 +347,7 @@ describe('Program/services/rabbitmq', () => {
 
       expect(stopSecondWorker).toBeCalledTimes(0);
 
-      await runningTxSubmitWorker.stop();
+      await runningTxSubmitWorker.shutdown();
       expect(stopSecondWorker).toBeCalledTimes(1);
       expect(workerFactory).toBeCalledTimes(2);
     });
