@@ -1,9 +1,9 @@
 import { ObservableWallet } from '@cardano-sdk/wallet';
-import { env } from '../environment';
+import { env } from '../../environment';
 import { firstValueFrom } from 'rxjs';
 import { getWallet } from '../../../src/factories';
 import { logger } from '@cardano-sdk/util-dev';
-import { submitAndConfirm, walletReady } from '../util';
+import { submitAndConfirm, walletReady } from '../../util';
 
 describe('SingleAddressWallet', () => {
   let wallet: ObservableWallet;

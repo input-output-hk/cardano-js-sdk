@@ -2,10 +2,10 @@
 import { Cardano, nativeScriptPolicyId } from '@cardano-sdk/core';
 import { InMemoryKeyAgent, KeyRole, util } from '@cardano-sdk/key-management';
 import { SingleAddressWallet } from '@cardano-sdk/wallet';
-import { env } from '../environment';
+import { env } from '../../environment';
 import { filter, firstValueFrom } from 'rxjs';
 import { getLogger, getWallet } from '../../../src/factories';
-import { submitAndConfirm, walletReady } from '../util';
+import { submitAndConfirm, walletReady } from '../../util';
 
 const logger = getLogger(env.LOGGER_MIN_SEVERITY);
 

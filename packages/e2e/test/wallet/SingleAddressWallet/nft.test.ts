@@ -3,9 +3,9 @@ import { Cardano, metadatum, nativeScriptPolicyId } from '@cardano-sdk/core';
 import { InMemoryKeyAgent, KeyRole, TransactionSigner, util } from '@cardano-sdk/key-management';
 import { SingleAddressWallet } from '@cardano-sdk/wallet';
 import { combineLatest, filter, firstValueFrom, map } from 'rxjs';
-import { env } from '../environment';
+import { env } from '../../environment';
 import { getLogger, getWallet } from '../../../src/factories';
-import { submitAndConfirm, walletReady } from '../util';
+import { submitAndConfirm, walletReady } from '../../util';
 
 const logger = getLogger(env.LOGGER_MIN_SEVERITY);
 

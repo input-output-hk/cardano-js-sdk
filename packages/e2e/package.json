@@ -18,6 +18,7 @@
     "test": "shx echo 'test' command not implemented yet",
     "test:wallet": "jest -c jest.config.js --forceExit --selectProjects wallet --runInBand --verbose",
     "test:load-testing": "jest -c jest.config.js --selectProjects load-testing --runInBand --verbose",
+    "test:long-running": "jest -c jest.config.js --selectProjects long-running --runInBand --verbose",
     "test:ogmios": "jest -c jest.config.js --selectProjects ogmios --runInBand --verbose",
     "test:web-extension:build": "tsc --build ./test && tsc --build ./test/web-extension && webpack -c test/web-extension/webpack.config.js",
     "test:web-extension:run": "wdio run test/web-extension/wdio.conf.js",
