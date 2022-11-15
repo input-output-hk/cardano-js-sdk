@@ -85,16 +85,24 @@ const mapCommonVrf = (block: CommonBlock): Cardano.VrfVkBech32 => Cardano.VrfVkB
 const mapCommonSlotLeader = (block: CommonBlock): Cardano.Ed25519PublicKey =>
   Cardano.Ed25519PublicKey(block.header.issuerVk);
 
+const mapStandardBlockHeader = (block: Schema.StandardBlock) => ({
+  blockNo: mapBlockHeight(block),
+  hash: mapByronHash(block),
+  slot: mapBlockSlot(block)
+});
+
+const mapCommonBlockHeader = (block: CommonBlock) => ({
+  blockNo: mapBlockHeight(block),
+  hash: mapCommonHash(block),
+  slot: mapBlockSlot(block)
+});
+
 const mapByronBlock = (block: Schema.StandardBlock): Cardano.Block => ({
   body: mapByronBlockBody(block),
   fees: undefined,
 
   // TODO: figure out how to calculate fees
-  header: {
-    blockNo: mapBlockHeight(block),
-    hash: mapByronHash(block),
-    slot: mapBlockSlot(block)
-  },
+  header: mapStandardBlockHeader(block),
   // TODO: use the genesisKey to provide a value here, but it needs more work. Leaving as undefined for now
   issuerVk: undefined,
 
@@ -109,11 +117,7 @@ const mapByronBlock = (block: Schema.StandardBlock): Cardano.Block => ({
 const mapCommonBlock = (block: CommonBlock): Cardano.Block => ({
   body: mapCommonBlockBody(block),
   fees: mapCommonFees(block),
-  header: {
-    blockNo: mapBlockHeight(block),
-    hash: mapCommonHash(block),
-    slot: mapBlockSlot(block)
-  },
+  header: mapCommonBlockHeader(block),
   issuerVk: mapCommonSlotLeader(block),
   previousBlock: mapPreviousBlock(block),
   size: mapCommonBlockSize(block),
@@ -121,6 +125,43 @@ const mapCommonBlock = (block: CommonBlock): Cardano.Block => ({
   txCount: mapCommonTxCount(block),
   vrf: mapCommonVrf(block)
 });
+
+const mapBlock = <R>(
+  ogmiosBlock: Schema.Block,
+  mapStandardBlock: (b: Schema.StandardBlock) => R,
+  mapOtherBlock: (b: CommonBlock) => R
+) => {
+  const b = getBlockAndKind(ogmiosBlock);
+  if (!b) return null;
+
+  switch (b.kind) {
+    case 'byron': {
+      return mapStandardBlock(b.block);
+    }
+    case 'babbage':
+    case 'allegra':
+    case 'alonzo':
+    case 'mary':
+    case 'shelley': {
+      return mapOtherBlock(b.block);
+    }
+    default: {
+      // eslint-disable-next-line sonarjs/prefer-immediate-return
+      const _exhaustiveCheck: never = b;
+      return _exhaustiveCheck;
+    }
+  }
+};
+
+/**
+ * Extract block header from `Ogmios` block
+ *
+ * @returns
+ *   - {Cardano.PartialBlockHeader} compact block header.
+ *   - `null` if `block` is the ByronEpochBoundaryBlock. This block can be skipped.
+ */
+export const blockHeader = (ogmiosBlock: Schema.Block): Cardano.PartialBlockHeader | null =>
+  mapBlock(ogmiosBlock, mapStandardBlockHeader, mapCommonBlockHeader);
 
 /**
  * Translate `Ogmios` block to `Cardano.BlockMinimal`
@@ -130,27 +171,7 @@ const mapCommonBlock = (block: CommonBlock): Cardano.Block => ({
  *   - {Cardano.BlockMinimal} a minimal block type encompassing information extracted from Ogmios block type.
  *   - `null` if `block` is the ByronEpochBoundaryBlock. This block can be skipped.
  */
-export const block = (ogmiosBlock: Schema.Block): Cardano.Block | null => {
-  const b = getBlockAndKind(ogmiosBlock);
-  if (!b) return null;
-
-  switch (b.kind) {
-    case 'byron': {
-      return mapByronBlock(b.block);
-    }
-    case 'babbage':
-    case 'allegra':
-    case 'alonzo':
-    case 'mary':
-    case 'shelley': {
-      return mapCommonBlock(b.block);
-    }
-    default: {
-      // eslint-disable-next-line sonarjs/prefer-immediate-return
-      const _exhaustiveCheck: never = b;
-      return _exhaustiveCheck;
-    }
-  }
-};
+export const block = (ogmiosBlock: Schema.Block): Cardano.Block | null =>
+  mapBlock(ogmiosBlock, mapByronBlock, mapCommonBlock);
 
 // byron-shelley-allegra-mary-alonzo-babbage
