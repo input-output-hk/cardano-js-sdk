@@ -70,7 +70,7 @@ describe('delegation rewards', () => {
 
     // Arrange
     const activePools = await providers.stakePoolProvider.queryStakePools({
-      filters: { status: [Cardano.StakePoolStatus.Active] },
+      filters: { pledgeMet: true, status: [Cardano.StakePoolStatus.Active] },
       pagination: { limit: 1, startAt: 0 }
     });
     expect(activePools.totalResultCount).toBeGreaterThan(0);
