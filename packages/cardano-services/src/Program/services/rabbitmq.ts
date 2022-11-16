@@ -7,7 +7,8 @@ import { CommonOptionDescriptions, CommonProgramOptions } from '../Options';
 import { DnsResolver, srvRecordToRabbitmqURL } from '../utils';
 import { Logger } from 'ts-log';
 import { MissingProgramOption } from '../errors';
-import { ProviderError, ProviderFailure, SubmitTxArgs, TxSubmitProvider } from '@cardano-sdk/core';
+import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
+import { ProviderError, ProviderFailure, SubmitTxArgs } from '@cardano-sdk/core';
 import { ServiceNames } from '../ServiceNames';
 import { TxWorkerOptions } from '../loadTxWorker';
 import { isConnectionError } from '@cardano-sdk/util';
@@ -59,6 +60,8 @@ export const rabbitMqTxSubmitProviderWithDiscovery = async (
         const method = rabbitmqProvider[prop as keyof RabbitMqTxSubmitProvider] as any;
         return method.bind(rabbitmqProvider);
       }
+
+      return rabbitmqProvider[prop as keyof RabbitMqTxSubmitProvider];
     }
   });
 };
@@ -83,7 +86,7 @@ type WorkerFactory = () => Promise<TxSubmitWorker>;
  * Create a worker factory with service discovery
  *
  * @param {DnsResolver} dnsResolver used for DNS resolution
- * @param {TxSubmitProvider} txSubmitProvider tx submit provider 'ogmiosTxSubmitProvider'
+ * @param {OgmiosTxSubmitProvider} txSubmitProvider tx submit provider
  * @param {Logger} logger common logger
  * @param {TxWorkerOptions} options needed for tx worker initialization
  * @returns {WorkerFactory} WorkerFactory with service discovery, returning a 'TxSubmitWorker' instance
@@ -91,7 +94,7 @@ type WorkerFactory = () => Promise<TxSubmitWorker>;
 export const createWorkerFactoryWithDiscovery =
   (
     dnsResolver: DnsResolver,
-    txSubmitProvider: TxSubmitProvider,
+    txSubmitProvider: OgmiosTxSubmitProvider,
     logger: Logger,
     options: TxWorkerOptions
   ): WorkerFactory =>
@@ -125,7 +128,7 @@ export const attachOnConnectionErrorHandler = (worker: TxSubmitWorker, factory: 
   worker.on(CONNECTION_ERROR_EVENT, () => createAndStartNewWorker(factory));
 };
 
-export type RunningTxSubmitWorker = Pick<TxSubmitWorker, 'stop' | 'getStatus'>;
+export type RunningTxSubmitWorker = Pick<TxSubmitWorker, 'shutdown' | 'getStatus'>;
 
 /**
  * An abstraction which starts and manages restarts of the worker instance with service discovery
@@ -141,7 +144,7 @@ export const startTxSubmitWorkerWithDiscovery = async (
 
   return {
     getStatus: () => worker.getStatus(),
-    stop: () => worker.stop()
+    shutdown: () => worker.shutdown()
   };
 };
 
@@ -149,7 +152,7 @@ export const startTxSubmitWorkerWithDiscovery = async (
  * Create and return a running worker instance with static service config or service discovery
  *
  * @param {DnsResolver} dnsResolver used for DNS resolution
- * @param {TxSubmitProvider} txSubmitProvider tx submit provider 'ogmiosTxSubmitProvider'
+ * @param {OgmiosTxSubmitProvider} txSubmitProvider tx submit provider
  * @param {Logger} logger common logger
  * @param {TxWorkerOptions} options needed for tx worker initialization
  * @returns {RunningTxSubmitWorker} RunningTxSubmitWorker instance
@@ -157,7 +160,7 @@ export const startTxSubmitWorkerWithDiscovery = async (
  */
 export const getRunningTxSubmitWorker = async (
   dnsResolver: DnsResolver,
-  txSubmitProvider: TxSubmitProvider,
+  txSubmitProvider: OgmiosTxSubmitProvider,
   logger: Logger,
   options?: TxWorkerOptions
 ): Promise<RunningTxSubmitWorker> => {

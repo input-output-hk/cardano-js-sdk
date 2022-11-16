@@ -1,7 +1,7 @@
 /* eslint-disable func-style */
 /* eslint-disable jsdoc/require-jsdoc */
 import { AssetId, logger, somePartialStakePools } from '@cardano-sdk/util-dev';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, CardanoNodeErrors } from '@cardano-sdk/core';
 import { of } from 'rxjs';
 
 import * as mocks from '../mocks';
@@ -548,7 +548,7 @@ describe('buildTx', () => {
     });
 
     it('rejects if error is encountered during submission', async () => {
-      const submitErr = new Cardano.TxSubmissionErrors.AlreadyDelegatingError({
+      const submitErr = new CardanoNodeErrors.TxSubmissionErrors.AlreadyDelegatingError({
         alreadyDelegating: 'that is just terrible'
       });
       observableWallet.submitTx = jest.fn().mockRejectedValue(submitErr);

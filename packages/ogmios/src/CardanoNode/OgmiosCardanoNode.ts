@@ -20,9 +20,6 @@ import { Logger } from 'ts-log';
 import { RunnableModule, contextLogger } from '@cardano-sdk/util';
 import { createInteractionContextWithLogger } from '../util';
 import { mapEraSummary } from './mappers';
-
-type CardanoNodeState = 'initialized' | 'initializing' | null;
-
 /**
  * Access cardano-node APIs via Ogmios
  *
@@ -31,39 +28,27 @@ type CardanoNodeState = 'initialized' | 'initializing' | null;
 export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
   #stateQueryClient: StateQuery.StateQueryClient;
   #logger: Logger;
-  #state: CardanoNodeState;
   #connectionConfig: ConnectionConfig;
-
   constructor(connectionConfig: ConnectionConfig, logger: Logger) {
     super('OgmiosCardanoNode', logger);
     this.#logger = contextLogger(logger, 'OgmiosCardanoNode');
-    this.#state = null;
     this.#connectionConfig = connectionConfig;
   }
-
-  public async initialize(): Promise<void> {
-    if (this.#state !== null) return;
-    this.#state = 'initializing';
+  public async initializeImpl(): Promise<void> {
     this.#logger.info('Initializing CardanoNode');
     this.#stateQueryClient = await createStateQueryClient(
       await createInteractionContextWithLogger(this.#logger, { connection: this.#connectionConfig })
     );
-    this.#state = 'initialized';
     this.#logger.info('CardanoNode initialized');
   }
-
-  public async shutdown(): Promise<void> {
-    if (this.#state !== 'initialized') {
-      throw new CardanoNodeErrors.CardanoNodeNotInitializedError('shutdown');
-    }
+  public async shutdownImpl(): Promise<void> {
     this.#logger.info('Shutting down CardanoNode');
     await this.#stateQueryClient.shutdown();
-    this.#state = null;
   }
 
   public async eraSummaries(): Promise<EraSummary[]> {
-    if (this.#state !== 'initialized') {
-      throw new CardanoNodeErrors.CardanoNodeNotInitializedError('eraSummaries');
+    if (this.state !== 'running') {
+      throw new CardanoNodeErrors.NotInitializedError('eraSummaries', this.name);
     }
     try {
       this.#logger.info('Getting era summaries');
@@ -76,8 +61,8 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
   }
 
   public async systemStart(): Promise<Date> {
-    if (this.#state !== 'initialized') {
-      throw new CardanoNodeErrors.CardanoNodeNotInitializedError('systemStart');
+    if (this.state !== 'running') {
+      throw new CardanoNodeErrors.NotInitializedError('systemStart', this.name);
     }
     try {
       this.#logger.info('Getting system start');
@@ -88,8 +73,8 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
   }
 
   public async stakeDistribution(): Promise<StakeDistribution> {
-    if (this.#state !== 'initialized') {
-      throw new CardanoNodeErrors.CardanoNodeNotInitializedError('stakeDistribution');
+    if (this.state !== 'running') {
+      throw new CardanoNodeErrors.NotInitializedError('stakeDistribution', this.name);
     }
     try {
       this.#logger.info('Getting stake distribution');
@@ -127,15 +112,6 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
       throw new ProviderError(ProviderFailure.Unknown, error);
     }
   }
-
-  async initializeImpl(): Promise<void> {
-    await this.initialize();
-  }
-
-  async shutdownImpl(): Promise<void> {
-    await this.shutdown();
-  }
-
   async startImpl(): Promise<void> {
     return Promise.resolve();
   }

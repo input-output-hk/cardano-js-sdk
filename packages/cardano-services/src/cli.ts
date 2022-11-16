@@ -321,7 +321,7 @@ commonOptions(program.command('start-worker').description('Start RabbitMQ worker
     console.log(`RabbitMQ transactions worker: ${options.parallel ? 'parallel' : 'serial'} mode`);
     const txWorker = await loadAndStartTxWorker({ options });
     onDeath(async () => {
-      await txWorker.stop();
+      await txWorker.shutdown();
       process.exit(1);
     });
   });

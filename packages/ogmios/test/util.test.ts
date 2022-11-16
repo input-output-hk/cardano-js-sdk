@@ -75,7 +75,7 @@ describe('util', () => {
         expect(onUnexpectedClose).not.toHaveBeenCalled();
       });
 
-      it('logs an error if the WebSocket is closed due to the server going down', async () => {
+      it('invokes the onUnexpectedClose callback if the socket is closed unexpectedly', async () => {
         await closeWithCode(interactionContext.socket, 1001);
         expect(onUnexpectedClose).toHaveBeenCalledTimes(1);
       });

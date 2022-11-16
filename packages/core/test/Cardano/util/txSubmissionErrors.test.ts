@@ -1,11 +1,12 @@
-import { TxSubmissionError, TxSubmissionErrors, util } from '../../../src/Cardano';
+import { CardanoNodeErrors } from '../../../src/CardanoNode';
+import { util } from '../../../src/Cardano';
 
-const badInputsError = new TxSubmissionErrors.BadInputsError({ badInputs: [] });
-const addressAttributesTooLargeError = new TxSubmissionErrors.AddressAttributesTooLargeError({
+const badInputsError = new CardanoNodeErrors.TxSubmissionErrors.BadInputsError({ badInputs: [] });
+const addressAttributesTooLargeError = new CardanoNodeErrors.TxSubmissionErrors.AddressAttributesTooLargeError({
   addressAttributesTooLarge: []
 });
-const someOtherError = new Error('some other error') as unknown as TxSubmissionError;
-const someString = 'some string' as unknown as TxSubmissionError;
+const someOtherError = new Error('some other error') as unknown as CardanoNodeErrors.TxSubmissionError;
+const someString = 'some string' as unknown as CardanoNodeErrors.TxSubmissionError;
 
 describe('txSubmissionErrors', () => {
   describe('isTxSubmissionError', () => {
