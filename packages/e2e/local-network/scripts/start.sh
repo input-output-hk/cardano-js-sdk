@@ -10,6 +10,8 @@ cd "$root"
 
 export PATH=$PWD/bin:$PATH
 
+source ./scripts/nodes-configuration.sh
+
 echo "Clean old state and logs"
 ./scripts/clean.sh
 
@@ -19,7 +21,14 @@ trap 'kill 0' INT
 echo "Run"
 ./scripts/make-babbage.sh
 ./network-files/run/all.sh &
-CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-spo1/node.sock ./scripts/update-pools-certificate.sh
+
+for ID in ${SPO_NODES_ID}; do
+  if [ -f "./scripts/pools/update-node-spo$ID.sh" ]; # Only update the pool if a script exists for that pool.
+  then
+    CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-spo"$ID"/node.sock ./scripts/pools/update-node-spo"$ID".sh
+  fi
+done
+
 CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-spo1/node.sock ./scripts/plutus-transaction.sh
 CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-spo1/node.sock ./scripts/mint-tokens.sh
 CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-spo1/node.sock ./scripts/setup-wallets.sh
