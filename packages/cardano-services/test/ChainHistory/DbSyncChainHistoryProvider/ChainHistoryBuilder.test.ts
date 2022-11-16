@@ -163,7 +163,13 @@ describe('ChainHistoryBuilder', () => {
       const txHashes = await fixtureBuilder.getTxHashes(2, { with: [TxWith.DelegationCertificate] });
       const result = await builder.queryCertificatesByHashes(txHashes);
       expect(result.size).toBeGreaterThanOrEqual(2);
-      expect(result.get(txHashes[0])).toMatchShapeOf(DataMocks.Tx.certificate);
+      const certificates = result.get(txHashes[0]);
+      let delegationCertificate;
+      for (let i = 0; i < certificates!.length; ++i) {
+        if (certificates![i].__typename === 'StakeDelegationCertificate') delegationCertificate = certificates![i];
+      }
+      expect(delegationCertificate).toBeDefined();
+      expect(delegationCertificate).toMatchShapeOf(DataMocks.Tx.certificate);
     });
     test('query certificates with empty array', async () => {
       const result = await builder.queryCertificatesByHashes([]);
