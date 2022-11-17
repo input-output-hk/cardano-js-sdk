@@ -8,7 +8,7 @@ root="$(cd "$here/.." && pwd)"
 cd "$root"
 
 export PATH=$PWD/bin:$PATH
-export CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-spo1/node.sock
+export CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock
 
 if [ ! -S "$CARDANO_NODE_SOCKET_PATH" ]; then
   echo "-1"

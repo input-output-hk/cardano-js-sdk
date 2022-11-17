@@ -34,7 +34,7 @@ trap clean EXIT
 updatePool()
 {
   # pool parameters
-  SPO_NODE_ID="$1"
+  SP_NODE_ID="$1"
   POOL_PLEDGE="$2"
   POOL_OWNER_STAKE="$3"
   POOL_COST="$4"
@@ -43,7 +43,7 @@ updatePool()
   METADATA_HASH=""
 
   while [ ! -S "$CARDANO_NODE_SOCKET_PATH" ]; do
-    echo "update-node-spo${SPO_NODE_ID}.sh: CARDANO_NODE_SOCKET_PATH: $CARDANO_NODE_SOCKET_PATH file doesn't exist, waiting..."
+    echo "update-node-sp${SP_NODE_ID}.sh: CARDANO_NODE_SOCKET_PATH: $CARDANO_NODE_SOCKET_PATH file doesn't exist, waiting..."
     sleep 2
   done
 
@@ -61,15 +61,15 @@ updatePool()
   genesisSKey=network-files/utxo-keys/utxo3.skey
   genesisAddr=$(cardano-cli address build --payment-verification-key-file "$genesisVKey" --testnet-magic 888)
 
-  stakeVKey=network-files/pools/staking-reward"${SPO_NODE_ID}".vkey
-  stakeKey=network-files/pools/staking-reward"${SPO_NODE_ID}".skey
-  coldVKey=network-files/pools/cold"${SPO_NODE_ID}".vkey
-  coldKey=network-files/pools/cold"${SPO_NODE_ID}".skey
-  vrfKey=network-files/pools/vrf"${SPO_NODE_ID}".vkey
-  delegatorPaymentKey=network-files/stake-delegator-keys/payment"${SPO_NODE_ID}".vkey
-  delegatorStakingKey=network-files/stake-delegator-keys/staking"${SPO_NODE_ID}".vkey
-  delegatorPaymentSKey=network-files/stake-delegator-keys/payment"${SPO_NODE_ID}".skey
-  delegatorStakingSKey=network-files/stake-delegator-keys/staking"${SPO_NODE_ID}".skey
+  stakeVKey=network-files/pools/staking-reward"${SP_NODE_ID}".vkey
+  stakeKey=network-files/pools/staking-reward"${SP_NODE_ID}".skey
+  coldVKey=network-files/pools/cold"${SP_NODE_ID}".vkey
+  coldKey=network-files/pools/cold"${SP_NODE_ID}".skey
+  vrfKey=network-files/pools/vrf"${SP_NODE_ID}".vkey
+  delegatorPaymentKey=network-files/stake-delegator-keys/payment"${SP_NODE_ID}".vkey
+  delegatorStakingKey=network-files/stake-delegator-keys/staking"${SP_NODE_ID}".vkey
+  delegatorPaymentSKey=network-files/stake-delegator-keys/payment"${SP_NODE_ID}".skey
+  delegatorStakingSKey=network-files/stake-delegator-keys/staking"${SP_NODE_ID}".skey
 
   POOL_ID=$(cardano-cli stake-pool id --cold-verification-key-file "$coldVKey" --output-format "hex")
 
@@ -214,7 +214,7 @@ updatePool()
   done
 
   # register delegator stake address
-  echo "Registering delegator stake certificate ${SPO_NODE_ID}..."
+  echo "Registering delegator stake certificate ${SP_NODE_ID}..."
 
   paymentAddr=$(cardano-cli address build --payment-verification-key-file "$delegatorPaymentKey" --stake-verification-key-file "$delegatorStakingKey" --testnet-magic 888)
   currentBalance=$(getAddressBalance "$paymentAddr")
@@ -275,7 +275,7 @@ updatePool()
   done
 
   # creating certs
-  echo "Update stake pool ${SPO_NODE_ID}..."
+  echo "Update stake pool ${SP_NODE_ID}..."
   currentBalance=$(getAddressBalance "$paymentAddr")
 
   # Only add metadata if given.
@@ -291,7 +291,7 @@ updatePool()
         --pool-owner-stake-verification-key-file "$stakeVKey" \
         --testnet-magic 888 \
         --pool-relay-ipv4 127.0.0.1 \
-        --pool-relay-port 300"$SPO_NODE_ID" \
+        --pool-relay-port 300"$SP_NODE_ID" \
         --metadata-url "${METADATA_URL}" \
         --metadata-hash "${METADATA_HASH}" \
         --out-file pool.cert
@@ -306,7 +306,7 @@ updatePool()
         --pool-owner-stake-verification-key-file "$stakeVKey" \
         --testnet-magic 888 \
         --pool-relay-ipv4 127.0.0.1 \
-        --pool-relay-port 300"$SPO_NODE_ID" \
+        --pool-relay-port 300"$SP_NODE_ID" \
         --out-file pool.cert
   fi
 
@@ -366,11 +366,11 @@ updatePool()
 deregisterPool()
 {
   # pool parameters
-  SPO_NODE_ID="$1"
+  SP_NODE_ID="$1"
   RETIRING_EPOCH="$2"
 
   while [ ! -S "$CARDANO_NODE_SOCKET_PATH" ]; do
-    echo "deregister pool ${SPO_NODE_ID}: CARDANO_NODE_SOCKET_PATH: $CARDANO_NODE_SOCKET_PATH file doesn't exist, waiting..."
+    echo "deregister pool ${SP_NODE_ID}: CARDANO_NODE_SOCKET_PATH: $CARDANO_NODE_SOCKET_PATH file doesn't exist, waiting..."
     sleep 2
   done
 
@@ -380,16 +380,16 @@ deregisterPool()
   genesisVKey=network-files/utxo-keys/utxo3.vkey
   genesisSKey=network-files/utxo-keys/utxo3.skey
   genesisAddr=$(cardano-cli address build --payment-verification-key-file "$genesisVKey" --testnet-magic 888)
-  stakeKey=network-files/pools/staking-reward"${SPO_NODE_ID}".skey
-  coldVKey=network-files/pools/cold"${SPO_NODE_ID}".vkey
-  coldKey=network-files/pools/cold"${SPO_NODE_ID}".skey
-  delegatorPaymentKey=network-files/stake-delegator-keys/payment"${SPO_NODE_ID}".vkey
-  delegatorStakingKey=network-files/stake-delegator-keys/staking"${SPO_NODE_ID}".vkey
-  delegatorPaymentSKey=network-files/stake-delegator-keys/payment"${SPO_NODE_ID}".skey
-  delegatorStakingSKey=network-files/stake-delegator-keys/staking"${SPO_NODE_ID}".skey
+  stakeKey=network-files/pools/staking-reward"${SP_NODE_ID}".skey
+  coldVKey=network-files/pools/cold"${SP_NODE_ID}".vkey
+  coldKey=network-files/pools/cold"${SP_NODE_ID}".skey
+  delegatorPaymentKey=network-files/stake-delegator-keys/payment"${SP_NODE_ID}".vkey
+  delegatorStakingKey=network-files/stake-delegator-keys/staking"${SP_NODE_ID}".vkey
+  delegatorPaymentSKey=network-files/stake-delegator-keys/payment"${SP_NODE_ID}".skey
+  delegatorStakingSKey=network-files/stake-delegator-keys/staking"${SP_NODE_ID}".skey
 
   # We are going to redelegate this stake to dbSync can index it properly.
-  echo "Registering delegator stake certificate ${SPO_NODE_ID}..."
+  echo "Registering delegator stake certificate ${SP_NODE_ID}..."
 
   paymentAddr=$(cardano-cli address build --payment-verification-key-file "$delegatorPaymentKey" --stake-verification-key-file "$delegatorStakingKey" --testnet-magic 888)
   currentBalance=$(getAddressBalance "$paymentAddr")
@@ -452,7 +452,7 @@ deregisterPool()
   done
 
   # creating certs
-  echo "Deregister stake pool ${SPO_NODE_ID}..."
+  echo "Deregister stake pool ${SP_NODE_ID}..."
   currentBalance=$(getAddressBalance "$genesisAddr")
 
   cardano-cli stake-pool deregistration-certificate \

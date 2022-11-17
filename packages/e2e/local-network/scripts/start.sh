@@ -22,15 +22,15 @@ echo "Run"
 ./scripts/make-babbage.sh
 ./network-files/run/all.sh &
 
-for ID in ${SPO_NODES_ID}; do
-  if [ -f "./scripts/pools/update-node-spo$ID.sh" ]; # Only update the pool if a script exists for that pool.
+for ID in ${SP_NODES_ID}; do
+  if [ -f "./scripts/pools/update-node-sp$ID.sh" ]; # Only update the pool if a script exists for that pool.
   then
-    CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-spo"$ID"/node.sock ./scripts/pools/update-node-spo"$ID".sh
+    CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp"$ID"/node.sock ./scripts/pools/update-node-sp"$ID".sh
   fi
 done
 
-CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-spo1/node.sock ./scripts/plutus-transaction.sh
-CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-spo1/node.sock ./scripts/mint-tokens.sh
-CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-spo1/node.sock ./scripts/setup-wallets.sh
+CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock ./scripts/plutus-transaction.sh
+CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock ./scripts/mint-tokens.sh
+CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock ./scripts/setup-wallets.sh
 
 wait

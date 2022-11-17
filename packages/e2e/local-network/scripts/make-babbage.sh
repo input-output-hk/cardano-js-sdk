@@ -91,7 +91,7 @@ cardano-cli byron genesis genesis \
   --start-time "${START_TIME}" \
   --k "${SECURITY_PARAM}" \
   --n-poor-addresses 0 \
-  --n-delegate-addresses "${NUM_SPO_NODES}" \
+  --n-delegate-addresses "${NUM_SP_NODES}" \
   --total-balance ${INIT_SUPPLY} \
   --delegate-share 1 \
   --avvm-entry-count 0 \
@@ -101,7 +101,7 @@ cardano-cli byron genesis genesis \
 
 # Because in Babbage the overlay schedule and decentralization parameter
 # are deprecated, we must use the "create-staked" cli command to create
-# SPOs in the ShelleyGenesis
+# SPs in the ShelleyGenesis
 
 cp templates/babbage/alonzo-babbage-test-genesis.json "${ROOT}/genesis.alonzo.spec.json"
 cp templates/babbage/byron-configuration.yaml "${ROOT}/configuration.yaml"
@@ -129,14 +129,14 @@ $SED -i "${ROOT}/configuration.yaml" \
 # Copy the cost mode
 cardano-cli genesis create-staked --genesis-dir "${ROOT}" \
   --testnet-magic "${NETWORK_MAGIC}" \
-  --gen-pools ${NUM_SPO_NODES} \
+  --gen-pools ${NUM_SP_NODES} \
   --supply ${MAX_SUPPLY} \
   --supply-delegated ${MAX_SUPPLY} \
-  --gen-stake-delegs ${NUM_SPO_NODES} \
-  --gen-utxo-keys ${NUM_SPO_NODES}
+  --gen-stake-delegs ${NUM_SP_NODES} \
+  --gen-utxo-keys ${NUM_SP_NODES}
 
 # create the node directories
-for NODE in ${SPO_NODES}; do
+for NODE in ${SP_NODES}; do
   mkdir -p "${ROOT}/${NODE}"
 done
 
@@ -171,8 +171,8 @@ $SED -i "${ROOT}/genesis/shelley/genesis.json" \
     -e 's/"tau": 0.0/"tau": 0.1/' \
     -e 's/"updateQuorum": 5/"updateQuorum": 2/'
 
-for NODE_ID in ${SPO_NODES_ID}; do
-  TARGET="${ROOT}/node-spo${NODE_ID}"
+for NODE_ID in ${SP_NODES_ID}; do
+  TARGET="${ROOT}/node-sp${NODE_ID}"
   PORT="$(("$NODE_ID" + 3000))"
 
   mv "${ROOT}/pools/vrf${NODE_ID}.skey" "${TARGET}/vrf.skey"
@@ -189,17 +189,17 @@ for NODE_ID in ${SPO_NODES_ID}; do
 done
 
 # Make topology files
-for ID in ${SPO_NODES_ID}; do
+for ID in ${SP_NODES_ID}; do
   port="$(("$ID" + 3001))"
 
-  if [ "$ID" -ge "$(("$NUM_SPO_NODES" - 1))" ] # Wrap around
+  if [ "$ID" -ge "$(("$NUM_SP_NODES" - 1))" ] # Wrap around
   then
-    port="$(("$port" - "$(("$NUM_SPO_NODES" - 1))"))"
+    port="$(("$port" - "$(("$NUM_SP_NODES" - 1))"))"
   fi
 
   secondPort="$(("$port" + 1))"
 
-  cat > "${ROOT}/node-spo${ID}/topology.json" <<EOF
+  cat > "${ROOT}/node-sp${ID}/topology.json" <<EOF
   {
      "Producers": [
        {
@@ -218,7 +218,7 @@ EOF
 
 done
 
-for NODE in ${SPO_NODES}; do
+for NODE in ${SP_NODES}; do
   (
     echo "#!/usr/bin/env bash"
     echo ""
@@ -297,7 +297,7 @@ echo "" >> "${ROOT}/run/all.sh"
 echo "export PATH=\$PWD/bin:\$PATH" >> "${ROOT}/run/all.sh"
 echo "" >> "${ROOT}/run/all.sh"
 
-for NODE in ${SPO_NODES}; do
+for NODE in ${SP_NODES}; do
   echo "$ROOT/${NODE}.sh &" >> "${ROOT}/run/all.sh"
 done
 echo "" >> "${ROOT}/run/all.sh"
