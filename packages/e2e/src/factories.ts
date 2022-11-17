@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   AssetProvider,
+  Cardano,
   ChainHistoryProvider,
   NetworkInfoProvider,
   ProviderFactory,
@@ -260,6 +261,13 @@ export const keyAgentById = memoize(async (accountIndex: number, provider: strin
   return keyManagementFactory.create(provider, params, dummyLogger);
 });
 
+export type KeyAgentFactoryProps = {
+  accountIndex: number;
+  mnemonic: string;
+  networkId: Cardano.NetworkId;
+  password: string;
+};
+
 export type GetWalletProps = {
   env: any;
   idx?: number;
@@ -267,6 +275,7 @@ export type GetWalletProps = {
   name: string;
   polling?: PollingConfig;
   stores?: storage.WalletStores;
+  customKeyParams?: KeyAgentFactoryProps;
 };
 
 /**
@@ -295,7 +304,7 @@ const patchInitializeTxToRespectEpochBoundary = <T extends ObservableWallet>(
  * @returns an object containing the wallet and providers passed to it
  */
 export const getWallet = async (props: GetWalletProps) => {
-  const { env, idx, logger, name, polling, stores } = props;
+  const { env, idx, logger, name, polling, stores, customKeyParams } = props;
   const providers = {
     assetProvider: await assetProviderFactory.create(env.ASSET_PROVIDER, env.ASSET_PROVIDER_PARAMS, logger),
     chainHistoryProvider: await chainHistoryProviderFactory.create(
@@ -321,7 +330,9 @@ export const getWallet = async (props: GetWalletProps) => {
     ),
     utxoProvider: await utxoProviderFactory.create(env.UTXO_PROVIDER, env.UTXO_PROVIDER_PARAMS, logger)
   };
-  const keyManagementParams = { ...env.KEY_MANAGEMENT_PARAMS, ...(idx === undefined ? {} : { accountIndex: idx }) };
+  const envKeyParams = customKeyParams ? customKeyParams : env.KEY_MANAGEMENT_PARAMS;
+  const keyManagementParams = { ...envKeyParams, ...(idx === undefined ? {} : { accountIndex: idx }) };
+
   const { wallet } = await setupWallet({
     createKeyAgent: await keyManagementFactory.create(env.KEY_MANAGEMENT_PROVIDER, keyManagementParams, logger),
     createWallet: async (keyAgent: AsyncKeyAgent) =>
