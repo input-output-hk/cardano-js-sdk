@@ -45,7 +45,7 @@ export enum VotingPurpose {
 export interface BuildVotingRegistrationProps {
   delegations: GovernanceKeyDelegation[];
   stakeKey: Cardano.Ed25519PublicKey;
-  rewardAccount: Cardano.RewardAccount;
+  rewardAddress: Cardano.Address;
   purpose: VotingPurpose;
   nonce?: number;
 }
@@ -68,10 +68,10 @@ export const metadataBuilder = {
     delegations,
     stakeKey,
     purpose,
-    rewardAccount,
+    rewardAddress,
     nonce = Date.now()
   }: BuildVotingRegistrationProps): Cardano.TxMetadata {
-    const cmlRewardAddress = CML.Address.from_bech32(rewardAccount.toString());
+    const cmlRewardAddress = CML.Address.from_bech32(rewardAddress.toString());
     const votingRegistration = new Map<bigint, Cardano.Metadatum>([
       [1n, delegations.map(({ votingKey, weight }) => [Buffer.from(votingKey, 'hex'), BigInt(weight)])],
       [2n, Buffer.from(stakeKey, 'hex')],

@@ -37,8 +37,8 @@ describe('cip36', () => {
     it('can create cip36 voting registration metadata', async () => {
       // Just ensuring we have some address. SingleAddressWallet already does this internally.
       await walletKeyAgent.deriveAddress({ index: 0, type: AddressType.External });
-      // SingleAddressWallet uses a single reward account, so it can be taken from any GroupedAddress
-      const rewardAccount = walletKeyAgent.knownAddresses[0].rewardAccount;
+      // Set reward address to the derived address.
+      const rewardAddress = await walletKeyAgent.knownAddresses[0].address;
       // InMemoryKeyAgent uses this derivation path for stake key.
       const stakeKey = await walletKeyAgent.derivePublicKey(util.STAKE_KEY_DERIVATION_PATH);
       // "Delegating" voting power to your own voting key
@@ -51,7 +51,7 @@ describe('cip36', () => {
       const votingRegistrationMetadata: Cardano.TxMetadata = cip36.metadataBuilder.buildVotingRegistration({
         delegations,
         purpose: cip36.VotingPurpose.CATALYST,
-        rewardAccount,
+        rewardAddress,
         stakeKey
       });
       const signedVotingRegistrationMetadata: Cardano.TxMetadata = await cip36.metadataBuilder.signVotingRegistration(
