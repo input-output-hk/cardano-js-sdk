@@ -10,9 +10,7 @@ here="$(cd "$(dirname "$0")" >/dev/null 2>&1 && pwd)"
 root_path="$(cd "$here/.." && pwd)"
 cd "$root_path"
 
-rm -rf ./network-files/node-spo1/*
-rm -rf ./network-files/node-spo2/*
-rm -rf ./network-files/node-spo3/*
+rm -rf ./network-files/node-sp*/*
 rm -rf ./sockets/*
 rm -rf ./config/*
 rm -rf ./logs/*

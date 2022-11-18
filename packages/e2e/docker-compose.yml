@@ -7,7 +7,7 @@ services:
     ports:
       - 3001:3001
     volumes:
-      - ./local-network/network-files/node-spo1/:/root/network-files/node-spo1
+      - ./local-network/network-files/node-sp1/:/root/network-files/node-sp1
       - ./local-network/config:/root/config
     depends_on:
       # We need the file server here in order to calculate the pool metadata hashes

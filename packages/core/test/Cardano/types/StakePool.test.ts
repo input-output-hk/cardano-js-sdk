@@ -5,6 +5,13 @@ describe('Cardano/types/StakePool', () => {
     expect(() => Cardano.PoolId('pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh')).not.toThrow();
   });
 
+  it('PoolId.fromKeyHash() returns valid pool id encoded as a bech32 string', () => {
+    const poolId = Cardano.PoolId.fromKeyHash(
+      Cardano.Ed25519KeyHash('594df1c896f6b05d4bebec0287627cf83416db779a3273205d3db9e0')
+    );
+    expect(poolId).toEqual(Cardano.PoolId('pool1t9xlrjyk76c96jltaspgwcnulq6pdkmhnge8xgza8ku7qvpsy9r'));
+  });
+
   it('PoolIdHex() accepts a valid pool id hex string', () => {
     expect(() => Cardano.PoolIdHex('e4b1c8ec89415ce6349755a1aa44b4affbb5f1248ff29943d190c715')).not.toThrow();
   });
