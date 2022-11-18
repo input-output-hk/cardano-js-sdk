@@ -1,6 +1,6 @@
+import { Cardano, Intersection } from '@cardano-sdk/core';
 import { Commit } from 'git-last-commit';
 import { getLastCommitPromise } from './util';
-import { Cardano, Intersection } from '@cardano-sdk/core';
 const packageJson = require('../../package.json');
 
 export type Metadata = {

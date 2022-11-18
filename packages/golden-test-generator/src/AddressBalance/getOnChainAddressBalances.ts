@@ -1,9 +1,9 @@
 /* eslint-disable complexity */
 import { GeneratorMetadata } from '../Content';
+import { Intersection } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { Ogmios, ogmiosToCore } from '@cardano-sdk/ogmios';
 import { applyValue } from './applyValue';
-import { Intersection } from '@cardano-sdk/core';
 
 export type AddressBalances = {
   [address: string]: Ogmios.Schema.Value;
@@ -22,7 +22,7 @@ export const getOnChainAddressBalances = (
     onBlock?: (slot: number) => void;
   }
 ): Promise<AddressBalancesResponse> => {
-  const { logger } = options;
+  const { logger, ogmiosConnectionConfig, onBlock } = options;
   const trackedAddressBalances: AddressBalances = Object.fromEntries(
     addresses.map((address) => [address, { assets: {}, coins: 0n }])
   );
@@ -37,16 +37,18 @@ export const getOnChainAddressBalances = (
       balances: {},
       metadata: {
         cardano: {
-          compactGenesis: ogmiosToCore.genesis(await Ogmios.StateQuery.genesisConfig(
-            await Ogmios.createInteractionContext(reject, logger.info, { connection: options.ogmiosConnectionConfig })
-          )),
+          compactGenesis: ogmiosToCore.genesis(
+            await Ogmios.StateQuery.genesisConfig(
+              await Ogmios.createInteractionContext(reject, logger.info, { connection: ogmiosConnectionConfig })
+            )
+          ),
           intersection: undefined as unknown as Intersection
         }
       }
     };
     try {
       const syncClient = await Ogmios.createChainSyncClient(
-        await Ogmios.createInteractionContext(reject, logger.info, { connection: options.ogmiosConnectionConfig }),
+        await Ogmios.createInteractionContext(reject, logger.info, { connection: ogmiosConnectionConfig }),
         {
           rollBackward: async (_res, requestNext) => {
             requestNext();
@@ -63,7 +65,7 @@ export const getOnChainAddressBalances = (
               | Ogmios.Schema.BlockAlonzo
               | Ogmios.Schema.BlockBabbage;
             let blockBody:
-              undefined
+              | undefined
               | Ogmios.Schema.StandardBlock['body']['txPayload']
               | Ogmios.Schema.BlockShelley['body']
               | Ogmios.Schema.BlockAllegra['body']
@@ -95,8 +97,8 @@ export const getOnChainAddressBalances = (
             }
             if (b !== undefined) {
               currentBlock = b.header!.blockHeight;
-              if (options?.onBlock !== undefined) {
-                options.onBlock(currentBlock);
+              if (onBlock !== undefined) {
+                onBlock(currentBlock);
               }
               if (blockBody) {
                 for (const tx of blockBody) {
@@ -133,7 +135,7 @@ export const getOnChainAddressBalances = (
           }
         }
       );
-      response.metadata.cardano.intersection = await syncClient.startSync(['origin']) as Intersection;
+      response.metadata.cardano.intersection = (await syncClient.startSync(['origin'])) as Intersection;
     } catch (error) {
       logger.error(error);
       return reject(error);

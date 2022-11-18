@@ -2552,6 +2552,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/golden-test-generator@workspace:packages/golden-test-generator"
   dependencies:
+    "@cardano-sdk/core": ^0.6.0
     "@cardano-sdk/ogmios": ^0.6.0
     "@cardano-sdk/util": ^0.6.0
     "@types/cli-progress": ^3.9.2

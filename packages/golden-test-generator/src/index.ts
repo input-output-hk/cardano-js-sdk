@@ -1,15 +1,16 @@
 #!/usr/bin/env node
+/* eslint-disable no-console */
 import { AddressBalancesResponse, getOnChainAddressBalances } from './AddressBalance';
 import { Command } from 'commander';
+import { GeneratorMetadata, prepareContent } from './Content';
 import { GetChainSyncEventsResponse, getChainSyncEvents as chainSync } from './ChainSyncEvents';
 import { Options, SingleBar } from 'cli-progress';
-import { ensureDir, writeFile } from 'fs-extra';
-import { GeneratorMetadata, prepareContent } from './Content';
 import { createLogger } from 'bunyan';
+import { ensureDir, writeFile } from 'fs-extra';
+import { toSerializableObject } from '@cardano-sdk/util';
 import chalk from 'chalk';
 import hash from 'object-hash';
 import path from 'path';
-import { toSerializableObject } from '@cardano-sdk/util';
 
 const clear = require('clear');
 const packageJson = require('../../package.json');
@@ -78,29 +79,33 @@ program
     }
   });
 
-const mapBlockHeights = (blockHeights: string) => 
-    blockHeights
-      .split(',')
-      .filter((b) => b !== '')
-      .flatMap((blockHeightSpec) => {
-        const [from, to] = blockHeightSpec.split('..').map(blockHeight => Number.parseInt(blockHeight));
-        if (!to) { // 0 is not supported, as such range doesn't make sense
-          if (!Number.isNaN(from)) return [from]; // single block
-          throw new Error('blockHeights must be either numbers or ranges, see --help')
-        }
-        const result: number[] = [];
-        for (let blockHeight = from; blockHeight <= to; blockHeight++) {
-          result.push(blockHeight)
-        }
-        return result;
-      });
+const mapBlockHeights = (blockHeights: string) =>
+  blockHeights
+    .split(',')
+    .filter((b) => b !== '')
+    .flatMap((blockHeightSpec) => {
+      const [from, to] = blockHeightSpec.split('..').map((blockHeight) => Number.parseInt(blockHeight));
+      if (!to) {
+        // 0 is not supported, as such range doesn't make sense
+        if (!Number.isNaN(from)) return [from]; // single block
+        throw new Error('blockHeights must be either numbers or ranges, see --help');
+      }
+      const result: number[] = [];
+      for (let blockHeight = from; blockHeight <= to; blockHeight++) {
+        result.push(blockHeight);
+      }
+      return result;
+    });
 
 program
   .command('chain-sync-events')
   .description('Dump the requested blocks (rollForward) in their raw structure and simulate rollbacks')
-  .argument('[blockHeights]', `Comma-separated sorted list of blocks by number.
+  .argument(
+    '[blockHeights]',
+    `Comma-separated sorted list of blocks by number.
   Use "-" for rollback to a block, e.g. 10,11,-10,11
-  Use ".." for block ranges (inclusive), e.g. 0..9`)
+  Use ".." for block ranges (inclusive), e.g. 0..9`
+  )
   .requiredOption('--out-dir [outDir]', 'File path to write results to')
   .option('--log-level [logLevel]', 'Minimum log level', 'info')
   .action(async (blockHeightsInput: string, { logLevel, outDir }) => {
@@ -124,7 +129,7 @@ program
         options: {
           blockHeights: blockHeightsInput
         }
-      }
+      };
       progress.stop();
       const content = await prepareContent<GetChainSyncEventsResponse['events']>(fullMetadata, data);
       const fileName = path.join(outDir, `blocks-${hash(content)}.json`);
