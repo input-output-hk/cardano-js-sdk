@@ -57,6 +57,7 @@
     "coverage": "shx echo No coverage report for this package"
   },
   "dependencies": {
+    "@cardano-sdk/core": "^0.6.0",
     "@cardano-sdk/ogmios": "^0.6.0",
     "@cardano-sdk/util": "^0.6.0",
     "bunyan": "^1.8.15",
@@ -66,7 +67,6 @@
     "commander": "^8.0.0",
     "fs-extra": "^10.0.0",
     "git-last-commit": "^1.0.0",
-    "json-bigint": "^1.0.0",
     "object-hash": "^2.2.0",
     "ts-log": "^2.2.3"
   },

@@ -1,18 +1,19 @@
 #!/usr/bin/env node
+/* eslint-disable no-console */
 import { AddressBalancesResponse, getOnChainAddressBalances } from './AddressBalance';
 import { Command } from 'commander';
-import { GetBlocksResponse, getBlocks } from './Block';
+import { GeneratorMetadata, prepareContent } from './Content';
+import { GetChainSyncEventsResponse, getChainSyncEvents as chainSync } from './ChainSyncEvents';
 import { Options, SingleBar } from 'cli-progress';
-import { ensureDir, writeFile } from 'fs-extra';
-import { prepareContent } from './Content';
 import { createLogger } from 'bunyan';
-import JSONBig from 'json-bigint';
+import { ensureDir, writeFile } from 'fs-extra';
+import { toSerializableObject } from '@cardano-sdk/util';
 import chalk from 'chalk';
 import hash from 'object-hash';
 import path from 'path';
 
 const clear = require('clear');
-const packageJson = require('../package.json');
+const packageJson = require('../../package.json');
 
 clear();
 console.log(chalk.blue('Cardano Golden Test Generator'));
@@ -70,7 +71,7 @@ program
       const fileName = path.join(outDir, `address-balances-${hash(content)}.json`);
 
       logger.info(`Writing ${fileName}`);
-      await writeFile(fileName, JSONBig.stringify(content, undefined, 2));
+      await writeFile(fileName, JSON.stringify(toSerializableObject(content), undefined, 2));
       process.exit(0);
     } catch (error) {
       console.error(error);
@@ -78,39 +79,63 @@ program
     }
   });
 
+const mapBlockHeights = (blockHeights: string) =>
+  blockHeights
+    .split(',')
+    .filter((b) => b !== '')
+    .flatMap((blockHeightSpec) => {
+      const [from, to] = blockHeightSpec.split('..').map((blockHeight) => Number.parseInt(blockHeight));
+      if (!to) {
+        // 0 is not supported, as such range doesn't make sense
+        if (!Number.isNaN(from)) return [from]; // single block
+        throw new Error('blockHeights must be either numbers or ranges, see --help');
+      }
+      const result: number[] = [];
+      for (let blockHeight = from; blockHeight <= to; blockHeight++) {
+        result.push(blockHeight);
+      }
+      return result;
+    });
+
 program
-  .command('get-block')
-  .description('Dump the requested blocks in their raw structure')
-  .argument('[blockHeights]', 'Comma-separated list of blocks by number', (blockHeights) =>
-    blockHeights
-      .split(',')
-      .filter((b) => b !== '')
-      .map((blockHeight) => Number.parseInt(blockHeight))
+  .command('chain-sync-events')
+  .description('Dump the requested blocks (rollForward) in their raw structure and simulate rollbacks')
+  .argument(
+    '[blockHeights]',
+    `Comma-separated sorted list of blocks by number.
+  Use "-" for rollback to a block, e.g. 10,11,-10,11
+  Use ".." for block ranges (inclusive), e.g. 0..9`
   )
   .requiredOption('--out-dir [outDir]', 'File path to write results to')
   .option('--log-level [logLevel]', 'Minimum log level', 'info')
-  .action(async (blockHeights: number[], { logLevel, outDir }) => {
+  .action(async (blockHeightsInput: string, { logLevel, outDir }) => {
     try {
       const { ogmiosHost, ogmiosPort, ogmiosTls } = program.opts();
-      const sortedblockHeights = blockHeights.sort((a: number, b: number) => a - b);
-      const lastblockHeight = sortedblockHeights[sortedblockHeights.length - 1];
-      const logger = createLogger({ level: logLevel, name: 'get-block' });
+      const blockHeights = mapBlockHeights(blockHeightsInput);
+      const lastblockHeight = blockHeights[blockHeights.length - 1];
+      const logger = createLogger({ level: logLevel, name: 'chain-sync-events' });
       const progress = createProgressBar(lastblockHeight);
       await ensureDir(outDir);
       progress.start(lastblockHeight, 0);
-      const { blocks, metadata } = await getBlocks(sortedblockHeights, {
+      const { events: data, metadata } = await chainSync(blockHeights, {
         logger,
         ogmiosConnectionConfig: { host: ogmiosHost, port: ogmiosPort, tls: ogmiosTls },
         onBlock: (blockHeight) => {
           progress.update(blockHeight);
         }
       });
+      const fullMetadata: GeneratorMetadata['metadata'] = {
+        ...metadata,
+        options: {
+          blockHeights: blockHeightsInput
+        }
+      };
       progress.stop();
-      const content = await prepareContent<GetBlocksResponse['blocks']>(metadata, blocks);
+      const content = await prepareContent<GetChainSyncEventsResponse['events']>(fullMetadata, data);
       const fileName = path.join(outDir, `blocks-${hash(content)}.json`);
 
       logger.info(`Writing ${fileName}`);
-      await writeFile(fileName, JSONBig.stringify(content, undefined, 2));
+      await writeFile(fileName, JSON.stringify(toSerializableObject(content), undefined, 2));
       process.exit(0);
     } catch (error) {
       console.error(error);
@@ -128,3 +153,6 @@ if (process.argv.slice(2).length === 0) {
     process.exit(0);
   });
 }
+
+type PromiseType<P> = P extends Promise<infer T> ? T : never;
+export type ChainSyncData = PromiseType<ReturnType<typeof prepareContent<GetChainSyncEventsResponse['events']>>>;

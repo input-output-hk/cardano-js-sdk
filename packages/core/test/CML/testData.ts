@@ -81,6 +81,12 @@ export const txBody: Cardano.NewTxBodyAlonzo = {
       __typename: Cardano.CertificateType.PoolRetirement,
       epoch: 500,
       poolId: Cardano.PoolId('pool1y6chk7x7fup4ms9leesdr57r4qy9cwxuee0msan72x976a6u0nc')
+    },
+    {
+      __typename: Cardano.CertificateType.GenesisKeyDelegation,
+      genesisDelegateHash: Cardano.util.Hash28ByteBase16('a646474b8f5431261506b6c273d307c7569a4eb6c96b42dd4a29520a'),
+      genesisHash: Cardano.util.Hash28ByteBase16('0d94e174732ef9aae73f395ab44507bfa983d65023c11a951f0c32e4'),
+      vrfKeyHash: Cardano.util.Hash32ByteBase16('03170a2e7597b7b7e3d84c05391d139a62b157e78786d8c082f29dcf4c111314')
     }
   ],
   collaterals: [{ ...txIn, index: txIn.index + 1 }],
@@ -128,7 +134,7 @@ export const tx: Cardano.NewTxAlonzo = {
     }
   },
   body: txBody,
-  id: Cardano.TransactionId('de9d33f66cffff721673219b19470aec81d96bc9253182369e41eec58389a448'),
+  id: Cardano.TransactionId('8d2feeab1087e0aa4ad06e878c5269eaa2edcef5264bcc97542a28c189b2cbc5'),
   witness: {
     signatures: new Map([[Cardano.Ed25519PublicKey(vkey), Cardano.Ed25519Signature(signature)]])
   }

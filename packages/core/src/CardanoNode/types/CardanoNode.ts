@@ -1,8 +1,8 @@
+import { Block, Lovelace, PoolId, Tip, VrfVkHex } from '../../Cardano';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { CardanoNodeError } from './CardanoNodeErrors';
 import { HealthCheckResponse } from '../../Provider';
-import { Lovelace, PoolId, VrfVkHex } from '../../Cardano';
 
 export interface EraSummary {
   parameters: {
@@ -52,3 +52,31 @@ export interface CardanoNode {
    */
   healthCheck(): Promise<HealthCheckResponse>;
 }
+
+// Similar to Ogmios.Point, but using Cardano.BlockId opaque string for hash
+export type Point = Pick<Tip, 'hash' | 'slot'>;
+export type Origin = 'origin';
+export type TipOrOrigin = Tip | Origin;
+export type PointOrOrigin = Point | Origin;
+export type Intersection = {
+  point: PointOrOrigin;
+  tip: TipOrOrigin;
+};
+
+export enum ChainSyncEventType {
+  RollForward,
+  RollBackward
+}
+
+export interface ChainSyncRollForward {
+  tip: Tip;
+  eventType: ChainSyncEventType.RollForward;
+  block: Block;
+}
+
+export interface ChainSyncRollBackward {
+  eventType: ChainSyncEventType.RollBackward;
+  tip: TipOrOrigin;
+}
+
+export type ChainSyncEvent = ChainSyncRollForward | ChainSyncRollBackward;

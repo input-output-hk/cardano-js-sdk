@@ -14,7 +14,7 @@ import {
   StakeDelegationCertificate,
   VrfVkHex
 } from '../../Cardano/types';
-import { Hash32ByteBase16 } from '../../Cardano/util/primitives';
+import { Hash28ByteBase16, Hash32ByteBase16 } from '../../Cardano/util/primitives';
 import { NetworkId } from '../../Cardano/NetworkId';
 import { NotImplementedError, SerializationError, SerializationFailure } from '../../errors';
 import { usingAutoFree } from '@cardano-sdk/util';
@@ -132,14 +132,12 @@ const poolRetirement = (certificate: CML.PoolRetirement): PoolRetirementCertific
     poolId: PoolId(scope.manage(certificate.pool_keyhash()).to_bech32('pool'))
   }));
 
-const genesisKeyDelegaation = (certificate: CML.GenesisKeyDelegation): GenesisKeyDelegationCertificate =>
+const genesisKeyDelegation = (certificate: CML.GenesisKeyDelegation): GenesisKeyDelegationCertificate =>
   usingAutoFree((scope) => ({
     __typename: CertificateType.GenesisKeyDelegation,
-    genesisDelegateHash: Hash32ByteBase16(
-      Buffer.from(scope.manage(certificate.genesis_delegate_hash()).to_bytes()).toString()
-    ),
-    genesisHash: Hash32ByteBase16(Buffer.from(scope.manage(certificate.genesishash()).to_bytes()).toString()),
-    vrfKeyHash: Hash32ByteBase16(Buffer.from(scope.manage(certificate.vrf_keyhash()).to_bytes()).toString())
+    genesisDelegateHash: Hash28ByteBase16(scope.manage(certificate.genesis_delegate_hash()).to_hex()),
+    genesisHash: Hash28ByteBase16(scope.manage(certificate.genesishash()).to_hex()),
+    vrfKeyHash: Hash32ByteBase16(scope.manage(certificate.vrf_keyhash()).to_hex())
   }));
 
 export const createCertificate = (cmlCertificate: CML.Certificate): Certificate =>
@@ -156,7 +154,7 @@ export const createCertificate = (cmlCertificate: CML.Certificate): Certificate 
       case CML.CertificateKind.PoolRetirement:
         return poolRetirement(scope.manage(cmlCertificate.as_pool_retirement()!));
       case CML.CertificateKind.GenesisKeyDelegation:
-        return genesisKeyDelegaation(scope.manage(cmlCertificate.as_genesis_key_delegation()!));
+        return genesisKeyDelegation(scope.manage(cmlCertificate.as_genesis_key_delegation()!));
       case CML.CertificateKind.MoveInstantaneousRewardsCert:
         throw new NotImplementedError('MIR certificate conversion'); // TODO: support this certificate type
       default:
