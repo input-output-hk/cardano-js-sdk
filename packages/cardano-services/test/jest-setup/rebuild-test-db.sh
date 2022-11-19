@@ -7,9 +7,11 @@ WORKSPACE_ROOT="$(dirname "${PACKAGES_DIR}")"
 SECRETS_DIR="$PACKAGES_DIR"/cardano-services/placeholder-secrets
 
 yarn --cwd "$PACKAGES_DIR"/e2e local-network:down
-yarn --cwd "$PACKAGES_DIR"/e2e local-network:up -d
+yarn --cwd "$PACKAGES_DIR"/e2e local-network:up -d --build
 yarn --cwd "$WORKSPACE_ROOT" build
 yarn --cwd "$PACKAGES_DIR"/e2e test:wallet
+yarn --cwd "$PACKAGES_DIR"/e2e test:long-running
+yarn --cwd "$PACKAGES_DIR"/e2e test:local-network register-pool.test.ts
 echo 'Stop writing data'
 docker compose -p local-network-e2e stop cardano-db-sync
 echo 'Creating snapshot...'
