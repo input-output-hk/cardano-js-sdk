@@ -19,7 +19,9 @@
   "scripts": {
     "artillery:stake-pool-query": "WORKERS=1 node -r ts-node/register ../../node_modules/.bin/artillery run test/artillery/StakePoolSearch.yml",
     "artillery:wallet-restoration": "WORKERS=1 node -r ts-node/register ../../node_modules/.bin/artillery run --dotenv ./.env test/artillery/wallet-restoration/WalletRestoration.yml",
+    "load-test-custom:wallet-init": "ts-node test/load-test-custom/wallet-init/wallet-init.test.ts",
     "test": "shx echo 'test' command not implemented yet",
+    "test:measurement-util": "jest -c jest.config.js --forceExit --selectProjects measurement-util --verbose",
     "test:load-testing": "jest -c jest.config.js --forceExit --selectProjects load-testing --runInBand --verbose",
     "test:long-running": "jest -c jest.config.js --forceExit --selectProjects long-running --runInBand --verbose",
     "test:local-network": "jest -c jest.config.js --forceExit --selectProjects local-network --runInBand --verbose",
