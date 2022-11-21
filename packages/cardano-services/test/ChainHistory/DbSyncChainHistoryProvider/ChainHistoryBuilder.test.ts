@@ -12,7 +12,7 @@ describe('ChainHistoryBuilder', () => {
 
   beforeAll(async () => {
     dbConnection = new Pool({
-      connectionString: process.env.LOCALNETWORK_INTEGRATION_TESTS_POSTGRES_CONNECTION_STRING
+      connectionString: process.env.POSTGRES_CONNECTION_STRING
     });
     builder = new ChainHistoryBuilder(dbConnection, logger);
     fixtureBuilder = new ChainHistoryFixtureBuilder(dbConnection, logger);

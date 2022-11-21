@@ -94,7 +94,7 @@ describe('StakePoolHttpService', () => {
   const epochPollInterval = 2 * 1000;
   const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
   const db = new Pool({
-    connectionString: process.env.LOCALNETWORK_INTEGRATION_TESTS_POSTGRES_CONNECTION_STRING,
+    connectionString: process.env.POSTGRES_CONNECTION_STRING,
     max: 1,
     min: 1
   });

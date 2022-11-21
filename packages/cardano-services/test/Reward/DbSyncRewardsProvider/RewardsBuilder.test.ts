@@ -6,7 +6,7 @@ import { logger } from '@cardano-sdk/util-dev';
 
 describe('RewardsBuilder', () => {
   const dbConnection = new Pool({
-    connectionString: process.env.LOCALNETWORK_INTEGRATION_TESTS_POSTGRES_CONNECTION_STRING
+    connectionString: process.env.POSTGRES_CONNECTION_STRING
   });
   const builder = new RewardsBuilder(dbConnection, logger);
   const fixtureBuilder = new RewardsFixtureBuilder(dbConnection, logger);

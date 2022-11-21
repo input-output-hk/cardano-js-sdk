@@ -42,7 +42,7 @@ describe('NetworkInfoHttpService', () => {
   const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
   const db = new Pool({
-    connectionString: process.env.LOCALNETWORK_INTEGRATION_TESTS_POSTGRES_CONNECTION_STRING,
+    connectionString: process.env.POSTGRES_CONNECTION_STRING,
     max: 1,
     min: 1
   });

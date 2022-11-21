@@ -36,7 +36,7 @@ describe('RewardsHttpService', () => {
     clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
     config = { listen: { port } };
     dbConnection = new Pool({
-      connectionString: process.env.LOCALNETWORK_INTEGRATION_TESTS_POSTGRES_CONNECTION_STRING
+      connectionString: process.env.POSTGRES_CONNECTION_STRING
     });
     fixtureBuilder = new RewardsFixtureBuilder(dbConnection, logger);
   });

@@ -99,7 +99,7 @@ describe('CLI', () => {
 
     beforeAll(async () => {
       ({ rabbitmqUrl } = await container.load());
-      db = new Pool({ connectionString: process.env.LOCALNETWORK_INTEGRATION_TESTS_POSTGRES_CONNECTION_STRING });
+      db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
       fixtureBuilder = new AssetFixtureBuilder(db, logger);
     });
 
