@@ -1,0 +1,22 @@
+config:
+  # target is a required field for artillery, but it is actually
+  # ignored since we are not using artillery to perform the HTTP requests.
+  target: "http://localhost"
+  http:
+    timeout: 180
+  phases:
+    - name: 'Restore wallet'
+      # The duration of an arrival phase determines only how long virtual users will be generated for. It is not the same as the duration of a test run.
+      duration: "{{$processEnvironment.ARRIVAL_PHASE_DURATION_IN_SECS}}"
+      # Fixed number of arrivals (virtual users)
+      arrivalCount: "{{$processEnvironment.VIRTUAL_USERS_COUNT}}"
+  processor: "./WalletRestoration.ts"
+before:
+    flow:
+      - log: "Find distinct addresses from DB"
+      - function: "findAddresses"
+scenarios:
+  - name: "Wallet restoration"
+    afterScenario: "shutdownWallet"
+    flow:
+      - function: "walletRestoration"
