@@ -3,7 +3,7 @@ export const HEALTH_RESPONSE_BODY = {
   currentEpoch: 192,
   currentEra: 'Alonzo',
   lastKnownTip: {
-    blockNo: 3_391_731,
+    blockNo: 100,
     hash: '9ef43ab6e234fcf90d103413096c7da752da2f45b15e1259f43d476afd12932c',
     slot: 52_819_355
   },
