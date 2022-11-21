@@ -10,6 +10,7 @@ import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../src/Net
 import { HttpServer, HttpServerConfig } from '../../src';
 import { INFO, createLogger } from 'bunyan';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../src/InMemoryCache';
+import { NetworkInfoFixtureBuilder } from './fixtures/FixtureBuilder';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
@@ -40,7 +41,12 @@ describe('NetworkInfoHttpService', () => {
   const epochPollInterval = 2 * 1000;
   const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
-  const db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING, max: 1, min: 1 });
+  const db = new Pool({
+    connectionString: process.env.LOCALNETWORK_INTEGRATION_TESTS_POSTGRES_CONNECTION_STRING,
+    max: 1,
+    min: 1
+  });
+  const fixtureBuilder = new NetworkInfoFixtureBuilder(db, logger);
   const epochMonitor = new DbSyncEpochPollService(db, epochPollInterval!);
 
   describe('unhealthy NetworkInfoProvider', () => {
@@ -167,7 +173,6 @@ describe('NetworkInfoHttpService', () => {
       const stakeTotalQueriesCount = 2;
       const stakeDbQueriesCount = 1;
       const stakeNodeQueriesCount = 1;
-      const DB_POLL_QUERIES_COUNT = 1;
 
       describe('with Http Server', () => {
         it('returns a 200 coded response with a well formed HTTP request', async () => {
@@ -213,14 +218,13 @@ describe('NetworkInfoHttpService', () => {
 
       it('should not invalidate the epoch values from the cache if there is no epoch rollover', async () => {
         const cardanoNodeStakeSpy = jest.spyOn(cardanoNode, 'stakeDistribution');
-        const totalQueriesCount = stakeTotalQueriesCount + DB_POLL_QUERIES_COUNT;
-        const currentEpochNo = 205;
+        const currentEpochNo = await fixtureBuilder.getLasKnownEpoch();
         await provider.stake();
         expect(cache.keys().length).toEqual(stakeTotalQueriesCount);
         await sleep(epochPollInterval * 2);
         expect(await epochMonitor.getLastKnownEpoch()).toEqual(currentEpochNo);
         expect(cache.keys().length).toEqual(stakeTotalQueriesCount);
-        expect(dbConnectionQuerySpy).toBeCalledTimes(totalQueriesCount);
+        expect(dbConnectionQuerySpy).toHaveBeenCalled();
         expect(cardanoNodeStakeSpy).toHaveBeenCalledTimes(stakeNodeQueriesCount);
         expect(clearCacheSpy).not.toHaveBeenCalled();
       });

@@ -5,8 +5,11 @@ export const getMaxSupply = `
   LIMIT 1
 `;
 
+export const lastKnownEpoch = 'select no from epoch order by id desc limit 1';
+
 const Queries = {
-  getMaxSupply
+  getMaxSupply,
+  lastKnownEpoch
 };
 
 export default Queries;
