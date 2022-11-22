@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.6.1-nightly.0...@cardano-sdk/cardano-services-client@0.7.0-nightly.0) (2022-11-22)
+
+### ⚠ BREAKING CHANGES
+
+- classify TxSubmission errors as variant of CardanoNode error
+
+### Code Refactoring
+
+- classify TxSubmission errors as variant of CardanoNode error ([234305e](https://github.com/input-output-hk/cardano-js-sdk/commit/234305e28aefd3d9bd1736315bdf89ca31f7556f))
+
 ## [0.6.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.6.0...@cardano-sdk/cardano-services-client@0.6.1-nightly.0) (2022-11-08)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services-client

@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.1-nightly.0...@cardano-sdk/core@0.7.0-nightly.0) (2022-11-22)
+
+### ⚠ BREAKING CHANGES
+
+- rename block types
+
+* CompactBlock -> BlockInfo
+* Block -> ExtendedBlockInfo
+
+- hoist ogmiosToCore to ogmios package
+- classify TxSubmission errors as variant of CardanoNode error
+
+### Features
+
+- **core:** added utility function to create pool ids from verification key hashes ([318c784](https://github.com/input-output-hk/cardano-js-sdk/commit/318c7847a3b432382f62c11640922b8af606432f))
+- implement ogmiosToCore certificates mapping ([aef2e8d](https://github.com/input-output-hk/cardano-js-sdk/commit/aef2e8d64da9352c6aab206034950d64f44e9559))
+- initial projection implementation ([8a93d8d](https://github.com/input-output-hk/cardano-js-sdk/commit/8a93d8d427eb947b6f34566f8a694fcedfe0e59f))
+
+### Bug Fixes
+
+- **core:** correct hash types in genesis key delegation certificate ([10d1f2b](https://github.com/input-output-hk/cardano-js-sdk/commit/10d1f2b5eda4831e87042cbb4c945d8a62aaa6a4))
+
+### Code Refactoring
+
+- classify TxSubmission errors as variant of CardanoNode error ([234305e](https://github.com/input-output-hk/cardano-js-sdk/commit/234305e28aefd3d9bd1736315bdf89ca31f7556f))
+
 ## [0.6.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0...@cardano-sdk/core@0.6.1-nightly.0) (2022-11-08)
 
 **Note:** Version bump only for package @cardano-sdk/core
