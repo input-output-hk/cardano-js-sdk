@@ -139,7 +139,7 @@ describe('chain history mappers', () => {
     };
     test('map BlockModel to Cardano.Block', () => {
       const result = mappers.mapBlock(blockModel, blockOutputModel, tipModel);
-      expect(result).toEqual<Cardano.Block>({
+      expect(result).toEqual<Cardano.ExtendedBlockInfo>({
         confirmations: 100,
         date: new Date(datetime),
         epoch: 12,
@@ -165,7 +165,7 @@ describe('chain history mappers', () => {
         blockOutputModel,
         tipModel
       );
-      expect(result).toEqual<Cardano.Block>({
+      expect(result).toEqual<Cardano.ExtendedBlockInfo>({
         confirmations: 100,
         date: new Date(datetime),
         epoch: 12,

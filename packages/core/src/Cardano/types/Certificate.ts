@@ -1,6 +1,6 @@
 import { Ed25519KeyHash } from './Key';
 import { EpochNo } from './Block';
-import { Hash32ByteBase16 } from '../util/primitives';
+import { Hash28ByteBase16, Hash32ByteBase16 } from '../util/primitives';
 import { Lovelace } from './Value';
 import { PoolId, PoolParameters } from './StakePool';
 import { RewardAccount } from './RewardAccount';
@@ -51,8 +51,8 @@ export interface MirCertificate {
 
 export interface GenesisKeyDelegationCertificate {
   __typename: CertificateType.GenesisKeyDelegation;
-  genesisHash: Hash32ByteBase16;
-  genesisDelegateHash: Hash32ByteBase16;
+  genesisHash: Hash28ByteBase16;
+  genesisDelegateHash: Hash28ByteBase16;
   vrfKeyHash: Hash32ByteBase16;
 }
 

@@ -32,8 +32,8 @@ export const AssetId = (value: string): AssetId => {
 /**
  * Hex-encoded policy id
  */
-export type PolicyId = Hash28ByteBase16<'PolicyId'>;
-export const PolicyId = (value: string): PolicyId => Hash28ByteBase16(value);
+export type PolicyId = OpaqueString<'PolicyId'>;
+export const PolicyId = (value: string): PolicyId => Hash28ByteBase16(value) as unknown as PolicyId;
 
 /**
  * Fingerprint of a native asset for human comparison

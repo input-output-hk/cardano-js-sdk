@@ -45,7 +45,7 @@ Ed25519PrivateKey.fromHexBlob = (value: HexBlob) => castHexBlob<Ed25519PrivateKe
  * 28 byte ED25519 key hash as hex string
  */
 export type Ed25519KeyHash = OpaqueString<'Ed25519KeyHash'>;
-export const Ed25519KeyHash = (value: string): Ed25519KeyHash => Hash28ByteBase16(value);
+export const Ed25519KeyHash = (value: string): Ed25519KeyHash => Hash28ByteBase16(value) as unknown as Ed25519KeyHash;
 Ed25519KeyHash.fromRewardAccount = (rewardAccount: RewardAccount): Ed25519KeyHash =>
   usingAutoFree((scope) => {
     const bech32 = scope.manage(CML.Address.from_bech32(rewardAccount.toString()));

@@ -31,7 +31,7 @@ export interface ChainHistoryProvider extends Provider {
    * Gets the blocks matching the provided hashes.
    *
    * @param {Cardano.BlockId[]} ids array of block ids
-   * @returns {Cardano.Block[]} an array of blocks, same length and in the same order as `hashes` argument.
+   * @returns {Cardano.ExtendedBlockInfo[]} an array of blocks, same length and in the same order as `hashes` argument.
    */
-  blocksByHashes: (args: BlocksByIdsArgs) => Promise<Cardano.Block[]>;
+  blocksByHashes: (args: BlocksByIdsArgs) => Promise<Cardano.ExtendedBlockInfo[]>;
 }

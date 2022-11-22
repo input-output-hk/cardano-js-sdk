@@ -8,7 +8,7 @@ import {
   typedBech32,
   typedHex
 } from '../../../src/Cardano/util';
-import { InvalidStringError } from '../../../src/errors';
+import { InvalidStringError } from '../../../src';
 
 describe('Cardano.util/primitives', () => {
   describe('typedBech32', () => {
@@ -48,6 +48,17 @@ describe('Cardano.util/primitives', () => {
           'pool'
         )
       ).toThrowError(InvalidStringError);
+    });
+  });
+
+  describe('HexBlob.toTypedBech32', () => {
+    it('throw when given an invalid hex', () => {
+      expect(() => HexBlob.toTypedBech32('', HexBlob('ffsa'))).toThrow();
+    });
+
+    it('returns the correct bech32 string when given a valid prefix and valid payload', () => {
+      const bech32 = HexBlob.toTypedBech32('pool', HexBlob('594df1c896f6b05d4bebec0287627cf83416db779a3273205d3db9e0'));
+      expect(bech32).toEqual('pool1t9xlrjyk76c96jltaspgwcnulq6pdkmhnge8xgza8ku7qvpsy9r');
     });
   });
 

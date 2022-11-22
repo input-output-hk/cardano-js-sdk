@@ -13,13 +13,13 @@ import { RewardAccount } from './RewardAccount';
 /**
  * transaction hash as hex string
  */
-export type TransactionId = Hash32ByteBase16<'TransactionId'>;
+export type TransactionId = OpaqueString<'TransactionId'>;
 
 /**
  * @param {string} value transaction hash as hex string
  * @throws InvalidStringError
  */
-export const TransactionId = (value: string): TransactionId => Hash32ByteBase16<'TransactionId'>(value);
+export const TransactionId = (value: string): TransactionId => Hash32ByteBase16(value) as unknown as TransactionId;
 TransactionId.fromHexBlob = (value: HexBlob) => Hash32ByteBase16.fromHexBlob<TransactionId>(value);
 
 /**
