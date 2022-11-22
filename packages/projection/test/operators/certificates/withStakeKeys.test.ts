@@ -1,20 +1,36 @@
 /* eslint-disable unicorn/no-array-for-each */
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { dataWithStakeKeyDeregistration } from '../../events';
-import { lastValueFrom, tap } from 'rxjs';
-import { withCertificates, withRolledBackEvents, withStabilityWindow, withStakeKeys } from '../../../src';
+import { defaultIfEmpty, lastValueFrom, mergeMap, tap } from 'rxjs';
+import { operators, sinks } from '../../../src';
 
 describe('withStakeKeys', () => {
+  // TODO: current test is the same as in projectToSink.test.ts
+  // This should be a unit test, without other operators.
   it('can be used to keep track of the current set of active stake keys', async () => {
     const activeStakeKeys = new Set<Cardano.Ed25519KeyHash>();
-    const project$ = dataWithStakeKeyDeregistration.chainSync$.pipe(
-      withStabilityWindow(dataWithStakeKeyDeregistration.genesis),
-      withRolledBackEvents(),
-      withCertificates(),
-      withStakeKeys(),
-      tap(({ stakeKeys: { register, deregister } }) => {
-        register.forEach(activeStakeKeys.add.bind(activeStakeKeys));
-        deregister.forEach(activeStakeKeys.delete.bind(activeStakeKeys));
+    const buffer = new sinks.InMemoryStabilityWindowBuffer(dataWithStakeKeyDeregistration.networkInfo);
+    const project$ = dataWithStakeKeyDeregistration.chainSync({ points: ['origin'] }).pipe(
+      mergeMap(({ chainSync$ }) => chainSync$),
+      operators.withRolledBackBlock(buffer),
+      tap((evt) => {
+        evt;
+      }),
+      operators.withNetworkInfo(dataWithStakeKeyDeregistration.networkInfo),
+      operators.withCertificates(),
+      operators.withStakeKeys(),
+      mergeMap((evt) => {
+        const { stakeKeys: eventStakeKeys, eventType, requestNext } = evt;
+        const operations =
+          eventType === ChainSyncEventType.RollForward
+            ? eventStakeKeys
+            : {
+                deregister: eventStakeKeys.register,
+                register: eventStakeKeys.deregister
+              };
+        operations.register.forEach(activeStakeKeys.add.bind(activeStakeKeys));
+        operations.deregister.forEach(activeStakeKeys.delete.bind(activeStakeKeys));
+        return sinks.manageBuffer(evt, buffer).pipe(defaultIfEmpty(null), tap(requestNext));
       })
     );
     await lastValueFrom(project$);

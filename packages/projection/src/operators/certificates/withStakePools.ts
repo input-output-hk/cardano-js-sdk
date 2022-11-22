@@ -1,7 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { CertificatePointer, WithCertificates } from './withCertificates';
 import { WithEpochNo } from '../withEpochNo';
-import { projectorOperator } from '../utils';
+import { unifiedProjectorOperator } from '../utils';
 
 export interface WithCertificateSource {
   source: CertificatePointer;
@@ -33,34 +33,30 @@ const addPoolItem = <T>(collection: Map<Cardano.PoolId, T[]>, poolId: Cardano.Po
 };
 
 /**
- * Map RollForward events with certificates to stake pool updates and retirements.
- * RollBackward events are unmodified.
+ * Map blocks with certificates to stake pool updates and retirements.
  */
-export const withStakePools = projectorOperator<WithCertificates & WithEpochNo, {}, WithStakePools, {}>({
-  rollBackward: (evt) => evt,
-  rollForward: (evt) => {
-    const updates = new Map<Cardano.PoolId, PoolUpdate[]>();
-    const retirements = new Map<Cardano.PoolId, PoolRetirement[]>();
-    for (const { certificate, pointer: source } of evt.certificates) {
-      switch (certificate.__typename) {
-        case Cardano.CertificateType.PoolRegistration:
-          addPoolItem(updates, certificate.poolParameters.id, {
-            issuedAtEpochNo: evt.epochNo,
-            poolParameters: certificate.poolParameters,
-            source
-          });
-          break;
-        case Cardano.CertificateType.PoolRetirement:
-          addPoolItem(retirements, certificate.poolId, {
-            retireAtEpoch: certificate.epoch,
-            source
-          });
-          break;
-      }
+export const withStakePools = unifiedProjectorOperator<WithCertificates & WithEpochNo, WithStakePools>((evt) => {
+  const updates = new Map<Cardano.PoolId, PoolUpdate[]>();
+  const retirements = new Map<Cardano.PoolId, PoolRetirement[]>();
+  for (const { certificate, pointer: source } of evt.certificates) {
+    switch (certificate.__typename) {
+      case Cardano.CertificateType.PoolRegistration:
+        addPoolItem(updates, certificate.poolParameters.id, {
+          issuedAtEpochNo: evt.epochNo,
+          poolParameters: certificate.poolParameters,
+          source
+        });
+        break;
+      case Cardano.CertificateType.PoolRetirement:
+        addPoolItem(retirements, certificate.poolId, {
+          retireAtEpoch: certificate.epoch,
+          source
+        });
+        break;
     }
-    return {
-      ...evt,
-      stakePools: { retirements, updates }
-    };
   }
+  return {
+    ...evt,
+    stakePools: { retirements, updates }
+  };
 });

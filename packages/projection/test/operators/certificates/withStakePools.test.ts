@@ -1,26 +1,18 @@
 /* eslint-disable unicorn/no-array-for-each */
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import {
-  PoolRetirement,
-  PoolUpdate,
-  WithCertificateSource,
-  withCertificates,
-  withEpochNo,
-  withRolledBackEvents,
-  withStabilityWindow,
-  withStakePools
-} from '../../../src';
 import { dataWithPoolRetirement } from '../../events';
-import { genesisToEraSummary } from '../genesisToEraSummary';
-import { lastValueFrom, tap } from 'rxjs';
+import { defaultIfEmpty, lastValueFrom, mergeMap, tap } from 'rxjs';
+import { operators, sinks } from '../../../src';
 
 describe('withStakePools', () => {
+  // TODO: current test is the same as in projectToSink.test.ts
+  // This should be a unit test, without other operators.
   it('can be used to keep track of stake pool registrations and retirements', async () => {
     const stakePools = new Map<
       Cardano.PoolId,
       {
-        updates: PoolUpdate[];
-        retirements: PoolRetirement[];
+        updates: operators.PoolUpdate[];
+        retirements: operators.PoolRetirement[];
       }
     >();
     const findOrCreate = (poolId: Cardano.PoolId) => {
@@ -30,13 +22,15 @@ describe('withStakePools', () => {
       }
       return stakePool;
     };
-    const project$ = dataWithPoolRetirement.chainSync$.pipe(
-      withStabilityWindow(dataWithPoolRetirement.genesis),
-      withRolledBackEvents(),
-      withEpochNo([genesisToEraSummary(dataWithPoolRetirement.genesis)]),
-      withCertificates(),
-      withStakePools(),
-      tap((evt) => {
+    const buffer = new sinks.InMemoryStabilityWindowBuffer(dataWithPoolRetirement.networkInfo);
+    const project$ = dataWithPoolRetirement.chainSync({ points: ['origin'] }).pipe(
+      mergeMap(({ chainSync$ }) => chainSync$),
+      operators.withRolledBackBlock(buffer),
+      operators.withNetworkInfo(dataWithPoolRetirement.networkInfo),
+      operators.withEpochNo(),
+      operators.withCertificates(),
+      operators.withStakePools(),
+      mergeMap((evt) => {
         if (evt.eventType === ChainSyncEventType.RollForward) {
           for (const [poolId, poolUpdates] of evt.stakePools.updates) {
             findOrCreate(poolId).updates.push(...poolUpdates);
@@ -46,13 +40,14 @@ describe('withStakePools', () => {
           }
         } else {
           // delete all updates and retirements <= current tip
-          const belowOrAtTip = ({ source }: WithCertificateSource) =>
+          const belowOrAtTip = ({ source }: operators.WithCertificateSource) =>
             evt.tip !== 'origin' && source.slot <= evt.tip.slot;
           for (const [_, stakePool] of stakePools) {
             stakePool.updates = stakePool.updates.filter(belowOrAtTip);
             stakePool.retirements = stakePool.retirements.filter(belowOrAtTip);
           }
         }
+        return sinks.manageBuffer(evt, buffer).pipe(defaultIfEmpty(null), tap(evt.requestNext));
       })
     );
     await lastValueFrom(project$);
