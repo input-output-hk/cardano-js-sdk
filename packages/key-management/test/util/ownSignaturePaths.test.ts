@@ -24,9 +24,13 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   );
 
+  const ownStakeKeyHash = Cardano.Ed25519KeyHash.fromRewardAccount(ownRewardAccount);
+  const otherStakeKeyHash = Cardano.Ed25519KeyHash.fromRewardAccount(otherRewardAccount);
+
+  const knownAddress1 = createGroupedAddress(address1, ownRewardAccount, AddressType.External, 0);
+
   it('returns distinct derivation paths required to sign the transaction', async () => {
     const txBody = {
-      certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration }],
       inputs: [{}, {}, {}]
     } as Cardano.TxBody;
     const knownAddresses = [address1, address2].map((address, index) =>
@@ -45,10 +49,200 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
       {
         index: 1,
         role: KeyRole.External
+      }
+    ]);
+  });
+
+  it(
+    'returns stake key derivation path when a StakeKeyRegistration' +
+      // eslint-disable-next-line sonarjs/no-duplicate-string
+      ' certificate with the wallet stake key hash is present',
+    async () => {
+      const txBody = {
+        certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration, stakeKeyHash: ownStakeKeyHash }],
+        inputs: [{}, {}, {}]
+      } as Cardano.NewTxBodyAlonzo;
+      const resolveInputAddress = jest.fn().mockReturnValueOnce(address1).mockReturnValueOnce(address1);
+      expect(await util.ownSignatureKeyPaths(txBody, [knownAddress1], { resolveInputAddress })).toEqual([
+        {
+          index: 0,
+          role: KeyRole.External
+        },
+        {
+          index: 0,
+          role: KeyRole.Stake
+        }
+      ]);
+    }
+  );
+
+  it(
+    'returns stake key derivation path when a StakeKeyDeregistration' +
+      ' certificate with the wallet stake key hash is present',
+    async () => {
+      const txBody = {
+        certificates: [{ __typename: Cardano.CertificateType.StakeKeyDeregistration, stakeKeyHash: ownStakeKeyHash }],
+        inputs: [{}, {}, {}]
+      } as Cardano.NewTxBodyAlonzo;
+      const resolveInputAddress = jest.fn().mockReturnValueOnce(address1).mockReturnValueOnce(address1);
+      expect(await util.ownSignatureKeyPaths(txBody, [knownAddress1], { resolveInputAddress })).toEqual([
+        {
+          index: 0,
+          role: KeyRole.External
+        },
+        {
+          index: 0,
+          role: KeyRole.Stake
+        }
+      ]);
+    }
+  );
+
+  it(
+    'returns stake key derivation path when a StakeDelegation' +
+      ' certificate with the wallet stake key hash is present',
+    async () => {
+      const txBody = {
+        certificates: [{ __typename: Cardano.CertificateType.StakeDelegation, stakeKeyHash: ownStakeKeyHash }],
+        inputs: [{}, {}, {}]
+      } as Cardano.NewTxBodyAlonzo;
+      const resolveInputAddress = jest.fn().mockReturnValueOnce(address1).mockReturnValueOnce(address1);
+      expect(await util.ownSignatureKeyPaths(txBody, [knownAddress1], { resolveInputAddress })).toEqual([
+        {
+          index: 0,
+          role: KeyRole.External
+        },
+        {
+          index: 0,
+          role: KeyRole.Stake
+        }
+      ]);
+    }
+  );
+
+  // eslint-disable-next-line max-len
+  it('returns stake key derivation path when at least one certificate with the wallet stake key hash is present', async () => {
+    const txBody = {
+      certificates: [
+        { __typename: Cardano.CertificateType.StakeDelegation, stakeKeyHash: ownStakeKeyHash },
+        { __typename: Cardano.CertificateType.StakeKeyDeregistration, stakeKeyHash: otherStakeKeyHash }
+      ],
+      inputs: [{}, {}, {}]
+    } as Cardano.NewTxBodyAlonzo;
+    const resolveInputAddress = jest.fn().mockReturnValueOnce(address1).mockReturnValueOnce(address1);
+    expect(await util.ownSignatureKeyPaths(txBody, [knownAddress1], { resolveInputAddress })).toEqual([
+      {
+        index: 0,
+        role: KeyRole.External
       },
       {
         index: 0,
         role: KeyRole.Stake
+      }
+    ]);
+  });
+
+  it(
+    'returns stake key derivation path when a PoolRetirement' +
+      ' certificate with the wallet stake key hash is present',
+    async () => {
+      const txBody = {
+        certificates: [
+          {
+            __typename: Cardano.CertificateType.PoolRetirement,
+            epoch: 40,
+            poolId: Cardano.PoolId.fromKeyHash(ownStakeKeyHash)
+          }
+        ],
+        inputs: [{}, {}, {}]
+      } as Cardano.NewTxBodyAlonzo;
+      const resolveInputAddress = jest.fn().mockReturnValueOnce(address1).mockReturnValueOnce(address1);
+      expect(await util.ownSignatureKeyPaths(txBody, [knownAddress1], { resolveInputAddress })).toEqual([
+        {
+          index: 0,
+          role: KeyRole.External
+        },
+        {
+          index: 0,
+          role: KeyRole.Stake
+        }
+      ]);
+    }
+  );
+
+  it(
+    'returns stake key derivation path when a PoolRegistration' +
+      ' certificate with the wallet stake key hash is present',
+    async () => {
+      const txBody = {
+        certificates: [
+          {
+            __typename: Cardano.CertificateType.PoolRegistration,
+            poolParameters: {
+              cost: 340n,
+              id: Cardano.PoolId.fromKeyHash(ownStakeKeyHash),
+              margin: {
+                denominator: 50,
+                numerator: 10
+              },
+              owners: [ownRewardAccount],
+              pledge: 10_000n,
+              relays: [
+                {
+                  __typename: 'RelayByName',
+                  hostname: 'localhost'
+                }
+              ],
+              rewardAccount: ownRewardAccount,
+              vrf: Cardano.VrfVkHex('641d042ed39c2c258d381060c1424f40ef8abfe25ef566f4cb22477c42b2a014')
+            }
+          }
+        ],
+        inputs: [{}, {}, {}]
+      } as Cardano.NewTxBodyAlonzo;
+      const resolveInputAddress = jest.fn().mockReturnValueOnce(address1).mockReturnValueOnce(address1);
+      expect(await util.ownSignatureKeyPaths(txBody, [knownAddress1], { resolveInputAddress })).toEqual([
+        {
+          index: 0,
+          role: KeyRole.External
+        },
+        {
+          index: 0,
+          role: KeyRole.Stake
+        }
+      ]);
+    }
+  );
+
+  it('returns stake key derivation path when a MIR certificate with the wallet stake key hash is present', async () => {
+    const txBody = {
+      certificates: [{ __typename: Cardano.CertificateType.MIR, rewardAccount: ownRewardAccount }],
+      inputs: [{}, {}, {}]
+    } as Cardano.NewTxBodyAlonzo;
+    const resolveInputAddress = jest.fn().mockReturnValueOnce(address1).mockReturnValueOnce(address1);
+    expect(await util.ownSignatureKeyPaths(txBody, [knownAddress1], { resolveInputAddress })).toEqual([
+      {
+        index: 0,
+        role: KeyRole.External
+      },
+      {
+        index: 0,
+        role: KeyRole.Stake
+      }
+    ]);
+  });
+
+  // eslint-disable-next-line max-len
+  it('does not return stake key derivation path when no certificate with wallet stake key hash is present', async () => {
+    const txBody = {
+      certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration, stakeKeyHash: otherStakeKeyHash }],
+      inputs: [{}, {}, {}]
+    } as Cardano.NewTxBodyAlonzo;
+    const resolveInputAddress = jest.fn().mockReturnValueOnce(address1).mockReturnValueOnce(address1);
+    expect(await util.ownSignatureKeyPaths(txBody, [knownAddress1], { resolveInputAddress })).toEqual([
+      {
+        index: 0,
+        role: KeyRole.External
       }
     ]);
   });
