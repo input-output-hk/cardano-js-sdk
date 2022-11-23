@@ -55,10 +55,14 @@ export const computeMinimumCoinQuantity =
   (output) =>
     usingAutoFree((scope) =>
       BigInt(
-        CML.min_ada_required(
-          coreToCml.txOut(scope, output),
-          scope.manage(CML.BigNum.from_str(coinsPerUtxoByte.toString()))
-        ).to_str()
+        scope
+          .manage(
+            CML.min_ada_required(
+              coreToCml.txOut(scope, output),
+              scope.manage(CML.BigNum.from_str(coinsPerUtxoByte.toString()))
+            )
+          )
+          .to_str()
       )
     );
 
