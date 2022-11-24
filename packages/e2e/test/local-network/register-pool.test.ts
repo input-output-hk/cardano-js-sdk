@@ -2,12 +2,14 @@
 import { Awaited } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
 import { KeyAgentFactoryProps, getWallet } from '../../src';
-import { env } from '../environment';
+import { getEnv, walletVariables } from '../environment';
 import { logger } from '@cardano-sdk/util-dev';
 import { submitAndConfirm, waitForWalletStateSettle, walletReady } from '../util';
 
 import { AddressType, KeyRole } from '@cardano-sdk/key-management';
 import { firstValueFrom } from 'rxjs';
+
+const env = getEnv(walletVariables);
 
 const vrf1 = Cardano.VrfVkHex('2ee5a4c423224bb9c42107fc18a60556d6a83cec1d9dd37a71f56af7198fc759');
 const vrf2 = Cardano.VrfVkHex('641d042ed39c2c258d381060c1424f40ef8abfe25ef566f4cb22477c42b2a014');

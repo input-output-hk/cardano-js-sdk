@@ -19,10 +19,12 @@ import {
 } from 'rxjs';
 import { ObservableWallet, SignedTx, buildTx } from '@cardano-sdk/wallet';
 import { assertTxIsValid } from '../../wallet/test/util';
-import { env } from './environment';
 import { faucetProviderFactory, networkInfoProviderFactory } from '../src';
+import { getEnv, walletVariables } from './environment';
 import { logger } from '@cardano-sdk/util-dev';
 import sortBy from 'lodash/sortBy';
+
+const env = getEnv(walletVariables);
 
 const SECOND = 1000;
 const MINUTE = 60 * SECOND;

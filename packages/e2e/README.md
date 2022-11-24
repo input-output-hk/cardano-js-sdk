@@ -42,11 +42,13 @@ $ ts-node ./src/util/mnemonic.ts
 
 Done in 5.44s.
 ```
+
 To add funds to your newly created wallet, copy the address displayed in the console and go to [Public Testnet Faucet](https://testnets.cardano.org/en/testnets/cardano/tools/faucet/). You can request 1000 tADA every 24h.
 
 > :information_source: tADA is a limited resource, so if you are no longer using the address, return the tADA to the faucet for others to use.
 
 ## Local Test Network
+
 <a name="local_test_network"></a>
 
 Some end-to-end tests can be run using the local test network, this network can be started as follows:
@@ -60,17 +62,19 @@ $ yarn workspace @cardano-sdk/e2e local-network:up
 ```bash
 $ yarn workspace @cardano-sdk/e2e local-network:down
 ```
+
 Instead of CTRL-C, since some resources need to be clear before you can set up the environment again, if you don't stop the containers with the proper command, you may run into issues restarting it.
 
 There are two ways of obtaining tADA on this network, first we have the faucet:
 
 ```javascript
-    let faucetProvider = await faucetProviderFactory.create(
-      env.FAUCET_PROVIDER,
-      env.FAUCET_PROVIDER_PARAMS,
-      getLogger(env.LOGGER_MIN_SEVERITY));
+let faucetProvider = await faucetProviderFactory.create(
+  env.FAUCET_PROVIDER,
+  env.FAUCET_PROVIDER_PARAMS,
+  getLogger(env.LOGGER_MIN_SEVERITY)
+);
 
-    await faucetProvider.request(address, amountFromFaucet, blockConfirmations);
+await faucetProvider.request(address, amountFromFaucet, blockConfirmations);
 ```
 
 The faucet allows you to request an arbitrary amount of tADA to a given address. The faucet will make sure the transaction is in a block before returning, which means you can access the funds immediately after.
@@ -123,55 +127,6 @@ You can override this port mapping by setting the `FILE_SERVER_PORT` environment
 
 `FILE_SERVER_PORT=9874 docker compose -p local-network-e2e up`
 
-## Load Testing
-
-Cardano services end to end load tests. Please note that you must have several services up before executing the test, to start the environment(from the root):
-
-```bash
-$ cd packages/cardano-services
-$ yarn preview:up
-```
-
-Once your environment is synced up, in a different terminal you can proceed to run the test, this is an example of the configuration you may need:
-
-```
-# Logger
-LOGGER_MIN_SEVERITY=info
-
-# Providers setup
-KEY_MANAGEMENT_PROVIDER=inMemory
-KEY_MANAGEMENT_PARAMS='{"accountIndex": 0, "networkId": 0, "password":"some_password","mnemonic":"vacant violin soft weird deliver render brief always monitor general maid smart jelly core drastic erode echo there clump dizzy card filter option defense"}'
-ASSET_PROVIDER=http
-ASSET_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/asset"}'
-CHAIN_HISTORY_PROVIDER=http
-CHAIN_HISTORY_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/chain-history"}'
-NETWORK_INFO_PROVIDER=http
-NETWORK_INFO_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/network-info"}'
-REWARDS_PROVIDER=http
-REWARDS_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/rewards"}'
-TX_SUBMIT_PROVIDER=http
-TX_SUBMIT_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/tx-submit"}'
-UTXO_PROVIDER=http
-UTXO_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/utxo"}'
-STAKE_POOL_PROVIDER=http
-STAKE_POOL_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/stake-pool"}'
-
-# Test Parameters
-OGMIOS_URL=ws://localhost:1340
-TX_SUBMIT_HTTP_URL=http://localhost:5001/tx-submit
-TRANSACTIONS_NUMBER=10
-START_LOCAL_HTTP_SERVER=true
-WORKER_PARALLEL_TRANSACTION=3
-
-```
-> :information_source: Remember to use a wallet with enough funds to carry out transactions (see [here](#generate_wallet)).
-
-To execute the test:
-
-```bash
-$ yarn workspace @cardano-sdk/e2e test:load-testing
-```
-
 ## Local Network
 
 The end-to-end local network test are meant to showcase the use of the local test network. The local network end-to-end test shows how we can fund wallets with local test network tADA so we can run the end-to-end tests. For the local network end-to-end test to run, we must first start our local test network environment (see [here](#local_test_network)).
@@ -211,6 +166,35 @@ Then to run the local network tests, run:
 $ yarn workspace @cardano-sdk/e2e test:local-network
 ```
 
+## RabbitMQ Load Testing
+
+**RabbitMQ** end to end load tests. Please note that this requires an _Ogmios_ server for submitting the txs.
+The default configuration matches the **local-network** host mapping (just leaving the `.env` file untouched)
+or we can configure the test to run against another system.
+
+```
+# Required by test:load-testing
+OGMIOS_URL=ws://localhost:1340
+TX_SUBMIT_HTTP_URL=http://localhost:3456/tx-submit
+TRANSACTIONS_NUMBER=10
+START_LOCAL_HTTP_SERVER=true
+WORKER_PARALLEL_TRANSACTION=3
+```
+
+> :information_source: Ensure the configured wallet has sufficient funds for the test transactions (see [here](#generate_wallet)).
+
+Before executing the test, start the *local-network*:
+
+```bash
+$ yarn workspace @cardano-sdk/e2e test:local-network
+```
+
+To execute the test:
+
+```bash
+$ yarn workspace @cardano-sdk/e2e test:load-testing
+```
+
 ## Wallet
 
 The wallet end-to-end tests showcase the use of different providers to create, sign, send and keep track of transactions on the blockchain, query assets and their metadata, delegate to pools and keep track of rewards (among others):
@@ -240,6 +224,7 @@ STAKE_POOL_PROVIDER=http
 STAKE_POOL_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/stake-pool"}'
 
 ```
+
 > :information_source: Remember to use a wallet with enough funds to carry out transactions (see [here](#generate_wallet)).
 
 Then to run the wallet tests, run:
