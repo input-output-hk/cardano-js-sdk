@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.7.0-nightly.1...@cardano-sdk/wallet@0.7.0-nightly.2) (2022-11-24)
+
+### ⚠ BREAKING CHANGES
+
+- create a new CML scope for every call of BuildTx in selection constraints
+
+### Bug Fixes
+
+- create a new CML scope for every call of BuildTx in selection constraints ([6818ae4](https://github.com/input-output-hk/cardano-js-sdk/commit/6818ae443dd53ac4786ce161f02aef5635433678))
+- **wallet:** sign entire transaction in cip30 mapping instead of transaction body ([c446d2d](https://github.com/input-output-hk/cardano-js-sdk/commit/c446d2dc6d6d23203864f3a802f04b579aa2a766))
+
 ## [0.7.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.7.0-nightly.0...@cardano-sdk/wallet@0.7.0-nightly.1) (2022-11-22)
 
 ### ⚠ BREAKING CHANGES
