@@ -1,10 +1,12 @@
-import { env } from '../../environment';
 import { filter, firstValueFrom } from 'rxjs';
+import { getEnv, walletVariables } from '../../environment';
 import { getWallet } from '../../../src/factories';
 import { logger } from '@cardano-sdk/util-dev';
 import { storage } from '@cardano-sdk/wallet';
 import { waitForWalletStateSettle, walletReady } from '../../util';
 import delay from 'delay';
+
+const env = getEnv(walletVariables);
 
 describe('SingleAddressWallet/pouchDbWalletStores', () => {
   const walletName = 'DbTestWallet';

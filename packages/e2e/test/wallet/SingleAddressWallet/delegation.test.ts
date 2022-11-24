@@ -4,11 +4,12 @@ import { Cardano } from '@cardano-sdk/core';
 import { ObservableWallet, StakeKeyStatus, buildTx } from '@cardano-sdk/wallet';
 import { TX_TIMEOUT, firstValueFromTimed, waitForWalletStateSettle, walletReady } from '../../util';
 import { assertTxIsValid } from '../../../../wallet/test/util';
-import { env } from '../../environment';
+import { combineLatest, filter, firstValueFrom } from 'rxjs';
+import { getEnv, walletVariables } from '../../environment';
 import { getWallet } from '../../../src/factories';
 import { logger } from '@cardano-sdk/util-dev';
 
-import { combineLatest, filter, firstValueFrom } from 'rxjs';
+const env = getEnv(walletVariables);
 
 const getWalletStateSnapshot = async (wallet: ObservableWallet) => {
   const [rewardAccount] = await firstValueFrom(wallet.delegation.rewardAccounts$);
@@ -158,7 +159,7 @@ describe('SingleAddressWallet/delegation', () => {
       expect(tx1ConfirmedState.rewardAccount.delegatee?.currentEpoch?.id).toEqual(poolId);
     }
 
-    // Make a 2nd tx with key deregistration
+    // Make a 2nd tx with key de-registration
     const txDeregister = await buildTx({ logger, observableWallet: sourceWallet }).delegate().build();
     assertTxIsValid(txDeregister);
     const txDeregisterSigned = await txDeregister.sign();

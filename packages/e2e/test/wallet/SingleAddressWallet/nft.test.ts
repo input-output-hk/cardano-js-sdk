@@ -3,10 +3,11 @@ import { Cardano, metadatum, nativeScriptPolicyId } from '@cardano-sdk/core';
 import { InMemoryKeyAgent, KeyRole, TransactionSigner, util } from '@cardano-sdk/key-management';
 import { SingleAddressWallet } from '@cardano-sdk/wallet';
 import { combineLatest, filter, firstValueFrom, map } from 'rxjs';
-import { env } from '../../environment';
+import { getEnv, walletVariables } from '../../environment';
 import { getLogger, getWallet } from '../../../src/factories';
 import { submitAndConfirm, walletReady } from '../../util';
 
+const env = getEnv(walletVariables);
 const logger = getLogger(env.LOGGER_MIN_SEVERITY);
 
 describe('SingleAddressWallet.assets/nft', () => {

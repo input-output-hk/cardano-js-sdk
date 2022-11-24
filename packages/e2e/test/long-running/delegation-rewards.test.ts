@@ -1,32 +1,13 @@
-import * as envalid from 'envalid';
 import { Cardano, createSlotEpochCalc } from '@cardano-sdk/core';
 import { SignedTx, SingleAddressWallet, buildTx } from '@cardano-sdk/wallet';
 import { TestWallet, getWallet } from '../../src';
 import { assertTxIsValid, waitForWalletStateSettle } from '../../../wallet/test/util';
 import { filter, firstValueFrom } from 'rxjs';
+import { getEnv, walletVariables } from '../environment';
 import { logger } from '@cardano-sdk/util-dev';
 import { requestCoins, runningAgainstLocalNetwork, submitAndConfirm, transferCoins, waitForEpoch } from '../util';
 
-// Verify environment.
-export const env = envalid.cleanEnv(process.env, {
-  ASSET_PROVIDER: envalid.str(),
-  ASSET_PROVIDER_PARAMS: envalid.json({ default: {} }),
-  CHAIN_HISTORY_PROVIDER: envalid.str(),
-  CHAIN_HISTORY_PROVIDER_PARAMS: envalid.json({ default: {} }),
-  KEY_MANAGEMENT_PARAMS: envalid.json({ default: {} }),
-  KEY_MANAGEMENT_PROVIDER: envalid.str(),
-  LOGGER_MIN_SEVERITY: envalid.str({ default: 'info' }),
-  NETWORK_INFO_PROVIDER: envalid.str(),
-  NETWORK_INFO_PROVIDER_PARAMS: envalid.json({ default: {} }),
-  REWARDS_PROVIDER: envalid.str(),
-  REWARDS_PROVIDER_PARAMS: envalid.json({ default: {} }),
-  STAKE_POOL_PROVIDER: envalid.str(),
-  STAKE_POOL_PROVIDER_PARAMS: envalid.json({ default: {} }),
-  TX_SUBMIT_PROVIDER: envalid.str(),
-  TX_SUBMIT_PROVIDER_PARAMS: envalid.json({ default: {} }),
-  UTXO_PROVIDER: envalid.str(),
-  UTXO_PROVIDER_PARAMS: envalid.json({ default: {} })
-});
+const env = getEnv(walletVariables);
 
 describe('delegation rewards', () => {
   let providers: TestWallet['providers'];

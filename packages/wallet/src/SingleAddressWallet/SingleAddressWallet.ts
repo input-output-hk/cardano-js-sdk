@@ -401,8 +401,7 @@ export class SingleAddressWallet implements ObservableWallet {
   async initializeTx(props: InitializeTxProps): Promise<InitializeTxResult> {
     const scope = new ManagedFreeableScope();
     const { constraints, utxo, implicitCoin, validityInterval, changeAddress, withdrawals } = await this.#prepareTx(
-      props,
-      scope
+      props
     );
     const { selection: inputSelection } = await this.#inputSelector.select({
       constraints,
