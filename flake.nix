@@ -50,6 +50,17 @@
         PYTHON = "${pkgs.python3}/bin/python3";
         # node-hid uses pkg-config to find sources
         buildInputs = oldAttrs.buildInputs ++ [pkgs.pkg-config pkgs.libusb1];
+
+        installPhase = ''
+          runHook preInstall
+          mkdir -p $out/libexec $out/bin
+          # Move the entire project to the output directory.
+          mv $PWD "$out/libexec/$sourceRoot"
+          cd "$out/libexec/$sourceRoot"
+          # Invoke a plugin internal command to setup binaries.
+          yarn nixify install-bin $out/bin
+          runHook postInstall
+        '';
       });
     in
       project.overrideAttrs (oldAttrs: {
@@ -69,7 +80,7 @@
 
           mkdir -p $out/libexec/$sourceRoot $out/bin
 
-          cp -r ${production-deps}/libexec/$sourceRoot/node_modules $out/libexec/$sourceRoot/node_modules
+          test -f ${production-deps}/libexec/$sourceRoot/packages/cardano-services/node_modules && cp -r ${production-deps}/libexec/$sourceRoot/node_modules $out/libexec/$sourceRoot/node_modules
           cp -r scripts $out/libexec/$sourceRoot/scripts
           for p in cardano-services core ogmios util; do
             mkdir -p $out/libexec/$sourceRoot/packages/$p
