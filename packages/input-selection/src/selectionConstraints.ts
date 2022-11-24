@@ -4,14 +4,14 @@ import {
   ComputeSelectionLimit,
   EstimateTxFee,
   ProtocolParametersForInputSelection,
+  ProtocolParametersRequiredByInputSelection,
   SelectionConstraints,
   SelectionSkeleton,
   TokenBundleSizeExceedsLimit
 } from './types';
-import { ProtocolParametersRequiredByInputSelection } from '.';
-import { usingAutoFree } from '@cardano-sdk/util';
+import { ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
 
-export type BuildTx = (selection: SelectionSkeleton) => Promise<CML.Transaction>;
+export type BuildTx = (selection: SelectionSkeleton, scope: ManagedFreeableScope) => Promise<CML.Transaction>;
 
 export interface DefaultSelectionConstraintsProps {
   protocolParameters: ProtocolParametersForInputSelection;
@@ -26,10 +26,10 @@ export const computeMinimumCost =
     }: Pick<ProtocolParametersRequiredByInputSelection, 'minFeeCoefficient' | 'minFeeConstant'>,
     buildTx: BuildTx
   ): EstimateTxFee =>
-  async (selection) => {
-    const tx = await buildTx(selection);
+  (selection) =>
+    usingAutoFree(async (scope) => {
+      const tx = await buildTx(selection, scope);
 
-    return usingAutoFree((scope) => {
       // TODO: Get this from cardano-services
       const priceMem = scope.manage(
         CML.UnitInterval.new(scope.manage(CML.BigNum.from_str('577')), scope.manage(CML.BigNum.from_str('10000')))
@@ -48,17 +48,20 @@ export const computeMinimumCost =
       const minFee = scope.manage(CML.min_fee(tx, linearFee, exInitPrices));
       return BigInt(minFee.to_str());
     });
-  };
 
 export const computeMinimumCoinQuantity =
   (coinsPerUtxoByte: ProtocolParametersRequiredByInputSelection['coinsPerUtxoByte']): ComputeMinimumCoinQuantity =>
   (output) =>
     usingAutoFree((scope) =>
       BigInt(
-        CML.min_ada_required(
-          coreToCml.txOut(scope, output),
-          scope.manage(CML.BigNum.from_str(coinsPerUtxoByte.toString()))
-        ).to_str()
+        scope
+          .manage(
+            CML.min_ada_required(
+              coreToCml.txOut(scope, output),
+              scope.manage(CML.BigNum.from_str(coinsPerUtxoByte.toString()))
+            )
+          )
+          .to_str()
       )
     );
 
@@ -87,14 +90,15 @@ const getTxSize = (tx: CML.Transaction) => tx.to_bytes().length;
  */
 export const computeSelectionLimit =
   (maxTxSize: ProtocolParametersRequiredByInputSelection['maxTxSize'], buildTx: BuildTx): ComputeSelectionLimit =>
-  async (selectionSkeleton) => {
-    const tx = await buildTx(selectionSkeleton);
-    const txSize = getTxSize(tx);
-    if (txSize <= maxTxSize) {
-      return selectionSkeleton.inputs.size;
-    }
-    return selectionSkeleton.inputs.size - 1;
-  };
+  (selectionSkeleton) =>
+    usingAutoFree(async (scope) => {
+      const tx = await buildTx(selectionSkeleton, scope);
+      const txSize = getTxSize(tx);
+      if (txSize <= maxTxSize) {
+        return selectionSkeleton.inputs.size;
+      }
+      return selectionSkeleton.inputs.size - 1;
+    });
 
 export const defaultSelectionConstraints = ({
   protocolParameters: { coinsPerUtxoByte, maxTxSize, maxValueSize, minFeeCoefficient, minFeeConstant },

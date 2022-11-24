@@ -52,7 +52,7 @@ describe('defaultSelectionConstraints', () => {
     const result = await constraints.computeMinimumCost(selectionSkeleton);
     expect(result).toEqual(fee);
     expect(buildTx).toBeCalledTimes(1);
-    expect(buildTx).toBeCalledWith(selectionSkeleton);
+    expect(buildTx).toBeCalledWith(selectionSkeleton, expect.anything());
   });
 
   it('computeMinimumCoinQuantity', () => {
