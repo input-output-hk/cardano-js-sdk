@@ -1,7 +1,6 @@
 import { Cardano, coreToCml } from '@cardano-sdk/core';
 import { FinalizeTxProps, InitializeTxProps, ObservableWallet } from '../types';
 import { Logger } from 'ts-log';
-import { ManagedFreeableScope } from '@cardano-sdk/util';
 import { Observable, combineLatest, filter, firstValueFrom, lastValueFrom, map, take } from 'rxjs';
 import { createTransactionInternals, ensureValidityInterval } from '../Transaction';
 import { defaultSelectionConstraints } from '@cardano-sdk/input-selection';
@@ -20,7 +19,7 @@ export interface PrepareTxDependencies {
 
 export const createTxPreparer =
   ({ wallet, signer, logger }: PrepareTxDependencies) =>
-  async (props: InitializeTxProps, scope: ManagedFreeableScope) => {
+  async (props: InitializeTxProps) => {
     await firstValueFrom(wallet.syncStatus.isSettled$.pipe(filter((isSettled) => isSettled)));
     const withdrawals$: Observable<Cardano.Withdrawal[] | undefined> = wallet.delegation.rewardAccounts$.pipe(
       map((accounts) => accounts.filter((account) => account.rewardBalance)),
@@ -41,7 +40,7 @@ export const createTxPreparer =
         map(([tip, utxo, protocolParameters, [{ address: changeAddress }], withdrawals]) => {
           const validityInterval = ensureValidityInterval(tip.slot, props.options?.validityInterval);
           const constraints = defaultSelectionConstraints({
-            buildTx: async (inputSelection) => {
+            buildTx: async (inputSelection, scope) => {
               logger.debug('Building TX for selection constraints', inputSelection);
               if (withdrawals?.length) {
                 logger.debug('Adding rewards withdrawal in the transaction', withdrawals);

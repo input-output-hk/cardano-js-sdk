@@ -55,5 +55,47 @@ describe('freeable', () => {
       expect(firstSpy).toHaveBeenCalledTimes(1);
       expect(secondSpy).toHaveBeenCalledTimes(1);
     });
+
+    describe('with callback that returns a Promise', () => {
+      let resolve: Function;
+      let reject: Function;
+      let freeable: FreeableEntity;
+      let freeableSpy: jest.SpyInstance;
+      let result: Promise<unknown>;
+
+      beforeEach(() => {
+        freeable = new FreeableEntity(1);
+        freeableSpy = jest.spyOn(freeable, 'free');
+        result = usingAutoFree((scope) => {
+          scope.manage(freeable);
+          return new Promise((_resolve, _reject) => {
+            resolve = _resolve;
+            reject = _reject;
+          });
+        });
+      });
+
+      it('returns promise and frees scope after it resolves', async () => {
+        expect(freeableSpy).not.toBeCalled();
+        const returnValue = 'result';
+        resolve(returnValue);
+        await expect(result).resolves.toBe(returnValue);
+        expect(freeableSpy).toBeCalledTimes(1);
+        reject;
+      });
+
+      it('returns promise and frees scope after promise rejects', async () => {
+        expect.assertions(3);
+        expect(freeableSpy).not.toBeCalled();
+        const rejectedWith = 'error';
+        reject(rejectedWith);
+        try {
+          await result;
+        } catch (error) {
+          expect(freeableSpy).toBeCalledTimes(1);
+          expect(error).toBe(rejectedWith);
+        }
+      });
+    });
   });
 });
