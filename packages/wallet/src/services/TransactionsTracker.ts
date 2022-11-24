@@ -252,7 +252,7 @@ export const createTransactionsTracker = (
       mergeMap((group$) =>
         group$.pipe(
           switchMap(({ tx }) => {
-            const invalidHereafter = tx.body.validityInterval.invalidHereafter;
+            const invalidHereafter = tx.body.validityInterval?.invalidHereafter;
             return race(
               rollback$.pipe(
                 map((rolledBackTx) => rolledBackTx.id),

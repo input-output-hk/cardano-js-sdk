@@ -50,25 +50,27 @@ export class SmartTxSubmitProvider implements TxSubmitProvider {
 
   submitTx(args: SubmitTxArgs): Promise<void> {
     const {
-      body: {
-        validityInterval: { invalidBefore, invalidHereafter }
-      }
+      body: { validityInterval }
     } = cmlUtil.deserializeTx(args.signedTransaction);
     const onlineAndWithinValidityInterval$ = combineLatest([this.#connectionStatus$, this.#tip$]).pipe(
       tap(([_, { slot }]) => {
-        if (slot >= (invalidHereafter || Number.POSITIVE_INFINITY))
+        if (slot >= (validityInterval?.invalidHereafter || Number.POSITIVE_INFINITY))
           throw new ProviderError(
             ProviderFailure.BadRequest,
             new CardanoNodeErrors.TxSubmissionErrors.OutsideOfValidityIntervalError({
               outsideOfValidityInterval: {
                 currentSlot: slot,
-                interval: { invalidBefore: invalidBefore || null, invalidHereafter: invalidHereafter || null }
+                interval: {
+                  invalidBefore: validityInterval?.invalidBefore || null,
+                  invalidHereafter: validityInterval?.invalidHereafter || null
+                }
               }
             })
           );
       }),
       filter(
-        ([connectionStatus, { slot }]) => connectionStatus === ConnectionStatus.up && slot >= (invalidBefore || 0)
+        ([connectionStatus, { slot }]) =>
+          connectionStatus === ConnectionStatus.up && slot >= (validityInterval?.invalidBefore || 0)
       ),
       take(1)
     );

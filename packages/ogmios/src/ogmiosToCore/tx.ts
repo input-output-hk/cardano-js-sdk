@@ -1,11 +1,30 @@
-import { Cardano, NotImplementedError, addressNetworkId, createRewardAccount } from '@cardano-sdk/core';
-import { CommonBlock } from './types';
+/* eslint-disable max-len */
+import { BlockKind, CommonBlock } from './types';
+import {
+  Cardano,
+  NotImplementedError,
+  ProviderUtil,
+  SerializationError,
+  SerializationFailure,
+  addressNetworkId,
+  createRewardAccount
+} from '@cardano-sdk/core';
 import { Schema } from '@cardano-ogmios/client';
+import {
+  isAlonzoOrAbove,
+  isExpiresAt,
+  isMaryOrAbove,
+  isNativeScript,
+  isPlutusV1Script,
+  isPlutusV2Script,
+  isRequireAllOf,
+  isRequireAnyOf,
+  isRequireNOf,
+  isShelleyTx,
+  isStartsAt
+} from './util';
 import Fraction from 'fraction.js';
 import omit from 'lodash/omit';
-
-// TODO: implement byron block body mapping
-export const mapByronBlockBody = (_: Schema.BlockByron): Cardano.Block['body'] => [];
 
 const mapMargin = (margin: string): Cardano.Fraction => {
   const { n: numerator, d: denominator } = new Fraction(margin);
@@ -109,12 +128,210 @@ const mapCertificate = (certificate: Schema.Certificate): Cardano.Certificate =>
   throw new NotImplementedError('Unknown certificate mapping');
 };
 
-// TODO: implement full block body mapping
-const mapCommonTx = (tx: CommonBlock['body'][0]): Cardano.TxAlonzo =>
-  ({
-    body: {
-      certificates: tx.body.certificates.map(mapCertificate)
-    } as Cardano.TxBodyAlonzo
-  } as Cardano.TxAlonzo);
+export const nativeScript = (script: Schema.ScriptNative): Cardano.NativeScript => {
+  let coreScript: Cardano.NativeScript;
 
-export const mapCommonBlockBody = ({ body }: CommonBlock): Cardano.Block['body'] => body.map(mapCommonTx);
+  if (typeof script === 'string') {
+    coreScript = {
+      __type: Cardano.ScriptType.Native,
+      keyHash: Cardano.Ed25519KeyHash(script),
+      kind: Cardano.NativeScriptKind.RequireSignature
+    };
+  } else if (isRequireAllOf(script)) {
+    coreScript = {
+      __type: Cardano.ScriptType.Native,
+      kind: Cardano.NativeScriptKind.RequireAllOf,
+      scripts: new Array<Cardano.NativeScript>()
+    };
+    for (let i = 0; i < script.all.length; ++i) {
+      coreScript.scripts.push(nativeScript(script.all[i]));
+    }
+  } else if (isRequireAnyOf(script)) {
+    coreScript = {
+      __type: Cardano.ScriptType.Native,
+      kind: Cardano.NativeScriptKind.RequireAnyOf,
+      scripts: new Array<Cardano.NativeScript>()
+    };
+    for (let i = 0; i < script.any.length; ++i) {
+      coreScript.scripts.push(nativeScript(script.any[i]));
+    }
+  } else if (isRequireNOf(script)) {
+    const required = Number.parseInt(Object.keys(script)[0]);
+    coreScript = {
+      __type: Cardano.ScriptType.Native,
+      kind: Cardano.NativeScriptKind.RequireMOf,
+      required,
+      scripts: new Array<Cardano.NativeScript>()
+    };
+
+    for (let i = 0; i < script[required].length; ++i) {
+      coreScript.scripts.push(nativeScript(script[required][i]));
+    }
+  } else if (isExpiresAt(script)) {
+    coreScript = {
+      __type: Cardano.ScriptType.Native,
+      kind: Cardano.NativeScriptKind.RequireTimeBefore,
+      slot: script.expiresAt
+    };
+  } else if (isStartsAt(script)) {
+    coreScript = {
+      __type: Cardano.ScriptType.Native,
+      kind: Cardano.NativeScriptKind.RequireTimeAfter,
+      slot: script.startsAt
+    };
+  } else {
+    throw new SerializationError(
+      SerializationFailure.InvalidNativeScriptKind,
+      `Native Script value '${script}' is not supported.`
+    );
+  }
+
+  return coreScript;
+};
+
+const mapPlutusScript = (script: Schema.PlutusV1 | Schema.PlutusV2): Cardano.PlutusScript => {
+  const version = isPlutusV1Script(script) ? Cardano.PlutusLanguageVersion.V1 : Cardano.PlutusLanguageVersion.V2;
+  const plutusScript = isPlutusV1Script(script) ? script['plutus:v1'] : script['plutus:v2'];
+  return {
+    __type: Cardano.ScriptType.Plutus,
+    bytes: Cardano.util.HexBlob(plutusScript),
+    version
+  };
+};
+
+export const mapScript = (script: Schema.Script): Cardano.Script => {
+  if (isNativeScript(script)) {
+    return nativeScript(script.native);
+  } else if (isPlutusV1Script(script) || isPlutusV2Script(script)) return mapPlutusScript(script);
+
+  throw new SerializationError(SerializationFailure.InvalidScriptType, `Script '${script}' is not supported.`);
+};
+
+const mapBootstrapWitness = (b: Schema.BootstrapWitness): Cardano.BootstrapWitness => ({
+  addressAttributes: b.addressAttributes ? Cardano.util.Base64Blob(b.addressAttributes) : undefined,
+  chainCode: b.chainCode ? Cardano.util.HexBlob(b.chainCode) : undefined,
+  key: b.key ? Cardano.Ed25519PublicKey(b.key) : undefined,
+  signature: b.signature ? Cardano.Ed25519Signature(b.signature) : undefined
+});
+
+const mapRedeemer = (key: string, redeemer: Schema.Redeemer): Cardano.Redeemer => {
+  const purposeAndIndex = key.split(':');
+
+  return {
+    executionUnits: redeemer.executionUnits,
+    index: Number(purposeAndIndex[1]),
+    purpose: purposeAndIndex[0] as Cardano.RedeemerPurpose,
+    scriptHash: Cardano.util.Hash28ByteBase16(redeemer.redeemer)
+  };
+};
+
+const mapAuxiliaryData = (data: Schema.AuxiliaryData | null): Cardano.AuxiliaryData | undefined => {
+  if (data === null) return undefined;
+
+  return {
+    body: {
+      blob: data.body.blob
+        ? new Map(
+            Object.entries(data.body.blob).map(([key, value]) => [BigInt(key), ProviderUtil.jsonToMetadatum(value)])
+          )
+        : undefined,
+      scripts: data.body.scripts ? data.body.scripts.map(mapScript) : undefined
+    },
+    hash: Cardano.util.Hash32ByteBase16(data.hash)
+  };
+};
+
+const mapTxIn = (txIn: Schema.TxIn): Cardano.NewTxIn => ({
+  index: txIn.index,
+  txId: Cardano.TransactionId(txIn.txId)
+});
+
+const mapTxOut = (txOut: Schema.TxOut): Cardano.TxOut => ({
+  address: Cardano.Address(txOut.address),
+  // `txOut.datum` could be `[k: string]: unknown` as well
+  datum: txOut.datum ? Cardano.util.Hash32ByteBase16(txOut.datum as Schema.Datum) : undefined,
+  value: {
+    assets: txOut.value.assets
+      ? new Map(Object.entries(txOut.value.assets).map(([key, value]) => [Cardano.AssetId(key), value]))
+      : undefined,
+    coins: txOut.value.coins
+  }
+});
+
+const mapMint = (tx: Schema.TxMary): Cardano.TokenMap | undefined => {
+  if (tx.body.mint.assets === undefined) return undefined;
+  return new Map(Object.entries(tx.body.mint.assets).map(([key, value]) => [Cardano.AssetId(key), value]));
+};
+
+const mapScriptIntegrityHash = ({
+  body: { scriptIntegrityHash }
+}: Schema.TxAlonzo): Cardano.util.Hash32ByteBase16 | undefined => {
+  if (scriptIntegrityHash === null) return undefined;
+  return Cardano.util.Hash32ByteBase16(scriptIntegrityHash);
+};
+
+const mapValidityInterval = ({
+  invalidBefore,
+  invalidHereafter
+}: Schema.ValidityInterval): Cardano.ValidityInterval => ({
+  invalidBefore: invalidBefore ?? undefined,
+  invalidHereafter: invalidHereafter ?? undefined
+});
+
+const mapCommonTx = (tx: CommonBlock['body'][0], kind: BlockKind): Cardano.NewTxAlonzo => ({
+  auxiliaryData: mapAuxiliaryData(tx.metadata),
+  body: {
+    certificates: tx.body.certificates.map(mapCertificate),
+    collaterals: isAlonzoOrAbove(kind) ? (tx as Schema.TxAlonzo).body.collaterals.map(mapTxIn) : undefined,
+    fee: tx.body.fee,
+    inputs: tx.body.inputs.map(mapTxIn),
+    mint: isMaryOrAbove(kind) ? mapMint(tx as Schema.TxMary) : undefined,
+    outputs: tx.body.outputs.map(mapTxOut),
+    requiredExtraSignatures: isAlonzoOrAbove(kind)
+      ? (tx as Schema.TxAlonzo).body.requiredExtraSignatures.map(Cardano.Ed25519KeyHash)
+      : undefined,
+    scriptIntegrityHash: isAlonzoOrAbove(kind) ? mapScriptIntegrityHash(tx as Schema.TxAlonzo) : undefined,
+    validityInterval: isShelleyTx(kind)
+      ? undefined
+      : mapValidityInterval((tx as Schema.TxAlonzo).body.validityInterval),
+    withdrawals: Object.entries(tx.body.withdrawals).map(([key, value]) => ({
+      quantity: value,
+      stakeAddress: Cardano.RewardAccount(key)
+    }))
+  },
+  id: Cardano.TransactionId(tx.id),
+  witness: {
+    bootstrap: tx.witness.bootstrap.map(mapBootstrapWitness),
+    datums: isAlonzoOrAbove(kind)
+      ? Object.values((tx as Schema.TxAlonzo).witness.datums).map((d) => Cardano.util.HexBlob(d))
+      : undefined,
+    redeemers: isAlonzoOrAbove(kind)
+      ? Object.entries((tx as Schema.TxAlonzo).witness.redeemers).map(([key, value]) => mapRedeemer(key, value))
+      : undefined,
+    scripts: [...Object.values(tx.witness.scripts).map(mapScript)],
+    signatures: new Map(
+      Object.entries(tx.witness.signatures).map(([key, value]) => [
+        Cardano.Ed25519PublicKey(key),
+        Cardano.Ed25519Signature(value)
+      ])
+    )
+  }
+});
+
+export const mapCommonBlockBody = ({ body }: CommonBlock, kind: BlockKind): Cardano.Block['body'] =>
+  body.map((blockBody) => mapCommonTx(blockBody, kind));
+
+const mapByronTx = (tx: Schema.TxByron): Cardano.NewTxAlonzo => ({
+  body: {
+    fee: 0n, // Not sure how to calculate the fee from ByronTx there is no fee?
+    inputs: tx.body.inputs.map(mapTxIn),
+    outputs: tx.body.outputs.map(mapTxOut)
+  },
+  id: Cardano.TransactionId(tx.id),
+  witness: {
+    signatures: new Map()
+  }
+});
+
+export const mapByronBlockBody = ({ body }: Schema.StandardBlock): Cardano.Block['body'] =>
+  body.txPayload.map((txPayload) => mapByronTx(txPayload));
