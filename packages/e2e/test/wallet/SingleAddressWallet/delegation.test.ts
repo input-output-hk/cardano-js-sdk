@@ -1,12 +1,12 @@
 /* eslint-disable max-statements */
-import { Awaited, BigIntMath } from '@cardano-sdk/util';
+import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
 import { ObservableWallet, StakeKeyStatus, buildTx } from '@cardano-sdk/wallet';
 import { TX_TIMEOUT, firstValueFromTimed, waitForWalletStateSettle, walletReady } from '../../util';
+import { TestWallet, getWallet } from '../../../src/factories';
 import { assertTxIsValid } from '../../../../wallet/test/util';
 import { combineLatest, filter, firstValueFrom } from 'rxjs';
 import { getEnv, walletVariables } from '../../environment';
-import { getWallet } from '../../../src/factories';
 import { logger } from '@cardano-sdk/util-dev';
 
 const env = getEnv(walletVariables);
@@ -44,8 +44,8 @@ const waitForTx = async (wallet: ObservableWallet, hash: Cardano.TransactionId) 
 };
 
 describe('SingleAddressWallet/delegation', () => {
-  let wallet1: Awaited<ReturnType<typeof getWallet>>;
-  let wallet2: Awaited<ReturnType<typeof getWallet>>;
+  let wallet1: TestWallet;
+  let wallet2: TestWallet;
 
   beforeAll(async () => {
     jest.setTimeout(180_000);

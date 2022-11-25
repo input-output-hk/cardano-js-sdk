@@ -1,11 +1,18 @@
-import { Cardano, createSlotEpochCalc } from '@cardano-sdk/core';
-import { SignedTx, SingleAddressWallet, buildTx } from '@cardano-sdk/wallet';
+import { Cardano } from '@cardano-sdk/core';
+import { SingleAddressWallet, buildTx } from '@cardano-sdk/wallet';
 import { TestWallet, getWallet } from '../../src';
 import { assertTxIsValid, waitForWalletStateSettle } from '../../../wallet/test/util';
-import { filter, firstValueFrom } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { getEnv, walletVariables } from '../environment';
+import {
+  getTxConfirmationEpoch,
+  requestCoins,
+  runningAgainstLocalNetwork,
+  submitAndConfirm,
+  transferCoins,
+  waitForEpoch
+} from '../util';
 import { logger } from '@cardano-sdk/util-dev';
-import { requestCoins, runningAgainstLocalNetwork, submitAndConfirm, transferCoins, waitForEpoch } from '../util';
 
 const env = getEnv(walletVariables);
 
@@ -71,18 +78,6 @@ describe('delegation rewards', () => {
       return signedTx;
     };
 
-    const getTxConfirmationEpoch = async (tx: SignedTx) => {
-      const txs = await firstValueFrom(
-        wallet1.transactions.history$.pipe(filter((_) => _.some(({ id }) => id === tx.tx.id)))
-      );
-      const delegationTx = txs.find(({ id }) => id === tx.tx.id);
-      const slotEpochCalc = createSlotEpochCalc(await firstValueFrom(wallet1.eraSummaries$));
-      const delegationTxConfirmedAtEpoch = slotEpochCalc(delegationTx!.blockHeader.slot);
-      logger.info(`Delegation tx confirmed at epoch #${delegationTxConfirmedAtEpoch}`);
-
-      return delegationTxConfirmedAtEpoch;
-    };
-
     const generateTxs = async () => {
       logger.info('Sending 100 txs to generate reward fees');
 
@@ -117,7 +112,10 @@ describe('delegation rewards', () => {
     // Stake and wait for reward
 
     const signedTx = await submitDelegationTx();
-    const delegationTxConfirmedAtEpoch = await getTxConfirmationEpoch(signedTx);
+    const delegationTxConfirmedAtEpoch = await getTxConfirmationEpoch(wallet1, signedTx.tx);
+
+    logger.info(`Delegation tx confirmed at epoch #${delegationTxConfirmedAtEpoch}`);
+
     await waitForEpoch(wallet1, delegationTxConfirmedAtEpoch + 2);
     await generateTxs();
     await waitForEpoch(wallet1, delegationTxConfirmedAtEpoch + 4);
