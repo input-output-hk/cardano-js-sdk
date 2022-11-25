@@ -34,7 +34,7 @@ $ yarn workspace @cardano-sdk/e2e generate-mnemonics
 And you will get the set of mnemonics plus the first derivative address on the console:
 
 ```bash
-$ ts-node ./src/util/mnemonic.ts
+$ ts-node ./src/scripts/mnemonic.ts
 
   Mnemonic:   toward bridge spell endless tunnel there deputy market scheme ketchup heavy fall fault pudding split desert swear maximum orchard estate match good decorate tribe
 

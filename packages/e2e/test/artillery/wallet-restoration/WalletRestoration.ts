@@ -4,7 +4,7 @@ import { Cardano } from '@cardano-sdk/core';
 import { FunctionHook } from '../artillery';
 import { Pool, QueryResult } from 'pg';
 import { StubKeyAgent, getWallet } from '../../../src';
-import { findAddressesWithRewardsHistory } from './queries';
+import { findAddressesWithRegisteredStakeKey } from './queries';
 import { getEnv, walletVariables } from '../../environment';
 import { logger } from '@cardano-sdk/util-dev';
 import { walletReady } from '../../util';
@@ -34,7 +34,9 @@ export const findAddresses: FunctionHook<WalletVars> = async ({ vars }, ee, done
 
   try {
     logger.info('About to query db for distinct addresses');
-    const result: QueryResult<AddressesModel> = await db.query(findAddressesWithRewardsHistory, [vars.walletsCount]);
+    const result: QueryResult<AddressesModel> = await db.query(findAddressesWithRegisteredStakeKey, [
+      vars.walletsCount
+    ]);
     logger.info('Found addresses count', result.rowCount);
 
     vars.addresses = result.rows.map(mapToGroupedAddress);

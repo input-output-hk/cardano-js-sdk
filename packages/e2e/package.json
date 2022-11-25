@@ -48,8 +48,8 @@
     "prepack": "yarn build",
     "test:build:verify": "yarn test:web-extension:build",
     "test:debug": "DEBUG=true yarn test",
-    "generate-mnemonics": "ts-node src/util/mnemonic.ts",
-    "wait-for-network": "ts-node src/util/is-local-network-ready.ts"
+    "generate-mnemonics": "ts-node src/scripts/mnemonic.ts",
+    "wait-for-network": "ts-node src/scripts/is-local-network-ready.ts"
   },
   "repository": "https://github.com/input-output-hk/cardano-js-sdk",
   "contributors": [

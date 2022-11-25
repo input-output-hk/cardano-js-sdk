@@ -1,7 +1,7 @@
 /**
- * Query randomized distinct addresses from db associated with users who are staking
+ * Query randomized distinct addresses from db associated with users who are staking.
  */
-export const findAddressesWithRewardsHistory = `
+export const findAddressesWithRegisteredStakeKey = `
   SELECT * FROM (
     SELECT DISTINCT txOut.address as address, sa.view as stake_address
     FROM public.delegation d
