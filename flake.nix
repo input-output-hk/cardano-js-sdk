@@ -80,14 +80,13 @@
 
           mkdir -p $out/libexec/$sourceRoot $out/bin
 
-          test -f ${production-deps}/libexec/$sourceRoot/packages/cardano-services/node_modules && cp -r ${production-deps}/libexec/$sourceRoot/node_modules $out/libexec/$sourceRoot/node_modules
+          cp -r ${production-deps}/libexec/$sourceRoot/node_modules $out/libexec/$sourceRoot/node_modules
           cp -r scripts $out/libexec/$sourceRoot/scripts
           for p in cardano-services core ogmios util; do
             mkdir -p $out/libexec/$sourceRoot/packages/$p
             cp -r packages/$p/dist $out/libexec/$sourceRoot/packages/$p/dist
             cp -r packages/$p/package.json $out/libexec/$sourceRoot/packages/$p/package.json
           done
-          test -f ${production-deps}/libexec/$sourceRoot/packages/cardano-services/node_modules && cp -r ${production-deps}/libexec/$sourceRoot/packages/cardano-services/node_modules $out/libexec/$sourceRoot/packages/cardano-services/node_modules
           cp -r ${production-deps}/libexec/$sourceRoot/packages/cardano-services/config $out/libexec/$sourceRoot/packages/cardano-services/config
 
           cd "$out/libexec/$sourceRoot"
