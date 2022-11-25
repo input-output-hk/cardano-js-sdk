@@ -1,7 +1,13 @@
 import { Cardano, EpochRewards } from '@cardano-sdk/core';
+import { KeyRole } from '@cardano-sdk/key-management';
 
 export const rewardAccount = Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d');
 export const stakeKeyHash = Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccount);
+
+export const stakeKeyDerivationPath = {
+  index: 0,
+  role: KeyRole.Stake
+};
 
 export const rewardAccountBalance = 33_333n;
 

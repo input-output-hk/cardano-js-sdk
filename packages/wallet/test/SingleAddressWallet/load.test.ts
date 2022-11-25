@@ -49,6 +49,7 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
         index: 0,
         networkId: Cardano.NetworkId.testnet,
         rewardAccount,
+        stakeKeyDerivationPath: mocks.stakeKeyDerivationPath,
         type: AddressType.External
       };
       const asyncKeyAgent = await testAsyncKeyAgent([groupedAddress], dependencies);

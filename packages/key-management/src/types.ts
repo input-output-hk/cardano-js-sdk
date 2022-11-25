@@ -78,6 +78,7 @@ export interface GroupedAddress {
   accountIndex: number;
   address: Cardano.Address;
   rewardAccount: Cardano.RewardAccount;
+  stakeKeyDerivationPath?: AccountKeyDerivationPath;
 }
 
 export interface TrezorConfig {
