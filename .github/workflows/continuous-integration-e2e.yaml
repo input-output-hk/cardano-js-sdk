@@ -47,6 +47,7 @@ jobs:
     - name: 🔬 Test - e2e - wallet
       run: |
         yarn workspace @cardano-sdk/e2e test:wallet
+        yarn workspace @cardano-sdk/e2e test:providers
       env:
         FAUCET_PROVIDER: 'cardano-wallet'
         FAUCET_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:8090/v2","mnemonic":"fire method repair aware foot tray accuse brother popular olive find account sick rocket next"}'
@@ -68,3 +69,4 @@ jobs:
         UTXO_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/utxo"}'
         STAKE_POOL_PROVIDER: 'http'
         STAKE_POOL_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/stake-pool"}'
+        STAKE_POOL_PROVIDER_URL: 'http://localhost:4000/stake-pool'

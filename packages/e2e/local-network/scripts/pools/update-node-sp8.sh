@@ -13,7 +13,7 @@ SP_NODE_ID=8
 RETIRING_EPOCH=3
 POOL_PLEDGE=500000000
 POOL_OWNER_STAKE=300000000 # Must be lesser than pledge
-POOL_COST=390000000
+POOL_COST=380000000
 POOL_MARGIN=0.15
 METADATA_URL="" # Leave it empty and the metadata field will be ignore in the TX
 
