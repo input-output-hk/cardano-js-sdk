@@ -43,7 +43,7 @@ export interface TxBodyAlonzo {
   collaterals?: TxIn[];
   outputs: TxOut[];
   fee: Lovelace;
-  validityInterval: ValidityInterval;
+  validityInterval?: ValidityInterval;
   withdrawals?: Withdrawal[];
   certificates?: Certificate[];
   mint?: TokenMap;
@@ -78,10 +78,10 @@ export type AddressAttributes = Base64Blob;
 export type VerificationKey = Ed25519PublicKey;
 
 export interface BootstrapWitness {
-  signature: Signature;
+  signature?: Signature;
   chainCode?: ChainCode;
   addressAttributes?: AddressAttributes;
-  key: VerificationKey;
+  key?: VerificationKey;
 }
 
 export type Witness = {

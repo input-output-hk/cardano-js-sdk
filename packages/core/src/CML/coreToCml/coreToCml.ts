@@ -375,13 +375,13 @@ export const txBody = (
       txInputs(scope, inputs),
       cslOutputs,
       scope.manage(BigNum.from_str(fee.toString())),
-      BigNum.from_str(validityInterval.invalidHereafter ? validityInterval.invalidHereafter.toString() : '0')
+      BigNum.from_str(validityInterval?.invalidHereafter ? validityInterval.invalidHereafter.toString() : '0')
     )
   );
 
-  if (validityInterval.invalidBefore) {
+  if (validityInterval?.invalidBefore) {
     cslBody.set_validity_start_interval(
-      BigNum.from_str(validityInterval.invalidBefore ? validityInterval.invalidBefore.toString() : '0')
+      BigNum.from_str(validityInterval?.invalidBefore ? validityInterval.invalidBefore.toString() : '0')
     );
   }
   if (mint) {
@@ -420,16 +420,18 @@ export const txWitnessBootstrap = (
 ): BootstrapWitnesses => {
   const witnesses = scope.manage(BootstrapWitnesses.new());
   for (const coreWitness of bootstrap) {
-    witnesses.add(
-      scope.manage(
-        BootstrapWitness.new(
-          scope.manage(Vkey.new(scope.manage(PublicKey.from_bytes(Buffer.from(coreWitness.key.toString(), 'hex'))))),
-          scope.manage(Ed25519Signature.from_hex(coreWitness.signature.toString())),
-          Buffer.from(coreWitness.chainCode || '', 'hex'),
-          scope.manage(AddrAttributes.from_bytes(Buffer.from(coreWitness.addressAttributes || '', 'base64')))
+    if (coreWitness.key && coreWitness.signature) {
+      witnesses.add(
+        scope.manage(
+          BootstrapWitness.new(
+            scope.manage(Vkey.new(scope.manage(PublicKey.from_bytes(Buffer.from(coreWitness.key.toString(), 'hex'))))),
+            scope.manage(Ed25519Signature.from_hex(coreWitness.signature.toString())),
+            Buffer.from(coreWitness.chainCode || '', 'hex'),
+            scope.manage(AddrAttributes.from_bytes(Buffer.from(coreWitness.addressAttributes || '', 'base64')))
+          )
         )
-      )
-    );
+      );
+    }
   }
   return witnesses;
 };

@@ -108,9 +108,9 @@ describe('coreToCml', () => {
     expect(Buffer.from(scope.manage(input0.transaction_id()).to_bytes()).toString('hex')).toBe(txBody.inputs[0].txId);
     expect(output0AmountCoin.to_str()).toBe(txBody.outputs[0].value.coins.toString());
     expect(Number(scope.manage(cmlBody.validity_start_interval())?.to_str())).toBe(
-      txBody.validityInterval.invalidBefore
+      txBody.validityInterval!.invalidBefore
     );
-    expect(Number(scope.manage(cmlBody.ttl())?.to_str())).toBe(txBody.validityInterval.invalidHereafter);
+    expect(Number(scope.manage(cmlBody.ttl())?.to_str())).toBe(txBody.validityInterval!.invalidHereafter);
     expect(withdrawal0!.to_str()).toBe(txBody.withdrawals![0].quantity.toString());
     const mint = scope.manage(cmlBody.multiassets())!;
     const scriptHashes = scope.manage(mint.keys());
