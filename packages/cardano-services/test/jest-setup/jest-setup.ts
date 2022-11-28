@@ -8,8 +8,8 @@ dotenv.config({ path: path.join(__dirname, '../../.env.test') });
 
 module.exports = async () => {
   const { user, password, port } = parse(
-    process.env.INTEGRAION_TESTS_POSTGRES_CONNECTION_STRING
-      ? process.env.INTEGRAION_TESTS_POSTGRES_CONNECTION_STRING
+    process.env.POSTGRES_CONNECTION_STRING
+      ? process.env.POSTGRES_CONNECTION_STRING
       : 'postgresql://postgres:mysecretpassword@127.0.0.1:5432/cardano'
   );
 

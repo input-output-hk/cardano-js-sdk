@@ -54,7 +54,7 @@ describe('AssetHttpService', () => {
   describe('healthy state', () => {
     beforeAll(async () => {
       ({ closeMock, serverUrl } = await mockTokenRegistry(() => ({})));
-      db = new Pool({ connectionString: process.env.LOCALNETWORK_INTEGRATION_TESTS_POSTGRES_CONNECTION_STRING });
+      db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
       ntfMetadataService = new DbSyncNftMetadataService({
         db,
         logger,

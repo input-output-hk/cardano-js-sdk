@@ -1,10 +1,17 @@
 import { DbSyncEpochPollService } from '../../../src/util';
+import { NetworkInfoFixtureBuilder } from '../../NetworkInfo/fixtures/FixtureBuilder';
 import { Pool } from 'pg';
 import { ingestDbData, sleep, wrapWithTransaction } from '../../util';
+import { logger } from '@cardano-sdk/util-dev';
 
 describe('DbSyncEpochPollService', () => {
   const epochPollInterval = 2 * 1000;
-  const db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING, max: 1, min: 1 });
+  const db = new Pool({
+    connectionString: process.env.POSTGRES_CONNECTION_STRING,
+    max: 1,
+    min: 1
+  });
+  const fixtureBuilder = new NetworkInfoFixtureBuilder(db, logger);
   const epochMonitor = new DbSyncEpochPollService(db, epochPollInterval!);
 
   describe('healthy state', () => {
@@ -15,7 +22,7 @@ describe('DbSyncEpochPollService', () => {
     it(
       'should execute all registered callbacks once the epoch rollover is detected by db polling',
       wrapWithTransaction(async (dbConnection) => {
-        const currentEpoch = 205;
+        const currentEpoch = await fixtureBuilder.getLasKnownEpoch();
         const greaterEpoch = 255;
 
         const firstRegisteredCallback = jest.fn();

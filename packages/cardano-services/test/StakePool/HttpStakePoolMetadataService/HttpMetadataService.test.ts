@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { DataMocks } from '../../data-mocks';
 import { ExtMetadataFormat } from '../../../src/StakePool/types';
 import { adaPoolsExtMetadataMock, cip6ExtMetadataMock, mainExtMetadataMock } from './mocks';
 import { createGenericMockServer, logger } from '@cardano-sdk/util-dev';
@@ -49,7 +50,7 @@ describe('StakePoolExtMetadataService', () => {
       const result = await extendedMetadataService.getStakePoolExtendedMetadata(extMetadata);
 
       expect(result).not.toBeNull();
-      expect(result).toMatchSnapshot();
+      expect(result).toMatchShapeOf(DataMocks.Pool.adaPoolExtendedMetadata);
     });
 
     it('returns CIP-6 format when extDataUrl is present in the metadata', async () => {
@@ -60,7 +61,7 @@ describe('StakePoolExtMetadataService', () => {
       const result = await extendedMetadataService.getStakePoolExtendedMetadata(extMetadata);
 
       expect(result).not.toBeNull();
-      expect(result).toMatchSnapshot();
+      expect(result).toMatchShapeOf(DataMocks.Pool.cip6ExtendedMetadata);
     });
 
     it('returns CIP-6 format with priority when the metadata including both extended properties', async () => {

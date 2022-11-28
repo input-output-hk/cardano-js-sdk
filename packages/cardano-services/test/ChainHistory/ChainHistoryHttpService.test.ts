@@ -46,7 +46,7 @@ describe('ChainHistoryHttpService', () => {
     clientConfig = { baseUrl, logger };
     config = { listen: { port } };
     dbConnection = new Pool({
-      connectionString: process.env.LOCALNETWORK_INTEGRATION_TESTS_POSTGRES_CONNECTION_STRING
+      connectionString: process.env.POSTGRES_CONNECTION_STRING
     });
     fixtureBuilder = new ChainHistoryFixtureBuilder(dbConnection, logger);
   });
@@ -454,7 +454,7 @@ describe('ChainHistoryHttpService', () => {
 
       describe('finds transactions of given addresses', () => {
         it('finds transactions with address within inputs', async () => {
-          const genesisAddresses: Cardano.Address[] = await fixtureBuilder.getGenesisAddresses();
+          const genesisAddresses: Cardano.Address[] = await fixtureBuilder.getDistinctAddresses(3);
           const addresses: Cardano.Address[] = [genesisAddresses[0]];
           const response = await provider.transactionsByAddresses({ addresses, pagination: { limit: 5, startAt: 0 } });
           expect(response.pageResults.length).toBeGreaterThan(0);
@@ -468,11 +468,11 @@ describe('ChainHistoryHttpService', () => {
           const addresses: Cardano.Address[] = await fixtureBuilder.getGenesisAddresses();
           const firstPageResponse = await provider.transactionsByAddresses({
             addresses,
-            pagination: { limit: 5, startAt: 0 }
+            pagination: { limit: 3, startAt: 0 }
           });
           const secondPageResponse = await provider.transactionsByAddresses({
             addresses,
-            pagination: { limit: 5, startAt: 5 }
+            pagination: { limit: 3, startAt: 3 }
           });
 
           const firstTx = firstPageResponse.pageResults[0];
