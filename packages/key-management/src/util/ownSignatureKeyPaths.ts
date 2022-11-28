@@ -9,7 +9,7 @@ import uniq from 'lodash/uniq';
  * @returns {AccountKeyDerivationPath[]} derivation paths for keys to sign transaction with
  */
 export const ownSignatureKeyPaths = async (
-  txBody: Cardano.NewTxBodyAlonzo,
+  txBody: Cardano.TxBody,
   knownAddresses: GroupedAddress[],
   inputResolver: Cardano.util.InputResolver
 ): Promise<AccountKeyDerivationPath[]> => {

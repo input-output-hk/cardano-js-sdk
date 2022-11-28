@@ -53,7 +53,7 @@ export const txIn = {
   txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
 };
 
-export const txInWithAddress: Cardano.TxIn = {
+export const txInWithAddress: Cardano.HydratedTxIn = {
   address: Cardano.Address(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
@@ -75,7 +75,7 @@ export const txOutWithDatum: Cardano.TxOut = {
   value: valueWithAssets
 };
 
-export const txBody: Cardano.NewTxBodyAlonzo = {
+export const txBody: Cardano.TxBody = {
   certificates: [
     {
       __typename: Cardano.CertificateType.PoolRetirement,
@@ -114,7 +114,7 @@ export const vkey = '6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f
 export const signature =
   // eslint-disable-next-line max-len
   'bdea87fca1b4b4df8a9b8fb4183c0fab2f8261eb6c5e4bc42c800bb9c8918755bdea87fca1b4b4df8a9b8fb4183c0fab2f8261eb6c5e4bc42c800bb9c8918755';
-export const tx: Cardano.NewTxAlonzo = {
+export const tx: Cardano.Tx = {
   auxiliaryData: {
     body: {
       blob: new Map<bigint, Cardano.Metadatum>([

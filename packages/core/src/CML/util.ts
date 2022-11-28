@@ -2,7 +2,7 @@
 import { BigNum } from '@dcspark/cardano-multiplatform-lib-nodejs';
 import { CML } from './CML';
 import { HexBlob } from '../Cardano/util/primitives';
-import { NewTxAlonzo, NewTxBodyAlonzo } from '../Cardano/types';
+import { Tx, TxBody } from '../Cardano/types';
 import { newTx } from './cmlToCore';
 import { usingAutoFree } from '@cardano-sdk/util';
 
@@ -39,4 +39,4 @@ export const deserializeTx = ((txBody: Buffer | Uint8Array | string) => usingAut
     const txDecoded = scope.manage(CML.Transaction.from_bytes(buffer));
 
     return newTx(txDecoded);
-  })) as (txBody: HexBlob | Buffer | Uint8Array | string) => NewTxAlonzo<NewTxBodyAlonzo>;
+  })) as (txBody: HexBlob | Buffer | Uint8Array | string) => Tx<TxBody>;

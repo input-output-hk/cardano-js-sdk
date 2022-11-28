@@ -10,11 +10,11 @@ export const shallowArrayEquals = <T>(a: T[], b: T[]) => arrayEquals(a, b, stric
 
 export const tipEquals = (a: Cardano.Tip, b: Cardano.Tip) => a.hash === b.hash;
 
-export const txEquals = (a: Cardano.TxAlonzo, b: Cardano.TxAlonzo) => a.id === b.id;
+export const txEquals = (a: Cardano.HydratedTx, b: Cardano.HydratedTx) => a.id === b.id;
 
-export const transactionsEquals = (a: Cardano.TxAlonzo[], b: Cardano.TxAlonzo[]) => arrayEquals(a, b, txEquals);
+export const transactionsEquals = (a: Cardano.HydratedTx[], b: Cardano.HydratedTx[]) => arrayEquals(a, b, txEquals);
 
-export const txInEquals = (a: Cardano.NewTxIn, b: Cardano.NewTxIn) => a.txId === b.txId && a.index === b.index;
+export const txInEquals = (a: Cardano.TxIn, b: Cardano.TxIn) => a.txId === b.txId && a.index === b.index;
 
 export const utxoEquals = (a: Cardano.Utxo[], b: Cardano.Utxo[]) =>
   arrayEquals(a, b, ([aTxIn], [bTxIn]) => txInEquals(aTxIn, bTxIn));

@@ -9,7 +9,7 @@ export type CreateTxInternalsProps = {
   certificates?: Cardano.Certificate[];
   withdrawals?: Cardano.Withdrawal[];
   auxiliaryData?: Cardano.AuxiliaryData;
-  collaterals?: Set<Cardano.NewTxIn>;
+  collaterals?: Set<Cardano.TxIn>;
   mint?: Cardano.TokenMap;
   scriptIntegrityHash?: Cardano.util.Hash32ByteBase16;
   requiredExtraSignatures?: Cardano.Ed25519KeyHash[];
@@ -35,7 +35,7 @@ export const createTransactionInternals = async ({
         value
       });
     }
-    const body: Cardano.NewTxBodyAlonzo = {
+    const body: Cardano.TxBody = {
       certificates,
       fee: inputSelection.fee,
       inputs: [...inputSelection.inputs].map(([txIn]) => txIn),

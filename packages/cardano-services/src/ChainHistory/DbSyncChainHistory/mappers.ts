@@ -59,7 +59,7 @@ export const mapTxOutTokenMap = (multiAssetModels: TxOutMultiAssetModel[]): TxOu
   return txTokenMap;
 };
 
-export const mapTxIn = (txIn: TxInput): Cardano.TxIn => ({
+export const mapTxIn = (txIn: TxInput): Cardano.HydratedTxIn => ({
   address: txIn.address,
   index: txIn.index,
   txId: txIn.txSourceId
@@ -153,20 +153,20 @@ export const mapCertificate = (
 };
 
 interface TxAlonzoData {
-  inputs: Cardano.TxIn[];
+  inputs: Cardano.HydratedTxIn[];
   outputs: Cardano.TxOut[];
   mint?: Cardano.TokenMap;
   withdrawals?: Cardano.Withdrawal[];
   redeemers?: Cardano.Redeemer[];
   metadata?: Cardano.TxMetadata;
-  collaterals?: Cardano.TxIn[];
+  collaterals?: Cardano.HydratedTxIn[];
   certificates?: Cardano.Certificate[];
 }
 
 export const mapTxAlonzo = (
   txModel: TxModel,
   { inputs, outputs, mint, withdrawals, redeemers, metadata, collaterals, certificates }: TxAlonzoData
-): Cardano.TxAlonzo => ({
+): Cardano.HydratedTx => ({
   auxiliaryData:
     metadata && metadata.size > 0
       ? {

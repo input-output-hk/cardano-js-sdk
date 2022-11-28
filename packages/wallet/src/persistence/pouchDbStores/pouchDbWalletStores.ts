@@ -19,7 +19,7 @@ export class PouchDbAddressesStore extends PouchDbDocumentStore<GroupedAddress[]
 export class PouchDbInFlightTransactionsStore extends PouchDbDocumentStore<TxInFlight[]> {}
 export class PouchDbVolatileTransactionsStore extends PouchDbDocumentStore<ConfirmedTx[]> {}
 
-export class PouchDbTransactionsStore extends PouchDbCollectionStore<Cardano.TxAlonzo> {}
+export class PouchDbTransactionsStore extends PouchDbCollectionStore<Cardano.HydratedTx> {}
 export class PouchDbUtxoStore extends PouchDbCollectionStore<Cardano.Utxo> {}
 
 export class PouchDbRewardsHistoryStore extends PouchDbKeyValueStore<Cardano.RewardAccount, EpochRewards[]> {}

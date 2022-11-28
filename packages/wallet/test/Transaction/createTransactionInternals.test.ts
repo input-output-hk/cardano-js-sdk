@@ -67,7 +67,7 @@ describe('Transaction.createTransactionInternals', () => {
     };
     const txInternals = await createSimpleTransactionInternals(() => props);
     expect(txInternals.body.outputs).toHaveLength(2);
-    expect(txInternals.body.collaterals).toEqual<Cardano.NewTxIn[]>([utxo[2][0]]);
+    expect(txInternals.body.collaterals).toEqual<Cardano.TxIn[]>([utxo[2][0]]);
     expect(txInternals.body.mint).toEqual<Cardano.TokenMap>(props.mint);
     expect(txInternals.body.requiredExtraSignatures).toEqual<Cardano.Ed25519KeyHash[]>(props.requiredExtraSignatures);
     expect(txInternals.body.scriptIntegrityHash).toEqual<Cardano.util.Hash32ByteBase16>(props.scriptIntegrityHash);

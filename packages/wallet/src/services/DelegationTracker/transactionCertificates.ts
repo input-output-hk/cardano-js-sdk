@@ -38,7 +38,7 @@ export const isLastStakeKeyCertOfType = (
 };
 
 export const transactionsWithCertificates = (
-  transactions$: Observable<Cardano.TxAlonzo[]>,
+  transactions$: Observable<Cardano.HydratedTx[]>,
   rewardAccounts$: Observable<Cardano.RewardAccount[]>,
   certificateTypes: Cardano.CertificateType[]
 ) =>

@@ -178,7 +178,7 @@ describe('cip30', () => {
     describe('submitTx', () => {
       let cmlTx: string;
       let txInternals: InitializeTxResult;
-      let finalizedTx: Cardano.NewTxAlonzo<Cardano.NewTxBodyAlonzo>;
+      let finalizedTx: Cardano.Tx<Cardano.TxBody>;
 
       beforeAll(async () => {
         txInternals = await wallet.initializeTx(simpleTxProps);

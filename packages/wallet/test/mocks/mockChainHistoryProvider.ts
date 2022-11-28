@@ -13,7 +13,7 @@ const address = Cardano.Address(
   'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'
 );
 
-export const generateTxAlonzo = (qty: number): Cardano.TxAlonzo[] =>
+export const generateTxAlonzo = (qty: number): Cardano.HydratedTx[] =>
   [...Array.from({ length: qty }).keys()].map((index) => ({
     blockHeader: {
       blockNo: 10_669,
@@ -46,7 +46,7 @@ export const generateTxAlonzo = (qty: number): Cardano.TxAlonzo[] =>
     }
   }));
 
-export const queryTransactionsResult: Paginated<Cardano.TxAlonzo> = {
+export const queryTransactionsResult: Paginated<Cardano.HydratedTx> = {
   pageResults: [
     {
       blockHeader: {
@@ -134,12 +134,12 @@ export const queryTransactionsResult: Paginated<Cardano.TxAlonzo> = {
         }
       },
       id: Cardano.TransactionId('6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad')
-    } as Cardano.TxAlonzo
+    } as Cardano.HydratedTx
   ],
   totalResultCount: 2
 };
 
-export const queryTransactionsResult2: Paginated<Cardano.TxAlonzo> = {
+export const queryTransactionsResult2: Paginated<Cardano.HydratedTx> = {
   pageResults: [
     ...queryTransactionsResult.pageResults,
     {
@@ -149,7 +149,7 @@ export const queryTransactionsResult2: Paginated<Cardano.TxAlonzo> = {
         slot: ledgerTip.slot - 50_000
       },
       id: Cardano.TransactionId('6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99caa')
-    } as Cardano.TxAlonzo
+    } as Cardano.HydratedTx
   ],
   totalResultCount: 3
 };

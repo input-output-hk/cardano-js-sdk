@@ -89,7 +89,7 @@ describe('InMemoryKeyAgent', () => {
       { index: 0, role: 0 },
       { index: 0, role: 2 }
     ]);
-    const body = {} as unknown as Cardano.TxBodyAlonzo;
+    const body = {} as unknown as Cardano.HydratedTxBody;
     const witnessSet = await keyAgent.signTransaction({
       body,
       hash: Cardano.TransactionId('8561258e210352fba2ac0488afed67b3427a27ccf1d41ec030c98a8199bc22ec')

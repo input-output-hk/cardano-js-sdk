@@ -225,7 +225,7 @@ describe('ChainHistoryHttpService', () => {
         it('has outputs with multi-assets', async () => {
           const ids = await fixtureBuilder.getTxHashes(1, { with: [TxWith.MultiAsset] });
           const response = await provider.transactionsByHashes({ ids });
-          const tx: Cardano.TxAlonzo = response[0];
+          const tx: Cardano.HydratedTx = response[0];
 
           // A transaction involving multi assets could also have outputs without multi assets, so we must first
           // find the index of the output inside the transaction with the native tokens.
@@ -240,7 +240,7 @@ describe('ChainHistoryHttpService', () => {
           const response = await provider.transactionsByHashes({
             ids: await fixtureBuilder.getTxHashes(1, { with: [TxWith.Mint] })
           });
-          const tx: Cardano.TxAlonzo = response[0];
+          const tx: Cardano.HydratedTx = response[0];
           expect(response.length).toEqual(1);
           expect(tx.body.mint).toMatchShapeOf(DataMocks.Tx.mint);
           expect(tx.body.mint?.size).toBeGreaterThan(0);
@@ -250,7 +250,7 @@ describe('ChainHistoryHttpService', () => {
           const response = await provider.transactionsByHashes({
             ids: await fixtureBuilder.getTxHashes(1, { with: [TxWith.Withdrawal] })
           });
-          const tx: Cardano.TxAlonzo = response[0];
+          const tx: Cardano.HydratedTx = response[0];
           expect(response.length).toEqual(1);
           expect(tx.body.withdrawals!).toMatchShapeOf(DataMocks.Tx.withdrawals);
           expect(tx.body.withdrawals?.length).toBeGreaterThan(0);
@@ -261,7 +261,7 @@ describe('ChainHistoryHttpService', () => {
             ids: await fixtureBuilder.getTxHashes(1, { with: [TxWith.Redeemer] })
           });
 
-          const tx: Cardano.NewTxAlonzo = response[0];
+          const tx: Cardano.Tx = response[0];
           expect(response.length).toEqual(1);
           expect(tx.witness).toMatchShapeOf(DataMocks.Tx.witnessRedeemers);
           expect(tx.witness.redeemers?.length).toBeGreaterThan(0);
@@ -271,7 +271,7 @@ describe('ChainHistoryHttpService', () => {
           const response = await provider.transactionsByHashes({
             ids: await fixtureBuilder.getTxHashes(1, { with: [TxWith.AuxiliaryData] })
           });
-          const tx: Cardano.TxAlonzo = response[0];
+          const tx: Cardano.HydratedTx = response[0];
           expect(response.length).toEqual(1);
           expect(tx.auxiliaryData).toBeDefined();
         });
@@ -280,7 +280,7 @@ describe('ChainHistoryHttpService', () => {
           const response = await provider.transactionsByHashes({
             ids: await fixtureBuilder.getTxHashes(1, { with: [TxWith.CollateralInput] })
           });
-          const tx: Cardano.TxAlonzo = response[0];
+          const tx: Cardano.HydratedTx = response[0];
           expect(response.length).toEqual(1);
 
           expect(tx.body.collaterals).toMatchShapeOf(DataMocks.Tx.collateralInputs);
@@ -292,8 +292,8 @@ describe('ChainHistoryHttpService', () => {
             ids: await fixtureBuilder.getTxHashes(2, { with: [TxWith.DelegationCertificate] })
           });
 
-          const tx1: Cardano.TxAlonzo = response[0];
-          const tx2: Cardano.TxAlonzo = response[1];
+          const tx1: Cardano.HydratedTx = response[0];
+          const tx2: Cardano.HydratedTx = response[1];
 
           expect(response.length).toEqual(2);
           expect(tx1.body.certificates?.length).toBeGreaterThan(0);
