@@ -18,7 +18,7 @@ export enum NativeScriptKind {
   RequireSignature = 0,
   RequireAllOf = 1,
   RequireAnyOf = 2,
-  RequireMOf = 3,
+  RequireNOf = 3,
   RequireTimeAfter = 4,
   RequireTimeBefore = 5
 }
@@ -114,7 +114,7 @@ export interface RequireAtLeastScript {
   /**
    * The native script kind.
    */
-  kind: NativeScriptKind.RequireMOf;
+  kind: NativeScriptKind.RequireNOf;
 }
 
 /**

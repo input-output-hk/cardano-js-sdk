@@ -349,11 +349,11 @@ export const nativeScript = (script: CML.NativeScript): Cardano.NativeScript =>
         }
         break;
       }
-      case Cardano.NativeScriptKind.RequireMOf: {
+      case Cardano.NativeScriptKind.RequireNOf: {
         const scriptMofK = scope.manage(script.as_script_n_of_k());
         coreScript = {
           __type: Cardano.ScriptType.Native,
-          kind: Cardano.NativeScriptKind.RequireMOf,
+          kind: Cardano.NativeScriptKind.RequireNOf,
           required: scriptMofK!.n(),
           scripts: new Array<Cardano.NativeScript>()
         };
