@@ -43,7 +43,7 @@ export interface HydratedTxBody {
   collaterals?: HydratedTxIn[];
   outputs: TxOut[];
   fee: Lovelace;
-  validityInterval: ValidityInterval;
+  validityInterval?: ValidityInterval;
   withdrawals?: Withdrawal[];
   certificates?: Certificate[];
   mint?: TokenMap;

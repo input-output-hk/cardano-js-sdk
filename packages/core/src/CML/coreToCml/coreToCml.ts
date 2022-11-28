@@ -375,13 +375,13 @@ export const txBody = (
       txInputs(scope, inputs),
       cslOutputs,
       scope.manage(BigNum.from_str(fee.toString())),
-      BigNum.from_str(validityInterval.invalidHereafter ? validityInterval.invalidHereafter.toString() : '0')
+      BigNum.from_str(validityInterval?.invalidHereafter ? validityInterval.invalidHereafter.toString() : '0')
     )
   );
 
-  if (validityInterval.invalidBefore) {
+  if (validityInterval?.invalidBefore) {
     cslBody.set_validity_start_interval(
-      BigNum.from_str(validityInterval.invalidBefore ? validityInterval.invalidBefore.toString() : '0')
+      BigNum.from_str(validityInterval?.invalidBefore ? validityInterval.invalidBefore.toString() : '0')
     );
   }
   if (mint) {

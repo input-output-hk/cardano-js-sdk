@@ -227,8 +227,8 @@ describe('TransactionsTracker', () => {
     it('emits at all relevant observable properties on timed out transaction', async () => {
       const tx = queryTransactionsResult.pageResults[0];
       createTestScheduler().run(({ hot, expectObservable }) => {
-        const tip1 = { slot: Cardano.Slot(tx.body.validityInterval.invalidHereafter!.valueOf() - 1) } as Cardano.Tip;
-        const tip2 = { slot: Cardano.Slot(tx.body.validityInterval.invalidHereafter!.valueOf() + 1) } as Cardano.Tip;
+        const tip1 = { slot: Cardano.Slot(tx.body.validityInterval!.invalidHereafter!.valueOf()! - 1) } as Cardano.Tip;
+        const tip2 = { slot: Cardano.Slot(tx.body.validityInterval!.invalidHereafter!.valueOf()! + 1) } as Cardano.Tip;
         const failedToSubmit$ = hot<FailedTx>('-----|');
         const tip$ = hot<Cardano.Tip>('--ab-|', { a: tip1, b: tip2 });
         const submitting$ = hot('-a---|', { a: tx });
@@ -274,12 +274,12 @@ describe('TransactionsTracker', () => {
         rollback of a transaction of which an output was used in a pending transaction interprets transaction as failed`, async () => {
       const tx = queryTransactionsResult.pageResults[0];
       createTestScheduler().run(({ cold, hot, expectObservable }) => {
-        const tip1 = { slot: Cardano.Slot(tx.body.validityInterval.invalidHereafter!.valueOf() - 1) } as Cardano.Tip;
+        const tip1 = { slot: Cardano.Slot(tx.body.validityInterval!.invalidHereafter!.valueOf() - 1) } as Cardano.Tip;
         const failedToSubmit$ = hot<FailedTx>('-----|');
         const tip$ = cold('a', { a: tip1 });
         const submitting$ = hot('-a---|', { a: tx });
-        const pending$ = hot(   '--a-a|', { a: tx }); // second emission must not re-add it to inFlight$
-        const rollback$ = hot(  '---a-|', { a: { id: tx.body.inputs[0].txId } as Cardano.HydratedTx });
+        const pending$ = hot('--a-a|', { a: tx }); // second emission must not re-add it to inFlight$
+        const rollback$ = hot('---a-|', { a: { id: tx.body.inputs[0].txId } as Cardano.HydratedTx });
         const transactionsSource$ = hot<Cardano.HydratedTx[]>('-----|');
         const transactionsTracker = createTransactionsTracker(
           {
@@ -301,8 +301,8 @@ describe('TransactionsTracker', () => {
             transactionsSource$
           }
         );
-        expectObservable(transactionsTracker.outgoing.submitting$).toBe(                         '-a---|', { a: tx });
-        expectObservable(transactionsTracker.outgoing.pending$).toBe(                            '--a-a|', { a: tx });
+        expectObservable(transactionsTracker.outgoing.submitting$).toBe('-a---|', { a: tx });
+        expectObservable(transactionsTracker.outgoing.pending$).toBe('--a-a|', { a: tx });
         expectObservable(transactionsTracker.outgoing.failed$.pipe(map(err => err.reason))).toBe('---a-|', {
           a: TransactionFailure.InvalidTransaction
         });
@@ -366,7 +366,7 @@ describe('TransactionsTracker', () => {
           b: { slot: submittedAt2 } as Cardano.Tip
         });
         const submitting$ = hot('-a-b--|', { a: tx, b: tx });
-        const pending$ = hot(   '--a-b-|', { a: tx, b: tx });
+        const pending$ = hot('--a-b-|', { a: tx, b: tx });
         const transactionsSource$ = hot<Cardano.HydratedTx[]>('-a---b|', {
           a: [],
           b: [tx]
@@ -393,8 +393,8 @@ describe('TransactionsTracker', () => {
           }
         );
         expectObservable(transactionsTracker.outgoing.submitting$).toBe('-a-b--|', { a: tx, b: tx });
-        expectObservable(transactionsTracker.outgoing.pending$).toBe(   '--a-b-|', { a: tx, b: tx });
-        expectObservable(transactionsTracker.outgoing.inFlight$).toBe(  'abcdef|', {
+        expectObservable(transactionsTracker.outgoing.pending$).toBe('--a-b-|', { a: tx, b: tx });
+        expectObservable(transactionsTracker.outgoing.inFlight$).toBe('abcdef|', {
           a: [],
           b: [{ tx }],
           c: [{ submittedAt: submittedAt1, tx }],
@@ -414,14 +414,14 @@ describe('TransactionsTracker', () => {
       createTestScheduler().run(({ hot, expectObservable }) => {
         const submittedAt1 = Cardano.Slot(123);
         const submittedAt2 = Cardano.Slot(124);
-        const tip$ = hot(                                   '--a-b-|', {
+        const tip$ = hot('--a-b-|', {
           a: { slot: submittedAt1 } as Cardano.Tip,
           b: { slot: submittedAt2 } as Cardano.Tip
         });
-        const submitting$ = hot(                            '-a-b--|', { a: tx, b: tx });
-        const pending$ = hot<Cardano.Tx>(          '------|');
+        const submitting$ = hot('-a-b--|', { a: tx, b: tx });
+        const pending$ = hot<Cardano.Tx>('------|');
         const transactionsSource$ = hot<Cardano.HydratedTx[]>('a-----|', { a: [] });
-        const failedToSubmit$ = hot<FailedTx>(              '-----a|', {
+        const failedToSubmit$ = hot<FailedTx>('-----a|', {
           a: { reason: TransactionFailure.FailedToSubmit, tx }
         });
         const transactionsTracker = createTransactionsTracker(
@@ -445,11 +445,11 @@ describe('TransactionsTracker', () => {
           }
         );
         expectObservable(transactionsTracker.outgoing.submitting$).toBe('-a-b--|', { a: tx, b: tx });
-        expectObservable(transactionsTracker.outgoing.inFlight$).toBe(  'ab-c-a|', { a: [], b: [{ tx }], c: [{ tx }] });
-        expectObservable(transactionsTracker.outgoing.failed$).toBe(    '-----a|', {
+        expectObservable(transactionsTracker.outgoing.inFlight$).toBe('ab-c-a|', { a: [], b: [{ tx }], c: [{ tx }] });
+        expectObservable(transactionsTracker.outgoing.failed$).toBe('-----a|', {
           a: { reason: TransactionFailure.FailedToSubmit, tx }
         });
-        expectObservable(transactionsTracker.outgoing.confirmed$).toBe( '------|');
+        expectObservable(transactionsTracker.outgoing.confirmed$).toBe('------|');
       });
     });
 
