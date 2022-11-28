@@ -13,7 +13,7 @@ export type InitializeTxProps = {
   options?: {
     validityInterval?: Cardano.ValidityInterval;
   };
-  collaterals?: Set<Cardano.NewTxIn>;
+  collaterals?: Set<Cardano.TxIn>;
   mint?: Cardano.TokenMap;
   scriptIntegrityHash?: Cardano.util.Hash32ByteBase16;
   requiredExtraSignatures?: Cardano.Ed25519KeyHash[];
@@ -89,7 +89,7 @@ export interface ObservableWallet {
    * @throws InputSelectionError
    */
   initializeTx(props: InitializeTxProps): Promise<InitializeTxResult>;
-  finalizeTx(props: FinalizeTxProps): Promise<Cardano.NewTxAlonzo>;
+  finalizeTx(props: FinalizeTxProps): Promise<Cardano.Tx>;
   /**
    * @throws Cip30DataSignError
    */
@@ -97,7 +97,7 @@ export interface ObservableWallet {
   /**
    * @throws CardanoNodeErrors.TxSubmissionError
    */
-  submitTx(tx: Cardano.NewTxAlonzo): Promise<void>;
+  submitTx(tx: Cardano.Tx): Promise<void>;
   shutdown(): void;
 }
 

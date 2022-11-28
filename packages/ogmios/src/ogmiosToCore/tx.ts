@@ -241,7 +241,7 @@ const mapAuxiliaryData = (data: Schema.AuxiliaryData | null): Cardano.AuxiliaryD
   };
 };
 
-const mapTxIn = (txIn: Schema.TxIn): Cardano.NewTxIn => ({
+const mapTxIn = (txIn: Schema.TxIn): Cardano.TxIn => ({
   index: txIn.index,
   txId: Cardano.TransactionId(txIn.txId)
 });
@@ -278,7 +278,7 @@ const mapValidityInterval = ({
   invalidHereafter: invalidHereafter ?? undefined
 });
 
-const mapCommonTx = (tx: CommonBlock['body'][0], kind: BlockKind): Cardano.NewTxAlonzo => ({
+const mapCommonTx = (tx: CommonBlock['body'][0], kind: BlockKind): Cardano.Tx => ({
   auxiliaryData: mapAuxiliaryData(tx.metadata),
   body: {
     certificates: tx.body.certificates.map(mapCertificate),
@@ -293,7 +293,7 @@ const mapCommonTx = (tx: CommonBlock['body'][0], kind: BlockKind): Cardano.NewTx
     scriptIntegrityHash: isAlonzoOrAbove(kind) ? mapScriptIntegrityHash(tx as Schema.TxAlonzo) : undefined,
     validityInterval: isShelleyTx(kind)
       ? undefined
-      : mapValidityInterval((tx as Schema.TxAlonzo).body.validityInterval),
+      : mapValidityInterval((tx as Schema.TxAllegra).body.validityInterval),
     withdrawals: Object.entries(tx.body.withdrawals).map(([key, value]) => ({
       quantity: value,
       stakeAddress: Cardano.RewardAccount(key)
@@ -321,7 +321,7 @@ const mapCommonTx = (tx: CommonBlock['body'][0], kind: BlockKind): Cardano.NewTx
 export const mapCommonBlockBody = ({ body }: CommonBlock, kind: BlockKind): Cardano.Block['body'] =>
   body.map((blockBody) => mapCommonTx(blockBody, kind));
 
-const mapByronTx = (tx: Schema.TxByron): Cardano.NewTxAlonzo => ({
+const mapByronTx = (tx: Schema.TxByron): Cardano.Tx => ({
   body: {
     fee: 0n, // Not sure how to calculate the fee from ByronTx there is no fee?
     inputs: tx.body.inputs.map(mapTxIn),

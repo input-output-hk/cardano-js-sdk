@@ -69,7 +69,7 @@ export const walletReady = (wallet: ObservableWallet) =>
     SYNC_TIMEOUT
   );
 
-export const normalizeTxBody = (body: Cardano.TxBodyAlonzo | Cardano.NewTxBodyAlonzo) => {
+export const normalizeTxBody = (body: Cardano.HydratedTxBody | Cardano.TxBody) => {
   body.collaterals ||= [];
   // TODO: inputs should be a Set since they're unordered.
   // Then Jest should correctly compare it with toEqual.
@@ -85,7 +85,7 @@ export const txConfirmed = (
       outgoing: { failed$ }
     }
   }: ObservableWallet,
-  { id }: Pick<Cardano.NewTxAlonzo, 'id'>,
+  { id }: Pick<Cardano.Tx, 'id'>,
   numConfirmations = 3
 ) =>
   firstValueFrom(
@@ -108,11 +108,10 @@ export const txConfirmed = (
     )
   );
 
-const submit = (wallet: ObservableWallet, tx: Cardano.NewTxAlonzo | SignedTx) =>
+const submit = (wallet: ObservableWallet, tx: Cardano.Tx | SignedTx) =>
   'submit' in tx ? tx.submit() : wallet.submitTx(tx);
-const confirm = (wallet: ObservableWallet, tx: Cardano.NewTxAlonzo | SignedTx) =>
-  txConfirmed(wallet, 'tx' in tx ? tx.tx : tx);
-export const submitAndConfirm = (wallet: ObservableWallet, tx: Cardano.NewTxAlonzo | SignedTx) =>
+const confirm = (wallet: ObservableWallet, tx: Cardano.Tx | SignedTx) => txConfirmed(wallet, 'tx' in tx ? tx.tx : tx);
+export const submitAndConfirm = (wallet: ObservableWallet, tx: Cardano.Tx | SignedTx) =>
   Promise.all([submit(wallet, tx), confirm(wallet, tx)]);
 
 export type RequestCoinsProps = {

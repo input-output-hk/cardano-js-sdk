@@ -50,7 +50,7 @@ describe('createUtxoTracker', () => {
           outputs: tx1Outputs
         },
         id: transactionId1
-      } as unknown as Cardano.NewTxAlonzo;
+      } as unknown as Cardano.Tx;
       const chainableUtxoFromTx1 = [
         { address: ownAddress, index: tx1Outputs.indexOf(tx1ChangeOutput), txId: transactionId1 },
         tx1ChangeOutput
@@ -65,7 +65,7 @@ describe('createUtxoTracker', () => {
           outputs: tx2Outputs
         },
         id: transactionId2
-      } as unknown as Cardano.NewTxAlonzo;
+      } as unknown as Cardano.Tx;
       const transactionsInFlight$ = cold('-a-b-c|', {
         a: [],
         b: [{ tx: inFlightTx1 }],

@@ -82,7 +82,7 @@ export const createQueryStakePoolsProvider =
 export type ObservableStakePoolProvider = ReturnType<typeof createQueryStakePoolsProvider>;
 
 const getWithdrawalQuantity = (
-  withdrawals: Cardano.TxBodyAlonzo['withdrawals'],
+  withdrawals: Cardano.HydratedTxBody['withdrawals'],
   rewardAccount?: Cardano.RewardAccount
 ): Cardano.Lovelace =>
   BigIntMath.sum(

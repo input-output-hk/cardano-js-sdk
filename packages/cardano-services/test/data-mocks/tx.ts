@@ -25,7 +25,7 @@ export const txOutWithCoinOnly: Cardano.TxOut = { ...txOutBase, value: valueWith
 
 export const txOutWithAssets: Cardano.TxOut = { ...txOutBase, value: valueWithAssets };
 
-export const txIn: Cardano.TxIn = {
+export const txIn: Cardano.HydratedTxIn = {
   address: Cardano.Address('addr_test1wrsexavz37208qda7mwwu4k7hcpg26cz0ce86f5e9kul3hqzlh22t'),
   index: 0,
   txId: Cardano.TransactionId('cefd2fcf657e5e5d6c35975f4e052f427819391b153ebb16ad8aa107ba5a3819')
@@ -41,7 +41,7 @@ export const base = {
     blockNo: 3_157_934,
     hash: Cardano.BlockId('f03084089ec7e74a79e69a5929b2d3c0836d6f12279bd103d0875847c740ae27'),
     slot: 45_286_016
-  } as Cardano.TxAlonzo['blockHeader'],
+  } as Cardano.HydratedTx['blockHeader'],
   body: {
     fee: 191_109n,
     inputs: [txIn],
@@ -50,7 +50,7 @@ export const base = {
       invalidBefore: undefined,
       invalidHereafter: undefined
     }
-  } as Omit<Cardano.TxAlonzo['body'], 'outputs'>,
+  } as Omit<Cardano.HydratedTx['body'], 'outputs'>,
   id: Cardano.TransactionId('cefd2fcf657e5e5d6c35975f4e052f427819391b153ebb16ad8aa107ba5a3819'),
   index: 30,
   txSize: 711,
@@ -59,11 +59,11 @@ export const base = {
   }
 };
 
-export const withCoinOnly: Cardano.TxAlonzo = merge(base, {
+export const withCoinOnly: Cardano.HydratedTx = merge(base, {
   body: { outputs: [txOutWithCoinOnly] }
 });
 
-export const withAssets: Cardano.TxAlonzo = merge(base, {
+export const withAssets: Cardano.HydratedTx = merge(base, {
   body: {
     ...base.body,
     outputs: [txOutWithAssets]
@@ -73,7 +73,7 @@ export const withAssets: Cardano.TxAlonzo = merge(base, {
   }
 });
 
-export const withMint: Cardano.TxAlonzo = merge(withAssets, {
+export const withMint: Cardano.HydratedTx = merge(withAssets, {
   body: {
     mint: new Map([
       [Cardano.AssetId('57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522534245525259'), 10_000_000n]
@@ -85,7 +85,7 @@ export const mint: Cardano.TokenMap = new Map([
   [Cardano.AssetId('57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522534245525259'), 10_000_000n]
 ]);
 
-export const withAuxiliaryData: Cardano.TxAlonzo = merge(withAssets, {
+export const withAuxiliaryData: Cardano.HydratedTx = merge(withAssets, {
   auxiliaryData: {
     body: {
       blob: new Map([[1, 'abc']])
@@ -107,7 +107,7 @@ export const collateralInputs = [
   }
 ];
 
-export const withValidityInterval: Cardano.TxAlonzo = merge(withAssets, {
+export const withValidityInterval: Cardano.HydratedTx = merge(withAssets, {
   body: {
     validityInterval: {
       invalidBefore: 1,
@@ -123,7 +123,7 @@ export const withdrawals = [
   }
 ];
 
-export const withWithdrawals: Cardano.TxAlonzo = merge(withAssets, {
+export const withWithdrawals: Cardano.HydratedTx = merge(withAssets, {
   body: {
     withdrawals
   }
@@ -163,7 +163,7 @@ export const output = {
 
 export const outputs = [output];
 
-export const blockHeader: Cardano.TxAlonzo['blockHeader'] = {
+export const blockHeader: Cardano.HydratedTx['blockHeader'] = {
   blockNo: 3_157_934,
   hash: Cardano.BlockId('f03084089ec7e74a79e69a5929b2d3c0836d6f12279bd103d0875847c740ae27'),
   slot: 45_286_016

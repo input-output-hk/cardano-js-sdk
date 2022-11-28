@@ -5,8 +5,8 @@ import { Certificate } from './Certificate';
 import { Datum, Script } from './Script';
 import { Ed25519KeyHash, Ed25519PublicKey } from './Key';
 import { ExUnits, ValidityInterval } from './ProtocolParameters';
+import { HydratedTxIn, TxIn, TxOut } from './Utxo';
 import { Lovelace, TokenMap } from './Value';
-import { NewTxIn, TxIn, TxOut } from './Utxo';
 import { PartialBlockHeader } from './Block';
 import { RewardAccount } from './RewardAccount';
 
@@ -38,9 +38,9 @@ export interface Withdrawal {
   quantity: Lovelace;
 }
 
-export interface TxBodyAlonzo {
-  inputs: TxIn[];
-  collaterals?: TxIn[];
+export interface HydratedTxBody {
+  inputs: HydratedTxIn[];
+  collaterals?: HydratedTxIn[];
   outputs: TxOut[];
   fee: Lovelace;
   validityInterval?: ValidityInterval;
@@ -51,9 +51,9 @@ export interface TxBodyAlonzo {
   requiredExtraSignatures?: Ed25519KeyHash[];
 }
 
-export interface NewTxBodyAlonzo extends Omit<TxBodyAlonzo, 'inputs' | 'collaterals'> {
-  inputs: NewTxIn[];
-  collaterals?: NewTxIn[];
+export interface TxBody extends Omit<HydratedTxBody, 'inputs' | 'collaterals'> {
+  inputs: TxIn[];
+  collaterals?: TxIn[];
 }
 
 export enum RedeemerPurpose {
@@ -92,21 +92,21 @@ export type Witness = {
   datums?: Datum[];
 };
 
-export interface NewTxAlonzo<TBody extends NewTxBodyAlonzo = NewTxBodyAlonzo> {
+export interface Tx<TBody extends TxBody = TxBody> {
   id: TransactionId;
   body: TBody;
   witness: Witness;
   auxiliaryData?: AuxiliaryData;
 }
 
-export interface TxAlonzo extends NewTxAlonzo<TxBodyAlonzo> {
+export interface HydratedTx extends Tx<HydratedTxBody> {
   index: number;
   blockHeader: PartialBlockHeader;
-  body: TxBodyAlonzo;
+  body: HydratedTxBody;
   txSize: number;
 }
 
 export type TxBodyWithHash = {
   hash: TransactionId;
-  body: NewTxBodyAlonzo;
+  body: TxBody;
 };

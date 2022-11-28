@@ -99,7 +99,7 @@ export const value = (scope: ManagedFreeableScope, { coins, assets }: Cardano.Va
   return result;
 };
 
-export const txIn = (scope: ManagedFreeableScope, core: Cardano.NewTxIn): TransactionInput =>
+export const txIn = (scope: ManagedFreeableScope, core: Cardano.TxIn): TransactionInput =>
   scope.manage(
     TransactionInput.new(
       scope.manage(TransactionHash.from_bytes(Buffer.from(core.txId, 'hex'))),
@@ -321,7 +321,7 @@ export const txAuxiliaryData = (
   return result;
 };
 
-const txInputs = (scope: ManagedFreeableScope, coreInputs: Cardano.NewTxIn[]) => {
+const txInputs = (scope: ManagedFreeableScope, coreInputs: Cardano.TxIn[]) => {
   const cslInputs = scope.manage(TransactionInputs.new());
   for (const input of coreInputs) {
     cslInputs.add(txIn(scope, input));
@@ -363,7 +363,7 @@ export const txBody = (
     collaterals,
     requiredExtraSignatures,
     scriptIntegrityHash
-  }: Cardano.NewTxBodyAlonzo,
+  }: Cardano.TxBody,
   auxiliaryData?: Cardano.AuxiliaryData
 ): TransactionBody => {
   const cslOutputs = scope.manage(TransactionOutputs.new());
@@ -464,7 +464,7 @@ export const witnessSet = (scope: ManagedFreeableScope, witness: Cardano.Witness
   return cslWitnessSet;
 };
 
-export const tx = (scope: ManagedFreeableScope, { body, witness, auxiliaryData }: Cardano.NewTxAlonzo): Transaction => {
+export const tx = (scope: ManagedFreeableScope, { body, witness, auxiliaryData }: Cardano.Tx): Transaction => {
   const txWitnessSet = witnessSet(scope, witness);
   // Possible optimization: only convert auxiliary data once
   return scope.manage(

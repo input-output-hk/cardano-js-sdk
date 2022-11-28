@@ -3,8 +3,8 @@ import { Ed25519PublicKey } from './Key';
 import { Hash28ByteBase16, Hash32ByteBase16, OpaqueString, typedBech32 } from '../util/primitives';
 import { InvalidStringError } from '../../errors';
 import { Lovelace } from './Value';
-import { NewTxAlonzo } from './Transaction';
 import { PoolId } from './StakePool/primitives';
+import { Tx } from './Transaction';
 
 /**
  * The block size in bytes
@@ -108,7 +108,7 @@ export interface BlockInfo {
 }
 
 export interface Block extends BlockInfo {
-  body: NewTxAlonzo[];
+  body: Tx[];
 }
 
 export interface ExtendedBlockInfo

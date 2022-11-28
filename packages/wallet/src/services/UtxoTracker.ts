@@ -91,7 +91,7 @@ export const createUtxoTracker = (
               )
           )
           .map((txOut): Cardano.Utxo => {
-            const txIn: Cardano.TxIn = {
+            const txIn: Cardano.HydratedTxIn = {
               address: txOut.address, // not necessarily correct in multi-address wallet
               index: tx.body.outputs.indexOf(txOut),
               txId: tx.id

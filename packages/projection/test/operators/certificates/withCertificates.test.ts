@@ -15,7 +15,7 @@ const rollForwardEvent = (slot: Cardano.Slot, txs: Cardano.Certificate[][]) =>
         (certificates) =>
           ({
             body: { certificates }
-          } as Cardano.NewTxAlonzo)
+          } as Cardano.Tx)
       ),
       header: { slot }
     },

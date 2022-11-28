@@ -88,7 +88,7 @@ const createSignedTx = async ({
  * Usage examples are in the unit/integration tests from `builtTx.test.ts`.
  */
 export class ObservableWalletTxBuilder implements TxBuilder {
-  partialTxBody: Partial<Cardano.NewTxBodyAlonzo> = {};
+  partialTxBody: Partial<Cardano.TxBody> = {};
   auxiliaryData?: Cardano.AuxiliaryData;
   extraSigners?: TransactionSigner[];
   signingOptions?: SignTransactionOptions;

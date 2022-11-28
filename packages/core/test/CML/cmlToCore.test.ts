@@ -39,7 +39,7 @@ describe('cmlToCore', () => {
   });
 
   it('utxo', () => {
-    const utxo: Cardano.Utxo[] = [[txIn as Cardano.TxIn, txOut]];
+    const utxo: Cardano.Utxo[] = [[txIn as Cardano.HydratedTxIn, txOut]];
     expect(cmlToCore.utxo(coreToCml.utxo(scope, utxo))).toEqual(utxo);
   });
 
