@@ -114,8 +114,8 @@ const mapByronBlock = (block: Schema.StandardBlock): Cardano.Block => ({
   vrf: undefined // no vrf key for byron. DbSync doesn't have one either
 });
 
-const mapCommonBlock = (block: CommonBlock): Cardano.Block => ({
-  body: mapCommonBlockBody(block),
+const mapCommonBlock = (block: CommonBlock, kind: BlockKind): Cardano.Block => ({
+  body: mapCommonBlockBody(block, kind),
   fees: mapCommonFees(block),
   header: mapCommonBlockHeader(block),
   issuerVk: mapCommonSlotLeader(block),
@@ -129,7 +129,7 @@ const mapCommonBlock = (block: CommonBlock): Cardano.Block => ({
 const mapBlock = <R>(
   ogmiosBlock: Schema.Block,
   mapStandardBlock: (b: Schema.StandardBlock) => R,
-  mapOtherBlock: (b: CommonBlock) => R
+  mapOtherBlock: (b: CommonBlock, k: BlockKind) => R
 ) => {
   const b = getBlockAndKind(ogmiosBlock);
   if (!b) return null;
@@ -143,7 +143,7 @@ const mapBlock = <R>(
     case 'alonzo':
     case 'mary':
     case 'shelley': {
-      return mapOtherBlock(b.block);
+      return mapOtherBlock(b.block, b.kind);
     }
     default: {
       // eslint-disable-next-line sonarjs/prefer-immediate-return
@@ -161,7 +161,7 @@ const mapBlock = <R>(
  *   - `null` if `block` is the ByronEpochBoundaryBlock. This block can be skipped.
  */
 export const blockHeader = (ogmiosBlock: Schema.Block): Cardano.PartialBlockHeader | null =>
-  mapBlock(ogmiosBlock, mapStandardBlockHeader, mapCommonBlockHeader);
+  mapBlock<Cardano.PartialBlockHeader>(ogmiosBlock, mapStandardBlockHeader, mapCommonBlockHeader);
 
 /**
  * Translate `Ogmios` block to `Cardano.BlockMinimal`
@@ -172,6 +172,6 @@ export const blockHeader = (ogmiosBlock: Schema.Block): Cardano.PartialBlockHead
  *   - `null` if `block` is the ByronEpochBoundaryBlock. This block can be skipped.
  */
 export const block = (ogmiosBlock: Schema.Block): Cardano.Block | null =>
-  mapBlock(ogmiosBlock, mapByronBlock, mapCommonBlock);
+  mapBlock<Cardano.Block>(ogmiosBlock, mapByronBlock, mapCommonBlock);
 
 // byron-shelley-allegra-mary-alonzo-babbage

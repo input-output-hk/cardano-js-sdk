@@ -109,7 +109,7 @@ export const mockAlonzoBlock: Ogmios.Schema.Alonzo = {
             { index: 0, txId: '1a3380c51384d151b876de02b7a4c5ca7eda7b1d1d744660aee4647516fd9a81' },
             { index: 1, txId: '1a3380c51384d151b876de02b7a4c5ca7eda7b1d1d744660aee4647516fd9a81' }
           ],
-          mint: { assets: {}, coins: 0n },
+          mint: { coins: 0n },
           network: null,
           outputs: [
             {
@@ -175,7 +175,7 @@ export const mockAlonzoBlock: Ogmios.Schema.Alonzo = {
           scripts: {},
           signatures: {
             '742d8af3543349b5b18f3cba28f23b2d6e465b9c136c42e1fae6b2390f565427':
-              'SE0MJCvCQBY6GshFaPv4cNg8//csJTLCrLUdEqIium57YzPIgSPubgTKeMPGHC1ZMuogYsWQk6lfzEw1w0EyBg=='
+              'a44cb6b46e2c6f2fb6d83f2680d7c34170e16a598b1e4929b14d45e547d640e1c4da7ca3bc367b80c90faf0ba82b1f09c5d5718b2dfae8a7e9454c01924634ba'
           }
         }
       }
@@ -290,39 +290,44 @@ export const mockAllegraBlock: Ogmios.Schema.Allegra = {
               addressAttributes: 'Sn5kyQ==',
               chainCode: 'beba7627',
               key: 'e731d1871cc922f6dac49e3130c03fdd706c565e2c9d64c02b6e5a9a5239ba67',
-              signature: 'b3N3cXlteHN3ZXluY3diaGRpbnpneWdoYWNkc2VhanVtdW90dHR5b2hpYnVibmN0dHpuZXVrZ2dsbWp2aXVpbw=='
+              signature:
+                '3163e1a4cc86af1d07e1930f3059ee20739acb080375d87a80c238bd38db914b3360273ff045d6626fd5c524b5a96f5b36934c5f62678939c49115787b16b9cf'
             },
             {
               addressAttributes: 'dFA=',
               chainCode: null,
               key: 'f0f5ffa432e7936e1f47092aa805ad34f198bd2b00bafb1950b41dc864b47874',
-              signature: 'aXVzYnRjendwamlhemFpb2pieWpkeHNkZmp0aXloaXZnanhleHJ3Z2Vxd2Nmb2xmYXZieWJvdHZleWJtZWtvbA=='
+              signature:
+                'd94ab1307736a0b3861612da3247bfc20312c6e029609a9359607509bc66bdcecb92adc2da4c5cc42876cb4d35e999140b593af53792d5a39b355f1697c9039c'
             },
             {
               addressAttributes: null,
               chainCode: '06777003',
               key: '501d21a038832a37d1d1cec177697adb498954e3fa4315498108c9ca48d0e51b',
-              signature: 'EPbWzTC0bl7uGr+Xxnz0JuI3asQQlFwQGCPzs7KJ/qQimuUkmT83VcvzrmmUknLEYToDOrUl99ZaD8hWn1+VeA=='
+              signature:
+                '3146f7df7d1b810303f4f3c5841678947ade00e59a487ab0018adecf231c442745d8afc7ba3eed1ab3bf267c09458a4fc1e48f8a4ad3c6d0f10d3b78161a2fb0'
             },
             {
               addressAttributes: 'Mw==',
               chainCode: '82',
               key: 'b99abe31700f07caa60b1ac6f7f55f00e5c926dea06c02451a88eefe9e81a2fa',
-              signature: 'ZG9zbnpqaXZ0aWVrbGt1dGZiaHVycHdiY2phbHRjZXdpYWxqdXRlc2FvdGFhem16dXZwdWJxZWF1dHFibm90ZQ=='
+              signature:
+                'cd4860d090ac25f092a218739f362e217e26e63b30e398164a3d4235c54dcea4aee75794345c05268f687344c4c3cc617c970d72909290911cc3f73fda2b4d20'
             },
             {
               addressAttributes: 'LA==',
               chainCode: 'cc',
               key: 'cfb0a988516364010755fe4b00982dd37cc678fad4fe67bbf7b8ff85af2da478',
-              signature: 'wMMYEVUlWj+nr4N/2RpZmhxUNDgeajgjmyZg8ivHs3iC31dsgHu9OFJ1tWZHxwayT8nWtSAIPE+GW9T0trFgeQ=='
+              signature:
+                '60b29c95e4c2583264d1fd1f26b90c1e0b8d0448505adc94affeb6eeab670d6bed74a532e91c665202c9f439f6578d186dbc16f282298bd9b5f38189d07f07f1'
             }
           ],
           scripts: {},
           signatures: {
             '0c6be66a669a7e598d49bac208a3760f702ed2f59369f4efbf4bef3e25a99428':
-              'UoOamH2dMBoP4TGfLCtH/e+UeWtnQArGF1JwiTTE/2N4pdC8aAP+pj9Qc+mn+DDrP0+GMa2OEP5j+OsZ6uPK8Q==',
+              'a44cb6b46e2c6f2fb6d83f2680d7c34170e16a598b1e4929b14d45e547d640e1c4da7ca3bc367b80c90faf0ba82b1f09c5d5718b2dfae8a7e9454c01924634ba',
             '88d69c23b54b27f253aa51971458bd21b5d700a91f02fea2373bf76e69d33ac1':
-              't6Pku/JDWzG3VG9+IXO0iiQWAPJTPGIUUYsk9r+NzdejWevJGuXO4hi0I7m+qhJRrsan/KRmYYI7j67HPh65gg=='
+              '52e08b71da66bb662f67e0c141832c02f6572579e98051b1ab9c45bf1e80e7f541810112123670c9e05ef7edd7fa412c3d01044668e994eef21252373cb7aa3a'
           }
         }
       }
@@ -397,19 +402,22 @@ export const mockMaryBlock: Ogmios.Schema.Mary = {
               addressAttributes: '/0dj0Q==',
               chainCode: '57d7',
               key: '35d259ed3ad32bda47b0bf2a4f049440f7c298e1c6919518b55cc75e26b06716',
-              signature: 'cWl5b3dqbGh1ZG9naGNtYnBzemJiaGFpYWZ0dnFibGt6emtqZWFicmV6eWVjcm52dGxpeHdrbXdvYXRwa2RyYg=='
+              signature:
+                '3163e1a4cc86af1d07e1930f3059ee20739acb080375d87a80c238bd38db914b3360273ff045d6626fd5c524b5a96f5b36934c5f62678939c49115787b16b9cf'
             },
             {
               addressAttributes: 'GJoe',
               chainCode: null,
               key: 'ba1f868037ad35194f719fe964af14509cbf9f611a155a9d1a52aded9ab4ae02',
-              signature: 'KQ4Rrl2pfDMrQKpfnmSaQuZfpgbSFzWlhEZEPYgWHD4vNdAwKjDh8EVevT287hITCJnv6lydt7PWoX9JPTME1g=='
+              signature:
+                'd94ab1307736a0b3861612da3247bfc20312c6e029609a9359607509bc66bdcecb92adc2da4c5cc42876cb4d35e999140b593af53792d5a39b355f1697c9039c'
             },
             {
               addressAttributes: '+w==',
               chainCode: '336f',
               key: '035d0c6528fc5cf842615c5b32fa031b4a3999e9c9bc6c4435bece5bd3cffde5',
-              signature: 'YWlubnB1eWFqbGtkdHp3ZW1heHd6aWRybWZscGxxeXp4ZGt1ZXlxanNtcXB3a3dkb3pwY3JnZXBpdXd0bmh4Zw=='
+              signature:
+                '3146f7df7d1b810303f4f3c5841678947ade00e59a487ab0018adecf231c442745d8afc7ba3eed1ab3bf267c09458a4fc1e48f8a4ad3c6d0f10d3b78161a2fb0'
             }
           ],
           scripts: {
@@ -515,11 +523,11 @@ export const mockMaryBlock: Ogmios.Schema.Mary = {
           },
           signatures: {
             '19cfd01741992858afaa1a8b99f2622738b4c03a68b9283027640b943181c4b6':
-              'lmL5+gmXVtjDh0Y+dLhjvUl64iVTdRtw0gSN7X7dJQcR87Tye6ZKCNA2k0uslVrLoqmaicMdAQOuhaSNlcWzNw==',
+              '3163e1a4cc86af1d07e1930f3059ee20739acb080375d87a80c238bd38db914b3360273ff045d6626fd5c524b5a96f5b36934c5f62678939c49115787b16b9cf',
             '97ba85b5beadd03c8ab7ea260a53f73cd47b87d9c2ef62b98f9bd23934bff852':
-              'hDRGX4+BYwbzdyjCTvs0lWRwxaQjUDI4BodSqtLCvsWQwdagSnTh8bktzfiHyK3w62jPvGuYXgbCuME4M98EUw==',
+              'd94ab1307736a0b3861612da3247bfc20312c6e029609a9359607509bc66bdcecb92adc2da4c5cc42876cb4d35e999140b593af53792d5a39b355f1697c9039c',
             b005f0e09760c2371b7cc8d6a8b67dd0ba09f71f2febdc9cd794251f18567329:
-              'VjYvpOSGRTBrgKkud+Op2bFZa/KdFFa9sWaFJUjBbM1o3PB7a+CGEYNhzUSLaFtjpPFK78t0eIAGXt27bVOTxw=='
+              '3146f7df7d1b810303f4f3c5841678947ade00e59a487ab0018adecf231c442745d8afc7ba3eed1ab3bf267c09458a4fc1e48f8a4ad3c6d0f10d3b78161a2fb0'
           }
         }
       }
@@ -589,8 +597,8 @@ export const mockBabbageBlock: Ogmios.Schema.Babbage = {
           inputs: [],
           mint: {
             assets: {
-              'e0a714319812c3f773ba04ec5d6b3ffcd5aad85006805b047b082541.00': -1n,
-              'e0a714319812c3f773ba04ec5d6b3ffcd5aad85006805b047b082541.01': 2n
+              '0d94e174732ef9aae73f395ab44507bfa983d65023c11a951f0c32e4': -1n,
+              '1d94e174732ef9aae73f395ab44507bfa983d65023c11a951f0c32e4': 2n
             },
             coins: 0n
           },
@@ -628,13 +636,15 @@ export const mockBabbageBlock: Ogmios.Schema.Babbage = {
               addressAttributes: null,
               chainCode: '4d',
               key: 'de46fb9f52d8a229e3cedc60002564a3d23309dbf21dfaabd38485c4538419b2',
-              signature: 'P20IobereBini+jUjqgosOmXYlikyjgVf2KP5N4fMmpO9APEDQNIhk3nclm+mlxgavILKevn9q61lKxAF3coqg=='
+              signature:
+                '3163e1a4cc86af1d07e1930f3059ee20739acb080375d87a80c238bd38db914b3360273ff045d6626fd5c524b5a96f5b36934c5f62678939c49115787b16b9cf'
             },
             {
               addressAttributes: 'mQ==',
               chainCode: '20',
               key: 'fc1a29ed3f0a4c1a4036298831ce117a23b6b714abba83d0a093d0839e193c39',
-              signature: 'PxmE3tWzUZi8/Oqk1fRLJsuOaqWc3nTleLBvk1G9sXVjFiN08ZmYBCPlLd5si35Cv0yhIN2/VXJBuaWbcwgJ/g=='
+              signature:
+                'd94ab1307736a0b3861612da3247bfc20312c6e029609a9359607509bc66bdcecb92adc2da4c5cc42876cb4d35e999140b593af53792d5a39b355f1697c9039c'
             }
           ],
           datums: {},
@@ -642,8 +652,7 @@ export const mockBabbageBlock: Ogmios.Schema.Babbage = {
             'spend:0': {
               // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
               executionUnits: { memory: 6_026_711_518_256_058_765, steps: 4_749_668_747_002_318_509 },
-              redeemer:
-                'a34160029f20a3419c204386a48244e21bd936202004a0ffa3a4435aed90040242b07a210523409f414d429b3f0440ffa09f034001ffa222234041b4d8668218da9f2341440302413eff4204e1a1d866821901939f23ffa0'
+              redeemer: '034001ffa222234041b4d8668218da9f2341440302413eff4204e1a1'
             }
           },
           scripts: {
@@ -651,9 +660,9 @@ export const mockBabbageBlock: Ogmios.Schema.Babbage = {
           },
           signatures: {
             '679b8abd1379729475da1c530dda8dc1bf9177eceae449a0a15e4f16f45399be':
-              'o+KixEeK/nzXNPpZPOM/BoQSVWVtwx06z/SIhM6UeNVjFN1rqHKN5BdBOnmKtuh/aF+5F/gwCzl3KPCGMcFuOQ==',
+              '3146f7df7d1b810303f4f3c5841678947ade00e59a487ab0018adecf231c442745d8afc7ba3eed1ab3bf267c09458a4fc1e48f8a4ad3c6d0f10d3b78161a2fb0',
             '238287f3ea9a746513acbee2aeb1e980d9feead29bf8157b7756437ffbe8ee5b':
-              'HmOXc0JcDPpjdtcyZQDvxXTZuHr7oilqThIVetgxds5zAGAKkhvtYIdgCzoRjqkFdGpiz+kGSeoqoA9GFCqtew=='
+              '60b29c95e4c2583264d1fd1f26b90c1e0b8d0448505adc94affeb6eeab670d6bed74a532e91c665202c9f439f6578d186dbc16f282298bd9b5f38189d07f07f1'
           }
         }
       }
