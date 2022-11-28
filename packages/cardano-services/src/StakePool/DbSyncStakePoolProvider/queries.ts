@@ -346,6 +346,10 @@ export const findPoolEpochRewards = (limit?: number) => `
   ORDER BY epoch_no desc
 `;
 
+// APY = (1 + i_nom/N)^N - 1
+// i_nom = avg_daily_roi.avg_roi * (epochs.epoch_length / 86400000)
+//                                                        86400000 ms = 1 day
+// N = 365 / ( epochs.epoch_length / 86400000 )
 export const findPoolAPY = (limit?: number) => `
   ${epochRewardsSubqueries(limit)},
   avg_daily_roi AS (
@@ -363,7 +367,14 @@ export const findPoolAPY = (limit?: number) => `
           POWER(
             (
               1 + (
-                avg_daily_roi.avg_roi * (epochs.epoch_length / 86400000)
+               COALESCE( 
+                 avg_daily_roi.avg_roi * (epochs.epoch_length / 86400000) / 
+                   COALESCE(
+                     365 / NULLIF(epochs.epoch_length / 86400000, 0), 
+                     0
+                   ):: numeric,
+                 0
+               )::numeric   
               )
             ):: numeric, 
             COALESCE(
