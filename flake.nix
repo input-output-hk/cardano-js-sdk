@@ -102,6 +102,7 @@
           chmod a+x $out/bin/cli
         '';
         meta.mainProgram = "cli";
+        passthru.nodejs = pkgs.nodejs;
         passthru.production-deps = production-deps;
       });
 
