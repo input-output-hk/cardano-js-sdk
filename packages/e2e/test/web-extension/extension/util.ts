@@ -4,8 +4,6 @@ import { RemoteApiProperties, RemoteApiPropertyType } from '@cardano-sdk/web-ext
 
 export const extensionId = 'lgehgfkeagjdklnanflcjoipaphegomm';
 
-export const ownOrigin = globalThis.location.origin;
-
 export const walletName = 'ccvault';
 export const observableWalletNames = ['UserCreatedWallet1', 'UserCreatedWallet2'];
 
