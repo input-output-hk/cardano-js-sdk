@@ -15,6 +15,7 @@ import { walletChannel, walletManagerChannel, walletManagerProperties } from './
 export class WalletManagerUi implements Shutdown, WalletManagerApi {
   #remoteApi: WalletManagerApi & Shutdown;
   #dependencies: MessengerDependencies;
+  #keyAgentApi: Shutdown | null = null;
 
   /**
    * Observable wallet. Its properties can be subscribed to at any point, even before activating a wallet.
@@ -39,7 +40,7 @@ export class WalletManagerUi implements Shutdown, WalletManagerApi {
   activate(props: WalletManagerActivateProps & { keyAgent: AsyncKeyAgent }): Promise<void> {
     const { keyAgent, observableWalletName, provider } = props;
     const { logger, runtime } = this.#dependencies;
-    exposeKeyAgent(
+    this.#keyAgentApi = exposeKeyAgent(
       {
         keyAgent,
         walletName: observableWalletName
@@ -53,6 +54,7 @@ export class WalletManagerUi implements Shutdown, WalletManagerApi {
   }
 
   deactivate(): Promise<void> {
+    this.#shutdownKeyAgent();
     return this.#remoteApi.deactivate();
   }
 
@@ -64,5 +66,11 @@ export class WalletManagerUi implements Shutdown, WalletManagerApi {
   shutdown(): void {
     this.#remoteApi.shutdown();
     this.wallet.shutdown();
+    this.#shutdownKeyAgent();
+  }
+
+  #shutdownKeyAgent(): void {
+    this.#keyAgentApi?.shutdown();
+    this.#keyAgentApi = null;
   }
 }
