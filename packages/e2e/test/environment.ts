@@ -56,6 +56,7 @@ const providerParams = makeValidator((value) => {
  * Shared across all tests
  */
 const validators = {
+  ARRIVAL_PHASE_DURATION_IN_SECS: num(),
   ASSET_PROVIDER: str(),
   ASSET_PROVIDER_PARAMS: providerParams(),
   CHAIN_HISTORY_PROVIDER: str(),
@@ -79,6 +80,7 @@ const validators = {
   TX_SUBMIT_PROVIDER_PARAMS: providerParams(),
   UTXO_PROVIDER: str(),
   UTXO_PROVIDER_PARAMS: providerParams(),
+  VIRTUAL_USERS_COUNT: num(),
   WORKER_PARALLEL_TRANSACTION: num()
 } as const;
 

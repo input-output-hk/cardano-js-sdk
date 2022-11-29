@@ -34,7 +34,7 @@ $ yarn workspace @cardano-sdk/e2e generate-mnemonics
 And you will get the set of mnemonics plus the first derivative address on the console:
 
 ```bash
-$ ts-node ./src/util/mnemonic.ts
+$ ts-node ./src/scripts/mnemonic.ts
 
   Mnemonic:   toward bridge spell endless tunnel there deputy market scheme ketchup heavy fall fault pudding split desert swear maximum orchard estate match good decorate tribe
 
@@ -273,8 +273,20 @@ $ yarn workspace @cardano-sdk/e2e test:web-extension
 **Artillery stress tests** are not exactly _e2e tests_ in the meaning of _jest tests_; the SDK is run through artillery.
 They are not aimed to check if specific functionalities work or not, but to stress test APIs.
 
-Currently only one artillery test is implemented ad it stresses a stake pool search endpoint. To run it against the local-network endpoint
+Currently a few artillery load test scenarios are implemented.
+The main purpose is to simulate expected load against provider endpoints or wallet initialization/restoration.
+
+**The Artillery tests** are currently configured to run only with 1 worker.
+With plan to design and introduce our custom Distributed load test solution in post MVP stage. 
+
+To run stake pool search scenario against the local-network endpoint:
 
 ```bash
 $ STAKE_POOL_PROVIDER_URL="http://localhost:4000/stake-pool" yarn artillery:stake-pool-query
+```
+
+To run wallet restoration scenario against the local-network endpoint:
+
+```bash
+$ ARRIVAL_PHASE_DURATION_IN_SECS={duration of how long virtual users will be generated} VIRTUAL_USERS_COUNT={wallets count to restore} yarn artillery:wallet-restoration
 ```
