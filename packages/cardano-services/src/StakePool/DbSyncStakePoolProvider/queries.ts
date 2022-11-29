@@ -358,10 +358,22 @@ export const findPoolAPY = (limit?: number) => `
   pool_apy AS (
     SELECT 
       epochs.hash_id,
-      POWER(
-        1 + (avg_daily_roi.avg_roi * (epochs.epoch_length / 86400000)), 
-        COALESCE(365 / NULLIF(epochs.epoch_length / 86400000, 0), 0)
-      ) - 1 AS apy
+      (
+        LEAST(
+          POWER(
+            (
+              1 + (
+                avg_daily_roi.avg_roi * (epochs.epoch_length / 86400000)
+              )
+            ):: numeric, 
+            COALESCE(
+              365 / NULLIF(epochs.epoch_length / 86400000, 0), 
+              0
+            ):: numeric
+          ), 
+          1E+308
+        ) -1
+      ):: double precision AS apy
     FROM epoch_rewards AS epochs
     JOIN (
       SELECT

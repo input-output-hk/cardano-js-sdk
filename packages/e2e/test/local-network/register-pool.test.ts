@@ -93,7 +93,7 @@ describe('local-network/register-pool', () => {
     wallet2.wallet.shutdown();
   });
 
-  test('without pledge', async () => {
+  test('does not meet pledge', async () => {
     const wallet = wallet1.wallet;
 
     await walletReady(wallet);
@@ -121,7 +121,7 @@ describe('local-network/register-pool', () => {
         id: poolId,
         margin: { denominator: 5, numerator: 1 },
         owners: [poolRewardAccount],
-        pledge: 50_000_000n,
+        pledge: 500_000_000_000_000n,
         relays: [
           {
             __typename: 'RelayByAddress',
@@ -134,13 +134,35 @@ describe('local-network/register-pool', () => {
       }
     };
 
+    const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);
+    const stakeKeyHash = Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccounts[0].address);
+
     await submitCertificate(registrationCert, wallet1);
+
+    // Register stake key.
+    const registerStakeKey: Cardano.StakeAddressCertificate = {
+      __typename: Cardano.CertificateType.StakeKeyRegistration,
+      stakeKeyHash
+    };
+
+    await submitCertificate(registerStakeKey, wallet1);
+
+    // Delegate pool owner funds to meet pledge.
+    const delegationCert: Cardano.StakeDelegationCertificate = {
+      __typename: Cardano.CertificateType.StakeDelegation,
+      poolId,
+      stakeKeyHash
+    };
+
+    await submitCertificate(delegationCert, wallet1);
 
     const result = await wallet1.providers.stakePoolProvider.queryStakePools({
       filters: {
+        _condition: 'and',
         identifier: {
           values: [{ id: poolId }]
-        }
+        },
+        pledgeMet: false
       },
       pagination: { limit: 1, startAt: 0 }
     });
@@ -148,10 +170,11 @@ describe('local-network/register-pool', () => {
     expect(result.pageResults.length).toBeGreaterThan(0);
     expect(result.pageResults[0].hexId).toBe(Cardano.PoolIdHex(poolKeyHash.toString()));
     expect(result.pageResults[0].id).toBe(poolId);
-    expect(result.pageResults[0].status).toBe('activating');
+    expect(result.pageResults[0].status).toBe(Cardano.StakePoolStatus.Activating);
+    expect(result.pageResults[0].metrics.livePledge).toBeLessThan(result.pageResults[0].pledge);
   });
 
-  test('with pledge', async () => {
+  test('meets pledge', async () => {
     const wallet = wallet2.wallet;
 
     await walletReady(wallet);
@@ -183,7 +206,7 @@ describe('local-network/register-pool', () => {
         relays: [
           {
             __typename: 'RelayByAddress',
-            ipv4: '127.0.0.1',
+            ipv4: '127.0.0.2',
             port: 6000
           }
         ],
@@ -228,6 +251,7 @@ describe('local-network/register-pool', () => {
     expect(result.pageResults.length).toBeGreaterThan(0);
     expect(result.pageResults[0].hexId).toBe(Cardano.PoolIdHex(poolKeyHash.toString()));
     expect(result.pageResults[0].id).toBe(poolId);
-    expect(result.pageResults[0].status).toBe('activating');
+    expect(result.pageResults[0].status).toBe(Cardano.StakePoolStatus.Activating);
+    expect(result.pageResults[0].metrics.livePledge).toBeGreaterThan(result.pageResults[0].pledge);
   });
 });

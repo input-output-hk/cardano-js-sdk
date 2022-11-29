@@ -8,14 +8,9 @@ const CONTAINER_TEMP_DIR = '/tmp';
 const CONTAINER_NAME = 'cardano-test';
 
 const databaseConfigs = {
-  loalnetwork: {
+  localnetwork: {
     database: 'localnetwork',
     fixture: false,
-    snapshot: true
-  },
-  testnet: {
-    database: 'testnet',
-    fixture: true,
     snapshot: true
   }
 };
@@ -121,9 +116,5 @@ export const setupPostgresContainer = async (user: string, password: string, por
   await container.start();
 
   await ensurePgServiceReadiness(container, user);
-
-  await Promise.all([
-    setupDBData(databaseConfigs.testnet, user, container),
-    setupDBData(databaseConfigs.loalnetwork, user, container)
-  ]);
+  await setupDBData(databaseConfigs.localnetwork, user, container);
 };
