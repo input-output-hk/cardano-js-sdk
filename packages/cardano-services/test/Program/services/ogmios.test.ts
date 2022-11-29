@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable max-len */
-import { CardanoNodeErrors, TxSubmitProvider } from '@cardano-sdk/core';
+import { CardanoNodeErrors } from '@cardano-sdk/core';
 import { Connection } from '@cardano-ogmios/client';
 import { DbSyncEpochPollService, listenPromise, serverClosePromise } from '../../../src/util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../../src/NetworkInfo';
@@ -52,7 +52,7 @@ describe('Service dependency abstractions', () => {
     let apiUrlBase: string;
     let ogmiosServer: http.Server;
     let ogmiosConnection: Connection;
-    let txSubmitProvider: TxSubmitProvider;
+    let txSubmitProvider: OgmiosTxSubmitProvider;
     let ogmiosCardanoNode: OgmiosCardanoNode;
     let httpServer: HttpServer;
     let port: number;
@@ -92,6 +92,10 @@ describe('Service dependency abstractions', () => {
           await httpServer.shutdown();
         });
 
+        it('txSubmitProvider state should be running when http server has started', () => {
+          expect(txSubmitProvider.state).toEqual('running');
+        });
+
         it('txSubmitProvider should be instance of a Proxy ', () => {
           expect(types.isProxy(txSubmitProvider)).toEqual(true);
         });
@@ -102,6 +106,15 @@ describe('Service dependency abstractions', () => {
           });
           expect(res.status).toBe(200);
           expect(res.data).toEqual(healthCheckResponseMock());
+        });
+
+        it('TxSubmitHttpService replies with status 200 OK when /submit endpoint is reached', async () => {
+          const res = await axios.post(
+            `${apiUrlBase}/submit`,
+            { signedTransaction: bufferToHexString(Buffer.from(new Uint8Array())) },
+            { headers: { 'Content-Type': APPLICATION_JSON } }
+          );
+          expect(res.status).toBe(200);
         });
       });
 
@@ -142,6 +155,10 @@ describe('Service dependency abstractions', () => {
           await httpServer.shutdown();
         });
 
+        it('ogmiosCardanoNode state should be running when http server has started', () => {
+          expect(ogmiosCardanoNode.state).toEqual('running');
+        });
+
         it('ogmiosCardanoNode should be instance of a Proxy ', () => {
           expect(types.isProxy(ogmiosCardanoNode)).toEqual(true);
         });
@@ -152,6 +169,13 @@ describe('Service dependency abstractions', () => {
           });
           expect(res.status).toBe(200);
           expect(res.data).toEqual(healthCheckResponseMock());
+        });
+
+        it('NetworkInfoHttpService replies with status 200 OK when /stake endpoint is reached', async () => {
+          const res = await axios.post(`${apiUrlBase}/stake`, undefined, {
+            headers: { 'Content-Type': APPLICATION_JSON }
+          });
+          expect(res.status).toBe(200);
         });
       });
     });

@@ -6,8 +6,8 @@ import { DnsResolver } from '../utils';
 import { Logger } from 'ts-log';
 import { MissingCardanoNodeOption } from '../errors';
 import { OgmiosCardanoNode, OgmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmios';
+import { RunnableModule, isConnectionError } from '@cardano-sdk/util';
 import { SubmitTxArgs } from '@cardano-sdk/core';
-import { isConnectionError } from '@cardano-sdk/util';
 
 const isCardanoNodeOperation = (prop: string | symbol): prop is 'eraSummaries' | 'systemStart' | 'stakeDistribution' =>
   ['eraSummaries', 'systemStart', 'stakeDistribution'].includes(prop as string);
@@ -58,7 +58,7 @@ export const ogmiosTxSubmitProviderWithDiscovery = async (
   const { name, port } = await dnsResolver(serviceName!);
   let ogmiosProvider = new OgmiosTxSubmitProvider({ host: name, port }, logger);
 
-  return new Proxy<OgmiosTxSubmitProvider>({} as OgmiosTxSubmitProvider, {
+  const txSubmitProviderProxy = new Proxy<OgmiosTxSubmitProvider>({} as OgmiosTxSubmitProvider, {
     get(_, prop) {
       if (prop === 'then') return;
       if (prop === 'initialize') {
@@ -92,6 +92,8 @@ export const ogmiosTxSubmitProviderWithDiscovery = async (
       return ogmiosProvider[prop as keyof OgmiosTxSubmitProvider];
     }
   });
+
+  return Object.setPrototypeOf(txSubmitProviderProxy, RunnableModule.prototype);
 };
 
 export const getOgmiosTxSubmitProvider = async (
@@ -127,7 +129,7 @@ export const ogmiosCardanoNodeWithDiscovery = async (
   const { name, port } = await dnsResolver(serviceName!);
   let ogmiosCardanoNode = new OgmiosCardanoNode({ host: name, port }, logger);
 
-  return new Proxy<OgmiosCardanoNode>({} as OgmiosCardanoNode, {
+  const cardanoNodeProxy = new Proxy<OgmiosCardanoNode>({} as OgmiosCardanoNode, {
     get(_, prop) {
       if (prop === 'then') return;
       if (prop === 'initialize') {
@@ -161,6 +163,8 @@ export const ogmiosCardanoNodeWithDiscovery = async (
       return ogmiosCardanoNode[prop as keyof OgmiosCardanoNode];
     }
   });
+
+  return Object.setPrototypeOf(cardanoNodeProxy, RunnableModule.prototype);
 };
 
 export const getOgmiosCardanoNode = async (
