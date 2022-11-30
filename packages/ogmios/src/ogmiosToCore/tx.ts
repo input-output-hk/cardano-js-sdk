@@ -221,10 +221,10 @@ const mapRedeemer = (key: string, redeemer: Schema.Redeemer): Cardano.Redeemer =
   const purposeAndIndex = key.split(':');
 
   return {
+    data: Cardano.util.HexBlob(redeemer.redeemer),
     executionUnits: redeemer.executionUnits,
     index: Number(purposeAndIndex[1]),
-    purpose: purposeAndIndex[0] as Cardano.RedeemerPurpose,
-    scriptHash: Cardano.util.Hash28ByteBase16(redeemer.redeemer)
+    purpose: purposeAndIndex[0] as Cardano.RedeemerPurpose
   };
 };
 

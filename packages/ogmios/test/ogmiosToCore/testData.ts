@@ -109,7 +109,7 @@ export const mockAlonzoBlock: Ogmios.Schema.Alonzo = {
             { index: 0, txId: '1a3380c51384d151b876de02b7a4c5ca7eda7b1d1d744660aee4647516fd9a81' },
             { index: 1, txId: '1a3380c51384d151b876de02b7a4c5ca7eda7b1d1d744660aee4647516fd9a81' }
           ],
-          mint: { coins: 0n },
+          mint: { assets: {}, coins: 0n },
           network: null,
           outputs: [
             {
@@ -642,7 +642,8 @@ export const mockBabbageBlock: Ogmios.Schema.Babbage = {
             'spend:0': {
               // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
               executionUnits: { memory: 6_026_711_518_256_058_765, steps: 4_749_668_747_002_318_509 },
-              redeemer: '034001ffa222234041b4d8668218da9f2341440302413eff4204e1a1'
+              redeemer:
+                'a34160029f20a3419c204386a48244e21bd936202004a0ffa3a4435aed90040242b07a210523409f414d429b3f0440ffa09f034001ffa222234041b4d8668218da9f2341440302413eff4204e1a1d866821901939f23ffa0'
             }
           },
           scripts: {
