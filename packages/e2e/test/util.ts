@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as envalid from 'envalid';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, createSlotEpochCalc } from '@cardano-sdk/core';
 import {
   EMPTY,
   Observable,
@@ -17,9 +17,9 @@ import {
   throwError,
   timeout
 } from 'rxjs';
-import { ObservableWallet, SignedTx, buildTx } from '@cardano-sdk/wallet';
+import { ObservableWallet, SignedTx, SingleAddressWallet, buildTx } from '@cardano-sdk/wallet';
+import { TestWallet, faucetProviderFactory, networkInfoProviderFactory } from '../src';
 import { assertTxIsValid } from '../../wallet/test/util';
-import { faucetProviderFactory, networkInfoProviderFactory } from '../src';
 import { getEnv, walletVariables } from './environment';
 import { logger } from '@cardano-sdk/util-dev';
 import sortBy from 'lodash/sortBy';
@@ -195,4 +195,43 @@ export const runningAgainstLocalNetwork = async () => {
     return false;
   }
   return true;
+};
+
+/**
+ * Gets the epoch when a transaction **was confirmed**.
+ *
+ * @param wallet The wallet used to perform the required actions
+ * @param tx The **already confirmed** transaction we need to know the confirmation epoch
+ * @returns The epoch when the given transaction was confirmed
+ */
+export const getTxConfirmationEpoch = async (
+  wallet: SingleAddressWallet,
+  tx: Cardano.NewTxAlonzo<Cardano.NewTxBodyAlonzo>
+) => {
+  const txs = await firstValueFrom(wallet.transactions.history$.pipe(filter((_) => _.some(({ id }) => id === tx.id))));
+  const observedTx = txs.find(({ id }) => id === tx.id);
+  const slotEpochCalc = createSlotEpochCalc(await firstValueFrom(wallet.eraSummaries$));
+
+  return slotEpochCalc(observedTx!.blockHeader.slot);
+};
+
+/**
+ * Submit certificates on behalf of the given wallet.
+ *
+ * @param certificate The certificate to be send.
+ * @param wallet The wallet
+ */
+export const submitCertificate = async (certificate: Cardano.Certificate, wallet: TestWallet) => {
+  const walletAddress = (await firstValueFrom(wallet.wallet.addresses$))[0].address;
+  const txProps = {
+    certificates: [certificate],
+    outputs: new Set([{ address: walletAddress, value: { coins: 3_000_000n } }])
+  };
+
+  const unsignedTx = await wallet.wallet.initializeTx(txProps);
+  const signedTx = await wallet.wallet.finalizeTx({ tx: unsignedTx });
+
+  await submitAndConfirm(wallet.wallet, signedTx);
+
+  return signedTx;
 };
