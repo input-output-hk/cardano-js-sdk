@@ -15,6 +15,7 @@
   },
   "scripts": {
     "artillery:stake-pool-query": "WORKERS=1 node -r ts-node/register ../../node_modules/.bin/artillery run test/artillery/StakePoolSearch.yml",
+    "artillery:wallet-restoration": "WORKERS=1 node -r ts-node/register ../../node_modules/.bin/artillery run --dotenv ./.env test/artillery/wallet-restoration/WalletRestoration.yml",
     "test": "shx echo 'test' command not implemented yet",
     "test:load-testing": "jest -c jest.config.js --forceExit --selectProjects load-testing --runInBand --verbose",
     "test:long-running": "jest -c jest.config.js --forceExit --selectProjects long-running --runInBand --verbose",
@@ -47,8 +48,8 @@
     "prepack": "yarn build",
     "test:build:verify": "yarn test:web-extension:build",
     "test:debug": "DEBUG=true yarn test",
-    "generate-mnemonics": "ts-node src/util/mnemonic.ts",
-    "wait-for-network": "ts-node src/util/is-local-network-ready.ts"
+    "generate-mnemonics": "ts-node src/scripts/mnemonic.ts",
+    "wait-for-network": "ts-node src/scripts/is-local-network-ready.ts"
   },
   "repository": "https://github.com/input-output-hk/cardano-js-sdk",
   "contributors": [
@@ -89,6 +90,7 @@
     "get-port-please": "^2.5.0",
     "lodash": "^4.17.21",
     "optionator": "^0.9.1",
+    "pg": "^8.7.3",
     "rxjs": "^7.4.0",
     "ts-log": "^2.2.4",
     "ts-node": "^10.8.1",

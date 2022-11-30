@@ -14,6 +14,7 @@ import {
   AsyncKeyAgent,
   CommunicationType,
   InMemoryKeyAgent,
+  KeyAgent,
   KeyAgentDependencies,
   LedgerKeyAgent,
   TrezorKeyAgent,
@@ -276,6 +277,7 @@ export type GetWalletProps = {
   polling?: PollingConfig;
   stores?: storage.WalletStores;
   customKeyParams?: KeyAgentFactoryProps;
+  keyAgent?: KeyAgent;
 };
 
 /**
@@ -304,7 +306,7 @@ const patchInitializeTxToRespectEpochBoundary = <T extends ObservableWallet>(
  * @returns an object containing the wallet and providers passed to it
  */
 export const getWallet = async (props: GetWalletProps) => {
-  const { env, idx, logger, name, polling, stores, customKeyParams } = props;
+  const { env, idx, logger, name, polling, stores, customKeyParams, keyAgent } = props;
   const providers = {
     assetProvider: await assetProviderFactory.create(env.ASSET_PROVIDER, env.ASSET_PROVIDER_PARAMS, logger),
     chainHistoryProvider: await chainHistoryProviderFactory.create(
@@ -334,9 +336,11 @@ export const getWallet = async (props: GetWalletProps) => {
   const keyManagementParams = { ...envKeyParams, ...(idx === undefined ? {} : { accountIndex: idx }) };
 
   const { wallet } = await setupWallet({
-    createKeyAgent: await keyManagementFactory.create(env.KEY_MANAGEMENT_PROVIDER, keyManagementParams, logger),
-    createWallet: async (keyAgent: AsyncKeyAgent) =>
-      new SingleAddressWallet({ name, polling }, { ...providers, keyAgent, logger, stores })
+    createKeyAgent: keyAgent
+      ? () => Promise.resolve(util.createAsyncKeyAgent(keyAgent))
+      : await keyManagementFactory.create(env.KEY_MANAGEMENT_PROVIDER, keyManagementParams, logger),
+    createWallet: async (asyncKeyAgent: AsyncKeyAgent) =>
+      new SingleAddressWallet({ name, polling }, { ...providers, keyAgent: asyncKeyAgent, logger, stores })
   });
 
   const [{ address, rewardAccount }] = await firstValueFrom(wallet.addresses$);
