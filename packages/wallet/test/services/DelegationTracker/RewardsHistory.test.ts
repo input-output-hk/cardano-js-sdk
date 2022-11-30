@@ -29,7 +29,7 @@ describe('RewardsHistory', () => {
     });
 
     it('when lower bound is specified: queries underlying provider', async () => {
-      expect(await firstValueFrom(provider(rewardAccounts, 1))).toBe(rewardsHistory);
+      expect(await firstValueFrom(provider(rewardAccounts, Cardano.EpochNo(1)))).toBe(rewardsHistory);
     });
 
     it('when lower bound is not specified: sets rewardsHistory as initialized and returns empty array', async () => {
@@ -48,7 +48,7 @@ describe('RewardsHistory', () => {
           cold('aa', {
             a: [
               {
-                epoch: 0,
+                epoch: Cardano.EpochNo(0),
                 tx: createStubTxWithCertificates([
                   { __typename: Cardano.CertificateType.StakeKeyDeregistration } as Cardano.Certificate
                 ])
@@ -77,7 +77,7 @@ describe('RewardsHistory', () => {
         });
         flush();
         expect(getRewardsHistory).toBeCalledTimes(1);
-        expect(getRewardsHistory).toBeCalledWith(rewardAccounts, epoch + 3);
+        expect(getRewardsHistory).toBeCalledWith(rewardAccounts, Cardano.EpochNo(epoch.valueOf() + 3));
       });
     });
 
@@ -90,7 +90,7 @@ describe('RewardsHistory', () => {
           cold('aa', {
             a: [
               {
-                epoch: 0,
+                epoch: Cardano.EpochNo(0),
                 tx: createStubTxWithCertificates(
                   [{ __typename: Cardano.CertificateType.StakeDelegation } as Cardano.Certificate],
                   { stakeKeyHash: '' }
@@ -120,7 +120,7 @@ describe('RewardsHistory', () => {
         });
         flush();
         expect(getRewardsHistory).toBeCalledTimes(1);
-        expect(getRewardsHistory).toBeCalledWith(rewardAccounts, epoch + 3);
+        expect(getRewardsHistory).toBeCalledWith(rewardAccounts, Cardano.EpochNo(epoch.valueOf() + 3));
       });
     });
 

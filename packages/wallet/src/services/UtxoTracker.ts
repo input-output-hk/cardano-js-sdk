@@ -11,7 +11,7 @@ export interface UtxoTrackerProps {
   addresses$: Observable<Cardano.Address[]>;
   stores: Pick<WalletStores, 'utxo' | 'unspendableUtxo'>;
   transactionsInFlight$: Observable<TxInFlight[]>;
-  tipBlockHeight$: Observable<number>;
+  tipBlockHeight$: Observable<Cardano.BlockNo>;
   retryBackoffConfig: RetryBackoffConfig;
   logger: Logger;
 }
@@ -24,7 +24,7 @@ export interface UtxoTrackerInternals {
 export const createUtxoProvider = (
   utxoProvider: UtxoProvider,
   addresses$: Observable<Cardano.Address[]>,
-  tipBlockHeight$: Observable<number>,
+  tipBlockHeight$: Observable<Cardano.BlockNo>,
   retryBackoffConfig: RetryBackoffConfig
 ) =>
   addresses$.pipe(

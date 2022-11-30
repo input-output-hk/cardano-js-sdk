@@ -79,7 +79,7 @@ export const txBody: Cardano.TxBody = {
   certificates: [
     {
       __typename: Cardano.CertificateType.PoolRetirement,
-      epoch: 500,
+      epoch: Cardano.EpochNo(500),
       poolId: Cardano.PoolId('pool1y6chk7x7fup4ms9leesdr57r4qy9cwxuee0msan72x976a6u0nc')
     },
     {
@@ -99,8 +99,8 @@ export const txBody: Cardano.TxBody = {
     '6199186adb51974690d7247d2646097d2c62763b16fb7ed3f9f55d38abc123de'
   ),
   validityInterval: {
-    invalidBefore: 100,
-    invalidHereafter: 1000
+    invalidBefore: Cardano.Slot(100),
+    invalidHereafter: Cardano.Slot(1000)
   },
   withdrawals: [
     {

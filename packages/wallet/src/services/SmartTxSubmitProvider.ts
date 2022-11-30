@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Cardano,
   CardanoNodeErrors,
@@ -61,8 +62,11 @@ export class SmartTxSubmitProvider implements TxSubmitProvider {
             ProviderFailure.BadRequest,
             new CardanoNodeErrors.TxSubmissionErrors.OutsideOfValidityIntervalError({
               outsideOfValidityInterval: {
-                currentSlot: slot,
-                interval: { invalidBefore: invalidBefore || null, invalidHereafter: invalidHereafter || null }
+                currentSlot: slot.valueOf(),
+                interval: {
+                  invalidBefore: invalidBefore?.valueOf() || null,
+                  invalidHereafter: invalidHereafter?.valueOf() || null
+                }
               }
             })
           );

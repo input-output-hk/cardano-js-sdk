@@ -43,27 +43,27 @@ describe('RewardsBuilder', () => {
     });
     it('returns RewardEpochModel when there is epochs field', async () => {
       const rewardAccWithBalance = (await fixtureBuilder.getRewardAccounts(1))[0];
-      const epochs = { lowerBound: 5, upperBound: 10 };
+      const epochs = { lowerBound: Cardano.EpochNo(5), upperBound: Cardano.EpochNo(10) };
       const result = await builder.getRewardsHistory([rewardAccWithBalance], epochs);
       expect(result.length).toBeGreaterThan(0);
       for (const reward of result) {
-        expect(Number(reward.epoch)).toBeGreaterThanOrEqual(epochs.lowerBound);
-        expect(Number(reward.epoch)).toBeLessThanOrEqual(epochs.upperBound);
+        expect(Number(reward.epoch)).toBeGreaterThanOrEqual(epochs.lowerBound.valueOf());
+        expect(Number(reward.epoch)).toBeLessThanOrEqual(epochs.upperBound.valueOf());
       }
     });
     it('returns RewardEpochModel when there is partially epochs field with lowerBound', async () => {
       const rewardAccWithBalance = (await fixtureBuilder.getRewardAccounts(1))[0];
-      const epochs = { lowerBound: 1 };
+      const epochs = { lowerBound: Cardano.EpochNo(1) };
       const result = await builder.getRewardsHistory([rewardAccWithBalance], epochs);
       expect(result.length).toBeGreaterThan(0);
-      for (const reward of result) expect(Number(reward.epoch)).toBeGreaterThanOrEqual(epochs.lowerBound);
+      for (const reward of result) expect(Number(reward.epoch)).toBeGreaterThanOrEqual(epochs.lowerBound.valueOf());
     });
     it('returns RewardEpochModel when there is partially epochs field with upperBound', async () => {
       const rewardAccWithBalance = (await fixtureBuilder.getRewardAccounts(1))[0];
-      const epochs = { upperBound: 90 };
+      const epochs = { upperBound: Cardano.EpochNo(90) };
       const result = await builder.getRewardsHistory([rewardAccWithBalance], epochs);
       expect(result.length).toBeGreaterThan(0);
-      for (const reward of result) expect(Number(reward.epoch)).toBeLessThanOrEqual(epochs.upperBound);
+      for (const reward of result) expect(Number(reward.epoch)).toBeLessThanOrEqual(epochs.upperBound.valueOf());
     });
   });
 });

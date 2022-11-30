@@ -15,6 +15,11 @@ export declare class OpaqueString<T extends string> extends String {
   toString(): string;
 }
 
+export declare class OpaqueNumber<T extends string> extends Number {
+  /** This helps typescript distinguish different opaque number types. */
+  protected readonly __opaqueNumber: T;
+}
+
 const isOneOf = <T>(target: T, options: T | T[]) =>
   (Array.isArray(options) && options.includes(target)) || target === options;
 

@@ -76,9 +76,9 @@ describe('ChainHistoryHttpService', () => {
   describe('healthy state', () => {
     beforeAll(async () => {
       const metadataService = createDbSyncMetadataService(dbConnection, logger);
-      lastBlockNoInDb = (await dbConnection.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no;
+      lastBlockNoInDb = Cardano.BlockNo((await dbConnection.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no);
       cardanoNode = mockCardanoNode(
-        healthCheckResponseMock({ blockNo: lastBlockNoInDb })
+        healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() })
       ) as unknown as OgmiosCardanoNode;
       chainHistoryProvider = new DbSyncChainHistoryProvider(
         { paginationPageSizeLimit: PAGINATION_PAGE_SIZE_LIMIT },
@@ -106,12 +106,12 @@ describe('ChainHistoryHttpService', () => {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
+        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() }));
       });
 
       it('forwards the chainHistoryProvider health response with provider client', async () => {
         const response = await provider.healthCheck();
-        expect(response).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
+        expect(response).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() }));
       });
     });
 
@@ -359,8 +359,8 @@ describe('ChainHistoryHttpService', () => {
 
       it('does not include transactions before indicated block', async () => {
         const { addresses, blockRange, txInRangeCount } = await fixtureBuilder.getAddressesWithSomeInBlockRange(2, {
-          lowerBound: 10,
-          upperBound: 100
+          lowerBound: Cardano.BlockNo(10),
+          upperBound: Cardano.BlockNo(100)
         });
         const response = await provider.transactionsByAddresses({
           addresses: [...addresses],
@@ -369,7 +369,7 @@ describe('ChainHistoryHttpService', () => {
         });
 
         let lowerBound = DB_MAX_SAFE_INTEGER;
-        for (const tx of response.pageResults) lowerBound = Math.min(lowerBound, tx.blockHeader.blockNo);
+        for (const tx of response.pageResults) lowerBound = Math.min(lowerBound, tx.blockHeader.blockNo.valueOf());
 
         expect(response.totalResultCount).toEqual(txInRangeCount);
         expect(lowerBound).toBeGreaterThanOrEqual(10);
@@ -378,8 +378,8 @@ describe('ChainHistoryHttpService', () => {
 
       it('does not include transactions after indicated block', async () => {
         const { addresses, blockRange, txInRangeCount } = await fixtureBuilder.getAddressesWithSomeInBlockRange(2, {
-          lowerBound: 0,
-          upperBound: 10
+          lowerBound: Cardano.BlockNo(0),
+          upperBound: Cardano.BlockNo(10)
         });
         const response = await provider.transactionsByAddresses({
           addresses: [...addresses],
@@ -388,7 +388,7 @@ describe('ChainHistoryHttpService', () => {
         });
 
         let upperBound = 0;
-        for (const tx of response.pageResults) upperBound = Math.max(upperBound, tx.blockHeader.blockNo);
+        for (const tx of response.pageResults) upperBound = Math.max(upperBound, tx.blockHeader.blockNo.valueOf());
 
         expect(response.totalResultCount).toEqual(txInRangeCount);
         expect(upperBound).toBeLessThanOrEqual(10);
@@ -397,8 +397,8 @@ describe('ChainHistoryHttpService', () => {
 
       it('includes transactions only in specified block range', async () => {
         const { addresses, blockRange, txInRangeCount } = await fixtureBuilder.getAddressesWithSomeInBlockRange(2, {
-          lowerBound: 200,
-          upperBound: 1000
+          lowerBound: Cardano.BlockNo(200),
+          upperBound: Cardano.BlockNo(1000)
         });
 
         const response = await provider.transactionsByAddresses({
@@ -411,8 +411,8 @@ describe('ChainHistoryHttpService', () => {
         let upperBound = 0;
 
         for (const tx of response.pageResults) {
-          upperBound = Math.max(upperBound, tx.blockHeader.blockNo);
-          lowerBound = Math.min(lowerBound, tx.blockHeader.blockNo);
+          upperBound = Math.max(upperBound, tx.blockHeader.blockNo.valueOf());
+          lowerBound = Math.min(lowerBound, tx.blockHeader.blockNo.valueOf());
         }
 
         expect(response.totalResultCount).toEqual(txInRangeCount);

@@ -42,7 +42,7 @@ export class DbSyncEpochPollService implements EpochMonitor {
   async #executePoll() {
     const lastEpoch = await this.#queryLastEpoch();
     const currentEpoch = await this.#currentEpoch;
-    const shouldClearCache = !!(currentEpoch && lastEpoch > currentEpoch);
+    const shouldClearCache = !!(currentEpoch && lastEpoch.valueOf() > currentEpoch.valueOf());
 
     if (shouldClearCache) this.onEpoch(lastEpoch);
   }
@@ -54,7 +54,7 @@ export class DbSyncEpochPollService implements EpochMonitor {
    */
   async #queryLastEpoch() {
     const result: QueryResult<EpochModel> = await this.#db.query(findLastEpoch);
-    return result.rows[0].no;
+    return Cardano.EpochNo(result.rows[0].no);
   }
 
   /**
@@ -93,7 +93,7 @@ export class DbSyncEpochPollService implements EpochMonitor {
     return this.#currentEpoch;
   }
 
-  onEpoch(currentEpoch: number) {
+  onEpoch(currentEpoch: Cardano.EpochNo) {
     this.#currentEpoch = Promise.resolve(currentEpoch);
 
     for (const cb of this.#callbacks) cb();

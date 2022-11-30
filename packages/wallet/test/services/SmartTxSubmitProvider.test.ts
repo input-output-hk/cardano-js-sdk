@@ -35,7 +35,7 @@ describe('SmartTxSubmitProvider', () => {
       id: Cardano.TransactionId('6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad'),
       witness: { signatures: new Map() }
     };
-    const validityInterval = { invalidBefore: 5, invalidHereafter: 10 };
+    const validityInterval = { invalidBefore: Cardano.Slot(5), invalidHereafter: Cardano.Slot(10) };
     const txWithoutValidityIntervalHex = util.bytesToHex(
       usingAutoFree((scope) => coreToCml.tx(scope, txWithoutValidityInterval).to_bytes())
     );
@@ -108,7 +108,7 @@ describe('SmartTxSubmitProvider', () => {
     });
 
     it('awaits for network tip to be ahead of tx body `ValidityInterval.invalidBefore` before submitting', async () => {
-      const tip$ = new BehaviorSubject<TipSlot>({ slot: validityInterval.invalidBefore - 1 });
+      const tip$ = new BehaviorSubject<TipSlot>({ slot: Cardano.Slot(validityInterval.invalidBefore.valueOf() - 1) });
       provider = new SmartTxSubmitProvider(
         { retryBackoffConfig },
         {

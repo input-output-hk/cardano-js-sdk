@@ -80,7 +80,7 @@ const mapCertificate = (certificate: Schema.Certificate): Cardano.Certificate =>
   if ('poolRetirement' in certificate) {
     return {
       __typename: Cardano.CertificateType.PoolRetirement,
-      epoch: certificate.poolRetirement.retirementEpoch,
+      epoch: Cardano.EpochNo(certificate.poolRetirement.retirementEpoch),
       poolId: Cardano.PoolId(certificate.poolRetirement.poolId)
     };
   }

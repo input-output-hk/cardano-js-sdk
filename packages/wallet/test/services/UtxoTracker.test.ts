@@ -10,7 +10,7 @@ import { utxo } from '../mocks';
 describe('createUtxoTracker', () => {
   // these variables are not relevant for this test, overwriting utxoSource$
   let retryBackoffConfig: RetryBackoffConfig;
-  let tipBlockHeight$: Observable<number>;
+  let tipBlockHeight$: Observable<Cardano.BlockNo>;
   let utxoProvider: UtxoProvider;
   const logger = dummyLogger;
 

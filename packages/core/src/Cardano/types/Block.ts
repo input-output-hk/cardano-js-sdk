@@ -1,6 +1,6 @@
 import { CML } from '../..';
 import { Ed25519PublicKey } from './Key';
-import { Hash28ByteBase16, Hash32ByteBase16, OpaqueString, typedBech32 } from '../util/primitives';
+import { Hash28ByteBase16, Hash32ByteBase16, OpaqueNumber, OpaqueString, typedBech32 } from '../util';
 import { InvalidStringError } from '../../errors';
 import { Lovelace } from './Value';
 import { PoolId } from './StakePool/primitives';
@@ -9,22 +9,26 @@ import { Tx } from './Transaction';
 /**
  * The block size in bytes
  */
-export type BlockSize = number;
+export type BlockSize = OpaqueNumber<'BlockSize'>;
+export const BlockSize = (value: number): BlockSize => value as unknown as BlockSize;
 
 /**
  * The block number.
  */
-export type BlockNo = number;
+export type BlockNo = OpaqueNumber<'BlockNo'>;
+export const BlockNo = (value: number): BlockNo => value as unknown as BlockNo;
 
 /**
  * The epoch number.
  */
-export type EpochNo = number;
+export type EpochNo = OpaqueNumber<'EpochNo'>;
+export const EpochNo = (value: number): EpochNo => value as unknown as EpochNo;
 
 /**
  * Smallest time period in the blockchain
  */
-export type Slot = number;
+export type Slot = OpaqueNumber<'Slot'>;
+export const Slot = (value: number): Slot => value as unknown as Slot;
 
 /**
  * block hash as hex string

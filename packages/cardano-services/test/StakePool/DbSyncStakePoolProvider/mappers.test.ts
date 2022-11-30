@@ -260,7 +260,7 @@ describe('mappers', () => {
     it('toStakePoolResults with retiring status', () => {
       expect(
         toStakePoolResults([hashId], fromCache, {
-          lastEpochNo: poolRetirementModel.retiring_epoch - 1,
+          lastEpochNo: Cardano.EpochNo(poolRetirementModel.retiring_epoch - 1),
           nodeMetricsDependencies,
           poolAPYs,
           poolDatas,
@@ -283,7 +283,7 @@ describe('mappers', () => {
 
       expect(
         toStakePoolResults([hashId], fromCache, {
-          lastEpochNo: poolRetirementModel.retiring_epoch + 1,
+          lastEpochNo: Cardano.EpochNo(poolRetirementModel.retiring_epoch + 1),
           nodeMetricsDependencies,
           poolAPYs,
           poolDatas,
@@ -318,7 +318,7 @@ describe('mappers', () => {
 
       expect(
         toStakePoolResults([hashId], fromCache, {
-          lastEpochNo: poolRegistrationModel.active_epoch_no - 1,
+          lastEpochNo: Cardano.EpochNo(poolRegistrationModel.active_epoch_no - 1),
           nodeMetricsDependencies,
           poolAPYs,
           poolDatas,
@@ -353,7 +353,7 @@ describe('mappers', () => {
 
       expect(
         toStakePoolResults([hashId], fromCache, {
-          lastEpochNo: poolRegistrationModel.active_epoch_no,
+          lastEpochNo: Cardano.EpochNo(poolRegistrationModel.active_epoch_no),
           nodeMetricsDependencies,
           poolAPYs,
           poolDatas,
@@ -380,7 +380,7 @@ describe('mappers', () => {
           [hashId],
           { [hashId]: stakePool },
           {
-            lastEpochNo: poolRetirementModel.retiring_epoch - 1,
+            lastEpochNo: Cardano.EpochNo(poolRetirementModel.retiring_epoch - 1),
             nodeMetricsDependencies,
             poolAPYs,
             poolDatas,

@@ -6,9 +6,9 @@ export const stakeKeyHash = Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccou
 export const rewardAccountBalance = 33_333n;
 
 export const ledgerTip = {
-  blockNo: 1_111_111,
+  blockNo: Cardano.BlockNo(1_111_111),
   hash: '10d64cc11e9b20e15b6c46aa7b1fed11246f437e62225655a30ea47bf8cc22d0',
-  slot: 37_834_496
+  slot: Cardano.Slot(37_834_496)
 };
 
 export const currentEpoch = {
@@ -30,11 +30,11 @@ export const protocolParameters = {
 
 export const epochRewards = [
   {
-    epoch: currentEpoch.number - 3,
+    epoch: Cardano.EpochNo(currentEpoch.number - 3),
     rewards: 10_000n
   },
   {
-    epoch: currentEpoch.number - 2,
+    epoch: Cardano.EpochNo(currentEpoch.number - 2),
     rewards: 11_000n
   }
 ];
@@ -59,7 +59,7 @@ export const rewardsHistory2 = new Map<Cardano.RewardAccount, EpochRewards[]>([
     rewardAccount,
     [
       {
-        epoch: currentEpoch.number - 4,
+        epoch: Cardano.EpochNo(currentEpoch.number - 4),
         rewards: 10_000n
       },
       ...epochRewards
