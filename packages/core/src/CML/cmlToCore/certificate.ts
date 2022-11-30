@@ -16,7 +16,7 @@ import {
   VrfVkHex
 } from '../../Cardano/types';
 import { Hash28ByteBase16, Hash32ByteBase16 } from '../../Cardano/util/primitives';
-import { NetworkId } from '../../Cardano/NetworkId';
+import { NetworkId } from '../../Cardano/ChainId';
 import { NotImplementedError, SerializationError, SerializationFailure } from '../../errors';
 import { usingAutoFree } from '@cardano-sdk/util';
 
