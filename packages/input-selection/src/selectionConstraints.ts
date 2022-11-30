@@ -72,7 +72,7 @@ export const tokenBundleSizeExceedsLimit =
       return false;
     }
     return usingAutoFree((scope) => {
-      const value = scope.manage(CML.Value.new(cmlUtil.maxBigNum));
+      const value = scope.manage(CML.Value.new(cmlUtil.maxBigNum(scope)));
       value.set_multiasset(coreToCml.tokenMap(scope, tokenBundle));
 
       return value.to_bytes().length > maxValueSize;
