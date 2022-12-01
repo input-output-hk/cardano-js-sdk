@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.6.0-nightly.6...@cardano-sdk/e2e@0.6.0-nightly.7) (2022-12-01)
+
+### ⚠ BREAKING CHANGES
+
+- Even if the value of DB_CACHE_TTL was already interpreted in seconds
+  rather than in minutes (despite the error in the description), it's default value is
+  changed
+
+### Bug Fixes
+
+- ttl validation now uses seconds and no longer minutes as the cache itself ([f0eb80f](https://github.com/input-output-hk/cardano-js-sdk/commit/f0eb80f73e61ea48f10809fb3c329fb5c4022e6b))
+
 ## [0.6.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.6.0-nightly.5...@cardano-sdk/e2e@0.6.0-nightly.6) (2022-11-30)
 
 **Note:** Version bump only for package @cardano-sdk/e2e

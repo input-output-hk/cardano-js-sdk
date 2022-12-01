@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.7.0-nightly.1...@cardano-sdk/core@0.7.0-nightly.2) (2022-12-01)
+
+### Features
+
+- **core:** memoizes computation slot nr to epoch nr ([40fe907](https://github.com/input-output-hk/cardano-js-sdk/commit/40fe90748d03e72724a549dc01cec0821945a819))
+
 ## [0.7.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.7.0-nightly.0...@cardano-sdk/core@0.7.0-nightly.1) (2022-11-24)
 
 **Note:** Version bump only for package @cardano-sdk/core

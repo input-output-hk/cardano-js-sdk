@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.7.0-nightly.2...@cardano-sdk/cardano-services@0.7.0-nightly.3) (2022-12-01)
+
+### ⚠ BREAKING CHANGES
+
+- Even if the value of DB_CACHE_TTL was already interpreted in seconds
+  rather than in minutes (despite the error in the description), it's default value is
+  changed
+
+### Features
+
+- **cardano-services:** synchronizes epoch rollover detected by ledger tip ([0de53ae](https://github.com/input-output-hk/cardano-js-sdk/commit/0de53aeaa320a2d7eff9c2c0a7d9786e39e41e14))
+
+### Bug Fixes
+
+- **cardano-services:** tx submit provider init ([d75b61d](https://github.com/input-output-hk/cardano-js-sdk/commit/d75b61d7c9204c299cb4757048946486b80e3b95))
+- ttl validation now uses seconds and no longer minutes as the cache itself ([f0eb80f](https://github.com/input-output-hk/cardano-js-sdk/commit/f0eb80f73e61ea48f10809fb3c329fb5c4022e6b))
+
 ## [0.7.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.7.0-nightly.1...@cardano-sdk/cardano-services@0.7.0-nightly.2) (2022-11-30)
 
 ### Bug Fixes

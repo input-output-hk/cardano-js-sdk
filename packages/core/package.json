@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/core",
-  "version": "0.7.0-nightly.1",
+  "version": "0.7.0-nightly.2",
   "description": "Core types and libraries for Cardano",
   "engines": {
     "node": ">=14.20.1"
@@ -61,7 +61,7 @@
   },
   "dependencies": {
     "@cardano-ogmios/client": "5.5.7",
-    "@cardano-sdk/util": "^0.7.0-nightly.0",
+    "@cardano-sdk/util": "^0.7.0-nightly.1",
     "@dcspark/cardano-multiplatform-lib-browser": "^3.1.0",
     "@dcspark/cardano-multiplatform-lib-nodejs": "^3.1.0",
     "@emurgo/cip14-js": "^3.0.1",
