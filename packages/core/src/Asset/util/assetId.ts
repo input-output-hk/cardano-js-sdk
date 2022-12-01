@@ -1,4 +1,4 @@
-import { AssetId, AssetName, PolicyId } from '../../Cardano/types';
+import { AssetId, AssetName, PolicyId } from '../../Cardano/types/Asset';
 import { CML } from '../../CML/CML';
 import { bytesToHex } from '../../util/misc/bytesToHex';
 

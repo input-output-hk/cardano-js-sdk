@@ -1,8 +1,9 @@
 import { CommonProgramOptions } from './Options';
 import { Logger } from 'ts-log';
 import { TxSubmitWorkerConfig } from '../TxSubmit';
-import { createDnsResolver, getOgmiosTxSubmitProvider, getRunningTxSubmitWorker } from './';
+import { createDnsResolver } from './utils';
 import { createLogger } from 'bunyan';
+import { getOgmiosTxSubmitProvider, getRunningTxSubmitWorker } from './services';
 
 export type TxWorkerOptions = CommonProgramOptions &
   Pick<TxSubmitWorkerConfig, 'parallel' | 'parallelTxs' | 'pollingCycle'>;

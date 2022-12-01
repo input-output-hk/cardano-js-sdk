@@ -1,6 +1,6 @@
-import { CML } from '../..';
+import { CML } from '../../CML/CML';
 import { Ed25519PublicKey } from './Key';
-import { Hash28ByteBase16, Hash32ByteBase16, OpaqueNumber, OpaqueString, typedBech32 } from '../util';
+import { Hash28ByteBase16, Hash32ByteBase16, OpaqueNumber, OpaqueString, typedBech32 } from '../util/primitives';
 import { InvalidStringError } from '../../errors';
 import { Lovelace } from './Value';
 import { PoolId } from './StakePool/primitives';

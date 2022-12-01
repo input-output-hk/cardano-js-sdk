@@ -1,7 +1,7 @@
 import { CML } from '../CML/CML';
 import { Metadatum, MetadatumMap } from '../Cardano/types/AuxiliaryData';
-import { txMetadatum as txMetadatumToCML } from '../CML/coreToCml';
-import { txMetadatum as txMetadatumToCore } from '../CML/cmlToCore';
+import { txMetadatum as txMetadatumToCML } from '../CML/coreToCml/coreToCml';
+import { txMetadatum as txMetadatumToCore } from '../CML/cmlToCore/cmlToCore';
 import { usingAutoFree } from '@cardano-sdk/util';
 
 /**
