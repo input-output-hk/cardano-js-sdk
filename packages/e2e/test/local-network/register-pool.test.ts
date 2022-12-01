@@ -1,10 +1,9 @@
 /* eslint-disable max-statements */
-import { Awaited } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
-import { KeyAgentFactoryProps, getWallet } from '../../src';
+import { KeyAgentFactoryProps, TestWallet, getWallet } from '../../src';
 import { getEnv, walletVariables } from '../environment';
 import { logger } from '@cardano-sdk/util-dev';
-import { submitAndConfirm, waitForWalletStateSettle, walletReady } from '../util';
+import { submitCertificate, waitForWalletStateSettle, walletReady } from '../util';
 
 import { AddressType, KeyRole } from '@cardano-sdk/key-management';
 import { firstValueFrom } from 'rxjs';
@@ -31,38 +30,9 @@ const wallet2Params: KeyAgentFactoryProps = {
   password: 'some_password'
 };
 
-/**
- * Submit certificates on behalf of the given wallet.
- *
- * @param certificate The certificate to be send.
- * @param wallet The wallet
- */
-const submitCertificate = async (certificate: Cardano.Certificate, wallet: Awaited<ReturnType<typeof getWallet>>) => {
-  const walletAddress = (await firstValueFrom(wallet.wallet.addresses$))[0].address;
-  const txProps = {
-    certificates: [certificate],
-    outputs: new Set([
-      {
-        address: walletAddress,
-        value: {
-          coins: 3_000_000n
-        }
-      }
-    ])
-  };
-
-  const unsignedTx = await wallet.wallet.initializeTx(txProps);
-
-  const signedTx = await wallet.wallet.finalizeTx({
-    tx: unsignedTx
-  });
-
-  await submitAndConfirm(wallet.wallet, signedTx);
-};
-
 describe('local-network/register-pool', () => {
-  let wallet1: Awaited<ReturnType<typeof getWallet>>;
-  let wallet2: Awaited<ReturnType<typeof getWallet>>;
+  let wallet1: TestWallet;
+  let wallet2: TestWallet;
 
   beforeAll(async () => {
     jest.setTimeout(180_000);

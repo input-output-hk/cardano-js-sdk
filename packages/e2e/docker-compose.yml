@@ -161,7 +161,7 @@ services:
       context: ../../
       target: http-server
     environment:
-      - DB_CACHE_TTL=${DB_CACHE_TTL:-120}
+      - DB_CACHE_TTL=${DB_CACHE_TTL:-7200}
       - EPOCH_POLL_INTERVAL=${EPOCH_POLL_INTERVAL:-500}
       - TOKEN_METADATA_SERVER_URL=stub://
       - ENABLE_METRICS=${ENABLE_METRICS:-false}

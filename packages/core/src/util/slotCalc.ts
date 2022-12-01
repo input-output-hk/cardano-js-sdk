@@ -3,6 +3,7 @@ import { CustomError } from 'ts-custom-error';
 import { EraSummary } from '../CardanoNode';
 import groupBy from 'lodash/groupBy';
 import last from 'lodash/last';
+import memoize from 'lodash/memoize';
 import orderBy from 'lodash/orderBy';
 
 export interface SlotDate {
@@ -76,15 +77,17 @@ const createSlotEpochCalcImpl = (eraSummaries: EraSummary[]) => {
 /**
  * @returns {SlotEpochCalc} function that computes epoch # given a slot #
  */
-export const createSlotEpochCalc = (eraSummaries: EraSummary[]) => {
-  const calc = createSlotEpochCalcImpl(eraSummaries);
+export const createSlotEpochCalc: (eraSummaries: EraSummary[]) => (slotNo: Slot) => EpochNo = memoize(
+  (eraSummaries: EraSummary[]) => {
+    const calc = createSlotEpochCalcImpl(eraSummaries);
 
-  /**
-   * @throws EraSummaryError
-   * @returns {EpochNo} epoch of the slot
-   */
-  return (slotNo: Slot): EpochNo => calc(slotNo).epochNo;
-};
+    /**
+     * @throws EraSummaryError
+     * @returns {EpochNo} epoch of the slot
+     */
+    return memoize((slotNo: Slot): EpochNo => calc(slotNo).epochNo);
+  }
+);
 
 /**
  * @returns {SlotTimeCalc} function that computes date/time of a given slot #

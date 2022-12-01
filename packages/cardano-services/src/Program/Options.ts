@@ -1,7 +1,7 @@
 import { LogLevel } from 'bunyan';
 
 export enum CommonOptionDescriptions {
-  DbCacheTtl = 'Cache TTL in minutes between 1 and 2880, an option for database related operations',
+  DbCacheTtl = 'Cache TTL in seconds between 60 and 172800 (two days), an option for database related operations',
   LoggerMinSeverity = 'Log level',
   OgmiosSrvServiceName = 'Ogmios SRV service name',
   OgmiosUrl = 'Ogmios URL',

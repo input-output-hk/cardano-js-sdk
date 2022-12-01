@@ -21,7 +21,11 @@ export const ogmiosServerReady = (connection: Ogmios.Connection): Promise<void> 
 export const createHealthyMockOgmiosServer = (submitTxHook?: () => void) =>
   createMockOgmiosServer({
     healthCheck: { response: { networkSynchronization: 0.999, success: true } },
-    stateQuery: { eraSummaries: { response: { success: true } }, systemStart: { response: { success: true } } },
+    stateQuery: {
+      eraSummaries: { response: { success: true } },
+      stakeDistribution: { response: { success: true } },
+      systemStart: { response: { success: true } }
+    },
     submitTx: { response: { success: true } },
     submitTxHook
   });

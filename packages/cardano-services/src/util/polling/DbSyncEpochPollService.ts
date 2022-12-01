@@ -44,12 +44,7 @@ export class DbSyncEpochPollService implements EpochMonitor {
     const currentEpoch = await this.#currentEpoch;
     const shouldClearCache = !!(currentEpoch && lastEpoch > currentEpoch);
 
-    if (shouldClearCache) {
-      this.#currentEpoch = Promise.resolve(lastEpoch);
-      for (const cb of this.#callbacks) {
-        cb();
-      }
-    }
+    if (shouldClearCache) this.onEpoch(lastEpoch);
   }
 
   /**
@@ -94,7 +89,13 @@ export class DbSyncEpochPollService implements EpochMonitor {
   /**
    * Get last known epoch
    */
-  async getLastKnownEpoch() {
-    return await this.#currentEpoch;
+  getLastKnownEpoch() {
+    return this.#currentEpoch;
+  }
+
+  onEpoch(currentEpoch: number) {
+    this.#currentEpoch = Promise.resolve(currentEpoch);
+
+    for (const cb of this.#callbacks) cb();
   }
 }

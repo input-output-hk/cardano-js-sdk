@@ -5,7 +5,8 @@ import {
   EraSummary,
   NetworkInfoProvider,
   StakeSummary,
-  SupplySummary
+  SupplySummary,
+  createSlotEpochCalc
 } from '@cardano-sdk/core';
 import { DbSyncProvider } from '../../util/DbSyncProvider';
 import { Disposer, EpochMonitor } from '../../util/polling/types';
@@ -31,6 +32,8 @@ export interface NetworkInfoProviderDependencies {
 export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) implements NetworkInfoProvider {
   #logger: Logger;
   #cache: InMemoryCache;
+  #currentEpoch: number;
+  #currentHash: Cardano.BlockId | undefined;
   #builder: NetworkInfoBuilder;
   #genesisDataReady: Promise<GenesisData>;
   #epochMonitor: EpochMonitor;
@@ -43,6 +46,7 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) im
     super(db, cardanoNode, 'DbSyncNetworkInfoProvider', logger);
     this.#logger = logger;
     this.#cache = cache;
+    this.#currentEpoch = 0;
     this.#epochMonitor = epochMonitor;
     this.#builder = new NetworkInfoBuilder(db, logger);
     this.#genesisDataReady = loadGenesisData(cardanoNodeConfigPath);
@@ -50,7 +54,25 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) im
 
   public async ledgerTip(): Promise<Cardano.Tip> {
     const tip = await this.#builder.queryLedgerTip();
-    return toLedgerTip(tip);
+    const result = toLedgerTip(tip);
+
+    // Perform computation only on changed tip
+    if (this.#currentHash !== result.hash) {
+      this.#currentHash = result.hash;
+
+      const slotEpochCalc = createSlotEpochCalc(await this.eraSummaries());
+      const currentEpoch = slotEpochCalc(result.slot);
+
+      // On epoch rollover, invalidate the cache before returning
+      if (this.#currentEpoch !== currentEpoch) {
+        // The first time, no need to invalidate the cache
+        if (this.#currentEpoch !== 0) this.#epochMonitor.onEpoch(currentEpoch);
+
+        this.#currentEpoch = currentEpoch;
+      }
+    }
+
+    return result;
   }
 
   public async protocolParameters(): Promise<Cardano.ProtocolParameters> {
