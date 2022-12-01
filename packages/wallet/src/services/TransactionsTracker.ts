@@ -59,7 +59,7 @@ export interface TransactionsTrackerInternalsProps {
   chainHistoryProvider: ChainHistoryProvider;
   addresses$: Observable<Cardano.Address[]>;
   retryBackoffConfig: RetryBackoffConfig;
-  tipBlockHeight$: Observable<number>;
+  tipBlockHeight$: Observable<Cardano.BlockNo>;
   store: OrderedCollectionStore<Cardano.HydratedTx>;
   logger: Logger;
 }

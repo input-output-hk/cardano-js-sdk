@@ -5,11 +5,13 @@ import {
   AssetId,
   AssetName,
   BlockId,
+  BlockNo,
   Certificate,
   CertificateType,
   Ed25519KeyHash,
   Ed25519PublicKey,
   Ed25519Signature,
+  EpochNo,
   HydratedTx,
   HydratedTxIn,
   NativeScriptKind,
@@ -19,6 +21,7 @@ import {
   PoolRetirementCertificate,
   RewardAccount,
   ScriptType,
+  Slot,
   StakeAddressCertificate,
   StakeDelegationCertificate,
   TokenMap,
@@ -96,7 +99,7 @@ describe('txInspector', () => {
   };
   const poolRetirementCert: PoolRetirementCertificate = {
     __typename: CertificateType.PoolRetirement,
-    epoch: 100,
+    epoch: EpochNo(100),
     poolId
   };
   const keyDeregistrationCert: StakeAddressCertificate = {
@@ -210,9 +213,9 @@ describe('txInspector', () => {
     ({
       auxiliaryData: args.includeAuxData ? auxiliaryData : undefined,
       blockHeader: {
-        blockNo: 200,
+        blockNo: BlockNo(200),
         hash: BlockId('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed'),
-        slot: 1000
+        slot: Slot(1000)
       },
       body: {
         certificates: args.certificates,

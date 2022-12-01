@@ -95,7 +95,7 @@ export const txConfirmed = (
           const tx = txs.find((historyTx) => historyTx.id === id);
           if (!tx) return EMPTY;
           return tip$.pipe(
-            filter(({ blockNo }) => blockNo >= tx.blockHeader.blockNo + numConfirmations),
+            filter(({ blockNo }) => blockNo >= Cardano.BlockNo(tx.blockHeader.blockNo.valueOf() + numConfirmations)),
             map(() => tx)
           );
         })
@@ -174,7 +174,7 @@ export const waitForEpoch = (wallet: Pick<ObservableWallet, 'currentEpoch$'>, wa
       map(({ epochNo }) => epochNo),
       distinctUntilChanged(),
       tap((epochNo) => logger.info(`Currently at epoch #${epochNo}`)),
-      filter((currentEpochNo) => currentEpochNo >= waitForEpochNo)
+      filter((currentEpochNo) => currentEpochNo.valueOf() >= waitForEpochNo)
     )
   );
 };

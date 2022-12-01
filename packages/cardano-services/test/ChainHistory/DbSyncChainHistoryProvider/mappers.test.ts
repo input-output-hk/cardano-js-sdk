@@ -142,17 +142,17 @@ describe('chain history mappers', () => {
       expect(result).toEqual<Cardano.ExtendedBlockInfo>({
         confirmations: 100,
         date: new Date(datetime),
-        epoch: 12,
+        epoch: Cardano.EpochNo(12),
         epochSlot: 202,
         fees: 170_000n,
         header: {
-          blockNo: 200,
+          blockNo: Cardano.BlockNo(200),
           hash: Cardano.BlockId(blockHash),
-          slot: 100
+          slot: Cardano.Slot(100)
         },
         nextBlock: Cardano.BlockId(blockHash),
         previousBlock: Cardano.BlockId(blockHash),
-        size: 50,
+        size: Cardano.BlockSize(50),
         slotLeader: Cardano.SlotLeader(poolId),
         totalOutput: 100_000_000n,
         txCount: 3000,
@@ -168,15 +168,15 @@ describe('chain history mappers', () => {
       expect(result).toEqual<Cardano.ExtendedBlockInfo>({
         confirmations: 100,
         date: new Date(datetime),
-        epoch: 12,
+        epoch: Cardano.EpochNo(12),
         epochSlot: 202,
         fees: 170_000n,
         header: {
-          blockNo: 200,
+          blockNo: Cardano.BlockNo(200),
           hash: Cardano.BlockId(blockHash),
-          slot: 100
+          slot: Cardano.Slot(100)
         },
-        size: 50,
+        size: Cardano.BlockSize(50),
         slotLeader: Cardano.SlotLeader(genesisLeaderHash),
         totalOutput: 100_000_000n,
         txCount: 3000,
@@ -195,7 +195,7 @@ describe('chain history mappers', () => {
       expect(result).toEqual<WithCertIndex<Cardano.PoolRetirementCertificate>>({
         __typename: Cardano.CertificateType.PoolRetirement,
         cert_index: 0,
-        epoch: 1,
+        epoch: Cardano.EpochNo(1),
         poolId: Cardano.PoolId(poolId)
       });
     });
@@ -319,8 +319,13 @@ describe('chain history mappers', () => {
     ];
 
     const expected: Cardano.HydratedTx = {
-      blockHeader: { blockNo: 200, hash: Cardano.BlockId(blockHash), slot: 250 },
-      body: { fee: 170_000n, inputs, outputs, validityInterval: { invalidBefore: 300, invalidHereafter: 500 } },
+      blockHeader: { blockNo: Cardano.BlockNo(200), hash: Cardano.BlockId(blockHash), slot: Cardano.Slot(250) },
+      body: {
+        fee: 170_000n,
+        inputs,
+        outputs,
+        validityInterval: { invalidBefore: Cardano.Slot(300), invalidHereafter: Cardano.Slot(500) }
+      },
       id: Cardano.TransactionId(transactionHash),
       index: 1,
       txSize: 20,

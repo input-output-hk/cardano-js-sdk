@@ -16,7 +16,7 @@ import {
   createRewardsProvider,
   fetchRewardsTrigger$,
   getStakePoolIdAtEpoch
-} from '../../../src/services';
+} from '../../../src';
 import { EMPTY, Observable, firstValueFrom, of } from 'rxjs';
 import { InMemoryStakePoolsStore, KeyValueStore } from '../../../src/persistence';
 import { RetryBackoffConfig } from 'backoff-rxjs';
@@ -87,32 +87,32 @@ describe('RewardAccounts', () => {
     const transactions = [
       {
         certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration } as Cardano.StakeAddressCertificate],
-        epoch: 100
+        epoch: Cardano.EpochNo(100)
       },
       {
         certificates: [{
           __typename: Cardano.CertificateType.StakeDelegation, poolId: poolId1
         } as Cardano.StakeDelegationCertificate],
-        epoch: 101
+        epoch: Cardano.EpochNo(101)
       },
       {
         certificates: [
           { __typename: Cardano.CertificateType.StakeKeyDeregistration } as Cardano.StakeAddressCertificate
         ],
-        epoch: 102
+        epoch: Cardano.EpochNo(102)
       },
       {
         certificates: [
           { __typename: Cardano.CertificateType.StakeDelegation, poolId: poolId2 } as Cardano.StakeDelegationCertificate
         ],
-        epoch: 103
+        epoch: Cardano.EpochNo(103)
       }
     ];
-    expect(getStakePoolIdAtEpoch(transactions)(102)).toBeUndefined();
-    expect(getStakePoolIdAtEpoch(transactions)(103)).toBeUndefined();
-    expect(getStakePoolIdAtEpoch(transactions)(104)).toBe(poolId1);
-    expect(getStakePoolIdAtEpoch(transactions)(105)).toBeUndefined();
-    expect(getStakePoolIdAtEpoch(transactions)(106)).toBeUndefined();
+    expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(102))).toBeUndefined();
+    expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(103))).toBeUndefined();
+    expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(104))).toBe(poolId1);
+    expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(105))).toBeUndefined();
+    expect(getStakePoolIdAtEpoch(transactions)(Cardano.EpochNo(106))).toBeUndefined();
   });
 
   test('addressKeyStatuses ', () => {
@@ -265,14 +265,14 @@ describe('RewardAccounts', () => {
       const rewardAccount = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
       createTestScheduler().run(({ cold, expectObservable }) => {
         const tx2 = { body: { withdrawals: [{ quantity: 5n, stakeAddress: rewardAccount }] } } as Cardano.HydratedTx;
-        const epoch$ = cold(      'a-b--', { a: 100, b: 101 });
+        const epoch$ = cold(      'a-b--', { a: Cardano.EpochNo(100), b: Cardano.EpochNo(101) });
         const txConfirmed$ = cold('-a--b', {
-          a: { confirmedAt: 1, tx: { body: {
+          a: { confirmedAt: Cardano.Slot(1), tx: { body: {
             withdrawals: [{
               quantity: 3n,
               stakeAddress: Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d')
             }] } } as Cardano.HydratedTx },
-          b: { confirmedAt: 2, tx: tx2 }
+          b: { confirmedAt: Cardano.Slot(2), tx: tx2 }
         });
         const target$ = fetchRewardsTrigger$(epoch$, txConfirmed$, rewardAccount);
         expectObservable(target$).toBe('a-b-c', {
@@ -320,7 +320,7 @@ describe('RewardAccounts', () => {
   describe('createDelegateeTracker', () => {
     it('queries and maps stake pools for epoch, epoch+1 and epoch+2', () => {
       createTestScheduler().run(({ cold, expectObservable, flush }) => {
-        const epoch = currentEpoch.number;
+        const epoch =  Cardano.EpochNo(currentEpoch.number);
         const epoch$ = cold('-a', { a: epoch });
         const stakePoolQueryResult = [{ id: poolId1 }, { id: poolId2 }];
         const stakePoolProvider = jest.fn().mockReturnValue(cold('-a', { a: stakePoolQueryResult }));
@@ -337,7 +337,7 @@ describe('RewardAccounts', () => {
                     poolId: poolId1
                   } as Cardano.StakeDelegationCertificate
                 ],
-                epoch: epoch - 2
+                epoch: Cardano.EpochNo(epoch.valueOf() - 2)
               },
               {
                 certificates: [
@@ -346,7 +346,7 @@ describe('RewardAccounts', () => {
                     poolId: poolId2
                   } as Cardano.StakeDelegationCertificate
                 ],
-                epoch: epoch - 1
+                epoch: Cardano.EpochNo(epoch.valueOf() - 1)
               }
             ]
           })
@@ -366,7 +366,7 @@ describe('RewardAccounts', () => {
 
     test('does not query the StakePoolProvider when there are no delegations certs provided', () => {
       createTestScheduler().run(({ cold, expectObservable, flush }) => {
-        const epoch$ = cold('-a', { a: currentEpoch.number });
+        const epoch$ = cold('-a', { a: Cardano.EpochNo(currentEpoch.number) });
         const trackedStakePoolProvider = {
           queryStakePools: jest.fn(),
           setStatInitialized: jest.fn(),

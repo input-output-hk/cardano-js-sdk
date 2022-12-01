@@ -112,13 +112,15 @@ describe('delegation rewards', () => {
     // Stake and wait for reward
 
     const signedTx = await submitDelegationTx();
+
     const delegationTxConfirmedAtEpoch = await getTxConfirmationEpoch(wallet1, signedTx.tx);
 
     logger.info(`Delegation tx confirmed at epoch #${delegationTxConfirmedAtEpoch}`);
 
-    await waitForEpoch(wallet1, delegationTxConfirmedAtEpoch + 2);
+    await waitForEpoch(wallet1, delegationTxConfirmedAtEpoch.valueOf() + 2);
+
     await generateTxs();
-    await waitForEpoch(wallet1, delegationTxConfirmedAtEpoch + 4);
+    await waitForEpoch(wallet1, delegationTxConfirmedAtEpoch.valueOf() + 4);
 
     // Check reward
     await waitForWalletStateSettle(wallet1);

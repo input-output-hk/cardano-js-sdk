@@ -13,16 +13,16 @@ describe('withRolledBackEvents', () => {
   const blockId = Cardano.BlockId('0000000000000000000000000000000000000000000000000000000000000000');
   const rollForwardEvent = (slot: number, hash?: Cardano.BlockId, blockNo = slot) =>
     ({
-      block: { header: { blockNo, hash, slot } },
+      block: { header: { blockNo: Cardano.BlockNo(blockNo), hash, slot: Cardano.Slot(slot) } },
       eventType: ChainSyncEventType.RollForward,
       stabilityWindowSlotsCount,
-      tip: { slot }
+      tip: { slot: Cardano.Slot(slot) }
     } as RollForwardEvent<WithStabilityWindow>);
   const rollBackwardEvent = (slot: number, hash: Cardano.BlockId, blockNo = slot) =>
     ({
       eventType: ChainSyncEventType.RollBackward,
       stabilityWindowSlotsCount,
-      tip: { blockNo, hash, slot }
+      tip: { blockNo: Cardano.BlockNo(blockNo), hash, slot: Cardano.Slot(slot) }
     } as RollBackwardEvent<WithStabilityWindow>);
 
   describe('without evtCache$', () => {

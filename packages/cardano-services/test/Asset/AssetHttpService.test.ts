@@ -60,9 +60,9 @@ describe('AssetHttpService', () => {
         logger,
         metadataService: createDbSyncMetadataService(db, logger)
       });
-      lastBlockNoInDb = (await db.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no;
+      lastBlockNoInDb = Cardano.BlockNo((await db.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no);
       cardanoNode = mockCardanoNode(
-        healthCheckResponseMock({ blockNo: lastBlockNoInDb })
+        healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() })
       ) as unknown as OgmiosCardanoNode;
       tokenMetadataService = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl: serverUrl });
       assetProvider = new DbSyncAssetProvider({ cardanoNode, db, logger, ntfMetadataService, tokenMetadataService });
@@ -86,12 +86,12 @@ describe('AssetHttpService', () => {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
+        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() }));
       });
 
       it('forwards the assetProvider health response with provider client', async () => {
         const response = await provider.healthCheck();
-        expect(response).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
+        expect(response).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() }));
       });
     });
 

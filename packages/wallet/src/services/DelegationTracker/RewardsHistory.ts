@@ -49,7 +49,7 @@ const firstDelegationEpoch$ = (transactions$: Observable<TxWithEpoch[]>, rewardA
         })
       )
     ),
-    map((tx) => (isNotNil(tx) ? tx.epoch + 3 : null)),
+    map((tx) => (isNotNil(tx) ? tx.epoch.valueOf() + 3 : null)),
     distinctUntilChanged()
   );
 
@@ -70,7 +70,7 @@ export const createRewardsHistoryTracker = (
             .pipe(map((rewards) => new Map(rewardAccounts.map((rewardAccount, i) => [rewardAccount, rewards[i]])))),
           firstDelegationEpoch$(transactions$, rewardAccounts).pipe(
             tap((firstEpoch) => logger.debug(`Fetching history rewards since epoch ${firstEpoch}`)),
-            switchMap((firstEpoch) => rewardsHistoryProvider(rewardAccounts, firstEpoch)),
+            switchMap((firstEpoch) => rewardsHistoryProvider(rewardAccounts, Cardano.EpochNo(firstEpoch!))),
             tap((allRewards) =>
               rewardsHistoryStore.setAll([...allRewards.entries()].map(([key, value]) => ({ key, value })))
             )
@@ -94,7 +94,10 @@ export const createRewardsHistoryTracker = (
         const epochs = Object.keys(rewardsByEpoch)
           .map((epoch) => Number(epoch))
           .sort();
-        const all = epochs.map((epoch) => ({ epoch, rewards: sumRewards(rewardsByEpoch[epoch]) }));
+        const all = epochs.map((epoch) => ({
+          epoch: Cardano.EpochNo(epoch),
+          rewards: sumRewards(rewardsByEpoch[epoch])
+        }));
         const rewardsHistory: RewardsHistory = {
           all,
           avgReward: avgReward(allRewards),

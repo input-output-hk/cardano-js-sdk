@@ -86,13 +86,16 @@ export const createTransactionReemitter = ({
         }
         case txSource.confirmed: {
           const oldestAcceptedSlot =
-            vt.confirmed.confirmedAt > stabilityWindowSlotsCount
-              ? vt.confirmed.confirmedAt - stabilityWindowSlotsCount
+            vt.confirmed.confirmedAt.valueOf() > stabilityWindowSlotsCount
+              ? vt.confirmed.confirmedAt.valueOf() - stabilityWindowSlotsCount
               : 0;
           // Remove transactions considered stable
           logger.debug(`Removing stable transactions (slot <= ${oldestAcceptedSlot}), from volatiles`);
           logger.debug(`Adding new volatile transaction ${vt.confirmed.tx.id}`);
-          volatiles = [...volatiles.filter(({ confirmedAt }) => confirmedAt > oldestAcceptedSlot), vt.confirmed];
+          volatiles = [
+            ...volatiles.filter(({ confirmedAt }) => confirmedAt.valueOf() > oldestAcceptedSlot),
+            vt.confirmed
+          ];
           stores.volatileTransactions.set(volatiles);
           break;
         }
@@ -143,11 +146,15 @@ export const createTransactionReemitter = ({
 
   const reemitSubmittedBefore$ = tipSlot$.pipe(
     withLatestFrom(genesisParameters$),
-    map(([tip, { slotLength }]) => tip - maxInterval / (slotLength * 1000))
+    map(([tip, { slotLength }]) => tip.valueOf() - maxInterval / (slotLength * 1000))
   );
   const reemitUnconfirmed$ = combineLatest([reemitSubmittedBefore$, inFlight$]).pipe(
     mergeMap(([reemitSubmittedBefore, inFlight]) =>
-      from(inFlight.filter(({ submittedAt }) => submittedAt && submittedAt < reemitSubmittedBefore).map(({ tx }) => tx))
+      from(
+        inFlight
+          .filter(({ submittedAt }) => submittedAt && submittedAt.valueOf() < reemitSubmittedBefore)
+          .map(({ tx }) => tx)
+      )
     )
   );
 

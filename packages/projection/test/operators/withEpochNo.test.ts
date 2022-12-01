@@ -1,10 +1,10 @@
-import { ChainSyncEventType } from '@cardano-sdk/core';
+import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { ProjectorEvent, RollForwardEvent, withEpochNo } from '../../src';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 
 const rollForwardEvent = (slot: number) =>
   ({
-    block: { header: { slot } },
+    block: { header: { slot: Cardano.Slot(slot) } },
     eventType: ChainSyncEventType.RollForward
   } as RollForwardEvent);
 const eraSummaries = [

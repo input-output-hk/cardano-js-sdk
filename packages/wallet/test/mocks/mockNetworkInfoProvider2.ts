@@ -1,4 +1,5 @@
 /* eslint-disable jsdoc/require-returns-type */
+import { Cardano } from '@cardano-sdk/core';
 import { genesisParameters, ledgerTip, protocolParameters } from './mockData';
 import { networkInfo } from './mockNetworkInfoProvider';
 import delay from 'delay';
@@ -15,7 +16,7 @@ export const genesisParameters2 = {
 
 export const ledgerTip2 = {
   ...ledgerTip,
-  blockNo: ledgerTip.blockNo + 1
+  blockNo: Cardano.BlockNo(ledgerTip.blockNo.valueOf() + 1)
 };
 
 /**

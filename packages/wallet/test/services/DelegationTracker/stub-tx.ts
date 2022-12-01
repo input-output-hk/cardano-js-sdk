@@ -4,7 +4,7 @@ import { Cardano } from '@cardano-sdk/core';
 export const createStubTxWithCertificates = (certificates?: Cardano.Certificate[], commonCertProps?: any) =>
   ({
     blockHeader: {
-      slot: 37_834_496
+      slot: Cardano.Slot(37_834_496)
     },
     body: {
       certificates: certificates?.map((cert) => ({ ...cert, ...commonCertProps }))

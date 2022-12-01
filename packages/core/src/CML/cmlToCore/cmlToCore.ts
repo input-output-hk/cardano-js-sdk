@@ -1,5 +1,6 @@
 import { Asset, CML, Cardano, SerializationFailure, util } from '../..';
 import { SerializationError } from '../../errors';
+import { Slot } from '../../Cardano';
 import { createCertificate } from './certificate';
 import { usingAutoFree } from '@cardano-sdk/util';
 
@@ -142,8 +143,8 @@ export const txBody = (body: CML.TransactionBody): Cardano.TxBody =>
       scriptIntegrityHash:
         cslScriptDataHash && Cardano.util.Hash32ByteBase16(Buffer.from(cslScriptDataHash.to_bytes()).toString('hex')),
       validityInterval: {
-        invalidBefore: Number(scope.manage(body.validity_start_interval())?.to_str()),
-        invalidHereafter: Number(scope.manage(body.ttl())?.to_str())
+        invalidBefore: Slot(Number(scope.manage(body.validity_start_interval())?.to_str())),
+        invalidHereafter: Slot(Number(scope.manage(body.ttl())?.to_str()))
       },
       withdrawals: txWithdrawals(scope.manage(body.withdrawals()))
     };
@@ -367,7 +368,7 @@ export const nativeScript = (script: CML.NativeScript): Cardano.NativeScript =>
         coreScript = {
           __type: Cardano.ScriptType.Native,
           kind: Cardano.NativeScriptKind.RequireTimeBefore,
-          slot: Number(scope.manage(scope.manage(script.as_timelock_expiry())!.slot()).to_str())
+          slot: Slot(Number(scope.manage(scope.manage(script.as_timelock_expiry())!.slot()).to_str()))
         };
         break;
       }
@@ -375,7 +376,7 @@ export const nativeScript = (script: CML.NativeScript): Cardano.NativeScript =>
         coreScript = {
           __type: Cardano.ScriptType.Native,
           kind: Cardano.NativeScriptKind.RequireTimeAfter,
-          slot: Number(scope.manage(scope.manage(script.as_timelock_start())!.slot()).to_str())
+          slot: Slot(Number(scope.manage(scope.manage(script.as_timelock_start())!.slot()).to_str()))
         };
         break;
       }

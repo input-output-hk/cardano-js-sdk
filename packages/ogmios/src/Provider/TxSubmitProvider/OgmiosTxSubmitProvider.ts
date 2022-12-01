@@ -86,7 +86,7 @@ export class OgmiosTxSubmitProvider extends RunnableModule implements TxSubmitPr
       return {
         localNode: {
           ledgerTip: lastKnownTip,
-          networkSync: networkSynchronization
+          networkSync: Cardano.Percent(networkSynchronization)
         },
         ok: networkSynchronization > 0.99
       };

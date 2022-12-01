@@ -5,7 +5,7 @@ export const rewardsToCore = (rewards: RewardEpochModel[]): Map<Cardano.RewardAc
   rewards.reduce((_rewards, current) => {
     const coreReward = Cardano.RewardAccount(current.address);
     const epochRewards = _rewards.get(coreReward);
-    const currentEpochReward = { epoch: current.epoch, rewards: BigInt(current.quantity) };
+    const currentEpochReward = { epoch: Cardano.EpochNo(current.epoch), rewards: BigInt(current.quantity) };
     if (epochRewards) {
       _rewards.set(coreReward, [...epochRewards, currentEpochReward]);
     } else {

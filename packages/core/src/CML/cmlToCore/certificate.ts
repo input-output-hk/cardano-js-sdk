@@ -3,6 +3,7 @@ import {
   Certificate,
   CertificateType,
   Ed25519KeyHash,
+  EpochNo,
   GenesisKeyDelegationCertificate,
   PoolId,
   PoolMetadataJson,
@@ -128,7 +129,7 @@ export const poolRegistration = (certificate: CML.PoolRegistration): PoolRegistr
 const poolRetirement = (certificate: CML.PoolRetirement): PoolRetirementCertificate =>
   usingAutoFree((scope) => ({
     __typename: CertificateType.PoolRetirement,
-    epoch: certificate.epoch(),
+    epoch: EpochNo(certificate.epoch()),
     poolId: PoolId(scope.manage(certificate.pool_keyhash()).to_bech32('pool'))
   }));
 

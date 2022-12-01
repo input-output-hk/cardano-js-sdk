@@ -226,9 +226,9 @@ describe('SingleAddressWallet load', () => {
         return async (): Promise<Cardano.Tip> => {
           const blockNo = ++numCall;
           return {
-            blockNo,
+            blockNo: Cardano.BlockNo(blockNo),
             hash: Cardano.BlockId(blockNo.toString(16).padStart(64, '0')),
-            slot: blockNo * 100
+            slot: Cardano.Slot(blockNo * 100)
           };
         };
       })()

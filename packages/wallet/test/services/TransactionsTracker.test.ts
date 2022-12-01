@@ -25,7 +25,7 @@ describe('TransactionsTracker', () => {
   describe('createAddressTransactionsProvider', () => {
     let store: InMemoryTransactionsStore;
     let chainHistoryProvider: ChainHistoryProviderStub;
-    const tipBlockHeight$ = of(300);
+    const tipBlockHeight$ = of(Cardano.BlockNo(300));
     const retryBackoffConfig = { initialInterval: 1 }; // not relevant
     const addresses = [queryTransactionsResult.pageResults[0].body.inputs[0].address!];
 
@@ -227,8 +227,8 @@ describe('TransactionsTracker', () => {
     it('emits at all relevant observable properties on timed out transaction', async () => {
       const tx = queryTransactionsResult.pageResults[0];
       createTestScheduler().run(({ hot, expectObservable }) => {
-        const tip1 = { slot: tx.body.validityInterval.invalidHereafter! - 1 } as Cardano.Tip;
-        const tip2 = { slot: tx.body.validityInterval.invalidHereafter! + 1 } as Cardano.Tip;
+        const tip1 = { slot: Cardano.Slot(tx.body.validityInterval.invalidHereafter!.valueOf() - 1) } as Cardano.Tip;
+        const tip2 = { slot: Cardano.Slot(tx.body.validityInterval.invalidHereafter!.valueOf() + 1) } as Cardano.Tip;
         const failedToSubmit$ = hot<FailedTx>('-----|');
         const tip$ = hot<Cardano.Tip>('--ab-|', { a: tip1, b: tip2 });
         const submitting$ = hot('-a---|', { a: tx });
@@ -274,7 +274,7 @@ describe('TransactionsTracker', () => {
         rollback of a transaction of which an output was used in a pending transaction interprets transaction as failed`, async () => {
       const tx = queryTransactionsResult.pageResults[0];
       createTestScheduler().run(({ cold, hot, expectObservable }) => {
-        const tip1 = { slot: tx.body.validityInterval.invalidHereafter! - 1 } as Cardano.Tip;
+        const tip1 = { slot: Cardano.Slot(tx.body.validityInterval.invalidHereafter!.valueOf() - 1) } as Cardano.Tip;
         const failedToSubmit$ = hot<FailedTx>('-----|');
         const tip$ = cold('a', { a: tip1 });
         const submitting$ = hot('-a---|', { a: tx });
@@ -359,8 +359,8 @@ describe('TransactionsTracker', () => {
     it('does not double-track confirmations of resubmitted transactions', async () => {
       const tx = queryTransactionsResult.pageResults[0];
       createTestScheduler().run(({ hot, expectObservable }) => {
-        const submittedAt1 = 123;
-        const submittedAt2 = 124;
+        const submittedAt1 = Cardano.Slot(123);
+        const submittedAt2 = Cardano.Slot(124);
         const tip$ = hot('--a-b-|', {
           a: { slot: submittedAt1 } as Cardano.Tip,
           b: { slot: submittedAt2 } as Cardano.Tip
@@ -412,8 +412,8 @@ describe('TransactionsTracker', () => {
     it('does not double-track failures of resubmitted transactions', async () => {
       const tx = queryTransactionsResult.pageResults[0];
       createTestScheduler().run(({ hot, expectObservable }) => {
-        const submittedAt1 = 123;
-        const submittedAt2 = 124;
+        const submittedAt1 = Cardano.Slot(123);
+        const submittedAt2 = Cardano.Slot(124);
         const tip$ = hot(                                   '--a-b-|', {
           a: { slot: submittedAt1 } as Cardano.Tip,
           b: { slot: submittedAt2 } as Cardano.Tip
@@ -456,7 +456,7 @@ describe('TransactionsTracker', () => {
     it('pending$ transactions updates inFlight$ with submittedAt from current tip$', async () => {
       const tx = queryTransactionsResult.pageResults[0];
       createTestScheduler().run(({ hot, expectObservable }) => {
-        const submittedAt = 123;
+        const submittedAt = Cardano.Slot(123);
         const tip$ = hot<Cardano.Tip>('--a-|', { a: { slot: submittedAt } as Cardano.Tip });
         const submitting$ = hot('-a--|', { a: tx });
         const pending$ = hot('--a-|', { a: tx });
@@ -502,8 +502,8 @@ describe('TransactionsTracker', () => {
 
     it('stored inFlight transactions are restored and merged with submitting ones', async () => {
       const storedInFlightTransaction: TxInFlight = {
-        submittedAt: 1,
-        tx: { body: { validityInterval: { invalidHereafter: 1 } } } as Cardano.Tx
+        submittedAt: Cardano.Slot(1),
+        tx: { body: { validityInterval: { invalidHereafter: Cardano.Slot(1) } } } as Cardano.Tx
       };
       const outgoingTx = queryTransactionsResult.pageResults[0];
       createTestScheduler().run(({ hot, expectObservable }) => {
@@ -564,7 +564,7 @@ describe('TransactionsTracker', () => {
       const storedInFlightTransaction = outgoingTx;
 
       createTestScheduler().run(({ hot, expectObservable }) => {
-        const storedInFlight = { submittedAt: 1, tx: storedInFlightTransaction };
+        const storedInFlight = { submittedAt: Cardano.Slot(1), tx: storedInFlightTransaction };
         const storedInFlight$ = hot<TxInFlight[]>('-x|', {
           x: [storedInFlight]
         });
@@ -627,14 +627,14 @@ describe('TransactionsTracker', () => {
         id: Cardano.TransactionId('6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad')
       } as Cardano.Tx;
       const storedInFlightTx = {
-        submittedAt: 1,
+        submittedAt: Cardano.Slot(1),
         tx: {
           body: { validityInterval: {} },
           id: Cardano.TransactionId('6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99caa')
         } as Cardano.Tx
       };
       const incomingTx = {
-        blockHeader: { blockNo: 1_000_000 },
+        blockHeader: { blockNo: Cardano.BlockNo(1_000_000) },
         body: { validityInterval: {} },
         // should remove storedInFlightTx from inFlight$ once confirmed
         id: storedInFlightTx.tx.id

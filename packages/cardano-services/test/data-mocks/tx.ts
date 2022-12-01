@@ -38,9 +38,9 @@ export const base = {
     }
   },
   blockHeader: {
-    blockNo: 3_157_934,
+    blockNo: Cardano.BlockNo(3_157_934),
     hash: Cardano.BlockId('f03084089ec7e74a79e69a5929b2d3c0836d6f12279bd103d0875847c740ae27'),
-    slot: 45_286_016
+    slot: Cardano.Slot(45_286_016)
   } as Cardano.HydratedTx['blockHeader'],
   body: {
     fee: 191_109n,
@@ -164,9 +164,9 @@ export const output = {
 export const outputs = [output];
 
 export const blockHeader: Cardano.HydratedTx['blockHeader'] = {
-  blockNo: 3_157_934,
+  blockNo: Cardano.BlockNo(3_157_934),
   hash: Cardano.BlockId('f03084089ec7e74a79e69a5929b2d3c0836d6f12279bd103d0875847c740ae27'),
-  slot: 45_286_016
+  slot: Cardano.Slot(45_286_016)
 };
 
 export const txInput = {

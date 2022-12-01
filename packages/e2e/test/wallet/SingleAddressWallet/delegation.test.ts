@@ -147,7 +147,7 @@ describe('SingleAddressWallet/delegation', () => {
 
     // If less than two epochs have elapsed, delegatee will still delegate to former pool during current epoch
     // if more than two epochs has elapsed, delegatee will delegate to new pool.
-    if (tx1ConfirmedState.epoch - initialState.epoch < 2) {
+    if (tx1ConfirmedState.epoch.valueOf() - initialState.epoch.valueOf() < 2) {
       expect(tx1ConfirmedState.rewardAccount.delegatee?.currentEpoch?.id).toEqual(
         initialState?.rewardAccount.delegatee?.currentEpoch?.id
       );

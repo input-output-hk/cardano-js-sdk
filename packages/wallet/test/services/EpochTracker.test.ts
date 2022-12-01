@@ -6,8 +6,8 @@ describe('currentEpochTracker', () => {
   it('computes epoch info from eraSummaries$ and tip$', () => {
     createTestScheduler().run(({ hot, expectObservable }) => {
       const tip$ = hot('-a-b', {
-        a: { slot: 123_456 } as Cardano.Tip,
-        b: { slot: 1_234_567 } as Cardano.Tip
+        a: { slot: Cardano.Slot(123_456) } as Cardano.Tip,
+        b: { slot: Cardano.Slot(1_234_567) } as Cardano.Tip
       });
       const eraSummaries$ = hot('a---', {
         a: testnetEraSummaries as EraSummary[]

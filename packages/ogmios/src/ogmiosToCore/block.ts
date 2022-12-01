@@ -13,6 +13,7 @@ import {
 import { BlockAndKind, BlockKind, CommonBlock, OgmiosBlockType } from './types';
 import { Cardano } from '@cardano-sdk/core';
 import { mapByronBlockBody, mapCommonBlockBody } from './tx';
+
 /**
  * @returns
  *   - {BlockAndKind} that unlocks type narrowing in switch statements based on `kind`.
@@ -75,7 +76,7 @@ const mapCommonTotalOutputs = (block: CommonBlock): Cardano.Lovelace =>
   BigIntMath.sum(
     block.body.map(({ body: { outputs } }) => BigIntMath.sum(outputs.map(({ value: { coins } }) => coins)))
   );
-const mapCommonBlockSize = (block: CommonBlock): number => block.header.blockSize;
+const mapCommonBlockSize = (block: CommonBlock): Cardano.BlockSize => Cardano.BlockSize(block.header.blockSize);
 const mapCommonFees = (block: CommonBlock): Cardano.Lovelace =>
   block.body.map(({ body: { fee } }) => fee).reduce((prev, current) => prev + current, 0n);
 // This is the VRF verification key, An Ed25519 verification key.
@@ -86,15 +87,15 @@ const mapCommonSlotLeader = (block: CommonBlock): Cardano.Ed25519PublicKey =>
   Cardano.Ed25519PublicKey(block.header.issuerVk);
 
 const mapStandardBlockHeader = (block: Schema.StandardBlock) => ({
-  blockNo: mapBlockHeight(block),
+  blockNo: Cardano.BlockNo(mapBlockHeight(block)),
   hash: mapByronHash(block),
-  slot: mapBlockSlot(block)
+  slot: Cardano.Slot(mapBlockSlot(block))
 });
 
 const mapCommonBlockHeader = (block: CommonBlock) => ({
-  blockNo: mapBlockHeight(block),
+  blockNo: Cardano.BlockNo(mapBlockHeight(block)),
   hash: mapCommonHash(block),
-  slot: mapBlockSlot(block)
+  slot: Cardano.Slot(mapBlockSlot(block))
 });
 
 const mapByronBlock = (block: Schema.StandardBlock): Cardano.Block => ({
