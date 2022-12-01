@@ -158,12 +158,12 @@ describe('RewardAccounts', () => {
         b: [
           { tx: {
             body: { certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration, stakeKeyHash }] }
-          } as Cardano.NewTxAlonzo }
+          } as Cardano.Tx }
         ],
         c: [
           { tx: {
             body: { certificates: [{ __typename: Cardano.CertificateType.StakeKeyDeregistration, stakeKeyHash }] }
-          } as Cardano.NewTxAlonzo }
+          } as Cardano.Tx }
         ]
       });
       const tracker$ = addressKeyStatuses([rewardAccount], transactions$, transactionsInFlight$);
@@ -192,7 +192,7 @@ describe('RewardAccounts', () => {
           a: [],
           b: [{ tx: { body: { withdrawals: [{
             quantity: acc1PendingWithdrawalQty, stakeAddress: twoRewardAccounts[0] } as Cardano.Withdrawal
-          ] } as Cardano.NewTxBodyAlonzo } as Cardano.NewTxAlonzo }]
+          ] } as Cardano.TxBody } as Cardano.Tx }]
         });
         const rewardsProvider = () => hot('-a--b-a--b---a', {
           a: [acc1Balance1, acc2Balance],
@@ -228,7 +228,7 @@ describe('RewardAccounts', () => {
           x: [] as TxInFlight[],
           y: [{ tx: { body: { withdrawals: [{
             quantity: acc1PendingWithdrawalQty, stakeAddress: twoRewardAccounts[0] } as Cardano.Withdrawal
-          ] } as Cardano.NewTxBodyAlonzo } } as TxInFlight]
+          ] } as Cardano.TxBody } } as TxInFlight]
         };
         const rewardsProviderEmits = {
           a: [accBalance1],
@@ -264,14 +264,14 @@ describe('RewardAccounts', () => {
     it('emits every epoch and after making a transaction with withdrawals', () => {
       const rewardAccount = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
       createTestScheduler().run(({ cold, expectObservable }) => {
-        const tx2 = { body: { withdrawals: [{ quantity: 5n, stakeAddress: rewardAccount }] } } as Cardano.TxAlonzo;
+        const tx2 = { body: { withdrawals: [{ quantity: 5n, stakeAddress: rewardAccount }] } } as Cardano.HydratedTx;
         const epoch$ = cold(      'a-b--', { a: 100, b: 101 });
         const txConfirmed$ = cold('-a--b', {
           a: { confirmedAt: 1, tx: { body: {
             withdrawals: [{
               quantity: 3n,
               stakeAddress: Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d')
-            }] } } as Cardano.TxAlonzo },
+            }] } } as Cardano.HydratedTx },
           b: { confirmedAt: 2, tx: tx2 }
         });
         const target$ = fetchRewardsTrigger$(epoch$, txConfirmed$, rewardAccount);

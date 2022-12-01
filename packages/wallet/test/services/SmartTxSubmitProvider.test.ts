@@ -25,7 +25,7 @@ describe('SmartTxSubmitProvider', () => {
   });
 
   describe('submitTx', () => {
-    const txWithoutValidityInterval: Cardano.NewTxAlonzo = {
+    const txWithoutValidityInterval: Cardano.Tx = {
       body: {
         fee: 0n,
         inputs: [],

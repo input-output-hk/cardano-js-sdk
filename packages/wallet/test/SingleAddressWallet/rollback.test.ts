@@ -87,7 +87,7 @@ const txOut: Cardano.TxOut = {
   }
 };
 
-const txBody: Cardano.NewTxBodyAlonzo = {
+const txBody: Cardano.TxBody = {
   fee: 10n,
   inputs: [
     {
@@ -105,7 +105,7 @@ const vkey = '6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d39';
 const signature =
   // eslint-disable-next-line max-len
   'bdea87fca1b4b4df8a9b8fb4183c0fab2f8261eb6c5e4bc42c800bb9c8918755bdea87fca1b4b4df8a9b8fb4183c0fab2f8261eb6c5e4bc42c800bb9c8918755';
-const tx: Cardano.NewTxAlonzo = {
+const tx: Cardano.Tx = {
   body: txBody,
   id: Cardano.TransactionId('de9d33f66cffff721673219b19470aec81d96bc9253182369e41eec58389a448'),
   witness: {

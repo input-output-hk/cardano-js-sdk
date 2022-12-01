@@ -52,7 +52,7 @@ export const createTransactionReemitter = ({
   maxInterval,
   genesisParameters$,
   logger
-}: TransactionReemitterProps): Observable<Cardano.NewTxAlonzo> => {
+}: TransactionReemitterProps): Observable<Cardano.Tx> => {
   const volatileTransactions$ = merge(
     stores.volatileTransactions.get().pipe(
       tap((txs) => logger.debug(`Store contains ${txs.length} volatile transactions`)),
@@ -118,7 +118,7 @@ export const createTransactionReemitter = ({
     filter((tx) => !!tx),
     withLatestFrom(volatileTransactions$),
     map(([tx, volatiles]) => {
-      // Get the confirmed NewTxAlonzo transaction to be retried
+      // Get the confirmed Tx transaction to be retried
       const reemitTx = volatiles.find(({ tx: txVolatile }) => txVolatile.id === tx!.id);
       if (!reemitTx) {
         const err = new TransactionReemitError(

@@ -38,14 +38,16 @@ describe('equals', () => {
   });
 
   test('txEquals', () => {
-    expect(txEquals({ id: txId1 } as Cardano.TxAlonzo, { id: txId2 } as Cardano.TxAlonzo)).toBe(false);
-    expect(txEquals({ id: txId1 } as Cardano.TxAlonzo, { id: txId1 } as Cardano.TxAlonzo)).toBe(true);
+    expect(txEquals({ id: txId1 } as Cardano.HydratedTx, { id: txId2 } as Cardano.HydratedTx)).toBe(false);
+    expect(txEquals({ id: txId1 } as Cardano.HydratedTx, { id: txId1 } as Cardano.HydratedTx)).toBe(true);
   });
 
   test('transactionsEquals', () => {
     expect(transactionsEquals([], [])).toBe(true);
-    expect(transactionsEquals([{ id: txId1 } as Cardano.TxAlonzo], [{ id: txId2 } as Cardano.TxAlonzo])).toBe(false);
-    expect(transactionsEquals([{ id: txId1 } as Cardano.TxAlonzo], [{ id: txId1 } as Cardano.TxAlonzo])).toBe(true);
+    expect(transactionsEquals([{ id: txId1 } as Cardano.HydratedTx], [{ id: txId2 } as Cardano.HydratedTx])).toBe(
+      false
+    );
+    expect(transactionsEquals([{ id: txId1 } as Cardano.HydratedTx], [{ id: txId1 } as Cardano.HydratedTx])).toBe(true);
   });
 
   test('utxoEquals ', () => {

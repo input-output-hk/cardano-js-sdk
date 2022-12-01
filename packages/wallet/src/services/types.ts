@@ -46,21 +46,21 @@ export interface PollingConfig {
 }
 
 export interface FailedTx {
-  tx: Cardano.NewTxAlonzo;
+  tx: Cardano.Tx;
   reason: TransactionFailure;
   error?: CardanoNodeErrors.TxSubmissionError;
 }
 
-export type ConfirmedTx = { tx: Cardano.NewTxAlonzo; confirmedAt: Cardano.PartialBlockHeader['slot'] };
-export type TxInFlight = { tx: Cardano.NewTxAlonzo; submittedAt?: Cardano.PartialBlockHeader['slot'] };
+export type ConfirmedTx = { tx: Cardano.Tx; confirmedAt: Cardano.PartialBlockHeader['slot'] };
+export type TxInFlight = { tx: Cardano.Tx; submittedAt?: Cardano.PartialBlockHeader['slot'] };
 
 export interface TransactionsTracker {
-  readonly history$: Observable<Cardano.TxAlonzo[]>;
-  readonly rollback$: Observable<Cardano.TxAlonzo>;
+  readonly history$: Observable<Cardano.HydratedTx[]>;
+  readonly rollback$: Observable<Cardano.HydratedTx>;
   readonly outgoing: {
     readonly inFlight$: Observable<TxInFlight[]>;
-    readonly submitting$: Observable<Cardano.NewTxAlonzo>;
-    readonly pending$: Observable<Cardano.NewTxAlonzo>;
+    readonly submitting$: Observable<Cardano.Tx>;
+    readonly pending$: Observable<Cardano.Tx>;
     readonly failed$: Observable<FailedTx>;
     readonly confirmed$: Observable<ConfirmedTx>;
   };

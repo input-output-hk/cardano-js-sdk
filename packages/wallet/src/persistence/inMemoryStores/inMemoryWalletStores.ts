@@ -18,7 +18,7 @@ export class InMemoryAddressesStore extends InMemoryDocumentStore<GroupedAddress
 export class InMemoryInFlightTransactionsStore extends InMemoryDocumentStore<TxInFlight[]> {}
 export class InMemoryVolatileTransactionsStore extends InMemoryDocumentStore<ConfirmedTx[]> {}
 
-export class InMemoryTransactionsStore extends InMemoryCollectionStore<Cardano.TxAlonzo> {}
+export class InMemoryTransactionsStore extends InMemoryCollectionStore<Cardano.HydratedTx> {}
 export class InMemoryUtxoStore extends InMemoryCollectionStore<Cardano.Utxo> {}
 export class InMemoryUnspendableUtxoStore extends InMemoryCollectionStore<Cardano.Utxo> {}
 

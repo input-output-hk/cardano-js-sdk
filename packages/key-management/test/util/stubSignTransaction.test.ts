@@ -7,7 +7,7 @@ const { ownSignatureKeyPaths } = jest.requireMock('../../src/util/ownSignatureKe
 describe('KeyManagement.util.stubSignTransaction', () => {
   it('returns as many signatures as number of keys returned by ownSignaturePaths', async () => {
     const inputResolver = {} as Cardano.util.InputResolver; // not called
-    const txBody = {} as Cardano.TxBodyAlonzo;
+    const txBody = {} as Cardano.HydratedTxBody;
     const knownAddresses = [{} as GroupedAddress];
     ownSignatureKeyPaths.mockReturnValueOnce(['a']).mockReturnValueOnce(['a', 'b']);
     expect((await util.stubSignTransaction(txBody, knownAddresses, inputResolver)).size).toBe(1);

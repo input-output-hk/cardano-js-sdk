@@ -12,7 +12,7 @@ export interface PrepareTxDependencies {
     syncStatus: Pick<ObservableWallet['syncStatus'], 'isSettled$'>;
   };
   signer: {
-    stubFinalizeTx(props: FinalizeTxProps): Observable<Cardano.NewTxAlonzo>;
+    stubFinalizeTx(props: FinalizeTxProps): Observable<Cardano.Tx>;
   };
   logger: Logger;
 }

@@ -9,4 +9,4 @@ export const createStubTxWithCertificates = (certificates?: Cardano.Certificate[
     body: {
       certificates: certificates?.map((cert) => ({ ...cert, ...commonCertProps }))
     }
-  } as Cardano.TxAlonzo);
+  } as Cardano.HydratedTx);

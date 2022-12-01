@@ -81,7 +81,7 @@ describe('ogmiosToCore', () => {
             body: {
               certificates: [] as Cardano.Certificate[]
             }
-          } as Cardano.TxAlonzo
+          } as Cardano.HydratedTx
         ],
         fees: ogmiosBlock.body[0].body.fee,
         header: {
@@ -190,7 +190,7 @@ describe('ogmiosToCore', () => {
                 }
               ] as Cardano.Certificate[]
             }
-          } as Cardano.TxAlonzo
+          } as Cardano.HydratedTx
         ],
         fees: 202_549n,
         header: {

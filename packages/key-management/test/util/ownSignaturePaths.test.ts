@@ -28,7 +28,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
     const txBody = {
       certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration }],
       inputs: [{}, {}, {}]
-    } as Cardano.NewTxBodyAlonzo;
+    } as Cardano.TxBody;
     const knownAddresses = [address1, address2].map((address, index) =>
       createGroupedAddress(address, ownRewardAccount, AddressType.External, index)
     );
@@ -57,7 +57,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
     const txBody = {
       inputs: [{}, {}, {}],
       withdrawals: [{ quantity: 1n, stakeAddress: ownRewardAccount }]
-    } as Cardano.NewTxBodyAlonzo;
+    } as Cardano.TxBody;
     const knownAddresses = [createGroupedAddress(address1, ownRewardAccount, AddressType.External, 0)];
     const resolveInputAddress = jest.fn().mockReturnValue(address1);
     expect(await util.ownSignatureKeyPaths(txBody, knownAddresses, { resolveInputAddress })).toEqual([
@@ -76,7 +76,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
     const txBody = {
       inputs: [{}, {}, {}],
       withdrawals: [{ quantity: 1n, stakeAddress: otherRewardAccount }]
-    } as Cardano.NewTxBodyAlonzo;
+    } as Cardano.TxBody;
     const knownAddresses = [createGroupedAddress(address1, ownRewardAccount, AddressType.External, 0)];
     const resolveInputAddress = jest.fn().mockReturnValue(address1);
     expect(await util.ownSignatureKeyPaths(txBody, knownAddresses, { resolveInputAddress })).toEqual([

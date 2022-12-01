@@ -4,7 +4,7 @@ import { Hash28ByteBase16, Hash32ByteBase16, OpaqueString, typedBech32 } from '.
 import { InvalidStringError } from '../../errors';
 import { Lovelace } from './Value';
 import { PoolId } from './StakePool/primitives';
-import { TxAlonzo } from './Transaction';
+import { Tx } from './Transaction';
 
 /**
  * The block size in bytes
@@ -108,7 +108,7 @@ export interface BlockInfo {
 }
 
 export interface Block extends BlockInfo {
-  body: TxAlonzo[];
+  body: Tx[];
 }
 
 export interface ExtendedBlockInfo
