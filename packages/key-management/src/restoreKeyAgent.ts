@@ -13,6 +13,7 @@ import {
 import { InMemoryKeyAgent } from './InMemoryKeyAgent';
 import { InvalidSerializableDataError } from './errors';
 import { LedgerKeyAgent } from './LedgerKeyAgent';
+import { STAKE_KEY_DERIVATION_PATH } from './util';
 import { TrezorKeyAgent } from './TrezorKeyAgent';
 
 // TODO: use this type as 2nd parameter of restoreKeyAgent
@@ -51,6 +52,8 @@ export async function restoreKeyAgent<T extends SerializableKeyAgentData>(
   dependencies: KeyAgentDependencies,
   getPassword?: GetPassword
 ): Promise<KeyAgent> {
+  for (const address of data.knownAddresses) address.stakeKeyDerivationPath ||= STAKE_KEY_DERIVATION_PATH;
+
   switch (data.__typename) {
     case KeyAgentType.InMemory: {
       if (!data.encryptedRootPrivateKeyBytes || data.encryptedRootPrivateKeyBytes.length !== 156) {

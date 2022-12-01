@@ -40,6 +40,7 @@ describe('LedgerKeyAgent', () => {
           index: 0,
           networkId: Cardano.NetworkId.testnet,
           rewardAccount: mocks.rewardAccount,
+          stakeKeyDerivationPath: mocks.stakeKeyDerivationPath,
           type: AddressType.External
         };
         ledgerKeyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);

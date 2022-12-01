@@ -43,6 +43,7 @@ describe('TrezorKeyAgent', () => {
           index: 0,
           networkId: Cardano.NetworkId.testnet,
           rewardAccount: mocks.rewardAccount,
+          stakeKeyDerivationPath: mocks.stakeKeyDerivationPath,
           type: AddressType.External
         };
         trezorKeyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);

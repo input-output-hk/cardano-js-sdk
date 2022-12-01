@@ -1,7 +1,63 @@
-import { AccountKeyDerivationPath, GroupedAddress, KeyRole } from '../types';
+import { AccountKeyDerivationPath, GroupedAddress } from '../types';
 import { Cardano } from '@cardano-sdk/core';
 import { isNotNil } from '@cardano-sdk/util';
 import uniq from 'lodash/uniq';
+import uniqBy from 'lodash/uniqBy';
+
+/**
+ * Gets whether any certificate in the provided certificate list requires a stake key signature.
+ *
+ * @param groupedAddresses The known grouped addresses.
+ * @param txBody The transaction body.
+ */
+// eslint-disable-next-line complexity
+const getStakingKeyPaths = (
+  groupedAddresses: GroupedAddress[],
+  txBody: Cardano.TxBody
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+) => {
+  const paths: Set<AccountKeyDerivationPath> = new Set();
+  const uniqueAccounts = uniqBy(groupedAddresses, 'rewardAccount');
+
+  for (const account of uniqueAccounts) {
+    const stakeKeyHash = Cardano.Ed25519KeyHash.fromRewardAccount(account.rewardAccount);
+    const poolId = Cardano.PoolId.fromKeyHash(stakeKeyHash);
+
+    if (!account.stakeKeyDerivationPath) continue;
+
+    if (txBody.withdrawals?.some((withdrawal) => account.rewardAccount === withdrawal.stakeAddress))
+      paths.add(account.stakeKeyDerivationPath);
+
+    if (!txBody.certificates) continue;
+
+    for (const certificate of txBody.certificates) {
+      switch (certificate.__typename) {
+        case Cardano.CertificateType.StakeKeyRegistration:
+        case Cardano.CertificateType.StakeKeyDeregistration:
+        case Cardano.CertificateType.StakeDelegation:
+          if (certificate.stakeKeyHash === stakeKeyHash) paths.add(account.stakeKeyDerivationPath);
+          break;
+        case Cardano.CertificateType.PoolRegistration:
+          for (const owner of certificate.poolParameters.owners) {
+            // eslint-disable-next-line max-depth
+            if (owner === account.rewardAccount) paths.add(account.stakeKeyDerivationPath);
+          }
+          break;
+        case Cardano.CertificateType.PoolRetirement:
+          if (certificate.poolId === poolId) paths.add(account.stakeKeyDerivationPath);
+          break;
+        case Cardano.CertificateType.MIR:
+          if (certificate.rewardAccount === account.rewardAccount) paths.add(account.stakeKeyDerivationPath);
+          break;
+        case Cardano.CertificateType.GenesisKeyDelegation:
+        default:
+        // Nothing to do.
+      }
+    }
+  }
+
+  return paths;
+};
 
 /**
  * Assumes that a single staking key is used for all addresses (index=0)
@@ -25,14 +81,5 @@ export const ownSignatureKeyPaths = async (
     ).filter(isNotNil)
   ).map(({ type, index }) => ({ index, role: Number(type) }));
 
-  const rewardAccounts = new Set(knownAddresses.map(({ rewardAccount }) => rewardAccount));
-
-  const isStakingKeySignatureRequired = txBody.certificates?.length;
-  if (
-    isStakingKeySignatureRequired ||
-    txBody.withdrawals?.some((withdrawal) => rewardAccounts.has(withdrawal.stakeAddress))
-  ) {
-    return [...paymentKeyPaths, { index: 0, role: KeyRole.Stake }];
-  }
-  return paymentKeyPaths;
+  return [...paymentKeyPaths, ...getStakingKeyPaths(knownAddresses, txBody)];
 };

@@ -49,6 +49,7 @@ describe('SingleAddressWallet methods', () => {
       index: 0,
       networkId: Cardano.NetworkId.testnet,
       rewardAccount: mocks.rewardAccount,
+      stakeKeyDerivationPath: mocks.stakeKeyDerivationPath,
       type: AddressType.External
     };
     ({ wallet } = await setupWallet({
