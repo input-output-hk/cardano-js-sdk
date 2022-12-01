@@ -66,11 +66,13 @@ export const utxo2 = utxo.slice(1);
 /**
  * Provider stub for testing
  *
+ * @param utxoSet The set of UTXOs to be included in the wallet state.
+ *
  * returns UtxoProvider-compatible object
  */
-export const mockUtxoProvider = (): UtxoProvider => ({
+export const mockUtxoProvider = (utxoSet?: Cardano.Utxo[]): UtxoProvider => ({
   healthCheck: jest.fn().mockResolvedValue({ ok: true }),
-  utxoByAddresses: jest.fn().mockResolvedValue(utxo)
+  utxoByAddresses: jest.fn().mockResolvedValue(utxoSet ? utxoSet : utxo)
 });
 
 export const mockUtxoProvider2 = (delayMs: number): UtxoProvider => {
