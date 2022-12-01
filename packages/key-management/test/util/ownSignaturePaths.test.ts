@@ -158,7 +158,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
         certificates: [
           {
             __typename: Cardano.CertificateType.PoolRetirement,
-            epoch: 40,
+            epoch: Cardano.EpochNo(40),
             poolId: Cardano.PoolId.fromKeyHash(ownStakeKeyHash)
           }
         ],
