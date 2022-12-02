@@ -497,6 +497,7 @@ export class SingleAddressWallet implements ObservableWallet {
     this.networkInfoProvider.stats.shutdown();
     this.stakePoolProvider.stats.shutdown();
     this.utxoProvider.stats.shutdown();
+    this.rewardsProvider.stats.shutdown();
     this.chainHistoryProvider.stats.shutdown();
     this.keyAgent.shutdown();
     this.currentEpoch$.complete();
