@@ -13,6 +13,9 @@
       "require": "./dist/cjs/index.js"
     }
   },
+  "sideEffects": [
+    "./test/web-extension/extension/**/*.ts"
+  ],
   "scripts": {
     "artillery:stake-pool-query": "WORKERS=1 node -r ts-node/register ../../node_modules/.bin/artillery run test/artillery/StakePoolSearch.yml",
     "artillery:wallet-restoration": "WORKERS=1 node -r ts-node/register ../../node_modules/.bin/artillery run --dotenv ./.env test/artillery/wallet-restoration/WalletRestoration.yml",
