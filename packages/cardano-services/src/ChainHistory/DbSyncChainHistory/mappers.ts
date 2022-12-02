@@ -59,7 +59,7 @@ export const mapTxOutTokenMap = (multiAssetModels: TxOutMultiAssetModel[]): TxOu
   return txTokenMap;
 };
 
-export const mapTxIn = (txIn: TxInput): Cardano.TxIn => ({
+export const mapTxIn = (txIn: TxInput): Cardano.HydratedTxIn => ({
   address: txIn.address,
   index: txIn.index,
   txId: txIn.txSourceId
@@ -112,7 +112,7 @@ export const mapCertificate = (
     return {
       __typename: Cardano.CertificateType.PoolRetirement,
       cert_index: certModel.cert_index,
-      epoch: certModel.retiring_epoch,
+      epoch: Cardano.EpochNo(certModel.retiring_epoch),
       poolId: Cardano.PoolId(certModel.pool_id)
     } as WithCertIndex<Cardano.PoolRetirementCertificate>;
 
@@ -153,20 +153,20 @@ export const mapCertificate = (
 };
 
 interface TxAlonzoData {
-  inputs: Cardano.TxIn[];
+  inputs: Cardano.HydratedTxIn[];
   outputs: Cardano.TxOut[];
   mint?: Cardano.TokenMap;
   withdrawals?: Cardano.Withdrawal[];
   redeemers?: Cardano.Redeemer[];
   metadata?: Cardano.TxMetadata;
-  collaterals?: Cardano.TxIn[];
+  collaterals?: Cardano.HydratedTxIn[];
   certificates?: Cardano.Certificate[];
 }
 
 export const mapTxAlonzo = (
   txModel: TxModel,
   { inputs, outputs, mint, withdrawals, redeemers, metadata, collaterals, certificates }: TxAlonzoData
-): Cardano.TxAlonzo => ({
+): Cardano.HydratedTx => ({
   auxiliaryData:
     metadata && metadata.size > 0
       ? {
@@ -176,9 +176,9 @@ export const mapTxAlonzo = (
         }
       : undefined,
   blockHeader: {
-    blockNo: txModel.block_no,
+    blockNo: Cardano.BlockNo(txModel.block_no),
     hash: Cardano.BlockId(txModel.block_hash.toString('hex')),
-    slot: Number(txModel.block_slot_no)
+    slot: Cardano.Slot(Number(txModel.block_slot_no))
   },
   body: {
     certificates,
@@ -188,8 +188,8 @@ export const mapTxAlonzo = (
     mint,
     outputs,
     validityInterval: {
-      invalidBefore: Number(txModel.invalid_before) || undefined,
-      invalidHereafter: Number(txModel.invalid_hereafter) || undefined
+      invalidBefore: Cardano.Slot(Number(txModel.invalid_before)) || undefined,
+      invalidHereafter: Cardano.Slot(Number(txModel.invalid_hereafter)) || undefined
     },
     withdrawals
   },
@@ -211,17 +211,17 @@ export const mapBlock = (
 ): Cardano.ExtendedBlockInfo => ({
   confirmations: tip.block_no - blockModel.block_no,
   date: new Date(blockModel.time),
-  epoch: blockModel.epoch_no,
+  epoch: Cardano.EpochNo(blockModel.epoch_no),
   epochSlot: blockModel.epoch_slot_no,
   fees: BigInt(blockOutputModel?.fees ?? 0),
   header: {
-    blockNo: blockModel.block_no,
+    blockNo: Cardano.BlockNo(blockModel.block_no),
     hash: Cardano.BlockId(blockModel.hash.toString('hex')),
-    slot: Number(blockModel.slot_no)
+    slot: Cardano.Slot(Number(blockModel.slot_no))
   },
   nextBlock: blockModel.next_block ? Cardano.BlockId(blockModel.next_block.toString('hex')) : undefined,
   previousBlock: blockModel.previous_block ? Cardano.BlockId(blockModel.previous_block.toString('hex')) : undefined,
-  size: blockModel.size,
+  size: Cardano.BlockSize(blockModel.size),
   slotLeader: blockModel.slot_leader_pool
     ? Cardano.SlotLeader(blockModel.slot_leader_pool)
     : Cardano.SlotLeader(blockModel.slot_leader_hash.toString('hex')),

@@ -61,9 +61,9 @@ describe('Service dependency abstractions', () => {
         config = { listen: { port } };
         apiUrlBase = `http://localhost:${port}/network-info`;
         epochMonitor = new DbSyncEpochPollService(db!, 10_000);
-        lastBlockNoInDb = (await db!.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no;
+        lastBlockNoInDb = Cardano.BlockNo((await db!.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no);
         cardanoNode = mockCardanoNode(
-          healthCheckResponseMock({ blockNo: lastBlockNoInDb })
+          healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() })
         ) as unknown as OgmiosCardanoNode;
         networkInfoProvider = new DbSyncNetworkInfoProvider(
           { cardanoNodeConfigPath },
@@ -92,7 +92,7 @@ describe('Service dependency abstractions', () => {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
+        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() }));
       });
     });
   });
@@ -123,9 +123,9 @@ describe('Service dependency abstractions', () => {
         config = { listen: { port } };
         apiUrlBase = `http://localhost:${port}/network-info`;
         epochMonitor = new DbSyncEpochPollService(db!, 1000);
-        lastBlockNoInDb = (await db!.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no;
+        lastBlockNoInDb = Cardano.BlockNo((await db!.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no);
         cardanoNode = mockCardanoNode(
-          healthCheckResponseMock({ blockNo: lastBlockNoInDb })
+          healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() })
         ) as unknown as OgmiosCardanoNode;
         networkInfoProvider = new DbSyncNetworkInfoProvider(
           { cardanoNodeConfigPath },
@@ -154,7 +154,7 @@ describe('Service dependency abstractions', () => {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
+        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() }));
       });
     });
   });

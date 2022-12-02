@@ -55,9 +55,9 @@ describe('NetworkInfoHttpService', () => {
       baseUrl = `http://localhost:${port}/network-info`;
       clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
       config = { listen: { port } };
-      lastBlockNoInDb = (await db.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no;
+      lastBlockNoInDb = Cardano.BlockNo((await db.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no);
       cardanoNode = mockCardanoNode(
-        healthCheckResponseMock({ blockNo: lastBlockNoInDb })
+        healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() })
       ) as unknown as OgmiosCardanoNode;
       networkInfoProvider = {
         eraSummaries: jest.fn(),
@@ -90,9 +90,9 @@ describe('NetworkInfoHttpService', () => {
     beforeAll(async () => {
       port = await getPort();
       baseUrl = `http://localhost:${port}/network-info`;
-      lastBlockNoInDb = (await db.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no;
+      lastBlockNoInDb = Cardano.BlockNo((await db.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no);
       cardanoNode = mockCardanoNode(
-        healthCheckResponseMock({ blockNo: lastBlockNoInDb })
+        healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() })
       ) as unknown as OgmiosCardanoNode;
       config = { listen: { port } };
       networkInfoProvider = new DbSyncNetworkInfoProvider(
@@ -137,12 +137,12 @@ describe('NetworkInfoHttpService', () => {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
+        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() }));
       });
 
       it('forwards the networkInfoProvider health response with provider client', async () => {
         const response = await provider.healthCheck();
-        expect(response).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
+        expect(response).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() }));
       });
     });
 

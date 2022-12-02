@@ -70,7 +70,7 @@ describe('Cardano.util.address', () => {
             }
           ]
         }
-      } as Cardano.TxAlonzo;
+      } as Cardano.HydratedTx;
 
       it('returns the transaction inputs that contain any of the addresses', () => {
         expect(Cardano.util.inputsWithAddresses(tx, addresses)).toEqual([

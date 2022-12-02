@@ -11,7 +11,7 @@ describe('Cardano.util.computeImplicitCoin', () => {
       { __typename: Cardano.CertificateType.StakeKeyRegistration, stakeKeyHash },
       {
         __typename: Cardano.CertificateType.PoolRetirement,
-        epoch: 500,
+        epoch: Cardano.EpochNo(500),
         poolId: Cardano.PoolId('pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh')
       },
       {

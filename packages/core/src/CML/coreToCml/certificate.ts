@@ -206,7 +206,7 @@ export const create = (scope: ManagedFreeableScope, certificate: Cardano.Certifi
     case Cardano.CertificateType.PoolRegistration:
       return poolRegistration(scope, certificate.poolParameters);
     case Cardano.CertificateType.PoolRetirement:
-      return poolRetirement(scope, certificate.poolId, certificate.epoch);
+      return poolRetirement(scope, certificate.poolId, certificate.epoch.valueOf());
     case Cardano.CertificateType.StakeDelegation:
       return stakeDelegation(scope, certificate.stakeKeyHash, certificate.poolId);
     case Cardano.CertificateType.StakeKeyDeregistration:

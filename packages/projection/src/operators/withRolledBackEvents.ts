@@ -24,8 +24,8 @@ const rollForward = <ExtraRollForwardProps extends WithStabilityWindow>(
   eventCache: RollForwardEvent<ExtraRollForwardProps>[]
 ) => {
   // clear blocks that are past stability window
-  const slotThreshold = evt.tip.slot - evt.stabilityWindowSlotsCount;
-  while (eventCache.length > 0 && eventCache[0].block.header.slot < slotThreshold) eventCache.shift();
+  const slotThreshold = evt.tip.slot.valueOf() - evt.stabilityWindowSlotsCount;
+  while (eventCache.length > 0 && eventCache[0].block.header.slot.valueOf() < slotThreshold) eventCache.shift();
   // add current block to cache and return the event unchanged
   eventCache.push(evt);
   return { eventCache, evt };
@@ -50,7 +50,7 @@ const rollBackward = <ExtraRollForwardProps, ExtraRollBackwardProps>(
     rolledBackEvents.push(eventCache.pop()!);
   if (
     rolledBackEvents.length > 0 &&
-    rolledBackEvents.length < rolledBackEvents[0].block.header.blockNo - rollbackTo.blockNo
+    rolledBackEvents.length < rolledBackEvents[0].block.header.blockNo.valueOf() - rollbackTo.blockNo.valueOf()
   ) {
     throw new InsufficientEventCacheError();
   }

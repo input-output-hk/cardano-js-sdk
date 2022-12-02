@@ -158,7 +158,7 @@ describe('coreToCml', () => {
             {
               __type: ScriptType.Native,
               kind: NativeScriptKind.RequireTimeBefore,
-              slot: 3000
+              slot: Cardano.Slot(3000)
             },
             {
               __type: ScriptType.Native,
@@ -168,7 +168,7 @@ describe('coreToCml', () => {
             {
               __type: ScriptType.Native,
               kind: NativeScriptKind.RequireTimeAfter,
-              slot: 4000
+              slot: Cardano.Slot(4000)
             }
           ]
         }

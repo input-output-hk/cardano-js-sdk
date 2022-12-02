@@ -138,8 +138,8 @@ export class SingleAddressWallet implements ObservableWallet {
   #prepareTx: PrepareTx;
   #newTransactions = {
     failedToSubmit$: new Subject<FailedTx>(),
-    pending$: new Subject<Cardano.NewTxAlonzo>(),
-    submitting$: new Subject<Cardano.NewTxAlonzo>()
+    pending$: new Subject<Cardano.Tx>(),
+    submitting$: new Subject<Cardano.Tx>()
   };
   #resubmitSubscription: Subscription;
   #trackedTxSubmitProvider: TrackedTxSubmitProvider;
@@ -426,7 +426,7 @@ export class SingleAddressWallet implements ObservableWallet {
     return { body, hash, inputSelection };
   }
 
-  async finalizeTx(props: FinalizeTxProps, stubSign = false): Promise<Cardano.NewTxAlonzo> {
+  async finalizeTx(props: FinalizeTxProps, stubSign = false): Promise<Cardano.Tx> {
     const addresses = await firstValueFrom(this.addresses$);
     const signatures = stubSign
       ? await keyManagementUtil.stubSignTransaction(
@@ -446,7 +446,7 @@ export class SingleAddressWallet implements ObservableWallet {
     };
   }
 
-  async submitTx(tx: Cardano.NewTxAlonzo, { mightBeAlreadySubmitted }: SubmitTxOptions = {}): Promise<void> {
+  async submitTx(tx: Cardano.Tx, { mightBeAlreadySubmitted }: SubmitTxOptions = {}): Promise<void> {
     this.#logger.debug(`Submitting transaction ${tx.id}`);
     this.#newTransactions.submitting$.next(tx);
     try {

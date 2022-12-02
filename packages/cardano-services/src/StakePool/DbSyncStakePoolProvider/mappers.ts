@@ -76,7 +76,7 @@ export const calcNodeMetricsValues = (
   const isZeroStake = liveStake === 0n;
   const size: Cardano.StakePoolMetricsSize = {
     active: activeStakePercentage,
-    live: !isZeroStake ? 1 - activeStakePercentage : 0
+    live: Cardano.Percent(!isZeroStake ? 1 - activeStakePercentage.valueOf() : 0)
   };
   const stake: Cardano.StakePoolMetricsStake = {
     active: activeStake,
@@ -84,7 +84,9 @@ export const calcNodeMetricsValues = (
   };
   stakePoolMetrics.size = size;
   stakePoolMetrics.stake = stake;
-  stakePoolMetrics.saturation = Number(divideBigIntToFloat(liveStake * BigInt(optimalPoolCount), totalAdaAmount));
+  stakePoolMetrics.saturation = Cardano.Percent(
+    Number(divideBigIntToFloat(liveStake * BigInt(optimalPoolCount), totalAdaAmount))
+  );
   return stakePoolMetrics;
 };
 
@@ -140,7 +142,7 @@ export const toStakePoolResults = (
             pledge: poolData.pledge,
             relays: poolRelays.filter((r) => r.updateId === poolData.updateId).map((r) => r.relay),
             rewardAccount: poolData.rewardAccount,
-            status: getPoolStatus(registrations[0], lastEpochNo, retirements[0]),
+            status: getPoolStatus(registrations[0], lastEpochNo.valueOf(), retirements[0]),
             transactions: {
               registration: registrations.map((r) => r.transactionId),
               retirement: retirements.map((r) => r.transactionId)
@@ -237,9 +239,9 @@ export const mapEpoch = ({ no, optimal_pool_count }: EpochModel): Epoch => ({
 export const mapEpochReward = (epochRewardModel: EpochRewardModel, hashId: number): EpochReward => ({
   epochReward: {
     activeStake: BigInt(epochRewardModel.active_stake),
-    epoch: epochRewardModel.epoch_no,
+    epoch: Cardano.EpochNo(epochRewardModel.epoch_no),
     epochLength: Number(epochRewardModel.epoch_length),
-    memberROI: epochRewardModel.member_roi,
+    memberROI: Cardano.Percent(epochRewardModel.member_roi),
     operatorFees: BigInt(epochRewardModel.operator_fees),
     totalRewards: BigInt(epochRewardModel.total_rewards)
   },
@@ -267,12 +269,12 @@ export const mapPoolMetrics = (poolMetricsModel: PoolMetricsModel): PoolMetrics 
   hashId: Number(poolMetricsModel.pool_hash_id),
   metrics: {
     activeStake: BigInt(poolMetricsModel.active_stake),
-    activeStakePercentage: Number(poolMetricsModel.active_stake_percentage),
+    activeStakePercentage: Cardano.Percent(Number(poolMetricsModel.active_stake_percentage)),
     blocksCreated: poolMetricsModel.blocks_created,
     delegators: poolMetricsModel.delegators,
     livePledge: BigInt(poolMetricsModel.live_pledge),
     liveStake: BigInt(poolMetricsModel.live_stake),
-    saturation: Number.parseFloat(poolMetricsModel.saturation)
+    saturation: Cardano.Percent(Number.parseFloat(poolMetricsModel.saturation))
   }
 });
 

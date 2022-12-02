@@ -231,7 +231,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
       orderedResult
     );
     const { results, poolsToCache } = toStakePoolResults(orderedResultHashIds, fromCache, {
-      lastEpochNo,
+      lastEpochNo: Cardano.EpochNo(lastEpochNo),
       nodeMetricsDependencies: {
         optimalPoolCount,
         totalAdaAmount: BigInt(totalAdaAmount)

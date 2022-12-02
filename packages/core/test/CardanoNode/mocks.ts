@@ -52,7 +52,7 @@ export const healthCheckResponseMock = (opts?: {
   blockNo?: number;
   slot?: number;
   hash?: string;
-  networkSync?: number;
+  networkSync?: Cardano.Percent;
 }) => ({
   localNode: {
     ledgerTip: {
@@ -60,7 +60,7 @@ export const healthCheckResponseMock = (opts?: {
       hash: opts?.hash ?? '9ef43ab6e234fcf90d103413096c7da752da2f45b15e1259f43d476afd12932c',
       slot: opts?.slot ?? 52_819_355
     },
-    networkSync: opts?.networkSync ?? 0.999
+    networkSync: opts?.networkSync ?? Cardano.Percent(0.999)
   },
   ok: true
 });

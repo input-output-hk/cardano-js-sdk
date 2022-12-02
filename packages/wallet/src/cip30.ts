@@ -41,12 +41,12 @@ export type SignDataCallbackParams = {
 
 export type SignTxCallbackParams = {
   type: Cip30ConfirmationCallbackType.SignTx;
-  data: Cardano.NewTxAlonzo;
+  data: Cardano.Tx;
 };
 
 export type SubmitTxCallbackParams = {
   type: Cip30ConfirmationCallbackType.SubmitTx;
-  data: Cardano.NewTxAlonzo;
+  data: Cardano.Tx;
 };
 
 export type CallbackConfirmation = (
@@ -291,7 +291,7 @@ export const createWalletApi = (
   },
   submitTx: async (tx: Cbor): Promise<string> => {
     logger.debug('submitting tx');
-    const txData: Cardano.NewTxAlonzo = usingAutoFree((scope) =>
+    const txData: Cardano.Tx = usingAutoFree((scope) =>
       cmlToCore.newTx(scope.manage(CML.Transaction.from_bytes(Buffer.from(tx, 'hex'))))
     );
     const shouldProceed = await confirmationCallback({

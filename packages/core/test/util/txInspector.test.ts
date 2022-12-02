@@ -5,11 +5,15 @@ import {
   AssetId,
   AssetName,
   BlockId,
+  BlockNo,
   Certificate,
   CertificateType,
   Ed25519KeyHash,
   Ed25519PublicKey,
   Ed25519Signature,
+  EpochNo,
+  HydratedTx,
+  HydratedTxIn,
   NativeScriptKind,
   PolicyId,
   PoolId,
@@ -17,12 +21,11 @@ import {
   PoolRetirementCertificate,
   RewardAccount,
   ScriptType,
+  Slot,
   StakeAddressCertificate,
   StakeDelegationCertificate,
   TokenMap,
   TransactionId,
-  TxAlonzo,
-  TxIn,
   TxOut,
   VrfVkHex,
   Withdrawal,
@@ -96,7 +99,7 @@ describe('txInspector', () => {
   };
   const poolRetirementCert: PoolRetirementCertificate = {
     __typename: CertificateType.PoolRetirement,
-    epoch: 100,
+    epoch: EpochNo(100),
     poolId
   };
   const keyDeregistrationCert: StakeAddressCertificate = {
@@ -114,7 +117,7 @@ describe('txInspector', () => {
     }
   ];
 
-  const historicalTxs: TxAlonzo[] = [
+  const historicalTxs: HydratedTx[] = [
     {
       body: {
         outputs: [
@@ -139,7 +142,7 @@ describe('txInspector', () => {
         ]
       },
       id: TransactionId('bb217abaca60fc0ca68c1555eca6a96d2478547818ae76ce6836133f3cc546e0')
-    } as unknown as TxAlonzo
+    } as unknown as HydratedTx
   ];
 
   const mockPolicy1 = 'b8fdbcbe003cef7e47eb5307d328e10191952bd02901a850699e7e35';
@@ -198,7 +201,7 @@ describe('txInspector', () => {
 
   const buildMockTx = (
     args: {
-      inputs?: TxIn[];
+      inputs?: HydratedTxIn[];
       outputs?: TxOut[];
       certificates?: Certificate[];
       withdrawals?: Withdrawal[];
@@ -206,13 +209,13 @@ describe('txInspector', () => {
       witness?: Witness;
       includeAuxData?: boolean;
     } = {}
-  ): TxAlonzo =>
+  ): HydratedTx =>
     ({
       auxiliaryData: args.includeAuxData ? auxiliaryData : undefined,
       blockHeader: {
-        blockNo: 200,
+        blockNo: BlockNo(200),
         hash: BlockId('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed'),
-        slot: 1000
+        slot: Slot(1000)
       },
       body: {
         certificates: args.certificates,
@@ -268,7 +271,7 @@ describe('txInspector', () => {
       id: TransactionId('e3a443363eb6ee3d67c5e75ec10b931603787581a948d68fa3b2cd3ff2e0d2ad'),
       index: 0,
       witness: args.witness ?? { scripts: [mockScript1], signatures: new Map<Ed25519PublicKey, Ed25519Signature>() }
-    } as TxAlonzo);
+    } as HydratedTx);
 
   describe('transaction sent inspector', () => {
     test('a transaction with inputs with provided addresses produces an inspection containing those inputs', () => {

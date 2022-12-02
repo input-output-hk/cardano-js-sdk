@@ -40,27 +40,27 @@ export interface TransactionsTrackerProps {
   addresses$: Observable<Cardano.Address[]>;
   tip$: Observable<Cardano.Tip>;
   retryBackoffConfig: RetryBackoffConfig;
-  transactionsHistoryStore: OrderedCollectionStore<Cardano.TxAlonzo>;
+  transactionsHistoryStore: OrderedCollectionStore<Cardano.HydratedTx>;
   inFlightTransactionsStore: DocumentStore<TxInFlight[]>;
   newTransactions: {
-    submitting$: Observable<Cardano.NewTxAlonzo>;
-    pending$: Observable<Cardano.NewTxAlonzo>;
+    submitting$: Observable<Cardano.Tx>;
+    pending$: Observable<Cardano.Tx>;
     failedToSubmit$: Observable<FailedTx>;
   };
   logger: Logger;
 }
 
 export interface TransactionsTrackerInternals {
-  transactionsSource$: Observable<Cardano.TxAlonzo[]>;
-  rollback$: Observable<Cardano.TxAlonzo>;
+  transactionsSource$: Observable<Cardano.HydratedTx[]>;
+  rollback$: Observable<Cardano.HydratedTx>;
 }
 
 export interface TransactionsTrackerInternalsProps {
   chainHistoryProvider: ChainHistoryProvider;
   addresses$: Observable<Cardano.Address[]>;
   retryBackoffConfig: RetryBackoffConfig;
-  tipBlockHeight$: Observable<number>;
-  store: OrderedCollectionStore<Cardano.TxAlonzo>;
+  tipBlockHeight$: Observable<Cardano.BlockNo>;
+  store: OrderedCollectionStore<Cardano.HydratedTx>;
   logger: Logger;
 }
 
@@ -70,10 +70,10 @@ export const PAGE_SIZE = 25;
 const allTransactionsByAddresses = async (
   chainHistoryProvider: ChainHistoryProvider,
   { addresses, blockRange }: { addresses: Cardano.Address[]; blockRange: Range<Cardano.BlockNo> }
-): Promise<Cardano.TxAlonzo[]> => {
+): Promise<Cardano.HydratedTx[]> => {
   let startAt = 0;
-  let response: Cardano.TxAlonzo[] = [];
-  let pageResults: Cardano.TxAlonzo[] = [];
+  let response: Cardano.HydratedTx[] = [];
+  let pageResults: Cardano.HydratedTx[] = [];
   do {
     pageResults = (
       await chainHistoryProvider.transactionsByAddresses({
@@ -97,7 +97,7 @@ export const createAddressTransactionsProvider = ({
   store,
   logger
 }: TransactionsTrackerInternalsProps): TransactionsTrackerInternals => {
-  const rollback$ = new Subject<Cardano.TxAlonzo>();
+  const rollback$ = new Subject<Cardano.HydratedTx>();
   const storedTransactions$ = store.getAll().pipe(share());
   return {
     rollback$: rollback$.asObservable(),
@@ -107,9 +107,9 @@ export const createAddressTransactionsProvider = ({
           logger.debug(`Stored history transactions count: ${storedTransactions?.length || 0}`)
         )
       ),
-      combineLatest([addresses$, storedTransactions$.pipe(defaultIfEmpty([] as Cardano.TxAlonzo[]))]).pipe(
+      combineLatest([addresses$, storedTransactions$.pipe(defaultIfEmpty([] as Cardano.HydratedTx[]))]).pipe(
         switchMap(([addresses, storedTransactions]) => {
-          let localTransactions: Cardano.TxAlonzo[] = [...storedTransactions];
+          let localTransactions: Cardano.HydratedTx[] = [...storedTransactions];
 
           return coldObservableProvider({
             // Do not re-fetch transactions twice on load when tipBlockHeight$ loads from storage first
@@ -120,7 +120,7 @@ export const createAddressTransactionsProvider = ({
             provider: async () => {
               // eslint-disable-next-line no-constant-condition
               while (true) {
-                const lastStoredTransaction: Cardano.TxAlonzo | undefined =
+                const lastStoredTransaction: Cardano.HydratedTx | undefined =
                   localTransactions[localTransactions.length - 1];
 
                 lastStoredTransaction &&
@@ -168,8 +168,8 @@ export const createAddressTransactionsProvider = ({
 };
 
 const createHistoricalTransactionsTrackerSubject = (
-  transactions$: Observable<Cardano.TxAlonzo[]>
-): TrackerSubject<Cardano.TxAlonzo[]> =>
+  transactions$: Observable<Cardano.HydratedTx[]>
+): TrackerSubject<Cardano.HydratedTx[]> =>
   new TrackerSubject(
     transactions$.pipe(
       map((transactions) =>
@@ -182,7 +182,7 @@ const createHistoricalTransactionsTrackerSubject = (
     )
   );
 
-const newTransactions$ = (transactions$: Observable<Cardano.TxAlonzo[]>) =>
+const newTransactions$ = (transactions$: Observable<Cardano.HydratedTx[]>) =>
   transactions$.pipe(
     take(1),
     map((transactions) => transactions.map(({ id }) => id)),
@@ -224,7 +224,7 @@ export const createTransactionsTracker = (
   const transactionsSource$ = new TrackerSubject(txSource$);
 
   const historicalTransactions$ = createHistoricalTransactionsTrackerSubject(transactionsSource$);
-  const txConfirmed$ = (tx: Cardano.NewTxAlonzo): Observable<ConfirmedTx> =>
+  const txConfirmed$ = (tx: Cardano.Tx): Observable<ConfirmedTx> =>
     newTransactions$(historicalTransactions$).pipe(
       filter((historyTx) => historyTx.id === tx.id),
       take(1),
@@ -282,13 +282,13 @@ export const createTransactionsTracker = (
     )
     .subscribe(failed$);
 
-  const txFailed$ = (tx: Cardano.NewTxAlonzo) =>
+  const txFailed$ = (tx: Cardano.Tx) =>
     failed$.pipe(
       filter((failed) => failed.tx === tx),
       take(1)
     );
 
-  const txPending$ = (tx: Cardano.NewTxAlonzo) =>
+  const txPending$ = (tx: Cardano.Tx) =>
     pending$.pipe(
       filter((pending) => pending === tx),
       withLatestFrom(tip$),

@@ -80,7 +80,7 @@ const mapCertificate = (certificate: Schema.Certificate): Cardano.Certificate =>
   if ('poolRetirement' in certificate) {
     return {
       __typename: Cardano.CertificateType.PoolRetirement,
-      epoch: certificate.poolRetirement.retirementEpoch,
+      epoch: Cardano.EpochNo(certificate.poolRetirement.retirementEpoch),
       poolId: Cardano.PoolId(certificate.poolRetirement.poolId)
     };
   }
@@ -110,11 +110,11 @@ const mapCertificate = (certificate: Schema.Certificate): Cardano.Certificate =>
 };
 
 // TODO: implement full block body mapping
-const mapCommonTx = (tx: CommonBlock['body'][0]): Cardano.TxAlonzo =>
+const mapCommonTx = (tx: CommonBlock['body'][0]): Cardano.Tx =>
   ({
     body: {
       certificates: tx.body.certificates.map(mapCertificate)
-    } as Cardano.TxBodyAlonzo
-  } as Cardano.TxAlonzo);
+    } as Cardano.TxBody
+  } as Cardano.Tx);
 
 export const mapCommonBlockBody = ({ body }: CommonBlock): Cardano.Block['body'] => body.map(mapCommonTx);

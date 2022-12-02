@@ -1,4 +1,4 @@
-import { Ed25519KeyHash, NativeScript, NativeScriptKind, ScriptType } from '../../src/Cardano';
+import { Ed25519KeyHash, NativeScript, NativeScriptKind, ScriptType, Slot } from '../../src/Cardano';
 import { nativeScriptPolicyId } from '../../src';
 
 describe('nativeScript utils', () => {
@@ -19,7 +19,7 @@ describe('nativeScript utils', () => {
             {
               __type: ScriptType.Native,
               kind: NativeScriptKind.RequireTimeBefore,
-              slot: 3000
+              slot: Slot(3000)
             },
             {
               __type: ScriptType.Native,
@@ -29,7 +29,7 @@ describe('nativeScript utils', () => {
             {
               __type: ScriptType.Native,
               kind: NativeScriptKind.RequireTimeAfter,
-              slot: 4000
+              slot: Slot(4000)
             }
           ]
         }

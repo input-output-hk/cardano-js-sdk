@@ -49,6 +49,7 @@ describe('SingleAddressWallet methods', () => {
       index: 0,
       networkId: Cardano.NetworkId.testnet,
       rewardAccount: mocks.rewardAccount,
+      stakeKeyDerivationPath: mocks.stakeKeyDerivationPath,
       type: AddressType.External
     };
     ({ wallet } = await setupWallet({
@@ -150,7 +151,7 @@ describe('SingleAddressWallet methods', () => {
   describe('creating transactions', () => {
     const props = {
       collaterals: new Set([utxo[2][0]]),
-      inputs: new Set<Cardano.TxIn>([utxo[1][0]]),
+      inputs: new Set<Cardano.HydratedTxIn>([utxo[1][0]]),
       mint: new Map([
         [AssetId.PXL, 5n],
         [AssetId.TSLA, 20n]

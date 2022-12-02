@@ -15,7 +15,7 @@ const rollForwardEvent = (slot: Cardano.Slot, txs: Cardano.Certificate[][]) =>
         (certificates) =>
           ({
             body: { certificates }
-          } as Cardano.TxAlonzo)
+          } as Cardano.Tx)
       ),
       header: { slot }
     },
@@ -30,7 +30,7 @@ const rollBackwardEvent = (blocks: Cardano.Certificate[][][]) =>
         body: txs.map((certificates) => ({
           body: { certificates }
         })),
-        header: { slot }
+        header: { slot: Cardano.Slot(slot) }
       }
     }))
   } as RollBackwardEvent<WithRolledBackEvents>);
@@ -47,12 +47,12 @@ describe('withCertificates', () => {
   it('flattens certificates from all transactions, preserving an on-chain pointer', () => {
     createTestScheduler().run(({ hot, expectObservable, expectSubscriptions }) => {
       const source$ = hot<ProjectorEvent<{}, WithRolledBackEvents>>('ab', {
-        a: rollForwardEvent(1, certificates),
-        b: rollForwardEvent(2, [])
+        a: rollForwardEvent(Cardano.Slot(1), certificates),
+        b: rollForwardEvent(Cardano.Slot(2), [])
       });
       expectObservable(source$.pipe(withCertificates())).toBe('ab', {
         a: {
-          ...rollForwardEvent(1, certificates),
+          ...rollForwardEvent(Cardano.Slot(1), certificates),
           certificates: [
             {
               certificate: certificates[0][0],
@@ -81,7 +81,7 @@ describe('withCertificates', () => {
           ]
         },
         b: {
-          ...rollForwardEvent(2, []),
+          ...rollForwardEvent(Cardano.Slot(2), []),
           certificates: []
         }
       });

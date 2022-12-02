@@ -25,7 +25,7 @@ export class RewardsBuilder {
     const params: (string[] | number)[] = [rewardAccounts.map((rewardAcc) => rewardAcc.toString())];
     this.#logger.debug('About to run findRewardsHistory query');
     const result: QueryResult<RewardEpochModel> = await this.#db.query(
-      findRewardsHistory(epochs?.lowerBound, epochs?.upperBound),
+      findRewardsHistory(epochs?.lowerBound?.valueOf(), epochs?.upperBound?.valueOf()),
       params
     );
     return result.rows.length > 0 ? result.rows : [];

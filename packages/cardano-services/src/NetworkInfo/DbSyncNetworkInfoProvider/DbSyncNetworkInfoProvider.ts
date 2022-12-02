@@ -32,7 +32,7 @@ export interface NetworkInfoProviderDependencies {
 export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) implements NetworkInfoProvider {
   #logger: Logger;
   #cache: InMemoryCache;
-  #currentEpoch: number;
+  #currentEpoch: Cardano.EpochNo;
   #currentHash: Cardano.BlockId | undefined;
   #builder: NetworkInfoBuilder;
   #genesisDataReady: Promise<GenesisData>;
@@ -46,7 +46,7 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) im
     super(db, cardanoNode, 'DbSyncNetworkInfoProvider', logger);
     this.#logger = logger;
     this.#cache = cache;
-    this.#currentEpoch = 0;
+    this.#currentEpoch = Cardano.EpochNo(0);
     this.#epochMonitor = epochMonitor;
     this.#builder = new NetworkInfoBuilder(db, logger);
     this.#genesisDataReady = loadGenesisData(cardanoNodeConfigPath);
@@ -64,9 +64,9 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) im
       const currentEpoch = slotEpochCalc(result.slot);
 
       // On epoch rollover, invalidate the cache before returning
-      if (this.#currentEpoch !== currentEpoch) {
+      if (this.#currentEpoch.valueOf() !== currentEpoch.valueOf()) {
         // The first time, no need to invalidate the cache
-        if (this.#currentEpoch !== 0) this.#epochMonitor.onEpoch(currentEpoch);
+        if (this.#currentEpoch.valueOf() !== 0) this.#epochMonitor.onEpoch(currentEpoch);
 
         this.#currentEpoch = currentEpoch;
       }

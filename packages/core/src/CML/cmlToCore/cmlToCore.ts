@@ -1,5 +1,6 @@
 import { Asset, CML, Cardano, SerializationFailure, util } from '../..';
 import { SerializationError } from '../../errors';
+import { Slot } from '../../Cardano';
 import { createCertificate } from './certificate';
 import { usingAutoFree } from '@cardano-sdk/util';
 
@@ -57,7 +58,7 @@ export const value = (cslValue: CML.Value): Cardano.Value =>
     return result;
   });
 
-export const txIn = (input: CML.TransactionInput): Cardano.NewTxIn =>
+export const txIn = (input: CML.TransactionInput): Cardano.TxIn =>
   usingAutoFree((scope) => ({
     index: Number(scope.manage(input.index()).to_str()),
     txId: Cardano.TransactionId.fromHexBlob(util.bytesToHex(scope.manage(input.transaction_id()).to_bytes()))
@@ -82,9 +83,9 @@ export const txOutputs = (outputs: CML.TransactionOutputs): Cardano.TxOut[] =>
     return result;
   });
 
-export const txInputs = (inputs: CML.TransactionInputs): Cardano.NewTxIn[] =>
+export const txInputs = (inputs: CML.TransactionInputs): Cardano.TxIn[] =>
   usingAutoFree((scope) => {
-    const result: Cardano.NewTxIn[] = [];
+    const result: Cardano.TxIn[] = [];
     for (let i = 0; i < inputs.len(); i++) {
       result.push(txIn(scope.manage(inputs.get(i))));
     }
@@ -126,7 +127,7 @@ export const txMint = (assets?: CML.Mint): Cardano.TokenMap | undefined =>
     return assetMap;
   });
 
-export const txBody = (body: CML.TransactionBody): Cardano.NewTxBodyAlonzo =>
+export const txBody = (body: CML.TransactionBody): Cardano.TxBody =>
   usingAutoFree((scope) => {
     const cslScriptDataHash = scope.manage(body.script_data_hash());
     const cslCollaterals = scope.manage(body.collateral());
@@ -142,8 +143,8 @@ export const txBody = (body: CML.TransactionBody): Cardano.NewTxBodyAlonzo =>
       scriptIntegrityHash:
         cslScriptDataHash && Cardano.util.Hash32ByteBase16(Buffer.from(cslScriptDataHash.to_bytes()).toString('hex')),
       validityInterval: {
-        invalidBefore: Number(scope.manage(body.validity_start_interval())?.to_str()),
-        invalidHereafter: Number(scope.manage(body.ttl())?.to_str())
+        invalidBefore: Slot(Number(scope.manage(body.validity_start_interval())?.to_str())),
+        invalidHereafter: Slot(Number(scope.manage(body.ttl())?.to_str()))
       },
       withdrawals: txWithdrawals(scope.manage(body.withdrawals()))
     };
@@ -292,7 +293,7 @@ export const utxo = (cslUtxos: CML.TransactionUnspentOutput[]) =>
     cslUtxos.map((cslUtxo) => [txIn(scope.manage(cslUtxo.input())), txOut(scope.manage(cslUtxo.output()))])
   );
 
-export const newTx = (cslTx: CML.Transaction): Cardano.NewTxAlonzo =>
+export const newTx = (cslTx: CML.Transaction): Cardano.Tx =>
   usingAutoFree((scope) => {
     const transactionHash = Cardano.TransactionId.fromHexBlob(
       util.bytesToHex(scope.manage(CML.hash_transaction(scope.manage(cslTx.body()))).to_bytes())
@@ -367,7 +368,7 @@ export const nativeScript = (script: CML.NativeScript): Cardano.NativeScript =>
         coreScript = {
           __type: Cardano.ScriptType.Native,
           kind: Cardano.NativeScriptKind.RequireTimeBefore,
-          slot: Number(scope.manage(scope.manage(script.as_timelock_expiry())!.slot()).to_str())
+          slot: Slot(Number(scope.manage(scope.manage(script.as_timelock_expiry())!.slot()).to_str()))
         };
         break;
       }
@@ -375,7 +376,7 @@ export const nativeScript = (script: CML.NativeScript): Cardano.NativeScript =>
         coreScript = {
           __type: Cardano.ScriptType.Native,
           kind: Cardano.NativeScriptKind.RequireTimeAfter,
-          slot: Number(scope.manage(scope.manage(script.as_timelock_start())!.slot()).to_str())
+          slot: Slot(Number(scope.manage(scope.manage(script.as_timelock_start())!.slot()).to_str()))
         };
         break;
       }

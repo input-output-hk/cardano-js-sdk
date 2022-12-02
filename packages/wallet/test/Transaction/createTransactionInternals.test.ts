@@ -38,7 +38,7 @@ describe('Transaction.createTransactionInternals', () => {
         'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9'
       ),
       validityInterval: {
-        invalidHereafter: ledgerTip.slot + 3600
+        invalidHereafter: Cardano.Slot(ledgerTip.slot.valueOf() + 3600)
       },
       ...overrides,
       inputSelection: {
@@ -67,7 +67,7 @@ describe('Transaction.createTransactionInternals', () => {
     };
     const txInternals = await createSimpleTransactionInternals(() => props);
     expect(txInternals.body.outputs).toHaveLength(2);
-    expect(txInternals.body.collaterals).toEqual<Cardano.NewTxIn[]>([utxo[2][0]]);
+    expect(txInternals.body.collaterals).toEqual<Cardano.TxIn[]>([utxo[2][0]]);
     expect(txInternals.body.mint).toEqual<Cardano.TokenMap>(props.mint);
     expect(txInternals.body.requiredExtraSignatures).toEqual<Cardano.Ed25519KeyHash[]>(props.requiredExtraSignatures);
     expect(txInternals.body.scriptIntegrityHash).toEqual<Cardano.util.Hash32ByteBase16>(props.scriptIntegrityHash);

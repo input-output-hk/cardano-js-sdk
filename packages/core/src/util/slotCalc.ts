@@ -54,7 +54,7 @@ const createSlotEpochCalcImpl = (eraSummaries: EraSummary[]) => {
   const eraSummariesAsc = orderBy(eraSummariesWithoutSkippedEras, ({ start }) => start.slot);
   return (slotNo: Slot) => {
     const relevantEraSummariesAsc = orderBy(
-      eraSummariesAsc.filter(({ start }) => start.slot <= slotNo),
+      eraSummariesAsc.filter(({ start }) => start.slot <= slotNo.valueOf()),
       ({ start }) => start.slot
     );
     if (relevantEraSummariesAsc.length === 0) {
@@ -66,7 +66,7 @@ const createSlotEpochCalcImpl = (eraSummaries: EraSummary[]) => {
       currentEraSummary = relevantEraSummariesAsc[i];
       const nextEraSummary: EraSummary | undefined = relevantEraSummariesAsc[i + 1];
       epochNo += Math.floor(
-        ((nextEraSummary?.start.slot || slotNo) - currentEraSummary.start.slot) /
+        ((nextEraSummary?.start.slot || slotNo.valueOf()) - currentEraSummary.start.slot) /
           currentEraSummary.parameters.epochLength
       );
     }
@@ -85,7 +85,7 @@ export const createSlotEpochCalc: (eraSummaries: EraSummary[]) => (slotNo: Slot)
      * @throws EraSummaryError
      * @returns {EpochNo} epoch of the slot
      */
-    return memoize((slotNo: Slot): EpochNo => calc(slotNo).epochNo);
+    return memoize((slotNo: Slot): EpochNo => EpochNo(calc(slotNo).epochNo));
   }
 );
 
@@ -100,13 +100,13 @@ export const createSlotTimeCalc = (eraSummaries: EraSummary[]) => {
    * @returns {Date} date of the slot
    */
   return (slotNo: Slot): Date => {
-    const activeEraSummary = eraSummariesDesc.find(({ start }) => start.slot <= slotNo);
+    const activeEraSummary = eraSummariesDesc.find(({ start }) => start.slot <= slotNo.valueOf());
     if (!activeEraSummary) {
       throw new EraSummaryError(`No EraSummary for slot ${slotNo} found`);
     }
     return new Date(
       activeEraSummary.start.time.getTime() +
-        (slotNo - activeEraSummary.start.slot) * activeEraSummary.parameters.slotLength
+        (slotNo.valueOf() - activeEraSummary.start.slot) * activeEraSummary.parameters.slotLength
     );
   };
 };
@@ -125,18 +125,18 @@ export const createSlotEpochInfoCalc = (eraSummaries: EraSummary[]) => {
     const { epochNo, epochEraSummary } = epochCalc(slot);
     const firstSlot =
       epochEraSummary.start.slot +
-      Math.floor((slot - epochEraSummary.start.slot) / epochEraSummary.parameters.epochLength) *
+      Math.floor((slot.valueOf() - epochEraSummary.start.slot) / epochEraSummary.parameters.epochLength) *
         epochEraSummary.parameters.epochLength;
     const lastSlot = firstSlot + epochEraSummary.parameters.epochLength - 1;
     return {
-      epochNo,
+      epochNo: EpochNo(epochNo),
       firstSlot: {
-        date: slotTimeCalc(firstSlot),
-        slot: firstSlot
+        date: slotTimeCalc(Slot(firstSlot)),
+        slot: Slot(firstSlot)
       },
       lastSlot: {
-        date: slotTimeCalc(lastSlot),
-        slot: lastSlot
+        date: slotTimeCalc(Slot(lastSlot)),
+        slot: Slot(lastSlot)
       }
     };
   };

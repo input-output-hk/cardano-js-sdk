@@ -19,7 +19,7 @@ export class PouchDbAddressesStore extends PouchDbDocumentStore<GroupedAddress[]
 export class PouchDbInFlightTransactionsStore extends PouchDbDocumentStore<TxInFlight[]> {}
 export class PouchDbVolatileTransactionsStore extends PouchDbDocumentStore<ConfirmedTx[]> {}
 
-export class PouchDbTransactionsStore extends PouchDbCollectionStore<Cardano.TxAlonzo> {}
+export class PouchDbTransactionsStore extends PouchDbCollectionStore<Cardano.HydratedTx> {}
 export class PouchDbUtxoStore extends PouchDbCollectionStore<Cardano.Utxo> {}
 
 export class PouchDbRewardsHistoryStore extends PouchDbKeyValueStore<Cardano.RewardAccount, EpochRewards[]> {}
@@ -72,7 +72,7 @@ export const createPouchDbWalletStores = (
            * Multiplied by 100k to distinguish between blockNo=1,index=0 and blockNo=0,index=1
            * Assuming there can never be more >=100k transactions in a block
            */
-          (blockNo * 100_000 + index).toString(),
+          (blockNo.valueOf() * 100_000 + index).toString(),
         dbName: `${baseDbName}Transactions`
       },
       logger

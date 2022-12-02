@@ -65,9 +65,9 @@ describe('RewardsHttpService', () => {
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('healthy state', () => {
     beforeAll(async () => {
-      lastBlockNoInDb = (await dbConnection.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no;
+      lastBlockNoInDb = Cardano.BlockNo((await dbConnection.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no);
       cardanoNode = mockCardanoNode(
-        healthCheckResponseMock({ blockNo: lastBlockNoInDb })
+        healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() })
       ) as unknown as OgmiosCardanoNode;
       rewardsProvider = new DbSyncRewardsProvider(
         { paginationPageSizeLimit: 5 },
@@ -88,12 +88,12 @@ describe('RewardsHttpService', () => {
       it('forwards the rewardsProvider health response with HTTP request', async () => {
         const res = await axios.post(`${baseUrl}/health`, {}, { headers: { 'Content-Type': APPLICATION_JSON } });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
+        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() }));
       });
 
       it('forwards the rewardsProvider health response with provider client', async () => {
         const response = await provider.healthCheck();
-        expect(response).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
+        expect(response).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() }));
       });
     });
 
@@ -235,8 +235,8 @@ describe('RewardsHttpService', () => {
           const rewardAccount = (await fixtureBuilder.getRewardAccounts(1))[0];
           const response = await provider.rewardsHistory({
             epochs: {
-              lowerBound: 5,
-              upperBound: 6
+              lowerBound: Cardano.EpochNo(5),
+              upperBound: Cardano.EpochNo(6)
             },
             rewardAccounts: [rewardAccount]
           });
@@ -246,8 +246,8 @@ describe('RewardsHttpService', () => {
           let lowestEpoch = Number.MAX_SAFE_INTEGER;
           let highestEpoch = 0;
           for (const result of response.get(rewardAccount)!) {
-            lowestEpoch = Math.min(lowestEpoch, result.epoch);
-            highestEpoch = Math.max(highestEpoch, result.epoch);
+            lowestEpoch = Math.min(lowestEpoch, result.epoch.valueOf());
+            highestEpoch = Math.max(highestEpoch, result.epoch.valueOf());
           }
 
           expect(lowestEpoch).toBeGreaterThanOrEqual(5);
@@ -259,7 +259,7 @@ describe('RewardsHttpService', () => {
           const rewardAccount = (await fixtureBuilder.getRewardAccounts(1))[0];
           const response = await provider.rewardsHistory({
             epochs: {
-              lowerBound: 5
+              lowerBound: Cardano.EpochNo(5)
             },
             rewardAccounts: [rewardAccount]
           });
@@ -267,7 +267,7 @@ describe('RewardsHttpService', () => {
 
           let lowestEpoch = Number.MAX_SAFE_INTEGER;
           for (const result of response.get(rewardAccount)!) {
-            lowestEpoch = Math.min(lowestEpoch, result.epoch);
+            lowestEpoch = Math.min(lowestEpoch, result.epoch.valueOf());
           }
 
           expect(lowestEpoch).toBeGreaterThanOrEqual(5);
@@ -278,7 +278,7 @@ describe('RewardsHttpService', () => {
           const rewardAccount = (await fixtureBuilder.getRewardAccounts(1))[0];
           const response = await provider.rewardsHistory({
             epochs: {
-              upperBound: 10
+              upperBound: Cardano.EpochNo(10)
             },
             rewardAccounts: [rewardAccount]
           });
@@ -286,7 +286,7 @@ describe('RewardsHttpService', () => {
 
           let highestEpoch = Number.MAX_SAFE_INTEGER;
           for (const result of response.get(rewardAccount)!) {
-            highestEpoch = Math.min(highestEpoch, result.epoch);
+            highestEpoch = Math.min(highestEpoch, result.epoch.valueOf());
           }
 
           expect(highestEpoch).toBeLessThanOrEqual(10);

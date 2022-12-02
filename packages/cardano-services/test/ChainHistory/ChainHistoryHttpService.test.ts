@@ -76,9 +76,9 @@ describe('ChainHistoryHttpService', () => {
   describe('healthy state', () => {
     beforeAll(async () => {
       const metadataService = createDbSyncMetadataService(dbConnection, logger);
-      lastBlockNoInDb = (await dbConnection.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no;
+      lastBlockNoInDb = Cardano.BlockNo((await dbConnection.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no);
       cardanoNode = mockCardanoNode(
-        healthCheckResponseMock({ blockNo: lastBlockNoInDb })
+        healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() })
       ) as unknown as OgmiosCardanoNode;
       chainHistoryProvider = new DbSyncChainHistoryProvider(
         { paginationPageSizeLimit: PAGINATION_PAGE_SIZE_LIMIT },
@@ -106,12 +106,12 @@ describe('ChainHistoryHttpService', () => {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
+        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() }));
       });
 
       it('forwards the chainHistoryProvider health response with provider client', async () => {
         const response = await provider.healthCheck();
-        expect(response).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
+        expect(response).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() }));
       });
     });
 
@@ -225,7 +225,7 @@ describe('ChainHistoryHttpService', () => {
         it('has outputs with multi-assets', async () => {
           const ids = await fixtureBuilder.getTxHashes(1, { with: [TxWith.MultiAsset] });
           const response = await provider.transactionsByHashes({ ids });
-          const tx: Cardano.TxAlonzo = response[0];
+          const tx: Cardano.HydratedTx = response[0];
 
           // A transaction involving multi assets could also have outputs without multi assets, so we must first
           // find the index of the output inside the transaction with the native tokens.
@@ -240,7 +240,7 @@ describe('ChainHistoryHttpService', () => {
           const response = await provider.transactionsByHashes({
             ids: await fixtureBuilder.getTxHashes(1, { with: [TxWith.Mint] })
           });
-          const tx: Cardano.TxAlonzo = response[0];
+          const tx: Cardano.HydratedTx = response[0];
           expect(response.length).toEqual(1);
           expect(tx.body.mint).toMatchShapeOf(DataMocks.Tx.mint);
           expect(tx.body.mint?.size).toBeGreaterThan(0);
@@ -250,7 +250,7 @@ describe('ChainHistoryHttpService', () => {
           const response = await provider.transactionsByHashes({
             ids: await fixtureBuilder.getTxHashes(1, { with: [TxWith.Withdrawal] })
           });
-          const tx: Cardano.TxAlonzo = response[0];
+          const tx: Cardano.HydratedTx = response[0];
           expect(response.length).toEqual(1);
           expect(tx.body.withdrawals!).toMatchShapeOf(DataMocks.Tx.withdrawals);
           expect(tx.body.withdrawals?.length).toBeGreaterThan(0);
@@ -261,7 +261,7 @@ describe('ChainHistoryHttpService', () => {
             ids: await fixtureBuilder.getTxHashes(1, { with: [TxWith.Redeemer] })
           });
 
-          const tx: Cardano.NewTxAlonzo = response[0];
+          const tx: Cardano.Tx = response[0];
           expect(response.length).toEqual(1);
           expect(tx.witness).toMatchShapeOf(DataMocks.Tx.witnessRedeemers);
           expect(tx.witness.redeemers?.length).toBeGreaterThan(0);
@@ -271,7 +271,7 @@ describe('ChainHistoryHttpService', () => {
           const response = await provider.transactionsByHashes({
             ids: await fixtureBuilder.getTxHashes(1, { with: [TxWith.AuxiliaryData] })
           });
-          const tx: Cardano.TxAlonzo = response[0];
+          const tx: Cardano.HydratedTx = response[0];
           expect(response.length).toEqual(1);
           expect(tx.auxiliaryData).toBeDefined();
         });
@@ -280,7 +280,7 @@ describe('ChainHistoryHttpService', () => {
           const response = await provider.transactionsByHashes({
             ids: await fixtureBuilder.getTxHashes(1, { with: [TxWith.CollateralInput] })
           });
-          const tx: Cardano.TxAlonzo = response[0];
+          const tx: Cardano.HydratedTx = response[0];
           expect(response.length).toEqual(1);
 
           expect(tx.body.collaterals).toMatchShapeOf(DataMocks.Tx.collateralInputs);
@@ -292,8 +292,8 @@ describe('ChainHistoryHttpService', () => {
             ids: await fixtureBuilder.getTxHashes(2, { with: [TxWith.DelegationCertificate] })
           });
 
-          const tx1: Cardano.TxAlonzo = response[0];
-          const tx2: Cardano.TxAlonzo = response[1];
+          const tx1: Cardano.HydratedTx = response[0];
+          const tx2: Cardano.HydratedTx = response[1];
 
           expect(response.length).toEqual(2);
           expect(tx1.body.certificates?.length).toBeGreaterThan(0);
@@ -359,8 +359,8 @@ describe('ChainHistoryHttpService', () => {
 
       it('does not include transactions before indicated block', async () => {
         const { addresses, blockRange, txInRangeCount } = await fixtureBuilder.getAddressesWithSomeInBlockRange(2, {
-          lowerBound: 10,
-          upperBound: 100
+          lowerBound: Cardano.BlockNo(10),
+          upperBound: Cardano.BlockNo(100)
         });
         const response = await provider.transactionsByAddresses({
           addresses: [...addresses],
@@ -369,7 +369,7 @@ describe('ChainHistoryHttpService', () => {
         });
 
         let lowerBound = DB_MAX_SAFE_INTEGER;
-        for (const tx of response.pageResults) lowerBound = Math.min(lowerBound, tx.blockHeader.blockNo);
+        for (const tx of response.pageResults) lowerBound = Math.min(lowerBound, tx.blockHeader.blockNo.valueOf());
 
         expect(response.totalResultCount).toEqual(txInRangeCount);
         expect(lowerBound).toBeGreaterThanOrEqual(10);
@@ -378,8 +378,8 @@ describe('ChainHistoryHttpService', () => {
 
       it('does not include transactions after indicated block', async () => {
         const { addresses, blockRange, txInRangeCount } = await fixtureBuilder.getAddressesWithSomeInBlockRange(2, {
-          lowerBound: 0,
-          upperBound: 10
+          lowerBound: Cardano.BlockNo(0),
+          upperBound: Cardano.BlockNo(10)
         });
         const response = await provider.transactionsByAddresses({
           addresses: [...addresses],
@@ -388,7 +388,7 @@ describe('ChainHistoryHttpService', () => {
         });
 
         let upperBound = 0;
-        for (const tx of response.pageResults) upperBound = Math.max(upperBound, tx.blockHeader.blockNo);
+        for (const tx of response.pageResults) upperBound = Math.max(upperBound, tx.blockHeader.blockNo.valueOf());
 
         expect(response.totalResultCount).toEqual(txInRangeCount);
         expect(upperBound).toBeLessThanOrEqual(10);
@@ -397,8 +397,8 @@ describe('ChainHistoryHttpService', () => {
 
       it('includes transactions only in specified block range', async () => {
         const { addresses, blockRange, txInRangeCount } = await fixtureBuilder.getAddressesWithSomeInBlockRange(2, {
-          lowerBound: 200,
-          upperBound: 1000
+          lowerBound: Cardano.BlockNo(200),
+          upperBound: Cardano.BlockNo(1000)
         });
 
         const response = await provider.transactionsByAddresses({
@@ -411,8 +411,8 @@ describe('ChainHistoryHttpService', () => {
         let upperBound = 0;
 
         for (const tx of response.pageResults) {
-          upperBound = Math.max(upperBound, tx.blockHeader.blockNo);
-          lowerBound = Math.min(lowerBound, tx.blockHeader.blockNo);
+          upperBound = Math.max(upperBound, tx.blockHeader.blockNo.valueOf());
+          lowerBound = Math.min(lowerBound, tx.blockHeader.blockNo.valueOf());
         }
 
         expect(response.totalResultCount).toEqual(txInRangeCount);

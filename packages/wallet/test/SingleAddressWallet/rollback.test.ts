@@ -39,6 +39,7 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
         index: 0,
         networkId: Cardano.NetworkId.testnet,
         rewardAccount,
+        stakeKeyDerivationPath: mocks.stakeKeyDerivationPath,
         type: AddressType.External
       };
       const asyncKeyAgent = await testAsyncKeyAgent([groupedAddress], dependencies);
@@ -87,7 +88,7 @@ const txOut: Cardano.TxOut = {
   }
 };
 
-const txBody: Cardano.NewTxBodyAlonzo = {
+const txBody: Cardano.TxBody = {
   fee: 10n,
   inputs: [
     {
@@ -97,7 +98,7 @@ const txBody: Cardano.NewTxBodyAlonzo = {
   ],
   outputs: [txOut],
   validityInterval: {
-    invalidHereafter: mocks.ledgerTip.slot + 10
+    invalidHereafter: Cardano.Slot(mocks.ledgerTip.slot.valueOf() + 10)
   }
 };
 
@@ -105,7 +106,7 @@ const vkey = '6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d39';
 const signature =
   // eslint-disable-next-line max-len
   'bdea87fca1b4b4df8a9b8fb4183c0fab2f8261eb6c5e4bc42c800bb9c8918755bdea87fca1b4b4df8a9b8fb4183c0fab2f8261eb6c5e4bc42c800bb9c8918755';
-const tx: Cardano.NewTxAlonzo = {
+const tx: Cardano.Tx = {
   body: txBody,
   id: Cardano.TransactionId('de9d33f66cffff721673219b19470aec81d96bc9253182369e41eec58389a448'),
   witness: {
@@ -125,14 +126,14 @@ describe('SingleAddressWallet rollback', () => {
     const secondTip = {
       blockNo: 1_111_112,
       hash: '10d64cc11e9b20e15b6c46aa7b1fed11246f438e62225655a30ea47bf8cc22d0',
-      slot: mocks.ledgerTip.slot + 1
+      slot: Cardano.Slot(mocks.ledgerTip.slot.valueOf() + 1)
     };
 
     networkInfoProvider.ledgerTip = jest.fn().mockResolvedValueOnce(mocks.ledgerTip).mockResolvedValueOnce(secondTip);
 
     const histTx1 = mocks.queryTransactionsResult.pageResults[0];
     const rollBackTx = { ...mocks.queryTransactionsResult.pageResults[1], id: tx.id };
-    rollBackTx.body.validityInterval.invalidHereafter = secondTip.slot + 1;
+    rollBackTx.body.validityInterval.invalidHereafter = Cardano.Slot(secondTip.slot.valueOf() + 1);
 
     const newTx = {
       ...rollBackTx,

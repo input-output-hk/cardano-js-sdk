@@ -14,16 +14,16 @@ describe('ogmiosToCore', () => {
   describe('blockHeader', () => {
     it('can translate from byron block', () => {
       expect(ogmiosToCore.blockHeader(mockByronBlock)).toEqual(<Cardano.PartialBlockHeader>{
-        blockNo: 42,
+        blockNo: Cardano.BlockNo(42),
         hash: Cardano.BlockId('5c3103bd0ff5ea85a62b202a1d2500cf3ebe0b9d793ed09e7febfe27ef12c968'),
-        slot: 77_761
+        slot: Cardano.Slot(77_761)
       });
     });
     it('can translate from common block', () => {
       expect(ogmiosToCore.blockHeader(mockShelleyBlock)).toEqual(<Cardano.PartialBlockHeader>{
-        blockNo: 1087,
+        blockNo: Cardano.BlockNo(1087),
         hash: Cardano.BlockId('071fceb6c20a412b9a9b57baedfe294e3cd9de641cd44c4cf8d0d56217e083ac'),
-        slot: 107_220
+        slot: Cardano.Slot(107_220)
       });
     });
   });
@@ -35,9 +35,9 @@ describe('ogmiosToCore', () => {
         body: [],
         fees: undefined,
         header: {
-          blockNo: 42,
+          blockNo: Cardano.BlockNo(42),
           hash: Cardano.BlockId('5c3103bd0ff5ea85a62b202a1d2500cf3ebe0b9d793ed09e7febfe27ef12c968'),
-          slot: 77_761
+          slot: Cardano.Slot(77_761)
         },
         issuerVk: undefined,
 
@@ -57,14 +57,14 @@ describe('ogmiosToCore', () => {
         body: [],
         fees: 0n,
         header: {
-          blockNo: 1087,
+          blockNo: Cardano.BlockNo(1087),
           hash: Cardano.BlockId('071fceb6c20a412b9a9b57baedfe294e3cd9de641cd44c4cf8d0d56217e083ac'),
-          slot: 107_220
+          slot: Cardano.Slot(107_220)
         },
         issuerVk: Cardano.Ed25519PublicKey('8b0960d234bda67d52432c5d1a26aca2bfb5b9a09f966d9592a7bf0c728a1ecd'),
         previousBlock: Cardano.BlockId('8d5d930981710fc8c6ca9fc8e0628665283f7efb28c7e6bddeee2d289f012dee'),
         // got size by querying the postgres db populated by db-sync
-        size: 3,
+        size: Cardano.BlockSize(3),
         totalOutput: 0n,
         txCount: 0,
         // vrf from https://preprod.cexplorer.io/block/071fceb6c20a412b9a9b57baedfe294e3cd9de641cd44c4cf8d0d56217e083ac
@@ -81,17 +81,17 @@ describe('ogmiosToCore', () => {
             body: {
               certificates: [] as Cardano.Certificate[]
             }
-          } as Cardano.TxAlonzo
+          } as Cardano.HydratedTx
         ],
         fees: ogmiosBlock.body[0].body.fee,
         header: {
-          blockNo: ogmiosBlock.header.blockHeight,
+          blockNo: Cardano.BlockNo(ogmiosBlock.header.blockHeight),
           hash: Cardano.BlockId(ogmiosBlock.headerHash),
-          slot: ogmiosBlock.header.slot
+          slot: Cardano.Slot(ogmiosBlock.header.slot)
         },
         issuerVk: Cardano.Ed25519PublicKey(ogmiosBlock.header.issuerVk),
         previousBlock: Cardano.BlockId(ogmiosBlock.header.prevHash),
-        size: ogmiosBlock.header.blockSize,
+        size: Cardano.BlockSize(ogmiosBlock.header.blockSize),
         totalOutput: 0n,
         txCount: ogmiosBlock.body.length,
         vrf: Cardano.VrfVkBech32FromBase64(ogmiosBlock.header.issuerVrf)
@@ -145,13 +145,13 @@ describe('ogmiosToCore', () => {
         ],
         fees: ogmiosBlock.body[0].body.fee + ogmiosBlock.body[1].body.fee,
         header: {
-          blockNo: ogmiosBlock.header.blockHeight,
+          blockNo: Cardano.BlockNo(ogmiosBlock.header.blockHeight),
           hash: Cardano.BlockId(ogmiosBlock.headerHash),
-          slot: ogmiosBlock.header.slot
+          slot: Cardano.Slot(ogmiosBlock.header.slot)
         },
         issuerVk: Cardano.Ed25519PublicKey(ogmiosBlock.header.issuerVk),
         previousBlock: Cardano.BlockId(ogmiosBlock.header.prevHash),
-        size: ogmiosBlock.header.blockSize,
+        size: Cardano.BlockSize(ogmiosBlock.header.blockSize),
         totalOutput:
           ogmiosBlock.body[0].body.outputs[0].value.coins +
           ogmiosBlock.body[1].body.outputs[0].value.coins +
@@ -179,7 +179,7 @@ describe('ogmiosToCore', () => {
                 },
                 {
                   __typename: Cardano.CertificateType.PoolRetirement,
-                  epoch: 123,
+                  epoch: Cardano.EpochNo(123),
                   poolId: Cardano.PoolId('pool15erywju02scjv9gxkmp885c8catf5n4ke9459h2299fq57u9c3e')
                 },
                 {
@@ -190,19 +190,19 @@ describe('ogmiosToCore', () => {
                 }
               ] as Cardano.Certificate[]
             }
-          } as Cardano.TxAlonzo
+          } as Cardano.HydratedTx
         ],
         fees: 202_549n,
         header: {
-          blockNo: 100_000,
+          blockNo: Cardano.BlockNo(100_000),
           hash: Cardano.BlockId('514f8be63ef25c46bee47a90658977f815919c06222c0b480be1e29efbd72c49'),
-          slot: 5_481_752
+          slot: Cardano.Slot(5_481_752)
         },
         issuerVk: Cardano.Ed25519PublicKey('a9d974fd26bfaf385749113f260271430276bed6ef4dad6968535de6778471ce'),
 
         previousBlock: Cardano.BlockId('518a24a3fb0cc6ee1a31668a63994e4dbda70ede5ff13be494a3b4c1bb7709c8'),
         // got size by querying the postgres db populated by db-sync
-        size: 836,
+        size: Cardano.BlockSize(836),
         totalOutput: 8_287_924_709n,
         txCount: 1,
         // vrf from https://preprod.cexplorer.io/block/514f8be63ef25c46bee47a90658977f815919c06222c0b480be1e29efbd72c49
@@ -261,12 +261,12 @@ describe('ogmiosToCore', () => {
         ],
         fees: ogmiosBlock.body[0].body.fee,
         header: {
-          blockNo: ogmiosBlock.header.blockHeight,
+          blockNo: Cardano.BlockNo(ogmiosBlock.header.blockHeight),
           hash: Cardano.BlockId(ogmiosBlock.headerHash),
-          slot: ogmiosBlock.header.slot
+          slot: Cardano.Slot(ogmiosBlock.header.slot)
         },
         issuerVk: Cardano.Ed25519PublicKey(ogmiosBlock.header.issuerVk),
-        size: ogmiosBlock.header.blockSize,
+        size: Cardano.BlockSize(ogmiosBlock.header.blockSize),
         totalOutput: ogmiosBlock.body[0].body.outputs[0].value.coins,
         txCount: ogmiosBlock.body.length,
         vrf: Cardano.VrfVkBech32FromBase64(ogmiosBlock.header.issuerVrf)

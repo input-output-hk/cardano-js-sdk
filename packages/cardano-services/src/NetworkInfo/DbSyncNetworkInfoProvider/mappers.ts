@@ -20,9 +20,9 @@ export const toSupply = ({ circulatingSupply, totalSupply }: ToLovalaceSupplyInp
 });
 
 export const toLedgerTip = ({ block_no, slot_no, hash }: LedgerTipModel): Cardano.Tip => ({
-  blockNo: Number(block_no),
+  blockNo: Cardano.BlockNo(Number(block_no)),
   hash: Cardano.BlockId(hash.toString('hex')),
-  slot: Number(slot_no)
+  slot: Cardano.Slot(Number(slot_no))
 });
 
 export const mapCostModels = (costs: CostModelsParamModel | null) => {

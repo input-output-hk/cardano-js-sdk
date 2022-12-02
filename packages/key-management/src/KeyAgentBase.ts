@@ -68,14 +68,16 @@ export abstract class KeyAgentBase implements KeyAgent {
     ).to_address();
 
     const rewardAccount = CML.RewardAddress.new(this.networkId, stakeKeyCredential).to_address();
-    const groupedAddress = {
+    const groupedAddress: GroupedAddress = {
       accountIndex: this.accountIndex,
       address: Cardano.Address(address.to_bech32()),
       index,
       networkId: this.networkId,
       rewardAccount: Cardano.RewardAccount(rewardAccount.to_bech32()),
+      stakeKeyDerivationPath: STAKE_KEY_DERIVATION_PATH,
       type
     };
+
     this.knownAddresses = [...this.knownAddresses, groupedAddress];
     return groupedAddress;
   }

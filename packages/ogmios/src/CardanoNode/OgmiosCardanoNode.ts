@@ -20,6 +20,7 @@ import { Logger } from 'ts-log';
 import { RunnableModule, contextLogger } from '@cardano-sdk/util';
 import { createInteractionContextWithLogger } from '../util';
 import { mapEraSummary } from './mappers';
+
 /**
  * Access cardano-node APIs via Ogmios
  *
@@ -100,7 +101,7 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
       return {
         localNode: {
           ledgerTip: lastKnownTip,
-          networkSync: networkSynchronization
+          networkSync: Cardano.Percent(networkSynchronization)
         },
         ok: networkSynchronization > 0.99
       };
