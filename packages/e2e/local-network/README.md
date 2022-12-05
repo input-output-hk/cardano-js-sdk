@@ -1,4 +1,4 @@
-**Current node version: 1.35.0**
+**Current node version: 1.35.4**
 
 Run a local test network on the host.
 
