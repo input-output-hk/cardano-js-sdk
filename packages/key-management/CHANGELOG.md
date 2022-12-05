@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.2.1-nightly.3...@cardano-sdk/key-management@0.3.0-nightly.0) (2022-12-05)
+
+### ⚠ BREAKING CHANGES
+
+- rename era-specific types in core
+
+### Features
+
+- **key-management:** ownSignatureKeyPaths now checks for reward account in certificates ([b8ab595](https://github.com/input-output-hk/cardano-js-sdk/commit/b8ab59588475f7cf2b4773f6e8fda084d74aeac0))
+- rename era-specific types in core ([c4955b1](https://github.com/input-output-hk/cardano-js-sdk/commit/c4955b1f3ae0992bb55b1c1461a1e449be0b6ef2))
+- type GroupedAddress now includes key derivation paths ([8ac0125](https://github.com/input-output-hk/cardano-js-sdk/commit/8ac0125152fa2f3eb95c3e4c32bee077d2df722f))
+
+### Bug Fixes
+
+- add sideEffects=false to package.json ([a1cb8f8](https://github.com/input-output-hk/cardano-js-sdk/commit/a1cb8f807e8d5947d0c512e0918713ff97d5d48e))
+- **key-management:** compile error in test file ([aeface7](https://github.com/input-output-hk/cardano-js-sdk/commit/aeface7d44416864256011f8ef8028cf38133470))
+
 ## [0.2.1-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.2.1-nightly.2...@cardano-sdk/key-management@0.2.1-nightly.3) (2022-12-01)
 
 **Note:** Version bump only for package @cardano-sdk/key-management

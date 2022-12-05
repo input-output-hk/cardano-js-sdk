@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.7.0-nightly.3...@cardano-sdk/wallet@0.7.0-nightly.4) (2022-12-05)
+
+### ⚠ BREAKING CHANGES
+
+- - BlockSize is now an OpaqueNumber rather than a type alias for number
+
+* BlockNo is now an OpaqueNumber rather than a type alias for number
+* EpochNo is now an OpaqueNumber rather than a type alias for number
+* Slot is now an OpaqueNumber rather than a type alias for number
+* Percentage is now an OpaqueNumber rather than a type alias for number
+
+- rename era-specific types in core
+
+### Features
+
+- add opaque numeric types to core package ([9ead8bd](https://github.com/input-output-hk/cardano-js-sdk/commit/9ead8bdb34b7ffc57c32f9ab18a6c6ca14af3fda))
+- rename era-specific types in core ([c4955b1](https://github.com/input-output-hk/cardano-js-sdk/commit/c4955b1f3ae0992bb55b1c1461a1e449be0b6ef2))
+- type GroupedAddress now includes key derivation paths ([8ac0125](https://github.com/input-output-hk/cardano-js-sdk/commit/8ac0125152fa2f3eb95c3e4c32bee077d2df722f))
+
+### Bug Fixes
+
+- add sideEffects=false to package.json ([a1cb8f8](https://github.com/input-output-hk/cardano-js-sdk/commit/a1cb8f807e8d5947d0c512e0918713ff97d5d48e))
+
 ## [0.7.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.7.0-nightly.2...@cardano-sdk/wallet@0.7.0-nightly.3) (2022-12-01)
 
 **Note:** Version bump only for package @cardano-sdk/wallet
