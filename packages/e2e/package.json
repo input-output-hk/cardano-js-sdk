@@ -13,6 +13,9 @@
       "require": "./dist/cjs/index.js"
     }
   },
+  "sideEffects": [
+    "./test/web-extension/extension/**/*.ts"
+  ],
   "scripts": {
     "artillery:stake-pool-query": "WORKERS=1 node -r ts-node/register ../../node_modules/.bin/artillery run test/artillery/StakePoolSearch.yml",
     "artillery:wallet-restoration": "WORKERS=1 node -r ts-node/register ../../node_modules/.bin/artillery run --dotenv ./.env test/artillery/wallet-restoration/WalletRestoration.yml",
@@ -23,10 +26,14 @@
     "test:ogmios": "jest -c jest.config.js --forceExit --selectProjects ogmios --runInBand --verbose",
     "test:providers": "jest -c jest.config.js --forceExit --selectProjects providers --runInBand --verbose",
     "test:wallet": "jest -c jest.config.js --forceExit --selectProjects wallet --runInBand --verbose",
-    "test:web-extension:build": "tsc --build ./test && tsc --build ./test/web-extension && webpack -c test/web-extension/webpack.config.js",
+    "test:web-extension:build:sw": "tsc --build ./test && tsc --build ./test/web-extension && webpack -c test/web-extension/webpack.config.sw.js",
+    "test:web-extension:build:other": "tsc --build ./test && tsc --build ./test/web-extension && webpack -c test/web-extension/webpack.config.js",
+    "test:web-extension:build:sw:watch": "yarn test:web-extension:build:sw --watch",
+    "test:web-extension:build:other:watch": "yarn test:web-extension:build:other --watch",
+    "test:web-extension:build": "run-s test:web-extension:build:sw test:web-extension:build:other",
     "test:web-extension:run": "wdio run test/web-extension/wdio.conf.js",
     "test:web-extension": "run-s test:web-extension:build test:web-extension:run",
-    "test:web-extension:watch:build": "yarn test:web-extension:build --watch",
+    "test:web-extension:watch:build": "run-p test:web-extension:build:sw:watch test:web-extension:build:other:watch",
     "test:web-extension:watch:run": "yarn test:web-extension:run --watch",
     "test:web-extension:watch": "run-s test:web-extension:build test:web-extension:watch:bg",
     "test:web-extension:watch:bg": "run-p test:web-extension:watch:build test:web-extension:watch:run",
@@ -105,7 +112,7 @@
     "@babel/preset-typescript": "^7.17.12",
     "@cardano-sdk/dapp-connector": "^0.6.0",
     "@cardano-sdk/web-extension": "^0.6.0",
-    "@dcspark/cardano-multiplatform-lib-asmjs": "^3.1.0",
+    "@dcspark/cardano-multiplatform-lib-browser": "^3.1.1",
     "@emurgo/cardano-message-signing-asmjs": "^1.0.1",
     "@types/bunyan": "^1.8.8",
     "@types/jest": "^28.1.2",
@@ -122,7 +129,7 @@
     "babel-loader": "^8.2.5",
     "blake2b-no-wasm": "2.1.4",
     "buffer": "^6.0.3",
-    "chromedriver": "^104.0.0",
+    "chromedriver": "^107.0.0",
     "copy-webpack-plugin": "^10.2.4",
     "delay": "^5.0.0",
     "eslint": "^7.32.0",
@@ -140,8 +147,10 @@
     "typescript": "^4.7.4",
     "util": "^0.12.4",
     "wdio-chromedriver-service": "^7.3.2",
+    "webassembly-loader-sw": "^1.1.0",
     "webdriverio": "^7.20.5",
     "webpack": "^5.72.0",
-    "webpack-cli": "^4.9.2"
+    "webpack-cli": "^4.9.2",
+    "webpack-merge": "^5.8.0"
   }
 }
