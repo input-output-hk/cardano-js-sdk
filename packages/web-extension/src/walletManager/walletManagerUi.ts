@@ -15,6 +15,8 @@ import { walletChannel, walletManagerChannel, walletManagerProperties } from './
 export class WalletManagerUi implements Shutdown, WalletManagerApi {
   #remoteApi: WalletManagerApi & Shutdown;
   #dependencies: MessengerDependencies;
+  #keyAgentApi: Shutdown | null = null;
+  #activeWalletName: string | null = null;
 
   /**
    * Observable wallet. Its properties can be subscribed to at any point, even before activating a wallet.
@@ -39,7 +41,15 @@ export class WalletManagerUi implements Shutdown, WalletManagerApi {
   activate(props: WalletManagerActivateProps & { keyAgent: AsyncKeyAgent }): Promise<void> {
     const { keyAgent, observableWalletName, provider } = props;
     const { logger, runtime } = this.#dependencies;
-    exposeKeyAgent(
+    if (this.#activeWalletName === observableWalletName) {
+      // Don't activate same wallet twice
+      return Promise.resolve();
+    }
+
+    // activate could be called without calling deactivate first
+    this.#shutdownKeyAgent();
+
+    this.#keyAgentApi = exposeKeyAgent(
       {
         keyAgent,
         walletName: observableWalletName
@@ -47,12 +57,15 @@ export class WalletManagerUi implements Shutdown, WalletManagerApi {
       { logger, runtime }
     );
 
+    this.#activeWalletName = observableWalletName;
     // Do not pass the whole props object here.
     // It contains `keyAgent` and that causes errors in the remoteApi, probably because it's not part of the api
     return this.#remoteApi.activate({ observableWalletName, provider });
   }
 
   deactivate(): Promise<void> {
+    this.#activeWalletName = null;
+    this.#shutdownKeyAgent();
     return this.#remoteApi.deactivate();
   }
 
@@ -64,5 +77,11 @@ export class WalletManagerUi implements Shutdown, WalletManagerApi {
   shutdown(): void {
     this.#remoteApi.shutdown();
     this.wallet.shutdown();
+    this.#shutdownKeyAgent();
+  }
+
+  #shutdownKeyAgent(): void {
+    this.#keyAgentApi?.shutdown();
+    this.#keyAgentApi = null;
   }
 }
