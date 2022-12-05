@@ -1,5 +1,16 @@
 import { observableWalletNames } from '../extension/util';
 
+const switchToWalletUi = async () => {
+  await browser.waitUntil(async () => {
+    try {
+      await browser.switchWindow('Test Wallet UI');
+      return true;
+    } catch {
+      return false;
+    }
+  });
+};
+
 describe('wallet', () => {
   const pWalletFound = '#root > div > p:nth-child(4)';
   const btnRefresh = '#root > div > button';
@@ -39,7 +50,7 @@ describe('wallet', () => {
 
   describe('wallet ui opens', () => {
     before(async () => {
-      await browser.switchWindow('Test Wallet UI');
+      await switchToWalletUi();
     });
 
     it('should display ADA price, provided by background process', async () => {
@@ -65,6 +76,12 @@ describe('wallet', () => {
         expect(walletAddr1).toHaveTextContaining('addr');
         await expect($(activeWalletName)).toHaveText(observableWalletNames[0]);
       });
+      it('dapp has access to cip30 WalletApi', async () => {
+        await browser.switchWindow('React App');
+        await expect($(pNetworkId)).toHaveText('Network Id (0 = testnet; 1 = mainnet): 0');
+        await browser.waitUntil($(liFirstUtxo).isExisting, { timeout: 60_000 });
+        await switchToWalletUi();
+      });
       it('can build and sign a transaction', async () => {
         await buildAndSign();
       });
@@ -88,12 +105,6 @@ describe('wallet', () => {
       it('can deactivate the wallet and clear the stores', async () => {
         await $(destroyWallets).click();
         await expect($(spanAddress)).toHaveText('-');
-      });
-
-      it('dapp has access to cip30 WalletApi', async () => {
-        await browser.switchWindow('React App');
-        await expect($(pNetworkId)).toHaveText('Network Id (0 = testnet; 1 = mainnet): 0');
-        await browser.waitUntil($(liFirstUtxo).isExisting, { timeout: 60_000 });
       });
     });
   });

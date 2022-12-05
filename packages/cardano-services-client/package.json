@@ -13,6 +13,7 @@
       "require": "./dist/cjs/index.js"
     }
   },
+  "sideEffects": false,
   "repository": "https://github.com/input-output-hk/cardano-js-sdk",
   "publishConfig": {
     "access": "public"

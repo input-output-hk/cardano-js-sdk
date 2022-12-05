@@ -17,6 +17,7 @@
   "publishConfig": {
     "access": "public"
   },
+  "sideEffects": false,
   "contributors": [
     "Rhys Bartels-Waller <rhys.bartelswaller@iohk.io> (https://iohk.io)",
     "Martynas Kazlauskas <martynas.kazlauskas@iohk.io> (https://iohk.io)",

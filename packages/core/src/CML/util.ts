@@ -1,17 +1,17 @@
 /* eslint-disable prettier/prettier */
 import { BigNum } from '@dcspark/cardano-multiplatform-lib-nodejs';
 import { CML } from './CML';
-import { HexBlob } from '../Cardano/util/primitives';
-import { Tx, TxBody } from '../Cardano/types';
+import { HexBlob } from '../Cardano/util';
+import { ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
+import { Tx, TxBody } from '../Cardano';
 import { newTx } from './cmlToCore';
-import { usingAutoFree } from '@cardano-sdk/util';
 
 export const MAX_U64 = 18_446_744_073_709_551_615n;
 
 export const MIN_I64 = -9_223_372_036_854_775_808n;
 export const MAX_I64 = 9_223_372_036_854_775_807n;
 
-export const maxBigNum = BigNum.from_str(MAX_U64.toString());
+export const maxBigNum = (scope: ManagedFreeableScope) => scope.manage(BigNum.from_str(MAX_U64.toString()));
 
 export type CslObject = { to_bytes: () => Uint8Array };
 

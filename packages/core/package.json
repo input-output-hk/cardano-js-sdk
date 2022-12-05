@@ -17,6 +17,7 @@
   "publishConfig": {
     "access": "public"
   },
+  "sideEffects": false,
   "contributors": [
     "Rhys Bartels-Waller <rhys.bartelswaller@iohk.io> (https://iohk.io)",
     "Martynas Kazlauskas <martynas.kazlauskas@iohk.io> (https://iohk.io)",
@@ -62,8 +63,7 @@
   "dependencies": {
     "@cardano-ogmios/client": "5.5.7",
     "@cardano-sdk/util": "^0.7.0-nightly.1",
-    "@dcspark/cardano-multiplatform-lib-browser": "^3.1.0",
-    "@dcspark/cardano-multiplatform-lib-nodejs": "^3.1.0",
+    "@dcspark/cardano-multiplatform-lib-nodejs": "^3.1.1",
     "@emurgo/cip14-js": "^3.0.1",
     "bech32": "^2.0.0",
     "lodash": "^4.17.21",
