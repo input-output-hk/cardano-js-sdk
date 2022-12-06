@@ -96,13 +96,13 @@ export const mapWithdrawal = (withdrawalModel: WithdrawalModel): Cardano.Withdra
 });
 
 export const mapRedeemer = (redeemerModel: RedeemerModel): Cardano.Redeemer => ({
+  data: Cardano.util.HexBlob(redeemerModel.script_hash.toString('hex')),
   executionUnits: {
     memory: Number(redeemerModel.unit_mem),
     steps: Number(redeemerModel.unit_steps)
   },
   index: redeemerModel.index,
-  purpose: redeemerModel.purpose as Cardano.RedeemerPurpose,
-  scriptHash: Cardano.util.Hash28ByteBase16(redeemerModel.script_hash.toString('hex'))
+  purpose: redeemerModel.purpose as Cardano.RedeemerPurpose
 });
 
 export const mapCertificate = (

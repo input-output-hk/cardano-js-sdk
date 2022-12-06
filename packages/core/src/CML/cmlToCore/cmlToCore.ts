@@ -189,10 +189,10 @@ export const txWitnessRedeemers = (redeemers?: CML.Redeemers): Cardano.Redeemer[
       const redeemerTagKind = scope.manage(reedeemer.tag()).kind();
 
       result.push({
+        data: Cardano.util.HexBlob(Buffer.from(data.to_bytes()).toString()),
         executionUnits: { memory: Number(scope.manage(exUnits.mem())), steps: Number(scope.manage(exUnits.steps())) },
         index: Number(index),
-        purpose: Object.values(Cardano.RedeemerPurpose)[redeemerTagKind],
-        scriptHash: Cardano.util.Hash28ByteBase16(Buffer.from(data.to_bytes()).toString())
+        purpose: Object.values(Cardano.RedeemerPurpose)[redeemerTagKind]
       });
     }
     return result;
@@ -352,11 +352,11 @@ export const nativeScript = (script: CML.NativeScript): Cardano.NativeScript =>
         }
         break;
       }
-      case Cardano.NativeScriptKind.RequireMOf: {
+      case Cardano.NativeScriptKind.RequireNOf: {
         const scriptMofK = scope.manage(script.as_script_n_of_k());
         coreScript = {
           __type: Cardano.ScriptType.Native,
-          kind: Cardano.NativeScriptKind.RequireMOf,
+          kind: Cardano.NativeScriptKind.RequireNOf,
           required: scriptMofK!.n(),
           scripts: new Array<Cardano.NativeScript>()
         };

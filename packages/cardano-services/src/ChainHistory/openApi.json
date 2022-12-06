@@ -361,7 +361,7 @@
               "withdrawal"
             ]
           },
-          "scriptHash": {
+          "data": {
             "type": "string"
           }
         }

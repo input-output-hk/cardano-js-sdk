@@ -236,7 +236,7 @@ export const nativeScript = (scope: ManagedFreeableScope, script: Cardano.Native
       cslScript = scope.manage(NativeScript.new_script_any(scope.manage(ScriptAny.new(cslScripts2))));
       break;
     }
-    case Cardano.NativeScriptKind.RequireMOf: {
+    case Cardano.NativeScriptKind.RequireNOf: {
       const cslScripts3 = scope.manage(NativeScripts.new());
       for (const subscript of script.scripts) {
         cslScripts3.add(nativeScript(scope, subscript));
@@ -375,13 +375,13 @@ export const txBody = (
       txInputs(scope, inputs),
       cslOutputs,
       scope.manage(BigNum.from_str(fee.toString())),
-      BigNum.from_str(validityInterval.invalidHereafter ? validityInterval.invalidHereafter.toString() : '0')
+      BigNum.from_str(validityInterval?.invalidHereafter ? validityInterval.invalidHereafter.toString() : '0')
     )
   );
 
-  if (validityInterval.invalidBefore) {
+  if (validityInterval?.invalidBefore) {
     cslBody.set_validity_start_interval(
-      BigNum.from_str(validityInterval.invalidBefore ? validityInterval.invalidBefore.toString() : '0')
+      BigNum.from_str(validityInterval?.invalidBefore ? validityInterval.invalidBefore.toString() : '0')
     );
   }
   if (mint) {
