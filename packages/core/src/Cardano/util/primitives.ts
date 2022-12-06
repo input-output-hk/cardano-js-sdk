@@ -1,5 +1,5 @@
 import { Decoded, bech32 } from 'bech32';
-import { Ed25519KeyHash } from '../types';
+import { Ed25519KeyHash } from '../types/Key';
 import { InvalidStringError } from '../../errors';
 
 const MAX_BECH32_LENGTH_LIMIT = 1023;

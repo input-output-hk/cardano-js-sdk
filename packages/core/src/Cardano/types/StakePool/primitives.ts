@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Ed25519KeyHash } from '../Key';
-import { Hash28ByteBase16, HexBlob, OpaqueString, typedBech32, typedHex } from '../../util';
+import { Hash28ByteBase16, HexBlob, OpaqueString, typedBech32, typedHex } from '../../util/primitives';
 
 /**
  * pool operator verification key hash as bech32 string or a genesis pool ID

@@ -1,3 +1,4 @@
+import * as NetworkInfoCacheKey from './keys';
 import {
   Cardano,
   CardanoNode,
@@ -14,7 +15,6 @@ import { GenesisData } from './types';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../InMemoryCache';
 import { Logger } from 'ts-log';
 import { NetworkInfoBuilder } from './NetworkInfoBuilder';
-import { NetworkInfoCacheKey } from '.';
 import { Pool } from 'pg';
 import { RunnableModule } from '@cardano-sdk/util';
 import { loadGenesisData, toGenesisParams, toLedgerTip, toProtocolParams, toSupply } from './mappers';
