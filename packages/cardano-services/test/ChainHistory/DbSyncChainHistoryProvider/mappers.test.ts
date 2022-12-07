@@ -286,13 +286,13 @@ describe('chain history mappers', () => {
     test('map RedeemerModel to Cardano.Redeemer', () => {
       const result = mappers.mapRedeemer(redeemerModel);
       expect(result).toEqual<Cardano.Redeemer>({
+        data: Cardano.util.HexBlob(hash28ByteBase16),
         executionUnits: {
           memory: 2000,
           steps: 5000
         },
         index: 1,
-        purpose: Cardano.RedeemerPurpose.mint,
-        scriptHash: Cardano.util.Hash28ByteBase16(hash28ByteBase16)
+        purpose: Cardano.RedeemerPurpose.mint
       });
     });
   });
@@ -303,10 +303,10 @@ describe('chain history mappers', () => {
     const outputs: Cardano.TxOut[] = [{ address: Cardano.Address(address), value: { assets, coins: 20_000_000n } }];
     const redeemers: Cardano.Redeemer[] = [
       {
+        data: Cardano.util.HexBlob(hash28ByteBase16),
         executionUnits: { memory: 1, steps: 2 },
         index: 1,
-        purpose: Cardano.RedeemerPurpose.spend,
-        scriptHash: Cardano.util.Hash28ByteBase16(hash28ByteBase16)
+        purpose: Cardano.RedeemerPurpose.spend
       }
     ];
     const withdrawals: Cardano.Withdrawal[] = [{ quantity: 200n, stakeAddress: Cardano.RewardAccount(stakeAddress) }];

@@ -1,5 +1,5 @@
 import { Decoded, bech32 } from 'bech32';
-import { Ed25519KeyHash } from '../types';
+import { Ed25519KeyHash } from '../types/Key';
 import { InvalidStringError } from '../../errors';
 
 const MAX_BECH32_LENGTH_LIMIT = 1023;
@@ -105,6 +105,13 @@ Base64Blob.fromBytes = (bytes: Uint8Array) => Buffer.from(bytes).toString('base6
 export type HexBlob = OpaqueString<'HexBlob'>;
 export const HexBlob = (target: string): HexBlob => typedHex(target);
 HexBlob.fromBytes = (bytes: Uint8Array) => Buffer.from(bytes).toString('hex') as unknown as HexBlob;
+
+/**
+ * Converts a base64 string into a hex (base16) encoded string.
+ *
+ * @param rawData The base64 encoded string.
+ */
+HexBlob.fromBase64 = (rawData: string) => Buffer.from(rawData, 'base64').toString('hex') as unknown as HexBlob;
 
 /**
  * Converts a hex string into a typed bech32 encoded string.

@@ -133,7 +133,9 @@ describe('SingleAddressWallet rollback', () => {
 
     const histTx1 = mocks.queryTransactionsResult.pageResults[0];
     const rollBackTx = { ...mocks.queryTransactionsResult.pageResults[1], id: tx.id };
-    rollBackTx.body.validityInterval.invalidHereafter = Cardano.Slot(secondTip.slot.valueOf() + 1);
+    if (rollBackTx.body.validityInterval?.invalidHereafter) {
+      rollBackTx.body.validityInterval.invalidHereafter = Cardano.Slot(secondTip.slot.valueOf() + 1);
+    }
 
     const newTx = {
       ...rollBackTx,

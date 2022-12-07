@@ -132,13 +132,13 @@ export const withWithdrawals: Cardano.HydratedTx = merge(withAssets, {
 export const witnessRedeemers = {
   redeemers: [
     {
+      data: '67f33146617a5e61936081db3b2117cbf59bd2123748f58ac9678656',
       executionUnits: {
         memory: 1700,
         steps: 476_468
       },
       index: 0,
-      purpose: 'spend',
-      scriptHash: '67f33146617a5e61936081db3b2117cbf59bd2123748f58ac9678656'
+      purpose: 'spend'
     }
   ],
   signatures: {}
@@ -205,13 +205,13 @@ export const certificate = {
 };
 
 export const redeemer = {
+  data: '67f33146617a5e61936081db3b2117cbf59bd2123748f58ac9678656',
   executionUnits: {
     memory: 0,
     steps: 0
   },
   index: 0,
-  purpose: 'spend',
-  scriptHash: '67f33146617a5e61936081db3b2117cbf59bd2123748f58ac9678656'
+  purpose: 'spend'
 };
 
 export const tx = [

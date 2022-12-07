@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AuxiliaryData } from './AuxiliaryData';
-import { Base64Blob, Hash28ByteBase16, Hash32ByteBase16, HexBlob, OpaqueString, typedHex } from '../util/primitives';
+import { Base64Blob, Hash32ByteBase16, HexBlob, OpaqueString, typedHex } from '../util/primitives';
 import { Certificate } from './Certificate';
 import { Datum, Script } from './Script';
 import { Ed25519KeyHash, Ed25519PublicKey } from './Key';
@@ -43,7 +43,7 @@ export interface HydratedTxBody {
   collaterals?: HydratedTxIn[];
   outputs: TxOut[];
   fee: Lovelace;
-  validityInterval: ValidityInterval;
+  validityInterval?: ValidityInterval;
   withdrawals?: Withdrawal[];
   certificates?: Certificate[];
   mint?: TokenMap;
@@ -66,7 +66,7 @@ export enum RedeemerPurpose {
 export interface Redeemer {
   index: number;
   purpose: RedeemerPurpose;
-  scriptHash: Hash28ByteBase16;
+  data: HexBlob;
   executionUnits: ExUnits;
 }
 

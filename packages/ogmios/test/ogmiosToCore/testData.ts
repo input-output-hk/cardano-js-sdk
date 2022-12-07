@@ -589,8 +589,8 @@ export const mockBabbageBlock: Ogmios.Schema.Babbage = {
           inputs: [],
           mint: {
             assets: {
-              'e0a714319812c3f773ba04ec5d6b3ffcd5aad85006805b047b082541.00': -1n,
-              'e0a714319812c3f773ba04ec5d6b3ffcd5aad85006805b047b082541.01': 2n
+              '0d94e174732ef9aae73f395ab44507bfa983d65023c11a951f0c32e4': -1n,
+              '1d94e174732ef9aae73f395ab44507bfa983d65023c11a951f0c32e4': 2n
             },
             coins: 0n
           },

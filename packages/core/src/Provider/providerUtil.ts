@@ -1,4 +1,5 @@
-import { Cardano, ProviderError, ProviderFailure } from '../';
+import * as Cardano from '../Cardano';
+import { ProviderError, ProviderFailure } from '../errors';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type ToProviderError = (error: unknown) => void;

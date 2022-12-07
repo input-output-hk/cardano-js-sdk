@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Logger } from 'ts-log';
-import { ServiceNames } from './ServiceNames';
+import { ServiceNames } from '../Program/ServiceNames';
 import dns, { SrvRecord } from 'dns';
 import pRetry, { FailedAttemptError } from 'p-retry';
 
