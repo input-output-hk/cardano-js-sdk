@@ -375,14 +375,16 @@ export const txBody = (
       txInputs(scope, inputs),
       cslOutputs,
       scope.manage(BigNum.from_str(fee.toString())),
-      BigNum.from_str(validityInterval?.invalidHereafter ? validityInterval.invalidHereafter.toString() : '0')
+      typeof validityInterval?.invalidHereafter !== 'undefined'
+        ? // TransactionBody appears to be taking ownership of this object: do not scope.manage
+          // https://github.com/dcSpark/cardano-multiplatform-lib/blob/master/rust/src/lib.rs#L413
+          BigNum.from_str(validityInterval.invalidHereafter.toString())
+        : undefined
     )
   );
 
-  if (validityInterval?.invalidBefore) {
-    cslBody.set_validity_start_interval(
-      BigNum.from_str(validityInterval?.invalidBefore ? validityInterval.invalidBefore.toString() : '0')
-    );
+  if (typeof validityInterval?.invalidBefore !== 'undefined') {
+    cslBody.set_validity_start_interval(scope.manage(BigNum.from_str(validityInterval.invalidBefore.toString())));
   }
   if (mint) {
     cslBody.set_mint(txMint(scope, mint));
