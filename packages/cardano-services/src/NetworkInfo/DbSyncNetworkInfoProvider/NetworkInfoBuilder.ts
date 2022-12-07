@@ -1,12 +1,6 @@
-import {
-  ActiveStakeModel,
-  CirculatingSupplyModel,
-  EpochModel,
-  LedgerTipModel,
-  ProtocolParamsModel,
-  TotalSupplyModel
-} from './types';
+import { ActiveStakeModel, CirculatingSupplyModel, EpochModel, ProtocolParamsModel, TotalSupplyModel } from './types';
 import { Cardano } from '@cardano-sdk/core';
+import { LedgerTipModel, findLedgerTip } from '../../util/DbSyncProvider';
 import { Logger } from 'ts-log';
 import { Pool, QueryResult } from 'pg';
 import Queries from './queries';
@@ -45,7 +39,7 @@ export class NetworkInfoBuilder {
 
   public async queryLedgerTip() {
     this.#logger.debug('About to query the ledger tip');
-    const result: QueryResult<LedgerTipModel> = await this.#db.query(Queries.findLedgerTip);
+    const result: QueryResult<LedgerTipModel> = await this.#db.query(findLedgerTip);
     return result.rows[0];
   }
 

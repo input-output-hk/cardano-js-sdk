@@ -30,12 +30,17 @@ const METRICS_ENDPOINT_LABEL_RESPONSE = 'http_request_duration_seconds duration 
 
 const exePath = path.join(__dirname, '..', 'dist', 'cjs', 'cli.js');
 
-const assertServiceHealthy = async (apiUrl: string, serviceName: ServiceNames, usedQueue?: boolean) => {
+const assertServiceHealthy = async (
+  apiUrl: string,
+  serviceName: ServiceNames,
+  usedQueue?: boolean,
+  withTip?: boolean
+) => {
   await serverReady(apiUrl);
   const headers = { 'Content-Type': 'application/json' };
   const res = await axios.post(`${apiUrl}/${serviceName}/health`, { headers });
 
-  const healthCheckResponse = usedQueue ? { ok: true } : healthCheckResponseMock();
+  const healthCheckResponse = usedQueue ? { ok: true } : healthCheckResponseMock({ withTip });
 
   expect(res.status).toBe(200);
   expect(res.data).toEqual(healthCheckResponse);
@@ -206,7 +211,7 @@ describe('CLI', () => {
             await assertServiceHealthy(apiUrl, ServiceNames.ChainHistory);
             await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo);
             await assertServiceHealthy(apiUrl, ServiceNames.StakePool);
-            await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
+            await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, false, false);
             await assertServiceHealthy(apiUrl, ServiceNames.Utxo);
             await assertServiceHealthy(apiUrl, ServiceNames.Rewards);
           });
@@ -230,7 +235,7 @@ describe('CLI', () => {
             await assertServiceHealthy(apiUrl, ServiceNames.ChainHistory);
             await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo);
             await assertServiceHealthy(apiUrl, ServiceNames.StakePool);
-            await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
+            await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, false, false);
             await assertServiceHealthy(apiUrl, ServiceNames.Utxo);
             await assertServiceHealthy(apiUrl, ServiceNames.Rewards);
           });
@@ -1029,7 +1034,7 @@ describe('CLI', () => {
                 env: {},
                 stdio: 'pipe'
               });
-              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
+              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, false, false);
             });
 
             it('tx-submit uses the default Ogmios configuration if not specified when using env variables', async () => {
@@ -1043,7 +1048,7 @@ describe('CLI', () => {
                 stdio: 'pipe'
               });
 
-              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
+              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, false, false);
             });
           });
 

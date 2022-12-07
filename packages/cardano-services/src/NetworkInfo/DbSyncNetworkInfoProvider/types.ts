@@ -20,12 +20,6 @@ export interface EpochModel {
   no: number;
 }
 
-export interface LedgerTipModel {
-  block_no: number;
-  slot_no: string;
-  hash: Buffer;
-}
-
 export interface CostModelsParamModel {
   PlutusV1?: Cardano.CostModel;
   PlutusV2?: Cardano.CostModel;

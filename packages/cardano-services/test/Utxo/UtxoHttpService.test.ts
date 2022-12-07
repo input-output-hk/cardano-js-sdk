@@ -1,11 +1,11 @@
 /* eslint-disable max-len */
 import { AddressWith, UtxoFixtureBuilder } from './fixtures/FixtureBuilder';
 import { Asset, Cardano, ProviderError, ProviderFailure, UtxoProvider } from '@cardano-sdk/core';
-import { BlockNoModel, findLastBlockNo } from '../../src/util/DbSyncProvider';
 import { CreateHttpProviderConfig, utxoHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { DataMocks } from '../data-mocks';
 import { DbSyncUtxoProvider, HttpServer, HttpServerConfig, UtxoHttpService } from '../../src';
 import { INFO, createLogger } from 'bunyan';
+import { LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
@@ -66,7 +66,7 @@ describe('UtxoHttpService', () => {
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('healthy state', () => {
     beforeAll(async () => {
-      lastBlockNoInDb = Cardano.BlockNo((await dbConnection.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no);
+      lastBlockNoInDb = Cardano.BlockNo((await dbConnection.query<LedgerTipModel>(findLedgerTip)).rows[0].block_no);
       cardanoNode = mockCardanoNode(
         healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() })
       ) as unknown as OgmiosCardanoNode;

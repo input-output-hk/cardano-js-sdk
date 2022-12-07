@@ -1,5 +1,5 @@
-import { BlockNoModel, DB_BLOCKS_BEHIND_TOLERANCE, DB_MAX_SAFE_INTEGER, findLastBlockNo } from './util';
-import { CardanoNode, HealthCheckResponse, Provider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { Cardano, CardanoNode, HealthCheckResponse, Provider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { DB_BLOCKS_BEHIND_TOLERANCE, DB_MAX_SAFE_INTEGER, LedgerTipModel, findLedgerTip } from './util';
 import { Pool } from 'pg';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -25,13 +25,20 @@ export const DbSyncProvider = <
     public async healthCheck(): Promise<HealthCheckResponse> {
       try {
         const { ok, localNode } = await this.cardanoNode.healthCheck();
-        const lastBlockNo = (await this.db.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no;
+        const tip = (await this.db.query<LedgerTipModel>(findLedgerTip)).rows[0];
         const isHealthy =
-          ok && lastBlockNo >= (localNode?.ledgerTip?.blockNo ?? DB_MAX_SAFE_INTEGER) - DB_BLOCKS_BEHIND_TOLERANCE;
+          ok && tip.block_no >= (localNode?.ledgerTip?.blockNo ?? DB_MAX_SAFE_INTEGER) - DB_BLOCKS_BEHIND_TOLERANCE;
+
+        const projectedTip: Cardano.Tip = {
+          blockNo: Cardano.BlockNo(tip.block_no),
+          hash: Cardano.BlockId(tip.hash.toString('hex')),
+          slot: Cardano.Slot(Number(tip.slot_no))
+        };
 
         return {
           localNode,
-          ok: isHealthy
+          ok: isHealthy,
+          projectedTip
         };
       } catch (error) {
         throw new ProviderError(

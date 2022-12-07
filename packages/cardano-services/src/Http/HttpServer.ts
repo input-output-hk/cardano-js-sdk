@@ -34,20 +34,25 @@ export class HttpServer extends RunnableModule {
       this.#dependencies.services.map((service) =>
         service
           .healthCheck()
-          .then(({ ok }) => ({
-            name: service.name,
-            ok
-          }))
+          .then((details) => {
+            const { ok } = details;
+
+            return { ...(ok ? { details } : undefined), name: service.name, ok };
+          })
           .catch((error) => {
             this.logger.error(error);
             return { name: service.name, ok: false };
           })
       )
     );
-    return {
+    const result = {
       ok: servicesHealth.every((service) => service.ok),
       services: servicesHealth
     };
+
+    if (!result.ok) this.logger.error('Root health check NOT OK!', result);
+
+    return result;
   }
   async initializeImpl(): Promise<void> {
     this.app = express();

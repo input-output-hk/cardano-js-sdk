@@ -10,9 +10,9 @@ import {
   TokenMetadataService
 } from '../../src';
 import { AssetProvider, Cardano } from '@cardano-sdk/core';
-import { BlockNoModel, findLastBlockNo } from '../../src/util/DbSyncProvider';
 import { CreateHttpProviderConfig, assetInfoHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { INFO, createLogger } from 'bunyan';
+import { LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { createDbSyncMetadataService } from '../../src/Metadata';
@@ -60,7 +60,7 @@ describe('AssetHttpService', () => {
         logger,
         metadataService: createDbSyncMetadataService(db, logger)
       });
-      lastBlockNoInDb = Cardano.BlockNo((await db.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no);
+      lastBlockNoInDb = Cardano.BlockNo((await db.query<LedgerTipModel>(findLedgerTip)).rows[0].block_no);
       cardanoNode = mockCardanoNode(
         healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() })
       ) as unknown as OgmiosCardanoNode;
