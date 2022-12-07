@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.7.0-nightly.4...@cardano-sdk/cardano-services@0.7.0-nightly.5) (2022-12-07)
+
+### ⚠ BREAKING CHANGES
+
+- - rename `redeemer.scriptHash` to `redeemer.data` in core
+
+* change the type from `Hash28ByteBase16` to `HexBlob`
+
+### Features
+
+- adds projected tip to the db sync based providers's health check response ([eb76414](https://github.com/input-output-hk/cardano-js-sdk/commit/eb76414d5796d6009611ba848e8d5c5fdffa46e4))
+
+### Code Refactoring
+
+- change redeemer script hash to data ([a24bbb8](https://github.com/input-output-hk/cardano-js-sdk/commit/a24bbb80d57007352d64b5b99dbc7a19d4948208))
+
 ## [0.7.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.7.0-nightly.3...@cardano-sdk/cardano-services@0.7.0-nightly.4) (2022-12-05)
 
 ### ⚠ BREAKING CHANGES

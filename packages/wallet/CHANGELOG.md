@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.7.0-nightly.4...@cardano-sdk/wallet@0.7.0-nightly.5) (2022-12-07)
+
+### ⚠ BREAKING CHANGES
+
+- - make `TxBodyAlonzo.validityInterval` an optional field aligned with Ogmios schema
+
+### Bug Fixes
+
+- **wallet:** assetsTracker never emits ([a0f33b5](https://github.com/input-output-hk/cardano-js-sdk/commit/a0f33b516b74f747dddcb36ea4b9bcbb0c7b65ad))
+
+### Code Refactoring
+
+- make tx validityInterval an optional ([fa1c487](https://github.com/input-output-hk/cardano-js-sdk/commit/fa1c4877bb64f0e2584950a27861cf16e727cadd))
+
 ## [0.7.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.7.0-nightly.3...@cardano-sdk/wallet@0.7.0-nightly.4) (2022-12-05)
 
 ### ⚠ BREAKING CHANGES

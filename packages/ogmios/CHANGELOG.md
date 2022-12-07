@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.7.0-nightly.3...@cardano-sdk/ogmios@0.7.0-nightly.4) (2022-12-07)
+
+### ⚠ BREAKING CHANGES
+
+- - rename `redeemer.scriptHash` to `redeemer.data` in core
+
+* change the type from `Hash28ByteBase16` to `HexBlob`
+
+### Features
+
+- adds projected tip to the db sync based providers's health check response ([eb76414](https://github.com/input-output-hk/cardano-js-sdk/commit/eb76414d5796d6009611ba848e8d5c5fdffa46e4))
+- **ogmios:** complete Ogmios tx to core mapping ([bcac56b](https://github.com/input-output-hk/cardano-js-sdk/commit/bcac56bbf943110703696e0854b2af2f5e2b1737))
+
+### Code Refactoring
+
+- change redeemer script hash to data ([a24bbb8](https://github.com/input-output-hk/cardano-js-sdk/commit/a24bbb80d57007352d64b5b99dbc7a19d4948208))
+
 ## [0.7.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.7.0-nightly.2...@cardano-sdk/ogmios@0.7.0-nightly.3) (2022-12-05)
 
 ### ⚠ BREAKING CHANGES

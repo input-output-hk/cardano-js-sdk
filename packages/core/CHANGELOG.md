@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.7.0-nightly.3...@cardano-sdk/core@0.7.0-nightly.4) (2022-12-07)
+
+### ⚠ BREAKING CHANGES
+
+- - rename `redeemer.scriptHash` to `redeemer.data` in core
+
+* change the type from `Hash28ByteBase16` to `HexBlob`
+
+- - make `TxBodyAlonzo.validityInterval` an optional field aligned with Ogmios schema
+- **core:** - rename `Cardano.NativeScriptKind.RequireMOf` to `Cardano.NativeScriptKind.RequireNOf`
+
+### Features
+
+- **core:** adds optional projected tip to the health cheak response interface ([ea59ed7](https://github.com/input-output-hk/cardano-js-sdk/commit/ea59ed748761e5d4edaf1a255ae43df2fdd27092))
+- **ogmios:** complete Ogmios tx to core mapping ([bcac56b](https://github.com/input-output-hk/cardano-js-sdk/commit/bcac56bbf943110703696e0854b2af2f5e2b1737))
+
+### Bug Fixes
+
+- **core:** correctly serialize/deserialize transactions with no validity interval ([5e6e3eb](https://github.com/input-output-hk/cardano-js-sdk/commit/5e6e3eb37743a54c174d82f973b26c2ed1d1e057))
+- **core:** native script type name ([bc62f8b](https://github.com/input-output-hk/cardano-js-sdk/commit/bc62f8bf8af18c9f34acf2072806a303927265c0))
+
+### Code Refactoring
+
+- change redeemer script hash to data ([a24bbb8](https://github.com/input-output-hk/cardano-js-sdk/commit/a24bbb80d57007352d64b5b99dbc7a19d4948208))
+- make tx validityInterval an optional ([fa1c487](https://github.com/input-output-hk/cardano-js-sdk/commit/fa1c4877bb64f0e2584950a27861cf16e727cadd))
+
 ## [0.7.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.7.0-nightly.2...@cardano-sdk/core@0.7.0-nightly.3) (2022-12-05)
 
 ### ⚠ BREAKING CHANGES
