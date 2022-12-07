@@ -1,7 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-len */
-import { BlockNoModel, findLastBlockNo } from '../../src/util/DbSyncProvider';
 import {
   Cardano,
   ProviderError,
@@ -22,6 +21,7 @@ import {
   createHttpStakePoolExtMetadataService
 } from '../../src';
 import { INFO, createLogger } from 'bunyan';
+import { LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { PoolInfo, PoolWith, StakePoolFixtureBuilder } from './fixtures/FixtureBuilder';
@@ -179,7 +179,7 @@ describe('StakePoolHttpService', () => {
     const clearCacheSpy = jest.spyOn(cache, 'clear');
 
     beforeAll(async () => {
-      lastBlockNoInDb = Cardano.BlockNo((await db.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no);
+      lastBlockNoInDb = Cardano.BlockNo((await db.query<LedgerTipModel>(findLedgerTip)).rows[0].block_no);
       cardanoNode = mockCardanoNode(
         healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() })
       ) as unknown as OgmiosCardanoNode;

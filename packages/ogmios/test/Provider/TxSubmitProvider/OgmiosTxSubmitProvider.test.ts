@@ -15,7 +15,7 @@ describe('OgmiosTxSubmitProvider', () => {
   let connection: Connection;
   let provider: OgmiosTxSubmitProvider;
 
-  const responseWithServiceState = healthCheckResponseMock();
+  const responseWithServiceState = healthCheckResponseMock({ withTip: false });
 
   beforeAll(async () => {
     connection = createConnectionObject({ port: await getRandomPort() });

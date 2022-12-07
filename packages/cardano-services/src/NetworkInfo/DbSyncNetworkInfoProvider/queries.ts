@@ -46,13 +46,6 @@ export const findLatestCompleteEpoch = `
     LIMIT 1
 `;
 
-export const findLedgerTip = `
-    SELECT block_no, slot_no, hash
-    FROM block
-    ORDER BY id DESC
-    LIMIT 1;
-`;
-
 export const findProtocolParams = `
     SELECT 
     min_fee_a, 
@@ -93,7 +86,6 @@ const Queries = {
   findActiveStake,
   findCirculatingSupply,
   findLatestCompleteEpoch,
-  findLedgerTip,
   findProtocolParams,
   findTotalSupply
 };

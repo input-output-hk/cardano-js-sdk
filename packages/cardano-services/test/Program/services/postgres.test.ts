@@ -1,12 +1,12 @@
 /* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable max-len */
-import { BlockNoModel, findLastBlockNo } from '../../../src/util/DbSyncProvider';
 import { Cardano } from '@cardano-sdk/core';
 import { DbSyncEpochPollService, EpochMonitor } from '../../../src/util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../../src/NetworkInfo';
 import { HttpServer, HttpServerConfig, createDnsResolver, getPool } from '../../../src';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../../src/InMemoryCache';
+import { LedgerTipModel, findLedgerTip } from '../../../src/util/DbSyncProvider';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { SrvRecord } from 'dns';
@@ -61,7 +61,7 @@ describe('Service dependency abstractions', () => {
         config = { listen: { port } };
         apiUrlBase = `http://localhost:${port}/network-info`;
         epochMonitor = new DbSyncEpochPollService(db!, 10_000);
-        lastBlockNoInDb = Cardano.BlockNo((await db!.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no);
+        lastBlockNoInDb = Cardano.BlockNo((await db!.query<LedgerTipModel>(findLedgerTip)).rows[0].block_no);
         cardanoNode = mockCardanoNode(
           healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() })
         ) as unknown as OgmiosCardanoNode;
@@ -123,7 +123,7 @@ describe('Service dependency abstractions', () => {
         config = { listen: { port } };
         apiUrlBase = `http://localhost:${port}/network-info`;
         epochMonitor = new DbSyncEpochPollService(db!, 1000);
-        lastBlockNoInDb = Cardano.BlockNo((await db!.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no);
+        lastBlockNoInDb = Cardano.BlockNo((await db!.query<LedgerTipModel>(findLedgerTip)).rows[0].block_no);
         cardanoNode = mockCardanoNode(
           healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() })
         ) as unknown as OgmiosCardanoNode;
