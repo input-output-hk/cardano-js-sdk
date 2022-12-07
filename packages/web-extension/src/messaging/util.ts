@@ -3,6 +3,7 @@ import {
   AnyMessage,
   ChannelName,
   EmitMessage,
+  InternalMsg,
   MethodRequest,
   ObservableCompletionMessage,
   RequestMessage,
@@ -41,3 +42,10 @@ export const senderOrigin = (sender?: Runtime.MessageSender): string | null => {
 export const newMessageId = uuidv4;
 
 export const deriveChannelName = (channel: ChannelName, path: string): ChannelName => `${channel}-${path}`;
+
+const isInternalMsg = (msg: unknown): msg is InternalMsg => (msg as InternalMsg)?.remoteApiInternalMsg !== undefined;
+export const disabledApiMsg: InternalMsg = {
+  remoteApiInternalMsg: 'apiObjDisabled'
+};
+export const isNotDisabledApiMsg = (msg: unknown) =>
+  !isInternalMsg(msg) || msg.remoteApiInternalMsg !== disabledApiMsg.remoteApiInternalMsg;

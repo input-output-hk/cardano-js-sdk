@@ -27,6 +27,7 @@ import {
   map,
   merge,
   mergeMap,
+  of,
   shareReplay,
   switchMap,
   takeUntil,
@@ -36,7 +37,9 @@ import { GetErrorPrototype, Shutdown, fromSerializableObject, toSerializableObje
 import { NotImplementedError } from '@cardano-sdk/core';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
 import {
+  disabledApiMsg,
   isEmitMessage,
+  isNotDisabledApiMsg,
   isObservableCompletionMessage,
   isRequestMessage,
   isResponseMessage,
@@ -136,7 +139,8 @@ export const consumeMessengerRemoteApi = <T extends object>(
             takeUntil(unsubscribe$),
             filter(isEmitMessage),
             map(({ emit }) => emit),
-            shareReplay(1)
+            shareReplay(1),
+            filter(isNotDisabledApiMsg) // Do not replay values from an api object that was disabled
           ));
         }
       },
@@ -226,7 +230,8 @@ export const bindObservableChannels = <API extends object>(
           }),
           // Null api (aka stop using the object).
           // Unsubscribe its properties but leave the wrapping subscription open, waiting for a new api object
-          switchMap((api) => (api ? ((api as any)[observableProperty] as Observable<unknown>) : NEVER))
+          // Send an internal disabledApiMsg to consumerApi, so it stops replaying values from disabled api object
+          switchMap((api) => (api ? ((api as any)[observableProperty] as Observable<unknown>) : of(disabledApiMsg)))
         )
       );
 
