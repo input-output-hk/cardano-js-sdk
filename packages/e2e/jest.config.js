@@ -11,6 +11,7 @@ module.exports = {
     project('load-testing'),
     project('local-network'),
     project('long-running'),
+    project('measurement-util'),
     project('ogmios'),
     project('providers'),
     project('wallet')

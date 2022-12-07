@@ -1,5 +1,6 @@
 import { Cardano, ProviderError, ProviderFailure, SupplySummary } from '@cardano-sdk/core';
-import { CostModelsParamModel, GenesisData, LedgerTipModel, ProtocolParamsModel } from './types';
+import { CostModelsParamModel, GenesisData, ProtocolParamsModel } from './types';
+import { LedgerTipModel } from '../../util/DbSyncProvider';
 import JSONbig from 'json-bigint';
 import fs from 'fs';
 import path from 'path';

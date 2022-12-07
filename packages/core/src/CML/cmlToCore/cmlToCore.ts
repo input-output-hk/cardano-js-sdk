@@ -1,10 +1,10 @@
 import * as Cardano from '../../Cardano';
 import { CML } from '../CML';
+import { ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
 import { SerializationError, SerializationFailure } from '../../errors';
 import { bytesToHex } from '../../util/misc/bytesToHex';
 import { createAssetId } from '../../Asset/util/assetId';
 import { createCertificate } from './certificate';
-import { usingAutoFree } from '@cardano-sdk/util';
 
 export const txRequiredExtraSignatures = (
   signatures: CML.Ed25519KeyHashes | undefined
@@ -129,6 +129,16 @@ export const txMint = (assets?: CML.Mint): Cardano.TokenMap | undefined =>
     return assetMap;
   });
 
+const validityInterval = (scope: ManagedFreeableScope, body: CML.TransactionBody) => {
+  const cmlInvalidBefore = body.validity_start_interval();
+  const cmlInvalidHereafter = body.ttl();
+  if (!cmlInvalidBefore && !cmlInvalidHereafter) return;
+  return {
+    invalidBefore: cmlInvalidBefore ? Cardano.Slot(Number(scope.manage(cmlInvalidBefore).to_str())) : undefined,
+    invalidHereafter: cmlInvalidHereafter ? Cardano.Slot(Number(scope.manage(cmlInvalidHereafter).to_str())) : undefined
+  };
+};
+
 export const txBody = (body: CML.TransactionBody): Cardano.TxBody =>
   usingAutoFree((scope) => {
     const cslScriptDataHash = scope.manage(body.script_data_hash());
@@ -144,10 +154,7 @@ export const txBody = (body: CML.TransactionBody): Cardano.TxBody =>
       requiredExtraSignatures: txRequiredExtraSignatures(scope.manage(body.required_signers())),
       scriptIntegrityHash:
         cslScriptDataHash && Cardano.util.Hash32ByteBase16(Buffer.from(cslScriptDataHash.to_bytes()).toString('hex')),
-      validityInterval: {
-        invalidBefore: Cardano.Slot(Number(scope.manage(body.validity_start_interval())?.to_str())),
-        invalidHereafter: Cardano.Slot(Number(scope.manage(body.ttl())?.to_str()))
-      },
+      validityInterval: validityInterval(scope, body),
       withdrawals: txWithdrawals(scope.manage(body.withdrawals()))
     };
   });

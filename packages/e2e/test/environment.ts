@@ -81,6 +81,7 @@ const validators = {
   UTXO_PROVIDER: str(),
   UTXO_PROVIDER_PARAMS: providerParams(),
   VIRTUAL_USERS_COUNT: num(),
+  VIRTUAL_USERS_GENERATE_DURATION: num(),
   WORKER_PARALLEL_TRANSACTION: num()
 } as const;
 

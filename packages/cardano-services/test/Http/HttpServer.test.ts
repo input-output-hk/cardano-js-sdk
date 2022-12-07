@@ -3,8 +3,8 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 
 import { APPLICATION_JSON, CONTENT_TYPE, DbSyncUtxoProvider, HttpServer, HttpService, ServiceNames } from '../../src';
-import { BlockNoModel, findLastBlockNo } from '../../src/util/DbSyncProvider';
 import { Cardano, Provider } from '@cardano-sdk/core';
+import { LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
 import { Logger } from 'ts-log';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
@@ -65,7 +65,7 @@ describe('HttpServer', () => {
   beforeEach(async () => {
     port = await getRandomPort();
     apiUrlBase = `http://localhost:${port}`;
-    lastBlockNoInDb = Cardano.BlockNo((await db.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no);
+    lastBlockNoInDb = Cardano.BlockNo((await db.query<LedgerTipModel>(findLedgerTip)).rows[0].block_no);
     cardanoNode = mockCardanoNode(
       healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() })
     ) as unknown as OgmiosCardanoNode;
@@ -420,10 +420,12 @@ describe('HttpServer', () => {
         ok: true,
         services: [
           {
+            details: { ok: true },
             name: ServiceNames.StakePool,
             ok: true
           },
           {
+            details: { ok: true },
             name: ServiceNames.NetworkInfo,
             ok: true
           }
@@ -454,6 +456,7 @@ describe('HttpServer', () => {
         ok: false,
         services: [
           {
+            details: { ok: true },
             name: ServiceNames.StakePool,
             ok: true
           },

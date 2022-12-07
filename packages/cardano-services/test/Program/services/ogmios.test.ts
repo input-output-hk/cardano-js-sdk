@@ -105,7 +105,7 @@ describe('Service dependency abstractions', () => {
             headers: { 'Content-Type': APPLICATION_JSON }
           });
           expect(res.status).toBe(200);
-          expect(res.data).toEqual(healthCheckResponseMock());
+          expect(res.data).toEqual(healthCheckResponseMock({ withTip: false }));
         });
 
         it('TxSubmitHttpService replies with status 200 OK when /submit endpoint is reached', async () => {
@@ -234,7 +234,7 @@ describe('Service dependency abstractions', () => {
             headers: { 'Content-Type': APPLICATION_JSON }
           });
           expect(res.status).toBe(200);
-          expect(res.data).toEqual(healthCheckResponseMock());
+          expect(res.data).toEqual(healthCheckResponseMock({ withTip: false }));
         });
       });
 
@@ -370,7 +370,7 @@ describe('Service dependency abstractions', () => {
         ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
       });
 
-      await expect(provider.healthCheck()).resolves.toEqual(healthCheckResponseMock());
+      await expect(provider.healthCheck()).resolves.toEqual(healthCheckResponseMock({ withTip: false }));
     });
   });
 
