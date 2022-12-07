@@ -53,7 +53,8 @@ describe('createAssetsTracker', () => {
           assetService
         }
       );
-      expectObservable(target$).toBe('--b-c', {
+      expectObservable(target$).toBe('a-b-c', {
+        a: new Map(),
         b: new Map([[AssetId.TSLA, assetTsla]]),
         c: new Map([
           [AssetId.TSLA, assetTsla],
@@ -63,6 +64,56 @@ describe('createAssetsTracker', () => {
       flush();
       expect(assetProvider.setStatInitialized).toBeCalledTimes(1); // only when there are no assets
       expect(assetService).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  it('does not emit if the assets in total balance have not changed', () => {
+    createTestScheduler().run(({ cold, expectObservable, flush }) => {
+      const balanceTracker = {
+        utxo: {
+          total$: cold('a-b-c', {
+            a: {} as Cardano.Value,
+            b: { assets: new Map([[AssetId.TSLA, 1n]]), coins: 1_000_000n } as Cardano.Value,
+            c: { assets: new Map([[AssetId.TSLA, 1n]]), coins: 2_000_000n } as Cardano.Value
+          })
+        }
+      } as unknown as TransactionalTracker<BalanceTracker>;
+
+      const target$ = createAssetsTracker(
+        { assetProvider, balanceTracker, logger, retryBackoffConfig } as unknown as AssetsTrackerProps,
+        {
+          assetService
+        }
+      );
+      expectObservable(target$).toBe('a-b--', {
+        a: new Map(),
+        b: new Map([[AssetId.TSLA, assetTsla]])
+      });
+      flush();
+      expect(assetProvider.setStatInitialized).toBeCalledTimes(1);
+      expect(assetService).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('emits at least once if there are no assets found in total balance', () => {
+    createTestScheduler().run(({ cold, expectObservable }) => {
+      const balanceTracker = {
+        utxo: {
+          total$: cold('a-b-c', {
+            a: { coins: 1_000_000n } as Cardano.Value,
+            b: { coins: 2_000_000n } as Cardano.Value,
+            c: { coins: 3_000_000n } as Cardano.Value
+          })
+        }
+      } as unknown as TransactionalTracker<BalanceTracker>;
+
+      const target$ = createAssetsTracker(
+        { assetProvider, balanceTracker, logger, retryBackoffConfig } as unknown as AssetsTrackerProps,
+        {
+          assetService
+        }
+      );
+      expectObservable(target$).toBe('a----', { a: new Map() });
     });
   });
 
@@ -89,7 +140,8 @@ describe('createAssetsTracker', () => {
           assetService
         }
       );
-      expectObservable(target$).toBe('--b-c', {
+      expectObservable(target$).toBe('a-b-c', {
+        a: new Map(),
         b: new Map([
           [AssetId.TSLA, assetTsla],
           [AssetId.PXL, assetPxl]
@@ -124,6 +176,7 @@ describe('createAssetsTracker', () => {
     const assetInfos: Map<Cardano.AssetId, Asset.AssetInfo>[] = [];
     await lastValueFrom(target$.pipe(tap((ai) => assetInfos.push(ai))));
     expect(assetInfos).toEqual([
+      new Map(),
       new Map([[AssetId.TSLA, { ...assetTsla, nftMetadata: undefined }]]),
       new Map([[AssetId.TSLA, { ...assetTsla, tokenMetadata: undefined }]]),
       new Map([[AssetId.TSLA, assetTsla]])

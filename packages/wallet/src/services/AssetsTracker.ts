@@ -1,10 +1,12 @@
+/* eslint-disable max-len */
 import { Asset, Cardano } from '@cardano-sdk/core';
 import { BalanceTracker } from './types';
 import { Logger } from 'ts-log';
-import { Observable, combineLatest, map, mergeMap, of, tap } from 'rxjs';
+import { Observable, combineLatest, distinctUntilChanged, map, mergeMap, of, tap } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackedAssetProvider } from './ProviderTracker';
 import { coldObservableProvider } from './util';
+import { deepEquals } from '@cardano-sdk/util';
 
 const isAssetInfoComplete = (assetInfo: Asset.AssetInfo): boolean =>
   assetInfo.nftMetadata !== undefined && assetInfo.tokenMetadata !== undefined;
@@ -40,6 +42,7 @@ export const createAssetsTracker = (
     const sub = balanceTracker.utxo.total$
       .pipe(
         map(({ assets }) => [...(assets?.keys() || [])]),
+        distinctUntilChanged(deepEquals), // It optimizes to not process duplicate emissions of the assets
         tap((assetIds) =>
           logger.debug(
             assetIds.length > 0
@@ -59,8 +62,11 @@ export const createAssetsTracker = (
             return assetService(assetId);
           })
         ),
-        // Wait for all asset metadata fetches have a value
-        mergeMap((assetInfos) => combineLatest(assetInfos)),
+        // If there are assets -> wait for all asset metadata fetches have a value, otherwise emit an empty array observable
+        mergeMap((assetInfos) => {
+          if (assetInfos.length === 0) return of([]);
+          return combineLatest(assetInfos);
+        }),
         tap((assetInfos) => logger.debug(`Got metadata for ${assetInfos.length} assets`)),
         map((assetInfos) => new Map(assetInfos.map((assetInfo) => [assetInfo!.assetId, assetInfo!]))),
         tap((v) => (assetsMap = v))
