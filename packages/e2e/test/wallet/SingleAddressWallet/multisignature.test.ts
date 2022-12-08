@@ -1,30 +1,14 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { Cardano, nativeScriptPolicyId } from '@cardano-sdk/core';
-import { InMemoryKeyAgent, KeyRole, util } from '@cardano-sdk/key-management';
+import { KeyRole, util } from '@cardano-sdk/key-management';
 import { SingleAddressWallet } from '@cardano-sdk/wallet';
+import { createLogger } from '@cardano-sdk/util-dev';
+import { createStandaloneKeyAgent, submitAndConfirm, walletReady } from '../../util';
 import { filter, firstValueFrom } from 'rxjs';
-import { getEnv, walletVariables } from '../../environment';
-import { getLogger, getWallet } from '../../../src/factories';
-import { submitAndConfirm, walletReady } from '../../util';
+import { getEnv, getWallet, walletVariables } from '../../../src';
 
 const env = getEnv(walletVariables);
-const logger = getLogger(env.LOGGER_MIN_SEVERITY);
-
-/**
- * Gets a key agent from a random set of mnemonics and the network id.
- *
- * @param mnemonics The random set of mnemonics.
- * @param networkId the network id.
- */
-const getKeyAgent = async (mnemonics: string[], networkId: Cardano.NetworkId) =>
-  await InMemoryKeyAgent.fromBip39MnemonicWords(
-    {
-      getPassword: async () => Buffer.from(''),
-      mnemonicWords: mnemonics,
-      networkId
-    },
-    { inputResolver: { resolveInputAddress: async () => null } }
-  );
+const logger = createLogger();
 
 describe('SingleAddressWallet/multisignature', () => {
   let wallet: SingleAddressWallet;
@@ -39,10 +23,10 @@ describe('SingleAddressWallet/multisignature', () => {
 
     await walletReady(wallet);
 
-    const params = await firstValueFrom(wallet.genesisParameters$);
+    const genesis = await firstValueFrom(wallet.genesisParameters$);
 
-    const aliceKeyAgent = await getKeyAgent(util.generateMnemonicWords(), params.networkId);
-    const bobKeyAgent = await getKeyAgent(util.generateMnemonicWords(), params.networkId);
+    const aliceKeyAgent = await createStandaloneKeyAgent(util.generateMnemonicWords(), genesis);
+    const bobKeyAgent = await createStandaloneKeyAgent(util.generateMnemonicWords(), genesis);
 
     const derivationPath = {
       index: 0,

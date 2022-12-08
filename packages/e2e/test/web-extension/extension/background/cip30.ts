@@ -3,8 +3,9 @@ import { runtime } from 'webextension-polyfill';
 import { cip30 as walletCip30 } from '@cardano-sdk/wallet';
 
 import { authenticator } from './authenticator';
-import { logger, walletName } from '../util';
+import { logger } from '../util';
 import { wallet$ } from './walletManager';
+import { walletName } from '../const';
 
 // this should come from remote api
 const confirmationCallback: walletCip30.CallbackConfirmation = async () => true;

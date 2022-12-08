@@ -87,7 +87,8 @@ const createWallet = async (
           utxoProvider
         }
       );
-    }
+    },
+    logger
   });
   return wallet;
 };

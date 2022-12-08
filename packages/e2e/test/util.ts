@@ -17,10 +17,10 @@ import {
   throwError,
   timeout
 } from 'rxjs';
+import { InMemoryKeyAgent } from '@cardano-sdk/key-management';
 import { ObservableWallet, SignedTx, SingleAddressWallet, buildTx } from '@cardano-sdk/wallet';
-import { TestWallet, faucetProviderFactory, networkInfoProviderFactory } from '../src';
+import { TestWallet, faucetProviderFactory, getEnv, networkInfoProviderFactory, walletVariables } from '../src';
 import { assertTxIsValid } from '../../wallet/test/util';
-import { getEnv, walletVariables } from './environment';
 import { logger } from '@cardano-sdk/util-dev';
 import sortBy from 'lodash/sortBy';
 
@@ -231,3 +231,21 @@ export const submitCertificate = async (certificate: Cardano.Certificate, wallet
 
   return signedTx;
 };
+
+/**
+ * Creates a key agent from a given set of mnemonics and the network id.
+ * Input resolver always resolves to 'null', so this KeyAgent won't be able to determine
+ * payment keys when signing a transaction.
+ *
+ * @param mnemonics The random set of mnemonics.
+ * @param genesis Network genesis parameters
+ */
+export const createStandaloneKeyAgent = async (mnemonics: string[], genesis: Cardano.CompactGenesis) =>
+  await InMemoryKeyAgent.fromBip39MnemonicWords(
+    {
+      chainId: genesis,
+      getPassword: async () => Buffer.from(''),
+      mnemonicWords: mnemonics
+    },
+    { inputResolver: { resolveInputAddress: async () => null }, logger }
+  );

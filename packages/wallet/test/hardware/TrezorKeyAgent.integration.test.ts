@@ -46,8 +46,7 @@ describe('TrezorKeyAgent+SingleAddressWallet', () => {
       createKeyAgent: (dependencies) =>
         TrezorKeyAgent.createWithDevice(
           {
-            networkId: Cardano.NetworkId.testnet,
-            protocolMagic: 1_097_911_063,
+            chainId: Cardano.ChainIds.LegacyTestnet,
             trezorConfig: {
               communicationType: CommunicationType.Node,
               manifest: {
@@ -58,11 +57,13 @@ describe('TrezorKeyAgent+SingleAddressWallet', () => {
           },
           dependencies
         ),
-      createWallet
+      createWallet,
+      logger
     });
     const { wallet: restoredWallet } = await setupWallet({
       createKeyAgent: (dependencies) => restoreKeyAgent(freshKeyAgent.serializableData, dependencies),
-      createWallet
+      createWallet,
+      logger
     });
 
     expect(await getAddress(freshWallet)).toEqual(await getAddress(restoredWallet));

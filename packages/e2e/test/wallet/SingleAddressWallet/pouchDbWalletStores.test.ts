@@ -1,6 +1,5 @@
 import { filter, firstValueFrom } from 'rxjs';
-import { getEnv, walletVariables } from '../../environment';
-import { getWallet } from '../../../src/factories';
+import { getEnv, getWallet, walletVariables } from '../../../src';
 import { logger } from '@cardano-sdk/util-dev';
 import { storage } from '@cardano-sdk/wallet';
 import { waitForWalletStateSettle, walletReady } from '../../util';

@@ -1,16 +1,6 @@
 /* eslint-disable no-use-before-define */
-import {
-  BackgroundServices,
-  UserPromptService,
-  adaPriceProperties,
-  adaPriceServiceChannel,
-  logger,
-  observableWalletNames,
-  userPromptServiceChannel,
-  walletName
-} from './util';
+import { BackgroundServices, UserPromptService, adaPriceProperties, env, logger } from './util';
 import { Cardano } from '@cardano-sdk/core';
-import { InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
 import {
   RemoteApiPropertyType,
   WalletManagerUi,
@@ -18,6 +8,8 @@ import {
   consumeSupplyDistributionTracker,
   exposeApi
 } from '@cardano-sdk/web-extension';
+import { adaPriceServiceChannel, getObservableWalletName, userPromptServiceChannel, walletName } from './const';
+import { keyManagementFactory } from '../../../src';
 
 import { combineLatest, firstValueFrom, of } from 'rxjs';
 import { runtime } from 'webextension-polyfill';
@@ -101,8 +93,8 @@ const clearWalletValues = (): void => {
 const destroyWallets = async (): Promise<void> => {
   await walletManager.deactivate();
   clearWalletValues();
-  await walletManager.clearStore(observableWalletNames[0]);
-  await walletManager.clearStore(observableWalletNames[1]);
+  await walletManager.clearStore(getObservableWalletName(0));
+  await walletManager.clearStore(getObservableWalletName(1));
 };
 
 const walletManager = new WalletManagerUi({ walletName }, { logger, runtime });
@@ -114,44 +106,36 @@ const wallet = walletManager.wallet;
 wallet.addresses$.subscribe(([{ address }]) => setAddress(address.toString()));
 wallet.balance.utxo.available$.subscribe(({ coins }) => setBalance(coins.toString()));
 
-const getEnvMnemonics = (name: string) =>
-  (name === observableWalletNames[0] ? process.env.MNEMONIC_WORDS_WALLET1! : process.env.MNEMONIC_WORDS_WALLET2!).split(
-    ' '
-  );
-
-const createWallet = async (name: string) => {
+const createWallet = async (accountIndex: number) => {
   clearWalletValues();
 
   // setupWallet call is required to provide context (InputResolver) to the key agent
   const { keyAgent } = await setupWallet({
     createKeyAgent: async (dependencies) =>
-      util.createAsyncKeyAgent(
-        await InMemoryKeyAgent.fromBip39MnemonicWords(
+      (
+        await keyManagementFactory.create(
+          env.KEY_MANAGEMENT_PROVIDER,
           {
-            accountIndex: 0,
-            getPassword: async () => Buffer.from(''),
-            mnemonicWords: getEnvMnemonics(name),
-            networkId: 0
+            ...env.KEY_MANAGEMENT_PARAMS,
+            accountIndex
           },
-          dependencies
+          logger
         )
-      ),
-    createWallet: async () => wallet
+      )(dependencies),
+    createWallet: async () => wallet,
+    logger
   });
 
-  await walletManager.activate({ keyAgent, observableWalletName: name });
+  // TODO: remove observableWalletName here
+  await walletManager.activate({ keyAgent, observableWalletName: getObservableWalletName(accountIndex) });
 
   // Same wallet object will return different names, based on which wallet is active
   // Calling this method before any wallet is active, will resolve only once a wallet becomes active
   setName(await wallet.getName());
 };
 
-document
-  .querySelector('#activateWallet1')!
-  .addEventListener('click', async () => await createWallet(observableWalletNames[0]));
-document
-  .querySelector('#activateWallet2')!
-  .addEventListener('click', async () => await createWallet(observableWalletNames[1]));
+document.querySelector('#activateWallet1')!.addEventListener('click', async () => await createWallet(0));
+document.querySelector('#activateWallet2')!.addEventListener('click', async () => await createWallet(1));
 document.querySelector('#destroyWallets')!.addEventListener('click', async () => await destroyWallets());
 
 document.querySelector('#buildAndSignTx')!.addEventListener('click', async () => {

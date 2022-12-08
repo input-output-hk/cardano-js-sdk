@@ -56,8 +56,8 @@ export interface ProtocolParamsModel {
 }
 
 export interface GenesisData {
-  networkMagic: Cardano.CardanoNetworkMagic;
-  networkId: Cardano.CardanoNetworkId;
+  networkMagic: Cardano.NetworkMagic;
+  networkId: 'Mainnet' | 'Testnet';
   maxLovelaceSupply: Cardano.Lovelace;
   activeSlotsCoefficient: number;
   securityParameter: number;

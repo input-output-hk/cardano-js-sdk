@@ -6,7 +6,10 @@ export enum NetworkId {
   Testnet = 0
 }
 
-export enum CardanoNetworkMagic {
+/**
+ * Common Cardano NetworkMagics
+ */
+export enum NetworkMagics {
   Mainnet = 764_824_073,
   Preprod = 1,
   Preview = 2,
@@ -16,5 +19,34 @@ export enum CardanoNetworkMagic {
   Testnet = 1_097_911_063
 }
 
-export type CardanoNetworkId = keyof typeof CardanoNetworkMagic;
 export type NetworkMagic = number;
+
+/**
+ * Network identifier
+ */
+export interface ChainId {
+  networkId: NetworkId;
+  networkMagic: NetworkMagic;
+}
+
+/**
+ * Common Cardano ChainIds
+ */
+export const ChainIds = {
+  LegacyTestnet: {
+    networkId: NetworkId.Testnet,
+    networkMagic: NetworkMagics.Testnet
+  },
+  Mainnet: {
+    networkId: NetworkId.Mainnet,
+    networkMagic: NetworkMagics.Mainnet
+  },
+  Preprod: {
+    networkId: NetworkId.Testnet,
+    networkMagic: NetworkMagics.Preprod
+  },
+  Preview: {
+    networkId: NetworkId.Testnet,
+    networkMagic: NetworkMagics.Preview
+  }
+};

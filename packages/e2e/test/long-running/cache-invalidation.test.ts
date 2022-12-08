@@ -1,8 +1,7 @@
 /* eslint-disable max-statements */
 import { AddressType, KeyRole } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
-import { KeyAgentFactoryProps, TestWallet, getWallet } from '../../src';
-import { getEnv, walletVariables } from '../environment';
+import { KeyAgentFactoryProps, TestWallet, getEnv, getWallet, walletVariables } from '../../src';
 import {
   getTxConfirmationEpoch,
   submitCertificate,
@@ -17,10 +16,10 @@ const vrf = Cardano.VrfVkHex('2ee5a4c423224bb9c42107fc18a60556d6a83cec1d9dd37a71
 
 const wallet1Params: KeyAgentFactoryProps = {
   accountIndex: 0,
+  chainId: env.KEY_MANAGEMENT_PARAMS.chainId,
   mnemonic:
     // eslint-disable-next-line max-len
     'phrase raw learn suspect inmate powder combine apology regular hero gain chronic fruit ritual short screen goddess odor keen creek brand today kit machine',
-  networkId: Cardano.NetworkId.testnet,
   password: 'some_password'
 };
 

@@ -74,7 +74,8 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
           utxoProvider
         }
       );
-    }
+    },
+    logger
   });
   return wallet;
 };

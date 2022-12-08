@@ -1,5 +1,5 @@
-import { CardanoNetworkMagic, EpochNo, Slot } from '../Cardano';
 import { CustomError } from 'ts-custom-error';
+import { EpochNo, NetworkMagics, Slot } from '../Cardano';
 import { EraSummary } from '../CardanoNode';
 import groupBy from 'lodash/groupBy';
 import last from 'lodash/last';
@@ -19,7 +19,7 @@ export interface EpochInfo {
 
 export class EraSummaryError extends CustomError {}
 
-export type EraSummariesMap = { [key in CardanoNetworkMagic]: EraSummary[] };
+export type EraSummariesMap = { [key in NetworkMagics]: EraSummary[] };
 
 const createSlotEpochCalcImpl = (eraSummaries: EraSummary[]) => {
   // It's possible to configure when particular eras are upgraded, without an upgrade proposal, in

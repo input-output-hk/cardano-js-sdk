@@ -72,7 +72,8 @@ describe('SingleAddressWallet methods', () => {
             txSubmitProvider,
             utxoProvider
           }
-        )
+        ),
+      logger
     }));
     await waitForWalletStateSettle(wallet);
   });

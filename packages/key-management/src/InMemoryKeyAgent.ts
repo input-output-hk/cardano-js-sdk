@@ -28,7 +28,7 @@ export interface InMemoryKeyAgentProps extends Omit<SerializableInMemoryKeyAgent
 }
 
 export interface FromBip39MnemonicWordsProps {
-  networkId: Cardano.NetworkId;
+  chainId: Cardano.ChainId;
   mnemonicWords: string[];
   mnemonic2ndFactorPassphrase?: Uint8Array;
   getPassword: GetPassword;
@@ -77,7 +77,7 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
    */
   static async fromBip39MnemonicWords(
     {
-      networkId,
+      chainId,
       getPassword,
       mnemonicWords,
       mnemonic2ndFactorPassphrase = Buffer.from(''),
@@ -102,11 +102,11 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
     return new InMemoryKeyAgent(
       {
         accountIndex,
+        chainId,
         encryptedRootPrivateKeyBytes: [...encryptedRootPrivateKey],
         extendedAccountPublicKey,
         getPassword,
-        knownAddresses: [],
-        networkId
+        knownAddresses: []
       },
       dependencies
     );

@@ -9,19 +9,12 @@ import {
 } from '@cardano-sdk/web-extension';
 
 import { AsyncKeyAgent } from '@cardano-sdk/key-management';
-import { SingleAddressWallet, storage } from '@cardano-sdk/wallet';
-import {
-  assetProvider,
-  chainHistoryProvider,
-  networkInfoProvider,
-  rewardsProvider,
-  stakePoolProvider,
-  txSubmitProvider,
-  utxoProvider
-} from './config';
-import { logger, walletName } from '../util';
+import { env, logger } from '../util';
+import { getWallet } from '../../../../src';
 import { of } from 'rxjs';
 import { runtime } from 'webextension-polyfill';
+import { storage } from '@cardano-sdk/wallet';
+import { walletName } from '../const';
 
 /**
  * {@link WalletManagerActivateProps.provider} could be used to pass the necessary information
@@ -31,23 +24,17 @@ import { runtime } from 'webextension-polyfill';
 const walletFactory: WalletFactory = {
   create: async (
     props: WalletManagerActivateProps,
-    dependencies: { keyAgent: AsyncKeyAgent; stores: storage.WalletStores }
+    { keyAgent, stores }: { keyAgent: AsyncKeyAgent; stores: storage.WalletStores }
   ) =>
-    new SingleAddressWallet(
-      { name: props.observableWalletName },
-      {
-        assetProvider: await assetProvider,
-        chainHistoryProvider: await chainHistoryProvider,
-        keyAgent: dependencies.keyAgent,
+    (
+      await getWallet({
+        env,
+        keyAgent,
         logger,
-        networkInfoProvider: await networkInfoProvider,
-        rewardsProvider: await rewardsProvider,
-        stakePoolProvider: await stakePoolProvider,
-        stores: dependencies.stores,
-        txSubmitProvider: await txSubmitProvider,
-        utxoProvider: await utxoProvider
-      }
-    )
+        name: props.observableWalletName,
+        stores
+      })
+    ).wallet
 };
 
 const storesFactory: StoresFactory = {

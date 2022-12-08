@@ -1,5 +1,6 @@
 import { AddressType, InMemoryKeyAgent, KeyRole, SerializableInMemoryKeyAgentData, util } from '../src';
 import { CML, Cardano } from '@cardano-sdk/core';
+import { dummyLogger } from 'ts-log';
 
 jest.mock('../src/util/ownSignatureKeyPaths');
 const { ownSignatureKeyPaths } = jest.requireMock('../src/util/ownSignatureKeyPaths');
@@ -16,18 +17,18 @@ describe('InMemoryKeyAgent', () => {
     inputResolver = { resolveInputAddress: jest.fn() };
     keyAgent = await InMemoryKeyAgent.fromBip39MnemonicWords(
       {
+        chainId: Cardano.ChainIds.Preview,
         getPassword,
-        mnemonicWords,
-        networkId: Cardano.NetworkId.testnet
+        mnemonicWords
       },
-      { inputResolver }
+      { inputResolver, logger: dummyLogger }
     );
   });
 
   afterEach(() => getPassword.mockReset());
 
-  test('networkId', () => {
-    expect(typeof keyAgent.networkId).toBe('number');
+  test('chainId', () => {
+    expect(keyAgent.chainId).toEqual(Cardano.ChainIds.Preview);
   });
 
   test('__typename', () => {
@@ -41,12 +42,12 @@ describe('InMemoryKeyAgent', () => {
   test('fromBip39MnemonicWords with "mnemonic2ndFactorPassphrase" results in different key', async () => {
     const saferKeyAgent = await InMemoryKeyAgent.fromBip39MnemonicWords(
       {
+        chainId: Cardano.ChainIds.Preview,
         getPassword,
         mnemonic2ndFactorPassphrase: Buffer.from('passphrase'),
-        mnemonicWords,
-        networkId: Cardano.NetworkId.testnet
+        mnemonicWords
       },
-      { inputResolver }
+      { inputResolver, logger: dummyLogger }
     );
     expect(await saferKeyAgent.exportRootPrivateKey()).not.toEqual(await keyAgent.exportRootPrivateKey());
   });
@@ -61,7 +62,7 @@ describe('InMemoryKeyAgent', () => {
     it('all fields are of correct types', () => {
       expect(typeof serializableData.__typename).toBe('string');
       expect(typeof serializableData.accountIndex).toBe('number');
-      expect(typeof serializableData.networkId).toBe('number');
+      expect(typeof serializableData.chainId).toBe('object');
       expect(Array.isArray(serializableData.knownAddresses)).toBe(true);
       expect(serializableData.encryptedRootPrivateKeyBytes.length > 0).toBe(true);
     });
@@ -146,6 +147,7 @@ describe('InMemoryKeyAgent', () => {
       const keyAgentFromEncryptedKey = new InMemoryKeyAgent(
         {
           accountIndex: 0,
+          chainId: Cardano.ChainIds.Preview,
           encryptedRootPrivateKeyBytes: [...Buffer.from(yoroiEncryptedRootPrivateKeyHex, 'hex')],
           extendedAccountPublicKey: Cardano.Bip32PublicKey(
             Buffer.from(
@@ -159,10 +161,9 @@ describe('InMemoryKeyAgent', () => {
             ).toString('hex')
           ),
           getPassword,
-          knownAddresses: [],
-          networkId: Cardano.NetworkId.testnet
+          knownAddresses: []
         },
-        { inputResolver }
+        { inputResolver, logger: dummyLogger }
       );
       const exportedPrivateKeyHex = await keyAgentFromEncryptedKey.exportRootPrivateKey();
       expect(exportedPrivateKeyHex).toEqual(yoroiRootPrivateKeyHex);
@@ -171,14 +172,39 @@ describe('InMemoryKeyAgent', () => {
     it('can import yoroi 15-word mnemonic', async () => {
       const keyAgentFromMnemonic = await InMemoryKeyAgent.fromBip39MnemonicWords(
         {
+          chainId: Cardano.ChainIds.Preview,
           getPassword,
-          mnemonicWords: yoroiMnemonic,
-          networkId: Cardano.NetworkId.testnet
+          mnemonicWords: yoroiMnemonic
         },
-        { inputResolver }
+        { inputResolver, logger: dummyLogger }
       );
       const exportedPrivateKeyHex = await keyAgentFromMnemonic.exportRootPrivateKey();
       expect(exportedPrivateKeyHex).toEqual(yoroiRootPrivateKeyHex);
+    });
+
+    it('can sign correctly', async () => {
+      const michaelMnemonic =
+        // eslint-disable-next-line max-len
+        'defy draw planet sketch security bless chaos candy evolve pupil arrest dismiss involve orphan pass cross envelope burger ghost short rescue penalty song slush'.split(
+          ' '
+        );
+      const keyAgentFromMnemonic = await InMemoryKeyAgent.fromBip39MnemonicWords(
+        {
+          chainId: Cardano.ChainIds.Preview,
+          getPassword,
+          mnemonicWords: michaelMnemonic
+        },
+        { inputResolver, logger: dummyLogger }
+      );
+
+      ownSignatureKeyPaths.mockResolvedValue([{ index: 0, type: KeyRole.External }]);
+      const signature = await keyAgentFromMnemonic.signTransaction({
+        body: { fee: 10n, inputs: [], outputs: [], validityInterval: {} },
+        hash: Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000')
+      });
+      expect(
+        signature.has(Cardano.Ed25519PublicKey('0b1c96fad4179d7910bd9485ac28c4c11368c83d18d01b29d4cf84d8ff6a06c4'))
+      ).toBe(true);
     });
   });
 
@@ -220,6 +246,7 @@ describe('InMemoryKeyAgent', () => {
       const keyAgentFromEncryptedKey = new InMemoryKeyAgent(
         {
           accountIndex: 0,
+          chainId: Cardano.ChainIds.Preview,
           encryptedRootPrivateKeyBytes: [...Buffer.from(daedelusEncryptedRootPrivateKeyHex, 'hex')],
           extendedAccountPublicKey: Cardano.Bip32PublicKey(
             Buffer.from(
@@ -232,11 +259,11 @@ describe('InMemoryKeyAgent', () => {
                 .as_bytes()
             ).toString('hex')
           ),
-          getPassword: jest.fn().mockResolvedValue(Buffer.from('nMmys*X002')), // daedelus enforces min length of 10
-          knownAddresses: [],
-          networkId: Cardano.NetworkId.testnet
+          // daedelus enforces min length of 10
+          getPassword: jest.fn().mockResolvedValue(Buffer.from('nMmys*X002')),
+          knownAddresses: []
         },
-        { inputResolver }
+        { inputResolver, logger: dummyLogger }
       );
       const derivedAddress = await keyAgentFromEncryptedKey.deriveAddress({
         index: 1,
@@ -248,11 +275,11 @@ describe('InMemoryKeyAgent', () => {
     it('can import daedelus 24-word mnemonic to produce expected stake address', async () => {
       const keyAgentFromMnemonic = await InMemoryKeyAgent.fromBip39MnemonicWords(
         {
+          chainId: Cardano.ChainIds.Preview,
           getPassword,
-          mnemonicWords: daedelusMnemonic24,
-          networkId: Cardano.NetworkId.testnet
+          mnemonicWords: daedelusMnemonic24
         },
-        { inputResolver }
+        { inputResolver, logger: dummyLogger }
       );
       const derivedAddress = await keyAgentFromMnemonic.deriveAddress({
         index: 1,
