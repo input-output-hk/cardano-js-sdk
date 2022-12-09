@@ -172,6 +172,7 @@ export interface KeyAgent {
 export type AsyncKeyAgent = Pick<KeyAgent, 'deriveAddress' | 'derivePublicKey' | 'signBlob' | 'signTransaction'> & {
   knownAddresses$: Observable<GroupedAddress[]>;
   getChainId(): Promise<Cardano.ChainId>;
+  getExtendedAccountPublicKey(): Promise<Cardano.Bip32PublicKey>;
 } & Shutdown;
 
 /**
@@ -179,7 +180,7 @@ export type AsyncKeyAgent = Pick<KeyAgent, 'deriveAddress' | 'derivePublicKey' |
  */
 export type TransactionSignerResult = {
   /**
-   * The public key matching the private key that generate the signautre.
+   * The public key matching the private key that generate the signature.
    */
   pubKey: Cardano.Ed25519PublicKey;
 

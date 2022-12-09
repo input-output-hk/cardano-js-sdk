@@ -38,8 +38,8 @@ describe('WalletManagerUi', () => {
   );
 
   const mockKeyAgent = {
-    extendedAccountPublicKey: async () => Promise.resolve(pubKey),
-    getChainId: async () => Promise.resolve({ networkId: Cardano.NetworkId.Testnet, networkMagic: 888 })
+    getChainId: async () => Promise.resolve({ networkId: Cardano.NetworkId.Testnet, networkMagic: 888 }),
+    getExtendedAccountPublicKey: async () => Promise.resolve(pubKey)
   } as AsyncKeyAgent;
 
   beforeEach(() => {
@@ -90,9 +90,9 @@ describe('WalletManagerUi', () => {
 
     it('deactivates previous keyAgent when activating a new one', async () => {
       const anotherKeyAgent = {
-        extendedAccountPublicKey: async () => Promise.resolve(pubKey),
         getChainId: async () =>
-          Promise.resolve({ networkId: Cardano.NetworkId.Mainnet, networkMagic: Cardano.NetworkMagics.Mainnet })
+          Promise.resolve({ networkId: Cardano.NetworkId.Mainnet, networkMagic: Cardano.NetworkMagics.Mainnet }),
+        getExtendedAccountPublicKey: async () => Promise.resolve(pubKey)
       } as AsyncKeyAgent;
       await walletUi.activate({ keyAgent: anotherKeyAgent, observableWalletName: 'mainnet-wallet' });
       expect(keyAgentApiMock.shutdown).toHaveBeenCalledTimes(1);

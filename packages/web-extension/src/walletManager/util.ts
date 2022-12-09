@@ -20,7 +20,7 @@ export const walletManagerProperties: RemoteApiProperties<WalletManagerApi> = {
  */
 export const getWalletId = async (keyAgent: AsyncKeyAgent): Promise<string> => {
   const { networkId, networkMagic } = await keyAgent.getChainId();
-  const extendedAccountPublicKey = await keyAgent.extendedAccountPublicKey();
+  const extendedAccountPublicKey = await keyAgent.getExtendedAccountPublicKey();
   const pubKey = Buffer.from(extendedAccountPublicKey, 'hex');
   const pubKeyHash = blake2b(blake2b.BYTES_MIN).update(pubKey).digest('hex');
 

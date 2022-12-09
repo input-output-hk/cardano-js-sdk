@@ -9,8 +9,8 @@ describe('getWalletId', () => {
     networkMagic: Cardano.NetworkMagics.Preview
   };
   const mockKeyAgent = {
-    extendedAccountPublicKey: async () => Promise.resolve(pubKey),
-    getChainId: async () => Promise.resolve(chainId)
+    getChainId: async () => Promise.resolve(chainId),
+    getExtendedAccountPublicKey: async () => Promise.resolve(pubKey)
   } as AsyncKeyAgent;
 
   beforeEach(() => {
