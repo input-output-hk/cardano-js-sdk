@@ -25,5 +25,6 @@ export const testKeyAgent = async (
 export const testAsyncKeyAgent = async (
   addresses?: GroupedAddress[],
   dependencies: KeyAgentDependencies | undefined = mockKeyAgentDependencies(),
-  keyAgentReady = testKeyAgent(addresses, dependencies)
-) => util.createAsyncKeyAgent(await keyAgentReady);
+  keyAgentReady = testKeyAgent(addresses, dependencies),
+  shutdownSpy?: () => void
+) => util.createAsyncKeyAgent(await keyAgentReady, shutdownSpy);
