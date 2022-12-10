@@ -45,7 +45,7 @@ services:
       - node-ipc:/ipc
 
   cardano-db-sync:
-    image: inputoutput/cardano-db-sync:${CARDANO_DB_SYNC_VERSION:-13.0.4}
+    image: inputoutput/cardano-db-sync:${CARDANO_DB_SYNC_VERSION:-13.1.0.0}
     command:
       [
         "--config",
