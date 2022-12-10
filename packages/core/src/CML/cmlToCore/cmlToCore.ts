@@ -69,8 +69,12 @@ export const txIn = (input: CML.TransactionInput): Cardano.TxIn =>
 export const txOut = (output: CML.TransactionOutput): Cardano.TxOut =>
   usingAutoFree((scope) => {
     const dataHashBytes = scope.manage(scope.manage(output.datum())?.as_data_hash())?.to_bytes();
+    const cmlAddress = scope.manage(output.address());
+    const byronAddress = scope.manage(cmlAddress.as_byron());
+    const address = byronAddress ? byronAddress.to_base58() : cmlAddress.to_bech32();
+
     return {
-      address: Cardano.Address(scope.manage(output.address()).to_bech32()),
+      address: Cardano.Address(address),
       datum: dataHashBytes ? Cardano.util.Hash32ByteBase16.fromHexBlob(bytesToHex(dataHashBytes)) : undefined,
       value: value(scope.manage(output.amount()))
     };
