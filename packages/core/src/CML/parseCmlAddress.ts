@@ -9,7 +9,7 @@ export const parseCmlAddress = (scope: ManagedFreeableScope, input: string): CML
     return scope.manage(CML.Address.from_bech32(input));
   } catch {
     try {
-      return scope.manage(CML.ByronAddress.from_base58(input).to_address());
+      return scope.manage(scope.manage(CML.ByronAddress.from_base58(input)).to_address());
     } catch {
       return null;
     }
