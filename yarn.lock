@@ -2490,13 +2490,13 @@ __metadata:
     "@cardano-sdk/cardano-services-client": ^0.7.0-nightly.4
     "@cardano-sdk/core": ^0.7.0-nightly.4
     "@cardano-sdk/dapp-connector": ^0.6.1-nightly.5
-    "@cardano-sdk/key-management": ^0.3.0-nightly.1
+    "@cardano-sdk/key-management": ^0.3.0-nightly.2
     "@cardano-sdk/ogmios": ^0.7.0-nightly.4
     "@cardano-sdk/util": ^0.7.0-nightly.3
     "@cardano-sdk/util-dev": ^0.6.0-nightly.1
     "@cardano-sdk/util-rxjs": ^0.4.3-nightly.5
-    "@cardano-sdk/wallet": ^0.7.0-nightly.5
-    "@cardano-sdk/web-extension": ^0.7.0-nightly.5
+    "@cardano-sdk/wallet": ^0.7.0-nightly.6
+    "@cardano-sdk/web-extension": ^0.7.0-nightly.6
     "@dcspark/cardano-multiplatform-lib-browser": ^3.1.1
     "@emurgo/cardano-message-signing-asmjs": ^1.0.1
     "@types/bunyan": ^1.8.8
@@ -2595,7 +2595,7 @@ __metadata:
   resolution: "@cardano-sdk/governance@workspace:packages/governance"
   dependencies:
     "@cardano-sdk/core": ^0.7.0-nightly.4
-    "@cardano-sdk/key-management": ^0.3.0-nightly.1
+    "@cardano-sdk/key-management": ^0.3.0-nightly.2
     "@cardano-sdk/util": ^0.7.0-nightly.3
     blake2b: ^2.1.4
     delay: ^5.0.0
@@ -2631,7 +2631,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cardano-sdk/key-management@^0.3.0-nightly.1, @cardano-sdk/key-management@workspace:packages/key-management":
+"@cardano-sdk/key-management@^0.3.0-nightly.2, @cardano-sdk/key-management@workspace:packages/key-management":
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/key-management@workspace:packages/key-management"
   dependencies:
@@ -2798,7 +2798,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cardano-sdk/wallet@^0.7.0-nightly.5, @cardano-sdk/wallet@workspace:packages/wallet":
+"@cardano-sdk/wallet@^0.7.0-nightly.6, @cardano-sdk/wallet@workspace:packages/wallet":
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/wallet@workspace:packages/wallet"
   dependencies:
@@ -2807,7 +2807,7 @@ __metadata:
     "@cardano-sdk/core": ^0.7.0-nightly.4
     "@cardano-sdk/dapp-connector": ^0.6.1-nightly.5
     "@cardano-sdk/input-selection": ^0.7.0-nightly.3
-    "@cardano-sdk/key-management": ^0.3.0-nightly.1
+    "@cardano-sdk/key-management": ^0.3.0-nightly.2
     "@cardano-sdk/ogmios": ^0.7.0-nightly.4
     "@cardano-sdk/util": ^0.7.0-nightly.3
     "@cardano-sdk/util-dev": ^0.6.0-nightly.1
@@ -2838,17 +2838,17 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cardano-sdk/web-extension@^0.7.0-nightly.5, @cardano-sdk/web-extension@workspace:packages/web-extension":
+"@cardano-sdk/web-extension@^0.7.0-nightly.6, @cardano-sdk/web-extension@workspace:packages/web-extension":
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/web-extension@workspace:packages/web-extension"
   dependencies:
     "@cardano-sdk/core": ^0.7.0-nightly.4
     "@cardano-sdk/dapp-connector": ^0.6.1-nightly.5
-    "@cardano-sdk/key-management": ^0.3.0-nightly.1
+    "@cardano-sdk/key-management": ^0.3.0-nightly.2
     "@cardano-sdk/util": ^0.7.0-nightly.3
     "@cardano-sdk/util-dev": ^0.6.0-nightly.1
     "@cardano-sdk/util-rxjs": ^0.4.3-nightly.5
-    "@cardano-sdk/wallet": ^0.7.0-nightly.5
+    "@cardano-sdk/wallet": ^0.7.0-nightly.6
     "@types/lodash": ^4.14.182
     "@types/uuid": ^8.3.4
     "@types/webextension-polyfill": ^0.8.0

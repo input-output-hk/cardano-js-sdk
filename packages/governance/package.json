@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/governance",
-  "version": "0.2.1-nightly.5",
+  "version": "0.2.1-nightly.6",
   "description": "Governance types and utilities for Cardano",
   "engines": {
     "node": ">=14.20.1"
@@ -60,7 +60,7 @@
   },
   "dependencies": {
     "@cardano-sdk/core": "^0.7.0-nightly.4",
-    "@cardano-sdk/key-management": "^0.3.0-nightly.1",
+    "@cardano-sdk/key-management": "^0.3.0-nightly.2",
     "@cardano-sdk/util": "^0.7.0-nightly.3",
     "blake2b": "^2.1.4"
   },

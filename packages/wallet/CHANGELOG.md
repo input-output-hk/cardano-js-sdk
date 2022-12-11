@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.7.0-nightly.5...@cardano-sdk/wallet@0.7.0-nightly.6) (2022-12-11)
+
+### Bug Fixes
+
+- **wallet:** the SingleAddressWallet now shuts down the RewardsProvider on shutdown ([c1bc43b](https://github.com/input-output-hk/cardano-js-sdk/commit/c1bc43b492457fb5c16a8435be428e241859a7d1))
+
 ## [0.7.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.7.0-nightly.4...@cardano-sdk/wallet@0.7.0-nightly.5) (2022-12-07)
 
 ### ⚠ BREAKING CHANGES
