@@ -38,7 +38,7 @@ const walletFactory: WalletFactory = {
 };
 
 const storesFactory: StoresFactory = {
-  create: ({ observableWalletName }) => storage.createPouchDbWalletStores(observableWalletName, { logger })
+  create: ({ walletId }) => storage.createPouchDbWalletStores(walletId, { logger })
 };
 
 export const wallet$ = (() => {

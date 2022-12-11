@@ -1,17 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AsyncKeyAgent } from '@cardano-sdk/key-management';
+import { Cardano } from '@cardano-sdk/core';
 import { logger } from '@cardano-sdk/util-dev';
 
 import {
   WalletManagerUi,
   consumeRemoteApi,
   exposeApi,
+  getWalletId,
   keyAgentChannel,
   walletChannel,
   walletManagerChannel
 } from '../../src';
 
-const consumeApiMock = { activate: jest.fn(), clearStore: jest.fn(), deactivate: jest.fn(), shutdown: jest.fn() };
+const consumeApiMock = { activate: jest.fn(), deactivate: jest.fn(), destroy: jest.fn(), shutdown: jest.fn() };
 const keyAgentApiMock = { shutdown: jest.fn() };
 jest.mock('../../src/messaging', () => {
   const originalModule = jest.requireActual('../../src/messaging');
@@ -29,6 +31,16 @@ describe('WalletManagerUi', () => {
   const observableWalletName = 'preprod-wallet';
   const exposeApiMock = exposeApi as jest.Mock;
   const consumeRemoteApiMock = consumeRemoteApi as jest.Mock;
+
+  const pubKey = Cardano.Bip32PublicKey(
+    // eslint-disable-next-line max-len
+    '3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d'
+  );
+
+  const mockKeyAgent = {
+    extendedAccountPublicKey: async () => Promise.resolve(pubKey),
+    getChainId: async () => Promise.resolve({ networkId: Cardano.NetworkId.Testnet, networkMagic: 888 })
+  } as AsyncKeyAgent;
 
   beforeEach(() => {
     walletUi = new WalletManagerUi(
@@ -53,37 +65,50 @@ describe('WalletManagerUi', () => {
   });
 
   describe('activate', () => {
+    let walletId: string;
+
     beforeEach(async () => {
-      await walletUi.activate({ keyAgent: {} as AsyncKeyAgent, observableWalletName });
+      walletId = await getWalletId(mockKeyAgent);
+      await walletUi.activate({ keyAgent: mockKeyAgent, observableWalletName });
     });
 
-    it('opens unique key agent channel based on observable wallet name', () => {
+    it('opens unique key agent channel based keyAgent chainId and root public key hash name', () => {
       expect(exposeApiMock).toHaveBeenCalledTimes(1);
       expect(exposeApiMock.mock.calls[0][0]).toEqual(
-        expect.objectContaining({ baseChannel: keyAgentChannel(observableWalletName) })
+        expect.objectContaining({ baseChannel: keyAgentChannel(walletId) })
       );
     });
 
     it('forwards call to wallet manager api', () => {
-      expect(consumeApiMock.activate).toHaveBeenCalledWith(expect.objectContaining({ observableWalletName }));
+      expect(consumeApiMock.activate).toHaveBeenCalledWith(expect.objectContaining({ observableWalletName, walletId }));
     });
 
     it('does not activate same wallet twice', async () => {
-      await walletUi.activate({ keyAgent: {} as AsyncKeyAgent, observableWalletName });
-      expect(exposeApiMock).toHaveBeenCalledTimes(1);
+      await walletUi.activate({ keyAgent: mockKeyAgent, observableWalletName });
+      expect(consumeApiMock.activate).toHaveBeenCalledTimes(1);
     });
 
-    it('deactivates previous wallet when activating a new one', async () => {
-      const anotherObsWallet = 'preview-wallet';
-      await walletUi.activate({ keyAgent: {} as AsyncKeyAgent, observableWalletName: anotherObsWallet });
+    it('deactivates previous keyAgent when activating a new one', async () => {
+      const anotherKeyAgent = {
+        extendedAccountPublicKey: async () => Promise.resolve(pubKey),
+        getChainId: async () =>
+          Promise.resolve({ networkId: Cardano.NetworkId.Mainnet, networkMagic: Cardano.NetworkMagics.Mainnet })
+      } as AsyncKeyAgent;
+      await walletUi.activate({ keyAgent: anotherKeyAgent, observableWalletName: 'mainnet-wallet' });
       expect(keyAgentApiMock.shutdown).toHaveBeenCalledTimes(1);
       expect(exposeApiMock).toHaveBeenCalledTimes(2);
+    });
+
+    it('destroy: deactivates keyAgent and forwards call to wallet manager api', async () => {
+      await walletUi.destroy();
+      expect(keyAgentApiMock.shutdown).toHaveBeenCalledTimes(1);
+      expect(consumeApiMock.destroy).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('deactivate', () => {
     beforeEach(async () => {
-      await walletUi.activate({ keyAgent: {} as AsyncKeyAgent, observableWalletName });
+      await walletUi.activate({ keyAgent: mockKeyAgent, observableWalletName });
       await walletUi.deactivate();
     });
 
@@ -101,13 +126,8 @@ describe('WalletManagerUi', () => {
     });
   });
 
-  it('clearStore: forwards call to wallet manager api', async () => {
-    await walletUi.clearStore(observableWalletName);
-    expect(consumeApiMock.clearStore).toHaveBeenCalledWith(observableWalletName);
-  });
-
   it('shutdown: closes all channels', async () => {
-    await walletUi.activate({ keyAgent: {} as AsyncKeyAgent, observableWalletName });
+    await walletUi.activate({ keyAgent: mockKeyAgent, observableWalletName });
 
     walletUi.shutdown();
     expect(consumeApiMock.shutdown).toHaveBeenCalledTimes(2);

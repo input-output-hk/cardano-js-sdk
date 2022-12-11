@@ -19,7 +19,8 @@ describe('wallet', () => {
   const btnGrantAccess = '#requestAccessGrant';
   const btnActivateWallet1 = '#activateWallet1';
   const btnActivateWallet2 = '#activateWallet2';
-  const destroyWallets = '#destroyWallets';
+  const deactivateWallet = '#deactivateWallet';
+  const destroyWallet = '#destroyWallet';
   const spanAddress = '#address';
   const spanBalance = '#balance';
   const spanSupplyDistribution = '#supplyDistribution';
@@ -86,6 +87,7 @@ describe('wallet', () => {
         await buildAndSign();
       });
       it('can switch to another wallet', async () => {
+        // Automatically deactivates first wallet, but keeps the store available for future activation
         await $(btnActivateWallet2).click();
         await expect($(spanAddress)).not.toHaveTextContaining(walletAddr1);
         await expect($(spanAddress)).toHaveTextContaining('addr');
@@ -97,14 +99,16 @@ describe('wallet', () => {
         await buildAndSign();
       });
 
-      it('can switch back to the first wallet', async () => {
+      it('can destroy second wallet before switching back to the first wallet', async () => {
+        // Destroy also clears associated store. Store will be rebuilt during future activation of same wallet
+        await $(destroyWallet).click();
         await $(btnActivateWallet1).click();
         await expect($(spanAddress)).toHaveTextContaining(walletAddr1);
         await expect($(activeWalletName)).toHaveText(getObservableWalletName(0));
       });
 
-      it('can deactivate the wallet and clear the stores', async () => {
-        await $(destroyWallets).click();
+      it('can deactivate the wallet but keep the store', async () => {
+        await $(deactivateWallet).click();
         await expect($(spanAddress)).toHaveText('-');
       });
     });

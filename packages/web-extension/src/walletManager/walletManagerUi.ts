@@ -1,22 +1,25 @@
+import { AsyncKeyAgent } from '@cardano-sdk/key-management';
 import { ObservableWallet } from '@cardano-sdk/wallet';
 import { Shutdown } from '@cardano-sdk/util';
 
-import { AsyncKeyAgent } from '@cardano-sdk/key-management';
 import { MessengerDependencies, consumeRemoteApi } from '../messaging';
 import { WalletManagerActivateProps, WalletManagerApi, WalletManagerProps } from './walletManager.types';
 import { exposeKeyAgent } from '../keyAgent';
+import { getWalletId, walletChannel, walletManagerChannel, walletManagerProperties } from './util';
 import { observableWalletProperties } from '../observableWallet';
-import { walletChannel, walletManagerChannel, walletManagerProperties } from './util';
 
 /**
  * Helper class for UI scripts.
  * Provides ObservableWallet activation/deactivation functionality while exposing a single ObservableWallet object.
+ * Not implementing the {@link WalletManagerApi} interface is intentional. {@link WalletManagerApi} `activate` method
+ * requires a unique `walletId`, which is calculated by {@link WalletManagerUi} before passing the message to
+ * {@link WalletManagerWorker}. It is not meant to be calculated or maintained by the user.
  */
-export class WalletManagerUi implements Shutdown, WalletManagerApi {
+export class WalletManagerUi implements Shutdown {
   #remoteApi: WalletManagerApi & Shutdown;
   #dependencies: MessengerDependencies;
   #keyAgentApi: Shutdown | null = null;
-  #activeWalletName: string | null = null;
+  #activeWalletId: string | null = null;
 
   /**
    * Observable wallet. Its properties can be subscribed to at any point, even before activating a wallet.
@@ -37,14 +40,23 @@ export class WalletManagerUi implements Shutdown, WalletManagerApi {
     );
   }
 
-  /** {@link wallet} observable properties will emit from this new wallet */
-  activate(props: WalletManagerActivateProps & { keyAgent: AsyncKeyAgent }): Promise<void> {
-    const { keyAgent, observableWalletName, provider } = props;
+  /**
+   * Create and activate a new ObservableWallet.
+   * Reuses the store if the wallet was previously deactivated but not destroyed.
+   * {@link wallet} observable properties will emit from this new wallet
+   */
+  async activate(
+    props: Pick<WalletManagerActivateProps, 'provider' | 'observableWalletName'> & { keyAgent: AsyncKeyAgent }
+  ): Promise<void> {
+    const { keyAgent, provider, observableWalletName } = props;
     const { logger, runtime } = this.#dependencies;
-    if (this.#activeWalletName === observableWalletName) {
+    const walletId = await getWalletId(keyAgent);
+
+    if (this.#activeWalletId === walletId) {
       // Don't activate same wallet twice
       return Promise.resolve();
     }
+    this.#activeWalletId = walletId;
 
     // activate could be called without calling deactivate first
     this.#shutdownKeyAgent();
@@ -52,25 +64,28 @@ export class WalletManagerUi implements Shutdown, WalletManagerApi {
     this.#keyAgentApi = exposeKeyAgent(
       {
         keyAgent,
-        walletName: observableWalletName
+        walletName: walletId // Not using observableWalletName because we want unique channels
       },
       { logger, runtime }
     );
 
-    this.#activeWalletName = observableWalletName;
     // Do not pass the whole props object here.
     // It contains `keyAgent` and that causes errors in the remoteApi, probably because it's not part of the api
-    return this.#remoteApi.activate({ observableWalletName, provider });
+    return this.#remoteApi.activate({ observableWalletName, provider, walletId });
   }
 
+  /** {@link WalletManagerApi.deactivate} */
   deactivate(): Promise<void> {
-    this.#activeWalletName = null;
+    this.#activeWalletId = null;
     this.#shutdownKeyAgent();
     return this.#remoteApi.deactivate();
   }
 
-  clearStore(observableWalletName: string): Promise<void> {
-    return this.#remoteApi.clearStore(observableWalletName);
+  /** {@link WalletManagerApi.destroy} */
+  destroy(): Promise<void> {
+    this.#activeWalletId = null;
+    this.#shutdownKeyAgent();
+    return this.#remoteApi.destroy();
   }
 
   /** Closes wallet and manager messaging channels */

@@ -90,11 +90,14 @@ const clearWalletValues = (): void => {
   setSignature('-');
 };
 
-const destroyWallets = async (): Promise<void> => {
+const destroyWallet = async (): Promise<void> => {
+  await walletManager.destroy();
+  clearWalletValues();
+};
+
+const deactivateWallet = async (): Promise<void> => {
   await walletManager.deactivate();
   clearWalletValues();
-  await walletManager.clearStore(getObservableWalletName(0));
-  await walletManager.clearStore(getObservableWalletName(1));
 };
 
 const walletManager = new WalletManagerUi({ walletName }, { logger, runtime });
@@ -126,7 +129,7 @@ const createWallet = async (accountIndex: number) => {
     logger
   });
 
-  // TODO: remove observableWalletName here
+  await walletManager.destroy();
   await walletManager.activate({ keyAgent, observableWalletName: getObservableWalletName(accountIndex) });
 
   // Same wallet object will return different names, based on which wallet is active
@@ -136,7 +139,8 @@ const createWallet = async (accountIndex: number) => {
 
 document.querySelector('#activateWallet1')!.addEventListener('click', async () => await createWallet(0));
 document.querySelector('#activateWallet2')!.addEventListener('click', async () => await createWallet(1));
-document.querySelector('#destroyWallets')!.addEventListener('click', async () => await destroyWallets());
+document.querySelector('#deactivateWallet')!.addEventListener('click', async () => await deactivateWallet());
+document.querySelector('#destroyWallet')!.addEventListener('click', async () => await destroyWallet());
 
 document.querySelector('#buildAndSignTx')!.addEventListener('click', async () => {
   const [{ address: ownAddress }] = await firstValueFrom(wallet.addresses$);

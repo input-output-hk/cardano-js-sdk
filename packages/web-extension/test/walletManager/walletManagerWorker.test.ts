@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { EMPTY, firstValueFrom } from 'rxjs';
 import { ObservableWallet } from '@cardano-sdk/wallet';
 import { logger } from '@cardano-sdk/util-dev';
 
 import { WalletFactory, WalletManagerWorker, keyAgentChannel } from '../../src';
 import { consumeRemoteApi, exposeApi } from '../../src/messaging';
-import { firstValueFrom } from 'rxjs';
 
 jest.mock('../../src/messaging', () => {
   const originalModule = jest.requireActual('../../src/messaging');
@@ -23,9 +23,15 @@ const expectWalletChannelClosed = () => {
 
 describe('WalletManagerWorker', () => {
   const observableWalletName = 'dummyWallet';
+  const walletId =
+    // eslint-disable-next-line max-len
+    '0-2-da7b4795b11a79116eb5232c83d2c862';
   let walletManager: WalletManagerWorker;
   let walletFactoryCreate: jest.Mock;
   let mockWallet: ObservableWallet;
+
+  const mockStoreA = { destroy: jest.fn().mockReturnValue(EMPTY), id: `${walletId}-A` };
+  const mockStoreB = { destroy: jest.fn().mockReturnValue(EMPTY), id: `${walletId}-B` };
 
   const expectWalletDeactivated = () => {
     const keyAgentSubscription = consumeRemoteApi({} as any, {} as any);
@@ -35,7 +41,6 @@ describe('WalletManagerWorker', () => {
 
   beforeEach(() => {
     mockWallet = {
-      getName: jest.fn().mockResolvedValue(observableWalletName),
       shutdown: jest.fn()
     } as unknown as ObservableWallet;
 
@@ -48,10 +53,7 @@ describe('WalletManagerWorker', () => {
         logger,
         runtime: { connect: jest.fn(), onConnect: jest.fn() as any },
         storesFactory: {
-          create: jest
-            .fn()
-            .mockReturnValueOnce({ id: `${observableWalletName}-A` })
-            .mockReturnValueOnce({ id: `${observableWalletName}-B` })
+          create: jest.fn().mockReturnValueOnce(mockStoreA).mockReturnValueOnce(mockStoreB)
         },
         walletFactory
       }
@@ -68,13 +70,13 @@ describe('WalletManagerWorker', () => {
 
   describe('activate', () => {
     beforeEach(async () => {
-      await walletManager.activate({ observableWalletName });
+      await walletManager.activate({ observableWalletName, walletId });
     });
 
     it('consumes keyAgent messenger associated with the wallet', async () => {
       const consumeRemoteApiMock = consumeRemoteApi as jest.Mock;
       expect(consumeRemoteApiMock.mock.calls[0][0]).toEqual(
-        expect.objectContaining({ baseChannel: keyAgentChannel(observableWalletName) })
+        expect.objectContaining({ baseChannel: keyAgentChannel(walletId) })
       );
     });
 
@@ -85,16 +87,15 @@ describe('WalletManagerWorker', () => {
     it('persists the store when activating multiple times', async () => {
       const storesFirstActivation = walletFactoryCreate.mock.calls[0][1].stores;
       await walletManager.deactivate();
-      await walletManager.activate({ observableWalletName });
+      await walletManager.activate({ observableWalletName, walletId });
       const storesSecondActivation = walletFactoryCreate.mock.calls[1][1].stores;
       expect(storesFirstActivation).toBe(storesSecondActivation);
     });
 
     it('recreates the store if it was cleared', async () => {
       const storesFirstActivation = walletFactoryCreate.mock.calls[0][1].stores;
-      await walletManager.deactivate();
-      await walletManager.clearStore(observableWalletName);
-      await walletManager.activate({ observableWalletName });
+      await walletManager.destroy();
+      await walletManager.activate({ observableWalletName, walletId });
       const storesSecondActivation = walletFactoryCreate.mock.calls[1][1].stores;
       expect(storesFirstActivation).not.toBe(storesSecondActivation);
     });
@@ -105,24 +106,29 @@ describe('WalletManagerWorker', () => {
     });
 
     it('does not activate same wallet twice', async () => {
-      await walletManager.activate({ observableWalletName });
+      await walletManager.activate({ observableWalletName, walletId });
       expect(walletFactoryCreate).toHaveBeenCalledTimes(1);
     });
 
     it('deactivates previous wallet when activating a new one', async () => {
-      await walletManager.activate({ observableWalletName: 'secondWallet' });
+      await walletManager.activate({ observableWalletName, walletId: 'another-id' });
       expectWalletDeactivated();
+    });
+
+    it('destroys store on destroy active wallet', async () => {
+      await walletManager.destroy();
+      expect(mockStoreA.destroy).toHaveBeenCalledTimes(1);
     });
   });
 
   it('deactivate shuts down the active wallet and key agent remote api', async () => {
-    await walletManager.activate({ observableWalletName });
+    await walletManager.activate({ observableWalletName, walletId });
     await walletManager.deactivate();
     expectWalletDeactivated();
   });
 
   it('shutdown deactivates wallet, key agent and wallet remote apis', async () => {
-    await walletManager.activate({ observableWalletName });
+    await walletManager.activate({ observableWalletName, walletId });
     walletManager.shutdown();
     expectWalletDeactivated();
     expectWalletChannelClosed();
