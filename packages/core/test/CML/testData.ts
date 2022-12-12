@@ -1,6 +1,11 @@
 import { Cardano } from '../../src';
-import { Ed25519KeyHash } from '../../src/Cardano';
-
+import {
+  Ed25519KeyHash,
+  NativeScriptKind,
+  PlutusLanguageVersion,
+  RedeemerPurpose,
+  ScriptType
+} from '../../src/Cardano';
 export const rewardAccount = Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
 export const stakeKeyHash = Ed25519KeyHash.fromRewardAccount(rewardAccount);
 export const poolId = Cardano.PoolId('pool1mpgg03jxj52qwxvvy7cmj58a96vl9pvxcqqvuw0kumheygxmn34');
@@ -136,6 +141,102 @@ export const tx: Cardano.Tx = {
   body: txBody,
   id: Cardano.TransactionId('8d2feeab1087e0aa4ad06e878c5269eaa2edcef5264bcc97542a28c189b2cbc5'),
   witness: {
+    // bootstrap values from ogmios.wsp.json
+    bootstrap: [
+      {
+        addressAttributes: Cardano.util.Base64Blob('oA=='),
+        chainCode: Cardano.util.HexBlob('b6dbf0b03c93afe5696f10d49e8a8304ebfac01deeb8f82f2af5836ebbc1b450'),
+        key: Cardano.Ed25519PublicKey('deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01'),
+        signature: Cardano.Ed25519Signature(
+          Buffer.from(
+            'ZGdic3hnZ3RvZ2hkanB0ZXR2dGtjb2N2eWZpZHFxZ2d1cmpocmhxYWlpc3BxcnVlbGh2eXBxeGVld3ByeWZ2dw==',
+            'base64'
+          ).toString('hex')
+        )
+      }
+    ],
+    datums: [Cardano.util.HexBlob('187b')],
+    redeemers: [
+      {
+        data: Cardano.util.HexBlob('d86682008101'),
+        executionUnits: {
+          memory: 3000,
+          steps: 7000
+        },
+        index: 0,
+        purpose: RedeemerPurpose.mint
+      },
+      {
+        data: Cardano.util.HexBlob('d86682008102'),
+        executionUnits: {
+          memory: 5000,
+          steps: 2000
+        },
+        index: 1,
+        purpose: RedeemerPurpose.certificate
+      }
+    ],
+    scripts: [
+      {
+        __type: ScriptType.Plutus,
+        bytes: Cardano.util.HexBlob('b6dbf0b03c93afe5696f10d49e8a8304ebfac01deeb8f82f2af5836ebbc1b450'),
+        version: PlutusLanguageVersion.V1
+      },
+      {
+        __type: ScriptType.Plutus,
+        bytes: Cardano.util.HexBlob('b6dbf0b03c93afe5696f10d49e8a8304ebfac01deeb8f82f2af5836ebbc1b450'),
+        version: PlutusLanguageVersion.V2
+      },
+      {
+        __type: ScriptType.Native,
+        kind: NativeScriptKind.RequireTimeBefore,
+        slot: Cardano.Slot(100)
+      },
+      {
+        __type: ScriptType.Native,
+        kind: NativeScriptKind.RequireTimeAfter,
+        slot: Cardano.Slot(500)
+      },
+      {
+        __type: ScriptType.Native,
+        keyHash: Cardano.Ed25519KeyHash('b5ae663aaea8e500157bdf4baafd6f5ba0ce5759f7cd4101fc132f54'),
+        kind: NativeScriptKind.RequireSignature
+      },
+      {
+        __type: ScriptType.Native,
+        kind: NativeScriptKind.RequireAllOf,
+        scripts: [
+          {
+            __type: ScriptType.Native,
+            keyHash: Cardano.Ed25519KeyHash('b5ae663aaea8e500157bdf4baafd6f5ba0ce5759f7cd4101fc132f54'),
+            kind: NativeScriptKind.RequireSignature
+          }
+        ]
+      },
+      {
+        __type: ScriptType.Native,
+        kind: NativeScriptKind.RequireAnyOf,
+        scripts: [
+          {
+            __type: ScriptType.Native,
+            keyHash: Cardano.Ed25519KeyHash('b5ae663aaea8e500157bdf4baafd6f5ba0ce5759f7cd4101fc132f54'),
+            kind: NativeScriptKind.RequireSignature
+          }
+        ]
+      },
+      {
+        __type: ScriptType.Native,
+        kind: NativeScriptKind.RequireNOf,
+        required: 1,
+        scripts: [
+          {
+            __type: ScriptType.Native,
+            keyHash: Cardano.Ed25519KeyHash('b5ae663aaea8e500157bdf4baafd6f5ba0ce5759f7cd4101fc132f54'),
+            kind: NativeScriptKind.RequireSignature
+          }
+        ]
+      }
+    ],
     signatures: new Map([[Cardano.Ed25519PublicKey(vkey), Cardano.Ed25519Signature(signature)]])
   }
 };
