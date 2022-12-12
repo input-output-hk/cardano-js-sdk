@@ -1,7 +1,17 @@
 import { Cardano, cmlToCore, coreToCml } from '../../src';
 import { ManagedFreeableScope } from '@cardano-sdk/util';
 import { NativeScript } from '@dcspark/cardano-multiplatform-lib-nodejs';
-import { mintTokenMap, tx, txBody, txIn, txInWithAddress, txOut, valueCoinOnly, valueWithAssets } from './testData';
+import {
+  mintTokenMap,
+  tx,
+  txBody,
+  txIn,
+  txInWithAddress,
+  txOut,
+  txOutWithByron,
+  valueCoinOnly,
+  valueWithAssets
+} from './testData';
 
 describe('cmlToCore', () => {
   let scope: ManagedFreeableScope;
@@ -34,8 +44,14 @@ describe('cmlToCore', () => {
     });
   });
 
-  it('txOut', () => {
-    expect(cmlToCore.txOut(coreToCml.txOut(scope, txOut))).toEqual(txOut);
+  describe('txOut', () => {
+    it('can convert a CML.TransactionOutput which contains a Shelley address to Core.TxOut', () => {
+      expect(cmlToCore.txOut(coreToCml.txOut(scope, txOut))).toEqual(txOut);
+    });
+
+    it('can convert a CML.TransactionOutput which contains a Byron address to Core.TxOut', () => {
+      expect(cmlToCore.txOut(coreToCml.txOut(scope, txOutWithByron))).toEqual(txOutWithByron);
+    });
   });
 
   it('utxo', () => {
