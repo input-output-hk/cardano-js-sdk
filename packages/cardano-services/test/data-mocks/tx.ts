@@ -18,7 +18,7 @@ export const txOutBase: Omit<Cardano.TxOut, 'value' | 'datum'> = {
 
 export const txOutBaseWithDatum: Omit<Cardano.TxOut, 'value'> = {
   ...txOutBase,
-  datum: Cardano.util.Hash32ByteBase16('c5dfa8c3cbd5a959829618a7b46e163078cb3f1b39f152514d0c3686d553529a')
+  datumHash: Cardano.util.Hash32ByteBase16('c5dfa8c3cbd5a959829618a7b46e163078cb3f1b39f152514d0c3686d553529a')
 };
 
 export const txOutWithCoinOnly: Cardano.TxOut = { ...txOutBase, value: valueWithCoinOnly };
@@ -183,7 +183,7 @@ export const txOut = {
   address:
     // eslint-disable-next-line max-len
     'addr_test1qpv5muwgjmmtqh2ta0kq9pmz0nurg9kmw7dryueqt57mncynjnzmk67fvy2unhzydrgzp2v6hl625t0d4qd5h3nxt04qu0ww7k',
-  datum: undefined,
+  datumHash: undefined,
   index: 0,
   txId: '59f3ea1bb67b39447aad523f35daa1950c833472bf9232b6c0abac968f45bad9',
   value: { assets: undefined, coins: 3_061_089_499_500n }

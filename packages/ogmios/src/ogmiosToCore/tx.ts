@@ -249,15 +249,21 @@ const mapTxIn = (txIn: Schema.TxIn): Cardano.TxIn => ({
   txId: Cardano.TransactionId(txIn.txId)
 });
 
-const mapDatum = (datum: Schema.TxOut['datum']) => {
+const mapInlineDatum = (datum: Schema.TxOut['datum']) => {
+  if (typeof datum !== 'string') return;
+  return Cardano.util.HexBlob(datum);
+};
+
+const mapDatumHash = (datum: Schema.TxOut['datumHash']) => {
   if (!datum) return;
-  if (typeof datum === 'string') return Cardano.util.Hash32ByteBase16(datum);
-  if (typeof datum === 'object') return Cardano.util.Hash32ByteBase16(JSON.stringify(datum));
+  return Cardano.util.Hash32ByteBase16(datum);
 };
 
 const mapTxOut = (txOut: Schema.TxOut): Cardano.TxOut => ({
   address: Cardano.Address(txOut.address),
-  datum: mapDatum(txOut.datum),
+  datum: mapInlineDatum(txOut.datum),
+  datumHash: mapDatumHash(txOut.datumHash),
+  scriptReference: txOut.script ? mapScript(txOut.script) : undefined,
   value: {
     assets: txOut.value.assets
       ? new Map(Object.entries(txOut.value.assets).map(([key, value]) => [Cardano.AssetId(key), value]))
