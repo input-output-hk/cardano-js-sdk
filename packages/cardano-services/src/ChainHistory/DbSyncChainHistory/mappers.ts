@@ -76,12 +76,14 @@ export const mapTxInModel = (txInModel: TxInputModel): TxInput => ({
 export const mapTxOut = (txOut: TxOutput): Cardano.TxOut => ({
   address: txOut.address,
   datum: txOut.datum,
+  datumHash: txOut.datumHash,
+  scriptReference: txOut.scriptReference,
   value: txOut.value
 });
 
 export const mapTxOutModel = (txOutModel: TxOutputModel, assets?: Cardano.TokenMap): TxOutput => ({
   address: Cardano.Address(txOutModel.address),
-  datum: txOutModel.datum ? Cardano.util.Hash32ByteBase16(txOutModel.datum.toString('hex')) : undefined,
+  datumHash: txOutModel.datum ? Cardano.util.Hash32ByteBase16(txOutModel.datum.toString('hex')) : undefined,
   index: txOutModel.index,
   txId: Cardano.TransactionId(txOutModel.tx_id.toString('hex')),
   value: {

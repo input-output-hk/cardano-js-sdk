@@ -91,8 +91,8 @@ export class ObservableWalletTxOutputBuilder implements OutputBuilder {
     return this;
   }
 
-  datum(datum: Cardano.util.Hash32ByteBase16): OutputBuilder {
-    this.#partialOutput = { ...this.#partialOutput, datum };
+  datum(datumHash: Cardano.util.Hash32ByteBase16): OutputBuilder {
+    this.#partialOutput = { ...this.#partialOutput, datumHash };
     return this;
   }
 

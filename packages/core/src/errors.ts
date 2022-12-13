@@ -84,7 +84,8 @@ export enum SerializationFailure {
   InvalidAddress = 'INVALID_ADDRESS',
   MaxLengthLimit = 'MAX_LENGTH_LIMIT',
   InvalidNativeScriptKind = 'INVALID_NATIVE_SCRIPT_KIND',
-  InvalidScriptType = 'INVALID_SCRIPT_TYPE'
+  InvalidScriptType = 'INVALID_SCRIPT_TYPE',
+  InvalidDatum = 'INVALID_DATUM'
 }
 
 export class SerializationError<InnerError = unknown> extends ComposableError<InnerError> {

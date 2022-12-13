@@ -64,7 +64,7 @@ const txInputModel: TxInputModel = {
 
 const txOutput: TxOutput = {
   address: Cardano.Address(address),
-  datum: Cardano.util.Hash32ByteBase16(hash32ByteBase16),
+  datumHash: Cardano.util.Hash32ByteBase16(hash32ByteBase16),
   index: 1,
   txId: Cardano.TransactionId(transactionHash),
   value: { coins: 20_000_000n }
@@ -388,7 +388,7 @@ describe('chain history mappers', () => {
       const result = mappers.mapTxOutModel(txOutModel, assets);
       expect(result).toEqual<TxOutput>({
         address: Cardano.Address(address),
-        datum: Cardano.util.Hash32ByteBase16(hash32ByteBase16),
+        datumHash: Cardano.util.Hash32ByteBase16(hash32ByteBase16),
         index: 1,
         txId: Cardano.TransactionId(transactionHash),
         value: { assets, coins: 20_000_000n }
@@ -398,7 +398,7 @@ describe('chain history mappers', () => {
       const result = mappers.mapTxOutModel(txOutModel);
       expect(result).toEqual<TxOutput>({
         address: Cardano.Address(address),
-        datum: Cardano.util.Hash32ByteBase16(hash32ByteBase16),
+        datumHash: Cardano.util.Hash32ByteBase16(hash32ByteBase16),
         index: 1,
         txId: Cardano.TransactionId(transactionHash),
         value: { coins: 20_000_000n }
@@ -419,7 +419,7 @@ describe('chain history mappers', () => {
       const result = mappers.mapTxOut(txOutput);
       expect(result).toEqual<Cardano.TxOut>({
         address: txOutput.address,
-        datum: txOutput.datum,
+        datumHash: txOutput.datumHash,
         value: txOutput.value
       });
     });

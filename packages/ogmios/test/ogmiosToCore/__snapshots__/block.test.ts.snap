@@ -259,6 +259,8 @@ Object {
           Object {
             "address": "addr_test1vpfwv0ezc5g8a4mkku8hhy3y3vp92t7s3ul8g778g5yegsgalc6gc",
             "datum": undefined,
+            "datumHash": undefined,
+            "scriptReference": undefined,
             "value": Object {
               "assets": Map {},
               "coins": 999978n,
@@ -267,6 +269,8 @@ Object {
           Object {
             "address": "addr_test1vpfwv0ezc5g8a4mkku8hhy3y3vp92t7s3ul8g778g5yegsgalc6gc",
             "datum": undefined,
+            "datumHash": undefined,
+            "scriptReference": undefined,
             "value": Object {
               "assets": Map {},
               "coins": 8286924731n,
@@ -385,9 +389,29 @@ Object {
           Object {
             "address": "addr1vxnyv36t3a2rzfs4q6mvyu7nqlr4dxjwkmykkskafg54yzsv3uzfs",
             "datum": undefined,
+            "datumHash": "0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5",
+            "scriptReference": Object {
+              "__type": "plutus",
+              "bytes": "46010000220011",
+              "version": 1,
+            },
             "value": Object {
               "assets": Map {},
               "coins": 2n,
+            },
+          },
+          Object {
+            "address": "addr1vxnyv36t3a2rzfs4q6mvyu7nqlr4dxjwkmykkskafg54yzsv3uzfs",
+            "datum": "187b",
+            "datumHash": undefined,
+            "scriptReference": Object {
+              "__type": "plutus",
+              "bytes": "46010000220011",
+              "version": 1,
+            },
+            "value": Object {
+              "assets": Map {},
+              "coins": 3n,
             },
           },
         ],
@@ -458,7 +482,7 @@ Object {
   "issuerVk": "f6cc957f17046ce6de24c81d08e9381608ed1acc083284916252f76f65643eae",
   "previousBlock": undefined,
   "size": 2,
-  "totalOutput": 2n,
+  "totalOutput": 5n,
   "txCount": 1,
   "vrf": "vrf_vk1mdx46ssmatqxlp4uedjxlnvepts5l6kh20m2a6mtzu0ycnsergpq6653ra",
 }
@@ -515,6 +539,8 @@ Object {
           Object {
             "address": "EqGAuA8vHnNpWh2vRvJSVMGRnu1r5SnDHJMQcHB1vbMSvMxgA8qwpMpsRJeSk2KaTZgJRTKwgDrLNaCQFVK1WisAZLVQ5oXZT6dqLDHDryZAkgwgZqf6S8x",
             "datum": undefined,
+            "datumHash": undefined,
+            "scriptReference": undefined,
             "value": Object {
               "assets": Map {},
               "coins": 2n,
@@ -641,6 +667,8 @@ Object {
           Object {
             "address": "addr_test1grs2w9p3nqfv8amnhgzwchtt8l7dt2kc2qrgqkcy0vyz2sgqqqqs2wje25",
             "datum": undefined,
+            "datumHash": undefined,
+            "scriptReference": undefined,
             "value": Object {
               "assets": Map {
                 "0d94e174732ef9aae73f395ab44507bfa983d65023c11a951f0c32e4" => 2n,
@@ -651,6 +679,8 @@ Object {
           Object {
             "address": "addr1g8s2w9p3nqfv8amnhgzwchtt8l7dt2kc2qrgqkcy0vyz2sgqqqqqx8489p",
             "datum": undefined,
+            "datumHash": undefined,
+            "scriptReference": undefined,
             "value": Object {
               "assets": Map {
                 "e0a714319812c3f773ba04ec5d6b3ffcd5aad85006805b047b082541" => 2n,
