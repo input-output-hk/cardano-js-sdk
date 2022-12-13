@@ -67,6 +67,11 @@ export const txOut: Cardano.TxOut = {
   value: valueWithAssets
 };
 
+export const txOutWithByron: Cardano.TxOut = {
+  address: Cardano.Address('5oP9ib6ym3Xc2XrPGC6S7AaJeHYBCmLjt98bnjKR58xXDhSDgLHr8tht3apMDXf2Mg'),
+  value: valueWithAssets
+};
+
 export const txOutWithDatum: Cardano.TxOut = {
   address: Cardano.Address(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
