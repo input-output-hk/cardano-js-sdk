@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.6.0-nightly.10...@cardano-sdk/e2e@0.6.0-nightly.11) (2022-12-14)
+
+### Bug Fixes
+
+- fixed an issue that was preveting TxOuts with byron addresses to be deserialized correctly ([65356d5](https://github.com/input-output-hk/cardano-js-sdk/commit/65356d5d07375f5b90c25aca4f1965e35edee747))
+
 ## [0.6.0-nightly.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.6.0-nightly.9...@cardano-sdk/e2e@0.6.0-nightly.10) (2022-12-11)
 
 **Note:** Version bump only for package @cardano-sdk/e2e

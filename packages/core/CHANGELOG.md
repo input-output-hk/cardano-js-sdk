@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.7.0-nightly.4...@cardano-sdk/core@0.7.0-nightly.5) (2022-12-14)
+
+### Bug Fixes
+
+- **core:** fixed a small memory leak when pasring byron era addresses ([16727e4](https://github.com/input-output-hk/cardano-js-sdk/commit/16727e435d318059e2d2749420aa5e40d1d4198d))
+- fixed an issue that was preveting TxOuts with byron addresses to be deserialized correctly ([65356d5](https://github.com/input-output-hk/cardano-js-sdk/commit/65356d5d07375f5b90c25aca4f1965e35edee747))
+
 ## [0.7.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.7.0-nightly.3...@cardano-sdk/core@0.7.0-nightly.4) (2022-12-07)
 
 ### ⚠ BREAKING CHANGES
