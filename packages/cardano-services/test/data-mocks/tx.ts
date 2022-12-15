@@ -161,6 +161,15 @@ export const output = {
   }
 };
 
+export const outputWithInlineDatum = {
+  address:
+    'addr_test1qpcncempf4svkpw0salztrsxzrfpr5ll323q5whw7lv94vyw0kz5rxvdaq6u6tslwfrrgz6l4n4lpcpnawn87yl9k6dsu4hhg2',
+  datum: '182a',
+  value: {
+    coins: 13_499_999_999_819_540n
+  }
+};
+
 export const outputs = [output];
 
 export const blockHeader: Cardano.HydratedTx['blockHeader'] = {
@@ -235,5 +244,6 @@ export const tx = [
   txTokenMap,
   redeemer,
   input,
-  withdrawals
+  withdrawals,
+  outputWithInlineDatum
 ];

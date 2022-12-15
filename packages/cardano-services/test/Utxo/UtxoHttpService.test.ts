@@ -135,6 +135,57 @@ describe('UtxoHttpService', () => {
         expect(res[0]).toMatchShapeOf([DataMocks.Tx.input, DataMocks.Tx.output]);
       });
 
+      it('return UTxO with inline datum', async () => {
+        const addresses = await fixtureBuilder.getAddresses(1, { with: [AddressWith.InlineDatum] });
+        const res = await provider.utxoByAddresses({ addresses });
+        expect(res.length).toBeGreaterThan(0);
+        expect(res[0]).toMatchShapeOf([DataMocks.Tx.input, DataMocks.Tx.outputWithInlineDatum]);
+      });
+
+      it('return UTxO with time lock reference script', async () => {
+        const addresses = await fixtureBuilder.getAddresses(1, {
+          scriptType: 'timelock',
+          with: [AddressWith.ReferenceScript]
+        });
+        const res = await provider.utxoByAddresses({ addresses });
+        const scriptRefUtxo = res.find((utxo) => utxo[1].scriptReference.__type === Cardano.ScriptType.Native);
+        expect(res.length).toBeGreaterThan(0);
+        expect(scriptRefUtxo).toBeDefined();
+        expect(res[0]).toMatchShapeOf([DataMocks.Tx.input, DataMocks.Tx.outputWithInlineDatum]);
+      });
+
+      it('return UTxO with plutus v1 reference script', async () => {
+        const addresses = await fixtureBuilder.getAddresses(1, {
+          scriptType: 'plutusV1',
+          with: [AddressWith.ReferenceScript]
+        });
+        const res = await provider.utxoByAddresses({ addresses });
+        const scriptRefUtxo = res.find(
+          (utxo) =>
+            utxo[1].scriptReference.__type === Cardano.ScriptType.Plutus &&
+            utxo[1].scriptReference.version === Cardano.PlutusLanguageVersion.V1
+        );
+        expect(res.length).toBeGreaterThan(0);
+        expect(scriptRefUtxo).toBeDefined();
+        expect(res[0]).toMatchShapeOf([DataMocks.Tx.input, DataMocks.Tx.outputWithInlineDatum]);
+      });
+
+      it('return UTxO with plutus v2 reference script', async () => {
+        const addresses = await fixtureBuilder.getAddresses(1, {
+          scriptType: 'plutusV2',
+          with: [AddressWith.ReferenceScript]
+        });
+        const res = await provider.utxoByAddresses({ addresses });
+        const scriptRefUtxo = res.find(
+          (utxo) =>
+            utxo[1].scriptReference.__type === Cardano.ScriptType.Plutus &&
+            utxo[1].scriptReference.version === Cardano.PlutusLanguageVersion.V2
+        );
+        expect(res.length).toBeGreaterThan(0);
+        expect(scriptRefUtxo).toBeDefined();
+        expect(res[0]).toMatchShapeOf([DataMocks.Tx.input, DataMocks.Tx.outputWithInlineDatum]);
+      });
+
       it('return UTxOs for multiple addresses', async () => {
         const addresses = await fixtureBuilder.getAddresses(3);
         const res = await provider.utxoByAddresses({ addresses });
