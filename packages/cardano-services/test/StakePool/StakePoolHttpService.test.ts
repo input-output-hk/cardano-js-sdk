@@ -1112,13 +1112,17 @@ describe('StakePoolHttpService', () => {
         });
       });
 
+      // eslint-disable-next-line complexity
       const sortByNameThenByPoolId = (poolA: Cardano.StakePool, poolB: Cardano.StakePool) => {
+        if (poolA.metadata?.name && poolB.metadata?.name === '') return 1;
+        if (poolB.metadata?.name && poolA.metadata?.name === '') return -1;
         if (poolA.metadata?.name && !poolB.metadata?.name) return -1;
         if (!poolA.metadata?.name && poolB.metadata?.name) return 1;
         if (poolA.metadata?.name && poolB.metadata?.name) {
           if (poolA.metadata?.name === poolB.metadata?.name) return 0;
           return poolA.metadata.name.toLowerCase() > poolB.metadata.name.toLowerCase() ? 1 : -1;
         }
+
         return poolA.id > poolB.id ? 1 : -1;
       };
 
