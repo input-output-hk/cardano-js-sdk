@@ -83,6 +83,7 @@ export enum SerializationFailure {
   Overflow = 'OVERFLOW',
   InvalidAddress = 'INVALID_ADDRESS',
   MaxLengthLimit = 'MAX_LENGTH_LIMIT',
+  InvalidScript = 'INVALID_SCRIPT',
   InvalidNativeScriptKind = 'INVALID_NATIVE_SCRIPT_KIND',
   InvalidScriptType = 'INVALID_SCRIPT_TYPE',
   InvalidDatum = 'INVALID_DATUM'

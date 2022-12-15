@@ -1,5 +1,5 @@
-import { Cardano, createUtxoId } from '@cardano-sdk/core';
-import { UtxoModel } from './types';
+import { Cardano, SerializationError, SerializationFailure, createUtxoId, jsonToNativeScript } from '@cardano-sdk/core';
+import { ReferenceScriptType, UtxoModel } from './types';
 import { generateAssetId } from './util';
 import { isNotNil } from '@cardano-sdk/util';
 
@@ -61,6 +61,7 @@ const parseReferenceScript = (model: UtxoModel): Cardano.Script => {
  * @returns {Cardano.Utxo[]} an array of core UTxO objects
  */
 export const utxosToCore = (utxosModels: UtxoModel[]): Cardano.Utxo[] => {
+  // eslint-disable-next-line complexity
   const utxosMap = utxosModels.reduce((utxos, current) => {
     const utxoId = createUtxoId(current.tx_id, current.index);
     const utxo = utxos.get(utxoId);
