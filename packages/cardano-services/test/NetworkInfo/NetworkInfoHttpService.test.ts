@@ -2,7 +2,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable sonarjs/no-identical-functions */
-import { Cardano, NetworkInfoProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, networkInfoHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { DbSyncEpochPollService } from '../../src/util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../src/NetworkInfo';
@@ -11,6 +10,7 @@ import { INFO, createLogger } from 'bunyan';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../src/InMemoryCache';
 import { LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
 import { NetworkInfoFixtureBuilder } from './fixtures/FixtureBuilder';
+import { NetworkInfoProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
@@ -36,7 +36,7 @@ describe('NetworkInfoHttpService', () => {
   let config: HttpServerConfig;
   let cardanoNode: OgmiosCardanoNode;
   let provider: NetworkInfoProvider;
-  let lastBlockNoInDb: Cardano.BlockNo;
+  let lastBlockNoInDb: LedgerTipModel;
 
   const epochPollInterval = 2 * 1000;
   const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
@@ -55,9 +55,19 @@ describe('NetworkInfoHttpService', () => {
       baseUrl = `http://localhost:${port}/network-info`;
       clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
       config = { listen: { port } };
-      lastBlockNoInDb = Cardano.BlockNo((await db.query<LedgerTipModel>(findLedgerTip)).rows[0].block_no);
+      lastBlockNoInDb = (await db.query<LedgerTipModel>(findLedgerTip)).rows[0];
       cardanoNode = mockCardanoNode(
-        healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() })
+        healthCheckResponseMock({
+          blockNo: lastBlockNoInDb.block_no.valueOf(),
+          hash: lastBlockNoInDb.hash.toString('hex'),
+          projectedTip: {
+            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            hash: lastBlockNoInDb.hash.toString('hex'),
+            slot: Number(lastBlockNoInDb.slot_no)
+          },
+          slot: Number(lastBlockNoInDb.slot_no),
+          withTip: true
+        })
       ) as unknown as OgmiosCardanoNode;
       networkInfoProvider = {
         eraSummaries: jest.fn(),
@@ -90,9 +100,19 @@ describe('NetworkInfoHttpService', () => {
     beforeAll(async () => {
       port = await getPort();
       baseUrl = `http://localhost:${port}/network-info`;
-      lastBlockNoInDb = Cardano.BlockNo((await db.query<LedgerTipModel>(findLedgerTip)).rows[0].block_no);
+      lastBlockNoInDb = (await db.query<LedgerTipModel>(findLedgerTip)).rows[0];
       cardanoNode = mockCardanoNode(
-        healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() })
+        healthCheckResponseMock({
+          blockNo: lastBlockNoInDb.block_no.valueOf(),
+          hash: lastBlockNoInDb.hash.toString('hex'),
+          projectedTip: {
+            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            hash: lastBlockNoInDb.hash.toString('hex'),
+            slot: Number(lastBlockNoInDb.slot_no)
+          },
+          slot: Number(lastBlockNoInDb.slot_no),
+          withTip: true
+        })
       ) as unknown as OgmiosCardanoNode;
       config = { listen: { port } };
       networkInfoProvider = new DbSyncNetworkInfoProvider(
@@ -137,12 +157,36 @@ describe('NetworkInfoHttpService', () => {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() }));
+        expect(res.data).toEqual(
+          healthCheckResponseMock({
+            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            hash: lastBlockNoInDb.hash.toString('hex'),
+            projectedTip: {
+              blockNo: lastBlockNoInDb.block_no.valueOf(),
+              hash: lastBlockNoInDb.hash.toString('hex'),
+              slot: Number(lastBlockNoInDb.slot_no)
+            },
+            slot: Number(lastBlockNoInDb.slot_no),
+            withTip: true
+          })
+        );
       });
 
       it('forwards the networkInfoProvider health response with provider client', async () => {
         const response = await provider.healthCheck();
-        expect(response).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() }));
+        expect(response).toEqual(
+          healthCheckResponseMock({
+            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            hash: lastBlockNoInDb.hash.toString('hex'),
+            projectedTip: {
+              blockNo: lastBlockNoInDb.block_no.valueOf(),
+              hash: lastBlockNoInDb.hash.toString('hex'),
+              slot: Number(lastBlockNoInDb.slot_no)
+            },
+            slot: Number(lastBlockNoInDb.slot_no),
+            withTip: true
+          })
+        );
       });
     });
 

@@ -37,7 +37,7 @@ describe('ChainHistoryHttpService', () => {
   let config: HttpServerConfig;
   let provider: ChainHistoryProvider;
   let cardanoNode: OgmiosCardanoNode;
-  let lastBlockNoInDb: Cardano.BlockNo;
+  let lastBlockNoInDb: LedgerTipModel;
   let fixtureBuilder: ChainHistoryFixtureBuilder;
 
   beforeAll(async () => {
@@ -76,9 +76,19 @@ describe('ChainHistoryHttpService', () => {
   describe('healthy state', () => {
     beforeAll(async () => {
       const metadataService = createDbSyncMetadataService(dbConnection, logger);
-      lastBlockNoInDb = Cardano.BlockNo((await dbConnection.query<LedgerTipModel>(findLedgerTip)).rows[0].block_no);
+      lastBlockNoInDb = (await dbConnection.query<LedgerTipModel>(findLedgerTip)).rows[0];
       cardanoNode = mockCardanoNode(
-        healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() })
+        healthCheckResponseMock({
+          blockNo: lastBlockNoInDb.block_no.valueOf(),
+          hash: lastBlockNoInDb.hash.toString('hex'),
+          projectedTip: {
+            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            hash: lastBlockNoInDb.hash.toString('hex'),
+            slot: Number(lastBlockNoInDb.slot_no)
+          },
+          slot: Number(lastBlockNoInDb.slot_no),
+          withTip: true
+        })
       ) as unknown as OgmiosCardanoNode;
       chainHistoryProvider = new DbSyncChainHistoryProvider(
         { paginationPageSizeLimit: PAGINATION_PAGE_SIZE_LIMIT },
@@ -106,12 +116,36 @@ describe('ChainHistoryHttpService', () => {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() }));
+        expect(res.data).toEqual(
+          healthCheckResponseMock({
+            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            hash: lastBlockNoInDb.hash.toString('hex'),
+            projectedTip: {
+              blockNo: lastBlockNoInDb.block_no.valueOf(),
+              hash: lastBlockNoInDb.hash.toString('hex'),
+              slot: Number(lastBlockNoInDb.slot_no)
+            },
+            slot: Number(lastBlockNoInDb.slot_no),
+            withTip: true
+          })
+        );
       });
 
       it('forwards the chainHistoryProvider health response with provider client', async () => {
         const response = await provider.healthCheck();
-        expect(response).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() }));
+        expect(response).toEqual(
+          healthCheckResponseMock({
+            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            hash: lastBlockNoInDb.hash.toString('hex'),
+            projectedTip: {
+              blockNo: lastBlockNoInDb.block_no.valueOf(),
+              hash: lastBlockNoInDb.hash.toString('hex'),
+              slot: Number(lastBlockNoInDb.slot_no)
+            },
+            slot: Number(lastBlockNoInDb.slot_no),
+            withTip: true
+          })
+        );
       });
     });
 

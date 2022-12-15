@@ -28,7 +28,7 @@ describe('RewardsHttpService', () => {
   let config: HttpServerConfig;
   let cardanoNode: OgmiosCardanoNode;
   let provider: RewardsProvider;
-  let lastBlockNoInDb: Cardano.BlockNo;
+  let lastBlockNoInDb: LedgerTipModel;
   let fixtureBuilder: RewardsFixtureBuilder;
   beforeAll(async () => {
     port = await getPort();
@@ -65,9 +65,19 @@ describe('RewardsHttpService', () => {
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('healthy state', () => {
     beforeAll(async () => {
-      lastBlockNoInDb = Cardano.BlockNo((await dbConnection.query<LedgerTipModel>(findLedgerTip)).rows[0].block_no);
+      lastBlockNoInDb = (await dbConnection.query<LedgerTipModel>(findLedgerTip)).rows[0];
       cardanoNode = mockCardanoNode(
-        healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() })
+        healthCheckResponseMock({
+          blockNo: lastBlockNoInDb.block_no.valueOf(),
+          hash: lastBlockNoInDb.hash.toString('hex'),
+          projectedTip: {
+            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            hash: lastBlockNoInDb.hash.toString('hex'),
+            slot: Number(lastBlockNoInDb.slot_no)
+          },
+          slot: Number(lastBlockNoInDb.slot_no),
+          withTip: true
+        })
       ) as unknown as OgmiosCardanoNode;
       rewardsProvider = new DbSyncRewardsProvider(
         { paginationPageSizeLimit: 5 },
@@ -88,12 +98,36 @@ describe('RewardsHttpService', () => {
       it('forwards the rewardsProvider health response with HTTP request', async () => {
         const res = await axios.post(`${baseUrl}/health`, {}, { headers: { 'Content-Type': APPLICATION_JSON } });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() }));
+        expect(res.data).toEqual(
+          healthCheckResponseMock({
+            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            hash: lastBlockNoInDb.hash.toString('hex'),
+            projectedTip: {
+              blockNo: lastBlockNoInDb.block_no.valueOf(),
+              hash: lastBlockNoInDb.hash.toString('hex'),
+              slot: Number(lastBlockNoInDb.slot_no)
+            },
+            slot: Number(lastBlockNoInDb.slot_no),
+            withTip: true
+          })
+        );
       });
 
       it('forwards the rewardsProvider health response with provider client', async () => {
         const response = await provider.healthCheck();
-        expect(response).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() }));
+        expect(response).toEqual(
+          healthCheckResponseMock({
+            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            hash: lastBlockNoInDb.hash.toString('hex'),
+            projectedTip: {
+              blockNo: lastBlockNoInDb.block_no.valueOf(),
+              hash: lastBlockNoInDb.hash.toString('hex'),
+              slot: Number(lastBlockNoInDb.slot_no)
+            },
+            slot: Number(lastBlockNoInDb.slot_no),
+            withTip: true
+          })
+        );
       });
     });
 
