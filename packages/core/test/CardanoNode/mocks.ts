@@ -48,18 +48,17 @@ export const mockStakeDistribution: StakeDistribution = new Map([
   ]
 ]);
 
-const projectedTip: Cardano.Tip = {
-  blockNo: Cardano.BlockNo(863),
-  hash: Cardano.BlockId('70de6ec951af0a47b000d0f2909270896d6c3d3de3951c96b0979164941bb15f'),
-  slot: Cardano.Slot(8450)
-};
-
 export const healthCheckResponseMock = (opts?: {
   blockNo?: number;
   slot?: number;
   hash?: string;
   networkSync?: Cardano.Percent;
   withTip?: boolean;
+  projectedTip?: {
+    blockNo?: number;
+    slot?: number;
+    hash?: string;
+  };
 }) => ({
   localNode: {
     ledgerTip: {
@@ -70,7 +69,17 @@ export const healthCheckResponseMock = (opts?: {
     networkSync: opts?.networkSync ?? Cardano.Percent(0.999)
   },
   ok: true,
-  ...(opts?.withTip === false ? undefined : { projectedTip })
+  ...(opts?.withTip === false
+    ? undefined
+    : {
+        projectedTip: {
+          blockNo: Cardano.BlockNo(opts?.projectedTip?.blockNo ?? 100),
+          hash: Cardano.BlockId(
+            opts?.projectedTip?.hash ?? '9ef43ab6e234fcf90d103413096c7da752da2f45b15e1259f43d476afd12932c'
+          ),
+          slot: Cardano.Slot(opts?.projectedTip?.slot ?? 52_819_355)
+        }
+      })
 });
 
 export const mockCardanoNode = (healthCheck?: HealthCheckResponse) => ({
