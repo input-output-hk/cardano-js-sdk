@@ -12,6 +12,11 @@ import first from 'lodash/first';
 import flatten from 'lodash/flatten';
 import groupBy from 'lodash/groupBy';
 
+const DELEGATION_EPOCHS_AHEAD_COUNT = 2;
+
+export const calcFirstDelegationEpoch = (epoch: Cardano.EpochNo): number =>
+  epoch.valueOf() + DELEGATION_EPOCHS_AHEAD_COUNT;
+
 const sumRewards = (arrayOfRewards: EpochRewards[]) => BigIntMath.sum(arrayOfRewards.map(({ rewards }) => rewards));
 const avgReward = (arrayOfRewards: EpochRewards[]) => sumRewards(arrayOfRewards) / BigInt(arrayOfRewards.length);
 
@@ -49,7 +54,7 @@ const firstDelegationEpoch$ = (transactions$: Observable<TxWithEpoch[]>, rewardA
         })
       )
     ),
-    map((tx) => (isNotNil(tx) ? tx.epoch.valueOf() + 3 : null)),
+    map((tx) => (isNotNil(tx) ? calcFirstDelegationEpoch(tx.epoch) : null)),
     distinctUntilChanged()
   );
 
