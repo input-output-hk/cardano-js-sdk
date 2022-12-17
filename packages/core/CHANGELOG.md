@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.7.0-nightly.5...@cardano-sdk/core@0.7.0-nightly.6) (2022-12-17)
+
+### Features
+
+- **core:** add missing tx props conversions ([6e9a962](https://github.com/input-output-hk/cardano-js-sdk/commit/6e9a962ff8911ada35a86b927af6650b300174c2))
+
 ## [0.7.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.7.0-nightly.4...@cardano-sdk/core@0.7.0-nightly.5) (2022-12-14)
 
 ### Bug Fixes
