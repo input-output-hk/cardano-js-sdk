@@ -14,6 +14,7 @@ import {
   Ed25519KeyHash,
   Ed25519KeyHashes,
   Ed25519Signature,
+  ExUnits,
   GeneralTransactionMetadata,
   Int,
   MetadataList,
@@ -23,9 +24,16 @@ import {
   MultiAsset,
   NativeScript,
   NativeScripts,
+  PlutusData,
+  PlutusList,
+  PlutusV1Script,
   PlutusV1Scripts,
+  PlutusV2Script,
   PlutusV2Scripts,
   PublicKey,
+  Redeemer,
+  RedeemerTag,
+  Redeemers,
   RewardAddress,
   ScriptAll,
   ScriptAny,
@@ -54,7 +62,9 @@ import {
 } from '@dcspark/cardano-multiplatform-lib-nodejs';
 
 import * as certificate from './certificate';
+import { CML } from '../CML';
 import { ManagedFreeableScope } from '@cardano-sdk/util';
+import { RedeemerPurpose } from '../../Cardano';
 import { SerializationError, SerializationFailure } from '../../errors';
 import { assetNameFromAssetId, parseAssetId, policyIdFromAssetId } from '../../Asset/util/assetId';
 import { parseCmlAddress } from '../parseCmlAddress';
@@ -285,13 +295,15 @@ export const getScripts = (
       case Cardano.ScriptType.Native:
         nativeScripts.add(nativeScript(scope, script));
         break;
-      // TODO: add support for Plutus scripts. Use script.version to add as V1 or V2.
       case Cardano.ScriptType.Plutus:
+        if (script.version === Cardano.PlutusLanguageVersion.V1) {
+          plutusV1Scripts.add(PlutusV1Script.new(Buffer.from(script.bytes, 'hex')));
+        } else if (script.version === Cardano.PlutusLanguageVersion.V2) {
+          plutusV2Scripts.add(PlutusV2Script.new(Buffer.from(script.bytes, 'hex')));
+        }
+        break;
       default:
-        throw new SerializationError(
-          SerializationFailure.InvalidScriptType,
-          `Script Type value '${script.__type}' is not supported.`
-        );
+        throw new SerializationError(SerializationFailure.InvalidScriptType, `Script '${script}' is not supported.`);
     }
   }
 
@@ -436,17 +448,48 @@ export const txWitnessBootstrap = (
   return witnesses;
 };
 
-export const witnessSet = (scope: ManagedFreeableScope, witness: Cardano.Witness): TransactionWitnessSet => {
-  const cslWitnessSet = scope.manage(TransactionWitnessSet.new());
-  const vkeyWitnesses = scope.manage(Vkeywitnesses.new());
-
-  if (witness.scripts) {
-    const { nativeScripts, plutusV1Scripts, plutusV2Scripts } = getScripts(scope, witness.scripts);
-
-    cslWitnessSet.set_native_scripts(nativeScripts);
-    cslWitnessSet.set_plutus_v1_scripts(plutusV1Scripts);
-    cslWitnessSet.set_plutus_v2_scripts(plutusV2Scripts);
+const mapRedeemerTag = (scope: ManagedFreeableScope, redeemerPurpose: RedeemerPurpose) => {
+  switch (redeemerPurpose) {
+    case RedeemerPurpose.spend:
+      return scope.manage(RedeemerTag.new_spend());
+    case RedeemerPurpose.mint:
+      return scope.manage(RedeemerTag.new_mint());
+    case RedeemerPurpose.certificate:
+      return scope.manage(RedeemerTag.new_cert());
+    case RedeemerPurpose.withdrawal:
+      return scope.manage(RedeemerTag.new_reward());
   }
+};
+
+export const txWitnessRedeemers = (scope: ManagedFreeableScope, redeemers: Cardano.Redeemer[]): Redeemers => {
+  const witnessRedeemers = scope.manage(Redeemers.new());
+  for (const redeemer of redeemers) {
+    const tag = mapRedeemerTag(scope, redeemer.purpose);
+    const index = scope.manage(BigNum.from_str(redeemer.index.toString()));
+    const data = scope.manage(PlutusData.from_bytes(Buffer.from(redeemer.data, 'hex')));
+    const units = scope.manage(
+      ExUnits.new(
+        scope.manage(BigNum.from_str(redeemer.executionUnits.memory.toString())),
+        scope.manage(BigNum.from_str(redeemer.executionUnits.steps.toString()))
+      )
+    );
+
+    witnessRedeemers.add(scope.manage(Redeemer.new(tag, index, data, units)));
+  }
+  return witnessRedeemers;
+};
+
+export const txWitnessDatumList = (scope: ManagedFreeableScope, datums: Cardano.Datum[]): CML.PlutusList => {
+  const plutusDatumList = scope.manage(PlutusList.new());
+  for (const datum of datums) {
+    plutusDatumList.add(scope.manage(CML.PlutusData.from_bytes(Buffer.from(datum.toString(), 'hex'))));
+  }
+  return plutusDatumList;
+};
+
+export const witnessSet = (scope: ManagedFreeableScope, witness: Cardano.Witness): TransactionWitnessSet => {
+  const txWitnessSet = scope.manage(TransactionWitnessSet.new());
+  const vkeyWitnesses = scope.manage(Vkeywitnesses.new());
 
   for (const [vkey, signature] of witness.signatures.entries()) {
     const publicKey = scope.manage(PublicKey.from_bytes(Buffer.from(vkey, 'hex')));
@@ -455,13 +498,25 @@ export const witnessSet = (scope: ManagedFreeableScope, witness: Cardano.Witness
     );
     vkeyWitnesses.add(vkeyWitness);
   }
-  cslWitnessSet.set_vkeys(vkeyWitnesses);
+  txWitnessSet.set_vkeys(vkeyWitnesses);
 
-  if (witness.bootstrap) {
-    cslWitnessSet.set_bootstraps(txWitnessBootstrap(scope, witness.bootstrap));
+  if (witness.scripts) {
+    const { nativeScripts, plutusV1Scripts, plutusV2Scripts } = getScripts(scope, witness.scripts);
+
+    txWitnessSet.set_native_scripts(nativeScripts);
+    txWitnessSet.set_plutus_v1_scripts(plutusV1Scripts);
+    txWitnessSet.set_plutus_v2_scripts(plutusV2Scripts);
   }
-
-  return cslWitnessSet;
+  if (witness.bootstrap) {
+    txWitnessSet.set_bootstraps(txWitnessBootstrap(scope, witness.bootstrap));
+  }
+  if (witness.redeemers) {
+    txWitnessSet.set_redeemers(txWitnessRedeemers(scope, witness.redeemers));
+  }
+  if (witness.datums) {
+    txWitnessSet.set_plutus_data(txWitnessDatumList(scope, witness.datums));
+  }
+  return txWitnessSet;
 };
 
 export const tx = (scope: ManagedFreeableScope, { body, witness, auxiliaryData }: Cardano.Tx): Transaction => {
