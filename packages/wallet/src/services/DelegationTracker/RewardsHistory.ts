@@ -24,10 +24,12 @@ export const createRewardsHistoryProvider =
   (rewardsProvider: TrackedRewardsProvider, retryBackoffConfig: RetryBackoffConfig) =>
   (
     rewardAccounts: Cardano.RewardAccount[],
-    lowerBound: Cardano.EpochNo | null
+    lowerBound: Cardano.EpochNo | null,
+    onFatalError?: (value: unknown) => void
   ): Observable<Map<Cardano.RewardAccount, EpochRewards[]>> => {
     if (lowerBound) {
       return coldObservableProvider({
+        onFatalError,
         provider: () =>
           rewardsProvider.rewardsHistory({
             epochs: { lowerBound },
@@ -63,7 +65,9 @@ export const createRewardsHistoryTracker = (
   rewardAccounts$: Observable<Cardano.RewardAccount[]>,
   rewardsHistoryProvider: RewardsHistoryProvider,
   rewardsHistoryStore: KeyValueStore<Cardano.RewardAccount, EpochRewards[]>,
-  logger: Logger
+  logger: Logger,
+  onFatalError?: (value: unknown) => void
+  // eslint-disable-next-line max-params
 ): Observable<RewardsHistory> =>
   rewardAccounts$
     .pipe(
@@ -75,7 +79,9 @@ export const createRewardsHistoryTracker = (
             .pipe(map((rewards) => new Map(rewardAccounts.map((rewardAccount, i) => [rewardAccount, rewards[i]])))),
           firstDelegationEpoch$(transactions$, rewardAccounts).pipe(
             tap((firstEpoch) => logger.debug(`Fetching history rewards since epoch ${firstEpoch}`)),
-            switchMap((firstEpoch) => rewardsHistoryProvider(rewardAccounts, Cardano.EpochNo(firstEpoch!))),
+            switchMap((firstEpoch) =>
+              rewardsHistoryProvider(rewardAccounts, Cardano.EpochNo(firstEpoch!), onFatalError)
+            ),
             tap((allRewards) =>
               rewardsHistoryStore.setAll([...allRewards.entries()].map(([key, value]) => ({ key, value })))
             )

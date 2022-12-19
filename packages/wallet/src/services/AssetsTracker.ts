@@ -12,8 +12,14 @@ const isAssetInfoComplete = (assetInfo: Asset.AssetInfo): boolean =>
   assetInfo.nftMetadata !== undefined && assetInfo.tokenMetadata !== undefined;
 
 export const createAssetService =
-  (assetProvider: TrackedAssetProvider, retryBackoffConfig: RetryBackoffConfig) => (assetId: Cardano.AssetId) =>
+  (
+    assetProvider: TrackedAssetProvider,
+    retryBackoffConfig: RetryBackoffConfig,
+    onFatalError?: (value: unknown) => void
+  ) =>
+  (assetId: Cardano.AssetId) =>
     coldObservableProvider({
+      onFatalError,
       pollUntil: isAssetInfoComplete,
       provider: () =>
         assetProvider.getAsset({ assetId, extraData: { history: false, nftMetadata: true, tokenMetadata: true } }),
@@ -27,6 +33,7 @@ export interface AssetsTrackerProps {
   assetProvider: TrackedAssetProvider;
   retryBackoffConfig: RetryBackoffConfig;
   logger: Logger;
+  onFatalError?: (value: unknown) => void;
 }
 
 interface AssetsTrackerInternals {
@@ -34,8 +41,8 @@ interface AssetsTrackerInternals {
 }
 
 export const createAssetsTracker = (
-  { assetProvider, balanceTracker, retryBackoffConfig, logger }: AssetsTrackerProps,
-  { assetService = createAssetService(assetProvider, retryBackoffConfig) }: AssetsTrackerInternals = {}
+  { assetProvider, balanceTracker, retryBackoffConfig, logger, onFatalError }: AssetsTrackerProps,
+  { assetService = createAssetService(assetProvider, retryBackoffConfig, onFatalError) }: AssetsTrackerInternals = {}
 ) =>
   new Observable<Map<Cardano.AssetId, Asset.AssetInfo>>((subscriber) => {
     let assetsMap = new Map<Cardano.AssetId, Asset.AssetInfo>();

@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-useless-undefined */
 import { Cardano } from '@cardano-sdk/core';
 import { InMemoryRewardsHistoryStore } from '../../../src/persistence';
 import {
@@ -78,7 +79,11 @@ describe('RewardsHistory', () => {
         });
         flush();
         expect(getRewardsHistory).toBeCalledTimes(1);
-        expect(getRewardsHistory).toBeCalledWith(rewardAccounts, Cardano.EpochNo(calcFirstDelegationEpoch(epoch)));
+        expect(getRewardsHistory).toBeCalledWith(
+          rewardAccounts,
+          Cardano.EpochNo(calcFirstDelegationEpoch(epoch)),
+          undefined
+        );
       });
     });
 
@@ -121,7 +126,11 @@ describe('RewardsHistory', () => {
         });
         flush();
         expect(getRewardsHistory).toBeCalledTimes(1);
-        expect(getRewardsHistory).toBeCalledWith(rewardAccounts, Cardano.EpochNo(calcFirstDelegationEpoch(epoch)));
+        expect(getRewardsHistory).toBeCalledWith(
+          rewardAccounts,
+          Cardano.EpochNo(calcFirstDelegationEpoch(epoch)),
+          undefined
+        );
       });
     });
 

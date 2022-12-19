@@ -48,6 +48,7 @@ export interface TransactionsTrackerProps {
     failedToSubmit$: Observable<FailedTx>;
   };
   logger: Logger;
+  onFatalError?: (value: unknown) => void;
 }
 
 export interface TransactionsTrackerInternals {
@@ -62,6 +63,7 @@ export interface TransactionsTrackerInternalsProps {
   tipBlockHeight$: Observable<Cardano.BlockNo>;
   store: OrderedCollectionStore<Cardano.HydratedTx>;
   logger: Logger;
+  onFatalError?: (value: unknown) => void;
 }
 
 // Temporarily hardcoded. Will be replaced with ChainHistoryProvider 'maxPageSize' value once ADP-2249 is implemented
@@ -95,7 +97,8 @@ export const createAddressTransactionsProvider = ({
   retryBackoffConfig,
   tipBlockHeight$,
   store,
-  logger
+  logger,
+  onFatalError
 }: TransactionsTrackerInternalsProps): TransactionsTrackerInternals => {
   const rollback$ = new Subject<Cardano.HydratedTx>();
   const storedTransactions$ = store.getAll().pipe(share());
@@ -117,6 +120,7 @@ export const createAddressTransactionsProvider = ({
             // Caveat is that local transactions might get out of date...
             combinator: exhaustMap,
             equals: transactionsEquals,
+            onFatalError,
             provider: async () => {
               // eslint-disable-next-line no-constant-condition
               while (true) {
@@ -205,12 +209,14 @@ export const createTransactionsTracker = (
     retryBackoffConfig,
     transactionsHistoryStore: transactionsStore,
     inFlightTransactionsStore: newTransactionsStore,
-    logger
+    logger,
+    onFatalError
   }: TransactionsTrackerProps,
   { transactionsSource$: txSource$, rollback$ }: TransactionsTrackerInternals = createAddressTransactionsProvider({
     addresses$,
     chainHistoryProvider,
     logger: contextLogger(logger, 'AddressTransactionsProvider'),
+    onFatalError,
     retryBackoffConfig,
     store: transactionsStore,
     tipBlockHeight$: distinctBlock(tip$)
