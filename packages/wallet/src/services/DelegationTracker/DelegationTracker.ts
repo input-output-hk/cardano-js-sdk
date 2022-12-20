@@ -20,8 +20,14 @@ import { coldObservableProvider } from '../util';
 import { transactionsWithCertificates } from './transactionCertificates';
 
 export const createBlockEpochProvider =
-  (chainHistoryProvider: ChainHistoryProvider, retryBackoffConfig: RetryBackoffConfig) => (ids: Cardano.BlockId[]) =>
+  (
+    chainHistoryProvider: ChainHistoryProvider,
+    retryBackoffConfig: RetryBackoffConfig,
+    onFatalError?: (value: unknown) => void
+  ) =>
+  (ids: Cardano.BlockId[]) =>
     coldObservableProvider({
+      onFatalError,
       provider: () => chainHistoryProvider.blocksByHashes({ ids }),
       retryBackoffConfig
     }).pipe(map((blocks) => blocks.map(({ epoch }) => epoch)));
@@ -44,6 +50,7 @@ export interface DelegationTrackerProps {
     slotEpochCalc$?: Observable<SlotEpochCalc>;
   };
   logger: Logger;
+  onFatalError?: (value: unknown) => void;
 }
 
 export const certificateTransactionsWithEpochs = (
@@ -71,14 +78,21 @@ export const createDelegationTracker = ({
   stakePoolProvider,
   stores,
   logger,
+  onFatalError,
   internals: {
-    queryStakePoolsProvider = createQueryStakePoolsProvider(stakePoolProvider, stores.stakePools, retryBackoffConfig),
+    queryStakePoolsProvider = createQueryStakePoolsProvider(
+      stakePoolProvider,
+      stores.stakePools,
+      retryBackoffConfig,
+      onFatalError
+    ),
     rewardsHistoryProvider = createRewardsHistoryProvider(rewardsTracker, retryBackoffConfig),
     rewardsProvider = createRewardsProvider(
       epoch$,
       transactionsTracker.outgoing.confirmed$,
       rewardsTracker,
-      retryBackoffConfig
+      retryBackoffConfig,
+      onFatalError
     ),
     slotEpochCalc$ = eraSummaries$.pipe(map((eraSummaries) => createSlotEpochCalc(eraSummaries)))
   } = {}
@@ -99,7 +113,8 @@ export const createDelegationTracker = ({
       rewardAccountAddresses$,
       rewardsHistoryProvider,
       stores.rewardsHistory,
-      contextLogger(logger, 'rewardsHistory$')
+      contextLogger(logger, 'rewardsHistory$'),
+      onFatalError
     )
   );
   const rewardAccounts$ = new TrackerSubject(

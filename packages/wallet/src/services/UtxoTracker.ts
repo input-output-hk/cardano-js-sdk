@@ -14,6 +14,7 @@ export interface UtxoTrackerProps {
   tipBlockHeight$: Observable<Cardano.BlockNo>;
   retryBackoffConfig: RetryBackoffConfig;
   logger: Logger;
+  onFatalError?: (value: unknown) => void;
 }
 
 export interface UtxoTrackerInternals {
@@ -25,12 +26,14 @@ export const createUtxoProvider = (
   utxoProvider: UtxoProvider,
   addresses$: Observable<Cardano.Address[]>,
   tipBlockHeight$: Observable<Cardano.BlockNo>,
-  retryBackoffConfig: RetryBackoffConfig
+  retryBackoffConfig: RetryBackoffConfig,
+  onFatalError?: (value: unknown) => void
 ) =>
   addresses$.pipe(
     switchMap((addresses) =>
       coldObservableProvider({
         equals: utxoEquals,
+        onFatalError,
         provider: () => utxoProvider.utxoByAddresses({ addresses }),
         retryBackoffConfig,
         trigger$: tipBlockHeight$
@@ -46,11 +49,12 @@ export const createUtxoTracker = (
     transactionsInFlight$,
     retryBackoffConfig,
     tipBlockHeight$,
-    logger
+    logger,
+    onFatalError
   }: UtxoTrackerProps,
   {
     utxoSource$ = new PersistentCollectionTrackerSubject<Cardano.Utxo>(
-      () => createUtxoProvider(utxoProvider, addresses$, tipBlockHeight$, retryBackoffConfig),
+      () => createUtxoProvider(utxoProvider, addresses$, tipBlockHeight$, retryBackoffConfig, onFatalError),
       stores.utxo
     ),
     unspendableUtxoSource$ = new PersistentCollectionTrackerSubject(

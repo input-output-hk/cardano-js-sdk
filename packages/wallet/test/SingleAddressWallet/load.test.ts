@@ -12,6 +12,7 @@ import {
 import {
   Cardano,
   ChainHistoryProvider,
+  InvalidStringError,
   NetworkInfoProvider,
   RewardsProvider,
   UtxoProvider,
@@ -386,6 +387,55 @@ describe('SingleAddressWallet creates big UTXO', () => {
 
     const nonChangeOutput = signedTx.body.outputs.find((out) => out.value!.assets!.size > 0);
     expect(nonChangeOutput!.value.assets).toBe(totalAssets.totalTokens);
+
+    wallet.shutdown();
+  });
+});
+
+describe('SingleAddressWallet.fatalError$', () => {
+  it('emits non retryable errors', async () => {
+    const stores = createInMemoryWalletStores();
+    const tipHandler = jest.fn();
+    const utxoSet = generateUtxos(30, 10);
+
+    const wallet = await createWallet(stores, {
+      chainHistoryProvider: mocks.mockChainHistoryProvider(),
+      networkInfoProvider: {
+        ...mocks.mockNetworkInfoProvider(),
+        ledgerTip: jest.fn().mockRejectedValue(new InvalidStringError('Test invalid string error'))
+      },
+      rewardsProvider: mocks.mockRewardsProvider(),
+      utxoProvider: mocks.mockUtxoProvider(utxoSet)
+    });
+
+    // wallet.fatalError$ must be observed till the beginning of time
+    const errorPromise = expect(firstValueFrom(wallet.fatalError$)).resolves.toBeInstanceOf(InvalidStringError);
+
+    wallet.tip$.subscribe(tipHandler);
+
+    await errorPromise;
+
+    wallet.shutdown();
+
+    expect(tipHandler).not.toBeCalled();
+  });
+
+  it('Observables work even if SingleAddressWallet.fatalError$ is not observed', async () => {
+    const stores = createInMemoryWalletStores();
+    const testValue = { test: 'value' };
+    const utxoSet = generateUtxos(30, 10);
+
+    const wallet = await createWallet(stores, {
+      chainHistoryProvider: mocks.mockChainHistoryProvider(),
+      networkInfoProvider: {
+        ...mocks.mockNetworkInfoProvider(),
+        ledgerTip: jest.fn().mockResolvedValue(testValue)
+      },
+      rewardsProvider: mocks.mockRewardsProvider(),
+      utxoProvider: mocks.mockUtxoProvider(utxoSet)
+    });
+
+    await expect(firstValueFrom(wallet.tip$)).resolves.toBe(testValue);
 
     wallet.shutdown();
   });
