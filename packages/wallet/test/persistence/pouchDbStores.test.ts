@@ -13,7 +13,7 @@ describe('pouchDbStores', () => {
 
   afterAll(async () => {
     // delete files from the filesystem
-    await new PouchDB(dbName).destroy();
+    await new PouchDB(dbName, { auto_compaction: true }).destroy();
   });
 
   describe('PouchDbDocumentStore', () => {
