@@ -48,7 +48,7 @@ describe('KeyManagement/restoreKeyAgent', () => {
           accountIndex: 0,
           address,
           index: 0,
-          networkId: Cardano.NetworkId.mainnet,
+          networkId: Cardano.NetworkId.Mainnet,
           rewardAccount,
           type: AddressType.External
         }
@@ -66,7 +66,7 @@ describe('KeyManagement/restoreKeyAgent', () => {
           accountIndex: 0,
           address,
           index: 0,
-          networkId: Cardano.NetworkId.mainnet,
+          networkId: Cardano.NetworkId.Mainnet,
           rewardAccount,
           stakeKeyDerivationPath: STAKE_KEY_DERIVATION_PATH,
           type: AddressType.External
@@ -121,7 +121,7 @@ describe('KeyManagement/restoreKeyAgent', () => {
             'addr1qx52knza2h5x090n4a5r7yraz3pwcamk9ppvuh7e26nfks7pnmhxqavtqy02zezklh27jt9r6z62sav3mugappdc7xnskxy2pn'
           ),
           index: 0,
-          networkId: Cardano.NetworkId.mainnet,
+          networkId: Cardano.NetworkId.Mainnet,
           rewardAccount: Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr'),
           stakeKeyDerivationPath: STAKE_KEY_DERIVATION_PATH,
           type: AddressType.External
@@ -152,7 +152,7 @@ describe('KeyManagement/restoreKeyAgent', () => {
             'addr1qx52knza2h5x090n4a5r7yraz3pwcamk9ppvuh7e26nfks7pnmhxqavtqy02zezklh27jt9r6z62sav3mugappdc7xnskxy2pn'
           ),
           index: 0,
-          networkId: Cardano.NetworkId.mainnet,
+          networkId: Cardano.NetworkId.Mainnet,
           rewardAccount: Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr'),
           stakeKeyDerivationPath: STAKE_KEY_DERIVATION_PATH,
           type: AddressType.External

@@ -50,7 +50,7 @@ const createWallet = async (
         accountIndex: 0,
         address,
         index: 0,
-        networkId: Cardano.NetworkId.testnet,
+        networkId: Cardano.NetworkId.Testnet,
         rewardAccount,
         stakeKeyDerivationPath: mocks.stakeKeyDerivationPath,
         type: AddressType.External

@@ -38,7 +38,7 @@ describe('LedgerKeyAgent', () => {
           accountIndex: 0,
           address,
           index: 0,
-          networkId: Cardano.NetworkId.testnet,
+          networkId: Cardano.NetworkId.Testnet,
           rewardAccount: mocks.rewardAccount,
           stakeKeyDerivationPath: mocks.stakeKeyDerivationPath,
           type: AddressType.External

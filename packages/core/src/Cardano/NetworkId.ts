@@ -1,6 +1,6 @@
 export enum NetworkId {
-  mainnet = 1,
-  testnet = 0
+  Mainnet = 1,
+  Testnet = 0
 }
 
 export enum CardanoNetworkMagic {
