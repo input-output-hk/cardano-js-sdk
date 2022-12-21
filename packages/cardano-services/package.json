@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/cardano-services",
-  "version": "0.7.0-nightly.7",
+  "version": "0.7.0-nightly.8",
   "description": "Cardano GraphQL Services",
   "engines": {
     "node": ">=14.20.1"
@@ -64,8 +64,8 @@
   },
   "devDependencies": {
     "@cardano-ogmios/client": "5.5.7",
-    "@cardano-sdk/cardano-services-client": "^0.7.0-nightly.6",
-    "@cardano-sdk/util-dev": "^0.6.0-nightly.3",
+    "@cardano-sdk/cardano-services-client": "^0.7.0-nightly.7",
+    "@cardano-sdk/util-dev": "^0.6.0-nightly.4",
     "@types/amqplib": "^0.8.2",
     "@types/bunyan": "^1.8.8",
     "@types/clear": "^0.1.2",
@@ -94,8 +94,8 @@
     "wait-on": "^6.0.1"
   },
   "dependencies": {
-    "@cardano-sdk/core": "^0.7.0-nightly.6",
-    "@cardano-sdk/ogmios": "^0.7.0-nightly.6",
+    "@cardano-sdk/core": "^0.7.0-nightly.7",
+    "@cardano-sdk/ogmios": "^0.7.0-nightly.7",
     "@cardano-sdk/util": "^0.7.0-nightly.3",
     "amqplib": "^0.10.0",
     "axios": "^0.27.2",

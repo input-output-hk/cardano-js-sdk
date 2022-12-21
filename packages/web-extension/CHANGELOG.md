@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0-nightly.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.7.0-nightly.8...@cardano-sdk/web-extension@0.7.0-nightly.9) (2022-12-21)
+
+### Features
+
+- adds a retry strategy to single address wallet ([7d01ee9](https://github.com/input-output-hk/cardano-js-sdk/commit/7d01ee931dba467ddd6ec8882d8777c6d289d890))
+
 ## [0.7.0-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.7.0-nightly.7...@cardano-sdk/web-extension@0.7.0-nightly.8) (2022-12-17)
 
 **Note:** Version bump only for package @cardano-sdk/web-extension

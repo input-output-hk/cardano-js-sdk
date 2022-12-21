@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0-nightly.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.7.0-nightly.8...@cardano-sdk/wallet@0.7.0-nightly.9) (2022-12-21)
+
+### Features
+
+- adds a retry strategy to single address wallet ([7d01ee9](https://github.com/input-output-hk/cardano-js-sdk/commit/7d01ee931dba467ddd6ec8882d8777c6d289d890))
+- **wallet:** enable pouchdb auto-compaction ([5c24ebc](https://github.com/input-output-hk/cardano-js-sdk/commit/5c24ebc5a27b2c58ff8287a62eee23a6aed6e87b))
+
+### Bug Fixes
+
+- cip30 wallet has to accept hex encoded address ([d5a748a](https://github.com/input-output-hk/cardano-js-sdk/commit/d5a748a74289c7ec703066a8eca11637e3a84734))
+- **wallet:** rewards amount formula ([9d187ab](https://github.com/input-output-hk/cardano-js-sdk/commit/9d187ab885e5c6d9f2b9c270ba284bb37d4892d1))
+
 ## [0.7.0-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.7.0-nightly.7...@cardano-sdk/wallet@0.7.0-nightly.8) (2022-12-17)
 
 **Note:** Version bump only for package @cardano-sdk/wallet

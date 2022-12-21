@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.1-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.6.1-nightly.7...@cardano-sdk/dapp-connector@0.6.1-nightly.8) (2022-12-21)
+
+### Bug Fixes
+
+- cip30 wallet has to accept hex encoded address ([d5a748a](https://github.com/input-output-hk/cardano-js-sdk/commit/d5a748a74289c7ec703066a8eca11637e3a84734))
+
 ## [0.6.1-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.6.1-nightly.6...@cardano-sdk/dapp-connector@0.6.1-nightly.7) (2022-12-17)
 
 **Note:** Version bump only for package @cardano-sdk/dapp-connector
