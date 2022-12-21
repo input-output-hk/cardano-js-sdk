@@ -30,7 +30,9 @@ describe('TxSubmitWorker', () => {
   beforeEach(async () => {
     await container.removeQueues();
     logger = createLogger({ record: true });
-    txSubmitProvider = new OgmiosTxSubmitProvider(urlToConnectionConfig(new URL(`http://localhost:${port}/`)), logger);
+    txSubmitProvider = new OgmiosTxSubmitProvider(urlToConnectionConfig(new URL(`http://localhost:${port}/`)), {
+      logger
+    });
   });
 
   afterEach(async () => {
