@@ -8,10 +8,10 @@ import {
   ProviderFailure
 } from '@cardano-sdk/core';
 import { AssetBuilder } from './AssetBuilder';
-import { DbSyncProvider } from '../util/DbSyncProvider';
 import { Logger } from 'ts-log';
-import { NftMetadataService, TokenMetadataService } from './types';
 import { Pool } from 'pg';
+import { DbSyncProvider } from '../../util/DbSyncProvider';
+import { NftMetadataService, TokenMetadataService } from '../types';
 
 /**
  * Dependencies that are need to create DbSyncAssetProvider
