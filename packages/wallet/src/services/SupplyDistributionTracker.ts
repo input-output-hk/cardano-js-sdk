@@ -17,6 +17,7 @@ export interface SupplyDistributionTrackerProps {
    * Failed request retry strategy
    */
   retryBackoffConfig?: RetryBackoffConfig;
+  onFatalError?: (value: unknown) => void;
 }
 
 export interface SupplyDistributionTrackerDependencies {
@@ -32,12 +33,17 @@ export interface SupplyDistributionTrackerDependencies {
  * @returns object that continuously fetches and emits network stats (StakeSummary and SupplySummary)
  */
 export const createSupplyDistributionTracker = (
-  { trigger$, retryBackoffConfig = { initialInterval: 1000, maxInterval: 60_000 } }: SupplyDistributionTrackerProps,
+  {
+    trigger$,
+    retryBackoffConfig = { initialInterval: 1000, maxInterval: 60_000 },
+    onFatalError
+  }: SupplyDistributionTrackerProps,
   { logger, stores, networkInfoProvider }: SupplyDistributionTrackerDependencies
 ) => {
   const stake$ = new PersistentDocumentTrackerSubject(
     coldObservableProvider({
       equals: isEqual,
+      onFatalError,
       provider: networkInfoProvider.stake,
       retryBackoffConfig,
       trigger$
@@ -48,6 +54,7 @@ export const createSupplyDistributionTracker = (
   const lovelaceSupply$ = new PersistentDocumentTrackerSubject(
     coldObservableProvider({
       equals: isEqual,
+      onFatalError,
       provider: networkInfoProvider.lovelaceSupply,
       retryBackoffConfig,
       trigger$

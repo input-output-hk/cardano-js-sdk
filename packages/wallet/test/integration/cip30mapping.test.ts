@@ -149,6 +149,22 @@ describe('cip30', () => {
         confirmationCallback.mockRejectedValue(1);
         await expect(api.signData(wallet.addresses$.value![0].address, payload)).rejects.toThrowError(DataSignError);
       });
+
+      test('gets the Cardano.Address equivalent of the hex address', async () => {
+        confirmationCallback.mockClear();
+        confirmationCallback.mockResolvedValueOnce(true);
+
+        const expectedAddr = wallet.addresses$.value![0].address;
+
+        const hexAddr = Buffer.from(scope.manage(CML.Address.from_bech32(expectedAddr.toString())).to_bytes()).toString(
+          'hex'
+        );
+
+        await api.signData(hexAddr, payload);
+        expect(confirmationCallback).toHaveBeenCalledWith(
+          expect.objectContaining({ data: expect.objectContaining({ addr: expectedAddr }) })
+        );
+      });
     });
 
     describe('signTx', () => {

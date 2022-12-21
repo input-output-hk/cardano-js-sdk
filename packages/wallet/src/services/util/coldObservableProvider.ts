@@ -1,10 +1,13 @@
+import { InvalidStringError } from '@cardano-sdk/core';
 import {
   NEVER,
   Observable,
+  Subject,
   concat,
   defer,
   distinctUntilChanged,
   from,
+  merge,
   mergeMap,
   of,
   switchMap,
@@ -17,6 +20,7 @@ import { strictEquals } from './equals';
 export interface ColdObservableProviderProps<T> {
   provider: () => Promise<T>;
   retryBackoffConfig: RetryBackoffConfig;
+  onFatalError?: (value: unknown) => void;
   trigger$?: Observable<unknown>;
   equals?: (t1: T, t2: T) => boolean;
   combinator?: typeof switchMap;
@@ -27,6 +31,7 @@ export interface ColdObservableProviderProps<T> {
 export const coldObservableProvider = <T>({
   provider,
   retryBackoffConfig,
+  onFatalError,
   trigger$ = of(true),
   equals = strictEquals,
   combinator = switchMap,
@@ -34,6 +39,8 @@ export const coldObservableProvider = <T>({
   pollUntil = () => true
 }: ColdObservableProviderProps<T>) =>
   new Observable<T>((subscriber) => {
+    const cancelOnFatalError$ = new Subject<boolean>();
+    const internalCancel$ = merge(cancel$, cancelOnFatalError$);
     const sub = trigger$
       .pipe(
         combinator(() =>
@@ -49,11 +56,29 @@ export const coldObservableProvider = <T>({
                     )
               )
             )
-          ).pipe(retryBackoff(retryBackoffConfig))
+          ).pipe(
+            retryBackoff({
+              ...retryBackoffConfig,
+              shouldRetry: (error) => {
+                if (retryBackoffConfig.shouldRetry && !retryBackoffConfig.shouldRetry(error)) return false;
+
+                if (error instanceof InvalidStringError) {
+                  onFatalError?.(error);
+                  cancelOnFatalError$.next(true);
+                }
+
+                return true;
+              }
+            })
+          )
         ),
         distinctUntilChanged(equals),
-        takeUntil(cancel$)
+        takeUntil(internalCancel$)
       )
       .subscribe(subscriber);
-    return () => sub.unsubscribe();
+
+    return () => {
+      sub.unsubscribe();
+      cancelOnFatalError$.complete();
+    };
   });

@@ -57,7 +57,8 @@ export const createQueryStakePoolsProvider =
   (
     stakePoolProvider: TrackedStakePoolProvider,
     store: KeyValueStore<Cardano.PoolId, Cardano.StakePool>,
-    retryBackoffConfig: RetryBackoffConfig
+    retryBackoffConfig: RetryBackoffConfig,
+    onFatalError?: (value: unknown) => void
   ) =>
   (poolIds: Cardano.PoolId[]) => {
     if (poolIds.length === 0) {
@@ -67,6 +68,7 @@ export const createQueryStakePoolsProvider =
     return merge(
       store.getValues(poolIds),
       coldObservableProvider({
+        onFatalError,
         provider: () => allStakePoolsByPoolIds(stakePoolProvider, { poolIds }),
         retryBackoffConfig
       }).pipe(
@@ -108,13 +110,15 @@ export const createRewardsProvider =
     epoch$: Observable<Cardano.EpochNo>,
     txConfirmed$: Observable<ConfirmedTx>,
     rewardsProvider: RewardsProvider,
-    retryBackoffConfig: RetryBackoffConfig
+    retryBackoffConfig: RetryBackoffConfig,
+    onFatalError?: (value: unknown) => void
   ) =>
   (rewardAccounts: Cardano.RewardAccount[], equals = isEqual): Observable<Cardano.Lovelace[]> =>
     combineLatest(
       rewardAccounts.map((rewardAccount) =>
         coldObservableProvider({
           equals,
+          onFatalError,
           provider: () => rewardsProvider.rewardAccountBalance({ rewardAccount }),
           retryBackoffConfig,
           trigger$: fetchRewardsTrigger$(epoch$, txConfirmed$, rewardAccount)

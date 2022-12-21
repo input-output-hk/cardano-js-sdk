@@ -23,6 +23,7 @@ export const observableWalletProperties: RemoteApiProperties<ObservableWallet> =
     rewardsHistory$: RemoteApiPropertyType.HotObservable
   },
   eraSummaries$: RemoteApiPropertyType.HotObservable,
+  fatalError$: RemoteApiPropertyType.HotObservable,
   finalizeTx: RemoteApiPropertyType.MethodReturningPromise,
   genesisParameters$: RemoteApiPropertyType.HotObservable,
   getName: RemoteApiPropertyType.MethodReturningPromise,

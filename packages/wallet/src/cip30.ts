@@ -232,13 +232,14 @@ export const createWalletApi = (
     scope.dispose();
     return cbor;
   },
-  signData: async (addr: Cardano.Address, payload: Bytes): Promise<Cip30DataSignature> => {
+  signData: async (addr: Cardano.Address | Bytes, payload: Bytes): Promise<Cip30DataSignature> => {
     logger.debug('signData');
     const hexBlobPayload = Cardano.util.HexBlob(payload);
+    const signWith = Cardano.Address(addr.toString());
 
     const shouldProceed = await confirmationCallback({
       data: {
-        addr,
+        addr: signWith,
         payload: hexBlobPayload
       },
       type: Cip30ConfirmationCallbackType.SignData
@@ -248,7 +249,7 @@ export const createWalletApi = (
       const wallet = await firstValueFrom(wallet$);
       return wallet.signData({
         payload: hexBlobPayload,
-        signWith: addr
+        signWith
       });
     }
     logger.debug('sign data declined');

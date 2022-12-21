@@ -1,9 +1,11 @@
+/* eslint-disable unicorn/no-useless-undefined */
 import { Cardano } from '@cardano-sdk/core';
 import { InMemoryRewardsHistoryStore } from '../../../src/persistence';
 import {
   RewardsHistory,
   RewardsHistoryProvider,
   TrackedRewardsProvider,
+  calcFirstDelegationEpoch,
   createRewardsHistoryProvider,
   createRewardsHistoryTracker
 } from '../../../src/services';
@@ -39,7 +41,7 @@ describe('RewardsHistory', () => {
   });
 
   describe('createRewardsHistoryTracker', () => {
-    it('queries and maps reward history starting from first delegation epoch+3', () => {
+    it('queries and maps reward history starting from first delegation epoch+2', () => {
       createTestScheduler().run(({ cold, expectObservable, flush }) => {
         const accountRewardsHistory = rewardsHistory.get(rewardAccount)!;
         const epoch = accountRewardsHistory[0].epoch;
@@ -77,7 +79,11 @@ describe('RewardsHistory', () => {
         });
         flush();
         expect(getRewardsHistory).toBeCalledTimes(1);
-        expect(getRewardsHistory).toBeCalledWith(rewardAccounts, Cardano.EpochNo(epoch.valueOf() + 3));
+        expect(getRewardsHistory).toBeCalledWith(
+          rewardAccounts,
+          Cardano.EpochNo(calcFirstDelegationEpoch(epoch)),
+          undefined
+        );
       });
     });
 
@@ -120,7 +126,11 @@ describe('RewardsHistory', () => {
         });
         flush();
         expect(getRewardsHistory).toBeCalledTimes(1);
-        expect(getRewardsHistory).toBeCalledWith(rewardAccounts, Cardano.EpochNo(epoch.valueOf() + 3));
+        expect(getRewardsHistory).toBeCalledWith(
+          rewardAccounts,
+          Cardano.EpochNo(calcFirstDelegationEpoch(epoch)),
+          undefined
+        );
       });
     });
 
