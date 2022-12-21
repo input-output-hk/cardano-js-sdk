@@ -10,9 +10,9 @@ import {
   SlotTimeCalc,
   createSlotEpochCalc,
   createSlotEpochInfoCalc,
-  createSlotTimeCalc,
-  testnetEraSummaries
+  createSlotTimeCalc
 } from '../../src';
+import { testnetEraSummaries } from '../../../util-dev/src';
 
 import merge from 'lodash/merge';
 

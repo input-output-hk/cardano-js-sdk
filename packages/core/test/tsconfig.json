@@ -6,6 +6,9 @@
   "references": [
     {
       "path": "../src"
+    },
+    {
+      "path": "../../util-dev/src"
     }
   ]
 }
