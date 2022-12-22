@@ -12,9 +12,10 @@ import {
 import { Cardano } from '@cardano-sdk/core';
 import { InvalidSerializableDataError } from '../src/errors';
 import { STAKE_KEY_DERIVATION_PATH } from '../src/util';
+import { dummyLogger } from 'ts-log';
 
 describe('KeyManagement/restoreKeyAgent', () => {
-  const dependencies: KeyAgentDependencies = { inputResolver: { resolveInputAddress: jest.fn() } }; // not called
+  const dependencies: KeyAgentDependencies = { inputResolver: { resolveInputAddress: jest.fn() }, logger: dummyLogger };
 
   describe('InMemoryKeyAgent', () => {
     const encryptedRootPrivateKeyBytes = [
@@ -41,6 +42,7 @@ describe('KeyManagement/restoreKeyAgent', () => {
     const inMemoryKeyAgentDataWithoutStakeDerivationPath: SerializableInMemoryKeyAgentData = {
       __typename: KeyAgentType.InMemory,
       accountIndex: 0,
+      chainId: Cardano.ChainIds.Preview,
       encryptedRootPrivateKeyBytes,
       extendedAccountPublicKey,
       knownAddresses: [
@@ -48,17 +50,17 @@ describe('KeyManagement/restoreKeyAgent', () => {
           accountIndex: 0,
           address,
           index: 0,
-          networkId: Cardano.NetworkId.mainnet,
+          networkId: Cardano.NetworkId.Mainnet,
           rewardAccount,
           type: AddressType.External
         }
-      ],
-      networkId: 0
+      ]
     };
 
     const inMemoryKeyAgentData: SerializableInMemoryKeyAgentData = {
       __typename: KeyAgentType.InMemory,
       accountIndex: 0,
+      chainId: Cardano.ChainIds.Preview,
       encryptedRootPrivateKeyBytes,
       extendedAccountPublicKey,
       knownAddresses: [
@@ -66,13 +68,12 @@ describe('KeyManagement/restoreKeyAgent', () => {
           accountIndex: 0,
           address,
           index: 0,
-          networkId: Cardano.NetworkId.mainnet,
+          networkId: Cardano.NetworkId.Mainnet,
           rewardAccount,
           stakeKeyDerivationPath: STAKE_KEY_DERIVATION_PATH,
           type: AddressType.External
         }
-      ],
-      networkId: 0
+      ]
     };
     // eslint-disable-next-line unicorn/consistent-function-scoping
     const getPassword: GetPassword = async () => Buffer.from('password');
@@ -88,7 +89,7 @@ describe('KeyManagement/restoreKeyAgent', () => {
 
     it('can restore key manager from valid data and password', async () => {
       const keyAgent = await restoreKeyAgent(inMemoryKeyAgentData, dependencies, getPassword);
-      expect(keyAgent.knownAddresses).toBe(inMemoryKeyAgentData.knownAddresses);
+      expect(keyAgent.knownAddresses).toEqual(inMemoryKeyAgentData.knownAddresses);
     });
 
     it('throws when attempting to restore key manager from valid data and no password', async () => {
@@ -109,6 +110,7 @@ describe('KeyManagement/restoreKeyAgent', () => {
     const ledgerKeyAgentData: SerializableLedgerKeyAgentData = {
       __typename: KeyAgentType.Ledger,
       accountIndex: 0,
+      chainId: Cardano.ChainIds.LegacyTestnet,
       communicationType: CommunicationType.Node,
       extendedAccountPublicKey: Cardano.Bip32PublicKey(
         // eslint-disable-next-line max-len
@@ -121,19 +123,17 @@ describe('KeyManagement/restoreKeyAgent', () => {
             'addr1qx52knza2h5x090n4a5r7yraz3pwcamk9ppvuh7e26nfks7pnmhxqavtqy02zezklh27jt9r6z62sav3mugappdc7xnskxy2pn'
           ),
           index: 0,
-          networkId: Cardano.NetworkId.mainnet,
+          networkId: Cardano.NetworkId.Mainnet,
           rewardAccount: Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr'),
           stakeKeyDerivationPath: STAKE_KEY_DERIVATION_PATH,
           type: AddressType.External
         }
-      ],
-      networkId: 0,
-      protocolMagic: 1_097_911_063
+      ]
     };
 
     it('can restore key manager from valid data', async () => {
       const keyAgent = await restoreKeyAgent(ledgerKeyAgentData, dependencies);
-      expect(keyAgent.knownAddresses).toBe(ledgerKeyAgentData.knownAddresses);
+      expect(keyAgent.knownAddresses).toEqual(ledgerKeyAgentData.knownAddresses);
     });
   });
 
@@ -141,6 +141,7 @@ describe('KeyManagement/restoreKeyAgent', () => {
     const trezorKeyAgentData: SerializableTrezorKeyAgentData = {
       __typename: KeyAgentType.Trezor,
       accountIndex: 0,
+      chainId: Cardano.ChainIds.LegacyTestnet,
       extendedAccountPublicKey: Cardano.Bip32PublicKey(
         // eslint-disable-next-line max-len
         'fc5ab25e830b67c47d0a17411bf7fdabf711a597fb6cf04102734b0a2934ceaaa65ff5e7c52498d52c07b8ddfcd436fc2b4d2775e2984a49d0c79f65ceee4779'
@@ -152,14 +153,12 @@ describe('KeyManagement/restoreKeyAgent', () => {
             'addr1qx52knza2h5x090n4a5r7yraz3pwcamk9ppvuh7e26nfks7pnmhxqavtqy02zezklh27jt9r6z62sav3mugappdc7xnskxy2pn'
           ),
           index: 0,
-          networkId: Cardano.NetworkId.mainnet,
+          networkId: Cardano.NetworkId.Mainnet,
           rewardAccount: Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr'),
           stakeKeyDerivationPath: STAKE_KEY_DERIVATION_PATH,
           type: AddressType.External
         }
       ],
-      networkId: 0,
-      protocolMagic: 1_097_911_063,
       trezorConfig: {
         communicationType: CommunicationType.Node,
         manifest: {
@@ -171,7 +170,7 @@ describe('KeyManagement/restoreKeyAgent', () => {
 
     it('can restore key manager from valid data', async () => {
       const keyAgent = await restoreKeyAgent(trezorKeyAgentData, dependencies);
-      expect(keyAgent.knownAddresses).toBe(trezorKeyAgentData.knownAddresses);
+      expect(keyAgent.knownAddresses).toEqual(trezorKeyAgentData.knownAddresses);
     });
   });
 

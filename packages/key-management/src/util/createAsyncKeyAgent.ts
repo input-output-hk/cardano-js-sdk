@@ -13,6 +13,8 @@ export const createAsyncKeyAgent = (keyAgent: KeyAgent, onShutdown?: () => void)
       return address;
     },
     derivePublicKey: keyAgent.derivePublicKey.bind(keyAgent),
+    getChainId: () => Promise.resolve(keyAgent.chainId),
+    getExtendedAccountPublicKey: () => Promise.resolve(keyAgent.extendedAccountPublicKey),
     knownAddresses$,
     shutdown() {
       knownAddresses$.complete();

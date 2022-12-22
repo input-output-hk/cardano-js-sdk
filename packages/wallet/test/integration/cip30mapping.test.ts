@@ -53,7 +53,7 @@ describe('cip30', () => {
   describe('createWalletApi', () => {
     test('api.getNetworkId', async () => {
       const cip30NetworkId = await api.getNetworkId();
-      expect(cip30NetworkId).toEqual(Cardano.NetworkId.testnet);
+      expect(cip30NetworkId).toEqual(Cardano.NetworkId.Testnet);
     });
 
     test('api.getUtxos', async () => {

@@ -1,7 +1,6 @@
 /* eslint-disable max-statements */
 import { Cardano } from '@cardano-sdk/core';
-import { KeyAgentFactoryProps, TestWallet, getWallet } from '../../src';
-import { getEnv, walletVariables } from '../environment';
+import { KeyAgentFactoryProps, TestWallet, getEnv, getWallet, walletVariables } from '../../src';
 import { logger } from '@cardano-sdk/util-dev';
 import { submitCertificate, waitForWalletStateSettle, walletReady } from '../util';
 
@@ -15,18 +14,18 @@ const vrf2 = Cardano.VrfVkHex('641d042ed39c2c258d381060c1424f40ef8abfe25ef566f4c
 
 const wallet1Params: KeyAgentFactoryProps = {
   accountIndex: 0,
+  chainId: env.KEY_MANAGEMENT_PARAMS.chainId,
   mnemonic:
     // eslint-disable-next-line max-len
     'decorate survey empower stairs pledge humble social leisure baby wrap grief exact monster rug dash kiss perfect select science light frame play swallow day',
-  networkId: Cardano.NetworkId.testnet,
   password: 'some_password'
 };
 const wallet2Params: KeyAgentFactoryProps = {
   accountIndex: 0,
+  chainId: env.KEY_MANAGEMENT_PARAMS.chainId,
   mnemonic:
     // eslint-disable-next-line max-len
     'salon zoo engage submit smile frost later decide wing sight chaos renew lizard rely canal coral scene hobby scare step bus leaf tobacco slice',
-  networkId: Cardano.NetworkId.testnet,
   password: 'some_password'
 };
 

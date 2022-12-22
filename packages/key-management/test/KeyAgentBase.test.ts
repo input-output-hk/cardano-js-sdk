@@ -8,13 +8,13 @@ import {
   SerializableInMemoryKeyAgentData
 } from '../src';
 import { CML, Cardano } from '@cardano-sdk/core';
+import { dummyLogger } from 'ts-log';
 
-const NETWORK_ID = Cardano.NetworkId.testnet;
 const ACCOUNT_INDEX = 1;
 
 class MockKeyAgent extends KeyAgentBase {
   constructor(data: SerializableInMemoryKeyAgentData) {
-    super(data, { inputResolver: { resolveInputAddress: () => Promise.resolve(null) } });
+    super(data, { inputResolver: { resolveInputAddress: () => Promise.resolve(null) }, logger: dummyLogger });
   }
 
   serializableDataImpl = jest.fn();
@@ -35,13 +35,13 @@ describe('KeyAgentBase', () => {
     keyAgent = new MockKeyAgent({
       __typename: KeyAgentType.InMemory,
       accountIndex: ACCOUNT_INDEX,
+      chainId: Cardano.ChainIds.Preview,
       encryptedRootPrivateKeyBytes: [],
       extendedAccountPublicKey: Cardano.Bip32PublicKey(
         // eslint-disable-next-line max-len
         'fc5ab25e830b67c47d0a17411bf7fdabf711a597fb6cf04102734b0a2934ceaaa65ff5e7c52498d52c07b8ddfcd436fc2b4d2775e2984a49d0c79f65ceee4779'
       ),
-      knownAddresses: [],
-      networkId: NETWORK_ID
+      knownAddresses: []
     });
   });
 
@@ -61,7 +61,7 @@ describe('KeyAgentBase', () => {
     expect(address.index).toBe(index);
     expect(address.type).toBe(type);
     expect(address.accountIndex).toBe(ACCOUNT_INDEX);
-    expect(address.networkId).toBe(NETWORK_ID);
+    expect(address.networkId).toBe(Cardano.ChainIds.Preview.networkId);
     expect(address.address.startsWith('addr_test')).toBe(true);
     expect(address.rewardAccount.startsWith('stake_test')).toBe(true);
     expect(keyAgent.knownAddresses).toHaveLength(1);

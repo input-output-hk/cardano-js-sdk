@@ -11,8 +11,8 @@ interface ToLovalaceSupplyInput {
 }
 
 export const networkIdMap = {
-  Mainnet: Cardano.NetworkId.mainnet,
-  Testnet: Cardano.NetworkId.testnet
+  Mainnet: Cardano.NetworkId.Mainnet,
+  Testnet: Cardano.NetworkId.Testnet
 };
 
 export const toSupply = ({ circulatingSupply, totalSupply }: ToLovalaceSupplyInput): SupplySummary => ({

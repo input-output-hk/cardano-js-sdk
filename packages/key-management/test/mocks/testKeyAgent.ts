@@ -10,9 +10,9 @@ export const testKeyAgent = async (
 ) => {
   const keyAgent = await InMemoryKeyAgent.fromBip39MnemonicWords(
     {
+      chainId: Cardano.ChainIds.Preview,
       getPassword,
-      mnemonicWords: util.generateMnemonicWords(),
-      networkId: Cardano.NetworkId.testnet
+      mnemonicWords: util.generateMnemonicWords()
     },
     dependencies
   );

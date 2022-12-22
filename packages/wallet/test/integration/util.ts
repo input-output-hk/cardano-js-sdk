@@ -38,5 +38,6 @@ export const createWallet = async (stores?: WalletStores) =>
           utxoProvider
         }
       );
-    }
+    },
+    logger
   });

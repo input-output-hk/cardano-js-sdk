@@ -9,3 +9,4 @@ export * from './testScheduler';
 export * from './createStubUtxoProvider';
 export * from './createGenericMockServer';
 export * from './dataGeneration';
+export * from './eraSummaries';

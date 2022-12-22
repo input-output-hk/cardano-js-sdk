@@ -1,7 +1,8 @@
 import { PersistentAuthenticator, createPersistentAuthenticatorStorage } from '@cardano-sdk/dapp-connector';
-import { logger, walletName } from '../util';
+import { logger } from '../util';
 import { requestAccess } from './requestAccess';
 import { storage } from 'webextension-polyfill';
+import { walletName } from '../const';
 
 const authenticatorStorage = createPersistentAuthenticatorStorage(`${walletName}Origins`, storage.local);
 

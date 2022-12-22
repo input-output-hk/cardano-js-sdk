@@ -3,10 +3,9 @@ import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
 import { ObservableWallet, StakeKeyStatus, buildTx } from '@cardano-sdk/wallet';
 import { TX_TIMEOUT, firstValueFromTimed, waitForWalletStateSettle, walletReady } from '../../util';
-import { TestWallet, getWallet } from '../../../src/factories';
+import { TestWallet, getEnv, getWallet, walletVariables } from '../../../src';
 import { assertTxIsValid } from '../../../../wallet/test/util';
 import { combineLatest, filter, firstValueFrom } from 'rxjs';
-import { getEnv, walletVariables } from '../../environment';
 import { logger } from '@cardano-sdk/util-dev';
 
 const env = getEnv(walletVariables);

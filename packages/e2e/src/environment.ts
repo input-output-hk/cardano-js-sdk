@@ -1,20 +1,25 @@
+import { Cardano } from '@cardano-sdk/core';
+import { Schema, Validator as SchemaValidator } from 'jsonschema';
 import { ValidatorSpec, bool, cleanEnv, makeValidator, num, str } from 'envalid';
-import { validate } from 'jsonschema';
 
-interface KeyManagementParams {
+export interface KeyManagementParams {
   accountIndex: number;
   mnemonic: string;
-  networkId: number;
+  chainId: Cardano.ChainId;
   password: string;
 }
 
-interface ProviderParams {
+export interface ProviderParams {
   baseUrl: string;
 }
 
-const baseValidator = <T>(value: string, schema: unknown) => {
+const baseValidator = <T>(value: string, schema: Schema, ...dependencySchemas: Schema[]) => {
   const parsed = JSON.parse(value) as T;
-  const res = validate(parsed, schema, { required: true });
+  const v = new SchemaValidator();
+  for (const dependencySchema of dependencySchemas) {
+    v.addSchema(dependencySchema);
+  }
+  const res = v.validate(parsed, schema, { required: true });
 
   if (!res.valid) throw new Error(res.errors[0].stack.replace(/^instance\./, ''));
 
@@ -22,16 +27,28 @@ const baseValidator = <T>(value: string, schema: unknown) => {
 };
 
 const keyManagementParams = makeValidator((value) =>
-  baseValidator<KeyManagementParams>(value, {
-    properties: {
-      accountIndex: { minimum: 0, type: 'integer' },
-      mnemonic: { type: 'string' },
-      networkId: { minimum: 0, type: 'integer' },
-      password: { type: 'string' }
+  baseValidator<KeyManagementParams>(
+    value,
+    {
+      properties: {
+        accountIndex: { minimum: 0, type: 'integer' },
+        chainId: { $ref: '/ChainId' },
+        mnemonic: { type: 'string' },
+        password: { type: 'string' }
+      },
+      required: ['accountIndex', 'mnemonic', 'chainId', 'password'],
+      type: 'object'
     },
-    required: ['accountIndex', 'mnemonic', 'networkId', 'password'],
-    type: 'object'
-  })
+    {
+      id: '/ChainId',
+      properties: {
+        networkId: { minimum: 0, type: 'integer' },
+        networkMagic: { minimum: 0, type: 'integer' }
+      },
+      required: ['networkId', 'networkMagic'],
+      type: 'object'
+    }
+  )
 );
 
 const providerParams = makeValidator((value) => {

@@ -4,12 +4,6 @@
     "baseUrl": "."
   },
   "exclude": ["./web-extension"],
-  "include": [
-    "./**/*.ts",
-    "../../ogmios/test",
-    "../../wallet/test",
-    "../../input-selection/test/util"
-  ],
   "references": [
     {
       "path": "../src"

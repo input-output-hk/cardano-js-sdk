@@ -1,5 +1,5 @@
-import { CardanoNetworkMagic, EpochNo, Slot } from '../Cardano';
 import { CustomError } from 'ts-custom-error';
+import { EpochNo, NetworkMagics, Slot } from '../Cardano';
 import { EraSummary } from '../CardanoNode';
 import groupBy from 'lodash/groupBy';
 import last from 'lodash/last';
@@ -19,31 +19,7 @@ export interface EpochInfo {
 
 export class EraSummaryError extends CustomError {}
 
-/**
- * Valid at 2022-05-28
- */
-export const mainnetEraSummaries: EraSummary[] = [
-  { parameters: { epochLength: 21_600, slotLength: 20_000 }, start: { slot: 0, time: new Date(1_506_192_291_000) } },
-  {
-    parameters: { epochLength: 432_000, slotLength: 1000 },
-    start: { slot: 4_492_800, time: new Date(1_596_059_091_000) }
-  }
-];
-
-export const testnetEraSummaries: EraSummary[] = [
-  { parameters: { epochLength: 21_600, slotLength: 20_000 }, start: { slot: 0, time: new Date(1_563_999_616_000) } },
-  {
-    parameters: { epochLength: 432_000, slotLength: 1000 },
-    start: { slot: 1_598_400, time: new Date(1_595_967_616_000) }
-  }
-];
-
-export type EraSummariesMap = { [key in CardanoNetworkMagic]: EraSummary[] };
-
-export const eraSummariesConfig: EraSummariesMap = {
-  [CardanoNetworkMagic.Mainnet]: mainnetEraSummaries,
-  [CardanoNetworkMagic.Testnet]: testnetEraSummaries
-};
+export type EraSummariesMap = { [key in NetworkMagics]: EraSummary[] };
 
 const createSlotEpochCalcImpl = (eraSummaries: EraSummary[]) => {
   // It's possible to configure when particular eras are upgraded, without an upgrade proposal, in

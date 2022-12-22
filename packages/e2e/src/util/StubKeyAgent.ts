@@ -20,8 +20,8 @@ export class StubKeyAgent implements KeyAgent {
     return this.#knownAddresses;
   }
 
-  get networkId(): Cardano.NetworkId {
-    throw new NotImplementedError('networkId');
+  get chainId(): Cardano.ChainId {
+    throw new NotImplementedError('chainId');
   }
 
   get accountIndex(): number {

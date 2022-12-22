@@ -2,14 +2,15 @@
 import { Cardano } from '@cardano-sdk/core';
 import { SingleAddressWallet, buildTx } from '@cardano-sdk/wallet';
 import { assertTxIsValid } from '../../../../wallet/test/util';
+import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, map, take } from 'rxjs';
-import { getEnv, walletVariables } from '../../environment';
-import { getLogger, getWallet } from '../../../src';
+import { getEnv, walletVariables } from '../../../src/environment';
+import { getWallet } from '../../../src';
 import { isNotNil } from '@cardano-sdk/util';
 import { normalizeTxBody, walletReady } from '../../util';
 
 const env = getEnv(walletVariables);
-const logger = getLogger(env.LOGGER_MIN_SEVERITY);
+const logger = createLogger();
 
 describe('SingleAddressWallet/byron', () => {
   let wallet: SingleAddressWallet;

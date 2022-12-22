@@ -1,3 +1,4 @@
+import { logger } from '@cardano-sdk/util-dev';
 import { setupWallet } from '../src';
 
 jest.mock('../src/services/WalletUtil');
@@ -17,11 +18,12 @@ describe('setupWallet', () => {
     expect(
       await setupWallet({
         createKeyAgent,
-        createWallet
+        createWallet,
+        logger
       })
     ).toEqual({ keyAgent, wallet, walletUtil });
     expect(initialize).toBeCalledWith(wallet);
-    expect(createKeyAgent).toBeCalledWith({ inputResolver: walletUtil });
+    expect(createKeyAgent).toBeCalledWith({ inputResolver: walletUtil, logger });
     expect(createWallet).toBeCalledWith(keyAgent);
   });
 });

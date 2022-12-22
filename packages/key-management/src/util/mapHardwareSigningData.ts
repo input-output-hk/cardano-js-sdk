@@ -13,19 +13,17 @@ import uniq from 'lodash/uniq';
 
 export interface TxToLedgerProps {
   cslTxBody: CML.TransactionBody;
-  networkId: Cardano.NetworkId;
+  chainId: Cardano.ChainId;
   inputResolver: Cardano.util.InputResolver;
   knownAddresses: GroupedAddress[];
-  protocolMagic: Cardano.NetworkMagic;
 }
 
 export interface TxToTrezorProps {
   cslTxBody: CML.TransactionBody;
-  networkId: Cardano.NetworkId;
+  chainId: Cardano.ChainId;
   accountIndex: number;
   inputResolver: Cardano.util.InputResolver;
   knownAddresses: GroupedAddress[];
-  protocolMagic: Cardano.NetworkMagic;
 }
 
 export interface LedgerCertificates {
@@ -839,10 +837,9 @@ const prepareLedgerMintBundle = (
 
 export const txToLedger = async ({
   cslTxBody,
-  networkId,
+  chainId,
   inputResolver: inputAddressResolver,
-  knownAddresses,
-  protocolMagic
+  knownAddresses
 }: TxToLedgerProps): Promise<ledger.SignTransactionRequest> => {
   const scope = new ManagedFreeableScope();
   const accountAddress = knownAddresses[0];
@@ -913,8 +910,8 @@ export const txToLedger = async ({
     inputs: ledgerInputs,
     mint: ledgerMintBundle?.mintAssetsGroup,
     network: {
-      networkId,
-      protocolMagic
+      networkId: chainId.networkId,
+      protocolMagic: chainId.networkMagic
     },
     outputs: ledgerOutputs,
     ttl,
@@ -936,10 +933,9 @@ export const txToLedger = async ({
 
 export const txToTrezor = async ({
   cslTxBody,
-  networkId,
+  chainId,
   inputResolver: inputAddressResolver,
-  knownAddresses,
-  protocolMagic
+  knownAddresses
 }: TxToTrezorProps): Promise<trezor.CardanoSignTransaction> => {
   const scope = new ManagedFreeableScope();
   const accountAddress = knownAddresses[0];
@@ -1015,9 +1011,9 @@ export const txToTrezor = async ({
     fee,
     inputs: trezorInputs,
     mint: trezorMintBundle?.mintAssetsGroup,
-    networkId,
+    networkId: chainId.networkId,
     outputs: trezorOutputs,
-    protocolMagic,
+    protocolMagic: chainId.networkMagic,
     signingMode,
     ttl,
     validityIntervalStart: validityIntervalStart?.toString(),
