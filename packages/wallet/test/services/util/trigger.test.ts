@@ -1,7 +1,8 @@
-import { Cardano, EraSummary, testnetEraSummaries } from '@cardano-sdk/core';
-import { createTestScheduler } from '@cardano-sdk/util-dev';
-import { distinctBlock, distinctEraSummaries } from '../../../src/services/util';
+import { Cardano, EraSummary } from '@cardano-sdk/core';
+import { createTestScheduler, testnetEraSummaries } from '@cardano-sdk/util-dev';
 import merge from 'lodash/merge';
+
+import { distinctBlock, distinctEraSummaries } from '../../../src/services/util';
 
 describe('trigger', () => {
   it('distinctBlock subscribes to tip$ on each subscription and emits when tip$ has new blockNo', () => {

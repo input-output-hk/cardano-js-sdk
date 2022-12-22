@@ -13,7 +13,7 @@ import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { Cardano } from '@cardano-sdk/core';
 import { SingleAddressWallet, setupWallet } from '../../src';
 import { dummyLogger as logger } from 'ts-log';
-import { mockKeyAgentDependencies } from '../../../key-management/test/mocks';
+import { mockKeyAgentDependencies } from '@cardano-sdk/key-management/test/mocks';
 import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 describe('LedgerKeyAgent', () => {
@@ -28,9 +28,8 @@ describe('LedgerKeyAgent', () => {
       createKeyAgent: async (dependencies) => {
         const ledgerKeyAgent = await LedgerKeyAgent.createWithDevice(
           {
-            communicationType: CommunicationType.Node,
-            networkId: Cardano.NetworkId.testnet,
-            protocolMagic: 1_097_911_063
+            chainId: Cardano.ChainIds.LegacyTestnet,
+            communicationType: CommunicationType.Node
           },
           dependencies
         );
@@ -38,7 +37,7 @@ describe('LedgerKeyAgent', () => {
           accountIndex: 0,
           address,
           index: 0,
-          networkId: Cardano.NetworkId.testnet,
+          networkId: Cardano.NetworkId.Testnet,
           rewardAccount: mocks.rewardAccount,
           stakeKeyDerivationPath: mocks.stakeKeyDerivationPath,
           type: AddressType.External
@@ -69,7 +68,8 @@ describe('LedgerKeyAgent', () => {
             utxoProvider
           }
         );
-      }
+      },
+      logger
     }));
   });
 
@@ -79,10 +79,9 @@ describe('LedgerKeyAgent', () => {
     const ledgerKeyAgentWithRandomIndex = await LedgerKeyAgent.createWithDevice(
       {
         accountIndex: 5,
+        chainId: Cardano.ChainIds.LegacyTestnet,
         communicationType: CommunicationType.Node,
-        deviceConnection: keyAgent.deviceConnection,
-        networkId: Cardano.NetworkId.testnet,
-        protocolMagic: 1_097_911_063
+        deviceConnection: keyAgent.deviceConnection
       },
       mockKeyAgentDependencies()
     );
@@ -95,8 +94,8 @@ describe('LedgerKeyAgent', () => {
     expect(typeof keyAgent.serializableData.__typename).toBe('string');
   });
 
-  test('networkId', () => {
-    expect(typeof keyAgent.networkId).toBe('number');
+  test('chainId', () => {
+    expect(keyAgent.chainId).toBe(Cardano.ChainIds.LegacyTestnet);
   });
 
   test('accountIndex', () => {
@@ -197,11 +196,10 @@ describe('LedgerKeyAgent', () => {
     it('all fields are of correct types', () => {
       expect(typeof serializableData.__typename).toBe('string');
       expect(typeof serializableData.accountIndex).toBe('number');
-      expect(typeof serializableData.networkId).toBe('number');
+      expect(typeof serializableData.chainId).toBe('object');
       expect(Array.isArray(serializableData.knownAddresses)).toBe(true);
       expect(typeof serializableData.extendedAccountPublicKey).toBe('string');
       expect(typeof serializableData.communicationType).toBe('string');
-      expect(typeof serializableData.protocolMagic).toBe('number');
     });
 
     it('is serializable', () => {

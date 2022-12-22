@@ -46,17 +46,18 @@ describe('LedgerKeyAgent+SingleAddressWallet', () => {
       createKeyAgent: (dependencies) =>
         LedgerKeyAgent.createWithDevice(
           {
-            communicationType: CommunicationType.Node,
-            networkId: Cardano.NetworkId.testnet,
-            protocolMagic: 1_097_911_063
+            chainId: Cardano.ChainIds.LegacyTestnet,
+            communicationType: CommunicationType.Node
           },
           dependencies
         ),
-      createWallet
+      createWallet,
+      logger
     });
     const { wallet: restoredWallet } = await setupWallet({
       createKeyAgent: (dependencies) => restoreKeyAgent(freshKeyAgent.serializableData, dependencies),
-      createWallet
+      createWallet,
+      logger
     });
     expect(await getAddress(freshWallet)).toEqual(await getAddress(restoredWallet));
     // TODO: finalizeTx with both wallets, assert that signature equals

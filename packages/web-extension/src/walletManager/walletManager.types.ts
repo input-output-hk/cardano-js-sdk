@@ -6,7 +6,13 @@ export interface WalletManagerProps {
 }
 
 export interface WalletManagerActivateProps<P extends string | number = string, O = unknown> {
+  /** User given name for the observableWallet being activated */
   observableWalletName: string;
+  /**
+   * Internal unique id calculated by {@link WalletManagerUi} based on the keyManager `chainId` and
+   * the root public key hash.
+   */
+  walletId: string;
   /**
    * `provider` could be used to pass the necessary information to construct providers for different networks.
    * Its value is passed to the {@link WalletFactory}, which is required to create {@link WalletManagerWorker}.
@@ -40,15 +46,21 @@ export interface WalletManagerActivateProps<P extends string | number = string, 
 }
 
 export interface WalletManagerApi {
-  /** Create and activate a new ObservableWallet */
+  /**
+   * Create and activate a new ObservableWallet.
+   * Reuses the store if the wallet was previously deactivated but not destroyed.
+   */
   activate(props: WalletManagerActivateProps): Promise<void>;
-  /** Deactivate wallet. Wallet observable properties will emit only after a new wallet is {@link activate}ed */
+  /**
+   * Deactivate wallet. Wallet observable properties will emit only after a new wallet is {@link activate}ed.
+   * The wallet store will be reused if the wallet is reactivated.
+   */
   deactivate(): Promise<void>;
   /**
-   * Remove `observableWalletName` associated store only if is inactive.
-   * The store is recreated when wallet is activated again.
+   * Deactivates the active wallet and destroy its existing store,
+   * so that a future activation of the same wallet creates a new store.
    */
-  clearStore(observableWalletName: string): Promise<void>;
+  destroy(): Promise<void>;
 }
 
 export interface WalletFactory {
@@ -59,5 +71,5 @@ export interface WalletFactory {
 }
 
 export interface StoresFactory {
-  create: (props: Pick<WalletManagerActivateProps, 'observableWalletName'>) => storage.WalletStores;
+  create: (props: Pick<WalletManagerActivateProps, 'walletId'>) => storage.WalletStores;
 }

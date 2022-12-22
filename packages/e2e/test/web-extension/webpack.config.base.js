@@ -5,7 +5,7 @@ const path = require('path');
 const distDir = path.join(__dirname, 'dist');
 
 // this is insecure, as it builds in your system's env variables. use webpack-dotenv or similar instead.
-require('dotenv').config({ path: path.join(__dirname, '.env') });
+require('dotenv').config({ path: path.join(__dirname, '../../', '.env') });
 
 module.exports = {
   baseConfig: {
@@ -66,6 +66,10 @@ module.exports = {
       })
     ],
     resolve: {
+      alias: {
+        // imported by faucet provider in e2e/src, not used in web-extension
+        'cardano-wallet-js': false
+      },
       extensions: ['.ts', '.js'],
       fallback: {
         buffer: require.resolve('buffer/'),
@@ -76,6 +80,7 @@ module.exports = {
         net: false,
         os: false,
         path: false,
+        perf_hooks: false,
         stream: require.resolve('readable-stream'),
         util: require.resolve('util/')
       }

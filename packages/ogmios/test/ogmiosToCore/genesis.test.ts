@@ -22,7 +22,7 @@ describe('ogmiosToCore', () => {
         ...ogmiosGenesis,
         activeSlotsCoefficient: 0.05,
         maxLovelaceSupply: 45_000_000_000_000_000n,
-        networkId: Cardano.NetworkId.testnet,
+        networkId: Cardano.NetworkId.Testnet,
         systemStart: new Date('2022-08-09T00:00:00Z')
       });
     });

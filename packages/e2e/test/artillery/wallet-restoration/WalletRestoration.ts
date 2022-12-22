@@ -1,11 +1,10 @@
-import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
+import { AddressType, GroupedAddress, util } from '@cardano-sdk/key-management';
 import { AddressesModel, WalletVars } from './types';
 import { Cardano } from '@cardano-sdk/core';
 import { FunctionHook } from '../artillery';
 import { Pool, QueryResult } from 'pg';
-import { StubKeyAgent, getWallet } from '../../../src';
+import { StubKeyAgent, getEnv, getWallet, walletVariables } from '../../../src';
 import { findAddressesWithRegisteredStakeKey } from './queries';
-import { getEnv, walletVariables } from '../../environment';
 import { logger } from '@cardano-sdk/util-dev';
 import { walletReady } from '../../util';
 
@@ -23,7 +22,7 @@ const mapToGroupedAddress = (addrModel: AddressesModel): GroupedAddress => ({
   accountIndex: 0,
   address: Cardano.Address(addrModel.address),
   index: 0,
-  networkId: addrModel.address.startsWith('addr_test') ? Cardano.NetworkId.testnet : Cardano.NetworkId.mainnet,
+  networkId: addrModel.address.startsWith('addr_test') ? Cardano.NetworkId.Testnet : Cardano.NetworkId.Mainnet,
   rewardAccount: Cardano.RewardAccount(addrModel.stake_address),
   type: AddressType.External
 });
@@ -58,7 +57,7 @@ export const walletRestoration: FunctionHook<WalletVars> = async ({ vars, _uid }
     const currentAddress = vars.addresses[index];
 
     try {
-      const keyAgent = new StubKeyAgent(currentAddress);
+      const keyAgent = util.createAsyncKeyAgent(new StubKeyAgent(currentAddress));
 
       // Start to measure wallet restoration time
       const startedAt = Date.now();

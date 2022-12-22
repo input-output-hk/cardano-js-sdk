@@ -1,3 +1,3 @@
-export * from './NetworkId';
+export * from './ChainId';
 export * as util from './util';
 export * from './types';

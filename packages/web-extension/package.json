@@ -54,6 +54,7 @@
   },
   "devDependencies": {
     "@cardano-sdk/util-dev": "^0.6.0-nightly.4",
+    "@types/blake2b": "^2.1.0",
     "@types/lodash": "^4.14.182",
     "@types/uuid": "^8.3.4",
     "@types/webextension-polyfill": "^0.8.0",
@@ -74,6 +75,7 @@
     "@cardano-sdk/util": "^0.7.0-nightly.3",
     "@cardano-sdk/util-rxjs": "^0.4.3-nightly.8",
     "@cardano-sdk/wallet": "^0.7.0-nightly.9",
+    "blake2b": "^2.1.4",
     "lodash": "^4.17.21",
     "rxjs": "^7.4.0",
     "ts-custom-error": "^3.2.0",

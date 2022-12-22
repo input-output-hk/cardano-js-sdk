@@ -1,15 +1,8 @@
 import { Observable } from 'rxjs';
 import { Origin } from '@cardano-sdk/dapp-connector';
 import { RemoteApiProperties, RemoteApiPropertyType } from '@cardano-sdk/web-extension';
-
-export const extensionId = 'lgehgfkeagjdklnanflcjoipaphegomm';
-
-export const walletName = 'ccvault';
-export const observableWalletNames = ['UserCreatedWallet1', 'UserCreatedWallet2'];
-
-export const userPromptServiceChannel = `user-prompt-${walletName}`;
-
-export const adaPriceServiceChannel = `ada-price-${walletName}`;
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { getEnv, walletVariables } from '@cardano-sdk/e2e';
 
 export interface UserPromptService {
   allowOrigin(origin: Origin): Promise<boolean>;
@@ -26,3 +19,5 @@ export const adaPriceProperties: RemoteApiProperties<BackgroundServices> = {
 };
 
 export const logger = console;
+
+export const env = getEnv(walletVariables);

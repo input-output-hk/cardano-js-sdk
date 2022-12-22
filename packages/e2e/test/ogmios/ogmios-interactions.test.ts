@@ -7,8 +7,7 @@ import WebSocket from 'ws';
 import axios from 'axios';
 import path from 'path';
 
-import { getEnv } from '../environment';
-import { networkInfoProviderFactory } from '../../src';
+import { getEnv, networkInfoProviderFactory } from '../../src';
 
 const env = getEnv(['DB_SYNC_CONNECTION_STRING', 'OGMIOS_SERVER_URL']);
 

@@ -14,15 +14,16 @@ import {
   MeasurementUtil,
   assetProviderFactory,
   chainHistoryProviderFactory,
+  getEnv,
   getLoadTestScheduler,
   keyManagementFactory,
   networkInfoProviderFactory,
   rewardsProviderFactory,
   stakePoolProviderFactory,
   txSubmitProviderFactory,
-  utxoProviderFactory
+  utxoProviderFactory,
+  walletVariables
 } from '../../../src';
-import { getEnv, walletVariables } from '../../environment';
 import { waitForWalletStateSettle } from '../../util';
 
 // Example call that creates 5000 wallets in 10 minutes:
@@ -70,7 +71,7 @@ const getKeyAgent = async (accountIndex: number) => {
     logger
   );
   const walletUtil = createLazyWalletUtil();
-  const keyAgent = await createKeyAgent({ inputResolver: walletUtil });
+  const keyAgent = await createKeyAgent({ inputResolver: walletUtil, logger });
   return { keyAgent, walletUtil };
 };
 

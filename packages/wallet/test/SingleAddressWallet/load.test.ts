@@ -54,7 +54,7 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
         accountIndex: 0,
         address,
         index: 0,
-        networkId: Cardano.NetworkId.testnet,
+        networkId: Cardano.NetworkId.Testnet,
         rewardAccount,
         stakeKeyDerivationPath: mocks.stakeKeyDerivationPath,
         type: AddressType.External
@@ -86,7 +86,8 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
           utxoProvider
         }
       );
-    }
+    },
+    logger
   });
   return wallet;
 };

@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import { AddressType, InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
-import { Cardano } from '@cardano-sdk/core';
+import { localNetworkChainId } from '../util';
 
 /**
  * Generates a new set of Mnemonic words and prints them to the console.
@@ -13,11 +13,11 @@ import { Cardano } from '@cardano-sdk/core';
 
   const keyAgentFromMnemonic = await InMemoryKeyAgent.fromBip39MnemonicWords(
     {
+      chainId: localNetworkChainId,
       getPassword: async () => Buffer.from(''),
-      mnemonicWords: mnemonicArray,
-      networkId: Cardano.NetworkId.testnet
+      mnemonicWords: mnemonicArray
     },
-    { inputResolver: { resolveInputAddress: async () => null } }
+    { inputResolver: { resolveInputAddress: async () => null }, logger: console }
   );
 
   const derivedAddress = await keyAgentFromMnemonic.deriveAddress({

@@ -1,5 +1,6 @@
-import { Cardano, EraSummary, testnetEraSummaries } from '@cardano-sdk/core';
-import { createTestScheduler } from '@cardano-sdk/util-dev';
+import { Cardano, EraSummary } from '@cardano-sdk/core';
+import { createTestScheduler, testnetEraSummaries } from '@cardano-sdk/util-dev';
+
 import { currentEpochTracker } from '../../src/services';
 
 describe('currentEpochTracker', () => {

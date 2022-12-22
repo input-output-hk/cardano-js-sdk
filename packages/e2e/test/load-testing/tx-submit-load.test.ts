@@ -6,7 +6,7 @@ import { RabbitMQContainer } from '../../../cardano-services/test/TxSubmit/rabbi
 import { ServiceNames } from '@cardano-sdk/cardano-services';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom } from 'rxjs';
-import { getEnv, walletVariables } from '../environment';
+import { getEnv, walletVariables } from '../../src';
 import { getWallet } from '../../src/factories';
 import { submitAndConfirm } from '../util';
 import JSONBig from 'json-bigint';

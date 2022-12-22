@@ -2,8 +2,7 @@
 import { SingleAddressWallet, buildTx } from '@cardano-sdk/wallet';
 import { assertTxIsValid } from '../../../../wallet/test/util';
 import { filter, firstValueFrom, map, take } from 'rxjs';
-import { getEnv, walletVariables } from '../../environment';
-import { getWallet } from '../../../src';
+import { getEnv, getWallet, walletVariables } from '../../../src';
 import { isNotNil } from '@cardano-sdk/util';
 import { logger } from '@cardano-sdk/util-dev';
 import { normalizeTxBody } from '../../util';

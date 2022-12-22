@@ -1,7 +1,6 @@
 import { ObservableWallet } from '@cardano-sdk/wallet';
 import { firstValueFrom } from 'rxjs';
-import { getEnv, walletVariables } from '../../environment';
-import { getWallet } from '../../../src/factories';
+import { getEnv, getWallet, walletVariables } from '../../../src';
 import { logger } from '@cardano-sdk/util-dev';
 import { submitAndConfirm, walletReady } from '../../util';
 

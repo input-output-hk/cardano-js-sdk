@@ -1,10 +1,12 @@
 import { AsyncKeyAgent, KeyAgentDependencies } from '@cardano-sdk/key-management';
+import { Logger } from 'ts-log';
 import { ObservableWallet } from './types';
 import { WalletUtil, WalletUtilContext, createLazyWalletUtil } from './services';
 
 export interface SetupWalletProps<TWallet, TKeyAgent> {
   createKeyAgent: (dependencies: KeyAgentDependencies) => Promise<TKeyAgent>;
   createWallet: (keyAgent: TKeyAgent) => Promise<TWallet>;
+  logger: Logger;
 }
 
 /**
@@ -16,10 +18,11 @@ export interface SetupWalletProps<TWallet, TKeyAgent> {
  */
 export const setupWallet = async <TWallet extends WalletUtilContext = ObservableWallet, TKeyAgent = AsyncKeyAgent>({
   createKeyAgent,
-  createWallet
+  createWallet,
+  logger
 }: SetupWalletProps<TWallet, TKeyAgent>) => {
   const walletUtil = createLazyWalletUtil();
-  const keyAgent = await createKeyAgent({ inputResolver: walletUtil });
+  const keyAgent = await createKeyAgent({ inputResolver: walletUtil, logger });
   const wallet = await createWallet(keyAgent);
   walletUtil.initialize(wallet);
   return { keyAgent, wallet, walletUtil: walletUtil as WalletUtil };

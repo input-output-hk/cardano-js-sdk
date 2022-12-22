@@ -1,9 +1,8 @@
 import * as envalid from 'envalid';
 import { Cardano, QueryStakePoolsArgs } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
-import { MeasurementUtil, getLoadTestScheduler } from '../../../src';
+import { MeasurementUtil, getEnv, getLoadTestScheduler } from '../../../src';
 import { bufferTime, from, tap } from 'rxjs';
-import { getEnv } from '../../environment';
 import { logger } from '@cardano-sdk/util-dev';
 import { stakePoolHttpProvider } from '@cardano-sdk/cardano-services-client';
 

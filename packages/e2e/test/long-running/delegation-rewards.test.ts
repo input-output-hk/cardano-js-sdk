@@ -1,9 +1,8 @@
 import { Cardano } from '@cardano-sdk/core';
 import { SingleAddressWallet, buildTx } from '@cardano-sdk/wallet';
-import { TestWallet, getWallet } from '../../src';
+import { TestWallet, getEnv, getWallet, walletVariables } from '../../src';
 import { assertTxIsValid, waitForWalletStateSettle } from '../../../wallet/test/util';
 import { firstValueFrom } from 'rxjs';
-import { getEnv, walletVariables } from '../environment';
 import {
   getTxConfirmationEpoch,
   requestCoins,
