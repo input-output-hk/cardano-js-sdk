@@ -3,6 +3,68 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.6.0...@cardano-sdk/wallet@0.7.0) (2022-12-22)
+
+### ⚠ BREAKING CHANGES
+
+- Alonzo transaction outputs will now contain a datumHash field, carrying the datum hash digest. However, they will also contain a datum field with the exact same value for backward compatibility reason. In Babbage however, transaction outputs will carry either datum or datumHash depending on the case; and datum will only contain inline datums.
+- - replace KeyAgent.networkId with KeyAgent.chainId
+
+* remove CardanoNetworkId type
+* rename CardanoNetworkMagic->NetworkMagics
+* add 'logger' to KeyAgentDependencies
+* setupWallet now requires a Logger
+
+- use titlecase for mainnet/testnet in NetworkId
+- moved testnetEraSummaries to util-dev package
+- - make `TxBodyAlonzo.validityInterval` an optional field aligned with Ogmios schema
+- - BlockSize is now an OpaqueNumber rather than a type alias for number
+
+* BlockNo is now an OpaqueNumber rather than a type alias for number
+* EpochNo is now an OpaqueNumber rather than a type alias for number
+* Slot is now an OpaqueNumber rather than a type alias for number
+* Percentage is now an OpaqueNumber rather than a type alias for number
+
+- rename era-specific types in core
+- create a new CML scope for every call of BuildTx in selection constraints
+- rename block types
+
+* CompactBlock -> BlockInfo
+* Block -> ExtendedBlockInfo
+
+- hoist ogmiosToCore to ogmios package
+- classify TxSubmission errors as variant of CardanoNode error
+- remote api wallet manager
+
+### Features
+
+- add opaque numeric types to core package ([9ead8bd](https://github.com/input-output-hk/cardano-js-sdk/commit/9ead8bdb34b7ffc57c32f9ab18a6c6ca14af3fda))
+- added new babbage era types in Transactions and Outputs ([0b1f2ff](https://github.com/input-output-hk/cardano-js-sdk/commit/0b1f2ffaad2edec281d206a6865cd1e6053d9826))
+- adds a retry strategy to single address wallet ([7d01ee9](https://github.com/input-output-hk/cardano-js-sdk/commit/7d01ee931dba467ddd6ec8882d8777c6d289d890))
+- implement ogmiosToCore certificates mapping ([aef2e8d](https://github.com/input-output-hk/cardano-js-sdk/commit/aef2e8d64da9352c6aab206034950d64f44e9559))
+- remote api wallet manager ([043f1df](https://github.com/input-output-hk/cardano-js-sdk/commit/043f1dff7ed85b43e489d972dc5158712c43ee68))
+- rename era-specific types in core ([c4955b1](https://github.com/input-output-hk/cardano-js-sdk/commit/c4955b1f3ae0992bb55b1c1461a1e449be0b6ef2))
+- replace KeyAgent.networkId with KeyAgent.chainId ([e44dee0](https://github.com/input-output-hk/cardano-js-sdk/commit/e44dee054611636f34b0a66e27d7971af01e0296))
+- type GroupedAddress now includes key derivation paths ([8ac0125](https://github.com/input-output-hk/cardano-js-sdk/commit/8ac0125152fa2f3eb95c3e4c32bee077d2df722f))
+- **wallet:** enable pouchdb auto-compaction ([5c24ebc](https://github.com/input-output-hk/cardano-js-sdk/commit/5c24ebc5a27b2c58ff8287a62eee23a6aed6e87b))
+
+### Bug Fixes
+
+- add sideEffects=false to package.json ([a1cb8f8](https://github.com/input-output-hk/cardano-js-sdk/commit/a1cb8f807e8d5947d0c512e0918713ff97d5d48e))
+- cip30 wallet has to accept hex encoded address ([d5a748a](https://github.com/input-output-hk/cardano-js-sdk/commit/d5a748a74289c7ec703066a8eca11637e3a84734))
+- create a new CML scope for every call of BuildTx in selection constraints ([6818ae4](https://github.com/input-output-hk/cardano-js-sdk/commit/6818ae443dd53ac4786ce161f02aef5635433678))
+- **wallet:** assetsTracker never emits ([a0f33b5](https://github.com/input-output-hk/cardano-js-sdk/commit/a0f33b516b74f747dddcb36ea4b9bcbb0c7b65ad))
+- **wallet:** rewards amount formula ([9d187ab](https://github.com/input-output-hk/cardano-js-sdk/commit/9d187ab885e5c6d9f2b9c270ba284bb37d4892d1))
+- **wallet:** sign entire transaction in cip30 mapping instead of transaction body ([c446d2d](https://github.com/input-output-hk/cardano-js-sdk/commit/c446d2dc6d6d23203864f3a802f04b579aa2a766))
+- **wallet:** the SingleAddressWallet now shuts down the RewardsProvider on shutdown ([c1bc43b](https://github.com/input-output-hk/cardano-js-sdk/commit/c1bc43b492457fb5c16a8435be428e241859a7d1))
+
+### Code Refactoring
+
+- classify TxSubmission errors as variant of CardanoNode error ([234305e](https://github.com/input-output-hk/cardano-js-sdk/commit/234305e28aefd3d9bd1736315bdf89ca31f7556f))
+- make tx validityInterval an optional ([fa1c487](https://github.com/input-output-hk/cardano-js-sdk/commit/fa1c4877bb64f0e2584950a27861cf16e727cadd))
+- moved testnetEraSummaries to util-dev package ([5ad0514](https://github.com/input-output-hk/cardano-js-sdk/commit/5ad0514846dd2d186eb04c29821d987c6409a5c2))
+- use titlecase for mainnet/testnet in NetworkId ([252c589](https://github.com/input-output-hk/cardano-js-sdk/commit/252c589480d3e422b9021ea66a67af978fb80264))
+
 ## [0.6.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.5.0...@cardano-sdk/wallet@0.6.0) (2022-11-04)
 
 ### ⚠ BREAKING CHANGES

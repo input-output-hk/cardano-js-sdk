@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.6.0...@cardano-sdk/util@0.7.0) (2022-12-22)
+
+### ⚠ BREAKING CHANGES
+
+- create a new CML scope for every call of BuildTx in selection constraints
+
+### Bug Fixes
+
+- add sideEffects=false to package.json ([a1cb8f8](https://github.com/input-output-hk/cardano-js-sdk/commit/a1cb8f807e8d5947d0c512e0918713ff97d5d48e))
+- create a new CML scope for every call of BuildTx in selection constraints ([6818ae4](https://github.com/input-output-hk/cardano-js-sdk/commit/6818ae443dd53ac4786ce161f02aef5635433678))
+- **util:** fixes util-dev version in dev dependencies ([6c165bf](https://github.com/input-output-hk/cardano-js-sdk/commit/6c165bf9f11159324850d9f7624c02bec9be60e1))
+
 ## [0.6.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.5.0...@cardano-sdk/util@0.6.0) (2022-11-04)
 
 ### ⚠ BREAKING CHANGES

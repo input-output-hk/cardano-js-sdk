@@ -3,6 +3,77 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0...@cardano-sdk/core@0.7.0) (2022-12-22)
+
+### ⚠ BREAKING CHANGES
+
+- Alonzo transaction outputs will now contain a datumHash field, carrying the datum hash digest. However, they will also contain a datum field with the exact same value for backward compatibility reason. In Babbage however, transaction outputs will carry either datum or datumHash depending on the case; and datum will only contain inline datums.
+- - replace KeyAgent.networkId with KeyAgent.chainId
+
+* remove CardanoNetworkId type
+* rename CardanoNetworkMagic->NetworkMagics
+* add 'logger' to KeyAgentDependencies
+* setupWallet now requires a Logger
+
+- use titlecase for mainnet/testnet in NetworkId
+- moved testnetEraSummaries to util-dev package
+- - rename `redeemer.scriptHash` to `redeemer.data` in core
+
+* change the type from `Hash28ByteBase16` to `HexBlob`
+
+- - make `TxBodyAlonzo.validityInterval` an optional field aligned with Ogmios schema
+- **core:** - rename `Cardano.NativeScriptKind.RequireMOf` to `Cardano.NativeScriptKind.RequireNOf`
+- - BlockSize is now an OpaqueNumber rather than a type alias for number
+
+* BlockNo is now an OpaqueNumber rather than a type alias for number
+* EpochNo is now an OpaqueNumber rather than a type alias for number
+* Slot is now an OpaqueNumber rather than a type alias for number
+* Percentage is now an OpaqueNumber rather than a type alias for number
+
+- rename era-specific types in core
+- rename block types
+
+* CompactBlock -> BlockInfo
+* Block -> ExtendedBlockInfo
+
+- hoist ogmiosToCore to ogmios package
+- classify TxSubmission errors as variant of CardanoNode error
+
+### Features
+
+- add opaque numeric types to core package ([9ead8bd](https://github.com/input-output-hk/cardano-js-sdk/commit/9ead8bdb34b7ffc57c32f9ab18a6c6ca14af3fda))
+- added new babbage era types in Transactions and Outputs ([0b1f2ff](https://github.com/input-output-hk/cardano-js-sdk/commit/0b1f2ffaad2edec281d206a6865cd1e6053d9826))
+- **core:** add missing tx props conversions ([6e9a962](https://github.com/input-output-hk/cardano-js-sdk/commit/6e9a962ff8911ada35a86b927af6650b300174c2))
+- **core:** add preview and preprod network magics ([676c576](https://github.com/input-output-hk/cardano-js-sdk/commit/676c5769fa744d5fa1fb7a6a4af152cc73347710))
+- **core:** added utility function to create pool ids from verification key hashes ([318c784](https://github.com/input-output-hk/cardano-js-sdk/commit/318c7847a3b432382f62c11640922b8af606432f))
+- **core:** adds optional projected tip to the health cheak response interface ([ea59ed7](https://github.com/input-output-hk/cardano-js-sdk/commit/ea59ed748761e5d4edaf1a255ae43df2fdd27092))
+- **core:** memoizes computation slot nr to epoch nr ([40fe907](https://github.com/input-output-hk/cardano-js-sdk/commit/40fe90748d03e72724a549dc01cec0821945a819))
+- dbSyncUtxoProvider now returns the new Babbage fields in the UTXO when present ([82b271b](https://github.com/input-output-hk/cardano-js-sdk/commit/82b271b602b6075a561ed12529ca29ab558e303b))
+- implement ogmiosToCore certificates mapping ([aef2e8d](https://github.com/input-output-hk/cardano-js-sdk/commit/aef2e8d64da9352c6aab206034950d64f44e9559))
+- initial projection implementation ([8a93d8d](https://github.com/input-output-hk/cardano-js-sdk/commit/8a93d8d427eb947b6f34566f8a694fcedfe0e59f))
+- **ogmios:** complete Ogmios tx to core mapping ([bcac56b](https://github.com/input-output-hk/cardano-js-sdk/commit/bcac56bbf943110703696e0854b2af2f5e2b1737))
+- rename era-specific types in core ([c4955b1](https://github.com/input-output-hk/cardano-js-sdk/commit/c4955b1f3ae0992bb55b1c1461a1e449be0b6ef2))
+- replace KeyAgent.networkId with KeyAgent.chainId ([e44dee0](https://github.com/input-output-hk/cardano-js-sdk/commit/e44dee054611636f34b0a66e27d7971af01e0296))
+
+### Bug Fixes
+
+- add sideEffects=false to package.json ([a1cb8f8](https://github.com/input-output-hk/cardano-js-sdk/commit/a1cb8f807e8d5947d0c512e0918713ff97d5d48e))
+- cip30 wallet has to accept hex encoded address ([d5a748a](https://github.com/input-output-hk/cardano-js-sdk/commit/d5a748a74289c7ec703066a8eca11637e3a84734))
+- **core:** correct hash types in genesis key delegation certificate ([10d1f2b](https://github.com/input-output-hk/cardano-js-sdk/commit/10d1f2b5eda4831e87042cbb4c945d8a62aaa6a4))
+- **core:** correctly serialize/deserialize transactions with no validity interval ([5e6e3eb](https://github.com/input-output-hk/cardano-js-sdk/commit/5e6e3eb37743a54c174d82f973b26c2ed1d1e057))
+- **core:** fixed a small memory leak when pasring byron era addresses ([16727e4](https://github.com/input-output-hk/cardano-js-sdk/commit/16727e435d318059e2d2749420aa5e40d1d4198d))
+- **core:** native script type name ([bc62f8b](https://github.com/input-output-hk/cardano-js-sdk/commit/bc62f8bf8af18c9f34acf2072806a303927265c0))
+- fixed an issue that was preveting TxOuts with byron addresses to be deserialized correctly ([65356d5](https://github.com/input-output-hk/cardano-js-sdk/commit/65356d5d07375f5b90c25aca4f1965e35edee747))
+- **input-selection:** fixed recursive use of CSL object ([ac39e77](https://github.com/input-output-hk/cardano-js-sdk/commit/ac39e775bb08b36c28593b960a0deda78f680c4d))
+
+### Code Refactoring
+
+- change redeemer script hash to data ([a24bbb8](https://github.com/input-output-hk/cardano-js-sdk/commit/a24bbb80d57007352d64b5b99dbc7a19d4948208))
+- classify TxSubmission errors as variant of CardanoNode error ([234305e](https://github.com/input-output-hk/cardano-js-sdk/commit/234305e28aefd3d9bd1736315bdf89ca31f7556f))
+- make tx validityInterval an optional ([fa1c487](https://github.com/input-output-hk/cardano-js-sdk/commit/fa1c4877bb64f0e2584950a27861cf16e727cadd))
+- moved testnetEraSummaries to util-dev package ([5ad0514](https://github.com/input-output-hk/cardano-js-sdk/commit/5ad0514846dd2d186eb04c29821d987c6409a5c2))
+- use titlecase for mainnet/testnet in NetworkId ([252c589](https://github.com/input-output-hk/cardano-js-sdk/commit/252c589480d3e422b9021ea66a67af978fb80264))
+
 ## [0.6.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.5.0...@cardano-sdk/core@0.6.0) (2022-11-04)
 
 ### ⚠ BREAKING CHANGES
