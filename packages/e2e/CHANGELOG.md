@@ -3,32 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.6.0-nightly.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.6.0-nightly.12...@cardano-sdk/e2e@0.6.0-nightly.13) (2022-12-21)
-
-**Note:** Version bump only for package @cardano-sdk/e2e
-
-## [0.6.0-nightly.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.6.0-nightly.11...@cardano-sdk/e2e@0.6.0-nightly.12) (2022-12-17)
-
-**Note:** Version bump only for package @cardano-sdk/e2e
-
-## [0.6.0-nightly.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.6.0-nightly.10...@cardano-sdk/e2e@0.6.0-nightly.11) (2022-12-14)
-
-### Bug Fixes
-
-- fixed an issue that was preveting TxOuts with byron addresses to be deserialized correctly ([65356d5](https://github.com/input-output-hk/cardano-js-sdk/commit/65356d5d07375f5b90c25aca4f1965e35edee747))
-
-## [0.6.0-nightly.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.6.0-nightly.9...@cardano-sdk/e2e@0.6.0-nightly.10) (2022-12-11)
-
-**Note:** Version bump only for package @cardano-sdk/e2e
-
-## [0.6.0-nightly.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.6.0-nightly.8...@cardano-sdk/e2e@0.6.0-nightly.9) (2022-12-07)
-
-**Note:** Version bump only for package @cardano-sdk/e2e
-
-## [0.6.0-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.6.0-nightly.7...@cardano-sdk/e2e@0.6.0-nightly.8) (2022-12-05)
+## [0.6.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.5.0...@cardano-sdk/e2e@0.6.0) (2022-12-22)
 
 ### ⚠ BREAKING CHANGES
 
+- **walletManager:** use a unique walletId with walletManager
+- - replace KeyAgent.networkId with KeyAgent.chainId
+
+* remove CardanoNetworkId type
+* rename CardanoNetworkMagic->NetworkMagics
+* add 'logger' to KeyAgentDependencies
+* setupWallet now requires a Logger
+
+- use titlecase for mainnet/testnet in NetworkId
 - - BlockSize is now an OpaqueNumber rather than a type alias for number
 
 * BlockNo is now an OpaqueNumber rather than a type alias for number
@@ -37,55 +24,31 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * Percentage is now an OpaqueNumber rather than a type alias for number
 
 - rename era-specific types in core
+- Even if the value of DB_CACHE_TTL was already interpreted in seconds
+  rather than in minutes (despite the error in the description), it's default value is
+  changed
+- remote api wallet manager
 
 ### Features
 
 - add opaque numeric types to core package ([9ead8bd](https://github.com/input-output-hk/cardano-js-sdk/commit/9ead8bdb34b7ffc57c32f9ab18a6c6ca14af3fda))
+- **e2e:** add artillery to perform stress tests ([0fd40cb](https://github.com/input-output-hk/cardano-js-sdk/commit/0fd40cbf154a8b900720a800dd5436ffc8540cd0))
+- remote api wallet manager ([043f1df](https://github.com/input-output-hk/cardano-js-sdk/commit/043f1dff7ed85b43e489d972dc5158712c43ee68))
 - rename era-specific types in core ([c4955b1](https://github.com/input-output-hk/cardano-js-sdk/commit/c4955b1f3ae0992bb55b1c1461a1e449be0b6ef2))
+- replace KeyAgent.networkId with KeyAgent.chainId ([e44dee0](https://github.com/input-output-hk/cardano-js-sdk/commit/e44dee054611636f34b0a66e27d7971af01e0296))
+- **walletManager:** use a unique walletId with walletManager ([55df794](https://github.com/input-output-hk/cardano-js-sdk/commit/55df794239f7b11fe3e6ea23ca36130e6db6c5eb))
 
 ### Bug Fixes
 
 - add sideEffects=false to package.json ([a1cb8f8](https://github.com/input-output-hk/cardano-js-sdk/commit/a1cb8f807e8d5947d0c512e0918713ff97d5d48e))
-
-## [0.6.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.6.0-nightly.6...@cardano-sdk/e2e@0.6.0-nightly.7) (2022-12-01)
-
-### ⚠ BREAKING CHANGES
-
-- Even if the value of DB_CACHE_TTL was already interpreted in seconds
-  rather than in minutes (despite the error in the description), it's default value is
-  changed
-
-### Bug Fixes
-
+- fixed an issue that was preveting TxOuts with byron addresses to be deserialized correctly ([65356d5](https://github.com/input-output-hk/cardano-js-sdk/commit/65356d5d07375f5b90c25aca4f1965e35edee747))
 - ttl validation now uses seconds and no longer minutes as the cache itself ([f0eb80f](https://github.com/input-output-hk/cardano-js-sdk/commit/f0eb80f73e61ea48f10809fb3c329fb5c4022e6b))
 
-## [0.6.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.6.0-nightly.5...@cardano-sdk/e2e@0.6.0-nightly.6) (2022-11-30)
+### Code Refactoring
 
-**Note:** Version bump only for package @cardano-sdk/e2e
+- use titlecase for mainnet/testnet in NetworkId ([252c589](https://github.com/input-output-hk/cardano-js-sdk/commit/252c589480d3e422b9021ea66a67af978fb80264))
 
-## [0.6.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.6.0-nightly.4...@cardano-sdk/e2e@0.6.0-nightly.5) (2022-11-26)
-
-**Note:** Version bump only for package @cardano-sdk/e2e
-
-## [0.6.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.6.0-nightly.3...@cardano-sdk/e2e@0.6.0-nightly.4) (2022-11-24)
-
-**Note:** Version bump only for package @cardano-sdk/e2e
-
-## [0.6.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.6.0-nightly.2...@cardano-sdk/e2e@0.6.0-nightly.3) (2022-11-22)
-
-**Note:** Version bump only for package @cardano-sdk/e2e
-
-## [0.6.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.6.0-nightly.1...@cardano-sdk/e2e@0.6.0-nightly.2) (2022-11-12)
-
-### Features
-
-- **e2e:** add artillery to perform stress tests ([0fd40cb](https://github.com/input-output-hk/cardano-js-sdk/commit/0fd40cbf154a8b900720a800dd5436ffc8540cd0))
-
-## [0.6.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.6.0-nightly.0...@cardano-sdk/e2e@0.6.0-nightly.1) (2022-11-11)
-
-**Note:** Version bump only for package @cardano-sdk/e2e
-
-## [0.6.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.5.1-nightly.0...@cardano-sdk/e2e@0.6.0-nightly.0) (2022-11-09)
+## [0.5.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.4.0...@cardano-sdk/e2e@0.5.0) (2022-11-04)
 
 ### ⚠ BREAKING CHANGES
 

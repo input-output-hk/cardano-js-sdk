@@ -3,62 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.7.0-nightly.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.7.0-nightly.8...@cardano-sdk/web-extension@0.7.0-nightly.9) (2022-12-21)
-
-### Features
-
-- adds a retry strategy to single address wallet ([7d01ee9](https://github.com/input-output-hk/cardano-js-sdk/commit/7d01ee931dba467ddd6ec8882d8777c6d289d890))
-
-## [0.7.0-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.7.0-nightly.7...@cardano-sdk/web-extension@0.7.0-nightly.8) (2022-12-17)
-
-**Note:** Version bump only for package @cardano-sdk/web-extension
-
-## [0.7.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.7.0-nightly.6...@cardano-sdk/web-extension@0.7.0-nightly.7) (2022-12-14)
-
-**Note:** Version bump only for package @cardano-sdk/web-extension
-
-## [0.7.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.7.0-nightly.5...@cardano-sdk/web-extension@0.7.0-nightly.6) (2022-12-11)
-
-**Note:** Version bump only for package @cardano-sdk/web-extension
-
-## [0.7.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.7.0-nightly.4...@cardano-sdk/web-extension@0.7.0-nightly.5) (2022-12-07)
-
-### Bug Fixes
-
-- **web-extension:** do not replay values from disabled remote api objects ([e341675](https://github.com/input-output-hk/cardano-js-sdk/commit/e3416750546412c65830849a3895463fc00bc707))
-
-## [0.7.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.7.0-nightly.3...@cardano-sdk/web-extension@0.7.0-nightly.4) (2022-12-05)
-
-### Bug Fixes
-
-- add sideEffects=false to package.json ([a1cb8f8](https://github.com/input-output-hk/cardano-js-sdk/commit/a1cb8f807e8d5947d0c512e0918713ff97d5d48e))
-- **web-extension:** close key agent channel on walletManagerUi deactivate ([f5d9183](https://github.com/input-output-hk/cardano-js-sdk/commit/f5d918325ba66a6e1433fb0e91cd42bf3d42f72c))
-
-## [0.7.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.7.0-nightly.2...@cardano-sdk/web-extension@0.7.0-nightly.3) (2022-12-01)
-
-**Note:** Version bump only for package @cardano-sdk/web-extension
-
-## [0.7.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.7.0-nightly.1...@cardano-sdk/web-extension@0.7.0-nightly.2) (2022-11-24)
-
-**Note:** Version bump only for package @cardano-sdk/web-extension
-
-## [0.7.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.7.0-nightly.0...@cardano-sdk/web-extension@0.7.0-nightly.1) (2022-11-22)
-
-**Note:** Version bump only for package @cardano-sdk/web-extension
-
-## [0.7.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.6.1-nightly.0...@cardano-sdk/web-extension@0.7.0-nightly.0) (2022-11-09)
+## [0.7.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.6.0...@cardano-sdk/web-extension@0.7.0) (2022-12-22)
 
 ### ⚠ BREAKING CHANGES
+
+- **walletManager:** use a unique walletId with walletManager
+- - replace KeyAgent.networkId with KeyAgent.chainId
+
+* remove CardanoNetworkId type
+* rename CardanoNetworkMagic->NetworkMagics
+* add 'logger' to KeyAgentDependencies
+* setupWallet now requires a Logger
 
 - remote api wallet manager
 
 ### Features
 
+- adds a retry strategy to single address wallet ([7d01ee9](https://github.com/input-output-hk/cardano-js-sdk/commit/7d01ee931dba467ddd6ec8882d8777c6d289d890))
+- **key-management:** expose extendedAccountPublicKey in AsyncKeyAgent ([122b281](https://github.com/input-output-hk/cardano-js-sdk/commit/122b281bc460924e5f69c59c896dec4d056d5de8))
 - remote api wallet manager ([043f1df](https://github.com/input-output-hk/cardano-js-sdk/commit/043f1dff7ed85b43e489d972dc5158712c43ee68))
+- replace KeyAgent.networkId with KeyAgent.chainId ([e44dee0](https://github.com/input-output-hk/cardano-js-sdk/commit/e44dee054611636f34b0a66e27d7971af01e0296))
+- **walletManager:** use a unique walletId with walletManager ([55df794](https://github.com/input-output-hk/cardano-js-sdk/commit/55df794239f7b11fe3e6ea23ca36130e6db6c5eb))
 
-## [0.6.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.6.0...@cardano-sdk/web-extension@0.6.1-nightly.0) (2022-11-08)
+### Bug Fixes
 
-**Note:** Version bump only for package @cardano-sdk/web-extension
+- add sideEffects=false to package.json ([a1cb8f8](https://github.com/input-output-hk/cardano-js-sdk/commit/a1cb8f807e8d5947d0c512e0918713ff97d5d48e))
+- **web-extension:** close key agent channel on walletManagerUi deactivate ([f5d9183](https://github.com/input-output-hk/cardano-js-sdk/commit/f5d918325ba66a6e1433fb0e91cd42bf3d42f72c))
+- **web-extension:** do not replay values from disabled remote api objects ([e341675](https://github.com/input-output-hk/cardano-js-sdk/commit/e3416750546412c65830849a3895463fc00bc707))
 
 ## [0.6.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.5.0...@cardano-sdk/web-extension@0.6.0) (2022-11-04)
 

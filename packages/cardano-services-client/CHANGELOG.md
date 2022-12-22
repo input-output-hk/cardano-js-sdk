@@ -3,25 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.7.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.7.0-nightly.6...@cardano-sdk/cardano-services-client@0.7.0-nightly.7) (2022-12-21)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-## [0.7.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.7.0-nightly.5...@cardano-sdk/cardano-services-client@0.7.0-nightly.6) (2022-12-17)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-## [0.7.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.7.0-nightly.4...@cardano-sdk/cardano-services-client@0.7.0-nightly.5) (2022-12-14)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-## [0.7.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.7.0-nightly.3...@cardano-sdk/cardano-services-client@0.7.0-nightly.4) (2022-12-07)
-
-### Bug Fixes
-
-- **cardano-services-client:** import warning ([2e0ac62](https://github.com/input-output-hk/cardano-js-sdk/commit/2e0ac62e5bf8abd5ae859e24abea00e9543e78c6))
-
-## [0.7.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.7.0-nightly.2...@cardano-sdk/cardano-services-client@0.7.0-nightly.3) (2022-12-05)
+## [0.7.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.6.0...@cardano-sdk/cardano-services-client@0.7.0) (2022-12-22)
 
 ### ⚠ BREAKING CHANGES
 
@@ -32,6 +14,8 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * Slot is now an OpaqueNumber rather than a type alias for number
 * Percentage is now an OpaqueNumber rather than a type alias for number
 
+- classify TxSubmission errors as variant of CardanoNode error
+
 ### Features
 
 - add opaque numeric types to core package ([9ead8bd](https://github.com/input-output-hk/cardano-js-sdk/commit/9ead8bdb34b7ffc57c32f9ab18a6c6ca14af3fda))
@@ -39,28 +23,11 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 ### Bug Fixes
 
 - add sideEffects=false to package.json ([a1cb8f8](https://github.com/input-output-hk/cardano-js-sdk/commit/a1cb8f807e8d5947d0c512e0918713ff97d5d48e))
-
-## [0.7.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.7.0-nightly.1...@cardano-sdk/cardano-services-client@0.7.0-nightly.2) (2022-12-01)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-## [0.7.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.7.0-nightly.0...@cardano-sdk/cardano-services-client@0.7.0-nightly.1) (2022-11-24)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-## [0.7.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.6.1-nightly.0...@cardano-sdk/cardano-services-client@0.7.0-nightly.0) (2022-11-22)
-
-### ⚠ BREAKING CHANGES
-
-- classify TxSubmission errors as variant of CardanoNode error
+- **cardano-services-client:** import warning ([2e0ac62](https://github.com/input-output-hk/cardano-js-sdk/commit/2e0ac62e5bf8abd5ae859e24abea00e9543e78c6))
 
 ### Code Refactoring
 
 - classify TxSubmission errors as variant of CardanoNode error ([234305e](https://github.com/input-output-hk/cardano-js-sdk/commit/234305e28aefd3d9bd1736315bdf89ca31f7556f))
-
-## [0.6.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.6.0...@cardano-sdk/cardano-services-client@0.6.1-nightly.0) (2022-11-08)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
 
 ## [0.6.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.5.0...@cardano-sdk/cardano-services-client@0.6.0) (2022-11-04)
 

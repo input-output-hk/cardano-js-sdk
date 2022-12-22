@@ -3,26 +3,11 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.6.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.6.0-nightly.3...@cardano-sdk/util-dev@0.6.0-nightly.4) (2022-12-21)
-
-**Note:** Version bump only for package @cardano-sdk/util-dev
-
-## [0.6.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.6.0-nightly.2...@cardano-sdk/util-dev@0.6.0-nightly.3) (2022-12-17)
-
-**Note:** Version bump only for package @cardano-sdk/util-dev
-
-## [0.6.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.6.0-nightly.1...@cardano-sdk/util-dev@0.6.0-nightly.2) (2022-12-14)
-
-**Note:** Version bump only for package @cardano-sdk/util-dev
-
-## [0.6.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.6.0-nightly.0...@cardano-sdk/util-dev@0.6.0-nightly.1) (2022-12-07)
-
-**Note:** Version bump only for package @cardano-sdk/util-dev
-
-## [0.6.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.5.1-nightly.3...@cardano-sdk/util-dev@0.6.0-nightly.0) (2022-12-05)
+## [0.6.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.5.0...@cardano-sdk/util-dev@0.6.0) (2022-12-22)
 
 ### ⚠ BREAKING CHANGES
 
+- moved testnetEraSummaries to util-dev package
 - - BlockSize is now an OpaqueNumber rather than a type alias for number
 
 * BlockNo is now an OpaqueNumber rather than a type alias for number
@@ -38,21 +23,9 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 - add sideEffects=false to package.json ([a1cb8f8](https://github.com/input-output-hk/cardano-js-sdk/commit/a1cb8f807e8d5947d0c512e0918713ff97d5d48e))
 
-## [0.5.1-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.5.1-nightly.2...@cardano-sdk/util-dev@0.5.1-nightly.3) (2022-12-01)
+### Code Refactoring
 
-**Note:** Version bump only for package @cardano-sdk/util-dev
-
-## [0.5.1-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.5.1-nightly.1...@cardano-sdk/util-dev@0.5.1-nightly.2) (2022-11-24)
-
-**Note:** Version bump only for package @cardano-sdk/util-dev
-
-## [0.5.1-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.5.1-nightly.0...@cardano-sdk/util-dev@0.5.1-nightly.1) (2022-11-22)
-
-**Note:** Version bump only for package @cardano-sdk/util-dev
-
-## [0.5.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.5.0...@cardano-sdk/util-dev@0.5.1-nightly.0) (2022-11-08)
-
-**Note:** Version bump only for package @cardano-sdk/util-dev
+- moved testnetEraSummaries to util-dev package ([5ad0514](https://github.com/input-output-hk/cardano-js-sdk/commit/5ad0514846dd2d186eb04c29821d987c6409a5c2))
 
 ## [0.5.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.4.1...@cardano-sdk/util-dev@0.5.0) (2022-11-04)
 
