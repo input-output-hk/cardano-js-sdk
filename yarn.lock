@@ -21334,11 +21334,11 @@ __metadata:
   linkType: hard
 
 "snyk@npm:^1.192.4":
-  version: 1.1044.0
-  resolution: "snyk@npm:1.1044.0"
+  version: 1.1075.0
+  resolution: "snyk@npm:1.1075.0"
   bin:
     snyk: bin/snyk
-  checksum: 4d464005bc6ab55fb9925d66f0654c6f1ed0dfb11259ffa29c3e2287d8b29782218978e90ac2873347e48ea3dac46bddc42afbd2eb2b22e6f7e5a1247443a759
+  checksum: 12708d59f303c9c22610e1d01e6bbff8afbd9c4761f73a4c3e1133ab77ad07e40b91a473703728fb1dcf52c5ec930b84d3894993f01719bbf84fc90625882094
   languageName: node
   linkType: hard
 
