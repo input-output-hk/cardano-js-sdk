@@ -29,7 +29,7 @@ describe('UtxoHttpService', () => {
   let config: HttpServerConfig;
   let cardanoNode: OgmiosCardanoNode;
   let provider: UtxoProvider;
-  let lastBlockNoInDb: Cardano.BlockNo;
+  let lastBlockNoInDb: LedgerTipModel;
   let fixtureBuilder: UtxoFixtureBuilder;
 
   beforeAll(async () => {
@@ -66,9 +66,19 @@ describe('UtxoHttpService', () => {
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('healthy state', () => {
     beforeAll(async () => {
-      lastBlockNoInDb = Cardano.BlockNo((await dbConnection.query<LedgerTipModel>(findLedgerTip)).rows[0].block_no);
+      lastBlockNoInDb = (await dbConnection.query<LedgerTipModel>(findLedgerTip)).rows[0];
       cardanoNode = mockCardanoNode(
-        healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() })
+        healthCheckResponseMock({
+          blockNo: lastBlockNoInDb.block_no.valueOf(),
+          hash: lastBlockNoInDb.hash.toString('hex'),
+          projectedTip: {
+            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            hash: lastBlockNoInDb.hash.toString('hex'),
+            slot: Number(lastBlockNoInDb.slot_no)
+          },
+          slot: Number(lastBlockNoInDb.slot_no),
+          withTip: true
+        })
       ) as unknown as OgmiosCardanoNode;
       utxoProvider = new DbSyncUtxoProvider({ cardanoNode, db: dbConnection, logger });
       service = new UtxoHttpService({ logger, utxoProvider });
@@ -88,12 +98,36 @@ describe('UtxoHttpService', () => {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() }));
+        expect(res.data).toEqual(
+          healthCheckResponseMock({
+            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            hash: lastBlockNoInDb.hash.toString('hex'),
+            projectedTip: {
+              blockNo: lastBlockNoInDb.block_no.valueOf(),
+              hash: lastBlockNoInDb.hash.toString('hex'),
+              slot: Number(lastBlockNoInDb.slot_no)
+            },
+            slot: Number(lastBlockNoInDb.slot_no),
+            withTip: true
+          })
+        );
       });
 
       it('forwards the utxoProvider health response with provider client', async () => {
         const response = await provider.healthCheck();
-        expect(response).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() }));
+        expect(response).toEqual(
+          healthCheckResponseMock({
+            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            hash: lastBlockNoInDb.hash.toString('hex'),
+            projectedTip: {
+              blockNo: lastBlockNoInDb.block_no.valueOf(),
+              hash: lastBlockNoInDb.hash.toString('hex'),
+              slot: Number(lastBlockNoInDb.slot_no)
+            },
+            slot: Number(lastBlockNoInDb.slot_no),
+            withTip: true
+          })
+        );
       });
     });
 
@@ -133,6 +167,57 @@ describe('UtxoHttpService', () => {
         const res = await provider.utxoByAddresses({ addresses });
         expect(res.length).toBeGreaterThan(0);
         expect(res[0]).toMatchShapeOf([DataMocks.Tx.input, DataMocks.Tx.output]);
+      });
+
+      it('return UTxO with inline datum', async () => {
+        const addresses = await fixtureBuilder.getAddresses(1, { with: [AddressWith.InlineDatum] });
+        const res = await provider.utxoByAddresses({ addresses });
+        expect(res.length).toBeGreaterThan(0);
+        expect(res[0]).toMatchShapeOf([DataMocks.Tx.input, DataMocks.Tx.outputWithInlineDatum]);
+      });
+
+      it('return UTxO with time lock reference script', async () => {
+        const addresses = await fixtureBuilder.getAddresses(1, {
+          scriptType: 'timelock',
+          with: [AddressWith.ReferenceScript]
+        });
+        const res = await provider.utxoByAddresses({ addresses });
+        const scriptRefUtxo = res.find((utxo) => utxo[1].scriptReference.__type === Cardano.ScriptType.Native);
+        expect(res.length).toBeGreaterThan(0);
+        expect(scriptRefUtxo).toBeDefined();
+        expect(res[0]).toMatchShapeOf([DataMocks.Tx.input, DataMocks.Tx.outputWithInlineDatum]);
+      });
+
+      it('return UTxO with plutus v1 reference script', async () => {
+        const addresses = await fixtureBuilder.getAddresses(1, {
+          scriptType: 'plutusV1',
+          with: [AddressWith.ReferenceScript]
+        });
+        const res = await provider.utxoByAddresses({ addresses });
+        const scriptRefUtxo = res.find(
+          (utxo) =>
+            utxo[1].scriptReference.__type === Cardano.ScriptType.Plutus &&
+            utxo[1].scriptReference.version === Cardano.PlutusLanguageVersion.V1
+        );
+        expect(res.length).toBeGreaterThan(0);
+        expect(scriptRefUtxo).toBeDefined();
+        expect(res[0]).toMatchShapeOf([DataMocks.Tx.input, DataMocks.Tx.outputWithInlineDatum]);
+      });
+
+      it('return UTxO with plutus v2 reference script', async () => {
+        const addresses = await fixtureBuilder.getAddresses(1, {
+          scriptType: 'plutusV2',
+          with: [AddressWith.ReferenceScript]
+        });
+        const res = await provider.utxoByAddresses({ addresses });
+        const scriptRefUtxo = res.find(
+          (utxo) =>
+            utxo[1].scriptReference.__type === Cardano.ScriptType.Plutus &&
+            utxo[1].scriptReference.version === Cardano.PlutusLanguageVersion.V2
+        );
+        expect(res.length).toBeGreaterThan(0);
+        expect(scriptRefUtxo).toBeDefined();
+        expect(res[0]).toMatchShapeOf([DataMocks.Tx.input, DataMocks.Tx.outputWithInlineDatum]);
       });
 
       it('return UTxOs for multiple addresses', async () => {

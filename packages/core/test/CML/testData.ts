@@ -1,6 +1,7 @@
 import { Cardano } from '../../src';
 import {
   Ed25519KeyHash,
+  NativeScript,
   NativeScriptKind,
   PlutusLanguageVersion,
   RedeemerPurpose,
@@ -33,6 +34,39 @@ export const poolParameters: Cardano.PoolParameters = {
   ],
   rewardAccount,
   vrf
+};
+
+export const script: NativeScript = {
+  __type: ScriptType.Native,
+  kind: NativeScriptKind.RequireAnyOf,
+  scripts: [
+    {
+      __type: ScriptType.Native,
+      keyHash: Ed25519KeyHash('b275b08c999097247f7c17e77007c7010cd19f20cc086ad99d398538'),
+      kind: NativeScriptKind.RequireSignature
+    },
+    {
+      __type: ScriptType.Native,
+      kind: NativeScriptKind.RequireAllOf,
+      scripts: [
+        {
+          __type: ScriptType.Native,
+          kind: NativeScriptKind.RequireTimeBefore,
+          slot: Cardano.Slot(3000)
+        },
+        {
+          __type: ScriptType.Native,
+          keyHash: Ed25519KeyHash('966e394a544f242081e41d1965137b1bb412ac230d40ed5407821c37'),
+          kind: NativeScriptKind.RequireSignature
+        },
+        {
+          __type: ScriptType.Native,
+          kind: NativeScriptKind.RequireTimeAfter,
+          slot: Cardano.Slot(4000)
+        }
+      ]
+    }
+  ]
 };
 
 export const mintTokenMap = new Map([
@@ -72,6 +106,34 @@ export const txOut: Cardano.TxOut = {
   value: valueWithAssets
 };
 
+export const invalidBabbageTxOut: Cardano.TxOut = {
+  address: Cardano.Address(
+    'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
+  ),
+  datum: Cardano.util.HexBlob('187b'),
+  datumHash: Cardano.util.Hash32ByteBase16('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'),
+  scriptReference: script,
+  value: valueWithAssets
+};
+
+export const babbageTxOutWithDatumHash: Cardano.TxOut = {
+  address: Cardano.Address(
+    'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
+  ),
+  datumHash: Cardano.util.Hash32ByteBase16('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'),
+  scriptReference: script,
+  value: valueWithAssets
+};
+
+export const babbageTxOutWithInlineDatum: Cardano.TxOut = {
+  address: Cardano.Address(
+    'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
+  ),
+  datum: Cardano.util.HexBlob('187b'),
+  scriptReference: script,
+  value: valueWithAssets
+};
+
 export const txOutWithByron: Cardano.TxOut = {
   address: Cardano.Address('5oP9ib6ym3Xc2XrPGC6S7AaJeHYBCmLjt98bnjKR58xXDhSDgLHr8tht3apMDXf2Mg'),
   value: valueWithAssets
@@ -81,7 +143,7 @@ export const txOutWithDatum: Cardano.TxOut = {
   address: Cardano.Address(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
-  datum: Cardano.util.Hash32ByteBase16('4c94610a582b748b8db506abb45ccd48d0d4934942daa87d191645b947a547a7'),
+  datumHash: Cardano.util.Hash32ByteBase16('4c94610a582b748b8db506abb45ccd48d0d4934942daa87d191645b947a547a7'),
   value: valueWithAssets
 };
 
@@ -118,6 +180,13 @@ export const txBody: Cardano.TxBody = {
       stakeAddress: Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27')
     }
   ]
+};
+
+export const babbageTxBody: Cardano.TxBody = {
+  ...txBody,
+  collateralReturn: txOut,
+  referenceInputs: [txIn],
+  totalCollateral: 100n
 };
 
 export const vkey = '6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d39';
@@ -244,4 +313,10 @@ export const tx: Cardano.Tx = {
     ],
     signatures: new Map([[Cardano.Ed25519PublicKey(vkey), Cardano.Ed25519Signature(signature)]])
   }
+};
+
+export const babbageTx: Cardano.Tx = {
+  ...tx,
+  body: babbageTxBody,
+  id: Cardano.TransactionId('856c8bc6ce3725188b496d62fa389f2beff2f701e6d35af39d3f3464bbce0cec')
 };

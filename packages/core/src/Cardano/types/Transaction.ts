@@ -49,11 +49,35 @@ export interface HydratedTxBody {
   mint?: TokenMap;
   scriptIntegrityHash?: Hash32ByteBase16;
   requiredExtraSignatures?: Ed25519KeyHash[];
+
+  /**
+   * The total collateral field lets users write transactions whose collateral is evident by just looking at the
+   * tx body instead of requiring information in the UTxO. The specification of total collateral is optional.
+   *
+   * It does not change how the collateral is computed but transactions whose collateral is different from the
+   * amount specified will be invalid.
+   */
+  totalCollateral?: Lovelace;
+
+  /**
+   * Return collateral allows us to specify an output with the remainder of our collateral input(s) in the event
+   * we over-collateralize our transaction. This allows us to avoid overpaying the collateral and also creates the
+   * possibility for native assets to be also present in the collateral, though they will not serve as a payment
+   * for the fee.
+   */
+  collateralReturn?: TxOut;
+
+  /**
+   * Reference inputs allows looking at an output without spending it. This facilitates access to information
+   * stored on the blockchain without the need of spending and recreating UTXOs.
+   */
+  referenceInputs?: HydratedTxIn[];
 }
 
-export interface TxBody extends Omit<HydratedTxBody, 'inputs' | 'collaterals'> {
+export interface TxBody extends Omit<HydratedTxBody, 'inputs' | 'collaterals' | 'referenceInputs'> {
   inputs: TxIn[];
   collaterals?: TxIn[];
+  referenceInputs?: TxIn[];
 }
 
 export enum RedeemerPurpose {

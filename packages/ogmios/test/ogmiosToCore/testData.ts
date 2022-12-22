@@ -599,9 +599,16 @@ export const mockBabbageBlock: Ogmios.Schema.Babbage = {
             {
               address: 'addr1vxnyv36t3a2rzfs4q6mvyu7nqlr4dxjwkmykkskafg54yzsv3uzfs',
               datum: null,
-              datumHash: null,
+              datumHash: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5',
               script: { 'plutus:v2': '46010000220011' },
               value: { assets: {}, coins: 2n }
+            },
+            {
+              address: 'addr1vxnyv36t3a2rzfs4q6mvyu7nqlr4dxjwkmykkskafg54yzsv3uzfs',
+              datum: '187b',
+              datumHash: null,
+              script: { 'plutus:v2': '46010000220011' },
+              value: { assets: {}, coins: 3n }
             }
           ],
           references: [{ index: 1, txId: '03170a2e7597b7b7e3d84c05391d139a62b157e78786d8c082f29dcf4c111314' }],

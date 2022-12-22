@@ -7,7 +7,9 @@ import { InputSelectionError, SelectionSkeleton } from '@cardano-sdk/input-selec
 import { OutputValidation } from '../types';
 import { SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
 
-export type PartialTxOut = Partial<Pick<Cardano.TxOut, 'address' | 'datum'> & { value: Partial<Cardano.Value> }>;
+export type PartialTxOut = Partial<
+  Pick<Cardano.TxOut, 'address' | 'datumHash' | 'datum' | 'scriptReference'> & { value: Partial<Cardano.Value> }
+>;
 
 export enum TxOutputFailure {
   MinimumCoin = 'Minimum coin not met',
