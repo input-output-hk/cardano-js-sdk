@@ -68,15 +68,19 @@ export enum ChainSyncEventType {
   RollBackward
 }
 
+export type RequestNext = () => void;
+
 export interface ChainSyncRollForward {
   tip: Tip;
   eventType: ChainSyncEventType.RollForward;
   block: Block;
+  requestNext: RequestNext;
 }
 
 export interface ChainSyncRollBackward {
   eventType: ChainSyncEventType.RollBackward;
   tip: TipOrOrigin;
+  requestNext: RequestNext;
 }
 
 export type ChainSyncEvent = ChainSyncRollForward | ChainSyncRollBackward;
