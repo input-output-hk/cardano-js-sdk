@@ -1,2 +1,2 @@
 export * from './DbSyncNetworkInfoProvider';
-export * as NetworkInfoCacheKey from './keys';
+export * from './keys';

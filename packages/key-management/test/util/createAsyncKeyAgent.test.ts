@@ -1,5 +1,6 @@
 import { AsyncKeyAgent, InMemoryKeyAgent, KeyAgent, util } from '../../src';
 import { Cardano } from '@cardano-sdk/core';
+import { dummyLogger } from 'ts-log';
 import { firstValueFrom } from 'rxjs';
 
 describe('createAsyncKeyAgent maps KeyAgent to AsyncKeyAgent', () => {
@@ -14,13 +15,16 @@ describe('createAsyncKeyAgent maps KeyAgent to AsyncKeyAgent', () => {
     inputResolver = { resolveInputAddress: jest.fn() };
     keyAgent = await InMemoryKeyAgent.fromBip39MnemonicWords(
       {
+        chainId: Cardano.ChainIds.Preview,
         getPassword,
-        mnemonicWords,
-        networkId: Cardano.NetworkId.testnet
+        mnemonicWords
       },
-      { inputResolver }
+      { inputResolver, logger: dummyLogger }
     );
     asyncKeyAgent = util.createAsyncKeyAgent(keyAgent);
+  });
+  it('getChainId resolves with chainId', async () => {
+    expect(await asyncKeyAgent.getChainId()).toEqual(keyAgent.chainId);
   });
   it('deriveAddress/signBlob/signTransaction are unchanged', async () => {
     await expect(asyncKeyAgent.deriveAddress(addressDerivationPath)).resolves.toEqual(
@@ -33,7 +37,7 @@ describe('createAsyncKeyAgent maps KeyAgent to AsyncKeyAgent', () => {
     );
     inputResolver.resolveInputAddress.mockResolvedValue(null);
     const txInternals = {
-      body: { fee: 20_000n, inputs: [], outputs: [], validityInterval: {} } as Cardano.TxBodyAlonzo,
+      body: { fee: 20_000n, inputs: [], outputs: [], validityInterval: {} } as Cardano.HydratedTxBody,
       hash: Cardano.TransactionId('8561258e210352fba2ac0488afed67b3427a27ccf1d41ec030c98a8199bc22ec')
     };
     await expect(asyncKeyAgent.signTransaction(txInternals)).resolves.toEqual(

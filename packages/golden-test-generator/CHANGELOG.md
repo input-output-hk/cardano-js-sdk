@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.4.2...@cardano-sdk/golden-test-generator@0.5.0) (2022-12-22)
+
+### ⚠ BREAKING CHANGES
+
+- - BlockSize is now an OpaqueNumber rather than a type alias for number
+
+* BlockNo is now an OpaqueNumber rather than a type alias for number
+* EpochNo is now an OpaqueNumber rather than a type alias for number
+* Slot is now an OpaqueNumber rather than a type alias for number
+* Percentage is now an OpaqueNumber rather than a type alias for number
+
+- **golden-test-generator:** export core chain-sync events instead of ogmios
+- **golden-test-generator:** preserve BigInts by replacing serializer to use toSerializableObj util
+- **golden-test-generator:** add chain-sync support
+
+### Features
+
+- add opaque numeric types to core package ([9ead8bd](https://github.com/input-output-hk/cardano-js-sdk/commit/9ead8bdb34b7ffc57c32f9ab18a6c6ca14af3fda))
+- **golden-test-generator:** add block range support to chain-sync ([66626a3](https://github.com/input-output-hk/cardano-js-sdk/commit/66626a35d4b947713c41492fecd031877165565e))
+- **golden-test-generator:** add chain-sync support ([c69cdba](https://github.com/input-output-hk/cardano-js-sdk/commit/c69cdbaac6f3a1c12dce6d6d2ab9397c47314a18))
+- **golden-test-generator:** export core chain-sync events instead of ogmios ([2df226c](https://github.com/input-output-hk/cardano-js-sdk/commit/2df226c5f10b3c8f66c6dd06e6d5b5d1588fd66c))
+
+### Bug Fixes
+
+- add sideEffects=false to package.json ([a1cb8f8](https://github.com/input-output-hk/cardano-js-sdk/commit/a1cb8f807e8d5947d0c512e0918713ff97d5d48e))
+- **golden-test-generator:** correct path of package.json ([aa02fec](https://github.com/input-output-hk/cardano-js-sdk/commit/aa02fec0f4bcdc2b37695904304d27ebc7ff8150))
+- **golden-test-generator:** preserve BigInts by replacing serializer to use toSerializableObj util ([d951df2](https://github.com/input-output-hk/cardano-js-sdk/commit/d951df2c2d852a66f1392b4903c0d588b3916b3b))
+
 ## [0.4.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.4.1...@cardano-sdk/golden-test-generator@0.4.2) (2022-11-04)
 
 **Note:** Version bump only for package @cardano-sdk/golden-test-generator

@@ -1,15 +1,16 @@
-import { Cardano, EraSummary, testnetEraSummaries } from '@cardano-sdk/core';
-import { createTestScheduler } from '@cardano-sdk/util-dev';
-import { distinctBlock, distinctEraSummaries } from '../../../src/services/util';
+import { Cardano, EraSummary } from '@cardano-sdk/core';
+import { createTestScheduler, testnetEraSummaries } from '@cardano-sdk/util-dev';
 import merge from 'lodash/merge';
+
+import { distinctBlock, distinctEraSummaries } from '../../../src/services/util';
 
 describe('trigger', () => {
   it('distinctBlock subscribes to tip$ on each subscription and emits when tip$ has new blockNo', () => {
     createTestScheduler().run(({ cold, expectObservable }) => {
       const tip$ = cold('a--b--c', {
-        a: { blockNo: 100 } as Cardano.Tip,
-        b: { blockNo: 100 } as Cardano.Tip,
-        c: { blockNo: 101 } as Cardano.Tip
+        a: { blockNo: Cardano.BlockNo(100) } as Cardano.Tip,
+        b: { blockNo: Cardano.BlockNo(100) } as Cardano.Tip,
+        c: { blockNo: Cardano.BlockNo(101) } as Cardano.Tip
       });
       const distinctTip$ = distinctBlock(tip$);
       expectObservable(distinctTip$).toBe('a-----b', {

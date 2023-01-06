@@ -138,8 +138,8 @@ export class SingleAddressWallet implements ObservableWallet {
   #prepareTx: PrepareTx;
   #newTransactions = {
     failedToSubmit$: new Subject<FailedTx>(),
-    pending$: new Subject<Cardano.NewTxAlonzo>(),
-    submitting$: new Subject<Cardano.NewTxAlonzo>()
+    pending$: new Subject<Cardano.Tx>(),
+    submitting$: new Subject<Cardano.Tx>()
   };
   #resubmitSubscription: Subscription;
   #trackedTxSubmitProvider: TrackedTxSubmitProvider;
@@ -162,6 +162,7 @@ export class SingleAddressWallet implements ObservableWallet {
   readonly protocolParameters$: TrackerSubject<Cardano.ProtocolParameters>;
   readonly genesisParameters$: TrackerSubject<Cardano.CompactGenesis>;
   readonly assets$: TrackerSubject<Assets>;
+  readonly fatalError$: Subject<unknown>;
   readonly syncStatus: SyncStatus;
   readonly name: string;
   readonly util: WalletUtil;
@@ -244,6 +245,10 @@ export class SingleAddressWallet implements ObservableWallet {
       )
     );
 
+    this.fatalError$ = new Subject();
+
+    const onFatalError = this.fatalError$.next.bind(this.fatalError$);
+
     this.name = name;
     const cancel$ = connectionStatusTracker$.pipe(
       tap((status) => (status === ConnectionStatus.up ? 'Connection UP' : 'Connection DOWN')),
@@ -256,6 +261,7 @@ export class SingleAddressWallet implements ObservableWallet {
       minPollInterval: pollInterval,
       provider$: coldObservableProvider({
         cancel$,
+        onFatalError,
         provider: this.networkInfoProvider.ledgerTip,
         retryBackoffConfig
       }),
@@ -279,6 +285,7 @@ export class SingleAddressWallet implements ObservableWallet {
       coldObservableProvider({
         cancel$,
         equals: deepEquals,
+        onFatalError,
         provider: this.networkInfoProvider.eraSummaries,
         retryBackoffConfig,
         trigger$: eraSummariesTrigger.pipe(tap(() => 'Trigger request era summaries'))
@@ -301,6 +308,7 @@ export class SingleAddressWallet implements ObservableWallet {
       coldObservableProvider({
         cancel$,
         equals: isEqual,
+        onFatalError,
         provider: this.networkInfoProvider.protocolParameters,
         retryBackoffConfig,
         trigger$: epoch$
@@ -311,6 +319,7 @@ export class SingleAddressWallet implements ObservableWallet {
       coldObservableProvider({
         cancel$,
         equals: isEqual,
+        onFatalError,
         provider: this.networkInfoProvider.genesisParameters,
         retryBackoffConfig,
         trigger$: epoch$
@@ -327,6 +336,7 @@ export class SingleAddressWallet implements ObservableWallet {
       inFlightTransactionsStore: stores.inFlightTransactions,
       logger: contextLogger(this.#logger, 'transactions'),
       newTransactions: this.#newTransactions,
+      onFatalError,
       retryBackoffConfig,
       tip$: this.tip$,
       transactionsHistoryStore: stores.transactions
@@ -352,6 +362,7 @@ export class SingleAddressWallet implements ObservableWallet {
     this.utxo = createUtxoTracker({
       addresses$,
       logger: contextLogger(this.#logger, 'utxo'),
+      onFatalError,
       retryBackoffConfig,
       stores,
       tipBlockHeight$,
@@ -363,6 +374,7 @@ export class SingleAddressWallet implements ObservableWallet {
       epoch$,
       eraSummaries$,
       logger: contextLogger(this.#logger, 'delegation'),
+      onFatalError,
       retryBackoffConfig,
       rewardAccountAddresses$: this.addresses$.pipe(
         map((addresses) => addresses.map((groupedAddress) => groupedAddress.rewardAccount))
@@ -379,6 +391,7 @@ export class SingleAddressWallet implements ObservableWallet {
         assetProvider: this.assetProvider,
         balanceTracker: this.balance,
         logger: contextLogger(this.#logger, 'assets$'),
+        onFatalError,
         retryBackoffConfig
       }),
       stores.assets
@@ -401,8 +414,7 @@ export class SingleAddressWallet implements ObservableWallet {
   async initializeTx(props: InitializeTxProps): Promise<InitializeTxResult> {
     const scope = new ManagedFreeableScope();
     const { constraints, utxo, implicitCoin, validityInterval, changeAddress, withdrawals } = await this.#prepareTx(
-      props,
-      scope
+      props
     );
     const { selection: inputSelection } = await this.#inputSelector.select({
       constraints,
@@ -427,7 +439,7 @@ export class SingleAddressWallet implements ObservableWallet {
     return { body, hash, inputSelection };
   }
 
-  async finalizeTx(props: FinalizeTxProps, stubSign = false): Promise<Cardano.NewTxAlonzo> {
+  async finalizeTx(props: FinalizeTxProps, stubSign = false): Promise<Cardano.Tx> {
     const addresses = await firstValueFrom(this.addresses$);
     const signatures = stubSign
       ? await keyManagementUtil.stubSignTransaction(
@@ -447,7 +459,7 @@ export class SingleAddressWallet implements ObservableWallet {
     };
   }
 
-  async submitTx(tx: Cardano.NewTxAlonzo, { mightBeAlreadySubmitted }: SubmitTxOptions = {}): Promise<void> {
+  async submitTx(tx: Cardano.Tx, { mightBeAlreadySubmitted }: SubmitTxOptions = {}): Promise<void> {
     this.#logger.debug(`Submitting transaction ${tx.id}`);
     this.#newTransactions.submitting$.next(tx);
     try {
@@ -498,11 +510,13 @@ export class SingleAddressWallet implements ObservableWallet {
     this.networkInfoProvider.stats.shutdown();
     this.stakePoolProvider.stats.shutdown();
     this.utxoProvider.stats.shutdown();
+    this.rewardsProvider.stats.shutdown();
     this.chainHistoryProvider.stats.shutdown();
     this.keyAgent.shutdown();
     this.currentEpoch$.complete();
     this.delegation.shutdown();
     this.assets$.complete();
+    this.fatalError$.complete();
     this.syncStatus.shutdown();
     this.#newTransactions.failedToSubmit$.complete();
     this.#newTransactions.pending$.complete();

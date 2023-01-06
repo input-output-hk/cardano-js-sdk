@@ -134,3 +134,6 @@ export interface MessengerApiDependencies {
   messenger: Messenger;
   logger: Logger;
 }
+
+export type InternalMsgType = 'apiObjDisabled';
+export type InternalMsg = { remoteApiInternalMsg: InternalMsgType };

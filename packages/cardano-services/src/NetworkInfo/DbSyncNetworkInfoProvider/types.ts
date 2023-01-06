@@ -20,12 +20,6 @@ export interface EpochModel {
   no: number;
 }
 
-export interface LedgerTipModel {
-  block_no: number;
-  slot_no: string;
-  hash: Buffer;
-}
-
 export interface CostModelsParamModel {
   PlutusV1?: Cardano.CostModel;
   PlutusV2?: Cardano.CostModel;
@@ -62,8 +56,8 @@ export interface ProtocolParamsModel {
 }
 
 export interface GenesisData {
-  networkMagic: Cardano.CardanoNetworkMagic;
-  networkId: Cardano.CardanoNetworkId;
+  networkMagic: Cardano.NetworkMagic;
+  networkId: 'Mainnet' | 'Testnet';
   maxLovelaceSupply: Cardano.Lovelace;
   activeSlotsCoefficient: number;
   securityParameter: number;

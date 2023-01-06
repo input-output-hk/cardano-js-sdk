@@ -31,8 +31,7 @@ describe('TrezorKeyAgent', () => {
       createKeyAgent: async (dependencies) => {
         const trezorKeyAgent = await TrezorKeyAgent.createWithDevice(
           {
-            networkId: Cardano.NetworkId.testnet,
-            protocolMagic: 1_097_911_063,
+            chainId: Cardano.ChainIds.LegacyTestnet,
             trezorConfig
           },
           dependencies
@@ -41,8 +40,9 @@ describe('TrezorKeyAgent', () => {
           accountIndex: 0,
           address: mocks.utxo[0][0].address,
           index: 0,
-          networkId: Cardano.NetworkId.testnet,
+          networkId: Cardano.NetworkId.Testnet,
           rewardAccount: mocks.rewardAccount,
+          stakeKeyDerivationPath: mocks.stakeKeyDerivationPath,
           type: AddressType.External
         };
         trezorKeyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
@@ -72,7 +72,8 @@ describe('TrezorKeyAgent', () => {
             utxoProvider
           }
         );
-      }
+      },
+      logger
     }));
   });
 
@@ -82,8 +83,7 @@ describe('TrezorKeyAgent', () => {
     const trezorKeyAgentWithRandomIndex = await TrezorKeyAgent.createWithDevice(
       {
         accountIndex: 5,
-        networkId: Cardano.NetworkId.testnet,
-        protocolMagic: 1_097_911_063,
+        chainId: Cardano.ChainIds.LegacyTestnet,
         trezorConfig
       },
       mockKeyAgentDependencies()
@@ -97,8 +97,8 @@ describe('TrezorKeyAgent', () => {
     expect(typeof keyAgent.serializableData.__typename).toBe('string');
   });
 
-  test('networkId', () => {
-    expect(typeof keyAgent.networkId).toBe('number');
+  test('chainId', () => {
+    expect(keyAgent.chainId).toBe(Cardano.ChainIds.LegacyTestnet);
   });
 
   test('accountIndex', () => {
@@ -152,10 +152,9 @@ describe('TrezorKeyAgent', () => {
     it('all fields are of correct types', () => {
       expect(typeof serializableData.__typename).toBe('string');
       expect(typeof serializableData.accountIndex).toBe('number');
-      expect(typeof serializableData.networkId).toBe('number');
+      expect(typeof serializableData.chainId).toBe('object');
       expect(typeof serializableData.extendedAccountPublicKey).toBe('string');
       expect(Array.isArray(serializableData.knownAddresses)).toBe(true);
-      expect(typeof serializableData.protocolMagic).toBe('number');
     });
 
     it('is serializable', () => {

@@ -39,6 +39,10 @@ export class ManagedFreeableScope {
   }
 }
 
+const isPromise = (obj: unknown): obj is Promise<unknown> =>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  typeof obj === 'object' && typeof (obj as any).then === 'function';
+
 class AutoFree<TReturn> {
   #scope: ManagedFreeableScope;
   readonly #callback: (scope: ManagedFreeableScope) => TReturn;
@@ -49,10 +53,25 @@ class AutoFree<TReturn> {
   }
 
   public execute() {
+    let result: TReturn;
     try {
-      return this.#callback(this.#scope);
-    } finally {
+      result = this.#callback(this.#scope);
+      if (isPromise(result)) {
+        return result
+          .then((value) => {
+            this.#scope.dispose();
+            return value;
+          })
+          .catch((error) => {
+            this.#scope.dispose();
+            throw error;
+          }) as TReturn;
+      }
       this.#scope.dispose();
+      return result;
+    } catch (error) {
+      this.#scope.dispose();
+      throw error;
     }
   }
 }

@@ -1,10 +1,8 @@
 export const latestDistinctAddresses = `
-  SELECT
-    tx_out.address AS address
+  SELECT address, count(*) as tx_count
   FROM tx_out
-  JOIN tx ON tx_out.tx_id = tx.id
-  JOIN block ON tx.block_id = block.id
-  ORDER BY block.id DESC
+  GROUP BY address
+  ORDER BY TX_COUNT desc
   LIMIT $1`;
 
 export const latestBlockHashes = `

@@ -1,4 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
+import { Logger } from 'ts-log';
 import { Observable } from 'rxjs';
 import { Shutdown } from '@cardano-sdk/util';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
@@ -64,6 +65,7 @@ export type BIP32Path = Array<number>;
 
 export interface KeyAgentDependencies {
   inputResolver: Cardano.util.InputResolver;
+  logger: Logger;
 }
 
 export interface AccountAddressDerivationPath {
@@ -78,6 +80,7 @@ export interface GroupedAddress {
   accountIndex: number;
   address: Cardano.Address;
   rewardAccount: Cardano.RewardAccount;
+  stakeKeyDerivationPath?: AccountKeyDerivationPath;
 }
 
 export interface TrezorConfig {
@@ -91,7 +94,7 @@ export interface TrezorConfig {
 }
 
 export interface SerializableKeyAgentDataBase {
-  networkId: Cardano.NetworkId;
+  chainId: Cardano.ChainId;
   accountIndex: number;
   knownAddresses: GroupedAddress[];
   extendedAccountPublicKey: Cardano.Bip32PublicKey;
@@ -105,13 +108,11 @@ export interface SerializableInMemoryKeyAgentData extends SerializableKeyAgentDa
 export interface SerializableLedgerKeyAgentData extends SerializableKeyAgentDataBase {
   __typename: KeyAgentType.Ledger;
   communicationType: CommunicationType;
-  protocolMagic: Cardano.NetworkMagic;
 }
 
 export interface SerializableTrezorKeyAgentData extends SerializableKeyAgentDataBase {
   __typename: KeyAgentType.Trezor;
   trezorConfig: TrezorConfig;
-  protocolMagic: Cardano.NetworkMagic;
 }
 
 export type SerializableKeyAgentData =
@@ -141,7 +142,7 @@ export interface SignTransactionOptions {
 }
 
 export interface KeyAgent {
-  get networkId(): Cardano.NetworkId;
+  get chainId(): Cardano.ChainId;
   get accountIndex(): number;
   get serializableData(): SerializableKeyAgentData;
   get knownAddresses(): GroupedAddress[];
@@ -170,6 +171,8 @@ export interface KeyAgent {
 
 export type AsyncKeyAgent = Pick<KeyAgent, 'deriveAddress' | 'derivePublicKey' | 'signBlob' | 'signTransaction'> & {
   knownAddresses$: Observable<GroupedAddress[]>;
+  getChainId(): Promise<Cardano.ChainId>;
+  getExtendedAccountPublicKey(): Promise<Cardano.Bip32PublicKey>;
 } & Shutdown;
 
 /**
@@ -177,7 +180,7 @@ export type AsyncKeyAgent = Pick<KeyAgent, 'deriveAddress' | 'derivePublicKey' |
  */
 export type TransactionSignerResult = {
   /**
-   * The public key matching the private key that generate the signautre.
+   * The public key matching the private key that generate the signature.
    */
   pubKey: Cardano.Ed25519PublicKey;
 

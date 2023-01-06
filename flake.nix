@@ -50,6 +50,17 @@
         PYTHON = "${pkgs.python3}/bin/python3";
         # node-hid uses pkg-config to find sources
         buildInputs = oldAttrs.buildInputs ++ [pkgs.pkg-config pkgs.libusb1];
+
+        installPhase = ''
+          runHook preInstall
+          mkdir -p $out/libexec $out/bin
+          # Move the entire project to the output directory.
+          mv $PWD "$out/libexec/$sourceRoot"
+          cd "$out/libexec/$sourceRoot"
+          # Invoke a plugin internal command to setup binaries.
+          yarn nixify install-bin $out/bin
+          runHook postInstall
+        '';
       });
     in
       project.overrideAttrs (oldAttrs: {
@@ -76,7 +87,6 @@
             cp -r packages/$p/dist $out/libexec/$sourceRoot/packages/$p/dist
             cp -r packages/$p/package.json $out/libexec/$sourceRoot/packages/$p/package.json
           done
-          test -f ${production-deps}/libexec/$sourceRoot/packages/cardano-services/node_modules && cp -r ${production-deps}/libexec/$sourceRoot/packages/cardano-services/node_modules $out/libexec/$sourceRoot/packages/cardano-services/node_modules
           cp -r ${production-deps}/libexec/$sourceRoot/packages/cardano-services/config $out/libexec/$sourceRoot/packages/cardano-services/config
 
           cd "$out/libexec/$sourceRoot"
@@ -92,6 +102,8 @@
           chmod a+x $out/bin/cli
         '';
         meta.mainProgram = "cli";
+        passthru.nodejs = pkgs.nodejs;
+        passthru.production-deps = production-deps;
       });
 
     apps = flake-utils.lib.eachDefaultSystemMap (system: let

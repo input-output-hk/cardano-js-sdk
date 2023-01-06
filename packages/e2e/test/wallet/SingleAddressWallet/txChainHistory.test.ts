@@ -1,12 +1,13 @@
 /* eslint-disable max-len */
 import { SingleAddressWallet, buildTx } from '@cardano-sdk/wallet';
 import { assertTxIsValid } from '../../../../wallet/test/util';
-import { env } from '../../environment';
 import { filter, firstValueFrom, map, take } from 'rxjs';
-import { getWallet } from '../../../src';
+import { getEnv, getWallet, walletVariables } from '../../../src';
 import { isNotNil } from '@cardano-sdk/util';
 import { logger } from '@cardano-sdk/util-dev';
 import { normalizeTxBody } from '../../util';
+
+const env = getEnv(walletVariables);
 
 describe('tx chain history', () => {
   let wallet: SingleAddressWallet;

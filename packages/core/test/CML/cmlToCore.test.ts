@@ -1,7 +1,21 @@
 import { Cardano, cmlToCore, coreToCml } from '../../src';
 import { ManagedFreeableScope } from '@cardano-sdk/util';
 import { NativeScript } from '@dcspark/cardano-multiplatform-lib-nodejs';
-import { mintTokenMap, tx, txBody, txIn, txInWithAddress, txOut, valueCoinOnly, valueWithAssets } from './testData';
+import {
+  babbageTx,
+  babbageTxBody,
+  babbageTxOutWithDatumHash,
+  babbageTxOutWithInlineDatum,
+  mintTokenMap,
+  tx,
+  txBody,
+  txIn,
+  txInWithAddress,
+  txOut,
+  txOutWithByron,
+  valueCoinOnly,
+  valueWithAssets
+} from './testData';
 
 describe('cmlToCore', () => {
   let scope: ManagedFreeableScope;
@@ -34,12 +48,23 @@ describe('cmlToCore', () => {
     });
   });
 
-  it('txOut', () => {
-    expect(cmlToCore.txOut(coreToCml.txOut(scope, txOut))).toEqual(txOut);
+  describe('txOut', () => {
+    it('can convert a CML.TransactionOutput which contains a Shelley address to Core.TxOut', () => {
+      expect(cmlToCore.txOut(coreToCml.txOut(scope, txOut))).toEqual(txOut);
+    });
+
+    it('can convert a CML.TransactionOutput which contains a Byron address to Core.TxOut', () => {
+      expect(cmlToCore.txOut(coreToCml.txOut(scope, txOutWithByron))).toEqual(txOutWithByron);
+    });
+
+    it('can convert a CML.TransactionOutput with babbage fields to Core.TxOut', () => {
+      expect(cmlToCore.txOut(coreToCml.txOut(scope, babbageTxOutWithInlineDatum))).toEqual(babbageTxOutWithInlineDatum);
+      expect(cmlToCore.txOut(coreToCml.txOut(scope, babbageTxOutWithDatumHash))).toEqual(babbageTxOutWithDatumHash);
+    });
   });
 
   it('utxo', () => {
-    const utxo: Cardano.Utxo[] = [[txIn as Cardano.TxIn, txOut]];
+    const utxo: Cardano.Utxo[] = [[txIn as Cardano.HydratedTxIn, txOut]];
     expect(cmlToCore.utxo(coreToCml.utxo(scope, utxo))).toEqual(utxo);
   });
 
@@ -76,7 +101,7 @@ describe('cmlToCore', () => {
             {
               __type: Cardano.ScriptType.Native,
               kind: Cardano.NativeScriptKind.RequireTimeBefore,
-              slot: 3000
+              slot: Cardano.Slot(3000)
             },
             {
               __type: Cardano.ScriptType.Native,
@@ -86,7 +111,7 @@ describe('cmlToCore', () => {
             {
               __type: Cardano.ScriptType.Native,
               kind: Cardano.NativeScriptKind.RequireTimeAfter,
-              slot: 4000
+              slot: Cardano.Slot(4000)
             }
           ]
         }
@@ -106,8 +131,16 @@ describe('cmlToCore', () => {
     expect(cmlToCore.txBody(scope.manage(coreToCml.txBody(scope, txBody)))).toEqual(txBody);
   });
 
+  it('Babbage txBody', () => {
+    expect(cmlToCore.txBody(scope.manage(coreToCml.txBody(scope, babbageTxBody)))).toEqual(babbageTxBody);
+  });
+
   it('newTx', () => {
     expect(cmlToCore.newTx(scope.manage(coreToCml.tx(scope, tx)))).toEqual(tx);
+  });
+
+  it('Babbage newTx', () => {
+    expect(cmlToCore.newTx(scope.manage(coreToCml.tx(scope, babbageTx)))).toEqual(babbageTx);
   });
 
   it('txWitnessBootstrap', () => {

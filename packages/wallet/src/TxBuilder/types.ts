@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { Cardano } from '@cardano-sdk/core';
 import { CustomError } from 'ts-custom-error';
 
@@ -6,7 +7,9 @@ import { InputSelectionError, SelectionSkeleton } from '@cardano-sdk/input-selec
 import { OutputValidation } from '../types';
 import { SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
 
-export type PartialTxOut = Partial<Pick<Cardano.TxOut, 'address' | 'datum'> & { value: Partial<Cardano.Value> }>;
+export type PartialTxOut = Partial<
+  Pick<Cardano.TxOut, 'address' | 'datumHash' | 'datum' | 'scriptReference'> & { value: Partial<Cardano.Value> }
+>;
 
 export enum TxOutputFailure {
   MinimumCoin = 'Minimum coin not met',
@@ -112,7 +115,7 @@ export interface OutputBuilder {
 }
 
 export interface SignedTx {
-  readonly tx: Cardano.NewTxAlonzo;
+  readonly tx: Cardano.Tx;
   /**
    * Once the transaction is successfully submitted, calls to the same txBuilder {@link TxBuilder.build} method
    * will fail with {@link TxAlreadySubmittedError} exception.
@@ -122,7 +125,7 @@ export interface SignedTx {
 
 /** Transaction body built with {@link TxBuilder.build}. */
 export interface ValidTxBody {
-  readonly body: Cardano.NewTxBodyAlonzo;
+  readonly body: Cardano.TxBody;
   readonly auxiliaryData?: Cardano.AuxiliaryData;
   readonly extraSigners?: TransactionSigner[];
   readonly signingOptions?: SignTransactionOptions;
@@ -139,15 +142,15 @@ export type MaybeValidTx = ValidTx | InvalidTx;
 export interface TxBuilder {
   /**
    * Transaction body that is updated by `TxBuilder` methods.
-   * It should not be updated directly, but this is not restricted to allow experimental TxBody changes that are not
+   * It should not be updated directly, but this is not restricted to allow experimental HydratedTxBody changes that are not
    * yet available in the TxBuilder interface.
    * Every method call recreates the partialTxBody, thus updating it immutably.
    */
-  partialTxBody: Partial<Cardano.NewTxBodyAlonzo>;
+  partialTxBody: Partial<Cardano.TxBody>;
   /**
    * TxMetadata to be added in the transaction auxiliary data body blob, after {@link TxBuilder.build}.
    * Configured using {@link TxBuilder.setMetadata} method.
-   * It should not be updated directly, but this is not restricted to allow experimental TxBody changes that are not.
+   * It should not be updated directly, but this is not restricted to allow experimental HydratedTxBody changes that are not.
    */
   auxiliaryData?: Cardano.AuxiliaryData;
   extraSigners?: TransactionSigner[];

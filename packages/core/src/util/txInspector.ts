@@ -5,6 +5,8 @@ import {
   Certificate,
   CertificateType,
   Ed25519KeyHash,
+  HydratedTx,
+  HydratedTxIn,
   Lovelace,
   Metadatum,
   PolicyId,
@@ -16,8 +18,6 @@ import {
   StakeAddressCertificate,
   StakeDelegationCertificate,
   TokenMap,
-  TxAlonzo,
-  TxIn,
   Value
 } from '../Cardano/types';
 import { BigIntMath } from '@cardano-sdk/util';
@@ -28,9 +28,9 @@ import { nativeScriptPolicyId } from './nativeScript';
 import { resolveInputValue } from '../Cardano/util/resolveInputValue';
 import { subtractValueQuantities } from './subtractValueQuantities';
 
-type Inspector<Inspection> = (tx: TxAlonzo) => Inspection;
+type Inspector<Inspection> = (tx: HydratedTx) => Inspection;
 type Inspectors = { [k: string]: Inspector<unknown> };
-type TxInspector<T extends Inspectors> = (tx: TxAlonzo) => {
+type TxInspector<T extends Inspectors> = (tx: HydratedTx) => {
   [k in keyof T]: ReturnType<T[k]>;
 };
 
@@ -43,7 +43,7 @@ export type PoolRetirementInspection = PoolRetirementCertificate[];
 
 export type WithdrawalInspection = Lovelace;
 export interface SentInspection {
-  inputs: TxIn[];
+  inputs: HydratedTxIn[];
   certificates: Certificate[];
 }
 export type SignedCertificatesInspection = Certificate[];
@@ -68,7 +68,7 @@ interface SentInspectorArgs {
 export type SentInspector = (args: SentInspectorArgs) => Inspector<SentInspection>;
 export type TotalAddressInputsValueInspector = (
   ownAddresses: Address[],
-  getHistoricalTxs: () => TxAlonzo[]
+  getHistoricalTxs: () => HydratedTx[]
 ) => Inspector<SendReceiveValueInspection>;
 export type SendReceiveValueInspector = (ownAddresses: Address[]) => Inspector<SendReceiveValueInspection>;
 export type DelegationInspector = Inspector<DelegationInspection>;
@@ -88,7 +88,7 @@ export type PoolRetirementInspector = Inspector<PoolRetirementInspection>;
  * containing any of the provided addresses.
  *
  * @param {Address[]} ownAddresses own wallet's addresses
- * @param {() => TxAlonzo[]} getHistoricalTxs wallet's historical transactions
+ * @param {() => HydratedTx[]} getHistoricalTxs wallet's historical transactions
  * @returns {Value} total value in inputs
  */
 export const totalAddressInputsValueInspector: TotalAddressInputsValueInspector =
@@ -212,7 +212,7 @@ const certificateInspector =
 /**
  * Inspects a transaction for a stake delegation certificate.
  *
- * @param {TxAlonzo} tx transaction to inspect
+ * @param {HydratedTx} tx transaction to inspect
  * @returns {DelegationInspection} array of delegation certificates
  */
 export const delegationInspector: DelegationInspector = certificateInspector<DelegationInspection>(
@@ -222,7 +222,7 @@ export const delegationInspector: DelegationInspector = certificateInspector<Del
 /**
  * Inspects a transaction for a stake key deregistration certificate.
  *
- * @param {TxAlonzo} tx transaction to inspect
+ * @param {HydratedTx} tx transaction to inspect
  * @returns {StakeKeyRegistrationInspection} array of stake key deregistration certificates
  */
 export const stakeKeyDeregistrationInspector: StakeKeyRegistrationInspector =
@@ -231,7 +231,7 @@ export const stakeKeyDeregistrationInspector: StakeKeyRegistrationInspector =
 /**
  * Inspects a transaction for a stake key registration certificate.
  *
- * @param {TxAlonzo} tx transaction to inspect
+ * @param {HydratedTx} tx transaction to inspect
  * @returns {StakeKeyRegistrationInspection} array of stake key registration certificates
  */
 export const stakeKeyRegistrationInspector: StakeKeyRegistrationInspector =
@@ -240,7 +240,7 @@ export const stakeKeyRegistrationInspector: StakeKeyRegistrationInspector =
 /**
  * Inspects a transaction for pool registration certificates.
  *
- * @param {TxAlonzo} tx transaction to inspect.
+ * @param {HydratedTx} tx transaction to inspect.
  * @returns {PoolRegistrationInspection} array of pool registration certificates.
  */
 export const poolRegistrationInspector: PoolRegistrationInspector = certificateInspector<PoolRegistrationInspection>(
@@ -250,7 +250,7 @@ export const poolRegistrationInspector: PoolRegistrationInspector = certificateI
 /**
  * Inspects a transaction for pool retirement certificates.
  *
- * @param {TxAlonzo} tx transaction to inspect.
+ * @param {HydratedTx} tx transaction to inspect.
  * @returns {PoolRetirementInspection} array of pool retirement certificates.
  */
 export const poolRetirementInspector: PoolRetirementInspector = certificateInspector<PoolRetirementInspection>(
@@ -260,7 +260,7 @@ export const poolRetirementInspector: PoolRetirementInspector = certificateInspe
 /**
  * Inspects a transaction for withdrawals.
  *
- * @param {TxAlonzo} tx transaction to inspect
+ * @param {HydratedTx} tx transaction to inspect
  * @returns {WithdrawalInspection} accumulated withdrawal quantities
  */
 export const withdrawalInspector: WithdrawalInspector = (tx) =>
@@ -340,7 +340,7 @@ export const assetsBurnedInspector: AssetsMintedInspector = mintInspector((quant
 /**
  * Inspects a transaction for its metadata.
  *
- * @param {TxAlonzo} tx transaction to inspect.
+ * @param {HydratedTx} tx transaction to inspect.
  */
 export const metadataInspector: MetadataInspector = (tx) => tx.auxiliaryData?.body?.blob ?? new Map();
 

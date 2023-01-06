@@ -51,11 +51,11 @@ describe('transactionCertificates', () => {
             } as Cardano.Certificate
           ]
         }
-      } as Cardano.TxAlonzo;
+      } as Cardano.HydratedTx;
       const outgoing$ = cold('abc', {
         a: [],
-        b: [{ body: { certificates: [{ __typename: Cardano.CertificateType.MIR }] } } as Cardano.TxAlonzo],
-        c: [{ body: {} } as Cardano.TxAlonzo, tx]
+        b: [{ body: { certificates: [{ __typename: Cardano.CertificateType.MIR }] } } as Cardano.HydratedTx],
+        c: [{ body: {} } as Cardano.HydratedTx, tx]
       });
       const rewardAccounts$ = cold('a', {
         a: [rewardAccount]

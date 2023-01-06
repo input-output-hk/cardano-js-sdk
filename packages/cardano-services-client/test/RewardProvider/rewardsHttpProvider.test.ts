@@ -47,7 +47,10 @@ describe('rewardsHttpProvider', () => {
     axiosMock.onPost().replyOnce(200, expectedResponse);
     const provider = rewardsHttpProvider(config);
     const response = toSerializableObject(
-      await provider.rewardsHistory({ epochs: { lowerBound: 10, upperBound: 20 }, rewardAccounts: [rewardAccount] })
+      await provider.rewardsHistory({
+        epochs: { lowerBound: Cardano.EpochNo(10), upperBound: Cardano.EpochNo(20) },
+        rewardAccounts: [rewardAccount]
+      })
     );
     expect(response).toEqual(expectedResponse);
   });

@@ -1,14 +1,14 @@
 /* eslint-disable max-statements */
-import { Awaited, BigIntMath } from '@cardano-sdk/util';
+import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
 import { ObservableWallet, StakeKeyStatus, buildTx } from '@cardano-sdk/wallet';
 import { TX_TIMEOUT, firstValueFromTimed, waitForWalletStateSettle, walletReady } from '../../util';
+import { TestWallet, getEnv, getWallet, walletVariables } from '../../../src';
 import { assertTxIsValid } from '../../../../wallet/test/util';
-import { env } from '../../environment';
-import { getWallet } from '../../../src/factories';
+import { combineLatest, filter, firstValueFrom } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 
-import { combineLatest, filter, firstValueFrom } from 'rxjs';
+const env = getEnv(walletVariables);
 
 const getWalletStateSnapshot = async (wallet: ObservableWallet) => {
   const [rewardAccount] = await firstValueFrom(wallet.delegation.rewardAccounts$);
@@ -43,8 +43,8 @@ const waitForTx = async (wallet: ObservableWallet, hash: Cardano.TransactionId) 
 };
 
 describe('SingleAddressWallet/delegation', () => {
-  let wallet1: Awaited<ReturnType<typeof getWallet>>;
-  let wallet2: Awaited<ReturnType<typeof getWallet>>;
+  let wallet1: TestWallet;
+  let wallet2: TestWallet;
 
   beforeAll(async () => {
     jest.setTimeout(180_000);
@@ -146,7 +146,7 @@ describe('SingleAddressWallet/delegation', () => {
 
     // If less than two epochs have elapsed, delegatee will still delegate to former pool during current epoch
     // if more than two epochs has elapsed, delegatee will delegate to new pool.
-    if (tx1ConfirmedState.epoch - initialState.epoch < 2) {
+    if (tx1ConfirmedState.epoch.valueOf() - initialState.epoch.valueOf() < 2) {
       expect(tx1ConfirmedState.rewardAccount.delegatee?.currentEpoch?.id).toEqual(
         initialState?.rewardAccount.delegatee?.currentEpoch?.id
       );
@@ -158,7 +158,7 @@ describe('SingleAddressWallet/delegation', () => {
       expect(tx1ConfirmedState.rewardAccount.delegatee?.currentEpoch?.id).toEqual(poolId);
     }
 
-    // Make a 2nd tx with key deregistration
+    // Make a 2nd tx with key de-registration
     const txDeregister = await buildTx({ logger, observableWallet: sourceWallet }).delegate().build();
     assertTxIsValid(txDeregister);
     const txDeregisterSigned = await txDeregister.sign();

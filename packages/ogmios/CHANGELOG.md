@@ -3,6 +3,54 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.6.0...@cardano-sdk/ogmios@0.7.0) (2022-12-22)
+
+### ⚠ BREAKING CHANGES
+
+- Alonzo transaction outputs will now contain a datumHash field, carrying the datum hash digest. However, they will also contain a datum field with the exact same value for backward compatibility reason. In Babbage however, transaction outputs will carry either datum or datumHash depending on the case; and datum will only contain inline datums.
+- use titlecase for mainnet/testnet in NetworkId
+- - rename `redeemer.scriptHash` to `redeemer.data` in core
+
+* change the type from `Hash28ByteBase16` to `HexBlob`
+
+- - BlockSize is now an OpaqueNumber rather than a type alias for number
+
+* BlockNo is now an OpaqueNumber rather than a type alias for number
+* EpochNo is now an OpaqueNumber rather than a type alias for number
+* Slot is now an OpaqueNumber rather than a type alias for number
+* Percentage is now an OpaqueNumber rather than a type alias for number
+
+- rename era-specific types in core
+- rename block types
+
+* CompactBlock -> BlockInfo
+* Block -> ExtendedBlockInfo
+
+- hoist ogmiosToCore to ogmios package
+- classify TxSubmission errors as variant of CardanoNode error
+
+### Features
+
+- add opaque numeric types to core package ([9ead8bd](https://github.com/input-output-hk/cardano-js-sdk/commit/9ead8bdb34b7ffc57c32f9ab18a6c6ca14af3fda))
+- added new babbage era types in Transactions and Outputs ([0b1f2ff](https://github.com/input-output-hk/cardano-js-sdk/commit/0b1f2ffaad2edec281d206a6865cd1e6053d9826))
+- adds projected tip to the db sync based providers's health check response ([eb76414](https://github.com/input-output-hk/cardano-js-sdk/commit/eb76414d5796d6009611ba848e8d5c5fdffa46e4))
+- implement ogmiosToCore certificates mapping ([aef2e8d](https://github.com/input-output-hk/cardano-js-sdk/commit/aef2e8d64da9352c6aab206034950d64f44e9559))
+- **ogmios:** add ogmiosToCore.blockHeader ([08fc7dc](https://github.com/input-output-hk/cardano-js-sdk/commit/08fc7dc958f30411136c660d8f9759487dba431c))
+- **ogmios:** add ogmiosToCore.genesis ([c48f6d4](https://github.com/input-output-hk/cardano-js-sdk/commit/c48f6d4eba896861b6e35ff39571bc261bafa991))
+- **ogmios:** complete Ogmios tx to core mapping ([bcac56b](https://github.com/input-output-hk/cardano-js-sdk/commit/bcac56bbf943110703696e0854b2af2f5e2b1737))
+- rename era-specific types in core ([c4955b1](https://github.com/input-output-hk/cardano-js-sdk/commit/c4955b1f3ae0992bb55b1c1461a1e449be0b6ef2))
+
+### Bug Fixes
+
+- add sideEffects=false to package.json ([a1cb8f8](https://github.com/input-output-hk/cardano-js-sdk/commit/a1cb8f807e8d5947d0c512e0918713ff97d5d48e))
+- **ogmios:** map prevHash='genesis' to undefined ([ad47bbb](https://github.com/input-output-hk/cardano-js-sdk/commit/ad47bbba6d8eef5d46ae14d9976e31d54be9aab1))
+
+### Code Refactoring
+
+- change redeemer script hash to data ([a24bbb8](https://github.com/input-output-hk/cardano-js-sdk/commit/a24bbb80d57007352d64b5b99dbc7a19d4948208))
+- classify TxSubmission errors as variant of CardanoNode error ([234305e](https://github.com/input-output-hk/cardano-js-sdk/commit/234305e28aefd3d9bd1736315bdf89ca31f7556f))
+- use titlecase for mainnet/testnet in NetworkId ([252c589](https://github.com/input-output-hk/cardano-js-sdk/commit/252c589480d3e422b9021ea66a67af978fb80264))
+
 ## [0.6.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.5.0...@cardano-sdk/ogmios@0.6.0) (2022-11-04)
 
 ### ⚠ BREAKING CHANGES

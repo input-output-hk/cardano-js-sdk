@@ -24,9 +24,8 @@ export interface GetTrezorXpubProps {
 }
 
 export interface CreateTrezorKeyAgentProps {
-  networkId: Cardano.NetworkId;
+  chainId: Cardano.ChainId;
   accountIndex?: number;
-  protocolMagic: Cardano.NetworkMagic;
   trezorConfig: TrezorConfig;
 }
 
@@ -35,11 +34,9 @@ const transportTypedError = (error?: any) =>
 
 export class TrezorKeyAgent extends KeyAgentBase {
   readonly isTrezorInitialized: Promise<boolean>;
-  readonly #protocolMagic: Cardano.NetworkMagic;
 
   constructor({ isTrezorInitialized, ...serializableData }: TrezorKeyAgentProps, dependencies: KeyAgentDependencies) {
     super({ ...serializableData, __typename: KeyAgentType.Trezor }, dependencies);
-    this.#protocolMagic = serializableData.protocolMagic;
     if (!isTrezorInitialized) {
       this.isTrezorInitialized = TrezorKeyAgent.initializeTrezorTransport(serializableData.trezorConfig);
     }
@@ -116,7 +113,7 @@ export class TrezorKeyAgent extends KeyAgentBase {
    * @throws AuthenticationError
    */
   static async createWithDevice(
-    { networkId, accountIndex = 0, protocolMagic, trezorConfig }: CreateTrezorKeyAgentProps,
+    { chainId, accountIndex = 0, trezorConfig }: CreateTrezorKeyAgentProps,
     dependencies: KeyAgentDependencies
   ) {
     const isTrezorInitialized = await TrezorKeyAgent.initializeTrezorTransport(trezorConfig);
@@ -124,11 +121,10 @@ export class TrezorKeyAgent extends KeyAgentBase {
     return new TrezorKeyAgent(
       {
         accountIndex,
+        chainId,
         extendedAccountPublicKey,
         isTrezorInitialized,
         knownAddresses: [],
-        networkId,
-        protocolMagic,
         trezorConfig
       },
       dependencies
@@ -142,11 +138,10 @@ export class TrezorKeyAgent extends KeyAgentBase {
       const cslTxBody = coreToCml.txBody(scope, body);
       const trezorTxData = await txToTrezor({
         accountIndex: this.accountIndex,
+        chainId: this.chainId,
         cslTxBody,
         inputResolver: this.inputResolver,
-        knownAddresses: this.knownAddresses,
-        networkId: this.networkId,
-        protocolMagic: this.#protocolMagic
+        knownAddresses: this.knownAddresses
       });
 
       const result = await TrezorConnect.cardanoSignTransaction(trezorTxData);

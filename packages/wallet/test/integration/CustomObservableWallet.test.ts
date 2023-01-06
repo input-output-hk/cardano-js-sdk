@@ -64,7 +64,7 @@ describe('CustomObservableWallet', () => {
     });
 
     it('does not necessarily have to use SingleAddressWallet, but can still utilize SDK utils', () => {
-      // let's say we have an API endpoint to submit transaction as bytes and not as SDK's Cardano.NewTxAlonzo
+      // let's say we have an API endpoint to submit transaction as bytes and not as SDK's Cardano.Tx
       const submitTxBytesHexString: (tx: string) => Promise<void> = () => Promise.resolve();
       // and another endpoint to get wallet addresses
       const getAddresses: () => Promise<GroupedAddress[]> = async () => [];
@@ -120,7 +120,7 @@ describe('CustomObservableWallet', () => {
             trigger$: walletUpdateTrigger$
           })
         },
-        submitTx(tx: Cardano.NewTxAlonzo) {
+        submitTx(tx: Cardano.Tx) {
           // can use utils from SDK, in this case `coreToCml.tx`
           // if you want to submit hex-encoded tx, there is also cslToCore.newTx for the reverse
           const txBytes = Buffer.from(usingAutoFree((scope) => coreToCml.tx(scope, tx).to_bytes())).toString('hex');

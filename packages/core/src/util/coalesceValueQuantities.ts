@@ -1,6 +1,6 @@
+import * as assetUtil from '../Asset/util';
 import { BigIntMath } from '@cardano-sdk/util';
 import { Value } from '../Cardano';
-import { util as assetUtil } from '../Asset';
 
 /**
  * Sum all quantities

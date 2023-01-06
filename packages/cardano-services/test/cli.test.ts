@@ -1,10 +1,14 @@
 /* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable max-len */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Asset } from '@cardano-sdk/core';
+import { AssetData, AssetFixtureBuilder, AssetWith } from './Asset/fixtures/FixtureBuilder';
 import { BAD_CONNECTION_URL } from './TxSubmit/rabbitmq/utils';
 import { ChildProcess, fork } from 'child_process';
+import { LedgerTipModel, findLedgerTip } from '../src/util/DbSyncProvider';
 import { Ogmios } from '@cardano-sdk/ogmios';
+import { Pool } from 'pg';
 import { RabbitMQContainer } from './TxSubmit/rabbitmq/docker';
 import { ServiceNames } from '../src';
 import { createHealthyMockOgmiosServer, createUnhealthyMockOgmiosServer, ogmiosServerReady, serverReady } from './util';
@@ -27,12 +31,27 @@ const METRICS_ENDPOINT_LABEL_RESPONSE = 'http_request_duration_seconds duration 
 
 const exePath = path.join(__dirname, '..', 'dist', 'cjs', 'cli.js');
 
-const assertServiceHealthy = async (apiUrl: string, serviceName: ServiceNames, usedQueue?: boolean) => {
+const assertServiceHealthy = async (
+  apiUrl: string,
+  serviceName: ServiceNames,
+  lastBlock: LedgerTipModel,
+  withTip = true,
+  usedQueue?: boolean
+) => {
   await serverReady(apiUrl);
   const headers = { 'Content-Type': 'application/json' };
   const res = await axios.post(`${apiUrl}/${serviceName}/health`, { headers });
 
-  const healthCheckResponse = usedQueue ? { ok: true } : healthCheckResponseMock();
+  const healthCheckResponse = usedQueue
+    ? { ok: true }
+    : healthCheckResponseMock({
+        projectedTip: {
+          blockNo: lastBlock!.block_no.valueOf(),
+          hash: lastBlock!.hash.toString('hex'),
+          slot: Number(lastBlock!.slot_no)
+        },
+        withTip
+      });
 
   expect(res.status).toBe(200);
   expect(res.data).toEqual(healthCheckResponse);
@@ -84,6 +103,9 @@ const callCliAndAssertExit = (
 
 describe('CLI', () => {
   const container = new RabbitMQContainer();
+  let db: Pool;
+  let fixtureBuilder: AssetFixtureBuilder;
+  let lastBlock: LedgerTipModel;
 
   describe('start-server', () => {
     let apiPort: number;
@@ -94,6 +116,9 @@ describe('CLI', () => {
 
     beforeAll(async () => {
       ({ rabbitmqUrl } = await container.load());
+      db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
+      fixtureBuilder = new AssetFixtureBuilder(db, logger);
+      lastBlock = (await db!.query<LedgerTipModel>(findLedgerTip)).rows[0];
     });
 
     beforeEach(async () => {
@@ -195,13 +220,13 @@ describe('CLI', () => {
               { env: {}, stdio: 'pipe' }
             );
 
-            await assertServiceHealthy(apiUrl, ServiceNames.Asset);
-            await assertServiceHealthy(apiUrl, ServiceNames.ChainHistory);
-            await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo);
-            await assertServiceHealthy(apiUrl, ServiceNames.StakePool);
-            await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
-            await assertServiceHealthy(apiUrl, ServiceNames.Utxo);
-            await assertServiceHealthy(apiUrl, ServiceNames.Rewards);
+            await assertServiceHealthy(apiUrl, ServiceNames.Asset, lastBlock);
+            await assertServiceHealthy(apiUrl, ServiceNames.ChainHistory, lastBlock);
+            await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo, lastBlock);
+            await assertServiceHealthy(apiUrl, ServiceNames.StakePool, lastBlock);
+            await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, false, false);
+            await assertServiceHealthy(apiUrl, ServiceNames.Utxo, lastBlock);
+            await assertServiceHealthy(apiUrl, ServiceNames.Rewards, lastBlock);
           });
 
           it('exposes a HTTP server at the configured URL with all services attached when using env variables', async () => {
@@ -219,13 +244,13 @@ describe('CLI', () => {
               stdio: 'pipe'
             });
 
-            await assertServiceHealthy(apiUrl, ServiceNames.Asset);
-            await assertServiceHealthy(apiUrl, ServiceNames.ChainHistory);
-            await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo);
-            await assertServiceHealthy(apiUrl, ServiceNames.StakePool);
-            await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
-            await assertServiceHealthy(apiUrl, ServiceNames.Utxo);
-            await assertServiceHealthy(apiUrl, ServiceNames.Rewards);
+            await assertServiceHealthy(apiUrl, ServiceNames.Asset, lastBlock);
+            await assertServiceHealthy(apiUrl, ServiceNames.ChainHistory, lastBlock);
+            await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo, lastBlock);
+            await assertServiceHealthy(apiUrl, ServiceNames.StakePool, lastBlock);
+            await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, false, false);
+            await assertServiceHealthy(apiUrl, ServiceNames.Utxo, lastBlock);
+            await assertServiceHealthy(apiUrl, ServiceNames.Rewards, lastBlock);
           });
 
           it('exposes a HTTP server with /metrics endpoint using CLI options', async () => {
@@ -320,8 +345,8 @@ describe('CLI', () => {
               }
             );
 
-            await assertServiceHealthy(apiUrl, ServiceNames.Utxo);
-            await assertServiceHealthy(apiUrl, ServiceNames.Rewards);
+            await assertServiceHealthy(apiUrl, ServiceNames.Utxo, lastBlock);
+            await assertServiceHealthy(apiUrl, ServiceNames.Rewards, lastBlock);
           });
         });
 
@@ -438,7 +463,7 @@ describe('CLI', () => {
                 }
               );
 
-              await assertServiceHealthy(apiUrl, ServiceNames.Utxo);
+              await assertServiceHealthy(apiUrl, ServiceNames.Utxo, lastBlock);
             });
 
             it('exposes a HTTP server when using env variables', async () => {
@@ -457,7 +482,7 @@ describe('CLI', () => {
                 stdio: 'pipe'
               });
 
-              await assertServiceHealthy(apiUrl, ServiceNames.Utxo);
+              await assertServiceHealthy(apiUrl, ServiceNames.Utxo, lastBlock);
             });
           });
 
@@ -998,8 +1023,7 @@ describe('CLI', () => {
                   stdio: 'pipe'
                 }
               );
-
-              await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo);
+              await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo, lastBlock);
             });
 
             it('network-info uses the default Ogmios configuration if not specified using env variables', async () => {
@@ -1013,8 +1037,7 @@ describe('CLI', () => {
                 },
                 stdio: 'pipe'
               });
-
-              await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo);
+              await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo, lastBlock);
             });
 
             it('tx-submit uses the default Ogmios configuration if not specified when using CLI options', async () => {
@@ -1022,7 +1045,7 @@ describe('CLI', () => {
                 env: {},
                 stdio: 'pipe'
               });
-              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
+              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, false, false);
             });
 
             it('tx-submit uses the default Ogmios configuration if not specified when using env variables', async () => {
@@ -1035,8 +1058,7 @@ describe('CLI', () => {
                 },
                 stdio: 'pipe'
               });
-
-              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit);
+              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, false, false);
             });
           });
 
@@ -1276,12 +1298,16 @@ describe('CLI', () => {
             let closeMock: () => Promise<void> = jest.fn();
             let tokenMetadataServerUrl = '';
             let serverUrl = ';';
-            const record = {
-              name: { value: 'test' },
-              subject: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65'
-            };
+            let asset: AssetData;
+            let record: any;
 
             beforeAll(async () => {
+              asset = (await fixtureBuilder.getAssets(1, { with: [AssetWith.CIP25Metadata] }))[0];
+              record = {
+                name: { value: asset.name },
+                subject: asset.id
+              };
+
               ({ closeMock, serverUrl } = await mockTokenRegistry(() => ({
                 body: { subjects: [record] }
               })));
@@ -1307,16 +1333,15 @@ describe('CLI', () => {
                 ],
                 { env: {}, stdio: 'pipe' }
               );
-
-              await assertServiceHealthy(apiUrl, ServiceNames.Asset);
+              await assertServiceHealthy(apiUrl, ServiceNames.Asset, lastBlock);
 
               const res = await axios.post(`${apiUrl}/asset/get-asset`, {
-                assetId: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65',
+                assetId: asset.id,
                 extraData: { tokenMetadata: true }
               });
 
               const { tokenMetadata } = fromSerializableObject<Asset.AssetInfo>(res.data);
-              expect(tokenMetadata).toStrictEqual({ name: 'test' });
+              expect(tokenMetadata).toStrictEqual({ name: asset.name });
             });
 
             it('exposes a HTTP server with healthy state when using env variables', async () => {
@@ -1331,16 +1356,15 @@ describe('CLI', () => {
                 },
                 stdio: 'pipe'
               });
-
-              await assertServiceHealthy(apiUrl, ServiceNames.Asset);
+              await assertServiceHealthy(apiUrl, ServiceNames.Asset, lastBlock);
 
               const res = await axios.post(`${apiUrl}/asset/get-asset`, {
-                assetId: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65',
+                assetId: asset.id,
                 extraData: { tokenMetadata: true }
               });
 
               const { tokenMetadata } = fromSerializableObject<Asset.AssetInfo>(res.data);
-              expect(tokenMetadata).toStrictEqual({ name: 'test' });
+              expect(tokenMetadata).toStrictEqual({ name: asset.name });
             });
 
             it('loads a stub asset metadata service when TOKEN_METADATA_SERVER_URL starts with "stub:"', async () => {
@@ -1355,11 +1379,10 @@ describe('CLI', () => {
                 },
                 stdio: 'pipe'
               });
-
-              await assertServiceHealthy(apiUrl, ServiceNames.Asset);
+              await assertServiceHealthy(apiUrl, ServiceNames.Asset, lastBlock);
 
               const res = await axios.post(`${apiUrl}/asset/get-asset`, {
-                assetId: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65',
+                assetId: asset.id,
                 extraData: { tokenMetadata: true }
               });
 
@@ -1389,7 +1412,7 @@ describe('CLI', () => {
                   stdio: 'pipe'
                 }
               );
-              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, true);
+              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, true, true);
             });
 
             it('exposes a HTTP server with healthy state when using env variables', async () => {
@@ -1403,7 +1426,7 @@ describe('CLI', () => {
                 },
                 stdio: 'pipe'
               });
-              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, true);
+              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, true, true);
             });
           });
 

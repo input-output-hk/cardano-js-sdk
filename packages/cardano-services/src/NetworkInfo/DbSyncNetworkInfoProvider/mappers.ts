@@ -1,5 +1,6 @@
 import { Cardano, ProviderError, ProviderFailure, SupplySummary } from '@cardano-sdk/core';
-import { CostModelsParamModel, GenesisData, LedgerTipModel, ProtocolParamsModel } from './types';
+import { CostModelsParamModel, GenesisData, ProtocolParamsModel } from './types';
+import { LedgerTipModel } from '../../util/DbSyncProvider';
 import JSONbig from 'json-bigint';
 import fs from 'fs';
 import path from 'path';
@@ -10,8 +11,8 @@ interface ToLovalaceSupplyInput {
 }
 
 export const networkIdMap = {
-  Mainnet: Cardano.NetworkId.mainnet,
-  Testnet: Cardano.NetworkId.testnet
+  Mainnet: Cardano.NetworkId.Mainnet,
+  Testnet: Cardano.NetworkId.Testnet
 };
 
 export const toSupply = ({ circulatingSupply, totalSupply }: ToLovalaceSupplyInput): SupplySummary => ({
@@ -20,9 +21,9 @@ export const toSupply = ({ circulatingSupply, totalSupply }: ToLovalaceSupplyInp
 });
 
 export const toLedgerTip = ({ block_no, slot_no, hash }: LedgerTipModel): Cardano.Tip => ({
-  blockNo: Number(block_no),
+  blockNo: Cardano.BlockNo(Number(block_no)),
   hash: Cardano.BlockId(hash.toString('hex')),
-  slot: Number(slot_no)
+  slot: Cardano.Slot(Number(slot_no))
 });
 
 export const mapCostModels = (costs: CostModelsParamModel | null) => {

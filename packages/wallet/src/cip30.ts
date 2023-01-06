@@ -41,12 +41,12 @@ export type SignDataCallbackParams = {
 
 export type SignTxCallbackParams = {
   type: Cip30ConfirmationCallbackType.SignTx;
-  data: Cardano.NewTxBodyAlonzo;
+  data: Cardano.Tx;
 };
 
 export type SubmitTxCallbackParams = {
   type: Cip30ConfirmationCallbackType.SubmitTx;
-  data: Cardano.NewTxAlonzo;
+  data: Cardano.Tx;
 };
 
 export type CallbackConfirmation = (
@@ -232,13 +232,14 @@ export const createWalletApi = (
     scope.dispose();
     return cbor;
   },
-  signData: async (addr: Cardano.Address, payload: Bytes): Promise<Cip30DataSignature> => {
+  signData: async (addr: Cardano.Address | Bytes, payload: Bytes): Promise<Cip30DataSignature> => {
     logger.debug('signData');
     const hexBlobPayload = Cardano.util.HexBlob(payload);
+    const signWith = Cardano.Address(addr.toString());
 
     const shouldProceed = await confirmationCallback({
       data: {
-        addr,
+        addr: signWith,
         payload: hexBlobPayload
       },
       type: Cip30ConfirmationCallbackType.SignData
@@ -248,7 +249,7 @@ export const createWalletApi = (
       const wallet = await firstValueFrom(wallet$);
       return wallet.signData({
         payload: hexBlobPayload,
-        signWith: addr
+        signWith
       });
     }
     logger.debug('sign data declined');
@@ -257,11 +258,11 @@ export const createWalletApi = (
   signTx: async (tx: Cbor, _partialSign?: Boolean): Promise<Cbor> => {
     const scope = new ManagedFreeableScope();
     logger.debug('signTx');
-    const txDecoded = scope.manage(CML.TransactionBody.from_bytes(Buffer.from(tx, 'hex')));
+    const txDecoded = scope.manage(CML.Transaction.from_bytes(Buffer.from(tx, 'hex')));
     const hash = Cardano.TransactionId(
-      Buffer.from(scope.manage(CML.hash_transaction(txDecoded)).to_bytes()).toString('hex')
+      Buffer.from(scope.manage(CML.hash_transaction(scope.manage(txDecoded.body()))).to_bytes()).toString('hex')
     );
-    const coreTx = cmlToCore.txBody(txDecoded);
+    const coreTx = cmlToCore.newTx(txDecoded);
     const shouldProceed = await confirmationCallback({
       data: coreTx,
       type: Cip30ConfirmationCallbackType.SignTx
@@ -271,7 +272,7 @@ export const createWalletApi = (
       try {
         const {
           witness: { signatures }
-        } = await wallet.finalizeTx({ tx: { body: coreTx, hash } });
+        } = await wallet.finalizeTx({ tx: { ...coreTx, hash } });
 
         const cslWitnessSet = scope.manage(coreToCml.witnessSet(scope, { signatures }));
         const cbor = Buffer.from(cslWitnessSet.to_bytes()).toString('hex');
@@ -291,7 +292,7 @@ export const createWalletApi = (
   },
   submitTx: async (tx: Cbor): Promise<string> => {
     logger.debug('submitting tx');
-    const txData: Cardano.NewTxAlonzo = usingAutoFree((scope) =>
+    const txData: Cardano.Tx = usingAutoFree((scope) =>
       cmlToCore.newTx(scope.manage(CML.Transaction.from_bytes(Buffer.from(tx, 'hex'))))
     );
     const shouldProceed = await confirmationCallback({

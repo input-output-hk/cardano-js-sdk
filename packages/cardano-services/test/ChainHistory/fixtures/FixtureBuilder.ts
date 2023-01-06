@@ -44,7 +44,7 @@ export class ChainHistoryFixtureBuilder {
     const txIds = new Set<bigint>();
     const addressesInBlockRange = {
       addresses: new Set<Cardano.Address>(),
-      blockRange: { lowerBound: DB_MAX_SAFE_INTEGER, upperBound: 0 },
+      blockRange: { lowerBound: Cardano.BlockNo(DB_MAX_SAFE_INTEGER), upperBound: Cardano.BlockNo(0) },
       txInRangeCount: 0
     };
 
@@ -72,8 +72,12 @@ export class ChainHistoryFixtureBuilder {
     for (const { address, block_no, tx_id } of results.rows) {
       if (addressesInBlockRange.addresses.has(Cardano.Address(address))) {
         txIds.add(tx_id);
-        addressesInBlockRange.blockRange.lowerBound = Math.min(addressesInBlockRange.blockRange.lowerBound, block_no);
-        addressesInBlockRange.blockRange.upperBound = Math.max(addressesInBlockRange.blockRange.upperBound, block_no);
+        addressesInBlockRange.blockRange.lowerBound = Cardano.BlockNo(
+          Math.min(addressesInBlockRange.blockRange.lowerBound.valueOf(), block_no)
+        );
+        addressesInBlockRange.blockRange.upperBound = Cardano.BlockNo(
+          Math.max(addressesInBlockRange.blockRange.upperBound.valueOf(), block_no)
+        );
       }
     }
 

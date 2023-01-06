@@ -1,32 +1,19 @@
-import * as envalid from 'envalid';
-import { Cardano, createSlotEpochCalc } from '@cardano-sdk/core';
-import { SignedTx, SingleAddressWallet, buildTx } from '@cardano-sdk/wallet';
-import { TestWallet, getWallet } from '../../src';
+import { Cardano } from '@cardano-sdk/core';
+import { SingleAddressWallet, buildTx } from '@cardano-sdk/wallet';
+import { TestWallet, getEnv, getWallet, walletVariables } from '../../src';
 import { assertTxIsValid, waitForWalletStateSettle } from '../../../wallet/test/util';
-import { filter, firstValueFrom } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
+import {
+  getTxConfirmationEpoch,
+  requestCoins,
+  runningAgainstLocalNetwork,
+  submitAndConfirm,
+  transferCoins,
+  waitForEpoch
+} from '../util';
 import { logger } from '@cardano-sdk/util-dev';
-import { requestCoins, runningAgainstLocalNetwork, submitAndConfirm, transferCoins, waitForEpoch } from '../util';
 
-// Verify environment.
-export const env = envalid.cleanEnv(process.env, {
-  ASSET_PROVIDER: envalid.str(),
-  ASSET_PROVIDER_PARAMS: envalid.json({ default: {} }),
-  CHAIN_HISTORY_PROVIDER: envalid.str(),
-  CHAIN_HISTORY_PROVIDER_PARAMS: envalid.json({ default: {} }),
-  KEY_MANAGEMENT_PARAMS: envalid.json({ default: {} }),
-  KEY_MANAGEMENT_PROVIDER: envalid.str(),
-  LOGGER_MIN_SEVERITY: envalid.str({ default: 'info' }),
-  NETWORK_INFO_PROVIDER: envalid.str(),
-  NETWORK_INFO_PROVIDER_PARAMS: envalid.json({ default: {} }),
-  REWARDS_PROVIDER: envalid.str(),
-  REWARDS_PROVIDER_PARAMS: envalid.json({ default: {} }),
-  STAKE_POOL_PROVIDER: envalid.str(),
-  STAKE_POOL_PROVIDER_PARAMS: envalid.json({ default: {} }),
-  TX_SUBMIT_PROVIDER: envalid.str(),
-  TX_SUBMIT_PROVIDER_PARAMS: envalid.json({ default: {} }),
-  UTXO_PROVIDER: envalid.str(),
-  UTXO_PROVIDER_PARAMS: envalid.json({ default: {} })
-});
+const env = getEnv(walletVariables);
 
 describe('delegation rewards', () => {
   let providers: TestWallet['providers'];
@@ -70,7 +57,7 @@ describe('delegation rewards', () => {
 
     // Arrange
     const activePools = await providers.stakePoolProvider.queryStakePools({
-      filters: { status: [Cardano.StakePoolStatus.Active] },
+      filters: { pledgeMet: true, status: [Cardano.StakePoolStatus.Active] },
       pagination: { limit: 1, startAt: 0 }
     });
     expect(activePools.totalResultCount).toBeGreaterThan(0);
@@ -88,18 +75,6 @@ describe('delegation rewards', () => {
       logger.info(`Delegation tx ${signedTx.tx.id} submitted at epoch #${epochNo}`);
 
       return signedTx;
-    };
-
-    const getTxConfirmationEpoch = async (tx: SignedTx) => {
-      const txs = await firstValueFrom(
-        wallet1.transactions.history$.pipe(filter((_) => _.some(({ id }) => id === tx.tx.id)))
-      );
-      const delegationTx = txs.find(({ id }) => id === tx.tx.id);
-      const slotEpochCalc = createSlotEpochCalc(await firstValueFrom(wallet1.eraSummaries$));
-      const delegationTxConfirmedAtEpoch = slotEpochCalc(delegationTx!.blockHeader.slot);
-      logger.info(`Delegation tx confirmed at epoch #${delegationTxConfirmedAtEpoch}`);
-
-      return delegationTxConfirmedAtEpoch;
     };
 
     const generateTxs = async () => {
@@ -136,10 +111,15 @@ describe('delegation rewards', () => {
     // Stake and wait for reward
 
     const signedTx = await submitDelegationTx();
-    const delegationTxConfirmedAtEpoch = await getTxConfirmationEpoch(signedTx);
-    await waitForEpoch(wallet1, delegationTxConfirmedAtEpoch + 2);
+
+    const delegationTxConfirmedAtEpoch = await getTxConfirmationEpoch(wallet1, signedTx.tx);
+
+    logger.info(`Delegation tx confirmed at epoch #${delegationTxConfirmedAtEpoch}`);
+
+    await waitForEpoch(wallet1, delegationTxConfirmedAtEpoch.valueOf() + 2);
+
     await generateTxs();
-    await waitForEpoch(wallet1, delegationTxConfirmedAtEpoch + 4);
+    await waitForEpoch(wallet1, delegationTxConfirmedAtEpoch.valueOf() + 4);
 
     // Check reward
     await waitForWalletStateSettle(wallet1);

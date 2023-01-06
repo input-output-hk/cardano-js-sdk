@@ -88,7 +88,7 @@ cardano-cli transaction build \
   --babbage-era \
   --testnet-magic 888 \
   --tx-in "$scriptUtxo" \
-  --tx-in-script-file scripts/alwayssucceeds.plutus \
+  --tx-in-script-file scripts/contracts/alwayssucceeds.plutus \
   --tx-in-datum-value "$SCRIPT_DATUM_VALUE" \
   --tx-in-redeemer-value "$SCRIPT_DATUM_VALUE" \
   --tx-in-collateral "$utxo" \

@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable sonarjs/no-duplicate-string */
 import {
   Base64Blob,
@@ -8,7 +9,7 @@ import {
   typedBech32,
   typedHex
 } from '../../../src/Cardano/util';
-import { InvalidStringError } from '../../../src/errors';
+import { InvalidStringError } from '../../../src';
 
 describe('Cardano.util/primitives', () => {
   describe('typedBech32', () => {
@@ -51,6 +52,17 @@ describe('Cardano.util/primitives', () => {
     });
   });
 
+  describe('HexBlob.toTypedBech32', () => {
+    it('throw when given an invalid hex', () => {
+      expect(() => HexBlob.toTypedBech32('', HexBlob('ffsa'))).toThrow();
+    });
+
+    it('returns the correct bech32 string when given a valid prefix and valid payload', () => {
+      const bech32 = HexBlob.toTypedBech32('pool', HexBlob('594df1c896f6b05d4bebec0287627cf83416db779a3273205d3db9e0'));
+      expect(bech32).toEqual('pool1t9xlrjyk76c96jltaspgwcnulq6pdkmhnge8xgza8ku7qvpsy9r');
+    });
+  });
+
   describe('typedHex', () => {
     it('does not throw when asserting an empty string', () => {
       expect(() => typedHex('')).not.toThrow();
@@ -89,6 +101,15 @@ describe('Cardano.util/primitives', () => {
 
     it('fromBytes converts byte array into HexBlob', () => {
       expect(HexBlob.fromBytes(new Uint8Array([112]))).toEqual('70');
+    });
+
+    it('fromBase64 converts a base64 encoded string into HexBlob', () => {
+      const base64String = 'o+KixEeK/nzXNPpZPOM/BoQSVWVtwx06z/SIhM6UeNVjFN1rqHKN5BdBOnmKtuh/aF+5F/gwCzl3KPCGMcFuOQ==';
+      const expectedHexString =
+        'a3e2a2c4478afe7cd734fa593ce33f06841255656dc31d3acff48884ce9478d56314dd6ba8728de417413a798ab6e87f685fb917f8300b397728f08631c16e39';
+      const hexString = HexBlob.fromBase64(base64String);
+      expect(hexString).toEqual(expectedHexString);
+      expect(hexString).toHaveLength(128);
     });
   });
 

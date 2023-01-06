@@ -1,4 +1,5 @@
 import { Decoded, bech32 } from 'bech32';
+import { Ed25519KeyHash } from '../types/Key';
 import { InvalidStringError } from '../../errors';
 
 const MAX_BECH32_LENGTH_LIMIT = 1023;
@@ -12,6 +13,11 @@ export declare class OpaqueString<T extends string> extends String {
    * makes typescript recognize it as such.
    */
   toString(): string;
+}
+
+export declare class OpaqueNumber<T extends string> extends Number {
+  /** This helps typescript distinguish different opaque number types. */
+  protected readonly __opaqueNumber: T;
 }
 
 const isOneOf = <T>(target: T, options: T | T[]) =>
@@ -101,6 +107,24 @@ export const HexBlob = (target: string): HexBlob => typedHex(target);
 HexBlob.fromBytes = (bytes: Uint8Array) => Buffer.from(bytes).toString('hex') as unknown as HexBlob;
 
 /**
+ * Converts a base64 string into a hex (base16) encoded string.
+ *
+ * @param rawData The base64 encoded string.
+ */
+HexBlob.fromBase64 = (rawData: string) => Buffer.from(rawData, 'base64').toString('hex') as unknown as HexBlob;
+
+/**
+ * Converts a hex string into a typed bech32 encoded string.
+ *
+ * @param prefix The prefix of the bech32 string.
+ * @param hexString The hex string to be encoded.
+ */
+HexBlob.toTypedBech32 = <T>(prefix: string, hexString: HexBlob): T =>
+  bech32.encode(prefix, bech32.toWords(Uint8Array.from(Buffer.from(hexString, 'hex')))) as unknown as T;
+
+HexBlob.fromEd25519KeyHash = (hash: Ed25519KeyHash) => hash as unknown as HexBlob;
+
+/**
  * Cast HexBlob it into another OpaqueString type.
  *
  * @param {HexBlob} target hex string to convert
@@ -114,24 +138,22 @@ export const castHexBlob = <T>(target: HexBlob, expectedLength?: number) => {
 /**
  * 32 byte hash as hex string
  */
-export type Hash32ByteBase16<T extends string = 'Hash32ByteBase16'> = OpaqueString<T>;
+export type Hash32ByteBase16 = OpaqueString<'Hash32ByteBase16'>;
 
 /**
  * @param {string} value 32 byte hash as hex string
  * @throws InvalidStringError
  */
-export const Hash32ByteBase16 = <T extends string = 'Hash32ByteBase16'>(value: string): Hash32ByteBase16<T> =>
-  typedHex<Hash32ByteBase16<T>>(value, 64);
+export const Hash32ByteBase16 = (value: string): Hash32ByteBase16 => typedHex<Hash32ByteBase16>(value, 64);
 Hash32ByteBase16.fromHexBlob = <T>(value: HexBlob) => castHexBlob<T>(value, 64);
 
 /**
  * 28 byte hash as hex string
  */
-export type Hash28ByteBase16<T extends string = 'Hash28ByteBase16'> = OpaqueString<T>;
+export type Hash28ByteBase16 = OpaqueString<'Hash28ByteBase16'>;
 
 /**
  * @param {string} value 28 byte hash as hex string
  * @throws InvalidStringError
  */
-export const Hash28ByteBase16 = <T extends string = 'Hash28ByteBase16'>(value: string): Hash28ByteBase16<T> =>
-  typedHex<Hash32ByteBase16<T>>(value, 56);
+export const Hash28ByteBase16 = (value: string): Hash28ByteBase16 => typedHex<Hash28ByteBase16>(value, 56);

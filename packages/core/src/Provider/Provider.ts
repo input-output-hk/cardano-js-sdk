@@ -1,4 +1,6 @@
+import { Cardano } from '..';
 import { Percent } from '../Cardano';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { Tip } from '@cardano-ogmios/schema';
 
 export type HealthCheckResponse = {
@@ -7,6 +9,7 @@ export type HealthCheckResponse = {
     ledgerTip?: Tip;
     networkSync?: Percent;
   };
+  projectedTip?: Cardano.Tip;
 };
 
 export interface Provider {

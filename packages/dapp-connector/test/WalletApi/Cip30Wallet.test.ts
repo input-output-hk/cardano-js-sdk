@@ -133,6 +133,15 @@ describe('Wallet', () => {
       expect(signedData).toEqual({});
     });
 
+    test('signData accepts hex format address', async () => {
+      jest.resetAllMocks();
+      const signedData = await api.signData(
+        '60d2696793b60a6e1c619dd16ff02be81e3d9ec435cfb880ac5e32b93a',
+        Buffer.from('').toString('hex')
+      );
+      expect(signedData).toEqual({});
+    });
+
     test('submitTx', async () => {
       expect(api.submitTx).toBeDefined();
       expect(typeof api.submitTx).toBe('function');

@@ -1,25 +1,25 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AuxiliaryData } from './AuxiliaryData';
-import { Base64Blob, Hash28ByteBase16, Hash32ByteBase16, HexBlob, OpaqueString, typedHex } from '../util/primitives';
+import { Base64Blob, Hash32ByteBase16, HexBlob, OpaqueString, typedHex } from '../util/primitives';
 import { Certificate } from './Certificate';
 import { Datum, Script } from './Script';
 import { Ed25519KeyHash, Ed25519PublicKey } from './Key';
 import { ExUnits, ValidityInterval } from './ProtocolParameters';
+import { HydratedTxIn, TxIn, TxOut } from './Utxo';
 import { Lovelace, TokenMap } from './Value';
-import { NewTxIn, TxIn, TxOut } from './Utxo';
 import { PartialBlockHeader } from './Block';
 import { RewardAccount } from './RewardAccount';
 
 /**
  * transaction hash as hex string
  */
-export type TransactionId = Hash32ByteBase16<'TransactionId'>;
+export type TransactionId = OpaqueString<'TransactionId'>;
 
 /**
  * @param {string} value transaction hash as hex string
  * @throws InvalidStringError
  */
-export const TransactionId = (value: string): TransactionId => Hash32ByteBase16<'TransactionId'>(value);
+export const TransactionId = (value: string): TransactionId => Hash32ByteBase16(value) as unknown as TransactionId;
 TransactionId.fromHexBlob = (value: HexBlob) => Hash32ByteBase16.fromHexBlob<TransactionId>(value);
 
 /**
@@ -38,22 +38,46 @@ export interface Withdrawal {
   quantity: Lovelace;
 }
 
-export interface TxBodyAlonzo {
-  inputs: TxIn[];
-  collaterals?: TxIn[];
+export interface HydratedTxBody {
+  inputs: HydratedTxIn[];
+  collaterals?: HydratedTxIn[];
   outputs: TxOut[];
   fee: Lovelace;
-  validityInterval: ValidityInterval;
+  validityInterval?: ValidityInterval;
   withdrawals?: Withdrawal[];
   certificates?: Certificate[];
   mint?: TokenMap;
   scriptIntegrityHash?: Hash32ByteBase16;
   requiredExtraSignatures?: Ed25519KeyHash[];
+
+  /**
+   * The total collateral field lets users write transactions whose collateral is evident by just looking at the
+   * tx body instead of requiring information in the UTxO. The specification of total collateral is optional.
+   *
+   * It does not change how the collateral is computed but transactions whose collateral is different from the
+   * amount specified will be invalid.
+   */
+  totalCollateral?: Lovelace;
+
+  /**
+   * Return collateral allows us to specify an output with the remainder of our collateral input(s) in the event
+   * we over-collateralize our transaction. This allows us to avoid overpaying the collateral and also creates the
+   * possibility for native assets to be also present in the collateral, though they will not serve as a payment
+   * for the fee.
+   */
+  collateralReturn?: TxOut;
+
+  /**
+   * Reference inputs allows looking at an output without spending it. This facilitates access to information
+   * stored on the blockchain without the need of spending and recreating UTXOs.
+   */
+  referenceInputs?: HydratedTxIn[];
 }
 
-export interface NewTxBodyAlonzo extends Omit<TxBodyAlonzo, 'inputs' | 'collaterals'> {
-  inputs: NewTxIn[];
-  collaterals?: NewTxIn[];
+export interface TxBody extends Omit<HydratedTxBody, 'inputs' | 'collaterals' | 'referenceInputs'> {
+  inputs: TxIn[];
+  collaterals?: TxIn[];
+  referenceInputs?: TxIn[];
 }
 
 export enum RedeemerPurpose {
@@ -66,7 +90,7 @@ export enum RedeemerPurpose {
 export interface Redeemer {
   index: number;
   purpose: RedeemerPurpose;
-  scriptHash: Hash28ByteBase16;
+  data: HexBlob;
   executionUnits: ExUnits;
 }
 
@@ -92,21 +116,21 @@ export type Witness = {
   datums?: Datum[];
 };
 
-export interface NewTxAlonzo<TBody extends NewTxBodyAlonzo = NewTxBodyAlonzo> {
+export interface Tx<TBody extends TxBody = TxBody> {
   id: TransactionId;
   body: TBody;
   witness: Witness;
   auxiliaryData?: AuxiliaryData;
 }
 
-export interface TxAlonzo extends NewTxAlonzo<TxBodyAlonzo> {
+export interface HydratedTx extends Tx<HydratedTxBody> {
   index: number;
   blockHeader: PartialBlockHeader;
-  body: TxBodyAlonzo;
+  body: HydratedTxBody;
   txSize: number;
 }
 
 export type TxBodyWithHash = {
   hash: TransactionId;
-  body: NewTxBodyAlonzo;
+  body: TxBody;
 };

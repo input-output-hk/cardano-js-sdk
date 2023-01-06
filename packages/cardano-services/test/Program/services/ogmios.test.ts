@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable max-len */
-import { CardanoNodeErrors, TxSubmitProvider } from '@cardano-sdk/core';
+import { CardanoNodeErrors } from '@cardano-sdk/core';
 import { Connection } from '@cardano-ogmios/client';
 import { DbSyncEpochPollService, listenPromise, serverClosePromise } from '../../../src/util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../../src/NetworkInfo';
@@ -15,6 +15,7 @@ import {
   getPool
 } from '../../../src';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../../src/InMemoryCache';
+import { LedgerTipModel, findLedgerTip } from '../../../src/util/DbSyncProvider';
 import { Ogmios, OgmiosCardanoNode, OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { SrvRecord } from 'dns';
@@ -47,16 +48,34 @@ describe('Service dependency abstractions', () => {
   const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
   const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
+  let lastBlockNoInDb: LedgerTipModel;
+  let db: Pool | undefined;
+
+  beforeAll(async () => {
+    db = await getPool(dnsResolver, logger, {
+      dbCacheTtl: 10_000,
+      epochPollInterval: 1000,
+      postgresDb: process.env.POSTGRES_DB!,
+      postgresPassword: process.env.POSTGRES_PASSWORD!,
+      postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,
+      postgresUser: process.env.POSTGRES_USER!
+    });
+
+    lastBlockNoInDb = (await db!.query<LedgerTipModel>(findLedgerTip)).rows[0];
+  });
+
+  afterAll(async () => {
+    await db!.end();
+  });
 
   describe('Ogmios-dependant services with service discovery', () => {
     let apiUrlBase: string;
     let ogmiosServer: http.Server;
     let ogmiosConnection: Connection;
-    let txSubmitProvider: TxSubmitProvider;
+    let txSubmitProvider: OgmiosTxSubmitProvider;
     let ogmiosCardanoNode: OgmiosCardanoNode;
     let httpServer: HttpServer;
     let port: number;
-    let db: Pool | undefined;
     let config: HttpServerConfig;
 
     beforeAll(async () => {
@@ -92,6 +111,10 @@ describe('Service dependency abstractions', () => {
           await httpServer.shutdown();
         });
 
+        it('txSubmitProvider state should be running when http server has started', () => {
+          expect(txSubmitProvider.state).toEqual('running');
+        });
+
         it('txSubmitProvider should be instance of a Proxy ', () => {
           expect(types.isProxy(txSubmitProvider)).toEqual(true);
         });
@@ -101,7 +124,16 @@ describe('Service dependency abstractions', () => {
             headers: { 'Content-Type': APPLICATION_JSON }
           });
           expect(res.status).toBe(200);
-          expect(res.data).toEqual(healthCheckResponseMock());
+          expect(res.data).toEqual(healthCheckResponseMock({ withTip: false }));
+        });
+
+        it('TxSubmitHttpService replies with status 200 OK when /submit endpoint is reached', async () => {
+          const res = await axios.post(
+            `${apiUrlBase}/submit`,
+            { signedTransaction: bufferToHexString(Buffer.from(new Uint8Array())) },
+            { headers: { 'Content-Type': APPLICATION_JSON } }
+          );
+          expect(res.status).toBe(200);
         });
       });
 
@@ -110,14 +142,6 @@ describe('Service dependency abstractions', () => {
           port = await getPort();
           apiUrlBase = `http://localhost:${port}/network-info`;
           config = { listen: { port } };
-          db = await getPool(dnsResolver, logger, {
-            dbCacheTtl: 10_000,
-            epochPollInterval: 1000,
-            postgresDb: process.env.POSTGRES_DB!,
-            postgresPassword: process.env.POSTGRES_PASSWORD!,
-            postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,
-            postgresUser: process.env.POSTGRES_USER!
-          });
           ogmiosCardanoNode = await getOgmiosCardanoNode(dnsResolver, logger, {
             ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
           });
@@ -137,9 +161,12 @@ describe('Service dependency abstractions', () => {
         });
 
         afterAll(async () => {
-          await db!.end();
           await cache.shutdown();
           await httpServer.shutdown();
+        });
+
+        it('ogmiosCardanoNode state should be running when http server has started', () => {
+          expect(ogmiosCardanoNode.state).toEqual('running');
         });
 
         it('ogmiosCardanoNode should be instance of a Proxy ', () => {
@@ -151,7 +178,23 @@ describe('Service dependency abstractions', () => {
             headers: { 'Content-Type': APPLICATION_JSON }
           });
           expect(res.status).toBe(200);
-          expect(res.data).toEqual(healthCheckResponseMock());
+          expect(res.data).toEqual(
+            healthCheckResponseMock({
+              projectedTip: {
+                blockNo: lastBlockNoInDb.block_no.valueOf(),
+                hash: lastBlockNoInDb.hash.toString('hex'),
+                slot: Number(lastBlockNoInDb.slot_no)
+              },
+              withTip: true
+            })
+          );
+        });
+
+        it('NetworkInfoHttpService replies with status 200 OK when /stake endpoint is reached', async () => {
+          const res = await axios.post(`${apiUrlBase}/stake`, undefined, {
+            headers: { 'Content-Type': APPLICATION_JSON }
+          });
+          expect(res.status).toBe(200);
         });
       });
     });
@@ -165,7 +208,6 @@ describe('Service dependency abstractions', () => {
     let ogmiosCardanoNode: OgmiosCardanoNode;
     let httpServer: HttpServer;
     let port: number;
-    let db: Pool | undefined;
     let config: HttpServerConfig;
 
     beforeAll(async () => {
@@ -173,6 +215,7 @@ describe('Service dependency abstractions', () => {
       ogmiosConnection = Ogmios.createConnectionObject();
       await listenPromise(ogmiosServer, { port: ogmiosConnection.port });
       await ogmiosServerReady(ogmiosConnection);
+      lastBlockNoInDb = (await db!.query<LedgerTipModel>(findLedgerTip)).rows[0];
     });
 
     afterAll(async () => {
@@ -210,7 +253,7 @@ describe('Service dependency abstractions', () => {
             headers: { 'Content-Type': APPLICATION_JSON }
           });
           expect(res.status).toBe(200);
-          expect(res.data).toEqual(healthCheckResponseMock());
+          expect(res.data).toEqual(healthCheckResponseMock({ withTip: false }));
         });
       });
 
@@ -220,11 +263,6 @@ describe('Service dependency abstractions', () => {
           apiUrlBase = `http://localhost:${port}/network-info`;
           config = { listen: { port } };
 
-          db = await getPool(dnsResolver, logger, {
-            dbCacheTtl: 10_000,
-            epochPollInterval: 1000,
-            postgresConnectionString: process.env.POSTGRES_CONNECTION_STRING!
-          });
           ogmiosCardanoNode = await getOgmiosCardanoNode(dnsResolver, logger, {
             ogmiosUrl: new URL(ogmiosConnection.address.webSocket)
           });
@@ -244,7 +282,6 @@ describe('Service dependency abstractions', () => {
         });
 
         afterAll(async () => {
-          await db!.end();
           await httpServer.shutdown();
           await serverClosePromise(ogmiosServer);
         });
@@ -258,7 +295,16 @@ describe('Service dependency abstractions', () => {
             headers: { 'Content-Type': APPLICATION_JSON }
           });
           expect(res.status).toBe(200);
-          expect(res.data).toEqual(healthCheckResponseMock());
+          expect(res.data).toEqual(
+            healthCheckResponseMock({
+              projectedTip: {
+                blockNo: lastBlockNoInDb.block_no.valueOf(),
+                hash: lastBlockNoInDb.hash.toString('hex'),
+                slot: Number(lastBlockNoInDb.slot_no)
+              },
+              withTip: true
+            })
+          );
         });
       });
     });
@@ -346,7 +392,7 @@ describe('Service dependency abstractions', () => {
         ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
       });
 
-      await expect(provider.healthCheck()).resolves.toEqual(healthCheckResponseMock());
+      await expect(provider.healthCheck()).resolves.toEqual(healthCheckResponseMock({ withTip: false }));
     });
   });
 

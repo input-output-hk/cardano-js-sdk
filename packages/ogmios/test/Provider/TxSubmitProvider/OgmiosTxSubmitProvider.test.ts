@@ -1,9 +1,10 @@
-import { CardanoNodeErrors, HealthCheckResponse, ProviderError } from '@cardano-sdk/core';
+import { CardanoNodeErrors, ProviderError } from '@cardano-sdk/core';
 import { Connection, createConnectionObject } from '@cardano-ogmios/client';
 import { OgmiosTxSubmitProvider } from '../../../src';
 import { bufferToHexString } from '@cardano-sdk/util';
 import { createMockOgmiosServer, listenPromise, serverClosePromise } from '../../mocks/mockOgmiosServer';
 import { getRandomPort } from 'get-port-please';
+import { healthCheckResponseMock } from '../../../../core/test/CardanoNode/mocks';
 import { dummyLogger as logger } from 'ts-log';
 import http from 'http';
 
@@ -14,17 +15,7 @@ describe('OgmiosTxSubmitProvider', () => {
   let connection: Connection;
   let provider: OgmiosTxSubmitProvider;
 
-  const responseWithServiceState: HealthCheckResponse = {
-    localNode: {
-      ledgerTip: {
-        blockNo: 3_391_731,
-        hash: '9ef43ab6e234fcf90d103413096c7da752da2f45b15e1259f43d476afd12932c',
-        slot: 52_819_355
-      },
-      networkSync: 0.999
-    },
-    ok: true
-  };
+  const responseWithServiceState = healthCheckResponseMock({ withTip: false });
 
   beforeAll(async () => {
     connection = createConnectionObject({ port: await getRandomPort() });

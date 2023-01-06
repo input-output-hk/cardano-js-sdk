@@ -11,6 +11,7 @@
   ],
   "scripts": {
     "build": "yarn workspaces foreach -v run build",
+    "circular-deps:check": "yarn workspaces foreach -v run circular-deps:check --summary",
     "cleanup-build": "yarn workspaces foreach -v run cleanup && yarn install && yarn workspaces foreach -v run build",
     "reinstall": "yarn workspaces foreach -v run cleanup:nm && yarn install",
     "rebuild": "yarn workspaces foreach -v run cleanup:dist && yarn workspaces foreach -v run build",

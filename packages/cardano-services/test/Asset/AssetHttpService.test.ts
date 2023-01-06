@@ -9,10 +9,10 @@ import {
   NftMetadataService,
   TokenMetadataService
 } from '../../src';
-import { AssetProvider, Cardano } from '@cardano-sdk/core';
-import { BlockNoModel, findLastBlockNo } from '../../src/util/DbSyncProvider';
+import { AssetProvider } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, assetInfoHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { INFO, createLogger } from 'bunyan';
+import { LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { createDbSyncMetadataService } from '../../src/Metadata';
@@ -41,7 +41,7 @@ describe('AssetHttpService', () => {
   let clientConfig: CreateHttpProviderConfig<AssetProvider>;
   let provider: AssetProvider;
   let cardanoNode: OgmiosCardanoNode;
-  let lastBlockNoInDb: Cardano.BlockNo;
+  let lastBlockNoInDb: LedgerTipModel;
   let fixtureBuilder: AssetFixtureBuilder;
 
   beforeAll(async () => {
@@ -54,15 +54,25 @@ describe('AssetHttpService', () => {
   describe('healthy state', () => {
     beforeAll(async () => {
       ({ closeMock, serverUrl } = await mockTokenRegistry(() => ({})));
-      db = new Pool({ connectionString: process.env.LOCALNETWORK_INTEGRATION_TESTS_POSTGRES_CONNECTION_STRING });
+      db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
       ntfMetadataService = new DbSyncNftMetadataService({
         db,
         logger,
         metadataService: createDbSyncMetadataService(db, logger)
       });
-      lastBlockNoInDb = (await db.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no;
+      lastBlockNoInDb = (await db.query<LedgerTipModel>(findLedgerTip)).rows[0];
       cardanoNode = mockCardanoNode(
-        healthCheckResponseMock({ blockNo: lastBlockNoInDb })
+        healthCheckResponseMock({
+          blockNo: lastBlockNoInDb.block_no.valueOf(),
+          hash: lastBlockNoInDb.hash.toString('hex'),
+          projectedTip: {
+            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            hash: lastBlockNoInDb.hash.toString('hex'),
+            slot: Number(lastBlockNoInDb.slot_no)
+          },
+          slot: Number(lastBlockNoInDb.slot_no),
+          withTip: true
+        })
       ) as unknown as OgmiosCardanoNode;
       tokenMetadataService = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl: serverUrl });
       assetProvider = new DbSyncAssetProvider({ cardanoNode, db, logger, ntfMetadataService, tokenMetadataService });
@@ -86,12 +96,36 @@ describe('AssetHttpService', () => {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
+        expect(res.data).toEqual(
+          healthCheckResponseMock({
+            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            hash: lastBlockNoInDb.hash.toString('hex'),
+            projectedTip: {
+              blockNo: lastBlockNoInDb.block_no.valueOf(),
+              hash: lastBlockNoInDb.hash.toString('hex'),
+              slot: Number(lastBlockNoInDb.slot_no)
+            },
+            slot: Number(lastBlockNoInDb.slot_no),
+            withTip: true
+          })
+        );
       });
 
       it('forwards the assetProvider health response with provider client', async () => {
         const response = await provider.healthCheck();
-        expect(response).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
+        expect(response).toEqual(
+          healthCheckResponseMock({
+            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            hash: lastBlockNoInDb.hash.toString('hex'),
+            projectedTip: {
+              blockNo: lastBlockNoInDb.block_no.valueOf(),
+              hash: lastBlockNoInDb.hash.toString('hex'),
+              slot: Number(lastBlockNoInDb.slot_no)
+            },
+            slot: Number(lastBlockNoInDb.slot_no),
+            withTip: true
+          })
+        );
       });
     });
 

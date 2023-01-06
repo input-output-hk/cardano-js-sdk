@@ -12,6 +12,11 @@ import first from 'lodash/first';
 import flatten from 'lodash/flatten';
 import groupBy from 'lodash/groupBy';
 
+const DELEGATION_EPOCHS_AHEAD_COUNT = 2;
+
+export const calcFirstDelegationEpoch = (epoch: Cardano.EpochNo): number =>
+  epoch.valueOf() + DELEGATION_EPOCHS_AHEAD_COUNT;
+
 const sumRewards = (arrayOfRewards: EpochRewards[]) => BigIntMath.sum(arrayOfRewards.map(({ rewards }) => rewards));
 const avgReward = (arrayOfRewards: EpochRewards[]) => sumRewards(arrayOfRewards) / BigInt(arrayOfRewards.length);
 
@@ -19,10 +24,12 @@ export const createRewardsHistoryProvider =
   (rewardsProvider: TrackedRewardsProvider, retryBackoffConfig: RetryBackoffConfig) =>
   (
     rewardAccounts: Cardano.RewardAccount[],
-    lowerBound: Cardano.EpochNo | null
+    lowerBound: Cardano.EpochNo | null,
+    onFatalError?: (value: unknown) => void
   ): Observable<Map<Cardano.RewardAccount, EpochRewards[]>> => {
     if (lowerBound) {
       return coldObservableProvider({
+        onFatalError,
         provider: () =>
           rewardsProvider.rewardsHistory({
             epochs: { lowerBound },
@@ -49,7 +56,7 @@ const firstDelegationEpoch$ = (transactions$: Observable<TxWithEpoch[]>, rewardA
         })
       )
     ),
-    map((tx) => (isNotNil(tx) ? tx.epoch + 3 : null)),
+    map((tx) => (isNotNil(tx) ? calcFirstDelegationEpoch(tx.epoch) : null)),
     distinctUntilChanged()
   );
 
@@ -58,7 +65,9 @@ export const createRewardsHistoryTracker = (
   rewardAccounts$: Observable<Cardano.RewardAccount[]>,
   rewardsHistoryProvider: RewardsHistoryProvider,
   rewardsHistoryStore: KeyValueStore<Cardano.RewardAccount, EpochRewards[]>,
-  logger: Logger
+  logger: Logger,
+  onFatalError?: (value: unknown) => void
+  // eslint-disable-next-line max-params
 ): Observable<RewardsHistory> =>
   rewardAccounts$
     .pipe(
@@ -70,7 +79,9 @@ export const createRewardsHistoryTracker = (
             .pipe(map((rewards) => new Map(rewardAccounts.map((rewardAccount, i) => [rewardAccount, rewards[i]])))),
           firstDelegationEpoch$(transactions$, rewardAccounts).pipe(
             tap((firstEpoch) => logger.debug(`Fetching history rewards since epoch ${firstEpoch}`)),
-            switchMap((firstEpoch) => rewardsHistoryProvider(rewardAccounts, firstEpoch)),
+            switchMap((firstEpoch) =>
+              rewardsHistoryProvider(rewardAccounts, Cardano.EpochNo(firstEpoch!), onFatalError)
+            ),
             tap((allRewards) =>
               rewardsHistoryStore.setAll([...allRewards.entries()].map(([key, value]) => ({ key, value })))
             )
@@ -94,7 +105,10 @@ export const createRewardsHistoryTracker = (
         const epochs = Object.keys(rewardsByEpoch)
           .map((epoch) => Number(epoch))
           .sort();
-        const all = epochs.map((epoch) => ({ epoch, rewards: sumRewards(rewardsByEpoch[epoch]) }));
+        const all = epochs.map((epoch) => ({
+          epoch: Cardano.EpochNo(epoch),
+          rewards: sumRewards(rewardsByEpoch[epoch])
+        }));
         const rewardsHistory: RewardsHistory = {
           all,
           avgReward: avgReward(allRewards),

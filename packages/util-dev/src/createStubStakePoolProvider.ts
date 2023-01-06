@@ -6,9 +6,9 @@ export const somePartialStakePools: Cardano.StakePool[] = [
     epochRewards: [
       {
         activeStake: 1_000_000_000_000n,
-        epoch: 123,
+        epoch: Cardano.EpochNo(123),
         epochLength: 432_000_000,
-        memberROI: 0.000_68,
+        memberROI: Cardano.Percent(0.000_68),
         operatorFees: 340n + 50n,
         totalRewards: 680n
       }

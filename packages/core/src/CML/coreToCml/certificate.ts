@@ -7,6 +7,9 @@ import {
   DNSRecordSRV,
   Ed25519KeyHash,
   Ed25519KeyHashes,
+  GenesisDelegateHash,
+  GenesisHash,
+  GenesisKeyDelegation,
   Ipv4,
   MultiHostName,
   PoolMetadata,
@@ -182,18 +185,36 @@ export const stakeDelegation = (
     )
   );
 
+const genesisKeyDelegation = (
+  scope: ManagedFreeableScope,
+  { genesisDelegateHash, genesisHash, vrfKeyHash }: Cardano.GenesisKeyDelegationCertificate
+) =>
+  scope.manage(
+    Certificate.new_genesis_key_delegation(
+      scope.manage(
+        GenesisKeyDelegation.new(
+          scope.manage(GenesisHash.from_hex(genesisHash.toString())),
+          scope.manage(GenesisDelegateHash.from_hex(genesisDelegateHash.toString())),
+          scope.manage(VRFKeyHash.from_hex(vrfKeyHash.toString()))
+        )
+      )
+    )
+  );
+
 export const create = (scope: ManagedFreeableScope, certificate: Cardano.Certificate) => {
   switch (certificate.__typename) {
     case Cardano.CertificateType.PoolRegistration:
       return poolRegistration(scope, certificate.poolParameters);
     case Cardano.CertificateType.PoolRetirement:
-      return poolRetirement(scope, certificate.poolId, certificate.epoch);
+      return poolRetirement(scope, certificate.poolId, certificate.epoch.valueOf());
     case Cardano.CertificateType.StakeDelegation:
       return stakeDelegation(scope, certificate.stakeKeyHash, certificate.poolId);
     case Cardano.CertificateType.StakeKeyDeregistration:
       return stakeKeyDeregistration(scope, certificate.stakeKeyHash);
     case Cardano.CertificateType.StakeKeyRegistration:
       return stakeKeyRegistration(scope, certificate.stakeKeyHash);
+    case Cardano.CertificateType.GenesisKeyDelegation:
+      return genesisKeyDelegation(scope, certificate);
     default:
       throw new NotImplementedError(`certificate.create ${certificate.__typename}`);
   }

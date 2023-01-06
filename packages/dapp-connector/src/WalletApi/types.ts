@@ -143,7 +143,7 @@ export type SignTx = (tx: Cbor, partialSign?: Boolean) => Promise<Cbor>;
  * @throws ApiError
  * @throws DataSignError
  */
-export type SignData = (addr: Cardano.Address, payload: Bytes) => Promise<Cip30DataSignature>;
+export type SignData = (addr: Cardano.Address | Bytes, payload: Bytes) => Promise<Cip30DataSignature>;
 
 /**
  * As wallets should already have this ability, we allow dApps to request that a transaction be sent through it.

@@ -17,21 +17,21 @@ export interface ChainHistoryProvider extends Provider {
    * @param {Cardano.Address[]} addresses array of addresses
    * @param {Cardano.PaginationArgs} [pagination] pagination args
    * @param {Range<Cardano.BlockNo>} [blockRange] transactions in specified block ranges (lower and upper bounds inclusive)
-   * @returns {Cardano.TxAlonzo[]} an array of transactions involving the addresses
+   * @returns {Cardano.HydratedTx[]} an array of transactions involving the addresses
    */
-  transactionsByAddresses: (args: TransactionsByAddressesArgs) => Promise<Paginated<Cardano.TxAlonzo>>;
+  transactionsByAddresses: (args: TransactionsByAddressesArgs) => Promise<Paginated<Cardano.HydratedTx>>;
   /**
    * Gets the transactions matching the provided hashes.
    *
    * @param {Cardano.TransactionId[]} ids array of transaction ids
-   * @returns {Cardano.TxAlonzo[]} an array of transactions
+   * @returns {Cardano.HydratedTx[]} an array of transactions
    */
-  transactionsByHashes: (args: TransactionsByIdsArgs) => Promise<Cardano.TxAlonzo[]>;
+  transactionsByHashes: (args: TransactionsByIdsArgs) => Promise<Cardano.HydratedTx[]>;
   /**
    * Gets the blocks matching the provided hashes.
    *
    * @param {Cardano.BlockId[]} ids array of block ids
-   * @returns {Cardano.Block[]} an array of blocks, same length and in the same order as `hashes` argument.
+   * @returns {Cardano.ExtendedBlockInfo[]} an array of blocks, same length and in the same order as `hashes` argument.
    */
-  blocksByHashes: (args: BlocksByIdsArgs) => Promise<Cardano.Block[]>;
+  blocksByHashes: (args: BlocksByIdsArgs) => Promise<Cardano.ExtendedBlockInfo[]>;
 }

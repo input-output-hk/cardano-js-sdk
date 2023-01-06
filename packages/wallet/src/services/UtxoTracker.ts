@@ -11,9 +11,10 @@ export interface UtxoTrackerProps {
   addresses$: Observable<Cardano.Address[]>;
   stores: Pick<WalletStores, 'utxo' | 'unspendableUtxo'>;
   transactionsInFlight$: Observable<TxInFlight[]>;
-  tipBlockHeight$: Observable<number>;
+  tipBlockHeight$: Observable<Cardano.BlockNo>;
   retryBackoffConfig: RetryBackoffConfig;
   logger: Logger;
+  onFatalError?: (value: unknown) => void;
 }
 
 export interface UtxoTrackerInternals {
@@ -24,13 +25,15 @@ export interface UtxoTrackerInternals {
 export const createUtxoProvider = (
   utxoProvider: UtxoProvider,
   addresses$: Observable<Cardano.Address[]>,
-  tipBlockHeight$: Observable<number>,
-  retryBackoffConfig: RetryBackoffConfig
+  tipBlockHeight$: Observable<Cardano.BlockNo>,
+  retryBackoffConfig: RetryBackoffConfig,
+  onFatalError?: (value: unknown) => void
 ) =>
   addresses$.pipe(
     switchMap((addresses) =>
       coldObservableProvider({
         equals: utxoEquals,
+        onFatalError,
         provider: () => utxoProvider.utxoByAddresses({ addresses }),
         retryBackoffConfig,
         trigger$: tipBlockHeight$
@@ -46,11 +49,12 @@ export const createUtxoTracker = (
     transactionsInFlight$,
     retryBackoffConfig,
     tipBlockHeight$,
-    logger
+    logger,
+    onFatalError
   }: UtxoTrackerProps,
   {
     utxoSource$ = new PersistentCollectionTrackerSubject<Cardano.Utxo>(
-      () => createUtxoProvider(utxoProvider, addresses$, tipBlockHeight$, retryBackoffConfig),
+      () => createUtxoProvider(utxoProvider, addresses$, tipBlockHeight$, retryBackoffConfig, onFatalError),
       stores.utxo
     ),
     unspendableUtxoSource$ = new PersistentCollectionTrackerSubject(
@@ -91,7 +95,7 @@ export const createUtxoTracker = (
               )
           )
           .map((txOut): Cardano.Utxo => {
-            const txIn: Cardano.TxIn = {
+            const txIn: Cardano.HydratedTxIn = {
               address: txOut.address, // not necessarily correct in multi-address wallet
               index: tx.body.outputs.indexOf(txOut),
               txId: tx.id

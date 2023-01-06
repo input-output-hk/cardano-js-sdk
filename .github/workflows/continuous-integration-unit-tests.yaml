@@ -28,6 +28,10 @@ jobs:
         yarn build
         yarn lint
 
+    - name: 🔃 Check for circular dependencies
+      run: |
+        yarn circular-deps:check
+
     - name: 🔬 Test
       run: |
         yarn test:build:verify

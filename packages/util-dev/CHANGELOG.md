@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.5.0...@cardano-sdk/util-dev@0.6.0) (2022-12-22)
+
+### ⚠ BREAKING CHANGES
+
+- moved testnetEraSummaries to util-dev package
+- - BlockSize is now an OpaqueNumber rather than a type alias for number
+
+* BlockNo is now an OpaqueNumber rather than a type alias for number
+* EpochNo is now an OpaqueNumber rather than a type alias for number
+* Slot is now an OpaqueNumber rather than a type alias for number
+* Percentage is now an OpaqueNumber rather than a type alias for number
+
+### Features
+
+- add opaque numeric types to core package ([9ead8bd](https://github.com/input-output-hk/cardano-js-sdk/commit/9ead8bdb34b7ffc57c32f9ab18a6c6ca14af3fda))
+
+### Bug Fixes
+
+- add sideEffects=false to package.json ([a1cb8f8](https://github.com/input-output-hk/cardano-js-sdk/commit/a1cb8f807e8d5947d0c512e0918713ff97d5d48e))
+
+### Code Refactoring
+
+- moved testnetEraSummaries to util-dev package ([5ad0514](https://github.com/input-output-hk/cardano-js-sdk/commit/5ad0514846dd2d186eb04c29821d987c6409a5c2))
+
 ## [0.5.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.4.1...@cardano-sdk/util-dev@0.5.0) (2022-11-04)
 
 ### ⚠ BREAKING CHANGES

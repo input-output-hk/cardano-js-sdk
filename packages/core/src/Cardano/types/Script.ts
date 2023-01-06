@@ -1,6 +1,7 @@
 /* eslint-disable no-use-before-define */
 import * as util from '../util/primitives';
 import { Ed25519KeyHash } from './Key';
+import { Hash32ByteBase16 } from '../util';
 import { Slot } from './Block';
 
 /**
@@ -18,7 +19,7 @@ export enum NativeScriptKind {
   RequireSignature = 0,
   RequireAllOf = 1,
   RequireAnyOf = 2,
-  RequireMOf = 3,
+  RequireNOf = 3,
   RequireTimeAfter = 4,
   RequireTimeBefore = 5
 }
@@ -114,7 +115,7 @@ export interface RequireAtLeastScript {
   /**
    * The native script kind.
    */
-  kind: NativeScriptKind.RequireMOf;
+  kind: NativeScriptKind.RequireNOf;
 }
 
 /**
@@ -207,13 +208,20 @@ export enum PlutusLanguageVersion {
 }
 
 /**
+ * Datum hash, this allows to specify a Datum without publicly revealing its value. To spend an output which specifies
+ * this type of datum, the actual Datum value must be provided and will be added to the witness set of
+ * the transaction.
+ */
+export type DatumHash = Hash32ByteBase16;
+
+/**
  * The datum is a piece of information that can be associated with a UTXO and is used to carry script state information
  * such as its owner or the timing details (which define when the UTXO can be spent)
  */
 export type Datum = util.HexBlob;
 
 /**
- * Plutus scripts are pieces of code that implement pure functions with True or False outputs. This functions take
+ * Plutus scripts are pieces of code that implement pure functions with True or False outputs. These functions take
  * several inputs such as Datum, Redeemer and the transaction context to decide whether an output can be spent or not.
  */
 export interface PlutusScript {

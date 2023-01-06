@@ -1,12 +1,11 @@
 /* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable max-len */
-import { BlockNoModel, findLastBlockNo } from '../../../src/util/DbSyncProvider';
-import { Cardano } from '@cardano-sdk/core';
 import { DbSyncEpochPollService, EpochMonitor } from '../../../src/util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../../src/NetworkInfo';
 import { HttpServer, HttpServerConfig, createDnsResolver, getPool } from '../../../src';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../../src/InMemoryCache';
+import { LedgerTipModel, findLedgerTip } from '../../../src/util/DbSyncProvider';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { SrvRecord } from 'dns';
@@ -42,7 +41,7 @@ describe('Service dependency abstractions', () => {
     let networkInfoProvider: DbSyncNetworkInfoProvider;
     let epochMonitor: EpochMonitor;
     let cardanoNode: OgmiosCardanoNode;
-    let lastBlockNoInDb: Cardano.BlockNo;
+    let lastBlockNoInDb: LedgerTipModel;
 
     beforeAll(async () => {
       db = await getPool(dnsResolver, logger, {
@@ -61,9 +60,19 @@ describe('Service dependency abstractions', () => {
         config = { listen: { port } };
         apiUrlBase = `http://localhost:${port}/network-info`;
         epochMonitor = new DbSyncEpochPollService(db!, 10_000);
-        lastBlockNoInDb = (await db!.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no;
+        lastBlockNoInDb = (await db!.query<LedgerTipModel>(findLedgerTip)).rows[0];
         cardanoNode = mockCardanoNode(
-          healthCheckResponseMock({ blockNo: lastBlockNoInDb })
+          healthCheckResponseMock({
+            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            hash: lastBlockNoInDb.hash.toString('hex'),
+            projectedTip: {
+              blockNo: lastBlockNoInDb.block_no.valueOf(),
+              hash: lastBlockNoInDb.hash.toString('hex'),
+              slot: Number(lastBlockNoInDb.slot_no)
+            },
+            slot: Number(lastBlockNoInDb.slot_no),
+            withTip: true
+          })
         ) as unknown as OgmiosCardanoNode;
         networkInfoProvider = new DbSyncNetworkInfoProvider(
           { cardanoNodeConfigPath },
@@ -92,7 +101,19 @@ describe('Service dependency abstractions', () => {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
+        expect(res.data).toEqual(
+          healthCheckResponseMock({
+            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            hash: lastBlockNoInDb.hash.toString('hex'),
+            projectedTip: {
+              blockNo: lastBlockNoInDb.block_no.valueOf(),
+              hash: lastBlockNoInDb.hash.toString('hex'),
+              slot: Number(lastBlockNoInDb.slot_no)
+            },
+            slot: Number(lastBlockNoInDb.slot_no),
+            withTip: true
+          })
+        );
       });
     });
   });
@@ -107,7 +128,7 @@ describe('Service dependency abstractions', () => {
     let networkInfoProvider: DbSyncNetworkInfoProvider;
     let epochMonitor: EpochMonitor;
     let cardanoNode: OgmiosCardanoNode;
-    let lastBlockNoInDb: Cardano.BlockNo;
+    let lastBlockNoInDb: LedgerTipModel;
 
     beforeAll(async () => {
       db = await getPool(dnsResolver, logger, {
@@ -123,9 +144,19 @@ describe('Service dependency abstractions', () => {
         config = { listen: { port } };
         apiUrlBase = `http://localhost:${port}/network-info`;
         epochMonitor = new DbSyncEpochPollService(db!, 1000);
-        lastBlockNoInDb = (await db!.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no;
+        lastBlockNoInDb = (await db!.query<LedgerTipModel>(findLedgerTip)).rows[0];
         cardanoNode = mockCardanoNode(
-          healthCheckResponseMock({ blockNo: lastBlockNoInDb })
+          healthCheckResponseMock({
+            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            hash: lastBlockNoInDb.hash.toString('hex'),
+            projectedTip: {
+              blockNo: lastBlockNoInDb.block_no.valueOf(),
+              hash: lastBlockNoInDb.hash.toString('hex'),
+              slot: Number(lastBlockNoInDb.slot_no)
+            },
+            slot: Number(lastBlockNoInDb.slot_no),
+            withTip: true
+          })
         ) as unknown as OgmiosCardanoNode;
         networkInfoProvider = new DbSyncNetworkInfoProvider(
           { cardanoNodeConfigPath },
@@ -154,7 +185,19 @@ describe('Service dependency abstractions', () => {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
+        expect(res.data).toEqual(
+          healthCheckResponseMock({
+            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            hash: lastBlockNoInDb.hash.toString('hex'),
+            projectedTip: {
+              blockNo: lastBlockNoInDb.block_no.valueOf(),
+              hash: lastBlockNoInDb.hash.toString('hex'),
+              slot: Number(lastBlockNoInDb.slot_no)
+            },
+            slot: Number(lastBlockNoInDb.slot_no),
+            withTip: true
+          })
+        );
       });
     });
   });

@@ -3,7 +3,7 @@ import { Cardano } from '../../../src';
 describe('estimateStakePoolAPY', () => {
   const rewards = {
     epochLength: 432_000_000,
-    memberROI: 0.000_68
+    memberROI: Cardano.Percent(0.000_68)
   } as Cardano.StakePoolEpochRewards;
 
   it('provided no history => returns null', () => {
@@ -15,7 +15,7 @@ describe('estimateStakePoolAPY', () => {
     const epochLengthInDays = rewards.epochLength / 1000 / 60 / 60 / 24;
     expect(apy).toBeGreaterThan(
       // % without compounding
-      (rewards.memberROI * 365) / epochLengthInDays
+      (rewards.memberROI.valueOf() * 365) / epochLengthInDays
     );
     expect(apy).toBeLessThan(0.1);
   });
@@ -28,12 +28,12 @@ describe('estimateStakePoolAPY', () => {
       ...rewards,
       epochLength: rewards.epochLength * 2,
       // worse ROI than 'rewards': 2x the epoch length, but only 1.5x ROI
-      memberROI: rewards.memberROI * 1.5
+      memberROI: Cardano.Percent(rewards.memberROI.valueOf() * 1.5)
     };
     const apy1 = Cardano.util.estimateStakePoolAPY([rewards])!;
     const apy2 = Cardano.util.estimateStakePoolAPY([rewards, worseRewards])!;
     const apy3 = Cardano.util.estimateStakePoolAPY([worseRewards])!;
-    expect(apy1).toBeGreaterThan(apy2);
-    expect(apy2).toBeGreaterThan(apy3);
+    expect(apy1).toBeGreaterThan(apy2.valueOf());
+    expect(apy2).toBeGreaterThan(apy3.valueOf());
   });
 });

@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import { genesisParameters, ledgerTip, protocolParameters } from './mockData';
-import { testnetEraSummaries } from '@cardano-sdk/core';
+import { testnetEraSummaries } from '@cardano-sdk/util-dev';
 
 export const networkInfo = {
   lovelaceSupply: {

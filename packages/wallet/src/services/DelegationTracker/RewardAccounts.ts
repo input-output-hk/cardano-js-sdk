@@ -57,7 +57,8 @@ export const createQueryStakePoolsProvider =
   (
     stakePoolProvider: TrackedStakePoolProvider,
     store: KeyValueStore<Cardano.PoolId, Cardano.StakePool>,
-    retryBackoffConfig: RetryBackoffConfig
+    retryBackoffConfig: RetryBackoffConfig,
+    onFatalError?: (value: unknown) => void
   ) =>
   (poolIds: Cardano.PoolId[]) => {
     if (poolIds.length === 0) {
@@ -67,6 +68,7 @@ export const createQueryStakePoolsProvider =
     return merge(
       store.getValues(poolIds),
       coldObservableProvider({
+        onFatalError,
         provider: () => allStakePoolsByPoolIds(stakePoolProvider, { poolIds }),
         retryBackoffConfig
       }).pipe(
@@ -82,7 +84,7 @@ export const createQueryStakePoolsProvider =
 export type ObservableStakePoolProvider = ReturnType<typeof createQueryStakePoolsProvider>;
 
 const getWithdrawalQuantity = (
-  withdrawals: Cardano.TxBodyAlonzo['withdrawals'],
+  withdrawals: Cardano.HydratedTxBody['withdrawals'],
   rewardAccount?: Cardano.RewardAccount
 ): Cardano.Lovelace =>
   BigIntMath.sum(
@@ -108,13 +110,15 @@ export const createRewardsProvider =
     epoch$: Observable<Cardano.EpochNo>,
     txConfirmed$: Observable<ConfirmedTx>,
     rewardsProvider: RewardsProvider,
-    retryBackoffConfig: RetryBackoffConfig
+    retryBackoffConfig: RetryBackoffConfig,
+    onFatalError?: (value: unknown) => void
   ) =>
   (rewardAccounts: Cardano.RewardAccount[], equals = isEqual): Observable<Cardano.Lovelace[]> =>
     combineLatest(
       rewardAccounts.map((rewardAccount) =>
         coldObservableProvider({
           equals,
+          onFatalError,
           provider: () => rewardsProvider.rewardAccountBalance({ rewardAccount }),
           retryBackoffConfig,
           trigger$: fetchRewardsTrigger$(epoch$, txConfirmed$, rewardAccount)
@@ -195,7 +199,7 @@ type TransactionsCertificates = ObservableType<ReturnType<typeof accountCertific
 
 export const getStakePoolIdAtEpoch = (transactions: TransactionsCertificates) => (atEpoch: Cardano.EpochNo) => {
   const certificatesUpToEpoch = transactions
-    .filter(({ epoch }) => epoch < atEpoch - 2)
+    .filter(({ epoch }) => epoch.valueOf() < atEpoch.valueOf() - 2)
     .map(({ certificates }) => certificates);
   if (!isLastStakeKeyCertOfType(certificatesUpToEpoch, Cardano.CertificateType.StakeKeyRegistration)) return;
   const delegationTxCertificates = findLast(certificatesUpToEpoch, (certs) =>
@@ -212,7 +216,11 @@ export const createDelegateeTracker = (
 ): Observable<Delegatee | undefined> =>
   combineLatest([certificates$, epoch$]).pipe(
     switchMap(([transactions, lastEpoch]) => {
-      const stakePoolIds = [lastEpoch + 1, lastEpoch + 2, lastEpoch + 3].map(getStakePoolIdAtEpoch(transactions));
+      const stakePoolIds = [
+        Cardano.EpochNo(lastEpoch.valueOf() + 1),
+        Cardano.EpochNo(lastEpoch.valueOf() + 2),
+        Cardano.EpochNo(lastEpoch.valueOf() + 3)
+      ].map(getStakePoolIdAtEpoch(transactions));
       const uniqStakePoolIds = uniq(stakePoolIds.filter(isNotNil));
       return stakePoolProvider(uniqStakePoolIds).pipe(
         map((stakePools) => stakePoolIds.map((poolId) => stakePools.find((pool) => pool.id === poolId) || undefined)),

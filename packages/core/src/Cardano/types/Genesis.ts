@@ -1,5 +1,5 @@
 import { Lovelace } from './Value';
-import { NetworkId, NetworkMagic } from '../NetworkId';
+import { NetworkId, NetworkMagic } from '../ChainId';
 
 /**
  * A compact (without genesis UTxO) representation of the genesis configuration.

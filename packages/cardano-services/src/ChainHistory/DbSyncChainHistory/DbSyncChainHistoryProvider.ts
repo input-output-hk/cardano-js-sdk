@@ -53,7 +53,7 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
     addresses,
     pagination,
     blockRange
-  }: TransactionsByAddressesArgs): Promise<Paginated<Cardano.TxAlonzo>> {
+  }: TransactionsByAddressesArgs): Promise<Paginated<Cardano.HydratedTx>> {
     if (addresses.length > this.#paginationPageSizeLimit) {
       throw new ProviderError(
         ProviderFailure.BadRequest,
@@ -104,7 +104,7 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
     };
   }
 
-  public async transactionsByHashes({ ids }: TransactionsByIdsArgs): Promise<Cardano.TxAlonzo[]> {
+  public async transactionsByHashes({ ids }: TransactionsByIdsArgs): Promise<Cardano.HydratedTx[]> {
     if (ids.length > this.#paginationPageSizeLimit) {
       throw new ProviderError(
         ProviderFailure.BadRequest,
@@ -148,7 +148,7 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
     });
   }
 
-  public async blocksByHashes({ ids }: BlocksByIdsArgs): Promise<Cardano.Block[]> {
+  public async blocksByHashes({ ids }: BlocksByIdsArgs): Promise<Cardano.ExtendedBlockInfo[]> {
     if (ids.length > this.#paginationPageSizeLimit) {
       throw new ProviderError(
         ProviderFailure.BadRequest,

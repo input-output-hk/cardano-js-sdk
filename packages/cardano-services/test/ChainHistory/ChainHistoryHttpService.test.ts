@@ -3,13 +3,13 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { BlockNoModel, findLastBlockNo } from '../../src/util/DbSyncProvider';
 import { Cardano, ChainHistoryProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { ChainHistoryFixtureBuilder, TxWith } from './fixtures/FixtureBuilder';
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider, HttpServer, HttpServerConfig } from '../../src';
 import { CreateHttpProviderConfig, chainHistoryHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { DB_MAX_SAFE_INTEGER } from '../../src/ChainHistory/DbSyncChainHistory/queries';
 import { DataMocks } from '../data-mocks';
+import { LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { createDbSyncMetadataService } from '../../src/Metadata';
@@ -37,7 +37,7 @@ describe('ChainHistoryHttpService', () => {
   let config: HttpServerConfig;
   let provider: ChainHistoryProvider;
   let cardanoNode: OgmiosCardanoNode;
-  let lastBlockNoInDb: Cardano.BlockNo;
+  let lastBlockNoInDb: LedgerTipModel;
   let fixtureBuilder: ChainHistoryFixtureBuilder;
 
   beforeAll(async () => {
@@ -46,7 +46,7 @@ describe('ChainHistoryHttpService', () => {
     clientConfig = { baseUrl, logger };
     config = { listen: { port } };
     dbConnection = new Pool({
-      connectionString: process.env.LOCALNETWORK_INTEGRATION_TESTS_POSTGRES_CONNECTION_STRING
+      connectionString: process.env.POSTGRES_CONNECTION_STRING
     });
     fixtureBuilder = new ChainHistoryFixtureBuilder(dbConnection, logger);
   });
@@ -76,9 +76,19 @@ describe('ChainHistoryHttpService', () => {
   describe('healthy state', () => {
     beforeAll(async () => {
       const metadataService = createDbSyncMetadataService(dbConnection, logger);
-      lastBlockNoInDb = (await dbConnection.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no;
+      lastBlockNoInDb = (await dbConnection.query<LedgerTipModel>(findLedgerTip)).rows[0];
       cardanoNode = mockCardanoNode(
-        healthCheckResponseMock({ blockNo: lastBlockNoInDb })
+        healthCheckResponseMock({
+          blockNo: lastBlockNoInDb.block_no.valueOf(),
+          hash: lastBlockNoInDb.hash.toString('hex'),
+          projectedTip: {
+            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            hash: lastBlockNoInDb.hash.toString('hex'),
+            slot: Number(lastBlockNoInDb.slot_no)
+          },
+          slot: Number(lastBlockNoInDb.slot_no),
+          withTip: true
+        })
       ) as unknown as OgmiosCardanoNode;
       chainHistoryProvider = new DbSyncChainHistoryProvider(
         { paginationPageSizeLimit: PAGINATION_PAGE_SIZE_LIMIT },
@@ -106,12 +116,36 @@ describe('ChainHistoryHttpService', () => {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
+        expect(res.data).toEqual(
+          healthCheckResponseMock({
+            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            hash: lastBlockNoInDb.hash.toString('hex'),
+            projectedTip: {
+              blockNo: lastBlockNoInDb.block_no.valueOf(),
+              hash: lastBlockNoInDb.hash.toString('hex'),
+              slot: Number(lastBlockNoInDb.slot_no)
+            },
+            slot: Number(lastBlockNoInDb.slot_no),
+            withTip: true
+          })
+        );
       });
 
       it('forwards the chainHistoryProvider health response with provider client', async () => {
         const response = await provider.healthCheck();
-        expect(response).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
+        expect(response).toEqual(
+          healthCheckResponseMock({
+            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            hash: lastBlockNoInDb.hash.toString('hex'),
+            projectedTip: {
+              blockNo: lastBlockNoInDb.block_no.valueOf(),
+              hash: lastBlockNoInDb.hash.toString('hex'),
+              slot: Number(lastBlockNoInDb.slot_no)
+            },
+            slot: Number(lastBlockNoInDb.slot_no),
+            withTip: true
+          })
+        );
       });
     });
 
@@ -225,7 +259,7 @@ describe('ChainHistoryHttpService', () => {
         it('has outputs with multi-assets', async () => {
           const ids = await fixtureBuilder.getTxHashes(1, { with: [TxWith.MultiAsset] });
           const response = await provider.transactionsByHashes({ ids });
-          const tx: Cardano.TxAlonzo = response[0];
+          const tx: Cardano.HydratedTx = response[0];
 
           // A transaction involving multi assets could also have outputs without multi assets, so we must first
           // find the index of the output inside the transaction with the native tokens.
@@ -240,7 +274,7 @@ describe('ChainHistoryHttpService', () => {
           const response = await provider.transactionsByHashes({
             ids: await fixtureBuilder.getTxHashes(1, { with: [TxWith.Mint] })
           });
-          const tx: Cardano.TxAlonzo = response[0];
+          const tx: Cardano.HydratedTx = response[0];
           expect(response.length).toEqual(1);
           expect(tx.body.mint).toMatchShapeOf(DataMocks.Tx.mint);
           expect(tx.body.mint?.size).toBeGreaterThan(0);
@@ -250,7 +284,7 @@ describe('ChainHistoryHttpService', () => {
           const response = await provider.transactionsByHashes({
             ids: await fixtureBuilder.getTxHashes(1, { with: [TxWith.Withdrawal] })
           });
-          const tx: Cardano.TxAlonzo = response[0];
+          const tx: Cardano.HydratedTx = response[0];
           expect(response.length).toEqual(1);
           expect(tx.body.withdrawals!).toMatchShapeOf(DataMocks.Tx.withdrawals);
           expect(tx.body.withdrawals?.length).toBeGreaterThan(0);
@@ -261,7 +295,7 @@ describe('ChainHistoryHttpService', () => {
             ids: await fixtureBuilder.getTxHashes(1, { with: [TxWith.Redeemer] })
           });
 
-          const tx: Cardano.NewTxAlonzo = response[0];
+          const tx: Cardano.Tx = response[0];
           expect(response.length).toEqual(1);
           expect(tx.witness).toMatchShapeOf(DataMocks.Tx.witnessRedeemers);
           expect(tx.witness.redeemers?.length).toBeGreaterThan(0);
@@ -271,7 +305,7 @@ describe('ChainHistoryHttpService', () => {
           const response = await provider.transactionsByHashes({
             ids: await fixtureBuilder.getTxHashes(1, { with: [TxWith.AuxiliaryData] })
           });
-          const tx: Cardano.TxAlonzo = response[0];
+          const tx: Cardano.HydratedTx = response[0];
           expect(response.length).toEqual(1);
           expect(tx.auxiliaryData).toBeDefined();
         });
@@ -280,7 +314,7 @@ describe('ChainHistoryHttpService', () => {
           const response = await provider.transactionsByHashes({
             ids: await fixtureBuilder.getTxHashes(1, { with: [TxWith.CollateralInput] })
           });
-          const tx: Cardano.TxAlonzo = response[0];
+          const tx: Cardano.HydratedTx = response[0];
           expect(response.length).toEqual(1);
 
           expect(tx.body.collaterals).toMatchShapeOf(DataMocks.Tx.collateralInputs);
@@ -292,8 +326,8 @@ describe('ChainHistoryHttpService', () => {
             ids: await fixtureBuilder.getTxHashes(2, { with: [TxWith.DelegationCertificate] })
           });
 
-          const tx1: Cardano.TxAlonzo = response[0];
-          const tx2: Cardano.TxAlonzo = response[1];
+          const tx1: Cardano.HydratedTx = response[0];
+          const tx2: Cardano.HydratedTx = response[1];
 
           expect(response.length).toEqual(2);
           expect(tx1.body.certificates?.length).toBeGreaterThan(0);
@@ -359,8 +393,8 @@ describe('ChainHistoryHttpService', () => {
 
       it('does not include transactions before indicated block', async () => {
         const { addresses, blockRange, txInRangeCount } = await fixtureBuilder.getAddressesWithSomeInBlockRange(2, {
-          lowerBound: 10,
-          upperBound: 100
+          lowerBound: Cardano.BlockNo(10),
+          upperBound: Cardano.BlockNo(100)
         });
         const response = await provider.transactionsByAddresses({
           addresses: [...addresses],
@@ -369,7 +403,7 @@ describe('ChainHistoryHttpService', () => {
         });
 
         let lowerBound = DB_MAX_SAFE_INTEGER;
-        for (const tx of response.pageResults) lowerBound = Math.min(lowerBound, tx.blockHeader.blockNo);
+        for (const tx of response.pageResults) lowerBound = Math.min(lowerBound, tx.blockHeader.blockNo.valueOf());
 
         expect(response.totalResultCount).toEqual(txInRangeCount);
         expect(lowerBound).toBeGreaterThanOrEqual(10);
@@ -378,8 +412,8 @@ describe('ChainHistoryHttpService', () => {
 
       it('does not include transactions after indicated block', async () => {
         const { addresses, blockRange, txInRangeCount } = await fixtureBuilder.getAddressesWithSomeInBlockRange(2, {
-          lowerBound: 0,
-          upperBound: 10
+          lowerBound: Cardano.BlockNo(0),
+          upperBound: Cardano.BlockNo(10)
         });
         const response = await provider.transactionsByAddresses({
           addresses: [...addresses],
@@ -388,7 +422,7 @@ describe('ChainHistoryHttpService', () => {
         });
 
         let upperBound = 0;
-        for (const tx of response.pageResults) upperBound = Math.max(upperBound, tx.blockHeader.blockNo);
+        for (const tx of response.pageResults) upperBound = Math.max(upperBound, tx.blockHeader.blockNo.valueOf());
 
         expect(response.totalResultCount).toEqual(txInRangeCount);
         expect(upperBound).toBeLessThanOrEqual(10);
@@ -397,8 +431,8 @@ describe('ChainHistoryHttpService', () => {
 
       it('includes transactions only in specified block range', async () => {
         const { addresses, blockRange, txInRangeCount } = await fixtureBuilder.getAddressesWithSomeInBlockRange(2, {
-          lowerBound: 200,
-          upperBound: 1000
+          lowerBound: Cardano.BlockNo(200),
+          upperBound: Cardano.BlockNo(1000)
         });
 
         const response = await provider.transactionsByAddresses({
@@ -411,8 +445,8 @@ describe('ChainHistoryHttpService', () => {
         let upperBound = 0;
 
         for (const tx of response.pageResults) {
-          upperBound = Math.max(upperBound, tx.blockHeader.blockNo);
-          lowerBound = Math.min(lowerBound, tx.blockHeader.blockNo);
+          upperBound = Math.max(upperBound, tx.blockHeader.blockNo.valueOf());
+          lowerBound = Math.min(lowerBound, tx.blockHeader.blockNo.valueOf());
         }
 
         expect(response.totalResultCount).toEqual(txInRangeCount);
@@ -454,7 +488,7 @@ describe('ChainHistoryHttpService', () => {
 
       describe('finds transactions of given addresses', () => {
         it('finds transactions with address within inputs', async () => {
-          const genesisAddresses: Cardano.Address[] = await fixtureBuilder.getGenesisAddresses();
+          const genesisAddresses: Cardano.Address[] = await fixtureBuilder.getDistinctAddresses(3);
           const addresses: Cardano.Address[] = [genesisAddresses[0]];
           const response = await provider.transactionsByAddresses({ addresses, pagination: { limit: 5, startAt: 0 } });
           expect(response.pageResults.length).toBeGreaterThan(0);
@@ -468,11 +502,11 @@ describe('ChainHistoryHttpService', () => {
           const addresses: Cardano.Address[] = await fixtureBuilder.getGenesisAddresses();
           const firstPageResponse = await provider.transactionsByAddresses({
             addresses,
-            pagination: { limit: 5, startAt: 0 }
+            pagination: { limit: 3, startAt: 0 }
           });
           const secondPageResponse = await provider.transactionsByAddresses({
             addresses,
-            pagination: { limit: 5, startAt: 5 }
+            pagination: { limit: 3, startAt: 3 }
           });
 
           const firstTx = firstPageResponse.pageResults[0];

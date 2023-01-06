@@ -2,14 +2,15 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable sonarjs/no-identical-functions */
-import { BlockNoModel, findLastBlockNo } from '../../src/util/DbSyncProvider';
-import { Cardano, NetworkInfoProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, networkInfoHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { DbSyncEpochPollService } from '../../src/util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../src/NetworkInfo';
 import { HttpServer, HttpServerConfig } from '../../src';
 import { INFO, createLogger } from 'bunyan';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../src/InMemoryCache';
+import { LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
+import { NetworkInfoFixtureBuilder } from './fixtures/FixtureBuilder';
+import { NetworkInfoProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
@@ -35,12 +36,17 @@ describe('NetworkInfoHttpService', () => {
   let config: HttpServerConfig;
   let cardanoNode: OgmiosCardanoNode;
   let provider: NetworkInfoProvider;
-  let lastBlockNoInDb: Cardano.BlockNo;
+  let lastBlockNoInDb: LedgerTipModel;
 
   const epochPollInterval = 2 * 1000;
   const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
-  const db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING, max: 1, min: 1 });
+  const db = new Pool({
+    connectionString: process.env.POSTGRES_CONNECTION_STRING,
+    max: 1,
+    min: 1
+  });
+  const fixtureBuilder = new NetworkInfoFixtureBuilder(db, logger);
   const epochMonitor = new DbSyncEpochPollService(db, epochPollInterval!);
 
   describe('unhealthy NetworkInfoProvider', () => {
@@ -49,9 +55,19 @@ describe('NetworkInfoHttpService', () => {
       baseUrl = `http://localhost:${port}/network-info`;
       clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
       config = { listen: { port } };
-      lastBlockNoInDb = (await db.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no;
+      lastBlockNoInDb = (await db.query<LedgerTipModel>(findLedgerTip)).rows[0];
       cardanoNode = mockCardanoNode(
-        healthCheckResponseMock({ blockNo: lastBlockNoInDb })
+        healthCheckResponseMock({
+          blockNo: lastBlockNoInDb.block_no.valueOf(),
+          hash: lastBlockNoInDb.hash.toString('hex'),
+          projectedTip: {
+            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            hash: lastBlockNoInDb.hash.toString('hex'),
+            slot: Number(lastBlockNoInDb.slot_no)
+          },
+          slot: Number(lastBlockNoInDb.slot_no),
+          withTip: true
+        })
       ) as unknown as OgmiosCardanoNode;
       networkInfoProvider = {
         eraSummaries: jest.fn(),
@@ -84,9 +100,19 @@ describe('NetworkInfoHttpService', () => {
     beforeAll(async () => {
       port = await getPort();
       baseUrl = `http://localhost:${port}/network-info`;
-      lastBlockNoInDb = (await db.query<BlockNoModel>(findLastBlockNo)).rows[0].block_no;
+      lastBlockNoInDb = (await db.query<LedgerTipModel>(findLedgerTip)).rows[0];
       cardanoNode = mockCardanoNode(
-        healthCheckResponseMock({ blockNo: lastBlockNoInDb })
+        healthCheckResponseMock({
+          blockNo: lastBlockNoInDb.block_no.valueOf(),
+          hash: lastBlockNoInDb.hash.toString('hex'),
+          projectedTip: {
+            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            hash: lastBlockNoInDb.hash.toString('hex'),
+            slot: Number(lastBlockNoInDb.slot_no)
+          },
+          slot: Number(lastBlockNoInDb.slot_no),
+          withTip: true
+        })
       ) as unknown as OgmiosCardanoNode;
       config = { listen: { port } };
       networkInfoProvider = new DbSyncNetworkInfoProvider(
@@ -131,12 +157,36 @@ describe('NetworkInfoHttpService', () => {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
-        expect(res.data).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
+        expect(res.data).toEqual(
+          healthCheckResponseMock({
+            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            hash: lastBlockNoInDb.hash.toString('hex'),
+            projectedTip: {
+              blockNo: lastBlockNoInDb.block_no.valueOf(),
+              hash: lastBlockNoInDb.hash.toString('hex'),
+              slot: Number(lastBlockNoInDb.slot_no)
+            },
+            slot: Number(lastBlockNoInDb.slot_no),
+            withTip: true
+          })
+        );
       });
 
       it('forwards the networkInfoProvider health response with provider client', async () => {
         const response = await provider.healthCheck();
-        expect(response).toEqual(healthCheckResponseMock({ blockNo: lastBlockNoInDb }));
+        expect(response).toEqual(
+          healthCheckResponseMock({
+            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            hash: lastBlockNoInDb.hash.toString('hex'),
+            projectedTip: {
+              blockNo: lastBlockNoInDb.block_no.valueOf(),
+              hash: lastBlockNoInDb.hash.toString('hex'),
+              slot: Number(lastBlockNoInDb.slot_no)
+            },
+            slot: Number(lastBlockNoInDb.slot_no),
+            withTip: true
+          })
+        );
       });
     });
 
@@ -167,7 +217,6 @@ describe('NetworkInfoHttpService', () => {
       const stakeTotalQueriesCount = 2;
       const stakeDbQueriesCount = 1;
       const stakeNodeQueriesCount = 1;
-      const DB_POLL_QUERIES_COUNT = 1;
 
       describe('with Http Server', () => {
         it('returns a 200 coded response with a well formed HTTP request', async () => {
@@ -213,14 +262,13 @@ describe('NetworkInfoHttpService', () => {
 
       it('should not invalidate the epoch values from the cache if there is no epoch rollover', async () => {
         const cardanoNodeStakeSpy = jest.spyOn(cardanoNode, 'stakeDistribution');
-        const totalQueriesCount = stakeTotalQueriesCount + DB_POLL_QUERIES_COUNT;
-        const currentEpochNo = 205;
+        const currentEpochNo = await fixtureBuilder.getLasKnownEpoch();
         await provider.stake();
         expect(cache.keys().length).toEqual(stakeTotalQueriesCount);
         await sleep(epochPollInterval * 2);
         expect(await epochMonitor.getLastKnownEpoch()).toEqual(currentEpochNo);
         expect(cache.keys().length).toEqual(stakeTotalQueriesCount);
-        expect(dbConnectionQuerySpy).toBeCalledTimes(totalQueriesCount);
+        expect(dbConnectionQuerySpy).toHaveBeenCalled();
         expect(cardanoNodeStakeSpy).toHaveBeenCalledTimes(stakeNodeQueriesCount);
         expect(clearCacheSpy).not.toHaveBeenCalled();
       });

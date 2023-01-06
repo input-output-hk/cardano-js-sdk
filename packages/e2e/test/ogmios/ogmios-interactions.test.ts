@@ -7,8 +7,9 @@ import WebSocket from 'ws';
 import axios from 'axios';
 import path from 'path';
 
-import { env, getEnv } from '../environment';
-import { networkInfoProviderFactory } from '../../src';
+import { getEnv, networkInfoProviderFactory } from '../../src';
+
+const env = getEnv(['DB_SYNC_CONNECTION_STRING', 'OGMIOS_SERVER_URL']);
 
 const cardanoNodeConfigPath = path.join(
   __dirname,
@@ -159,8 +160,10 @@ describe('interactions with ogmios server', () => {
   });
 
   it('connection close is correctly handled', async () => {
-    const providerEnv = getEnv({
-      NETWORK_INFO_PROVIDER_PARAMS: JSON.stringify({ baseUrl: `http://localhost:${httpPort}/network-info` })
+    const providerEnv = getEnv(['NETWORK_INFO_PROVIDER', 'NETWORK_INFO_PROVIDER_PARAMS'], {
+      override: {
+        NETWORK_INFO_PROVIDER_PARAMS: JSON.stringify({ baseUrl: `http://localhost:${httpPort}/network-info` })
+      }
     });
 
     // This performs an health check behind the scenes, so this is enough

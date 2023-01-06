@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   AssetProvider,
+  Cardano,
   ChainHistoryProvider,
   NetworkInfoProvider,
   ProviderFactory,
@@ -28,8 +29,7 @@ import {
   setupWallet,
   storage
 } from '@cardano-sdk/wallet';
-import { LogLevel, createLogger } from 'bunyan';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import {
   assetInfoHttpProvider,
@@ -46,13 +46,14 @@ import { filter, firstValueFrom } from 'rxjs';
 import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import memoize from 'lodash/memoize';
 
+const isNodeJs = typeof process !== 'undefined' && process.release?.name === 'node';
+// tsc doesn't like the 'import' of this package, works with webpack
+const customHttpFetchAdapter = isNodeJs ? undefined : require('@vespaiach/axios-fetch-adapter').default;
+
 // CONSTANTS
 const HTTP_PROVIDER = 'http';
 const OGMIOS_PROVIDER = 'ogmios';
 const STUB_PROVIDER = 'stub';
-const KEY_AGENT_MISSING_PASSWORD = 'Missing wallet password';
-const KEY_AGENT_MISSING_NETWORK_ID = 'Missing network id';
-const KEY_AGENT_MISSING_ACCOUNT_INDEX = 'Missing account index';
 const MISSING_URL_PARAM = 'Missing URL';
 
 export const faucetProviderFactory = new ProviderFactory<FaucetProvider>();
@@ -75,7 +76,7 @@ assetProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger)
   if (params.baseUrl === undefined) throw new Error(`${assetInfoHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
   return new Promise<AssetProvider>(async (resolve) => {
-    resolve(assetInfoHttpProvider({ baseUrl: params.baseUrl, logger }));
+    resolve(assetInfoHttpProvider({ adapter: customHttpFetchAdapter, baseUrl: params.baseUrl, logger }));
   });
 });
 
@@ -85,7 +86,7 @@ chainHistoryProviderFactory.register(
     if (params.baseUrl === undefined) throw new Error(`${chainHistoryHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
     return new Promise<ChainHistoryProvider>(async (resolve) => {
-      resolve(chainHistoryHttpProvider({ baseUrl: params.baseUrl, logger }));
+      resolve(chainHistoryHttpProvider({ adapter: customHttpFetchAdapter, baseUrl: params.baseUrl, logger }));
     });
   }
 );
@@ -96,7 +97,7 @@ networkInfoProviderFactory.register(
     if (params.baseUrl === undefined) throw new Error(`${networkInfoHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
     return new Promise<NetworkInfoProvider>(async (resolve) => {
-      resolve(networkInfoHttpProvider({ baseUrl: params.baseUrl, logger }));
+      resolve(networkInfoHttpProvider({ adapter: customHttpFetchAdapter, baseUrl: params.baseUrl, logger }));
     });
   }
 );
@@ -105,7 +106,7 @@ rewardsProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logge
   if (params.baseUrl === undefined) throw new Error(`${rewardsHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
   return new Promise<RewardsProvider>(async (resolve) => {
-    resolve(rewardsHttpProvider({ baseUrl: params.baseUrl, logger }));
+    resolve(rewardsHttpProvider({ adapter: customHttpFetchAdapter, baseUrl: params.baseUrl, logger }));
   });
 });
 
@@ -127,7 +128,7 @@ txSubmitProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logg
   if (params.baseUrl === undefined) throw new Error(`${txSubmitHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
   return new Promise<TxSubmitProvider>(async (resolve) => {
-    resolve(txSubmitHttpProvider({ baseUrl: params.baseUrl, logger }));
+    resolve(txSubmitHttpProvider({ adapter: customHttpFetchAdapter, baseUrl: params.baseUrl, logger }));
   });
 });
 
@@ -135,7 +136,7 @@ utxoProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger):
   if (params.baseUrl === undefined) throw new Error(`${utxoHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
   return new Promise<UtxoProvider>(async (resolve) => {
-    resolve(utxoHttpProvider({ baseUrl: params.baseUrl, logger }));
+    resolve(utxoHttpProvider({ adapter: customHttpFetchAdapter, baseUrl: params.baseUrl, logger }));
   });
 });
 
@@ -152,7 +153,7 @@ stakePoolProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Log
   if (params.baseUrl === undefined) throw new Error(`${stakePoolHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
   return new Promise<StakePoolProvider>(async (resolve) => {
-    resolve(stakePoolHttpProvider({ baseUrl: params.baseUrl, logger }));
+    resolve(stakePoolHttpProvider({ adapter: customHttpFetchAdapter, baseUrl: params.baseUrl, logger }));
   });
 });
 
@@ -162,20 +163,14 @@ keyManagementFactory.register('inMemory', async (params: any): Promise<CreateKey
 
   if (mnemonicWords.length <= 1) mnemonicWords = util.generateMnemonicWords();
 
-  if (params.password === undefined) throw new Error(KEY_AGENT_MISSING_PASSWORD);
-
-  if (params.networkId === undefined) throw new Error(KEY_AGENT_MISSING_NETWORK_ID);
-
-  if (params.accountIndex === undefined) throw new Error(KEY_AGENT_MISSING_ACCOUNT_INDEX);
-
   return async (dependencies) =>
     util.createAsyncKeyAgent(
       await InMemoryKeyAgent.fromBip39MnemonicWords(
         {
           accountIndex: params.accountIndex,
+          chainId: params.chainId,
           getPassword: async () => Buffer.from(params.password),
-          mnemonicWords,
-          networkId: params.networkId
+          mnemonicWords
         },
         dependencies
       )
@@ -183,20 +178,15 @@ keyManagementFactory.register('inMemory', async (params: any): Promise<CreateKey
 });
 
 keyManagementFactory.register('ledger', async (params: any): Promise<CreateKeyAgent> => {
-  if (params.networkId === undefined) throw new Error(KEY_AGENT_MISSING_NETWORK_ID);
-
-  if (params.accountIndex === undefined) throw new Error(KEY_AGENT_MISSING_ACCOUNT_INDEX);
-
   let deviceConnection: DeviceConnection | null | undefined;
 
   return async (dependencies) => {
     const ledgerKeyAgent = await LedgerKeyAgent.createWithDevice(
       {
         accountIndex: params.accountIndex,
+        chainId: params.chainId,
         communicationType: CommunicationType.Node,
-        deviceConnection,
-        networkId: params.networkId,
-        protocolMagic: 1_097_911_063
+        deviceConnection
       },
       dependencies
     );
@@ -205,45 +195,27 @@ keyManagementFactory.register('ledger', async (params: any): Promise<CreateKeyAg
   };
 });
 
-keyManagementFactory.register('trezor', async (params: any): Promise<CreateKeyAgent> => {
-  if (params.networkId === undefined) throw new Error(KEY_AGENT_MISSING_NETWORK_ID);
-
-  if (params.accountIndex === undefined) throw new Error(KEY_AGENT_MISSING_ACCOUNT_INDEX);
-
-  return async (dependencies) =>
-    util.createAsyncKeyAgent(
-      await TrezorKeyAgent.createWithDevice(
-        {
-          accountIndex: params.accountIndex,
-          networkId: params.networkId,
-          protocolMagic: 1_097_911_063,
-          trezorConfig: {
-            communicationType: CommunicationType.Node,
-            manifest: {
-              appUrl: 'https://your.application.com',
-              email: 'email@developer.com'
+keyManagementFactory.register(
+  'trezor',
+  async (params: any): Promise<CreateKeyAgent> =>
+    async (dependencies) =>
+      util.createAsyncKeyAgent(
+        await TrezorKeyAgent.createWithDevice(
+          {
+            accountIndex: params.accountIndex,
+            chainId: params.chainId,
+            trezorConfig: {
+              communicationType: CommunicationType.Node,
+              manifest: {
+                appUrl: 'https://your.application.com',
+                email: 'email@developer.com'
+              }
             }
-          }
-        },
-        dependencies
+          },
+          dependencies
+        )
       )
-    );
-});
-
-// Logger
-
-/**
- * Gets the logger instance.
- *
- * @param severity The minimum severity of the log messages that will be logged.
- * @returns The Logger instance.
- */
-export const getLogger = function (severity: string): Logger {
-  return createLogger({
-    level: severity as LogLevel,
-    name: 'e2e tests'
-  });
-};
+);
 
 // Wallet
 
@@ -255,10 +227,17 @@ export const getLogger = function (severity: string): Logger {
  * @param params The provider parameters.
  * @returns a key agent.
  */
-export const keyAgentById = memoize(async (accountIndex: number, provider: string, params: any) => {
+export const keyAgentById = memoize(async (accountIndex: number, provider: string, params: any, logger: Logger) => {
   params.accountIndex = accountIndex;
-  return keyManagementFactory.create(provider, params, dummyLogger);
+  return keyManagementFactory.create(provider, params, logger);
 });
+
+export type KeyAgentFactoryProps = {
+  accountIndex: number;
+  mnemonic: string;
+  chainId: Cardano.ChainId;
+  password: string;
+};
 
 export type GetWalletProps = {
   env: any;
@@ -267,6 +246,8 @@ export type GetWalletProps = {
   name: string;
   polling?: PollingConfig;
   stores?: storage.WalletStores;
+  customKeyParams?: KeyAgentFactoryProps;
+  keyAgent?: AsyncKeyAgent;
 };
 
 /**
@@ -295,7 +276,7 @@ const patchInitializeTxToRespectEpochBoundary = <T extends ObservableWallet>(
  * @returns an object containing the wallet and providers passed to it
  */
 export const getWallet = async (props: GetWalletProps) => {
-  const { env, idx, logger, name, polling, stores } = props;
+  const { env, idx, logger, name, polling, stores, customKeyParams, keyAgent } = props;
   const providers = {
     assetProvider: await assetProviderFactory.create(env.ASSET_PROVIDER, env.ASSET_PROVIDER_PARAMS, logger),
     chainHistoryProvider: await chainHistoryProviderFactory.create(
@@ -321,11 +302,16 @@ export const getWallet = async (props: GetWalletProps) => {
     ),
     utxoProvider: await utxoProviderFactory.create(env.UTXO_PROVIDER, env.UTXO_PROVIDER_PARAMS, logger)
   };
-  const keyManagementParams = { ...env.KEY_MANAGEMENT_PARAMS, ...(idx === undefined ? {} : { accountIndex: idx }) };
+  const envKeyParams = customKeyParams ? customKeyParams : env.KEY_MANAGEMENT_PARAMS;
+  const keyManagementParams = { ...envKeyParams, ...(idx === undefined ? {} : { accountIndex: idx }) };
+
   const { wallet } = await setupWallet({
-    createKeyAgent: await keyManagementFactory.create(env.KEY_MANAGEMENT_PROVIDER, keyManagementParams, logger),
-    createWallet: async (keyAgent: AsyncKeyAgent) =>
-      new SingleAddressWallet({ name, polling }, { ...providers, keyAgent, logger, stores })
+    createKeyAgent: keyAgent
+      ? () => Promise.resolve(keyAgent)
+      : await keyManagementFactory.create(env.KEY_MANAGEMENT_PROVIDER, keyManagementParams, logger),
+    createWallet: async (asyncKeyAgent: AsyncKeyAgent) =>
+      new SingleAddressWallet({ name, polling }, { ...providers, keyAgent: asyncKeyAgent, logger, stores }),
+    logger
   });
 
   const [{ address, rewardAccount }] = await firstValueFrom(wallet.addresses$);

@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import * as envalid from 'envalid';
 import { Cardano } from '@cardano-sdk/core';
 import { ChildProcess, fork } from 'child_process';
 import { InitializeTxResult, ObservableWallet } from '@cardano-sdk/wallet';
@@ -7,36 +6,21 @@ import { RabbitMQContainer } from '../../../cardano-services/test/TxSubmit/rabbi
 import { ServiceNames } from '@cardano-sdk/cardano-services';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom } from 'rxjs';
+import { getEnv, walletVariables } from '../../src';
 import { getWallet } from '../../src/factories';
 import { submitAndConfirm } from '../util';
 import JSONBig from 'json-bigint';
 import path from 'path';
 
 // Verify environment.
-export const env = envalid.cleanEnv(process.env, {
-  ASSET_PROVIDER: envalid.str(),
-  ASSET_PROVIDER_PARAMS: envalid.json({ default: {} }),
-  CHAIN_HISTORY_PROVIDER: envalid.str(),
-  CHAIN_HISTORY_PROVIDER_PARAMS: envalid.json({ default: {} }),
-  KEY_MANAGEMENT_PARAMS: envalid.json({ default: {} }),
-  KEY_MANAGEMENT_PROVIDER: envalid.str(),
-  LOGGER_MIN_SEVERITY: envalid.str({ default: 'info' }),
-  NETWORK_INFO_PROVIDER: envalid.str(),
-  NETWORK_INFO_PROVIDER_PARAMS: envalid.json({ default: {} }),
-  OGMIOS_URL: envalid.str(),
-  REWARDS_PROVIDER: envalid.str(),
-  REWARDS_PROVIDER_PARAMS: envalid.json({ default: {} }),
-  STAKE_POOL_PROVIDER: envalid.str(),
-  STAKE_POOL_PROVIDER_PARAMS: envalid.json({ default: {} }),
-  START_LOCAL_HTTP_SERVER: envalid.bool(),
-  TRANSACTIONS_NUMBER: envalid.num(),
-  TX_SUBMIT_HTTP_URL: envalid.str(),
-  TX_SUBMIT_PROVIDER: envalid.str(),
-  TX_SUBMIT_PROVIDER_PARAMS: envalid.json({ default: {} }),
-  UTXO_PROVIDER: envalid.str(),
-  UTXO_PROVIDER_PARAMS: envalid.json({ default: {} }),
-  WORKER_PARALLEL_TRANSACTION: envalid.num()
-});
+const env = getEnv([
+  ...walletVariables,
+  'OGMIOS_URL',
+  'START_LOCAL_HTTP_SERVER',
+  'TRANSACTIONS_NUMBER',
+  'TX_SUBMIT_HTTP_URL',
+  'WORKER_PARALLEL_TRANSACTION'
+]);
 
 interface TestOptions {
   directlyToOgmios?: boolean;
@@ -145,7 +129,10 @@ describe('load', () => {
   const testWallets: TestWallet[] = [];
 
   const prepareWallet = async (idx: number) => {
-    const { wallet } = await getWallet({ env, idx, logger, name: `Test Wallet ${idx}` });
+    const walletEnv = getEnv(walletVariables, {
+      override: { TX_SUBMIT_PROVIDER_PARAMS: JSON.stringify({ baseUrl: env.TX_SUBMIT_HTTP_URL }) }
+    });
+    const { wallet } = await getWallet({ env: walletEnv, idx, logger, name: `Test Wallet ${idx}` });
     const { address } = (await firstValueFrom(wallet.addresses$))[0];
     logger.info(`Got wallet idx: ${idx} - address: ${address}`);
 

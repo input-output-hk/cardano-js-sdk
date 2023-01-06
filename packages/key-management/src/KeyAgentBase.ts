@@ -28,8 +28,8 @@ export abstract class KeyAgentBase implements KeyAgent {
   get extendedAccountPublicKey(): Cardano.Bip32PublicKey {
     return this.serializableData.extendedAccountPublicKey;
   }
-  get networkId(): Cardano.NetworkId {
-    return this.serializableData.networkId;
+  get chainId(): Cardano.ChainId {
+    return this.serializableData.chainId;
   }
   get accountIndex(): number {
     return this.serializableData.accountIndex;
@@ -62,20 +62,22 @@ export abstract class KeyAgentBase implements KeyAgent {
     const stakeKeyCredential = CML.StakeCredential.from_keyhash(publicStakeKey.hash());
 
     const address = CML.BaseAddress.new(
-      this.networkId,
+      this.chainId.networkId,
       CML.StakeCredential.from_keyhash(derivedPublicPaymentKey.hash()),
       stakeKeyCredential
     ).to_address();
 
-    const rewardAccount = CML.RewardAddress.new(this.networkId, stakeKeyCredential).to_address();
+    const rewardAccount = CML.RewardAddress.new(this.chainId.networkId, stakeKeyCredential).to_address();
     const groupedAddress = {
       accountIndex: this.accountIndex,
       address: Cardano.Address(address.to_bech32()),
       index,
-      networkId: this.networkId,
+      networkId: this.chainId.networkId,
       rewardAccount: Cardano.RewardAccount(rewardAccount.to_bech32()),
+      stakeKeyDerivationPath: STAKE_KEY_DERIVATION_PATH,
       type
     };
+
     this.knownAddresses = [...this.knownAddresses, groupedAddress];
     return groupedAddress;
   }

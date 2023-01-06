@@ -11,7 +11,20 @@ import {
   deriveChannelName,
   exposeMessengerApi
 } from '../../src/messaging';
-import { EmptyError, Observable, Subject, firstValueFrom, map, of, tap, throwError, timer, toArray } from 'rxjs';
+import {
+  EmptyError,
+  Observable,
+  Subject,
+  delay,
+  firstValueFrom,
+  map,
+  of,
+  race,
+  tap,
+  throwError,
+  timer,
+  toArray
+} from 'rxjs';
 import { dummyLogger } from 'ts-log';
 import memoize from 'lodash/memoize';
 
@@ -435,6 +448,21 @@ describe('remoteApi integration', () => {
             setTimeout(() => sut.hostMessenger.shutdown());
             expect(await emitted).toEqual([1n]);
             done();
+          }, 1);
+        });
+
+        it('does not emit if source was disabled', (done) => {
+          someNumbersSource$.next(1n);
+          const emittedBeforeDisable = firstValueFrom(sut.consumer.someNumbers$);
+          setTimeout(async () => {
+            expect(await emittedBeforeDisable).toEqual(1n);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            sut.api$.next(null as any);
+            setTimeout(async () => {
+              const emittedAfterDisable = firstValueFrom(race(sut.consumer.someNumbers$, of('nothing').pipe(delay(1))));
+              expect(await emittedAfterDisable).toEqual('nothing');
+              done();
+            });
           }, 1);
         });
 

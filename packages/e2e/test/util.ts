@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as envalid from 'envalid';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, createSlotEpochCalc } from '@cardano-sdk/core';
 import {
   EMPTY,
   Observable,
@@ -17,12 +17,14 @@ import {
   throwError,
   timeout
 } from 'rxjs';
-import { ObservableWallet, SignedTx, buildTx } from '@cardano-sdk/wallet';
+import { InMemoryKeyAgent } from '@cardano-sdk/key-management';
+import { ObservableWallet, SignedTx, SingleAddressWallet, buildTx } from '@cardano-sdk/wallet';
+import { TestWallet, faucetProviderFactory, getEnv, networkInfoProviderFactory, walletVariables } from '../src';
 import { assertTxIsValid } from '../../wallet/test/util';
-import { env } from './environment';
-import { faucetProviderFactory, networkInfoProviderFactory } from '../src';
 import { logger } from '@cardano-sdk/util-dev';
 import sortBy from 'lodash/sortBy';
+
+const env = getEnv(walletVariables);
 
 const SECOND = 1000;
 const MINUTE = 60 * SECOND;
@@ -67,7 +69,7 @@ export const walletReady = (wallet: ObservableWallet) =>
     SYNC_TIMEOUT
   );
 
-export const normalizeTxBody = (body: Cardano.TxBodyAlonzo | Cardano.NewTxBodyAlonzo) => {
+export const normalizeTxBody = (body: Cardano.HydratedTxBody | Cardano.TxBody) => {
   body.collaterals ||= [];
   // TODO: inputs should be a Set since they're unordered.
   // Then Jest should correctly compare it with toEqual.
@@ -83,7 +85,7 @@ export const txConfirmed = (
       outgoing: { failed$ }
     }
   }: ObservableWallet,
-  { id }: Pick<Cardano.NewTxAlonzo, 'id'>,
+  { id }: Pick<Cardano.Tx, 'id'>,
   numConfirmations = 3
 ) =>
   firstValueFrom(
@@ -93,7 +95,7 @@ export const txConfirmed = (
           const tx = txs.find((historyTx) => historyTx.id === id);
           if (!tx) return EMPTY;
           return tip$.pipe(
-            filter(({ blockNo }) => blockNo >= tx.blockHeader.blockNo + numConfirmations),
+            filter(({ blockNo }) => blockNo >= Cardano.BlockNo(tx.blockHeader.blockNo.valueOf() + numConfirmations)),
             map(() => tx)
           );
         })
@@ -106,11 +108,10 @@ export const txConfirmed = (
     )
   );
 
-const submit = (wallet: ObservableWallet, tx: Cardano.NewTxAlonzo | SignedTx) =>
+const submit = (wallet: ObservableWallet, tx: Cardano.Tx | SignedTx) =>
   'submit' in tx ? tx.submit() : wallet.submitTx(tx);
-const confirm = (wallet: ObservableWallet, tx: Cardano.NewTxAlonzo | SignedTx) =>
-  txConfirmed(wallet, 'tx' in tx ? tx.tx : tx);
-export const submitAndConfirm = (wallet: ObservableWallet, tx: Cardano.NewTxAlonzo | SignedTx) =>
+const confirm = (wallet: ObservableWallet, tx: Cardano.Tx | SignedTx) => txConfirmed(wallet, 'tx' in tx ? tx.tx : tx);
+export const submitAndConfirm = (wallet: ObservableWallet, tx: Cardano.Tx | SignedTx) =>
   Promise.all([submit(wallet, tx), confirm(wallet, tx)]);
 
 export type RequestCoinsProps = {
@@ -173,7 +174,7 @@ export const waitForEpoch = (wallet: Pick<ObservableWallet, 'currentEpoch$'>, wa
       map(({ epochNo }) => epochNo),
       distinctUntilChanged(),
       tap((epochNo) => logger.info(`Currently at epoch #${epochNo}`)),
-      filter((currentEpochNo) => currentEpochNo >= waitForEpochNo)
+      filter((currentEpochNo) => currentEpochNo.valueOf() >= waitForEpochNo)
     )
   );
 };
@@ -194,3 +195,57 @@ export const runningAgainstLocalNetwork = async () => {
   }
   return true;
 };
+
+/**
+ * Gets the epoch when a transaction **was confirmed**.
+ *
+ * @param wallet The wallet used to perform the required actions
+ * @param tx The **already confirmed** transaction we need to know the confirmation epoch
+ * @returns The epoch when the given transaction was confirmed
+ */
+export const getTxConfirmationEpoch = async (wallet: SingleAddressWallet, tx: Cardano.Tx<Cardano.TxBody>) => {
+  const txs = await firstValueFrom(wallet.transactions.history$.pipe(filter((_) => _.some(({ id }) => id === tx.id))));
+  const observedTx = txs.find(({ id }) => id === tx.id);
+  const slotEpochCalc = createSlotEpochCalc(await firstValueFrom(wallet.eraSummaries$));
+
+  return slotEpochCalc(observedTx!.blockHeader.slot);
+};
+
+/**
+ * Submit certificates on behalf of the given wallet.
+ *
+ * @param certificate The certificate to be send.
+ * @param wallet The wallet
+ */
+export const submitCertificate = async (certificate: Cardano.Certificate, wallet: TestWallet) => {
+  const walletAddress = (await firstValueFrom(wallet.wallet.addresses$))[0].address;
+  const txProps = {
+    certificates: [certificate],
+    outputs: new Set([{ address: walletAddress, value: { coins: 3_000_000n } }])
+  };
+
+  const unsignedTx = await wallet.wallet.initializeTx(txProps);
+  const signedTx = await wallet.wallet.finalizeTx({ tx: unsignedTx });
+
+  await submitAndConfirm(wallet.wallet, signedTx);
+
+  return signedTx;
+};
+
+/**
+ * Creates a key agent from a given set of mnemonics and the network id.
+ * Input resolver always resolves to 'null', so this KeyAgent won't be able to determine
+ * payment keys when signing a transaction.
+ *
+ * @param mnemonics The random set of mnemonics.
+ * @param genesis Network genesis parameters
+ */
+export const createStandaloneKeyAgent = async (mnemonics: string[], genesis: Cardano.CompactGenesis) =>
+  await InMemoryKeyAgent.fromBip39MnemonicWords(
+    {
+      chainId: genesis,
+      getPassword: async () => Buffer.from(''),
+      mnemonicWords: mnemonics
+    },
+    { inputResolver: { resolveInputAddress: async () => null }, logger }
+  );

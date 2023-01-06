@@ -12,12 +12,12 @@ const MILLISECONDS_PER_DAY = 1000 * 60 * 60 * 24;
 export const estimateStakePoolAPY = (rewardsHistory: StakePoolEpochRewards[]): Percent | null => {
   if (rewardsHistory.length === 0) return null;
   const roisPerDay = rewardsHistory.map(
-    ({ epochLength, memberROI }) => memberROI / (epochLength / MILLISECONDS_PER_DAY)
+    ({ epochLength, memberROI }) => memberROI.valueOf() / (epochLength / MILLISECONDS_PER_DAY)
   );
   const epochLengthInDays = rewardsHistory[rewardsHistory.length - 1].epochLength / MILLISECONDS_PER_DAY;
   const averageDailyROI = sum(roisPerDay) / roisPerDay.length;
   const roiPerEpoch = averageDailyROI * epochLengthInDays;
   const numEpochs = 365 / epochLengthInDays;
   // Compound interest formula
-  return Math.pow(1 + roiPerEpoch, numEpochs) - 1;
+  return Percent(Math.pow(1 + roiPerEpoch, numEpochs) - 1);
 };

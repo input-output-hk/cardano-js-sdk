@@ -2,10 +2,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as mocks from '../mocks';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
-import { AssetId, createStubStakePoolProvider, somePartialStakePools } from '@cardano-sdk/util-dev';
+import {
+  AssetId,
+  createStubStakePoolProvider,
+  generateRandomBigInt,
+  generateRandomHexString,
+  somePartialStakePools
+} from '@cardano-sdk/util-dev';
 import {
   Cardano,
   ChainHistoryProvider,
+  InvalidStringError,
   NetworkInfoProvider,
   RewardsProvider,
   UtxoProvider,
@@ -47,8 +54,9 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
         accountIndex: 0,
         address,
         index: 0,
-        networkId: Cardano.NetworkId.testnet,
+        networkId: Cardano.NetworkId.Testnet,
         rewardAccount,
+        stakeKeyDerivationPath: mocks.stakeKeyDerivationPath,
         type: AddressType.External
       };
       const asyncKeyAgent = await testAsyncKeyAgent([groupedAddress], dependencies);
@@ -78,7 +86,8 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
           utxoProvider
         }
       );
-    }
+    },
+    logger
   });
   return wallet;
 };
@@ -164,6 +173,62 @@ const assertWalletProperties2 = async (wallet: ObservableWallet) => {
   expect(rewardAccounts[0].rewardBalance).toBe(mocks.rewardAccountBalance2);
 };
 
+/**
+ * Generates a set of UTXOs matching the given parameters.
+ *
+ * @param utxoCount The number of UTXOs to be generated.
+ * @param assetsPerUtxo The number of Assets per UTXO.
+ */
+const generateUtxos = (utxoCount: number, assetsPerUtxo: number): Cardano.Utxo[] => {
+  const utxos: Cardano.Utxo[] = [];
+
+  for (let utxoIndex = 0; utxoIndex < utxoCount; ++utxoIndex) {
+    const utxo: Cardano.Utxo = [
+      {
+        address,
+        index: 0,
+        txId: Cardano.TransactionId(generateRandomHexString(64))
+      },
+      {
+        address,
+        value: {
+          assets: new Map(),
+          coins: generateRandomBigInt(1_000_000, 9_999_999_000_000) // from 1 tADA to 9.999.999 tADA
+        }
+      }
+    ];
+    for (let assetIndex = 0; assetIndex < assetsPerUtxo; ++assetIndex) {
+      utxo[1].value!.assets!.set(Cardano.AssetId(generateRandomHexString(72)), generateRandomBigInt(1, 1000));
+    }
+
+    utxos.push(utxo);
+  }
+
+  return utxos;
+};
+
+/**
+ * Gets the asset list and the total amount of lovelace on a utxo set.
+ *
+ * @param utxos The utxos.
+ * @returns The total lovelace and the aggregated asset set.
+ */
+const getAssetsFromUtxos = (utxos: Cardano.Utxo[]) => {
+  const values = utxos.map((utxo) => utxo[1].value);
+  let totalLovelace = 0n;
+  const totalTokens = new Map();
+
+  for (const value of values) {
+    totalLovelace += value.coins;
+
+    for (const [key, val] of value.assets!.entries()) {
+      totalTokens.set(key, val);
+    }
+  }
+
+  return { totalLovelace, totalTokens };
+};
+
 describe('SingleAddressWallet load', () => {
   it('loads all properties from provider, stores them and restores on subsequent load, fetches new data', async () => {
     const stores = createInMemoryWalletStores();
@@ -225,9 +290,9 @@ describe('SingleAddressWallet load', () => {
         return async (): Promise<Cardano.Tip> => {
           const blockNo = ++numCall;
           return {
-            blockNo,
+            blockNo: Cardano.BlockNo(blockNo),
             hash: Cardano.BlockId(blockNo.toString(16).padStart(64, '0')),
-            slot: blockNo * 100
+            slot: Cardano.Slot(blockNo * 100)
           };
         };
       })()
@@ -283,6 +348,95 @@ describe('SingleAddressWallet load', () => {
     connectionStatusTracker$.next(ConnectionStatus.down);
     await delay(AUTO_TRIGGER_AFTER + ONCE_SETTLED_FETCH_AFTER + 1);
     expect(networkInfoProvider.ledgerTip).toHaveBeenCalledTimes(3);
+
+    wallet.shutdown();
+  });
+});
+
+describe('SingleAddressWallet creates big UTXO', () => {
+  it('creates an UTXO with 300 hundred mixed assets coming from several inputs', async () => {
+    const stores = createInMemoryWalletStores();
+    const utxoSet = generateUtxos(30, 10);
+    const totalAssets = getAssetsFromUtxos(utxoSet);
+
+    const wallet = await createWallet(stores, {
+      chainHistoryProvider: mocks.mockChainHistoryProvider(),
+      networkInfoProvider: mocks.mockNetworkInfoProvider(),
+      rewardsProvider: mocks.mockRewardsProvider(),
+      utxoProvider: mocks.mockUtxoProvider(utxoSet)
+    });
+
+    const txProps = {
+      outputs: new Set([
+        {
+          address,
+          value: {
+            assets: totalAssets.totalTokens,
+            coins: totalAssets.totalLovelace - 10_000_000n // Leave some tADA available for fees
+          }
+        }
+      ])
+    };
+
+    const unsignedTx = await wallet.initializeTx(txProps);
+
+    const finalizeProps = {
+      tx: unsignedTx
+    };
+
+    const signedTx = await wallet.finalizeTx(finalizeProps);
+
+    const nonChangeOutput = signedTx.body.outputs.find((out) => out.value!.assets!.size > 0);
+    expect(nonChangeOutput!.value.assets).toBe(totalAssets.totalTokens);
+
+    wallet.shutdown();
+  });
+});
+
+describe('SingleAddressWallet.fatalError$', () => {
+  it('emits non retryable errors', async () => {
+    const stores = createInMemoryWalletStores();
+    const tipHandler = jest.fn();
+    const utxoSet = generateUtxos(30, 10);
+
+    const wallet = await createWallet(stores, {
+      chainHistoryProvider: mocks.mockChainHistoryProvider(),
+      networkInfoProvider: {
+        ...mocks.mockNetworkInfoProvider(),
+        ledgerTip: jest.fn().mockRejectedValue(new InvalidStringError('Test invalid string error'))
+      },
+      rewardsProvider: mocks.mockRewardsProvider(),
+      utxoProvider: mocks.mockUtxoProvider(utxoSet)
+    });
+
+    // wallet.fatalError$ must be observed till the beginning of time
+    const errorPromise = expect(firstValueFrom(wallet.fatalError$)).resolves.toBeInstanceOf(InvalidStringError);
+
+    wallet.tip$.subscribe(tipHandler);
+
+    await errorPromise;
+
+    wallet.shutdown();
+
+    expect(tipHandler).not.toBeCalled();
+  });
+
+  it('Observables work even if SingleAddressWallet.fatalError$ is not observed', async () => {
+    const stores = createInMemoryWalletStores();
+    const testValue = { test: 'value' };
+    const utxoSet = generateUtxos(30, 10);
+
+    const wallet = await createWallet(stores, {
+      chainHistoryProvider: mocks.mockChainHistoryProvider(),
+      networkInfoProvider: {
+        ...mocks.mockNetworkInfoProvider(),
+        ledgerTip: jest.fn().mockResolvedValue(testValue)
+      },
+      rewardsProvider: mocks.mockRewardsProvider(),
+      utxoProvider: mocks.mockUtxoProvider(utxoSet)
+    });
+
+    await expect(firstValueFrom(wallet.tip$)).resolves.toBe(testValue);
 
     wallet.shutdown();
   });

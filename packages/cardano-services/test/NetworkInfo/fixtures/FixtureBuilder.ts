@@ -19,4 +19,14 @@ export class NetworkInfoFixtureBuilder {
 
     return result.rows.map(({ max_supply }) => BigInt(max_supply))[0];
   }
+
+  public async getLasKnownEpoch(): Promise<number> {
+    this.#logger.debug('About to fetch last known epoch');
+
+    const result: QueryResult<{
+      no: number;
+    }> = await this.#db.query(Queries.lastKnownEpoch);
+
+    return result.rows.map(({ no }) => no)[0];
+  }
 }

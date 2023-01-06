@@ -53,7 +53,7 @@ describe('cip30', () => {
   describe('createWalletApi', () => {
     test('api.getNetworkId', async () => {
       const cip30NetworkId = await api.getNetworkId();
-      expect(cip30NetworkId).toEqual(Cardano.NetworkId.testnet);
+      expect(cip30NetworkId).toEqual(Cardano.NetworkId.Testnet);
     });
 
     test('api.getUtxos', async () => {
@@ -107,9 +107,9 @@ describe('cip30', () => {
     test('api.signTx', async () => {
       const txInternals = await wallet.initializeTx(simpleTxProps);
       const finalizedTx = await wallet.finalizeTx({ tx: txInternals });
-      const hexTxBody = Buffer.from(coreToCml.tx(scope, finalizedTx).body().to_bytes()).toString('hex');
+      const hexTx = Buffer.from(coreToCml.tx(scope, finalizedTx).to_bytes()).toString('hex');
 
-      const cip30witnessSet = await api.signTx(hexTxBody);
+      const cip30witnessSet = await api.signTx(hexTx);
       const signatures = Buffer.from(cip30witnessSet, 'hex');
       expect(() => scope.manage(CML.TransactionWitnessSet.from_bytes(signatures))).not.toThrow();
     });
@@ -149,36 +149,52 @@ describe('cip30', () => {
         confirmationCallback.mockRejectedValue(1);
         await expect(api.signData(wallet.addresses$.value![0].address, payload)).rejects.toThrowError(DataSignError);
       });
+
+      test('gets the Cardano.Address equivalent of the hex address', async () => {
+        confirmationCallback.mockClear();
+        confirmationCallback.mockResolvedValueOnce(true);
+
+        const expectedAddr = wallet.addresses$.value![0].address;
+
+        const hexAddr = Buffer.from(scope.manage(CML.Address.from_bech32(expectedAddr.toString())).to_bytes()).toString(
+          'hex'
+        );
+
+        await api.signData(hexAddr, payload);
+        expect(confirmationCallback).toHaveBeenCalledWith(
+          expect.objectContaining({ data: expect.objectContaining({ addr: expectedAddr }) })
+        );
+      });
     });
 
     describe('signTx', () => {
-      let hexTxBody: string;
+      let hexTx: string;
       beforeAll(async () => {
         const txInternals = await wallet.initializeTx(simpleTxProps);
         const finalizedTx = await wallet.finalizeTx({ tx: txInternals });
-        hexTxBody = Buffer.from(coreToCml.tx(scope, finalizedTx).body().to_bytes()).toString('hex');
+        hexTx = Buffer.from(coreToCml.tx(scope, finalizedTx).to_bytes()).toString('hex');
       });
 
       test('resolves true', async () => {
         confirmationCallback.mockResolvedValueOnce(true);
-        await expect(api.signTx(hexTxBody)).resolves.not.toThrow();
+        await expect(api.signTx(hexTx)).resolves.not.toThrow();
       });
 
       test('resolves false', async () => {
         confirmationCallback.mockResolvedValueOnce(false);
-        await expect(api.signTx(hexTxBody)).rejects.toThrowError(TxSignError);
+        await expect(api.signTx(hexTx)).rejects.toThrowError(TxSignError);
       });
 
       test('rejects', async () => {
         confirmationCallback.mockRejectedValue(1);
-        await expect(api.signTx(hexTxBody)).rejects.toThrowError(TxSignError);
+        await expect(api.signTx(hexTx)).rejects.toThrowError(TxSignError);
       });
     });
 
     describe('submitTx', () => {
       let cmlTx: string;
       let txInternals: InitializeTxResult;
-      let finalizedTx: Cardano.NewTxAlonzo<Cardano.NewTxBodyAlonzo>;
+      let finalizedTx: Cardano.Tx<Cardano.TxBody>;
 
       beforeAll(async () => {
         txInternals = await wallet.initializeTx(simpleTxProps);

@@ -25,9 +25,9 @@ export const generateStakePools = (qty: number): Cardano.StakePool[] =>
     epochRewards: [
       {
         activeStake: 2_986_376_991n,
-        epoch: 205,
+        epoch: Cardano.EpochNo(205),
         epochLength: 431_850_000,
-        memberROI: 0,
+        memberROI: Cardano.Percent(0),
         operatorFees: 0n,
         totalRewards: 0n
       }
@@ -49,14 +49,14 @@ export const generateStakePools = (qty: number): Cardano.StakePool[] =>
       url: 'https://git.io/JJ7wm'
     },
     metrics: {
-      apy: 0,
+      apy: Cardano.Percent(0),
       blocksCreated: 0,
       delegators: 1,
       livePledge: 495_463_149n,
-      saturation: 0.000_035_552_103_558_591_88,
+      saturation: Cardano.Percent(0.000_035_552_103_558_591_88),
       size: {
-        active: 1,
-        live: 0
+        active: Cardano.Percent(1),
+        live: Cardano.Percent(0)
       },
       stake: {
         active: 2_986_376_991n,

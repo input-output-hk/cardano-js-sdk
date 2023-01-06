@@ -1,14 +1,15 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Pool } from 'pg';
 import { RewardsBuilder } from '../../../src';
+import { RewardsFixtureBuilder } from '../fixtures/FixtureBuilder';
 import { logger } from '@cardano-sdk/util-dev';
 
 describe('RewardsBuilder', () => {
-  const dbConnection = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
+  const dbConnection = new Pool({
+    connectionString: process.env.POSTGRES_CONNECTION_STRING
+  });
   const builder = new RewardsBuilder(dbConnection, logger);
-  const rewardAccWithBalance = Cardano.RewardAccount(
-    'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27'
-  );
+  const fixtureBuilder = new RewardsFixtureBuilder(dbConnection, logger);
 
   afterAll(async () => {
     await dbConnection.end();
@@ -16,19 +17,23 @@ describe('RewardsBuilder', () => {
 
   describe('getAccountBalance', () => {
     it('returns AccountBalanceModel', async () => {
+      const rewardAccWithBalance = (await fixtureBuilder.getRewardAccounts(1))[0];
       const result = await builder.getAccountBalance(rewardAccWithBalance);
-      expect(result).toMatchSnapshot();
+      expect(result).toMatchShapeOf({ balance: '0' });
+      expect(Number(result?.balance)).toBeGreaterThan(0);
     });
     it('returns 0 balance', async () => {
       const stakeAddressWithNoRewardsBalance = Cardano.RewardAccount(
         'stake_test1uzxvhl83q8ujv2yvpy6n2krvpdlqqx28h7e9vsk6re43h3c3kufy6'
       );
       const result = await builder.getAccountBalance(stakeAddressWithNoRewardsBalance);
-      expect(result).toMatchSnapshot();
+      expect(result).toMatchShapeOf({ balance: '0' });
+      expect(Number(result?.balance)).toEqual(0);
     });
   });
   describe('getRewardsHistory', () => {
     it('returns RewardEpochModel when there is no epochs field', async () => {
+      const rewardAccWithBalance = (await fixtureBuilder.getRewardAccounts(1))[0];
       const result = await builder.getRewardsHistory([rewardAccWithBalance]);
       expect(result.length).toBeGreaterThan(0);
     });
@@ -37,25 +42,28 @@ describe('RewardsBuilder', () => {
       expect(result).toHaveLength(0);
     });
     it('returns RewardEpochModel when there is epochs field', async () => {
-      const epochs = { lowerBound: 80, upperBound: 90 };
+      const rewardAccWithBalance = (await fixtureBuilder.getRewardAccounts(1))[0];
+      const epochs = { lowerBound: Cardano.EpochNo(5), upperBound: Cardano.EpochNo(10) };
       const result = await builder.getRewardsHistory([rewardAccWithBalance], epochs);
-      expect(result).toHaveLength(3);
+      expect(result.length).toBeGreaterThan(0);
       for (const reward of result) {
-        expect(Number(reward.epoch)).toBeGreaterThanOrEqual(epochs.lowerBound);
-        expect(Number(reward.epoch)).toBeLessThanOrEqual(epochs.upperBound);
+        expect(Number(reward.epoch)).toBeGreaterThanOrEqual(epochs.lowerBound.valueOf());
+        expect(Number(reward.epoch)).toBeLessThanOrEqual(epochs.upperBound.valueOf());
       }
     });
     it('returns RewardEpochModel when there is partially epochs field with lowerBound', async () => {
-      const epochs = { lowerBound: 10 };
+      const rewardAccWithBalance = (await fixtureBuilder.getRewardAccounts(1))[0];
+      const epochs = { lowerBound: Cardano.EpochNo(1) };
       const result = await builder.getRewardsHistory([rewardAccWithBalance], epochs);
       expect(result.length).toBeGreaterThan(0);
-      for (const reward of result) expect(Number(reward.epoch)).toBeGreaterThanOrEqual(epochs.lowerBound);
+      for (const reward of result) expect(Number(reward.epoch)).toBeGreaterThanOrEqual(epochs.lowerBound.valueOf());
     });
     it('returns RewardEpochModel when there is partially epochs field with upperBound', async () => {
-      const epochs = { upperBound: 90 };
+      const rewardAccWithBalance = (await fixtureBuilder.getRewardAccounts(1))[0];
+      const epochs = { upperBound: Cardano.EpochNo(90) };
       const result = await builder.getRewardsHistory([rewardAccWithBalance], epochs);
-      expect(result).toHaveLength(3);
-      for (const reward of result) expect(Number(reward.epoch)).toBeLessThanOrEqual(epochs.upperBound);
+      expect(result.length).toBeGreaterThan(0);
+      for (const reward of result) expect(Number(reward.epoch)).toBeLessThanOrEqual(epochs.upperBound.valueOf());
     });
   });
 });

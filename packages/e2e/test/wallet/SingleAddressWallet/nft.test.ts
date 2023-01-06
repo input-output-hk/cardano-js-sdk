@@ -1,13 +1,14 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { Cardano, metadatum, nativeScriptPolicyId } from '@cardano-sdk/core';
-import { InMemoryKeyAgent, KeyRole, TransactionSigner, util } from '@cardano-sdk/key-management';
+import { KeyRole, TransactionSigner, util } from '@cardano-sdk/key-management';
 import { SingleAddressWallet } from '@cardano-sdk/wallet';
 import { combineLatest, filter, firstValueFrom, map } from 'rxjs';
-import { env } from '../../environment';
-import { getLogger, getWallet } from '../../../src/factories';
-import { submitAndConfirm, walletReady } from '../../util';
+import { createLogger } from '@cardano-sdk/util-dev';
+import { createStandaloneKeyAgent, submitAndConfirm, walletReady } from '../../util';
+import { getEnv, getWallet, walletVariables } from '../../../src';
 
-const logger = getLogger(env.LOGGER_MIN_SEVERITY);
+const env = getEnv(walletVariables);
+const logger = createLogger();
 
 describe('SingleAddressWallet.assets/nft', () => {
   const TOKEN_METADATA_1_INDEX = 0;
@@ -29,16 +30,9 @@ describe('SingleAddressWallet.assets/nft', () => {
 
     await walletReady(wallet);
 
-    const params = await firstValueFrom(wallet.genesisParameters$);
+    const genesis = await firstValueFrom(wallet.genesisParameters$);
 
-    const keyAgent = await InMemoryKeyAgent.fromBip39MnemonicWords(
-      {
-        getPassword: async () => Buffer.from(''),
-        mnemonicWords: util.generateMnemonicWords(),
-        networkId: params.networkId
-      },
-      { inputResolver: { resolveInputAddress: async () => null } }
-    );
+    const keyAgent = await createStandaloneKeyAgent(util.generateMnemonicWords(), genesis);
 
     const pubKey = await keyAgent.derivePublicKey({
       index: 0,

@@ -1,7 +1,9 @@
 /* eslint-disable func-style */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import { Cardano } from '@cardano-sdk/core';
 import {
   GetPassword,
+  GroupedAddress,
   KeyAgent,
   KeyAgentDependencies,
   KeyAgentType,
@@ -13,6 +15,8 @@ import {
 import { InMemoryKeyAgent } from './InMemoryKeyAgent';
 import { InvalidSerializableDataError } from './errors';
 import { LedgerKeyAgent } from './LedgerKeyAgent';
+import { Logger } from 'ts-log';
+import { STAKE_KEY_DERIVATION_PATH } from './util';
 import { TrezorKeyAgent } from './TrezorKeyAgent';
 
 // TODO: use this type as 2nd parameter of restoreKeyAgent
@@ -22,6 +26,30 @@ export interface RestoreInMemoryKeyAgentProps {
    */
   getPassword?: GetPassword;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const migrateSerializableData = <T extends SerializableKeyAgentData>(data: any, logger: Logger): T => ({
+  ...data,
+  chainId:
+    data.chainId ||
+    (() => {
+      logger.info('Migrating serializable data due to missing "chainId"');
+      return {
+        ...data,
+        chainId:
+          data.networkId === Cardano.NetworkId.Mainnet
+            ? Cardano.ChainIds.Mainnet
+            : (() => {
+                logger.warn('Assuming "Preprod" network is used');
+                return Cardano.ChainIds.Preprod;
+              })()
+      };
+    })(),
+  knownAddresses: data.knownAddresses.map((address: GroupedAddress) => ({
+    ...address,
+    stakeKeyDerivationPath: address.stakeKeyDerivationPath || STAKE_KEY_DERIVATION_PATH
+  }))
+});
 
 export function restoreKeyAgent(
   data: SerializableInMemoryKeyAgentData,
@@ -47,10 +75,12 @@ export function restoreKeyAgent(
  * @throws InvalidSerializableDataError, AuthenticationError
  */
 export async function restoreKeyAgent<T extends SerializableKeyAgentData>(
-  data: T,
+  dataArg: T,
   dependencies: KeyAgentDependencies,
   getPassword?: GetPassword
 ): Promise<KeyAgent> {
+  // migrateSerializableData
+  const data = migrateSerializableData(dataArg, dependencies.logger);
   switch (data.__typename) {
     case KeyAgentType.InMemory: {
       if (!data.encryptedRootPrivateKeyBytes || data.encryptedRootPrivateKeyBytes.length !== 156) {

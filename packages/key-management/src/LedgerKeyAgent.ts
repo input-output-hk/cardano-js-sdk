@@ -24,8 +24,7 @@ export interface LedgerKeyAgentProps extends Omit<SerializableLedgerKeyAgentData
 }
 
 export interface CreateLedgerKeyAgentProps {
-  networkId: Cardano.NetworkId;
-  protocolMagic: Cardano.NetworkMagic;
+  chainId: Cardano.ChainId;
   accountIndex?: number;
   communicationType: CommunicationType;
   deviceConnection?: LedgerConnection | null;
@@ -49,13 +48,11 @@ const transportTypedError = (error?: any) =>
 export class LedgerKeyAgent extends KeyAgentBase {
   readonly deviceConnection?: LedgerConnection;
   readonly #communicationType: CommunicationType;
-  readonly #protocolMagic: Cardano.NetworkMagic;
 
   constructor({ deviceConnection, ...serializableData }: LedgerKeyAgentProps, dependencies: KeyAgentDependencies) {
     super({ ...serializableData, __typename: KeyAgentType.Ledger }, dependencies);
     this.deviceConnection = deviceConnection;
     this.#communicationType = serializableData.communicationType;
-    this.#protocolMagic = serializableData.protocolMagic;
   }
 
   /**
@@ -199,7 +196,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
    * @throws TransportError
    */
   static async createWithDevice(
-    { networkId, protocolMagic, accountIndex = 0, communicationType, deviceConnection }: CreateLedgerKeyAgentProps,
+    { chainId, accountIndex = 0, communicationType, deviceConnection }: CreateLedgerKeyAgentProps,
     dependencies: KeyAgentDependencies
   ) {
     const deviceListPaths = await LedgerKeyAgent.getHidDeviceList(communicationType);
@@ -216,12 +213,11 @@ export class LedgerKeyAgent extends KeyAgentBase {
     return new LedgerKeyAgent(
       {
         accountIndex,
+        chainId,
         communicationType,
         deviceConnection: activeDeviceConnection,
         extendedAccountPublicKey,
-        knownAddresses: [],
-        networkId,
-        protocolMagic
+        knownAddresses: []
       },
       dependencies
     );
@@ -232,11 +228,10 @@ export class LedgerKeyAgent extends KeyAgentBase {
     try {
       const cslTxBody = coreToCml.txBody(scope, body);
       const ledgerTxData = await txToLedger({
+        chainId: this.chainId,
         cslTxBody,
         inputResolver: this.inputResolver,
-        knownAddresses: this.knownAddresses,
-        networkId: this.networkId,
-        protocolMagic: this.#protocolMagic
+        knownAddresses: this.knownAddresses
       });
       const deviceConnection = await LedgerKeyAgent.checkDeviceConnection(
         this.#communicationType,

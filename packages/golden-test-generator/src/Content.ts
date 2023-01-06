@@ -1,12 +1,12 @@
+import { Cardano, Intersection } from '@cardano-sdk/core';
 import { Commit } from 'git-last-commit';
-import { Ogmios } from '@cardano-sdk/ogmios';
 import { getLastCommitPromise } from './util';
-const packageJson = require('../package.json');
+const packageJson = require('../../package.json');
 
 export type Metadata = {
   cardano: {
-    compactGenesis: Ogmios.Schema.CompactGenesis;
-    intersection: Ogmios.ChainSync.Intersection;
+    compactGenesis: Cardano.CompactGenesis;
+    intersection: Intersection;
   };
   software: {
     name: string;
@@ -15,7 +15,7 @@ export type Metadata = {
   };
 };
 
-export type GeneratorMetadata = { metadata: { cardano: Metadata['cardano'] } };
+export type GeneratorMetadata = { metadata: { cardano: Metadata['cardano']; options?: { blockHeights: string } } };
 
 export const prepareContent = async <Body>(
   metadata: Omit<Metadata, 'software'>,

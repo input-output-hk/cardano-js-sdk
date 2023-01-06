@@ -1,5 +1,6 @@
 // Expose any additional services to be shared with UIs
-import { BackgroundServices, adaPriceProperties, adaPriceServiceChannel, logger, walletName } from '../util';
+import { BackgroundServices, adaPriceProperties, logger } from '../util';
+import { adaPriceServiceChannel, walletName } from '../const';
 import { authenticator } from './authenticator';
 import { exposeApi, exposeSupplyDistributionTracker } from '@cardano-sdk/web-extension';
 import { of } from 'rxjs';

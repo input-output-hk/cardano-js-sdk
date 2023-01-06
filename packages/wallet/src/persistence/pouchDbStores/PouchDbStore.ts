@@ -11,7 +11,7 @@ export abstract class PouchDbStore<T extends {}> {
 
   constructor(public dbName: string, logger: Logger) {
     this.logger = logger;
-    this.db = new PouchDB<T>(dbName);
+    this.db = new PouchDB<T>(dbName, { auto_compaction: true });
   }
 
   /**

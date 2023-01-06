@@ -1,34 +1,39 @@
-import { CML } from '../..';
-import { Ed25519PublicKey } from '.';
-import { Hash28ByteBase16, Hash32ByteBase16, OpaqueString, typedBech32 } from '../util/primitives';
+import { CML } from '../../CML/CML';
+import { Ed25519PublicKey } from './Key';
+import { Hash28ByteBase16, Hash32ByteBase16, OpaqueNumber, OpaqueString, typedBech32 } from '../util/primitives';
 import { InvalidStringError } from '../../errors';
 import { Lovelace } from './Value';
 import { PoolId } from './StakePool/primitives';
+import { Tx } from './Transaction';
 
 /**
  * The block size in bytes
  */
-export type BlockSize = number;
+export type BlockSize = OpaqueNumber<'BlockSize'>;
+export const BlockSize = (value: number): BlockSize => value as unknown as BlockSize;
 
 /**
  * The block number.
  */
-export type BlockNo = number;
+export type BlockNo = OpaqueNumber<'BlockNo'>;
+export const BlockNo = (value: number): BlockNo => value as unknown as BlockNo;
 
 /**
  * The epoch number.
  */
-export type EpochNo = number;
+export type EpochNo = OpaqueNumber<'EpochNo'>;
+export const EpochNo = (value: number): EpochNo => value as unknown as EpochNo;
 
 /**
  * Smallest time period in the blockchain
  */
-export type Slot = number;
+export type Slot = OpaqueNumber<'Slot'>;
+export const Slot = (value: number): Slot => value as unknown as Slot;
 
 /**
  * block hash as hex string
  */
-export type BlockId = Hash32ByteBase16<'BlockId'>;
+export type BlockId = OpaqueString<'BlockId'>;
 
 export interface PartialBlockHeader {
   blockNo: BlockNo;
@@ -43,7 +48,7 @@ export type Tip = PartialBlockHeader;
  * @param {string} value block hash as hex string
  * @throws InvalidStringError
  */
-export const BlockId = (value: string): BlockId => Hash32ByteBase16<'BlockId'>(value);
+export const BlockId = (value: string): BlockId => Hash32ByteBase16(value) as unknown as BlockId;
 
 /**
  * 32 byte ed25519 verification key as bech32 string.
@@ -61,7 +66,7 @@ export const GenesisDelegate = (value: string): GenesisDelegate => {
   if (/ShelleyGenesis-[\da-f]{16}/.test(value)) {
     return value as unknown as GenesisDelegate;
   }
-  return Hash28ByteBase16(value);
+  return Hash28ByteBase16(value) as unknown as GenesisDelegate;
 };
 
 export type SlotLeader = PoolId | GenesisDelegate;
@@ -89,7 +94,7 @@ export const VrfVkBech32FromBase64 = (value: string) =>
 /** Minimal Block type meant as a base for the more complete version `Block`  */
 // TODO: optionals (except previousBlock) are there because they are not calculated for Byron yet.
 // Remove them once calculation is done and remove the Required<BlockMinimal> from interface Block
-export interface BlockMinimal {
+export interface BlockInfo {
   header: PartialBlockHeader;
   /** Byron blocks fee not calculated yet */
   fees?: Lovelace;
@@ -106,14 +111,18 @@ export interface BlockMinimal {
   issuerVk?: Ed25519PublicKey;
 }
 
-export interface Block
-  extends Required<Omit<BlockMinimal, 'issuerVk' | 'previousBlock'>>,
-    Pick<BlockMinimal, 'previousBlock'> {
+export interface Block extends BlockInfo {
+  body: Tx[];
+}
+
+export interface ExtendedBlockInfo
+  extends Required<Omit<BlockInfo, 'issuerVk' | 'previousBlock'>>,
+    Pick<BlockInfo, 'previousBlock'> {
   /**
    * In case of blocks produced by BFT nodes, the SlotLeader the issuerVk hash
    * For blocks produced by stake pools, it is the Bech32 encoded value of issuerVk hash
    */
-  slotLeader: SlotLeader;
+  slotLeader: SlotLeader; // TODO: move to CompactBlockInfo and make nullable
   date: Date;
   epoch: EpochNo;
   epochSlot: number;

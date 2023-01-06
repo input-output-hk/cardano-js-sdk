@@ -190,7 +190,7 @@ describe('buildTx', () => {
     let assetQuantity: bigint;
     let assets: Cardano.TokenMap;
     let address: Cardano.Address;
-    let datum: Cardano.util.Hash32ByteBase16;
+    let datumHash: Cardano.util.Hash32ByteBase16;
     let output1Coin: bigint;
     let output2Base: Cardano.TxOut;
 
@@ -199,7 +199,7 @@ describe('buildTx', () => {
       assetQuantity = 100n;
       assets = new Map([[assetId, assetQuantity]]);
       address = Cardano.Address('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg');
-      datum = Cardano.util.Hash32ByteBase16('3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d');
+      datumHash = Cardano.util.Hash32ByteBase16('3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d');
       output1Coin = 10_000_000n;
       output2Base = mocks.utxo[0][1];
 
@@ -261,8 +261,8 @@ describe('buildTx', () => {
     });
 
     it('can set datum', () => {
-      outputBuilder.datum(datum);
-      expect(outputBuilder.toTxOut().datum).toEqual(datum);
+      outputBuilder.datum(datumHash);
+      expect(outputBuilder.toTxOut().datumHash).toEqual(datumHash);
     });
 
     it('can build a valid output', async () => {
@@ -276,10 +276,10 @@ describe('buildTx', () => {
       assertTxOutIsValid(builtOutput);
       expect(builtOutput.txOut).toEqual<Cardano.TxOut>({ address, value: { assets, coins: output1Coin } });
 
-      const builtOutputFromOther = await txBuilder.buildOutput(output2Base).assets(assets).datum(datum).build();
+      const builtOutputFromOther = await txBuilder.buildOutput(output2Base).assets(assets).datum(datumHash).build();
       assertTxOutIsValid(builtOutputFromOther);
       expect(builtOutputFromOther.txOut).toEqual<Cardano.TxOut>({
-        datum,
+        datumHash,
         ...output2Base,
         value: { ...output2Base.value, assets }
       });

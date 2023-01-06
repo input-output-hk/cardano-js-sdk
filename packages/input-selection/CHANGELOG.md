@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.6.0...@cardano-sdk/input-selection@0.7.0) (2022-12-22)
+
+### ⚠ BREAKING CHANGES
+
+- create a new CML scope for every call of BuildTx in selection constraints
+
+### Bug Fixes
+
+- add sideEffects=false to package.json ([a1cb8f8](https://github.com/input-output-hk/cardano-js-sdk/commit/a1cb8f807e8d5947d0c512e0918713ff97d5d48e))
+- create a new CML scope for every call of BuildTx in selection constraints ([6818ae4](https://github.com/input-output-hk/cardano-js-sdk/commit/6818ae443dd53ac4786ce161f02aef5635433678))
+- **input-selection:** fixed recursive use of CSL object ([ac39e77](https://github.com/input-output-hk/cardano-js-sdk/commit/ac39e775bb08b36c28593b960a0deda78f680c4d))
+- **input-selection:** manage result of CML.min_ada_required in computeMinimumCoinQuantity ([ae9ad7a](https://github.com/input-output-hk/cardano-js-sdk/commit/ae9ad7adeea72e7b5836b99ce6b640eebb99f20c))
+- **input-selection:** moved call of CML outside of recursive function ([5c6568c](https://github.com/input-output-hk/cardano-js-sdk/commit/5c6568ceac9793daba573e82ba9fb16cdeece207))
+
 ## 0.6.0 (2022-11-04)
 
 ### ⚠ BREAKING CHANGES

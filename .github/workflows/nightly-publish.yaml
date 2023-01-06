@@ -3,7 +3,7 @@ name: nightly-publish
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: [nightly-test]
+    workflows: [nightly-e2e]
     types:
       - completed
 
