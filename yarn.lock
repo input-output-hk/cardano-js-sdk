@@ -2754,6 +2754,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/util-rxjs@workspace:packages/util-rxjs"
   dependencies:
+    "@cardano-sdk/util": ^0.7.0
     "@cardano-sdk/util-dev": ^0.6.0
     eslint: ^7.32.0
     jest: ^28.1.3

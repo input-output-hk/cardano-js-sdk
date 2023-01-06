@@ -3,15 +3,18 @@
 import {
   Observable,
   OperatorFunction,
-  buffer,
-  delay,
-  merge,
-  mergeAll,
-  share,
-  skipUntil,
-  take,
-  withLatestFrom
+  combineLatest,
+  distinctUntilKeyChanged,
+  filter,
+  from,
+  map,
+  mergeScan,
+  of,
+  startWith
 } from 'rxjs';
+import { isNotNil } from '@cardano-sdk/util';
+
+const EMPTY_DEPENDENCY = Symbol('EMPTY');
 
 export function blockingWithLatestFrom<T, O>(dependency$: Observable<O>): OperatorFunction<T, [T, O]>;
 export function blockingWithLatestFrom<T, O, R>(
@@ -27,19 +30,33 @@ export function blockingWithLatestFrom<T, R>(
   dependency$: Observable<any>,
   combinator = (a: any, b: any) => [a, b]
 ): OperatorFunction<T, R | any[]> {
-  return (source$: Observable<T>) => {
-    const sharedDependency$ = dependency$.pipe(share());
-    // delay(1) is needed in case dependency$ resolves instantly.
-    // in that case both merge() items emit.
-    const firstDependency$ = sharedDependency$.pipe(delay(1), take(1));
-    const sharedSource$ = source$.pipe(share());
-    return merge(
-      // Emit values up until dependency$ first emits
-      // 'buffer' will emit once and complete, also completing source subscription
-      // 'mergeAll' is equivalent to mergeMap((array) => from(array))
-      sharedSource$.pipe(buffer(firstDependency$), mergeAll()),
-      // Emit values since dependency$ first emission
-      sharedSource$.pipe(skipUntil(firstDependency$))
-    ).pipe(withLatestFrom(sharedDependency$, combinator));
+  const accumulator = {
+    buffer: [] as T[],
+    output: null as [T, any] | null
   };
+  type Accumulator = typeof accumulator;
+
+  return (source$: Observable<T>) =>
+    combineLatest([source$, dependency$.pipe(startWith(EMPTY_DEPENDENCY))]).pipe(
+      mergeScan(({ buffer }: Accumulator, output): Observable<Accumulator> => {
+        // add source values to buffer until dependency$ emits
+        if (output[1] === EMPTY_DEPENDENCY) {
+          return of({
+            buffer: [...buffer, output[0]],
+            output: null
+          });
+        }
+        // emit values from buffer and the current value
+        return from(
+          [...buffer, output[0]].map((sourceValue) => ({
+            buffer: [],
+            output: [sourceValue, output[1]] as [T, any]
+          }))
+        );
+      }, accumulator),
+      map(({ output }) => output),
+      filter(isNotNil),
+      distinctUntilKeyChanged(0),
+      map(([sourceValue, dependency]) => combinator(sourceValue, dependency))
+    );
 }

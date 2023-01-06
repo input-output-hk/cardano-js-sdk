@@ -18,7 +18,7 @@ describe('withStaticContext', () => {
             eventType: ChainSyncEventType.RollBackward
           } as ProjectorEvent
         });
-        expectObservable(source$.pipe(withStaticContext(context$))).toBe('-a-b', {
+        expectObservable(source$.pipe(withStaticContext(context$))).toBe('a--b', {
           a: {
             ctx: 'a',
             eventType: ChainSyncEventType.RollForward
@@ -46,7 +46,7 @@ describe('withStaticContext', () => {
             eventType: ChainSyncEventType.RollBackward
           } as ProjectorEvent
         });
-        expectObservable(source$.pipe(withStaticContext(context))).toBe('-a-b', {
+        expectObservable(source$.pipe(withStaticContext(context))).toBe('a--b', {
           a: {
             ctx: 'a',
             eventType: ChainSyncEventType.RollForward
