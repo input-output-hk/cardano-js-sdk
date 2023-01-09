@@ -37,7 +37,7 @@ const recreateOgmiosTxSubmitProvider = async (
   await ogmiosTxSubmitProvider
     .shutdown()
     .catch((error_) => logger.warn(`OgmiosTxSubmitProvider failed to shutdown after connection error: ${error_}`));
-  return new OgmiosTxSubmitProvider({ host: record.name, port: record.port }, logger);
+  return new OgmiosTxSubmitProvider({ host: record.name, port: record.port }, { logger });
 };
 /**
  * Creates an extended TxSubmitProvider instance :
@@ -56,7 +56,7 @@ export const ogmiosTxSubmitProviderWithDiscovery = async (
   serviceName: string
 ): Promise<OgmiosTxSubmitProvider> => {
   const { name, port } = await dnsResolver(serviceName!);
-  let ogmiosProvider = new OgmiosTxSubmitProvider({ host: name, port }, logger);
+  let ogmiosProvider = new OgmiosTxSubmitProvider({ host: name, port }, { logger });
 
   const txSubmitProviderProxy = new Proxy<OgmiosTxSubmitProvider>({} as OgmiosTxSubmitProvider, {
     get(_, prop) {
@@ -103,7 +103,7 @@ export const getOgmiosTxSubmitProvider = async (
 ): Promise<OgmiosTxSubmitProvider> => {
   if (options?.ogmiosSrvServiceName)
     return ogmiosTxSubmitProviderWithDiscovery(dnsResolver, logger, options.ogmiosSrvServiceName);
-  if (options?.ogmiosUrl) return new OgmiosTxSubmitProvider(urlToConnectionConfig(options?.ogmiosUrl), logger);
+  if (options?.ogmiosUrl) return new OgmiosTxSubmitProvider(urlToConnectionConfig(options?.ogmiosUrl), { logger });
   throw new MissingCardanoNodeOption([
     CommonOptionDescriptions.OgmiosUrl,
     CommonOptionDescriptions.OgmiosSrvServiceName

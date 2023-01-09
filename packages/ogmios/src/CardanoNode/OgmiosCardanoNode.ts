@@ -30,6 +30,7 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
   #stateQueryClient: StateQuery.StateQueryClient;
   #logger: Logger;
   #connectionConfig: ConnectionConfig;
+
   constructor(connectionConfig: ConnectionConfig, logger: Logger) {
     super('OgmiosCardanoNode', logger);
     this.#logger = contextLogger(logger, 'OgmiosCardanoNode');

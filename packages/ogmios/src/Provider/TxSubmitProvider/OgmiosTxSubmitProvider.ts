@@ -3,6 +3,7 @@ import {
   Cardano,
   CardanoNodeErrors,
   HealthCheckResponse,
+  ProviderDependencies,
   ProviderError,
   ProviderFailure,
   SubmitTxArgs,
@@ -36,7 +37,7 @@ export class OgmiosTxSubmitProvider extends RunnableModule implements TxSubmitPr
    * @param {Logger} logger object implementing the Logger abstract class
    * @throws {TxSubmission.errors}
    */
-  constructor(connectionConfig: ConnectionConfig, logger: Logger) {
+  constructor(connectionConfig: ConnectionConfig, { logger }: ProviderDependencies) {
     super('OgmiosTxSubmitProvider', logger);
     this.#logger = contextLogger(logger, 'OgmiosTxSubmitProvider');
     this.#connectionConfig = connectionConfig;

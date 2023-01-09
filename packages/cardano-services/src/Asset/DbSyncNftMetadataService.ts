@@ -1,5 +1,5 @@
 import { Asset, Cardano } from '@cardano-sdk/core';
-import { AssetBuilder } from './AssetBuilder';
+import { AssetBuilder } from './DbSyncAssetProvider';
 import { AssetPolicyIdAndName, NftMetadataService } from './types';
 import { Logger } from 'ts-log';
 import { Pool } from 'pg';

@@ -1,7 +1,6 @@
 import * as NetworkInfoCacheKey from './keys';
 import {
   Cardano,
-  CardanoNode,
   CardanoNodeUtil,
   EraSummary,
   NetworkInfoProvider,
@@ -9,26 +8,39 @@ import {
   SupplySummary,
   createSlotEpochCalc
 } from '@cardano-sdk/core';
-import { DbSyncProvider } from '../../util/DbSyncProvider';
+import { DbSyncProvider, DbSyncProviderDependencies } from '../../util/DbSyncProvider';
 import { Disposer, EpochMonitor } from '../../util/polling/types';
 import { GenesisData } from './types';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../InMemoryCache';
 import { Logger } from 'ts-log';
 import { NetworkInfoBuilder } from './NetworkInfoBuilder';
-import { Pool } from 'pg';
 import { RunnableModule } from '@cardano-sdk/util';
 import { loadGenesisData, toGenesisParams, toLedgerTip, toProtocolParams, toSupply } from './mappers';
 
+/**
+ * Properties that are need to create DbSyncNetworkInfoProvider
+ */
 export interface NetworkInfoProviderProps {
+  /**
+   * Cardano node config path string
+   */
   cardanoNodeConfigPath: string;
 }
-export interface NetworkInfoProviderDependencies {
-  db: Pool;
+
+/**
+ * Dependencies that are need to create DbSyncNetworkInfoProvider
+ */
+export interface NetworkInfoProviderDependencies extends DbSyncProviderDependencies {
+  /**
+   * The in memory cache engine.
+   */
   cache: InMemoryCache;
-  logger: Logger;
-  cardanoNode: CardanoNode;
+  /**
+   * Monitor the epoch rollover through db polling.
+   */
   epochMonitor: EpochMonitor;
 }
+
 export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) implements NetworkInfoProvider {
   #logger: Logger;
   #cache: InMemoryCache;
@@ -43,7 +55,8 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) im
     { cardanoNodeConfigPath }: NetworkInfoProviderProps,
     { db, cache, logger, cardanoNode, epochMonitor }: NetworkInfoProviderDependencies
   ) {
-    super(db, cardanoNode, 'DbSyncNetworkInfoProvider', logger);
+    super({ cardanoNode, db, logger }, 'DbSyncNetworkInfoProvider', logger);
+
     this.#logger = logger;
     this.#cache = cache;
     this.#currentEpoch = Cardano.EpochNo(0);
