@@ -1,0 +1,77 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Server Metadata",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/meta": {
+      "post": {
+        "summary": "HTTP Server metadata POST",
+        "operationId": "server-metadata-post",
+        "responses": {
+          "200": {
+            "description": "HTTP Server metadata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerMetadata"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "HTTP server metadata GET",
+        "operationId": "server-metadata-get",
+        "responses": {
+          "200": {
+            "description": "HTTP Server metadata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerMetadata"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ServerMetadata": {
+        "type": "object",
+        "required": [
+          "startupTime"
+        ],
+        "properties": {
+          "startupTime": {
+            "type": "number"
+          },
+          "lastModified": {
+            "type": "number"
+          },
+          "lastModifiedDate": {
+            "type": "string"
+          },
+          "rev": {
+            "type": "string"
+          },
+          "shortRev": {
+            "type": "string"
+          },
+          "extra": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  }
+}
