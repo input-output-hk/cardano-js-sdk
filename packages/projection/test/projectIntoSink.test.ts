@@ -1,4 +1,4 @@
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, ChainSyncEventType, ChainSyncRollForward } from '@cardano-sdk/core';
 import { InvalidIntersectionError, projectIntoSink, projections, sinks } from '../src';
 import { StubChainSyncData, dataWithPoolRetirement, dataWithStakeKeyDeregistration } from './events';
 import { concat, defaultIfEmpty, firstValueFrom, lastValueFrom, toArray } from 'rxjs';
@@ -50,13 +50,12 @@ describe('projectIntoSink', () => {
   it('resumes from specific block', async () => {
     await firstValueFrom(
       inMemorySinks.buffer
-        .addStabilityWindowBlock({
-          header: {
-            blockNo: Cardano.BlockNo(32_209),
-            hash: Cardano.BlockId('bebbc2cfdd79fe1eddd67c95e80d0889bf5a3285379772cf6da4fb768aa32ab4'),
-            slot: Cardano.Slot(878_625)
-          }
-        } as Cardano.Block)
+        .addStabilityWindowBlock(
+          dataWithPoolRetirement.allEvents.find(
+            (evt): evt is ChainSyncRollForward =>
+              evt.eventType === ChainSyncEventType.RollForward && evt.block.header.blockNo === Cardano.BlockNo(32_209)
+          )!.block
+        )
         .pipe(defaultIfEmpty(null))
     );
     const [firstBlock] = await projectAll(dataWithPoolRetirement, inMemorySinks);
