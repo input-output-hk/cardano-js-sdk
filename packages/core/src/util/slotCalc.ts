@@ -61,7 +61,7 @@ export const createSlotEpochCalc: (eraSummaries: EraSummary[]) => (slotNo: Slot)
      * @throws EraSummaryError
      * @returns {EpochNo} epoch of the slot
      */
-    return memoize((slotNo: Slot): EpochNo => EpochNo(calc(slotNo).epochNo));
+    return (slotNo: Slot): EpochNo => EpochNo(calc(slotNo).epochNo);
   }
 );
 

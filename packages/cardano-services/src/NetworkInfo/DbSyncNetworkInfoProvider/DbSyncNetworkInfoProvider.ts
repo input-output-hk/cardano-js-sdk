@@ -4,6 +4,7 @@ import {
   CardanoNodeUtil,
   EraSummary,
   NetworkInfoProvider,
+  SlotEpochCalc,
   StakeSummary,
   SupplySummary,
   createSlotEpochCalc
@@ -16,6 +17,7 @@ import { Logger } from 'ts-log';
 import { NetworkInfoBuilder } from './NetworkInfoBuilder';
 import { RunnableModule } from '@cardano-sdk/util';
 import { loadGenesisData, toGenesisParams, toLedgerTip, toProtocolParams, toSupply } from './mappers';
+import memoize from 'lodash/memoize';
 
 /**
  * Properties that are need to create DbSyncNetworkInfoProvider
@@ -50,6 +52,7 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) im
   #genesisDataReady: Promise<GenesisData>;
   #epochMonitor: EpochMonitor;
   #epochRolloverDisposer: Disposer;
+  #slotEpochCalc: SlotEpochCalc;
 
   constructor(
     { cardanoNodeConfigPath }: NetworkInfoProviderProps,
@@ -73,7 +76,7 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) im
     if (this.#currentHash !== result.hash) {
       this.#currentHash = result.hash;
 
-      const slotEpochCalc = createSlotEpochCalc(await this.eraSummaries());
+      const slotEpochCalc = await this.#getSlotEpochCalc();
       const currentEpoch = slotEpochCalc(result.slot);
 
       // On epoch rollover, invalidate the cache before returning
@@ -149,5 +152,12 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) im
     this.#cache.shutdown();
     await this.#genesisDataReady;
     this.#epochRolloverDisposer();
+  }
+
+  async #getSlotEpochCalc() {
+    if (!this.#slotEpochCalc) {
+      this.#slotEpochCalc = memoize(createSlotEpochCalc(await this.eraSummaries()));
+    }
+    return this.#slotEpochCalc;
   }
 }
