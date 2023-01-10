@@ -25,12 +25,18 @@ export const withStakeKeys = unifiedProjectorOperator<WithCertificates, WithStak
   for (const { certificate } of evt.certificates)
     switch (certificate.__typename) {
       case Cardano.CertificateType.StakeKeyRegistration:
-        deregister.delete(certificate.stakeKeyHash);
-        register.add(certificate.stakeKeyHash);
+        if (deregister.has(certificate.stakeKeyHash)) {
+          deregister.delete(certificate.stakeKeyHash);
+        } else {
+          register.add(certificate.stakeKeyHash);
+        }
         break;
       case Cardano.CertificateType.StakeKeyDeregistration:
-        register.delete(certificate.stakeKeyHash);
-        deregister.add(certificate.stakeKeyHash);
+        if (register.has(certificate.stakeKeyHash)) {
+          register.delete(certificate.stakeKeyHash);
+        } else {
+          deregister.add(certificate.stakeKeyHash);
+        }
         break;
     }
   return {
