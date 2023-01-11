@@ -1,4 +1,12 @@
-import { ChainSyncRollBackward, ChainSyncRollForward, PointOrOrigin } from '@cardano-sdk/core';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  ChainSyncEvent,
+  ChainSyncRollBackward,
+  ChainSyncRollForward,
+  Intersection,
+  PointOrOrigin
+} from '@cardano-sdk/core';
+import { CustomError } from 'ts-custom-error';
 import { Observable } from 'rxjs';
 import { ObservableType } from '@cardano-sdk/util-rxjs';
 
@@ -28,15 +36,37 @@ export type ProjectorOperator<
   >
 >;
 
+export type WithBlock = Pick<ChainSyncRollForward, 'block'>;
+export type UnifiedProjectorOperator<ExtraPropsIn, ExtraPropsOut> = ProjectorOperator<
+  ExtraPropsIn,
+  ExtraPropsIn & WithBlock,
+  ExtraPropsOut,
+  ExtraPropsOut
+>;
+export type UnifiedProjectorEvent<ExtraProps> = ProjectorEvent<ExtraProps, ExtraProps & WithBlock>;
+export type UnifiedProjectorObservable<ExtraProps> = ProjectorObservable<ExtraProps, ExtraProps & WithBlock>;
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type OperatorEventType<T extends (...args: any[]) => any> = ReturnType<T> extends (...args: any[]) => any
   ? OperatorEventType<ReturnType<T>>
   : ObservableType<ReturnType<T>>;
 
-// To be used for a higher level projector initialization
 export interface ChainSyncProps {
-  localTip: PointOrOrigin;
+  /**
+   * Sorted tip to origin
+   */
+  points: PointOrOrigin[];
 }
-export interface ProjectorDependencies {
-  chainSync$: Observable<ProjectorEvent>;
+
+export class InvalidIntersectionError extends CustomError {}
+
+export interface ObservableChainSync {
+  chainSync$: Observable<ChainSyncEvent>;
+  intersection: Intersection;
 }
+
+/**
+ * @throws errors with {@link InvalidIntersectionError} when intersection point is not found by the node (probably due
+ * to a rollback). User is expected to handle the rollback and call `chainSync` with another intersection point.
+ */
+export type ObservableChainSyncClient = (props: ChainSyncProps) => Observable<ObservableChainSync>;

@@ -1,7 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
-import { RollForwardEvent } from '../../types';
-import { WithRolledBackEvents } from '../withRolledBackEvents';
-import { projectorOperator } from '../utils';
+import { WithBlock } from '../../types';
+import { unifiedProjectorOperator } from '../utils';
 
 export interface CertificatePointer {
   slot: Cardano.Slot;
@@ -26,7 +25,7 @@ const blockCertificates = ({
     header: { slot },
     body
   }
-}: RollForwardEvent) =>
+}: WithBlock) =>
   body.flatMap(({ body: { certificates = [] } }, txIndex) =>
     certificates.map((certificate, certIndex) => ({
       certificate,
@@ -40,15 +39,8 @@ const blockCertificates = ({
 
 /**
  * Map ChainSyncEvents to a flat array of certificates.
- * Order of certificates on rolled back transactions is reversed.
  */
-export const withCertificates = projectorOperator<{}, WithRolledBackEvents, WithCertificates, WithCertificates>({
-  rollBackward: (evt) => ({
-    ...evt,
-    certificates: evt.rolledBackEvents.flatMap((rolledBackEvt) => blockCertificates(rolledBackEvt).reverse())
-  }),
-  rollForward: (evt) => ({
-    ...evt,
-    certificates: blockCertificates(evt)
-  })
-});
+export const withCertificates = unifiedProjectorOperator<{}, WithCertificates>((evt) => ({
+  ...evt,
+  certificates: blockCertificates(evt)
+}));

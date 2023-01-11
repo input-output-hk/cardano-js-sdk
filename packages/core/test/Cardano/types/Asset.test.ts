@@ -16,6 +16,12 @@ describe('Cardano/types/Asset', () => {
       expect(util.assertIsHexString).toBeCalledWith('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed');
     });
 
+    it('accepts asset id where policy id and asset name are separated with a dot', () => {
+      expect(AssetId('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea.4172b2ed')).toEqual(
+        '0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed'
+      );
+    });
+
     it('does not accept a hex string < 56 chars', () => {
       expect(() => AssetId('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5e')).toThrow();
     });

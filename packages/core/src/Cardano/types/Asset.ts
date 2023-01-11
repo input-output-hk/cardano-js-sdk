@@ -23,10 +23,11 @@ export const AssetName = (value: string): AssetName => {
  * @throws InvalidStringError
  */
 export const AssetId = (value: string): AssetId => {
-  assertIsHexString(value);
-  if (value.length > 120) throw new InvalidStringError('too long');
-  if (value.length < 56) throw new InvalidStringError('too short');
-  return value as unknown as AssetId;
+  const normalizedValue = value.split('.').join('');
+  assertIsHexString(normalizedValue);
+  if (normalizedValue.length > 120) throw new InvalidStringError('too long');
+  if (normalizedValue.length < 56) throw new InvalidStringError('too short');
+  return normalizedValue as unknown as AssetId;
 };
 
 /**
