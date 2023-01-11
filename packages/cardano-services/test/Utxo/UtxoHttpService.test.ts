@@ -239,21 +239,21 @@ describe('UtxoHttpService', () => {
           with: [AddressWith.MultiAsset, AddressWith.AssetWithoutName]
         });
         const res = await provider.utxoByAddresses({ addresses });
-        let txOut: Cardano.TxOut;
+        let txOutWithAssetThatHasNoName: Cardano.TxOut;
 
-        for (const outputs of res) {
-          const assets = outputs[1].value.assets;
+        for (const [_, output] of res) {
+          const assets = output.value.assets;
           if (!assets) continue;
 
-          for (const id of Cardano.AssetId(outputs[1].value.assets!.keys())) {
+          for (const id of assets.keys()) {
             if (Asset.util.assetNameFromAssetId(Cardano.AssetId(id)).toString() === '') {
-              txOut = outputs[1];
+              txOutWithAssetThatHasNoName = output;
             }
           }
         }
 
-        expect(txOut!).toBeDefined();
-        expect(txOut!.value.assets!.size).toBeGreaterThan(0);
+        expect(txOutWithAssetThatHasNoName!).toBeDefined();
+        expect(txOutWithAssetThatHasNoName!.value.assets!.size).toBeGreaterThan(0);
       });
     });
   });
