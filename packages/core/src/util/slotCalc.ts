@@ -82,7 +82,7 @@ export const createSlotTimeCalc = (eraSummaries: EraSummary[]) => {
     }
     return new Date(
       activeEraSummary.start.time.getTime() +
-        (slotNo.valueOf() - activeEraSummary.start.slot) * activeEraSummary.parameters.slotLength
+        (slotNo.valueOf() - activeEraSummary.start.slot) * activeEraSummary.parameters.slotLength.valueOf()
     );
   };
 };

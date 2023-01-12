@@ -3,11 +3,12 @@ import { Block, Lovelace, PoolId, Tip, VrfVkHex } from '../../Cardano';
 // @ts-ignore
 import { CardanoNodeError } from './CardanoNodeErrors';
 import { HealthCheckResponse } from '../../Provider';
+import { Milliseconds } from '../../util';
 
 export interface EraSummary {
   parameters: {
     epochLength: number;
-    slotLength: number;
+    slotLength: Milliseconds;
   };
   start: {
     slot: number;

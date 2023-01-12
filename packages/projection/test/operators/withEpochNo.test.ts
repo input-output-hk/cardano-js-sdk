@@ -1,10 +1,10 @@
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import { Cardano, ChainSyncEventType, Milliseconds } from '@cardano-sdk/core';
 import { RollForwardEvent, UnifiedProjectorEvent, operators } from '../../src';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 
 const eraSummaries = [
   {
-    parameters: { epochLength: 432_000, slotLength: 1000 },
+    parameters: { epochLength: 432_000, slotLength: Milliseconds(1000) },
     start: { slot: 0, time: new Date(1_595_967_616_000) }
   }
 ];
