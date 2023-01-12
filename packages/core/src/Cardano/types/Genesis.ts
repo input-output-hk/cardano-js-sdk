@@ -1,5 +1,6 @@
 import { Lovelace } from './Value';
 import { NetworkId, NetworkMagic } from '../ChainId';
+import { Seconds } from '../../util';
 
 /**
  * A compact (without genesis UTxO) representation of the genesis configuration.
@@ -13,7 +14,7 @@ export interface CompactGenesis {
   epochLength: number;
   slotsPerKesPeriod: number;
   maxKesEvolutions: number;
-  slotLength: number;
+  slotLength: Seconds;
   updateQuorum: number;
   maxLovelaceSupply: Lovelace;
 }

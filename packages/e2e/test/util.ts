@@ -189,7 +189,7 @@ export const runningAgainstLocalNetwork = async () => {
 
   const estimatedTestDurationInEpochs = 4;
   const localNetworkEpochDuration = 1000 * 0.2;
-  const estimatedTestDuration = epochLength * slotLength * estimatedTestDurationInEpochs;
+  const estimatedTestDuration = epochLength * slotLength.valueOf() * estimatedTestDurationInEpochs;
   if (estimatedTestDuration > localNetworkEpochDuration * estimatedTestDurationInEpochs) {
     return false;
   }
