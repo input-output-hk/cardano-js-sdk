@@ -6,7 +6,7 @@ import { createTransactionInternals, ensureValidityInterval } from '../Transacti
 import { defaultSelectionConstraints } from '@cardano-sdk/input-selection';
 
 export interface PrepareTxDependencies {
-  wallet: Pick<ObservableWallet, 'tip$' | 'protocolParameters$' | 'addresses$'> & {
+  wallet: Pick<ObservableWallet, 'tip$' | 'protocolParameters$' | 'addresses$' | 'genesisParameters$'> & {
     delegation: Pick<ObservableWallet['delegation'], 'rewardAccounts$'>;
     utxo: Pick<ObservableWallet['utxo'], 'available$'>;
     syncStatus: Pick<ObservableWallet['syncStatus'], 'isSettled$'>;
@@ -34,11 +34,12 @@ export const createTxPreparer =
         wallet.utxo.available$,
         wallet.protocolParameters$,
         wallet.addresses$,
-        withdrawals$
+        withdrawals$,
+        wallet.genesisParameters$
       ]).pipe(
         take(1),
-        map(([tip, utxo, protocolParameters, [{ address: changeAddress }], withdrawals]) => {
-          const validityInterval = ensureValidityInterval(tip.slot, props.options?.validityInterval);
+        map(([tip, utxo, protocolParameters, [{ address: changeAddress }], withdrawals, genesisParameters]) => {
+          const validityInterval = ensureValidityInterval(tip.slot, genesisParameters, props.options?.validityInterval);
           const constraints = defaultSelectionConstraints({
             buildTx: async (inputSelection, scope) => {
               logger.debug('Building TX for selection constraints', inputSelection);
