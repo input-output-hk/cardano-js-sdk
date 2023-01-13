@@ -1,0 +1,40 @@
+@startuml Event Driven Wallet Backend
+
+actor Wallet
+participant Server
+database DB
+participant Projector
+participant "Cardano Node" as Node
+queue "Task Queue" as Queue
+participant "Projection Worker" as Worker
+
+group Wallet connect
+  Wallet -> Server: connect(addresses, localState: {ledgerTip, lastTx})
+  Server -> DB: transactionExists(lastTx)
+  alt tx exists => no rollback
+    Server -> DB: rewardsSinceBlock(ledgerTip, addresses)
+    Server -> DB: transactionsSinceBlock(ledgerTip, addresses)
+    DB --> Server: response: rewardsSinceBlock: [rewards]
+    DB --> Server: response: transactionsSinceBlock: [tx]
+    Server -> Wallet: <event> {rewards, transactions:{add}}
+  else tx doesn't exist => rollback
+    Server -> Wallet: <event> rollback, please remove last block & reconnect
+  end
+end
+group Synchronous projection
+  Node -> Projector: <event> Chain Sync
+  Projector -> DB: write & notify(extendedBlock)
+  DB -> Server: <event> notify(extendedBlock)
+  Server -> Wallet: <event> {utxo: {add,remove}, transactions:{add,remove}}
+end
+group Asynchronous projection
+  Node -> Projector: <event> Chain Sync
+  Projector -> Queue: insert or delete task
+  Worker -> Queue: getTask()
+  Queue --> Worker: return task
+  Worker -> DB: insert & notify
+  DB -> Server: <event> {metadata: {pool:{id, metadata}}
+  Server -> Wallet: <event> {metadata: {pool:{id, metadata}}
+end
+
+@enduml

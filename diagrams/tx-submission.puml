@@ -1,0 +1,35 @@
+@startuml Transaction Submission
+
+actor Wallet
+participant Server
+database "Transaction Queue" as Queue
+participant "Tx Submission Worker" as Worker
+participant "Cardano Node" as Node
+database "Database" as DB
+participant "Projector" as Projector
+
+Wallet -> Server: submitTx(tx)
+Server -> Queue: addTask(task)
+Queue --> Server: response addTask(task): ok
+Server --> Wallet: response submitTx(tx): phase 0 success
+Server -> Queue: awaitCompletion(task)
+Worker -> Queue: getTask()
+Queue --> Worker: response getTask(): task
+Worker -> Node: submitTx(tx)
+alt phase 1 success
+  Node --> Worker: submitTx(tx): ok
+  Worker -> Queue: completeTask(ok)
+  Queue --> Server: response awaitCompletion(task): success
+  Server -> Wallet: <event> phase 1 success
+  Node -> Projector: <event> Chain Sync
+  Projector -> DB: Insert tx
+  DB -> Server: <event> Notify
+  Server -> Wallet: <event> phase 2 success
+else phase 1 failure
+  Node --> Worker: submitTx(tx): failure
+  Worker -> Queue: completeTask(failure)
+  Queue --> Server: response awaitCompletion(task): failure
+  Server -> Wallet: <event> phase 1 failure
+end
+
+@enduml

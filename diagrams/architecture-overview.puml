@@ -1,0 +1,58 @@
+@startuml Architecture Overview
+
+cloud Infrastructure {
+  [Cardano Node] <-> [Projector] : Chain Sync
+  note bottom of [Cardano Node]
+    Will be using Ogmios as our
+    interface to Cardano Node.
+    Other options could be
+    implemented later.
+  end note
+  note bottom of Projector
+    Follows the chain and projects blocks
+    into application-optimized database.
+  end note
+  database Database {
+    folder "Projected Data" as Data
+    folder "Stability Window Buffer" as Buffer
+    note bottom of Buffer
+      Used to resume projection from last
+      projected tip (find intersection),
+      as well as get rolled back block
+      data to replay it backwards.
+    end note
+    folder "Task Queue" as TaskQueue
+    note bottom of TaskQueue
+      - Jobs to fetch off-chain data,
+      such as token or extended stake
+      pool metadata.
+      - Resource/time-consuming jobs,
+      such as computing stake pool APY.
+    end note
+  }
+  note top of Database
+    Ideally we should use 1 database:
+    if we can atomically write projected
+    data, buffer and tasks, then we
+    can make consistency guarantees
+    without too much effort.
+  end note
+  database "Transaction Queue" as TxQueue
+  [Server] --> [TxQueue] : Submit Tx
+  [Tx Submission Worker] --> [TxQueue] : Process jobs
+  [Tx Submission Worker] --> [Cardano Node] : Submit Tx
+  Database <-- [Projector] : Read & Write
+  [Projection Worker] -> TaskQueue : Process jobs
+  [Projection Worker] --> Data : Insert
+  [Server] <--> Data : Read & Subscribe
+  note top of [Server]
+    Maintains a stateful connection
+    with the Wallet and pushes
+    events with wallet state updates
+  end note
+}
+
+node Wallet
+Wallet <---> [Server] : Wallet state updates
+
+@enduml
