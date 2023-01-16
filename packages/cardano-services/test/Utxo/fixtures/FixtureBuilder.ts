@@ -54,6 +54,6 @@ export class UtxoFixtureBuilder {
       this.#logger.warn(`${desiredQty} distinct addresses desired, only ${resultsQty} results found`);
     }
 
-    return result!.rows.map(({ address }) => Cardano.Address(address));
+    return result!.rows.map(({ address }) => address as unknown as Cardano.Address);
   }
 }

@@ -78,7 +78,7 @@ export class StakePoolFixtureBuilder {
 
     return result.rows.map(({ pool_id, metadata, hash_id, update_id }) => ({
       hashId: Number(hash_id.toString()),
-      id: Cardano.PoolId(pool_id),
+      id: pool_id as unknown as Cardano.PoolId,
       name: metadata?.name,
       ticker: metadata?.ticker,
       updateId: Number(update_id.toString())
@@ -112,6 +112,6 @@ export class StakePoolFixtureBuilder {
       this.#logger.warn(`${desiredQty} pools desired, only ${resultsQty} results found`);
     }
 
-    return result.rows.map(({ pool_id }) => Cardano.PoolId(pool_id));
+    return result.rows.map(({ pool_id }) => pool_id as unknown as Cardano.PoolId);
   }
 }

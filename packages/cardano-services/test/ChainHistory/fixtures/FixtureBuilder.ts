@@ -62,7 +62,7 @@ export class ChainHistoryFixtureBuilder {
     for (const { address } of results.rows) {
       if (addressesInBlockRange.addresses.size >= desiredQty) break;
 
-      addressesInBlockRange.addresses.add(Cardano.Address(address));
+      addressesInBlockRange.addresses.add(address as unknown as Cardano.Address);
     }
 
     if (results.rows.length < desiredQty) {
@@ -70,7 +70,7 @@ export class ChainHistoryFixtureBuilder {
     }
 
     for (const { address, block_no, tx_id } of results.rows) {
-      if (addressesInBlockRange.addresses.has(Cardano.Address(address))) {
+      if (addressesInBlockRange.addresses.has(address as unknown as Cardano.Address)) {
         txIds.add(tx_id);
         addressesInBlockRange.blockRange.lowerBound = Cardano.BlockNo(
           Math.min(addressesInBlockRange.blockRange.lowerBound.valueOf(), block_no)
@@ -95,7 +95,7 @@ export class ChainHistoryFixtureBuilder {
     } else if (resultsQty < desiredQty) {
       this.#logger.warn(`${desiredQty} blocks desired, only ${resultsQty} results found`);
     }
-    return result.rows.map(({ hash }) => Cardano.BlockId(bufferToHexString(hash)));
+    return result.rows.map(({ hash }) => bufferToHexString(hash) as unknown as Cardano.BlockId);
   }
 
   // eslint-disable-next-line sonarjs/cognitive-complexity,complexity
@@ -132,7 +132,7 @@ export class ChainHistoryFixtureBuilder {
     } else if (resultsQty < desiredQty) {
       this.#logger.warn(`${desiredQty} transactions desired, only ${resultsQty} results found`);
     }
-    return result.rows.map(({ hash }) => Cardano.TransactionId(bufferToHexString(hash)));
+    return result.rows.map(({ hash }) => bufferToHexString(hash) as unknown as Cardano.TransactionId);
   }
 
   public async getMultiAssetTxOutIds(desiredQty: number) {
@@ -144,7 +144,7 @@ export class ChainHistoryFixtureBuilder {
   public async getGenesisAddresses() {
     this.#logger.debug('About to fetch genesis addresses');
     const result: QueryResult<{ address: string }> = await this.#db.query(Queries.genesisUtxoAddresses);
-    return result.rows.map(({ address }) => Cardano.Address(address));
+    return result.rows.map(({ address }) => address as unknown as Cardano.Address);
   }
 
   public async getDistinctAddresses(desiredQty: number): Promise<Cardano.Address[]> {
@@ -158,6 +158,6 @@ export class ChainHistoryFixtureBuilder {
     } else if (resultsQty < desiredQty) {
       this.#logger.warn(`${desiredQty} distinct addresses desired, only ${resultsQty} results found`);
     }
-    return result.rows.map(({ address }) => Cardano.Address(address));
+    return result.rows.map(({ address }) => address as unknown as Cardano.Address);
   }
 }

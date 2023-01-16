@@ -34,7 +34,7 @@ export class DbSyncNftMetadataService implements NftMetadataService {
 
     if (!lastMintedTx) return null;
 
-    const lastMintedTxId = Cardano.TransactionId(lastMintedTx.tx_hash.toString('hex'));
+    const lastMintedTxId = lastMintedTx.tx_hash.toString('hex') as unknown as Cardano.TransactionId;
 
     this.#logger.debug('Querying tx metadata', lastMintedTxId);
     const metadatas = await this.#metadataService.queryTxMetadataByHashes([lastMintedTxId]);

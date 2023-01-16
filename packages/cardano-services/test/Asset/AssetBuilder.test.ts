@@ -26,6 +26,8 @@ describe('AssetBuilder', () => {
     test('query last Mint transaction', async () => {
       const assets = await fixtureBuilder.getAssets(1, { with: [AssetWith.CIP25Metadata] });
       const lastMintTx = await fixtureBuilder.queryLastMintTx(assets[0].policyId, assets[0].name);
+      expect(() => Cardano.TransactionId(lastMintTx.tx_hash.toString('hex'))).not.toThrow();
+
       const result = await builder.queryLastMintTx(assets[0].policyId, assets[0].name);
       expect(result.tx_hash).toEqual(lastMintTx.tx_hash);
     });
@@ -39,6 +41,8 @@ describe('AssetBuilder', () => {
     test('query multi_asset', async () => {
       const assets = await fixtureBuilder.getAssets(1, { with: [AssetWith.CIP25Metadata] });
       const ma = await builder.queryMultiAsset(assets[0].policyId, assets[0].name);
+
+      expect(() => Cardano.AssetFingerprint(ma.fingerprint)).not.toThrow();
       expect(ma.fingerprint).toEqual(Cardano.AssetFingerprint.fromParts(assets[0].policyId, assets[0].name).toString());
       expect(ma).toMatchShapeOf({
         fingerprint: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65',

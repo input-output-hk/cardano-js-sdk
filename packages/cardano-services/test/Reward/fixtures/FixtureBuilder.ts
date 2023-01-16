@@ -21,6 +21,6 @@ export class RewardsFixtureBuilder {
     } else if (resultsQty < desiredQty) {
       this.#logger.warn(`${desiredQty} reward accounts desired, only ${resultsQty} results found`);
     }
-    return result.rows.map(({ address }) => Cardano.RewardAccount(address));
+    return result.rows.map(({ address }) => address as unknown as Cardano.RewardAccount);
   }
 }

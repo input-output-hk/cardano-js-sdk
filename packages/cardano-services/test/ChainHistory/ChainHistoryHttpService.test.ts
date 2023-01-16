@@ -168,9 +168,12 @@ describe('ChainHistoryHttpService', () => {
       });
 
       it('returns an array of blocks', async () => {
-        const response = await provider.blocksByHashes({
-          ids: await fixtureBuilder.getBlockHashes(2)
-        });
+        const blockIds = await fixtureBuilder.getBlockHashes(2);
+        const response = await provider.blocksByHashes({ ids: blockIds });
+
+        expect(() => Cardano.BlockId(blockIds[0] as unknown as string)).not.toThrow();
+        expect(() => Cardano.VrfVkBech32(response[0].vrf as unknown as string)).not.toThrow();
+
         expect(response).toHaveLength(2);
       });
 
@@ -227,8 +230,11 @@ describe('ChainHistoryHttpService', () => {
       });
 
       it('returns an array of transactions', async () => {
-        const response = await provider.transactionsByHashes({ ids: await fixtureBuilder.getTxHashes(5) });
+        const ids = await fixtureBuilder.getTxHashes(5);
+        const response = await provider.transactionsByHashes({ ids });
+
         expect(response).toHaveLength(5);
+        expect(() => Cardano.TransactionId(ids[0] as unknown as string)).not.toThrow();
       });
 
       it('does not include transactions not found', async () => {
@@ -298,7 +304,8 @@ describe('ChainHistoryHttpService', () => {
           const tx: Cardano.Tx = response[0];
           expect(response.length).toEqual(1);
           expect(tx.witness).toMatchShapeOf(DataMocks.Tx.witnessRedeemers);
-          expect(tx.witness.redeemers?.length).toBeGreaterThan(0);
+          expect(tx.witness.redeemers!.length).toBeGreaterThan(0);
+          expect(() => Cardano.util.HexBlob(tx.witness.redeemers![0].data as unknown as string)).not.toThrow();
         });
 
         it('has auxiliary data', async () => {
@@ -367,11 +374,13 @@ describe('ChainHistoryHttpService', () => {
       });
 
       it('returns an array of transactions', async () => {
-        const response = await provider.transactionsByAddresses({
-          addresses: await fixtureBuilder.getDistinctAddresses(2),
-          pagination: { limit: 5, startAt: 0 }
-        });
+        const addresses = await fixtureBuilder.getDistinctAddresses(2);
+        const pagination = { limit: 5, startAt: 0 };
+
+        const response = await provider.transactionsByAddresses({ addresses, pagination });
+
         expect(response.pageResults.length).toEqual(5);
+        expect(() => Cardano.Address(addresses[0] as unknown as string)).not.toThrow();
       });
 
       it('does not include transactions not found', async () => {
@@ -407,6 +416,7 @@ describe('ChainHistoryHttpService', () => {
 
         expect(response.totalResultCount).toEqual(txInRangeCount);
         expect(lowerBound).toBeGreaterThanOrEqual(10);
+        expect(() => Cardano.Address([...addresses][0] as unknown as string)).not.toThrow();
         for (const tx of response.pageResults) expect(tx.blockHeader).toMatchShapeOf(DataMocks.Tx.blockHeader);
       });
 
@@ -500,6 +510,8 @@ describe('ChainHistoryHttpService', () => {
 
         it('finds transactions with address within outputs', async () => {
           const addresses: Cardano.Address[] = await fixtureBuilder.getGenesisAddresses();
+          expect(() => Cardano.Address(addresses[0] as unknown as string)).not.toThrow();
+
           const firstPageResponse = await provider.transactionsByAddresses({
             addresses,
             pagination: { limit: 3, startAt: 0 }
