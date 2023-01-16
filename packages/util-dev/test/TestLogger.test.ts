@@ -28,24 +28,32 @@ const getPassThrough = () => {
 };
 
 describe('TestLogger', () => {
-  it('records logged messages', () => {
+  describe('logged message record', () => {
     const logger = createLogger({ env: {}, record: true, stream: toVoid });
 
-    logger.trace({ some: 'data' });
-    logger.debug('Debug string');
-    logger.info('Info content', { answer: 42, data: 'test' });
-    logger.warn('Error which can be ignored', new Error('you can ignore me'));
-    logger.error(new TypeError('test error'), 'with data', { answer: 42, test: 'data' });
-    logger.fatal('FATAL ERROR');
+    it('logged messages are correctly logged', () => {
+      logger.trace({ some: 'data' });
+      logger.debug('Debug string');
+      logger.info('Info content', { answer: 42, data: 'test' });
+      logger.warn('Error which can be ignored', new Error('you can ignore me'));
+      logger.error(new TypeError('test error'), 'with data', { answer: 42, test: 'data' });
+      logger.fatal('FATAL ERROR');
 
-    expect(logger.messages).toStrictEqual([
-      { level: 'trace', message: [{ some: 'data' }] },
-      { level: 'debug', message: ['Debug string'] },
-      { level: 'info', message: ['Info content', { answer: 42, data: 'test' }] },
-      { level: 'warn', message: ['Error which can be ignored', new Error('you can ignore me')] },
-      { level: 'error', message: [new TypeError('test error'), 'with data', { answer: 42, test: 'data' }] },
-      { level: 'fatal', message: ['FATAL ERROR'] }
-    ]);
+      expect(logger.messages).toStrictEqual([
+        { level: 'trace', message: [{ some: 'data' }] },
+        { level: 'debug', message: ['Debug string'] },
+        { level: 'info', message: ['Info content', { answer: 42, data: 'test' }] },
+        { level: 'warn', message: ['Error which can be ignored', new Error('you can ignore me')] },
+        { level: 'error', message: [new TypeError('test error'), 'with data', { answer: 42, test: 'data' }] },
+        { level: 'fatal', message: ['FATAL ERROR'] }
+      ]);
+    });
+
+    it('reset method removes all logged messages', () => {
+      logger.reset();
+
+      expect(logger.messages).toStrictEqual([]);
+    });
   });
 
   it('stringifies all logged types', async () => {

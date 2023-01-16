@@ -29,7 +29,7 @@ export type Logger = { [l in LogLevel]: LogFunction };
  * A unit test dedicated logger. Check
  * https://github.com/input-output-hk/cardano-js-sdk/tree/master/packages/util-dev#testlogger for details.
  */
-export type TestLogger = Logger & { messages: LoggedMessage[] };
+export type TestLogger = Logger & { messages: LoggedMessage[]; reset: () => void };
 
 type TestStream = { columns?: number; isTTY?: boolean; write: Function };
 
@@ -129,8 +129,9 @@ export const createLogger = (options: TestLoggerOptions = {}) => {
   };
 
   const logger = Object.fromEntries((<LoggerEntry[]>Object.entries(logLevels)).map((_) => [_[0], getLogFunction(_)]));
+  const reset = () => <void>(<unknown>(messages.length = 0));
 
-  return <TestLogger>{ messages, ...logger };
+  return <TestLogger>{ messages, reset, ...logger };
 };
 
 /**
