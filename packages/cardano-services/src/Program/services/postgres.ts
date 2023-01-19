@@ -57,7 +57,9 @@ export const getPool = async (
   logger: Logger,
   options?: HttpServerOptions
 ): Promise<Pool | undefined> => {
-  const ssl = options?.postgresSslCaFile ? { ca: loadSecret(options.postgresSslCaFile) } : undefined;
+  const ssl = options?.postgresSslCaFile
+    ? { ca: loadSecret(options.postgresSslCaFile) }
+    : { rejectUnauthorized: false };
   if (options?.postgresConnectionString) return new Pool({ connectionString: options.postgresConnectionString, ssl });
   if (options?.postgresSrvServiceName && options.postgresUser && options.postgresDb && options.postgresPassword) {
     return getPoolWithServiceDiscovery(dnsResolver, logger, {
