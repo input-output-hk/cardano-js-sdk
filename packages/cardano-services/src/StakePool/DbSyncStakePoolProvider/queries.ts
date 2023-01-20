@@ -4,21 +4,21 @@ import { OrderByOptions, SubQuery } from './types';
 import { getStakePoolSortType } from './util';
 
 export const findLastEpoch = `
- SELECT 
+ SELECT
   "no"
  FROM epoch
- ORDER BY no DESC 
+ ORDER BY no DESC
  LIMIT 1
 `;
 
-export const findLastEpochWithData = ` 
-SELECT 
+export const findLastEpochWithData = `
+SELECT
   epoch."no",
   ep.optimal_pool_count
-FROM epoch 
-LEFT JOIN epoch_param ep ON 
+FROM epoch
+LEFT JOIN epoch_param ep ON
   ep.epoch_no = epoch."no"
-ORDER BY no DESC 
+ORDER BY no DESC
 LIMIT 1`;
 
 export const findTotalAda = `
@@ -27,7 +27,7 @@ FROM tx_out AS tx_outer WHERE
 NOT exists
   ( SELECT tx_out.id
   FROM tx_out
-  JOIN tx_in on
+  JOIN tx_in ON
   tx_out.tx_id = tx_in.tx_out_id AND
   tx_out.index = tx_in.tx_out_index
   WHERE tx_outer.id = tx_out.id
@@ -35,113 +35,113 @@ NOT exists
 `;
 
 export const findPoolsMetrics = `
-with current_epoch AS (
+WITH current_epoch AS (
   SELECT
     e."no" AS epoch_no,
-    optimal_pool_count 
+    optimal_pool_count
   FROM epoch e
-  JOIN epoch_param ep on 
+  JOIN epoch_param ep ON
     ep.epoch_no = e."no"
-  order by e.no desc limit 1
+  ORDER BY e.no DESC LIMIT 1
 ),
 blocks_created AS (
-  SELECT 
-    count(1) AS blocks_created,
+  SELECT
+    COUNT(1) AS blocks_created,
     pool_hash.id AS pool_hash_id
-  FROM block 
-    JOIN slot_leader on block.slot_leader_id = slot_leader.id
-    JOIN pool_hash on slot_leader.pool_hash_id = pool_hash.id
-  where pool_hash.id = ANY($1)
+  FROM block
+    JOIN slot_leader ON block.slot_leader_id = slot_leader.id
+    JOIN pool_hash ON slot_leader.pool_hash_id = pool_hash.id
+  WHERE pool_hash.id = ANY($1)
   GROUP BY pool_hash.id
 ),
 pools_delegates AS (
-  SELECT 
+  SELECT
     ph.id AS pool_hash_id,
     sa.id AS addr_id
-  FROM pool_hash ph 
+  FROM pool_hash ph
   JOIN pool_update pu
-        ON pu.id = (
-          SELECT id
-          FROM pool_update pu2
-          WHERE pu2.hash_id = ph.id
-          ORDER BY id DESC
-          LIMIT 1
-        )
-   LEFT JOIN pool_retire pr 
-          ON pr.id = (
-            SELECT id
-            FROM pool_retire pr2
-            WHERE pr2.hash_id = ph.id
-            ORDER BY id desc 
-            LIMIT 1
-      )
-   JOIN stake_address sa ON 
-     sa.id  = pu.reward_addr_id 
-   WHERE (pr.id is null or pr.announced_tx_id < pu.registered_tx_id) and
-       ph.id = ANY($1)
+    ON pu.id = (
+      SELECT id
+      FROM pool_update pu2
+      WHERE pu2.hash_id = ph.id
+      ORDER BY id DESC
+      LIMIT 1
+    )
+  LEFT JOIN pool_retire pr
+    ON pr.id = (
+      SELECT id
+      FROM pool_retire pr2
+      WHERE pr2.hash_id = ph.id
+      ORDER BY id desc
+      LIMIT 1
+    )
+  JOIN stake_address sa ON
+    sa.id  = pu.reward_addr_id
+  WHERE (pr.id is null or pr.announced_tx_id < pu.registered_tx_id) and
+    ph.id = ANY($1)
   ),
   total_rewards_of_reward_acc AS (
-    SELECT 
+    SELECT
       SUM(r.amount) AS amount,
       pd.pool_hash_id
     FROM reward r
-    JOIN pools_delegates pd ON 
+    JOIN pools_delegates pd ON
       pd.addr_id = r.addr_id
     GROUP BY pd.pool_hash_id
   ),
   total_withdraws_of_reward_acc AS (
-    SELECT 
+    SELECT
       SUM(w.amount) AS amount,
       pd.pool_hash_id
     FROM withdrawal w
-    JOIN pools_delegates pd ON 
-      pd.addr_id = w.addr_id 
+    JOIN pools_delegates pd ON
+      pd.addr_id = w.addr_id
     GROUP BY pd.pool_hash_id
   ),
   owners_total_utxos AS (
     SELECT
       sum(tx_out.value) AS amount,
-      pu.hash_id 
+      pu.hash_id
     FROM tx_out
-    JOIN pool_owner o ON 
+    JOIN pool_owner o ON
       o.addr_id = tx_out.stake_address_id
     JOIN pool_update pu ON
       o.pool_update_id = pu.id
       AND pu.hash_id = ANY($1)
-    LEFT JOIN tx_in ON 
-      tx_out.tx_id = tx_in.tx_out_id AND 
+    LEFT JOIN tx_in ON
+      tx_out.tx_id = tx_in.tx_out_id AND
       tx_out.index::smallint = tx_in.tx_out_index::smallint
-    LEFT JOIN tx AS tx_in_tx ON 
+    LEFT JOIN tx AS tx_in_tx ON
       tx_in_tx.id = tx_in.tx_in_id AND
-        tx_in_tx.valid_contract = TRUE
+      tx_in_tx.valid_contract = TRUE
     JOIN tx AS tx_out_tx ON
       tx_out_tx.id = tx_out.tx_id AND
-        tx_out_tx.valid_contract = TRUE
-    WHERE 
+      tx_out_tx.valid_contract = TRUE
+    WHERE
       tx_in_tx.id IS null
-    GROUP BY pu.hash_id 
+    GROUP BY pu.hash_id
   ),
 active_stake AS (
-SELECT 
+SELECT
   sum(es.amount) AS active_stake,
   es.pool_id  AS pool_hash_id
 FROM epoch_stake es
-where es.pool_id = ANY($1) 
+WHERE es.pool_id = ANY($1)
   AND es.epoch_no = (SELECT epoch_no FROM current_epoch)
-GROUP BY es.pool_id 
+GROUP BY es.pool_id
 ),
 active_delegations AS (
-  SELECT 
+  SELECT
     d1.addr_id,
     ph.id AS pool_hash_id
   FROM pool_hash ph
-  JOIN delegation d1 on
-    ph.id = d1.pool_hash_id 
+  JOIN delegation d1 ON
+    ph.id = d1.pool_hash_id
   WHERE ph.id = ANY($1)
    AND NOT EXISTS
      (SELECT TRUE
       FROM delegation d2
-      WHERE d2.addr_id=d1.addr_id 
+      WHERE d2.addr_id=d1.addr_id
         AND d2.tx_id>d1.tx_id)
    AND NOT EXISTS
      (SELECT TRUE
@@ -152,63 +152,63 @@ active_delegations AS (
 delegators AS (
   SELECT
     COUNT(1) AS delegators,
-    d.pool_hash_id 
-  FROM active_delegations d 
-  GROUP BY d.pool_hash_id  
+    d.pool_hash_id
+  FROM active_delegations d
+  GROUP BY d.pool_hash_id
 ),
 total_utxos AS (
-  SELECT 
+  SELECT
     COALESCE(SUM(tx_out.value),0) AS total_amount,
     ad.pool_hash_id
-  FROM active_delegations ad 
-  JOIN tx_out ON 
+  FROM active_delegations ad
+  JOIN tx_out ON
     tx_out.stake_address_id = ad.addr_id
-	LEFT JOIN tx_in ON 
-	  tx_out.tx_id = tx_in.tx_out_id AND 
-	  tx_out.index::smallint = tx_in.tx_out_index::smallint 
-	LEFT JOIN tx AS tx_in_tx ON 
-	  tx_in_tx.id = tx_in.tx_in_id AND
-	tx_in_tx.valid_contract = TRUE
-	JOIN tx AS tx_out_tx ON
-	  tx_out_tx.id = tx_out.tx_id AND
-	  tx_out_tx.valid_contract = TRUE
-	WHERE 
-	  tx_in_tx.id IS NULL
+  LEFT JOIN tx_in ON
+    tx_out.tx_id = tx_in.tx_out_id AND
+    tx_out.index::smallint = tx_in.tx_out_index::smallint
+  LEFT JOIN tx AS tx_in_tx ON
+    tx_in_tx.id = tx_in.tx_in_id AND
+  tx_in_tx.valid_contract = TRUE
+  JOIN tx AS tx_out_tx ON
+    tx_out_tx.id = tx_out.tx_id AND
+    tx_out_tx.valid_contract = TRUE
+  WHERE
+    tx_in_tx.id IS NULL
   GROUP BY ad.pool_hash_id
 ),
 total_rewards AS (
-  SELECT 
+  SELECT
     COALESCE(SUM(r.amount),0) AS total_amount,
     ad.pool_hash_id
-    FROM active_delegations ad 
-    JOIN reward r ON 
-        ad.addr_id = r.addr_id
+    FROM active_delegations ad
+    JOIN reward r ON
+      ad.addr_id = r.addr_id
     WHERE r.spendable_epoch <= (SELECT epoch_no FROM current_epoch)
     GROUP BY ad.pool_hash_id
 ),
 total_withdraws AS (
-  SELECT 
+  SELECT
     COALESCE(SUM(w.amount),0) AS total_amount,
     ad.pool_hash_id
     FROM withdrawal w
-    JOIN tx ON tx.id = w.tx_id AND 
+    JOIN tx ON tx.id = w.tx_id AND
       tx.valid_contract = TRUE
     JOIN active_delegations ad ON ad.addr_id = w.addr_id
     GROUP BY ad.pool_hash_id
 ),
 live_stake AS (
-  SELECT 
+  SELECT
     (total_utxos.total_amount +
     COALESCE(tr.total_amount,0) -
     COALESCE(tw.total_amount,0)) AS live_stake,
     total_utxos.pool_hash_id
   FROM total_utxos
-  LEFT JOIN total_rewards tr on
+  LEFT JOIN total_rewards tr ON
     total_utxos.pool_hash_id = tr.pool_hash_id
-  LEFT JOIN total_withdraws tw on 
+  LEFT JOIN total_withdraws tw ON
     total_utxos.pool_hash_id = tw.pool_hash_id
 )
-SELECT 
+SELECT
  COALESCE(bc.blocks_created,0) AS blocks_created,
  COALESCE(d.delegators,0) AS delegators,
  COALESCE(a_stake.active_stake,0) AS active_stake,
@@ -216,9 +216,9 @@ SELECT
  (COALESCE(tr.amount,0) - COALESCE(tw.amount,0) + COALESCE (otu.amount,0))
  AS live_pledge,
  CASE
-    WHEN $2::numeric = 0::numeric 
+    WHEN $2::numeric = 0::numeric
     THEN 0::numeric
-    ELSE 
+    ELSE
       (
         COALESCE(l_stake.live_stake,0::numeric) *
         ((SELECT optimal_pool_count FROM current_epoch)::NUMERIC) /
@@ -231,101 +231,101 @@ SELECT
     ELSE
     (COALESCE(a_stake.active_stake,0)/COALESCE(l_stake.live_stake,0))
   END AS active_stake_percentage,
-  ph.id AS pool_hash_id 
+  ph.id AS pool_hash_id
 FROM pool_hash ph
-LEFT JOIN blocks_created bc on 
+LEFT JOIN blocks_created bc ON
   bc.pool_hash_id = ph.id
-LEFT JOIN delegators d on 
+LEFT JOIN delegators d ON
   d.pool_hash_id = ph.id
-LEFT JOIN active_stake a_stake on 
+LEFT JOIN active_stake a_stake ON
   a_stake.pool_hash_id = ph.id
-LEFT JOIN live_stake l_stake on 
+LEFT JOIN live_stake l_stake ON
   l_stake.pool_hash_id = ph.id
 LEFT JOIN total_rewards_of_reward_acc AS tr ON
-	tr.pool_hash_id = ph.id
+  tr.pool_hash_id = ph.id
 LEFT JOIN total_withdraws_of_reward_acc AS tw ON
-	tw.pool_hash_id = ph.id
-LEFT JOIN owners_total_utxos otu on 
-	otu.hash_id = ph.id
-where id = ANY($1)
+  tw.pool_hash_id = ph.id
+LEFT JOIN owners_total_utxos otu ON
+  otu.hash_id = ph.id
+WHERE id = ANY($1)
 `;
 
 const epochRewardsSubqueries = (limit?: number) => `
 WITH epochs AS (
-	SELECT 
-	  "no" AS epoch_no,
-		(extract(epoch FROM (end_time - start_time)) * 1000) AS epoch_length
-	FROM epoch
-	ORDER BY no DESC
+  SELECT
+    "no" AS epoch_no,
+    (EXTRACT(EPOCH FROM (end_time - start_time)) * 1000) AS epoch_length
+  FROM epoch
+  ORDER BY no DESC
   ${limit !== undefined ? `LIMIT ${limit}` : ''}
 ),
 pool_rewards_per_epoch AS (
-	SELECT
-		reward.pool_id AS hash_id,
-		epochs.epoch_no,
-		SUM(reward.amount) AS total_amount
-	FROM epochs
-	JOIN reward 
-		ON reward.spendable_epoch = epochs.epoch_no
-		AND reward.pool_id = ANY($1)
+  SELECT
+    reward.pool_id AS hash_id,
+    epochs.epoch_no,
+    SUM(reward.amount) AS total_amount
+  FROM epochs
+  JOIN reward
+    ON reward.spendable_epoch = epochs.epoch_no
+    AND reward.pool_id = ANY($1)
   WHERE reward.type = 'member'
-	GROUP BY reward.pool_id, epochs.epoch_no
+  GROUP BY reward.pool_id, epochs.epoch_no
 ),
 pool_stake_per_epoch AS (
-	SELECT
-		epoch_stake.pool_id AS hash_id,
-		epochs.epoch_no,
+  SELECT
+    epoch_stake.pool_id AS hash_id,
+    epochs.epoch_no,
     SUM(epoch_stake.amount) AS active_stake
-	FROM epochs
-	JOIN epoch_stake 
-		ON epoch_stake.epoch_no = epochs.epoch_no
-		AND epoch_stake.pool_id = ANY($1)
-	GROUP BY epoch_stake.pool_id, epochs.epoch_no
+  FROM epochs
+  JOIN epoch_stake
+    ON epoch_stake.epoch_no = epochs.epoch_no
+    AND epoch_stake.pool_id = ANY($1)
+  GROUP BY epoch_stake.pool_id, epochs.epoch_no
 ),
 epoch_rewards AS (
-	SELECT 
-		epochs.epoch_no,
-		epochs.epoch_length,
-		stake.hash_id,
-		COALESCE(rewards.total_amount, 0) AS total_rewards,
-		COALESCE(stake.active_stake, 0) AS active_stake,		
-		CASE 
-			WHEN pool.fixed_cost >= rewards.total_amount
-	    	THEN COALESCE(rewards.total_amount, 0)
-	    	ELSE (
-	      	COALESCE(
-	      		FLOOR((rewards.total_amount - pool.fixed_cost) * pool.margin) + pool.fixed_cost
-	      	, 0)
-	    	) 
-		END AS operator_fees,
-		CASE 
-			WHEN COALESCE(stake.active_stake, 0) = 0
-				THEN 0
-			WHEN pool.fixed_cost >= rewards.total_amount
-		    THEN (
-		      COALESCE(
-		      	(rewards.total_amount - COALESCE(rewards.total_amount, 0)) / stake.active_stake
-		      , 0)
-		    )
-		    ELSE (
-		      COALESCE(
-						(rewards.total_amount - 
-							COALESCE(
-	      				FLOOR((rewards.total_amount - pool.fixed_cost) * pool.margin) + pool.fixed_cost
-	      			, 0)) / stake.active_stake
-		      , 0)
-		    ) END AS member_roi
-  FROM pool_stake_per_epoch AS stake 
-  JOIN epochs 
-  	ON epochs.epoch_no = stake.epoch_no
+  SELECT
+    epochs.epoch_no,
+    epochs.epoch_length,
+    stake.hash_id,
+    COALESCE(rewards.total_amount, 0) AS total_rewards,
+    COALESCE(stake.active_stake, 0) AS active_stake,
+    CASE
+      WHEN pool.fixed_cost >= rewards.total_amount
+        THEN COALESCE(rewards.total_amount, 0)
+        ELSE (
+          COALESCE(
+            FLOOR((rewards.total_amount - pool.fixed_cost) * pool.margin) + pool.fixed_cost
+          , 0)
+        )
+    END AS operator_fees,
+    CASE
+      WHEN COALESCE(stake.active_stake, 0) = 0
+        THEN 0
+      WHEN pool.fixed_cost >= rewards.total_amount
+        THEN (
+          COALESCE(
+            (rewards.total_amount - COALESCE(rewards.total_amount, 0)) / stake.active_stake
+          , 0)
+        )
+        ELSE (
+          COALESCE(
+            (rewards.total_amount -
+              COALESCE(
+                FLOOR((rewards.total_amount - pool.fixed_cost) * pool.margin) + pool.fixed_cost
+              , 0)) / stake.active_stake
+          , 0)
+        ) END AS member_roi
+  FROM pool_stake_per_epoch AS stake
+  JOIN epochs
+    ON epochs.epoch_no = stake.epoch_no
   LEFT JOIN pool_rewards_per_epoch AS rewards
-  	ON rewards.epoch_no = stake.epoch_no
-  	AND rewards.hash_id = stake.hash_id
+    ON rewards.epoch_no = stake.epoch_no
+    AND rewards.hash_id = stake.hash_id
   JOIN pool_update AS pool
     ON pool.id = (
       SELECT id
       FROM pool_update
-      WHERE hash_id = stake.hash_id 
+      WHERE hash_id = stake.hash_id
         AND active_epoch_no <= epochs.epoch_no
       ORDER BY id DESC
       LIMIT 1
@@ -334,7 +334,7 @@ epoch_rewards AS (
 
 export const findPoolEpochRewards = (limit?: number) => `
   ${epochRewardsSubqueries(limit)}
-  SELECT 
+  SELECT
     epoch_no,
     epoch_length::TEXT,
     hash_id,
@@ -349,14 +349,14 @@ export const findPoolEpochRewards = (limit?: number) => `
 export const findPoolAPY = (limit?: number) => `
   ${epochRewardsSubqueries(limit)},
   avg_daily_roi AS (
-    SELECT 
+    SELECT
       hash_id,
-      SUM(COALESCE(member_roi / NULLIF(epoch_length / 86400000, 0.0), 0.0)) / count(1) AS avg_roi
+      SUM(COALESCE(member_roi / NULLIF(epoch_length / 86400000, 0.0), 0.0)) / COUNT(1) AS avg_roi
     FROM epoch_rewards
     GROUP BY hash_id
   ),
   pool_apy AS (
-    SELECT 
+    SELECT
       epochs.hash_id,
       (
         LEAST(
@@ -365,12 +365,12 @@ export const findPoolAPY = (limit?: number) => `
               1 + (
                 avg_daily_roi.avg_roi * (epochs.epoch_length / 86400000)
               )
-            ):: numeric, 
+            ):: numeric,
             COALESCE(
-              365 / NULLIF(epochs.epoch_length / 86400000, 0), 
+              365 / NULLIF(epochs.epoch_length / 86400000, 0),
               0
             ):: numeric
-          ), 
+          ),
           1E+308
         ) -1
       ):: double precision AS apy
@@ -381,8 +381,8 @@ export const findPoolAPY = (limit?: number) => `
         MAX(epoch_no) AS epoch_no
         FROM epoch_rewards AS sub
         GROUP BY hash_id
-      ) AS max_epoch 
-      ON max_epoch.epoch_no = epochs.epoch_no 
+      ) AS max_epoch
+      ON max_epoch.epoch_no = epochs.epoch_no
       AND max_epoch.hash_id = epochs.hash_id
     JOIN avg_daily_roi
       ON avg_daily_roi.hash_id = epochs.hash_id
@@ -391,7 +391,7 @@ export const findPoolAPY = (limit?: number) => `
 `;
 
 export const findPools = `
-SELECT 
+SELECT
   ph.id,
   pu.id AS update_id
 FROM pool_hash ph
@@ -415,25 +415,25 @@ SELECT
   dns_name,
   dns_srv_name AS hostname --fixme: check this is correct
 FROM pool_relay
-JOIN pool_update 
+JOIN pool_update
   ON pool_relay.update_id = pool_update.id
 WHERE update_id = ANY($1)
 `;
 
 export const findPoolsOwners = `
-SELECT 
- 	address."view" AS address,
-	pool_update.hash_id AS hash_id
+SELECT
+   address."view" AS address,
+  pool_update.hash_id AS hash_id
 FROM pool_owner AS "owner"
 JOIN pool_update
- 	ON "owner".pool_update_id = pool_update.id
+   ON "owner".pool_update_id = pool_update.id
 JOIN stake_address AS address
- 	ON "owner".addr_id = address.id
+   ON "owner".addr_id = address.id
 WHERE pool_update.id = ANY($1)
 `;
 
 export const findPoolsRegistrations = `
-SELECT  
+SELECT
   tx.hash AS tx_hash,
   pu.hash_id AS hash_id,
   active_epoch_no
@@ -445,7 +445,7 @@ ORDER BY pu.id DESC
 `;
 
 export const findPoolsRetirements = `
-SELECT  
+SELECT
   tx.hash AS tx_hash,
   pr.hash_id AS hash_id,
   retiring_epoch
@@ -459,14 +459,14 @@ export const poolsByPledgeMetSubqueries: readonly SubQuery[] = [
   {
     id: { name: 'pools_delegated' },
     query: `
-    SELECT 
+    SELECT
       ph.id,
       ph.view,
       pu.id AS update_id,
       pu.active_epoch_no,
       pu.pledge,
       sa.id AS stake_address_id
-    FROM pool_hash ph 
+    FROM pool_hash ph
     JOIN pool_update pu
       ON pu.id = (
         SELECT id
@@ -474,15 +474,15 @@ export const poolsByPledgeMetSubqueries: readonly SubQuery[] = [
         WHERE pu2.hash_id = ph.id
         ORDER BY id DESC
         LIMIT 1
-      ) 
+      )
     JOIN stake_address sa ON
-      sa.id = pu.reward_addr_id 
-    JOIN delegation d1 on
-      sa.id = d1.addr_id 
+      sa.id = pu.reward_addr_id
+    JOIN delegation d1 ON
+      sa.id = d1.addr_id
     WHERE NOT EXISTS
       (SELECT TRUE
         FROM delegation d2
-        WHERE d2.addr_id=d1.addr_id 
+        WHERE d2.addr_id=d1.addr_id
           AND d2.tx_id>d1.tx_id)
     AND NOT EXISTS
       (SELECT TRUE
@@ -494,12 +494,12 @@ export const poolsByPledgeMetSubqueries: readonly SubQuery[] = [
   {
     id: { name: 'pool_owner_rewards' },
     query: `
-  SELECT 
+  SELECT
     COALESCE(SUM(r.amount),0) AS total_amount,
     sa.id AS stake_address_id,
     r.pool_id
   FROM reward r
-  JOIN stake_address sa ON 
+  JOIN stake_address sa ON
       sa.id = r.addr_id
   WHERE sa.id in (SELECT stake_address_id FROM pools_delegated) and
     r.spendable_epoch <= (SELECT "no" FROM current_epoch)
@@ -507,66 +507,66 @@ export const poolsByPledgeMetSubqueries: readonly SubQuery[] = [
   },
   {
     id: { name: 'pool_owner_withdraws' },
-    query: ` 
-  SELECT 
+    query: `
+  SELECT
     COALESCE(SUM(w.amount),0)  AS total_amount,
     sa.id AS stake_address_id
   FROM withdrawal w
-  JOIN tx ON tx.id = w.tx_id AND 
+  JOIN tx ON tx.id = w.tx_id AND
     tx.valid_contract = TRUE
   JOIN stake_address sa ON sa.id = w.addr_id
-  JOIN pools_delegated pool on pool.stake_address_id = sa.id 
+  JOIN pools_delegated pool ON pool.stake_address_id = sa.id
   GROUP BY sa.id`
   },
   {
     id: { name: 'reward_acc_balance' },
     query: `
-  SELECT 
+  SELECT
     (r.total_amount - w.total_amount)  AS total_amount,
     r.stake_address_id,
-    r.pool_id 
+    r.pool_id
   FROM pool_owner_rewards r
-  JOIN pool_owner_withdraws w 
-    on r.stake_address_id = w.stake_address_id `
+  JOIN pool_owner_withdraws w
+    ON r.stake_address_id = w.stake_address_id `
   },
   {
     id: { name: 'owners_utxo' },
     query: `
   SELECT
     tx_out.value AS value,
-    pu.hash_id 
+    pu.hash_id
   FROM tx_out
-  JOIN pool_owner o ON 
+  JOIN pool_owner o ON
     o.addr_id = tx_out.stake_address_id
   JOIN pool_update pu ON
     o.pool_update_id = pu.id
     AND pu.hash_id IN (SELECT id FROM pools_delegated)
-  LEFT JOIN tx_in ON 
-    tx_out.tx_id = tx_in.tx_out_id AND 
+  LEFT JOIN tx_in ON
+    tx_out.tx_id = tx_in.tx_out_id AND
     tx_out.index::smallint = tx_in.tx_out_index::smallint
-  LEFT JOIN tx AS tx_in_tx ON 
+  LEFT JOIN tx AS tx_in_tx ON
     tx_in_tx.id = tx_in.tx_in_id AND
       tx_in_tx.valid_contract = TRUE
   JOIN tx AS tx_out_tx ON
     tx_out_tx.id = tx_out.tx_id AND
       tx_out_tx.valid_contract = TRUE
-  WHERE 
+  WHERE
     tx_in_tx.id IS NULL`
   },
   {
     id: { name: 'owners_balance' },
     query: `
-  SELECT 
+  SELECT
     SUM(value) AS total_amount,
     hash_id AS pool_hash_id
-  FROM owners_utxo 
+  FROM owners_utxo
   GROUP BY hash_id`
   }
 ];
 
 export const POOLS_WITH_PLEDGE_MET = {
   JOIN_CLAUSE: `
-    LEFT JOIN owners_balance o_balance ON 
+    LEFT JOIN owners_balance o_balance ON
         ph.id = o_balance.pool_hash_id
     LEFT JOIN reward_acc_balance r_balance ON
         r_balance.pool_id = ph.id`,
@@ -575,20 +575,20 @@ export const POOLS_WITH_PLEDGE_MET = {
         ph.id,
         ph.update_id
     FROM pools_delegated AS ph`,
-  WHERE_CLAUSE: (metPledge: boolean) => ` 
+  WHERE_CLAUSE: (metPledge: boolean) => `
     ((COALESCE(o_balance.total_amount,0) +
-    COALESCE (r_balance.total_amount, 0)) 
+    COALESCE (r_balance.total_amount, 0))
     ${metPledge ? ' >=' : '<'} ph.pledge)`,
-  WITH_CLAUSE: `WITH 
+  WITH_CLAUSE: `WITH
     current_epoch AS (${findLastEpoch}),
      ${poolsByPledgeMetSubqueries.map((subQuery) => `${subQuery.id.name} AS (${subQuery.query})`).join(', ')}
       `
 };
 
 export const findPoolsWithPledgeMet = (metPledge: boolean) => `
-  ${POOLS_WITH_PLEDGE_MET.WITH_CLAUSE} 
-  ${POOLS_WITH_PLEDGE_MET.SELECT_CLAUSE} 
-  ${POOLS_WITH_PLEDGE_MET.JOIN_CLAUSE} 
+  ${POOLS_WITH_PLEDGE_MET.WITH_CLAUSE}
+  ${POOLS_WITH_PLEDGE_MET.SELECT_CLAUSE}
+  ${POOLS_WITH_PLEDGE_MET.JOIN_CLAUSE}
   WHERE ${POOLS_WITH_PLEDGE_MET.WHERE_CLAUSE(metPledge)}`;
 
 export const STATUS_QUERY = {
@@ -605,26 +605,26 @@ export const STATUS_QUERY = {
           ORDER BY id DESC
           LIMIT 1
         )
-    LEFT JOIN pool_retire pr 
+    LEFT JOIN pool_retire pr
         ON pr.id = (
           SELECT id
           FROM pool_retire pr2
           WHERE pr2.hash_id = ph.id
-          ORDER BY id desc 
+          ORDER BY id desc
           LIMIT 1
     )
   `,
-  WITH_CLAUSE: `WITH 
+  WITH_CLAUSE: `WITH
   current_epoch AS (${findLastEpoch})`
 };
 
 export const IDENTIFIER_QUERY = {
   JOIN_CLAUSE: {
-    OFFLINE_METADATA: ` 
-    LEFT JOIN pool_offline_data pod 
+    OFFLINE_METADATA: `
+    LEFT JOIN pool_offline_data pod
       ON pod.pool_id = ph.id
     `,
-    POOL_UPDATE: ` 
+    POOL_UPDATE: `
     JOIN pool_update pu
       ON pu.id = (
         SELECT id
@@ -635,19 +635,19 @@ export const IDENTIFIER_QUERY = {
       )`
   },
   SELECT_CLAUSE: `
-  SELECT 
+  SELECT
     ph.id,
     pu.id AS update_id
-  FROM pool_hash ph 
+  FROM pool_hash ph
   `
 };
 
 export const getIdentifierFullJoinClause = () => `
-${IDENTIFIER_QUERY.JOIN_CLAUSE.POOL_UPDATE} 
+${IDENTIFIER_QUERY.JOIN_CLAUSE.POOL_UPDATE}
 ${IDENTIFIER_QUERY.JOIN_CLAUSE.OFFLINE_METADATA}`;
 
 export const findPoolsData = `
-SELECT 
+SELECT
   pu.hash_id,
   ph.hash_raw AS pool_hash,
   pu.id AS update_id,
@@ -658,12 +658,12 @@ SELECT
   pu.fixed_cost,
   pu.margin,
   pu.vrf_key_hash,
-  metadata.url AS metadata_url, 
+  metadata.url AS metadata_url,
   metadata.hash AS metadata_hash,
   pod.json AS offline_data,
   pod.json -> 'name' AS name
 FROM pool_update pu
-JOIN pool_hash ph ON 
+JOIN pool_hash ph ON
   ph.id = pu.hash_id
 JOIN stake_address sa ON
   sa.id = pu.reward_addr_id
@@ -720,22 +720,22 @@ export const getStatusWhereClause = (
   const activeEpochColumn = columns?.activeEpoch || 'pu.active_epoch_no';
   if (status.includes(Cardano.StakePoolStatus.Retiring))
     whereClause.push(
-      `(COALESCE(pr.retiring_epoch,0) > (SELECT "no" FROM current_epoch) 
+      `(COALESCE(pr.retiring_epoch,0) > (SELECT "no" FROM current_epoch)
           AND COALESCE(pr.retiring_epoch,0) > ${activeEpochColumn})`
     );
   if (status.includes(Cardano.StakePoolStatus.Retired))
     whereClause.push(
-      `(COALESCE(pr.retiring_epoch,0) <= (SELECT "no" FROM current_epoch) 
+      `(COALESCE(pr.retiring_epoch,0) <= (SELECT "no" FROM current_epoch)
           AND COALESCE(pr.retiring_epoch,0) > ${activeEpochColumn})`
     );
   if (status.includes(Cardano.StakePoolStatus.Activating))
     whereClause.push(
-      `(${activeEpochColumn} > (SELECT "no" FROM current_epoch) 
+      `(${activeEpochColumn} > (SELECT "no" FROM current_epoch)
           AND COALESCE(pr.retiring_epoch,0) <= ${activeEpochColumn})`
     );
   if (status.includes(Cardano.StakePoolStatus.Active))
     whereClause.push(
-      `(${activeEpochColumn} <= (SELECT "no" FROM current_epoch) 
+      `(${activeEpochColumn} <= (SELECT "no" FROM current_epoch)
           AND COALESCE(pr.retiring_epoch,0) < ${activeEpochColumn})`
     );
   return `(${whereClause.join(' OR ')})`;
@@ -764,7 +764,7 @@ export const buildOrQueryFromClauses = (clauses: SubQuery[]) => {
   });
   const primarySubQueries = clauses.filter((clause) => clause.id.isPrimary);
   return `
-    WITH ${uniqueClauses.map(({ id, query }) => `${id.name} AS (${query})`).join(', ')} 
+    WITH ${uniqueClauses.map(({ id, query }) => `${id.name} AS (${query})`).join(', ')}
     SELECT id, update_id
     FROM
     (${primarySubQueries.map((subQuery) => `SELECT id, update_id FROM ${subQuery.id.name}`).join(' UNION ')})
@@ -775,65 +775,65 @@ export const buildOrQueryFromClauses = (clauses: SubQuery[]) => {
 };
 
 export const getTotalCountQueryFromQuery = (query: string) => `
-SELECT 
+SELECT
   COUNT(1) AS total_count
-FROM (${query}) as query
+FROM (${query}) AS query
 `;
 
 export const findPoolStats = `
 WITH current_epoch AS (
-	SELECT max(epoch_no) AS epoch_no 
-	FROM block
+  SELECT MAX(epoch_no) AS epoch_no
+  FROM block
 ),
 last_pool_update AS (
-	SELECT 
-		pool_update.hash_id,
-		pool_update.registered_tx_id,
-		pool_update.active_epoch_no
-	FROM pool_update 
-	JOIN (
-		SELECT hash_id, max(registered_tx_id) AS tx_id
-		FROM pool_update
-		WHERE active_epoch_no <= (SELECT epoch_no FROM current_epoch)
-		GROUP BY hash_id
-	) AS last_update ON pool_update.hash_id = last_update.hash_id 
-	AND pool_update.registered_tx_id = last_update.tx_id
+  SELECT
+    pool_update.hash_id,
+    pool_update.registered_tx_id,
+    pool_update.active_epoch_no
+  FROM pool_update
+  JOIN (
+    SELECT hash_id, MAX(registered_tx_id) AS tx_id
+    FROM pool_update
+    WHERE active_epoch_no <= (SELECT epoch_no FROM current_epoch)
+    GROUP BY hash_id
+  ) AS last_update ON pool_update.hash_id = last_update.hash_id
+  AND pool_update.registered_tx_id = last_update.tx_id
 ),
 last_pool_retire AS (
-	SELECT 
-		pool_retire.hash_id, 
-		max(pool_retire.announced_tx_id) AS announced_tx_id, 
-		pool_retire.retiring_epoch FROM pool_retire 
-	JOIN (
-		SELECT hash_id, max(retiring_epoch) AS epoch
-		FROM pool_retire
-		GROUP BY hash_id
-	) AS last_retired ON pool_retire.hash_id = last_retired.hash_id 
-	AND pool_retire.retiring_epoch = last_retired.epoch
-	GROUP BY pool_retire.hash_id, pool_retire.retiring_epoch
+  SELECT
+    pool_retire.hash_id,
+    MAX(pool_retire.announced_tx_id) AS announced_tx_id,
+    pool_retire.retiring_epoch FROM pool_retire
+  JOIN (
+    SELECT hash_id, MAX(retiring_epoch) AS epoch
+    FROM pool_retire
+    GROUP BY hash_id
+  ) AS last_retired ON pool_retire.hash_id = last_retired.hash_id
+  AND pool_retire.retiring_epoch = last_retired.epoch
+  GROUP BY pool_retire.hash_id, pool_retire.retiring_epoch
 )
-SELECT 
-	count(
-		CASE WHEN pool_retire.hash_id IS NULL
-			OR (
-				pool_update.active_epoch_no > pool_retire.retiring_epoch
-				AND pool_retire.retiring_epoch <= (SELECT epoch_no FROM current_epoch)
-			) THEN 1 ELSE NULL END) AS active,
-	count(
-		CASE WHEN pool_retire.hash_id IS NOT NULL
-			AND (
-				pool_update.active_epoch_no <= pool_retire.retiring_epoch
-				AND pool_retire.retiring_epoch <= (SELECT epoch_no FROM current_epoch)
-			) THEN 1 ELSE NULL END) AS retired,
-	count(
-		CASE WHEN pool_retire.hash_id IS NOT NULL
-			AND (
-				pool_update.active_epoch_no <= pool_retire.retiring_epoch
-				AND pool_retire.retiring_epoch > (SELECT epoch_no FROM current_epoch)
-			) THEN 1 ELSE NULL END) AS retiring
-FROM last_pool_update AS pool_update 
-LEFT JOIN last_pool_retire AS pool_retire 
-	ON pool_update.hash_id = pool_retire.hash_id`;
+SELECT
+  COUNT(
+    CASE WHEN pool_retire.hash_id IS NULL
+      OR (
+        pool_update.active_epoch_no > pool_retire.retiring_epoch
+        AND pool_retire.retiring_epoch <= (SELECT epoch_no FROM current_epoch)
+      ) THEN 1 ELSE NULL END) AS active,
+  COUNT(
+    CASE WHEN pool_retire.hash_id IS NOT NULL
+      AND (
+        pool_update.active_epoch_no <= pool_retire.retiring_epoch
+        AND pool_retire.retiring_epoch <= (SELECT epoch_no FROM current_epoch)
+      ) THEN 1 ELSE NULL END) AS retired,
+  COUNT(
+    CASE WHEN pool_retire.hash_id IS NOT NULL
+      AND (
+        pool_update.active_epoch_no <= pool_retire.retiring_epoch
+        AND pool_retire.retiring_epoch > (SELECT epoch_no FROM current_epoch)
+      ) THEN 1 ELSE NULL END) AS retiring
+FROM last_pool_update AS pool_update
+LEFT JOIN last_pool_retire AS pool_retire
+  ON pool_update.hash_id = pool_retire.hash_id`;
 
 const sortFieldMapping: Record<string, { field: string; secondary?: string[] }> = {
   cost: { field: 'fixed_cost', secondary: ['margin'] },
