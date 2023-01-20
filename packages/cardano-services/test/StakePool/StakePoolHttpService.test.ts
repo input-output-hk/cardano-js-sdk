@@ -1289,6 +1289,19 @@ describe('StakePoolHttpService', () => {
             expect(firstPageResultSet.pageResults).toEqual(firstPageResultSetCached.pageResults);
             expect(secondPageResultSet.pageResults).toEqual(secondPageResultSetCached.pageResults);
           });
+
+          it('returns only the remaining items in a result set, on the final page when using pagination', async () => {
+            const firstPageOptions = setSortCondition(setPagination({ pagination }, 0, 10), 'asc', 'saturation');
+            const { totalResultCount } = await provider.queryStakePools(firstPageOptions);
+            const secondPageOptions = setSortCondition(
+              setPagination({ pagination }, totalResultCount - 1, 10),
+              'asc',
+              'saturation'
+            );
+            const { pageResults } = await provider.queryStakePools(secondPageOptions);
+
+            expect(pageResults.length).toBe(1);
+          });
         });
 
         describe('sort by APY', () => {

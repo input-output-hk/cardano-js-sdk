@@ -114,21 +114,8 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
     );
     let poolDatas: PoolData[] = [];
     if (sortType !== 'data') {
-      // If queryPoolData is not the one used to sort there could be more stake pools that should be fetched
-      // but might not appear in the orderByQuery result
       this.logger.debug('About to query stake pools data');
       poolDatas = await this.#builder.queryPoolData(orderedResultUpdateIds);
-      // If not reached, try to fill the pagination limit using pool data default order
-      if (options?.pagination?.limit && orderedResult.length < options.pagination.limit) {
-        const restOfPoolUpdateIds = updatesIds.filter((updateId) => !orderedResultUpdateIds.includes(updateId));
-        this.logger.debug('About to query rest of stake pools data');
-        const restOfPoolData = await this.#builder.queryPoolData(restOfPoolUpdateIds, {
-          pagination: { limit: options.pagination.limit - orderedResult.length, startAt: 0 }
-        });
-        poolDatas.push(...restOfPoolData);
-        orderedResultUpdateIds.push(...restOfPoolData.map(({ updateId }) => updateId));
-        orderedResultHashIds.push(...restOfPoolData.map(({ hashId }) => hashId));
-      }
     } else {
       poolDatas = orderedResult as PoolData[];
     }
