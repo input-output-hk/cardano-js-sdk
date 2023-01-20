@@ -29,7 +29,7 @@ const parseReferenceScript = (model: UtxoModel): Cardano.Script => {
         );
       script = {
         __type: Cardano.ScriptType.Plutus,
-        bytes: Cardano.util.HexBlob(model.reference_script_bytes),
+        bytes: model.reference_script_bytes as unknown as Cardano.util.HexBlob,
         version: Cardano.PlutusLanguageVersion.V1
       };
       break;
@@ -41,7 +41,7 @@ const parseReferenceScript = (model: UtxoModel): Cardano.Script => {
         );
       script = {
         __type: Cardano.ScriptType.Plutus,
-        bytes: Cardano.util.HexBlob(model.reference_script_bytes),
+        bytes: model.reference_script_bytes as unknown as Cardano.util.HexBlob,
         version: Cardano.PlutusLanguageVersion.V2
       };
       break;
@@ -75,15 +75,15 @@ export const utxosToCore = (utxosModels: UtxoModel[]): Cardano.Utxo[] => {
       }
       utxos.set(utxoId, [txIn, txOut]);
     } else {
-      const address = Cardano.Address(current.address);
+      const address = current.address as unknown as Cardano.Address;
       const txOut: Cardano.TxOut = {
         address,
         value: {
           coins: BigInt(current.coins)
         }
       };
-      if (isNotNil(current.data_hash)) txOut.datumHash = Cardano.util.Hash32ByteBase16(current.data_hash);
-      if (isNotNil(current.inline_datum)) txOut.datum = Cardano.util.HexBlob(current.inline_datum);
+      if (isNotNil(current.data_hash)) txOut.datumHash = current.data_hash as unknown as Cardano.util.Hash32ByteBase16;
+      if (isNotNil(current.inline_datum)) txOut.datum = current.inline_datum as unknown as Cardano.util.HexBlob;
       if (isNotNil(current.reference_script_type)) txOut.scriptReference = parseReferenceScript(current);
 
       if (isNotNil(current.asset_name) && current.asset_policy && current.asset_quantity) {
@@ -95,7 +95,7 @@ export const utxosToCore = (utxosModels: UtxoModel[]): Cardano.Utxo[] => {
         {
           address,
           index: current.index,
-          txId: Cardano.TransactionId(current.tx_id)
+          txId: current.tx_id as unknown as Cardano.TransactionId
         },
         txOut
       ]);

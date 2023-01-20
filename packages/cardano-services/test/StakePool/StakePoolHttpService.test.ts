@@ -371,6 +371,11 @@ describe('StakePoolHttpService', () => {
           pagination
         };
         const response = await provider.queryStakePools(options);
+
+        expect(() => Cardano.PoolId(poolsInfo[0].id as unknown as string)).not.toThrow();
+        expect(() => Cardano.PoolIdHex(response.pageResults[0].hexId as unknown as string)).not.toThrow();
+        expect(() => Cardano.VrfVkHex(response.pageResults[0].vrf as unknown as string)).not.toThrow();
+
         expect(response.pageResults).toHaveLength(2);
         expect(response.totalResultCount).toEqual(2);
       });
@@ -1153,23 +1158,23 @@ describe('StakePoolHttpService', () => {
           });
 
           describe('positions stake pools with no name registered after named pools, sorted by poolId', () => {
-            let fistNoMetadataPoolId: Cardano.PoolId;
+            let firstNoMetadataPoolId: Cardano.PoolId;
             let secondNoMetadataPoolId: Cardano.PoolId;
             let firstNamedPoolId: Cardano.PoolId;
             let reqOptions: QueryStakePoolsArgs;
 
             beforeAll(async () => {
-              const noMetadata = await fixtureBuilder.getDistinctPoolIds(2, false);
-              const metadata = await fixtureBuilder.getDistinctPoolIds(1, true);
+              const poolsWithoutMeta = await fixtureBuilder.getDistinctPoolIds(2, false);
+              const poolsWithMeta = await fixtureBuilder.getDistinctPoolIds(1, true);
 
-              fistNoMetadataPoolId = noMetadata[0];
-              secondNoMetadataPoolId = noMetadata[1];
-              firstNamedPoolId = metadata[0];
+              firstNoMetadataPoolId = poolsWithoutMeta[0];
+              secondNoMetadataPoolId = poolsWithoutMeta[1];
+              firstNamedPoolId = poolsWithMeta[0];
 
               reqOptions = {
                 filters: {
                   identifier: {
-                    values: [{ id: secondNoMetadataPoolId }, { id: fistNoMetadataPoolId }, { id: firstNamedPoolId }]
+                    values: [{ id: secondNoMetadataPoolId }, { id: firstNoMetadataPoolId }, { id: firstNamedPoolId }]
                   }
                 },
                 pagination
@@ -1177,19 +1182,23 @@ describe('StakePoolHttpService', () => {
             });
 
             it('with name ascending', async () => {
-              const stakePoolIdsSorted = [firstNamedPoolId, fistNoMetadataPoolId, secondNoMetadataPoolId];
+              const stakePoolIdsSorted = [firstNamedPoolId, firstNoMetadataPoolId, secondNoMetadataPoolId];
               const { pageResults } = await provider.queryStakePools({
                 ...reqOptions,
                 sort: { field: 'name', order: 'asc' }
               });
 
+              expect(() => Cardano.PoolId(firstNoMetadataPoolId as unknown as string)).not.toThrow();
+              expect(() =>
+                Cardano.util.Hash32ByteBase16(pageResults[0].metadataJson!.hash as unknown as string)
+              ).not.toThrow();
               expect(pageResults.length).toBeGreaterThan(0);
               expect(pageResults[pageResults.length - 1].metadata?.name).toBeUndefined();
               expect(pageResults.map(({ id }) => id)).toEqual(stakePoolIdsSorted);
             });
 
             it('with name descending', async () => {
-              const stakePoolIdsSorted = [firstNamedPoolId, fistNoMetadataPoolId, secondNoMetadataPoolId];
+              const stakePoolIdsSorted = [firstNamedPoolId, firstNoMetadataPoolId, secondNoMetadataPoolId];
               const { pageResults } = await provider.queryStakePools({
                 ...reqOptions,
                 sort: { field: 'name', order: 'desc' }

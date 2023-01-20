@@ -181,17 +181,17 @@ export const mapPoolData = (poolDataModel: PoolDataModel): PoolData => {
   const toReturn: PoolData = {
     cost: BigInt(poolDataModel.fixed_cost),
     hashId: Number(poolDataModel.hash_id),
-    hexId: Cardano.PoolIdHex(bufferToHexString(poolDataModel.pool_hash)),
-    id: Cardano.PoolId(poolDataModel.pool_id),
+    hexId: bufferToHexString(poolDataModel.pool_hash) as unknown as Cardano.PoolIdHex,
+    id: poolDataModel.pool_id as unknown as Cardano.PoolId,
     margin: { denominator, numerator },
     pledge: BigInt(poolDataModel.pledge),
-    rewardAccount: Cardano.RewardAccount(poolDataModel.reward_address),
+    rewardAccount: poolDataModel.reward_address as unknown as Cardano.RewardAccount,
     updateId: Number(poolDataModel.update_id),
-    vrfKeyHash: Cardano.VrfVkHex(vrfAsHexString)
+    vrfKeyHash: vrfAsHexString as unknown as Cardano.VrfVkHex
   };
   if (poolDataModel.metadata_hash) {
     toReturn.metadataJson = {
-      hash: Cardano.util.Hash32ByteBase16(bufferToHexString(poolDataModel.metadata_hash)),
+      hash: bufferToHexString(poolDataModel.metadata_hash) as unknown as Cardano.util.Hash32ByteBase16,
       url: poolDataModel.metadata_url
     };
   }
@@ -240,20 +240,20 @@ export const mapEpochReward = (epochRewardModel: EpochRewardModel, hashId: numbe
 });
 
 export const mapAddressOwner = (ownerAddressModel: OwnerAddressModel): PoolOwner => ({
-  address: Cardano.RewardAccount(ownerAddressModel.address),
+  address: ownerAddressModel.address as unknown as Cardano.RewardAccount,
   hashId: Number(ownerAddressModel.hash_id)
 });
 
 export const mapPoolRegistration = (poolRegistrationModel: PoolRegistrationModel): PoolRegistration => ({
   activeEpochNo: poolRegistrationModel.active_epoch_no,
   hashId: Number(poolRegistrationModel.hash_id),
-  transactionId: Cardano.TransactionId(bufferToHexString(poolRegistrationModel.tx_hash))
+  transactionId: bufferToHexString(poolRegistrationModel.tx_hash) as unknown as Cardano.TransactionId
 });
 
 export const mapPoolRetirement = (poolRetirementModel: PoolRetirementModel): PoolRetirement => ({
   hashId: Number(poolRetirementModel.hash_id),
   retiringEpoch: poolRetirementModel.retiring_epoch,
-  transactionId: Cardano.TransactionId(bufferToHexString(poolRetirementModel.tx_hash))
+  transactionId: bufferToHexString(poolRetirementModel.tx_hash) as unknown as Cardano.TransactionId
 });
 
 export const mapPoolMetrics = (poolMetricsModel: PoolMetricsModel): PoolMetrics => ({

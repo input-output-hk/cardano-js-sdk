@@ -22,6 +22,7 @@ describe('createDbSyncMetadataService', () => {
     expect(result.size).toEqual(2);
     expect(result.get(hashes[0])).toBeDefined();
     expect(result.get(hashes[1])).toBeDefined();
+    expect(() => Cardano.TransactionId(hashes[0] as unknown as string)).not.toThrow();
   });
 
   test('query transaction metadata with empty array', async () => {

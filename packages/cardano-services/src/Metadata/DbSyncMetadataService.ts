@@ -19,7 +19,7 @@ export const createDbSyncMetadataService = (db: Pool, logger: Logger): TxMetadat
     const metadataMap: Map<Cardano.TransactionId, TxMetadataModel[]> = new Map();
 
     for (const metadata of result.rows) {
-      const txId = Cardano.TransactionId(metadata.tx_id.toString('hex'));
+      const txId = metadata.tx_id.toString('hex') as unknown as Cardano.TransactionId;
       const currentMetadata: TxMetadataModel[] = metadataMap.get(txId) ?? [];
       metadataMap.set(txId, [...currentMetadata, metadata]);
     }

@@ -63,7 +63,7 @@ export const DbSyncProvider = <
 
         const projectedTip: Cardano.Tip = {
           blockNo: Cardano.BlockNo(tip.block_no),
-          hash: Cardano.BlockId(tip.hash.toString('hex')),
+          hash: tip.hash.toString('hex') as unknown as Cardano.BlockId,
           slot: Cardano.Slot(Number(tip.slot_no))
         };
 

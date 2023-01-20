@@ -138,7 +138,7 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
     ]);
 
     return txResults.rows.map((tx) => {
-      const txId = Cardano.TransactionId(tx.id.toString('hex'));
+      const txId = tx.id.toString('hex') as unknown as Cardano.TransactionId;
       const txInputs = orderBy(inputs.filter((input) => input.txInputId === txId).map(mapTxIn), ['index']);
       const txCollaterals = orderBy(collaterals.filter((col) => col.txInputId === txId).map(mapTxIn), ['index']);
       const txOutputs = orderBy(outputs.filter((output) => output.txId === txId).map(mapTxOut), ['index']);

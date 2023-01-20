@@ -87,7 +87,7 @@ export class ChainHistoryBuilder {
     const result: QueryResult<WithdrawalModel> = await this.#db.query(Queries.findWithdrawal, [byteHashes]);
     const withdrawalMap: TransactionDataMap<Cardano.Withdrawal[]> = new Map();
     for (const withdrawal of result.rows) {
-      const txId = Cardano.TransactionId(withdrawal.tx_id.toString('hex'));
+      const txId = withdrawal.tx_id.toString('hex') as unknown as Cardano.TransactionId;
       const currentWithdrawals = withdrawalMap.get(txId) ?? [];
       withdrawalMap.set(txId, [...currentWithdrawals, mapWithdrawal(withdrawal)]);
     }
@@ -102,7 +102,7 @@ export class ChainHistoryBuilder {
     const result: QueryResult<RedeemerModel> = await this.#db.query(Queries.findRedeemer, [byteHashes]);
     const redeemerMap: TransactionDataMap<Cardano.Redeemer[]> = new Map();
     for (const redeemer of result.rows) {
-      const txId = Cardano.TransactionId(redeemer.tx_id.toString('hex'));
+      const txId = redeemer.tx_id.toString('hex') as unknown as Cardano.TransactionId;
       const currentRedeemers = redeemerMap.get(txId) ?? [];
       redeemerMap.set(txId, [...currentRedeemers, mapRedeemer(redeemer)]);
     }
@@ -139,7 +139,7 @@ export class ChainHistoryBuilder {
 
     const indexedCertsMap: TransactionDataMap<WithCertIndex<Cardano.Certificate>[]> = new Map();
     for (const cert of allCerts) {
-      const txId = Cardano.TransactionId(cert.tx_id.toString('hex'));
+      const txId = cert.tx_id.toString('hex') as unknown as Cardano.TransactionId;
       const currentCerts = indexedCertsMap.get(txId) ?? [];
       const newCert = mapCertificate(cert);
       if (newCert) indexedCertsMap.set(txId, [...currentCerts, newCert]);

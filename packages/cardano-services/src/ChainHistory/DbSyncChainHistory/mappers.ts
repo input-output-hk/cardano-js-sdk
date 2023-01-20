@@ -30,8 +30,8 @@ import {
 const addMultiAssetToTokenMap = (multiAsset: MultiAssetModel, tokenMap: Cardano.TokenMap): Cardano.TokenMap => {
   const tokens = new Map(tokenMap);
   const assetId = Asset.util.assetIdFromPolicyAndName(
-    Cardano.PolicyId(multiAsset.policy_id.toString('hex')),
-    Cardano.AssetName(multiAsset.asset_name.toString('hex'))
+    multiAsset.policy_id.toString('hex') as unknown as Cardano.PolicyId,
+    multiAsset.asset_name.toString('hex') as unknown as Cardano.AssetName
   );
   const currentQuantity = tokens.get(assetId) ?? 0n;
   tokens.set(assetId, BigIntMath.sum([currentQuantity, BigInt(multiAsset.quantity)]));
@@ -41,7 +41,7 @@ const addMultiAssetToTokenMap = (multiAsset: MultiAssetModel, tokenMap: Cardano.
 export const mapTxTokenMap = (multiAssetModels: MultiAssetModel[]): TxTokenMap => {
   const txTokenMap: TxTokenMap = new Map();
   for (const multiAsset of multiAssetModels) {
-    const txId = Cardano.TransactionId(multiAsset.tx_id.toString('hex'));
+    const txId = multiAsset.tx_id.toString('hex') as unknown as Cardano.TransactionId;
     const currentTokenMap = txTokenMap.get(txId) ?? new Map();
     const tokenMap = addMultiAssetToTokenMap(multiAsset, currentTokenMap);
     txTokenMap.set(txId, tokenMap);
@@ -66,11 +66,11 @@ export const mapTxIn = (txIn: TxInput): Cardano.HydratedTxIn => ({
 });
 
 export const mapTxInModel = (txInModel: TxInputModel): TxInput => ({
-  address: Cardano.Address(txInModel.address),
+  address: txInModel.address as unknown as Cardano.Address,
   id: txInModel.id,
   index: txInModel.index,
-  txInputId: Cardano.TransactionId(txInModel.tx_input_id.toString('hex')),
-  txSourceId: Cardano.TransactionId(txInModel.tx_source_id.toString('hex'))
+  txInputId: txInModel.tx_input_id.toString('hex') as unknown as Cardano.TransactionId,
+  txSourceId: txInModel.tx_source_id.toString('hex') as unknown as Cardano.TransactionId
 });
 
 export const mapTxOut = (txOut: TxOutput): Cardano.TxOut => ({
@@ -82,10 +82,12 @@ export const mapTxOut = (txOut: TxOutput): Cardano.TxOut => ({
 });
 
 export const mapTxOutModel = (txOutModel: TxOutputModel, assets?: Cardano.TokenMap): TxOutput => ({
-  address: Cardano.Address(txOutModel.address),
-  datumHash: txOutModel.datum ? Cardano.util.Hash32ByteBase16(txOutModel.datum.toString('hex')) : undefined,
+  address: txOutModel.address as unknown as Cardano.Address,
+  datumHash: txOutModel.datum
+    ? (txOutModel.datum.toString('hex') as unknown as Cardano.util.Hash32ByteBase16)
+    : undefined,
   index: txOutModel.index,
-  txId: Cardano.TransactionId(txOutModel.tx_id.toString('hex')),
+  txId: txOutModel.tx_id.toString('hex') as unknown as Cardano.TransactionId,
   value: {
     assets: assets && assets.size > 0 ? assets : undefined,
     coins: BigInt(txOutModel.coin_value)
@@ -94,11 +96,11 @@ export const mapTxOutModel = (txOutModel: TxOutputModel, assets?: Cardano.TokenM
 
 export const mapWithdrawal = (withdrawalModel: WithdrawalModel): Cardano.Withdrawal => ({
   quantity: BigInt(withdrawalModel.quantity),
-  stakeAddress: Cardano.RewardAccount(withdrawalModel.stake_address)
+  stakeAddress: withdrawalModel.stake_address as unknown as Cardano.RewardAccount
 });
 
 export const mapRedeemer = (redeemerModel: RedeemerModel): Cardano.Redeemer => ({
-  data: Cardano.util.HexBlob(redeemerModel.script_hash.toString('hex')),
+  data: redeemerModel.script_hash.toString('hex') as unknown as Cardano.util.HexBlob,
   executionUnits: {
     memory: Number(redeemerModel.unit_mem),
     steps: Number(redeemerModel.unit_steps)
@@ -115,7 +117,7 @@ export const mapCertificate = (
       __typename: Cardano.CertificateType.PoolRetirement,
       cert_index: certModel.cert_index,
       epoch: Cardano.EpochNo(certModel.retiring_epoch),
-      poolId: Cardano.PoolId(certModel.pool_id)
+      poolId: certModel.pool_id as unknown as Cardano.PoolId
     } as WithCertIndex<Cardano.PoolRetirementCertificate>;
 
   if (isPoolRegisterCertModel(certModel))
@@ -131,7 +133,7 @@ export const mapCertificate = (
       cert_index: certModel.cert_index,
       pot: certModel.pot === 'reserve' ? Cardano.MirCertificatePot.Reserves : Cardano.MirCertificatePot.Treasury,
       quantity: BigInt(certModel.amount),
-      rewardAccount: Cardano.RewardAccount(certModel.address)
+      rewardAccount: certModel.address as unknown as Cardano.RewardAccount
     } as WithCertIndex<Cardano.MirCertificate>;
 
   if (isStakeCertModel(certModel))
@@ -140,15 +142,15 @@ export const mapCertificate = (
         ? Cardano.CertificateType.StakeKeyRegistration
         : Cardano.CertificateType.StakeKeyDeregistration,
       cert_index: certModel.cert_index,
-      stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(Cardano.RewardAccount(certModel.address))
+      stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(certModel.address as unknown as Cardano.RewardAccount)
     } as WithCertIndex<Cardano.StakeAddressCertificate>;
 
   if (isDelegationCertModel(certModel))
     return {
       __typename: Cardano.CertificateType.StakeDelegation,
       cert_index: certModel.cert_index,
-      poolId: Cardano.PoolId(certModel.pool_id),
-      stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(Cardano.RewardAccount(certModel.address))
+      poolId: certModel.pool_id as unknown as Cardano.PoolId,
+      stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(certModel.address as unknown as Cardano.RewardAccount)
     } as WithCertIndex<Cardano.StakeDelegationCertificate>;
 
   return null;
@@ -179,7 +181,7 @@ export const mapTxAlonzo = (
       : undefined,
   blockHeader: {
     blockNo: Cardano.BlockNo(txModel.block_no),
-    hash: Cardano.BlockId(txModel.block_hash.toString('hex')),
+    hash: txModel.block_hash.toString('hex') as unknown as Cardano.BlockId,
     slot: Cardano.Slot(Number(txModel.block_slot_no))
   },
   body: {
@@ -195,7 +197,7 @@ export const mapTxAlonzo = (
     },
     withdrawals
   },
-  id: Cardano.TransactionId(txModel.id.toString('hex')),
+  id: txModel.id.toString('hex') as unknown as Cardano.TransactionId,
   index: txModel.index,
   txSize: txModel.size,
   witness: {
@@ -218,16 +220,18 @@ export const mapBlock = (
   fees: BigInt(blockOutputModel?.fees ?? 0),
   header: {
     blockNo: Cardano.BlockNo(blockModel.block_no),
-    hash: Cardano.BlockId(blockModel.hash.toString('hex')),
+    hash: blockModel.hash.toString('hex') as unknown as Cardano.BlockId,
     slot: Cardano.Slot(Number(blockModel.slot_no))
   },
-  nextBlock: blockModel.next_block ? Cardano.BlockId(blockModel.next_block.toString('hex')) : undefined,
-  previousBlock: blockModel.previous_block ? Cardano.BlockId(blockModel.previous_block.toString('hex')) : undefined,
+  nextBlock: blockModel.next_block ? (blockModel.next_block.toString('hex') as unknown as Cardano.BlockId) : undefined,
+  previousBlock: blockModel.previous_block
+    ? (blockModel.previous_block.toString('hex') as unknown as Cardano.BlockId)
+    : undefined,
   size: Cardano.BlockSize(blockModel.size),
   slotLeader: blockModel.slot_leader_pool
     ? Cardano.SlotLeader(blockModel.slot_leader_pool)
     : Cardano.SlotLeader(blockModel.slot_leader_hash.toString('hex')),
   totalOutput: BigInt(blockOutputModel?.output ?? 0),
   txCount: Number(blockModel.tx_count),
-  vrf: Cardano.VrfVkBech32(blockModel.vrf)
+  vrf: blockModel.vrf as unknown as Cardano.VrfVkBech32
 });
