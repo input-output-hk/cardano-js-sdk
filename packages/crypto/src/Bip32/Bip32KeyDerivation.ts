@@ -1,9 +1,10 @@
 import { BN } from 'bn.js';
-import { InvalidArgumentError } from '../errors';
-import { crypto_auth_hmacsha512, crypto_scalarmult_ed25519_base_noclamp } from 'libsodium-wrappers-sumo';
-import { eddsa } from 'elliptic';
-
-const ed25519 = new eddsa('ed25519');
+import { InvalidArgumentError } from '@cardano-sdk/util';
+import {
+  crypto_auth_hmacsha512,
+  crypto_core_ed25519_add,
+  crypto_scalarmult_ed25519_base_noclamp
+} from 'libsodium-wrappers-sumo';
 
 /**
  * Check if the index is hardened.
@@ -78,8 +79,9 @@ const truc28Mul8 = (lhs: Uint8Array, rhs: Uint8Array): Buffer =>
  * @param sk The secret key.
  */
 const pointOfTrunc28Mul8 = (sk: Uint8Array) => {
-  const left = new BN(sk.slice(0, 28), 16, 'le').mul(new BN(8));
-  return ed25519.curve.g.mul(left);
+  const left = new BN(sk.slice(0, 28), 16, 'le').mul(new BN(8)).toArrayLike(Buffer, 'le', 32);
+
+  return crypto_scalarmult_ed25519_base_noclamp(left);
 };
 
 /**
@@ -165,11 +167,10 @@ export const derivePublic = (key: Buffer, index: number): Buffer => {
   const c = crypto_auth_hmacsha512(data, cc);
 
   const chainCode = c.slice(32, 64);
+
   const zl = z.slice(0, 32);
 
   const p = pointOfTrunc28Mul8(zl);
-  const pp = ed25519.decodePoint(pk.toString('hex'));
-  const point = pp.add(p);
 
-  return Buffer.concat([Buffer.from(ed25519.encodePoint(point)), chainCode]);
+  return Buffer.concat([crypto_core_ed25519_add(p, pk), chainCode]);
 };
