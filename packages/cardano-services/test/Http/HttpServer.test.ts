@@ -1,8 +1,17 @@
+/* eslint-disable max-len */
 /* eslint-disable max-params */
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-empty-function */
 
-import { APPLICATION_JSON, CONTENT_TYPE, DbSyncUtxoProvider, HttpServer, HttpService, ServiceNames } from '../../src';
+import {
+  APPLICATION_JSON,
+  CONTENT_TYPE,
+  DbSyncUtxoProvider,
+  HttpServer,
+  HttpService,
+  ServerMetadata,
+  ServiceNames
+} from '../../src';
 import { Cardano, Provider } from '@cardano-sdk/core';
 import { LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
 import { Logger } from 'ts-log';
@@ -466,6 +475,47 @@ describe('HttpServer', () => {
           }
         ]
       });
+    });
+  });
+
+  describe('Server metadata', () => {
+    const metaEndpoint = 'meta';
+
+    afterEach(async () => {
+      await httpServer.shutdown();
+    });
+
+    it('/meta endpoint returns a 200 coded response with a valid metadata', async () => {
+      const meta: ServerMetadata = {
+        extra: JSON.parse(
+          '{"narHash": "sha256-PN60Ot9hQZIwh4LRgnPd8iiq9F3hFNXP7PYVpBlM9TQ=", "path":"/nix/store/i0sgvj906qpzw1bk7h8b3vij0z477ff6-source"}'
+        ),
+        lastModified: 1_666_954_298,
+        lastModifiedDate: '20_221_028_105_138',
+        rev: '65d78fc015bf7bd856c5febe0ba84d3ad18a069c',
+        shortRev: '65d78fc',
+        startupTime: 1_234_566
+      };
+
+      httpServer = new HttpServer(
+        { listen: { host: 'localhost', port }, meta },
+        {
+          logger,
+          runnableDependencies: [cardanoNode],
+          services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)]
+        }
+      );
+
+      await httpServer.initialize();
+      await httpServer.start();
+      await onHttpServer(apiUrlBase);
+
+      const res = await axios.get<ServerMetadata>(`${apiUrlBase}/${metaEndpoint}`, {
+        headers: { [CONTENT_TYPE]: 'application/json' }
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.data).toMatchObject(meta);
     });
   });
 });

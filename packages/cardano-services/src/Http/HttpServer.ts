@@ -1,3 +1,4 @@
+import * as OpenApiValidator from 'express-openapi-validator';
 import { Gauge, Registry } from 'prom-client';
 import { HttpServerConfig, ServiceHealth, ServicesHealthCheckResponse } from './types';
 import { HttpService } from './HttpService';
@@ -9,6 +10,8 @@ import bodyParser from 'body-parser';
 import express from 'express';
 import expressPromBundle from 'express-prom-bundle';
 import http from 'http';
+import path from 'path';
+
 export const CONTENT_TYPE = 'Content-Type';
 export const APPLICATION_JSON = 'application/json';
 
@@ -91,6 +94,7 @@ export class HttpServer extends RunnableModule {
     }
     const requestLogger = contextLogger(this.logger, 'request');
     this.app.use((req, _res, next) => {
+      // eslint-disable-next-line @typescript-eslint/no-shadow
       const { body, method, path, query } = req;
       requestLogger.debug({ body, method, path, query });
       next();
@@ -122,11 +126,22 @@ export class HttpServer extends RunnableModule {
       HttpServer.sendJSON(res, new ProviderError(ProviderFailure.Unhealthy, err), err.status || 500);
     });
 
-    const buildInfo = JSON.parse(process.env.BUILD_INFO ?? '{}');
-    const deploymentInfo = { ...buildInfo, startupDate: new Date() };
-    const metaHandler = (_: express.Request, res: express.Response) => res.json(deploymentInfo);
-    this.app.get('/meta', metaHandler);
-    this.app.post('/meta', metaHandler);
+    const apiSpec = path.join(__dirname, 'openApi.json');
+    this.app.use(
+      OpenApiValidator.middleware({
+        apiSpec,
+        ignoreUndocumented: true,
+        validateRequests: true,
+        validateResponses: true
+      })
+    );
+
+    const serverMetadataHandler = async (req: express.Request, res: express.Response) => {
+      this.logger.debug('/meta', { ip: req.ip });
+      return HttpServer.sendJSON(res, this.#config.meta);
+    };
+
+    this.app.use('/meta', serverMetadataHandler);
   }
 
   static sendJSON<ResponseBody>(

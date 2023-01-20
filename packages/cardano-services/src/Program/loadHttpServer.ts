@@ -7,6 +7,7 @@ import {
   DbSyncNftMetadataService,
   StubTokenMetadataService
 } from '../Asset';
+import { BuildInfo, HttpServer, HttpServerConfig, HttpService } from '../Http';
 import { CardanoNode } from '@cardano-sdk/core';
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../ChainHistory';
 import { CommonProgramOptions, ProgramOptionDescriptions } from './Options';
@@ -16,7 +17,6 @@ import { DbSyncRewardsProvider, RewardsHttpService } from '../Rewards';
 import { DbSyncStakePoolProvider, StakePoolHttpService, createHttpStakePoolExtMetadataService } from '../StakePool';
 import { DbSyncUtxoProvider, UtxoHttpService } from '../Utxo';
 import { DnsResolver, createDnsResolver, shouldInitCardanoNode } from './utils';
-import { HttpServer, HttpServerConfig, HttpService } from '../Http';
 import { InMemoryCache } from '../InMemoryCache';
 import { Logger } from 'ts-log';
 import { MissingProgramOption, MissingServiceDependency, RunnableDependencies, UnknownServiceName } from './errors';
@@ -34,6 +34,7 @@ import pg from 'pg';
 export interface HttpServerOptions extends CommonProgramOptions {
   serviceNames?: ServiceNames[];
   enableMetrics?: boolean;
+  buildInfo?: BuildInfo;
   cardanoNodeConfigPath?: string;
   tokenMetadataCacheTTL?: number;
   tokenMetadataServerUrl?: string;
@@ -210,7 +211,8 @@ export const loadHttpServer = async (args: ProgramArgs, deps: LoadHttpServerDepe
     listen: {
       host: apiUrl.hostname,
       port: Number.parseInt(apiUrl.port)
-    }
+    },
+    meta: { ...options?.buildInfo, startupTime: Date.now() }
   };
   if (options?.enableMetrics) {
     config.metrics = { enabled: options?.enableMetrics };
