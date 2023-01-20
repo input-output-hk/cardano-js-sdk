@@ -27,7 +27,6 @@ import {
   StakePoolStatsModel
 } from './types';
 import { bufferToHexString, isNotNil } from '@cardano-sdk/util';
-import { divideBigIntToFloat } from './util';
 import Fraction from 'fraction.js';
 
 const getPoolStatus = (
@@ -66,11 +65,7 @@ interface ToCoreStakePoolInput {
  * Calculates metrics that depends on Node's retrieved data.
  * Since some metrics are obtained from the Node they have to be calculated outside db queries
  */
-export const calcNodeMetricsValues = (
-  metrics: PoolMetrics['metrics'],
-  { totalAdaAmount, optimalPoolCount = 0 }: NodeMetricsDependencies,
-  apy: number
-): Cardano.StakePoolMetrics => {
+export const calcNodeMetricsValues = (metrics: PoolMetrics['metrics'], apy: number): Cardano.StakePoolMetrics => {
   const { activeStake, liveStake, activeStakePercentage, ...rest } = metrics;
   const stakePoolMetrics = { ...rest, apy } as unknown as Cardano.StakePoolMetrics;
   const isZeroStake = liveStake === 0n;
@@ -84,9 +79,6 @@ export const calcNodeMetricsValues = (
   };
   stakePoolMetrics.size = size;
   stakePoolMetrics.stake = stake;
-  stakePoolMetrics.saturation = Cardano.Percent(
-    Number(divideBigIntToFloat(liveStake * BigInt(optimalPoolCount), totalAdaAmount))
-  );
   return stakePoolMetrics;
 };
 
@@ -103,8 +95,7 @@ export const toStakePoolResults = (
     lastEpochNo,
     poolMetrics,
     totalCount,
-    poolAPYs,
-    nodeMetricsDependencies
+    poolAPYs
   }: ToCoreStakePoolInput
 ): StakePoolResults => {
   const poolsToCache: PoolsToCache = {};
@@ -129,7 +120,7 @@ export const toStakePoolResults = (
           const partialMetrics = poolMetrics.find((metric) => metric.hashId === poolData.hashId)?.metrics;
           let metrics: Cardano.StakePoolMetrics | undefined;
           if (partialMetrics) {
-            metrics = calcNodeMetricsValues(partialMetrics, nodeMetricsDependencies, apy!);
+            metrics = calcNodeMetricsValues(partialMetrics, apy!);
           }
           const coreStakePool: Cardano.StakePool = {
             cost: poolData.cost,

@@ -100,7 +100,7 @@ describe('mappers', () => {
     live_stake: '110000000',
     live_stake_percentage: 0.5,
     pool_hash_id: hash_id,
-    saturation: '0.000_000_8'
+    saturation: '0.0000008'
   };
   const poolAPYModel = {
     apy: 0.015,
@@ -208,12 +208,12 @@ describe('mappers', () => {
   it('calcNodeMetricsValues', () => {
     const metrics = mapPoolMetrics(poolMetricsModel).metrics;
     const apy = poolAPYModel.apy;
-    expect(calcNodeMetricsValues(metrics, nodeMetricsDependencies, apy)).toEqual({
+    expect(calcNodeMetricsValues(metrics, apy)).toEqual({
       apy: 0.015,
       blocksCreated: 20,
       delegators: 88,
       livePledge: 99_999n,
-      saturation: 0.000_000_026_190_473_628_95,
+      saturation: 0.000_000_8,
       size: {
         active: 0.5,
         live: 0.5
@@ -233,7 +233,7 @@ describe('mappers', () => {
     const poolRewards = [mapEpochReward(epochRewardModel, hashId)];
     const partialMetrics = [mapPoolMetrics(poolMetricsModel)];
     const poolAPYs = [mapPoolAPY(poolAPYModel)];
-    const poolMetrics = calcNodeMetricsValues(partialMetrics[0].metrics, nodeMetricsDependencies, poolAPYs[0].apy);
+    const poolMetrics = calcNodeMetricsValues(partialMetrics[0].metrics, poolAPYs[0].apy);
     const stakePool = {
       cost: poolDatas[0].cost,
       epochRewards: poolRewards.map((r) => r.epochReward),
