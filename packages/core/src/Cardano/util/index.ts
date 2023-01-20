@@ -5,4 +5,3 @@ export * from './primitives';
 export * from './txSubmissionErrors';
 export * from './resolveInputValue';
 export * from './address';
-export * from './time';
