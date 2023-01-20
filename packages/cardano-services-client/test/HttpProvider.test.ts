@@ -101,7 +101,7 @@ describe('createHttpServer', () => {
   describe('errors', () => {
     describe('connection errors', () => {
       it('maps ECONNREFUSED and ENOTFOUND to ProviderError{ConnectionFailure}', async () => {
-        const provider = createTxSubmitProviderClient();
+        const provider = createTxSubmitProviderClient({ mapError: jest.fn() });
         try {
           await provider.noArgsEmptyReturn();
           throw new Error('Expected to throw');
@@ -113,15 +113,24 @@ describe('createHttpServer', () => {
           }
         }
       });
-
-      it('calls mapError with null response when request fails', async () => {
-        const provider = createTxSubmitProviderClient({
-          mapError: (error) => {
-            expect(error).toBeNull();
-            return 'error';
-          }
+      it('maps EAI_AGAIN to ProviderError{ConnectionFailure}', async () => {
+        const provider = createHttpProvider<TestProvider>({
+          axiosOptions: {},
+          baseUrl: 'http://some-hostname:3000',
+          logger,
+          mapError: jest.fn(),
+          paths: stubProviderPaths
         });
-        expect(await provider.noArgsEmptyReturn()).toEqual('error');
+        try {
+          await provider.noArgsEmptyReturn();
+          throw new Error('Expected to throw');
+        } catch (error) {
+          if (error instanceof ProviderError) {
+            expect(error.reason).toBe(ProviderFailure.ConnectionFailure);
+          } else {
+            throw new TypeError('Invalid error type');
+          }
+        }
       });
     });
 

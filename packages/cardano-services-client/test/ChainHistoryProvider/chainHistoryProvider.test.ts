@@ -12,7 +12,7 @@ describe('chainHistoryProvider', () => {
   describe('healthCheck', () => {
     it('is not ok if cannot connect', async () => {
       const provider = chainHistoryHttpProvider(config);
-      await expect(provider.healthCheck()).resolves.toEqual({ ok: false });
+      await expect(() => provider.healthCheck()).rejects.toThrow();
     });
   });
   describe('mocked', () => {
