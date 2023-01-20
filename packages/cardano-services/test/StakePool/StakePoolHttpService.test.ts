@@ -1362,6 +1362,13 @@ describe('StakePoolHttpService', () => {
           });
         });
       });
+
+      it('rewardsHistoryLimit is correctly honored', async () => {
+        const noLimitResponse = await provider.queryStakePools({ pagination });
+        const limitOneResponse = await provider.queryStakePools({ pagination, rewardsHistoryLimit: 1 });
+
+        expect(noLimitResponse.pageResults[0].metrics.apy).not.toBe(limitOneResponse.pageResults[0].metrics.apy);
+      });
     });
 
     describe('/stats', () => {

@@ -124,9 +124,9 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
     return { hashesIds, orderedResult, orderedResultHashIds, orderedResultUpdateIds, poolDatas, sortType };
   }
 
-  private cacheStakePools(itemsToCache: { [hashId: number]: Cardano.StakePool }) {
+  private cacheStakePools(itemsToCache: { [hashId: number]: Cardano.StakePool }, rewardsHistoryKey: string) {
     for (const [hashId, pool] of Object.entries(itemsToCache))
-      this.#cache.set(`${IDS_NAMESPACE}/${hashId}`, pool, UNLIMITED_CACHE_TTL);
+      this.#cache.set(`${IDS_NAMESPACE}/${rewardsHistoryKey}/${hashId}`, pool, UNLIMITED_CACHE_TTL);
   }
 
   private async queryExtraPoolsData(
@@ -212,10 +212,11 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
       orderedResultHashIds.map((hashId, idx) => [hashId, orderedResultUpdateIds[idx]])
     );
     // Create a lookup table with cached pools: (hashId:Cardano.StakePool)
+    const rewardsHistoryKey = JSON.stringify(options?.rewardsHistoryLimit);
     const fromCache = Object.fromEntries(
       orderedResultHashIds.map((hashId) => [
         hashId,
-        this.#cache.getVal<Cardano.StakePool>(`${IDS_NAMESPACE}/${hashId}`)
+        this.#cache.getVal<Cardano.StakePool>(`${IDS_NAMESPACE}/${rewardsHistoryKey}/${hashId}`)
       ])
     );
     // Compute ids to fetch from db
@@ -246,7 +247,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
       totalCount
     });
     // Cache stake pools core objects
-    this.cacheStakePools(poolsToCache);
+    this.cacheStakePools(poolsToCache, rewardsHistoryKey);
     return results;
   }
 
