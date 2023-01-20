@@ -79,6 +79,7 @@ module.exports = {
         os: false,
         path: false,
         perf_hooks: false,
+        crypto: require.resolve('crypto-browserify'),
         stream: require.resolve('readable-stream'),
         util: require.resolve('util/')
       }
