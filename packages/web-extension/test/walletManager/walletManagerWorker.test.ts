@@ -3,8 +3,8 @@ import { EMPTY, firstValueFrom } from 'rxjs';
 import { ObservableWallet } from '@cardano-sdk/wallet';
 import { logger } from '@cardano-sdk/util-dev';
 
+import { MinimalRuntime, consumeRemoteApi, exposeApi } from '../../src/messaging';
 import { WalletFactory, WalletManagerWorker, keyAgentChannel } from '../../src';
-import { consumeRemoteApi, exposeApi } from '../../src/messaging';
 
 jest.mock('../../src/messaging', () => {
   const originalModule = jest.requireActual('../../src/messaging');
@@ -29,6 +29,7 @@ describe('WalletManagerWorker', () => {
   let walletManager: WalletManagerWorker;
   let walletFactoryCreate: jest.Mock;
   let mockWallet: ObservableWallet;
+  const runtime: MinimalRuntime = { connect: jest.fn(), onConnect: jest.fn() as any };
 
   const mockStoreA = { destroy: jest.fn().mockReturnValue(EMPTY), id: `${walletId}-A` };
   const mockStoreB = { destroy: jest.fn().mockReturnValue(EMPTY), id: `${walletId}-B` };
@@ -51,7 +52,7 @@ describe('WalletManagerWorker', () => {
       { walletName: 'ccvault' },
       {
         logger,
-        runtime: { connect: jest.fn(), onConnect: jest.fn() as any },
+        runtime,
         storesFactory: {
           create: jest.fn().mockReturnValueOnce(mockStoreA).mockReturnValueOnce(mockStoreB)
         },
@@ -78,6 +79,11 @@ describe('WalletManagerWorker', () => {
       expect(consumeRemoteApiMock.mock.calls[0][0]).toEqual(
         expect.objectContaining({ baseChannel: keyAgentChannel(walletId) })
       );
+    });
+
+    it('uses the configured messenger runtime when consuming apis', async () => {
+      const consumeRemoteApiMock = consumeRemoteApi as jest.Mock;
+      expect(consumeRemoteApiMock.mock.calls[0][1]).toEqual(expect.objectContaining({ runtime }));
     });
 
     it('uses wallet factory to create new wallet', () => {
