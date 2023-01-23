@@ -16,6 +16,7 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 0,
     '@typescript-eslint/no-non-null-assertion': 0,
     '@typescript-eslint/no-shadow': ['error'],
+    '@typescript-eslint/no-unused-expressions': ['error', { allowShortCircuit: true, allowTernary: true }],
     '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
     // needed for inference from type guards
     '@typescript-eslint/no-var-requires': 0,
@@ -40,7 +41,7 @@ module.exports = {
       }
     ],
     'no-shadow': 'off',
-    'no-unused-expressions': 0,
+    'no-unused-expressions': 'off',
     'no-unused-vars': 0,
     'no-useless-constructor': 0,
     'promise/avoid-new': 0,

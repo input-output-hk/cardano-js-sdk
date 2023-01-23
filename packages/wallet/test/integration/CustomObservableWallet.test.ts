@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable sonarjs/no-extra-arguments */
 /* eslint-disable unicorn/consistent-function-scoping */
 import * as mocks from '../mocks';
