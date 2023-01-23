@@ -1,4 +1,4 @@
-import { Cardano, ProviderError, ProviderFailure, SupplySummary } from '@cardano-sdk/core';
+import { Cardano, ProviderError, ProviderFailure, Seconds, SupplySummary } from '@cardano-sdk/core';
 import { CostModelsParamModel, GenesisData, ProtocolParamsModel } from './types';
 import { LedgerTipModel } from '../../util/DbSyncProvider';
 import JSONbig from 'json-bigint';
@@ -102,6 +102,7 @@ export const toProtocolParams = ({
 export const toGenesisParams = (genesis: GenesisData): Cardano.CompactGenesis => ({
   ...genesis,
   networkId: networkIdMap[genesis.networkId],
+  slotLength: Seconds(genesis.slotLength),
   systemStart: new Date(genesis.systemStart)
 });
 

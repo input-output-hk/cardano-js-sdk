@@ -1,10 +1,10 @@
-import { EraSummary } from '@cardano-sdk/core';
+import { EraSummary, Seconds } from '@cardano-sdk/core';
 import { Schema } from '@cardano-ogmios/client';
 
 export const mapEraSummary = (eraSummary: Schema.EraSummary, systemStart: Date): EraSummary => ({
   parameters: {
     epochLength: eraSummary.parameters.epochLength,
-    slotLength: eraSummary.parameters.slotLength * 1000
+    slotLength: Seconds.toMilliseconds(Seconds(eraSummary.parameters.slotLength))
   },
   start: {
     slot: eraSummary.start.slot,

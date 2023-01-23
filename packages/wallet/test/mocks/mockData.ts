@@ -1,4 +1,4 @@
-import { Cardano, EpochRewards } from '@cardano-sdk/core';
+import { Cardano, EpochRewards, Seconds } from '@cardano-sdk/core';
 import { KeyRole } from '@cardano-sdk/key-management';
 
 export const rewardAccount = Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d');
@@ -46,7 +46,7 @@ export const epochRewards = [
 ];
 export const rewardsHistory: Map<Cardano.RewardAccount, EpochRewards[]> = new Map([[rewardAccount, epochRewards]]);
 
-export const genesisParameters = {
+export const genesisParameters: Cardano.CompactGenesis = {
   activeSlotsCoefficient: 0.05,
   epochLength: 432_000,
   maxKesEvolutions: 62,
@@ -54,7 +54,7 @@ export const genesisParameters = {
   networkId: 0,
   networkMagic: 764_824_073,
   securityParameter: 2160,
-  slotLength: 1,
+  slotLength: Seconds(1),
   slotsPerKesPeriod: 129_600,
   systemStart: new Date(1_506_203_091_000),
   updateQuorum: 5

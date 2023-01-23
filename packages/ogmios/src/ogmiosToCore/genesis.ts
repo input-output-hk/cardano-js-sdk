@@ -1,4 +1,4 @@
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, Seconds } from '@cardano-sdk/core';
 import { Schema } from '@cardano-ogmios/client';
 import omit from 'lodash/omit';
 
@@ -10,5 +10,6 @@ export const genesis = (ogmiosGenesis: Schema.CompactGenesis): Cardano.CompactGe
   })(),
   maxLovelaceSupply: BigInt(ogmiosGenesis.maxLovelaceSupply),
   networkId: ogmiosGenesis.network === 'mainnet' ? Cardano.NetworkId.Mainnet : Cardano.NetworkId.Testnet,
+  slotLength: Seconds(ogmiosGenesis.slotLength),
   systemStart: new Date(ogmiosGenesis.systemStart)
 });
