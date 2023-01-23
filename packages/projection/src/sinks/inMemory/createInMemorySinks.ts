@@ -3,6 +3,7 @@ import { InMemoryStabilityWindowBuffer } from './InMemoryStabilityWindowBuffer';
 import { InMemoryStore } from './types';
 import { Sinks } from '../types';
 import { WithNetworkInfo, withStaticContext } from '../../operators';
+import { adaHandles } from './adaHandles';
 import { stakeKeys } from './stakeKeys';
 import { stakePools } from './stakePools';
 
@@ -13,6 +14,7 @@ export const createInMemorySinks = (
   before: withStaticContext({ store }),
   buffer: new InMemoryStabilityWindowBuffer(networkInfo),
   projectionSinks: {
+    adaHandles,
     stakeKeys,
     stakePools
   }

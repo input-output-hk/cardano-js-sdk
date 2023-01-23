@@ -10,6 +10,7 @@ export type InMemoryStore = {
       retirements: PoolRetirement[];
     }
   >;
+  adaHandles: Map<Cardano.Address, string>;
 };
 
 export type WithInMemoryStore = {
