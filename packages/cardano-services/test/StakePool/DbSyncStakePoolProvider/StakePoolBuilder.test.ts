@@ -64,8 +64,8 @@ describe('StakePoolBuilder', () => {
   describe('queryPoolRewards', () => {
     it('queryPoolRewards', async () => {
       const epochRewards = await builder.queryPoolRewards(hashIds);
-      expect(epochRewards).toHaveLength(3);
 
+      expect(epochRewards.filter(({ epochReward: { epoch } }) => epoch === Cardano.EpochNo(12))).toHaveLength(3);
       expect(epochRewards[0]).toMatchShapeOf(DataMocks.Pool.epochReward);
     });
   });

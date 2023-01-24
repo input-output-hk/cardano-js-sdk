@@ -276,16 +276,11 @@ describe('StakePoolHttpService', () => {
 
     describe('/search', () => {
       const url = '/search';
-      const DB_POLL_QUERIES_COUNT = 1;
-      const cachedSubQueriesCount = 5;
-      const cacheKeysCount = 6;
+      const cachedSubQueriesCount = 11;
+      const cacheKeysCount = 7;
       const nonCacheableSubQueriesCount = 1; // getLastEpoch
       const filerOnePoolOptions: QueryStakePoolsArgs = {
-        filters: {
-          identifier: {
-            values: [{ id: Cardano.PoolId('pool1jcwn98a6rqr7a7yakanm5sz6asx9gfjsr343mus0tsye23wmg70') }]
-          }
-        },
+        filters: { identifier: { values: [{ ticker: 'SP1$' }] } },
         pagination
       };
 
@@ -389,7 +384,8 @@ describe('StakePoolHttpService', () => {
       });
 
       it('should query the DB only once when the response is cached', async () => {
-        await provider.queryStakePools(filerOnePoolOptions);
+        const { pageResults } = await provider.queryStakePools(filerOnePoolOptions);
+        expect(pageResults.length).toBe(1);
         expect(dbConnectionQuerySpy).toHaveBeenCalledTimes(cachedSubQueriesCount + nonCacheableSubQueriesCount);
         dbConnectionQuerySpy.mockClear();
         await provider.queryStakePools(filerOnePoolOptions);
@@ -478,7 +474,7 @@ describe('StakePoolHttpService', () => {
           const reqWithRewardsPagination = { pagination: { limit: 1, startAt: 1 }, rewardsHistoryLimit: 0 };
           const responseWithPagination = await provider.queryStakePools(reqWithRewardsPagination);
           const response = await provider.queryStakePools(req);
-          expect(response.pageResults[0].epochRewards.length).toEqual(1);
+          expect(response.pageResults[0].epochRewards.length).toBeGreaterThanOrEqual(1);
           expect(responseWithPagination.pageResults[0].epochRewards.length).toEqual(0);
 
           const responseCached = await provider.queryStakePools(req);
@@ -491,7 +487,7 @@ describe('StakePoolHttpService', () => {
           const reqWithRewardsPagination = { pagination: { limit: 1, startAt: 1 }, rewardsHistoryLimit: 0 };
           const responseWithPagination = await provider.queryStakePools(reqWithRewardsPagination);
           const response = await provider.queryStakePools(req);
-          expect(response.pageResults[0].epochRewards.length).toEqual(1);
+          expect(response.pageResults[0].epochRewards.length).toBeGreaterThanOrEqual(1);
           expect(responseWithPagination.pageResults[0].epochRewards.length).toEqual(0);
 
           const responseCached = await provider.queryStakePools(req);
@@ -502,9 +498,7 @@ describe('StakePoolHttpService', () => {
         it('should cache paginated response', async () => {
           const reqWithPagination: QueryStakePoolsArgs = { pagination: { limit: 3, startAt: 0 } };
           const firstResponseWithPagination = await provider.queryStakePools(reqWithPagination);
-          expect(dbConnectionQuerySpy).toHaveBeenCalledTimes(
-            (cachedSubQueriesCount + nonCacheableSubQueriesCount + DB_POLL_QUERIES_COUNT) * 2
-          );
+          expect(dbConnectionQuerySpy).toHaveBeenCalledTimes(cachedSubQueriesCount + nonCacheableSubQueriesCount);
           dbConnectionQuerySpy.mockClear();
           const secondResponseWithPaginationCached = await provider.queryStakePools(reqWithPagination);
           expect(firstResponseWithPagination.pageResults).toEqual(secondResponseWithPaginationCached.pageResults);
@@ -1125,7 +1119,7 @@ describe('StakePoolHttpService', () => {
         });
       });
 
-      // eslint-disable-next-line complexity
+      // eslint-disable-next-line complexity, unicorn/consistent-function-scoping
       const sortByNameThenByPoolId = (poolA: Cardano.StakePool, poolB: Cardano.StakePool) => {
         if (poolA.metadata?.name && poolB.metadata?.name === '') return 1;
         if (poolB.metadata?.name && poolA.metadata?.name === '') return -1;

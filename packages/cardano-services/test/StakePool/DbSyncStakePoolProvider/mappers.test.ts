@@ -175,7 +175,7 @@ describe('mappers', () => {
     });
   });
   it('mapEpochReward', () => {
-    expect(mapEpochReward(epochRewardModel, hashId)).toEqual({
+    expect(mapEpochReward(epochRewardModel)).toEqual({
       epochReward: {
         activeStake: BigInt(epochRewardModel.active_stake),
         epoch: epochRewardModel.epoch_no,
@@ -185,7 +185,7 @@ describe('mappers', () => {
         memberRewards: BigInt(epochRewardModel.member_rewards),
         pledge: BigInt(epochRewardModel.pledge)
       },
-      hashId
+      hashId: Number(epochRewardModel.hash_id)
     });
   });
   it('mapPoolMetrics', () => {
@@ -233,7 +233,7 @@ describe('mappers', () => {
     const poolRegistrations = [mapPoolRegistration(poolRegistrationModel)];
     const poolRelays = [mapRelay(poolRelayByAddress)];
     const poolRetirements = [mapPoolRetirement(poolRetirementModel)];
-    const poolRewards = [mapEpochReward(epochRewardModel, hashId)];
+    const poolRewards = [mapEpochReward(epochRewardModel)];
     const partialMetrics = [mapPoolMetrics(poolMetricsModel)];
     const poolAPYs = [mapPoolAPY(poolAPYModel)];
     const poolMetrics = calcNodeMetricsValues(partialMetrics[0].metrics, poolAPYs[0].apy);

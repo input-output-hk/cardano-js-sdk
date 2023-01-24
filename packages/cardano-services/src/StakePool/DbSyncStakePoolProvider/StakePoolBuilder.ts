@@ -91,15 +91,12 @@ export class StakePoolBuilder {
 
   public async queryPoolRewards(hashesIds: number[], limit?: number) {
     this.#logger.debug('About to query pool rewards');
-    return Promise.all(
-      hashesIds.map(async (hashId) => {
-        const result: QueryResult<EpochRewardModel> = await this.#db.query(Queries.findPoolEpochRewards(limit), [
-          [hashId]
-        ]);
-        return result.rows.length > 0 ? mapEpochReward(result.rows[0], hashId) : undefined;
-      })
-    );
+
+    const result = await this.#db.query<EpochRewardModel>(Queries.findPoolEpochRewards(limit), [hashesIds]);
+
+    return result.rows.map(mapEpochReward);
   }
+
   public async queryPoolAPY(hashesIds: number[], options?: QueryPoolsApyArgs): Promise<PoolAPY[]> {
     this.#logger.debug('About to query pools APY');
     const defaultSort: OrderByOptions[] = [{ field: 'apy', order: 'desc' }];
