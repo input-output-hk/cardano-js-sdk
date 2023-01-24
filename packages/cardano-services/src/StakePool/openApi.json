@@ -237,23 +237,26 @@
       "EpochRewards": {
         "type": "object",
         "properties": {
-          "epochLength": {
-            "type": "number"
+          "activeStake": {
+            "$ref": "#/components/schemas/BigInt"
           },
           "epoch": {
             "type": "number"
           },
-          "activeStake": {
-            "$ref": "#/components/schemas/BigInt"
+          "epochLength": {
+            "type": "number"
           },
-          "totalRewards": {
-            "$ref": "#/components/schemas/BigInt"
-          },
-          "operatorFees": {
+          "leaderRewards": {
             "$ref": "#/components/schemas/BigInt"
           },
           "memberROI": {
             "type": "number"
+          },
+          "memberRewards": {
+            "$ref": "#/components/schemas/BigInt"
+          },
+          "pledge": {
+            "$ref": "#/components/schemas/BigInt"
           }
         }
       },

@@ -232,9 +232,10 @@ export const mapEpochReward = (epochRewardModel: EpochRewardModel, hashId: numbe
     activeStake: BigInt(epochRewardModel.active_stake),
     epoch: Cardano.EpochNo(epochRewardModel.epoch_no),
     epochLength: Number(epochRewardModel.epoch_length),
+    leaderRewards: BigInt(epochRewardModel.leader_rewards),
     memberROI: Cardano.Percent(epochRewardModel.member_roi),
-    operatorFees: BigInt(epochRewardModel.operator_fees),
-    totalRewards: BigInt(epochRewardModel.total_rewards)
+    memberRewards: BigInt(epochRewardModel.member_rewards),
+    pledge: BigInt(epochRewardModel.pledge)
   },
   hashId
 });

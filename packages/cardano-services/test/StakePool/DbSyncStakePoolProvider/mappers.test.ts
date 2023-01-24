@@ -87,9 +87,11 @@ describe('mappers', () => {
     active_stake: '10000000',
     epoch_length: '10000000',
     epoch_no: 2,
+    hash_id: 1,
+    leader_rewards: '200000',
+    member_rewards: '300000',
     member_roi: 0.000_000_05,
-    operator_fees: '233333333',
-    total_rewards: '99999'
+    pledge: '1000000'
   };
   const poolMetricsModel = {
     active_stake: '100000000',
@@ -178,9 +180,10 @@ describe('mappers', () => {
         activeStake: BigInt(epochRewardModel.active_stake),
         epoch: epochRewardModel.epoch_no,
         epochLength: Number(epochRewardModel.epoch_length),
+        leaderRewards: BigInt(epochRewardModel.leader_rewards),
         memberROI: epochRewardModel.member_roi,
-        operatorFees: BigInt(epochRewardModel.operator_fees),
-        totalRewards: BigInt(epochRewardModel.total_rewards)
+        memberRewards: BigInt(epochRewardModel.member_rewards),
+        pledge: BigInt(epochRewardModel.pledge)
       },
       hashId
     });

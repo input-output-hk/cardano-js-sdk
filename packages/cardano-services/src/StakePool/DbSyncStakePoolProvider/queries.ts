@@ -259,17 +259,31 @@ WITH epochs AS (
   ORDER BY no DESC
   ${limit !== undefined ? `LIMIT ${limit}` : ''}
 ),
-pool_rewards_per_epoch AS (
+pool_mixed_rewards_per_epoch AS (
   SELECT
     reward.pool_id AS hash_id,
     epochs.epoch_no,
-    SUM(reward.amount) AS total_amount
+    reward.type,
+    SUM(reward.amount) AS amount
   FROM epochs
   JOIN reward
-    ON reward.spendable_epoch = epochs.epoch_no
+    ON reward.earned_epoch = epochs.epoch_no
     AND reward.pool_id = ANY($1)
-  WHERE reward.type = 'member'
-  GROUP BY reward.pool_id, epochs.epoch_no
+  WHERE reward.type IN ('leader', 'member')
+  GROUP BY reward.pool_id, epochs.epoch_no, reward.type
+),
+pool_rewards_per_epoch AS (
+  SELECT
+    leader.hash_id,
+    leader.epoch_no,
+    leader.amount AS leader_rewards,
+    member.amount AS member_rewards
+  FROM pool_mixed_rewards_per_epoch AS leader
+  JOIN pool_mixed_rewards_per_epoch AS member
+    ON leader.hash_id = member.hash_id
+    AND leader.epoch_no = member.epoch_no
+  WHERE leader.type = 'leader'
+    AND member.type = 'member'
 ),
 pool_stake_per_epoch AS (
   SELECT
@@ -287,34 +301,11 @@ epoch_rewards AS (
     epochs.epoch_no,
     epochs.epoch_length,
     stake.hash_id,
-    COALESCE(rewards.total_amount, 0) AS total_rewards,
+    COALESCE(rewards.leader_rewards, 0) AS leader_rewards,
+    COALESCE(rewards.member_rewards, 0) AS member_rewards,
     COALESCE(stake.active_stake, 0) AS active_stake,
-    CASE
-      WHEN pool.fixed_cost >= rewards.total_amount
-        THEN COALESCE(rewards.total_amount, 0)
-        ELSE (
-          COALESCE(
-            FLOOR((rewards.total_amount - pool.fixed_cost) * pool.margin) + pool.fixed_cost
-          , 0)
-        )
-    END AS operator_fees,
-    CASE
-      WHEN COALESCE(stake.active_stake, 0) = 0
-        THEN 0
-      WHEN pool.fixed_cost >= rewards.total_amount
-        THEN (
-          COALESCE(
-            (rewards.total_amount - COALESCE(rewards.total_amount, 0)) / stake.active_stake
-          , 0)
-        )
-        ELSE (
-          COALESCE(
-            (rewards.total_amount -
-              COALESCE(
-                FLOOR((rewards.total_amount - pool.fixed_cost) * pool.margin) + pool.fixed_cost
-              , 0)) / stake.active_stake
-          , 0)
-        ) END AS member_roi
+    pool.pledge,
+    COALESCE(rewards.member_rewards / (stake.active_stake - pool.pledge), 0)::DOUBLE PRECISION AS member_roi
   FROM pool_stake_per_epoch AS stake
   JOIN epochs
     ON epochs.epoch_no = stake.epoch_no
@@ -335,13 +326,14 @@ epoch_rewards AS (
 export const findPoolEpochRewards = (limit?: number) => `
   ${epochRewardsSubqueries(limit)}
   SELECT
-    epoch_no,
-    epoch_length::TEXT,
-    hash_id,
-    total_rewards,
     active_stake,
-    operator_fees,
-    member_roi
+    epoch_length::TEXT,
+    epoch_no,
+    hash_id,
+    leader_rewards,
+    member_rewards,
+    member_roi,
+    pledge
   FROM epoch_rewards
   ORDER BY epoch_no desc
 `;
