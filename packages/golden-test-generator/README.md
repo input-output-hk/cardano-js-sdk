@@ -6,11 +6,11 @@ module is structured to offer access as libraries.
 ## Download or Build
 Builds are attached as artifacts from the GitHub workflow runs, otherwise run
 
-``` console
+```bash
 yarn pkg
 ```
 
 ## Run
-```console
+```bash
 ./build/golden-test-generator-{ linux | macos } --help
 ```
