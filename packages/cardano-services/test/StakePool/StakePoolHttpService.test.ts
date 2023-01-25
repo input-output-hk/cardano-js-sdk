@@ -10,7 +10,7 @@ import {
   StakePoolProvider
 } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, stakePoolHttpProvider } from '../../../cardano-services-client';
-import { DbSyncEpochPollService } from '../../src/util';
+import { DbSyncEpochPollService, loadGenesisData } from '../../src/util';
 import {
   DbSyncStakePoolProvider,
   HttpServer,
@@ -34,7 +34,7 @@ import axios from 'axios';
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
 const APPLICATION_CBOR = 'application/cbor';
 const APPLICATION_JSON = 'application/json';
-
+const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
 const pagination = { limit: 10, startAt: 0 };
 const BAD_REQUEST = 'Request failed with status code 400';
 
@@ -201,9 +201,11 @@ describe('StakePoolHttpService', () => {
           withTip: true
         })
       ) as unknown as OgmiosCardanoNode;
+      const genesisData = await loadGenesisData(cardanoNodeConfigPath);
+      const metadataService = createHttpStakePoolExtMetadataService(logger);
       stakePoolProvider = new DbSyncStakePoolProvider(
         { paginationPageSizeLimit: pagination.limit },
-        { cache, cardanoNode, db, epochMonitor, logger, metadataService: createHttpStakePoolExtMetadataService(logger) }
+        { cache, cardanoNode, db, epochMonitor, genesisData, logger, metadataService }
       );
       service = new StakePoolHttpService({ logger, stakePoolProvider });
       httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });

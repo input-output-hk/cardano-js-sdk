@@ -8,13 +8,11 @@ import {
   StakePoolStats
 } from '@cardano-sdk/core';
 import { CommonPoolInfo, OrderedResult, PoolAPY, PoolData, PoolMetrics, PoolSortType, PoolUpdate } from './types';
-import { DbSyncProvider, DbSyncProviderDependencies } from '../../util/DbSyncProvider';
-import { Disposer, EpochMonitor } from '../../util/polling/types';
+import { DbSyncProvider, DbSyncProviderDependencies, Disposer, EpochMonitor } from '../../util';
+import { GenesisData, InMemoryCache, StakePoolExtMetadataService, UNLIMITED_CACHE_TTL } from '../..';
 import { IDS_NAMESPACE, StakePoolsSubQuery, emptyPoolsExtraInfo, getStakePoolSortType, queryCacheKey } from './util';
-import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../InMemoryCache';
 import { RunnableModule, isNotNil } from '@cardano-sdk/util';
 import { StakePoolBuilder } from './StakePoolBuilder';
-import { StakePoolExtMetadataService } from '../types';
 import { toStakePoolResults } from './mappers';
 
 /**
@@ -35,10 +33,17 @@ export interface StakePoolProviderDependencies extends DbSyncProviderDependencie
    *The in memory cache engine.
    */
   cache: InMemoryCache;
+
   /**
    * Monitor the epoch rollover through db polling.
    */
   epochMonitor: EpochMonitor;
+
+  /**
+   * The genesis data loaded from the genesis file.
+   */
+  genesisData: GenesisData;
+
   /**
    * The Stake Pool extended metadata service.
    */
