@@ -157,8 +157,7 @@ const mapBlock = <R>(
 /**
  * Extract block header from `Ogmios` block
  *
- * @returns
- *   - {Cardano.PartialBlockHeader} compact block header.
+ * @returns {Cardano.PartialBlockHeader} compact block header.
  *   - `null` if `block` is the ByronEpochBoundaryBlock. This block can be skipped.
  */
 export const blockHeader = (ogmiosBlock: Schema.Block): Cardano.PartialBlockHeader | null =>
@@ -168,9 +167,8 @@ export const blockHeader = (ogmiosBlock: Schema.Block): Cardano.PartialBlockHead
  * Translate `Ogmios` block to `Cardano.BlockMinimal`
  *
  * @param ogmiosBlock the block to translate into a `Cardano.BlockMinimal`
- * @returns
- *   - {Cardano.BlockMinimal} a minimal block type encompassing information extracted from Ogmios block type.
- *   - `null` if `block` is the ByronEpochBoundaryBlock. This block can be skipped.
+ * @returns {Cardano.BlockMinimal} a minimal block type encompassing information extracted from Ogmios block type.
+ *  - `null` if `block` is the ByronEpochBoundaryBlock. This block can be skipped.
  */
 export const block = (ogmiosBlock: Schema.Block): Cardano.Block | null =>
   mapBlock<Cardano.Block>(ogmiosBlock, mapByronBlock, mapCommonBlock);

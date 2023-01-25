@@ -86,7 +86,7 @@ const getConfig = (env: NodeJS.ProcessEnv, stream?: TestStream) => {
 /**
  * Creates a new TestLogger
  *
- * @param options If { record: true }, all logged values are recorded in logger.messages
+ * @param options If `record` is equal to `true`, all logged values are recorded in logger.messages
  * @returns the newly created TestLogger
  */
 export const createLogger = (options: TestLoggerOptions = {}) => {

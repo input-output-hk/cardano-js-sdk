@@ -6,7 +6,7 @@ export interface MarkerDetail<T> {
 }
 
 export interface MeasurementData {
-  /** Stats for targets added with {@link addMeasureMarker} */
+  /** Stats for targets added with {@link MeasurementUtil.addMeasureMarker} */
   time?: {
     total: number;
     min: number;
@@ -14,7 +14,7 @@ export interface MeasurementData {
     avg: number;
   }; // only for measurement markers done with `addMeasureMarker`
 
-  /** The number of times {@link addStartMarker} was called for a target */
+  /** The number of times {@link MeasurementUtil.addStartMarker} was called for a target */
   calls_count: number;
 }
 
@@ -60,24 +60,24 @@ export class MeasurementUtil<T extends string> {
 
   /**
    * Add a stop time marker in the timeline.
-   * Useful when the {@link addMeasureMarker} is done separately/later than the start&stop markers.
+   * Useful when the {@link MeasurementUtil.addMeasureMarker} is done separately/later than the start&stop markers.
    * In that case, the measurement is done from startMarker to stopMarker, instead of startMarker to measurementMarker.
    *
-   * @param target same as {@link addStartMarker}
-   * @param id same as {@link addStartMarker}
+   * @param target same as {@link MeasurementUtil.addStartMarker}
+   * @param id same as {@link MeasurementUtil.addStartMarker}
    */
   addStopMarker(target: T, id: number): void {
     performance.mark(this.#getStopLabel(target, id));
   }
 
   /**
-   * Adds a measurement marker in the timeline for {@link target} with {@link id}.
-   * It measures the time since {@link addStartMarker} with the same `target` and `id` was called.
-   * If {@link useStopMarker} is specified, it measures the time between {@link addStartMarker} and
+   * Adds a measurement marker in the timeline for `target` with `id`.
+   * It measures the time since {@link MeasurementUtil.addStartMarker} with the same `target` and `id` was called.
+   * If `useStopMarker` is specified, it measures the time between {@link MeasurementUtil.addStartMarker} and
    * {@link addStopMarker} called with the same `target` and `id`.
    *
-   * @param target same as {@link addStartMarker}
-   * @param id same as {@link addStartMarker}
+   * @param target same as {@link MeasurementUtil.addStartMarker}
+   * @param id same as {@link MeasurementUtil.addStartMarker}
    * @param useStopMarker Values:
    *   - `false | undefined`: Measure from start marker until this measure marker.
    *   - `true`: Measure from start marker until the associated stop marker.
@@ -92,10 +92,10 @@ export class MeasurementUtil<T extends string> {
   }
 
   /**
-   * Calculates statistics for all {@link targets} added with {@link addMeasureMarker}.
+   * Calculates statistics for all `targets` added with {@link MeasurementUtil.addMeasureMarker}.
    *
    * @param targets an array of user defined strings for which measurement markers were added.
-   * @returns a record indexed with the `target` and having as value a {@link @MeasurementData} object.
+   * @returns a record indexed with the `target` and having as value a {@link MeasurementData} object.
    */
   getMeasurements(targets: T[]): MeasurementResults<T> {
     const measurementData: Record<T, MeasurementData> = {} as Record<T, MeasurementData>;
