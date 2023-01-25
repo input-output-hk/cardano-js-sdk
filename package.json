@@ -16,7 +16,7 @@
     "reinstall": "yarn workspaces foreach -v run cleanup:nm && yarn install",
     "rebuild": "yarn workspaces foreach -v run cleanup:dist && yarn workspaces foreach -v run build",
     "predocs": "yarn build",
-    "docs:typedoc": "typedoc --entryPointStrategy packages .",
+    "docs:typedoc": "typedoc",
     "docs:coverage:build": "yarn workspaces foreach -v run coverage",
     "docs:coverage:collect": "node collectCoverage.mjs",
     "docs:coverage": "run-s docs:coverage:build docs:coverage:collect",
