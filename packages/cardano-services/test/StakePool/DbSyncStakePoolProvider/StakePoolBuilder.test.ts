@@ -13,6 +13,7 @@ describe('StakePoolBuilder', () => {
   });
   const pagination = { limit: PAGINATION_PAGE_SIZE_LIMIT_DEFAULT, startAt: 0 };
   const builder = new StakePoolBuilder(dbConnection, logger);
+  const epochLength = 432_000_000;
   let fixtureBuilder: StakePoolFixtureBuilder;
   let poolsInfo: PoolInfo[];
   let hashIds: number[];
@@ -63,7 +64,7 @@ describe('StakePoolBuilder', () => {
   });
   describe('queryPoolRewards', () => {
     it('queryPoolRewards', async () => {
-      const epochRewards = await builder.queryPoolRewards(hashIds);
+      const epochRewards = await builder.queryPoolRewards(hashIds, epochLength);
 
       expect(epochRewards.filter(({ epochReward: { epoch } }) => epoch === Cardano.EpochNo(12))).toHaveLength(3);
       expect(epochRewards[0]).toMatchShapeOf(DataMocks.Pool.epochReward);
@@ -298,13 +299,13 @@ describe('StakePoolBuilder', () => {
   describe('queryPoolAPY', () => {
     describe('sort', () => {
       it('by default sort (APY desc)', async () => {
-        const result = await builder.queryPoolAPY(hashIds);
+        const result = await builder.queryPoolAPY(hashIds, epochLength);
         expect(result.length).toBeGreaterThan(0);
         expect(result[0].apy).toBeGreaterThan(result[1].apy);
         expect(result[0]).toMatchShapeOf({ apy: 0, hashId: 0 });
       });
       it('by APY asc', async () => {
-        const result = await builder.queryPoolAPY(hashIds, { sort: { field: 'apy', order: 'asc' } });
+        const result = await builder.queryPoolAPY(hashIds, epochLength, { sort: { field: 'apy', order: 'asc' } });
         expect(result.length).toBeGreaterThan(0);
         expect(result[0].apy).toBeLessThan(result[1].apy);
         expect(result[0]).toMatchShapeOf({ apy: 0, hashId: 0 });
@@ -312,12 +313,12 @@ describe('StakePoolBuilder', () => {
     });
     describe('pagination', () => {
       it('with limit', async () => {
-        const result = await builder.queryPoolAPY(hashIds, { pagination: { limit: 1, startAt: 0 } });
+        const result = await builder.queryPoolAPY(hashIds, epochLength, { pagination: { limit: 1, startAt: 0 } });
         expect(result.length).toBeGreaterThan(0);
         expect(result[0]).toMatchShapeOf({ apy: 0, hashId: 0 });
       });
       it('with startAt', async () => {
-        const result = await builder.queryPoolAPY(hashIds, { pagination: { limit: 5, startAt: 1 } });
+        const result = await builder.queryPoolAPY(hashIds, epochLength, { pagination: { limit: 5, startAt: 1 } });
         expect(result.length).toBeGreaterThan(0);
         expect(result[0]).toMatchShapeOf({ apy: 0, hashId: 0 });
       });

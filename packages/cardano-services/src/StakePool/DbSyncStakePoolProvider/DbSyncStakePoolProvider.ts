@@ -53,6 +53,7 @@ export interface StakePoolProviderDependencies extends DbSyncProviderDependencie
 export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) implements StakePoolProvider {
   #builder: StakePoolBuilder;
   #cache: InMemoryCache;
+  #epochLength: number;
   #epochMonitor: EpochMonitor;
   #epochRolloverDisposer: Disposer;
   #paginationPageSizeLimit: number;
@@ -60,14 +61,20 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
 
   constructor(
     { paginationPageSizeLimit }: StakePoolProviderProps,
-    { db, cardanoNode, metadataService, cache, logger, epochMonitor }: StakePoolProviderDependencies
+    { db, cardanoNode, genesisData, metadataService, cache, logger, epochMonitor }: StakePoolProviderDependencies
   ) {
     super({ cardanoNode, db, logger }, 'DbSyncStakePoolProvider', logger);
-    this.#cache = cache;
-    this.#epochMonitor = epochMonitor;
+
     this.#builder = new StakePoolBuilder(db, logger);
-    this.#paginationPageSizeLimit = paginationPageSizeLimit;
+    this.#cache = cache;
+    this.#epochLength = genesisData.epochLength * 1000;
+    // epochLength can change, so it should come from EraSummaries instead of from CompactGenesis.
+    // Then we would need to look up the length of the specific epoch based on slot number.
+    // However it would add a lot of complexity to the queries, so for now we use this simple approach.
+    this.#epochLength = genesisData.epochLength * 1000;
+    this.#epochMonitor = epochMonitor;
     this.#metadataService = metadataService;
+    this.#paginationPageSizeLimit = paginationPageSizeLimit;
   }
 
   private getQueryBySortType(
@@ -82,7 +89,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
       case 'metrics':
         return (options?: QueryStakePoolsArgs) => this.#builder.queryPoolMetrics(hashesIds, totalAdaAmount, options);
       case 'apy':
-        return (options?: QueryStakePoolsArgs) => this.#builder.queryPoolAPY(hashesIds, options);
+        return (options?: QueryStakePoolsArgs) => this.#builder.queryPoolAPY(hashesIds, this.#epochLength, options);
       case 'data':
       default:
         return (options?: QueryStakePoolsArgs) => this.#builder.queryPoolData(updatesIds, options);
@@ -157,27 +164,30 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
     ]);
     return { poolMetrics, poolOwners, poolRegistrations, poolRelays, poolRetirements };
   }
+
   public async queryStakePools(options: QueryStakePoolsArgs): Promise<Paginated<Cardano.StakePool>> {
-    if (options.pagination.limit > this.#paginationPageSizeLimit) {
+    const { filters, pagination, rewardsHistoryLimit } = options;
+
+    if (pagination.limit > this.#paginationPageSizeLimit) {
       throw new ProviderError(
         ProviderFailure.BadRequest,
         undefined,
-        `Page size of ${options.pagination.limit} can not be greater than ${this.#paginationPageSizeLimit}`
+        `Page size of ${pagination.limit} can not be greater than ${this.#paginationPageSizeLimit}`
       );
     }
-    if (options.filters?.identifier && options.filters.identifier.values.length > this.#paginationPageSizeLimit) {
+
+    if (filters?.identifier && filters.identifier.values.length > this.#paginationPageSizeLimit) {
       throw new ProviderError(
         ProviderFailure.BadRequest,
         undefined,
-        `Filter identifiers of ${options.filters.identifier.values.length} can not be greater than ${
+        `Filter identifiers of ${filters.identifier.values.length} can not be greater than ${
           this.#paginationPageSizeLimit
         }`
       );
     }
+
     const { params, query } =
-      options.filters?._condition === 'or'
-        ? this.#builder.buildOrQuery(options.filters)
-        : this.#builder.buildAndQuery(options.filters);
+      filters?._condition === 'or' ? this.#builder.buildOrQuery(filters) : this.#builder.buildAndQuery(filters);
     // Get pool updates/hashes cached
     const poolUpdates = await this.#cache.get(queryCacheKey(StakePoolsSubQuery.POOL_HASHES, options), () =>
       this.#builder.queryPoolHashes(query, params)
@@ -203,13 +213,13 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
       sortType === 'apy'
         ? (orderedResult as PoolAPY[])
         : await this.#cache.get(queryCacheKey(StakePoolsSubQuery.APY, hashesIds, options), () =>
-            this.#builder.queryPoolAPY(hashesIds, { rewardsHistoryLimit: options?.rewardsHistoryLimit })
+            this.#builder.queryPoolAPY(hashesIds, this.#epochLength, { rewardsHistoryLimit })
           );
 
     // Get stake pools rewards cached
     const poolRewards = await this.#cache.get(
       queryCacheKey(StakePoolsSubQuery.REWARDS, orderedResultHashIds, options),
-      () => this.#builder.queryPoolRewards(orderedResultHashIds, options?.rewardsHistoryLimit),
+      () => this.#builder.queryPoolRewards(orderedResultHashIds, this.#epochLength, rewardsHistoryLimit),
       UNLIMITED_CACHE_TTL
     );
     // Create lookup table with pool ids: (hashId:updateId)
@@ -217,7 +227,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
       orderedResultHashIds.map((hashId, idx) => [hashId, orderedResultUpdateIds[idx]])
     );
     // Create a lookup table with cached pools: (hashId:Cardano.StakePool)
-    const rewardsHistoryKey = JSON.stringify(options?.rewardsHistoryLimit);
+    const rewardsHistoryKey = JSON.stringify(rewardsHistoryLimit);
     const fromCache = Object.fromEntries(
       orderedResultHashIds.map((hashId) => [
         hashId,

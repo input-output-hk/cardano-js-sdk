@@ -89,19 +89,21 @@ export class StakePoolBuilder {
     return result.rows.length > 0 ? result.rows.map(mapAddressOwner) : [];
   }
 
-  public async queryPoolRewards(hashesIds: number[], limit?: number) {
+  public async queryPoolRewards(hashesIds: number[], epochLength: number, limit?: number) {
     this.#logger.debug('About to query pool rewards');
 
-    const result = await this.#db.query<EpochRewardModel>(Queries.findPoolEpochRewards(limit), [hashesIds]);
+    const result = await this.#db.query<EpochRewardModel>(Queries.findPoolEpochRewards(epochLength, limit), [
+      hashesIds
+    ]);
 
     return result.rows.map(mapEpochReward);
   }
 
-  public async queryPoolAPY(hashesIds: number[], options?: QueryPoolsApyArgs): Promise<PoolAPY[]> {
+  public async queryPoolAPY(hashesIds: number[], epochLength: number, options?: QueryPoolsApyArgs): Promise<PoolAPY[]> {
     this.#logger.debug('About to query pools APY');
     const defaultSort: OrderByOptions[] = [{ field: 'apy', order: 'desc' }];
     const queryWithSortAndPagination = withPagination(
-      withSort(Queries.findPoolAPY(options?.rewardsHistoryLimit), options?.sort, defaultSort),
+      withSort(Queries.findPoolAPY(epochLength, options?.rewardsHistoryLimit), options?.sort, defaultSort),
       options?.pagination
     );
     const result: QueryResult<PoolAPYModel> = await this.#db.query(queryWithSortAndPagination, [hashesIds]);

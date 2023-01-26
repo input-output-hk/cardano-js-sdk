@@ -250,11 +250,16 @@ LEFT JOIN owners_total_utxos otu ON
 WHERE id = ANY($1)
 `;
 
-const epochRewardsSubqueries = (limit?: number) => `
+const epochRewardsSubqueries = (epochLength: number, limit?: number) => `
 WITH epochs AS (
   SELECT
     "no" AS epoch_no,
-    (EXTRACT(EPOCH FROM (end_time - start_time)) * 1000) AS epoch_length
+    CASE
+      WHEN "no" = (SELECT MAX("no") FROM epoch)
+        THEN EXTRACT(EPOCH FROM (end_time - start_time)) * 1000
+      ELSE
+        ${epochLength}
+    END AS epoch_length
   FROM epoch
   ORDER BY no DESC
   ${limit !== undefined ? `LIMIT ${limit}` : ''}
@@ -323,8 +328,8 @@ epoch_rewards AS (
     )
 )`;
 
-export const findPoolEpochRewards = (limit?: number) => `
-  ${epochRewardsSubqueries(limit)}
+export const findPoolEpochRewards = (epochLength: number, limit?: number) => `
+  ${epochRewardsSubqueries(epochLength, limit)}
   SELECT
     active_stake,
     epoch_length::TEXT,
@@ -338,8 +343,8 @@ export const findPoolEpochRewards = (limit?: number) => `
   ORDER BY epoch_no desc
 `;
 
-export const findPoolAPY = (limit?: number) => `
-  ${epochRewardsSubqueries(limit)},
+export const findPoolAPY = (epochLength: number, limit?: number) => `
+  ${epochRewardsSubqueries(epochLength, limit)},
   avg_daily_roi AS (
     SELECT
       hash_id,
