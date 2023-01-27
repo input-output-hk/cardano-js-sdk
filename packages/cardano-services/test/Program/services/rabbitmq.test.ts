@@ -210,7 +210,6 @@ describe('Program/services/rabbitmq', () => {
 
         await expect(provider.healthCheck()).resolves.toEqual({ ok: true });
       });
-      ('');
     });
   });
 
