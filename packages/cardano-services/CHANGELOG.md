@@ -3,6 +3,35 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.8.0-nightly.0...@cardano-sdk/cardano-services@0.8.0-nightly.1) (2023-01-27)
+
+### ⚠ BREAKING CHANGES
+
+- CompactGenesis.slotLength type changed
+  from `number` to `Seconds`
+- **cardano-services:** Nested `narHash`, `path` and `sourceInfo` under top level `extra` property of BUILD_INFO
+- - all provider constructors are updated to use standardized form of deps
+
+### Features
+
+- **cardano-services:** upgrade /meta endpoint ([e9c3a5b](https://github.com/input-output-hk/cardano-js-sdk/commit/e9c3a5b74a2cc1f69c53f562af8a5b4e693bd20a))
+- update CompactGenesis slotLength type to be Seconds ([82e63d6](https://github.com/input-output-hk/cardano-js-sdk/commit/82e63d6cacedbab5ecf8491dfd37749bfeddbc22))
+
+### Bug Fixes
+
+- **cardano-services:** cache TTL validator ([012b6c5](https://github.com/input-output-hk/cardano-js-sdk/commit/012b6c55456b5c7501940186c3783bd8643b4cd5))
+- **cardano-services:** fixes a bug on stake pool saturation compute also causing a wrong sort ([4e66060](https://github.com/input-output-hk/cardano-js-sdk/commit/4e660601d6b6b0d22dc6ce635e130f4b19cd73df))
+- **cardano-services:** fixes tx_id format in logged messages ([a4116d7](https://github.com/input-output-hk/cardano-js-sdk/commit/a4116d73b4c594d71a69e5a615293bbe2c2c4b86))
+- unmemoize slot epoch calc in core package ([2dc6af4](https://github.com/input-output-hk/cardano-js-sdk/commit/2dc6af44906f1b61323a69c3e840834f2c86930f))
+
+### Performance Improvements
+
+- **cardano-services:** remove type validations ([551ddad](https://github.com/input-output-hk/cardano-js-sdk/commit/551ddad4fa6e2161e6ed5f9aece3191d5777522e))
+
+### Code Refactoring
+
+- standardize provider dependencies ([05b37e6](https://github.com/input-output-hk/cardano-js-sdk/commit/05b37e6383a906152df457143c5a27341a11c341))
+
 ## [0.8.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.7.0...@cardano-sdk/cardano-services@0.8.0-nightly.0) (2022-12-24)
 
 ### ⚠ BREAKING CHANGES

@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.6.1-nightly.0...@cardano-sdk/util-dev@0.7.0-nightly.0) (2023-01-27)
+
+### ⚠ BREAKING CHANGES
+
+- EraSummary.parameters.slotLength type changed from number
+  to Milliseconds
+
+### Features
+
+- update EraSummary slotLength type to be Milliseconds ([fb1f1a2](https://github.com/input-output-hk/cardano-js-sdk/commit/fb1f1a2c4fb77d03e45f9255c182e9bc54583324))
+- **util-dev:** adds a reset method to test logger to reset recorded logged messages ([4ebe552](https://github.com/input-output-hk/cardano-js-sdk/commit/4ebe5524ee0d95c314520c25f6a9a42c6957fbc3))
+
 ## [0.6.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.6.0...@cardano-sdk/util-dev@0.6.1-nightly.0) (2022-12-24)
 
 **Note:** Version bump only for package @cardano-sdk/util-dev

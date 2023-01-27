@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.6.1-nightly.0...@cardano-sdk/e2e@0.7.0-nightly.0) (2023-01-27)
+
+### ⚠ BREAKING CHANGES
+
+- CompactGenesis.slotLength type changed
+  from `number` to `Seconds`
+- - all provider constructors are updated to use standardized form of deps
+
+### Features
+
+- update CompactGenesis slotLength type to be Seconds ([82e63d6](https://github.com/input-output-hk/cardano-js-sdk/commit/82e63d6cacedbab5ecf8491dfd37749bfeddbc22))
+
+### Code Refactoring
+
+- standardize provider dependencies ([05b37e6](https://github.com/input-output-hk/cardano-js-sdk/commit/05b37e6383a906152df457143c5a27341a11c341))
+
 ## [0.6.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.6.0...@cardano-sdk/e2e@0.6.1-nightly.0) (2022-12-24)
 
 **Note:** Version bump only for package @cardano-sdk/e2e

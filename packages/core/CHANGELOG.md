@@ -3,6 +3,35 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.8.0-nightly.0...@cardano-sdk/core@0.8.0-nightly.1) (2023-01-27)
+
+### ⚠ BREAKING CHANGES
+
+- CompactGenesis.slotLength type changed
+  from `number` to `Seconds`
+- EraSummary.parameters.slotLength type changed from number
+  to Milliseconds
+- Types coming from time.ts should be imported directly
+  from core package instead of using the `Cardano.util` namespace.
+- **core:** add ChainSyncEvent.requestNext
+- - all provider constructors are updated to use standardized form of deps
+
+### Features
+
+- **core:** add ChainSyncEvent.requestNext ([484fced](https://github.com/input-output-hk/cardano-js-sdk/commit/484fced69079f004141ae9eb9c5129328d4cbc01))
+- **core:** add support for '{policyId}.{assetName}' format when parsing AssetId ([eb49a0a](https://github.com/input-output-hk/cardano-js-sdk/commit/eb49a0a310a1d6c1c58a56b4f79b7139c2ee44ee))
+- update CompactGenesis slotLength type to be Seconds ([82e63d6](https://github.com/input-output-hk/cardano-js-sdk/commit/82e63d6cacedbab5ecf8491dfd37749bfeddbc22))
+- update EraSummary slotLength type to be Milliseconds ([fb1f1a2](https://github.com/input-output-hk/cardano-js-sdk/commit/fb1f1a2c4fb77d03e45f9255c182e9bc54583324))
+
+### Bug Fixes
+
+- unmemoize slot epoch calc in core package ([2dc6af4](https://github.com/input-output-hk/cardano-js-sdk/commit/2dc6af44906f1b61323a69c3e840834f2c86930f))
+
+### Code Refactoring
+
+- hoist time.ts out of Cardano namespace ([666701c](https://github.com/input-output-hk/cardano-js-sdk/commit/666701c40cb49a9b3865e1d8bd0d36e7cc8c325c))
+- standardize provider dependencies ([05b37e6](https://github.com/input-output-hk/cardano-js-sdk/commit/05b37e6383a906152df457143c5a27341a11c341))
+
 ## [0.8.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.7.0...@cardano-sdk/core@0.8.0-nightly.0) (2022-12-24)
 
 ### ⚠ BREAKING CHANGES

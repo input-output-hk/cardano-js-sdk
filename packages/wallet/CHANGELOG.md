@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.8.0-nightly.0...@cardano-sdk/wallet@0.8.0-nightly.1) (2023-01-27)
+
+### ⚠ BREAKING CHANGES
+
+- **wallet:** ensureValidityInterval now requires slotLength property from Cardano.CompactGenesis
+- CompactGenesis.slotLength type changed
+  from `number` to `Seconds`
+
+### Features
+
+- update CompactGenesis slotLength type to be Seconds ([82e63d6](https://github.com/input-output-hk/cardano-js-sdk/commit/82e63d6cacedbab5ecf8491dfd37749bfeddbc22))
+- **wallet:** convert static TTL to be based on slotLength ([7f6df55](https://github.com/input-output-hk/cardano-js-sdk/commit/7f6df557dedb8e2ea4dc393d950d2e895325328d))
+
 ## [0.8.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.7.0...@cardano-sdk/wallet@0.8.0-nightly.0) (2022-12-24)
 
 ### ⚠ BREAKING CHANGES

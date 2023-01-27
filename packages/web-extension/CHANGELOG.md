@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.1-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.7.1-nightly.0...@cardano-sdk/web-extension@0.7.1-nightly.1) (2023-01-27)
+
+### Bug Fixes
+
+- **wallet-manager:** initialize walletManagerWorker runtime property ([db4ce63](https://github.com/input-output-hk/cardano-js-sdk/commit/db4ce63c85e5b80e2f36e4a92f2c71916c477657))
+
 ## [0.7.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.7.0...@cardano-sdk/web-extension@0.7.1-nightly.0) (2022-12-24)
 
 **Note:** Version bump only for package @cardano-sdk/web-extension

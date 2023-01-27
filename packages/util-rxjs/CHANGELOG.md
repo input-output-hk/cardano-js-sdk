@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.4-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.4.4-nightly.0...@cardano-sdk/util-rxjs@0.4.4-nightly.1) (2023-01-27)
+
+### Features
+
+- **util-rxjs:** add 'passthrough' operator ([5696105](https://github.com/input-output-hk/cardano-js-sdk/commit/5696105729bf5839c1e07603333c4f69efd5d080))
+
+### Bug Fixes
+
+- **util-rxjs:** rework blockingWithLatestFrom ([3d9e41c](https://github.com/input-output-hk/cardano-js-sdk/commit/3d9e41cbc309557fdc080587b7394de654a115ee))
+
 ## [0.4.4-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.4.3...@cardano-sdk/util-rxjs@0.4.4-nightly.0) (2022-12-24)
 
 **Note:** Version bump only for package @cardano-sdk/util-rxjs

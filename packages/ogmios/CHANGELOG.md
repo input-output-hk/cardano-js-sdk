@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.8.0-nightly.0...@cardano-sdk/ogmios@0.8.0-nightly.1) (2023-01-27)
+
+### ⚠ BREAKING CHANGES
+
+- CompactGenesis.slotLength type changed
+  from `number` to `Seconds`
+- EraSummary.parameters.slotLength type changed from number
+  to Milliseconds
+- - all provider constructors are updated to use standardized form of deps
+
+### Features
+
+- update CompactGenesis slotLength type to be Seconds ([82e63d6](https://github.com/input-output-hk/cardano-js-sdk/commit/82e63d6cacedbab5ecf8491dfd37749bfeddbc22))
+- update EraSummary slotLength type to be Milliseconds ([fb1f1a2](https://github.com/input-output-hk/cardano-js-sdk/commit/fb1f1a2c4fb77d03e45f9255c182e9bc54583324))
+
+### Code Refactoring
+
+- standardize provider dependencies ([05b37e6](https://github.com/input-output-hk/cardano-js-sdk/commit/05b37e6383a906152df457143c5a27341a11c341))
+
 ## [0.8.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.7.0...@cardano-sdk/ogmios@0.8.0-nightly.0) (2022-12-24)
 
 ### ⚠ BREAKING CHANGES
