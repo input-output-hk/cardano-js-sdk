@@ -1,5 +1,24 @@
 {
   "out": "./docs",
+  "readme": "none",
+  "exclude": [ "**/node_modules/**"],
   "excludeInternal": true,
-  "readme": "none"
+  "entryPointStrategy": "packages",
+  "entryPoints": [
+    "packages/cardano-services",
+    "packages/cardano-services-client",
+    "packages/core",
+    "packages/e2e",
+    "packages/golden-test-generator",
+    "packages/governance",
+    "packages/input-selection",
+    "packages/key-management",
+    "packages/ogmios",
+    "packages/projection",
+    "packages/util",
+    "packages/util-dev",
+    "packages/util-rxjs",
+    "packages/wallet",
+    "packages/web-extension"
+  ]
 }

@@ -52,7 +52,7 @@ export type CreateHttpProviderConfig<T> = Pick<HttpProviderConfig<T>, 'baseUrl' 
 /**
  * Creates a HTTP client for specified provider type, following some conventions:
  * - All methods use POST requests
- * - Arguments are serialized using core toSerializableObject and sent as JSON {args: unknown[]} in request body
+ * - Arguments are serialized using core toSerializableObject and sent as JSON `{args: unknown[]}` in request body
  * - Server is expected to use the following core utils:
  *   - fromSerializableObject after deserializing args
  *   - toSerializableObject before serializing response body

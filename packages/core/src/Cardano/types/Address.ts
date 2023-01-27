@@ -25,7 +25,7 @@ const isRewardAccount = (address: string) => {
 };
 
 /**
- * Transform {@link value} into `Cardano.Address`,
+ * Transform a `value` into `Cardano.Address`,
  * Resulting Address will be base58 in case of Byron era or bech32 in case of Shelley era or newer.
  *
  * @param value bech32 string, base58 string or hex-encoded bytes address.

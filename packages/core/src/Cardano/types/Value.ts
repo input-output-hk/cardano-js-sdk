@@ -3,7 +3,7 @@ import { AssetId } from './Asset';
 export type Lovelace = bigint;
 
 /**
- * {[assetId]: amount}
+ * `{[assetId]: amount}`
  */
 export type TokenMap = Map<AssetId, bigint>;
 

@@ -46,7 +46,7 @@ _The following examples require the [install and build] steps to be completed._
 
 **`start-server` using CLI options:**
 
-```console
+```bash
 ./dist/cjs/cli.js \
   start-server \
     --api-url http://localhost:6000 \
@@ -58,7 +58,7 @@ _The following examples require the [install and build] steps to be completed._
 
 **`start-server` using env variables:**
 
-```console
+```bash
 SERVICE_NAMES=asset,chain-history,stake-pool,tx-submit,network-info,utxo,rewards \
 API_URL=http://localhost:6000 \
 CARDANO_NODE_CONFIG_PATH=./config/network/preprod/cardano-node/config.json \
@@ -79,7 +79,7 @@ OGMIOS_URL=ws://localhost:1338 \
 
 **`start-server` using CLI options:**
 
-```console
+```bash
 ./dist/cjs/cli.js \
   start-server \
     --api-url http://localhost:6000 \
@@ -97,7 +97,7 @@ OGMIOS_URL=ws://localhost:1338 \
 
 **`start-server` using env variables:**
 
-```console
+```bash
 SERVICE_NAMES=asset,chain-history,stake-pool,tx-submit,network-info,utxo,rewards \
 API_URL=http://localhost:6000 \
 ENABLE_METRICS=true \
@@ -114,7 +114,7 @@ USE_QUEUE=true \
 
 **`start-worker` using CLI options:**
 
-```console
+```bash
 ./dist/cjs/cli.js \
   start-worker \
     --ogmios-srv-service-name  some-domain-for-ogmios \
@@ -123,7 +123,7 @@ USE_QUEUE=true \
 
 **`start-worker` using env variables:**
 
-```console
+```bash
 OGMIOS_SRV_SERVICE_NAME=some-domain-for-ogmios \
 RABBITMQ_SRV_SERVICE_NAME=some-domain-for-rabbitmq \
 ./dist/cjs/cli.js start-worker
