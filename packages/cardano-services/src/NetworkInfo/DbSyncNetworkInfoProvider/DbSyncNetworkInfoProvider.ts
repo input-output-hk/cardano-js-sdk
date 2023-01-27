@@ -1,34 +1,48 @@
 import * as NetworkInfoCacheKey from './keys';
 import {
   Cardano,
-  CardanoNode,
   CardanoNodeUtil,
   EraSummary,
   NetworkInfoProvider,
+  SlotEpochCalc,
   StakeSummary,
   SupplySummary,
   createSlotEpochCalc
 } from '@cardano-sdk/core';
-import { DbSyncProvider } from '../../util/DbSyncProvider';
+import { DbSyncProvider, DbSyncProviderDependencies } from '../../util/DbSyncProvider';
 import { Disposer, EpochMonitor } from '../../util/polling/types';
 import { GenesisData } from './types';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../InMemoryCache';
 import { Logger } from 'ts-log';
 import { NetworkInfoBuilder } from './NetworkInfoBuilder';
-import { Pool } from 'pg';
 import { RunnableModule } from '@cardano-sdk/util';
 import { loadGenesisData, toGenesisParams, toLedgerTip, toProtocolParams, toSupply } from './mappers';
+import memoize from 'lodash/memoize';
 
+/**
+ * Properties that are need to create DbSyncNetworkInfoProvider
+ */
 export interface NetworkInfoProviderProps {
+  /**
+   * Cardano node config path string
+   */
   cardanoNodeConfigPath: string;
 }
-export interface NetworkInfoProviderDependencies {
-  db: Pool;
+
+/**
+ * Dependencies that are need to create DbSyncNetworkInfoProvider
+ */
+export interface NetworkInfoProviderDependencies extends DbSyncProviderDependencies {
+  /**
+   * The in memory cache engine.
+   */
   cache: InMemoryCache;
-  logger: Logger;
-  cardanoNode: CardanoNode;
+  /**
+   * Monitor the epoch rollover through db polling.
+   */
   epochMonitor: EpochMonitor;
 }
+
 export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) implements NetworkInfoProvider {
   #logger: Logger;
   #cache: InMemoryCache;
@@ -38,12 +52,14 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) im
   #genesisDataReady: Promise<GenesisData>;
   #epochMonitor: EpochMonitor;
   #epochRolloverDisposer: Disposer;
+  #slotEpochCalc: SlotEpochCalc;
 
   constructor(
     { cardanoNodeConfigPath }: NetworkInfoProviderProps,
     { db, cache, logger, cardanoNode, epochMonitor }: NetworkInfoProviderDependencies
   ) {
-    super(db, cardanoNode, 'DbSyncNetworkInfoProvider', logger);
+    super({ cardanoNode, db, logger }, 'DbSyncNetworkInfoProvider', logger);
+
     this.#logger = logger;
     this.#cache = cache;
     this.#currentEpoch = Cardano.EpochNo(0);
@@ -60,7 +76,7 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) im
     if (this.#currentHash !== result.hash) {
       this.#currentHash = result.hash;
 
-      const slotEpochCalc = createSlotEpochCalc(await this.eraSummaries());
+      const slotEpochCalc = await this.#getSlotEpochCalc();
       const currentEpoch = slotEpochCalc(result.slot);
 
       // On epoch rollover, invalidate the cache before returning
@@ -136,5 +152,12 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) im
     this.#cache.shutdown();
     await this.#genesisDataReady;
     this.#epochRolloverDisposer();
+  }
+
+  async #getSlotEpochCalc() {
+    if (!this.#slotEpochCalc) {
+      this.#slotEpochCalc = memoize(createSlotEpochCalc(await this.eraSummaries()));
+    }
+    return this.#slotEpochCalc;
   }
 }

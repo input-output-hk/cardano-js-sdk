@@ -120,7 +120,7 @@ txSubmitProviderFactory.register(OGMIOS_PROVIDER, async (params: any, logger: Lo
   };
 
   return new Promise<TxSubmitProvider>(async (resolve) => {
-    resolve(new OgmiosTxSubmitProvider(createConnectionObject(connectionConfig), logger));
+    resolve(new OgmiosTxSubmitProvider(createConnectionObject(connectionConfig), { logger }));
   });
 });
 

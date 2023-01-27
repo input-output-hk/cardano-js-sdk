@@ -53,6 +53,7 @@
     "test:e2e": "shx echo 'test:e2e' command not implemented yet"
   },
   "dependencies": {
+    "@cardano-sdk/util": "^0.7.0",
     "rxjs": "^7.4.0"
   },
   "devDependencies": {

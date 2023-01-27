@@ -3,11 +3,12 @@ import { Block, Lovelace, PoolId, Tip, VrfVkHex } from '../../Cardano';
 // @ts-ignore
 import { CardanoNodeError } from './CardanoNodeErrors';
 import { HealthCheckResponse } from '../../Provider';
+import { Milliseconds } from '../../util';
 
 export interface EraSummary {
   parameters: {
     epochLength: number;
-    slotLength: number;
+    slotLength: Milliseconds;
   };
   start: {
     slot: number;
@@ -68,15 +69,19 @@ export enum ChainSyncEventType {
   RollBackward
 }
 
+export type RequestNext = () => void;
+
 export interface ChainSyncRollForward {
   tip: Tip;
   eventType: ChainSyncEventType.RollForward;
   block: Block;
+  requestNext: RequestNext;
 }
 
 export interface ChainSyncRollBackward {
   eventType: ChainSyncEventType.RollBackward;
   tip: TipOrOrigin;
+  requestNext: RequestNext;
 }
 
 export type ChainSyncEvent = ChainSyncRollForward | ChainSyncRollBackward;

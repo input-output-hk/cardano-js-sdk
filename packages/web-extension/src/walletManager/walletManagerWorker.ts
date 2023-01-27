@@ -47,7 +47,7 @@ export class WalletManagerWorker implements WalletManagerApi {
     this.#walletFactory = walletFactory;
     this.#storesFactory = storesFactory;
     this.#logger = logger;
-    this.#runtime;
+    this.#runtime = runtime;
     this.#hostSubscription = exposeApi(
       {
         api$: this.#api$.asObservable(),

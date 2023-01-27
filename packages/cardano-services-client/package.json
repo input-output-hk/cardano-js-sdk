@@ -70,7 +70,7 @@
     "@cardano-sdk/core": "^0.8.0-nightly.0",
     "@cardano-sdk/util": "^0.7.1-nightly.0",
     "axios": "^0.27.2",
-    "class-validator": "^0.13.1",
+    "class-validator": "^0.14.0",
     "json-bigint": "~1.0.0",
     "ts-log": "^2.2.4"
   },

@@ -1,5 +1,5 @@
 import { Asset, Cardano } from '@cardano-sdk/core';
-import { AssetBuilder } from './AssetBuilder';
+import { AssetBuilder } from './DbSyncAssetProvider';
 import { AssetPolicyIdAndName, NftMetadataService } from './types';
 import { Logger } from 'ts-log';
 import { Pool } from 'pg';
@@ -34,7 +34,7 @@ export class DbSyncNftMetadataService implements NftMetadataService {
 
     if (!lastMintedTx) return null;
 
-    const lastMintedTxId = Cardano.TransactionId(lastMintedTx.tx_hash.toString('hex'));
+    const lastMintedTxId = lastMintedTx.tx_hash.toString('hex') as unknown as Cardano.TransactionId;
 
     this.#logger.debug('Querying tx metadata', lastMintedTxId);
     const metadatas = await this.#metadataService.queryTxMetadataByHashes([lastMintedTxId]);

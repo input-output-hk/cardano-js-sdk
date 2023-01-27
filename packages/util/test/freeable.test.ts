@@ -81,7 +81,6 @@ describe('freeable', () => {
         resolve(returnValue);
         await expect(result).resolves.toBe(returnValue);
         expect(freeableSpy).toBeCalledTimes(1);
-        reject;
       });
 
       it('returns promise and frees scope after promise rejects', async () => {

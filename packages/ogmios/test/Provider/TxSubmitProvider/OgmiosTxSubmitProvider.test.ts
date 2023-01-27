@@ -29,7 +29,7 @@ describe('OgmiosTxSubmitProvider', () => {
     });
 
     it('is not ok if cannot connect', async () => {
-      provider = new OgmiosTxSubmitProvider(connection, logger);
+      provider = new OgmiosTxSubmitProvider(connection, { logger });
       const res = await provider.healthCheck();
       expect(res).toEqual({ ok: false });
     });
@@ -40,7 +40,7 @@ describe('OgmiosTxSubmitProvider', () => {
         submitTx: { response: { success: true } }
       });
       await listenPromise(mockServer, connection.port);
-      provider = new OgmiosTxSubmitProvider(connection, logger);
+      provider = new OgmiosTxSubmitProvider(connection, { logger });
       const res = await provider.healthCheck();
       expect(res).toEqual(responseWithServiceState);
     });
@@ -51,7 +51,7 @@ describe('OgmiosTxSubmitProvider', () => {
         submitTx: { response: { success: true } }
       });
       await listenPromise(mockServer, connection.port);
-      provider = new OgmiosTxSubmitProvider(connection, logger);
+      provider = new OgmiosTxSubmitProvider(connection, { logger });
       const res = await provider.healthCheck();
       expect(res).toEqual({
         ...responseWithServiceState,
@@ -66,7 +66,7 @@ describe('OgmiosTxSubmitProvider', () => {
         submitTx: { response: { success: true } }
       });
       await listenPromise(mockServer, connection.port);
-      provider = new OgmiosTxSubmitProvider(connection, logger);
+      provider = new OgmiosTxSubmitProvider(connection, { logger });
       await expect(provider.healthCheck()).rejects.toThrowError(ProviderError);
     });
   });
@@ -79,7 +79,7 @@ describe('OgmiosTxSubmitProvider', () => {
     it('resolves if successful', async () => {
       mockServer = createMockOgmiosServer({ submitTx: { response: { success: true } } });
       await listenPromise(mockServer, connection.port);
-      provider = new OgmiosTxSubmitProvider(connection, logger);
+      provider = new OgmiosTxSubmitProvider(connection, { logger });
       await provider.initialize();
       await provider.start();
 
@@ -92,7 +92,7 @@ describe('OgmiosTxSubmitProvider', () => {
         submitTx: { response: { failWith: { type: 'eraMismatch' }, success: false } }
       });
       await listenPromise(mockServer, connection.port);
-      provider = new OgmiosTxSubmitProvider(connection, logger);
+      provider = new OgmiosTxSubmitProvider(connection, { logger });
       await provider.initialize();
       await provider.start();
 
@@ -113,7 +113,7 @@ describe('OgmiosTxSubmitProvider', () => {
     });
 
     beforeEach(async () => {
-      provider = new OgmiosTxSubmitProvider(connection, logger);
+      provider = new OgmiosTxSubmitProvider(connection, { logger });
       await provider.initialize();
       await provider.start();
     });

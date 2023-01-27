@@ -1,37 +1,12 @@
-import {
-  Asset,
-  AssetProvider,
-  Cardano,
-  CardanoNode,
-  GetAssetArgs,
-  ProviderError,
-  ProviderFailure
-} from '@cardano-sdk/core';
+import { Asset, AssetProvider, Cardano, GetAssetArgs, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { AssetBuilder } from './AssetBuilder';
-import { DbSyncProvider } from '../util/DbSyncProvider';
-import { Logger } from 'ts-log';
-import { NftMetadataService, TokenMetadataService } from './types';
-import { Pool } from 'pg';
+import { DbSyncProvider, DbSyncProviderDependencies } from '../../util/DbSyncProvider';
+import { NftMetadataService, TokenMetadataService } from '../types';
 
 /**
  * Dependencies that are need to create DbSyncAssetProvider
  */
-export type DbSyncAssetProviderDependencies = {
-  /**
-   * The db-sync database PgPool
-   */
-  db: Pool;
-
-  /**
-   * The Ogmios Cardano node
-   */
-  cardanoNode: CardanoNode;
-
-  /**
-   *
-   * The logger object
-   */
-  logger: Logger;
+export interface DbSyncAssetProviderDependencies extends DbSyncProviderDependencies {
   /**
    * The NftMetadataService to retrieve Asset.NftMetadata.
    */
@@ -40,7 +15,7 @@ export type DbSyncAssetProviderDependencies = {
    * The TokenMetadataService to retrieve Asset.TokenMetadata.
    */
   tokenMetadataService: TokenMetadataService;
-};
+}
 
 /**
  * AssetProvider implementation using NftMetadataService, TokenMetadataService
@@ -52,8 +27,7 @@ export class DbSyncAssetProvider extends DbSyncProvider() implements AssetProvid
 
   constructor(dependencies: DbSyncAssetProviderDependencies) {
     const { db, cardanoNode, logger } = dependencies;
-
-    super(db, cardanoNode);
+    super({ cardanoNode, db, logger });
 
     this.#builder = new AssetBuilder(db, logger);
     this.#dependencies = dependencies;
@@ -67,7 +41,7 @@ export class DbSyncAssetProvider extends DbSyncProvider() implements AssetProvid
     if (!multiAsset)
       throw new ProviderError(ProviderFailure.NotFound, undefined, 'No entries found in multi_asset table');
 
-    const fingerprint = Cardano.AssetFingerprint(multiAsset.fingerprint);
+    const fingerprint = multiAsset.fingerprint as unknown as Cardano.AssetFingerprint;
     const quantities = await this.#builder.queryMultiAssetQuantities(multiAsset.id);
     const quantity = BigInt(quantities.sum);
     const mintOrBurnCount = Number(quantities.count);
@@ -97,7 +71,7 @@ export class DbSyncAssetProvider extends DbSyncProvider() implements AssetProvid
       await this.#builder.queryMultiAssetHistory(assetInfo.policyId, assetInfo.name)
     ).map<Asset.AssetMintOrBurn>(({ hash, quantity }) => ({
       quantity: BigInt(quantity),
-      transactionId: Cardano.TransactionId(hash.toString('hex'))
+      transactionId: hash.toString('hex') as unknown as Cardano.TransactionId
     }));
   }
 }

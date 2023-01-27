@@ -1,5 +1,5 @@
 import * as mappers from '../../src/CardanoNode/mappers';
-import { EraSummary } from '@cardano-sdk/core';
+import { EraSummary, Milliseconds } from '@cardano-sdk/core';
 import { Schema } from '@cardano-ogmios/client';
 
 describe('cardano node mappers', () => {
@@ -14,7 +14,7 @@ describe('cardano node mappers', () => {
       expect(result).toEqual<EraSummary>({
         parameters: {
           epochLength: 432_000,
-          slotLength: 1000
+          slotLength: Milliseconds(1000)
         },
         start: {
           slot: 1_598_400,

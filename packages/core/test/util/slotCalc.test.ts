@@ -5,6 +5,7 @@ import {
   EpochInfo,
   EraSummary,
   EraSummaryError,
+  Milliseconds,
   SlotEpochCalc,
   SlotEpochInfoCalc,
   SlotTimeCalc,
@@ -12,9 +13,26 @@ import {
   createSlotEpochInfoCalc,
   createSlotTimeCalc
 } from '../../src';
-import { testnetEraSummaries } from '../../../util-dev/src';
 
 import merge from 'lodash/merge';
+
+// Era summaries copied from util-dev package.
+// Importing directly from util-dev reports Milliseconds types incompatible.
+// Type 'import("core/dist/cjs/util/time").Milliseconds' is not assignable to type
+// 'import("core/src/util/time").Milliseconds'.
+// Property '__opaqueNumber' is protected but type 'OpaqueNumber<T>' is not a class derived from 'OpaqueNumber<T>'.
+// Duplicating the test era summaries here to work around it.
+
+export const testnetEraSummaries: EraSummary[] = [
+  {
+    parameters: { epochLength: 21_600, slotLength: Milliseconds(20_000) },
+    start: { slot: 0, time: new Date(1_563_999_616_000) }
+  },
+  {
+    parameters: { epochLength: 432_000, slotLength: Milliseconds(1000) },
+    start: { slot: 1_598_400, time: new Date(1_595_967_616_000) }
+  }
+];
 
 describe('slotCalc utils', () => {
   describe('slotTimeCalc', () => {
@@ -61,11 +79,17 @@ describe('slotCalc utils', () => {
       it('correctly computes epoch with multiple summaries starting from genesis', () => {
         const eraSummaries: EraSummary[] = [
           {
-            parameters: { epochLength: 100, slotLength: 3 },
+            parameters: { epochLength: 100, slotLength: Milliseconds(3) },
             start: { slot: 0, time: new Date(1_563_999_616_000) }
           },
-          { parameters: { epochLength: 200, slotLength: 10 }, start: { slot: 0, time: new Date(1_563_999_616_000) } },
-          { parameters: { epochLength: 200, slotLength: 1 }, start: { slot: 0, time: new Date(1_563_999_616_000) } }
+          {
+            parameters: { epochLength: 200, slotLength: Milliseconds(10) },
+            start: { slot: 0, time: new Date(1_563_999_616_000) }
+          },
+          {
+            parameters: { epochLength: 200, slotLength: Milliseconds(1) },
+            start: { slot: 0, time: new Date(1_563_999_616_000) }
+          }
         ];
         const slotEpochCalc: SlotEpochCalc = createSlotEpochCalc(eraSummaries);
 
@@ -74,15 +98,15 @@ describe('slotCalc utils', () => {
       it('correctly computes epoch with summaries indicating an upgrade after genesis, from the same slotNo', () => {
         const eraSummaries: EraSummary[] = [
           {
-            parameters: { epochLength: 100, slotLength: 3 },
+            parameters: { epochLength: 100, slotLength: Milliseconds(3) },
             start: { slot: 0, time: new Date(1_563_999_616_000) }
           },
           {
-            parameters: { epochLength: 200, slotLength: 10 },
+            parameters: { epochLength: 200, slotLength: Milliseconds(10) },
             start: { slot: 301, time: new Date(1_563_999_716_000) }
           },
           {
-            parameters: { epochLength: 200, slotLength: 1 },
+            parameters: { epochLength: 200, slotLength: Milliseconds(1) },
             start: { slot: 301, time: new Date(1_563_999_716_000) }
           }
         ];
@@ -143,15 +167,17 @@ describe('slotCalc utils', () => {
         expect(firstSlot).toEqual({
           date: new Date(
             epochEraSummary.start.time.getTime() +
-              epochEraSummary.parameters.epochLength * epochEraSummary.parameters.slotLength * relativeEpoch
+              epochEraSummary.parameters.epochLength * epochEraSummary.parameters.slotLength.valueOf() * relativeEpoch
           ),
           slot: epochEraSummary.start.slot + epochEraSummary.parameters.epochLength * relativeEpoch
         });
         expect(lastSlot).toEqual({
           date: new Date(
             epochEraSummary.start.time.getTime() +
-              epochEraSummary.parameters.epochLength * epochEraSummary.parameters.slotLength * (relativeEpoch + 1) -
-              epochEraSummary.parameters.slotLength
+              epochEraSummary.parameters.epochLength *
+                epochEraSummary.parameters.slotLength.valueOf() *
+                (relativeEpoch + 1) -
+              epochEraSummary.parameters.slotLength.valueOf()
           ),
           slot: epochEraSummary.start.slot + epochEraSummary.parameters.epochLength * (relativeEpoch + 1) - 1
         });

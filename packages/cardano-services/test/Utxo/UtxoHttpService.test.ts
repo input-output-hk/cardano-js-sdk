@@ -165,15 +165,21 @@ describe('UtxoHttpService', () => {
       it('return UTxOs for a single address', async () => {
         const addresses = await fixtureBuilder.getAddresses(1);
         const res = await provider.utxoByAddresses({ addresses });
+
         expect(res.length).toBeGreaterThan(0);
         expect(res[0]).toMatchShapeOf([DataMocks.Tx.input, DataMocks.Tx.output]);
+        expect(() => Cardano.Address(addresses[0] as unknown as string)).not.toThrow();
       });
 
       it('return UTxO with inline datum', async () => {
         const addresses = await fixtureBuilder.getAddresses(1, { with: [AddressWith.InlineDatum] });
-        const res = await provider.utxoByAddresses({ addresses });
+        const res: Cardano.Utxo[] = await provider.utxoByAddresses({ addresses });
+        const firstTxOut = res[0][1];
+
         expect(res.length).toBeGreaterThan(0);
         expect(res[0]).toMatchShapeOf([DataMocks.Tx.input, DataMocks.Tx.outputWithInlineDatum]);
+        expect(() => Cardano.util.HexBlob(firstTxOut.datum! as unknown as string)).not.toThrow();
+        expect(() => Cardano.util.Hash32ByteBase16(firstTxOut.datumHash! as unknown as string)).not.toThrow();
       });
 
       it('return UTxO with time lock reference script', async () => {
@@ -239,21 +245,21 @@ describe('UtxoHttpService', () => {
           with: [AddressWith.MultiAsset, AddressWith.AssetWithoutName]
         });
         const res = await provider.utxoByAddresses({ addresses });
-        let txOut: Cardano.TxOut;
+        let txOutWithAssetThatHasNoName: Cardano.TxOut;
 
-        for (const outputs of res) {
-          const assets = outputs[1].value.assets;
+        for (const [_, output] of res) {
+          const assets = output.value.assets;
           if (!assets) continue;
 
-          for (const id of Cardano.AssetId(outputs[1].value.assets!.keys())) {
+          for (const id of assets.keys()) {
             if (Asset.util.assetNameFromAssetId(Cardano.AssetId(id)).toString() === '') {
-              txOut = outputs[1];
+              txOutWithAssetThatHasNoName = output;
             }
           }
         }
 
-        expect(txOut!).toBeDefined();
-        expect(txOut!.value.assets!.size).toBeGreaterThan(0);
+        expect(txOutWithAssetThatHasNoName!).toBeDefined();
+        expect(txOutWithAssetThatHasNoName!.value.assets!.size).toBeGreaterThan(0);
       });
     });
   });

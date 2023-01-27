@@ -1,37 +1,33 @@
+import { DbSyncProvider, DbSyncProviderDependencies } from '../../util/DbSyncProvider';
 import {
-  CardanoNode,
   ProviderError,
   ProviderFailure,
   RewardAccountBalanceArgs,
   RewardsHistoryArgs,
   RewardsProvider
 } from '@cardano-sdk/core';
-import { DbSyncProvider } from '../../util/DbSyncProvider';
-import { Logger } from 'ts-log';
-import { Pool } from 'pg';
 import { RewardsBuilder } from './RewardsBuilder';
 import { rewardsToCore } from './mappers';
 
+/**
+ * Properties that are need to create DbSyncRewardsProvider
+ */
 export interface RewardsProviderProps {
+  /**
+   * Pagination page size limit used for provider methods constraint.
+   */
   paginationPageSizeLimit: number;
-}
-export interface RewardsProviderDependencies {
-  db: Pool;
-  cardanoNode: CardanoNode;
-  logger: Logger;
 }
 
 export class DbSyncRewardsProvider extends DbSyncProvider() implements RewardsProvider {
-  #logger: Logger;
   #builder: RewardsBuilder;
   #paginationPageSizeLimit: number;
 
   constructor(
     { paginationPageSizeLimit }: RewardsProviderProps,
-    { db, cardanoNode, logger }: RewardsProviderDependencies
+    { db, cardanoNode, logger }: DbSyncProviderDependencies
   ) {
-    super(db, cardanoNode);
-    this.#logger = logger;
+    super({ cardanoNode, db, logger });
     this.#builder = new RewardsBuilder(db, logger);
     this.#paginationPageSizeLimit = paginationPageSizeLimit;
   }
@@ -48,7 +44,7 @@ export class DbSyncRewardsProvider extends DbSyncProvider() implements RewardsPr
     return rewardsToCore(rewards);
   }
   public async rewardAccountBalance({ rewardAccount }: RewardAccountBalanceArgs) {
-    this.#logger.debug(`About to get balance of reward account ${rewardAccount.toString()}`);
+    this.logger.debug(`About to get balance of reward account ${rewardAccount.toString()}`);
     const balance = await this.#builder.getAccountBalance(rewardAccount);
     return BigInt(balance?.balance || '0');
   }

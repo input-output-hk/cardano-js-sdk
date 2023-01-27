@@ -34,7 +34,7 @@ import { DEFAULT_TOKEN_METADATA_CACHE_TTL, DEFAULT_TOKEN_METADATA_SERVER_URL } f
 import { EPOCH_POLL_INTERVAL_DEFAULT } from './util';
 import { InvalidLoggerLevel } from './errors';
 import { URL } from 'url';
-import { cacheTtlValidator } from './util/validators';
+import { buildInfoValidator, cacheTtlValidator, existingFileValidator } from './util/validators';
 import { loggerMethodNames } from '@cardano-sdk/util';
 import clear from 'clear';
 import fs from 'fs';
@@ -58,12 +58,6 @@ const stringToBoolean = (value: string, program: Programs, option: string) => {
   throw new WrongOption(program, option, ['false', 'true']);
 };
 
-const existingFileValidator = (filePath: string) => {
-  if (fs.existsSync(filePath)) {
-    return filePath;
-  }
-  throw new Error(`No file exists at ${filePath}`);
-};
 const getSecret = (secretFilePath?: string, secret?: string) =>
   secretFilePath ? loadSecret(secretFilePath) : secret ? secret : undefined;
 
@@ -155,6 +149,11 @@ commonOptions(
       .argParser((enableMetrics) =>
         stringToBoolean(enableMetrics, Programs.HttpServer, ProgramOptionDescriptions.EnableMetrics)
       )
+  )
+  .addOption(
+    new Option('--build-info <buildInfo>', ProgramOptionDescriptions.BuildInfo)
+      .env('BUILD_INFO')
+      .argParser(buildInfoValidator)
   )
   .addOption(
     new Option(

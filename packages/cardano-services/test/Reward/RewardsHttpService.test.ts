@@ -238,6 +238,7 @@ describe('RewardsHttpService', () => {
           const rewardAccount = (await fixtureBuilder.getRewardAccounts(1))[0];
           const response = await provider.rewardAccountBalance({ rewardAccount });
           expect(response).toBeGreaterThan(0);
+          expect(() => Cardano.RewardAccount(rewardAccount as unknown as string)).not.toThrow();
         });
 
         it('returns address balance 0 when it has no rewards', async () => {

@@ -1,19 +1,23 @@
-import { ChainSyncEvent, ChainSyncEventType, Intersection } from '@cardano-sdk/core';
+import { ChainSyncEventType, ChainSyncRollBackward, ChainSyncRollForward, Intersection } from '@cardano-sdk/core';
 import { GeneratorMetadata } from '../Content';
 import { Logger } from 'ts-log';
 import { Ogmios, ogmiosToCore } from '@cardano-sdk/ogmios';
 
 type CardanoMetadata = Pick<GeneratorMetadata['metadata'], 'cardano'>;
 
+export type SerializedChainSyncEvent =
+  | Omit<ChainSyncRollForward, 'requestNext'>
+  | Omit<ChainSyncRollBackward, 'requestNext'>;
+
 export type GetChainSyncEventsResponse = {
-  events: ChainSyncEvent[];
+  events: SerializedChainSyncEvent[];
   metadata: CardanoMetadata;
 };
 
 type RequestedBlocks = { [blockHeight: number]: Ogmios.Schema.Block };
 
-const blocksWithRollbacks = (blockHeights: number[], requestedBlocks: RequestedBlocks): ChainSyncEvent[] => {
-  const result: ChainSyncEvent[] = [];
+const blocksWithRollbacks = (blockHeights: number[], requestedBlocks: RequestedBlocks): SerializedChainSyncEvent[] => {
+  const result: SerializedChainSyncEvent[] = [];
   for (const blockHeight of blockHeights) {
     if (blockHeight >= 0) {
       const requestedBlock = requestedBlocks[blockHeight];

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Logger } from 'ts-log';
 import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
-import { fromSerializableObject, isConnectionError, toSerializableObject } from '@cardano-sdk/util';
+import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import axios, { AxiosAdapter, AxiosRequestConfig } from 'axios';
 
 const isEmptyResponse = (response: any) => response === '';
@@ -110,8 +110,7 @@ export const createHttpProvider = <T extends object>({
               if (mapError) return mapError(typedError, method);
               throw new ProviderError(ProviderFailure.Unknown, typedError);
             }
-            if (mapError) return mapError(null, method);
-            if (isConnectionError(error)) {
+            if (error.request) {
               throw new ProviderError(ProviderFailure.ConnectionFailure, error, error.code);
             }
           }

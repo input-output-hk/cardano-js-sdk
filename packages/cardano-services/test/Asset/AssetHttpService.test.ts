@@ -9,7 +9,7 @@ import {
   NftMetadataService,
   TokenMetadataService
 } from '../../src';
-import { AssetProvider } from '@cardano-sdk/core';
+import { AssetProvider, Cardano } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, assetInfoHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { INFO, createLogger } from 'bunyan';
 import { LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
@@ -172,7 +172,10 @@ describe('AssetHttpService', () => {
         const res = await provider.getAsset({
           assetId: assets[0].id
         });
+
         expect(res.name).toEqual(assets[0].name);
+        expect(() => Cardano.PolicyId(assets[0].policyId as unknown as string)).not.toThrow();
+        expect(() => Cardano.AssetName(assets[0].name as unknown as string)).not.toThrow();
       });
 
       it('returns asset info with extra data when requested', async () => {

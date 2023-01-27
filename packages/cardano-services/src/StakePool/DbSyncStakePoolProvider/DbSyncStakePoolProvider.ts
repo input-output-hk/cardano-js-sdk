@@ -1,6 +1,5 @@
 import {
   Cardano,
-  CardanoNode,
   Paginated,
   ProviderError,
   ProviderFailure,
@@ -9,31 +8,45 @@ import {
   StakePoolStats
 } from '@cardano-sdk/core';
 import { CommonPoolInfo, OrderedResult, PoolAPY, PoolData, PoolMetrics, PoolSortType, PoolUpdate } from './types';
-import { DbSyncProvider } from '../../util/DbSyncProvider';
+import { DbSyncProvider, DbSyncProviderDependencies } from '../../util/DbSyncProvider';
 import { Disposer, EpochMonitor } from '../../util/polling/types';
 import { IDS_NAMESPACE, StakePoolsSubQuery, emptyPoolsExtraInfo, getStakePoolSortType, queryCacheKey } from './util';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../InMemoryCache';
-import { Logger } from 'ts-log';
-import { Pool } from 'pg';
 import { RunnableModule, isNotNil } from '@cardano-sdk/util';
 import { StakePoolBuilder } from './StakePoolBuilder';
 import { StakePoolExtMetadataService } from '../types';
 import { toStakePoolResults } from './mappers';
 
+/**
+ * Properties that are need to create DbSyncStakePoolProvider
+ */
 export interface StakePoolProviderProps {
+  /**
+   * Pagination page size limit used for provider methods constraint.
+   */
   paginationPageSizeLimit: number;
 }
-export interface StakePoolProviderDependencies {
-  db: Pool;
-  logger: Logger;
+
+/**
+ * Dependencies that are need to create DbSyncStakePoolProvider
+ */
+export interface StakePoolProviderDependencies extends DbSyncProviderDependencies {
+  /**
+   *The in memory cache engine.
+   */
   cache: InMemoryCache;
+  /**
+   * Monitor the epoch rollover through db polling.
+   */
   epochMonitor: EpochMonitor;
-  cardanoNode: CardanoNode;
+  /**
+   * The Stake Pool extended metadata service.
+   */
   metadataService: StakePoolExtMetadataService;
 }
+
 export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) implements StakePoolProvider {
   #builder: StakePoolBuilder;
-  #logger: Logger;
   #cache: InMemoryCache;
   #epochMonitor: EpochMonitor;
   #epochRolloverDisposer: Disposer;
@@ -44,8 +57,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
     { paginationPageSizeLimit }: StakePoolProviderProps,
     { db, cardanoNode, metadataService, cache, logger, epochMonitor }: StakePoolProviderDependencies
   ) {
-    super(db, cardanoNode, 'DbSyncStakePoolProvider', logger);
-    this.#logger = logger;
+    super({ cardanoNode, db, logger }, 'DbSyncStakePoolProvider', logger);
     this.#cache = cache;
     this.#epochMonitor = epochMonitor;
     this.#builder = new StakePoolBuilder(db, logger);
@@ -93,7 +105,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
   private async getPoolsDataOrdered(poolUpdates: PoolUpdate[], totalAdaAmount: string, options?: QueryStakePoolsArgs) {
     const hashesIds = poolUpdates.map(({ id }) => id);
     const updatesIds = poolUpdates.map(({ updateId }) => updateId);
-    this.#logger.debug(`${hashesIds.length} pools found`);
+    this.logger.debug(`${hashesIds.length} pools found`);
     const sortType = options?.sort?.field ? getStakePoolSortType(options.sort.field) : 'data';
     const orderedResult = await this.getQueryBySortType(sortType, { hashesIds, totalAdaAmount, updatesIds })(options);
     const orderedResultHashIds = (orderedResult as CommonPoolInfo[]).map(({ hashId }) => hashId);
@@ -104,12 +116,12 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
     if (sortType !== 'data') {
       // If queryPoolData is not the one used to sort there could be more stake pools that should be fetched
       // but might not appear in the orderByQuery result
-      this.#logger.debug('About to query stake pools data');
+      this.logger.debug('About to query stake pools data');
       poolDatas = await this.#builder.queryPoolData(orderedResultUpdateIds);
       // If not reached, try to fill the pagination limit using pool data default order
       if (options?.pagination?.limit && orderedResult.length < options.pagination.limit) {
         const restOfPoolUpdateIds = updatesIds.filter((updateId) => !orderedResultUpdateIds.includes(updateId));
-        this.#logger.debug('About to query rest of stake pools data');
+        this.logger.debug('About to query rest of stake pools data');
         const restOfPoolData = await this.#builder.queryPoolData(restOfPoolUpdateIds, {
           pagination: { limit: options.pagination.limit - orderedResult.length, startAt: 0 }
         });
@@ -137,7 +149,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
     orderedResult: OrderedResult
   ) {
     if (idsToFetch.length === 0) return emptyPoolsExtraInfo;
-    this.#logger.debug('About to query stake pool extra information');
+    this.logger.debug('About to query stake pool extra information');
     const orderedResultHashIds = idsToFetch.map(({ id }) => id);
     const orderedResultUpdateIds = idsToFetch.map(({ updateId }) => updateId);
     const [poolRelays, poolOwners, poolRegistrations, poolRetirements, poolMetrics] = await Promise.all([
@@ -252,7 +264,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
   }
 
   public async stakePoolStats(): Promise<StakePoolStats> {
-    this.#logger.debug('About to query pool stats');
+    this.logger.debug('About to query pool stats');
     return await this.#cache.get(queryCacheKey(StakePoolsSubQuery.STATS), () => this.#builder.queryPoolStats());
   }
 

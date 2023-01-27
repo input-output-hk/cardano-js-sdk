@@ -1,4 +1,4 @@
-import { Cardano, ProviderError, ProviderFailure, SupplySummary } from '@cardano-sdk/core';
+import { Cardano, ProviderError, ProviderFailure, Seconds, SupplySummary } from '@cardano-sdk/core';
 import { CostModelsParamModel, GenesisData, ProtocolParamsModel } from './types';
 import { LedgerTipModel } from '../../util/DbSyncProvider';
 import JSONbig from 'json-bigint';
@@ -22,7 +22,7 @@ export const toSupply = ({ circulatingSupply, totalSupply }: ToLovalaceSupplyInp
 
 export const toLedgerTip = ({ block_no, slot_no, hash }: LedgerTipModel): Cardano.Tip => ({
   blockNo: Cardano.BlockNo(Number(block_no)),
-  hash: Cardano.BlockId(hash.toString('hex')),
+  hash: hash.toString('hex') as unknown as Cardano.BlockId,
   slot: Cardano.Slot(Number(slot_no))
 });
 
@@ -102,6 +102,7 @@ export const toProtocolParams = ({
 export const toGenesisParams = (genesis: GenesisData): Cardano.CompactGenesis => ({
   ...genesis,
   networkId: networkIdMap[genesis.networkId],
+  slotLength: Seconds(genesis.slotLength),
   systemStart: new Date(genesis.systemStart)
 });
 

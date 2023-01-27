@@ -10,7 +10,7 @@ import { LedgerTipModel, findLedgerTip } from '../src/util/DbSyncProvider';
 import { Ogmios } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { RabbitMQContainer } from './TxSubmit/rabbitmq/docker';
-import { ServiceNames } from '../src';
+import { ServerMetadata, ServiceNames } from '../src';
 import { createHealthyMockOgmiosServer, createUnhealthyMockOgmiosServer, ogmiosServerReady, serverReady } from './util';
 import { fromSerializableObject } from '@cardano-sdk/util';
 import { getRandomPort } from 'get-port-please';
@@ -22,7 +22,7 @@ import axios, { AxiosError } from 'axios';
 import http from 'http';
 import path from 'path';
 
-jest.setTimeout(60_000);
+jest.setTimeout(90_000);
 
 const DNS_SERVER_NOT_REACHABLE_ERROR = 'querySrv ENOTFOUND';
 const CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE = 'cannot be used with option';
@@ -64,6 +64,18 @@ const assertMetricsEndpoint = async (apiUrl: string, assertFound: boolean) => {
   try {
     const res = await axios.get(`${apiUrl}/metrics`, { headers });
     expect(res.data.toString().includes(METRICS_ENDPOINT_LABEL_RESPONSE)).toEqual(assertFound);
+  } catch (error) {
+    expect((error as AxiosError).response?.status).toBe(404);
+  }
+};
+
+const assertMetaEndpoint = async (apiUrl: string, dataMatch: any) => {
+  expect.assertions(1);
+  await serverReady(apiUrl);
+  const headers = { 'Content-Type': 'application/json' };
+  try {
+    const res = await axios.get(`${apiUrl}/meta`, { headers });
+    expect(res.data).toMatchShapeOf(dataMatch);
   } catch (error) {
     expect((error as AxiosError).response?.status).toBe(404);
   }
@@ -318,6 +330,144 @@ describe('CLI', () => {
             });
 
             await assertMetricsEndpoint(apiUrl, false);
+          });
+
+          describe('exposes a HTTP server with /meta endpoint', () => {
+            const buildInfo =
+              '{"lastModified":1666954298,"lastModifiedDate":"20221028105138","rev":"65d78fc015bf7bd856c5febe0ba84d3ad18a069c","shortRev":"65d78fc","extra":{ "narHash":"sha256-PN60Ot9hQZIwh4LRgnPd8iiq9F3hFNXP7PYVpBlM9TQ=", "path":"/nix/store/i0sgvj906qpzw1bk7h8b3vij0z477ff6-source","sourceInfo":"/nix/store/i0sgvj906qpzw1bk7h8b3vij0z477ff6-source"}}';
+
+            const metaResponse: ServerMetadata = {
+              extra: JSON.parse(
+                '{"narHash": "sha256-PN60Ot9hQZIwh4LRgnPd8iiq9F3hFNXP7PYVpBlM9TQ=", "path":"/nix/store/i0sgvj906qpzw1bk7h8b3vij0z477ff6-source", "sourceInfo":"/nix/store/i0sgvj906qpzw1bk7h8b3vij0z477ff6-source"}'
+              ),
+              lastModified: 1_666_954_298,
+              lastModifiedDate: '20221028105138',
+              rev: '65d78fc015bf7bd856c5febe0ba84d3ad18a069c',
+              shortRev: '65d78fc',
+              startupTime: 1_673_353_278_641
+            };
+
+            it('using CLI options', async () => {
+              proc = fork(
+                exePath,
+                [
+                  ...baseArgs,
+                  '--api-url',
+                  apiUrl,
+                  '--build-info',
+                  buildInfo,
+                  '--postgres-connection-string',
+                  postgresConnectionString,
+                  '--ogmios-url',
+                  ogmiosConnection.address.webSocket,
+                  '--cardano-node-config-path',
+                  cardanoNodeConfigPath,
+                  '--db-cache-ttl',
+                  dbCacheTtl,
+                  ServiceNames.Utxo
+                ],
+                { env: {}, stdio: 'pipe' }
+              );
+
+              await assertMetaEndpoint(apiUrl, metaResponse);
+            });
+
+            it('using env variables', async () => {
+              proc = fork(exePath, ['start-server'], {
+                env: {
+                  API_URL: apiUrl,
+                  BUILD_INFO: buildInfo,
+                  CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
+                  DB_CACHE_TTL: dbCacheTtl,
+                  LOGGER_MIN_SEVERITY: 'error',
+                  OGMIOS_URL: ogmiosConnection.address.webSocket,
+                  POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                  SERVICE_NAMES: `${ServiceNames.Utxo}`
+                },
+                stdio: 'pipe'
+              });
+
+              await assertMetaEndpoint(apiUrl, metaResponse);
+            });
+
+            it('defaults if build info is not provided on startup', async () => {
+              const defaultServerMeta: ServerMetadata = { startupTime: 1_234_567 };
+
+              proc = fork(
+                exePath,
+                [
+                  ...baseArgs,
+                  '--api-url',
+                  apiUrl,
+                  '--postgres-connection-string',
+                  postgresConnectionString,
+                  '--ogmios-url',
+                  ogmiosConnection.address.webSocket,
+                  '--cardano-node-config-path',
+                  cardanoNodeConfigPath,
+                  '--db-cache-ttl',
+                  dbCacheTtl,
+                  ServiceNames.Utxo
+                ],
+                { env: {}, stdio: 'pipe' }
+              );
+
+              await assertMetaEndpoint(apiUrl, defaultServerMeta);
+            });
+
+            it('exits with code 1 with provided invalid build info JSON format', (done) => {
+              const invalidBuildInfo = '{"lastModified":}';
+
+              callCliAndAssertExit(
+                {
+                  args: [
+                    ...baseArgs,
+                    '--api-url',
+                    apiUrl,
+                    '--build-info',
+                    invalidBuildInfo,
+                    '--postgres-connection-string',
+                    postgresConnectionString,
+                    '--ogmios-url',
+                    ogmiosConnection.address.webSocket,
+                    '--cardano-node-config-path',
+                    cardanoNodeConfigPath,
+                    '--db-cache-ttl',
+                    dbCacheTtl,
+                    ServiceNames.Utxo
+                  ],
+                  dataMatchOnError: 'Invalid JSON format of process.env.BUILD_INFO'
+                },
+                done
+              );
+            });
+
+            it('exits with code 1 when the provided build info does not follow the JSON schema', (done) => {
+              const buildInfoWithWrongProp = '{"lastModified1111": 1673457714494}';
+
+              callCliAndAssertExit(
+                {
+                  args: [
+                    ...baseArgs,
+                    '--api-url',
+                    apiUrl,
+                    '--build-info',
+                    buildInfoWithWrongProp,
+                    '--postgres-connection-string',
+                    postgresConnectionString,
+                    '--ogmios-url',
+                    ogmiosConnection.address.webSocket,
+                    '--cardano-node-config-path',
+                    cardanoNodeConfigPath,
+                    '--db-cache-ttl',
+                    dbCacheTtl,
+                    ServiceNames.Utxo
+                  ],
+                  dataMatchOnError: 'is not allowed to have the additional property "lastModified1111"'
+                },
+                done
+              );
+            });
           });
 
           it('setting the service names via env variable takes preference over command line argument', async () => {

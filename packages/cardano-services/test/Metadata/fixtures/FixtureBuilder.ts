@@ -24,6 +24,6 @@ export class MetadataFixtureBuilder {
       this.#logger.warn(`${desiredQty} transactions desired, only ${resultsQty} results found`);
     }
 
-    return result.rows.map(({ tx_id }) => Cardano.TransactionId(bufferToHexString(tx_id)));
+    return result.rows.map(({ tx_id }) => bufferToHexString(tx_id) as unknown as Cardano.TransactionId);
   }
 }

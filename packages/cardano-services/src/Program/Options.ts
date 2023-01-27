@@ -13,6 +13,7 @@ export enum CommonOptionDescriptions {
 
 enum HttpServerOptionDescriptions {
   ApiUrl = 'API URL',
+  BuildInfo = 'HTTP server build info',
   CardanoNodeConfigPath = 'Cardano node config path',
   EpochPollInterval = 'Epoch poll interval',
   EnableMetrics = 'Enable Prometheus Metrics',

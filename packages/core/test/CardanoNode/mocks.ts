@@ -1,9 +1,12 @@
-import { Cardano, EraSummary, HealthCheckResponse, StakeDistribution } from '../../src';
+import { Cardano, EraSummary, HealthCheckResponse, Milliseconds, StakeDistribution } from '../../src';
 
 const mockEraSummaries: EraSummary[] = [
-  { parameters: { epochLength: 21_600, slotLength: 20_000 }, start: { slot: 0, time: new Date(1_563_999_616_000) } },
   {
-    parameters: { epochLength: 432_000, slotLength: 1000 },
+    parameters: { epochLength: 21_600, slotLength: Milliseconds(20_000) },
+    start: { slot: 0, time: new Date(1_563_999_616_000) }
+  },
+  {
+    parameters: { epochLength: 432_000, slotLength: Milliseconds(1000) },
     start: { slot: 1_598_400, time: new Date(1_595_964_016_000) }
   }
 ];

@@ -1,5 +1,5 @@
 import { ChainSyncEventType } from '@cardano-sdk/core';
-import { ProjectorEvent, withEventContext } from '../../src';
+import { ProjectorEvent, operators } from '../../src';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 
 describe('withEventContext', () => {
@@ -19,7 +19,7 @@ describe('withEventContext', () => {
             eventType: ChainSyncEventType.RollBackward
           } as ProjectorEvent
         });
-        expectObservable(source$.pipe(withEventContext(createContext))).toBe('a--b', {
+        expectObservable(source$.pipe(operators.withEventContext(createContext))).toBe('a--b', {
           a: {
             ctx: 'a',
             eventType: ChainSyncEventType.RollForward
@@ -48,7 +48,7 @@ describe('withEventContext', () => {
             eventType: ChainSyncEventType.RollBackward
           } as ProjectorEvent
         });
-        expectObservable(source$.pipe(withEventContext(createContext))).toBe('a--b', {
+        expectObservable(source$.pipe(operators.withEventContext(createContext))).toBe('a--b', {
           a: {
             ctx: 'a',
             eventType: ChainSyncEventType.RollForward

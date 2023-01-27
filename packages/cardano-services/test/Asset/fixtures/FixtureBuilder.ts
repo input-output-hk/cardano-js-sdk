@@ -44,7 +44,7 @@ export class AssetFixtureBuilder {
 
     return result.rows.map(({ hash, quantity }) => ({
       quantity: BigInt(quantity),
-      transactionId: bufferToHexString(hash)
+      transactionId: bufferToHexString(hash) as unknown as Cardano.TransactionId
     }));
   }
 
@@ -68,8 +68,8 @@ export class AssetFixtureBuilder {
     return result.rows.map(({ policy, name, json }) => {
       const hexPolicy = bufferToHexString(policy);
       const hexName = bufferToHexString(name);
-      const policyId = Cardano.PolicyId(hexPolicy);
-      const assetName = Cardano.AssetName(hexName);
+      const policyId = hexPolicy as unknown as Cardano.PolicyId;
+      const assetName = hexName as unknown as Cardano.AssetName;
 
       return {
         id: Cardano.AssetId(`${hexPolicy}${hexName}`),

@@ -4,6 +4,7 @@
 
 cp ./package.json ./dist/cjs/original-package.json
 
+cp ./src/Http/openApi.json ./dist/cjs/Http/openApi.json
 cp ./src/Asset/openApi.json ./dist/cjs/Asset/openApi.json
 cp ./src/ChainHistory/openApi.json ./dist/cjs/ChainHistory/openApi.json
 cp ./src/NetworkInfo/openApi.json ./dist/cjs/NetworkInfo/openApi.json

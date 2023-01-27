@@ -4,7 +4,6 @@ import { BlockModel, BlockOutputModel, TipModel, TxInputModel, TxModel, TxOutput
 import {
   BlocksByIdsArgs,
   Cardano,
-  CardanoNode,
   ChainHistoryProvider,
   Paginated,
   ProviderError,
@@ -14,36 +13,45 @@ import {
 } from '@cardano-sdk/core';
 import { ChainHistoryBuilder } from './ChainHistoryBuilder';
 import { DB_MAX_SAFE_INTEGER } from './queries';
-import { DbSyncProvider } from '../../util/DbSyncProvider';
-import { Logger } from 'ts-log';
-import { Pool, QueryResult } from 'pg';
+import { DbSyncProvider, DbSyncProviderDependencies } from '../../util/DbSyncProvider';
+import { QueryResult } from 'pg';
 import { TxMetadataService } from '../../Metadata';
 import { applyPagination } from './util';
 import { hexStringToBuffer } from '@cardano-sdk/util';
 import { mapBlock, mapTxAlonzo, mapTxIn, mapTxInModel, mapTxOut, mapTxOutModel } from './mappers';
 import orderBy from 'lodash/orderBy';
 import uniq from 'lodash/uniq';
+
+/**
+ * Properties that are need to create DbSyncChainHistoryProvider
+ */
 export interface ChainHistoryProviderProps {
+  /**
+   * Pagination page size limit used for provider methods constraint.
+   */
   paginationPageSizeLimit: number;
 }
-export interface ChainHistoryProviderDependencies {
-  db: Pool;
-  cardanoNode: CardanoNode;
+
+/**
+ * Dependencies that are need to create DbSyncChainHistoryProvider
+ */
+export interface ChainHistoryProviderDependencies extends DbSyncProviderDependencies {
+  /**
+   * The TxMetadataService to retrieve transactions metadata by hashes.
+   */
   metadataService: TxMetadataService;
-  logger: Logger;
 }
+
 export class DbSyncChainHistoryProvider extends DbSyncProvider() implements ChainHistoryProvider {
   #paginationPageSizeLimit: number;
   #builder: ChainHistoryBuilder;
   #metadataService: TxMetadataService;
-  #logger: Logger;
 
   constructor(
     { paginationPageSizeLimit }: ChainHistoryProviderProps,
     { db, cardanoNode, metadataService, logger }: ChainHistoryProviderDependencies
   ) {
-    super(db, cardanoNode);
-    this.#logger = logger;
+    super({ cardanoNode, db, logger });
     this.#builder = new ChainHistoryBuilder(db, logger);
     this.#metadataService = metadataService;
     this.#paginationPageSizeLimit = paginationPageSizeLimit;
@@ -73,7 +81,7 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
     const lowerBound = blockRange?.lowerBound ?? 0;
     const upperBound = blockRange?.upperBound ?? DB_MAX_SAFE_INTEGER;
 
-    this.#logger.debug(
+    this.logger.debug(
       `About to find transactions of addresses ${addresses} ${
         blockRange?.lowerBound ? `since block ${lowerBound}` : ''
       } ${blockRange?.upperBound ? `and before ${upperBound}` : ''}`
@@ -114,7 +122,7 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
     }
 
     const byteIds = ids.map((id) => hexStringToBuffer(id.toString()));
-    this.#logger.debug('About to find transactions with hashes:', byteIds);
+    this.logger.debug('About to find transactions with hashes:', byteIds);
     const txResults: QueryResult<TxModel> = await this.db.query(Queries.findTransactionsByHashes, [byteIds]);
     if (txResults.rows.length === 0) return [];
 
@@ -130,7 +138,7 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
     ]);
 
     return txResults.rows.map((tx) => {
-      const txId = Cardano.TransactionId(tx.id.toString('hex'));
+      const txId = tx.id.toString('hex') as unknown as Cardano.TransactionId;
       const txInputs = orderBy(inputs.filter((input) => input.txInputId === txId).map(mapTxIn), ['index']);
       const txCollaterals = orderBy(collaterals.filter((col) => col.txInputId === txId).map(mapTxIn), ['index']);
       const txOutputs = orderBy(outputs.filter((output) => output.txId === txId).map(mapTxOut), ['index']);
@@ -157,17 +165,17 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
       );
     }
 
-    this.#logger.debug('About to find network tip');
+    this.logger.debug('About to find network tip');
     const tipResult: QueryResult<TipModel> = await this.db.query(Queries.findTip);
     const tip: TipModel = tipResult.rows[0];
     if (!tip) return [];
 
     const byteIds = ids.map((id) => hexStringToBuffer(id.toString()));
-    this.#logger.debug('About to find blocks with hashes:', byteIds);
+    this.logger.debug('About to find blocks with hashes:', byteIds);
     const blocksResult: QueryResult<BlockModel> = await this.db.query(Queries.findBlocksByHashes, [byteIds]);
     if (blocksResult.rows.length === 0) return [];
 
-    this.#logger.debug('About to find blocks outputs and fees for blocks:', byteIds);
+    this.logger.debug('About to find blocks outputs and fees for blocks:', byteIds);
     const outputResult: QueryResult<BlockOutputModel> = await this.db.query(Queries.findBlocksOutputByHashes, [
       byteIds
     ]);

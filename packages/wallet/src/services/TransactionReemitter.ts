@@ -146,7 +146,7 @@ export const createTransactionReemitter = ({
 
   const reemitSubmittedBefore$ = tipSlot$.pipe(
     withLatestFrom(genesisParameters$),
-    map(([tip, { slotLength }]) => tip.valueOf() - maxInterval / (slotLength * 1000))
+    map(([tip, { slotLength }]) => tip.valueOf() - maxInterval / (slotLength.valueOf() * 1000))
   );
   const reemitUnconfirmed$ = combineLatest([reemitSubmittedBefore$, inFlight$]).pipe(
     mergeMap(([reemitSubmittedBefore, inFlight]) =>

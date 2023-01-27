@@ -220,7 +220,7 @@ SELECT
     THEN 0::numeric
     ELSE 
       (
-        (COALESCE(a_stake.active_stake,0::numeric) + COALESCE(l_stake.live_stake,0::numeric)) * 
+        COALESCE(l_stake.live_stake,0::numeric) *
         ((SELECT optimal_pool_count FROM current_epoch)::NUMERIC) /
         ($2::numeric)
       )::numeric

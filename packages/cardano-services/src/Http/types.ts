@@ -12,6 +12,15 @@ export type ServicesHealthCheckResponse = {
   services: ServiceHealth[];
 };
 
+export type ServerMetadata = {
+  lastModified?: number;
+  lastModifiedDate?: string;
+  rev?: string;
+  shortRev?: string;
+  extra?: JSON;
+  startupTime: number;
+};
+
 export type HttpServerConfig = {
   metrics?: {
     enabled: boolean;
@@ -21,5 +30,8 @@ export type HttpServerConfig = {
     limit?: Options['limit'];
   };
   name?: string;
+  meta?: ServerMetadata;
   listen: net.ListenOptions;
 };
+
+export type BuildInfo = Omit<ServerMetadata, 'extra' | 'startupTime'>;

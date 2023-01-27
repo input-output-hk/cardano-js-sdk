@@ -61,7 +61,7 @@ export const createSlotEpochCalc: (eraSummaries: EraSummary[]) => (slotNo: Slot)
      * @throws EraSummaryError
      * @returns {EpochNo} epoch of the slot
      */
-    return memoize((slotNo: Slot): EpochNo => EpochNo(calc(slotNo).epochNo));
+    return (slotNo: Slot): EpochNo => EpochNo(calc(slotNo).epochNo);
   }
 );
 
@@ -82,7 +82,7 @@ export const createSlotTimeCalc = (eraSummaries: EraSummary[]) => {
     }
     return new Date(
       activeEraSummary.start.time.getTime() +
-        (slotNo.valueOf() - activeEraSummary.start.slot) * activeEraSummary.parameters.slotLength
+        (slotNo.valueOf() - activeEraSummary.start.slot) * activeEraSummary.parameters.slotLength.valueOf()
     );
   };
 };
