@@ -53,14 +53,14 @@ A Yarn Workspace maintaining a single version across all packages.
 - [Docker Desktop] 3.4 or later or a Docker installation that includes Compose V2
 
 #### Clone
-``` console
+``` bash
 git clone \
   https://github.com/input-output-hk/cardano-js-sdk.git \
   && cd cardano-js-sdk
 ```
 #### Install and Build
 
-```console
+```bash
 nvm install && \
 nvm use && \
 yarn install && \
@@ -69,19 +69,19 @@ yarn build
 
 #### Run Tests
 
-```console
+```bash
 yarn test
 ```
 
 or
 
-```console
+```bash
 yarn test:debug
 ```
 
 ### Lint
 
-```console
+```bash
 yarn lint
 yarn lint --fix
 ```
@@ -116,19 +116,19 @@ nix run .#config-update
 
 ### Pack
 
-```console
+```bash
 ./scripts/pack.sh
 ```
 
 ### Publish to npm.org
 
-```console
+```bash
 ./scripts/publish.sh
 ```
 
 ### Generate Docs
 
-```console
+```bash
 yarn docs
 ```
 

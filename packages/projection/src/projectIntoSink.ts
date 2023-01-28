@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable jsdoc/valid-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Cardano, ChainSyncEventType, Intersection } from '@cardano-sdk/core';
@@ -61,7 +62,7 @@ const intersectionDescription = (intersection: Intersection) =>
 // TODO: try to write types that will infer returned observable type from supplied projections.
 // Inferring properties added by sinks (e.g. before() and after()) would be nice too, but probably not necessary.
 /**
- * @throws {@link InvalidIntersectionError} when no intesection with provided {@link StabilityWindowBuffer} is found.
+ * @throws {@link InvalidIntersectionError} when no intersection with provided {@link sinks.StabilityWindowBuffer} is found.
  */
 export const projectIntoSink = <P extends object, PS extends P>(
   props: ProjectIntoSinkProps<P, PS>

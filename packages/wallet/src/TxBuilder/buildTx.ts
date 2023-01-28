@@ -1,6 +1,5 @@
+/* eslint-disable max-len */
 import { Cardano } from '@cardano-sdk/core';
-import { Observable, firstValueFrom } from 'rxjs';
-
 import { FinalizeTxProps, InitializeTxProps, InitializeTxResult, ObservableWallet } from '../types';
 import {
   IncompatibleWalletError,
@@ -15,6 +14,7 @@ import {
   ValidTx
 } from './types';
 import { Logger } from 'ts-log';
+import { Observable, firstValueFrom } from 'rxjs';
 import { ObservableWalletTxOutputBuilder } from './OutputBuilder';
 import { OutputValidator, RewardAccount, StakeKeyStatus, WalletUtilContext, createWalletUtil } from '../services';
 import { SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
@@ -38,8 +38,8 @@ export type ObservableWalletTxBuilderDependencies = Pick<ObservableWallet, 'subm
 /**
  * Properties needed by {@link buildTx} to build a {@link ObservableWalletTxBuilder} TxBuilder
  *
- * - {@link BuildTxProps.observableWallet} minimal ObservableWallet needed to do actions like {@link build()},
- *   {@link delegate()} etc.
+ * - {@link BuildTxProps.observableWallet} minimal ObservableWallet needed to do actions like {@link ObservableWalletTxBuilder.build},
+ *   {@link ObservableWalletTxBuilder.delegate} etc.
  * - {@link BuildTxProps.outputValidator} optional custom output validator util.
  *   Uses {@link createWalletUtil} by default.
  */
