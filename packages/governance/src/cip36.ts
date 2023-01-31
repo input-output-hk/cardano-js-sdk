@@ -17,18 +17,18 @@ export enum MetadataLabel {
 export const SIG_MAP_KEY = 1n;
 
 /**
- * CIP-36 voting key derivation path constants
+ * CIP-36 vote key derivation path constants
  */
-export enum VotingKeyDerivationPath {
+export enum CIP36VoteKeyDerivationPath {
   PURPOSE = 1694,
   COIN_TYPE = 1815
 }
 
 /**
- * Voting power delegation to a specified voting key
+ * Voting power delegation to a specified vote key
  */
-export interface GovernanceKeyDelegation {
-  votingKey: Crypto.Ed25519PublicKeyHex;
+export interface VoteKeyDelegation {
+  cip36VoteKey: Crypto.Ed25519PublicKeyHex;
   /**
    * Integer >0
    */
@@ -43,9 +43,9 @@ export enum VotingPurpose {
 }
 
 export interface BuildVotingRegistrationProps {
-  delegations: GovernanceKeyDelegation[];
+  delegations: VoteKeyDelegation[];
   stakeKey: Crypto.Ed25519PublicKeyHex;
-  rewardAccount: Cardano.RewardAccount;
+  paymentAddress: Cardano.Address;
   purpose: VotingPurpose;
   nonce?: number;
 }
@@ -68,14 +68,14 @@ export const metadataBuilder = {
     delegations,
     stakeKey,
     purpose,
-    rewardAccount,
+    paymentAddress,
     nonce = Date.now()
   }: BuildVotingRegistrationProps): Cardano.TxMetadata {
-    const cmlRewardAddress = CML.Address.from_bech32(rewardAccount.toString());
+    const cmlPaymentAddress = CML.Address.from_bech32(paymentAddress.toString());
     const votingRegistration = new Map<bigint, Cardano.Metadatum>([
-      [1n, delegations.map(({ votingKey, weight }) => [Buffer.from(votingKey, 'hex'), BigInt(weight)])],
+      [1n, delegations.map(({ cip36VoteKey, weight }) => [Buffer.from(cip36VoteKey, 'hex'), BigInt(weight)])],
       [2n, Buffer.from(stakeKey, 'hex')],
-      [3n, Buffer.from(cmlRewardAddress.to_bytes())],
+      [3n, Buffer.from(cmlPaymentAddress.to_bytes())],
       [4n, BigInt(nonce)],
       [5n, BigInt(purpose)]
     ]);
