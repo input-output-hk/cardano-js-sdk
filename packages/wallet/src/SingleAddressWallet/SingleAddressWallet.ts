@@ -141,7 +141,8 @@ export class SingleAddressWallet implements ObservableWallet {
     pending$: new Subject<Cardano.Tx>(),
     submitting$: new Subject<Cardano.Tx>()
   };
-  #resubmitSubscription: Subscription;
+  #reemitSubscriptions: Subscription;
+  #failedFromReemitter$: Subject<FailedTx>;
   #trackedTxSubmitProvider: TrackedTxSubmitProvider;
 
   readonly keyAgent: AsyncKeyAgent;
@@ -330,9 +331,11 @@ export class SingleAddressWallet implements ObservableWallet {
     const addresses$ = this.addresses$.pipe(
       map((addresses) => addresses.map((groupedAddress) => groupedAddress.address))
     );
+    this.#failedFromReemitter$ = new Subject<FailedTx>();
     this.transactions = createTransactionsTracker({
       addresses$,
       chainHistoryProvider: this.chainHistoryProvider,
+      failedFromReemitter$: this.#failedFromReemitter$,
       inFlightTransactionsStore: stores.inFlightTransactions,
       logger: contextLogger(this.#logger, 'transactions'),
       newTransactions: this.#newTransactions,
@@ -342,7 +345,7 @@ export class SingleAddressWallet implements ObservableWallet {
       transactionsHistoryStore: stores.transactions
     });
 
-    const transactionsReemiter = createTransactionReemitter({
+    const transactionsReemitter = createTransactionReemitter({
       genesisParameters$: this.genesisParameters$,
       logger: contextLogger(this.#logger, 'transactionsReemitter'),
       maxInterval,
@@ -351,15 +354,19 @@ export class SingleAddressWallet implements ObservableWallet {
       transactions: this.transactions
     });
 
-    this.#resubmitSubscription = transactionsReemiter.reemit$
-      .pipe(
-        mergeMap((transaction) => from(this.submitTx(transaction, { mightBeAlreadySubmitted: true }))),
-        catchError((err) => {
-          this.#logger.error('Failed to resubmit transaction', err);
-          return EMPTY;
-        })
-      )
-      .subscribe();
+    this.#reemitSubscriptions = new Subscription();
+    this.#reemitSubscriptions.add(transactionsReemitter.failed$.subscribe(this.#failedFromReemitter$));
+    this.#reemitSubscriptions.add(
+      transactionsReemitter.reemit$
+        .pipe(
+          mergeMap((transaction) => from(this.submitTx(transaction, { mightBeAlreadySubmitted: true }))),
+          catchError((err) => {
+            this.#logger.error('Failed to resubmit transaction', err);
+            return EMPTY;
+          })
+        )
+        .subscribe()
+    );
 
     this.utxo = createUtxoTracker({
       addresses$,
@@ -523,7 +530,8 @@ export class SingleAddressWallet implements ObservableWallet {
     this.#newTransactions.failedToSubmit$.complete();
     this.#newTransactions.pending$.complete();
     this.#newTransactions.submitting$.complete();
-    this.#resubmitSubscription.unsubscribe();
+    this.#reemitSubscriptions.unsubscribe();
+    this.#failedFromReemitter$.complete();
     this.#logger.debug('Shutdown');
   }
 

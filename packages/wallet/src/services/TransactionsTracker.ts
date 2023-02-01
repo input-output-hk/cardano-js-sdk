@@ -15,6 +15,7 @@ import {
   map,
   merge,
   mergeMap,
+  mergeWith,
   of,
   race,
   scan,
@@ -47,6 +48,7 @@ export interface TransactionsTrackerProps {
     pending$: Observable<Cardano.Tx>;
     failedToSubmit$: Observable<FailedTx>;
   };
+  failedFromReemitter$?: Observable<FailedTx>;
   logger: Logger;
   onFatalError?: (value: unknown) => void;
 }
@@ -210,6 +212,7 @@ export const createTransactionsTracker = (
     transactionsHistoryStore: transactionsStore,
     inFlightTransactionsStore: newTransactionsStore,
     logger,
+    failedFromReemitter$,
     onFatalError
   }: TransactionsTrackerProps,
   { transactionsSource$: txSource$, rollback$ }: TransactionsTrackerInternals = createAddressTransactionsProvider({
@@ -284,6 +287,7 @@ export const createTransactionsTracker = (
           })
         )
       ),
+      mergeWith(failedFromReemitter$ || EMPTY),
       tap((failed) => logger.debug(`Transaction ${failed.tx.id} failed`, failed.reason))
     )
     .subscribe(failed$);
