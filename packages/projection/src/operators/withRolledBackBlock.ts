@@ -20,7 +20,7 @@ export const withRolledBackBlock =
               takeWhile(
                 (block): block is Cardano.Block =>
                   block !== 'origin' &&
-                  (chainSyncEvent.tip === 'origin' || chainSyncEvent.tip.hash !== block.header.hash)
+                  (chainSyncEvent.point === 'origin' || chainSyncEvent.point.hash !== block.header.hash)
               ),
               map((block) => ({
                 ...chainSyncEvent,

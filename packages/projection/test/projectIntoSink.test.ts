@@ -1,6 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, ChainSyncEventType, ChainSyncRollForward } from '@cardano-sdk/core';
-import { InvalidIntersectionError, projectIntoSink, projections, sinks } from '../src';
+import { ObservableChainSyncError, projectIntoSink, projections, sinks } from '../src';
 import { StubChainSyncData, dataWithPoolRetirement, dataWithStakeKeyDeregistration } from './events';
 import { concat, defaultIfEmpty, firstValueFrom, lastValueFrom, toArray } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
@@ -132,7 +132,7 @@ describe('projectIntoSink', () => {
       ).pipe(defaultIfEmpty(null))
     );
     await expect(projectAll(dataWithStakeKeyDeregistration, inMemorySinks)).rejects.toThrowError(
-      InvalidIntersectionError
+      ObservableChainSyncError
     );
   });
 

@@ -547,6 +547,10 @@
     },
     {
       "eventType": 1,
+      "point": {
+        "hash": "b830b7fb2eb6f7ed18a30cedd2c347769d83ecd7902edf89a4c9ea2b7ffa2020",
+        "slot": 687859
+      },
       "tip": {
         "blockNo": 22618,
         "hash": "b830b7fb2eb6f7ed18a30cedd2c347769d83ecd7902edf89a4c9ea2b7ffa2020",
@@ -4197,6 +4201,10 @@
     },
     {
       "eventType": 1,
+      "point": {
+        "hash": "383bb0210d135b0701aca287b4b534957b64f364076158987af3a128d20c04f7",
+        "slot": 690875
+      },
       "tip": {
         "blockNo": 22734,
         "hash": "383bb0210d135b0701aca287b4b534957b64f364076158987af3a128d20c04f7",
