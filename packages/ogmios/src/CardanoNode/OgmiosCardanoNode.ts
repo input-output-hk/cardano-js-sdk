@@ -19,7 +19,7 @@ import {
 import { Logger } from 'ts-log';
 import { RunnableModule, contextLogger } from '@cardano-sdk/util';
 import { createInteractionContextWithLogger } from '../util';
-import { mapEraSummary } from './mappers';
+import { eraSummary } from '../ogmiosToCore';
 
 /**
  * Access cardano-node APIs via Ogmios
@@ -56,7 +56,7 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
       this.#logger.info('Getting era summaries');
       const systemStart = await this.#stateQueryClient.systemStart();
       const eraSummaries = await this.#stateQueryClient.eraSummaries();
-      return eraSummaries.map((era) => mapEraSummary(era, systemStart));
+      return eraSummaries.map((era) => eraSummary(era, systemStart));
     } catch (error) {
       throw CardanoNodeUtil.asCardanoNodeError(error) || new CardanoNodeErrors.UnknownCardanoNodeError(error);
     }
