@@ -329,62 +329,34 @@ epoch_rewards AS (
 )`;
 
 export const findPoolEpochRewards = (epochLength: number, limit?: number) => `
-  ${epochRewardsSubqueries(epochLength, limit)}
-  SELECT
-    active_stake,
-    epoch_length::TEXT,
-    epoch_no,
-    hash_id,
-    leader_rewards,
-    member_rewards,
-    member_roi,
-    pledge
-  FROM epoch_rewards
-  ORDER BY epoch_no desc
+${epochRewardsSubqueries(epochLength, limit)}
+SELECT
+  active_stake,
+  epoch_length::TEXT,
+  epoch_no,
+  hash_id,
+  leader_rewards,
+  member_rewards,
+  member_roi,
+  pledge
+FROM epoch_rewards
+ORDER BY epoch_no desc
 `;
 
 export const findPoolAPY = (epochLength: number, limit?: number) => `
-  ${epochRewardsSubqueries(epochLength, limit)},
-  avg_daily_roi AS (
-    SELECT
-      hash_id,
-      SUM(COALESCE(member_roi / NULLIF(epoch_length / 86400000, 0.0), 0.0)) / COUNT(1) AS avg_roi
-    FROM epoch_rewards
-    GROUP BY hash_id
-  ),
-  pool_apy AS (
-    SELECT
-      epochs.hash_id,
-      (
-        LEAST(
-          POWER(
-            (
-              1 + (
-                avg_daily_roi.avg_roi * (epochs.epoch_length / 86400000)
-              )
-            ):: numeric,
-            COALESCE(
-              365 / NULLIF(epochs.epoch_length / 86400000, 0),
-              0
-            ):: numeric
-          ),
-          1E+308
-        ) -1
-      ):: double precision AS apy
-    FROM epoch_rewards AS epochs
-    JOIN (
-      SELECT
-        hash_id,
-        MAX(epoch_no) AS epoch_no
-        FROM epoch_rewards AS sub
-        GROUP BY hash_id
-      ) AS max_epoch
-      ON max_epoch.epoch_no = epochs.epoch_no
-      AND max_epoch.hash_id = epochs.hash_id
-    JOIN avg_daily_roi
-      ON avg_daily_roi.hash_id = epochs.hash_id
-  )
-  SELECT * FROM pool_apy
+${epochRewardsSubqueries(epochLength, limit)}
+SELECT
+  hash_id,
+  COALESCE(
+    (SUM(member_rewards) / (SUM(active_stake) - SUM(pledge))) /
+      NULLIF(${epochLength} / 86400000, 0) * 365,
+    0
+  )::DOUBLE PRECISION AS apy
+FROM epoch_rewards
+WHERE
+  epoch_no < (SELECT MAX("no") - 1 FROM epoch)
+GROUP BY
+  hash_id
 `;
 
 export const findPools = `

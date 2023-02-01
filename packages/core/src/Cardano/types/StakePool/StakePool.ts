@@ -81,7 +81,15 @@ export interface StakePoolMetrics {
   delegators: number;
 
   /**
-   * Rewards Annual Percentage Yield (APY).
+   * The Annual Percentage Yield (APY) from a delegator's perspective in the given period.
+   *
+   * The given period is defined by all requested spendable epochs: all requested epochs except
+   * the current and previous.
+   *
+   * Formula: (memberRewards / (activeStake - pledge)) / days_per_epoch * 365
+   *
+   * Where: memberRewards, activeStake and pledge are the sum of the respective data from all
+   * epochs in the given period.
    */
   apy?: Percent;
 }
@@ -138,7 +146,10 @@ export class StakePoolEpochRewards {
   leaderRewards: Lovelace;
 
   /**
-   * memberRewards / (activeStake - pledge), not annualized.
+   * The Return Of Investment (ROI) from a delegator's perspective in the given epoch. Not annualized.
+   *
+   * Formula: memberRewards / (activeStake - pledge)
+   *
    * Incomplete for last two epochs.
    */
   memberROI: Percent;
