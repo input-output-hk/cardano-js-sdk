@@ -104,6 +104,7 @@ export const projectIntoSink = <P extends object, PS extends P>(
             of({
               block,
               eventType: ChainSyncEventType.RollBackward,
+              point: chainSync.intersection.point,
               // requestNext is a no-op when rolling back during initialization, because projectIntoSink will
               // delete block from the buffer for every RollBackward event via `manageBuffer`,
               // which will trigger the buffer to emit the next tip$

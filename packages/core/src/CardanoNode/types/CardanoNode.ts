@@ -80,6 +80,7 @@ export interface ChainSyncRollForward {
 
 export interface ChainSyncRollBackward {
   eventType: ChainSyncEventType.RollBackward;
+  point: PointOrOrigin;
   tip: TipOrOrigin;
   requestNext: RequestNext;
 }

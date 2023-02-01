@@ -9,16 +9,23 @@ const createEvent = (eventType: ChainSyncEventType, slot: number, tipSlot = slot
   ({
     block: { header: { blockNo: Cardano.BlockNo(slot), hash: stubBlockId(slot), slot: Cardano.Slot(slot) } },
     eventType,
+    point:
+      eventType === ChainSyncEventType.RollForward
+        ? undefined
+        : { hash: stubBlockId(tipSlot), slot: Cardano.Slot(tipSlot) },
     requestNext: expect.anything(),
     tip: { blockNo: Cardano.BlockNo(tipSlot), hash: stubBlockId(tipSlot), slot: Cardano.Slot(tipSlot) }
   } as UnifiedProjectorEvent<{}>);
 
-const sourceRollback = (slot: number) =>
-  ({
+const sourceRollback = (slot: number): ChainSyncRollBackward => {
+  const point = { hash: stubBlockId(slot), slot: Cardano.Slot(slot) };
+  return {
     eventType: ChainSyncEventType.RollBackward,
+    point,
     requestNext: jest.fn(),
-    tip: { blockNo: Cardano.BlockNo(slot), hash: stubBlockId(slot), slot: Cardano.Slot(slot) }
-  } as ChainSyncRollBackward);
+    tip: { ...point, blockNo: Cardano.BlockNo(slot) }
+  };
+};
 
 describe('withRolledBackBlocks', () => {
   let buffer: sinks.StabilityWindowBuffer;
