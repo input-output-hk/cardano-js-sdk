@@ -12,7 +12,6 @@ import {
 import {
   Cardano,
   ChainHistoryProvider,
-  InvalidStringError,
   NetworkInfoProvider,
   RewardsProvider,
   UtxoProvider,
@@ -26,6 +25,7 @@ import {
   SingleAddressWallet,
   setupWallet
 } from '../../src';
+import { InvalidStringError } from '@cardano-sdk/util';
 import { ReplaySubject, firstValueFrom } from 'rxjs';
 import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
 import { currentEpoch, networkInfo, queryTransactionsResult, queryTransactionsResult2 } from '../mocks';

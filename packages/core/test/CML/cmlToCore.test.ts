@@ -1,5 +1,5 @@
+import { Base64Blob, HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { Cardano, cmlToCore, coreToCml } from '../../src';
-import { ManagedFreeableScope } from '@cardano-sdk/util';
 import { NativeScript } from '@dcspark/cardano-multiplatform-lib-nodejs';
 import {
   babbageTx,
@@ -147,8 +147,8 @@ describe('cmlToCore', () => {
     // values from ogmios.wsp.json
     const bootstrap: Cardano.BootstrapWitness[] = [
       {
-        addressAttributes: Cardano.util.Base64Blob('oA=='),
-        chainCode: Cardano.util.HexBlob('b6dbf0b03c93afe5696f10d49e8a8304ebfac01deeb8f82f2af5836ebbc1b450'),
+        addressAttributes: Base64Blob('oA=='),
+        chainCode: HexBlob('b6dbf0b03c93afe5696f10d49e8a8304ebfac01deeb8f82f2af5836ebbc1b450'),
         key: Cardano.Ed25519PublicKey('deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01'),
         signature: Cardano.Ed25519Signature(
           Buffer.from(

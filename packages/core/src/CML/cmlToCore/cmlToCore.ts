@@ -1,7 +1,6 @@
 import * as Cardano from '../../Cardano';
-import * as util from '../../Cardano/util/primitives';
+import { Base64Blob, Hash32ByteBase16, HexBlob, ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
 import { CML } from '../CML';
-import { ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
 import { PlutusLanguageVersion, ScriptType } from '../../Cardano';
 import { ScriptKind } from '@dcspark/cardano-multiplatform-lib-nodejs';
 import { SerializationError, SerializationFailure } from '../../errors';
@@ -157,14 +156,14 @@ export const getCoreScript = (scope: ManagedFreeableScope, script: CML.Script): 
     case ScriptKind.PlutusScriptV1:
       coreScriptRef = {
         __type: ScriptType.Plutus,
-        bytes: util.HexBlob.fromBytes(scope.manage(script.as_plutus_v1()!).to_bytes()),
+        bytes: HexBlob.fromBytes(scope.manage(script.as_plutus_v1()!).to_bytes()),
         version: PlutusLanguageVersion.V1
       };
       break;
     case ScriptKind.PlutusScriptV2:
       coreScriptRef = {
         __type: ScriptType.Plutus,
-        bytes: util.HexBlob.fromBytes(scope.manage(script.as_plutus_v2()!).to_bytes()),
+        bytes: HexBlob.fromBytes(scope.manage(script.as_plutus_v2()!).to_bytes()),
         version: PlutusLanguageVersion.V2
       };
       break;
@@ -189,7 +188,7 @@ export const txOut = (output: CML.TransactionOutput): Cardano.TxOut =>
     return {
       address: Cardano.Address(address),
       datum: inlineDatum ? bytesToHex(inlineDatum) : undefined,
-      datumHash: dataHashBytes ? Cardano.util.Hash32ByteBase16.fromHexBlob(bytesToHex(dataHashBytes)) : undefined,
+      datumHash: dataHashBytes ? Hash32ByteBase16.fromHexBlob(bytesToHex(dataHashBytes)) : undefined,
       scriptReference: scriptRef ? getCoreScript(scope, scope.manage(scriptRef.script())) : undefined,
       value: value(scope.manage(output.amount()))
     };
@@ -282,7 +281,7 @@ export const txBody = (body: CML.TransactionBody): Cardano.TxBody =>
       referenceInputs: cslReferenceInputs ? txInputs(cslReferenceInputs) : undefined,
       requiredExtraSignatures: txRequiredExtraSignatures(scope.manage(body.required_signers())),
       scriptIntegrityHash:
-        cslScriptDataHash && Cardano.util.Hash32ByteBase16(Buffer.from(cslScriptDataHash.to_bytes()).toString('hex')),
+        cslScriptDataHash && Hash32ByteBase16(Buffer.from(cslScriptDataHash.to_bytes()).toString('hex')),
       totalCollateral: cslTotalCollateral ? BigInt(cslTotalCollateral.to_str()) : undefined,
       validityInterval: validityInterval(scope, body),
       withdrawals: txWithdrawals(scope.manage(body.withdrawals()))
@@ -298,8 +297,8 @@ export const txWitnessBootstrap = (bootstraps?: CML.BootstrapWitnesses): Cardano
       const attributes = scope.manage(bootstrap.attributes()).to_bytes();
       const chainCode = bootstrap.chain_code();
       result.push({
-        addressAttributes: attributes?.length > 0 ? Cardano.util.Base64Blob.fromBytes(attributes) : undefined,
-        chainCode: chainCode?.length > 0 ? Cardano.util.HexBlob.fromBytes(chainCode) : undefined,
+        addressAttributes: attributes?.length > 0 ? Base64Blob.fromBytes(attributes) : undefined,
+        chainCode: chainCode?.length > 0 ? HexBlob.fromBytes(chainCode) : undefined,
         key: Cardano.Ed25519PublicKey(
           Buffer.from(scope.manage(scope.manage(bootstrap.vkey()).public_key()).as_bytes()).toString('hex')
         ),
@@ -324,7 +323,7 @@ export const txWitnessRedeemers = (redeemers?: CML.Redeemers): Cardano.Redeemer[
       const redeemerTagKind = scope.manage(reedeemer.tag()).kind();
 
       result.push({
-        data: Cardano.util.HexBlob.fromBytes(scope.manage(reedeemer.data()).to_bytes()),
+        data: HexBlob.fromBytes(scope.manage(reedeemer.data()).to_bytes()),
         executionUnits: {
           memory: Number(scope.manage(exUnits.mem()).to_str()),
           steps: Number(scope.manage(exUnits.steps()).to_str())
@@ -341,7 +340,7 @@ export const txWitnessDatums = (datums?: CML.PlutusList): Cardano.Datum[] | unde
     if (!datums) return;
     const result: Cardano.Datum[] = [];
     for (let j = 0; j < datums.len(); j++) {
-      result.push(Cardano.util.HexBlob.fromBytes(scope.manage(datums.get(j)).to_bytes()));
+      result.push(HexBlob.fromBytes(scope.manage(datums.get(j)).to_bytes()));
     }
     return result;
   });
@@ -357,7 +356,7 @@ export const txWitnessScripts = (witnessSet: CML.TransactionWitnessSet): Cardano
       for (let i = 0; i < plutusScriptsV1.len(); ++i) {
         scripts.push({
           __type: Cardano.ScriptType.Plutus,
-          bytes: Cardano.util.HexBlob(scope.manage(plutusScriptsV1.get(i)).to_js_value()),
+          bytes: HexBlob(scope.manage(plutusScriptsV1.get(i)).to_js_value()),
           version: Cardano.PlutusLanguageVersion.V1
         });
       }
@@ -366,7 +365,7 @@ export const txWitnessScripts = (witnessSet: CML.TransactionWitnessSet): Cardano
       for (let i = 0; i < plutusScriptsV2.len(); ++i) {
         scripts.push({
           __type: Cardano.ScriptType.Plutus,
-          bytes: Cardano.util.HexBlob(scope.manage(plutusScriptsV2.get(i)).to_js_value()),
+          bytes: HexBlob(scope.manage(plutusScriptsV2.get(i)).to_js_value()),
           version: Cardano.PlutusLanguageVersion.V2
         });
       }

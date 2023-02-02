@@ -1,5 +1,6 @@
 import { AsyncKeyAgent, InMemoryKeyAgent, KeyAgent, util } from '../../src';
 import { Cardano } from '@cardano-sdk/core';
+import { HexBlob } from '@cardano-sdk/util';
 import { dummyLogger } from 'ts-log';
 import { firstValueFrom } from 'rxjs';
 
@@ -31,7 +32,7 @@ describe('createAsyncKeyAgent maps KeyAgent to AsyncKeyAgent', () => {
       await keyAgent.deriveAddress(addressDerivationPath)
     );
     const keyDerivationPath = { index: 0, role: 0 };
-    const blob = Cardano.util.HexBlob('abc123');
+    const blob = HexBlob('abc123');
     await expect(asyncKeyAgent.signBlob(keyDerivationPath, blob)).resolves.toEqual(
       await keyAgent.signBlob(keyDerivationPath, blob)
     );

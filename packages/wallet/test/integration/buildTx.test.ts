@@ -5,6 +5,7 @@ import { Cardano, CardanoNodeErrors } from '@cardano-sdk/core';
 import { of } from 'rxjs';
 
 import * as mocks from '../mocks';
+import { Hash32ByteBase16 } from '@cardano-sdk/util';
 import {
   IncompatibleWalletError,
   ObservableWallet,
@@ -190,7 +191,7 @@ describe('buildTx', () => {
     let assetQuantity: bigint;
     let assets: Cardano.TokenMap;
     let address: Cardano.Address;
-    let datumHash: Cardano.util.Hash32ByteBase16;
+    let datumHash: Hash32ByteBase16;
     let output1Coin: bigint;
     let output2Base: Cardano.TxOut;
 
@@ -199,7 +200,7 @@ describe('buildTx', () => {
       assetQuantity = 100n;
       assets = new Map([[assetId, assetQuantity]]);
       address = Cardano.Address('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg');
-      datumHash = Cardano.util.Hash32ByteBase16('3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d');
+      datumHash = Hash32ByteBase16('3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d');
       output1Coin = 10_000_000n;
       output2Base = mocks.utxo[0][1];
 

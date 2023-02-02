@@ -1,5 +1,5 @@
 import { Ed25519Signature, TransactionId } from '../../../src/Cardano';
-import { HexBlob } from '../../../src/Cardano/util';
+import { HexBlob } from '@cardano-sdk/util';
 
 describe('Cardano/types/Transaction', () => {
   it('TransactionId accepts a valid transaction hash hex string', () => {

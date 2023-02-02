@@ -9,6 +9,7 @@ import { ChainHistoryHttpService, DbSyncChainHistoryProvider, HttpServer, HttpSe
 import { CreateHttpProviderConfig, chainHistoryHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { DB_MAX_SAFE_INTEGER } from '../../src/ChainHistory/DbSyncChainHistory/queries';
 import { DataMocks } from '../data-mocks';
+import { HexBlob } from '@cardano-sdk/util';
 import { LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
@@ -305,7 +306,7 @@ describe('ChainHistoryHttpService', () => {
           expect(response.length).toEqual(1);
           expect(tx.witness).toMatchShapeOf(DataMocks.Tx.witnessRedeemers);
           expect(tx.witness.redeemers!.length).toBeGreaterThan(0);
-          expect(() => Cardano.util.HexBlob(tx.witness.redeemers![0].data as unknown as string)).not.toThrow();
+          expect(() => HexBlob(tx.witness.redeemers![0].data as unknown as string)).not.toThrow();
         });
 
         it('has auxiliary data', async () => {

@@ -1,6 +1,6 @@
 import { Ed25519KeyHash } from './Key';
 import { EpochNo } from './Block';
-import { Hash28ByteBase16, Hash32ByteBase16 } from '../util/primitives';
+import { Hash28ByteBase16, Hash32ByteBase16 } from '@cardano-sdk/util';
 import { Lovelace } from './Value';
 import { PoolId, PoolParameters } from './StakePool';
 import { RewardAccount } from './RewardAccount';

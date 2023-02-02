@@ -1,7 +1,8 @@
 /* eslint-disable max-len */
 import { ExtendedStakePoolMetadata } from './ExtendedStakePoolMetadata';
-import { Hash32ByteBase16, OpaqueString, typedBech32 } from '../../util/primitives';
+import { Hash32ByteBase16, typedBech32 } from '@cardano-sdk/util';
 import { Lovelace } from '../Value';
+import { OpaqueString } from '@cardano-sdk/util';
 import { PoolId, VrfVkHex } from './primitives';
 import { Relay } from './Relay';
 import { RewardAccount } from '../RewardAccount';

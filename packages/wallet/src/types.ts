@@ -2,9 +2,9 @@ import { Asset, Cardano, EpochInfo, EraSummary, NetworkInfoProvider } from '@car
 import { BalanceTracker, DelegationTracker, TransactionalObservables, TransactionsTracker } from './services';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { GroupedAddress, SignTransactionOptions, TransactionSigner, cip8 } from '@cardano-sdk/key-management';
+import { Hash32ByteBase16, Shutdown } from '@cardano-sdk/util';
 import { Observable } from 'rxjs';
 import { SelectionSkeleton } from '@cardano-sdk/input-selection';
-import { Shutdown } from '@cardano-sdk/util';
 
 export type InitializeTxProps = {
   outputs?: Set<Cardano.TxOut>;
@@ -15,7 +15,7 @@ export type InitializeTxProps = {
   };
   collaterals?: Set<Cardano.TxIn>;
   mint?: Cardano.TokenMap;
-  scriptIntegrityHash?: Cardano.util.Hash32ByteBase16;
+  scriptIntegrityHash?: Hash32ByteBase16;
   requiredExtraSignatures?: Cardano.Ed25519KeyHash[];
   extraSigners?: TransactionSigner[];
   signingOptions?: SignTransactionOptions;

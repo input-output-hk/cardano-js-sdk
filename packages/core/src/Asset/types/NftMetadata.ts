@@ -1,8 +1,8 @@
 /* eslint-disable wrap-regex */
-import { InvalidStringError } from '../../errors';
-import { Metadatum, util } from '../../Cardano';
+import { Metadatum } from '../../Cardano';
+import { InvalidStringError, OpaqueString } from '@cardano-sdk/util';
 
-export type Uri = util.OpaqueString<'Uri'>;
+export type Uri = OpaqueString<'Uri'>;
 export const Uri = (uri: string) => {
   if (/^[a-z]+:\/\/.+/.test(uri)) {
     return uri as unknown as Uri;
@@ -15,7 +15,7 @@ export const Uri = (uri: string) => {
   );
 };
 
-export type ImageMediaType = util.OpaqueString<'ImageMediaType'>;
+export type ImageMediaType = OpaqueString<'ImageMediaType'>;
 export const ImageMediaType = (mediaType: string) => {
   if (/^image\/.+$/.test(mediaType)) {
     return mediaType as unknown as ImageMediaType;
@@ -23,7 +23,7 @@ export const ImageMediaType = (mediaType: string) => {
   throw new InvalidStringError('Expected media type to be "image/*"');
 };
 
-export type MediaType = util.OpaqueString<'MediaType'>;
+export type MediaType = OpaqueString<'MediaType'>;
 export const MediaType = (mediaType: string) => {
   if (/^[a-z]+\/.+$/.test(mediaType)) {
     return mediaType as unknown as MediaType;

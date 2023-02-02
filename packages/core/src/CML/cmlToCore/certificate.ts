@@ -15,10 +15,9 @@ import {
   StakeDelegationCertificate,
   VrfVkHex
 } from '../../Cardano/types';
-import { Hash28ByteBase16, Hash32ByteBase16 } from '../../Cardano/util/primitives';
+import { Hash28ByteBase16, Hash32ByteBase16, usingAutoFree } from '@cardano-sdk/util';
 import { NetworkId } from '../../Cardano/ChainId';
 import { NotImplementedError, SerializationError, SerializationFailure } from '../../errors';
-import { usingAutoFree } from '@cardano-sdk/util';
 
 const stakeRegistration = (certificate: CML.StakeRegistration): StakeAddressCertificate =>
   usingAutoFree((scope) => ({

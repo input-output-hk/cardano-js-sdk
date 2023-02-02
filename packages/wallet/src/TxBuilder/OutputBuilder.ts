@@ -1,5 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
 
+import { Hash32ByteBase16 } from '@cardano-sdk/util';
 import {
   MaybeValidTxOut,
   OutputBuilder,
@@ -91,7 +92,7 @@ export class ObservableWalletTxOutputBuilder implements OutputBuilder {
     return this;
   }
 
-  datum(datumHash: Cardano.util.Hash32ByteBase16): OutputBuilder {
+  datum(datumHash: Hash32ByteBase16): OutputBuilder {
     this.#partialOutput = { ...this.#partialOutput, datumHash };
     return this;
   }

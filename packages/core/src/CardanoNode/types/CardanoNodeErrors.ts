@@ -10,7 +10,7 @@ import {
   UnknownResultError,
   WebSocketClosed
 } from '@cardano-ogmios/client';
-import { ComposableError } from '../../errors';
+import { ComposableError } from '@cardano-sdk/util';
 import { CustomError } from 'ts-custom-error';
 
 export class NotInitializedError extends CustomError {

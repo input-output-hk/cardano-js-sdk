@@ -10,6 +10,7 @@ import {
   SignTransactionOptions
 } from './types';
 import { CML, Cardano, util } from '@cardano-sdk/core';
+import { HexBlob } from '@cardano-sdk/util';
 import { STAKE_KEY_DERIVATION_PATH } from './util';
 
 export abstract class KeyAgentBase implements KeyAgent {
@@ -34,7 +35,7 @@ export abstract class KeyAgentBase implements KeyAgent {
   get accountIndex(): number {
     return this.serializableData.accountIndex;
   }
-  abstract signBlob(derivationPath: AccountKeyDerivationPath, blob: Cardano.util.HexBlob): Promise<SignBlobResult>;
+  abstract signBlob(derivationPath: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult>;
   abstract exportRootPrivateKey(): Promise<Cardano.Bip32PrivateKey>;
   abstract signTransaction(
     txInternals: Cardano.TxBodyWithHash,

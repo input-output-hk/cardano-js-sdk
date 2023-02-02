@@ -1,3 +1,4 @@
+import { Base64Blob, Hash28ByteBase16, Hash32ByteBase16, HexBlob } from '@cardano-sdk/util';
 import { Cardano } from '../../src';
 import {
   Ed25519KeyHash,
@@ -13,7 +14,7 @@ export const poolId = Cardano.PoolId('pool1mpgg03jxj52qwxvvy7cmj58a96vl9pvxcqqvu
 export const ownerRewardAccount = Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
 export const vrf = Cardano.VrfVkHex('8dd154228946bd12967c12bedb1cb6038b78f8b84a1760b1a788fa72a4af3db0');
 export const metadataJson = {
-  hash: Cardano.util.Hash32ByteBase16('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'),
+  hash: Hash32ByteBase16('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'),
   url: 'https://example.com'
 };
 export const poolParameters: Cardano.PoolParameters = {
@@ -110,8 +111,8 @@ export const invalidBabbageTxOut: Cardano.TxOut = {
   address: Cardano.Address(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
-  datum: Cardano.util.HexBlob('187b'),
-  datumHash: Cardano.util.Hash32ByteBase16('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'),
+  datum: HexBlob('187b'),
+  datumHash: Hash32ByteBase16('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'),
   scriptReference: script,
   value: valueWithAssets
 };
@@ -120,7 +121,7 @@ export const babbageTxOutWithDatumHash: Cardano.TxOut = {
   address: Cardano.Address(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
-  datumHash: Cardano.util.Hash32ByteBase16('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'),
+  datumHash: Hash32ByteBase16('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'),
   scriptReference: script,
   value: valueWithAssets
 };
@@ -129,7 +130,7 @@ export const babbageTxOutWithInlineDatum: Cardano.TxOut = {
   address: Cardano.Address(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
-  datum: Cardano.util.HexBlob('187b'),
+  datum: HexBlob('187b'),
   scriptReference: script,
   value: valueWithAssets
 };
@@ -143,7 +144,7 @@ export const txOutWithDatum: Cardano.TxOut = {
   address: Cardano.Address(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
-  datumHash: Cardano.util.Hash32ByteBase16('4c94610a582b748b8db506abb45ccd48d0d4934942daa87d191645b947a547a7'),
+  datumHash: Hash32ByteBase16('4c94610a582b748b8db506abb45ccd48d0d4934942daa87d191645b947a547a7'),
   value: valueWithAssets
 };
 
@@ -156,9 +157,9 @@ export const txBody: Cardano.TxBody = {
     },
     {
       __typename: Cardano.CertificateType.GenesisKeyDelegation,
-      genesisDelegateHash: Cardano.util.Hash28ByteBase16('a646474b8f5431261506b6c273d307c7569a4eb6c96b42dd4a29520a'),
-      genesisHash: Cardano.util.Hash28ByteBase16('0d94e174732ef9aae73f395ab44507bfa983d65023c11a951f0c32e4'),
-      vrfKeyHash: Cardano.util.Hash32ByteBase16('03170a2e7597b7b7e3d84c05391d139a62b157e78786d8c082f29dcf4c111314')
+      genesisDelegateHash: Hash28ByteBase16('a646474b8f5431261506b6c273d307c7569a4eb6c96b42dd4a29520a'),
+      genesisHash: Hash28ByteBase16('0d94e174732ef9aae73f395ab44507bfa983d65023c11a951f0c32e4'),
+      vrfKeyHash: Hash32ByteBase16('03170a2e7597b7b7e3d84c05391d139a62b157e78786d8c082f29dcf4c111314')
     }
   ],
   collaterals: [{ ...txIn, index: txIn.index + 1 }],
@@ -167,9 +168,7 @@ export const txBody: Cardano.TxBody = {
   mint: mintTokenMap,
   outputs: [txOut],
   requiredExtraSignatures: [Cardano.Ed25519KeyHash('6199186adb51974690d7247d2646097d2c62763b16fb7ed3f9f55d39')],
-  scriptIntegrityHash: Cardano.util.Hash32ByteBase16(
-    '6199186adb51974690d7247d2646097d2c62763b16fb7ed3f9f55d38abc123de'
-  ),
+  scriptIntegrityHash: Hash32ByteBase16('6199186adb51974690d7247d2646097d2c62763b16fb7ed3f9f55d38abc123de'),
   validityInterval: {
     invalidBefore: Cardano.Slot(100),
     invalidHereafter: Cardano.Slot(1000)
@@ -218,8 +217,8 @@ export const tx: Cardano.Tx = {
     // bootstrap values from ogmios.wsp.json
     bootstrap: [
       {
-        addressAttributes: Cardano.util.Base64Blob('oA=='),
-        chainCode: Cardano.util.HexBlob('b6dbf0b03c93afe5696f10d49e8a8304ebfac01deeb8f82f2af5836ebbc1b450'),
+        addressAttributes: Base64Blob('oA=='),
+        chainCode: HexBlob('b6dbf0b03c93afe5696f10d49e8a8304ebfac01deeb8f82f2af5836ebbc1b450'),
         key: Cardano.Ed25519PublicKey('deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01'),
         signature: Cardano.Ed25519Signature(
           Buffer.from(
@@ -229,10 +228,10 @@ export const tx: Cardano.Tx = {
         )
       }
     ],
-    datums: [Cardano.util.HexBlob('187b')],
+    datums: [HexBlob('187b')],
     redeemers: [
       {
-        data: Cardano.util.HexBlob('d86682008101'),
+        data: HexBlob('d86682008101'),
         executionUnits: {
           memory: 3000,
           steps: 7000
@@ -241,7 +240,7 @@ export const tx: Cardano.Tx = {
         purpose: RedeemerPurpose.mint
       },
       {
-        data: Cardano.util.HexBlob('d86682008102'),
+        data: HexBlob('d86682008102'),
         executionUnits: {
           memory: 5000,
           steps: 2000
@@ -253,12 +252,12 @@ export const tx: Cardano.Tx = {
     scripts: [
       {
         __type: ScriptType.Plutus,
-        bytes: Cardano.util.HexBlob('b6dbf0b03c93afe5696f10d49e8a8304ebfac01deeb8f82f2af5836ebbc1b450'),
+        bytes: HexBlob('b6dbf0b03c93afe5696f10d49e8a8304ebfac01deeb8f82f2af5836ebbc1b450'),
         version: PlutusLanguageVersion.V1
       },
       {
         __type: ScriptType.Plutus,
-        bytes: Cardano.util.HexBlob('b6dbf0b03c93afe5696f10d49e8a8304ebfac01deeb8f82f2af5836ebbc1b450'),
+        bytes: HexBlob('b6dbf0b03c93afe5696f10d49e8a8304ebfac01deeb8f82f2af5836ebbc1b450'),
         version: PlutusLanguageVersion.V2
       },
       {

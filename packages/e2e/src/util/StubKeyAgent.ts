@@ -8,6 +8,7 @@ import {
   SignTransactionOptions
 } from '@cardano-sdk/key-management';
 import { Cardano, NotImplementedError } from '@cardano-sdk/core';
+import { HexBlob } from '@cardano-sdk/util';
 
 export class StubKeyAgent implements KeyAgent {
   readonly #knownAddresses: GroupedAddress[];
@@ -44,7 +45,7 @@ export class StubKeyAgent implements KeyAgent {
     throw new NotImplementedError('derivePublicKey');
   }
 
-  signBlob(_derivationPath: AccountKeyDerivationPath, _blob: Cardano.util.HexBlob): Promise<SignBlobResult> {
+  signBlob(_derivationPath: AccountKeyDerivationPath, _blob: HexBlob): Promise<SignBlobResult> {
     throw new NotImplementedError('signBlob');
   }
 

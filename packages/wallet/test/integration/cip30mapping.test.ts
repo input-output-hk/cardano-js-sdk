@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, sonarjs/no-duplicate-string */
 import { ApiError, DataSignError, TxSendError, TxSignError, WalletApi } from '@cardano-sdk/dapp-connector';
 import { CML, Cardano, cmlToCore, coreToCml } from '@cardano-sdk/core';
+import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence';
 import { InitializeTxProps, InitializeTxResult, SingleAddressWallet, cip30 } from '../../src';
-import { ManagedFreeableScope } from '@cardano-sdk/util';
 import { createWallet } from './util';
 import { firstValueFrom, of } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
@@ -116,7 +116,7 @@ describe('cip30', () => {
 
     test('api.signData', async () => {
       const [{ address }] = await firstValueFrom(wallet.addresses$);
-      const cip30dataSignature = await api.signData(address, Cardano.util.HexBlob('abc123').toString());
+      const cip30dataSignature = await api.signData(address, HexBlob('abc123').toString());
       expect(typeof cip30dataSignature.key).toBe('string');
       expect(typeof cip30dataSignature.signature).toBe('string');
     });

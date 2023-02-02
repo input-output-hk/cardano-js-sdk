@@ -5,11 +5,11 @@ import {
   Hash28ByteBase16,
   Hash32ByteBase16,
   HexBlob,
+  InvalidStringError,
   castHexBlob,
   typedBech32,
   typedHex
-} from '../../../src/Cardano/util';
-import { InvalidStringError } from '../../../src';
+} from '../src';
 
 describe('Cardano.util/primitives', () => {
   describe('typedBech32', () => {

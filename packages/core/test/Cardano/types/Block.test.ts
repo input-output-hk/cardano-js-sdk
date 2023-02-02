@@ -1,9 +1,10 @@
-import { BlockId, SlotLeader, VrfVkBech32, util } from '../../../src/Cardano';
-import { InvalidStringError } from '../../../src';
+import { BlockId, SlotLeader, VrfVkBech32 } from '../../../src/Cardano';
+import { Hash32ByteBase16, InvalidStringError, typedBech32 } from '@cardano-sdk/util';
 
-jest.mock('../../../src/Cardano/util/primitives', () => {
-  const actual = jest.requireActual('../../../src/Cardano/util/primitives');
+jest.mock('@cardano-sdk/util', () => {
+  const actual = jest.requireActual('@cardano-sdk/util');
   return {
+    ...actual,
     Hash28ByteBase16: jest.fn().mockImplementation((...args) => actual.Hash28ByteBase16(...args)),
     Hash32ByteBase16: jest.fn().mockImplementation((...args) => actual.Hash32ByteBase16(...args)),
     typedBech32: jest.fn().mockImplementation((...args) => actual.typedBech32(...args))
@@ -11,14 +12,14 @@ jest.mock('../../../src/Cardano/util/primitives', () => {
 });
 
 describe('Cardano/types/Block', () => {
-  it('BlockId() accepts a valid transaction hash and is implemented using util.Hash32ByteBase16', () => {
+  it('BlockId() accepts a valid transaction hash and is implemented using Hash32ByteBase16', () => {
     expect(() => BlockId('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed')).not.toThrow();
-    expect(util.Hash32ByteBase16).toBeCalledWith('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed');
+    expect(Hash32ByteBase16).toBeCalledWith('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed');
   });
 
-  it('VrfVkBech32() accepts a valid vrf vkey bech32 string and is implemented using util.typedBech32', () => {
+  it('VrfVkBech32() accepts a valid vrf vkey bech32 string and is implemented using typedBech32', () => {
     expect(() => VrfVkBech32('vrf_vk19j362pkr4t9y0m3qxgmrv0365vd7c4ze03ny4jh84q8agjy4ep4s99zvg8')).not.toThrow();
-    expect(util.typedBech32).toBeCalledWith(
+    expect(typedBech32).toBeCalledWith(
       'vrf_vk19j362pkr4t9y0m3qxgmrv0365vd7c4ze03ny4jh84q8agjy4ep4s99zvg8',
       'vrf_vk',
       52
@@ -26,7 +27,7 @@ describe('Cardano/types/Block', () => {
   });
 
   describe('SlotLeader()', () => {
-    it('accepts a valid PoolId and is implemented using util.typedBech32', () => {
+    it('accepts a valid PoolId and is implemented using typedBech32', () => {
       expect(() => SlotLeader('pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh')).not.toThrow();
     });
     it('accepts a valid Shelley genesis delegate', () => {

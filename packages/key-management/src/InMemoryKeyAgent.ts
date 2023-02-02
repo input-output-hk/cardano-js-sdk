@@ -11,6 +11,7 @@ import {
   SignTransactionOptions
 } from './types';
 import { CML, Cardano, util } from '@cardano-sdk/core';
+import { HexBlob } from '@cardano-sdk/util';
 import { KeyAgentBase } from './KeyAgentBase';
 import {
   deriveAccountPrivateKey,
@@ -51,7 +52,7 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
     this.#getPassword = getPassword;
   }
 
-  async signBlob({ index, role: type }: AccountKeyDerivationPath, blob: Cardano.util.HexBlob): Promise<SignBlobResult> {
+  async signBlob({ index, role: type }: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult> {
     const rootPrivateKey = await this.#decryptRootPrivateKey();
     const accountKey = deriveAccountPrivateKey({
       accountIndex: this.accountIndex,
@@ -117,7 +118,7 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
     { additionalKeyPaths = [] }: SignTransactionOptions | undefined = {}
   ): Promise<Cardano.Signatures> {
     // Possible optimization is casting strings to OpaqueString types directly and skipping validation
-    const blob = Cardano.util.HexBlob(hash.toString());
+    const blob = HexBlob(hash.toString());
     const derivationPaths = await ownSignatureKeyPaths(body, this.knownAddresses, this.inputResolver);
     const keyPaths = uniqBy([...derivationPaths, ...additionalKeyPaths], ({ role, index }) => `${role}.${index}`);
     // TODO:

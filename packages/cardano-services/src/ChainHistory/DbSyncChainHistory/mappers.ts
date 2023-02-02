@@ -1,5 +1,5 @@
 import { Asset, Cardano } from '@cardano-sdk/core';
-import { BigIntMath } from '@cardano-sdk/util';
+import { BigIntMath, Hash32ByteBase16, HexBlob } from '@cardano-sdk/util';
 import {
   BlockModel,
   BlockOutputModel,
@@ -83,9 +83,7 @@ export const mapTxOut = (txOut: TxOutput): Cardano.TxOut => ({
 
 export const mapTxOutModel = (txOutModel: TxOutputModel, assets?: Cardano.TokenMap): TxOutput => ({
   address: txOutModel.address as unknown as Cardano.Address,
-  datumHash: txOutModel.datum
-    ? (txOutModel.datum.toString('hex') as unknown as Cardano.util.Hash32ByteBase16)
-    : undefined,
+  datumHash: txOutModel.datum ? (txOutModel.datum.toString('hex') as unknown as Hash32ByteBase16) : undefined,
   index: txOutModel.index,
   txId: txOutModel.tx_id.toString('hex') as unknown as Cardano.TransactionId,
   value: {
@@ -100,7 +98,7 @@ export const mapWithdrawal = (withdrawalModel: WithdrawalModel): Cardano.Withdra
 });
 
 export const mapRedeemer = (redeemerModel: RedeemerModel): Cardano.Redeemer => ({
-  data: redeemerModel.script_hash.toString('hex') as unknown as Cardano.util.HexBlob,
+  data: redeemerModel.script_hash.toString('hex') as unknown as HexBlob,
   executionUnits: {
     memory: Number(redeemerModel.unit_mem),
     steps: Number(redeemerModel.unit_steps)

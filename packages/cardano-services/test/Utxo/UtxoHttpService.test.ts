@@ -4,6 +4,7 @@ import { Asset, Cardano, ProviderError, ProviderFailure, UtxoProvider } from '@c
 import { CreateHttpProviderConfig, utxoHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { DataMocks } from '../data-mocks';
 import { DbSyncUtxoProvider, HttpServer, HttpServerConfig, UtxoHttpService } from '../../src';
+import { Hash32ByteBase16, HexBlob } from '@cardano-sdk/util';
 import { INFO, createLogger } from 'bunyan';
 import { LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
@@ -178,8 +179,8 @@ describe('UtxoHttpService', () => {
 
         expect(res.length).toBeGreaterThan(0);
         expect(res[0]).toMatchShapeOf([DataMocks.Tx.input, DataMocks.Tx.outputWithInlineDatum]);
-        expect(() => Cardano.util.HexBlob(firstTxOut.datum! as unknown as string)).not.toThrow();
-        expect(() => Cardano.util.Hash32ByteBase16(firstTxOut.datumHash! as unknown as string)).not.toThrow();
+        expect(() => HexBlob(firstTxOut.datum! as unknown as string)).not.toThrow();
+        expect(() => Hash32ByteBase16(firstTxOut.datumHash! as unknown as string)).not.toThrow();
       });
 
       it('return UTxO with time lock reference script', async () => {

@@ -1,6 +1,6 @@
 import { EpochNo } from '../Block';
 import { Lovelace } from '../Value';
-import { OpaqueNumber } from '../../util';
+import { OpaqueNumber } from '@cardano-sdk/util';
 import { PoolIdHex } from './primitives';
 import { PoolParameters } from './PoolParameters';
 import { TransactionId } from '../Transaction';

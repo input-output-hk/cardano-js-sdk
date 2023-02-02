@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Ed25519KeyHash } from '../Key';
-import { Hash28ByteBase16, HexBlob, OpaqueString, typedBech32, typedHex } from '../../util/primitives';
+import { Hash28ByteBase16, HexBlob, OpaqueString, typedBech32, typedHex } from '@cardano-sdk/util';
 
 /**
  * pool operator verification key hash as bech32 string or a genesis pool ID
@@ -17,8 +17,7 @@ export const PoolId = (value: string): PoolId => typedBech32(value, 'pool', 45);
  * @param {string} value blake2b_224 digest of an operator verification key hash
  * @throws InvalidStringError
  */
-PoolId.fromKeyHash = (value: Ed25519KeyHash): PoolId =>
-  HexBlob.toTypedBech32('pool', HexBlob.fromEd25519KeyHash(value));
+PoolId.fromKeyHash = (value: Ed25519KeyHash): PoolId => HexBlob.toTypedBech32('pool', value as unknown as HexBlob);
 
 /**
 /**

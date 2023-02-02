@@ -1,5 +1,6 @@
 import { AddressType, InMemoryKeyAgent, KeyRole, SerializableInMemoryKeyAgentData, util } from '../src';
 import { CML, Cardano } from '@cardano-sdk/core';
+import { HexBlob } from '@cardano-sdk/util';
 import { dummyLogger } from 'ts-log';
 
 jest.mock('../src/util/ownSignatureKeyPaths');
@@ -77,10 +78,7 @@ describe('InMemoryKeyAgent', () => {
   });
 
   test('signBlob', async () => {
-    const { publicKey, signature } = await keyAgent.signBlob(
-      { index: 0, role: KeyRole.Internal },
-      Cardano.util.HexBlob('abc123')
-    );
+    const { publicKey, signature } = await keyAgent.signBlob({ index: 0, role: KeyRole.Internal }, HexBlob('abc123'));
     expect(typeof publicKey).toBe('string');
     expect(typeof signature).toBe('string');
   });

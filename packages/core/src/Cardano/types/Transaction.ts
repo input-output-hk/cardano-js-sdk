@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AuxiliaryData } from './AuxiliaryData';
-import { Base64Blob, Hash32ByteBase16, HexBlob, OpaqueString, typedHex } from '../util/primitives';
+import { Base64Blob, Hash32ByteBase16, HexBlob, OpaqueString, typedHex } from '@cardano-sdk/util';
 import { Certificate } from './Certificate';
 import { Datum, Script } from './Script';
 import { Ed25519KeyHash, Ed25519PublicKey } from './Key';

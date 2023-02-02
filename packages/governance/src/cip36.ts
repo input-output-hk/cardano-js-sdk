@@ -1,6 +1,6 @@
 import { CML, Cardano, coreToCml, util } from '@cardano-sdk/core';
+import { HexBlob, usingAutoFree } from '@cardano-sdk/util';
 import { util as keyManagementUtil } from '@cardano-sdk/key-management';
-import { usingAutoFree } from '@cardano-sdk/util';
 import blake2b from 'blake2b';
 
 /**
@@ -57,7 +57,7 @@ export interface BlobSigner {
   /**
    * Sign blob with some key
    */
-  signBlob(blob: Cardano.util.HexBlob): Promise<Cardano.Ed25519Signature>;
+  signBlob(blob: HexBlob): Promise<Cardano.Ed25519Signature>;
 }
 
 export const metadataBuilder = {

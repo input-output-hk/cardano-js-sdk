@@ -1,8 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { BigNum } from '@dcspark/cardano-multiplatform-lib-nodejs';
 import { CML } from './CML';
-import { HexBlob } from '../Cardano/util';
-import { ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
+import { HexBlob, ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
 import { Tx, TxBody } from '../Cardano';
 import { newTx } from './cmlToCore';
 

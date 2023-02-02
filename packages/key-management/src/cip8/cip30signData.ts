@@ -13,17 +13,17 @@ import {
   SigStructure
 } from '@emurgo/cardano-message-signing-nodejs';
 import { AsyncKeyAgent, KeyRole } from '../types';
-import { Cardano, ComposableError, parseCmlAddress, util } from '@cardano-sdk/core';
+import { Cardano, parseCmlAddress, util } from '@cardano-sdk/core';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
+import { ComposableError, HexBlob, usingAutoFree } from '@cardano-sdk/util';
 import { CoseLabel } from './util';
 import { STAKE_KEY_DERIVATION_PATH } from '../util';
 import { firstValueFrom } from 'rxjs';
-import { usingAutoFree } from '@cardano-sdk/util';
 
 export interface Cip30SignDataRequest {
   keyAgent: AsyncKeyAgent;
   signWith: Cardano.Address | Cardano.RewardAccount;
-  payload: Cardano.util.HexBlob;
+  payload: HexBlob;
 }
 
 export enum Cip30DataSignErrorCode {

@@ -1,6 +1,7 @@
 import { AssetId } from '@cardano-sdk/util-dev';
 import { Cardano, NetworkInfoProvider } from '@cardano-sdk/core';
 import { CreateTxInternalsProps, createTransactionInternals } from '../../src/Transaction';
+import { Hash32ByteBase16 } from '@cardano-sdk/util';
 import { SelectionConstraints } from '../../../input-selection/test/util';
 import { SelectionSkeleton, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 import { mockNetworkInfoProvider, utxo } from '../mocks';
@@ -61,16 +62,14 @@ describe('Transaction.createTransactionInternals', () => {
         [AssetId.TSLA, 20n]
       ]),
       requiredExtraSignatures: [Cardano.Ed25519KeyHash('6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed5')],
-      scriptIntegrityHash: Cardano.util.Hash32ByteBase16(
-        '3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d'
-      )
+      scriptIntegrityHash: Hash32ByteBase16('3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d')
     };
     const txInternals = await createSimpleTransactionInternals(() => props);
     expect(txInternals.body.outputs).toHaveLength(2);
     expect(txInternals.body.collaterals).toEqual<Cardano.TxIn[]>([utxo[2][0]]);
     expect(txInternals.body.mint).toEqual<Cardano.TokenMap>(props.mint);
     expect(txInternals.body.requiredExtraSignatures).toEqual<Cardano.Ed25519KeyHash[]>(props.requiredExtraSignatures);
-    expect(txInternals.body.scriptIntegrityHash).toEqual<Cardano.util.Hash32ByteBase16>(props.scriptIntegrityHash);
+    expect(txInternals.body.scriptIntegrityHash).toEqual<Hash32ByteBase16>(props.scriptIntegrityHash);
     expect(typeof txInternals.body.fee).toBe('bigint');
     expect(typeof txInternals.body.inputs[0].txId).toBe('string');
     expect(typeof txInternals.hash).toBe('string');

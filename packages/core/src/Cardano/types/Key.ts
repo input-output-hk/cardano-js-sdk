@@ -1,7 +1,7 @@
 import { CML } from '../../CML/CML';
-import { Hash28ByteBase16, HexBlob, OpaqueString, castHexBlob, typedHex } from '../util/primitives';
+import { Hash28ByteBase16, HexBlob, castHexBlob, typedHex } from '@cardano-sdk/util';
+import { OpaqueString, usingAutoFree } from '@cardano-sdk/util';
 import { RewardAccount } from './RewardAccount';
-import { usingAutoFree } from '@cardano-sdk/util';
 
 /**
  * BIP32 public key as hex string

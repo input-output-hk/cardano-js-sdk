@@ -31,7 +31,7 @@ import {
   Withdrawal,
   Witness
 } from '../../src/Cardano';
-import { Hash32ByteBase16 } from '../../src/Cardano/util';
+import { Hash32ByteBase16 } from '@cardano-sdk/util';
 import {
   assetsBurnedInspector,
   assetsMintedInspector,

@@ -1,7 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
+import { HexBlob, Shutdown } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
 import { Observable } from 'rxjs';
-import { Shutdown } from '@cardano-sdk/util';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
 import TransportWebHID from '@ledgerhq/hw-transport-webhid';
 
@@ -150,7 +150,7 @@ export interface KeyAgent {
   /**
    * @throws AuthenticationError
    */
-  signBlob(derivationPath: AccountKeyDerivationPath, blob: Cardano.util.HexBlob): Promise<SignBlobResult>;
+  signBlob(derivationPath: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult>;
   /**
    * @throws AuthenticationError
    */

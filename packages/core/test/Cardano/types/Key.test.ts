@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
 import { CML, Cardano } from '../../../src';
 import { Ed25519KeyHash } from '../../../src/Cardano';
+import { HexBlob } from '@cardano-sdk/util';
 
 describe('Cardano/types/Key', () => {
   it('Ed25519PublicKey() accepts a valid public key hex string', () => {
@@ -8,9 +9,7 @@ describe('Cardano/types/Key', () => {
       Cardano.Ed25519PublicKey('6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d39')
     ).not.toThrow();
     expect(() =>
-      Cardano.Ed25519PublicKey.fromHexBlob(
-        Cardano.util.HexBlob('6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d39')
-      )
+      Cardano.Ed25519PublicKey.fromHexBlob(HexBlob('6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d39'))
     ).not.toThrow();
   });
 
@@ -22,7 +21,7 @@ describe('Cardano/types/Key', () => {
     ).not.toThrow();
     expect(() =>
       Cardano.Ed25519PrivateKey.fromHexBlob(
-        Cardano.util.HexBlob(
+        HexBlob(
           '6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d396199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d39'
         )
       )
@@ -63,7 +62,7 @@ describe('Cardano/types/Key', () => {
     ).not.toThrow();
     expect(() =>
       Cardano.Bip32PublicKey.fromHexBlob(
-        Cardano.util.HexBlob(
+        HexBlob(
           '6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d396199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d39'
         )
       )
@@ -78,7 +77,7 @@ describe('Cardano/types/Key', () => {
     ).not.toThrow();
     expect(() =>
       Cardano.Bip32PrivateKey.fromHexBlob(
-        Cardano.util.HexBlob(
+        HexBlob(
           '6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d36199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d3996199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d39'
         )
       )

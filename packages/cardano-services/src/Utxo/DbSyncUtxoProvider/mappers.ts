@@ -1,7 +1,7 @@
 import { Cardano, SerializationError, SerializationFailure, createUtxoId, jsonToNativeScript } from '@cardano-sdk/core';
+import { Hash32ByteBase16, HexBlob, isNotNil } from '@cardano-sdk/util';
 import { ReferenceScriptType, UtxoModel } from './types';
 import { generateAssetId } from './util';
-import { isNotNil } from '@cardano-sdk/util';
 
 /**
  * Parse the reference script from the UtxoModel
@@ -29,7 +29,7 @@ const parseReferenceScript = (model: UtxoModel): Cardano.Script => {
         );
       script = {
         __type: Cardano.ScriptType.Plutus,
-        bytes: model.reference_script_bytes as unknown as Cardano.util.HexBlob,
+        bytes: model.reference_script_bytes as unknown as HexBlob,
         version: Cardano.PlutusLanguageVersion.V1
       };
       break;
@@ -41,7 +41,7 @@ const parseReferenceScript = (model: UtxoModel): Cardano.Script => {
         );
       script = {
         __type: Cardano.ScriptType.Plutus,
-        bytes: model.reference_script_bytes as unknown as Cardano.util.HexBlob,
+        bytes: model.reference_script_bytes as unknown as HexBlob,
         version: Cardano.PlutusLanguageVersion.V2
       };
       break;
@@ -82,8 +82,8 @@ export const utxosToCore = (utxosModels: UtxoModel[]): Cardano.Utxo[] => {
           coins: BigInt(current.coins)
         }
       };
-      if (isNotNil(current.data_hash)) txOut.datumHash = current.data_hash as unknown as Cardano.util.Hash32ByteBase16;
-      if (isNotNil(current.inline_datum)) txOut.datum = current.inline_datum as unknown as Cardano.util.HexBlob;
+      if (isNotNil(current.data_hash)) txOut.datumHash = current.data_hash as unknown as Hash32ByteBase16;
+      if (isNotNil(current.inline_datum)) txOut.datum = current.inline_datum as unknown as HexBlob;
       if (isNotNil(current.reference_script_type)) txOut.scriptReference = parseReferenceScript(current);
 
       if (isNotNil(current.asset_name) && current.asset_policy && current.asset_quantity) {

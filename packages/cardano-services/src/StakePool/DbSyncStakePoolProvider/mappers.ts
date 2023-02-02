@@ -26,7 +26,7 @@ import {
   StakePoolResults,
   StakePoolStatsModel
 } from './types';
-import { bufferToHexString, isNotNil } from '@cardano-sdk/util';
+import { Hash32ByteBase16, bufferToHexString, isNotNil } from '@cardano-sdk/util';
 import Fraction from 'fraction.js';
 
 const getPoolStatus = (
@@ -191,7 +191,7 @@ export const mapPoolData = (poolDataModel: PoolDataModel): PoolData => {
   };
   if (poolDataModel.metadata_hash) {
     toReturn.metadataJson = {
-      hash: bufferToHexString(poolDataModel.metadata_hash) as unknown as Cardano.util.Hash32ByteBase16,
+      hash: bufferToHexString(poolDataModel.metadata_hash) as unknown as Hash32ByteBase16,
       url: poolDataModel.metadata_url
     };
   }

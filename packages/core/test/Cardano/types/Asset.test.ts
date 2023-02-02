@@ -1,8 +1,10 @@
-import { AssetFingerprint, AssetId, AssetName, PolicyId, util } from '../../../src/Cardano';
+import { AssetFingerprint, AssetId, AssetName, PolicyId } from '../../../src/Cardano';
+import { Hash28ByteBase16, assertIsHexString, typedBech32 } from '@cardano-sdk/util';
 
-jest.mock('../../../src/Cardano/util/primitives', () => {
-  const actual = jest.requireActual('../../../src/Cardano/util/primitives');
+jest.mock('@cardano-sdk/util', () => {
+  const actual = jest.requireActual('@cardano-sdk/util');
   return {
+    ...actual,
     Hash28ByteBase16: jest.fn().mockImplementation((...args) => actual.Hash28ByteBase16(...args)),
     assertIsHexString: jest.fn().mockImplementation((...args) => actual.assertIsHexString(...args)),
     typedBech32: jest.fn().mockImplementation((...args) => actual.typedBech32(...args))
@@ -13,7 +15,7 @@ describe('Cardano/types/Asset', () => {
   describe('AssetId', () => {
     it('accepts a valid asset id and is implemented using util.assetIsHexString', () => {
       expect(() => AssetId('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed')).not.toThrow();
-      expect(util.assertIsHexString).toBeCalledWith('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed');
+      expect(assertIsHexString).toBeCalledWith('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed');
     });
 
     it('accepts asset id where policy id and asset name are separated with a dot', () => {
@@ -38,13 +40,13 @@ describe('Cardano/types/Asset', () => {
 
   it('PolicyId() accepts a valid policy id and is implemented using util.Hash28ByteBase16', () => {
     expect(() => PolicyId('1e349c9bdea19fd6c147626a5260bc44b71635f398b67c59881df209')).not.toThrow();
-    expect(util.Hash28ByteBase16).toBeCalledWith('1e349c9bdea19fd6c147626a5260bc44b71635f398b67c59881df209');
+    expect(Hash28ByteBase16).toBeCalledWith('1e349c9bdea19fd6c147626a5260bc44b71635f398b67c59881df209');
   });
 
   describe('AssetName', () => {
     it('accepts a valid asset name and is implemented using util.assertIsHexString', () => {
       expect(() => AssetName('1e349c9bdea19fd')).not.toThrow();
-      expect(util.assertIsHexString).toBeCalledWith('1e349c9bdea19fd');
+      expect(assertIsHexString).toBeCalledWith('1e349c9bdea19fd');
     });
 
     it('accepts an empty string', () => {
@@ -59,7 +61,7 @@ describe('Cardano/types/Asset', () => {
   describe('AssetFingerprint', () => {
     it('accepts a valid asset fingerprint and is implemented using util.typedBech32', () => {
       expect(() => AssetFingerprint('asset13n25uv0yaf5kus35fm2k86cqy60z58d9xmde92')).not.toThrow();
-      expect(util.typedBech32).toBeCalledWith('asset13n25uv0yaf5kus35fm2k86cqy60z58d9xmde92', 'asset', 32);
+      expect(typedBech32).toBeCalledWith('asset13n25uv0yaf5kus35fm2k86cqy60z58d9xmde92', 'asset', 32);
     });
 
     it('can be build from the policy id and asset name', async () => {
