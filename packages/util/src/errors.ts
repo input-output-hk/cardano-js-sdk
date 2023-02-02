@@ -55,3 +55,18 @@ export class InvalidStringError<InnerError = unknown> extends ComposableError<In
     super(`Invalid string: "${expectation}"`, innerError);
   }
 }
+
+/**
+ * Represents an error that is thrown when a function is called with an invalid argument.
+ */
+export class InvalidArgumentError extends CustomError {
+  /**
+   * Initializes a new instance of the InvalidArgumentError class.
+   *
+   * @param argName The invalid argument name.
+   * @param message The error message.
+   */
+  public constructor(argName: string, message: string) {
+    super(`Invalid argument '${argName}': ${message}`);
+  }
+}
