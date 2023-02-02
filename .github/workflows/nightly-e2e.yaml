@@ -72,7 +72,7 @@ jobs:
         DB_SYNC_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/cexplorer'
         NETWORK_INFO_PROVIDER: 'http'
         NETWORK_INFO_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/network-info"}'
-        OGMIOS_SERVER_URL: 'ws://localhost:1340/'
+        OGMIOS_URL: 'ws://localhost:1340/'
         REWARDS_PROVIDER: 'http'
         REWARDS_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/rewards"}'
         TX_SUBMIT_PROVIDER: 'http'
