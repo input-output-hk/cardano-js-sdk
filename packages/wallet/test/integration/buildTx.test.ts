@@ -1,11 +1,12 @@
 /* eslint-disable func-style */
 /* eslint-disable jsdoc/require-jsdoc */
+import * as Crypto from '@cardano-sdk/crypto';
 import { AssetId, logger, somePartialStakePools } from '@cardano-sdk/util-dev';
 import { Cardano, CardanoNodeErrors } from '@cardano-sdk/core';
+
 import { of } from 'rxjs';
 
 import * as mocks from '../mocks';
-import { Hash32ByteBase16 } from '@cardano-sdk/util';
 import {
   IncompatibleWalletError,
   ObservableWallet,
@@ -115,8 +116,8 @@ describe('buildTx', () => {
 
   describe('setExtraSigners', () => {
     let signers: TransactionSigner[];
-    const pubKey = Cardano.Ed25519PublicKey('6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d39');
-    const signature = Cardano.Ed25519Signature(
+    const pubKey = Crypto.Ed25519PublicKeyHex('6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d39');
+    const signature = Crypto.Ed25519SignatureHex(
       // eslint-disable-next-line max-len
       '709f937c4ce152c81f8406c03279ff5a8556a12a8657e40a578eaaa6223d2e6a2fece39733429e3ec73a6c798561b5c2d47d82224d656b1d964cfe8b5fdffe09'
     );
@@ -191,7 +192,7 @@ describe('buildTx', () => {
     let assetQuantity: bigint;
     let assets: Cardano.TokenMap;
     let address: Cardano.Address;
-    let datumHash: Hash32ByteBase16;
+    let datumHash: Crypto.Hash32ByteBase16;
     let output1Coin: bigint;
     let output2Base: Cardano.TxOut;
 
@@ -200,7 +201,7 @@ describe('buildTx', () => {
       assetQuantity = 100n;
       assets = new Map([[assetId, assetQuantity]]);
       address = Cardano.Address('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg');
-      datumHash = Hash32ByteBase16('3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d');
+      datumHash = Crypto.Hash32ByteBase16('3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d');
       output1Coin = 10_000_000n;
       output2Base = mocks.utxo[0][1];
 

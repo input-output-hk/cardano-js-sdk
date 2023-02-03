@@ -1,3 +1,4 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import { Base64Blob, HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { Cardano, cmlToCore, coreToCml } from '../../src';
 import { NativeScript } from '@dcspark/cardano-multiplatform-lib-nodejs';
@@ -91,7 +92,7 @@ describe('cmlToCore', () => {
       scripts: [
         {
           __type: Cardano.ScriptType.Native,
-          keyHash: Cardano.Ed25519KeyHash('b275b08c999097247f7c17e77007c7010cd19f20cc086ad99d398538'),
+          keyHash: Crypto.Ed25519KeyHashHex('b275b08c999097247f7c17e77007c7010cd19f20cc086ad99d398538'),
           kind: Cardano.NativeScriptKind.RequireSignature
         },
         {
@@ -105,7 +106,7 @@ describe('cmlToCore', () => {
             },
             {
               __type: Cardano.ScriptType.Native,
-              keyHash: Cardano.Ed25519KeyHash('966e394a544f242081e41d1965137b1bb412ac230d40ed5407821c37'),
+              keyHash: Crypto.Ed25519KeyHashHex('966e394a544f242081e41d1965137b1bb412ac230d40ed5407821c37'),
               kind: Cardano.NativeScriptKind.RequireSignature
             },
             {
@@ -149,8 +150,8 @@ describe('cmlToCore', () => {
       {
         addressAttributes: Base64Blob('oA=='),
         chainCode: HexBlob('b6dbf0b03c93afe5696f10d49e8a8304ebfac01deeb8f82f2af5836ebbc1b450'),
-        key: Cardano.Ed25519PublicKey('deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01'),
-        signature: Cardano.Ed25519Signature(
+        key: Crypto.Ed25519PublicKeyHex('deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01'),
+        signature: Crypto.Ed25519SignatureHex(
           Buffer.from(
             'ZGdic3hnZ3RvZ2hkanB0ZXR2dGtjb2N2eWZpZHFxZ2d1cmpocmhxYWlpc3BxcnVlbGh2eXBxeGVld3ByeWZ2dw==',
             'base64'

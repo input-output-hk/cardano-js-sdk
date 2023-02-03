@@ -1,5 +1,5 @@
 import { Cardano, Paginated, StakePoolProvider } from '@cardano-sdk/core';
-import { Hash32ByteBase16 } from '@cardano-sdk/util';
+import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { getRandomTxId } from './mockChainHistoryProvider';
 import { rewardAccountBalance, rewardAccountBalance2, rewardsHistory, rewardsHistory2 } from './mockData';
 import delay from 'delay';

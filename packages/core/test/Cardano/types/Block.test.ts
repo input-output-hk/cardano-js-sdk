@@ -1,13 +1,21 @@
 import { BlockId, SlotLeader, VrfVkBech32 } from '../../../src/Cardano';
-import { Hash32ByteBase16, InvalidStringError, typedBech32 } from '@cardano-sdk/util';
+import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import { InvalidStringError, typedBech32 } from '@cardano-sdk/util';
 
 jest.mock('@cardano-sdk/util', () => {
   const actual = jest.requireActual('@cardano-sdk/util');
   return {
     ...actual,
-    Hash28ByteBase16: jest.fn().mockImplementation((...args) => actual.Hash28ByteBase16(...args)),
-    Hash32ByteBase16: jest.fn().mockImplementation((...args) => actual.Hash32ByteBase16(...args)),
     typedBech32: jest.fn().mockImplementation((...args) => actual.typedBech32(...args))
+  };
+});
+
+jest.mock('@cardano-sdk/crypto', () => {
+  const actual = jest.requireActual('@cardano-sdk/crypto');
+  return {
+    ...actual,
+    Hash28ByteBase16: jest.fn().mockImplementation((...args) => actual.Hash28ByteBase16(...args)),
+    Hash32ByteBase16: jest.fn().mockImplementation((...args) => actual.Hash32ByteBase16(...args))
   };
 });
 

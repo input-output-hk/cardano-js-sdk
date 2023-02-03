@@ -1,9 +1,11 @@
 /* eslint-disable max-statements */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import * as Crypto from '@cardano-sdk/crypto';
 import * as mocks from '../mocks';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, somePartialStakePools } from '@cardano-sdk/util-dev';
 import {
+  CML,
   Cardano,
   ChainHistoryProvider,
   NetworkInfoProvider,
@@ -45,6 +47,7 @@ const createWallet = async (
   pollingConfig?: PollingConfig
 ) => {
   const { wallet } = await setupWallet({
+    bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
     createKeyAgent: async (dependencies) => {
       const groupedAddress: GroupedAddress = {
         accountIndex: 0,

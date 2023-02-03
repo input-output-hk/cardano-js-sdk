@@ -4,7 +4,8 @@ import { Asset, Cardano, ProviderError, ProviderFailure, UtxoProvider } from '@c
 import { CreateHttpProviderConfig, utxoHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { DataMocks } from '../data-mocks';
 import { DbSyncUtxoProvider, HttpServer, HttpServerConfig, UtxoHttpService } from '../../src';
-import { Hash32ByteBase16, HexBlob } from '@cardano-sdk/util';
+import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import { HexBlob } from '@cardano-sdk/util';
 import { INFO, createLogger } from 'bunyan';
 import { LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';

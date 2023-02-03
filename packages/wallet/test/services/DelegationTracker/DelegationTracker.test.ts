@@ -42,7 +42,7 @@ describe('DelegationTracker', () => {
           createStubTxWithCertificates([
             {
               __typename: Cardano.CertificateType.StakeKeyRegistration,
-              stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccount)
+              stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
             }
           ]),
           createStubTxWithCertificates([
@@ -51,14 +51,14 @@ describe('DelegationTracker', () => {
             } as Cardano.Certificate,
             {
               __typename: Cardano.CertificateType.StakeDelegation,
-              stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccount)
+              stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
             } as Cardano.Certificate
           ]),
           createStubTxWithCertificates(),
           createStubTxWithCertificates([
             {
               __typename: Cardano.CertificateType.StakeKeyDeregistration,
-              stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccount)
+              stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
             }
           ])
         ];

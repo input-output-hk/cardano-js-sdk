@@ -68,6 +68,7 @@
   "dependencies": {
     "@cardano-ogmios/client": "5.5.7",
     "@cardano-sdk/core": "^0.7.0",
+    "@cardano-sdk/crypto": "^0.1.0",
     "@cardano-sdk/util": "^0.7.0",
     "buffer": "5.7.1",
     "fraction.js": "^4.2.0",

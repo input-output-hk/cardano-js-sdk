@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import * as Crypto from '@cardano-sdk/crypto';
 import { AuthenticationError, TransportError } from './errors';
 import { Cardano, NotImplementedError, coreToCml } from '@cardano-sdk/core';
 import {
@@ -92,7 +93,7 @@ export class TrezorKeyAgent extends KeyAgentBase {
   /**
    * @throws AuthenticationError
    */
-  static async getXpub({ accountIndex }: GetTrezorXpubProps): Promise<Cardano.Bip32PublicKey> {
+  static async getXpub({ accountIndex }: GetTrezorXpubProps): Promise<Crypto.Bip32PublicKeyHex> {
     try {
       await TrezorKeyAgent.checkDeviceConnection();
       const derivationPath = `m/${CardanoKeyConst.PURPOSE}'/${CardanoKeyConst.COIN_TYPE}'/${accountIndex}'`;
@@ -103,7 +104,7 @@ export class TrezorKeyAgent extends KeyAgentBase {
       if (!extendedPublicKey.success) {
         throw new TransportError('Failed to export extended account public key', extendedPublicKey.payload);
       }
-      return Cardano.Bip32PublicKey(extendedPublicKey.payload.publicKey);
+      return Crypto.Bip32PublicKeyHex(extendedPublicKey.payload.publicKey);
     } catch (error: any) {
       throw transportTypedError(error);
     }
@@ -150,11 +151,11 @@ export class TrezorKeyAgent extends KeyAgentBase {
       }
 
       const signedData = result.payload;
-      return new Map<Cardano.Ed25519PublicKey, Cardano.Ed25519Signature>(
+      return new Map<Crypto.Ed25519PublicKeyHex, Crypto.Ed25519SignatureHex>(
         await Promise.all(
           signedData.witnesses.map(async (witness) => {
-            const publicKey = Cardano.Ed25519PublicKey(witness.pubKey);
-            const signature = Cardano.Ed25519Signature(witness.signature);
+            const publicKey = Crypto.Ed25519PublicKeyHex(witness.pubKey);
+            const signature = Crypto.Ed25519SignatureHex(witness.signature);
             return [publicKey, signature] as const;
           })
         )
@@ -173,7 +174,7 @@ export class TrezorKeyAgent extends KeyAgentBase {
     throw new NotImplementedError('signBlob');
   }
 
-  async exportRootPrivateKey(): Promise<Cardano.Bip32PrivateKey> {
+  async exportRootPrivateKey(): Promise<Crypto.Bip32PrivateKeyHex> {
     throw new NotImplementedError('Operation not supported!');
   }
 }

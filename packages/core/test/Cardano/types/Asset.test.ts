@@ -1,13 +1,21 @@
 import { AssetFingerprint, AssetId, AssetName, PolicyId } from '../../../src/Cardano';
-import { Hash28ByteBase16, assertIsHexString, typedBech32 } from '@cardano-sdk/util';
+import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
+import { assertIsHexString, typedBech32 } from '@cardano-sdk/util';
 
 jest.mock('@cardano-sdk/util', () => {
   const actual = jest.requireActual('@cardano-sdk/util');
   return {
     ...actual,
-    Hash28ByteBase16: jest.fn().mockImplementation((...args) => actual.Hash28ByteBase16(...args)),
     assertIsHexString: jest.fn().mockImplementation((...args) => actual.assertIsHexString(...args)),
     typedBech32: jest.fn().mockImplementation((...args) => actual.typedBech32(...args))
+  };
+});
+
+jest.mock('@cardano-sdk/crypto', () => {
+  const actual = jest.requireActual('@cardano-sdk/crypto');
+  return {
+    ...actual,
+    Hash28ByteBase16: jest.fn().mockImplementation((...args) => actual.Hash28ByteBase16(...args))
   };
 });
 

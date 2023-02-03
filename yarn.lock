@@ -2355,6 +2355,7 @@ __metadata:
     "@cardano-ogmios/client": 5.5.7
     "@cardano-sdk/cardano-services-client": ^0.7.0
     "@cardano-sdk/core": ^0.7.0
+    "@cardano-sdk/crypto": ^0.1.0
     "@cardano-sdk/ogmios": ^0.7.0
     "@cardano-sdk/util": ^0.7.0
     "@cardano-sdk/util-dev": ^0.6.0
@@ -2420,6 +2421,7 @@ __metadata:
   dependencies:
     "@cardano-ogmios/client": 5.5.7
     "@cardano-ogmios/schema": 5.5.7
+    "@cardano-sdk/crypto": ^0.1.0
     "@cardano-sdk/util": ^0.7.0
     "@dcspark/cardano-multiplatform-lib-nodejs": ^3.1.1
     "@emurgo/cip14-js": ^3.0.1
@@ -2454,7 +2456,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cardano-sdk/crypto@workspace:packages/crypto":
+"@cardano-sdk/crypto@^0.1.0, @cardano-sdk/crypto@workspace:packages/crypto":
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/crypto@workspace:packages/crypto"
   dependencies:
@@ -2528,6 +2530,7 @@ __metadata:
     "@cardano-sdk/cardano-services": ^0.7.0
     "@cardano-sdk/cardano-services-client": ^0.7.0
     "@cardano-sdk/core": ^0.7.0
+    "@cardano-sdk/crypto": ^0.1.0
     "@cardano-sdk/dapp-connector": ^0.6.1
     "@cardano-sdk/key-management": ^0.3.0
     "@cardano-sdk/ogmios": ^0.7.0
@@ -2634,6 +2637,7 @@ __metadata:
   resolution: "@cardano-sdk/governance@workspace:packages/governance"
   dependencies:
     "@cardano-sdk/core": ^0.7.0
+    "@cardano-sdk/crypto": ^0.1.0
     "@cardano-sdk/key-management": ^0.3.0
     "@cardano-sdk/util": ^0.7.0
     blake2b: ^2.1.4
@@ -2676,8 +2680,10 @@ __metadata:
   dependencies:
     "@cardano-foundation/ledgerjs-hw-app-cardano": ^5.0.0
     "@cardano-sdk/core": ^0.7.0
+    "@cardano-sdk/crypto": ^0.1.0
     "@cardano-sdk/dapp-connector": ^0.6.1
     "@cardano-sdk/util": ^0.7.0
+    "@cardano-sdk/util-dev": ^0.6.0
     "@emurgo/cardano-message-signing-nodejs": ^1.0.1
     "@ledgerhq/hw-transport": ^6.27.2
     "@ledgerhq/hw-transport-node-hid-noevents": ^6.27.2
@@ -2710,6 +2716,7 @@ __metadata:
     "@cardano-ogmios/client": 5.5.7
     "@cardano-ogmios/schema": 5.5.7
     "@cardano-sdk/core": ^0.7.0
+    "@cardano-sdk/crypto": ^0.1.0
     "@cardano-sdk/util": ^0.7.0
     "@cardano-sdk/util-dev": ^0.6.0
     "@types/lodash": ^4.14.182
@@ -2734,6 +2741,7 @@ __metadata:
   resolution: "@cardano-sdk/projection@workspace:packages/projection"
   dependencies:
     "@cardano-sdk/core": ^0.7.0
+    "@cardano-sdk/crypto": ^0.1.0
     "@cardano-sdk/ogmios": ^0.7.0
     "@cardano-sdk/util": ^0.7.0
     "@cardano-sdk/util-dev": ^0.6.0
@@ -2848,6 +2856,7 @@ __metadata:
     "@cardano-foundation/ledgerjs-hw-app-cardano": ^5.0.0
     "@cardano-ogmios/client": 5.5.7
     "@cardano-sdk/core": ^0.7.0
+    "@cardano-sdk/crypto": ^0.1.0
     "@cardano-sdk/dapp-connector": ^0.6.1
     "@cardano-sdk/input-selection": ^0.7.0
     "@cardano-sdk/key-management": ^0.3.0
@@ -2886,6 +2895,7 @@ __metadata:
   resolution: "@cardano-sdk/web-extension@workspace:packages/web-extension"
   dependencies:
     "@cardano-sdk/core": ^0.7.0
+    "@cardano-sdk/crypto": ^0.1.0
     "@cardano-sdk/dapp-connector": ^0.6.1
     "@cardano-sdk/key-management": ^0.3.0
     "@cardano-sdk/util": ^0.7.0
@@ -4657,9 +4667,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@npmcli/arborist@npm:^6.2.1":
-  version: 6.2.1
-  resolution: "@npmcli/arborist@npm:6.2.1"
+"@npmcli/arborist@npm:^6.1.6":
+  version: 6.1.6
+  resolution: "@npmcli/arborist@npm:6.1.6"
   dependencies:
     "@isaacs/string-locale-compare": ^1.1.0
     "@npmcli/fs": ^3.1.0
@@ -4696,13 +4706,13 @@ __metadata:
     walk-up-path: ^1.0.0
   bin:
     arborist: bin/index.js
-  checksum: f0c2e7c46de5dbcf67e0756cb33eb435be608e1d536f2da644543993a987047dc0f4dee5aabdb901d232faab9236cbb19cbcd05fb30822442c283907de9517bd
+  checksum: dca822b38f18d729d261123212952bef87334ede7816fa44a61cddb6990efbd583c8a90071cf2828390d750042bb619b57642c54fd850ccea9320b5391210d27
   languageName: node
   linkType: hard
 
-"@npmcli/config@npm:^6.1.2":
-  version: 6.1.2
-  resolution: "@npmcli/config@npm:6.1.2"
+"@npmcli/config@npm:^6.1.1":
+  version: 6.1.1
+  resolution: "@npmcli/config@npm:6.1.1"
   dependencies:
     "@npmcli/map-workspaces": ^3.0.0
     ini: ^3.0.0
@@ -4711,7 +4721,7 @@ __metadata:
     read-package-json-fast: ^3.0.0
     semver: ^7.3.5
     walk-up-path: ^1.0.0
-  checksum: 2d9744c4a2bf63df30253b36834b0b448f146ff15d649ff3473e4d449bf881a339b61c821ee8b5f7b5d991bb58a97a8bab668e80997528fbc799e94bbaa909b2
+  checksum: bd9e9b30b0a66b0993e1719ed865f4d307bb18cac278b714ce0e6200c3039bdd216b2c3d38bec4ac642a72847ed4ce06bab4c591776627e13a1bb7cb4793d523
   languageName: node
   linkType: hard
 
@@ -13438,11 +13448,11 @@ __metadata:
   linkType: hard
 
 "fs-minipass@npm:^3.0.0":
-  version: 3.0.1
-  resolution: "fs-minipass@npm:3.0.1"
+  version: 3.0.0
+  resolution: "fs-minipass@npm:3.0.0"
   dependencies:
     minipass: ^4.0.0
-  checksum: ce1fd3ccef7d64caa9ee5f566db1abe250b6e0067defe53003288537b310956e6f42c433c3ee6001e044f656ce8ba5a0b2e5b5589c513c67b57470d11c3d9b07
+  checksum: b72e9fe426e39f05b35bf237c8218b7ab3f68a65f325725ad7b4e431ff5a10725946fc62883b78446c07515ab938d25fdde3d08fb5ac8693f7f9eb9990da21f0
   languageName: node
   linkType: hard
 
@@ -14442,13 +14452,6 @@ __metadata:
   version: 4.1.0
   resolution: "http-cache-semantics@npm:4.1.0"
   checksum: 974de94a81c5474be07f269f9fd8383e92ebb5a448208223bfb39e172a9dbc26feff250192ecc23b9593b3f92098e010406b0f24bd4d588d631f80214648ed42
-  languageName: node
-  linkType: hard
-
-"http-cache-semantics@npm:^4.1.1":
-  version: 4.1.1
-  resolution: "http-cache-semantics@npm:4.1.1"
-  checksum: 83ac0bc60b17a3a36f9953e7be55e5c8f41acc61b22583060e8dedc9dd5e3607c823a88d0926f9150e571f90946835c7fe150732801010845c72cd8bbff1a236
   languageName: node
   linkType: hard
 
@@ -16825,11 +16828,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"libnpmdiff@npm:^5.0.9":
-  version: 5.0.9
-  resolution: "libnpmdiff@npm:5.0.9"
+"libnpmdiff@npm:^5.0.7":
+  version: 5.0.7
+  resolution: "libnpmdiff@npm:5.0.7"
   dependencies:
-    "@npmcli/arborist": ^6.2.1
+    "@npmcli/arborist": ^6.1.6
     "@npmcli/disparity-colors": ^3.0.0
     "@npmcli/installed-package-contents": ^2.0.0
     binary-extensions: ^2.2.0
@@ -16838,15 +16841,15 @@ __metadata:
     npm-package-arg: ^10.1.0
     pacote: ^15.0.7
     tar: ^6.1.13
-  checksum: f7a464ad2f4006d373616c68bb1f842779239390941ccb2c3455378d9c9ac8fee934d4684c671be5e2a65202b6d9f21460ddadbd1f2892c872a144daf969ec31
+  checksum: 175a42556afa517a361ac29a53d5bf0090aea864946a95502f3659ccfef2a3349ba3778d01339ca50d24dc6189f16fcce204920f918bf712d7b1c2a2a602a067
   languageName: node
   linkType: hard
 
-"libnpmexec@npm:^5.0.9":
-  version: 5.0.9
-  resolution: "libnpmexec@npm:5.0.9"
+"libnpmexec@npm:^5.0.7":
+  version: 5.0.7
+  resolution: "libnpmexec@npm:5.0.7"
   dependencies:
-    "@npmcli/arborist": ^6.2.1
+    "@npmcli/arborist": ^6.1.6
     "@npmcli/run-script": ^6.0.0
     chalk: ^4.1.0
     ci-info: ^3.7.0
@@ -16858,16 +16861,16 @@ __metadata:
     read-package-json-fast: ^3.0.1
     semver: ^7.3.7
     walk-up-path: ^1.0.0
-  checksum: 573f0a6dde7886421ea9d8d07f664b28b5522420a9c1085537caf29725e61cd29df2e92748cbbec850c963913b362d0d6c5c97c033721c82d9becae1fcfb14c5
+  checksum: 4267de0ef09a0e820976bae0a1a35ee8da76c3c34171db2e7e8adb39e956ab5542f5f6e276ca34eb1a2b4ee39c5f2b7fe1edc86a2fa9757974e6c9cf7e8b117b
   languageName: node
   linkType: hard
 
-"libnpmfund@npm:^4.0.9":
-  version: 4.0.9
-  resolution: "libnpmfund@npm:4.0.9"
+"libnpmfund@npm:^4.0.7":
+  version: 4.0.7
+  resolution: "libnpmfund@npm:4.0.7"
   dependencies:
-    "@npmcli/arborist": ^6.2.1
-  checksum: dfeacc12d477d65d80ec20260c2a7378fa909ca54a6188d682cfc01be24f49cdceca949edbfb579c2fde18caf9b3c09c18c530640d777841d0ffb8c6a1b6b45e
+    "@npmcli/arborist": ^6.1.6
+  checksum: 918ee624cfd9f7d1523fe7a1e980be8c1319346768ab30393d72a3fe85d89bdedcf206104383c2ba3e8bf937bd30ffa6844ffe618f1b907efcb51200bc5c56d1
   languageName: node
   linkType: hard
 
@@ -16891,15 +16894,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"libnpmpack@npm:^5.0.9":
-  version: 5.0.9
-  resolution: "libnpmpack@npm:5.0.9"
+"libnpmpack@npm:^5.0.7":
+  version: 5.0.7
+  resolution: "libnpmpack@npm:5.0.7"
   dependencies:
-    "@npmcli/arborist": ^6.2.1
+    "@npmcli/arborist": ^6.1.6
     "@npmcli/run-script": ^6.0.0
     npm-package-arg: ^10.1.0
     pacote: ^15.0.7
-  checksum: 7d03c4747353a06733846a4f82454782e06648325cfb46d302a3da4cdea961b60f7723fa8b68a146810a76b85440f11de08bb5228269575fb70ab345fe74d997
+  checksum: efbafba4cf277fd1476d0e56e9a2abfad5e2ba85616040360b5dd7f1c39792042ad3ba6286dbf32e47e47f4b11c54bb4a6adc05c312980778d0ab6f03889b026
   languageName: node
   linkType: hard
 
@@ -17588,17 +17591,18 @@ __metadata:
   linkType: hard
 
 "make-fetch-happen@npm:^11.0.0, make-fetch-happen@npm:^11.0.2":
-  version: 11.0.3
-  resolution: "make-fetch-happen@npm:11.0.3"
+  version: 11.0.2
+  resolution: "make-fetch-happen@npm:11.0.2"
   dependencies:
     agentkeepalive: ^4.2.1
     cacache: ^17.0.0
-    http-cache-semantics: ^4.1.1
+    http-cache-semantics: ^4.1.0
     http-proxy-agent: ^5.0.0
     https-proxy-agent: ^5.0.0
     is-lambda: ^1.0.1
     lru-cache: ^7.7.1
     minipass: ^4.0.0
+    minipass-collect: ^1.0.2
     minipass-fetch: ^3.0.0
     minipass-flush: ^1.0.5
     minipass-pipeline: ^1.2.4
@@ -17606,7 +17610,7 @@ __metadata:
     promise-retry: ^2.0.1
     socks-proxy-agent: ^7.0.0
     ssri: ^10.0.0
-  checksum: f718d6b6945d967fa02ae8c6b1146c6e36335b0f9654c5757fd57211a5bcc13bf1dfbaa0d2fdfe8bdd13f78b0e2aa79b4d4438f824dcf0d2ea74883baae1ae31
+  checksum: b843ef2e42bc17c37c7636dbe82867caceaa36b3f2591f20918abc190ca85cf37e5e142148b730dab7d94e9d2f0c80947a703f8dadebae993cd93ad929dba103
   languageName: node
   linkType: hard
 
@@ -18089,9 +18093,11 @@ __metadata:
   linkType: hard
 
 "minipass@npm:^4.0.0":
-  version: 4.0.1
-  resolution: "minipass@npm:4.0.1"
-  checksum: 48eb3141cc247b44f738944cbd789aedeed9288ebdb64c7de9b3bf23e9e71d611381bfecf643d877d25f7ca9f3d5ab7b6757ef6f46282086812ac5372b7cd291
+  version: 4.0.0
+  resolution: "minipass@npm:4.0.0"
+  dependencies:
+    yallist: ^4.0.0
+  checksum: 7a609afbf394abfcf9c48e6c90226f471676c8f2a67f07f6838871afb03215ede431d1433feffe1b855455bcb13ef0eb89162841b9796109d6fed8d89790f381
   languageName: node
   linkType: hard
 
@@ -19090,12 +19096,12 @@ __metadata:
   linkType: hard
 
 "npm@npm:^9.3.0":
-  version: 9.4.1
-  resolution: "npm@npm:9.4.1"
+  version: 9.3.0
+  resolution: "npm@npm:9.3.0"
   dependencies:
     "@isaacs/string-locale-compare": ^1.1.0
-    "@npmcli/arborist": ^6.2.1
-    "@npmcli/config": ^6.1.2
+    "@npmcli/arborist": ^6.1.6
+    "@npmcli/config": ^6.1.1
     "@npmcli/map-workspaces": ^3.0.0
     "@npmcli/package-json": ^3.0.0
     "@npmcli/run-script": ^6.0.0
@@ -19117,12 +19123,12 @@ __metadata:
     is-cidr: ^4.0.2
     json-parse-even-better-errors: ^3.0.0
     libnpmaccess: ^7.0.1
-    libnpmdiff: ^5.0.9
-    libnpmexec: ^5.0.9
-    libnpmfund: ^4.0.9
+    libnpmdiff: ^5.0.7
+    libnpmexec: ^5.0.7
+    libnpmfund: ^4.0.7
     libnpmhook: ^9.0.1
     libnpmorg: ^5.0.1
-    libnpmpack: ^5.0.9
+    libnpmpack: ^5.0.7
     libnpmpublish: ^7.0.6
     libnpmsearch: ^6.0.1
     libnpmteam: ^5.0.1
@@ -19163,7 +19169,7 @@ __metadata:
   bin:
     npm: bin/npm-cli.js
     npx: bin/npx-cli.js
-  checksum: fcac823b7c53d610a666d2b0c90f119a12a804b7eac0d1ccbb7c75dc22197e028273c5a01421216281f36e080eba4279102034cb9cb1866458cde5dde8fb02a0
+  checksum: b520eca5e88353496cceb16a608aafe2b979c6d8b239beca66b5c1ebfe62202573d00e556c3ecc13d34a6e355364611bff64c77bc982c31a11036ed364e8a05a
   languageName: node
   linkType: hard
 

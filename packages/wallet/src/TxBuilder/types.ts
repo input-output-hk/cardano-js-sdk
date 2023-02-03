@@ -4,7 +4,7 @@ import { CustomError } from 'ts-custom-error';
 
 import { InputSelectionError, SelectionSkeleton } from '@cardano-sdk/input-selection';
 
-import { Hash32ByteBase16 } from '@cardano-sdk/util';
+import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { OutputValidation } from '../types';
 import { SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
 

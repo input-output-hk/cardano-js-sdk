@@ -1,6 +1,7 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import { CML, Cardano, coreToCml, util } from '@cardano-sdk/core';
-import { Hash32ByteBase16, usingAutoFree } from '@cardano-sdk/util';
 import { SelectionResult } from '@cardano-sdk/input-selection';
+import { usingAutoFree } from '@cardano-sdk/util';
 
 export type CreateTxInternalsProps = {
   changeAddress: Cardano.Address;
@@ -11,8 +12,8 @@ export type CreateTxInternalsProps = {
   auxiliaryData?: Cardano.AuxiliaryData;
   collaterals?: Set<Cardano.TxIn>;
   mint?: Cardano.TokenMap;
-  scriptIntegrityHash?: Hash32ByteBase16;
-  requiredExtraSignatures?: Cardano.Ed25519KeyHash[];
+  scriptIntegrityHash?: Crypto.Hash32ByteBase16;
+  requiredExtraSignatures?: Crypto.Ed25519KeyHashHex[];
 };
 
 export const createTransactionInternals = async ({

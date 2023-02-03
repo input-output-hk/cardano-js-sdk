@@ -1,6 +1,6 @@
 /* eslint-disable no-use-before-define */
-import { Ed25519KeyHash } from './Key';
-import { Hash32ByteBase16, HexBlob } from '@cardano-sdk/util';
+import * as Crypto from '@cardano-sdk/crypto';
+import { HexBlob } from '@cardano-sdk/util';
 import { Slot } from './Block';
 
 /**
@@ -39,7 +39,7 @@ export interface RequireSignatureScript {
   /**
    * The hash of a verification key.
    */
-  keyHash: Ed25519KeyHash;
+  keyHash: Crypto.Ed25519KeyHashHex;
 
   /**
    * The native script kind.
@@ -211,7 +211,7 @@ export enum PlutusLanguageVersion {
  * this type of datum, the actual Datum value must be provided and will be added to the witness set of
  * the transaction.
  */
-export type DatumHash = Hash32ByteBase16;
+export type DatumHash = Crypto.Hash32ByteBase16;
 
 /**
  * The datum is a piece of information that can be associated with a UTXO and is used to carry script state information

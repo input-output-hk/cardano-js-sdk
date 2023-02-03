@@ -1,3 +1,4 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import {
   AccountAddressDerivationPath,
   AccountKeyDerivationPath,
@@ -21,6 +22,10 @@ export class StubKeyAgent implements KeyAgent {
     return this.#knownAddresses;
   }
 
+  get bip32Ed25519(): Crypto.Bip32Ed25519 {
+    throw new NotImplementedError('bip32Ed25519');
+  }
+
   get chainId(): Cardano.ChainId {
     throw new NotImplementedError('chainId');
   }
@@ -33,7 +38,7 @@ export class StubKeyAgent implements KeyAgent {
     throw new NotImplementedError('serializableData');
   }
 
-  get extendedAccountPublicKey(): Cardano.Bip32PublicKey {
+  get extendedAccountPublicKey(): Crypto.Bip32PublicKeyHex {
     throw new NotImplementedError('extendedAccountPublicKey');
   }
 
@@ -41,7 +46,7 @@ export class StubKeyAgent implements KeyAgent {
     throw new NotImplementedError('deriveAddress');
   }
 
-  derivePublicKey(_derivationPath: AccountKeyDerivationPath): Promise<Cardano.Ed25519PublicKey> {
+  derivePublicKey(_derivationPath: AccountKeyDerivationPath): Promise<Crypto.Ed25519PublicKeyHex> {
     throw new NotImplementedError('derivePublicKey');
   }
 
@@ -56,7 +61,7 @@ export class StubKeyAgent implements KeyAgent {
     throw new NotImplementedError('signTransaction');
   }
 
-  exportRootPrivateKey(): Promise<Cardano.Bip32PrivateKey> {
+  exportRootPrivateKey(): Promise<Crypto.Bip32PrivateKeyHex> {
     throw new NotImplementedError('exportRootPrivateKey');
   }
 }

@@ -1,5 +1,6 @@
 import * as Cardano from '../../Cardano';
-import { Base64Blob, Hash32ByteBase16, HexBlob, ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
+import * as Crypto from '@cardano-sdk/crypto';
+import { Base64Blob, HexBlob, ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
 import { CML } from '../CML';
 import { PlutusLanguageVersion, ScriptType } from '../../Cardano';
 import { ScriptKind } from '@dcspark/cardano-multiplatform-lib-nodejs';
@@ -10,13 +11,13 @@ import { createCertificate } from './certificate';
 
 export const txRequiredExtraSignatures = (
   signatures: CML.Ed25519KeyHashes | undefined
-): Cardano.Ed25519KeyHash[] | undefined =>
+): Crypto.Ed25519KeyHashHex[] | undefined =>
   usingAutoFree((scope) => {
     if (!signatures) return;
-    const requiredSignatures: Cardano.Ed25519KeyHash[] = [];
+    const requiredSignatures: Crypto.Ed25519KeyHashHex[] = [];
     for (let i = 0; i < signatures.len(); i++) {
       const signature = scope.manage(signatures.get(i));
-      const cardanoSignature = Cardano.Ed25519KeyHash(Buffer.from(signature.to_bytes()).toString('hex'));
+      const cardanoSignature = Crypto.Ed25519KeyHashHex(Buffer.from(signature.to_bytes()).toString('hex'));
       requiredSignatures.push(cardanoSignature);
     }
     return requiredSignatures;
@@ -71,7 +72,7 @@ export const nativeScript = (script: CML.NativeScript): Cardano.NativeScript =>
       case Cardano.NativeScriptKind.RequireSignature: {
         coreScript = {
           __type: Cardano.ScriptType.Native,
-          keyHash: Cardano.Ed25519KeyHash(
+          keyHash: Crypto.Ed25519KeyHashHex(
             bytesToHex(scope.manage(scope.manage(script.as_script_pubkey())!.addr_keyhash()).to_bytes()).toString()
           ),
           kind: Cardano.NativeScriptKind.RequireSignature
@@ -188,7 +189,7 @@ export const txOut = (output: CML.TransactionOutput): Cardano.TxOut =>
     return {
       address: Cardano.Address(address),
       datum: inlineDatum ? bytesToHex(inlineDatum) : undefined,
-      datumHash: dataHashBytes ? Hash32ByteBase16.fromHexBlob(bytesToHex(dataHashBytes)) : undefined,
+      datumHash: dataHashBytes ? Crypto.Hash32ByteBase16.fromHexBlob(bytesToHex(dataHashBytes)) : undefined,
       scriptReference: scriptRef ? getCoreScript(scope, scope.manage(scriptRef.script())) : undefined,
       value: value(scope.manage(output.amount()))
     };
@@ -281,7 +282,7 @@ export const txBody = (body: CML.TransactionBody): Cardano.TxBody =>
       referenceInputs: cslReferenceInputs ? txInputs(cslReferenceInputs) : undefined,
       requiredExtraSignatures: txRequiredExtraSignatures(scope.manage(body.required_signers())),
       scriptIntegrityHash:
-        cslScriptDataHash && Hash32ByteBase16(Buffer.from(cslScriptDataHash.to_bytes()).toString('hex')),
+        cslScriptDataHash && Crypto.Hash32ByteBase16(Buffer.from(cslScriptDataHash.to_bytes()).toString('hex')),
       totalCollateral: cslTotalCollateral ? BigInt(cslTotalCollateral.to_str()) : undefined,
       validityInterval: validityInterval(scope, body),
       withdrawals: txWithdrawals(scope.manage(body.withdrawals()))
@@ -299,10 +300,10 @@ export const txWitnessBootstrap = (bootstraps?: CML.BootstrapWitnesses): Cardano
       result.push({
         addressAttributes: attributes?.length > 0 ? Base64Blob.fromBytes(attributes) : undefined,
         chainCode: chainCode?.length > 0 ? HexBlob.fromBytes(chainCode) : undefined,
-        key: Cardano.Ed25519PublicKey(
+        key: Crypto.Ed25519PublicKeyHex(
           Buffer.from(scope.manage(scope.manage(bootstrap.vkey()).public_key()).as_bytes()).toString('hex')
         ),
-        signature: Cardano.Ed25519Signature(scope.manage(bootstrap.signature()).to_hex())
+        signature: Crypto.Ed25519SignatureHex(scope.manage(bootstrap.signature()).to_hex())
       });
     }
     return result;
@@ -390,10 +391,10 @@ export const txWitnessSet = (witnessSet: CML.TransactionWitnessSet): Cardano.Wit
       for (let i = 0; i < vkeys!.len(); i++) {
         const witness = scope.manage(vkeys.get(i));
         txSignatures.set(
-          Cardano.Ed25519PublicKey(
+          Crypto.Ed25519PublicKeyHex(
             Buffer.from(scope.manage(scope.manage(witness.vkey()).public_key()).as_bytes()).toString('hex')
           ),
-          Cardano.Ed25519Signature(scope.manage(witness.signature()).to_hex())
+          Crypto.Ed25519SignatureHex(scope.manage(witness.signature()).to_hex())
         );
       }
     }

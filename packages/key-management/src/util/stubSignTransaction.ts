@@ -1,11 +1,13 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
 import { GroupedAddress, SignTransactionOptions, TransactionSigner } from '../types';
 import { deepEquals } from '@cardano-sdk/util';
 import { ownSignatureKeyPaths } from './ownSignatureKeyPaths';
+
 import uniqWith from 'lodash/uniqWith';
 
 const randomHexChar = () => Math.floor(Math.random() * 16).toString(16);
-const randomPublicKey = () => Cardano.Ed25519PublicKey(Array.from({ length: 64 }).map(randomHexChar).join(''));
+const randomPublicKey = () => Crypto.Ed25519PublicKeyHex(Array.from({ length: 64 }).map(randomHexChar).join(''));
 
 export const stubSignTransaction = async (
   txBody: Cardano.TxBody,
@@ -14,7 +16,7 @@ export const stubSignTransaction = async (
   extraSigners?: TransactionSigner[],
   { additionalKeyPaths = [] }: SignTransactionOptions = {}
 ): Promise<Cardano.Signatures> => {
-  const mockSignature = Cardano.Ed25519Signature(
+  const mockSignature = Crypto.Ed25519SignatureHex(
     // eslint-disable-next-line max-len
     'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
   );

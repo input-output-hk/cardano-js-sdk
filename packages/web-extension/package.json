@@ -70,6 +70,7 @@
   },
   "dependencies": {
     "@cardano-sdk/core": "^0.7.0",
+    "@cardano-sdk/crypto": "^0.1.0",
     "@cardano-sdk/dapp-connector": "^0.6.1",
     "@cardano-sdk/key-management": "^0.3.0",
     "@cardano-sdk/util": "^0.7.0",

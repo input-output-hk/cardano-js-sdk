@@ -1,4 +1,4 @@
-import { Hash32ByteBase16 } from '@cardano-sdk/util';
+import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { Script } from './Script';
 
 // eslint-disable-next-line no-use-before-define

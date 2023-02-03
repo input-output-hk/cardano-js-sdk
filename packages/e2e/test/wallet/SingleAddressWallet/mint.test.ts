@@ -24,7 +24,11 @@ describe('SingleAddressWallet/mint', () => {
 
     const genesis = await firstValueFrom(wallet.genesisParameters$);
 
-    const aliceKeyAgent = await createStandaloneKeyAgent(util.generateMnemonicWords(), genesis);
+    const aliceKeyAgent = await createStandaloneKeyAgent(
+      util.generateMnemonicWords(),
+      genesis,
+      await wallet.keyAgent.getBip32Ed25519()
+    );
 
     const derivationPath = {
       index: 0,
@@ -32,7 +36,7 @@ describe('SingleAddressWallet/mint', () => {
     };
 
     const alicePubKey = await aliceKeyAgent.derivePublicKey(derivationPath);
-    const aliceKeyHash = Cardano.Ed25519KeyHash.fromKey(alicePubKey);
+    const aliceKeyHash = await aliceKeyAgent.bip32Ed25519.getPubKeyHash(alicePubKey);
 
     const alicePolicySigner = new util.KeyAgentTransactionSigner(aliceKeyAgent, derivationPath);
 

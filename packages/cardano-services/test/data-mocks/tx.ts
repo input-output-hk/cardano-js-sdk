@@ -1,5 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
-import { Hash32ByteBase16 } from '@cardano-sdk/util';
+import { Ed25519KeyHashHex, Hash32ByteBase16 } from '@cardano-sdk/crypto';
+
 import merge from 'lodash/merge';
 
 export const valueWithCoinOnly: Cardano.Value = {
@@ -97,7 +98,7 @@ export const withAuxiliaryData: Cardano.HydratedTx = merge(withAssets, {
 export const delegationCertificate: Cardano.StakeDelegationCertificate = {
   __typename: Cardano.CertificateType.StakeDelegation,
   poolId: Cardano.PoolId('pool1cjm567pd9eqj7wlpuq2mnsasw2upewq0tchg4n8gktq5k7eepvr'),
-  stakeKeyHash: Cardano.Ed25519KeyHash('f15db05f56035465bf8900a09bdaa16c3d8b8244fea686524408dd80')
+  stakeKeyHash: Ed25519KeyHashHex('f15db05f56035465bf8900a09bdaa16c3d8b8244fea686524408dd80')
 };
 
 export const collateralInputs = [

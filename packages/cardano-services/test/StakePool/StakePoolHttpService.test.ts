@@ -20,7 +20,7 @@ import {
   UNLIMITED_CACHE_TTL,
   createHttpStakePoolExtMetadataService
 } from '../../src';
-import { Hash32ByteBase16 } from '@cardano-sdk/util';
+import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { INFO, createLogger } from 'bunyan';
 import { LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';

@@ -32,8 +32,8 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   );
 
-  const ownStakeKeyHash = Cardano.Ed25519KeyHash.fromRewardAccount(ownRewardAccount);
-  const otherStakeKeyHash = Cardano.Ed25519KeyHash.fromRewardAccount(otherRewardAccount);
+  const ownStakeKeyHash = Cardano.RewardAccount.toHash(ownRewardAccount);
+  const otherStakeKeyHash = Cardano.RewardAccount.toHash(otherRewardAccount);
 
   const knownAddress1 = createGroupedAddress(address1, ownRewardAccount, AddressType.External, 0, stakeKeyPath);
 

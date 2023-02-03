@@ -1,3 +1,4 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import { AccountKeyDerivationPath } from '..';
 import {
   AlgorithmId,
@@ -80,7 +81,7 @@ const signSigStructure = (
   }
 };
 
-const createCoseKey = (addressBytes: Uint8Array, publicKey: Cardano.Ed25519PublicKey) => {
+const createCoseKey = (addressBytes: Uint8Array, publicKey: Crypto.Ed25519PublicKeyHex) => {
   const coseKey = COSEKey.new(Label.from_key_type(COSEKeyType.OKP));
   coseKey.set_key_id(addressBytes);
   coseKey.set_algorithm_id(Label.from_algorithm_id(AlgorithmId.EdDSA));

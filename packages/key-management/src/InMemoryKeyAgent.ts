@@ -1,3 +1,4 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import * as errors from './errors';
 import {
   AccountKeyDerivationPath,
@@ -10,7 +11,7 @@ import {
   SignBlobResult,
   SignTransactionOptions
 } from './types';
-import { CML, Cardano, util } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 import { KeyAgentBase } from './KeyAgentBase';
 import {
@@ -31,7 +32,7 @@ export interface InMemoryKeyAgentProps extends Omit<SerializableInMemoryKeyAgent
 export interface FromBip39MnemonicWordsProps {
   chainId: Cardano.ChainId;
   mnemonicWords: string[];
-  mnemonic2ndFactorPassphrase?: Uint8Array;
+  mnemonic2ndFactorPassphrase?: string;
   getPassword: GetPassword;
   accountIndex?: number;
 }
@@ -54,23 +55,27 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
 
   async signBlob({ index, role: type }: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult> {
     const rootPrivateKey = await this.#decryptRootPrivateKey();
-    const accountKey = deriveAccountPrivateKey({
+    const accountKey = await deriveAccountPrivateKey({
       accountIndex: this.accountIndex,
+      bip32Ed25519: this.bip32Ed25519,
       rootPrivateKey
     });
-    const signingKey = accountKey.derive(type).derive(index).to_raw_key();
-    const signature = Cardano.Ed25519Signature(signingKey.sign(Buffer.from(blob, 'hex')).to_hex());
-    const publicKey = Cardano.Ed25519PublicKey.fromHexBlob(util.bytesToHex(signingKey.to_public().as_bytes()));
+
+    const bip32SigningKey = await this.bip32Ed25519.derivePrivateKey(accountKey, [type, index]);
+    const signingKey = await this.bip32Ed25519.getRawPrivateKey(bip32SigningKey);
+    const signature = await this.bip32Ed25519.sign(signingKey, blob);
+    const publicKey = await this.bip32Ed25519.getPublicKey(signingKey);
+
     return { publicKey, signature };
   }
 
   // To export mnemonic, get entropy by reversing this:
+
   // rootPrivateKey = CML.Bip32PrivateKey.from_bip39_entropy(entropy, EMPTY_PASSWORD);
   // eslint-disable-next-line max-len
   // https://github.com/Emurgo/cardano-serialization-lib/blob/f817a033ade7a2255591d7c6444fa4f9ffbcf061/rust/src/chain_crypto/derive.rs#L30-L38
-  async exportRootPrivateKey(): Promise<Cardano.Bip32PrivateKey> {
-    const rootPrivateKey = await this.#decryptRootPrivateKey(true);
-    return Cardano.Bip32PrivateKey.fromHexBlob(util.bytesToHex(rootPrivateKey.as_bytes()));
+  async exportRootPrivateKey(): Promise<Crypto.Bip32PrivateKeyHex> {
+    return await this.#decryptRootPrivateKey(true);
   }
 
   /**
@@ -81,7 +86,7 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
       chainId,
       getPassword,
       mnemonicWords,
-      mnemonic2ndFactorPassphrase = Buffer.from(''),
+      mnemonic2ndFactorPassphrase = '',
       accountIndex = 0
     }: FromBip39MnemonicWordsProps,
     dependencies: KeyAgentDependencies
@@ -90,16 +95,17 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
     const validMnemonic = validateMnemonic(mnemonic);
     if (!validMnemonic) throw new errors.InvalidMnemonicError();
     const entropy = Buffer.from(mnemonicWordsToEntropy(mnemonicWords), 'hex');
-    const rootPrivateKey = CML.Bip32PrivateKey.from_bip39_entropy(entropy, mnemonic2ndFactorPassphrase);
+    const rootPrivateKey = await dependencies.bip32Ed25519.fromBip39Entropy(entropy, mnemonic2ndFactorPassphrase);
     const password = await getPasswordRethrowTypedError(getPassword);
-    const encryptedRootPrivateKey = await emip3encrypt(rootPrivateKey.as_bytes(), password);
-    const accountPrivateKey = deriveAccountPrivateKey({
+    const encryptedRootPrivateKey = await emip3encrypt(Buffer.from(rootPrivateKey, 'hex'), password);
+    const accountPrivateKey = await deriveAccountPrivateKey({
       accountIndex,
+      bip32Ed25519: dependencies.bip32Ed25519,
       rootPrivateKey
     });
-    const extendedAccountPublicKey = Cardano.Bip32PublicKey(
-      Buffer.from(accountPrivateKey.to_public().as_bytes()).toString('hex')
-    );
+
+    const extendedAccountPublicKey = await dependencies.bip32Ed25519.getBip32PublicKey(accountPrivateKey);
+
     return new InMemoryKeyAgent(
       {
         accountIndex,
@@ -125,7 +131,7 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
     // if (keyPaths.length === 0) {
     //   throw new ProofGenerationError();
     // }
-    return new Map<Cardano.Ed25519PublicKey, Cardano.Ed25519Signature>(
+    return new Map<Crypto.Ed25519PublicKeyHex, Crypto.Ed25519SignatureHex>(
       await Promise.all(
         keyPaths.map(async ({ role, index }) => {
           const { publicKey, signature } = await this.signBlob({ index, role }, blob);
@@ -140,14 +146,12 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
    */
   async exportExtendedKeyPair(derivationPath: number[]): Promise<KeyPair> {
     const rootPrivateKey = await this.exportRootPrivateKey();
-    const cslRootPrivateKey = CML.Bip32PrivateKey.from_bytes(Buffer.from(rootPrivateKey, 'hex'));
-    let cslPrivateKey = cslRootPrivateKey;
-    for (const val of derivationPath) {
-      cslPrivateKey = cslPrivateKey.derive(harden(val));
-    }
+    const hardenedIndices = derivationPath.map((index: number) => harden(index));
+    const childKey = await this.bip32Ed25519.derivePrivateKey(rootPrivateKey, hardenedIndices);
+
     return {
-      skey: Cardano.Bip32PrivateKey(Buffer.from(cslPrivateKey.as_bytes()).toString('hex')),
-      vkey: Cardano.Bip32PublicKey(Buffer.from(cslPrivateKey.to_public().as_bytes()).toString('hex'))
+      skey: childKey,
+      vkey: await this.bip32Ed25519.getBip32PublicKey(childKey)
     };
   }
 
@@ -162,6 +166,6 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
     } catch (error) {
       throw new errors.AuthenticationError('Failed to decrypt root private key', error);
     }
-    return CML.Bip32PrivateKey.from_bytes(decryptedRootKeyBytes);
+    return Crypto.Bip32PrivateKeyHex(Buffer.from(decryptedRootKeyBytes).toString('hex'));
   }
 }

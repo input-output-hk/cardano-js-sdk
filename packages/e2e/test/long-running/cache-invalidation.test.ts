@@ -55,7 +55,8 @@ describe('cache invalidation', () => {
       role: KeyRole.External
     });
 
-    const poolKeyHash = Cardano.Ed25519KeyHash.fromKey(poolPubKey);
+    const bip32Ed25519 = await poolKeyAgent.getBip32Ed25519();
+    const poolKeyHash = await bip32Ed25519.getPubKeyHash(poolPubKey);
     const poolId = Cardano.PoolId.fromKeyHash(poolKeyHash);
     const poolRewardAccount = (
       await poolKeyAgent.deriveAddress({

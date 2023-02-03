@@ -8,9 +8,6 @@ import {
   BlockNo,
   Certificate,
   CertificateType,
-  Ed25519KeyHash,
-  Ed25519PublicKey,
-  Ed25519Signature,
   EpochNo,
   HydratedTx,
   HydratedTxIn,
@@ -31,7 +28,7 @@ import {
   Withdrawal,
   Witness
 } from '../../src/Cardano';
-import { Hash32ByteBase16 } from '@cardano-sdk/util';
+import { Ed25519KeyHashHex, Ed25519PublicKeyHex, Ed25519SignatureHex, Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import {
   assetsBurnedInspector,
   assetsMintedInspector,
@@ -61,7 +58,7 @@ describe('txInspector', () => {
     'addr_test1qpfhhfy2qgls50r9u4yh0l7z67xpg0a5rrhkmvzcuqrd0znuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q9gw0lz'
   );
   const rewardAccount = RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d');
-  const stakeKeyHash = Ed25519KeyHash.fromRewardAccount(rewardAccount);
+  const stakeKeyHash = RewardAccount.toHash(rewardAccount);
   const poolId = PoolId('pool1euf2nh92ehqfw7rpd4s9qgq34z8dg4pvfqhjmhggmzk95gcd402');
   const delegationCert: StakeDelegationCertificate = {
     __typename: CertificateType.StakeDelegation,
@@ -174,7 +171,7 @@ describe('txInspector', () => {
     scripts: [
       {
         __type: ScriptType.Native,
-        keyHash: Ed25519KeyHash('24accb6ca2690388f067175d773871f5640de57bf11aec0be258d6c7'),
+        keyHash: Ed25519KeyHashHex('24accb6ca2690388f067175d773871f5640de57bf11aec0be258d6c7'),
         kind: NativeScriptKind.RequireSignature
       }
     ]
@@ -186,7 +183,7 @@ describe('txInspector', () => {
     scripts: [
       {
         __type: ScriptType.Native,
-        keyHash: Ed25519KeyHash('00accb6ca2690388f067175d773871f5640de57bf11aec0be258d6c7'),
+        keyHash: Ed25519KeyHashHex('00accb6ca2690388f067175d773871f5640de57bf11aec0be258d6c7'),
         kind: NativeScriptKind.RequireSignature
       }
     ]
@@ -270,7 +267,10 @@ describe('txInspector', () => {
       },
       id: TransactionId('e3a443363eb6ee3d67c5e75ec10b931603787581a948d68fa3b2cd3ff2e0d2ad'),
       index: 0,
-      witness: args.witness ?? { scripts: [mockScript1], signatures: new Map<Ed25519PublicKey, Ed25519Signature>() }
+      witness: args.witness ?? {
+        scripts: [mockScript1],
+        signatures: new Map<Ed25519PublicKeyHex, Ed25519SignatureHex>()
+      }
     } as HydratedTx);
 
   describe('transaction sent inspector', () => {
@@ -565,7 +565,7 @@ describe('txInspector', () => {
       'a transaction with some certificates signed with any of the provided reward accounts' +
         ' and some signed with other produces an inspection containing only the former',
       () => {
-        const otherCert = { ...delegationCert, stakeKeyHash: '' as unknown as Ed25519KeyHash };
+        const otherCert = { ...delegationCert, stakeKeyHash: '' as unknown as Ed25519KeyHashHex };
         const tx = buildMockTx({ certificates: [delegationCert, otherCert] });
         const inspectTx = createTxInspector({ signedCertificates: signedCertificatesInspector([rewardAccount]) });
         const txProperties = inspectTx(tx);

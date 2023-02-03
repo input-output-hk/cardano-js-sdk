@@ -9,7 +9,7 @@ import {
   exposeApi
 } from '@cardano-sdk/web-extension';
 import { adaPriceServiceChannel, getObservableWalletName, userPromptServiceChannel, walletName } from './const';
-import { keyManagementFactory } from '../../../src';
+import { bip32Ed25519Factory, keyManagementFactory } from '../../../src';
 
 import { combineLatest, firstValueFrom, of } from 'rxjs';
 import { runtime } from 'webextension-polyfill';
@@ -114,6 +114,7 @@ const createWallet = async (accountIndex: number) => {
 
   // setupWallet call is required to provide context (InputResolver) to the key agent
   const { keyAgent } = await setupWallet({
+    bip32Ed25519: await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger),
     createKeyAgent: async (dependencies) =>
       (
         await keyManagementFactory.create(

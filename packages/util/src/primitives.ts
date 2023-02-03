@@ -116,26 +116,3 @@ export const castHexBlob = <T>(target: HexBlob, expectedLength?: number) => {
   assertLength(expectedLength, target.toString());
   return target as unknown as T;
 };
-
-/**
- * 32 byte hash as hex string
- */
-export type Hash32ByteBase16 = OpaqueString<'Hash32ByteBase16'>;
-
-/**
- * @param {string} value 32 byte hash as hex string
- * @throws InvalidStringError
- */
-export const Hash32ByteBase16 = (value: string): Hash32ByteBase16 => typedHex<Hash32ByteBase16>(value, 64);
-Hash32ByteBase16.fromHexBlob = <T>(value: HexBlob) => castHexBlob<T>(value, 64);
-
-/**
- * 28 byte hash as hex string
- */
-export type Hash28ByteBase16 = OpaqueString<'Hash28ByteBase16'>;
-
-/**
- * @param {string} value 28 byte hash as hex string
- * @throws InvalidStringError
- */
-export const Hash28ByteBase16 = (value: string): Hash28ByteBase16 => typedHex<Hash28ByteBase16>(value, 56);

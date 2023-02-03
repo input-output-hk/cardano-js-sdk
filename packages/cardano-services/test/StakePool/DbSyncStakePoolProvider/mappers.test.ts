@@ -15,7 +15,7 @@ import {
   mapRelay,
   toStakePoolResults
 } from '../../../src';
-import { Hash32ByteBase16 } from '@cardano-sdk/util';
+import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { mockStakeDistribution } from '../../../../core/test/CardanoNode/mocks';
 
 // eslint-disable-next-line max-statements

@@ -1,5 +1,6 @@
 import * as cip14 from '@emurgo/cip14-js';
-import { Hash28ByteBase16, InvalidStringError, OpaqueString, assertIsHexString, typedBech32 } from '@cardano-sdk/util';
+import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
+import { InvalidStringError, OpaqueString, assertIsHexString, typedBech32 } from '@cardano-sdk/util';
 
 export type AssetId = OpaqueString<'AssetId'>;
 

@@ -13,6 +13,7 @@ import { logger } from '@cardano-sdk/util-dev';
 import {
   MeasurementUtil,
   assetProviderFactory,
+  bip32Ed25519Factory,
   chainHistoryProviderFactory,
   getEnv,
   getLoadTestScheduler,
@@ -70,8 +71,9 @@ const getKeyAgent = async (accountIndex: number) => {
     { ...env.KEY_MANAGEMENT_PARAMS, accountIndex },
     logger
   );
+  const bip32Ed25519 = await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger);
   const walletUtil = createLazyWalletUtil();
-  const keyAgent = await createKeyAgent({ inputResolver: walletUtil, logger });
+  const keyAgent = await createKeyAgent({ bip32Ed25519, inputResolver: walletUtil, logger });
   return { keyAgent, walletUtil };
 };
 

@@ -1,4 +1,5 @@
 /* eslint-disable max-len */
+import * as Crypto from '@cardano-sdk/crypto';
 import {
   BYRON_TX_FEE_COEFFICIENT,
   BYRON_TX_FEE_CONSTANT,
@@ -14,7 +15,7 @@ import {
   isShelleyTx,
   isStartsAt
 } from './util';
-import { Base64Blob, Hash28ByteBase16, Hash32ByteBase16, HexBlob } from '@cardano-sdk/util';
+import { Base64Blob, HexBlob } from '@cardano-sdk/util';
 import { BlockKind, CommonBlock } from './types';
 import {
   Cardano,
@@ -60,12 +61,12 @@ const mapPoolParameters = (poolParameters: Schema.PoolParameters): Cardano.PoolP
     margin: mapMargin(poolParameters.margin),
     metadataJson: poolParameters.metadata
       ? {
-          hash: Hash32ByteBase16(poolParameters.metadata.hash),
+          hash: Crypto.Hash32ByteBase16(poolParameters.metadata.hash),
           url: poolParameters.metadata.url
         }
       : undefined,
     owners: poolParameters.owners.map((ownerKeyHash) =>
-      createRewardAccount(Cardano.Ed25519KeyHash(ownerKeyHash), addressNetworkId(rewardAccount))
+      createRewardAccount(Crypto.Ed25519KeyHashHex(ownerKeyHash), addressNetworkId(rewardAccount))
     ),
     relays: poolParameters.relays.map(mapRelay),
     rewardAccount,
@@ -78,19 +79,19 @@ const mapCertificate = (certificate: Schema.Certificate): Cardano.Certificate =>
     return {
       __typename: Cardano.CertificateType.StakeDelegation,
       poolId: Cardano.PoolId(certificate.stakeDelegation.delegatee),
-      stakeKeyHash: Cardano.Ed25519KeyHash(certificate.stakeDelegation.delegator)
+      stakeKeyHash: Crypto.Ed25519KeyHashHex(certificate.stakeDelegation.delegator)
     };
   }
   if ('stakeKeyRegistration' in certificate) {
     return {
       __typename: Cardano.CertificateType.StakeKeyRegistration,
-      stakeKeyHash: Cardano.Ed25519KeyHash(certificate.stakeKeyRegistration)
+      stakeKeyHash: Crypto.Ed25519KeyHashHex(certificate.stakeKeyRegistration)
     };
   }
   if ('stakeKeyDeregistration' in certificate) {
     return {
       __typename: Cardano.CertificateType.StakeKeyDeregistration,
-      stakeKeyHash: Cardano.Ed25519KeyHash(certificate.stakeKeyDeregistration)
+      stakeKeyHash: Crypto.Ed25519KeyHashHex(certificate.stakeKeyDeregistration)
     };
   }
   if ('poolRegistration' in certificate) {
@@ -109,9 +110,9 @@ const mapCertificate = (certificate: Schema.Certificate): Cardano.Certificate =>
   if ('genesisDelegation' in certificate) {
     return {
       __typename: Cardano.CertificateType.GenesisKeyDelegation,
-      genesisDelegateHash: Hash28ByteBase16(certificate.genesisDelegation.delegateKeyHash),
-      genesisHash: Hash28ByteBase16(certificate.genesisDelegation.verificationKeyHash),
-      vrfKeyHash: Hash32ByteBase16(certificate.genesisDelegation.vrfVerificationKeyHash)
+      genesisDelegateHash: Crypto.Hash28ByteBase16(certificate.genesisDelegation.delegateKeyHash),
+      genesisHash: Crypto.Hash28ByteBase16(certificate.genesisDelegation.verificationKeyHash),
+      vrfKeyHash: Crypto.Hash32ByteBase16(certificate.genesisDelegation.vrfVerificationKeyHash)
     };
   }
   if ('moveInstantaneousRewards' in certificate) {
@@ -137,7 +138,7 @@ export const nativeScript = (script: Schema.ScriptNative): Cardano.NativeScript 
   if (typeof script === 'string') {
     coreScript = {
       __type: Cardano.ScriptType.Native,
-      keyHash: Cardano.Ed25519KeyHash(script),
+      keyHash: Crypto.Ed25519KeyHashHex(script),
       kind: Cardano.NativeScriptKind.RequireSignature
     };
   } else if (isRequireAllOf(script)) {
@@ -214,8 +215,8 @@ const mapBootstrapWitness = (b: Schema.BootstrapWitness): Cardano.BootstrapWitne
   // Based on the Ogmios maintainer answer  https://github.com/CardanoSolutions/ogmios/discussions/285#discussioncomment-4271726
   addressAttributes: b.addressAttributes ? Base64Blob(b.addressAttributes) : undefined,
   chainCode: b.chainCode ? HexBlob(b.chainCode) : undefined,
-  key: Cardano.Ed25519PublicKey(b.key!),
-  signature: Cardano.Ed25519Signature(HexBlob.fromBase64(b.signature!).toString())
+  key: Crypto.Ed25519PublicKeyHex(b.key!),
+  signature: Crypto.Ed25519SignatureHex(HexBlob.fromBase64(b.signature!).toString())
 });
 
 const mapRedeemer = (key: string, redeemer: Schema.Redeemer): Cardano.Redeemer => {
@@ -241,7 +242,7 @@ const mapAuxiliaryData = (data: Schema.AuxiliaryData | null): Cardano.AuxiliaryD
         : undefined,
       scripts: data.body.scripts ? data.body.scripts.map(mapScript) : undefined
     },
-    hash: Hash32ByteBase16(data.hash)
+    hash: Crypto.Hash32ByteBase16(data.hash)
   };
 };
 
@@ -257,7 +258,7 @@ const mapInlineDatum = (datum: Schema.TxOut['datum']) => {
 
 const mapDatumHash = (datum: Schema.TxOut['datumHash']) => {
   if (!datum) return;
-  return Hash32ByteBase16(datum);
+  return Crypto.Hash32ByteBase16(datum);
 };
 
 const mapTxOut = (txOut: Schema.TxOut): Cardano.TxOut => ({
@@ -278,9 +279,11 @@ const mapMint = (tx: Schema.TxMary): Cardano.TokenMap | undefined => {
   return new Map(Object.entries(tx.body.mint.assets).map(([key, value]) => [Cardano.AssetId(key), value]));
 };
 
-const mapScriptIntegrityHash = ({ body: { scriptIntegrityHash } }: Schema.TxAlonzo): Hash32ByteBase16 | undefined => {
+const mapScriptIntegrityHash = ({
+  body: { scriptIntegrityHash }
+}: Schema.TxAlonzo): Crypto.Hash32ByteBase16 | undefined => {
   if (scriptIntegrityHash === null) return undefined;
-  return Hash32ByteBase16(scriptIntegrityHash);
+  return Crypto.Hash32ByteBase16(scriptIntegrityHash);
 };
 
 const mapValidityInterval = ({
@@ -301,7 +304,7 @@ const mapCommonTx = (tx: CommonBlock['body'][0], kind: BlockKind): Cardano.Tx =>
     mint: isMaryOrAbove(kind) ? mapMint(tx as Schema.TxMary) : undefined,
     outputs: tx.body.outputs.map(mapTxOut),
     requiredExtraSignatures: isAlonzoOrAbove(kind)
-      ? (tx as Schema.TxAlonzo).body.requiredExtraSignatures.map(Cardano.Ed25519KeyHash)
+      ? (tx as Schema.TxAlonzo).body.requiredExtraSignatures.map(Crypto.Ed25519KeyHashHex)
       : undefined,
     scriptIntegrityHash: isAlonzoOrAbove(kind) ? mapScriptIntegrityHash(tx as Schema.TxAlonzo) : undefined,
     validityInterval: isShelleyTx(kind)
@@ -324,8 +327,8 @@ const mapCommonTx = (tx: CommonBlock['body'][0], kind: BlockKind): Cardano.Tx =>
     scripts: [...Object.values(tx.witness.scripts).map(mapScript)],
     signatures: new Map(
       Object.entries(tx.witness.signatures).map(([key, value]) => [
-        Cardano.Ed25519PublicKey(key),
-        Cardano.Ed25519Signature(HexBlob.fromBase64(value).toString())
+        Crypto.Ed25519PublicKeyHex(key),
+        Crypto.Ed25519SignatureHex(HexBlob.fromBase64(value).toString())
       ])
     )
   }

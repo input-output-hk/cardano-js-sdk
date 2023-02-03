@@ -1,6 +1,5 @@
-import { Ed25519KeyHash } from './Key';
+import * as Crypto from '@cardano-sdk/crypto';
 import { EpochNo } from './Block';
-import { Hash28ByteBase16, Hash32ByteBase16 } from '@cardano-sdk/util';
 import { Lovelace } from './Value';
 import { PoolId, PoolParameters } from './StakePool';
 import { RewardAccount } from './RewardAccount';
@@ -17,7 +16,7 @@ export enum CertificateType {
 
 export interface StakeAddressCertificate {
   __typename: CertificateType.StakeKeyRegistration | CertificateType.StakeKeyDeregistration;
-  stakeKeyHash: Ed25519KeyHash;
+  stakeKeyHash: Crypto.Ed25519KeyHashHex;
 }
 
 export interface PoolRegistrationCertificate {
@@ -33,7 +32,7 @@ export interface PoolRetirementCertificate {
 
 export interface StakeDelegationCertificate {
   __typename: CertificateType.StakeDelegation;
-  stakeKeyHash: Ed25519KeyHash;
+  stakeKeyHash: Crypto.Ed25519KeyHashHex;
   poolId: PoolId;
 }
 
@@ -51,9 +50,9 @@ export interface MirCertificate {
 
 export interface GenesisKeyDelegationCertificate {
   __typename: CertificateType.GenesisKeyDelegation;
-  genesisHash: Hash28ByteBase16;
-  genesisDelegateHash: Hash28ByteBase16;
-  vrfKeyHash: Hash32ByteBase16;
+  genesisHash: Crypto.Hash28ByteBase16;
+  genesisDelegateHash: Crypto.Hash28ByteBase16;
+  vrfKeyHash: Crypto.Hash32ByteBase16;
 }
 
 export type Certificate =

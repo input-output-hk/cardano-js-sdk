@@ -10,6 +10,7 @@ import {
   isShelleyBlock
 } from '@cardano-ogmios/client';
 
+import * as Crypto from '@cardano-sdk/crypto';
 import { BlockAndKind, BlockKind, CommonBlock, OgmiosBlockType } from './types';
 import { Cardano } from '@cardano-sdk/core';
 import { mapByronBlockBody, mapCommonBlockBody } from './tx';
@@ -83,8 +84,8 @@ const mapCommonFees = (block: CommonBlock): Cardano.Lovelace =>
 const mapCommonVrf = (block: CommonBlock): Cardano.VrfVkBech32 => Cardano.VrfVkBech32FromBase64(block.header.issuerVrf);
 // SlotLeader is the producer pool id. It can be calculated from the issuer verification key
 // which is actually the cold verification key
-const mapCommonSlotLeader = (block: CommonBlock): Cardano.Ed25519PublicKey =>
-  Cardano.Ed25519PublicKey(block.header.issuerVk);
+const mapCommonSlotLeader = (block: CommonBlock): Crypto.Ed25519PublicKeyHex =>
+  Crypto.Ed25519PublicKeyHex(block.header.issuerVk);
 
 const mapStandardBlockHeader = (block: Schema.StandardBlock) => ({
   blockNo: Cardano.BlockNo(mapBlockHeight(block)),

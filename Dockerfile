@@ -45,6 +45,8 @@ COPY --from=cardano-services-builder /app/packages/ogmios/dist /app/packages/ogm
 COPY --from=cardano-services-builder /app/packages/ogmios/package.json /app/packages/ogmios/package.json
 COPY --from=cardano-services-builder /app/packages/util/dist /app/packages/util/dist
 COPY --from=cardano-services-builder /app/packages/util/package.json /app/packages/util/package.json
+COPY --from=cardano-services-builder /app/packages/crypto/dist /app/packages/crypto/dist
+COPY --from=cardano-services-builder /app/packages/crypto/package.json /app/packages/crypto/package.json
 
 FROM cardano-services as http-server
 ARG NETWORK=mainnet

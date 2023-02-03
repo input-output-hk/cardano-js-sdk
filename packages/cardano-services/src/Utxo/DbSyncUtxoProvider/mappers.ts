@@ -1,5 +1,6 @@
 import { Cardano, SerializationError, SerializationFailure, createUtxoId, jsonToNativeScript } from '@cardano-sdk/core';
-import { Hash32ByteBase16, HexBlob, isNotNil } from '@cardano-sdk/util';
+import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import { HexBlob, isNotNil } from '@cardano-sdk/util';
 import { ReferenceScriptType, UtxoModel } from './types';
 import { generateAssetId } from './util';
 

@@ -1,6 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
 
-import { Hash32ByteBase16 } from '@cardano-sdk/util';
+import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import {
   MaybeValidTxOut,
   OutputBuilder,

@@ -3,8 +3,9 @@
 /* eslint-disable sonarjs/cognitive-complexity,  max-depth, max-statements, complexity */
 import * as ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import * as trezor from 'trezor-connect';
-import { BIP32Path, CardanoKeyConst, GroupedAddress } from '../types';
+import { BIP32Path } from '@cardano-sdk/crypto';
 import { CML, Cardano, cmlToCore } from '@cardano-sdk/core';
+import { CardanoKeyConst, GroupedAddress } from '../types';
 import { HwMappingError } from '../errors';
 import { ManagedFreeableScope, isNotNil, usingAutoFree } from '@cardano-sdk/util';
 import { STAKE_KEY_DERIVATION_PATH, harden } from './key';

@@ -1,4 +1,8 @@
+import * as Crypto from '@cardano-sdk/crypto';
+import * as mocks from '../mocks';
+import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
 import {
+  CML,
   Cardano,
   ChainHistoryProvider,
   NetworkInfoProvider,
@@ -6,14 +10,11 @@ import {
   TxSubmitProvider,
   UtxoProvider
 } from '@cardano-sdk/core';
+import { ConnectionStatusTracker, PollingConfig, SingleAddressWallet, setupWallet } from '../../src';
+import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
-
-import * as mocks from '../mocks';
-import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
-import { ConnectionStatusTracker, PollingConfig, SingleAddressWallet, setupWallet } from '../../src';
-import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
 import { testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { waitForWalletStateSettle } from '../util';
 
@@ -32,6 +33,7 @@ interface Providers {
 
 const createWallet = async (stores: WalletStores, providers: Providers, pollingConfig?: PollingConfig) => {
   const { wallet } = await setupWallet({
+    bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
     createKeyAgent: async (dependencies) => {
       const groupedAddress: GroupedAddress = {
         accountIndex: 0,
@@ -111,7 +113,7 @@ const tx: Cardano.Tx = {
   body: txBody,
   id: Cardano.TransactionId('de9d33f66cffff721673219b19470aec81d96bc9253182369e41eec58389a448'),
   witness: {
-    signatures: new Map([[Cardano.Ed25519PublicKey(vkey), Cardano.Ed25519Signature(signature)]])
+    signatures: new Map([[Crypto.Ed25519PublicKeyHex(vkey), Crypto.Ed25519SignatureHex(signature)]])
   }
 };
 
