@@ -54,10 +54,12 @@ describe('cip36', () => {
       );
       const signedCip36Metadata = await cip36.metadataBuilder.signVotingRegistration(votingRegistrationMetadata, {
         signBlob: async (blob) => {
-          const privateStakeKey = CML.PrivateKey.from_normal_bytes(
-            Buffer.from('f5beaeff7932a4164d270afde7716067582412e8977e67986cd9b456fc082e3a', 'hex')
+          const bip32Ed25519 = new Crypto.CmlBip32Ed25519(CML);
+          const privateStakeKey = Crypto.Ed25519PrivateNormalKeyHex(
+            'f5beaeff7932a4164d270afde7716067582412e8977e67986cd9b456fc082e3a'
           );
-          return Crypto.Ed25519SignatureHex(privateStakeKey.sign(Buffer.from(blob, 'hex')).to_hex());
+
+          return bip32Ed25519.sign(privateStakeKey, blob);
         }
       });
       expect((signedCip36Metadata.get(61_285n) as Cardano.MetadatumMap).get(1n)).toEqual(
