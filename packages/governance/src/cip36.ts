@@ -1,7 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { CML, Cardano, coreToCml, util } from '@cardano-sdk/core';
 import { HexBlob, usingAutoFree } from '@cardano-sdk/util';
-import { util as keyManagementUtil } from '@cardano-sdk/key-management';
 import blake2b from 'blake2b';
 
 /**
@@ -21,8 +20,8 @@ export const SIG_MAP_KEY = 1n;
  * CIP-36 voting key derivation path constants
  */
 export enum VotingKeyDerivationPath {
-  PURPOSE = keyManagementUtil.harden(1694),
-  COIN_TYPE = keyManagementUtil.harden(1815)
+  PURPOSE = 1694,
+  COIN_TYPE = 1815
 }
 
 /**
