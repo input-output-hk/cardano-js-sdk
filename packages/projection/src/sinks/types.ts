@@ -8,8 +8,8 @@ import { WithNetworkInfo } from '../operators';
  * Keeps track of blocks within stability window (computed as numSlots=3k/f).
  *
  * With current mainnet protocol parameters (Dec 2022),
- * it can be up to 2160 ("securityParam") * 3 = 6480 blocks,
- * which can be up to ~584 megabytes in raw serialized block data.
+ * it can be up to 2160 ("securityParam"/"k") blocks,
+ * which can be up to ~195 megabytes in raw serialized block data.
  *
  * Implementations should have a strategy for deleting blocks outside of the stability window.
  * Implementations are not expected to keep exactly the required # of blocks (having more blocks is ok).
