@@ -1,5 +1,5 @@
 import { BehaviorSubject, EMPTY, Observable } from 'rxjs';
-import { Cardano, calculateStabilityWindowSlotsCount } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { RollForwardEvent } from '../../types';
 import { StabilityWindowBuffer } from '../types';
 import { WithNetworkInfo } from '../../operators';
@@ -23,11 +23,12 @@ export class InMemoryStabilityWindowBuffer<E extends WithNetworkInfo> implements
     return EMPTY;
   }
 
-  rollForward({ block, genesisParameters }: RollForwardEvent<WithNetworkInfo>): Observable<void> {
-    const stabilityWindowSlotsCount = calculateStabilityWindowSlotsCount(genesisParameters);
+  rollForward({
+    block,
+    genesisParameters: { securityParameter }
+  }: RollForwardEvent<WithNetworkInfo>): Observable<void> {
     // clear blocks that are past stability window
-    const slotThreshold = block.header.slot.valueOf() - stabilityWindowSlotsCount;
-    while (this.#blocks.length > 0 && this.#blocks[0].header.slot.valueOf() < slotThreshold) this.#blocks.shift();
+    while (this.#blocks.length > securityParameter) this.#blocks.shift();
     // add current block to cache and return the event unchanged
     this.#blocks.push(block);
     this.tip$.next(block);
