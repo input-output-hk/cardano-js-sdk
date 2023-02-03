@@ -57,9 +57,17 @@ describe('UtxoHttpService', () => {
     });
 
     it('throws during service initialization if the UtxoProvider is unhealthy', async () => {
+      expect.assertions(2);
       service = new UtxoHttpService({ logger, utxoProvider });
       httpServer = new HttpServer(config, { logger, runnableDependencies: [], services: [service] });
-      await expect(httpServer.initialize()).rejects.toThrow(new ProviderError(ProviderFailure.Unhealthy));
+      try {
+        await httpServer.initialize();
+      } catch (error: unknown) {
+        if (error instanceof ProviderError) {
+          expect(error.name).toBe('ProviderError');
+          expect(error.reason).toBe('UNHEALTHY');
+        }
+      }
     });
   });
 
