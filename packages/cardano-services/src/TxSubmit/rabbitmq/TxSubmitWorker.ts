@@ -156,9 +156,9 @@ export class TxSubmitWorker extends EventEmitter {
     }
     this.#dependencies.logger.info(`${moduleName} init: checking tx submission provider health status`);
 
-    const { ok } = await this.#dependencies.txSubmitProvider.healthCheck();
+    const health = await this.#dependencies.txSubmitProvider.healthCheck();
 
-    if (!ok) throw new ProviderError(ProviderFailure.Unhealthy);
+    if (!health.ok) throw new ProviderError(ProviderFailure.Unhealthy, null, JSON.stringify(health, null, 2));
 
     try {
       this.#dependencies.logger.info(`${moduleName} init: opening RabbitMQ connection`);
