@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.8.0-nightly.3...@cardano-sdk/cardano-services@0.8.0-nightly.4) (2023-02-04)
+
+### Features
+
+- **cardano-services:** include healthCheck response as detail in Provider.Unhealthy errors ([16d008d](https://github.com/input-output-hk/cardano-js-sdk/commit/16d008dfa31661c76543f8704292a283c41dd38b))
+
 ## [0.8.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.8.0-nightly.2...@cardano-sdk/cardano-services@0.8.0-nightly.3) (2023-02-03)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services
