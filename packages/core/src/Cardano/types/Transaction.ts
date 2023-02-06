@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import * as Crypto from '@cardano-sdk/crypto';
 import { AuxiliaryData } from './AuxiliaryData';
-import { Base64Blob, Hash32ByteBase16, HexBlob, OpaqueString, typedHex } from '../util/primitives';
+import { Base64Blob, HexBlob, OpaqueString } from '@cardano-sdk/util';
 import { Certificate } from './Certificate';
 import { Datum, Script } from './Script';
-import { Ed25519KeyHash, Ed25519PublicKey } from './Key';
 import { ExUnits, ValidityInterval } from './ProtocolParameters';
 import { HydratedTxIn, TxIn, TxOut } from './Utxo';
 import { Lovelace, TokenMap } from './Value';
@@ -19,19 +19,9 @@ export type TransactionId = OpaqueString<'TransactionId'>;
  * @param {string} value transaction hash as hex string
  * @throws InvalidStringError
  */
-export const TransactionId = (value: string): TransactionId => Hash32ByteBase16(value) as unknown as TransactionId;
-TransactionId.fromHexBlob = (value: HexBlob) => Hash32ByteBase16.fromHexBlob<TransactionId>(value);
-
-/**
- * Ed25519 signature as hex string
- */
-export type Ed25519Signature = OpaqueString<'Ed25519Signature'>;
-
-/**
- * @param {string} value Ed25519 signature as hex string
- * @throws InvalidStringError
- */
-export const Ed25519Signature = (value: string): Ed25519Signature => typedHex(value, 128);
+export const TransactionId = (value: string): TransactionId =>
+  Crypto.Hash32ByteBase16(value) as unknown as TransactionId;
+TransactionId.fromHexBlob = (value: HexBlob) => Crypto.Hash32ByteBase16.fromHexBlob<TransactionId>(value);
 
 export interface Withdrawal {
   stakeAddress: RewardAccount;
@@ -47,8 +37,8 @@ export interface HydratedTxBody {
   withdrawals?: Withdrawal[];
   certificates?: Certificate[];
   mint?: TokenMap;
-  scriptIntegrityHash?: Hash32ByteBase16;
-  requiredExtraSignatures?: Ed25519KeyHash[];
+  scriptIntegrityHash?: Crypto.Hash32ByteBase16;
+  requiredExtraSignatures?: Crypto.Ed25519KeyHashHex[];
 
   /**
    * The total collateral field lets users write transactions whose collateral is evident by just looking at the
@@ -94,12 +84,12 @@ export interface Redeemer {
   executionUnits: ExUnits;
 }
 
-export type Signatures = Map<Ed25519PublicKey, Ed25519Signature>;
+export type Signatures = Map<Crypto.Ed25519PublicKeyHex, Crypto.Ed25519SignatureHex>;
 
-export type Signature = Ed25519Signature;
+export type Signature = Crypto.Ed25519SignatureHex;
 export type ChainCode = HexBlob;
 export type AddressAttributes = Base64Blob;
-export type VerificationKey = Ed25519PublicKey;
+export type VerificationKey = Crypto.Ed25519PublicKeyHex;
 
 export interface BootstrapWitness {
   signature: Signature;

@@ -25,8 +25,16 @@ describe('SingleAddressWallet/multisignature', () => {
 
     const genesis = await firstValueFrom(wallet.genesisParameters$);
 
-    const aliceKeyAgent = await createStandaloneKeyAgent(util.generateMnemonicWords(), genesis);
-    const bobKeyAgent = await createStandaloneKeyAgent(util.generateMnemonicWords(), genesis);
+    const aliceKeyAgent = await createStandaloneKeyAgent(
+      util.generateMnemonicWords(),
+      genesis,
+      await wallet.keyAgent.getBip32Ed25519()
+    );
+    const bobKeyAgent = await createStandaloneKeyAgent(
+      util.generateMnemonicWords(),
+      genesis,
+      await wallet.keyAgent.getBip32Ed25519()
+    );
 
     const derivationPath = {
       index: 0,
@@ -34,10 +42,10 @@ describe('SingleAddressWallet/multisignature', () => {
     };
 
     const alicePubKey = await aliceKeyAgent.derivePublicKey(derivationPath);
-    const aliceKeyHash = Cardano.Ed25519KeyHash.fromKey(alicePubKey);
+    const aliceKeyHash = await aliceKeyAgent.bip32Ed25519.getPubKeyHash(alicePubKey);
 
     const bobPubKey = await bobKeyAgent.derivePublicKey(derivationPath);
-    const bobKeyHash = Cardano.Ed25519KeyHash.fromKey(bobPubKey);
+    const bobKeyHash = await bobKeyAgent.bip32Ed25519.getPubKeyHash(bobPubKey);
 
     const alicePolicySigner = new util.KeyAgentTransactionSigner(aliceKeyAgent, derivationPath);
     const bobPolicySigner = new util.KeyAgentTransactionSigner(bobKeyAgent, derivationPath);

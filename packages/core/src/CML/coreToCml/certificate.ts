@@ -1,4 +1,5 @@
 import * as Cardano from '../../Cardano/types';
+import * as Crypto from '@cardano-sdk/crypto';
 import {
   Address,
   BigNum,
@@ -33,7 +34,7 @@ import {
 import { ManagedFreeableScope } from '@cardano-sdk/util';
 import { NotImplementedError } from '../../errors';
 
-export const stakeKeyRegistration = (scope: ManagedFreeableScope, stakeKeyHash: Cardano.Ed25519KeyHash) =>
+export const stakeKeyRegistration = (scope: ManagedFreeableScope, stakeKeyHash: Crypto.Ed25519KeyHashHex) =>
   scope.manage(
     Certificate.new_stake_registration(
       scope.manage(
@@ -48,7 +49,7 @@ export const stakeKeyRegistration = (scope: ManagedFreeableScope, stakeKeyHash: 
     )
   );
 
-export const stakeKeyDeregistration = (scope: ManagedFreeableScope, stakeKeyHash: Cardano.Ed25519KeyHash) =>
+export const stakeKeyDeregistration = (scope: ManagedFreeableScope, stakeKeyHash: Crypto.Ed25519KeyHashHex) =>
   scope.manage(
     Certificate.new_stake_deregistration(
       scope.manage(
@@ -166,7 +167,7 @@ export const poolRetirement = (scope: ManagedFreeableScope, poolId: Cardano.Pool
 
 export const stakeDelegation = (
   scope: ManagedFreeableScope,
-  stakeKeyHash: Cardano.Ed25519KeyHash,
+  stakeKeyHash: Crypto.Ed25519KeyHashHex,
   delegatee: Cardano.PoolId
 ) =>
   scope.manage(

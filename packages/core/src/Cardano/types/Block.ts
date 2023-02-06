@@ -1,7 +1,6 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import { CML } from '../../CML/CML';
-import { Ed25519PublicKey } from './Key';
-import { Hash28ByteBase16, Hash32ByteBase16, OpaqueNumber, OpaqueString, typedBech32 } from '../util/primitives';
-import { InvalidStringError } from '../../errors';
+import { InvalidStringError, OpaqueNumber, OpaqueString, typedBech32 } from '@cardano-sdk/util';
 import { Lovelace } from './Value';
 import { PoolId } from './StakePool/primitives';
 import { Tx } from './Transaction';
@@ -48,7 +47,7 @@ export type Tip = PartialBlockHeader;
  * @param {string} value block hash as hex string
  * @throws InvalidStringError
  */
-export const BlockId = (value: string): BlockId => Hash32ByteBase16(value) as unknown as BlockId;
+export const BlockId = (value: string): BlockId => Crypto.Hash32ByteBase16(value) as unknown as BlockId;
 
 /**
  * 32 byte ed25519 verification key as bech32 string.
@@ -66,7 +65,7 @@ export const GenesisDelegate = (value: string): GenesisDelegate => {
   if (/ShelleyGenesis-[\da-f]{16}/.test(value)) {
     return value as unknown as GenesisDelegate;
   }
-  return Hash28ByteBase16(value) as unknown as GenesisDelegate;
+  return Crypto.Hash28ByteBase16(value) as unknown as GenesisDelegate;
 };
 
 export type SlotLeader = PoolId | GenesisDelegate;
@@ -108,7 +107,7 @@ export interface BlockInfo {
    * This is the operational cold verification key of the stake pool
    * Leaving as undefined for Byron blocks until we figure out how/if we can use the genesisKey field
    */
-  issuerVk?: Ed25519PublicKey;
+  issuerVk?: Crypto.Ed25519PublicKeyHex;
 }
 
 export interface Block extends BlockInfo {

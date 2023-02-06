@@ -1,3 +1,4 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano } from '../../../src';
 
 describe('Cardano/types/StakePool', () => {
@@ -7,7 +8,7 @@ describe('Cardano/types/StakePool', () => {
 
   it('PoolId.fromKeyHash() returns valid pool id encoded as a bech32 string', () => {
     const poolId = Cardano.PoolId.fromKeyHash(
-      Cardano.Ed25519KeyHash('594df1c896f6b05d4bebec0287627cf83416db779a3273205d3db9e0')
+      Crypto.Ed25519KeyHashHex('594df1c896f6b05d4bebec0287627cf83416db779a3273205d3db9e0')
     );
     expect(poolId).toEqual(Cardano.PoolId('pool1t9xlrjyk76c96jltaspgwcnulq6pdkmhnge8xgza8ku7qvpsy9r'));
   });

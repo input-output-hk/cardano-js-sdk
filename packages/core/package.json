@@ -64,6 +64,7 @@
   "dependencies": {
     "@cardano-ogmios/client": "5.5.7",
     "@cardano-ogmios/schema": "5.5.7",
+    "@cardano-sdk/crypto": "^0.1.0",
     "@cardano-sdk/util": "^0.7.0",
     "@dcspark/cardano-multiplatform-lib-nodejs": "^3.1.1",
     "@emurgo/cip14-js": "^3.0.1",

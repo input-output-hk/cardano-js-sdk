@@ -1,3 +1,4 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import {
   AccountAddressDerivationPath,
   AccountKeyDerivationPath,
@@ -9,11 +10,13 @@ import {
   SignBlobResult,
   SignTransactionOptions
 } from './types';
-import { CML, Cardano, util } from '@cardano-sdk/core';
+import { CML, Cardano } from '@cardano-sdk/core';
+import { HexBlob, usingAutoFree } from '@cardano-sdk/util';
 import { STAKE_KEY_DERIVATION_PATH } from './util';
 
 export abstract class KeyAgentBase implements KeyAgent {
   readonly #serializableData: SerializableKeyAgentData;
+  readonly #bip32Ed25519: Crypto.Bip32Ed25519;
   protected readonly inputResolver: Cardano.util.InputResolver;
 
   get knownAddresses(): GroupedAddress[] {
@@ -25,7 +28,7 @@ export abstract class KeyAgentBase implements KeyAgent {
   get serializableData(): SerializableKeyAgentData {
     return this.#serializableData;
   }
-  get extendedAccountPublicKey(): Cardano.Bip32PublicKey {
+  get extendedAccountPublicKey(): Crypto.Bip32PublicKeyHex {
     return this.serializableData.extendedAccountPublicKey;
   }
   get chainId(): Cardano.ChainId {
@@ -34,16 +37,21 @@ export abstract class KeyAgentBase implements KeyAgent {
   get accountIndex(): number {
     return this.serializableData.accountIndex;
   }
-  abstract signBlob(derivationPath: AccountKeyDerivationPath, blob: Cardano.util.HexBlob): Promise<SignBlobResult>;
-  abstract exportRootPrivateKey(): Promise<Cardano.Bip32PrivateKey>;
+  get bip32Ed25519(): Crypto.Bip32Ed25519 {
+    return this.#bip32Ed25519;
+  }
+
+  abstract signBlob(derivationPath: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult>;
+  abstract exportRootPrivateKey(): Promise<Crypto.Bip32PrivateKeyHex>;
   abstract signTransaction(
     txInternals: Cardano.TxBodyWithHash,
     signTransactionOptions?: SignTransactionOptions
   ): Promise<Cardano.Signatures>;
 
-  constructor(serializableData: SerializableKeyAgentData, { inputResolver }: KeyAgentDependencies) {
+  constructor(serializableData: SerializableKeyAgentData, { inputResolver, bip32Ed25519 }: KeyAgentDependencies) {
     this.#serializableData = serializableData;
     this.inputResolver = inputResolver;
+    this.#bip32Ed25519 = bip32Ed25519;
   }
 
   /**
@@ -52,44 +60,64 @@ export abstract class KeyAgentBase implements KeyAgent {
   async deriveAddress({ index, type }: AccountAddressDerivationPath): Promise<GroupedAddress> {
     const knownAddress = this.knownAddresses.find((addr) => addr.type === type && addr.index === index);
     if (knownAddress) return knownAddress;
-    const derivedPublicPaymentKey = await this.deriveCmlPublicKey({
+    const derivedPublicPaymentKey = await this.derivePublicKey({
       index,
       role: type as unknown as KeyRole
     });
 
+    const derivedPublicPaymentKeyHash = await this.#bip32Ed25519.getPubKeyHash(derivedPublicPaymentKey);
+
     // Possible optimization: memoize/cache stakeKeyCredential, because it's always the same
-    const publicStakeKey = await this.deriveCmlPublicKey(STAKE_KEY_DERIVATION_PATH);
-    const stakeKeyCredential = CML.StakeCredential.from_keyhash(publicStakeKey.hash());
+    const publicStakeKey = await this.derivePublicKey(STAKE_KEY_DERIVATION_PATH);
+    const publicStakeKeyHash = await this.#bip32Ed25519.getPubKeyHash(publicStakeKey);
 
-    const address = CML.BaseAddress.new(
-      this.chainId.networkId,
-      CML.StakeCredential.from_keyhash(derivedPublicPaymentKey.hash()),
-      stakeKeyCredential
-    ).to_address();
+    const groupedAddress = usingAutoFree((scope) => {
+      const stakeKeyCredential = scope.manage(
+        CML.StakeCredential.from_keyhash(
+          scope.manage(CML.Ed25519KeyHash.from_bytes(Buffer.from(publicStakeKeyHash, 'hex')))
+        )
+      );
 
-    const rewardAccount = CML.RewardAddress.new(this.chainId.networkId, stakeKeyCredential).to_address();
-    const groupedAddress = {
-      accountIndex: this.accountIndex,
-      address: Cardano.Address(address.to_bech32()),
-      index,
-      networkId: this.chainId.networkId,
-      rewardAccount: Cardano.RewardAccount(rewardAccount.to_bech32()),
-      stakeKeyDerivationPath: STAKE_KEY_DERIVATION_PATH,
-      type
-    };
+      const address = scope.manage(
+        scope
+          .manage(
+            CML.BaseAddress.new(
+              this.chainId.networkId,
+              scope.manage(
+                CML.StakeCredential.from_keyhash(
+                  scope.manage(CML.Ed25519KeyHash.from_bytes(Buffer.from(derivedPublicPaymentKeyHash, 'hex')))
+                )
+              ),
+              stakeKeyCredential
+            )
+          )
+          .to_address()
+      );
+
+      const rewardAccount = scope.manage(
+        scope.manage(CML.RewardAddress.new(this.chainId.networkId, stakeKeyCredential)).to_address()
+      );
+      return {
+        accountIndex: this.accountIndex,
+        address: Cardano.Address(address.to_bech32()),
+        index,
+        networkId: this.chainId.networkId,
+        rewardAccount: Cardano.RewardAccount(rewardAccount.to_bech32()),
+        stakeKeyDerivationPath: STAKE_KEY_DERIVATION_PATH,
+        type
+      };
+    });
 
     this.knownAddresses = [...this.knownAddresses, groupedAddress];
     return groupedAddress;
   }
 
-  async derivePublicKey(derivationPath: AccountKeyDerivationPath): Promise<Cardano.Ed25519PublicKey> {
-    const cslPublicKey = await this.deriveCmlPublicKey(derivationPath);
-    return Cardano.Ed25519PublicKey.fromHexBlob(util.bytesToHex(cslPublicKey.as_bytes()));
-  }
+  async derivePublicKey(derivationPath: AccountKeyDerivationPath): Promise<Crypto.Ed25519PublicKeyHex> {
+    const childKey = await this.#bip32Ed25519.derivePublicKey(this.extendedAccountPublicKey, [
+      derivationPath.role,
+      derivationPath.index
+    ]);
 
-  protected async deriveCmlPublicKey({ index, role: type }: AccountKeyDerivationPath): Promise<CML.PublicKey> {
-    const accountPublicKeyBytes = Buffer.from(this.extendedAccountPublicKey, 'hex');
-    const accountPublicKey = CML.Bip32PublicKey.from_bytes(accountPublicKeyBytes);
-    return accountPublicKey.derive(type).derive(index).to_raw_key();
+    return await this.#bip32Ed25519.getRawPublicKey(childKey);
   }
 }

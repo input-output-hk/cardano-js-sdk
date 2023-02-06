@@ -1,4 +1,4 @@
-import { Cardano } from '@cardano-sdk/core';
+import { HexBlob } from '@cardano-sdk/util';
 
-export type CoseSign1CborHex = Cardano.util.HexBlob;
-export type CoseKeyCborHex = Cardano.util.HexBlob;
+export type CoseSign1CborHex = HexBlob;
+export type CoseKeyCborHex = HexBlob;

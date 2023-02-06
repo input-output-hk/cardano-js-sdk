@@ -1,3 +1,4 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
 import { CertificatePointer, WithCertificates, withStakeKeys } from '../../../src/operators';
 import { UnifiedProjectorEvent, WithBlock } from '../../../src';
@@ -10,14 +11,14 @@ describe('withStakeKeys', () => {
         {
           certificate: {
             __typename: Cardano.CertificateType.StakeKeyRegistration,
-            stakeKeyHash: Cardano.Ed25519KeyHash('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')
+            stakeKeyHash: Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')
           },
           pointer: {} as CertificatePointer
         },
         {
           certificate: {
             __typename: Cardano.CertificateType.StakeKeyDeregistration,
-            stakeKeyHash: Cardano.Ed25519KeyHash('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857c')
+            stakeKeyHash: Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857c')
           },
           pointer: {} as CertificatePointer
         }
@@ -36,14 +37,14 @@ describe('withStakeKeys', () => {
         {
           certificate: {
             __typename: Cardano.CertificateType.StakeKeyRegistration,
-            stakeKeyHash: Cardano.Ed25519KeyHash('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')
+            stakeKeyHash: Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')
           },
           pointer: {} as CertificatePointer
         },
         {
           certificate: {
             __typename: Cardano.CertificateType.StakeKeyDeregistration,
-            stakeKeyHash: Cardano.Ed25519KeyHash('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')
+            stakeKeyHash: Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')
           },
           pointer: {} as CertificatePointer
         }
@@ -62,14 +63,14 @@ describe('withStakeKeys', () => {
         {
           certificate: {
             __typename: Cardano.CertificateType.StakeKeyDeregistration,
-            stakeKeyHash: Cardano.Ed25519KeyHash('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')
+            stakeKeyHash: Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')
           },
           pointer: {} as CertificatePointer
         },
         {
           certificate: {
             __typename: Cardano.CertificateType.StakeKeyRegistration,
-            stakeKeyHash: Cardano.Ed25519KeyHash('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')
+            stakeKeyHash: Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')
           },
           pointer: {} as CertificatePointer
         }

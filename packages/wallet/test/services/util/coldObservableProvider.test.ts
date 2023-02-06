@@ -1,5 +1,5 @@
 import { BehaviorSubject, EmptyError, Subject, firstValueFrom, lastValueFrom, tap } from 'rxjs';
-import { InvalidStringError } from '@cardano-sdk/core';
+import { InvalidStringError } from '@cardano-sdk/util';
 import { RetryBackoffConfig, retryBackoff } from 'backoff-rxjs';
 import { coldObservableProvider } from '../../../src';
 

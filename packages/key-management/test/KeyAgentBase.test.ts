@@ -1,20 +1,19 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import {
-  AccountKeyDerivationPath,
-  AddressType,
-  KeyAgentBase,
-  KeyAgentType,
-  KeyRole,
-  SerializableInMemoryKeyAgentData
-} from '../src';
+import * as Crypto from '@cardano-sdk/crypto';
+import { AddressType, KeyAgentBase, KeyAgentType, KeyRole, SerializableInMemoryKeyAgentData } from '../src';
 import { CML, Cardano } from '@cardano-sdk/core';
 import { dummyLogger } from 'ts-log';
 
 const ACCOUNT_INDEX = 1;
+const bip32Ed25519 = new Crypto.CmlBip32Ed25519(CML);
 
 class MockKeyAgent extends KeyAgentBase {
   constructor(data: SerializableInMemoryKeyAgentData) {
-    super(data, { inputResolver: { resolveInputAddress: () => Promise.resolve(null) }, logger: dummyLogger });
+    super(data, {
+      bip32Ed25519,
+      inputResolver: { resolveInputAddress: () => Promise.resolve(null) },
+      logger: dummyLogger
+    });
   }
 
   serializableDataImpl = jest.fn();
@@ -23,21 +22,18 @@ class MockKeyAgent extends KeyAgentBase {
   signTransaction = jest.fn();
   signVotingMetadata = jest.fn();
   exportExtendedKeyPair = jest.fn();
-  deriveCmlPublicKeyPublic(derivationPath: AccountKeyDerivationPath) {
-    return this.deriveCmlPublicKey(derivationPath);
-  }
 }
 
 describe('KeyAgentBase', () => {
   let keyAgent: MockKeyAgent;
 
-  beforeAll(() => {
+  beforeEach(() => {
     keyAgent = new MockKeyAgent({
       __typename: KeyAgentType.InMemory,
       accountIndex: ACCOUNT_INDEX,
       chainId: Cardano.ChainIds.Preview,
       encryptedRootPrivateKeyBytes: [],
-      extendedAccountPublicKey: Cardano.Bip32PublicKey(
+      extendedAccountPublicKey: Crypto.Bip32PublicKeyHex(
         // eslint-disable-next-line max-len
         'fc5ab25e830b67c47d0a17411bf7fdabf711a597fb6cf04102734b0a2934ceaaa65ff5e7c52498d52c07b8ddfcd436fc2b4d2775e2984a49d0c79f65ceee4779'
       ),
@@ -78,9 +74,5 @@ describe('KeyAgentBase', () => {
     expect(typeof externalPublicKey).toBe('string');
     const stakePublicKey = await keyAgent.derivePublicKey({ index: 1, role: KeyRole.Stake });
     expect(typeof stakePublicKey).toBe('string');
-  });
-
-  test('deriveCMLPublicKey', async () => {
-    expect(await keyAgent.deriveCmlPublicKeyPublic({ index: 0, role: KeyRole.External })).toBeInstanceOf(CML.PublicKey);
   });
 });

@@ -1,4 +1,5 @@
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import * as Crypto from '@cardano-sdk/crypto';
+import { ChainSyncEventType } from '@cardano-sdk/core';
 import { InMemoryStore } from '../../../src/sinks';
 import { defaultIfEmpty, firstValueFrom } from 'rxjs';
 import { stakeKeys } from '../../../src/sinks/inMemory/stakeKeys';
@@ -11,8 +12,8 @@ describe('sinks/inMemory/stakeKeys', () => {
     };
     const sink = async (
       eventType: ChainSyncEventType,
-      register: Cardano.Ed25519KeyHash[],
-      deregister: Cardano.Ed25519KeyHash[]
+      register: Crypto.Ed25519KeyHashHex[],
+      deregister: Crypto.Ed25519KeyHashHex[]
     ) => {
       await firstValueFrom(
         stakeKeys
@@ -27,31 +28,31 @@ describe('sinks/inMemory/stakeKeys', () => {
     };
     await sink(
       ChainSyncEventType.RollForward,
-      [Cardano.Ed25519KeyHash('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')],
+      [Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')],
       []
     );
     await sink(
       ChainSyncEventType.RollForward,
-      [Cardano.Ed25519KeyHash('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857c')],
+      [Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857c')],
       []
     );
     expect(store.stakeKeys.size).toBe(2);
     await sink(
       ChainSyncEventType.RollForward,
       [],
-      [Cardano.Ed25519KeyHash('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857c')]
+      [Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857c')]
     );
     expect(store.stakeKeys.size).toBe(1);
     await sink(
       ChainSyncEventType.RollBackward,
-      [Cardano.Ed25519KeyHash('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')],
+      [Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')],
       []
     );
     expect(store.stakeKeys.size).toBe(0);
     await sink(
       ChainSyncEventType.RollBackward,
       [],
-      [Cardano.Ed25519KeyHash('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')]
+      [Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')]
     );
     expect(store.stakeKeys.size).toBe(1);
   });

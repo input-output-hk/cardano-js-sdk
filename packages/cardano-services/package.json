@@ -95,6 +95,7 @@
   },
   "dependencies": {
     "@cardano-sdk/core": "^0.7.0",
+    "@cardano-sdk/crypto": "^0.1.0",
     "@cardano-sdk/ogmios": "^0.7.0",
     "@cardano-sdk/util": "^0.7.0",
     "amqplib": "^0.10.0",

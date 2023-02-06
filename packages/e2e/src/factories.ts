@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import * as Crypto from '@cardano-sdk/crypto';
 import {
   AssetProvider,
+  CML,
   Cardano,
   ChainHistoryProvider,
   NetworkInfoProvider,
@@ -66,8 +68,14 @@ export const rewardsProviderFactory = new ProviderFactory<RewardsProvider>();
 export const txSubmitProviderFactory = new ProviderFactory<TxSubmitProvider>();
 export const utxoProviderFactory = new ProviderFactory<UtxoProvider>();
 export const stakePoolProviderFactory = new ProviderFactory<StakePoolProvider>();
+export const bip32Ed25519Factory = new ProviderFactory<Crypto.Bip32Ed25519>();
+
+// bip32Ed25519
+
+bip32Ed25519Factory.register('CML', async () => new Crypto.CmlBip32Ed25519(CML));
 
 // Faucet providers
+
 faucetProviderFactory.register('cardano-wallet', CardanoWalletFaucetProvider.create);
 
 // Asset providers
@@ -305,7 +313,9 @@ export const getWallet = async (props: GetWalletProps) => {
   const envKeyParams = customKeyParams ? customKeyParams : env.KEY_MANAGEMENT_PARAMS;
   const keyManagementParams = { ...envKeyParams, ...(idx === undefined ? {} : { accountIndex: idx }) };
 
+  const bip32Ed25519 = await bip32Ed25519Factory.create(env.KEY_MANAGEMENT_PARAMS.bip32Ed25519, null, logger);
   const { wallet } = await setupWallet({
+    bip32Ed25519,
     createKeyAgent: keyAgent
       ? () => Promise.resolve(keyAgent)
       : await keyManagementFactory.create(env.KEY_MANAGEMENT_PROVIDER, keyManagementParams, logger),

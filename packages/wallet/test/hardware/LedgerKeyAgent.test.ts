@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import * as Crypto from '@cardano-sdk/crypto';
 import * as mocks from '../mocks';
 import {
   AddressType,
@@ -10,7 +11,7 @@ import {
   util
 } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
-import { Cardano } from '@cardano-sdk/core';
+import { CML, Cardano } from '@cardano-sdk/core';
 import { SingleAddressWallet, setupWallet } from '../../src';
 import { dummyLogger as logger } from 'ts-log';
 import { mockKeyAgentDependencies } from '@cardano-sdk/key-management/test/mocks';
@@ -25,6 +26,7 @@ describe('LedgerKeyAgent', () => {
   beforeAll(async () => {
     txSubmitProvider = mocks.mockTxSubmitProvider();
     ({ keyAgent, wallet } = await setupWallet({
+      bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
       createKeyAgent: async (dependencies) => {
         const ledgerKeyAgent = await LedgerKeyAgent.createWithDevice(
           {

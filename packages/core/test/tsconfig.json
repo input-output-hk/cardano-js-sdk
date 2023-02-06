@@ -9,6 +9,9 @@
     },
     {
       "path": "../../util-dev/src"
+    },
+    {
+      "path": "../../crypto/src"
     }
   ]
 }

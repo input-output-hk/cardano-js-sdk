@@ -1,4 +1,4 @@
-import { ComposableError } from '@cardano-sdk/core';
+import { ComposableError } from '@cardano-sdk/util';
 
 const formatMessage = (detail?: string) => {
   const messageDetail = detail ? `: ${detail}` : '';

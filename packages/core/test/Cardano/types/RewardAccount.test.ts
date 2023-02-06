@@ -1,8 +1,10 @@
 import { Cardano } from '../../../src';
+import { typedBech32 } from '@cardano-sdk/util';
 
-jest.mock('../../../src/Cardano/util/primitives', () => {
-  const actual = jest.requireActual('../../../src/Cardano/util/primitives');
+jest.mock('@cardano-sdk/util', () => {
+  const actual = jest.requireActual('@cardano-sdk/util');
   return {
+    ...actual,
     typedBech32: jest.fn().mockImplementation((...args) => actual.typedBech32(...args))
   };
 });
@@ -10,7 +12,7 @@ jest.mock('../../../src/Cardano/util/primitives', () => {
 describe('Cardano/types/RewardAccount', () => {
   it('RewardAccount() accepts a valid mainnet stake key bech32 and is implemented using util.typedBech32', () => {
     expect(() => Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr')).not.toThrow();
-    expect(Cardano.util.typedBech32).toBeCalledWith(
+    expect(typedBech32).toBeCalledWith(
       'stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr',
       ['stake', 'stake_test'],
       47

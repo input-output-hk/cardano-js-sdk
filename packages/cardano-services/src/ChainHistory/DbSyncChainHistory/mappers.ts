@@ -1,5 +1,5 @@
 import { Asset, Cardano } from '@cardano-sdk/core';
-import { BigIntMath } from '@cardano-sdk/util';
+import { BigIntMath, HexBlob } from '@cardano-sdk/util';
 import {
   BlockModel,
   BlockOutputModel,
@@ -19,6 +19,7 @@ import {
   WithCertType,
   WithdrawalModel
 } from './types';
+import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import {
   isDelegationCertModel,
   isMirCertModel,
@@ -83,9 +84,7 @@ export const mapTxOut = (txOut: TxOutput): Cardano.TxOut => ({
 
 export const mapTxOutModel = (txOutModel: TxOutputModel, assets?: Cardano.TokenMap): TxOutput => ({
   address: txOutModel.address as unknown as Cardano.Address,
-  datumHash: txOutModel.datum
-    ? (txOutModel.datum.toString('hex') as unknown as Cardano.util.Hash32ByteBase16)
-    : undefined,
+  datumHash: txOutModel.datum ? (txOutModel.datum.toString('hex') as unknown as Hash32ByteBase16) : undefined,
   index: txOutModel.index,
   txId: txOutModel.tx_id.toString('hex') as unknown as Cardano.TransactionId,
   value: {
@@ -100,7 +99,7 @@ export const mapWithdrawal = (withdrawalModel: WithdrawalModel): Cardano.Withdra
 });
 
 export const mapRedeemer = (redeemerModel: RedeemerModel): Cardano.Redeemer => ({
-  data: redeemerModel.script_hash.toString('hex') as unknown as Cardano.util.HexBlob,
+  data: redeemerModel.script_hash.toString('hex') as unknown as HexBlob,
   executionUnits: {
     memory: Number(redeemerModel.unit_mem),
     steps: Number(redeemerModel.unit_steps)
@@ -142,7 +141,7 @@ export const mapCertificate = (
         ? Cardano.CertificateType.StakeKeyRegistration
         : Cardano.CertificateType.StakeKeyDeregistration,
       cert_index: certModel.cert_index,
-      stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(certModel.address as unknown as Cardano.RewardAccount)
+      stakeKeyHash: Cardano.RewardAccount.toHash(Cardano.RewardAccount(certModel.address))
     } as WithCertIndex<Cardano.StakeAddressCertificate>;
 
   if (isDelegationCertModel(certModel))
@@ -150,7 +149,7 @@ export const mapCertificate = (
       __typename: Cardano.CertificateType.StakeDelegation,
       cert_index: certModel.cert_index,
       poolId: certModel.pool_id as unknown as Cardano.PoolId,
-      stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(certModel.address as unknown as Cardano.RewardAccount)
+      stakeKeyHash: Cardano.RewardAccount.toHash(Cardano.RewardAccount(certModel.address))
     } as WithCertIndex<Cardano.StakeDelegationCertificate>;
 
   return null;

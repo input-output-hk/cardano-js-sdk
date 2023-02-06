@@ -1,13 +1,14 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
+import { HexBlob, Shutdown } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
 import { Observable } from 'rxjs';
-import { Shutdown } from '@cardano-sdk/util';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
 import TransportWebHID from '@ledgerhq/hw-transport-webhid';
 
 export interface SignBlobResult {
-  publicKey: Cardano.Ed25519PublicKey;
-  signature: Cardano.Ed25519Signature;
+  publicKey: Crypto.Ed25519PublicKeyHex;
+  signature: Crypto.Ed25519SignatureHex;
 }
 
 export enum CardanoKeyConst {
@@ -61,11 +62,10 @@ export enum CommunicationType {
   Node = 'node'
 }
 
-export type BIP32Path = Array<number>;
-
 export interface KeyAgentDependencies {
   inputResolver: Cardano.util.InputResolver;
   logger: Logger;
+  bip32Ed25519: Crypto.Bip32Ed25519;
 }
 
 export interface AccountAddressDerivationPath {
@@ -97,7 +97,7 @@ export interface SerializableKeyAgentDataBase {
   chainId: Cardano.ChainId;
   accountIndex: number;
   knownAddresses: GroupedAddress[];
-  extendedAccountPublicKey: Cardano.Bip32PublicKey;
+  extendedAccountPublicKey: Crypto.Bip32PublicKeyHex;
 }
 
 export interface SerializableInMemoryKeyAgentData extends SerializableKeyAgentDataBase {
@@ -123,13 +123,13 @@ export type SerializableKeyAgentData =
 export type LedgerTransportType = TransportWebHID | TransportNodeHid;
 
 export interface KeyPair {
-  skey: Cardano.Bip32PrivateKey;
-  vkey: Cardano.Bip32PublicKey;
+  skey: Crypto.Bip32PrivateKeyHex;
+  vkey: Crypto.Bip32PublicKeyHex;
 }
 
 export interface Ed25519KeyPair {
-  skey: Cardano.Ed25519PrivateKey;
-  vkey: Cardano.Ed25519PublicKey;
+  skey: Crypto.Ed25519PrivateNormalKeyHex | Crypto.Ed25519PrivateExtendedKeyHex;
+  vkey: Crypto.Ed25519PublicKeyHex;
 }
 
 /**
@@ -146,11 +146,12 @@ export interface KeyAgent {
   get accountIndex(): number;
   get serializableData(): SerializableKeyAgentData;
   get knownAddresses(): GroupedAddress[];
-  get extendedAccountPublicKey(): Cardano.Bip32PublicKey;
+  get extendedAccountPublicKey(): Crypto.Bip32PublicKeyHex;
+  get bip32Ed25519(): Crypto.Bip32Ed25519;
   /**
    * @throws AuthenticationError
    */
-  signBlob(derivationPath: AccountKeyDerivationPath, blob: Cardano.util.HexBlob): Promise<SignBlobResult>;
+  signBlob(derivationPath: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult>;
   /**
    * @throws AuthenticationError
    */
@@ -158,7 +159,7 @@ export interface KeyAgent {
   /**
    * @throws AuthenticationError
    */
-  derivePublicKey(derivationPath: AccountKeyDerivationPath): Promise<Cardano.Ed25519PublicKey>;
+  derivePublicKey(derivationPath: AccountKeyDerivationPath): Promise<Crypto.Ed25519PublicKeyHex>;
   /**
    * @throws AuthenticationError
    */
@@ -166,13 +167,14 @@ export interface KeyAgent {
   /**
    * @throws AuthenticationError
    */
-  exportRootPrivateKey(): Promise<Cardano.Bip32PrivateKey>;
+  exportRootPrivateKey(): Promise<Crypto.Bip32PrivateKeyHex>;
 }
 
 export type AsyncKeyAgent = Pick<KeyAgent, 'deriveAddress' | 'derivePublicKey' | 'signBlob' | 'signTransaction'> & {
   knownAddresses$: Observable<GroupedAddress[]>;
   getChainId(): Promise<Cardano.ChainId>;
-  getExtendedAccountPublicKey(): Promise<Cardano.Bip32PublicKey>;
+  getBip32Ed25519(): Promise<Crypto.Bip32Ed25519>;
+  getExtendedAccountPublicKey(): Promise<Crypto.Bip32PublicKeyHex>;
 } & Shutdown;
 
 /**
@@ -182,12 +184,12 @@ export type TransactionSignerResult = {
   /**
    * The public key matching the private key that generate the signature.
    */
-  pubKey: Cardano.Ed25519PublicKey;
+  pubKey: Crypto.Ed25519PublicKeyHex;
 
   /**
    * The transaction signature.
    */
-  signature: Cardano.Ed25519Signature;
+  signature: Crypto.Ed25519SignatureHex;
 };
 
 /**

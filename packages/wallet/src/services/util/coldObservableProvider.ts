@@ -1,4 +1,4 @@
-import { InvalidStringError } from '@cardano-sdk/core';
+import { InvalidStringError } from '@cardano-sdk/util';
 import {
   NEVER,
   Observable,

@@ -20,6 +20,7 @@ import {
   UNLIMITED_CACHE_TTL,
   createHttpStakePoolExtMetadataService
 } from '../../src';
+import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { INFO, createLogger } from 'bunyan';
 import { LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
@@ -1197,9 +1198,7 @@ describe('StakePoolHttpService', () => {
               });
 
               expect(() => Cardano.PoolId(firstNoMetadataPoolId as unknown as string)).not.toThrow();
-              expect(() =>
-                Cardano.util.Hash32ByteBase16(pageResults[0].metadataJson!.hash as unknown as string)
-              ).not.toThrow();
+              expect(() => Hash32ByteBase16(pageResults[0].metadataJson!.hash as unknown as string)).not.toThrow();
               expect(pageResults.length).toBeGreaterThan(0);
               expect(pageResults[pageResults.length - 1].metadata?.name).toBeUndefined();
               expect(pageResults.map(({ id }) => id)).toEqual(stakePoolIdsSorted);

@@ -20,7 +20,7 @@ const getStakingKeyPaths = (
   const uniqueAccounts = uniqBy(groupedAddresses, 'rewardAccount');
 
   for (const account of uniqueAccounts) {
-    const stakeKeyHash = Cardano.Ed25519KeyHash.fromRewardAccount(account.rewardAccount);
+    const stakeKeyHash = Cardano.RewardAccount.toHash(account.rewardAccount);
     const poolId = Cardano.PoolId.fromKeyHash(stakeKeyHash);
 
     if (!account.stakeKeyDerivationPath) continue;

@@ -1,15 +1,6 @@
 /* eslint-disable max-len */
 /* eslint-disable sonarjs/no-duplicate-string */
-import {
-  Base64Blob,
-  Hash28ByteBase16,
-  Hash32ByteBase16,
-  HexBlob,
-  castHexBlob,
-  typedBech32,
-  typedHex
-} from '../../../src/Cardano/util';
-import { InvalidStringError } from '../../../src';
+import { Base64Blob, HexBlob, InvalidStringError, castHexBlob, typedBech32, typedHex } from '../src';
 
 describe('Cardano.util/primitives', () => {
   describe('typedBech32', () => {
@@ -143,51 +134,6 @@ describe('Cardano.util/primitives', () => {
 
     it('throws when string length does not match expectedLength', () => {
       expect(() => castHexBlob(HexBlob('ABCDEF'), 5)).toThrowError(InvalidStringError);
-    });
-  });
-
-  describe('Hash32ByteBase16', () => {
-    it('expects a hex string with length of 64', () => {
-      expect(() => Hash32ByteBase16('3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d')).not.toThrow();
-      expect(() =>
-        Hash32ByteBase16.fromHexBlob(HexBlob('3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d'))
-      ).not.toThrow();
-    });
-
-    it('throws with non-hex string', () => {
-      expect(() => Hash32ByteBase16('ge33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d')).toThrowError(
-        InvalidStringError
-      );
-      expect(() =>
-        Hash32ByteBase16.fromHexBlob(HexBlob('ge33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d'))
-      ).toThrowError(InvalidStringError);
-    });
-
-    it('throws with hex string of different length', () => {
-      expect(() => Hash32ByteBase16('e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d')).toThrowError(
-        InvalidStringError
-      );
-      expect(() =>
-        Hash32ByteBase16.fromHexBlob(HexBlob('e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d'))
-      ).toThrowError(InvalidStringError);
-    });
-  });
-
-  describe('Hash28ByteBase16', () => {
-    it('expects a hex string with length of 64', () => {
-      expect(() => Hash28ByteBase16('8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d')).not.toThrow();
-    });
-
-    it('throws with non-hex string', () => {
-      expect(() => Hash28ByteBase16('g293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d')).toThrowError(
-        InvalidStringError
-      );
-    });
-
-    it('throws with hex string of different length', () => {
-      expect(() => Hash28ByteBase16('293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d')).toThrowError(
-        InvalidStringError
-      );
     });
   });
 });

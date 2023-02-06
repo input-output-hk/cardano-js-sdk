@@ -10,6 +10,5 @@ export * from './Genesis';
 export * from './Block';
 export * from './Asset';
 export * from './AuxiliaryData';
-export * from './Key';
 export * from './Script';
 export * from './ProtocolParameters';

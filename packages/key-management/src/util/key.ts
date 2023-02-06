@@ -1,5 +1,5 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import { AccountKeyDerivationPath, CardanoKeyConst, Ed25519KeyPair, KeyPair, KeyRole } from '../types';
-import { CML, Cardano, util } from '@cardano-sdk/core';
 
 export const harden = (num: number): number => 0x80_00_00_00 + num;
 
@@ -8,29 +8,27 @@ export const STAKE_KEY_DERIVATION_PATH: AccountKeyDerivationPath = {
   role: KeyRole.Stake
 };
 
-export const toEd25519KeyPair = (bip32KeyPair: KeyPair): Ed25519KeyPair => {
-  const pubKeyBytes = Buffer.from(bip32KeyPair.vkey, 'hex');
-  const cmlPubKey = CML.Bip32PublicKey.from_bytes(pubKeyBytes);
-  const vkey = Cardano.Ed25519PublicKey.fromHexBlob(util.bytesToHex(cmlPubKey.to_raw_key().as_bytes()));
-  const prvKeyBytes = Buffer.from(bip32KeyPair.skey, 'hex');
-  const cmlPrvKey = CML.Bip32PrivateKey.from_bytes(prvKeyBytes);
-  const skey = Cardano.Ed25519PrivateKey.fromHexBlob(util.bytesToHex(cmlPrvKey.to_raw_key().as_bytes()));
-  return {
-    skey,
-    vkey
-  };
-};
+export const toEd25519KeyPair = async (
+  bip32KeyPair: KeyPair,
+  provider: Crypto.Bip32Ed25519
+): Promise<Ed25519KeyPair> => ({
+  skey: await provider.getRawPrivateKey(bip32KeyPair.skey),
+  vkey: await provider.getRawPublicKey(bip32KeyPair.vkey)
+});
 
 export interface DeriveAccountPrivateKeyProps {
-  rootPrivateKey: CML.Bip32PrivateKey;
+  rootPrivateKey: Crypto.Bip32PrivateKeyHex;
   accountIndex: number;
+  bip32Ed25519: Crypto.Bip32Ed25519;
 }
 
-export const deriveAccountPrivateKey = ({
+export const deriveAccountPrivateKey = async ({
   rootPrivateKey,
-  accountIndex
-}: DeriveAccountPrivateKeyProps): CML.Bip32PrivateKey =>
-  rootPrivateKey
-    .derive(harden(CardanoKeyConst.PURPOSE))
-    .derive(harden(CardanoKeyConst.COIN_TYPE))
-    .derive(harden(accountIndex));
+  accountIndex,
+  bip32Ed25519
+}: DeriveAccountPrivateKeyProps): Promise<Crypto.Bip32PrivateKeyHex> =>
+  await bip32Ed25519.derivePrivateKey(rootPrivateKey, [
+    harden(CardanoKeyConst.PURPOSE),
+    harden(CardanoKeyConst.COIN_TYPE),
+    harden(accountIndex)
+  ]);

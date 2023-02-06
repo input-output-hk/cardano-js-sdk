@@ -4,6 +4,7 @@ import { CustomError } from 'ts-custom-error';
 
 import { InputSelectionError, SelectionSkeleton } from '@cardano-sdk/input-selection';
 
+import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { OutputValidation } from '../types';
 import { SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
 
@@ -104,7 +105,7 @@ export interface OutputBuilder {
   /** Sets transaction output `address` field. */
   address(address: Cardano.Address): OutputBuilder;
   /** Sets transaction output `datum` field. */
-  datum(datum: Cardano.util.Hash32ByteBase16): OutputBuilder;
+  datum(datum: Hash32ByteBase16): OutputBuilder;
   /**
    * Checks if the transaction output is complete and valid
    *

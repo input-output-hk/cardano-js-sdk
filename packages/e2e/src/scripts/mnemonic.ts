@@ -1,6 +1,8 @@
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-floating-promises */
+import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
+import { CML } from '@cardano-sdk/core';
 import { localNetworkChainId } from '../util';
 
 /**
@@ -17,7 +19,11 @@ import { localNetworkChainId } from '../util';
       getPassword: async () => Buffer.from(''),
       mnemonicWords: mnemonicArray
     },
-    { inputResolver: { resolveInputAddress: async () => null }, logger: console }
+    {
+      bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
+      inputResolver: { resolveInputAddress: async () => null },
+      logger: console
+    }
   );
 
   const derivedAddress = await keyAgentFromMnemonic.deriveAddress({

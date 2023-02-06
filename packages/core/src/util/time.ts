@@ -1,4 +1,4 @@
-import { OpaqueNumber } from '../Cardano/util';
+import { OpaqueNumber } from '@cardano-sdk/util';
 
 /**
  * Milliseconds time unit.

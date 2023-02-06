@@ -15,6 +15,7 @@ import {
   mapRelay,
   toStakePoolResults
 } from '../../../src';
+import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { mockStakeDistribution } from '../../../../core/test/CardanoNode/mocks';
 
 // eslint-disable-next-line max-statements
@@ -151,7 +152,7 @@ describe('mappers', () => {
       margin: { denominator: 10_000, numerator: 1 },
       metadata: poolDataModel.offline_data,
       metadataJson: {
-        hash: Cardano.util.Hash32ByteBase16(metadataHash),
+        hash: Hash32ByteBase16(metadataHash),
         url: poolDataModel.metadata_url
       },
       pledge: BigInt(poolDataModel.pledge),

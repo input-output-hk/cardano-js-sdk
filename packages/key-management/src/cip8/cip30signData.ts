@@ -1,3 +1,4 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import { AccountKeyDerivationPath } from '..';
 import {
   AlgorithmId,
@@ -13,17 +14,17 @@ import {
   SigStructure
 } from '@emurgo/cardano-message-signing-nodejs';
 import { AsyncKeyAgent, KeyRole } from '../types';
-import { Cardano, ComposableError, parseCmlAddress, util } from '@cardano-sdk/core';
+import { Cardano, parseCmlAddress, util } from '@cardano-sdk/core';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
+import { ComposableError, HexBlob, usingAutoFree } from '@cardano-sdk/util';
 import { CoseLabel } from './util';
 import { STAKE_KEY_DERIVATION_PATH } from '../util';
 import { firstValueFrom } from 'rxjs';
-import { usingAutoFree } from '@cardano-sdk/util';
 
 export interface Cip30SignDataRequest {
   keyAgent: AsyncKeyAgent;
   signWith: Cardano.Address | Cardano.RewardAccount;
-  payload: Cardano.util.HexBlob;
+  payload: HexBlob;
 }
 
 export enum Cip30DataSignErrorCode {
@@ -80,7 +81,7 @@ const signSigStructure = (
   }
 };
 
-const createCoseKey = (addressBytes: Uint8Array, publicKey: Cardano.Ed25519PublicKey) => {
+const createCoseKey = (addressBytes: Uint8Array, publicKey: Crypto.Ed25519PublicKeyHex) => {
   const coseKey = COSEKey.new(Label.from_key_type(COSEKeyType.OKP));
   coseKey.set_key_id(addressBytes);
   coseKey.set_algorithm_id(Label.from_algorithm_id(AlgorithmId.EdDSA));

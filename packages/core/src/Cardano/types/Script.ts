@@ -1,7 +1,6 @@
 /* eslint-disable no-use-before-define */
-import * as util from '../util/primitives';
-import { Ed25519KeyHash } from './Key';
-import { Hash32ByteBase16 } from '../util';
+import * as Crypto from '@cardano-sdk/crypto';
+import { HexBlob } from '@cardano-sdk/util';
 import { Slot } from './Block';
 
 /**
@@ -40,7 +39,7 @@ export interface RequireSignatureScript {
   /**
    * The hash of a verification key.
    */
-  keyHash: Ed25519KeyHash;
+  keyHash: Crypto.Ed25519KeyHashHex;
 
   /**
    * The native script kind.
@@ -212,13 +211,13 @@ export enum PlutusLanguageVersion {
  * this type of datum, the actual Datum value must be provided and will be added to the witness set of
  * the transaction.
  */
-export type DatumHash = Hash32ByteBase16;
+export type DatumHash = Crypto.Hash32ByteBase16;
 
 /**
  * The datum is a piece of information that can be associated with a UTXO and is used to carry script state information
  * such as its owner or the timing details (which define when the UTXO can be spent)
  */
-export type Datum = util.HexBlob;
+export type Datum = HexBlob;
 
 /**
  * Plutus scripts are pieces of code that implement pure functions with True or False outputs. These functions take
@@ -226,7 +225,7 @@ export type Datum = util.HexBlob;
  */
 export interface PlutusScript {
   __type: ScriptType.Plutus;
-  bytes: util.HexBlob;
+  bytes: HexBlob;
   version: PlutusLanguageVersion;
 }
 
