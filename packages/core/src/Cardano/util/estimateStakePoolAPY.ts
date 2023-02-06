@@ -1,23 +1,26 @@
 import { Percent, StakePoolEpochRewards } from '../types';
-import sum from 'lodash/sum';
 
 const MILLISECONDS_PER_DAY = 1000 * 60 * 60 * 24;
 
 /**
  * Estimates annualized percentage yield given past stake pool rewards.
- * Assumes 365 day year, average historical yield "per time" and epoch length of last rewardsHistory data point.
+ * Assumes 365 day year.
  *
- * @param rewardsHistory sorted by epoch in ascending order
+ * @param rewardsHistory The list of `StakePoolEpochRewards` to estimate the APY
+ * @returns `null` if provided an empty `rewardsHistory` or the estimated APY otherwise
  */
 export const estimateStakePoolAPY = (rewardsHistory: StakePoolEpochRewards[]): Percent | null => {
   if (rewardsHistory.length === 0) return null;
-  const roisPerDay = rewardsHistory.map(
-    ({ epochLength, memberROI }) => memberROI.valueOf() / (epochLength / MILLISECONDS_PER_DAY)
+
+  const { activeStake, epochLength, memberRewards, pledge } = rewardsHistory.reduce(
+    (previous, current) =>
+      ({
+        activeStake: previous.activeStake + current.activeStake,
+        epochLength: previous.epochLength + current.epochLength,
+        memberRewards: previous.memberRewards + current.memberRewards,
+        pledge: previous.pledge + current.activeStake
+      } as StakePoolEpochRewards)
   );
-  const epochLengthInDays = rewardsHistory[rewardsHistory.length - 1].epochLength / MILLISECONDS_PER_DAY;
-  const averageDailyROI = sum(roisPerDay) / roisPerDay.length;
-  const roiPerEpoch = averageDailyROI * epochLengthInDays;
-  const numEpochs = 365 / epochLengthInDays;
-  // Compound interest formula
-  return Percent(Math.pow(1 + roiPerEpoch, numEpochs) - 1);
+
+  return Percent((Number(memberRewards) / Number(activeStake - pledge) / (epochLength / MILLISECONDS_PER_DAY)) * 365);
 };

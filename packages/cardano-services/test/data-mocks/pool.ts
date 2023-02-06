@@ -13,9 +13,10 @@ export const epochReward = {
     activeStake: 497_443_657n,
     epoch: 77,
     epochLength: 431_980_000,
+    leaderRewards: 10n,
     memberROI: 0,
-    operatorFees: 0n,
-    totalRewards: 0n
+    memberRewards: 100n,
+    pledge: 97_443_657n
   },
   hashId: 6
 };
@@ -116,9 +117,10 @@ export const stakePoolResult = {
       activeStake: 13_958_004_965_545_733n,
       epoch: 151,
       epochLength: 112_600,
+      leaderRewards: 10n,
       memberROI: 0.000_074_882_188_185_275_1,
-      operatorFees: 184_793_109_621n,
-      totalRewards: 1_229_999_064_142n
+      memberRewards: 100n,
+      pledge: 958_004_965_545_733n
     }
   ],
   hexId: 'a3ea0e70b6d9a9a149017379301b3e98ea9e3addbdd49935aabb56f5',

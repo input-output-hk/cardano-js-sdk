@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable max-len */
-import { DbSyncEpochPollService, EpochMonitor } from '../../../src/util';
+import { DbSyncEpochPollService, EpochMonitor, loadGenesisData } from '../../../src/util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../../src/NetworkInfo';
 import { HttpServer, HttpServerConfig, createDnsResolver, getPool } from '../../../src';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../../src/InMemoryCache';
@@ -74,10 +74,10 @@ describe('Service dependency abstractions', () => {
             withTip: true
           })
         ) as unknown as OgmiosCardanoNode;
-        networkInfoProvider = new DbSyncNetworkInfoProvider(
-          { cardanoNodeConfigPath },
-          { cache, cardanoNode, db: db!, epochMonitor, logger }
-        );
+        const genesisData = await loadGenesisData(cardanoNodeConfigPath);
+        const deps = { cache, cardanoNode, db: db!, epochMonitor, genesisData, logger };
+
+        networkInfoProvider = new DbSyncNetworkInfoProvider(deps);
         service = new NetworkInfoHttpService({ logger, networkInfoProvider });
         httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
 
@@ -158,10 +158,9 @@ describe('Service dependency abstractions', () => {
             withTip: true
           })
         ) as unknown as OgmiosCardanoNode;
-        networkInfoProvider = new DbSyncNetworkInfoProvider(
-          { cardanoNodeConfigPath },
-          { cache, cardanoNode, db: db!, epochMonitor, logger }
-        );
+        const genesisData = await loadGenesisData(cardanoNodeConfigPath);
+        const deps = { cache, cardanoNode, db: db!, epochMonitor, genesisData, logger };
+        networkInfoProvider = new DbSyncNetworkInfoProvider(deps);
         service = new NetworkInfoHttpService({ logger, networkInfoProvider });
         httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
 

@@ -228,16 +228,17 @@ export const mapEpoch = ({ no, optimal_pool_count }: EpochModel): Epoch => ({
   optimalPoolCount: optimal_pool_count
 });
 
-export const mapEpochReward = (epochRewardModel: EpochRewardModel, hashId: number): EpochReward => ({
+export const mapEpochReward = (epochRewardModel: EpochRewardModel): EpochReward => ({
   epochReward: {
     activeStake: BigInt(epochRewardModel.active_stake),
     epoch: Cardano.EpochNo(epochRewardModel.epoch_no),
     epochLength: Number(epochRewardModel.epoch_length),
+    leaderRewards: BigInt(epochRewardModel.leader_rewards),
     memberROI: Cardano.Percent(epochRewardModel.member_roi),
-    operatorFees: BigInt(epochRewardModel.operator_fees),
-    totalRewards: BigInt(epochRewardModel.total_rewards)
+    memberRewards: BigInt(epochRewardModel.member_rewards),
+    pledge: BigInt(epochRewardModel.pledge)
   },
-  hashId
+  hashId: Number(epochRewardModel.hash_id)
 });
 
 export const mapAddressOwner = (ownerAddressModel: OwnerAddressModel): PoolOwner => ({

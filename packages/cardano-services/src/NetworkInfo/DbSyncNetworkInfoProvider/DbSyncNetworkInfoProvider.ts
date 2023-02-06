@@ -9,25 +9,13 @@ import {
   SupplySummary,
   createSlotEpochCalc
 } from '@cardano-sdk/core';
-import { DbSyncProvider, DbSyncProviderDependencies } from '../../util/DbSyncProvider';
-import { Disposer, EpochMonitor } from '../../util/polling/types';
-import { GenesisData } from './types';
-import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../InMemoryCache';
+import { DbSyncProvider, DbSyncProviderDependencies, Disposer, EpochMonitor } from '../../util';
+import { GenesisData, InMemoryCache, UNLIMITED_CACHE_TTL } from '../..';
 import { Logger } from 'ts-log';
 import { NetworkInfoBuilder } from './NetworkInfoBuilder';
 import { RunnableModule } from '@cardano-sdk/util';
-import { loadGenesisData, toGenesisParams, toLedgerTip, toProtocolParams, toSupply } from './mappers';
+import { toGenesisParams, toLedgerTip, toProtocolParams, toSupply } from './mappers';
 import memoize from 'lodash/memoize';
-
-/**
- * Properties that are need to create DbSyncNetworkInfoProvider
- */
-export interface NetworkInfoProviderProps {
-  /**
-   * Cardano node config path string
-   */
-  cardanoNodeConfigPath: string;
-}
 
 /**
  * Dependencies that are need to create DbSyncNetworkInfoProvider
@@ -37,10 +25,16 @@ export interface NetworkInfoProviderDependencies extends DbSyncProviderDependenc
    * The in memory cache engine.
    */
   cache: InMemoryCache;
+
   /**
    * Monitor the epoch rollover through db polling.
    */
   epochMonitor: EpochMonitor;
+
+  /**
+   * The genesis data loaded from the genesis file.
+   */
+  genesisData: GenesisData;
 }
 
 export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) implements NetworkInfoProvider {
@@ -49,15 +43,12 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) im
   #currentEpoch: Cardano.EpochNo;
   #currentHash: Cardano.BlockId | undefined;
   #builder: NetworkInfoBuilder;
-  #genesisDataReady: Promise<GenesisData>;
+  #genesisData: GenesisData;
   #epochMonitor: EpochMonitor;
   #epochRolloverDisposer: Disposer;
   #slotEpochCalc: SlotEpochCalc;
 
-  constructor(
-    { cardanoNodeConfigPath }: NetworkInfoProviderProps,
-    { db, cache, logger, cardanoNode, epochMonitor }: NetworkInfoProviderDependencies
-  ) {
+  constructor({ cache, cardanoNode, db, epochMonitor, genesisData, logger }: NetworkInfoProviderDependencies) {
     super({ cardanoNode, db, logger }, 'DbSyncNetworkInfoProvider', logger);
 
     this.#logger = logger;
@@ -65,7 +56,7 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) im
     this.#currentEpoch = Cardano.EpochNo(0);
     this.#epochMonitor = epochMonitor;
     this.#builder = new NetworkInfoBuilder(db, logger);
-    this.#genesisDataReady = loadGenesisData(cardanoNodeConfigPath);
+    this.#genesisData = genesisData;
   }
 
   public async ledgerTip(): Promise<Cardano.Tip> {
@@ -97,12 +88,11 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) im
   }
 
   public async genesisParameters(): Promise<Cardano.CompactGenesis> {
-    const genesisData = await this.#genesisDataReady;
-    return toGenesisParams(genesisData);
+    return toGenesisParams(this.#genesisData);
   }
 
   public async lovelaceSupply(): Promise<SupplySummary> {
-    const { maxLovelaceSupply } = await this.#genesisDataReady;
+    const { maxLovelaceSupply } = this.#genesisData;
 
     const [circulatingSupply, totalSupply] = await Promise.all([
       this.#cache.get(NetworkInfoCacheKey.CIRCULATING_SUPPLY, () => this.#builder.queryCirculatingSupply()),
@@ -150,7 +140,6 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) im
 
   async shutdownImpl() {
     this.#cache.shutdown();
-    await this.#genesisDataReady;
     this.#epochRolloverDisposer();
   }
 

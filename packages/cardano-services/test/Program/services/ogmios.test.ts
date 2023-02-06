@@ -3,7 +3,7 @@
 /* eslint-disable max-len */
 import { CardanoNodeErrors } from '@cardano-sdk/core';
 import { Connection } from '@cardano-ogmios/client';
-import { DbSyncEpochPollService, listenPromise, serverClosePromise } from '../../../src/util';
+import { DbSyncEpochPollService, listenPromise, loadGenesisData, serverClosePromise } from '../../../src/util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../../src/NetworkInfo';
 import {
   HttpServer,
@@ -145,11 +145,10 @@ describe('Service dependency abstractions', () => {
           ogmiosCardanoNode = await getOgmiosCardanoNode(dnsResolver, logger, {
             ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
           });
+          const genesisData = await loadGenesisData(cardanoNodeConfigPath);
           const epochMonitor = new DbSyncEpochPollService(db!, 10_000);
-          const networkInfoProvider = new DbSyncNetworkInfoProvider(
-            { cardanoNodeConfigPath },
-            { cache, cardanoNode: ogmiosCardanoNode, db: db!, epochMonitor, logger }
-          );
+          const deps = { cache, cardanoNode: ogmiosCardanoNode, db: db!, epochMonitor, genesisData, logger };
+          const networkInfoProvider = new DbSyncNetworkInfoProvider(deps);
 
           httpServer = new HttpServer(config, {
             logger,
@@ -266,11 +265,10 @@ describe('Service dependency abstractions', () => {
           ogmiosCardanoNode = await getOgmiosCardanoNode(dnsResolver, logger, {
             ogmiosUrl: new URL(ogmiosConnection.address.webSocket)
           });
+          const genesisData = await loadGenesisData(cardanoNodeConfigPath);
           const epochMonitor = new DbSyncEpochPollService(db!, 10_000);
-          const networkInfoProvider = new DbSyncNetworkInfoProvider(
-            { cardanoNodeConfigPath },
-            { cache, cardanoNode: ogmiosCardanoNode, db: db!, epochMonitor, logger }
-          );
+          const deps = { cache, cardanoNode: ogmiosCardanoNode, db: db!, epochMonitor, genesisData, logger };
+          const networkInfoProvider = new DbSyncNetworkInfoProvider(deps);
 
           httpServer = new HttpServer(config, {
             logger,
