@@ -3,7 +3,12 @@
 /* eslint-disable no-multi-spaces */
 /* eslint-disable prettier/prettier */
 import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
-import { ChainHistoryProviderStub, generateTxAlonzo, mockChainHistoryProvider, queryTransactionsResult } from '../mocks';
+import {
+  ChainHistoryProviderStub,
+  generateTxAlonzo,
+  mockChainHistoryProvider,
+  queryTransactionsResult
+} from '../mocks';
 import {
   FailedTx,
   PAGE_SIZE,
@@ -303,7 +308,7 @@ describe('TransactionsTracker', () => {
         );
         expectObservable(transactionsTracker.outgoing.submitting$).toBe('-a---|', { a: tx });
         expectObservable(transactionsTracker.outgoing.pending$).toBe('--a-a|', { a: tx });
-        expectObservable(transactionsTracker.outgoing.failed$.pipe(map(err => err.reason))).toBe('---a-|', {
+        expectObservable(transactionsTracker.outgoing.failed$.pipe(map((err) => err.reason))).toBe('---a-|', {
           a: TransactionFailure.InvalidTransaction
         });
         expectObservable(transactionsTracker.outgoing.inFlight$).toBe('abcd-|', {
@@ -316,8 +321,10 @@ describe('TransactionsTracker', () => {
       });
     });
 
-    it('emits at all relevant observable properties on transaction that failed to submit', async () => {
+    it('emits at all relevant observable properties on transaction that failed to submit and merges reemit failures', async () => {
       const tx = queryTransactionsResult.pageResults[0];
+      const txReemit = queryTransactionsResult.pageResults[1];
+
       createTestScheduler().run(({ cold, hot, expectObservable }) => {
         const tip$ = hot<Cardano.Tip>('----|');
         const submitting$ = cold('-a--|', { a: tx });
@@ -326,10 +333,12 @@ describe('TransactionsTracker', () => {
         const failedToSubmit$ = hot<FailedTx>('---a|', {
           a: { reason: TransactionFailure.FailedToSubmit, tx }
         });
+        const failedFromReemitter$ = cold<FailedTx>('-a|', { a: { reason: TransactionFailure.Timeout, tx: txReemit } });
         const transactionsTracker = createTransactionsTracker(
           {
             addresses$,
             chainHistoryProvider,
+            failedFromReemitter$,
             inFlightTransactionsStore,
             logger,
             newTransactions: {
@@ -350,8 +359,9 @@ describe('TransactionsTracker', () => {
         expectObservable(transactionsTracker.outgoing.pending$).toBe('--a-|', { a: tx });
         expectObservable(transactionsTracker.outgoing.inFlight$).toBe('ab-c|', { a: [], b: [{ tx }], c: [] });
         expectObservable(transactionsTracker.outgoing.confirmed$).toBe('----|');
-        expectObservable(transactionsTracker.outgoing.failed$).toBe('---a|', {
-          a: { reason: TransactionFailure.FailedToSubmit, tx }
+        expectObservable(transactionsTracker.outgoing.failed$).toBe('-a-b|', {
+          a: { reason: TransactionFailure.Timeout, tx: txReemit },
+          b: { reason: TransactionFailure.FailedToSubmit, tx }
         });
       });
     });

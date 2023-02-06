@@ -1,23 +1,23 @@
 import { Cardano, calculateStabilityWindowSlotsCount } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
-import { Observable, combineLatest, filter, from, map, merge, mergeMap, scan, tap, withLatestFrom } from 'rxjs';
+import {
+  Observable,
+  combineLatest,
+  filter,
+  from,
+  map,
+  merge,
+  mergeMap,
+  partition,
+  scan,
+  share,
+  tap,
+  withLatestFrom
+} from 'rxjs';
 
-import { ConfirmedTx, Milliseconds, TransactionsTracker } from './types';
-import { CustomError } from 'ts-custom-error';
+import { ConfirmedTx, FailedTx, Milliseconds, TransactionFailure, TransactionsTracker } from './types';
 import { WalletStores } from '../persistence';
 import { isNotNil } from '@cardano-sdk/util';
-
-export enum TransactionReemitErrorCode {
-  invalidHereafter = 'invalidHereafter',
-  notFound = 'notFound'
-}
-class TransactionReemitError extends CustomError {
-  code: TransactionReemitErrorCode;
-  public constructor(code: TransactionReemitErrorCode, message: string) {
-    super(message);
-    this.code = code;
-  }
-}
 
 export interface TransactionReemitterProps {
   transactions: Pick<TransactionsTracker, 'rollback$'> & {
@@ -36,6 +36,11 @@ export interface TransactionReemitterProps {
   logger: Logger;
 }
 
+export interface TransactionReemiter {
+  reemit$: Observable<Cardano.Tx>;
+  failed$: Observable<FailedTx>;
+}
+
 enum txSource {
   store,
   confirmed,
@@ -52,7 +57,7 @@ export const createTransactionReemitter = ({
   maxInterval,
   genesisParameters$,
   logger
-}: TransactionReemitterProps): Observable<Cardano.Tx> => {
+}: TransactionReemitterProps): TransactionReemiter => {
   const volatileTransactions$ = merge(
     stores.volatileTransactions.get().pipe(
       tap((txs) => logger.debug(`Store contains ${txs.length} volatile transactions`)),
@@ -105,36 +110,35 @@ export const createTransactionReemitter = ({
   );
 
   const rollbacks$ = rollback$.pipe(
-    withLatestFrom(tipSlot$),
-    map(([tx, tipSlot]) => {
-      const invalidHereafter = tx.body?.validityInterval?.invalidHereafter;
-      if (invalidHereafter && tipSlot > invalidHereafter) {
-        const err = new TransactionReemitError(
-          TransactionReemitErrorCode.invalidHereafter,
-          `Rolled back transaction with id ${tx.id} is no longer valid`
-        );
-        logger.error(err.message, err.code);
-        return;
-      }
-      return tx;
-    }),
-    filter((tx) => !!tx),
     withLatestFrom(volatileTransactions$),
     map(([tx, volatiles]) => {
       // Get the confirmed Tx transaction to be retried
       const reemitTx = volatiles.find(({ tx: txVolatile }) => txVolatile.id === tx!.id);
       if (!reemitTx) {
-        const err = new TransactionReemitError(
-          TransactionReemitErrorCode.notFound,
-          `Could not find confirmed transaction with id ${tx!.id} that was rolled back`
-        );
-        logger.error(err.message, err.code);
+        logger.error(`Could not find confirmed transaction with id ${tx!.id} that was rolled back`);
+        return;
       }
       return reemitTx!;
     }),
     filter(isNotNil),
-    map(({ tx }) => tx)
+    map(({ tx }) => tx),
+    withLatestFrom(tipSlot$),
+    map(([tx, tipSlot]) => {
+      const invalidHereafter = tx.body?.validityInterval?.invalidHereafter;
+      if (invalidHereafter && tipSlot > invalidHereafter) {
+        const err: FailedTx = {
+          reason: TransactionFailure.Timeout,
+          tx
+        };
+        logger.error(`Rolled back transaction with id ${err.tx.id} is no longer valid`, err.reason);
+        return err;
+      }
+      return tx;
+    }),
+    share()
   );
+
+  const [failed$, rollbackRetry$] = partition(rollbacks$, (v): v is FailedTx => (v as FailedTx).reason !== undefined);
 
   // If there are any transactions without `submittedAt` in store on load, it means that
   // wallet was shut down before transaction submission resolved.
@@ -158,5 +162,8 @@ export const createTransactionReemitter = ({
     )
   );
 
-  return merge(rollbacks$, unsubmitted$, reemitUnconfirmed$);
+  return {
+    failed$,
+    reemit$: merge(rollbackRetry$, unsubmitted$, reemitUnconfirmed$)
+  };
 };

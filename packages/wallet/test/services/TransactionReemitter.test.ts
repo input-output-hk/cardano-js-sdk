@@ -1,7 +1,8 @@
 import { Cardano } from '@cardano-sdk/core';
 import {
   ConfirmedTx,
-  TransactionReemitErrorCode,
+  FailedTx,
+  TransactionFailure,
   TransactionReemitterProps,
   TxInFlight,
   createTransactionReemitter
@@ -84,13 +85,13 @@ describe('TransactionReemiter', () => {
           rollback$
         }
       });
-      expectObservable(transactionReemiter).toBe('-|');
+      expectObservable(transactionReemiter.reemit$).toBe('-|');
     });
     expect(stores.volatileTransactions.get).toHaveBeenCalledTimes(1);
     expect(stores.volatileTransactions.set).not.toHaveBeenCalledTimes(1); // already in store
   });
 
-  it('Merges stored transacions with confirmed transactions and adds them all to store', () => {
+  it('Merges stored transactions with confirmed transactions and adds them all to store', () => {
     const storeTransaction = volatileTransactions[0];
     createTestScheduler().run(({ hot, cold, expectObservable }) => {
       stores.volatileTransactions.get = jest.fn(() => cold('a|', { a: [storeTransaction] }));
@@ -115,7 +116,7 @@ describe('TransactionReemiter', () => {
           rollback$
         }
       });
-      expectObservable(transactionReemiter).toBe('----|');
+      expectObservable(transactionReemiter.reemit$).toBe('----|');
     });
     expect(stores.volatileTransactions.set).toHaveBeenCalledTimes(2);
     expect(stores.volatileTransactions.set).toHaveBeenLastCalledWith(volatileTransactions.slice(0, 3));
@@ -146,7 +147,7 @@ describe('TransactionReemiter', () => {
           rollback$
         }
       });
-      expectObservable(transactionReemiter).toBe('--|');
+      expectObservable(transactionReemiter.reemit$).toBe('--|');
     });
     expect(stores.volatileTransactions.set).toHaveBeenCalledTimes(1);
     expect(stores.volatileTransactions.set).toHaveBeenLastCalledWith(volatileTransactions.slice(1));
@@ -182,7 +183,7 @@ describe('TransactionReemiter', () => {
           rollback$
         }
       });
-      expectObservable(transactionReemiter).toBe('---|');
+      expectObservable(transactionReemiter.reemit$).toBe('---|');
     });
     expect(stores.volatileTransactions.set).toHaveBeenCalledTimes(3);
     expect(stores.volatileTransactions.set).toHaveBeenLastCalledWith(volatileTransactions.slice(1, 3));
@@ -191,9 +192,10 @@ describe('TransactionReemiter', () => {
   it('Emits transactions that were rolled back and still valid', () => {
     const LAST_TIP_SLOT = 400;
     const [volatileA, volatileB, volatileC, volatileD] = volatileTransactions;
+    volatileC.tx.body.validityInterval = { invalidHereafter: Cardano.Slot(LAST_TIP_SLOT - 1) };
     const rollbackA: Cardano.HydratedTx = { body: volatileA.tx.body, id: volatileA.tx.id } as Cardano.HydratedTx;
     const rollbackC: Cardano.HydratedTx = {
-      body: { validityInterval: { invalidHereafter: Cardano.Slot(LAST_TIP_SLOT - 1) } },
+      body: volatileC.tx.body,
       id: volatileC.tx.id
     } as Cardano.HydratedTx;
     const rollbackD: Cardano.HydratedTx = { body: volatileD.tx.body, id: volatileD.tx.id } as Cardano.HydratedTx;
@@ -228,10 +230,13 @@ describe('TransactionReemiter', () => {
           rollback$
         }
       });
-      expectObservable(transactionReemiter).toBe('--a-----d|', { a: volatileA.tx, d: volatileD.tx });
+      expectObservable(transactionReemiter.failed$).toBe('-----c---|', {
+        c: { reason: TransactionFailure.Timeout, tx: volatileC.tx } as FailedTx
+      });
+      expectObservable(transactionReemiter.reemit$).toBe('--a-----d|', { a: volatileA.tx, d: volatileD.tx });
     });
 
-    expect(logger.error).toHaveBeenCalledWith(expect.anything(), TransactionReemitErrorCode.invalidHereafter);
+    expect(logger.error).toHaveBeenCalledWith(expect.anything(), TransactionFailure.Timeout);
   });
 
   it('Logs error message for rolledback transactions not found in volatiles', () => {
@@ -266,9 +271,9 @@ describe('TransactionReemiter', () => {
           rollback$
         }
       });
-      expectObservable(transactionReemiter).toBe('---|');
+      expectObservable(transactionReemiter.reemit$).toBe('---|');
     });
-    expect(logger.error).toHaveBeenCalledWith(expect.anything(), TransactionReemitErrorCode.notFound);
+    expect(logger.error).toHaveBeenCalledWith(expect.stringContaining('Could not find confirmed transaction'));
   });
 
   it('Emits unconfirmed submission transactions from stores.inFlightTransactions', () => {
@@ -307,7 +312,7 @@ describe('TransactionReemiter', () => {
           rollback$
         }
       });
-      expectObservable(transactionReemiter).toBe('a|', { a: volatileTransactions[0].tx });
+      expectObservable(transactionReemiter.reemit$).toBe('a|', { a: volatileTransactions[0].tx });
     });
     expect(stores.inFlightTransactions.get).toHaveBeenCalledTimes(1);
   });
@@ -345,7 +350,7 @@ describe('TransactionReemiter', () => {
           rollback$
         }
       });
-      expectObservable(transactionReemiter).toBe('-a|', { a: volatileTransactions[1].tx });
+      expectObservable(transactionReemiter.reemit$).toBe('-a|', { a: volatileTransactions[1].tx });
     });
   });
 
@@ -381,7 +386,7 @@ describe('TransactionReemiter', () => {
           rollback$
         }
       });
-      expectObservable(transactionReemiter).toBe('-a--|', { a: volatileTransactions[1].tx });
+      expectObservable(transactionReemiter.reemit$).toBe('-a--|', { a: volatileTransactions[1].tx });
     });
   });
 });
