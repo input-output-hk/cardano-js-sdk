@@ -15,6 +15,9 @@
       "path": "../../core/src"
     },
     {
+      "path": "../../crypto/src"
+    },
+    {
       "path": "../../key-management/src"
     }
   ]

@@ -20,6 +20,9 @@
       "path": "../../util/src"
     },
     {
+      "path": "../../crypto/src"
+    },
+    {
       "path": "../../util-rxjs/src"
     },
     {
