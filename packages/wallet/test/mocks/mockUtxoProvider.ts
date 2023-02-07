@@ -66,13 +66,23 @@ export const utxo2 = utxo.slice(1);
 /**
  * Provider stub for testing
  *
- * @param utxoSet The set of UTXOs to be included in the wallet state.
+ * @param The options
+ * @param The.address patch utxos to use a specific utxo output address
+ * @param The.utxoSet The set of UTXOs to be included in the wallet state.
  *
  * returns UtxoProvider-compatible object
  */
-export const mockUtxoProvider = (utxoSet?: Cardano.Utxo[]): UtxoProvider => ({
+export const mockUtxoProvider = ({
+  address,
+  utxoSet = utxo
+}: {
+  address?: Cardano.Address;
+  utxoSet?: Cardano.Utxo[];
+} = {}): UtxoProvider => ({
   healthCheck: jest.fn().mockResolvedValue({ ok: true }),
-  utxoByAddresses: jest.fn().mockResolvedValue(utxoSet ? utxoSet : utxo)
+  utxoByAddresses: jest
+    .fn()
+    .mockResolvedValue(address ? utxoSet.map(([txIn, txOut]) => [txIn, { ...txOut, address }]) : utxoSet)
 });
 
 export const mockUtxoProvider2 = (delayMs: number): UtxoProvider => {

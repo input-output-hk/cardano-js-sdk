@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AuthenticationError, TransportError } from './errors';
+import { AuthenticationError, HwMappingError, TransportError } from './errors';
 import { Cardano, NotImplementedError, coreToCml } from '@cardano-sdk/core';
 import {
   CardanoKeyConst,
@@ -224,7 +224,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
     );
   }
 
-  async signTransaction({ body }: Cardano.TxBodyWithHash): Promise<Cardano.Signatures> {
+  async signTransaction({ body, hash }: Cardano.TxBodyWithHash): Promise<Cardano.Signatures> {
     const scope = new ManagedFreeableScope();
     try {
       const cslTxBody = coreToCml.txBody(scope, body);
@@ -239,6 +239,9 @@ export class LedgerKeyAgent extends KeyAgentBase {
         this.deviceConnection
       );
       const result = await deviceConnection.signTransaction(ledgerTxData);
+      if (result.txHashHex !== hash.toString()) {
+        throw new HwMappingError('Ledger computed a different transaction id');
+      }
 
       return new Map<Crypto.Ed25519PublicKeyHex, Crypto.Ed25519SignatureHex>(
         await Promise.all(
