@@ -1,6 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { AsyncKeyAgent, InMemoryKeyAgent, KeyAgent, util } from '../../src';
-import { CML, Cardano } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 import { dummyLogger } from 'ts-log';
 import { firstValueFrom } from 'rxjs';
@@ -21,7 +21,7 @@ describe('createAsyncKeyAgent maps KeyAgent to AsyncKeyAgent', () => {
         getPassphrase,
         mnemonicWords
       },
-      { bip32Ed25519: new Crypto.CmlBip32Ed25519(CML), inputResolver, logger: dummyLogger }
+      { bip32Ed25519: new Crypto.SodiumBip32Ed25519(), inputResolver, logger: dummyLogger }
     );
     asyncKeyAgent = util.createAsyncKeyAgent(keyAgent);
   });
