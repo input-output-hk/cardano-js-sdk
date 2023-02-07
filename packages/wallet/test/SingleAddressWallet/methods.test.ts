@@ -1,8 +1,10 @@
 /* eslint-disable max-len */
+import * as Crypto from '@cardano-sdk/crypto';
 import * as mocks from '../mocks';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
-import { Cardano, CardanoNodeErrors, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { CML, Cardano, CardanoNodeErrors, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { HexBlob } from '@cardano-sdk/util';
 import { InitializeTxProps, SingleAddressWallet, setupWallet } from '../../src';
 import { firstValueFrom, skip } from 'rxjs';
 import { getPassword, testAsyncKeyAgent } from '../../../key-management/test/mocks';
@@ -53,6 +55,7 @@ describe('SingleAddressWallet methods', () => {
       type: AddressType.External
     };
     ({ wallet } = await setupWallet({
+      bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
       createKeyAgent: async (dependencies) => {
         const asyncKeyAgent = await testAsyncKeyAgent([groupedAddress], dependencies);
         asyncKeyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
@@ -158,10 +161,8 @@ describe('SingleAddressWallet methods', () => {
         [AssetId.TSLA, 20n]
       ]),
       outputs: new Set<Cardano.TxOut>(outputs),
-      requiredExtraSignatures: [Cardano.Ed25519KeyHash('6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed5')],
-      scriptIntegrityHash: Cardano.util.Hash32ByteBase16(
-        '3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d'
-      )
+      requiredExtraSignatures: [Crypto.Ed25519KeyHashHex('6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed5')],
+      scriptIntegrityHash: Crypto.Hash32ByteBase16('3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d')
     } as InitializeTxProps;
 
     it('initializeTx', async () => {
@@ -233,7 +234,7 @@ describe('SingleAddressWallet methods', () => {
   });
 
   it('signData calls cip30signData', async () => {
-    const response = await wallet.signData({ payload: Cardano.util.HexBlob('abc123'), signWith: address });
+    const response = await wallet.signData({ payload: HexBlob('abc123'), signWith: address });
     expect(response).toHaveProperty('signature');
   });
 });

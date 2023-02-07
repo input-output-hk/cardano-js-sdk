@@ -49,6 +49,7 @@
   },
   "dependencies": {
     "@cardano-sdk/core": "^0.8.0-nightly.3",
+    "@cardano-sdk/crypto": "^0.1.0",
     "@cardano-sdk/util": "^0.7.1-nightly.1",
     "@cardano-sdk/util-rxjs": "^0.4.4-nightly.3",
     "lodash": "^4.17.21",

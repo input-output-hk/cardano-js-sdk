@@ -14,9 +14,9 @@ import {
   WalletApi
 } from '@cardano-sdk/dapp-connector';
 import { CML, Cardano, cmlToCore, coreToCml } from '@cardano-sdk/core';
+import { HexBlob, ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
 import { InputSelectionError } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
-import { ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
 import { Observable, firstValueFrom } from 'rxjs';
 import { ObservableWallet } from './types';
 import { errors } from '@cardano-sdk/key-management';
@@ -35,7 +35,7 @@ export type SignDataCallbackParams = {
   type: Cip30ConfirmationCallbackType.SignData;
   data: {
     addr: Cardano.Address;
-    payload: Cardano.util.HexBlob;
+    payload: HexBlob;
   };
 };
 
@@ -234,7 +234,7 @@ export const createWalletApi = (
   },
   signData: async (addr: Cardano.Address | Bytes, payload: Bytes): Promise<Cip30DataSignature> => {
     logger.debug('signData');
-    const hexBlobPayload = Cardano.util.HexBlob(payload);
+    const hexBlobPayload = HexBlob(payload);
     const signWith = Cardano.Address(addr.toString());
 
     const shouldProceed = await confirmationCallback({

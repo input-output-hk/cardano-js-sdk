@@ -70,12 +70,14 @@ export interface EpochReward {
 }
 
 export interface EpochRewardModel {
+  active_stake: string;
   epoch_no: number;
   epoch_length: string;
-  operator_fees: string;
-  active_stake: string;
+  hash_id: number;
+  leader_rewards: string;
+  member_rewards: string;
   member_roi: number;
-  total_rewards: string;
+  pledge: string;
 }
 
 export interface OwnerAddressModel {

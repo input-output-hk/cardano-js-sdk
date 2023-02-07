@@ -1,4 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
+import { Ed25519KeyHashHex, Hash32ByteBase16 } from '@cardano-sdk/crypto';
+
 import merge from 'lodash/merge';
 
 export const valueWithCoinOnly: Cardano.Value = {
@@ -18,7 +20,7 @@ export const txOutBase: Omit<Cardano.TxOut, 'value' | 'datum'> = {
 
 export const txOutBaseWithDatum: Omit<Cardano.TxOut, 'value'> = {
   ...txOutBase,
-  datumHash: Cardano.util.Hash32ByteBase16('c5dfa8c3cbd5a959829618a7b46e163078cb3f1b39f152514d0c3686d553529a')
+  datumHash: Hash32ByteBase16('c5dfa8c3cbd5a959829618a7b46e163078cb3f1b39f152514d0c3686d553529a')
 };
 
 export const txOutWithCoinOnly: Cardano.TxOut = { ...txOutBase, value: valueWithCoinOnly };
@@ -96,7 +98,7 @@ export const withAuxiliaryData: Cardano.HydratedTx = merge(withAssets, {
 export const delegationCertificate: Cardano.StakeDelegationCertificate = {
   __typename: Cardano.CertificateType.StakeDelegation,
   poolId: Cardano.PoolId('pool1cjm567pd9eqj7wlpuq2mnsasw2upewq0tchg4n8gktq5k7eepvr'),
-  stakeKeyHash: Cardano.Ed25519KeyHash('f15db05f56035465bf8900a09bdaa16c3d8b8244fea686524408dd80')
+  stakeKeyHash: Ed25519KeyHashHex('f15db05f56035465bf8900a09bdaa16c3d8b8244fea686524408dd80')
 };
 
 export const collateralInputs = [

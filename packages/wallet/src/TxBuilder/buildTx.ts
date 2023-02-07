@@ -1,4 +1,5 @@
 /* eslint-disable max-len */
+import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
 import { FinalizeTxProps, InitializeTxProps, InitializeTxResult, ObservableWallet } from '../types';
 import {
@@ -219,7 +220,7 @@ export class ObservableWalletTxBuilder implements TxBuilder {
     this.partialTxBody = { ...this.partialTxBody, certificates: [] };
 
     for (const rewardAccount of rewardAccounts) {
-      const stakeKeyHash = Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccount.address);
+      const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount.address);
       if (this.#delegateConfig.type === 'deregister') {
         // Deregister scenario
         if (rewardAccount.keyStatus === StakeKeyStatus.Unregistered) {
@@ -258,7 +259,7 @@ export class ObservableWalletTxBuilder implements TxBuilder {
 
   static #createDelegationCert(
     poolId: Cardano.PoolId,
-    stakeKeyHash: Cardano.Ed25519KeyHash
+    stakeKeyHash: Crypto.Ed25519KeyHashHex
   ): Cardano.StakeDelegationCertificate {
     return {
       __typename: Cardano.CertificateType.StakeDelegation,

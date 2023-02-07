@@ -131,6 +131,7 @@ describe('loadHttpServer', () => {
             await loadHttpServer({
               apiUrl,
               options: {
+                cardanoNodeConfigPath,
                 dbCacheTtl,
                 epochPollInterval,
                 ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
@@ -156,6 +157,7 @@ describe('loadHttpServer', () => {
             await loadHttpServer({
               apiUrl,
               options: {
+                cardanoNodeConfigPath,
                 dbCacheTtl,
                 epochPollInterval,
                 ogmiosUrl: new URL(ogmiosConnection.address.webSocket)
@@ -176,6 +178,7 @@ describe('loadHttpServer', () => {
         httpServer = await loadHttpServer({
           apiUrl,
           options: {
+            cardanoNodeConfigPath,
             dbCacheTtl,
             epochPollInterval,
             ogmiosSrvServiceName,
@@ -192,6 +195,7 @@ describe('loadHttpServer', () => {
         httpServer = await loadHttpServer({
           apiUrl,
           options: {
+            cardanoNodeConfigPath,
             dbCacheTtl,
             epochPollInterval,
             ogmiosSrvServiceName,
@@ -211,6 +215,7 @@ describe('loadHttpServer', () => {
             await loadHttpServer({
               apiUrl,
               options: {
+                cardanoNodeConfigPath,
                 dbCacheTtl,
                 epochPollInterval,
                 serviceDiscoveryBackoffFactor,
@@ -232,6 +237,7 @@ describe('loadHttpServer', () => {
         httpServer = await loadHttpServer({
           apiUrl,
           options: {
+            cardanoNodeConfigPath,
             dbCacheTtl,
             epochPollInterval,
             rabbitmqSrvServiceName,
@@ -249,6 +255,7 @@ describe('loadHttpServer', () => {
         httpServer = await loadHttpServer({
           apiUrl,
           options: {
+            cardanoNodeConfigPath,
             dbCacheTtl,
             epochPollInterval,
             rabbitmqSrvServiceName,
@@ -269,6 +276,7 @@ describe('loadHttpServer', () => {
             await loadHttpServer({
               apiUrl,
               options: {
+                cardanoNodeConfigPath,
                 dbCacheTtl,
                 epochPollInterval,
                 serviceDiscoveryBackoffFactor,
@@ -286,10 +294,11 @@ describe('loadHttpServer', () => {
       });
     });
 
-    it('throws if genesis-config dependent service is nominated without providing the node config path', async () => {
-      await expect(
-        async () =>
-          await loadHttpServer({
+    describe('throws if genesis-config dependent service is nominated without providing the node config path', () => {
+      // eslint-disable-next-line unicorn/consistent-function-scoping
+      const test = (serviceName: ServiceNames) =>
+        expect(() =>
+          loadHttpServer({
             apiUrl,
             options: {
               dbCacheTtl: 0,
@@ -297,11 +306,12 @@ describe('loadHttpServer', () => {
               ogmiosUrl: new URL('http://localhost:1337'),
               postgresConnectionString: 'postgres'
             },
-            serviceNames: [ServiceNames.NetworkInfo]
+            serviceNames: [serviceName]
           })
-      ).rejects.toThrow(
-        new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.CardanoNodeConfigPath)
-      );
+        ).rejects.toThrow(new MissingProgramOption(serviceName, ProgramOptionDescriptions.CardanoNodeConfigPath));
+
+      it('with network-info provider', () => test(ServiceNames.NetworkInfo));
+      it('with stake-pool provider', () => test(ServiceNames.StakePool));
     });
   });
 
@@ -321,6 +331,7 @@ describe('loadHttpServer', () => {
         loadHttpServer({
           apiUrl,
           options: {
+            cardanoNodeConfigPath,
             dbCacheTtl,
             epochPollInterval,
             ogmiosUrl: new URL(ogmiosConnection.address.webSocket),

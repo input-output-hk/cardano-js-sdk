@@ -1,4 +1,5 @@
 import { Cardano, Paginated, StakePoolProvider } from '@cardano-sdk/core';
+import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { getRandomTxId } from './mockChainHistoryProvider';
 import { rewardAccountBalance, rewardAccountBalance2, rewardsHistory, rewardsHistory2 } from './mockData';
 import delay from 'delay';
@@ -27,9 +28,10 @@ export const generateStakePools = (qty: number): Cardano.StakePool[] =>
         activeStake: 2_986_376_991n,
         epoch: Cardano.EpochNo(205),
         epochLength: 431_850_000,
+        leaderRewards: 1000n,
         memberROI: Cardano.Percent(0),
-        operatorFees: 0n,
-        totalRewards: 0n
+        memberRewards: 2000n,
+        pledge: 986_376_991n
       }
     ],
     hexId: Cardano.PoolIdHex('5d99282bbb4840380bb98c075498ed1983aee18a4a0925b9b44d93f1'),
@@ -45,7 +47,7 @@ export const generateStakePools = (qty: number): Cardano.StakePool[] =>
       ticker: 'BANDA'
     },
     metadataJson: {
-      hash: Cardano.util.Hash32ByteBase16(getRandomTxId()),
+      hash: Hash32ByteBase16(getRandomTxId()),
       url: 'https://git.io/JJ7wm'
     },
     metrics: {

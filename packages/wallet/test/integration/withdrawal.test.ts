@@ -88,7 +88,7 @@ describe('integration/withdrawal', () => {
       certificates: [
         {
           __typename: Cardano.CertificateType.StakeKeyDeregistration,
-          stakeKeyHash: Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccount)
+          stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
         }
       ],
       outputs: new Set() // In a real transaction you would probably want to have some outputs

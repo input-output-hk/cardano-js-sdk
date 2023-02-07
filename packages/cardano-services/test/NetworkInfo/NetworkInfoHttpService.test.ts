@@ -3,12 +3,11 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable sonarjs/no-identical-functions */
 import { CreateHttpProviderConfig, networkInfoHttpProvider } from '@cardano-sdk/cardano-services-client';
-import { DbSyncEpochPollService } from '../../src/util';
+import { DbSyncEpochPollService, LedgerTipModel, findLedgerTip, loadGenesisData } from '../../src/util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../src/NetworkInfo';
 import { HttpServer, HttpServerConfig } from '../../src';
 import { INFO, createLogger } from 'bunyan';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../src/InMemoryCache';
-import { LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
 import { NetworkInfoFixtureBuilder } from './fixtures/FixtureBuilder';
 import { NetworkInfoProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
@@ -16,7 +15,6 @@ import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
 import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
 import { ingestDbData, sleep, wrapWithTransaction } from '../util';
-import { loadGenesisData } from '../../src/NetworkInfo/DbSyncNetworkInfoProvider/mappers';
 import { logger } from '@cardano-sdk/util-dev';
 import axios from 'axios';
 
@@ -123,10 +121,9 @@ describe('NetworkInfoHttpService', () => {
         })
       ) as unknown as OgmiosCardanoNode;
       config = { listen: { port } };
-      networkInfoProvider = new DbSyncNetworkInfoProvider(
-        { cardanoNodeConfigPath },
-        { cache, cardanoNode, db, epochMonitor, logger }
-      );
+      const genesisData = await loadGenesisData(cardanoNodeConfigPath);
+      const deps = { cache, cardanoNode, db, epochMonitor, genesisData, logger };
+      networkInfoProvider = new DbSyncNetworkInfoProvider(deps);
       service = new NetworkInfoHttpService({ logger, networkInfoProvider });
       httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
       clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };

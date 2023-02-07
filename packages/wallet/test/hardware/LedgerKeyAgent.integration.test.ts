@@ -1,4 +1,5 @@
-import { Cardano } from '@cardano-sdk/core';
+import * as Crypto from '@cardano-sdk/crypto';
+import { CML, Cardano } from '@cardano-sdk/core';
 import { CommunicationType, KeyAgent, LedgerKeyAgent, restoreKeyAgent, util } from '@cardano-sdk/key-management';
 import { ObservableWallet, SingleAddressWallet, setupWallet } from '../../src';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
@@ -43,6 +44,7 @@ const getAddress = async (wallet: ObservableWallet) => (await firstValueFrom(wal
 describe('LedgerKeyAgent+SingleAddressWallet', () => {
   test('creating and restoring LedgerKeyAgent wallet', async () => {
     const { wallet: freshWallet, keyAgent: freshKeyAgent } = await setupWallet({
+      bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
       createKeyAgent: (dependencies) =>
         LedgerKeyAgent.createWithDevice(
           {
@@ -55,6 +57,7 @@ describe('LedgerKeyAgent+SingleAddressWallet', () => {
       logger
     });
     const { wallet: restoredWallet } = await setupWallet({
+      bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
       createKeyAgent: (dependencies) => restoreKeyAgent(freshKeyAgent.serializableData, dependencies),
       createWallet,
       logger

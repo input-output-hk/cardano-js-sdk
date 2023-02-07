@@ -1,3 +1,4 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, addressNetworkId, createRewardAccount } from '../../src';
 
 describe('address', () => {
@@ -42,7 +43,7 @@ describe('address', () => {
   });
 
   describe('createRewardAccount', () => {
-    const keyHash = Cardano.Ed25519KeyHash('f15db05f56035465bf8900a09bdaa16c3d8b8244fea686524408dd80');
+    const keyHash = Crypto.Ed25519KeyHashHex('f15db05f56035465bf8900a09bdaa16c3d8b8244fea686524408dd80');
 
     it('creates a mainnet address', () => {
       const rewardAccount = createRewardAccount(keyHash, Cardano.NetworkId.Mainnet);

@@ -4,7 +4,6 @@ import {
   AssetName,
   Certificate,
   CertificateType,
-  Ed25519KeyHash,
   HydratedTx,
   HydratedTxIn,
   Lovelace,
@@ -27,7 +26,6 @@ import { inputsWithAddresses, isAddressWithin } from '../Cardano/util/address';
 import { nativeScriptPolicyId } from './nativeScript';
 import { resolveInputValue } from '../Cardano/util/resolveInputValue';
 import { subtractValueQuantities } from './subtractValueQuantities';
-
 type Inspector<Inspection> = (tx: HydratedTx) => Inspection;
 type Inspectors = { [k: string]: Inspector<unknown> };
 type TxInspector<T extends Inspectors> = (tx: HydratedTx) => {
@@ -123,7 +121,7 @@ export const totalAddressOutputsValueInspector: SendReceiveValueInspector = (own
 export const signedCertificatesInspector: SignedCertificatesInspector =
   (rewardAccounts: RewardAccount[], certificateTypes?: CertificateType[]) => (tx) => {
     if (!tx.body.certificates || tx.body.certificates.length === 0) return [];
-    const stakeKeyHashes = rewardAccounts?.map((account) => Ed25519KeyHash.fromRewardAccount(account));
+    const stakeKeyHashes = rewardAccounts?.map((account) => RewardAccount.toHash(account));
     const certificates = certificateTypes
       ? tx.body.certificates?.filter((certificate) => certificateTypes.includes(certificate.__typename))
       : tx.body.certificates;

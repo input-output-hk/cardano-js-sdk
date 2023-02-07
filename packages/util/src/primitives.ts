@@ -1,24 +1,8 @@
 import { Decoded, bech32 } from 'bech32';
-import { Ed25519KeyHash } from '../types/Key';
-import { InvalidStringError } from '../../errors';
+import { InvalidStringError } from './errors';
+import { OpaqueString } from './opaqueTypes';
 
 const MAX_BECH32_LENGTH_LIMIT = 1023;
-
-// Source: https://github.com/Microsoft/Typescript/issues/202#issuecomment-811246768
-export declare class OpaqueString<T extends string> extends String {
-  /** This helps typescript distinguish different opaque string types. */
-  protected readonly __opaqueString: T;
-  /**
-   * This object is already a string, but calling this makes method
-   * makes typescript recognize it as such.
-   */
-  toString(): string;
-}
-
-export declare class OpaqueNumber<T extends string> extends Number {
-  /** This helps typescript distinguish different opaque number types. */
-  protected readonly __opaqueNumber: T;
-}
 
 const isOneOf = <T>(target: T, options: T | T[]) =>
   (Array.isArray(options) && options.includes(target)) || target === options;
@@ -122,8 +106,6 @@ HexBlob.fromBase64 = (rawData: string) => Buffer.from(rawData, 'base64').toStrin
 HexBlob.toTypedBech32 = <T>(prefix: string, hexString: HexBlob): T =>
   bech32.encode(prefix, bech32.toWords(Uint8Array.from(Buffer.from(hexString, 'hex')))) as unknown as T;
 
-HexBlob.fromEd25519KeyHash = (hash: Ed25519KeyHash) => hash as unknown as HexBlob;
-
 /**
  * Cast HexBlob it into another OpaqueString type.
  *
@@ -134,26 +116,3 @@ export const castHexBlob = <T>(target: HexBlob, expectedLength?: number) => {
   assertLength(expectedLength, target.toString());
   return target as unknown as T;
 };
-
-/**
- * 32 byte hash as hex string
- */
-export type Hash32ByteBase16 = OpaqueString<'Hash32ByteBase16'>;
-
-/**
- * @param {string} value 32 byte hash as hex string
- * @throws InvalidStringError
- */
-export const Hash32ByteBase16 = (value: string): Hash32ByteBase16 => typedHex<Hash32ByteBase16>(value, 64);
-Hash32ByteBase16.fromHexBlob = <T>(value: HexBlob) => castHexBlob<T>(value, 64);
-
-/**
- * 28 byte hash as hex string
- */
-export type Hash28ByteBase16 = OpaqueString<'Hash28ByteBase16'>;
-
-/**
- * @param {string} value 28 byte hash as hex string
- * @throws InvalidStringError
- */
-export const Hash28ByteBase16 = (value: string): Hash28ByteBase16 => typedHex<Hash28ByteBase16>(value, 56);

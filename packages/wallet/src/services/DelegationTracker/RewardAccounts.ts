@@ -176,7 +176,7 @@ const accountCertificateTransactions = (
   transactions$: Observable<TxWithEpoch[]>,
   rewardAccount: Cardano.RewardAccount
 ) => {
-  const stakeKeyHash = Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccount);
+  const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
   return transactions$.pipe(
     map((transactions) =>
       transactions

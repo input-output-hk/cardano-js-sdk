@@ -23,14 +23,15 @@ describe('cip36', () => {
       // - it can also be a separate key agent, then it would be using a different seedphrase,
       //   but right now it's the only way to support voting when stake key is controlled by a HW device.
       const votingKeyAgent: InMemoryKeyAgent = (await testKeyAgent()) as unknown as InMemoryKeyAgent;
-      votingKeyPair = util.toEd25519KeyPair(
+      votingKeyPair = await util.toEd25519KeyPair(
         await votingKeyAgent.exportExtendedKeyPair([
           cip36.VotingKeyDerivationPath.PURPOSE,
           cip36.VotingKeyDerivationPath.COIN_TYPE,
-          util.harden(walletKeyAgent.accountIndex), // using same account index as wallet's key agent here
+          walletKeyAgent.accountIndex, // using same account index as wallet's key agent here
           0, // chain as per cip36
           0 // address_index as per cip36
-        ])
+        ]),
+        votingKeyAgent.bip32Ed25519
       );
     });
 

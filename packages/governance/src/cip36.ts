@@ -1,6 +1,6 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import { CML, Cardano, coreToCml, util } from '@cardano-sdk/core';
-import { util as keyManagementUtil } from '@cardano-sdk/key-management';
-import { usingAutoFree } from '@cardano-sdk/util';
+import { HexBlob, usingAutoFree } from '@cardano-sdk/util';
 import blake2b from 'blake2b';
 
 /**
@@ -20,15 +20,15 @@ export const SIG_MAP_KEY = 1n;
  * CIP-36 voting key derivation path constants
  */
 export enum VotingKeyDerivationPath {
-  PURPOSE = keyManagementUtil.harden(1694),
-  COIN_TYPE = keyManagementUtil.harden(1815)
+  PURPOSE = 1694,
+  COIN_TYPE = 1815
 }
 
 /**
  * Voting power delegation to a specified voting key
  */
 export interface GovernanceKeyDelegation {
-  votingKey: Cardano.Ed25519PublicKey;
+  votingKey: Crypto.Ed25519PublicKeyHex;
   /**
    * Integer >0
    */
@@ -44,7 +44,7 @@ export enum VotingPurpose {
 
 export interface BuildVotingRegistrationProps {
   delegations: GovernanceKeyDelegation[];
-  stakeKey: Cardano.Ed25519PublicKey;
+  stakeKey: Crypto.Ed25519PublicKeyHex;
   rewardAccount: Cardano.RewardAccount;
   purpose: VotingPurpose;
   nonce?: number;
@@ -57,7 +57,7 @@ export interface BlobSigner {
   /**
    * Sign blob with some key
    */
-  signBlob(blob: Cardano.util.HexBlob): Promise<Cardano.Ed25519Signature>;
+  signBlob(blob: HexBlob): Promise<Crypto.Ed25519SignatureHex>;
 }
 
 export const metadataBuilder = {

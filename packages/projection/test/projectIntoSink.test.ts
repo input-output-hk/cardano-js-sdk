@@ -1,3 +1,4 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, ChainSyncEventType, ChainSyncRollForward } from '@cardano-sdk/core';
 import { InvalidIntersectionError, projectIntoSink, projections, sinks } from '../src';
 import { StubChainSyncData, dataWithPoolRetirement, dataWithStakeKeyDeregistration } from './events';
@@ -42,7 +43,7 @@ describe('projectIntoSink', () => {
     it('projects stakeKeys', async () => {
       await projectAll(dataWithStakeKeyDeregistration, inMemorySinks);
       expect(store.stakeKeys).toEqual(
-        new Set([Cardano.Ed25519KeyHash('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')])
+        new Set([Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')])
       );
     });
   });
@@ -66,7 +67,7 @@ describe('projectIntoSink', () => {
   });
 
   it('resuming from a fork rolls back and continues from intersection', async () => {
-    const rolledBackKey = Cardano.Ed25519KeyHash('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857c');
+    const rolledBackKey = Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857c');
     store.stakeKeys.add(rolledBackKey);
     await lastValueFrom(
       concat(

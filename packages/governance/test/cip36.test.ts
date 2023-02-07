@@ -1,7 +1,9 @@
 /* eslint-disable max-len */
+import * as Crypto from '@cardano-sdk/crypto';
 import { CML, Cardano, coreToCml } from '@cardano-sdk/core';
 import { cip36 } from '../src';
 import { usingAutoFree } from '@cardano-sdk/util';
+
 import delay from 'delay';
 
 describe('cip36', () => {
@@ -10,13 +12,13 @@ describe('cip36', () => {
       const props: cip36.BuildVotingRegistrationProps = {
         delegations: [
           {
-            votingKey: Cardano.Ed25519PublicKey('a6a3c0447aeb9cc54cf6422ba32b294e5e1c3ef6d782f2acff4a70694c4d1663'),
+            votingKey: Crypto.Ed25519PublicKeyHex('a6a3c0447aeb9cc54cf6422ba32b294e5e1c3ef6d782f2acff4a70694c4d1663'),
             weight: 1
           }
         ],
         purpose: cip36.VotingPurpose.CATALYST,
         rewardAccount: Cardano.RewardAccount('stake_test1uzhr5zn6akj2affzua8ylcm8t872spuf5cf6tzjrvnmwemcehgcjm'),
-        stakeKey: Cardano.Ed25519PublicKey('86870efc99c453a873a16492ce87738ec79a0ebd064379a62e2c9cf4e119219e')
+        stakeKey: Crypto.Ed25519PublicKeyHex('86870efc99c453a873a16492ce87738ec79a0ebd064379a62e2c9cf4e119219e')
       };
       const getNonce = (metadata: Cardano.TxMetadata) =>
         (metadata.get(61_284n) as Cardano.MetadatumMap).get(4n) as bigint;
@@ -30,18 +32,18 @@ describe('cip36', () => {
       const votingRegistrationMetadata = cip36.metadataBuilder.buildVotingRegistration({
         delegations: [
           {
-            votingKey: Cardano.Ed25519PublicKey('a6a3c0447aeb9cc54cf6422ba32b294e5e1c3ef6d782f2acff4a70694c4d1663'),
+            votingKey: Crypto.Ed25519PublicKeyHex('a6a3c0447aeb9cc54cf6422ba32b294e5e1c3ef6d782f2acff4a70694c4d1663'),
             weight: 1
           },
           {
-            votingKey: Cardano.Ed25519PublicKey('00588e8e1d18cba576a4d35758069fe94e53f638b6faf7c07b8abd2bc5c5cdee'),
+            votingKey: Crypto.Ed25519PublicKeyHex('00588e8e1d18cba576a4d35758069fe94e53f638b6faf7c07b8abd2bc5c5cdee'),
             weight: 3
           }
         ],
         nonce: 1234,
         purpose: cip36.VotingPurpose.CATALYST,
         rewardAccount: Cardano.RewardAccount('stake_test1uzhr5zn6akj2affzua8ylcm8t872spuf5cf6tzjrvnmwemcehgcjm'),
-        stakeKey: Cardano.Ed25519PublicKey('86870efc99c453a873a16492ce87738ec79a0ebd064379a62e2c9cf4e119219e')
+        stakeKey: Crypto.Ed25519PublicKeyHex('86870efc99c453a873a16492ce87738ec79a0ebd064379a62e2c9cf4e119219e')
       });
       expect(
         Buffer.from(
@@ -52,10 +54,12 @@ describe('cip36', () => {
       );
       const signedCip36Metadata = await cip36.metadataBuilder.signVotingRegistration(votingRegistrationMetadata, {
         signBlob: async (blob) => {
-          const privateStakeKey = CML.PrivateKey.from_normal_bytes(
-            Buffer.from('f5beaeff7932a4164d270afde7716067582412e8977e67986cd9b456fc082e3a', 'hex')
+          const bip32Ed25519 = new Crypto.CmlBip32Ed25519(CML);
+          const privateStakeKey = Crypto.Ed25519PrivateNormalKeyHex(
+            'f5beaeff7932a4164d270afde7716067582412e8977e67986cd9b456fc082e3a'
           );
-          return Cardano.Ed25519Signature(privateStakeKey.sign(Buffer.from(blob, 'hex')).to_hex());
+
+          return bip32Ed25519.sign(privateStakeKey, blob);
         }
       });
       expect((signedCip36Metadata.get(61_285n) as Cardano.MetadatumMap).get(1n)).toEqual(

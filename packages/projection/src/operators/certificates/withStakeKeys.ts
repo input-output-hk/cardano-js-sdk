@@ -1,11 +1,12 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
 import { WithCertificates } from './withCertificates';
 import { unifiedProjectorOperator } from '../utils';
 
 export interface WithStakeKeys {
   stakeKeys: {
-    register: Set<Cardano.Ed25519KeyHash>;
-    deregister: Set<Cardano.Ed25519KeyHash>;
+    register: Set<Crypto.Ed25519KeyHashHex>;
+    deregister: Set<Crypto.Ed25519KeyHashHex>;
   };
 }
 
@@ -20,8 +21,8 @@ export interface WithStakeKeys {
  * ignoring **when** they were registered or unregistered.
  */
 export const withStakeKeys = unifiedProjectorOperator<WithCertificates, WithStakeKeys>((evt) => {
-  const register = new Set<Cardano.Ed25519KeyHash>();
-  const deregister = new Set<Cardano.Ed25519KeyHash>();
+  const register = new Set<Crypto.Ed25519KeyHashHex>();
+  const deregister = new Set<Crypto.Ed25519KeyHashHex>();
   for (const { certificate } of evt.certificates)
     switch (certificate.__typename) {
       case Cardano.CertificateType.StakeKeyRegistration:

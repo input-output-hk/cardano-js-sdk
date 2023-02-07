@@ -3,6 +3,7 @@ import { AsyncKeyAgent } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import { logger } from '@cardano-sdk/util-dev';
 
+import { Bip32PublicKeyHex } from '@cardano-sdk/crypto';
 import {
   WalletManagerUi,
   consumeRemoteApi,
@@ -32,7 +33,7 @@ describe('WalletManagerUi', () => {
   const exposeApiMock = exposeApi as jest.Mock;
   const consumeRemoteApiMock = consumeRemoteApi as jest.Mock;
 
-  const pubKey = Cardano.Bip32PublicKey(
+  const pubKey = Bip32PublicKeyHex(
     // eslint-disable-next-line max-len
     '3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d'
   );

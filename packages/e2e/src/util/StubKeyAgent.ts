@@ -1,3 +1,4 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import {
   AccountAddressDerivationPath,
   AccountKeyDerivationPath,
@@ -8,6 +9,7 @@ import {
   SignTransactionOptions
 } from '@cardano-sdk/key-management';
 import { Cardano, NotImplementedError } from '@cardano-sdk/core';
+import { HexBlob } from '@cardano-sdk/util';
 
 export class StubKeyAgent implements KeyAgent {
   readonly #knownAddresses: GroupedAddress[];
@@ -18,6 +20,10 @@ export class StubKeyAgent implements KeyAgent {
 
   get knownAddresses(): GroupedAddress[] {
     return this.#knownAddresses;
+  }
+
+  get bip32Ed25519(): Crypto.Bip32Ed25519 {
+    throw new NotImplementedError('bip32Ed25519');
   }
 
   get chainId(): Cardano.ChainId {
@@ -32,7 +38,7 @@ export class StubKeyAgent implements KeyAgent {
     throw new NotImplementedError('serializableData');
   }
 
-  get extendedAccountPublicKey(): Cardano.Bip32PublicKey {
+  get extendedAccountPublicKey(): Crypto.Bip32PublicKeyHex {
     throw new NotImplementedError('extendedAccountPublicKey');
   }
 
@@ -40,11 +46,11 @@ export class StubKeyAgent implements KeyAgent {
     throw new NotImplementedError('deriveAddress');
   }
 
-  derivePublicKey(_derivationPath: AccountKeyDerivationPath): Promise<Cardano.Ed25519PublicKey> {
+  derivePublicKey(_derivationPath: AccountKeyDerivationPath): Promise<Crypto.Ed25519PublicKeyHex> {
     throw new NotImplementedError('derivePublicKey');
   }
 
-  signBlob(_derivationPath: AccountKeyDerivationPath, _blob: Cardano.util.HexBlob): Promise<SignBlobResult> {
+  signBlob(_derivationPath: AccountKeyDerivationPath, _blob: HexBlob): Promise<SignBlobResult> {
     throw new NotImplementedError('signBlob');
   }
 
@@ -55,7 +61,7 @@ export class StubKeyAgent implements KeyAgent {
     throw new NotImplementedError('signTransaction');
   }
 
-  exportRootPrivateKey(): Promise<Cardano.Bip32PrivateKey> {
+  exportRootPrivateKey(): Promise<Crypto.Bip32PrivateKeyHex> {
     throw new NotImplementedError('exportRootPrivateKey');
   }
 }

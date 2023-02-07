@@ -1,4 +1,5 @@
 import * as Cardano from '../../Cardano';
+import * as Crypto from '@cardano-sdk/crypto';
 import {
   AddrAttributes,
   Address,
@@ -385,7 +386,7 @@ const txInputs = (scope: ManagedFreeableScope, coreInputs: Cardano.TxIn[]) => {
   return cslInputs;
 };
 
-const keyHashes = (scope: ManagedFreeableScope, coreHashes: Cardano.Ed25519KeyHash[]) => {
+const keyHashes = (scope: ManagedFreeableScope, coreHashes: Crypto.Ed25519KeyHashHex[]) => {
   const cslKeyHashes = scope.manage(Ed25519KeyHashes.new());
   for (const signature of coreHashes) {
     cslKeyHashes.add(scope.manage(Ed25519KeyHash.from_bytes(Buffer.from(signature, 'hex'))));

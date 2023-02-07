@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import * as Crypto from '@cardano-sdk/crypto';
 import * as envalid from 'envalid';
 import { Cardano, createSlotEpochCalc } from '@cardano-sdk/core';
 import {
@@ -239,13 +240,18 @@ export const submitCertificate = async (certificate: Cardano.Certificate, wallet
  *
  * @param mnemonics The random set of mnemonics.
  * @param genesis Network genesis parameters
+ * @param bip32Ed25519 The Ed25519 cryptography implementation.
  */
-export const createStandaloneKeyAgent = async (mnemonics: string[], genesis: Cardano.CompactGenesis) =>
+export const createStandaloneKeyAgent = async (
+  mnemonics: string[],
+  genesis: Cardano.CompactGenesis,
+  bip32Ed25519: Crypto.Bip32Ed25519
+) =>
   await InMemoryKeyAgent.fromBip39MnemonicWords(
     {
       chainId: genesis,
       getPassword: async () => Buffer.from(''),
       mnemonicWords: mnemonics
     },
-    { inputResolver: { resolveInputAddress: async () => null }, logger }
+    { bip32Ed25519, inputResolver: { resolveInputAddress: async () => null }, logger }
   );

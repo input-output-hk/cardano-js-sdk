@@ -74,7 +74,8 @@ describe('local-network/register-pool', () => {
       role: KeyRole.External
     });
 
-    const poolKeyHash = Cardano.Ed25519KeyHash.fromKey(poolPubKey);
+    const bip32Ed25519 = await poolKeyAgent.getBip32Ed25519();
+    const poolKeyHash = await bip32Ed25519.getPubKeyHash(poolPubKey);
     const poolId = Cardano.PoolId.fromKeyHash(poolKeyHash);
     const poolRewardAccount = (
       await poolKeyAgent.deriveAddress({
@@ -104,7 +105,7 @@ describe('local-network/register-pool', () => {
     };
 
     const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);
-    const stakeKeyHash = Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccounts[0].address);
+    const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccounts[0].address);
 
     await submitCertificate(registrationCert, wallet1);
 
@@ -155,7 +156,8 @@ describe('local-network/register-pool', () => {
       role: KeyRole.External
     });
 
-    const poolKeyHash = Cardano.Ed25519KeyHash.fromKey(poolPubKey);
+    const bip32Ed25519 = await poolKeyAgent.getBip32Ed25519();
+    const poolKeyHash = await bip32Ed25519.getPubKeyHash(poolPubKey);
     const poolId = Cardano.PoolId.fromKeyHash(poolKeyHash);
     const poolRewardAccount = (
       await poolKeyAgent.deriveAddress({
@@ -185,7 +187,7 @@ describe('local-network/register-pool', () => {
     };
 
     const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);
-    const stakeKeyHash = Cardano.Ed25519KeyHash.fromRewardAccount(rewardAccounts[0].address);
+    const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccounts[0].address);
 
     await submitCertificate(registrationCert, wallet2);
 

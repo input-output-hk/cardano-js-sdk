@@ -76,6 +76,7 @@
   },
   "dependencies": {
     "@cardano-sdk/core": "^0.8.0-nightly.3",
+    "@cardano-sdk/crypto": "^0.1.0",
     "@cardano-sdk/dapp-connector": "^0.6.2-nightly.3",
     "@cardano-sdk/input-selection": "^0.7.1-nightly.3",
     "@cardano-sdk/key-management": "^0.3.1-nightly.3",

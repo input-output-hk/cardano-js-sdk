@@ -1,17 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable promise/always-return */
 /* eslint-disable brace-style */
-import { Cardano } from '@cardano-sdk/core';
 import { EMPTY, Observable, from } from 'rxjs';
 import { KeyValueCollection, KeyValueStore } from '../types';
 import { Logger } from 'ts-log';
+import { OpaqueString } from '@cardano-sdk/util';
 import { PouchDbStore } from './PouchDbStore';
 import { sanitizePouchDbDoc } from './util';
 
 /**
  * PouchDB database that implements KeyValueStore by using keys as document _id
  */
-export class PouchDbKeyValueStore<K extends string | Cardano.util.OpaqueString<any>, V extends {}>
+export class PouchDbKeyValueStore<K extends string | OpaqueString<any>, V extends {}>
   extends PouchDbStore<V>
   implements KeyValueStore<K, V>
 {

@@ -1,8 +1,11 @@
-import { usingAutoFree } from '@cardano-sdk/util';
-
 import { CML } from '../../CML';
-import { InvalidStringError } from '../../errors';
-import { OpaqueString, assertIsBech32WithPrefix, assertIsHexString } from '../util/primitives';
+import {
+  InvalidStringError,
+  OpaqueString,
+  assertIsBech32WithPrefix,
+  assertIsHexString,
+  usingAutoFree
+} from '@cardano-sdk/util';
 import { isAddress } from '../util/address';
 
 /**

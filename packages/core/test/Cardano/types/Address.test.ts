@@ -1,4 +1,5 @@
-import { Cardano, InvalidStringError } from '../../../src';
+import { Cardano } from '../../../src';
+import { InvalidStringError } from '@cardano-sdk/util';
 
 // eslint-disable-next-line sonarjs/no-duplicate-string
 jest.mock('../../../src/Cardano/util/address', () => {

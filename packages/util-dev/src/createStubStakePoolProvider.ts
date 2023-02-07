@@ -8,9 +8,10 @@ export const somePartialStakePools: Cardano.StakePool[] = [
         activeStake: 1_000_000_000_000n,
         epoch: Cardano.EpochNo(123),
         epochLength: 432_000_000,
+        leaderRewards: 1_000_000n,
         memberROI: Cardano.Percent(0.000_68),
-        operatorFees: 340n + 50n,
-        totalRewards: 680n
+        memberRewards: 2_000_000n,
+        pledge: 1_000_000_000n
       }
     ],
     hexId: Cardano.PoolIdHex('cf12a9dcaacdc09778616d60502011a88ed4542c482f2ddd08d8ac5a'),

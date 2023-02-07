@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Cardano from '../Cardano';
+import * as Crypto from '@cardano-sdk/crypto';
 import * as toCml from '../CML/coreToCml';
 import { SerializationError, SerializationFailure } from '../';
 import { usingAutoFree } from '@cardano-sdk/util';
@@ -35,7 +36,7 @@ export const jsonToNativeScript = (json: any): Cardano.NativeScript => {
     case 'sig': {
       coreScript = {
         __type: Cardano.ScriptType.Native,
-        keyHash: Cardano.Ed25519KeyHash(json.keyHash),
+        keyHash: Crypto.Ed25519KeyHashHex(json.keyHash),
         kind: Cardano.NativeScriptKind.RequireSignature
       };
 

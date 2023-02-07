@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import * as Crypto from '@cardano-sdk/crypto';
 import { AuthenticationError, TransportError } from './errors';
 import { Cardano, NotImplementedError, coreToCml } from '@cardano-sdk/core';
 import {
@@ -163,7 +164,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
     deviceConnection,
     communicationType,
     accountIndex
-  }: GetLedgerXpubProps): Promise<Cardano.Bip32PublicKey> {
+  }: GetLedgerXpubProps): Promise<Crypto.Bip32PublicKeyHex> {
     try {
       const recoveredDeviceConnection = await LedgerKeyAgent.checkDeviceConnection(communicationType, deviceConnection);
       const derivationPath = `${CardanoKeyConst.PURPOSE}'/${CardanoKeyConst.COIN_TYPE}'/${accountIndex}'`;
@@ -171,7 +172,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
         path: utils.str_to_path(derivationPath) // BIP32Path
       });
       const xPubHex = `${extendedPublicKey.publicKeyHex}${extendedPublicKey.chainCodeHex}`;
-      return Cardano.Bip32PublicKey(xPubHex);
+      return Crypto.Bip32PublicKeyHex(xPubHex);
     } catch (error: any) {
       if (error.code === 28_169) {
         throw new AuthenticationError('Failed to export extended account public key', error);
@@ -239,14 +240,14 @@ export class LedgerKeyAgent extends KeyAgentBase {
       );
       const result = await deviceConnection.signTransaction(ledgerTxData);
 
-      return new Map<Cardano.Ed25519PublicKey, Cardano.Ed25519Signature>(
+      return new Map<Crypto.Ed25519PublicKeyHex, Crypto.Ed25519SignatureHex>(
         await Promise.all(
           result.witnesses.map(async (witness) => {
             const publicKey = await this.derivePublicKey({
               index: witness.path[Cip1852PathLevelIndexes.INDEX],
               role: witness.path[Cip1852PathLevelIndexes.ROLE]
             });
-            const signature = Cardano.Ed25519Signature(witness.witnessSignatureHex);
+            const signature = Crypto.Ed25519SignatureHex(witness.witnessSignatureHex);
             return [publicKey, signature] as const;
           })
         )
@@ -265,7 +266,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
     throw new NotImplementedError('signBlob');
   }
 
-  async exportRootPrivateKey(): Promise<Cardano.Bip32PrivateKey> {
+  async exportRootPrivateKey(): Promise<Crypto.Bip32PrivateKeyHex> {
     throw new NotImplementedError('Operation not supported!');
   }
 }

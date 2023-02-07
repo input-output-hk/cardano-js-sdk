@@ -22,7 +22,6 @@ describe('SingleAddressWallet.assets/nft', () => {
   let assetIds: Cardano.AssetId[];
   let fingerprints: Cardano.AssetFingerprint[];
   const assetNames = ['4e46542d66696c6573', '4e46542d303031', '4e46542d303032'];
-
   let walletAddress: Cardano.Address;
 
   beforeAll(async () => {
@@ -32,14 +31,18 @@ describe('SingleAddressWallet.assets/nft', () => {
 
     const genesis = await firstValueFrom(wallet.genesisParameters$);
 
-    const keyAgent = await createStandaloneKeyAgent(util.generateMnemonicWords(), genesis);
+    const keyAgent = await createStandaloneKeyAgent(
+      util.generateMnemonicWords(),
+      genesis,
+      await wallet.keyAgent.getBip32Ed25519()
+    );
 
     const pubKey = await keyAgent.derivePublicKey({
       index: 0,
       role: KeyRole.External
     });
 
-    const keyHash = Cardano.Ed25519KeyHash.fromKey(pubKey);
+    const keyHash = await keyAgent.bip32Ed25519.getPubKeyHash(pubKey);
 
     policySigner = new util.KeyAgentTransactionSigner(keyAgent, {
       index: 0,

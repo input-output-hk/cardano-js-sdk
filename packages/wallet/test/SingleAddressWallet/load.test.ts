@@ -1,5 +1,6 @@
 /* eslint-disable max-statements */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import * as Crypto from '@cardano-sdk/crypto';
 import * as mocks from '../mocks';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
 import {
@@ -10,9 +11,9 @@ import {
   somePartialStakePools
 } from '@cardano-sdk/util-dev';
 import {
+  CML,
   Cardano,
   ChainHistoryProvider,
-  InvalidStringError,
   NetworkInfoProvider,
   RewardsProvider,
   UtxoProvider,
@@ -26,6 +27,7 @@ import {
   SingleAddressWallet,
   setupWallet
 } from '../../src';
+import { InvalidStringError } from '@cardano-sdk/util';
 import { ReplaySubject, firstValueFrom } from 'rxjs';
 import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
 import { currentEpoch, networkInfo, queryTransactionsResult, queryTransactionsResult2 } from '../mocks';
@@ -49,6 +51,7 @@ interface Providers {
 
 const createWallet = async (stores: WalletStores, providers: Providers, pollingConfig?: PollingConfig) => {
   const { wallet } = await setupWallet({
+    bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
     createKeyAgent: async (dependencies) => {
       const groupedAddress: GroupedAddress = {
         accountIndex: 0,

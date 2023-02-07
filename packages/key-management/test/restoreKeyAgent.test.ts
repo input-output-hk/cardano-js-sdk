@@ -1,3 +1,4 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import {
   AddressType,
   CommunicationType,
@@ -9,13 +10,17 @@ import {
   SerializableTrezorKeyAgentData,
   restoreKeyAgent
 } from '../src';
-import { Cardano } from '@cardano-sdk/core';
+import { CML, Cardano } from '@cardano-sdk/core';
 import { InvalidSerializableDataError } from '../src/errors';
 import { STAKE_KEY_DERIVATION_PATH } from '../src/util';
 import { dummyLogger } from 'ts-log';
 
 describe('KeyManagement/restoreKeyAgent', () => {
-  const dependencies: KeyAgentDependencies = { inputResolver: { resolveInputAddress: jest.fn() }, logger: dummyLogger };
+  const dependencies: KeyAgentDependencies = {
+    bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
+    inputResolver: { resolveInputAddress: jest.fn() },
+    logger: dummyLogger
+  };
 
   describe('InMemoryKeyAgent', () => {
     const encryptedRootPrivateKeyBytes = [
@@ -32,7 +37,7 @@ describe('KeyManagement/restoreKeyAgent', () => {
       'addr1qx52knza2h5x090n4a5r7yraz3pwcamk9ppvuh7e26nfks7pnmhxqavtqy02zezklh27jt9r6z62sav3mugappdc7xnskxy2pn'
     );
 
-    const extendedAccountPublicKey = Cardano.Bip32PublicKey(
+    const extendedAccountPublicKey = Crypto.Bip32PublicKeyHex(
       // eslint-disable-next-line max-len
       '6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d396199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d39'
     );
@@ -112,7 +117,7 @@ describe('KeyManagement/restoreKeyAgent', () => {
       accountIndex: 0,
       chainId: Cardano.ChainIds.LegacyTestnet,
       communicationType: CommunicationType.Node,
-      extendedAccountPublicKey: Cardano.Bip32PublicKey(
+      extendedAccountPublicKey: Crypto.Bip32PublicKeyHex(
         // eslint-disable-next-line max-len
         'fc5ab25e830b67c47d0a17411bf7fdabf711a597fb6cf04102734b0a2934ceaaa65ff5e7c52498d52c07b8ddfcd436fc2b4d2775e2984a49d0c79f65ceee4779'
       ),
@@ -142,7 +147,7 @@ describe('KeyManagement/restoreKeyAgent', () => {
       __typename: KeyAgentType.Trezor,
       accountIndex: 0,
       chainId: Cardano.ChainIds.LegacyTestnet,
-      extendedAccountPublicKey: Cardano.Bip32PublicKey(
+      extendedAccountPublicKey: Crypto.Bip32PublicKeyHex(
         // eslint-disable-next-line max-len
         'fc5ab25e830b67c47d0a17411bf7fdabf711a597fb6cf04102734b0a2934ceaaa65ff5e7c52498d52c07b8ddfcd436fc2b4d2775e2984a49d0c79f65ceee4779'
       ),

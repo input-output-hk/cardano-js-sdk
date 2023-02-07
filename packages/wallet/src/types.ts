@@ -1,3 +1,4 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import { Asset, Cardano, EpochInfo, EraSummary, NetworkInfoProvider } from '@cardano-sdk/core';
 import { BalanceTracker, DelegationTracker, TransactionalObservables, TransactionsTracker } from './services';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
@@ -15,8 +16,8 @@ export type InitializeTxProps = {
   };
   collaterals?: Set<Cardano.TxIn>;
   mint?: Cardano.TokenMap;
-  scriptIntegrityHash?: Cardano.util.Hash32ByteBase16;
-  requiredExtraSignatures?: Cardano.Ed25519KeyHash[];
+  scriptIntegrityHash?: Crypto.Hash32ByteBase16;
+  requiredExtraSignatures?: Crypto.Ed25519KeyHashHex[];
   extraSigners?: TransactionSigner[];
   signingOptions?: SignTransactionOptions;
   scripts?: Cardano.Script[];

@@ -11,12 +11,13 @@ import { BuildInfo, HttpServer, HttpServerConfig, HttpService } from '../Http';
 import { CardanoNode } from '@cardano-sdk/core';
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../ChainHistory';
 import { CommonProgramOptions, ProgramOptionDescriptions } from './Options';
-import { DbSyncEpochPollService } from '../util';
+import { DbSyncEpochPollService, loadGenesisData } from '../util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../NetworkInfo';
 import { DbSyncRewardsProvider, RewardsHttpService } from '../Rewards';
 import { DbSyncStakePoolProvider, StakePoolHttpService, createHttpStakePoolExtMetadataService } from '../StakePool';
 import { DbSyncUtxoProvider, UtxoHttpService } from '../Utxo';
 import { DnsResolver, createDnsResolver, shouldInitCardanoNode } from './utils';
+import { GenesisData } from '../types';
 import { InMemoryCache } from '../InMemoryCache';
 import { Logger } from 'ts-log';
 import { MissingProgramOption, MissingServiceDependency, RunnableDependencies, UnknownServiceName } from './errors';
@@ -76,13 +77,17 @@ export interface ProgramArgs {
   options?: HttpServerOptions;
 }
 
-const serviceMapFactory = (
-  args: ProgramArgs,
-  logger: Logger,
-  dnsResolver: DnsResolver,
-  dbConnection?: pg.Pool,
-  node?: OgmiosCardanoNode
-) => {
+interface ServiceMapFactoryOptions {
+  args: ProgramArgs;
+  dbConnection?: pg.Pool;
+  dnsResolver: DnsResolver;
+  genesisData?: GenesisData;
+  logger: Logger;
+  node?: OgmiosCardanoNode;
+}
+
+const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
+  const { args, dbConnection, dnsResolver, genesisData, logger, node } = options;
   const withDbSyncProvider =
     <T>(factory: (db: pg.Pool, cardanoNode: CardanoNode) => T, serviceName: ServiceNames) =>
     () => {
@@ -120,6 +125,8 @@ const serviceMapFactory = (
       return new AssetHttpService({ assetProvider, logger });
     }, ServiceNames.Asset),
     [ServiceNames.StakePool]: withDbSyncProvider(async (db, cardanoNode) => {
+      if (!genesisData)
+        throw new MissingProgramOption(ServiceNames.StakePool, ProgramOptionDescriptions.CardanoNodeConfigPath);
       const stakePoolProvider = new DbSyncStakePoolProvider(
         { paginationPageSizeLimit: args.options!.paginationPageSizeLimit! },
         {
@@ -127,6 +134,7 @@ const serviceMapFactory = (
           cardanoNode,
           db,
           epochMonitor: getEpochMonitor(db),
+          genesisData,
           logger,
           metadataService: createHttpStakePoolExtMetadataService(logger)
         }
@@ -154,18 +162,16 @@ const serviceMapFactory = (
       return new RewardsHttpService({ logger, rewardsProvider });
     }, ServiceNames.Rewards),
     [ServiceNames.NetworkInfo]: withDbSyncProvider(async (db, cardanoNode) => {
-      if (args.options?.cardanoNodeConfigPath === undefined)
+      if (!genesisData)
         throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.CardanoNodeConfigPath);
-      const networkInfoProvider = new DbSyncNetworkInfoProvider(
-        { cardanoNodeConfigPath: args.options.cardanoNodeConfigPath },
-        {
-          cache: new InMemoryCache(args.options!.dbCacheTtl!),
-          cardanoNode,
-          db,
-          epochMonitor: getEpochMonitor(db),
-          logger
-        }
-      );
+      const networkInfoProvider = new DbSyncNetworkInfoProvider({
+        cache: new InMemoryCache(args.options!.dbCacheTtl!),
+        cardanoNode,
+        db,
+        epochMonitor: getEpochMonitor(db),
+        genesisData,
+        logger
+      });
       return new NetworkInfoHttpService({ logger, networkInfoProvider });
     }, ServiceNames.NetworkInfo),
     [ServiceNames.TxSubmit]: async () => {
@@ -176,6 +182,7 @@ const serviceMapFactory = (
     }
   };
 };
+
 export const loadHttpServer = async (args: ProgramArgs, deps: LoadHttpServerDependencies = {}): Promise<HttpServer> => {
   const { apiUrl, options, serviceNames } = args;
   const services: HttpService[] = [];
@@ -198,7 +205,10 @@ export const loadHttpServer = async (args: ProgramArgs, deps: LoadHttpServerDepe
   const cardanoNode = shouldInitCardanoNode(serviceNames)
     ? await getOgmiosCardanoNode(dnsResolver, logger, options)
     : undefined;
-  const serviceMap = serviceMapFactory(args, logger, dnsResolver, db, cardanoNode);
+  const genesisData = options?.cardanoNodeConfigPath
+    ? await loadGenesisData(options?.cardanoNodeConfigPath)
+    : undefined;
+  const serviceMap = serviceMapFactory({ args, dbConnection: db, dnsResolver, genesisData, logger, node: cardanoNode });
 
   for (const serviceName of serviceNames) {
     if (serviceMap[serviceName]) {

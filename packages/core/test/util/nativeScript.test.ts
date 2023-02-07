@@ -1,5 +1,6 @@
 import * as Cardano from '../../src/Cardano';
-import { Ed25519KeyHash, NativeScript, NativeScriptKind, ScriptType, Slot } from '../../src/Cardano';
+import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
+import { NativeScript, NativeScriptKind, ScriptType, Slot } from '../../src/Cardano';
 import { jsonToNativeScript, nativeScriptPolicyId } from '../../src';
 
 describe('nativeScript utils', () => {
@@ -10,7 +11,7 @@ describe('nativeScript utils', () => {
       scripts: [
         {
           __type: ScriptType.Native,
-          keyHash: Ed25519KeyHash('b275b08c999097247f7c17e77007c7010cd19f20cc086ad99d398538'),
+          keyHash: Ed25519KeyHashHex('b275b08c999097247f7c17e77007c7010cd19f20cc086ad99d398538'),
           kind: NativeScriptKind.RequireSignature
         },
         {
@@ -24,7 +25,7 @@ describe('nativeScript utils', () => {
             },
             {
               __type: ScriptType.Native,
-              keyHash: Ed25519KeyHash('966e394a544f242081e41d1965137b1bb412ac230d40ed5407821c37'),
+              keyHash: Ed25519KeyHashHex('966e394a544f242081e41d1965137b1bb412ac230d40ed5407821c37'),
               kind: NativeScriptKind.RequireSignature
             },
             {
@@ -48,7 +49,7 @@ describe('nativeScript utils', () => {
 
     const expectedScript: NativeScript = {
       __type: Cardano.ScriptType.Native,
-      keyHash: Cardano.Ed25519KeyHash('e09d36c79dec9bd1b3d9e152247701cd0bb860b5ebfd1de8abb6735a'),
+      keyHash: Ed25519KeyHashHex('e09d36c79dec9bd1b3d9e152247701cd0bb860b5ebfd1de8abb6735a'),
       kind: Cardano.NativeScriptKind.RequireSignature
     };
 
@@ -85,17 +86,17 @@ describe('nativeScript utils', () => {
       scripts: [
         {
           __type: Cardano.ScriptType.Native,
-          keyHash: Cardano.Ed25519KeyHash('e09d36c79dec9bd1b3d9e152247701cd0bb860b5ebfd1de8abb6735a'),
+          keyHash: Ed25519KeyHashHex('e09d36c79dec9bd1b3d9e152247701cd0bb860b5ebfd1de8abb6735a'),
           kind: Cardano.NativeScriptKind.RequireSignature
         },
         {
           __type: Cardano.ScriptType.Native,
-          keyHash: Cardano.Ed25519KeyHash('a687dcc24e00dd3caafbeb5e68f97ca8ef269cb6fe971345eb951756'),
+          keyHash: Ed25519KeyHashHex('a687dcc24e00dd3caafbeb5e68f97ca8ef269cb6fe971345eb951756'),
           kind: Cardano.NativeScriptKind.RequireSignature
         },
         {
           __type: Cardano.ScriptType.Native,
-          keyHash: Cardano.Ed25519KeyHash('0bd1d702b2e6188fe0857a6dc7ffb0675229bab58c86638ffa87ed6d'),
+          keyHash: Ed25519KeyHashHex('0bd1d702b2e6188fe0857a6dc7ffb0675229bab58c86638ffa87ed6d'),
           kind: Cardano.NativeScriptKind.RequireSignature
         }
       ]
@@ -133,17 +134,17 @@ describe('nativeScript utils', () => {
       scripts: [
         {
           __type: Cardano.ScriptType.Native,
-          keyHash: Cardano.Ed25519KeyHash('e09d36c79dec9bd1b3d9e152247701cd0bb860b5ebfd1de8abb6735a'),
+          keyHash: Ed25519KeyHashHex('e09d36c79dec9bd1b3d9e152247701cd0bb860b5ebfd1de8abb6735a'),
           kind: Cardano.NativeScriptKind.RequireSignature
         },
         {
           __type: Cardano.ScriptType.Native,
-          keyHash: Cardano.Ed25519KeyHash('a687dcc24e00dd3caafbeb5e68f97ca8ef269cb6fe971345eb951756'),
+          keyHash: Ed25519KeyHashHex('a687dcc24e00dd3caafbeb5e68f97ca8ef269cb6fe971345eb951756'),
           kind: Cardano.NativeScriptKind.RequireSignature
         },
         {
           __type: Cardano.ScriptType.Native,
-          keyHash: Cardano.Ed25519KeyHash('0bd1d702b2e6188fe0857a6dc7ffb0675229bab58c86638ffa87ed6d'),
+          keyHash: Ed25519KeyHashHex('0bd1d702b2e6188fe0857a6dc7ffb0675229bab58c86638ffa87ed6d'),
           kind: Cardano.NativeScriptKind.RequireSignature
         }
       ]
@@ -183,17 +184,17 @@ describe('nativeScript utils', () => {
       scripts: [
         {
           __type: Cardano.ScriptType.Native,
-          keyHash: Cardano.Ed25519KeyHash('e09d36c79dec9bd1b3d9e152247701cd0bb860b5ebfd1de8abb6735a'),
+          keyHash: Ed25519KeyHashHex('e09d36c79dec9bd1b3d9e152247701cd0bb860b5ebfd1de8abb6735a'),
           kind: Cardano.NativeScriptKind.RequireSignature
         },
         {
           __type: Cardano.ScriptType.Native,
-          keyHash: Cardano.Ed25519KeyHash('a687dcc24e00dd3caafbeb5e68f97ca8ef269cb6fe971345eb951756'),
+          keyHash: Ed25519KeyHashHex('a687dcc24e00dd3caafbeb5e68f97ca8ef269cb6fe971345eb951756'),
           kind: Cardano.NativeScriptKind.RequireSignature
         },
         {
           __type: Cardano.ScriptType.Native,
-          keyHash: Cardano.Ed25519KeyHash('0bd1d702b2e6188fe0857a6dc7ffb0675229bab58c86638ffa87ed6d'),
+          keyHash: Ed25519KeyHashHex('0bd1d702b2e6188fe0857a6dc7ffb0675229bab58c86638ffa87ed6d'),
           kind: Cardano.NativeScriptKind.RequireSignature
         }
       ]
@@ -232,7 +233,7 @@ describe('nativeScript utils', () => {
         },
         {
           __type: Cardano.ScriptType.Native,
-          keyHash: Cardano.Ed25519KeyHash('966e394a544f242081e41d1965137b1bb412ac230d40ed5407821c37'),
+          keyHash: Ed25519KeyHashHex('966e394a544f242081e41d1965137b1bb412ac230d40ed5407821c37'),
           kind: Cardano.NativeScriptKind.RequireSignature
         }
       ]
@@ -271,7 +272,7 @@ describe('nativeScript utils', () => {
         },
         {
           __type: Cardano.ScriptType.Native,
-          keyHash: Cardano.Ed25519KeyHash('966e394a544f242081e41d1965137b1bb412ac230d40ed5407821c37'),
+          keyHash: Ed25519KeyHashHex('966e394a544f242081e41d1965137b1bb412ac230d40ed5407821c37'),
           kind: Cardano.NativeScriptKind.RequireSignature
         }
       ]
