@@ -2,13 +2,17 @@ import { AssetInfo } from '../../../src/Asset';
 import { AssetName, Metadatum, PolicyId, TxMetadata } from '../../../src/Cardano';
 import { Cardano } from '../../../src';
 import { fromSerializableObject } from '@cardano-sdk/util';
-import { dummyLogger as logger } from 'ts-log';
+import { logger } from '@cardano-sdk/util-dev';
 import { metadatumToCip25 } from '../../../src/Asset/util';
 
 describe('NftMetadata/metadatumToCip25', () => {
+  const assetNameStringUtf8 = 'CIP0025-v2';
+  const assetNameString = Buffer.from(assetNameStringUtf8).toString('hex');
+  const policyIdString = 'b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a7';
+
   const asset = {
-    name: AssetName('abc123'),
-    policyId: PolicyId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a7')
+    name: AssetName(assetNameString),
+    policyId: PolicyId(policyIdString)
   } as AssetInfo;
 
   const minimalMetadata = new Map([
@@ -174,25 +178,30 @@ describe('NftMetadata/metadatumToCip25', () => {
 
   it('returns null for cip25 metadatum with no metadata for given assetId', () => {
     const metadatum: TxMetadata = new Map([
-      [721n, new Map([[asset.policyId.toString(), new Map([['other_asset_id', minimalMetadata]])]])]
+      [721n, new Map([[policyIdString, new Map([['other_asset_id', minimalMetadata]])]])]
     ]);
     expect(metadatumToCip25(asset, metadatum, logger)).toBeNull();
   });
 
   it('converts minimal metadata', () => {
     const metadatum: TxMetadata = new Map([
-      [721n, new Map([[asset.policyId.toString(), new Map([[asset.name.toString(), minimalMetadata]])]])]
+      [721n, new Map([[policyIdString, new Map([[assetNameString, minimalMetadata]])]])]
     ]);
     expect(metadatumToCip25(asset, metadatum, logger)).toEqual(minimalConvertedMetadata);
   });
 
   it('supports asset name as utf8 string', () => {
     const metadatum: TxMetadata = new Map([
+      [721n, new Map([[policyIdString, new Map([[assetNameStringUtf8, minimalMetadata]])]])]
+    ]);
+    expect(metadatumToCip25(asset, metadatum, logger)).toEqual(minimalConvertedMetadata);
+  });
+
+  it('supports CIP-0025 v2', () => {
+    const metadatum: TxMetadata = new Map([
       [
         721n,
-        new Map([
-          [asset.policyId.toString(), new Map([[Buffer.from(asset.name.toString()).toString('utf8'), minimalMetadata]])]
-        ])
+        new Map([[Buffer.from(policyIdString, 'hex'), new Map([[Buffer.from(assetNameStringUtf8), minimalMetadata]])]])
       ]
     ]);
     expect(metadatumToCip25(asset, metadatum, logger)).toEqual(minimalConvertedMetadata);
@@ -204,9 +213,9 @@ describe('NftMetadata/metadatumToCip25', () => {
         721n,
         new Map([
           [
-            asset.policyId.toString(),
+            policyIdString,
             new Map<Metadatum, Metadatum>([
-              [asset.name.toString(), minimalMetadata],
+              [assetNameString, minimalMetadata],
               ['version', '2.0']
             ])
           ]
@@ -225,10 +234,10 @@ describe('NftMetadata/metadatumToCip25', () => {
         721n,
         new Map([
           [
-            asset.policyId.toString(),
+            policyIdString,
             new Map<Metadatum, Metadatum>([
               [
-                asset.name.toString(),
+                assetNameString,
                 new Map([
                   ...minimalMetadata.entries(),
                   ['description', 'description'],
@@ -266,10 +275,10 @@ describe('NftMetadata/metadatumToCip25', () => {
         721n,
         new Map([
           [
-            asset.policyId.toString(),
+            policyIdString,
             new Map<Metadatum, Metadatum>([
               [
-                asset.name.toString(),
+                assetNameString,
                 new Map<Metadatum, Metadatum>([...minimalMetadata.entries(), ['files', [file1, file2]]])
               ]
             ])
