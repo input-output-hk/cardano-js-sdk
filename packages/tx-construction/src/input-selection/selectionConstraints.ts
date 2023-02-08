@@ -1,4 +1,4 @@
-import { CML, InvalidProtocolParametersError, cmlUtil, coreToCml } from '@cardano-sdk/core';
+import { CML, Cardano, InvalidProtocolParametersError, cmlUtil, coreToCml } from '@cardano-sdk/core';
 import {
   ComputeMinimumCoinQuantity,
   ComputeSelectionLimit,
@@ -8,10 +8,11 @@ import {
   SelectionConstraints,
   SelectionSkeleton,
   TokenBundleSizeExceedsLimit
-} from './types';
-import { ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
+} from '@cardano-sdk/input-selection';
+import { MinFeeCoefficient, MinFeeConstant, minAdaRequired, minFee } from '../fees';
+import { usingAutoFree } from '@cardano-sdk/util';
 
-export type BuildTx = (selection: SelectionSkeleton, scope: ManagedFreeableScope) => Promise<CML.Transaction>;
+export type BuildTx = (selection: SelectionSkeleton) => Promise<Cardano.Tx>;
 
 export interface DefaultSelectionConstraintsProps {
   protocolParameters: ProtocolParametersForInputSelection;
@@ -22,48 +23,21 @@ export const computeMinimumCost =
   (
     {
       minFeeCoefficient,
-      minFeeConstant
-    }: Pick<ProtocolParametersRequiredByInputSelection, 'minFeeCoefficient' | 'minFeeConstant'>,
+      minFeeConstant,
+      prices
+    }: Pick<ProtocolParametersRequiredByInputSelection, 'minFeeCoefficient' | 'minFeeConstant' | 'prices'>,
     buildTx: BuildTx
   ): EstimateTxFee =>
-  (selection) =>
-    usingAutoFree(async (scope) => {
-      const tx = await buildTx(selection, scope);
+  async (selection) => {
+    const tx = await buildTx(selection);
 
-      // TODO: Get this from cardano-services
-      const priceMem = scope.manage(
-        CML.UnitInterval.new(scope.manage(CML.BigNum.from_str('577')), scope.manage(CML.BigNum.from_str('10000')))
-      );
-      const priceStep = scope.manage(
-        CML.UnitInterval.new(scope.manage(CML.BigNum.from_str('721')), scope.manage(CML.BigNum.from_str('100000000')))
-      );
-      const exInitPrices = scope.manage(CML.ExUnitPrices.new(priceMem, priceStep));
-
-      const linearFee = scope.manage(
-        CML.LinearFee.new(
-          scope.manage(CML.BigNum.from_str(minFeeCoefficient.toString())),
-          scope.manage(CML.BigNum.from_str(minFeeConstant.toString()))
-        )
-      );
-      const minFee = scope.manage(CML.min_fee(tx, linearFee, exInitPrices));
-      return BigInt(minFee.to_str());
-    });
+    return minFee(tx, prices, MinFeeConstant(minFeeConstant), MinFeeCoefficient(minFeeCoefficient));
+  };
 
 export const computeMinimumCoinQuantity =
   (coinsPerUtxoByte: ProtocolParametersRequiredByInputSelection['coinsPerUtxoByte']): ComputeMinimumCoinQuantity =>
   (output) =>
-    usingAutoFree((scope) =>
-      BigInt(
-        scope
-          .manage(
-            CML.min_ada_required(
-              coreToCml.txOut(scope, output),
-              scope.manage(CML.BigNum.from_str(coinsPerUtxoByte.toString()))
-            )
-          )
-          .to_str()
-      )
-    );
+    minAdaRequired(output, BigInt(coinsPerUtxoByte));
 
 export const tokenBundleSizeExceedsLimit =
   (maxValueSize: ProtocolParametersRequiredByInputSelection['maxValueSize']): TokenBundleSizeExceedsLimit =>
@@ -92,8 +66,8 @@ export const computeSelectionLimit =
   (maxTxSize: ProtocolParametersRequiredByInputSelection['maxTxSize'], buildTx: BuildTx): ComputeSelectionLimit =>
   (selectionSkeleton) =>
     usingAutoFree(async (scope) => {
-      const tx = await buildTx(selectionSkeleton, scope);
-      const txSize = getTxSize(tx);
+      const tx = await buildTx(selectionSkeleton);
+      const txSize = getTxSize(coreToCml.tx(scope, tx));
       if (txSize <= maxTxSize) {
         return selectionSkeleton.inputs.size;
       }
@@ -101,17 +75,17 @@ export const computeSelectionLimit =
     });
 
 export const defaultSelectionConstraints = ({
-  protocolParameters: { coinsPerUtxoByte, maxTxSize, maxValueSize, minFeeCoefficient, minFeeConstant },
+  protocolParameters: { coinsPerUtxoByte, maxTxSize, maxValueSize, minFeeCoefficient, minFeeConstant, prices },
   buildTx
 }: DefaultSelectionConstraintsProps): SelectionConstraints => {
-  if (!coinsPerUtxoByte || !maxTxSize || !maxValueSize || !minFeeCoefficient || !minFeeConstant) {
+  if (!coinsPerUtxoByte || !maxTxSize || !maxValueSize || !minFeeCoefficient || !minFeeConstant || !prices) {
     throw new InvalidProtocolParametersError(
-      'Missing one of: coinsPerUtxoByte, maxTxSize, maxValueSize, minFeeCoefficient, minFeeConstant'
+      'Missing one of: coinsPerUtxoByte, maxTxSize, maxValueSize, minFeeCoefficient, minFeeConstant, prices'
     );
   }
   return {
     computeMinimumCoinQuantity: computeMinimumCoinQuantity(coinsPerUtxoByte),
-    computeMinimumCost: computeMinimumCost({ minFeeCoefficient, minFeeConstant }, buildTx),
+    computeMinimumCost: computeMinimumCost({ minFeeCoefficient, minFeeConstant, prices }, buildTx),
     computeSelectionLimit: computeSelectionLimit(maxTxSize, buildTx),
     tokenBundleSizeExceedsLimit: tokenBundleSizeExceedsLimit(maxValueSize)
   };

@@ -2,7 +2,7 @@ import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
 import { Observable, firstValueFrom } from 'rxjs';
 import { OutputValidation } from '../types';
-import { computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit } from '@cardano-sdk/input-selection';
+import { computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit } from '@cardano-sdk/tx-construction';
 import { txInEquals } from './util';
 
 export type ProtocolParametersRequiredByOutputValidator = Pick<
