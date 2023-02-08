@@ -250,7 +250,7 @@ export const createStandaloneKeyAgent = async (
   await InMemoryKeyAgent.fromBip39MnemonicWords(
     {
       chainId: genesis,
-      getPassword: async () => Buffer.from(''),
+      getPassphrase: async () => Buffer.from(''),
       mnemonicWords: mnemonics
     },
     { bip32Ed25519, inputResolver: { resolveInputAddress: async () => null }, logger }

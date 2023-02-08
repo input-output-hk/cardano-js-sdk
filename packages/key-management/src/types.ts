@@ -133,9 +133,9 @@ export interface Ed25519KeyPair {
 }
 
 /**
- * @returns password used to decrypt root private key
+ * @returns passphrase used to decrypt root private key
  */
-export type GetPassword = (noCache?: true) => Promise<Uint8Array>;
+export type GetPassphrase = (noCache?: true) => Promise<Uint8Array>;
 
 export interface SignTransactionOptions {
   additionalKeyPaths?: AccountKeyDerivationPath[];

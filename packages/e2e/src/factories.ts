@@ -177,7 +177,7 @@ keyManagementFactory.register('inMemory', async (params: any): Promise<CreateKey
         {
           accountIndex: params.accountIndex,
           chainId: params.chainId,
-          getPassword: async () => Buffer.from(params.password),
+          getPassphrase: async () => Buffer.from(params.passphrase),
           mnemonicWords
         },
         dependencies
@@ -244,7 +244,7 @@ export type KeyAgentFactoryProps = {
   accountIndex: number;
   mnemonic: string;
   chainId: Cardano.ChainId;
-  password: string;
+  passphrase: string;
 };
 
 export type GetWalletProps = {

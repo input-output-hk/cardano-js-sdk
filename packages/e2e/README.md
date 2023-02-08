@@ -173,7 +173,7 @@ LOGGER_MIN_SEVERITY=info
 FAUCET_PROVIDER=cardano-wallet
 FAUCET_PROVIDER_PARAMS='{"baseUrl":"http://localhost:8090/v2","mnemonic":"fire method repair aware foot tray accuse brother popular olive find account sick rocket next"}'
 KEY_MANAGEMENT_PROVIDER=inMemory
-KEY_MANAGEMENT_PARAMS='{"accountIndex": 0, "chainId":{"networkId": 0, "networkMagic": 888}, "password":"some_password","mnemonic":""}'
+KEY_MANAGEMENT_PARAMS='{"accountIndex": 0, "chainId":{"networkId": 0, "networkMagic": 888}, "passphrase":"some_passphrase","mnemonic":""}'
 ASSET_PROVIDER=http
 ASSET_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/asset"}'
 CHAIN_HISTORY_PROVIDER=http
@@ -190,7 +190,7 @@ STAKE_POOL_PROVIDER=stub
 STAKE_POOL_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/stake-pool"}'
 ```
 
-> :information_source: Notice that KEY_MANAGEMENT_PARAMS *mnemonic* property is empty, if you leave this empty on the **local network's** e2e tests a new set of random mnemonics will be generated for you, this is the recommended way of setting up e2e tests on this network.
+> :information_source: Notice that KEY_MANAGEMENT_PARAMS _mnemonic_ property is empty, if you leave this empty on the **local network's** e2e tests a new set of random mnemonics will be generated for you, this is the recommended way of setting up e2e tests on this network.
 
 Then to run the local network tests, run:
 
@@ -215,7 +215,7 @@ WORKER_PARALLEL_TRANSACTION=3
 
 > :information_source: Ensure the configured wallet has sufficient funds for the test transactions (see [here](#generate_wallet)).
 
-Before executing the test, start the *local-network*:
+Before executing the test, start the _local-network_:
 
 ```bash
 $ yarn workspace @cardano-sdk/e2e test:local-network
@@ -239,7 +239,7 @@ LOGGER_MIN_SEVERITY=debug
 
 # Providers setup
 KEY_MANAGEMENT_PROVIDER=inMemory
-KEY_MANAGEMENT_PARAMS='{"accountIndex": 0, "chainId":{"networkId": 0, "networkMagic": 888}, "password":"some_password","mnemonic":"vacant violin soft weird deliver render brief always monitor general maid smart jelly core drastic erode echo there clump dizzy card filter option defense"}'
+KEY_MANAGEMENT_PARAMS='{"accountIndex": 0, "chainId":{"networkId": 0, "networkMagic": 888}, "passphrase":"some_passphrase","mnemonic":"vacant violin soft weird deliver render brief always monitor general maid smart jelly core drastic erode echo there clump dizzy card filter option defense"}'
 ASSET_PROVIDER=http
 ASSET_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/asset"}'
 CHAIN_HISTORY_PROVIDER=http
@@ -309,7 +309,7 @@ Currently a few artillery load test scenarios are implemented.
 The main purpose is to simulate expected load against provider endpoints or wallet initialization/restoration.
 
 **The Artillery tests** are currently configured to run only with 1 worker.
-With plan to design and introduce our custom Distributed load test solution in post MVP stage. 
+With plan to design and introduce our custom Distributed load test solution in post MVP stage.
 
 To run stake pool search scenario against the local-network endpoint:
 

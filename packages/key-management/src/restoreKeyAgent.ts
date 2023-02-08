@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Cardano } from '@cardano-sdk/core';
 import {
-  GetPassword,
+  GetPassphrase,
   GroupedAddress,
   KeyAgent,
   KeyAgentDependencies,
@@ -24,7 +24,7 @@ export interface RestoreInMemoryKeyAgentProps {
   /**
    * Required for InMemoryKeyAgent
    */
-  getPassword?: GetPassword;
+  getPassphrase?: GetPassphrase;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -54,12 +54,12 @@ const migrateSerializableData = <T extends SerializableKeyAgentData>(data: any, 
 export function restoreKeyAgent(
   data: SerializableInMemoryKeyAgentData,
   dependencies: KeyAgentDependencies,
-  getPassword: GetPassword
+  getPassphrase: GetPassphrase
 ): Promise<KeyAgent>;
 export function restoreKeyAgent(
   data: SerializableKeyAgentData,
   dependencies: KeyAgentDependencies,
-  getPassword?: GetPassword
+  getPassphrase?: GetPassphrase
 ): Promise<KeyAgent>;
 export function restoreKeyAgent(
   data: SerializableLedgerKeyAgentData,
@@ -77,7 +77,7 @@ export function restoreKeyAgent(
 export async function restoreKeyAgent<T extends SerializableKeyAgentData>(
   dataArg: T,
   dependencies: KeyAgentDependencies,
-  getPassword?: GetPassword
+  getPassphrase?: GetPassphrase
 ): Promise<KeyAgent> {
   // migrateSerializableData
   const data = migrateSerializableData(dataArg, dependencies.logger);
@@ -88,10 +88,12 @@ export async function restoreKeyAgent<T extends SerializableKeyAgentData>(
           'Expected encrypted root private key in "agentData" for InMemoryKeyAgent"'
         );
       }
-      if (!getPassword) {
-        throw new InvalidSerializableDataError('Expected "getPassword" in RestoreKeyAgentProps for InMemoryKeyAgent"');
+      if (!getPassphrase) {
+        throw new InvalidSerializableDataError(
+          'Expected "getPassphrase" in RestoreKeyAgentProps for InMemoryKeyAgent"'
+        );
       }
-      return new InMemoryKeyAgent({ ...data, getPassword }, dependencies);
+      return new InMemoryKeyAgent({ ...data, getPassphrase }, dependencies);
     }
     case KeyAgentType.Ledger: {
       return new LedgerKeyAgent(data, dependencies);

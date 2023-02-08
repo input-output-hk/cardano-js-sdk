@@ -6,7 +6,7 @@ export interface KeyManagementParams {
   accountIndex: number;
   mnemonic: string;
   chainId: Cardano.ChainId;
-  password: string;
+  passphrase: string;
   bip32Ed25519: string;
 }
 
@@ -36,9 +36,9 @@ const keyManagementParams = makeValidator((value) =>
         bip32Ed25519: { type: 'string' },
         chainId: { $ref: '/ChainId' },
         mnemonic: { type: 'string' },
-        password: { type: 'string' }
+        passphrase: { type: 'string' }
       },
-      required: ['accountIndex', 'mnemonic', 'chainId', 'password', 'bip32Ed25519'],
+      required: ['accountIndex', 'mnemonic', 'chainId', 'passphrase', 'bip32Ed25519'],
       type: 'object'
     },
     {
