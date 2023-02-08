@@ -30,6 +30,7 @@ export const protocolParameters = {
   minFeeConstant: 155_381,
   minPoolCost: 340_000_000,
   poolDeposit: 500_000_000,
+  prices: { memory: 0.0577, steps: 0.000_007_21 },
   protocolVersion: { major: 5, minor: 0 },
   stakeKeyDeposit: 2_000_000
 };

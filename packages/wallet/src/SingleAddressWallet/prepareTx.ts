@@ -1,9 +1,9 @@
-import { Cardano, coreToCml } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { FinalizeTxProps, InitializeTxProps, ObservableWallet } from '../types';
 import { Logger } from 'ts-log';
 import { Observable, combineLatest, filter, firstValueFrom, lastValueFrom, map, take } from 'rxjs';
 import { createTransactionInternals, ensureValidityInterval } from '../Transaction';
-import { defaultSelectionConstraints } from '@cardano-sdk/input-selection';
+import { defaultSelectionConstraints } from '@cardano-sdk/tx-construction';
 
 export interface PrepareTxDependencies {
   wallet: Pick<ObservableWallet, 'tip$' | 'protocolParameters$' | 'addresses$' | 'genesisParameters$'> & {
@@ -41,7 +41,7 @@ export const createTxPreparer =
         map(([tip, utxo, protocolParameters, [{ address: changeAddress }], withdrawals, genesisParameters]) => {
           const validityInterval = ensureValidityInterval(tip.slot, genesisParameters, props.options?.validityInterval);
           const constraints = defaultSelectionConstraints({
-            buildTx: async (inputSelection, scope) => {
+            buildTx: async (inputSelection) => {
               logger.debug('Building TX for selection constraints', inputSelection);
               if (withdrawals?.length) {
                 logger.debug('Adding rewards withdrawal in the transaction', withdrawals);
@@ -59,17 +59,14 @@ export const createTxPreparer =
                 withdrawals
               });
 
-              return coreToCml.tx(
-                scope,
-                await firstValueFrom(
-                  signer.stubFinalizeTx({
-                    auxiliaryData: props.auxiliaryData,
-                    extraSigners: props.extraSigners,
-                    scripts: props.scripts,
-                    signingOptions: props.signingOptions,
-                    tx: txInternals
-                  })
-                )
+              return await firstValueFrom(
+                signer.stubFinalizeTx({
+                  auxiliaryData: props.auxiliaryData,
+                  extraSigners: props.extraSigners,
+                  scripts: props.scripts,
+                  signingOptions: props.signingOptions,
+                  tx: txInternals
+                })
               );
             },
             protocolParameters

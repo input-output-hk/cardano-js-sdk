@@ -3,9 +3,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable unicorn/consistent-function-scoping */
 import { AssetId } from '@cardano-sdk/util-dev';
-import { CML, Cardano, InvalidProtocolParametersError } from '@cardano-sdk/core';
-import { DefaultSelectionConstraintsProps, defaultSelectionConstraints } from '../src/selectionConstraints';
-import { ProtocolParametersForInputSelection, SelectionSkeleton } from '../src/types';
+import { Cardano, InvalidProtocolParametersError } from '@cardano-sdk/core';
+import { DefaultSelectionConstraintsProps, defaultSelectionConstraints } from '../../src';
+import { ProtocolParametersForInputSelection, SelectionSkeleton } from '@cardano-sdk/input-selection';
+import { babbageTx, getBigBabbageTx } from '../testData';
 
 jest.mock('@dcspark/cardano-multiplatform-lib-nodejs', () => {
   const actualCml = jest.requireActual('@dcspark/cardano-multiplatform-lib-nodejs');
@@ -26,7 +27,8 @@ describe('defaultSelectionConstraints', () => {
     maxTxSize: 16_384,
     maxValueSize: 5000,
     minFeeCoefficient: 44,
-    minFeeConstant: 155_381
+    minFeeConstant: 155_381,
+    prices: { memory: 0.0577, steps: 0.000_007_21 }
   } as ProtocolParametersForInputSelection;
 
   it('Invalid parameters', () => {
@@ -40,10 +42,9 @@ describe('defaultSelectionConstraints', () => {
   });
 
   it('computeMinimumCost', async () => {
-    const fee = 200_000n;
-    // Need this to not have to build Tx
-    cmlMock.min_fee.mockReturnValueOnce(cmlMock.BigNum.from_str(fee.toString()));
-    const buildTx = jest.fn();
+    cmlMock.Value.new.mockImplementation(cmlActual.Value.new);
+    const fee = 218_807n;
+    const buildTx = jest.fn(async () => babbageTx);
     const selectionSkeleton = {} as SelectionSkeleton;
     const constraints = defaultSelectionConstraints({
       buildTx,
@@ -52,7 +53,7 @@ describe('defaultSelectionConstraints', () => {
     const result = await constraints.computeMinimumCost(selectionSkeleton);
     expect(result).toEqual(fee);
     expect(buildTx).toBeCalledTimes(1);
-    expect(buildTx).toBeCalledWith(selectionSkeleton, expect.anything());
+    expect(buildTx).toBeCalledWith(selectionSkeleton);
   });
 
   it('computeMinimumCoinQuantity', () => {
@@ -75,11 +76,9 @@ describe('defaultSelectionConstraints', () => {
   });
 
   describe('computeSelectionLimit', () => {
-    const buildTxOfLength = (length: number) => async () => ({ to_bytes: () => ({ length }) } as CML.Transaction);
-
     it("doesn't exceed max tx size", async () => {
       const constraints = defaultSelectionConstraints({
-        buildTx: buildTxOfLength(protocolParameters.maxTxSize!),
+        buildTx: async () => babbageTx,
         protocolParameters
       });
       expect(await constraints.computeSelectionLimit({ inputs: new Set([1, 2]) as any } as SelectionSkeleton)).toEqual(
@@ -89,7 +88,7 @@ describe('defaultSelectionConstraints', () => {
 
     it('exceeds max tx size', async () => {
       const constraints = defaultSelectionConstraints({
-        buildTx: buildTxOfLength(protocolParameters.maxTxSize! + 1),
+        buildTx: getBigBabbageTx,
         protocolParameters
       });
       expect(await constraints.computeSelectionLimit({ inputs: new Set([1, 2]) as any } as SelectionSkeleton)).toEqual(
