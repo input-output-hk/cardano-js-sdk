@@ -22,6 +22,8 @@ describe('wallet', () => {
   const deactivateWallet = '#deactivateWallet';
   const destroyWallet = '#destroyWallet';
   const spanAddress = '#address';
+  const spanStakeAddress = '#stakeAddress';
+
   const spanBalance = '#balance';
   const spanSupplyDistribution = '#supplyDistribution';
   const divAdaPrice = '#adaPrice';
@@ -29,8 +31,15 @@ describe('wallet', () => {
   const divSignature = '#signature';
   const activeWalletName = '#observableWalletName';
 
+  const dappBtnRun = '#bp3-tab-panel_TabsExample_1 > div > button';
+  const dappSubmittedTxConfirmation = '#root > div > p:last-child';
+  const dappChangeAddress = '#root > div > p:nth-child(11)';
+  const dappStakingAddress = '#root > div > p:nth-child(12)';
+  const dappUsedAddress = '#root > div > p:nth-child(13)';
+
   // The address is filled in by the tests, which are order dependent
   let walletAddr1 = '';
+  let walletStakeAddr1 = '';
 
   const buildAndSign = async () => {
     await $(btnSignAndBuildTx).click();
@@ -74,16 +83,31 @@ describe('wallet', () => {
           }
         });
         walletAddr1 = await $(spanAddress).getText();
+        walletStakeAddr1 = await $(spanStakeAddress).getText();
         expect(walletAddr1).toHaveTextContaining('addr');
+        expect(walletStakeAddr1).toHaveTextContaining('stake');
         await expect($(activeWalletName)).toHaveText(getObservableWalletName(0));
       });
       it('dapp has access to cip30 WalletApi', async () => {
         await browser.switchWindow('React App');
         await expect($(pNetworkId)).toHaveText('Network Id (0 = testnet; 1 = mainnet): 0');
         await browser.waitUntil($(liFirstUtxo).isExisting, { timeout: 60_000 });
-        await switchToWalletUi();
       });
+
+      it('dapp can build and send a transaction using cip30 WalletApi', async () => {
+        await browser.switchWindow('React App');
+        await $(dappBtnRun).click();
+        await expect($(dappSubmittedTxConfirmation)).toHaveTextContaining('check your wallet');
+      });
+
+      it('dapp gets correct addresses from cip30 wallet api', async () => {
+        await expect($(dappChangeAddress)).toHaveTextContaining(walletAddr1);
+        await expect($(dappStakingAddress)).toHaveTextContaining(walletStakeAddr1);
+        await expect($(dappUsedAddress)).toHaveTextContaining(walletAddr1);
+      });
+
       it('can build and sign a transaction', async () => {
+        await switchToWalletUi();
         await buildAndSign();
       });
       it('can switch to another wallet', async () => {

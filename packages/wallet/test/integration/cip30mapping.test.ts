@@ -84,7 +84,7 @@ describe('cip30', () => {
     test('api.getUsedAddresses', async () => {
       const cipUsedAddressess = await api.getUsedAddresses();
       const [{ address: walletAddress }] = await firstValueFrom(wallet.addresses$);
-      expect(cipUsedAddressess).toEqual([walletAddress]);
+      expect(cipUsedAddressess.map((cipAddr) => Cardano.Address(cipAddr))).toEqual([walletAddress]);
     });
 
     test('api.getUnusedAddresses', async () => {
@@ -95,11 +95,15 @@ describe('cip30', () => {
     test('api.getChangeAddress', async () => {
       const cipChangeAddress = await api.getChangeAddress();
       const [{ address: walletAddress }] = await firstValueFrom(wallet.addresses$);
-      expect(cipChangeAddress).toEqual(walletAddress);
+      expect(Cardano.Address(cipChangeAddress)).toEqual(walletAddress);
     });
 
     test('api.getRewardAddresses', async () => {
-      const cipRewardAddresses = await api.getRewardAddresses();
+      const cipRewardAddressesCbor = await api.getRewardAddresses();
+      const cipRewardAddresses = cipRewardAddressesCbor.map((cipAddr) =>
+        scope.manage(CML.Address.from_bytes(Buffer.from(cipAddr, 'hex'))).to_bech32()
+      );
+
       const [{ rewardAccount: walletRewardAccount }] = await firstValueFrom(wallet.addresses$);
       expect(cipRewardAddresses).toEqual([walletRewardAccount]);
     });
