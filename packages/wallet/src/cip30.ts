@@ -98,7 +98,7 @@ export const createWalletApi = (
 
       if (!address) {
         logger.error('could not get change address');
-        throw new ApiError(500, 'could not get change address');
+        throw new ApiError(APIErrorCode.InternalError, 'could not get change address');
       } else {
         return address.toString();
       }
@@ -107,7 +107,7 @@ export const createWalletApi = (
       if (error instanceof ApiError) {
         throw error;
       }
-      throw new ApiError(500, 'Nope');
+      throw new ApiError(APIErrorCode.InternalError, 'Nope');
     }
   },
   // eslint-disable-next-line max-statements
