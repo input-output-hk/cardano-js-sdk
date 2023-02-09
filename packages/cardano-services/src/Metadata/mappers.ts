@@ -1,10 +1,21 @@
-import { Cardano, ProviderUtil } from '@cardano-sdk/core';
+import { CML, Cardano, cmlToCore } from '@cardano-sdk/core';
 import { TxMetadataModel } from './types';
+import { usingAutoFree } from '@cardano-sdk/util';
 
-export const mapTxMetadata = (metadataModel: Pick<TxMetadataModel, 'json_value' | 'key'>[]): Cardano.TxMetadata =>
+export const mapTxMetadata = (metadataModel: Pick<TxMetadataModel, 'bytes' | 'key'>[]): Cardano.TxMetadata =>
   metadataModel.reduce((map, metadatum) => {
-    const { key, json_value } = metadatum;
-    if (!json_value || !key) return map;
-    map.set(BigInt(key), ProviderUtil.jsonToMetadatum(json_value));
+    const { bytes, key } = metadatum;
+
+    if (bytes && key) {
+      const biKey = BigInt(key);
+      const metadata = usingAutoFree((_) => cmlToCore.txMetadata(CML.GeneralTransactionMetadata.from_bytes(bytes)));
+
+      if (metadata) {
+        const datum = metadata.get(biKey);
+
+        if (datum) map.set(biKey, datum);
+      }
+    }
+
     return map;
   }, new Map<bigint, Cardano.Metadatum>());
