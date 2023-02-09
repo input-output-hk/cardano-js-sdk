@@ -154,7 +154,26 @@ export const queryTransactionsResult2: Paginated<Cardano.HydratedTx> = {
   totalResultCount: 3
 };
 
-const queryTransactions = () => jest.fn().mockResolvedValueOnce(queryTransactionsResult);
+const queryTransactions = ({ rewardAccount }: { rewardAccount?: Cardano.RewardAccount } = {}) =>
+  jest.fn().mockResolvedValueOnce({
+    ...queryTransactionsResult,
+    pageResults: rewardAccount
+      ? queryTransactionsResult.pageResults.map((tx) => ({
+          ...tx,
+          body: {
+            ...tx.body,
+            certificates: tx.body.certificates?.map((certificate) =>
+              'stakeKeyHash' in certificate
+                ? {
+                    ...certificate,
+                    stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+                  }
+                : certificate
+            )
+          }
+        }))
+      : queryTransactionsResult.pageResults
+  });
 
 export const blocksByHashes = [{ epoch: Cardano.EpochNo(currentEpoch.number - 3) } as Cardano.ExtendedBlockInfo];
 
@@ -163,11 +182,11 @@ export const blocksByHashes = [{ epoch: Cardano.EpochNo(currentEpoch.number - 3)
  *
  * returns ChainHistoryProvider-compatible object
  */
-export const mockChainHistoryProvider = () => ({
+export const mockChainHistoryProvider = (props: { rewardAccount?: Cardano.RewardAccount } = {}) => ({
   blocksByHashes: jest.fn().mockResolvedValue(blocksByHashes),
   healthCheck: jest.fn().mockResolvedValue({ ok: true }),
-  transactionsByAddresses: queryTransactions(),
-  transactionsByHashes: queryTransactions()
+  transactionsByAddresses: queryTransactions(props),
+  transactionsByHashes: queryTransactions(props)
 });
 
 /**

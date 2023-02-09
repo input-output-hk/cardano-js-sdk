@@ -882,7 +882,7 @@ export const txToLedger = async ({
   const ttl = Number(scope.manage(cslTxBody.ttl())?.to_str());
 
   // TX - validityStartInterval
-  const validityStartInterval = Number(scope.manage(cslTxBody.validity_start_interval())?.to_str());
+  const validityIntervalStart = Number(scope.manage(cslTxBody.validity_start_interval())?.to_str());
 
   // TX  - auxiliaryData
   const txBodyAuxDataHash = scope.manage(cslTxBody.auxiliary_data_hash());
@@ -904,7 +904,7 @@ export const txToLedger = async ({
   }
   const additionalWitnessPaths = ledgerMintBundle?.additionalWitnessPaths || [];
 
-  const ledgerTx = {
+  const ledgerTx: ledger.Transaction = {
     auxiliaryData,
     certificates: ledgerCertificatesData?.certs,
     fee,
@@ -916,7 +916,7 @@ export const txToLedger = async ({
     },
     outputs: ledgerOutputs,
     ttl,
-    validityStartInterval,
+    validityIntervalStart,
     withdrawals: ledgerWithdrawals
   };
 
