@@ -67,8 +67,9 @@ combineLatest([supplyDistribution.lovelaceSupply$, supplyDistribution.stake$]).s
     (document.querySelector('#supplyDistribution')!.textContent = `${stake.live} out of ${lovelaceSupply.total}`)
 );
 
-const setAddress = (text: string): void => {
-  document.querySelector('#address')!.textContent = text;
+const setAddresses = ({ address, stakeAddress }: { address: string; stakeAddress: string }): void => {
+  document.querySelector('#address')!.textContent = address;
+  document.querySelector('#stakeAddress')!.textContent = stakeAddress;
 };
 
 const setBalance = (text: string): void => {
@@ -85,7 +86,7 @@ const setName = (text: string): void => {
 
 const clearWalletValues = (): void => {
   setName('-');
-  setAddress('-');
+  setAddresses({ address: '-', stakeAddress: '-' });
   setBalance('-');
   setSignature('-');
 };
@@ -106,7 +107,9 @@ const walletManager = new WalletManagerUi({ walletName }, { logger, runtime });
 const wallet = walletManager.wallet;
 
 // Wallet can be subscribed can be used even before it is actually created.
-wallet.addresses$.subscribe(([{ address }]) => setAddress(address.toString()));
+wallet.addresses$.subscribe(([{ address, rewardAccount }]) =>
+  setAddresses({ address: address.toString(), stakeAddress: rewardAccount.valueOf() })
+);
 wallet.balance.utxo.available$.subscribe(({ coins }) => setBalance(coins.toString()));
 
 const createWallet = async (accountIndex: number) => {

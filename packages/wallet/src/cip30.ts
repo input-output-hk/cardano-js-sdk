@@ -13,7 +13,7 @@ import {
   TxSignErrorCode,
   WalletApi
 } from '@cardano-sdk/dapp-connector';
-import { CML, Cardano, cmlToCore, coreToCml } from '@cardano-sdk/core';
+import { CML, Cardano, cmlToCore, coreToCml, parseCmlAddress } from '@cardano-sdk/core';
 import { HexBlob, ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
 import { InputSelectionError } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
@@ -74,6 +74,15 @@ const compareUtxos = (utxo: Cardano.Utxo, comparedTo: Cardano.Utxo) => {
   return 0;
 };
 
+const cardanoAddressToCbor = (address: Cardano.Address | Cardano.RewardAccount): Cbor =>
+  usingAutoFree((scope) => {
+    const cmlAddr = parseCmlAddress(scope, address.toString());
+    if (!cmlAddr) {
+      throw new ApiError(APIErrorCode.InternalError, `could not transform address ${address} to CBOR`);
+    }
+    return Buffer.from(cmlAddr.to_bytes()).toString('hex');
+  });
+
 export const createWalletApi = (
   wallet$: Observable<ObservableWallet>,
   confirmationCallback: CallbackConfirmation,
@@ -98,16 +107,16 @@ export const createWalletApi = (
 
       if (!address) {
         logger.error('could not get change address');
-        throw new ApiError(500, 'could not get change address');
+        throw new ApiError(APIErrorCode.InternalError, 'could not get change address');
       } else {
-        return address.toString();
+        return cardanoAddressToCbor(address);
       }
     } catch (error) {
       logger.error(error);
       if (error instanceof ApiError) {
         throw error;
       }
-      throw new ApiError(500, 'Nope');
+      throw new ApiError(APIErrorCode.InternalError, 'Nope');
     }
   },
   // eslint-disable-next-line max-statements
@@ -172,7 +181,7 @@ export const createWalletApi = (
       if (!rewardAccount) {
         throw new ApiError(APIErrorCode.InternalError, 'could not get reward address');
       } else {
-        return [rewardAccount.toString()];
+        return [cardanoAddressToCbor(rewardAccount)];
       }
     } catch (error) {
       logger.error(error);
@@ -195,7 +204,7 @@ export const createWalletApi = (
     if (!address) {
       throw new ApiError(APIErrorCode.InternalError, 'could not get used addresses');
     } else {
-      return [address.toString()];
+      return [cardanoAddressToCbor(address)];
     }
   },
   getUtxos: async (amount?: Cbor, paginate?: Paginate): Promise<Cbor[] | undefined> => {
