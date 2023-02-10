@@ -310,7 +310,7 @@ epoch_rewards AS (
     COALESCE(rewards.member_rewards, 0) AS member_rewards,
     COALESCE(stake.active_stake, 0) AS active_stake,
     pool.pledge,
-    COALESCE(rewards.member_rewards / (stake.active_stake - pool.pledge), 0)::DOUBLE PRECISION AS member_roi
+    COALESCE(rewards.member_rewards / NULLIF(stake.active_stake - pool.pledge, 0), 0)::DOUBLE PRECISION AS member_roi
   FROM pool_stake_per_epoch AS stake
   JOIN epochs
     ON epochs.epoch_no = stake.epoch_no
@@ -348,7 +348,7 @@ ${epochRewardsSubqueries(epochLength, limit)}
 SELECT
   hash_id,
   COALESCE(
-    (SUM(member_rewards) / (SUM(active_stake) - SUM(pledge))) /
+    (SUM(member_rewards) / NULLIF(SUM(active_stake) - SUM(pledge), 0)) /
       NULLIF(${epochLength} / 86400000, 0) * 365,
     0
   )::DOUBLE PRECISION AS apy
