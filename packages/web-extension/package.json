@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/web-extension",
-  "version": "0.7.0",
+  "version": "0.7.1-patch.0",
   "description": "Web extension wallet utilities",
   "engines": {
     "node": ">=14.20.1"
@@ -74,7 +74,7 @@
     "@cardano-sdk/key-management": "^0.3.0",
     "@cardano-sdk/util": "^0.7.0",
     "@cardano-sdk/util-rxjs": "^0.4.3",
-    "@cardano-sdk/wallet": "^0.7.0",
+    "@cardano-sdk/wallet": "^0.7.1-patch.0",
     "blake2b": "^2.1.4",
     "lodash": "^4.17.21",
     "rxjs": "^7.4.0",

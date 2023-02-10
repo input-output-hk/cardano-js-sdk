@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.1-patch.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.6.0...@cardano-sdk/e2e@0.6.1-patch.0) (2023-02-10)
+
+### ⚠ BREAKING CHANGES
+
+- **wallet:** return cip30 addresses as cbor instead of bech32
+
+### Bug Fixes
+
+- **wallet:** return cip30 addresses as cbor instead of bech32 ([cf8cdd3](https://github.com/input-output-hk/cardano-js-sdk/commit/cf8cdd359098e9c4d7b686271b1917fc2b8324d6))
+
 ## [0.6.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.5.0...@cardano-sdk/e2e@0.6.0) (2022-12-22)
 
 ### ⚠ BREAKING CHANGES
