@@ -23,12 +23,12 @@ describe('StakePoolProvider', () => {
 
   const threePoolsIds: Cardano.PoolId[] = [];
 
-  const fetchAllPools = async (startAt = 0): Promise<Cardano.StakePool[]> => {
-    const result = await provider.queryStakePools({ pagination: { ...pagination, startAt } });
+  const fetchAllPools = async (filters?: QueryStakePoolsArgs['filters'], startAt = 0): Promise<Cardano.StakePool[]> => {
+    const result = await provider.queryStakePools({ filters, pagination: { ...pagination, startAt } });
 
     return result.pageResults.length === 0
       ? result.pageResults
-      : [...result.pageResults, ...(await fetchAllPools(startAt + 20))];
+      : [...result.pageResults, ...(await fetchAllPools(filters, startAt + 20))];
   };
 
   const pickUsefulPoolsForTest = () => {
@@ -288,7 +288,7 @@ describe('StakePoolProvider', () => {
           const names: string[] = [];
 
           // Pick id for up to 20 pools with not null distinct name
-          for (const pool of pools)
+          for (const pool of pools.sort(() => 0.5 - Math.random()))
             if (names.length < 20 && pool.metadata?.name && !names.includes(pool.metadata.name)) {
               names.push(pool.metadata.name);
               poolsId.push(pool.id);
@@ -310,7 +310,7 @@ describe('StakePoolProvider', () => {
             pools
               .filter(({ id }) => poolsId.includes(id))
               .map(({ id, metadata }) => ({ id, name: metadata!.name }))
-              .sort((a, b) => (a.name < b.name ? -1 : 1))
+              .sort((a, b) => (a.name.toLocaleLowerCase() < b.name.toLocaleLowerCase() ? -1 : 1))
               .map(({ id }) => id)
           );
         });
@@ -326,7 +326,7 @@ describe('StakePoolProvider', () => {
             pools
               .filter(({ id }) => poolsId.includes(id))
               .map(({ id, metadata }) => ({ id, name: metadata!.name }))
-              .sort((a, b) => (a.name < b.name ? 1 : -1))
+              .sort((a, b) => (a.name.toLocaleLowerCase() < b.name.toLocaleLowerCase() ? 1 : -1))
               .map(({ id }) => id)
           );
         });
