@@ -629,8 +629,7 @@ SELECT
   pu.vrf_key_hash,
   metadata.url AS metadata_url,
   metadata.hash AS metadata_hash,
-  pod.json AS offline_data,
-  pod.json -> 'name' AS name
+  pod.json AS offline_data
 FROM pool_update pu
 JOIN pool_hash ph ON
   ph.id = pu.hash_id
@@ -806,7 +805,7 @@ LEFT JOIN last_pool_retire AS pool_retire
 
 const sortFieldMapping: Record<string, { field: string; secondary?: string[] }> = {
   cost: { field: 'fixed_cost', secondary: ['margin'] },
-  name: { field: "lower((pod.json -> 'name')::TEXT)" }
+  name: { field: "lower((pod.json ->> 'name')::TEXT)" }
 };
 
 const mapSort = (sort: OrderByOptions | undefined) => {
