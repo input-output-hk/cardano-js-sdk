@@ -446,7 +446,7 @@ export const poolsByPledgeMetSubqueries: readonly SubQuery[] = [
       )
     JOIN stake_address sa ON
       sa.id = pu.reward_addr_id
-    JOIN delegation d1 ON
+    LEFT JOIN delegation d1 ON
       sa.id = d1.addr_id
     WHERE NOT EXISTS
       (SELECT TRUE
