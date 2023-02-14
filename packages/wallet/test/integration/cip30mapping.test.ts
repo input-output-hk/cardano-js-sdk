@@ -268,9 +268,9 @@ describe('cip30', () => {
         // 1a004c4b40 Represents a CML.BigNum object of 5 ADA
         await expect(api2.getCollateral({ amount: '1a004c4b40' })).rejects.toThrow(ApiError);
       });
-      test('throws an error when there are no UTxOs in the wallet', async () => {
+      test('returns null when there are no "unspendable" UTxOs in the wallet', async () => {
         // 1a003d0900 Represents a CML.BigNum object of 4 ADA
-        await expect(api3.getCollateral({ amount: '1a003d0900' })).rejects.toThrow(ApiError);
+        expect(await api3.getCollateral({ amount: '1a003d0900' })).toBe(null);
         wallet3.shutdown();
       });
       test('throws when the given amount is greater than max amount', async () => {
@@ -297,8 +297,8 @@ describe('cip30', () => {
         ).not.toThrow();
         expect(utxos).toHaveLength(1);
       });
-      test('throws when there is no given amount and wallet has no UTxOs', async () => {
-        await expect(api3.getCollateral()).rejects.toThrow(ApiError);
+      test('returns null when there is no given amount and wallet has no UTxOs', async () => {
+        expect(await api3.getCollateral()).toBe(null);
       });
       test('throws when unspendable UTxOs contain assets', async () => {
         await expect(api4.getCollateral()).rejects.toThrow(ApiError);

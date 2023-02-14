@@ -128,6 +128,10 @@ export const createWalletApi = (
     logger.debug('getting collateral');
     const wallet = await firstValueFrom(wallet$);
     let unspendables = (await firstValueFrom(wallet.utxo.unspendable$)).sort(compareUtxos);
+
+    // No available unspendable UTXO
+    if (unspendables.length === 0) return null;
+
     if (unspendables.some((utxo) => utxo[1].value.assets && utxo[1].value.assets.size > 0)) {
       scope.dispose();
       throw new ApiError(APIErrorCode.Refused, 'unspendable UTxOs must not contain assets when used as collateral');
