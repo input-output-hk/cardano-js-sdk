@@ -15,11 +15,9 @@ import {
 } from '@cardano-sdk/dapp-connector';
 import { CML, Cardano, cmlToCore, coreToCml, parseCmlAddress } from '@cardano-sdk/core';
 import { HexBlob, ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
-import { InputSelectionError } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
 import { Observable, firstValueFrom } from 'rxjs';
 import { ObservableWallet } from './types';
-import { errors } from '@cardano-sdk/key-management';
 
 export type Cip30WalletDependencies = {
   logger: Logger;
@@ -83,6 +81,8 @@ const cardanoAddressToCbor = (address: Cardano.Address | Cardano.RewardAccount):
     return Buffer.from(cmlAddr.to_bytes()).toString('hex');
   });
 
+const formatUnknownError = (error: unknown): string => (error as Error)?.message || 'Unknown error';
+
 export const createWalletApi = (
   wallet$: Observable<ObservableWallet>,
   confirmationCallback: CallbackConfirmation,
@@ -116,7 +116,7 @@ export const createWalletApi = (
       if (error instanceof ApiError) {
         throw error;
       }
-      throw new ApiError(APIErrorCode.InternalError, 'Nope');
+      throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));
     }
   },
   // eslint-disable-next-line max-statements
@@ -163,7 +163,7 @@ export const createWalletApi = (
         if (error instanceof ApiError) {
           throw error;
         }
-        throw new ApiError(APIErrorCode.InternalError, 'Nope');
+        throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));
       }
     }
     const cbor = coreToCml.utxo(scope, unspendables).map(cslToCbor);
@@ -192,7 +192,7 @@ export const createWalletApi = (
       if (error instanceof ApiError) {
         throw error;
       }
-      throw new ApiError(APIErrorCode.InternalError, 'Nope');
+      throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));
     }
   },
   getUnusedAddresses: async (): Promise<Cbor[]> => {
@@ -233,7 +233,7 @@ export const createWalletApi = (
         utxos = [...inputSelection.inputs];
       } catch (error) {
         logger.debug(error);
-        const message = error instanceof InputSelectionError ? error.message : 'Nope';
+        const message = formatUnknownError(error);
 
         scope.dispose();
         throw new ApiError(APIErrorCode.Refused, message);
@@ -293,7 +293,7 @@ export const createWalletApi = (
       } catch (error) {
         logger.error(error);
         // TODO: handle ProofGeneration errors?
-        const message = error instanceof errors.AuthenticationError ? error.message : 'Nope';
+        const message = formatUnknownError(error);
         throw new TxSignError(TxSignErrorCode.UserDeclined, message);
       } finally {
         scope.dispose();

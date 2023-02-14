@@ -1,5 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, sonarjs/no-duplicate-string */
-import { ApiError, DataSignError, TxSendError, TxSignError, WalletApi } from '@cardano-sdk/dapp-connector';
+import {
+  APIErrorCode,
+  ApiError,
+  DataSignError,
+  TxSendError,
+  TxSignError,
+  WalletApi
+} from '@cardano-sdk/dapp-connector';
 import { CML, Cardano, cmlToCore, coreToCml } from '@cardano-sdk/core';
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence';
@@ -251,6 +258,13 @@ describe('cip30', () => {
         wallet2.shutdown();
         wallet3.shutdown();
         wallet4.shutdown();
+      });
+
+      test('can handle an unknown error', async () => {
+        // YYYY is invalid hex that will throw at serialization
+        await expect(api.getCollateral({ amount: 'YYYY' })).rejects.toThrowError(
+          expect.objectContaining({ code: APIErrorCode.InternalError, info: 'Unknown error' })
+        );
       });
 
       test('returns multiple UTxOs when more than 1 utxo needed to satisfy amount', async () => {
