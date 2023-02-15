@@ -7,7 +7,7 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "lint": "eslint .",
-    "pod-install": "yarn pod-install",
+    "pod-install": "cd ios && pod install && cd ..",
     "start": "react-native start",
     "test": "jest",
     "typecheck": "tsc --noEmit",
