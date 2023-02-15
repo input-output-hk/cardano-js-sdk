@@ -13,7 +13,7 @@ import {
   TxSignErrorCode,
   WalletApi
 } from '@cardano-sdk/dapp-connector';
-import { CML, Cardano, cmlToCore, coreToCml, parseCmlAddress } from '@cardano-sdk/core';
+import { CML, Cardano, TxCBOR, cmlToCore, coreToCml, parseCmlAddress } from '@cardano-sdk/core';
 import { HexBlob, ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
 import { Observable, firstValueFrom } from 'rxjs';
@@ -316,7 +316,7 @@ export const createWalletApi = (
     if (shouldProceed) {
       try {
         const wallet = await firstValueFrom(wallet$);
-        await wallet.submitTx(txData);
+        await wallet.submitTx(TxCBOR(tx));
         return txData.id.toString();
       } catch (error) {
         logger.error(error);

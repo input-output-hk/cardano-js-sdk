@@ -14,33 +14,35 @@ import {
 } from '../mocks';
 import { testAsyncKeyAgent } from '../../../key-management/test/mocks';
 
-export const createWallet = async (stores?: WalletStores) =>
-  setupWallet({
+const createDefaultProviders = () => ({
+  assetProvider: mockAssetProvider(),
+  chainHistoryProvider: mockChainHistoryProvider(),
+  networkInfoProvider: mockNetworkInfoProvider(),
+  rewardsProvider: mockRewardsProvider(),
+  stakePoolProvider: createStubStakePoolProvider(),
+  txSubmitProvider: mockTxSubmitProvider(),
+  utxoProvider: mockUtxoProvider()
+});
+
+type RequiredProviders = ReturnType<typeof createDefaultProviders>;
+export type Providers = {
+  [k in keyof RequiredProviders]?: RequiredProviders[k];
+};
+
+export const createWallet = async (stores?: WalletStores, providers: Providers = {}) =>
+  await setupWallet({
     bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
     createKeyAgent: (dependencies) => testAsyncKeyAgent(undefined, dependencies),
-    createWallet: async (keyAgent) => {
-      const txSubmitProvider = mockTxSubmitProvider();
-      const stakePoolProvider = createStubStakePoolProvider();
-      const networkInfoProvider = mockNetworkInfoProvider();
-      const assetProvider = mockAssetProvider();
-      const utxoProvider = mockUtxoProvider();
-      const chainHistoryProvider = mockChainHistoryProvider();
-      const rewardsProvider = mockRewardsProvider();
-      return new SingleAddressWallet(
+    createWallet: async (keyAgent) =>
+      new SingleAddressWallet(
         { name: 'Test Wallet' },
         {
-          assetProvider,
-          chainHistoryProvider,
+          ...createDefaultProviders(),
+          ...providers,
           keyAgent,
           logger,
-          networkInfoProvider,
-          rewardsProvider,
-          stakePoolProvider,
-          stores,
-          txSubmitProvider,
-          utxoProvider
+          stores
         }
-      );
-    },
+      ),
     logger
   });
