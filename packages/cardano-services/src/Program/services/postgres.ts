@@ -5,6 +5,7 @@ import { ClientConfig, Pool, QueryConfig } from 'pg';
 import { DnsResolver } from '../utils';
 import { HttpServerOptions } from '../loadHttpServer';
 import { Logger } from 'ts-log';
+import { installTemporarySchemaOnDbSync } from '../../util';
 import { isConnectionError } from '@cardano-sdk/util';
 import fs from 'fs';
 
@@ -21,10 +22,15 @@ import fs from 'fs';
 export const getPoolWithServiceDiscovery = async (
   dnsResolver: DnsResolver,
   logger: Logger,
-  { host, database, password, ssl, user }: ClientConfig
+  { host, database, password, ssl, user }: ClientConfig,
+  epochLength?: number
 ): Promise<Pool> => {
   const { name, port } = await dnsResolver(host!);
-  let pool = new Pool({ database, host: name, password, port, ssl, user });
+  let pool = installTemporarySchemaOnDbSync(
+    new Pool({ database, host: name, password, port, ssl, user }),
+    logger,
+    epochLength
+  );
 
   return new Proxy<Pool>({} as Pool, {
     get(_, prop) {
@@ -35,7 +41,11 @@ export const getPoolWithServiceDiscovery = async (
             if (isConnectionError(error)) {
               const record = await dnsResolver(host!);
               logger.info(`DNS resolution for Postgres service, resolved with record: ${JSON.stringify(record)}`);
-              pool = new Pool({ database, host: record.name, password, port: record.port, ssl, user });
+              pool = installTemporarySchemaOnDbSync(
+                new Pool({ database, host: record.name, password, port: record.port, ssl, user }),
+                logger,
+                epochLength
+              );
               return await pool.query(args, values);
             }
             throw error;
@@ -55,18 +65,29 @@ export const loadSecret = (path: string) => fs.readFileSync(path, 'utf8').toStri
 export const getPool = async (
   dnsResolver: DnsResolver,
   logger: Logger,
-  options?: HttpServerOptions
+  options?: HttpServerOptions,
+  epochLength?: number
 ): Promise<Pool | undefined> => {
   const ssl = options?.postgresSslCaFile ? { ca: loadSecret(options.postgresSslCaFile) } : undefined;
-  if (options?.postgresConnectionString) return new Pool({ connectionString: options.postgresConnectionString, ssl });
+  if (options?.postgresConnectionString)
+    return installTemporarySchemaOnDbSync(
+      new Pool({ connectionString: options.postgresConnectionString, ssl }),
+      logger,
+      epochLength
+    );
   if (options?.postgresSrvServiceName && options.postgresUser && options.postgresDb && options.postgresPassword) {
-    return getPoolWithServiceDiscovery(dnsResolver, logger, {
-      database: options.postgresDb,
-      host: options.postgresSrvServiceName,
-      password: options.postgresPassword,
-      ssl,
-      user: options.postgresUser
-    });
+    return getPoolWithServiceDiscovery(
+      dnsResolver,
+      logger,
+      {
+        database: options.postgresDb,
+        host: options.postgresSrvServiceName,
+        password: options.postgresPassword,
+        ssl,
+        user: options.postgresUser
+      },
+      epochLength
+    );
   }
   // If db connection string is not passed nor postgres srv service name
   return undefined;

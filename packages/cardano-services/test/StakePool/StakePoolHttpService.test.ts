@@ -10,7 +10,7 @@ import {
   StakePoolProvider
 } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, stakePoolHttpProvider } from '../../../cardano-services-client';
-import { DbSyncEpochPollService, loadGenesisData } from '../../src/util';
+import { DbSyncEpochPollService, installTemporarySchemaOnDbSync, loadGenesisData } from '../../src/util';
 import {
   DbSyncStakePoolProvider,
   HttpServer,
@@ -94,11 +94,14 @@ describe('StakePoolHttpService', () => {
 
   const epochPollInterval = 2 * 1000;
   const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
-  const db = new Pool({
-    connectionString: process.env.POSTGRES_CONNECTION_STRING,
-    max: 1,
-    min: 1
-  });
+  const db = installTemporarySchemaOnDbSync(
+    new Pool({
+      connectionString: process.env.POSTGRES_CONNECTION_STRING,
+      max: 1,
+      min: 1
+    }),
+    logger
+  );
   const epochMonitor = new DbSyncEpochPollService(db, epochPollInterval!);
   let reqWithFilter: QueryStakePoolsArgs;
   let reqWithMultipleFilters: QueryStakePoolsArgs;

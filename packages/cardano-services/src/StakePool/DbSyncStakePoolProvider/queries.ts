@@ -35,101 +35,7 @@ NOT exists
 `;
 
 export const findPoolsMetrics = `
-WITH current_epoch AS (
-  SELECT
-    e."no" AS epoch_no,
-    optimal_pool_count
-  FROM epoch e
-  JOIN epoch_param ep ON
-    ep.epoch_no = e."no"
-  ORDER BY e.no DESC LIMIT 1
-),
-blocks_created AS (
-  SELECT
-    COUNT(1) AS blocks_created,
-    pool_hash.id AS pool_hash_id
-  FROM block
-    JOIN slot_leader ON block.slot_leader_id = slot_leader.id
-    JOIN pool_hash ON slot_leader.pool_hash_id = pool_hash.id
-  WHERE pool_hash.id = ANY($1)
-  GROUP BY pool_hash.id
-),
-pools_delegates AS (
-  SELECT
-    ph.id AS pool_hash_id,
-    sa.id AS addr_id
-  FROM pool_hash ph
-  JOIN pool_update pu
-    ON pu.id = (
-      SELECT id
-      FROM pool_update pu2
-      WHERE pu2.hash_id = ph.id
-      ORDER BY id DESC
-      LIMIT 1
-    )
-  LEFT JOIN pool_retire pr
-    ON pr.id = (
-      SELECT id
-      FROM pool_retire pr2
-      WHERE pr2.hash_id = ph.id
-      ORDER BY id desc
-      LIMIT 1
-    )
-  JOIN stake_address sa ON
-    sa.id  = pu.reward_addr_id
-  WHERE (pr.id is null or pr.announced_tx_id < pu.registered_tx_id) and
-    ph.id = ANY($1)
-  ),
-  total_rewards_of_reward_acc AS (
-    SELECT
-      SUM(r.amount) AS amount,
-      pd.pool_hash_id
-    FROM reward r
-    JOIN pools_delegates pd ON
-      pd.addr_id = r.addr_id
-    GROUP BY pd.pool_hash_id
-  ),
-  total_withdraws_of_reward_acc AS (
-    SELECT
-      SUM(w.amount) AS amount,
-      pd.pool_hash_id
-    FROM withdrawal w
-    JOIN pools_delegates pd ON
-      pd.addr_id = w.addr_id
-    GROUP BY pd.pool_hash_id
-  ),
-  owners_total_utxos AS (
-    SELECT
-      sum(tx_out.value) AS amount,
-      pu.hash_id
-    FROM tx_out
-    JOIN pool_owner o ON
-      o.addr_id = tx_out.stake_address_id
-    JOIN pool_update pu ON
-      o.pool_update_id = pu.id
-      AND pu.hash_id = ANY($1)
-    LEFT JOIN tx_in ON
-      tx_out.tx_id = tx_in.tx_out_id AND
-      tx_out.index::smallint = tx_in.tx_out_index::smallint
-    LEFT JOIN tx AS tx_in_tx ON
-      tx_in_tx.id = tx_in.tx_in_id AND
-      tx_in_tx.valid_contract = TRUE
-    JOIN tx AS tx_out_tx ON
-      tx_out_tx.id = tx_out.tx_id AND
-      tx_out_tx.valid_contract = TRUE
-    WHERE
-      tx_in_tx.id IS null
-    GROUP BY pu.hash_id
-  ),
-active_stake AS (
-SELECT
-  sum(es.amount) AS active_stake,
-  es.pool_id  AS pool_hash_id
-FROM epoch_stake es
-WHERE es.pool_id = ANY($1)
-  AND es.epoch_no = (SELECT epoch_no FROM current_epoch)
-GROUP BY es.pool_id
-),
+WITH
 active_delegations AS (
   SELECT
     d1.addr_id,
@@ -250,18 +156,10 @@ LEFT JOIN owners_total_utxos otu ON
 WHERE id = ANY($1)
 `;
 
-const epochRewardsSubqueries = (epochLength: number, limit?: number) => `
+const epochRewardsSubqueries = (limit?: number) => `
 WITH epochs AS (
-  SELECT
-    "no" AS epoch_no,
-    CASE
-      WHEN "no" = (SELECT MAX("no") FROM epoch)
-        THEN EXTRACT(EPOCH FROM (end_time - start_time)) * 1000
-      ELSE
-        ${epochLength}
-    END AS epoch_length
-  FROM epoch
-  ORDER BY no DESC
+  SELECT *
+  FROM epoch_details
   ${limit !== undefined ? `LIMIT ${limit}` : ''}
 ),
 pool_mixed_rewards_per_epoch AS (
@@ -328,8 +226,8 @@ epoch_rewards AS (
     )
 )`;
 
-export const findPoolEpochRewards = (epochLength: number, limit?: number) => `
-${epochRewardsSubqueries(epochLength, limit)}
+export const findPoolEpochRewards = (limit?: number) => `
+${epochRewardsSubqueries(limit)}
 SELECT
   active_stake,
   epoch_length::TEXT,
@@ -344,7 +242,7 @@ ORDER BY epoch_no desc
 `;
 
 export const findPoolAPY = (epochLength: number, limit?: number) => `
-${epochRewardsSubqueries(epochLength, limit)}
+${epochRewardsSubqueries(limit)}
 SELECT
   hash_id,
   COALESCE(

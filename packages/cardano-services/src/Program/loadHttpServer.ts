@@ -201,13 +201,13 @@ export const loadHttpServer = async (args: ProgramArgs, deps: LoadHttpServerDepe
       },
       logger
     );
-  const db = await getPool(dnsResolver, logger, options);
   const cardanoNode = shouldInitCardanoNode(serviceNames)
     ? await getOgmiosCardanoNode(dnsResolver, logger, options)
     : undefined;
   const genesisData = options?.cardanoNodeConfigPath
     ? await loadGenesisData(options?.cardanoNodeConfigPath)
     : undefined;
+  const db = await getPool(dnsResolver, logger, options, genesisData ? genesisData.epochLength * 1000 : undefined);
   const serviceMap = serviceMapFactory({ args, dbConnection: db, dnsResolver, genesisData, logger, node: cardanoNode });
 
   for (const serviceName of serviceNames) {

@@ -89,12 +89,10 @@ export class StakePoolBuilder {
     return result.rows.length > 0 ? result.rows.map(mapAddressOwner) : [];
   }
 
-  public async queryPoolRewards(hashesIds: number[], epochLength: number, limit?: number) {
+  public async queryPoolRewards(hashesIds: number[], limit?: number) {
     this.#logger.debug('About to query pool rewards');
 
-    const result = await this.#db.query<EpochRewardModel>(Queries.findPoolEpochRewards(epochLength, limit), [
-      hashesIds
-    ]);
+    const result = await this.#db.query<EpochRewardModel>(Queries.findPoolEpochRewards(limit), [hashesIds]);
 
     return result.rows.map(mapEpochReward);
   }

@@ -5,12 +5,16 @@ import { DataMocks } from '../../data-mocks';
 import { PAGINATION_PAGE_SIZE_LIMIT_DEFAULT, StakePoolBuilder } from '../../../src';
 import { Pool } from 'pg';
 import { PoolInfo, PoolWith, StakePoolFixtureBuilder } from '../fixtures/FixtureBuilder';
+import { installTemporarySchemaOnDbSync } from '../../../src/util';
 import { logger } from '@cardano-sdk/util-dev';
 
 describe('StakePoolBuilder', () => {
-  const dbConnection = new Pool({
-    connectionString: process.env.POSTGRES_CONNECTION_STRING
-  });
+  const dbConnection = installTemporarySchemaOnDbSync(
+    new Pool({
+      connectionString: process.env.POSTGRES_CONNECTION_STRING
+    }),
+    logger
+  );
   const pagination = { limit: PAGINATION_PAGE_SIZE_LIMIT_DEFAULT, startAt: 0 };
   const builder = new StakePoolBuilder(dbConnection, logger);
   const epochLength = 432_000_000;

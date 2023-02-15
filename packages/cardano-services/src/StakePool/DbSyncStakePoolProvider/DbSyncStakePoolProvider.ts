@@ -219,7 +219,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
     // Get stake pools rewards cached
     const poolRewards = await this.#cache.get(
       queryCacheKey(StakePoolsSubQuery.REWARDS, orderedResultHashIds, options),
-      () => this.#builder.queryPoolRewards(orderedResultHashIds, this.#epochLength, rewardsHistoryLimit),
+      () => this.#builder.queryPoolRewards(orderedResultHashIds, rewardsHistoryLimit),
       UNLIMITED_CACHE_TTL
     );
     // Create lookup table with pool ids: (hashId:updateId)
