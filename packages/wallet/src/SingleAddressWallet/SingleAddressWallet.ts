@@ -491,7 +491,7 @@ export class SingleAddressWallet implements ObservableWallet {
   async submitTx(
     input: Cardano.Tx | TxCBOR | OutgoingTx,
     { mightBeAlreadySubmitted }: SubmitTxOptions = {}
-  ): Promise<void> {
+  ): Promise<Cardano.TransactionId> {
     const outgoingTx = processOutgoingTx(input);
     this.#logger.debug(`Submitting transaction ${outgoingTx.id}`);
     this.#newTransactions.submitting$.next(outgoingTx);
@@ -502,6 +502,7 @@ export class SingleAddressWallet implements ObservableWallet {
       const { slot: submittedAt } = await firstValueFrom(this.tip$);
       this.#logger.debug(`Submitted transaction ${outgoingTx.id} at slot ${submittedAt}`);
       this.#newTransactions.pending$.next(outgoingTx);
+      return outgoingTx.id;
     } catch (error) {
       if (
         mightBeAlreadySubmitted &&
@@ -514,7 +515,7 @@ export class SingleAddressWallet implements ObservableWallet {
       ) {
         this.#logger.debug(`Transaction ${outgoingTx.id} appears to be already submitted...`);
         this.#newTransactions.pending$.next(outgoingTx);
-        return;
+        return outgoingTx.id;
       }
       this.#newTransactions.failedToSubmit$.next({
         error: error as CardanoNodeErrors.TxSubmissionError,

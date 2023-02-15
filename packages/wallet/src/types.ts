@@ -104,7 +104,7 @@ export interface ObservableWallet {
   /**
    * @throws CardanoNodeErrors.TxSubmissionError
    */
-  submitTx(tx: Cardano.Tx | TxCBOR): Promise<void>;
+  submitTx(tx: Cardano.Tx | TxCBOR): Promise<Cardano.TransactionId>;
 
   shutdown(): void;
 }

@@ -202,8 +202,9 @@ describe('SingleAddressWallet methods', () => {
         const txPending = firstValueFrom(wallet.transactions.outgoing.pending$);
         const txInFlight = firstValueFrom(wallet.transactions.outgoing.inFlight$.pipe(skip(1)));
 
-        await wallet.submitTx(tx);
+        const txId = await wallet.submitTx(tx);
 
+        expect(txId).toBe(tx.id);
         expect(txSubmitProvider.submitTx).toBeCalledTimes(1);
         expect(txSubmitProvider.submitTx).toBeCalledWith({ signedTransaction: outgoingTx.cbor });
         expect(await txSubmitting).toEqual(outgoingTx);
