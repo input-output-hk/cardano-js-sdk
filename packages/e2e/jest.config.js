@@ -14,6 +14,7 @@ module.exports = {
     project('measurement-util'),
     project('ogmios'),
     project('providers'),
+    project('refactoring/stake-pool'),
     project('wallet')
   ],
   testTimeout: 1000 * 60 * 25

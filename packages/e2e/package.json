@@ -28,6 +28,7 @@
     "test:local-network": "jest -c jest.config.js --forceExit --selectProjects local-network --runInBand --verbose",
     "test:ogmios": "jest -c jest.config.js --forceExit --selectProjects ogmios --runInBand --verbose",
     "test:providers": "jest -c jest.config.js --forceExit --selectProjects providers --runInBand --verbose",
+    "test:refactor:stake-pool": "jest -c jest.config.js --forceExit --selectProjects refactoring/stake-pool --runInBand --verbose",
     "test:wallet": "jest -c jest.config.js --forceExit --selectProjects wallet --runInBand --verbose",
     "test:web-extension:build:sw": "tsc --build ./test && tsc --build ./test/web-extension && webpack -c test/web-extension/webpack.config.sw.js",
     "test:web-extension:build:other": "tsc --build ./test && tsc --build ./test/web-extension && webpack -c test/web-extension/webpack.config.js",
