@@ -58,7 +58,8 @@
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
     "lint:fix": "eslint --fix --ignore-path ../../.eslintignore \"**/*.ts\"",
     "prepack": "yarn build",
-    "test:build:verify": "yarn test:web-extension:build",
+    "test:build:verify:tsc": "tsc --build ./test",
+    "test:build:verify": "run-p test:web-extension:build test:build:verify:tsc",
     "test:debug": "DEBUG=true yarn test",
     "generate-mnemonics": "ts-node src/scripts/mnemonic.ts",
     "wait-for-network": "ts-node src/scripts/is-local-network-ready.ts"
