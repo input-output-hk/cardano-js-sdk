@@ -60,6 +60,16 @@ const mapCallbackFailure = (err: unknown, logger: Logger) => {
   return false;
 };
 
+const processTxInput = (input: string) => {
+  try {
+    const cbor = TxCBOR(input);
+    const tx = TxCBOR.deserialize(cbor);
+    return { cbor, tx };
+  } catch {
+    throw new ApiError(APIErrorCode.InvalidRequest, "Couldn't parse transaction. Expecting hex-encoded CBOR string.");
+  }
+};
+
 const MAX_COLLATERAL_AMOUNT = CML.BigNum.from_str('5000000');
 
 const cslToCbor = (csl: CslInterface) => Buffer.from(csl.to_bytes()).toString('hex');
@@ -303,21 +313,19 @@ export const createWalletApi = (
       throw new TxSignError(TxSignErrorCode.UserDeclined, 'user declined signing tx');
     }
   },
-  submitTx: async (tx: Cbor): Promise<string> => {
+  submitTx: async (input: Cbor): Promise<string> => {
     logger.debug('submitting tx');
-    const txData: Cardano.Tx = usingAutoFree((scope) =>
-      cmlToCore.newTx(scope.manage(CML.Transaction.from_bytes(Buffer.from(tx, 'hex'))))
-    );
+    const { cbor, tx } = processTxInput(input);
     const shouldProceed = await confirmationCallback({
-      data: txData,
+      data: tx,
       type: Cip30ConfirmationCallbackType.SubmitTx
     }).catch((error) => mapCallbackFailure(error, logger));
 
     if (shouldProceed) {
       try {
         const wallet = await firstValueFrom(wallet$);
-        await wallet.submitTx(TxCBOR(tx));
-        return txData.id.toString();
+        await wallet.submitTx(cbor);
+        return tx.id.toString();
       } catch (error) {
         logger.error(error);
         throw error;

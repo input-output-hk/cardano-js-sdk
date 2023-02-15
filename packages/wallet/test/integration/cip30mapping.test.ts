@@ -264,14 +264,30 @@ describe('cip30', () => {
         expect(typeof cip30dataSignature.signature).toBe('string');
       });
 
-      test('api.submitTx', async () => {
-        const txInternals = await wallet.initializeTx(simpleTxProps);
-        const finalizedTx = await wallet.finalizeTx({ tx: txInternals });
-        const cmlTx = coreToCml.tx(scope, finalizedTx).to_bytes();
-        await expect(api.submitTx(Buffer.from(cmlTx).toString('hex'))).resolves.not.toThrow();
-      });
+      describe('api.submitTx', () => {
+        let finalizedTx: Cardano.Tx;
+        let cmlTx: Uint8Array;
 
-      test.todo('errorStates');
+        beforeEach(async () => {
+          const txInternals = await wallet.initializeTx(simpleTxProps);
+          finalizedTx = await wallet.finalizeTx({ tx: txInternals });
+          cmlTx = coreToCml.tx(scope, finalizedTx).to_bytes();
+        });
+
+        it('resolves when submitting a valid transaction', async () => {
+          await expect(api.submitTx(Buffer.from(cmlTx).toString('hex'))).resolves.not.toThrow();
+        });
+
+        it('throws ApiError when submitting a transaction that has invalid encoding', async () => {
+          await expect(api.submitTx(Buffer.from(cmlTx).toString('base64'))).rejects.toThrowError(ApiError);
+        });
+
+        it('throws ApiError when submitting a hex string that is not a serialized transaction', async () => {
+          await expect(api.submitTx(Buffer.from([0, 1, 3]).toString('hex'))).rejects.toThrowError(ApiError);
+        });
+
+        test.todo('errorStates');
+      });
     });
 
     describe('confirmation callbacks', () => {
