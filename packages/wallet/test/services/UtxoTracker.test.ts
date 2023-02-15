@@ -1,11 +1,12 @@
 import { Cardano, UtxoProvider } from '@cardano-sdk/core';
 import { InMemoryUtxoStore } from '../../src/persistence';
 import { Observable } from 'rxjs';
-import { PersistentCollectionTrackerSubject, createUtxoTracker } from '../../src/services';
+import { PersistentCollectionTrackerSubject, TxInFlight, createUtxoTracker } from '../../src/services';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
+import { dummyCbor } from '../util';
 import { dummyLogger } from 'ts-log';
-import { utxo } from '../mocks';
+import { utxo, utxo2 } from '../mocks';
 
 describe('createUtxoTracker', () => {
   // these variables are not relevant for this test, overwriting utxoSource$
@@ -44,13 +45,14 @@ describe('createUtxoTracker', () => {
     };
     const tx2Outputs = [tx2Output];
     createTestScheduler().run(({ cold, expectObservable }) => {
-      const inFlightTx1 = {
+      const inFlightTx1: TxInFlight = {
         body: {
-          inputs: [spendUtxo[0]],
+          inputs: [spendUtxo[0] as Cardano.TxIn],
           outputs: tx1Outputs
-        },
+        } as Cardano.TxBody,
+        cbor: dummyCbor,
         id: transactionId1
-      } as unknown as Cardano.Tx;
+      };
       const chainableUtxoFromTx1 = [
         { address: ownAddress, index: tx1Outputs.indexOf(tx1ChangeOutput), txId: transactionId1 },
         tx1ChangeOutput
@@ -59,17 +61,19 @@ describe('createUtxoTracker', () => {
         { address: ownAddress, index: tx2Outputs.indexOf(tx2Output), txId: transactionId2 },
         tx2Output
       ] as Cardano.Utxo;
-      const inFlightTx2 = {
+      const inFlightTx2: TxInFlight = {
         body: {
-          inputs: [chainableUtxoFromTx1[0]],
+          inputs: [chainableUtxoFromTx1[0] as Cardano.TxIn],
           outputs: tx2Outputs
-        },
+        } as Cardano.TxBody,
+        cbor: dummyCbor,
         id: transactionId2
-      } as unknown as Cardano.Tx;
-      const transactionsInFlight$ = cold('-a-b-c|', {
+      };
+
+      const transactionsInFlight$ = cold<TxInFlight[]>('-a-b-c|', {
         a: [],
-        b: [{ tx: inFlightTx1 }],
-        c: [{ tx: inFlightTx1 }, { tx: inFlightTx2 }]
+        b: [inFlightTx1],
+        c: [inFlightTx1, inFlightTx2]
       });
       const utxoTracker = createUtxoTracker(
         {
@@ -98,7 +102,7 @@ describe('createUtxoTracker', () => {
       const utxoWithTx1InFlight = [...utxo.slice(1), chainableUtxoFromTx1];
       const utxoWithTx2InFlight = [...utxo.slice(1), chainableUtxoFromTx2];
       expectObservable(utxoTracker.total$).toBe('-a-b-c|', { a: utxo, b: utxoWithTx1InFlight, c: utxoWithTx2InFlight });
-      expectObservable(utxoTracker.unspendable$).toBe('a---|', { a: [] });
+      expectObservable(utxoTracker.unspendable$).toBe('-a----|', { a: [] });
       expectObservable(utxoTracker.available$).toBe('-a-b-c|', {
         a: utxo,
         b: utxoWithTx1InFlight,
@@ -146,10 +150,10 @@ describe('createUtxoTracker', () => {
     });
   });
 
-  it('sets unspendable utxos and locks them', () => {
+  it('sets unspendable utxos and locks them', async () => {
     const store = new InMemoryUtxoStore();
     const address = utxo[0][0].address;
-    createTestScheduler().run(({ cold, expectObservable }) => {
+    await createTestScheduler().run(async ({ cold, expectObservable }) => {
       const transactionsInFlight$ = cold('-a--|', { a: [] });
       const utxoTracker = createUtxoTracker(
         {
@@ -168,11 +172,52 @@ describe('createUtxoTracker', () => {
           utxoSource$: cold('a---|', { a: utxo }) as unknown as PersistentCollectionTrackerSubject<Cardano.Utxo>
         }
       );
-      utxoTracker.setUnspendable(utxo.slice(1));
+      await utxoTracker.setUnspendable(utxo.slice(1));
 
       expectObservable(utxoTracker.total$).toBe('-a--|', { a: utxo });
       expectObservable(utxoTracker.unspendable$).toBe('a', { a: utxo.slice(1) });
       expectObservable(utxoTracker.available$).toBe('-a', { a: [utxo[0]] });
+    });
+  });
+
+  it('unsets unspendable utxos if they are no longer present in wallet utxo set', () => {
+    const store = new InMemoryUtxoStore();
+    const address = utxo[0][0].address;
+    createTestScheduler().run(({ cold, expectObservable }) => {
+      const transactionsInFlight$ = cold('-a--|', { a: [] });
+      const utxoTracker = createUtxoTracker(
+        {
+          addresses$: cold('a|', { a: [address!] }),
+          logger,
+          retryBackoffConfig,
+          stores: {
+            unspendableUtxo: store,
+            utxo: store
+          },
+          tipBlockHeight$,
+          transactionsInFlight$,
+          utxoProvider
+        },
+        {
+          unspendableUtxoSource$: new PersistentCollectionTrackerSubject<Cardano.Utxo>(
+            () =>
+              cold('a|', {
+                a: [utxo[0]]
+              }),
+            store
+          ),
+          utxoSource$: cold('a---b---|', {
+            a: utxo,
+            b: utxo2
+          }) as unknown as PersistentCollectionTrackerSubject<Cardano.Utxo>
+        }
+      );
+      expectObservable(utxoTracker.total$).toBe('-a--b---|', { a: utxo, b: utxo2 });
+      expectObservable(utxoTracker.unspendable$).toBe('-a--b---|', { a: [utxo[0]], b: [] });
+      expectObservable(utxoTracker.available$).toBe('-a--b---|', {
+        a: utxo2,
+        b: utxo2
+      });
     });
   });
 });

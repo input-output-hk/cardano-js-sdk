@@ -52,7 +52,7 @@
     "prepack": "yarn build"
   },
   "devDependencies": {
-    "@cardano-ogmios/schema": "5.5.7",
+    "@cardano-ogmios/schema": "5.6.0",
     "@cardano-sdk/util-dev": "^0.7.0-nightly.2",
     "@types/lodash": "^4.14.182",
     "eslint": "^7.32.0",
@@ -66,7 +66,7 @@
     "ws": "^8.5.0"
   },
   "dependencies": {
-    "@cardano-ogmios/client": "5.5.7",
+    "@cardano-ogmios/client": "5.6.0",
     "@cardano-sdk/core": "^0.8.0-nightly.3",
     "@cardano-sdk/crypto": "^0.1.0",
     "@cardano-sdk/util": "^0.7.1-nightly.1",

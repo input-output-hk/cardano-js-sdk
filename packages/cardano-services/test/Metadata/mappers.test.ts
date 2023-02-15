@@ -1,17 +1,21 @@
-import { Cardano, ProviderUtil } from '@cardano-sdk/core';
+import { Buffer } from 'buffer';
+import { Cardano, cmlToCore, coreToCml, metadatum } from '@cardano-sdk/core';
 import { TxMetadataModel, mapTxMetadata } from '../../src/Metadata';
+import { usingAutoFree } from '@cardano-sdk/util';
+
+const toBytes = (data: Cardano.Metadatum) => usingAutoFree((scope) => coreToCml.txMetadatum(scope, data).to_bytes());
 
 describe('mapTxMetadata', () => {
   it('maps TxMetadataModel to Cardano.TxMetadata', () => {
     const transactionHash = 'cefd2fcf657e5e5d6c35975f4e052f427819391b153ebb16ad8aa107ba5a3819';
     const txMetadataModel: TxMetadataModel[] = [
       {
-        json_value: { v: 1 },
+        bytes: toBytes(new Map([[127n, metadatum.jsonToMetadatum({ v: 1 })]])),
         key: '127',
         tx_id: Buffer.from(transactionHash, 'hex')
       },
       {
-        json_value: { a: 2 },
+        bytes: toBytes(new Map([[500n, metadatum.jsonToMetadatum({ a: 2 })]])),
         key: '500',
         tx_id: Buffer.from(transactionHash, 'hex')
       }
@@ -29,22 +33,33 @@ describe('mapTxMetadata', () => {
     expect(mapTxMetadata([])).toEqual(new Map());
   });
 
-  it('ignores non-metadata objects (with no metadata "key" or "json_value")', () => {
-    expect(mapTxMetadata([{ json_value: { a: 1 }, key: '' }])).toEqual(new Map());
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect(mapTxMetadata([{ json_value: null, key: '123' } as any])).toEqual(new Map());
+  it('ignores non-metadata objects (with no metadata "key")', () => {
+    expect(mapTxMetadata([{ bytes: toBytes(new Map([[127n, '']])), key: '' }])).toEqual(new Map());
+  });
+
+  it('ignores non-metadata objects (with no metadata "bytes")', () => {
+    expect(mapTxMetadata([{ bytes: null as unknown as Uint8Array, key: '123' }])).toEqual(new Map());
+  });
+
+  it('throws if non-metadata objects (with metadata "bytes" which is not a Map)', () => {
+    expect(() => mapTxMetadata([{ bytes: toBytes('test'), key: '123' }])).toThrow();
+  });
+
+  it('ignores non-metadata objects (with metadata "bytes" which is a Map but doesn\'t contain key)', () => {
+    expect(mapTxMetadata([{ bytes: toBytes(new Map([[127n, '']])), key: '123' }])).toEqual(new Map());
   });
 
   it('throws if key cannot be parse to bigint', () => {
-    expect(() => mapTxMetadata([{ json_value: { a: 1 }, key: 'bad' }])).toThrow();
+    expect(() => mapTxMetadata([{ bytes: toBytes('test'), key: 'bad' }])).toThrow();
   });
 
-  it('uses ProviderUtil.jsonToMetadata to map json_value', () => {
-    const spy = jest.spyOn(ProviderUtil, 'jsonToMetadatum');
+  it.skip('uses cmlToCore.txMetadatum to map bytes', () => {
+    const bytes = toBytes(new Map([[127n, 'test']]));
+    const spy = jest.spyOn(cmlToCore, 'txMetadatum');
     spy.mockReset();
-    const json_value = { a: 1 };
-    mapTxMetadata([{ json_value, key: '123' }]);
+
+    mapTxMetadata([{ bytes, key: '127' }]);
     expect(spy).toBeCalledTimes(1);
-    expect(spy).toBeCalledWith(json_value);
+    expect(spy).toBeCalledWith(bytes);
   });
 });

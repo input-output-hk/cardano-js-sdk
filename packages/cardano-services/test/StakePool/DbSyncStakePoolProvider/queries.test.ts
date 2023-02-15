@@ -10,7 +10,7 @@ describe('queries', () => {
     test('sort by field with simple mapping', () => {
       const query = withSort(dummyQuery, { field: 'name', order: 'asc' });
       expect(query).toEqual(
-        `${dummyQuery} ORDER BY lower((pod.json -> 'name')::TEXT) asc NULLS LAST, pool_id asc NULLS LAST`
+        `${dummyQuery} ORDER BY lower((pod.json ->> 'name')::TEXT) asc NULLS LAST, pool_id asc NULLS LAST`
       );
     });
     test('sort by field with secondary sorts', () => {

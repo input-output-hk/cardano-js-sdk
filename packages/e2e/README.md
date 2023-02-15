@@ -113,6 +113,38 @@ Address:    addr_test1qr0c3frkem9cqn5f73dnvqpena27k2fgqew6wct9eaka03agfwkvzr0zyq
 
 You can configure any of these five wallets in your test and use any amount of tADA you need.
 
+### Local Test Network - development version
+
+In addition to the **local-network** npm script there is a script suitable for development, which mounts the `packages` directory in
+the service containers. It helps to apply changes to the components without shutting down the **local-network** each time.
+
+It can be started with:
+
+```bash
+$ yarn workspace @cardano-sdk/e2e local-network:dev
+```
+
+and a good idea is to run following command before starting it.
+
+```bash
+$ yarn cleanup && yarn && yarn build
+```
+
+Restart the http-server:
+
+```bash
+$ docker exec -it local-network-e2e-http-server-1 kill 1
+```
+
+So, if while working on the `core` and `cardano-services` packages simultaneously, we need to restart the http-server
+to check the effect of our ongoing changes, it is enough to issue the following command:
+
+```bash
+$ yarn workspace @cardano-sdk/core build && yarn workspace @cardano-sdk/cardano-services build && docker exec -it local-network-e2e-http-server-1 kill 1
+```
+
+if it exits with error we need to fix our ongoing changes, if it exits silently, the http-server is now running with our changes.
+
 ## Local file server
 
 The end-to-end environment runs a Nginx instance that allows us to serve files directly to the local-network.
@@ -141,7 +173,7 @@ LOGGER_MIN_SEVERITY=info
 FAUCET_PROVIDER=cardano-wallet
 FAUCET_PROVIDER_PARAMS='{"baseUrl":"http://localhost:8090/v2","mnemonic":"fire method repair aware foot tray accuse brother popular olive find account sick rocket next"}'
 KEY_MANAGEMENT_PROVIDER=inMemory
-KEY_MANAGEMENT_PARAMS='{"accountIndex": 0, "chainId":{"networkId": 0, "networkMagic": 888}, "password":"some_password","mnemonic":""}'
+KEY_MANAGEMENT_PARAMS='{"accountIndex": 0, "chainId":{"networkId": 0, "networkMagic": 888}, "passphrase":"some_passphrase","mnemonic":""}'
 ASSET_PROVIDER=http
 ASSET_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/asset"}'
 CHAIN_HISTORY_PROVIDER=http
@@ -158,7 +190,7 @@ STAKE_POOL_PROVIDER=stub
 STAKE_POOL_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/stake-pool"}'
 ```
 
-> :information_source: Notice that KEY_MANAGEMENT_PARAMS *mnemonic* property is empty, if you leave this empty on the **local network's** e2e tests a new set of random mnemonics will be generated for you, this is the recommended way of setting up e2e tests on this network.
+> :information_source: Notice that KEY_MANAGEMENT_PARAMS _mnemonic_ property is empty, if you leave this empty on the **local network's** e2e tests a new set of random mnemonics will be generated for you, this is the recommended way of setting up e2e tests on this network.
 
 Then to run the local network tests, run:
 
@@ -183,7 +215,7 @@ WORKER_PARALLEL_TRANSACTION=3
 
 > :information_source: Ensure the configured wallet has sufficient funds for the test transactions (see [here](#generate_wallet)).
 
-Before executing the test, start the *local-network*:
+Before executing the test, start the _local-network_:
 
 ```bash
 $ yarn workspace @cardano-sdk/e2e test:local-network
@@ -207,7 +239,7 @@ LOGGER_MIN_SEVERITY=debug
 
 # Providers setup
 KEY_MANAGEMENT_PROVIDER=inMemory
-KEY_MANAGEMENT_PARAMS='{"accountIndex": 0, "chainId":{"networkId": 0, "networkMagic": 888}, "password":"some_password","mnemonic":"vacant violin soft weird deliver render brief always monitor general maid smart jelly core drastic erode echo there clump dizzy card filter option defense"}'
+KEY_MANAGEMENT_PARAMS='{"accountIndex": 0, "chainId":{"networkId": 0, "networkMagic": 888}, "passphrase":"some_passphrase","mnemonic":"vacant violin soft weird deliver render brief always monitor general maid smart jelly core drastic erode echo there clump dizzy card filter option defense"}'
 ASSET_PROVIDER=http
 ASSET_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/asset"}'
 CHAIN_HISTORY_PROVIDER=http
@@ -277,7 +309,7 @@ Currently a few artillery load test scenarios are implemented.
 The main purpose is to simulate expected load against provider endpoints or wallet initialization/restoration.
 
 **The Artillery tests** are currently configured to run only with 1 worker.
-With plan to design and introduce our custom Distributed load test solution in post MVP stage. 
+With plan to design and introduce our custom Distributed load test solution in post MVP stage.
 
 To run stake pool search scenario against the local-network endpoint:
 

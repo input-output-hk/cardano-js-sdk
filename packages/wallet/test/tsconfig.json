@@ -19,6 +19,9 @@
       "path": "../../util/src"
     },
     {
+      "path": "../../crypto/src"
+    },
+    {
       "path": "../../util-dev/src"
     },
     {

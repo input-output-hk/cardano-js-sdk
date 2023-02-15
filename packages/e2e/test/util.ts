@@ -102,8 +102,12 @@ export const txConfirmed = (
         })
       ),
       failed$.pipe(
-        mergeMap(({ tx, error, reason }) =>
-          tx.id === id ? throwError(() => error || new Error(`Tx failed due to '${reason}': ${id}`)) : EMPTY
+        mergeMap((outgoingTx) =>
+          outgoingTx.id === id
+            ? throwError(
+                () => outgoingTx.error || new Error(`Tx failed due to '${outgoingTx.reason}': ${outgoingTx.id}`)
+              )
+            : EMPTY
         )
       )
     )
@@ -250,7 +254,7 @@ export const createStandaloneKeyAgent = async (
   await InMemoryKeyAgent.fromBip39MnemonicWords(
     {
       chainId: genesis,
-      getPassword: async () => Buffer.from(''),
+      getPassphrase: async () => Buffer.from(''),
       mnemonicWords: mnemonics
     },
     { bip32Ed25519, inputResolver: { resolveInputAddress: async () => null }, logger }

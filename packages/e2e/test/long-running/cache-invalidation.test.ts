@@ -20,7 +20,7 @@ const wallet1Params: KeyAgentFactoryProps = {
   mnemonic:
     // eslint-disable-next-line max-len
     'phrase raw learn suspect inmate powder combine apology regular hero gain chronic fruit ritual short screen goddess odor keen creek brand today kit machine',
-  password: 'some_password'
+  passphrase: 'some_passphrase'
 };
 
 describe('cache invalidation', () => {

@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
 import { AuxiliaryData } from './AuxiliaryData';
-import { Base64Blob, HexBlob, OpaqueString } from '@cardano-sdk/util';
+import { Base64Blob, HexBlob, OpaqueString, hexStringToBuffer, usingAutoFree } from '@cardano-sdk/util';
+import { CML } from '../../CML/CML';
 import { Certificate } from './Certificate';
 import { Datum, Script } from './Script';
 import { ExUnits, ValidityInterval } from './ProtocolParameters';
@@ -9,6 +9,8 @@ import { HydratedTxIn, TxIn, TxOut } from './Utxo';
 import { Lovelace, TokenMap } from './Value';
 import { PartialBlockHeader } from './Block';
 import { RewardAccount } from './RewardAccount';
+import { TxBodyCBOR } from '../../CBOR/TxBodyCBOR';
+import { bytesToHex } from '../../util/misc';
 
 /**
  * transaction hash as hex string
@@ -22,6 +24,16 @@ export type TransactionId = OpaqueString<'TransactionId'>;
 export const TransactionId = (value: string): TransactionId =>
   Crypto.Hash32ByteBase16(value) as unknown as TransactionId;
 TransactionId.fromHexBlob = (value: HexBlob) => Crypto.Hash32ByteBase16.fromHexBlob<TransactionId>(value);
+TransactionId.fromTxBodyCbor = (bodyCbor: TxBodyCBOR): TransactionId =>
+  bytesToHex(
+    usingAutoFree((scope) =>
+      scope
+        .manage(
+          CML.hash_transaction(scope.manage(CML.TransactionBody.from_bytes(hexStringToBuffer(bodyCbor.toString()))))
+        )
+        .to_bytes()
+    )
+  ) as unknown as TransactionId;
 
 export interface Withdrawal {
   stakeAddress: RewardAccount;

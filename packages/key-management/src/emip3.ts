@@ -9,9 +9,9 @@ const SALT_LENGTH = 32;
 const TAG_LENGTH = 16;
 const AAD = Buffer.from('', 'hex');
 
-export const createPbkdf2Key = async (password: Uint8Array, salt: Uint8Array | Uint16Array) =>
+export const createPbkdf2Key = async (passphrase: Uint8Array, salt: Uint8Array | Uint16Array) =>
   await new Promise<Buffer>((resolve, reject) =>
-    pbkdf2(password, salt, PBKDF2_ITERATIONS, KEY_LENGTH, 'sha512', (err, derivedKey) => {
+    pbkdf2(passphrase, salt, PBKDF2_ITERATIONS, KEY_LENGTH, 'sha512', (err, derivedKey) => {
       if (err) return reject(err);
       resolve(derivedKey);
     })
@@ -20,10 +20,10 @@ export const createPbkdf2Key = async (password: Uint8Array, salt: Uint8Array | U
 /**
  * https://github.com/Emurgo/EmIPs/blob/master/specs/emip-003.md
  */
-export const emip3encrypt = async (data: Uint8Array, password: Uint8Array): Promise<Uint8Array> => {
+export const emip3encrypt = async (data: Uint8Array, passphrase: Uint8Array): Promise<Uint8Array> => {
   const salt = new Uint8Array(SALT_LENGTH);
   getRandomValues(salt);
-  const key = await createPbkdf2Key(password, salt);
+  const key = await createPbkdf2Key(passphrase, salt);
   const nonce = new Uint8Array(NONCE_LENGTH);
   getRandomValues(nonce);
   const cipher = chacha.createCipher(key, Buffer.from(nonce));
@@ -37,12 +37,12 @@ export const emip3encrypt = async (data: Uint8Array, password: Uint8Array): Prom
 /**
  * https://github.com/Emurgo/EmIPs/blob/master/specs/emip-003.md
  */
-export const emip3decrypt = async (encrypted: Uint8Array, password: Uint8Array): Promise<Uint8Array> => {
+export const emip3decrypt = async (encrypted: Uint8Array, passphrase: Uint8Array): Promise<Uint8Array> => {
   const salt = encrypted.slice(0, SALT_LENGTH);
   const nonce = encrypted.slice(SALT_LENGTH, SALT_LENGTH + NONCE_LENGTH);
   const tag = encrypted.slice(SALT_LENGTH + NONCE_LENGTH, SALT_LENGTH + NONCE_LENGTH + TAG_LENGTH);
   const data = encrypted.slice(SALT_LENGTH + NONCE_LENGTH + TAG_LENGTH);
-  const key = await createPbkdf2Key(password, salt);
+  const key = await createPbkdf2Key(passphrase, salt);
   const decipher = chacha.createDecipher(key, Buffer.from(nonce));
   decipher.setAuthTag(Buffer.from(tag));
   decipher.setAAD(AAD);

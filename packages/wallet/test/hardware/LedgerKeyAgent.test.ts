@@ -1,10 +1,10 @@
+/* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
 import * as mocks from '../mocks';
 import {
   AddressType,
   CommunicationType,
-  GroupedAddress,
   LedgerKeyAgent,
   LedgerTransportType,
   SerializableLedgerKeyAgentData,
@@ -12,14 +12,13 @@ import {
 } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { CML, Cardano } from '@cardano-sdk/core';
-import { SingleAddressWallet, setupWallet } from '../../src';
+import { InitializeTxProps, InitializeTxResult, SingleAddressWallet, setupWallet } from '../../src';
 import { dummyLogger as logger } from 'ts-log';
-import { mockKeyAgentDependencies } from '@cardano-sdk/key-management/test/mocks';
+import { mockKeyAgentDependencies } from '../../../key-management/test/mocks';
 import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 describe('LedgerKeyAgent', () => {
   let keyAgent: LedgerKeyAgent;
-  const address = mocks.utxo[0][0].address;
   let txSubmitProvider: mocks.TxSubmitProviderStub;
   let wallet: SingleAddressWallet;
 
@@ -27,34 +26,22 @@ describe('LedgerKeyAgent', () => {
     txSubmitProvider = mocks.mockTxSubmitProvider();
     ({ keyAgent, wallet } = await setupWallet({
       bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
-      createKeyAgent: async (dependencies) => {
-        const ledgerKeyAgent = await LedgerKeyAgent.createWithDevice(
+      createKeyAgent: async (dependencies) =>
+        await LedgerKeyAgent.createWithDevice(
           {
             chainId: Cardano.ChainIds.LegacyTestnet,
             communicationType: CommunicationType.Node
           },
           dependencies
-        );
-        const groupedAddress: GroupedAddress = {
-          accountIndex: 0,
-          address,
-          index: 0,
-          networkId: Cardano.NetworkId.Testnet,
-          rewardAccount: mocks.rewardAccount,
-          stakeKeyDerivationPath: mocks.stakeKeyDerivationPath,
-          type: AddressType.External
-        };
-        ledgerKeyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
-        ledgerKeyAgent.knownAddresses.push(groupedAddress);
-        return ledgerKeyAgent;
-      },
+        ),
       createWallet: async (ledgerKeyAgent) => {
+        const { address, rewardAccount } = await ledgerKeyAgent.deriveAddress({ index: 0, type: AddressType.External });
         const assetProvider = mocks.mockAssetProvider();
         const stakePoolProvider = createStubStakePoolProvider();
         const networkInfoProvider = mocks.mockNetworkInfoProvider();
-        const utxoProvider = mocks.mockUtxoProvider();
-        const rewardsProvider = mocks.mockRewardsProvider();
-        const chainHistoryProvider = mocks.mockChainHistoryProvider();
+        const utxoProvider = mocks.mockUtxoProvider({ address });
+        const rewardsProvider = mocks.mockRewardsProvider({ rewardAccount });
+        const chainHistoryProvider = mocks.mockChainHistoryProvider({ rewardAccount });
         const asyncKeyAgent = util.createAsyncKeyAgent(ledgerKeyAgent);
         return new SingleAddressWallet(
           { name: 'HW Wallet' },
@@ -112,7 +99,7 @@ describe('LedgerKeyAgent', () => {
     expect(typeof keyAgent.extendedAccountPublicKey).toBe('string');
   });
 
-  test('sign tx', async () => {
+  describe('signTransaction', () => {
     const outputs = [
       {
         address: Cardano.Address(
@@ -130,16 +117,34 @@ describe('LedgerKeyAgent', () => {
         }
       }
     ];
-    const props = {
+    const props: InitializeTxProps = {
+      options: {
+        validityInterval: {
+          invalidBefore: Cardano.Slot(1),
+          invalidHereafter: Cardano.Slot(999_999_999)
+        }
+      },
       outputs: new Set<Cardano.TxOut>(outputs)
     };
+    let txInternals: InitializeTxResult;
 
-    const txInternals = await wallet.initializeTx(props);
-    const signatures = await keyAgent.signTransaction({
-      body: txInternals.body,
-      hash: txInternals.hash
+    beforeAll(async () => {
+      txInternals = await wallet.initializeTx(props);
     });
-    expect(signatures.size).toBe(2);
+
+    it('successfully signs a transaction with assets and validity interval', async () => {
+      const signatures = await keyAgent.signTransaction(txInternals);
+      expect(signatures.size).toBe(2);
+    });
+
+    it('throws if signed transaction hash doesnt match hash computed by the wallet', async () => {
+      await expect(
+        keyAgent.signTransaction({
+          ...txInternals,
+          hash: 'non-matching' as unknown as Cardano.TransactionId
+        })
+      ).rejects.toThrow();
+    });
   });
 
   describe('establish, check and re-establish device connection', () => {

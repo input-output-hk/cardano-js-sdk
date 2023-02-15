@@ -45,6 +45,57 @@ export const utxo: Cardano.Utxo[] = [
   [
     {
       address: Cardano.Address(
+        'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz'
+      ),
+      index: 1,
+      txId: Cardano.TransactionId('c7c0973c6bbf1a04a9f306da7814b4fa564db649bf48b0bd93c273bd03143547')
+    },
+    {
+      address: Cardano.Address(
+        'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'
+      ),
+      value: {
+        coins: 3_289_566n
+      }
+    }
+  ],
+  [
+    {
+      address: Cardano.Address(
+        'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz'
+      ),
+      index: 2,
+      txId: Cardano.TransactionId('c7c0973c6bbf1a04a9f306da7814b4fa564db649bf48b0bd93c273bd03143547')
+    },
+    {
+      address: Cardano.Address(
+        'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'
+      ),
+      value: {
+        coins: 1_000_000n
+      }
+    }
+  ],
+  [
+    {
+      address: Cardano.Address(
+        'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz'
+      ),
+      index: 3,
+      txId: Cardano.TransactionId('c7c0973c6bbf1a04a9f306da7814b4fa564db649bf48b0bd93c273bd03143547')
+    },
+    {
+      address: Cardano.Address(
+        'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'
+      ),
+      value: {
+        coins: 5_289_566n
+      }
+    }
+  ],
+  [
+    {
+      address: Cardano.Address(
         'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'
       ),
       index: 2,
@@ -66,13 +117,23 @@ export const utxo2 = utxo.slice(1);
 /**
  * Provider stub for testing
  *
- * @param utxoSet The set of UTXOs to be included in the wallet state.
+ * @param The options
+ * @param The.address patch utxos to use a specific utxo output address
+ * @param The.utxoSet The set of UTXOs to be included in the wallet state.
  *
  * returns UtxoProvider-compatible object
  */
-export const mockUtxoProvider = (utxoSet?: Cardano.Utxo[]): UtxoProvider => ({
+export const mockUtxoProvider = ({
+  address,
+  utxoSet = utxo
+}: {
+  address?: Cardano.Address;
+  utxoSet?: Cardano.Utxo[];
+} = {}): UtxoProvider => ({
   healthCheck: jest.fn().mockResolvedValue({ ok: true }),
-  utxoByAddresses: jest.fn().mockResolvedValue(utxoSet ? utxoSet : utxo)
+  utxoByAddresses: jest
+    .fn()
+    .mockResolvedValue(address ? utxoSet.map(([txIn, txOut]) => [txIn, { ...txOut, address }]) : utxoSet)
 });
 
 export const mockUtxoProvider2 = (delayMs: number): UtxoProvider => {

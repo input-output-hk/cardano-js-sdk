@@ -1,4 +1,4 @@
-import { Cardano, CardanoNodeErrors, EpochRewards } from '@cardano-sdk/core';
+import { Cardano, CardanoNodeErrors, EpochRewards, TxCBOR } from '@cardano-sdk/core';
 import { Observable } from 'rxjs';
 
 export enum TransactionFailure {
@@ -31,7 +31,7 @@ export interface TransactionalTracker<T> extends TransactionalObservables<T> {
 }
 
 export interface UtxoTracker extends TransactionalTracker<Cardano.Utxo[]> {
-  setUnspendable(utxo: Cardano.Utxo[]): void;
+  setUnspendable(utxo: Cardano.Utxo[]): Promise<void>;
 }
 
 export type Milliseconds = number;
@@ -45,22 +45,32 @@ export interface PollingConfig {
   readonly consideredOutOfSyncAfter?: Milliseconds;
 }
 
-export interface FailedTx {
-  tx: Cardano.Tx;
+export interface OutgoingTx {
+  cbor: TxCBOR;
+  body: Cardano.TxBody;
+  id: Cardano.TransactionId;
+}
+
+export interface FailedTx extends OutgoingTx {
   reason: TransactionFailure;
   error?: CardanoNodeErrors.TxSubmissionError;
 }
 
-export type ConfirmedTx = { tx: Cardano.Tx; confirmedAt: Cardano.PartialBlockHeader['slot'] };
-export type TxInFlight = { tx: Cardano.Tx; submittedAt?: Cardano.PartialBlockHeader['slot'] };
+export interface ConfirmedTx extends OutgoingTx {
+  confirmedAt: Cardano.PartialBlockHeader['slot'];
+}
+
+export interface TxInFlight extends OutgoingTx {
+  submittedAt?: Cardano.PartialBlockHeader['slot'];
+}
 
 export interface TransactionsTracker {
   readonly history$: Observable<Cardano.HydratedTx[]>;
   readonly rollback$: Observable<Cardano.HydratedTx>;
   readonly outgoing: {
     readonly inFlight$: Observable<TxInFlight[]>;
-    readonly submitting$: Observable<Cardano.Tx>;
-    readonly pending$: Observable<Cardano.Tx>;
+    readonly submitting$: Observable<OutgoingTx>;
+    readonly pending$: Observable<OutgoingTx>;
     readonly failed$: Observable<FailedTx>;
     readonly confirmed$: Observable<ConfirmedTx>;
   };

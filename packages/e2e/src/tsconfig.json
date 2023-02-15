@@ -26,6 +26,9 @@
       "path": "../../util/src"
     },
     {
+      "path": "../../crypto/src"
+    },
+    {
       "path": "../../wallet/src"
     }
   ]

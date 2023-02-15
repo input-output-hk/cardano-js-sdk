@@ -15,9 +15,10 @@ import {
   withLatestFrom
 } from 'rxjs';
 
-import { ConfirmedTx, FailedTx, Milliseconds, TransactionFailure, TransactionsTracker } from './types';
+import { ConfirmedTx, FailedTx, Milliseconds, OutgoingTx, TransactionFailure, TransactionsTracker } from './types';
 import { WalletStores } from '../persistence';
 import { isNotNil } from '@cardano-sdk/util';
+import pick from 'lodash/pick';
 
 export interface TransactionReemitterProps {
   transactions: Pick<TransactionsTracker, 'rollback$'> & {
@@ -37,7 +38,7 @@ export interface TransactionReemitterProps {
 }
 
 export interface TransactionReemiter {
-  reemit$: Observable<Cardano.Tx>;
+  reemit$: Observable<OutgoingTx>;
   failed$: Observable<FailedTx>;
 }
 
@@ -85,7 +86,7 @@ export const createTransactionReemitter = ({
         case txSource.submitting: {
           // Transactions in submitting are the ones reemitted. Remove them from volatiles
           logger.debug(`Transaction ${vt.tx.id} is being resubmitted. Remove it from volatiles`);
-          volatiles = volatiles.filter(({ tx }) => tx.id !== vt.tx.id);
+          volatiles = volatiles.filter((tx) => tx.id !== vt.tx.id);
           stores.volatileTransactions.set(volatiles);
           break;
         }
@@ -96,7 +97,7 @@ export const createTransactionReemitter = ({
               : 0;
           // Remove transactions considered stable
           logger.debug(`Removing stable transactions (slot <= ${oldestAcceptedSlot}), from volatiles`);
-          logger.debug(`Adding new volatile transaction ${vt.confirmed.tx.id}`);
+          logger.debug(`Adding new volatile transaction ${vt.confirmed.id}`);
           volatiles = [
             ...volatiles.filter(({ confirmedAt }) => confirmedAt.valueOf() > oldestAcceptedSlot),
             vt.confirmed
@@ -113,24 +114,23 @@ export const createTransactionReemitter = ({
     withLatestFrom(volatileTransactions$),
     map(([tx, volatiles]) => {
       // Get the confirmed Tx transaction to be retried
-      const reemitTx = volatiles.find(({ tx: txVolatile }) => txVolatile.id === tx!.id);
+      const reemitTx = volatiles.find((txVolatile) => txVolatile.id === tx.id);
       if (!reemitTx) {
-        logger.error(`Could not find confirmed transaction with id ${tx!.id} that was rolled back`);
+        logger.error(`Could not find confirmed transaction with id ${tx.id} that was rolled back`);
         return;
       }
       return reemitTx!;
     }),
     filter(isNotNil),
-    map(({ tx }) => tx),
     withLatestFrom(tipSlot$),
     map(([tx, tipSlot]) => {
       const invalidHereafter = tx.body?.validityInterval?.invalidHereafter;
       if (invalidHereafter && tipSlot > invalidHereafter) {
         const err: FailedTx = {
           reason: TransactionFailure.Timeout,
-          tx
+          ...tx
         };
-        logger.error(`Rolled back transaction with id ${err.tx.id} is no longer valid`, err.reason);
+        logger.error(`Rolled back transaction with id ${err.id} is no longer valid`, err.reason);
         return err;
       }
       return tx;
@@ -144,7 +144,7 @@ export const createTransactionReemitter = ({
   // wallet was shut down before transaction submission resolved.
   // Submission might have failed and could be retryable, so we should attempt to re-submit it.
   const unsubmitted$ = stores.inFlightTransactions.get().pipe(
-    map((txs) => txs.filter(({ submittedAt }) => !submittedAt).map(({ tx }) => tx)),
+    map((txs) => txs.filter(({ submittedAt }) => !submittedAt)),
     mergeMap((txs) => from(txs))
   );
 
@@ -154,16 +154,12 @@ export const createTransactionReemitter = ({
   );
   const reemitUnconfirmed$ = combineLatest([reemitSubmittedBefore$, inFlight$]).pipe(
     mergeMap(([reemitSubmittedBefore, inFlight]) =>
-      from(
-        inFlight
-          .filter(({ submittedAt }) => submittedAt && submittedAt.valueOf() < reemitSubmittedBefore)
-          .map(({ tx }) => tx)
-      )
+      from(inFlight.filter(({ submittedAt }) => submittedAt && submittedAt.valueOf() < reemitSubmittedBefore))
     )
   );
 
   return {
     failed$,
-    reemit$: merge(rollbackRetry$, unsubmitted$, reemitUnconfirmed$)
+    reemit$: merge(rollbackRetry$, unsubmitted$, reemitUnconfirmed$).pipe(map((tx) => pick(tx, ['cbor', 'body', 'id'])))
   };
 };

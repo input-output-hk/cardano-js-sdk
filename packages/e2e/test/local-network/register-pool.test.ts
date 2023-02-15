@@ -18,7 +18,7 @@ const wallet1Params: KeyAgentFactoryProps = {
   mnemonic:
     // eslint-disable-next-line max-len
     'decorate survey empower stairs pledge humble social leisure baby wrap grief exact monster rug dash kiss perfect select science light frame play swallow day',
-  password: 'some_password'
+  passphrase: 'some_passphrase'
 };
 const wallet2Params: KeyAgentFactoryProps = {
   accountIndex: 0,
@@ -26,7 +26,7 @@ const wallet2Params: KeyAgentFactoryProps = {
   mnemonic:
     // eslint-disable-next-line max-len
     'salon zoo engage submit smile frost later decide wing sight chaos renew lizard rely canal coral scene hobby scare step bus leaf tobacco slice',
-  password: 'some_password'
+  passphrase: 'some_passphrase'
 };
 
 describe('local-network/register-pool', () => {
