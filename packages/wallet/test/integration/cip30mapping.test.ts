@@ -274,9 +274,13 @@ describe('cip30', () => {
           cmlTx = coreToCml.tx(scope, finalizedTx).to_bytes();
         });
 
-        it('resolves when submitting a valid transaction', async () => {
-          await expect(api.submitTx(Buffer.from(cmlTx).toString('hex'))).resolves.not.toThrow();
+        it('resolves with transaction id when submitting a valid transaction', async () => {
+          const txId = await api.submitTx(Buffer.from(cmlTx).toString('hex'));
+          expect(txId).toBe(finalizedTx.id);
         });
+
+        // Need to find a transaction that body can't be consistently re-serialized by using our serialization utils
+        it.todo('resolves with original transactionId (not the one computed when re-serializing the transaction)');
 
         it('throws ApiError when submitting a transaction that has invalid encoding', async () => {
           await expect(api.submitTx(Buffer.from(cmlTx).toString('base64'))).rejects.toThrowError(ApiError);
