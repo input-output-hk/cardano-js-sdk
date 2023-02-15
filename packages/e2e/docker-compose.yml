@@ -52,7 +52,7 @@ services:
       test: [ "CMD-SHELL", "wget -O /dev/null http://localhost || exit 1" ]
       timeout: 10s
   cardano-node-ogmios:
-    image: cardanosolutions/cardano-node-ogmios:${CARDANO_NODE_OGMIOS_VERSION:-v5.5.7_1.35.3}
+    image: cardanosolutions/cardano-node-ogmios:v${OGMIOS_VERSION:-5.6.0}_${CARDANO_NODE_VERSION:-1.35.5}
     logging:
       driver: "json-file"
       options:
