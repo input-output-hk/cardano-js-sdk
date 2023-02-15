@@ -16,7 +16,7 @@ import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
 import { testAsyncKeyAgent } from '../../../key-management/test/mocks';
-import { waitForWalletStateSettle } from '../util';
+import { toOutgoingTx, waitForWalletStateSettle } from '../util';
 
 const name = 'Test Wallet';
 const address = mocks.utxo[0][0].address!;
@@ -154,7 +154,7 @@ describe('SingleAddressWallet rollback', () => {
     stores.volatileTransactions.set([
       {
         confirmedAt: rollBackTx.blockHeader.slot,
-        tx
+        ...toOutgoingTx(tx)
       }
     ]);
 

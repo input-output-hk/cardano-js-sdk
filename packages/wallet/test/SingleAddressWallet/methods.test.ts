@@ -3,14 +3,18 @@ import * as Crypto from '@cardano-sdk/crypto';
 import * as mocks from '../mocks';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
-import { CML, Cardano, CardanoNodeErrors, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { CML, Cardano, CardanoNodeErrors, ProviderError, ProviderFailure, TxCBOR } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 import { InitializeTxProps, SingleAddressWallet, setupWallet } from '../../src';
 import { firstValueFrom, skip } from 'rxjs';
 import { getPassphrase, testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { dummyLogger as logger } from 'ts-log';
 import { mockChainHistoryProvider, mockRewardsProvider, utxo } from '../mocks';
-import { waitForWalletStateSettle } from '../util';
+import { toOutgoingTx, waitForWalletStateSettle } from '../util';
+
+// We can't consistently re-serialize this specific tx due to witness.datums list format
+const serializedForeignTx =
+  '84a60081825820260aed6e7a24044b1254a87a509468a649f522a4e54e830ac10f27ea7b5ec61f01018383581d70b429738bd6cc58b5c7932d001aa2bd05cfea47020a556c8c753d44361a004c4b40582007845f8f3841996e3d8157954e2f5e2fb90465f27112fc5fe9056d916fae245b82583900b1814238b0d287a8a46ce7348c6ad79ab8995b0e6d46010e2d9e1c68042f1946335c498d2e7556c5c647c4649c6a69d2b645cd1428a339ba1a0463676982583900b1814238b0d287a8a46ce7348c6ad79ab8995b0e6d46010e2d9e1c68042f1946335c498d2e7556c5c647c4649c6a69d2b645cd1428a339ba821a00177a6ea2581c648823ffdad1610b4162f4dbc87bd47f6f9cf45d772ddef661eff198a5447742544319271044774554481a0031f9194577444f47451a0056898d4577555344431a000fc589467753484942411a000103c2581c659ab0b5658687c2e74cd10dba8244015b713bf503b90557769d77a7a14a57696e675269646572731a02269552021a0002e665031a02414F03081a02414EFA0b58204107eada931c72a600a6e3305bd22c7aeb9ada7c3f6823b155f4db85de36a69aa20081825820e686ade5bc97372f271fd2abc06cfd96c24b3d9170f9459de1d8e3dd8fd385575840653324a9dddad004f05a8ac99fa2d1811af5f00543591407fb5206cfe9ac91bb1412404323fa517e0e189684cd3592e7f74862e3f16afbc262519abec958180c0481d8799fd8799fd8799fd8799f581cb1814238b0d287a8a46ce7348c6ad79ab8995b0e6d46010e2d9e1c68ffd8799fd8799fd8799f581c042f1946335c498d2e7556c5c647c4649c6a69d2b645cd1428a339baffffffff581cb1814238b0d287a8a46ce7348c6ad79ab8995b0e6d46010e2d9e1c681b000001863784a12ed8799fd8799f4040ffd8799f581c648823ffdad1610b4162f4dbc87bd47f6f9cf45d772ddef661eff1984577444f4745ffffffd8799fd87980190c8efffff5f6';
 
 const outputs = [
   {
@@ -192,14 +196,42 @@ describe('SingleAddressWallet methods', () => {
     describe('submitTx', () => {
       it('resolves on success', async () => {
         const tx = await wallet.finalizeTx({ tx: await wallet.initializeTx(props) });
+        const outgoingTx = toOutgoingTx(tx);
+
         const txSubmitting = firstValueFrom(wallet.transactions.outgoing.submitting$);
         const txPending = firstValueFrom(wallet.transactions.outgoing.pending$);
         const txInFlight = firstValueFrom(wallet.transactions.outgoing.inFlight$.pipe(skip(1)));
+
         await wallet.submitTx(tx);
+
         expect(txSubmitProvider.submitTx).toBeCalledTimes(1);
-        expect(await txSubmitting).toBe(tx);
-        expect(await txPending).toBe(tx);
-        expect(await txInFlight).toEqual([{ tx }]);
+        expect(txSubmitProvider.submitTx).toBeCalledWith({ signedTransaction: outgoingTx.cbor });
+        expect(await txSubmitting).toEqual(outgoingTx);
+        expect(await txPending).toEqual(outgoingTx);
+        expect(await txInFlight).toEqual([outgoingTx]);
+      });
+
+      it('resolves on success when submitting tx as a serialized hex blob, encoded as CBOR', async () => {
+        const cbor = TxCBOR(serializedForeignTx);
+
+        const txSubmitting = firstValueFrom(wallet.transactions.outgoing.submitting$);
+        const txPending = firstValueFrom(wallet.transactions.outgoing.pending$);
+        const txInFlight = firstValueFrom(wallet.transactions.outgoing.inFlight$.pipe(skip(1)));
+
+        await wallet.submitTx(cbor);
+
+        expect(txSubmitProvider.submitTx).toBeCalledTimes(1);
+        expect(txSubmitProvider.submitTx).toBeCalledWith({ signedTransaction: serializedForeignTx });
+
+        const { body, id } = TxCBOR.deserialize(cbor);
+        const outgoingTx = {
+          body,
+          cbor,
+          id
+        };
+        expect(await txSubmitting).toEqual(outgoingTx);
+        expect(await txPending).toEqual(outgoingTx);
+        expect(await txInFlight).toEqual([outgoingTx]);
       });
 
       it('mightBeAlreadySubmitted option interprets ValueNotConservedError as success', async () => {
@@ -212,6 +244,7 @@ describe('SingleAddressWallet methods', () => {
           )
         );
         const tx = await wallet.finalizeTx({ tx: await wallet.initializeTx(props) });
+        const outgoingTx = toOutgoingTx(tx);
 
         // rejects when option is not provided
         await expect(wallet.submitTx(tx)).rejects.toThrow();
@@ -219,7 +252,7 @@ describe('SingleAddressWallet methods', () => {
         // resolves when option is provided
         const txPending = firstValueFrom(wallet.transactions.outgoing.pending$);
         await expect(wallet.submitTx(tx, { mightBeAlreadySubmitted: true })).resolves.not.toThrow();
-        expect(await txPending).toBe(tx);
+        expect(await txPending).toEqual(outgoingTx);
       });
     });
   });

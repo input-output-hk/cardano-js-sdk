@@ -100,7 +100,7 @@ export const fetchRewardsTrigger$ = (
     // Reload every epoch and after every tx that has withdrawals for this reward account
     epoch$,
     txConfirmed$.pipe(
-      map(({ tx }) => getWithdrawalQuantity(tx.body.withdrawals, rewardAccount)),
+      map(({ body: { withdrawals } }) => getWithdrawalQuantity(withdrawals, rewardAccount)),
       filter((withdrawalQty) => withdrawalQty > 0n)
     )
   );
@@ -133,13 +133,7 @@ const isDelegationCertificate = (cert: Cardano.Certificate): cert is Cardano.Sta
 const getAccountsKeyStatus =
   (addresses: Cardano.RewardAccount[]) =>
   ([transactions, transactionsInFlight]: [TxWithEpoch[], TxInFlight[]]) => {
-    const certificatesInFlight = transactionsInFlight.map(
-      ({
-        tx: {
-          body: { certificates }
-        }
-      }) => certificates || []
-    );
+    const certificatesInFlight = transactionsInFlight.map(({ body: { certificates } }) => certificates || []);
     return addresses.map((address) => {
       const isRegistered = isLastStakeKeyCertOfType(
         transactions.map(
@@ -274,17 +268,7 @@ export const addressRewards = (
     )
   );
   const withdrawalsInFlight$ = transactionsInFlight$.pipe(
-    map((txs) =>
-      txs
-        .flatMap(
-          ({
-            tx: {
-              body: { withdrawals }
-            }
-          }) => withdrawals
-        )
-        .filter(isNotNil)
-    ),
+    map((txs) => txs.flatMap(({ body: { withdrawals } }) => withdrawals).filter(isNotNil)),
     distinctUntilChanged(deepEquals)
   );
   return combineLatest([rewards$, withdrawalsInFlight$]).pipe(

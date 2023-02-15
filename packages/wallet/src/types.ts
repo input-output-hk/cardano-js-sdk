@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Asset, Cardano, EpochInfo, EraSummary, NetworkInfoProvider } from '@cardano-sdk/core';
+import { Asset, Cardano, EpochInfo, EraSummary, NetworkInfoProvider, TxCBOR } from '@cardano-sdk/core';
 import { BalanceTracker, DelegationTracker, TransactionalObservables, TransactionsTracker } from './services';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { GroupedAddress, SignTransactionOptions, TransactionSigner, cip8 } from '@cardano-sdk/key-management';
@@ -104,7 +104,8 @@ export interface ObservableWallet {
   /**
    * @throws CardanoNodeErrors.TxSubmissionError
    */
-  submitTx(tx: Cardano.Tx): Promise<void>;
+  submitTx(tx: Cardano.Tx | TxCBOR): Promise<void>;
+
   shutdown(): void;
 }
 

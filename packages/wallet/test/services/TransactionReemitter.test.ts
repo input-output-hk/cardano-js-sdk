@@ -2,6 +2,7 @@ import { Cardano } from '@cardano-sdk/core';
 import {
   ConfirmedTx,
   FailedTx,
+  OutgoingTx,
   TransactionFailure,
   TransactionReemitterProps,
   TxInFlight,
@@ -10,12 +11,15 @@ import {
 import { InMemoryInFlightTransactionsStore, InMemoryVolatileTransactionsStore } from '../../src/persistence';
 import { Logger, dummyLogger } from 'ts-log';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
+import { dummyCbor } from '../util';
 import { genesisParameters } from '../mocks';
+import omit from 'lodash/omit';
 
 describe('TransactionReemiter', () => {
   const maxInterval = 2000;
   let stores: TransactionReemitterProps['stores'];
   let volatileTransactions: ConfirmedTx[];
+  let outgoingTransactions: OutgoingTx[];
   let logger: Logger;
 
   beforeEach(() => {
@@ -28,36 +32,31 @@ describe('TransactionReemiter', () => {
     stores.inFlightTransactions.set = jest.fn();
     volatileTransactions = [
       {
+        body: { validityInterval: { invalidHereafter: Cardano.Slot(1000) } },
+        cbor: dummyCbor,
         confirmedAt: Cardano.Slot(100),
-        tx: {
-          body: { validityInterval: { invalidHereafter: Cardano.Slot(1000) } },
-          id: Cardano.TransactionId('6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad')
-        }
+        id: Cardano.TransactionId('6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad')
       },
       {
+        body: { validityInterval: { invalidHereafter: Cardano.Slot(1000) } },
+        cbor: dummyCbor,
         confirmedAt: Cardano.Slot(200),
-        tx: {
-          body: { validityInterval: { invalidHereafter: Cardano.Slot(1000) } },
-          id: Cardano.TransactionId('7804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad')
-        }
+        id: Cardano.TransactionId('7804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad')
       },
       {
+        body: { validityInterval: { invalidHereafter: Cardano.Slot(1000) } },
+        cbor: dummyCbor,
         confirmedAt: Cardano.Slot(300),
-        tx: {
-          body: { validityInterval: { invalidHereafter: Cardano.Slot(1000) } },
-          id: Cardano.TransactionId('8804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad'),
-          slot: 300
-        }
+        id: Cardano.TransactionId('8804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad')
       },
       {
+        body: { validityInterval: { invalidHereafter: Cardano.Slot(1000) } },
+        cbor: dummyCbor,
         confirmedAt: Cardano.Slot(400),
-        tx: {
-          body: { validityInterval: { invalidHereafter: Cardano.Slot(1000) } },
-          id: Cardano.TransactionId('9904edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad'),
-          slot: 400
-        }
+        id: Cardano.TransactionId('9904edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad')
       }
     ] as ConfirmedTx[];
+    outgoingTransactions = volatileTransactions.map((tx) => omit(tx, 'confirmedAt'));
   });
 
   it('Stored volatile transactions are fetched on init', () => {
@@ -68,7 +67,7 @@ describe('TransactionReemiter', () => {
       const genesisParameters$ = cold<Cardano.CompactGenesis>('-|');
       const confirmed$ = cold<ConfirmedTx>('-|');
       const rollback$ = cold<Cardano.HydratedTx>('-|');
-      const submitting$ = cold<Cardano.Tx>('-|');
+      const submitting$ = cold<OutgoingTx>('-|');
       const inFlight$ = cold<TxInFlight[]>('-|');
       const transactionReemiter = createTransactionReemitter({
         genesisParameters$,
@@ -99,7 +98,7 @@ describe('TransactionReemiter', () => {
       const genesisParameters$ = cold<Cardano.CompactGenesis>('a---|', { a: genesisParameters });
       const confirmed$ = cold<ConfirmedTx>('-b-c|', { b: volatileTransactions[1], c: volatileTransactions[2] });
       const rollback$ = cold<Cardano.HydratedTx>('----|');
-      const submitting$ = cold<Cardano.Tx>('----|');
+      const submitting$ = cold<OutgoingTx>('----|');
       const inFlight$ = cold<TxInFlight[]>('-|');
       const transactionReemiter = createTransactionReemitter({
         genesisParameters$,
@@ -130,7 +129,7 @@ describe('TransactionReemiter', () => {
       const genesisParameters$ = cold<Cardano.CompactGenesis>('a-|', { a: genesisParameters });
       const confirmed$ = cold<ConfirmedTx>('--|');
       const rollback$ = cold<Cardano.HydratedTx>('--|');
-      const submitting$ = cold<Cardano.Tx>('-b|', { b: volatileTransactions[0].tx });
+      const submitting$ = cold<OutgoingTx>('-b|', { b: outgoingTransactions[0] });
       const inFlight$ = cold<TxInFlight[]>('-|');
       const transactionReemiter = createTransactionReemitter({
         genesisParameters$,
@@ -166,7 +165,7 @@ describe('TransactionReemiter', () => {
         c: volatileSlot300
       });
       const rollback$ = cold<Cardano.HydratedTx>('---|');
-      const submitting$ = cold<Cardano.Tx>('---|');
+      const submitting$ = cold<OutgoingTx>('---|');
       const inFlight$ = cold<TxInFlight[]>('-|');
       const transactionReemiter = createTransactionReemitter({
         genesisParameters$,
@@ -192,13 +191,14 @@ describe('TransactionReemiter', () => {
   it('Emits transactions that were rolled back and still valid', () => {
     const LAST_TIP_SLOT = 400;
     const [volatileA, volatileB, volatileC, volatileD] = volatileTransactions;
-    volatileC.tx.body.validityInterval = { invalidHereafter: Cardano.Slot(LAST_TIP_SLOT - 1) };
-    const rollbackA: Cardano.HydratedTx = { body: volatileA.tx.body, id: volatileA.tx.id } as Cardano.HydratedTx;
+    const [outgoingA, _, __, outgoingD] = outgoingTransactions;
+    volatileC.body.validityInterval = { invalidHereafter: Cardano.Slot(LAST_TIP_SLOT - 1) };
+    const rollbackA: Cardano.HydratedTx = { body: volatileA.body, id: volatileA.id } as Cardano.HydratedTx;
     const rollbackC: Cardano.HydratedTx = {
-      body: volatileC.tx.body,
-      id: volatileC.tx.id
+      body: volatileC.body,
+      id: volatileC.id
     } as Cardano.HydratedTx;
-    const rollbackD: Cardano.HydratedTx = { body: volatileD.tx.body, id: volatileD.tx.id } as Cardano.HydratedTx;
+    const rollbackD: Cardano.HydratedTx = { body: volatileD.body, id: volatileD.id } as Cardano.HydratedTx;
 
     // eslint-disable-next-line @typescript-eslint/no-shadow
     logger.error = jest.fn();
@@ -213,7 +213,7 @@ describe('TransactionReemiter', () => {
         d: volatileD
       });
       const rollback$ = cold<Cardano.HydratedTx>('--a--c--d|', { a: rollbackA, c: rollbackC, d: rollbackD });
-      const submitting$ = cold<Cardano.Tx>('---------|');
+      const submitting$ = cold<OutgoingTx>('---------|');
       const inFlight$ = cold<TxInFlight[]>('-|');
       const transactionReemiter = createTransactionReemitter({
         genesisParameters$,
@@ -231,9 +231,9 @@ describe('TransactionReemiter', () => {
         }
       });
       expectObservable(transactionReemiter.failed$).toBe('-----c---|', {
-        c: { reason: TransactionFailure.Timeout, tx: volatileC.tx } as FailedTx
+        c: { reason: TransactionFailure.Timeout, ...volatileC } as FailedTx
       });
-      expectObservable(transactionReemiter.reemit$).toBe('--a-----d|', { a: volatileA.tx, d: volatileD.tx });
+      expectObservable(transactionReemiter.reemit$).toBe('--a-----d|', { a: outgoingA, d: outgoingD });
     });
 
     expect(logger.error).toHaveBeenCalledWith(expect.anything(), TransactionFailure.Timeout);
@@ -241,7 +241,7 @@ describe('TransactionReemiter', () => {
 
   it('Logs error message for rolledback transactions not found in volatiles', () => {
     const [volatileA, volatileB, volatileC] = volatileTransactions;
-    const rollbackC: Cardano.HydratedTx = { body: volatileC.tx.body, id: volatileC.tx.id } as Cardano.HydratedTx;
+    const rollbackC: Cardano.HydratedTx = { body: volatileC.body, id: volatileC.id } as Cardano.HydratedTx;
     // eslint-disable-next-line @typescript-eslint/no-shadow
     const logger = dummyLogger;
     logger.error = jest.fn();
@@ -254,7 +254,7 @@ describe('TransactionReemiter', () => {
         b: volatileB
       });
       const rollback$ = cold<Cardano.HydratedTx>('--c|', { c: rollbackC });
-      const submitting$ = cold<Cardano.Tx>('---|');
+      const submitting$ = cold<OutgoingTx>('---|');
       const inFlight$ = cold<TxInFlight[]>('-|');
       const transactionReemiter = createTransactionReemitter({
         genesisParameters$,
@@ -281,12 +281,10 @@ describe('TransactionReemiter', () => {
       stores.inFlightTransactions.get = jest.fn(() =>
         cold<TxInFlight[]>('a|', {
           a: [
-            {
-              tx: volatileTransactions[0].tx
-            },
+            outgoingTransactions[0],
             {
               submittedAt: Cardano.Slot(123),
-              tx: volatileTransactions[1].tx
+              ...outgoingTransactions[1]
             }
           ]
         })
@@ -295,7 +293,7 @@ describe('TransactionReemiter', () => {
       const genesisParameters$ = cold<Cardano.CompactGenesis>('-|');
       const confirmed$ = cold<ConfirmedTx>('-|');
       const rollback$ = cold<Cardano.HydratedTx>('-|');
-      const submitting$ = cold<Cardano.Tx>('-|');
+      const submitting$ = cold<OutgoingTx>('-|');
       const inFlight$ = cold<TxInFlight[]>('-|');
       const transactionReemiter = createTransactionReemitter({
         genesisParameters$,
@@ -312,7 +310,7 @@ describe('TransactionReemiter', () => {
           rollback$
         }
       });
-      expectObservable(transactionReemiter.reemit$).toBe('a|', { a: volatileTransactions[0].tx });
+      expectObservable(transactionReemiter.reemit$).toBe('a|', { a: outgoingTransactions[0] });
     });
     expect(stores.inFlightTransactions.get).toHaveBeenCalledTimes(1);
   });
@@ -325,13 +323,13 @@ describe('TransactionReemiter', () => {
       const genesisParameters$ = hot('a|', { a: genesisParameters });
       const confirmed$ = cold<ConfirmedTx>('-|');
       const rollback$ = cold<Cardano.HydratedTx>('-|');
-      const submitting$ = cold<Cardano.Tx>('-|');
+      const submitting$ = cold<OutgoingTx>('-|');
       const inFlight$ = cold<TxInFlight[]>('a|', {
         a: [
-          { submittedAt: Cardano.Slot(tip - 1), tx: volatileTransactions[0].tx },
+          { submittedAt: Cardano.Slot(tip - 1), ...outgoingTransactions[0] },
           {
             submittedAt: Cardano.Slot(tip - maxInterval / 1000 - 1),
-            tx: volatileTransactions[1].tx
+            ...outgoingTransactions[1]
           }
         ]
       });
@@ -350,7 +348,7 @@ describe('TransactionReemiter', () => {
           rollback$
         }
       });
-      expectObservable(transactionReemiter.reemit$).toBe('-a|', { a: volatileTransactions[1].tx });
+      expectObservable(transactionReemiter.reemit$).toBe('-a|', { a: outgoingTransactions[1] });
     });
   });
 
@@ -361,13 +359,13 @@ describe('TransactionReemiter', () => {
       const genesisParameters$ = cold('a-b|', { a: genesisParameters, b: genesisParameters });
       const confirmed$ = cold<ConfirmedTx>('-|');
       const rollback$ = cold<Cardano.HydratedTx>('-|');
-      const submitting$ = cold<Cardano.Tx>('-|');
+      const submitting$ = cold<OutgoingTx>('-|');
       const inFlight$ = cold<TxInFlight[]>('a|', {
         a: [
-          { submittedAt: Cardano.Slot(tip - 1), tx: volatileTransactions[0].tx },
+          { submittedAt: Cardano.Slot(tip - 1), ...outgoingTransactions[0] },
           {
             submittedAt: Cardano.Slot(tip - maxInterval / 1000 - 1),
-            tx: volatileTransactions[1].tx
+            ...outgoingTransactions[1]
           }
         ]
       });
@@ -386,7 +384,7 @@ describe('TransactionReemiter', () => {
           rollback$
         }
       });
-      expectObservable(transactionReemiter.reemit$).toBe('-a--|', { a: volatileTransactions[1].tx });
+      expectObservable(transactionReemiter.reemit$).toBe('-a--|', { a: outgoingTransactions[1] });
     });
   });
 });
