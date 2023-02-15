@@ -1,18 +1,27 @@
 import { Cardano, TxBodyCBOR, TxCBOR } from '../../../';
 import { Ed25519SignatureHex } from '@cardano-sdk/crypto';
-import { HexBlob } from '@cardano-sdk/util';
+import { HexBlob, InvalidStringError } from '@cardano-sdk/util';
 import { babbageTx } from '../../CML/testData';
 
 describe('Cardano/types/Transaction', () => {
   describe('TransactionId', () => {
     describe('when used as a constructor', () => {
-      it('TransactionId accepts a valid transaction hash hex string', () => {
+      it('accepts a valid transaction hash hex string', () => {
         expect(() =>
           Cardano.TransactionId('3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d')
         ).not.toThrow();
+      });
+    });
+
+    describe('fromHexBlob', () => {
+      it('accepts a valid length hex string', () => {
         expect(() =>
           Cardano.TransactionId.fromHexBlob(HexBlob('3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d'))
         ).not.toThrow();
+      });
+
+      it('throws when given an invalid length hex string', () => {
+        expect(() => Cardano.TransactionId.fromHexBlob(HexBlob('33018e8293d319e'))).toThrowError(InvalidStringError);
       });
     });
 
