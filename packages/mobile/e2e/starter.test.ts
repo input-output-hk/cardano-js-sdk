@@ -1,4 +1,4 @@
-import { device, element, expect, by } from 'detox';
+import { by, device, element, expect } from 'detox';
 
 describe('Example', () => {
   beforeAll(async () => {
@@ -14,7 +14,7 @@ describe('Example', () => {
     await expect(element(by.id('section-0-title'))).toHaveText('Step One');
     await expect(element(by.id('section-0-text'))).toBeVisible();
     await expect(element(by.id('section-0-text'))).toHaveText(
-      'Edit App.tsx to change this screen and then come back to see your edits.',
+      'Edit App.tsx to change this screen and then come back to see your edits.'
     );
   });
 });
