@@ -1,6 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Asset, Cardano, EpochInfo, EraSummary, NetworkInfoProvider, TxCBOR } from '@cardano-sdk/core';
-import { BalanceTracker, DelegationTracker, TransactionalObservables, TransactionsTracker } from './services';
+import { BalanceTracker, DelegationTracker, TransactionsTracker, UtxoTracker } from './services';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { GroupedAddress, SignTransactionOptions, TransactionSigner, cip8 } from '@cardano-sdk/key-management';
 import { Observable } from 'rxjs';
@@ -74,7 +74,7 @@ export interface SyncStatus extends Shutdown {
 export interface ObservableWallet {
   readonly balance: BalanceTracker;
   readonly delegation: DelegationTracker;
-  readonly utxo: TransactionalObservables<Cardano.Utxo[]>;
+  readonly utxo: UtxoTracker;
   readonly transactions: TransactionsTracker;
   readonly tip$: Observable<Cardano.Tip>;
   readonly genesisParameters$: Observable<Cardano.CompactGenesis>;
