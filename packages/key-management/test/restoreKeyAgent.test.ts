@@ -2,7 +2,7 @@ import * as Crypto from '@cardano-sdk/crypto';
 import {
   AddressType,
   CommunicationType,
-  GetPassword,
+  GetPassphrase,
   KeyAgentDependencies,
   KeyAgentType,
   SerializableInMemoryKeyAgentData,
@@ -81,30 +81,34 @@ describe('KeyManagement/restoreKeyAgent', () => {
       ]
     };
     // eslint-disable-next-line unicorn/consistent-function-scoping
-    const getPassword: GetPassword = async () => Buffer.from('password');
+    const getPassphrase: GetPassphrase = async () => Buffer.from('password');
 
     it('assumes default stakeKeyDerivationPath if not present in serializable data', async () => {
       expect.assertions(1);
-      const keyAgent = await restoreKeyAgent(inMemoryKeyAgentDataWithoutStakeDerivationPath, dependencies, getPassword);
+      const keyAgent = await restoreKeyAgent(
+        inMemoryKeyAgentDataWithoutStakeDerivationPath,
+        dependencies,
+        getPassphrase
+      );
 
       for (const knownAddress of keyAgent.knownAddresses) {
         expect(knownAddress.stakeKeyDerivationPath).toBe(STAKE_KEY_DERIVATION_PATH);
       }
     });
 
-    it('can restore key manager from valid data and password', async () => {
-      const keyAgent = await restoreKeyAgent(inMemoryKeyAgentData, dependencies, getPassword);
+    it('can restore key manager from valid data and passphrase', async () => {
+      const keyAgent = await restoreKeyAgent(inMemoryKeyAgentData, dependencies, getPassphrase);
       expect(keyAgent.knownAddresses).toEqual(inMemoryKeyAgentData.knownAddresses);
     });
 
-    it('throws when attempting to restore key manager from valid data and no password', async () => {
+    it('throws when attempting to restore key manager from valid data and no passphrase', async () => {
       await expect(() => restoreKeyAgent(inMemoryKeyAgentData, dependencies)).rejects.toThrowError(
-        new InvalidSerializableDataError('Expected "getPassword" in RestoreKeyAgentProps for InMemoryKeyAgent"')
+        new InvalidSerializableDataError('Expected "getPassphrase" in RestoreKeyAgentProps for InMemoryKeyAgent"')
       );
     });
 
     it('does not attempt to decrypt private key on restoration', async () => {
-      // invalid password, would throw if it attempts to decrypt
+      // invalid passphrase, would throw if it attempts to decrypt
       await expect(
         restoreKeyAgent(inMemoryKeyAgentData, dependencies, async () => Buffer.from('123'))
       ).resolves.not.toThrow();

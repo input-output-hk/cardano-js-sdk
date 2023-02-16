@@ -7,7 +7,7 @@ import { CML, Cardano, CardanoNodeErrors, ProviderError, ProviderFailure } from 
 import { HexBlob } from '@cardano-sdk/util';
 import { InitializeTxProps, SingleAddressWallet, setupWallet } from '../../src';
 import { firstValueFrom, skip } from 'rxjs';
-import { getPassword, testAsyncKeyAgent } from '../../../key-management/test/mocks';
+import { getPassphrase, testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { dummyLogger as logger } from 'ts-log';
 import { mockChainHistoryProvider, mockRewardsProvider, utxo } from '../mocks';
 import { waitForWalletStateSettle } from '../util';
@@ -166,7 +166,7 @@ describe('SingleAddressWallet methods', () => {
     } as InitializeTxProps;
 
     it('initializeTx', async () => {
-      getPassword.mockClear();
+      getPassphrase.mockClear();
       const { body, hash, inputSelection } = await wallet.initializeTx(props);
       expect(body.outputs).toHaveLength(props.outputs!.size + 1 /* change output */);
       expect(body.collaterals).toEqual([utxo[2][0]]);
@@ -178,7 +178,7 @@ describe('SingleAddressWallet methods', () => {
       expect(inputSelection.inputs.size).toBeGreaterThan(0);
       expect(inputSelection.fee).toBeGreaterThan(0n);
       expect(inputSelection.change.size).toBeGreaterThan(0);
-      expect(getPassword).not.toBeCalled();
+      expect(getPassphrase).not.toBeCalled();
     });
 
     it('finalizeTx', async () => {

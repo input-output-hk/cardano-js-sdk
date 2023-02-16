@@ -13,12 +13,12 @@ describe('createAsyncKeyAgent maps KeyAgent to AsyncKeyAgent', () => {
 
   beforeEach(async () => {
     const mnemonicWords = util.generateMnemonicWords();
-    const getPassword = jest.fn().mockResolvedValue(Buffer.from('password'));
+    const getPassphrase = jest.fn().mockResolvedValue(Buffer.from('password'));
     inputResolver = { resolveInputAddress: jest.fn() };
     keyAgent = await InMemoryKeyAgent.fromBip39MnemonicWords(
       {
         chainId: Cardano.ChainIds.Preview,
-        getPassword,
+        getPassphrase,
         mnemonicWords
       },
       { bip32Ed25519: new Crypto.CmlBip32Ed25519(CML), inputResolver, logger: dummyLogger }
