@@ -96,7 +96,7 @@ describe('cip30', () => {
     beforeAll(async () => {
       // CREATE A WALLET
       scope = new ManagedFreeableScope();
-      ({ wallet, api, confirmationCallback } = await createWalletAndApiWithStores([mockedUtxo[2]]));
+      ({ wallet, api, confirmationCallback } = await createWalletAndApiWithStores([mockedUtxo[4]]));
     });
 
     afterAll(() => {
