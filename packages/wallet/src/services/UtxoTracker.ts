@@ -1,6 +1,6 @@
 import { Cardano, UtxoProvider } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
-import { NEVER, Observable, combineLatest, concat, map, of, switchMap } from 'rxjs';
+import { NEVER, Observable, combineLatest, concat, distinctUntilChanged, map, of, switchMap } from 'rxjs';
 import { PersistentCollectionTrackerSubject, coldObservableProvider, txInEquals, utxoEquals } from './util';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxInFlight, UtxoTracker } from './types';
@@ -118,6 +118,11 @@ export const createUtxoTracker = (
       logger.debug('Shutdown');
     },
     total$,
-    unspendable$: unspendableUtxoSource$
+    unspendable$: combineLatest([unspendableUtxoSource$, total$]).pipe(
+      map(([unspendableUtxo, utxo]) =>
+        unspendableUtxo.filter(([unspendable]) => utxo.some(([utxoTxIn]) => txInEquals(utxoTxIn, unspendable)))
+      ),
+      distinctUntilChanged((previous, current) => utxoEquals(previous, current))
+    )
   };
 };
