@@ -31,7 +31,7 @@ export interface TransactionalTracker<T> extends TransactionalObservables<T> {
 }
 
 export interface UtxoTracker extends TransactionalTracker<Cardano.Utxo[]> {
-  setUnspendable(utxo: Cardano.Utxo[]): void;
+  setUnspendable(utxo: Cardano.Utxo[]): Promise<void>;
 }
 
 export type Milliseconds = number;

@@ -51,8 +51,8 @@ import {
   TrackedTxSubmitProvider,
   TrackedWalletNetworkInfoProvider,
   TransactionFailure,
-  TransactionalTracker,
   TransactionsTracker,
+  UtxoTracker,
   WalletUtil,
   coldObservableProvider,
   createAssetsTracker,
@@ -173,7 +173,7 @@ export class SingleAddressWallet implements ObservableWallet {
   readonly stakePoolProvider: TrackedStakePoolProvider;
   readonly assetProvider: TrackedAssetProvider;
   readonly chainHistoryProvider: TrackedChainHistoryProvider;
-  readonly utxo: TransactionalTracker<Cardano.Utxo[]>;
+  readonly utxo: UtxoTracker;
   readonly balance: BalanceTracker;
   readonly transactions: TransactionsTracker & Shutdown;
   readonly delegation: DelegationTracker & Shutdown;
@@ -398,6 +398,7 @@ export class SingleAddressWallet implements ObservableWallet {
       transactionsInFlight$: this.transactions.outgoing.inFlight$,
       utxoProvider: this.utxoProvider
     });
+
     const eraSummaries$ = distinctEraSummaries(this.eraSummaries$);
     this.delegation = createDelegationTracker({
       epoch$,
