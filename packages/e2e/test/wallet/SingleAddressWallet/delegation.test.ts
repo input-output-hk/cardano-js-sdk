@@ -34,7 +34,7 @@ const waitForTx = async (wallet: ObservableWallet, hash: Cardano.TransactionId) 
     combineLatest([
       wallet.transactions.history$.pipe(filter((txs) => txs.some(({ id }) => id === hash))),
       // test that confirmed$ works
-      wallet.transactions.outgoing.confirmed$.pipe(filter(({ tx: { id } }) => id === hash))
+      wallet.transactions.outgoing.confirmed$.pipe(filter(({ id }) => id === hash))
     ]),
     'Tx not confirmed for too long',
     TX_TIMEOUT

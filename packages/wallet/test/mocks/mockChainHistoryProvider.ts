@@ -110,8 +110,9 @@ export const queryTransactionsResult: Paginated<Cardano.HydratedTx> = {
       blockHeader: {
         blockNo: Cardano.BlockNo(10_100),
         slot: Cardano.Slot(ledgerTip.slot.valueOf() - 100_000)
-      },
+      } as Cardano.PartialBlockHeader,
       body: {
+        fee: 123n,
         inputs: [
           {
             address: Cardano.Address(
@@ -133,8 +134,13 @@ export const queryTransactionsResult: Paginated<Cardano.HydratedTx> = {
           invalidHereafter: Cardano.Slot(ledgerTip.slot.valueOf() + 1)
         }
       },
-      id: Cardano.TransactionId('6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad')
-    } as Cardano.HydratedTx
+      id: Cardano.TransactionId('6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad'),
+      index: 1,
+      txSize: 200_000,
+      witness: {
+        signatures: new Map()
+      }
+    }
   ],
   totalResultCount: 2
 };

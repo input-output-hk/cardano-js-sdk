@@ -1,9 +1,10 @@
 import { Cardano, UtxoProvider } from '@cardano-sdk/core';
 import { InMemoryUtxoStore } from '../../src/persistence';
 import { Observable } from 'rxjs';
-import { PersistentCollectionTrackerSubject, createUtxoTracker } from '../../src/services';
+import { PersistentCollectionTrackerSubject, TxInFlight, createUtxoTracker } from '../../src/services';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
+import { dummyCbor } from '../util';
 import { dummyLogger } from 'ts-log';
 import { utxo } from '../mocks';
 
@@ -44,13 +45,14 @@ describe('createUtxoTracker', () => {
     };
     const tx2Outputs = [tx2Output];
     createTestScheduler().run(({ cold, expectObservable }) => {
-      const inFlightTx1 = {
+      const inFlightTx1: TxInFlight = {
         body: {
-          inputs: [spendUtxo[0]],
+          inputs: [spendUtxo[0] as Cardano.TxIn],
           outputs: tx1Outputs
-        },
+        } as Cardano.TxBody,
+        cbor: dummyCbor,
         id: transactionId1
-      } as unknown as Cardano.Tx;
+      };
       const chainableUtxoFromTx1 = [
         { address: ownAddress, index: tx1Outputs.indexOf(tx1ChangeOutput), txId: transactionId1 },
         tx1ChangeOutput
@@ -59,17 +61,19 @@ describe('createUtxoTracker', () => {
         { address: ownAddress, index: tx2Outputs.indexOf(tx2Output), txId: transactionId2 },
         tx2Output
       ] as Cardano.Utxo;
-      const inFlightTx2 = {
+      const inFlightTx2: TxInFlight = {
         body: {
-          inputs: [chainableUtxoFromTx1[0]],
+          inputs: [chainableUtxoFromTx1[0] as Cardano.TxIn],
           outputs: tx2Outputs
-        },
+        } as Cardano.TxBody,
+        cbor: dummyCbor,
         id: transactionId2
-      } as unknown as Cardano.Tx;
-      const transactionsInFlight$ = cold('-a-b-c|', {
+      };
+
+      const transactionsInFlight$ = cold<TxInFlight[]>('-a-b-c|', {
         a: [],
-        b: [{ tx: inFlightTx1 }],
-        c: [{ tx: inFlightTx1 }, { tx: inFlightTx2 }]
+        b: [inFlightTx1],
+        c: [inFlightTx1, inFlightTx2]
       });
       const utxoTracker = createUtxoTracker(
         {

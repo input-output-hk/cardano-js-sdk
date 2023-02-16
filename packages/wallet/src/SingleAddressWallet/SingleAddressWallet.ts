@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-nested-ternary */
 import {
   AddressType,
   AsyncKeyAgent,
@@ -17,9 +18,10 @@ import {
   ProviderError,
   RewardsProvider,
   StakePoolProvider,
+  TxBodyCBOR,
+  TxCBOR,
   TxSubmitProvider,
-  UtxoProvider,
-  coreToCml
+  UtxoProvider
 } from '@cardano-sdk/core';
 import {
   Assets,
@@ -37,6 +39,7 @@ import {
   ConnectionStatusTracker,
   DelegationTracker,
   FailedTx,
+  OutgoingTx,
   PersistentDocumentTrackerSubject,
   PollingConfig,
   SmartTxSubmitProvider,
@@ -84,14 +87,7 @@ import {
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
-import {
-  ManagedFreeableScope,
-  Shutdown,
-  bufferToHexString,
-  contextLogger,
-  deepEquals,
-  usingAutoFree
-} from '@cardano-sdk/util';
+import { ManagedFreeableScope, Shutdown, contextLogger, deepEquals } from '@cardano-sdk/util';
 import { PrepareTx, createTxPreparer } from './prepareTx';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackedUtxoProvider } from '../services/ProviderTracker/TrackedUtxoProvider';
@@ -131,6 +127,30 @@ export const DEFAULT_POLLING_CONFIG = {
   pollInterval: 5000
 };
 
+const isOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx): input is OutgoingTx =>
+  typeof input === 'object' && 'cbor' in input;
+const isTxCBOR = (input: Cardano.Tx | TxCBOR | OutgoingTx): input is TxCBOR => typeof input === 'string';
+const processOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx): OutgoingTx => {
+  // TxCbor
+  if (isTxCBOR(input)) {
+    return {
+      body: TxCBOR.deserialize(input).body,
+      cbor: input,
+      // Do not re-serialize transaction body to compute transaction id
+      id: Cardano.TransactionId.fromTxBodyCbor(TxBodyCBOR.fromTxCBOR(input))
+    };
+  }
+  // OutgoingTx (resubmitted)
+  if (isOutgoingTx(input)) {
+    return input;
+  }
+  return {
+    body: input.body,
+    cbor: TxCBOR.serialize(input),
+    id: input.id
+  };
+};
+
 export class SingleAddressWallet implements ObservableWallet {
   #inputSelector: InputSelector;
   #logger: Logger;
@@ -138,8 +158,8 @@ export class SingleAddressWallet implements ObservableWallet {
   #prepareTx: PrepareTx;
   #newTransactions = {
     failedToSubmit$: new Subject<FailedTx>(),
-    pending$: new Subject<Cardano.Tx>(),
-    submitting$: new Subject<Cardano.Tx>()
+    pending$: new Subject<OutgoingTx>(),
+    submitting$: new Subject<OutgoingTx>()
   };
   #reemitSubscriptions: Subscription;
   #failedFromReemitter$: Subject<FailedTx>;
@@ -359,7 +379,7 @@ export class SingleAddressWallet implements ObservableWallet {
     this.#reemitSubscriptions.add(
       transactionsReemitter.reemit$
         .pipe(
-          mergeMap((transaction) => from(this.submitTx(transaction, { mightBeAlreadySubmitted: true }))),
+          mergeMap((tx) => from(this.submitTx(tx, { mightBeAlreadySubmitted: true }))),
           catchError((err) => {
             this.#logger.error('Failed to resubmit transaction', err);
             return EMPTY;
@@ -468,16 +488,21 @@ export class SingleAddressWallet implements ObservableWallet {
     };
   }
 
-  async submitTx(tx: Cardano.Tx, { mightBeAlreadySubmitted }: SubmitTxOptions = {}): Promise<void> {
-    this.#logger.debug(`Submitting transaction ${tx.id}`);
-    this.#newTransactions.submitting$.next(tx);
+  async submitTx(
+    input: Cardano.Tx | TxCBOR | OutgoingTx,
+    { mightBeAlreadySubmitted }: SubmitTxOptions = {}
+  ): Promise<Cardano.TransactionId> {
+    const outgoingTx = processOutgoingTx(input);
+    this.#logger.debug(`Submitting transaction ${outgoingTx.id}`);
+    this.#newTransactions.submitting$.next(outgoingTx);
     try {
       await this.txSubmitProvider.submitTx({
-        signedTransaction: bufferToHexString(Buffer.from(usingAutoFree((scope) => coreToCml.tx(scope, tx).to_bytes())))
+        signedTransaction: outgoingTx.cbor
       });
       const { slot: submittedAt } = await firstValueFrom(this.tip$);
-      this.#logger.debug(`Submitted transaction ${tx.id} at slot ${submittedAt}`);
-      this.#newTransactions.pending$.next(tx);
+      this.#logger.debug(`Submitted transaction ${outgoingTx.id} at slot ${submittedAt}`);
+      this.#newTransactions.pending$.next(outgoingTx);
+      return outgoingTx.id;
     } catch (error) {
       if (
         mightBeAlreadySubmitted &&
@@ -488,18 +513,19 @@ export class SingleAddressWallet implements ObservableWallet {
         (error.innerError instanceof CardanoNodeErrors.TxSubmissionErrors.ValueNotConservedError ||
           error.innerError instanceof CardanoNodeErrors.TxSubmissionErrors.UnknownOrIncompleteWithdrawalsError)
       ) {
-        this.#logger.debug(`Transaction ${tx.id} appears to be already submitted...`);
-        this.#newTransactions.pending$.next(tx);
-        return;
+        this.#logger.debug(`Transaction ${outgoingTx.id} appears to be already submitted...`);
+        this.#newTransactions.pending$.next(outgoingTx);
+        return outgoingTx.id;
       }
       this.#newTransactions.failedToSubmit$.next({
         error: error as CardanoNodeErrors.TxSubmissionError,
         reason: TransactionFailure.FailedToSubmit,
-        tx
+        ...outgoingTx
       });
       throw error;
     }
   }
+
   signData(props: SignDataProps): Promise<Cip30DataSignature> {
     return cip8.cip30signData({ keyAgent: this.keyAgent, ...props });
   }

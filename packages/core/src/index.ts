@@ -5,3 +5,4 @@ export * from './CML';
 export * from './util';
 export * from './errors';
 export * from './CardanoNode';
+export * from './CBOR';
