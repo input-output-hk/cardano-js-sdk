@@ -156,6 +156,7 @@ export const mapCertificate = (
 };
 
 interface TxAlonzoData {
+  inputSource: Cardano.InputSource;
   inputs: Cardano.HydratedTxIn[];
   outputs: Cardano.TxOut[];
   mint?: Cardano.TokenMap;
@@ -168,7 +169,7 @@ interface TxAlonzoData {
 
 export const mapTxAlonzo = (
   txModel: TxModel,
-  { inputs, outputs, mint, withdrawals, redeemers, metadata, collaterals, certificates }: TxAlonzoData
+  { inputSource, inputs, outputs, mint, withdrawals, redeemers, metadata, collaterals, certificates }: TxAlonzoData
 ): Cardano.HydratedTx => ({
   auxiliaryData:
     metadata && metadata.size > 0
@@ -198,6 +199,7 @@ export const mapTxAlonzo = (
   },
   id: txModel.id.toString('hex') as unknown as Cardano.TransactionId,
   index: txModel.index,
+  inputSource,
   txSize: txModel.size,
   witness: {
     // TODO: fetch bootstrap witnesses, datums and scripts

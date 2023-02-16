@@ -68,6 +68,7 @@ Array [
             "withdrawals": Array [],
           },
           "id": "a278b540fb192eb8276a0d49004968076c9f9f026fa8727c3f9981a4aac25cc9",
+          "inputSource": "inputs",
           "witness": Object {
             "bootstrap": Array [],
             "datums": Array [

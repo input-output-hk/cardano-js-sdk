@@ -109,7 +109,8 @@ const txModel: TxModel = {
   index: 1,
   invalid_before: '300',
   invalid_hereafter: '500',
-  size: 20
+  size: 20,
+  valid_contract: true
 };
 
 describe('chain history mappers', () => {
@@ -315,6 +316,8 @@ describe('chain history mappers', () => {
     ];
     const withdrawals: Cardano.Withdrawal[] = [{ quantity: 200n, stakeAddress: Cardano.RewardAccount(stakeAddress) }];
     const metadata: Cardano.TxMetadata = new Map([[1n, 'data']]);
+    const inputSource = Cardano.InputSource.inputs;
+
     const certificates: Cardano.Certificate[] = [
       {
         __typename: Cardano.CertificateType.StakeKeyRegistration,
@@ -332,17 +335,18 @@ describe('chain history mappers', () => {
       },
       id: Cardano.TransactionId(transactionHash),
       index: 1,
+      inputSource: Cardano.InputSource.inputs,
       txSize: 20,
       witness: { signatures: new Map() }
     };
     test('map TxModel to Cardano.HydratedTx with minimal data', () => {
-      const result = mappers.mapTxAlonzo(txModel, { inputs, outputs });
+      const result = mappers.mapTxAlonzo(txModel, { inputSource, inputs, outputs });
       expect(result).toEqual<Cardano.HydratedTx>(expected);
     });
     test('map TxModel with null fields to Cardano.HydratedTx', () => {
       const result = mappers.mapTxAlonzo(
         { ...txModel, invalid_before: null, invalid_hereafter: null },
-        { inputs, outputs }
+        { inputSource, inputs, outputs }
       );
       expect(result).toEqual<Cardano.HydratedTx>({ ...expected, body: { ...expected.body, validityInterval: {} } });
     });
@@ -350,6 +354,7 @@ describe('chain history mappers', () => {
       const result = mappers.mapTxAlonzo(txModel, {
         certificates,
         collaterals: inputs,
+        inputSource,
         inputs,
         metadata,
         mint: assets,

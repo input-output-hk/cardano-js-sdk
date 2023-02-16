@@ -40,6 +40,7 @@ export const generateTxAlonzo = (qty: number): Cardano.HydratedTx[] =>
     },
     id: Cardano.TransactionId(getRandomTxId()),
     index,
+    inputSource: Cardano.InputSource.inputs,
     txSize: 100_000,
     witness: {
       signatures: new Map()
@@ -101,6 +102,7 @@ export const queryTransactionsResult: Paginated<Cardano.HydratedTx> = {
       },
       id: Cardano.TransactionId('12fa9af65e21b36ec4dc4cbce478e911d52585adb46f2b4fe3d6563e7ee5a61a'),
       index: 0,
+      inputSource: Cardano.InputSource.inputs,
       txSize: 100_000,
       witness: {
         signatures: new Map()
@@ -136,6 +138,7 @@ export const queryTransactionsResult: Paginated<Cardano.HydratedTx> = {
       },
       id: Cardano.TransactionId('6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad'),
       index: 1,
+      inputSource: Cardano.InputSource.inputs,
       txSize: 200_000,
       witness: {
         signatures: new Map()
