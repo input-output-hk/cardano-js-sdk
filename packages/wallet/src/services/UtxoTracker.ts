@@ -109,7 +109,9 @@ export const createUtxoTracker = (
 
   return {
     available$,
-    setUnspendable: unspendableUtxoSource$.next.bind(unspendableUtxoSource$),
+    setUnspendable: async (utxo) => {
+      unspendableUtxoSource$.next(utxo);
+    },
     shutdown: () => {
       utxoSource$.complete();
       unspendableUtxoSource$.complete();
