@@ -3,6 +3,57 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.7.0...@cardano-sdk/core@0.8.0) (2023-02-17)
+
+### ⚠ BREAKING CHANGES
+
+- reworks stake pool epoch rewards fields to be ledger compliant
+- - Bip32PublicKey removed from core and replaced by the Bip32PublicKeyHex type from the crypto package.
+
+* Bip32PrivateKey removed from core and replaced by the Bip32PrivateKeyHex type from the crypto package.
+* Ed25519PublicKey removed from core and replaced by the Ed25519PublicKeyHex type from the crypto package.
+* Ed25519PrivateKey removed from core and replaced by the Ed25519PrivateKeyHex type from the crypto package.
+* Ed25519KeyHash removed from core and replaced by the Ed25519KeyHashHex type from the the crypto package.
+* Ed25519Signature removed from core and replaced by the Ed25519SignatureHex type from the crypto package.
+* Hash32ByteBase16 removed from core and replaced by the Hash32ByteBase16 type from the crypto package.
+* Hash28ByteBase16 removed from core and replaced by the Hash28ByteBase16 type from the crypto package.
+* The KeyAgent interface now has a new field bip32Ed25519.
+* The KeyAgentBase class and all its derived classes (InMemoryKeyAgent, LedgerKeyAgent and TrezorKeyAgent) must now be provided with a Bip32Ed25519 implementation on their constructors.
+* Bip32Path type was removed from the key-management package and replaced by the Bip32Path from the crypto package.
+
+- hoist Opaque types, hexBlob, Base64Blob and related utils
+- CompactGenesis.slotLength type changed
+  from `number` to `Seconds`
+- EraSummary.parameters.slotLength type changed from number
+  to Milliseconds
+- Types coming from time.ts should be imported directly
+  from core package instead of using the `Cardano.util` namespace.
+- **core:** add ChainSyncEvent.requestNext
+- - all provider constructors are updated to use standardized form of deps
+
+### Features
+
+- **core:** add ChainSyncEvent.requestNext ([484fced](https://github.com/input-output-hk/cardano-js-sdk/commit/484fced69079f004141ae9eb9c5129328d4cbc01))
+- **core:** add OpaqueString types for TxCBOR and TxBodyCBOR with some utility functions ([f408baa](https://github.com/input-output-hk/cardano-js-sdk/commit/f408baa25b330134f1502e460eb41ec2d46dcb58))
+- **core:** add support for '{policyId}.{assetName}' format when parsing AssetId ([eb49a0a](https://github.com/input-output-hk/cardano-js-sdk/commit/eb49a0a310a1d6c1c58a56b4f79b7139c2ee44ee))
+- **core:** adds support for cip-0025 version 2 ([be21a75](https://github.com/input-output-hk/cardano-js-sdk/commit/be21a75898e15bea252489f50e82286434f73929))
+- update CompactGenesis slotLength type to be Seconds ([82e63d6](https://github.com/input-output-hk/cardano-js-sdk/commit/82e63d6cacedbab5ecf8491dfd37749bfeddbc22))
+- update EraSummary slotLength type to be Milliseconds ([fb1f1a2](https://github.com/input-output-hk/cardano-js-sdk/commit/fb1f1a2c4fb77d03e45f9255c182e9bc54583324))
+
+### Bug Fixes
+
+- **core:** omit NFT meta files with invalid format ([ef783fb](https://github.com/input-output-hk/cardano-js-sdk/commit/ef783fba6e95a7085f21565ec445ba4dbf7a5ecc))
+- fixes the computation of apy ([6ea2474](https://github.com/input-output-hk/cardano-js-sdk/commit/6ea2474026cdf85436811fab07a847ae9bf0a27b))
+- unmemoize slot epoch calc in core package ([2dc6af4](https://github.com/input-output-hk/cardano-js-sdk/commit/2dc6af44906f1b61323a69c3e840834f2c86930f))
+
+### Code Refactoring
+
+- hoist Opaque types, hexBlob, Base64Blob and related utils ([391a8f2](https://github.com/input-output-hk/cardano-js-sdk/commit/391a8f20d60607c4fb6ce8586b97ae96841f759b))
+- hoist time.ts out of Cardano namespace ([666701c](https://github.com/input-output-hk/cardano-js-sdk/commit/666701c40cb49a9b3865e1d8bd0d36e7cc8c325c))
+- refactor the SDK to use the new crypto package ([3b41320](https://github.com/input-output-hk/cardano-js-sdk/commit/3b41320e7971a231d50785733ff4cd0793418d3d))
+- reworks stake pool epoch rewards fields to be ledger compliant ([a9ff583](https://github.com/input-output-hk/cardano-js-sdk/commit/a9ff583d26fe427c2816ab286bb3ae4aeacc9301))
+- standardize provider dependencies ([05b37e6](https://github.com/input-output-hk/cardano-js-sdk/commit/05b37e6383a906152df457143c5a27341a11c341))
+
 ## [0.7.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.6.0...@cardano-sdk/core@0.7.0) (2022-12-22)
 
 ### ⚠ BREAKING CHANGES

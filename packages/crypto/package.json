@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/crypto",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Cryptographic types and functions for Cardano",
   "engines": {
     "node": ">=14.20.1"
@@ -75,7 +75,7 @@
     }
   },
   "dependencies": {
-    "@cardano-sdk/util": "^0.7.0",
+    "@cardano-sdk/util": "^0.8.0",
     "@types/bn.js": "^5.1.1",
     "@types/libsodium-wrappers-sumo": "^0.7.5",
     "bn.js": "^5.2.1",
