@@ -1,7 +1,8 @@
 {
   "extends": "../../../test/tsconfig.json",
   "compilerOptions": {
-    "baseUrl": "."
+    "baseUrl": ".",
+    "jsx": "react-native"
   },
   "exclude": ["./web-extension"],
   "references": [
