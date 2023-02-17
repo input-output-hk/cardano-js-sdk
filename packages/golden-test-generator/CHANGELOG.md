@@ -3,15 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.6.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.6.0-nightly.1...@cardano-sdk/golden-test-generator@0.6.0-nightly.2) (2023-02-03)
-
-**Note:** Version bump only for package @cardano-sdk/golden-test-generator
-
-## [0.6.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.6.0-nightly.0...@cardano-sdk/golden-test-generator@0.6.0-nightly.1) (2023-01-28)
-
-**Note:** Version bump only for package @cardano-sdk/golden-test-generator
-
-## [0.6.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.5.1-nightly.0...@cardano-sdk/golden-test-generator@0.6.0-nightly.0) (2023-01-27)
+## [0.6.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.5.0...@cardano-sdk/golden-test-generator@0.6.0) (2023-02-17)
 
 ### ⚠ BREAKING CHANGES
 
@@ -20,10 +12,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 ### Features
 
 - **core:** add ChainSyncEvent.requestNext ([484fced](https://github.com/input-output-hk/cardano-js-sdk/commit/484fced69079f004141ae9eb9c5129328d4cbc01))
-
-## [0.5.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.5.0...@cardano-sdk/golden-test-generator@0.5.1-nightly.0) (2022-12-24)
-
-**Note:** Version bump only for package @cardano-sdk/golden-test-generator
 
 ## [0.5.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.4.2...@cardano-sdk/golden-test-generator@0.5.0) (2022-12-22)
 

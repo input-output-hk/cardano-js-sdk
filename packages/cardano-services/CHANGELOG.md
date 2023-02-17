@@ -3,24 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.8.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.8.0-nightly.3...@cardano-sdk/cardano-services@0.8.0-nightly.4) (2023-02-04)
-
-### Features
-
-- **cardano-services:** include healthCheck response as detail in Provider.Unhealthy errors ([16d008d](https://github.com/input-output-hk/cardano-js-sdk/commit/16d008dfa31661c76543f8704292a283c41dd38b))
-
-## [0.8.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.8.0-nightly.2...@cardano-sdk/cardano-services@0.8.0-nightly.3) (2023-02-03)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services
-
-## [0.8.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.8.0-nightly.1...@cardano-sdk/cardano-services@0.8.0-nightly.2) (2023-01-28)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services
-
-## [0.8.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.8.0-nightly.0...@cardano-sdk/cardano-services@0.8.0-nightly.1) (2023-01-27)
+## [0.8.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.7.0...@cardano-sdk/cardano-services@0.8.0) (2023-02-17)
 
 ### ⚠ BREAKING CHANGES
 
+- **cardano-services:** makes genesis data a dependency for providers which need it
+- reworks stake pool epoch rewards fields to be ledger compliant
+- - Bip32PublicKey removed from core and replaced by the Bip32PublicKeyHex type from the crypto package.
+
+* Bip32PrivateKey removed from core and replaced by the Bip32PrivateKeyHex type from the crypto package.
+* Ed25519PublicKey removed from core and replaced by the Ed25519PublicKeyHex type from the crypto package.
+* Ed25519PrivateKey removed from core and replaced by the Ed25519PrivateKeyHex type from the crypto package.
+* Ed25519KeyHash removed from core and replaced by the Ed25519KeyHashHex type from the the crypto package.
+* Ed25519Signature removed from core and replaced by the Ed25519SignatureHex type from the crypto package.
+* Hash32ByteBase16 removed from core and replaced by the Hash32ByteBase16 type from the crypto package.
+* Hash28ByteBase16 removed from core and replaced by the Hash28ByteBase16 type from the crypto package.
+* The KeyAgent interface now has a new field bip32Ed25519.
+* The KeyAgentBase class and all its derived classes (InMemoryKeyAgent, LedgerKeyAgent and TrezorKeyAgent) must now be provided with a Bip32Ed25519 implementation on their constructors.
+* Bip32Path type was removed from the key-management package and replaced by the Bip32Path from the crypto package.
+
+- hoist Opaque types, hexBlob, Base64Blob and related utils
 - CompactGenesis.slotLength type changed
   from `number` to `Seconds`
 - **cardano-services:** Nested `narHash`, `path` and `sourceInfo` under top level `extra` property of BUILD_INFO
@@ -28,14 +30,25 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
+- **cardano-services:** adds dev version of mainnet preprod and preview docker compose ([107ea57](https://github.com/input-output-hk/cardano-js-sdk/commit/107ea574a4932d0e7d402bbbc15be5a0999cd779))
+- **cardano-services:** changes the way tx metadatum are read from db, from json to raw bytes ([ca9a110](https://github.com/input-output-hk/cardano-js-sdk/commit/ca9a1107ed89d1f18d68c79bf598b2dd3db8989e))
+- **cardano-services:** include healthCheck response as detail in Provider.Unhealthy errors ([16d008d](https://github.com/input-output-hk/cardano-js-sdk/commit/16d008dfa31661c76543f8704292a283c41dd38b))
 - **cardano-services:** upgrade /meta endpoint ([e9c3a5b](https://github.com/input-output-hk/cardano-js-sdk/commit/e9c3a5b74a2cc1f69c53f562af8a5b4e693bd20a))
 - update CompactGenesis slotLength type to be Seconds ([82e63d6](https://github.com/input-output-hk/cardano-js-sdk/commit/82e63d6cacedbab5ecf8491dfd37749bfeddbc22))
 
 ### Bug Fixes
 
+- **cardano-service:** fixes a division by zero in stake pools query ([caa4aac](https://github.com/input-output-hk/cardano-js-sdk/commit/caa4aac213be9c40d572d280ccaac62f67ab80a9))
 - **cardano-services:** cache TTL validator ([012b6c5](https://github.com/input-output-hk/cardano-js-sdk/commit/012b6c55456b5c7501940186c3783bd8643b4cd5))
+- **cardano-services:** fixes a bug excluding some pools from queries filtering by pledge meet ([9f71a99](https://github.com/input-output-hk/cardano-js-sdk/commit/9f71a9989b47e317e2019a38b6ef27e51dd47935))
 - **cardano-services:** fixes a bug on stake pool saturation compute also causing a wrong sort ([4e66060](https://github.com/input-output-hk/cardano-js-sdk/commit/4e660601d6b6b0d22dc6ce635e130f4b19cd73df))
+- **cardano-services:** fixes epoch rewards of stake pool query to have the right number of elements ([c7bf65e](https://github.com/input-output-hk/cardano-js-sdk/commit/c7bf65e869bf38c1ff258e626c483cc690f67049))
 - **cardano-services:** fixes tx_id format in logged messages ([a4116d7](https://github.com/input-output-hk/cardano-js-sdk/commit/a4116d73b4c594d71a69e5a615293bbe2c2c4b86))
+- **cardano-services:** makes rewards epoch length the one from genesis for all epochs but current ([90880cf](https://github.com/input-output-hk/cardano-js-sdk/commit/90880cf1be445808b2ca39b3bcd4757bef0f9981))
+- **cardano-services:** stake pool query by metrics results no longer exceedes total count ([adceaa2](https://github.com/input-output-hk/cardano-js-sdk/commit/adceaa25bc459fb68ff48cc326ccee2e3d3b33fc))
+- **cardano-services:** stake pool search cached results now correctly handle rewards history limit ([62eefd9](https://github.com/input-output-hk/cardano-js-sdk/commit/62eefd9788e3770e80ed779ea280d4448b9efc18))
+- fixes a minor bug in stake pool query sort by name ([5eb3aa5](https://github.com/input-output-hk/cardano-js-sdk/commit/5eb3aa52faed5add00fa63f74094033a8fb28fa0))
+- fixes the computation of apy ([6ea2474](https://github.com/input-output-hk/cardano-js-sdk/commit/6ea2474026cdf85436811fab07a847ae9bf0a27b))
 - unmemoize slot epoch calc in core package ([2dc6af4](https://github.com/input-output-hk/cardano-js-sdk/commit/2dc6af44906f1b61323a69c3e840834f2c86930f))
 
 ### Performance Improvements
@@ -44,18 +57,11 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Code Refactoring
 
+- **cardano-services:** makes genesis data a dependency for providers which need it ([d4c7e24](https://github.com/input-output-hk/cardano-js-sdk/commit/d4c7e249ebbce4ec5d52304565b032905e0286cc))
+- hoist Opaque types, hexBlob, Base64Blob and related utils ([391a8f2](https://github.com/input-output-hk/cardano-js-sdk/commit/391a8f20d60607c4fb6ce8586b97ae96841f759b))
+- refactor the SDK to use the new crypto package ([3b41320](https://github.com/input-output-hk/cardano-js-sdk/commit/3b41320e7971a231d50785733ff4cd0793418d3d))
+- reworks stake pool epoch rewards fields to be ledger compliant ([a9ff583](https://github.com/input-output-hk/cardano-js-sdk/commit/a9ff583d26fe427c2816ab286bb3ae4aeacc9301))
 - standardize provider dependencies ([05b37e6](https://github.com/input-output-hk/cardano-js-sdk/commit/05b37e6383a906152df457143c5a27341a11c341))
-
-## [0.8.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.7.0...@cardano-sdk/cardano-services@0.8.0-nightly.0) (2022-12-24)
-
-### ⚠ BREAKING CHANGES
-
-- Alonzo transaction outputs will now contain a datumHash field, carrying the datum hash digest. However, they will also contain a datum field with the exact same value for backward compatibility reason. In Babbage however, transaction outputs will carry either datum or datumHash depending on the case; and datum will only contain inline datums.
-
-### Features
-
-- added new babbage era types in Transactions and Outputs ([917b2a4](https://github.com/input-output-hk/cardano-js-sdk/commit/917b2a43319ecedf8cd8ef72fbcdecc04e010d8e))
-- dbSyncUtxoProvider now returns the new Babbage fields in the UTXO when present ([ad8184b](https://github.com/input-output-hk/cardano-js-sdk/commit/ad8184bcf9bae92a386c36175f4a773637faf8eb))
 
 ## [0.7.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.6.0...@cardano-sdk/cardano-services@0.7.0) (2022-12-22)
 

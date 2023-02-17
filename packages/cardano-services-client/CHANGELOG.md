@@ -3,23 +3,11 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.7.1-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.7.1-nightly.2...@cardano-sdk/cardano-services-client@0.7.1-nightly.3) (2023-02-03)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-## [0.7.1-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.7.1-nightly.1...@cardano-sdk/cardano-services-client@0.7.1-nightly.2) (2023-01-28)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-## [0.7.1-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.7.1-nightly.0...@cardano-sdk/cardano-services-client@0.7.1-nightly.1) (2023-01-27)
+## [0.7.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.7.0...@cardano-sdk/cardano-services-client@0.7.1) (2023-02-17)
 
 ### Bug Fixes
 
 - **cardano-services:** updated http provider error handling ([#514](https://github.com/input-output-hk/cardano-js-sdk/issues/514)) ([33a4867](https://github.com/input-output-hk/cardano-js-sdk/commit/33a48670490fa998cef0196eb71492103105dcf7))
-
-## [0.7.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.7.0...@cardano-sdk/cardano-services-client@0.7.1-nightly.0) (2022-12-24)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
 
 ## [0.7.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.6.0...@cardano-sdk/cardano-services-client@0.7.0) (2022-12-22)
 

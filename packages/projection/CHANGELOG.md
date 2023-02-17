@@ -3,17 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.3.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.3.0-nightly.1...@cardano-sdk/projection@0.3.0-nightly.2) (2023-02-03)
-
-**Note:** Version bump only for package @cardano-sdk/projection
-
-## [0.3.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.3.0-nightly.0...@cardano-sdk/projection@0.3.0-nightly.1) (2023-01-28)
-
-**Note:** Version bump only for package @cardano-sdk/projection
-
-## [0.3.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.2.1-nightly.0...@cardano-sdk/projection@0.3.0-nightly.0) (2023-01-27)
+## [0.3.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.2.0...@cardano-sdk/projection@0.3.0) (2023-02-17)
 
 ### ⚠ BREAKING CHANGES
+
+- - Bip32PublicKey removed from core and replaced by the Bip32PublicKeyHex type from the crypto package.
+
+* Bip32PrivateKey removed from core and replaced by the Bip32PrivateKeyHex type from the crypto package.
+* Ed25519PublicKey removed from core and replaced by the Ed25519PublicKeyHex type from the crypto package.
+* Ed25519PrivateKey removed from core and replaced by the Ed25519PrivateKeyHex type from the crypto package.
+* Ed25519KeyHash removed from core and replaced by the Ed25519KeyHashHex type from the the crypto package.
+* Ed25519Signature removed from core and replaced by the Ed25519SignatureHex type from the crypto package.
+* Hash32ByteBase16 removed from core and replaced by the Hash32ByteBase16 type from the crypto package.
+* Hash28ByteBase16 removed from core and replaced by the Hash28ByteBase16 type from the crypto package.
+* The KeyAgent interface now has a new field bip32Ed25519.
+* The KeyAgentBase class and all its derived classes (InMemoryKeyAgent, LedgerKeyAgent and TrezorKeyAgent) must now be provided with a Bip32Ed25519 implementation on their constructors.
+* Bip32Path type was removed from the key-management package and replaced by the Bip32Path from the crypto package.
 
 - EraSummary.parameters.slotLength type changed from number
   to Milliseconds
@@ -37,9 +42,9 @@ Update some operator signatures to not require any arguments.
 - **projection:** stake key register/deregister now cancels each other out ([026bd06](https://github.com/input-output-hk/cardano-js-sdk/commit/026bd0682e7656e8b0ec2b8f36c240d856407a52))
 - **util-rxjs:** rework blockingWithLatestFrom ([3d9e41c](https://github.com/input-output-hk/cardano-js-sdk/commit/3d9e41cbc309557fdc080587b7394de654a115ee))
 
-## [0.2.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.2.0...@cardano-sdk/projection@0.2.1-nightly.0) (2022-12-24)
+### Code Refactoring
 
-**Note:** Version bump only for package @cardano-sdk/projection
+- refactor the SDK to use the new crypto package ([3b41320](https://github.com/input-output-hk/cardano-js-sdk/commit/3b41320e7971a231d50785733ff4cd0793418d3d))
 
 ## 0.2.0 (2022-12-22)
 

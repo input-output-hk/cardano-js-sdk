@@ -3,15 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.4.4-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.4.4-nightly.2...@cardano-sdk/util-rxjs@0.4.4-nightly.3) (2023-02-03)
-
-**Note:** Version bump only for package @cardano-sdk/util-rxjs
-
-## [0.4.4-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.4.4-nightly.1...@cardano-sdk/util-rxjs@0.4.4-nightly.2) (2023-01-28)
-
-**Note:** Version bump only for package @cardano-sdk/util-rxjs
-
-## [0.4.4-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.4.4-nightly.0...@cardano-sdk/util-rxjs@0.4.4-nightly.1) (2023-01-27)
+## [0.4.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.4.3...@cardano-sdk/util-rxjs@0.4.4) (2023-02-17)
 
 ### Features
 
@@ -20,10 +12,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 ### Bug Fixes
 
 - **util-rxjs:** rework blockingWithLatestFrom ([3d9e41c](https://github.com/input-output-hk/cardano-js-sdk/commit/3d9e41cbc309557fdc080587b7394de654a115ee))
-
-## [0.4.4-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.4.3...@cardano-sdk/util-rxjs@0.4.4-nightly.0) (2022-12-24)
-
-**Note:** Version bump only for package @cardano-sdk/util-rxjs
 
 ## [0.4.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.4.2...@cardano-sdk/util-rxjs@0.4.3) (2022-12-22)
 

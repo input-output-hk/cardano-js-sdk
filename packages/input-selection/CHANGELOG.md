@@ -3,21 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.7.1-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.7.1-nightly.2...@cardano-sdk/input-selection@0.7.1-nightly.3) (2023-02-03)
+## [0.8.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.7.0...@cardano-sdk/input-selection@0.8.0) (2023-02-17)
 
-**Note:** Version bump only for package @cardano-sdk/input-selection
+### ⚠ BREAKING CHANGES
 
-## [0.7.1-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.7.1-nightly.1...@cardano-sdk/input-selection@0.7.1-nightly.2) (2023-01-28)
+- - The default input selection constraints were moved from input-selection package to tx-construction package.
+- **input-selection:** - The ProtocolParametersForInputSelection type now includes the field
+  'prices' from the protocol parameters.
 
-**Note:** Version bump only for package @cardano-sdk/input-selection
+### Features
 
-## [0.7.1-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.7.1-nightly.0...@cardano-sdk/input-selection@0.7.1-nightly.1) (2023-01-27)
-
-**Note:** Version bump only for package @cardano-sdk/input-selection
-
-## [0.7.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.7.0...@cardano-sdk/input-selection@0.7.1-nightly.0) (2022-12-24)
-
-**Note:** Version bump only for package @cardano-sdk/input-selection
+- **input-selection:** input selection now requires execution unit prices ([680845f](https://github.com/input-output-hk/cardano-js-sdk/commit/680845f5763194a1d6b18bebd8af543fcd5f47e4))
+- new tx construction package added ([45c0c75](https://github.com/input-output-hk/cardano-js-sdk/commit/45c0c75b20f766a069af45cec636a1756a3fc0da))
 
 ## [0.7.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.6.0...@cardano-sdk/input-selection@0.7.0) (2022-12-22)
 

@@ -3,23 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.7.1-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.7.1-nightly.2...@cardano-sdk/web-extension@0.7.1-nightly.3) (2023-02-03)
+## [0.8.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.7.0...@cardano-sdk/web-extension@0.8.0) (2023-02-17)
 
-**Note:** Version bump only for package @cardano-sdk/web-extension
+### ⚠ BREAKING CHANGES
 
-## [0.7.1-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.7.1-nightly.1...@cardano-sdk/web-extension@0.7.1-nightly.2) (2023-01-28)
+- - Bip32PublicKey removed from core and replaced by the Bip32PublicKeyHex type from the crypto package.
 
-**Note:** Version bump only for package @cardano-sdk/web-extension
+* Bip32PrivateKey removed from core and replaced by the Bip32PrivateKeyHex type from the crypto package.
+* Ed25519PublicKey removed from core and replaced by the Ed25519PublicKeyHex type from the crypto package.
+* Ed25519PrivateKey removed from core and replaced by the Ed25519PrivateKeyHex type from the crypto package.
+* Ed25519KeyHash removed from core and replaced by the Ed25519KeyHashHex type from the the crypto package.
+* Ed25519Signature removed from core and replaced by the Ed25519SignatureHex type from the crypto package.
+* Hash32ByteBase16 removed from core and replaced by the Hash32ByteBase16 type from the crypto package.
+* Hash28ByteBase16 removed from core and replaced by the Hash28ByteBase16 type from the crypto package.
+* The KeyAgent interface now has a new field bip32Ed25519.
+* The KeyAgentBase class and all its derived classes (InMemoryKeyAgent, LedgerKeyAgent and TrezorKeyAgent) must now be provided with a Bip32Ed25519 implementation on their constructors.
+* Bip32Path type was removed from the key-management package and replaced by the Bip32Path from the crypto package.
 
-## [0.7.1-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.7.1-nightly.0...@cardano-sdk/web-extension@0.7.1-nightly.1) (2023-01-27)
+### Features
+
+- expose setUnspendable on ObservableWallet interface ([729e5d7](https://github.com/input-output-hk/cardano-js-sdk/commit/729e5d7c63447837a4196f2e19fb306939873a69))
 
 ### Bug Fixes
 
 - **wallet-manager:** initialize walletManagerWorker runtime property ([db4ce63](https://github.com/input-output-hk/cardano-js-sdk/commit/db4ce63c85e5b80e2f36e4a92f2c71916c477657))
 
-## [0.7.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.7.0...@cardano-sdk/web-extension@0.7.1-nightly.0) (2022-12-24)
+### Code Refactoring
 
-**Note:** Version bump only for package @cardano-sdk/web-extension
+- refactor the SDK to use the new crypto package ([3b41320](https://github.com/input-output-hk/cardano-js-sdk/commit/3b41320e7971a231d50785733ff4cd0793418d3d))
 
 ## [0.7.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.6.0...@cardano-sdk/web-extension@0.7.0) (2022-12-22)
 
