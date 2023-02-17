@@ -38,6 +38,7 @@ local.properties
 node_modules/
 npm-debug.log
 yarn-error.log
+.yarn/*
 
 # fastlane
 #
@@ -63,3 +64,4 @@ yarn-error.log
 
 **/allure-report/
 **/allure-results/
+/e2e/artifacts/
