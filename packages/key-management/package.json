@@ -64,7 +64,7 @@
     "@cardano-sdk/crypto": "^0.1.0",
     "@cardano-sdk/dapp-connector": "^0.6.2-nightly.3",
     "@cardano-sdk/util": "^0.7.1-nightly.1",
-    "@cardano-sdk/util-dev": "^0.6.0",
+    "@cardano-sdk/util-dev": "0.7.0-nightly.2",
     "@emurgo/cardano-message-signing-nodejs": "^1.0.1",
     "@ledgerhq/hw-transport": "^6.27.2",
     "@ledgerhq/hw-transport-node-hid-noevents": "^6.27.2",
