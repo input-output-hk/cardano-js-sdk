@@ -116,7 +116,6 @@ CREATE TEMPORARY VIEW active_stake AS (
   GROUP BY es.pool_id
 );
 
-/*
 CREATE TEMPORARY VIEW pools_delegated AS (
 SELECT
   ph.id,
@@ -166,7 +165,62 @@ CREATE TEMPORARY VIEW pool_owner_rewards AS (
     r.spendable_epoch <= (SELECT epoch_no FROM current_epoch)
   GROUP BY r.pool_id, sa.id
 );
-*/
+
+CREATE TEMPORARY VIEW pool_owner_withdraws AS (
+  SELECT
+    COALESCE(SUM(w.amount), 0) AS total_amount,
+    sa.id AS stake_address_id
+  FROM withdrawal w
+  JOIN tx ON
+    tx.id = w.tx_id AND
+    tx.valid_contract = TRUE
+  JOIN stake_address sa ON
+    sa.id = w.addr_id
+  JOIN pools_delegated pool ON
+    pool.stake_address_id = sa.id
+  GROUP BY sa.id
+);
+
+CREATE TEMPORARY VIEW reward_acc_balance AS (
+  SELECT
+    r.total_amount - w.total_amount AS total_amount,
+    r.stake_address_id,
+    r.pool_id
+  FROM pool_owner_rewards r
+  JOIN pool_owner_withdraws w ON
+    r.stake_address_id = w.stake_address_id
+);
+
+CREATE TEMPORARY VIEW owners_utxo AS (
+  SELECT
+    tx_out.value AS value,
+    pu.hash_id
+  FROM tx_out
+  JOIN pool_owner o ON
+    o.addr_id = tx_out.stake_address_id
+  JOIN pool_update pu ON
+    o.pool_update_id = pu.id
+    AND pu.hash_id IN (SELECT id FROM pools_delegated)
+  LEFT JOIN tx_in ON
+    tx_out.tx_id = tx_in.tx_out_id AND
+    tx_out.index::smallint = tx_in.tx_out_index::smallint
+  LEFT JOIN tx AS tx_in_tx ON
+    tx_in_tx.id = tx_in.tx_in_id AND
+      tx_in_tx.valid_contract = TRUE
+  JOIN tx AS tx_out_tx ON
+    tx_out_tx.id = tx_out.tx_id AND
+      tx_out_tx.valid_contract = TRUE
+  WHERE
+    tx_in_tx.id IS NULL
+);
+
+CREATE TEMPORARY VIEW owners_balance AS (
+  SELECT
+    SUM(value) AS total_amount,
+    hash_id AS pool_hash_id
+  FROM owners_utxo
+  GROUP BY hash_id
+);
 `;
 
 export const dumpDbSyncTemporarySchema = (epochLength?: number) =>
