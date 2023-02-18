@@ -7,11 +7,9 @@ import {
   HydratedTxIn,
   Lovelace,
   Metadatum,
-  PaymentAddress,
   PolicyId,
   PoolRegistrationCertificate,
   PoolRetirementCertificate,
-  RewardAccount,
   Script,
   ScriptType,
   StakeAddressCertificate,
@@ -20,9 +18,9 @@ import {
   Value
 } from '../Cardano/types';
 import { BigIntMath } from '@cardano-sdk/util';
+import { PaymentAddress, RewardAccount, inputsWithAddresses, isAddressWithin } from '../Cardano';
 import { assetNameFromAssetId, policyIdFromAssetId, removeNegativesFromTokenMap } from '../Asset/util';
 import { coalesceValueQuantities } from './coalesceValueQuantities';
-import { inputsWithAddresses, isAddressWithin } from '../Cardano/util/address';
 import { nativeScriptPolicyId } from './nativeScript';
 import { resolveInputValue } from '../Cardano/util/resolveInputValue';
 import { subtractValueQuantities } from './subtractValueQuantities';

@@ -13,7 +13,7 @@ import {
   TxSignErrorCode,
   WalletApi
 } from '@cardano-sdk/dapp-connector';
-import { CML, Cardano, TxCBOR, cmlToCore, coreToCml, parseCmlAddress } from '@cardano-sdk/core';
+import { CML, Cardano, TxCBOR, cmlToCore, coreToCml } from '@cardano-sdk/core';
 import { HexBlob, ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
 import { Observable, firstValueFrom } from 'rxjs';
@@ -82,14 +82,14 @@ const compareUtxos = (utxo: Cardano.Utxo, comparedTo: Cardano.Utxo) => {
   return 0;
 };
 
-const cardanoAddressToCbor = (address: Cardano.PaymentAddress | Cardano.RewardAccount): Cbor =>
-  usingAutoFree((scope) => {
-    const cmlAddr = parseCmlAddress(scope, address);
-    if (!cmlAddr) {
-      throw new ApiError(APIErrorCode.InternalError, `could not transform address ${address} to CBOR`);
-    }
-    return Buffer.from(cmlAddr.to_bytes()).toString('hex');
-  });
+const cardanoAddressToCbor = (address: Cardano.PaymentAddress | Cardano.RewardAccount): Cbor => {
+  const addr = Cardano.Address.fromString(address);
+
+  if (!addr) {
+    throw new ApiError(APIErrorCode.InternalError, `could not transform address ${address} to CBOR`);
+  }
+  return addr.toBytes();
+};
 
 const formatUnknownError = (error: unknown): string => (error as Error)?.message || 'Unknown error';
 

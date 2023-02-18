@@ -105,7 +105,7 @@ export const createOutputValidator = ({ protocolParameters$ }: OutputValidatorCo
   };
 };
 
-export const createInputResolver = ({ utxo }: InputResolverContext): Cardano.util.InputResolver => ({
+export const createInputResolver = ({ utxo }: InputResolverContext): Cardano.InputResolver => ({
   async resolveInputAddress(input: Cardano.TxIn) {
     const utxoAvailable = await firstValueFrom(utxo.available$);
     return utxoAvailable?.find(([txIn]) => txInEquals(txIn, input))?.[1].address || null;

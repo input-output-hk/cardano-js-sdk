@@ -1,5 +1,5 @@
 import { Datum, DatumHash, Script } from './Script';
-import { PaymentAddress } from './Address';
+import { PaymentAddress } from './../Address';
 import { TransactionId } from './Transaction';
 import { Value } from './Value';
 

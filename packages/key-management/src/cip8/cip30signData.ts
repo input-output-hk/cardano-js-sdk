@@ -14,9 +14,9 @@ import {
   SigStructure
 } from '@emurgo/cardano-message-signing-nodejs';
 import { AsyncKeyAgent, KeyRole } from '../types';
-import { Cardano, parseCmlAddress, util } from '@cardano-sdk/core';
+import { Cardano, util } from '@cardano-sdk/core';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
-import { ComposableError, HexBlob, usingAutoFree } from '@cardano-sdk/util';
+import { ComposableError, HexBlob } from '@cardano-sdk/util';
 import { CoseLabel } from './util';
 import { STAKE_KEY_DERIVATION_PATH } from '../util';
 import { firstValueFrom } from 'rxjs';
@@ -39,14 +39,15 @@ export class Cip30DataSignError<InnerError = unknown> extends ComposableError<In
   }
 }
 
-const getAddressBytes = (signWith: Cardano.PaymentAddress | Cardano.RewardAccount) =>
-  usingAutoFree((scope) => {
-    const cslAddress = parseCmlAddress(scope, signWith);
-    if (!cslAddress) {
-      throw new Cip30DataSignError(Cip30DataSignErrorCode.AddressNotPK, 'Invalid address');
-    }
-    return cslAddress.to_bytes();
-  });
+const getAddressBytes = (signWith: Cardano.PaymentAddress | Cardano.RewardAccount) => {
+  const address = Cardano.Address.fromString(signWith);
+
+  if (!address) {
+    throw new Cip30DataSignError(Cip30DataSignErrorCode.AddressNotPK, 'Invalid address');
+  }
+
+  return Buffer.from(address.toBytes(), 'hex');
+};
 
 const getDerivationPath = async (signWith: Cardano.PaymentAddress | Cardano.RewardAccount, keyAgent: AsyncKeyAgent) => {
   const isRewardAccount = signWith.startsWith('stake');

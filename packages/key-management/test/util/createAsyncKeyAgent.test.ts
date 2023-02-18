@@ -8,7 +8,7 @@ import { firstValueFrom } from 'rxjs';
 describe('createAsyncKeyAgent maps KeyAgent to AsyncKeyAgent', () => {
   let keyAgent: KeyAgent;
   let asyncKeyAgent: AsyncKeyAgent;
-  let inputResolver: jest.Mocked<Cardano.util.InputResolver>;
+  let inputResolver: jest.Mocked<Cardano.InputResolver>;
   const addressDerivationPath = { index: 0, type: 0 };
 
   beforeEach(async () => {

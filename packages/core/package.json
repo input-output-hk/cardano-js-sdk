@@ -77,7 +77,9 @@
     "@cardano-sdk/util": "^0.8.0",
     "@dcspark/cardano-multiplatform-lib-nodejs": "^3.1.1",
     "@emurgo/cip14-js": "^3.0.1",
-    "bech32": "^2.0.0",
+    "@foxglove/crc": "^0.0.3",
+    "@scure/base": "^1.1.1",
+    "borc": "^3.0.0",
     "lodash": "^4.17.21",
     "ts-custom-error": "^3.2.0",
     "ts-log": "^2.2.4"

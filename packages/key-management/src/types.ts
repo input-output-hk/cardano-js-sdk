@@ -63,7 +63,7 @@ export enum CommunicationType {
 }
 
 export interface KeyAgentDependencies {
-  inputResolver: Cardano.util.InputResolver;
+  inputResolver: Cardano.InputResolver;
   logger: Logger;
   bip32Ed25519: Crypto.Bip32Ed25519;
 }

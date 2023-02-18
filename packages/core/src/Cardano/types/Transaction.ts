@@ -8,7 +8,7 @@ import { ExUnits, ValidityInterval } from './ProtocolParameters';
 import { HydratedTxIn, TxIn, TxOut } from './Utxo';
 import { Lovelace, TokenMap } from './Value';
 import { PartialBlockHeader } from './Block';
-import { RewardAccount } from './RewardAccount';
+import { RewardAccount } from '../Address';
 import { TxBodyCBOR } from '../../CBOR/TxBodyCBOR';
 import { bytesToHex } from '../../util/misc';
 

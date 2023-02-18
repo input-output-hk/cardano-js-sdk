@@ -18,7 +18,7 @@ describe('cip36', () => {
             weight: 1
           }
         ],
-        paymentAddress: Cardano.Address(
+        paymentAddress: Cardano.PaymentAddress(
           'addr_test1qprhw4s70k0vzyhvxp6h97hvrtlkrlcvlmtgmaxdtjz87xrjkctk27ypuv9dzlzxusqse89naweygpjn5dxnygvus05sdq9h07'
         ),
         purpose: cip36.VotingPurpose.CATALYST,
@@ -43,7 +43,7 @@ describe('cip36', () => {
           }
         ],
         nonce: 1234,
-        paymentAddress: Cardano.Address(
+        paymentAddress: Cardano.PaymentAddress(
           'addr_test1qprhw4s70k0vzyhvxp6h97hvrtlkrlcvlmtgmaxdtjz87xrjkctk27ypuv9dzlzxusqse89naweygpjn5dxnygvus05sdq9h07'
         ),
         purpose: cip36.VotingPurpose.CATALYST,

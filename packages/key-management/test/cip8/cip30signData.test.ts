@@ -45,7 +45,7 @@ describe('cip30signData', () => {
     // @emurgo/cardano-message-signing-nodejs only allows CBORValue for headers
     const addressHeaderBytes = addressHeader.as_bytes();
 
-    expect(addressHeaderBytes).toEqual(CML.Address.from_bech32(signWith).to_bytes());
+    expect(Buffer.from(addressHeaderBytes!).toString('hex')).toEqual(Cardano.Address.fromBech32(signWith).toBytes());
   };
 
   it('supports sign with payment address', async () => {

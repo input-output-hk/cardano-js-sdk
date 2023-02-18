@@ -12,7 +12,7 @@ const randomPublicKey = () => Crypto.Ed25519PublicKeyHex(Array.from({ length: 64
 export const stubSignTransaction = async (
   txBody: Cardano.TxBody,
   knownAddresses: GroupedAddress[],
-  inputResolver: Cardano.util.InputResolver,
+  inputResolver: Cardano.InputResolver,
   extraSigners?: TransactionSigner[],
   { additionalKeyPaths = [] }: SignTransactionOptions = {}
 ): Promise<Cardano.Signatures> => {
