@@ -7,6 +7,7 @@
 import {
   API_URL_DEFAULT,
   CommonOptionDescriptions,
+  DISABLE_STAKE_POOL_METRIC_APY_DEFAULT,
   ENABLE_METRICS_DEFAULT,
   HttpServerOptions,
   OGMIOS_URL_DEFAULT,
@@ -148,6 +149,14 @@ commonOptions(
       .default(ENABLE_METRICS_DEFAULT)
       .argParser((enableMetrics) =>
         stringToBoolean(enableMetrics, Programs.HttpServer, ProgramOptionDescriptions.EnableMetrics)
+      )
+  )
+  .addOption(
+    new Option('--disable-stake-pool-metric-apy <true/false>', ProgramOptionDescriptions.DisableStakePoolMetricApy)
+      .env('DISABLE_STAKE_POOL_METRIC_APY')
+      .default(DISABLE_STAKE_POOL_METRIC_APY_DEFAULT)
+      .argParser((disable) =>
+        stringToBoolean(disable, Programs.HttpServer, ProgramOptionDescriptions.DisableStakePoolMetricApy)
       )
   )
   .addOption(

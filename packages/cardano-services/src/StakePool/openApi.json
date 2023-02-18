@@ -361,7 +361,14 @@
         ],
         "properties": {
           "apy": {
-            "type": "number"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Undefined"
+              },
+              {
+                "type": "number"
+              }
+            ]
           },
           "blocksCreated": {
             "type": "string"

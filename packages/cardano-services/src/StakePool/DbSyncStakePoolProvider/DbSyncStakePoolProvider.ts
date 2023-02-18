@@ -14,6 +14,7 @@ import { IDS_NAMESPACE, StakePoolsSubQuery, emptyPoolsExtraInfo, getStakePoolSor
 import { RunnableModule, isNotNil } from '@cardano-sdk/util';
 import { StakePoolBuilder } from './StakePoolBuilder';
 import { toStakePoolResults } from './mappers';
+import merge from 'lodash/merge';
 
 /**
  * Properties that are need to create DbSyncStakePoolProvider
@@ -23,6 +24,16 @@ export interface StakePoolProviderProps {
    * Pagination page size limit used for provider methods constraint.
    */
   paginationPageSizeLimit: number;
+  /**
+   * Configure the response optional fields
+   */
+  responseConfig?: {
+    search?: {
+      metrics?: {
+        apy?: boolean;
+      };
+    };
+  };
 }
 
 /**
@@ -58,9 +69,10 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
   #epochRolloverDisposer: Disposer;
   #paginationPageSizeLimit: number;
   #metadataService: StakePoolExtMetadataService;
+  #responseConfig: StakePoolProviderProps['responseConfig'];
 
   constructor(
-    { paginationPageSizeLimit }: StakePoolProviderProps,
+    { paginationPageSizeLimit, responseConfig }: StakePoolProviderProps,
     { db, cardanoNode, genesisData, metadataService, cache, logger, epochMonitor }: StakePoolProviderDependencies
   ) {
     super({ cardanoNode, db, logger }, 'DbSyncStakePoolProvider', logger);
@@ -75,6 +87,14 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
     this.#epochMonitor = epochMonitor;
     this.#metadataService = metadataService;
     this.#paginationPageSizeLimit = paginationPageSizeLimit;
+    this.#responseConfig = merge({
+      search: {
+        metrics: {
+          apy: true
+        }
+      },
+      ...responseConfig
+    });
   }
 
   private getQueryBySortType(
@@ -89,6 +109,9 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
       case 'metrics':
         return (options?: QueryStakePoolsArgs) => this.#builder.queryPoolMetrics(hashesIds, totalAdaAmount, options);
       case 'apy':
+        if (this.#responseConfig?.search?.metrics?.apy === false) {
+          throw new ProviderError(ProviderFailure.BadRequest, undefined, 'APY metric is disabled');
+        }
         return (options?: QueryStakePoolsArgs) => this.#builder.queryPoolAPY(hashesIds, this.#epochLength, options);
       case 'data':
       default:
@@ -209,13 +232,15 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
         this.getPoolsDataOrdered(poolUpdates, totalAdaAmount, options)
       );
     // Get stake pools APYs cached
-    const poolAPYs =
-      sortType === 'apy'
-        ? (orderedResult as PoolAPY[])
-        : await this.#cache.get(queryCacheKey(StakePoolsSubQuery.APY, hashesIds, options), () =>
-            this.#builder.queryPoolAPY(hashesIds, this.#epochLength, { rewardsHistoryLimit })
-          );
-
+    let poolAPYs = [] as PoolAPY[];
+    if (this.#responseConfig?.search?.metrics?.apy) {
+      poolAPYs =
+        sortType === 'apy'
+          ? (orderedResult as PoolAPY[])
+          : await this.#cache.get(queryCacheKey(StakePoolsSubQuery.APY, hashesIds, options), () =>
+              this.#builder.queryPoolAPY(hashesIds, this.#epochLength, { rewardsHistoryLimit })
+            );
+    }
     // Get stake pools rewards cached
     const poolRewards = await this.#cache.get(
       queryCacheKey(StakePoolsSubQuery.REWARDS, orderedResultHashIds, options),

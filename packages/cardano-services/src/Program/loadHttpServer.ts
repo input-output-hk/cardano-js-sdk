@@ -35,6 +35,7 @@ import pg from 'pg';
 export interface HttpServerOptions extends CommonProgramOptions {
   serviceNames?: ServiceNames[];
   enableMetrics?: boolean;
+  disableStakePoolMetricApy?: boolean;
   buildInfo?: BuildInfo;
   cardanoNodeConfigPath?: string;
   tokenMetadataCacheTTL?: number;
@@ -128,7 +129,10 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       if (!genesisData)
         throw new MissingProgramOption(ServiceNames.StakePool, ProgramOptionDescriptions.CardanoNodeConfigPath);
       const stakePoolProvider = new DbSyncStakePoolProvider(
-        { paginationPageSizeLimit: args.options!.paginationPageSizeLimit! },
+        {
+          paginationPageSizeLimit: args.options!.paginationPageSizeLimit!,
+          responseConfig: { search: { metrics: { apy: !args.options?.disableStakePoolMetricApy } } }
+        },
         {
           cache: new InMemoryCache(args.options!.dbCacheTtl!),
           cardanoNode,

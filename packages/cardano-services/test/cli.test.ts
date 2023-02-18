@@ -81,6 +81,19 @@ const assertMetaEndpoint = async (apiUrl: string, dataMatch: any) => {
   }
 };
 
+const assertStakePoolApyInResponse = async (apiUrl: string, assertFound: boolean) => {
+  expect.assertions(1);
+  await serverReady(apiUrl);
+  const headers = { 'Content-Type': 'application/json' };
+  const res = await axios.post(`${apiUrl}/stake-pool/search`, { headers, pagination: { limit: 1, startAt: 0 } });
+  const apy = res.data.pageResults[0].metrics.apy;
+  if (assertFound) {
+    expect(typeof apy).toBe('number');
+  } else {
+    expect(apy.__type).toBe('undefined');
+  }
+};
+
 type CallCliAndAssertExitArgs = {
   args?: string[];
   dataMatchOnError?: string;
@@ -497,6 +510,72 @@ describe('CLI', () => {
 
             await assertServiceHealthy(apiUrl, ServiceNames.Utxo, lastBlock);
             await assertServiceHealthy(apiUrl, ServiceNames.Rewards, lastBlock);
+          });
+
+          it('exposes a HTTP server with /stake-pool/search endpoint that includes metrics.apy, by default', async () => {
+            proc = fork(
+              exePath,
+              [
+                ...baseArgs,
+                '--api-url',
+                apiUrl,
+                '--postgres-connection-string',
+                postgresConnectionString,
+                '--ogmios-url',
+                ogmiosConnection.address.webSocket,
+                '--cardano-node-config-path',
+                cardanoNodeConfigPath,
+                '--db-cache-ttl',
+                dbCacheTtl,
+                ServiceNames.StakePool
+              ],
+              { env: {}, stdio: 'pipe' }
+            );
+
+            await assertStakePoolApyInResponse(apiUrl, true);
+          });
+
+          it('exposes a HTTP server with /stake-pool/search endpoint that disables metrics.apy, when configured via CLI option', async () => {
+            proc = fork(
+              exePath,
+              [
+                ...baseArgs,
+                '--api-url',
+                apiUrl,
+                '--disable-stake-pool-metric-apy',
+                'true',
+                '--postgres-connection-string',
+                postgresConnectionString,
+                '--ogmios-url',
+                ogmiosConnection.address.webSocket,
+                '--cardano-node-config-path',
+                cardanoNodeConfigPath,
+                '--db-cache-ttl',
+                dbCacheTtl,
+                ServiceNames.StakePool
+              ],
+              { env: {}, stdio: 'pipe' }
+            );
+
+            await assertStakePoolApyInResponse(apiUrl, false);
+          });
+
+          it('exposes a HTTP server with /stake-pool/search endpoint that disables metrics.apy when using env', async () => {
+            proc = fork(exePath, ['start-server'], {
+              env: {
+                API_URL: apiUrl,
+                CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
+                DB_CACHE_TTL: dbCacheTtl,
+                DISABLE_STAKE_POOL_METRIC_APY: 'true',
+                LOGGER_MIN_SEVERITY: 'error',
+                OGMIOS_URL: ogmiosConnection.address.webSocket,
+                POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                SERVICE_NAMES: `${ServiceNames.StakePool}`
+              },
+              stdio: 'pipe'
+            });
+
+            await assertStakePoolApyInResponse(apiUrl, false);
           });
         });
 

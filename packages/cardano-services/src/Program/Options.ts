@@ -15,6 +15,7 @@ enum HttpServerOptionDescriptions {
   ApiUrl = 'API URL',
   BuildInfo = 'HTTP server build info',
   CardanoNodeConfigPath = 'Cardano node config path',
+  DisableStakePoolMetricApy = 'Omit this metric for improved query performance',
   EpochPollInterval = 'Epoch poll interval',
   EnableMetrics = 'Enable Prometheus Metrics',
   OgmiosUrl = 'Ogmios URL',
