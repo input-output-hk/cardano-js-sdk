@@ -68,7 +68,7 @@ interface ToCoreStakePoolInput {
  * Calculates metrics that depends on Node's retrieved data.
  * Since some metrics are obtained from the Node they have to be calculated outside db queries
  */
-export const calcNodeMetricsValues = (metrics: PoolMetrics['metrics'], apy: number): Cardano.StakePoolMetrics => {
+export const calcNodeMetricsValues = (metrics: PoolMetrics['metrics'], apy?: number): Cardano.StakePoolMetrics => {
   const { activeStake, liveStake, activeStakePercentage, ...rest } = metrics;
   const stakePoolMetrics = { ...rest, apy } as unknown as Cardano.StakePoolMetrics;
   const isZeroStake = liveStake === 0n;
@@ -128,7 +128,7 @@ export const toStakePoolResults = (
           const partialMetrics = poolMetric?.metrics;
           let metrics: Cardano.StakePoolMetrics | undefined;
           if (partialMetrics) {
-            metrics = calcNodeMetricsValues(partialMetrics, apy!);
+            metrics = calcNodeMetricsValues(partialMetrics, apy);
           }
           const coreStakePool: Cardano.StakePool = {
             cost: poolData.cost,
