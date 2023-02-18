@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/util-rxjs",
-  "version": "0.4.4",
+  "version": "0.4.5-nightly.0",
   "description": "RxJS extensions",
   "engines": {
     "node": ">=14.20.1"
@@ -53,11 +53,11 @@
     "test:e2e": "shx echo 'test:e2e' command not implemented yet"
   },
   "dependencies": {
-    "@cardano-sdk/util": "^0.8.0",
+    "@cardano-sdk/util": "^0.8.1-nightly.0",
     "rxjs": "^7.4.0"
   },
   "devDependencies": {
-    "@cardano-sdk/util-dev": "^0.7.0",
+    "@cardano-sdk/util-dev": "^0.7.1-nightly.0",
     "eslint": "^7.32.0",
     "jest": "^28.1.3",
     "madge": "^5.0.1",
