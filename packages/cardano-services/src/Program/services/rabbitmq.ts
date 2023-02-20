@@ -3,12 +3,12 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { CONNECTION_ERROR_EVENT, RabbitMqTxSubmitProvider, TxSubmitWorker } from '../../TxSubmit';
-import { CommonOptionDescriptions, CommonProgramOptions } from '../Options';
 import { DnsResolver, srvRecordToRabbitmqURL } from '../utils';
 import { Logger } from 'ts-log';
 import { MissingProgramOption } from '../errors';
 import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import { ProviderError, ProviderFailure, SubmitTxArgs } from '@cardano-sdk/core';
+import { RabbitMqOptionDescriptions, RabbitMqProgramOptions } from '../options';
 import { ServiceNames } from '../ServiceNames';
 import { TxWorkerOptions } from '../loadTxWorker';
 import { isConnectionError } from '@cardano-sdk/util';
@@ -69,14 +69,14 @@ export const rabbitMqTxSubmitProviderWithDiscovery = async (
 export const getRabbitMqTxSubmitProvider = async (
   dnsResolver: DnsResolver,
   logger: Logger,
-  options?: CommonProgramOptions
+  options?: RabbitMqProgramOptions
 ): Promise<RabbitMqTxSubmitProvider> => {
   if (options?.rabbitmqSrvServiceName)
     return rabbitMqTxSubmitProviderWithDiscovery(dnsResolver, logger, options.rabbitmqSrvServiceName);
   if (options?.rabbitmqUrl) return new RabbitMqTxSubmitProvider({ rabbitmqUrl: options.rabbitmqUrl }, { logger });
   throw new MissingProgramOption(ServiceNames.TxSubmit, [
-    CommonOptionDescriptions.RabbitMQUrl,
-    CommonOptionDescriptions.RabbitMQSrvServiceName
+    RabbitMqOptionDescriptions.Url,
+    RabbitMqOptionDescriptions.SrvServiceName
   ]);
 };
 
@@ -178,7 +178,7 @@ export const getRunningTxSubmitWorker = async (
     return worker;
   }
   throw new MissingProgramOption(ServiceNames.TxSubmit, [
-    CommonOptionDescriptions.RabbitMQUrl,
-    CommonOptionDescriptions.RabbitMQSrvServiceName
+    RabbitMqOptionDescriptions.Url,
+    RabbitMqOptionDescriptions.SrvServiceName
   ]);
 };

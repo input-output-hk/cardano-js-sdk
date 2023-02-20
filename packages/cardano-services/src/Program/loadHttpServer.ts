@@ -7,10 +7,15 @@ import {
   DbSyncNftMetadataService,
   StubTokenMetadataService
 } from '../Asset';
-import { BuildInfo, HttpServer, HttpServerConfig, HttpService } from '../Http';
 import { CardanoNode } from '@cardano-sdk/core';
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../ChainHistory';
-import { CommonProgramOptions, ProgramOptionDescriptions } from './Options';
+import {
+  CommonProgramOptions,
+  OgmiosProgramOptions,
+  PosgresProgramOptions,
+  PostgresOptionDescriptions,
+  RabbitMqProgramOptions
+} from './options';
 import { DbSyncEpochPollService, loadGenesisData } from '../util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../NetworkInfo';
 import { DbSyncRewardsProvider, RewardsHttpService } from '../Rewards';
@@ -18,6 +23,7 @@ import { DbSyncStakePoolProvider, StakePoolHttpService, createHttpStakePoolExtMe
 import { DbSyncUtxoProvider, UtxoHttpService } from '../Utxo';
 import { DnsResolver, createDnsResolver, shouldInitCardanoNode } from './utils';
 import { GenesisData } from '../types';
+import { HttpServer, BuildInfo as HttpServerBuildInfo, HttpServerConfig, HttpService } from '../Http';
 import { InMemoryCache } from '../InMemoryCache';
 import { Logger } from 'ts-log';
 import { MissingProgramOption, MissingServiceDependency, RunnableDependencies, UnknownServiceName } from './errors';
@@ -25,6 +31,7 @@ import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { ServiceNames } from './ServiceNames';
 import { SrvRecord } from 'dns';
 import { TxSubmitHttpService } from '../TxSubmit';
+import { URL } from 'url';
 import { createDbSyncMetadataService } from '../Metadata';
 import { createLogger } from 'bunyan';
 import { getOgmiosCardanoNode, getOgmiosTxSubmitProvider, getPool, getRabbitMqTxSubmitProvider } from './services';
@@ -32,29 +39,34 @@ import { isNotNil } from '@cardano-sdk/util';
 import memoize from 'lodash/memoize';
 import pg from 'pg';
 
-export interface HttpServerOptions extends CommonProgramOptions {
-  serviceNames?: ServiceNames[];
-  enableMetrics?: boolean;
-  buildInfo?: BuildInfo;
-  cardanoNodeConfigPath?: string;
-  tokenMetadataCacheTTL?: number;
-  tokenMetadataServerUrl?: string;
-  postgresConnectionString?: string;
-  postgresSrvServiceName?: string;
-  postgresDb?: string;
-  postgresDbFile?: string;
-  postgresUser?: string;
-  postgresUserFile?: string;
-  postgresPassword?: string;
-  postgresPasswordFile?: string;
-  postgresHost?: string;
-  postgresPort?: string;
-  postgresSslCaFile?: string;
-  epochPollInterval: number;
-  dbCacheTtl: number;
-  useQueue?: boolean;
-  paginationPageSizeLimit?: number;
+export enum HttpServerOptionDescriptions {
+  ApiUrl = 'API URL',
+  BuildInfo = 'HTTP server build info',
+  CardanoNodeConfigPath = 'Cardano node config path',
+  DbCacheTtl = 'Cache TTL in seconds between 60 and 172800 (two days), an option for database related operations',
+  EpochPollInterval = 'Epoch poll interval',
+  EnableMetrics = 'Enable Prometheus Metrics',
+  TokenMetadataCacheTtl = 'Token Metadata API cache TTL in minutes',
+  TokenMetadataServerUrl = 'Token Metadata API server URL',
+  UseQueue = 'Enables RabbitMQ',
+  PaginationPageSizeLimit = 'Pagination page size limit shared across all providers'
 }
+
+export type HttpServerOptions = CommonProgramOptions &
+  PosgresProgramOptions &
+  OgmiosProgramOptions &
+  RabbitMqProgramOptions & {
+    serviceNames?: ServiceNames[];
+    enableMetrics?: boolean;
+    buildInfo?: HttpServerBuildInfo;
+    cardanoNodeConfigPath?: string;
+    tokenMetadataCacheTTL?: number;
+    tokenMetadataServerUrl?: string;
+    epochPollInterval: number;
+    dbCacheTtl: number;
+    useQueue?: boolean;
+    paginationPageSizeLimit?: number;
+  };
 export interface LoadHttpServerDependencies {
   dnsResolver?: (serviceName: string) => Promise<SrvRecord>;
   logger?: Logger;
@@ -93,8 +105,8 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     () => {
       if (!dbConnection)
         throw new MissingProgramOption(serviceName, [
-          ProgramOptionDescriptions.PostgresConnectionString,
-          ProgramOptionDescriptions.PostgresServiceDiscoveryArgs
+          PostgresOptionDescriptions.ConnectionString,
+          PostgresOptionDescriptions.ServiceDiscoveryArgs
         ]);
 
       if (!node) throw new MissingServiceDependency(serviceName, RunnableDependencies.CardanoNode);
@@ -126,7 +138,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     }, ServiceNames.Asset),
     [ServiceNames.StakePool]: withDbSyncProvider(async (db, cardanoNode) => {
       if (!genesisData)
-        throw new MissingProgramOption(ServiceNames.StakePool, ProgramOptionDescriptions.CardanoNodeConfigPath);
+        throw new MissingProgramOption(ServiceNames.StakePool, HttpServerOptionDescriptions.CardanoNodeConfigPath);
       const stakePoolProvider = new DbSyncStakePoolProvider(
         { paginationPageSizeLimit: args.options!.paginationPageSizeLimit! },
         {
@@ -163,7 +175,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     }, ServiceNames.Rewards),
     [ServiceNames.NetworkInfo]: withDbSyncProvider(async (db, cardanoNode) => {
       if (!genesisData)
-        throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.CardanoNodeConfigPath);
+        throw new MissingProgramOption(ServiceNames.NetworkInfo, HttpServerOptionDescriptions.CardanoNodeConfigPath);
       const networkInfoProvider = new DbSyncNetworkInfoProvider({
         cache: new InMemoryCache(args.options!.dbCacheTtl!),
         cardanoNode,

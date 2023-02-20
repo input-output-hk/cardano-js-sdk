@@ -1,11 +1,19 @@
-import { CommonProgramOptions } from './Options';
+import { CommonProgramOptions, OgmiosProgramOptions, RabbitMqProgramOptions } from './options';
 import { Logger } from 'ts-log';
 import { TxSubmitWorkerConfig } from '../TxSubmit';
 import { createDnsResolver } from './utils';
 import { createLogger } from 'bunyan';
 import { getOgmiosTxSubmitProvider, getRunningTxSubmitWorker } from './services';
 
+export enum TxWorkerOptionDescriptions {
+  Parallel = 'Parallel mode',
+  ParallelTxs = 'Parallel transactions',
+  PollingCycle = 'Polling cycle'
+}
+
 export type TxWorkerOptions = CommonProgramOptions &
+  OgmiosProgramOptions &
+  RabbitMqProgramOptions &
   Pick<TxSubmitWorkerConfig, 'parallel' | 'parallelTxs' | 'pollingCycle'>;
 
 export interface TxWorkerArgs {

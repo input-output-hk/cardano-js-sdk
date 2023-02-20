@@ -4,15 +4,20 @@ import { DB_CACHE_TTL_DEFAULT } from '../../src/InMemoryCache';
 import { EPOCH_POLL_INTERVAL_DEFAULT, listenPromise, serverClosePromise } from '../../src/util';
 import {
   HttpServer,
+  HttpServerOptionDescriptions,
   MissingCardanoNodeOption,
   MissingProgramOption,
-  ProgramOptionDescriptions,
   SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT,
   SERVICE_DISCOVERY_TIMEOUT_DEFAULT,
   ServiceNames,
   loadHttpServer
 } from '../../src';
 import { Ogmios } from '@cardano-sdk/ogmios';
+import {
+  OgmiosOptionDescriptions,
+  PostgresOptionDescriptions,
+  RabbitMqOptionDescriptions
+} from '../../src/Program/options';
 import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { SrvRecord } from 'dns';
 import { URL } from 'url';
@@ -145,8 +150,8 @@ describe('loadHttpServer', () => {
             })
         ).rejects.toThrow(
           new MissingProgramOption(ServiceNames.StakePool, [
-            ProgramOptionDescriptions.PostgresConnectionString,
-            ProgramOptionDescriptions.PostgresServiceDiscoveryArgs
+            PostgresOptionDescriptions.ConnectionString,
+            PostgresOptionDescriptions.ServiceDiscoveryArgs
           ])
         );
       });
@@ -166,8 +171,8 @@ describe('loadHttpServer', () => {
             })
         ).rejects.toThrow(
           new MissingProgramOption(ServiceNames.StakePool, [
-            ProgramOptionDescriptions.PostgresConnectionString,
-            ProgramOptionDescriptions.PostgresServiceDiscoveryArgs
+            PostgresOptionDescriptions.ConnectionString,
+            PostgresOptionDescriptions.ServiceDiscoveryArgs
           ])
         );
       });
@@ -224,10 +229,7 @@ describe('loadHttpServer', () => {
               serviceNames: [ServiceNames.TxSubmit]
             })
         ).rejects.toThrow(
-          new MissingCardanoNodeOption([
-            ProgramOptionDescriptions.OgmiosUrl,
-            ProgramOptionDescriptions.OgmiosSrvServiceName
-          ])
+          new MissingCardanoNodeOption([OgmiosOptionDescriptions.Url, OgmiosOptionDescriptions.SrvServiceName])
         );
       });
     });
@@ -287,8 +289,8 @@ describe('loadHttpServer', () => {
             })
         ).rejects.toThrow(
           new MissingProgramOption(ServiceNames.TxSubmit, [
-            ProgramOptionDescriptions.RabbitMQUrl,
-            ProgramOptionDescriptions.RabbitMQSrvServiceName
+            RabbitMqOptionDescriptions.Url,
+            RabbitMqOptionDescriptions.SrvServiceName
           ])
         );
       });
@@ -308,7 +310,7 @@ describe('loadHttpServer', () => {
             },
             serviceNames: [serviceName]
           })
-        ).rejects.toThrow(new MissingProgramOption(serviceName, ProgramOptionDescriptions.CardanoNodeConfigPath));
+        ).rejects.toThrow(new MissingProgramOption(serviceName, HttpServerOptionDescriptions.CardanoNodeConfigPath));
 
       it('with network-info provider', () => test(ServiceNames.NetworkInfo));
       it('with stake-pool provider', () => test(ServiceNames.StakePool));
