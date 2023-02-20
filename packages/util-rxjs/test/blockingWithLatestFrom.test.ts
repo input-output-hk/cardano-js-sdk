@@ -6,19 +6,22 @@ import { delay, firstValueFrom, from, of, toArray } from 'rxjs';
 
 /* eslint-disable prettier/prettier */
 describe('blockingWithLatestFrom', () => {
-  it('waits for dependency$ to emit, does not lose any source emissions and subscribes only once', () => {
+  it(`waits for dependency$ to emit,
+      does not lose any source emissions,
+      subscribes only once,
+      unsubscribes from dependency$ when source completes`, () => {
     createTestScheduler().run(({ hot, expectObservable, expectSubscriptions }) => {
-      const source$ =     hot('abc----de');
+      const source$ =     hot('abc----de|');
       const dependency$ = hot('--a---b--');
-      expectObservable(source$.pipe(blockingWithLatestFrom(dependency$))).toBe('--(abc)de', {
+      expectObservable(source$.pipe(blockingWithLatestFrom(dependency$))).toBe('--(abc)de|', {
         a: ['a', 'a'],
         b: ['b', 'a'],
         c: ['c', 'a'],
         d: ['d', 'b'],
         e: ['e', 'b']
       });
-      expectSubscriptions(source$.subscriptions).toBe('^');
-      expectSubscriptions(dependency$.subscriptions).toBe('^');
+      expectSubscriptions(source$.subscriptions).toBe('^--------!');
+      expectSubscriptions(dependency$.subscriptions).toBe('^--------!');
     });
   });
 

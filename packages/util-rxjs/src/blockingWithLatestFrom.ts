@@ -4,13 +4,18 @@ import {
   Observable,
   OperatorFunction,
   combineLatest,
+  defaultIfEmpty,
+  delay,
   distinctUntilKeyChanged,
   filter,
   from,
+  last,
   map,
   mergeScan,
   of,
-  startWith
+  share,
+  startWith,
+  takeUntil
 } from 'rxjs';
 import { isNotNil } from '@cardano-sdk/util';
 
@@ -36,8 +41,15 @@ export function blockingWithLatestFrom<T, R>(
   };
   type Accumulator = typeof accumulator;
 
-  return (source$: Observable<T>) =>
-    combineLatest([source$, dependency$.pipe(startWith(EMPTY_DEPENDENCY))]).pipe(
+  return (source$: Observable<T>) => {
+    const sharedSource$ = source$.pipe(share());
+    return combineLatest([
+      sharedSource$,
+      dependency$.pipe(
+        startWith(EMPTY_DEPENDENCY),
+        takeUntil(sharedSource$.pipe(defaultIfEmpty(null), delay(1), last()))
+      )
+    ]).pipe(
       mergeScan(({ buffer }: Accumulator, output): Observable<Accumulator> => {
         // add source values to buffer until dependency$ emits
         if (output[1] === EMPTY_DEPENDENCY) {
@@ -59,4 +71,5 @@ export function blockingWithLatestFrom<T, R>(
       distinctUntilKeyChanged(0),
       map(([sourceValue, dependency]) => combinator(sourceValue, dependency))
     );
+  };
 }
