@@ -36,7 +36,6 @@ import { InvalidLoggerLevel } from './errors';
 import { URL } from 'url';
 import { buildInfoValidator, cacheTtlValidator, existingFileValidator } from './util/validators';
 import { loggerMethodNames } from '@cardano-sdk/util';
-import clear from 'clear';
 import fs from 'fs';
 import onDeath from 'death';
 import path from 'path';
@@ -48,7 +47,6 @@ const packageJsonPath = fs.existsSync(copiedPackageJsonPath)
   : path.join(__dirname, '../package.json');
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
-clear();
 // eslint-disable-next-line no-console
 console.log('Cardano Services CLI');
 

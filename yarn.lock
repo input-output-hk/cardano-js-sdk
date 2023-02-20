@@ -2337,7 +2337,6 @@ __metadata:
     "@cardano-sdk/util-dev": ^0.7.0
     "@types/amqplib": ^0.8.2
     "@types/bunyan": ^1.8.8
-    "@types/clear": ^0.1.2
     "@types/death": ^1.1.2
     "@types/dockerode": ^3.3.8
     "@types/express": ^4.17.13
@@ -2351,7 +2350,6 @@ __metadata:
     body-parser: ^1.19.2
     bunyan: ^1.8.15
     cbor: ^8.1.0
-    clear: ^0.1.0
     commander: ^9.1.0
     death: ^1.1.0
     debug: ^4.3.4
@@ -5960,13 +5958,6 @@ __metadata:
     "@types/node": "*"
     "@types/responselike": "*"
   checksum: 667d25808dbf46fe104d6f029e0281ff56058d50c7c1b9182774b3e38bb9c1124f56e4c367ba54f92dbde2d1cc573f26eb0e9748710b2822bc0fd1e5498859c6
-  languageName: node
-  linkType: hard
-
-"@types/clear@npm:^0.1.2":
-  version: 0.1.2
-  resolution: "@types/clear@npm:0.1.2"
-  checksum: 12d7d3fce357315645fd7fa750ae84a491b214ebdaf6f02bffc861608ed419642d9284dcac428dbf639f439f1e55ceb58447acccbbf5a273eee2a74073a36037
   languageName: node
   linkType: hard
 
