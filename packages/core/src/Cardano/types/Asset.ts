@@ -1,6 +1,6 @@
-import * as cip14 from '@emurgo/cip14-js';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { InvalidStringError, OpaqueString, assertIsHexString, typedBech32 } from '@cardano-sdk/util';
+import cip14 from '@emurgo/cip14-js';
 
 export type AssetId = OpaqueString<'AssetId'>;
 
@@ -51,7 +51,7 @@ export const AssetFingerprint = (value: string): AssetFingerprint => typedBech32
  * @param assetName The native asset name.
  */
 AssetFingerprint.fromParts = (policyId: PolicyId, assetName: AssetName): AssetFingerprint => {
-  const cip14Fingerprint = cip14.default.fromParts(
+  const cip14Fingerprint = cip14.fromParts(
     Buffer.from(policyId.toString(), 'hex'),
     Buffer.from(assetName.toString(), 'hex')
   );
