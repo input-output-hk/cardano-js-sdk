@@ -1,5 +1,5 @@
 import { Cardano, Seconds } from '@cardano-sdk/core';
-import { sinks, RollForwardEvent } from '../../../src';
+import { InMemory, RollForwardEvent } from '../../../src';
 import { WithNetworkInfo } from '../../../src/operators';
 import { firstValueFrom, take, toArray } from 'rxjs';
 import { genesisToEraSummary } from '../../events/genesisToEraSummary';
@@ -26,10 +26,10 @@ const event = (slotNo: number) =>
   } as RollForwardEvent<WithNetworkInfo>);
 
 describe('InMemoryStabilityWindowBuffer', () => {
-  let buffer: sinks.InMemoryStabilityWindowBuffer<WithNetworkInfo>;
+  let buffer: InMemory.InMemoryStabilityWindowBuffer<WithNetworkInfo>;
 
   beforeEach(() => {
-    buffer = new sinks.InMemoryStabilityWindowBuffer<WithNetworkInfo>();
+    buffer = new InMemory.InMemoryStabilityWindowBuffer<WithNetworkInfo>();
   });
 
   it('emits tip$ and tail$ when adding and deleting blocks', async () => {

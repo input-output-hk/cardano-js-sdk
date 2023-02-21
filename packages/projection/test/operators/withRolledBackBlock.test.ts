@@ -1,5 +1,11 @@
 import { Cardano, ChainSyncEventType, ChainSyncRollBackward } from '@cardano-sdk/core';
-import { UnifiedProjectorEvent, operators, sinks } from '../../src';
+import {
+  InMemory,
+  Operators,
+  StabilityWindowBuffer,
+  UnifiedProjectorEvent,
+  manageStabilityWindowBuffer
+} from '../../src';
 import { WithNetworkInfo } from '../../src/operators';
 import { concatMap, defaultIfEmpty, map } from 'rxjs';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
@@ -29,18 +35,18 @@ const sourceRollback = (slot: number): ChainSyncRollBackward => {
 };
 
 describe('withRolledBackBlocks', () => {
-  let buffer: sinks.StabilityWindowBuffer<WithNetworkInfo>;
+  let buffer: StabilityWindowBuffer<WithNetworkInfo>;
 
   const manageBuffer = () =>
     concatMap((evt: UnifiedProjectorEvent<WithNetworkInfo>) =>
-      sinks.manageBuffer<WithNetworkInfo>(evt, buffer).pipe(
+      manageStabilityWindowBuffer<WithNetworkInfo>(evt, buffer).pipe(
         defaultIfEmpty(null),
         map(() => evt)
       )
     );
 
   beforeEach(() => {
-    buffer = new sinks.InMemoryStabilityWindowBuffer();
+    buffer = new InMemory.InMemoryStabilityWindowBuffer();
   });
 
   it('re-emits rolled back blocks one by one and calls requestNext on original event', () => {
@@ -55,8 +61,8 @@ describe('withRolledBackBlocks', () => {
       });
       expectObservable(
         source$.pipe(
-          operators.withRolledBackBlock(buffer),
-          operators.withNetworkInfo(dataWithStakeKeyDeregistration.cardanoNode),
+          Operators.withRolledBackBlock(buffer),
+          Operators.withNetworkInfo(dataWithStakeKeyDeregistration.cardanoNode),
           manageBuffer()
         )
       ).toBe('abcd(ef)', {

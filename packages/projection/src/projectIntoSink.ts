@@ -28,7 +28,7 @@ import {
   tap
 } from 'rxjs';
 import { Projection } from './projections';
-import { Sink, Sinks, manageBuffer } from './sinks';
+import { Sink, Sinks, manageStabilityWindowBuffer } from './sinks';
 import { UnifiedProjectorEvent } from './types';
 import { WithNetworkInfo, withNetworkInfo, withRolledBackBlock } from './operators';
 import { combineProjections } from './combineProjections';
@@ -170,7 +170,7 @@ export const projectIntoSink = <P extends object, PS extends P>(
     concatMap((evt) => {
       const projectionSinks = sinks.map((sink) => sink.sink(evt));
       const projectorEvent = evt as UnifiedProjectorEvent<WithNetworkInfo>;
-      const bufferSink$ = manageBuffer(projectorEvent, props.sinks.buffer);
+      const bufferSink$ = manageStabilityWindowBuffer(projectorEvent, props.sinks.buffer);
       return combineLatest([...projectionSinks, bufferSink$].map((o$) => o$.pipe(defaultIfEmpty(null)))).pipe(
         map(() => projectorEvent)
       );
