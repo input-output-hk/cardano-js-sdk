@@ -1,13 +1,15 @@
 /* eslint-disable max-len */
 /* eslint-disable jsdoc/valid-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Cardano, ChainSyncEventType, Intersection } from '@cardano-sdk/core';
 import {
-  InvalidIntersectionError,
+  Cardano,
+  CardanoNodeErrors,
+  ChainSyncEventType,
+  Intersection,
+  ObservableCardanoNode,
   ObservableChainSync,
-  ObservableChainSyncClient,
-  UnifiedProjectorEvent
-} from './types';
+  PointOrOrigin
+} from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import {
   Observable,
@@ -16,6 +18,7 @@ import {
   concatMap,
   defaultIfEmpty,
   defer,
+  finalize,
   map,
   mergeMap,
   noop,
@@ -26,16 +29,17 @@ import {
 } from 'rxjs';
 import { Projection } from './projections';
 import { Sink, Sinks, manageBuffer } from './sinks';
+import { UnifiedProjectorEvent } from './types';
 import { WithNetworkInfo, withNetworkInfo, withRolledBackBlock } from './operators';
 import { combineProjections } from './combineProjections';
+import { contextLogger } from '@cardano-sdk/util';
 import { passthrough } from '@cardano-sdk/util-rxjs';
 import uniq from 'lodash/uniq';
 
 export interface ProjectIntoSinkProps<P, PS extends P> {
   projections: P;
   sinks: Sinks<PS>;
-  chainSync: ObservableChainSyncClient;
-  networkInfo: WithNetworkInfo;
+  cardanoNode: ObservableCardanoNode;
   logger: Logger;
 }
 
@@ -56,8 +60,8 @@ const isIntersectionBlock = (block: Cardano.Block, intersection: Intersection) =
 const blocksToPoints = (blocks: Array<Cardano.Block | 'origin'>) =>
   uniq([...blocks.map((p) => (p === 'origin' ? p : p.header)), 'origin' as const]);
 
-const intersectionDescription = (intersection: Intersection) =>
-  intersection.point === 'origin' ? 'origin' : `slot ${intersection.point.slot}, block ${intersection.point.hash}`;
+const pointDescription = (point: PointOrOrigin) =>
+  point === 'origin' ? 'origin' : `slot ${point.slot}, block ${point.hash}`;
 
 // TODO: try to write types that will infer returned observable type from supplied projections.
 // Inferring properties added by sinks (e.g. before() and after()) would be nice too, but probably not necessary.
@@ -67,15 +71,17 @@ const intersectionDescription = (intersection: Intersection) =>
 export const projectIntoSink = <P extends object, PS extends P>(
   props: ProjectIntoSinkProps<P, PS>
 ): Observable<ProjectionsEvent<P>> => {
+  const logger = contextLogger(props.logger, 'Projector');
+
   const syncFromIntersection = ({ intersection, chainSync$ }: ObservableChainSync) =>
     new Observable<UnifiedProjectorEvent<{}>>((observer) => {
-      props.logger.info(`Starting ChainSync from ${intersectionDescription(intersection)}`);
+      logger.info(`Starting ChainSync from ${pointDescription(intersection.point)}`);
       return chainSync$.pipe(withRolledBackBlock(props.sinks.buffer)).subscribe(observer);
     });
 
   const rollbackAndSyncFromIntersection = (initialChainSync: ObservableChainSync, tail: Cardano.Block | 'origin') =>
     new Observable<UnifiedProjectorEvent<{}>>((subscriber) => {
-      props.logger.warn(`Rolling back to intersection ${intersectionDescription(initialChainSync.intersection)}`);
+      logger.warn('Rolling back to find intersection');
       let skipFindingNewIntersection = true;
       let chainSync = initialChainSync;
       const rollback$ = props.sinks.buffer.tip$.pipe(
@@ -87,16 +93,13 @@ export const projectIntoSink = <P extends object, PS extends P>(
             return of(block);
           }
           // try to find intersection with new tip
-          return props
-            .chainSync({
-              points: blocksToPoints([block, tail, 'origin'])
-            })
-            .pipe(
-              tap((newChainSync) => {
-                chainSync = newChainSync;
-              }),
-              map(() => block)
-            );
+          return props.cardanoNode.findIntersect(blocksToPoints([block, tail, 'origin'])).pipe(
+            take(1),
+            tap((newChainSync) => {
+              chainSync = newChainSync;
+            }),
+            map(() => block)
+          );
         }),
         takeWhile((block) => !isIntersectionBlock(block, chainSync.intersection)),
         mergeMap(
@@ -121,32 +124,55 @@ export const projectIntoSink = <P extends object, PS extends P>(
 
   const source$ = combineLatest([props.sinks.buffer.tip$, props.sinks.buffer.tail$]).pipe(
     take(1),
-    mergeMap((blocks) =>
-      props
-        .chainSync({
-          points: blocksToPoints(blocks)
-        })
-        .pipe(
-          mergeMap((initialChainSync) => {
-            if (initialChainSync.intersection.point === 'origin') {
-              if (blocks[0] !== 'origin') {
-                throw new InvalidIntersectionError(
-                  "Couldn't find intersection within stability window buffer. Possible network configuration mismatch."
-                );
-              }
-              // buffer is empty, sync from origin
-              return syncFromIntersection(initialChainSync);
+    mergeMap((blocks) => {
+      const points = blocksToPoints(blocks);
+      logger.info(`Starting projector with local tip at ${pointDescription(points[0])}`);
+
+      return props.cardanoNode.findIntersect(points).pipe(
+        take(1),
+        mergeMap((initialChainSync) => {
+          if (initialChainSync.intersection.point === 'origin') {
+            if (blocks[0] !== 'origin') {
+              throw new CardanoNodeErrors.CardanoClientErrors.IntersectionNotFoundError(
+                // TODO: CardanoClientErrors are currently coupled to ogmios types.
+                // This would be cleaner if errors were mapped to use our core objects.
+                points.map((point) =>
+                  point === 'origin'
+                    ? 'origin'
+                    : {
+                        hash: point.hash.toString(),
+                        slot: point.slot.valueOf()
+                      }
+                )
+              );
             }
-            if (blocks[0] !== 'origin' && initialChainSync.intersection.point.hash !== blocks[0].header.hash) {
-              // rollback to intersection, then sync from intersection
-              return rollbackAndSyncFromIntersection(initialChainSync, blocks[1]);
-            }
-            // intersection is at tip$ - no rollback, just sync from intersection
+            // buffer is empty, sync from origin
             return syncFromIntersection(initialChainSync);
-          })
-        )
-    ),
-    withNetworkInfo(props.networkInfo)
+          }
+          if (blocks[0] !== 'origin' && initialChainSync.intersection.point.hash !== blocks[0].header.hash) {
+            // rollback to intersection, then sync from intersection
+            return rollbackAndSyncFromIntersection(initialChainSync, blocks[1]);
+          }
+          // intersection is at tip$ - no rollback, just sync from intersection
+          return syncFromIntersection(initialChainSync);
+        })
+      );
+    }),
+    // tap((evt) => {
+    //   logger.debug(
+    //     `Processed event PRE ${
+    //       evt.eventType === ChainSyncEventType.RollForward ? 'RollForward' : 'RollBackward'
+    //     } ${pointDescription(evt.block.header)}`
+    //   );
+    // }),
+    withNetworkInfo(props.cardanoNode)
+    // tap((evt) => {
+    //   logger.debug(
+    //     `Processed event POST ${
+    //       evt.eventType === ChainSyncEventType.RollForward ? 'RollForward' : 'RollBackward'
+    //     } ${pointDescription(evt.block.header)}`
+    //   );
+    // })
   );
   // eslint-disable-next-line prefer-spread
   const projected$ = source$.pipe.apply(source$, combineProjections(props.projections) as any);
@@ -164,6 +190,14 @@ export const projectIntoSink = <P extends object, PS extends P>(
       );
     }),
     props.sinks.after || passthrough(),
-    tap((evt) => evt.requestNext())
+    tap((evt) => {
+      logger.debug(
+        `Processed event ${
+          evt.eventType === ChainSyncEventType.RollForward ? 'RollForward' : 'RollBackward'
+        } ${pointDescription(evt.block.header)}`
+      );
+      evt.requestNext();
+    }),
+    finalize(() => logger.info('Stopped'))
   );
 };

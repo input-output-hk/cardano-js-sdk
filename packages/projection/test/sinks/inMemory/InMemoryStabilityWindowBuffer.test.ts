@@ -1,55 +1,61 @@
-import { Cardano } from '@cardano-sdk/core';
-import { InMemoryStabilityWindowBuffer } from '../../../src/sinks';
+import { Cardano, Seconds } from '@cardano-sdk/core';
+import { sinks, RollForwardEvent } from '../../../src';
+import { WithNetworkInfo } from '../../../src/operators';
 import { firstValueFrom, take, toArray } from 'rxjs';
-import { sinks } from '../../../src';
+import { genesisToEraSummary } from '../../events/genesisToEraSummary';
 import { stubBlockId } from '../../util';
 
-const block = (slotNo: number) =>
+const genesisParameters = {
+  // stability window = 2 blocks
+  activeSlotsCoefficient: 2,
+  securityParameter: 2,
+  // slotLength is only needed for test setup (genesisToEraSummary)
+  slotLength: Seconds(1)
+} as Cardano.CompactGenesis;
+
+const event = (slotNo: number) =>
   ({
-    header: {
-      hash: stubBlockId(slotNo),
-      slot: Cardano.Slot(slotNo)
-    }
-  } as Cardano.Block);
+    block: {
+      header: {
+        hash: stubBlockId(slotNo),
+        slot: Cardano.Slot(slotNo)
+      }
+    },
+    eraSummaries: [genesisToEraSummary(genesisParameters)],
+    genesisParameters
+  } as RollForwardEvent<WithNetworkInfo>);
 
 describe('InMemoryStabilityWindowBuffer', () => {
-  const networkInfo = {
-    // stability window = 3 slots
-    genesisParameters: {
-      activeSlotsCoefficient: 1,
-      securityParameter: 1
-    } as Cardano.CompactGenesis
-  };
-  let buffer: sinks.InMemoryStabilityWindowBuffer;
+  let buffer: sinks.InMemoryStabilityWindowBuffer<WithNetworkInfo>;
 
   beforeEach(() => {
-    buffer = new InMemoryStabilityWindowBuffer(networkInfo);
+    buffer = new sinks.InMemoryStabilityWindowBuffer<WithNetworkInfo>();
   });
 
   it('emits tip$ and tail$ when adding and deleting blocks', async () => {
     const tips = firstValueFrom(buffer.tip$.pipe(take(10), toArray()));
     const tails = firstValueFrom(buffer.tail$.pipe(take(5), toArray()));
-    buffer.addStabilityWindowBlock(block(1));
-    buffer.deleteStabilityWindowBlock(block(1));
-    buffer.addStabilityWindowBlock(block(1));
-    buffer.addStabilityWindowBlock(block(2));
-    buffer.deleteStabilityWindowBlock(block(2));
-    buffer.addStabilityWindowBlock(block(2));
-    buffer.addStabilityWindowBlock(block(3));
-    buffer.addStabilityWindowBlock(block(4));
-    buffer.addStabilityWindowBlock(block(5));
+    buffer.rollForward(event(1));
+    buffer.deleteBlock(event(1).block);
+    buffer.rollForward(event(1));
+    buffer.rollForward(event(2));
+    buffer.deleteBlock(event(2).block);
+    buffer.rollForward(event(2));
+    buffer.rollForward(event(3));
+    buffer.rollForward(event(4));
+    buffer.rollForward(event(5));
     expect(await tips).toEqual([
       'origin',
-      block(1),
+      event(1).block,
       'origin',
-      block(1),
-      block(2),
-      block(1),
-      block(2),
-      block(3),
-      block(4),
-      block(5)
+      event(1).block,
+      event(2).block,
+      event(1).block,
+      event(2).block,
+      event(3).block,
+      event(4).block,
+      event(5).block
     ]);
-    expect(await tails).toEqual(['origin', block(1), 'origin', block(1), block(2)]);
+    expect(await tails).toEqual(['origin', event(1).block, 'origin', event(1).block, event(2).block]);
   });
 });

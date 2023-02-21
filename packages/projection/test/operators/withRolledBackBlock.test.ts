@@ -1,5 +1,6 @@
 import { Cardano, ChainSyncEventType, ChainSyncRollBackward } from '@cardano-sdk/core';
 import { UnifiedProjectorEvent, operators, sinks } from '../../src';
+import { WithNetworkInfo } from '../../src/operators';
 import { concatMap, defaultIfEmpty, map } from 'rxjs';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 import { dataWithStakeKeyDeregistration } from '../events';
@@ -28,18 +29,18 @@ const sourceRollback = (slot: number): ChainSyncRollBackward => {
 };
 
 describe('withRolledBackBlocks', () => {
-  let buffer: sinks.StabilityWindowBuffer;
+  let buffer: sinks.StabilityWindowBuffer<WithNetworkInfo>;
 
   const manageBuffer = () =>
-    concatMap((evt: UnifiedProjectorEvent<{}>) =>
-      sinks.manageBuffer<{}>(evt, buffer).pipe(
+    concatMap((evt: UnifiedProjectorEvent<WithNetworkInfo>) =>
+      sinks.manageBuffer<WithNetworkInfo>(evt, buffer).pipe(
         defaultIfEmpty(null),
         map(() => evt)
       )
     );
 
   beforeEach(() => {
-    buffer = new sinks.InMemoryStabilityWindowBuffer(dataWithStakeKeyDeregistration.networkInfo);
+    buffer = new sinks.InMemoryStabilityWindowBuffer();
   });
 
   it('re-emits rolled back blocks one by one and calls requestNext on original event', () => {
@@ -52,13 +53,19 @@ describe('withRolledBackBlocks', () => {
         d: createEvent(ChainSyncEventType.RollForward, 3),
         e: originalRollbackEvent
       });
-      expectObservable(source$.pipe(operators.withRolledBackBlock(buffer), manageBuffer())).toBe('abcd(ef)', {
-        a: createEvent(ChainSyncEventType.RollForward, 0),
-        b: createEvent(ChainSyncEventType.RollForward, 1),
-        c: createEvent(ChainSyncEventType.RollForward, 2),
-        d: createEvent(ChainSyncEventType.RollForward, 3),
-        e: createEvent(ChainSyncEventType.RollBackward, 3, 1),
-        f: createEvent(ChainSyncEventType.RollBackward, 2, 1)
+      expectObservable(
+        source$.pipe(
+          operators.withRolledBackBlock(buffer),
+          operators.withNetworkInfo(dataWithStakeKeyDeregistration.cardanoNode),
+          manageBuffer()
+        )
+      ).toBe('abcd(ef)', {
+        a: { ...createEvent(ChainSyncEventType.RollForward, 0), ...dataWithStakeKeyDeregistration.networkInfo },
+        b: { ...createEvent(ChainSyncEventType.RollForward, 1), ...dataWithStakeKeyDeregistration.networkInfo },
+        c: { ...createEvent(ChainSyncEventType.RollForward, 2), ...dataWithStakeKeyDeregistration.networkInfo },
+        d: { ...createEvent(ChainSyncEventType.RollForward, 3), ...dataWithStakeKeyDeregistration.networkInfo },
+        e: { ...createEvent(ChainSyncEventType.RollBackward, 3, 1), ...dataWithStakeKeyDeregistration.networkInfo },
+        f: { ...createEvent(ChainSyncEventType.RollBackward, 2, 1), ...dataWithStakeKeyDeregistration.networkInfo }
       });
       expectSubscriptions(source$.subscriptions).toBe('^');
       flush();
