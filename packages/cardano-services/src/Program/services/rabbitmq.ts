@@ -10,7 +10,7 @@ import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import { ProviderError, ProviderFailure, SubmitTxArgs } from '@cardano-sdk/core';
 import { RabbitMqOptionDescriptions, RabbitMqProgramOptions } from '../options';
 import { ServiceNames } from '../ServiceNames';
-import { TxWorkerOptions } from '../loadTxWorker';
+import { TxWorkerOptions } from '../programs';
 import { isConnectionError } from '@cardano-sdk/util';
 
 /**

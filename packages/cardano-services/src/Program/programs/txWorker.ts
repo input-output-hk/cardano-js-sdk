@@ -1,9 +1,9 @@
-import { CommonProgramOptions, OgmiosProgramOptions, RabbitMqProgramOptions } from './options';
+import { CommonProgramOptions, OgmiosProgramOptions, RabbitMqProgramOptions } from '../options';
 import { Logger } from 'ts-log';
-import { TxSubmitWorkerConfig } from '../TxSubmit';
-import { createDnsResolver } from './utils';
+import { TxSubmitWorkerConfig } from '../../TxSubmit';
+import { createDnsResolver } from '../utils';
 import { createLogger } from 'bunyan';
-import { getOgmiosTxSubmitProvider, getRunningTxSubmitWorker } from './services';
+import { getOgmiosTxSubmitProvider, getRunningTxSubmitWorker } from '../services';
 
 export const PARALLEL_MODE_DEFAULT = false;
 export const PARALLEL_TXS_DEFAULT = 3;

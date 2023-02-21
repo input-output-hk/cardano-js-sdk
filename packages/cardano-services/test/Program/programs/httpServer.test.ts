@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 /* eslint-disable sonarjs/no-duplicate-string */
-import { DB_CACHE_TTL_DEFAULT } from '../../src/InMemoryCache';
-import { EPOCH_POLL_INTERVAL_DEFAULT, listenPromise, serverClosePromise } from '../../src/util';
+import { DB_CACHE_TTL_DEFAULT } from '../../../src/InMemoryCache';
+import { EPOCH_POLL_INTERVAL_DEFAULT, listenPromise, serverClosePromise } from '../../../src/util';
 import {
   HttpServer,
   HttpServerOptionDescriptions,
@@ -11,14 +11,13 @@ import {
   SERVICE_DISCOVERY_TIMEOUT_DEFAULT,
   ServiceNames,
   loadHttpServer
-} from '../../src';
+} from '../../../src';
 import { Ogmios } from '@cardano-sdk/ogmios';
 import {
   OgmiosOptionDescriptions,
   PostgresOptionDescriptions,
   RabbitMqOptionDescriptions
-} from '../../src/Program/options';
-import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
+} from '../../../src/Program/options';
 import { SrvRecord } from 'dns';
 import { URL } from 'url';
 import {
@@ -26,9 +25,10 @@ import {
   createHealthyMockOgmiosServer,
   createUnhealthyMockOgmiosServer,
   ogmiosServerReady
-} from '../util';
+} from '../../util';
 import { getRandomPort } from 'get-port-please';
 import http from 'http';
+import { ProviderError, ProviderFailure } from '@cardano-sdk/core'
 
 jest.mock('dns', () => ({
   promises: {
@@ -36,7 +36,7 @@ jest.mock('dns', () => ({
   }
 }));
 
-describe('loadHttpServer', () => {
+describe('HTTP Server', () => {
   let apiUrl: URL;
   let cardanoNodeConfigPath: string;
   let postgresConnectionString: string;

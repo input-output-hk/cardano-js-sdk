@@ -6,35 +6,35 @@ import {
   DbSyncAssetProvider,
   DbSyncNftMetadataService,
   StubTokenMetadataService
-} from '../Asset';
+} from '../../Asset';
 import { CardanoNode } from '@cardano-sdk/core';
-import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../ChainHistory';
+import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../../ChainHistory';
 import {
   CommonProgramOptions,
   OgmiosProgramOptions,
   PosgresProgramOptions,
   PostgresOptionDescriptions,
   RabbitMqProgramOptions
-} from './options';
-import { DbSyncEpochPollService, loadGenesisData } from '../util';
-import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../NetworkInfo';
-import { DbSyncRewardsProvider, RewardsHttpService } from '../Rewards';
-import { DbSyncStakePoolProvider, StakePoolHttpService, createHttpStakePoolExtMetadataService } from '../StakePool';
-import { DbSyncUtxoProvider, UtxoHttpService } from '../Utxo';
-import { DnsResolver, createDnsResolver, shouldInitCardanoNode } from './utils';
-import { GenesisData } from '../types';
-import { HttpServer, BuildInfo as HttpServerBuildInfo, HttpServerConfig, HttpService } from '../Http';
-import { InMemoryCache } from '../InMemoryCache';
+} from '../options';
+import { DbSyncEpochPollService, loadGenesisData } from '../../util';
+import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../NetworkInfo';
+import { DbSyncRewardsProvider, RewardsHttpService } from '../../Rewards';
+import { DbSyncStakePoolProvider, StakePoolHttpService, createHttpStakePoolExtMetadataService } from '../../StakePool';
+import { DbSyncUtxoProvider, UtxoHttpService } from '../../Utxo';
+import { DnsResolver, createDnsResolver, shouldInitCardanoNode } from '../utils';
+import { GenesisData } from '../../types';
+import { HttpServer, BuildInfo as HttpServerBuildInfo, HttpServerConfig, HttpService } from '../../Http';
+import { InMemoryCache } from '../../InMemoryCache';
 import { Logger } from 'ts-log';
-import { MissingProgramOption, MissingServiceDependency, RunnableDependencies, UnknownServiceName } from './errors';
+import { MissingProgramOption, MissingServiceDependency, RunnableDependencies, UnknownServiceName } from '../errors';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
-import { ServiceNames } from './ServiceNames';
+import { ServiceNames } from '../ServiceNames';
 import { SrvRecord } from 'dns';
-import { TxSubmitHttpService } from '../TxSubmit';
+import { TxSubmitHttpService } from '../../TxSubmit';
 import { URL } from 'url';
-import { createDbSyncMetadataService } from '../Metadata';
+import { createDbSyncMetadataService } from '../../Metadata';
 import { createLogger } from 'bunyan';
-import { getOgmiosCardanoNode, getOgmiosTxSubmitProvider, getPool, getRabbitMqTxSubmitProvider } from './services';
+import { getOgmiosCardanoNode, getOgmiosTxSubmitProvider, getPool, getRabbitMqTxSubmitProvider } from '../services';
 import { isNotNil } from '@cardano-sdk/util';
 import memoize from 'lodash/memoize';
 import pg from 'pg';

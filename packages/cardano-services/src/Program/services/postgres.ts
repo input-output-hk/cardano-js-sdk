@@ -4,7 +4,7 @@
 /* eslint-disable unicorn/no-nested-ternary */
 import { ClientConfig, Pool, QueryConfig } from 'pg';
 import { DnsResolver } from '../utils';
-import { HttpServerOptions } from '../loadHttpServer';
+import { HttpServerOptions } from '../programs';
 import { Logger } from 'ts-log';
 import { PosgresProgramOptions } from '../options';
 import { URL } from 'url';
