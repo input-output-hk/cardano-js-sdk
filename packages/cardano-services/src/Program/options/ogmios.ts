@@ -1,6 +1,11 @@
 import { Command, Option } from 'commander';
-import { OGMIOS_URL_DEFAULT } from '../defaults';
+import { Ogmios } from '@cardano-sdk/ogmios';
 import { URL } from 'url';
+
+const OGMIOS_URL_DEFAULT = (() => {
+  const connection = Ogmios.createConnectionObject();
+  return connection.address.webSocket;
+})();
 
 export enum OgmiosOptionDescriptions {
   SrvServiceName = 'Ogmios SRV service name',

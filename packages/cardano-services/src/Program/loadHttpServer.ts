@@ -39,6 +39,11 @@ import { isNotNil } from '@cardano-sdk/util';
 import memoize from 'lodash/memoize';
 import pg from 'pg';
 
+export const API_URL_DEFAULT = 'http://localhost:3000';
+export const PAGINATION_PAGE_SIZE_LIMIT_DEFAULT = 25;
+export const USE_QUEUE_DEFAULT = false;
+export const ENABLE_METRICS_DEFAULT = false;
+
 export enum HttpServerOptionDescriptions {
   ApiUrl = 'API URL',
   BuildInfo = 'HTTP server build info',

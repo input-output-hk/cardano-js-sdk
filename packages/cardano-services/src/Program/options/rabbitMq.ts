@@ -1,6 +1,7 @@
 import { Command, Option } from 'commander';
-import { RABBITMQ_URL_DEFAULT } from '../defaults';
 import { URL } from 'url';
+
+const RABBITMQ_URL_DEFAULT = 'amqp://localhost:5672';
 
 export enum RabbitMqOptionDescriptions {
   SrvServiceName = 'RabbitMQ SRV service name',
