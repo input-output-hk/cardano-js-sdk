@@ -19,7 +19,7 @@ import {
 import { Logger } from 'ts-log';
 import { RunnableModule, contextLogger } from '@cardano-sdk/util';
 import { createInteractionContextWithLogger } from '../util';
-import { eraSummary } from '../ogmiosToCore';
+import { queryEraSummaries } from './queries';
 
 /**
  * Access cardano-node APIs via Ogmios
@@ -36,6 +36,7 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
     this.#logger = contextLogger(logger, 'OgmiosCardanoNode');
     this.#connectionConfig = connectionConfig;
   }
+
   public async initializeImpl(): Promise<void> {
     this.#logger.info('Initializing CardanoNode');
     this.#stateQueryClient = await createStateQueryClient(
@@ -43,6 +44,7 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
     );
     this.#logger.info('CardanoNode initialized');
   }
+
   public async shutdownImpl(): Promise<void> {
     this.#logger.info('Shutting down CardanoNode');
     await this.#stateQueryClient.shutdown();
@@ -52,14 +54,7 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
     if (this.state !== 'running') {
       throw new CardanoNodeErrors.NotInitializedError('eraSummaries', this.name);
     }
-    try {
-      this.#logger.info('Getting era summaries');
-      const systemStart = await this.#stateQueryClient.systemStart();
-      const eraSummaries = await this.#stateQueryClient.eraSummaries();
-      return eraSummaries.map((era) => eraSummary(era, systemStart));
-    } catch (error) {
-      throw CardanoNodeUtil.asCardanoNodeError(error) || new CardanoNodeErrors.UnknownCardanoNodeError(error);
-    }
+    return queryEraSummaries(this.#stateQueryClient, this.#logger);
   }
 
   public async systemStart(): Promise<Date> {
@@ -114,6 +109,7 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
       throw new ProviderError(ProviderFailure.Unknown, error);
     }
   }
+
   async startImpl(): Promise<void> {
     return Promise.resolve();
   }

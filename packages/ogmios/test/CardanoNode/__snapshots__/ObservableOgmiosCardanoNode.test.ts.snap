@@ -1,0 +1,129 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ObservableOgmiosCardanoNode subscribing to all observables shares a single lazily created connection & emits well-formed data 1`] = `
+Array [
+  Array [
+    Object {
+      "parameters": Object {
+        "epochLength": 21600,
+        "slotLength": 20000,
+      },
+      "start": Object {
+        "slot": 0,
+        "time": 2017-09-23T21:44:51.000Z,
+      },
+    },
+    Object {
+      "parameters": Object {
+        "epochLength": 432000,
+        "slotLength": 1000,
+      },
+      "start": Object {
+        "slot": 1598400,
+        "time": 2018-09-28T21:44:51.000Z,
+      },
+    },
+  ],
+  Object {
+    "activeSlotsCoefficient": 0.05,
+    "epochLength": 86400,
+    "maxKesEvolutions": 120,
+    "maxLovelaceSupply": 45000000000000000n,
+    "network": "testnet",
+    "networkId": 0,
+    "networkMagic": 2,
+    "securityParameter": 432,
+    "slotLength": 1,
+    "slotsPerKesPeriod": 86400,
+    "systemStart": 2022-08-09T00:00:00.000Z,
+    "updateQuorum": 5,
+  },
+  Object {
+    "block": Object {
+      "body": Array [
+        Object {
+          "auxiliaryData": undefined,
+          "body": Object {
+            "certificates": Array [],
+            "collaterals": Array [
+              Object {
+                "index": 0,
+                "txId": "ae85d245a3d00bfde01f59f3c4fe0b4bfae1cb37e9cf91929eadcea4985711de",
+              },
+              Object {
+                "index": 0,
+                "txId": "ee155ace9c40292074cb6aff8c9ccdd273c81648ff1149ef36bcea6ebb8a3e25",
+              },
+            ],
+            "fee": 648n,
+            "inputs": Array [],
+            "mint": Map {},
+            "outputs": Array [],
+            "requiredExtraSignatures": Array [],
+            "scriptIntegrityHash": "bb30a42c1e62f0afda5f0a4e8a562f7a13a24cea00ee81917b86b89e801314aa",
+            "validityInterval": Object {
+              "invalidBefore": 26215,
+              "invalidHereafter": undefined,
+            },
+            "withdrawals": Array [],
+          },
+          "id": "a278b540fb192eb8276a0d49004968076c9f9f026fa8727c3f9981a4aac25cc9",
+          "witness": Object {
+            "bootstrap": Array [],
+            "datums": Array [
+              "40",
+            ],
+            "redeemers": Array [
+              Object {
+                "data": "434d357a",
+                "executionUnits": Object {
+                  "memory": 8959327235984229000n,
+                  "steps": 4473903472119932000n,
+                },
+                "index": 2,
+                "purpose": "certificate",
+              },
+              Object {
+                "data": "9fd866821901739fd866821902dd9f2341e14478c0fcf5ff22d866821903e39f438002ab0104ffa1448858788900ff029fa040ffff",
+                "executionUnits": Object {
+                  "memory": 4858311980956467000n,
+                  "steps": 1434644070377693400n,
+                },
+                "index": 1,
+                "purpose": "withdrawal",
+              },
+            ],
+            "scripts": Array [
+              Object {
+                "__type": "plutus",
+                "bytes": "450100002601",
+                "version": 1,
+              },
+            ],
+            "signatures": Map {},
+          },
+        },
+      ],
+      "fees": 648n,
+      "header": Object {
+        "blockNo": 2,
+        "hash": "bb30a42c1e62f0afda5f0a4e8a562f7a13a24cea00ee81917b86b89e801314aa",
+        "slot": 8,
+      },
+      "issuerVk": "5effdd0f8a1c75abfbd837ced4bc50fe8e42aded5d5a310addcba6eccb495d78",
+      "previousBlock": "03170a2e7597b7b7e3d84c05391d139a62b157e78786d8c082f29dcf4c111314",
+      "size": 757,
+      "totalOutput": 0n,
+      "txCount": 1,
+      "vrf": "vrf_vk15rekjgqyvguv2eggspcmdda7xkgrf2tdmj2kgv22ejcwwujhzc7sfl7zpz",
+    },
+    "eventType": 0,
+    "requestNext": [Function],
+    "tip": Object {
+      "blockNo": 9501533,
+      "hash": "c190ad992ae264008253235c98e3ccdcd78d5d95f74f317f9c8af0482cb04b0b",
+      "slot": 11119,
+    },
+  },
+]
+`;
