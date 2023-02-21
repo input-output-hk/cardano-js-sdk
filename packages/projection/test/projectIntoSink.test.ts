@@ -1,19 +1,16 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano, ChainSyncEventType, ChainSyncRollForward } from '@cardano-sdk/core';
-import { ObservableChainSyncError, projectIntoSink, projections, sinks } from '../src';
+import { Cardano, CardanoNodeErrors, ChainSyncEventType, ChainSyncRollForward } from '@cardano-sdk/core';
+import { RollForwardEvent, projectIntoSink, projections, sinks } from '../src';
 import { StubChainSyncData, dataWithPoolRetirement, dataWithStakeKeyDeregistration } from './events';
+import { WithNetworkInfo } from '../src/operators';
 import { concat, defaultIfEmpty, firstValueFrom, lastValueFrom, toArray } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 
-const projectAll = (
-  { networkInfo, chainSync }: StubChainSyncData,
-  projectionSinks: sinks.Sinks<projections.AllProjections>
-) =>
+const projectAll = ({ cardanoNode }: StubChainSyncData, projectionSinks: sinks.Sinks<projections.AllProjections>) =>
   lastValueFrom(
     projectIntoSink({
-      chainSync,
+      cardanoNode,
       logger,
-      networkInfo,
       projections: projections.allProjections,
       sinks: projectionSinks
     }).pipe(toArray())
@@ -25,7 +22,7 @@ describe('projectIntoSink', () => {
 
   beforeEach(() => {
     store = { stakeKeys: new Set(), stakePools: new Map() };
-    inMemorySinks = sinks.createInMemorySinks(dataWithStakeKeyDeregistration.networkInfo, store);
+    inMemorySinks = sinks.createInMemorySinks(store);
   });
 
   describe('from origin', () => {
@@ -51,12 +48,13 @@ describe('projectIntoSink', () => {
   it('resumes from specific block', async () => {
     await firstValueFrom(
       inMemorySinks.buffer
-        .addStabilityWindowBlock(
-          dataWithPoolRetirement.allEvents.find(
+        .rollForward({
+          ...dataWithPoolRetirement.allEvents.find(
             (evt): evt is ChainSyncRollForward =>
               evt.eventType === ChainSyncEventType.RollForward && evt.block.header.blockNo === Cardano.BlockNo(32_209)
-          )!.block
-        )
+          )!,
+          ...dataWithPoolRetirement.networkInfo
+        })
         .pipe(defaultIfEmpty(null))
     );
     const [firstBlock] = await projectAll(dataWithPoolRetirement, inMemorySinks);
@@ -72,38 +70,47 @@ describe('projectIntoSink', () => {
     await lastValueFrom(
       concat(
         // Tail
-        inMemorySinks.buffer.addStabilityWindowBlock({
-          header: {
-            blockNo: Cardano.BlockNo(22_620),
-            hash: Cardano.BlockId('786f9ca474cc0db3ccbd35fec7ce69835a0a58b2d954db07102768033869b0f2'),
-            slot: Cardano.Slot(687_927)
-          }
-        } as Cardano.Block),
+        inMemorySinks.buffer.rollForward({
+          block: {
+            header: {
+              blockNo: Cardano.BlockNo(22_620),
+              hash: Cardano.BlockId('786f9ca474cc0db3ccbd35fec7ce69835a0a58b2d954db07102768033869b0f2'),
+              slot: Cardano.Slot(687_927)
+            }
+          },
+          ...dataWithStakeKeyDeregistration.networkInfo
+        } as RollForwardEvent<WithNetworkInfo>),
         // Intersection
-        inMemorySinks.buffer.addStabilityWindowBlock({
-          header: {
-            blockNo: Cardano.BlockNo(22_621),
-            hash: Cardano.BlockId('c75e9fdb8c24caf2e8d10d1a066c1157572c4ce769378d6708ff2e0aa87ba2db'),
-            slot: Cardano.Slot(687_935)
-          }
-        } as Cardano.Block),
+        inMemorySinks.buffer.rollForward({
+          block: {
+            header: {
+              blockNo: Cardano.BlockNo(22_621),
+              hash: Cardano.BlockId('c75e9fdb8c24caf2e8d10d1a066c1157572c4ce769378d6708ff2e0aa87ba2db'),
+              slot: Cardano.Slot(687_935)
+            }
+          },
+          ...dataWithStakeKeyDeregistration.networkInfo
+        } as RollForwardEvent<WithNetworkInfo>),
         // To be rolled back
-        inMemorySinks.buffer.addStabilityWindowBlock({
-          body: [
-            {
-              body: {
-                certificates: [
-                  { __typename: Cardano.CertificateType.StakeKeyRegistration, stakeKeyHash: rolledBackKey }
-                ]
-              }
-            } as Cardano.Tx
-          ],
-          header: {
-            blockNo: Cardano.BlockNo(22_622),
-            hash: Cardano.BlockId('c75e9fdb8c24caf2e8d10d1a066c1157572c4ce769378d6708ff2e0aa87ba2de'),
-            slot: Cardano.Slot(688_935)
-          }
-        } as Cardano.Block)
+        inMemorySinks.buffer.rollForward({
+          block: {
+            body: [
+              {
+                body: {
+                  certificates: [
+                    { __typename: Cardano.CertificateType.StakeKeyRegistration, stakeKeyHash: rolledBackKey }
+                  ]
+                }
+              } as Cardano.Tx
+            ],
+            header: {
+              blockNo: Cardano.BlockNo(22_622),
+              hash: Cardano.BlockId('c75e9fdb8c24caf2e8d10d1a066c1157572c4ce769378d6708ff2e0aa87ba2de'),
+              slot: Cardano.Slot(688_935)
+            }
+          },
+          ...dataWithStakeKeyDeregistration.networkInfo
+        } as RollForwardEvent<WithNetworkInfo>)
       ).pipe(defaultIfEmpty(null))
     );
     const [firstBlock] = await projectAll(dataWithStakeKeyDeregistration, inMemorySinks);
@@ -115,33 +122,38 @@ describe('projectIntoSink', () => {
     await lastValueFrom(
       // No intersection, both block hashes are not present in the dataset
       concat(
-        inMemorySinks.buffer.addStabilityWindowBlock({
-          header: {
-            blockNo: Cardano.BlockNo(22_621),
-            hash: Cardano.BlockId('c75e9fdb8c24caf2e8d10d1a066c1157572c4ce769378d6708ff2e0aa87ba2de'),
-            slot: Cardano.Slot(687_935)
-          }
-        } as Cardano.Block),
-        inMemorySinks.buffer.addStabilityWindowBlock({
-          header: {
-            blockNo: Cardano.BlockNo(22_622),
-            hash: Cardano.BlockId('c75e9fdb8c24caf2e8d10d1a066c1157572c4ce769378d6708ff2e0aa87ba2df'),
-            slot: Cardano.Slot(688_935)
-          }
-        } as Cardano.Block)
+        inMemorySinks.buffer.rollForward({
+          block: {
+            header: {
+              blockNo: Cardano.BlockNo(22_621),
+              hash: Cardano.BlockId('c75e9fdb8c24caf2e8d10d1a066c1157572c4ce769378d6708ff2e0aa87ba2de'),
+              slot: Cardano.Slot(687_935)
+            }
+          },
+          ...dataWithStakeKeyDeregistration.networkInfo
+        } as RollForwardEvent<WithNetworkInfo>),
+        inMemorySinks.buffer.rollForward({
+          block: {
+            header: {
+              blockNo: Cardano.BlockNo(22_622),
+              hash: Cardano.BlockId('c75e9fdb8c24caf2e8d10d1a066c1157572c4ce769378d6708ff2e0aa87ba2df'),
+              slot: Cardano.Slot(688_935)
+            }
+          },
+          ...dataWithStakeKeyDeregistration.networkInfo
+        } as RollForwardEvent<WithNetworkInfo>)
       ).pipe(defaultIfEmpty(null))
     );
     await expect(projectAll(dataWithStakeKeyDeregistration, inMemorySinks)).rejects.toThrowError(
-      ObservableChainSyncError
+      CardanoNodeErrors.CardanoClientErrors.IntersectionNotFoundError
     );
   });
 
   it('can be used with a subset of available projections', async () => {
     await lastValueFrom(
       projectIntoSink({
-        chainSync: dataWithPoolRetirement.chainSync,
+        cardanoNode: dataWithPoolRetirement.cardanoNode,
         logger,
-        networkInfo: dataWithPoolRetirement.networkInfo,
         projections: {
           // not projecting stakePools
           stakeKeys: projections.stakeKeys

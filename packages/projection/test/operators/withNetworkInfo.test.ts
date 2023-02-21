@@ -3,8 +3,6 @@ import { RollForwardEvent, UnifiedProjectorEvent, operators } from '../../src';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 import { dataWithPoolRetirement } from '../events';
 
-const networkInfo = dataWithPoolRetirement.networkInfo;
-
 const createEvent = (eventType: ChainSyncEventType) =>
   ({
     block: { header: { slot: Cardano.Slot(123) } },
@@ -18,16 +16,16 @@ describe('withNetworkInfo', () => {
         a: createEvent(ChainSyncEventType.RollForward),
         b: createEvent(ChainSyncEventType.RollBackward)
       });
-      expectObservable(source$.pipe(operators.withNetworkInfo(networkInfo))).toBe('ab', {
+      expectObservable(source$.pipe(operators.withNetworkInfo(dataWithPoolRetirement.cardanoNode))).toBe('ab', {
         a: {
           ...createEvent(ChainSyncEventType.RollForward),
-          eraSummaries: networkInfo.eraSummaries,
-          genesisParameters: networkInfo.genesisParameters
+          eraSummaries: dataWithPoolRetirement.networkInfo.eraSummaries,
+          genesisParameters: dataWithPoolRetirement.networkInfo.genesisParameters
         },
         b: {
           ...createEvent(ChainSyncEventType.RollBackward),
-          eraSummaries: networkInfo.eraSummaries,
-          genesisParameters: networkInfo.genesisParameters
+          eraSummaries: dataWithPoolRetirement.networkInfo.eraSummaries,
+          genesisParameters: dataWithPoolRetirement.networkInfo.genesisParameters
         }
       });
       expectSubscriptions(source$.subscriptions).toBe('^');

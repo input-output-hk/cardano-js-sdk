@@ -1,7 +1,8 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Observable } from 'rxjs';
 import { ProjectionExtraProps } from '../projections';
-import { UnifiedProjectorEvent } from '../types';
+import { RollForwardEvent, UnifiedProjectorEvent } from '../types';
+import { WithNetworkInfo } from '../operators';
 
 /**
  * Keeps track of blocks within stability window (computed as numSlots=3k/f).
@@ -13,7 +14,7 @@ import { UnifiedProjectorEvent } from '../types';
  * Implementations should have a strategy for deleting blocks outside of the stability window.
  * Implementations are not expected to keep exactly the required # of blocks (having more blocks is ok).
  */
-export interface StabilityWindowBuffer {
+export interface StabilityWindowBuffer<E extends WithNetworkInfo> {
   /**
    * Observable that emits current tip stored in stability window buffer.
    * 'origin' when buffer is empty.
@@ -29,7 +30,7 @@ export interface StabilityWindowBuffer {
    * @param evt block to add to the buffer
    * @returns Observable that completes once the block is added.
    */
-  addStabilityWindowBlock(block: Cardano.Block): Observable<void>;
+  rollForward(block: RollForwardEvent<E>): Observable<void>;
   /**
    * Delete a block from the buffer.
    *
@@ -38,7 +39,7 @@ export interface StabilityWindowBuffer {
    *
    * @returns Observable that completes once the block is deleted.
    */
-  deleteStabilityWindowBlock(evt: Cardano.Block): Observable<void>;
+  deleteBlock(evt: Cardano.Block): Observable<void>;
 }
 
 export interface Sink<P, SinkSpecificProps = {}> {
@@ -54,7 +55,7 @@ export type SinkLifecycleOperator = (evt$: Observable<any>) => Observable<any>;
 
 export type Sinks<Projections> = {
   projectionSinks: ProjectionSinks<Projections>;
-  buffer: StabilityWindowBuffer;
+  buffer: StabilityWindowBuffer<WithNetworkInfo>;
   before?: SinkLifecycleOperator;
   after?: SinkLifecycleOperator;
 };

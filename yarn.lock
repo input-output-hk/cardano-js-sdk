@@ -2500,7 +2500,6 @@ __metadata:
     "@cardano-sdk/dapp-connector": ^0.7.0
     "@cardano-sdk/key-management": ^0.4.0
     "@cardano-sdk/ogmios": ^0.8.0
-    "@cardano-sdk/projection": ^0.3.0
     "@cardano-sdk/util": ^0.8.0
     "@cardano-sdk/util-dev": ^0.7.0
     "@cardano-sdk/util-rxjs": ^0.4.4
@@ -2707,7 +2706,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cardano-sdk/projection@^0.3.0, @cardano-sdk/projection@workspace:packages/projection":
+"@cardano-sdk/projection@workspace:packages/projection":
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/projection@workspace:packages/projection"
   dependencies:
