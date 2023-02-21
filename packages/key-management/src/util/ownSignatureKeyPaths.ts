@@ -69,10 +69,11 @@ export const ownSignatureKeyPaths = async (
   knownAddresses: GroupedAddress[],
   inputResolver: Cardano.InputResolver
 ): Promise<AccountKeyDerivationPath[]> => {
+  const txInputs = [...txBody.inputs, ...(txBody.collaterals ? txBody.collaterals : [])];
   const paymentKeyPaths = uniq(
     (
       await Promise.all(
-        txBody.inputs.map(async (input) => {
+        txInputs.map(async (input) => {
           const ownAddress = await inputResolver.resolveInputAddress(input);
           if (!ownAddress) return null;
           return knownAddresses.find(({ address }) => address === ownAddress);
