@@ -1,3 +1,3 @@
 export * from './types';
-export * from './inMemory';
+export * as InMemory from './inMemory';
 export * from './util';

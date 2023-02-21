@@ -1,15 +1,12 @@
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { InMemoryStore } from '../../../src/sinks';
+import { InMemory } from '../../../src';
 import { PoolRetirement, PoolUpdate, WithCertificateSource } from '../../../src/operators';
 import { defaultIfEmpty, firstValueFrom } from 'rxjs';
 import { stakePools } from '../../../src/sinks/inMemory/stakePools';
 
 describe('sinks/inMemory/stakePools', () => {
   it('adds pool updates and retirements on RollRorward, removes on RollBackward', async () => {
-    const store: InMemoryStore = {
-      stakeKeys: new Set(),
-      stakePools: new Map()
-    };
+    const store = InMemory.createStore();
     const sink = async (
       eventType: ChainSyncEventType,
       slotNo: number,

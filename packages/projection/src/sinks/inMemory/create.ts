@@ -6,12 +6,12 @@ import { stakeKeys } from './stakeKeys';
 import { stakePools } from './stakePools';
 import { withStaticContext } from '../../operators';
 
-export const createInMemoryStore = (): InMemoryStore => ({
+export const createStore = (): InMemoryStore => ({
   stakeKeys: new Set(),
   stakePools: new Map()
 });
 
-export const createInMemorySinks = (store: InMemoryStore): Sinks<AllProjections> => ({
+export const createSinks = (store: InMemoryStore): Sinks<AllProjections> => ({
   before: withStaticContext({ store }),
   buffer: new InMemoryStabilityWindowBuffer(),
   projectionSinks: {
@@ -20,4 +20,4 @@ export const createInMemorySinks = (store: InMemoryStore): Sinks<AllProjections>
   }
 });
 
-export type InMemorySinks = ReturnType<typeof createInMemorySinks>;
+export type InMemorySinks = ReturnType<typeof createSinks>;

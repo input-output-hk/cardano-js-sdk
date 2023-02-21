@@ -1,13 +1,13 @@
+import { Projections } from '../src';
 import { combineProjections } from '../src/combineProjections';
-import { projections } from '../src';
 
 describe('combineProjections', () => {
   it('deduplicates operators', () => {
     expect(
       combineProjections({
-        stakeKeys: projections.stakeKeys,
-        stakePools: projections.stakePools
+        stakeKeys: Projections.stakeKeys,
+        stakePools: Projections.stakePools
       }).length
-    ).toBeLessThan(projections.stakeKeys.length + projections.stakePools.length);
+    ).toBeLessThan(Projections.stakeKeys.length + Projections.stakePools.length);
   });
 });

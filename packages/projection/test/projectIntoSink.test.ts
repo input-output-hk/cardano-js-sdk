@@ -1,28 +1,28 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, CardanoNodeErrors, ChainSyncEventType, ChainSyncRollForward } from '@cardano-sdk/core';
-import { RollForwardEvent, projectIntoSink, projections, sinks } from '../src';
+import { InMemory, Projections, RollForwardEvent, Sinks, projectIntoSink } from '../src';
 import { StubChainSyncData, dataWithPoolRetirement, dataWithStakeKeyDeregistration } from './events';
 import { WithNetworkInfo } from '../src/operators';
 import { concat, defaultIfEmpty, firstValueFrom, lastValueFrom, toArray } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 
-const projectAll = ({ cardanoNode }: StubChainSyncData, projectionSinks: sinks.Sinks<projections.AllProjections>) =>
+const projectAll = ({ cardanoNode }: StubChainSyncData, projectionSinks: Sinks<Projections.AllProjections>) =>
   lastValueFrom(
     projectIntoSink({
       cardanoNode,
       logger,
-      projections: projections.allProjections,
+      projections: Projections.allProjections,
       sinks: projectionSinks
     }).pipe(toArray())
   );
 
 describe('projectIntoSink', () => {
-  let store: sinks.InMemoryStore;
-  let inMemorySinks: sinks.InMemorySinks;
+  let store: InMemory.InMemoryStore;
+  let inMemorySinks: InMemory.InMemorySinks;
 
   beforeEach(() => {
     store = { stakeKeys: new Set(), stakePools: new Map() };
-    inMemorySinks = sinks.createInMemorySinks(store);
+    inMemorySinks = InMemory.createSinks(store);
   });
 
   describe('from origin', () => {
@@ -156,7 +156,7 @@ describe('projectIntoSink', () => {
         logger,
         projections: {
           // not projecting stakePools
-          stakeKeys: projections.stakeKeys
+          stakeKeys: Projections.stakeKeys
         },
         sinks: inMemorySinks
       }).pipe(toArray())
