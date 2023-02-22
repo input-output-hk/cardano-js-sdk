@@ -21,14 +21,13 @@ import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../Network
 import { DbSyncRewardsProvider, RewardsHttpService } from '../../Rewards';
 import { DbSyncStakePoolProvider, StakePoolHttpService, createHttpStakePoolExtMetadataService } from '../../StakePool';
 import { DbSyncUtxoProvider, UtxoHttpService } from '../../Utxo';
-import { DnsResolver, createDnsResolver, shouldInitCardanoNode } from '../utils';
+import { DnsResolver, createDnsResolver, serviceSetHas } from '../utils';
 import { GenesisData } from '../../types';
 import { HttpServer, BuildInfo as HttpServerBuildInfo, HttpServerConfig, HttpService } from '../../Http';
 import { InMemoryCache } from '../../InMemoryCache';
 import { Logger } from 'ts-log';
 import { MissingProgramOption, MissingServiceDependency, RunnableDependencies, UnknownServiceName } from '../errors';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
-import { ServiceNames } from '../ServiceNames';
 import { SrvRecord } from 'dns';
 import { TxSubmitHttpService } from '../../TxSubmit';
 import { URL } from 'url';
@@ -43,6 +42,29 @@ export const API_URL_DEFAULT = 'http://localhost:3000';
 export const PAGINATION_PAGE_SIZE_LIMIT_DEFAULT = 25;
 export const USE_QUEUE_DEFAULT = false;
 export const ENABLE_METRICS_DEFAULT = false;
+
+/**
+ * Used as mount segments, so must be URL-friendly
+ *
+ */
+export enum ServiceNames {
+  Asset = 'asset',
+  StakePool = 'stake-pool',
+  NetworkInfo = 'network-info',
+  TxSubmit = 'tx-submit',
+  Utxo = 'utxo',
+  ChainHistory = 'chain-history',
+  Rewards = 'rewards'
+}
+
+export const cardanoNodeDependantServices = new Set([
+  ServiceNames.NetworkInfo,
+  ServiceNames.StakePool,
+  ServiceNames.Utxo,
+  ServiceNames.Rewards,
+  ServiceNames.Asset,
+  ServiceNames.ChainHistory
+]);
 
 export enum HttpServerOptionDescriptions {
   ApiUrl = 'API URL',
@@ -219,7 +241,7 @@ export const loadHttpServer = async (args: ProgramArgs, deps: LoadHttpServerDepe
       logger
     );
   const db = await getPool(dnsResolver, logger, options);
-  const cardanoNode = shouldInitCardanoNode(serviceNames)
+  const cardanoNode = serviceSetHas(serviceNames, cardanoNodeDependantServices)
     ? await getOgmiosCardanoNode(dnsResolver, logger, options)
     : undefined;
   const genesisData = options?.cardanoNodeConfigPath
@@ -231,7 +253,7 @@ export const loadHttpServer = async (args: ProgramArgs, deps: LoadHttpServerDepe
     if (serviceMap[serviceName]) {
       services.push(await serviceMap[serviceName]());
     } else {
-      throw new UnknownServiceName(serviceName);
+      throw new UnknownServiceName(serviceName, Object.values(ServiceNames));
     }
   }
   const config: HttpServerConfig = {

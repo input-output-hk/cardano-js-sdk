@@ -3,15 +3,17 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { CONNECTION_ERROR_EVENT, RabbitMqTxSubmitProvider, TxSubmitWorker } from '../../TxSubmit';
-import { DnsResolver, srvRecordToRabbitmqURL } from '../utils';
+import { DnsResolver } from '../utils';
 import { Logger } from 'ts-log';
 import { MissingProgramOption } from '../errors';
 import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import { ProviderError, ProviderFailure, SubmitTxArgs } from '@cardano-sdk/core';
 import { RabbitMqOptionDescriptions, RabbitMqProgramOptions } from '../options';
-import { ServiceNames } from '../ServiceNames';
-import { TxWorkerOptions } from '../programs';
+import { ServiceNames, TxWorkerOptions } from '../programs';
+import { SrvRecord } from 'dns';
 import { isConnectionError } from '@cardano-sdk/util';
+
+export const srvRecordToRabbitmqURL = ({ name, port }: SrvRecord) => new URL(`amqp://${name}:${port}`);
 
 /**
  * Creates a extended RabbitMqTxSubmitProvider instance :
