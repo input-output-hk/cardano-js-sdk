@@ -4,7 +4,7 @@
 /* eslint-disable unicorn/no-nested-ternary */
 import { ClientConfig, Pool, QueryConfig } from 'pg';
 import { DnsResolver } from '../utils';
-import { HttpServerOptions } from '../programs';
+import { HttpServerArgs } from '../programs';
 import { Logger } from 'ts-log';
 import { PosgresProgramOptions } from '../options';
 import { URL } from 'url';
@@ -78,7 +78,7 @@ export const getPool = async (
 const getSecret = (secretFilePath?: string, secret?: string) =>
   secretFilePath ? loadSecret(secretFilePath) : secret ? secret : undefined;
 
-export const connectionStringFromOptions = (args: HttpServerOptions) => {
+export const connectionStringFromArgs = (args: HttpServerArgs) => {
   const dbName = getSecret(args.postgresDbFile, args.postgresDb);
   const dbUser = getSecret(args.postgresUserFile, args.postgresUser);
   const dbPassword = getSecret(args.postgresPasswordFile, args.postgresPassword);

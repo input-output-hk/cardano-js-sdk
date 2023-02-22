@@ -9,10 +9,9 @@ import { DB_CACHE_TTL_DEFAULT } from './InMemoryCache';
 import { DEFAULT_TOKEN_METADATA_CACHE_TTL, DEFAULT_TOKEN_METADATA_SERVER_URL } from './Asset';
 import { EPOCH_POLL_INTERVAL_DEFAULT } from './util';
 import {
-  API_URL_DEFAULT,
-  ENABLE_METRICS_DEFAULT,
+  HTTP_SERVER_API_URL_DEFAULT,
+  HttpServerArgs,
   HttpServerOptionDescriptions,
-  HttpServerOptions,
   PAGINATION_PAGE_SIZE_LIMIT_DEFAULT,
   PARALLEL_MODE_DEFAULT,
   PARALLEL_TXS_DEFAULT,
@@ -20,10 +19,10 @@ import {
   Programs,
   ServiceNames,
   TX_WORKER_API_URL_DEFAULT,
+  TxWorkerArgs,
   TxWorkerOptionDescriptions,
-  TxWorkerOptions,
   USE_QUEUE_DEFAULT,
-  connectionStringFromOptions,
+  connectionStringFromArgs,
   loadAndStartTxWorker,
   loadHttpServer,
   stringOptionToBoolean
@@ -71,25 +70,6 @@ withCommonOptions(
     )
       .env('SERVICE_NAMES')
       .argParser((names) => names.split(',') as ServiceNames[])
-  )
-  .addOption(
-    new Option('--api-url <apiUrl>', HttpServerOptionDescriptions.ApiUrl)
-      .env('API_URL')
-      .default(new URL(API_URL_DEFAULT))
-      .argParser((url) => new URL(url))
-  )
-  .addOption(
-    new Option('--enable-metrics <true/false>', HttpServerOptionDescriptions.EnableMetrics)
-      .env('ENABLE_METRICS')
-      .default(ENABLE_METRICS_DEFAULT)
-      .argParser((enableMetrics) =>
-        stringToBoolean(enableMetrics, Programs.HttpServer, HttpServerOptionDescriptions.EnableMetrics)
-      )
-  )
-  .addOption(
-    new Option('--build-info <buildInfo>', HttpServerOptionDescriptions.BuildInfo)
-      .env('BUILD_INFO')
-      .argParser(buildInfoValidator)
   )
   .addOption(
     new Option(
@@ -141,13 +121,13 @@ withCommonOptions(
       .default(PAGINATION_PAGE_SIZE_LIMIT_DEFAULT)
       .argParser((interval) => Number.parseInt(interval, 10))
   )
-  .action(async (serviceNames: ServiceNames[], options: { apiUrl: URL } & HttpServerOptions) => {
-    // Setting the service names via env variable takes preference over command line argument
-    const services = options.serviceNames ? options.serviceNames : serviceNames;
+  .action(async (serviceNames: ServiceNames[], args: { apiUrl: URL } & HttpServerArgs) => {
     try {
       const server = await loadHttpServer({
-        options: { ...options, postgresConnectionString: connectionStringFromOptions(options) },
-        serviceNames: services
+        ...args,
+        postgresConnectionString: connectionStringFromArgs(args),
+        // Setting the service names via env variable takes preference over command line argument
+        serviceNames: args.serviceNames ? args.serviceNames : serviceNames
       });
       await server.initialize();
       await server.start();
@@ -188,10 +168,10 @@ withCommonOptions(
       .default(POLLING_CYCLE_DEFAULT)
       .argParser((pollingCycle) => Number.parseInt(pollingCycle, 10))
   )
-  .action(async (options: TxWorkerOptions) => {
+  .action(async (args: TxWorkerArgs) => {
     // eslint-disable-next-line no-console
-    console.log(`RabbitMQ transactions worker: ${options.parallel ? 'parallel' : 'serial'} mode`);
-    const txWorker = await loadAndStartTxWorker({ options });
+    console.log(`RabbitMQ transactions worker: ${args.parallel ? 'parallel' : 'serial'} mode`);
+    const txWorker = await loadAndStartTxWorker(args);
     onDeath(async () => {
       await txWorker.shutdown();
       process.exit(1);

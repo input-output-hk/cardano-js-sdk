@@ -86,14 +86,12 @@ describe('HTTP Server', () => {
 
     it('loads the nominated HTTP services and server if required program arguments are set', async () => {
       httpServer = await loadHttpServer({
-        options: {
-          apiUrl,
-          cardanoNodeConfigPath,
-          dbCacheTtl,
-          epochPollInterval,
-          ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
-          postgresConnectionString
-        },
+        apiUrl,
+        cardanoNodeConfigPath,
+        dbCacheTtl,
+        epochPollInterval,
+        ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+        postgresConnectionString,
         serviceNames: [
           ServiceNames.StakePool,
           ServiceNames.TxSubmit,
@@ -109,19 +107,17 @@ describe('HTTP Server', () => {
     describe('postgres-dependent services', () => {
       it('loads the nominated HTTP service and server with service discovery', async () => {
         httpServer = await loadHttpServer({
-          options: {
-            apiUrl,
-            cardanoNodeConfigPath,
-            dbCacheTtl,
-            epochPollInterval,
-            ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
-            postgresDb,
-            postgresPassword,
-            postgresSrvServiceName,
-            postgresUser,
-            serviceDiscoveryBackoffFactor,
-            serviceDiscoveryTimeout
-          },
+          apiUrl,
+          cardanoNodeConfigPath,
+          dbCacheTtl,
+          epochPollInterval,
+          ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+          postgresDb,
+          postgresPassword,
+          postgresSrvServiceName,
+          postgresUser,
+          serviceDiscoveryBackoffFactor,
+          serviceDiscoveryTimeout,
           serviceNames: [ServiceNames.StakePool]
         });
 
@@ -134,18 +130,16 @@ describe('HTTP Server', () => {
         await expect(
           async () =>
             await loadHttpServer({
-              options: {
-                apiUrl,
-                cardanoNodeConfigPath,
-                dbCacheTtl,
-                epochPollInterval,
-                ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
-                postgresDb: missingPostgresDb,
-                postgresSrvServiceName,
-                postgresUser,
-                serviceDiscoveryBackoffFactor,
-                serviceDiscoveryTimeout
-              },
+              apiUrl,
+              cardanoNodeConfigPath,
+              dbCacheTtl,
+              epochPollInterval,
+              ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+              postgresDb: missingPostgresDb,
+              postgresSrvServiceName,
+              postgresUser,
+              serviceDiscoveryBackoffFactor,
+              serviceDiscoveryTimeout,
               serviceNames: [ServiceNames.StakePool]
             })
         ).rejects.toThrow(
@@ -160,13 +154,11 @@ describe('HTTP Server', () => {
         await expect(
           async () =>
             await loadHttpServer({
-              options: {
-                apiUrl,
-                cardanoNodeConfigPath,
-                dbCacheTtl,
-                epochPollInterval,
-                ogmiosUrl: new URL(ogmiosConnection.address.webSocket)
-              },
+              apiUrl,
+              cardanoNodeConfigPath,
+              dbCacheTtl,
+              epochPollInterval,
+              ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
               serviceNames: [ServiceNames.StakePool]
             })
         ).rejects.toThrow(
@@ -181,15 +173,13 @@ describe('HTTP Server', () => {
     describe('ogmios-dependent services', () => {
       it('loads the nominated HTTP service and server with service discovery', async () => {
         httpServer = await loadHttpServer({
-          options: {
-            apiUrl,
-            cardanoNodeConfigPath,
-            dbCacheTtl,
-            epochPollInterval,
-            ogmiosSrvServiceName,
-            serviceDiscoveryBackoffFactor,
-            serviceDiscoveryTimeout
-          },
+          apiUrl,
+          cardanoNodeConfigPath,
+          dbCacheTtl,
+          epochPollInterval,
+          ogmiosSrvServiceName,
+          serviceDiscoveryBackoffFactor,
+          serviceDiscoveryTimeout,
           serviceNames: [ServiceNames.TxSubmit]
         });
 
@@ -198,16 +188,14 @@ describe('HTTP Server', () => {
 
       it('loads the nominated HTTP server and service discovery takes preference over url if both are provided', async () => {
         httpServer = await loadHttpServer({
-          options: {
-            apiUrl,
-            cardanoNodeConfigPath,
-            dbCacheTtl,
-            epochPollInterval,
-            ogmiosSrvServiceName,
-            ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
-            serviceDiscoveryBackoffFactor,
-            serviceDiscoveryTimeout
-          },
+          apiUrl,
+          cardanoNodeConfigPath,
+          dbCacheTtl,
+          epochPollInterval,
+          ogmiosSrvServiceName,
+          ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+          serviceDiscoveryBackoffFactor,
+          serviceDiscoveryTimeout,
           serviceNames: [ServiceNames.TxSubmit]
         });
 
@@ -218,14 +206,12 @@ describe('HTTP Server', () => {
         await expect(
           async () =>
             await loadHttpServer({
-              options: {
-                apiUrl,
-                cardanoNodeConfigPath,
-                dbCacheTtl,
-                epochPollInterval,
-                serviceDiscoveryBackoffFactor,
-                serviceDiscoveryTimeout
-              },
+              apiUrl,
+              cardanoNodeConfigPath,
+              dbCacheTtl,
+              epochPollInterval,
+              serviceDiscoveryBackoffFactor,
+              serviceDiscoveryTimeout,
               serviceNames: [ServiceNames.TxSubmit]
             })
         ).rejects.toThrow(
@@ -237,17 +223,15 @@ describe('HTTP Server', () => {
     describe('rabbitmq-dependent services', () => {
       it('loads the nominated HTTP service and server with service discovery', async () => {
         httpServer = await loadHttpServer({
-          options: {
-            apiUrl,
-            cardanoNodeConfigPath,
-            dbCacheTtl,
-            epochPollInterval,
-            rabbitmqSrvServiceName,
-            serviceDiscoveryBackoffFactor,
-            serviceDiscoveryTimeout,
-            useQueue: true
-          },
-          serviceNames: [ServiceNames.TxSubmit]
+          apiUrl,
+          cardanoNodeConfigPath,
+          dbCacheTtl,
+          epochPollInterval,
+          rabbitmqSrvServiceName,
+          serviceDiscoveryBackoffFactor,
+          serviceDiscoveryTimeout,
+          serviceNames: [ServiceNames.TxSubmit],
+          useQueue: true
         });
 
         expect(httpServer).toBeInstanceOf(HttpServer);
@@ -255,18 +239,16 @@ describe('HTTP Server', () => {
 
       it('loads the nominated HTTP server and service discovery takes preference over url if both are provided', async () => {
         httpServer = await loadHttpServer({
-          options: {
-            apiUrl,
-            cardanoNodeConfigPath,
-            dbCacheTtl,
-            epochPollInterval,
-            rabbitmqSrvServiceName,
-            rabbitmqUrl,
-            serviceDiscoveryBackoffFactor,
-            serviceDiscoveryTimeout,
-            useQueue: true
-          },
-          serviceNames: [ServiceNames.TxSubmit]
+          apiUrl,
+          cardanoNodeConfigPath,
+          dbCacheTtl,
+          epochPollInterval,
+          rabbitmqSrvServiceName,
+          rabbitmqUrl,
+          serviceDiscoveryBackoffFactor,
+          serviceDiscoveryTimeout,
+          serviceNames: [ServiceNames.TxSubmit],
+          useQueue: true
         });
 
         expect(httpServer).toBeInstanceOf(HttpServer);
@@ -276,16 +258,14 @@ describe('HTTP Server', () => {
         await expect(
           async () =>
             await loadHttpServer({
-              options: {
-                apiUrl,
-                cardanoNodeConfigPath,
-                dbCacheTtl,
-                epochPollInterval,
-                serviceDiscoveryBackoffFactor,
-                serviceDiscoveryTimeout,
-                useQueue: true
-              },
-              serviceNames: [ServiceNames.TxSubmit]
+              apiUrl,
+              cardanoNodeConfigPath,
+              dbCacheTtl,
+              epochPollInterval,
+              serviceDiscoveryBackoffFactor,
+              serviceDiscoveryTimeout,
+              serviceNames: [ServiceNames.TxSubmit],
+              useQueue: true
             })
         ).rejects.toThrow(
           new MissingProgramOption(ServiceNames.TxSubmit, [
@@ -301,13 +281,11 @@ describe('HTTP Server', () => {
       const test = (serviceName: ServiceNames) =>
         expect(() =>
           loadHttpServer({
-            options: {
-              apiUrl,
-              dbCacheTtl: 0,
-              epochPollInterval: 0,
-              ogmiosUrl: new URL('http://localhost:1337'),
-              postgresConnectionString: 'postgres'
-            },
+            apiUrl,
+            dbCacheTtl: 0,
+            epochPollInterval: 0,
+            ogmiosUrl: new URL('http://localhost:1337'),
+            postgresConnectionString: 'postgres',
             serviceNames: [serviceName]
           })
         ).rejects.toThrow(new MissingProgramOption(serviceName, HttpServerOptionDescriptions.CardanoNodeConfigPath));
@@ -331,14 +309,12 @@ describe('HTTP Server', () => {
     it('should not throw if any internal providers are unhealthy during HTTP server initialization', () => {
       expect(() =>
         loadHttpServer({
-          options: {
-            apiUrl,
-            cardanoNodeConfigPath,
-            dbCacheTtl,
-            epochPollInterval,
-            ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
-            postgresConnectionString
-          },
+          apiUrl,
+          cardanoNodeConfigPath,
+          dbCacheTtl,
+          epochPollInterval,
+          ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+          postgresConnectionString,
           serviceNames: [ServiceNames.StakePool, ServiceNames.TxSubmit]
         })
       ).not.toThrow(new ProviderError(ProviderFailure.Unhealthy));

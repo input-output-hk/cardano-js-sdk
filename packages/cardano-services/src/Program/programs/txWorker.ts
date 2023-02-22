@@ -16,17 +16,13 @@ export enum TxWorkerOptionDescriptions {
   PollingCycle = 'Polling cycle'
 }
 
-export type TxWorkerOptions = CommonProgramOptions &
+export type TxWorkerArgs = CommonProgramOptions &
   OgmiosProgramOptions &
   RabbitMqProgramOptions &
   Pick<TxSubmitWorkerConfig, 'parallel' | 'parallelTxs' | 'pollingCycle'>;
 
-export interface TxWorkerArgs {
-  options: TxWorkerOptions;
-}
-
 export const loadAndStartTxWorker = async (args: TxWorkerArgs, logger?: Logger) => {
-  const { loggerMinSeverity, serviceDiscoveryBackoffFactor, serviceDiscoveryTimeout } = args.options;
+  const { loggerMinSeverity, serviceDiscoveryBackoffFactor, serviceDiscoveryTimeout } = args;
 
   if (!logger) logger = createLogger({ level: loggerMinSeverity, name: 'tx-worker' });
 
@@ -37,6 +33,6 @@ export const loadAndStartTxWorker = async (args: TxWorkerArgs, logger?: Logger) 
     },
     logger
   );
-  const txSubmitProvider = await getOgmiosTxSubmitProvider(dnsResolver, logger, args.options);
-  return await getRunningTxSubmitWorker(dnsResolver, txSubmitProvider, logger, args.options);
+  const txSubmitProvider = await getOgmiosTxSubmitProvider(dnsResolver, logger, args);
+  return await getRunningTxSubmitWorker(dnsResolver, txSubmitProvider, logger, args);
 };

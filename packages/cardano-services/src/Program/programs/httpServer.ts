@@ -75,7 +75,7 @@ export enum HttpServerOptionDescriptions {
   PaginationPageSizeLimit = 'Pagination page size limit shared across all providers'
 }
 
-export type HttpServerOptions = CommonProgramOptions &
+export type HttpServerArgs = CommonProgramOptions &
   PosgresProgramOptions &
   OgmiosProgramOptions &
   RabbitMqProgramOptions & {
@@ -86,30 +86,15 @@ export type HttpServerOptions = CommonProgramOptions &
     dbCacheTtl: number;
     useQueue?: boolean;
     paginationPageSizeLimit?: number;
+    serviceNames: ServiceNames[];
   };
 export interface LoadHttpServerDependencies {
   dnsResolver?: (serviceName: string) => Promise<SrvRecord>;
   logger?: Logger;
 }
-export interface ProgramArgs {
-  serviceNames: (
-    | ServiceNames.Asset
-    | ServiceNames.StakePool
-    | ServiceNames.TxSubmit
-    | ServiceNames.ChainHistory
-    | ServiceNames.Utxo
-    | ServiceNames.NetworkInfo
-    | ServiceNames.Rewards
-  )[];
-  /*
-    TODO: optimize passed options -> 'options' is always passed by default and shouldn't be optional field,
-    no need to check it with '.?' everywhere.Will be fixed within ADP-1990
-  */
-  options?: HttpServerOptions;
-}
 
 interface ServiceMapFactoryOptions {
-  args: ProgramArgs;
+  args: HttpServerArgs;
   dbConnection?: pg.Pool;
   dnsResolver: DnsResolver;
   genesisData?: GenesisData;
@@ -133,7 +118,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       return factory(dbConnection, node);
     };
 
-  const getEpochMonitor = memoize((dbPool) => new DbSyncEpochPollService(dbPool, args.options!.epochPollInterval!));
+  const getEpochMonitor = memoize((dbPool) => new DbSyncEpochPollService(dbPool, args.epochPollInterval!));
 
   return {
     [ServiceNames.Asset]: withDbSyncProvider(async (db, cardanoNode) => {
@@ -142,9 +127,9 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
         logger,
         metadataService: createDbSyncMetadataService(db, logger)
       });
-      const tokenMetadataService = args.options?.tokenMetadataServerUrl?.startsWith('stub:')
+      const tokenMetadataService = args.tokenMetadataServerUrl?.startsWith('stub:')
         ? new StubTokenMetadataService()
-        : new CardanoTokenRegistry({ logger }, args.options);
+        : new CardanoTokenRegistry({ logger }, args);
       const assetProvider = new DbSyncAssetProvider({
         cardanoNode,
         db,
@@ -159,9 +144,9 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       if (!genesisData)
         throw new MissingProgramOption(ServiceNames.StakePool, HttpServerOptionDescriptions.CardanoNodeConfigPath);
       const stakePoolProvider = new DbSyncStakePoolProvider(
-        { paginationPageSizeLimit: args.options!.paginationPageSizeLimit! },
+        { paginationPageSizeLimit: args.paginationPageSizeLimit! },
         {
-          cache: new InMemoryCache(args.options!.dbCacheTtl!),
+          cache: new InMemoryCache(args.dbCacheTtl!),
           cardanoNode,
           db,
           epochMonitor: getEpochMonitor(db),
@@ -180,14 +165,14 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     [ServiceNames.ChainHistory]: withDbSyncProvider(async (db, cardanoNode) => {
       const metadataService = createDbSyncMetadataService(db, logger);
       const chainHistoryProvider = new DbSyncChainHistoryProvider(
-        { paginationPageSizeLimit: args.options!.paginationPageSizeLimit! },
+        { paginationPageSizeLimit: args.paginationPageSizeLimit! },
         { cardanoNode, db, logger, metadataService }
       );
       return new ChainHistoryHttpService({ chainHistoryProvider, logger });
     }, ServiceNames.ChainHistory),
     [ServiceNames.Rewards]: withDbSyncProvider(async (db, cardanoNode) => {
       const rewardsProvider = new DbSyncRewardsProvider(
-        { paginationPageSizeLimit: args.options!.paginationPageSizeLimit! },
+        { paginationPageSizeLimit: args.paginationPageSizeLimit! },
         { cardanoNode, db, logger }
       );
       return new RewardsHttpService({ logger, rewardsProvider });
@@ -196,7 +181,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       if (!genesisData)
         throw new MissingProgramOption(ServiceNames.NetworkInfo, HttpServerOptionDescriptions.CardanoNodeConfigPath);
       const networkInfoProvider = new DbSyncNetworkInfoProvider({
-        cache: new InMemoryCache(args.options!.dbCacheTtl!),
+        cache: new InMemoryCache(args.dbCacheTtl!),
         cardanoNode,
         db,
         epochMonitor: getEpochMonitor(db),
@@ -206,42 +191,42 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       return new NetworkInfoHttpService({ logger, networkInfoProvider });
     }, ServiceNames.NetworkInfo),
     [ServiceNames.TxSubmit]: async () => {
-      const txSubmitProvider = args.options?.useQueue
-        ? await getRabbitMqTxSubmitProvider(dnsResolver, logger, args.options)
-        : await getOgmiosTxSubmitProvider(dnsResolver, logger, args.options);
+      const txSubmitProvider = args.useQueue
+        ? await getRabbitMqTxSubmitProvider(dnsResolver, logger, args)
+        : await getOgmiosTxSubmitProvider(dnsResolver, logger, args);
       return new TxSubmitHttpService({ logger, txSubmitProvider });
     }
   };
 };
 
-export const loadHttpServer = async (args: ProgramArgs, deps: LoadHttpServerDependencies = {}): Promise<HttpServer> => {
-  const { options, serviceNames } = args;
+export const loadHttpServer = async (
+  args: HttpServerArgs,
+  deps: LoadHttpServerDependencies = {}
+): Promise<HttpServer> => {
   const services: HttpService[] = [];
   const logger =
     deps?.logger ||
     createLogger({
-      level: options?.loggerMinSeverity,
+      level: args.loggerMinSeverity,
       name: 'http-server'
     });
   const dnsResolver =
     deps?.dnsResolver ||
     createDnsResolver(
       {
-        factor: options?.serviceDiscoveryBackoffFactor,
-        maxRetryTime: options?.serviceDiscoveryTimeout
+        factor: args.serviceDiscoveryBackoffFactor,
+        maxRetryTime: args.serviceDiscoveryTimeout
       },
       logger
     );
-  const db = await getPool(dnsResolver, logger, options);
-  const cardanoNode = serviceSetHas(serviceNames, cardanoNodeDependantServices)
-    ? await getOgmiosCardanoNode(dnsResolver, logger, options)
+  const db = await getPool(dnsResolver, logger, args);
+  const cardanoNode = serviceSetHas(args.serviceNames, cardanoNodeDependantServices)
+    ? await getOgmiosCardanoNode(dnsResolver, logger, args)
     : undefined;
-  const genesisData = options?.cardanoNodeConfigPath
-    ? await loadGenesisData(options?.cardanoNodeConfigPath)
-    : undefined;
+  const genesisData = args.cardanoNodeConfigPath ? await loadGenesisData(args.cardanoNodeConfigPath) : undefined;
   const serviceMap = serviceMapFactory({ args, dbConnection: db, dnsResolver, genesisData, logger, node: cardanoNode });
 
-  for (const serviceName of serviceNames) {
+  for (const serviceName of args.serviceNames) {
     if (serviceMap[serviceName]) {
       services.push(await serviceMap[serviceName]());
     } else {
@@ -250,13 +235,13 @@ export const loadHttpServer = async (args: ProgramArgs, deps: LoadHttpServerDepe
   }
   const config: HttpServerConfig = {
     listen: {
-      host: options?.apiUrl.hostname,
-      port: options?.apiUrl ? Number.parseInt(options?.apiUrl.port) : undefined
+      host: args.apiUrl.hostname,
+      port: args.apiUrl ? Number.parseInt(args.apiUrl.port) : undefined
     },
-    meta: { ...options?.buildInfo, startupTime: Date.now() }
+    meta: { ...args.buildInfo, startupTime: Date.now() }
   };
-  if (options?.enableMetrics) {
-    config.metrics = { enabled: options?.enableMetrics };
+  if (args.enableMetrics) {
+    config.metrics = { enabled: args.enableMetrics };
   }
   return new HttpServer(config, { logger, runnableDependencies: [cardanoNode].filter(isNotNil), services });
 };
