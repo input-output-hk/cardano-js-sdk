@@ -18,6 +18,7 @@ import {
   PostgresOptionDescriptions,
   RabbitMqOptionDescriptions
 } from '../../../src/Program/options';
+import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { SrvRecord } from 'dns';
 import { URL } from 'url';
 import {
@@ -28,7 +29,6 @@ import {
 } from '../../util';
 import { getRandomPort } from 'get-port-please';
 import http from 'http';
-import { ProviderError, ProviderFailure } from '@cardano-sdk/core'
 
 jest.mock('dns', () => ({
   promises: {
@@ -86,8 +86,8 @@ describe('HTTP Server', () => {
 
     it('loads the nominated HTTP services and server if required program arguments are set', async () => {
       httpServer = await loadHttpServer({
-        apiUrl,
         options: {
+          apiUrl,
           cardanoNodeConfigPath,
           dbCacheTtl,
           epochPollInterval,
@@ -109,8 +109,8 @@ describe('HTTP Server', () => {
     describe('postgres-dependent services', () => {
       it('loads the nominated HTTP service and server with service discovery', async () => {
         httpServer = await loadHttpServer({
-          apiUrl,
           options: {
+            apiUrl,
             cardanoNodeConfigPath,
             dbCacheTtl,
             epochPollInterval,
@@ -134,8 +134,8 @@ describe('HTTP Server', () => {
         await expect(
           async () =>
             await loadHttpServer({
-              apiUrl,
               options: {
+                apiUrl,
                 cardanoNodeConfigPath,
                 dbCacheTtl,
                 epochPollInterval,
@@ -160,8 +160,8 @@ describe('HTTP Server', () => {
         await expect(
           async () =>
             await loadHttpServer({
-              apiUrl,
               options: {
+                apiUrl,
                 cardanoNodeConfigPath,
                 dbCacheTtl,
                 epochPollInterval,
@@ -181,8 +181,8 @@ describe('HTTP Server', () => {
     describe('ogmios-dependent services', () => {
       it('loads the nominated HTTP service and server with service discovery', async () => {
         httpServer = await loadHttpServer({
-          apiUrl,
           options: {
+            apiUrl,
             cardanoNodeConfigPath,
             dbCacheTtl,
             epochPollInterval,
@@ -198,8 +198,8 @@ describe('HTTP Server', () => {
 
       it('loads the nominated HTTP server and service discovery takes preference over url if both are provided', async () => {
         httpServer = await loadHttpServer({
-          apiUrl,
           options: {
+            apiUrl,
             cardanoNodeConfigPath,
             dbCacheTtl,
             epochPollInterval,
@@ -218,8 +218,8 @@ describe('HTTP Server', () => {
         await expect(
           async () =>
             await loadHttpServer({
-              apiUrl,
               options: {
+                apiUrl,
                 cardanoNodeConfigPath,
                 dbCacheTtl,
                 epochPollInterval,
@@ -237,8 +237,8 @@ describe('HTTP Server', () => {
     describe('rabbitmq-dependent services', () => {
       it('loads the nominated HTTP service and server with service discovery', async () => {
         httpServer = await loadHttpServer({
-          apiUrl,
           options: {
+            apiUrl,
             cardanoNodeConfigPath,
             dbCacheTtl,
             epochPollInterval,
@@ -255,8 +255,8 @@ describe('HTTP Server', () => {
 
       it('loads the nominated HTTP server and service discovery takes preference over url if both are provided', async () => {
         httpServer = await loadHttpServer({
-          apiUrl,
           options: {
+            apiUrl,
             cardanoNodeConfigPath,
             dbCacheTtl,
             epochPollInterval,
@@ -276,8 +276,8 @@ describe('HTTP Server', () => {
         await expect(
           async () =>
             await loadHttpServer({
-              apiUrl,
               options: {
+                apiUrl,
                 cardanoNodeConfigPath,
                 dbCacheTtl,
                 epochPollInterval,
@@ -301,8 +301,8 @@ describe('HTTP Server', () => {
       const test = (serviceName: ServiceNames) =>
         expect(() =>
           loadHttpServer({
-            apiUrl,
             options: {
+              apiUrl,
               dbCacheTtl: 0,
               epochPollInterval: 0,
               ogmiosUrl: new URL('http://localhost:1337'),
@@ -331,8 +331,8 @@ describe('HTTP Server', () => {
     it('should not throw if any internal providers are unhealthy during HTTP server initialization', () => {
       expect(() =>
         loadHttpServer({
-          apiUrl,
           options: {
+            apiUrl,
             cardanoNodeConfigPath,
             dbCacheTtl,
             epochPollInterval,

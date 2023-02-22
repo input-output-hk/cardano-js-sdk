@@ -23,7 +23,7 @@ import { DbSyncStakePoolProvider, StakePoolHttpService, createHttpStakePoolExtMe
 import { DbSyncUtxoProvider, UtxoHttpService } from '../../Utxo';
 import { DnsResolver, createDnsResolver, serviceSetHas } from '../utils';
 import { GenesisData } from '../../types';
-import { HttpServer, BuildInfo as HttpServerBuildInfo, HttpServerConfig, HttpService } from '../../Http';
+import { HttpServer, HttpServerConfig, HttpService } from '../../Http';
 import { InMemoryCache } from '../../InMemoryCache';
 import { Logger } from 'ts-log';
 import { MissingProgramOption, MissingServiceDependency, RunnableDependencies, UnknownServiceName } from '../errors';
@@ -38,10 +38,9 @@ import { isNotNil } from '@cardano-sdk/util';
 import memoize from 'lodash/memoize';
 import pg from 'pg';
 
-export const API_URL_DEFAULT = 'http://localhost:3000';
+export const HTTP_SERVER_API_URL_DEFAULT = new URL('http://localhost:3000');
 export const PAGINATION_PAGE_SIZE_LIMIT_DEFAULT = 25;
 export const USE_QUEUE_DEFAULT = false;
-export const ENABLE_METRICS_DEFAULT = false;
 
 /**
  * Used as mount segments, so must be URL-friendly
@@ -67,12 +66,9 @@ export const cardanoNodeDependantServices = new Set([
 ]);
 
 export enum HttpServerOptionDescriptions {
-  ApiUrl = 'API URL',
-  BuildInfo = 'HTTP server build info',
   CardanoNodeConfigPath = 'Cardano node config path',
   DbCacheTtl = 'Cache TTL in seconds between 60 and 172800 (two days), an option for database related operations',
   EpochPollInterval = 'Epoch poll interval',
-  EnableMetrics = 'Enable Prometheus Metrics',
   TokenMetadataCacheTtl = 'Token Metadata API cache TTL in minutes',
   TokenMetadataServerUrl = 'Token Metadata API server URL',
   UseQueue = 'Enables RabbitMQ',
@@ -83,9 +79,6 @@ export type HttpServerOptions = CommonProgramOptions &
   PosgresProgramOptions &
   OgmiosProgramOptions &
   RabbitMqProgramOptions & {
-    serviceNames?: ServiceNames[];
-    enableMetrics?: boolean;
-    buildInfo?: HttpServerBuildInfo;
     cardanoNodeConfigPath?: string;
     tokenMetadataCacheTTL?: number;
     tokenMetadataServerUrl?: string;
@@ -99,7 +92,6 @@ export interface LoadHttpServerDependencies {
   logger?: Logger;
 }
 export interface ProgramArgs {
-  apiUrl: URL;
   serviceNames: (
     | ServiceNames.Asset
     | ServiceNames.StakePool
@@ -223,7 +215,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
 };
 
 export const loadHttpServer = async (args: ProgramArgs, deps: LoadHttpServerDependencies = {}): Promise<HttpServer> => {
-  const { apiUrl, options, serviceNames } = args;
+  const { options, serviceNames } = args;
   const services: HttpService[] = [];
   const logger =
     deps?.logger ||
@@ -258,8 +250,8 @@ export const loadHttpServer = async (args: ProgramArgs, deps: LoadHttpServerDepe
   }
   const config: HttpServerConfig = {
     listen: {
-      host: apiUrl.hostname,
-      port: Number.parseInt(apiUrl.port)
+      host: options?.apiUrl.hostname,
+      port: options?.apiUrl ? Number.parseInt(options?.apiUrl.port) : undefined
     },
     meta: { ...options?.buildInfo, startupTime: Date.now() }
   };

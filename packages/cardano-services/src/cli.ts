@@ -4,9 +4,12 @@
 /* eslint-disable complexity */
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable unicorn/no-nested-ternary */
+import { Command, Option } from 'commander';
+import { DB_CACHE_TTL_DEFAULT } from './InMemoryCache';
+import { DEFAULT_TOKEN_METADATA_CACHE_TTL, DEFAULT_TOKEN_METADATA_SERVER_URL } from './Asset';
+import { EPOCH_POLL_INTERVAL_DEFAULT } from './util';
 import {
   API_URL_DEFAULT,
-  CommonOptionDescriptions,
   ENABLE_METRICS_DEFAULT,
   HttpServerOptionDescriptions,
   HttpServerOptions,
@@ -16,20 +19,17 @@ import {
   POLLING_CYCLE_DEFAULT,
   Programs,
   ServiceNames,
+  TX_WORKER_API_URL_DEFAULT,
   TxWorkerOptionDescriptions,
   TxWorkerOptions,
   USE_QUEUE_DEFAULT,
-  WrongOption,
   connectionStringFromOptions,
   loadAndStartTxWorker,
-  loadHttpServer
+  loadHttpServer,
+  stringOptionToBoolean
 } from './Program';
-import { Command, Option } from 'commander';
-import { DB_CACHE_TTL_DEFAULT } from './InMemoryCache';
-import { DEFAULT_TOKEN_METADATA_CACHE_TTL, DEFAULT_TOKEN_METADATA_SERVER_URL } from './Asset';
-import { EPOCH_POLL_INTERVAL_DEFAULT } from './util';
 import { URL } from 'url';
-import { buildInfoValidator, cacheTtlValidator } from './util/validators';
+import { cacheTtlValidator } from './util/validators';
 import { withCommonOptions, withOgmiosOptions, withPostgresOptions, withRabbitMqOptions } from './Program/options/';
 import fs from 'fs';
 import onDeath from 'death';
@@ -45,12 +45,6 @@ const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 // eslint-disable-next-line no-console
 console.log('Cardano Services CLI');
 
-const stringToBoolean = (value: string, program: Programs, option: string) => {
-  if (['0', 'f', 'false'].includes(value)) return false;
-  if (['1', 't', 'true'].includes(value)) return true;
-  throw new WrongOption(program, option, ['false', 'true']);
-};
-
 const program = new Command('cardano-services');
 
 program.version(packageJson.version);
@@ -65,7 +59,10 @@ withCommonOptions(
           .argument('[serviceNames...]', `List of services to attach: ${Object.values(ServiceNames).toString()}`)
       )
     )
-  )
+  ),
+  {
+    apiUrl: HTTP_SERVER_API_URL_DEFAULT
+  }
 )
   .addOption(
     new Option(
@@ -131,7 +128,9 @@ withCommonOptions(
     new Option('--use-queue <true/false>', HttpServerOptionDescriptions.UseQueue)
       .env('USE_QUEUE')
       .default(USE_QUEUE_DEFAULT)
-      .argParser((useQueue) => stringToBoolean(useQueue, Programs.HttpServer, HttpServerOptionDescriptions.UseQueue))
+      .argParser((useQueue) =>
+        stringOptionToBoolean(useQueue, Programs.HttpServer, HttpServerOptionDescriptions.UseQueue)
+      )
   )
   .addOption(
     new Option(
@@ -143,14 +142,11 @@ withCommonOptions(
       .argParser((interval) => Number.parseInt(interval, 10))
   )
   .action(async (serviceNames: ServiceNames[], options: { apiUrl: URL } & HttpServerOptions) => {
-    const { apiUrl, ...rest } = options;
-
     // Setting the service names via env variable takes preference over command line argument
-    const services = rest.serviceNames ? rest.serviceNames : serviceNames;
+    const services = options.serviceNames ? options.serviceNames : serviceNames;
     try {
       const server = await loadHttpServer({
-        apiUrl: apiUrl || API_URL_DEFAULT,
-        options: { ...rest, postgresConnectionString: connectionStringFromOptions(options) },
+        options: { ...options, postgresConnectionString: connectionStringFromOptions(options) },
         serviceNames: services
       });
       await server.initialize();
@@ -167,13 +163,18 @@ withCommonOptions(
   });
 
 withCommonOptions(
-  withOgmiosOptions(withRabbitMqOptions(program.command('start-worker').description('Start RabbitMQ worker')))
+  withOgmiosOptions(withRabbitMqOptions(program.command('start-worker').description('Start RabbitMQ worker'))),
+  {
+    apiUrl: TX_WORKER_API_URL_DEFAULT
+  }
 )
   .addOption(
     new Option('--parallel <true/false>', TxWorkerOptionDescriptions.Parallel)
       .env('PARALLEL')
       .default(PARALLEL_MODE_DEFAULT)
-      .argParser((parallel) => stringToBoolean(parallel, Programs.RabbitmqWorker, TxWorkerOptionDescriptions.Parallel))
+      .argParser((parallel) =>
+        stringOptionToBoolean(parallel, Programs.RabbitmqWorker, TxWorkerOptionDescriptions.Parallel)
+      )
   )
   .addOption(
     new Option('--parallel-txs <parallelTxs>', TxWorkerOptionDescriptions.ParallelTxs)

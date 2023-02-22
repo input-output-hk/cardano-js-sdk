@@ -1,4 +1,6 @@
 import { Logger } from 'ts-log';
+import { Programs } from './programs';
+import { WrongOption } from './errors';
 import dns, { SrvRecord } from 'dns';
 import pRetry, { FailedAttemptError } from 'p-retry';
 
@@ -38,7 +40,11 @@ export const createDnsResolver = (config: RetryBackoffConfig, logger: Logger) =>
   });
 export type DnsResolver = ReturnType<typeof createDnsResolver>;
 
-export const serviceSetHas = <ServiceNames>(
-  serviceNames: ServiceNames[],
-  cardanoNodeDependantServices: Set<ServiceNames>
-) => serviceNames.some((name) => cardanoNodeDependantServices.has(name));
+export const serviceSetHas = <ServiceNames>(serviceNames: ServiceNames[], services: Set<ServiceNames>) =>
+  serviceNames.some((name) => services.has(name));
+
+export const stringOptionToBoolean = (value: string, program: Programs, option: string) => {
+  if (['0', 'f', 'false'].includes(value)) return false;
+  if (['1', 't', 'true'].includes(value)) return true;
+  throw new WrongOption(program, option, ['false', 'true']);
+};

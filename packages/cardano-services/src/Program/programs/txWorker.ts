@@ -5,6 +5,7 @@ import { createDnsResolver } from '../utils';
 import { createLogger } from 'bunyan';
 import { getOgmiosTxSubmitProvider, getRunningTxSubmitWorker } from '../services';
 
+export const TX_WORKER_API_URL_DEFAULT = new URL('http://localhost:3001');
 export const PARALLEL_MODE_DEFAULT = false;
 export const PARALLEL_TXS_DEFAULT = 3;
 export const POLLING_CYCLE_DEFAULT = 500;
