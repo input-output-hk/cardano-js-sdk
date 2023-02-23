@@ -144,19 +144,17 @@ const prepareTrezorOutputs = (
         const multiAssetKeys = scope.manage(multiAsset.keys());
         for (let j = 0; j < multiAssetKeys.len(); j++) {
           const policy = scope.manage(multiAssetKeys.get(j));
-          const assets = scope.manage(multiAsset.get(policy));
+          const assets = scope.manage(multiAsset.get(policy))!;
           const tokens = [];
-          if (assets) {
-            const assetsKeys = scope.manage(assets.keys());
-            for (let k = 0; k < assetsKeys.len(); k++) {
-              const assetName = scope.manage(assetsKeys.get(k));
-              const amount = scope.manage(assets.get(assetName));
-              if (assetName && amount) {
-                tokens.push({
-                  amount: amount.to_str(),
-                  assetNameBytes: Buffer.from(assetName.name()).toString('hex')
-                });
-              }
+          const assetsKeys = scope.manage(assets.keys());
+          for (let k = 0; k < assetsKeys.len(); k++) {
+            const assetName = scope.manage(assetsKeys.get(k));
+            const amount = scope.manage(assets.get(assetName));
+            if (assetName && amount) {
+              tokens.push({
+                amount: amount.to_str(),
+                assetNameBytes: Buffer.from(assetName.name()).toString('hex')
+              });
             }
           }
           sortTokensCanonically(tokens);
@@ -395,15 +393,12 @@ const prepareTrezorMintBundle = (
         for (let k = 0; k < assetsKeys.len(); k++) {
           const assetName = scope.manage(assetsKeys.get(k));
           const amount = scope.manage(assets.get(assetName));
-          const positiveAmount = scope.manage(amount?.as_positive())?.to_str();
-          const negativeAmount = scope.manage(amount?.as_negative())?.to_str();
-          if (!amount || !positiveAmount || !negativeAmount) {
-            throw new HwMappingError('Missing token amount.');
+          if (amount) {
+            tokens.push({
+              amount: amount.to_str(),
+              assetNameBytes: Buffer.from(assetName.name()).toString('hex')
+            });
           }
-          tokens.push({
-            amount: amount.is_positive() ? positiveAmount : `-${negativeAmount}`,
-            assetNameBytes: Buffer.from(assetName.name()).toString('hex')
-          });
         }
       }
       sortTokensCanonically(tokens);
@@ -469,19 +464,17 @@ const prepareLedgerOutputs = (outputs: CML.TransactionOutputs, knownAddresses: G
         const multiAssetKeys = scope.manage(multiAsset.keys());
         for (let j = 0; j < multiAssetKeys.len(); j++) {
           const policy = scope.manage(multiAssetKeys.get(j));
-          const assets = scope.manage(multiAsset.get(policy));
+          const assets = scope.manage(multiAsset.get(policy))!;
           const tokens = [];
-          if (assets) {
-            const assetsKeys = scope.manage(assets.keys());
-            for (let k = 0; k < assetsKeys.len(); k++) {
-              const assetName = scope.manage(assetsKeys.get(k));
-              const amount = scope.manage(assets.get(assetName));
-              if (assetName && amount) {
-                tokens.push({
-                  amount: amount.to_str(),
-                  assetNameHex: Buffer.from(assetName.name()).toString('hex')
-                });
-              }
+          const assetsKeys = scope.manage(assets.keys());
+          for (let k = 0; k < assetsKeys.len(); k++) {
+            const assetName = scope.manage(assetsKeys.get(k));
+            const amount = scope.manage(assets.get(assetName));
+            if (assetName && amount) {
+              tokens.push({
+                amount: amount.to_str(),
+                assetNameHex: Buffer.from(assetName.name()).toString('hex')
+              });
             }
           }
           sortTokensCanonically(tokens);
@@ -809,15 +802,11 @@ const prepareLedgerMintBundle = (
         for (let k = 0; k < assetsKeys.len(); k++) {
           const assetName = scope.manage(assetsKeys.get(k));
           const amount = scope.manage(assets.get(assetName));
-          const positiveAmount = scope.manage(amount?.as_positive())?.to_str();
-          const negativeAmount = scope.manage(amount?.as_negative())?.to_str();
-          if (!amount || !positiveAmount || !negativeAmount) {
-            throw new HwMappingError('Missing token amount.');
-          }
-          tokens.push({
-            amount: amount.is_positive() ? positiveAmount : `-${negativeAmount}`,
-            assetNameHex: Buffer.from(assetName.name()).toString('hex')
-          });
+          if (amount)
+            tokens.push({
+              amount: amount.to_str(),
+              assetNameHex: Buffer.from(assetName.name()).toString('hex')
+            });
         }
       }
       sortTokensCanonically(tokens);
