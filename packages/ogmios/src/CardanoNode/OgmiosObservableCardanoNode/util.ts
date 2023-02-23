@@ -5,7 +5,7 @@ export const pointOrOriginToOgmios = (point: PointOrOrigin) =>
   point === 'origin'
     ? 'origin'
     : {
-        hash: point.hash.toString(),
+        hash: point.hash,
         slot: point.slot
       };
 

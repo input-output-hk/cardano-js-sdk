@@ -19,6 +19,6 @@ export const TxBodyCBOR = (tx: string): TxBodyCBOR => HexBlob(tx) as unknown as 
 TxBodyCBOR.fromTxCBOR = (txCbor: TxCBOR) =>
   Buffer.from(
     usingAutoFree((scope) =>
-      scope.manage(scope.manage(CML.Transaction.from_bytes(Buffer.from(txCbor.toString(), 'hex'))).body()).to_bytes()
+      scope.manage(scope.manage(CML.Transaction.from_bytes(Buffer.from(txCbor, 'hex'))).body()).to_bytes()
     )
   ).toString('hex') as unknown as TxBodyCBOR;

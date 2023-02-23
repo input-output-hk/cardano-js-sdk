@@ -40,9 +40,7 @@ export const stakeKeyRegistration = (scope: ManagedFreeableScope, stakeKeyHash: 
       scope.manage(
         StakeRegistration.new(
           scope.manage(
-            StakeCredential.from_keyhash(
-              scope.manage(Ed25519KeyHash.from_bytes(Buffer.from(stakeKeyHash.toString(), 'hex')))
-            )
+            StakeCredential.from_keyhash(scope.manage(Ed25519KeyHash.from_bytes(Buffer.from(stakeKeyHash, 'hex'))))
           )
         )
       )
@@ -55,9 +53,7 @@ export const stakeKeyDeregistration = (scope: ManagedFreeableScope, stakeKeyHash
       scope.manage(
         StakeDeregistration.new(
           scope.manage(
-            StakeCredential.from_keyhash(
-              scope.manage(Ed25519KeyHash.from_bytes(Buffer.from(stakeKeyHash.toString(), 'hex')))
-            )
+            StakeCredential.from_keyhash(scope.manage(Ed25519KeyHash.from_bytes(Buffer.from(stakeKeyHash, 'hex'))))
           )
         )
       )
@@ -122,9 +118,7 @@ export const poolRegistration = (
   for (const owner of owners) {
     const hash = scope.manage(
       scope
-        .manage(
-          scope.manage(RewardAddress.from_address(scope.manage(Address.from_bech32(owner.toString()))))!.payment_cred()
-        )
+        .manage(scope.manage(RewardAddress.from_address(scope.manage(Address.from_bech32(owner))))!.payment_cred())
         .to_keyhash()
     )!;
     cslOwners.add(hash);
@@ -132,7 +126,7 @@ export const poolRegistration = (
   const cslRelays = createCslRelays(scope, relays);
   const poolParams = scope.manage(
     PoolParams.new(
-      scope.manage(Ed25519KeyHash.from_bech32(id.toString())),
+      scope.manage(Ed25519KeyHash.from_bech32(id)),
       scope.manage(VRFKeyHash.from_bytes(Buffer.from(vrf, 'hex'))),
       scope.manage(BigNum.from_str(pledge.toString())),
       scope.manage(BigNum.from_str(cost.toString())),
@@ -142,7 +136,7 @@ export const poolRegistration = (
           scope.manage(BigNum.from_str(margin.denominator.toString()))
         )
       ),
-      scope.manage(RewardAddress.from_address(scope.manage(Address.from_bech32(rewardAccount.toString())))!),
+      scope.manage(RewardAddress.from_address(scope.manage(Address.from_bech32(rewardAccount)))!),
       cslOwners,
       cslRelays,
       metadataJson
@@ -161,7 +155,7 @@ export const poolRegistration = (
 export const poolRetirement = (scope: ManagedFreeableScope, poolId: Cardano.PoolId, epoch: number) =>
   scope.manage(
     Certificate.new_pool_retirement(
-      scope.manage(PoolRetirement.new(scope.manage(Ed25519KeyHash.from_bech32(poolId.toString())), epoch))
+      scope.manage(PoolRetirement.new(scope.manage(Ed25519KeyHash.from_bech32(poolId)), epoch))
     )
   );
 
@@ -176,11 +170,9 @@ export const stakeDelegation = (
       scope.manage(
         StakeDelegation.new(
           scope.manage(
-            StakeCredential.from_keyhash(
-              scope.manage(Ed25519KeyHash.from_bytes(Buffer.from(stakeKeyHash.toString(), 'hex')))
-            )
+            StakeCredential.from_keyhash(scope.manage(Ed25519KeyHash.from_bytes(Buffer.from(stakeKeyHash, 'hex'))))
           ),
-          scope.manage(Ed25519KeyHash.from_bech32(delegatee.toString()))
+          scope.manage(Ed25519KeyHash.from_bech32(delegatee))
         )
       )
     )
@@ -194,9 +186,9 @@ const genesisKeyDelegation = (
     Certificate.new_genesis_key_delegation(
       scope.manage(
         GenesisKeyDelegation.new(
-          scope.manage(GenesisHash.from_hex(genesisHash.toString())),
-          scope.manage(GenesisDelegateHash.from_hex(genesisDelegateHash.toString())),
-          scope.manage(VRFKeyHash.from_hex(vrfKeyHash.toString()))
+          scope.manage(GenesisHash.from_hex(genesisHash)),
+          scope.manage(GenesisDelegateHash.from_hex(genesisDelegateHash)),
+          scope.manage(VRFKeyHash.from_hex(vrfKeyHash))
         )
       )
     )

@@ -262,7 +262,7 @@ describe('UtxoHttpService', () => {
           if (!assets) continue;
 
           for (const id of assets.keys()) {
-            if (Asset.util.assetNameFromAssetId(Cardano.AssetId(id)).toString() === '') {
+            if (Asset.util.assetNameFromAssetId(Cardano.AssetId(id)) === '') {
               txOutWithAssetThatHasNoName = output;
             }
           }

@@ -138,7 +138,7 @@ describe('local-network/register-pool', () => {
     });
 
     expect(result.pageResults.length).toBeGreaterThan(0);
-    expect(result.pageResults[0].hexId).toBe(Cardano.PoolIdHex(poolKeyHash.toString()));
+    expect(result.pageResults[0].hexId).toBe(Cardano.PoolIdHex(poolKeyHash));
     expect(result.pageResults[0].id).toBe(poolId);
     expect(result.pageResults[0].status).toBe(Cardano.StakePoolStatus.Activating);
     expect(result.pageResults[0].metrics.livePledge).toBeLessThan(result.pageResults[0].pledge);
@@ -220,7 +220,7 @@ describe('local-network/register-pool', () => {
     });
 
     expect(result.pageResults.length).toBeGreaterThan(0);
-    expect(result.pageResults[0].hexId).toBe(Cardano.PoolIdHex(poolKeyHash.toString()));
+    expect(result.pageResults[0].hexId).toBe(Cardano.PoolIdHex(poolKeyHash));
     expect(result.pageResults[0].id).toBe(poolId);
     expect(result.pageResults[0].status).toBe(Cardano.StakePoolStatus.Activating);
     expect(result.pageResults[0].metrics.livePledge).toBeGreaterThan(result.pageResults[0].pledge);

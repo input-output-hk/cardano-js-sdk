@@ -22,4 +22,4 @@ TxCBOR.serialize = (tx: Cardano.Tx): TxCBOR =>
 /**
  * Deserialize transaction from hex-encoded CBOR
  */
-TxCBOR.deserialize = (tx: TxCBOR): Cardano.Tx => cmlUtil.deserializeTx(tx.toString());
+TxCBOR.deserialize = (tx: TxCBOR): Cardano.Tx => cmlUtil.deserializeTx(tx);

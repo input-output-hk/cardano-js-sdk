@@ -656,7 +656,7 @@ export const getIdentifierWhereClause = (
   const tickers = [];
   const ids = [];
   for (const value of identifier.values) {
-    value.id && ids.push(value.id.toString());
+    value.id && ids.push(value.id);
     value.ticker && tickers.push(value.ticker);
     value.name && names.push(value.name);
   }
