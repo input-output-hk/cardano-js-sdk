@@ -14,8 +14,7 @@ import groupBy from 'lodash/groupBy';
 
 const DELEGATION_EPOCHS_AHEAD_COUNT = 2;
 
-export const calcFirstDelegationEpoch = (epoch: Cardano.EpochNo): number =>
-  epoch.valueOf() + DELEGATION_EPOCHS_AHEAD_COUNT;
+export const calcFirstDelegationEpoch = (epoch: Cardano.EpochNo): number => epoch + DELEGATION_EPOCHS_AHEAD_COUNT;
 
 const sumRewards = (arrayOfRewards: EpochRewards[]) => BigIntMath.sum(arrayOfRewards.map(({ rewards }) => rewards));
 const avgReward = (arrayOfRewards: EpochRewards[]) => sumRewards(arrayOfRewards) / BigInt(arrayOfRewards.length);

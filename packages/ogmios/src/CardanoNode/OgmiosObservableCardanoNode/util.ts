@@ -5,8 +5,8 @@ export const pointOrOriginToOgmios = (point: PointOrOrigin) =>
   point === 'origin'
     ? 'origin'
     : {
-        hash: point.hash.toString(),
-        slot: point.slot.valueOf()
+        hash: point.hash,
+        slot: point.slot
       };
 
 export const ogmiosToCorePoint = (point: Schema.Point) => ({

@@ -51,10 +51,7 @@ export const AssetFingerprint = (value: string): AssetFingerprint => typedBech32
  * @param assetName The native asset name.
  */
 AssetFingerprint.fromParts = (policyId: PolicyId, assetName: AssetName): AssetFingerprint => {
-  const cip14Fingerprint = cip14.fromParts(
-    Buffer.from(policyId.toString(), 'hex'),
-    Buffer.from(assetName.toString(), 'hex')
-  );
+  const cip14Fingerprint = cip14.fromParts(Buffer.from(policyId, 'hex'), Buffer.from(assetName, 'hex'));
 
   return AssetFingerprint(cip14Fingerprint.fingerprint());
 };

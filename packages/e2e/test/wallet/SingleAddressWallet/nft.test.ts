@@ -84,7 +84,7 @@ describe('SingleAddressWallet.assets/nft', () => {
     walletAddress = (await firstValueFrom(wallet.addresses$))[0].address;
 
     const txMetadatum = metadatum.jsonToMetadatum({
-      [policyId.toString()]: {
+      [policyId]: {
         'NFT-001': {
           image: ['ipfs://some_hash1'],
           name: 'One',
@@ -193,7 +193,7 @@ describe('SingleAddressWallet.assets/nft', () => {
         otherProperties: new Map([['version', '1.0']]),
         version: '1.0'
       },
-      policyId: policyId.toString(),
+      policyId,
       quantity: 1n,
       tokenMetadata: null
     });
@@ -235,7 +235,7 @@ describe('SingleAddressWallet.assets/nft', () => {
         ]),
         version: '1.0'
       },
-      policyId: policyId.toString(),
+      policyId,
       quantity: 1n,
       tokenMetadata: null
     });
@@ -299,7 +299,7 @@ describe('SingleAddressWallet.assets/nft', () => {
 
         const txDataMetadatum = new Map([
           [
-            version === 1 ? policyId.toString() : Buffer.from(policyId.toString(), 'hex'),
+            version === 1 ? policyId : Buffer.from(policyId, 'hex'),
             new Map([
               [
                 version === 1 ? (encoding === 'hex' ? assetNameHex : assetName) : Buffer.from(assetName),
@@ -363,7 +363,7 @@ describe('SingleAddressWallet.assets/nft', () => {
             otherProperties: new Map([['version', '1.0']]),
             version: '1.0'
           },
-          policyId: policyId.toString(),
+          policyId,
           quantity: 1n,
           tokenMetadata: null
         });

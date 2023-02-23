@@ -60,7 +60,7 @@ const sortTokensCanonically = (tokens: trezor.CardanoToken[] | ledger.Token[]) =
 
 const getRewardAccountKeyHash = (rewardAccount: Cardano.RewardAccount) =>
   usingAutoFree((scope) => {
-    const address = scope.manage(CML.Address.from_bech32(rewardAccount.toString()));
+    const address = scope.manage(CML.Address.from_bech32(rewardAccount));
     const rewardAddress = scope.manage(CML.RewardAddress.from_address(address));
     const paymentCred = scope.manage(rewardAddress!.payment_cred());
     const keyHash = scope.manage(paymentCred.to_keyhash());
@@ -84,7 +84,7 @@ const bytesToIp = (bytes?: Uint8Array) => {
 
 const matchGroupedAddress = (knownAddresses: GroupedAddress[], outputAddress: Buffer): GroupedAddress | undefined => {
   const outputAddressBech32 = ledger.utils.bech32_encodeAddress(outputAddress);
-  return knownAddresses.find(({ address }) => address.toString() === outputAddressBech32);
+  return knownAddresses.find(({ address }) => address === outputAddressBech32);
 };
 
 const prepareTrezorInputs = async (
@@ -720,7 +720,7 @@ const prepareLedgerCertificates = (
         const poolRewardAccount = scope.manage(params.reward_account());
         const rewardAccountBytes = Buffer.from(scope.manage(poolRewardAccount.to_address()).to_bytes());
         const isDeviceOwned = knownAddresses.some(
-          ({ address }) => address.toString() === ledger.utils.bech32_encodeAddress(rewardAccountBytes)
+          ({ address }) => address === ledger.utils.bech32_encodeAddress(rewardAccountBytes)
         );
         const rewardAccount: ledger.PoolRewardAccount = isDeviceOwned
           ? {
@@ -871,7 +871,7 @@ export const txToLedger = async ({
   // TX - Certificates
   const cslCertificates = scope.manage(cslTxBody.certs());
   const ledgerCertificatesData = cslCertificates
-    ? prepareLedgerCertificates(cslCertificates, knownAddresses, rewardAccountKeyPath, rewardAccountKeyHash.toString())
+    ? prepareLedgerCertificates(cslCertificates, knownAddresses, rewardAccountKeyPath, rewardAccountKeyHash)
     : null;
   const signingMode = ledgerCertificatesData?.signingMode || ledger.TransactionSigningMode.ORDINARY_TRANSACTION;
 
@@ -968,11 +968,7 @@ export const txToTrezor = async ({
   const cslCertificates = scope.manage(cslTxBody.certs());
   let trezorCertificatesData;
   if (cslCertificates) {
-    trezorCertificatesData = prepareTrezorCertificates(
-      cslCertificates,
-      rewardAccountKeyPath,
-      rewardAccountKeyHash.toString()
-    );
+    trezorCertificatesData = prepareTrezorCertificates(cslCertificates, rewardAccountKeyPath, rewardAccountKeyHash);
   }
   const signingMode = trezorCertificatesData?.signingMode || trezor.CardanoTxSigningMode.ORDINARY_TRANSACTION;
 
@@ -986,7 +982,7 @@ export const txToTrezor = async ({
     ttl = cslTTL.toString();
   }
 
-  const validityIntervalStart = cslTxBody.validity_start_interval();
+  const validityIntervalStart = cslTxBody.validity_start_interval()?.to_str();
 
   // TX  - auxiliaryData
   const txBodyAuxDataHash = scope.manage(cslTxBody.auxiliary_data_hash());
@@ -1017,7 +1013,7 @@ export const txToTrezor = async ({
     protocolMagic: chainId.networkMagic,
     signingMode,
     ttl,
-    validityIntervalStart: validityIntervalStart?.toString(),
+    validityIntervalStart,
     withdrawals: trezorWithdrawals
   };
 };

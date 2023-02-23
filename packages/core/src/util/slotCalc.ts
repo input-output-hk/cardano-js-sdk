@@ -30,7 +30,7 @@ const createSlotEpochCalcImpl = (eraSummaries: EraSummary[]) => {
   const eraSummariesAsc = orderBy(eraSummariesWithoutSkippedEras, ({ start }) => start.slot);
   return (slotNo: Slot) => {
     const relevantEraSummariesAsc = orderBy(
-      eraSummariesAsc.filter(({ start }) => start.slot <= slotNo.valueOf()),
+      eraSummariesAsc.filter(({ start }) => start.slot <= slotNo),
       ({ start }) => start.slot
     );
     if (relevantEraSummariesAsc.length === 0) {
@@ -42,7 +42,7 @@ const createSlotEpochCalcImpl = (eraSummaries: EraSummary[]) => {
       currentEraSummary = relevantEraSummariesAsc[i];
       const nextEraSummary: EraSummary | undefined = relevantEraSummariesAsc[i + 1];
       epochNo += Math.floor(
-        ((nextEraSummary?.start.slot || slotNo.valueOf()) - currentEraSummary.start.slot) /
+        ((nextEraSummary?.start.slot || slotNo) - currentEraSummary.start.slot) /
           currentEraSummary.parameters.epochLength
       );
     }
@@ -76,13 +76,13 @@ export const createSlotTimeCalc = (eraSummaries: EraSummary[]) => {
    * @returns {Date} date of the slot
    */
   return (slotNo: Slot): Date => {
-    const activeEraSummary = eraSummariesDesc.find(({ start }) => start.slot <= slotNo.valueOf());
+    const activeEraSummary = eraSummariesDesc.find(({ start }) => start.slot <= slotNo);
     if (!activeEraSummary) {
       throw new EraSummaryError(`No EraSummary for slot ${slotNo} found`);
     }
     return new Date(
       activeEraSummary.start.time.getTime() +
-        (slotNo.valueOf() - activeEraSummary.start.slot) * activeEraSummary.parameters.slotLength.valueOf()
+        (slotNo - activeEraSummary.start.slot) * activeEraSummary.parameters.slotLength
     );
   };
 };
@@ -101,7 +101,7 @@ export const createSlotEpochInfoCalc = (eraSummaries: EraSummary[]) => {
     const { epochNo, epochEraSummary } = epochCalc(slot);
     const firstSlot =
       epochEraSummary.start.slot +
-      Math.floor((slot.valueOf() - epochEraSummary.start.slot) / epochEraSummary.parameters.epochLength) *
+      Math.floor((slot - epochEraSummary.start.slot) / epochEraSummary.parameters.epochLength) *
         epochEraSummary.parameters.epochLength;
     const lastSlot = firstSlot + epochEraSummary.parameters.epochLength - 1;
     return {

@@ -20,7 +20,7 @@ describe('TxBodyCBOR', () => {
       const bodyCbor = TxBodyCBOR.fromTxCBOR(txCbor);
       expect(bodyCbor.length).toBeGreaterThan(0);
       expect(bodyCbor.length).toBeLessThan(txCbor.length);
-      expect(txCbor.includes(bodyCbor.toString())).toBe(true);
+      expect(txCbor.includes(bodyCbor)).toBe(true);
     });
   });
 });

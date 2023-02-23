@@ -28,9 +28,7 @@ TransactionId.fromTxBodyCbor = (bodyCbor: TxBodyCBOR): TransactionId =>
   bytesToHex(
     usingAutoFree((scope) =>
       scope
-        .manage(
-          CML.hash_transaction(scope.manage(CML.TransactionBody.from_bytes(hexStringToBuffer(bodyCbor.toString()))))
-        )
+        .manage(CML.hash_transaction(scope.manage(CML.TransactionBody.from_bytes(hexStringToBuffer(bodyCbor)))))
         .to_bytes()
     )
   ) as unknown as TransactionId;

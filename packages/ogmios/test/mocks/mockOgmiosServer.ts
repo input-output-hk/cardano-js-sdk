@@ -323,7 +323,7 @@ export const waitForWsClientsDisconnect = (server: Server, timeout: Milliseconds
         }
       }
     }),
-    delay(timeout.valueOf()).then(() => {
+    delay(timeout).then(() => {
       throw new Error(`Websocket clients did not disconnect in ${timeout}`);
     })
   ]);

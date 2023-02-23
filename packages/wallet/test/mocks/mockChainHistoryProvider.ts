@@ -51,7 +51,7 @@ export const queryTransactionsResult: Paginated<Cardano.HydratedTx> = {
     {
       blockHeader: {
         blockNo: Cardano.BlockNo(10_050),
-        slot: Cardano.Slot(ledgerTip.slot.valueOf() - 150_000)
+        slot: Cardano.Slot(ledgerTip.slot - 150_000)
       } as Cardano.PartialBlockHeader,
       body: {
         certificates: [
@@ -96,7 +96,7 @@ export const queryTransactionsResult: Paginated<Cardano.HydratedTx> = {
           }
         ],
         validityInterval: {
-          invalidHereafter: Cardano.Slot(ledgerTip.slot.valueOf() + 1)
+          invalidHereafter: Cardano.Slot(ledgerTip.slot + 1)
         }
       },
       id: Cardano.TransactionId('12fa9af65e21b36ec4dc4cbce478e911d52585adb46f2b4fe3d6563e7ee5a61a'),
@@ -109,7 +109,7 @@ export const queryTransactionsResult: Paginated<Cardano.HydratedTx> = {
     {
       blockHeader: {
         blockNo: Cardano.BlockNo(10_100),
-        slot: Cardano.Slot(ledgerTip.slot.valueOf() - 100_000)
+        slot: Cardano.Slot(ledgerTip.slot - 100_000)
       } as Cardano.PartialBlockHeader,
       body: {
         fee: 123n,
@@ -131,7 +131,7 @@ export const queryTransactionsResult: Paginated<Cardano.HydratedTx> = {
           }
         ],
         validityInterval: {
-          invalidHereafter: Cardano.Slot(ledgerTip.slot.valueOf() + 1)
+          invalidHereafter: Cardano.Slot(ledgerTip.slot + 1)
         }
       },
       id: Cardano.TransactionId('6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad'),
@@ -152,7 +152,7 @@ export const queryTransactionsResult2: Paginated<Cardano.HydratedTx> = {
       ...queryTransactionsResult.pageResults[1],
       blockHeader: {
         blockNo: Cardano.BlockNo(10_150),
-        slot: Cardano.Slot(ledgerTip.slot.valueOf() - 50_000)
+        slot: Cardano.Slot(ledgerTip.slot - 50_000)
       },
       id: Cardano.TransactionId('6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99caa')
     } as Cardano.HydratedTx

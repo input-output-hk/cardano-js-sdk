@@ -140,8 +140,8 @@ export const projectIntoSink = <P extends object, PS extends P>(
                   point === 'origin'
                     ? 'origin'
                     : {
-                        hash: point.hash.toString(),
-                        slot: point.slot.valueOf()
+                        hash: point.hash,
+                        slot: point.slot
                       }
                 )
               );

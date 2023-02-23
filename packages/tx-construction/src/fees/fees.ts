@@ -88,7 +88,7 @@ export const MinFeeCoefficient = (value: number): MinFeeCoefficient => value as 
  */
 const minNoScriptFee = (tx: Cardano.Tx, minFeeConstant: MinFeeConstant, minFeeCoefficient: MinFeeCoefficient) => {
   const txSize = serializeTx(tx).length;
-  return BigInt(Math.ceil(txSize * minFeeCoefficient.valueOf() + minFeeConstant.valueOf()));
+  return BigInt(Math.ceil(txSize * minFeeCoefficient + minFeeConstant));
 };
 
 /**

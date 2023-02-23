@@ -71,9 +71,9 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) im
       const currentEpoch = slotEpochCalc(result.slot);
 
       // On epoch rollover, invalidate the cache before returning
-      if (this.#currentEpoch.valueOf() !== currentEpoch.valueOf()) {
+      if (this.#currentEpoch !== currentEpoch) {
         // The first time, no need to invalidate the cache
-        if (this.#currentEpoch.valueOf() !== 0) this.#epochMonitor.onEpoch(currentEpoch);
+        if (this.#currentEpoch !== 0) this.#epochMonitor.onEpoch(currentEpoch);
 
         this.#currentEpoch = currentEpoch;
       }

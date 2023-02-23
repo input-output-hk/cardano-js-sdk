@@ -92,18 +92,15 @@ const mapFile = (metadatum: Cardano.Metadatum, assetId: Cardano.AssetId, logger:
  * @param policy The `MetadatumMap` containing the NFT metadata for all the NFT assets
  * @returns The `MetadatumMap` containing the NFT metadata for all the NFT assets with the given policyId
  */
-const getPolicyMetadata = (policy: Cardano.MetadatumMap, policyId: Cardano.PolicyId) => {
-  const policyIdString = policyId.toString();
-
-  return asMetadatumMap(
-    policy.get(policyIdString) ||
+const getPolicyMetadata = (policy: Cardano.MetadatumMap, policyId: Cardano.PolicyId) =>
+  asMetadatumMap(
+    policy.get(policyId) ||
       (() => {
         for (const [key, value] of policy.entries()) {
-          if (ArrayBuffer.isView(key) && Buffer.from(key).toString('hex') === policyIdString) return value;
+          if (ArrayBuffer.isView(key) && Buffer.from(key).toString('hex') === policyId) return value;
         }
       })()
   );
-};
 
 /**
  * Gets the `NFTMetadata` relative to the given assetName from the given `Map<AssetName, NFTMetadata>`.
@@ -113,19 +110,16 @@ const getPolicyMetadata = (policy: Cardano.MetadatumMap, policyId: Cardano.Polic
  * @param policy The `MetadatumMap` containing the NFT metadata for all the NFT assets with a specific policyId.
  * @returns The NFT metadata for the requested asset
  */
-const getAssetMetadata = (policy: Cardano.MetadatumMap, assetName: Cardano.AssetName) => {
-  const assetNameString = assetName.toString();
-
-  return asMetadatumMap(
-    policy.get(assetNameString) ||
-      policy.get(Buffer.from(assetNameString, 'hex').toString('utf8')) ||
+const getAssetMetadata = (policy: Cardano.MetadatumMap, assetName: Cardano.AssetName) =>
+  asMetadatumMap(
+    policy.get(assetName) ||
+      policy.get(Buffer.from(assetName, 'hex').toString('utf8')) ||
       (() => {
         for (const [key, value] of policy.entries()) {
-          if (ArrayBuffer.isView(key) && Buffer.from(key).toString('hex') === assetNameString) return value;
+          if (ArrayBuffer.isView(key) && Buffer.from(key).toString('hex') === assetName) return value;
         }
       })()
   );
-};
 
 // TODO: consider hoisting this function together with cip25 types to core or a new cip25 package
 /**

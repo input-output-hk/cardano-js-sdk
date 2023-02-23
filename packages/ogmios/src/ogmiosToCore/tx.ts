@@ -216,7 +216,7 @@ const mapBootstrapWitness = (b: Schema.BootstrapWitness): Cardano.BootstrapWitne
   addressAttributes: b.addressAttributes ? Base64Blob(b.addressAttributes) : undefined,
   chainCode: b.chainCode ? HexBlob(b.chainCode) : undefined,
   key: Crypto.Ed25519PublicKeyHex(b.key!),
-  signature: Crypto.Ed25519SignatureHex(HexBlob.fromBase64(b.signature!).toString())
+  signature: Crypto.Ed25519SignatureHex(HexBlob.fromBase64(b.signature!))
 });
 
 const mapRedeemer = (key: string, redeemer: Schema.Redeemer): Cardano.Redeemer => {
@@ -328,7 +328,7 @@ const mapCommonTx = (tx: CommonBlock['body'][0], kind: BlockKind): Cardano.Tx =>
     signatures: new Map(
       Object.entries(tx.witness.signatures).map(([key, value]) => [
         Crypto.Ed25519PublicKeyHex(key),
-        Crypto.Ed25519SignatureHex(HexBlob.fromBase64(value).toString())
+        Crypto.Ed25519SignatureHex(HexBlob.fromBase64(value))
       ])
     )
   }
@@ -338,7 +338,7 @@ export const mapCommonBlockBody = ({ body }: CommonBlock, kind: BlockKind): Card
   body.map((blockBody) => mapCommonTx(blockBody, kind));
 
 export const mapByronTxFee = ({ raw }: Schema.TxByron) => {
-  const txSize = Buffer.from(Base64Blob(raw).toString(), 'base64').length;
+  const txSize = Buffer.from(Base64Blob(raw), 'base64').length;
   return BigInt(BYRON_TX_FEE_COEFFICIENT * txSize + BYRON_TX_FEE_CONSTANT);
 };
 

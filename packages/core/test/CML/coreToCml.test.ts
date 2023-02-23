@@ -50,7 +50,7 @@ describe('coreToCml', () => {
       const cmlTxOut = coreToCml.txOut(scope, txOutWithDatum);
       const dataHash = scope.manage(scope.manage(cmlTxOut.datum())?.as_data_hash());
       expect(dataHash).toBeInstanceOf(CML.DataHash);
-      expect(Buffer.from(dataHash!.to_bytes()).toString('hex')).toBe(txOutWithDatum.datumHash?.toString());
+      expect(Buffer.from(dataHash!.to_bytes()).toString('hex')).toBe(txOutWithDatum.datumHash);
     });
   });
   it('utxo', () => {

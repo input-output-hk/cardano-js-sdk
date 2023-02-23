@@ -46,7 +46,7 @@ const assertServiceHealthy = async (
     ? { ok: true }
     : healthCheckResponseMock({
         projectedTip: {
-          blockNo: lastBlock!.block_no.valueOf(),
+          blockNo: lastBlock!.block_no,
           hash: lastBlock!.hash.toString('hex'),
           slot: Number(lastBlock!.slot_no)
         },

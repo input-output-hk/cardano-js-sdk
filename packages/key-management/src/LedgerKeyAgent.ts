@@ -239,7 +239,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
         this.deviceConnection
       );
       const result = await deviceConnection.signTransaction(ledgerTxData);
-      if (result.txHashHex !== hash.toString()) {
+      if (result.txHashHex !== hash) {
         throw new HwMappingError('Ledger computed a different transaction id');
       }
 

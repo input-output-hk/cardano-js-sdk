@@ -84,7 +84,7 @@ const compareUtxos = (utxo: Cardano.Utxo, comparedTo: Cardano.Utxo) => {
 
 const cardanoAddressToCbor = (address: Cardano.Address | Cardano.RewardAccount): Cbor =>
   usingAutoFree((scope) => {
-    const cmlAddr = parseCmlAddress(scope, address.toString());
+    const cmlAddr = parseCmlAddress(scope, address);
     if (!cmlAddr) {
       throw new ApiError(APIErrorCode.InternalError, `could not transform address ${address} to CBOR`);
     }
@@ -258,7 +258,7 @@ export const createWalletApi = (
   signData: async (addr: Cardano.Address | Bytes, payload: Bytes): Promise<Cip30DataSignature> => {
     logger.debug('signData');
     const hexBlobPayload = HexBlob(payload);
-    const signWith = Cardano.Address(addr.toString());
+    const signWith = Cardano.Address(addr);
 
     const shouldProceed = await confirmationCallback({
       data: {
@@ -325,7 +325,7 @@ export const createWalletApi = (
       try {
         const wallet = await firstValueFrom(wallet$);
         await wallet.submitTx(cbor);
-        return tx.id.toString();
+        return tx.id;
       } catch (error) {
         logger.error(error);
         throw error;

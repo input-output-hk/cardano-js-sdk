@@ -121,7 +121,7 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
       );
     }
 
-    const byteIds = ids.map((id) => hexStringToBuffer(id.toString()));
+    const byteIds = ids.map((id) => hexStringToBuffer(id));
     this.logger.debug('About to find transactions with hashes:', byteIds);
     const txResults: QueryResult<TxModel> = await this.db.query(Queries.findTransactionsByHashes, [byteIds]);
     if (txResults.rows.length === 0) return [];
@@ -170,7 +170,7 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
     const tip: TipModel = tipResult.rows[0];
     if (!tip) return [];
 
-    const byteIds = ids.map((id) => hexStringToBuffer(id.toString()));
+    const byteIds = ids.map((id) => hexStringToBuffer(id));
     this.logger.debug('About to find blocks with hashes:', byteIds);
     const blocksResult: QueryResult<BlockModel> = await this.db.query(Queries.findBlocksByHashes, [byteIds]);
     if (blocksResult.rows.length === 0) return [];

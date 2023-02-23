@@ -83,7 +83,7 @@ describe('cip30', () => {
             // Validity interval of serializedTx is 20263284 <= n <= 20266884
             slot: Cardano.Slot(20_263_285)
           });
-          await expect(api.submitTx(serializedTx.toString())).resolves.not.toThrow();
+          await expect(api.submitTx(serializedTx)).resolves.not.toThrow();
           expect(providers.txSubmitProvider.submitTx).toHaveBeenCalledWith({ signedTransaction: serializedTx });
         });
       });
@@ -259,7 +259,7 @@ describe('cip30', () => {
 
       test('api.signData', async () => {
         const [{ address }] = await firstValueFrom(wallet.addresses$);
-        const cip30dataSignature = await api.signData(address, HexBlob('abc123').toString());
+        const cip30dataSignature = await api.signData(address, HexBlob('abc123'));
         expect(typeof cip30dataSignature.key).toBe('string');
         expect(typeof cip30dataSignature.signature).toBe('string');
       });
@@ -319,9 +319,7 @@ describe('cip30', () => {
 
           const expectedAddr = wallet.addresses$.value![0].address;
 
-          const hexAddr = Buffer.from(
-            scope.manage(CML.Address.from_bech32(expectedAddr.toString())).to_bytes()
-          ).toString('hex');
+          const hexAddr = Buffer.from(scope.manage(CML.Address.from_bech32(expectedAddr)).to_bytes()).toString('hex');
 
           await api.signData(hexAddr, payload);
           expect(confirmationCallback).toHaveBeenCalledWith(

@@ -39,7 +39,7 @@ describe('Transaction.createTransactionInternals', () => {
         'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9'
       ),
       validityInterval: {
-        invalidHereafter: Cardano.Slot(ledgerTip.slot.valueOf() + 3600)
+        invalidHereafter: Cardano.Slot(ledgerTip.slot + 3600)
       },
       ...overrides,
       inputSelection: {

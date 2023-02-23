@@ -9,13 +9,13 @@ export const assetNameFromAssetId = (assetId: AssetId): AssetName => AssetName(a
  * @returns {string} concatenated hex-encoded policy id and asset name
  */
 export const createAssetId = (scriptHash: CML.ScriptHash, assetName: CML.AssetName): AssetId =>
-  AssetId(bytesToHex(scriptHash.to_bytes()) + bytesToHex(assetName.name()).toString());
+  AssetId(bytesToHex(scriptHash.to_bytes()) + bytesToHex(assetName.name()));
 
 /**
  * @returns {AssetId} concatenated policy id and asset name
  */
 export const assetIdFromPolicyAndName = (policyId: PolicyId, assetName: AssetName): AssetId =>
-  AssetId(policyId.toString() + assetName.toString());
+  AssetId(policyId + assetName);
 
 export const parseAssetId = (assetId: AssetId) => {
   const policyId = policyIdFromAssetId(assetId);

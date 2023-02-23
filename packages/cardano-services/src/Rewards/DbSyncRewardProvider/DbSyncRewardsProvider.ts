@@ -44,7 +44,7 @@ export class DbSyncRewardsProvider extends DbSyncProvider() implements RewardsPr
     return rewardsToCore(rewards);
   }
   public async rewardAccountBalance({ rewardAccount }: RewardAccountBalanceArgs) {
-    this.logger.debug(`About to get balance of reward account ${rewardAccount.toString()}`);
+    this.logger.debug(`About to get balance of reward account ${rewardAccount}`);
     const balance = await this.#builder.getAccountBalance(rewardAccount);
     return BigInt(balance?.balance || '0');
   }

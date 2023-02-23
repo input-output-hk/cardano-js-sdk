@@ -14,7 +14,7 @@ export const calcTimeOffsetSlotNumber = (
   startSlot: Cardano.Slot,
   seconds: Seconds,
   slotLength: Seconds
-): Cardano.Slot => Cardano.Slot(startSlot.valueOf() + seconds.valueOf() * slotLength.valueOf());
+): Cardano.Slot => Cardano.Slot(startSlot + seconds * slotLength);
 
 /**
  * Configures {@link "@cardano-sdk/core".Cardano.ValidityInterval.invalidHereafter} to the slot number equivalent to

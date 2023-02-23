@@ -73,7 +73,7 @@ export const nativeScript = (script: CML.NativeScript): Cardano.NativeScript =>
         coreScript = {
           __type: Cardano.ScriptType.Native,
           keyHash: Crypto.Ed25519KeyHashHex(
-            bytesToHex(scope.manage(scope.manage(script.as_script_pubkey())!.addr_keyhash()).to_bytes()).toString()
+            bytesToHex(scope.manage(scope.manage(script.as_script_pubkey())!.addr_keyhash()).to_bytes())
           ),
           kind: Cardano.NativeScriptKind.RequireSignature
         };

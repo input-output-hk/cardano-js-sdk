@@ -47,8 +47,8 @@ describe('RewardsBuilder', () => {
       const result = await builder.getRewardsHistory([rewardAccWithBalance], epochs);
       expect(result.length).toBeGreaterThan(0);
       for (const reward of result) {
-        expect(Number(reward.epoch)).toBeGreaterThanOrEqual(epochs.lowerBound.valueOf());
-        expect(Number(reward.epoch)).toBeLessThanOrEqual(epochs.upperBound.valueOf());
+        expect(Number(reward.epoch)).toBeGreaterThanOrEqual(epochs.lowerBound);
+        expect(Number(reward.epoch)).toBeLessThanOrEqual(epochs.upperBound);
       }
     });
     it('returns RewardEpochModel when there is partially epochs field with lowerBound', async () => {
@@ -56,14 +56,14 @@ describe('RewardsBuilder', () => {
       const epochs = { lowerBound: Cardano.EpochNo(1) };
       const result = await builder.getRewardsHistory([rewardAccWithBalance], epochs);
       expect(result.length).toBeGreaterThan(0);
-      for (const reward of result) expect(Number(reward.epoch)).toBeGreaterThanOrEqual(epochs.lowerBound.valueOf());
+      for (const reward of result) expect(Number(reward.epoch)).toBeGreaterThanOrEqual(epochs.lowerBound);
     });
     it('returns RewardEpochModel when there is partially epochs field with upperBound', async () => {
       const rewardAccWithBalance = (await fixtureBuilder.getRewardAccounts(1))[0];
       const epochs = { upperBound: Cardano.EpochNo(90) };
       const result = await builder.getRewardsHistory([rewardAccWithBalance], epochs);
       expect(result.length).toBeGreaterThan(0);
-      for (const reward of result) expect(Number(reward.epoch)).toBeLessThanOrEqual(epochs.upperBound.valueOf());
+      for (const reward of result) expect(Number(reward.epoch)).toBeLessThanOrEqual(epochs.upperBound);
     });
   });
 });

@@ -48,7 +48,7 @@ const createForkProjectionSource = (forkFromNode: ObservableCardanoNode): Observ
           const nextEvt = events.shift();
           if (nextEvt) {
             const slot = Cardano.Slot(
-              intersectionPoint.slot.valueOf() + someEventsWithStakeKeyRegistration.length - events.length
+              intersectionPoint.slot + someEventsWithStakeKeyRegistration.length - events.length
             );
             subscriber.next({
               ...nextEvt,
@@ -131,9 +131,7 @@ describe('resuming projection when intersection is not local tip', () => {
       }),
       firstValueFrom(rollForward$).then((firstRollForwardEvent) => {
         // Block heights continues from intersection
-        expect(firstRollForwardEvent.block.header.blockNo).toEqual(
-          lastEventFromOriginalSync.block.header.blockNo.valueOf() + 1
-        );
+        expect(firstRollForwardEvent.block.header.blockNo).toEqual(lastEventFromOriginalSync.block.header.blockNo + 1);
         // State continues from intersection
         expect(store.stakeKeys.size).toBe(
           numStakeKeysBeforeFork +
