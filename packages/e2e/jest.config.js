@@ -13,6 +13,7 @@ module.exports = {
     project('long-running'),
     project('measurement-util'),
     project('ogmios'),
+    project('projection'),
     project('providers'),
     project('wallet')
   ],

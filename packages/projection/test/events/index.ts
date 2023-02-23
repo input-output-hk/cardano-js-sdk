@@ -1,6 +1,12 @@
+import {
+  CardanoNodeErrors,
+  ChainSyncEvent,
+  ChainSyncEventType,
+  ObservableCardanoNode,
+  Point,
+  PointOrOrigin
+} from '@cardano-sdk/core';
 import { ChainSyncData } from '../../../golden-test-generator/src';
-import { ChainSyncEvent, ChainSyncEventType, Point, PointOrOrigin } from '@cardano-sdk/core';
-import { InvalidIntersectionError, ObservableChainSyncClient } from '../../src';
 import { Observable, of } from 'rxjs';
 import { SerializedChainSyncEvent } from '../../../golden-test-generator/src/ChainSyncEvents';
 import { genesisToEraSummary } from './genesisToEraSummary';
@@ -9,7 +15,8 @@ const intersect = (events: ChainSyncData['body'], points: PointOrOrigin[]) => {
   const blockPoints = points.filter((point): point is Point => point !== 'origin');
   if (blockPoints.length === 0) {
     if (points.length === 0) {
-      throw new InvalidIntersectionError('No intersection found. Forgot to pass "origin" as one of the "points"?');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      throw new CardanoNodeErrors.CardanoClientErrors.IntersectionNotFoundError(points as any[]);
     }
     return {
       events,
@@ -54,7 +61,8 @@ const intersect = (events: ChainSyncData['body'], points: PointOrOrigin[]) => {
       }
     };
   }
-  throw new InvalidIntersectionError('No intersection found. Forgot to pass "origin" as one of the "points"?');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  throw new CardanoNodeErrors.CardanoClientErrors.IntersectionNotFoundError(points as any[]);
 };
 
 const prepareData = (dataFileName: string) => {
@@ -64,32 +72,37 @@ const prepareData = (dataFileName: string) => {
       cardano: { compactGenesis }
     }
   } = require(`./data/${dataFileName}`) as ChainSyncData;
-  const chainSync: ObservableChainSyncClient = ({ points }) => {
-    const { intersection, events } = intersect(allEvents, points);
-    return of({
-      chainSync$: new Observable<ChainSyncEvent>((subscriber) => {
-        const remainingEvents = [...events];
-        const requestNext = () => {
-          const nextEvent = remainingEvents.shift();
-          if (nextEvent) {
-            subscriber.next({
-              ...nextEvent,
-              requestNext: () => setTimeout(requestNext, 1)
-            });
-          } else {
-            subscriber.complete();
-          }
-        };
-        requestNext();
-      }),
-      intersection
-    });
+  const eraSummaries = [genesisToEraSummary(compactGenesis)];
+  const cardanoNode: ObservableCardanoNode = {
+    eraSummaries$: of(eraSummaries),
+    findIntersect: (points) => {
+      const { intersection, events } = intersect(allEvents, points);
+      return of({
+        chainSync$: new Observable<ChainSyncEvent>((subscriber) => {
+          const remainingEvents = [...events];
+          const requestNext = () => {
+            const nextEvent = remainingEvents.shift();
+            if (nextEvent) {
+              subscriber.next({
+                ...nextEvent,
+                requestNext: () => setTimeout(requestNext, 1)
+              });
+            } else {
+              subscriber.complete();
+            }
+          };
+          requestNext();
+        }),
+        intersection
+      });
+    },
+    genesisParameters$: of(compactGenesis)
   };
   return {
     allEvents,
-    chainSync,
+    cardanoNode,
     networkInfo: {
-      eraSummaries: [genesisToEraSummary(compactGenesis)],
+      eraSummaries,
       genesisParameters: compactGenesis
     }
   };

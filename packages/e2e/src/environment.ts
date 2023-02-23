@@ -86,7 +86,6 @@ const validators = {
   LOGGER_MIN_SEVERITY: str({ default: 'info' }),
   NETWORK_INFO_PROVIDER: str(),
   NETWORK_INFO_PROVIDER_PARAMS: providerParams(),
-  OGMIOS_SERVER_URL: str(),
   OGMIOS_URL: str(),
   REWARDS_PROVIDER: str(),
   REWARDS_PROVIDER_PARAMS: providerParams(),
