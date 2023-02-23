@@ -372,7 +372,7 @@ describe('RewardAccounts', () => {
                     poolId: poolId1
                   } as Cardano.StakeDelegationCertificate
                 ],
-                epoch: Cardano.EpochNo(epoch.valueOf() - 2)
+                epoch: Cardano.EpochNo(epoch - 2)
               },
               {
                 certificates: [
@@ -381,7 +381,7 @@ describe('RewardAccounts', () => {
                     poolId: poolId2
                   } as Cardano.StakeDelegationCertificate
                 ],
-                epoch: Cardano.EpochNo(epoch.valueOf() - 1)
+                epoch: Cardano.EpochNo(epoch - 1)
               }
             ]
           })

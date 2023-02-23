@@ -193,7 +193,7 @@ type TransactionsCertificates = ObservableType<ReturnType<typeof accountCertific
 
 export const getStakePoolIdAtEpoch = (transactions: TransactionsCertificates) => (atEpoch: Cardano.EpochNo) => {
   const certificatesUpToEpoch = transactions
-    .filter(({ epoch }) => epoch.valueOf() < atEpoch.valueOf() - 2)
+    .filter(({ epoch }) => epoch < atEpoch - 2)
     .map(({ certificates }) => certificates);
   if (!isLastStakeKeyCertOfType(certificatesUpToEpoch, Cardano.CertificateType.StakeKeyRegistration)) return;
   const delegationTxCertificates = findLast(certificatesUpToEpoch, (certs) =>
@@ -211,9 +211,9 @@ export const createDelegateeTracker = (
   combineLatest([certificates$, epoch$]).pipe(
     switchMap(([transactions, lastEpoch]) => {
       const stakePoolIds = [
-        Cardano.EpochNo(lastEpoch.valueOf() + 1),
-        Cardano.EpochNo(lastEpoch.valueOf() + 2),
-        Cardano.EpochNo(lastEpoch.valueOf() + 3)
+        Cardano.EpochNo(lastEpoch + 1),
+        Cardano.EpochNo(lastEpoch + 2),
+        Cardano.EpochNo(lastEpoch + 3)
       ].map(getStakePoolIdAtEpoch(transactions));
       const uniqStakePoolIds = uniq(stakePoolIds.filter(isNotNil));
       return stakePoolProvider(uniqStakePoolIds).pipe(

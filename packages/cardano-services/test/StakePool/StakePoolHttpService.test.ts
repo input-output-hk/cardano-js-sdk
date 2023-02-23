@@ -191,10 +191,10 @@ describe('StakePoolHttpService', () => {
       lastBlockNoInDb = (await db.query<LedgerTipModel>(findLedgerTip)).rows[0];
       cardanoNode = mockCardanoNode(
         healthCheckResponseMock({
-          blockNo: lastBlockNoInDb.block_no.valueOf(),
+          blockNo: lastBlockNoInDb.block_no,
           hash: lastBlockNoInDb.hash.toString('hex'),
           projectedTip: {
-            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            blockNo: lastBlockNoInDb.block_no,
             hash: lastBlockNoInDb.hash.toString('hex'),
             slot: Number(lastBlockNoInDb.slot_no)
           },
@@ -246,10 +246,10 @@ describe('StakePoolHttpService', () => {
         expect(res.status).toBe(200);
         expect(res.data).toEqual(
           healthCheckResponseMock({
-            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            blockNo: lastBlockNoInDb.block_no,
             hash: lastBlockNoInDb.hash.toString('hex'),
             projectedTip: {
-              blockNo: lastBlockNoInDb.block_no.valueOf(),
+              blockNo: lastBlockNoInDb.block_no,
               hash: lastBlockNoInDb.hash.toString('hex'),
               slot: Number(lastBlockNoInDb.slot_no)
             },
@@ -263,10 +263,10 @@ describe('StakePoolHttpService', () => {
         const response = await provider.healthCheck();
         expect(response).toEqual(
           healthCheckResponseMock({
-            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            blockNo: lastBlockNoInDb.block_no,
             hash: lastBlockNoInDb.hash.toString('hex'),
             projectedTip: {
-              blockNo: lastBlockNoInDb.block_no.valueOf(),
+              blockNo: lastBlockNoInDb.block_no,
               hash: lastBlockNoInDb.hash.toString('hex'),
               slot: Number(lastBlockNoInDb.slot_no)
             },

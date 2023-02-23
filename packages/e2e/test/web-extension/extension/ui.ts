@@ -108,7 +108,7 @@ const wallet = walletManager.wallet;
 
 // Wallet can be subscribed can be used even before it is actually created.
 wallet.addresses$.subscribe(([{ address, rewardAccount }]) =>
-  setAddresses({ address: address.toString(), stakeAddress: rewardAccount.valueOf() })
+  setAddresses({ address: address.toString(), stakeAddress: rewardAccount })
 );
 wallet.balance.utxo.available$.subscribe(({ coins }) => setBalance(coins.toString()));
 

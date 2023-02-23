@@ -24,7 +24,7 @@ describe('ensureValidityInterval', () => {
   it('configures invalidHereafter to 2h by default', () => {
     const currentSlot = Cardano.Slot(1);
     const validityInterval = ensureValidityInterval(currentSlot, { slotLength: Seconds(1) });
-    expect(validityInterval.invalidHereafter).toEqual(Cardano.Slot(twoHours.valueOf() + currentSlot.valueOf()));
+    expect(validityInterval.invalidHereafter).toEqual(Cardano.Slot(twoHours + currentSlot));
   });
 
   it('uses calculated invalidHereafter value when user provides a partial ValidityInterval', () => {
@@ -36,7 +36,7 @@ describe('ensureValidityInterval', () => {
     );
     expect(validityInterval).toEqual({
       invalidBefore: currentSlot,
-      invalidHereafter: Cardano.Slot(twoHours.valueOf() + currentSlot.valueOf())
+      invalidHereafter: Cardano.Slot(twoHours + currentSlot)
     });
   });
 

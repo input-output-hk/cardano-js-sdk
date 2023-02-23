@@ -96,7 +96,7 @@ export const txConfirmed = (
           const tx = txs.find((historyTx) => historyTx.id === id);
           if (!tx) return EMPTY;
           return tip$.pipe(
-            filter(({ blockNo }) => blockNo >= Cardano.BlockNo(tx.blockHeader.blockNo.valueOf() + numConfirmations)),
+            filter(({ blockNo }) => blockNo >= Cardano.BlockNo(tx.blockHeader.blockNo + numConfirmations)),
             map(() => tx)
           );
         })
@@ -179,7 +179,7 @@ export const waitForEpoch = (wallet: Pick<ObservableWallet, 'currentEpoch$'>, wa
       map(({ epochNo }) => epochNo),
       distinctUntilChanged(),
       tap((epochNo) => logger.info(`Currently at epoch #${epochNo}`)),
-      filter((currentEpochNo) => currentEpochNo.valueOf() >= waitForEpochNo)
+      filter((currentEpochNo) => currentEpochNo >= waitForEpochNo)
     )
   );
 };
@@ -194,7 +194,7 @@ export const runningAgainstLocalNetwork = async () => {
 
   const estimatedTestDurationInEpochs = 4;
   const localNetworkEpochDuration = 1000 * 0.2;
-  const estimatedTestDuration = epochLength * slotLength.valueOf() * estimatedTestDurationInEpochs;
+  const estimatedTestDuration = epochLength * slotLength * estimatedTestDurationInEpochs;
   if (estimatedTestDuration > localNetworkEpochDuration * estimatedTestDurationInEpochs) {
     return false;
   }

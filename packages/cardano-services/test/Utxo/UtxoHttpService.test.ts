@@ -79,10 +79,10 @@ describe('UtxoHttpService', () => {
       lastBlockNoInDb = (await dbConnection.query<LedgerTipModel>(findLedgerTip)).rows[0];
       cardanoNode = mockCardanoNode(
         healthCheckResponseMock({
-          blockNo: lastBlockNoInDb.block_no.valueOf(),
+          blockNo: lastBlockNoInDb.block_no,
           hash: lastBlockNoInDb.hash.toString('hex'),
           projectedTip: {
-            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            blockNo: lastBlockNoInDb.block_no,
             hash: lastBlockNoInDb.hash.toString('hex'),
             slot: Number(lastBlockNoInDb.slot_no)
           },
@@ -110,10 +110,10 @@ describe('UtxoHttpService', () => {
         expect(res.status).toBe(200);
         expect(res.data).toEqual(
           healthCheckResponseMock({
-            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            blockNo: lastBlockNoInDb.block_no,
             hash: lastBlockNoInDb.hash.toString('hex'),
             projectedTip: {
-              blockNo: lastBlockNoInDb.block_no.valueOf(),
+              blockNo: lastBlockNoInDb.block_no,
               hash: lastBlockNoInDb.hash.toString('hex'),
               slot: Number(lastBlockNoInDb.slot_no)
             },
@@ -127,10 +127,10 @@ describe('UtxoHttpService', () => {
         const response = await provider.healthCheck();
         expect(response).toEqual(
           healthCheckResponseMock({
-            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            blockNo: lastBlockNoInDb.block_no,
             hash: lastBlockNoInDb.hash.toString('hex'),
             projectedTip: {
-              blockNo: lastBlockNoInDb.block_no.valueOf(),
+              blockNo: lastBlockNoInDb.block_no,
               hash: lastBlockNoInDb.hash.toString('hex'),
               slot: Number(lastBlockNoInDb.slot_no)
             },

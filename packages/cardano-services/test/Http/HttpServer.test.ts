@@ -76,7 +76,7 @@ describe('HttpServer', () => {
     apiUrlBase = `http://localhost:${port}`;
     lastBlockNoInDb = Cardano.BlockNo((await db.query<LedgerTipModel>(findLedgerTip)).rows[0].block_no);
     cardanoNode = mockCardanoNode(
-      healthCheckResponseMock({ blockNo: lastBlockNoInDb.valueOf() })
+      healthCheckResponseMock({ blockNo: lastBlockNoInDb })
     ) as unknown as OgmiosCardanoNode;
     provider = new DbSyncUtxoProvider({ cardanoNode, db, logger });
   });

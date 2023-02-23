@@ -99,7 +99,7 @@ describe('cache invalidation', () => {
 
     const registrationTxConfirmedAtEpoch = await getTxConfirmationEpoch(wallet1.wallet, signedTx);
 
-    await waitForEpoch(wallet1.wallet, registrationTxConfirmedAtEpoch.valueOf() + 1);
+    await waitForEpoch(wallet1.wallet, registrationTxConfirmedAtEpoch + 1);
 
     const resultAfterOneEpoch = await wallet1.providers.stakePoolProvider.queryStakePools({
       filters: { identifier: { values: [{ id: poolId }] } },
@@ -109,7 +109,7 @@ describe('cache invalidation', () => {
     expect(resultAfterOneEpoch.totalResultCount).toBe(1);
     expect(resultAfterOneEpoch.pageResults[0].status).toBe('activating');
 
-    await waitForEpoch(wallet1.wallet, registrationTxConfirmedAtEpoch.valueOf() + 2);
+    await waitForEpoch(wallet1.wallet, registrationTxConfirmedAtEpoch + 2);
 
     const resultAfterTwoEpochs = await wallet1.providers.stakePoolProvider.queryStakePools({
       filters: { identifier: { values: [{ id: poolId }] } },

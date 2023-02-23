@@ -42,43 +42,43 @@ describe('Cardano.util.time', () => {
   describe('TimeSpan', () => {
     it('can get the right number of total days', () => {
       const span = new TimeSpan(oneAndAHalfDay);
-      expect(span.getTotalDays().valueOf()).toBe(1.5);
+      expect(span.getTotalDays()).toBe(1.5);
     });
     it('can get the right number of total hours', () => {
       const span = new TimeSpan(oneAndAHalfDay);
-      expect(span.getTotalHours().valueOf()).toBe(36);
+      expect(span.getTotalHours()).toBe(36);
     });
     it('can get the right number of total minutes', () => {
       const span = new TimeSpan(oneAndAHalfDay);
-      expect(span.getTotalMinutes().valueOf()).toBe(2160);
+      expect(span.getTotalMinutes()).toBe(2160);
     });
     it('can get the right number of total seconds', () => {
       const span = new TimeSpan(oneAndAHalfDay);
-      expect(span.getTotalSeconds().valueOf()).toBe(129_600);
+      expect(span.getTotalSeconds()).toBe(129_600);
     });
     it('can get the right number of total milliseconds', () => {
       const span = new TimeSpan(oneAndAHalfDay);
-      expect(span.getTotalMilliseconds().valueOf()).toBe(129_600_000);
+      expect(span.getTotalMilliseconds()).toBe(129_600_000);
     });
     it('can get the days component of the elapsed time', () => {
       const span = new TimeSpan(oneAndAHalfDay);
-      expect(span.getDays().valueOf()).toBe(1);
+      expect(span.getDays()).toBe(1);
     });
     it('can get the hours component of the elapsed time', () => {
       const span = new TimeSpan(oneAndAHalfDay);
-      expect(span.getHours().valueOf()).toBe(12);
+      expect(span.getHours()).toBe(12);
     });
     it('can get the minutes component of the elapsed time', () => {
       const span = new TimeSpan(twentyMinutesAndTenSeconds);
-      expect(span.getMinutes().valueOf()).toBe(20);
+      expect(span.getMinutes()).toBe(20);
     });
     it('can get the seconds component of the elapsed time', () => {
       const span = new TimeSpan(twentyMinutesAndTenSeconds);
-      expect(span.getSeconds().valueOf()).toBe(10);
+      expect(span.getSeconds()).toBe(10);
     });
     it('can get the milliseconds component of the elapsed time', () => {
       const span = new TimeSpan(oneMinuteAndTenMilliseconds);
-      expect(span.getMilliseconds().valueOf()).toBe(10);
+      expect(span.getMilliseconds()).toBe(10);
     });
     it('can convert the time value to an ISO-8601 duration string', () => {
       const span = TimeSpan.fromSeconds(Seconds(102_751));
@@ -86,15 +86,15 @@ describe('Cardano.util.time', () => {
     });
     it('can be created from seconds', () => {
       const span = TimeSpan.fromSeconds(Seconds(120));
-      expect(span.getTotalMilliseconds().valueOf()).toBe(120_000);
+      expect(span.getTotalMilliseconds()).toBe(120_000);
     });
     it('can be created from minutes', () => {
       const span = TimeSpan.fromMinutes(Minutes(10));
-      expect(span.getTotalMilliseconds().valueOf()).toBe(600_000);
+      expect(span.getTotalMilliseconds()).toBe(600_000);
     });
     it('can be created from hours', () => {
       const span = TimeSpan.fromHours(Hours(2));
-      expect(span.getTotalMilliseconds().valueOf()).toBe(7_200_000);
+      expect(span.getTotalMilliseconds()).toBe(7_200_000);
     });
   });
 });

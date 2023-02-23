@@ -30,17 +30,17 @@ export const Hours = (value: number): Hours => value as unknown as Hours;
 export type Days = OpaqueNumber<'Days'>;
 export const Days = (value: number): Days => value as unknown as Days;
 
-Hours.toDays = (value: Hours): Days => (value.valueOf() / 24) as unknown as Days;
-Days.toHours = (value: Days): Hours => (value.valueOf() * 24) as unknown as Hours;
+Hours.toDays = (value: Hours): Days => (value / 24) as unknown as Days;
+Days.toHours = (value: Days): Hours => (value * 24) as unknown as Hours;
 
-Minutes.toHours = (value: Minutes): Hours => (value.valueOf() / 60) as unknown as Hours;
-Hours.toMinutes = (value: Hours): Minutes => (value.valueOf() * 60) as unknown as Minutes;
+Minutes.toHours = (value: Minutes): Hours => (value / 60) as unknown as Hours;
+Hours.toMinutes = (value: Hours): Minutes => (value * 60) as unknown as Minutes;
 
-Seconds.toMinutes = (value: Seconds): Minutes => (value.valueOf() / 60) as unknown as Minutes;
-Minutes.toSeconds = (value: Minutes): Seconds => (value.valueOf() * 60) as unknown as Seconds;
+Seconds.toMinutes = (value: Seconds): Minutes => (value / 60) as unknown as Minutes;
+Minutes.toSeconds = (value: Minutes): Seconds => (value * 60) as unknown as Seconds;
 
-Seconds.toMilliseconds = (value: Seconds): Milliseconds => (value.valueOf() * 1000) as unknown as Milliseconds;
-Milliseconds.toSeconds = (value: Milliseconds): Seconds => (value.valueOf() / 1000) as unknown as Seconds;
+Seconds.toMilliseconds = (value: Seconds): Milliseconds => (value * 1000) as unknown as Milliseconds;
+Milliseconds.toSeconds = (value: Milliseconds): Seconds => (value / 1000) as unknown as Seconds;
 
 /**
  * Represents a time interval.
@@ -148,7 +148,7 @@ export class TimeSpan {
    * @returns The day component of this instance.
    */
   public getDays(): Days {
-    return Days(Math.floor(this.getTotalDays().valueOf()));
+    return Days(Math.floor(this.getTotalDays()));
   }
 
   /**
@@ -157,7 +157,7 @@ export class TimeSpan {
    * @returns The hours component of this instance.
    */
   public getHours(): Hours {
-    return Hours(Math.floor(this.getTotalHours().valueOf() - this.getDays().valueOf() * 24));
+    return Hours(Math.floor(this.getTotalHours() - this.getDays() * 24));
   }
 
   /**
@@ -166,7 +166,7 @@ export class TimeSpan {
    * @returns The minutes component of this instance.
    */
   public getMinutes(): Minutes {
-    return Minutes(Math.floor(this.getTotalMinutes().valueOf() - Math.floor(this.getTotalHours().valueOf()) * 60));
+    return Minutes(Math.floor(this.getTotalMinutes() - Math.floor(this.getTotalHours()) * 60));
   }
 
   /**
@@ -175,7 +175,7 @@ export class TimeSpan {
    * @returns The seconds component of this instance.
    */
   public getSeconds(): Seconds {
-    return Seconds(Math.floor(this.getTotalSeconds().valueOf() - Math.floor(this.getTotalMinutes().valueOf()) * 60));
+    return Seconds(Math.floor(this.getTotalSeconds() - Math.floor(this.getTotalMinutes()) * 60));
   }
 
   /**
@@ -184,7 +184,7 @@ export class TimeSpan {
    * @returns The millisecond component of this instance.
    */
   public getMilliseconds(): Milliseconds {
-    return Milliseconds(this.elapsed.valueOf() - Math.floor(this.getTotalSeconds().valueOf()) * 1000);
+    return Milliseconds(this.elapsed - Math.floor(this.getTotalSeconds()) * 1000);
   }
 
   /**
@@ -193,16 +193,16 @@ export class TimeSpan {
    * @returns The ISO-8601 duration string.
    */
   public toString(): string {
-    let result = this.getTotalSeconds().valueOf() < 0 ? '-P' : 'P';
+    let result = this.getTotalSeconds() < 0 ? '-P' : 'P';
     let time = '';
 
-    if (this.getHours().valueOf() !== 0) time += `${Math.abs(this.getHours().valueOf()).toString()}H`;
+    if (this.getHours() !== 0) time += `${Math.abs(this.getHours()).toString()}H`;
 
-    if (this.getMinutes().valueOf() !== 0) time += `${Math.abs(this.getMinutes().valueOf()).toString()}M`;
+    if (this.getMinutes() !== 0) time += `${Math.abs(this.getMinutes()).toString()}M`;
 
-    if (this.getSeconds().valueOf() !== 0) time += `${Math.abs(this.getSeconds().valueOf()).toString()}S`;
+    if (this.getSeconds() !== 0) time += `${Math.abs(this.getSeconds()).toString()}S`;
 
-    if (this.getDays().valueOf() !== 0 || time === '') result += `${Math.abs(this.getDays().valueOf()).toString()}D`;
+    if (this.getDays() !== 0 || time === '') result += `${Math.abs(this.getDays()).toString()}D`;
 
     if (time !== '') result += `T${time}`;
 

@@ -73,10 +73,10 @@ export class ChainHistoryFixtureBuilder {
       if (addressesInBlockRange.addresses.has(address as unknown as Cardano.Address)) {
         txIds.add(tx_id);
         addressesInBlockRange.blockRange.lowerBound = Cardano.BlockNo(
-          Math.min(addressesInBlockRange.blockRange.lowerBound.valueOf(), block_no)
+          Math.min(addressesInBlockRange.blockRange.lowerBound, block_no)
         );
         addressesInBlockRange.blockRange.upperBound = Cardano.BlockNo(
-          Math.max(addressesInBlockRange.blockRange.upperBound.valueOf(), block_no)
+          Math.max(addressesInBlockRange.blockRange.upperBound, block_no)
         );
       }
     }
