@@ -338,7 +338,9 @@ describe('TransactionsTracker', () => {
         const failedToSubmit$ = hot<FailedTx>('---a|', {
           a: { reason: TransactionFailure.FailedToSubmit, ...outgoingTx }
         });
-        const failedFromReemitter$ = cold<FailedTx>('-a|', { a: { reason: TransactionFailure.Timeout, ...outgoingTxReemit } });
+        const failedFromReemitter$ = cold<FailedTx>('-a|', {
+          a: { reason: TransactionFailure.Timeout, ...outgoingTxReemit }
+        });
         const transactionsTracker = createTransactionsTracker(
           {
             addresses$,
@@ -462,7 +464,11 @@ describe('TransactionsTracker', () => {
           }
         );
         expectObservable(transactionsTracker.outgoing.submitting$).toBe('-a-b--|', { a: outgoingTx, b: outgoingTx });
-        expectObservable(transactionsTracker.outgoing.inFlight$).toBe('ab-c-a|', { a: [], b: [outgoingTx], c: [outgoingTx] });
+        expectObservable(transactionsTracker.outgoing.inFlight$).toBe('ab-c-a|', {
+          a: [],
+          b: [outgoingTx],
+          c: [outgoingTx]
+        });
         expectObservable(transactionsTracker.outgoing.failed$).toBe('-----a|', {
           a: { reason: TransactionFailure.FailedToSubmit, ...outgoingTx }
         });
