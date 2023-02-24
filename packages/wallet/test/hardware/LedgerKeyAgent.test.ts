@@ -151,7 +151,7 @@ describe('LedgerKeyAgent', () => {
     let deviceConnection: DeviceConnection;
     beforeAll(async () => {
       if (keyAgent.deviceConnection) {
-        keyAgent.deviceConnection.transport.close();
+        await keyAgent.deviceConnection.transport.close();
       }
       deviceConnection = await LedgerKeyAgent.establishDeviceConnection(CommunicationType.Node);
     });
@@ -163,17 +163,17 @@ describe('LedgerKeyAgent', () => {
       );
       expect(activeDeviceConnection).toBeDefined();
       expect(typeof activeDeviceConnection).toBe('object');
-      activeDeviceConnection.transport.close();
+      await activeDeviceConnection.transport.close();
     });
 
     it('can re-establish closed device connection', async () => {
       if (deviceConnection) {
-        deviceConnection.transport.close();
+        await deviceConnection.transport.close();
       }
       const activeDeviceConnection = await LedgerKeyAgent.checkDeviceConnection(CommunicationType.Node);
       expect(activeDeviceConnection).toBeDefined();
       expect(typeof activeDeviceConnection).toBe('object');
-      activeDeviceConnection.transport.close();
+      await activeDeviceConnection.transport.close();
     });
   });
 
@@ -189,7 +189,7 @@ describe('LedgerKeyAgent', () => {
       const activeDeviceConnection = await LedgerKeyAgent.createDeviceConnection(transport);
       expect(activeDeviceConnection).toBeDefined();
       expect(typeof activeDeviceConnection).toBe('object');
-      activeDeviceConnection.transport.close();
+      await activeDeviceConnection.transport.close();
     });
   });
 
