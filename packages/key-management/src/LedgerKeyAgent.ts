@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AuthenticationError, TransportError } from './errors';
+import { AuthenticationError, HwMappingError, TransportError } from './errors';
 import { Cardano, NotImplementedError, coreToCml } from '@cardano-sdk/core';
 import {
   CardanoKeyConst,
@@ -14,8 +14,9 @@ import {
 } from './types';
 import { KeyAgentBase } from './KeyAgentBase';
 import { ManagedFreeableScope } from '@cardano-sdk/util';
+import { str_to_path } from '@cardano-foundation/ledgerjs-hw-app-cardano/dist/utils/address';
 import { txToLedger } from './util';
-import LedgerConnection, { GetVersionResponse, utils } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import LedgerConnection, { GetVersionResponse } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
 import TransportWebHID from '@ledgerhq/hw-transport-webhid';
 import type LedgerTransport from '@ledgerhq/hw-transport';
@@ -169,7 +170,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
       const recoveredDeviceConnection = await LedgerKeyAgent.checkDeviceConnection(communicationType, deviceConnection);
       const derivationPath = `${CardanoKeyConst.PURPOSE}'/${CardanoKeyConst.COIN_TYPE}'/${accountIndex}'`;
       const extendedPublicKey = await recoveredDeviceConnection.getExtendedPublicKey({
-        path: utils.str_to_path(derivationPath) // BIP32Path
+        path: str_to_path(derivationPath) // BIP32Path
       });
       const xPubHex = `${extendedPublicKey.publicKeyHex}${extendedPublicKey.chainCodeHex}`;
       return Crypto.Bip32PublicKeyHex(xPubHex);
@@ -224,7 +225,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
     );
   }
 
-  async signTransaction({ body }: Cardano.TxBodyWithHash): Promise<Cardano.Signatures> {
+  async signTransaction({ body, hash }: Cardano.TxBodyWithHash): Promise<Cardano.Signatures> {
     const scope = new ManagedFreeableScope();
     try {
       const cslTxBody = coreToCml.txBody(scope, body);
@@ -239,6 +240,9 @@ export class LedgerKeyAgent extends KeyAgentBase {
         this.deviceConnection
       );
       const result = await deviceConnection.signTransaction(ledgerTxData);
+      if (result.txHashHex !== hash) {
+        throw new HwMappingError('Ledger computed a different transaction id');
+      }
 
       return new Map<Crypto.Ed25519PublicKeyHex, Crypto.Ed25519SignatureHex>(
         await Promise.all(

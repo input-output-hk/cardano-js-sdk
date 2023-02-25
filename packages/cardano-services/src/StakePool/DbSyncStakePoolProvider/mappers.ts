@@ -72,7 +72,7 @@ export const calcNodeMetricsValues = (metrics: PoolMetrics['metrics'], apy: numb
   const isZeroStake = liveStake === 0n;
   const size: Cardano.StakePoolMetricsSize = {
     active: activeStakePercentage,
-    live: Cardano.Percent(!isZeroStake ? 1 - activeStakePercentage.valueOf() : 0)
+    live: Cardano.Percent(!isZeroStake ? 1 - activeStakePercentage : 0)
   };
   const stake: Cardano.StakePoolMetricsStake = {
     active: activeStake,
@@ -134,7 +134,7 @@ export const toStakePoolResults = (
             pledge: poolData.pledge,
             relays: poolRelays.filter((r) => r.updateId === poolData.updateId).map((r) => r.relay),
             rewardAccount: poolData.rewardAccount,
-            status: getPoolStatus(registrations[0], lastEpochNo.valueOf(), retirements[0]),
+            status: getPoolStatus(registrations[0], lastEpochNo, retirements[0]),
             transactions: {
               registration: registrations.map((r) => r.transactionId),
               retirement: retirements.map((r) => r.transactionId)

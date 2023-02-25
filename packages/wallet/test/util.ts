@@ -1,7 +1,8 @@
 /* eslint-disable func-style */
 /* eslint-disable jsdoc/require-jsdoc */
 
-import { MaybeValidTx, MaybeValidTxOut, ObservableWallet, ValidTx, ValidTxOut } from '../src';
+import { Cardano, TxCBOR } from '@cardano-sdk/core';
+import { MaybeValidTx, MaybeValidTxOut, ObservableWallet, OutgoingTx, ValidTx, ValidTxOut } from '../src';
 import { Observable, catchError, filter, firstValueFrom, throwError, timeout } from 'rxjs';
 
 const SECOND = 1000;
@@ -36,3 +37,11 @@ export function assertTxIsValid(tx: MaybeValidTx): asserts tx is ValidTx {
 export function assertTxOutIsValid(txOut: MaybeValidTxOut): asserts txOut is ValidTxOut {
   expect(txOut.isValid).toBe(true);
 }
+
+export const toOutgoingTx = (tx: Cardano.Tx): OutgoingTx => ({
+  body: tx.body,
+  cbor: TxCBOR.serialize(tx),
+  id: tx.id
+});
+
+export const dummyCbor = TxCBOR('123');

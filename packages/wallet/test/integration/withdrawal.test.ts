@@ -98,14 +98,14 @@ describe('integration/withdrawal', () => {
 
     expect(tx.body.withdrawals).toEqual([{ quantity: availableRewards, stakeAddress: rewardAccount }]);
 
-    const confirmedSubscription = wallet.transactions.outgoing.confirmed$.subscribe(({ tx: confirmedTx }) => {
-      if (confirmedTx === tx) {
+    const confirmedSubscription = wallet.transactions.outgoing.confirmed$.subscribe(({ id }) => {
+      if (id === tx.id) {
         // Transaction successful
       }
     });
 
-    const failedSubscription = wallet.transactions.outgoing.failed$.subscribe(({ tx: failedTx, reason }) => {
-      if (failedTx === tx) {
+    const failedSubscription = wallet.transactions.outgoing.failed$.subscribe(({ id, reason }) => {
+      if (id === tx.id) {
         // Transaction failed because of reason, which is most likely:
         expect(reason === TransactionFailure.Timeout || reason === TransactionFailure.FailedToSubmit).toBe(true);
       }

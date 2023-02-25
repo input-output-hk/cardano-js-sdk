@@ -1,6 +1,6 @@
 import { Cardano, UtxoProvider } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
-import { NEVER, Observable, combineLatest, concat, map, of, switchMap } from 'rxjs';
+import { NEVER, Observable, combineLatest, concat, distinctUntilChanged, map, of, switchMap } from 'rxjs';
 import { PersistentCollectionTrackerSubject, coldObservableProvider, txInEquals, utxoEquals } from './util';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxInFlight, UtxoTracker } from './types';
@@ -66,39 +66,29 @@ export const createUtxoTracker = (
   const total$ = combineLatest([utxoSource$, transactionsInFlight$, addresses$]).pipe(
     map(([onChainUtxo, transactionsInFlight, ownAddresses]) => [
       ...onChainUtxo.filter(([utxoTxIn]) => {
-        const utxoIsUsedInFlight = transactionsInFlight.some(
-          ({
-            tx: {
-              body: { inputs }
-            }
-          }) => inputs.some((input) => input.txId === utxoTxIn.txId && input.index === utxoTxIn.index)
+        const utxoIsUsedInFlight = transactionsInFlight.some(({ body: { inputs } }) =>
+          inputs.some((input) => input.txId === utxoTxIn.txId && input.index === utxoTxIn.index)
         );
         utxoIsUsedInFlight &&
           logger.debug('OnChain UTXO is already used in in-flight transaction. Excluding from total$.', utxoTxIn);
         return !utxoIsUsedInFlight;
       }),
-      ...transactionsInFlight.flatMap(({ tx }, txInFlightIndex) =>
-        tx.body.outputs
+      ...transactionsInFlight.flatMap(({ body: { outputs }, id }, txInFlightIndex) =>
+        outputs
           .filter(
             ({ address }, outputIndex) =>
               ownAddresses.includes(address) &&
               // not already consumed by another tx in flight
               !transactionsInFlight.some(
-                (
-                  {
-                    tx: {
-                      body: { inputs }
-                    }
-                  },
-                  i
-                ) => txInFlightIndex !== i && inputs.some((txIn) => txIn.txId === tx.id && txIn.index === outputIndex)
+                ({ body: { inputs } }, i) =>
+                  txInFlightIndex !== i && inputs.some((txIn) => txIn.txId === id && txIn.index === outputIndex)
               )
           )
           .map((txOut): Cardano.Utxo => {
             const txIn: Cardano.HydratedTxIn = {
               address: txOut.address, // not necessarily correct in multi-address wallet
-              index: tx.body.outputs.indexOf(txOut),
-              txId: tx.id
+              index: outputs.indexOf(txOut),
+              txId: id
             };
             logger.debug('New UTXO available from in-flight transactions. Including in total$.', txIn);
             return [txIn, txOut];
@@ -119,13 +109,20 @@ export const createUtxoTracker = (
 
   return {
     available$,
-    setUnspendable: unspendableUtxoSource$.next.bind(unspendableUtxoSource$),
+    setUnspendable: async (utxo) => {
+      unspendableUtxoSource$.next(utxo);
+    },
     shutdown: () => {
       utxoSource$.complete();
       unspendableUtxoSource$.complete();
       logger.debug('Shutdown');
     },
     total$,
-    unspendable$: unspendableUtxoSource$
+    unspendable$: combineLatest([unspendableUtxoSource$, total$]).pipe(
+      map(([unspendableUtxo, utxo]) =>
+        unspendableUtxo.filter(([unspendable]) => utxo.some(([utxoTxIn]) => txInEquals(utxoTxIn, unspendable)))
+      ),
+      distinctUntilChanged((previous, current) => utxoEquals(previous, current))
+    )
   };
 };

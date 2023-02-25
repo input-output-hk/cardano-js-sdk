@@ -1,3 +1,4 @@
+import { Logger } from 'ts-log';
 import { Primitive } from 'type-fest';
 
 export interface Shutdown {
@@ -18,4 +19,8 @@ export type DeepPartial<T, O = never> = T extends O | Primitive
 
 export interface Freeable {
   free: () => void;
+}
+
+export interface WithLogger {
+  logger: Logger;
 }

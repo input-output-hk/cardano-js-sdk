@@ -34,7 +34,7 @@ const waitForTx = async (wallet: ObservableWallet, hash: Cardano.TransactionId) 
     combineLatest([
       wallet.transactions.history$.pipe(filter((txs) => txs.some(({ id }) => id === hash))),
       // test that confirmed$ works
-      wallet.transactions.outgoing.confirmed$.pipe(filter(({ tx: { id } }) => id === hash))
+      wallet.transactions.outgoing.confirmed$.pipe(filter(({ id }) => id === hash))
     ]),
     'Tx not confirmed for too long',
     TX_TIMEOUT
@@ -146,7 +146,7 @@ describe('SingleAddressWallet/delegation', () => {
 
     // If less than two epochs have elapsed, delegatee will still delegate to former pool during current epoch
     // if more than two epochs has elapsed, delegatee will delegate to new pool.
-    if (tx1ConfirmedState.epoch.valueOf() - initialState.epoch.valueOf() < 2) {
+    if (tx1ConfirmedState.epoch - initialState.epoch < 2) {
       expect(tx1ConfirmedState.rewardAccount.delegatee?.currentEpoch?.id).toEqual(
         initialState?.rewardAccount.delegatee?.currentEpoch?.id
       );

@@ -96,14 +96,18 @@ export const txConfirmed = (
           const tx = txs.find((historyTx) => historyTx.id === id);
           if (!tx) return EMPTY;
           return tip$.pipe(
-            filter(({ blockNo }) => blockNo >= Cardano.BlockNo(tx.blockHeader.blockNo.valueOf() + numConfirmations)),
+            filter(({ blockNo }) => blockNo >= Cardano.BlockNo(tx.blockHeader.blockNo + numConfirmations)),
             map(() => tx)
           );
         })
       ),
       failed$.pipe(
-        mergeMap(({ tx, error, reason }) =>
-          tx.id === id ? throwError(() => error || new Error(`Tx failed due to '${reason}': ${id}`)) : EMPTY
+        mergeMap((outgoingTx) =>
+          outgoingTx.id === id
+            ? throwError(
+                () => outgoingTx.error || new Error(`Tx failed due to '${outgoingTx.reason}': ${outgoingTx.id}`)
+              )
+            : EMPTY
         )
       )
     )
@@ -122,7 +126,7 @@ export type RequestCoinsProps = {
 
 export const requestCoins = async ({ coins, wallet }: RequestCoinsProps) => {
   const [{ address }] = await firstValueFrom(wallet.addresses$);
-  logger.info(`Address ${address.toString()} will be funded with ${coins} tLovelace.`);
+  logger.info(`Address ${address} will be funded with ${coins} tLovelace.`);
 
   const { FAUCET_PROVIDER, FAUCET_PROVIDER_PARAMS } = envalid.cleanEnv(process.env, {
     FAUCET_PROVIDER: envalid.str(),
@@ -137,7 +141,7 @@ export const requestCoins = async ({ coins, wallet }: RequestCoinsProps) => {
   // and has the given amount of confirmation, which means the funds can be used immediately after
   // this call.
   // TODO: change FaucetProvider signature to accept Cardano.Lovelace
-  const requestResult = await faucetProvider.request(address.toString(), Number.parseInt(coins.toString()), 3, 30_000);
+  const requestResult = await faucetProvider.request(address, Number.parseInt(coins.toString()), 3, 30_000);
   await txConfirmed(wallet, requestResult);
   await faucetProvider.close();
 };
@@ -152,9 +156,7 @@ export const transferCoins = async ({ fromWallet, toWallet, coins }: TransferCoi
   // Arrange
   const [{ address: sendingAddress }] = await firstValueFrom(fromWallet.addresses$);
   const [{ address: receivingAddress }] = await firstValueFrom(toWallet.addresses$);
-  logger.info(
-    `Address ${sendingAddress.toString()} will send ${coins} lovelace to address ${receivingAddress.toString()}.`
-  );
+  logger.info(`Address ${sendingAddress} will send ${coins} lovelace to address ${receivingAddress}.`);
 
   // Act
   // Send 50 tADA to second wallet.
@@ -175,7 +177,7 @@ export const waitForEpoch = (wallet: Pick<ObservableWallet, 'currentEpoch$'>, wa
       map(({ epochNo }) => epochNo),
       distinctUntilChanged(),
       tap((epochNo) => logger.info(`Currently at epoch #${epochNo}`)),
-      filter((currentEpochNo) => currentEpochNo.valueOf() >= waitForEpochNo)
+      filter((currentEpochNo) => currentEpochNo >= waitForEpochNo)
     )
   );
 };
@@ -190,7 +192,7 @@ export const runningAgainstLocalNetwork = async () => {
 
   const estimatedTestDurationInEpochs = 4;
   const localNetworkEpochDuration = 1000 * 0.2;
-  const estimatedTestDuration = epochLength * slotLength.valueOf() * estimatedTestDurationInEpochs;
+  const estimatedTestDuration = epochLength * slotLength * estimatedTestDurationInEpochs;
   if (estimatedTestDuration > localNetworkEpochDuration * estimatedTestDurationInEpochs) {
     return false;
   }
@@ -250,7 +252,7 @@ export const createStandaloneKeyAgent = async (
   await InMemoryKeyAgent.fromBip39MnemonicWords(
     {
       chainId: genesis,
-      getPassword: async () => Buffer.from(''),
+      getPassphrase: async () => Buffer.from(''),
       mnemonicWords: mnemonics
     },
     { bip32Ed25519, inputResolver: { resolveInputAddress: async () => null }, logger }

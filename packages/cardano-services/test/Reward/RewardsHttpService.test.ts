@@ -76,10 +76,10 @@ describe('RewardsHttpService', () => {
       lastBlockNoInDb = (await dbConnection.query<LedgerTipModel>(findLedgerTip)).rows[0];
       cardanoNode = mockCardanoNode(
         healthCheckResponseMock({
-          blockNo: lastBlockNoInDb.block_no.valueOf(),
+          blockNo: lastBlockNoInDb.block_no,
           hash: lastBlockNoInDb.hash.toString('hex'),
           projectedTip: {
-            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            blockNo: lastBlockNoInDb.block_no,
             hash: lastBlockNoInDb.hash.toString('hex'),
             slot: Number(lastBlockNoInDb.slot_no)
           },
@@ -108,10 +108,10 @@ describe('RewardsHttpService', () => {
         expect(res.status).toBe(200);
         expect(res.data).toEqual(
           healthCheckResponseMock({
-            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            blockNo: lastBlockNoInDb.block_no,
             hash: lastBlockNoInDb.hash.toString('hex'),
             projectedTip: {
-              blockNo: lastBlockNoInDb.block_no.valueOf(),
+              blockNo: lastBlockNoInDb.block_no,
               hash: lastBlockNoInDb.hash.toString('hex'),
               slot: Number(lastBlockNoInDb.slot_no)
             },
@@ -125,10 +125,10 @@ describe('RewardsHttpService', () => {
         const response = await provider.healthCheck();
         expect(response).toEqual(
           healthCheckResponseMock({
-            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            blockNo: lastBlockNoInDb.block_no,
             hash: lastBlockNoInDb.hash.toString('hex'),
             projectedTip: {
-              blockNo: lastBlockNoInDb.block_no.valueOf(),
+              blockNo: lastBlockNoInDb.block_no,
               hash: lastBlockNoInDb.hash.toString('hex'),
               slot: Number(lastBlockNoInDb.slot_no)
             },
@@ -289,8 +289,8 @@ describe('RewardsHttpService', () => {
           let lowestEpoch = Number.MAX_SAFE_INTEGER;
           let highestEpoch = 0;
           for (const result of response.get(rewardAccount)!) {
-            lowestEpoch = Math.min(lowestEpoch, result.epoch.valueOf());
-            highestEpoch = Math.max(highestEpoch, result.epoch.valueOf());
+            lowestEpoch = Math.min(lowestEpoch, result.epoch);
+            highestEpoch = Math.max(highestEpoch, result.epoch);
           }
 
           expect(lowestEpoch).toBeGreaterThanOrEqual(5);
@@ -310,7 +310,7 @@ describe('RewardsHttpService', () => {
 
           let lowestEpoch = Number.MAX_SAFE_INTEGER;
           for (const result of response.get(rewardAccount)!) {
-            lowestEpoch = Math.min(lowestEpoch, result.epoch.valueOf());
+            lowestEpoch = Math.min(lowestEpoch, result.epoch);
           }
 
           expect(lowestEpoch).toBeGreaterThanOrEqual(5);
@@ -329,7 +329,7 @@ describe('RewardsHttpService', () => {
 
           let highestEpoch = Number.MAX_SAFE_INTEGER;
           for (const result of response.get(rewardAccount)!) {
-            highestEpoch = Math.min(highestEpoch, result.epoch.valueOf());
+            highestEpoch = Math.min(highestEpoch, result.epoch);
           }
 
           expect(highestEpoch).toBeLessThanOrEqual(10);

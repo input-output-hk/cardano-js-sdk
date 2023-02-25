@@ -310,7 +310,7 @@ epoch_rewards AS (
     COALESCE(rewards.member_rewards, 0) AS member_rewards,
     COALESCE(stake.active_stake, 0) AS active_stake,
     pool.pledge,
-    COALESCE(rewards.member_rewards / (stake.active_stake - pool.pledge), 0)::DOUBLE PRECISION AS member_roi
+    COALESCE(rewards.member_rewards / NULLIF(stake.active_stake - pool.pledge, 0), 0)::DOUBLE PRECISION AS member_roi
   FROM pool_stake_per_epoch AS stake
   JOIN epochs
     ON epochs.epoch_no = stake.epoch_no
@@ -348,7 +348,7 @@ ${epochRewardsSubqueries(epochLength, limit)}
 SELECT
   hash_id,
   COALESCE(
-    (SUM(member_rewards) / (SUM(active_stake) - SUM(pledge))) /
+    (SUM(member_rewards) / NULLIF(SUM(active_stake) - SUM(pledge), 0)) /
       NULLIF(${epochLength} / 86400000, 0) * 365,
     0
   )::DOUBLE PRECISION AS apy
@@ -446,7 +446,7 @@ export const poolsByPledgeMetSubqueries: readonly SubQuery[] = [
       )
     JOIN stake_address sa ON
       sa.id = pu.reward_addr_id
-    JOIN delegation d1 ON
+    LEFT JOIN delegation d1 ON
       sa.id = d1.addr_id
     WHERE NOT EXISTS
       (SELECT TRUE
@@ -629,8 +629,7 @@ SELECT
   pu.vrf_key_hash,
   metadata.url AS metadata_url,
   metadata.hash AS metadata_hash,
-  pod.json AS offline_data,
-  pod.json -> 'name' AS name
+  pod.json AS offline_data
 FROM pool_update pu
 JOIN pool_hash ph ON
   ph.id = pu.hash_id
@@ -657,7 +656,7 @@ export const getIdentifierWhereClause = (
   const tickers = [];
   const ids = [];
   for (const value of identifier.values) {
-    value.id && ids.push(value.id.toString());
+    value.id && ids.push(value.id);
     value.ticker && tickers.push(value.ticker);
     value.name && names.push(value.name);
   }
@@ -806,7 +805,7 @@ LEFT JOIN last_pool_retire AS pool_retire
 
 const sortFieldMapping: Record<string, { field: string; secondary?: string[] }> = {
   cost: { field: 'fixed_cost', secondary: ['margin'] },
-  name: { field: "lower((pod.json -> 'name')::TEXT)" }
+  name: { field: "lower((pod.json ->> 'name')::TEXT)" }
 };
 
 const mapSort = (sort: OrderByOptions | undefined) => {

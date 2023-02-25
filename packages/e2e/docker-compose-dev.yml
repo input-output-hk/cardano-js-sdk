@@ -1,0 +1,9 @@
+version: '3.9'
+
+services:
+  http-server:
+    volumes:
+      - ../..:/app
+  worker:
+    volumes:
+      - ../..:/app

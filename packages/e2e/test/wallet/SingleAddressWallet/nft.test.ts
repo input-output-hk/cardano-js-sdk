@@ -84,7 +84,7 @@ describe('SingleAddressWallet.assets/nft', () => {
     walletAddress = (await firstValueFrom(wallet.addresses$))[0].address;
 
     const txMetadatum = metadatum.jsonToMetadatum({
-      [policyId.toString()]: {
+      [policyId]: {
         'NFT-001': {
           image: ['ipfs://some_hash1'],
           name: 'One',
@@ -193,7 +193,7 @@ describe('SingleAddressWallet.assets/nft', () => {
         otherProperties: new Map([['version', '1.0']]),
         version: '1.0'
       },
-      policyId: policyId.toString(),
+      policyId,
       quantity: 1n,
       tokenMetadata: null
     });
@@ -235,7 +235,7 @@ describe('SingleAddressWallet.assets/nft', () => {
         ]),
         version: '1.0'
       },
-      policyId: policyId.toString(),
+      policyId,
       quantity: 1n,
       tokenMetadata: null
     });
@@ -286,5 +286,91 @@ describe('SingleAddressWallet.assets/nft', () => {
     );
 
     expect(nfts.find((nft) => nft.assetId === assetIds[TOKEN_BURN_INDEX])).toBeUndefined();
+  });
+
+  describe('CIP-0025 v1 and v2', () => {
+    // eslint-disable-next-line unicorn/consistent-function-scoping
+    const CIP0025Test = (testName: string, assetName: string, version: 1 | 2, encoding?: 'hex' | 'utf8') =>
+      it(testName, async () => {
+        const assetNameHex = Buffer.from(assetName).toString('hex');
+        const assetId = Cardano.AssetId(`${policyId}${assetNameHex}`);
+        const fingerprint = Cardano.AssetFingerprint.fromParts(policyId, Cardano.AssetName(assetNameHex));
+        const tokens = new Map([[assetId, 1n]]);
+
+        const txDataMetadatum = new Map([
+          [
+            version === 1 ? policyId : Buffer.from(policyId, 'hex'),
+            new Map([
+              [
+                version === 1 ? (encoding === 'hex' ? assetNameHex : assetName) : Buffer.from(assetName),
+                metadatum.jsonToMetadatum({
+                  image: ['ipfs://some_hash1'],
+                  name: assetName,
+                  version: '1.0'
+                })
+              ]
+            ])
+          ]
+        ]);
+
+        const auxiliaryData = { body: { blob: new Map([[721n, txDataMetadatum]]) } };
+
+        const txProps = {
+          auxiliaryData,
+          extraSigners: [policySigner],
+          mint: tokens,
+          outputs: new Set([
+            {
+              address: walletAddress,
+              value: {
+                assets: tokens,
+                coins: 50_000_000n
+              }
+            }
+          ]),
+          scripts: [policyScript]
+        };
+
+        const unsignedTx = await wallet.initializeTx(txProps);
+
+        const finalizeProps = {
+          auxiliaryData,
+          extraSigners: [policySigner],
+          scripts: [policyScript],
+          tx: unsignedTx
+        };
+
+        const signedTx = await wallet.finalizeTx(finalizeProps);
+
+        await submitAndConfirm(wallet, signedTx);
+
+        // try remove the asset.nftMetadata filter
+        const nfts = await firstValueFrom(
+          combineLatest([wallet.assets$, wallet.balance.utxo.total$]).pipe(
+            filter(([assets, balance]) => assets.size === balance.assets?.size),
+            map(([assets]) => [...assets.values()].filter((asset) => !!asset.nftMetadata))
+          )
+        );
+
+        expect(nfts.find((nft) => nft.assetId === assetId)).toMatchObject({
+          assetId,
+          fingerprint,
+          mintOrBurnCount: 1,
+          name: assetNameHex,
+          nftMetadata: {
+            image: ['ipfs://some_hash1'],
+            name: assetName,
+            otherProperties: new Map([['version', '1.0']]),
+            version: '1.0'
+          },
+          policyId,
+          quantity: 1n,
+          tokenMetadata: null
+        });
+      });
+
+    CIP0025Test('supports CIP-25 v1, assetName hex encoded', 'CIP-0025-v1-hex', 1, 'hex');
+    CIP0025Test('supports CIP-25 v1, assetName utf8 encoded', 'CIP-0025-v1-utf8', 1, 'utf8');
+    CIP0025Test('supports CIP-25 v2', 'CIP-0025-v2', 2);
   });
 });

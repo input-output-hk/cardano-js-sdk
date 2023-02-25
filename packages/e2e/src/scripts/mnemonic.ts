@@ -16,7 +16,7 @@ import { localNetworkChainId } from '../util';
   const keyAgentFromMnemonic = await InMemoryKeyAgent.fromBip39MnemonicWords(
     {
       chainId: localNetworkChainId,
-      getPassword: async () => Buffer.from(''),
+      getPassphrase: async () => Buffer.from(''),
       mnemonicWords: mnemonicArray
     },
     {

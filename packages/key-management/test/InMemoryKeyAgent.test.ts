@@ -9,26 +9,26 @@ const { ownSignatureKeyPaths } = jest.requireMock('../src/util/ownSignatureKeyPa
 
 describe('InMemoryKeyAgent', () => {
   let keyAgent: InMemoryKeyAgent;
-  let getPassword: jest.Mock;
+  let getPassphrase: jest.Mock;
   let inputResolver: jest.Mocked<Cardano.util.InputResolver>;
   let mnemonicWords: string[];
   const bip32Ed25519 = new Crypto.CmlBip32Ed25519(CML);
 
   beforeEach(async () => {
     mnemonicWords = util.generateMnemonicWords();
-    getPassword = jest.fn().mockResolvedValue(Buffer.from('password'));
+    getPassphrase = jest.fn().mockResolvedValue(Buffer.from('password'));
     inputResolver = { resolveInputAddress: jest.fn() };
     keyAgent = await InMemoryKeyAgent.fromBip39MnemonicWords(
       {
         chainId: Cardano.ChainIds.Preview,
-        getPassword,
+        getPassphrase,
         mnemonicWords
       },
       { bip32Ed25519, inputResolver, logger: dummyLogger }
     );
   });
 
-  afterEach(() => getPassword.mockReset());
+  afterEach(() => getPassphrase.mockReset());
 
   test('chainId', () => {
     expect(keyAgent.chainId).toEqual(Cardano.ChainIds.Preview);
@@ -46,7 +46,7 @@ describe('InMemoryKeyAgent', () => {
     const saferKeyAgent = await InMemoryKeyAgent.fromBip39MnemonicWords(
       {
         chainId: Cardano.ChainIds.Preview,
-        getPassword,
+        getPassphrase,
         mnemonic2ndFactorPassphrase: 'passphrase',
         mnemonicWords
       },
@@ -111,11 +111,11 @@ describe('InMemoryKeyAgent', () => {
     expect(address).toBeDefined();
   });
 
-  test('exportRootPrivateKey ignores password cache', async () => {
+  test('exportRootPrivateKey ignores passphrase cache', async () => {
     const privateKey = await keyAgent.exportRootPrivateKey();
     expect(typeof privateKey).toBe('string');
-    expect(getPassword).toBeCalledTimes(2); // once on initialization of key agent
-    expect(getPassword).toBeCalledWith(true);
+    expect(getPassphrase).toBeCalledTimes(2); // once on initialization of key agent
+    expect(getPassphrase).toBeCalledWith(true);
   });
 
   describe('yoroi compatibility', () => {
@@ -156,7 +156,7 @@ describe('InMemoryKeyAgent', () => {
               rootPrivateKey: Crypto.Bip32PrivateKeyHex(yoroiRootPrivateKeyHex)
             })
           ),
-          getPassword,
+          getPassphrase,
           knownAddresses: []
         },
         { bip32Ed25519, inputResolver, logger: dummyLogger }
@@ -169,7 +169,7 @@ describe('InMemoryKeyAgent', () => {
       const keyAgentFromMnemonic = await InMemoryKeyAgent.fromBip39MnemonicWords(
         {
           chainId: Cardano.ChainIds.Preview,
-          getPassword,
+          getPassphrase,
           mnemonicWords: yoroiMnemonic
         },
         { bip32Ed25519, inputResolver, logger: dummyLogger }
@@ -187,7 +187,7 @@ describe('InMemoryKeyAgent', () => {
       const keyAgentFromMnemonic = await InMemoryKeyAgent.fromBip39MnemonicWords(
         {
           chainId: Cardano.ChainIds.Preview,
-          getPassword,
+          getPassphrase,
           mnemonicWords: michaelMnemonic
         },
         { bip32Ed25519, inputResolver, logger: dummyLogger }
@@ -252,7 +252,7 @@ describe('InMemoryKeyAgent', () => {
             })
           ),
           // daedelus enforces min length of 10
-          getPassword: jest.fn().mockResolvedValue(Buffer.from('nMmys*X002')),
+          getPassphrase: jest.fn().mockResolvedValue(Buffer.from('nMmys*X002')),
           knownAddresses: []
         },
         { bip32Ed25519, inputResolver, logger: dummyLogger }
@@ -268,7 +268,7 @@ describe('InMemoryKeyAgent', () => {
       const keyAgentFromMnemonic = await InMemoryKeyAgent.fromBip39MnemonicWords(
         {
           chainId: Cardano.ChainIds.Preview,
-          getPassword,
+          getPassphrase,
           mnemonicWords: daedelusMnemonic24
         },
         { bip32Ed25519, inputResolver, logger: dummyLogger }

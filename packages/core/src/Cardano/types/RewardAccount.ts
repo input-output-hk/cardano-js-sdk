@@ -16,7 +16,7 @@ export const RewardAccount = (value: string): RewardAccount => typedBech32(value
 
 RewardAccount.toHash = (rewardAccount: RewardAccount): Ed25519KeyHashHex =>
   usingAutoFree((scope) => {
-    const bech32 = scope.manage(CML.Address.from_bech32(rewardAccount.toString()));
+    const bech32 = scope.manage(CML.Address.from_bech32(rewardAccount));
     const rewardAddress = scope.manage(CML.RewardAddress.from_address(bech32)!);
     const paymentCred = scope.manage(rewardAddress.payment_cred()!);
     const keyHash = scope.manage(paymentCred.to_keyhash()!);

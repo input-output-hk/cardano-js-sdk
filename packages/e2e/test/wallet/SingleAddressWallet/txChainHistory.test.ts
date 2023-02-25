@@ -28,9 +28,7 @@ describe('tx chain history', () => {
     const [{ address: sendingAddress }] = await firstValueFrom(wallet.addresses$);
     const receivingAddress = sendingAddress;
 
-    logger.info(
-      `Address ${sendingAddress.toString()} will send ${tAdaToSend} lovelace to address ${receivingAddress.toString()}.`
-    );
+    logger.info(`Address ${sendingAddress} will send ${tAdaToSend} lovelace to address ${receivingAddress}.`);
 
     // Send 10 tADA to the same wallet.
     const txBuilder = buildTx({ logger, observableWallet: wallet });

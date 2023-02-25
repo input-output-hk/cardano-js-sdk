@@ -3,6 +3,58 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.6.0...@cardano-sdk/e2e@0.7.0) (2023-02-17)
+
+### ⚠ BREAKING CHANGES
+
+- **wallet:** ObservableWallet.transactions.outgoing.\* types have been updated to emit
+  events that no longer contain the entire deserialized Cardano.Tx.
+  Instead, it now contains serialized transaction (hex-encoded cbor)
+  and deserialized transaction body.
+
+PouchDB stores will re-create the stores of volatileTransactions and inFlightTransactions
+with a new db name ('V2' suffix), which means that data in existing stores will be forgotten.
+
+- replaces occurrences of password with passphrase
+- **wallet:** return cip30 addresses as cbor instead of bech32
+- - Bip32PublicKey removed from core and replaced by the Bip32PublicKeyHex type from the crypto package.
+
+* Bip32PrivateKey removed from core and replaced by the Bip32PrivateKeyHex type from the crypto package.
+* Ed25519PublicKey removed from core and replaced by the Ed25519PublicKeyHex type from the crypto package.
+* Ed25519PrivateKey removed from core and replaced by the Ed25519PrivateKeyHex type from the crypto package.
+* Ed25519KeyHash removed from core and replaced by the Ed25519KeyHashHex type from the the crypto package.
+* Ed25519Signature removed from core and replaced by the Ed25519SignatureHex type from the crypto package.
+* Hash32ByteBase16 removed from core and replaced by the Hash32ByteBase16 type from the crypto package.
+* Hash28ByteBase16 removed from core and replaced by the Hash28ByteBase16 type from the crypto package.
+* The KeyAgent interface now has a new field bip32Ed25519.
+* The KeyAgentBase class and all its derived classes (InMemoryKeyAgent, LedgerKeyAgent and TrezorKeyAgent) must now be provided with a Bip32Ed25519 implementation on their constructors.
+* Bip32Path type was removed from the key-management package and replaced by the Bip32Path from the crypto package.
+
+- hoist Opaque types, hexBlob, Base64Blob and related utils
+- CompactGenesis.slotLength type changed
+  from `number` to `Seconds`
+- - all provider constructors are updated to use standardized form of deps
+
+### Features
+
+- **e2e:** adds development version of local-network ([6ab352c](https://github.com/input-output-hk/cardano-js-sdk/commit/6ab352c4fc0c4faf4c6acffc569df460a1a99527))
+- **e2e:** enhance dev version of local network to include node_packages dir as well ([fb20a7c](https://github.com/input-output-hk/cardano-js-sdk/commit/fb20a7c115368254b3844244f498299480218886))
+- update CompactGenesis slotLength type to be Seconds ([82e63d6](https://github.com/input-output-hk/cardano-js-sdk/commit/82e63d6cacedbab5ecf8491dfd37749bfeddbc22))
+- **wallet:** manage unspendables after collateral consumption or chain rollbacks ([e600746](https://github.com/input-output-hk/cardano-js-sdk/commit/e6007465e617698954a61774b3c2a461678c322a))
+- **wallet:** support foreign transaction submission ([3a116c6](https://github.com/input-output-hk/cardano-js-sdk/commit/3a116c637f88f37cae302a477ca5375fca65f088))
+
+### Bug Fixes
+
+- fixes a minor bug in stake pool query sort by name ([5eb3aa5](https://github.com/input-output-hk/cardano-js-sdk/commit/5eb3aa52faed5add00fa63f74094033a8fb28fa0))
+- **wallet:** return cip30 addresses as cbor instead of bech32 ([cae6081](https://github.com/input-output-hk/cardano-js-sdk/commit/cae6081e672d2f4678762ca20be432765be5eeae))
+
+### Code Refactoring
+
+- hoist Opaque types, hexBlob, Base64Blob and related utils ([391a8f2](https://github.com/input-output-hk/cardano-js-sdk/commit/391a8f20d60607c4fb6ce8586b97ae96841f759b))
+- refactor the SDK to use the new crypto package ([3b41320](https://github.com/input-output-hk/cardano-js-sdk/commit/3b41320e7971a231d50785733ff4cd0793418d3d))
+- replaces occurrences of password with passphrase ([0c0ec5f](https://github.com/input-output-hk/cardano-js-sdk/commit/0c0ec5fba7a0f7595dbca5b2ab1c66e58ac49e36))
+- standardize provider dependencies ([05b37e6](https://github.com/input-output-hk/cardano-js-sdk/commit/05b37e6383a906152df457143c5a27341a11c341))
+
 ## [0.6.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.5.0...@cardano-sdk/e2e@0.6.0) (2022-12-22)
 
 ### ⚠ BREAKING CHANGES

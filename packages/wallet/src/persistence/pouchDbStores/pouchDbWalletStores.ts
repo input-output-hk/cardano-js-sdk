@@ -59,7 +59,7 @@ export const createPouchDbWalletStores = (
     destroyed: false,
     eraSummaries: new PouchDbEraSummariesStore(docsDbName, 'EraSummaries', logger),
     genesisParameters: new PouchDbGenesisParametersStore(docsDbName, 'genesisParameters', logger),
-    inFlightTransactions: new PouchDbInFlightTransactionsStore(docsDbName, 'transactionsInFlight', logger),
+    inFlightTransactions: new PouchDbInFlightTransactionsStore(docsDbName, 'transactionsInFlight_v2', logger),
     protocolParameters: new PouchDbProtocolParametersStore(docsDbName, 'protocolParameters', logger),
     rewardsBalances: new PouchDbRewardsBalancesStore(`${baseDbName}RewardsBalances`, logger),
     rewardsHistory: new PouchDbRewardsHistoryStore(`${baseDbName}RewardsHistory`, logger),
@@ -72,13 +72,13 @@ export const createPouchDbWalletStores = (
            * Multiplied by 100k to distinguish between blockNo=1,index=0 and blockNo=0,index=1
            * Assuming there can never be more >=100k transactions in a block
            */
-          (blockNo.valueOf() * 100_000 + index).toString(),
+          (blockNo * 100_000 + index).toString(),
         dbName: `${baseDbName}Transactions`
       },
       logger
     ),
     unspendableUtxo: new PouchDbUtxoStore({ dbName: `${baseDbName}UnspendableUtxo` }, logger),
     utxo: new PouchDbUtxoStore({ dbName: `${baseDbName}Utxo` }, logger),
-    volatileTransactions: new PouchDbVolatileTransactionsStore(docsDbName, 'volatileTransactions', logger)
+    volatileTransactions: new PouchDbVolatileTransactionsStore(docsDbName, 'volatileTransactions_v2', logger)
   };
 };

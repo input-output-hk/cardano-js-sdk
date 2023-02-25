@@ -3,6 +3,77 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.7.0...@cardano-sdk/wallet@0.8.0) (2023-02-17)
+
+### ⚠ BREAKING CHANGES
+
+- **wallet:** convert SingleAddressWallet.setUnspendable to async
+- **wallet:** update ObservableWallet.submitTx signature to return transaction ID
+- **wallet:** ObservableWallet.transactions.outgoing.\* types have been updated to emit
+  events that no longer contain the entire deserialized Cardano.Tx.
+  Instead, it now contains serialized transaction (hex-encoded cbor)
+  and deserialized transaction body.
+
+PouchDB stores will re-create the stores of volatileTransactions and inFlightTransactions
+with a new db name ('V2' suffix), which means that data in existing stores will be forgotten.
+
+- replaces occurrences of password with passphrase
+- **wallet:** return cip30 addresses as cbor instead of bech32
+- - The default input selection constraints were moved from input-selection package to tx-construction package.
+- **input-selection:** - The ProtocolParametersForInputSelection type now includes the field
+  'prices' from the protocol parameters.
+- **wallet:** `createTransactionReemitter` returns a
+  `TransactionReemiter` object instead of an `Observable<Cardano.NewTxAlonzo>`
+- reworks stake pool epoch rewards fields to be ledger compliant
+- - Bip32PublicKey removed from core and replaced by the Bip32PublicKeyHex type from the crypto package.
+
+* Bip32PrivateKey removed from core and replaced by the Bip32PrivateKeyHex type from the crypto package.
+* Ed25519PublicKey removed from core and replaced by the Ed25519PublicKeyHex type from the crypto package.
+* Ed25519PrivateKey removed from core and replaced by the Ed25519PrivateKeyHex type from the crypto package.
+* Ed25519KeyHash removed from core and replaced by the Ed25519KeyHashHex type from the the crypto package.
+* Ed25519Signature removed from core and replaced by the Ed25519SignatureHex type from the crypto package.
+* Hash32ByteBase16 removed from core and replaced by the Hash32ByteBase16 type from the crypto package.
+* Hash28ByteBase16 removed from core and replaced by the Hash28ByteBase16 type from the crypto package.
+* The KeyAgent interface now has a new field bip32Ed25519.
+* The KeyAgentBase class and all its derived classes (InMemoryKeyAgent, LedgerKeyAgent and TrezorKeyAgent) must now be provided with a Bip32Ed25519 implementation on their constructors.
+* Bip32Path type was removed from the key-management package and replaced by the Bip32Path from the crypto package.
+
+- hoist Opaque types, hexBlob, Base64Blob and related utils
+- **wallet:** ensureValidityInterval now requires slotLength property from Cardano.CompactGenesis
+- CompactGenesis.slotLength type changed
+  from `number` to `Seconds`
+
+### Features
+
+- expose setUnspendable on ObservableWallet interface ([729e5d7](https://github.com/input-output-hk/cardano-js-sdk/commit/729e5d7c63447837a4196f2e19fb306939873a69))
+- **input-selection:** input selection now requires execution unit prices ([680845f](https://github.com/input-output-hk/cardano-js-sdk/commit/680845f5763194a1d6b18bebd8af543fcd5f47e4))
+- new tx construction package added ([45c0c75](https://github.com/input-output-hk/cardano-js-sdk/commit/45c0c75b20f766a069af45cec636a1756a3fc0da))
+- update CompactGenesis slotLength type to be Seconds ([82e63d6](https://github.com/input-output-hk/cardano-js-sdk/commit/82e63d6cacedbab5ecf8491dfd37749bfeddbc22))
+- **wallet:** convert static TTL to be based on slotLength ([7f6df55](https://github.com/input-output-hk/cardano-js-sdk/commit/7f6df557dedb8e2ea4dc393d950d2e895325328d))
+- **wallet:** emit failed rollbacks from createTransactionReemitter ([2a64ee5](https://github.com/input-output-hk/cardano-js-sdk/commit/2a64ee58e50d740666491d0e7fb12c97a4f7e1d4))
+- **wallet:** manage unspendables after collateral consumption or chain rollbacks ([e600746](https://github.com/input-output-hk/cardano-js-sdk/commit/e6007465e617698954a61774b3c2a461678c322a))
+- **wallet:** reemit failures are merged with transactionTracker failure ([2dd9c3d](https://github.com/input-output-hk/cardano-js-sdk/commit/2dd9c3dd7fc3dbf34dd160e022d5c6d3c2713e66))
+- **wallet:** support foreign transaction submission ([3a116c6](https://github.com/input-output-hk/cardano-js-sdk/commit/3a116c637f88f37cae302a477ca5375fca65f088))
+- **wallet:** update ObservableWallet.submitTx signature to return transaction ID ([0e6c6f1](https://github.com/input-output-hk/cardano-js-sdk/commit/0e6c6f15c1ec21c816680aa257731a069df7ee51))
+
+### Bug Fixes
+
+- **key-management:** correct ledger tx mapping validityIntervalStart prop name ([4627230](https://github.com/input-output-hk/cardano-js-sdk/commit/4627230ff0eb26a473cf3dc1c4c544d5bee8bb09))
+- **wallet:** cip30 getCollateral return null on missing utxo ([fbfce69](https://github.com/input-output-hk/cardano-js-sdk/commit/fbfce697c7bc5c3829a25b2254f87ee8afcc0026))
+- **wallet:** reject with ApiError(InvalidRequest) when trying to submit invalid tx ([865c8b9](https://github.com/input-output-hk/cardano-js-sdk/commit/865c8b91914638416f8ce79925fa8d3a000fb3fb))
+- **wallet:** remove serialization round-trip from CIP-30 submitTx mapping ([8f062e5](https://github.com/input-output-hk/cardano-js-sdk/commit/8f062e5f8dd2ee503f1c63ab7151767470bb3788))
+- **wallet:** replace misleading 'nope' errors ([d63dea1](https://github.com/input-output-hk/cardano-js-sdk/commit/d63dea1b0cbb46ba6df4f4988f6b295ac09e01ae))
+- **wallet:** return cip30 addresses as cbor instead of bech32 ([cae6081](https://github.com/input-output-hk/cardano-js-sdk/commit/cae6081e672d2f4678762ca20be432765be5eeae))
+- **wallet:** standard error codes in getChangeAddress ([b79cb99](https://github.com/input-output-hk/cardano-js-sdk/commit/b79cb99b2671c2a4fe68028b11b330a5fb631611))
+
+### Code Refactoring
+
+- hoist Opaque types, hexBlob, Base64Blob and related utils ([391a8f2](https://github.com/input-output-hk/cardano-js-sdk/commit/391a8f20d60607c4fb6ce8586b97ae96841f759b))
+- refactor the SDK to use the new crypto package ([3b41320](https://github.com/input-output-hk/cardano-js-sdk/commit/3b41320e7971a231d50785733ff4cd0793418d3d))
+- replaces occurrences of password with passphrase ([0c0ec5f](https://github.com/input-output-hk/cardano-js-sdk/commit/0c0ec5fba7a0f7595dbca5b2ab1c66e58ac49e36))
+- reworks stake pool epoch rewards fields to be ledger compliant ([a9ff583](https://github.com/input-output-hk/cardano-js-sdk/commit/a9ff583d26fe427c2816ab286bb3ae4aeacc9301))
+- **wallet:** convert SingleAddressWallet.setUnspendable to async ([b5689b1](https://github.com/input-output-hk/cardano-js-sdk/commit/b5689b18c51d6e7db509f4223ad27944e050cb1d))
+
 ## [0.7.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.6.0...@cardano-sdk/wallet@0.7.0) (2022-12-22)
 
 ### ⚠ BREAKING CHANGES

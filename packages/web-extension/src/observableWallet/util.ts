@@ -50,6 +50,7 @@ export const observableWalletProperties: RemoteApiProperties<ObservableWallet> =
   },
   utxo: {
     available$: RemoteApiPropertyType.HotObservable,
+    setUnspendable: RemoteApiPropertyType.MethodReturningPromise,
     total$: RemoteApiPropertyType.HotObservable,
     unspendable$: RemoteApiPropertyType.HotObservable
   }

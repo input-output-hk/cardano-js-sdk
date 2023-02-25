@@ -29,7 +29,15 @@ const blocksWithRollbacks = (blockHeights: number[], requestedBlocks: RequestedB
       const requestedBlock = requestedBlocks[blockNo];
       if (!requestedBlock) throw new Error(`Cannot rollback to a non-requested block: ${blockHeight}`);
       const header = ogmiosToCore.blockHeader(requestedBlock);
-      header && result.push({ eventType: ChainSyncEventType.RollBackward, tip: header });
+      header &&
+        result.push({
+          eventType: ChainSyncEventType.RollBackward,
+          point: {
+            hash: header.hash,
+            slot: header.slot
+          },
+          tip: header
+        });
     }
   }
   return result;
@@ -71,7 +79,7 @@ export const getChainSyncEvents = async (
             if (draining) return;
             const header = ogmiosToCore.blockHeader(block);
             if (!header) return;
-            currentBlock = header.blockNo.valueOf();
+            currentBlock = header.blockNo;
             if (onBlock !== undefined) {
               onBlock(currentBlock);
             }

@@ -16,7 +16,7 @@ import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
 import { testAsyncKeyAgent } from '../../../key-management/test/mocks';
-import { waitForWalletStateSettle } from '../util';
+import { toOutgoingTx, waitForWalletStateSettle } from '../util';
 
 const name = 'Test Wallet';
 const address = mocks.utxo[0][0].address!;
@@ -101,7 +101,7 @@ const txBody: Cardano.TxBody = {
   ],
   outputs: [txOut],
   validityInterval: {
-    invalidHereafter: Cardano.Slot(mocks.ledgerTip.slot.valueOf() + 10)
+    invalidHereafter: Cardano.Slot(mocks.ledgerTip.slot + 10)
   }
 };
 
@@ -129,7 +129,7 @@ describe('SingleAddressWallet rollback', () => {
     const secondTip = {
       blockNo: 1_111_112,
       hash: '10d64cc11e9b20e15b6c46aa7b1fed11246f438e62225655a30ea47bf8cc22d0',
-      slot: Cardano.Slot(mocks.ledgerTip.slot.valueOf() + 1)
+      slot: Cardano.Slot(mocks.ledgerTip.slot + 1)
     };
 
     networkInfoProvider.ledgerTip = jest.fn().mockResolvedValueOnce(mocks.ledgerTip).mockResolvedValueOnce(secondTip);
@@ -137,7 +137,7 @@ describe('SingleAddressWallet rollback', () => {
     const histTx1 = mocks.queryTransactionsResult.pageResults[0];
     const rollBackTx = { ...mocks.queryTransactionsResult.pageResults[1], id: tx.id };
     if (rollBackTx.body.validityInterval?.invalidHereafter) {
-      rollBackTx.body.validityInterval.invalidHereafter = Cardano.Slot(secondTip.slot.valueOf() + 1);
+      rollBackTx.body.validityInterval.invalidHereafter = Cardano.Slot(secondTip.slot + 1);
     }
 
     const newTx = {
@@ -154,7 +154,7 @@ describe('SingleAddressWallet rollback', () => {
     stores.volatileTransactions.set([
       {
         confirmedAt: rollBackTx.blockHeader.slot,
-        tx
+        ...toOutgoingTx(tx)
       }
     ]);
 

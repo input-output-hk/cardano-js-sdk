@@ -51,7 +51,7 @@ export const queryTransactionsResult: Paginated<Cardano.HydratedTx> = {
     {
       blockHeader: {
         blockNo: Cardano.BlockNo(10_050),
-        slot: Cardano.Slot(ledgerTip.slot.valueOf() - 150_000)
+        slot: Cardano.Slot(ledgerTip.slot - 150_000)
       } as Cardano.PartialBlockHeader,
       body: {
         certificates: [
@@ -96,7 +96,7 @@ export const queryTransactionsResult: Paginated<Cardano.HydratedTx> = {
           }
         ],
         validityInterval: {
-          invalidHereafter: Cardano.Slot(ledgerTip.slot.valueOf() + 1)
+          invalidHereafter: Cardano.Slot(ledgerTip.slot + 1)
         }
       },
       id: Cardano.TransactionId('12fa9af65e21b36ec4dc4cbce478e911d52585adb46f2b4fe3d6563e7ee5a61a'),
@@ -109,9 +109,10 @@ export const queryTransactionsResult: Paginated<Cardano.HydratedTx> = {
     {
       blockHeader: {
         blockNo: Cardano.BlockNo(10_100),
-        slot: Cardano.Slot(ledgerTip.slot.valueOf() - 100_000)
-      },
+        slot: Cardano.Slot(ledgerTip.slot - 100_000)
+      } as Cardano.PartialBlockHeader,
       body: {
+        fee: 123n,
         inputs: [
           {
             address: Cardano.Address(
@@ -130,11 +131,16 @@ export const queryTransactionsResult: Paginated<Cardano.HydratedTx> = {
           }
         ],
         validityInterval: {
-          invalidHereafter: Cardano.Slot(ledgerTip.slot.valueOf() + 1)
+          invalidHereafter: Cardano.Slot(ledgerTip.slot + 1)
         }
       },
-      id: Cardano.TransactionId('6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad')
-    } as Cardano.HydratedTx
+      id: Cardano.TransactionId('6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad'),
+      index: 1,
+      txSize: 200_000,
+      witness: {
+        signatures: new Map()
+      }
+    }
   ],
   totalResultCount: 2
 };
@@ -146,7 +152,7 @@ export const queryTransactionsResult2: Paginated<Cardano.HydratedTx> = {
       ...queryTransactionsResult.pageResults[1],
       blockHeader: {
         blockNo: Cardano.BlockNo(10_150),
-        slot: Cardano.Slot(ledgerTip.slot.valueOf() - 50_000)
+        slot: Cardano.Slot(ledgerTip.slot - 50_000)
       },
       id: Cardano.TransactionId('6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99caa')
     } as Cardano.HydratedTx
@@ -154,7 +160,26 @@ export const queryTransactionsResult2: Paginated<Cardano.HydratedTx> = {
   totalResultCount: 3
 };
 
-const queryTransactions = () => jest.fn().mockResolvedValueOnce(queryTransactionsResult);
+const queryTransactions = ({ rewardAccount }: { rewardAccount?: Cardano.RewardAccount } = {}) =>
+  jest.fn().mockResolvedValueOnce({
+    ...queryTransactionsResult,
+    pageResults: rewardAccount
+      ? queryTransactionsResult.pageResults.map((tx) => ({
+          ...tx,
+          body: {
+            ...tx.body,
+            certificates: tx.body.certificates?.map((certificate) =>
+              'stakeKeyHash' in certificate
+                ? {
+                    ...certificate,
+                    stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+                  }
+                : certificate
+            )
+          }
+        }))
+      : queryTransactionsResult.pageResults
+  });
 
 export const blocksByHashes = [{ epoch: Cardano.EpochNo(currentEpoch.number - 3) } as Cardano.ExtendedBlockInfo];
 
@@ -163,11 +188,11 @@ export const blocksByHashes = [{ epoch: Cardano.EpochNo(currentEpoch.number - 3)
  *
  * returns ChainHistoryProvider-compatible object
  */
-export const mockChainHistoryProvider = () => ({
+export const mockChainHistoryProvider = (props: { rewardAccount?: Cardano.RewardAccount } = {}) => ({
   blocksByHashes: jest.fn().mockResolvedValue(blocksByHashes),
   healthCheck: jest.fn().mockResolvedValue({ ok: true }),
-  transactionsByAddresses: queryTransactions(),
-  transactionsByHashes: queryTransactions()
+  transactionsByAddresses: queryTransactions(props),
+  transactionsByHashes: queryTransactions(props)
 });
 
 /**

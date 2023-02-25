@@ -1,13 +1,13 @@
 import { Cardano, Paginated, StakePoolProvider } from '@cardano-sdk/core';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import { epochRewards, rewardAccountBalance, rewardAccountBalance2, rewardsHistory, rewardsHistory2 } from './mockData';
 import { getRandomTxId } from './mockChainHistoryProvider';
-import { rewardAccountBalance, rewardAccountBalance2, rewardsHistory, rewardsHistory2 } from './mockData';
 import delay from 'delay';
 
-export const mockRewardsProvider = () => ({
+export const mockRewardsProvider = ({ rewardAccount }: { rewardAccount?: Cardano.RewardAccount } = {}) => ({
   healthCheck: jest.fn().mockResolvedValue({ ok: true }),
   rewardAccountBalance: jest.fn().mockResolvedValue(rewardAccountBalance),
-  rewardsHistory: jest.fn().mockResolvedValue(rewardsHistory)
+  rewardsHistory: jest.fn().mockResolvedValue(rewardAccount ? new Map([[rewardAccount, epochRewards]]) : rewardsHistory)
 });
 
 export const mockRewardsProvider2 = (delayMs: number) => {

@@ -1,15 +1,12 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { ChainSyncEventType } from '@cardano-sdk/core';
-import { InMemoryStore } from '../../../src/sinks';
+import { InMemory } from '../../../src';
 import { defaultIfEmpty, firstValueFrom } from 'rxjs';
 import { stakeKeys } from '../../../src/sinks/inMemory/stakeKeys';
 
 describe('sinks/inMemory/stakeKeys', () => {
   it('adds a key on registration, removes on deregistration and inverses operations on rollbacks', async () => {
-    const store: InMemoryStore = {
-      stakeKeys: new Set(),
-      stakePools: new Map()
-    };
+    const store = InMemory.createStore();
     const sink = async (
       eventType: ChainSyncEventType,
       register: Crypto.Ed25519KeyHashHex[],

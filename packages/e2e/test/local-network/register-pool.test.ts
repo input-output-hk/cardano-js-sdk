@@ -18,7 +18,7 @@ const wallet1Params: KeyAgentFactoryProps = {
   mnemonic:
     // eslint-disable-next-line max-len
     'decorate survey empower stairs pledge humble social leisure baby wrap grief exact monster rug dash kiss perfect select science light frame play swallow day',
-  password: 'some_password'
+  passphrase: 'some_passphrase'
 };
 const wallet2Params: KeyAgentFactoryProps = {
   accountIndex: 0,
@@ -26,7 +26,7 @@ const wallet2Params: KeyAgentFactoryProps = {
   mnemonic:
     // eslint-disable-next-line max-len
     'salon zoo engage submit smile frost later decide wing sight chaos renew lizard rely canal coral scene hobby scare step bus leaf tobacco slice',
-  password: 'some_password'
+  passphrase: 'some_passphrase'
 };
 
 describe('local-network/register-pool', () => {
@@ -138,7 +138,7 @@ describe('local-network/register-pool', () => {
     });
 
     expect(result.pageResults.length).toBeGreaterThan(0);
-    expect(result.pageResults[0].hexId).toBe(Cardano.PoolIdHex(poolKeyHash.toString()));
+    expect(result.pageResults[0].hexId).toBe(Cardano.PoolIdHex(poolKeyHash));
     expect(result.pageResults[0].id).toBe(poolId);
     expect(result.pageResults[0].status).toBe(Cardano.StakePoolStatus.Activating);
     expect(result.pageResults[0].metrics.livePledge).toBeLessThan(result.pageResults[0].pledge);
@@ -220,7 +220,7 @@ describe('local-network/register-pool', () => {
     });
 
     expect(result.pageResults.length).toBeGreaterThan(0);
-    expect(result.pageResults[0].hexId).toBe(Cardano.PoolIdHex(poolKeyHash.toString()));
+    expect(result.pageResults[0].hexId).toBe(Cardano.PoolIdHex(poolKeyHash));
     expect(result.pageResults[0].id).toBe(poolId);
     expect(result.pageResults[0].status).toBe(Cardano.StakePoolStatus.Activating);
     expect(result.pageResults[0].metrics.livePledge).toBeGreaterThan(result.pageResults[0].pledge);

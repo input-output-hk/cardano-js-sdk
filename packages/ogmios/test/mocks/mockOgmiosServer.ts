@@ -1,7 +1,10 @@
+/* eslint-disable sonarjs/no-nested-switch */
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { EraMismatch, IntersectionFound, IntersectionNotFound, PointOrOrigin } from '@cardano-ogmios/schema';
 import {
   EraSummariesResponse,
+  GenesisConfigResponse,
   HealthCheckResponse,
   InvocationState,
   StakeDistributionResponse,
@@ -9,9 +12,13 @@ import {
   TxSubmitResponse
 } from './types';
 import { HEALTH_RESPONSE_BODY } from './util';
+import { Milliseconds } from '@cardano-sdk/core';
 import { Schema, UnknownResultError } from '@cardano-ogmios/client';
 import { Server, createServer } from 'http';
 import WebSocket from 'ws';
+import delay from 'delay';
+import fs from 'fs';
+import path from 'path';
 
 export interface MockOgmiosServerConfig {
   healthCheck?: {
@@ -24,6 +31,9 @@ export interface MockOgmiosServerConfig {
     eraSummaries?: {
       response: EraSummariesResponse;
     };
+    genesisConfig?: {
+      response: GenesisConfigResponse | GenesisConfigResponse[];
+    };
     systemStart?: {
       response: SystemStartResponse;
     };
@@ -31,8 +41,52 @@ export interface MockOgmiosServerConfig {
       response: StakeDistributionResponse;
     };
   };
+  /**
+   * Also used for chainSync.start
+   */
+  findIntersect?: (points: PointOrOrigin[]) => IntersectionFound | IntersectionNotFound;
+  chainSync?: {
+    requestNext: {
+      /**
+       * Filenames of test vectors
+       */
+      responses: string[];
+    };
+  };
   submitTxHook?: (data?: Uint8Array) => void;
+  maxConnections?: number;
 }
+
+export const mockGenesisConfig = {
+  activeSlotsCoefficient: '1/20',
+  epochLength: 86_400,
+  maxKesEvolutions: 120,
+  maxLovelaceSupply: 45_000_000_000_000_000,
+  network: 'testnet',
+  networkMagic: 2,
+  securityParameter: 432,
+  slotLength: 1,
+  slotsPerKesPeriod: 86_400,
+  systemStart: '2022-08-09T00:00:00Z',
+  updateQuorum: 5
+} as Schema.CompactGenesis;
+
+const handleFindIntersect = (args: any, config: MockOgmiosServerConfig, send: (result: unknown) => void) => {
+  const response = config.findIntersect?.(args.points);
+  if (!response) {
+    throw new Error('findIntersect config not found');
+  }
+  send(response);
+};
+
+const handleRequestNext = (config: MockOgmiosServerConfig, send: (result: unknown) => void) => {
+  const fileName = config.chainSync?.requestNext.responses.shift();
+  if (!fileName) {
+    throw new Error('No next event in config requestNext');
+  }
+  // This will lose precision with large numbers
+  send(JSON.parse(fs.readFileSync(path.join(__dirname, './chainSyncEvents', fileName), 'utf-8')));
+};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const handleSubmitTx = async (
@@ -73,13 +127,9 @@ const handleSubmitTx = async (
   send(result);
 };
 
+// eslint-disable-next-line complexity, sonarjs/cognitive-complexity
 const handleQuery = async (query: string, config: MockOgmiosServerConfig, send: (result: unknown) => void) => {
-  let result:
-    | Schema.EraSummary[]
-    | Date
-    | 'QueryUnavailableInCurrentEra'
-    | Schema.PoolDistribution
-    | UnknownResultError;
+  let result: any;
   switch (query) {
     case 'eraSummaries':
       if (config.stateQuery?.eraSummaries?.response.success) {
@@ -96,8 +146,10 @@ const handleQuery = async (query: string, config: MockOgmiosServerConfig, send: 
           }
         ];
       } else if (config.stateQuery?.eraSummaries?.response.failWith?.type === 'unknownResultError') {
-        result = new UnknownResultError('');
+        result = 'unknown';
       } else if (config.stateQuery?.eraSummaries?.response.failWith?.type === 'connectionError') {
+        // This error is never actually returned by the server,
+        // But is used by cardano-services tests
         result = new UnknownResultError({ code: 'ECONNREFUSED' });
       } else {
         throw new Error('Unknown mock response');
@@ -112,6 +164,33 @@ const handleQuery = async (query: string, config: MockOgmiosServerConfig, send: 
         throw new Error('Unknown mock response');
       }
       break;
+    case 'genesisConfig': {
+      const responseConfig = config.stateQuery?.genesisConfig?.response;
+      const response = Array.isArray(responseConfig) ? responseConfig.shift() : responseConfig;
+      if (response?.success) {
+        result = response.config || mockGenesisConfig;
+      } else if (response?.failWith?.type) {
+        switch (response?.failWith?.type) {
+          case 'queryUnavailableInCurrentEraError': {
+            result = 'QueryUnavailableInCurrentEra';
+            break;
+          }
+          case 'eraMismatchError': {
+            result = { eraMismatch: { ledgerEra: 'Byron', queryEra: 'Shelley' } } as EraMismatch;
+            break;
+          }
+          case 'unknownResultError': {
+            result = 'unknown';
+            break;
+          }
+          default:
+            throw new Error(`Unknown failedWith.type: ${response?.failWith.type}`);
+        }
+      } else {
+        throw new Error(`Invalid response config: ${response}`);
+      }
+      break;
+    }
     case 'stakeDistribution':
       if (config.stateQuery?.stakeDistribution?.response.success) {
         result = {
@@ -139,12 +218,14 @@ const handleQuery = async (query: string, config: MockOgmiosServerConfig, send: 
       }
       break;
     default:
-      throw new Error('Query not mocked');
+      throw new Error(`Query not mocked: ${query}`);
   }
   send(result);
 };
 
-export const createMockOgmiosServer = (config: MockOgmiosServerConfig): Server => {
+export type MockServer = Server & { wss: WebSocket.Server };
+
+export const createMockOgmiosServer = (config: MockOgmiosServerConfig): MockServer => {
   const invocations: InvocationState = {
     txSubmit: 0
   };
@@ -173,6 +254,9 @@ export const createMockOgmiosServer = (config: MockOgmiosServerConfig): Server =
       })
     );
   });
+  if (config.maxConnections) {
+    server.maxConnections = config.maxConnections;
+  }
   const wss = new WebSocket.Server({
     server
   });
@@ -197,12 +281,19 @@ export const createMockOgmiosServer = (config: MockOgmiosServerConfig): Server =
         case 'Query':
           await handleQuery(args.query, config, send);
           break;
+        case 'FindIntersect':
+          handleFindIntersect(args, config, send);
+          break;
+        case 'RequestNext':
+          handleRequestNext(config, send);
+          break;
         default:
-          throw new Error('Method not mocked');
+          throw new Error(`Method not mocked: ${methodname}`);
       }
     });
   });
-  return server;
+  (server as any).wss = wss;
+  return server as MockServer;
 };
 
 export const listenPromise = (server: Server, port: number, hostname?: string): Promise<Server> =>
@@ -213,3 +304,26 @@ export const listenPromise = (server: Server, port: number, hostname?: string): 
 
 export const serverClosePromise = (server: Server): Promise<void> =>
   new Promise((resolve, reject) => server.close((error) => (error ? reject(error) : resolve())));
+
+export const waitForWsClientsDisconnect = (server: Server, timeout: Milliseconds): Promise<void> =>
+  Promise.race<any>([
+    new Promise<void>((resolve) => {
+      const wss: WebSocket.Server = (server as any).wss;
+      let numClients = wss.clients.size;
+      if (numClients === 0) {
+        resolve();
+      } else {
+        for (const client of wss.clients) {
+          // eslint-disable-next-line no-loop-func
+          client.on('close', () => {
+            if (--numClients === 0) {
+              resolve();
+            }
+          });
+        }
+      }
+    }),
+    delay(timeout).then(() => {
+      throw new Error(`Websocket clients did not disconnect in ${timeout}`);
+    })
+  ]);

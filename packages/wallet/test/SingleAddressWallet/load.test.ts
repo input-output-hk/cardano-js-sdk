@@ -366,7 +366,7 @@ describe('SingleAddressWallet creates big UTXO', () => {
       chainHistoryProvider: mocks.mockChainHistoryProvider(),
       networkInfoProvider: mocks.mockNetworkInfoProvider(),
       rewardsProvider: mocks.mockRewardsProvider(),
-      utxoProvider: mocks.mockUtxoProvider(utxoSet)
+      utxoProvider: mocks.mockUtxoProvider({ utxoSet })
     });
 
     const txProps = {
@@ -409,7 +409,7 @@ describe('SingleAddressWallet.fatalError$', () => {
         ledgerTip: jest.fn().mockRejectedValue(new InvalidStringError('Test invalid string error'))
       },
       rewardsProvider: mocks.mockRewardsProvider(),
-      utxoProvider: mocks.mockUtxoProvider(utxoSet)
+      utxoProvider: mocks.mockUtxoProvider({ utxoSet })
     });
 
     // wallet.fatalError$ must be observed till the beginning of time
@@ -436,7 +436,7 @@ describe('SingleAddressWallet.fatalError$', () => {
         ledgerTip: jest.fn().mockResolvedValue(testValue)
       },
       rewardsProvider: mocks.mockRewardsProvider(),
-      utxoProvider: mocks.mockUtxoProvider(utxoSet)
+      utxoProvider: mocks.mockUtxoProvider({ utxoSet })
     });
 
     await expect(firstValueFrom(wallet.tip$)).resolves.toBe(testValue);

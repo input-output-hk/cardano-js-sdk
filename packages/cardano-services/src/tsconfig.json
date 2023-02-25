@@ -11,6 +11,9 @@
       "path": "../../ogmios/src"
     },
     {
+      "path": "../../crypto/src"
+    },
+    {
       "path": "../../util/src"
     }
   ]

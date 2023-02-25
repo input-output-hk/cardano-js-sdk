@@ -71,7 +71,7 @@ export const metadataBuilder = {
     paymentAddress,
     nonce = Date.now()
   }: BuildVotingRegistrationProps): Cardano.TxMetadata {
-    const cmlPaymentAddress = CML.Address.from_bech32(paymentAddress.toString());
+    const cmlPaymentAddress = CML.Address.from_bech32(paymentAddress);
     const votingRegistration = new Map<bigint, Cardano.Metadatum>([
       [1n, delegations.map(({ cip36VoteKey, weight }) => [Buffer.from(cip36VoteKey, 'hex'), BigInt(weight)])],
       [2n, Buffer.from(stakeKey, 'hex')],

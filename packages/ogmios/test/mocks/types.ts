@@ -1,3 +1,5 @@
+import { Schema } from '@cardano-ogmios/client';
+
 export type HealthCheckResponse = {
   success: boolean;
   failWith?: Error;
@@ -16,6 +18,14 @@ export type EraSummariesResponse = {
   success: boolean;
   failWith?: {
     type: 'unknownResultError' | 'connectionError';
+  };
+};
+
+export type GenesisConfigResponse = {
+  success: boolean;
+  config?: Schema.CompactGenesis;
+  failWith?: {
+    type: 'queryUnavailableInCurrentEraError' | 'eraMismatchError' | 'unknownResultError';
   };
 };
 

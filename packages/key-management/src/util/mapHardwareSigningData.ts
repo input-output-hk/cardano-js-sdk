@@ -60,7 +60,7 @@ const sortTokensCanonically = (tokens: trezor.CardanoToken[] | ledger.Token[]) =
 
 const getRewardAccountKeyHash = (rewardAccount: Cardano.RewardAccount) =>
   usingAutoFree((scope) => {
-    const address = scope.manage(CML.Address.from_bech32(rewardAccount.toString()));
+    const address = scope.manage(CML.Address.from_bech32(rewardAccount));
     const rewardAddress = scope.manage(CML.RewardAddress.from_address(address));
     const paymentCred = scope.manage(rewardAddress!.payment_cred());
     const keyHash = scope.manage(paymentCred.to_keyhash());
@@ -84,7 +84,7 @@ const bytesToIp = (bytes?: Uint8Array) => {
 
 const matchGroupedAddress = (knownAddresses: GroupedAddress[], outputAddress: Buffer): GroupedAddress | undefined => {
   const outputAddressBech32 = ledger.utils.bech32_encodeAddress(outputAddress);
-  return knownAddresses.find(({ address }) => address.toString() === outputAddressBech32);
+  return knownAddresses.find(({ address }) => address === outputAddressBech32);
 };
 
 const prepareTrezorInputs = async (
@@ -144,19 +144,17 @@ const prepareTrezorOutputs = (
         const multiAssetKeys = scope.manage(multiAsset.keys());
         for (let j = 0; j < multiAssetKeys.len(); j++) {
           const policy = scope.manage(multiAssetKeys.get(j));
-          const assets = scope.manage(multiAsset.get(policy));
+          const assets = scope.manage(multiAsset.get(policy))!;
           const tokens = [];
-          if (assets) {
-            const assetsKeys = scope.manage(assets.keys());
-            for (let k = 0; k < assetsKeys.len(); k++) {
-              const assetName = scope.manage(assetsKeys.get(k));
-              const amount = scope.manage(assets.get(assetName));
-              if (assetName && amount) {
-                tokens.push({
-                  amount: amount.to_str(),
-                  assetNameBytes: Buffer.from(assetName.name()).toString('hex')
-                });
-              }
+          const assetsKeys = scope.manage(assets.keys());
+          for (let k = 0; k < assetsKeys.len(); k++) {
+            const assetName = scope.manage(assetsKeys.get(k));
+            const amount = scope.manage(assets.get(assetName));
+            if (assetName && amount) {
+              tokens.push({
+                amount: amount.to_str(),
+                assetNameBytes: Buffer.from(assetName.name()).toString('hex')
+              });
             }
           }
           sortTokensCanonically(tokens);
@@ -395,15 +393,12 @@ const prepareTrezorMintBundle = (
         for (let k = 0; k < assetsKeys.len(); k++) {
           const assetName = scope.manage(assetsKeys.get(k));
           const amount = scope.manage(assets.get(assetName));
-          const positiveAmount = scope.manage(amount?.as_positive())?.to_str();
-          const negativeAmount = scope.manage(amount?.as_negative())?.to_str();
-          if (!amount || !positiveAmount || !negativeAmount) {
-            throw new HwMappingError('Missing token amount.');
+          if (amount) {
+            tokens.push({
+              amount: amount.to_str(),
+              assetNameBytes: Buffer.from(assetName.name()).toString('hex')
+            });
           }
-          tokens.push({
-            amount: amount.is_positive() ? positiveAmount : `-${negativeAmount}`,
-            assetNameBytes: Buffer.from(assetName.name()).toString('hex')
-          });
         }
       }
       sortTokensCanonically(tokens);
@@ -469,19 +464,17 @@ const prepareLedgerOutputs = (outputs: CML.TransactionOutputs, knownAddresses: G
         const multiAssetKeys = scope.manage(multiAsset.keys());
         for (let j = 0; j < multiAssetKeys.len(); j++) {
           const policy = scope.manage(multiAssetKeys.get(j));
-          const assets = scope.manage(multiAsset.get(policy));
+          const assets = scope.manage(multiAsset.get(policy))!;
           const tokens = [];
-          if (assets) {
-            const assetsKeys = scope.manage(assets.keys());
-            for (let k = 0; k < assetsKeys.len(); k++) {
-              const assetName = scope.manage(assetsKeys.get(k));
-              const amount = scope.manage(assets.get(assetName));
-              if (assetName && amount) {
-                tokens.push({
-                  amount: amount.to_str(),
-                  assetNameHex: Buffer.from(assetName.name()).toString('hex')
-                });
-              }
+          const assetsKeys = scope.manage(assets.keys());
+          for (let k = 0; k < assetsKeys.len(); k++) {
+            const assetName = scope.manage(assetsKeys.get(k));
+            const amount = scope.manage(assets.get(assetName));
+            if (assetName && amount) {
+              tokens.push({
+                amount: amount.to_str(),
+                assetNameHex: Buffer.from(assetName.name()).toString('hex')
+              });
             }
           }
           sortTokensCanonically(tokens);
@@ -720,7 +713,7 @@ const prepareLedgerCertificates = (
         const poolRewardAccount = scope.manage(params.reward_account());
         const rewardAccountBytes = Buffer.from(scope.manage(poolRewardAccount.to_address()).to_bytes());
         const isDeviceOwned = knownAddresses.some(
-          ({ address }) => address.toString() === ledger.utils.bech32_encodeAddress(rewardAccountBytes)
+          ({ address }) => address === ledger.utils.bech32_encodeAddress(rewardAccountBytes)
         );
         const rewardAccount: ledger.PoolRewardAccount = isDeviceOwned
           ? {
@@ -809,15 +802,11 @@ const prepareLedgerMintBundle = (
         for (let k = 0; k < assetsKeys.len(); k++) {
           const assetName = scope.manage(assetsKeys.get(k));
           const amount = scope.manage(assets.get(assetName));
-          const positiveAmount = scope.manage(amount?.as_positive())?.to_str();
-          const negativeAmount = scope.manage(amount?.as_negative())?.to_str();
-          if (!amount || !positiveAmount || !negativeAmount) {
-            throw new HwMappingError('Missing token amount.');
-          }
-          tokens.push({
-            amount: amount.is_positive() ? positiveAmount : `-${negativeAmount}`,
-            assetNameHex: Buffer.from(assetName.name()).toString('hex')
-          });
+          if (amount)
+            tokens.push({
+              amount: amount.to_str(),
+              assetNameHex: Buffer.from(assetName.name()).toString('hex')
+            });
         }
       }
       sortTokensCanonically(tokens);
@@ -871,7 +860,7 @@ export const txToLedger = async ({
   // TX - Certificates
   const cslCertificates = scope.manage(cslTxBody.certs());
   const ledgerCertificatesData = cslCertificates
-    ? prepareLedgerCertificates(cslCertificates, knownAddresses, rewardAccountKeyPath, rewardAccountKeyHash.toString())
+    ? prepareLedgerCertificates(cslCertificates, knownAddresses, rewardAccountKeyPath, rewardAccountKeyHash)
     : null;
   const signingMode = ledgerCertificatesData?.signingMode || ledger.TransactionSigningMode.ORDINARY_TRANSACTION;
 
@@ -882,7 +871,7 @@ export const txToLedger = async ({
   const ttl = Number(scope.manage(cslTxBody.ttl())?.to_str());
 
   // TX - validityStartInterval
-  const validityStartInterval = Number(scope.manage(cslTxBody.validity_start_interval())?.to_str());
+  const validityIntervalStart = Number(scope.manage(cslTxBody.validity_start_interval())?.to_str());
 
   // TX  - auxiliaryData
   const txBodyAuxDataHash = scope.manage(cslTxBody.auxiliary_data_hash());
@@ -904,7 +893,7 @@ export const txToLedger = async ({
   }
   const additionalWitnessPaths = ledgerMintBundle?.additionalWitnessPaths || [];
 
-  const ledgerTx = {
+  const ledgerTx: ledger.Transaction = {
     auxiliaryData,
     certificates: ledgerCertificatesData?.certs,
     fee,
@@ -916,7 +905,7 @@ export const txToLedger = async ({
     },
     outputs: ledgerOutputs,
     ttl,
-    validityStartInterval,
+    validityIntervalStart,
     withdrawals: ledgerWithdrawals
   };
 
@@ -968,11 +957,7 @@ export const txToTrezor = async ({
   const cslCertificates = scope.manage(cslTxBody.certs());
   let trezorCertificatesData;
   if (cslCertificates) {
-    trezorCertificatesData = prepareTrezorCertificates(
-      cslCertificates,
-      rewardAccountKeyPath,
-      rewardAccountKeyHash.toString()
-    );
+    trezorCertificatesData = prepareTrezorCertificates(cslCertificates, rewardAccountKeyPath, rewardAccountKeyHash);
   }
   const signingMode = trezorCertificatesData?.signingMode || trezor.CardanoTxSigningMode.ORDINARY_TRANSACTION;
 
@@ -986,7 +971,7 @@ export const txToTrezor = async ({
     ttl = cslTTL.toString();
   }
 
-  const validityIntervalStart = cslTxBody.validity_start_interval();
+  const validityIntervalStart = cslTxBody.validity_start_interval()?.to_str();
 
   // TX  - auxiliaryData
   const txBodyAuxDataHash = scope.manage(cslTxBody.auxiliary_data_hash());
@@ -1017,7 +1002,7 @@ export const txToTrezor = async ({
     protocolMagic: chainId.networkMagic,
     signingMode,
     ttl,
-    validityIntervalStart: validityIntervalStart?.toString(),
+    validityIntervalStart,
     withdrawals: trezorWithdrawals
   };
 };

@@ -9,7 +9,7 @@ import path from 'path';
 
 import { getEnv, networkInfoProviderFactory } from '../../src';
 
-const env = getEnv(['DB_SYNC_CONNECTION_STRING', 'OGMIOS_SERVER_URL']);
+const env = getEnv(['DB_SYNC_CONNECTION_STRING', 'OGMIOS_URL']);
 
 const cardanoNodeConfigPath = path.join(
   __dirname,
@@ -49,7 +49,7 @@ class OgmiosProxy {
       let closeClients: (() => void) | undefined;
       const server = createServer(async (_req, res) => {
         try {
-          const actual = await axios.get(`${env.OGMIOS_SERVER_URL.replace('ws://', 'http://')}health`, {
+          const actual = await axios.get(`${env.OGMIOS_URL.replace('ws://', 'http://')}health`, {
             headers: { 'Content-Type': 'application/json' }
           });
           res.setHeader('Content-Type', 'application/json');
@@ -60,7 +60,7 @@ class OgmiosProxy {
           res.end();
         }
       });
-      const wsc = new WebSocket(env.OGMIOS_SERVER_URL);
+      const wsc = new WebSocket(env.OGMIOS_URL);
       const wss = new WebSocket.Server({ server });
 
       closeClients = () => wsc.close();

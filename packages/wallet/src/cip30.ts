@@ -13,13 +13,11 @@ import {
   TxSignErrorCode,
   WalletApi
 } from '@cardano-sdk/dapp-connector';
-import { CML, Cardano, cmlToCore, coreToCml } from '@cardano-sdk/core';
+import { CML, Cardano, TxCBOR, cmlToCore, coreToCml, parseCmlAddress } from '@cardano-sdk/core';
 import { HexBlob, ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
-import { InputSelectionError } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
 import { Observable, firstValueFrom } from 'rxjs';
 import { ObservableWallet } from './types';
-import { errors } from '@cardano-sdk/key-management';
 
 export type Cip30WalletDependencies = {
   logger: Logger;
@@ -62,6 +60,16 @@ const mapCallbackFailure = (err: unknown, logger: Logger) => {
   return false;
 };
 
+const processTxInput = (input: string) => {
+  try {
+    const cbor = TxCBOR(input);
+    const tx = TxCBOR.deserialize(cbor);
+    return { cbor, tx };
+  } catch {
+    throw new ApiError(APIErrorCode.InvalidRequest, "Couldn't parse transaction. Expecting hex-encoded CBOR string.");
+  }
+};
+
 const MAX_COLLATERAL_AMOUNT = CML.BigNum.from_str('5000000');
 
 const cslToCbor = (csl: CslInterface) => Buffer.from(csl.to_bytes()).toString('hex');
@@ -73,6 +81,17 @@ const compareUtxos = (utxo: Cardano.Utxo, comparedTo: Cardano.Utxo) => {
   if (currentCoin > comparedToCoin) return 1;
   return 0;
 };
+
+const cardanoAddressToCbor = (address: Cardano.Address | Cardano.RewardAccount): Cbor =>
+  usingAutoFree((scope) => {
+    const cmlAddr = parseCmlAddress(scope, address);
+    if (!cmlAddr) {
+      throw new ApiError(APIErrorCode.InternalError, `could not transform address ${address} to CBOR`);
+    }
+    return Buffer.from(cmlAddr.to_bytes()).toString('hex');
+  });
+
+const formatUnknownError = (error: unknown): string => (error as Error)?.message || 'Unknown error';
 
 export const createWalletApi = (
   wallet$: Observable<ObservableWallet>,
@@ -98,16 +117,16 @@ export const createWalletApi = (
 
       if (!address) {
         logger.error('could not get change address');
-        throw new ApiError(500, 'could not get change address');
+        throw new ApiError(APIErrorCode.InternalError, 'could not get change address');
       } else {
-        return address.toString();
+        return cardanoAddressToCbor(address);
       }
     } catch (error) {
       logger.error(error);
       if (error instanceof ApiError) {
         throw error;
       }
-      throw new ApiError(500, 'Nope');
+      throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));
     }
   },
   // eslint-disable-next-line max-statements
@@ -119,6 +138,10 @@ export const createWalletApi = (
     logger.debug('getting collateral');
     const wallet = await firstValueFrom(wallet$);
     let unspendables = (await firstValueFrom(wallet.utxo.unspendable$)).sort(compareUtxos);
+
+    // No available unspendable UTXO
+    if (unspendables.length === 0) return null;
+
     if (unspendables.some((utxo) => utxo[1].value.assets && utxo[1].value.assets.size > 0)) {
       scope.dispose();
       throw new ApiError(APIErrorCode.Refused, 'unspendable UTxOs must not contain assets when used as collateral');
@@ -150,7 +173,7 @@ export const createWalletApi = (
         if (error instanceof ApiError) {
           throw error;
         }
-        throw new ApiError(APIErrorCode.InternalError, 'Nope');
+        throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));
       }
     }
     const cbor = coreToCml.utxo(scope, unspendables).map(cslToCbor);
@@ -172,14 +195,14 @@ export const createWalletApi = (
       if (!rewardAccount) {
         throw new ApiError(APIErrorCode.InternalError, 'could not get reward address');
       } else {
-        return [rewardAccount.toString()];
+        return [cardanoAddressToCbor(rewardAccount)];
       }
     } catch (error) {
       logger.error(error);
       if (error instanceof ApiError) {
         throw error;
       }
-      throw new ApiError(APIErrorCode.InternalError, 'Nope');
+      throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));
     }
   },
   getUnusedAddresses: async (): Promise<Cbor[]> => {
@@ -195,7 +218,7 @@ export const createWalletApi = (
     if (!address) {
       throw new ApiError(APIErrorCode.InternalError, 'could not get used addresses');
     } else {
-      return [address.toString()];
+      return [cardanoAddressToCbor(address)];
     }
   },
   getUtxos: async (amount?: Cbor, paginate?: Paginate): Promise<Cbor[] | undefined> => {
@@ -220,7 +243,7 @@ export const createWalletApi = (
         utxos = [...inputSelection.inputs];
       } catch (error) {
         logger.debug(error);
-        const message = error instanceof InputSelectionError ? error.message : 'Nope';
+        const message = formatUnknownError(error);
 
         scope.dispose();
         throw new ApiError(APIErrorCode.Refused, message);
@@ -235,7 +258,7 @@ export const createWalletApi = (
   signData: async (addr: Cardano.Address | Bytes, payload: Bytes): Promise<Cip30DataSignature> => {
     logger.debug('signData');
     const hexBlobPayload = HexBlob(payload);
-    const signWith = Cardano.Address(addr.toString());
+    const signWith = Cardano.Address(addr);
 
     const shouldProceed = await confirmationCallback({
       data: {
@@ -280,7 +303,7 @@ export const createWalletApi = (
       } catch (error) {
         logger.error(error);
         // TODO: handle ProofGeneration errors?
-        const message = error instanceof errors.AuthenticationError ? error.message : 'Nope';
+        const message = formatUnknownError(error);
         throw new TxSignError(TxSignErrorCode.UserDeclined, message);
       } finally {
         scope.dispose();
@@ -290,21 +313,19 @@ export const createWalletApi = (
       throw new TxSignError(TxSignErrorCode.UserDeclined, 'user declined signing tx');
     }
   },
-  submitTx: async (tx: Cbor): Promise<string> => {
+  submitTx: async (input: Cbor): Promise<string> => {
     logger.debug('submitting tx');
-    const txData: Cardano.Tx = usingAutoFree((scope) =>
-      cmlToCore.newTx(scope.manage(CML.Transaction.from_bytes(Buffer.from(tx, 'hex'))))
-    );
+    const { cbor, tx } = processTxInput(input);
     const shouldProceed = await confirmationCallback({
-      data: txData,
+      data: tx,
       type: Cip30ConfirmationCallbackType.SubmitTx
     }).catch((error) => mapCallbackFailure(error, logger));
 
     if (shouldProceed) {
       try {
         const wallet = await firstValueFrom(wallet$);
-        await wallet.submitTx(txData);
-        return txData.id.toString();
+        await wallet.submitTx(cbor);
+        return tx.id;
       } catch (error) {
         logger.error(error);
         throw error;

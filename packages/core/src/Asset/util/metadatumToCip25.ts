@@ -2,7 +2,6 @@ import { AssetInfo, ImageMediaType, MediaType, NftMetadata, NftMetadataFile, Uri
 import { Cardano } from '../..';
 import { CustomError } from 'ts-custom-error';
 import { Logger } from 'ts-log';
-import { Metadatum, MetadatumMap } from '../../Cardano/types/AuxiliaryData';
 import { asMetadatumArray, asMetadatumMap } from '../../util/metadatum';
 import { assetIdFromPolicyAndName } from './assetId';
 import { isNotNil } from '@cardano-sdk/util';
@@ -18,7 +17,7 @@ const asString = (obj: unknown): string | undefined => {
   }
 };
 
-const asStringArray = (metadatum: Metadatum | undefined): string[] | undefined => {
+const asStringArray = (metadatum: Cardano.Metadatum | undefined): string[] | undefined => {
   if (Array.isArray(metadatum)) {
     const result = metadatum.map(asString);
     if (result.some((str) => typeof str === 'undefined')) {
@@ -32,13 +31,13 @@ const asStringArray = (metadatum: Metadatum | undefined): string[] | undefined =
   }
 };
 
-const mapOtherProperties = (metadata: MetadatumMap, primaryProperties: string[]) => {
+const mapOtherProperties = (metadata: Cardano.MetadatumMap, primaryProperties: string[]) => {
   const extraProperties = difference([...metadata.keys()].filter(isString), primaryProperties);
   if (extraProperties.length === 0) return;
   return extraProperties.reduce((result, key) => {
     result.set(key, metadata.get(key)!);
     return result;
-  }, new Map<string, Metadatum>());
+  }, new Map<string, Cardano.Metadatum>());
 };
 
 const toArray = <T>(value: T | T[]): T[] => (Array.isArray(value) ? value : [value]);
@@ -46,7 +45,7 @@ const toArray = <T>(value: T | T[]): T[] => (Array.isArray(value) ? value : [val
 const missingFileFieldLogMessage = (fieldType: string, assetId: Cardano.AssetId) =>
   `Omitting cip25 metadata file: missing "${fieldType}". AssetId: ${assetId}`;
 
-const mapFile = (metadatum: Metadatum, assetId: Cardano.AssetId, logger: Logger): NftMetadataFile | null => {
+const mapFile = (metadatum: Cardano.Metadatum, assetId: Cardano.AssetId, logger: Logger): NftMetadataFile | null => {
   const file = asMetadatumMap(metadatum);
   if (!file) throw new InvalidFileError();
 
@@ -85,10 +84,42 @@ const mapFile = (metadatum: Metadatum, assetId: Cardano.AssetId, logger: Logger)
 };
 
 /**
- * Also considers asset name encoded in utf8 within metadata valid
+ * Gets the `Map<AssetName, NFTMetadata>` relative to the given policyId from the given
+ * `Map<PolicyId, Map<AssetName, NFTMetadata>>`.
+ *
+ * The policyId in the `policy` Map can be encoded as per CIP-0025 v1 or v2 specifications.
+ *
+ * @param policy The `MetadatumMap` containing the NFT metadata for all the NFT assets
+ * @returns The `MetadatumMap` containing the NFT metadata for all the NFT assets with the given policyId
  */
-const getAssetMetadata = (policy: MetadatumMap, asset: Pick<AssetInfo, 'name'>) =>
-  asMetadatumMap(policy.get(asset.name.toString()) || policy.get(Buffer.from(asset.name, 'hex').toString('utf8')));
+const getPolicyMetadata = (policy: Cardano.MetadatumMap, policyId: Cardano.PolicyId) =>
+  asMetadatumMap(
+    policy.get(policyId) ||
+      (() => {
+        for (const [key, value] of policy.entries()) {
+          if (ArrayBuffer.isView(key) && Buffer.from(key).toString('hex') === policyId) return value;
+        }
+      })()
+  );
+
+/**
+ * Gets the `NFTMetadata` relative to the given assetName from the given `Map<AssetName, NFTMetadata>`.
+ *
+ * The assetName in the `policy` Map can be encoded as per CIP-0025 v1 (hex or utf8) or v2 specifications.
+ *
+ * @param policy The `MetadatumMap` containing the NFT metadata for all the NFT assets with a specific policyId.
+ * @returns The NFT metadata for the requested asset
+ */
+const getAssetMetadata = (policy: Cardano.MetadatumMap, assetName: Cardano.AssetName) =>
+  asMetadatumMap(
+    policy.get(assetName) ||
+      policy.get(Buffer.from(assetName, 'hex').toString('utf8')) ||
+      (() => {
+        for (const [key, value] of policy.entries()) {
+          if (ArrayBuffer.isView(key) && Buffer.from(key).toString('hex') === assetName) return value;
+        }
+      })()
+  );
 
 // TODO: consider hoisting this function together with cip25 types to core or a new cip25 package
 /**
@@ -96,17 +127,16 @@ const getAssetMetadata = (policy: MetadatumMap, asset: Pick<AssetInfo, 'name'>) 
  */
 export const metadatumToCip25 = (
   asset: Pick<AssetInfo, 'policyId' | 'name'>,
-  metadatumMap: MetadatumMap | undefined,
+  metadatumMap: Cardano.MetadatumMap | undefined,
   logger: Logger
 ): NftMetadata | null => {
   const cip25Metadata = metadatumMap?.get(721n);
   if (!cip25Metadata) return null;
   const cip25MetadatumMap = asMetadatumMap(cip25Metadata);
   if (!cip25MetadatumMap) return null;
-  const policy = asMetadatumMap(cip25MetadatumMap.get(asset.policyId.toString())!);
+  const policy = getPolicyMetadata(cip25MetadatumMap, asset.policyId);
   if (!policy) return null;
-  const assetMetadata = getAssetMetadata(policy, asset);
-
+  const assetMetadata = getAssetMetadata(policy, asset.name);
   if (!assetMetadata) return null;
   const name = asString(assetMetadata.get('name'));
   const image = asStringArray(assetMetadata.get('image'));

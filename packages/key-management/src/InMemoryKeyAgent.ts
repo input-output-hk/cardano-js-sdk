@@ -2,7 +2,7 @@ import * as Crypto from '@cardano-sdk/crypto';
 import * as errors from './errors';
 import {
   AccountKeyDerivationPath,
-  GetPassword,
+  GetPassphrase,
   KeyAgent,
   KeyAgentDependencies,
   KeyAgentType,
@@ -26,31 +26,31 @@ import { emip3decrypt, emip3encrypt } from './emip3';
 import uniqBy from 'lodash/uniqBy';
 
 export interface InMemoryKeyAgentProps extends Omit<SerializableInMemoryKeyAgentData, '__typename'> {
-  getPassword: GetPassword;
+  getPassphrase: GetPassphrase;
 }
 
 export interface FromBip39MnemonicWordsProps {
   chainId: Cardano.ChainId;
   mnemonicWords: string[];
   mnemonic2ndFactorPassphrase?: string;
-  getPassword: GetPassword;
+  getPassphrase: GetPassphrase;
   accountIndex?: number;
 }
 
-const getPasswordRethrowTypedError = async (getPassword: GetPassword) => {
+const getPassphraseRethrowTypedError = async (getPassphrase: GetPassphrase) => {
   try {
-    return await getPassword();
+    return await getPassphrase();
   } catch (error) {
-    throw new errors.AuthenticationError('Failed to enter password', error);
+    throw new errors.AuthenticationError('Failed to enter passphrase', error);
   }
 };
 
 export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
-  readonly #getPassword: GetPassword;
+  readonly #getPassphrase: GetPassphrase;
 
-  constructor({ getPassword, ...serializableData }: InMemoryKeyAgentProps, dependencies: KeyAgentDependencies) {
+  constructor({ getPassphrase, ...serializableData }: InMemoryKeyAgentProps, dependencies: KeyAgentDependencies) {
     super({ ...serializableData, __typename: KeyAgentType.InMemory }, dependencies);
-    this.#getPassword = getPassword;
+    this.#getPassphrase = getPassphrase;
   }
 
   async signBlob({ index, role: type }: AccountKeyDerivationPath, blob: HexBlob): Promise<SignBlobResult> {
@@ -71,7 +71,7 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
 
   // To export mnemonic, get entropy by reversing this:
 
-  // rootPrivateKey = CML.Bip32PrivateKey.from_bip39_entropy(entropy, EMPTY_PASSWORD);
+  // rootPrivateKey = CML.Bip32PrivateKey.from_bip39_entropy(entropy, EMPTY_PASSPHRASE);
   // eslint-disable-next-line max-len
   // https://github.com/Emurgo/cardano-serialization-lib/blob/f817a033ade7a2255591d7c6444fa4f9ffbcf061/rust/src/chain_crypto/derive.rs#L30-L38
   async exportRootPrivateKey(): Promise<Crypto.Bip32PrivateKeyHex> {
@@ -84,7 +84,7 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
   static async fromBip39MnemonicWords(
     {
       chainId,
-      getPassword,
+      getPassphrase,
       mnemonicWords,
       mnemonic2ndFactorPassphrase = '',
       accountIndex = 0
@@ -96,8 +96,8 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
     if (!validMnemonic) throw new errors.InvalidMnemonicError();
     const entropy = Buffer.from(mnemonicWordsToEntropy(mnemonicWords), 'hex');
     const rootPrivateKey = await dependencies.bip32Ed25519.fromBip39Entropy(entropy, mnemonic2ndFactorPassphrase);
-    const password = await getPasswordRethrowTypedError(getPassword);
-    const encryptedRootPrivateKey = await emip3encrypt(Buffer.from(rootPrivateKey, 'hex'), password);
+    const passphrase = await getPassphraseRethrowTypedError(getPassphrase);
+    const encryptedRootPrivateKey = await emip3encrypt(Buffer.from(rootPrivateKey, 'hex'), passphrase);
     const accountPrivateKey = await deriveAccountPrivateKey({
       accountIndex,
       bip32Ed25519: dependencies.bip32Ed25519,
@@ -112,7 +112,7 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
         chainId,
         encryptedRootPrivateKeyBytes: [...encryptedRootPrivateKey],
         extendedAccountPublicKey,
-        getPassword,
+        getPassphrase,
         knownAddresses: []
       },
       dependencies
@@ -124,7 +124,7 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
     { additionalKeyPaths = [] }: SignTransactionOptions | undefined = {}
   ): Promise<Cardano.Signatures> {
     // Possible optimization is casting strings to OpaqueString types directly and skipping validation
-    const blob = HexBlob(hash.toString());
+    const blob = HexBlob(hash);
     const derivationPaths = await ownSignatureKeyPaths(body, this.knownAddresses, this.inputResolver);
     const keyPaths = uniqBy([...derivationPaths, ...additionalKeyPaths], ({ role, index }) => `${role}.${index}`);
     // TODO:
@@ -156,12 +156,12 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
   }
 
   async #decryptRootPrivateKey(noCache?: true) {
-    const password = await getPasswordRethrowTypedError(() => this.#getPassword(noCache));
+    const passphrase = await getPassphraseRethrowTypedError(() => this.#getPassphrase(noCache));
     let decryptedRootKeyBytes: Uint8Array;
     try {
       decryptedRootKeyBytes = await emip3decrypt(
         new Uint8Array((this.serializableData as SerializableInMemoryKeyAgentData).encryptedRootPrivateKeyBytes),
-        password
+        passphrase
       );
     } catch (error) {
       throw new errors.AuthenticationError('Failed to decrypt root private key', error);

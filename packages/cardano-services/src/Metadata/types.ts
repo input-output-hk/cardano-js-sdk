@@ -5,7 +5,7 @@ export interface TxMetadataService {
 }
 
 export interface TxMetadataModel {
+  bytes: Uint8Array;
   key: string;
-  json_value: { [k: string]: unknown };
   tx_id: Buffer;
 }

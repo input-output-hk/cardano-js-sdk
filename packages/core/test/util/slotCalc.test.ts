@@ -163,21 +163,19 @@ describe('slotCalc utils', () => {
         epochEraSummary: EraSummary & { firstEpoch: number }
       ) => {
         expect(epochNo).toEqual(expectedEpochNo);
-        const relativeEpoch = expectedEpochNo.valueOf() - epochEraSummary.firstEpoch;
+        const relativeEpoch = expectedEpochNo - epochEraSummary.firstEpoch;
         expect(firstSlot).toEqual({
           date: new Date(
             epochEraSummary.start.time.getTime() +
-              epochEraSummary.parameters.epochLength * epochEraSummary.parameters.slotLength.valueOf() * relativeEpoch
+              epochEraSummary.parameters.epochLength * epochEraSummary.parameters.slotLength * relativeEpoch
           ),
           slot: epochEraSummary.start.slot + epochEraSummary.parameters.epochLength * relativeEpoch
         });
         expect(lastSlot).toEqual({
           date: new Date(
             epochEraSummary.start.time.getTime() +
-              epochEraSummary.parameters.epochLength *
-                epochEraSummary.parameters.slotLength.valueOf() *
-                (relativeEpoch + 1) -
-              epochEraSummary.parameters.slotLength.valueOf()
+              epochEraSummary.parameters.epochLength * epochEraSummary.parameters.slotLength * (relativeEpoch + 1) -
+              epochEraSummary.parameters.slotLength
           ),
           slot: epochEraSummary.start.slot + epochEraSummary.parameters.epochLength * (relativeEpoch + 1) - 1
         });

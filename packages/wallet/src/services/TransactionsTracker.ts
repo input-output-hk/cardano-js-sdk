@@ -1,8 +1,9 @@
 import { Cardano, ChainHistoryProvider, Range } from '@cardano-sdk/core';
-import { ConfirmedTx, FailedTx, TransactionFailure, TransactionsTracker, TxInFlight } from './types';
+import { ConfirmedTx, FailedTx, OutgoingTx, TransactionFailure, TransactionsTracker, TxInFlight } from './types';
 import { DocumentStore, OrderedCollectionStore } from '../persistence';
 import {
   EMPTY,
+  NEVER,
   Observable,
   Subject,
   combineLatest,
@@ -44,8 +45,8 @@ export interface TransactionsTrackerProps {
   transactionsHistoryStore: OrderedCollectionStore<Cardano.HydratedTx>;
   inFlightTransactionsStore: DocumentStore<TxInFlight[]>;
   newTransactions: {
-    submitting$: Observable<Cardano.Tx>;
-    pending$: Observable<Cardano.Tx>;
+    submitting$: Observable<OutgoingTx>;
+    pending$: Observable<OutgoingTx>;
     failedToSubmit$: Observable<FailedTx>;
   };
   failedFromReemitter$?: Observable<FailedTx>;
@@ -233,16 +234,16 @@ export const createTransactionsTracker = (
   const transactionsSource$ = new TrackerSubject(txSource$);
 
   const historicalTransactions$ = createHistoricalTransactionsTrackerSubject(transactionsSource$);
-  const txConfirmed$ = (tx: Cardano.Tx): Observable<ConfirmedTx> =>
+  const txConfirmed$ = (evt: OutgoingTx): Observable<ConfirmedTx> =>
     newTransactions$(historicalTransactions$).pipe(
-      filter((historyTx) => historyTx.id === tx.id),
+      filter((historyTx) => historyTx.id === evt.id),
       take(1),
-      map((historyTx) => ({ confirmedAt: historyTx.blockHeader.slot, tx })),
-      tap(({ confirmedAt }) => logger.debug(`Transaction ${tx.id} is confirmed in slot ${confirmedAt}`))
+      map((historyTx) => ({ ...evt, confirmedAt: historyTx.blockHeader.slot })),
+      tap(({ confirmedAt }) => logger.debug(`Transaction ${evt.id} is confirmed in slot ${confirmedAt}`))
     );
 
   const submittingOrPreviouslySubmitted$ = merge<TxInFlight[]>(
-    submitting$.pipe(map((tx) => ({ tx }))),
+    submitting$.pipe(map((evt) => evt)),
     newTransactionsStore.get().pipe(
       tap((transactions) => logger.debug(`Store contains ${transactions?.length} in flight transactions`)),
       map((transactions) => transactions.filter(({ submittedAt }) => !!submittedAt)),
@@ -250,7 +251,7 @@ export const createTransactionsTracker = (
     )
   ).pipe(
     // Tx could be re-submitted, so we group by tx id
-    groupBy(({ tx: { id } }) => id),
+    groupBy(({ id }) => id),
     map((group$) => group$.pipe(share())),
     share()
   );
@@ -260,7 +261,7 @@ export const createTransactionsTracker = (
     .pipe(
       mergeMap((group$) =>
         group$.pipe(
-          switchMap(({ tx }) => {
+          switchMap((tx) => {
             const invalidHereafter = tx.body.validityInterval?.invalidHereafter;
             return race(
               rollback$.pipe(
@@ -272,37 +273,37 @@ export const createTransactionsTracker = (
                       `Invalid inputs due to rolled back tx (${rolledBackTxId}}). Try to rebuild and resubmit.`
                     ),
                     reason: TransactionFailure.InvalidTransaction,
-                    tx
+                    ...tx
                   })
                 )
               ),
-              failedToSubmit$.pipe(filter((failed) => failed.tx === tx)),
+              failedToSubmit$.pipe(filter((failed) => failed.id === tx.id)),
               invalidHereafter
                 ? tip$.pipe(
                     filter(({ slot }) => slot > invalidHereafter),
-                    map(() => ({ reason: TransactionFailure.Timeout, tx }))
+                    map(() => ({ reason: TransactionFailure.Timeout, ...tx }))
                   )
-                : EMPTY
+                : NEVER
             ).pipe(take(1), takeUntil(txConfirmed$(tx)));
           })
         )
       ),
       mergeWith(failedFromReemitter$ || EMPTY),
-      tap((failed) => logger.debug(`Transaction ${failed.tx.id} failed`, failed.reason))
+      tap(({ id, reason }) => logger.debug(`Transaction ${id} failed`, reason))
     )
     .subscribe(failed$);
 
-  const txFailed$ = (tx: Cardano.Tx) =>
+  const txFailed$ = (tx: OutgoingTx) =>
     failed$.pipe(
-      filter((failed) => failed.tx === tx),
+      filter((failed) => failed.id === tx.id),
       take(1)
     );
 
-  const txPending$ = (tx: Cardano.Tx) =>
+  const txPending$ = (tx: OutgoingTx) =>
     pending$.pipe(
-      filter((pending) => pending === tx),
+      filter((pending) => pending.id === tx.id),
       withLatestFrom(tip$),
-      map(([_, { slot }]) => ({ submittedAt: slot, tx }))
+      map(([_, { slot }]) => ({ submittedAt: slot, ...tx }))
     );
 
   const inFlight$ = new TrackerSubject<TxInFlight[]>(
@@ -310,15 +311,15 @@ export const createTransactionsTracker = (
       mergeMap((group$) =>
         group$.pipe(
           // Only keep 1 (latest) inner observable per tx id.
-          switchMap(({ tx, submittedAt }) => {
+          switchMap((tx) => {
             const done$ = race(txConfirmed$(tx), txFailed$(tx)).pipe(
               map(() => ({ op: 'remove' as const, tx })),
               share()
             );
             return merge(
-              of({ op: 'add' as const, submittedAt, tx }),
+              of({ op: 'add' as const, tx }),
               done$,
-              submittedAt
+              tx.submittedAt
                 ? EMPTY
                 : // NOTE: current implementation might incorrectly update 'submittedAt'
                   // if transaction was attempted to resubmit and appeared to be already submitted.
@@ -326,7 +327,10 @@ export const createTransactionsTracker = (
                   // time when transaction got into a mempool - it works more like 'lastAttemptToSubmitAt',
                   // which isn't necessarily bad as it might prevent frequent resubmissions in some cases
                   txPending$(tx).pipe(
-                    map((pending) => ({ op: 'submitted' as const, submittedAt: pending.submittedAt, tx })),
+                    map((pendingTx) => ({
+                      op: 'submitted' as const,
+                      tx: pendingTx
+                    })),
                     takeUntil(done$)
                   )
             );
@@ -334,23 +338,18 @@ export const createTransactionsTracker = (
         )
       ),
       scan((inFlight, props) => {
-        const idx = inFlight.findIndex((txInFlight) => txInFlight.tx === props.tx);
+        const idx = inFlight.findIndex((txInFlight) => txInFlight.id === props.tx.id);
         if (props.op === 'add') {
-          const newInFlightTx = { submittedAt: props.submittedAt, tx: props.tx };
           if (idx >= 0) {
-            return [...inFlight.slice(0, idx), newInFlightTx, ...inFlight.slice(idx + 1)];
+            return [...inFlight.slice(0, idx), props.tx, ...inFlight.slice(idx + 1)];
           }
-          return [...inFlight, newInFlightTx];
+          return [...inFlight, props.tx];
         }
         if (props.op === 'remove') {
           return [...inFlight.slice(0, idx), ...inFlight.slice(idx + 1)];
         }
         // props.op === 'submitted'
-        return [
-          ...inFlight.slice(0, idx),
-          { submittedAt: props.submittedAt, tx: props.tx },
-          ...inFlight.slice(idx + 1)
-        ];
+        return [...inFlight.slice(0, idx), props.tx, ...inFlight.slice(idx + 1)];
       }, [] as TxInFlight[]),
       tap((inFlight) => newTransactionsStore.set(inFlight)),
       tap((inFlight) => logger.debug(`${inFlight.length} in flight transactions`)),
@@ -360,7 +359,7 @@ export const createTransactionsTracker = (
 
   const confirmed$ = new Subject<ConfirmedTx>();
   const confirmedSubscription = submittingOrPreviouslySubmitted$
-    .pipe(mergeMap((group$) => group$.pipe(switchMap(({ tx }) => txConfirmed$(tx).pipe(takeUntil(txFailed$(tx)))))))
+    .pipe(mergeMap((group$) => group$.pipe(switchMap((tx) => txConfirmed$(tx).pipe(takeUntil(txFailed$(tx)))))))
     .subscribe(confirmed$);
 
   return {

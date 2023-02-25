@@ -10,22 +10,22 @@ describe('deserializeTx', () => {
   describe('converts input', () => {
     it('Cardano.util.HexBlob', () => {
       const tx = deserializeTx(HexBlob(txBody));
-      expect(tx.id.toString()).toEqual(txId);
+      expect(tx.id).toEqual(txId);
     });
 
     it('Buffer', () => {
       const tx = deserializeTx(Buffer.from(txBody, 'hex'));
-      expect(tx.id.toString()).toEqual(txId);
+      expect(tx.id).toEqual(txId);
     });
 
     it('Uint8Array', () => {
       const tx = deserializeTx(Uint8Array.from(Buffer.from(txBody, 'hex')));
-      expect(tx.id.toString()).toEqual(txId);
+      expect(tx.id).toEqual(txId);
     });
 
     it('string', () => {
       const tx = deserializeTx(txBody);
-      expect(tx.id.toString()).toEqual(txId);
+      expect(tx.id).toEqual(txId);
     });
   });
 

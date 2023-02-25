@@ -66,7 +66,8 @@ describe('CustomObservableWallet', () => {
 
     it('does not necessarily have to use SingleAddressWallet, but can still utilize SDK utils', () => {
       // let's say we have an API endpoint to submit transaction as bytes and not as SDK's Cardano.Tx
-      const submitTxBytesHexString: (tx: string) => Promise<void> = () => Promise.resolve();
+      const submitTxBytesHexString: (tx: string) => Promise<Cardano.TransactionId> = () =>
+        Promise.resolve(Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000'));
       // and another endpoint to get wallet addresses
       const getAddresses: () => Promise<GroupedAddress[]> = async () => [];
       // and another endpoint to get wallet's utxo balance

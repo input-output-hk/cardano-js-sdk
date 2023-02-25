@@ -33,7 +33,7 @@ export class PouchDbKeyValueStore<K extends string | OpaqueString<any>, V extend
           await this.db.bulkDocs(
             docs.map(({ key, value }) => ({
               ...this.toPouchDbDoc(value),
-              _id: key.toString()
+              _id: key
             }))
           );
         } catch (error) {
@@ -47,7 +47,7 @@ export class PouchDbKeyValueStore<K extends string | OpaqueString<any>, V extend
     if (this.destroyed) return EMPTY;
     return new Observable((observer) => {
       this.db
-        .bulkGet({ docs: keys.map((key) => ({ id: key.toString() })) })
+        .bulkGet({ docs: keys.map((key) => ({ id: key })) })
         .then(({ results }) => {
           const values: V[] = [];
           for (const { docs } of results) {
@@ -64,6 +64,6 @@ export class PouchDbKeyValueStore<K extends string | OpaqueString<any>, V extend
   }
 
   setValue(key: K, value: V): Observable<void> {
-    return this.forcePut(key.toString(), value);
+    return this.forcePut(key, value);
   }
 }

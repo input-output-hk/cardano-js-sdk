@@ -61,10 +61,10 @@ export class SmartTxSubmitProvider implements TxSubmitProvider {
             ProviderFailure.BadRequest,
             new CardanoNodeErrors.TxSubmissionErrors.OutsideOfValidityIntervalError({
               outsideOfValidityInterval: {
-                currentSlot: slot.valueOf(),
+                currentSlot: slot,
                 interval: {
-                  invalidBefore: validityInterval?.invalidBefore?.valueOf() || null,
-                  invalidHereafter: validityInterval?.invalidHereafter?.valueOf() || null
+                  invalidBefore: validityInterval?.invalidBefore || null,
+                  invalidHereafter: validityInterval?.invalidHereafter || null
                 }
               }
             })

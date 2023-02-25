@@ -111,7 +111,7 @@ export interface InputSelector {
 
 export type ProtocolParametersForInputSelection = Pick<
   Cardano.ProtocolParameters,
-  'coinsPerUtxoByte' | 'maxTxSize' | 'maxValueSize' | 'minFeeCoefficient' | 'minFeeConstant'
+  'coinsPerUtxoByte' | 'maxTxSize' | 'maxValueSize' | 'minFeeCoefficient' | 'minFeeConstant' | 'prices'
 >;
 
 export type ProtocolParametersRequiredByInputSelection = Required<{
