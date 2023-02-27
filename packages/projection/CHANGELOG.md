@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.3.1-nightly.1...@cardano-sdk/projection@0.4.0-nightly.0) (2023-02-27)
+
+### ⚠ BREAKING CHANGES
+
+- **projection:** rename exported namespaces to start with Uppercase
+- **projection:** improve design by using ObservableCardanoNode
+- add ChainSyncRollBackward.point
+
+### Features
+
+- **projection:** optimize InMemoryStabilityWindowBuffer to keep a maximum of 'k' blocks ([c28ed60](https://github.com/input-output-hk/cardano-js-sdk/commit/c28ed60308825804460387b522de9be72a270750))
+
+### Code Refactoring
+
+- add ChainSyncRollBackward.point ([4f61a6d](https://github.com/input-output-hk/cardano-js-sdk/commit/4f61a6d960adb85f762c09fb61d1a461e907cd72))
+- **projection:** improve design by using ObservableCardanoNode ([9f54088](https://github.com/input-output-hk/cardano-js-sdk/commit/9f54088fb256f79e8da2c838b1244e92618f25b2))
+- **projection:** rename exported namespaces to start with Uppercase ([4ea9c93](https://github.com/input-output-hk/cardano-js-sdk/commit/4ea9c931950585110901b23907a25ee6e9b61f75))
+
 ## [0.3.1-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.3.1-nightly.0...@cardano-sdk/projection@0.3.1-nightly.1) (2023-02-21)
 
 **Note:** Version bump only for package @cardano-sdk/projection

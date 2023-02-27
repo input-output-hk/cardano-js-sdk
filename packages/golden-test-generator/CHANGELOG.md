@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.6.1-nightly.1...@cardano-sdk/golden-test-generator@0.7.0-nightly.0) (2023-02-27)
+
+### ⚠ BREAKING CHANGES
+
+- add ChainSyncRollBackward.point
+
+### Code Refactoring
+
+- add ChainSyncRollBackward.point ([4f61a6d](https://github.com/input-output-hk/cardano-js-sdk/commit/4f61a6d960adb85f762c09fb61d1a461e907cd72))
+
 ## [0.6.1-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.6.1-nightly.0...@cardano-sdk/golden-test-generator@0.6.1-nightly.1) (2023-02-21)
 
 **Note:** Version bump only for package @cardano-sdk/golden-test-generator

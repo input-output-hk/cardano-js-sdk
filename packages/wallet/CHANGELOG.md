@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.9.0-nightly.1...@cardano-sdk/wallet@0.9.0-nightly.2) (2023-02-27)
+
+### Bug Fixes
+
+- **wallet:** undefined invalidHereafter causes failed tx to go undetected ([08daba5](https://github.com/input-output-hk/cardano-js-sdk/commit/08daba51bc4f930ca7b5e1ee23e28b9169b16e15))
+
 ## [0.9.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.9.0-nightly.0...@cardano-sdk/wallet@0.9.0-nightly.1) (2023-02-21)
 
 **Note:** Version bump only for package @cardano-sdk/wallet
