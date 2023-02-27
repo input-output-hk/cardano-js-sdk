@@ -54,7 +54,7 @@ export const createStubStakePoolProvider = (
     const pageResults = stakePools.filter(({ id, metadata }) =>
       filterValues.some(
         (value) =>
-          (value.id && id.includes(value.id.toString())) ||
+          (value.id && id.includes(value.id)) ||
           (value.name && metadata?.name.includes(value.name)) ||
           (value.ticker && metadata?.ticker.includes(value.ticker))
       )

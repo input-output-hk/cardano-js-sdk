@@ -41,7 +41,7 @@ export class Cip30DataSignError<InnerError = unknown> extends ComposableError<In
 
 const getAddressBytes = (signWith: Cardano.Address | Cardano.RewardAccount) =>
   usingAutoFree((scope) => {
-    const cslAddress = parseCmlAddress(scope, signWith.toString());
+    const cslAddress = parseCmlAddress(scope, signWith);
     if (!cslAddress) {
       throw new Cip30DataSignError(Cip30DataSignErrorCode.AddressNotPK, 'Invalid address');
     }

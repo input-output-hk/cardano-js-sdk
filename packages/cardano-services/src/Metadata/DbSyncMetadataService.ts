@@ -10,7 +10,7 @@ export type TxMetadataByHashes = Map<Cardano.TransactionId, Cardano.TxMetadata>;
 
 export const createDbSyncMetadataService = (db: Pool, logger: Logger): TxMetadataService => ({
   async queryTxMetadataByHashes(hashes: Cardano.TransactionId[]): Promise<TxMetadataByHashes> {
-    const byteHashes = hashes.map((hash) => hexStringToBuffer(hash.toString()));
+    const byteHashes = hashes.map((hash) => hexStringToBuffer(hash));
     logger.debug('About to find metadata for txs:', hashes);
 
     const result: QueryResult<TxMetadataModel> = await db.query(Queries.findTxMetadata, [byteHashes]);

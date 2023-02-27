@@ -33,7 +33,7 @@ export const deserializeTx = ((txBody: Buffer | Uint8Array | string) => usingAut
         ? txBody
         : (txBody instanceof Uint8Array
           ? Buffer.from(txBody)
-          : Buffer.from(HexBlob(txBody).toString(), 'hex'));
+          : Buffer.from(HexBlob(txBody), 'hex'));
 
     const txDecoded = scope.manage(CML.Transaction.from_bytes(buffer));
 

@@ -3,6 +3,7 @@ import { ConfirmedTx, FailedTx, OutgoingTx, TransactionFailure, TransactionsTrac
 import { DocumentStore, OrderedCollectionStore } from '../persistence';
 import {
   EMPTY,
+  NEVER,
   Observable,
   Subject,
   combineLatest,
@@ -282,7 +283,7 @@ export const createTransactionsTracker = (
                     filter(({ slot }) => slot > invalidHereafter),
                     map(() => ({ reason: TransactionFailure.Timeout, ...tx }))
                   )
-                : EMPTY
+                : NEVER
             ).pipe(take(1), takeUntil(txConfirmed$(tx)));
           })
         )

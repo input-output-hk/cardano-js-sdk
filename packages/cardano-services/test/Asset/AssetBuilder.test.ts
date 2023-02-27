@@ -43,7 +43,7 @@ describe('AssetBuilder', () => {
       const ma = await builder.queryMultiAsset(assets[0].policyId, assets[0].name);
 
       expect(() => Cardano.AssetFingerprint(ma.fingerprint)).not.toThrow();
-      expect(ma.fingerprint).toEqual(Cardano.AssetFingerprint.fromParts(assets[0].policyId, assets[0].name).toString());
+      expect(ma.fingerprint).toEqual(Cardano.AssetFingerprint.fromParts(assets[0].policyId, assets[0].name));
       expect(ma).toMatchShapeOf({
         fingerprint: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65',
         id: '590675'

@@ -81,7 +81,7 @@ export const tokenMap = (scope: ManagedFreeableScope, map: Cardano.TokenMap) => 
     scope.manage(assetName);
     scope.manage(scriptHash);
 
-    const policyId = policyIdFromAssetId(assetId).toString();
+    const policyId = policyIdFromAssetId(assetId);
     const amount = scope.manage(BigNum.from_str(map.get(assetId)!.toString()));
     if (!policyMap.has(policyId)) {
       policyMap.set(policyId, { assetsMap: new Map([[assetName, amount]]), scriptHash });
@@ -187,9 +187,7 @@ export const txIn = (scope: ManagedFreeableScope, core: Cardano.TxIn): Transacti
   );
 
 export const txOut = (scope: ManagedFreeableScope, core: Cardano.TxOut): TransactionOutput => {
-  const cslTxOut = scope.manage(
-    TransactionOutput.new(parseCmlAddress(scope, core.address.toString())!, value(scope, core.value))
-  );
+  const cslTxOut = scope.manage(TransactionOutput.new(parseCmlAddress(scope, core.address)!, value(scope, core.value)));
 
   if (core.datum && core.datumHash)
     throw new SerializationError(
@@ -199,15 +197,13 @@ export const txOut = (scope: ManagedFreeableScope, core: Cardano.TxOut): Transac
 
   if (core.datum) {
     cslTxOut.set_datum(
-      scope.manage(Datum.new_data(scope.manage(PlutusData.from_bytes(Buffer.from(core.datum.toString(), 'hex')))))
+      scope.manage(Datum.new_data(scope.manage(PlutusData.from_bytes(Buffer.from(core.datum, 'hex')))))
     );
   }
 
   if (core.datumHash) {
     cslTxOut.set_datum(
-      scope.manage(
-        Datum.new_data_hash(scope.manage(DataHash.from_bytes(Buffer.from(core.datumHash.toString(), 'hex'))))
-      )
+      scope.manage(Datum.new_data_hash(scope.manage(DataHash.from_bytes(Buffer.from(core.datumHash, 'hex')))))
     );
   }
 
@@ -397,7 +393,7 @@ const keyHashes = (scope: ManagedFreeableScope, coreHashes: Crypto.Ed25519KeyHas
 const txWithdrawals = (scope: ManagedFreeableScope, coreWithdrawals: Cardano.Withdrawal[]) => {
   const cslWithdrawals = scope.manage(Withdrawals.new());
   for (const { stakeAddress, quantity } of coreWithdrawals) {
-    const cslAddress = RewardAddress.from_address(scope.manage(Address.from_bech32(stakeAddress.toString())));
+    const cslAddress = RewardAddress.from_address(scope.manage(Address.from_bech32(stakeAddress)));
     if (!cslAddress) {
       throw new SerializationError(SerializationFailure.InvalidAddress, `Invalid withdrawal address: ${stakeAddress}`);
     }
@@ -494,8 +490,8 @@ export const txWitnessBootstrap = (
     witnesses.add(
       scope.manage(
         BootstrapWitness.new(
-          scope.manage(Vkey.new(scope.manage(PublicKey.from_bytes(Buffer.from(coreWitness.key.toString(), 'hex'))))),
-          scope.manage(Ed25519Signature.from_hex(coreWitness.signature.toString())),
+          scope.manage(Vkey.new(scope.manage(PublicKey.from_bytes(Buffer.from(coreWitness.key, 'hex'))))),
+          scope.manage(Ed25519Signature.from_hex(coreWitness.signature)),
           Buffer.from(coreWitness.chainCode || '', 'hex'),
           scope.manage(AddrAttributes.from_bytes(Buffer.from(coreWitness.addressAttributes || '', 'base64')))
         )
@@ -539,7 +535,7 @@ export const txWitnessRedeemers = (scope: ManagedFreeableScope, redeemers: Carda
 export const txWitnessDatumList = (scope: ManagedFreeableScope, datums: Cardano.Datum[]): CML.PlutusList => {
   const plutusDatumList = scope.manage(PlutusList.new());
   for (const datum of datums) {
-    plutusDatumList.add(scope.manage(CML.PlutusData.from_bytes(Buffer.from(datum.toString(), 'hex'))));
+    plutusDatumList.add(scope.manage(CML.PlutusData.from_bytes(Buffer.from(datum, 'hex'))));
   }
   return plutusDatumList;
 };
@@ -551,7 +547,7 @@ export const witnessSet = (scope: ManagedFreeableScope, witness: Cardano.Witness
   for (const [vkey, signature] of witness.signatures.entries()) {
     const publicKey = scope.manage(PublicKey.from_bytes(Buffer.from(vkey, 'hex')));
     const vkeyWitness = scope.manage(
-      Vkeywitness.new(scope.manage(Vkey.new(publicKey)), scope.manage(Ed25519Signature.from_hex(signature.toString())))
+      Vkeywitness.new(scope.manage(Vkey.new(publicKey)), scope.manage(Ed25519Signature.from_hex(signature)))
     );
     vkeyWitnesses.add(vkeyWitness);
   }

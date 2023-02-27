@@ -2,20 +2,22 @@ import { AllProjections } from '../../projections';
 import { InMemoryStabilityWindowBuffer } from './InMemoryStabilityWindowBuffer';
 import { InMemoryStore } from './types';
 import { Sinks } from '../types';
-import { WithNetworkInfo, withStaticContext } from '../../operators';
 import { stakeKeys } from './stakeKeys';
 import { stakePools } from './stakePools';
+import { withStaticContext } from '../../operators';
 
-export const createInMemorySinks = (
-  networkInfo: Pick<WithNetworkInfo, 'genesisParameters'>,
-  store: InMemoryStore
-): Sinks<AllProjections> => ({
+export const createStore = (): InMemoryStore => ({
+  stakeKeys: new Set(),
+  stakePools: new Map()
+});
+
+export const createSinks = (store: InMemoryStore): Sinks<AllProjections> => ({
   before: withStaticContext({ store }),
-  buffer: new InMemoryStabilityWindowBuffer(networkInfo),
+  buffer: new InMemoryStabilityWindowBuffer(),
   projectionSinks: {
     stakeKeys,
     stakePools
   }
 });
 
-export type InMemorySinks = ReturnType<typeof createInMemorySinks>;
+export type InMemorySinks = ReturnType<typeof createSinks>;

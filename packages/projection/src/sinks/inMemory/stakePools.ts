@@ -23,9 +23,9 @@ export const stakePools: Sink<StakePoolsProjection, WithInMemoryStore> = {
         findOrCreate(evt, poolId).retirements.push(...poolRetirements);
       }
     } else {
-      // Delete all updates and retirements >= current tip.
+      // Delete all updates and retirements >= current cursor.
       const belowTip = ({ source }: WithCertificateSource) =>
-        evt.tip !== 'origin' && source.slot < evt.block.header.slot;
+        evt.point !== 'origin' && source.slot < evt.block.header.slot;
       for (const [_, stakePool] of evt.store.stakePools) {
         stakePool.updates = stakePool.updates.filter(belowTip);
         stakePool.retirements = stakePool.retirements.filter(belowTip);

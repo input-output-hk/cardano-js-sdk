@@ -180,7 +180,7 @@ describe('Service dependency abstractions', () => {
           expect(res.data).toEqual(
             healthCheckResponseMock({
               projectedTip: {
-                blockNo: lastBlockNoInDb.block_no.valueOf(),
+                blockNo: lastBlockNoInDb.block_no,
                 hash: lastBlockNoInDb.hash.toString('hex'),
                 slot: Number(lastBlockNoInDb.slot_no)
               },
@@ -296,7 +296,7 @@ describe('Service dependency abstractions', () => {
           expect(res.data).toEqual(
             healthCheckResponseMock({
               projectedTip: {
-                blockNo: lastBlockNoInDb.block_no.valueOf(),
+                blockNo: lastBlockNoInDb.block_no,
                 hash: lastBlockNoInDb.hash.toString('hex'),
                 slot: Number(lastBlockNoInDb.slot_no)
               },

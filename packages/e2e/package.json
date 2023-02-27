@@ -26,6 +26,7 @@
     "test:load-testing": "jest -c jest.config.js --forceExit --selectProjects load-testing --runInBand --verbose",
     "test:long-running": "jest -c jest.config.js --forceExit --selectProjects long-running --runInBand --verbose",
     "test:local-network": "jest -c jest.config.js --forceExit --selectProjects local-network --runInBand --verbose",
+    "test:projection": "jest -c jest.config.js --forceExit --selectProjects projection --runInBand --verbose",
     "test:ogmios": "jest -c jest.config.js --forceExit --selectProjects ogmios --runInBand --verbose",
     "test:providers": "jest -c jest.config.js --forceExit --selectProjects providers --runInBand --verbose",
     "test:wallet": "jest -c jest.config.js --forceExit --selectProjects wallet --runInBand --verbose",
@@ -84,7 +85,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@cardano-foundation/ledgerjs-hw-app-cardano": "^5.0.0",
+    "@cardano-foundation/ledgerjs-hw-app-cardano": "^6.0.0",
     "@cardano-ogmios/client": "5.6.0",
     "@cardano-sdk/cardano-services": "^0.9.0-nightly.1",
     "@cardano-sdk/cardano-services-client": "^0.7.2-nightly.1",
@@ -120,6 +121,7 @@
     "@babel/preset-env": "^7.18.2",
     "@babel/preset-typescript": "^7.17.12",
     "@cardano-sdk/dapp-connector": "^0.7.1-nightly.1",
+    "@cardano-sdk/projection": "^0.3.1-nightly.1",
     "@cardano-sdk/web-extension": "^0.8.1-nightly.1",
     "@dcspark/cardano-multiplatform-lib-browser": "^3.1.1",
     "@emurgo/cardano-message-signing-asmjs": "^1.0.1",

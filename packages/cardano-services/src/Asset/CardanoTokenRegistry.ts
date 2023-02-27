@@ -136,7 +136,7 @@ export class CardanoTokenRegistry implements TokenMetadataService {
             const metadata = toCoreTokenMetadata(record);
 
             tokenMetadata[assetIds.indexOf(assetId)] = metadata;
-            this.#cache.set(assetId.toString(), metadata);
+            this.#cache.set(assetId, metadata);
           } else
             throw new ProviderError(
               ProviderFailure.InvalidResponse,
@@ -168,12 +168,10 @@ export class CardanoTokenRegistry implements TokenMetadataService {
     const cachedTokenMetadata: (Asset.TokenMetadata | null)[] = new Array(assetIds.length).fill(null);
 
     for (const [i, assetId] of assetIds.entries()) {
-      const stringAssetId = assetId.toString();
-
-      const cachedMetadata = this.#cache.getVal<Asset.TokenMetadata>(stringAssetId);
+      const cachedMetadata = this.#cache.getVal<Asset.TokenMetadata>(assetId);
 
       if (cachedMetadata) {
-        this.#logger.debug(`Using cached asset metadata value for "${stringAssetId}"`);
+        this.#logger.debug(`Using cached asset metadata value for "${assetId}"`);
         cachedTokenMetadata[i] = cachedMetadata;
       } else assetIdsToRequest.push(assetId);
     }

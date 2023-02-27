@@ -47,7 +47,7 @@ export class ChainHistoryBuilder {
 
   public async queryTransactionInputsByHashes(hashes: Cardano.TransactionId[], collateral = false): Promise<TxInput[]> {
     this.#logger.debug(`About to find inputs (collateral: ${collateral}) for transactions:`, hashes);
-    const byteHashes = hashes.map((hash) => hexStringToBuffer(hash.toString()));
+    const byteHashes = hashes.map((hash) => hexStringToBuffer(hash));
     const result: QueryResult<TxInputModel> = await this.#db.query(
       collateral ? Queries.findTxCollateralsByHashes : Queries.findTxInputsByHashes,
       [byteHashes]
@@ -63,7 +63,7 @@ export class ChainHistoryBuilder {
 
   public async queryTransactionOutputsByHashes(hashes: Cardano.TransactionId[]): Promise<TxOutput[]> {
     this.#logger.debug('About to find outputs for transactions:', hashes);
-    const byteHashes = hashes.map((hash) => hexStringToBuffer(hash.toString()));
+    const byteHashes = hashes.map((hash) => hexStringToBuffer(hash));
     const result: QueryResult<TxOutputModel> = await this.#db.query(Queries.findTxOutputsByHashes, [byteHashes]);
     if (result.rows.length === 0) return [];
 
@@ -74,7 +74,7 @@ export class ChainHistoryBuilder {
 
   public async queryTxMintByHashes(hashes: Cardano.TransactionId[]): Promise<TxTokenMap> {
     this.#logger.debug('About to find tx mint for txs:', hashes);
-    const byteHashes = hashes.map((hash) => hexStringToBuffer(hash.toString()));
+    const byteHashes = hashes.map((hash) => hexStringToBuffer(hash));
     const result: QueryResult<MultiAssetModel> = await this.#db.query(Queries.findTxMint, [byteHashes]);
     return mapTxTokenMap(result.rows);
   }
@@ -83,7 +83,7 @@ export class ChainHistoryBuilder {
     hashes: Cardano.TransactionId[]
   ): Promise<TransactionDataMap<Cardano.Withdrawal[]>> {
     this.#logger.debug('About to find withdrawals for txs:', hashes);
-    const byteHashes = hashes.map((hash) => hexStringToBuffer(hash.toString()));
+    const byteHashes = hashes.map((hash) => hexStringToBuffer(hash));
     const result: QueryResult<WithdrawalModel> = await this.#db.query(Queries.findWithdrawal, [byteHashes]);
     const withdrawalMap: TransactionDataMap<Cardano.Withdrawal[]> = new Map();
     for (const withdrawal of result.rows) {
@@ -98,7 +98,7 @@ export class ChainHistoryBuilder {
     hashes: Cardano.TransactionId[]
   ): Promise<TransactionDataMap<Cardano.Redeemer[]>> {
     this.#logger.debug('About to find redeemers for txs:', hashes);
-    const byteHashes = hashes.map((hash) => hexStringToBuffer(hash.toString()));
+    const byteHashes = hashes.map((hash) => hexStringToBuffer(hash));
     const result: QueryResult<RedeemerModel> = await this.#db.query(Queries.findRedeemer, [byteHashes]);
     const redeemerMap: TransactionDataMap<Cardano.Redeemer[]> = new Map();
     for (const redeemer of result.rows) {
@@ -113,7 +113,7 @@ export class ChainHistoryBuilder {
     hashes: Cardano.TransactionId[]
   ): Promise<TransactionDataMap<Cardano.Certificate[]>> {
     this.#logger.debug('About to find certificates for txs:', hashes);
-    const byteHashes = hashes.map((hash) => hexStringToBuffer(hash.toString()));
+    const byteHashes = hashes.map((hash) => hexStringToBuffer(hash));
     const poolRetireCerts: QueryResult<PoolRetireCertModel> = await this.#db.query(Queries.findPoolRetireCerts, [
       byteHashes
     ]);

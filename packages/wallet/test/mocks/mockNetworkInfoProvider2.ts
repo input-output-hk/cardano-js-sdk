@@ -16,7 +16,7 @@ export const genesisParameters2 = {
 
 export const ledgerTip2 = {
   ...ledgerTip,
-  blockNo: Cardano.BlockNo(ledgerTip.blockNo.valueOf() + 1)
+  blockNo: Cardano.BlockNo(ledgerTip.blockNo + 1)
 };
 
 /**

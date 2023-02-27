@@ -42,7 +42,7 @@ export class DbSyncEpochPollService implements EpochMonitor {
   async #executePoll() {
     const lastEpoch = await this.#queryLastEpoch();
     const currentEpoch = await this.#currentEpoch;
-    const shouldClearCache = !!(currentEpoch && lastEpoch.valueOf() > currentEpoch.valueOf());
+    const shouldClearCache = !!(currentEpoch && lastEpoch > currentEpoch);
 
     if (shouldClearCache) this.onEpoch(lastEpoch);
   }

@@ -113,6 +113,6 @@ HexBlob.toTypedBech32 = <T>(prefix: string, hexString: HexBlob): T =>
  * @param {number} expectedLength optionally validate the length
  */
 export const castHexBlob = <T>(target: HexBlob, expectedLength?: number) => {
-  assertLength(expectedLength, target.toString());
+  assertLength(expectedLength, target);
   return target as unknown as T;
 };

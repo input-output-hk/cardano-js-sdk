@@ -236,8 +236,8 @@ describe('TransactionsTracker', () => {
       const tx = queryTransactionsResult.pageResults[0];
       const outgoingTx = toOutgoingTx(tx);
       createTestScheduler().run(({ hot, expectObservable }) => {
-        const tip1 = { slot: Cardano.Slot(tx.body.validityInterval!.invalidHereafter!.valueOf()! - 1) } as Cardano.Tip;
-        const tip2 = { slot: Cardano.Slot(tx.body.validityInterval!.invalidHereafter!.valueOf()! + 1) } as Cardano.Tip;
+        const tip1 = { slot: Cardano.Slot(tx.body.validityInterval!.invalidHereafter! - 1) } as Cardano.Tip;
+        const tip2 = { slot: Cardano.Slot(tx.body.validityInterval!.invalidHereafter! + 1) } as Cardano.Tip;
         const failedToSubmit$ = hot<FailedTx>('-----|');
         const tip$ = hot<Cardano.Tip>('--ab-|', { a: tip1, b: tip2 });
         const submitting$ = hot('-a---|', { a: outgoingTx });
@@ -284,7 +284,7 @@ describe('TransactionsTracker', () => {
       const tx = queryTransactionsResult.pageResults[0];
       const outgoingTx = toOutgoingTx(tx);
       createTestScheduler().run(({ cold, hot, expectObservable }) => {
-        const tip1 = { slot: Cardano.Slot(tx.body.validityInterval!.invalidHereafter!.valueOf() - 1) } as Cardano.Tip;
+        const tip1 = { slot: Cardano.Slot(tx.body.validityInterval!.invalidHereafter! - 1) } as Cardano.Tip;
         const failedToSubmit$ = hot<FailedTx>('-----|');
         const tip$ = cold('a', { a: tip1 });
         const submitting$ = hot('-a---|', { a: outgoingTx });
@@ -338,7 +338,9 @@ describe('TransactionsTracker', () => {
         const failedToSubmit$ = hot<FailedTx>('---a|', {
           a: { reason: TransactionFailure.FailedToSubmit, ...outgoingTx }
         });
-        const failedFromReemitter$ = cold<FailedTx>('-a|', { a: { reason: TransactionFailure.Timeout, ...outgoingTxReemit } });
+        const failedFromReemitter$ = cold<FailedTx>('-a|', {
+          a: { reason: TransactionFailure.Timeout, ...outgoingTxReemit }
+        });
         const transactionsTracker = createTransactionsTracker(
           {
             addresses$,
@@ -367,6 +369,49 @@ describe('TransactionsTracker', () => {
         expectObservable(transactionsTracker.outgoing.failed$).toBe('-a-b|', {
           a: { reason: TransactionFailure.Timeout, ...outgoingTxReemit },
           b: { reason: TransactionFailure.FailedToSubmit, ...outgoingTx }
+        });
+      });
+    });
+
+    // Verify fix for bug where undefined invalidHereafter causes the failed transaction to go undetected
+    it('emits failed transaction with undefined invalidHereafter', async () => {
+      const outgoingTx = toOutgoingTx(queryTransactionsResult.pageResults[0]);
+      outgoingTx.body.validityInterval = undefined;
+
+      createTestScheduler().run(({ cold, hot, expectObservable }) => {
+        const tip$ = hot<Cardano.Tip>('----|');
+        const submitting$ = cold('-a--|', { a: outgoingTx });
+        const pending$ = cold('--a-|', { a: outgoingTx });
+        const transactionsSource$ = cold<Cardano.HydratedTx[]>('----|');
+        const failedToSubmit$ = hot<FailedTx>('---a|', {
+          a: { reason: TransactionFailure.FailedToSubmit, ...outgoingTx }
+        });
+        const transactionsTracker = createTransactionsTracker(
+          {
+            addresses$,
+            chainHistoryProvider,
+            inFlightTransactionsStore,
+            logger,
+            newTransactions: {
+              failedToSubmit$,
+              pending$,
+              submitting$
+            },
+            retryBackoffConfig,
+            tip$,
+            transactionsHistoryStore: transactionsStore
+          },
+          {
+            rollback$: NEVER,
+            transactionsSource$
+          }
+        );
+        expectObservable(transactionsTracker.outgoing.submitting$).toBe('-a--|', { a: outgoingTx });
+        expectObservable(transactionsTracker.outgoing.pending$).toBe('--a-|', { a: outgoingTx });
+        expectObservable(transactionsTracker.outgoing.inFlight$).toBe('ab-c|', { a: [], b: [outgoingTx], c: [] });
+        expectObservable(transactionsTracker.outgoing.confirmed$).toBe('----|');
+        expectObservable(transactionsTracker.outgoing.failed$).toBe('---a|', {
+          a: { reason: TransactionFailure.FailedToSubmit, ...outgoingTx }
         });
       });
     });
@@ -462,7 +507,11 @@ describe('TransactionsTracker', () => {
           }
         );
         expectObservable(transactionsTracker.outgoing.submitting$).toBe('-a-b--|', { a: outgoingTx, b: outgoingTx });
-        expectObservable(transactionsTracker.outgoing.inFlight$).toBe('ab-c-a|', { a: [], b: [outgoingTx], c: [outgoingTx] });
+        expectObservable(transactionsTracker.outgoing.inFlight$).toBe('ab-c-a|', {
+          a: [],
+          b: [outgoingTx],
+          c: [outgoingTx]
+        });
         expectObservable(transactionsTracker.outgoing.failed$).toBe('-----a|', {
           a: { reason: TransactionFailure.FailedToSubmit, ...outgoingTx }
         });

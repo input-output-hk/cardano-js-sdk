@@ -1,19 +1,15 @@
 import { BehaviorSubject, EMPTY, Observable } from 'rxjs';
-import { Cardano, calculateStabilityWindowSlotsCount } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
+import { RollForwardEvent } from '../../types';
 import { StabilityWindowBuffer } from '../types';
 import { WithNetworkInfo } from '../../operators';
 
-export class InMemoryStabilityWindowBuffer implements StabilityWindowBuffer {
-  readonly #stabilityWindowSlotsCount: number;
+export class InMemoryStabilityWindowBuffer<E extends WithNetworkInfo> implements StabilityWindowBuffer<E> {
   readonly #blocks: Cardano.Block[] = [];
   readonly tip$ = new BehaviorSubject<Cardano.Block | 'origin'>('origin');
   readonly tail$ = new BehaviorSubject<Cardano.Block | 'origin'>('origin');
 
-  constructor({ genesisParameters }: Pick<WithNetworkInfo, 'genesisParameters'>) {
-    this.#stabilityWindowSlotsCount = calculateStabilityWindowSlotsCount(genesisParameters);
-  }
-
-  deleteStabilityWindowBlock(block: Cardano.Block): Observable<void> {
+  deleteBlock(block: Cardano.Block): Observable<void> {
     for (let i = this.#blocks.length - 1; i >= 0; i--) {
       const bufferBlock = this.#blocks[i];
       if (bufferBlock.header.hash === block.header.hash) {
@@ -27,10 +23,12 @@ export class InMemoryStabilityWindowBuffer implements StabilityWindowBuffer {
     return EMPTY;
   }
 
-  addStabilityWindowBlock(block: Cardano.Block): Observable<void> {
+  rollForward({
+    block,
+    genesisParameters: { securityParameter }
+  }: RollForwardEvent<WithNetworkInfo>): Observable<void> {
     // clear blocks that are past stability window
-    const slotThreshold = block.header.slot.valueOf() - this.#stabilityWindowSlotsCount;
-    while (this.#blocks.length > 0 && this.#blocks[0].header.slot.valueOf() < slotThreshold) this.#blocks.shift();
+    while (this.#blocks.length > securityParameter) this.#blocks.shift();
     // add current block to cache and return the event unchanged
     this.#blocks.push(block);
     this.tip$.next(block);

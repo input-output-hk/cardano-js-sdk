@@ -88,10 +88,10 @@ describe('ChainHistoryHttpService', () => {
       lastBlockNoInDb = (await dbConnection.query<LedgerTipModel>(findLedgerTip)).rows[0];
       cardanoNode = mockCardanoNode(
         healthCheckResponseMock({
-          blockNo: lastBlockNoInDb.block_no.valueOf(),
+          blockNo: lastBlockNoInDb.block_no,
           hash: lastBlockNoInDb.hash.toString('hex'),
           projectedTip: {
-            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            blockNo: lastBlockNoInDb.block_no,
             hash: lastBlockNoInDb.hash.toString('hex'),
             slot: Number(lastBlockNoInDb.slot_no)
           },
@@ -127,10 +127,10 @@ describe('ChainHistoryHttpService', () => {
         expect(res.status).toBe(200);
         expect(res.data).toEqual(
           healthCheckResponseMock({
-            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            blockNo: lastBlockNoInDb.block_no,
             hash: lastBlockNoInDb.hash.toString('hex'),
             projectedTip: {
-              blockNo: lastBlockNoInDb.block_no.valueOf(),
+              blockNo: lastBlockNoInDb.block_no,
               hash: lastBlockNoInDb.hash.toString('hex'),
               slot: Number(lastBlockNoInDb.slot_no)
             },
@@ -144,10 +144,10 @@ describe('ChainHistoryHttpService', () => {
         const response = await provider.healthCheck();
         expect(response).toEqual(
           healthCheckResponseMock({
-            blockNo: lastBlockNoInDb.block_no.valueOf(),
+            blockNo: lastBlockNoInDb.block_no,
             hash: lastBlockNoInDb.hash.toString('hex'),
             projectedTip: {
-              blockNo: lastBlockNoInDb.block_no.valueOf(),
+              blockNo: lastBlockNoInDb.block_no,
               hash: lastBlockNoInDb.hash.toString('hex'),
               slot: Number(lastBlockNoInDb.slot_no)
             },
@@ -421,7 +421,7 @@ describe('ChainHistoryHttpService', () => {
         });
 
         let lowerBound = DB_MAX_SAFE_INTEGER;
-        for (const tx of response.pageResults) lowerBound = Math.min(lowerBound, tx.blockHeader.blockNo.valueOf());
+        for (const tx of response.pageResults) lowerBound = Math.min(lowerBound, tx.blockHeader.blockNo);
 
         expect(response.totalResultCount).toEqual(txInRangeCount);
         expect(lowerBound).toBeGreaterThanOrEqual(10);
@@ -441,7 +441,7 @@ describe('ChainHistoryHttpService', () => {
         });
 
         let upperBound = 0;
-        for (const tx of response.pageResults) upperBound = Math.max(upperBound, tx.blockHeader.blockNo.valueOf());
+        for (const tx of response.pageResults) upperBound = Math.max(upperBound, tx.blockHeader.blockNo);
 
         expect(response.totalResultCount).toEqual(txInRangeCount);
         expect(upperBound).toBeLessThanOrEqual(10);
@@ -464,8 +464,8 @@ describe('ChainHistoryHttpService', () => {
         let upperBound = 0;
 
         for (const tx of response.pageResults) {
-          upperBound = Math.max(upperBound, tx.blockHeader.blockNo.valueOf());
-          lowerBound = Math.min(lowerBound, tx.blockHeader.blockNo.valueOf());
+          upperBound = Math.max(upperBound, tx.blockHeader.blockNo);
+          lowerBound = Math.min(lowerBound, tx.blockHeader.blockNo);
         }
 
         expect(response.totalResultCount).toEqual(txInRangeCount);
