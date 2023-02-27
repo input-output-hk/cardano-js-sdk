@@ -15,6 +15,9 @@ before:
     flow:
       - log: "Find distinct addresses from DB"
       - function: "findAddresses"
+after:
+    flow:
+      - log: "Load test scenario completed"
 scenarios:
   - name: "Wallet restoration"
     afterScenario: "shutdownWallet"

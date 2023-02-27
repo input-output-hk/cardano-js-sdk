@@ -51,42 +51,46 @@ export const findAddresses: FunctionHook<WalletVars> = async ({ vars }, ee, done
   done();
 };
 
+/**
+ * The current index of found addresses list
+ */
+let index = 0;
+
 export const walletRestoration: FunctionHook<WalletVars> = async ({ vars, _uid }, ee, done) => {
-  let index = 0;
-  return (async () => {
-    const currentAddress = vars.addresses[index];
+  const currentAddress = vars.addresses[index];
+  logger.info('Current address:', currentAddress.address);
 
-    try {
-      const keyAgent = util.createAsyncKeyAgent(new StubKeyAgent(currentAddress));
+  try {
+    const keyAgent = util.createAsyncKeyAgent(new StubKeyAgent(currentAddress));
 
-      // Start to measure wallet restoration time
-      const startedAt = Date.now();
-      const { wallet } = await getWallet({
-        env,
-        idx: 0,
-        keyAgent,
-        logger,
-        name: `Test Wallet of VU with id: ${_uid}`,
-        polling: { interval: 50 }
-      });
-      await walletReady(wallet);
-      vars.currentWallet = wallet;
+    // Start to measure wallet restoration time
+    const startedAt = Date.now();
+    const { wallet } = await getWallet({
+      env,
+      idx: 0,
+      keyAgent,
+      logger,
+      name: `Test Wallet of VU with id: ${_uid}`,
+      polling: { interval: 50 }
+    });
+    await walletReady(wallet);
+    vars.currentWallet = wallet;
 
-      // Emit custom metrics
-      ee.emit('histogram', `${operationName}.time`, Date.now() - startedAt);
-      ee.emit('counter', operationName, 1);
+    // Emit custom metrics
+    ee.emit('histogram', `${operationName}.time`, Date.now() - startedAt);
+    ee.emit('counter', operationName, 1);
 
-      logger.info(`Wallet with name ${wallet.name} is successfully restored`);
-    } catch (error) {
-      ee.emit('counter', `${operationName}.error`, 1);
-      logger.error(error);
-    }
-    ++index;
-    done();
-  })();
+    logger.info(`Wallet with name ${wallet.name} was successfully restored`);
+  } catch (error) {
+    ee.emit('counter', `${operationName}.error`, 1);
+    logger.error(error);
+  }
+  ++index;
+  done();
 };
 
-export const shutdownWallet: FunctionHook<WalletVars> = async ({ vars }, _ee, done) => {
+export const shutdownWallet: FunctionHook<WalletVars> = async ({ vars, _uid }, _ee, done) => {
   vars.currentWallet.shutdown();
+  logger.info(`Wallet with VU id ${_uid} was shutdown`);
   done();
 };
