@@ -171,6 +171,7 @@
           "cost",
           "id",
           "margin",
+          "metrics",
           "owners",
           "pledge",
           "relays",
@@ -218,7 +219,7 @@
             "type": "string"
           },
           "metrics": {
-            "type": "object"
+            "$ref": "#/components/schemas/StakePoolMetrics"
           },
           "status": {
             "$ref": "#/components/schemas/StakePoolStatus"
@@ -344,6 +345,79 @@
           },
           "extVkey": {
             "type": "string"
+          }
+        }
+      },
+      "StakePoolMetrics": {
+        "type": "object",
+        "required": [
+          "apy",
+          "blocksCreated",
+          "delegators",
+          "livePledge",
+          "saturation",
+          "size",
+          "stake"
+        ],
+        "properties": {
+          "apy": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Undefined"
+              },
+              {
+                "type": "number",
+                "nullable": true
+              }
+            ]
+          },
+          "blocksCreated": {
+            "type": "string"
+          },
+          "delegators": {
+            "type": "string"
+          },
+          "livePledge": {
+            "$ref": "#/components/schemas/BigInt"
+          },
+          "saturation": {
+            "type": "number"
+          },
+          "size": {
+            "$ref": "#/components/schemas/StakePoolMetricsSize"
+          },
+          "stake": {
+            "$ref": "#/components/schemas/StakePoolMetricsStake"
+          }
+        }
+      },
+      "StakePoolMetricsStake": {
+        "type": "object",
+        "required": [
+          "active",
+          "live"
+        ],
+        "properties": {
+          "active": {
+            "$ref": "#/components/schemas/BigInt"
+          },
+          "live": {
+            "$ref": "#/components/schemas/BigInt"
+          }
+        }
+      },
+      "StakePoolMetricsSize": {
+        "type": "object",
+        "required": [
+          "active",
+          "live"
+        ],
+        "properties": {
+          "active": {
+            "type": "number"
+          },
+          "live": {
+            "type": "number"
           }
         }
       },

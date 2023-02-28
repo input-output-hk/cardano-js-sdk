@@ -21,9 +21,10 @@ import {
 import { Ogmios, OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import { RabbitMQContainer } from '../../TxSubmit/rabbitmq/docker';
 import { SrvRecord } from 'dns';
+import { URL } from 'url';
 import { bufferToHexString } from '@cardano-sdk/util';
 import { createMockOgmiosServer } from '../../../../ogmios/test/mocks/mockOgmiosServer';
-import { getPort, getRandomPort } from 'get-port-please';
+import { getRandomPort } from 'get-port-please';
 import { listenPromise, serverClosePromise } from '../../../src/util';
 import { logger } from '@cardano-sdk/util-dev';
 import { ogmiosServerReady } from '../../util';
@@ -51,24 +52,24 @@ jest.mock('dns', () => ({
 
 describe('Program/services/rabbitmq', () => {
   describe('http-server', () => {
+    let apiUrl: URL;
+    let config: HttpServerConfig;
     const APPLICATION_JSON = 'application/json';
     const container = new RabbitMQContainer();
     const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
 
-    beforeAll(async () => ({ rabbitmqPort, rabbitmqUrl } = await container.load()));
+    beforeAll(async () => {
+      ({ rabbitmqPort, rabbitmqUrl } = await container.load());
+      apiUrl = new URL(`http://localhost:${await getRandomPort()}`);
+      config = { listen: { port: Number.parseInt(apiUrl.port) } };
+    });
 
     describe('RabbitMQ-dependant service with service discovery', () => {
-      let apiUrlBase: string;
       let txSubmitProvider: TxSubmitProvider;
       let httpServer: HttpServer;
-      let port: number;
-      let config: HttpServerConfig;
 
       describe('Established connection', () => {
         beforeAll(async () => {
-          port = await getPort();
-          apiUrlBase = `http://localhost:${port}/tx-submit`;
-          config = { listen: { port } };
           txSubmitProvider = await getRabbitMqTxSubmitProvider(dnsResolver, logger, {
             rabbitmqSrvServiceName: process.env.RABBITMQ_SRV_SERVICE_NAME
           });
@@ -90,7 +91,7 @@ describe('Program/services/rabbitmq', () => {
         });
 
         it('forwards the txSubmitProvider health response', async () => {
-          const res = await axios.post(`${apiUrlBase}/health`, {
+          const res = await axios.post(`${apiUrl}tx-submit/health`, {
             headers: { 'Content-Type': APPLICATION_JSON }
           });
           expect(res.status).toBe(200);
@@ -100,17 +101,12 @@ describe('Program/services/rabbitmq', () => {
     });
 
     describe('RabbitMQ-dependant service with static config', () => {
-      let apiUrlBase: string;
       let txSubmitProvider: TxSubmitProvider;
       let httpServer: HttpServer;
-      let port: number;
-      let config: HttpServerConfig;
 
       describe('Established connection', () => {
         beforeAll(async () => {
-          port = await getPort();
-          apiUrlBase = `http://localhost:${port}/tx-submit`;
-          config = { listen: { port } };
+          config = { listen: { port: Number.parseInt(apiUrl.port) } };
           txSubmitProvider = await getRabbitMqTxSubmitProvider(dnsResolver, logger, { rabbitmqUrl });
           httpServer = new HttpServer(config, {
             logger,
@@ -130,7 +126,7 @@ describe('Program/services/rabbitmq', () => {
         });
 
         it('forwards the txSubmitProvider health response', async () => {
-          const res = await axios.post(`${apiUrlBase}/health`, {
+          const res = await axios.post(`${apiUrl}tx-submit/health`, {
             headers: { 'Content-Type': APPLICATION_JSON }
           });
           expect(res.status).toBe(200);
@@ -158,12 +154,11 @@ describe('Program/services/rabbitmq', () => {
 
         txSubmitWorker = await loadAndStartTxWorker(
           {
-            options: {
-              loggerMinSeverity: 'error',
-              ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME,
-              parallel: true,
-              rabbitmqSrvServiceName: process.env.RABBITMQ_SRV_SERVICE_NAME
-            }
+            apiUrl,
+            loggerMinSeverity: 'error',
+            ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME,
+            parallel: true,
+            rabbitmqSrvServiceName: process.env.RABBITMQ_SRV_SERVICE_NAME
           },
           logger
         );
@@ -214,10 +209,12 @@ describe('Program/services/rabbitmq', () => {
   });
 
   describe('tx-worker', () => {
+    let apiUrl: URL;
+
     beforeAll(async () => {
       const container = new RabbitMQContainer();
-
       ({ rabbitmqPort, rabbitmqUrl } = await container.load());
+      apiUrl = new URL(`http://localhost:${await getRandomPort()}`);
     });
 
     describe('getRunningTxSubmitWorker', () => {
@@ -252,7 +249,10 @@ describe('Program/services/rabbitmq', () => {
           ogmiosUrl: new URL(connection.address.webSocket)
         });
 
-        txSubmitWorker = await getRunningTxSubmitWorker(dnsResolverMock, txSubmitProvider, logger, { rabbitmqUrl });
+        txSubmitWorker = await getRunningTxSubmitWorker(dnsResolverMock, txSubmitProvider, logger, {
+          apiUrl,
+          rabbitmqUrl
+        });
 
         expect(dnsResolverMock).toBeCalledTimes(0);
         expect(txSubmitWorker.getStatus()).toEqual('connected');
@@ -266,6 +266,7 @@ describe('Program/services/rabbitmq', () => {
         });
 
         txSubmitWorker = await getRunningTxSubmitWorker(dnsResolverMock, txSubmitProvider, logger, {
+          apiUrl,
           rabbitmqSrvServiceName: process.env.RABBITMQ_SRV_SERVICE_NAME
         });
 

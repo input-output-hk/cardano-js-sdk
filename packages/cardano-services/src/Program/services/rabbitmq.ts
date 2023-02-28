@@ -3,15 +3,17 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { CONNECTION_ERROR_EVENT, RabbitMqTxSubmitProvider, TxSubmitWorker } from '../../TxSubmit';
-import { CommonOptionDescriptions, CommonProgramOptions } from '../Options';
-import { DnsResolver, srvRecordToRabbitmqURL } from '../utils';
+import { DnsResolver } from '../utils';
 import { Logger } from 'ts-log';
 import { MissingProgramOption } from '../errors';
 import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import { ProviderError, ProviderFailure, SubmitTxArgs } from '@cardano-sdk/core';
-import { ServiceNames } from '../ServiceNames';
-import { TxWorkerOptions } from '../loadTxWorker';
+import { RabbitMqOptionDescriptions, RabbitMqProgramOptions } from '../options';
+import { ServiceNames, TxWorkerArgs } from '../programs';
+import { SrvRecord } from 'dns';
 import { isConnectionError } from '@cardano-sdk/util';
+
+export const srvRecordToRabbitmqURL = ({ name, port }: SrvRecord) => new URL(`amqp://${name}:${port}`);
 
 /**
  * Creates a extended RabbitMqTxSubmitProvider instance :
@@ -69,14 +71,14 @@ export const rabbitMqTxSubmitProviderWithDiscovery = async (
 export const getRabbitMqTxSubmitProvider = async (
   dnsResolver: DnsResolver,
   logger: Logger,
-  options?: CommonProgramOptions
+  options?: RabbitMqProgramOptions
 ): Promise<RabbitMqTxSubmitProvider> => {
   if (options?.rabbitmqSrvServiceName)
     return rabbitMqTxSubmitProviderWithDiscovery(dnsResolver, logger, options.rabbitmqSrvServiceName);
   if (options?.rabbitmqUrl) return new RabbitMqTxSubmitProvider({ rabbitmqUrl: options.rabbitmqUrl }, { logger });
   throw new MissingProgramOption(ServiceNames.TxSubmit, [
-    CommonOptionDescriptions.RabbitMQUrl,
-    CommonOptionDescriptions.RabbitMQSrvServiceName
+    RabbitMqOptionDescriptions.Url,
+    RabbitMqOptionDescriptions.SrvServiceName
   ]);
 };
 
@@ -88,7 +90,7 @@ type WorkerFactory = () => Promise<TxSubmitWorker>;
  * @param {DnsResolver} dnsResolver used for DNS resolution
  * @param {OgmiosTxSubmitProvider} txSubmitProvider tx submit provider
  * @param {Logger} logger common logger
- * @param {TxWorkerOptions} options needed for tx worker initialization
+ * @param {TxWorkerArgs} args needed for tx worker initialization
  * @returns {WorkerFactory} WorkerFactory with service discovery, returning a 'TxSubmitWorker' instance
  */
 export const createWorkerFactoryWithDiscovery =
@@ -96,14 +98,11 @@ export const createWorkerFactoryWithDiscovery =
     dnsResolver: DnsResolver,
     txSubmitProvider: OgmiosTxSubmitProvider,
     logger: Logger,
-    options: TxWorkerOptions
+    args: TxWorkerArgs
   ): WorkerFactory =>
   async () => {
-    const record = await dnsResolver(options.rabbitmqSrvServiceName!);
-    return new TxSubmitWorker(
-      { ...options, rabbitmqUrl: srvRecordToRabbitmqURL(record) },
-      { logger, txSubmitProvider }
-    );
+    const record = await dnsResolver(args.rabbitmqSrvServiceName!);
+    return new TxSubmitWorker({ ...args, rabbitmqUrl: srvRecordToRabbitmqURL(record) }, { logger, txSubmitProvider });
   };
 
 /**
@@ -154,22 +153,21 @@ export const startTxSubmitWorkerWithDiscovery = async (
  * @param {DnsResolver} dnsResolver used for DNS resolution
  * @param {OgmiosTxSubmitProvider} txSubmitProvider tx submit provider
  * @param {Logger} logger common logger
- * @param {TxWorkerOptions} options needed for tx worker initialization
- * @returns {RunningTxSubmitWorker} RunningTxSubmitWorker instance
+ * @param {TxWorkerArgs} args needed for tx worker initialization * @returns {RunningTxSubmitWorker} RunningTxSubmitWorker instance
  * @throws {MissingProgramOption} error if neither URL nor service name is provided
  */
 export const getRunningTxSubmitWorker = async (
   dnsResolver: DnsResolver,
   txSubmitProvider: OgmiosTxSubmitProvider,
   logger: Logger,
-  options?: TxWorkerOptions
+  args?: TxWorkerArgs
 ): Promise<RunningTxSubmitWorker> => {
-  if (options?.rabbitmqSrvServiceName)
+  if (args?.rabbitmqSrvServiceName)
     return startTxSubmitWorkerWithDiscovery(
-      createWorkerFactoryWithDiscovery(dnsResolver, txSubmitProvider, logger, options)
+      createWorkerFactoryWithDiscovery(dnsResolver, txSubmitProvider, logger, args)
     );
-  if (options?.rabbitmqUrl) {
-    const worker = new TxSubmitWorker({ ...options, rabbitmqUrl: options.rabbitmqUrl }, { logger, txSubmitProvider });
+  if (args?.rabbitmqUrl) {
+    const worker = new TxSubmitWorker({ ...args, rabbitmqUrl: args.rabbitmqUrl }, { logger, txSubmitProvider });
     worker.on(CONNECTION_ERROR_EVENT, (error) => {
       logger.error(`Worker received a connection error event, terminating the process caused by: ${error}`);
       throw new ProviderError(ProviderFailure.ConnectionFailure, error);
@@ -178,7 +176,7 @@ export const getRunningTxSubmitWorker = async (
     return worker;
   }
   throw new MissingProgramOption(ServiceNames.TxSubmit, [
-    CommonOptionDescriptions.RabbitMQUrl,
-    CommonOptionDescriptions.RabbitMQSrvServiceName
+    RabbitMqOptionDescriptions.Url,
+    RabbitMqOptionDescriptions.SrvServiceName
   ]);
 };

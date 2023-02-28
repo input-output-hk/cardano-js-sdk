@@ -2,7 +2,7 @@ import * as OpenApiValidator from 'express-openapi-validator';
 import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
 import { HttpServer, HttpService } from '../Http';
 import { Logger } from 'ts-log';
-import { ServiceNames } from '../Program/ServiceNames';
+import { ServiceNames } from '../Program';
 import { providerHandler } from '../util';
 import bodyParser from 'body-parser';
 import express from 'express';

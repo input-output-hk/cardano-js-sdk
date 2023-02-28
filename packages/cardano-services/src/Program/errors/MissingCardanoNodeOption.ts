@@ -1,11 +1,11 @@
 import { CustomError } from 'ts-custom-error';
-import { ProgramOptionDescriptions } from '../Options';
+import { OgmiosOptionDescriptions } from '../options';
 
 export class MissingCardanoNodeOption extends CustomError {
-  public constructor(option: ProgramOptionDescriptions | ProgramOptionDescriptions[]) {
+  public constructor(option: OgmiosOptionDescriptions | OgmiosOptionDescriptions[]) {
     super();
     this.message = `Cardano Node Ogmios requires the ${
-      typeof option === 'string' ? option : option.join(' or ')
+      Array.isArray(option) ? option.join(' or ') : option
     } program option.`;
   }
 }

@@ -1,4 +1,11 @@
-import { DB_CACHE_TTL_DEFAULT, HttpServer, ServiceNames, loadHttpServer, util } from '@cardano-sdk/cardano-services';
+import {
+  DB_CACHE_TTL_DEFAULT,
+  HttpServer,
+  HttpServerArgs,
+  ServiceNames,
+  loadHttpServer,
+  util
+} from '@cardano-sdk/cardano-services';
 import { SrvRecord } from 'dns';
 import { createServer } from 'http';
 import { getPort } from 'get-port-please';
@@ -134,21 +141,21 @@ describe('interactions with ogmios server', () => {
 
     httpPort = await getPort();
 
-    const apiUrl = new URL(`http://localhost:${httpPort}`);
     const dependencies = {
       dnsResolver: () => Promise.resolve<SrvRecord>({ name: 'localhost', port: ogmiosPort, priority: 1, weight: 1 }),
       logger
     } as const;
-    const options = {
+    const args = {
+      apiUrl: new URL(`http://localhost:${httpPort}`),
       cardanoNodeConfigPath,
       dbCacheTtl: DB_CACHE_TTL_DEFAULT,
       epochPollInterval: util.EPOCH_POLL_INTERVAL_DEFAULT,
       ogmiosSrvServiceName: 'localhost',
-      postgresConnectionString: env.DB_SYNC_CONNECTION_STRING
-    } as const;
-    const serviceNames = [ServiceNames.NetworkInfo];
+      postgresConnectionString: env.DB_SYNC_CONNECTION_STRING,
+      serviceNames: [ServiceNames.NetworkInfo]
+    } as HttpServerArgs;
 
-    httpServer = await loadHttpServer({ apiUrl, options, serviceNames }, dependencies);
+    httpServer = await loadHttpServer(args, dependencies);
 
     await httpServer.initialize();
     await httpServer.start();

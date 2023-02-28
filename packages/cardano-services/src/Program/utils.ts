@@ -1,19 +1,18 @@
-/* eslint-disable max-len */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Logger } from 'ts-log';
-import { ServiceNames } from '../Program/ServiceNames';
+import { Programs } from './programs';
+import { WrongOption } from './errors';
 import dns, { SrvRecord } from 'dns';
 import pRetry, { FailedAttemptError } from 'p-retry';
 
 export const SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT = 1.1;
 export const SERVICE_DISCOVERY_TIMEOUT_DEFAULT = 60 * 1000;
-export const DNS_SRV_CACHE_KEY = 'DNS_SRV_Record';
+
 export type RetryBackoffConfig = {
   factor?: number;
   maxRetryTime?: number;
 };
 export const onFailedAttemptFor =
-  (serviceName: string, logger: Logger) =>
+  <ServiceNames>(serviceName: ServiceNames, logger: Logger) =>
   async ({ attemptNumber, message, retriesLeft }: FailedAttemptError) => {
     const nextAction = retriesLeft > 0 ? 'retrying...' : 'exiting';
     logger.trace(message);
@@ -24,7 +23,7 @@ export const onFailedAttemptFor =
     );
     if (retriesLeft === 0) {
       logger.error(message);
-      // Invokes onDeath() callback within cardano-services entrypoints, following by server.shutdown() and process.exit(1)
+      // will be caught by onDeath() to server.shutdown() and process.exit(1)
       process.kill(process.pid, 'SIGTERM');
     }
   };
@@ -41,16 +40,11 @@ export const createDnsResolver = (config: RetryBackoffConfig, logger: Logger) =>
   });
 export type DnsResolver = ReturnType<typeof createDnsResolver>;
 
-export const srvRecordToRabbitmqURL = ({ name, port }: SrvRecord) => new URL(`amqp://${name}:${port}`);
+export const serviceSetHas = <ServiceNames>(serviceNames: ServiceNames[], services: Set<ServiceNames>) =>
+  serviceNames.some((name) => services.has(name));
 
-export const cardanoNodeDependantServices = new Set([
-  ServiceNames.NetworkInfo,
-  ServiceNames.StakePool,
-  ServiceNames.Utxo,
-  ServiceNames.Rewards,
-  ServiceNames.Asset,
-  ServiceNames.ChainHistory
-]);
-
-export const shouldInitCardanoNode = (serviceNames: ServiceNames[]) =>
-  serviceNames.some((name) => cardanoNodeDependantServices.has(name));
+export const stringOptionToBoolean = (value: string, program: Programs, option: string) => {
+  if (['0', 'f', 'false'].includes(value)) return false;
+  if (['1', 't', 'true'].includes(value)) return true;
+  throw new WrongOption(program, option, ['false', 'true']);
+};

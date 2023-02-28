@@ -1,12 +1,8 @@
 import { CustomError } from 'ts-custom-error';
-import { ProgramOptionDescriptions } from '../Options';
-import { ServiceNames } from '../ServiceNames';
 
-export class MissingProgramOption extends CustomError {
-  public constructor(service: ServiceNames, option: ProgramOptionDescriptions | ProgramOptionDescriptions[]) {
+export class MissingProgramOption<ServiceNames, OptionsType> extends CustomError {
+  public constructor(service: ServiceNames, option: OptionsType | OptionsType[]) {
     super();
-    this.message = `${service} requires the ${
-      typeof option === 'string' ? option : option.join(' or ')
-    } program option.`;
+    this.message = `${service} requires the ${Array.isArray(option) ? option.join(' or ') : option} program option.`;
   }
 }
