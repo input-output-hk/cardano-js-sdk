@@ -12,13 +12,17 @@ describe('cip36', () => {
       const props: cip36.BuildVotingRegistrationProps = {
         delegations: [
           {
-            votingKey: Crypto.Ed25519PublicKeyHex('a6a3c0447aeb9cc54cf6422ba32b294e5e1c3ef6d782f2acff4a70694c4d1663'),
+            cip36VoteKey: Crypto.Ed25519PublicKeyHex(
+              '0036ef3e1f0d3f5989e2d155ea54bdb2a72c4c456ccb959af4c94868f473f5a0'
+            ),
             weight: 1
           }
         ],
+        paymentAddress: Cardano.Address(
+          'addr_test1qprhw4s70k0vzyhvxp6h97hvrtlkrlcvlmtgmaxdtjz87xrjkctk27ypuv9dzlzxusqse89naweygpjn5dxnygvus05sdq9h07'
+        ),
         purpose: cip36.VotingPurpose.CATALYST,
-        rewardAccount: Cardano.RewardAccount('stake_test1uzhr5zn6akj2affzua8ylcm8t872spuf5cf6tzjrvnmwemcehgcjm'),
-        stakeKey: Crypto.Ed25519PublicKeyHex('86870efc99c453a873a16492ce87738ec79a0ebd064379a62e2c9cf4e119219e')
+        stakeKey: Crypto.Ed25519PublicKeyHex('e3cd2404c84de65f96918f18d5b445bcb933a7cda18eeded7945dd191e432369')
       };
       const getNonce = (metadata: Cardano.TxMetadata) =>
         (metadata.get(61_284n) as Cardano.MetadatumMap).get(4n) as bigint;
@@ -32,39 +36,38 @@ describe('cip36', () => {
       const votingRegistrationMetadata = cip36.metadataBuilder.buildVotingRegistration({
         delegations: [
           {
-            votingKey: Crypto.Ed25519PublicKeyHex('a6a3c0447aeb9cc54cf6422ba32b294e5e1c3ef6d782f2acff4a70694c4d1663'),
+            cip36VoteKey: Crypto.Ed25519PublicKeyHex(
+              '0036ef3e1f0d3f5989e2d155ea54bdb2a72c4c456ccb959af4c94868f473f5a0'
+            ),
             weight: 1
-          },
-          {
-            votingKey: Crypto.Ed25519PublicKeyHex('00588e8e1d18cba576a4d35758069fe94e53f638b6faf7c07b8abd2bc5c5cdee'),
-            weight: 3
           }
         ],
         nonce: 1234,
+        paymentAddress: Cardano.Address(
+          'addr_test1qprhw4s70k0vzyhvxp6h97hvrtlkrlcvlmtgmaxdtjz87xrjkctk27ypuv9dzlzxusqse89naweygpjn5dxnygvus05sdq9h07'
+        ),
         purpose: cip36.VotingPurpose.CATALYST,
-        rewardAccount: Cardano.RewardAccount('stake_test1uzhr5zn6akj2affzua8ylcm8t872spuf5cf6tzjrvnmwemcehgcjm'),
-        stakeKey: Crypto.Ed25519PublicKeyHex('86870efc99c453a873a16492ce87738ec79a0ebd064379a62e2c9cf4e119219e')
+        stakeKey: Crypto.Ed25519PublicKeyHex('e3cd2404c84de65f96918f18d5b445bcb933a7cda18eeded7945dd191e432369')
       });
       expect(
         Buffer.from(
           usingAutoFree((scope) => coreToCml.txMetadata(scope, votingRegistrationMetadata).to_bytes())
         ).toString('hex')
       ).toEqual(
-        'a119ef64a50182825820a6a3c0447aeb9cc54cf6422ba32b294e5e1c3ef6d782f2acff4a70694c4d16630182582000588e8e1d18cba576a4d35758069fe94e53f638b6faf7c07b8abd2bc5c5cdee0302582086870efc99c453a873a16492ce87738ec79a0ebd064379a62e2c9cf4e119219e03581de0ae3a0a7aeda4aea522e74e4fe36759fca80789a613a58a4364f6ecef041904d20500'
+        'a119ef64a501818258200036ef3e1f0d3f5989e2d155ea54bdb2a72c4c456ccb959af4c94868f473f5a001025820e3cd2404c84de65f96918f18d5b445bcb933a7cda18eeded7945dd191e432369035839004777561e7d9ec112ec307572faec1aff61ff0cfed68df4cd5c847f1872b617657881e30ad17c46e4010c9cb3ebb2440653a34d32219c83e9041904d20500'
       );
       const signedCip36Metadata = await cip36.metadataBuilder.signVotingRegistration(votingRegistrationMetadata, {
         signBlob: async (blob) => {
           const bip32Ed25519 = new Crypto.CmlBip32Ed25519(CML);
           const privateStakeKey = Crypto.Ed25519PrivateNormalKeyHex(
-            'f5beaeff7932a4164d270afde7716067582412e8977e67986cd9b456fc082e3a'
+            '852fa5d17df3efdfdcd6dac53ec9fe5593f3c0bd7cadb3c2af76c7e15dfa8a5c'
           );
-
           return bip32Ed25519.sign(privateStakeKey, blob);
         }
       });
       expect((signedCip36Metadata.get(61_285n) as Cardano.MetadatumMap).get(1n)).toEqual(
         Buffer.from(
-          '3aaa2e6b43c0a96e880a7d70df84dffb2a1a17b19d7a99a6ed27b91d499b32027c43acfbf6dff097af7634b2ee38c8039af259b0b6a64316f02b4ffee28a0608',
+          'cbb96ba1596fafc18eec84e306feea3067ba1c6ace95b11af820bcbd53837ef32bdcf28176749061e1f2a1300d4df98c80582722786e40cf330072d0b78a7408',
           'hex'
         )
       );
