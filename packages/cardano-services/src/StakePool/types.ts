@@ -1,7 +1,7 @@
 import { APExtMetadataResponse, Cip6ExtMetadataResponse } from './HttpStakePoolMetadata';
 import { Cardano } from '@cardano-sdk/core';
 
-export interface StakePoolExtMetadataService {
+export interface StakePoolMetadataService {
   getStakePoolExtendedMetadata(
     poolMetadata: Cardano.StakePoolMetadata
   ): Promise<Cardano.ExtendedStakePoolMetadata | null>;

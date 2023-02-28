@@ -19,7 +19,7 @@ import {
 import { DbSyncEpochPollService, loadGenesisData } from '../../util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../NetworkInfo';
 import { DbSyncRewardsProvider, RewardsHttpService } from '../../Rewards';
-import { DbSyncStakePoolProvider, StakePoolHttpService, createHttpStakePoolExtMetadataService } from '../../StakePool';
+import { DbSyncStakePoolProvider, StakePoolHttpService, createHttpStakePoolMetadataService } from '../../StakePool';
 import { DbSyncUtxoProvider, UtxoHttpService } from '../../Utxo';
 import { DnsResolver, createDnsResolver, serviceSetHas } from '../utils';
 import { GenesisData } from '../../types';
@@ -168,7 +168,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
           epochMonitor: getEpochMonitor(db),
           genesisData,
           logger,
-          metadataService: createHttpStakePoolExtMetadataService(logger)
+          metadataService: createHttpStakePoolMetadataService(logger)
         }
       );
       return new StakePoolHttpService({ logger, stakePoolProvider });

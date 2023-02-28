@@ -1,6 +1,6 @@
 import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
-import { StakePoolExtMetadataResponse, StakePoolExtMetadataService } from '../types';
+import { StakePoolExtMetadataResponse, StakePoolMetadataService } from '../types';
 import { ValidationError, validate } from 'jsonschema';
 import { getExtMetadataUrl, getSchemaFormat, loadJsonSchema } from './util';
 import { mapToExtendedMetadata } from './mappers';
@@ -9,13 +9,13 @@ import axios, { AxiosInstance } from 'axios';
 const HTTP_CLIENT_TIMEOUT = 1 * 1000;
 const HTTP_CLIENT_MAX_CONTENT_LENGTH = 5000;
 
-export const createHttpStakePoolExtMetadataService = (
+export const createHttpStakePoolMetadataService = (
   logger: Logger,
   axiosClient: AxiosInstance = axios.create({
     maxContentLength: HTTP_CLIENT_MAX_CONTENT_LENGTH,
     timeout: HTTP_CLIENT_TIMEOUT
   })
-): StakePoolExtMetadataService => ({
+): StakePoolMetadataService => ({
   async getStakePoolExtendedMetadata(metadata: Cardano.StakePoolMetadata): Promise<Cardano.ExtendedStakePoolMetadata> {
     const url = getExtMetadataUrl(metadata);
     try {
@@ -30,14 +30,14 @@ export const createHttpStakePoolExtMetadataService = (
           throw new ProviderError(
             ProviderFailure.NotFound,
             error,
-            `StakePoolExtMetadataService failed to fetch extended metadata from ${url} due to resource not found`
+            `StakePoolMetadataService failed to fetch extended metadata from ${url} due to resource not found`
           );
         }
 
         throw new ProviderError(
           ProviderFailure.ConnectionFailure,
           error,
-          `StakePoolExtMetadataService failed to fetch extended metadata from ${url} due to connection error`
+          `StakePoolMetadataService failed to fetch extended metadata from ${url} due to connection error`
         );
       }
       if (error instanceof ValidationError) {
