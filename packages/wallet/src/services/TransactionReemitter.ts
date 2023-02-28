@@ -84,9 +84,14 @@ export const createTransactionReemitter = ({
           break;
         }
         case txSource.submitting: {
-          // Transactions in submitting are the ones reemitted. Remove them from volatiles
-          logger.debug(`Transaction ${vt.tx.id} is being resubmitted. Remove it from volatiles`);
-          volatiles = volatiles.filter((tx) => tx.id !== vt.tx.id);
+          volatiles = volatiles.filter((tx) => {
+            const isResubmittedTx = tx.id === vt.tx.id;
+            if (isResubmittedTx) {
+              // Volatile transactions in submitting are the ones reemitted. Remove them from volatiles
+              logger.debug(`Transaction ${vt.tx.id} is being resubmitted. Remove it from volatiles`);
+            }
+            return !isResubmittedTx;
+          });
           stores.volatileTransactions.set(volatiles);
           break;
         }
@@ -143,7 +148,8 @@ export const createTransactionReemitter = ({
   // Submission might have failed and could be retryable, so we should attempt to re-submit it.
   const unsubmitted$ = stores.inFlightTransactions.get().pipe(
     map((txs) => txs.filter(({ submittedAt }) => !submittedAt)),
-    mergeMap((txs) => from(txs))
+    mergeMap((txs) => from(txs)),
+    tap((tx) => logger.debug('Reemitting in-flight tx that was never submitted', tx.id))
   );
 
   const reemitSubmittedBefore$ = tipSlot$.pipe(
@@ -153,7 +159,8 @@ export const createTransactionReemitter = ({
   const reemitUnconfirmed$ = combineLatest([reemitSubmittedBefore$, inFlight$]).pipe(
     mergeMap(([reemitSubmittedBefore, inFlight]) =>
       from(inFlight.filter(({ submittedAt }) => submittedAt && submittedAt < reemitSubmittedBefore))
-    )
+    ),
+    tap((tx) => logger.debug('Reemitting unconfirmed in-flight tx', tx.id, 'submitted at slot', tx.submittedAt))
   );
 
   return {

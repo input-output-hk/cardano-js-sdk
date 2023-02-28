@@ -520,7 +520,9 @@ export class SingleAddressWallet implements ObservableWallet {
           error.innerError instanceof CardanoNodeErrors.TxSubmissionErrors.CollectErrorsError ||
           error.innerError instanceof CardanoNodeErrors.TxSubmissionErrors.BadInputsError)
       ) {
-        this.#logger.debug(`Transaction ${outgoingTx.id} appears to be already submitted...`);
+        this.#logger.debug(
+          `Transaction ${outgoingTx.id} failed with ${error.innerError}, but it appears to be already submitted...`
+        );
         this.#newTransactions.pending$.next(outgoingTx);
         return outgoingTx.id;
       }
