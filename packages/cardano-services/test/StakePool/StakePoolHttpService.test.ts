@@ -18,7 +18,7 @@ import {
   InMemoryCache,
   StakePoolHttpService,
   UNLIMITED_CACHE_TTL,
-  createHttpStakePoolExtMetadataService
+  createHttpStakePoolMetadataService
 } from '../../src';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { INFO, createLogger } from 'bunyan';
@@ -203,7 +203,7 @@ describe('StakePoolHttpService', () => {
         })
       ) as unknown as OgmiosCardanoNode;
       const genesisData = await loadGenesisData(cardanoNodeConfigPath);
-      const metadataService = createHttpStakePoolExtMetadataService(logger);
+      const metadataService = createHttpStakePoolMetadataService(logger);
       stakePoolProvider = new DbSyncStakePoolProvider(
         { paginationPageSizeLimit: pagination.limit },
         { cache, cardanoNode, db, epochMonitor, genesisData, logger, metadataService }

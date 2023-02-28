@@ -9,7 +9,7 @@ import {
 } from '@cardano-sdk/core';
 import { CommonPoolInfo, OrderedResult, PoolAPY, PoolData, PoolMetrics, PoolSortType, PoolUpdate } from './types';
 import { DbSyncProvider, DbSyncProviderDependencies, Disposer, EpochMonitor } from '../../util';
-import { GenesisData, InMemoryCache, StakePoolExtMetadataService, UNLIMITED_CACHE_TTL } from '../..';
+import { GenesisData, InMemoryCache, StakePoolMetadataService, UNLIMITED_CACHE_TTL } from '../..';
 import { IDS_NAMESPACE, StakePoolsSubQuery, emptyPoolsExtraInfo, getStakePoolSortType, queryCacheKey } from './util';
 import { RunnableModule, isNotNil } from '@cardano-sdk/util';
 import { StakePoolBuilder } from './StakePoolBuilder';
@@ -47,7 +47,7 @@ export interface StakePoolProviderDependencies extends DbSyncProviderDependencie
   /**
    * The Stake Pool extended metadata service.
    */
-  metadataService: StakePoolExtMetadataService;
+  metadataService: StakePoolMetadataService;
 }
 
 export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) implements StakePoolProvider {
@@ -57,7 +57,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
   #epochMonitor: EpochMonitor;
   #epochRolloverDisposer: Disposer;
   #paginationPageSizeLimit: number;
-  #metadataService: StakePoolExtMetadataService;
+  #metadataService: StakePoolMetadataService;
 
   constructor(
     { paginationPageSizeLimit }: StakePoolProviderProps,

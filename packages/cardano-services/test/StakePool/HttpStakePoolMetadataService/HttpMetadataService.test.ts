@@ -4,7 +4,7 @@ import { DataMocks } from '../../data-mocks';
 import { ExtMetadataFormat } from '../../../src/StakePool/types';
 import { adaPoolsExtMetadataMock, cip6ExtMetadataMock, mainExtMetadataMock } from './mocks';
 import { createGenericMockServer, logger } from '@cardano-sdk/util-dev';
-import { createHttpStakePoolExtMetadataService } from '../../../src';
+import { createHttpStakePoolMetadataService } from '../../../src';
 import url from 'url';
 
 export const mockPoolExtMetadataServer = createGenericMockServer((handler) => async (req, res) => {
@@ -28,11 +28,11 @@ export const mockPoolExtMetadataServer = createGenericMockServer((handler) => as
   return res.end(JSON.stringify(adaPoolsExtMetadataMock));
 });
 
-describe('StakePoolExtMetadataService', () => {
+describe('StakePoolMetadataService', () => {
   describe('healthy state', () => {
     let closeMock: () => Promise<void> = jest.fn();
     let serverUrl = '';
-    const extendedMetadataService = createHttpStakePoolExtMetadataService(logger);
+    const extendedMetadataService = createHttpStakePoolMetadataService(logger);
 
     beforeAll(async () => {
       ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(() => ({})));
@@ -78,7 +78,7 @@ describe('StakePoolExtMetadataService', () => {
   });
 
   describe('error cases are correctly handled', () => {
-    const extendedMetadataService = createHttpStakePoolExtMetadataService(logger);
+    const extendedMetadataService = createHttpStakePoolMetadataService(logger);
     let closeMock: () => Promise<void> = jest.fn();
     let serverUrl: string;
 
@@ -147,7 +147,7 @@ describe('StakePoolExtMetadataService', () => {
         new ProviderError(
           ProviderFailure.ConnectionFailure,
           null,
-          `StakePoolExtMetadataService failed to fetch extended metadata from ${serverUrl}/${ExtMetadataFormat.CIP6} due to connection error`
+          `StakePoolMetadataService failed to fetch extended metadata from ${serverUrl}/${ExtMetadataFormat.CIP6} due to connection error`
         )
       );
     });
@@ -177,7 +177,7 @@ describe('StakePoolExtMetadataService', () => {
         new ProviderError(
           ProviderFailure.NotFound,
           null,
-          `StakePoolExtMetadataService failed to fetch extended metadata from ${serverUrl}/${ExtMetadataFormat.CIP6} due to resource not found`
+          `StakePoolMetadataService failed to fetch extended metadata from ${serverUrl}/${ExtMetadataFormat.CIP6} due to resource not found`
         )
       );
     });
