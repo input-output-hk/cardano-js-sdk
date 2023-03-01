@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/governance@0.3.0...@cardano-sdk/governance@0.4.0) (2023-03-01)
+
+### ⚠ BREAKING CHANGES
+
+- **governance:** align with updates to cip-36
+
+### Code Refactoring
+
+- **governance:** align with updates to cip-36 ([5e1de74](https://github.com/input-output-hk/cardano-js-sdk/commit/5e1de74bb48ee716d7ef9c98eb7628a4928f79a8))
+
 ## [0.3.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/governance@0.2.1...@cardano-sdk/governance@0.3.0) (2023-02-17)
 
 ### ⚠ BREAKING CHANGES

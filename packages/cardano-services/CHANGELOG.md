@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.8.0...@cardano-sdk/cardano-services@0.9.0) (2023-03-01)
+
+### ⚠ BREAKING CHANGES
+
+- **cardano-services:** simplify program args interface
+- **cardano-services:** move API URL, build info, enable metrics into common
+
+### Features
+
+- **cardano-services:** add schema for StakePoolMetrics to OpenAPI spec ([959a2f0](https://github.com/input-output-hk/cardano-js-sdk/commit/959a2f02a069fe6f7de7dade658fd054cf37f41a))
+- **cardano-services:** remove CLI terminal clear ([97c5a0c](https://github.com/input-output-hk/cardano-js-sdk/commit/97c5a0ca555c993b6349250851239484c1cf834f))
+
+### Code Refactoring
+
+- **cardano-services:** move API URL, build info, enable metrics into common ([c67e550](https://github.com/input-output-hk/cardano-js-sdk/commit/c67e550981df62532f2b8c2f2f28b4a9e88e9de5))
+- **cardano-services:** simplify program args interface ([eb6ceb3](https://github.com/input-output-hk/cardano-js-sdk/commit/eb6ceb394a2e9525b65933bda1a5800eaa1cc652))
+
 ## [0.8.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.7.0...@cardano-sdk/cardano-services@0.8.0) (2023-02-17)
 
 ### ⚠ BREAKING CHANGES

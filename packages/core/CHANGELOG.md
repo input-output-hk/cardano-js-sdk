@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.8.0...@cardano-sdk/core@0.9.0) (2023-03-01)
+
+### ⚠ BREAKING CHANGES
+
+- add ChainSyncRollBackward.point
+
+### Features
+
+- **core:** add ObservableCardanoNode interface ([56ec469](https://github.com/input-output-hk/cardano-js-sdk/commit/56ec4695235715f114314c8963dfd0bc888d766a))
+
+### Bug Fixes
+
+- **core:** update @emurgo/cip14-js import style ([33013c5](https://github.com/input-output-hk/cardano-js-sdk/commit/33013c56eaf24edd9d85781fb3f41a95837059da))
+
+### Code Refactoring
+
+- add ChainSyncRollBackward.point ([4f61a6d](https://github.com/input-output-hk/cardano-js-sdk/commit/4f61a6d960adb85f762c09fb61d1a461e907cd72))
+
 ## [0.8.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.7.0...@cardano-sdk/core@0.8.0) (2023-02-17)
 
 ### ⚠ BREAKING CHANGES

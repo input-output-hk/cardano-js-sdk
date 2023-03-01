@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.8.0...@cardano-sdk/ogmios@0.9.0) (2023-03-01)
+
+### Features
+
+- **ogmios:** add OgmiosObservableCardanoNode ([b1c7785](https://github.com/input-output-hk/cardano-js-sdk/commit/b1c7785c2b7cd554dc1adf9cf90db5897e4eaebc))
+- **ogmios:** export ogmiosToCore.eraSummary ([412b674](https://github.com/input-output-hk/cardano-js-sdk/commit/412b674ffc82d38e94881fa248aa0d89d9693973))
+
 ## [0.8.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.7.0...@cardano-sdk/ogmios@0.8.0) (2023-02-17)
 
 ### ⚠ BREAKING CHANGES
