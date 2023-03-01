@@ -1,20 +1,34 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, sonarjs/no-duplicate-string */
+import * as Crypto from '@cardano-sdk/crypto';
+import * as mocks from '../mocks';
 import {
   APIErrorCode,
   ApiError,
   DataSignError,
+  DataSignErrorCode,
   TxSendError,
   TxSignError,
   WalletApi
 } from '@cardano-sdk/dapp-connector';
+import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
 import { CML, Cardano, TxCBOR, cmlToCore, coreToCml } from '@cardano-sdk/core';
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence';
-import { InitializeTxProps, InitializeTxResult, SingleAddressWallet, cip30 } from '../../src';
+import { InitializeTxProps, InitializeTxResult, SingleAddressWallet, cip30, setupWallet } from '../../src';
 import { Providers, createWallet } from './util';
+import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { firstValueFrom, of } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
-import { mockNetworkInfoProvider, mockTxSubmitProvider, utxo as mockedUtxo, utxosWithLowCoins } from '../mocks';
+import {
+  mockChainHistoryProvider,
+  mockNetworkInfoProvider,
+  mockRewardsProvider,
+  mockTxSubmitProvider,
+  utxo as mockUtxo,
+  utxo as mockedUtxo,
+  utxosWithLowCoins
+} from '../mocks';
+import { testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { waitForWalletStateSettle } from '../util';
 
 type TestProviders = Required<Pick<Providers, 'txSubmitProvider' | 'networkInfoProvider'>>;
@@ -379,6 +393,282 @@ describe('cip30', () => {
           await expect(api.submitTx(cmlTx)).rejects.toThrowError(TxSendError);
         });
       });
+    });
+
+    describe('ProofGeneration errors', () => {
+      const address = mocks.utxo[0][0].address!;
+      let txSubmitProvider: mocks.TxSubmitProviderStub;
+      let networkInfoProvider: mocks.NetworkInfoProviderStub;
+      let mockWallet: SingleAddressWallet;
+      let utxoProvider: mocks.UtxoProviderStub;
+      let tx: Cardano.Tx;
+      let mockApi: WalletApi;
+
+      beforeEach(async () => {
+        txSubmitProvider = mocks.mockTxSubmitProvider();
+        networkInfoProvider = mocks.mockNetworkInfoProvider();
+        utxoProvider = mocks.mockUtxoProvider();
+        const assetProvider = mocks.mockAssetProvider();
+        const stakePoolProvider = createStubStakePoolProvider();
+        const rewardsProvider = mockRewardsProvider();
+        const chainHistoryProvider = mockChainHistoryProvider();
+        const groupedAddress: GroupedAddress = {
+          accountIndex: 0,
+          address,
+          index: 0,
+          networkId: Cardano.NetworkId.Testnet,
+          rewardAccount: mocks.rewardAccount,
+          stakeKeyDerivationPath: mocks.stakeKeyDerivationPath,
+          type: AddressType.External
+        };
+        ({ wallet: mockWallet } = await setupWallet({
+          bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
+          createKeyAgent: async (dependencies) => {
+            const asyncKeyAgent = await testAsyncKeyAgent([groupedAddress], dependencies);
+            asyncKeyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
+            return asyncKeyAgent;
+          },
+          createWallet: async (keyAgent) =>
+            new SingleAddressWallet(
+              { name: 'Test Wallet' },
+              {
+                assetProvider,
+                chainHistoryProvider,
+                keyAgent,
+                logger,
+                networkInfoProvider,
+                rewardsProvider,
+                stakePoolProvider,
+                txSubmitProvider,
+                utxoProvider
+              }
+            ),
+          logger
+        }));
+
+        await waitForWalletStateSettle(mockWallet);
+        mockApi = cip30.createWalletApi(of(mockWallet), jest.fn().mockResolvedValue(true), { logger });
+
+        const props = {
+          certificates: [
+            {
+              __typename: Cardano.CertificateType.StakeKeyDeregistration,
+              stakeKeyHash: mocks.stakeKeyHash
+            } as Cardano.StakeAddressCertificate
+          ],
+          collaterals: new Set([mockUtxo[2][0]]),
+          outputs: new Set([
+            {
+              address: Cardano.Address(
+                // eslint-disable-next-line max-len
+                'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w'
+              ),
+              value: { coins: 11_111_111n }
+            }
+          ])
+        };
+
+        tx = await mockWallet.finalizeTx({ tx: await mockWallet.initializeTx(props) });
+      });
+
+      afterEach(() => {
+        mockWallet.shutdown();
+      });
+
+      it(
+        'dont throw DataSignError with ProofGeneration as error code if all inputs/certs can be signed and ' +
+          ' partialSign is set to false',
+        async () => {
+          const cbor = TxCBOR.serialize(tx);
+
+          // Inputs are selected by input selection algorithm
+          expect(tx.body.inputs.length).toBeGreaterThanOrEqual(1);
+          expect(tx.body.certificates!.length).toBe(1);
+          await expect(mockApi.signTx(cbor, false)).resolves.not.toThrow();
+        }
+      );
+
+      it(
+        'dont throw DataSignError with ProofGeneration as error code if all inputs/certs can be signed and ' +
+          ' partialSign is set to true',
+        async () => {
+          const cbor = TxCBOR.serialize(tx);
+
+          tx.witness = {
+            signatures: new Map([
+              [
+                Crypto.Ed25519PublicKeyHex('0b1c96fad4179d7910bd9485ac28c4c11368c83d18d01b29d4cf84d8ff6a06c4'),
+                Crypto.Ed25519SignatureHex(
+                  // eslint-disable-next-line max-len
+                  '0b1c96fad4179d7910bd9485ac28c4c11368c83d18d01b29d4cf84d8ff6a06c40b1c96fad4179d7910bd9485ac28c4c11368c83d18d01b29d4cf84d8ff6a06c4'
+                )
+              ]
+            ])
+          };
+
+          mockWallet.finalizeTx = () => Promise.resolve(tx as unknown as Cardano.Tx);
+
+          // Inputs are selected by input selection algorithm
+          expect(tx.body.inputs.length).toBeGreaterThanOrEqual(1);
+          expect(tx.body.certificates!.length).toBe(1);
+          await expect(mockApi.signTx(cbor, true)).resolves.not.toThrow();
+        }
+      );
+
+      it(
+        'dont throw DataSignError with ProofGeneration as error code if at least one input can be signed and ' +
+          ' partialSign is set to true',
+        async () => {
+          const cbor = TxCBOR.serialize(tx);
+
+          tx.witness = {
+            signatures: new Map([
+              [
+                Crypto.Ed25519PublicKeyHex('0b1c96fad4179d7910bd9485ac28c4c11368c83d18d01b29d4cf84d8ff6a06c4'),
+                Crypto.Ed25519SignatureHex(
+                  // eslint-disable-next-line max-len
+                  '0b1c96fad4179d7910bd9485ac28c4c11368c83d18d01b29d4cf84d8ff6a06c40b1c96fad4179d7910bd9485ac28c4c11368c83d18d01b29d4cf84d8ff6a06c4'
+                )
+              ]
+            ])
+          };
+
+          tx.body.inputs = [
+            {
+              index: 0,
+              txId: Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000')
+            },
+            ...tx.body.inputs
+          ];
+
+          mockWallet.finalizeTx = () => Promise.resolve(tx as unknown as Cardano.Tx);
+
+          // Inputs are selected by input selection algorithm
+          expect(tx.body.inputs.length).toBeGreaterThanOrEqual(1);
+          expect(tx.body.certificates!.length).toBe(1);
+          await expect(mockApi.signTx(cbor, true)).resolves.not.toThrow();
+        }
+      );
+
+      it(
+        'dont throw DataSignError with ProofGeneration as error code if at least one cert can be signed and ' +
+          ' partialSign is set to true',
+        async () => {
+          const foreignRewardAccountHash = Cardano.RewardAccount.toHash(
+            Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27')
+          );
+
+          const cbor = TxCBOR.serialize(tx);
+
+          tx.witness = {
+            signatures: new Map([
+              [
+                Crypto.Ed25519PublicKeyHex('0b1c96fad4179d7910bd9485ac28c4c11368c83d18d01b29d4cf84d8ff6a06c4'),
+                Crypto.Ed25519SignatureHex(
+                  // eslint-disable-next-line max-len
+                  '0b1c96fad4179d7910bd9485ac28c4c11368c83d18d01b29d4cf84d8ff6a06c40b1c96fad4179d7910bd9485ac28c4c11368c83d18d01b29d4cf84d8ff6a06c4'
+                )
+              ]
+            ])
+          };
+
+          tx.body.certificates = [
+            {
+              __typename: Cardano.CertificateType.StakeDelegation,
+              poolId: Cardano.PoolId.fromKeyHash(foreignRewardAccountHash),
+              stakeKeyHash: foreignRewardAccountHash
+            } as Cardano.StakeDelegationCertificate,
+            ...tx.body.certificates!
+          ];
+
+          mockWallet.finalizeTx = () => Promise.resolve(tx as unknown as Cardano.Tx);
+
+          expect(tx.body.inputs.length).toBeGreaterThanOrEqual(1);
+          expect(tx.body.certificates!.length).toBe(2);
+          await expect(mockApi.signTx(cbor, true)).resolves.not.toThrow();
+        }
+      );
+
+      it(
+        'throw DataSignError with ProofGeneration as error code if the wallet cant sign a single input/cert and ' +
+          ' partialSign is set to true',
+        async () => {
+          const cbor = TxCBOR.serialize(tx);
+
+          tx.witness = { signatures: new Map() };
+          mockWallet.finalizeTx = () => Promise.resolve(tx as unknown as Cardano.Tx);
+
+          // Inputs are selected by input selection algorithm
+          expect(tx.body.inputs.length).toBeGreaterThanOrEqual(1);
+          expect(tx.body.certificates!.length).toBe(1);
+
+          await expect(mockApi.signTx(cbor, true)).rejects.toMatchObject(
+            new DataSignError(
+              DataSignErrorCode.ProofGeneration,
+              'The wallet does not have the secret key associated with any of the inputs and certificates.'
+            )
+          );
+        }
+      );
+
+      it(
+        'throw DataSignError with ProofGeneration as error code if at least one input can not be signed and ' +
+          ' partialSign is set to false',
+        async () => {
+          tx.body.inputs = [
+            {
+              index: 0,
+              txId: Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000')
+            },
+            ...tx.body.inputs
+          ];
+
+          const cbor = TxCBOR.serialize(tx);
+
+          // Inputs are selected by input selection algorithm
+          expect(tx.body.inputs.length).toBeGreaterThanOrEqual(1);
+          expect(tx.body.certificates!.length).toBe(1);
+
+          await expect(mockApi.signTx(cbor, false)).rejects.toMatchObject(
+            new DataSignError(
+              DataSignErrorCode.ProofGeneration,
+              'The wallet does not have the secret key associated with some of the inputs or certificates.'
+            )
+          );
+        }
+      );
+
+      it(
+        'throw DataSignError with ProofGeneration as error code if at least one cert can not be signed and ' +
+          ' partialSign is set to false',
+        async () => {
+          const foreignRewardAccountHash = Cardano.RewardAccount.toHash(
+            Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27')
+          );
+
+          tx.body.certificates = [
+            {
+              __typename: Cardano.CertificateType.StakeDelegation,
+              poolId: Cardano.PoolId.fromKeyHash(foreignRewardAccountHash),
+              stakeKeyHash: foreignRewardAccountHash
+            } as Cardano.StakeDelegationCertificate,
+            ...tx.body.certificates!
+          ];
+
+          const cbor = TxCBOR.serialize(tx);
+
+          // Inputs are selected by input selection algorithm
+          expect(tx.body.inputs.length).toBeGreaterThanOrEqual(1);
+          expect(tx.body.certificates!.length).toBe(2);
+
+          await expect(mockApi.signTx(cbor, false)).rejects.toMatchObject(
+            new DataSignError(
+              DataSignErrorCode.ProofGeneration,
+              'The wallet does not have the secret key associated with some of the inputs or certificates.'
+            )
+          );
+        }
+      );
     });
   });
 });

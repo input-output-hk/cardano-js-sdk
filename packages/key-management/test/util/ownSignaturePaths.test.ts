@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 import { AccountKeyDerivationPath, AddressType, GroupedAddress, KeyRole, util } from '../../src';
 import { Cardano } from '@cardano-sdk/core';
 
@@ -62,8 +63,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
   });
 
   it(
-    'doesnt returns stake key derivation path when a StakeKeyRegistration' +
-      // eslint-disable-next-line sonarjs/no-duplicate-string
+    'does not return stake key derivation path when a StakeKeyRegistration' +
       ' certificate with the wallet stake key hash is present',
     async () => {
       const txBody = {
