@@ -2333,6 +2333,7 @@ __metadata:
     "@cardano-sdk/ogmios": ^0.8.0
     "@cardano-sdk/util": ^0.8.0
     "@cardano-sdk/util-dev": ^0.7.0
+    "@dcspark/cardano-multiplatform-lib-nodejs": ^3.1.1
     "@types/amqplib": ^0.8.2
     "@types/bunyan": ^1.8.8
     "@types/clear": ^0.1.2
@@ -2346,6 +2347,7 @@ __metadata:
     amqplib: ^0.10.0
     axios: ^0.27.2
     bignumber.js: ^9.1.0
+    blake2b: ^2.1.4
     body-parser: ^1.19.2
     bunyan: ^1.8.15
     cbor: ^8.1.0

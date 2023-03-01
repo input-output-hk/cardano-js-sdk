@@ -42,6 +42,16 @@ describe('StakePoolMetadataService', () => {
       await closeMock();
     });
 
+    // it('fetch stake pool JSON metadata', async () => {
+    //   // const extMetadata: Cardano.StakePoolMetadata = {
+    //   //   ...mainExtMetadataMock(),
+    //   //   extended: `${serverUrl}/${ExtMetadataFormat.AdaPools}`
+    //   // };
+    //   const result = await extendedMetadataService.getStakePoolMetadata('4781fffc4cc4a0d6074ae905869e8596f13246b79888af5a8d9580d3a372729a' as Hash32ByteBase16, 'https://hermes-stakepool.com/meta/hrms.json');
+
+    //   expect(result).not.toBeNull();
+    // });
+
     it('returns ada pools format when extended key is present in the metadata', async () => {
       const extMetadata: Cardano.StakePoolMetadata = {
         ...mainExtMetadataMock(),
