@@ -53,8 +53,6 @@ describe('Service dependency abstractions', () => {
 
   beforeAll(async () => {
     db = await getPool(dnsResolver, logger, {
-      dbCacheTtl: 10_000,
-      epochPollInterval: 1000,
       postgresDb: process.env.POSTGRES_DB!,
       postgresPassword: process.env.POSTGRES_PASSWORD!,
       postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,

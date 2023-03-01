@@ -1,9 +1,8 @@
 import { CustomError } from 'ts-custom-error';
-import { ServiceNames } from '../ServiceNames';
 
-export class UnknownServiceName extends CustomError {
-  public constructor(input: string) {
+export class UnknownServiceName<ServiceNames> extends CustomError {
+  public constructor(input: string, serviceNames: ServiceNames) {
     super();
-    this.message = `${input} is an unknown service. Try ${Object.values(ServiceNames)}`;
+    this.message = `${input} is an unknown service. Try ${serviceNames}`;
   }
 }

@@ -45,8 +45,6 @@ describe('Service dependency abstractions', () => {
 
     beforeAll(async () => {
       db = await getPool(dnsResolver, logger, {
-        dbCacheTtl: 10_000,
-        epochPollInterval: 1000,
         postgresDb: process.env.POSTGRES_DB!,
         postgresPassword: process.env.POSTGRES_PASSWORD!,
         postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,
@@ -132,8 +130,6 @@ describe('Service dependency abstractions', () => {
 
     beforeAll(async () => {
       db = await getPool(dnsResolver, logger, {
-        dbCacheTtl: 10_000,
-        epochPollInterval: 1000,
         postgresConnectionString: process.env.POSTGRES_CONNECTION_STRING
       });
     });
@@ -221,8 +217,6 @@ describe('Service dependency abstractions', () => {
       });
 
       provider = await getPool(dnsResolverMock, logger, {
-        dbCacheTtl: 10_000,
-        epochPollInterval: 1000,
         postgresDb: process.env.POSTGRES_DB!,
         postgresPassword: process.env.POSTGRES_PASSWORD!,
         postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,
@@ -236,8 +230,6 @@ describe('Service dependency abstractions', () => {
 
     it('should execute a provider operation without to intercept it', async () => {
       provider = await getPool(dnsResolver, logger, {
-        dbCacheTtl: 10_000,
-        epochPollInterval: 1000,
         postgresDb: process.env.POSTGRES_DB!,
         postgresPassword: process.env.POSTGRES_PASSWORD!,
         postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,

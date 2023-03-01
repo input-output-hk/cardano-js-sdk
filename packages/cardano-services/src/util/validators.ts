@@ -1,6 +1,6 @@
 import { BuildInfo } from '../Http';
 import { CACHE_TTL_LOWER_LIMIT, CACHE_TTL_UPPER_LIMIT } from '../InMemoryCache';
-import { MissingProgramOption, ProgramOptionDescriptions, ServiceNames } from '../Program';
+import { HttpServerOptionDescriptions, MissingProgramOption, ServiceNames } from '../Program';
 import { validate } from 'jsonschema';
 import fs from 'fs';
 
@@ -45,5 +45,5 @@ export const cacheTtlValidator = (ttlInSecs: string) => {
     return cacheTtlInSecs;
   }
 
-  throw new MissingProgramOption(ServiceNames.NetworkInfo, ProgramOptionDescriptions.DbCacheTtl);
+  throw new MissingProgramOption(ServiceNames.NetworkInfo, HttpServerOptionDescriptions.DbCacheTtl);
 };

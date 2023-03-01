@@ -1,11 +1,11 @@
 /* eslint-disable max-len */
 /* eslint-disable promise/no-nesting */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { CommonOptionDescriptions, CommonProgramOptions } from '../Options';
 import { DnsResolver } from '../utils';
 import { Logger } from 'ts-log';
 import { MissingCardanoNodeOption } from '../errors';
 import { OgmiosCardanoNode, OgmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmios';
+import { OgmiosOptionDescriptions, OgmiosProgramOptions } from '../options';
 import { RunnableModule, isConnectionError } from '@cardano-sdk/util';
 import { SubmitTxArgs } from '@cardano-sdk/core';
 
@@ -99,15 +99,12 @@ export const ogmiosTxSubmitProviderWithDiscovery = async (
 export const getOgmiosTxSubmitProvider = async (
   dnsResolver: DnsResolver,
   logger: Logger,
-  options?: CommonProgramOptions
+  options?: OgmiosProgramOptions
 ): Promise<OgmiosTxSubmitProvider> => {
   if (options?.ogmiosSrvServiceName)
     return ogmiosTxSubmitProviderWithDiscovery(dnsResolver, logger, options.ogmiosSrvServiceName);
   if (options?.ogmiosUrl) return new OgmiosTxSubmitProvider(urlToConnectionConfig(options?.ogmiosUrl), { logger });
-  throw new MissingCardanoNodeOption([
-    CommonOptionDescriptions.OgmiosUrl,
-    CommonOptionDescriptions.OgmiosSrvServiceName
-  ]);
+  throw new MissingCardanoNodeOption([OgmiosOptionDescriptions.Url, OgmiosOptionDescriptions.SrvServiceName]);
 };
 
 /**
@@ -170,13 +167,10 @@ export const ogmiosCardanoNodeWithDiscovery = async (
 export const getOgmiosCardanoNode = async (
   dnsResolver: DnsResolver,
   logger: Logger,
-  options?: CommonProgramOptions
+  options?: OgmiosProgramOptions
 ): Promise<OgmiosCardanoNode> => {
   if (options?.ogmiosSrvServiceName)
     return ogmiosCardanoNodeWithDiscovery(dnsResolver, logger, options.ogmiosSrvServiceName);
   if (options?.ogmiosUrl) return new OgmiosCardanoNode(urlToConnectionConfig(options.ogmiosUrl), logger);
-  throw new MissingCardanoNodeOption([
-    CommonOptionDescriptions.OgmiosUrl,
-    CommonOptionDescriptions.OgmiosSrvServiceName
-  ]);
+  throw new MissingCardanoNodeOption([OgmiosOptionDescriptions.Url, OgmiosOptionDescriptions.SrvServiceName]);
 };

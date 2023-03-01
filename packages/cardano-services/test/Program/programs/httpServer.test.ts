@@ -1,18 +1,23 @@
 /* eslint-disable max-len */
 /* eslint-disable sonarjs/no-duplicate-string */
-import { DB_CACHE_TTL_DEFAULT } from '../../src/InMemoryCache';
-import { EPOCH_POLL_INTERVAL_DEFAULT, listenPromise, serverClosePromise } from '../../src/util';
+import { DB_CACHE_TTL_DEFAULT } from '../../../src/InMemoryCache';
+import { EPOCH_POLL_INTERVAL_DEFAULT, listenPromise, serverClosePromise } from '../../../src/util';
 import {
   HttpServer,
+  HttpServerOptionDescriptions,
   MissingCardanoNodeOption,
   MissingProgramOption,
-  ProgramOptionDescriptions,
   SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT,
   SERVICE_DISCOVERY_TIMEOUT_DEFAULT,
   ServiceNames,
   loadHttpServer
-} from '../../src';
+} from '../../../src';
 import { Ogmios } from '@cardano-sdk/ogmios';
+import {
+  OgmiosOptionDescriptions,
+  PostgresOptionDescriptions,
+  RabbitMqOptionDescriptions
+} from '../../../src/Program/options';
 import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { SrvRecord } from 'dns';
 import { URL } from 'url';
@@ -21,7 +26,7 @@ import {
   createHealthyMockOgmiosServer,
   createUnhealthyMockOgmiosServer,
   ogmiosServerReady
-} from '../util';
+} from '../../util';
 import { getRandomPort } from 'get-port-please';
 import http from 'http';
 
@@ -31,7 +36,7 @@ jest.mock('dns', () => ({
   }
 }));
 
-describe('loadHttpServer', () => {
+describe('HTTP Server', () => {
   let apiUrl: URL;
   let cardanoNodeConfigPath: string;
   let postgresConnectionString: string;
@@ -82,13 +87,11 @@ describe('loadHttpServer', () => {
     it('loads the nominated HTTP services and server if required program arguments are set', async () => {
       httpServer = await loadHttpServer({
         apiUrl,
-        options: {
-          cardanoNodeConfigPath,
-          dbCacheTtl,
-          epochPollInterval,
-          ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
-          postgresConnectionString
-        },
+        cardanoNodeConfigPath,
+        dbCacheTtl,
+        epochPollInterval,
+        ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+        postgresConnectionString,
         serviceNames: [
           ServiceNames.StakePool,
           ServiceNames.TxSubmit,
@@ -105,18 +108,16 @@ describe('loadHttpServer', () => {
       it('loads the nominated HTTP service and server with service discovery', async () => {
         httpServer = await loadHttpServer({
           apiUrl,
-          options: {
-            cardanoNodeConfigPath,
-            dbCacheTtl,
-            epochPollInterval,
-            ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
-            postgresDb,
-            postgresPassword,
-            postgresSrvServiceName,
-            postgresUser,
-            serviceDiscoveryBackoffFactor,
-            serviceDiscoveryTimeout
-          },
+          cardanoNodeConfigPath,
+          dbCacheTtl,
+          epochPollInterval,
+          ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+          postgresDb,
+          postgresPassword,
+          postgresSrvServiceName,
+          postgresUser,
+          serviceDiscoveryBackoffFactor,
+          serviceDiscoveryTimeout,
           serviceNames: [ServiceNames.StakePool]
         });
 
@@ -130,23 +131,21 @@ describe('loadHttpServer', () => {
           async () =>
             await loadHttpServer({
               apiUrl,
-              options: {
-                cardanoNodeConfigPath,
-                dbCacheTtl,
-                epochPollInterval,
-                ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
-                postgresDb: missingPostgresDb,
-                postgresSrvServiceName,
-                postgresUser,
-                serviceDiscoveryBackoffFactor,
-                serviceDiscoveryTimeout
-              },
+              cardanoNodeConfigPath,
+              dbCacheTtl,
+              epochPollInterval,
+              ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+              postgresDb: missingPostgresDb,
+              postgresSrvServiceName,
+              postgresUser,
+              serviceDiscoveryBackoffFactor,
+              serviceDiscoveryTimeout,
               serviceNames: [ServiceNames.StakePool]
             })
         ).rejects.toThrow(
           new MissingProgramOption(ServiceNames.StakePool, [
-            ProgramOptionDescriptions.PostgresConnectionString,
-            ProgramOptionDescriptions.PostgresServiceDiscoveryArgs
+            PostgresOptionDescriptions.ConnectionString,
+            PostgresOptionDescriptions.ServiceDiscoveryArgs
           ])
         );
       });
@@ -156,18 +155,16 @@ describe('loadHttpServer', () => {
           async () =>
             await loadHttpServer({
               apiUrl,
-              options: {
-                cardanoNodeConfigPath,
-                dbCacheTtl,
-                epochPollInterval,
-                ogmiosUrl: new URL(ogmiosConnection.address.webSocket)
-              },
+              cardanoNodeConfigPath,
+              dbCacheTtl,
+              epochPollInterval,
+              ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
               serviceNames: [ServiceNames.StakePool]
             })
         ).rejects.toThrow(
           new MissingProgramOption(ServiceNames.StakePool, [
-            ProgramOptionDescriptions.PostgresConnectionString,
-            ProgramOptionDescriptions.PostgresServiceDiscoveryArgs
+            PostgresOptionDescriptions.ConnectionString,
+            PostgresOptionDescriptions.ServiceDiscoveryArgs
           ])
         );
       });
@@ -177,14 +174,12 @@ describe('loadHttpServer', () => {
       it('loads the nominated HTTP service and server with service discovery', async () => {
         httpServer = await loadHttpServer({
           apiUrl,
-          options: {
-            cardanoNodeConfigPath,
-            dbCacheTtl,
-            epochPollInterval,
-            ogmiosSrvServiceName,
-            serviceDiscoveryBackoffFactor,
-            serviceDiscoveryTimeout
-          },
+          cardanoNodeConfigPath,
+          dbCacheTtl,
+          epochPollInterval,
+          ogmiosSrvServiceName,
+          serviceDiscoveryBackoffFactor,
+          serviceDiscoveryTimeout,
           serviceNames: [ServiceNames.TxSubmit]
         });
 
@@ -194,15 +189,13 @@ describe('loadHttpServer', () => {
       it('loads the nominated HTTP server and service discovery takes preference over url if both are provided', async () => {
         httpServer = await loadHttpServer({
           apiUrl,
-          options: {
-            cardanoNodeConfigPath,
-            dbCacheTtl,
-            epochPollInterval,
-            ogmiosSrvServiceName,
-            ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
-            serviceDiscoveryBackoffFactor,
-            serviceDiscoveryTimeout
-          },
+          cardanoNodeConfigPath,
+          dbCacheTtl,
+          epochPollInterval,
+          ogmiosSrvServiceName,
+          ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+          serviceDiscoveryBackoffFactor,
+          serviceDiscoveryTimeout,
           serviceNames: [ServiceNames.TxSubmit]
         });
 
@@ -214,20 +207,15 @@ describe('loadHttpServer', () => {
           async () =>
             await loadHttpServer({
               apiUrl,
-              options: {
-                cardanoNodeConfigPath,
-                dbCacheTtl,
-                epochPollInterval,
-                serviceDiscoveryBackoffFactor,
-                serviceDiscoveryTimeout
-              },
+              cardanoNodeConfigPath,
+              dbCacheTtl,
+              epochPollInterval,
+              serviceDiscoveryBackoffFactor,
+              serviceDiscoveryTimeout,
               serviceNames: [ServiceNames.TxSubmit]
             })
         ).rejects.toThrow(
-          new MissingCardanoNodeOption([
-            ProgramOptionDescriptions.OgmiosUrl,
-            ProgramOptionDescriptions.OgmiosSrvServiceName
-          ])
+          new MissingCardanoNodeOption([OgmiosOptionDescriptions.Url, OgmiosOptionDescriptions.SrvServiceName])
         );
       });
     });
@@ -236,16 +224,14 @@ describe('loadHttpServer', () => {
       it('loads the nominated HTTP service and server with service discovery', async () => {
         httpServer = await loadHttpServer({
           apiUrl,
-          options: {
-            cardanoNodeConfigPath,
-            dbCacheTtl,
-            epochPollInterval,
-            rabbitmqSrvServiceName,
-            serviceDiscoveryBackoffFactor,
-            serviceDiscoveryTimeout,
-            useQueue: true
-          },
-          serviceNames: [ServiceNames.TxSubmit]
+          cardanoNodeConfigPath,
+          dbCacheTtl,
+          epochPollInterval,
+          rabbitmqSrvServiceName,
+          serviceDiscoveryBackoffFactor,
+          serviceDiscoveryTimeout,
+          serviceNames: [ServiceNames.TxSubmit],
+          useQueue: true
         });
 
         expect(httpServer).toBeInstanceOf(HttpServer);
@@ -254,17 +240,15 @@ describe('loadHttpServer', () => {
       it('loads the nominated HTTP server and service discovery takes preference over url if both are provided', async () => {
         httpServer = await loadHttpServer({
           apiUrl,
-          options: {
-            cardanoNodeConfigPath,
-            dbCacheTtl,
-            epochPollInterval,
-            rabbitmqSrvServiceName,
-            rabbitmqUrl,
-            serviceDiscoveryBackoffFactor,
-            serviceDiscoveryTimeout,
-            useQueue: true
-          },
-          serviceNames: [ServiceNames.TxSubmit]
+          cardanoNodeConfigPath,
+          dbCacheTtl,
+          epochPollInterval,
+          rabbitmqSrvServiceName,
+          rabbitmqUrl,
+          serviceDiscoveryBackoffFactor,
+          serviceDiscoveryTimeout,
+          serviceNames: [ServiceNames.TxSubmit],
+          useQueue: true
         });
 
         expect(httpServer).toBeInstanceOf(HttpServer);
@@ -275,20 +259,18 @@ describe('loadHttpServer', () => {
           async () =>
             await loadHttpServer({
               apiUrl,
-              options: {
-                cardanoNodeConfigPath,
-                dbCacheTtl,
-                epochPollInterval,
-                serviceDiscoveryBackoffFactor,
-                serviceDiscoveryTimeout,
-                useQueue: true
-              },
-              serviceNames: [ServiceNames.TxSubmit]
+              cardanoNodeConfigPath,
+              dbCacheTtl,
+              epochPollInterval,
+              serviceDiscoveryBackoffFactor,
+              serviceDiscoveryTimeout,
+              serviceNames: [ServiceNames.TxSubmit],
+              useQueue: true
             })
         ).rejects.toThrow(
           new MissingProgramOption(ServiceNames.TxSubmit, [
-            ProgramOptionDescriptions.RabbitMQUrl,
-            ProgramOptionDescriptions.RabbitMQSrvServiceName
+            RabbitMqOptionDescriptions.Url,
+            RabbitMqOptionDescriptions.SrvServiceName
           ])
         );
       });
@@ -300,15 +282,13 @@ describe('loadHttpServer', () => {
         expect(() =>
           loadHttpServer({
             apiUrl,
-            options: {
-              dbCacheTtl: 0,
-              epochPollInterval: 0,
-              ogmiosUrl: new URL('http://localhost:1337'),
-              postgresConnectionString: 'postgres'
-            },
+            dbCacheTtl: 0,
+            epochPollInterval: 0,
+            ogmiosUrl: new URL('http://localhost:1337'),
+            postgresConnectionString: 'postgres',
             serviceNames: [serviceName]
           })
-        ).rejects.toThrow(new MissingProgramOption(serviceName, ProgramOptionDescriptions.CardanoNodeConfigPath));
+        ).rejects.toThrow(new MissingProgramOption(serviceName, HttpServerOptionDescriptions.CardanoNodeConfigPath));
 
       it('with network-info provider', () => test(ServiceNames.NetworkInfo));
       it('with stake-pool provider', () => test(ServiceNames.StakePool));
@@ -330,13 +310,11 @@ describe('loadHttpServer', () => {
       expect(() =>
         loadHttpServer({
           apiUrl,
-          options: {
-            cardanoNodeConfigPath,
-            dbCacheTtl,
-            epochPollInterval,
-            ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
-            postgresConnectionString
-          },
+          cardanoNodeConfigPath,
+          dbCacheTtl,
+          epochPollInterval,
+          ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+          postgresConnectionString,
           serviceNames: [ServiceNames.StakePool, ServiceNames.TxSubmit]
         })
       ).not.toThrow(new ProviderError(ProviderFailure.Unhealthy));

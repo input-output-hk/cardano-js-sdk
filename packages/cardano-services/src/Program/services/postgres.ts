@@ -1,10 +1,13 @@
 /* eslint-disable max-len */
 /* eslint-disable promise/no-nesting */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable unicorn/no-nested-ternary */
 import { ClientConfig, Pool, QueryConfig } from 'pg';
 import { DnsResolver } from '../utils';
-import { HttpServerOptions } from '../loadHttpServer';
+import { HttpServerArgs } from '../programs';
 import { Logger } from 'ts-log';
+import { PosgresProgramOptions } from '../options';
+import { URL } from 'url';
 import { isConnectionError } from '@cardano-sdk/util';
 import fs from 'fs';
 
@@ -55,7 +58,7 @@ export const loadSecret = (path: string) => fs.readFileSync(path, 'utf8').toStri
 export const getPool = async (
   dnsResolver: DnsResolver,
   logger: Logger,
-  options?: HttpServerOptions
+  options?: PosgresProgramOptions
 ): Promise<Pool | undefined> => {
   const ssl = options?.postgresSslCaFile ? { ca: loadSecret(options.postgresSslCaFile) } : undefined;
   if (options?.postgresConnectionString) return new Pool({ connectionString: options.postgresConnectionString, ssl });
@@ -70,4 +73,23 @@ export const getPool = async (
   }
   // If db connection string is not passed nor postgres srv service name
   return undefined;
+};
+
+const getSecret = (secretFilePath?: string, secret?: string) =>
+  secretFilePath ? loadSecret(secretFilePath) : secret ? secret : undefined;
+
+export const connectionStringFromArgs = (args: HttpServerArgs) => {
+  const dbName = getSecret(args.postgresDbFile, args.postgresDb);
+  const dbUser = getSecret(args.postgresUserFile, args.postgresUser);
+  const dbPassword = getSecret(args.postgresPasswordFile, args.postgresPassword);
+
+  // Setting the connection string takes preference over secrets.
+  // It can also remain undefined since there is no a default value. Usually used locally with static config.
+  let postgresConnectionString;
+  if (args.postgresConnectionString) {
+    postgresConnectionString = new URL(args.postgresConnectionString).toString();
+  } else if (dbName && dbPassword && dbUser && args.postgresHost && args.postgresPort) {
+    postgresConnectionString = `postgresql://${dbUser}:${dbPassword}@${args.postgresHost}:${args.postgresPort}/${dbName}`;
+  }
+  return postgresConnectionString;
 };
