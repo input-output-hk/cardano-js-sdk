@@ -4,9 +4,9 @@
 /* eslint-disable unicorn/no-nested-ternary */
 import { ClientConfig, Pool, QueryConfig } from 'pg';
 import { DnsResolver } from '../utils';
-import { HttpServerArgs } from '../programs';
 import { Logger } from 'ts-log';
 import { PosgresProgramOptions } from '../options';
+import { ProviderServerArgs } from '../programs';
 import { URL } from 'url';
 import { isConnectionError } from '@cardano-sdk/util';
 import fs from 'fs';
@@ -78,7 +78,7 @@ export const getPool = async (
 const getSecret = (secretFilePath?: string, secret?: string) =>
   secretFilePath ? loadSecret(secretFilePath) : secret ? secret : undefined;
 
-export const connectionStringFromArgs = (args: HttpServerArgs) => {
+export const connectionStringFromArgs = (args: ProviderServerArgs) => {
   const dbName = getSecret(args.postgresDbFile, args.postgresDb);
   const dbUser = getSecret(args.postgresUserFile, args.postgresUser);
   const dbPassword = getSecret(args.postgresPasswordFile, args.postgresPassword);

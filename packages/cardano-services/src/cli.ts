@@ -10,13 +10,13 @@ import { DEFAULT_TOKEN_METADATA_CACHE_TTL, DEFAULT_TOKEN_METADATA_SERVER_URL } f
 import { EPOCH_POLL_INTERVAL_DEFAULT } from './util';
 import {
   HTTP_SERVER_API_URL_DEFAULT,
-  HttpServerArgs,
-  HttpServerOptionDescriptions,
   PAGINATION_PAGE_SIZE_LIMIT_DEFAULT,
   PARALLEL_MODE_DEFAULT,
   PARALLEL_TXS_DEFAULT,
   POLLING_CYCLE_DEFAULT,
   Programs,
+  ProviderServerArgs,
+  ProviderServerOptionDescriptions,
   ServiceNames,
   TX_WORKER_API_URL_DEFAULT,
   TxWorkerArgs,
@@ -24,7 +24,7 @@ import {
   USE_QUEUE_DEFAULT,
   connectionStringFromArgs,
   loadAndStartTxWorker,
-  loadHttpServer,
+  loadProviderServer,
   stringOptionToBoolean
 } from './Program';
 import { URL } from 'url';
@@ -53,8 +53,8 @@ withCommonOptions(
     withPostgresOptions(
       withRabbitMqOptions(
         program
-          .command('start-server')
-          .description('Start the HTTP server')
+          .command('start-provider-server')
+          .description('Start the Provider Server')
           .argument('[serviceNames...]', `List of services to attach: ${Object.values(ServiceNames).toString()}`)
       )
     )
@@ -74,17 +74,17 @@ withCommonOptions(
   .addOption(
     new Option(
       '--cardano-node-config-path <cardanoNodeConfigPath>',
-      HttpServerOptionDescriptions.CardanoNodeConfigPath
+      ProviderServerOptionDescriptions.CardanoNodeConfigPath
     ).env('CARDANO_NODE_CONFIG_PATH')
   )
   .addOption(
-    new Option('--db-cache-ttl <dbCacheTtl>', HttpServerOptionDescriptions.DbCacheTtl)
+    new Option('--db-cache-ttl <dbCacheTtl>', ProviderServerOptionDescriptions.DbCacheTtl)
       .env('DB_CACHE_TTL')
       .default(DB_CACHE_TTL_DEFAULT)
       .argParser(cacheTtlValidator)
   )
   .addOption(
-    new Option('--epoch-poll-interval <epochPollInterval>', HttpServerOptionDescriptions.EpochPollInterval)
+    new Option('--epoch-poll-interval <epochPollInterval>', ProviderServerOptionDescriptions.EpochPollInterval)
       .env('EPOCH_POLL_INTERVAL')
       .default(EPOCH_POLL_INTERVAL_DEFAULT)
       .argParser((interval) => Number.parseInt(interval, 10))
@@ -92,38 +92,41 @@ withCommonOptions(
   .addOption(
     new Option(
       '--token-metadata-server-url <tokenMetadataServerUrl>',
-      HttpServerOptionDescriptions.TokenMetadataServerUrl
+      ProviderServerOptionDescriptions.TokenMetadataServerUrl
     )
       .env('TOKEN_METADATA_SERVER_URL')
       .default(DEFAULT_TOKEN_METADATA_SERVER_URL)
       .argParser((url) => new URL(url).toString())
   )
   .addOption(
-    new Option('--token-metadata-cache-ttl <tokenMetadataCacheTTL>', HttpServerOptionDescriptions.TokenMetadataCacheTtl)
+    new Option(
+      '--token-metadata-cache-ttl <tokenMetadataCacheTTL>',
+      ProviderServerOptionDescriptions.TokenMetadataCacheTtl
+    )
       .env('TOKEN_METADATA_CACHE_TTL')
       .default(DEFAULT_TOKEN_METADATA_CACHE_TTL)
       .argParser(cacheTtlValidator)
   )
   .addOption(
-    new Option('--use-queue <true/false>', HttpServerOptionDescriptions.UseQueue)
+    new Option('--use-queue <true/false>', ProviderServerOptionDescriptions.UseQueue)
       .env('USE_QUEUE')
       .default(USE_QUEUE_DEFAULT)
       .argParser((useQueue) =>
-        stringOptionToBoolean(useQueue, Programs.HttpServer, HttpServerOptionDescriptions.UseQueue)
+        stringOptionToBoolean(useQueue, Programs.ProviderServer, ProviderServerOptionDescriptions.UseQueue)
       )
   )
   .addOption(
     new Option(
       '--pagination-page-size-limit <paginationPageSizeLimit>',
-      HttpServerOptionDescriptions.PaginationPageSizeLimit
+      ProviderServerOptionDescriptions.PaginationPageSizeLimit
     )
       .env('PAGINATION_PAGE_SIZE_LIMIT')
       .default(PAGINATION_PAGE_SIZE_LIMIT_DEFAULT)
       .argParser((interval) => Number.parseInt(interval, 10))
   )
-  .action(async (serviceNames: ServiceNames[], args: { apiUrl: URL } & HttpServerArgs) => {
+  .action(async (serviceNames: ServiceNames[], args: { apiUrl: URL } & ProviderServerArgs) => {
     try {
-      const server = await loadHttpServer({
+      const server = await loadProviderServer({
         ...args,
         postgresConnectionString: connectionStringFromArgs(args),
         // Setting the service names via env variable takes preference over command line argument

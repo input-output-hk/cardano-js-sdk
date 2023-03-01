@@ -27,7 +27,7 @@ jobs:
 
       - name: Docker Build
         run: |
-          docker build --target http-server -t cardano-services-http-server:${{ github.sha }} .
+          docker build --target provider-server -t cardano-services-provider-server:${{ github.sha }} .
           docker build --target worker -t cardano-services-worker:${{ github.sha }} .
 
       - name: 📘 Publish

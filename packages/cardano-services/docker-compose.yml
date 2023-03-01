@@ -97,12 +97,12 @@ services:
     volumes:
       - rabbitmq-db:/var/lib/rabbitmq/mnesia
 
-  http-server:
+  provider-server:
     build:
       args:
         - NETWORK=${NETWORK:-mainnet}
       context: ../../
-      target: http-server
+      target: provider-server
     depends_on:
       cardano-node-ogmios:
         condition: service_healthy

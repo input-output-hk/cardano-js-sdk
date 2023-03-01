@@ -1,4 +1,4 @@
-export * from './httpServer';
+export * from './providerServer';
 export * from './txWorker';
 
 /**
@@ -6,6 +6,6 @@ export * from './txWorker';
  */
 
 export enum Programs {
-  HttpServer = 'HTTP server',
+  ProviderServer = 'Provider server',
   RabbitmqWorker = 'RabbitMQ worker'
 }

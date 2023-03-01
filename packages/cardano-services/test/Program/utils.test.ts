@@ -26,7 +26,7 @@ describe('Program/utils', () => {
     // eslint-disable-next-line unicorn/consistent-function-scoping
     const runTest = (inputs: string[], expectation: boolean) => {
       for (const input of inputs) {
-        expect(stringOptionToBoolean(input, Programs.HttpServer, 'some-option')).toBe(expectation);
+        expect(stringOptionToBoolean(input, Programs.ProviderServer, 'some-option')).toBe(expectation);
       }
     };
     it('converts falsey strings to false boolean', () => {
@@ -36,7 +36,7 @@ describe('Program/utils', () => {
       runTest(['1', 't', 'true'], true);
     });
     it('throws if provided string is not a match', () => {
-      expect(() => stringOptionToBoolean('invalidString', Programs.HttpServer, 'some-option')).toThrow(WrongOption);
+      expect(() => stringOptionToBoolean('invalidString', Programs.ProviderServer, 'some-option')).toThrow(WrongOption);
     });
   });
 });

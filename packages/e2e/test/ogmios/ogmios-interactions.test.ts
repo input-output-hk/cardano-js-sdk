@@ -1,9 +1,9 @@
 import {
   DB_CACHE_TTL_DEFAULT,
   HttpServer,
-  HttpServerArgs,
+  ProviderServerArgs,
   ServiceNames,
-  loadHttpServer,
+  loadProviderServer,
   util
 } from '@cardano-sdk/cardano-services';
 import { SrvRecord } from 'dns';
@@ -121,7 +121,7 @@ class OgmiosProxy {
 
 describe('interactions with ogmios server', () => {
   let closeOgmiosProxy: (() => Promise<void>) | undefined;
-  let httpServer: HttpServer;
+  let providerServer: HttpServer;
   let httpPort: number;
   let ogmiosPort: number;
 
@@ -153,16 +153,16 @@ describe('interactions with ogmios server', () => {
       ogmiosSrvServiceName: 'localhost',
       postgresConnectionString: env.DB_SYNC_CONNECTION_STRING,
       serviceNames: [ServiceNames.NetworkInfo]
-    } as HttpServerArgs;
+    } as ProviderServerArgs;
 
-    httpServer = await loadHttpServer(args, dependencies);
+    providerServer = await loadProviderServer(args, dependencies);
 
-    await httpServer.initialize();
-    await httpServer.start();
+    await providerServer.initialize();
+    await providerServer.start();
   });
 
   afterAll(async () => {
-    await httpServer.shutdown();
+    await providerServer.shutdown();
     await closeOgmiosProxy?.();
   });
 

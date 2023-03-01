@@ -88,7 +88,7 @@ const startServer = async (options: TestOptions = {}) => {
   if (env.START_LOCAL_HTTP_SERVER)
     serverProc = await runCli(
       [
-        'start-server',
+        'start-provider-server',
         '--api-url',
         env.TX_SUBMIT_HTTP_URL,
         ...(options.directlyToOgmios ? [] : ['--use-queue', 'true']),
