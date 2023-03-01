@@ -1,7 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, coreToCml, util } from '@cardano-sdk/core';
 import { HexBlob, usingAutoFree } from '@cardano-sdk/util';
-import blake2b from 'blake2b';
 
 /**
  * CIP-36 metadata label
@@ -95,7 +94,7 @@ export const metadataBuilder = {
     const votingRegistrationMetadataBytes = usingAutoFree((scope) =>
       coreToCml.txMetadata(scope, votingRegistrationMetadata).to_bytes()
     );
-    const hashedMetadata = blake2b(256 / 8)
+    const hashedMetadata = Crypto.blake2b(256 / 8)
       .update(votingRegistrationMetadataBytes)
       .digest('binary');
     const signature = await stakeKeyBlobSigner.signBlob(util.bytesToHex(hashedMetadata));
