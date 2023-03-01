@@ -10,7 +10,14 @@ import {
 import { CommonPoolInfo, OrderedResult, PoolAPY, PoolData, PoolMetrics, PoolSortType, PoolUpdate } from './types';
 import { DbSyncProvider, DbSyncProviderDependencies, Disposer, EpochMonitor } from '../../util';
 import { GenesisData, InMemoryCache, StakePoolExtMetadataService, UNLIMITED_CACHE_TTL } from '../..';
-import { IDS_NAMESPACE, StakePoolsSubQuery, emptyPoolsExtraInfo, getStakePoolSortType, queryCacheKey } from './util';
+import {
+  IDS_NAMESPACE,
+  REWARDS_HISTORY_LIMIT_DEFAULT,
+  StakePoolsSubQuery,
+  emptyPoolsExtraInfo,
+  getStakePoolSortType,
+  queryCacheKey
+} from './util';
 import { RunnableModule, isNotNil } from '@cardano-sdk/util';
 import { StakePoolBuilder } from './StakePoolBuilder';
 import { toStakePoolResults } from './mappers';
@@ -166,7 +173,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
   }
 
   public async queryStakePools(options: QueryStakePoolsArgs): Promise<Paginated<Cardano.StakePool>> {
-    const { filters, pagination, rewardsHistoryLimit } = options;
+    const { filters, pagination, rewardsHistoryLimit = REWARDS_HISTORY_LIMIT_DEFAULT } = options;
 
     if (pagination.limit > this.#paginationPageSizeLimit) {
       throw new ProviderError(

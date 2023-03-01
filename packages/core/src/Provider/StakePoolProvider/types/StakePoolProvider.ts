@@ -43,7 +43,7 @@ export interface QueryStakePoolsArgs {
     status?: Cardano.StakePoolStatus[];
   };
   /**
-   * Will fetch all stake pool reward history if not specified
+   * Will fetch stake pool reward history up to 3 epochs back if not specified
    */
   rewardsHistoryLimit?: number;
   /**

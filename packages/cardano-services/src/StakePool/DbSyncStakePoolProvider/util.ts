@@ -8,6 +8,8 @@ import {
 } from '@cardano-sdk/core';
 import BigNumber from 'bignumber.js';
 
+export const REWARDS_HISTORY_LIMIT_DEFAULT = 3;
+
 export const getStakePoolSortType = (field: string): PoolSortType => {
   if (isPoolDataSortField(field)) return 'data';
   if (isPoolMetricsSortField(field)) return 'metrics';
