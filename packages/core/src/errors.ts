@@ -8,7 +8,8 @@ export enum ProviderFailure {
   NotImplemented = 'NOT_IMPLEMENTED',
   Unhealthy = 'UNHEALTHY',
   ConnectionFailure = 'CONNECTION_FAILURE',
-  BadRequest = 'BAD_REQUEST'
+  BadRequest = 'BAD_REQUEST',
+  ServerUnavailable = 'SERVER_UNAVAILABLE'
 }
 
 export const providerFailureToStatusCodeMap: { [key in ProviderFailure]: number } = {
@@ -18,7 +19,8 @@ export const providerFailureToStatusCodeMap: { [key in ProviderFailure]: number 
   [ProviderFailure.Unknown]: 500,
   [ProviderFailure.InvalidResponse]: 500,
   [ProviderFailure.NotImplemented]: 500,
-  [ProviderFailure.ConnectionFailure]: 500
+  [ProviderFailure.ConnectionFailure]: 500,
+  [ProviderFailure.ServerUnavailable]: 500
 };
 
 export class ProviderError<InnerError = unknown> extends ComposableError<InnerError> {

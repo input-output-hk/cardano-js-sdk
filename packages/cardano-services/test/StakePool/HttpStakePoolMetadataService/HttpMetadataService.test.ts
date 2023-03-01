@@ -1,11 +1,22 @@
 /* eslint-disable max-len */
-import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+/* eslint-disable prefer-const */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import * as Crypto from '@cardano-sdk/crypto';
+import { Cardano } from '@cardano-sdk/core';
 import { DataMocks } from '../../data-mocks';
 import { ExtMetadataFormat } from '../../../src/StakePool/types';
-import { adaPoolsExtMetadataMock, cip6ExtMetadataMock, mainExtMetadataMock } from './mocks';
+import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import {
+  StakePoolMetadataServiceError,
+  StakePoolMetadataServiceFailure,
+  createHttpStakePoolMetadataService
+} from '../../../src';
+import { adaPoolsExtMetadataMock, cip6ExtMetadataMock, mainExtMetadataMock, stakePoolMetadata } from './mocks';
 import { createGenericMockServer, logger } from '@cardano-sdk/util-dev';
-import { createHttpStakePoolMetadataService } from '../../../src';
 import url from 'url';
+
+const UNFETCHABLE = 'http://some_url/unfetchable';
+const INVALID_KEY = 'd75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a';
 
 export const mockPoolExtMetadataServer = createGenericMockServer((handler) => async (req, res) => {
   const result = handler(req);
@@ -19,74 +30,313 @@ export const mockPoolExtMetadataServer = createGenericMockServer((handler) => as
 
   const reqUrl = url.parse(req.url!).pathname;
 
-  if (reqUrl === `/${ExtMetadataFormat.AdaPools}`) {
-    return res.end(JSON.stringify(adaPoolsExtMetadataMock));
-  } else if (reqUrl === `/${ExtMetadataFormat.CIP6}`) {
-    return res.end(JSON.stringify(cip6ExtMetadataMock));
+  switch (reqUrl) {
+    case `/${ExtMetadataFormat.AdaPools}`: {
+      return res.end(JSON.stringify(adaPoolsExtMetadataMock));
+    }
+    case `/${ExtMetadataFormat.CIP6}`: {
+      return res.end(JSON.stringify(cip6ExtMetadataMock));
+    }
+    // No default
   }
 
   return res.end(JSON.stringify(adaPoolsExtMetadataMock));
 });
 
 describe('StakePoolMetadataService', () => {
-  describe('healthy state', () => {
-    let closeMock: () => Promise<void> = jest.fn();
-    let serverUrl = '';
-    const extendedMetadataService = createHttpStakePoolMetadataService(logger);
+  let closeMock: () => Promise<void> = jest.fn();
+  let serverUrl = '';
+  const metadataService = createHttpStakePoolMetadataService(logger);
 
-    beforeAll(async () => {
-      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(() => ({})));
+  afterEach(async () => {
+    await closeMock();
+  });
+
+  describe('getStakePoolMetadata', () => {
+    it('fetch stake pool JSON metadata without extended data', async () => {
+      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(() => ({ body: mainExtMetadataMock, code: 200 })));
+
+      const result = await metadataService.getStakePoolMetadata(
+        '0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8' as Hash32ByteBase16,
+        `${serverUrl}/metadata`
+      );
+
+      expect(result).toEqual({
+        errors: [],
+        metadata: { ...mainExtMetadataMock }
+      });
     });
 
-    afterAll(async () => {
-      await closeMock();
+    it('fetch stake pool JSON metadata with extended metadata', async () => {
+      let metadata: any;
+
+      // First fetch returns the metadata, second fetch return the extended metadata.
+      let alreadyCalled = false;
+      const handler = () => {
+        if (alreadyCalled) return { body: adaPoolsExtMetadataMock, code: 200 };
+        alreadyCalled = true;
+
+        return {
+          body: metadata,
+          code: 200
+        };
+      };
+
+      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(handler));
+      metadata = { ...stakePoolMetadata, extended: `${serverUrl}/extendedMetadata` };
+
+      // Since the extended metadata URL will change each run and its part of the metadata, we must
+      // recalculate metadata the hash.
+      const metadataHash = Crypto.blake2b(Crypto.blake2b.BYTES)
+        .update(Buffer.from(JSON.stringify(metadata), 'ascii'))
+        .digest('hex');
+
+      const result = await metadataService.getStakePoolMetadata(
+        metadataHash as Hash32ByteBase16,
+        `${serverUrl}/metadata`
+      );
+
+      expect(result).toEqual({
+        errors: [],
+        metadata: { ...metadata, ext: DataMocks.Pool.adaPoolExtendedMetadata }
+      });
     });
 
+    it('returns StakePoolMetadataServiceError with FailedToFetchMetadata error code when it gets resource not found server error', async () => {
+      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(() => ({ body: {}, code: 500 })));
+
+      const result = await metadataService.getStakePoolMetadata(
+        '4781fffc4cc4a0d6074ae905869e8596f13246b79888af5a8d9580d3a372729a' as Hash32ByteBase16,
+        serverUrl
+      );
+
+      expect(result).toEqual({
+        errors: [
+          new StakePoolMetadataServiceError(
+            StakePoolMetadataServiceFailure.FailedToFetchMetadata,
+            null,
+            `StakePoolMetadataService failed to fetch metadata JSON from ${serverUrl} due to Request failed with status code 500`
+          )
+        ],
+        metadata: { ext: undefined }
+      });
+    });
+
+    it('returns StakePoolMetadataServiceError with InvalidStakePoolHash error code when the hash doesnt match', async () => {
+      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(() => ({ body: mainExtMetadataMock, code: 200 })));
+
+      const result = await metadataService.getStakePoolMetadata(
+        '0000000000000000000000000000000000000000000000000000000000000000' as Hash32ByteBase16,
+        `${serverUrl}/metadata`
+      );
+
+      expect(result).toEqual({
+        errors: [
+          new StakePoolMetadataServiceError(
+            StakePoolMetadataServiceFailure.InvalidStakePoolHash,
+            null,
+            "Invalid stake pool hash. Computed '0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8', expected '0000000000000000000000000000000000000000000000000000000000000000'"
+          )
+        ],
+        metadata: undefined
+      });
+    });
+
+    it('returns StakePoolMetadataServiceError with InvalidMetadata error code when metadata has extDataUrl but is missing extSigUrl', async () => {
+      const metadata = { ...mainExtMetadataMock, extDataUrl: UNFETCHABLE };
+      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(() => ({
+        body: metadata,
+        code: 200
+      })));
+
+      const result = await metadataService.getStakePoolMetadata(
+        '71782c81f1e90c08e3f9083db36c9966362ac08356bf10cbd50bb91eabf19135' as Hash32ByteBase16,
+        `${serverUrl}/metadata`
+      );
+
+      expect(result).toEqual({
+        errors: [
+          new StakePoolMetadataServiceError(
+            StakePoolMetadataServiceFailure.InvalidMetadata,
+            null,
+            'Missing ext signature or public key'
+          )
+        ],
+        metadata
+      });
+    });
+
+    it('returns StakePoolMetadataServiceError with InvalidMetadata error code when metadata has extDataUrl and extSigUrl but is missing extVkey', async () => {
+      const metadata = {
+        ...mainExtMetadataMock,
+        extDataUrl: UNFETCHABLE,
+        extSigUrl: UNFETCHABLE
+      };
+      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(() => ({
+        body: metadata,
+        code: 200
+      })));
+
+      const result = await metadataService.getStakePoolMetadata(
+        'bc8b5da244f49515e97c874e9830b709faaef18ef32ce63cd0b6a8af15e4b01b' as Hash32ByteBase16,
+        `${serverUrl}/metadata`
+      );
+
+      expect(result).toEqual({
+        errors: [
+          new StakePoolMetadataServiceError(
+            StakePoolMetadataServiceFailure.InvalidMetadata,
+            null,
+            'Missing ext signature or public key'
+          )
+        ],
+        metadata
+      });
+    });
+
+    it('returns StakePoolMetadataServiceError with FailedToFetchExtendedSignature error code when it cant fetch the signature', async () => {
+      let metadata: any;
+
+      let alreadyCalled = false;
+      const handler = () => {
+        if (alreadyCalled) return { body: cip6ExtMetadataMock, code: 200 };
+        alreadyCalled = true;
+
+        return {
+          body: metadata,
+          code: 200
+        };
+      };
+
+      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(handler));
+
+      metadata = {
+        ...mainExtMetadataMock,
+        extDataUrl: `${serverUrl}/${ExtMetadataFormat.CIP6}`,
+        extSigUrl: UNFETCHABLE,
+        extVkey: '00000000000000000000000000000000'
+      };
+
+      const metadataHash = Crypto.blake2b(Crypto.blake2b.BYTES)
+        .update(Buffer.from(JSON.stringify(metadata), 'ascii'))
+        .digest('hex');
+
+      const result = await metadataService.getStakePoolMetadata(
+        metadataHash as Hash32ByteBase16,
+        `${serverUrl}/metadata`
+      );
+
+      expect(result).toEqual({
+        errors: [
+          new StakePoolMetadataServiceError(
+            StakePoolMetadataServiceFailure.FailedToFetchExtendedSignature,
+            new Error('getaddrinfo EAI_AGAIN some_url'),
+            `StakePoolMetadataService failed to fetch extended signature from ${UNFETCHABLE} due to connection error`
+          )
+        ],
+        metadata
+      });
+    });
+
+    it('returns StakePoolMetadataServiceError with InvalidExtendedMetadataSignature error code when the signature is invalid', async () => {
+      let metadata: any;
+
+      let numFetch = 0;
+      const handler = () => {
+        if (numFetch === 0) {
+          ++numFetch;
+          return {
+            body: metadata,
+            code: 200
+          };
+        } else if (numFetch === 1) {
+          ++numFetch;
+          return { body: DataMocks.Pool.cip6ExtendedMetadata, code: 200 };
+        }
+
+        return {
+          body:
+            'e5564300c360ac729086e2cc806e828a' +
+            '84877f1eb8e5d974d873e06522490155' +
+            '5fb8821590a33bacc61e39701cf9b46b' +
+            'd25bf5f0595bbe24655141438e7a100b',
+          code: 200
+        };
+      };
+
+      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(handler));
+
+      metadata = {
+        ...mainExtMetadataMock,
+        extDataUrl: `${serverUrl}/${ExtMetadataFormat.CIP6}`,
+        extSigUrl: `${serverUrl}/invalidSignature`,
+        extVkey: INVALID_KEY
+      };
+
+      const metadataHash = Crypto.blake2b(Crypto.blake2b.BYTES)
+        .update(Buffer.from(JSON.stringify(metadata), 'ascii'))
+        .digest('hex');
+
+      const result = await metadataService.getStakePoolMetadata(
+        metadataHash as Hash32ByteBase16,
+        `${serverUrl}/metadata`
+      );
+
+      expect(result).toEqual({
+        errors: [
+          new StakePoolMetadataServiceError(
+            StakePoolMetadataServiceFailure.InvalidExtendedMetadataSignature,
+            null,
+            'Invalid extended metadata signature'
+          )
+        ],
+        metadata
+      });
+    });
+  });
+
+  describe('getStakePoolExtendedMetadata', () => {
     it('returns ada pools format when extended key is present in the metadata', async () => {
+      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(() => ({})));
+
       const extMetadata: Cardano.StakePoolMetadata = {
         ...mainExtMetadataMock(),
         extended: `${serverUrl}/${ExtMetadataFormat.AdaPools}`
       };
-      const result = await extendedMetadataService.getStakePoolExtendedMetadata(extMetadata);
+      const result = await metadataService.getStakePoolExtendedMetadata(extMetadata);
 
       expect(result).not.toBeNull();
       expect(result).toMatchShapeOf(DataMocks.Pool.adaPoolExtendedMetadata);
     });
 
     it('returns CIP-6 format when extDataUrl is present in the metadata', async () => {
+      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(() => ({})));
+
       const extMetadata: Cardano.StakePoolMetadata = {
         ...mainExtMetadataMock(),
         extDataUrl: `${serverUrl}/${ExtMetadataFormat.CIP6}`
       };
-      const result = await extendedMetadataService.getStakePoolExtendedMetadata(extMetadata);
+      const result = await metadataService.getStakePoolExtendedMetadata(extMetadata);
 
       expect(result).not.toBeNull();
       expect(result).toMatchShapeOf(DataMocks.Pool.cip6ExtendedMetadata);
     });
 
     it('returns CIP-6 format with priority when the metadata including both extended properties', async () => {
+      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(() => ({})));
+
       const extMetadata: Cardano.StakePoolMetadata = {
         ...mainExtMetadataMock(),
         extDataUrl: `${serverUrl}/${ExtMetadataFormat.CIP6}`,
         extended: `${serverUrl}/${ExtMetadataFormat.AdaPools}`
       };
-      const result = await extendedMetadataService.getStakePoolExtendedMetadata(extMetadata);
+      const result = await metadataService.getStakePoolExtendedMetadata(extMetadata);
 
       expect(result).not.toBeNull();
       expect(result?.serial).toBeDefined();
     });
-  });
 
-  describe('error cases are correctly handled', () => {
-    const extendedMetadataService = createHttpStakePoolMetadataService(logger);
-    let closeMock: () => Promise<void> = jest.fn();
-    let serverUrl: string;
-
-    beforeEach(() => (closeMock = jest.fn()));
-
-    afterEach(async () => await closeMock());
-
-    it('invalid CIP-6 response format', async () => {
+    it('throws StakePoolMetadataServiceError with InvalidExtendedMetadataFormat error code when it gets an invalid CIP-6 response format', async () => {
       const invalidCip6ResponseFormat = { pool1: { ...cip6ExtMetadataMock.pool }, serial: 12_345 };
       ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(() => ({ body: invalidCip6ResponseFormat })));
 
@@ -95,16 +345,16 @@ describe('StakePoolMetadataService', () => {
         extDataUrl: `${serverUrl}/${ExtMetadataFormat.CIP6}`
       };
 
-      await expect(extendedMetadataService.getStakePoolExtendedMetadata(extMetadata)).rejects.toThrow(
-        new ProviderError(
-          ProviderFailure.InvalidResponse,
+      await expect(metadataService.getStakePoolExtendedMetadata(extMetadata)).rejects.toThrow(
+        new StakePoolMetadataServiceError(
+          StakePoolMetadataServiceFailure.InvalidExtendedMetadataFormat,
           'instance requires property "pool"',
           'Extended metadata JSON format validation failed against the corresponding schema for correctness'
         )
       );
     });
 
-    it('invalid AP response format', async () => {
+    it('throws StakePoolMetadataServiceError with InvalidExtendedMetadataFormat error code when it gets an invalid AP response format', async () => {
       const invalidAdaPoolsResponseFormat = { info1: { ...adaPoolsExtMetadataMock.info } };
       ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(() => ({ body: invalidAdaPoolsResponseFormat })));
 
@@ -113,16 +363,16 @@ describe('StakePoolMetadataService', () => {
         extended: `${serverUrl}/${ExtMetadataFormat.AdaPools}`
       };
 
-      await expect(extendedMetadataService.getStakePoolExtendedMetadata(extMetadata)).rejects.toThrow(
-        new ProviderError(
-          ProviderFailure.InvalidResponse,
+      await expect(metadataService.getStakePoolExtendedMetadata(extMetadata)).rejects.toThrow(
+        new StakePoolMetadataServiceError(
+          StakePoolMetadataServiceFailure.InvalidExtendedMetadataFormat,
           'instance requires property "info"',
           'Extended metadata JSON format validation failed against the corresponding schema for correctness'
         )
       );
     });
 
-    it('internal server error', async () => {
+    it('throws StakePoolMetadataServiceError with FailedToFetchExtendedMetadata error code when it gets internal server error response', async () => {
       let alreadyCalled = false;
       const handler = () => {
         if (alreadyCalled) return { body: {}, code: 500 };
@@ -140,19 +390,19 @@ describe('StakePoolMetadataService', () => {
         extDataUrl: `${serverUrl}/${ExtMetadataFormat.CIP6}`
       };
 
-      const result = await extendedMetadataService.getStakePoolExtendedMetadata(extMetadata);
+      const result = await metadataService.getStakePoolExtendedMetadata(extMetadata);
       expect(result).toBeDefined();
 
-      await expect(extendedMetadataService.getStakePoolExtendedMetadata(extMetadata)).rejects.toThrow(
-        new ProviderError(
-          ProviderFailure.ConnectionFailure,
+      await expect(metadataService.getStakePoolExtendedMetadata(extMetadata)).rejects.toThrow(
+        new StakePoolMetadataServiceError(
+          StakePoolMetadataServiceFailure.FailedToFetchExtendedMetadata,
           null,
           `StakePoolMetadataService failed to fetch extended metadata from ${serverUrl}/${ExtMetadataFormat.CIP6} due to connection error`
         )
       );
     });
 
-    it('resource not found server error', async () => {
+    it('throws StakePoolMetadataServiceError with FailedToFetchExtendedMetadata error code when it gets resource not found server error', async () => {
       let alreadyCalled = false;
       const handler = () => {
         if (alreadyCalled) return { body: {}, code: 404 };
@@ -170,12 +420,12 @@ describe('StakePoolMetadataService', () => {
         extDataUrl: `${serverUrl}/${ExtMetadataFormat.CIP6}`
       };
 
-      const result = await extendedMetadataService.getStakePoolExtendedMetadata(extMetadata);
+      const result = await metadataService.getStakePoolExtendedMetadata(extMetadata);
       expect(result).toBeDefined();
 
-      await expect(extendedMetadataService.getStakePoolExtendedMetadata(extMetadata)).rejects.toThrow(
-        new ProviderError(
-          ProviderFailure.NotFound,
+      await expect(metadataService.getStakePoolExtendedMetadata(extMetadata)).rejects.toThrow(
+        new StakePoolMetadataServiceError(
+          StakePoolMetadataServiceFailure.FailedToFetchExtendedMetadata,
           null,
           `StakePoolMetadataService failed to fetch extended metadata from ${serverUrl}/${ExtMetadataFormat.CIP6} due to resource not found`
         )
