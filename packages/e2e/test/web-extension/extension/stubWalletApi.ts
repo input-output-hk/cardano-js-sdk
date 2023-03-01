@@ -13,12 +13,12 @@ export const stubWalletApi: WalletApi = {
     mapUtxos([
       [
         {
-          address: Cardano.Address('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg'),
+          address: Cardano.PaymentAddress('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg'),
           index: 1,
           txId: Cardano.TransactionId('886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8')
         },
         {
-          address: Cardano.Address(
+          address: Cardano.PaymentAddress(
             // eslint-disable-next-line max-len
             'addr_test1qra788mu4sg8kwd93ns9nfdh3k4ufxwg4xhz2r3n064tzfgxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6cy45x'
           ),
@@ -36,12 +36,12 @@ export const stubWalletApi: WalletApi = {
     mapUtxos([
       [
         {
-          address: Cardano.Address('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg'),
+          address: Cardano.PaymentAddress('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg'),
           index: 0,
           txId: Cardano.TransactionId('886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8')
         },
         {
-          address: Cardano.Address(
+          address: Cardano.PaymentAddress(
             // eslint-disable-next-line max-len
             'addr_test1qra788mu4sg8kwd93ns9nfdh3k4ufxwg4xhz2r3n064tzfgxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6cy45x'
           ),

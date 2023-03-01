@@ -389,11 +389,11 @@ describe('ChainHistoryHttpService', () => {
         const response = await provider.transactionsByAddresses({ addresses, pagination });
 
         expect(response.pageResults.length).toEqual(5);
-        expect(() => Cardano.Address(addresses[0] as unknown as string)).not.toThrow();
+        expect(() => Cardano.PaymentAddress(addresses[0] as unknown as string)).not.toThrow();
       });
 
       it('does not include transactions not found', async () => {
-        const unknownAddress = Cardano.Address(
+        const unknownAddress = Cardano.PaymentAddress(
           'addr_test1qrrmuxkfgytnf2lhlx2qhg8uz276747cnduyqpjutqac4qydra7fr0rzkg800zmk29x6tg92yqp7mnvmt42ruqgg5vjsncz9rt'
         );
         const response = await provider.transactionsByAddresses({
@@ -425,7 +425,7 @@ describe('ChainHistoryHttpService', () => {
 
         expect(response.totalResultCount).toEqual(txInRangeCount);
         expect(lowerBound).toBeGreaterThanOrEqual(10);
-        expect(() => Cardano.Address([...addresses][0] as unknown as string)).not.toThrow();
+        expect(() => Cardano.PaymentAddress([...addresses][0] as unknown as string)).not.toThrow();
         for (const tx of response.pageResults) expect(tx.blockHeader).toMatchShapeOf(DataMocks.Tx.blockHeader);
       });
 
@@ -507,8 +507,8 @@ describe('ChainHistoryHttpService', () => {
 
       describe('finds transactions of given addresses', () => {
         it('finds transactions with address within inputs', async () => {
-          const genesisAddresses: Cardano.Address[] = await fixtureBuilder.getDistinctAddresses(3);
-          const addresses: Cardano.Address[] = [genesisAddresses[0]];
+          const genesisAddresses: Cardano.PaymentAddress[] = await fixtureBuilder.getDistinctAddresses(3);
+          const addresses: Cardano.PaymentAddress[] = [genesisAddresses[0]];
           const response = await provider.transactionsByAddresses({ addresses, pagination: { limit: 5, startAt: 0 } });
           expect(response.pageResults.length).toBeGreaterThan(0);
           expect(
@@ -518,8 +518,8 @@ describe('ChainHistoryHttpService', () => {
         });
 
         it('finds transactions with address within outputs', async () => {
-          const addresses: Cardano.Address[] = await fixtureBuilder.getGenesisAddresses();
-          expect(() => Cardano.Address(addresses[0] as unknown as string)).not.toThrow();
+          const addresses: Cardano.PaymentAddress[] = await fixtureBuilder.getGenesisAddresses();
+          expect(() => Cardano.PaymentAddress(addresses[0] as unknown as string)).not.toThrow();
 
           const firstPageResponse = await provider.transactionsByAddresses({
             addresses,

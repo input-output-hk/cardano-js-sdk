@@ -4,9 +4,9 @@ import { Cardano, addressNetworkId, createRewardAccount } from '../../src';
 describe('address', () => {
   describe('addressNetworkId', () => {
     it('parses testnet address', () => {
-      expect(addressNetworkId(Cardano.Address('addr_test1wrsexavz37208qda7mwwu4k7hcpg26cz0ce86f5e9kul3hqzlh22t'))).toBe(
-        Cardano.NetworkId.Testnet
-      );
+      expect(
+        addressNetworkId(Cardano.PaymentAddress('addr_test1wrsexavz37208qda7mwwu4k7hcpg26cz0ce86f5e9kul3hqzlh22t'))
+      ).toBe(Cardano.NetworkId.Testnet);
     });
 
     it('parses testnet reward account', () => {
@@ -18,7 +18,7 @@ describe('address', () => {
     it('parses mainnet address', () => {
       expect(
         addressNetworkId(
-          Cardano.Address(
+          Cardano.PaymentAddress(
             'addr1qx52knza2h5x090n4a5r7yraz3pwcamk9ppvuh7e26nfks7pnmhxqavtqy02zezklh27jt9r6z62sav3mugappdc7xnskxy2pn'
           )
         )
@@ -34,7 +34,7 @@ describe('address', () => {
     it('parses mainnet byron address', () => {
       expect(
         addressNetworkId(
-          Cardano.Address(
+          Cardano.PaymentAddress(
             'DdzFFzCqrht4PWfBGtmrQz4x1GkZHYLVGbK7aaBkjWxujxzz3L5GxCgPiTsks5RjUr3yX9KvwKjNJBt7ZzPCmS3fUQrGeRvo9Y1YBQKQ'
           )
         )

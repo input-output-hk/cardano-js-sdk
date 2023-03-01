@@ -58,7 +58,7 @@ export const createOutputValidator = ({ protocolParameters$ }: OutputValidatorCo
     protocolParameters?: ProtocolParametersRequiredByOutputValidator
   ): Promise<OutputValidation> => {
     const { coinsPerUtxoByte, maxValueSize } = protocolParameters || (await firstValueFrom(protocolParameters$));
-    const stubMaxSizeAddress = Cardano.Address(
+    const stubMaxSizeAddress = Cardano.PaymentAddress(
       'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9'
     );
     const stubTxOut: Cardano.TxOut = { address: stubMaxSizeAddress, value };

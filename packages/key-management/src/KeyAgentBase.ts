@@ -99,7 +99,7 @@ export abstract class KeyAgentBase implements KeyAgent {
       );
       return {
         accountIndex: this.accountIndex,
-        address: Cardano.Address(address.to_bech32()),
+        address: Cardano.PaymentAddress(address.to_bech32()),
         index,
         networkId: this.chainId.networkId,
         rewardAccount: Cardano.RewardAccount(rewardAccount.to_bech32()),

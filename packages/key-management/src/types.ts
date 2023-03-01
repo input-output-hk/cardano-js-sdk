@@ -78,7 +78,7 @@ export interface GroupedAddress {
   index: number;
   networkId: Cardano.NetworkId;
   accountIndex: number;
-  address: Cardano.Address;
+  address: Cardano.PaymentAddress;
   rewardAccount: Cardano.RewardAccount;
   stakeKeyDerivationPath?: AccountKeyDerivationPath;
 }

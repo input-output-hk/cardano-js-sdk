@@ -262,7 +262,7 @@ const mapDatumHash = (datum: Schema.TxOut['datumHash']) => {
 };
 
 const mapTxOut = (txOut: Schema.TxOut): Cardano.TxOut => ({
-  address: Cardano.Address(txOut.address),
+  address: Cardano.PaymentAddress(txOut.address),
   datum: mapInlineDatum(txOut.datum),
   datumHash: mapDatumHash(txOut.datumHash),
   scriptReference: txOut.script ? mapScript(txOut.script) : undefined,

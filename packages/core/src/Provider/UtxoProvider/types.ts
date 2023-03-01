@@ -3,7 +3,7 @@
 import Cardano, { Provider } from '../..';
 
 export interface UtxoByAddressesArgs {
-  addresses: Cardano.Address[];
+  addresses: Cardano.PaymentAddress[];
 }
 
 export interface UtxoProvider extends Provider {

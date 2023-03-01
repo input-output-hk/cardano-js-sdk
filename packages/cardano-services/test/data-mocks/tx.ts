@@ -15,7 +15,7 @@ export const valueWithAssets: Cardano.Value = {
 };
 
 export const txOutBase: Omit<Cardano.TxOut, 'value' | 'datum'> = {
-  address: Cardano.Address('addr_test1wrsexavz37208qda7mwwu4k7hcpg26cz0ce86f5e9kul3hqzlh22t')
+  address: Cardano.PaymentAddress('addr_test1wrsexavz37208qda7mwwu4k7hcpg26cz0ce86f5e9kul3hqzlh22t')
 };
 
 export const txOutBaseWithDatum: Omit<Cardano.TxOut, 'value'> = {
@@ -28,7 +28,7 @@ export const txOutWithCoinOnly: Cardano.TxOut = { ...txOutBase, value: valueWith
 export const txOutWithAssets: Cardano.TxOut = { ...txOutBase, value: valueWithAssets };
 
 export const txIn: Cardano.HydratedTxIn = {
-  address: Cardano.Address('addr_test1wrsexavz37208qda7mwwu4k7hcpg26cz0ce86f5e9kul3hqzlh22t'),
+  address: Cardano.PaymentAddress('addr_test1wrsexavz37208qda7mwwu4k7hcpg26cz0ce86f5e9kul3hqzlh22t'),
   index: 0,
   txId: Cardano.TransactionId('cefd2fcf657e5e5d6c35975f4e052f427819391b153ebb16ad8aa107ba5a3819')
 };

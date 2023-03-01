@@ -53,7 +53,7 @@ export interface TxInputModel {
 }
 
 export interface TxInput {
-  address: Cardano.Address;
+  address: Cardano.PaymentAddress;
   id: string;
   index: number;
   txInputId: Cardano.TransactionId;

@@ -32,7 +32,7 @@ export enum Cip30ConfirmationCallbackType {
 export type SignDataCallbackParams = {
   type: Cip30ConfirmationCallbackType.SignData;
   data: {
-    addr: Cardano.Address;
+    addr: Cardano.PaymentAddress;
     payload: HexBlob;
   };
 };
@@ -82,7 +82,7 @@ const compareUtxos = (utxo: Cardano.Utxo, comparedTo: Cardano.Utxo) => {
   return 0;
 };
 
-const cardanoAddressToCbor = (address: Cardano.Address | Cardano.RewardAccount): Cbor =>
+const cardanoAddressToCbor = (address: Cardano.PaymentAddress | Cardano.RewardAccount): Cbor =>
   usingAutoFree((scope) => {
     const cmlAddr = parseCmlAddress(scope, address);
     if (!cmlAddr) {
@@ -255,10 +255,10 @@ export const createWalletApi = (
     scope.dispose();
     return cbor;
   },
-  signData: async (addr: Cardano.Address | Bytes, payload: Bytes): Promise<Cip30DataSignature> => {
+  signData: async (addr: Cardano.PaymentAddress | Bytes, payload: Bytes): Promise<Cip30DataSignature> => {
     logger.debug('signData');
     const hexBlobPayload = HexBlob(payload);
-    const signWith = Cardano.Address(addr);
+    const signWith = Cardano.PaymentAddress(addr);
 
     const shouldProceed = await confirmationCallback({
       data: {

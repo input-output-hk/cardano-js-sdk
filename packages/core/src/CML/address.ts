@@ -1,10 +1,10 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Address, NetworkId, RewardAccount } from '../Cardano';
 import { CML } from './CML';
+import { NetworkId, PaymentAddress, RewardAccount } from '../Cardano';
 import { parseCmlAddress } from './parseCmlAddress';
 import { usingAutoFree } from '@cardano-sdk/util';
 
-export const addressNetworkId = (address: RewardAccount | Address): NetworkId =>
+export const addressNetworkId = (address: RewardAccount | PaymentAddress): NetworkId =>
   usingAutoFree((scope) => parseCmlAddress(scope, address)!.network_id());
 
 export const createRewardAccount = (stakeKeyHash: Crypto.Ed25519KeyHashHex, networkId: NetworkId) =>

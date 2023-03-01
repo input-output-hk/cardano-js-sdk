@@ -67,8 +67,8 @@ describe('equals', () => {
   });
 
   test('groupedAddressesEquals compares address', () => {
-    const addresses1 = [{ address: 'a' as unknown as Cardano.Address } as GroupedAddress];
-    const addresses2 = [{ address: 'b' as unknown as Cardano.Address } as GroupedAddress];
+    const addresses1 = [{ address: 'a' as unknown as Cardano.PaymentAddress } as GroupedAddress];
+    const addresses2 = [{ address: 'b' as unknown as Cardano.PaymentAddress } as GroupedAddress];
     expect(groupedAddressesEquals(addresses1, [...addresses1.map((addr) => ({ ...addr }))])).toBe(true);
     expect(groupedAddressesEquals(addresses1, addresses2)).toBe(false);
   });

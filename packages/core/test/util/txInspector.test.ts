@@ -1,6 +1,5 @@
 import * as AssetIds from '../AssetId';
 import {
-  Address,
   AssetFingerprint,
   AssetId,
   AssetName,
@@ -12,6 +11,7 @@ import {
   HydratedTx,
   HydratedTxIn,
   NativeScriptKind,
+  PaymentAddress,
   PolicyId,
   PoolId,
   PoolRegistrationCertificate,
@@ -51,10 +51,10 @@ import { jsonToMetadatum } from '../../src/util/metadatum';
 
 // eslint-disable-next-line max-statements
 describe('txInspector', () => {
-  const sendingAddress = Address(
+  const sendingAddress = PaymentAddress(
     'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'
   );
-  const receivingAddress = Address(
+  const receivingAddress = PaymentAddress(
     'addr_test1qpfhhfy2qgls50r9u4yh0l7z67xpg0a5rrhkmvzcuqrd0znuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q9gw0lz'
   );
   const rewardAccount = RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d');

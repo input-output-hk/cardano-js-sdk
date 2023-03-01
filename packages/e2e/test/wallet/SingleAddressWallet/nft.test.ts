@@ -22,7 +22,7 @@ describe('SingleAddressWallet.assets/nft', () => {
   let assetIds: Cardano.AssetId[];
   let fingerprints: Cardano.AssetFingerprint[];
   const assetNames = ['4e46542d66696c6573', '4e46542d303031', '4e46542d303032'];
-  let walletAddress: Cardano.Address;
+  let walletAddress: Cardano.PaymentAddress;
 
   beforeAll(async () => {
     wallet = (await getWallet({ env, idx: 0, logger, name: 'Minting Wallet', polling: { interval: 50 } })).wallet;

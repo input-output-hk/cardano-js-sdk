@@ -23,7 +23,7 @@ import { firstValueFrom } from 'rxjs';
 
 export interface Cip30SignDataRequest {
   keyAgent: AsyncKeyAgent;
-  signWith: Cardano.Address | Cardano.RewardAccount;
+  signWith: Cardano.PaymentAddress | Cardano.RewardAccount;
   payload: HexBlob;
 }
 
@@ -39,7 +39,7 @@ export class Cip30DataSignError<InnerError = unknown> extends ComposableError<In
   }
 }
 
-const getAddressBytes = (signWith: Cardano.Address | Cardano.RewardAccount) =>
+const getAddressBytes = (signWith: Cardano.PaymentAddress | Cardano.RewardAccount) =>
   usingAutoFree((scope) => {
     const cslAddress = parseCmlAddress(scope, signWith);
     if (!cslAddress) {
@@ -48,7 +48,7 @@ const getAddressBytes = (signWith: Cardano.Address | Cardano.RewardAccount) =>
     return cslAddress.to_bytes();
   });
 
-const getDerivationPath = async (signWith: Cardano.Address | Cardano.RewardAccount, keyAgent: AsyncKeyAgent) => {
+const getDerivationPath = async (signWith: Cardano.PaymentAddress | Cardano.RewardAccount, keyAgent: AsyncKeyAgent) => {
   const isRewardAccount = signWith.startsWith('stake');
   if (isRewardAccount) {
     return STAKE_KEY_DERIVATION_PATH;

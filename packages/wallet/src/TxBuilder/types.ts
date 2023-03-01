@@ -103,7 +103,7 @@ export interface OutputBuilder {
    */
   asset(assetId: Cardano.AssetId, quantity: bigint): OutputBuilder;
   /** Sets transaction output `address` field. */
-  address(address: Cardano.Address): OutputBuilder;
+  address(address: Cardano.PaymentAddress): OutputBuilder;
   /** Sets transaction output `datum` field. */
   datum(datum: Hash32ByteBase16): OutputBuilder;
   /**
