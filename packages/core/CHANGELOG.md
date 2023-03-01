@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.9.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.9.0-nightly.1...@cardano-sdk/core@0.9.0-nightly.2) (2023-02-27)
+## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.8.0...@cardano-sdk/core@0.9.0) (2023-03-01)
 
 ### ⚠ BREAKING CHANGES
 
@@ -13,26 +13,13 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 - **core:** add ObservableCardanoNode interface ([56ec469](https://github.com/input-output-hk/cardano-js-sdk/commit/56ec4695235715f114314c8963dfd0bc888d766a))
 
-### Code Refactoring
-
-- add ChainSyncRollBackward.point ([4f61a6d](https://github.com/input-output-hk/cardano-js-sdk/commit/4f61a6d960adb85f762c09fb61d1a461e907cd72))
-
-## [0.9.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.9.0-nightly.0...@cardano-sdk/core@0.9.0-nightly.1) (2023-02-21)
-
 ### Bug Fixes
 
 - **core:** update @emurgo/cip14-js import style ([33013c5](https://github.com/input-output-hk/cardano-js-sdk/commit/33013c56eaf24edd9d85781fb3f41a95837059da))
 
-## [0.9.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.8.0...@cardano-sdk/core@0.9.0-nightly.0) (2023-02-18)
+### Code Refactoring
 
-### ⚠ BREAKING CHANGES
-
-- Alonzo transaction outputs will now contain a datumHash field, carrying the datum hash digest. However, they will also contain a datum field with the exact same value for backward compatibility reason. In Babbage however, transaction outputs will carry either datum or datumHash depending on the case; and datum will only contain inline datums.
-
-### Features
-
-- added new babbage era types in Transactions and Outputs ([917b2a4](https://github.com/input-output-hk/cardano-js-sdk/commit/917b2a43319ecedf8cd8ef72fbcdecc04e010d8e))
-- dbSyncUtxoProvider now returns the new Babbage fields in the UTXO when present ([ad8184b](https://github.com/input-output-hk/cardano-js-sdk/commit/ad8184bcf9bae92a386c36175f4a773637faf8eb))
+- add ChainSyncRollBackward.point ([4f61a6d](https://github.com/input-output-hk/cardano-js-sdk/commit/4f61a6d960adb85f762c09fb61d1a461e907cd72))
 
 ## [0.8.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.7.0...@cardano-sdk/core@0.8.0) (2023-02-17)
 

@@ -3,19 +3,11 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.4.1-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.4.1-nightly.1...@cardano-sdk/key-management@0.4.1-nightly.2) (2023-02-27)
+## [0.4.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.4.0...@cardano-sdk/key-management@0.4.1) (2023-03-01)
 
 ### Bug Fixes
 
 - **key-management:** correct logic in mint/burn hardware wallet mapping ([674ad20](https://github.com/input-output-hk/cardano-js-sdk/commit/674ad20b05d24b619076f481cc14bfe7ab1dd790))
-
-## [0.4.1-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.4.1-nightly.0...@cardano-sdk/key-management@0.4.1-nightly.1) (2023-02-21)
-
-**Note:** Version bump only for package @cardano-sdk/key-management
-
-## [0.4.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.4.0...@cardano-sdk/key-management@0.4.1-nightly.0) (2023-02-18)
-
-**Note:** Version bump only for package @cardano-sdk/key-management
 
 ## [0.4.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.3.0...@cardano-sdk/key-management@0.4.0) (2023-02-17)
 

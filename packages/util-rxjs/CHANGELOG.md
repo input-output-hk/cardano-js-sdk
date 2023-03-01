@@ -3,16 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.4.5-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.4.5-nightly.0...@cardano-sdk/util-rxjs@0.4.5-nightly.1) (2023-02-27)
+## [0.4.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.4.4...@cardano-sdk/util-rxjs@0.4.5) (2023-03-01)
 
 ### Bug Fixes
 
 - **util-rxjs:** blockingWithLatestFrom now unsubscribes from dependency when source completes ([246f74f](https://github.com/input-output-hk/cardano-js-sdk/commit/246f74f0892121a74f502fd2eb04cf095cbe087a))
 - **util-rxjs:** set blockingWithLatestFrom mergeScan concurrency to 1 ([8e7108a](https://github.com/input-output-hk/cardano-js-sdk/commit/8e7108a1115a1ce3d4240803aaf5537ca47803b9))
-
-## [0.4.5-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.4.4...@cardano-sdk/util-rxjs@0.4.5-nightly.0) (2023-02-18)
-
-**Note:** Version bump only for package @cardano-sdk/util-rxjs
 
 ## [0.4.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.4.3...@cardano-sdk/util-rxjs@0.4.4) (2023-02-17)
 

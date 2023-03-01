@@ -3,26 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.9.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.9.0-nightly.1...@cardano-sdk/ogmios@0.9.0-nightly.2) (2023-02-27)
+## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.8.0...@cardano-sdk/ogmios@0.9.0) (2023-03-01)
 
 ### Features
 
 - **ogmios:** add OgmiosObservableCardanoNode ([b1c7785](https://github.com/input-output-hk/cardano-js-sdk/commit/b1c7785c2b7cd554dc1adf9cf90db5897e4eaebc))
 - **ogmios:** export ogmiosToCore.eraSummary ([412b674](https://github.com/input-output-hk/cardano-js-sdk/commit/412b674ffc82d38e94881fa248aa0d89d9693973))
-
-## [0.9.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.9.0-nightly.0...@cardano-sdk/ogmios@0.9.0-nightly.1) (2023-02-21)
-
-**Note:** Version bump only for package @cardano-sdk/ogmios
-
-## [0.9.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.8.0...@cardano-sdk/ogmios@0.9.0-nightly.0) (2023-02-18)
-
-### ⚠ BREAKING CHANGES
-
-- Alonzo transaction outputs will now contain a datumHash field, carrying the datum hash digest. However, they will also contain a datum field with the exact same value for backward compatibility reason. In Babbage however, transaction outputs will carry either datum or datumHash depending on the case; and datum will only contain inline datums.
-
-### Features
-
-- added new babbage era types in Transactions and Outputs ([917b2a4](https://github.com/input-output-hk/cardano-js-sdk/commit/917b2a43319ecedf8cd8ef72fbcdecc04e010d8e))
 
 ## [0.8.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.7.0...@cardano-sdk/ogmios@0.8.0) (2023-02-17)
 

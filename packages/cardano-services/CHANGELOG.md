@@ -3,24 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.9.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.9.0-nightly.1...@cardano-sdk/cardano-services@0.9.0-nightly.2) (2023-02-27)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services
-
-## [0.9.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.9.0-nightly.0...@cardano-sdk/cardano-services@0.9.0-nightly.1) (2023-02-21)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services
-
-## [0.9.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.8.0...@cardano-sdk/cardano-services@0.9.0-nightly.0) (2023-02-18)
+## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.8.0...@cardano-sdk/cardano-services@0.9.0) (2023-03-01)
 
 ### ⚠ BREAKING CHANGES
 
-- Alonzo transaction outputs will now contain a datumHash field, carrying the datum hash digest. However, they will also contain a datum field with the exact same value for backward compatibility reason. In Babbage however, transaction outputs will carry either datum or datumHash depending on the case; and datum will only contain inline datums.
+- **cardano-services:** simplify program args interface
+- **cardano-services:** move API URL, build info, enable metrics into common
 
 ### Features
 
-- added new babbage era types in Transactions and Outputs ([917b2a4](https://github.com/input-output-hk/cardano-js-sdk/commit/917b2a43319ecedf8cd8ef72fbcdecc04e010d8e))
-- dbSyncUtxoProvider now returns the new Babbage fields in the UTXO when present ([ad8184b](https://github.com/input-output-hk/cardano-js-sdk/commit/ad8184bcf9bae92a386c36175f4a773637faf8eb))
+- **cardano-services:** add schema for StakePoolMetrics to OpenAPI spec ([959a2f0](https://github.com/input-output-hk/cardano-js-sdk/commit/959a2f02a069fe6f7de7dade658fd054cf37f41a))
+- **cardano-services:** remove CLI terminal clear ([97c5a0c](https://github.com/input-output-hk/cardano-js-sdk/commit/97c5a0ca555c993b6349250851239484c1cf834f))
+
+### Code Refactoring
+
+- **cardano-services:** move API URL, build info, enable metrics into common ([c67e550](https://github.com/input-output-hk/cardano-js-sdk/commit/c67e550981df62532f2b8c2f2f28b4a9e88e9de5))
+- **cardano-services:** simplify program args interface ([eb6ceb3](https://github.com/input-output-hk/cardano-js-sdk/commit/eb6ceb394a2e9525b65933bda1a5800eaa1cc652))
 
 ## [0.8.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.7.0...@cardano-sdk/cardano-services@0.8.0) (2023-02-17)
 
