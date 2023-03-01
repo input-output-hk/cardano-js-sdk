@@ -2261,6 +2261,42 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@blockfrost/blockfrost-js@npm:^5.2.0":
+  version: 5.2.0
+  resolution: "@blockfrost/blockfrost-js@npm:5.2.0"
+  dependencies:
+    "@blockfrost/blockfrost-utils": 2.0.0
+    "@blockfrost/openapi": 0.1.49
+    "@emurgo/cardano-serialization-lib-nodejs": ^10.2.0
+    "@emurgo/cip14-js": 3.0.1
+    bottleneck: ^2.19.5
+    form-data: ^4.0.0
+    got: ^11.8.5
+  checksum: 285a000e95c83be4d10da903f4a2a145b4c8d01ba8a3fce37e6f1b3211e97c5d1f317d923fe81dc6b8beff5e1eeee2b68728db589f8ec46eb6c00069f306bdf2
+  languageName: node
+  linkType: hard
+
+"@blockfrost/blockfrost-utils@npm:2.0.0":
+  version: 2.0.0
+  resolution: "@blockfrost/blockfrost-utils@npm:2.0.0"
+  dependencies:
+    "@emurgo/cardano-serialization-lib-nodejs": ^11.0.5
+    bech32: ^2.0.0
+    yaml: ^2.1.1
+  checksum: 51e613d14e792a957e339bfcf0e428127e659a199a4a6a3deff41751155befb1869c3d6da29afab11a2bd431dfa4839b0e812e8c38eb89b1584661a092bf8885
+  languageName: node
+  linkType: hard
+
+"@blockfrost/openapi@npm:0.1.49":
+  version: 0.1.49
+  resolution: "@blockfrost/openapi@npm:0.1.49"
+  dependencies:
+    "@redocly/openapi-cli": ^1.0.0-beta.95
+    yaml: ^2.1.3
+  checksum: cab0b3ec0677d9a82e0cb0a6b02b5e7a4d5b0ad7ba5e6bf969142e6262eacf947f94c4d0bed397fb38e9983c20b78ed66b4b1dfab7bab7d19b38605156ee693d
+  languageName: node
+  linkType: hard
+
 "@cardano-foundation/ledgerjs-hw-app-cardano@npm:^6.0.0":
   version: 6.0.0
   resolution: "@cardano-foundation/ledgerjs-hw-app-cardano@npm:6.0.0"
@@ -2326,6 +2362,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/cardano-services@workspace:packages/cardano-services"
   dependencies:
+    "@blockfrost/blockfrost-js": ^5.2.0
     "@cardano-ogmios/client": 5.6.0
     "@cardano-sdk/cardano-services-client": ^0.7.2
     "@cardano-sdk/core": ^0.9.0
@@ -3160,10 +3197,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@emurgo/cardano-serialization-lib-nodejs@npm:^10.0.4":
+"@emurgo/cardano-serialization-lib-nodejs@npm:^10.0.4, @emurgo/cardano-serialization-lib-nodejs@npm:^10.2.0":
   version: 10.2.0
   resolution: "@emurgo/cardano-serialization-lib-nodejs@npm:10.2.0"
   checksum: 4337c4b57d6c980ffa0263e9c4d1819deb25d4b70042524f4f61b24826e6aef5e316e0a29026bc53f423a2337013b33e201b18cd4abe5bc5591f3214dbeda244
+  languageName: node
+  linkType: hard
+
+"@emurgo/cardano-serialization-lib-nodejs@npm:^11.0.5":
+  version: 11.3.0
+  resolution: "@emurgo/cardano-serialization-lib-nodejs@npm:11.3.0"
+  checksum: 6126cc43d7ef9a09eb9be7476712ae5e2951a3fbec6be702bf2b3de3ae00de468e0c16dd3cb8b3d0d246824f3ec2347500a417c3819164c437d686cbf37e09bb
+  languageName: node
+  linkType: hard
+
+"@emurgo/cip14-js@npm:3.0.1":
+  version: 3.0.1
+  resolution: "@emurgo/cip14-js@npm:3.0.1"
+  dependencies:
+    bech32: 2.0.0
+    blake2b: 2.1.3
+  checksum: 9eaf3124108e8c252a745de9ef1f334ab26a32271077b00fe0ea2a06e40838dd435165dac523ebd4d851ae7a94d8c56766dabc372aabffedd36551c798c607c5
   languageName: node
   linkType: hard
 
@@ -5628,6 +5682,57 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@redocly/ajv@npm:^8.6.4":
+  version: 8.11.0
+  resolution: "@redocly/ajv@npm:8.11.0"
+  dependencies:
+    fast-deep-equal: ^3.1.1
+    json-schema-traverse: ^1.0.0
+    require-from-string: ^2.0.2
+    uri-js: ^4.2.2
+  checksum: 3e4c7a18226aefd2016628eed88a84588c49f6e721a1009081a20873f374a3d765c6a640856f6cb6bdd1732b027e3c82ea5c06d27427bc5a8af2cf8bb69bbd9b
+  languageName: node
+  linkType: hard
+
+"@redocly/openapi-cli@npm:^1.0.0-beta.95":
+  version: 1.0.0-beta.95
+  resolution: "@redocly/openapi-cli@npm:1.0.0-beta.95"
+  dependencies:
+    "@redocly/openapi-core": 1.0.0-beta.95
+    "@types/node": ^14.11.8
+    assert-node-version: ^1.0.3
+    chokidar: ^3.5.1
+    colorette: ^1.2.0
+    glob: ^7.1.6
+    glob-promise: ^3.4.0
+    handlebars: ^4.7.6
+    portfinder: ^1.0.26
+    simple-websocket: ^9.0.0
+    yargs: 17.0.1
+  bin:
+    openapi: bin/cli.js
+  checksum: 9f096facef1e8d96b6b07d76ca085debe8690f3eeaaba5d59abc7db5c247f72294bdfab14f323e881a08ddf41ac19c3b858ef5f331a12d39224a01d244810c9e
+  languageName: node
+  linkType: hard
+
+"@redocly/openapi-core@npm:1.0.0-beta.95":
+  version: 1.0.0-beta.95
+  resolution: "@redocly/openapi-core@npm:1.0.0-beta.95"
+  dependencies:
+    "@redocly/ajv": ^8.6.4
+    "@types/node": ^14.11.8
+    colorette: ^1.2.0
+    js-levenshtein: ^1.1.6
+    js-yaml: ^4.1.0
+    lodash.isequal: ^4.5.0
+    minimatch: ^3.0.4
+    node-fetch: ^2.6.1
+    pluralize: ^8.0.0
+    yaml-ast-parser: 0.0.43
+  checksum: 4862afda66d80c5aeb20cf7c3cb4554baf9fdd4eb95c848a6a5ca57a80263f5f5d483552dbc2f7b7fdfcfc4f5da1d697030d30566aa3bdc3bf4315f560fcfa5f
+  languageName: node
+  linkType: hard
+
 "@scure/base@npm:^1.1.1":
   version: 1.1.1
   resolution: "@scure/base@npm:1.1.1"
@@ -6151,6 +6256,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/glob@npm:*":
+  version: 8.1.0
+  resolution: "@types/glob@npm:8.1.0"
+  dependencies:
+    "@types/minimatch": ^5.1.2
+    "@types/node": "*"
+  checksum: 9101f3a9061e40137190f70626aa0e202369b5ec4012c3fabe6f5d229cce04772db9a94fa5a0eb39655e2e4ad105c38afbb4af56a56c0996a8c7d4fc72350e3d
+  languageName: node
+  linkType: hard
+
 "@types/glob@npm:^7.1.1":
   version: 7.2.0
   resolution: "@types/glob@npm:7.2.0"
@@ -6346,7 +6461,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/minimatch@npm:*":
+"@types/minimatch@npm:*, @types/minimatch@npm:^5.1.2":
   version: 5.1.2
   resolution: "@types/minimatch@npm:5.1.2"
   checksum: 0391a282860c7cb6fe262c12b99564732401bdaa5e395bee9ca323c312c1a0f45efbf34dce974682036e857db59a5c9b1da522f3d6055aeead7097264c8705a8
@@ -6426,6 +6541,13 @@ __metadata:
   version: 11.15.54
   resolution: "@types/node@npm:11.15.54"
   checksum: d65c15001070c5df893876bb7637024a1a412d8ccfd803c61b4ee3293aafb85d69e278cd27dc28f66c8d21018d85fa50f93ade0937a187c16c8dad23fb1598d8
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^14.11.8":
+  version: 14.18.37
+  resolution: "@types/node@npm:14.18.37"
+  checksum: d21e8c58ddd01ae069b196c2a4eaf9c9749e6666565349667334c60cfc119c1fa280234a8001157dd7ffe73501ce4f4940ca05f9d5c402c5abe78c8dca8376a6
   languageName: node
   linkType: hard
 
@@ -8347,6 +8469,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"assert-node-version@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "assert-node-version@npm:1.0.3"
+  dependencies:
+    expected-node-version: ^1.0.0
+    semver: ^5.0.3
+  checksum: 3fb6b2ff674d67cfad89c3702040929b93e8a5f65dc896c5952df364757b930c72339b3e6a6f22ed53ed39911181fc56dac7552c601103537d09e301c2513483
+  languageName: node
+  linkType: hard
+
 "assert-plus@npm:1.0.0, assert-plus@npm:^1.0.0":
   version: 1.0.0
   resolution: "assert-plus@npm:1.0.0"
@@ -8786,17 +8918,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bech32@npm:2.0.0, bech32@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "bech32@npm:2.0.0"
+  checksum: fa15acb270b59aa496734a01f9155677b478987b773bf701f465858bf1606c6a970085babd43d71ce61895f1baa594cb41a2cd1394bd2c6698f03cc2d811300e
+  languageName: node
+  linkType: hard
+
 "bech32@npm:^1.1.4":
   version: 1.1.4
   resolution: "bech32@npm:1.1.4"
   checksum: 0e98db619191548390d6f09ff68b0253ba7ae6a55db93dfdbb070ba234c1fd3308c0606fbcc95fad50437227b10011e2698b89f0181f6e7f845c499bd14d0f4b
-  languageName: node
-  linkType: hard
-
-"bech32@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "bech32@npm:2.0.0"
-  checksum: fa15acb270b59aa496734a01f9155677b478987b773bf701f465858bf1606c6a970085babd43d71ce61895f1baa594cb41a2cd1394bd2c6698f03cc2d811300e
   languageName: node
   linkType: hard
 
@@ -8973,6 +9105,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"blake2b-wasm@npm:^1.1.0":
+  version: 1.1.7
+  resolution: "blake2b-wasm@npm:1.1.7"
+  dependencies:
+    nanoassert: ^1.0.0
+  checksum: be5ebacdd25076ae5fcaf1c60c37096c85490a36ee1f8e78d5c4c2fb8ccad0fe0e22cecadba6fcf6ed7d91c1aed9c55980811fe064fafb4ccd80ac34a8a326ea
+  languageName: node
+  linkType: hard
+
 "blake2b-wasm@npm:^2.4.0":
   version: 2.4.0
   resolution: "blake2b-wasm@npm:2.4.0"
@@ -8980,6 +9121,16 @@ __metadata:
     b4a: ^1.0.1
     nanoassert: ^2.0.0
   checksum: 1839dd0693681228d81f781dd8680a6803a629ca374aed5ac02fa649ce40a67a85eb49eeb2ec6aeb7ef3ef5aa169b3579b50eabf7afa360d190338bc3e8666bd
+  languageName: node
+  linkType: hard
+
+"blake2b@npm:2.1.3":
+  version: 2.1.3
+  resolution: "blake2b@npm:2.1.3"
+  dependencies:
+    blake2b-wasm: ^1.1.0
+    nanoassert: ^1.0.0
+  checksum: e652234249cbdb3345488d52b5e76e8572b8e5333f3f0d5e716772b7c5d2142f433c3fe86130e92117329532e1d1235cdaa89f40bbca27a8ae528bef428241ef
   languageName: node
   linkType: hard
 
@@ -9051,6 +9202,13 @@ __metadata:
     cbor2json: bin/cbor2json.js
     json2cbor: bin/json2cbor.js
   checksum: 23e39557ed952a2e6e984cfc6277e714a3077c96202604a1a404149b656766ba1d3351d4a585b0f27126964fcd14aa95ff7acee83bfe947b863bd306b84876c2
+  languageName: node
+  linkType: hard
+
+"bottleneck@npm:^2.19.5":
+  version: 2.19.5
+  resolution: "bottleneck@npm:2.19.5"
+  checksum: c5eef1bbea12cef1f1405e7306e7d24860568b0f7ac5eeab706a86762b3fc65ef6d1c641c8a166e4db90f412fc5c948fc5ce8008a8cd3d28c7212ef9c3482bda
   languageName: node
   linkType: hard
 
@@ -10270,6 +10428,13 @@ __metadata:
   bin:
     color-support: bin.js
   checksum: 9b7356817670b9a13a26ca5af1c21615463b500783b739b7634a0c2047c16cef4b2865d7576875c31c3cddf9dd621fa19285e628f20198b233a5cfdda6d0793b
+  languageName: node
+  linkType: hard
+
+"colorette@npm:^1.2.0":
+  version: 1.4.0
+  resolution: "colorette@npm:1.4.0"
+  checksum: 01c3c16058b182a4ab4c126a65a75faa4d38a20fa7c845090b25453acec6c371bb2c5dceb0a2338511f17902b9d1a9af0cadd8509c9403894b79311032c256c3
   languageName: node
   linkType: hard
 
@@ -12766,6 +12931,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expected-node-version@npm:^1.0.0":
+  version: 1.0.2
+  resolution: "expected-node-version@npm:1.0.2"
+  checksum: 2d7bac9ea517cfa172d2a306aef4093c7a121d30d49646c44b50c391803705f8f5d1a6cd07f996bb05df1fdb3b6206c8021b3c6518625cbda1a7056b19f78445
+  languageName: node
+  linkType: hard
+
 "express-openapi-validator@npm:^4.13.8":
   version: 4.13.8
   resolution: "express-openapi-validator@npm:4.13.8"
@@ -13852,6 +14024,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"glob-promise@npm:^3.4.0":
+  version: 3.4.0
+  resolution: "glob-promise@npm:3.4.0"
+  dependencies:
+    "@types/glob": "*"
+  peerDependencies:
+    glob: "*"
+  checksum: 84a2c076e7581c9f8aa7a8a151ad5f9352c4118ba03c5673ecfcf540f4c53aa75f8d32fe493c2286d471dccd7a75932b9bfe97bf782564c1f4a50b9c7954e3b6
+  languageName: node
+  linkType: hard
+
 "glob-to-regexp@npm:^0.4.1":
   version: 0.4.1
   resolution: "glob-to-regexp@npm:0.4.1"
@@ -14172,7 +14355,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"handlebars@npm:^4.7.7":
+"handlebars@npm:^4.7.6, handlebars@npm:^4.7.7":
   version: 4.7.7
   resolution: "handlebars@npm:4.7.7"
   dependencies:
@@ -16198,6 +16381,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"js-levenshtein@npm:^1.1.6":
+  version: 1.1.6
+  resolution: "js-levenshtein@npm:1.1.6"
+  checksum: 409f052a7f1141be4058d97da7860e08efd97fc588b7a4c5cfa0548bc04f6d576644dae65ab630266dff685d56fb90d494e03d4d79cb484c287746b4f1bf0694
+  languageName: node
+  linkType: hard
+
 "js-tokens@npm:^4.0.0":
   version: 4.0.0
   resolution: "js-tokens@npm:4.0.0"
@@ -18186,7 +18376,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mkdirp@npm:^0.5.1, mkdirp@npm:^0.5.4, mkdirp@npm:~0.5.1":
+"mkdirp@npm:^0.5.1, mkdirp@npm:^0.5.4, mkdirp@npm:^0.5.6, mkdirp@npm:~0.5.1":
   version: 0.5.6
   resolution: "mkdirp@npm:0.5.6"
   dependencies:
@@ -18448,6 +18638,13 @@ __metadata:
   dependencies:
     node-gyp: latest
   checksum: ec609aeaf7e68b76592a3ba96b372aa7f5df5b056c1e37410b0f1deefbab5a57a922061e2c5b369bae9c7c6b5e6eecf4ad2dac8833a1a7d3a751e0a7c7f849ed
+  languageName: node
+  linkType: hard
+
+"nanoassert@npm:^1.0.0":
+  version: 1.1.0
+  resolution: "nanoassert@npm:1.1.0"
+  checksum: f360fe639db8edc422de9f5a8a7d384ba9c11e9c6fac149f7ad3b0a94e4ec9d5aa44ce55b3e4c7682658efad792604fc96c336b0e80a3590744104ba58af80c7
   languageName: node
   linkType: hard
 
@@ -20540,6 +20737,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"portfinder@npm:^1.0.26":
+  version: 1.0.32
+  resolution: "portfinder@npm:1.0.32"
+  dependencies:
+    async: ^2.6.4
+    debug: ^3.2.7
+    mkdirp: ^0.5.6
+  checksum: 116b4aed1b9e16f6d5503823d966d9ffd41b1c2339e27f54c06cd2f3015a9d8ef53e2a53b57bc0a25af0885977b692007353aa28f9a0a98a44335cb50487240d
+  languageName: node
+  linkType: hard
+
 "postcss-selector-parser@npm:^6.0.10":
   version: 6.0.11
   resolution: "postcss-selector-parser@npm:6.0.11"
@@ -22238,7 +22446,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:2 || 3 || 4 || 5, semver@npm:^5.4.1, semver@npm:^5.5.0, semver@npm:^5.6.0":
+"semver@npm:2 || 3 || 4 || 5, semver@npm:^5.0.3, semver@npm:^5.4.1, semver@npm:^5.5.0, semver@npm:^5.6.0":
   version: 5.7.1
   resolution: "semver@npm:5.7.1"
   bin:
@@ -22503,6 +22711,19 @@ __metadata:
     once: ^1.3.1
     simple-concat: ^1.0.0
   checksum: e4132fd27cf7af230d853fa45c1b8ce900cb430dd0a3c6d3829649fe4f2b26574c803698076c4006450efb0fad2ba8c5455fbb5755d4b0a5ec42d4f12b31d27e
+  languageName: node
+  linkType: hard
+
+"simple-websocket@npm:^9.0.0":
+  version: 9.1.0
+  resolution: "simple-websocket@npm:9.1.0"
+  dependencies:
+    debug: ^4.3.1
+    queue-microtask: ^1.2.2
+    randombytes: ^2.1.0
+    readable-stream: ^3.6.0
+    ws: ^7.4.2
+  checksum: 458af3cdf1dadd4eed4724f432fdbe2abd8432b4ea49064f3a9c2a98c7539a65a94d0aa24cd3140ac87274f1f16706287c433773e93696f8b82e67c6adcaaae9
   languageName: node
   linkType: hard
 
@@ -25570,7 +25791,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ws@npm:^7.2.0, ws@npm:^7.4.6, ws@npm:^7.5.7":
+"ws@npm:^7.2.0, ws@npm:^7.4.2, ws@npm:^7.4.6, ws@npm:^7.5.7":
   version: 7.5.9
   resolution: "ws@npm:7.5.9"
   peerDependencies:
@@ -25733,6 +25954,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"yaml-ast-parser@npm:0.0.43":
+  version: 0.0.43
+  resolution: "yaml-ast-parser@npm:0.0.43"
+  checksum: fb5df4c067b6ccbd00953a46faf6ff27f0e290d623c712dc41f330251118f110e22cfd184bbff498bd969cbcda3cd27e0f9d0adb9e6d90eb60ccafc0d8e28077
+  languageName: node
+  linkType: hard
+
 "yaml@npm:^1.10.0":
   version: 1.10.2
   resolution: "yaml@npm:1.10.2"
@@ -25744,6 +25972,13 @@ __metadata:
   version: 2.1.3
   resolution: "yaml@npm:2.1.3"
   checksum: 91316062324a93f9cb547469092392e7d004ff8f70c40fecb420f042a4870b2181557350da56c92f07bd44b8f7a252b0be26e6ade1f548e1f4351bdd01c9d3c7
+  languageName: node
+  linkType: hard
+
+"yaml@npm:^2.1.3":
+  version: 2.2.1
+  resolution: "yaml@npm:2.2.1"
+  checksum: 84f68cbe462d5da4e7ded4a8bded949ffa912bc264472e5a684c3d45b22d8f73a3019963a32164023bdf3d83cfb6f5b58ff7b2b10ef5b717c630f40bd6369a23
   languageName: node
   linkType: hard
 
@@ -25809,6 +26044,21 @@ __metadata:
     y18n: ^5.0.5
     yargs-parser: ^20.2.2
   checksum: b14afbb51e3251a204d81937c86a7e9d4bdbf9a2bcee38226c900d00f522969ab675703bee2a6f99f8e20103f608382936034e64d921b74df82b63c07c5e8f59
+  languageName: node
+  linkType: hard
+
+"yargs@npm:17.0.1":
+  version: 17.0.1
+  resolution: "yargs@npm:17.0.1"
+  dependencies:
+    cliui: ^7.0.2
+    escalade: ^3.1.1
+    get-caller-file: ^2.0.5
+    require-directory: ^2.1.1
+    string-width: ^4.2.0
+    y18n: ^5.0.5
+    yargs-parser: ^20.2.2
+  checksum: 4ffffa5a82647e5d07840b64bed88c365b901d3d4a4c51745dddb10d177902d85014026d7224aae18c42df9ca3f75a41c5aff556e5342e2f8ffc5177d149cd17
   languageName: node
   linkType: hard
 

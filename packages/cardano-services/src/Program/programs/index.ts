@@ -1,3 +1,4 @@
+export * from './blockfrostWorker';
 export * from './providerServer';
 export * from './txWorker';
 
@@ -6,6 +7,7 @@ export * from './txWorker';
  */
 
 export enum Programs {
+  BlockfrostWorker = 'Blockfrost worker',
   ProviderServer = 'Provider server',
   RabbitmqWorker = 'RabbitMQ worker'
 }

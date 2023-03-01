@@ -1,13 +1,6 @@
 /* eslint-disable sonarjs/no-nested-template-literals */
 import {
-  Cardano,
-  MultipleChoiceSearchFilter,
-  ProviderError,
-  ProviderFailure,
-  QueryStakePoolsArgs,
-  StakePoolStats
-} from '@cardano-sdk/core';
-import {
+  BlockfrostPoolMetricsModel,
   EpochModel,
   EpochRewardModel,
   OrderByOptions,
@@ -24,10 +17,19 @@ import {
   StakePoolStatsModel,
   SubQuery
 } from './types';
+import {
+  Cardano,
+  MultipleChoiceSearchFilter,
+  ProviderError,
+  ProviderFailure,
+  QueryStakePoolsArgs,
+  StakePoolStats
+} from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { Pool, QueryResult } from 'pg';
 import {
   mapAddressOwner,
+  mapBlockfrostPoolMetrics,
   mapEpoch,
   mapEpochReward,
   mapPoolAPY,
@@ -41,6 +43,7 @@ import {
 } from './mappers';
 import Queries, {
   addSentenceToQuery,
+  blockfrostQuery,
   buildOrQueryFromClauses,
   findLastEpoch,
   findPoolStats,
@@ -107,14 +110,14 @@ export class StakePoolBuilder {
     return result.rows.map(mapPoolAPY);
   }
 
-  public async queryPoolData(updatesIds: number[], options?: QueryStakePoolsArgs) {
+  public async queryPoolData(updatesIds: number[], useBlockfrost: boolean, options?: QueryStakePoolsArgs) {
     this.#logger.debug('About to query pool data');
     const defaultSort: OrderByOptions[] = [
       { field: 'name', order: 'asc' },
       { field: 'pool_id', order: 'asc' }
     ];
     const queryWithSortAndPagination = withPagination(
-      withSort(Queries.findPoolsData, options?.sort, defaultSort),
+      withSort(useBlockfrost ? Queries.findBlockfrostPoolsData : Queries.findPoolsData, options?.sort, defaultSort),
       options?.pagination
     );
     const result: QueryResult<PoolDataModel> = await this.#db.query(queryWithSortAndPagination, [updatesIds]);
@@ -128,8 +131,23 @@ export class StakePoolBuilder {
     return result.rows.length > 0 ? result.rows.map(mapPoolUpdate) : [];
   }
 
-  public async queryPoolMetrics(hashesIds: number[], totalStake: string, options?: QueryStakePoolsArgs) {
+  public async queryPoolMetrics(
+    hashesIds: number[],
+    totalStake: string,
+    useBlockfrost: boolean,
+    options?: QueryStakePoolsArgs
+  ) {
     this.#logger.debug('About to query pool metrics');
+
+    if (useBlockfrost) {
+      const queryWithSortAndPagination = withPagination(
+        withSort(Queries.findBlockfrostPoolsMetrics, options?.sort, [{ field: 'saturation', order: 'desc' }]),
+        options?.pagination
+      );
+      const result = await this.#db.query<BlockfrostPoolMetricsModel>(queryWithSortAndPagination, [hashesIds]);
+      return result.rows.map(mapBlockfrostPoolMetrics);
+    }
+
     const queryWithSortAndPagination = withPagination(
       withSort(Queries.findPoolsMetrics, options?.sort, [{ field: 'saturation', order: 'desc' }]),
       options?.pagination
@@ -282,5 +300,42 @@ export class StakePoolBuilder {
     const poolStats = result.rows[0];
     if (!poolStats) throw new ProviderError(ProviderFailure.Unknown, null, "Couldn't fetch pool stats");
     return mapPoolStats(poolStats);
+  }
+
+  public buildBlockfrostQuery(filters: QueryStakePoolsArgs['filters']): { params: string[]; query: string } {
+    const query = blockfrostQuery.SELECT;
+    let params: string[] = [];
+
+    if (!filters) return { params, query };
+
+    const { _condition, identifier, pledgeMet, status } = filters;
+    const clauses: string[] = [query];
+    const whereConditions: string[] = [];
+
+    if (identifier || pledgeMet !== undefined) clauses.push(blockfrostQuery.identifierOrPledge.JOIN);
+
+    if (identifier) {
+      let where: string;
+      ({ params, where } = getIdentifierWhereClause(filters!.identifier!));
+
+      clauses.push(blockfrostQuery.identifier.JOIN);
+      whereConditions.push(where);
+    }
+
+    if (pledgeMet !== undefined || status) clauses.push(blockfrostQuery.pledgeOrStatus.JOIN);
+
+    if (pledgeMet !== undefined) whereConditions.push(blockfrostQuery.pledge.WHERE(pledgeMet));
+
+    if (status) whereConditions.push(blockfrostQuery.status.WHERE(status));
+
+    // this happens when an empty object is provided as filter parameter
+    if (whereConditions.length === 0) return { params, query };
+
+    return {
+      params,
+      query: `${clauses.join('')}
+WHERE
+  ${whereConditions.join(` ${_condition === 'or' ? 'OR' : 'AND'}\n  `)}`
+    };
   }
 }

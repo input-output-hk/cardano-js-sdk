@@ -74,3 +74,15 @@ CMD ["node", "dist/cjs/cli.js", "start-provider-server"]
 FROM cardano-services as worker
 WORKDIR /app/packages/cardano-services
 CMD ["node", "dist/cjs/cli.js", "start-worker"]
+
+FROM cardano-services as blockfrost-worker
+ENV \
+  API_URL="http://0.0.0.0:3000" \
+  BLOCKFROST_API_FILE=/run/secrets/blockfrost_key \
+  POSTGRES_DB_FILE=/run/secrets/postgres_db \
+  POSTGRES_HOST=postgres \
+  POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password \
+  POSTGRES_PORT=5432 \
+  POSTGRES_USER_FILE=/run/secrets/postgres_user
+WORKDIR /app/packages/cardano-services
+CMD ["node", "dist/cjs/cli.js", "start-blockfrost-worker"]

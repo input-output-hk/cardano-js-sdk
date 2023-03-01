@@ -227,7 +227,7 @@ describe('StakePoolHttpService', () => {
     describe('with DbSyncStakePoolProvider', () => {
       beforeAll(async () => {
         stakePoolProvider = new DbSyncStakePoolProvider(
-          { paginationPageSizeLimit: pagination.limit },
+          { paginationPageSizeLimit: pagination.limit, useBlockfrost: false },
           { cache, cardanoNode, db, epochMonitor, genesisData, logger, metadataService }
         );
         service = new StakePoolHttpService({ logger, stakePoolProvider });

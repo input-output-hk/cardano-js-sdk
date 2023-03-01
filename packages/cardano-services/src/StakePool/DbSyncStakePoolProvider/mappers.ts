@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Cardano, StakePoolStats } from '@cardano-sdk/core';
 import {
+  BlockfrostPoolMetrics,
+  BlockfrostPoolMetricsModel,
   Epoch,
   EpochModel,
   EpochReward,
@@ -26,6 +27,7 @@ import {
   StakePoolResults,
   StakePoolStatsModel
 } from './types';
+import { Cardano, StakePoolStats } from '@cardano-sdk/core';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { bufferToHexString, isNotNil } from '@cardano-sdk/util';
 import Fraction from 'fraction.js';
@@ -86,6 +88,7 @@ export const calcNodeMetricsValues = (metrics: PoolMetrics['metrics'], apy: numb
 export const toStakePoolResults = (
   poolHashIds: number[],
   fromCache: HashIdStakePoolMap,
+  useBlockfrost: boolean,
   {
     poolOwners,
     poolDatas,
@@ -104,6 +107,7 @@ export const toStakePoolResults = (
     poolsToCache,
     results: {
       pageResults: poolHashIds
+        // eslint-disable-next-line complexity
         .map((hashId) => {
           const poolData = poolDatas.find((data) => data.hashId === hashId);
           if (!poolData) return;
@@ -118,7 +122,10 @@ export const toStakePoolResults = (
           const apy = poolAPYs.find((pool) => pool.hashId === hashId)?.apy;
           const registrations = poolRegistrations.filter((r) => r.hashId === poolData.hashId);
           const retirements = poolRetirements.filter((r) => r.hashId === poolData.hashId);
-          const partialMetrics = poolMetrics.find((metric) => metric.hashId === poolData.hashId)?.metrics;
+          const poolMetric = (poolMetrics as BlockfrostPoolMetrics[]).find(
+            (metric) => metric.hashId === poolData.hashId
+          );
+          const partialMetrics = poolMetric?.metrics;
           let metrics: Cardano.StakePoolMetrics | undefined;
           if (partialMetrics) {
             metrics = calcNodeMetricsValues(partialMetrics, apy!);
@@ -130,16 +137,28 @@ export const toStakePoolResults = (
             id: poolData.id,
             margin: poolData.margin,
             metrics: metrics ? metrics : ({} as Cardano.StakePoolMetrics),
-            owners: poolOwners.filter((o) => o.hashId === poolData.hashId).map((o) => o.address),
             pledge: poolData.pledge,
             relays: poolRelays.filter((r) => r.updateId === poolData.updateId).map((r) => r.relay),
-            rewardAccount: poolData.rewardAccount,
-            status: getPoolStatus(registrations[0], lastEpochNo, retirements[0]),
-            transactions: {
-              registration: registrations.map((r) => r.transactionId),
-              retirement: retirements.map((r) => r.transactionId)
-            },
-            vrf: poolData.vrfKeyHash
+            vrf: poolData.vrfKeyHash,
+            ...(useBlockfrost
+              ? {
+                  owners: poolMetric?.owners || [],
+                  rewardAccount: poolMetric?.rewardAccount || ('' as Cardano.RewardAccount),
+                  status: poolMetric?.status || Cardano.StakePoolStatus.Retired,
+                  transactions: {
+                    registration: poolMetric?.registration || [],
+                    retirement: poolMetric?.retirement || []
+                  }
+                }
+              : {
+                  owners: poolOwners.filter((o) => o.hashId === poolData.hashId).map((o) => o.address),
+                  rewardAccount: poolData.rewardAccount,
+                  status: getPoolStatus(registrations[0], lastEpochNo, retirements[0]),
+                  transactions: {
+                    registration: registrations.map((r) => r.transactionId),
+                    retirement: retirements.map((r) => r.transactionId)
+                  }
+                })
           };
           if (poolData.metadata) coreStakePool.metadata = poolData.metadata;
           if (poolData.metadataJson) coreStakePool.metadataJson = poolData.metadataJson;
@@ -270,6 +289,20 @@ export const mapPoolMetrics = (poolMetricsModel: PoolMetricsModel): PoolMetrics 
     saturation: Cardano.Percent(Number.parseFloat(poolMetricsModel.saturation))
   }
 });
+
+export const mapBlockfrostPoolMetrics = (poolMetricsModel: BlockfrostPoolMetricsModel): BlockfrostPoolMetrics => {
+  const { extra, reward_address, status } = poolMetricsModel;
+  const [owners, registration, retirement] = JSON.parse(extra);
+
+  return {
+    ...mapPoolMetrics(poolMetricsModel),
+    owners,
+    registration,
+    retirement,
+    rewardAccount: reward_address as unknown as Cardano.RewardAccount,
+    status: status as unknown as Cardano.StakePoolStatus
+  };
+};
 
 export const mapPoolStats = (poolStats: StakePoolStatsModel): StakePoolStats => ({
   qty: { active: Number(poolStats.active), retired: Number(poolStats.retired), retiring: Number(poolStats.retiring) }

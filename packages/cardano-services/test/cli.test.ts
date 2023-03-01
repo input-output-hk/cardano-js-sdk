@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable max-len */
@@ -1747,7 +1748,102 @@ describe('CLI', () => {
     });
   });
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
+  describe('start-blockfrost-worker', () => {
+    const commonArgs = ['start-blockfrost-worker', '--logger-min-severity', 'info', '--dry-run', 'true'];
+    let port: number;
+    let proc: ChildProcess;
+
+    beforeAll(async () => {
+      port = await getRandomPort();
+    });
+
+    afterEach((done) => {
+      if (proc?.kill()) proc.on('close', () => done());
+      else done();
+    });
+
+    // Tests without any assertion fail if they get timeout
+    it('exits with code 1 without api key', (done) => {
+      expect.assertions(2);
+      proc = fork(exePath, commonArgs, { env: {}, stdio: 'pipe' });
+      proc.stderr!.on('data', (data) =>
+        expect(data.toString()).toMatch(
+          'MissingProgramOption: Blockfrost worker requires the Blockfrost API Key file path or Blockfrost API Key program option'
+        )
+      );
+      proc.on('exit', (code) => {
+        expect(code).toBe(1);
+        done();
+      });
+    });
+
+    it('exits with code 1 without network', (done) => {
+      expect.assertions(2);
+      proc = fork(exePath, [...commonArgs, '--blockfrost-api-key', 'abc'], { env: {}, stdio: 'pipe' });
+      proc.stderr!.on('data', (data) =>
+        expect(data.toString()).toMatch(
+          'MissingProgramOption: Blockfrost worker requires the network to run against program option'
+        )
+      );
+      proc.on('exit', (code) => {
+        expect(code).toBe(1);
+        done();
+      });
+    });
+
+    it('exits with code 1 with wrong network', (done) => {
+      expect.assertions(2);
+      proc = fork(exePath, [...commonArgs, '--blockfrost-api-key', 'abc', '--network', 'none'], {
+        env: {},
+        stdio: 'pipe'
+      });
+      proc.stderr!.on('data', (data) => expect(data.toString()).toMatch('Error: Unknown network: none'));
+      proc.on('exit', (code) => {
+        expect(code).toBe(1);
+        done();
+      });
+    });
+
+    it('exits with code 1 without db connection string', (done) => {
+      expect.assertions(2);
+      proc = fork(exePath, [...commonArgs, '--blockfrost-api-key', 'abc', '--network', 'mainnet'], {
+        env: {},
+        stdio: 'pipe'
+      });
+      proc.stderr!.on('data', (data) =>
+        expect(data.toString()).toMatch(
+          'MissingProgramOption: Blockfrost worker requires the PostgreSQL Connection string or Postgres SRV service name, db, user and password program option'
+        )
+      );
+      proc.on('exit', (code) => {
+        expect(code).toBe(1);
+        done();
+      });
+    });
+
+    it('dry run', (done) => {
+      proc = fork(
+        exePath,
+        [
+          ...commonArgs,
+          '--blockfrost-api-key',
+          'abc',
+          '--network',
+          'mainnet',
+          '--postgres-connection-string',
+          process.env.POSTGRES_CONNECTION_STRING!,
+          '--api-url',
+          `http://localhost:${port}/`
+        ],
+        { env: {}, stdio: 'pipe' }
+      );
+      proc.stdout!.on('data', (data) => {
+        // eslint-disable-next-line unicorn/prefer-regexp-test
+        if (data.toString('utf8').match(/Sleeping for \d+ milliseconds to start next run/)) done();
+      });
+    });
+  });
+
   describe('start-worker', () => {
     let commonArgs: string[];
     let commonArgsWithServiceDiscovery: string[];
@@ -1819,7 +1915,6 @@ describe('CLI', () => {
     });
 
     // Tests without any assertion fail if they get timeout
-    // eslint-disable-next-line sonarjs/cognitive-complexity
     describe('cli:start-worker with a working RabbitMQ server', () => {
       describe('transaction are actually submitted', () => {
         it('submits transactions using CLI options', async () => {

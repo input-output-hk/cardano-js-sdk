@@ -223,6 +223,26 @@ LEFT JOIN owners_total_utxos otu ON
 WHERE id = ANY($1)
 `;
 
+export const findBlockfrostPoolsMetrics = `
+SELECT
+  COALESCE(blocks_created, 0) AS blocks_created,
+  COALESCE(delegators, 0) AS delegators,
+  COALESCE(active_stake, 0) AS active_stake,
+  COALESCE(live_stake, 0) AS live_stake,
+  COALESCE(live_pledge, 0) AS live_pledge,
+  COALESCE(saturation, 0) AS saturation,
+  COALESCE(active_stake / NULLIF(live_stake, 0), 0) AS active_stake_percentage,
+  COALESCE(reward_address, '') AS reward_address,
+  COALESCE(extra, '[[],[],[]]') AS extra,
+  COALESCE(status, 'retired') AS status,
+  pool_hash_id
+FROM pool_hash
+LEFT JOIN blockfrost.pool_metric ON
+  pool_hash_id = id
+WHERE
+  id = ANY($1)
+`;
+
 const epochRewardsSubqueries = (epochLength: number, limit?: number) => `
 WITH epochs AS (
   SELECT
@@ -601,6 +621,30 @@ LEFT JOIN pool_offline_data pod
 WHERE pu.id = ANY($1)
 `;
 
+export const findBlockfrostPoolsData = `
+SELECT
+  pu.hash_id,
+  ph.hash_raw AS pool_hash,
+  pu.id AS update_id,
+  ph.view AS pool_id,
+  pu.reward_addr_id,
+  pu.pledge,
+  pu.fixed_cost,
+  pu.margin,
+  pu.vrf_key_hash,
+  metadata.url AS metadata_url,
+  metadata.hash AS metadata_hash,
+  pod.json AS offline_data
+FROM pool_update pu
+JOIN pool_hash ph ON
+  ph.id = pu.hash_id
+LEFT JOIN pool_metadata_ref metadata
+  ON metadata.id = pu.meta_id
+LEFT JOIN pool_offline_data pod
+  ON metadata.id = pod.pmr_id
+WHERE pu.id = ANY($1)
+`;
+
 const toCaseInsensitiveParam = (_array: string[]) => `${_array.join('|')}`;
 
 const toSimilarToString = (_array: string[]) => `%(${_array.join('|')})%`;
@@ -789,10 +833,46 @@ export const withSort = (query: string, sort?: QueryStakePoolsArgs['sort'], defa
   }
 };
 
+export const blockfrostQuery = {
+  SELECT: `
+WITH pool_updates AS (
+  SELECT
+    hash_id,
+    MAX(id) AS update_id
+  FROM pool_update
+  GROUP BY hash_id
+)
+SELECT
+  ph.id,
+  pu.update_id
+FROM pool_hash ph
+JOIN pool_updates pu ON
+  pu.hash_id = ph.id`,
+  identifier: {
+    JOIN: `
+LEFT JOIN pool_offline_data pod ON
+  pmr_id = meta_id`
+  },
+  identifierOrPledge: {
+    JOIN: `
+JOIN pool_update pl ON
+  pl.id = pu.update_id`
+  },
+  pledge: { WHERE: (pledgeMet: boolean) => `live_pledge ${pledgeMet ? '>=' : '<'} pledge` },
+  pledgeOrStatus: {
+    JOIN: `
+LEFT JOIN blockfrost.pool_metric pm ON
+  pm.pool_hash_id = ph.id`
+  },
+  status: { WHERE: (status: Cardano.StakePoolStatus[]) => `(${status.map((_) => `status = '${_}'`).join(' OR ')})` }
+} as const;
+
 const Queries = {
   IDENTIFIER_QUERY,
   POOLS_WITH_PLEDGE_MET,
   STATUS_QUERY,
+  findBlockfrostPoolsData,
+  findBlockfrostPoolsMetrics,
   findLastEpoch,
   findLastEpochWithData,
   findPoolAPY,
