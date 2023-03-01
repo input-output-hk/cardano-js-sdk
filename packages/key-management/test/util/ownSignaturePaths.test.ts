@@ -62,7 +62,7 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
   });
 
   it(
-    'returns stake key derivation path when a StakeKeyRegistration' +
+    'doesnt returns stake key derivation path when a StakeKeyRegistration' +
       // eslint-disable-next-line sonarjs/no-duplicate-string
       ' certificate with the wallet stake key hash is present',
     async () => {
@@ -75,10 +75,6 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
         {
           index: 0,
           role: KeyRole.External
-        },
-        {
-          index: 0,
-          role: KeyRole.Stake
         }
       ]);
     }
