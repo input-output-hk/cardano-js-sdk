@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.9.0...@cardano-sdk/core@0.10.0-nightly.0) (2023-03-02)
+
+### ⚠ BREAKING CHANGES
+
+- Alonzo transaction outputs will now contain a datumHash field, carrying the datum hash digest. However, they will also contain a datum field with the exact same value for backward compatibility reason. In Babbage however, transaction outputs will carry either datum or datumHash depending on the case; and datum will only contain inline datums.
+
+### Features
+
+- added new babbage era types in Transactions and Outputs ([917b2a4](https://github.com/input-output-hk/cardano-js-sdk/commit/917b2a43319ecedf8cd8ef72fbcdecc04e010d8e))
+- dbSyncUtxoProvider now returns the new Babbage fields in the UTXO when present ([ad8184b](https://github.com/input-output-hk/cardano-js-sdk/commit/ad8184bcf9bae92a386c36175f4a773637faf8eb))
+- rewards history limit default ([8c32be8](https://github.com/input-output-hk/cardano-js-sdk/commit/8c32be88a9edd3ed82a34c75d33a7a428ecc3b7c))
+
 ## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.8.0...@cardano-sdk/core@0.9.0) (2023-03-01)
 
 ### ⚠ BREAKING CHANGES
