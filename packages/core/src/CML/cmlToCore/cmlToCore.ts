@@ -490,6 +490,7 @@ export const newTx = (cslTx: CML.Transaction): Cardano.Tx =>
       auxiliaryData: txAuxiliaryData(auxiliary_data),
       body: txBody(scope.manage(cslTx.body())),
       id: transactionHash,
+      isValid: cslTx.is_valid(),
       witness: txWitnessSet(witnessSet)
     };
   });

@@ -126,6 +126,13 @@ export interface Tx<TBody extends TxBody = TxBody> {
   body: TBody;
   witness: Witness;
   auxiliaryData?: AuxiliaryData;
+  /**
+   * Transactions containing Plutus scripts that are expected to fail validation can still be submitted if
+   * this value is set to false.
+   *
+   * Remark: Sending transactions with invalid scripts will cause the collateral of the transaction to be lost.
+   */
+  isValid?: boolean;
 }
 
 export interface OnChainTx<TBody extends TxBody = TxBody> extends Omit<Tx<TBody>, 'isValid'> {

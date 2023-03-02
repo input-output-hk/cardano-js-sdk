@@ -33,6 +33,7 @@ export interface InitializeTxProps extends TxProps {
 
 export interface FinalizeTxProps extends TxProps {
   tx: Cardano.TxBodyWithHash;
+  isValid?: boolean;
 }
 
 export type Assets = Map<Cardano.AssetId, Asset.AssetInfo>;

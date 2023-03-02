@@ -484,6 +484,7 @@ export class SingleAddressWallet implements ObservableWallet {
       auxiliaryData: props.auxiliaryData,
       body: props.tx.body,
       id: props.tx.hash,
+      isValid: props.isValid,
       witness: {
         ...props.witness,
         scripts: props.scripts,
