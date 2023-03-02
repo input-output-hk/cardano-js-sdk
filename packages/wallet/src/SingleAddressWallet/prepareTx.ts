@@ -62,10 +62,10 @@ export const createTxPreparer =
               return await firstValueFrom(
                 signer.stubFinalizeTx({
                   auxiliaryData: props.auxiliaryData,
-                  extraSigners: props.extraSigners,
                   scripts: props.scripts,
                   signingOptions: props.signingOptions,
-                  tx: txInternals
+                  tx: txInternals,
+                  witness: props.witness
                 })
               );
             },

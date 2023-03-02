@@ -476,16 +476,19 @@ export class SingleAddressWallet implements ObservableWallet {
           props.tx.body,
           addresses,
           this.util,
-          props.extraSigners,
+          props.witness?.extraSigners,
           props.signingOptions
         )
-      : await this.#getSignatures(props.tx, props.extraSigners, props.signingOptions);
+      : await this.#getSignatures(props.tx, props.witness?.extraSigners, props.signingOptions);
     return {
       auxiliaryData: props.auxiliaryData,
       body: props.tx.body,
       id: props.tx.hash,
-      // TODO: add support for the rest of the witness properties
-      witness: { scripts: props.scripts, signatures }
+      witness: {
+        ...props.witness,
+        scripts: props.scripts,
+        signatures
+      }
     };
   }
 

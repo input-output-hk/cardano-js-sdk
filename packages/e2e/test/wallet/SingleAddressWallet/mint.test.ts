@@ -1,10 +1,15 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { Cardano, nativeScriptPolicyId } from '@cardano-sdk/core';
+import {
+  FinalizeTxProps,
+  InitializeTxProps,
+  SingleAddressWallet,
+} from '@cardano-sdk/wallet';
+import { isNotNil } from '@cardano-sdk/util';
 import { KeyRole, util } from '@cardano-sdk/key-management';
-import { SingleAddressWallet } from '@cardano-sdk/wallet';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { createStandaloneKeyAgent, submitAndConfirm, walletReady } from '../../util';
-import { filter, firstValueFrom } from 'rxjs';
+import { filter, firstValueFrom, map, take } from 'rxjs';
 import { getEnv, getWallet, walletVariables } from '../../../src';
 
 const env = getEnv(walletVariables);
@@ -58,8 +63,7 @@ describe('SingleAddressWallet/mint', () => {
 
     const walletAddress = (await firstValueFrom(wallet.addresses$))[0].address;
 
-    const txProps = {
-      extraSigners: [alicePolicySigner],
+    const txProps: InitializeTxProps = {
       mint: tokens,
       outputs: new Set([
         {
@@ -70,18 +74,31 @@ describe('SingleAddressWallet/mint', () => {
           }
         }
       ]),
-      scripts: [policyScript]
+      scripts: [policyScript],
+      witness: { extraSigners: [alicePolicySigner] }
     };
 
     const unsignedTx = await wallet.initializeTx(txProps);
 
-    const finalizeProps = {
-      extraSigners: [alicePolicySigner],
+    const finalizeProps: FinalizeTxProps = {
       scripts: [policyScript],
-      tx: unsignedTx
+      tx: unsignedTx,
+      witness: { extraSigners: [alicePolicySigner] }
     };
 
-    await submitAndConfirm(wallet, await wallet.finalizeTx(finalizeProps));
+    const signedTx = await wallet.finalizeTx(finalizeProps);
+    await submitAndConfirm(wallet, signedTx);
+
+    // Search chain history to see if the transaction is there.
+    const txFoundInHistory = await firstValueFrom(
+      wallet.transactions.history$.pipe(
+        map((txs) => txs.find((tx) => tx.id === signedTx.id)),
+        filter(isNotNil),
+        take(1)
+      )
+    );
+
+    expect(txFoundInHistory.id).toEqual(signedTx.id);
 
     // Wait until wallet is aware of the minted token.
     const value = await firstValueFrom(
@@ -91,5 +108,6 @@ describe('SingleAddressWallet/mint', () => {
     expect(value).toBeDefined();
     expect(value!.assets!.has(assetId)).toBeTruthy();
     expect(value!.assets!.get(assetId)).toBe(1n);
+    expect(txFoundInHistory.inputSource).toBe(Cardano.InputSource.inputs);
   });
 });

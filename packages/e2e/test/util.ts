@@ -19,7 +19,7 @@ import {
   timeout
 } from 'rxjs';
 import { InMemoryKeyAgent } from '@cardano-sdk/key-management';
-import { ObservableWallet, SignedTx, SingleAddressWallet, buildTx } from '@cardano-sdk/wallet';
+import { InitializeTxProps, ObservableWallet, SignedTx, SingleAddressWallet, buildTx } from '@cardano-sdk/wallet';
 import { TestWallet, faucetProviderFactory, getEnv, networkInfoProviderFactory, walletVariables } from '../src';
 import { assertTxIsValid } from '../../wallet/test/util';
 import { logger } from '@cardano-sdk/util-dev';
@@ -222,7 +222,7 @@ export const getTxConfirmationEpoch = async (wallet: SingleAddressWallet, tx: Ca
  */
 export const submitCertificate = async (certificate: Cardano.Certificate, wallet: TestWallet) => {
   const walletAddress = (await firstValueFrom(wallet.wallet.addresses$))[0].address;
-  const txProps = {
+  const txProps: InitializeTxProps = {
     certificates: [certificate],
     outputs: new Set([{ address: walletAddress, value: { coins: 3_000_000n } }])
   };

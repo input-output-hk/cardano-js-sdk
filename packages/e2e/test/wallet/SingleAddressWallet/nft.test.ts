@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { Cardano, metadatum, nativeScriptPolicyId } from '@cardano-sdk/core';
+import { FinalizeTxProps, InitializeTxProps, SingleAddressWallet } from '@cardano-sdk/wallet';
 import { KeyRole, TransactionSigner, util } from '@cardano-sdk/key-management';
-import { SingleAddressWallet } from '@cardano-sdk/wallet';
 import { combineLatest, filter, firstValueFrom, map } from 'rxjs';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { createStandaloneKeyAgent, submitAndConfirm, walletReady } from '../../util';
@@ -124,9 +124,8 @@ describe('SingleAddressWallet.assets/nft', () => {
       }
     };
 
-    const txProps = {
+    const txProps: InitializeTxProps = {
       auxiliaryData,
-      extraSigners: [policySigner],
       mint: tokens,
       outputs: new Set([
         {
@@ -137,16 +136,17 @@ describe('SingleAddressWallet.assets/nft', () => {
           }
         }
       ]),
-      scripts: [policyScript]
+      scripts: [policyScript],
+      witness: { extraSigners: [policySigner] }
     };
 
     const unsignedTx = await wallet.initializeTx(txProps);
 
-    const finalizeProps = {
+    const finalizeProps: FinalizeTxProps = {
       auxiliaryData,
-      extraSigners: [policySigner],
       scripts: [policyScript],
-      tx: unsignedTx
+      tx: unsignedTx,
+      witness: { extraSigners: [policySigner] }
     };
 
     const signedTx = await wallet.finalizeTx(finalizeProps);
@@ -246,8 +246,7 @@ describe('SingleAddressWallet.assets/nft', () => {
     const availableBalance = await firstValueFrom(wallet.balance.utxo.available$);
     const assetBalance = availableBalance.assets!.get(assetIds[TOKEN_BURN_INDEX])!;
     expect(assetBalance).toBeGreaterThan(0n);
-    const txProps = {
-      extraSigners: [policySigner],
+    const txProps: InitializeTxProps = {
       mint: new Map([[assetIds[TOKEN_BURN_INDEX], -assetBalance]]),
       outputs: new Set([
         {
@@ -257,15 +256,16 @@ describe('SingleAddressWallet.assets/nft', () => {
           }
         }
       ]),
-      scripts: [policyScript]
+      scripts: [policyScript],
+      witness: { extraSigners: [policySigner] }
     };
 
     const unsignedTx = await wallet.initializeTx(txProps);
 
-    const finalizeProps = {
-      extraSigners: [policySigner],
+    const finalizeProps: FinalizeTxProps = {
       scripts: [policyScript],
-      tx: unsignedTx
+      tx: unsignedTx,
+      witness: { extraSigners: [policySigner] }
     };
 
     const signedTx = await wallet.finalizeTx(finalizeProps);
@@ -315,9 +315,8 @@ describe('SingleAddressWallet.assets/nft', () => {
 
         const auxiliaryData = { body: { blob: new Map([[721n, txDataMetadatum]]) } };
 
-        const txProps = {
+        const txProps: InitializeTxProps = {
           auxiliaryData,
-          extraSigners: [policySigner],
           mint: tokens,
           outputs: new Set([
             {
@@ -328,16 +327,17 @@ describe('SingleAddressWallet.assets/nft', () => {
               }
             }
           ]),
-          scripts: [policyScript]
+          scripts: [policyScript],
+          witness: { extraSigners: [policySigner] }
         };
 
         const unsignedTx = await wallet.initializeTx(txProps);
 
-        const finalizeProps = {
+        const finalizeProps: FinalizeTxProps = {
           auxiliaryData,
-          extraSigners: [policySigner],
           scripts: [policyScript],
-          tx: unsignedTx
+          tx: unsignedTx,
+          witness: { extraSigners: [policySigner] }
         };
 
         const signedTx = await wallet.finalizeTx(finalizeProps);
