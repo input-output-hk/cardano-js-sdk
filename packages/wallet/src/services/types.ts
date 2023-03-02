@@ -6,7 +6,8 @@ export enum TransactionFailure {
   FailedToSubmit = 'FAILED_TO_SUBMIT',
   Unknown = 'UNKNOWN',
   CannotTrack = 'CANNOT_TRACK',
-  Timeout = 'TIMEOUT'
+  Timeout = 'TIMEOUT',
+  Phase2Validation = 'PHASE_2_VALIDATION'
 }
 
 export interface TransactionalObservables<T> {

@@ -108,6 +108,7 @@ export const createTransactionReemitter = ({
   );
 
   const rollbacks$ = rollback$.pipe(
+    filter((tx) => !Cardano.util.isPhase2ValidationErrTx(tx)),
     withLatestFrom(volatileTransactions$),
     map(([tx, volatiles]) => {
       // Get the confirmed Tx transaction to be retried
