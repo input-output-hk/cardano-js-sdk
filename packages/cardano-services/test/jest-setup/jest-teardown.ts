@@ -1,9 +1,9 @@
+import { DockerUtil } from '@cardano-sdk/util-dev';
 import { RabbitMQContainer } from '../TxSubmit/rabbitmq/docker';
-import { removePostgresContainer } from './docker';
 
 module.exports = async () => {
   const container = new RabbitMQContainer();
 
-  await removePostgresContainer();
+  await DockerUtil.removePostgresContainer();
   await container.stop();
 };
