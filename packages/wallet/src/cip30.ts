@@ -18,6 +18,7 @@ import { HexBlob, ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util'
 import { Logger } from 'ts-log';
 import { Observable, firstValueFrom } from 'rxjs';
 import { ObservableWallet } from './types';
+import { requiresForeignSignatures } from './services';
 
 export type Cip30WalletDependencies = {
   logger: Logger;
@@ -278,7 +279,7 @@ export const createWalletApi = (
     logger.debug('sign data declined');
     throw new DataSignError(DataSignErrorCode.UserDeclined, 'user declined signing');
   },
-  signTx: async (tx: Cbor, _partialSign?: Boolean): Promise<Cbor> => {
+  signTx: async (tx: Cbor, partialSign?: Boolean): Promise<Cbor> => {
     const scope = new ManagedFreeableScope();
     logger.debug('signTx');
     const txDecoded = scope.manage(CML.Transaction.from_bytes(Buffer.from(tx, 'hex')));
@@ -293,18 +294,38 @@ export const createWalletApi = (
     if (shouldProceed) {
       const wallet = await firstValueFrom(wallet$);
       try {
+        const needsForeignSignature = await requiresForeignSignatures(coreTx, wallet);
+
+        // If partialSign is false and the wallet could not sign the entire transaction
+        if (!partialSign && needsForeignSignature)
+          throw new DataSignError(
+            DataSignErrorCode.ProofGeneration,
+            'The wallet does not have the secret key associated with some of the inputs or certificates.'
+          );
         const {
           witness: { signatures }
         } = await wallet.finalizeTx({ tx: { ...coreTx, hash } });
+
+        // If partialSign is true, the wallet only tries to sign what it can. However, if
+        // signatures size is 0 then throw.
+        if (partialSign && signatures.size === 0) {
+          throw new DataSignError(
+            DataSignErrorCode.ProofGeneration,
+            'The wallet does not have the secret key associated with any of the inputs and certificates.'
+          );
+        }
 
         const cslWitnessSet = scope.manage(coreToCml.witnessSet(scope, { signatures }));
         const cbor = Buffer.from(cslWitnessSet.to_bytes()).toString('hex');
         return Promise.resolve(cbor);
       } catch (error) {
         logger.error(error);
-        // TODO: handle ProofGeneration errors?
-        const message = formatUnknownError(error);
-        throw new TxSignError(TxSignErrorCode.UserDeclined, message);
+        if (error instanceof DataSignError) {
+          throw error;
+        } else {
+          const message = formatUnknownError(error);
+          throw new TxSignError(TxSignErrorCode.UserDeclined, message);
+        }
       } finally {
         scope.dispose();
       }

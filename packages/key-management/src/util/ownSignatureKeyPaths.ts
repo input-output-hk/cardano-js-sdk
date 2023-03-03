@@ -32,7 +32,6 @@ const getStakingKeyPaths = (
 
     for (const certificate of txBody.certificates) {
       switch (certificate.__typename) {
-        case Cardano.CertificateType.StakeKeyRegistration:
         case Cardano.CertificateType.StakeKeyDeregistration:
         case Cardano.CertificateType.StakeDelegation:
           if (certificate.stakeKeyHash === stakeKeyHash) paths.add(account.stakeKeyDerivationPath);
@@ -49,6 +48,7 @@ const getStakingKeyPaths = (
         case Cardano.CertificateType.MIR:
           if (certificate.rewardAccount === account.rewardAccount) paths.add(account.stakeKeyDerivationPath);
           break;
+        case Cardano.CertificateType.StakeKeyRegistration:
         case Cardano.CertificateType.GenesisKeyDelegation:
         default:
         // Nothing to do.
