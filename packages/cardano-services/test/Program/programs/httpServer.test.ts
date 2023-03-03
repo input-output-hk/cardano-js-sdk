@@ -4,13 +4,13 @@ import { DB_CACHE_TTL_DEFAULT } from '../../../src/InMemoryCache';
 import { EPOCH_POLL_INTERVAL_DEFAULT, listenPromise, serverClosePromise } from '../../../src/util';
 import {
   HttpServer,
-  HttpServerOptionDescriptions,
   MissingCardanoNodeOption,
   MissingProgramOption,
+  ProviderServerOptionDescriptions,
   SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT,
   SERVICE_DISCOVERY_TIMEOUT_DEFAULT,
   ServiceNames,
-  loadHttpServer
+  loadProviderServer
 } from '../../../src';
 import { Ogmios } from '@cardano-sdk/ogmios';
 import {
@@ -85,7 +85,7 @@ describe('HTTP Server', () => {
     });
 
     it('loads the nominated HTTP services and server if required program arguments are set', async () => {
-      httpServer = await loadHttpServer({
+      httpServer = await loadProviderServer({
         apiUrl,
         cardanoNodeConfigPath,
         dbCacheTtl,
@@ -106,7 +106,7 @@ describe('HTTP Server', () => {
 
     describe('postgres-dependent services', () => {
       it('loads the nominated HTTP service and server with service discovery', async () => {
-        httpServer = await loadHttpServer({
+        httpServer = await loadProviderServer({
           apiUrl,
           cardanoNodeConfigPath,
           dbCacheTtl,
@@ -129,7 +129,7 @@ describe('HTTP Server', () => {
 
         await expect(
           async () =>
-            await loadHttpServer({
+            await loadProviderServer({
               apiUrl,
               cardanoNodeConfigPath,
               dbCacheTtl,
@@ -153,7 +153,7 @@ describe('HTTP Server', () => {
       it('throws if a service is nominated without providing db connection string nor service discovery args', async () => {
         await expect(
           async () =>
-            await loadHttpServer({
+            await loadProviderServer({
               apiUrl,
               cardanoNodeConfigPath,
               dbCacheTtl,
@@ -172,7 +172,7 @@ describe('HTTP Server', () => {
 
     describe('ogmios-dependent services', () => {
       it('loads the nominated HTTP service and server with service discovery', async () => {
-        httpServer = await loadHttpServer({
+        httpServer = await loadProviderServer({
           apiUrl,
           cardanoNodeConfigPath,
           dbCacheTtl,
@@ -186,8 +186,8 @@ describe('HTTP Server', () => {
         expect(httpServer).toBeInstanceOf(HttpServer);
       });
 
-      it('loads the nominated HTTP server and service discovery takes preference over url if both are provided', async () => {
-        httpServer = await loadHttpServer({
+      it('loads the nominated Provider server and service discovery takes preference over url if both are provided', async () => {
+        httpServer = await loadProviderServer({
           apiUrl,
           cardanoNodeConfigPath,
           dbCacheTtl,
@@ -205,7 +205,7 @@ describe('HTTP Server', () => {
       it('throws if a service is nominated without providing ogmios url nor service discovery name', async () => {
         await expect(
           async () =>
-            await loadHttpServer({
+            await loadProviderServer({
               apiUrl,
               cardanoNodeConfigPath,
               dbCacheTtl,
@@ -222,7 +222,7 @@ describe('HTTP Server', () => {
 
     describe('rabbitmq-dependent services', () => {
       it('loads the nominated HTTP service and server with service discovery', async () => {
-        httpServer = await loadHttpServer({
+        httpServer = await loadProviderServer({
           apiUrl,
           cardanoNodeConfigPath,
           dbCacheTtl,
@@ -237,8 +237,8 @@ describe('HTTP Server', () => {
         expect(httpServer).toBeInstanceOf(HttpServer);
       });
 
-      it('loads the nominated HTTP server and service discovery takes preference over url if both are provided', async () => {
-        httpServer = await loadHttpServer({
+      it('loads the nominated Provider server and service discovery takes preference over url if both are provided', async () => {
+        httpServer = await loadProviderServer({
           apiUrl,
           cardanoNodeConfigPath,
           dbCacheTtl,
@@ -257,7 +257,7 @@ describe('HTTP Server', () => {
       it('throws if a service is nominated without providing rabbitmq url nor service discovery name', async () => {
         await expect(
           async () =>
-            await loadHttpServer({
+            await loadProviderServer({
               apiUrl,
               cardanoNodeConfigPath,
               dbCacheTtl,
@@ -280,7 +280,7 @@ describe('HTTP Server', () => {
       // eslint-disable-next-line unicorn/consistent-function-scoping
       const test = (serviceName: ServiceNames) =>
         expect(() =>
-          loadHttpServer({
+          loadProviderServer({
             apiUrl,
             dbCacheTtl: 0,
             epochPollInterval: 0,
@@ -288,7 +288,9 @@ describe('HTTP Server', () => {
             postgresConnectionString: 'postgres',
             serviceNames: [serviceName]
           })
-        ).rejects.toThrow(new MissingProgramOption(serviceName, HttpServerOptionDescriptions.CardanoNodeConfigPath));
+        ).rejects.toThrow(
+          new MissingProgramOption(serviceName, ProviderServerOptionDescriptions.CardanoNodeConfigPath)
+        );
 
       it('with network-info provider', () => test(ServiceNames.NetworkInfo));
       it('with stake-pool provider', () => test(ServiceNames.StakePool));
@@ -306,9 +308,9 @@ describe('HTTP Server', () => {
       await serverClosePromise(ogmiosServer);
     });
 
-    it('should not throw if any internal providers are unhealthy during HTTP server initialization', () => {
+    it('should not throw if any internal providers are unhealthy during Provider server initialization', () => {
       expect(() =>
-        loadHttpServer({
+        loadProviderServer({
           apiUrl,
           cardanoNodeConfigPath,
           dbCacheTtl,

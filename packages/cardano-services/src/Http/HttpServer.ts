@@ -108,19 +108,28 @@ export class HttpServer extends RunnableModule {
       this.logger.debug(`Using /${service.slug}`);
     }
 
-    const servicesHealthCheckHandler = async (req: express.Request, res: express.Response) => {
-      this.logger.debug('/health', { ip: req.ip });
-      let body: ServicesHealthCheckResponse | Error['message'];
-      try {
-        body = await this.#getServicesHealth();
-      } catch (error) {
-        this.logger.error(error);
-        return HttpServer.sendJSON(res, new ProviderError(ProviderFailure.Unhealthy, error), 500);
-      }
-      return HttpServer.sendJSON(res, body);
-    };
+    const healthCheckHandler =
+      (statusCodeFromHealth: (health: ServicesHealthCheckResponse) => number) =>
+      async (req: express.Request, res: express.Response) => {
+        this.logger.debug('/ready', { ip: req.ip });
+        let health: ServicesHealthCheckResponse | Error['message'];
+        try {
+          health = await this.#getServicesHealth();
+        } catch (error) {
+          this.logger.error(error);
+          return HttpServer.sendJSON(res, new ProviderError(ProviderFailure.Unhealthy, error), 500);
+        }
+        return HttpServer.sendJSON(res, health, statusCodeFromHealth(health));
+      };
 
-    this.app.use('/health', servicesHealthCheckHandler);
+    this.app.use(
+      '/health',
+      healthCheckHandler(() => 200)
+    );
+    this.app.use(
+      '/ready',
+      healthCheckHandler(({ ok }) => (ok ? 200 : 503))
+    );
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.app.use((err: any, _req: express.Request, res: express.Response, _n: express.NextFunction) => {
       HttpServer.sendJSON(res, new ProviderError(ProviderFailure.Unhealthy, err), err.status || 500);

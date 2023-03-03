@@ -87,7 +87,7 @@ type CallCliAndAssertExitArgs = {
   env?: NodeJS.ProcessEnv;
 };
 
-const baseArgs = ['start-server', '--logger-min-severity', 'error'];
+const baseArgs = ['start-provider-server', '--logger-min-severity', 'error'];
 
 const callCliAndAssertExit = (
   { args = [], dataMatchOnError, env = {} }: CallCliAndAssertExitArgs,
@@ -119,7 +119,7 @@ describe('CLI', () => {
   let fixtureBuilder: AssetFixtureBuilder;
   let lastBlock: LedgerTipModel;
 
-  describe('start-server', () => {
+  describe('start-provider-server', () => {
     let apiPort: number;
     let apiUrl: string;
     let ogmiosServer: http.Server;
@@ -157,7 +157,7 @@ describe('CLI', () => {
       });
     });
 
-    describe('cli:start-server', () => {
+    describe('cli:start-provider-server', () => {
       let postgresConnectionString: string;
       let ogmiosPort: Ogmios.ConnectionConfig['port'];
       let ogmiosConnection: Ogmios.Connection;
@@ -242,7 +242,7 @@ describe('CLI', () => {
           });
 
           it('exposes a HTTP server at the configured URL with all services attached when using env variables', async () => {
-            proc = fork(exePath, ['start-server'], {
+            proc = fork(exePath, ['start-provider-server'], {
               env: {
                 API_URL: apiUrl,
                 CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
@@ -297,7 +297,7 @@ describe('CLI', () => {
           });
 
           it('exposes a HTTP server with /metrics endpoint using env variables', async () => {
-            proc = fork(exePath, ['start-server'], {
+            proc = fork(exePath, ['start-provider-server'], {
               env: {
                 API_URL: apiUrl,
                 CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
@@ -315,7 +315,7 @@ describe('CLI', () => {
           });
 
           it('exposes a HTTP server without /metrics endpoint when env set to false', async () => {
-            proc = fork(exePath, ['start-server'], {
+            proc = fork(exePath, ['start-provider-server'], {
               env: {
                 API_URL: apiUrl,
                 CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
@@ -373,7 +373,7 @@ describe('CLI', () => {
             });
 
             it('using env variables', async () => {
-              proc = fork(exePath, ['start-server'], {
+              proc = fork(exePath, ['start-provider-server'], {
                 env: {
                   API_URL: apiUrl,
                   BUILD_INFO: buildInfo,
@@ -617,7 +617,7 @@ describe('CLI', () => {
             });
 
             it('exposes a HTTP server when using env variables', async () => {
-              proc = fork(exePath, ['start-server'], {
+              proc = fork(exePath, ['start-provider-server'], {
                 env: {
                   API_URL: apiUrl,
                   LOGGER_MIN_SEVERITY: 'error',
@@ -1177,7 +1177,7 @@ describe('CLI', () => {
             });
 
             it('network-info uses the default Ogmios configuration if not specified using env variables', async () => {
-              proc = fork(exePath, ['start-server'], {
+              proc = fork(exePath, ['start-provider-server'], {
                 env: {
                   API_URL: apiUrl,
                   CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
@@ -1199,7 +1199,7 @@ describe('CLI', () => {
             });
 
             it('tx-submit uses the default Ogmios configuration if not specified when using env variables', async () => {
-              proc = fork(exePath, ['start-server'], {
+              proc = fork(exePath, ['start-provider-server'], {
                 env: {
                   API_URL: apiUrl,
                   LOGGER_MIN_SEVERITY: 'error',
@@ -1495,7 +1495,7 @@ describe('CLI', () => {
             });
 
             it('exposes a HTTP server with healthy state when using env variables', async () => {
-              proc = fork(exePath, ['start-server'], {
+              proc = fork(exePath, ['start-provider-server'], {
                 env: {
                   API_URL: apiUrl,
                   LOGGER_MIN_SEVERITY: 'error',
@@ -1518,7 +1518,7 @@ describe('CLI', () => {
             });
 
             it('loads a stub asset metadata service when TOKEN_METADATA_SERVER_URL starts with "stub:"', async () => {
-              proc = fork(exePath, ['start-server'], {
+              proc = fork(exePath, ['start-provider-server'], {
                 env: {
                   API_URL: apiUrl,
                   LOGGER_MIN_SEVERITY: 'error',
@@ -1566,7 +1566,7 @@ describe('CLI', () => {
             });
 
             it('exposes a HTTP server with healthy state when using env variables', async () => {
-              proc = fork(exePath, ['start-server'], {
+              proc = fork(exePath, ['start-provider-server'], {
                 env: {
                   API_URL: apiUrl,
                   LOGGER_MIN_SEVERITY: 'error',
@@ -1600,7 +1600,7 @@ describe('CLI', () => {
             it('throws a provider unhealthy error when using env variables', (done) => {
               expect.assertions(2);
 
-              proc = fork(exePath, ['start-server'], {
+              proc = fork(exePath, ['start-provider-server'], {
                 env: {
                   API_URL: apiUrl,
                   LOGGER_MIN_SEVERITY: 'error',
@@ -1728,7 +1728,7 @@ describe('CLI', () => {
           ogmiosServer = createHealthyMockOgmiosServer();
         });
 
-        it('cli:start-server exits with code 1', (done) => {
+        it('cli:start-provider-server exits with code 1', (done) => {
           ogmiosServer.listen(ogmiosConnection.port, () => {
             callCliAndAssertExit(
               {

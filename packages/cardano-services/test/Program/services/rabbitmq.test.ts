@@ -51,7 +51,7 @@ jest.mock('dns', () => ({
 }));
 
 describe('Program/services/rabbitmq', () => {
-  describe('http-server', () => {
+  describe('provider-server', () => {
     let apiUrl: URL;
     let config: HttpServerConfig;
     const APPLICATION_JSON = 'application/json';

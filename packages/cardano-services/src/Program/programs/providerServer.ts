@@ -65,7 +65,7 @@ export const cardanoNodeDependantServices = new Set([
   ServiceNames.ChainHistory
 ]);
 
-export enum HttpServerOptionDescriptions {
+export enum ProviderServerOptionDescriptions {
   CardanoNodeConfigPath = 'Cardano node config path',
   DbCacheTtl = 'Cache TTL in seconds between 60 and 172800 (two days), an option for database related operations',
   EpochPollInterval = 'Epoch poll interval',
@@ -75,7 +75,7 @@ export enum HttpServerOptionDescriptions {
   PaginationPageSizeLimit = 'Pagination page size limit shared across all providers'
 }
 
-export type HttpServerArgs = CommonProgramOptions &
+export type ProviderServerArgs = CommonProgramOptions &
   PosgresProgramOptions &
   OgmiosProgramOptions &
   RabbitMqProgramOptions & {
@@ -88,13 +88,13 @@ export type HttpServerArgs = CommonProgramOptions &
     paginationPageSizeLimit?: number;
     serviceNames: ServiceNames[];
   };
-export interface LoadHttpServerDependencies {
+export interface LoadProviderServerDependencies {
   dnsResolver?: (serviceName: string) => Promise<SrvRecord>;
   logger?: Logger;
 }
 
 interface ServiceMapFactoryOptions {
-  args: HttpServerArgs;
+  args: ProviderServerArgs;
   dbConnection?: pg.Pool;
   dnsResolver: DnsResolver;
   genesisData?: GenesisData;
@@ -142,7 +142,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     }, ServiceNames.Asset),
     [ServiceNames.StakePool]: withDbSyncProvider(async (db, cardanoNode) => {
       if (!genesisData)
-        throw new MissingProgramOption(ServiceNames.StakePool, HttpServerOptionDescriptions.CardanoNodeConfigPath);
+        throw new MissingProgramOption(ServiceNames.StakePool, ProviderServerOptionDescriptions.CardanoNodeConfigPath);
       const stakePoolProvider = new DbSyncStakePoolProvider(
         { paginationPageSizeLimit: args.paginationPageSizeLimit! },
         {
@@ -179,7 +179,10 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     }, ServiceNames.Rewards),
     [ServiceNames.NetworkInfo]: withDbSyncProvider(async (db, cardanoNode) => {
       if (!genesisData)
-        throw new MissingProgramOption(ServiceNames.NetworkInfo, HttpServerOptionDescriptions.CardanoNodeConfigPath);
+        throw new MissingProgramOption(
+          ServiceNames.NetworkInfo,
+          ProviderServerOptionDescriptions.CardanoNodeConfigPath
+        );
       const networkInfoProvider = new DbSyncNetworkInfoProvider({
         cache: new InMemoryCache(args.dbCacheTtl!),
         cardanoNode,
@@ -199,16 +202,16 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
   };
 };
 
-export const loadHttpServer = async (
-  args: HttpServerArgs,
-  deps: LoadHttpServerDependencies = {}
+export const loadProviderServer = async (
+  args: ProviderServerArgs,
+  deps: LoadProviderServerDependencies = {}
 ): Promise<HttpServer> => {
   const services: HttpService[] = [];
   const logger =
     deps?.logger ||
     createLogger({
       level: args.loggerMinSeverity,
-      name: 'http-server'
+      name: 'provider-server'
     });
   const dnsResolver =
     deps?.dnsResolver ||

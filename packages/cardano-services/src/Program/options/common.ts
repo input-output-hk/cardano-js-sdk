@@ -50,7 +50,7 @@ export const withCommonOptions = (command: Command, defaults: { apiUrl: URL }) =
         .env('ENABLE_METRICS')
         .default(ENABLE_METRICS_DEFAULT)
         .argParser((enableMetrics) =>
-          stringOptionToBoolean(enableMetrics, Programs.HttpServer, CommonOptionDescriptions.EnableMetrics)
+          stringOptionToBoolean(enableMetrics, Programs.ProviderServer, CommonOptionDescriptions.EnableMetrics)
         )
     )
     .addOption(

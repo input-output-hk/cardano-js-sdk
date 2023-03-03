@@ -1,8 +1,8 @@
 import {
   CACHE_TTL_LOWER_LIMIT,
   CACHE_TTL_UPPER_LIMIT,
-  HttpServerOptionDescriptions,
   MissingProgramOption,
+  ProviderServerOptionDescriptions,
   ServiceNames
 } from '../../src';
 import { cacheTtlValidator } from '../../src/util/validators';
@@ -16,21 +16,21 @@ describe('utils/validators', () => {
 
     it('throws a validation error if TTL is not a valid number', async () => {
       expect(() => cacheTtlValidator('not a number')).toThrowError(
-        new MissingProgramOption(ServiceNames.NetworkInfo, HttpServerOptionDescriptions.DbCacheTtl)
+        new MissingProgramOption(ServiceNames.NetworkInfo, ProviderServerOptionDescriptions.DbCacheTtl)
       );
     });
 
     it('throws a validation error if TTL is lower than the lower limit', async () => {
       const ttl = (CACHE_TTL_LOWER_LIMIT - 1).toString();
       expect(() => cacheTtlValidator(ttl)).toThrowError(
-        new MissingProgramOption(ServiceNames.NetworkInfo, HttpServerOptionDescriptions.DbCacheTtl)
+        new MissingProgramOption(ServiceNames.NetworkInfo, ProviderServerOptionDescriptions.DbCacheTtl)
       );
     });
 
     it('throws a validation error if TTL is higher than the upper limit', async () => {
       const ttl = (CACHE_TTL_UPPER_LIMIT + 1).toString();
       expect(() => cacheTtlValidator(ttl)).toThrowError(
-        new MissingProgramOption(ServiceNames.NetworkInfo, HttpServerOptionDescriptions.DbCacheTtl)
+        new MissingProgramOption(ServiceNames.NetworkInfo, ProviderServerOptionDescriptions.DbCacheTtl)
       );
     });
   });
