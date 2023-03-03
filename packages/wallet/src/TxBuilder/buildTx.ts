@@ -28,11 +28,11 @@ export type ObservableWalletTxBuilderDependencies = Pick<ObservableWallet, 'subm
   delegation: { rewardAccounts$: Observable<Pick<RewardAccount, 'address' | 'keyStatus'>[]> };
 } & {
   initializeTx: (
-    props: Pick<InitializeTxProps, 'auxiliaryData' | 'outputs' | 'signingOptions' | 'extraSigners' | 'certificates'>
+    props: Pick<InitializeTxProps, 'auxiliaryData' | 'outputs' | 'signingOptions' | 'certificates' | 'witness'>
   ) => ReturnType<ObservableWallet['initializeTx']>;
 } & {
   finalizeTx: (
-    props: Pick<FinalizeTxProps, 'auxiliaryData' | 'tx' | 'signingOptions' | 'extraSigners'>
+    props: Pick<FinalizeTxProps, 'auxiliaryData' | 'tx' | 'signingOptions' | 'witness'>
   ) => ReturnType<ObservableWallet['finalizeTx']>;
 } & WalletUtilContext;
 
@@ -68,7 +68,7 @@ type DelegateConfig = Delegate | KeyDeregistration;
 const createSignedTx = async ({
   wallet,
   tx,
-  extraSigners,
+  witness,
   signingOptions,
   auxiliaryData,
   afterSubmitCb
@@ -76,7 +76,12 @@ const createSignedTx = async ({
   wallet: ObservableWalletTxBuilderDependencies;
   afterSubmitCb: () => void;
 }): Promise<SignedTx> => {
-  const finalizedTx = await wallet.finalizeTx({ auxiliaryData, extraSigners, signingOptions, tx });
+  const finalizedTx = await wallet.finalizeTx({
+    auxiliaryData,
+    signingOptions,
+    tx,
+    witness
+  });
   return {
     submit: () => wallet.submitTx(finalizedTx).then(() => afterSubmitCb()),
     tx: finalizedTx
@@ -156,9 +161,9 @@ export class ObservableWalletTxBuilder implements TxBuilder {
       const tx = await this.#observableWallet.initializeTx({
         auxiliaryData: this.auxiliaryData,
         certificates: this.partialTxBody.certificates,
-        extraSigners: this.extraSigners,
         outputs: new Set(this.partialTxBody.outputs || []),
-        signingOptions: this.signingOptions
+        signingOptions: this.signingOptions,
+        witness: { extraSigners: this.extraSigners }
       });
       return this.#createValidTx(tx);
     } catch (error) {
@@ -183,10 +188,10 @@ export class ObservableWalletTxBuilder implements TxBuilder {
         createSignedTx({
           afterSubmitCb: () => (this.#isSubmitted = true),
           auxiliaryData: this.auxiliaryData && { ...this.auxiliaryData },
-          extraSigners: this.extraSigners && [...this.extraSigners],
           signingOptions: this.signingOptions && { ...this.signingOptions },
           tx,
-          wallet: this.#observableWallet
+          wallet: this.#observableWallet,
+          witness: { extraSigners: this.extraSigners && [...this.extraSigners] }
         }),
       signingOptions: this.signingOptions && { ...this.signingOptions }
     };

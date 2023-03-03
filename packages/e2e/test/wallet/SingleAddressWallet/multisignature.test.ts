@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { Cardano, nativeScriptPolicyId } from '@cardano-sdk/core';
+import { FinalizeTxProps, InitializeTxProps, SingleAddressWallet } from '@cardano-sdk/wallet';
 import { KeyRole, util } from '@cardano-sdk/key-management';
-import { SingleAddressWallet } from '@cardano-sdk/wallet';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { createStandaloneKeyAgent, submitAndConfirm, walletReady } from '../../util';
 import { filter, firstValueFrom } from 'rxjs';
@@ -73,8 +73,7 @@ describe('SingleAddressWallet/multisignature', () => {
 
     const walletAddress = (await firstValueFrom(wallet.addresses$))[0].address;
 
-    const txProps = {
-      extraSigners: [alicePolicySigner, bobPolicySigner],
+    const txProps: InitializeTxProps = {
       mint: tokens,
       outputs: new Set([
         {
@@ -85,15 +84,16 @@ describe('SingleAddressWallet/multisignature', () => {
           }
         }
       ]),
-      scripts: [policyScript]
+      scripts: [policyScript],
+      witness: { extraSigners: [alicePolicySigner, bobPolicySigner] }
     };
 
     const unsignedTx = await wallet.initializeTx(txProps);
 
-    const finalizeProps = {
-      extraSigners: [alicePolicySigner, bobPolicySigner],
+    const finalizeProps: FinalizeTxProps = {
       scripts: [policyScript],
-      tx: unsignedTx
+      tx: unsignedTx,
+      witness: { extraSigners: [alicePolicySigner, bobPolicySigner] }
     };
 
     const signedTx = await wallet.finalizeTx(finalizeProps);

@@ -574,10 +574,14 @@ export const witnessSet = (scope: ManagedFreeableScope, witness: Cardano.Witness
   return txWitnessSet;
 };
 
-export const tx = (scope: ManagedFreeableScope, { body, witness, auxiliaryData }: Cardano.Tx): Transaction => {
+export const tx = (scope: ManagedFreeableScope, { body, witness, auxiliaryData, isValid }: Cardano.Tx): Transaction => {
   const txWitnessSet = witnessSet(scope, witness);
   // Possible optimization: only convert auxiliary data once
-  return scope.manage(
+  const cmlTx = scope.manage(
     Transaction.new(txBody(scope, body, auxiliaryData), txWitnessSet, txAuxiliaryData(scope, auxiliaryData))
   );
+
+  if (typeof isValid !== 'undefined') cmlTx.set_is_valid(isValid);
+
+  return cmlTx;
 };

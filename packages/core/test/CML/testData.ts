@@ -207,6 +207,7 @@ export const tx: Cardano.Tx = {
   },
   body: txBody,
   id: Cardano.TransactionId('8d2feeab1087e0aa4ad06e878c5269eaa2edcef5264bcc97542a28c189b2cbc5'),
+  isValid: true,
   witness: {
     // bootstrap values from ogmios.wsp.json
     bootstrap: [

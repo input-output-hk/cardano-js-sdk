@@ -2,14 +2,20 @@ import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { Operators, RollForwardEvent, UnifiedProjectorEvent } from '../../../src';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 
-const createEvent = (eventType: ChainSyncEventType, slot: Cardano.Slot, txs: Cardano.Certificate[][]) =>
+const createEvent = (
+  eventType: ChainSyncEventType,
+  slot: Cardano.Slot,
+  txs: Cardano.Certificate[][],
+  inputSource: Cardano.InputSource = Cardano.InputSource.inputs
+) =>
   ({
     block: {
       body: txs.map(
         (certificates) =>
           ({
-            body: { certificates }
-          } as Cardano.Tx)
+            body: { certificates },
+            inputSource
+          } as Cardano.OnChainTx)
       ),
       header: { slot }
     },
@@ -25,13 +31,15 @@ const certificates = [
 ];
 
 describe('withCertificates', () => {
-  it('flattens certificates from all transactions, preserving an on-chain pointer', () => {
+  it(`flattens certificates from all transactions, preserving an on-chain pointer.
+      skips certificates from phase2validation failed transactions`, () => {
     createTestScheduler().run(({ hot, expectObservable, expectSubscriptions }) => {
-      const source$ = hot<UnifiedProjectorEvent<{}>>('ab', {
+      const source$ = hot<UnifiedProjectorEvent<{}>>('abc', {
         a: createEvent(ChainSyncEventType.RollForward, Cardano.Slot(1), certificates),
-        b: createEvent(ChainSyncEventType.RollForward, Cardano.Slot(2), [])
+        b: createEvent(ChainSyncEventType.RollForward, Cardano.Slot(2), []),
+        c: createEvent(ChainSyncEventType.RollForward, Cardano.Slot(3), certificates, Cardano.InputSource.collaterals)
       });
-      expectObservable(source$.pipe(Operators.withCertificates())).toBe('ab', {
+      expectObservable(source$.pipe(Operators.withCertificates())).toBe('abc', {
         a: {
           ...createEvent(ChainSyncEventType.RollForward, Cardano.Slot(1), certificates),
           certificates: [
@@ -63,6 +71,15 @@ describe('withCertificates', () => {
         },
         b: {
           ...createEvent(ChainSyncEventType.RollForward, Cardano.Slot(2), []),
+          certificates: []
+        },
+        c: {
+          ...createEvent(
+            ChainSyncEventType.RollForward,
+            Cardano.Slot(3),
+            certificates,
+            Cardano.InputSource.collaterals
+          ),
           certificates: []
         }
       });

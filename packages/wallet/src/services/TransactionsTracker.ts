@@ -18,6 +18,7 @@ import {
   mergeMap,
   mergeWith,
   of,
+  partition,
   race,
   scan,
   share,
@@ -33,6 +34,7 @@ import { RetryBackoffConfig } from 'backoff-rxjs';
 import { Shutdown, contextLogger } from '@cardano-sdk/util';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
 import { coldObservableProvider, distinctBlock, transactionsEquals } from './util';
+
 import intersectionBy from 'lodash/intersectionBy';
 import sortBy from 'lodash/sortBy';
 import unionBy from 'lodash/unionBy';
@@ -234,8 +236,14 @@ export const createTransactionsTracker = (
   const transactionsSource$ = new TrackerSubject(txSource$);
 
   const historicalTransactions$ = createHistoricalTransactionsTrackerSubject(transactionsSource$);
+
+  const [onChainNewTxPhase2Failed$, onChainNewTxSuccess$] = partition(
+    newTransactions$(historicalTransactions$).pipe(share()),
+    (tx) => Cardano.util.isPhase2ValidationErrTx(tx)
+  );
+
   const txConfirmed$ = (evt: OutgoingTx): Observable<ConfirmedTx> =>
-    newTransactions$(historicalTransactions$).pipe(
+    onChainNewTxSuccess$.pipe(
       filter((historyTx) => historyTx.id === evt.id),
       take(1),
       map((historyTx) => ({ ...evt, confirmedAt: historyTx.blockHeader.slot })),
@@ -264,6 +272,10 @@ export const createTransactionsTracker = (
           switchMap((tx) => {
             const invalidHereafter = tx.body.validityInterval?.invalidHereafter;
             return race(
+              onChainNewTxPhase2Failed$.pipe(
+                filter((failedTx) => failedTx.id === tx.id),
+                map((): FailedTx => ({ reason: TransactionFailure.Phase2Validation, ...tx }))
+              ),
               rollback$.pipe(
                 map((rolledBackTx) => rolledBackTx.id),
                 filter((rolledBackTxId) => tx.body.inputs.some(({ txId }) => txId === rolledBackTxId)),

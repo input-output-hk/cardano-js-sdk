@@ -476,16 +476,20 @@ export class SingleAddressWallet implements ObservableWallet {
           props.tx.body,
           addresses,
           this.util,
-          props.extraSigners,
+          props.witness?.extraSigners,
           props.signingOptions
         )
-      : await this.#getSignatures(props.tx, props.extraSigners, props.signingOptions);
+      : await this.#getSignatures(props.tx, props.witness?.extraSigners, props.signingOptions);
     return {
       auxiliaryData: props.auxiliaryData,
       body: props.tx.body,
       id: props.tx.hash,
-      // TODO: add support for the rest of the witness properties
-      witness: { scripts: props.scripts, signatures }
+      isValid: props.isValid,
+      witness: {
+        ...props.witness,
+        scripts: props.scripts,
+        signatures
+      }
     };
   }
 
@@ -512,9 +516,13 @@ export class SingleAddressWallet implements ObservableWallet {
         // - checking if ValueNotConservedError produced === 0 (all utxos invalid)
         // - check if UnknownOrIncompleteWithdrawalsError available withdrawal amount === wallet's reward acc balance
         (error.innerError instanceof CardanoNodeErrors.TxSubmissionErrors.ValueNotConservedError ||
-          error.innerError instanceof CardanoNodeErrors.TxSubmissionErrors.UnknownOrIncompleteWithdrawalsError)
+          error.innerError instanceof CardanoNodeErrors.TxSubmissionErrors.UnknownOrIncompleteWithdrawalsError ||
+          error.innerError instanceof CardanoNodeErrors.TxSubmissionErrors.CollectErrorsError ||
+          error.innerError instanceof CardanoNodeErrors.TxSubmissionErrors.BadInputsError)
       ) {
-        this.#logger.debug(`Transaction ${outgoingTx.id} appears to be already submitted...`);
+        this.#logger.debug(
+          `Transaction ${outgoingTx.id} failed with ${error.innerError}, but it appears to be already submitted...`
+        );
         this.#newTransactions.pending$.next(outgoingTx);
         return outgoingTx.id;
       }

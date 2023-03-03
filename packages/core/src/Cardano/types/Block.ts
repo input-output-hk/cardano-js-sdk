@@ -2,8 +2,8 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { CML } from '../../CML/CML';
 import { InvalidStringError, OpaqueNumber, OpaqueString, typedBech32 } from '@cardano-sdk/util';
 import { Lovelace } from './Value';
+import { OnChainTx } from './Transaction';
 import { PoolId } from './StakePool/primitives';
-import { Tx } from './Transaction';
 
 /**
  * The block size in bytes
@@ -111,7 +111,7 @@ export interface BlockInfo {
 }
 
 export interface Block extends BlockInfo {
-  body: Tx[];
+  body: OnChainTx[];
 }
 
 export interface ExtendedBlockInfo
