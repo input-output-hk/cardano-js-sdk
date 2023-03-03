@@ -4,7 +4,7 @@ import { SelectionResult } from '@cardano-sdk/input-selection';
 import { usingAutoFree } from '@cardano-sdk/util';
 
 export type CreateTxInternalsProps = {
-  changeAddress: Cardano.Address;
+  changeAddress: Cardano.PaymentAddress;
   inputSelection: SelectionResult['selection'];
   validityInterval: Cardano.ValidityInterval;
   certificates?: Cardano.Certificate[];

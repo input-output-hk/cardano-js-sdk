@@ -10,11 +10,12 @@ import {
   PoolRegistrationCertificate,
   PoolRetirementCertificate,
   Relay,
-  RewardAccount,
   StakeAddressCertificate,
   StakeDelegationCertificate,
   VrfVkHex
 } from '../../Cardano/types';
+import { CredentialType, RewardAccount, RewardAddress } from '../../Cardano';
+import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { NetworkId } from '../../Cardano/ChainId';
 import { NotImplementedError, SerializationError, SerializationFailure } from '../../errors';
 import { usingAutoFree } from '@cardano-sdk/util';
@@ -86,9 +87,11 @@ const createCardanoOwners = (owners: CML.Ed25519KeyHashes, networkId: NetworkId)
     const result: RewardAccount[] = [];
     for (let i = 0; i < owners.len(); i++) {
       const keyHash = scope.manage(owners.get(i));
-      const stakeCredential = scope.manage(CML.StakeCredential.from_keyhash(keyHash));
-      const rewardAccount = scope.manage(CML.RewardAddress.new(networkId, stakeCredential));
-      result.push(RewardAccount(scope.manage(rewardAccount.to_address()).to_bech32()));
+
+      const stakeCredential = { hash: Hash28ByteBase16(keyHash.to_hex()), type: CredentialType.KeyHash };
+      const rewardAccount = RewardAddress.fromCredentials(networkId, stakeCredential);
+
+      result.push(RewardAccount(rewardAccount.toAddress().toBech32()));
     }
     return result;
   });

@@ -17,7 +17,7 @@ describe('integration/txChainingBalance', () => {
     const balanceBefore = await firstValueFrom(wallet.balance.utxo.available$);
     const outputCoins = utxo[0][1].value.coins + 1n; // will always select at least 2 utxo with mock utxo set
     const output: Cardano.TxOut = {
-      address: Cardano.Address(
+      address: Cardano.PaymentAddress(
         'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz'
       ),
       value: {

@@ -20,7 +20,7 @@ const SHORTAGE_OF_WALLETS_FOUND_ERROR_MESSAGE = 'Addresses found from db are les
 
 const mapToGroupedAddress = (addrModel: AddressesModel): GroupedAddress => ({
   accountIndex: 0,
-  address: Cardano.Address(addrModel.address),
+  address: Cardano.PaymentAddress(addrModel.address),
   index: 0,
   networkId: addrModel.address.startsWith('addr_test') ? Cardano.NetworkId.Testnet : Cardano.NetworkId.Mainnet,
   rewardAccount: Cardano.RewardAccount(addrModel.stake_address),

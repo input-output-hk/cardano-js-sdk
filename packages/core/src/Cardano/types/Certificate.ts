@@ -2,7 +2,7 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { EpochNo } from './Block';
 import { Lovelace } from './Value';
 import { PoolId, PoolParameters } from './StakePool';
-import { RewardAccount } from './RewardAccount';
+import { RewardAccount } from '../Address';
 
 export enum CertificateType {
   StakeKeyRegistration = 'StakeKeyRegistrationCertificate',

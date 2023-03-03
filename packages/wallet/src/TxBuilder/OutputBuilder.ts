@@ -87,7 +87,7 @@ export class ObservableWalletTxOutputBuilder implements OutputBuilder {
     return this.assets(assets);
   }
 
-  address(address: Cardano.Address): OutputBuilder {
+  address(address: Cardano.PaymentAddress): OutputBuilder {
     this.#partialOutput = { ...this.#partialOutput, address };
     return this;
   }

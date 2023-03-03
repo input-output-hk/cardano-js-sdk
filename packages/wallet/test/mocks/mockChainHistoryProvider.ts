@@ -9,7 +9,7 @@ export const getRandomTxId = () =>
     .map(() => Math.floor(Math.random() * 16).toString(16))
     .join('');
 
-const address = Cardano.Address(
+const address = Cardano.PaymentAddress(
   'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'
 );
 
@@ -68,7 +68,7 @@ export const queryTransactionsResult: Paginated<Cardano.HydratedTx> = {
         fee: 200_000n,
         inputs: [
           {
-            address: Cardano.Address(
+            address: Cardano.PaymentAddress(
               'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'
             ),
             index: 0,
@@ -77,19 +77,19 @@ export const queryTransactionsResult: Paginated<Cardano.HydratedTx> = {
         ],
         outputs: [
           {
-            address: Cardano.Address(
+            address: Cardano.PaymentAddress(
               'addr_test1qpfhhfy2qgls50r9u4yh0l7z67xpg0a5rrhkmvzcuqrd0znuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q9gw0lz'
             ),
             value: { coins: 5_000_000n }
           },
           {
-            address: Cardano.Address(
+            address: Cardano.PaymentAddress(
               'addr_test1qplfzem2xsc29wxysf8wkdqrm4s4mmncd40qnjq9sk84l3tuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q52ukj5'
             ),
             value: { coins: 5_000_000n }
           },
           {
-            address: Cardano.Address(
+            address: Cardano.PaymentAddress(
               'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9'
             ),
             value: { coins: 9_825_963n }
@@ -115,7 +115,7 @@ export const queryTransactionsResult: Paginated<Cardano.HydratedTx> = {
         fee: 123n,
         inputs: [
           {
-            address: Cardano.Address(
+            address: Cardano.PaymentAddress(
               'addr_test1qpfhhfy2qgls50r9u4yh0l7z67xpg0a5rrhkmvzcuqrd0znuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q9gw0lz'
             ),
             index: 0,
@@ -124,7 +124,7 @@ export const queryTransactionsResult: Paginated<Cardano.HydratedTx> = {
         ],
         outputs: [
           {
-            address: Cardano.Address(
+            address: Cardano.PaymentAddress(
               'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'
             ),
             value: { coins: 5_000_000n }

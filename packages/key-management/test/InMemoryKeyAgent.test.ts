@@ -10,7 +10,7 @@ const { ownSignatureKeyPaths } = jest.requireMock('../src/util/ownSignatureKeyPa
 describe('InMemoryKeyAgent', () => {
   let keyAgent: InMemoryKeyAgent;
   let getPassphrase: jest.Mock;
-  let inputResolver: jest.Mocked<Cardano.util.InputResolver>;
+  let inputResolver: jest.Mocked<Cardano.InputResolver>;
   let mnemonicWords: string[];
   const bip32Ed25519 = new Crypto.CmlBip32Ed25519(CML);
 

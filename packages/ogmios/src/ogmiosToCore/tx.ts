@@ -22,9 +22,7 @@ import {
   NotImplementedError,
   ProviderUtil,
   SerializationError,
-  SerializationFailure,
-  addressNetworkId,
-  createRewardAccount
+  SerializationFailure
 } from '@cardano-sdk/core';
 import { Schema } from '@cardano-ogmios/client';
 import Fraction from 'fraction.js';
@@ -66,7 +64,7 @@ const mapPoolParameters = (poolParameters: Schema.PoolParameters): Cardano.PoolP
         }
       : undefined,
     owners: poolParameters.owners.map((ownerKeyHash) =>
-      createRewardAccount(Crypto.Ed25519KeyHashHex(ownerKeyHash), addressNetworkId(rewardAccount))
+      Cardano.createRewardAccount(Crypto.Ed25519KeyHashHex(ownerKeyHash), Cardano.addressNetworkId(rewardAccount))
     ),
     relays: poolParameters.relays.map(mapRelay),
     rewardAccount,
@@ -262,7 +260,7 @@ const mapDatumHash = (datum: Schema.TxOut['datumHash']) => {
 };
 
 const mapTxOut = (txOut: Schema.TxOut): Cardano.TxOut => ({
-  address: Cardano.Address(txOut.address),
+  address: Cardano.PaymentAddress(txOut.address),
   datum: mapInlineDatum(txOut.datum),
   datumHash: mapDatumHash(txOut.datumHash),
   scriptReference: txOut.script ? mapScript(txOut.script) : undefined,

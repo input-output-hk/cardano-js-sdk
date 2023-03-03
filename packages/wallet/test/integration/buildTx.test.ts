@@ -191,7 +191,7 @@ describe('buildTx', () => {
     let assetId: Cardano.AssetId;
     let assetQuantity: bigint;
     let assets: Cardano.TokenMap;
-    let address: Cardano.Address;
+    let address: Cardano.PaymentAddress;
     let datumHash: Crypto.Hash32ByteBase16;
     let output1Coin: bigint;
     let output2Base: Cardano.TxOut;
@@ -200,7 +200,7 @@ describe('buildTx', () => {
       assetId = Cardano.AssetId('1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c960150584c');
       assetQuantity = 100n;
       assets = new Map([[assetId, assetQuantity]]);
-      address = Cardano.Address('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg');
+      address = Cardano.PaymentAddress('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg');
       datumHash = Crypto.Hash32ByteBase16('3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d');
       output1Coin = 10_000_000n;
       output2Base = mocks.utxo[0][1];
@@ -339,7 +339,7 @@ describe('buildTx', () => {
     });
 
     it('certificates are added to tx.body on build', async () => {
-      const address = Cardano.Address('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg');
+      const address = Cardano.PaymentAddress('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg');
       txBuilder.delegate(poolId);
       const maybeValidTxOut = await txBuilder.buildOutput().address(address).coin(10_000_000n).build();
       assertTxOutIsValid(maybeValidTxOut);

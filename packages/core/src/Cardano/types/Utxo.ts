@@ -1,5 +1,5 @@
-import { Address } from './Address';
 import { Datum, DatumHash, Script } from './Script';
+import { PaymentAddress } from './../Address';
 import { TransactionId } from './Transaction';
 import { Value } from './Value';
 
@@ -9,11 +9,11 @@ export interface TxIn {
 }
 
 export interface HydratedTxIn extends TxIn {
-  address: Address;
+  address: PaymentAddress;
 }
 
 export interface TxOut {
-  address: Address;
+  address: PaymentAddress;
   value: Value;
 
   /**

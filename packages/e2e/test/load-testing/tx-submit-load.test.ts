@@ -36,7 +36,7 @@ interface TestReport extends TestOptions {
 }
 
 interface TestWallet {
-  address: Cardano.Address;
+  address: Cardano.PaymentAddress;
   coins: bigint;
   wallet: ObservableWallet;
 }
@@ -166,7 +166,7 @@ describe('load', () => {
   const fragmentWhenRequired = async (options: TestOptions) => {
     await refreshWallets();
 
-    const toRefill: Cardano.Address[] = [];
+    const toRefill: Cardano.PaymentAddress[] = [];
     const { wallet } = testWallets[0];
 
     for (let i = 0; i < env.TRANSACTIONS_NUMBER; ++i)

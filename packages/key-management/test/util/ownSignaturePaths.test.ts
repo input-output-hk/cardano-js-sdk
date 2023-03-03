@@ -7,7 +7,7 @@ export const stakeKeyPath = {
 };
 
 const createGroupedAddress = (
-  address: Cardano.Address,
+  address: Cardano.PaymentAddress,
   rewardAccount: Cardano.RewardAccount,
   type: AddressType,
   index: number,
@@ -25,10 +25,10 @@ const createGroupedAddress = (
 describe('KeyManagement.util.ownSignaturePaths', () => {
   const ownRewardAccount = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
   const otherRewardAccount = Cardano.RewardAccount('stake_test1uqrw9tjymlm8wrwq7jk68n6v7fs9qz8z0tkdkve26dylmfc2ux2hj');
-  const address1 = Cardano.Address(
+  const address1 = Cardano.PaymentAddress(
     'addr_test1qra788mu4sg8kwd93ns9nfdh3k4ufxwg4xhz2r3n064tzfgxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6cy45x'
   );
-  const address2 = Cardano.Address(
+  const address2 = Cardano.PaymentAddress(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   );
 

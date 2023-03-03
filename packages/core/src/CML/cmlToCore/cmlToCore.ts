@@ -187,7 +187,7 @@ export const txOut = (output: CML.TransactionOutput): Cardano.TxOut =>
     const address = byronAddress ? byronAddress.to_base58() : cmlAddress.to_bech32();
 
     return {
-      address: Cardano.Address(address),
+      address: Cardano.PaymentAddress(address),
       datum: inlineDatum ? bytesToHex(inlineDatum) : undefined,
       datumHash: dataHashBytes ? Crypto.Hash32ByteBase16.fromHexBlob(bytesToHex(dataHashBytes)) : undefined,
       scriptReference: scriptRef ? getCoreScript(scope, scope.manage(scriptRef.script())) : undefined,

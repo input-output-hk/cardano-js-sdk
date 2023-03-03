@@ -22,7 +22,7 @@ import {
 
 const txOutByron = {
   ...txOut,
-  address: Cardano.Address(
+  address: Cardano.PaymentAddress(
     'DdzFFzCqrhsw3prhfMFDNFowbzUku3QmrMwarfjUbWXRisodn97R436SHc1rimp4MhPNmbdYb1aTdqtGSJixMVMi5MkArDQJ6Sc1n3Ez'
   )
 };

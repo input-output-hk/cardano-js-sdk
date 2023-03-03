@@ -67,7 +67,7 @@ export const txIn = {
 };
 
 export const txOut: Cardano.TxOut = {
-  address: Cardano.Address(
+  address: Cardano.PaymentAddress(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
   value: valueWithAssets
@@ -298,7 +298,7 @@ export const getBigBabbageTx = async () => {
 };
 
 export const noMultiasset = {
-  address: Cardano.Address(
+  address: Cardano.PaymentAddress(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
   value: {
@@ -309,7 +309,7 @@ export const noMultiasset = {
 export const noMultiassetMinAda = 969_750n;
 
 export const onePolicyOne0CharAsset = {
-  address: Cardano.Address(
+  address: Cardano.PaymentAddress(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
   value: {
@@ -321,7 +321,7 @@ export const onePolicyOne0CharAsset = {
 export const onePolicyOne0CharAssetMinAda = 1_120_600n;
 
 export const onePolicyOne1CharAsset = {
-  address: Cardano.Address(
+  address: Cardano.PaymentAddress(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
   value: {
@@ -333,7 +333,7 @@ export const onePolicyOne1CharAsset = {
 export const onePolicyOne1CharAssetMinAda = 1_124_910n;
 
 export const onePolicyThree1CharAsset = {
-  address: Cardano.Address(
+  address: Cardano.PaymentAddress(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
   value: {
@@ -349,7 +349,7 @@ export const onePolicyThree1CharAsset = {
 export const onePolicyThree1CharAssetMinAda = 1_150_770n;
 
 export const twoPoliciesOne0CharAsset = {
-  address: Cardano.Address(
+  address: Cardano.PaymentAddress(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
   value: {
@@ -364,7 +364,7 @@ export const twoPoliciesOne0CharAsset = {
 export const twoPoliciesOne0CharAssetMinAda = 1_262_830n;
 
 export const twoPoliciesOne1CharAsset = {
-  address: Cardano.Address(
+  address: Cardano.PaymentAddress(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
   value: {
@@ -379,7 +379,7 @@ export const twoPoliciesOne1CharAsset = {
 export const twoPoliciesOne1CharAssetMinAda = 1_271_450n;
 
 export const onePolicyOne0CharAssetDatumHash = {
-  address: Cardano.Address(
+  address: Cardano.PaymentAddress(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
   datumHash: Crypto.Hash32ByteBase16('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'),
@@ -392,7 +392,7 @@ export const onePolicyOne0CharAssetDatumHash = {
 export const onePolicyOne0CharAssetDatumHashMinAda = 1_267_140n;
 
 export const threePolicyThree32CharAssetDatumHash = {
-  address: Cardano.Address(
+  address: Cardano.PaymentAddress(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
   datumHash: Crypto.Hash32ByteBase16('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'),
@@ -427,7 +427,7 @@ export const threePolicyThree32CharAssetDatumHash = {
 export const threePolicyThree32CharAssetDatumHashMinAda = 1_409_370n;
 
 export const twoPolicyOne0CharAssetDatumHash = {
-  address: Cardano.Address(
+  address: Cardano.PaymentAddress(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
   datumHash: Crypto.Hash32ByteBase16('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'),
@@ -443,7 +443,7 @@ export const twoPolicyOne0CharAssetDatumHash = {
 export const twoPolicyOne0CharAssetDatumHashMinAda = 1_409_370n;
 
 export const twoPolicyOne0CharAssetDatum = {
-  address: Cardano.Address(
+  address: Cardano.PaymentAddress(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
   datum: HexBlob('187b'),
@@ -459,7 +459,7 @@ export const twoPolicyOne0CharAssetDatum = {
 export const twoPolicyOne0CharAssetDatumMinAda = 1_305_930n;
 
 export const twoPolicyOne0CharAssetDatumAndScriptReference = {
-  address: Cardano.Address(
+  address: Cardano.PaymentAddress(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
   datum: HexBlob('187b'),

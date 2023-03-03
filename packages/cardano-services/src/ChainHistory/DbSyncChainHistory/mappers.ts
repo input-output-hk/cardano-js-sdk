@@ -67,7 +67,7 @@ export const mapTxIn = (txIn: TxInput): Cardano.HydratedTxIn => ({
 });
 
 export const mapTxInModel = (txInModel: TxInputModel): TxInput => ({
-  address: txInModel.address as unknown as Cardano.Address,
+  address: txInModel.address as unknown as Cardano.PaymentAddress,
   id: txInModel.id,
   index: txInModel.index,
   txInputId: txInModel.tx_input_id.toString('hex') as unknown as Cardano.TransactionId,
@@ -83,7 +83,7 @@ export const mapTxOut = (txOut: TxOutput): Cardano.TxOut => ({
 });
 
 export const mapTxOutModel = (txOutModel: TxOutputModel, assets?: Cardano.TokenMap): TxOutput => ({
-  address: txOutModel.address as unknown as Cardano.Address,
+  address: txOutModel.address as unknown as Cardano.PaymentAddress,
   datumHash: txOutModel.datum ? (txOutModel.datum.toString('hex') as unknown as Hash32ByteBase16) : undefined,
   index: txOutModel.index,
   txId: txOutModel.tx_id.toString('hex') as unknown as Cardano.TransactionId,

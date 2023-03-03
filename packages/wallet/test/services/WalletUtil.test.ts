@@ -58,14 +58,14 @@ describe('WalletUtil', () => {
       const utxo: Cardano.Utxo[] = [
         [
           {
-            address: Cardano.Address(
+            address: Cardano.PaymentAddress(
               'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
             ),
             index: 0,
             txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
           },
           {
-            address: Cardano.Address('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg'),
+            address: Cardano.PaymentAddress('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg'),
             value: { coins: 50_000_000n }
           }
         ]

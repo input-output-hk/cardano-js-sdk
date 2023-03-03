@@ -10,7 +10,7 @@ const env = getEnv(walletVariables);
 
 describe('SingleAddressWallet/metadata', () => {
   let wallet: SingleAddressWallet;
-  let ownAddress: Cardano.Address;
+  let ownAddress: Cardano.PaymentAddress;
 
   beforeAll(async () => {
     wallet = (await getWallet({ env, logger, name: 'Test Wallet' })).wallet;

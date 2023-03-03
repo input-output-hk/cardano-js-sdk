@@ -70,7 +70,6 @@ import { ManagedFreeableScope } from '@cardano-sdk/util';
 import { RedeemerPurpose } from '../../Cardano';
 import { SerializationError, SerializationFailure } from '../../errors';
 import { assetNameFromAssetId, parseAssetId, policyIdFromAssetId } from '../../Asset/util';
-import { parseCmlAddress } from '../parseCmlAddress';
 
 export const tokenMap = (scope: ManagedFreeableScope, map: Cardano.TokenMap) => {
   const multiasset = scope.manage(MultiAsset.new());
@@ -187,7 +186,10 @@ export const txIn = (scope: ManagedFreeableScope, core: Cardano.TxIn): Transacti
   );
 
 export const txOut = (scope: ManagedFreeableScope, core: Cardano.TxOut): TransactionOutput => {
-  const cslTxOut = scope.manage(TransactionOutput.new(parseCmlAddress(scope, core.address)!, value(scope, core.value)));
+  const cmlAddress = scope.manage(
+    Address.from_bytes(Buffer.from(Cardano.Address.fromString(core.address)!.toBytes(), 'hex'))
+  );
+  const cslTxOut = scope.manage(TransactionOutput.new(cmlAddress, value(scope, core.value)));
 
   if (core.datum && core.datumHash)
     throw new SerializationError(

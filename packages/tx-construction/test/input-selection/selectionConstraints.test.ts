@@ -65,7 +65,7 @@ describe('defaultSelectionConstraints', () => {
     const constraints = defaultSelectionConstraints({
       protocolParameters
     } as DefaultSelectionConstraintsProps);
-    const address = Cardano.Address(
+    const address = Cardano.PaymentAddress(
       'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9'
     );
     const minCoinWithAssets = constraints.computeMinimumCoinQuantity({ address, value: { assets, coins: 0n } });

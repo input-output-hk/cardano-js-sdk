@@ -18,7 +18,7 @@ describe('cip30signData', () => {
     address = await asyncKeyAgent.deriveAddress(addressDerivationPath);
   });
 
-  const signAndDecode = async (signWith: Cardano.Address | Cardano.RewardAccount) => {
+  const signAndDecode = async (signWith: Cardano.PaymentAddress | Cardano.RewardAccount) => {
     const dataSignature = await cip8.cip30signData({
       keyAgent: asyncKeyAgent,
       payload: HexBlob('abc123'),
@@ -37,7 +37,7 @@ describe('cip30signData', () => {
   };
 
   // eslint-disable-next-line unicorn/consistent-function-scoping
-  const testAddressHeader = (signedData: SigStructure, signWith: Cardano.RewardAccount | Cardano.Address) => {
+  const testAddressHeader = (signedData: SigStructure, signWith: Cardano.RewardAccount | Cardano.PaymentAddress) => {
     const addressHeader = signedData.body_protected().deserialized_headers().header(CoseLabel.address)!;
 
     // Subject to change (cbor vs raw bytes argument), PR open: https://github.com/cardano-foundation/CIPs/pull/148
@@ -45,7 +45,7 @@ describe('cip30signData', () => {
     // @emurgo/cardano-message-signing-nodejs only allows CBORValue for headers
     const addressHeaderBytes = addressHeader.as_bytes();
 
-    expect(addressHeaderBytes).toEqual(CML.Address.from_bech32(signWith).to_bytes());
+    expect(Buffer.from(addressHeaderBytes!).toString('hex')).toEqual(Cardano.Address.fromBech32(signWith).toBytes());
   };
 
   it('supports sign with payment address', async () => {

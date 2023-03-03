@@ -67,7 +67,7 @@ const getStakingKeyPaths = (
 export const ownSignatureKeyPaths = async (
   txBody: Cardano.TxBody,
   knownAddresses: GroupedAddress[],
-  inputResolver: Cardano.util.InputResolver
+  inputResolver: Cardano.InputResolver
 ): Promise<AccountKeyDerivationPath[]> => {
   const paymentKeyPaths = uniq(
     (

@@ -8,7 +8,7 @@ import { WalletStores } from '../persistence';
 
 export interface UtxoTrackerProps {
   utxoProvider: UtxoProvider;
-  addresses$: Observable<Cardano.Address[]>;
+  addresses$: Observable<Cardano.PaymentAddress[]>;
   stores: Pick<WalletStores, 'utxo' | 'unspendableUtxo'>;
   transactionsInFlight$: Observable<TxInFlight[]>;
   tipBlockHeight$: Observable<Cardano.BlockNo>;
@@ -24,7 +24,7 @@ export interface UtxoTrackerInternals {
 
 export const createUtxoProvider = (
   utxoProvider: UtxoProvider,
-  addresses$: Observable<Cardano.Address[]>,
+  addresses$: Observable<Cardano.PaymentAddress[]>,
   tipBlockHeight$: Observable<Cardano.BlockNo>,
   retryBackoffConfig: RetryBackoffConfig,
   onFatalError?: (value: unknown) => void

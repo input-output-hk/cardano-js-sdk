@@ -63,7 +63,7 @@ export enum CommunicationType {
 }
 
 export interface KeyAgentDependencies {
-  inputResolver: Cardano.util.InputResolver;
+  inputResolver: Cardano.InputResolver;
   logger: Logger;
   bip32Ed25519: Crypto.Bip32Ed25519;
 }
@@ -78,7 +78,7 @@ export interface GroupedAddress {
   index: number;
   networkId: Cardano.NetworkId;
   accountIndex: number;
-  address: Cardano.Address;
+  address: Cardano.PaymentAddress;
   rewardAccount: Cardano.RewardAccount;
   stakeKeyDerivationPath?: AccountKeyDerivationPath;
 }

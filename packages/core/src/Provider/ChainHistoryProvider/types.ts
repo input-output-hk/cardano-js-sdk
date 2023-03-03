@@ -2,7 +2,7 @@
 import { Cardano, Paginated, PaginationArgs, Provider, Range } from '../..';
 
 export type TransactionsByAddressesArgs = {
-  addresses: Cardano.Address[];
+  addresses: Cardano.PaymentAddress[];
   pagination: PaginationArgs;
   blockRange?: Range<Cardano.BlockNo>;
 };
@@ -14,7 +14,7 @@ export interface ChainHistoryProvider extends Provider {
    * Gets the transactions involving the provided addresses.
    * It's also possible to provide a block number to only look for transactions since that block inclusive
    *
-   * @param {Cardano.Address[]} addresses array of addresses
+   * @param {Cardano.PaymentAddress[]} addresses array of addresses
    * @param {Cardano.PaginationArgs} [pagination] pagination args
    * @param {Range<Cardano.BlockNo>} [blockRange] transactions in specified block ranges (lower and upper bounds inclusive)
    * @returns {Cardano.HydratedTx[]} an array of transactions involving the addresses

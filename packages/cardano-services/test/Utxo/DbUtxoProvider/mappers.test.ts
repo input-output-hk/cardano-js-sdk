@@ -19,14 +19,14 @@ describe('utxosToCore', () => {
     expect(utxosToCore(someFetchedUtxos)).toEqual([
       [
         {
-          address: Cardano.Address(
+          address: Cardano.PaymentAddress(
             'addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7'
           ),
           index: 1,
           txId: Cardano.TransactionId('8fd14baca91c674fafae59701b7dc0eda1266202ec8445bad3244bd8669a7fb5')
         },
         {
-          address: Cardano.Address(
+          address: Cardano.PaymentAddress(
             'addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7'
           ),
           value: {
@@ -52,14 +52,14 @@ describe('utxosToCore', () => {
     ).toEqual([
       [
         {
-          address: Cardano.Address(
+          address: Cardano.PaymentAddress(
             'addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7'
           ),
           index: 1,
           txId: Cardano.TransactionId('8fd14baca91c674fafae59701b7dc0eda1266202ec8445bad3244bd8669a7fb5')
         },
         {
-          address: Cardano.Address(
+          address: Cardano.PaymentAddress(
             'addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7'
           ),
           value: {

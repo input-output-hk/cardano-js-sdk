@@ -38,7 +38,7 @@ describe('cip30', () => {
   const simpleTxProps: InitializeTxProps = {
     outputs: new Set([
       {
-        address: Cardano.Address(
+        address: Cardano.PaymentAddress(
           // eslint-disable-next-line max-len
           'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w'
         ),
@@ -223,7 +223,7 @@ describe('cip30', () => {
       test('api.getUsedAddresses', async () => {
         const cipUsedAddressess = await api.getUsedAddresses();
         const [{ address: walletAddress }] = await firstValueFrom(wallet.addresses$);
-        expect(cipUsedAddressess.map((cipAddr) => Cardano.Address(cipAddr))).toEqual([walletAddress]);
+        expect(cipUsedAddressess.map((cipAddr) => Cardano.PaymentAddress(cipAddr))).toEqual([walletAddress]);
       });
 
       test('api.getUnusedAddresses', async () => {
@@ -234,13 +234,13 @@ describe('cip30', () => {
       test('api.getChangeAddress', async () => {
         const cipChangeAddress = await api.getChangeAddress();
         const [{ address: walletAddress }] = await firstValueFrom(wallet.addresses$);
-        expect(Cardano.Address(cipChangeAddress)).toEqual(walletAddress);
+        expect(Cardano.PaymentAddress(cipChangeAddress)).toEqual(walletAddress);
       });
 
       test('api.getRewardAddresses', async () => {
         const cipRewardAddressesCbor = await api.getRewardAddresses();
         const cipRewardAddresses = cipRewardAddressesCbor.map((cipAddr) =>
-          scope.manage(CML.Address.from_bytes(Buffer.from(cipAddr, 'hex'))).to_bech32()
+          Cardano.Address.fromBytes(HexBlob(cipAddr)).toBech32()
         );
 
         const [{ rewardAccount: walletRewardAccount }] = await firstValueFrom(wallet.addresses$);
@@ -318,8 +318,7 @@ describe('cip30', () => {
           confirmationCallback.mockResolvedValueOnce(true);
 
           const expectedAddr = wallet.addresses$.value![0].address;
-
-          const hexAddr = Buffer.from(scope.manage(CML.Address.from_bech32(expectedAddr)).to_bytes()).toString('hex');
+          const hexAddr = Cardano.Address.fromBech32(expectedAddr).toBytes();
 
           await api.signData(hexAddr, payload);
           expect(confirmationCallback).toHaveBeenCalledWith(

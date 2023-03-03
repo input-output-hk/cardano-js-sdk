@@ -1,5 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { CML, Cardano, cmlToCore, coreToCml } from '../../src';
+import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { ManagedFreeableScope } from '@cardano-sdk/util';
 import { metadataJson, ownerRewardAccount, poolId, poolParameters, rewardAccount, stakeKeyHash, vrf } from './testData';
 
@@ -19,18 +20,24 @@ describe('certificates', () => {
       const certificate = coreToCml.certificate.stakeKeyRegistration(scope, stakeKeyHash);
       const registration = scope.manage(certificate.as_stake_registration())!;
       const stakeCredential = scope.manage(registration.stake_credential());
-      const rewardAddress = scope.manage(CML.RewardAddress.new(1, stakeCredential));
-      const cmlAddress = scope.manage(rewardAddress.to_address());
-      expect(cmlAddress.to_bech32()).toBe(rewardAccount);
+      const rewardAddress = Cardano.RewardAddress.fromCredentials(1, {
+        hash: Hash28ByteBase16(stakeCredential.to_keyhash()!.to_hex()),
+        type: stakeCredential.kind()
+      });
+
+      expect(rewardAddress.toAddress().toBech32()).toBe(rewardAccount);
     });
 
     it('stakeKeyDeregistration', () => {
       const certificate = coreToCml.certificate.stakeKeyDeregistration(scope, stakeKeyHash);
       const deregistration = scope.manage(certificate.as_stake_deregistration())!;
       const stakeCredential = scope.manage(deregistration.stake_credential());
-      const rewardAddress = scope.manage(CML.RewardAddress.new(1, stakeCredential));
-      const cmlAddress = scope.manage(rewardAddress.to_address());
-      expect(cmlAddress.to_bech32()).toBe(rewardAccount);
+      const rewardAddress = Cardano.RewardAddress.fromCredentials(1, {
+        hash: Hash28ByteBase16(stakeCredential.to_keyhash()!.to_hex()),
+        type: stakeCredential.kind()
+      });
+
+      expect(rewardAddress.toAddress().toBech32()).toBe(rewardAccount);
     });
 
     it('stakeDelegation', () => {
@@ -38,9 +45,12 @@ describe('certificates', () => {
       const delegation = scope.manage(certificate.as_stake_delegation())!;
       const poolKeyHash = scope.manage(delegation.pool_keyhash());
       const stakeCredential = scope.manage(delegation.stake_credential());
-      const rewardAddress = scope.manage(CML.RewardAddress.new(1, stakeCredential));
-      const cmlAddress = rewardAddress.to_address();
-      expect(cmlAddress.to_bech32()).toBe(rewardAccount);
+      const rewardAddress = Cardano.RewardAddress.fromCredentials(1, {
+        hash: Hash28ByteBase16(stakeCredential.to_keyhash()!.to_hex()),
+        type: stakeCredential.kind()
+      });
+
+      expect(rewardAddress.toAddress().toBech32()).toBe(rewardAccount);
       expect(poolKeyHash.to_bech32('pool')).toBe(poolId);
     });
 
@@ -60,8 +70,11 @@ describe('certificates', () => {
       const owners = scope.manage(params.pool_owners());
       const owner = scope.manage(owners.get(0));
       const stakeCredential = scope.manage(CML.StakeCredential.from_keyhash(owner));
-      const rewardAddress = scope.manage(CML.RewardAddress.new(1, stakeCredential));
-      const cmlAddress = scope.manage(rewardAddress.to_address());
+      const rewardAddress = Cardano.RewardAddress.fromCredentials(1, {
+        hash: Hash28ByteBase16(stakeCredential.to_keyhash()!.to_hex()),
+        type: stakeCredential.kind()
+      });
+      const address = rewardAddress.toAddress();
       const metadata = scope.manage(params.pool_metadata())!;
       const metadataUrl = scope.manage(metadata.url());
       const metadataHash = scope.manage(metadata.pool_metadata_hash());
@@ -71,7 +84,7 @@ describe('certificates', () => {
       expect(scope.manage(margin.numerator()).to_str()).toBe('1');
       expect(scope.manage(margin.denominator()).to_str()).toBe('5');
       expect(owners.len()).toBe(1);
-      expect(cmlAddress.to_bech32()).toBe(ownerRewardAccount);
+      expect(address.toBech32()).toBe(ownerRewardAccount);
       expect(operator.to_bech32('pool')).toBe(poolId);
       expect(relays.len()).toBe(3);
       expect(Buffer.from(vrfKeyHash.to_bytes()).toString('hex')).toBe(vrf);

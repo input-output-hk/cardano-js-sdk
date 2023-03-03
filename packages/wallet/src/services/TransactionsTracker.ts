@@ -39,7 +39,7 @@ import unionBy from 'lodash/unionBy';
 
 export interface TransactionsTrackerProps {
   chainHistoryProvider: ChainHistoryProvider;
-  addresses$: Observable<Cardano.Address[]>;
+  addresses$: Observable<Cardano.PaymentAddress[]>;
   tip$: Observable<Cardano.Tip>;
   retryBackoffConfig: RetryBackoffConfig;
   transactionsHistoryStore: OrderedCollectionStore<Cardano.HydratedTx>;
@@ -61,7 +61,7 @@ export interface TransactionsTrackerInternals {
 
 export interface TransactionsTrackerInternalsProps {
   chainHistoryProvider: ChainHistoryProvider;
-  addresses$: Observable<Cardano.Address[]>;
+  addresses$: Observable<Cardano.PaymentAddress[]>;
   retryBackoffConfig: RetryBackoffConfig;
   tipBlockHeight$: Observable<Cardano.BlockNo>;
   store: OrderedCollectionStore<Cardano.HydratedTx>;
@@ -74,7 +74,7 @@ export const PAGE_SIZE = 25;
 
 const allTransactionsByAddresses = async (
   chainHistoryProvider: ChainHistoryProvider,
-  { addresses, blockRange }: { addresses: Cardano.Address[]; blockRange: Range<Cardano.BlockNo> }
+  { addresses, blockRange }: { addresses: Cardano.PaymentAddress[]; blockRange: Range<Cardano.BlockNo> }
 ): Promise<Cardano.HydratedTx[]> => {
   let startAt = 0;
   let response: Cardano.HydratedTx[] = [];

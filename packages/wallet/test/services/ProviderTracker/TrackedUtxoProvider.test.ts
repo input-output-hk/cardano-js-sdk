@@ -51,7 +51,7 @@ describe('TrackedStakePoolProvider', () => {
         (provider) =>
           provider.utxoByAddresses({
             addresses: [
-              Cardano.Address(
+              Cardano.PaymentAddress(
                 // eslint-disable-next-line max-len
                 'addr_test1qpcnmvyjmxmsm75f747u566gw7ewz4mesdw7yl278uf9r3f5l7d7dpx2ymfwlm3e56flupga8yamjr2kwdt7dw77ktyqqtx2r7'
               )

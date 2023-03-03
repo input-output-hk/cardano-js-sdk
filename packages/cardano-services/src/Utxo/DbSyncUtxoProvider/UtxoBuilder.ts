@@ -12,7 +12,7 @@ export class UtxoBuilder {
     this.#db = db;
     this.#logger = logger;
   }
-  public async utxoByAddresses(addresses: Cardano.Address[]): Promise<Cardano.Utxo[]> {
+  public async utxoByAddresses(addresses: Cardano.PaymentAddress[]): Promise<Cardano.Utxo[]> {
     this.#logger.debug('About to find utxos of addresses ', addresses);
     const result: QueryResult<UtxoModel> = await this.#db.query(findUtxosByAddresses, [addresses]);
     return result.rows.length > 0 ? utxosToCore(result.rows) : [];
