@@ -19,6 +19,9 @@ jest.mock('@cardano-sdk/crypto', () => {
   };
 });
 
+const createFingerprint = (policyId: string, assetName: string): string =>
+  AssetFingerprint.fromParts(PolicyId(policyId), AssetName(assetName));
+
 describe('Cardano/types/Asset', () => {
   describe('AssetId', () => {
     it('accepts a valid asset id and is implemented using util.assetIsHexString', () => {
@@ -72,10 +75,47 @@ describe('Cardano/types/Asset', () => {
       expect(typedBech32).toBeCalledWith('asset13n25uv0yaf5kus35fm2k86cqy60z58d9xmde92', 'asset', 32);
     });
 
-    it('can be build from the policy id and asset name', async () => {
-      const policyId = PolicyId('659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba82');
-      const assetName = AssetName('54534c41');
-      expect(AssetFingerprint.fromParts(policyId, assetName)).toEqual('asset1rqluyux4nxv6kjashz626c8usp8g88unmqwnyh');
+    it('creates expected fingerprint from cip14 test vectors', async () => {
+      expect(createFingerprint('7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373', '')).toEqual(
+        'asset1rjklcrnsdzqp65wjgrg55sy9723kw09mlgvlc3'
+      );
+
+      expect(createFingerprint('7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc37e', '')).toEqual(
+        'asset1nl0puwxmhas8fawxp8nx4e2q3wekg969n2auw3'
+      );
+
+      expect(createFingerprint('1e349c9bdea19fd6c147626a5260bc44b71635f398b67c59881df209', '')).toEqual(
+        'asset1uyuxku60yqe57nusqzjx38aan3f2wq6s93f6ea'
+      );
+
+      expect(createFingerprint('7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373', '504154415445')).toEqual(
+        'asset13n25uv0yaf5kus35fm2k86cqy60z58d9xmde92'
+      );
+
+      expect(createFingerprint('1e349c9bdea19fd6c147626a5260bc44b71635f398b67c59881df209', '504154415445')).toEqual(
+        'asset1hv4p5tv2a837mzqrst04d0dcptdjmluqvdx9k3'
+      );
+
+      expect(
+        createFingerprint(
+          '1e349c9bdea19fd6c147626a5260bc44b71635f398b67c59881df209',
+          '7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373'
+        )
+      ).toEqual('asset1aqrdypg669jgazruv5ah07nuyqe0wxjhe2el6f');
+
+      expect(
+        createFingerprint(
+          '7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373',
+          '1e349c9bdea19fd6c147626a5260bc44b71635f398b67c59881df209'
+        )
+      ).toEqual('asset17jd78wukhtrnmjh3fngzasxm8rck0l2r4hhyyt');
+
+      expect(
+        createFingerprint(
+          '7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373',
+          '0000000000000000000000000000000000000000000000000000000000000000'
+        )
+      ).toEqual('asset1pkpwyknlvul7az0xx8czhl60pyel45rpje4z8w');
     });
   });
 });

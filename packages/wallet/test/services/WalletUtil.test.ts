@@ -174,7 +174,7 @@ describe('WalletUtil', () => {
         collaterals: new Set([mockUtxo[2][0]]),
         outputs: new Set([
           {
-            address: Cardano.Address(
+            address: Cardano.PaymentAddress(
               'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w'
             ),
             value: { coins: 11_111_111n }
