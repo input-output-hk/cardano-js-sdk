@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { WithCertificates } from './withCertificates';
 import { unifiedProjectorOperator } from '../utils';
 
@@ -7,6 +7,8 @@ export interface WithStakeKeys {
   stakeKeys: {
     register: Set<Crypto.Ed25519KeyHashHex>;
     deregister: Set<Crypto.Ed25519KeyHashHex>;
+    insert: Crypto.Ed25519KeyHashHex[];
+    del: Crypto.Ed25519KeyHashHex[];
   };
 }
 
@@ -23,7 +25,7 @@ export interface WithStakeKeys {
 export const withStakeKeys = unifiedProjectorOperator<WithCertificates, WithStakeKeys>((evt) => {
   const register = new Set<Crypto.Ed25519KeyHashHex>();
   const deregister = new Set<Crypto.Ed25519KeyHashHex>();
-  for (const { certificate } of evt.certificates)
+  for (const { certificate } of evt.certificates) {
     switch (certificate.__typename) {
       case Cardano.CertificateType.StakeKeyRegistration:
         if (deregister.has(certificate.stakeKeyHash)) {
@@ -40,10 +42,17 @@ export const withStakeKeys = unifiedProjectorOperator<WithCertificates, WithStak
         }
         break;
     }
+  }
+  const [insert, del] =
+    evt.eventType === ChainSyncEventType.RollForward
+      ? [[...register], [...deregister]]
+      : [[...deregister], [...register]];
   return {
     ...evt,
     stakeKeys: {
+      del,
       deregister,
+      insert,
       register
     }
   };
