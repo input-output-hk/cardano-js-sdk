@@ -124,10 +124,6 @@ export interface SubQuery {
   query: string;
 }
 
-export interface TotalAdaModel {
-  total_ada: string;
-}
-
 export interface PoolMetricsModel {
   blocks_created: number;
   delegators: number;

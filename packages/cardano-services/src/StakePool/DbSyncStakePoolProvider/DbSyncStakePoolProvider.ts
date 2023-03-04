@@ -63,8 +63,8 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
   #epochLength: number;
   #epochMonitor: EpochMonitor;
   #epochRolloverDisposer: Disposer;
-  #paginationPageSizeLimit: number;
   #metadataService: StakePoolExtMetadataService;
+  #paginationPageSizeLimit: number;
 
   constructor(
     { paginationPageSizeLimit }: StakePoolProviderProps,
@@ -86,15 +86,15 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
 
   private getQueryBySortType(
     sortType: PoolSortType,
-    queryArgs: { hashesIds: number[]; updatesIds: number[]; totalAdaAmount: string }
+    queryArgs: { hashesIds: number[]; updatesIds: number[]; totalStake: string }
   ) {
-    const { hashesIds, updatesIds, totalAdaAmount } = queryArgs;
+    const { hashesIds, updatesIds, totalStake } = queryArgs;
     // Identify which query to use to order and paginate the result
     // Should be the only one to get the sort options, rest should be ordered by their own defaults
     switch (sortType) {
       // Add more cases as more sort types are supported
       case 'metrics':
-        return (options?: QueryStakePoolsArgs) => this.#builder.queryPoolMetrics(hashesIds, totalAdaAmount, options);
+        return (options?: QueryStakePoolsArgs) => this.#builder.queryPoolMetrics(hashesIds, totalStake, options);
       case 'apy':
         return (options?: QueryStakePoolsArgs) => this.#builder.queryPoolAPY(hashesIds, this.#epochLength, options);
       case 'data':
@@ -121,12 +121,12 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
     }
   }
 
-  private async getPoolsDataOrdered(poolUpdates: PoolUpdate[], totalAdaAmount: string, options?: QueryStakePoolsArgs) {
+  private async getPoolsDataOrdered(poolUpdates: PoolUpdate[], totalStake: string, options?: QueryStakePoolsArgs) {
     const hashesIds = poolUpdates.map(({ id }) => id);
     const updatesIds = poolUpdates.map(({ updateId }) => updateId);
     this.logger.debug(`${hashesIds.length} pools found`);
     const sortType = options?.sort?.field ? getStakePoolSortType(options.sort.field) : 'data';
-    const orderedResult = await this.getQueryBySortType(sortType, { hashesIds, totalAdaAmount, updatesIds })(options);
+    const orderedResult = await this.getQueryBySortType(sortType, { hashesIds, totalStake, updatesIds })(options);
     const orderedResultHashIds = (orderedResult as CommonPoolInfo[]).map(({ hashId }) => hashId);
     const orderedResultUpdateIds = orderedResultHashIds.map(
       (id) => poolUpdates[poolUpdates.findIndex((item) => item.id === id)].updateId
@@ -151,7 +151,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
   private async queryExtraPoolsData(
     idsToFetch: PoolUpdate[],
     sortType: PoolSortType,
-    totalAdaAmount: string,
+    totalStake: string,
     orderedResult: OrderedResult
   ) {
     if (idsToFetch.length === 0) return emptyPoolsExtraInfo;
@@ -167,7 +167,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
       this.#builder.queryRetirements(orderedResultHashIds),
       sortType === 'metrics'
         ? (orderedResult as PoolMetrics[])
-        : this.#builder.queryPoolMetrics(orderedResultHashIds, totalAdaAmount)
+        : this.#builder.queryPoolMetrics(orderedResultHashIds, totalStake)
     ]);
     return { poolMetrics, poolOwners, poolRegistrations, poolRelays, poolRetirements };
   }
@@ -199,10 +199,18 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
     const poolUpdates = await this.#cache.get(queryCacheKey(StakePoolsSubQuery.POOL_HASHES, options), () =>
       this.#builder.queryPoolHashes(query, params)
     );
-    // Get total amount of ada cached
-    const totalAdaAmount = await this.#cache.get(queryCacheKey(StakePoolsSubQuery.TOTAL_ADA_AMOUNT), () =>
-      this.#builder.getTotalAmountOfAda()
-    );
+    // Get cached total staked amount
+    const totalStake = await this.#cache.get(queryCacheKey(StakePoolsSubQuery.TOTAL_STAKE), async () => {
+      const distribution = await this.cardanoNode.stakeDistribution();
+
+      for (const [_, value] of distribution) return value.stake.supply.toString();
+
+      throw new ProviderError(
+        ProviderFailure.InvalidResponse,
+        undefined,
+        'Got an empty distribution response from OgmiosCardanoNode'
+      );
+    });
     // Get total stake pools count cached
     const totalCount = await this.#cache.get(queryCacheKey(StakePoolsSubQuery.TOTAL_POOLS_COUNT, options), () =>
       this.#builder.queryTotalCount(query, params)
@@ -213,7 +221,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
     // Get stake pools data cached
     const { orderedResultHashIds, orderedResultUpdateIds, orderedResult, poolDatas, hashesIds, sortType } =
       await this.#cache.get(queryCacheKey(StakePoolsSubQuery.POOLS_DATA_ORDERED, options), () =>
-        this.getPoolsDataOrdered(poolUpdates, totalAdaAmount, options)
+        this.getPoolsDataOrdered(poolUpdates, totalStake, options)
       );
     // Get stake pools APYs cached
     const poolAPYs =
@@ -249,14 +257,14 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
     const { poolRelays, poolOwners, poolRegistrations, poolRetirements, poolMetrics } = await this.queryExtraPoolsData(
       idsToFetch,
       sortType,
-      totalAdaAmount,
+      totalStake,
       orderedResult
     );
     const { results, poolsToCache } = toStakePoolResults(orderedResultHashIds, fromCache, {
       lastEpochNo: Cardano.EpochNo(lastEpochNo),
       nodeMetricsDependencies: {
         optimalPoolCount,
-        totalAdaAmount: BigInt(totalAdaAmount)
+        totalAdaAmount: BigInt(totalStake)
       },
       poolAPYs,
       poolDatas,

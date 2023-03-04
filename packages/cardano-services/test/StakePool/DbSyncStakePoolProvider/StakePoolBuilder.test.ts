@@ -186,12 +186,6 @@ describe('StakePoolBuilder', () => {
       });
     });
   });
-  describe('getTotalAmountOfAda', () => {
-    it('getTotalAmountOfAda', async () => {
-      const totalAdaAmount = Number(await builder.getTotalAmountOfAda());
-      expect(totalAdaAmount).toBeGreaterThan(0);
-    });
-  });
   describe('getLastEpoch', () => {
     it('getLastEpoch', async () => {
       const lastEpoch = await builder.getLastEpoch();

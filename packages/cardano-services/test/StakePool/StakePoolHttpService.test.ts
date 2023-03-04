@@ -288,7 +288,7 @@ describe('StakePoolHttpService', () => {
 
       describe('/search', () => {
         const url = '/search';
-        const cachedSubQueriesCount = 11;
+        const cachedSubQueriesCount = 10;
         const cacheKeysCount = 7;
         const nonCacheableSubQueriesCount = 1; // getLastEpoch
         const filerOnePoolOptions: QueryStakePoolsArgs = {

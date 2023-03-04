@@ -21,19 +21,6 @@ LEFT JOIN epoch_param ep ON
 ORDER BY no DESC
 LIMIT 1`;
 
-export const findTotalAda = `
-SELECT COALESCE(SUM(value)) AS total_ada
-FROM tx_out AS tx_outer WHERE
-NOT exists
-  ( SELECT tx_out.id
-  FROM tx_out
-  JOIN tx_in ON
-  tx_out.tx_id = tx_in.tx_out_id AND
-  tx_out.index = tx_in.tx_out_index
-  WHERE tx_outer.id = tx_out.id
-  );
-`;
-
 export const findPoolsMetrics = `
 WITH current_epoch AS (
   SELECT
@@ -852,8 +839,7 @@ const Queries = {
   findPoolsRegistrations,
   findPoolsRelays,
   findPoolsRetirements,
-  findPoolsWithPledgeMet,
-  findTotalAda
+  findPoolsWithPledgeMet
 };
 
 export default Queries;
