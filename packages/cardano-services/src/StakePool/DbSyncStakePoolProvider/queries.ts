@@ -97,15 +97,9 @@ pools_delegates AS (
       AND pu.hash_id = ANY($1)
     LEFT JOIN tx_in ON
       tx_out.tx_id = tx_in.tx_out_id AND
-      tx_out.index::smallint = tx_in.tx_out_index::smallint
-    LEFT JOIN tx AS tx_in_tx ON
-      tx_in_tx.id = tx_in.tx_in_id AND
-      tx_in_tx.valid_contract = TRUE
-    JOIN tx AS tx_out_tx ON
-      tx_out_tx.id = tx_out.tx_id AND
-      tx_out_tx.valid_contract = TRUE
+      tx_out.index = tx_in.tx_out_index
     WHERE
-      tx_in_tx.id IS null
+      tx_in.tx_out_id IS null
     GROUP BY pu.hash_id
   ),
 active_stake AS (
@@ -152,15 +146,9 @@ total_utxos AS (
     tx_out.stake_address_id = ad.addr_id
   LEFT JOIN tx_in ON
     tx_out.tx_id = tx_in.tx_out_id AND
-    tx_out.index::smallint = tx_in.tx_out_index::smallint
-  LEFT JOIN tx AS tx_in_tx ON
-    tx_in_tx.id = tx_in.tx_in_id AND
-  tx_in_tx.valid_contract = TRUE
-  JOIN tx AS tx_out_tx ON
-    tx_out_tx.id = tx_out.tx_id AND
-    tx_out_tx.valid_contract = TRUE
+    tx_out.index = tx_in.tx_out_index
   WHERE
-    tx_in_tx.id IS NULL
+    tx_in.tx_out_id IS NULL
   GROUP BY ad.pool_hash_id
 ),
 total_rewards AS (
@@ -178,8 +166,6 @@ total_withdraws AS (
     COALESCE(SUM(w.amount),0) AS total_amount,
     ad.pool_hash_id
     FROM withdrawal w
-    JOIN tx ON tx.id = w.tx_id AND
-      tx.valid_contract = TRUE
     JOIN active_delegations ad ON ad.addr_id = w.addr_id
     GROUP BY ad.pool_hash_id
 ),
@@ -468,8 +454,6 @@ export const poolsByPledgeMetSubqueries: readonly SubQuery[] = [
     COALESCE(SUM(w.amount),0)  AS total_amount,
     sa.id AS stake_address_id
   FROM withdrawal w
-  JOIN tx ON tx.id = w.tx_id AND
-    tx.valid_contract = TRUE
   JOIN stake_address sa ON sa.id = w.addr_id
   JOIN pools_delegated pool ON pool.stake_address_id = sa.id
   GROUP BY sa.id`
@@ -499,15 +483,9 @@ export const poolsByPledgeMetSubqueries: readonly SubQuery[] = [
     AND pu.hash_id IN (SELECT id FROM pools_delegated)
   LEFT JOIN tx_in ON
     tx_out.tx_id = tx_in.tx_out_id AND
-    tx_out.index::smallint = tx_in.tx_out_index::smallint
-  LEFT JOIN tx AS tx_in_tx ON
-    tx_in_tx.id = tx_in.tx_in_id AND
-      tx_in_tx.valid_contract = TRUE
-  JOIN tx AS tx_out_tx ON
-    tx_out_tx.id = tx_out.tx_id AND
-      tx_out_tx.valid_contract = TRUE
+    tx_out.index = tx_in.tx_out_index
   WHERE
-    tx_in_tx.id IS NULL`
+    tx_in.tx_out_id IS NULL`
   },
   {
     id: { name: 'owners_balance' },
