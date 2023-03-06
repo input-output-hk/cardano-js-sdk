@@ -70,11 +70,15 @@ export const walletReady = (wallet: ObservableWallet) =>
     SYNC_TIMEOUT
   );
 
+const sortTxIn = (txInCollection: Cardano.TxIn[] | undefined): Cardano.TxIn[] =>
+  sortBy(txInCollection, ['txId', 'index']);
+
 export const normalizeTxBody = (body: Cardano.HydratedTxBody | Cardano.TxBody) => {
-  body.collaterals ||= [];
   // TODO: inputs should be a Set since they're unordered.
   // Then Jest should correctly compare it with toEqual.
-  body.inputs = sortBy(body.inputs, 'txId');
+  body.inputs = sortTxIn(body.inputs);
+  body.collaterals = sortTxIn(body.collaterals);
+  body.referenceInputs = sortTxIn(body.referenceInputs);
   return body;
 };
 
