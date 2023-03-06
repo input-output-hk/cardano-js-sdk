@@ -7,13 +7,14 @@ import {
   ObservableCardanoNode,
   Point
 } from '@cardano-sdk/core';
+import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { ConnectionConfig } from '@cardano-ogmios/client';
 import { InMemory, Projections, projectIntoSink } from '@cardano-sdk/projection';
 import { Observable, filter, firstValueFrom, lastValueFrom, of, share, take } from 'rxjs';
 import { OgmiosObservableCardanoNode } from '@cardano-sdk/ogmios';
-import { dataWithStakeKeyDeregistration } from '../../../projection/test/events';
 import { getEnv } from '../../src';
-import { logger } from '@cardano-sdk/util-dev';
+
+const dataWithStakeKeyDeregistration = chainSyncData(ChainSyncDataSet.WithStakeKeyDeregistration);
 
 const connectionConfig = ((): ConnectionConfig => {
   const { OGMIOS_URL } = getEnv(['OGMIOS_URL']);

@@ -36,7 +36,8 @@
   "scripts": {
     "build:esm": "tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020",
     "build:cjs": "tsc --build src",
-    "build": "run-s build:cjs build:esm module-fixup",
+    "build:copy": "shx cp -r src/chainSync/data dist/cjs/chainSync/data",
+    "build": "run-s build:cjs build:esm module-fixup build:copy",
     "circular-deps:check": "madge --circular dist",
     "module-fixup": "shx cp ../../build/cjs-package.json ./dist/cjs/package.json && cp ../../build/esm-package.json ./dist/esm/package.json",
     "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",
@@ -72,6 +73,7 @@
     "envalid": "^7.3.1",
     "get-port-please": "^2.5.0",
     "json-bigint": "^1.0.0",
+    "lodash": "^4.17.21",
     "rxjs": "^7.4.0",
     "ts-log": "^2.2.4"
   },
