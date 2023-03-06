@@ -1,10 +1,12 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, CardanoNodeErrors, ChainSyncEventType, ChainSyncRollForward } from '@cardano-sdk/core';
+import { ChainSyncDataSet, StubChainSyncData, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { InMemory, Projections, RollForwardEvent, Sinks, projectIntoSink } from '../src';
-import { StubChainSyncData, dataWithPoolRetirement, dataWithStakeKeyDeregistration } from './events';
 import { WithNetworkInfo } from '../src/operators';
 import { from, lastValueFrom, of, toArray } from 'rxjs';
-import { logger } from '@cardano-sdk/util-dev';
+
+const dataWithPoolRetirement = chainSyncData(ChainSyncDataSet.WithPoolRetirement);
+const dataWithStakeKeyDeregistration = chainSyncData(ChainSyncDataSet.WithStakeKeyDeregistration);
 
 const projectAll = ({ cardanoNode }: StubChainSyncData, projectionSinks: Sinks<Projections.AllProjections>) =>
   lastValueFrom(

@@ -1,13 +1,10 @@
-import { Cardano, Intersection } from '@cardano-sdk/core';
 import { Commit } from 'git-last-commit';
 import { getLastCommitPromise } from './util';
+import type { ChainSyncMetadata } from '@cardano-sdk/util-dev';
 const packageJson = require('../../package.json');
 
 export type Metadata = {
-  cardano: {
-    compactGenesis: Cardano.CompactGenesis;
-    intersection: Intersection;
-  };
+  cardano: ChainSyncMetadata['cardano'];
   software: {
     name: string;
     version: string;

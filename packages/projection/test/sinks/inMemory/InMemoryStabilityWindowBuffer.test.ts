@@ -2,7 +2,7 @@ import { Cardano, ChainSyncEventType, Seconds } from '@cardano-sdk/core';
 import { InMemory, UnifiedProjectorEvent } from '../../../src';
 import { WithNetworkInfo } from '../../../src/operators';
 import { firstValueFrom, from, take, toArray } from 'rxjs';
-import { genesisToEraSummary } from '../../events/genesisToEraSummary';
+import { genesisToEraSummary } from '@cardano-sdk/util-dev';
 import { stubBlockId } from '../../util';
 
 const genesisParameters = {

@@ -2,6 +2,7 @@ export * as AssetId from './assetId';
 export * as CmlTestUtil from './cmlTestUtil';
 export * as TxTestUtil from './txTestUtil';
 export * as DockerUtil from './docker';
+export * from './chainSync';
 export * from './TestLogger';
 export * from './util';
 export * from './createStubStakePoolProvider';

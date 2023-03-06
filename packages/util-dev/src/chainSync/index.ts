@@ -1,15 +1,36 @@
 import {
+  Cardano,
   CardanoNodeErrors,
   ChainSyncEvent,
   ChainSyncEventType,
+  ChainSyncRollBackward,
+  ChainSyncRollForward,
+  Intersection,
   ObservableCardanoNode,
   Point,
   PointOrOrigin
 } from '@cardano-sdk/core';
-import { ChainSyncData } from '../../../golden-test-generator/src';
 import { Observable, of } from 'rxjs';
-import { SerializedChainSyncEvent } from '../../../golden-test-generator/src/ChainSyncEvents';
 import { genesisToEraSummary } from './genesisToEraSummary';
+import memoize from 'lodash/memoize';
+
+export type SerializedChainSyncEvent =
+  | Omit<ChainSyncRollForward, 'requestNext'>
+  | Omit<ChainSyncRollBackward, 'requestNext'>;
+
+export type ChainSyncMetadata = {
+  cardano: {
+    compactGenesis: Cardano.CompactGenesis;
+    intersection: Intersection;
+  };
+};
+
+export type ChainSyncData = {
+  body: SerializedChainSyncEvent[];
+  metadata: ChainSyncMetadata;
+};
+
+export * from './genesisToEraSummary';
 
 const intersect = (events: ChainSyncData['body'], points: PointOrOrigin[]) => {
   const blockPoints = points.filter((point): point is Point => point !== 'origin');
@@ -65,13 +86,18 @@ const intersect = (events: ChainSyncData['body'], points: PointOrOrigin[]) => {
   throw new CardanoNodeErrors.CardanoClientErrors.IntersectionNotFoundError(points as any[]);
 };
 
-const prepareData = (dataFileName: string) => {
+export enum ChainSyncDataSet {
+  WithPoolRetirement = 'with-pool-retirement.json',
+  WithStakeKeyDeregistration = 'with-stake-key-deregistration.json'
+}
+
+export const chainSyncData = memoize((dataSet: ChainSyncDataSet) => {
   const {
     body: allEvents,
     metadata: {
       cardano: { compactGenesis }
     }
-  } = require(`./data/${dataFileName}`) as ChainSyncData;
+  } = require(`./data/${dataSet}`) as ChainSyncData;
   const eraSummaries = [genesisToEraSummary(compactGenesis)];
   const cardanoNode: ObservableCardanoNode = {
     eraSummaries$: of(eraSummaries),
@@ -106,8 +132,6 @@ const prepareData = (dataFileName: string) => {
       genesisParameters: compactGenesis
     }
   };
-};
-export type StubChainSyncData = ReturnType<typeof prepareData>;
+});
 
-export const dataWithPoolRetirement = prepareData('with-pool-retirement.json');
-export const dataWithStakeKeyDeregistration = prepareData('with-stake-key-deregistration');
+export type StubChainSyncData = ReturnType<typeof chainSyncData>;

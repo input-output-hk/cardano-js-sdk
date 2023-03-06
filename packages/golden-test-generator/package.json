@@ -73,6 +73,7 @@
     "ts-log": "^2.2.3"
   },
   "devDependencies": {
+    "@cardano-sdk/util-dev": "^0.7.1",
     "@types/cli-progress": "^3.9.2",
     "@types/fs-extra": "^9.0.12",
     "@types/object-hash": "^2.1.1",

@@ -1,9 +1,10 @@
 import { Cardano, ChainSyncEventType, ChainSyncRollBackward } from '@cardano-sdk/core';
+import { ChainSyncDataSet, chainSyncData, createTestScheduler } from '@cardano-sdk/util-dev';
 import { InMemory, Operators, StabilityWindowBuffer, UnifiedProjectorEvent } from '../../src';
 import { WithNetworkInfo } from '../../src/operators';
-import { createTestScheduler } from '@cardano-sdk/util-dev';
-import { dataWithStakeKeyDeregistration } from '../events';
 import { stubBlockId } from '../util';
+
+const dataWithStakeKeyDeregistration = chainSyncData(ChainSyncDataSet.WithPoolRetirement);
 
 const createEvent = (eventType: ChainSyncEventType, slot: number, tipSlot = slot) =>
   ({
