@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Cardano } from '@cardano-sdk/core';
 import { Observable } from 'rxjs';
 import { ProjectionExtraProps } from '../projections';
@@ -45,7 +46,6 @@ export type ProjectionSinks<Projections> = {
   [k in keyof Projections]: Sink<Projections[k]>;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type SinkLifecycleOperator = (evt$: Observable<any>) => Observable<any>;
 
 export type Sinks<Projections> = {
@@ -54,3 +54,6 @@ export type Sinks<Projections> = {
   before?: SinkLifecycleOperator;
   after?: SinkLifecycleOperator;
 };
+
+type InferArg<T> = T extends (arg: infer Arg) => any ? Arg : never;
+export type SinkEventType<S extends { sink: any }> = InferArg<S['sink']>;
