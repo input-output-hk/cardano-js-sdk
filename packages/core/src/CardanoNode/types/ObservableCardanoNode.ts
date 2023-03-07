@@ -1,4 +1,4 @@
-import type { Cardano } from '../..';
+import type { Cardano, HealthCheckResponse } from '../..';
 import type { EraSummary } from './CardanoNode';
 import type { Observable } from 'rxjs';
 
@@ -46,6 +46,7 @@ export interface ObservableChainSync {
 export interface ObservableCardanoNode {
   eraSummaries$: Observable<EraSummary[]>;
   genesisParameters$: Observable<Cardano.CompactGenesis>;
+  healthCheck$: Observable<HealthCheckResponse>;
   /**
    * Find a common point between your local state and the node.
    *

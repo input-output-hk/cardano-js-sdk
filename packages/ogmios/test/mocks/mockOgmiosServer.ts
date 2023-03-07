@@ -228,7 +228,7 @@ const handleQuery = async (query: string, config: MockOgmiosServerConfig, send: 
   send(result);
 };
 
-export type MockServer = Server & { wss: WebSocket.Server };
+export type MockServer = Server & { wss: WebSocket.Server; invocations: InvocationState };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export const createMockOgmiosServer = (config: MockOgmiosServerConfig): MockServer => {
@@ -306,6 +306,7 @@ export const createMockOgmiosServer = (config: MockOgmiosServerConfig): MockServ
     });
   });
   (server as any).wss = wss;
+  (server as any).invocations = invocations;
   return server as MockServer;
 };
 
