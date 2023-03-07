@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { AddressType, GroupedAddress, util } from '@cardano-sdk/key-management';
 import { AddressesModel, WalletVars } from './types';
 import { Cardano } from '@cardano-sdk/core';
@@ -6,7 +7,7 @@ import { Pool, QueryResult } from 'pg';
 import { StubKeyAgent, getEnv, getWallet, walletVariables } from '../../../src';
 import { findAddressesWithRegisteredStakeKey } from './queries';
 import { logger } from '@cardano-sdk/util-dev';
-import { walletReady } from '../../util';
+import { waitForWalletStateSettle } from '../../util';
 
 const env = getEnv([
   ...walletVariables,
@@ -29,19 +30,34 @@ const mapToGroupedAddress = (addrModel: AddressesModel): GroupedAddress => ({
 
 export const findAddresses: FunctionHook<WalletVars> = async ({ vars }, ee, done) => {
   vars.walletsCount = Number(env.VIRTUAL_USERS_COUNT);
+  logger.info('env.DB_SYNC_CONNECTION_STRING', env.DB_SYNC_CONNECTION_STRING);
   const db: Pool = new Pool({ connectionString: env.DB_SYNC_CONNECTION_STRING });
 
   try {
-    logger.info('About to query db for distinct addresses');
+    logger.info('About to query db for addresses');
     const result: QueryResult<AddressesModel> = await db.query(findAddressesWithRegisteredStakeKey, [
       vars.walletsCount
     ]);
+
+    // Uncomment to use predefined addresses
+
+    // const predefinedAddresses = new Array<AddressesModel>(vars.walletsCount).fill({
+    //   address: 'addr1qyht4ja0zcn45qvyx477qlyp6j5ftu5ng0prt9608dxp6l2j2c79gy9l76sdg0xwhd7r0c0kna0tycz4y5s6mlenh8pq4jxtdy',
+    //   stake_address: 'stake1u9f9v0z5zzlldgx58n8tklphu8mf7h4jvp2j2gddluemnssjfnkzz'
+    // })
+    // result.rows = predefinedAddresses
+
     logger.info('Found addresses count', result.rowCount);
+    logger.info(
+      'Found addresses',
+      result.rows.map(({ address }) => address)
+    );
 
     vars.addresses = result.rows.map(mapToGroupedAddress);
   } catch (error) {
     ee.emit('counter', 'findAddresses.error', 1);
     logger.error('Error thrown while performing findAddresses db sync query', error);
+    done();
   }
 
   if (vars.addresses.length < vars.walletsCount) {
@@ -73,19 +89,22 @@ export const walletRestoration: FunctionHook<WalletVars> = async ({ vars, _uid }
       name: `Test Wallet of VU with id: ${_uid}`,
       polling: { interval: 50 }
     });
-    await walletReady(wallet);
+
+    ++index;
+
+    await waitForWalletStateSettle(wallet);
     vars.currentWallet = wallet;
 
     // Emit custom metrics
     ee.emit('histogram', `${operationName}.time`, Date.now() - startedAt);
     ee.emit('counter', operationName, 1);
 
-    logger.info(`Wallet with name ${wallet.name} was successfully restored`);
+    logger.info(`Wallet with name ${wallet.name}: ${currentAddress.address} was successfully restored`);
   } catch (error) {
     ee.emit('counter', `${operationName}.error`, 1);
     logger.error(error);
+    done();
   }
-  ++index;
   done();
 };
 

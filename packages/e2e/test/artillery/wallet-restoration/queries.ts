@@ -2,13 +2,11 @@
  * Query randomized distinct addresses from db associated with users who are staking.
  */
 export const findAddressesWithRegisteredStakeKey = `
-  SELECT * FROM (
-    SELECT DISTINCT txOut.address as address, sa.view as stake_address
-    FROM public.delegation d
-      LEFT JOIN public.tx_out txOut on
-    d.addr_id = txOut.stake_address_id
-      LEFT JOIN public.stake_address sa on
-    txOut.stake_address_id = sa.id
-  ) distinct_addresses
-  ORDER BY RANDOM() LIMIT $1
+  SELECT COUNT(*) AS txCount, address, sa.view as stake_address
+  FROM tx_out 
+  LEFT JOIN public.stake_address sa 
+    ON tx_out.stake_address_id = sa.id WHERE tx_out.id 
+  BETWEEN 172998335 AND 173998286 AND stake_address_id IS NOT NULL 
+  GROUP BY address, stake_address 
+  ORDER BY RANDOM() LIMIT $1;
 `;

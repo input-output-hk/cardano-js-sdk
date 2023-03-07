@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable complexity */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Logger } from 'ts-log';
 import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
@@ -77,6 +79,13 @@ export const createHttpProvider = <T extends object>({
         throw new ProviderError(ProviderFailure.NotImplemented, `HttpProvider missing path for '${prop.toString()}'`);
       return async (...args: any[]) => {
         try {
+          // Print only the most expensive requests
+          if (path === '/utxo-by-addresses' || path === '/txs/by-addresses' || path === '/search') {
+            console.time(
+              `REQUEST --------->> PATH: ${path.toLocaleUpperCase()}, ARGS: ${JSON.stringify(args)}, TIME: `
+            );
+          }
+
           const req: AxiosRequestConfig = {
             ...axiosOptions,
             adapter,
@@ -100,6 +109,23 @@ export const createHttpProvider = <T extends object>({
             data: fromSerializableObject(value.data, { getErrorPrototype: () => ProviderError.prototype })
           }));
           const response = (await axiosInstance.request(req)).data;
+
+          // Print only the most expensive requests
+          if (path === '/utxo-by-addresses' || path === '/txs/by-addresses' || path === '/search') {
+            console.timeEnd(
+              `REQUEST --------->> PATH: ${path.toLocaleUpperCase()}, ARGS: ${JSON.stringify(args)}, TIME: `
+            );
+          }
+
+          // Log responses. Skip protocol parameters, the response JSON is too long
+          // if (path !== '/protocol-parameters') {
+          //   console.info(
+          //     `RESPONSE <<--------- PATH ${path.toLocaleUpperCase()}, DATA: ${JSON.stringify(
+          //       toSerializableObject(response)
+          //     )}`
+          //   );
+          // }
+
           return !isEmptyResponse(response) ? response : undefined;
         } catch (error) {
           if (axios.isAxiosError(error)) {
