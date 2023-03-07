@@ -16,7 +16,7 @@ import {
 } from '@cardano-ogmios/client';
 import { Logger } from 'ts-log';
 import { RunnableModule, contextLogger } from '@cardano-sdk/util';
-import { createInteractionContextWithLogger } from '../util';
+import { createInteractionContextWithLogger, ogmiosServerHealthToHealthCheckResponse } from '../util';
 import { queryEraSummaries } from './queries';
 
 /**
@@ -92,21 +92,17 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
   }
 
   static async healthCheck(connectionConfig: ConnectionConfig, logger: Logger): Promise<HealthCheckResponse> {
-    const response: HealthCheckResponse = { ok: false };
     try {
-      const { networkSynchronization, lastKnownTip } = await getServerHealth({
-        connection: createConnectionObject(connectionConfig)
-      });
-      response.localNode = {
-        ledgerTip: lastKnownTip,
-        networkSync: Cardano.Percent(networkSynchronization)
-      };
-      response.ok = networkSynchronization > 0.99;
+      return ogmiosServerHealthToHealthCheckResponse(
+        await getServerHealth({
+          connection: createConnectionObject(connectionConfig)
+        })
+      );
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       logger.error(error.message);
+      return { ok: false };
     }
-    return response;
   }
 
   async startImpl(): Promise<void> {
