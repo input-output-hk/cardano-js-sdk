@@ -94,7 +94,7 @@ describe('resuming projection when intersection is not local tip', () => {
         cardanoNode,
         logger,
         projections,
-        sinks: inMemorySinks
+        sinksFactory: () => inMemorySinks
       });
 
     // Project some events until we find at least 1 stake key registration

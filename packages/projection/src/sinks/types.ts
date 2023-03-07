@@ -57,3 +57,5 @@ export type Sinks<Projections> = {
 
 type InferArg<T> = T extends (arg: infer Arg) => any ? Arg : never;
 export type SinkEventType<S extends { sink: any }> = InferArg<S['sink']>;
+
+export type SinksFactory<P> = () => Sinks<P>;
