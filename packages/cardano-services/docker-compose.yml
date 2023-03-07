@@ -20,6 +20,8 @@ services:
     shm_size: '2gb'
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    ports:
+      - ${POSTGRES_PORT:-5432}:5432
     restart: on-failure
     logging:
       driver: "json-file"
