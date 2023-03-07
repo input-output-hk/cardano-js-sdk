@@ -288,8 +288,8 @@ describe('StakePoolHttpService', () => {
 
       describe('/search', () => {
         const url = '/search';
-        const cachedSubQueriesCount = 10;
-        const cacheKeysCount = 7;
+        const cachedSubQueriesCount = 9;
+        const cacheKeysCount = 6;
         const nonCacheableSubQueriesCount = 1; // getLastEpoch
         const filerOnePoolOptions: QueryStakePoolsArgs = {
           filters: { identifier: { values: [{ ticker: 'SP1$' }] } },

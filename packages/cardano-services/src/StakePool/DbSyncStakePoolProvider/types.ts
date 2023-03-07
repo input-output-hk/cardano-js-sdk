@@ -148,10 +148,6 @@ export interface PoolMetrics extends CommonPoolInfo {
   };
 }
 
-export interface TotalCountModel {
-  total_count: number;
-}
-
 export interface StakePoolStatsModel {
   active: string;
   retired: string;

@@ -211,10 +211,8 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
         'Got an empty distribution response from OgmiosCardanoNode'
       );
     });
-    // Get total stake pools count cached
-    const totalCount = await this.#cache.get(queryCacheKey(StakePoolsSubQuery.TOTAL_POOLS_COUNT, options), () =>
-      this.#builder.queryTotalCount(query, params)
-    );
+    // Get total stake pools count
+    const totalCount = poolUpdates.length;
     // Get last epoch data
     const lastEpoch = await this.#builder.getLastEpochWithData();
     const { optimalPoolCount, no: lastEpochNo } = lastEpoch;

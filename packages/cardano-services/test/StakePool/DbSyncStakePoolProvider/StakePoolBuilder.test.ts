@@ -268,7 +268,7 @@ describe('StakePoolBuilder', () => {
       const builtQuery = builder.buildOrQuery(filters);
       const { query, params } = builtQuery;
       const poolHashes = await builder.queryPoolHashes(query, params);
-      const totalCount = Number(await builder.queryTotalCount(query, params));
+      const totalCount = poolHashes.length;
       expect(poolHashes.length).toBeGreaterThan(0);
       expect(totalCount).toBeGreaterThan(0);
     });
@@ -278,7 +278,7 @@ describe('StakePoolBuilder', () => {
       const builtQuery = builder.buildAndQuery(filters);
       const { query, params } = builtQuery;
       const poolHashes = await builder.queryPoolHashes(query, params);
-      const totalCount = Number(await builder.queryTotalCount(query, params));
+      const totalCount = poolHashes.length;
       expect(poolHashes).toHaveLength(1);
       expect(totalCount).toBeGreaterThan(0);
     });

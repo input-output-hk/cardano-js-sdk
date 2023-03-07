@@ -701,12 +701,6 @@ export const buildOrQueryFromClauses = (clauses: SubQuery[]) => {
     `;
 };
 
-export const getTotalCountQueryFromQuery = (query: string) => `
-SELECT
-  COUNT(1) AS total_count
-FROM (${query}) AS query
-`;
-
 export const findPoolStats = `
 WITH current_epoch AS (
   SELECT MAX(epoch_no) AS epoch_no

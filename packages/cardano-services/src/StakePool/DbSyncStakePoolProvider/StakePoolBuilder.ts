@@ -22,8 +22,7 @@ import {
   QueryPoolsApyArgs,
   RelayModel,
   StakePoolStatsModel,
-  SubQuery,
-  TotalCountModel
+  SubQuery
 } from './types';
 import { Logger } from 'ts-log';
 import { Pool, QueryResult } from 'pg';
@@ -48,7 +47,6 @@ import Queries, {
   getIdentifierFullJoinClause,
   getIdentifierWhereClause,
   getStatusWhereClause,
-  getTotalCountQueryFromQuery,
   poolsByPledgeMetSubqueries,
   withPagination,
   withSort
@@ -276,13 +274,6 @@ export class StakePoolBuilder {
     if (whereClause.length > 0) query = addSentenceToQuery(query, ` WHERE ${whereClause.join(' AND ')}`);
     query = addSentenceToQuery(query, groupByClause);
     return { params, query };
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async queryTotalCount(query: string, _params: any[]) {
-    this.#logger.debug('About to get total count of pools');
-    const result: QueryResult<TotalCountModel> = await this.#db.query(getTotalCountQueryFromQuery(query), _params);
-    return result.rows[0].total_count;
   }
 
   public async queryPoolStats(): Promise<StakePoolStats> {
