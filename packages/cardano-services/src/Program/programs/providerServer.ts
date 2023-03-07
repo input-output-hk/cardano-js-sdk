@@ -23,7 +23,7 @@ import { DbSyncStakePoolProvider, StakePoolHttpService, createHttpStakePoolExtMe
 import { DbSyncUtxoProvider, UtxoHttpService } from '../../Utxo';
 import { DnsResolver, createDnsResolver, serviceSetHas } from '../utils';
 import { GenesisData } from '../../types';
-import { HttpServer, HttpServerConfig, HttpService } from '../../Http';
+import { HttpServer, HttpServerConfig, HttpService, getListen } from '../../Http';
 import { InMemoryCache } from '../../InMemoryCache';
 import { Logger } from 'ts-log';
 import { MissingProgramOption, MissingServiceDependency, RunnableDependencies, UnknownServiceName } from '../errors';
@@ -237,10 +237,7 @@ export const loadProviderServer = async (
     }
   }
   const config: HttpServerConfig = {
-    listen: {
-      host: args.apiUrl.hostname,
-      port: args.apiUrl ? Number.parseInt(args.apiUrl.port) : undefined
-    },
+    listen: getListen(args.apiUrl),
     meta: { ...args.buildInfo, startupTime: Date.now() }
   };
   if (args.enableMetrics) {

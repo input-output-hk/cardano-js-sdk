@@ -15,6 +15,8 @@ import path from 'path';
 export const CONTENT_TYPE = 'Content-Type';
 export const APPLICATION_JSON = 'application/json';
 
+export const getListen = (url: URL) => ({ host: url.hostname, port: url ? Number.parseInt(url.port) : undefined });
+
 export interface HttpServerDependencies {
   services: HttpService[];
   runnableDependencies: RunnableModule[];
@@ -57,7 +59,8 @@ export class HttpServer extends RunnableModule {
 
     return result;
   }
-  async initializeImpl(): Promise<void> {
+
+  protected async initializeImpl(): Promise<void> {
     this.app = express();
     this.app.use(
       bodyParser.json({
@@ -163,13 +166,13 @@ export class HttpServer extends RunnableModule {
     res.send(toSerializableObject(obj) as ResponseBody);
   }
 
-  async startImpl(): Promise<void> {
+  protected async startImpl(): Promise<void> {
     for (const dependency of this.#dependencies.runnableDependencies) await dependency.start();
     for (const service of this.#dependencies.services) await service.start();
     this.server = await listenPromise(this.app, this.#config.listen);
   }
 
-  async shutdownImpl(): Promise<void> {
+  protected async shutdownImpl(): Promise<void> {
     this.#healthGauge?.set(0);
 
     for (const service of this.#dependencies.services) await service.shutdown();
