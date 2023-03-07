@@ -48,7 +48,9 @@ type ProjectionTypes<P> = {
 };
 // https://stackoverflow.com/a/50375286
 type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never;
-type ProjectionsEvent<P extends object> = UnifiedProjectorEvent<UnionToIntersection<ProjectionTypes<P>[keyof P]>>;
+export type ProjectionsEvent<P extends object> = UnifiedProjectorEvent<
+  UnionToIntersection<ProjectionTypes<P>[keyof P]>
+>;
 
 const isIntersectionBlock = (block: Cardano.Block, intersection: Intersection) => {
   if (intersection.point === 'origin') {
