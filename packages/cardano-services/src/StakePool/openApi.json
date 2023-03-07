@@ -372,10 +372,10 @@
             ]
           },
           "blocksCreated": {
-            "type": "string"
+            "type": "number"
           },
           "delegators": {
-            "type": "string"
+            "type": "number"
           },
           "livePledge": {
             "$ref": "#/components/schemas/BigInt"

@@ -182,8 +182,8 @@ live_stake AS (
     total_utxos.pool_hash_id = tw.pool_hash_id
 )
 SELECT
- COALESCE(bc.blocks_created,0) AS blocks_created,
- COALESCE(d.delegators,0) AS delegators,
+ COALESCE(bc.blocks_created,0)::integer AS blocks_created,
+ COALESCE(d.delegators,0)::integer AS delegators,
  COALESCE(a_stake.active_stake,0) AS active_stake,
  COALESCE(l_stake.live_stake,0) AS live_stake,
  (COALESCE(tr.amount,0) - COALESCE(tw.amount,0) + COALESCE (otu.amount,0))
