@@ -84,7 +84,6 @@ export const subQueries = `
     FROM
       withdrawal w
       JOIN tx ON tx.id = w.tx_id
-      AND tx.valid_contract = TRUE
       JOIN stake_address sa ON sa.id = w.addr_id
       JOIN pools_delegated pool on pool.stake_address_id = sa.id
     GROUP BY
@@ -116,9 +115,7 @@ export const subQueries = `
       LEFT JOIN tx_in ON tx_out.tx_id = tx_in.tx_out_id
       AND tx_out.index :: smallint = tx_in.tx_out_index :: smallint
       LEFT JOIN tx AS tx_in_tx ON tx_in_tx.id = tx_in.tx_in_id
-      AND tx_in_tx.valid_contract = TRUE
       JOIN tx AS tx_out_tx ON tx_out_tx.id = tx_out.tx_id
-      AND tx_out_tx.valid_contract = TRUE
     WHERE
       tx_in_tx.id IS NULL
   ),

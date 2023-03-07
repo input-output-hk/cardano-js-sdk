@@ -23,7 +23,6 @@ import {
   RelayModel,
   StakePoolStatsModel,
   SubQuery,
-  TotalAdaModel,
   TotalCountModel
 } from './types';
 import { Logger } from 'ts-log';
@@ -131,7 +130,7 @@ export class StakePoolBuilder {
     return result.rows.length > 0 ? result.rows.map(mapPoolUpdate) : [];
   }
 
-  public async queryPoolMetrics(hashesIds: number[], totalAdaAmount: string, options?: QueryStakePoolsArgs) {
+  public async queryPoolMetrics(hashesIds: number[], totalStake: string, options?: QueryStakePoolsArgs) {
     this.#logger.debug('About to query pool metrics');
     const queryWithSortAndPagination = withPagination(
       withSort(Queries.findPoolsMetrics, options?.sort, [{ field: 'saturation', order: 'desc' }]),
@@ -139,7 +138,7 @@ export class StakePoolBuilder {
     );
     const result: QueryResult<PoolMetricsModel> = await this.#db.query(queryWithSortAndPagination, [
       hashesIds,
-      totalAdaAmount
+      totalStake
     ]);
     return result.rows.length > 0 ? result.rows.map(mapPoolMetrics) : [];
   }
@@ -195,12 +194,6 @@ export class StakePoolBuilder {
     const lastEpoch = result.rows[0];
     if (!lastEpoch) throw new ProviderError(ProviderFailure.Unknown, null, "Couldn't find last epoch");
     return mapEpoch(lastEpoch);
-  }
-
-  public async getTotalAmountOfAda() {
-    this.#logger.debug('About to query total ada amount');
-    const result: QueryResult<TotalAdaModel> = await this.#db.query(Queries.findTotalAda);
-    return result.rows[0].total_ada;
   }
 
   public buildOrQuery(filters: QueryStakePoolsArgs['filters']) {
