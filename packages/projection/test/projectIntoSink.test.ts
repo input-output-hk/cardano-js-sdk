@@ -12,7 +12,7 @@ const projectAll = ({ cardanoNode }: StubChainSyncData, projectionSinks: Sinks<P
       cardanoNode,
       logger,
       projections: Projections.allProjections,
-      sinks: projectionSinks
+      sinksFactory: () => projectionSinks
     }).pipe(toArray())
   );
 
@@ -167,7 +167,7 @@ describe('projectIntoSink', () => {
           // not projecting stakePools
           stakeKeys: Projections.stakeKeys
         },
-        sinks: inMemorySinks
+        sinksFactory: () => inMemorySinks
       }).pipe(toArray())
     );
     expect(store.stakeKeys.size).toBeGreaterThan(0);

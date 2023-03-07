@@ -54,3 +54,5 @@ export type Sinks<Projections> = {
   before?: SinkLifecycleOperator;
   after?: SinkLifecycleOperator;
 };
+
+export type SinksFactory<P> = () => Sinks<P>;
