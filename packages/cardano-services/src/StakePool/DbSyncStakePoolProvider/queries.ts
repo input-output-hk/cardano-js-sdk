@@ -519,12 +519,6 @@ export const POOLS_WITH_PLEDGE_MET = {
       `
 };
 
-export const findPoolsWithPledgeMet = (metPledge: boolean) => `
-  ${POOLS_WITH_PLEDGE_MET.WITH_CLAUSE}
-  ${POOLS_WITH_PLEDGE_MET.SELECT_CLAUSE}
-  ${POOLS_WITH_PLEDGE_MET.JOIN_CLAUSE}
-  WHERE ${POOLS_WITH_PLEDGE_MET.WHERE_CLAUSE(metPledge)}`;
-
 export const STATUS_QUERY = {
   SELECT_CLAUSE: `
     SELECT
@@ -816,8 +810,7 @@ const Queries = {
   findPoolsOwners,
   findPoolsRegistrations,
   findPoolsRelays,
-  findPoolsRetirements,
-  findPoolsWithPledgeMet
+  findPoolsRetirements
 };
 
 export default Queries;
