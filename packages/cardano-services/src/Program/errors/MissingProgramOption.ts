@@ -6,3 +6,10 @@ export class MissingProgramOption<ServiceNames, OptionsType> extends CustomError
     this.message = `${service} requires the ${Array.isArray(option) ? option.join(' or ') : option} program option.`;
   }
 }
+
+export class InvalidProgramOption<OptionsType> extends CustomError {
+  public constructor(option: OptionsType | OptionsType[]) {
+    super();
+    this.message = `Invalid program option: ${Array.isArray(option) ? option.join(' or ') : option}.`;
+  }
+}

@@ -2,11 +2,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable unicorn/no-nested-ternary */
 import { DnsResolver } from '../utils';
+import { InvalidProgramOption, MissingProgramOption } from '../errors';
 import { Logger } from 'ts-log';
+import { Observable, defer, from, of } from 'rxjs';
+import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
 import { Pool, PoolConfig, QueryConfig } from 'pg';
 import { PosgresProgramOptions } from '../options';
+import { TlsOptions } from 'tls';
 import { URL } from 'url';
 import { isConnectionError } from '@cardano-sdk/util';
+import connString from 'pg-connection-string';
 import fs from 'fs';
 
 const timedQuery = (pool: Pool, logger: Logger) => async (args: string | QueryConfig, values?: any) => {
@@ -61,6 +66,65 @@ export const getPoolWithServiceDiscovery = async (
 };
 
 export const loadSecret = (path: string) => fs.readFileSync(path, 'utf8').toString();
+
+// types of 'pg-connection-string' seem to be incorrect:
+// according to documentation it is either a boolean or a compatible TlsOptions object.
+const mergeTlsOptions = (
+  conn: connString.ConnectionOptions,
+  ssl: { ca: string } | undefined
+): boolean | TlsOptions | undefined =>
+  typeof conn.ssl === 'object'
+    ? {
+        ...(conn.ssl as TlsOptions),
+        ca: ssl?.ca || (conn.ssl as TlsOptions).ca
+      }
+    : (conn.ssl as boolean | undefined);
+
+export const getConnectionConfig = (
+  dnsResolver: DnsResolver,
+  options?: PosgresProgramOptions
+): Observable<PgConnectionConfig> => {
+  const ssl = options?.postgresSslCaFile ? { ca: loadSecret(options.postgresSslCaFile) } : undefined;
+  if (options?.postgresConnectionString) {
+    const conn = connString.parse(options.postgresConnectionString);
+    if (!conn.database || !conn.host) {
+      throw new InvalidProgramOption('postgresConnectionString');
+    }
+    return of({
+      database: conn.database,
+      host: conn.host,
+      password: conn.password,
+      port: conn.port ? Number.parseInt(conn.port) : undefined,
+      ssl: mergeTlsOptions(conn, ssl),
+      username: conn.user
+    });
+  }
+
+  if (options?.postgresSrvServiceName && options.postgresUser && options.postgresDb && options.postgresPassword) {
+    return defer(() =>
+      from(
+        dnsResolver(options.postgresSrvServiceName!).then(
+          (record): PgConnectionConfig => ({
+            database: options.postgresDb,
+            host: record.name,
+            password: options.postgresPassword,
+            port: record.port,
+            ssl,
+            username: options.postgresUser
+          })
+        )
+      )
+    );
+  }
+
+  throw new MissingProgramOption('projector', [
+    'postgresConnectionString',
+    'postgresSrvServiceName',
+    'postgresUser',
+    'postgresDb',
+    'postgresPassword'
+  ]);
+};
 
 export const getPool = async (
   dnsResolver: DnsResolver,

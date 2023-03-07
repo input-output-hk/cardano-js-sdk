@@ -22,6 +22,7 @@ import {
   POLLING_CYCLE_DEFAULT,
   PROVIDER_SERVER_API_URL_DEFAULT,
   Programs,
+  ProjectorOptionDescriptions,
   ProviderServerArgs,
   ProviderServerOptionDescriptions,
   SCAN_INTERVAL_DEFAULT,
@@ -47,6 +48,8 @@ import {
 } from './Asset';
 import { EPOCH_POLL_INTERVAL_DEFAULT } from './util';
 import { HttpServer } from './Http';
+import { PROJECTOR_API_URL_DEFAULT, ProjectorArgs, loadProjector } from './Program/programs/projector';
+import { ProjectionName } from './Projection';
 import { URL } from 'url';
 import { dbCacheValidator } from './util/validators';
 import { withCommonOptions, withOgmiosOptions, withPostgresOptions, withRabbitMqOptions } from './Program/options/';
@@ -60,6 +63,7 @@ const packageJsonPath = fs.existsSync(copiedPackageJsonPath)
   ? copiedPackageJsonPath
   : path.join(__dirname, '../package.json');
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+const projectionNameParser = (names: string) => names.split(',') as ProjectionName[];
 
 process.on('unhandledRejection', (reason) => {
   // To be handled by 'onDeath'
@@ -89,6 +93,60 @@ const runServer = async (message: string, loadServer: () => Promise<HttpServer>)
     process.exit(1);
   }
 };
+
+withCommonOptions(
+  withOgmiosOptions(
+    withPostgresOptions(
+      program
+        .command('start-projector')
+        .description('Start a projector')
+        .argument(
+          '[projectionNames...]',
+          `List of projections to start: ${Object.values(ProjectionName).toString()}`,
+          projectionNameParser
+        )
+    )
+  ),
+  {
+    apiUrl: PROJECTOR_API_URL_DEFAULT
+  }
+)
+  .addOption(
+    new Option('--drop-schema <true/false>', ProjectorOptionDescriptions.DropSchema)
+      .default(false)
+      .argParser((dropSchema) =>
+        stringOptionToBoolean(dropSchema, Programs.Projector, ProjectorOptionDescriptions.DropSchema)
+      )
+  )
+  .addOption(
+    new Option('--dry-run <true/false>', BlockfrostWorkerOptionDescriptions.DryRun)
+      .env('DRY_RUN')
+      .default(DRY_RUN_DEFAULT)
+      .argParser((dryRun) => stringOptionToBoolean(dryRun, Programs.Projector, ProjectorOptionDescriptions.DryRun))
+  )
+  .addOption(
+    new Option(
+      '--projection-names <projectionNames>',
+      `List of projections to start: ${Object.values(ProjectionName).toString()}`
+    )
+      .env('PROJECTION_NAMES')
+      .argParser(projectionNameParser)
+  )
+  .action(async (projectionNames: ProjectionName[], args: { apiUrl: URL } & ProjectorArgs) => {
+    const projector = await loadProjector({
+      ...args,
+      postgresConnectionString: connectionStringFromArgs(args),
+      // Setting the projection names via env variable takes preference over command line argument
+      projectionNames: args.projectionNames ? args.projectionNames : projectionNames
+    });
+    await projector.initialize();
+    await projector.start();
+
+    onDeath(async () => {
+      await projector.shutdown();
+      process.exit(1);
+    });
+  });
 
 withCommonOptions(
   withOgmiosOptions(

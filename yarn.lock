@@ -2368,8 +2368,12 @@ __metadata:
     "@cardano-sdk/core": ^0.10.0
     "@cardano-sdk/crypto": ^0.1.3
     "@cardano-sdk/ogmios": ^0.10.0
+    "@cardano-sdk/projection": ^0.5.0
+    "@cardano-sdk/projection-typeorm": ^0.1.1
     "@cardano-sdk/util": ^0.8.2
     "@cardano-sdk/util-dev": ^0.8.0
+    "@cardano-sdk/util-rxjs": ^0.4.6
+    "@hapi/topo": ^6.0.2
     "@types/amqplib": ^0.8.2
     "@types/bunyan": ^1.8.8
     "@types/cors": ^2.8.13
@@ -2414,11 +2418,13 @@ __metadata:
     pg-connection-string: ^2.5.0
     prom-client: ^14.0.1
     reflect-metadata: ~0.1.13
+    rxjs: ^7.4.0
     shx: ^0.3.3
     ts-custom-error: ^3.2.0
     ts-jest: ^28.0.7
     ts-log: ^2.2.4
     ts-node: ^10.0.0
+    typeorm: ^0.3.15
     typescript: ^4.7.4
     wait-on: ^6.0.1
   bin:
@@ -3289,6 +3295,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@hapi/hoek@npm:^11.0.2":
+  version: 11.0.2
+  resolution: "@hapi/hoek@npm:11.0.2"
+  checksum: 02e5d5d030f2c81180b43c380e6445558d1cb463c8db957c2d50e11dff83687a0ff4539a88530338e2bab1924bb8cdc7896eeb48ebf32199f89e178591d8b0b1
+  languageName: node
+  linkType: hard
+
 "@hapi/hoek@npm:^9.0.0":
   version: 9.3.0
   resolution: "@hapi/hoek@npm:9.3.0"
@@ -3302,6 +3315,15 @@ __metadata:
   dependencies:
     "@hapi/hoek": ^9.0.0
   checksum: 604dfd5dde76d5c334bd03f9001fce69c7ce529883acf92da96f4fe7e51221bf5e5110e964caca287a6a616ba027c071748ab636ff178ad750547fba611d6014
+  languageName: node
+  linkType: hard
+
+"@hapi/topo@npm:^6.0.2":
+  version: 6.0.2
+  resolution: "@hapi/topo@npm:6.0.2"
+  dependencies:
+    "@hapi/hoek": ^11.0.2
+  checksum: c11da8a995ac66d94dcc8ffe37cc094ace15ab8aec30ba2b556e8318394454cc93967a5bcc6519b846586fea4d347f95d924cb6ce5d51236c199c5e677b9575c
   languageName: node
   linkType: hard
 

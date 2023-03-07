@@ -1,0 +1,50 @@
+import {
+  AssetEntity,
+  OutputEntity,
+  TokensEntity,
+  TypeormStabilityWindowBuffer,
+  createDataSource
+} from '@cardano-sdk/projection-typeorm';
+import { Bootstrap } from '@cardano-sdk/projection';
+import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
+import { ProjectionName, createTypeormProjection, prepareTypeormProjection } from '../../src';
+import { lastValueFrom } from 'rxjs';
+import { projectorConnectionConfig, projectorConnectionConfig$ } from '../util';
+
+describe('createTypeormProjection', () => {
+  it('creates a projection to PostgreSQL based on requested projection names', async () => {
+    // Setup
+    const data = chainSyncData(ChainSyncDataSet.WithMint);
+    const buffer = new TypeormStabilityWindowBuffer({ allowNonSequentialBlockHeights: true, logger });
+    const projections = [ProjectionName.UTXO];
+    const projection$ = createTypeormProjection({
+      buffer,
+      connectionConfig$: projectorConnectionConfig$,
+      devOptions: { dropSchema: true, synchronize: true },
+      logger,
+      projectionSource$: Bootstrap.fromCardanoNode({
+        buffer,
+        cardanoNode: data.cardanoNode,
+        logger
+      }),
+      projections
+    });
+
+    // Project
+    await lastValueFrom(projection$);
+
+    // Check data in the database
+    const { entities } = prepareTypeormProjection({ buffer, projections });
+    const dataSource = createDataSource({ connectionConfig: projectorConnectionConfig, entities, logger });
+    await dataSource.initialize();
+    const queryRunner = dataSource.createQueryRunner();
+    await queryRunner.connect();
+    expect(await queryRunner.manager.count(AssetEntity)).toBeGreaterThan(0);
+    expect(await queryRunner.manager.count(TokensEntity)).toBeGreaterThan(0);
+    expect(await queryRunner.manager.count(OutputEntity)).toBeGreaterThan(0);
+    await queryRunner.release();
+    await dataSource.destroy();
+  });
+
+  // PostgreSQL transaction retries are tested in projection-typeorm package
+});

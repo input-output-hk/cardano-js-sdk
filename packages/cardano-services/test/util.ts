@@ -4,6 +4,7 @@ import { Ogmios } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { createMockOgmiosServer } from '../../ogmios/test/mocks/mockOgmiosServer';
 import { getRandomPort } from 'get-port-please';
+import { of } from 'rxjs';
 import axios, { AxiosRequestConfig } from 'axios';
 import waitOn from 'wait-on';
 
@@ -85,3 +86,12 @@ export const clearDbPools = async ({ main, healthCheck }: DbPools) => {
   await main?.end();
   await healthCheck?.end();
 };
+
+export const projectorConnectionConfig = {
+  database: process.env.POSTGRES_DB_PROJECTION!,
+  host: process.env.POSTGRES_HOST!,
+  password: process.env.POSTGRES_PASSWORD!,
+  port: Number.parseInt(process.env.POSTGRES_PORT!),
+  username: process.env.POSTGRES_USER!
+};
+export const projectorConnectionConfig$ = of(projectorConnectionConfig);

@@ -1,9 +1,14 @@
 version: '3.9'
 
 services:
+  projector:
+    volumes:
+      - ../..:/app
+
   provider-server:
     volumes:
       - ../..:/app
+
   worker:
     volumes:
       - ../..:/app
