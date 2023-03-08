@@ -2525,7 +2525,7 @@ __metadata:
     buffer: ^6.0.3
     bunyan: ^1.8.15
     cardano-wallet-js: ^1.4.0
-    chromedriver: ^107.0.0
+    chromedriver: ^110.0.0
     copy-webpack-plugin: ^10.2.4
     delay: ^5.0.0
     dotenv: ^16.0.1
@@ -2542,6 +2542,7 @@ __metadata:
     madge: ^5.0.1
     mock-browser: ^0.92.14
     npm-run-all: ^4.1.5
+    null-loader: ^4.0.1
     optionator: ^0.9.1
     pg: ^8.7.3
     readable-stream: ^3.6.0
@@ -8511,14 +8512,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.1.3":
-  version: 1.2.0
-  resolution: "axios@npm:1.2.0"
+"axios@npm:^1.2.1":
+  version: 1.3.4
+  resolution: "axios@npm:1.3.4"
   dependencies:
     follow-redirects: ^1.15.0
     form-data: ^4.0.0
     proxy-from-env: ^1.1.0
-  checksum: f08ce214e957dfde45b837f8d3c7861424608fb7df32faa638835e338782a9f4c0b05074e92e0e8dcca3a1e6250112fbbe1b15a6b21104da633d84745bbb79cc
+  checksum: 7440edefcf8498bc3cdf39de00443e8101f249972c83b739c6e880d9d669fea9486372dbe8739e88b3bf8bb1ad15f6106693f206f078f4516fe8fd47b1c3093c
   languageName: node
   linkType: hard
 
@@ -9816,12 +9817,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chromedriver@npm:^107.0.0":
-  version: 107.0.3
-  resolution: "chromedriver@npm:107.0.3"
+"chromedriver@npm:^110.0.0":
+  version: 110.0.0
+  resolution: "chromedriver@npm:110.0.0"
   dependencies:
     "@testim/chrome-version": ^1.1.3
-    axios: ^1.1.3
+    axios: ^1.2.1
     compare-versions: ^5.0.1
     extract-zip: ^2.0.1
     https-proxy-agent: ^5.0.1
@@ -9829,7 +9830,7 @@ __metadata:
     tcp-port-used: ^1.0.1
   bin:
     chromedriver: bin/chromedriver
-  checksum: e8f3f8cc5e5f8fd2c6a22cd37b5350835c9300812f7e6ae1d9eba1d83fa6f25f10de66e376dae6b8530a1b084f09652f59056ea40c77ae2e378a0fec467e36b0
+  checksum: 52c51f21ef523865af6496736e92689bf8a16d477653cb096ff22ad3bbf16495935b6f42f860a3cdea3123e2d8a4084688acc07a06da4924b7c0e2d2bc646ae4
   languageName: node
   linkType: hard
 
@@ -19158,6 +19159,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"null-loader@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "null-loader@npm:4.0.1"
+  dependencies:
+    loader-utils: ^2.0.0
+    schema-utils: ^3.0.0
+  peerDependencies:
+    webpack: ^4.0.0 || ^5.0.0
+  checksum: eeb4c4dd2f8f41e46f5665e4500359109e95ec1028a178a60e0161984906572da7dd87644bcc3cb29f0125d77e2b2508fb4f3813cfb1c6604a15865beb4b987b
+  languageName: node
+  linkType: hard
+
 "number-is-nan@npm:^1.0.0":
   version: 1.0.1
   resolution: "number-is-nan@npm:1.0.1"
@@ -22001,7 +22014,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"schema-utils@npm:^3.1.0, schema-utils@npm:^3.1.1":
+"schema-utils@npm:^3.0.0, schema-utils@npm:^3.1.0, schema-utils@npm:^3.1.1":
   version: 3.1.1
   resolution: "schema-utils@npm:3.1.1"
   dependencies:
