@@ -1,8 +1,4 @@
-export type ObjectPatches<T> = {
-  [k in keyof T]?: T[k];
-};
-
-export const patchObject = <T extends object>(baseObject: T, patches: ObjectPatches<T>) =>
+export const patchObject = <T extends object>(baseObject: T, patches: Partial<T>) =>
   new Proxy(baseObject, {
     get(target, p, receiver) {
       const value = p in patches ? patches[p as keyof T] : target[p as keyof T];

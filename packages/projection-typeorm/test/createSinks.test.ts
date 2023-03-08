@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/consistent-function-scoping */
 import { BlockDataEntity, BlockEntity, createSinks, createSinksFactory } from '../src';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { ChainSyncDataSet, ObjectPatches, chainSyncData, logger, patchObject } from '@cardano-sdk/util-dev';
+import { ChainSyncDataSet, chainSyncData, logger, patchObject } from '@cardano-sdk/util-dev';
 import { ConnectionNotFoundError, DataSource, QueryFailedError, QueryRunner } from 'typeorm';
 import {
   Observable,
@@ -22,7 +22,7 @@ import { initializeDataSource } from './connection';
 
 const { cardanoNode, networkInfo } = chainSyncData(ChainSyncDataSet.WithStakeKeyDeregistration);
 
-const stubDataSource = (baseDataSource: DataSource, queryRunnerStubs: ObjectPatches<QueryRunner>) =>
+const stubDataSource = (baseDataSource: DataSource, queryRunnerStubs: Partial<QueryRunner>) =>
   patchObject(baseDataSource, {
     createQueryRunner: (mode) => patchObject(baseDataSource.createQueryRunner(mode), queryRunnerStubs)
   });
