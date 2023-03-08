@@ -179,7 +179,9 @@ describe('createSinks', () => {
       const lastEvent = await lastValueFrom(project$.pipe(take(2)));
       // deleting last block from the buffer creates an inconsistency: resumed projection will
       // try to insert a 'block' with an already existing 'hash' which has a unique constraint.
-      await queryRunner.manager.query(`DELETE FROM block_data WHERE block_hash = '${lastEvent.block.header.hash}'`);
+      await queryRunner.manager.query(
+        `DELETE FROM block_data WHERE block_id IN (SELECT id FROM block WHERE hash='${lastEvent.block.header.hash}')`
+      );
       // ADP-2807
       await expect(firstValueFrom(project$)).rejects.toThrowError(QueryFailedError);
     });
