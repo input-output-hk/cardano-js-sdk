@@ -1,7 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Column, Entity, Index, PrimaryColumn, RelationOptions } from 'typeorm';
 
-@Entity({ name: 'block' })
+@Entity()
 export class BlockEntity {
   @PrimaryColumn({ length: 64, type: 'char' })
   hash?: Cardano.BlockId;

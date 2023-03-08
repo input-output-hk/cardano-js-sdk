@@ -3,7 +3,7 @@ import { Cardano } from '@cardano-sdk/core';
 import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { json, serializableObj, stringBytea } from './transformers';
 
-@Entity('block_data')
+@Entity()
 export class BlockDataEntity {
   @PrimaryGeneratedColumn()
   id?: number;

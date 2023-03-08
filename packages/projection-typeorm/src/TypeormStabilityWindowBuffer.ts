@@ -187,7 +187,7 @@ export class TypeormStabilityWindowBuffer
       // select IDs and then delete
       queryRunner.query(`
         DELETE FROM block_data
-        WHERE "blockHash" IN (SELECT hash FROM block WHERE height < ${nextTailBlockHeight})
+        WHERE block_hash IN (SELECT hash FROM block WHERE height < ${nextTailBlockHeight})
       `)
     ]);
     const nextTail = nextTailEntity?.data;
