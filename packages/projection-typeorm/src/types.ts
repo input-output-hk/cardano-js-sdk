@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { BlockEntity } from './entity/Block.entity';
 import { QueryRunner } from 'typeorm';
 import { Sink } from '@cardano-sdk/projection';
