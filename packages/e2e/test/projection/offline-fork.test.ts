@@ -123,11 +123,11 @@ describe('resuming projection when intersection is not local tip', () => {
     it('rolls back local data to intersection and resumes projection from there', async () => {
       // Project some events until we find at least 1 stake key registration
       const firstEventWithKeyRegistrations = await firstValueFrom(
-        project(ogmiosCardanoNode, sinksFactory).pipe(filter((evt) => evt.stakeKeys.register.size > 0))
+        project(ogmiosCardanoNode, sinksFactory).pipe(filter((evt) => evt.stakeKeys.insert.length > 0))
       );
       const lastEventFromOriginalSync = firstEventWithKeyRegistrations;
       const numStakeKeysBeforeFork = await getNumberOfLocalStakeKeys();
-      expect(numStakeKeysBeforeFork).toBe(firstEventWithKeyRegistrations.stakeKeys.register.size); // sanity check
+      expect(numStakeKeysBeforeFork).toBe(firstEventWithKeyRegistrations.stakeKeys.insert.length); // sanity check
 
       // Simulate a fork by adding some blocks that are not on the ogmios chain
       const stubForkCardanoNode = createForkProjectionSource(ogmiosCardanoNode, lastEventFromOriginalSync);
@@ -139,7 +139,7 @@ describe('resuming projection when intersection is not local tip', () => {
       const continue$ = project(ogmiosCardanoNode, sinksFactory).pipe(share());
       const rollForward$ = continue$.pipe(filter((evt) => evt.eventType === ChainSyncEventType.RollForward));
       const rolledBackKeyRegistrations$ = continue$.pipe(
-        filter((evt) => evt.eventType === ChainSyncEventType.RollBackward && evt.stakeKeys.register.size > 0)
+        filter((evt) => evt.eventType === ChainSyncEventType.RollBackward && evt.stakeKeys.del.length > 0)
       );
       await Promise.all([
         firstValueFrom(continue$).then((firstEvent) => {
@@ -150,8 +150,8 @@ describe('resuming projection when intersection is not local tip', () => {
           // Rolls back registrations in store
           expect(await getNumberOfLocalStakeKeys()).toBe(
             numStakeKeysAfterFork -
-              rolledBackKeyRegistrationsEvent.stakeKeys.register.size +
-              rolledBackKeyRegistrationsEvent.stakeKeys.deregister.size
+              rolledBackKeyRegistrationsEvent.stakeKeys.del.length +
+              rolledBackKeyRegistrationsEvent.stakeKeys.insert.length
           );
         }),
         firstValueFrom(rollForward$).then(async (firstRollForwardEvent) => {
@@ -162,8 +162,8 @@ describe('resuming projection when intersection is not local tip', () => {
           // State continues from intersection
           expect(await getNumberOfLocalStakeKeys()).toBe(
             numStakeKeysBeforeFork +
-              firstRollForwardEvent.stakeKeys.register.size -
-              firstRollForwardEvent.stakeKeys.deregister.size
+              firstRollForwardEvent.stakeKeys.insert.length -
+              firstRollForwardEvent.stakeKeys.del.length
           );
         })
       ]);

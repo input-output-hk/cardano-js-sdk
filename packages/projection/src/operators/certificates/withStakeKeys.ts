@@ -5,8 +5,6 @@ import { unifiedProjectorOperator } from '../utils';
 
 export interface WithStakeKeys {
   stakeKeys: {
-    register: Set<Crypto.Ed25519KeyHashHex>;
-    deregister: Set<Crypto.Ed25519KeyHashHex>;
     insert: Crypto.Ed25519KeyHashHex[];
     del: Crypto.Ed25519KeyHashHex[];
   };
@@ -51,9 +49,7 @@ export const withStakeKeys = unifiedProjectorOperator<WithCertificates, WithStak
     ...evt,
     stakeKeys: {
       del,
-      deregister,
-      insert,
-      register
+      insert
     }
   };
 });
