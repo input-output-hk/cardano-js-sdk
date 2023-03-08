@@ -22,16 +22,12 @@ export class InMemoryStabilityWindowBuffer<E extends WithNetworkInfo> implements
             this.tip$.next(block);
             this.#setTail(this.#blocks[0]);
           } else if (eventType === ChainSyncEventType.RollBackward) {
-            for (let i = this.#blocks.length - 1; i >= 0; i--) {
-              const bufferBlock = this.#blocks[i];
-              if (bufferBlock.header.hash === block.header.hash) {
-                this.#blocks.splice(i, 1);
-                break;
-              }
+            const lastBlock = this.#blocks.pop();
+            if (lastBlock?.header.hash !== block.header.hash) {
+              throw new Error('Assert: inconsistent stability window buffer at RollBackward');
             }
             this.tip$.next(this.#blocks[this.#blocks.length - 1] || 'origin');
-            const newTail = this.#blocks[0] || 'origin';
-            this.#setTail(newTail);
+            this.#setTail(this.#blocks[0] || 'origin');
           }
         })
       );
