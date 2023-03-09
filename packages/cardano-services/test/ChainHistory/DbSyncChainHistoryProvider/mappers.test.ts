@@ -353,7 +353,6 @@ describe('chain history mappers', () => {
     test('map TxModel to Cardano.HydratedTx with extra data', () => {
       const result = mappers.mapTxAlonzo(txModel, {
         certificates,
-        collaterals: inputs,
         inputSource,
         inputs,
         metadata,
@@ -365,7 +364,7 @@ describe('chain history mappers', () => {
       expect(result).toEqual<Cardano.HydratedTx>({
         ...expected,
         auxiliaryData: { body: { blob: metadata } },
-        body: { ...expected.body, certificates, collaterals: inputs, mint: assets, withdrawals },
+        body: { ...expected.body, certificates, mint: assets, withdrawals },
         witness: { ...expected.witness, redeemers }
       });
     });

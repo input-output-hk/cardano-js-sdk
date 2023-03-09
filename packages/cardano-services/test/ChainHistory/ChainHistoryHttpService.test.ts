@@ -326,16 +326,16 @@ describe('ChainHistoryHttpService', () => {
           expect(tx.auxiliaryData).toBeDefined();
         });
 
-        it('has collateral inputs', async () => {
-          const response = await provider.transactionsByHashes({
-            ids: await fixtureBuilder.getTxHashes(1, { with: [TxWith.CollateralInput] })
-          });
-          const tx: Cardano.HydratedTx = response[0];
-          expect(response.length).toEqual(1);
+        // it('has collateral inputs', async () => {
+        //   const response = await provider.transactionsByHashes({
+        //     ids: await fixtureBuilder.getTxHashes(1, { with: [TxWith.CollateralInput] })
+        //   });
+        //   const tx: Cardano.HydratedTx = response[0];
+        //   expect(response.length).toEqual(1);
 
-          expect(tx.body.collaterals).toMatchShapeOf(DataMocks.Tx.collateralInputs);
-          expect(tx.body.collaterals?.length).toEqual(1);
-        });
+        //   expect(tx.body.collaterals).toMatchShapeOf(DataMocks.Tx.collateralInputs);
+        //   expect(tx.body.collaterals?.length).toEqual(1);
+        // });
 
         it('has certificates', async () => {
           const response = await provider.transactionsByHashes({

@@ -77,7 +77,6 @@ export const normalizeTxBody = (body: Cardano.HydratedTxBody | Cardano.TxBody) =
   // TODO: inputs should be a Set since they're unordered.
   // Then Jest should correctly compare it with toEqual.
   body.inputs = sortTxIn(body.inputs);
-  body.collaterals = sortTxIn(body.collaterals);
   body.referenceInputs = sortTxIn(body.referenceInputs);
   return body;
 };

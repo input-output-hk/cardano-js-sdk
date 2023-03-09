@@ -126,21 +126,19 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
     const txResults: QueryResult<TxModel> = await this.db.query(Queries.findTransactionsByHashes, [byteIds]);
     if (txResults.rows.length === 0) return [];
 
-    const [inputs, outputs, mints, withdrawals, redeemers, metadata, collaterals, certificates] = await Promise.all([
+    const [inputs, outputs, mints, withdrawals, redeemers, metadata, certificates] = await Promise.all([
       this.#builder.queryTransactionInputsByHashes(ids),
       this.#builder.queryTransactionOutputsByHashes(ids),
       this.#builder.queryTxMintByHashes(ids),
       this.#builder.queryWithdrawalsByHashes(ids),
       this.#builder.queryRedeemersByHashes(ids),
       this.#metadataService.queryTxMetadataByHashes(ids),
-      this.#builder.queryTransactionInputsByHashes(ids, true),
       this.#builder.queryCertificatesByHashes(ids)
     ]);
 
     return txResults.rows.map((tx) => {
       const txId = tx.id.toString('hex') as unknown as Cardano.TransactionId;
       const txInputs = orderBy(inputs.filter((input) => input.txInputId === txId).map(mapTxIn), ['index']);
-      const txCollaterals = orderBy(collaterals.filter((col) => col.txInputId === txId).map(mapTxIn), ['index']);
       const txOutputs = orderBy(outputs.filter((output) => output.txId === txId).map(mapTxOut), ['index']);
       const inputSource: Cardano.InputSource = tx.valid_contract
         ? Cardano.InputSource.inputs
@@ -148,7 +146,6 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
 
       return mapTxAlonzo(tx, {
         certificates: certificates.get(txId),
-        collaterals: txCollaterals,
         inputSource,
         inputs: txInputs,
         metadata: metadata.get(txId),

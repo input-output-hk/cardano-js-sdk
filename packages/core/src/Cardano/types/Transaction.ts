@@ -40,7 +40,6 @@ export interface Withdrawal {
 
 export interface HydratedTxBody {
   inputs: HydratedTxIn[];
-  collaterals?: HydratedTxIn[];
   outputs: TxOut[];
   fee: Lovelace;
   validityInterval?: ValidityInterval;
