@@ -1,9 +1,8 @@
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import { ChainSyncDataSet, chainSyncData, createTestScheduler } from '@cardano-sdk/util-dev';
 import { Operators, RollForwardEvent, UnifiedProjectorEvent } from '../../src';
-import { createTestScheduler } from '@cardano-sdk/util-dev';
-import { dataWithPoolRetirement } from '../events';
 
-const networkInfo = dataWithPoolRetirement.networkInfo;
+const { networkInfo, cardanoNode } = chainSyncData(ChainSyncDataSet.WithPoolRetirement);
 
 const createEvent = (eventType: ChainSyncEventType) =>
   ({
@@ -18,7 +17,7 @@ describe('withNetworkInfo', () => {
         a: createEvent(ChainSyncEventType.RollForward),
         b: createEvent(ChainSyncEventType.RollBackward)
       });
-      expectObservable(source$.pipe(Operators.withNetworkInfo(dataWithPoolRetirement.cardanoNode))).toBe('ab', {
+      expectObservable(source$.pipe(Operators.withNetworkInfo(cardanoNode))).toBe('ab', {
         a: {
           ...createEvent(ChainSyncEventType.RollForward),
           eraSummaries: networkInfo.eraSummaries,

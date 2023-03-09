@@ -1,19 +1,12 @@
 /* eslint-disable max-len */
 import { containerExec, imageExists, pullImageAsync } from 'dockerode-utils';
 import Docker from 'dockerode';
-import path from 'path';
+
+export { Docker };
+export { containerExec } from 'dockerode-utils';
 
 const CONTAINER_IMAGE = 'postgres:11.5-alpine';
-const CONTAINER_TEMP_DIR = '/tmp';
 const CONTAINER_NAME = 'cardano-test';
-
-const databaseConfigs = {
-  localnetwork: {
-    database: 'localnetwork',
-    fixture: false,
-    snapshot: true
-  }
-};
 
 export const removePostgresContainer = async (): Promise<void> => {
   const docker = new Docker();
@@ -34,13 +27,7 @@ export const removePostgresContainer = async (): Promise<void> => {
   }
 };
 
-interface DatabaseConfig {
-  database: string;
-  snapshot: boolean;
-  fixture: boolean;
-}
-
-const ensureDatabaseExistence = async (container: Docker.Container, user: string, database: string) => {
+export const ensureDatabaseExistence = async (container: Docker.Container, user: string, database: string) => {
   await containerExec(container, [
     'bash',
     '-c',
@@ -56,42 +43,7 @@ const ensurePgServiceReadiness = async (container: Docker.Container, user: strin
   ]);
 };
 
-const setupDBData = async (databaseConfig: DatabaseConfig, user: string, container: Docker.Container) => {
-  const { database, snapshot, fixture } = databaseConfig;
-
-  await containerExec(container, ['bash', '-c', `psql -U ${user} -c "CREATE DATABASE ${database}"`]);
-
-  if (snapshot) {
-    await container.putArchive(path.join(__dirname, `${database}-db-snapshot.tar`), {
-      User: 'root',
-      path: CONTAINER_TEMP_DIR
-    });
-
-    // Execute backup restore
-    await containerExec(container, [
-      'bash',
-      '-c',
-      `cat ${CONTAINER_TEMP_DIR}/${database}.bak | psql -U ${user} ${database}`
-    ]);
-  }
-
-  if (fixture) {
-    await container.putArchive(path.join(__dirname, `${database}-fixture-data.tar`), {
-      User: 'root',
-      path: CONTAINER_TEMP_DIR
-    });
-
-    await containerExec(container, [
-      'bash',
-      '-c',
-      `cat ${CONTAINER_TEMP_DIR}/${database}-fixture-data.sql | psql -U ${user} ${database}`
-    ]);
-  }
-
-  await ensureDatabaseExistence(container, user, database);
-};
-
-export const setupPostgresContainer = async (user: string, password: string, port: string): Promise<void> => {
+export const setupPostgresContainer = async (user: string, password: string, port: string) => {
   const docker = new Docker();
   const needsToPull = !(await imageExists(docker, CONTAINER_IMAGE));
 
@@ -116,5 +68,5 @@ export const setupPostgresContainer = async (user: string, password: string, por
   await container.start();
 
   await ensurePgServiceReadiness(container, user);
-  await setupDBData(databaseConfigs.localnetwork, user, container);
+  return container;
 };

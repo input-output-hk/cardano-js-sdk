@@ -1,4 +1,5 @@
 /* eslint-disable promise/always-return */
+import * as Postgres from '@cardano-sdk/projection-typeorm';
 import {
   Cardano,
   ChainSyncEvent,
@@ -7,15 +8,17 @@ import {
   ObservableCardanoNode,
   Point
 } from '@cardano-sdk/core';
+import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { ConnectionConfig } from '@cardano-ogmios/client';
-import { InMemory, Projections, projectIntoSink } from '@cardano-sdk/projection';
+import { InMemory, Projections, SinksFactory, WithBlock, projectIntoSink } from '@cardano-sdk/projection';
 import { Observable, filter, firstValueFrom, lastValueFrom, of, share, take } from 'rxjs';
 import { OgmiosObservableCardanoNode } from '@cardano-sdk/ogmios';
-import { dataWithStakeKeyDeregistration } from '../../../projection/test/events';
+import { createDatabase } from 'typeorm-extension';
 import { getEnv } from '../../src';
-import { logger } from '@cardano-sdk/util-dev';
 
-const connectionConfig = ((): ConnectionConfig => {
+const dataWithStakeKeyDeregistration = chainSyncData(ChainSyncDataSet.WithStakeKeyDeregistration);
+
+const ogmiosConnectionConfig = ((): ConnectionConfig => {
   const { OGMIOS_URL } = getEnv(['OGMIOS_URL']);
   const url = new URL(OGMIOS_URL);
   return {
@@ -24,7 +27,28 @@ const connectionConfig = ((): ConnectionConfig => {
   };
 })();
 
-const createForkProjectionSource = (forkFromNode: ObservableCardanoNode): ObservableCardanoNode => ({
+// const { PROJECTION_PG_CONNECTION_STRING } = getEnv(['PROJECTION_PG_CONNECTION_STRING']);
+const pgConnectionConfig = ((): Postgres.PgConnectionConfig => {
+  const { PROJECTION_PG_CONNECTION_STRING } = getEnv(['PROJECTION_PG_CONNECTION_STRING']);
+  // postgresql://postgres:doNoUseThisSecret!@localhost:5435/projection
+  const withoutProtocol = PROJECTION_PG_CONNECTION_STRING.split('://')[1];
+  const [credentials, hostPortDb] = withoutProtocol.split('@');
+  const [username, password] = credentials.split(':');
+  const [hostPort, database] = hostPortDb.split('/');
+  const [host, port] = hostPort.split(':');
+  return {
+    database,
+    host,
+    password,
+    port: Number.parseInt(port),
+    username
+  };
+})();
+
+const createForkProjectionSource = (
+  forkFromNode: ObservableCardanoNode,
+  lastEvt: WithBlock
+): ObservableCardanoNode => ({
   // Same network info
   eraSummaries$: forkFromNode.eraSummaries$,
   genesisParameters$: forkFromNode.genesisParameters$,
@@ -47,15 +71,16 @@ const createForkProjectionSource = (forkFromNode: ObservableCardanoNode): Observ
         const requestNext = () => {
           const nextEvt = events.shift();
           if (nextEvt) {
-            const slot = Cardano.Slot(
-              intersectionPoint.slot + someEventsWithStakeKeyRegistration.length - events.length
-            );
+            const blockOffset = someEventsWithStakeKeyRegistration.length - events.length;
+            const slot = Cardano.Slot(intersectionPoint.slot + blockOffset * 20);
+            const blockNo = Cardano.BlockNo(lastEvt.block.header.blockNo + blockOffset);
             subscriber.next({
               ...nextEvt,
               block: {
                 ...nextEvt.block,
                 header: {
                   ...nextEvt.block.header,
+                  blockNo,
                   slot
                 }
               },
@@ -77,68 +102,117 @@ const createForkProjectionSource = (forkFromNode: ObservableCardanoNode): Observ
 
 describe('resuming projection when intersection is not local tip', () => {
   let ogmiosCardanoNode: ObservableCardanoNode;
-  let stubForkCardanoNode: ObservableCardanoNode;
+  const projections = { stakeKeys: Projections.stakeKeys };
 
   beforeAll(async () => {
-    ogmiosCardanoNode = new OgmiosObservableCardanoNode({ connectionConfig$: of(connectionConfig) }, { logger });
-    stubForkCardanoNode = createForkProjectionSource(ogmiosCardanoNode);
+    ogmiosCardanoNode = new OgmiosObservableCardanoNode({ connectionConfig$: of(ogmiosConnectionConfig) }, { logger });
   });
 
-  it('rolls back local data to intersection and resumes projection from there', async () => {
-    // Setup projection service
+  const project = (cardanoNode: ObservableCardanoNode, sinksFactory: SinksFactory<typeof projections>) =>
+    projectIntoSink({
+      cardanoNode,
+      logger,
+      projections,
+      sinksFactory
+    });
+
+  const testRollbackAndContinue = (
+    sinksFactory: SinksFactory<typeof projections>,
+    getNumberOfLocalStakeKeys: () => Promise<number>
+  ) => {
+    it('rolls back local data to intersection and resumes projection from there', async () => {
+      // Project some events until we find at least 1 stake key registration
+      const firstEventWithKeyRegistrations = await firstValueFrom(
+        project(ogmiosCardanoNode, sinksFactory).pipe(filter((evt) => evt.stakeKeys.insert.length > 0))
+      );
+      const lastEventFromOriginalSync = firstEventWithKeyRegistrations;
+      const numStakeKeysBeforeFork = await getNumberOfLocalStakeKeys();
+      expect(numStakeKeysBeforeFork).toBe(firstEventWithKeyRegistrations.stakeKeys.insert.length); // sanity check
+
+      // Simulate a fork by adding some blocks that are not on the ogmios chain
+      const stubForkCardanoNode = createForkProjectionSource(ogmiosCardanoNode, lastEventFromOriginalSync);
+      await lastValueFrom(project(stubForkCardanoNode, sinksFactory).pipe(take(4)));
+      const numStakeKeysAfterFork = await getNumberOfLocalStakeKeys();
+      expect(numStakeKeysAfterFork).toBeGreaterThan(numStakeKeysBeforeFork);
+
+      // Continue projection from ogmios
+      const continue$ = project(ogmiosCardanoNode, sinksFactory).pipe(share());
+      const rollForward$ = continue$.pipe(filter((evt) => evt.eventType === ChainSyncEventType.RollForward));
+      const rolledBackKeyRegistrations$ = continue$.pipe(
+        filter((evt) => evt.eventType === ChainSyncEventType.RollBackward && evt.stakeKeys.del.length > 0)
+      );
+      await Promise.all([
+        firstValueFrom(continue$).then((firstEvent) => {
+          // Starts sync by rolling back to intersection
+          expect(firstEvent.eventType).toBe(ChainSyncEventType.RollBackward);
+        }),
+        firstValueFrom(rolledBackKeyRegistrations$).then(async (rolledBackKeyRegistrationsEvent) => {
+          // Rolls back registrations in store
+          expect(await getNumberOfLocalStakeKeys()).toBe(
+            numStakeKeysAfterFork -
+              rolledBackKeyRegistrationsEvent.stakeKeys.del.length +
+              rolledBackKeyRegistrationsEvent.stakeKeys.insert.length
+          );
+        }),
+        firstValueFrom(rollForward$).then(async (firstRollForwardEvent) => {
+          // Block heights continues from intersection
+          expect(firstRollForwardEvent.block.header.blockNo).toEqual(
+            lastEventFromOriginalSync.block.header.blockNo + 1
+          );
+          // State continues from intersection
+          expect(await getNumberOfLocalStakeKeys()).toBe(
+            numStakeKeysBeforeFork +
+              firstRollForwardEvent.stakeKeys.insert.length -
+              firstRollForwardEvent.stakeKeys.del.length
+          );
+        })
+      ]);
+    });
+  };
+
+  describe('InMemory', () => {
     const store = InMemory.createStore();
-    const inMemorySinks = InMemory.createSinks(store);
-    const projections = { stakeKeys: Projections.stakeKeys };
-    const projectFrom = (cardanoNode: ObservableCardanoNode) =>
-      projectIntoSink({
-        cardanoNode,
-        logger,
-        projections,
-        sinks: inMemorySinks
+    const sinks = InMemory.createSinks(store);
+    testRollbackAndContinue(
+      () => sinks,
+      async () => store.stakeKeys.size
+    );
+  });
+
+  describe('typeorm', () => {
+    const dataSource = Postgres.createDataSource({
+      connectionConfig: pgConnectionConfig,
+      devOptions: {
+        dropSchema: true,
+        synchronize: true
+      },
+      logger,
+      options: {
+        installExtensions: true
+      },
+      projections
+    });
+    const sinksFactory = Postgres.createSinksFactory({
+      dataSource$: of(dataSource),
+      logger
+    });
+    const getNumberOfLocalStakeKeys = async () => {
+      const repository = dataSource.getRepository(Postgres.StakeKeyEntity);
+      return repository.count();
+    };
+
+    beforeAll(async () => {
+      await createDatabase({
+        options: {
+          type: 'postgres',
+          ...pgConnectionConfig,
+          installExtensions: true
+        }
       });
+      await dataSource.initialize();
+    });
+    afterAll(() => dataSource.destroy());
 
-    // Project some events until we find at least 1 stake key registration
-    const firstEventWithKeyRegistrations = await firstValueFrom(
-      projectFrom(ogmiosCardanoNode).pipe(filter((evt) => evt.stakeKeys.register.size > 0))
-    );
-    const lastEventFromOriginalSync = firstEventWithKeyRegistrations;
-    const numStakeKeysBeforeFork = store.stakeKeys.size;
-    expect(numStakeKeysBeforeFork).toBe(firstEventWithKeyRegistrations.stakeKeys.register.size); // sanity check
-
-    // Simulate a fork by adding some blocks that are not on the ogmios chain
-    await lastValueFrom(projectFrom(stubForkCardanoNode).pipe(take(4)));
-    const numStakeKeysAfterFork = store.stakeKeys.size;
-    expect(numStakeKeysAfterFork).toBeGreaterThan(numStakeKeysBeforeFork);
-
-    // Continue projection from ogmios
-    const continue$ = projectFrom(ogmiosCardanoNode).pipe(share());
-    const rollForward$ = continue$.pipe(filter((evt) => evt.eventType === ChainSyncEventType.RollForward));
-    const rolledBackKeyRegistrations$ = continue$.pipe(
-      filter((evt) => evt.eventType === ChainSyncEventType.RollBackward && evt.stakeKeys.register.size > 0)
-    );
-    await Promise.all([
-      firstValueFrom(continue$).then((firstEvent) => {
-        // Starts sync by rolling back to intersection
-        expect(firstEvent.eventType).toBe(ChainSyncEventType.RollBackward);
-      }),
-      firstValueFrom(rolledBackKeyRegistrations$).then((rolledBackKeyRegistrationsEvent) => {
-        // Rolls back registrations in store
-        expect(store.stakeKeys.size).toBe(
-          numStakeKeysAfterFork -
-            rolledBackKeyRegistrationsEvent.stakeKeys.register.size +
-            rolledBackKeyRegistrationsEvent.stakeKeys.deregister.size
-        );
-      }),
-      firstValueFrom(rollForward$).then((firstRollForwardEvent) => {
-        // Block heights continues from intersection
-        expect(firstRollForwardEvent.block.header.blockNo).toEqual(lastEventFromOriginalSync.block.header.blockNo + 1);
-        // State continues from intersection
-        expect(store.stakeKeys.size).toBe(
-          numStakeKeysBeforeFork +
-            firstRollForwardEvent.stakeKeys.register.size -
-            firstRollForwardEvent.stakeKeys.deregister.size
-        );
-      })
-    ]);
+    testRollbackAndContinue(sinksFactory, getNumberOfLocalStakeKeys);
   });
 });

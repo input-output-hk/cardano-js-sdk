@@ -16,7 +16,12 @@ describe('sinks/inMemory/stakeKeys', () => {
         stakeKeys
           .sink({
             eventType,
-            stakeKeys: { deregister: new Set(deregister), register: new Set(register) },
+            stakeKeys: {
+              del: eventType === ChainSyncEventType.RollForward ? deregister : register,
+              deregister: new Set(deregister),
+              insert: eventType === ChainSyncEventType.RollForward ? register : deregister,
+              register: new Set(register)
+            },
             store
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } as any)

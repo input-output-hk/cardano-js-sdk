@@ -1,13 +1,10 @@
-import { ChainSyncEventType, ChainSyncRollBackward, ChainSyncRollForward, Intersection } from '@cardano-sdk/core';
+import { ChainSyncEventType, Intersection } from '@cardano-sdk/core';
 import { GeneratorMetadata } from '../Content';
 import { Logger } from 'ts-log';
 import { Ogmios, ogmiosToCore } from '@cardano-sdk/ogmios';
+import type { SerializedChainSyncEvent } from '@cardano-sdk/util-dev';
 
 type CardanoMetadata = Pick<GeneratorMetadata['metadata'], 'cardano'>;
-
-export type SerializedChainSyncEvent =
-  | Omit<ChainSyncRollForward, 'requestNext'>
-  | Omit<ChainSyncRollBackward, 'requestNext'>;
 
 export type GetChainSyncEventsResponse = {
   events: SerializedChainSyncEvent[];
