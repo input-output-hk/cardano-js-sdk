@@ -5,7 +5,7 @@ import { Subject } from 'rxjs';
 
 export interface WithTypeormContext {
   queryRunner: QueryRunner;
-  transactionCommit$: Subject<void>;
+  transactionCommitted$: Subject<void>;
   blockEntity: BlockEntity;
 }
 

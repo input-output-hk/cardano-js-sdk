@@ -46,7 +46,7 @@ export interface TypeormSinksProps extends TypeormStabilityWindowBufferProps, Wi
   reconnectionConfig?: ReconnectionConfig;
 }
 
-const TypeormContextProps: Array<keyof WithTypeormContext> = ['blockEntity', 'queryRunner', 'transactionCommit$'];
+const TypeormContextProps: Array<keyof WithTypeormContext> = ['blockEntity', 'queryRunner', 'transactionCommitted$'];
 
 export type SupportedProjections = Pick<Projections.AllProjections, keyof typeof supportedSinks>;
 
@@ -95,7 +95,7 @@ export const createSinks = ({
       evt$.pipe(
         concatMap((evt) =>
           from(evt.queryRunner.commitTransaction()).pipe(
-            tap(() => evt.transactionCommit$.next()),
+            tap(() => evt.transactionCommitted$.next()),
             map(() => omit(evt, TypeormContextProps))
           )
         ),
@@ -127,14 +127,14 @@ export const createSinks = ({
           dataSource$.pipe(switchMap((dataSource) => withQueryRunner(dataSource, buffer, logger)))
         ),
         Operators.withEventContext(
-          ({ queryRunner }): Observable<Pick<WithTypeormContext, 'transactionCommit$'>> =>
+          ({ queryRunner }): Observable<Pick<WithTypeormContext, 'transactionCommitted$'>> =>
             from(
-              // - transactionCommit$.next is called in 'after' hook, it is
+              // - transactionCommitted$.next is called in 'after' hook, it is
               //   used by TypeormStabilityWindowBuffer to emit new tip$
               // - might be possible to optimize by setting a different isolation level,
               //   but we're using the safest one until there's a need to optimize
               //   https://www.postgresql.org/docs/current/transaction-iso.html
-              queryRunner.startTransaction('SERIALIZABLE').then(() => ({ transactionCommit$: new Subject<void>() }))
+              queryRunner.startTransaction('SERIALIZABLE').then(() => ({ transactionCommitted$: new Subject<void>() }))
             )
         ),
         Operators.withEventContext(({ block, queryRunner, eventType }) => {

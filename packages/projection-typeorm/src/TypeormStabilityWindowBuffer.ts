@@ -97,7 +97,7 @@ export class TypeormStabilityWindowBuffer
   }
 
   async #rollForward(evt: RollForwardEvent<Operators.WithNetworkInfo & WithTypeormContext>) {
-    const { eventType, transactionCommit$, queryRunner, blockEntity, block } = evt;
+    const { eventType, transactionCommitted$, queryRunner, blockEntity, block } = evt;
     const {
       header: { blockNo }
     } = block;
@@ -109,7 +109,7 @@ export class TypeormStabilityWindowBuffer
         data: block
       });
       await Promise.all([repository.insert(blockData), this.#deleteOldBlockData(evt)]);
-      transactionCommit$.subscribe(() => {
+      transactionCommitted$.subscribe(() => {
         this.#tip$.next(block);
         if (this.#tail === 'origin') {
           this.#setTail(block);
@@ -119,7 +119,7 @@ export class TypeormStabilityWindowBuffer
   }
 
   async #rollBackward({
-    transactionCommit$,
+    transactionCommitted$,
     queryRunner,
     block: {
       header: { slot, blockNo }
@@ -146,7 +146,7 @@ export class TypeormStabilityWindowBuffer
     if (prevTip?.data && blockNo !== prevTip?.data.header.blockNo + 1) {
       throw new Error('Assert: inconsistent PgStabilityWindowBuffer at rollBackward');
     }
-    transactionCommit$.subscribe(() => {
+    transactionCommitted$.subscribe(() => {
       this.#tip$.next(prevTip?.data || 'origin');
       if (!prevTip?.data) {
         this.#setTail('origin');
@@ -160,7 +160,7 @@ export class TypeormStabilityWindowBuffer
       header: { blockNo }
     },
     queryRunner,
-    transactionCommit$
+    transactionCommitted$
   }: RollForwardEvent<Operators.WithNetworkInfo & WithTypeormContext>) {
     if (blockNo < securityParameter || blockNo % this.#compactEvery !== 0) {
       return;
@@ -194,7 +194,7 @@ export class TypeormStabilityWindowBuffer
     if (!nextTail) {
       throw new Error('Assert: inconsistent PgStabilityWindowBuffer at #deleteOldBlockData');
     }
-    transactionCommit$.subscribe(() => this.#setTail(nextTail));
+    transactionCommitted$.subscribe(() => this.#setTail(nextTail));
   }
 
   #setTail(tail: Cardano.Block | 'origin') {
