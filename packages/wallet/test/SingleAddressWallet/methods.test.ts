@@ -138,16 +138,17 @@ describe('SingleAddressWallet methods', () => {
       });
     });
 
-    describe('resolveInputAddress', () => {
-      it('returns input address for wallet-owned utxo', async () => {
+    describe('resolveInput', () => {
+      it('returns the txOut associated with the input for wallet-owned UTxO', async () => {
         const utxoSet = await firstValueFrom(wallet.utxo.available$);
-        const resolveInputAddressResult = await wallet.util.resolveInputAddress(utxoSet[0][0]);
-        expect(typeof resolveInputAddressResult).toBe('string');
+        const resolveInputAddressResult = await wallet.util.resolveInput(utxoSet[0][0]);
+        expect(typeof resolveInputAddressResult!.address).toBe('string');
+        expect(typeof resolveInputAddressResult!.value).toBe('object');
       });
 
       it('returns null for non-wallet-owned utxo', async () => {
         expect(
-          await wallet.util.resolveInputAddress({
+          await wallet.util.resolveInput({
             index: 9,
             txId: Cardano.TransactionId('6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad')
           })

@@ -3,6 +3,9 @@
   "compilerOptions": {
     "baseUrl": "."
   },
+  "include": [
+    "../../tx-construction/test/testData"
+  ],
   "references": [
     {
       "path": "../src"

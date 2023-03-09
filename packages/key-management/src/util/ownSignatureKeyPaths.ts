@@ -74,9 +74,9 @@ export const ownSignatureKeyPaths = async (
     (
       await Promise.all(
         txInputs.map(async (input) => {
-          const ownAddress = await inputResolver.resolveInputAddress(input);
-          if (!ownAddress) return null;
-          return knownAddresses.find(({ address }) => address === ownAddress);
+          const resolution = await inputResolver.resolveInput(input);
+          if (!resolution) return null;
+          return knownAddresses.find(({ address }) => address === resolution.address);
         })
       )
     ).filter(isNotNil)

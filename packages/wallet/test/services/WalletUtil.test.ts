@@ -65,7 +65,7 @@ describe('WalletUtil', () => {
   });
 
   describe('createInputResolver', () => {
-    it('resolveInputAddress resolves inputs from provided utxo set', async () => {
+    it('resolveInput resolves inputs from provided utxo set', async () => {
       const utxo: Cardano.Utxo[] = [
         [
           {
@@ -83,13 +83,16 @@ describe('WalletUtil', () => {
       ];
       const resolver = createInputResolver({ utxo: { available$: of(utxo) } });
       expect(
-        await resolver.resolveInputAddress({
+        await resolver.resolveInput({
           index: 0,
           txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5')
         })
-      ).toBe('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg');
+      ).toEqual({
+        address: 'addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg',
+        value: { coins: 50_000_000n }
+      });
       expect(
-        await resolver.resolveInputAddress({
+        await resolver.resolveInput({
           index: 0,
           txId: Cardano.TransactionId('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d4')
         })

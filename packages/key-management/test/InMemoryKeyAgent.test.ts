@@ -17,7 +17,7 @@ describe('InMemoryKeyAgent', () => {
   beforeEach(async () => {
     mnemonicWords = util.generateMnemonicWords();
     getPassphrase = jest.fn().mockResolvedValue(Buffer.from('password'));
-    inputResolver = { resolveInputAddress: jest.fn() };
+    inputResolver = { resolveInput: jest.fn() };
     keyAgent = await InMemoryKeyAgent.fromBip39MnemonicWords(
       {
         chainId: Cardano.ChainIds.Preview,

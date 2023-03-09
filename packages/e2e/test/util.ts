@@ -259,5 +259,5 @@ export const createStandaloneKeyAgent = async (
       getPassphrase: async () => Buffer.from(''),
       mnemonicWords: mnemonics
     },
-    { bip32Ed25519, inputResolver: { resolveInputAddress: async () => null }, logger }
+    { bip32Ed25519, inputResolver: { resolveInput: async () => null }, logger }
   );
