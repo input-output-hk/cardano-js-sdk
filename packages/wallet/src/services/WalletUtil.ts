@@ -108,9 +108,11 @@ export const createOutputValidator = ({ protocolParameters$ }: OutputValidatorCo
 };
 
 export const createInputResolver = ({ utxo }: InputResolverContext): Cardano.InputResolver => ({
-  async resolveInputAddress(input: Cardano.TxIn) {
+  async resolveInput(input: Cardano.TxIn) {
     const utxoAvailable = await firstValueFrom(utxo.available$);
-    return utxoAvailable?.find(([txIn]) => txInEquals(txIn, input))?.[1].address || null;
+    const availableUtxo = utxoAvailable?.find(([txIn]) => txInEquals(txIn, input));
+    if (!availableUtxo) return null;
+    return availableUtxo[1];
   }
 });
 
@@ -137,9 +139,9 @@ export const createLazyWalletUtil = (): WalletUtil & { initialize: SetWalletUtil
   const resolverReady = new Promise((resolve: SetWalletUtilContext) => (initialize = resolve)).then(createWalletUtil);
   return {
     initialize: initialize!,
-    async resolveInputAddress(input) {
+    async resolveInput(input) {
       const resolver = await resolverReady;
-      return resolver.resolveInputAddress(input);
+      return resolver.resolveInput(input);
     },
     async validateOutput(output) {
       const resolver = await resolverReady;

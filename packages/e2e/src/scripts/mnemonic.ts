@@ -21,7 +21,7 @@ import { localNetworkChainId } from '../util';
     },
     {
       bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
-      inputResolver: { resolveInputAddress: async () => null },
+      inputResolver: { resolveInput: async () => null },
       logger: console
     }
   );

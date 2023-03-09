@@ -18,7 +18,7 @@ import { dummyLogger } from 'ts-log';
 describe('KeyManagement/restoreKeyAgent', () => {
   const dependencies: KeyAgentDependencies = {
     bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
-    inputResolver: { resolveInputAddress: jest.fn() },
+    inputResolver: { resolveInput: jest.fn() },
     logger: dummyLogger
   };
 

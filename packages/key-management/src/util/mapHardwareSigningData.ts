@@ -91,7 +91,7 @@ const prepareTrezorInputs = async (
     const input = scope.manage(inputs.get(i));
     const inputTxId = scope.manage(input.transaction_id());
     const coreInput = cmlToCore.txIn(input);
-    const paymentAddress = await inputResolver.resolveInputAddress(coreInput);
+    const resolution = await inputResolver.resolveInput(coreInput);
 
     let trezorInput = {
       prev_hash: Buffer.from(inputTxId.to_bytes()).toString('hex'),
@@ -99,8 +99,8 @@ const prepareTrezorInputs = async (
     } as trezor.CardanoInput;
 
     let paymentKeyPath = null;
-    if (paymentAddress) {
-      const knownAddress = knownAddresses.find(({ address }) => address === paymentAddress);
+    if (resolution?.address) {
+      const knownAddress = knownAddresses.find(({ address }) => address === resolution.address);
       if (knownAddress) {
         paymentKeyPath = [
           harden(CardanoKeyConst.PURPOSE),
@@ -420,11 +420,11 @@ const prepareLedgerInputs = async (
   for (let i = 0; i < inputs.len(); i++) {
     const input = scope.manage(inputs.get(i));
     const coreInput = cmlToCore.txIn(input);
-    const paymentAddress = await inputResolver.resolveInputAddress(coreInput);
+    const resolution = await inputResolver.resolveInput(coreInput);
 
     let paymentKeyPath = null;
-    if (paymentAddress) {
-      const knownAddress = knownAddresses.find(({ address }) => address === paymentAddress);
+    if (resolution?.address) {
+      const knownAddress = knownAddresses.find(({ address }) => address === resolution.address);
       if (knownAddress) {
         paymentKeyPath = [
           harden(CardanoKeyConst.PURPOSE),
