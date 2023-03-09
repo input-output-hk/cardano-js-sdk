@@ -140,6 +140,7 @@ export const createSinks = ({
         Operators.withEventContext(({ block, queryRunner, eventType }) => {
           const repository = queryRunner.manager.getRepository(BlockEntity);
           const blockEntity = repository.create({
+            bufferData: block,
             hash: block.header.hash,
             height: block.header.blockNo,
             slot: block.header.slot

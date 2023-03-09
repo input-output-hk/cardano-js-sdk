@@ -1,5 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Column, Entity, Index, PrimaryGeneratedColumn, RelationOptions } from 'typeorm';
+import { json, serializableObj, stringBytea } from './transformers';
 
 @Entity()
 export class BlockEntity {
@@ -17,6 +18,9 @@ export class BlockEntity {
   @Index({ unique: true })
   @Column({ type: 'int' })
   height?: number;
+
+  @Column({ nullable: true, transformer: [serializableObj, json, stringBytea], type: 'bytea' })
+  bufferData?: Cardano.Block;
 }
 
 /**

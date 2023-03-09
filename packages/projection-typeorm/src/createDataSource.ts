@@ -1,6 +1,5 @@
 import 'reflect-metadata';
 import * as supportedSinks from './sinks';
-import { BlockDataEntity } from './entity';
 import { BlockEntity } from './entity/Block.entity';
 import { DataSource, DataSourceOptions, DefaultNamingStrategy, NamingStrategyInterface } from 'typeorm';
 import { Logger } from 'ts-log';
@@ -96,7 +95,7 @@ export const createDataSource = <P extends object>({
   const requestedProjectionEntities = Object.entries<WithTypeormSinkMetadata>(supportedSinks)
     .filter(([projectionName]) => projectionName in projections)
     .flatMap(([_, sink]) => sink.entities);
-  const entities: Function[] = uniq([BlockEntity, BlockDataEntity, ...requestedProjectionEntities]);
+  const entities: Function[] = uniq([BlockEntity, ...requestedProjectionEntities]);
   return new DataSource({
     ...connectionConfig,
     ...devOptions,

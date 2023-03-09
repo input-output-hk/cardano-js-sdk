@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable brace-style */
-import { BlockDataEntity } from './entity';
+import { BlockEntity } from './entity';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { FindOptionsSelect, LessThan, QueryRunner } from 'typeorm';
+import { IsNull, LessThan, Not, QueryRunner } from 'typeorm';
 import { Logger } from 'ts-log';
 import { Observable, ReplaySubject, concatMap, from, map } from 'rxjs';
 import {
@@ -15,17 +15,6 @@ import {
 } from '@cardano-sdk/projection';
 import { WithLogger, contextLogger } from '@cardano-sdk/util';
 import { WithTypeormContext } from './types';
-
-const blockDataSelect: FindOptionsSelect<BlockDataEntity> = {
-  block: {
-    slot: true
-  },
-  // Using 'transformers' breaks the types.
-  // Types seem to expect model to have fields that match database types:
-  // If it's an 'object', it will recursively apply FindOptionsSelect.
-  data: true as any,
-  id: true
-};
 
 export interface TypeormStabilityWindowBufferProps {
   /**
@@ -65,30 +54,31 @@ export class TypeormStabilityWindowBuffer
   }
 
   async initialize(queryRunner: QueryRunner): Promise<void> {
-    const repository = queryRunner.manager.getRepository(BlockDataEntity);
+    const repository = queryRunner.manager.getRepository(BlockEntity);
     const [tip, tail] = await Promise.all([
       // findOne fails without `where:`, so using find().
       // It makes 2 queries so is not very efficient,
       // but it should be fine for `initialize`.
       repository.find({
-        order: { block: { slot: 'DESC' } },
-        relations: {
-          block: true
+        order: { slot: 'DESC' },
+        select: {
+          bufferData: true as any
         },
-        select: blockDataSelect,
         take: 1
       }),
       repository.find({
-        order: { block: { slot: 'ASC' } },
-        relations: {
-          block: true
+        order: { slot: 'ASC' },
+        select: {
+          bufferData: true as any
         },
-        select: blockDataSelect,
-        take: 1
+        take: 1,
+        where: {
+          bufferData: Not(IsNull())
+        }
       })
     ]);
-    this.#tip$.next(tip[0]?.data || 'origin');
-    this.#setTail(tail[0]?.data || 'origin');
+    this.#tip$.next(tip[0]?.bufferData || 'origin');
+    this.#setTail(tail[0]?.bufferData || 'origin');
   }
 
   shutdown(): void {
@@ -97,25 +87,14 @@ export class TypeormStabilityWindowBuffer
   }
 
   async #rollForward(evt: RollForwardEvent<Operators.WithNetworkInfo & WithTypeormContext>) {
-    const { eventType, transactionCommitted$, queryRunner, blockEntity, block } = evt;
-    const {
-      header: { blockNo }
-    } = block;
-    const repository = queryRunner.manager.getRepository(BlockDataEntity);
-    if (eventType === ChainSyncEventType.RollForward) {
-      this.#logger.debug('Add block data at height', blockNo);
-      const blockData = repository.create({
-        block: blockEntity,
-        data: block
-      });
-      await Promise.all([repository.insert(blockData), this.#deleteOldBlockData(evt)]);
-      transactionCommitted$.subscribe(() => {
-        this.#tip$.next(block);
-        if (this.#tail === 'origin') {
-          this.#setTail(block);
-        }
-      });
-    }
+    const { transactionCommitted$, block } = evt;
+    await this.#deleteOldBlockData(evt);
+    transactionCommitted$.subscribe(() => {
+      this.#tip$.next(block);
+      if (this.#tail === 'origin') {
+        this.#setTail(block);
+      }
+    });
   }
 
   async #rollBackward({
@@ -125,30 +104,25 @@ export class TypeormStabilityWindowBuffer
       header: { slot, blockNo }
     }
   }: RollBackwardEvent<WithBlock & WithTypeormContext>) {
-    const repository = queryRunner.manager.getRepository(BlockDataEntity);
-    // No need to delete rolled back block here, as it should cascade when the block entity gets deleted
+    const repository = queryRunner.manager.getRepository(BlockEntity);
     const prevTip = await repository.findOne({
       order: {
-        block: {
-          slot: 'DESC'
-        }
+        slot: 'DESC'
       },
-      relations: {
-        block: true
+      select: {
+        bufferData: true as any
       },
-      select: blockDataSelect,
       where: {
-        block: {
-          slot: LessThan(slot)
-        }
+        bufferData: Not(IsNull()),
+        slot: LessThan(slot)
       }
     });
-    if (prevTip?.data && blockNo !== prevTip?.data.header.blockNo + 1) {
+    if (prevTip?.bufferData && blockNo !== prevTip?.bufferData.header.blockNo + 1) {
       throw new Error('Assert: inconsistent PgStabilityWindowBuffer at rollBackward');
     }
     transactionCommitted$.subscribe(() => {
-      this.#tip$.next(prevTip?.data || 'origin');
-      if (!prevTip?.data) {
+      this.#tip$.next(prevTip?.bufferData || 'origin');
+      if (!prevTip?.bufferData) {
         this.#setTail('origin');
       }
     });
@@ -165,32 +139,35 @@ export class TypeormStabilityWindowBuffer
     if (blockNo < securityParameter || blockNo % this.#compactEvery !== 0) {
       return;
     }
-    const repository = queryRunner.manager.getRepository(BlockDataEntity);
+    const repository = queryRunner.manager.getRepository(BlockEntity);
     const nextTailBlockHeight = blockNo - securityParameter;
+    this.#logger.info(`Deleting old block buffer data (<${nextTailBlockHeight})`);
     const [nextTailEntity] = await Promise.all([
       repository.findOne({
-        relations: {
-          block: true
-        },
         select: {
-          block: { height: true },
-          data: true as any,
-          id: true
+          bufferData: true as any
         },
         where: {
-          block: {
-            height: nextTailBlockHeight
-          }
+          height: nextTailBlockHeight
         }
       }),
+      repository.update(
+        {
+          height: LessThan(nextTailBlockHeight)
+        },
+        {
+          blockData: null
+        }
+      )
+      // TODO
       // Review: this is fragile, may be better to make 2 type-safe(r) queries instead:
       // select IDs and then delete
-      queryRunner.query(`
-        DELETE FROM block_data
-        WHERE block_id IN (SELECT id FROM block WHERE height < ${nextTailBlockHeight})
-      `)
+      // queryRunner.query(`
+      //   DELETE FROM block_data
+      //   WHERE block_id IN (SELECT id FROM block WHERE height < ${nextTailBlockHeight})
+      // `)
     ]);
-    const nextTail = nextTailEntity?.data;
+    const nextTail = nextTailEntity?.bufferData;
     if (!nextTail) {
       throw new Error('Assert: inconsistent PgStabilityWindowBuffer at #deleteOldBlockData');
     }
