@@ -23,8 +23,8 @@ import { DbSyncStakePoolProvider, StakePoolHttpService, createHttpStakePoolExtMe
 import { DbSyncUtxoProvider, UtxoHttpService } from '../../Utxo';
 import { DnsResolver, createDnsResolver, serviceSetHas } from '../utils';
 import { GenesisData } from '../../types';
-import { HttpServer, HttpServerConfig, HttpService } from '../../Http';
-import { InMemoryCache } from '../../InMemoryCache';
+import { HttpServer, HttpServerConfig, HttpService, getListen } from '../../Http';
+import { InMemoryCache, NoCache } from '../../InMemoryCache';
 import { Logger } from 'ts-log';
 import { MissingProgramOption, MissingServiceDependency, RunnableDependencies, UnknownServiceName } from '../errors';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
@@ -38,8 +38,10 @@ import { isNotNil } from '@cardano-sdk/util';
 import memoize from 'lodash/memoize';
 import pg from 'pg';
 
+export const DISABLE_DB_CACHE_DEFAULT = false;
 export const HTTP_SERVER_API_URL_DEFAULT = new URL('http://localhost:3000');
 export const PAGINATION_PAGE_SIZE_LIMIT_DEFAULT = 25;
+export const USE_BLOCKFROST_DEFAULT = false;
 export const USE_QUEUE_DEFAULT = false;
 
 /**
@@ -68,9 +70,11 @@ export const cardanoNodeDependantServices = new Set([
 export enum ProviderServerOptionDescriptions {
   CardanoNodeConfigPath = 'Cardano node config path',
   DbCacheTtl = 'Cache TTL in seconds between 60 and 172800 (two days), an option for database related operations',
+  DisableDbCache = 'Disable DB cache',
   EpochPollInterval = 'Epoch poll interval',
   TokenMetadataCacheTtl = 'Token Metadata API cache TTL in minutes',
   TokenMetadataServerUrl = 'Token Metadata API server URL',
+  UseBlockfrost = 'Enables Blockfrost cached data DB',
   UseQueue = 'Enables RabbitMQ',
   PaginationPageSizeLimit = 'Pagination page size limit shared across all providers'
 }
@@ -80,14 +84,17 @@ export type ProviderServerArgs = CommonProgramOptions &
   OgmiosProgramOptions &
   RabbitMqProgramOptions & {
     cardanoNodeConfigPath?: string;
+    disableDbCache?: boolean;
     tokenMetadataCacheTTL?: number;
     tokenMetadataServerUrl?: string;
     epochPollInterval: number;
     dbCacheTtl: number;
+    useBlockfrost?: boolean;
     useQueue?: boolean;
     paginationPageSizeLimit?: number;
     serviceNames: ServiceNames[];
   };
+
 export interface LoadProviderServerDependencies {
   dnsResolver?: (serviceName: string) => Promise<SrvRecord>;
   logger?: Logger;
@@ -118,6 +125,8 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       return factory(dbConnection, node);
     };
 
+  const getCache = () => (args.disableDbCache ? new NoCache() : new InMemoryCache(args.dbCacheTtl!));
+
   const getEpochMonitor = memoize((dbPool) => new DbSyncEpochPollService(dbPool, args.epochPollInterval!));
 
   return {
@@ -144,9 +153,12 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       if (!genesisData)
         throw new MissingProgramOption(ServiceNames.StakePool, ProviderServerOptionDescriptions.CardanoNodeConfigPath);
       const stakePoolProvider = new DbSyncStakePoolProvider(
-        { paginationPageSizeLimit: args.paginationPageSizeLimit! },
         {
-          cache: new InMemoryCache(args.dbCacheTtl!),
+          paginationPageSizeLimit: args.paginationPageSizeLimit!,
+          useBlockfrost: args.useBlockfrost!
+        },
+        {
+          cache: getCache(),
           cardanoNode,
           db,
           epochMonitor: getEpochMonitor(db),
@@ -184,7 +196,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
           ProviderServerOptionDescriptions.CardanoNodeConfigPath
         );
       const networkInfoProvider = new DbSyncNetworkInfoProvider({
-        cache: new InMemoryCache(args.dbCacheTtl!),
+        cache: getCache(),
         cardanoNode,
         db,
         epochMonitor: getEpochMonitor(db),
@@ -237,10 +249,7 @@ export const loadProviderServer = async (
     }
   }
   const config: HttpServerConfig = {
-    listen: {
-      host: args.apiUrl.hostname,
-      port: args.apiUrl ? Number.parseInt(args.apiUrl.port) : undefined
-    },
+    listen: getListen(args.apiUrl),
     meta: { ...args.buildInfo, startupTime: Date.now() }
   };
   if (args.enableMetrics) {

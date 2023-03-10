@@ -38,7 +38,7 @@ export abstract class HttpService extends RunnableModule {
     this.router.post('/health', healthHandler);
   }
 
-  async initializeImpl(): Promise<void> {
+  protected async initializeImpl(): Promise<void> {
     if (this.provider instanceof RunnableModule) await this.provider.initialize();
 
     const health = await this.healthCheck();
@@ -47,11 +47,11 @@ export abstract class HttpService extends RunnableModule {
     }
   }
 
-  async startImpl(): Promise<void> {
+  protected async startImpl(): Promise<void> {
     if (this.provider instanceof RunnableModule) await this.provider.start();
   }
 
-  async shutdownImpl(): Promise<void> {
+  protected async shutdownImpl(): Promise<void> {
     if (this.provider instanceof RunnableModule) await this.provider.shutdown();
   }
 

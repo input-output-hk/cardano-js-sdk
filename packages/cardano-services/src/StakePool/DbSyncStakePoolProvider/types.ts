@@ -136,6 +136,12 @@ export interface PoolMetricsModel {
   pool_hash_id: string;
 }
 
+export interface BlockfrostPoolMetricsModel extends PoolMetricsModel {
+  reward_address: string;
+  extra: string;
+  status: string;
+}
+
 export interface PoolMetrics extends CommonPoolInfo {
   metrics: {
     blocksCreated: number;
@@ -148,8 +154,12 @@ export interface PoolMetrics extends CommonPoolInfo {
   };
 }
 
-export interface TotalCountModel {
-  total_count: number;
+export interface BlockfrostPoolMetrics extends PoolMetrics {
+  rewardAccount: Cardano.RewardAccount;
+  owners: Cardano.RewardAccount[];
+  registration: Cardano.TransactionId[];
+  retirement: Cardano.TransactionId[];
+  status: Cardano.StakePoolStatus;
 }
 
 export interface StakePoolStatsModel {

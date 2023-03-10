@@ -35,8 +35,8 @@ export const relay = {
 export const metrics = {
   activeStake: 0n,
   activeStakePercentage: 0,
-  blocksCreated: '0',
-  delegators: '1',
+  blocksCreated: 0,
+  delegators: 1,
   livePledge: 999_999_828_559n,
   liveStake: 999_999_828_559n,
   saturation: 0.011_898_674_769_756_331

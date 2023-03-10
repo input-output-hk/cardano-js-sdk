@@ -20,6 +20,8 @@ services:
     shm_size: '2gb'
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    ports:
+      - ${POSTGRES_PORT:-5432}:5432
     restart: on-failure
     logging:
       driver: "json-file"
@@ -109,13 +111,15 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      - EPOCH_POLL_INTERVAL=${EPOCH_POLL_INTERVAL:-10000}
       - DB_CACHE_TTL=${DB_CACHE_TTL:-120}
+      - DISABLE_DB_CACHE=${DISABLE_DB_CACHE:-false}
       - ENABLE_METRICS=${ENABLE_METRICS:-false}
+      - EPOCH_POLL_INTERVAL=${EPOCH_POLL_INTERVAL:-10000}
       - LOGGER_MIN_SEVERITY=${LOGGER_MIN_SEVERITY:-info}
       - OGMIOS_URL=ws://cardano-node-ogmios:1337
       - RABBITMQ_URL=amqp://rabbitmq:5672
       - SERVICE_NAMES=${SERVICE_NAMES:-asset,chain-history,network-info,rewards,stake-pool,tx-submit,utxo}
+      - USE_BLOCKFROST=${USE_BLOCKFROST:-false}
       - USE_QUEUE=${USE_QUEUE:-false}
     ports:
       - ${API_PORT:-4000}:3000
@@ -153,7 +157,37 @@ services:
         max-size: "200k"
         max-file: "10"
 
+  blockfrost-worker:
+    build:
+      context: ../../
+      target: blockfrost-worker
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - CACHE_TTL=${CACHE_TTL:-1440}
+      - CREATE_SCHEMA=${CREATE_SCHEMA:-true}
+      - DROP_SCHEMA=${DROP_SCHEMA:-false}
+      - LOGGER_MIN_SEVERITY=${LOGGER_MIN_SEVERITY:-info}
+      - NETWORK=${NETWORK:-mainnet}
+      - SCAN_INTERVAL=${SCAN_INTERVAL:-60}
+    ports:
+      - 3000:3000
+    restart: on-failure
+    secrets:
+      - blockfrost_key
+      - postgres_db
+      - postgres_password
+      - postgres_user
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
 secrets:
+  blockfrost_key:
+    file: ./blockfrost-keys/${NETWORK:-mainnet}.key
   postgres_db:
     file: ./placeholder-secrets/postgres_db
   postgres_password:

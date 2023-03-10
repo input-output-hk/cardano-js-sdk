@@ -23,9 +23,9 @@ module.exports = {
     // typescript checks return types
     camelcase: 0,
     'consistent-return': 0,
+    'import/no-extraneous-dependencies': ['error', { devDependencies: ['**/test/**/*.ts'] }],
     // eslint compains about TS enums hence disable here and enable @typescript-eslint/no-shadow
     'import/no-unresolved': 0,
-    'import/no-extraneous-dependencies': ['error', { devDependencies: ['**/test/**/*.ts'] }],
     'jsdoc/require-param': 0,
     'jsdoc/require-param-type': 0,
     'jsdoc/require-returns': 0,
@@ -53,6 +53,7 @@ module.exports = {
     'unicorn/filename-case': 0,
     'unicorn/no-array-callback-reference': 0,
     'unicorn/no-array-reduce': 0,
+    'unicorn/no-nested-ternary': 0,
     'unicorn/no-null': 0,
     'unicorn/prefer-module': 0,
     'unicorn/prefer-node-protocol': 0,

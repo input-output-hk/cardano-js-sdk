@@ -227,7 +227,7 @@ describe('StakePoolHttpService', () => {
     describe('with DbSyncStakePoolProvider', () => {
       beforeAll(async () => {
         stakePoolProvider = new DbSyncStakePoolProvider(
-          { paginationPageSizeLimit: pagination.limit },
+          { paginationPageSizeLimit: pagination.limit, useBlockfrost: false },
           { cache, cardanoNode, db, epochMonitor, genesisData, logger, metadataService }
         );
         service = new StakePoolHttpService({ logger, stakePoolProvider });
@@ -288,8 +288,8 @@ describe('StakePoolHttpService', () => {
 
       describe('/search', () => {
         const url = '/search';
-        const cachedSubQueriesCount = 10;
-        const cacheKeysCount = 7;
+        const cachedSubQueriesCount = 9;
+        const cacheKeysCount = 6;
         const nonCacheableSubQueriesCount = 1; // getLastEpoch
         const filerOnePoolOptions: QueryStakePoolsArgs = {
           filters: { identifier: { values: [{ ticker: 'SP1$' }] } },

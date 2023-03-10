@@ -263,7 +263,7 @@ describe('mappers', () => {
 
     it('toStakePoolResults with retiring status', () => {
       expect(
-        toStakePoolResults([hashId], fromCache, {
+        toStakePoolResults([hashId], fromCache, false, {
           lastEpochNo: Cardano.EpochNo(poolRetirementModel.retiring_epoch - 1),
           nodeMetricsDependencies,
           poolAPYs,
@@ -286,7 +286,7 @@ describe('mappers', () => {
       const stakePoolRetired = { ...stakePool, status: Cardano.StakePoolStatus.Retired };
 
       expect(
-        toStakePoolResults([hashId], fromCache, {
+        toStakePoolResults([hashId], fromCache, false, {
           lastEpochNo: Cardano.EpochNo(poolRetirementModel.retiring_epoch + 1),
           nodeMetricsDependencies,
           poolAPYs,
@@ -321,7 +321,7 @@ describe('mappers', () => {
       };
 
       expect(
-        toStakePoolResults([hashId], fromCache, {
+        toStakePoolResults([hashId], fromCache, false, {
           lastEpochNo: Cardano.EpochNo(poolRegistrationModel.active_epoch_no - 1),
           nodeMetricsDependencies,
           poolAPYs,
@@ -356,7 +356,7 @@ describe('mappers', () => {
       };
 
       expect(
-        toStakePoolResults([hashId], fromCache, {
+        toStakePoolResults([hashId], fromCache, false, {
           lastEpochNo: Cardano.EpochNo(poolRegistrationModel.active_epoch_no),
           nodeMetricsDependencies,
           poolAPYs,
@@ -380,23 +380,19 @@ describe('mappers', () => {
 
     it('toStakePoolResults with cached pool', () => {
       expect(
-        toStakePoolResults(
-          [hashId],
-          { [hashId]: stakePool },
-          {
-            lastEpochNo: Cardano.EpochNo(poolRetirementModel.retiring_epoch - 1),
-            nodeMetricsDependencies,
-            poolAPYs,
-            poolDatas,
-            poolMetrics: partialMetrics,
-            poolOwners,
-            poolRegistrations,
-            poolRelays,
-            poolRetirements,
-            poolRewards,
-            totalCount
-          }
-        )
+        toStakePoolResults([hashId], { [hashId]: stakePool }, false, {
+          lastEpochNo: Cardano.EpochNo(poolRetirementModel.retiring_epoch - 1),
+          nodeMetricsDependencies,
+          poolAPYs,
+          poolDatas,
+          poolMetrics: partialMetrics,
+          poolOwners,
+          poolRegistrations,
+          poolRelays,
+          poolRetirements,
+          poolRewards,
+          totalCount
+        })
       ).toStrictEqual({
         poolsToCache: {},
         results: { pageResults: [stakePool], totalResultCount: totalCount }
