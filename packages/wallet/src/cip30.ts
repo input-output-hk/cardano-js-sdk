@@ -349,7 +349,8 @@ export const createWalletApi = (
         return tx.id;
       } catch (error) {
         logger.error(error);
-        throw error;
+        const info = error instanceof Error ? error.message : 'unknown';
+        throw new TxSendError(TxSendErrorCode.Failure, info);
       }
     } else {
       logger.debug('transaction refused');

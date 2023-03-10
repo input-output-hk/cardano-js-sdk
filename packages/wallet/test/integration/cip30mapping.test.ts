@@ -11,7 +11,7 @@ import {
   WalletApi
 } from '@cardano-sdk/dapp-connector';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
-import { CML, Cardano, TxCBOR, cmlToCore, coreToCml } from '@cardano-sdk/core';
+import { CML, Cardano, CardanoNodeErrors, TxCBOR, cmlToCore, coreToCml } from '@cardano-sdk/core';
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence';
 import { InitializeTxProps, InitializeTxResult, SingleAddressWallet, cip30, setupWallet } from '../../src';
@@ -106,11 +106,16 @@ describe('cip30', () => {
 
   describe('with default mock data', () => {
     let scope: ManagedFreeableScope;
+    let providers: TestProviders;
 
     beforeAll(async () => {
       // CREATE A WALLET
       scope = new ManagedFreeableScope();
-      ({ wallet, api, confirmationCallback } = await createWalletAndApiWithStores([mockedUtxo[4]]));
+      providers = {
+        networkInfoProvider: mockNetworkInfoProvider(),
+        txSubmitProvider: mockTxSubmitProvider()
+      };
+      ({ wallet, api, confirmationCallback } = await createWalletAndApiWithStores([mockedUtxo[4]], providers));
     });
 
     afterAll(() => {
@@ -280,16 +285,18 @@ describe('cip30', () => {
 
       describe('api.submitTx', () => {
         let finalizedTx: Cardano.Tx;
-        let cmlTx: Uint8Array;
+        let txBytes: Uint8Array;
+        let hexTx: string;
 
         beforeEach(async () => {
           const txInternals = await wallet.initializeTx(simpleTxProps);
           finalizedTx = await wallet.finalizeTx({ tx: txInternals });
-          cmlTx = coreToCml.tx(scope, finalizedTx).to_bytes();
+          txBytes = coreToCml.tx(scope, finalizedTx).to_bytes();
+          hexTx = Buffer.from(txBytes).toString('hex');
         });
 
         it('resolves with transaction id when submitting a valid transaction', async () => {
-          const txId = await api.submitTx(Buffer.from(cmlTx).toString('hex'));
+          const txId = await api.submitTx(hexTx);
           expect(txId).toBe(finalizedTx.id);
         });
 
@@ -297,14 +304,21 @@ describe('cip30', () => {
         it.todo('resolves with original transactionId (not the one computed when re-serializing the transaction)');
 
         it('throws ApiError when submitting a transaction that has invalid encoding', async () => {
-          await expect(api.submitTx(Buffer.from(cmlTx).toString('base64'))).rejects.toThrowError(ApiError);
+          await expect(api.submitTx(Buffer.from(txBytes).toString('base64'))).rejects.toThrowError(ApiError);
         });
 
         it('throws ApiError when submitting a hex string that is not a serialized transaction', async () => {
           await expect(api.submitTx(Buffer.from([0, 1, 3]).toString('hex'))).rejects.toThrowError(ApiError);
         });
 
-        test.todo('errorStates');
+        it('throws TxSendError when submission fails', async () => {
+          providers.txSubmitProvider.submitTx.mockRejectedValueOnce(
+            new CardanoNodeErrors.TxSubmissionErrors.OutsideOfValidityIntervalError({
+              outsideOfValidityInterval: { currentSlot: 5, interval: { invalidBefore: 6, invalidHereafter: 7 } }
+            })
+          );
+          await expect(api.submitTx(hexTx)).rejects.toThrowError(TxSendError);
+        });
       });
     });
 
