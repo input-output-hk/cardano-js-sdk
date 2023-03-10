@@ -1,4 +1,4 @@
-export const findTxMetadata = `
+export const findTxMetadataByTxHashes = `
 SELECT
   key,
   bytes,
@@ -6,4 +6,14 @@ SELECT
 FROM tx_metadata AS meta
 JOIN tx ON tx_id = tx.id
 WHERE hash = ANY($1)
+ORDER BY meta.id ASC`;
+
+export const findTxMetadataByTxIds = `
+SELECT
+  key,
+  bytes,
+  hash AS tx_id
+FROM tx_metadata AS meta
+JOIN tx ON tx_id = tx.id
+WHERE tx.id = ANY($1)
 ORDER BY meta.id ASC`;

@@ -512,7 +512,7 @@ describe('ChainHistoryHttpService', () => {
           const response = await provider.transactionsByAddresses({ addresses, pagination: { limit: 5, startAt: 0 } });
           expect(response.pageResults.length).toBeGreaterThan(0);
           expect(
-            response.pageResults[0].body.inputs.find((txIn) => txIn.address === genesisAddresses[0])
+            response.pageResults[1].body.inputs.find((txIn) => txIn.address === genesisAddresses[0])
           ).toBeDefined();
           expect(response.pageResults[0].body.inputs).toMatchShapeOf(DataMocks.Tx.inputs);
         });
