@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable sonarjs/no-duplicate-string */
-import { HttpProviderConfig, createHttpProvider } from '../src';
+import { HttpProviderConfig, createHttpProvider, version } from '../src';
 import { Provider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { Server } from 'http';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
@@ -31,7 +31,7 @@ const stubProviderPaths = {
   noArgsEmptyReturn: '/simple'
 };
 
-describe('createHttpServer', () => {
+describe('createHttpProvider', () => {
   let port: number;
   let baseUrl: string;
 
@@ -42,6 +42,7 @@ describe('createHttpServer', () => {
       baseUrl,
       logger,
       paths: stubProviderPaths,
+      version,
       ...config
     });
 
@@ -89,10 +90,12 @@ describe('createHttpServer', () => {
     });
   });
 
-  it('passes through axios options', async () => {
+  it('passes through axios options, merging custom header with the included provider version headers', async () => {
     const provider = createTxSubmitProviderClient({ axiosOptions: { headers: { 'custom-header': 'header-value' } } });
     const closeServer = await createStubHttpProviderServer(port, stubProviderPaths.noArgsEmptyReturn, (req, res) => {
       expect(req.headers['custom-header']).toBe('header-value');
+      expect(req.headers['Version-Api']).toEqual(version.api);
+      expect(req.headers['Version-Software']).toEqual(version.software);
       res.send();
     });
     await provider.noArgsEmptyReturn();
@@ -120,7 +123,8 @@ describe('createHttpServer', () => {
           baseUrl: 'http://some-hostname:3000',
           logger,
           mapError: jest.fn(),
-          paths: stubProviderPaths
+          paths: stubProviderPaths,
+          version
         });
         try {
           await provider.noArgsEmptyReturn();

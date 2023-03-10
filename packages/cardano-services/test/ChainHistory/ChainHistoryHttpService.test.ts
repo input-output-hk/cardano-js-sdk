@@ -12,7 +12,7 @@ import {
   InMemoryCache,
   UNLIMITED_CACHE_TTL
 } from '../../src';
-import { CreateHttpProviderConfig, chainHistoryHttpProvider } from '@cardano-sdk/cardano-services-client';
+import { CreateHttpProviderConfig, chainHistoryHttpProvider, version } from '@cardano-sdk/cardano-services-client';
 import { DB_MAX_SAFE_INTEGER } from '../../src/ChainHistory/DbSyncChainHistory/queries';
 import { DataMocks } from '../data-mocks';
 import { DbPools, LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
@@ -52,7 +52,7 @@ describe('ChainHistoryHttpService', () => {
   beforeAll(async () => {
     port = await getPort();
     baseUrl = `http://localhost:${port}/chain-history`;
-    clientConfig = { baseUrl, logger };
+    clientConfig = { baseUrl, logger, version };
     config = { listen: { port } };
     dbPools = {
       healthCheck: new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING_DB_SYNC }),

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Cardano, RewardsProvider } from '@cardano-sdk/core';
-import { CreateHttpProviderConfig, rewardsHttpProvider } from '@cardano-sdk/cardano-services-client';
+import { CreateHttpProviderConfig, rewardsHttpProvider, version } from '@cardano-sdk/cardano-services-client';
 import { DbPools, LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
 import {
   DbSyncRewardsProvider,
@@ -43,7 +43,7 @@ describe('RewardsHttpService', () => {
   beforeAll(async () => {
     port = await getPort();
     baseUrl = `http://localhost:${port}/rewards`;
-    clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
+    clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }), version };
     config = { listen: { port } };
     dbPools = {
       healthCheck: new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING_DB_SYNC }),

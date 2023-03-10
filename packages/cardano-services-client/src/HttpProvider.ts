@@ -9,6 +9,13 @@ const isEmptyResponse = (response: any) => response === '';
 type ResponseTransformers<T> = { [K in keyof T]?: AxiosResponseTransformer };
 
 export interface HttpProviderConfig<T extends Provider> {
+  version: {
+    /**
+     * API version compatibility declaration.
+     */
+    api: string;
+    software: string;
+  };
   /**
    * Example: "http://localhost:3000"
    */
@@ -54,7 +61,7 @@ export interface HttpProviderConfig<T extends Provider> {
  */
 export type CreateHttpProviderConfig<T extends Provider> = Pick<
   HttpProviderConfig<T>,
-  'baseUrl' | 'adapter' | 'logger'
+  'baseUrl' | 'adapter' | 'logger' | 'version'
 >;
 
 /**
@@ -74,7 +81,8 @@ export const createHttpProvider = <T extends Provider>({
   paths,
   adapter,
   logger,
-  responseTransformers
+  responseTransformers,
+  version
 }: HttpProviderConfig<T>): T =>
   new Proxy<T>({} as T, {
     // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -93,6 +101,7 @@ export const createHttpProvider = <T extends Provider>({
             adapter,
             baseURL: baseUrl,
             data: { ...args[0] },
+            headers: { ...axiosOptions?.headers, 'Version-Api': version.api, 'Version-Software': version.software },
             method: 'post',
             responseType: 'json',
             url: path
