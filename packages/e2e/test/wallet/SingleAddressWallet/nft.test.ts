@@ -25,7 +25,7 @@ describe('SingleAddressWallet.assets/nft', () => {
   let walletAddress: Cardano.PaymentAddress;
 
   beforeAll(async () => {
-    wallet = (await getWallet({ env, idx: 0, logger, name: 'Minting Wallet', polling: { interval: 50 } })).wallet;
+    wallet = (await getWallet({ env, logger, name: 'Minting Wallet', polling: { interval: 50 } })).wallet;
 
     await walletReady(wallet);
 

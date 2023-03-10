@@ -19,7 +19,7 @@ describe('SingleAddressWallet/multisignature', () => {
   });
 
   it('can create a transaction with multiple signatures to mint an asset', async () => {
-    wallet = (await getWallet({ env, idx: 0, logger, name: 'Minting Wallet', polling: { interval: 50 } })).wallet;
+    wallet = (await getWallet({ env, logger, name: 'Minting Wallet', polling: { interval: 50 } })).wallet;
 
     await walletReady(wallet);
 

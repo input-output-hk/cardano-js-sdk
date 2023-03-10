@@ -73,7 +73,7 @@ describe('SingleAddressWallet/mint', () => {
   });
 
   it('can mint a token with no asset name', async () => {
-    wallet = (await getWallet({ env, idx: 0, logger, name: 'Minting Wallet', polling: { interval: 50 } })).wallet;
+    wallet = (await getWallet({ env, logger, name: 'Minting Wallet', polling: { interval: 50 } })).wallet;
 
     await walletReady(wallet);
 
@@ -162,7 +162,7 @@ describe('SingleAddressWallet/mint', () => {
   });
 
   it('can detect a phase2 validation failure and emit the transaction as failed', async () => {
-    wallet = (await getWallet({ env, idx: 0, logger, name: 'Minting Wallet', polling: { interval: 50 } })).wallet;
+    wallet = (await getWallet({ env, logger, name: 'Minting Wallet', polling: { interval: 50 } })).wallet;
 
     // Plutus script that always returns false.
     const alwaysFailScript: Cardano.PlutusScript = {
