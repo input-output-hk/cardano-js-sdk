@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.4.2-nightly.0...@cardano-sdk/key-management@0.5.0-nightly.0) (2023-03-10)
+
+### ⚠ BREAKING CHANGES
+
+- upgrade resolveInputAddress to resolveInput
+- add new Address types that implement CIP-19 natively
+- core type for address string reprensetation 'Address' renamed to PaymentAddress
+
+### Features
+
+- add new Address types that implement CIP-19 natively ([a892176](https://github.com/input-output-hk/cardano-js-sdk/commit/a8921760b714b090bb6c15d6b4696e2dd0b2fdc5))
+- **key-management:** ownSignatureKeyPaths will now also take into account collateral inputs ([991c117](https://github.com/input-output-hk/cardano-js-sdk/commit/991c1170060c751996a6fe4a1ba4f9b987f42e7d))
+- upgrade resolveInputAddress to resolveInput ([fcfa035](https://github.com/input-output-hk/cardano-js-sdk/commit/fcfa035a3498f675945dafcc82b8f05c08318dd8))
+
+### Bug Fixes
+
+- **key-management:** removed redundant signing for stake key registration certificates ([8f2edd0](https://github.com/input-output-hk/cardano-js-sdk/commit/8f2edd061410fab28e4a33a5a4f753e724732dbf))
+- **wallet:** cip30 interface now throws ProofGeneration error if it cant sign the tx as specified ([81d9c9c](https://github.com/input-output-hk/cardano-js-sdk/commit/81d9c9cb32dc05d2f579d285fa58a638041dd3d1))
+
+### Code Refactoring
+
+- core type for address string reprensetation 'Address' renamed to PaymentAddress ([4287463](https://github.com/input-output-hk/cardano-js-sdk/commit/42874633de6069510efdc57323f61140d22ed203))
+
 ## [0.4.2-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.4.1...@cardano-sdk/key-management@0.4.2-nightly.0) (2023-03-02)
 
 **Note:** Version bump only for package @cardano-sdk/key-management

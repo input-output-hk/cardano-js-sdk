@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/governance@0.4.1-nightly.0...@cardano-sdk/governance@0.5.0-nightly.0) (2023-03-10)
+
+### ⚠ BREAKING CHANGES
+
+- add new Address types that implement CIP-19 natively
+
+### Features
+
+- add new Address types that implement CIP-19 natively ([a892176](https://github.com/input-output-hk/cardano-js-sdk/commit/a8921760b714b090bb6c15d6b4696e2dd0b2fdc5))
+
 ## [0.4.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/governance@0.4.0...@cardano-sdk/governance@0.4.1-nightly.0) (2023-03-02)
 
 **Note:** Version bump only for package @cardano-sdk/governance

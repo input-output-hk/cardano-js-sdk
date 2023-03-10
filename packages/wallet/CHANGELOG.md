@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.10.0-nightly.0...@cardano-sdk/wallet@0.10.0-nightly.1) (2023-03-10)
+
+### ⚠ BREAKING CHANGES
+
+- upgrade resolveInputAddress to resolveInput
+- added optional isValid field to Transaction object
+- **wallet:** add missing `witness` fields to initializeTx and finalizeTx props
+- add new Address types that implement CIP-19 natively
+- core type for address string reprensetation 'Address' renamed to PaymentAddress
+
+### Features
+
+- add inputSource in transactions ([7ed99d5](https://github.com/input-output-hk/cardano-js-sdk/commit/7ed99d5a12cf8667114c76ecde0cbdc3cfbc3887))
+- add new Address types that implement CIP-19 natively ([a892176](https://github.com/input-output-hk/cardano-js-sdk/commit/a8921760b714b090bb6c15d6b4696e2dd0b2fdc5))
+- added optional isValid field to Transaction object ([f722ae8](https://github.com/input-output-hk/cardano-js-sdk/commit/f722ae8075744a6ca61df1c2c077131cbd0ecf3b))
+- send phase2 validation failed transactions as failed$ ([ef25825](https://github.com/input-output-hk/cardano-js-sdk/commit/ef2582532677aeee4b19e84adf1957f09631dd72))
+- upgrade resolveInputAddress to resolveInput ([fcfa035](https://github.com/input-output-hk/cardano-js-sdk/commit/fcfa035a3498f675945dafcc82b8f05c08318dd8))
+- **wallet:** add missing `witness` fields to initializeTx and finalizeTx props ([c34ee2b](https://github.com/input-output-hk/cardano-js-sdk/commit/c34ee2b7cf056a6861523823afff64b70654500b))
+
+### Bug Fixes
+
+- **wallet:** cip30 interface now throws ProofGeneration error if it cant sign the tx as specified ([81d9c9c](https://github.com/input-output-hk/cardano-js-sdk/commit/81d9c9cb32dc05d2f579d285fa58a638041dd3d1))
+- **wallet:** map tx submission errors to TxSendError in cip30 submitTx ([4522ef3](https://github.com/input-output-hk/cardano-js-sdk/commit/4522ef3f4ee0eb636bcc799fe29f43725ab6726c))
+
+### Code Refactoring
+
+- core type for address string reprensetation 'Address' renamed to PaymentAddress ([4287463](https://github.com/input-output-hk/cardano-js-sdk/commit/42874633de6069510efdc57323f61140d22ed203))
+
 ## [0.10.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.9.0...@cardano-sdk/wallet@0.10.0-nightly.0) (2023-03-02)
 
 ### ⚠ BREAKING CHANGES

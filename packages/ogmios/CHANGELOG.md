@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.10.0-nightly.0...@cardano-sdk/ogmios@0.10.0-nightly.1) (2023-03-10)
+
+### ⚠ BREAKING CHANGES
+
+- add new Address types that implement CIP-19 natively
+- core type for address string reprensetation 'Address' renamed to PaymentAddress
+
+### Features
+
+- add inputSource in transactions ([7ed99d5](https://github.com/input-output-hk/cardano-js-sdk/commit/7ed99d5a12cf8667114c76ecde0cbdc3cfbc3887))
+- add new Address types that implement CIP-19 natively ([a892176](https://github.com/input-output-hk/cardano-js-sdk/commit/a8921760b714b090bb6c15d6b4696e2dd0b2fdc5))
+
+### Code Refactoring
+
+- core type for address string reprensetation 'Address' renamed to PaymentAddress ([4287463](https://github.com/input-output-hk/cardano-js-sdk/commit/42874633de6069510efdc57323f61140d22ed203))
+
 ## [0.10.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.9.0...@cardano-sdk/ogmios@0.10.0-nightly.0) (2023-03-02)
 
 ### ⚠ BREAKING CHANGES

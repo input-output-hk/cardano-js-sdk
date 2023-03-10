@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.6-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.4.6-nightly.0...@cardano-sdk/util-rxjs@0.4.6-nightly.1) (2023-03-10)
+
+### Features
+
+- **util-rxjs:** add finalizeWithLatest operator ([efb46ec](https://github.com/input-output-hk/cardano-js-sdk/commit/efb46eca852dee9faa0e6004a64b3227e0fb62fe))
+
 ## [0.4.6-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.4.5...@cardano-sdk/util-rxjs@0.4.6-nightly.0) (2023-03-02)
 
 **Note:** Version bump only for package @cardano-sdk/util-rxjs
