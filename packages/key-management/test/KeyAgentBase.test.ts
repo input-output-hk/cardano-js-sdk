@@ -11,7 +11,7 @@ class MockKeyAgent extends KeyAgentBase {
   constructor(data: SerializableInMemoryKeyAgentData) {
     super(data, {
       bip32Ed25519,
-      inputResolver: { resolveInputAddress: () => Promise.resolve(null) },
+      inputResolver: { resolveInput: () => Promise.resolve(null) },
       logger: dummyLogger
     });
   }

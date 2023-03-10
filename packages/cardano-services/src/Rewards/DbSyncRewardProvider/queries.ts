@@ -19,8 +19,6 @@ export const findAccountBalance = `
     ) - (
         SELECT COALESCE(SUM(w.amount),0) 
         FROM withdrawal w
-        JOIN tx ON tx.id = w.tx_id AND 
-            tx.valid_contract = TRUE
         JOIN stake_address ON stake_address.id = w.addr_id
         WHERE stake_address.view = $1
     ) AS balance

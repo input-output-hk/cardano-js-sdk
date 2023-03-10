@@ -10,14 +10,15 @@ import {
   SignBlobResult,
   SignTransactionOptions
 } from './types';
-import { CML, Cardano } from '@cardano-sdk/core';
-import { HexBlob, usingAutoFree } from '@cardano-sdk/util';
+import { Cardano } from '@cardano-sdk/core';
+import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
+import { HexBlob } from '@cardano-sdk/util';
 import { STAKE_KEY_DERIVATION_PATH } from './util';
 
 export abstract class KeyAgentBase implements KeyAgent {
   readonly #serializableData: SerializableKeyAgentData;
   readonly #bip32Ed25519: Crypto.Bip32Ed25519;
-  protected readonly inputResolver: Cardano.util.InputResolver;
+  protected readonly inputResolver: Cardano.InputResolver;
 
   get knownAddresses(): GroupedAddress[] {
     return this.#serializableData.knownAddresses;
@@ -71,42 +72,25 @@ export abstract class KeyAgentBase implements KeyAgent {
     const publicStakeKey = await this.derivePublicKey(STAKE_KEY_DERIVATION_PATH);
     const publicStakeKeyHash = await this.#bip32Ed25519.getPubKeyHash(publicStakeKey);
 
-    const groupedAddress = usingAutoFree((scope) => {
-      const stakeKeyCredential = scope.manage(
-        CML.StakeCredential.from_keyhash(
-          scope.manage(CML.Ed25519KeyHash.from_bytes(Buffer.from(publicStakeKeyHash, 'hex')))
-        )
-      );
+    const stakeCredential = { hash: Hash28ByteBase16(publicStakeKeyHash), type: Cardano.CredentialType.KeyHash };
 
-      const address = scope.manage(
-        scope
-          .manage(
-            CML.BaseAddress.new(
-              this.chainId.networkId,
-              scope.manage(
-                CML.StakeCredential.from_keyhash(
-                  scope.manage(CML.Ed25519KeyHash.from_bytes(Buffer.from(derivedPublicPaymentKeyHash, 'hex')))
-                )
-              ),
-              stakeKeyCredential
-            )
-          )
-          .to_address()
-      );
+    const address = Cardano.BaseAddress.fromCredentials(
+      this.chainId.networkId,
+      { hash: Hash28ByteBase16(derivedPublicPaymentKeyHash), type: Cardano.CredentialType.KeyHash },
+      stakeCredential
+    ).toAddress();
 
-      const rewardAccount = scope.manage(
-        scope.manage(CML.RewardAddress.new(this.chainId.networkId, stakeKeyCredential)).to_address()
-      );
-      return {
-        accountIndex: this.accountIndex,
-        address: Cardano.Address(address.to_bech32()),
-        index,
-        networkId: this.chainId.networkId,
-        rewardAccount: Cardano.RewardAccount(rewardAccount.to_bech32()),
-        stakeKeyDerivationPath: STAKE_KEY_DERIVATION_PATH,
-        type
-      };
-    });
+    const rewardAccount = Cardano.RewardAddress.fromCredentials(this.chainId.networkId, stakeCredential).toAddress();
+
+    const groupedAddress = {
+      accountIndex: this.accountIndex,
+      address: Cardano.PaymentAddress(address.toBech32()),
+      index,
+      networkId: this.chainId.networkId,
+      rewardAccount: Cardano.RewardAccount(rewardAccount.toBech32()),
+      stakeKeyDerivationPath: STAKE_KEY_DERIVATION_PATH,
+      type
+    };
 
     this.knownAddresses = [...this.knownAddresses, groupedAddress];
     return groupedAddress;

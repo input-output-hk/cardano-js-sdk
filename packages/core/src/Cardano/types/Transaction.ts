@@ -8,7 +8,7 @@ import { ExUnits, ValidityInterval } from './ProtocolParameters';
 import { HydratedTxIn, TxIn, TxOut } from './Utxo';
 import { Lovelace, TokenMap } from './Value';
 import { PartialBlockHeader } from './Block';
-import { RewardAccount } from './RewardAccount';
+import { RewardAccount } from '../Address';
 import { TxBodyCBOR } from '../../CBOR/TxBodyCBOR';
 import { bytesToHex } from '../../util/misc';
 
@@ -80,6 +80,11 @@ export interface TxBody extends Omit<HydratedTxBody, 'inputs' | 'collaterals' | 
   referenceInputs?: TxIn[];
 }
 
+export enum InputSource {
+  inputs = 'inputs',
+  collaterals = 'collaterals'
+}
+
 export enum RedeemerPurpose {
   spend = 'spend',
   mint = 'mint',
@@ -121,9 +126,20 @@ export interface Tx<TBody extends TxBody = TxBody> {
   body: TBody;
   witness: Witness;
   auxiliaryData?: AuxiliaryData;
+  /**
+   * Transactions containing Plutus scripts that are expected to fail validation can still be submitted if
+   * this value is set to false.
+   *
+   * Remark: Sending transactions with invalid scripts will cause the collateral of the transaction to be lost.
+   */
+  isValid?: boolean;
 }
 
-export interface HydratedTx extends Tx<HydratedTxBody> {
+export interface OnChainTx<TBody extends TxBody = TxBody> extends Omit<Tx<TBody>, 'isValid'> {
+  inputSource: InputSource;
+}
+
+export interface HydratedTx extends OnChainTx<HydratedTxBody> {
   index: number;
   blockHeader: PartialBlockHeader;
   body: HydratedTxBody;

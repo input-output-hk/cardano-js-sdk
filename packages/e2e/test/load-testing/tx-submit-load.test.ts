@@ -36,7 +36,7 @@ interface TestReport extends TestOptions {
 }
 
 interface TestWallet {
-  address: Cardano.Address;
+  address: Cardano.PaymentAddress;
   coins: bigint;
   wallet: ObservableWallet;
 }
@@ -88,7 +88,7 @@ const startServer = async (options: TestOptions = {}) => {
   if (env.START_LOCAL_HTTP_SERVER)
     serverProc = await runCli(
       [
-        'start-server',
+        'start-provider-server',
         '--api-url',
         env.TX_SUBMIT_HTTP_URL,
         ...(options.directlyToOgmios ? [] : ['--use-queue', 'true']),
@@ -166,7 +166,7 @@ describe('load', () => {
   const fragmentWhenRequired = async (options: TestOptions) => {
     await refreshWallets();
 
-    const toRefill: Cardano.Address[] = [];
+    const toRefill: Cardano.PaymentAddress[] = [];
     const { wallet } = testWallets[0];
 
     for (let i = 0; i < env.TRANSACTIONS_NUMBER; ++i)

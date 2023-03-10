@@ -18,13 +18,13 @@ const serializedForeignTx =
 
 const outputs = [
   {
-    address: Cardano.Address(
+    address: Cardano.PaymentAddress(
       'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w'
     ),
     value: { coins: 11_111_111n }
   },
   {
-    address: Cardano.Address(
+    address: Cardano.PaymentAddress(
       'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
     ),
     value: {
@@ -138,16 +138,17 @@ describe('SingleAddressWallet methods', () => {
       });
     });
 
-    describe('resolveInputAddress', () => {
-      it('returns input address for wallet-owned utxo', async () => {
+    describe('resolveInput', () => {
+      it('returns the txOut associated with the input for wallet-owned UTxO', async () => {
         const utxoSet = await firstValueFrom(wallet.utxo.available$);
-        const resolveInputAddressResult = await wallet.util.resolveInputAddress(utxoSet[0][0]);
-        expect(typeof resolveInputAddressResult).toBe('string');
+        const resolveInputAddressResult = await wallet.util.resolveInput(utxoSet[0][0]);
+        expect(typeof resolveInputAddressResult!.address).toBe('string');
+        expect(typeof resolveInputAddressResult!.value).toBe('object');
       });
 
       it('returns null for non-wallet-owned utxo', async () => {
         expect(
-          await wallet.util.resolveInputAddress({
+          await wallet.util.resolveInput({
             index: 9,
             txId: Cardano.TransactionId('6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad')
           })

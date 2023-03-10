@@ -15,7 +15,7 @@ import uniq from 'lodash/uniq';
 export interface TxToLedgerProps {
   cslTxBody: CML.TransactionBody;
   chainId: Cardano.ChainId;
-  inputResolver: Cardano.util.InputResolver;
+  inputResolver: Cardano.InputResolver;
   knownAddresses: GroupedAddress[];
 }
 
@@ -23,7 +23,7 @@ export interface TxToTrezorProps {
   cslTxBody: CML.TransactionBody;
   chainId: Cardano.ChainId;
   accountIndex: number;
-  inputResolver: Cardano.util.InputResolver;
+  inputResolver: Cardano.InputResolver;
   knownAddresses: GroupedAddress[];
 }
 
@@ -58,14 +58,7 @@ const sortTokensCanonically = (tokens: trezor.CardanoToken[] | ledger.Token[]) =
   });
 };
 
-const getRewardAccountKeyHash = (rewardAccount: Cardano.RewardAccount) =>
-  usingAutoFree((scope) => {
-    const address = scope.manage(CML.Address.from_bech32(rewardAccount));
-    const rewardAddress = scope.manage(CML.RewardAddress.from_address(address));
-    const paymentCred = scope.manage(rewardAddress!.payment_cred());
-    const keyHash = scope.manage(paymentCred.to_keyhash());
-    return Buffer.from(keyHash!.to_bytes()).toString('hex');
-  });
+const getRewardAccountKeyHash = (rewardAccount: Cardano.RewardAccount) => Cardano.RewardAccount.toHash(rewardAccount);
 
 const bytesToIp = (bytes?: Uint8Array) => {
   if (!bytes) return null;
@@ -89,7 +82,7 @@ const matchGroupedAddress = (knownAddresses: GroupedAddress[], outputAddress: Bu
 
 const prepareTrezorInputs = async (
   inputs: CML.TransactionInputs,
-  inputResolver: Cardano.util.InputResolver,
+  inputResolver: Cardano.InputResolver,
   knownAddresses: GroupedAddress[]
 ): Promise<trezor.CardanoInput[]> => {
   const scope = new ManagedFreeableScope();
@@ -98,7 +91,7 @@ const prepareTrezorInputs = async (
     const input = scope.manage(inputs.get(i));
     const inputTxId = scope.manage(input.transaction_id());
     const coreInput = cmlToCore.txIn(input);
-    const paymentAddress = await inputResolver.resolveInputAddress(coreInput);
+    const resolution = await inputResolver.resolveInput(coreInput);
 
     let trezorInput = {
       prev_hash: Buffer.from(inputTxId.to_bytes()).toString('hex'),
@@ -106,8 +99,8 @@ const prepareTrezorInputs = async (
     } as trezor.CardanoInput;
 
     let paymentKeyPath = null;
-    if (paymentAddress) {
-      const knownAddress = knownAddresses.find(({ address }) => address === paymentAddress);
+    if (resolution?.address) {
+      const knownAddress = knownAddresses.find(({ address }) => address === resolution.address);
       if (knownAddress) {
         paymentKeyPath = [
           harden(CardanoKeyConst.PURPOSE),
@@ -419,7 +412,7 @@ const prepareTrezorMintBundle = (
 
 const prepareLedgerInputs = async (
   inputs: CML.TransactionInputs,
-  inputResolver: Cardano.util.InputResolver,
+  inputResolver: Cardano.InputResolver,
   knownAddresses: GroupedAddress[]
 ): Promise<ledger.TxInput[]> => {
   const scope = new ManagedFreeableScope();
@@ -427,11 +420,11 @@ const prepareLedgerInputs = async (
   for (let i = 0; i < inputs.len(); i++) {
     const input = scope.manage(inputs.get(i));
     const coreInput = cmlToCore.txIn(input);
-    const paymentAddress = await inputResolver.resolveInputAddress(coreInput);
+    const resolution = await inputResolver.resolveInput(coreInput);
 
     let paymentKeyPath = null;
-    if (paymentAddress) {
-      const knownAddress = knownAddresses.find(({ address }) => address === paymentAddress);
+    if (resolution?.address) {
+      const knownAddress = knownAddresses.find(({ address }) => address === resolution.address);
       if (knownAddress) {
         paymentKeyPath = [
           harden(CardanoKeyConst.PURPOSE),

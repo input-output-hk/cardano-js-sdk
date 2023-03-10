@@ -1,12 +1,12 @@
 version: '3.9'
 
 services:
-  postgres:
-    ports:
-      - ${POSTGRES_PORT:-5432}:5432
-  http-server:
+  provider-server:
     volumes:
       - ../..:/app
   worker:
+    volumes:
+      - ../..:/app
+  blockfrost-worker:
     volumes:
       - ../..:/app

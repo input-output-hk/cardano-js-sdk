@@ -1,7 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { CML, Cardano, coreToCml, util } from '@cardano-sdk/core';
+import { Cardano, coreToCml, util } from '@cardano-sdk/core';
 import { HexBlob, usingAutoFree } from '@cardano-sdk/util';
-import blake2b from 'blake2b';
 
 /**
  * CIP-36 metadata label
@@ -45,7 +44,7 @@ export enum VotingPurpose {
 export interface BuildVotingRegistrationProps {
   delegations: VoteKeyDelegation[];
   stakeKey: Crypto.Ed25519PublicKeyHex;
-  paymentAddress: Cardano.Address;
+  paymentAddress: Cardano.PaymentAddress;
   purpose: VotingPurpose;
   nonce?: number;
 }
@@ -71,11 +70,11 @@ export const metadataBuilder = {
     paymentAddress,
     nonce = Date.now()
   }: BuildVotingRegistrationProps): Cardano.TxMetadata {
-    const cmlPaymentAddress = CML.Address.from_bech32(paymentAddress);
+    const address = Cardano.Address.fromBech32(paymentAddress);
     const votingRegistration = new Map<bigint, Cardano.Metadatum>([
       [1n, delegations.map(({ cip36VoteKey, weight }) => [Buffer.from(cip36VoteKey, 'hex'), BigInt(weight)])],
       [2n, Buffer.from(stakeKey, 'hex')],
-      [3n, Buffer.from(cmlPaymentAddress.to_bytes())],
+      [3n, Buffer.from(address.toBytes(), 'hex')],
       [4n, BigInt(nonce)],
       [5n, BigInt(purpose)]
     ]);
@@ -95,7 +94,7 @@ export const metadataBuilder = {
     const votingRegistrationMetadataBytes = usingAutoFree((scope) =>
       coreToCml.txMetadata(scope, votingRegistrationMetadata).to_bytes()
     );
-    const hashedMetadata = blake2b(256 / 8)
+    const hashedMetadata = Crypto.blake2b(256 / 8)
       .update(votingRegistrationMetadataBytes)
       .digest('binary');
     const signature = await stakeKeyBlobSigner.signBlob(util.bytesToHex(hashedMetadata));

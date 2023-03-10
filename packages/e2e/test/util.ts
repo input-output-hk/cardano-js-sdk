@@ -19,7 +19,7 @@ import {
   timeout
 } from 'rxjs';
 import { InMemoryKeyAgent } from '@cardano-sdk/key-management';
-import { ObservableWallet, SignedTx, SingleAddressWallet, buildTx } from '@cardano-sdk/wallet';
+import { InitializeTxProps, ObservableWallet, SignedTx, SingleAddressWallet, buildTx } from '@cardano-sdk/wallet';
 import { TestWallet, faucetProviderFactory, getEnv, networkInfoProviderFactory, walletVariables } from '../src';
 import { assertTxIsValid } from '../../wallet/test/util';
 import { logger } from '@cardano-sdk/util-dev';
@@ -70,11 +70,15 @@ export const walletReady = (wallet: ObservableWallet) =>
     SYNC_TIMEOUT
   );
 
+const sortTxIn = (txInCollection: Cardano.TxIn[] | undefined): Cardano.TxIn[] =>
+  sortBy(txInCollection, ['txId', 'index']);
+
 export const normalizeTxBody = (body: Cardano.HydratedTxBody | Cardano.TxBody) => {
-  body.collaterals ||= [];
   // TODO: inputs should be a Set since they're unordered.
   // Then Jest should correctly compare it with toEqual.
-  body.inputs = sortBy(body.inputs, 'txId');
+  body.inputs = sortTxIn(body.inputs);
+  body.collaterals = sortTxIn(body.collaterals);
+  body.referenceInputs = sortTxIn(body.referenceInputs);
   return body;
 };
 
@@ -222,7 +226,7 @@ export const getTxConfirmationEpoch = async (wallet: SingleAddressWallet, tx: Ca
  */
 export const submitCertificate = async (certificate: Cardano.Certificate, wallet: TestWallet) => {
   const walletAddress = (await firstValueFrom(wallet.wallet.addresses$))[0].address;
-  const txProps = {
+  const txProps: InitializeTxProps = {
     certificates: [certificate],
     outputs: new Set([{ address: walletAddress, value: { coins: 3_000_000n } }])
   };
@@ -255,5 +259,5 @@ export const createStandaloneKeyAgent = async (
       getPassphrase: async () => Buffer.from(''),
       mnemonicWords: mnemonics
     },
-    { bip32Ed25519, inputResolver: { resolveInputAddress: async () => null }, logger }
+    { bip32Ed25519, inputResolver: { resolveInput: async () => null }, logger }
   );

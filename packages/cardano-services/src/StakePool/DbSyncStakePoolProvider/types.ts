@@ -124,10 +124,6 @@ export interface SubQuery {
   query: string;
 }
 
-export interface TotalAdaModel {
-  total_ada: string;
-}
-
 export interface PoolMetricsModel {
   blocks_created: number;
   delegators: number;
@@ -138,6 +134,12 @@ export interface PoolMetricsModel {
   active_stake_percentage: number;
   live_stake_percentage: number;
   pool_hash_id: string;
+}
+
+export interface BlockfrostPoolMetricsModel extends PoolMetricsModel {
+  reward_address: string;
+  extra: string;
+  status: string;
 }
 
 export interface PoolMetrics extends CommonPoolInfo {
@@ -152,8 +154,12 @@ export interface PoolMetrics extends CommonPoolInfo {
   };
 }
 
-export interface TotalCountModel {
-  total_count: number;
+export interface BlockfrostPoolMetrics extends PoolMetrics {
+  rewardAccount: Cardano.RewardAccount;
+  owners: Cardano.RewardAccount[];
+  registration: Cardano.TransactionId[];
+  retirement: Cardano.TransactionId[];
+  status: Cardano.StakePoolStatus;
 }
 
 export interface StakePoolStatsModel {

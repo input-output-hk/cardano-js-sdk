@@ -48,7 +48,7 @@ COPY --from=cardano-services-builder /app/packages/util/package.json /app/packag
 COPY --from=cardano-services-builder /app/packages/crypto/dist /app/packages/crypto/dist
 COPY --from=cardano-services-builder /app/packages/crypto/package.json /app/packages/crypto/package.json
 
-FROM cardano-services as http-server
+FROM cardano-services as provider-server
 ARG NETWORK=mainnet
 RUN curl --proto '=https' --tlsv1.2 -sSf -L https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - &&\
   echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" | tee  /etc/apt/sources.list.d/pgdg.list &&\
@@ -69,8 +69,20 @@ COPY packages/cardano-services/config/network/${NETWORK} /config/
 EXPOSE 3000
 HEALTHCHECK --interval=15s --timeout=15s \
   CMD curl --fail --silent http://0.0.0.0:3000/health | jq '.ok' | awk '{ if ($0 == "true") exit 0; else exit 1}'
-CMD ["node", "dist/cjs/cli.js", "start-server"]
+CMD ["node", "dist/cjs/cli.js", "start-provider-server"]
 
 FROM cardano-services as worker
 WORKDIR /app/packages/cardano-services
 CMD ["node", "dist/cjs/cli.js", "start-worker"]
+
+FROM cardano-services as blockfrost-worker
+ENV \
+  API_URL="http://0.0.0.0:3000" \
+  BLOCKFROST_API_FILE=/run/secrets/blockfrost_key \
+  POSTGRES_DB_FILE=/run/secrets/postgres_db \
+  POSTGRES_HOST=postgres \
+  POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password \
+  POSTGRES_PORT=5432 \
+  POSTGRES_USER_FILE=/run/secrets/postgres_user
+WORKDIR /app/packages/cardano-services
+CMD ["node", "dist/cjs/cli.js", "start-blockfrost-worker"]

@@ -18,6 +18,7 @@ import {
   mergeMap,
   mergeWith,
   of,
+  partition,
   race,
   scan,
   share,
@@ -33,13 +34,14 @@ import { RetryBackoffConfig } from 'backoff-rxjs';
 import { Shutdown, contextLogger } from '@cardano-sdk/util';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
 import { coldObservableProvider, distinctBlock, transactionsEquals } from './util';
+
 import intersectionBy from 'lodash/intersectionBy';
 import sortBy from 'lodash/sortBy';
 import unionBy from 'lodash/unionBy';
 
 export interface TransactionsTrackerProps {
   chainHistoryProvider: ChainHistoryProvider;
-  addresses$: Observable<Cardano.Address[]>;
+  addresses$: Observable<Cardano.PaymentAddress[]>;
   tip$: Observable<Cardano.Tip>;
   retryBackoffConfig: RetryBackoffConfig;
   transactionsHistoryStore: OrderedCollectionStore<Cardano.HydratedTx>;
@@ -61,7 +63,7 @@ export interface TransactionsTrackerInternals {
 
 export interface TransactionsTrackerInternalsProps {
   chainHistoryProvider: ChainHistoryProvider;
-  addresses$: Observable<Cardano.Address[]>;
+  addresses$: Observable<Cardano.PaymentAddress[]>;
   retryBackoffConfig: RetryBackoffConfig;
   tipBlockHeight$: Observable<Cardano.BlockNo>;
   store: OrderedCollectionStore<Cardano.HydratedTx>;
@@ -74,7 +76,7 @@ export const PAGE_SIZE = 25;
 
 const allTransactionsByAddresses = async (
   chainHistoryProvider: ChainHistoryProvider,
-  { addresses, blockRange }: { addresses: Cardano.Address[]; blockRange: Range<Cardano.BlockNo> }
+  { addresses, blockRange }: { addresses: Cardano.PaymentAddress[]; blockRange: Range<Cardano.BlockNo> }
 ): Promise<Cardano.HydratedTx[]> => {
   let startAt = 0;
   let response: Cardano.HydratedTx[] = [];
@@ -234,8 +236,14 @@ export const createTransactionsTracker = (
   const transactionsSource$ = new TrackerSubject(txSource$);
 
   const historicalTransactions$ = createHistoricalTransactionsTrackerSubject(transactionsSource$);
+
+  const [onChainNewTxPhase2Failed$, onChainNewTxSuccess$] = partition(
+    newTransactions$(historicalTransactions$).pipe(share()),
+    (tx) => Cardano.util.isPhase2ValidationErrTx(tx)
+  );
+
   const txConfirmed$ = (evt: OutgoingTx): Observable<ConfirmedTx> =>
-    newTransactions$(historicalTransactions$).pipe(
+    onChainNewTxSuccess$.pipe(
       filter((historyTx) => historyTx.id === evt.id),
       take(1),
       map((historyTx) => ({ ...evt, confirmedAt: historyTx.blockHeader.slot })),
@@ -264,6 +272,10 @@ export const createTransactionsTracker = (
           switchMap((tx) => {
             const invalidHereafter = tx.body.validityInterval?.invalidHereafter;
             return race(
+              onChainNewTxPhase2Failed$.pipe(
+                filter((failedTx) => failedTx.id === tx.id),
+                map((): FailedTx => ({ reason: TransactionFailure.Phase2Validation, ...tx }))
+              ),
               rollback$.pipe(
                 map((rolledBackTx) => rolledBackTx.id),
                 filter((rolledBackTxId) => tx.body.inputs.some(({ txId }) => txId === rolledBackTxId)),

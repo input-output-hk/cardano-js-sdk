@@ -8,6 +8,7 @@ const project = (displayName) => ({
 
 module.exports = {
   projects: [
+    { ...project('blockfrost'), globalSetup: './test/blockfrost/setup.ts' },
     project('load-testing'),
     project('local-network'),
     project('long-running'),

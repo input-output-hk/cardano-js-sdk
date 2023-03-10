@@ -26,16 +26,18 @@ const blockCertificates = ({
     body
   }
 }: WithBlock) =>
-  body.flatMap(({ body: { certificates = [] } }, txIndex) =>
-    certificates.map((certificate, certIndex) => ({
-      certificate,
-      pointer: {
-        certIndex,
-        slot,
-        txIndex
-      }
-    }))
-  );
+  body
+    .filter((tx) => !Cardano.util.isPhase2ValidationErrTx(tx))
+    .flatMap(({ body: { certificates = [] } }, txIndex) =>
+      certificates.map((certificate, certIndex) => ({
+        certificate,
+        pointer: {
+          certIndex,
+          slot,
+          txIndex
+        }
+      }))
+    );
 
 /**
  * Map ChainSyncEvents to a flat array of certificates.

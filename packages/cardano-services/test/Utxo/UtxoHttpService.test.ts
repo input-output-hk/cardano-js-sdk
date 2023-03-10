@@ -178,7 +178,7 @@ describe('UtxoHttpService', () => {
 
         expect(res.length).toBeGreaterThan(0);
         expect(res[0]).toMatchShapeOf([DataMocks.Tx.input, DataMocks.Tx.output]);
-        expect(() => Cardano.Address(addresses[0] as unknown as string)).not.toThrow();
+        expect(() => Cardano.PaymentAddress(addresses[0] as unknown as string)).not.toThrow();
       });
 
       it('return UTxO with inline datum', async () => {

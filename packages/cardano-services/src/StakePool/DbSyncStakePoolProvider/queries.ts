@@ -21,19 +21,6 @@ LEFT JOIN epoch_param ep ON
 ORDER BY no DESC
 LIMIT 1`;
 
-export const findTotalAda = `
-SELECT COALESCE(SUM(value)) AS total_ada
-FROM tx_out AS tx_outer WHERE
-NOT exists
-  ( SELECT tx_out.id
-  FROM tx_out
-  JOIN tx_in ON
-  tx_out.tx_id = tx_in.tx_out_id AND
-  tx_out.index = tx_in.tx_out_index
-  WHERE tx_outer.id = tx_out.id
-  );
-`;
-
 export const findPoolsMetrics = `
 WITH current_epoch AS (
   SELECT
@@ -110,15 +97,9 @@ pools_delegates AS (
       AND pu.hash_id = ANY($1)
     LEFT JOIN tx_in ON
       tx_out.tx_id = tx_in.tx_out_id AND
-      tx_out.index::smallint = tx_in.tx_out_index::smallint
-    LEFT JOIN tx AS tx_in_tx ON
-      tx_in_tx.id = tx_in.tx_in_id AND
-      tx_in_tx.valid_contract = TRUE
-    JOIN tx AS tx_out_tx ON
-      tx_out_tx.id = tx_out.tx_id AND
-      tx_out_tx.valid_contract = TRUE
+      tx_out.index = tx_in.tx_out_index
     WHERE
-      tx_in_tx.id IS null
+      tx_in.tx_out_id IS null
     GROUP BY pu.hash_id
   ),
 active_stake AS (
@@ -165,15 +146,9 @@ total_utxos AS (
     tx_out.stake_address_id = ad.addr_id
   LEFT JOIN tx_in ON
     tx_out.tx_id = tx_in.tx_out_id AND
-    tx_out.index::smallint = tx_in.tx_out_index::smallint
-  LEFT JOIN tx AS tx_in_tx ON
-    tx_in_tx.id = tx_in.tx_in_id AND
-  tx_in_tx.valid_contract = TRUE
-  JOIN tx AS tx_out_tx ON
-    tx_out_tx.id = tx_out.tx_id AND
-    tx_out_tx.valid_contract = TRUE
+    tx_out.index = tx_in.tx_out_index
   WHERE
-    tx_in_tx.id IS NULL
+    tx_in.tx_out_id IS NULL
   GROUP BY ad.pool_hash_id
 ),
 total_rewards AS (
@@ -191,8 +166,6 @@ total_withdraws AS (
     COALESCE(SUM(w.amount),0) AS total_amount,
     ad.pool_hash_id
     FROM withdrawal w
-    JOIN tx ON tx.id = w.tx_id AND
-      tx.valid_contract = TRUE
     JOIN active_delegations ad ON ad.addr_id = w.addr_id
     GROUP BY ad.pool_hash_id
 ),
@@ -209,8 +182,8 @@ live_stake AS (
     total_utxos.pool_hash_id = tw.pool_hash_id
 )
 SELECT
- COALESCE(bc.blocks_created,0) AS blocks_created,
- COALESCE(d.delegators,0) AS delegators,
+ COALESCE(bc.blocks_created,0)::integer AS blocks_created,
+ COALESCE(d.delegators,0)::integer AS delegators,
  COALESCE(a_stake.active_stake,0) AS active_stake,
  COALESCE(l_stake.live_stake,0) AS live_stake,
  (COALESCE(tr.amount,0) - COALESCE(tw.amount,0) + COALESCE (otu.amount,0))
@@ -248,6 +221,26 @@ LEFT JOIN total_withdraws_of_reward_acc AS tw ON
 LEFT JOIN owners_total_utxos otu ON
   otu.hash_id = ph.id
 WHERE id = ANY($1)
+`;
+
+export const findBlockfrostPoolsMetrics = `
+SELECT
+  COALESCE(blocks_created, 0) AS blocks_created,
+  COALESCE(delegators, 0) AS delegators,
+  COALESCE(active_stake, 0) AS active_stake,
+  COALESCE(live_stake, 0) AS live_stake,
+  COALESCE(live_pledge, 0) AS live_pledge,
+  COALESCE(saturation, 0) AS saturation,
+  COALESCE(active_stake / NULLIF(live_stake, 0), 0) AS active_stake_percentage,
+  COALESCE(reward_address, '') AS reward_address,
+  COALESCE(extra, '[[],[],[]]') AS extra,
+  COALESCE(status, 'retired') AS status,
+  pool_hash_id
+FROM pool_hash
+LEFT JOIN blockfrost.pool_metric ON
+  pool_hash_id = id
+WHERE
+  id = ANY($1)
 `;
 
 const epochRewardsSubqueries = (epochLength: number, limit?: number) => `
@@ -481,8 +474,6 @@ export const poolsByPledgeMetSubqueries: readonly SubQuery[] = [
     COALESCE(SUM(w.amount),0)  AS total_amount,
     sa.id AS stake_address_id
   FROM withdrawal w
-  JOIN tx ON tx.id = w.tx_id AND
-    tx.valid_contract = TRUE
   JOIN stake_address sa ON sa.id = w.addr_id
   JOIN pools_delegated pool ON pool.stake_address_id = sa.id
   GROUP BY sa.id`
@@ -512,15 +503,9 @@ export const poolsByPledgeMetSubqueries: readonly SubQuery[] = [
     AND pu.hash_id IN (SELECT id FROM pools_delegated)
   LEFT JOIN tx_in ON
     tx_out.tx_id = tx_in.tx_out_id AND
-    tx_out.index::smallint = tx_in.tx_out_index::smallint
-  LEFT JOIN tx AS tx_in_tx ON
-    tx_in_tx.id = tx_in.tx_in_id AND
-      tx_in_tx.valid_contract = TRUE
-  JOIN tx AS tx_out_tx ON
-    tx_out_tx.id = tx_out.tx_id AND
-      tx_out_tx.valid_contract = TRUE
+    tx_out.index = tx_in.tx_out_index
   WHERE
-    tx_in_tx.id IS NULL`
+    tx_in.tx_out_id IS NULL`
   },
   {
     id: { name: 'owners_balance' },
@@ -553,12 +538,6 @@ export const POOLS_WITH_PLEDGE_MET = {
      ${poolsByPledgeMetSubqueries.map((subQuery) => `${subQuery.id.name} AS (${subQuery.query})`).join(', ')}
       `
 };
-
-export const findPoolsWithPledgeMet = (metPledge: boolean) => `
-  ${POOLS_WITH_PLEDGE_MET.WITH_CLAUSE}
-  ${POOLS_WITH_PLEDGE_MET.SELECT_CLAUSE}
-  ${POOLS_WITH_PLEDGE_MET.JOIN_CLAUSE}
-  WHERE ${POOLS_WITH_PLEDGE_MET.WHERE_CLAUSE(metPledge)}`;
 
 export const STATUS_QUERY = {
   SELECT_CLAUSE: `
@@ -635,6 +614,30 @@ JOIN pool_hash ph ON
   ph.id = pu.hash_id
 JOIN stake_address sa ON
   sa.id = pu.reward_addr_id
+LEFT JOIN pool_metadata_ref metadata
+  ON metadata.id = pu.meta_id
+LEFT JOIN pool_offline_data pod
+  ON metadata.id = pod.pmr_id
+WHERE pu.id = ANY($1)
+`;
+
+export const findBlockfrostPoolsData = `
+SELECT
+  pu.hash_id,
+  ph.hash_raw AS pool_hash,
+  pu.id AS update_id,
+  ph.view AS pool_id,
+  pu.reward_addr_id,
+  pu.pledge,
+  pu.fixed_cost,
+  pu.margin,
+  pu.vrf_key_hash,
+  metadata.url AS metadata_url,
+  metadata.hash AS metadata_hash,
+  pod.json AS offline_data
+FROM pool_update pu
+JOIN pool_hash ph ON
+  ph.id = pu.hash_id
 LEFT JOIN pool_metadata_ref metadata
   ON metadata.id = pu.meta_id
 LEFT JOIN pool_offline_data pod
@@ -742,12 +745,6 @@ export const buildOrQueryFromClauses = (clauses: SubQuery[]) => {
     `;
 };
 
-export const getTotalCountQueryFromQuery = (query: string) => `
-SELECT
-  COUNT(1) AS total_count
-FROM (${query}) AS query
-`;
-
 export const findPoolStats = `
 WITH current_epoch AS (
   SELECT MAX(epoch_no) AS epoch_no
@@ -836,10 +833,46 @@ export const withSort = (query: string, sort?: QueryStakePoolsArgs['sort'], defa
   }
 };
 
+export const blockfrostQuery = {
+  SELECT: `
+WITH pool_updates AS (
+  SELECT
+    hash_id,
+    MAX(id) AS update_id
+  FROM pool_update
+  GROUP BY hash_id
+)
+SELECT
+  ph.id,
+  pu.update_id
+FROM pool_hash ph
+JOIN pool_updates pu ON
+  pu.hash_id = ph.id`,
+  identifier: {
+    JOIN: `
+LEFT JOIN pool_offline_data pod ON
+  pmr_id = meta_id`
+  },
+  identifierOrPledge: {
+    JOIN: `
+JOIN pool_update pl ON
+  pl.id = pu.update_id`
+  },
+  pledge: { WHERE: (pledgeMet: boolean) => `live_pledge ${pledgeMet ? '>=' : '<'} pledge` },
+  pledgeOrStatus: {
+    JOIN: `
+LEFT JOIN blockfrost.pool_metric pm ON
+  pm.pool_hash_id = ph.id`
+  },
+  status: { WHERE: (status: Cardano.StakePoolStatus[]) => `(${status.map((_) => `status = '${_}'`).join(' OR ')})` }
+} as const;
+
 const Queries = {
   IDENTIFIER_QUERY,
   POOLS_WITH_PLEDGE_MET,
   STATUS_QUERY,
+  findBlockfrostPoolsData,
+  findBlockfrostPoolsMetrics,
   findLastEpoch,
   findLastEpochWithData,
   findPoolAPY,
@@ -851,9 +884,7 @@ const Queries = {
   findPoolsOwners,
   findPoolsRegistrations,
   findPoolsRelays,
-  findPoolsRetirements,
-  findPoolsWithPledgeMet,
-  findTotalAda
+  findPoolsRetirements
 };
 
 export default Queries;

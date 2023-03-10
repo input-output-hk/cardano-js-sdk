@@ -7,10 +7,21 @@ import { Observable } from 'rxjs';
 import { SelectionSkeleton } from '@cardano-sdk/input-selection';
 import { Shutdown } from '@cardano-sdk/util';
 
-export type InitializeTxProps = {
+export interface TxProps {
+  auxiliaryData?: Cardano.AuxiliaryData;
+  witness?: {
+    datums?: Cardano.Datum[];
+    redeemers?: Cardano.Redeemer[];
+    bootstrap?: Cardano.BootstrapWitness[];
+    extraSigners?: TransactionSigner[];
+  };
+  scripts?: Cardano.Script[];
+  signingOptions?: SignTransactionOptions;
+}
+
+export interface InitializeTxProps extends TxProps {
   outputs?: Set<Cardano.TxOut>;
   certificates?: Cardano.Certificate[];
-  auxiliaryData?: Cardano.AuxiliaryData;
   options?: {
     validityInterval?: Cardano.ValidityInterval;
   };
@@ -18,17 +29,11 @@ export type InitializeTxProps = {
   mint?: Cardano.TokenMap;
   scriptIntegrityHash?: Crypto.Hash32ByteBase16;
   requiredExtraSignatures?: Crypto.Ed25519KeyHashHex[];
-  extraSigners?: TransactionSigner[];
-  signingOptions?: SignTransactionOptions;
-  scripts?: Cardano.Script[];
-};
+}
 
-export interface FinalizeTxProps {
+export interface FinalizeTxProps extends TxProps {
   tx: Cardano.TxBodyWithHash;
-  auxiliaryData?: Cardano.AuxiliaryData;
-  scripts?: Cardano.Script[];
-  extraSigners?: TransactionSigner[];
-  signingOptions?: SignTransactionOptions;
+  isValid?: boolean;
 }
 
 export type Assets = Map<Cardano.AssetId, Asset.AssetInfo>;

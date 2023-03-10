@@ -30,7 +30,7 @@ describe('SingleAddressWallet/byron', () => {
 
     const txOutput = txBuilder
       .buildOutput()
-      .address(Cardano.Address('5oP9ib6ym3Xc2XrPGC6S7AaJeHYBCmLjt98bnjKR58xXDhSDgLHr8tht3apMDXf2Mg'))
+      .address(Cardano.PaymentAddress('5oP9ib6ym3Xc2XrPGC6S7AaJeHYBCmLjt98bnjKR58xXDhSDgLHr8tht3apMDXf2Mg'))
       .coin(3_000_000n)
       .toTxOut();
 

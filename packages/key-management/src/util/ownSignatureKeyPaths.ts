@@ -32,7 +32,6 @@ const getStakingKeyPaths = (
 
     for (const certificate of txBody.certificates) {
       switch (certificate.__typename) {
-        case Cardano.CertificateType.StakeKeyRegistration:
         case Cardano.CertificateType.StakeKeyDeregistration:
         case Cardano.CertificateType.StakeDelegation:
           if (certificate.stakeKeyHash === stakeKeyHash) paths.add(account.stakeKeyDerivationPath);
@@ -49,6 +48,7 @@ const getStakingKeyPaths = (
         case Cardano.CertificateType.MIR:
           if (certificate.rewardAccount === account.rewardAccount) paths.add(account.stakeKeyDerivationPath);
           break;
+        case Cardano.CertificateType.StakeKeyRegistration:
         case Cardano.CertificateType.GenesisKeyDelegation:
         default:
         // Nothing to do.
@@ -67,15 +67,16 @@ const getStakingKeyPaths = (
 export const ownSignatureKeyPaths = async (
   txBody: Cardano.TxBody,
   knownAddresses: GroupedAddress[],
-  inputResolver: Cardano.util.InputResolver
+  inputResolver: Cardano.InputResolver
 ): Promise<AccountKeyDerivationPath[]> => {
+  const txInputs = [...txBody.inputs, ...(txBody.collaterals ? txBody.collaterals : [])];
   const paymentKeyPaths = uniq(
     (
       await Promise.all(
-        txBody.inputs.map(async (input) => {
-          const ownAddress = await inputResolver.resolveInputAddress(input);
-          if (!ownAddress) return null;
-          return knownAddresses.find(({ address }) => address === ownAddress);
+        txInputs.map(async (input) => {
+          const resolution = await inputResolver.resolveInput(input);
+          if (!resolution) return null;
+          return knownAddresses.find(({ address }) => address === resolution.address);
         })
       )
     ).filter(isNotNil)

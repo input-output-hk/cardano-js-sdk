@@ -10,14 +10,14 @@ const { ownSignatureKeyPaths } = jest.requireMock('../src/util/ownSignatureKeyPa
 describe('InMemoryKeyAgent', () => {
   let keyAgent: InMemoryKeyAgent;
   let getPassphrase: jest.Mock;
-  let inputResolver: jest.Mocked<Cardano.util.InputResolver>;
+  let inputResolver: jest.Mocked<Cardano.InputResolver>;
   let mnemonicWords: string[];
   const bip32Ed25519 = new Crypto.CmlBip32Ed25519(CML);
 
   beforeEach(async () => {
     mnemonicWords = util.generateMnemonicWords();
     getPassphrase = jest.fn().mockResolvedValue(Buffer.from('password'));
-    inputResolver = { resolveInputAddress: jest.fn() };
+    inputResolver = { resolveInput: jest.fn() };
     keyAgent = await InMemoryKeyAgent.fromBip39MnemonicWords(
       {
         chainId: Cardano.ChainIds.Preview,

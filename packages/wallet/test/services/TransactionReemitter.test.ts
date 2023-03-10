@@ -194,6 +194,12 @@ describe('TransactionReemiter', () => {
     const [outgoingA, _, __, outgoingD] = outgoingTransactions;
     volatileC.body.validityInterval = { invalidHereafter: Cardano.Slot(LAST_TIP_SLOT - 1) };
     const rollbackA: Cardano.HydratedTx = { body: volatileA.body, id: volatileA.id } as Cardano.HydratedTx;
+    // phase2validation failed transactions will not be reemited
+    const rollbackB: Cardano.HydratedTx = {
+      body: volatileB.body,
+      id: volatileB.id,
+      inputSource: Cardano.InputSource.collaterals
+    } as Cardano.HydratedTx;
     const rollbackC: Cardano.HydratedTx = {
       body: volatileC.body,
       id: volatileC.id
@@ -212,7 +218,12 @@ describe('TransactionReemiter', () => {
         c: volatileC,
         d: volatileD
       });
-      const rollback$ = cold<Cardano.HydratedTx>('--a--c--d|', { a: rollbackA, c: rollbackC, d: rollbackD });
+      const rollback$ = cold<Cardano.HydratedTx>('--ab-c--d|', {
+        a: rollbackA,
+        b: rollbackB,
+        c: rollbackC,
+        d: rollbackD
+      });
       const submitting$ = cold<OutgoingTx>('---------|');
       const inFlight$ = cold<TxInFlight[]>('-|');
       const transactionReemiter = createTransactionReemitter({

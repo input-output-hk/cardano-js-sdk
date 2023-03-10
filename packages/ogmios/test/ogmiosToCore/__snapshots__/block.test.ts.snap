@@ -91,6 +91,7 @@ Object {
         "withdrawals": Array [],
       },
       "id": "8ba812bad0c356ec842365720acb4a4ea18f03d40b03ad1cc785426170d542f5",
+      "inputSource": "inputs",
       "witness": Object {
         "bootstrap": Array [
           Object {
@@ -286,6 +287,7 @@ Object {
         "withdrawals": Array [],
       },
       "id": "bb81604e09c4530ad02de6b80a0c13d82949fb307402dd0c2b447e211bdc621d",
+      "inputSource": "inputs",
       "witness": Object {
         "bootstrap": Array [],
         "datums": Array [],
@@ -432,6 +434,7 @@ Object {
         ],
       },
       "id": "c32a4a4f5a4b540d4f79730ca0c658d9a8400be2173e0ba1dc8471004c1cb0db",
+      "inputSource": "collaterals",
       "witness": Object {
         "bootstrap": Array [
           Object {
@@ -561,6 +564,7 @@ Object {
         ],
       },
       "id": "f138917a172058f68c93de999592c5fb7cafc9265add9723eb2e8b9c12654654",
+      "inputSource": "inputs",
       "witness": Object {
         "bootstrap": Array [
           Object {
@@ -707,6 +711,7 @@ Object {
         ],
       },
       "id": "77c4a3c21573c57f0599499bc780de457c35c1d95bfb7e2370d3328b49327117",
+      "inputSource": "inputs",
       "witness": Object {
         "bootstrap": Array [],
         "datums": undefined,

@@ -15,6 +15,8 @@ import path from 'path';
 export const CONTENT_TYPE = 'Content-Type';
 export const APPLICATION_JSON = 'application/json';
 
+export const getListen = (url: URL) => ({ host: url.hostname, port: url ? Number.parseInt(url.port) : undefined });
+
 export interface HttpServerDependencies {
   services: HttpService[];
   runnableDependencies: RunnableModule[];
@@ -57,7 +59,8 @@ export class HttpServer extends RunnableModule {
 
     return result;
   }
-  async initializeImpl(): Promise<void> {
+
+  protected async initializeImpl(): Promise<void> {
     this.app = express();
     this.app.use(
       bodyParser.json({
@@ -108,19 +111,28 @@ export class HttpServer extends RunnableModule {
       this.logger.debug(`Using /${service.slug}`);
     }
 
-    const servicesHealthCheckHandler = async (req: express.Request, res: express.Response) => {
-      this.logger.debug('/health', { ip: req.ip });
-      let body: ServicesHealthCheckResponse | Error['message'];
-      try {
-        body = await this.#getServicesHealth();
-      } catch (error) {
-        this.logger.error(error);
-        return HttpServer.sendJSON(res, new ProviderError(ProviderFailure.Unhealthy, error), 500);
-      }
-      return HttpServer.sendJSON(res, body);
-    };
+    const healthCheckHandler =
+      (statusCodeFromHealth: (health: ServicesHealthCheckResponse) => number) =>
+      async (req: express.Request, res: express.Response) => {
+        this.logger.debug('/ready', { ip: req.ip });
+        let health: ServicesHealthCheckResponse | Error['message'];
+        try {
+          health = await this.#getServicesHealth();
+        } catch (error) {
+          this.logger.error(error);
+          return HttpServer.sendJSON(res, new ProviderError(ProviderFailure.Unhealthy, error), 500);
+        }
+        return HttpServer.sendJSON(res, health, statusCodeFromHealth(health));
+      };
 
-    this.app.use('/health', servicesHealthCheckHandler);
+    this.app.use(
+      '/health',
+      healthCheckHandler(() => 200)
+    );
+    this.app.use(
+      '/ready',
+      healthCheckHandler(({ ok }) => (ok ? 200 : 503))
+    );
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.app.use((err: any, _req: express.Request, res: express.Response, _n: express.NextFunction) => {
       HttpServer.sendJSON(res, new ProviderError(ProviderFailure.Unhealthy, err), err.status || 500);
@@ -154,13 +166,13 @@ export class HttpServer extends RunnableModule {
     res.send(toSerializableObject(obj) as ResponseBody);
   }
 
-  async startImpl(): Promise<void> {
+  protected async startImpl(): Promise<void> {
     for (const dependency of this.#dependencies.runnableDependencies) await dependency.start();
     for (const service of this.#dependencies.services) await service.start();
     this.server = await listenPromise(this.app, this.#config.listen);
   }
 
-  async shutdownImpl(): Promise<void> {
+  protected async shutdownImpl(): Promise<void> {
     this.#healthGauge?.set(0);
 
     for (const service of this.#dependencies.services) await service.shutdown();

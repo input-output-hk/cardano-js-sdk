@@ -8,13 +8,13 @@ import { firstValueFrom } from 'rxjs';
 describe('createAsyncKeyAgent maps KeyAgent to AsyncKeyAgent', () => {
   let keyAgent: KeyAgent;
   let asyncKeyAgent: AsyncKeyAgent;
-  let inputResolver: jest.Mocked<Cardano.util.InputResolver>;
+  let inputResolver: jest.Mocked<Cardano.InputResolver>;
   const addressDerivationPath = { index: 0, type: 0 };
 
   beforeEach(async () => {
     const mnemonicWords = util.generateMnemonicWords();
     const getPassphrase = jest.fn().mockResolvedValue(Buffer.from('password'));
-    inputResolver = { resolveInputAddress: jest.fn() };
+    inputResolver = { resolveInput: jest.fn() };
     keyAgent = await InMemoryKeyAgent.fromBip39MnemonicWords(
       {
         chainId: Cardano.ChainIds.Preview,
@@ -37,7 +37,7 @@ describe('createAsyncKeyAgent maps KeyAgent to AsyncKeyAgent', () => {
     await expect(asyncKeyAgent.signBlob(keyDerivationPath, blob)).resolves.toEqual(
       await keyAgent.signBlob(keyDerivationPath, blob)
     );
-    inputResolver.resolveInputAddress.mockResolvedValue(null);
+    inputResolver.resolveInput.mockResolvedValue(null);
     const txInternals = {
       body: { fee: 20_000n, inputs: [], outputs: [], validityInterval: {} } as Cardano.HydratedTxBody,
       hash: Cardano.TransactionId('8561258e210352fba2ac0488afed67b3427a27ccf1d41ec030c98a8199bc22ec')

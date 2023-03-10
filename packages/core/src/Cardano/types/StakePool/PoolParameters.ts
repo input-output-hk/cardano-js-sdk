@@ -5,7 +5,7 @@ import { Lovelace } from '../Value';
 import { OpaqueString, typedBech32 } from '@cardano-sdk/util';
 import { PoolId, VrfVkHex } from './primitives';
 import { Relay } from './Relay';
-import { RewardAccount } from '../RewardAccount';
+import { RewardAccount } from '../../Address';
 
 export interface Fraction {
   numerator: number;

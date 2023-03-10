@@ -87,6 +87,7 @@ const validators = {
   NETWORK_INFO_PROVIDER: str(),
   NETWORK_INFO_PROVIDER_PARAMS: providerParams(),
   OGMIOS_URL: str(),
+  PROJECTION_PG_CONNECTION_STRING: str(),
   REWARDS_PROVIDER: str(),
   REWARDS_PROVIDER_PARAMS: providerParams(),
   STAKE_POOL_PROVIDER: str(),

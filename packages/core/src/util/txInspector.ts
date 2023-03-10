@@ -1,5 +1,4 @@
 import {
-  Address,
   AssetFingerprint,
   AssetName,
   Certificate,
@@ -11,7 +10,6 @@ import {
   PolicyId,
   PoolRegistrationCertificate,
   PoolRetirementCertificate,
-  RewardAccount,
   Script,
   ScriptType,
   StakeAddressCertificate,
@@ -20,9 +18,9 @@ import {
   Value
 } from '../Cardano/types';
 import { BigIntMath } from '@cardano-sdk/util';
+import { PaymentAddress, RewardAccount, inputsWithAddresses, isAddressWithin } from '../Cardano';
 import { assetNameFromAssetId, policyIdFromAssetId, removeNegativesFromTokenMap } from '../Asset/util';
 import { coalesceValueQuantities } from './coalesceValueQuantities';
-import { inputsWithAddresses, isAddressWithin } from '../Cardano/util/address';
 import { nativeScriptPolicyId } from './nativeScript';
 import { resolveInputValue } from '../Cardano/util/resolveInputValue';
 import { subtractValueQuantities } from './subtractValueQuantities';
@@ -60,15 +58,15 @@ export type MetadataInspection = Metadatum;
 
 // Inspector types
 interface SentInspectorArgs {
-  addresses?: Address[];
+  addresses?: PaymentAddress[];
   rewardAccounts?: RewardAccount[];
 }
 export type SentInspector = (args: SentInspectorArgs) => Inspector<SentInspection>;
 export type TotalAddressInputsValueInspector = (
-  ownAddresses: Address[],
+  ownAddresses: PaymentAddress[],
   getHistoricalTxs: () => HydratedTx[]
 ) => Inspector<SendReceiveValueInspection>;
-export type SendReceiveValueInspector = (ownAddresses: Address[]) => Inspector<SendReceiveValueInspection>;
+export type SendReceiveValueInspector = (ownAddresses: PaymentAddress[]) => Inspector<SendReceiveValueInspection>;
 export type DelegationInspector = Inspector<DelegationInspection>;
 export type StakeKeyRegistrationInspector = Inspector<StakeKeyRegistrationInspection>;
 export type WithdrawalInspector = Inspector<WithdrawalInspection>;
@@ -85,7 +83,7 @@ export type PoolRetirementInspector = Inspector<PoolRetirementInspection>;
  * Inspects a transaction for values (coins + assets) in inputs
  * containing any of the provided addresses.
  *
- * @param {Address[]} ownAddresses own wallet's addresses
+ * @param {PaymentAddress[]} ownAddresses own wallet's addresses
  * @param {() => HydratedTx[]} getHistoricalTxs wallet's historical transactions
  * @returns {Value} total value in inputs
  */
@@ -103,7 +101,7 @@ export const totalAddressInputsValueInspector: TotalAddressInputsValueInspector 
  * Inspects a transaction for values (coins + assets) in outputs
  * containing any of the provided addresses.
  *
- * @param {Address[]} ownAddresses own wallet's addresses
+ * @param {PaymentAddress[]} ownAddresses own wallet's addresses
  * @returns {Value} total value in outputs
  */
 export const totalAddressOutputsValueInspector: SendReceiveValueInspector = (ownAddresses) => (tx) => {
@@ -151,7 +149,7 @@ export const sentInspector: SentInspector =
 /**
  * Inspects a transaction for net value (coins + assets) sent by the provided addresses.
  *
- * @param {Address[]} ownAddresses own wallet's addresses
+ * @param {PaymentAddress[]} ownAddresses own wallet's addresses
  * @param historicalTxs A list of historical transaction
  * @returns {Value} net value sent
  */
@@ -172,7 +170,7 @@ export const valueSentInspector: TotalAddressInputsValueInspector = (ownAddresse
 /**
  * Inspects a transaction for net value (coins + assets) received by the provided addresses.
  *
- * @param {Address[]} ownAddresses own wallet's addresses
+ * @param {PaymentAddress[]} ownAddresses own wallet's addresses
  * @param historicalTxs A list of historical transaction
  * @returns {Value} net value received
  */

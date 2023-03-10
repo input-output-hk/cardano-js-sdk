@@ -1,6 +1,5 @@
-import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
-import { InvalidStringError, OpaqueString, assertIsHexString, typedBech32 } from '@cardano-sdk/util';
-import cip14 from '@emurgo/cip14-js';
+import * as Crypto from '@cardano-sdk/crypto';
+import { HexBlob, InvalidStringError, OpaqueString, assertIsHexString, typedBech32 } from '@cardano-sdk/util';
 
 export type AssetId = OpaqueString<'AssetId'>;
 
@@ -34,7 +33,7 @@ export const AssetId = (value: string): AssetId => {
  * Hex-encoded policy id
  */
 export type PolicyId = OpaqueString<'PolicyId'>;
-export const PolicyId = (value: string): PolicyId => Hash28ByteBase16(value) as unknown as PolicyId;
+export const PolicyId = (value: string): PolicyId => Crypto.Hash28ByteBase16(value) as unknown as PolicyId;
 
 /**
  * Fingerprint of a native asset for human comparison
@@ -51,7 +50,13 @@ export const AssetFingerprint = (value: string): AssetFingerprint => typedBech32
  * @param assetName The native asset name.
  */
 AssetFingerprint.fromParts = (policyId: PolicyId, assetName: AssetName): AssetFingerprint => {
-  const cip14Fingerprint = cip14.fromParts(Buffer.from(policyId, 'hex'), Buffer.from(assetName, 'hex'));
+  const policyBuf = Buffer.from(policyId, 'hex');
+  const assetNameBuf = Buffer.from(assetName, 'hex');
+  const hexDigest = HexBlob(
+    Crypto.blake2b(20)
+      .update(new Uint8Array([...policyBuf, ...assetNameBuf]))
+      .digest('hex')
+  );
 
-  return AssetFingerprint(cip14Fingerprint.fingerprint());
+  return AssetFingerprint(HexBlob.toTypedBech32<string>('asset', hexDigest));
 };

@@ -326,6 +326,50 @@ describe('TransactionsTracker', () => {
       });
     });
 
+    it('emits phase 2 validation on-chain transactions as failed$', async () => {
+      const outgoingTx = toOutgoingTx(queryTransactionsResult.pageResults[0]);
+      const phase2FailedTx: Cardano.HydratedTx = {
+        ...queryTransactionsResult.pageResults[0],
+        inputSource: Cardano.InputSource.collaterals
+      };
+
+      createTestScheduler().run(({ cold, hot, expectObservable }) => {
+        const tip$ = hot<Cardano.Tip>('-----|');
+        const submitting$ = cold('-a---|', { a: outgoingTx });
+        const pending$ = cold('--a--|', { a: outgoingTx });
+        const transactionsSource$ = cold<Cardano.HydratedTx[]>('a--b-|', { a: [], b: [phase2FailedTx] });
+        const failedToSubmit$ = hot<FailedTx>('-----|');
+
+        const transactionsTracker = createTransactionsTracker(
+          {
+            addresses$,
+            chainHistoryProvider,
+            inFlightTransactionsStore,
+            logger,
+            newTransactions: {
+              failedToSubmit$,
+              pending$,
+              submitting$
+            },
+            retryBackoffConfig,
+            tip$,
+            transactionsHistoryStore: transactionsStore
+          },
+          {
+            rollback$: NEVER,
+            transactionsSource$
+          }
+        );
+        expectObservable(transactionsTracker.outgoing.submitting$).toBe('-a---|', { a: outgoingTx });
+        expectObservable(transactionsTracker.outgoing.pending$).toBe('--a--|', { a: outgoingTx });
+        expectObservable(transactionsTracker.outgoing.inFlight$).toBe('ab-c-|', { a: [], b: [outgoingTx], c: [] });
+        expectObservable(transactionsTracker.outgoing.confirmed$).toBe('-----|');
+        expectObservable(transactionsTracker.outgoing.failed$).toBe('---a-|', {
+          a: { reason: TransactionFailure.Phase2Validation, ...outgoingTx }
+        });
+      });
+    });
+
     it('emits at all relevant observable properties on transaction that failed to submit and merges reemit failures', async () => {
       const outgoingTx = toOutgoingTx(queryTransactionsResult.pageResults[0]);
       const outgoingTxReemit = toOutgoingTx(queryTransactionsResult.pageResults[1]);

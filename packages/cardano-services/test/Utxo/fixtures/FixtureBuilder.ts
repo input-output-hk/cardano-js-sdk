@@ -22,7 +22,7 @@ export class UtxoFixtureBuilder {
   public async getAddresses(
     desiredQty: number,
     options?: { with?: AddressWith[]; scriptType?: string }
-  ): Promise<Cardano.Address[]> {
+  ): Promise<Cardano.PaymentAddress[]> {
     this.#logger.debug(`About to fetch up to ${desiredQty} addresses`);
 
     let result: QueryResult<{ address: string }>;
@@ -54,6 +54,6 @@ export class UtxoFixtureBuilder {
       this.#logger.warn(`${desiredQty} distinct addresses desired, only ${resultsQty} results found`);
     }
 
-    return result!.rows.map(({ address }) => address as unknown as Cardano.Address);
+    return result!.rows.map(({ address }) => address as unknown as Cardano.PaymentAddress);
   }
 }

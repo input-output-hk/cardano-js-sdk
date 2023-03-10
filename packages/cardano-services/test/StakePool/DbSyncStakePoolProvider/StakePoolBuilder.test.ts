@@ -88,7 +88,7 @@ describe('StakePoolBuilder', () => {
     const totalAda = '42021479194505231';
     describe('sort', () => {
       it('by default sort', async () => {
-        const metrics = (await builder.queryPoolMetrics(hashIds, totalAda)).map((m) => m.metrics);
+        const metrics = (await builder.queryPoolMetrics(hashIds, totalAda, false)).map((m) => m.metrics);
         expect(metrics).toHaveLength(3);
 
         expect(metrics).toHaveLength(3);
@@ -96,7 +96,7 @@ describe('StakePoolBuilder', () => {
       });
       it('by saturation', async () => {
         const metrics = (
-          await builder.queryPoolMetrics(hashIds, totalAda, {
+          await builder.queryPoolMetrics(hashIds, totalAda, false, {
             pagination,
             sort: { field: 'saturation', order: 'asc' }
           })
@@ -109,7 +109,7 @@ describe('StakePoolBuilder', () => {
     describe('pagination', () => {
       it('with limit', async () => {
         const metrics = (
-          await builder.queryPoolMetrics(hashIds, totalAda, { pagination: { limit: 2, startAt: 0 } })
+          await builder.queryPoolMetrics(hashIds, totalAda, false, { pagination: { limit: 2, startAt: 0 } })
         ).map((m) => m.metrics);
         expect(metrics).toHaveLength(2);
 
@@ -117,7 +117,7 @@ describe('StakePoolBuilder', () => {
       });
       it('with startAt', async () => {
         const metrics = (
-          await builder.queryPoolMetrics(hashIds, totalAda, { pagination: { limit: 3, startAt: 1 } })
+          await builder.queryPoolMetrics(hashIds, totalAda, false, { pagination: { limit: 3, startAt: 1 } })
         ).map((m) => m.metrics);
         expect(metrics).toHaveLength(2);
 
@@ -128,7 +128,7 @@ describe('StakePoolBuilder', () => {
   describe('queryPoolData', () => {
     describe('sort', () => {
       it('by default sort (name asc)', async () => {
-        const pools = (await builder.queryPoolData(hashIds)).map((qR) => {
+        const pools = (await builder.queryPoolData(hashIds, false)).map((qR) => {
           const { hashId, updateId, ...poolData } = qR;
           return poolData;
         });
@@ -137,7 +137,7 @@ describe('StakePoolBuilder', () => {
       });
       it('by name desc', async () => {
         const pools = (
-          await builder.queryPoolData(hashIds, { pagination, sort: { field: 'name', order: 'desc' } })
+          await builder.queryPoolData(hashIds, false, { pagination, sort: { field: 'name', order: 'desc' } })
         ).map((qR) => {
           const { hashId: _1, updateId: _2, ...poolData } = qR;
           return poolData;
@@ -147,7 +147,7 @@ describe('StakePoolBuilder', () => {
       });
       it('by real-world cost considering fixed cost and margin when specifying sort by cost desc', async () => {
         const pools = (
-          await builder.queryPoolData(hashIds, { pagination, sort: { field: 'cost', order: 'desc' } })
+          await builder.queryPoolData(hashIds, false, { pagination, sort: { field: 'cost', order: 'desc' } })
         ).map((qR) => {
           const { hashId: _1, updateId: _2, ...poolData } = qR;
           return poolData;
@@ -156,12 +156,12 @@ describe('StakePoolBuilder', () => {
         expect(pools[0]).toMatchShapeOf(DataMocks.Pool.info);
       });
       it('by real-world cost considering fixed cost and margin when specifying sort by cost asc', async () => {
-        const pools = (await builder.queryPoolData(hashIds, { pagination, sort: { field: 'cost', order: 'asc' } })).map(
-          (qR) => {
-            const { hashId: _1, updateId: _2, ...poolData } = qR;
-            return poolData;
-          }
-        );
+        const pools = (
+          await builder.queryPoolData(hashIds, false, { pagination, sort: { field: 'cost', order: 'asc' } })
+        ).map((qR) => {
+          const { hashId: _1, updateId: _2, ...poolData } = qR;
+          return poolData;
+        });
 
         expect(pools).toHaveLength(3);
         expect(pools[0]).toMatchShapeOf(DataMocks.Pool.info);
@@ -169,27 +169,25 @@ describe('StakePoolBuilder', () => {
     });
     describe('pagination', () => {
       it('with limit', async () => {
-        const pools = (await builder.queryPoolData(hashIds, { pagination: { limit: 3, startAt: 0 } })).map((qR) => {
-          const { hashId, updateId, ...poolData } = qR;
-          return poolData;
-        });
+        const pools = (await builder.queryPoolData(hashIds, false, { pagination: { limit: 3, startAt: 0 } })).map(
+          (qR) => {
+            const { hashId, updateId, ...poolData } = qR;
+            return poolData;
+          }
+        );
         expect(pools.length).toBeGreaterThan(0);
         expect(pools[0]).toMatchShapeOf(DataMocks.Pool.info);
       });
       it('with startAt', async () => {
-        const pools = (await builder.queryPoolData(hashIds, { pagination: { limit: 5, startAt: 2 } })).map((qR) => {
-          const { hashId, updateId, ...poolData } = qR;
-          return poolData;
-        });
+        const pools = (await builder.queryPoolData(hashIds, false, { pagination: { limit: 5, startAt: 2 } })).map(
+          (qR) => {
+            const { hashId, updateId, ...poolData } = qR;
+            return poolData;
+          }
+        );
         expect(pools.length).toBeGreaterThan(0);
         expect(pools[0]).toMatchShapeOf(DataMocks.Pool.info);
       });
-    });
-  });
-  describe('getTotalAmountOfAda', () => {
-    it('getTotalAmountOfAda', async () => {
-      const totalAdaAmount = Number(await builder.getTotalAmountOfAda());
-      expect(totalAdaAmount).toBeGreaterThan(0);
     });
   });
   describe('getLastEpoch', () => {
@@ -274,7 +272,7 @@ describe('StakePoolBuilder', () => {
       const builtQuery = builder.buildOrQuery(filters);
       const { query, params } = builtQuery;
       const poolHashes = await builder.queryPoolHashes(query, params);
-      const totalCount = Number(await builder.queryTotalCount(query, params));
+      const totalCount = poolHashes.length;
       expect(poolHashes.length).toBeGreaterThan(0);
       expect(totalCount).toBeGreaterThan(0);
     });
@@ -284,7 +282,7 @@ describe('StakePoolBuilder', () => {
       const builtQuery = builder.buildAndQuery(filters);
       const { query, params } = builtQuery;
       const poolHashes = await builder.queryPoolHashes(query, params);
-      const totalCount = Number(await builder.queryTotalCount(query, params));
+      const totalCount = poolHashes.length;
       expect(poolHashes).toHaveLength(1);
       expect(totalCount).toBeGreaterThan(0);
     });

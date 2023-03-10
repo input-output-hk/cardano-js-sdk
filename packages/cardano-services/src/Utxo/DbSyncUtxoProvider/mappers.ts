@@ -76,7 +76,7 @@ export const utxosToCore = (utxosModels: UtxoModel[]): Cardano.Utxo[] => {
       }
       utxos.set(utxoId, [txIn, txOut]);
     } else {
-      const address = current.address as unknown as Cardano.Address;
+      const address = current.address as unknown as Cardano.PaymentAddress;
       const txOut: Cardano.TxOut = {
         address,
         value: {

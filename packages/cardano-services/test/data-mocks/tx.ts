@@ -15,7 +15,7 @@ export const valueWithAssets: Cardano.Value = {
 };
 
 export const txOutBase: Omit<Cardano.TxOut, 'value' | 'datum'> = {
-  address: Cardano.Address('addr_test1wrsexavz37208qda7mwwu4k7hcpg26cz0ce86f5e9kul3hqzlh22t')
+  address: Cardano.PaymentAddress('addr_test1wrsexavz37208qda7mwwu4k7hcpg26cz0ce86f5e9kul3hqzlh22t')
 };
 
 export const txOutBaseWithDatum: Omit<Cardano.TxOut, 'value'> = {
@@ -28,7 +28,7 @@ export const txOutWithCoinOnly: Cardano.TxOut = { ...txOutBase, value: valueWith
 export const txOutWithAssets: Cardano.TxOut = { ...txOutBase, value: valueWithAssets };
 
 export const txIn: Cardano.HydratedTxIn = {
-  address: Cardano.Address('addr_test1wrsexavz37208qda7mwwu4k7hcpg26cz0ce86f5e9kul3hqzlh22t'),
+  address: Cardano.PaymentAddress('addr_test1wrsexavz37208qda7mwwu4k7hcpg26cz0ce86f5e9kul3hqzlh22t'),
   index: 0,
   txId: Cardano.TransactionId('cefd2fcf657e5e5d6c35975f4e052f427819391b153ebb16ad8aa107ba5a3819')
 };
@@ -62,7 +62,8 @@ export const base = {
 };
 
 export const withCoinOnly: Cardano.HydratedTx = merge(base, {
-  body: { outputs: [txOutWithCoinOnly] }
+  body: { outputs: [txOutWithCoinOnly] },
+  inputSource: Cardano.InputSource.inputs
 });
 
 export const withAssets: Cardano.HydratedTx = merge(base, {
@@ -70,6 +71,7 @@ export const withAssets: Cardano.HydratedTx = merge(base, {
     ...base.body,
     outputs: [txOutWithAssets]
   },
+  inputSource: Cardano.InputSource.inputs,
   witness: {
     signatures: new Map()
   }
@@ -80,7 +82,8 @@ export const withMint: Cardano.HydratedTx = merge(withAssets, {
     mint: new Map([
       [Cardano.AssetId('57fca08abbaddee36da742a839f7d83a7e1d2419f1507fcbf3916522534245525259'), 10_000_000n]
     ])
-  }
+  },
+  inputSource: Cardano.InputSource.inputs
 });
 
 export const mint: Cardano.TokenMap = new Map([
@@ -92,7 +95,8 @@ export const withAuxiliaryData: Cardano.HydratedTx = merge(withAssets, {
     body: {
       blob: new Map([[1, 'abc']])
     }
-  }
+  },
+  inputSource: Cardano.InputSource.inputs
 });
 
 export const delegationCertificate: Cardano.StakeDelegationCertificate = {
@@ -115,7 +119,8 @@ export const withValidityInterval: Cardano.HydratedTx = merge(withAssets, {
       invalidBefore: 1,
       invalidHereafter: 2
     }
-  }
+  },
+  inputSource: Cardano.InputSource.inputs
 });
 
 export const withdrawals = [
@@ -128,7 +133,8 @@ export const withdrawals = [
 export const withWithdrawals: Cardano.HydratedTx = merge(withAssets, {
   body: {
     withdrawals
-  }
+  },
+  inputSource: Cardano.InputSource.inputs
 });
 
 export const witnessRedeemers = {

@@ -1,0 +1,17 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../dist/cjs"
+  },
+  "references": [
+    {
+      "path": "../../core/src"
+    },
+    {
+      "path": "../../crypto/src"
+    },
+    {
+      "path": "../../util-rxjs/src"
+    }
+  ]
+}

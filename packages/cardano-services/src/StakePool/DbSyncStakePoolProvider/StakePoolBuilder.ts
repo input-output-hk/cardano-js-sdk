@@ -1,13 +1,6 @@
 /* eslint-disable sonarjs/no-nested-template-literals */
 import {
-  Cardano,
-  MultipleChoiceSearchFilter,
-  ProviderError,
-  ProviderFailure,
-  QueryStakePoolsArgs,
-  StakePoolStats
-} from '@cardano-sdk/core';
-import {
+  BlockfrostPoolMetricsModel,
   EpochModel,
   EpochRewardModel,
   OrderByOptions,
@@ -22,14 +15,21 @@ import {
   QueryPoolsApyArgs,
   RelayModel,
   StakePoolStatsModel,
-  SubQuery,
-  TotalAdaModel,
-  TotalCountModel
+  SubQuery
 } from './types';
+import {
+  Cardano,
+  MultipleChoiceSearchFilter,
+  ProviderError,
+  ProviderFailure,
+  QueryStakePoolsArgs,
+  StakePoolStats
+} from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { Pool, QueryResult } from 'pg';
 import {
   mapAddressOwner,
+  mapBlockfrostPoolMetrics,
   mapEpoch,
   mapEpochReward,
   mapPoolAPY,
@@ -43,13 +43,13 @@ import {
 } from './mappers';
 import Queries, {
   addSentenceToQuery,
+  blockfrostQuery,
   buildOrQueryFromClauses,
   findLastEpoch,
   findPoolStats,
   getIdentifierFullJoinClause,
   getIdentifierWhereClause,
   getStatusWhereClause,
-  getTotalCountQueryFromQuery,
   poolsByPledgeMetSubqueries,
   withPagination,
   withSort
@@ -110,14 +110,14 @@ export class StakePoolBuilder {
     return result.rows.map(mapPoolAPY);
   }
 
-  public async queryPoolData(updatesIds: number[], options?: QueryStakePoolsArgs) {
+  public async queryPoolData(updatesIds: number[], useBlockfrost: boolean, options?: QueryStakePoolsArgs) {
     this.#logger.debug('About to query pool data');
     const defaultSort: OrderByOptions[] = [
       { field: 'name', order: 'asc' },
       { field: 'pool_id', order: 'asc' }
     ];
     const queryWithSortAndPagination = withPagination(
-      withSort(Queries.findPoolsData, options?.sort, defaultSort),
+      withSort(useBlockfrost ? Queries.findBlockfrostPoolsData : Queries.findPoolsData, options?.sort, defaultSort),
       options?.pagination
     );
     const result: QueryResult<PoolDataModel> = await this.#db.query(queryWithSortAndPagination, [updatesIds]);
@@ -131,15 +131,30 @@ export class StakePoolBuilder {
     return result.rows.length > 0 ? result.rows.map(mapPoolUpdate) : [];
   }
 
-  public async queryPoolMetrics(hashesIds: number[], totalAdaAmount: string, options?: QueryStakePoolsArgs) {
+  public async queryPoolMetrics(
+    hashesIds: number[],
+    totalStake: string,
+    useBlockfrost: boolean,
+    options?: QueryStakePoolsArgs
+  ) {
     this.#logger.debug('About to query pool metrics');
+
+    if (useBlockfrost) {
+      const queryWithSortAndPagination = withPagination(
+        withSort(Queries.findBlockfrostPoolsMetrics, options?.sort, [{ field: 'saturation', order: 'desc' }]),
+        options?.pagination
+      );
+      const result = await this.#db.query<BlockfrostPoolMetricsModel>(queryWithSortAndPagination, [hashesIds]);
+      return result.rows.map(mapBlockfrostPoolMetrics);
+    }
+
     const queryWithSortAndPagination = withPagination(
       withSort(Queries.findPoolsMetrics, options?.sort, [{ field: 'saturation', order: 'desc' }]),
       options?.pagination
     );
     const result: QueryResult<PoolMetricsModel> = await this.#db.query(queryWithSortAndPagination, [
       hashesIds,
-      totalAdaAmount
+      totalStake
     ]);
     return result.rows.length > 0 ? result.rows.map(mapPoolMetrics) : [];
   }
@@ -195,12 +210,6 @@ export class StakePoolBuilder {
     const lastEpoch = result.rows[0];
     if (!lastEpoch) throw new ProviderError(ProviderFailure.Unknown, null, "Couldn't find last epoch");
     return mapEpoch(lastEpoch);
-  }
-
-  public async getTotalAmountOfAda() {
-    this.#logger.debug('About to query total ada amount');
-    const result: QueryResult<TotalAdaModel> = await this.#db.query(Queries.findTotalAda);
-    return result.rows[0].total_ada;
   }
 
   public buildOrQuery(filters: QueryStakePoolsArgs['filters']) {
@@ -285,18 +294,48 @@ export class StakePoolBuilder {
     return { params, query };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async queryTotalCount(query: string, _params: any[]) {
-    this.#logger.debug('About to get total count of pools');
-    const result: QueryResult<TotalCountModel> = await this.#db.query(getTotalCountQueryFromQuery(query), _params);
-    return result.rows[0].total_count;
-  }
-
   public async queryPoolStats(): Promise<StakePoolStats> {
     this.#logger.debug('About to get pool stats');
     const result: QueryResult<StakePoolStatsModel> = await this.#db.query(findPoolStats);
     const poolStats = result.rows[0];
     if (!poolStats) throw new ProviderError(ProviderFailure.Unknown, null, "Couldn't fetch pool stats");
     return mapPoolStats(poolStats);
+  }
+
+  public buildBlockfrostQuery(filters: QueryStakePoolsArgs['filters']): { params: string[]; query: string } {
+    const query = blockfrostQuery.SELECT;
+    let params: string[] = [];
+
+    if (!filters) return { params, query };
+
+    const { _condition, identifier, pledgeMet, status } = filters;
+    const clauses: string[] = [query];
+    const whereConditions: string[] = [];
+
+    if (identifier || pledgeMet !== undefined) clauses.push(blockfrostQuery.identifierOrPledge.JOIN);
+
+    if (identifier) {
+      let where: string;
+      ({ params, where } = getIdentifierWhereClause(filters!.identifier!));
+
+      clauses.push(blockfrostQuery.identifier.JOIN);
+      whereConditions.push(where);
+    }
+
+    if (pledgeMet !== undefined || status) clauses.push(blockfrostQuery.pledgeOrStatus.JOIN);
+
+    if (pledgeMet !== undefined) whereConditions.push(blockfrostQuery.pledge.WHERE(pledgeMet));
+
+    if (status) whereConditions.push(blockfrostQuery.status.WHERE(status));
+
+    // this happens when an empty object is provided as filter parameter
+    if (whereConditions.length === 0) return { params, query };
+
+    return {
+      params,
+      query: `${clauses.join('')}
+WHERE
+  ${whereConditions.join(` ${_condition === 'or' ? 'OR' : 'AND'}\n  `)}`
+    };
   }
 }

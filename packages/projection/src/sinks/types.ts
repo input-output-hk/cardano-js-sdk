@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Cardano } from '@cardano-sdk/core';
 import { Observable } from 'rxjs';
 import { ProjectionExtraProps } from '../projections';
-import { RollForwardEvent, UnifiedProjectorEvent } from '../types';
+import { Shutdown } from '@cardano-sdk/util';
+import { UnifiedProjectorEvent, UnifiedProjectorOperator } from '../types';
 import { WithNetworkInfo } from '../operators';
 
 /**
@@ -14,7 +16,7 @@ import { WithNetworkInfo } from '../operators';
  * Implementations should have a strategy for deleting blocks outside of the stability window.
  * Implementations are not expected to keep exactly the required # of blocks (having more blocks is ok).
  */
-export interface StabilityWindowBuffer<E extends WithNetworkInfo> {
+export interface StabilityWindowBuffer<E extends WithNetworkInfo> extends Shutdown {
   /**
    * Observable that emits current tip stored in stability window buffer.
    * 'origin' when buffer is empty.
@@ -27,19 +29,13 @@ export interface StabilityWindowBuffer<E extends WithNetworkInfo> {
    */
   tail$: Observable<Cardano.Block | 'origin'>;
   /**
-   * @param evt block to add to the buffer
-   * @returns Observable that completes once the block is added.
-   */
-  rollForward(block: RollForwardEvent<E>): Observable<void>;
-  /**
-   * Delete a block from the buffer.
+   * RxJS operator that applies each event to the buffer:
+   * - adds a new block on RollForward
+   * - deletes the block on RollBackward
    *
-   * This should be called when rollback of the block is handled (e.g. when deleting data from the database).
-   * Projection rollback and deleting the block from the buffer should be implemented as atomic operation.
-   *
-   * @returns Observable that completes once the block is deleted.
+   * Buffer must emit new tip$ after each 'apply' takes effect.
    */
-  deleteBlock(evt: Cardano.Block): Observable<void>;
+  handleEvents: UnifiedProjectorOperator<E, E>;
 }
 
 export interface Sink<P, SinkSpecificProps = {}> {
@@ -50,7 +46,6 @@ export type ProjectionSinks<Projections> = {
   [k in keyof Projections]: Sink<Projections[k]>;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type SinkLifecycleOperator = (evt$: Observable<any>) => Observable<any>;
 
 export type Sinks<Projections> = {
@@ -59,3 +54,8 @@ export type Sinks<Projections> = {
   before?: SinkLifecycleOperator;
   after?: SinkLifecycleOperator;
 };
+
+type InferArg<T> = T extends (arg: infer Arg) => any ? Arg : never;
+export type SinkEventType<S extends { sink: any }> = InferArg<S['sink']>;
+
+export type SinksFactory<P> = () => Sinks<P>;

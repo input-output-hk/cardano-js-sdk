@@ -23,10 +23,10 @@ The services require instances of [Cardano Node] and [Ogmios] as a minimum, with
 [docker-compose.json](./docker-compose.yml) for the current supported version of each service
 dependency.
 
-### HTTP Server
+### Provider Server
 
-The HTTP server can be started with one or more provider modules by name, segmented by URL path.
-Run the [CLI] with `start-server --help` to see the full list of options.
+The Provider server can be started with one or more services by name, segmented by URL path.
+Run the [CLI] with `start-provider-server --help` to see the full list of options.
 
 ### Worker
 
@@ -44,11 +44,11 @@ _The following examples require the [install and build] steps to be completed._
 - Connects to [PostgreSQL] service running at `localhost:5432`
 - HTTP API exposed using a custom API URL
 
-**`start-server` using CLI options:**
+**`start-provider-server` using CLI options:**
 
 ```bash
 ./dist/cjs/cli.js \
-  start-server \
+  start-provider-server \
     --api-url http://localhost:6000 \
     --cardano-node-config-path ./config/network/preprod/cardano-node/config.json \
     --postgres-connection-string postgresql://somePgUser:somePassword@localhost:5432/someDbName \
@@ -56,7 +56,7 @@ _The following examples require the [install and build] steps to be completed._
     asset chain-history stake-pool tx-submit network-info utxo rewards
 ```
 
-**`start-server` using env variables:**
+**`start-provider-server` using env variables:**
 
 ```bash
 SERVICE_NAMES=asset,chain-history,stake-pool,tx-submit,network-info,utxo,rewards \
@@ -64,7 +64,7 @@ API_URL=http://localhost:6000 \
 CARDANO_NODE_CONFIG_PATH=./config/network/preprod/cardano-node/config.json \
 POSTGRES_CONNECTION_STRING=postgresql://somePgUser:somePassword@localhost:5432/someDbName \
 OGMIOS_URL=ws://localhost:1338 \
-./dist/cjs/cli.js start-server
+./dist/cjs/cli.js start-provider-server
 ```
 
 #### All Providers | Service Discovery | Queued Tx Submission | Metrics
@@ -77,11 +77,11 @@ OGMIOS_URL=ws://localhost:1338 \
 - HTTP API exposed using a custom API URL
 - Prometheus metrics exporter enabled at http://localhost:6000/metrics
 
-**`start-server` using CLI options:**
+**`start-provider-server` using CLI options:**
 
 ```bash
 ./dist/cjs/cli.js \
-  start-server \
+  start-provider-server \
     --api-url http://localhost:6000 \
     --enable-metrics \
     --cardano-node-config-path ./config/network/preprod/cardano-node/config.json \
@@ -95,7 +95,7 @@ OGMIOS_URL=ws://localhost:1338 \
     asset chain-history stake-pool tx-submit network-info utxo rewards
 ```
 
-**`start-server` using env variables:**
+**`start-provider-server` using env variables:**
 
 ```bash
 SERVICE_NAMES=asset,chain-history,stake-pool,tx-submit,network-info,utxo,rewards \
@@ -109,7 +109,7 @@ POSTGRES_PASSWORD=somePassword \
 OGMIOS_SRV_SERVICE_NAME=some-domain-for-ogmios \
 RABBITMQ_SRV_SERVICE_NAME=some-domain-for-rabbitmq \
 USE_QUEUE=true \
-./dist/cjs/cli.js start-server
+./dist/cjs/cli.js start-provider-server
 ```
 
 **`start-worker` using CLI options:**

@@ -37,6 +37,7 @@ export interface TxModel {
   index: number;
   size: number;
   fee: string;
+  valid_contract: boolean;
   invalid_before: string | null;
   invalid_hereafter: string | null;
   block_no: number;
@@ -53,7 +54,7 @@ export interface TxInputModel {
 }
 
 export interface TxInput {
-  address: Cardano.Address;
+  address: Cardano.PaymentAddress;
   id: string;
   index: number;
   txInputId: Cardano.TransactionId;

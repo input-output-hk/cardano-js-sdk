@@ -22,9 +22,7 @@ import {
   NotImplementedError,
   ProviderUtil,
   SerializationError,
-  SerializationFailure,
-  addressNetworkId,
-  createRewardAccount
+  SerializationFailure
 } from '@cardano-sdk/core';
 import { Schema } from '@cardano-ogmios/client';
 import Fraction from 'fraction.js';
@@ -66,7 +64,7 @@ const mapPoolParameters = (poolParameters: Schema.PoolParameters): Cardano.PoolP
         }
       : undefined,
     owners: poolParameters.owners.map((ownerKeyHash) =>
-      createRewardAccount(Crypto.Ed25519KeyHashHex(ownerKeyHash), addressNetworkId(rewardAccount))
+      Cardano.createRewardAccount(Crypto.Ed25519KeyHashHex(ownerKeyHash), Cardano.addressNetworkId(rewardAccount))
     ),
     relays: poolParameters.relays.map(mapRelay),
     rewardAccount,
@@ -262,7 +260,7 @@ const mapDatumHash = (datum: Schema.TxOut['datumHash']) => {
 };
 
 const mapTxOut = (txOut: Schema.TxOut): Cardano.TxOut => ({
-  address: Cardano.Address(txOut.address),
+  address: Cardano.PaymentAddress(txOut.address),
   datum: mapInlineDatum(txOut.datum),
   datumHash: mapDatumHash(txOut.datumHash),
   scriptReference: txOut.script ? mapScript(txOut.script) : undefined,
@@ -294,7 +292,7 @@ const mapValidityInterval = ({
   invalidHereafter: invalidHereafter ? Cardano.Slot(invalidHereafter) : undefined
 });
 
-const mapCommonTx = (tx: CommonBlock['body'][0], kind: BlockKind): Cardano.Tx => ({
+const mapCommonTx = (tx: CommonBlock['body'][0], kind: BlockKind): Cardano.OnChainTx => ({
   auxiliaryData: mapAuxiliaryData(tx.metadata),
   body: {
     certificates: tx.body.certificates.map(mapCertificate),
@@ -316,6 +314,9 @@ const mapCommonTx = (tx: CommonBlock['body'][0], kind: BlockKind): Cardano.Tx =>
     }))
   },
   id: Cardano.TransactionId(tx.id),
+  inputSource: isAlonzoOrAbove(kind)
+    ? Cardano.InputSource[(tx as Schema.TxAlonzo).inputSource]
+    : Cardano.InputSource.inputs,
   witness: {
     bootstrap: tx.witness.bootstrap.map(mapBootstrapWitness),
     datums: isAlonzoOrAbove(kind)
@@ -342,13 +343,14 @@ export const mapByronTxFee = ({ raw }: Schema.TxByron) => {
   return BigInt(BYRON_TX_FEE_COEFFICIENT * txSize + BYRON_TX_FEE_CONSTANT);
 };
 
-const mapByronTx = (tx: Schema.TxByron): Cardano.Tx => ({
+const mapByronTx = (tx: Schema.TxByron): Cardano.OnChainTx => ({
   body: {
     fee: mapByronTxFee(tx),
     inputs: tx.body.inputs.map(mapTxIn),
     outputs: tx.body.outputs.map(mapTxOut)
   },
   id: Cardano.TransactionId(tx.id),
+  inputSource: Cardano.InputSource.inputs,
   witness: {
     signatures: new Map()
   }

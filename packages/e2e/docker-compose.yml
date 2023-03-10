@@ -154,12 +154,12 @@ services:
         condition: service_healthy
     volumes:
       - rabbitmq-db:/var/lib/rabbitmq/mnesia
-  http-server:
+  provider-server:
     build:
       args:
         - NETWORK=${NETWORK:-mainnet}
       context: ../../
-      target: http-server
+      target: provider-server
     environment:
       - DB_CACHE_TTL=${DB_CACHE_TTL:-7200}
       - EPOCH_POLL_INTERVAL=${EPOCH_POLL_INTERVAL:-500}

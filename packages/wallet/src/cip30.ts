@@ -13,11 +13,12 @@ import {
   TxSignErrorCode,
   WalletApi
 } from '@cardano-sdk/dapp-connector';
-import { CML, Cardano, TxCBOR, cmlToCore, coreToCml, parseCmlAddress } from '@cardano-sdk/core';
+import { CML, Cardano, TxCBOR, cmlToCore, coreToCml } from '@cardano-sdk/core';
 import { HexBlob, ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
 import { Observable, firstValueFrom } from 'rxjs';
 import { ObservableWallet } from './types';
+import { requiresForeignSignatures } from './services';
 
 export type Cip30WalletDependencies = {
   logger: Logger;
@@ -32,7 +33,7 @@ export enum Cip30ConfirmationCallbackType {
 export type SignDataCallbackParams = {
   type: Cip30ConfirmationCallbackType.SignData;
   data: {
-    addr: Cardano.Address;
+    addr: Cardano.PaymentAddress;
     payload: HexBlob;
   };
 };
@@ -82,14 +83,14 @@ const compareUtxos = (utxo: Cardano.Utxo, comparedTo: Cardano.Utxo) => {
   return 0;
 };
 
-const cardanoAddressToCbor = (address: Cardano.Address | Cardano.RewardAccount): Cbor =>
-  usingAutoFree((scope) => {
-    const cmlAddr = parseCmlAddress(scope, address);
-    if (!cmlAddr) {
-      throw new ApiError(APIErrorCode.InternalError, `could not transform address ${address} to CBOR`);
-    }
-    return Buffer.from(cmlAddr.to_bytes()).toString('hex');
-  });
+const cardanoAddressToCbor = (address: Cardano.PaymentAddress | Cardano.RewardAccount): Cbor => {
+  const addr = Cardano.Address.fromString(address);
+
+  if (!addr) {
+    throw new ApiError(APIErrorCode.InternalError, `could not transform address ${address} to CBOR`);
+  }
+  return addr.toBytes();
+};
 
 const formatUnknownError = (error: unknown): string => (error as Error)?.message || 'Unknown error';
 
@@ -255,10 +256,10 @@ export const createWalletApi = (
     scope.dispose();
     return cbor;
   },
-  signData: async (addr: Cardano.Address | Bytes, payload: Bytes): Promise<Cip30DataSignature> => {
+  signData: async (addr: Cardano.PaymentAddress | Bytes, payload: Bytes): Promise<Cip30DataSignature> => {
     logger.debug('signData');
     const hexBlobPayload = HexBlob(payload);
-    const signWith = Cardano.Address(addr);
+    const signWith = Cardano.PaymentAddress(addr);
 
     const shouldProceed = await confirmationCallback({
       data: {
@@ -278,7 +279,7 @@ export const createWalletApi = (
     logger.debug('sign data declined');
     throw new DataSignError(DataSignErrorCode.UserDeclined, 'user declined signing');
   },
-  signTx: async (tx: Cbor, _partialSign?: Boolean): Promise<Cbor> => {
+  signTx: async (tx: Cbor, partialSign?: Boolean): Promise<Cbor> => {
     const scope = new ManagedFreeableScope();
     logger.debug('signTx');
     const txDecoded = scope.manage(CML.Transaction.from_bytes(Buffer.from(tx, 'hex')));
@@ -293,18 +294,38 @@ export const createWalletApi = (
     if (shouldProceed) {
       const wallet = await firstValueFrom(wallet$);
       try {
+        const needsForeignSignature = await requiresForeignSignatures(coreTx, wallet);
+
+        // If partialSign is false and the wallet could not sign the entire transaction
+        if (!partialSign && needsForeignSignature)
+          throw new DataSignError(
+            DataSignErrorCode.ProofGeneration,
+            'The wallet does not have the secret key associated with some of the inputs or certificates.'
+          );
         const {
           witness: { signatures }
         } = await wallet.finalizeTx({ tx: { ...coreTx, hash } });
+
+        // If partialSign is true, the wallet only tries to sign what it can. However, if
+        // signatures size is 0 then throw.
+        if (partialSign && signatures.size === 0) {
+          throw new DataSignError(
+            DataSignErrorCode.ProofGeneration,
+            'The wallet does not have the secret key associated with any of the inputs and certificates.'
+          );
+        }
 
         const cslWitnessSet = scope.manage(coreToCml.witnessSet(scope, { signatures }));
         const cbor = Buffer.from(cslWitnessSet.to_bytes()).toString('hex');
         return Promise.resolve(cbor);
       } catch (error) {
         logger.error(error);
-        // TODO: handle ProofGeneration errors?
-        const message = formatUnknownError(error);
-        throw new TxSignError(TxSignErrorCode.UserDeclined, message);
+        if (error instanceof DataSignError) {
+          throw error;
+        } else {
+          const message = formatUnknownError(error);
+          throw new TxSignError(TxSignErrorCode.UserDeclined, message);
+        }
       } finally {
         scope.dispose();
       }
@@ -328,7 +349,8 @@ export const createWalletApi = (
         return tx.id;
       } catch (error) {
         logger.error(error);
-        throw error;
+        const info = error instanceof Error ? error.message : 'unknown';
+        throw new TxSendError(TxSendErrorCode.Failure, info);
       }
     } else {
       logger.debug('transaction refused');

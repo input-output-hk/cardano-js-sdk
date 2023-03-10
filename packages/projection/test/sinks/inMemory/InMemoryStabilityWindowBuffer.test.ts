@@ -1,8 +1,8 @@
-import { Cardano, Seconds } from '@cardano-sdk/core';
-import { InMemory, RollForwardEvent } from '../../../src';
+import { Cardano, ChainSyncEventType, Seconds } from '@cardano-sdk/core';
+import { InMemory, UnifiedProjectorEvent } from '../../../src';
 import { WithNetworkInfo } from '../../../src/operators';
-import { firstValueFrom, take, toArray } from 'rxjs';
-import { genesisToEraSummary } from '../../events/genesisToEraSummary';
+import { firstValueFrom, from, take, toArray } from 'rxjs';
+import { genesisToEraSummary } from '@cardano-sdk/util-dev';
 import { stubBlockId } from '../../util';
 
 const genesisParameters = {
@@ -13,7 +13,7 @@ const genesisParameters = {
   slotLength: Seconds(1)
 } as Cardano.CompactGenesis;
 
-const event = (slotNo: number) =>
+const event = (slotNo: number, eventType?: ChainSyncEventType) =>
   ({
     block: {
       header: {
@@ -22,8 +22,9 @@ const event = (slotNo: number) =>
       }
     },
     eraSummaries: [genesisToEraSummary(genesisParameters)],
+    eventType,
     genesisParameters
-  } as RollForwardEvent<WithNetworkInfo>);
+  } as UnifiedProjectorEvent<WithNetworkInfo>);
 
 describe('InMemoryStabilityWindowBuffer', () => {
   let buffer: InMemory.InMemoryStabilityWindowBuffer<WithNetworkInfo>;
@@ -35,15 +36,21 @@ describe('InMemoryStabilityWindowBuffer', () => {
   it('emits tip$ and tail$ when adding and deleting blocks', async () => {
     const tips = firstValueFrom(buffer.tip$.pipe(take(10), toArray()));
     const tails = firstValueFrom(buffer.tail$.pipe(take(5), toArray()));
-    buffer.rollForward(event(1));
-    buffer.deleteBlock(event(1).block);
-    buffer.rollForward(event(1));
-    buffer.rollForward(event(2));
-    buffer.deleteBlock(event(2).block);
-    buffer.rollForward(event(2));
-    buffer.rollForward(event(3));
-    buffer.rollForward(event(4));
-    buffer.rollForward(event(5));
+    buffer
+      .handleEvents(
+        from([
+          event(1, ChainSyncEventType.RollForward),
+          event(1, ChainSyncEventType.RollBackward),
+          event(1, ChainSyncEventType.RollForward),
+          event(2, ChainSyncEventType.RollForward),
+          event(2, ChainSyncEventType.RollBackward),
+          event(2, ChainSyncEventType.RollForward),
+          event(3, ChainSyncEventType.RollForward),
+          event(4, ChainSyncEventType.RollForward),
+          event(5, ChainSyncEventType.RollForward)
+        ])
+      )
+      .subscribe();
     expect(await tips).toEqual([
       'origin',
       event(1).block,

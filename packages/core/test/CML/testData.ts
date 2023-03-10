@@ -88,21 +88,21 @@ export const txIn = {
 };
 
 export const txInWithAddress: Cardano.HydratedTxIn = {
-  address: Cardano.Address(
+  address: Cardano.PaymentAddress(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
   ...txIn
 };
 
 export const txOut: Cardano.TxOut = {
-  address: Cardano.Address(
+  address: Cardano.PaymentAddress(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
   value: valueWithAssets
 };
 
 export const invalidBabbageTxOut: Cardano.TxOut = {
-  address: Cardano.Address(
+  address: Cardano.PaymentAddress(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
   datum: HexBlob('187b'),
@@ -112,7 +112,7 @@ export const invalidBabbageTxOut: Cardano.TxOut = {
 };
 
 export const babbageTxOutWithDatumHash: Cardano.TxOut = {
-  address: Cardano.Address(
+  address: Cardano.PaymentAddress(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
   datumHash: Crypto.Hash32ByteBase16('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'),
@@ -121,7 +121,7 @@ export const babbageTxOutWithDatumHash: Cardano.TxOut = {
 };
 
 export const babbageTxOutWithInlineDatum: Cardano.TxOut = {
-  address: Cardano.Address(
+  address: Cardano.PaymentAddress(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
   datum: HexBlob('187b'),
@@ -130,12 +130,12 @@ export const babbageTxOutWithInlineDatum: Cardano.TxOut = {
 };
 
 export const txOutWithByron: Cardano.TxOut = {
-  address: Cardano.Address('5oP9ib6ym3Xc2XrPGC6S7AaJeHYBCmLjt98bnjKR58xXDhSDgLHr8tht3apMDXf2Mg'),
+  address: Cardano.PaymentAddress('5oP9ib6ym3Xc2XrPGC6S7AaJeHYBCmLjt98bnjKR58xXDhSDgLHr8tht3apMDXf2Mg'),
   value: valueWithAssets
 };
 
 export const txOutWithDatum: Cardano.TxOut = {
-  address: Cardano.Address(
+  address: Cardano.PaymentAddress(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
   datumHash: Crypto.Hash32ByteBase16('4c94610a582b748b8db506abb45ccd48d0d4934942daa87d191645b947a547a7'),
@@ -207,6 +207,7 @@ export const tx: Cardano.Tx = {
   },
   body: txBody,
   id: Cardano.TransactionId('8d2feeab1087e0aa4ad06e878c5269eaa2edcef5264bcc97542a28c189b2cbc5'),
+  isValid: true,
   witness: {
     // bootstrap values from ogmios.wsp.json
     bootstrap: [

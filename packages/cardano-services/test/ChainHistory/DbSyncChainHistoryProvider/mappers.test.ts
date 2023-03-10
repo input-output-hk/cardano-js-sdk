@@ -49,7 +49,7 @@ const baseCertModel: CertificateModel = {
 };
 
 const txInput: TxInput = {
-  address: Cardano.Address(address),
+  address: Cardano.PaymentAddress(address),
   id: '1',
   index: 1,
   txInputId: Cardano.TransactionId(transactionHash),
@@ -65,7 +65,7 @@ const txInputModel: TxInputModel = {
 };
 
 const txOutput: TxOutput = {
-  address: Cardano.Address(address),
+  address: Cardano.PaymentAddress(address),
   datumHash: Hash32ByteBase16(hash32ByteBase16),
   index: 1,
   txId: Cardano.TransactionId(transactionHash),
@@ -109,7 +109,8 @@ const txModel: TxModel = {
   index: 1,
   invalid_before: '300',
   invalid_hereafter: '500',
-  size: 20
+  size: 20,
+  valid_contract: true
 };
 
 describe('chain history mappers', () => {
@@ -300,9 +301,11 @@ describe('chain history mappers', () => {
   });
   describe('mapTxAlonzo', () => {
     const inputs: Cardano.HydratedTxIn[] = [
-      { address: Cardano.Address(address), index: 1, txId: Cardano.TransactionId(transactionHash) }
+      { address: Cardano.PaymentAddress(address), index: 1, txId: Cardano.TransactionId(transactionHash) }
     ];
-    const outputs: Cardano.TxOut[] = [{ address: Cardano.Address(address), value: { assets, coins: 20_000_000n } }];
+    const outputs: Cardano.TxOut[] = [
+      { address: Cardano.PaymentAddress(address), value: { assets, coins: 20_000_000n } }
+    ];
     const redeemers: Cardano.Redeemer[] = [
       {
         data: HexBlob(hash28ByteBase16),
@@ -313,6 +316,8 @@ describe('chain history mappers', () => {
     ];
     const withdrawals: Cardano.Withdrawal[] = [{ quantity: 200n, stakeAddress: Cardano.RewardAccount(stakeAddress) }];
     const metadata: Cardano.TxMetadata = new Map([[1n, 'data']]);
+    const inputSource = Cardano.InputSource.inputs;
+
     const certificates: Cardano.Certificate[] = [
       {
         __typename: Cardano.CertificateType.StakeKeyRegistration,
@@ -330,17 +335,18 @@ describe('chain history mappers', () => {
       },
       id: Cardano.TransactionId(transactionHash),
       index: 1,
+      inputSource: Cardano.InputSource.inputs,
       txSize: 20,
       witness: { signatures: new Map() }
     };
     test('map TxModel to Cardano.HydratedTx with minimal data', () => {
-      const result = mappers.mapTxAlonzo(txModel, { inputs, outputs });
+      const result = mappers.mapTxAlonzo(txModel, { inputSource, inputs, outputs });
       expect(result).toEqual<Cardano.HydratedTx>(expected);
     });
     test('map TxModel with null fields to Cardano.HydratedTx', () => {
       const result = mappers.mapTxAlonzo(
         { ...txModel, invalid_before: null, invalid_hereafter: null },
-        { inputs, outputs }
+        { inputSource, inputs, outputs }
       );
       expect(result).toEqual<Cardano.HydratedTx>({ ...expected, body: { ...expected.body, validityInterval: {} } });
     });
@@ -348,6 +354,7 @@ describe('chain history mappers', () => {
       const result = mappers.mapTxAlonzo(txModel, {
         certificates,
         collaterals: inputs,
+        inputSource,
         inputs,
         metadata,
         mint: assets,
@@ -367,7 +374,7 @@ describe('chain history mappers', () => {
     test('map txInputModel to TxInput', () => {
       const result = mappers.mapTxInModel(txInputModel);
       expect(result).toEqual<TxInput>({
-        address: Cardano.Address(txInputModel.address),
+        address: Cardano.PaymentAddress(txInputModel.address),
         id: txInputModel.id,
         index: txInputModel.index,
         txInputId: Cardano.TransactionId(transactionHash),
@@ -379,7 +386,7 @@ describe('chain history mappers', () => {
     test('map TxInput to Cardano.HydratedTxIn', () => {
       const result = mappers.mapTxIn(txInput);
       expect(result).toEqual<Cardano.HydratedTxIn>({
-        address: Cardano.Address(address),
+        address: Cardano.PaymentAddress(address),
         index: 1,
         txId: Cardano.TransactionId(sourceTransactionHash)
       });
@@ -389,7 +396,7 @@ describe('chain history mappers', () => {
     test('map TxOutputModel with assets to TxOutput', () => {
       const result = mappers.mapTxOutModel(txOutModel, assets);
       expect(result).toEqual<TxOutput>({
-        address: Cardano.Address(address),
+        address: Cardano.PaymentAddress(address),
         datumHash: Hash32ByteBase16(hash32ByteBase16),
         index: 1,
         txId: Cardano.TransactionId(transactionHash),
@@ -399,7 +406,7 @@ describe('chain history mappers', () => {
     test('map TxOutputModel with no assets to TxOutput', () => {
       const result = mappers.mapTxOutModel(txOutModel);
       expect(result).toEqual<TxOutput>({
-        address: Cardano.Address(address),
+        address: Cardano.PaymentAddress(address),
         datumHash: Hash32ByteBase16(hash32ByteBase16),
         index: 1,
         txId: Cardano.TransactionId(transactionHash),
@@ -409,7 +416,7 @@ describe('chain history mappers', () => {
     test('map TxOutputModel with nulls to TxOutput', () => {
       const result = mappers.mapTxOutModel({ ...txOutModel, datum: null });
       expect(result).toEqual<TxOutput>({
-        address: Cardano.Address(address),
+        address: Cardano.PaymentAddress(address),
         index: 1,
         txId: Cardano.TransactionId(transactionHash),
         value: { coins: 20_000_000n }

@@ -136,6 +136,7 @@ export const findTransactionsByHashes = `
 		tx.fee AS fee,
 		tx.invalid_before AS invalid_before,
 		tx.invalid_hereafter AS invalid_hereafter,
+		tx.valid_contract AS valid_contract,
 		block.block_no AS block_no,
 		block.hash AS block_hash,
 		block.slot_no AS block_slot_no

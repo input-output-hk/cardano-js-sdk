@@ -424,7 +424,9 @@ describe('HttpServer', () => {
       const res = await axios.post(`${apiUrlBase}/health`, {
         headers: { [CONTENT_TYPE]: 'application/json' }
       });
+      const readyRes = await axios.get(`${apiUrlBase}/ready`);
       expect(res.status).toBe(200);
+      expect(readyRes.status).toBe(200);
       expect(res.data).toEqual({
         ok: true,
         services: [
@@ -460,7 +462,11 @@ describe('HttpServer', () => {
       const res = await axios.post(`${apiUrlBase}/health`, {
         headers: { [CONTENT_TYPE]: 'application/json' }
       });
+      const readyRes = await axios.get(`${apiUrlBase}/ready`, {
+        validateStatus: () => true
+      });
       expect(res.status).toBe(200);
+      expect(readyRes.status).toBe(503);
       expect(res.data).toEqual({
         ok: false,
         services: [

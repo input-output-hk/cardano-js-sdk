@@ -8,7 +8,7 @@ import pick from 'lodash/pick';
 
 type EstimateTxFeeWithOriginalOutputs = (utxo: Cardano.Utxo[], change: Cardano.Value[]) => Promise<Cardano.Lovelace>;
 
-const stubMaxSizeAddress = Cardano.Address(
+const stubMaxSizeAddress = Cardano.PaymentAddress(
   'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9'
 );
 
@@ -207,7 +207,22 @@ const pickExtraRandomUtxo = (
   return { utxoRemaining: newUtxoRemaining, utxoSelected: newUtxoSelected };
 };
 
-const coalesceChangeBundlesForMinCoinRequirement = (
+const mergeWithSmallestBundle = (values: Cardano.Value[], index: number): Cardano.Value[] => {
+  let result = [...values];
+  const toBeMerged = result.splice(index, 1)[0];
+
+  if (result.length === 0) return [toBeMerged];
+
+  const last = result.splice(-1, 1)[0];
+  const merged = coalesceValueQuantities([toBeMerged, last]);
+
+  result = [...result, merged];
+  result = orderBy(result, ({ coins }) => coins, 'desc');
+
+  return result;
+};
+
+export const coalesceChangeBundlesForMinCoinRequirement = (
   changeBundles: Cardano.Value[],
   computeMinimumCoinQuantity: ComputeMinimumCoinQuantity
 ): Cardano.Value[] | undefined => {
@@ -230,15 +245,22 @@ const coalesceChangeBundlesForMinCoinRequirement = (
     return value.coins >= computeMinimumCoinQuantity(stubTxOut);
   };
 
-  while (sortedBundles.length > 1 && !satisfiesMinCoinRequirement(sortedBundles[sortedBundles.length - 1])) {
-    const smallestBundle = sortedBundles.pop()!;
-    sortedBundles[sortedBundles.length - 1] = coalesceValueQuantities([
-      sortedBundles[sortedBundles.length - 1],
-      smallestBundle
-    ]);
-    // Re-sort because last bundle is not necessarily the smallest one after merging it
-    sortedBundles = orderBy(sortedBundles, ({ coins }) => coins, 'desc');
+  let allBundlesSatisfyMinCoin = false;
+
+  while (sortedBundles.length > 1 && !allBundlesSatisfyMinCoin) {
+    allBundlesSatisfyMinCoin = true;
+    for (let i = sortedBundles.length - 1; i >= 0; --i) {
+      const satisfies = satisfiesMinCoinRequirement(sortedBundles[i]);
+
+      allBundlesSatisfyMinCoin = allBundlesSatisfyMinCoin && satisfies;
+
+      if (!satisfies) {
+        sortedBundles = mergeWithSmallestBundle(sortedBundles, i);
+        break;
+      }
+    }
   }
+
   if (!satisfiesMinCoinRequirement(sortedBundles[0])) {
     // Coalesced all bundles to 1 and it's still less than min utxo value
     return undefined;

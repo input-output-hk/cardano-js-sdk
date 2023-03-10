@@ -130,20 +130,20 @@ and a good idea is to run following command before starting it.
 $ yarn cleanup && yarn && yarn build
 ```
 
-Restart the http-server:
+Restart the provider-server:
 
 ```bash
-$ docker exec -it local-network-e2e-http-server-1 kill 1
+$ docker exec -it local-network-e2e-provider-server-1 kill 1
 ```
 
-So, if while working on the `core` and `cardano-services` packages simultaneously, we need to restart the http-server
+So, if while working on the `core` and `cardano-services` packages simultaneously, we need to restart the provider-server
 to check the effect of our ongoing changes, it is enough to issue the following command:
 
 ```bash
-$ yarn workspace @cardano-sdk/core build && yarn workspace @cardano-sdk/cardano-services build && docker exec -it local-network-e2e-http-server-1 kill 1
+$ yarn workspace @cardano-sdk/core build && yarn workspace @cardano-sdk/cardano-services build && docker exec -it local-network-e2e-provider-server-1 kill 1
 ```
 
-if it exits with error we need to fix our ongoing changes, if it exits silently, the http-server is now running with our changes.
+if it exits with error we need to fix our ongoing changes, if it exits silently, the provider-server is now running with our changes.
 
 ## Local file server
 

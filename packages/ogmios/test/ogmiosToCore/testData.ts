@@ -1,4 +1,5 @@
 /* eslint-disable max-len */
+import { Cardano } from '@cardano-sdk/core';
 import { Ogmios } from '../../src';
 
 // Mock data extracted using ogmios chain-sync api from the preprod network
@@ -132,7 +133,7 @@ export const mockAlonzoBlock: Ogmios.Schema.Alonzo = {
           withdrawals: {}
         },
         id: 'bb81604e09c4530ad02de6b80a0c13d82949fb307402dd0c2b447e211bdc621d',
-        inputSource: 'inputs',
+        inputSource: Cardano.InputSource.inputs,
         metadata: {
           body: {
             blob: {
@@ -623,7 +624,7 @@ export const mockBabbageBlock: Ogmios.Schema.Babbage = {
           withdrawals: { stake1uxnyv36t3a2rzfs4q6mvyu7nqlr4dxjwkmykkskafg54yzssmuy4z: 724n }
         },
         id: 'c32a4a4f5a4b540d4f79730ca0c658d9a8400be2173e0ba1dc8471004c1cb0db',
-        inputSource: 'collaterals',
+        inputSource: Cardano.InputSource.collaterals,
         metadata: {
           body: { blob: { '2': { string: '\u0013' } }, scripts: [{ native: { startsAt: 63_725 } }] },
           hash: 'bb30a42c1e62f0afda5f0a4e8a562f7a13a24cea00ee81917b86b89e801314aa'

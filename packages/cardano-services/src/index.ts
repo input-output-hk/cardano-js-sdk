@@ -1,4 +1,5 @@
 export * from './Asset';
+export * from './Blockfrost';
 export * from './ChainHistory';
 export * from './Http';
 export * from './InMemoryCache';

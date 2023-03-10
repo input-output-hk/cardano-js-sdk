@@ -6,7 +6,7 @@ import { dummyLogger } from 'ts-log';
 export const mockKeyAgentDependencies = (): jest.Mocked<KeyAgentDependencies> => ({
   bip32Ed25519: new CmlBip32Ed25519(CML),
   inputResolver: {
-    resolveInputAddress: jest.fn().mockResolvedValue(null)
+    resolveInput: jest.fn().mockResolvedValue(null)
   },
   logger: dummyLogger
 });

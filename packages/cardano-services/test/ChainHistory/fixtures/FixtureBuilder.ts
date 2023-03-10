@@ -21,7 +21,7 @@ export enum TxWith {
 }
 
 export type AddressesInBlockRange = {
-  addresses: Set<Cardano.Address>;
+  addresses: Set<Cardano.PaymentAddress>;
   blockRange: Range<Cardano.BlockNo>;
   txInRangeCount: number;
 };
@@ -43,7 +43,7 @@ export class ChainHistoryFixtureBuilder {
     const upperBound = blockRange?.upperBound ?? DB_MAX_SAFE_INTEGER;
     const txIds = new Set<bigint>();
     const addressesInBlockRange = {
-      addresses: new Set<Cardano.Address>(),
+      addresses: new Set<Cardano.PaymentAddress>(),
       blockRange: { lowerBound: Cardano.BlockNo(DB_MAX_SAFE_INTEGER), upperBound: Cardano.BlockNo(0) },
       txInRangeCount: 0
     };
@@ -62,7 +62,7 @@ export class ChainHistoryFixtureBuilder {
     for (const { address } of results.rows) {
       if (addressesInBlockRange.addresses.size >= desiredQty) break;
 
-      addressesInBlockRange.addresses.add(address as unknown as Cardano.Address);
+      addressesInBlockRange.addresses.add(address as unknown as Cardano.PaymentAddress);
     }
 
     if (results.rows.length < desiredQty) {
@@ -70,7 +70,7 @@ export class ChainHistoryFixtureBuilder {
     }
 
     for (const { address, block_no, tx_id } of results.rows) {
-      if (addressesInBlockRange.addresses.has(address as unknown as Cardano.Address)) {
+      if (addressesInBlockRange.addresses.has(address as unknown as Cardano.PaymentAddress)) {
         txIds.add(tx_id);
         addressesInBlockRange.blockRange.lowerBound = Cardano.BlockNo(
           Math.min(addressesInBlockRange.blockRange.lowerBound, block_no)
@@ -144,10 +144,10 @@ export class ChainHistoryFixtureBuilder {
   public async getGenesisAddresses() {
     this.#logger.debug('About to fetch genesis addresses');
     const result: QueryResult<{ address: string }> = await this.#db.query(Queries.genesisUtxoAddresses);
-    return result.rows.map(({ address }) => address as unknown as Cardano.Address);
+    return result.rows.map(({ address }) => address as unknown as Cardano.PaymentAddress);
   }
 
-  public async getDistinctAddresses(desiredQty: number): Promise<Cardano.Address[]> {
+  public async getDistinctAddresses(desiredQty: number): Promise<Cardano.PaymentAddress[]> {
     this.#logger.debug(`About to fetch up to the last ${desiredQty} distinct addresses`);
     const result: QueryResult<{ address: string }> = await this.#db.query(Queries.latestDistinctAddresses, [
       desiredQty
@@ -158,6 +158,6 @@ export class ChainHistoryFixtureBuilder {
     } else if (resultsQty < desiredQty) {
       this.#logger.warn(`${desiredQty} distinct addresses desired, only ${resultsQty} results found`);
     }
-    return result.rows.map(({ address }) => address as unknown as Cardano.Address);
+    return result.rows.map(({ address }) => address as unknown as Cardano.PaymentAddress);
   }
 }

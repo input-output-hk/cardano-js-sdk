@@ -18,7 +18,7 @@ import { dummyLogger } from 'ts-log';
 describe('KeyManagement/restoreKeyAgent', () => {
   const dependencies: KeyAgentDependencies = {
     bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
-    inputResolver: { resolveInputAddress: jest.fn() },
+    inputResolver: { resolveInput: jest.fn() },
     logger: dummyLogger
   };
 
@@ -33,7 +33,7 @@ describe('KeyManagement/restoreKeyAgent', () => {
       87, 78, 204, 222, 109, 3, 239, 117
     ];
 
-    const address = Cardano.Address(
+    const address = Cardano.PaymentAddress(
       'addr1qx52knza2h5x090n4a5r7yraz3pwcamk9ppvuh7e26nfks7pnmhxqavtqy02zezklh27jt9r6z62sav3mugappdc7xnskxy2pn'
     );
 
@@ -128,7 +128,7 @@ describe('KeyManagement/restoreKeyAgent', () => {
       knownAddresses: [
         {
           accountIndex: 0,
-          address: Cardano.Address(
+          address: Cardano.PaymentAddress(
             'addr1qx52knza2h5x090n4a5r7yraz3pwcamk9ppvuh7e26nfks7pnmhxqavtqy02zezklh27jt9r6z62sav3mugappdc7xnskxy2pn'
           ),
           index: 0,
@@ -158,7 +158,7 @@ describe('KeyManagement/restoreKeyAgent', () => {
       knownAddresses: [
         {
           accountIndex: 0,
-          address: Cardano.Address(
+          address: Cardano.PaymentAddress(
             'addr1qx52knza2h5x090n4a5r7yraz3pwcamk9ppvuh7e26nfks7pnmhxqavtqy02zezklh27jt9r6z62sav3mugappdc7xnskxy2pn'
           ),
           index: 0,

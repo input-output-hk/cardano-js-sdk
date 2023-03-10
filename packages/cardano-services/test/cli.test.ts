@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable max-len */
@@ -87,7 +88,7 @@ type CallCliAndAssertExitArgs = {
   env?: NodeJS.ProcessEnv;
 };
 
-const baseArgs = ['start-server', '--logger-min-severity', 'error'];
+const baseArgs = ['start-provider-server', '--logger-min-severity', 'error'];
 
 const callCliAndAssertExit = (
   { args = [], dataMatchOnError, env = {} }: CallCliAndAssertExitArgs,
@@ -119,7 +120,7 @@ describe('CLI', () => {
   let fixtureBuilder: AssetFixtureBuilder;
   let lastBlock: LedgerTipModel;
 
-  describe('start-server', () => {
+  describe('start-provider-server', () => {
     let apiPort: number;
     let apiUrl: string;
     let ogmiosServer: http.Server;
@@ -157,7 +158,7 @@ describe('CLI', () => {
       });
     });
 
-    describe('cli:start-server', () => {
+    describe('cli:start-provider-server', () => {
       let postgresConnectionString: string;
       let ogmiosPort: Ogmios.ConnectionConfig['port'];
       let ogmiosConnection: Ogmios.Connection;
@@ -242,7 +243,7 @@ describe('CLI', () => {
           });
 
           it('exposes a HTTP server at the configured URL with all services attached when using env variables', async () => {
-            proc = fork(exePath, ['start-server'], {
+            proc = fork(exePath, ['start-provider-server'], {
               env: {
                 API_URL: apiUrl,
                 CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
@@ -297,7 +298,7 @@ describe('CLI', () => {
           });
 
           it('exposes a HTTP server with /metrics endpoint using env variables', async () => {
-            proc = fork(exePath, ['start-server'], {
+            proc = fork(exePath, ['start-provider-server'], {
               env: {
                 API_URL: apiUrl,
                 CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
@@ -315,7 +316,7 @@ describe('CLI', () => {
           });
 
           it('exposes a HTTP server without /metrics endpoint when env set to false', async () => {
-            proc = fork(exePath, ['start-server'], {
+            proc = fork(exePath, ['start-provider-server'], {
               env: {
                 API_URL: apiUrl,
                 CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
@@ -373,7 +374,7 @@ describe('CLI', () => {
             });
 
             it('using env variables', async () => {
-              proc = fork(exePath, ['start-server'], {
+              proc = fork(exePath, ['start-provider-server'], {
                 env: {
                   API_URL: apiUrl,
                   BUILD_INFO: buildInfo,
@@ -617,7 +618,7 @@ describe('CLI', () => {
             });
 
             it('exposes a HTTP server when using env variables', async () => {
-              proc = fork(exePath, ['start-server'], {
+              proc = fork(exePath, ['start-provider-server'], {
                 env: {
                   API_URL: apiUrl,
                   LOGGER_MIN_SEVERITY: 'error',
@@ -1177,7 +1178,7 @@ describe('CLI', () => {
             });
 
             it('network-info uses the default Ogmios configuration if not specified using env variables', async () => {
-              proc = fork(exePath, ['start-server'], {
+              proc = fork(exePath, ['start-provider-server'], {
                 env: {
                   API_URL: apiUrl,
                   CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
@@ -1199,7 +1200,7 @@ describe('CLI', () => {
             });
 
             it('tx-submit uses the default Ogmios configuration if not specified when using env variables', async () => {
-              proc = fork(exePath, ['start-server'], {
+              proc = fork(exePath, ['start-provider-server'], {
                 env: {
                   API_URL: apiUrl,
                   LOGGER_MIN_SEVERITY: 'error',
@@ -1495,7 +1496,7 @@ describe('CLI', () => {
             });
 
             it('exposes a HTTP server with healthy state when using env variables', async () => {
-              proc = fork(exePath, ['start-server'], {
+              proc = fork(exePath, ['start-provider-server'], {
                 env: {
                   API_URL: apiUrl,
                   LOGGER_MIN_SEVERITY: 'error',
@@ -1518,7 +1519,7 @@ describe('CLI', () => {
             });
 
             it('loads a stub asset metadata service when TOKEN_METADATA_SERVER_URL starts with "stub:"', async () => {
-              proc = fork(exePath, ['start-server'], {
+              proc = fork(exePath, ['start-provider-server'], {
                 env: {
                   API_URL: apiUrl,
                   LOGGER_MIN_SEVERITY: 'error',
@@ -1566,7 +1567,7 @@ describe('CLI', () => {
             });
 
             it('exposes a HTTP server with healthy state when using env variables', async () => {
-              proc = fork(exePath, ['start-server'], {
+              proc = fork(exePath, ['start-provider-server'], {
                 env: {
                   API_URL: apiUrl,
                   LOGGER_MIN_SEVERITY: 'error',
@@ -1600,7 +1601,7 @@ describe('CLI', () => {
             it('throws a provider unhealthy error when using env variables', (done) => {
               expect.assertions(2);
 
-              proc = fork(exePath, ['start-server'], {
+              proc = fork(exePath, ['start-provider-server'], {
                 env: {
                   API_URL: apiUrl,
                   LOGGER_MIN_SEVERITY: 'error',
@@ -1728,7 +1729,7 @@ describe('CLI', () => {
           ogmiosServer = createHealthyMockOgmiosServer();
         });
 
-        it('cli:start-server exits with code 1', (done) => {
+        it('cli:start-provider-server exits with code 1', (done) => {
           ogmiosServer.listen(ogmiosConnection.port, () => {
             callCliAndAssertExit(
               {
@@ -1747,7 +1748,102 @@ describe('CLI', () => {
     });
   });
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
+  describe('start-blockfrost-worker', () => {
+    const commonArgs = ['start-blockfrost-worker', '--logger-min-severity', 'info', '--dry-run', 'true'];
+    let port: number;
+    let proc: ChildProcess;
+
+    beforeAll(async () => {
+      port = await getRandomPort();
+    });
+
+    afterEach((done) => {
+      if (proc?.kill()) proc.on('close', () => done());
+      else done();
+    });
+
+    // Tests without any assertion fail if they get timeout
+    it('exits with code 1 without api key', (done) => {
+      expect.assertions(2);
+      proc = fork(exePath, commonArgs, { env: {}, stdio: 'pipe' });
+      proc.stderr!.on('data', (data) =>
+        expect(data.toString()).toMatch(
+          'MissingProgramOption: Blockfrost worker requires the Blockfrost API Key file path or Blockfrost API Key program option'
+        )
+      );
+      proc.on('exit', (code) => {
+        expect(code).toBe(1);
+        done();
+      });
+    });
+
+    it('exits with code 1 without network', (done) => {
+      expect.assertions(2);
+      proc = fork(exePath, [...commonArgs, '--blockfrost-api-key', 'abc'], { env: {}, stdio: 'pipe' });
+      proc.stderr!.on('data', (data) =>
+        expect(data.toString()).toMatch(
+          'MissingProgramOption: Blockfrost worker requires the network to run against program option'
+        )
+      );
+      proc.on('exit', (code) => {
+        expect(code).toBe(1);
+        done();
+      });
+    });
+
+    it('exits with code 1 with wrong network', (done) => {
+      expect.assertions(2);
+      proc = fork(exePath, [...commonArgs, '--blockfrost-api-key', 'abc', '--network', 'none'], {
+        env: {},
+        stdio: 'pipe'
+      });
+      proc.stderr!.on('data', (data) => expect(data.toString()).toMatch('Error: Unknown network: none'));
+      proc.on('exit', (code) => {
+        expect(code).toBe(1);
+        done();
+      });
+    });
+
+    it('exits with code 1 without db connection string', (done) => {
+      expect.assertions(2);
+      proc = fork(exePath, [...commonArgs, '--blockfrost-api-key', 'abc', '--network', 'mainnet'], {
+        env: {},
+        stdio: 'pipe'
+      });
+      proc.stderr!.on('data', (data) =>
+        expect(data.toString()).toMatch(
+          'MissingProgramOption: Blockfrost worker requires the PostgreSQL Connection string or Postgres SRV service name, db, user and password program option'
+        )
+      );
+      proc.on('exit', (code) => {
+        expect(code).toBe(1);
+        done();
+      });
+    });
+
+    it('dry run', (done) => {
+      proc = fork(
+        exePath,
+        [
+          ...commonArgs,
+          '--blockfrost-api-key',
+          'abc',
+          '--network',
+          'mainnet',
+          '--postgres-connection-string',
+          process.env.POSTGRES_CONNECTION_STRING!,
+          '--api-url',
+          `http://localhost:${port}/`
+        ],
+        { env: {}, stdio: 'pipe' }
+      );
+      proc.stdout!.on('data', (data) => {
+        // eslint-disable-next-line unicorn/prefer-regexp-test
+        if (data.toString('utf8').match(/Sleeping for \d+ milliseconds to start next run/)) done();
+      });
+    });
+  });
+
   describe('start-worker', () => {
     let commonArgs: string[];
     let commonArgsWithServiceDiscovery: string[];
@@ -1819,7 +1915,6 @@ describe('CLI', () => {
     });
 
     // Tests without any assertion fail if they get timeout
-    // eslint-disable-next-line sonarjs/cognitive-complexity
     describe('cli:start-worker with a working RabbitMQ server', () => {
       describe('transaction are actually submitted', () => {
         it('submits transactions using CLI options', async () => {
