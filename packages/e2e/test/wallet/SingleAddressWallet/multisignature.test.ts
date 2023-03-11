@@ -26,29 +26,34 @@ describe('SingleAddressWallet/multisignature', () => {
     const genesis = await firstValueFrom(wallet.genesisParameters$);
 
     const aliceKeyAgent = await createStandaloneKeyAgent(
-      util.generateMnemonicWords(),
+      env.KEY_MANAGEMENT_PARAMS.mnemonic.split(' '),
       genesis,
       await wallet.keyAgent.getBip32Ed25519()
     );
     const bobKeyAgent = await createStandaloneKeyAgent(
-      util.generateMnemonicWords(),
+      env.KEY_MANAGEMENT_PARAMS.mnemonic.split(' '),
       genesis,
       await wallet.keyAgent.getBip32Ed25519()
     );
 
-    const derivationPath = {
-      index: 0,
+    const aliceDerivationPath = {
+      index: 2,
       role: KeyRole.External
     };
 
-    const alicePubKey = await aliceKeyAgent.derivePublicKey(derivationPath);
+    const bobDerivationPath = {
+      index: 3,
+      role: KeyRole.External
+    };
+
+    const alicePubKey = await aliceKeyAgent.derivePublicKey(aliceDerivationPath);
     const aliceKeyHash = await aliceKeyAgent.bip32Ed25519.getPubKeyHash(alicePubKey);
 
-    const bobPubKey = await bobKeyAgent.derivePublicKey(derivationPath);
+    const bobPubKey = await bobKeyAgent.derivePublicKey(bobDerivationPath);
     const bobKeyHash = await bobKeyAgent.bip32Ed25519.getPubKeyHash(bobPubKey);
 
-    const alicePolicySigner = new util.KeyAgentTransactionSigner(aliceKeyAgent, derivationPath);
-    const bobPolicySigner = new util.KeyAgentTransactionSigner(bobKeyAgent, derivationPath);
+    const alicePolicySigner = new util.KeyAgentTransactionSigner(aliceKeyAgent, aliceDerivationPath);
+    const bobPolicySigner = new util.KeyAgentTransactionSigner(bobKeyAgent, bobDerivationPath);
 
     const policyScript: Cardano.NativeScript = {
       __type: Cardano.ScriptType.Native,

@@ -32,22 +32,21 @@ describe('SingleAddressWallet.assets/nft', () => {
     const genesis = await firstValueFrom(wallet.genesisParameters$);
 
     const keyAgent = await createStandaloneKeyAgent(
-      util.generateMnemonicWords(),
+      env.KEY_MANAGEMENT_PARAMS.mnemonic.split(' '),
       genesis,
       await wallet.keyAgent.getBip32Ed25519()
     );
 
-    const pubKey = await keyAgent.derivePublicKey({
-      index: 0,
+    const derivationPath = {
+      index: 2,
       role: KeyRole.External
-    });
+    };
+
+    const pubKey = await keyAgent.derivePublicKey(derivationPath);
 
     const keyHash = await keyAgent.bip32Ed25519.getPubKeyHash(pubKey);
 
-    policySigner = new util.KeyAgentTransactionSigner(keyAgent, {
-      index: 0,
-      role: KeyRole.External
-    });
+    policySigner = new util.KeyAgentTransactionSigner(keyAgent, derivationPath);
 
     policyScript = {
       __type: Cardano.ScriptType.Native,

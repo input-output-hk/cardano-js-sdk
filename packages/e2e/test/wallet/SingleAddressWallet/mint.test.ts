@@ -25,13 +25,13 @@ describe('SingleAddressWallet/mint', () => {
     const genesis = await firstValueFrom(wallet.genesisParameters$);
 
     const aliceKeyAgent = await createStandaloneKeyAgent(
-      util.generateMnemonicWords(),
+      env.KEY_MANAGEMENT_PARAMS.mnemonic.split(' '),
       genesis,
       await wallet.keyAgent.getBip32Ed25519()
     );
 
     const derivationPath = {
-      index: 0,
+      index: 2,
       role: KeyRole.External
     };
 
