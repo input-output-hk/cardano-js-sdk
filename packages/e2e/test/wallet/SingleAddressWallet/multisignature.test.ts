@@ -2,8 +2,8 @@
 import { Cardano, nativeScriptPolicyId } from '@cardano-sdk/core';
 import { FinalizeTxProps, InitializeTxProps, SingleAddressWallet } from '@cardano-sdk/wallet';
 import { KeyRole, util } from '@cardano-sdk/key-management';
+import { burnTokens, createStandaloneKeyAgent, submitAndConfirm, walletReady } from '../../util';
 import { createLogger } from '@cardano-sdk/util-dev';
-import { createStandaloneKeyAgent, submitAndConfirm, walletReady } from '../../util';
 import { filter, firstValueFrom } from 'rxjs';
 import { getEnv, getWallet, walletVariables } from '../../../src';
 
@@ -112,5 +112,11 @@ describe('SingleAddressWallet/multisignature', () => {
     expect(value).toBeDefined();
     expect(value!.assets!.has(assetId)).toBeTruthy();
     expect(value!.assets!.get(assetId)).toBe(10n);
+
+    await burnTokens({
+      policySigners: [alicePolicySigner, bobPolicySigner],
+      scripts: [policyScript],
+      wallet
+    });
   });
 });

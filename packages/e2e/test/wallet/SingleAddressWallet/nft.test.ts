@@ -2,9 +2,9 @@
 import { Cardano, metadatum, nativeScriptPolicyId } from '@cardano-sdk/core';
 import { FinalizeTxProps, InitializeTxProps, SingleAddressWallet } from '@cardano-sdk/wallet';
 import { KeyRole, TransactionSigner, util } from '@cardano-sdk/key-management';
+import { burnTokens, createStandaloneKeyAgent, submitAndConfirm, walletReady } from '../../util';
 import { combineLatest, filter, firstValueFrom, map } from 'rxjs';
 import { createLogger } from '@cardano-sdk/util-dev';
-import { createStandaloneKeyAgent, submitAndConfirm, walletReady } from '../../util';
 import { getEnv, getWallet, walletVariables } from '../../../src';
 
 const env = getEnv(walletVariables);
@@ -169,22 +169,31 @@ describe('SingleAddressWallet.assets/nft', () => {
     );
   });
 
-  afterAll(() => {
+  afterAll(async () => {
+    await burnTokens({
+      policySigners: [policySigner],
+      scripts: [policyScript],
+      wallet
+    });
     wallet.shutdown();
   });
 
   it('supports multiple CIP-25 NFT metadata in one tx', async () => {
-    const nfts = await firstValueFrom(
+    const [nfts, walletAssetBalance] = await firstValueFrom(
       combineLatest([wallet.assets$, wallet.balance.utxo.total$]).pipe(
         filter(([assets, balance]) => assets.size === balance.assets?.size),
-        map(([assets]) => [...assets.values()].filter((asset) => !!asset.nftMetadata))
+        filter(([assets]) => [...assets.values()].every((quantity) => !!quantity)),
+        map(([assets, balance]) => [[...assets.values()].filter((asset) => !!asset.nftMetadata), balance.assets])
       )
     );
+
+    // Check balance here because asset info will not be re-fetched when balance changes due to minting and burning
+    expect(walletAssetBalance?.get(assetIds[TOKEN_METADATA_2_INDEX])).toBe(1n);
 
     expect(nfts.find((nft) => nft.assetId === assetIds[TOKEN_METADATA_2_INDEX])).toMatchObject({
       assetId: assetIds[TOKEN_METADATA_2_INDEX],
       fingerprint: fingerprints[TOKEN_METADATA_2_INDEX],
-      mintOrBurnCount: 1,
+      mintOrBurnCount: expect.anything(),
       name: assetNames[TOKEN_METADATA_2_INDEX],
       nftMetadata: {
         image: ['ipfs://some_hash1'],
@@ -193,23 +202,29 @@ describe('SingleAddressWallet.assets/nft', () => {
         version: '1.0'
       },
       policyId,
-      quantity: 1n,
+      // in case of repeated tests on the same network, total asset quantity is not updated due to
+      // the limitation that asset info is not refreshed on wallet balance changes
+      quantity: expect.anything(),
       tokenMetadata: null
     });
     expect(nfts.find((nft) => nft.assetId === assetIds[TOKEN_METADATA_1_INDEX])).toBeDefined();
   });
 
   it('parses CIP-25 NFT metadata with files', async () => {
-    const nfts = await firstValueFrom(
+    const [nfts, walletAssetBalance] = await firstValueFrom(
       combineLatest([wallet.assets$, wallet.balance.utxo.total$]).pipe(
         filter(([assets, balance]) => assets.size === balance.assets?.size),
-        map(([assets]) => [...assets.values()].filter((asset) => !!asset.nftMetadata))
+        map(([assets, balance]) => [[...assets.values()].filter((asset) => !!asset.nftMetadata), balance.assets])
       )
     );
+
+    // Check balance here because asset info will not be re-fetched when balance changes due to minting and burning
+    expect(walletAssetBalance?.get(assetIds[TOKEN_METADATA_1_INDEX])).toBe(1n);
+
     expect(nfts.find((nft) => nft.assetId === assetIds[TOKEN_METADATA_1_INDEX])).toMatchObject({
       assetId: assetIds[TOKEN_METADATA_1_INDEX],
       fingerprint: fingerprints[TOKEN_METADATA_1_INDEX],
-      mintOrBurnCount: 1,
+      mintOrBurnCount: expect.anything(),
       name: assetNames[TOKEN_METADATA_1_INDEX],
       nftMetadata: {
         description: ['NFT with different types of files'],
@@ -235,7 +250,7 @@ describe('SingleAddressWallet.assets/nft', () => {
         version: '1.0'
       },
       policyId,
-      quantity: 1n,
+      quantity: expect.anything(),
       tokenMetadata: null
     });
   });
@@ -354,7 +369,7 @@ describe('SingleAddressWallet.assets/nft', () => {
         expect(nfts.find((nft) => nft.assetId === assetId)).toMatchObject({
           assetId,
           fingerprint,
-          mintOrBurnCount: 1,
+          mintOrBurnCount: expect.anything(),
           name: assetNameHex,
           nftMetadata: {
             image: ['ipfs://some_hash1'],
@@ -363,7 +378,7 @@ describe('SingleAddressWallet.assets/nft', () => {
             version: '1.0'
           },
           policyId,
-          quantity: 1n,
+          quantity: expect.anything(),
           tokenMetadata: null
         });
       });

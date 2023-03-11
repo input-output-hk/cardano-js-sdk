@@ -28,8 +28,15 @@ import {
   throwError,
   timeout
 } from 'rxjs';
-import { InMemoryKeyAgent } from '@cardano-sdk/key-management';
-import { InitializeTxProps, ObservableWallet, SignedTx, SingleAddressWallet, buildTx } from '@cardano-sdk/wallet';
+import {
+  FinalizeTxProps,
+  InitializeTxProps,
+  ObservableWallet,
+  SignedTx,
+  SingleAddressWallet,
+  buildTx
+} from '@cardano-sdk/wallet';
+import { InMemoryKeyAgent, TransactionSigner } from '@cardano-sdk/key-management';
 import { assertTxIsValid } from '../../wallet/test/util';
 import { logger } from '@cardano-sdk/util-dev';
 import sortBy from 'lodash/sortBy';
@@ -262,3 +269,61 @@ export const createStandaloneKeyAgent = async (
     },
     { bip32Ed25519, inputResolver: { resolveInput: async () => null }, logger }
   );
+
+/**
+ * Create burn transaction to cleanup minted assets in tests.
+ * Each test or test suite should call this function to remove any minted assets.
+ * Pass `tokens` with positive value. This method will negate them.
+ * In case `tokens` is undefined, all wallet tokens will be burned.
+ */
+export const burnTokens = async ({
+  wallet,
+  tokens,
+  scripts,
+  policySigners: extraSigners
+}: {
+  wallet: SingleAddressWallet;
+  tokens?: Cardano.TokenMap;
+  scripts: Cardano.Script[];
+  policySigners: TransactionSigner[];
+}) => {
+  if (!tokens) {
+    tokens = (await firstValueFrom(wallet.balance.utxo.available$)).assets;
+  }
+
+  if (!tokens?.size) {
+    return; // nothing to burn
+  }
+
+  const negativeTokens = new Map([...tokens].map(([assetId, value]) => [assetId, -value]));
+  const txProps: InitializeTxProps = {
+    mint: negativeTokens,
+    scripts,
+    witness: { extraSigners }
+  };
+
+  const unsignedTx = await wallet.initializeTx(txProps);
+
+  const finalizeProps: FinalizeTxProps = {
+    scripts,
+    tx: unsignedTx,
+    witness: { extraSigners }
+  };
+
+  const signedTx = await wallet.finalizeTx(finalizeProps);
+  await submitAndConfirm(wallet, signedTx);
+
+  // Wait until all assets are burned
+  await firstValueFromTimed(
+    wallet.balance.utxo.available$.pipe(
+      map(({ assets: availableAssets }) => availableAssets),
+      filter(
+        (availableAssets) =>
+          !availableAssets?.size ||
+          ![...tokens!].some(([id]) => [...availableAssets].some(([assetId]) => assetId === id))
+      )
+    ),
+    'Not all assets were burned',
+    FAST_OPERATION_TIMEOUT_DEFAULT
+  );
+};

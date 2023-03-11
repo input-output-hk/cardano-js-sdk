@@ -1,8 +1,8 @@
 import { Cardano, nativeScriptPolicyId } from '@cardano-sdk/core';
 import { FinalizeTxProps, InitializeTxProps, SingleAddressWallet } from '@cardano-sdk/wallet';
 import { KeyRole, util } from '@cardano-sdk/key-management';
+import { burnTokens, createStandaloneKeyAgent, submitAndConfirm, walletReady } from '../../util';
 import { createLogger } from '@cardano-sdk/util-dev';
-import { createStandaloneKeyAgent, submitAndConfirm, walletReady } from '../../util';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import { getEnv, getWallet, walletVariables } from '../../../src';
 import { isNotNil } from '@cardano-sdk/util';
@@ -104,5 +104,7 @@ describe('SingleAddressWallet/mint', () => {
     expect(value!.assets!.has(assetId)).toBeTruthy();
     expect(value!.assets!.get(assetId)).toBe(1n);
     expect(txFoundInHistory.inputSource).toBe(Cardano.InputSource.inputs);
+
+    await burnTokens({ policySigners: [alicePolicySigner], scripts: [policyScript], wallet });
   });
 });
