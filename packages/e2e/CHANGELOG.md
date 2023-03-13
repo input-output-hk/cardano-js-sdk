@@ -3,11 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.9.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.9.0-nightly.0...@cardano-sdk/e2e@0.9.0-nightly.1) (2023-03-13)
-
-**Note:** Version bump only for package @cardano-sdk/e2e
-
-## [0.9.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.8.1-nightly.0...@cardano-sdk/e2e@0.9.0-nightly.0) (2023-03-10)
+## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.8.0...@cardano-sdk/e2e@0.9.0) (2023-03-13)
 
 ### ⚠ BREAKING CHANGES
 
@@ -34,10 +30,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 - **cardano-services:** rename http-server to provider-server ([7b58748](https://github.com/input-output-hk/cardano-js-sdk/commit/7b587480edda5a9f36796ac577fd56baa6d4ee11))
 - core type for address string reprensetation 'Address' renamed to PaymentAddress ([4287463](https://github.com/input-output-hk/cardano-js-sdk/commit/42874633de6069510efdc57323f61140d22ed203))
 - **projection:** replace projectIntoSink 'sinks' prop with 'sinksFactory' ([8f15f6f](https://github.com/input-output-hk/cardano-js-sdk/commit/8f15f6f9fa09fea25df7d14ed10a64afcfa234c2))
-
-## [0.8.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.8.0...@cardano-sdk/e2e@0.8.1-nightly.0) (2023-03-02)
-
-**Note:** Version bump only for package @cardano-sdk/e2e
 
 ## [0.8.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.7.0...@cardano-sdk/e2e@0.8.0) (2023-03-01)
 

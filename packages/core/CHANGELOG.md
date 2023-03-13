@@ -3,11 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.10.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.10.0-nightly.1...@cardano-sdk/core@0.10.0-nightly.2) (2023-03-13)
-
-**Note:** Version bump only for package @cardano-sdk/core
-
-## [0.10.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.10.0-nightly.0...@cardano-sdk/core@0.10.0-nightly.1) (2023-03-10)
+## [0.10.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.9.0...@cardano-sdk/core@0.10.0) (2023-03-13)
 
 ### ⚠ BREAKING CHANGES
 
@@ -21,24 +17,13 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 - add inputSource in transactions ([7ed99d5](https://github.com/input-output-hk/cardano-js-sdk/commit/7ed99d5a12cf8667114c76ecde0cbdc3cfbc3887))
 - add new Address types that implement CIP-19 natively ([a892176](https://github.com/input-output-hk/cardano-js-sdk/commit/a8921760b714b090bb6c15d6b4696e2dd0b2fdc5))
 - added optional isValid field to Transaction object ([f722ae8](https://github.com/input-output-hk/cardano-js-sdk/commit/f722ae8075744a6ca61df1c2c077131cbd0ecf3b))
+- rewards history limit default ([8c32be8](https://github.com/input-output-hk/cardano-js-sdk/commit/8c32be88a9edd3ed82a34c75d33a7a428ecc3b7c))
 - send phase2 validation failed transactions as failed$ ([ef25825](https://github.com/input-output-hk/cardano-js-sdk/commit/ef2582532677aeee4b19e84adf1957f09631dd72))
 - upgrade resolveInputAddress to resolveInput ([fcfa035](https://github.com/input-output-hk/cardano-js-sdk/commit/fcfa035a3498f675945dafcc82b8f05c08318dd8))
 
 ### Code Refactoring
 
 - core type for address string reprensetation 'Address' renamed to PaymentAddress ([4287463](https://github.com/input-output-hk/cardano-js-sdk/commit/42874633de6069510efdc57323f61140d22ed203))
-
-## [0.10.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.9.0...@cardano-sdk/core@0.10.0-nightly.0) (2023-03-02)
-
-### ⚠ BREAKING CHANGES
-
-- Alonzo transaction outputs will now contain a datumHash field, carrying the datum hash digest. However, they will also contain a datum field with the exact same value for backward compatibility reason. In Babbage however, transaction outputs will carry either datum or datumHash depending on the case; and datum will only contain inline datums.
-
-### Features
-
-- added new babbage era types in Transactions and Outputs ([917b2a4](https://github.com/input-output-hk/cardano-js-sdk/commit/917b2a43319ecedf8cd8ef72fbcdecc04e010d8e))
-- dbSyncUtxoProvider now returns the new Babbage fields in the UTXO when present ([ad8184b](https://github.com/input-output-hk/cardano-js-sdk/commit/ad8184bcf9bae92a386c36175f4a773637faf8eb))
-- rewards history limit default ([8c32be8](https://github.com/input-output-hk/cardano-js-sdk/commit/8c32be88a9edd3ed82a34c75d33a7a428ecc3b7c))
 
 ## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.8.0...@cardano-sdk/core@0.9.0) (2023-03-01)
 

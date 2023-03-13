@@ -3,11 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.5.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.5.0-nightly.0...@cardano-sdk/projection@0.5.0-nightly.1) (2023-03-13)
-
-**Note:** Version bump only for package @cardano-sdk/projection
-
-## [0.5.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.4.1-nightly.0...@cardano-sdk/projection@0.5.0-nightly.0) (2023-03-10)
+## [0.5.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.4.0...@cardano-sdk/projection@0.5.0) (2023-03-13)
 
 ### ⚠ BREAKING CHANGES
 
@@ -25,10 +21,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 - **projection:** replace projectIntoSink 'sinks' prop with 'sinksFactory' ([8f15f6f](https://github.com/input-output-hk/cardano-js-sdk/commit/8f15f6f9fa09fea25df7d14ed10a64afcfa234c2))
 - **projection:** replace StabilityWindowBuffer methods with a single `handleEvents` ([5c8d330](https://github.com/input-output-hk/cardano-js-sdk/commit/5c8d3303890c3c6b299b145cd906222d25cdceec))
-
-## [0.4.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.4.0...@cardano-sdk/projection@0.4.1-nightly.0) (2023-03-02)
-
-**Note:** Version bump only for package @cardano-sdk/projection
 
 ## [0.4.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.3.0...@cardano-sdk/projection@0.4.0) (2023-03-01)
 

@@ -3,11 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.10.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.10.0-nightly.1...@cardano-sdk/ogmios@0.10.0-nightly.2) (2023-03-13)
-
-**Note:** Version bump only for package @cardano-sdk/ogmios
-
-## [0.10.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.10.0-nightly.0...@cardano-sdk/ogmios@0.10.0-nightly.1) (2023-03-10)
+## [0.10.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.9.0...@cardano-sdk/ogmios@0.10.0) (2023-03-13)
 
 ### ⚠ BREAKING CHANGES
 
@@ -22,16 +18,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 ### Code Refactoring
 
 - core type for address string reprensetation 'Address' renamed to PaymentAddress ([4287463](https://github.com/input-output-hk/cardano-js-sdk/commit/42874633de6069510efdc57323f61140d22ed203))
-
-## [0.10.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.9.0...@cardano-sdk/ogmios@0.10.0-nightly.0) (2023-03-02)
-
-### ⚠ BREAKING CHANGES
-
-- Alonzo transaction outputs will now contain a datumHash field, carrying the datum hash digest. However, they will also contain a datum field with the exact same value for backward compatibility reason. In Babbage however, transaction outputs will carry either datum or datumHash depending on the case; and datum will only contain inline datums.
-
-### Features
-
-- added new babbage era types in Transactions and Outputs ([917b2a4](https://github.com/input-output-hk/cardano-js-sdk/commit/917b2a43319ecedf8cd8ef72fbcdecc04e010d8e))
 
 ## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.8.0...@cardano-sdk/ogmios@0.9.0) (2023-03-01)
 

@@ -3,13 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.10.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.10.0-nightly.1...@cardano-sdk/cardano-services@0.10.0-nightly.2) (2023-03-13)
-
-### Features
-
-- **cardano-services:** support disabling stake pool APY metric, for performance benefits ([18e1dfb](https://github.com/input-output-hk/cardano-js-sdk/commit/18e1dfba661705f0e36f5255f7a3a182952c40ed))
-
-## [0.10.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.10.0-nightly.0...@cardano-sdk/cardano-services@0.10.0-nightly.1) (2023-03-10)
+## [0.10.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.9.0...@cardano-sdk/cardano-services@0.10.0) (2023-03-13)
 
 ### ⚠ BREAKING CHANGES
 
@@ -21,6 +15,8 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 - add inputSource in transactions ([7ed99d5](https://github.com/input-output-hk/cardano-js-sdk/commit/7ed99d5a12cf8667114c76ecde0cbdc3cfbc3887))
 - adds caching stake pools metric from blockfrost ([d2de0a4](https://github.com/input-output-hk/cardano-js-sdk/commit/d2de0a4efa8f443fb4b63da9a6322eeaa099d09e))
 - **cardano-services:** HTTP server /ready endpoint ([e613306](https://github.com/input-output-hk/cardano-js-sdk/commit/e613306d1eba64eaab638d68319db1154e414756))
+- **cardano-services:** support disabling stake pool APY metric, for performance benefits ([18e1dfb](https://github.com/input-output-hk/cardano-js-sdk/commit/18e1dfba661705f0e36f5255f7a3a182952c40ed))
+- rewards history limit default ([8c32be8](https://github.com/input-output-hk/cardano-js-sdk/commit/8c32be88a9edd3ed82a34c75d33a7a428ecc3b7c))
 - **util-dev:** add DockerUtil (hoisted from cardano-services tests) ([ccb86ab](https://github.com/input-output-hk/cardano-js-sdk/commit/ccb86ab3ad8f0ae3c73a3c36173b1f76c0704f6d))
 
 ### Bug Fixes
@@ -33,18 +29,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 - **cardano-services:** rename http-server to provider-server ([7b58748](https://github.com/input-output-hk/cardano-js-sdk/commit/7b587480edda5a9f36796ac577fd56baa6d4ee11))
 - core type for address string reprensetation 'Address' renamed to PaymentAddress ([4287463](https://github.com/input-output-hk/cardano-js-sdk/commit/42874633de6069510efdc57323f61140d22ed203))
-
-## [0.10.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.9.0...@cardano-sdk/cardano-services@0.10.0-nightly.0) (2023-03-02)
-
-### ⚠ BREAKING CHANGES
-
-- Alonzo transaction outputs will now contain a datumHash field, carrying the datum hash digest. However, they will also contain a datum field with the exact same value for backward compatibility reason. In Babbage however, transaction outputs will carry either datum or datumHash depending on the case; and datum will only contain inline datums.
-
-### Features
-
-- added new babbage era types in Transactions and Outputs ([917b2a4](https://github.com/input-output-hk/cardano-js-sdk/commit/917b2a43319ecedf8cd8ef72fbcdecc04e010d8e))
-- dbSyncUtxoProvider now returns the new Babbage fields in the UTXO when present ([ad8184b](https://github.com/input-output-hk/cardano-js-sdk/commit/ad8184bcf9bae92a386c36175f4a773637faf8eb))
-- rewards history limit default ([8c32be8](https://github.com/input-output-hk/cardano-js-sdk/commit/8c32be88a9edd3ed82a34c75d33a7a428ecc3b7c))
 
 ## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.8.0...@cardano-sdk/cardano-services@0.9.0) (2023-03-01)
 
