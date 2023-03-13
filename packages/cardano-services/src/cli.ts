@@ -12,6 +12,7 @@ import {
   CACHE_TTL_DEFAULT,
   CREATE_SCHEMA_DEFAULT,
   DISABLE_DB_CACHE_DEFAULT,
+  DISABLE_STAKE_POOL_METRIC_APY_DEFAULT,
   DROP_SCHEMA_DEFAULT,
   DRY_RUN_DEFAULT,
   HTTP_SERVER_API_URL_DEFAULT,
@@ -123,6 +124,21 @@ withCommonOptions(
       .default(DISABLE_DB_CACHE_DEFAULT)
       .argParser((disableDbCache) =>
         stringOptionToBoolean(disableDbCache, Programs.ProviderServer, ProviderServerOptionDescriptions.DisableDbCache)
+      )
+  )
+  .addOption(
+    new Option(
+      '--disable-stake-pool-metric-apy <true/false>',
+      ProviderServerOptionDescriptions.DisableStakePoolMetricApy
+    )
+      .env('DISABLE_STAKE_POOL_METRIC_APY')
+      .default(DISABLE_STAKE_POOL_METRIC_APY_DEFAULT)
+      .argParser((disableStakePoolMetricApy) =>
+        stringOptionToBoolean(
+          disableStakePoolMetricApy,
+          Programs.ProviderServer,
+          ProviderServerOptionDescriptions.DisableStakePoolMetricApy
+        )
       )
   )
   .addOption(

@@ -1327,16 +1327,19 @@ describe('StakePoolHttpService', () => {
             it('desc order', async () => {
               const response = await provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'apy'));
               expect(response.pageResults.length).toBeGreaterThan(0);
+              expect(response.pageResults[0].metrics.apy).toBeDefined();
             });
             it('asc order', async () => {
               const response = await provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'apy'));
               expect(response.pageResults.length).toBeGreaterThan(0);
+              expect(response.pageResults[0].metrics.apy).toBeDefined();
             });
             it('with applied filters', async () => {
               const response = await provider.queryStakePools(
                 setSortCondition(setFilterCondition(filterArgs, 'or'), 'asc', 'apy')
               );
               expect(response.pageResults.length).toBeGreaterThan(0);
+              expect(response.pageResults[0].metrics.apy).toBeDefined();
             });
             it('with applied pagination', async () => {
               const firstPageOptions = setSortCondition(setPagination({ pagination }, 0, 3), 'desc', 'apy');
@@ -1425,6 +1428,48 @@ describe('StakePoolHttpService', () => {
             const response = await provider.stakePoolStats();
             expect(response.qty).toBeDefined();
             expect(response.qty).toMatchShapeOf({ active: 0, retired: 0, retiring: 0 });
+          });
+        });
+      });
+    });
+    describe('with APY metric disabled', () => {
+      beforeAll(async () => {
+        stakePoolProvider = new DbSyncStakePoolProvider(
+          {
+            paginationPageSizeLimit: pagination.limit,
+            responseConfig: { search: { metrics: { apy: false } } },
+            useBlockfrost: false
+          },
+          { cache, cardanoNode, db, epochMonitor, genesisData, logger, metadataService }
+        );
+        service = new StakePoolHttpService({ logger, stakePoolProvider });
+        httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
+        await httpServer.initialize();
+        await httpServer.start();
+      });
+      afterAll(async () => {
+        await httpServer.shutdown();
+      });
+      describe('/search', () => {
+        it('response excludes stake pool APY metric', async () => {
+          const response = await provider.queryStakePools({ pagination: { limit: 1, startAt: 0 } });
+          expect(response.pageResults[0].metrics.apy).toBeUndefined();
+        });
+        describe('sort by APY', () => {
+          it('desc order', async () => {
+            await expect(
+              provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'apy'))
+            ).rejects.toBeInstanceOf(ProviderError);
+          });
+          it('asc order', async () => {
+            await expect(
+              provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'apy'))
+            ).rejects.toBeInstanceOf(ProviderError);
+          });
+          it('with applied filters', async () => {
+            await expect(
+              provider.queryStakePools(setSortCondition(setFilterCondition(filterArgs, 'or'), 'asc', 'apy'))
+            ).rejects.toBeInstanceOf(ProviderError);
           });
         });
       });

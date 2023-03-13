@@ -1,7 +1,8 @@
 import * as Queries from './queries';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, PaginationArgs, Range } from '@cardano-sdk/core';
 import {
   CertificateModel,
+  CountModel,
   DelegationCertModel,
   MirCertModel,
   MultiAssetModel,
@@ -10,6 +11,7 @@ import {
   RedeemerModel,
   StakeCertModel,
   TransactionDataMap,
+  TxIdModel,
   TxInput,
   TxInputModel,
   TxOutMultiAssetModel,
@@ -21,18 +23,21 @@ import {
   WithCertType,
   WithdrawalModel
 } from './types';
+import { DB_MAX_SAFE_INTEGER, findTxsByAddresses } from './queries';
 import { Logger } from 'ts-log';
 import { Pool, QueryResult } from 'pg';
 import { hexStringToBuffer } from '@cardano-sdk/util';
 import {
   mapCertificate,
   mapRedeemer,
+  mapTxId,
   mapTxInModel,
   mapTxOutModel,
   mapTxOutTokenMap,
   mapTxTokenMap,
   mapWithdrawal
 } from './mappers';
+import { withPagination } from '../../StakePool/DbSyncStakePoolProvider/queries';
 import omit from 'lodash/omit';
 import orderBy from 'lodash/orderBy';
 
@@ -45,12 +50,11 @@ export class ChainHistoryBuilder {
     this.#logger = logger;
   }
 
-  public async queryTransactionInputsByHashes(hashes: Cardano.TransactionId[], collateral = false): Promise<TxInput[]> {
-    this.#logger.debug(`About to find inputs (collateral: ${collateral}) for transactions:`, hashes);
-    const byteHashes = hashes.map((hash) => hexStringToBuffer(hash));
+  public async queryTransactionInputsByIds(ids: string[], collateral = false): Promise<TxInput[]> {
+    this.#logger.debug(`About to find inputs (collateral: ${collateral}) for transactions with ids:`, ids);
     const result: QueryResult<TxInputModel> = await this.#db.query(
-      collateral ? Queries.findTxCollateralsByHashes : Queries.findTxInputsByHashes,
-      [byteHashes]
+      collateral ? Queries.findTxCollateralsByIds : Queries.findTxInputsByIds,
+      [ids]
     );
     return result.rows.length > 0 ? result.rows.map(mapTxInModel) : [];
   }
@@ -61,10 +65,9 @@ export class ChainHistoryBuilder {
     return mapTxOutTokenMap(result.rows);
   }
 
-  public async queryTransactionOutputsByHashes(hashes: Cardano.TransactionId[]): Promise<TxOutput[]> {
-    this.#logger.debug('About to find outputs for transactions:', hashes);
-    const byteHashes = hashes.map((hash) => hexStringToBuffer(hash));
-    const result: QueryResult<TxOutputModel> = await this.#db.query(Queries.findTxOutputsByHashes, [byteHashes]);
+  public async queryTransactionOutputsByIds(ids: string[]): Promise<TxOutput[]> {
+    this.#logger.debug('About to find outputs for transactions with ids:', ids);
+    const result: QueryResult<TxOutputModel> = await this.#db.query(Queries.findTxOutputsByIds, [ids]);
     if (result.rows.length === 0) return [];
 
     const txOutIds = result.rows.flatMap((txOut) => BigInt(txOut.id));
@@ -72,19 +75,22 @@ export class ChainHistoryBuilder {
     return result.rows.map((txOut) => mapTxOutModel(txOut, multiAssets.get(txOut.id)));
   }
 
-  public async queryTxMintByHashes(hashes: Cardano.TransactionId[]): Promise<TxTokenMap> {
-    this.#logger.debug('About to find tx mint for txs:', hashes);
-    const byteHashes = hashes.map((hash) => hexStringToBuffer(hash));
-    const result: QueryResult<MultiAssetModel> = await this.#db.query(Queries.findTxMint, [byteHashes]);
+  public async queryTxMintByIds(ids: string[]): Promise<TxTokenMap> {
+    this.#logger.debug('About to find tx mint for transactions with ids:', ids);
+    const result: QueryResult<MultiAssetModel> = await this.#db.query(Queries.findTxMintByIds, [ids]);
     return mapTxTokenMap(result.rows);
   }
 
-  public async queryWithdrawalsByHashes(
-    hashes: Cardano.TransactionId[]
-  ): Promise<TransactionDataMap<Cardano.Withdrawal[]>> {
-    this.#logger.debug('About to find withdrawals for txs:', hashes);
-    const byteHashes = hashes.map((hash) => hexStringToBuffer(hash));
-    const result: QueryResult<WithdrawalModel> = await this.#db.query(Queries.findWithdrawal, [byteHashes]);
+  public async queryTxRecordIdsByTxHashes(ids: Cardano.TransactionId[]): Promise<string[]> {
+    this.#logger.debug('About to find tx mint for transactions with ids:', ids);
+    const byteHashes = ids.map((id) => hexStringToBuffer(id));
+    const result: QueryResult<{ id: string }> = await this.#db.query(Queries.findTxRecordIdsByTxHashes, [byteHashes]);
+    return result.rows.length > 0 ? result.rows.map(({ id }) => id) : [];
+  }
+
+  public async queryWithdrawalsByTxIds(ids: string[]): Promise<TransactionDataMap<Cardano.Withdrawal[]>> {
+    this.#logger.debug('About to find withdrawals for transactions with ids:', ids);
+    const result: QueryResult<WithdrawalModel> = await this.#db.query(Queries.findWithdrawalsByTxIds, [ids]);
     const withdrawalMap: TransactionDataMap<Cardano.Withdrawal[]> = new Map();
     for (const withdrawal of result.rows) {
       const txId = withdrawal.tx_id.toString('hex') as unknown as Cardano.TransactionId;
@@ -94,12 +100,9 @@ export class ChainHistoryBuilder {
     return withdrawalMap;
   }
 
-  public async queryRedeemersByHashes(
-    hashes: Cardano.TransactionId[]
-  ): Promise<TransactionDataMap<Cardano.Redeemer[]>> {
-    this.#logger.debug('About to find redeemers for txs:', hashes);
-    const byteHashes = hashes.map((hash) => hexStringToBuffer(hash));
-    const result: QueryResult<RedeemerModel> = await this.#db.query(Queries.findRedeemer, [byteHashes]);
+  public async queryRedeemersByIds(ids: string[]): Promise<TransactionDataMap<Cardano.Redeemer[]>> {
+    this.#logger.debug('About to find redeemers for transactions with ids:', ids);
+    const result: QueryResult<RedeemerModel> = await this.#db.query(Queries.findRedeemersByTxIds, [ids]);
     const redeemerMap: TransactionDataMap<Cardano.Redeemer[]> = new Map();
     for (const redeemer of result.rows) {
       const txId = redeemer.tx_id.toString('hex') as unknown as Cardano.TransactionId;
@@ -109,22 +112,19 @@ export class ChainHistoryBuilder {
     return redeemerMap;
   }
 
-  public async queryCertificatesByHashes(
-    hashes: Cardano.TransactionId[]
-  ): Promise<TransactionDataMap<Cardano.Certificate[]>> {
-    this.#logger.debug('About to find certificates for txs:', hashes);
-    const byteHashes = hashes.map((hash) => hexStringToBuffer(hash));
-    const poolRetireCerts: QueryResult<PoolRetireCertModel> = await this.#db.query(Queries.findPoolRetireCerts, [
-      byteHashes
+  public async queryCertificatesByIds(ids: string[]): Promise<TransactionDataMap<Cardano.Certificate[]>> {
+    this.#logger.debug('About to find certificates for transactions with ids:', ids);
+    const poolRetireCerts: QueryResult<PoolRetireCertModel> = await this.#db.query(Queries.findPoolRetireCertsTxIds, [
+      ids
     ]);
-
-    const poolRegisterCerts: QueryResult<PoolRegisterCertModel> = await this.#db.query(Queries.findPoolRegisterCerts, [
-      byteHashes
-    ]);
-    const mirCerts: QueryResult<MirCertModel> = await this.#db.query(Queries.findMirCerts, [byteHashes]);
-    const stakeCerts: QueryResult<StakeCertModel> = await this.#db.query(Queries.findStakeCerts, [byteHashes]);
-    const delegationCerts: QueryResult<DelegationCertModel> = await this.#db.query(Queries.findDelegationCerts, [
-      byteHashes
+    const poolRegisterCerts: QueryResult<PoolRegisterCertModel> = await this.#db.query(
+      Queries.findPoolRegisterCertsByTxIds,
+      [ids]
+    );
+    const mirCerts: QueryResult<MirCertModel> = await this.#db.query(Queries.findMirCertsByTxIds, [ids]);
+    const stakeCerts: QueryResult<StakeCertModel> = await this.#db.query(Queries.findStakeCertsByTxIds, [ids]);
+    const delegationCerts: QueryResult<DelegationCertModel> = await this.#db.query(Queries.findDelegationCertsByTxIds, [
+      ids
     ]);
 
     // There is currently no way to get GenesisKeyDelegationCertificate from db-sync
@@ -154,5 +154,50 @@ export class ChainHistoryBuilder {
       certsMap.set(txId, certs);
     }
     return certsMap;
+  }
+
+  /**
+   * Gets the paginated `tx.id` or the total count of the transaction interesting the given set of addresses
+   *
+   * @param addresses the set of addresses to get transaction
+   * @param blockRange optional: the block range within transactions are requested
+   * @param pagination optional: the pagination of the response
+   * @returns the paginated `tx.id` set or, if `pagination` is omitted, the total number of transactions
+   */
+  public queryTxIdsByAddresses(
+    addresses: Cardano.PaymentAddress[],
+    blockRange?: Range<Cardano.BlockNo>
+  ): Promise<number>;
+  public queryTxIdsByAddresses(
+    addresses: Cardano.PaymentAddress[],
+    blockRange?: Range<Cardano.BlockNo>,
+    pagination?: PaginationArgs
+  ): Promise<string[]>;
+  public async queryTxIdsByAddresses(
+    addresses: Cardano.PaymentAddress[],
+    blockRange?: Range<Cardano.BlockNo>,
+    pagination?: PaginationArgs
+  ): Promise<number | string[]> {
+    const rangeForQuery: Range<Cardano.BlockNo> | undefined = blockRange
+      ? {
+          lowerBound: blockRange.lowerBound ?? (0 as Cardano.BlockNo),
+          upperBound: blockRange.upperBound ?? (DB_MAX_SAFE_INTEGER as Cardano.BlockNo)
+        }
+      : undefined;
+    const kind = rangeForQuery ? 'withRange' : 'withoutRange';
+    const target = pagination ? 'page' : 'count';
+    const q = findTxsByAddresses;
+    const query = `${q.WITH}${q[kind].WITH}${q[target].SELECT}${q[kind].FROM}${q[target].ORDER}`;
+    const args = rangeForQuery ? [addresses, rangeForQuery.lowerBound, rangeForQuery.upperBound] : [addresses];
+
+    if (pagination) {
+      const result = await this.#db.query<TxIdModel>(withPagination(query, pagination), args);
+
+      return result.rows.map(mapTxId);
+    }
+
+    const result = await this.#db.query<CountModel>(query, args);
+
+    return Number(result.rows[0].count);
   }
 }

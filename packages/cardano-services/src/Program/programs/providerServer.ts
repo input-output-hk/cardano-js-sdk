@@ -39,6 +39,7 @@ import memoize from 'lodash/memoize';
 import pg from 'pg';
 
 export const DISABLE_DB_CACHE_DEFAULT = false;
+export const DISABLE_STAKE_POOL_METRIC_APY_DEFAULT = false;
 export const HTTP_SERVER_API_URL_DEFAULT = new URL('http://localhost:3000');
 export const PAGINATION_PAGE_SIZE_LIMIT_DEFAULT = 25;
 export const USE_BLOCKFROST_DEFAULT = false;
@@ -71,6 +72,7 @@ export enum ProviderServerOptionDescriptions {
   CardanoNodeConfigPath = 'Cardano node config path',
   DbCacheTtl = 'Cache TTL in seconds between 60 and 172800 (two days), an option for database related operations',
   DisableDbCache = 'Disable DB cache',
+  DisableStakePoolMetricApy = 'Omit this metric for improved query performance',
   EpochPollInterval = 'Epoch poll interval',
   TokenMetadataCacheTtl = 'Token Metadata API cache TTL in minutes',
   TokenMetadataServerUrl = 'Token Metadata API server URL',
@@ -85,6 +87,7 @@ export type ProviderServerArgs = CommonProgramOptions &
   RabbitMqProgramOptions & {
     cardanoNodeConfigPath?: string;
     disableDbCache?: boolean;
+    disableStakePoolMetricApy?: boolean;
     tokenMetadataCacheTTL?: number;
     tokenMetadataServerUrl?: string;
     epochPollInterval: number;
@@ -155,6 +158,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       const stakePoolProvider = new DbSyncStakePoolProvider(
         {
           paginationPageSizeLimit: args.paginationPageSizeLimit!,
+          responseConfig: { search: { metrics: { apy: !args.disableStakePoolMetricApy } } },
           useBlockfrost: args.useBlockfrost!
         },
         {

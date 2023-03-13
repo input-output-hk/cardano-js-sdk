@@ -54,6 +54,7 @@
     "test:e2e": "shx echo 'test:e2e' command not implemented yet"
   },
   "devDependencies": {
+    "@types/dockerode": "^3.3.8",
     "@types/jest": "^26.0.24",
     "eslint": "^7.32.0",
     "jest": "^28.1.3",

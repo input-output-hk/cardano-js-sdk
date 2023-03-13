@@ -26,14 +26,14 @@ const selectTxOutput = `
 	FROM tx_out
 	JOIN tx ON tx_out.tx_id = tx.id`;
 
-export const findTxInputsByHashes = `
-  ${selectTxInput()}
-  WHERE tx.hash = ANY($1)
+export const findTxInputsByIds = `
+  	${selectTxInput()}
+  	WHERE tx.id = ANY($1)
 	ORDER BY tx_in.id ASC`;
 
-export const findTxCollateralsByHashes = `
+export const findTxCollateralsByIds = `
 	${selectTxInput(true)}
-	WHERE tx.hash = ANY($1)
+	WHERE tx.id = ANY($1)
 	ORDER BY tx_in.id ASC`;
 
 export const findTxInputsByAddresses = `
@@ -44,9 +44,9 @@ export const findTxInputsByAddresses = `
 	AND block.block_no <= $3
 	ORDER BY tx_in.id ASC`;
 
-export const findTxOutputsByHashes = `
-  ${selectTxOutput}
-  WHERE tx.hash = ANY($1)
+export const findTxOutputsByIds = `
+  	${selectTxOutput}
+  	WHERE tx.id = ANY($1)
 	ORDER BY tx_out.id ASC`;
 
 export const findTxOutputsByAddresses = `
@@ -115,7 +115,7 @@ export const findMultiAssetByTxOut = `
 	WHERE tx_out.id = ANY($1)
 	ORDER BY ma_out.id ASC`;
 
-export const findTxMint = `
+export const findTxMintByIds = `
 	SELECT 
 		mint.quantity AS quantity,
 		ma_id.fingerprint AS fingerprint,
@@ -125,10 +125,10 @@ export const findTxMint = `
 	FROM ma_tx_mint AS mint
 	JOIN multi_asset AS ma_id ON mint.ident = ma_id.id
 	JOIN tx ON tx.id = mint.tx_id
-	WHERE tx.hash = ANY($1)
+	WHERE tx.id = ANY($1)
 	ORDER BY mint.id ASC`;
 
-export const findTransactionsByHashes = `
+export const findTransactionsByIds = `
 	SELECT 
 		tx.hash AS id,
 		tx.block_index AS "index",
@@ -142,10 +142,14 @@ export const findTransactionsByHashes = `
 		block.slot_no AS block_slot_no
 	FROM tx
 	JOIN block ON tx.block_id = block.id
-  WHERE tx.hash = ANY($1)
+  WHERE tx.id = ANY($1)
 	ORDER BY tx.id ASC`;
 
-export const findWithdrawal = `
+export const findTxRecordIdsByTxHashes = `
+	SELECT id FROM tx WHERE hash = ANY($1)	
+`;
+
+export const findWithdrawalsByTxIds = `
 	SELECT
 		withdrawal.amount AS quantity,
 		tx.hash AS tx_id,
@@ -153,10 +157,10 @@ export const findWithdrawal = `
 	FROM withdrawal
 	JOIN tx ON tx.id = withdrawal.tx_id
 	JOIN stake_address AS stk_addr ON stk_addr.id = withdrawal.addr_id
-	WHERE tx.hash = ANY($1)
+	WHERE tx.id = ANY($1)
 	ORDER BY withdrawal.id ASC`;
 
-export const findRedeemer = `
+export const findRedeemersByTxIds = `
 	SELECT
 		redeemer."index" AS "index",
 		redeemer.purpose AS purpose,
@@ -166,10 +170,10 @@ export const findRedeemer = `
 		tx.hash AS tx_id
 	FROM redeemer
 	JOIN tx ON tx.id = redeemer.tx_id
-	WHERE tx.hash = ANY($1)
+	WHERE tx.id = ANY($1)
 	ORDER BY redeemer.id ASC`;
 
-export const findPoolRetireCerts = `
+export const findPoolRetireCertsTxIds = `
 	SELECT 
 		cert.cert_index AS cert_index,
 		cert.retiring_epoch AS retiring_epoch,
@@ -178,10 +182,10 @@ export const findPoolRetireCerts = `
 	FROM tx 
 	JOIN pool_retire AS cert ON cert.announced_tx_id = tx.id
 	JOIN pool_hash AS pool ON pool.id = cert.hash_id
-	WHERE tx.hash = ANY($1)
+	WHERE tx.id = ANY($1)
 	ORDER BY tx.id ASC`;
 
-export const findPoolRegisterCerts = `
+export const findPoolRegisterCertsByTxIds = `
 	SELECT	
 		cert.cert_index AS cert_index,
 		pool."view" AS pool_id,
@@ -189,10 +193,10 @@ export const findPoolRegisterCerts = `
 	FROM tx
 	JOIN pool_update AS cert ON cert.registered_tx_id = tx.id
 	JOIN pool_hash AS pool ON pool.id = cert.hash_id
-	WHERE tx.hash = ANY($1)
+	WHERE tx.id = ANY($1)
 	ORDER BY tx.id ASC`;
 
-export const findMirCerts = `
+export const findMirCertsByTxIds = `
 	(SELECT
 		cert.cert_index AS cert_index,
 		cert.amount AS amount,
@@ -202,7 +206,7 @@ export const findMirCerts = `
 	FROM tx
 	JOIN reserve AS cert ON cert.tx_id = tx.id
 	JOIN stake_address AS addr ON cert.addr_id = addr.id
-	WHERE tx.hash = ANY($1)
+	WHERE tx.id = ANY($1)
 	ORDER BY tx.id ASC)
 	UNION
 	(SELECT
@@ -214,10 +218,10 @@ export const findMirCerts = `
 	FROM tx
 	JOIN treasury AS cert ON cert.tx_id = tx.id
 	JOIN stake_address AS addr ON cert.addr_id = addr.id
-	WHERE tx.hash = ANY($1)
+	WHERE tx.id = ANY($1)
 	ORDER BY tx.id ASC)`;
 
-export const findStakeCerts = `
+export const findStakeCertsByTxIds = `
 	(SELECT 
 		cert.cert_index AS cert_index,
 		addr."view" AS address,
@@ -226,7 +230,7 @@ export const findStakeCerts = `
 	FROM tx
 	JOIN stake_registration AS cert ON cert.tx_id = tx.id
 	JOIN stake_address AS addr ON addr.id = cert.addr_id
-	WHERE tx.hash = ANY($1)
+	WHERE tx.id = ANY($1)
 	ORDER BY tx.id ASC)
 	UNION
 	(SELECT 
@@ -237,10 +241,10 @@ export const findStakeCerts = `
 	FROM tx
 	JOIN stake_deregistration AS cert ON cert.tx_id = tx.id
 	JOIN stake_address AS addr ON addr.id = cert.addr_id
-	WHERE tx.hash = ANY($1)
+	WHERE tx.id = ANY($1)
 	ORDER BY tx.id ASC)`;
 
-export const findDelegationCerts = `
+export const findDelegationCertsByTxIds = `
 	SELECT 
 		cert.cert_index AS cert_index,
 		tx.hash AS tx_id,
@@ -250,5 +254,53 @@ export const findDelegationCerts = `
 	JOIN delegation AS cert ON cert.tx_id = tx.id
 	JOIN pool_hash AS pool ON pool.id = cert.pool_hash_id
 	JOIN stake_address AS addr ON addr.id = cert.addr_id
-	WHERE tx.hash = ANY($1)
+	WHERE tx.id = ANY($1)
 	ORDER BY tx.id ASC`;
+
+export const findTxsByAddresses = {
+  WITH: `
+WITH source AS (
+  SELECT tx_id, tx_in_id FROM tx_out
+  LEFT JOIN tx_in ON tx_out_id = tx_id AND tx_out_index = index
+  WHERE address = ANY($1)
+),
+combined AS (
+  SELECT tx_id FROM source
+  UNION ALL
+  SELECT tx_in_id AS tx_id FROM source WHERE tx_in_id IS NOT NULL
+)`,
+  count: {
+    ORDER: '',
+    SELECT: `
+SELECT
+  COUNT(DISTINCT tx_id) AS count`
+  },
+  page: {
+    ORDER: `
+ORDER BY tx_id`,
+    SELECT: `
+SELECT
+  DISTINCT tx_id`
+  },
+  withRange: {
+    FROM: `
+FROM partial
+JOIN tx ON
+  tx.id = tx_id
+JOIN block ON
+  block.id = block_id AND
+  block_no BETWEEN $2 AND $3`,
+    WITH: `,
+partial AS (
+  SELECT
+    DISTINCT tx_id
+  FROM combined
+  ORDER BY tx_id
+)`
+  },
+  withoutRange: {
+    FROM: `
+FROM combined`,
+    WITH: ''
+  }
+} as const;

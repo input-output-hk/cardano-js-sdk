@@ -1,3 +1,5 @@
+# guard accidental inclusion after incorrectly using npm install
+package-lock.json
 coverage
 node_modules
 docs

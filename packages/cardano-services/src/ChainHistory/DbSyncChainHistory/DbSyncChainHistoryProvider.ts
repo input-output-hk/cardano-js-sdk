@@ -1,6 +1,7 @@
+/* eslint-disable max-len */
 /* eslint-disable sonarjs/no-nested-template-literals */
 import * as Queries from './queries';
-import { BlockModel, BlockOutputModel, TipModel, TxInputModel, TxModel, TxOutputModel } from './types';
+import { BlockModel, BlockOutputModel, TipModel, TxModel } from './types';
 import {
   BlocksByIdsArgs,
   Cardano,
@@ -16,11 +17,9 @@ import { DB_MAX_SAFE_INTEGER } from './queries';
 import { DbSyncProvider, DbSyncProviderDependencies } from '../../util/DbSyncProvider';
 import { QueryResult } from 'pg';
 import { TxMetadataService } from '../../Metadata';
-import { applyPagination } from './util';
 import { hexStringToBuffer } from '@cardano-sdk/util';
-import { mapBlock, mapTxAlonzo, mapTxIn, mapTxInModel, mapTxOut, mapTxOutModel } from './mappers';
+import { mapBlock, mapTxAlonzo, mapTxIn, mapTxOut } from './mappers';
 import orderBy from 'lodash/orderBy';
-import uniq from 'lodash/uniq';
 
 /**
  * Properties that are need to create DbSyncChainHistoryProvider
@@ -87,29 +86,12 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
       } ${blockRange?.upperBound ? `and before ${upperBound}` : ''}`
     );
 
-    const inputsResults: QueryResult<TxInputModel> = await this.db.query(Queries.findTxInputsByAddresses, [
-      addresses,
-      lowerBound,
-      upperBound
-    ]);
-    const outputsResults: QueryResult<TxOutputModel> = await this.db.query(Queries.findTxOutputsByAddresses, [
-      addresses,
-      lowerBound,
-      upperBound
+    const [totalResultCount, ids] = await Promise.all([
+      this.#builder.queryTxIdsByAddresses(addresses, blockRange),
+      this.#builder.queryTxIdsByAddresses(addresses, blockRange, pagination)
     ]);
 
-    if (inputsResults.rows.length === 0 && outputsResults.rows.length === 0)
-      return { pageResults: [], totalResultCount: 0 };
-
-    const ids = uniq([
-      ...inputsResults.rows.map(mapTxInModel).flatMap((input) => input.txInputId),
-      ...outputsResults.rows.map((outputModel) => mapTxOutModel(outputModel)).flatMap((output) => output.txId)
-    ]);
-
-    return {
-      pageResults: await this.transactionsByHashes({ ids: applyPagination(ids, pagination) }),
-      totalResultCount: ids.length
-    };
+    return { pageResults: totalResultCount ? await this.transactionsByIds(ids) : [], totalResultCount };
   }
 
   public async transactionsByHashes({ ids }: TransactionsByIdsArgs): Promise<Cardano.HydratedTx[]> {
@@ -121,20 +103,25 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
       );
     }
 
-    const byteIds = ids.map((id) => hexStringToBuffer(id));
-    this.logger.debug('About to find transactions with hashes:', byteIds);
-    const txResults: QueryResult<TxModel> = await this.db.query(Queries.findTransactionsByHashes, [byteIds]);
+    // Conversion tx.hash -> tx.id
+    const txRecordIds = await this.#builder.queryTxRecordIdsByTxHashes(ids);
+    return this.transactionsByIds(txRecordIds);
+  }
+
+  private async transactionsByIds(ids: string[]): Promise<Cardano.HydratedTx[]> {
+    this.logger.debug('About to find transactions with ids:', ids);
+    const txResults: QueryResult<TxModel> = await this.db.query(Queries.findTransactionsByIds, [ids]);
     if (txResults.rows.length === 0) return [];
 
     const [inputs, outputs, mints, withdrawals, redeemers, metadata, collaterals, certificates] = await Promise.all([
-      this.#builder.queryTransactionInputsByHashes(ids),
-      this.#builder.queryTransactionOutputsByHashes(ids),
-      this.#builder.queryTxMintByHashes(ids),
-      this.#builder.queryWithdrawalsByHashes(ids),
-      this.#builder.queryRedeemersByHashes(ids),
-      this.#metadataService.queryTxMetadataByHashes(ids),
-      this.#builder.queryTransactionInputsByHashes(ids, true),
-      this.#builder.queryCertificatesByHashes(ids)
+      this.#builder.queryTransactionInputsByIds(ids),
+      this.#builder.queryTransactionOutputsByIds(ids),
+      this.#builder.queryTxMintByIds(ids),
+      this.#builder.queryWithdrawalsByTxIds(ids),
+      this.#builder.queryRedeemersByIds(ids),
+      this.#metadataService.queryTxMetadataByRecordIds(ids),
+      this.#builder.queryTransactionInputsByIds(ids, true),
+      this.#builder.queryCertificatesByIds(ids)
     ]);
 
     return txResults.rows.map((tx) => {
