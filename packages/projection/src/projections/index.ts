@@ -1,5 +1,5 @@
 import { stakeKeys } from './stakeKeys';
-import { stakePools } from './stakePools';
+import { stakePoolMetadata, stakePoolMetrics, stakePools } from './stakePools';
 
 export * from './stakeKeys';
 export * from './stakePools';
@@ -8,6 +8,8 @@ export * from './types';
 
 export const allProjections = {
   stakeKeys,
+  stakePoolMetadata,
+  stakePoolMetrics,
   stakePools
 };
 

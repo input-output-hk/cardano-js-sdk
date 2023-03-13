@@ -11,7 +11,9 @@ export const createStore = (): InMemoryStore => ({
   stakePools: new Map()
 });
 
-export const createSinks = (store: InMemoryStore): Sinks<AllProjections> => ({
+type SupportedProjections = Pick<AllProjections, 'stakeKeys' | 'stakePools'>;
+
+export const createSinks = (store: InMemoryStore): Sinks<SupportedProjections> => ({
   before: withStaticContext({ store }),
   buffer: new InMemoryStabilityWindowBuffer(),
   projectionSinks: {
@@ -21,7 +23,7 @@ export const createSinks = (store: InMemoryStore): Sinks<AllProjections> => ({
 });
 
 export const createSinksFactory =
-  (store: InMemoryStore): SinksFactory<AllProjections> =>
+  (store: InMemoryStore): SinksFactory<SupportedProjections> =>
   () =>
     createSinks(store);
 

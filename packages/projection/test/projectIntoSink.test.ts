@@ -8,12 +8,18 @@ import { from, lastValueFrom, of, toArray } from 'rxjs';
 const dataWithPoolRetirement = chainSyncData(ChainSyncDataSet.WithPoolRetirement);
 const dataWithStakeKeyDeregistration = chainSyncData(ChainSyncDataSet.WithStakeKeyDeregistration);
 
-const projectAll = ({ cardanoNode }: StubChainSyncData, projectionSinks: Sinks<Projections.AllProjections>) =>
+const projections = {
+  stakeKeys: Projections.stakeKeys,
+  stakePools: Projections.stakePools
+};
+type TestProjections = typeof projections;
+
+const projectAll = ({ cardanoNode }: StubChainSyncData, projectionSinks: Sinks<TestProjections>) =>
   lastValueFrom(
     projectIntoSink({
       cardanoNode,
       logger,
-      projections: Projections.allProjections,
+      projections,
       sinksFactory: () => projectionSinks
     }).pipe(toArray())
   );
