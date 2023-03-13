@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.4.0...@cardano-sdk/projection@0.5.0) (2023-03-13)
+
+### ⚠ BREAKING CHANGES
+
+- **projection:** replace projectIntoSink 'sinks' prop with 'sinksFactory'
+- **projection:** replace register/deregister with insert/del for withStakeKeys
+- **projection:** replace StabilityWindowBuffer methods with a single `handleEvents`
+
+### Features
+
+- **projection:** export ProjectionsEvent and SinkEventType type utils ([0463c9d](https://github.com/input-output-hk/cardano-js-sdk/commit/0463c9dd70a9eda88238e524c36e3564ff37169d))
+- **projection:** replace register/deregister with insert/del for withStakeKeys ([9386990](https://github.com/input-output-hk/cardano-js-sdk/commit/938699076b5ed67fecdb7663c26526ce7e80356a))
+- send phase2 validation failed transactions as failed$ ([ef25825](https://github.com/input-output-hk/cardano-js-sdk/commit/ef2582532677aeee4b19e84adf1957f09631dd72))
+
+### Code Refactoring
+
+- **projection:** replace projectIntoSink 'sinks' prop with 'sinksFactory' ([8f15f6f](https://github.com/input-output-hk/cardano-js-sdk/commit/8f15f6f9fa09fea25df7d14ed10a64afcfa234c2))
+- **projection:** replace StabilityWindowBuffer methods with a single `handleEvents` ([5c8d330](https://github.com/input-output-hk/cardano-js-sdk/commit/5c8d3303890c3c6b299b145cd906222d25cdceec))
+
 ## [0.4.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.3.0...@cardano-sdk/projection@0.4.0) (2023-03-01)
 
 ### ⚠ BREAKING CHANGES

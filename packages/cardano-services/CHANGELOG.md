@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.9.0...@cardano-sdk/cardano-services@0.10.0) (2023-03-13)
+
+### ⚠ BREAKING CHANGES
+
+- **cardano-services:** rename http-server to provider-server
+- core type for address string reprensetation 'Address' renamed to PaymentAddress
+
+### Features
+
+- add inputSource in transactions ([7ed99d5](https://github.com/input-output-hk/cardano-js-sdk/commit/7ed99d5a12cf8667114c76ecde0cbdc3cfbc3887))
+- adds caching stake pools metric from blockfrost ([d2de0a4](https://github.com/input-output-hk/cardano-js-sdk/commit/d2de0a4efa8f443fb4b63da9a6322eeaa099d09e))
+- **cardano-services:** HTTP server /ready endpoint ([e613306](https://github.com/input-output-hk/cardano-js-sdk/commit/e613306d1eba64eaab638d68319db1154e414756))
+- **cardano-services:** support disabling stake pool APY metric, for performance benefits ([18e1dfb](https://github.com/input-output-hk/cardano-js-sdk/commit/18e1dfba661705f0e36f5255f7a3a182952c40ed))
+- rewards history limit default ([8c32be8](https://github.com/input-output-hk/cardano-js-sdk/commit/8c32be88a9edd3ed82a34c75d33a7a428ecc3b7c))
+- **util-dev:** add DockerUtil (hoisted from cardano-services tests) ([ccb86ab](https://github.com/input-output-hk/cardano-js-sdk/commit/ccb86ab3ad8f0ae3c73a3c36173b1f76c0704f6d))
+
+### Bug Fixes
+
+- **cardano-services:** fixes how collaterals are handled in stake pools related queries ([d4a4158](https://github.com/input-output-hk/cardano-js-sdk/commit/d4a4158e94cedd090a5df569a0aa3c2ec2425c2f))
+- **cardano-services:** fixes the total ada computation formula ([c63df83](https://github.com/input-output-hk/cardano-js-sdk/commit/c63df8377b867a5e477f81e54a21c5f4a74c3c93))
+- **cardano-services:** fixes the type of blocks created and delegats in stake pools search api ([b76ed1e](https://github.com/input-output-hk/cardano-js-sdk/commit/b76ed1e6fb678843d8bfc08b22c46b439f311ec2))
+
+### Code Refactoring
+
+- **cardano-services:** rename http-server to provider-server ([7b58748](https://github.com/input-output-hk/cardano-js-sdk/commit/7b587480edda5a9f36796ac577fd56baa6d4ee11))
+- core type for address string reprensetation 'Address' renamed to PaymentAddress ([4287463](https://github.com/input-output-hk/cardano-js-sdk/commit/42874633de6069510efdc57323f61140d22ed203))
+
 ## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.8.0...@cardano-sdk/cardano-services@0.9.0) (2023-03-01)
 
 ### ⚠ BREAKING CHANGES

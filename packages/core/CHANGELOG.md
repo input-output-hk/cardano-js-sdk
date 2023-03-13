@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.9.0...@cardano-sdk/core@0.10.0) (2023-03-13)
+
+### ⚠ BREAKING CHANGES
+
+- upgrade resolveInputAddress to resolveInput
+- added optional isValid field to Transaction object
+- add new Address types that implement CIP-19 natively
+- core type for address string reprensetation 'Address' renamed to PaymentAddress
+
+### Features
+
+- add inputSource in transactions ([7ed99d5](https://github.com/input-output-hk/cardano-js-sdk/commit/7ed99d5a12cf8667114c76ecde0cbdc3cfbc3887))
+- add new Address types that implement CIP-19 natively ([a892176](https://github.com/input-output-hk/cardano-js-sdk/commit/a8921760b714b090bb6c15d6b4696e2dd0b2fdc5))
+- added optional isValid field to Transaction object ([f722ae8](https://github.com/input-output-hk/cardano-js-sdk/commit/f722ae8075744a6ca61df1c2c077131cbd0ecf3b))
+- rewards history limit default ([8c32be8](https://github.com/input-output-hk/cardano-js-sdk/commit/8c32be88a9edd3ed82a34c75d33a7a428ecc3b7c))
+- send phase2 validation failed transactions as failed$ ([ef25825](https://github.com/input-output-hk/cardano-js-sdk/commit/ef2582532677aeee4b19e84adf1957f09631dd72))
+- upgrade resolveInputAddress to resolveInput ([fcfa035](https://github.com/input-output-hk/cardano-js-sdk/commit/fcfa035a3498f675945dafcc82b8f05c08318dd8))
+
+### Code Refactoring
+
+- core type for address string reprensetation 'Address' renamed to PaymentAddress ([4287463](https://github.com/input-output-hk/cardano-js-sdk/commit/42874633de6069510efdc57323f61140d22ed203))
+
 ## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.8.0...@cardano-sdk/core@0.9.0) (2023-03-01)
 
 ### ⚠ BREAKING CHANGES

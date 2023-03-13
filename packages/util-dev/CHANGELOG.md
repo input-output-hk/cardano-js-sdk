@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.7.1...@cardano-sdk/util-dev@0.8.0) (2023-03-13)
+
+### ⚠ BREAKING CHANGES
+
+- core type for address string reprensetation 'Address' renamed to PaymentAddress
+
+### Features
+
+- **util-dev:** add DockerUtil (hoisted from cardano-services tests) ([ccb86ab](https://github.com/input-output-hk/cardano-js-sdk/commit/ccb86ab3ad8f0ae3c73a3c36173b1f76c0704f6d))
+- **util-dev:** add patchObject test util ([17afde8](https://github.com/input-output-hk/cardano-js-sdk/commit/17afde825ed7a092e770c0058161f71e55ba471b))
+
+### Code Refactoring
+
+- core type for address string reprensetation 'Address' renamed to PaymentAddress ([4287463](https://github.com/input-output-hk/cardano-js-sdk/commit/42874633de6069510efdc57323f61140d22ed203))
+
 ## [0.7.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.7.0...@cardano-sdk/util-dev@0.7.1) (2023-03-01)
 
 **Note:** Version bump only for package @cardano-sdk/util-dev

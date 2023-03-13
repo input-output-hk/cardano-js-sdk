@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.8.0...@cardano-sdk/e2e@0.9.0) (2023-03-13)
+
+### ⚠ BREAKING CHANGES
+
+- **projection:** replace projectIntoSink 'sinks' prop with 'sinksFactory'
+- upgrade resolveInputAddress to resolveInput
+- **projection:** replace register/deregister with insert/del for withStakeKeys
+- added optional isValid field to Transaction object
+- **wallet:** add missing `witness` fields to initializeTx and finalizeTx props
+- **cardano-services:** rename http-server to provider-server
+- core type for address string reprensetation 'Address' renamed to PaymentAddress
+
+### Features
+
+- added optional isValid field to Transaction object ([f722ae8](https://github.com/input-output-hk/cardano-js-sdk/commit/f722ae8075744a6ca61df1c2c077131cbd0ecf3b))
+- adds caching stake pools metric from blockfrost ([d2de0a4](https://github.com/input-output-hk/cardano-js-sdk/commit/d2de0a4efa8f443fb4b63da9a6322eeaa099d09e))
+- **e2e:** add new env variable PROJECTION_PG_CONNECTION_STRING ([0ff4e84](https://github.com/input-output-hk/cardano-js-sdk/commit/0ff4e84719975980832ee35b6e98d66da123fdc0))
+- **projection-typeorm:** initial implementation ([d0d8ccb](https://github.com/input-output-hk/cardano-js-sdk/commit/d0d8ccbfac6e5732497cd1719c005a4cc241f30c))
+- **projection:** replace register/deregister with insert/del for withStakeKeys ([9386990](https://github.com/input-output-hk/cardano-js-sdk/commit/938699076b5ed67fecdb7663c26526ce7e80356a))
+- upgrade resolveInputAddress to resolveInput ([fcfa035](https://github.com/input-output-hk/cardano-js-sdk/commit/fcfa035a3498f675945dafcc82b8f05c08318dd8))
+- **wallet:** add missing `witness` fields to initializeTx and finalizeTx props ([c34ee2b](https://github.com/input-output-hk/cardano-js-sdk/commit/c34ee2b7cf056a6861523823afff64b70654500b))
+
+### Code Refactoring
+
+- **cardano-services:** rename http-server to provider-server ([7b58748](https://github.com/input-output-hk/cardano-js-sdk/commit/7b587480edda5a9f36796ac577fd56baa6d4ee11))
+- core type for address string reprensetation 'Address' renamed to PaymentAddress ([4287463](https://github.com/input-output-hk/cardano-js-sdk/commit/42874633de6069510efdc57323f61140d22ed203))
+- **projection:** replace projectIntoSink 'sinks' prop with 'sinksFactory' ([8f15f6f](https://github.com/input-output-hk/cardano-js-sdk/commit/8f15f6f9fa09fea25df7d14ed10a64afcfa234c2))
+
 ## [0.8.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.7.0...@cardano-sdk/e2e@0.8.0) (2023-03-01)
 
 ### ⚠ BREAKING CHANGES
