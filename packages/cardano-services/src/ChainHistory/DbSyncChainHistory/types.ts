@@ -133,3 +133,11 @@ export interface DelegationCertModel extends CertificateModel {
   address: string;
   pool_id: string;
 }
+
+export interface CountModel {
+  count: string;
+}
+
+export interface TxIdModel {
+  tx_id: string;
+}

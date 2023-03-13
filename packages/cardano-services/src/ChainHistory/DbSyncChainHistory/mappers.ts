@@ -7,6 +7,7 @@ import {
   MultiAssetModel,
   RedeemerModel,
   TipModel,
+  TxIdModel,
   TxInput,
   TxInputModel,
   TxModel,
@@ -180,7 +181,7 @@ export const mapTxAlonzo = (
         }
       : undefined,
   blockHeader: {
-    blockNo: Cardano.BlockNo(txModel.block_no),
+    blockNo: Cardano.BlockNo(Number(txModel.block_no)),
     hash: txModel.block_hash.toString('hex') as unknown as Cardano.BlockId,
     slot: Cardano.Slot(Number(txModel.block_slot_no))
   },
@@ -236,3 +237,5 @@ export const mapBlock = (
   txCount: Number(blockModel.tx_count),
   vrf: blockModel.vrf as unknown as Cardano.VrfVkBech32
 });
+
+export const mapTxId = ({ tx_id }: TxIdModel) => tx_id;

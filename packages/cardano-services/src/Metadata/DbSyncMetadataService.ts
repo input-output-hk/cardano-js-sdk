@@ -4,7 +4,7 @@ import { Logger } from 'ts-log';
 import { Pool, QueryResult } from 'pg';
 import { TxMetadataModel, TxMetadataService } from './types';
 import { hexStringToBuffer } from '@cardano-sdk/util';
-import { mapTxMetadata } from './mappers';
+import { mapTxMetadataByHashes } from './util';
 
 export type TxMetadataByHashes = Map<Cardano.TransactionId, Cardano.TxMetadata>;
 
@@ -13,17 +13,17 @@ export const createDbSyncMetadataService = (db: Pool, logger: Logger): TxMetadat
     const byteHashes = hashes.map((hash) => hexStringToBuffer(hash));
     logger.debug('About to find metadata for txs:', hashes);
 
-    const result: QueryResult<TxMetadataModel> = await db.query(Queries.findTxMetadata, [byteHashes]);
+    const result: QueryResult<TxMetadataModel> = await db.query(Queries.findTxMetadataByTxHashes, [byteHashes]);
 
     if (result.rows.length === 0) return new Map();
-    const metadataMap: Map<Cardano.TransactionId, TxMetadataModel[]> = new Map();
+    return mapTxMetadataByHashes(result.rows);
+  },
+  async queryTxMetadataByRecordIds(ids: string[]): Promise<TxMetadataByHashes> {
+    logger.debug('About to find metadata for transactions with ids:', ids);
 
-    for (const metadata of result.rows) {
-      const txId = metadata.tx_id.toString('hex') as unknown as Cardano.TransactionId;
-      const currentMetadata: TxMetadataModel[] = metadataMap.get(txId) ?? [];
-      metadataMap.set(txId, [...currentMetadata, metadata]);
-    }
+    const result: QueryResult<TxMetadataModel> = await db.query(Queries.findTxMetadataByTxIds, [ids]);
 
-    return new Map([...metadataMap].map(([id, metadata]) => [id, mapTxMetadata(metadata)]));
+    if (result.rows.length === 0) return new Map();
+    return mapTxMetadataByHashes(result.rows);
   }
 });
