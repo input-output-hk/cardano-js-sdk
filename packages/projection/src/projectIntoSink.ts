@@ -8,7 +8,8 @@ import {
   Intersection,
   ObservableCardanoNode,
   ObservableChainSync,
-  PointOrOrigin
+  PointOrOrigin,
+  TipOrOrigin
 } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import {
@@ -64,6 +65,45 @@ const blocksToPoints = (blocks: Array<Cardano.Block | 'origin'>) =>
 
 const pointDescription = (point: PointOrOrigin) =>
   point === 'origin' ? 'origin' : `slot ${point.slot}, block ${point.hash}`;
+
+const isAtTheTipOrHigher = (header: Cardano.PartialBlockHeader, tip: TipOrOrigin) => {
+  if (tip === 'origin') return false;
+  return header.blockNo >= tip.blockNo;
+};
+
+const logEvent =
+  <T extends UnifiedProjectorEvent<{}>>(logger: Logger) =>
+  (evt$: Observable<T>) => {
+    let numEvt = 0;
+    const logFrequency = 1000;
+    const startedAt = Date.now();
+    let lastLogAt = startedAt;
+    return evt$.pipe(
+      tap(({ block: { header }, eventType, tip }) => {
+        numEvt++;
+        if (isAtTheTipOrHigher(header, tip)) {
+          logger.info(
+            `Processed event ${
+              eventType === ChainSyncEventType.RollForward ? 'RollForward' : 'RollBackward'
+            } ${pointDescription(header)}`
+          );
+        } else if (numEvt % logFrequency === 0 && tip !== 'origin') {
+          const syncPercentage = ((header.blockNo * 100) / tip.blockNo).toFixed(2);
+          const now = Date.now();
+          const currentSpeed = Math.round(logFrequency / ((now - lastLogAt) / 1000));
+          lastLogAt = now;
+          const overallSpeedPerMs = numEvt / (now - startedAt);
+          const overallSpeed = Math.round(overallSpeedPerMs * 1000);
+          const eta = new Date(now + (tip.blockNo - header.blockNo) / overallSpeedPerMs);
+          logger.info(
+            `Initializing ${syncPercentage}% at block #${
+              header.blockNo
+            }. Speed: ${currentSpeed}bps (avg ${overallSpeed}bps). ETA: ${eta.toISOString()}`
+          );
+        }
+      })
+    );
+  };
 
 const syncFromIntersection = <PS>({
   chainSync: { intersection, chainSync$ },
@@ -220,14 +260,8 @@ export const projectIntoSink = <P extends object, PS extends P>({
         }),
         sinks.buffer.handleEvents,
         sinks.after || passthrough(),
-        tap((evt) => {
-          logger.debug(
-            `Processed event ${
-              evt.eventType === ChainSyncEventType.RollForward ? 'RollForward' : 'RollBackward'
-            } ${pointDescription(evt.block.header)}`
-          );
-          evt.requestNext();
-        }),
+        logEvent(logger),
+        tap((evt) => evt.requestNext()),
         finalize(() => logger.info('Stopped'))
       );
     })
