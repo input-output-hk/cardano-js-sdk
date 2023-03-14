@@ -1,8 +1,9 @@
+/* eslint-disable max-len */
 import { AddressType, GroupedAddress, util } from '@cardano-sdk/key-management';
 import { AddressesModel, WalletVars } from './types';
 import { Cardano } from '@cardano-sdk/core';
 import { FunctionHook } from '../artillery';
-import { Pool, QueryResult } from 'pg';
+import { Pool } from 'pg';
 import { StubKeyAgent, getEnv, getWallet, walletVariables } from '../../../src';
 import { findAddressesWithRegisteredStakeKey } from './queries';
 import { logger } from '@cardano-sdk/util-dev';
@@ -12,11 +13,57 @@ const env = getEnv([
   ...walletVariables,
   'DB_SYNC_CONNECTION_STRING',
   'ARRIVAL_PHASE_DURATION_IN_SECS',
-  'VIRTUAL_USERS_COUNT'
+  'VIRTUAL_USERS_COUNT',
+  'WALLET_SYNC_TIMEOUT_IN_MS'
 ]);
 
 const operationName = 'wallet-restoration';
-const SHORTAGE_OF_WALLETS_FOUND_ERROR_MESSAGE = 'Addresses found from db are less than desired wallets count';
+const syncTimeout = env.WALLET_SYNC_TIMEOUT_IN_MS;
+
+const getNetworkName = ({ networkMagic }: Cardano.ChainId) => {
+  switch (networkMagic) {
+    case Cardano.NetworkMagics.Mainnet:
+      return 'mainnet';
+    case Cardano.NetworkMagics.Preprod:
+      return 'preprod';
+    default:
+  }
+};
+
+/**
+ * Extract addresses from predefined dump if specified network exists,
+ * otherwise fallback extraction using DB query (mainly to support local network env).
+ *
+ * @param {number} count Number of addresses to extract
+ * @returns {AddressesModel[]} Addresses subset
+ */
+const extractAddresses = async (count: number): Promise<AddressesModel[]> => {
+  let result: AddressesModel[] = [];
+  const network = getNetworkName(env.KEY_MANAGEMENT_PARAMS.chainId);
+  try {
+    if (network) {
+      const dump = require(`../../dump/addresses/${network}.json`);
+      if (dump.length < count) {
+        throw new Error(`You can not restore more than ${dump.length} distinct wallets for ${network} network.`);
+      }
+      result = dump.slice(0, count);
+      logger.info(`Selected subset of predefined ${network} addresses with count: ${result.length}.`);
+    } else if (env.DB_SYNC_CONNECTION_STRING) {
+      const db = new Pool({ connectionString: env.DB_SYNC_CONNECTION_STRING });
+      logger.info('About to query db for distinct addresses.');
+      result = (await db.query(findAddressesWithRegisteredStakeKey, [count])).rows;
+      if (result.length < count) {
+        throw new Error(`Addresses found from db are less than desired wallets count of ${count}`);
+      }
+      logger.info(`Found DB addresses count: ${result.length}`);
+    } else {
+      throw new Error('Please provide a valid KEY_MANAGEMENT_PARAMS or DB_SYNC_CONNECTION_STRING env variable.');
+    }
+  } catch (error) {
+    throw new Error(`Error was thrown while extracting addresses due to: ${error}`);
+  }
+  return result;
+};
 
 const mapToGroupedAddress = (addrModel: AddressesModel): GroupedAddress => ({
   accountIndex: 0,
@@ -27,31 +74,10 @@ const mapToGroupedAddress = (addrModel: AddressesModel): GroupedAddress => ({
   type: AddressType.External
 });
 
-export const findAddresses: FunctionHook<WalletVars> = async ({ vars }, ee, done) => {
-  vars.walletsCount = Number(env.VIRTUAL_USERS_COUNT);
-  const db: Pool = new Pool({ connectionString: env.DB_SYNC_CONNECTION_STRING });
-
-  try {
-    logger.info('About to query db for distinct addresses');
-    const result: QueryResult<AddressesModel> = await db.query(findAddressesWithRegisteredStakeKey, [
-      vars.walletsCount
-    ]);
-    logger.info('Found addresses count', result.rowCount);
-    logger.info(
-      'Found addresses',
-      result.rows.map(({ address }) => address)
-    );
-
-    vars.addresses = result.rows.map(mapToGroupedAddress);
-  } catch (error) {
-    ee.emit('counter', 'findAddresses.error', 1);
-    logger.error('Error thrown while performing findAddresses db sync query', error);
-  }
-
-  if (vars.addresses.length < vars.walletsCount) {
-    logger.error(SHORTAGE_OF_WALLETS_FOUND_ERROR_MESSAGE);
-    throw new Error(SHORTAGE_OF_WALLETS_FOUND_ERROR_MESSAGE);
-  }
+export const getAddresses: FunctionHook<WalletVars> = async ({ vars }, _, done) => {
+  vars.walletLoads = Number(env.VIRTUAL_USERS_COUNT);
+  const result = await extractAddresses(vars.walletLoads);
+  vars.addresses = result.map(mapToGroupedAddress);
   done();
 };
 
@@ -62,10 +88,11 @@ let index = 0;
 
 export const walletRestoration: FunctionHook<WalletVars> = async ({ vars, _uid }, ee, done) => {
   const currentAddress = vars.addresses[index];
-  logger.info('Current address:', currentAddress.address);
+  logger.info(`Current address: ${currentAddress.address}`);
   ++index;
 
   try {
+    // Creates Stub KeyAgent
     const keyAgent = util.createAsyncKeyAgent(new StubKeyAgent(currentAddress));
 
     // Start to measure wallet restoration time
@@ -79,24 +106,28 @@ export const walletRestoration: FunctionHook<WalletVars> = async ({ vars, _uid }
       polling: { interval: 50 }
     });
 
-    await waitForWalletStateSettle(wallet);
     vars.currentWallet = wallet;
+    await waitForWalletStateSettle(wallet, syncTimeout);
 
     // Emit custom metrics
     ee.emit('histogram', `${operationName}.time`, Date.now() - startedAt);
     ee.emit('counter', operationName, 1);
 
-    logger.info(`Wallet with name ${wallet.name} was successfully restored`);
+    logger.info(
+      `Wallet with name ${vars.currentWallet.name} and address ${currentAddress.address} was successfully restored`
+    );
   } catch (error) {
     ee.emit('counter', `${operationName}.error`, 1);
-    logger.error(error);
+    logger.error(
+      `Error was thrown while wallet restoration for ${vars.currentWallet.name} with address ${currentAddress.address} caused by: ${error}`
+    );
   }
 
   done();
 };
 
 export const shutdownWallet: FunctionHook<WalletVars> = async ({ vars, _uid }, _ee, done) => {
-  vars.currentWallet.shutdown();
+  vars.currentWallet?.shutdown();
   logger.info(`Wallet with VU id ${_uid} was shutdown`);
   done();
 };
