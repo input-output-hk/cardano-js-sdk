@@ -6,7 +6,7 @@ import { Pool, QueryResult } from 'pg';
 import { StubKeyAgent, getEnv, getWallet, walletVariables } from '../../../src';
 import { findAddressesWithRegisteredStakeKey } from './queries';
 import { logger } from '@cardano-sdk/util-dev';
-import { walletReady } from '../../util';
+import { waitForWalletStateSettle } from '../../util';
 
 const env = getEnv([
   ...walletVariables,
@@ -37,6 +37,10 @@ export const findAddresses: FunctionHook<WalletVars> = async ({ vars }, ee, done
       vars.walletsCount
     ]);
     logger.info('Found addresses count', result.rowCount);
+    logger.info(
+      'Found addresses',
+      result.rows.map(({ address }) => address)
+    );
 
     vars.addresses = result.rows.map(mapToGroupedAddress);
   } catch (error) {
@@ -59,6 +63,7 @@ let index = 0;
 export const walletRestoration: FunctionHook<WalletVars> = async ({ vars, _uid }, ee, done) => {
   const currentAddress = vars.addresses[index];
   logger.info('Current address:', currentAddress.address);
+  ++index;
 
   try {
     const keyAgent = util.createAsyncKeyAgent(new StubKeyAgent(currentAddress));
@@ -73,7 +78,8 @@ export const walletRestoration: FunctionHook<WalletVars> = async ({ vars, _uid }
       name: `Test Wallet of VU with id: ${_uid}`,
       polling: { interval: 50 }
     });
-    await walletReady(wallet);
+
+    await waitForWalletStateSettle(wallet);
     vars.currentWallet = wallet;
 
     // Emit custom metrics
@@ -85,7 +91,7 @@ export const walletRestoration: FunctionHook<WalletVars> = async ({ vars, _uid }
     ee.emit('counter', `${operationName}.error`, 1);
     logger.error(error);
   }
-  ++index;
+
   done();
 };
 
