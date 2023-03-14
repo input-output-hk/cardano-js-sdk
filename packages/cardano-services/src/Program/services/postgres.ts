@@ -2,9 +2,9 @@
 /* eslint-disable promise/no-nesting */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable unicorn/no-nested-ternary */
-import { ClientConfig, Pool, QueryConfig } from 'pg';
 import { DnsResolver } from '../utils';
 import { Logger } from 'ts-log';
+import { Pool, PoolConfig, QueryConfig } from 'pg';
 import { PosgresProgramOptions } from '../options';
 import { URL } from 'url';
 import { isConnectionError } from '@cardano-sdk/util';
@@ -23,10 +23,10 @@ import fs from 'fs';
 export const getPoolWithServiceDiscovery = async (
   dnsResolver: DnsResolver,
   logger: Logger,
-  { host, database, password, ssl, user }: ClientConfig
+  { host, database, max, password, ssl, user }: PoolConfig
 ): Promise<Pool> => {
   const { name, port } = await dnsResolver(host!);
-  let pool = new Pool({ database, host: name, password, port, ssl, user });
+  let pool = new Pool({ database, host: name, max, password, port, ssl, user });
 
   return new Proxy<Pool>({} as Pool, {
     get(_, prop) {
@@ -37,7 +37,7 @@ export const getPoolWithServiceDiscovery = async (
             if (isConnectionError(error)) {
               const record = await dnsResolver(host!);
               logger.info(`DNS resolution for Postgres service, resolved with record: ${JSON.stringify(record)}`);
-              pool = new Pool({ database, host: record.name, password, port: record.port, ssl, user });
+              pool = new Pool({ database, host: record.name, max, password, port: record.port, ssl, user });
               return await pool.query(args, values);
             }
             throw error;
@@ -60,11 +60,13 @@ export const getPool = async (
   options?: PosgresProgramOptions
 ): Promise<Pool | undefined> => {
   const ssl = options?.postgresSslCaFile ? { ca: loadSecret(options.postgresSslCaFile) } : undefined;
-  if (options?.postgresConnectionString) return new Pool({ connectionString: options.postgresConnectionString, ssl });
+  if (options?.postgresConnectionString)
+    return new Pool({ connectionString: options.postgresConnectionString, max: options.postgresPoolMax, ssl });
   if (options?.postgresSrvServiceName && options.postgresUser && options.postgresDb && options.postgresPassword) {
     return getPoolWithServiceDiscovery(dnsResolver, logger, {
       database: options.postgresDb,
       host: options.postgresSrvServiceName,
+      max: options.postgresPoolMax,
       password: options.postgresPassword,
       ssl,
       user: options.postgresUser

@@ -683,6 +683,8 @@ describe('CLI', () => {
                   postgresPassword,
                   '--postgres-host',
                   postgresHost,
+                  '--postgres-pool-max',
+                  '50',
                   '--postgres-port',
                   postgresPort,
                   ServiceNames.Utxo
@@ -705,6 +707,7 @@ describe('CLI', () => {
                   POSTGRES_DB: postgresDb,
                   POSTGRES_HOST: postgresHost,
                   POSTGRES_PASSWORD: postgresPassword,
+                  POSTGRES_POOL_MAX: '50',
                   POSTGRES_PORT: postgresPort,
                   POSTGRES_USER: postgresUser,
                   SERVICE_NAMES: ServiceNames.Utxo
