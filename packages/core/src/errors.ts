@@ -1,4 +1,4 @@
-import { ComposableError } from '@cardano-sdk/util';
+import { ComposableError, formatErrorMessage } from '@cardano-sdk/util';
 import { CustomError } from 'ts-custom-error';
 
 export enum ProviderFailure {
@@ -21,11 +21,9 @@ export const providerFailureToStatusCodeMap: { [key in ProviderFailure]: number 
   [ProviderFailure.ConnectionFailure]: 500
 };
 
-const formatMessage = (reason: string, detail?: string) => reason + (detail ? ` (${detail})` : '');
-
 export class ProviderError<InnerError = unknown> extends ComposableError<InnerError> {
   constructor(public reason: ProviderFailure, innerError?: InnerError, public detail?: string) {
-    super(formatMessage(reason, detail), innerError);
+    super(formatErrorMessage(reason, detail), innerError);
   }
 }
 
@@ -42,7 +40,7 @@ export enum SerializationFailure {
 
 export class SerializationError<InnerError = unknown> extends ComposableError<InnerError> {
   constructor(public reason: SerializationFailure, public detail?: string, innerError?: InnerError) {
-    super(formatMessage(reason, detail), innerError);
+    super(formatErrorMessage(reason, detail), innerError);
   }
 }
 
