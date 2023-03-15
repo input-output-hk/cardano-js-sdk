@@ -49,7 +49,7 @@
     "lint:fix": "yarn lint --fix",
     "mainnet:dev": "DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker compose -p cardano-services-mainnet -f docker-compose.yml -f docker-compose-dev.yml up",
     "mainnet:up": "DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker compose -p cardano-services-mainnet up",
-    "mainnet:down": "docker compose -p cardano-services-mainnet down",
+    "mainnet:down": "docker compose -p cardano-services-mainnet down -t 30",
     "prepack": "yarn build",
     "preprod:dev": "DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 OGMIOS_PORT=${OGMIOS_PORT:-1339} NETWORK=preprod docker compose -p cardano-services-preprod -f docker-compose.yml -f docker-compose-dev.yml up",
     "preprod:up": "DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 OGMIOS_PORT=${OGMIOS_PORT:-1339} NETWORK=preprod docker compose -p cardano-services-preprod up",
