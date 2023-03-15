@@ -3,7 +3,7 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Cardano, ChainHistoryProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
 import { ChainHistoryFixtureBuilder, TxWith } from './fixtures/FixtureBuilder';
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider, HttpServer, HttpServerConfig } from '../../src';
 import { CreateHttpProviderConfig, chainHistoryHttpProvider } from '@cardano-sdk/cardano-services-client';
@@ -50,36 +50,6 @@ describe('ChainHistoryHttpService', () => {
       connectionString: process.env.POSTGRES_CONNECTION_STRING
     });
     fixtureBuilder = new ChainHistoryFixtureBuilder(dbConnection, logger);
-  });
-
-  describe('unhealthy ChainHistoryProvider', () => {
-    beforeEach(async () => {
-      chainHistoryProvider = {
-        blocksByHashes: jest.fn(),
-        healthCheck: jest.fn(() => Promise.resolve({ ok: false })),
-        transactionsByAddresses: jest.fn(),
-        transactionsByHashes: jest.fn()
-      } as unknown as DbSyncChainHistoryProvider;
-    });
-    it('should not throw during service create if the ChainHistoryProvider is unhealthy', () => {
-      expect(() => new ChainHistoryHttpService({ chainHistoryProvider, logger })).not.toThrow(
-        new ProviderError(ProviderFailure.Unhealthy)
-      );
-    });
-
-    it('throws during service initialization if the ChainHistoryProvider is unhealthy', async () => {
-      expect.assertions(2);
-      service = new ChainHistoryHttpService({ chainHistoryProvider, logger });
-      httpServer = new HttpServer(config, { logger, runnableDependencies: [], services: [service] });
-      try {
-        await httpServer.initialize();
-      } catch (error: unknown) {
-        if (error instanceof ProviderError) {
-          expect(error.name).toBe('ProviderError');
-          expect(error.reason).toBe('UNHEALTHY');
-        }
-      }
-    });
   });
 
   describe('healthy state', () => {

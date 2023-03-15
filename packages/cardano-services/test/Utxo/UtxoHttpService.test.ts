@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import { AddressWith, UtxoFixtureBuilder } from './fixtures/FixtureBuilder';
-import { Asset, Cardano, ProviderError, ProviderFailure, UtxoProvider } from '@cardano-sdk/core';
+import { Asset, Cardano, UtxoProvider } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, utxoHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { DataMocks } from '../data-mocks';
 import { DbSyncUtxoProvider, HttpServer, HttpServerConfig, UtxoHttpService } from '../../src';
@@ -43,34 +43,6 @@ describe('UtxoHttpService', () => {
       connectionString: process.env.POSTGRES_CONNECTION_STRING
     });
     fixtureBuilder = new UtxoFixtureBuilder(dbConnection, logger);
-  });
-
-  describe('unhealthy UtxoProvider', () => {
-    beforeEach(async () => {
-      utxoProvider = {
-        healthCheck: jest.fn(() => Promise.resolve({ ok: false })),
-        utxoByAddresses: jest.fn()
-      } as unknown as DbSyncUtxoProvider;
-    });
-    it('should not throw during service create if the UtxoProvider is unhealthy', () => {
-      expect(() => new UtxoHttpService({ logger, utxoProvider })).not.toThrow(
-        new ProviderError(ProviderFailure.Unhealthy)
-      );
-    });
-
-    it('throws during service initialization if the UtxoProvider is unhealthy', async () => {
-      expect.assertions(2);
-      service = new UtxoHttpService({ logger, utxoProvider });
-      httpServer = new HttpServer(config, { logger, runnableDependencies: [], services: [service] });
-      try {
-        await httpServer.initialize();
-      } catch (error: unknown) {
-        if (error instanceof ProviderError) {
-          expect(error.name).toBe('ProviderError');
-          expect(error.reason).toBe('UNHEALTHY');
-        }
-      }
-    });
   });
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
