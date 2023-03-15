@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
-import { Asset, CML, Cardano, SerializationFailure, coreToCml } from '../../src';
+import { AssetId } from '../../src/Cardano';
 import { BigNum } from '@dcspark/cardano-multiplatform-lib-nodejs';
+import { CML, Cardano, SerializationFailure, coreToCml } from '../../src';
 import { ManagedFreeableScope } from '@cardano-sdk/util';
 import {
   babbageTxBody,
@@ -19,6 +20,7 @@ import {
   valueWithAssets,
   vkey
 } from './testData';
+import { parseAssetId } from '../../src/CML/coreToCml';
 
 const txOutByron = {
   ...txOut,
@@ -38,9 +40,22 @@ describe('coreToCml', () => {
     scope.dispose();
   });
 
+  describe('AssetId', () => {
+    it('parseAssetId', async () => {
+      const assetId = AssetId('659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41');
+      const cmlAssetId = parseAssetId(assetId);
+
+      expect(new TextDecoder().decode(cmlAssetId.assetName.name())).toEqual('TSLA');
+      expect(Buffer.from(cmlAssetId.scriptHash.to_bytes()).toString('hex')).toEqual(
+        '659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba82'
+      );
+    });
+  });
+
   it('txIn', () => {
     expect(coreToCml.txIn(scope, txIn)).toBeInstanceOf(CML.TransactionInput);
   });
+
   describe('txOut', () => {
     it('converts to CML.TransactionOutput', () => {
       expect(coreToCml.txOut(scope, txOut)).toBeInstanceOf(CML.TransactionOutput);
@@ -80,7 +95,7 @@ describe('coreToCml', () => {
       const multiasset = scope.manage(value.multiasset())!;
       expect(multiasset.len()).toBe(3);
       for (const [assetId, expectedAssetQuantity] of valueWithAssets.assets!.entries()) {
-        const { scriptHash, assetName } = Asset.util.parseAssetId(assetId);
+        const { scriptHash, assetName } = parseAssetId(assetId);
         const multiAsset = scope.manage(multiasset.get(scriptHash)!);
         const assetQuantity = BigInt(scope.manage(multiAsset.get(assetName)!).to_str());
         expect(assetQuantity).toBe(expectedAssetQuantity);
@@ -95,7 +110,7 @@ describe('coreToCml', () => {
       const scriptHashes = scope.manage(multiasset.keys());
       expect(scriptHashes.len()).toBe(3);
       for (const [assetId, expectedAssetQuantity] of txOut.value.assets!.entries()) {
-        const { scriptHash, assetName } = Asset.util.parseAssetId(assetId);
+        const { scriptHash, assetName } = parseAssetId(assetId);
         const multiAsset = scope.manage(multiasset.get(scriptHash)!);
         const assetQuantity = BigInt(scope.manage(multiAsset.get(assetName)!).to_str());
         expect(assetQuantity).toBe(expectedAssetQuantity);
