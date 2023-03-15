@@ -1,13 +1,18 @@
 import * as Cardano from '../../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
+import { AssetId, PlutusLanguageVersion, ScriptType } from '../../Cardano';
 import { Base64Blob, HexBlob, ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
 import { CML } from '../CML';
-import { PlutusLanguageVersion, ScriptType } from '../../Cardano';
 import { ScriptKind } from '@dcspark/cardano-multiplatform-lib-nodejs';
 import { SerializationError, SerializationFailure } from '../../errors';
 import { bytesToHex } from '../../util/misc';
-import { createAssetId } from '../../Asset/util';
 import { createCertificate } from './certificate';
+
+/**
+ * @returns {string} concatenated hex-encoded policy id and asset name
+ */
+export const createAssetId = (scriptHash: CML.ScriptHash, assetName: CML.AssetName): AssetId =>
+  AssetId(bytesToHex(scriptHash.to_bytes()) + bytesToHex(assetName.name()));
 
 export const txRequiredExtraSignatures = (
   signatures: CML.Ed25519KeyHashes | undefined
