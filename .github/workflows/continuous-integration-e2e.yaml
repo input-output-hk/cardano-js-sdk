@@ -26,6 +26,7 @@ jobs:
       run: |
         yarn install --immutable --inline-builds
         yarn build
+        docker build --no-cache .
 
     - name: 🌐 Setup local test network
       working-directory: packages/e2e
