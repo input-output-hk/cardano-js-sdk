@@ -89,10 +89,14 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
     }
   }
 
-  async healthCheck(): Promise<HealthCheckResponse> {
+  healthCheck(): Promise<HealthCheckResponse> {
+    return OgmiosCardanoNode.healthCheck(this.#connectionConfig);
+  }
+
+  static async healthCheck(connectionConfig: ConnectionConfig): Promise<HealthCheckResponse> {
     try {
       const { networkSynchronization, lastKnownTip } = await getServerHealth({
-        connection: createConnectionObject(this.#connectionConfig)
+        connection: createConnectionObject(connectionConfig)
       });
       return {
         localNode: {
