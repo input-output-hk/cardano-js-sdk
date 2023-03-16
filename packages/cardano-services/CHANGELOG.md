@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.11.0-nightly.0...@cardano-sdk/cardano-services@0.11.0-nightly.1) (2023-03-16)
+
+### Features
+
+- **cardano-services:** configurable pgpool size ([3eb3250](https://github.com/input-output-hk/cardano-js-sdk/commit/3eb325017696441a068590abff2d627b038e8b31))
+
 ## [0.11.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.10.0...@cardano-sdk/cardano-services@0.11.0-nightly.0) (2023-03-14)
 
 ### ⚠ BREAKING CHANGES

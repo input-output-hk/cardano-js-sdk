@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.3-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.8.3-nightly.0...@cardano-sdk/web-extension@0.8.3-nightly.1) (2023-03-16)
+
+**Note:** Version bump only for package @cardano-sdk/web-extension
+
 ## [0.8.3-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.8.2...@cardano-sdk/web-extension@0.8.3-nightly.0) (2023-03-14)
 
 **Note:** Version bump only for package @cardano-sdk/web-extension

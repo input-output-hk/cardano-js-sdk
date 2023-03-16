@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.11.0-nightly.0...@cardano-sdk/core@0.11.0-nightly.1) (2023-03-16)
+
+### ⚠ BREAKING CHANGES
+
+- **core:** - parseAssetId was moved from util.assetId.ts to coreToCml.ts
+
+* createAssetId was moved from util.assetId.ts to cmlToCore.ts
+
+### Code Refactoring
+
+- **core:** move parseAssetId and createAssetId from util.assetId to coreToCml and cmlToCore ([d649e02](https://github.com/input-output-hk/cardano-js-sdk/commit/d649e023ab98598ff093afcb3b36d052969335bb))
+
 ## [0.11.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.10.0...@cardano-sdk/core@0.11.0-nightly.0) (2023-03-14)
 
 ### ⚠ BREAKING CHANGES
