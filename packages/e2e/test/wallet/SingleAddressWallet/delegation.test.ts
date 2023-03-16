@@ -2,10 +2,10 @@
 import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
 import { ObservableWallet, StakeKeyStatus, buildTx } from '@cardano-sdk/wallet';
-import { TX_TIMEOUT, firstValueFromTimed, waitForWalletStateSettle, walletReady } from '../../util';
-import { TestWallet, getEnv, getWallet, walletVariables } from '../../../src';
+import { TX_TIMEOUT_DEFAULT, TestWallet, getEnv, getWallet, walletVariables } from '../../../src';
 import { assertTxIsValid } from '../../../../wallet/test/util';
 import { combineLatest, filter, firstValueFrom } from 'rxjs';
+import { firstValueFromTimed, waitForWalletStateSettle, walletReady } from '../../util';
 import { logger } from '@cardano-sdk/util-dev';
 
 const env = getEnv(walletVariables);
@@ -37,7 +37,7 @@ const waitForTx = async (wallet: ObservableWallet, hash: Cardano.TransactionId) 
       wallet.transactions.outgoing.confirmed$.pipe(filter(({ id }) => id === hash))
     ]),
     'Tx not confirmed for too long',
-    TX_TIMEOUT
+    TX_TIMEOUT_DEFAULT
   );
   await waitForWalletStateSettle(wallet);
 };

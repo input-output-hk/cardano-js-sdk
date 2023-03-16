@@ -1,0 +1,7 @@
+export const SECOND = 1000;
+export const MINUTE = 60 * SECOND;
+
+export const TX_TIMEOUT_DEFAULT = 7 * MINUTE;
+export const SYNC_TIMEOUT_DEFAULT = 3 * MINUTE;
+export const BALANCE_TIMEOUT_DEFAULT = 3 * MINUTE;
+export const FAST_OPERATION_TIMEOUT_DEFAULT = 15 * SECOND;
