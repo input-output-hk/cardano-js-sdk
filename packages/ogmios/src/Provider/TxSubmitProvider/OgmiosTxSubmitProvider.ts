@@ -4,8 +4,6 @@ import {
   CardanoNodeErrors,
   HealthCheckResponse,
   ProviderDependencies,
-  ProviderError,
-  ProviderFailure,
   SubmitTxArgs,
   TxSubmitProvider
 } from '@cardano-sdk/core';
@@ -14,11 +12,10 @@ import {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   TxSubmission,
-  createConnectionObject,
-  createTxSubmissionClient,
-  getServerHealth
+  createTxSubmissionClient
 } from '@cardano-ogmios/client';
 import { Logger } from 'ts-log';
+import { OgmiosCardanoNode } from '../../CardanoNode';
 import { RunnableModule, contextLogger, isNotNil } from '@cardano-sdk/util';
 import { createInteractionContextWithLogger } from '../../util';
 
@@ -80,24 +77,7 @@ export class OgmiosTxSubmitProvider extends RunnableModule implements TxSubmitPr
   }
 
   async healthCheck(): Promise<HealthCheckResponse> {
-    try {
-      const { networkSynchronization, lastKnownTip } = await getServerHealth({
-        connection: createConnectionObject(this.#connectionConfig)
-      });
-      return {
-        localNode: {
-          ledgerTip: lastKnownTip,
-          networkSync: Cardano.Percent(networkSynchronization)
-        },
-        ok: networkSynchronization > 0.99
-      };
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      if (error.name === 'FetchError') {
-        return { ok: false };
-      }
-      throw new ProviderError(ProviderFailure.Unknown, error);
-    }
+    return OgmiosCardanoNode.healthCheck(this.#connectionConfig, this.logger);
   }
 
   async startImpl(): Promise<void> {

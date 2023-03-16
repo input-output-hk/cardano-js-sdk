@@ -1,13 +1,5 @@
 /* eslint-disable max-len */
-import {
-  Cardano,
-  CardanoNode,
-  HealthCheckResponse,
-  Provider,
-  ProviderDependencies,
-  ProviderError,
-  ProviderFailure
-} from '@cardano-sdk/core';
+import { Cardano, CardanoNode, HealthCheckResponse, Provider, ProviderDependencies } from '@cardano-sdk/core';
 import { DB_BLOCKS_BEHIND_TOLERANCE, DB_MAX_SAFE_INTEGER, LedgerTipModel, findLedgerTip } from './util';
 import { Logger } from 'ts-log';
 import { Pool } from 'pg';
@@ -51,34 +43,32 @@ export const DbSyncProvider = <
     }
 
     public async healthCheck(): Promise<HealthCheckResponse> {
+      const response: HealthCheckResponse = { ok: false };
       try {
-        const { ok, localNode } = await this.cardanoNode.healthCheck();
+        const cardanoNode = await this.cardanoNode.healthCheck();
+        response.localNode = cardanoNode.localNode;
         const tip = (await this.db.query<LedgerTipModel>(findLedgerTip)).rows[0];
-        const isHealthy =
-          ok && tip.block_no >= (localNode?.ledgerTip?.blockNo ?? DB_MAX_SAFE_INTEGER) - DB_BLOCKS_BEHIND_TOLERANCE;
 
-        this.logger.debug(
-          `Service /health: projected block tip: ${tip.block_no},local node block tip: ${localNode?.ledgerTip?.blockNo}.`
-        );
+        if (tip) {
+          response.projectedTip = {
+            blockNo: Cardano.BlockNo(tip.block_no),
+            hash: tip.hash.toString('hex') as unknown as Cardano.BlockId,
+            slot: Cardano.Slot(Number(tip.slot_no))
+          };
+          response.ok =
+            cardanoNode.ok &&
+            tip?.block_no >=
+              (cardanoNode.localNode?.ledgerTip?.blockNo ?? DB_MAX_SAFE_INTEGER) - DB_BLOCKS_BEHIND_TOLERANCE;
 
-        const projectedTip: Cardano.Tip = {
-          blockNo: Cardano.BlockNo(tip.block_no),
-          hash: tip.hash.toString('hex') as unknown as Cardano.BlockId,
-          slot: Cardano.Slot(Number(tip.slot_no))
-        };
-
-        return {
-          localNode,
-          ok: isHealthy,
-          projectedTip
-        };
-      } catch (error) {
-        throw new ProviderError(
-          ProviderFailure.ConnectionFailure,
-          error,
-          'Failed to perform health check against dependencies'
-        );
+          this.logger.debug(
+            `Service /health: projected block tip: ${tip.block_no},local node block tip: ${cardanoNode.localNode?.ledgerTip?.blockNo}.`
+          );
+        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        this.logger.error(error.message);
       }
+      return response;
     }
   }
 

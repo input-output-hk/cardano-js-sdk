@@ -44,5 +44,6 @@ export type StakeDistributionResponse = {
 };
 
 export type InvocationState = {
+  health: number;
   txSubmit: number;
 };
