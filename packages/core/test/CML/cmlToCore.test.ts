@@ -1,4 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
+import { AssetId } from '../../src/Cardano';
 import { Base64Blob, HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { Cardano, cmlToCore, coreToCml } from '../../src';
 import { NativeScript } from '@dcspark/cardano-multiplatform-lib-nodejs';
@@ -17,6 +18,8 @@ import {
   valueCoinOnly,
   valueWithAssets
 } from './testData';
+import { createAssetId } from '../../src/CML/cmlToCore';
+import { parseAssetId } from '../../src/CML/coreToCml';
 
 describe('cmlToCore', () => {
   let scope: ManagedFreeableScope;
@@ -28,6 +31,16 @@ describe('cmlToCore', () => {
   afterEach(() => {
     scope.dispose();
   });
+
+  describe('AssetId', () => {
+    it('createAssetId', async () => {
+      const assetId = AssetId('659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41');
+      const cmlAssetId = parseAssetId(assetId);
+
+      expect(createAssetId(cmlAssetId.scriptHash, cmlAssetId.assetName)).toEqual(assetId);
+    });
+  });
+
   describe('value', () => {
     it('coin only', () => {
       expect(cmlToCore.value(coreToCml.value(scope, valueCoinOnly))).toEqual(valueCoinOnly);

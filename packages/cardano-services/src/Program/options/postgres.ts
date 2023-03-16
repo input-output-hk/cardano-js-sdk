@@ -13,6 +13,7 @@ export enum PostgresOptionDescriptions {
   SslCaFile = 'PostgreSQL SSL CA file path',
   Host = 'PostgreSQL host',
   Port = 'PostgreSQL port',
+  PoolMax = 'Maximum number of clients in the PostgreSQL pool',
   ServiceDiscoveryArgs = 'Postgres SRV service name, db, user and password'
 }
 
@@ -26,6 +27,7 @@ export interface PosgresProgramOptions {
   postgresPassword?: string;
   postgresPasswordFile?: string;
   postgresHost?: string;
+  postgresPoolMax?: number;
   postgresPort?: string;
   postgresSslCaFile?: string;
 }
@@ -82,6 +84,11 @@ export const withPostgresOptions = (command: Command) =>
         .argParser(existingFileValidator)
     )
     .addOption(new Option('--postgres-host <postgresHost>', PostgresOptionDescriptions.Host).env('POSTGRES_HOST'))
+    .addOption(
+      new Option('--postgres-pool-max <postgresPoolMax>', PostgresOptionDescriptions.PoolMax)
+        .env('POSTGRES_POOL_MAX')
+        .argParser((max) => Number.parseInt(max, 10))
+    )
     .addOption(new Option('--postgres-port <postgresPort>', PostgresOptionDescriptions.Port).env('POSTGRES_PORT'))
     .addOption(
       new Option('--postgres-ssl-ca-file <postgresSslCaFile>', PostgresOptionDescriptions.SslCaFile).env(

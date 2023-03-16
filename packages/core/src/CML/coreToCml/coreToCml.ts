@@ -65,11 +65,20 @@ import {
 } from '@dcspark/cardano-multiplatform-lib-nodejs';
 
 import * as certificate from './certificate';
+import { AssetId, RedeemerPurpose } from '../../Cardano';
 import { CML } from '../CML';
 import { ManagedFreeableScope } from '@cardano-sdk/util';
-import { RedeemerPurpose } from '../../Cardano';
 import { SerializationError, SerializationFailure } from '../../errors';
-import { assetNameFromAssetId, parseAssetId, policyIdFromAssetId } from '../../Asset/util';
+import { assetNameFromAssetId, policyIdFromAssetId } from '../../Asset/util';
+
+export const parseAssetId = (assetId: AssetId) => {
+  const policyId = policyIdFromAssetId(assetId);
+  const assetName = assetNameFromAssetId(assetId);
+  return {
+    assetName: CML.AssetName.new(Buffer.from(assetName, 'hex')),
+    scriptHash: CML.ScriptHash.from_bytes(Buffer.from(policyId, 'hex'))
+  };
+};
 
 export const tokenMap = (scope: ManagedFreeableScope, map: Cardano.TokenMap) => {
   const multiasset = scope.manage(MultiAsset.new());
