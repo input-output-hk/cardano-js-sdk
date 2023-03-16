@@ -1,4 +1,5 @@
 import { CardanoNodeErrors } from '../../CardanoNode';
+import { isProductionEnvironment, stripStackTrace } from '@cardano-sdk/util';
 
 /**
  * Tests the provided error for an instanceof match in the TxSubmissionErrors object
@@ -17,10 +18,19 @@ export const asTxSubmissionError = (error: unknown): CardanoNodeErrors.TxSubmiss
   if (Array.isArray(error)) {
     for (const err of error) {
       if (isTxSubmissionError(err)) {
+        if (isProductionEnvironment()) stripStackTrace(err);
+
         return err;
       }
     }
     return null;
   }
-  return isTxSubmissionError(error) ? error : null;
+
+  if (isTxSubmissionError(error)) {
+    if (isProductionEnvironment()) stripStackTrace(error);
+
+    return error;
+  }
+
+  return null;
 };

@@ -12,3 +12,4 @@ export * from './network';
 export * from './logging';
 export * from './RunnableModule';
 export * from './opaqueTypes';
+export * from './environment';

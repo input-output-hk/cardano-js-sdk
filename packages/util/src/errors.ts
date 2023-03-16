@@ -5,6 +5,18 @@ interface ErrorLike {
   stack: string;
 }
 
+interface WithInnerError {
+  innerError: string | Error;
+}
+
+/**
+ * Gets whether the given error has an innerError.
+ *
+ * @param error The error to be checked for.
+ */
+const isWithInnerError = (error: unknown): error is WithInnerError =>
+  error !== null && typeof error === 'object' && 'innerError' in (error as never);
+
 /**
  * This type check works as an "error instanceof Error" check, but it let pass also those objects
  * which implements the Error interface without inheriting from the same base class
@@ -20,6 +32,23 @@ const isErrorLike = (error: unknown): error is ErrorLike => {
   const { message, stack } = error as ErrorLike;
 
   return typeof message === 'string' && typeof stack === 'string';
+};
+
+/**
+ * Strips the stack trace of all errors and their inner errors recursively.
+ *
+ * @param error The error to be stripped of its stack trace.
+ */
+export const stripStackTrace = (error: unknown) => {
+  if (!error) return;
+
+  if (isErrorLike(error)) {
+    delete (error as Error).stack;
+  }
+
+  if (isWithInnerError(error)) {
+    stripStackTrace(error.innerError);
+  }
 };
 
 export class ComposableError<InnerError = unknown> extends CustomError {
