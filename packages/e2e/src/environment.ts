@@ -80,7 +80,7 @@ const validators = {
   ASSET_PROVIDER_PARAMS: providerParams(),
   CHAIN_HISTORY_PROVIDER: str(),
   CHAIN_HISTORY_PROVIDER_PARAMS: providerParams(),
-  DB_SYNC_CONNECTION_STRING: str(),
+  DB_SYNC_CONNECTION_STRING: str({ default: undefined }),
   KEY_MANAGEMENT_PARAMS: keyManagementParams(),
   KEY_MANAGEMENT_PROVIDER: str(),
   LOGGER_MIN_SEVERITY: str({ default: 'info' }),
@@ -101,6 +101,7 @@ const validators = {
   UTXO_PROVIDER_PARAMS: providerParams(),
   VIRTUAL_USERS_COUNT: num(),
   VIRTUAL_USERS_GENERATE_DURATION: num(),
+  WALLET_SYNC_TIMEOUT_IN_MS: num({ default: undefined }),
   WORKER_PARALLEL_TRANSACTION: num()
 } as const;
 

@@ -5,8 +5,6 @@ import {
   CardanoNodeUtil,
   EraSummary,
   HealthCheckResponse,
-  ProviderError,
-  ProviderFailure,
   StakeDistribution
 } from '@cardano-sdk/core';
 import {
@@ -89,25 +87,26 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
     }
   }
 
-  async healthCheck(): Promise<HealthCheckResponse> {
+  healthCheck(): Promise<HealthCheckResponse> {
+    return OgmiosCardanoNode.healthCheck(this.#connectionConfig, this.logger);
+  }
+
+  static async healthCheck(connectionConfig: ConnectionConfig, logger: Logger): Promise<HealthCheckResponse> {
+    const response: HealthCheckResponse = { ok: false };
     try {
       const { networkSynchronization, lastKnownTip } = await getServerHealth({
-        connection: createConnectionObject(this.#connectionConfig)
+        connection: createConnectionObject(connectionConfig)
       });
-      return {
-        localNode: {
-          ledgerTip: lastKnownTip,
-          networkSync: Cardano.Percent(networkSynchronization)
-        },
-        ok: networkSynchronization > 0.99
+      response.localNode = {
+        ledgerTip: lastKnownTip,
+        networkSync: Cardano.Percent(networkSynchronization)
       };
+      response.ok = networkSynchronization > 0.99;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      if (error.name === 'FetchError') {
-        return { ok: false };
-      }
-      throw new ProviderError(ProviderFailure.Unknown, error);
+      logger.error(error.message);
     }
+    return response;
   }
 
   async startImpl(): Promise<void> {

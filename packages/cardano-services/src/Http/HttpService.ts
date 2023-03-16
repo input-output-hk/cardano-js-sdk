@@ -43,7 +43,7 @@ export abstract class HttpService extends RunnableModule {
 
     const health = await this.healthCheck();
     if (!health.ok) {
-      throw new ProviderError(ProviderFailure.Unhealthy, null, JSON.stringify(health, null, 2));
+      this.logger.warn('Service started in unhealthy state');
     }
   }
 

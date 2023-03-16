@@ -133,6 +133,53 @@ describe('OgmiosCardanoNode', () => {
         });
       });
     });
+    describe('healthCheck', () => {
+      describe('success', () => {
+        beforeAll(async () => {
+          mockServer = createMockOgmiosServer({
+            healthCheck: { response: { success: true } }
+          });
+          await listenPromise(mockServer, connection.port);
+          node = new OgmiosCardanoNode(connection, logger);
+          await node.initialize();
+          await node.start();
+        });
+        afterAll(async () => {
+          await node.shutdown();
+          await serverClosePromise(mockServer);
+        });
+        it('returns ok if successful', async () => {
+          const res = await node.healthCheck();
+          expect(res.ok).toBe(true);
+        });
+      });
+      describe('failure', () => {
+        beforeAll(async () => {
+          mockServer = createMockOgmiosServer({
+            healthCheck: {
+              response: {
+                failWith: new Error('Some error'),
+                success: false
+              },
+              skipInvocations: 1
+            }
+          });
+          await listenPromise(mockServer, connection.port);
+          node = new OgmiosCardanoNode(connection, logger);
+          await node.initialize();
+          await node.start();
+        });
+        afterAll(async () => {
+          await node.shutdown();
+          await serverClosePromise(mockServer);
+        });
+
+        it('returns not ok if the Ogmios server throws an error', async () => {
+          const res = await node.healthCheck();
+          expect(res.ok).toBe(false);
+        });
+      });
+    });
     describe('stakeDistribution', () => {
       describe('success', () => {
         beforeAll(async () => {

@@ -1,6 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
 import * as envalid from 'envalid';
+import {
+  BALANCE_TIMEOUT_DEFAULT,
+  FAST_OPERATION_TIMEOUT_DEFAULT,
+  SYNC_TIMEOUT_DEFAULT,
+  TestWallet,
+  faucetProviderFactory,
+  getEnv,
+  networkInfoProviderFactory,
+  walletVariables
+} from '../src';
 import { Cardano, createSlotEpochCalc } from '@cardano-sdk/core';
 import {
   EMPTY,
@@ -20,25 +30,16 @@ import {
 } from 'rxjs';
 import { InMemoryKeyAgent } from '@cardano-sdk/key-management';
 import { InitializeTxProps, ObservableWallet, SignedTx, SingleAddressWallet, buildTx } from '@cardano-sdk/wallet';
-import { TestWallet, faucetProviderFactory, getEnv, networkInfoProviderFactory, walletVariables } from '../src';
 import { assertTxIsValid } from '../../wallet/test/util';
 import { logger } from '@cardano-sdk/util-dev';
 import sortBy from 'lodash/sortBy';
 
 const env = getEnv(walletVariables);
 
-const SECOND = 1000;
-const MINUTE = 60 * SECOND;
-export const TX_TIMEOUT = 7 * MINUTE;
-const SYNC_TIMEOUT = 3 * MINUTE;
-const BALANCE_TIMEOUT = 3 * MINUTE;
-
-export const FAST_OPERATION_TIMEOUT = 15 * SECOND;
-
 export const firstValueFromTimed = <T>(
   observable$: Observable<T>,
   timeoutMessage = 'Timed out',
-  timeoutAfter = FAST_OPERATION_TIMEOUT
+  timeoutAfter = FAST_OPERATION_TIMEOUT_DEFAULT
 ) =>
   firstValueFrom(
     observable$.pipe(
@@ -47,18 +48,18 @@ export const firstValueFromTimed = <T>(
     )
   );
 
-export const waitForWalletStateSettle = (wallet: ObservableWallet) =>
+export const waitForWalletStateSettle = (wallet: ObservableWallet, syncTimeout: number = SYNC_TIMEOUT_DEFAULT) =>
   firstValueFromTimed(
     wallet.syncStatus.isSettled$.pipe(filter((isSettled) => isSettled)),
     'Took too long to settle',
-    SYNC_TIMEOUT
+    syncTimeout
   );
 
 export const waitForWalletBalance = (wallet: ObservableWallet) =>
   firstValueFromTimed(
     wallet.balance.utxo.total$.pipe(filter(({ coins }) => coins > 0)),
     'Took too long to load balance',
-    BALANCE_TIMEOUT
+    BALANCE_TIMEOUT_DEFAULT
   );
 
 export const walletReady = (wallet: ObservableWallet) =>
@@ -67,7 +68,7 @@ export const walletReady = (wallet: ObservableWallet) =>
       filter(([isSettled, balance]) => isSettled && balance.coins > 0n)
     ),
     'Took too long to be ready',
-    SYNC_TIMEOUT
+    SYNC_TIMEOUT_DEFAULT
   );
 
 const sortTxIn = (txInCollection: Cardano.TxIn[] | undefined): Cardano.TxIn[] =>

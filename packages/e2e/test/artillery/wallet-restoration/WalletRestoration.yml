@@ -13,8 +13,8 @@ config:
   processor: "./WalletRestoration.ts"
 before:
     flow:
-      - log: "Find distinct addresses from DB"
-      - function: "findAddresses"
+      - log: "Get a subset of predefined addresses"
+      - function: "getAddresses"
 after:
     flow:
       - log: "Load test scenario completed"

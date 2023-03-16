@@ -9,7 +9,7 @@ import { HttpServer, HttpServerConfig } from '../../src';
 import { INFO, createLogger } from 'bunyan';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../src/InMemoryCache';
 import { NetworkInfoFixtureBuilder } from './fixtures/FixtureBuilder';
-import { NetworkInfoProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { NetworkInfoProvider } from '@cardano-sdk/core';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { getPort } from 'get-port-please';
@@ -46,58 +46,6 @@ describe('NetworkInfoHttpService', () => {
   });
   const fixtureBuilder = new NetworkInfoFixtureBuilder(db, logger);
   const epochMonitor = new DbSyncEpochPollService(db, epochPollInterval!);
-
-  describe('unhealthy NetworkInfoProvider', () => {
-    beforeEach(async () => {
-      port = await getPort();
-      baseUrl = `http://localhost:${port}/network-info`;
-      clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
-      config = { listen: { port } };
-      lastBlockNoInDb = (await db.query<LedgerTipModel>(findLedgerTip)).rows[0];
-      cardanoNode = mockCardanoNode(
-        healthCheckResponseMock({
-          blockNo: lastBlockNoInDb.block_no,
-          hash: lastBlockNoInDb.hash.toString('hex'),
-          projectedTip: {
-            blockNo: lastBlockNoInDb.block_no,
-            hash: lastBlockNoInDb.hash.toString('hex'),
-            slot: Number(lastBlockNoInDb.slot_no)
-          },
-          slot: Number(lastBlockNoInDb.slot_no),
-          withTip: true
-        })
-      ) as unknown as OgmiosCardanoNode;
-      networkInfoProvider = {
-        eraSummaries: jest.fn(),
-        genesisParameters: jest.fn(),
-        healthCheck: jest.fn(() => Promise.resolve({ ok: false })),
-        ledgerTip: jest.fn(),
-        lovelaceSupply: jest.fn(),
-        protocolParameters: jest.fn(),
-        stake: jest.fn()
-      } as unknown as DbSyncNetworkInfoProvider;
-    });
-
-    it('should not throw during service create if the NetworkInfoProvider is unhealthy', () => {
-      expect(() => new NetworkInfoHttpService({ logger, networkInfoProvider })).not.toThrow(
-        new ProviderError(ProviderFailure.Unhealthy)
-      );
-    });
-
-    it('throws during service initialization if the NetworkInfoProvider is unhealthy', async () => {
-      expect.assertions(2);
-      service = new NetworkInfoHttpService({ logger, networkInfoProvider });
-      httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
-      try {
-        await httpServer.initialize();
-      } catch (error: unknown) {
-        if (error instanceof ProviderError) {
-          expect(error.name).toBe('ProviderError');
-          expect(error.reason).toBe('UNHEALTHY');
-        }
-      }
-    });
-  });
 
   describe('healthy state', () => {
     const dbConnectionQuerySpy = jest.spyOn(db, 'query');
