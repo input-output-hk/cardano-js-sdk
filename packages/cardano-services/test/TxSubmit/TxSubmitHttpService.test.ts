@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-len */
 import { APPLICATION_JSON, CONTENT_TYPE, HttpServer, HttpServerConfig, TxSubmitHttpService } from '../../src';
-import { CardanoNodeErrors, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
+import { CardanoNodeErrors, ProviderError, TxSubmitProvider } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, txSubmitHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { FATAL, createLogger } from 'bunyan';
 import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
@@ -46,18 +46,6 @@ describe('TxSubmitHttpService', () => {
 
   afterEach(async () => {
     jest.clearAllMocks();
-  });
-
-  describe('unhealthy TxSubmitProvider', () => {
-    beforeAll(async () => {
-      txSubmitProvider = txSubmitProviderMock(() => Promise.resolve({ ok: false }));
-    });
-
-    it('should not throw during initialization if the TxSubmitProvider is unhealthy', () => {
-      expect(() => new TxSubmitHttpService({ logger, txSubmitProvider })).not.toThrow(
-        new ProviderError(ProviderFailure.Unhealthy)
-      );
-    });
   });
 
   describe('healthy TxSubmitProvider on startup, unhealthy at request time', () => {

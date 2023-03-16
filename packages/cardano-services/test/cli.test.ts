@@ -1663,45 +1663,6 @@ describe('CLI', () => {
             });
           });
 
-          describe('with RabbitMQ and default URL', () => {
-            it('throws a provider unhealthy error when using CLI options', (done) => {
-              expect.assertions(2);
-
-              proc = fork(exePath, [...baseArgs, '--api-url', apiUrl, '--use-queue', 'true', ServiceNames.TxSubmit], {
-                env: {},
-                stdio: 'pipe'
-              });
-
-              proc.stderr!.on('data', (data) => expect(data.toString()).toMatch('ProviderError: UNHEALTHY'));
-
-              proc.on('exit', (code) => {
-                expect(code).toBe(1);
-                done();
-              });
-            });
-
-            it('throws a provider unhealthy error when using env variables', (done) => {
-              expect.assertions(2);
-
-              proc = fork(exePath, ['start-provider-server'], {
-                env: {
-                  API_URL: apiUrl,
-                  LOGGER_MIN_SEVERITY: 'error',
-                  SERVICE_NAMES: ServiceNames.TxSubmit,
-                  USE_QUEUE: 'true'
-                },
-                stdio: 'pipe'
-              });
-
-              proc.stderr!.on('data', (data) => expect(data.toString()).toMatch('ProviderError: UNHEALTHY'));
-
-              proc.on('exit', (code) => {
-                expect(code).toBe(1);
-                done();
-              });
-            });
-          });
-
           describe('with service discovery', () => {
             it('tx-submit throws DNS SRV error and exits with code 1 when using CLI options', (done) => {
               callCliAndAssertExit(

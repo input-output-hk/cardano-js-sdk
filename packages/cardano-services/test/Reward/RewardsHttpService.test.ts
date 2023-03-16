@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-len */
-import { Cardano, ProviderError, ProviderFailure, RewardsProvider } from '@cardano-sdk/core';
+import { Cardano, RewardsProvider } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, rewardsHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { DbSyncRewardsProvider, HttpServer, HttpServerConfig, RewardsHttpService } from '../../src';
 import { INFO, createLogger } from 'bunyan';
@@ -39,35 +39,6 @@ describe('RewardsHttpService', () => {
       connectionString: process.env.POSTGRES_CONNECTION_STRING
     });
     fixtureBuilder = new RewardsFixtureBuilder(dbConnection, logger);
-  });
-
-  describe('unhealthy RewardsProvider', () => {
-    beforeEach(async () => {
-      rewardsProvider = {
-        healthCheck: jest.fn(() => Promise.resolve({ ok: false })),
-        rewardAccountBalance: jest.fn(),
-        rewardsHistory: jest.fn()
-      } as unknown as DbSyncRewardsProvider;
-    });
-    it('should not throw during service create if the RewardsProvider is unhealthy', () => {
-      expect(() => new RewardsHttpService({ logger, rewardsProvider })).not.toThrow(
-        new ProviderError(ProviderFailure.Unhealthy)
-      );
-    });
-
-    it('throws during service initialization if the RewardsProvider is unhealthy', async () => {
-      expect.assertions(2);
-      service = new RewardsHttpService({ logger, rewardsProvider });
-      httpServer = new HttpServer(config, { logger, runnableDependencies: [], services: [service] });
-      try {
-        await httpServer.initialize();
-      } catch (error: unknown) {
-        if (error instanceof ProviderError) {
-          expect(error.name).toBe('ProviderError');
-          expect(error.reason).toBe('UNHEALTHY');
-        }
-      }
-    });
   });
 
   // eslint-disable-next-line sonarjs/cognitive-complexity

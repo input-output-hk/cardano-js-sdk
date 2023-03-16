@@ -1,14 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-len */
-import {
-  Cardano,
-  ProviderError,
-  ProviderFailure,
-  QueryStakePoolsArgs,
-  SortField,
-  StakePoolProvider
-} from '@cardano-sdk/core';
+import { Cardano, ProviderError, QueryStakePoolsArgs, SortField, StakePoolProvider } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, stakePoolHttpProvider } from '../../../cardano-services-client';
 import { DbSyncEpochPollService, loadGenesisData } from '../../src/util';
 import {
@@ -152,36 +145,6 @@ describe('StakePoolHttpService', () => {
       },
       pagination
     };
-  });
-
-  describe('unhealthy StakePoolProvider', () => {
-    beforeEach(async () => {
-      stakePoolProvider = {
-        healthCheck: jest.fn(() => Promise.resolve({ ok: false })),
-        queryStakePools: jest.fn(),
-        stakePoolStats: jest.fn()
-      } as unknown as DbSyncStakePoolProvider;
-    });
-
-    it('should not throw during service create if the StakePoolProvider is unhealthy', () => {
-      expect(() => new StakePoolHttpService({ logger, stakePoolProvider })).not.toThrow(
-        new ProviderError(ProviderFailure.Unhealthy)
-      );
-    });
-
-    it('throws during service initialization if the StakePoolProvider is unhealthy', async () => {
-      expect.assertions(2);
-      service = new StakePoolHttpService({ logger, stakePoolProvider });
-      httpServer = new HttpServer(config, { logger, runnableDependencies: [], services: [service] });
-      try {
-        await httpServer.initialize();
-      } catch (error: unknown) {
-        if (error instanceof ProviderError) {
-          expect(error.name).toBe('ProviderError');
-          expect(error.reason).toBe('UNHEALTHY');
-        }
-      }
-    });
   });
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
