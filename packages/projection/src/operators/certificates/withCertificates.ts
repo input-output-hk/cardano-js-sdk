@@ -14,9 +14,6 @@ export interface OnChainCertificate {
 }
 
 export interface WithCertificates {
-  /**
-   * Order of certificates on rolled back transactions is reversed.
-   */
   certificates: OnChainCertificate[];
 }
 
