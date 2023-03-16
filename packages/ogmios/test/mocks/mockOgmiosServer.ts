@@ -23,6 +23,11 @@ import path from 'path';
 export interface MockOgmiosServerConfig {
   healthCheck?: {
     response: HealthCheckResponse;
+    /**
+     * The Ogmios clients use the server health check during
+     * initialization, so a number of invocations must skipped depending on the test scenario.
+     */
+    skipInvocations?: number;
   };
   submitTx?: {
     response: TxSubmitResponse | TxSubmitResponse[];
@@ -225,15 +230,23 @@ const handleQuery = async (query: string, config: MockOgmiosServerConfig, send: 
 
 export type MockServer = Server & { wss: WebSocket.Server };
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export const createMockOgmiosServer = (config: MockOgmiosServerConfig): MockServer => {
   const invocations: InvocationState = {
+    health: 0,
     txSubmit: 0
   };
 
   const server = createServer((req, res) => {
-    if (config.healthCheck?.response.success === false) {
-      res.statusCode = 500;
-      return res.end('{"error":"INTERNAL_SERVER_ERROR"}');
+    if (req.url === '/health') {
+      if (
+        config.healthCheck?.response.success === false &&
+        invocations.health === (config.healthCheck?.skipInvocations || 0)
+      ) {
+        res.statusCode = 500;
+        return res.end('{"error":"INTERNAL_SERVER_ERROR"}');
+      }
+      invocations.health++;
     }
     res.setHeader('Content-Type', 'application/json');
 

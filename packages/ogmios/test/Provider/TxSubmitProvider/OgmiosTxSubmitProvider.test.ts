@@ -1,4 +1,4 @@
-import { CardanoNodeErrors, ProviderError } from '@cardano-sdk/core';
+import { CardanoNodeErrors } from '@cardano-sdk/core';
 import { Connection, createConnectionObject } from '@cardano-ogmios/client';
 import { OgmiosTxSubmitProvider } from '../../../src';
 import { bufferToHexString } from '@cardano-sdk/util';
@@ -60,14 +60,15 @@ describe('OgmiosTxSubmitProvider', () => {
       });
     });
 
-    it('throws a typed error if caught during the service interaction', async () => {
+    it('returns not ok if the Ogmios server throws an error', async () => {
       mockServer = createMockOgmiosServer({
         healthCheck: { response: { failWith: new Error('Some error'), success: false } },
         submitTx: { response: { success: true } }
       });
       await listenPromise(mockServer, connection.port);
       provider = new OgmiosTxSubmitProvider(connection, { logger });
-      await expect(provider.healthCheck()).rejects.toThrowError(ProviderError);
+      const health = await provider.healthCheck();
+      expect(health.ok).toBe(false);
     });
   });
 

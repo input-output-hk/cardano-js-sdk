@@ -77,7 +77,7 @@ export class OgmiosTxSubmitProvider extends RunnableModule implements TxSubmitPr
   }
 
   async healthCheck(): Promise<HealthCheckResponse> {
-    return OgmiosCardanoNode.healthCheck(this.#connectionConfig);
+    return OgmiosCardanoNode.healthCheck(this.#connectionConfig, this.logger);
   }
 
   async startImpl(): Promise<void> {
