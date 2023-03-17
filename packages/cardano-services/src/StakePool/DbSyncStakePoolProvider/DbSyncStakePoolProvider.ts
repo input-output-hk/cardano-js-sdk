@@ -126,9 +126,14 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
         return (options?: QueryStakePoolsArgs) =>
           this.#builder.queryPoolMetrics(hashesIds, totalStake, useBlockfrost, options);
       case 'apy':
+        // HACK: If the client request sort by APY default to normal sorting.
         if (this.#responseConfig?.search?.metrics?.apy === false) {
-          throw new ProviderError(ProviderFailure.BadRequest, undefined, 'APY metric is disabled');
+          return async (options?: QueryStakePoolsArgs) => {
+            if (options) options.sort = undefined;
+            return await this.#builder.queryPoolData(updatesIds, useBlockfrost, options);
+          };
         }
+
         return (options?: QueryStakePoolsArgs) => this.#builder.queryPoolAPY(hashesIds, this.#epochLength, options);
       case 'data':
       default:
@@ -164,6 +169,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
     const updatesIds = poolUpdates.map(({ updateId }) => updateId);
     this.logger.debug(`${hashesIds.length} pools found`);
     const sortType = options?.sort?.field ? getStakePoolSortType(options.sort.field) : 'data';
+
     const orderedResult = await this.getQueryBySortType(
       sortType,
       { hashesIds, totalStake, updatesIds },
@@ -174,6 +180,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
       (id) => poolUpdates[poolUpdates.findIndex((item) => item.id === id)].updateId
     );
     let poolDatas: PoolData[] = [];
+
     if (sortType !== 'data') {
       this.logger.debug('About to query stake pools data');
       poolDatas = await this.#builder.queryPoolData(orderedResultUpdateIds, useBlockfrost);
