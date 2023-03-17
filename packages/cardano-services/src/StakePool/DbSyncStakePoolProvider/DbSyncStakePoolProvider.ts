@@ -114,7 +114,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
 
   private getQueryBySortType(
     sortType: PoolSortType,
-    queryArgs: { hashesIds: number[]; updatesIds: number[]; totalStake: string },
+    queryArgs: { hashesIds: number[]; updatesIds: number[]; totalStake: string | null },
     useBlockfrost: boolean
   ) {
     const { hashesIds, updatesIds, totalStake } = queryArgs;
@@ -161,7 +161,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
 
   private async getPoolsDataOrdered(
     poolUpdates: PoolUpdate[],
-    totalStake: string,
+    totalStake: string | null,
     useBlockfrost: boolean,
     options?: QueryStakePoolsArgs
   ) {
@@ -200,7 +200,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
   private async queryExtraPoolsData(
     idsToFetch: PoolUpdate[],
     sortType: PoolSortType,
-    totalStake: string,
+    totalStake: string | null,
     orderedResult: OrderedResult,
     useBlockfrost: boolean
   ) {
@@ -253,18 +253,21 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
     const poolUpdates = await this.#cache.get(queryCacheKey(StakePoolsSubQuery.POOL_HASHES, options), () =>
       this.#builder.queryPoolHashes(query, params)
     );
-    // Get cached total staked amount
-    const totalStake = await this.#cache.get(queryCacheKey(StakePoolsSubQuery.TOTAL_STAKE), async () => {
-      const distribution = await this.cardanoNode.stakeDistribution();
+    // Get cached total staked amount used to compute the saturation
+    // When Blockfrost cache is enabled the saturation is one of the cached values: the query can be skipped
+    const totalStake = this.#useBlockfrost
+      ? null
+      : await this.#cache.get(queryCacheKey(StakePoolsSubQuery.TOTAL_STAKE), async () => {
+          const distribution = await this.cardanoNode.stakeDistribution();
 
-      for (const [_, value] of distribution) return value.stake.supply.toString();
+          for (const [_, value] of distribution) return value.stake.supply.toString();
 
-      throw new ProviderError(
-        ProviderFailure.InvalidResponse,
-        undefined,
-        'Got an empty distribution response from OgmiosCardanoNode'
-      );
-    });
+          throw new ProviderError(
+            ProviderFailure.InvalidResponse,
+            undefined,
+            'Got an empty distribution response from OgmiosCardanoNode'
+          );
+        });
     // Get total stake pools count
     const totalCount = poolUpdates.length;
     // Get last epoch data

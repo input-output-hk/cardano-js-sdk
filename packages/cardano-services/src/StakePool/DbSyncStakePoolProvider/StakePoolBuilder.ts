@@ -133,7 +133,7 @@ export class StakePoolBuilder {
 
   public async queryPoolMetrics(
     hashesIds: number[],
-    totalStake: string,
+    totalStake: string | null,
     useBlockfrost: boolean,
     options?: QueryStakePoolsArgs
   ) {
