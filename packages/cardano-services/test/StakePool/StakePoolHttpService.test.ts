@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable max-len */
-import { Cardano, ProviderError, QueryStakePoolsArgs, SortField, StakePoolProvider } from '@cardano-sdk/core';
+import { Cardano, QueryStakePoolsArgs, SortField, StakePoolProvider } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, stakePoolHttpProvider } from '../../../cardano-services-client';
 import { DbSyncEpochPollService, loadGenesisData } from '../../src/util';
 import {
@@ -1420,19 +1420,21 @@ describe('StakePoolHttpService', () => {
         });
         describe('sort by APY', () => {
           it('desc order', async () => {
-            await expect(
-              provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'apy'))
-            ).rejects.toBeInstanceOf(ProviderError);
+            const response = await provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'apy'));
+            expect(response.pageResults.length).toBeGreaterThan(0);
+            expect(response.pageResults[0].metrics.apy).toBeUndefined();
           });
           it('asc order', async () => {
-            await expect(
-              provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'apy'))
-            ).rejects.toBeInstanceOf(ProviderError);
+            const response = await provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'apy'));
+            expect(response.pageResults.length).toBeGreaterThan(0);
+            expect(response.pageResults[0].metrics.apy).toBeUndefined();
           });
           it('with applied filters', async () => {
-            await expect(
-              provider.queryStakePools(setSortCondition(setFilterCondition(filterArgs, 'or'), 'asc', 'apy'))
-            ).rejects.toBeInstanceOf(ProviderError);
+            const response = await provider.queryStakePools(
+              setSortCondition(setFilterCondition(filterArgs, 'or'), 'asc', 'apy')
+            );
+            expect(response.pageResults.length).toBeGreaterThan(0);
+            expect(response.pageResults[0].metrics.apy).toBeUndefined();
           });
         });
       });
