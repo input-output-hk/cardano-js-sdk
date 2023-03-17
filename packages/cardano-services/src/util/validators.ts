@@ -1,7 +1,7 @@
 import { BuildInfo } from '../Http';
 import { CACHE_TTL_LOWER_LIMIT, CACHE_TTL_UPPER_LIMIT } from '../InMemoryCache';
-import { MissingProgramOption } from '../Program/errors/MissingProgramOption';
-import { ProviderServerOptionDescriptions, ServiceNames } from '../Program/programs/types';
+import { ProviderServerOptionDescriptions } from '../Program/programs/types';
+import { Range, throwIfOutsideRange } from '@cardano-sdk/util';
 import { validate } from 'jsonschema';
 import fs from 'fs';
 
@@ -35,16 +35,20 @@ export const existingFileValidator = (filePath: string) => {
   throw new Error(`No file exists at ${filePath}`);
 };
 
-export const cacheTtlValidator = (ttlInSecs: string) => {
+export const cacheTtlValidator = <Description>(
+  ttlInSecs: string,
+  range: Required<Range<number>>,
+  description: Description
+) => {
   const cacheTtlInSecs = Number.parseInt(ttlInSecs, 10);
-
-  if (
-    typeof cacheTtlInSecs === 'number' &&
-    cacheTtlInSecs >= CACHE_TTL_LOWER_LIMIT &&
-    cacheTtlInSecs <= CACHE_TTL_UPPER_LIMIT
-  ) {
-    return cacheTtlInSecs;
-  }
-
-  throw new MissingProgramOption(ServiceNames.NetworkInfo, ProviderServerOptionDescriptions.DbCacheTtl);
+  if (Number.isNaN(cacheTtlInSecs)) throw new TypeError(`${description} - ${ttlInSecs} is not a number`);
+  throwIfOutsideRange(cacheTtlInSecs, range, description as string);
+  return cacheTtlInSecs;
 };
+
+export const dbCacheValidator = (ttl: string) =>
+  cacheTtlValidator(
+    ttl,
+    { lowerBound: CACHE_TTL_LOWER_LIMIT, upperBound: CACHE_TTL_UPPER_LIMIT },
+    ProviderServerOptionDescriptions.DbCacheTtl
+  );

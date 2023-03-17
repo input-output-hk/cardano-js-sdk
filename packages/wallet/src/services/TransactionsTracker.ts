@@ -1,4 +1,4 @@
-import { Cardano, ChainHistoryProvider, Range } from '@cardano-sdk/core';
+import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
 import { ConfirmedTx, FailedTx, OutgoingTx, TransactionFailure, TransactionsTracker, TxInFlight } from './types';
 import { DocumentStore, OrderedCollectionStore } from '../persistence';
 import {
@@ -30,8 +30,8 @@ import {
   withLatestFrom
 } from 'rxjs';
 import { Logger } from 'ts-log';
+import { Range, Shutdown, contextLogger } from '@cardano-sdk/util';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { Shutdown, contextLogger } from '@cardano-sdk/util';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
 import { coldObservableProvider, distinctBlock, transactionsEquals } from './util';
 
