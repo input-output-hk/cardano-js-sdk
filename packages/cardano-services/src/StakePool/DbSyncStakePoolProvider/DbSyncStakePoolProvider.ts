@@ -269,7 +269,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
     const totalCount = poolUpdates.length;
     // Get last epoch data
     const lastEpoch = await this.#builder.getLastEpochWithData();
-    const { optimalPoolCount, no: lastEpochNo } = lastEpoch;
+    const { no: lastEpochNo } = lastEpoch;
     // Get stake pools data cached
     const { orderedResultHashIds, orderedResultUpdateIds, orderedResult, poolDatas, hashesIds, sortType } =
       await this.#cache.get(queryCacheKey(StakePoolsSubQuery.POOLS_DATA_ORDERED, options), () =>
@@ -317,10 +317,6 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
     );
     const { results, poolsToCache } = toStakePoolResults(orderedResultHashIds, fromCache, useBlockfrost, {
       lastEpochNo: Cardano.EpochNo(lastEpochNo),
-      nodeMetricsDependencies: {
-        optimalPoolCount,
-        totalAdaAmount: BigInt(totalStake)
-      },
       poolAPYs,
       poolDatas,
       poolMetrics,

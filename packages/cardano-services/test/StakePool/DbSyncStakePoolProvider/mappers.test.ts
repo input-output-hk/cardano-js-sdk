@@ -16,7 +16,6 @@ import {
   toStakePoolResults
 } from '../../../src';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
-import { mockStakeDistribution } from '../../../../core/test/CardanoNode/mocks';
 
 // eslint-disable-next-line max-statements
 describe('mappers', () => {
@@ -108,11 +107,6 @@ describe('mappers', () => {
   const poolAPYModel = {
     apy: 0.015,
     hash_id
-  };
-  const nodeMetricsDependencies = {
-    optimalPoolCount: 10,
-    stakeDistribution: mockStakeDistribution,
-    totalAdaAmount: BigInt('42000004107749657')
   };
   it('mapPoolRetirement', () => {
     expect(mapPoolRetirement(poolRetirementModel)).toEqual({
@@ -265,7 +259,6 @@ describe('mappers', () => {
       expect(
         toStakePoolResults([hashId], fromCache, false, {
           lastEpochNo: Cardano.EpochNo(poolRetirementModel.retiring_epoch - 1),
-          nodeMetricsDependencies,
           poolAPYs,
           poolDatas,
           poolMetrics: partialMetrics,
@@ -288,7 +281,6 @@ describe('mappers', () => {
       expect(
         toStakePoolResults([hashId], fromCache, false, {
           lastEpochNo: Cardano.EpochNo(poolRetirementModel.retiring_epoch + 1),
-          nodeMetricsDependencies,
           poolAPYs,
           poolDatas,
           poolMetrics: partialMetrics,
@@ -323,7 +315,6 @@ describe('mappers', () => {
       expect(
         toStakePoolResults([hashId], fromCache, false, {
           lastEpochNo: Cardano.EpochNo(poolRegistrationModel.active_epoch_no - 1),
-          nodeMetricsDependencies,
           poolAPYs,
           poolDatas,
           poolMetrics: partialMetrics,
@@ -358,7 +349,6 @@ describe('mappers', () => {
       expect(
         toStakePoolResults([hashId], fromCache, false, {
           lastEpochNo: Cardano.EpochNo(poolRegistrationModel.active_epoch_no),
-          nodeMetricsDependencies,
           poolAPYs,
           poolDatas,
           poolMetrics: partialMetrics,
@@ -382,7 +372,6 @@ describe('mappers', () => {
       expect(
         toStakePoolResults([hashId], { [hashId]: stakePool }, false, {
           lastEpochNo: Cardano.EpochNo(poolRetirementModel.retiring_epoch - 1),
-          nodeMetricsDependencies,
           poolAPYs,
           poolDatas,
           poolMetrics: partialMetrics,
