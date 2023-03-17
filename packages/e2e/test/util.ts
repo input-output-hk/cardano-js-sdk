@@ -1,16 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
 import * as envalid from 'envalid';
-import {
-  BALANCE_TIMEOUT_DEFAULT,
-  FAST_OPERATION_TIMEOUT_DEFAULT,
-  SYNC_TIMEOUT_DEFAULT,
-  TestWallet,
-  faucetProviderFactory,
-  getEnv,
-  networkInfoProviderFactory,
-  walletVariables
-} from '../src';
 import { Cardano, createSlotEpochCalc } from '@cardano-sdk/core';
 import {
   EMPTY,
@@ -28,6 +18,15 @@ import {
   throwError,
   timeout
 } from 'rxjs';
+import {
+  FAST_OPERATION_TIMEOUT_DEFAULT,
+  SYNC_TIMEOUT_DEFAULT,
+  TestWallet,
+  faucetProviderFactory,
+  getEnv,
+  networkInfoProviderFactory,
+  walletVariables
+} from '../src';
 import {
   FinalizeTxProps,
   InitializeTxProps,
@@ -62,21 +61,34 @@ export const waitForWalletStateSettle = (wallet: ObservableWallet, syncTimeout: 
     syncTimeout
   );
 
-export const waitForWalletBalance = (wallet: ObservableWallet) =>
-  firstValueFromTimed(
-    wallet.balance.utxo.total$.pipe(filter(({ coins }) => coins > 0)),
-    'Took too long to load balance',
-    BALANCE_TIMEOUT_DEFAULT
+export const insufficientFundsMessage = (
+  address: Cardano.PaymentAddress,
+  min: bigint,
+  actual: bigint
+) => `Insufficient funds at ${address}. Expected ${min}, found ${actual} lovelace.
+      Please use a faucet to fund the address or another address with sufficient funds`;
+
+export const walletReady = async (
+  wallet: ObservableWallet,
+  minCoinBalance = 1n,
+  syncTimeout = SYNC_TIMEOUT_DEFAULT
+): Promise<[boolean, Cardano.Value]> => {
+  const [isSettled, balance, address] = await firstValueFromTimed(
+    combineLatest([
+      wallet.syncStatus.isSettled$,
+      wallet.balance.utxo.total$,
+      wallet.addresses$.pipe(map((addresses) => addresses[0].address))
+    ]).pipe(filter(([settled]) => settled)),
+    'Took too long to be ready',
+    syncTimeout
   );
 
-export const walletReady = (wallet: ObservableWallet) =>
-  firstValueFromTimed(
-    combineLatest([wallet.syncStatus.isSettled$, wallet.balance.utxo.total$]).pipe(
-      filter(([isSettled, balance]) => isSettled && balance.coins > 0n)
-    ),
-    'Took too long to be ready',
-    SYNC_TIMEOUT_DEFAULT
-  );
+  if (balance.coins < minCoinBalance) {
+    throw new Error(insufficientFundsMessage(address, minCoinBalance, balance.coins));
+  }
+
+  return [isSettled, balance];
+};
 
 const sortTxIn = (txInCollection: Cardano.TxIn[] | undefined): Cardano.TxIn[] =>
   sortBy(txInCollection, ['txId', 'index']);

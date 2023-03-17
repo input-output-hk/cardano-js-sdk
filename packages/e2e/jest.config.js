@@ -1,9 +1,13 @@
-const project = (displayName) => ({
-  displayName,
+const commonProjectProps = {
   preset: 'ts-jest',
   setupFiles: ['dotenv/config'],
-  testMatch: [`<rootDir>/test/${displayName}/**/*.test.ts`],
   transform: { '^.+\\.test.ts?$': 'ts-jest' }
+};
+
+const project = (displayName) => ({
+  displayName,
+  testMatch: [`<rootDir>/test/${displayName}/**/*.test.ts`],
+  ...commonProjectProps
 });
 
 // jest tests suitable to run in an environment with real ADA (not tADA)
@@ -25,17 +29,19 @@ module.exports = {
     project('load-testing'),
     project('local-network'),
     project('long-running'),
-    project('measurement-util'),
     project('ogmios'),
     project('projection'),
     project('providers'),
     project('wallet'),
     {
+      ...commonProjectProps,
       displayName: 'wallet-real-ada',
-      preset: 'ts-jest',
-      setupFiles: ['dotenv/config'],
-      testMatch: [`<rootDir>/test/wallet/SingleAddressWallet/(${realAdaTestFileNames.join('|')}).test.ts`],
-      transform: { '^.+\\.test.ts?$': 'ts-jest' }
+      testMatch: [`<rootDir>/test/wallet/SingleAddressWallet/(${realAdaTestFileNames.join('|')}).test.ts`]
+    },
+    {
+      ...commonProjectProps,
+      displayName: 'utils',
+      testMatch: ['<rootDir>/test/measurement-util/*.test.ts', '<rootDir>/test/util.test.ts']
     }
   ],
   testTimeout: 1000 * 60 * 25

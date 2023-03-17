@@ -23,7 +23,7 @@
     "load-test-custom:wallet-init": "ts-node test/load-test-custom/wallet-init/wallet-init.test.ts",
     "test": "shx echo 'test' command not implemented yet",
     "test:blockfrost": "jest -c jest.config.js --forceExit --selectProjects blockfrost --runInBand --verbose",
-    "test:measurement-util": "jest -c jest.config.js --forceExit --selectProjects measurement-util --verbose",
+    "test:utils": "jest -c jest.config.js --forceExit --selectProjects utils --verbose",
     "test:load-testing": "jest -c jest.config.js --forceExit --selectProjects load-testing --runInBand --verbose",
     "test:long-running": "jest -c jest.config.js --forceExit --selectProjects long-running --runInBand --verbose",
     "test:local-network": "jest -c jest.config.js --forceExit --selectProjects local-network --runInBand --verbose",
