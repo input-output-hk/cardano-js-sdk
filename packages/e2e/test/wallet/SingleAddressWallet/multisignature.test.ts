@@ -21,7 +21,8 @@ describe('SingleAddressWallet/multisignature', () => {
   it('can create a transaction with multiple signatures to mint an asset', async () => {
     wallet = (await getWallet({ env, logger, name: 'Minting Wallet', polling: { interval: 50 } })).wallet;
 
-    await walletReady(wallet);
+    const coins = 3_000_000n;
+    await walletReady(wallet, coins);
 
     const genesis = await firstValueFrom(wallet.genesisParameters$);
 
@@ -85,7 +86,7 @@ describe('SingleAddressWallet/multisignature', () => {
           address: walletAddress,
           value: {
             assets: tokens,
-            coins: 3_000_000n
+            coins
           }
         }
       ]),

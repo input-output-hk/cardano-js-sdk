@@ -23,11 +23,12 @@ describe('SingleAddressWallet.assets/nft', () => {
   let fingerprints: Cardano.AssetFingerprint[];
   const assetNames = ['4e46542d66696c6573', '4e46542d303031', '4e46542d303032'];
   let walletAddress: Cardano.PaymentAddress;
+  const coins = 10_000_000n; // number of coins to use in each transaction
 
   beforeAll(async () => {
     wallet = (await getWallet({ env, logger, name: 'Minting Wallet', polling: { interval: 50 } })).wallet;
 
-    await walletReady(wallet);
+    await walletReady(wallet, coins);
 
     const genesis = await firstValueFrom(wallet.genesisParameters$);
 
@@ -131,7 +132,7 @@ describe('SingleAddressWallet.assets/nft', () => {
           address: walletAddress,
           value: {
             assets: tokens,
-            coins: 50_000_000n
+            coins
           }
         }
       ]),
@@ -256,6 +257,9 @@ describe('SingleAddressWallet.assets/nft', () => {
   });
 
   it('supports burning tokens', async () => {
+    // Make sure the wallet has sufficient funds to run this test
+    await walletReady(wallet, coins);
+
     // spend entire balance of test asset
     const availableBalance = await firstValueFrom(wallet.balance.utxo.available$);
     const assetBalance = availableBalance.assets!.get(assetIds[TOKEN_BURN_INDEX])!;
@@ -266,7 +270,7 @@ describe('SingleAddressWallet.assets/nft', () => {
         {
           address: walletAddress,
           value: {
-            coins: 50_000_000n
+            coins
           }
         }
       ]),
@@ -306,6 +310,9 @@ describe('SingleAddressWallet.assets/nft', () => {
     // eslint-disable-next-line unicorn/consistent-function-scoping
     const CIP0025Test = (testName: string, assetName: string, version: 1 | 2, encoding?: 'hex' | 'utf8') =>
       it(testName, async () => {
+        // Make sure the wallet has sufficient funds to run this test
+        await walletReady(wallet, coins);
+
         const assetNameHex = Buffer.from(assetName).toString('hex');
         const assetId = Cardano.AssetId(`${policyId}${assetNameHex}`);
         const fingerprint = Cardano.AssetFingerprint.fromParts(policyId, Cardano.AssetName(assetNameHex));
@@ -337,7 +344,7 @@ describe('SingleAddressWallet.assets/nft', () => {
               address: walletAddress,
               value: {
                 assets: tokens,
-                coins: 50_000_000n
+                coins
               }
             }
           ]),

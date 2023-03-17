@@ -5,7 +5,7 @@ import { filter, firstValueFrom, map, take } from 'rxjs';
 import { getEnv, getWallet, walletVariables } from '../../../src';
 import { isNotNil } from '@cardano-sdk/util';
 import { logger } from '@cardano-sdk/util-dev';
-import { normalizeTxBody } from '../../util';
+import { normalizeTxBody, walletReady } from '../../util';
 
 const env = getEnv(walletVariables);
 
@@ -22,6 +22,8 @@ describe('SingleAddressWallet/txChainHistory', () => {
 
   it('submit a transaction and find it in chain history', async () => {
     const tAdaToSend = 10_000_000n;
+    // Make sure the wallet has sufficient funds to run this test
+    await walletReady(wallet, tAdaToSend);
 
     await firstValueFrom(wallet.syncStatus.isSettled$.pipe(filter((isSettled) => isSettled)));
 

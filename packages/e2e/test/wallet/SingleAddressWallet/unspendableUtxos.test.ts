@@ -25,8 +25,9 @@ describe('SingleAddressWallet/unspendableUtxos', () => {
     wallet1 = (await getWallet({ env, logger, name: 'Wallet 1', polling: { interval: 50 } })).wallet;
     wallet2 = (await getWallet({ env, logger, name: 'Wallet 2', polling: { interval: 50 } })).wallet;
 
-    await walletReady(wallet1);
-    await walletReady(wallet2);
+    const coins = 5_000_000n;
+    await walletReady(wallet1, coins);
+    await walletReady(wallet2, coins);
 
     const txBuilder1 = buildTx({ logger, observableWallet: wallet1 });
     const txBuilder2 = buildTx({ logger, observableWallet: wallet2 });
