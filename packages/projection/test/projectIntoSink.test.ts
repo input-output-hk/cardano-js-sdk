@@ -122,6 +122,7 @@ describe('projectIntoSink', () => {
       .subscribe();
     const [firstBlock] = await projectAll(dataWithStakeKeyDeregistration, inMemorySinks);
     expect(firstBlock.block.header.blockNo).toBe(22_622);
+    expect(firstBlock.crossEpochBoundary).toBe(false);
     expect(store.stakeKeys.size).toBe(1);
   });
 

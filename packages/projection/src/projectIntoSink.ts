@@ -11,6 +11,7 @@ import {
   PointOrOrigin,
   TipOrOrigin
 } from '@cardano-sdk/core';
+import { DefaultProjectionProps, Projection } from './projections';
 import { Logger } from 'ts-log';
 import {
   Observable,
@@ -28,10 +29,9 @@ import {
   takeWhile,
   tap
 } from 'rxjs';
-import { Projection } from './projections';
 import { Sink, Sinks, SinksFactory } from './sinks';
 import { UnifiedProjectorEvent } from './types';
-import { WithNetworkInfo, withNetworkInfo, withRolledBackBlock } from './operators';
+import { WithNetworkInfo, withEpochBoundary, withEpochNo, withNetworkInfo, withRolledBackBlock } from './operators';
 import { combineProjections } from './combineProjections';
 import { contextLogger } from '@cardano-sdk/util';
 import { passthrough } from '@cardano-sdk/util-rxjs';
@@ -106,17 +106,26 @@ const logEvent =
   };
 
 const syncFromIntersection = <PS>({
+  cardanoNode,
   chainSync: { intersection, chainSync$ },
   logger,
   sinks
 }: {
   logger: Logger;
+  cardanoNode: ObservableCardanoNode;
   sinks: Sinks<PS>;
   chainSync: ObservableChainSync;
 }) =>
-  new Observable<UnifiedProjectorEvent<{}>>((observer) => {
+  new Observable<UnifiedProjectorEvent<DefaultProjectionProps>>((observer) => {
     logger.info(`Starting ChainSync from ${pointDescription(intersection.point)}`);
-    return chainSync$.pipe(withRolledBackBlock(sinks.buffer)).subscribe(observer);
+    return chainSync$
+      .pipe(
+        withRolledBackBlock(sinks.buffer),
+        withNetworkInfo(cardanoNode),
+        withEpochNo(),
+        withEpochBoundary(intersection)
+      )
+      .subscribe(observer);
   });
 
 const rollbackAndSyncFromIntersection = <PS>({
@@ -137,40 +146,49 @@ const rollbackAndSyncFromIntersection = <PS>({
     let skipFindingNewIntersection = true;
     let chainSync = initialChainSync;
     const rollback$ = sinks.buffer.tip$.pipe(
-      takeWhile((block): block is Cardano.Block => block !== 'origin'),
-      mergeMap((block): Observable<Cardano.Block> => {
-        // we already have an intersection for the 1st tip
-        if (skipFindingNewIntersection) {
-          skipFindingNewIntersection = false;
-          return of(block);
-        }
-        // try to find intersection with new tip
-        return cardanoNode.findIntersect(blocksToPoints([block, tail, 'origin'])).pipe(
-          take(1),
-          tap((newChainSync) => {
-            chainSync = newChainSync;
+      // Use the initial tip as intersection point for withEpochBoundary
+      take(1),
+      mergeMap((initialTip) =>
+        sinks.buffer.tip$.pipe(
+          takeWhile((block): block is Cardano.Block => block !== 'origin'),
+          mergeMap((block): Observable<Cardano.Block> => {
+            // we already have an intersection for the 1st tip
+            if (skipFindingNewIntersection) {
+              skipFindingNewIntersection = false;
+              return of(block);
+            }
+            // try to find intersection with new tip
+            return cardanoNode.findIntersect(blocksToPoints([block, tail, 'origin'])).pipe(
+              take(1),
+              tap((newChainSync) => {
+                chainSync = newChainSync;
+              }),
+              map(() => block)
+            );
           }),
-          map(() => block)
-        );
-      }),
-      takeWhile((block) => !isIntersectionBlock(block, chainSync.intersection)),
-      mergeMap(
-        (block): Observable<UnifiedProjectorEvent<{}>> =>
-          of({
-            block,
-            eventType: ChainSyncEventType.RollBackward,
-            point: chainSync.intersection.point,
-            // requestNext is a no-op when rolling back during initialization, because projectIntoSink will
-            // delete block from the buffer for every RollBackward event via `manageBuffer`,
-            // which will trigger the buffer to emit the next tip$
-            requestNext: noop,
-            tip: chainSync.intersection.tip
-          })
+          takeWhile((block) => !isIntersectionBlock(block, chainSync.intersection)),
+          mergeMap(
+            (block): Observable<UnifiedProjectorEvent<{}>> =>
+              of({
+                block,
+                eventType: ChainSyncEventType.RollBackward,
+                point: chainSync.intersection.point,
+                // requestNext is a no-op when rolling back during initialization, because projectIntoSink will
+                // delete block from the buffer for every RollBackward event via `manageBuffer`,
+                // which will trigger the buffer to emit the next tip$
+                requestNext: noop,
+                tip: chainSync.intersection.tip
+              })
+          ),
+          withNetworkInfo(cardanoNode),
+          withEpochNo(),
+          withEpochBoundary({ point: initialTip === 'origin' ? initialTip : initialTip.header })
+        )
       )
     );
     return concat(
       rollback$,
-      defer(() => syncFromIntersection({ chainSync, logger, sinks }))
+      defer(() => syncFromIntersection({ cardanoNode, chainSync, logger, sinks }))
     ).subscribe(subscriber);
   });
 
@@ -208,7 +226,7 @@ const createChainSyncSource = <PS>({
               );
             }
             // buffer is empty, sync from origin
-            return syncFromIntersection({ chainSync: initialChainSync, logger, sinks });
+            return syncFromIntersection({ cardanoNode, chainSync: initialChainSync, logger, sinks });
           }
           if (blocks[0] !== 'origin' && initialChainSync.intersection.point.hash !== blocks[0].header.hash) {
             // rollback to intersection, then sync from intersection
@@ -221,11 +239,10 @@ const createChainSyncSource = <PS>({
             });
           }
           // intersection is at tip$ - no rollback, just sync from intersection
-          return syncFromIntersection({ chainSync: initialChainSync, logger, sinks });
+          return syncFromIntersection({ cardanoNode, chainSync: initialChainSync, logger, sinks });
         })
       );
-    }),
-    withNetworkInfo(cardanoNode)
+    })
   );
 
 // TODO: try to write types that will infer returned observable type from supplied projections.

@@ -1,6 +1,6 @@
 import { createProjection } from './utils';
-import { withCertificates, withEpochNo, withStakePools } from '../operators';
+import { withCertificates, withStakePools } from '../operators';
 
-export const stakePools = createProjection((evt$) => evt$.pipe(withEpochNo(), withCertificates(), withStakePools()));
+export const stakePools = createProjection((evt$) => evt$.pipe(withCertificates(), withStakePools()));
 
 export type StakePoolsProjection = typeof stakePools;
