@@ -36,4 +36,4 @@ jobs:
       run: |
         yarn test:build:verify
         yarn test --showConfig
-        yarn test --forceExit --expand --detectOpenHandles
+        TL_LEVEL=debug yarn test --forceExit --expand --detectOpenHandles
