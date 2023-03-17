@@ -117,7 +117,7 @@ const callCliAndAssertExit = (
   proc.stderr!.on('data', (data) => {
     spy();
     if (dataMatchOnError) {
-      expect(data.toString().includes(dataMatchOnError)).toEqual(true);
+      expect(data.toString()).toContain(dataMatchOnError);
     }
   });
   proc.on('exit', (code) => {
