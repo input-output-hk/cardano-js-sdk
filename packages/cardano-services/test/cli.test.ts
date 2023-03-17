@@ -13,11 +13,11 @@ import { Pool } from 'pg';
 import { RabbitMQContainer } from './TxSubmit/rabbitmq/docker';
 import { ServerMetadata, ServiceNames } from '../src';
 import { createHealthyMockOgmiosServer, createUnhealthyMockOgmiosServer, ogmiosServerReady, serverReady } from './util';
+import { createLogger } from '@cardano-sdk/util-dev';
 import { fromSerializableObject } from '@cardano-sdk/util';
 import { getRandomPort } from 'get-port-please';
 import { healthCheckResponseMock } from '../../core/test/CardanoNode/mocks';
 import { listenPromise, serverClosePromise } from '../src/util';
-import { logger } from '@cardano-sdk/util-dev';
 import { mockTokenRegistry } from './Asset/CardanoTokenRegistry.test';
 import axios, { AxiosError } from 'axios';
 import http from 'http';
@@ -31,6 +31,7 @@ const CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE = 'cannot be used with environment 
 const METRICS_ENDPOINT_LABEL_RESPONSE = 'http_request_duration_seconds duration histogram of http responses';
 
 const exePath = path.join(__dirname, '..', 'dist', 'cjs', 'cli.js');
+const logger = createLogger({ env: process.env.TL_LEVEL ? process.env : { ...process.env, TL_LEVEL: 'error' } });
 
 const assertServiceHealthy = async (
   apiUrl: string,
@@ -103,16 +104,27 @@ type CallCliAndAssertExitArgs = {
 
 const baseArgs = ['start-provider-server', '--logger-min-severity', 'error'];
 
+const withLogging = (proc: ChildProcess, expectingExceptions = false): ChildProcess => {
+  const methodOnFailure = expectingExceptions ? 'debug' : 'error';
+  proc.on('error', (error) => logger[methodOnFailure](error));
+  proc.stderr!.on('data', (data) => logger[methodOnFailure](data.toString()));
+  proc.stdout!.on('data', (data) => logger.info(data.toString()));
+  return proc;
+};
+
 const callCliAndAssertExit = (
   { args = [], dataMatchOnError, env = {} }: CallCliAndAssertExitArgs,
   done: jest.DoneCallback
 ) => {
   const spy = jest.fn();
   expect.assertions(dataMatchOnError ? 3 : 2);
-  const proc = fork(exePath, [...baseArgs, ...args], {
-    env,
-    stdio: 'pipe'
-  });
+  const proc = withLogging(
+    fork(exePath, [...baseArgs, ...args], {
+      env,
+      stdio: 'pipe'
+    }),
+    true
+  );
   proc.stderr!.on('data', spy);
   proc.stderr!.on('data', (data) => {
     spy();
@@ -160,9 +172,11 @@ describe('CLI', () => {
     });
 
     it('CLI version', (done) => {
-      proc = fork(exePath, ['--version'], {
-        stdio: 'pipe'
-      });
+      proc = withLogging(
+        fork(exePath, ['--version'], {
+          stdio: 'pipe'
+        })
+      );
       proc.stdout!.on('data', (data) => {
         expect(data.toString()).toBeDefined();
       });
@@ -219,31 +233,33 @@ describe('CLI', () => {
           });
 
           it('exposes a HTTP server at the configured URL with all services attached when using CLI options', async () => {
-            proc = fork(
-              exePath,
-              [
-                ...baseArgs,
-                '--api-url',
-                apiUrl,
-                '--enable-metrics',
-                'true',
-                '--postgres-connection-string',
-                postgresConnectionString,
-                '--ogmios-url',
-                ogmiosConnection.address.webSocket,
-                '--cardano-node-config-path',
-                cardanoNodeConfigPath,
-                '--db-cache-ttl',
-                dbCacheTtl,
-                ServiceNames.Asset,
-                ServiceNames.ChainHistory,
-                ServiceNames.NetworkInfo,
-                ServiceNames.StakePool,
-                ServiceNames.TxSubmit,
-                ServiceNames.Utxo,
-                ServiceNames.Rewards
-              ],
-              { env: {}, stdio: 'pipe' }
+            proc = withLogging(
+              fork(
+                exePath,
+                [
+                  ...baseArgs,
+                  '--api-url',
+                  apiUrl,
+                  '--enable-metrics',
+                  'true',
+                  '--postgres-connection-string',
+                  postgresConnectionString,
+                  '--ogmios-url',
+                  ogmiosConnection.address.webSocket,
+                  '--cardano-node-config-path',
+                  cardanoNodeConfigPath,
+                  '--db-cache-ttl',
+                  dbCacheTtl,
+                  ServiceNames.Asset,
+                  ServiceNames.ChainHistory,
+                  ServiceNames.NetworkInfo,
+                  ServiceNames.StakePool,
+                  ServiceNames.TxSubmit,
+                  ServiceNames.Utxo,
+                  ServiceNames.Rewards
+                ],
+                { env: {}, stdio: 'pipe' }
+              )
             );
 
             await assertServiceHealthy(apiUrl, ServiceNames.Asset, lastBlock);
@@ -256,19 +272,21 @@ describe('CLI', () => {
           });
 
           it('exposes a HTTP server at the configured URL with all services attached when using env variables', async () => {
-            proc = fork(exePath, ['start-provider-server'], {
-              env: {
-                API_URL: apiUrl,
-                CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
-                DB_CACHE_TTL: dbCacheTtl,
-                ENABLE_METRICS: 'true',
-                LOGGER_MIN_SEVERITY: 'error',
-                OGMIOS_URL: ogmiosConnection.address.webSocket,
-                POSTGRES_CONNECTION_STRING: postgresConnectionString,
-                SERVICE_NAMES: `${ServiceNames.Asset},${ServiceNames.ChainHistory},${ServiceNames.NetworkInfo},${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.Utxo},${ServiceNames.Rewards}`
-              },
-              stdio: 'pipe'
-            });
+            proc = withLogging(
+              fork(exePath, ['start-provider-server'], {
+                env: {
+                  API_URL: apiUrl,
+                  CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
+                  DB_CACHE_TTL: dbCacheTtl,
+                  ENABLE_METRICS: 'true',
+                  LOGGER_MIN_SEVERITY: 'error',
+                  OGMIOS_URL: ogmiosConnection.address.webSocket,
+                  POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                  SERVICE_NAMES: `${ServiceNames.Asset},${ServiceNames.ChainHistory},${ServiceNames.NetworkInfo},${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.Utxo},${ServiceNames.Rewards}`
+                },
+                stdio: 'pipe'
+              })
+            );
 
             await assertServiceHealthy(apiUrl, ServiceNames.Asset, lastBlock);
             await assertServiceHealthy(apiUrl, ServiceNames.ChainHistory, lastBlock);
@@ -280,68 +298,74 @@ describe('CLI', () => {
           });
 
           it('exposes a HTTP server with /metrics endpoint using CLI options', async () => {
-            proc = fork(
-              exePath,
-              [
-                ...baseArgs,
-                '--api-url',
-                apiUrl,
-                '--enable-metrics',
-                'true',
-                '--postgres-connection-string',
-                postgresConnectionString,
-                '--ogmios-url',
-                ogmiosConnection.address.webSocket,
-                '--cardano-node-config-path',
-                cardanoNodeConfigPath,
-                '--db-cache-ttl',
-                dbCacheTtl,
-                ServiceNames.Asset,
-                ServiceNames.ChainHistory,
-                ServiceNames.NetworkInfo,
-                ServiceNames.StakePool,
-                ServiceNames.TxSubmit,
-                ServiceNames.Utxo,
-                ServiceNames.Rewards
-              ],
-              { env: {}, stdio: 'pipe' }
+            proc = withLogging(
+              fork(
+                exePath,
+                [
+                  ...baseArgs,
+                  '--api-url',
+                  apiUrl,
+                  '--enable-metrics',
+                  'true',
+                  '--postgres-connection-string',
+                  postgresConnectionString,
+                  '--ogmios-url',
+                  ogmiosConnection.address.webSocket,
+                  '--cardano-node-config-path',
+                  cardanoNodeConfigPath,
+                  '--db-cache-ttl',
+                  dbCacheTtl,
+                  ServiceNames.Asset,
+                  ServiceNames.ChainHistory,
+                  ServiceNames.NetworkInfo,
+                  ServiceNames.StakePool,
+                  ServiceNames.TxSubmit,
+                  ServiceNames.Utxo,
+                  ServiceNames.Rewards
+                ],
+                { env: {}, stdio: 'pipe' }
+              )
             );
 
             await assertMetricsEndpoint(apiUrl, true);
           });
 
           it('exposes a HTTP server with /metrics endpoint using env variables', async () => {
-            proc = fork(exePath, ['start-provider-server'], {
-              env: {
-                API_URL: apiUrl,
-                CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
-                DB_CACHE_TTL: dbCacheTtl,
-                ENABLE_METRICS: 'true',
-                LOGGER_MIN_SEVERITY: 'error',
-                OGMIOS_URL: ogmiosConnection.address.webSocket,
-                POSTGRES_CONNECTION_STRING: postgresConnectionString,
-                SERVICE_NAMES: `${ServiceNames.Asset},${ServiceNames.ChainHistory},${ServiceNames.NetworkInfo},${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.Utxo},${ServiceNames.Rewards}`
-              },
-              stdio: 'pipe'
-            });
+            proc = withLogging(
+              fork(exePath, ['start-provider-server'], {
+                env: {
+                  API_URL: apiUrl,
+                  CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
+                  DB_CACHE_TTL: dbCacheTtl,
+                  ENABLE_METRICS: 'true',
+                  LOGGER_MIN_SEVERITY: 'error',
+                  OGMIOS_URL: ogmiosConnection.address.webSocket,
+                  POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                  SERVICE_NAMES: `${ServiceNames.Asset},${ServiceNames.ChainHistory},${ServiceNames.NetworkInfo},${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.Utxo},${ServiceNames.Rewards}`
+                },
+                stdio: 'pipe'
+              })
+            );
 
             await assertMetricsEndpoint(apiUrl, true);
           });
 
           it('exposes a HTTP server without /metrics endpoint when env set to false', async () => {
-            proc = fork(exePath, ['start-provider-server'], {
-              env: {
-                API_URL: apiUrl,
-                CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
-                DB_CACHE_TTL: dbCacheTtl,
-                ENABLE_METRICS: 'false',
-                LOGGER_MIN_SEVERITY: 'error',
-                OGMIOS_URL: ogmiosConnection.address.webSocket,
-                POSTGRES_CONNECTION_STRING: postgresConnectionString,
-                SERVICE_NAMES: `${ServiceNames.Asset},${ServiceNames.ChainHistory},${ServiceNames.NetworkInfo},${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.Utxo},${ServiceNames.Rewards}`
-              },
-              stdio: 'pipe'
-            });
+            proc = withLogging(
+              fork(exePath, ['start-provider-server'], {
+                env: {
+                  API_URL: apiUrl,
+                  CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
+                  DB_CACHE_TTL: dbCacheTtl,
+                  ENABLE_METRICS: 'false',
+                  LOGGER_MIN_SEVERITY: 'error',
+                  OGMIOS_URL: ogmiosConnection.address.webSocket,
+                  POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                  SERVICE_NAMES: `${ServiceNames.Asset},${ServiceNames.ChainHistory},${ServiceNames.NetworkInfo},${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.Utxo},${ServiceNames.Rewards}`
+                },
+                stdio: 'pipe'
+              })
+            );
 
             await assertMetricsEndpoint(apiUrl, false);
           });
@@ -362,44 +386,48 @@ describe('CLI', () => {
             };
 
             it('using CLI options', async () => {
-              proc = fork(
-                exePath,
-                [
-                  ...baseArgs,
-                  '--api-url',
-                  apiUrl,
-                  '--build-info',
-                  buildInfo,
-                  '--postgres-connection-string',
-                  postgresConnectionString,
-                  '--ogmios-url',
-                  ogmiosConnection.address.webSocket,
-                  '--cardano-node-config-path',
-                  cardanoNodeConfigPath,
-                  '--db-cache-ttl',
-                  dbCacheTtl,
-                  ServiceNames.Utxo
-                ],
-                { env: {}, stdio: 'pipe' }
+              proc = withLogging(
+                fork(
+                  exePath,
+                  [
+                    ...baseArgs,
+                    '--api-url',
+                    apiUrl,
+                    '--build-info',
+                    buildInfo,
+                    '--postgres-connection-string',
+                    postgresConnectionString,
+                    '--ogmios-url',
+                    ogmiosConnection.address.webSocket,
+                    '--cardano-node-config-path',
+                    cardanoNodeConfigPath,
+                    '--db-cache-ttl',
+                    dbCacheTtl,
+                    ServiceNames.Utxo
+                  ],
+                  { env: {}, stdio: 'pipe' }
+                )
               );
 
               await assertMetaEndpoint(apiUrl, metaResponse);
             });
 
             it('using env variables', async () => {
-              proc = fork(exePath, ['start-provider-server'], {
-                env: {
-                  API_URL: apiUrl,
-                  BUILD_INFO: buildInfo,
-                  CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
-                  DB_CACHE_TTL: dbCacheTtl,
-                  LOGGER_MIN_SEVERITY: 'error',
-                  OGMIOS_URL: ogmiosConnection.address.webSocket,
-                  POSTGRES_CONNECTION_STRING: postgresConnectionString,
-                  SERVICE_NAMES: `${ServiceNames.Utxo}`
-                },
-                stdio: 'pipe'
-              });
+              proc = withLogging(
+                fork(exePath, ['start-provider-server'], {
+                  env: {
+                    API_URL: apiUrl,
+                    BUILD_INFO: buildInfo,
+                    CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
+                    DB_CACHE_TTL: dbCacheTtl,
+                    LOGGER_MIN_SEVERITY: 'error',
+                    OGMIOS_URL: ogmiosConnection.address.webSocket,
+                    POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                    SERVICE_NAMES: `${ServiceNames.Utxo}`
+                  },
+                  stdio: 'pipe'
+                })
+              );
 
               await assertMetaEndpoint(apiUrl, metaResponse);
             });
@@ -407,23 +435,25 @@ describe('CLI', () => {
             it('defaults if build info is not provided on startup', async () => {
               const defaultServerMeta: ServerMetadata = { startupTime: 1_234_567 };
 
-              proc = fork(
-                exePath,
-                [
-                  ...baseArgs,
-                  '--api-url',
-                  apiUrl,
-                  '--postgres-connection-string',
-                  postgresConnectionString,
-                  '--ogmios-url',
-                  ogmiosConnection.address.webSocket,
-                  '--cardano-node-config-path',
-                  cardanoNodeConfigPath,
-                  '--db-cache-ttl',
-                  dbCacheTtl,
-                  ServiceNames.Utxo
-                ],
-                { env: {}, stdio: 'pipe' }
+              proc = withLogging(
+                fork(
+                  exePath,
+                  [
+                    ...baseArgs,
+                    '--api-url',
+                    apiUrl,
+                    '--postgres-connection-string',
+                    postgresConnectionString,
+                    '--ogmios-url',
+                    ogmiosConnection.address.webSocket,
+                    '--cardano-node-config-path',
+                    cardanoNodeConfigPath,
+                    '--db-cache-ttl',
+                    dbCacheTtl,
+                    ServiceNames.Utxo
+                  ],
+                  { env: {}, stdio: 'pipe' }
+                )
               );
 
               await assertMetaEndpoint(apiUrl, defaultServerMeta);
@@ -485,28 +515,30 @@ describe('CLI', () => {
           });
 
           it('setting the service names via env variable takes preference over command line argument', async () => {
-            proc = fork(
-              exePath,
-              [
-                ...baseArgs,
-                '--api-url',
-                apiUrl,
-                '--postgres-connection-string',
-                postgresConnectionString,
-                '--ogmios-url',
-                ogmiosConnection.address.webSocket,
-                '--cardano-node-config-path',
-                cardanoNodeConfigPath,
-                '--db-cache-ttl',
-                dbCacheTtl,
-                ServiceNames.Utxo
-              ],
-              {
-                env: {
-                  SERVICE_NAMES: `${ServiceNames.Utxo},${ServiceNames.Rewards}`
-                },
-                stdio: 'pipe'
-              }
+            proc = withLogging(
+              fork(
+                exePath,
+                [
+                  ...baseArgs,
+                  '--api-url',
+                  apiUrl,
+                  '--postgres-connection-string',
+                  postgresConnectionString,
+                  '--ogmios-url',
+                  ogmiosConnection.address.webSocket,
+                  '--cardano-node-config-path',
+                  cardanoNodeConfigPath,
+                  '--db-cache-ttl',
+                  dbCacheTtl,
+                  ServiceNames.Utxo
+                ],
+                {
+                  env: {
+                    SERVICE_NAMES: `${ServiceNames.Utxo},${ServiceNames.Rewards}`
+                  },
+                  stdio: 'pipe'
+                }
+              )
             );
 
             await assertServiceHealthy(apiUrl, ServiceNames.Utxo, lastBlock);
@@ -514,67 +546,73 @@ describe('CLI', () => {
           });
 
           it('exposes a HTTP server with /stake-pool/search endpoint that includes metrics.apy, by default', async () => {
-            proc = fork(
-              exePath,
-              [
-                ...baseArgs,
-                '--api-url',
-                apiUrl,
-                '--postgres-connection-string',
-                postgresConnectionString,
-                '--ogmios-url',
-                ogmiosConnection.address.webSocket,
-                '--cardano-node-config-path',
-                cardanoNodeConfigPath,
-                '--db-cache-ttl',
-                dbCacheTtl,
-                ServiceNames.StakePool
-              ],
-              { env: {}, stdio: 'pipe' }
+            proc = withLogging(
+              fork(
+                exePath,
+                [
+                  ...baseArgs,
+                  '--api-url',
+                  apiUrl,
+                  '--postgres-connection-string',
+                  postgresConnectionString,
+                  '--ogmios-url',
+                  ogmiosConnection.address.webSocket,
+                  '--cardano-node-config-path',
+                  cardanoNodeConfigPath,
+                  '--db-cache-ttl',
+                  dbCacheTtl,
+                  ServiceNames.StakePool
+                ],
+                { env: {}, stdio: 'pipe' }
+              )
             );
 
             await assertStakePoolApyInResponse(apiUrl, true);
           });
 
           it('exposes a HTTP server with /stake-pool/search endpoint that disables metrics.apy, when configured via CLI option', async () => {
-            proc = fork(
-              exePath,
-              [
-                ...baseArgs,
-                '--api-url',
-                apiUrl,
-                '--disable-stake-pool-metric-apy',
-                'true',
-                '--postgres-connection-string',
-                postgresConnectionString,
-                '--ogmios-url',
-                ogmiosConnection.address.webSocket,
-                '--cardano-node-config-path',
-                cardanoNodeConfigPath,
-                '--db-cache-ttl',
-                dbCacheTtl,
-                ServiceNames.StakePool
-              ],
-              { env: {}, stdio: 'pipe' }
+            proc = withLogging(
+              fork(
+                exePath,
+                [
+                  ...baseArgs,
+                  '--api-url',
+                  apiUrl,
+                  '--disable-stake-pool-metric-apy',
+                  'true',
+                  '--postgres-connection-string',
+                  postgresConnectionString,
+                  '--ogmios-url',
+                  ogmiosConnection.address.webSocket,
+                  '--cardano-node-config-path',
+                  cardanoNodeConfigPath,
+                  '--db-cache-ttl',
+                  dbCacheTtl,
+                  ServiceNames.StakePool
+                ],
+                { env: {}, stdio: 'pipe' }
+              )
             );
 
             await assertStakePoolApyInResponse(apiUrl, false);
           });
 
           it('exposes a HTTP server with /stake-pool/search endpoint that disables metrics.apy when using env', async () => {
-            proc = fork(exePath, ['start-provider-server'], {
-              env: {
-                API_URL: apiUrl,
-                CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
-                DB_CACHE_TTL: dbCacheTtl,
-                DISABLE_STAKE_POOL_METRIC_APY: 'true',
-                LOGGER_MIN_SEVERITY: 'error',
-                OGMIOS_URL: ogmiosConnection.address.webSocket,
-                POSTGRES_CONNECTION_STRING: postgresConnectionString,
-                SERVICE_NAMES: `${ServiceNames.StakePool}`
-              },
-              stdio: 'pipe'
-            });
+            proc = withLogging(
+              fork(exePath, ['start-provider-server'], {
+                env: {
+                  API_URL: apiUrl,
+                  CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
+                  DB_CACHE_TTL: dbCacheTtl,
+                  DISABLE_STAKE_POOL_METRIC_APY: 'true',
+                  LOGGER_MIN_SEVERITY: 'error',
+                  OGMIOS_URL: ogmiosConnection.address.webSocket,
+                  POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                  SERVICE_NAMES: `${ServiceNames.StakePool}`
+                },
+                stdio: 'pipe'
+              })
+            );
 
             await assertStakePoolApyInResponse(apiUrl, false);
           });
@@ -667,53 +705,57 @@ describe('CLI', () => {
             });
 
             it('exposes a HTTP server when using CLI options', async () => {
-              proc = fork(
-                exePath,
-                [
-                  ...baseArgs,
-                  '--api-url',
-                  apiUrl,
-                  '--ogmios-url',
-                  ogmiosConnection.address.webSocket,
-                  '--postgres-db',
-                  postgresDb,
-                  '--postgres-user',
-                  postgresUser,
-                  '--postgres-password',
-                  postgresPassword,
-                  '--postgres-host',
-                  postgresHost,
-                  '--postgres-pool-max',
-                  '50',
-                  '--postgres-port',
-                  postgresPort,
-                  ServiceNames.Utxo
-                ],
-                {
-                  env: {},
-                  stdio: 'pipe'
-                }
+              proc = withLogging(
+                fork(
+                  exePath,
+                  [
+                    ...baseArgs,
+                    '--api-url',
+                    apiUrl,
+                    '--ogmios-url',
+                    ogmiosConnection.address.webSocket,
+                    '--postgres-db',
+                    postgresDb,
+                    '--postgres-user',
+                    postgresUser,
+                    '--postgres-password',
+                    postgresPassword,
+                    '--postgres-host',
+                    postgresHost,
+                    '--postgres-pool-max',
+                    '50',
+                    '--postgres-port',
+                    postgresPort,
+                    ServiceNames.Utxo
+                  ],
+                  {
+                    env: {},
+                    stdio: 'pipe'
+                  }
+                )
               );
 
               await assertServiceHealthy(apiUrl, ServiceNames.Utxo, lastBlock);
             });
 
             it('exposes a HTTP server when using env variables', async () => {
-              proc = fork(exePath, ['start-provider-server'], {
-                env: {
-                  API_URL: apiUrl,
-                  LOGGER_MIN_SEVERITY: 'error',
-                  OGMIOS_URL: ogmiosConnection.address.webSocket,
-                  POSTGRES_DB: postgresDb,
-                  POSTGRES_HOST: postgresHost,
-                  POSTGRES_PASSWORD: postgresPassword,
-                  POSTGRES_POOL_MAX: '50',
-                  POSTGRES_PORT: postgresPort,
-                  POSTGRES_USER: postgresUser,
-                  SERVICE_NAMES: ServiceNames.Utxo
-                },
-                stdio: 'pipe'
-              });
+              proc = withLogging(
+                fork(exePath, ['start-provider-server'], {
+                  env: {
+                    API_URL: apiUrl,
+                    LOGGER_MIN_SEVERITY: 'error',
+                    OGMIOS_URL: ogmiosConnection.address.webSocket,
+                    POSTGRES_DB: postgresDb,
+                    POSTGRES_HOST: postgresHost,
+                    POSTGRES_PASSWORD: postgresPassword,
+                    POSTGRES_POOL_MAX: '50',
+                    POSTGRES_PORT: postgresPort,
+                    POSTGRES_USER: postgresUser,
+                    SERVICE_NAMES: ServiceNames.Utxo
+                  },
+                  stdio: 'pipe'
+                })
+              );
 
               await assertServiceHealthy(apiUrl, ServiceNames.Utxo, lastBlock);
             });
@@ -1239,58 +1281,66 @@ describe('CLI', () => {
 
           describe('without providing the Ogmios URL', () => {
             it('network-info uses the default Ogmios configuration if not specified when using CLI options', async () => {
-              proc = fork(
-                exePath,
-                [
-                  ...baseArgs,
-                  '--api-url',
-                  apiUrl,
-                  '--postgres-connection-string',
-                  postgresConnectionString,
-                  '--cardano-node-config-path',
-                  cardanoNodeConfigPath,
-                  ServiceNames.NetworkInfo
-                ],
-                {
-                  env: {},
-                  stdio: 'pipe'
-                }
+              proc = withLogging(
+                fork(
+                  exePath,
+                  [
+                    ...baseArgs,
+                    '--api-url',
+                    apiUrl,
+                    '--postgres-connection-string',
+                    postgresConnectionString,
+                    '--cardano-node-config-path',
+                    cardanoNodeConfigPath,
+                    ServiceNames.NetworkInfo
+                  ],
+                  {
+                    env: {},
+                    stdio: 'pipe'
+                  }
+                )
               );
               await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo, lastBlock);
             });
 
             it('network-info uses the default Ogmios configuration if not specified using env variables', async () => {
-              proc = fork(exePath, ['start-provider-server'], {
-                env: {
-                  API_URL: apiUrl,
-                  CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
-                  LOGGER_MIN_SEVERITY: 'error',
-                  POSTGRES_CONNECTION_STRING: postgresConnectionString,
-                  SERVICE_NAMES: ServiceNames.NetworkInfo
-                },
-                stdio: 'pipe'
-              });
+              proc = withLogging(
+                fork(exePath, ['start-provider-server'], {
+                  env: {
+                    API_URL: apiUrl,
+                    CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
+                    LOGGER_MIN_SEVERITY: 'error',
+                    POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                    SERVICE_NAMES: ServiceNames.NetworkInfo
+                  },
+                  stdio: 'pipe'
+                })
+              );
               await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo, lastBlock);
             });
 
             it('tx-submit uses the default Ogmios configuration if not specified when using CLI options', async () => {
-              proc = fork(exePath, [...baseArgs, '--api-url', apiUrl, ServiceNames.TxSubmit], {
-                env: {},
-                stdio: 'pipe'
-              });
+              proc = withLogging(
+                fork(exePath, [...baseArgs, '--api-url', apiUrl, ServiceNames.TxSubmit], {
+                  env: {},
+                  stdio: 'pipe'
+                })
+              );
               await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, false, false);
             });
 
             it('tx-submit uses the default Ogmios configuration if not specified when using env variables', async () => {
-              proc = fork(exePath, ['start-provider-server'], {
-                env: {
-                  API_URL: apiUrl,
-                  LOGGER_MIN_SEVERITY: 'error',
-                  SERVICE_NAMES: ServiceNames.TxSubmit,
-                  USE_QUEUE: 'false'
-                },
-                stdio: 'pipe'
-              });
+              proc = withLogging(
+                fork(exePath, ['start-provider-server'], {
+                  env: {
+                    API_URL: apiUrl,
+                    LOGGER_MIN_SEVERITY: 'error',
+                    SERVICE_NAMES: ServiceNames.TxSubmit,
+                    USE_QUEUE: 'false'
+                  },
+                  stdio: 'pipe'
+                })
+              );
               await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, false, false);
             });
           });
@@ -1550,21 +1600,23 @@ describe('CLI', () => {
             afterAll(async () => await closeMock());
 
             it('exposes a HTTP server with healthy state when using CLI options', async () => {
-              proc = fork(
-                exePath,
-                [
-                  ...baseArgs,
-                  '--api-url',
-                  apiUrl,
-                  '--ogmios-url',
-                  ogmiosConnection.address.webSocket,
-                  '--postgres-connection-string',
-                  postgresConnectionString,
-                  '--token-metadata-server-url',
-                  tokenMetadataServerUrl,
-                  ServiceNames.Asset
-                ],
-                { env: {}, stdio: 'pipe' }
+              proc = withLogging(
+                fork(
+                  exePath,
+                  [
+                    ...baseArgs,
+                    '--api-url',
+                    apiUrl,
+                    '--ogmios-url',
+                    ogmiosConnection.address.webSocket,
+                    '--postgres-connection-string',
+                    postgresConnectionString,
+                    '--token-metadata-server-url',
+                    tokenMetadataServerUrl,
+                    ServiceNames.Asset
+                  ],
+                  { env: {}, stdio: 'pipe' }
+                )
               );
               await assertServiceHealthy(apiUrl, ServiceNames.Asset, lastBlock);
 
@@ -1578,17 +1630,19 @@ describe('CLI', () => {
             });
 
             it('exposes a HTTP server with healthy state when using env variables', async () => {
-              proc = fork(exePath, ['start-provider-server'], {
-                env: {
-                  API_URL: apiUrl,
-                  LOGGER_MIN_SEVERITY: 'error',
-                  OGMIOS_URL: ogmiosConnection.address.webSocket,
-                  POSTGRES_CONNECTION_STRING: postgresConnectionString,
-                  SERVICE_NAMES: ServiceNames.Asset,
-                  TOKEN_METADATA_SERVER_URL: tokenMetadataServerUrl
-                },
-                stdio: 'pipe'
-              });
+              proc = withLogging(
+                fork(exePath, ['start-provider-server'], {
+                  env: {
+                    API_URL: apiUrl,
+                    LOGGER_MIN_SEVERITY: 'error',
+                    OGMIOS_URL: ogmiosConnection.address.webSocket,
+                    POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                    SERVICE_NAMES: ServiceNames.Asset,
+                    TOKEN_METADATA_SERVER_URL: tokenMetadataServerUrl
+                  },
+                  stdio: 'pipe'
+                })
+              );
               await assertServiceHealthy(apiUrl, ServiceNames.Asset, lastBlock);
 
               const res = await axios.post(`${apiUrl}/asset/get-asset`, {
@@ -1601,17 +1655,19 @@ describe('CLI', () => {
             });
 
             it('loads a stub asset metadata service when TOKEN_METADATA_SERVER_URL starts with "stub:"', async () => {
-              proc = fork(exePath, ['start-provider-server'], {
-                env: {
-                  API_URL: apiUrl,
-                  LOGGER_MIN_SEVERITY: 'error',
-                  OGMIOS_URL: ogmiosConnection.address.webSocket,
-                  POSTGRES_CONNECTION_STRING: postgresConnectionString,
-                  SERVICE_NAMES: ServiceNames.Asset,
-                  TOKEN_METADATA_SERVER_URL: 'stub://'
-                },
-                stdio: 'pipe'
-              });
+              proc = withLogging(
+                fork(exePath, ['start-provider-server'], {
+                  env: {
+                    API_URL: apiUrl,
+                    LOGGER_MIN_SEVERITY: 'error',
+                    OGMIOS_URL: ogmiosConnection.address.webSocket,
+                    POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                    SERVICE_NAMES: ServiceNames.Asset,
+                    TOKEN_METADATA_SERVER_URL: 'stub://'
+                  },
+                  stdio: 'pipe'
+                })
+              );
               await assertServiceHealthy(apiUrl, ServiceNames.Asset, lastBlock);
 
               const res = await axios.post(`${apiUrl}/asset/get-asset`, {
@@ -1628,37 +1684,41 @@ describe('CLI', () => {
         describe('specifying a RabbitMQ-dependent service', () => {
           describe('with RabbitMQ and explicit URL', () => {
             it('exposes a HTTP server with healthy state when using CLI options', async () => {
-              proc = fork(
-                exePath,
-                [
-                  ...baseArgs,
-                  '--api-url',
-                  apiUrl,
-                  '--use-queue',
-                  'true',
-                  '--rabbitmq-url',
-                  rabbitmqUrl.toString(),
-                  ServiceNames.TxSubmit
-                ],
-                {
-                  env: {},
-                  stdio: 'pipe'
-                }
+              proc = withLogging(
+                fork(
+                  exePath,
+                  [
+                    ...baseArgs,
+                    '--api-url',
+                    apiUrl,
+                    '--use-queue',
+                    'true',
+                    '--rabbitmq-url',
+                    rabbitmqUrl.toString(),
+                    ServiceNames.TxSubmit
+                  ],
+                  {
+                    env: {},
+                    stdio: 'pipe'
+                  }
+                )
               );
               await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, true, true);
             });
 
             it('exposes a HTTP server with healthy state when using env variables', async () => {
-              proc = fork(exePath, ['start-provider-server'], {
-                env: {
-                  API_URL: apiUrl,
-                  LOGGER_MIN_SEVERITY: 'error',
-                  RABBITMQ_URL: rabbitmqUrl.toString(),
-                  SERVICE_NAMES: ServiceNames.TxSubmit,
-                  USE_QUEUE: 'true'
-                },
-                stdio: 'pipe'
-              });
+              proc = withLogging(
+                fork(exePath, ['start-provider-server'], {
+                  env: {
+                    API_URL: apiUrl,
+                    LOGGER_MIN_SEVERITY: 'error',
+                    RABBITMQ_URL: rabbitmqUrl.toString(),
+                    SERVICE_NAMES: ServiceNames.TxSubmit,
+                    USE_QUEUE: 'true'
+                  },
+                  stdio: 'pipe'
+                })
+              );
               await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, true, true);
             });
           });
@@ -1808,7 +1868,7 @@ describe('CLI', () => {
     // Tests without any assertion fail if they get timeout
     it('exits with code 1 without api key', (done) => {
       expect.assertions(2);
-      proc = fork(exePath, commonArgs, { env: {}, stdio: 'pipe' });
+      proc = withLogging(fork(exePath, commonArgs, { env: {}, stdio: 'pipe' }), true);
       proc.stderr!.on('data', (data) =>
         expect(data.toString()).toMatch(
           'MissingProgramOption: Blockfrost worker requires the Blockfrost API Key file path or Blockfrost API Key program option'
@@ -1822,7 +1882,10 @@ describe('CLI', () => {
 
     it('exits with code 1 without network', (done) => {
       expect.assertions(2);
-      proc = fork(exePath, [...commonArgs, '--blockfrost-api-key', 'abc'], { env: {}, stdio: 'pipe' });
+      proc = withLogging(
+        fork(exePath, [...commonArgs, '--blockfrost-api-key', 'abc'], { env: {}, stdio: 'pipe' }),
+        true
+      );
       proc.stderr!.on('data', (data) =>
         expect(data.toString()).toMatch(
           'MissingProgramOption: Blockfrost worker requires the network to run against program option'
@@ -1836,10 +1899,13 @@ describe('CLI', () => {
 
     it('exits with code 1 with wrong network', (done) => {
       expect.assertions(2);
-      proc = fork(exePath, [...commonArgs, '--blockfrost-api-key', 'abc', '--network', 'none'], {
-        env: {},
-        stdio: 'pipe'
-      });
+      proc = withLogging(
+        fork(exePath, [...commonArgs, '--blockfrost-api-key', 'abc', '--network', 'none'], {
+          env: {},
+          stdio: 'pipe'
+        }),
+        true
+      );
       proc.stderr!.on('data', (data) => expect(data.toString()).toMatch('Error: Unknown network: none'));
       proc.on('exit', (code) => {
         expect(code).toBe(1);
@@ -1849,10 +1915,13 @@ describe('CLI', () => {
 
     it('exits with code 1 without db connection string', (done) => {
       expect.assertions(2);
-      proc = fork(exePath, [...commonArgs, '--blockfrost-api-key', 'abc', '--network', 'mainnet'], {
-        env: {},
-        stdio: 'pipe'
-      });
+      proc = withLogging(
+        fork(exePath, [...commonArgs, '--blockfrost-api-key', 'abc', '--network', 'mainnet'], {
+          env: {},
+          stdio: 'pipe'
+        }),
+        true
+      );
       proc.stderr!.on('data', (data) =>
         expect(data.toString()).toMatch(
           'MissingProgramOption: Blockfrost worker requires the PostgreSQL Connection string or Postgres SRV service name, db, user and password program option'
@@ -1865,20 +1934,22 @@ describe('CLI', () => {
     });
 
     it('dry run', (done) => {
-      proc = fork(
-        exePath,
-        [
-          ...commonArgs,
-          '--blockfrost-api-key',
-          'abc',
-          '--network',
-          'mainnet',
-          '--postgres-connection-string',
-          process.env.POSTGRES_CONNECTION_STRING!,
-          '--api-url',
-          `http://localhost:${port}/`
-        ],
-        { env: {}, stdio: 'pipe' }
+      proc = withLogging(
+        fork(
+          exePath,
+          [
+            ...commonArgs,
+            '--blockfrost-api-key',
+            'abc',
+            '--network',
+            'mainnet',
+            '--postgres-connection-string',
+            process.env.POSTGRES_CONNECTION_STRING!,
+            '--api-url',
+            `http://localhost:${port}/`
+          ],
+          { env: {}, stdio: 'pipe' }
+        )
       );
       proc.stdout!.on('data', (data) => {
         // eslint-disable-next-line unicorn/prefer-regexp-test
@@ -1962,13 +2033,13 @@ describe('CLI', () => {
       describe('transaction are actually submitted', () => {
         it('submits transactions using CLI options', async () => {
           hookPromise = new Promise((resolve) => (hook = resolve));
-          proc = fork(exePath, commonArgs, { env: {}, stdio: 'pipe' });
+          proc = withLogging(fork(exePath, commonArgs, { env: {}, stdio: 'pipe' }));
           await Promise.all([hookPromise, container.enqueueTx(logger)]);
         });
 
         it('submits transactions using env variables', async () => {
           hookPromise = new Promise((resolve) => (hook = resolve));
-          proc = fork(exePath, ['start-worker'], { env: commonEnv, stdio: 'pipe' });
+          proc = withLogging(fork(exePath, ['start-worker'], { env: commonEnv, stdio: 'pipe' }));
           await Promise.all([hookPromise, container.enqueueTx(logger)]);
         });
       });
@@ -1976,12 +2047,12 @@ describe('CLI', () => {
       describe('parallel option', () => {
         describe('without parallel option', () => {
           it('starts in serial mode', (done) => {
-            proc = fork(exePath, commonArgs, { env: {}, stdio: 'pipe' });
+            proc = withLogging(fork(exePath, commonArgs, { env: {}, stdio: 'pipe' }));
             proc.stdout!.on('data', (data) => (data.toString().match('serial mode') ? done() : null));
           });
 
           it('starts in serial mode', (done) => {
-            proc = fork(exePath, ['start-worker'], { env: commonEnv, stdio: 'pipe' });
+            proc = withLogging(fork(exePath, ['start-worker'], { env: commonEnv, stdio: 'pipe' }));
             proc.stdout!.on('data', (data) => (data.toString().match('serial mode') ? done() : null));
           });
         });
@@ -1989,7 +2060,7 @@ describe('CLI', () => {
         describe('with bad parallel option', () => {
           it('exits with code 1 using CLI options', (done) => {
             expect.assertions(2);
-            proc = fork(exePath, [...commonArgs, '--parallel', 'test'], { env: {}, stdio: 'pipe' });
+            proc = withLogging(fork(exePath, [...commonArgs, '--parallel', 'test'], { env: {}, stdio: 'pipe' }), true);
             proc.stderr!.on('data', (data) =>
               expect(data.toString()).toMatch('RabbitMQ worker requires a valid Parallel mode')
             );
@@ -2001,7 +2072,10 @@ describe('CLI', () => {
 
           it('exits with code 1 using env variables', (done) => {
             expect.assertions(2);
-            proc = fork(exePath, ['start-worker'], { env: { ...commonEnv, PARALLEL: 'test' }, stdio: 'pipe' });
+            proc = withLogging(
+              fork(exePath, ['start-worker'], { env: { ...commonEnv, PARALLEL: 'test' }, stdio: 'pipe' }),
+              true
+            );
             proc.stderr!.on('data', (data) =>
               expect(data.toString()).toMatch('RabbitMQ worker requires a valid Parallel mode')
             );
@@ -2014,31 +2088,35 @@ describe('CLI', () => {
 
         describe('with parallel option set to false', () => {
           it('worker starts in serial mode using CLI options', (done) => {
-            proc = fork(exePath, [...commonArgs, '--parallel', 'false'], { env: {}, stdio: 'pipe' });
+            proc = withLogging(fork(exePath, [...commonArgs, '--parallel', 'false'], { env: {}, stdio: 'pipe' }));
             proc.stdout!.on('data', (data) => (data.toString().match('serial mode') ? done() : null));
           });
 
           it('worker starts in serial mode using env variables', (done) => {
-            proc = fork(exePath, ['start-worker'], { env: { ...commonEnv, PARALLEL: 'false' }, stdio: 'pipe' });
+            proc = withLogging(
+              fork(exePath, ['start-worker'], { env: { ...commonEnv, PARALLEL: 'false' }, stdio: 'pipe' })
+            );
             proc.stdout!.on('data', (data) => (data.toString().match('serial mode') ? done() : null));
           });
         });
 
         describe('with parallel option set to true', () => {
           it('worker starts in parallel mode using CLI options', (done) => {
-            proc = fork(exePath, [...commonArgs, '--parallel', 'true'], { env: {}, stdio: 'pipe' });
+            proc = withLogging(fork(exePath, [...commonArgs, '--parallel', 'true'], { env: {}, stdio: 'pipe' }));
             proc.stdout!.on('data', (data) => (data.toString().match('parallel mode') ? done() : null));
           });
 
           it('worker starts in parallel mode using env variables', (done) => {
-            proc = fork(exePath, ['start-worker'], { env: { ...commonEnv, PARALLEL: 'true' }, stdio: 'pipe' });
+            proc = withLogging(
+              fork(exePath, ['start-worker'], { env: { ...commonEnv, PARALLEL: 'true' }, stdio: 'pipe' })
+            );
             proc.stdout!.on('data', (data) => (data.toString().match('parallel mode') ? done() : null));
           });
         });
 
         describe('default parallel option value', () => {
           it('worker starts in parallel mode using CLI options', (done) => {
-            proc = fork(exePath, [...commonArgs, '--parallel', 'true'], { env: {}, stdio: 'pipe' });
+            proc = withLogging(fork(exePath, [...commonArgs, '--parallel', 'true'], { env: {}, stdio: 'pipe' }));
             proc.stdout!.on('data', (data) => (data.toString().match('parallel mode') ? done() : null));
           });
         });
@@ -2048,10 +2126,13 @@ describe('CLI', () => {
     describe('without a working RabbitMQ server handles a connection error event', () => {
       it('exits with code 1 using CLI options', (done) => {
         expect.assertions(2);
-        proc = fork(exePath, [...commonArgs, '--rabbitmq-url', BAD_CONNECTION_URL.toString()], {
-          env: {},
-          stdio: 'pipe'
-        });
+        proc = withLogging(
+          fork(exePath, [...commonArgs, '--rabbitmq-url', BAD_CONNECTION_URL.toString()], {
+            env: {},
+            stdio: 'pipe'
+          }),
+          true
+        );
 
         proc.stderr!.on('data', (data) => {
           expect(data.toString()).toMatch('CONNECTION_FAILURE');
@@ -2064,10 +2145,13 @@ describe('CLI', () => {
 
       it('exits with code 1 using env variables', (done) => {
         expect.assertions(2);
-        proc = fork(exePath, ['start-worker'], {
-          env: { ...commonEnv, RABBITMQ_URL: BAD_CONNECTION_URL.toString() },
-          stdio: 'pipe'
-        });
+        proc = withLogging(
+          fork(exePath, ['start-worker'], {
+            env: { ...commonEnv, RABBITMQ_URL: BAD_CONNECTION_URL.toString() },
+            stdio: 'pipe'
+          }),
+          true
+        );
 
         proc.stderr!.on('data', (data) => {
           expect(data.toString()).toMatch('CONNECTION_FAILURE');
@@ -2082,7 +2166,7 @@ describe('CLI', () => {
     describe('with service discovery', () => {
       it('throws DNS SRV error and exits with code 1 using CLI options', (done) => {
         expect.assertions(2);
-        proc = fork(exePath, commonArgsWithServiceDiscovery, { env: {}, stdio: 'pipe' });
+        proc = withLogging(fork(exePath, commonArgsWithServiceDiscovery, { env: {}, stdio: 'pipe' }), true);
 
         proc.stderr!.on('data', (data) => {
           expect(data.toString().includes('querySrv ENOTFOUND')).toEqual(true);
@@ -2096,7 +2180,10 @@ describe('CLI', () => {
 
       it('throws DNS SRV error and exits with code 1 using env variables', (done) => {
         expect.assertions(2);
-        proc = fork(exePath, ['start-worker'], { env: commonEnvWithServiceDiscovery, stdio: 'pipe' });
+        proc = withLogging(
+          fork(exePath, ['start-worker'], { env: commonEnvWithServiceDiscovery, stdio: 'pipe' }),
+          true
+        );
 
         proc.stderr!.on('data', (data) => {
           expect(data.toString().includes('querySrv ENOTFOUND')).toEqual(true);
