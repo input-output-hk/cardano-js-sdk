@@ -29,6 +29,7 @@ const DNS_SERVER_NOT_REACHABLE_ERROR = 'querySrv ENOTFOUND';
 const CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE = 'cannot be used with option';
 const CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE = 'cannot be used with environment variable';
 const METRICS_ENDPOINT_LABEL_RESPONSE = 'http_request_duration_seconds duration histogram of http responses';
+const REQUIRES_PG_CONNECTION = 'requires the PostgreSQL Connection string or Postgres SRV service name';
 
 const exePath = path.join(__dirname, '..', 'dist', 'cjs', 'cli.js');
 const logger = createLogger({ env: process.env.TL_LEVEL ? process.env : { ...process.env, TL_LEVEL: 'error' } });
@@ -103,7 +104,7 @@ const assertStakePoolApyInResponse = async (apiUrl: string, assertFound: boolean
 
 type CallCliAndAssertExitArgs = {
   args?: string[];
-  dataMatchOnError?: string;
+  dataMatchOnError: string;
   env?: NodeJS.ProcessEnv;
 };
 
@@ -631,7 +632,8 @@ describe('CLI', () => {
             it('stake-pool exits with code 1', (done) => {
               callCliAndAssertExit(
                 {
-                  args: ['--service-names', ServiceNames.StakePool]
+                  args: ['--service-names', ServiceNames.StakePool],
+                  dataMatchOnError: REQUIRES_PG_CONNECTION
                 },
                 done
               );
@@ -645,7 +647,8 @@ describe('CLI', () => {
                     cardanoNodeConfigPath,
                     '--service-names',
                     ServiceNames.NetworkInfo
-                  ]
+                  ],
+                  dataMatchOnError: REQUIRES_PG_CONNECTION
                 },
                 done
               );
@@ -662,7 +665,8 @@ describe('CLI', () => {
                     cacheTtlOutOfRange,
                     '--service-names',
                     ServiceNames.NetworkInfo
-                  ]
+                  ],
+                  dataMatchOnError: REQUIRES_PG_CONNECTION
                 },
                 done
               );
@@ -671,7 +675,8 @@ describe('CLI', () => {
             it('utxo exits with code 1', (done) => {
               callCliAndAssertExit(
                 {
-                  args: ['--service-names', ServiceNames.Utxo]
+                  args: ['--service-names', ServiceNames.Utxo],
+                  dataMatchOnError: REQUIRES_PG_CONNECTION
                 },
                 done
               );
@@ -680,7 +685,8 @@ describe('CLI', () => {
             it('rewards exits with code 1', (done) => {
               callCliAndAssertExit(
                 {
-                  args: ['--service-names', ServiceNames.Rewards]
+                  args: ['--service-names', ServiceNames.Rewards],
+                  dataMatchOnError: REQUIRES_PG_CONNECTION
                 },
                 done
               );
@@ -689,7 +695,8 @@ describe('CLI', () => {
             it('chain-history exits with code 1', (done) => {
               callCliAndAssertExit(
                 {
-                  args: ['--service-names', ServiceNames.ChainHistory]
+                  args: ['--service-names', ServiceNames.ChainHistory],
+                  dataMatchOnError: REQUIRES_PG_CONNECTION
                 },
                 done
               );
@@ -698,7 +705,8 @@ describe('CLI', () => {
             it('asset exits with code 1', (done) => {
               callCliAndAssertExit(
                 {
-                  args: ['--service-names', ServiceNames.Asset]
+                  args: ['--service-names', ServiceNames.Asset],
+                  dataMatchOnError: REQUIRES_PG_CONNECTION
                 },
                 done
               );
@@ -1259,7 +1267,8 @@ describe('CLI', () => {
           it('network-info exits with code 1 when using CLI options', (done) => {
             callCliAndAssertExit(
               {
-                args: ['--postgres-connection-string', postgresConnectionString, ServiceNames.NetworkInfo]
+                args: ['--postgres-connection-string', postgresConnectionString, ServiceNames.NetworkInfo],
+                dataMatchOnError: 'network-info requires the Cardano node config path program option'
               },
               done
             );
@@ -1268,6 +1277,7 @@ describe('CLI', () => {
           it('network-info exits with code 1 when using env variables', (done) => {
             callCliAndAssertExit(
               {
+                dataMatchOnError: 'network-info requires the Cardano node config path program option',
                 env: {
                   POSTGRES_CONNECTION_STRING: postgresConnectionString,
                   SERVICE_NAMES: ServiceNames.NetworkInfo
@@ -1861,7 +1871,8 @@ describe('CLI', () => {
                   ogmiosConnection.address.webSocket,
                   'some-unknown-service',
                   ServiceNames.TxSubmit
-                ]
+                ],
+                dataMatchOnError: 'UnknownServiceName: some-unknown-service is an unknown service'
               },
               done
             );
@@ -1942,11 +1953,7 @@ describe('CLI', () => {
         }),
         true
       );
-      proc.stderr!.on('data', (data) =>
-        expect(data.toString()).toMatch(
-          'MissingProgramOption: Blockfrost worker requires the PostgreSQL Connection string or Postgres SRV service name, db, user and password program option'
-        )
-      );
+      proc.stderr!.on('data', (data) => expect(data.toString()).toMatch(REQUIRES_PG_CONNECTION));
       proc.on('exit', (code) => {
         expect(code).toBe(1);
         done();
