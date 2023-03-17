@@ -9,7 +9,7 @@ import { normalizeTxBody } from '../../util';
 
 const env = getEnv(walletVariables);
 
-describe('tx chain history', () => {
+describe('SingleAddressWallet/txChainHistory', () => {
   let wallet: SingleAddressWallet;
 
   beforeEach(async () => {
