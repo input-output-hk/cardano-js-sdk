@@ -17,14 +17,10 @@ import { WithLogger, contextLogger } from '@cardano-sdk/util';
 import { WithTypeormContext } from './types';
 
 const blockDataSelect: FindOptionsSelect<BlockDataEntity> = {
-  block: {
-    slot: true
-  },
   // Using 'transformers' breaks the types.
   // Types seem to expect model to have fields that match database types:
   // If it's an 'object', it will recursively apply FindOptionsSelect.
-  data: true as any,
-  id: true
+  data: true as any
 };
 
 export interface TypeormStabilityWindowBufferProps {
@@ -71,18 +67,12 @@ export class TypeormStabilityWindowBuffer
       // It makes 2 queries so is not very efficient,
       // but it should be fine for `initialize`.
       repository.find({
-        order: { block: { slot: 'DESC' } },
-        relations: {
-          block: true
-        },
+        order: { blockHeight: 'DESC' },
         select: blockDataSelect,
         take: 1
       }),
       repository.find({
-        order: { block: { slot: 'ASC' } },
-        relations: {
-          block: true
-        },
+        order: { blockHeight: 'ASC' },
         select: blockDataSelect,
         take: 1
       })
@@ -122,25 +112,18 @@ export class TypeormStabilityWindowBuffer
     transactionCommitted$,
     queryRunner,
     block: {
-      header: { slot, blockNo }
+      header: { blockNo }
     }
   }: RollBackwardEvent<WithBlock & WithTypeormContext>) {
     const repository = queryRunner.manager.getRepository(BlockDataEntity);
     // No need to delete rolled back block here, as it should cascade when the block entity gets deleted
     const prevTip = await repository.findOne({
       order: {
-        block: {
-          slot: 'DESC'
-        }
-      },
-      relations: {
-        block: true
+        blockHeight: 'DESC'
       },
       select: blockDataSelect,
       where: {
-        block: {
-          slot: LessThan(slot)
-        }
+        blockHeight: LessThan(blockNo)
       }
     });
     if (prevTip?.data && blockNo !== prevTip?.data.header.blockNo + 1) {
@@ -169,24 +152,16 @@ export class TypeormStabilityWindowBuffer
     const nextTailBlockHeight = blockNo - securityParameter;
     const [nextTailEntity] = await Promise.all([
       repository.findOne({
-        relations: {
-          block: true
-        },
         select: {
-          block: { height: true },
-          data: true as any,
-          id: true
+          data: true as any
         },
         where: {
-          block: {
-            height: nextTailBlockHeight
-          }
+          blockHeight: nextTailBlockHeight
         }
       }),
-      queryRunner.query(`
-        DELETE FROM block_data
-        WHERE block_id IN (SELECT id FROM block WHERE height < ${nextTailBlockHeight})
-      `)
+      repository.delete({
+        blockHeight: LessThan(nextTailBlockHeight)
+      })
     ]);
     const nextTail = nextTailEntity?.data;
     if (!nextTail) {

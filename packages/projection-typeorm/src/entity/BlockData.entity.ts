@@ -1,14 +1,16 @@
-import { BlockCascadeRelationOptions, BlockEntity } from './Block.entity';
+import { BlockEntity } from './Block.entity';
 import { Cardano } from '@cardano-sdk/core';
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import { DeleteCascadeRelationOptions } from './util';
 import { json, serializableObj, stringBytea } from './transformers';
 
 @Entity()
 export class BlockDataEntity {
-  @PrimaryGeneratedColumn()
-  id?: number;
+  // Using the same column for both primary and foreign key
+  @PrimaryColumn()
+  blockHeight?: number;
 
-  @OneToOne(() => BlockEntity, BlockCascadeRelationOptions)
+  @OneToOne(() => BlockEntity, DeleteCascadeRelationOptions)
   @JoinColumn()
   block?: BlockEntity;
 
