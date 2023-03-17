@@ -37,12 +37,16 @@ const assertServiceHealthy = async (
   apiUrl: string,
   serviceName: ServiceNames,
   lastBlock: LedgerTipModel,
-  withTip = true,
-  usedQueue?: boolean
+  options?: {
+    unhealthy?: boolean;
+    usedQueue?: boolean;
+    withTip?: boolean;
+  }
 ) => {
   await serverReady(apiUrl);
   const headers = { 'Content-Type': 'application/json' };
   const res = await axios.post(`${apiUrl}/${serviceName}/health`, { headers });
+  const { unhealthy, usedQueue, withTip } = { withTip: true, ...options };
 
   const healthCheckResponse = usedQueue
     ? { ok: true }
@@ -56,7 +60,8 @@ const assertServiceHealthy = async (
       });
 
   expect(res.status).toBe(200);
-  expect(res.data).toEqual(healthCheckResponse);
+  if (unhealthy) expect(res.data.ok).toBeFalsy();
+  else expect(res.data).toEqual(healthCheckResponse);
 };
 
 const assertMetricsEndpoint = async (apiUrl: string, assertFound: boolean) => {
@@ -269,7 +274,7 @@ describe('CLI', () => {
             await assertServiceHealthy(apiUrl, ServiceNames.ChainHistory, lastBlock);
             await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo, lastBlock);
             await assertServiceHealthy(apiUrl, ServiceNames.StakePool, lastBlock);
-            await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, false, false);
+            await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, { withTip: false });
             await assertServiceHealthy(apiUrl, ServiceNames.Utxo, lastBlock);
             await assertServiceHealthy(apiUrl, ServiceNames.Rewards, lastBlock);
           });
@@ -295,7 +300,7 @@ describe('CLI', () => {
             await assertServiceHealthy(apiUrl, ServiceNames.ChainHistory, lastBlock);
             await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo, lastBlock);
             await assertServiceHealthy(apiUrl, ServiceNames.StakePool, lastBlock);
-            await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, false, false);
+            await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, { withTip: false });
             await assertServiceHealthy(apiUrl, ServiceNames.Utxo, lastBlock);
             await assertServiceHealthy(apiUrl, ServiceNames.Rewards, lastBlock);
           });
@@ -1329,7 +1334,7 @@ describe('CLI', () => {
                   stdio: 'pipe'
                 })
               );
-              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, false, false);
+              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, { withTip: false });
             });
 
             it('tx-submit uses the default Ogmios configuration if not specified when using env variables', async () => {
@@ -1344,7 +1349,7 @@ describe('CLI', () => {
                   stdio: 'pipe'
                 })
               );
-              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, false, false);
+              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, { withTip: false });
             });
           });
 
@@ -1440,7 +1445,7 @@ describe('CLI', () => {
                     ogmiosConnection.address.webSocket,
                     '--ogmios-srv-service-name',
                     ogmiosSrvServiceName,
-                    '--service_names',
+                    '--service-names',
                     ServiceNames.NetworkInfo
                   ],
                   dataMatchOnError: CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE
@@ -1473,7 +1478,7 @@ describe('CLI', () => {
                     ogmiosConnection.address.webSocket,
                     '--ogmios-srv-service-name',
                     ogmiosSrvServiceName,
-                    '--service_names',
+                    '--service-names',
                     ServiceNames.TxSubmit
                   ],
                   dataMatchOnError: CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE
@@ -1706,7 +1711,7 @@ describe('CLI', () => {
                   }
                 )
               );
-              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, true, true);
+              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, { usedQueue: true });
             });
 
             it('exposes a HTTP server with healthy state when using env variables', async () => {
@@ -1722,7 +1727,7 @@ describe('CLI', () => {
                   stdio: 'pipe'
                 })
               );
-              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, true, true);
+              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, { usedQueue: true });
             });
           });
 
@@ -1776,7 +1781,7 @@ describe('CLI', () => {
                     rabbitmqUrl.toString(),
                     '--service-discovery-timeout',
                     '1000',
-                    '--service_names',
+                    '--service-names',
                     ServiceNames.TxSubmit
                   ],
                   dataMatchOnError: CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE
@@ -1810,22 +1815,34 @@ describe('CLI', () => {
           ogmiosServer = createUnhealthyMockOgmiosServer();
         });
 
-        it('exits with code 1', (done) => {
-          ogmiosServer.listen(ogmiosConnection.port, () => {
-            callCliAndAssertExit(
-              {
-                args: [
+        it('starts and can be queried for health status', (done) => {
+          ogmiosServer.listen(ogmiosConnection.port, async () => {
+            proc = withLogging(
+              fork(
+                exePath,
+                [
+                  ...baseArgs,
+                  '--api-url',
+                  apiUrl,
                   '--postgres-connection-string',
                   postgresConnectionString,
+                  '--cardano-node-config-path',
+                  cardanoNodeConfigPath,
                   '--ogmios-url',
                   ogmiosConnection.address.webSocket,
-                  '--service_names',
+                  '--service-names',
                   ServiceNames.StakePool,
                   ServiceNames.TxSubmit
-                ]
-              },
-              done
+                ],
+                {
+                  env: {},
+                  stdio: 'pipe'
+                }
+              )
             );
+
+            await assertServiceHealthy(apiUrl, ServiceNames.StakePool, lastBlock, { unhealthy: true });
+            done();
           });
         });
       });
