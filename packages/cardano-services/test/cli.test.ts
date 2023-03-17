@@ -125,17 +125,20 @@ const callCliAndAssertExit = (
     }),
     true
   );
-  proc.stderr!.on('data', spy);
+  const chunks: string[] = [];
   proc.stderr!.on('data', (data) => {
     spy();
-    if (dataMatchOnError) {
-      expect(data.toString()).toContain(dataMatchOnError);
-    }
+    chunks.push(data.toString());
   });
   proc.on('exit', (code) => {
-    expect(code).toBe(1);
-    expect(spy).toHaveBeenCalled();
-    done();
+    try {
+      expect(code).toBe(1);
+      expect(spy).toHaveBeenCalled();
+      if (dataMatchOnError) expect(chunks.join('')).toContain(dataMatchOnError);
+      done();
+    } catch (error) {
+      done(error);
+    }
   });
 };
 
