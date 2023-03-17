@@ -35,4 +35,5 @@ jobs:
     - name: 🔬 Test
       run: |
         yarn test:build:verify
-        yarn test --forceExit
+        yarn test --showConfig
+        yarn test --forceExit --expand --detectOpenHandles
