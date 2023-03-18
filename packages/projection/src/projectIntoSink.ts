@@ -31,10 +31,10 @@ import {
 } from 'rxjs';
 import { Sink, Sinks, SinksFactory } from './sinks';
 import { UnifiedProjectorEvent } from './types';
-import { WithNetworkInfo, withEpochBoundary, withEpochNo, withNetworkInfo, withRolledBackBlock } from './operators';
 import { combineProjections } from './combineProjections';
 import { contextLogger } from '@cardano-sdk/util';
 import { passthrough } from '@cardano-sdk/util-rxjs';
+import { withEpochBoundary, withEpochNo, withNetworkInfo, withRolledBackBlock } from './operators';
 import uniq from 'lodash/uniq';
 
 export interface ProjectIntoSinkProps<P, PS extends P> {
@@ -270,7 +270,7 @@ export const projectIntoSink = <P extends object, PS extends P>({
         sinks.before || passthrough(),
         concatMap((evt) => {
           const projectionSinks = selectedSinks.map((sink) => sink.sink(evt));
-          const projectorEvent = evt as UnifiedProjectorEvent<WithNetworkInfo>;
+          const projectorEvent = evt as UnifiedProjectorEvent<DefaultProjectionProps>;
           return projectionSinks.length > 0
             ? combineLatest(projectionSinks.map((o$) => o$.pipe(defaultIfEmpty(null)))).pipe(map(() => projectorEvent))
             : of(projectorEvent);

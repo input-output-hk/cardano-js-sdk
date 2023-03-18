@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Cardano } from '@cardano-sdk/core';
+import { DefaultProjectionProps, ProjectionExtraProps } from '../projections';
 import { Observable } from 'rxjs';
-import { ProjectionExtraProps } from '../projections';
 import { Shutdown } from '@cardano-sdk/util';
 import { UnifiedProjectorEvent, UnifiedProjectorOperator } from '../types';
 import { WithNetworkInfo } from '../operators';
@@ -39,7 +39,9 @@ export interface StabilityWindowBuffer<E extends WithNetworkInfo> extends Shutdo
 }
 
 export interface Sink<P, SinkSpecificProps = {}> {
-  sink: (evt: UnifiedProjectorEvent<ProjectionExtraProps<P> & SinkSpecificProps>) => Observable<void>;
+  sink: (
+    evt: UnifiedProjectorEvent<ProjectionExtraProps<P> & SinkSpecificProps & DefaultProjectionProps>
+  ) => Observable<void>;
 }
 
 export type ProjectionSinks<Projections> = {
@@ -50,7 +52,7 @@ export type SinkLifecycleOperator = (evt$: Observable<any>) => Observable<any>;
 
 export type Sinks<Projections> = {
   projectionSinks: ProjectionSinks<Projections>;
-  buffer: StabilityWindowBuffer<WithNetworkInfo>;
+  buffer: StabilityWindowBuffer<DefaultProjectionProps>;
   before?: SinkLifecycleOperator;
   after?: SinkLifecycleOperator;
 };
