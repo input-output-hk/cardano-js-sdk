@@ -28,3 +28,13 @@ export const serializableObj: ValueTransformer = {
     return toSerializableObject(obj);
   }
 };
+
+export const parseBigInt: ValueTransformer = {
+  from(obj: unknown) {
+    return typeof obj === 'string' ? BigInt(obj) : obj;
+  },
+  to(obj: any) {
+    // Works as-is
+    return obj;
+  }
+};
