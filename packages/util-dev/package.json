@@ -36,7 +36,7 @@
   "scripts": {
     "build:esm": "tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020",
     "build:cjs": "tsc --build src",
-    "build:copy": "shx cp -r src/chainSync/data dist/cjs/chainSync/data",
+    "build:copy": "shx cp -rf src/chainSync/data dist/cjs/chainSync/",
     "build": "run-s build:cjs build:esm module-fixup build:copy",
     "circular-deps:check": "madge --circular dist",
     "module-fixup": "shx cp ../../build/cjs-package.json ./dist/cjs/package.json && cp ../../build/esm-package.json ./dist/esm/package.json",
