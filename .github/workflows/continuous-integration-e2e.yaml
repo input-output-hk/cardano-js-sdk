@@ -1,6 +1,7 @@
 name: Continuous Integration - E2E
 
 on:
+  merge_group:
   pull_request:
     branches: [ "master" ]
   push:

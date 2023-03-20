@@ -1,6 +1,7 @@
 name: Continuous Integration - Unit Tests
 
 on:
+  merge_group:
   pull_request:
     branches: [ "master" ]
   push:
