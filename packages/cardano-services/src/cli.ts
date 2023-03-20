@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+/* eslint-disable no-console */
 /* eslint-disable max-len */
 /* eslint-disable complexity */
 /* eslint-disable sonarjs/cognitive-complexity */
@@ -56,7 +57,11 @@ const packageJsonPath = fs.existsSync(copiedPackageJsonPath)
   : path.join(__dirname, '../package.json');
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
-// eslint-disable-next-line no-console
+process.on('unhandledRejection', (reason) => {
+  // To be handled by 'onDeath'
+  throw reason;
+});
+
 console.log('Cardano Services CLI');
 
 const program = new Command('cardano-services');
@@ -65,7 +70,6 @@ program.version(packageJson.version);
 
 const runServer = async (message: string, loadServer: () => Promise<HttpServer>) => {
   try {
-    // eslint-disable-next-line no-console
     console.log(message);
     const server = await loadServer();
 
@@ -77,7 +81,6 @@ const runServer = async (message: string, loadServer: () => Promise<HttpServer>)
       process.exit(1);
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error(error);
     process.exit(1);
   }
