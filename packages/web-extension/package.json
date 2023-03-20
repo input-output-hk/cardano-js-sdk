@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/web-extension",
-  "version": "0.8.3-nightly.1",
+  "version": "0.8.3-nightly.2",
   "description": "Web extension wallet utilities",
   "engines": {
     "node": ">=14.20.1"
@@ -74,7 +74,7 @@
     "@cardano-sdk/key-management": "^0.5.1-nightly.1",
     "@cardano-sdk/util": "^0.8.3-nightly.0",
     "@cardano-sdk/util-rxjs": "^0.4.7-nightly.0",
-    "@cardano-sdk/wallet": "^0.11.0-nightly.1",
+    "@cardano-sdk/wallet": "^0.11.0-nightly.2",
     "lodash": "^4.17.21",
     "rxjs": "^7.4.0",
     "ts-custom-error": "^3.2.0",

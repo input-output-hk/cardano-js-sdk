@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.11.0-nightly.1...@cardano-sdk/cardano-services@0.11.0-nightly.2) (2023-03-20)
+
+### Bug Fixes
+
+- **cardano-service:** fixes a log called method ([4d57718](https://github.com/input-output-hk/cardano-js-sdk/commit/4d5771884a2c67217b8e79d9081b06e7180bc608))
+- **cardano-services:** explicitly process.exit(1) on unhandledRejections ([aeb0520](https://github.com/input-output-hk/cardano-js-sdk/commit/aeb0520b77d23d5d877fff667321f8d3deac21e2))
+- **cardano-services:** stake-pool APY sorted search no longer returns error if APY is disabled ([f81d6c0](https://github.com/input-output-hk/cardano-js-sdk/commit/f81d6c00cdd715db037bb05ce58b03d571742910))
+
 ## [0.11.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.11.0-nightly.0...@cardano-sdk/cardano-services@0.11.0-nightly.1) (2023-03-16)
 
 ### Features

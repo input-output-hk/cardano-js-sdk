@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/cardano-services",
-  "version": "0.11.0-nightly.1",
+  "version": "0.11.0-nightly.2",
   "description": "Cardano GraphQL Services",
   "engines": {
     "node": ">=14.20.1"
@@ -99,7 +99,7 @@
     "@blockfrost/blockfrost-js": "^5.2.0",
     "@cardano-sdk/core": "^0.11.0-nightly.1",
     "@cardano-sdk/crypto": "^0.1.4-nightly.0",
-    "@cardano-sdk/ogmios": "^0.11.0-nightly.1",
+    "@cardano-sdk/ogmios": "^0.11.0-nightly.2",
     "@cardano-sdk/util": "^0.8.3-nightly.0",
     "amqplib": "^0.10.0",
     "axios": "^0.27.2",
