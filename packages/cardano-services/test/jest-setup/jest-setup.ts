@@ -25,7 +25,14 @@ const databaseConfigs = {
 const setupDBData = async (databaseConfig: DatabaseConfig, user: string, container: DockerUtil.Docker.Container) => {
   const { database, snapshot, fixture } = databaseConfig;
 
-  await DockerUtil.containerExec(container, ['bash', '-c', `psql -U ${user} -c "CREATE DATABASE ${database}"`]);
+  const create = await DockerUtil.containerExec(container, [
+    'bash',
+    '-c',
+    `psql -U ${user} -c "CREATE DATABASE ${database}"`
+  ]);
+
+  if (create.length !== 1 || !create[0].match('CREATE DATABASE'))
+    throw new Error(`Error while creating the DB ${JSON.stringify(create)}`);
 
   if (snapshot) {
     await container.putArchive(path.join(__dirname, `${database}-db-snapshot.tar`), {
