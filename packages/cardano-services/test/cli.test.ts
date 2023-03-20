@@ -29,6 +29,7 @@ const DNS_SERVER_NOT_REACHABLE_ERROR = 'querySrv ENOTFOUND';
 const CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE = 'cannot be used with option';
 const CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE = 'cannot be used with environment variable';
 const METRICS_ENDPOINT_LABEL_RESPONSE = 'http_request_duration_seconds duration histogram of http responses';
+const REQUIRES_PG_CONNECTION = 'requires the PostgreSQL Connection string or Postgres SRV service name';
 
 const exePath = path.join(__dirname, '..', 'dist', 'cjs', 'cli.js');
 const logger = createLogger({ env: process.env.TL_LEVEL ? process.env : { ...process.env, TL_LEVEL: 'error' } });
@@ -37,12 +38,16 @@ const assertServiceHealthy = async (
   apiUrl: string,
   serviceName: ServiceNames,
   lastBlock: LedgerTipModel,
-  withTip = true,
-  usedQueue?: boolean
+  options?: {
+    unhealthy?: boolean;
+    usedQueue?: boolean;
+    withTip?: boolean;
+  }
 ) => {
   await serverReady(apiUrl);
   const headers = { 'Content-Type': 'application/json' };
   const res = await axios.post(`${apiUrl}/${serviceName}/health`, { headers });
+  const { unhealthy, usedQueue, withTip } = { withTip: true, ...options };
 
   const healthCheckResponse = usedQueue
     ? { ok: true }
@@ -56,7 +61,8 @@ const assertServiceHealthy = async (
       });
 
   expect(res.status).toBe(200);
-  expect(res.data).toEqual(healthCheckResponse);
+  if (unhealthy) expect(res.data.ok).toBeFalsy();
+  else expect(res.data).toEqual(healthCheckResponse);
 };
 
 const assertMetricsEndpoint = async (apiUrl: string, assertFound: boolean) => {
@@ -98,7 +104,7 @@ const assertStakePoolApyInResponse = async (apiUrl: string, assertFound: boolean
 
 type CallCliAndAssertExitArgs = {
   args?: string[];
-  dataMatchOnError?: string;
+  dataMatchOnError: string;
   env?: NodeJS.ProcessEnv;
 };
 
@@ -125,17 +131,20 @@ const callCliAndAssertExit = (
     }),
     true
   );
-  proc.stderr!.on('data', spy);
+  const chunks: string[] = [];
   proc.stderr!.on('data', (data) => {
     spy();
-    if (dataMatchOnError) {
-      expect(data.toString()).toContain(dataMatchOnError);
-    }
+    chunks.push(data.toString());
   });
   proc.on('exit', (code) => {
-    expect(code).toBe(1);
-    expect(spy).toHaveBeenCalled();
-    done();
+    try {
+      expect(code).toBe(1);
+      expect(spy).toHaveBeenCalled();
+      if (dataMatchOnError) expect(chunks.join('')).toContain(dataMatchOnError);
+      done();
+    } catch (error) {
+      done(error);
+    }
   });
 };
 
@@ -266,7 +275,7 @@ describe('CLI', () => {
             await assertServiceHealthy(apiUrl, ServiceNames.ChainHistory, lastBlock);
             await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo, lastBlock);
             await assertServiceHealthy(apiUrl, ServiceNames.StakePool, lastBlock);
-            await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, false, false);
+            await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, { withTip: false });
             await assertServiceHealthy(apiUrl, ServiceNames.Utxo, lastBlock);
             await assertServiceHealthy(apiUrl, ServiceNames.Rewards, lastBlock);
           });
@@ -292,7 +301,7 @@ describe('CLI', () => {
             await assertServiceHealthy(apiUrl, ServiceNames.ChainHistory, lastBlock);
             await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo, lastBlock);
             await assertServiceHealthy(apiUrl, ServiceNames.StakePool, lastBlock);
-            await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, false, false);
+            await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, { withTip: false });
             await assertServiceHealthy(apiUrl, ServiceNames.Utxo, lastBlock);
             await assertServiceHealthy(apiUrl, ServiceNames.Rewards, lastBlock);
           });
@@ -623,7 +632,8 @@ describe('CLI', () => {
             it('stake-pool exits with code 1', (done) => {
               callCliAndAssertExit(
                 {
-                  args: ['--service-names', ServiceNames.StakePool]
+                  args: ['--service-names', ServiceNames.StakePool],
+                  dataMatchOnError: REQUIRES_PG_CONNECTION
                 },
                 done
               );
@@ -637,7 +647,8 @@ describe('CLI', () => {
                     cardanoNodeConfigPath,
                     '--service-names',
                     ServiceNames.NetworkInfo
-                  ]
+                  ],
+                  dataMatchOnError: REQUIRES_PG_CONNECTION
                 },
                 done
               );
@@ -654,7 +665,8 @@ describe('CLI', () => {
                     cacheTtlOutOfRange,
                     '--service-names',
                     ServiceNames.NetworkInfo
-                  ]
+                  ],
+                  dataMatchOnError: REQUIRES_PG_CONNECTION
                 },
                 done
               );
@@ -663,7 +675,8 @@ describe('CLI', () => {
             it('utxo exits with code 1', (done) => {
               callCliAndAssertExit(
                 {
-                  args: ['--service-names', ServiceNames.Utxo]
+                  args: ['--service-names', ServiceNames.Utxo],
+                  dataMatchOnError: REQUIRES_PG_CONNECTION
                 },
                 done
               );
@@ -672,7 +685,8 @@ describe('CLI', () => {
             it('rewards exits with code 1', (done) => {
               callCliAndAssertExit(
                 {
-                  args: ['--service-names', ServiceNames.Rewards]
+                  args: ['--service-names', ServiceNames.Rewards],
+                  dataMatchOnError: REQUIRES_PG_CONNECTION
                 },
                 done
               );
@@ -681,7 +695,8 @@ describe('CLI', () => {
             it('chain-history exits with code 1', (done) => {
               callCliAndAssertExit(
                 {
-                  args: ['--service-names', ServiceNames.ChainHistory]
+                  args: ['--service-names', ServiceNames.ChainHistory],
+                  dataMatchOnError: REQUIRES_PG_CONNECTION
                 },
                 done
               );
@@ -690,7 +705,8 @@ describe('CLI', () => {
             it('asset exits with code 1', (done) => {
               callCliAndAssertExit(
                 {
-                  args: ['--service-names', ServiceNames.Asset]
+                  args: ['--service-names', ServiceNames.Asset],
+                  dataMatchOnError: REQUIRES_PG_CONNECTION
                 },
                 done
               );
@@ -1251,7 +1267,8 @@ describe('CLI', () => {
           it('network-info exits with code 1 when using CLI options', (done) => {
             callCliAndAssertExit(
               {
-                args: ['--postgres-connection-string', postgresConnectionString, ServiceNames.NetworkInfo]
+                args: ['--postgres-connection-string', postgresConnectionString, ServiceNames.NetworkInfo],
+                dataMatchOnError: 'network-info requires the Cardano node config path program option'
               },
               done
             );
@@ -1260,6 +1277,7 @@ describe('CLI', () => {
           it('network-info exits with code 1 when using env variables', (done) => {
             callCliAndAssertExit(
               {
+                dataMatchOnError: 'network-info requires the Cardano node config path program option',
                 env: {
                   POSTGRES_CONNECTION_STRING: postgresConnectionString,
                   SERVICE_NAMES: ServiceNames.NetworkInfo
@@ -1326,7 +1344,7 @@ describe('CLI', () => {
                   stdio: 'pipe'
                 })
               );
-              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, false, false);
+              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, { withTip: false });
             });
 
             it('tx-submit uses the default Ogmios configuration if not specified when using env variables', async () => {
@@ -1341,7 +1359,7 @@ describe('CLI', () => {
                   stdio: 'pipe'
                 })
               );
-              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, false, false);
+              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, { withTip: false });
             });
           });
 
@@ -1437,7 +1455,7 @@ describe('CLI', () => {
                     ogmiosConnection.address.webSocket,
                     '--ogmios-srv-service-name',
                     ogmiosSrvServiceName,
-                    '--service_names',
+                    '--service-names',
                     ServiceNames.NetworkInfo
                   ],
                   dataMatchOnError: CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE
@@ -1470,7 +1488,7 @@ describe('CLI', () => {
                     ogmiosConnection.address.webSocket,
                     '--ogmios-srv-service-name',
                     ogmiosSrvServiceName,
-                    '--service_names',
+                    '--service-names',
                     ServiceNames.TxSubmit
                   ],
                   dataMatchOnError: CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE
@@ -1703,7 +1721,7 @@ describe('CLI', () => {
                   }
                 )
               );
-              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, true, true);
+              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, { usedQueue: true });
             });
 
             it('exposes a HTTP server with healthy state when using env variables', async () => {
@@ -1719,7 +1737,7 @@ describe('CLI', () => {
                   stdio: 'pipe'
                 })
               );
-              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, true, true);
+              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, { usedQueue: true });
             });
           });
 
@@ -1773,7 +1791,7 @@ describe('CLI', () => {
                     rabbitmqUrl.toString(),
                     '--service-discovery-timeout',
                     '1000',
-                    '--service_names',
+                    '--service-names',
                     ServiceNames.TxSubmit
                   ],
                   dataMatchOnError: CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE
@@ -1807,22 +1825,34 @@ describe('CLI', () => {
           ogmiosServer = createUnhealthyMockOgmiosServer();
         });
 
-        it('exits with code 1', (done) => {
-          ogmiosServer.listen(ogmiosConnection.port, () => {
-            callCliAndAssertExit(
-              {
-                args: [
+        it('starts and can be queried for health status', (done) => {
+          ogmiosServer.listen(ogmiosConnection.port, async () => {
+            proc = withLogging(
+              fork(
+                exePath,
+                [
+                  ...baseArgs,
+                  '--api-url',
+                  apiUrl,
                   '--postgres-connection-string',
                   postgresConnectionString,
+                  '--cardano-node-config-path',
+                  cardanoNodeConfigPath,
                   '--ogmios-url',
                   ogmiosConnection.address.webSocket,
-                  '--service_names',
+                  '--service-names',
                   ServiceNames.StakePool,
                   ServiceNames.TxSubmit
-                ]
-              },
-              done
+                ],
+                {
+                  env: {},
+                  stdio: 'pipe'
+                }
+              )
             );
+
+            await assertServiceHealthy(apiUrl, ServiceNames.StakePool, lastBlock, { unhealthy: true });
+            done();
           });
         });
       });
@@ -1841,7 +1871,8 @@ describe('CLI', () => {
                   ogmiosConnection.address.webSocket,
                   'some-unknown-service',
                   ServiceNames.TxSubmit
-                ]
+                ],
+                dataMatchOnError: 'UnknownServiceName: some-unknown-service is an unknown service'
               },
               done
             );
@@ -1922,11 +1953,7 @@ describe('CLI', () => {
         }),
         true
       );
-      proc.stderr!.on('data', (data) =>
-        expect(data.toString()).toMatch(
-          'MissingProgramOption: Blockfrost worker requires the PostgreSQL Connection string or Postgres SRV service name, db, user and password program option'
-        )
-      );
+      proc.stderr!.on('data', (data) => expect(data.toString()).toMatch(REQUIRES_PG_CONNECTION));
       proc.on('exit', (code) => {
         expect(code).toBe(1);
         done();
