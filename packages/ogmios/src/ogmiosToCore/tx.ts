@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import * as Crypto from '@cardano-sdk/crypto';
 import {
   BYRON_TX_FEE_COEFFICIENT,

@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { Cardano, Paginated, PaginationArgs, Provider, Range } from '../..';
 
 export type TransactionsByAddressesArgs = {

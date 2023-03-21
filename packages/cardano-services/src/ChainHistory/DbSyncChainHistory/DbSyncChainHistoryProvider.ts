@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 /* eslint-disable sonarjs/no-nested-template-literals */
 import * as Queries from './queries';
 import { BlockModel, BlockOutputModel, TipModel, TxModel } from './types';

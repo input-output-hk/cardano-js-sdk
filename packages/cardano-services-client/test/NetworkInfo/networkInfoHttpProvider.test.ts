@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { logger } from '@cardano-sdk/util-dev';
 import { networkInfoHttpProvider } from '../../src';
 import MockAdapter from 'axios-mock-adapter';

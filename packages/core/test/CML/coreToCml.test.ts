@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { AssetId } from '../../src/Cardano';
 import { BigNum } from '@dcspark/cardano-multiplatform-lib-nodejs';
 import { CML, Cardano, SerializationFailure, coreToCml } from '../../src';

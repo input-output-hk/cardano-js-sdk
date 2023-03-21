@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import * as Crypto from '../src';
 import { HexBlob, InvalidStringError } from '@cardano-sdk/util';
 

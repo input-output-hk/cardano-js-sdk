@@ -57,7 +57,16 @@ module.exports = {
     'unicorn/no-null': 0,
     'unicorn/prefer-module': 0,
     'unicorn/prefer-node-protocol': 0,
-    'unicorn/prevent-abbreviations': 0
+    'unicorn/prevent-abbreviations': 0,
+    'max-len': [
+      'warn', {
+        "code": 120, // Keep the existing max line length of 120
+        "ignoreComments": true,
+        "ignoreUrls": true,
+        "ignoreStrings": true,
+        "ignoreTemplateLiterals": true
+      }
+    ]
   },
   settings: {
     'import/resolver': {

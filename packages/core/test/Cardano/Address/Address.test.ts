@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import * as cip19TestVectors from './Cip19TestVectors';
 import { ByronAddressType } from '../../../src/Cardano';
 import { Cardano } from '../../../src';

@@ -1,7 +1,6 @@
 /* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable sonarjs/cognitive-complexity */
-/* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
 import { ChainHistoryFixtureBuilder, TxWith } from './fixtures/FixtureBuilder';
