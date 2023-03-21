@@ -9,7 +9,7 @@ import {
 } from '@cardano-sdk/core';
 import { CommonPoolInfo, OrderedResult, PoolAPY, PoolData, PoolMetrics, PoolSortType, PoolUpdate } from './types';
 import { DbSyncProvider, DbSyncProviderDependencies, Disposer, EpochMonitor } from '../../util';
-import { GenesisData, InMemoryCache, StakePoolExtMetadataService, UNLIMITED_CACHE_TTL } from '../..';
+import { GenesisData, InMemoryCache, StakePoolMetadataService, UNLIMITED_CACHE_TTL } from '../..';
 import {
   IDS_NAMESPACE,
   REWARDS_HISTORY_LIMIT_DEFAULT,
@@ -71,7 +71,7 @@ export interface StakePoolProviderDependencies extends DbSyncProviderDependencie
   /**
    * The Stake Pool extended metadata service.
    */
-  metadataService: StakePoolExtMetadataService;
+  metadataService: StakePoolMetadataService;
 }
 
 export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) implements StakePoolProvider {
@@ -80,7 +80,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
   #epochLength: number;
   #epochMonitor: EpochMonitor;
   #epochRolloverDisposer: Disposer;
-  #metadataService: StakePoolExtMetadataService;
+  #metadataService: StakePoolMetadataService;
   #paginationPageSizeLimit: number;
   #responseConfig: StakePoolProviderProps['responseConfig'];
   #useBlockfrost: boolean;

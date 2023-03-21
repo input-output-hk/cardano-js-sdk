@@ -1,3 +1,6 @@
+import { Cardano } from '@cardano-sdk/core';
+import { CustomError } from 'ts-custom-error';
+
 /**
  * AdaPools format response types
  * Based on: https://a.adapools.org/extended-example
@@ -88,4 +91,9 @@ export type Cip6ExtendedStakePoolMetadataFields = {
 export type Cip6ExtMetadataResponse = {
   serial: number;
   pool: Cip6ExtendedStakePoolMetadataFields;
+};
+
+export type StakePoolMetadataResponse = {
+  metadata: Cardano.StakePoolMetadata | undefined;
+  errors: CustomError[];
 };

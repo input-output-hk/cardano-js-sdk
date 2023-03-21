@@ -66,3 +66,11 @@ export const cip6ExtMetadataMock: Cip6ExtMetadataResponse = {
   },
   serial: 2_020_072_001
 };
+
+export const stakePoolMetadata: Cardano.StakePoolMetadata = {
+  description: 'Stakepool - Your reliable & trustworthy stakepool',
+  extended: 'http://localhost/extendedMetadata',
+  homepage: 'https://www.home-page.com',
+  name: 'Stakepool #1',
+  ticker: 'STKP'
+};

@@ -1,10 +1,10 @@
-import { APExtMetadataResponse, Cip6ExtMetadataResponse } from './HttpStakePoolMetadata';
+import { APExtMetadataResponse, Cip6ExtMetadataResponse, StakePoolMetadataResponse } from './HttpStakePoolMetadata';
 import { Cardano } from '@cardano-sdk/core';
+import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 
-export interface StakePoolExtMetadataService {
-  getStakePoolExtendedMetadata(
-    poolMetadata: Cardano.StakePoolMetadata
-  ): Promise<Cardano.ExtendedStakePoolMetadata | null>;
+export interface StakePoolMetadataService {
+  getStakePoolMetadata(hash: Hash32ByteBase16, url: string): Promise<StakePoolMetadataResponse>;
+  getStakePoolExtendedMetadata(poolMetadata: Cardano.StakePoolMetadata): Promise<Cardano.ExtendedStakePoolMetadata>;
 }
 
 export enum ExtMetadataFormat {
