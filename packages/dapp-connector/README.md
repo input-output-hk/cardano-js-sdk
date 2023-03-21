@@ -5,5 +5,5 @@ persistence and set up web extension messaging.
 
 See [example web extension].
 
-[example web extension]: ../web-extension/e2e/extension
+[example web extension]: ../e2e/test/web-extension/
 [CIP-0030]: https://github.com/cardano-foundation/CIPs/pull/88
