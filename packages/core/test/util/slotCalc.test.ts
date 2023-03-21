@@ -11,7 +11,8 @@ import {
   SlotTimeCalc,
   createSlotEpochCalc,
   createSlotEpochInfoCalc,
-  createSlotTimeCalc
+  createSlotTimeCalc,
+  epochSlotsCalc
 } from '../../src';
 
 import merge from 'lodash/merge';
@@ -34,7 +35,85 @@ export const testnetEraSummaries: EraSummary[] = [
   }
 ];
 
+// Valid at 2023-03
+const preprodEraSummaries: EraSummary[] = [
+  {
+    parameters: { epochLength: 21_600, slotLength: Milliseconds(20_000) },
+    start: { slot: 0, time: new Date('2022-06-01T00:00:00.000Z') }
+  },
+  {
+    parameters: { epochLength: 432_000, slotLength: Milliseconds(1000) },
+    start: { slot: 86_400, time: new Date('2022-06-21T00:00:00.000Z') }
+  },
+  {
+    parameters: { epochLength: 432_000, slotLength: Milliseconds(1000) },
+    start: { slot: 518_400, time: new Date('2022-06-26T00:00:00.000Z') }
+  },
+  {
+    parameters: { epochLength: 432_000, slotLength: Milliseconds(1000) },
+    start: { slot: 950_400, time: new Date('2022-07-01T00:00:00.000Z') }
+  },
+  {
+    parameters: { epochLength: 432_000, slotLength: Milliseconds(1000) },
+    start: { slot: 1_382_400, time: new Date('2022-07-06T00:00:00.000Z') }
+  },
+  {
+    parameters: { epochLength: 432_000, slotLength: Milliseconds(1000) },
+    start: { slot: 3_542_400, time: new Date('2022-07-31T00:00:00.000Z') }
+  }
+];
+
+const SomeByronSlot = Cardano.Slot(1_209_592);
+
 describe('slotCalc utils', () => {
+  describe('epochStartCalc', () => {
+    describe('preprod', () => {
+      it('correctly computes 1st slot of the 0th epoch', () => {
+        const { firstSlot, lastSlot } = epochSlotsCalc(Cardano.EpochNo(0), preprodEraSummaries);
+        expect(firstSlot).toBe(0);
+        expect(lastSlot).toBe(21_599);
+      });
+
+      it('correctly computes 1st slot of some Byron epoch', () => {
+        const { firstSlot, lastSlot } = epochSlotsCalc(Cardano.EpochNo(2), preprodEraSummaries);
+        expect(firstSlot).toBe(43_200);
+        expect(lastSlot).toBe(64_799);
+      });
+
+      it('correctly computes 1st slot of last Byron epoch', () => {
+        const { firstSlot, lastSlot } = epochSlotsCalc(Cardano.EpochNo(3), preprodEraSummaries);
+        expect(firstSlot).toBe(64_800);
+        expect(lastSlot).toBe(86_399);
+      });
+
+      it('correctly computes 1st slot of first Shelley epoch', () => {
+        const { firstSlot, lastSlot } = epochSlotsCalc(Cardano.EpochNo(4), preprodEraSummaries);
+        expect(firstSlot).toBe(86_400);
+        expect(lastSlot).toBe(518_399);
+      });
+
+      it('correctly computes 1st slot of some epoch in the middle of era summaries', () => {
+        const { firstSlot, lastSlot } = epochSlotsCalc(Cardano.EpochNo(5), preprodEraSummaries);
+        expect(firstSlot).toBe(518_400);
+        expect(lastSlot).toBe(950_399);
+      });
+
+      it('correctly computes 1st slot of some epoch of the last era summary and aligns with epochSlotCalc', () => {
+        const epoch = Cardano.EpochNo(20);
+        const expectedFirstSlot = Cardano.Slot(6_998_400);
+        const expectedLastSlot = Cardano.Slot(7_430_399);
+        const { firstSlot, lastSlot } = epochSlotsCalc(epoch, preprodEraSummaries);
+        expect(firstSlot).toBe(expectedFirstSlot);
+        expect(lastSlot).toBe(expectedLastSlot);
+        const epochSlotCalc = createSlotEpochCalc(preprodEraSummaries);
+        expect(epochSlotCalc(expectedFirstSlot)).toEqual(epoch);
+        expect(epochSlotCalc(Cardano.Slot(expectedFirstSlot - 1))).toEqual(epoch - 1);
+        expect(epochSlotCalc(expectedLastSlot)).toEqual(epoch);
+        expect(epochSlotCalc(Cardano.Slot(expectedLastSlot + 1))).toEqual(epoch + 1);
+      });
+    });
+  });
+
   describe('slotTimeCalc', () => {
     describe('testnet', () => {
       const slotTimeCalc: SlotTimeCalc = createSlotTimeCalc(testnetEraSummaries);
@@ -46,7 +125,7 @@ describe('slotCalc utils', () => {
         expect(slotTimeCalc(Cardano.Slot(0))).toEqual(new Date(1_563_999_616_000)));
 
       it('correctly computes date of some Byron block', () =>
-        expect(slotTimeCalc(Cardano.Slot(1_209_592))).toEqual(new Date(1_588_191_456_000)));
+        expect(slotTimeCalc(SomeByronSlot)).toEqual(new Date(1_588_191_456_000)));
 
       it('correctly computes date of the last Byron block', () =>
         expect(slotTimeCalc(Cardano.Slot(1_598_399))).toEqual(new Date(1_595_967_596_000)));

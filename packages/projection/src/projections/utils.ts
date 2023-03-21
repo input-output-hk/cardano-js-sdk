@@ -1,9 +1,8 @@
-import { Projection } from './types';
+import { DefaultProjectionProps, Projection } from './types';
 import { ProjectorObservable, UnifiedProjectorObservable } from '../types';
-import { WithNetworkInfo } from '../operators';
 
 export const createProjection = <ExtraPropsOut>(
-  projection: (evt$: UnifiedProjectorObservable<WithNetworkInfo>) => ProjectorObservable<ExtraPropsOut>
+  projection: (evt$: UnifiedProjectorObservable<DefaultProjectionProps>) => ProjectorObservable<ExtraPropsOut>
 ) => {
   let operators: Projection<ExtraPropsOut>;
   const operatorCollector = {

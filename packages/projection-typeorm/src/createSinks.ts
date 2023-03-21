@@ -87,9 +87,13 @@ export const createSinks = ({
   dataSource$,
   reconnectionConfig,
   logger,
-  compactBufferEveryNBlocks
+  compactBufferEveryNBlocks,
+  allowNonSequentialBlockHeights
 }: TypeormSinksProps): Sinks<SupportedProjections> => {
-  const buffer = new TypeormStabilityWindowBuffer({ compactBufferEveryNBlocks }, { logger });
+  const buffer = new TypeormStabilityWindowBuffer(
+    { allowNonSequentialBlockHeights, compactBufferEveryNBlocks },
+    { logger }
+  );
   return {
     after: (evt$: Observable<UnifiedProjectorEvent<WithTypeormContext>>) =>
       evt$.pipe(

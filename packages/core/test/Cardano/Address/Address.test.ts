@@ -102,6 +102,11 @@ describe('Cardano/Address', () => {
     expect(Cardano.Address.isValid('invalidAddress')).toEqual(false);
   });
 
+  it('Address isValid return false when a bitcoin address is given', () => {
+    const address = Cardano.Address.isValid('bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh');
+    expect(address).toEqual(false);
+  });
+
   it('Address can correctly decode/encode mainnet BasePaymentKeyStakeKey', () => {
     const address = Cardano.Address.fromBech32(cip19TestVectors.basePaymentKeyStakeKey);
 

@@ -8,8 +8,10 @@ import {
   Intersection,
   ObservableCardanoNode,
   ObservableChainSync,
-  PointOrOrigin
+  PointOrOrigin,
+  TipOrOrigin
 } from '@cardano-sdk/core';
+import { DefaultProjectionProps, Projection } from './projections';
 import { Logger } from 'ts-log';
 import {
   Observable,
@@ -27,13 +29,12 @@ import {
   takeWhile,
   tap
 } from 'rxjs';
-import { Projection } from './projections';
 import { Sink, Sinks, SinksFactory } from './sinks';
 import { UnifiedProjectorEvent } from './types';
-import { WithNetworkInfo, withNetworkInfo, withRolledBackBlock } from './operators';
 import { combineProjections } from './combineProjections';
 import { contextLogger } from '@cardano-sdk/util';
 import { passthrough } from '@cardano-sdk/util-rxjs';
+import { withEpochBoundary, withEpochNo, withNetworkInfo, withRolledBackBlock } from './operators';
 import uniq from 'lodash/uniq';
 
 export interface ProjectIntoSinkProps<P, PS extends P> {
@@ -65,18 +66,66 @@ const blocksToPoints = (blocks: Array<Cardano.Block | 'origin'>) =>
 const pointDescription = (point: PointOrOrigin) =>
   point === 'origin' ? 'origin' : `slot ${point.slot}, block ${point.hash}`;
 
+const isAtTheTipOrHigher = (header: Cardano.PartialBlockHeader, tip: TipOrOrigin) => {
+  if (tip === 'origin') return false;
+  return header.blockNo >= tip.blockNo;
+};
+
+const logEvent =
+  <T extends UnifiedProjectorEvent<{}>>(logger: Logger) =>
+  (evt$: Observable<T>) => {
+    let numEvt = 0;
+    const logFrequency = 1000;
+    const startedAt = Date.now();
+    let lastLogAt = startedAt;
+    return evt$.pipe(
+      tap(({ block: { header }, eventType, tip }) => {
+        numEvt++;
+        if (isAtTheTipOrHigher(header, tip)) {
+          logger.info(
+            `Processed event ${
+              eventType === ChainSyncEventType.RollForward ? 'RollForward' : 'RollBackward'
+            } ${pointDescription(header)}`
+          );
+        } else if (numEvt % logFrequency === 0 && tip !== 'origin') {
+          const syncPercentage = ((header.blockNo * 100) / tip.blockNo).toFixed(2);
+          const now = Date.now();
+          const currentSpeed = Math.round(logFrequency / ((now - lastLogAt) / 1000));
+          lastLogAt = now;
+          const overallSpeedPerMs = numEvt / (now - startedAt);
+          const overallSpeed = Math.round(overallSpeedPerMs * 1000);
+          const eta = new Date(now + (tip.blockNo - header.blockNo) / overallSpeedPerMs);
+          logger.info(
+            `Initializing ${syncPercentage}% at block #${
+              header.blockNo
+            }. Speed: ${currentSpeed}bps (avg ${overallSpeed}bps). ETA: ${eta.toISOString()}`
+          );
+        }
+      })
+    );
+  };
+
 const syncFromIntersection = <PS>({
+  cardanoNode,
   chainSync: { intersection, chainSync$ },
   logger,
   sinks
 }: {
   logger: Logger;
+  cardanoNode: ObservableCardanoNode;
   sinks: Sinks<PS>;
   chainSync: ObservableChainSync;
 }) =>
-  new Observable<UnifiedProjectorEvent<{}>>((observer) => {
+  new Observable<UnifiedProjectorEvent<DefaultProjectionProps>>((observer) => {
     logger.info(`Starting ChainSync from ${pointDescription(intersection.point)}`);
-    return chainSync$.pipe(withRolledBackBlock(sinks.buffer)).subscribe(observer);
+    return chainSync$
+      .pipe(
+        withRolledBackBlock(sinks.buffer),
+        withNetworkInfo(cardanoNode),
+        withEpochNo(),
+        withEpochBoundary(intersection)
+      )
+      .subscribe(observer);
   });
 
 const rollbackAndSyncFromIntersection = <PS>({
@@ -97,40 +146,49 @@ const rollbackAndSyncFromIntersection = <PS>({
     let skipFindingNewIntersection = true;
     let chainSync = initialChainSync;
     const rollback$ = sinks.buffer.tip$.pipe(
-      takeWhile((block): block is Cardano.Block => block !== 'origin'),
-      mergeMap((block): Observable<Cardano.Block> => {
-        // we already have an intersection for the 1st tip
-        if (skipFindingNewIntersection) {
-          skipFindingNewIntersection = false;
-          return of(block);
-        }
-        // try to find intersection with new tip
-        return cardanoNode.findIntersect(blocksToPoints([block, tail, 'origin'])).pipe(
-          take(1),
-          tap((newChainSync) => {
-            chainSync = newChainSync;
+      // Use the initial tip as intersection point for withEpochBoundary
+      take(1),
+      mergeMap((initialTip) =>
+        sinks.buffer.tip$.pipe(
+          takeWhile((block): block is Cardano.Block => block !== 'origin'),
+          mergeMap((block): Observable<Cardano.Block> => {
+            // we already have an intersection for the 1st tip
+            if (skipFindingNewIntersection) {
+              skipFindingNewIntersection = false;
+              return of(block);
+            }
+            // try to find intersection with new tip
+            return cardanoNode.findIntersect(blocksToPoints([block, tail, 'origin'])).pipe(
+              take(1),
+              tap((newChainSync) => {
+                chainSync = newChainSync;
+              }),
+              map(() => block)
+            );
           }),
-          map(() => block)
-        );
-      }),
-      takeWhile((block) => !isIntersectionBlock(block, chainSync.intersection)),
-      mergeMap(
-        (block): Observable<UnifiedProjectorEvent<{}>> =>
-          of({
-            block,
-            eventType: ChainSyncEventType.RollBackward,
-            point: chainSync.intersection.point,
-            // requestNext is a no-op when rolling back during initialization, because projectIntoSink will
-            // delete block from the buffer for every RollBackward event via `manageBuffer`,
-            // which will trigger the buffer to emit the next tip$
-            requestNext: noop,
-            tip: chainSync.intersection.tip
-          })
+          takeWhile((block) => !isIntersectionBlock(block, chainSync.intersection)),
+          mergeMap(
+            (block): Observable<UnifiedProjectorEvent<{}>> =>
+              of({
+                block,
+                eventType: ChainSyncEventType.RollBackward,
+                point: chainSync.intersection.point,
+                // requestNext is a no-op when rolling back during initialization, because projectIntoSink will
+                // delete block from the buffer for every RollBackward event via `manageBuffer`,
+                // which will trigger the buffer to emit the next tip$
+                requestNext: noop,
+                tip: chainSync.intersection.tip
+              })
+          ),
+          withNetworkInfo(cardanoNode),
+          withEpochNo(),
+          withEpochBoundary({ point: initialTip === 'origin' ? initialTip : initialTip.header })
+        )
       )
     );
     return concat(
       rollback$,
-      defer(() => syncFromIntersection({ chainSync, logger, sinks }))
+      defer(() => syncFromIntersection({ cardanoNode, chainSync, logger, sinks }))
     ).subscribe(subscriber);
   });
 
@@ -168,7 +226,7 @@ const createChainSyncSource = <PS>({
               );
             }
             // buffer is empty, sync from origin
-            return syncFromIntersection({ chainSync: initialChainSync, logger, sinks });
+            return syncFromIntersection({ cardanoNode, chainSync: initialChainSync, logger, sinks });
           }
           if (blocks[0] !== 'origin' && initialChainSync.intersection.point.hash !== blocks[0].header.hash) {
             // rollback to intersection, then sync from intersection
@@ -181,11 +239,10 @@ const createChainSyncSource = <PS>({
             });
           }
           // intersection is at tip$ - no rollback, just sync from intersection
-          return syncFromIntersection({ chainSync: initialChainSync, logger, sinks });
+          return syncFromIntersection({ cardanoNode, chainSync: initialChainSync, logger, sinks });
         })
       );
-    }),
-    withNetworkInfo(cardanoNode)
+    })
   );
 
 // TODO: try to write types that will infer returned observable type from supplied projections.
@@ -213,21 +270,15 @@ export const projectIntoSink = <P extends object, PS extends P>({
         sinks.before || passthrough(),
         concatMap((evt) => {
           const projectionSinks = selectedSinks.map((sink) => sink.sink(evt));
-          const projectorEvent = evt as UnifiedProjectorEvent<WithNetworkInfo>;
+          const projectorEvent = evt as UnifiedProjectorEvent<DefaultProjectionProps>;
           return projectionSinks.length > 0
             ? combineLatest(projectionSinks.map((o$) => o$.pipe(defaultIfEmpty(null)))).pipe(map(() => projectorEvent))
             : of(projectorEvent);
         }),
         sinks.buffer.handleEvents,
         sinks.after || passthrough(),
-        tap((evt) => {
-          logger.debug(
-            `Processed event ${
-              evt.eventType === ChainSyncEventType.RollForward ? 'RollForward' : 'RollBackward'
-            } ${pointDescription(evt.block.header)}`
-          );
-          evt.requestNext();
-        }),
+        logEvent(logger),
+        tap((evt) => evt.requestNext()),
         finalize(() => logger.info('Stopped'))
       );
     })
