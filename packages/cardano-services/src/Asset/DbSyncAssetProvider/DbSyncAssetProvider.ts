@@ -55,7 +55,8 @@ export class DbSyncAssetProvider extends DbSyncProvider() implements AssetProvid
       try {
         assetInfo.tokenMetadata = (await this.#dependencies.tokenMetadataService.getTokenMetadata([assetId]))[0];
       } catch (error) {
-        if (error instanceof ProviderError && error.reason === ProviderFailure.ConnectionFailure) {
+        if (error instanceof ProviderError && error.reason === ProviderFailure.Unhealthy) {
+          this.logger.error(`Failed to fetch token metadata for asset with ${assetId} due to: ${error.message}`);
           assetInfo.tokenMetadata = undefined;
         } else {
           throw error;

@@ -19,7 +19,7 @@ const UNFETCHABLE = 'http://some_url/unfetchable';
 const INVALID_KEY = 'd75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a';
 
 export const mockPoolExtMetadataServer = createGenericMockServer((handler) => async (req, res) => {
-  const result = handler(req);
+  const result = await handler(req);
 
   res.setHeader('Content-Type', 'application/json');
 
@@ -54,7 +54,10 @@ describe('StakePoolMetadataService', () => {
 
   describe('getStakePoolMetadata', () => {
     it('fetch stake pool JSON metadata without extended data', async () => {
-      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(() => ({ body: mainExtMetadataMock, code: 200 })));
+      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(async () => ({
+        body: mainExtMetadataMock,
+        code: 200
+      })));
 
       const result = await metadataService.getStakePoolMetadata(
         '0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8' as Hash32ByteBase16,
@@ -72,7 +75,7 @@ describe('StakePoolMetadataService', () => {
 
       // First fetch returns the metadata, second fetch return the extended metadata.
       let alreadyCalled = false;
-      const handler = () => {
+      const handler = async () => {
         if (alreadyCalled) return { body: adaPoolsExtMetadataMock, code: 200 };
         alreadyCalled = true;
 
@@ -103,7 +106,7 @@ describe('StakePoolMetadataService', () => {
     });
 
     it('returns StakePoolMetadataServiceError with FailedToFetchMetadata error code when it gets resource not found server error', async () => {
-      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(() => ({ body: {}, code: 500 })));
+      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(async () => ({ body: {}, code: 500 })));
 
       const result = await metadataService.getStakePoolMetadata(
         '4781fffc4cc4a0d6074ae905869e8596f13246b79888af5a8d9580d3a372729a' as Hash32ByteBase16,
@@ -123,7 +126,10 @@ describe('StakePoolMetadataService', () => {
     });
 
     it('returns StakePoolMetadataServiceError with InvalidStakePoolHash error code when the hash doesnt match', async () => {
-      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(() => ({ body: mainExtMetadataMock, code: 200 })));
+      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(async () => ({
+        body: mainExtMetadataMock,
+        code: 200
+      })));
 
       const result = await metadataService.getStakePoolMetadata(
         '0000000000000000000000000000000000000000000000000000000000000000' as Hash32ByteBase16,
@@ -144,7 +150,7 @@ describe('StakePoolMetadataService', () => {
 
     it('returns StakePoolMetadataServiceError with InvalidMetadata error code when metadata has extDataUrl but is missing extSigUrl', async () => {
       const metadata = { ...mainExtMetadataMock, extDataUrl: UNFETCHABLE };
-      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(() => ({
+      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(async () => ({
         body: metadata,
         code: 200
       })));
@@ -172,7 +178,7 @@ describe('StakePoolMetadataService', () => {
         extDataUrl: UNFETCHABLE,
         extSigUrl: UNFETCHABLE
       };
-      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(() => ({
+      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(async () => ({
         body: metadata,
         code: 200
       })));
@@ -198,7 +204,7 @@ describe('StakePoolMetadataService', () => {
       let metadata: any;
 
       let alreadyCalled = false;
-      const handler = () => {
+      const handler = async () => {
         if (alreadyCalled) return { body: cip6ExtMetadataMock, code: 200 };
         alreadyCalled = true;
 
@@ -242,7 +248,7 @@ describe('StakePoolMetadataService', () => {
       let metadata: any;
 
       let numFetch = 0;
-      const handler = () => {
+      const handler = async () => {
         if (numFetch === 0) {
           ++numFetch;
           return {
@@ -297,7 +303,7 @@ describe('StakePoolMetadataService', () => {
 
   describe('getStakePoolExtendedMetadata', () => {
     it('returns ada pools format when extended key is present in the metadata', async () => {
-      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(() => ({})));
+      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(async () => ({})));
 
       const extMetadata: Cardano.StakePoolMetadata = {
         ...mainExtMetadataMock(),
@@ -310,7 +316,7 @@ describe('StakePoolMetadataService', () => {
     });
 
     it('returns CIP-6 format when extDataUrl is present in the metadata', async () => {
-      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(() => ({})));
+      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(async () => ({})));
 
       const extMetadata: Cardano.StakePoolMetadata = {
         ...mainExtMetadataMock(),
@@ -323,7 +329,7 @@ describe('StakePoolMetadataService', () => {
     });
 
     it('returns CIP-6 format with priority when the metadata including both extended properties', async () => {
-      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(() => ({})));
+      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(async () => ({})));
 
       const extMetadata: Cardano.StakePoolMetadata = {
         ...mainExtMetadataMock(),
@@ -338,7 +344,7 @@ describe('StakePoolMetadataService', () => {
 
     it('throws StakePoolMetadataServiceError with InvalidExtendedMetadataFormat error code when it gets an invalid CIP-6 response format', async () => {
       const invalidCip6ResponseFormat = { pool1: { ...cip6ExtMetadataMock.pool }, serial: 12_345 };
-      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(() => ({ body: invalidCip6ResponseFormat })));
+      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(async () => ({ body: invalidCip6ResponseFormat })));
 
       const extMetadata: Cardano.StakePoolMetadata = {
         ...mainExtMetadataMock(),
@@ -356,7 +362,9 @@ describe('StakePoolMetadataService', () => {
 
     it('throws StakePoolMetadataServiceError with InvalidExtendedMetadataFormat error code when it gets an invalid AP response format', async () => {
       const invalidAdaPoolsResponseFormat = { info1: { ...adaPoolsExtMetadataMock.info } };
-      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(() => ({ body: invalidAdaPoolsResponseFormat })));
+      ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(async () => ({
+        body: invalidAdaPoolsResponseFormat
+      })));
 
       const extMetadata: Cardano.StakePoolMetadata = {
         ...mainExtMetadataMock(),
@@ -374,7 +382,7 @@ describe('StakePoolMetadataService', () => {
 
     it('throws StakePoolMetadataServiceError with FailedToFetchExtendedMetadata error code when it gets internal server error response', async () => {
       let alreadyCalled = false;
-      const handler = () => {
+      const handler = async () => {
         if (alreadyCalled) return { body: {}, code: 500 };
         alreadyCalled = true;
 
@@ -404,7 +412,7 @@ describe('StakePoolMetadataService', () => {
 
     it('throws StakePoolMetadataServiceError with FailedToFetchExtendedMetadata error code when it gets resource not found server error', async () => {
       let alreadyCalled = false;
-      const handler = () => {
+      const handler = async () => {
         if (alreadyCalled) return { body: {}, code: 404 };
         alreadyCalled = true;
 
