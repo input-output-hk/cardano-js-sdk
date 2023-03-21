@@ -139,7 +139,13 @@ describe('resuming projection when intersection is not local tip', () => {
       const continue$ = project(ogmiosCardanoNode, sinksFactory).pipe(share());
       const rollForward$ = continue$.pipe(filter((evt) => evt.eventType === ChainSyncEventType.RollForward));
       const rolledBackKeyRegistrations$ = continue$.pipe(
-        filter((evt) => evt.eventType === ChainSyncEventType.RollBackward && evt.stakeKeys.del.length > 0)
+        filter(
+          (evt) =>
+            evt.eventType === ChainSyncEventType.RollBackward &&
+            // Test was flaky when checking only `del.length`,
+            // because then it could be skipping some events that affect total # of stake pools
+            (evt.stakeKeys.del.length > 0 || evt.stakeKeys.insert.length > 0)
+        )
       );
       await Promise.all([
         firstValueFrom(continue$).then((firstEvent) => {
