@@ -90,6 +90,7 @@ export type ProviderServerArgs = CommonProgramOptions &
     disableStakePoolMetricApy?: boolean;
     tokenMetadataCacheTTL?: number;
     tokenMetadataServerUrl?: string;
+    tokenMetadataRequestTimeout?: number;
     epochPollInterval: number;
     dbCacheTtl: number;
     useBlockfrost?: boolean;

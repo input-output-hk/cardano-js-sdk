@@ -1,49 +1,10 @@
+/* eslint-disable max-len */
 import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
-import { CardanoTokenRegistry, toCoreTokenMetadata } from '../../src/Asset';
+import { CardanoTokenRegistry, DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT, toCoreTokenMetadata } from '../../src/Asset';
 import { InMemoryCache, Key } from '../../src/InMemoryCache';
-import { createGenericMockServer, logger } from '@cardano-sdk/util-dev';
-
-const mockResults: Record<string, unknown> = {
-  '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65': {
-    description: { value: 'This is my first NFT of the macaron cake' },
-    name: { value: 'macaron cake token' },
-    subject: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65'
-  },
-  f43a62fdc3965df486de8a0d32fe800963589c41b38946602a0dc53541474958: {
-    decimals: { value: 8 },
-    description: { value: 'SingularityNET' },
-    logo: { value: 'testLogo' },
-    name: { value: 'SingularityNet AGIX Token' },
-    subject: 'f43a62fdc3965df486de8a0d32fe800963589c41b38946602a0dc53541474958',
-    ticker: { value: 'AGIX' },
-    url: { value: 'https://singularitynet.io/' }
-  }
-};
-
-export const mockTokenRegistry = createGenericMockServer((handler) => async (req, res) => {
-  const { body, code } = handler(req);
-
-  res.setHeader('Content-Type', 'application/json');
-
-  if (body) {
-    res.statusCode = code || 200;
-
-    return res.end(JSON.stringify(body));
-  }
-
-  const buffers: Buffer[] = [];
-  for await (const chunk of req) buffers.push(chunk);
-  const data = Buffer.concat(buffers).toString();
-  const subjects: unknown[] = [];
-
-  for (const subject of JSON.parse(data).subjects) {
-    const mockResult = mockResults[subject as string];
-
-    if (mockResult) subjects.push(mockResult);
-  }
-
-  return res.end(JSON.stringify({ subjects }));
-});
+import { logger } from '@cardano-sdk/util-dev';
+import { mockTokenRegistry } from './fixtures/mocks';
+import { sleep } from '../util';
 
 const testDescription = 'test description';
 const testName = 'test name';
@@ -51,6 +12,7 @@ const testName = 'test name';
 describe('CardanoTokenRegistry', () => {
   const invalidAssetId = Cardano.AssetId('0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef');
   const validAssetId = Cardano.AssetId('f43a62fdc3965df486de8a0d32fe800963589c41b38946602a0dc53541474958');
+  const defaultTimeout = DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT;
 
   describe('toCoreTokenMetadata', () => {
     it('complete attributes', () =>
@@ -89,7 +51,7 @@ describe('CardanoTokenRegistry', () => {
     let tokenRegistry = new CardanoTokenRegistry({ logger });
 
     beforeAll(async () => {
-      ({ closeMock, serverUrl } = await mockTokenRegistry(() => ({})));
+      ({ closeMock, serverUrl } = await mockTokenRegistry(async () => ({})));
       tokenRegistry = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl: serverUrl });
     });
 
@@ -148,7 +110,7 @@ describe('CardanoTokenRegistry', () => {
     let tokenRegistry = new CardanoTokenRegistry({ logger });
 
     beforeAll(async () => {
-      ({ closeMock, serverUrl } = await mockTokenRegistry(() => ({})));
+      ({ closeMock, serverUrl } = await mockTokenRegistry(async () => ({})));
       tokenRegistry = new CardanoTokenRegistry(
         { cache: new TestInMemoryCache(60), logger },
         { tokenMetadataServerUrl: serverUrl }
@@ -179,8 +141,11 @@ describe('CardanoTokenRegistry', () => {
     afterEach(async () => await closeMock());
 
     it('null record', async () => {
-      ({ closeMock, serverUrl } = await mockTokenRegistry(() => ({ body: { subjects: [null] } })));
-      const tokenRegistry = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl: serverUrl });
+      ({ closeMock, serverUrl } = await mockTokenRegistry(async () => ({ body: { subjects: [null] } })));
+      const tokenRegistry = new CardanoTokenRegistry(
+        { logger },
+        { tokenMetadataRequestTimeout: defaultTimeout, tokenMetadataServerUrl: serverUrl }
+      );
 
       await expect(tokenRegistry.getTokenMetadata([validAssetId])).rejects.toThrow(
         new ProviderError(
@@ -193,8 +158,11 @@ describe('CardanoTokenRegistry', () => {
 
     it('record without the subject property', async () => {
       const record = { test: 'test' };
-      ({ closeMock, serverUrl } = await mockTokenRegistry(() => ({ body: { subjects: [record] } })));
-      const tokenRegistry = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl: serverUrl });
+      ({ closeMock, serverUrl } = await mockTokenRegistry(async () => ({ body: { subjects: [record] } })));
+      const tokenRegistry = new CardanoTokenRegistry(
+        { logger },
+        { tokenMetadataRequestTimeout: defaultTimeout, tokenMetadataServerUrl: serverUrl }
+      );
 
       await expect(tokenRegistry.getTokenMetadata([validAssetId])).rejects.toThrow(
         new ProviderError(
@@ -210,7 +178,7 @@ describe('CardanoTokenRegistry', () => {
       const succeededMetadata = { name: 'test' };
 
       let alreadyCalled = false;
-      const record = () => {
+      const record = async () => {
         if (alreadyCalled) return { body: {}, code: 500 };
 
         alreadyCalled = true;
@@ -225,15 +193,47 @@ describe('CardanoTokenRegistry', () => {
       };
 
       ({ closeMock, serverUrl } = await mockTokenRegistry(record));
-      const tokenRegistry = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl: serverUrl });
+      const tokenRegistry = new CardanoTokenRegistry(
+        { logger },
+        { tokenMetadataRequestTimeout: defaultTimeout, tokenMetadataServerUrl: serverUrl }
+      );
       const firstSucceedResult = await tokenRegistry.getTokenMetadata([invalidAssetId, validAssetId]);
       expect(firstSucceedResult).toEqual([failedMetadata, succeededMetadata]);
 
       await expect(tokenRegistry.getTokenMetadata([invalidAssetId, validAssetId])).rejects.toThrow(
         new ProviderError(
-          ProviderFailure.ConnectionFailure,
+          ProviderFailure.Unhealthy,
           null,
-          'CardanoTokenRegistry failed to fetch asset metadata from the token registry server'
+          'CardanoTokenRegistry failed to fetch asset metadata from the token registry server due to: Request failed with status code 500'
+        )
+      );
+    });
+
+    it('timeout server error', async () => {
+      const exceededTimeout = defaultTimeout + 1000;
+      const record = async () => {
+        await sleep(exceededTimeout);
+
+        return {
+          body: {
+            subjects: [
+              { name: { value: 'test' }, subject: 'f43a62fdc3965df486de8a0d32fe800963589c41b38946602a0dc53541474958' }
+            ]
+          }
+        };
+      };
+
+      ({ closeMock, serverUrl } = await mockTokenRegistry(record));
+      const tokenRegistry = new CardanoTokenRegistry(
+        { logger },
+        { tokenMetadataRequestTimeout: defaultTimeout, tokenMetadataServerUrl: serverUrl }
+      );
+
+      await expect(tokenRegistry.getTokenMetadata([validAssetId])).rejects.toThrow(
+        new ProviderError(
+          ProviderFailure.Unhealthy,
+          null,
+          `CardanoTokenRegistry failed to fetch asset metadata from the token registry server due to: timeout of ${defaultTimeout}ms exceeded`
         )
       );
     });

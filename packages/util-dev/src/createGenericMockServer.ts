@@ -1,7 +1,7 @@
 import { IncomingMessage, RequestListener, createServer } from 'http';
 import { getRandomPort } from 'get-port-please';
 
-export type MockHandler = (req?: IncomingMessage) => { body?: unknown; code?: number };
+export type MockHandler = (req?: IncomingMessage) => Promise<{ body?: unknown; code?: number }>;
 export type ListenerGenerator = (handler: MockHandler) => RequestListener;
 
 /**
@@ -14,7 +14,7 @@ export type ListenerGenerator = (handler: MockHandler) => RequestListener;
  */
 export const createGenericMockServer =
   (listenerGenerator: ListenerGenerator, serverPort?: number) =>
-  (handler: MockHandler = () => ({})) =>
+  (handler: MockHandler = async () => ({})) =>
     // eslint-disable-next-line func-call-spacing
     new Promise<{ closeMock: () => Promise<void>; serverUrl: string }>(async (resolve, reject) => {
       try {

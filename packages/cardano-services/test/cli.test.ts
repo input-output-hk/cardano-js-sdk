@@ -17,7 +17,7 @@ import { fromSerializableObject } from '@cardano-sdk/util';
 import { getRandomPort } from 'get-port-please';
 import { healthCheckResponseMock } from '../../core/test/CardanoNode/mocks';
 import { listenPromise, serverClosePromise } from '../src/util';
-import { mockTokenRegistry } from './Asset/CardanoTokenRegistry.test';
+import { mockTokenRegistry } from './Asset/fixtures/mocks';
 import axios, { AxiosError } from 'axios';
 import http from 'http';
 import path from 'path';
@@ -1595,6 +1595,7 @@ describe('CLI', () => {
           });
 
           describe('specifying a Token-Registry-dependent service', () => {
+            const tokenMetadataRequestTimeout = '3000';
             let closeMock: () => Promise<void> = jest.fn();
             let tokenMetadataServerUrl = '';
             let serverUrl = ';';
@@ -1608,7 +1609,7 @@ describe('CLI', () => {
                 subject: asset.id
               };
 
-              ({ closeMock, serverUrl } = await mockTokenRegistry(() => ({
+              ({ closeMock, serverUrl } = await mockTokenRegistry(async () => ({
                 body: { subjects: [record] }
               })));
               tokenMetadataServerUrl = serverUrl;
@@ -1630,6 +1631,8 @@ describe('CLI', () => {
                     postgresConnectionString,
                     '--token-metadata-server-url',
                     tokenMetadataServerUrl,
+                    '--token-metadata-request-timeout',
+                    tokenMetadataRequestTimeout,
                     ServiceNames.Asset
                   ],
                   { env: {}, stdio: 'pipe' }
@@ -1655,6 +1658,7 @@ describe('CLI', () => {
                     OGMIOS_URL: ogmiosConnection.address.webSocket,
                     POSTGRES_CONNECTION_STRING: postgresConnectionString,
                     SERVICE_NAMES: ServiceNames.Asset,
+                    TOKEN_METADATA_REQUEST_TIMEOUT: tokenMetadataRequestTimeout,
                     TOKEN_METADATA_SERVER_URL: tokenMetadataServerUrl
                   },
                   stdio: 'pipe'
