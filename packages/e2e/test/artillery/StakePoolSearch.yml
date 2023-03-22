@@ -6,12 +6,11 @@ config:
     timeout: 180
   phases:
     - name: 'Stake Pool Search'
-      duration: 10
-      arrivalRate: 1
+      duration: 1
+      arrivalCount: 1
     - name: 'Stake Pool Search Queries'
-      duration: 90
-      arrivalRate: 1
-      rampTo: 100
+      duration: '{{$processEnvironment.TEST_DURATION_IN_SECS}}'
+      arrivalCount: '{{$processEnvironment.VIRTUAL_USERS_COUNT}}'
   processor: './StakePoolSearch.ts'
 
 scenarios:

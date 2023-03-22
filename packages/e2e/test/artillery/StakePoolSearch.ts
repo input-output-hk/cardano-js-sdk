@@ -59,11 +59,13 @@ const getStatName = (ctx: ArtilleryContext<StakePoolSearchVars>) => {
   return `query.${nameStatId}_${statusStatName}`;
 };
 
-const randomizeFilter = () => {
-  const filters: NonNullable<QueryStakePoolsArgs['filters']> = {};
+type Filters = NonNullable<QueryStakePoolsArgs['filters']>;
 
-  // Apply a random filter to 80% of the remaining users in the list, or if it's empty.
-  if (poolIds.length === 0 || Math.random() > 0.2) {
+const randomizeFilter = (): Filters => {
+  const filters: Filters = {};
+
+  // Apply a random filter to 80% of the users
+  if (Math.random() > 0.2) {
     filters.status = [
       [
         Cardano.StakePoolStatus.Activating,
@@ -132,7 +134,7 @@ export const performQuery: FunctionHook<StakePoolSearchVars> = async (ctx, ee, d
     const result = await provider.queryStakePools(args);
 
     // Take ids to randomize next requests
-    for (const pool of result.pageResults) poolIds.push(pool.id);
+    for (const pool of result.pageResults) if (!poolIds.includes(pool.id)) poolIds.push(pool.id);
 
     // Store the result in the context
     vars.pageResults = result.pageResults;

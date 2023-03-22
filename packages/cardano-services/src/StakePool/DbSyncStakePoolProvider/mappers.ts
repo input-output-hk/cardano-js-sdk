@@ -45,11 +45,6 @@ const getPoolStatus = (
   return Cardano.StakePoolStatus.Retired;
 };
 
-interface NodeMetricsDependencies {
-  totalAdaAmount: Cardano.Lovelace;
-  optimalPoolCount?: number;
-}
-
 interface ToCoreStakePoolInput {
   poolOwners: PoolOwner[];
   poolDatas: PoolData[];
@@ -61,7 +56,6 @@ interface ToCoreStakePoolInput {
   poolMetrics: PoolMetrics[];
   totalCount: number;
   poolAPYs: PoolAPY[];
-  nodeMetricsDependencies: NodeMetricsDependencies;
 }
 
 /**
