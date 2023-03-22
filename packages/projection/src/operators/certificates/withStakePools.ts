@@ -7,56 +7,52 @@ export interface WithCertificateSource {
   source: CertificatePointer;
 }
 
-export interface PoolUpdate extends WithCertificateSource {
-  poolParameters: Cardano.PoolParameters;
-  issuedAtEpochNo: Cardano.EpochNo;
-}
+export type PoolUpdate = Omit<Cardano.PoolRegistrationCertificate, '__typename'> & WithCertificateSource;
 
-export interface PoolRetirement extends WithCertificateSource {
-  retireAtEpoch: Cardano.EpochNo;
-}
+export type PoolRetirement = Omit<Cardano.PoolRetirementCertificate, '__typename'> & WithCertificateSource;
 
 export interface WithStakePools {
   stakePools: {
-    updates: Map<Cardano.PoolId, PoolUpdate[]>;
-    retirements: Map<Cardano.PoolId, PoolRetirement[]>;
+    /**
+     * One per PoolId (only the latest certificate takes effect)
+     */
+    updates: PoolUpdate[];
+    /**
+     * Does not include retirements that were invalidated by PoolUpdate in this same block.
+     * TODO: confirm below
+     * One per PoolId (only the latest certificate takes effect)
+     */
+    retirements: PoolRetirement[];
   };
 }
-
-const addPoolItem = <T>(collection: Map<Cardano.PoolId, T[]>, poolId: Cardano.PoolId, item: T) => {
-  let poolItems = collection.get(poolId);
-  if (!poolItems) {
-    poolItems = [];
-    collection.set(poolId, poolItems);
-  }
-  poolItems.push(item);
-};
 
 /**
  * Map blocks with certificates to stake pool updates and retirements.
  */
 export const withStakePools = unifiedProjectorOperator<WithCertificates & WithEpochNo, WithStakePools>((evt) => {
-  const updates = new Map<Cardano.PoolId, PoolUpdate[]>();
-  const retirements = new Map<Cardano.PoolId, PoolRetirement[]>();
+  const updates: Record<Cardano.PoolId, PoolUpdate> = {};
+  const retirements: Record<Cardano.PoolId, PoolRetirement> = {};
   for (const { certificate, pointer: source } of evt.certificates) {
     switch (certificate.__typename) {
       case Cardano.CertificateType.PoolRegistration:
-        addPoolItem(updates, certificate.poolParameters.id, {
-          issuedAtEpochNo: evt.epochNo,
+        updates[certificate.poolParameters.id] = {
           poolParameters: certificate.poolParameters,
           source
-        });
+        };
+        // PoolRegistration cancels PoolRetirement
+        delete retirements[certificate.poolParameters.id];
         break;
       case Cardano.CertificateType.PoolRetirement:
-        addPoolItem(retirements, certificate.poolId, {
-          retireAtEpoch: certificate.epoch,
+        retirements[certificate.poolId] = {
+          epoch: certificate.epoch,
+          poolId: certificate.poolId,
           source
-        });
+        };
         break;
     }
   }
   return {
     ...evt,
-    stakePools: { retirements, updates }
+    stakePools: { retirements: Object.values(retirements), updates: Object.values(updates) }
   };
 });

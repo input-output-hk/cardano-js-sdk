@@ -119,6 +119,32 @@ export const createSlotEpochInfoCalc = (eraSummaries: EraSummary[]) => {
 };
 
 /**
+ * @returns first slot of the epoch
+ */
+export const epochSlotsCalc = memoize((epochNo: EpochNo, eraSummaries: EraSummary[]) => {
+  let atEpoch = 0;
+  let atSlot = eraSummaries[0].start.slot;
+  let eraSummaryIdx = 0;
+  const maxEraSummaryIdx = eraSummaries.length - 1;
+  while (atEpoch !== epochNo) {
+    atSlot += eraSummaries[eraSummaryIdx].parameters.epochLength;
+    atEpoch++;
+    if (eraSummaryIdx < maxEraSummaryIdx && atSlot >= eraSummaries[eraSummaryIdx + 1].start.slot) {
+      eraSummaryIdx++;
+    }
+  }
+  return {
+    firstSlot: Slot(atSlot),
+    lastSlot: Slot(atSlot + eraSummaries[eraSummaryIdx].parameters.epochLength - 1)
+  };
+});
+
+/**
+ * @returns first and last slot numbers of the epoch
+ */
+export type EpochSlots = ReturnType<typeof epochSlotsCalc>;
+
+/**
  * @throws EraSummaryError
  * @returns {Date} date of the slot
  */

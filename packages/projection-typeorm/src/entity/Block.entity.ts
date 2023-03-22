@@ -1,29 +1,16 @@
 import { Cardano } from '@cardano-sdk/core';
-import { Column, Entity, Index, PrimaryGeneratedColumn, RelationOptions } from 'typeorm';
+import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class BlockEntity {
-  @PrimaryGeneratedColumn()
-  id?: number;
+  @PrimaryColumn()
+  height?: Cardano.BlockNo;
 
   @Index({ unique: true })
   @Column({ length: 64, type: 'char' })
   hash?: Cardano.BlockId;
 
   @Index({ unique: true })
-  @Column({ type: 'int' })
-  slot?: number;
-
-  @Index({ unique: true })
-  @Column({ type: 'int' })
-  height?: number;
+  @Column()
+  slot?: Cardano.Slot;
 }
-
-/**
- * Use these RelationOptions if it's appropriate for an entity row
- * to be deleted when the block is rolled back.
- */
-export const BlockCascadeRelationOptions: RelationOptions = {
-  nullable: false,
-  onDelete: 'CASCADE'
-};

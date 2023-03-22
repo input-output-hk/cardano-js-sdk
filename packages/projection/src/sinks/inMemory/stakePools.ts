@@ -16,11 +16,11 @@ const findOrCreate = ({ store: { stakePools } }: WithInMemoryStore, poolId: Card
 export const stakePools: Sink<StakePoolsProjection, WithInMemoryStore> = {
   sink(evt) {
     if (evt.eventType === ChainSyncEventType.RollForward) {
-      for (const [poolId, poolUpdates] of evt.stakePools.updates) {
-        findOrCreate(evt, poolId).updates.push(...poolUpdates);
+      for (const update of evt.stakePools.updates) {
+        findOrCreate(evt, update.poolParameters.id).updates.push(update);
       }
-      for (const [poolId, poolRetirements] of evt.stakePools.retirements) {
-        findOrCreate(evt, poolId).retirements.push(...poolRetirements);
+      for (const retirement of evt.stakePools.retirements) {
+        findOrCreate(evt, retirement.poolId).retirements.push(retirement);
       }
     } else {
       // Delete all updates and retirements >= current cursor.

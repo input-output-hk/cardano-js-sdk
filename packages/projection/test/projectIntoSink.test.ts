@@ -1,8 +1,8 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, CardanoNodeErrors, ChainSyncEventType, ChainSyncRollForward } from '@cardano-sdk/core';
 import { ChainSyncDataSet, StubChainSyncData, chainSyncData, logger } from '@cardano-sdk/util-dev';
-import { InMemory, Projections, RollForwardEvent, Sinks, projectIntoSink } from '../src';
-import { WithNetworkInfo } from '../src/operators';
+import { DefaultProjectionProps } from '../src/projections';
+import { InMemory, Projections, RollForwardEvent, Sinks, UnifiedProjectorEvent, projectIntoSink } from '../src';
 import { from, lastValueFrom, of, toArray } from 'rxjs';
 
 const dataWithPoolRetirement = chainSyncData(ChainSyncDataSet.WithPoolRetirement);
@@ -56,7 +56,7 @@ describe('projectIntoSink', () => {
               evt.eventType === ChainSyncEventType.RollForward && evt.block.header.blockNo === Cardano.BlockNo(32_209)
           )!,
           ...dataWithPoolRetirement.networkInfo
-        })
+        } as UnifiedProjectorEvent<DefaultProjectionProps>)
       )
       .subscribe();
     const [firstBlock] = await projectAll(dataWithPoolRetirement, inMemorySinks);
@@ -83,7 +83,7 @@ describe('projectIntoSink', () => {
             },
             eventType: ChainSyncEventType.RollForward,
             ...dataWithStakeKeyDeregistration.networkInfo
-          } as RollForwardEvent<WithNetworkInfo>,
+          } as RollForwardEvent<DefaultProjectionProps>,
           // Intersection
           {
             block: {
@@ -95,7 +95,7 @@ describe('projectIntoSink', () => {
             },
             eventType: ChainSyncEventType.RollForward,
             ...dataWithStakeKeyDeregistration.networkInfo
-          } as RollForwardEvent<WithNetworkInfo>,
+          } as RollForwardEvent<DefaultProjectionProps>,
           // To be rolled back
           {
             block: {
@@ -116,12 +116,13 @@ describe('projectIntoSink', () => {
             },
             eventType: ChainSyncEventType.RollForward,
             ...dataWithStakeKeyDeregistration.networkInfo
-          } as RollForwardEvent<WithNetworkInfo>
+          } as RollForwardEvent<DefaultProjectionProps>
         ])
       )
       .subscribe();
     const [firstBlock] = await projectAll(dataWithStakeKeyDeregistration, inMemorySinks);
     expect(firstBlock.block.header.blockNo).toBe(22_622);
+    expect(firstBlock.crossEpochBoundary).toBe(false);
     expect(store.stakeKeys.size).toBe(1);
   });
 
@@ -140,7 +141,7 @@ describe('projectIntoSink', () => {
             },
             eventType: ChainSyncEventType.RollForward,
             ...dataWithStakeKeyDeregistration.networkInfo
-          } as RollForwardEvent<WithNetworkInfo>,
+          } as RollForwardEvent<DefaultProjectionProps>,
           {
             block: {
               header: {
@@ -151,7 +152,7 @@ describe('projectIntoSink', () => {
             },
             eventType: ChainSyncEventType.RollForward,
             ...dataWithStakeKeyDeregistration.networkInfo
-          } as RollForwardEvent<WithNetworkInfo>
+          } as RollForwardEvent<DefaultProjectionProps>
         ])
       )
       .subscribe();

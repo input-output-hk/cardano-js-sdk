@@ -1,17 +1,12 @@
-import { Cardano, ChainSyncEventType, Milliseconds } from '@cardano-sdk/core';
+import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { Operators, RollForwardEvent, UnifiedProjectorEvent } from '../../src';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
+import { stubEraSummaries } from '../util';
 
-const eraSummaries = [
-  {
-    parameters: { epochLength: 432_000, slotLength: Milliseconds(1000) },
-    start: { slot: 0, time: new Date(1_595_967_616_000) }
-  }
-];
 const rollForwardEvent = (slot: number) =>
   ({
     block: { header: { slot: Cardano.Slot(slot) } },
-    eraSummaries,
+    eraSummaries: stubEraSummaries,
     eventType: ChainSyncEventType.RollForward
   } as RollForwardEvent<Operators.WithNetworkInfo>);
 

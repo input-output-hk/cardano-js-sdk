@@ -11,6 +11,7 @@ import {
   PointOrOrigin
 } from '@cardano-sdk/core';
 import { Observable, of } from 'rxjs';
+import { fromSerializableObject } from '@cardano-sdk/util';
 import { genesisToEraSummary } from './genesisToEraSummary';
 import memoize from 'lodash/memoize';
 
@@ -97,7 +98,7 @@ export const chainSyncData = memoize((dataSet: ChainSyncDataSet) => {
     metadata: {
       cardano: { compactGenesis }
     }
-  } = require(`./data/${dataSet}`) as ChainSyncData;
+  } = fromSerializableObject(require(`./data/${dataSet}`)) as ChainSyncData;
   const eraSummaries = [genesisToEraSummary(compactGenesis)];
   const cardanoNode: ObservableCardanoNode = {
     eraSummaries$: of(eraSummaries),

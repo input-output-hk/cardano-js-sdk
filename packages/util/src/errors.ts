@@ -1,5 +1,7 @@
 import { CustomError } from 'ts-custom-error';
 
+export const formatErrorMessage = (reason: string, detail?: string) => reason + (detail ? ` (${detail})` : '');
+
 interface ErrorLike {
   message: string;
   stack: string;

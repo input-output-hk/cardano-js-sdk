@@ -12,7 +12,7 @@ import {
   InMemoryCache,
   StakePoolHttpService,
   UNLIMITED_CACHE_TTL,
-  createHttpStakePoolExtMetadataService
+  createHttpStakePoolMetadataService
 } from '../../src';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { INFO, createLogger } from 'bunyan';
@@ -152,7 +152,7 @@ describe('StakePoolHttpService', () => {
     const dbConnectionQuerySpy = jest.spyOn(db, 'query');
     const clearCacheSpy = jest.spyOn(cache, 'clear');
     let genesisData: GenesisData;
-    const metadataService = createHttpStakePoolExtMetadataService(logger);
+    const metadataService = createHttpStakePoolMetadataService(logger);
 
     beforeAll(async () => {
       genesisData = await loadGenesisData(cardanoNodeConfigPath);
@@ -170,7 +170,12 @@ describe('StakePoolHttpService', () => {
           withTip: true
         })
       ) as unknown as OgmiosCardanoNode;
-
+      stakePoolProvider = new DbSyncStakePoolProvider(
+        { paginationPageSizeLimit: pagination.limit, useBlockfrost: false },
+        { cache, cardanoNode, db, epochMonitor, genesisData, logger, metadataService }
+      );
+      service = new StakePoolHttpService({ logger, stakePoolProvider });
+      httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
       provider = stakePoolHttpProvider(clientConfig);
     });
 
