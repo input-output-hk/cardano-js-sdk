@@ -87,14 +87,13 @@ describe('SingleAddressWallet/delegation', () => {
     // source wallet has the highest balance to begin with
     const [sourceWallet, destWallet] = await chooseWallets();
 
-    await walletReady(sourceWallet);
+    const tx1OutputCoins = 1_000_000n;
+    await walletReady(sourceWallet, tx1OutputCoins);
 
     const protocolParameters = await firstValueFrom(sourceWallet.protocolParameters$);
     const stakeKeyDeposit = BigInt(protocolParameters.stakeKeyDeposit);
     const initialState = await getWalletStateSnapshot(sourceWallet);
-    expect(initialState.balance.total.coins).toBeGreaterThan(0n);
     expect(initialState.balance.total.coins).toBe(initialState.balance.available.coins);
-    const tx1OutputCoins = 1_000_000n;
     const poolId = await chooseDifferentPoolIdRandomly(initialState.rewardAccount.delegatee?.nextNextEpoch?.id);
     expect(poolId).toBeDefined();
     const initialDeposit = initialState.isStakeKeyRegistered ? stakeKeyDeposit : 0n;

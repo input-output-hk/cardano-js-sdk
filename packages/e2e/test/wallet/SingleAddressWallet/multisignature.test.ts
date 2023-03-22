@@ -2,8 +2,8 @@
 import { Cardano, nativeScriptPolicyId } from '@cardano-sdk/core';
 import { FinalizeTxProps, InitializeTxProps, SingleAddressWallet } from '@cardano-sdk/wallet';
 import { KeyRole, util } from '@cardano-sdk/key-management';
+import { burnTokens, createStandaloneKeyAgent, submitAndConfirm, walletReady } from '../../util';
 import { createLogger } from '@cardano-sdk/util-dev';
-import { createStandaloneKeyAgent, submitAndConfirm, walletReady } from '../../util';
 import { filter, firstValueFrom } from 'rxjs';
 import { getEnv, getWallet, walletVariables } from '../../../src';
 
@@ -19,36 +19,42 @@ describe('SingleAddressWallet/multisignature', () => {
   });
 
   it('can create a transaction with multiple signatures to mint an asset', async () => {
-    wallet = (await getWallet({ env, idx: 0, logger, name: 'Minting Wallet', polling: { interval: 50 } })).wallet;
+    wallet = (await getWallet({ env, logger, name: 'Minting Wallet', polling: { interval: 50 } })).wallet;
 
-    await walletReady(wallet);
+    const coins = 3_000_000n;
+    await walletReady(wallet, coins);
 
     const genesis = await firstValueFrom(wallet.genesisParameters$);
 
     const aliceKeyAgent = await createStandaloneKeyAgent(
-      util.generateMnemonicWords(),
+      env.KEY_MANAGEMENT_PARAMS.mnemonic.split(' '),
       genesis,
       await wallet.keyAgent.getBip32Ed25519()
     );
     const bobKeyAgent = await createStandaloneKeyAgent(
-      util.generateMnemonicWords(),
+      env.KEY_MANAGEMENT_PARAMS.mnemonic.split(' '),
       genesis,
       await wallet.keyAgent.getBip32Ed25519()
     );
 
-    const derivationPath = {
-      index: 0,
+    const aliceDerivationPath = {
+      index: 2,
       role: KeyRole.External
     };
 
-    const alicePubKey = await aliceKeyAgent.derivePublicKey(derivationPath);
+    const bobDerivationPath = {
+      index: 3,
+      role: KeyRole.External
+    };
+
+    const alicePubKey = await aliceKeyAgent.derivePublicKey(aliceDerivationPath);
     const aliceKeyHash = await aliceKeyAgent.bip32Ed25519.getPubKeyHash(alicePubKey);
 
-    const bobPubKey = await bobKeyAgent.derivePublicKey(derivationPath);
+    const bobPubKey = await bobKeyAgent.derivePublicKey(bobDerivationPath);
     const bobKeyHash = await bobKeyAgent.bip32Ed25519.getPubKeyHash(bobPubKey);
 
-    const alicePolicySigner = new util.KeyAgentTransactionSigner(aliceKeyAgent, derivationPath);
-    const bobPolicySigner = new util.KeyAgentTransactionSigner(bobKeyAgent, derivationPath);
+    const alicePolicySigner = new util.KeyAgentTransactionSigner(aliceKeyAgent, aliceDerivationPath);
+    const bobPolicySigner = new util.KeyAgentTransactionSigner(bobKeyAgent, bobDerivationPath);
 
     const policyScript: Cardano.NativeScript = {
       __type: Cardano.ScriptType.Native,
@@ -80,7 +86,7 @@ describe('SingleAddressWallet/multisignature', () => {
           address: walletAddress,
           value: {
             assets: tokens,
-            coins: 3_000_000n
+            coins
           }
         }
       ]),
@@ -107,5 +113,11 @@ describe('SingleAddressWallet/multisignature', () => {
     expect(value).toBeDefined();
     expect(value!.assets!.has(assetId)).toBeTruthy();
     expect(value!.assets!.get(assetId)).toBe(10n);
+
+    await burnTokens({
+      policySigners: [alicePolicySigner, bobPolicySigner],
+      scripts: [policyScript],
+      wallet
+    });
   });
 });
