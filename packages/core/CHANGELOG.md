@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.11.0-nightly.1...@cardano-sdk/core@0.11.0-nightly.2) (2023-03-22)
+
+### Features
+
+- **cardano-services:** metadata fetching logic ([3647598](https://github.com/input-output-hk/cardano-js-sdk/commit/36475984368426f50323322da622f0af4c5d046b))
+- **core:** add createEpochSlotsCalc that computes 1st and last slot # of the epoch ([266b951](https://github.com/input-output-hk/cardano-js-sdk/commit/266b951f23a898ad226f82c491138660094149b6))
+
 ## [0.11.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.11.0-nightly.0...@cardano-sdk/core@0.11.0-nightly.1) (2023-03-16)
 
 ### ⚠ BREAKING CHANGES

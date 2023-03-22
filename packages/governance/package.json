@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/governance",
-  "version": "0.5.1-nightly.1",
+  "version": "0.5.1-nightly.2",
   "description": "Governance types and utilities for Cardano",
   "engines": {
     "node": ">=14.20.1"
@@ -59,10 +59,10 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "@cardano-sdk/core": "^0.11.0-nightly.1",
-    "@cardano-sdk/crypto": "^0.1.4-nightly.0",
-    "@cardano-sdk/key-management": "^0.5.1-nightly.1",
-    "@cardano-sdk/util": "^0.8.3-nightly.0"
+    "@cardano-sdk/core": "^0.11.0-nightly.2",
+    "@cardano-sdk/crypto": "^0.1.4-nightly.1",
+    "@cardano-sdk/key-management": "^0.5.1-nightly.2",
+    "@cardano-sdk/util": "^0.8.3-nightly.1"
   },
   "files": [
     "dist/*",

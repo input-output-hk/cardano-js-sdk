@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.1-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.8.1-nightly.1...@cardano-sdk/util-dev@0.8.1-nightly.2) (2023-03-22)
+
+### Features
+
+- **util-dev:** update retirement chain sync dataset ([4ae30a7](https://github.com/input-output-hk/cardano-js-sdk/commit/4ae30a79426cb4726fa2c7eb2955a5aa4c8aac95))
+
+### Bug Fixes
+
+- **util-dev:** transform chainSyncData with fromSerializableObject ([91d6b92](https://github.com/input-output-hk/cardano-js-sdk/commit/91d6b9221a1f9531150a615a68511e6178c891b6))
+
 ## [0.8.1-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.8.1-nightly.0...@cardano-sdk/util-dev@0.8.1-nightly.1) (2023-03-16)
 
 **Note:** Version bump only for package @cardano-sdk/util-dev

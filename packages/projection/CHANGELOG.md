@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.5.1-nightly.2...@cardano-sdk/projection@0.6.0-nightly.0) (2023-03-22)
+
+### ⚠ BREAKING CHANGES
+
+- **projection:** omit pool updates and retirements that do not take effect
+
+### Features
+
+- **projection:** add withEpochBoundary operator ([a646412](https://github.com/input-output-hk/cardano-js-sdk/commit/a64641270f55839d824733189f447f899ac8e3be))
+- **projection:** improve logging ([69a5c8b](https://github.com/input-output-hk/cardano-js-sdk/commit/69a5c8b7e5a1307b4b6a936ef327b14fbf7e65c7))
+- **projection:** omit pool updates and retirements that do not take effect ([c76b1a1](https://github.com/input-output-hk/cardano-js-sdk/commit/c76b1a1a6dc6baddf4a90127a58b3682db83ef31))
+
 ## [0.5.1-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.5.1-nightly.1...@cardano-sdk/projection@0.5.1-nightly.2) (2023-03-20)
 
 **Note:** Version bump only for package @cardano-sdk/projection
