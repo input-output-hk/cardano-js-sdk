@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import * as Crypto from '@cardano-sdk/crypto';
 import * as mocks from '../mocks';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';

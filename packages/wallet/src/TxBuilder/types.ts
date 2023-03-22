@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { Cardano } from '@cardano-sdk/core';
 import { CustomError } from 'ts-custom-error';
 

@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { SingleAddressWallet, buildTx } from '@cardano-sdk/wallet';
 import { assertTxIsValid } from '../../../../wallet/test/util';
 import { filter, firstValueFrom, map, take } from 'rxjs';

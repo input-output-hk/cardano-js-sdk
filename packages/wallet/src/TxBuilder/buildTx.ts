@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
 import { FinalizeTxProps, InitializeTxProps, InitializeTxResult, ObservableWallet } from '../types';

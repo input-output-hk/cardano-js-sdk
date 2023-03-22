@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { Asset, Cardano } from '@cardano-sdk/core';
 import { BalanceTracker } from './types';
 import { Logger } from 'ts-log';

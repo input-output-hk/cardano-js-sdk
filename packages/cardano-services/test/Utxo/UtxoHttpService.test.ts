@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { AddressWith, UtxoFixtureBuilder } from './fixtures/FixtureBuilder';
 import { Asset, Cardano, UtxoProvider } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, utxoHttpProvider } from '@cardano-sdk/cardano-services-client';

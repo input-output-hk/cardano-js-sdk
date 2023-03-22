@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { Cardano } from '@cardano-sdk/core';
 import { Cip6ExtMetadataResponse } from './types';
 import { ExtMetadataFormat, StakePoolExtMetadataResponse } from '../types';

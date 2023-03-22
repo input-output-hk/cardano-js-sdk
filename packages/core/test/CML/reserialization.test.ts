@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { CML, cmlToCore, coreToCml } from '../../src';
 import { ManagedFreeableScope } from '@cardano-sdk/util';
 

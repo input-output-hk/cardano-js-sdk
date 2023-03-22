@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { Cardano } from '@cardano-sdk/core';
 import { healthCheckResponseWithState } from '../util';
 import { logger } from '@cardano-sdk/util-dev';

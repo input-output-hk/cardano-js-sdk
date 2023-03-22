@@ -1,7 +1,6 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable sonarjs/no-duplicate-string */
-/* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Asset } from '@cardano-sdk/core';
 import { AssetData, AssetFixtureBuilder, AssetWith } from './Asset/fixtures/FixtureBuilder';

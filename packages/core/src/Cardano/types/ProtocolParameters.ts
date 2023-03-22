@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { Slot } from './Block';
 
 /* eslint-disable no-use-before-define */
