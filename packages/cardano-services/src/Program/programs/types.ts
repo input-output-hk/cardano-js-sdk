@@ -45,6 +45,7 @@ export type ProviderServerArgs = CommonProgramOptions &
     cardanoNodeConfigPath?: string;
     disableDbCache?: boolean;
     disableStakePoolMetricApy?: boolean;
+    healthCheckCacheTtl: number;
     tokenMetadataCacheTTL?: number;
     tokenMetadataServerUrl?: string;
     tokenMetadataRequestTimeout?: number;

@@ -26,7 +26,7 @@ jest.mock('dns', () => ({
 
 describe('Service dependency abstractions', () => {
   const APPLICATION_JSON = 'application/json';
-  const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
+  const cache = { db: new InMemoryCache(UNLIMITED_CACHE_TTL), healthCheck: new InMemoryCache(UNLIMITED_CACHE_TTL) };
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
   const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
 
@@ -85,7 +85,7 @@ describe('Service dependency abstractions', () => {
       afterAll(async () => {
         await db!.end();
         await httpServer.shutdown();
-        await cache.shutdown();
+        await cache.db.shutdown();
         jest.clearAllTimers();
       });
 
@@ -166,7 +166,7 @@ describe('Service dependency abstractions', () => {
       afterAll(async () => {
         await db!.end();
         await httpServer.shutdown();
-        await cache.shutdown();
+        await cache.db.shutdown();
         jest.clearAllTimers();
       });
 

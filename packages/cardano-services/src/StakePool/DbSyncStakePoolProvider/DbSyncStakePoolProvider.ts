@@ -67,7 +67,9 @@ export interface StakePoolProviderDependencies extends DbSyncProviderDependencie
   /**
    *The in memory cache engine.
    */
-  cache: InMemoryCache;
+  cache: DbSyncProviderDependencies['cache'] & {
+    db: InMemoryCache;
+  };
 
   /**
    * Monitor the epoch rollover through db polling.
@@ -98,12 +100,12 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
 
   constructor(
     { paginationPageSizeLimit, responseConfig, useBlockfrost }: StakePoolProviderProps,
-    { db, cardanoNode, genesisData, metadataService, cache, logger, epochMonitor }: StakePoolProviderDependencies
+    { cache, db, cardanoNode, genesisData, metadataService, logger, epochMonitor }: StakePoolProviderDependencies
   ) {
-    super({ cardanoNode, db, logger }, 'DbSyncStakePoolProvider', logger);
+    super({ cache: { healthCheck: cache.healthCheck }, cardanoNode, db, logger }, 'DbSyncStakePoolProvider', logger);
 
     this.#builder = new StakePoolBuilder(db, logger);
-    this.#cache = cache;
+    this.#cache = cache.db;
     this.#epochLength = genesisData.epochLength * 1000;
     // epochLength can change, so it should come from EraSummaries instead of from CompactGenesis.
     // Then we would need to look up the length of the specific epoch based on slot number.

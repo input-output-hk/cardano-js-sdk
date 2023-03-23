@@ -1,6 +1,7 @@
 import { Connection, createConnectionObject } from '@cardano-ogmios/client';
 import { DbSyncProvider, DbSyncProviderDependencies } from '../../../src/util';
 import { HEALTH_RESPONSE_BODY } from '../../../../ogmios/test/mocks/util';
+import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../../src';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool, QueryResult } from 'pg';
 import { Provider } from '@cardano-sdk/core';
@@ -94,6 +95,21 @@ describe('DbSyncProvider', () => {
         expect(res.ok).toEqual(true);
         expect(res.localNode).toBeDefined();
         expect(res.projectedTip).toBeDefined();
+      });
+
+      it('caches the health check result', async () => {
+        mockServer = healthyMockOgmios();
+        const cache = { healthCheck: new InMemoryCache(UNLIMITED_CACHE_TTL) };
+        const cacheSetSpy = jest.spyOn(cache.healthCheck, 'set');
+        await listenPromise(mockServer, connection.port);
+        provider = new DbSyncSomeProvider({ cache, cardanoNode, db, logger, pgConnectionCreator });
+        const res1 = await provider.healthCheck();
+        expect(res1.ok).toEqual(true);
+        expect(cacheSetSpy).toBeCalled();
+        const res2 = await provider.healthCheck();
+        expect(res2.ok).toEqual(true);
+        expect(cacheSetSpy).not.toBeCalled();
+        cacheSetSpy.mockClear();
       });
 
       it('is not ok when node is unhealthy', async () => {

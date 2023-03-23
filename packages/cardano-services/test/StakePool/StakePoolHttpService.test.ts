@@ -87,7 +87,7 @@ describe('StakePoolHttpService', () => {
   let poolsInfo: PoolInfo[];
 
   const epochPollInterval = 2 * 1000;
-  const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
+  const cache = { db: new InMemoryCache(UNLIMITED_CACHE_TTL), healthCheck: new InMemoryCache(UNLIMITED_CACHE_TTL) };
   const db = new Pool({
     connectionString: process.env.POSTGRES_CONNECTION_STRING,
     max: 1,
@@ -149,7 +149,10 @@ describe('StakePoolHttpService', () => {
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('healthy state', () => {
     const dbConnectionQuerySpy = jest.spyOn(db, 'query');
-    const clearCacheSpy = jest.spyOn(cache, 'clear');
+    const clearCacheSpy = {
+      db: jest.spyOn(cache.db, 'clear'),
+      healthCheck: jest.spyOn(cache.healthCheck, 'clear')
+    };
     let genesisData: GenesisData;
     const metadataService = createHttpStakePoolMetadataService(logger);
 
@@ -180,15 +183,17 @@ describe('StakePoolHttpService', () => {
 
     afterAll(async () => {
       await db.end();
-      cache.shutdown();
+      cache.db.shutdown();
+      cache.healthCheck.shutdown();
       jest.clearAllTimers();
     });
 
     beforeEach(async () => {
-      cache.clear();
+      cache.db.clear();
+      cache.healthCheck.clear();
       jest.clearAllMocks();
       dbConnectionQuerySpy.mockClear();
-      clearCacheSpy.mockClear();
+      clearCacheSpy.db.mockClear();
     });
 
     describe('with DbSyncStakePoolProvider', () => {
@@ -210,7 +215,7 @@ describe('StakePoolHttpService', () => {
           await sleep(epochPollInterval * 2);
 
           expect(await epochMonitor.getLastKnownEpoch()).toBeDefined();
-          expect(clearCacheSpy).not.toHaveBeenCalled();
+          expect(clearCacheSpy.db).not.toHaveBeenCalled();
         });
       });
 
@@ -371,13 +376,13 @@ describe('StakePoolHttpService', () => {
           dbConnectionQuerySpy.mockClear();
           await provider.queryStakePools(filerOnePoolOptions);
           expect(dbConnectionQuerySpy).toHaveBeenCalledTimes(nonCacheableSubQueriesCount);
-          expect(cache.keys().length).toEqual(cacheKeysCount);
+          expect(cache.db.keys().length).toEqual(cacheKeysCount);
         });
 
         it('should call db-sync queries again once the cache is cleared', async () => {
           await provider.queryStakePools(filerOnePoolOptions);
-          cache.clear();
-          expect(cache.keys().length).toEqual(0);
+          cache.db.clear();
+          expect(cache.db.keys().length).toEqual(0);
 
           await provider.queryStakePools(filerOnePoolOptions);
           expect(dbConnectionQuerySpy).toBeCalledTimes((cachedSubQueriesCount + nonCacheableSubQueriesCount) * 2);
@@ -387,12 +392,12 @@ describe('StakePoolHttpService', () => {
           const currentEpochNo = await fixtureBuilder.getLasKnownEpoch();
           const response = await provider.queryStakePools(filerOnePoolOptions);
 
-          expect(cache.keys().length).toEqual(cacheKeysCount);
+          expect(cache.db.keys().length).toEqual(cacheKeysCount);
 
           await sleep(epochPollInterval);
 
           expect(await epochMonitor.getLastKnownEpoch()).toEqual(currentEpochNo);
-          expect(cache.keys().length).toEqual(cacheKeysCount);
+          expect(cache.db.keys().length).toEqual(cacheKeysCount);
           expect(dbConnectionQuerySpy).toBeCalled();
           expect(clearCacheSpy).not.toHaveBeenCalled();
 
@@ -409,7 +414,7 @@ describe('StakePoolHttpService', () => {
             await provider.queryStakePools(filerOnePoolOptions);
             await sleep(epochPollInterval);
 
-            expect(cache.keys().length).toEqual(cacheKeysCount);
+            expect(cache.db.keys().length).toEqual(cacheKeysCount);
             await ingestDbData(
               dbConnection,
               'epoch',
@@ -421,7 +426,7 @@ describe('StakePoolHttpService', () => {
             expect(clearCacheSpy).toHaveBeenCalled();
 
             expect(await epochMonitor.getLastKnownEpoch()).toEqual(greaterEpoch);
-            expect(cache.keys().length).toEqual(0);
+            expect(cache.db.keys().length).toEqual(0);
           }, db)
         );
 

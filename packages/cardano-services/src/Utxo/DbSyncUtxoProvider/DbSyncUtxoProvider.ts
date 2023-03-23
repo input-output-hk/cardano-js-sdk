@@ -4,8 +4,8 @@ import { UtxoBuilder } from './UtxoBuilder';
 
 export class DbSyncUtxoProvider extends DbSyncProvider() implements UtxoProvider {
   #builder: UtxoBuilder;
-  constructor({ db, cardanoNode, logger }: DbSyncProviderDependencies) {
-    super({ cardanoNode, db, logger });
+  constructor({ cache, db, cardanoNode, logger }: DbSyncProviderDependencies) {
+    super({ cache, cardanoNode, db, logger });
 
     this.#builder = new UtxoBuilder(db, logger);
   }

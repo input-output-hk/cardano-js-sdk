@@ -37,7 +37,7 @@ describe('NetworkInfoHttpService', () => {
   let lastBlockNoInDb: LedgerTipModel;
 
   const epochPollInterval = 2 * 1000;
-  const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
+  const cache = { db: new InMemoryCache(UNLIMITED_CACHE_TTL), healthCheck: new InMemoryCache(UNLIMITED_CACHE_TTL) };
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
   const db = new Pool({
     connectionString: process.env.POSTGRES_CONNECTION_STRING,
@@ -49,7 +49,9 @@ describe('NetworkInfoHttpService', () => {
 
   describe('healthy state', () => {
     const dbConnectionQuerySpy = jest.spyOn(db, 'query');
-    const clearCacheSpy = jest.spyOn(cache, 'clear');
+    const clearCacheSpy = {
+      db: jest.spyOn(cache.db, 'clear')
+    };
 
     beforeAll(async () => {
       port = await getPort();
@@ -84,15 +86,17 @@ describe('NetworkInfoHttpService', () => {
     afterAll(async () => {
       await db.end();
       await httpServer.shutdown();
-      await cache.shutdown();
+      await cache.db.shutdown();
+      await cache.healthCheck.shutdown();
       jest.clearAllTimers();
     });
 
     beforeEach(async () => {
-      await cache.clear();
+      await cache.db.clear();
+      await cache.healthCheck.clear();
       jest.clearAllMocks();
       dbConnectionQuerySpy.mockClear();
-      clearCacheSpy.mockClear();
+      clearCacheSpy.db.mockClear();
     });
 
     describe('start', () => {
@@ -199,14 +203,14 @@ describe('NetworkInfoHttpService', () => {
         await provider.stake();
         expect(dbConnectionQuerySpy).toHaveBeenCalledTimes(stakeDbQueriesCount);
         expect(cardanoNodeStakeSpy).toHaveBeenCalledTimes(stakeNodeQueriesCount);
-        expect(cache.keys().length).toEqual(stakeTotalQueriesCount);
+        expect(cache.db.keys().length).toEqual(stakeTotalQueriesCount);
       });
 
       it('should call db-sync queries again once the cache is cleared', async () => {
         const cardanoNodeStakeSpy = jest.spyOn(cardanoNode, 'stakeDistribution');
         await provider.stake();
-        await cache.clear();
-        expect(cache.keys().length).toEqual(0);
+        await cache.db.clear();
+        expect(cache.db.keys().length).toEqual(0);
 
         await provider.stake();
         expect(dbConnectionQuerySpy).toBeCalledTimes(stakeDbQueriesCount * 2);
@@ -217,10 +221,10 @@ describe('NetworkInfoHttpService', () => {
         const cardanoNodeStakeSpy = jest.spyOn(cardanoNode, 'stakeDistribution');
         const currentEpochNo = await fixtureBuilder.getLasKnownEpoch();
         await provider.stake();
-        expect(cache.keys().length).toEqual(stakeTotalQueriesCount);
+        expect(cache.db.keys().length).toEqual(stakeTotalQueriesCount);
         await sleep(epochPollInterval * 2);
         expect(await epochMonitor.getLastKnownEpoch()).toEqual(currentEpochNo);
-        expect(cache.keys().length).toEqual(stakeTotalQueriesCount);
+        expect(cache.db.keys().length).toEqual(stakeTotalQueriesCount);
         expect(dbConnectionQuerySpy).toHaveBeenCalled();
         expect(cardanoNodeStakeSpy).toHaveBeenCalledTimes(stakeNodeQueriesCount);
         expect(clearCacheSpy).not.toHaveBeenCalled();
@@ -234,7 +238,7 @@ describe('NetworkInfoHttpService', () => {
           await provider.stake();
           await sleep(epochPollInterval);
 
-          expect(cache.keys().length).toEqual(stakeTotalQueriesCount);
+          expect(cache.db.keys().length).toEqual(stakeTotalQueriesCount);
           await ingestDbData(
             dbConnection,
             'epoch',
@@ -246,7 +250,7 @@ describe('NetworkInfoHttpService', () => {
           expect(clearCacheSpy).toHaveBeenCalled();
 
           expect(await epochMonitor.getLastKnownEpoch()).toEqual(greaterEpoch);
-          expect(cache.keys().length).toEqual(0);
+          expect(cache.db.keys().length).toEqual(0);
         }, db)
       );
     });
@@ -294,12 +298,12 @@ describe('NetworkInfoHttpService', () => {
       });
 
       it('should call queries again once the cache is cleared', async () => {
-        await cache.clear();
+        await cache.db.clear();
         await provider.lovelaceSupply();
-        expect(cache.keys().length).toEqual(cacheItemsInSupplySummaryCount);
+        expect(cache.db.keys().length).toEqual(cacheItemsInSupplySummaryCount);
         expect(dbConnectionQuerySpy).toBeCalledTimes(2);
-        await cache.clear();
-        expect(cache.keys().length).toEqual(0);
+        await cache.db.clear();
+        expect(cache.db.keys().length).toEqual(0);
         await provider.lovelaceSupply();
         expect(dbConnectionQuerySpy).toBeCalledTimes(dbSyncQueriesCount * 2);
       });

@@ -76,7 +76,11 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       return factory(dbConnection, node);
     };
 
-  const getCache = () => (args.disableDbCache ? new NoCache() : new InMemoryCache(args.dbCacheTtl!));
+  const getCache = (ttl: number) => (args.disableDbCache ? new NoCache() : new InMemoryCache(ttl));
+  const getDbCache = () => getCache(args.dbCacheTtl);
+
+  // Shared cache across all providers
+  const healthCheckCache = getCache(args.healthCheckCacheTtl);
 
   const getEpochMonitor = memoize((dbPool) => new DbSyncEpochPollService(dbPool, args.epochPollInterval!));
 
@@ -91,6 +95,9 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
         ? new StubTokenMetadataService()
         : new CardanoTokenRegistry({ logger }, args);
       const assetProvider = new DbSyncAssetProvider({
+        cache: {
+          healthCheck: healthCheckCache
+        },
         cardanoNode,
         db,
         logger,
@@ -110,7 +117,10 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
           useBlockfrost: args.useBlockfrost!
         },
         {
-          cache: getCache(),
+          cache: {
+            db: getDbCache(),
+            healthCheck: healthCheckCache
+          },
           cardanoNode,
           db,
           epochMonitor: getEpochMonitor(db),
@@ -123,21 +133,46 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     }, ServiceNames.StakePool),
     [ServiceNames.Utxo]: withDbSyncProvider(
       async (db, cardanoNode) =>
-        new UtxoHttpService({ logger, utxoProvider: new DbSyncUtxoProvider({ cardanoNode, db, logger }) }),
+        new UtxoHttpService({
+          logger,
+          utxoProvider: new DbSyncUtxoProvider({
+            cache: {
+              healthCheck: healthCheckCache
+            },
+            cardanoNode,
+            db,
+            logger
+          })
+        }),
       ServiceNames.Utxo
     ),
     [ServiceNames.ChainHistory]: withDbSyncProvider(async (db, cardanoNode) => {
       const metadataService = createDbSyncMetadataService(db, logger);
       const chainHistoryProvider = new DbSyncChainHistoryProvider(
         { paginationPageSizeLimit: args.paginationPageSizeLimit! },
-        { cardanoNode, db, logger, metadataService }
+        {
+          cache: {
+            healthCheck: healthCheckCache
+          },
+          cardanoNode,
+          db,
+          logger,
+          metadataService
+        }
       );
       return new ChainHistoryHttpService({ chainHistoryProvider, logger });
     }, ServiceNames.ChainHistory),
     [ServiceNames.Rewards]: withDbSyncProvider(async (db, cardanoNode) => {
       const rewardsProvider = new DbSyncRewardsProvider(
         { paginationPageSizeLimit: args.paginationPageSizeLimit! },
-        { cardanoNode, db, logger }
+        {
+          cache: {
+            healthCheck: healthCheckCache
+          },
+          cardanoNode,
+          db,
+          logger
+        }
       );
       return new RewardsHttpService({ logger, rewardsProvider });
     }, ServiceNames.Rewards),
@@ -148,7 +183,10 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
           ProviderServerOptionDescriptions.CardanoNodeConfigPath
         );
       const networkInfoProvider = new DbSyncNetworkInfoProvider({
-        cache: getCache(),
+        cache: {
+          db: getDbCache(),
+          healthCheck: healthCheckCache
+        },
         cardanoNode,
         db,
         epochMonitor: getEpochMonitor(db),

@@ -9,15 +9,17 @@ import {
 } from '../utils';
 import { BuildInfo as ServiceBuildInfo } from '../../Http';
 import { URL } from 'url';
-import { buildInfoValidator } from '../../util/validators';
+import { buildInfoValidator, cacheTtlValidator } from '../../util/validators';
 import { loggerMethodNames } from '@cardano-sdk/util';
 
 export const ENABLE_METRICS_DEFAULT = false;
+export const DEFAULT_HEALTH_CHECK_CACHE_TTL = 5;
 
 export enum CommonOptionDescriptions {
   ApiUrl = 'API URL',
   BuildInfo = 'Service build info',
   LoggerMinSeverity = 'Log level',
+  HealthCheckCacheTtl = 'Health check cache TTL in seconds between 1 and 10',
   EnableMetrics = 'Enable Prometheus Metrics',
   ServiceDiscoveryBackoffFactor = 'Exponential backoff factor for service discovery',
   ServiceDiscoveryTimeout = 'Timeout for service discovery attempts'
@@ -51,6 +53,14 @@ export const withCommonOptions = (command: Command, defaults: { apiUrl: URL }) =
         .default(ENABLE_METRICS_DEFAULT)
         .argParser((enableMetrics) =>
           stringOptionToBoolean(enableMetrics, Programs.ProviderServer, CommonOptionDescriptions.EnableMetrics)
+        )
+    )
+    .addOption(
+      new Option('--health-check-cache-ttl <healthCheckCacheTTL>', CommonOptionDescriptions.HealthCheckCacheTtl)
+        .env('HEALTH_CHECK_CACHE_TTL')
+        .default(DEFAULT_HEALTH_CHECK_CACHE_TTL)
+        .argParser((ttl: string) =>
+          cacheTtlValidator(ttl, { lowerBound: 1, upperBound: 120 }, CommonOptionDescriptions.HealthCheckCacheTtl)
         )
     )
     .addOption(

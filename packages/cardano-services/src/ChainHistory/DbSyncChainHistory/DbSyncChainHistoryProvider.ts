@@ -47,9 +47,9 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
 
   constructor(
     { paginationPageSizeLimit }: ChainHistoryProviderProps,
-    { db, cardanoNode, metadataService, logger }: ChainHistoryProviderDependencies
+    { cache, db, cardanoNode, metadataService, logger }: ChainHistoryProviderDependencies
   ) {
-    super({ cardanoNode, db, logger });
+    super({ cache, cardanoNode, db, logger });
     this.#builder = new ChainHistoryBuilder(db, logger);
     this.#metadataService = metadataService;
     this.#paginationPageSizeLimit = paginationPageSizeLimit;
