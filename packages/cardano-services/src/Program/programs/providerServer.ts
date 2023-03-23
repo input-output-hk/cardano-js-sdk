@@ -4,8 +4,8 @@ import { AssetHttpService } from '../../Asset/AssetHttpService';
 import { CardanoNode } from '@cardano-sdk/core';
 import { CardanoTokenRegistry } from '../../Asset/CardanoTokenRegistry';
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../../ChainHistory';
+import { DbPools, DbSyncEpochPollService, loadGenesisData } from '../../util';
 import { DbSyncAssetProvider } from '../../Asset/DbSyncAssetProvider';
-import { DbSyncEpochPollService, loadGenesisData } from '../../util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../NetworkInfo';
 import { DbSyncNftMetadataService, StubTokenMetadataService } from '../../Asset';
 import { DbSyncRewardsProvider, RewardsHttpService } from '../../Rewards';
@@ -18,6 +18,7 @@ import { InMemoryCache, NoCache } from '../../InMemoryCache';
 import { Logger } from 'ts-log';
 import { MissingProgramOption, MissingServiceDependency, RunnableDependencies, UnknownServiceName } from '../errors';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
+import { Pool } from 'pg';
 import { PostgresOptionDescriptions } from '../options/postgres';
 import { ProviderServerArgs, ProviderServerOptionDescriptions, ServiceNames } from './types';
 import { SrvRecord } from 'dns';
@@ -28,7 +29,6 @@ import { createLogger } from 'bunyan';
 import { getOgmiosCardanoNode, getOgmiosTxSubmitProvider, getPool, getRabbitMqTxSubmitProvider } from '../services';
 import { isNotNil } from '@cardano-sdk/util';
 import memoize from 'lodash/memoize';
-import pg from 'pg';
 
 export const DISABLE_DB_CACHE_DEFAULT = false;
 export const DISABLE_STAKE_POOL_METRIC_APY_DEFAULT = false;
@@ -53,7 +53,7 @@ export interface LoadProviderServerDependencies {
 
 interface ServiceMapFactoryOptions {
   args: ProviderServerArgs;
-  dbConnection?: pg.Pool;
+  pools: Partial<DbPools>;
   dnsResolver: DnsResolver;
   genesisData?: GenesisData;
   logger: Logger;
@@ -61,11 +61,11 @@ interface ServiceMapFactoryOptions {
 }
 
 const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
-  const { args, dbConnection, dnsResolver, genesisData, logger, node } = options;
+  const { args, pools, dnsResolver, genesisData, logger, node } = options;
   const withDbSyncProvider =
-    <T>(factory: (db: pg.Pool, cardanoNode: CardanoNode) => T, serviceName: ServiceNames) =>
+    <T>(factory: (dbPools: DbPools, cardanoNode: CardanoNode) => T, serviceName: ServiceNames) =>
     () => {
-      if (!dbConnection)
+      if (!pools.main || !pools.healthCheck)
         throw new MissingProgramOption(serviceName, [
           PostgresOptionDescriptions.ConnectionString,
           PostgresOptionDescriptions.ServiceDiscoveryArgs
@@ -73,7 +73,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
 
       if (!node) throw new MissingServiceDependency(serviceName, RunnableDependencies.CardanoNode);
 
-      return factory(dbConnection, node);
+      return factory(pools as DbPools, node);
     };
 
   const getCache = (ttl: number) => (args.disableDbCache ? new NoCache() : new InMemoryCache(ttl));
@@ -82,14 +82,14 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
   // Shared cache across all providers
   const healthCheckCache = getCache(args.healthCheckCacheTtl);
 
-  const getEpochMonitor = memoize((dbPool) => new DbSyncEpochPollService(dbPool, args.epochPollInterval!));
+  const getEpochMonitor = memoize((dbPool: Pool) => new DbSyncEpochPollService(dbPool, args.epochPollInterval!));
 
   return {
-    [ServiceNames.Asset]: withDbSyncProvider(async (db, cardanoNode) => {
+    [ServiceNames.Asset]: withDbSyncProvider(async (dbPools, cardanoNode) => {
       const ntfMetadataService = new DbSyncNftMetadataService({
-        db,
+        db: dbPools.main,
         logger,
-        metadataService: createDbSyncMetadataService(db, logger)
+        metadataService: createDbSyncMetadataService(dbPools.main, logger)
       });
       const tokenMetadataService = args.tokenMetadataServerUrl?.startsWith('stub:')
         ? new StubTokenMetadataService()
@@ -99,7 +99,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
           healthCheck: healthCheckCache
         },
         cardanoNode,
-        db,
+        dbPools,
         logger,
         ntfMetadataService,
         tokenMetadataService
@@ -107,7 +107,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
 
       return new AssetHttpService({ assetProvider, logger });
     }, ServiceNames.Asset),
-    [ServiceNames.StakePool]: withDbSyncProvider(async (db, cardanoNode) => {
+    [ServiceNames.StakePool]: withDbSyncProvider(async (dbPools, cardanoNode) => {
       if (!genesisData)
         throw new MissingProgramOption(ServiceNames.StakePool, ProviderServerOptionDescriptions.CardanoNodeConfigPath);
       const stakePoolProvider = new DbSyncStakePoolProvider(
@@ -122,8 +122,8 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
             healthCheck: healthCheckCache
           },
           cardanoNode,
-          db,
-          epochMonitor: getEpochMonitor(db),
+          dbPools,
+          epochMonitor: getEpochMonitor(dbPools.main),
           genesisData,
           logger,
           metadataService: createHttpStakePoolMetadataService(logger)
@@ -132,7 +132,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       return new StakePoolHttpService({ logger, stakePoolProvider });
     }, ServiceNames.StakePool),
     [ServiceNames.Utxo]: withDbSyncProvider(
-      async (db, cardanoNode) =>
+      async (dbPools, cardanoNode) =>
         new UtxoHttpService({
           logger,
           utxoProvider: new DbSyncUtxoProvider({
@@ -140,14 +140,14 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
               healthCheck: healthCheckCache
             },
             cardanoNode,
-            db,
+            dbPools,
             logger
           })
         }),
       ServiceNames.Utxo
     ),
-    [ServiceNames.ChainHistory]: withDbSyncProvider(async (db, cardanoNode) => {
-      const metadataService = createDbSyncMetadataService(db, logger);
+    [ServiceNames.ChainHistory]: withDbSyncProvider(async (dbPools, cardanoNode) => {
+      const metadataService = createDbSyncMetadataService(dbPools.main, logger);
       const chainHistoryProvider = new DbSyncChainHistoryProvider(
         { paginationPageSizeLimit: args.paginationPageSizeLimit! },
         {
@@ -155,14 +155,14 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
             healthCheck: healthCheckCache
           },
           cardanoNode,
-          db,
+          dbPools,
           logger,
           metadataService
         }
       );
       return new ChainHistoryHttpService({ chainHistoryProvider, logger });
     }, ServiceNames.ChainHistory),
-    [ServiceNames.Rewards]: withDbSyncProvider(async (db, cardanoNode) => {
+    [ServiceNames.Rewards]: withDbSyncProvider(async (dbPools, cardanoNode) => {
       const rewardsProvider = new DbSyncRewardsProvider(
         { paginationPageSizeLimit: args.paginationPageSizeLimit! },
         {
@@ -170,13 +170,13 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
             healthCheck: healthCheckCache
           },
           cardanoNode,
-          db,
+          dbPools,
           logger
         }
       );
       return new RewardsHttpService({ logger, rewardsProvider });
     }, ServiceNames.Rewards),
-    [ServiceNames.NetworkInfo]: withDbSyncProvider(async (db, cardanoNode) => {
+    [ServiceNames.NetworkInfo]: withDbSyncProvider(async (dbPools, cardanoNode) => {
       if (!genesisData)
         throw new MissingProgramOption(
           ServiceNames.NetworkInfo,
@@ -188,8 +188,8 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
           healthCheck: healthCheckCache
         },
         cardanoNode,
-        db,
-        epochMonitor: getEpochMonitor(db),
+        dbPools,
+        epochMonitor: getEpochMonitor(dbPools.main),
         genesisData,
         logger
       });
@@ -224,12 +224,15 @@ export const loadProviderServer = async (
       },
       logger
     );
-  const db = await getPool(dnsResolver, logger, args);
+  const pools: Partial<DbPools> = {
+    healthCheck: await getPool(dnsResolver, logger, args),
+    main: await getPool(dnsResolver, logger, args)
+  };
   const cardanoNode = serviceSetHas(args.serviceNames, cardanoNodeDependantServices)
     ? await getOgmiosCardanoNode(dnsResolver, logger, args)
     : undefined;
   const genesisData = args.cardanoNodeConfigPath ? await loadGenesisData(args.cardanoNodeConfigPath) : undefined;
-  const serviceMap = serviceMapFactory({ args, dbConnection: db, dnsResolver, genesisData, logger, node: cardanoNode });
+  const serviceMap = serviceMapFactory({ args, dnsResolver, genesisData, logger, node: cardanoNode, pools });
 
   for (const serviceName of args.serviceNames) {
     if (serviceMap[serviceName]) {

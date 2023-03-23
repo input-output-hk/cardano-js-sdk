@@ -25,10 +25,10 @@ export class DbSyncRewardsProvider extends DbSyncProvider() implements RewardsPr
 
   constructor(
     { paginationPageSizeLimit }: RewardsProviderProps,
-    { cache, db, cardanoNode, logger }: DbSyncProviderDependencies
+    { cache, dbPools, cardanoNode, logger }: DbSyncProviderDependencies
   ) {
-    super({ cache, cardanoNode, db, logger });
-    this.#builder = new RewardsBuilder(db, logger);
+    super({ cache, cardanoNode, dbPools, logger });
+    this.#builder = new RewardsBuilder(dbPools.main, logger);
     this.#paginationPageSizeLimit = paginationPageSizeLimit;
   }
 

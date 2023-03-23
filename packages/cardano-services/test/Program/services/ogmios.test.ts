@@ -2,6 +2,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { CardanoNodeErrors } from '@cardano-sdk/core';
 import { Connection } from '@cardano-ogmios/client';
+import { DbPools, LedgerTipModel, findLedgerTip } from '../../../src/util/DbSyncProvider';
 import { DbSyncEpochPollService, listenPromise, loadGenesisData, serverClosePromise } from '../../../src/util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../../src/NetworkInfo';
 import {
@@ -14,12 +15,11 @@ import {
   getPool
 } from '../../../src';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../../src/InMemoryCache';
-import { LedgerTipModel, findLedgerTip } from '../../../src/util/DbSyncProvider';
 import { Ogmios, OgmiosCardanoNode, OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { SrvRecord } from 'dns';
 import { bufferToHexString } from '@cardano-sdk/util';
-import { createHealthyMockOgmiosServer, ogmiosServerReady } from '../../util';
+import { clearDbPools, createHealthyMockOgmiosServer, ogmiosServerReady } from '../../util';
 import { createMockOgmiosServer } from '../../../../ogmios/test/mocks/mockOgmiosServer';
 import { getPort, getRandomPort } from 'get-port-please';
 import { healthCheckResponseMock } from '../../../../core/test/CardanoNode/mocks';
@@ -48,21 +48,29 @@ describe('Service dependency abstractions', () => {
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
   const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
   let lastBlockNoInDb: LedgerTipModel;
-  let db: Pool | undefined;
+  let dbPools: DbPools;
 
   beforeAll(async () => {
-    db = await getPool(dnsResolver, logger, {
-      postgresDb: process.env.POSTGRES_DB!,
-      postgresPassword: process.env.POSTGRES_PASSWORD!,
-      postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,
-      postgresUser: process.env.POSTGRES_USER!
-    });
+    dbPools = {
+      healthCheck: (await getPool(dnsResolver, logger, {
+        postgresDb: process.env.POSTGRES_DB!,
+        postgresPassword: process.env.POSTGRES_PASSWORD!,
+        postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,
+        postgresUser: process.env.POSTGRES_USER!
+      })) as Pool,
+      main: (await getPool(dnsResolver, logger, {
+        postgresDb: process.env.POSTGRES_DB!,
+        postgresPassword: process.env.POSTGRES_PASSWORD!,
+        postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,
+        postgresUser: process.env.POSTGRES_USER!
+      })) as Pool
+    };
 
-    lastBlockNoInDb = (await db!.query<LedgerTipModel>(findLedgerTip)).rows[0];
+    lastBlockNoInDb = (await dbPools.main!.query<LedgerTipModel>(findLedgerTip)).rows[0];
   });
 
   afterAll(async () => {
-    await db!.end();
+    await clearDbPools(dbPools);
   });
 
   describe('Ogmios-dependant services with service discovery', () => {
@@ -143,9 +151,15 @@ describe('Service dependency abstractions', () => {
             ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
           });
           const genesisData = await loadGenesisData(cardanoNodeConfigPath);
-          const epochMonitor = new DbSyncEpochPollService(db!, 10_000);
-          const deps = { cache, cardanoNode: ogmiosCardanoNode, db: db!, epochMonitor, genesisData, logger };
-          const networkInfoProvider = new DbSyncNetworkInfoProvider(deps);
+          const epochMonitor = new DbSyncEpochPollService(dbPools.main!, 10_000);
+          const networkInfoProvider = new DbSyncNetworkInfoProvider({
+            cache,
+            cardanoNode: ogmiosCardanoNode,
+            dbPools,
+            epochMonitor,
+            genesisData,
+            logger
+          });
 
           httpServer = new HttpServer(config, {
             logger,
@@ -211,7 +225,7 @@ describe('Service dependency abstractions', () => {
       ogmiosConnection = Ogmios.createConnectionObject();
       await listenPromise(ogmiosServer, { port: ogmiosConnection.port });
       await ogmiosServerReady(ogmiosConnection);
-      lastBlockNoInDb = (await db!.query<LedgerTipModel>(findLedgerTip)).rows[0];
+      lastBlockNoInDb = (await dbPools.main!.query<LedgerTipModel>(findLedgerTip)).rows[0];
     });
 
     afterAll(async () => {
@@ -263,8 +277,15 @@ describe('Service dependency abstractions', () => {
             ogmiosUrl: new URL(ogmiosConnection.address.webSocket)
           });
           const genesisData = await loadGenesisData(cardanoNodeConfigPath);
-          const epochMonitor = new DbSyncEpochPollService(db!, 10_000);
-          const deps = { cache, cardanoNode: ogmiosCardanoNode, db: db!, epochMonitor, genesisData, logger };
+          const epochMonitor = new DbSyncEpochPollService(dbPools.main!, 10_000);
+          const deps = {
+            cache,
+            cardanoNode: ogmiosCardanoNode,
+            dbPools,
+            epochMonitor,
+            genesisData,
+            logger
+          };
           const networkInfoProvider = new DbSyncNetworkInfoProvider(deps);
 
           httpServer = new HttpServer(config, {

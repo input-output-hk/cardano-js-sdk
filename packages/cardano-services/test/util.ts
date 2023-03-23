@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { DbPools } from '../src/util/DbSyncProvider';
 import { Ogmios } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { createMockOgmiosServer } from '../../ogmios/test/mocks/mockOgmiosServer';
@@ -71,3 +72,8 @@ export const wrapWithTransaction =
   };
 
 export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export const clearDbPools = async ({ main, healthCheck }: DbPools) => {
+  await main?.end();
+  await healthCheck?.end();
+};

@@ -25,9 +25,8 @@ export interface NetworkInfoProviderDependencies extends DbSyncProviderDependenc
   /**
    * The in memory cache engine.
    */
-  cache: {
+  cache: DbSyncProviderDependencies['cache'] & {
     db: InMemoryCache;
-    healthCheck: InMemoryCache;
   };
 
   /**
@@ -52,14 +51,14 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) im
   #epochRolloverDisposer: Disposer;
   #slotEpochCalc: SlotEpochCalc;
 
-  constructor({ cache, cardanoNode, db, epochMonitor, genesisData, logger }: NetworkInfoProviderDependencies) {
-    super({ cache, cardanoNode, db, logger }, 'DbSyncNetworkInfoProvider', logger);
+  constructor({ cache, cardanoNode, dbPools, epochMonitor, genesisData, logger }: NetworkInfoProviderDependencies) {
+    super({ cache, cardanoNode, dbPools, logger }, 'DbSyncNetworkInfoProvider', logger);
 
     this.#logger = logger;
     this.#cache = cache.db;
     this.#currentEpoch = Cardano.EpochNo(0);
     this.#epochMonitor = epochMonitor;
-    this.#builder = new NetworkInfoBuilder(db, logger);
+    this.#builder = new NetworkInfoBuilder(dbPools.main, logger);
     this.#genesisData = genesisData;
   }
 

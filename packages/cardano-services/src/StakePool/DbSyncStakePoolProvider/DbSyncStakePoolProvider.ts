@@ -100,11 +100,15 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
 
   constructor(
     { paginationPageSizeLimit, responseConfig, useBlockfrost }: StakePoolProviderProps,
-    { cache, db, cardanoNode, genesisData, metadataService, logger, epochMonitor }: StakePoolProviderDependencies
+    { cache, dbPools, cardanoNode, genesisData, metadataService, logger, epochMonitor }: StakePoolProviderDependencies
   ) {
-    super({ cache: { healthCheck: cache.healthCheck }, cardanoNode, db, logger }, 'DbSyncStakePoolProvider', logger);
+    super(
+      { cache: { healthCheck: cache.healthCheck }, cardanoNode, dbPools, logger },
+      'DbSyncStakePoolProvider',
+      logger
+    );
 
-    this.#builder = new StakePoolBuilder(db, logger);
+    this.#builder = new StakePoolBuilder(dbPools.main, logger);
     this.#cache = cache.db;
     this.#epochLength = genesisData.epochLength * 1000;
     // epochLength can change, so it should come from EraSummaries instead of from CompactGenesis.

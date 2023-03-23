@@ -32,7 +32,7 @@ export class InMemoryCache {
     }
 
     const resultPromise = asyncAction();
-    this.#cache.set(
+    this.set(
       key,
       resultPromise.catch(() => this.#cache.del(key)),
       ttl

@@ -3,7 +3,7 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable sonarjs/no-identical-functions */
 import { CreateHttpProviderConfig, networkInfoHttpProvider } from '@cardano-sdk/cardano-services-client';
-import { DbSyncEpochPollService, LedgerTipModel, findLedgerTip, loadGenesisData } from '../../src/util';
+import { DbPools, DbSyncEpochPollService, LedgerTipModel, findLedgerTip, loadGenesisData } from '../../src/util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../src/NetworkInfo';
 import { HttpServer, HttpServerConfig } from '../../src';
 import { INFO, createLogger } from 'bunyan';
@@ -12,9 +12,9 @@ import { NetworkInfoFixtureBuilder } from './fixtures/FixtureBuilder';
 import { NetworkInfoProvider } from '@cardano-sdk/core';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
+import { clearDbPools, ingestDbData, sleep, wrapWithTransaction } from '../util';
 import { getPort } from 'get-port-please';
 import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
-import { ingestDbData, sleep, wrapWithTransaction } from '../util';
 import { logger } from '@cardano-sdk/util-dev';
 import axios from 'axios';
 
@@ -39,16 +39,27 @@ describe('NetworkInfoHttpService', () => {
   const epochPollInterval = 2 * 1000;
   const cache = { db: new InMemoryCache(UNLIMITED_CACHE_TTL), healthCheck: new InMemoryCache(UNLIMITED_CACHE_TTL) };
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
-  const db = new Pool({
-    connectionString: process.env.POSTGRES_CONNECTION_STRING,
-    max: 1,
-    min: 1
-  });
-  const fixtureBuilder = new NetworkInfoFixtureBuilder(db, logger);
-  const epochMonitor = new DbSyncEpochPollService(db, epochPollInterval!);
+  const dbPools: DbPools = {
+    healthCheck: new Pool({
+      connectionString: process.env.POSTGRES_CONNECTION_STRING,
+      max: 1,
+      min: 1
+    }),
+    main: new Pool({
+      connectionString: process.env.POSTGRES_CONNECTION_STRING,
+      max: 1,
+      min: 1
+    })
+  };
+
+  const fixtureBuilder = new NetworkInfoFixtureBuilder(dbPools.main, logger);
+  const epochMonitor = new DbSyncEpochPollService(dbPools.main, epochPollInterval!);
 
   describe('healthy state', () => {
-    const dbConnectionQuerySpy = jest.spyOn(db, 'query');
+    const dbQuerySpy = {
+      healthCheck: jest.spyOn(dbPools.healthCheck, 'query'),
+      main: jest.spyOn(dbPools.main, 'query')
+    };
     const clearCacheSpy = {
       db: jest.spyOn(cache.db, 'clear')
     };
@@ -56,7 +67,7 @@ describe('NetworkInfoHttpService', () => {
     beforeAll(async () => {
       port = await getPort();
       baseUrl = `http://localhost:${port}/network-info`;
-      lastBlockNoInDb = (await db.query<LedgerTipModel>(findLedgerTip)).rows[0];
+      lastBlockNoInDb = (await dbPools.main.query<LedgerTipModel>(findLedgerTip)).rows[0];
       cardanoNode = mockCardanoNode(
         healthCheckResponseMock({
           blockNo: lastBlockNoInDb.block_no,
@@ -72,8 +83,14 @@ describe('NetworkInfoHttpService', () => {
       ) as unknown as OgmiosCardanoNode;
       config = { listen: { port } };
       const genesisData = await loadGenesisData(cardanoNodeConfigPath);
-      const deps = { cache, cardanoNode, db, epochMonitor, genesisData, logger };
-      networkInfoProvider = new DbSyncNetworkInfoProvider(deps);
+      networkInfoProvider = new DbSyncNetworkInfoProvider({
+        cache,
+        cardanoNode,
+        dbPools,
+        epochMonitor,
+        genesisData,
+        logger
+      });
       service = new NetworkInfoHttpService({ logger, networkInfoProvider });
       httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
       clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
@@ -84,7 +101,7 @@ describe('NetworkInfoHttpService', () => {
     });
 
     afterAll(async () => {
-      await db.end();
+      await clearDbPools(dbPools);
       await httpServer.shutdown();
       await cache.db.shutdown();
       await cache.healthCheck.shutdown();
@@ -95,8 +112,6 @@ describe('NetworkInfoHttpService', () => {
       await cache.db.clear();
       await cache.healthCheck.clear();
       jest.clearAllMocks();
-      dbConnectionQuerySpy.mockClear();
-      clearCacheSpy.db.mockClear();
     });
 
     describe('start', () => {
@@ -104,7 +119,7 @@ describe('NetworkInfoHttpService', () => {
         await sleep(epochPollInterval * 2);
 
         expect(await epochMonitor.getLastKnownEpoch()).toBeDefined();
-        expect(clearCacheSpy).not.toHaveBeenCalled();
+        expect(clearCacheSpy.db).not.toHaveBeenCalled();
       });
     });
 
@@ -131,6 +146,8 @@ describe('NetworkInfoHttpService', () => {
 
       it('forwards the networkInfoProvider health response with provider client', async () => {
         const response = await provider.healthCheck();
+        expect(dbQuerySpy.main).toHaveBeenCalledTimes(0);
+        expect(dbQuerySpy.healthCheck).toHaveBeenCalledTimes(1);
         expect(response).toEqual(
           healthCheckResponseMock({
             blockNo: lastBlockNoInDb.block_no,
@@ -201,7 +218,7 @@ describe('NetworkInfoHttpService', () => {
         const cardanoNodeStakeSpy = jest.spyOn(cardanoNode, 'stakeDistribution');
         await provider.stake();
         await provider.stake();
-        expect(dbConnectionQuerySpy).toHaveBeenCalledTimes(stakeDbQueriesCount);
+        expect(dbQuerySpy.main).toHaveBeenCalledTimes(stakeDbQueriesCount);
         expect(cardanoNodeStakeSpy).toHaveBeenCalledTimes(stakeNodeQueriesCount);
         expect(cache.db.keys().length).toEqual(stakeTotalQueriesCount);
       });
@@ -213,7 +230,7 @@ describe('NetworkInfoHttpService', () => {
         expect(cache.db.keys().length).toEqual(0);
 
         await provider.stake();
-        expect(dbConnectionQuerySpy).toBeCalledTimes(stakeDbQueriesCount * 2);
+        expect(dbQuerySpy.main).toBeCalledTimes(stakeDbQueriesCount * 2);
         expect(cardanoNodeStakeSpy).toBeCalledTimes(stakeNodeQueriesCount * 2);
       });
 
@@ -225,9 +242,9 @@ describe('NetworkInfoHttpService', () => {
         await sleep(epochPollInterval * 2);
         expect(await epochMonitor.getLastKnownEpoch()).toEqual(currentEpochNo);
         expect(cache.db.keys().length).toEqual(stakeTotalQueriesCount);
-        expect(dbConnectionQuerySpy).toHaveBeenCalled();
+        expect(dbQuerySpy.main).toHaveBeenCalled();
         expect(cardanoNodeStakeSpy).toHaveBeenCalledTimes(stakeNodeQueriesCount);
-        expect(clearCacheSpy).not.toHaveBeenCalled();
+        expect(clearCacheSpy.db).not.toHaveBeenCalled();
       });
 
       it(
@@ -247,11 +264,11 @@ describe('NetworkInfoHttpService', () => {
           );
 
           await sleep(epochPollInterval);
-          expect(clearCacheSpy).toHaveBeenCalled();
+          expect(clearCacheSpy.db).toHaveBeenCalled();
 
           expect(await epochMonitor.getLastKnownEpoch()).toEqual(greaterEpoch);
           expect(cache.db.keys().length).toEqual(0);
-        }, db)
+        }, dbPools.main)
       );
     });
 
@@ -294,18 +311,18 @@ describe('NetworkInfoHttpService', () => {
       it('should query only once when the response is cached', async () => {
         await provider.lovelaceSupply();
         await provider.lovelaceSupply();
-        expect(dbConnectionQuerySpy).toHaveBeenCalledTimes(cacheItemsInSupplySummaryCount);
+        expect(dbQuerySpy.main).toHaveBeenCalledTimes(cacheItemsInSupplySummaryCount);
       });
 
       it('should call queries again once the cache is cleared', async () => {
         await cache.db.clear();
         await provider.lovelaceSupply();
         expect(cache.db.keys().length).toEqual(cacheItemsInSupplySummaryCount);
-        expect(dbConnectionQuerySpy).toBeCalledTimes(2);
+        expect(dbQuerySpy.main).toBeCalledTimes(2);
         await cache.db.clear();
         expect(cache.db.keys().length).toEqual(0);
         await provider.lovelaceSupply();
-        expect(dbConnectionQuerySpy).toBeCalledTimes(dbSyncQueriesCount * 2);
+        expect(dbQuerySpy.main).toBeCalledTimes(dbSyncQueriesCount * 2);
       });
     });
 

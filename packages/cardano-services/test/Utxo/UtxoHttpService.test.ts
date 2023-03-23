@@ -2,13 +2,21 @@ import { AddressWith, UtxoFixtureBuilder } from './fixtures/FixtureBuilder';
 import { Asset, Cardano, UtxoProvider } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, utxoHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { DataMocks } from '../data-mocks';
-import { DbSyncUtxoProvider, HttpServer, HttpServerConfig, UtxoHttpService } from '../../src';
+import { DbPools, LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
+import {
+  DbSyncUtxoProvider,
+  HttpServer,
+  HttpServerConfig,
+  InMemoryCache,
+  UNLIMITED_CACHE_TTL,
+  UtxoHttpService
+} from '../../src';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
 import { INFO, createLogger } from 'bunyan';
-import { LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
+import { clearDbPools } from '../util';
 import { getPort } from 'get-port-please';
 import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
 import { logger } from '@cardano-sdk/util-dev';
@@ -20,7 +28,7 @@ const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
 const BAD_REQUEST_STRING = 'Request failed with status code 400';
 
 describe('UtxoHttpService', () => {
-  let dbConnection: Pool;
+  let dbPools: DbPools;
   let httpServer: HttpServer;
   let utxoProvider: DbSyncUtxoProvider;
   let service: UtxoHttpService;
@@ -32,22 +40,28 @@ describe('UtxoHttpService', () => {
   let provider: UtxoProvider;
   let lastBlockNoInDb: LedgerTipModel;
   let fixtureBuilder: UtxoFixtureBuilder;
+  const cache = { db: new InMemoryCache(UNLIMITED_CACHE_TTL), healthCheck: new InMemoryCache(UNLIMITED_CACHE_TTL) };
 
   beforeAll(async () => {
     port = await getPort();
     baseUrl = `http://localhost:${port}/utxo`;
     clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
     config = { listen: { port } };
-    dbConnection = new Pool({
-      connectionString: process.env.POSTGRES_CONNECTION_STRING
-    });
-    fixtureBuilder = new UtxoFixtureBuilder(dbConnection, logger);
+    dbPools = {
+      healthCheck: new Pool({
+        connectionString: process.env.POSTGRES_CONNECTION_STRING
+      }),
+      main: new Pool({
+        connectionString: process.env.POSTGRES_CONNECTION_STRING
+      })
+    };
+    fixtureBuilder = new UtxoFixtureBuilder(dbPools.main, logger);
   });
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('healthy state', () => {
     beforeAll(async () => {
-      lastBlockNoInDb = (await dbConnection.query<LedgerTipModel>(findLedgerTip)).rows[0];
+      lastBlockNoInDb = (await dbPools.main.query<LedgerTipModel>(findLedgerTip)).rows[0];
       cardanoNode = mockCardanoNode(
         healthCheckResponseMock({
           blockNo: lastBlockNoInDb.block_no,
@@ -61,7 +75,7 @@ describe('UtxoHttpService', () => {
           withTip: true
         })
       ) as unknown as OgmiosCardanoNode;
-      utxoProvider = new DbSyncUtxoProvider({ cardanoNode, db: dbConnection, logger });
+      utxoProvider = new DbSyncUtxoProvider({ cache, cardanoNode, dbPools, logger });
       service = new UtxoHttpService({ logger, utxoProvider });
       provider = utxoHttpProvider(clientConfig);
       httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
@@ -69,7 +83,7 @@ describe('UtxoHttpService', () => {
       await httpServer.start();
     });
     afterAll(async () => {
-      await dbConnection.end();
+      await clearDbPools(dbPools);
       await httpServer.shutdown();
     });
 

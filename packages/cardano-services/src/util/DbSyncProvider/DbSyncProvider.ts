@@ -1,9 +1,22 @@
 import { Cardano, CardanoNode, HealthCheckResponse, Provider, ProviderDependencies } from '@cardano-sdk/core';
 import { DB_BLOCKS_BEHIND_TOLERANCE, DB_MAX_SAFE_INTEGER, LedgerTipModel, findLedgerTip } from './util';
-import { DEFAULT_HEALTH_CHECK_CACHE_TTL } from '../../Program/options';
 import { InMemoryCache } from '../../InMemoryCache';
 import { Logger } from 'ts-log';
 import { Pool } from 'pg';
+
+/**
+ * Dedicated DB pools
+ */
+export interface DbPools {
+  /**
+   * Main operational db pool
+   */
+  main: Pool;
+  /**
+   * Secondary health check db pool
+   */
+  healthCheck: Pool;
+}
 
 /**
  * Properties that are need to create DbSyncProvider
@@ -12,13 +25,13 @@ export interface DbSyncProviderDependencies extends ProviderDependencies {
   /**
    * Cache engines. Default: InMemoryCache with HealthCheck.cacheTTL as default TTL
    */
-  cache?: {
-    healthCheck?: InMemoryCache;
+  cache: {
+    healthCheck: InMemoryCache;
   };
   /**
-   * DB connection
+   * DB pools
    */
-  db: Pool;
+  dbPools: DbPools;
   /**
    * Ogmios Cardano Node provider
    */
@@ -34,7 +47,7 @@ export const DbSyncProvider = <
   BaseClass?: T
 ) => {
   abstract class Mixin extends (BaseClass || Object) implements Provider {
-    public db: Pool;
+    public dbPools: DbPools;
     public cardanoNode: CardanoNode;
     public logger: Logger;
     #cache: {
@@ -43,16 +56,13 @@ export const DbSyncProvider = <
 
     constructor(...args: AnyArgs) {
       const [dependencies, ...baseArgs] = [...args] as [DbSyncProviderDependencies, ...AnyArgs];
-      const { cache, db, cardanoNode, logger } = dependencies;
-
+      const { cache, dbPools, cardanoNode, logger } = dependencies;
       super(...baseArgs);
 
-      this.#cache = cache?.healthCheck
-        ? { healthCheck: cache.healthCheck }
-        : { healthCheck: new InMemoryCache(DEFAULT_HEALTH_CHECK_CACHE_TTL) };
-      this.db = db;
+      this.dbPools = dbPools;
       this.cardanoNode = cardanoNode;
       this.logger = logger;
+      this.#cache = cache;
     }
 
     public async healthCheck(): Promise<HealthCheckResponse> {
@@ -64,7 +74,7 @@ export const DbSyncProvider = <
         response.localNode = cardanoNode.localNode;
         const tip = await this.#cache.healthCheck.get(
           'db_tip',
-          async () => (await this.db.query<LedgerTipModel>(findLedgerTip)).rows[0]
+          async () => (await this.dbPools.healthCheck.query<LedgerTipModel>(findLedgerTip)).rows[0]
         );
 
         if (tip) {
@@ -101,7 +111,7 @@ export const DbSyncProvider = <
     ? I
     : never;
   type ReturnedType = BaseInstance & {
-    db: Pool;
+    dbPools: DbPools;
     cardanoNode: CardanoNode;
     logger: Logger;
     healthCheck: () => Promise<HealthCheckResponse>;
