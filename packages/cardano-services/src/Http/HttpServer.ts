@@ -1,11 +1,11 @@
 import * as OpenApiValidator from 'express-openapi-validator';
+import { DB_BLOCKS_BEHIND_TOLERANCE, listenPromise, serverClosePromise } from '../util';
 import { Gauge, Registry } from 'prom-client';
 import { HttpServerConfig, ServiceHealth, ServicesHealthCheckResponse } from './types';
 import { HttpService } from './HttpService';
 import { Logger } from 'ts-log';
 import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { RunnableModule, contextLogger, fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
-import { listenPromise, serverClosePromise } from '../util';
 import bodyParser from 'body-parser';
 import express from 'express';
 import expressPromBundle from 'express-prom-bundle';
@@ -69,31 +69,7 @@ export class HttpServer extends RunnableModule {
       })
     );
     if (this.#config?.metrics?.enabled) {
-      const promRegistry = new Registry();
-      const getServicesHealth = async () => await this.#getServicesHealth();
-      this.#healthGauge = new Gauge<string>({
-        async collect() {
-          const currentValue = Number((await getServicesHealth()).ok);
-          // Set a health check gauge value with type number.Health check values: 0/1 (unhealthy/healthy)
-          this.set(currentValue);
-        },
-        help: 'healthcheck_help',
-        labelNames: ['method', 'statusCode'],
-        name: 'healthcheck',
-        registers: [promRegistry]
-      });
-      this.app.use(
-        expressPromBundle({
-          includeMethod: true,
-          promRegistry,
-          ...this.#config.metrics.options
-        })
-      );
-      this.logger.info(
-        `Prometheus metrics: ${(await promRegistry.getMetricsAsArray()).map(({ name }) => name)} configured at ${
-          this.#config.metrics.options?.metricsPath || '/metrics'
-        }`
-      );
+      await this.initMetrics();
     }
     const requestLogger = contextLogger(this.logger, 'request');
     this.app.use((req, _res, next) => {
@@ -179,5 +155,73 @@ export class HttpServer extends RunnableModule {
     for (const dependency of this.#dependencies.runnableDependencies) await dependency.shutdown();
 
     return serverClosePromise(this.server);
+  }
+
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+  private async initMetrics() {
+    const promRegistry = new Registry();
+    const anyService = this.#dependencies.services[0];
+    // eslint-disable-next-line no-new
+    new Gauge<string>({
+      async collect() {
+        const currentValue = (await anyService.healthCheck()).localNode?.networkSync;
+        if (currentValue) this.set(currentValue * 100);
+      },
+      help: 'Node synchronization status',
+      name: 'node_sync_percentage',
+      registers: [promRegistry]
+    });
+    for (const service of this.#dependencies.services) {
+      // '-' replaced with '_' to satisfy name validation rules
+      const serviceName = service.slug.replace('-', '_');
+      // eslint-disable-next-line no-new
+      new Gauge<string>({
+        async collect() {
+          const data = await service.healthCheck();
+          let syncStatus;
+          if (data.projectedTip && data.localNode?.ledgerTip) {
+            syncStatus =
+              (data.projectedTip.blockNo * 100) / (data.localNode?.ledgerTip?.blockNo - DB_BLOCKS_BEHIND_TOLERANCE);
+          }
+          if (syncStatus) {
+            // syncStatus calculation takes into account DB_BLOCKS_BEHIND_TOLERANCE
+            // and reports 100% if the value is within the rage
+            // (ledgerTip - DB_BLOCKS_BEHIND_TOLERANCE) ≤  projectedTip ≤ ledgerTip
+            if (syncStatus > 100) this.set(100);
+            else this.set(syncStatus);
+          }
+        },
+        help: `Projection synchronization status - ${service.name}`,
+        name: `projection_sync_percentage_${serviceName}`,
+        registers: [promRegistry]
+      });
+    }
+
+    // eslint-disable-next-line unicorn/consistent-function-scoping
+    const getServicesHealth = async () => await this.#getServicesHealth();
+    this.#healthGauge = new Gauge<string>({
+      // eslint-disable-next-line sonarjs/no-identical-functions
+      async collect() {
+        const currentValue = Number((await getServicesHealth()).ok);
+        // Set a health check gauge value with type number.Health check values: 0/1 (unhealthy/healthy)
+        this.set(currentValue);
+      },
+      help: 'healthcheck_help',
+      labelNames: ['method', 'statusCode'],
+      name: 'healthcheck',
+      registers: [promRegistry]
+    });
+    this.app.use(
+      expressPromBundle({
+        includeMethod: true,
+        promRegistry,
+        ...this.#config.metrics?.options
+      })
+    );
+    this.logger.info(
+      `Prometheus metrics: ${(await promRegistry.getMetricsAsArray()).map(({ name }) => name)} configured at ${
+        this.#config.metrics?.options?.metricsPath || '/metrics'
+      }`
+    );
   }
 }
