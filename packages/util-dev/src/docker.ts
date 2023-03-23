@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { containerExec, imageExists, pullImageAsync } from 'dockerode-utils';
 import Docker from 'dockerode';
 

@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 /* eslint-disable max-params */
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-empty-function */

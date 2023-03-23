@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-/* eslint-disable max-len */
 /* eslint-disable sonarjs/cognitive-complexity */
 import * as envalid from 'envalid';
 import { Cardano, QueryStakePoolsArgs, StakePoolProvider } from '@cardano-sdk/core';

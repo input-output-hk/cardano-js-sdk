@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { Cardano, Paginated } from '@cardano-sdk/core';
 import { currentEpoch, ledgerTip, stakeKeyHash } from './mockData';
 import { somePartialStakePools } from '@cardano-sdk/util-dev';

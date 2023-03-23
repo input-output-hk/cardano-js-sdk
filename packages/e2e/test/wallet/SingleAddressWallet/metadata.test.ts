@@ -26,6 +26,9 @@ describe('SingleAddressWallet/metadata', () => {
     const walletUtil = createWalletUtil(wallet);
     const { minimumCoin } = await walletUtil.validateValue({ coins: 0n });
 
+    // Make sure the wallet has sufficient funds to run this test
+    await walletReady(wallet, minimumCoin);
+
     const builtTx = await buildTx({ logger, observableWallet: wallet })
       .addOutput({ address: ownAddress, value: { coins: minimumCoin } })
       .setMetadata(metadata)

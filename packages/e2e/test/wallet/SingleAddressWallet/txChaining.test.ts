@@ -6,14 +6,14 @@ import { submitAndConfirm, walletReady } from '../../util';
 
 const env = getEnv(walletVariables);
 
-describe('SingleAddressWallet', () => {
+describe('SingleAddressWallet/txChaining', () => {
   let wallet: ObservableWallet;
 
   beforeAll(async () => {
     jest.setTimeout(180_000);
     wallet = (await getWallet({ env, logger, name: 'Test Wallet' })).wallet;
 
-    await walletReady(wallet);
+    await walletReady(wallet, 1_000_000n);
   });
 
   afterAll(() => {

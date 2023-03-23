@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { ExtendedStakePoolMetadata } from './ExtendedStakePoolMetadata';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { Lovelace } from '../Value';

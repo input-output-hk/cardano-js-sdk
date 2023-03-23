@@ -1,60 +1,48 @@
-import { IncomingMessage, createServer } from 'http';
-import { getRandomPort } from 'get-port-please';
+import { createGenericMockServer } from '@cardano-sdk/util-dev';
 
-export const mockTokenRegistry = (handler: (req?: IncomingMessage) => { body?: unknown; code?: number } = () => ({})) =>
-  // eslint-disable-next-line func-call-spacing
-  new Promise<{ closeMock: () => Promise<void>; serverUrl: string }>(async (resolve, reject) => {
-    try {
-      const port = await getRandomPort();
-      const server = createServer(async (req, res) => {
-        const { body, code } = handler(req);
+export const tokenMetadataMockResults: Record<string, unknown> = {
+  '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65': {
+    description: { value: 'This is my first NFT of the macaron cake' },
+    name: { value: 'macaron cake token' },
+    subject: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65'
+  },
+  '728847c7898b06f180de05c80b37d38bf77a9ea22bd1e222b8014d964e46542d66696c6573': {
+    description: { value: 'This is my second NFT' },
+    name: { value: 'Bored Ape' },
+    subject: '728847c7898b06f180de05c80b37d38bf77a9ea22bd1e222b8014d964e46542d66696c6573'
+  },
+  f43a62fdc3965df486de8a0d32fe800963589c41b38946602a0dc53541474958: {
+    decimals: { value: 8 },
+    description: { value: 'SingularityNET' },
+    logo: { value: 'testLogo' },
+    name: { value: 'SingularityNet AGIX Token' },
+    subject: 'f43a62fdc3965df486de8a0d32fe800963589c41b38946602a0dc53541474958',
+    ticker: { value: 'AGIX' },
+    url: { value: 'https://singularitynet.io/' }
+  }
+};
 
-        res.setHeader('Content-Type', 'application/json');
+export const mockTokenRegistry = createGenericMockServer((handler) => async (req, res) => {
+  const { body, code } = await handler(req);
 
-        if (body) {
-          res.statusCode = code || 200;
+  res.setHeader('Content-Type', 'application/json');
 
-          return res.end(JSON.stringify(body));
-        }
+  if (body) {
+    res.statusCode = code || 200;
 
-        const buffers: Buffer[] = [];
-        for await (const chunk of req) buffers.push(chunk);
-        const data = Buffer.concat(buffers).toString();
-        const subjects: unknown[] = [];
+    return res.end(JSON.stringify(body));
+  }
 
-        for (const subject of JSON.parse(data).subjects) {
-          const mockResult = {
-            description: { value: 'This is my first NFT of the macaron cake' },
-            name: { value: 'macaron cake token' },
-            subject: subject as string
-          };
+  const buffers: Buffer[] = [];
+  for await (const chunk of req) buffers.push(chunk);
+  const data = Buffer.concat(buffers).toString();
+  const subjects: unknown[] = [];
 
-          if (mockResult) subjects.push(mockResult);
-        }
+  for (const subject of JSON.parse(data).subjects) {
+    const mockResult = tokenMetadataMockResults[subject as string];
 
-        return res.end(JSON.stringify({ subjects }));
-      });
+    if (mockResult) subjects.push(mockResult);
+  }
 
-      let resolver: () => void = jest.fn();
-      let rejecter: (reason: unknown) => void = jest.fn();
-
-      // eslint-disable-next-line @typescript-eslint/no-shadow
-      const closePromise = new Promise<void>((resolve, reject) => {
-        resolver = resolve;
-        rejecter = reject;
-      });
-
-      server.on('error', rejecter);
-      server.listen(port, 'localhost', () =>
-        resolve({
-          closeMock: () => {
-            server.close((error) => (error ? rejecter(error) : resolver()));
-            return closePromise;
-          },
-          serverUrl: `http://localhost:${port}`
-        })
-      );
-    } catch (error) {
-      reject(error);
-    }
-  });
+  return res.end(JSON.stringify({ subjects }));
+});

@@ -1,5 +1,3 @@
-/* eslint-disable max-len */
-
 import { Cardano, Paginated, QueryStakePoolsArgs } from '@cardano-sdk/core';
 export interface PoolUpdateModel {
   id: string; // pool hash id

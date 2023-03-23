@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { AddressType, GroupedAddress, util } from '@cardano-sdk/key-management';
 import { AddressesModel, WalletVars } from './types';
 import { Cardano } from '@cardano-sdk/core';

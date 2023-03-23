@@ -5,6 +5,7 @@ import { TokenMetadataService } from './types';
 import axios, { AxiosInstance } from 'axios';
 
 export const DEFAULT_TOKEN_METADATA_CACHE_TTL = 600;
+export const DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT = 3 * 1000;
 export const DEFAULT_TOKEN_METADATA_SERVER_URL = 'https://tokens.cardano.org';
 
 interface NumberValue {
@@ -54,6 +55,11 @@ export interface CardanoTokenRegistryConfiguration {
    * The Cardano Token Registry public API base URL. Default: https://tokens.cardano.org
    */
   tokenMetadataServerUrl?: string;
+
+  /**
+   * The HTTP request timeout value
+   */
+  tokenMetadataRequestTimeout?: number;
 }
 
 interface CardanoTokenRegistryConfigurationWithRequired extends CardanoTokenRegistryConfiguration {
@@ -98,12 +104,16 @@ export class CardanoTokenRegistry implements TokenMetadataService {
   constructor({ cache, logger }: CardanoTokenRegistryDependencies, config: CardanoTokenRegistryConfiguration = {}) {
     const defaultConfig: CardanoTokenRegistryConfigurationWithRequired = {
       tokenMetadataCacheTTL: DEFAULT_TOKEN_METADATA_CACHE_TTL,
+      tokenMetadataRequestTimeout: DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT,
       tokenMetadataServerUrl: DEFAULT_TOKEN_METADATA_SERVER_URL,
       ...config
     };
 
     this.#cache = cache || new InMemoryCache(defaultConfig.tokenMetadataCacheTTL);
-    this.#axiosClient = axios.create({ baseURL: defaultConfig.tokenMetadataServerUrl });
+    this.#axiosClient = axios.create({
+      baseURL: defaultConfig.tokenMetadataServerUrl,
+      timeout: defaultConfig.tokenMetadataRequestTimeout
+    });
     this.#logger = logger;
   }
 
@@ -150,12 +160,11 @@ export class CardanoTokenRegistry implements TokenMetadataService {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         throw new ProviderError(
-          ProviderFailure.ConnectionFailure,
+          ProviderFailure.Unhealthy,
           error,
-          'CardanoTokenRegistry failed to fetch asset metadata from the token registry server'
+          `CardanoTokenRegistry failed to fetch asset metadata from the token registry server due to: ${error.message}`
         );
       }
-
       throw error;
     }
 

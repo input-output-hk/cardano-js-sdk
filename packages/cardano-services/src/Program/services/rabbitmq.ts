@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 /* eslint-disable promise/no-nesting */
 /* eslint-disable no-use-before-define */
 /* eslint-disable @typescript-eslint/no-explicit-any */

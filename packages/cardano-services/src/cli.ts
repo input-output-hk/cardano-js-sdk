@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 /* eslint-disable no-console */
-/* eslint-disable max-len */
 /* eslint-disable complexity */
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable unicorn/no-nested-ternary */
@@ -40,7 +39,11 @@ import {
 } from './Program';
 import { Command, Option } from 'commander';
 import { DB_CACHE_TTL_DEFAULT } from './InMemoryCache';
-import { DEFAULT_TOKEN_METADATA_CACHE_TTL, DEFAULT_TOKEN_METADATA_SERVER_URL } from './Asset';
+import {
+  DEFAULT_TOKEN_METADATA_CACHE_TTL,
+  DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT,
+  DEFAULT_TOKEN_METADATA_SERVER_URL
+} from './Asset';
 import { EPOCH_POLL_INTERVAL_DEFAULT } from './util';
 import { HttpServer } from './Http';
 import { URL } from 'url';
@@ -167,6 +170,15 @@ withCommonOptions(
       .env('TOKEN_METADATA_CACHE_TTL')
       .default(DEFAULT_TOKEN_METADATA_CACHE_TTL)
       .argParser(cacheTtlValidator)
+  )
+  .addOption(
+    new Option(
+      '--token-metadata-request-timeout <tokenMetadataRequestTimeout>',
+      ProviderServerOptionDescriptions.PaginationPageSizeLimit
+    )
+      .env('TOKEN_METADATA_REQUEST_TIMEOUT')
+      .default(DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT)
+      .argParser((interval) => Number.parseInt(interval, 10))
   )
   .addOption(
     new Option('--use-blockfrost <true/false>', ProviderServerOptionDescriptions.UseBlockfrost)

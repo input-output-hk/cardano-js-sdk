@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import * as Crypto from '@cardano-sdk/crypto';
 import { CML, Cardano, coreToCml } from '@cardano-sdk/core';
 import { cip36 } from '../src';

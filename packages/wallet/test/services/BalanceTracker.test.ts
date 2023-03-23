@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 /* eslint-disable prettier/prettier */
 /* eslint-disable no-multi-spaces */
 /* eslint-disable space-in-parens */

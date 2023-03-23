@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 /* eslint-disable sonarjs/no-duplicate-string */
 import { DB_CACHE_TTL_DEFAULT } from '../../../src/InMemoryCache';
 import { EPOCH_POLL_INTERVAL_DEFAULT, listenPromise, serverClosePromise } from '../../../src/util';

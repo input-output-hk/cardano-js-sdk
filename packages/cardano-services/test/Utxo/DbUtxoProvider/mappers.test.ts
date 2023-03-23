@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { Cardano } from '@cardano-sdk/core';
 import { UtxoModel, utxosToCore } from '../../../src/Utxo';
 
