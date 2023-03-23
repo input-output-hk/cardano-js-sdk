@@ -1,6 +1,7 @@
 import { BuildInfo } from '../Http';
 import { CACHE_TTL_LOWER_LIMIT, CACHE_TTL_UPPER_LIMIT } from '../InMemoryCache';
-import { MissingProgramOption, ProviderServerOptionDescriptions, ServiceNames } from '../Program';
+import { MissingProgramOption } from '../Program/errors/MissingProgramOption';
+import { ProviderServerOptionDescriptions, ServiceNames } from '../Program/programs/types';
 import { validate } from 'jsonschema';
 import fs from 'fs';
 

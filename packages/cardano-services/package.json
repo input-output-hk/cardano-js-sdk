@@ -44,7 +44,7 @@
     "cleanup": "run-s cleanup:dist cleanup:nm",
     "cli": "ts-node --transpile-only src/cli.ts",
     "coverage": "yarn test --coverage",
-    "circular-deps:check": "madge --circular dist",
+    "circular-deps:check": "madge --circular dist/cjs",
     "lint": "eslint -c ../../complete.eslintrc.js \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint:fix": "yarn lint --fix",
     "mainnet:dev": "DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker compose -p cardano-services-mainnet -f docker-compose.yml -f docker-compose-dev.yml up",
