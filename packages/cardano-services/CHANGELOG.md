@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.11.0-nightly.3...@cardano-sdk/cardano-services@0.11.0-nightly.4) (2023-03-24)
+
+### Features
+
+- **cardano-services:** changes stake pool search provider to not repeat on going queries ([8162246](https://github.com/input-output-hk/cardano-js-sdk/commit/8162246c80713443cf0047035c2bfbb123f6d855))
+- **cardano-services:** optimizes the query to get the ledger tip ([a81b013](https://github.com/input-output-hk/cardano-js-sdk/commit/a81b01366a4a914e4a58986c61f02d7c2fb2c7c1))
+- expose configurable request timeout ([cea5379](https://github.com/input-output-hk/cardano-js-sdk/commit/cea5379e77afda47c2b10f5f9ad66695637f5a01))
+
 ## [0.11.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.11.0-nightly.2...@cardano-sdk/cardano-services@0.11.0-nightly.3) (2023-03-22)
 
 ### Features

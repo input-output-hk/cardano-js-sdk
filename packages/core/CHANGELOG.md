@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.11.0-nightly.2...@cardano-sdk/core@0.11.0-nightly.3) (2023-03-24)
+
+### ⚠ BREAKING CHANGES
+
+- - stack property of returned errors was removed
+
+### Code Refactoring
+
+- the TxSubmit endpoint no longer adds the stack trace when returning domain errors ([f018f30](https://github.com/input-output-hk/cardano-js-sdk/commit/f018f30caea1c9cf764a419431ac642b98733bb9))
+
 ## [0.11.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.11.0-nightly.1...@cardano-sdk/core@0.11.0-nightly.2) (2023-03-22)
 
 ### Features
