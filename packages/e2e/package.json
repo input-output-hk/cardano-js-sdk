@@ -21,6 +21,7 @@
     "artillery:wallet-restoration": "WORKERS=1 node -r ts-node/register ../../node_modules/.bin/artillery run --dotenv ./.env test/artillery/wallet-restoration/WalletRestoration.yml",
     "load-test-custom:stake-pool-query": "ts-node test/load-test-custom/stake-pool-search/stake-pool-search.test.ts",
     "load-test-custom:wallet-init": "ts-node test/load-test-custom/wallet-init/wallet-init.test.ts",
+    "load-test-custom:wallet-restoration": "ts-node test/load-test-custom/wallet-restoration/wallet-restoration.test.ts",
     "test": "shx echo 'test' command not implemented yet",
     "test:blockfrost": "jest -c jest.config.js --forceExit --selectProjects blockfrost --runInBand --verbose",
     "test:utils": "jest -c jest.config.js --forceExit --selectProjects utils --verbose",

@@ -5,6 +5,7 @@ import { Cardano } from '@cardano-sdk/core';
 import { DataMocks } from '../../data-mocks';
 import { ExtMetadataFormat } from '../../../src/StakePool/types';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import { IncomingMessage } from 'http';
 import {
   StakePoolMetadataServiceError,
   StakePoolMetadataServiceFailure,
@@ -202,15 +203,11 @@ describe('StakePoolMetadataService', () => {
     it('returns StakePoolMetadataServiceError with FailedToFetchExtendedSignature error code when it cant fetch the signature', async () => {
       let metadata: any;
 
-      let alreadyCalled = false;
-      const handler = async () => {
-        if (alreadyCalled) return { body: cip6ExtMetadataMock, code: 200 };
-        alreadyCalled = true;
+      const handler = async (req?: IncomingMessage) => {
+        if (req?.url === '/cip-6') return { body: cip6ExtMetadataMock, code: 200 };
+        if (req?.url === '/metadata') return { body: metadata, code: 200 };
 
-        return {
-          body: metadata,
-          code: 200
-        };
+        return { body: 'not found', code: 404 };
       };
 
       ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(handler));
@@ -218,7 +215,7 @@ describe('StakePoolMetadataService', () => {
       metadata = {
         ...mainExtMetadataMock,
         extDataUrl: `${serverUrl}/${ExtMetadataFormat.CIP6}`,
-        extSigUrl: UNFETCHABLE,
+        extSigUrl: `${serverUrl}/not/found`,
         extVkey: '00000000000000000000000000000000'
       };
 
@@ -235,8 +232,8 @@ describe('StakePoolMetadataService', () => {
         errors: [
           new StakePoolMetadataServiceError(
             StakePoolMetadataServiceFailure.FailedToFetchExtendedSignature,
-            new Error('getaddrinfo EAI_AGAIN some_url'),
-            `StakePoolMetadataService failed to fetch extended signature from ${UNFETCHABLE} due to connection error`
+            null,
+            `StakePoolMetadataService failed to fetch extended signature from ${metadata.extSigUrl} due to connection error`
           )
         ],
         metadata
