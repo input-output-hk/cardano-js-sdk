@@ -349,6 +349,8 @@ describe('HttpServer', () => {
       const response = await axios.get(`${apiUrlBase}/metrics`, { headers });
       expect(response.status).toBe(200);
       expect(response.data.includes('healthcheck 1')).toEqual(true);
+      expect(response.data.includes('node_sync_percentage')).toEqual(true);
+      expect(response.data.includes('projection_sync_percentage')).toEqual(true);
     });
     it('metrics endpoint with unhealthy service', async () => {
       const service = new SomeHttpService(ServiceNames.StakePool, provider, logger);
