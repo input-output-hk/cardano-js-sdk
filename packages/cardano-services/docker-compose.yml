@@ -1,166 +1,28 @@
-version: "3.9"
+version: '3.9'
+
+x-logging: &logging
+  logging:
+    driver: 'json-file'
+    options:
+      max-size: '400k'
+      max-file: '20'
 
 services:
   postgres:
-    image: postgres:${POSTGRES_VERSION:-11.5-alpine}
-    environment:
-      - POSTGRES_LOGGING=true
-      - POSTGRES_DB_FILE=/run/secrets/postgres_db
-      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
-      - POSTGRES_USER_FILE=/run/secrets/postgres_user
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    secrets:
-      - postgres_db
-      - postgres_password
-      - postgres_user
-    shm_size: '2gb'
     volumes:
       - postgres-data:/var/lib/postgresql/data
-    ports:
-      - ${POSTGRES_PORT:-5432}:5432
-    restart: on-failure
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200k"
-        max-file: "10"
 
   cardano-node-ogmios:
     image: cardanosolutions/cardano-node-ogmios:v${OGMIOS_VERSION:-5.6.0}_${CARDANO_NODE_VERSION:-1.35.5}-${NETWORK:-mainnet}
-    healthcheck:
-      retries: 200
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "400k"
-        max-file: "20"
-    ports:
-      - ${OGMIOS_PORT:-1337}:1337
-    restart: on-failure
     volumes:
       - ./config/network/${NETWORK:-mainnet}:/config
-      - node-db:/db
-      - node-ipc:/ipc
 
   cardano-db-sync:
-    image: inputoutput/cardano-db-sync:${CARDANO_DB_SYNC_VERSION:-13.1.0.0}
-    command:
-      [
-        "--config",
-        "/config/cardano-db-sync/config.json",
-        "--socket-path",
-        "/node-ipc/node.socket"
-      ]
-    environment:
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
-      - RESTORE_SNAPSHOT=${RESTORE_SNAPSHOT:-}
-      - RESTORE_RECREATE_DB=N
-    depends_on:
-      cardano-node-ogmios:
-        condition: service_healthy
-      postgres:
-        condition: service_healthy
-    secrets:
-      - postgres_password
-      - postgres_user
-      - postgres_db
     volumes:
       - ./config/network/${NETWORK:-mainnet}:/config
-      - db-sync-data:/var/lib/cexplorer
-      - node-ipc:/node-ipc
-    restart: on-failure
-    stop_signal: SIGINT
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200k"
-        max-file: "10"
-
-  rabbitmq:
-    image: rabbitmq:3.10-management
-    healthcheck:
-      test: rabbitmq-diagnostics -q ping
-      interval: 30s
-      timeout: 30s
-      retries: 3
-    ports:
-      # HTTP management UI
-      - '15672:15672'
-    restart: on-failure
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200k"
-        max-file: "10"
-    volumes:
-      - rabbitmq-db:/var/lib/rabbitmq/mnesia
-
-  provider-server:
-    build:
-      args:
-        - NETWORK=${NETWORK:-mainnet}
-      context: ../../
-      target: provider-server
-    depends_on:
-      cardano-node-ogmios:
-        condition: service_healthy
-      postgres:
-        condition: service_healthy
-    environment:
-      - DB_CACHE_TTL=${DB_CACHE_TTL:-120}
-      - DISABLE_DB_CACHE=${DISABLE_DB_CACHE:-false}
-      - DISABLE_STAKE_POOL_METRIC_APY=${DISABLE_STAKE_POOL_METRIC_APY:-false}
-      - ENABLE_METRICS=${ENABLE_METRICS:-false}
-      - EPOCH_POLL_INTERVAL=${EPOCH_POLL_INTERVAL:-10000}
-      - LOGGER_MIN_SEVERITY=${LOGGER_MIN_SEVERITY:-info}
-      - OGMIOS_URL=ws://cardano-node-ogmios:1337
-      - POSTGRES_POOL_MAX=${POSTGRES_POOL_MAX:-10}
-      - RABBITMQ_URL=amqp://rabbitmq:5672
-      - SERVICE_NAMES=${SERVICE_NAMES:-asset,chain-history,network-info,rewards,stake-pool,tx-submit,utxo}
-      - USE_BLOCKFROST=${USE_BLOCKFROST:-false}
-      - USE_QUEUE=${USE_QUEUE:-false}
-    ports:
-      - ${API_PORT:-4000}:3000
-    restart: on-failure
-    secrets:
-      - postgres_db
-      - postgres_password
-      - postgres_user
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200k"
-        max-file: "10"
-
-  worker:
-    build:
-      context: ../../
-      target: worker
-    depends_on:
-      cardano-node-ogmios:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-    environment:
-      - LOGGER_MIN_SEVERITY=${LOGGER_MIN_SEVERITY:-info}
-      - OGMIOS_URL=ws://cardano-node-ogmios:1337
-      - PARALLEL=${PARALLEL:-false}
-      - PARALLEL_TX=${PARALLEL_TX:-3}
-      - POLLING_CYCLE=${POLLING_CYCLE:-500}
-      - RABBITMQ_URL=amqp://rabbitmq:5672
-    restart: on-failure
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200k"
-        max-file: "10"
 
   blockfrost-worker:
+    <<: *logging
     build:
       context: ../../
       target: blockfrost-worker
@@ -182,11 +44,6 @@ services:
       - postgres_db
       - postgres_password
       - postgres_user
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200k"
-        max-file: "10"
 
 secrets:
   blockfrost_key:
@@ -197,9 +54,6 @@ secrets:
     file: ./placeholder-secrets/postgres_password
   postgres_user:
     file: ./placeholder-secrets/postgres_user
+
 volumes:
-  db-sync-data:
-  node-db:
-  node-ipc:
   postgres-data:
-  rabbitmq-db:
