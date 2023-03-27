@@ -162,7 +162,7 @@ export class RabbitMqTxSubmitProvider implements TxSubmitProvider {
       };
 
       try {
-        txId = cmlUtil.deserializeTx(signedTransaction).id;
+        txId = (await cmlUtil.deserializeTx(signedTransaction)).id;
 
         this.#dependencies.logger.info(`${moduleName}: queuing tx id: ${txId}`);
 

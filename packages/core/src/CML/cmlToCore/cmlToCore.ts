@@ -481,21 +481,3 @@ export const utxo = (cslUtxos: CML.TransactionUnspentOutput[]) =>
   usingAutoFree((scope) =>
     cslUtxos.map((cslUtxo) => [txIn(scope.manage(cslUtxo.input())), txOut(scope.manage(cslUtxo.output()))])
   );
-
-export const newTx = (cslTx: CML.Transaction): Cardano.Tx =>
-  usingAutoFree((scope) => {
-    const transactionHash = Cardano.TransactionId.fromHexBlob(
-      bytesToHex(scope.manage(CML.hash_transaction(scope.manage(cslTx.body()))).to_bytes())
-    );
-    const auxiliary_data = scope.manage(cslTx.auxiliary_data());
-
-    const witnessSet = scope.manage(cslTx.witness_set());
-
-    return {
-      auxiliaryData: txAuxiliaryData(auxiliary_data),
-      body: txBody(scope.manage(cslTx.body())),
-      id: transactionHash,
-      isValid: cslTx.is_valid(),
-      witness: txWitnessSet(witnessSet)
-    };
-  });

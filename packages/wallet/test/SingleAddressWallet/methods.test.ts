@@ -224,7 +224,7 @@ describe('SingleAddressWallet methods', () => {
         expect(txSubmitProvider.submitTx).toBeCalledTimes(1);
         expect(txSubmitProvider.submitTx).toBeCalledWith({ signedTransaction: serializedForeignTx });
 
-        const { body, id } = TxCBOR.deserialize(cbor);
+        const { body, id } = await TxCBOR.deserialize(cbor);
         const outgoingTx = {
           body,
           cbor,

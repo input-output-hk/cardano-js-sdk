@@ -49,10 +49,10 @@ export class SmartTxSubmitProvider implements TxSubmitProvider {
     this.#retryBackoffConfig = retryBackoffConfig;
   }
 
-  submitTx(args: SubmitTxArgs): Promise<void> {
+  async submitTx(args: SubmitTxArgs): Promise<void> {
     const {
       body: { validityInterval }
-    } = cmlUtil.deserializeTx(args.signedTransaction);
+    } = await cmlUtil.deserializeTx(args.signedTransaction);
 
     const onlineAndWithinValidityInterval$ = combineLatest([this.#connectionStatus$, this.#tip$]).pipe(
       tap(([_, { slot }]) => {

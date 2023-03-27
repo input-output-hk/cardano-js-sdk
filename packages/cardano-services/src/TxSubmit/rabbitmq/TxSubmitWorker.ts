@@ -294,7 +294,7 @@ export class TxSubmitWorker extends EventEmitter {
       const txBody = new Uint8Array(content);
 
       // Register the handling of current transaction
-      txId = cmlUtil.deserializeTx(txBody).id;
+      txId = (await cmlUtil.deserializeTx(txBody)).id;
 
       this.#dependencies.logger.info(`${moduleName}: submitting tx #${counter} id: ${txId}`);
       this.#dependencies.logger.debug(`${moduleName}: tx #${counter} dump:`, [content.toString('hex')]);

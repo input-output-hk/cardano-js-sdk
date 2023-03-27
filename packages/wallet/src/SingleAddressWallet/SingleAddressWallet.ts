@@ -130,11 +130,11 @@ export const DEFAULT_POLLING_CONFIG = {
 const isOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx): input is OutgoingTx =>
   typeof input === 'object' && 'cbor' in input;
 const isTxCBOR = (input: Cardano.Tx | TxCBOR | OutgoingTx): input is TxCBOR => typeof input === 'string';
-const processOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx): OutgoingTx => {
+const processOutgoingTx = async (input: Cardano.Tx | TxCBOR | OutgoingTx): Promise<OutgoingTx> => {
   // TxCbor
   if (isTxCBOR(input)) {
     return {
-      body: TxCBOR.deserialize(input).body,
+      body: (await TxCBOR.deserialize(input)).body,
       cbor: input,
       // Do not re-serialize transaction body to compute transaction id
       id: Cardano.TransactionId.fromTxBodyCbor(TxBodyCBOR.fromTxCBOR(input))
@@ -497,7 +497,7 @@ export class SingleAddressWallet implements ObservableWallet {
     input: Cardano.Tx | TxCBOR | OutgoingTx,
     { mightBeAlreadySubmitted }: SubmitTxOptions = {}
   ): Promise<Cardano.TransactionId> {
-    const outgoingTx = processOutgoingTx(input);
+    const outgoingTx = await processOutgoingTx(input);
     this.#logger.debug(`Submitting transaction ${outgoingTx.id}`);
     this.#newTransactions.submitting$.next(outgoingTx);
     try {

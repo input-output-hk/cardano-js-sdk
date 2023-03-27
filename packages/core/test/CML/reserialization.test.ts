@@ -1,15 +1,15 @@
-import { CML, cmlToCore, coreToCml } from '../../src';
-import { ManagedFreeableScope } from '@cardano-sdk/util';
+import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
+import { Transaction } from '../../src';
 
 describe('reserialization', () => {
   let scope: ManagedFreeableScope;
 
   const testReserialization = (testName: string, originalSerialized: string) =>
-    test(testName, () => {
-      const cmlTx = CML.Transaction.from_bytes(Buffer.from(originalSerialized, 'hex'));
-      const deserialized = cmlToCore.newTx(cmlTx);
-      const cmlTxReserialized = coreToCml.tx(scope, deserialized);
-      const reserialized = Buffer.from(cmlTxReserialized.to_bytes()).toString('hex');
+    test(testName, async () => {
+      const cmlTx = scope.manage(await Transaction.fromCbor(HexBlob(originalSerialized)));
+      const deserialized = cmlTx.toCore();
+      const cmlTxReserialized = scope.manage(Transaction.fromCore(scope, deserialized));
+      const reserialized = cmlTxReserialized.toCbor();
       expect(reserialized).toEqual(originalSerialized);
     });
 

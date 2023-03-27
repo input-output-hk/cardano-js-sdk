@@ -8,33 +8,34 @@ const txBody =
 
 describe('deserializeTx', () => {
   describe('converts input', () => {
-    it('Cardano.util.HexBlob', () => {
-      const tx = deserializeTx(HexBlob(txBody));
+    it('Cardano.util.HexBlob', async () => {
+      const tx = await deserializeTx(HexBlob(txBody));
       expect(tx.id).toEqual(txId);
     });
 
-    it('Buffer', () => {
-      const tx = deserializeTx(Buffer.from(txBody, 'hex'));
+    it('Buffer', async () => {
+      const tx = await deserializeTx(Buffer.from(txBody, 'hex'));
       expect(tx.id).toEqual(txId);
     });
 
-    it('Uint8Array', () => {
-      const tx = deserializeTx(Uint8Array.from(Buffer.from(txBody, 'hex')));
+    it('Uint8Array', async () => {
+      const tx = await deserializeTx(Uint8Array.from(Buffer.from(txBody, 'hex')));
       expect(tx.id).toEqual(txId);
     });
 
-    it('string', () => {
-      const tx = deserializeTx(txBody);
+    it('string', async () => {
+      const tx = await deserializeTx(txBody);
       expect(tx.id).toEqual(txId);
     });
   });
 
   describe('throws error', () => {
-    it('if input is not an hex string', () => expect(() => deserializeTx('qwerty')).toThrow(InvalidStringError));
-    it('if input is not a valid transaction', () =>
-      expect(() => deserializeTx('abcdef')).toThrow(
+    it('if input is not an hex string', async () =>
+      expect(deserializeTx('qwerty')).rejects.toThrow(InvalidStringError));
+    it('if input is not a valid transaction', async () =>
+      expect(deserializeTx('abcdef')).rejects.toThrow(
         // eslint-disable-next-line max-len
-        "Deserialization failed in Transaction because: Invalid cbor: not the right type, expected `Array' byte received `Map'."
+        'Failed to parse'
       ));
   });
 });
