@@ -10,7 +10,8 @@ import {
   createSlotEpochCalc
 } from '@cardano-sdk/core';
 import { DbSyncProvider, DbSyncProviderDependencies, Disposer, EpochMonitor } from '../../util';
-import { GenesisData, InMemoryCache, UNLIMITED_CACHE_TTL } from '../..';
+import { GenesisData } from '../../types';
+import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../InMemoryCache';
 import { Logger } from 'ts-log';
 import { NetworkInfoBuilder } from './NetworkInfoBuilder';
 import { RunnableModule } from '@cardano-sdk/util';

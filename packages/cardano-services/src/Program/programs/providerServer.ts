@@ -1,23 +1,13 @@
 /* eslint-disable complexity */
 /* eslint-disable sonarjs/cognitive-complexity */
-import {
-  AssetHttpService,
-  CardanoTokenRegistry,
-  DbSyncAssetProvider,
-  DbSyncNftMetadataService,
-  StubTokenMetadataService
-} from '../../Asset';
+import { AssetHttpService } from '../../Asset/AssetHttpService';
 import { CardanoNode } from '@cardano-sdk/core';
+import { CardanoTokenRegistry } from '../../Asset/CardanoTokenRegistry';
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../../ChainHistory';
-import {
-  CommonProgramOptions,
-  OgmiosProgramOptions,
-  PosgresProgramOptions,
-  PostgresOptionDescriptions,
-  RabbitMqProgramOptions
-} from '../options';
+import { DbSyncAssetProvider } from '../../Asset/DbSyncAssetProvider';
 import { DbSyncEpochPollService, loadGenesisData } from '../../util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../NetworkInfo';
+import { DbSyncNftMetadataService, StubTokenMetadataService } from '../../Asset';
 import { DbSyncRewardsProvider, RewardsHttpService } from '../../Rewards';
 import { DbSyncStakePoolProvider, StakePoolHttpService, createHttpStakePoolMetadataService } from '../../StakePool';
 import { DbSyncUtxoProvider, UtxoHttpService } from '../../Utxo';
@@ -28,6 +18,8 @@ import { InMemoryCache, NoCache } from '../../InMemoryCache';
 import { Logger } from 'ts-log';
 import { MissingProgramOption, MissingServiceDependency, RunnableDependencies, UnknownServiceName } from '../errors';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
+import { PostgresOptionDescriptions } from '../options/postgres';
+import { ProviderServerArgs, ProviderServerOptionDescriptions, ServiceNames } from './types';
 import { SrvRecord } from 'dns';
 import { TxSubmitHttpService } from '../../TxSubmit';
 import { URL } from 'url';
@@ -45,20 +37,6 @@ export const PAGINATION_PAGE_SIZE_LIMIT_DEFAULT = 25;
 export const USE_BLOCKFROST_DEFAULT = false;
 export const USE_QUEUE_DEFAULT = false;
 
-/**
- * Used as mount segments, so must be URL-friendly
- *
- */
-export enum ServiceNames {
-  Asset = 'asset',
-  StakePool = 'stake-pool',
-  NetworkInfo = 'network-info',
-  TxSubmit = 'tx-submit',
-  Utxo = 'utxo',
-  ChainHistory = 'chain-history',
-  Rewards = 'rewards'
-}
-
 export const cardanoNodeDependantServices = new Set([
   ServiceNames.NetworkInfo,
   ServiceNames.StakePool,
@@ -67,37 +45,6 @@ export const cardanoNodeDependantServices = new Set([
   ServiceNames.Asset,
   ServiceNames.ChainHistory
 ]);
-
-export enum ProviderServerOptionDescriptions {
-  CardanoNodeConfigPath = 'Cardano node config path',
-  DbCacheTtl = 'Cache TTL in seconds between 60 and 172800 (two days), an option for database related operations',
-  DisableDbCache = 'Disable DB cache',
-  DisableStakePoolMetricApy = 'Omit this metric for improved query performance',
-  EpochPollInterval = 'Epoch poll interval',
-  TokenMetadataCacheTtl = 'Token Metadata API cache TTL in minutes',
-  TokenMetadataServerUrl = 'Token Metadata API server URL',
-  UseBlockfrost = 'Enables Blockfrost cached data DB',
-  UseQueue = 'Enables RabbitMQ',
-  PaginationPageSizeLimit = 'Pagination page size limit shared across all providers'
-}
-
-export type ProviderServerArgs = CommonProgramOptions &
-  PosgresProgramOptions &
-  OgmiosProgramOptions &
-  RabbitMqProgramOptions & {
-    cardanoNodeConfigPath?: string;
-    disableDbCache?: boolean;
-    disableStakePoolMetricApy?: boolean;
-    tokenMetadataCacheTTL?: number;
-    tokenMetadataServerUrl?: string;
-    tokenMetadataRequestTimeout?: number;
-    epochPollInterval: number;
-    dbCacheTtl: number;
-    useBlockfrost?: boolean;
-    useQueue?: boolean;
-    paginationPageSizeLimit?: number;
-    serviceNames: ServiceNames[];
-  };
 
 export interface LoadProviderServerDependencies {
   dnsResolver?: (serviceName: string) => Promise<SrvRecord>;

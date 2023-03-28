@@ -1,7 +1,7 @@
 import { BlockfrostWorker, BlockfrostWorkerConfig, getPool } from '../services';
 import { CommonProgramOptions, PosgresProgramOptions, PostgresOptionDescriptions } from '../options';
 import { Logger } from 'ts-log';
-import { MissingProgramOption } from '..';
+import { MissingProgramOption } from '../errors/MissingProgramOption';
 import { SrvRecord } from 'dns';
 import { createDnsResolver } from '../utils';
 import { createLogger } from 'bunyan';

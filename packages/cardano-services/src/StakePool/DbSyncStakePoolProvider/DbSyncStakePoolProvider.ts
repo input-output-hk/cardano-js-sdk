@@ -18,7 +18,7 @@ import {
   StakePoolResults
 } from './types';
 import { DbSyncProvider, DbSyncProviderDependencies, Disposer, EpochMonitor } from '../../util';
-import { GenesisData, InMemoryCache, StakePoolMetadataService, UNLIMITED_CACHE_TTL } from '../..';
+import { GenesisData } from '../../types';
 import {
   IDS_NAMESPACE,
   REWARDS_HISTORY_LIMIT_DEFAULT,
@@ -27,8 +27,10 @@ import {
   getStakePoolSortType,
   queryCacheKey
 } from './util';
+import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../InMemoryCache';
 import { PromiseOrValue, RunnableModule, isNotNil, resolveObjectValues } from '@cardano-sdk/util';
 import { StakePoolBuilder } from './StakePoolBuilder';
+import { StakePoolMetadataService } from '../types';
 import { toStakePoolResults } from './mappers';
 import merge from 'lodash/merge';
 
