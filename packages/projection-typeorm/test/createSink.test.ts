@@ -81,28 +81,28 @@ describe('createSink', () => {
 
     const project = (sink: Sink<{}>) =>
       firstValueFrom(
-        projectIntoSink({
-          logger,
-          projections: {},
-          sink,
-          source$: Bootstrap.fromCardanoNode({
-            buffer,
-            cardanoNode: patchObject(cardanoNode, {
-              findIntersect: (points) =>
-                cardanoNode.findIntersect(points).pipe(
-                  map((intersection) =>
-                    patchObject(intersection, {
-                      chainSync$: defer(() => {
-                        numChainSyncSubscriptions++;
-                        return intersection.chainSync$;
-                      })
+        Bootstrap.fromCardanoNode({
+          buffer,
+          cardanoNode: patchObject(cardanoNode, {
+            findIntersect: (points) =>
+              cardanoNode.findIntersect(points).pipe(
+                map((intersection) =>
+                  patchObject(intersection, {
+                    chainSync$: defer(() => {
+                      numChainSyncSubscriptions++;
+                      return intersection.chainSync$;
                     })
-                  )
+                  })
                 )
-            }),
-            logger
+              )
+          }),
+          logger
+        }).pipe(
+          projectIntoSink({
+            projections: {},
+            sink
           })
-        })
+        )
       );
 
     beforeEach(() => (numChainSyncSubscriptions = 0));
@@ -153,7 +153,7 @@ describe('createSink', () => {
         dataSource$: of(dataSource),
         logger
       });
-      const source$ = defer(() =>
+      project$ = defer(() =>
         Bootstrap.fromCardanoNode({
           buffer,
           cardanoNode: {
@@ -165,13 +165,12 @@ describe('createSink', () => {
           },
           logger
         })
+      ).pipe(
+        projectIntoSink({
+          projections: {},
+          sink
+        })
       );
-      project$ = projectIntoSink({
-        logger,
-        projections: {},
-        sink,
-        source$
-      });
     });
 
     it('is persistent', async () => {

@@ -117,12 +117,12 @@ describe('resuming projection when intersection is not local tip', () => {
   });
 
   const project = (cardanoNode: ObservableCardanoNode, buffer: StabilityWindowBuffer, sink: Sink<typeof projections>) =>
-    projectIntoSink({
-      logger,
-      projections,
-      sink,
-      source$: Bootstrap.fromCardanoNode({ buffer, cardanoNode, logger })
-    });
+    Bootstrap.fromCardanoNode({ buffer, cardanoNode, logger }).pipe(
+      projectIntoSink({
+        projections,
+        sink
+      })
+    );
 
   const testRollbackAndContinue = (
     buffer: StabilityWindowBuffer,

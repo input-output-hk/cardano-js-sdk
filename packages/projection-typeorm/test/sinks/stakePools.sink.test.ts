@@ -41,21 +41,20 @@ describe('sinks/stakePools', () => {
   });
 
   const project$ = () =>
-    projectIntoSink({
-      logger,
-      projections,
-      sink: createSink({
-        buffer,
-        dataSource$: of(dataSource),
-        logger
-      }),
-      source$: Bootstrap.fromCardanoNode({
-        buffer,
-        cardanoNode: data.cardanoNode,
-        logger
+    Bootstrap.fromCardanoNode({
+      buffer,
+      cardanoNode: data.cardanoNode,
+      logger
+    }).pipe(
+      projectIntoSink({
+        projections,
+        sink: createSink({
+          buffer,
+          dataSource$: of(dataSource),
+          logger
+        })
       })
-    });
-
+    );
   const projectTilFirst = async (filter: (evt: Projections.ProjectionsEvent<typeof projections>) => boolean) =>
     lastValueFrom(project$().pipe(takeWhile((evt) => !filter(evt), true)));
 

@@ -26,12 +26,13 @@ const projectAll = (
   sink: Sink<typeof projections>
 ) =>
   lastValueFrom(
-    projectIntoSink({
-      logger,
-      projections,
-      sink,
-      source$: Bootstrap.fromCardanoNode({ buffer, cardanoNode, logger })
-    }).pipe(toArray())
+    Bootstrap.fromCardanoNode({ buffer, cardanoNode, logger }).pipe(
+      projectIntoSink({
+        projections,
+        sink
+      }),
+      toArray()
+    )
   );
 
 describe('projectIntoSink', () => {
@@ -182,16 +183,17 @@ describe('projectIntoSink', () => {
   it('can be used with a subset of available projections', async () => {
     const subsetOfProjections = pick(allProjections, ['stakeKeys']);
     await lastValueFrom(
-      projectIntoSink({
-        logger,
-        projections: subsetOfProjections,
-        sink,
-        source$: Bootstrap.fromCardanoNode({
-          buffer,
-          cardanoNode: dataWithPoolRetirement.cardanoNode,
-          logger
-        })
-      }).pipe(toArray())
+      Bootstrap.fromCardanoNode({
+        buffer,
+        cardanoNode: dataWithPoolRetirement.cardanoNode,
+        logger
+      }).pipe(
+        projectIntoSink({
+          projections: subsetOfProjections,
+          sink
+        }),
+        toArray()
+      )
     );
     expect(store.stakeKeys.size).toBeGreaterThan(0);
     expect(store.stakePools.size).toBe(0);

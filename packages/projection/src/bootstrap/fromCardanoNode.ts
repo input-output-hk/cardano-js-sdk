@@ -7,8 +7,7 @@ import {
   ChainSyncEventType,
   Intersection,
   ObservableCardanoNode,
-  ObservableChainSync,
-  PointOrOrigin
+  ObservableChainSync
 } from '@cardano-sdk/core';
 import { DefaultProjectionProps } from '../projections';
 import { Logger } from 'ts-log';
@@ -16,6 +15,8 @@ import { Observable, combineLatest, concat, defer, map, mergeMap, noop, of, take
 import { ProjectionSource } from './types';
 import { StabilityWindowBuffer } from '../sinks';
 import { UnifiedProjectorEvent } from '../types';
+import { contextLogger } from '@cardano-sdk/util';
+import { pointDescription } from '../util';
 import { withEpochBoundary, withEpochNo, withNetworkInfo, withRolledBackBlock } from '../operators';
 import uniq from 'lodash/uniq';
 
@@ -28,9 +29,6 @@ const isIntersectionBlock = (block: Cardano.Block, intersection: Intersection) =
 
 const blocksToPoints = (blocks: Array<Cardano.Block | 'origin'>) =>
   uniq([...blocks.map((p) => (p === 'origin' ? p : p.header)), 'origin' as const]);
-
-const pointDescription = (point: PointOrOrigin) =>
-  point === 'origin' ? 'origin' : `slot ${point.slot}, block ${point.hash}`;
 
 const syncFromIntersection = ({
   cardanoNode,
@@ -124,14 +122,15 @@ const rollbackAndSyncFromIntersection = ({
  */
 export const fromCardanoNode = ({
   buffer,
-  logger,
+  logger: baseLogger,
   cardanoNode
 }: {
   cardanoNode: ObservableCardanoNode;
   logger: Logger;
   buffer: StabilityWindowBuffer;
-}): ProjectionSource =>
-  combineLatest([buffer.tip$, buffer.tail$]).pipe(
+}): ProjectionSource => {
+  const logger = contextLogger(baseLogger, 'Bootstrap');
+  return combineLatest([buffer.tip$, buffer.tail$]).pipe(
     take(1),
     mergeMap((blocks) => {
       const points = blocksToPoints(blocks);
@@ -174,3 +173,4 @@ export const fromCardanoNode = ({
       );
     })
   );
+};

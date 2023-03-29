@@ -1,7 +1,7 @@
 // Runtime dependency: `yarn preprod:up cardano-node-ogmios postgres` (can be any network)
 /* eslint-disable import/no-extraneous-dependencies */
-const { Projections, projectIntoSink } = require('@cardano-sdk/projection');
-const { createDataSource, createSinks } = require('@cardano-sdk/projection-typeorm');
+const { Bootstrap, Projections, projectIntoSink, logProjectionProgress } = require('@cardano-sdk/projection');
+const { createDataSource, createSink, TypeormStabilityWindowBuffer } = require('@cardano-sdk/projection-typeorm');
 const { OgmiosObservableCardanoNode } = require('@cardano-sdk/ogmios');
 const { from, of } = require('rxjs');
 const { createDatabase } = require('typeorm-extension');
@@ -24,13 +24,29 @@ const connectionConfig = {
 
 const dataSource = createDataSource({
   connectionConfig,
-  devOptions: {
-    dropSchema: true,
-    synchronize: true
-  },
+  devOptions: process.argv.includes('--drop')
+    ? {
+        dropSchema: true,
+        synchronize: true
+      }
+    : undefined,
   logger,
   projections
 });
+
+const dataSource$ = from(
+  (async () => {
+    await createDatabase({
+      options: {
+        type: 'postgres',
+        ...connectionConfig,
+        installExtensions: true
+      }
+    });
+    await dataSource.initialize();
+    return dataSource;
+  })()
+);
 
 const cardanoNode = new OgmiosObservableCardanoNode(
   {
@@ -41,25 +57,22 @@ const cardanoNode = new OgmiosObservableCardanoNode(
   { logger }
 );
 
-projectIntoSink({
+const buffer = new TypeormStabilityWindowBuffer({ logger });
+
+Bootstrap.fromCardanoNode({
+  buffer,
   cardanoNode,
-  logger,
-  projections,
-  sinksFactory: () =>
-    createSinks({
-      dataSource$: from(
-        (async () => {
-          await createDatabase({
-            options: {
-              type: 'postgres',
-              ...connectionConfig,
-              installExtensions: true
-            }
-          });
-          await dataSource.initialize();
-          return dataSource;
-        })()
-      ),
-      logger
-    })
-}).subscribe();
+  logger
+})
+  .pipe(
+    projectIntoSink({
+      projections,
+      sink: createSink({
+        buffer,
+        dataSource$,
+        logger
+      })
+    }),
+    logProjectionProgress(logger)
+  )
+  .subscribe();

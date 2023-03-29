@@ -4,3 +4,4 @@ export * as Bootstrap from './bootstrap';
 export * from './sinks';
 export * from './projectIntoSink';
 export * from './types';
+export * from './logProjectionProgress';
