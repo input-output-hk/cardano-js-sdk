@@ -328,7 +328,7 @@ describe('Service dependency abstractions', () => {
       }
     });
 
-    it('should resolve initialize without reconnection logic with one time ws connection type', async () => {
+    it('should resolve DNS twice during initialization without reconnection logic with long ws connection type', async () => {
       const srvRecord = { name: 'localhost', port: ogmiosPortDefault, priority: 1, weight: 1 };
       const failingOgmiosMockPort = await getRandomPort();
       let resolverAlreadyCalled = false;
@@ -347,10 +347,7 @@ describe('Service dependency abstractions', () => {
       });
 
       await expect(provider.initialize()).resolves.toBeUndefined();
-      // This test should fail once we switch to a long-running ws connection
-      // dnsResolverMock should be called twice and try to dns resolve
-      // while init the txSubmitClient within `provider.initialize()`
-      expect(dnsResolverMock).toBeCalledTimes(1);
+      expect(dnsResolverMock).toBeCalledTimes(2);
       await provider.start();
       await provider.shutdown();
     });
