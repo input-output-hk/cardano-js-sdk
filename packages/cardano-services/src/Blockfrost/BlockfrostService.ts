@@ -1,4 +1,4 @@
-import { AvailableNetworks } from '..';
+import { AvailableNetworks } from '../Program/programs/blockfrostWorker';
 import { BlockFrostAPI } from '@blockfrost/blockfrost-js';
 import { BlockfrostCacheBuilder } from './builder';
 import { Cardano, Provider } from '@cardano-sdk/core';

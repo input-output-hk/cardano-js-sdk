@@ -6,15 +6,18 @@ import {
   DbSyncNftMetadataService,
   HttpServer,
   HttpServerConfig,
+  InMemoryCache,
   NftMetadataService,
-  TokenMetadataService
+  TokenMetadataService,
+  UNLIMITED_CACHE_TTL
 } from '../../src';
 import { AssetProvider, Cardano } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, assetInfoHttpProvider } from '@cardano-sdk/cardano-services-client';
+import { DbPools, LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
 import { INFO, createLogger } from 'bunyan';
-import { LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
+import { clearDbPools } from '../util';
 import { createDbSyncMetadataService } from '../../src/Metadata';
 import { getPort } from 'get-port-please';
 import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
@@ -26,12 +29,13 @@ const APPLICATION_JSON = 'application/json';
 const APPLICATION_CBOR = 'application/cbor';
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
 const BAD_REQUEST_STRING = 'Request failed with status code 400';
+
 describe('AssetHttpService', () => {
   let apiUrlBase: string;
   let assetProvider: AssetProvider;
   let closeMock: () => Promise<void> = jest.fn();
   let config: HttpServerConfig;
-  let db: Pool;
+  let dbPools: DbPools;
   let httpServer: HttpServer;
   let ntfMetadataService: NftMetadataService;
   let service: AssetHttpService;
@@ -54,13 +58,16 @@ describe('AssetHttpService', () => {
   describe('healthy state', () => {
     beforeAll(async () => {
       ({ closeMock, serverUrl } = await mockTokenRegistry(async () => ({})));
-      db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
+      dbPools = {
+        healthCheck: new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING }),
+        main: new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING })
+      };
       ntfMetadataService = new DbSyncNftMetadataService({
-        db,
+        db: dbPools.main,
         logger,
-        metadataService: createDbSyncMetadataService(db, logger)
+        metadataService: createDbSyncMetadataService(dbPools.main, logger)
       });
-      lastBlockNoInDb = (await db.query<LedgerTipModel>(findLedgerTip)).rows[0];
+      lastBlockNoInDb = (await dbPools.main.query<LedgerTipModel>(findLedgerTip)).rows[0];
       cardanoNode = mockCardanoNode(
         healthCheckResponseMock({
           blockNo: lastBlockNoInDb.block_no,
@@ -74,19 +81,29 @@ describe('AssetHttpService', () => {
           withTip: true
         })
       ) as unknown as OgmiosCardanoNode;
+      const cache = { db: new InMemoryCache(UNLIMITED_CACHE_TTL), healthCheck: new InMemoryCache(UNLIMITED_CACHE_TTL) };
+
       tokenMetadataService = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl: serverUrl });
-      assetProvider = new DbSyncAssetProvider({ cardanoNode, db, logger, ntfMetadataService, tokenMetadataService });
+      assetProvider = new DbSyncAssetProvider({
+        cache,
+        cardanoNode,
+        dbPools,
+        logger,
+        ntfMetadataService,
+        tokenMetadataService
+      });
       service = new AssetHttpService({ assetProvider, logger });
       httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
       provider = assetInfoHttpProvider(clientConfig);
-      fixtureBuilder = new AssetFixtureBuilder(db, logger);
+      fixtureBuilder = new AssetFixtureBuilder(dbPools.main, logger);
       await httpServer.initialize();
       await httpServer.start();
     });
+
     afterAll(async () => {
       await httpServer.shutdown();
       tokenMetadataService.shutdown();
-      await db.end();
+      await clearDbPools(dbPools);
       await closeMock();
     });
 

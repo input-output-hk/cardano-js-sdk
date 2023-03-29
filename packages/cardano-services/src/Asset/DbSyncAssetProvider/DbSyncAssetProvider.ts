@@ -26,10 +26,10 @@ export class DbSyncAssetProvider extends DbSyncProvider() implements AssetProvid
   #dependencies: DbSyncAssetProviderDependencies;
 
   constructor(dependencies: DbSyncAssetProviderDependencies) {
-    const { db, cardanoNode, logger } = dependencies;
-    super({ cardanoNode, db, logger });
+    const { cache, dbPools, cardanoNode, logger } = dependencies;
+    super({ cache, cardanoNode, dbPools, logger });
 
-    this.#builder = new AssetBuilder(db, logger);
+    this.#builder = new AssetBuilder(dbPools.main, logger);
     this.#dependencies = dependencies;
   }
 

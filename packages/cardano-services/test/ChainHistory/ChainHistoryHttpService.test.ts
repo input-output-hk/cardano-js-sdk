@@ -4,14 +4,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
 import { ChainHistoryFixtureBuilder, TxWith } from './fixtures/FixtureBuilder';
-import { ChainHistoryHttpService, DbSyncChainHistoryProvider, HttpServer, HttpServerConfig } from '../../src';
+import {
+  ChainHistoryHttpService,
+  DbSyncChainHistoryProvider,
+  HttpServer,
+  HttpServerConfig,
+  InMemoryCache,
+  UNLIMITED_CACHE_TTL
+} from '../../src';
 import { CreateHttpProviderConfig, chainHistoryHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { DB_MAX_SAFE_INTEGER } from '../../src/ChainHistory/DbSyncChainHistory/queries';
 import { DataMocks } from '../data-mocks';
+import { DbPools, LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
 import { HexBlob } from '@cardano-sdk/util';
-import { LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
+import { clearDbPools } from '../util';
 import { createDbSyncMetadataService } from '../../src/Metadata';
 import { getPort } from 'get-port-please';
 import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
@@ -27,7 +35,7 @@ const APPLICATION_JSON = 'application/json';
 const PAGINATION_PAGE_SIZE_LIMIT = 5;
 
 describe('ChainHistoryHttpService', () => {
-  let dbConnection: Pool;
+  let dbPools: DbPools;
   let httpServer: HttpServer;
   let chainHistoryProvider: DbSyncChainHistoryProvider;
   let service: ChainHistoryHttpService;
@@ -39,22 +47,24 @@ describe('ChainHistoryHttpService', () => {
   let cardanoNode: OgmiosCardanoNode;
   let lastBlockNoInDb: LedgerTipModel;
   let fixtureBuilder: ChainHistoryFixtureBuilder;
+  const cache = { db: new InMemoryCache(UNLIMITED_CACHE_TTL), healthCheck: new InMemoryCache(UNLIMITED_CACHE_TTL) };
 
   beforeAll(async () => {
     port = await getPort();
     baseUrl = `http://localhost:${port}/chain-history`;
     clientConfig = { baseUrl, logger };
     config = { listen: { port } };
-    dbConnection = new Pool({
-      connectionString: process.env.POSTGRES_CONNECTION_STRING
-    });
-    fixtureBuilder = new ChainHistoryFixtureBuilder(dbConnection, logger);
+    dbPools = {
+      healthCheck: new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING }),
+      main: new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING })
+    };
+    fixtureBuilder = new ChainHistoryFixtureBuilder(dbPools.main, logger);
   });
 
   describe('healthy state', () => {
     beforeAll(async () => {
-      const metadataService = createDbSyncMetadataService(dbConnection, logger);
-      lastBlockNoInDb = (await dbConnection.query<LedgerTipModel>(findLedgerTip)).rows[0];
+      const metadataService = createDbSyncMetadataService(dbPools.main, logger);
+      lastBlockNoInDb = (await dbPools.main.query<LedgerTipModel>(findLedgerTip)).rows[0];
       cardanoNode = mockCardanoNode(
         healthCheckResponseMock({
           blockNo: lastBlockNoInDb.block_no,
@@ -70,7 +80,7 @@ describe('ChainHistoryHttpService', () => {
       ) as unknown as OgmiosCardanoNode;
       chainHistoryProvider = new DbSyncChainHistoryProvider(
         { paginationPageSizeLimit: PAGINATION_PAGE_SIZE_LIMIT },
-        { cardanoNode, db: dbConnection, logger, metadataService }
+        { cache, cardanoNode, dbPools, logger, metadataService }
       );
       service = new ChainHistoryHttpService({ chainHistoryProvider, logger });
       provider = chainHistoryHttpProvider(clientConfig);
@@ -83,7 +93,7 @@ describe('ChainHistoryHttpService', () => {
       await httpServer.start();
     });
     afterAll(async () => {
-      await dbConnection.end();
+      await clearDbPools(dbPools);
       await httpServer.shutdown();
     });
 

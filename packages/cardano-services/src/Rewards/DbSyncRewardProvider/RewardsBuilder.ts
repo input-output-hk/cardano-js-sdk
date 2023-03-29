@@ -1,7 +1,8 @@
 import { AccountBalanceModel, RewardEpochModel } from './types';
-import { Cardano, Range } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { Pool, QueryResult } from 'pg';
+import { Range } from '@cardano-sdk/util';
 import { findAccountBalance, findRewardsHistory } from './queries';
 
 export class RewardsBuilder {
