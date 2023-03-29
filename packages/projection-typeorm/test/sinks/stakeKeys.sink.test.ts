@@ -1,9 +1,10 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { DataSource, QueryRunner } from 'typeorm';
-import { Operators, Projections, SinkEventType } from '@cardano-sdk/projection';
+import { GranularSinkEvent, Operators, Projections } from '@cardano-sdk/projection';
 import { StakeKeyEntity } from '../../src';
-import { firstValueFrom } from 'rxjs';
-import { initializeDataSource } from '../connection';
+import { WithTypeormContext } from '../../src/types';
+import { firstValueFrom, of } from 'rxjs';
+import { initializeDataSource } from '../util';
 import { stakeKeys } from '../../src/sinks';
 
 describe('sinks/stakeKeys', () => {
@@ -12,10 +13,10 @@ describe('sinks/stakeKeys', () => {
 
   const processEvent = (projectedStakeKeys: Pick<Operators.WithStakeKeys['stakeKeys'], 'insert' | 'del'>) =>
     firstValueFrom(
-      stakeKeys.sink({
+      of({
         queryRunner,
         stakeKeys: projectedStakeKeys
-      } as SinkEventType<typeof stakeKeys>)
+      } as GranularSinkEvent<'stakeKeys', WithTypeormContext>).pipe(stakeKeys.sink$)
     );
 
   beforeEach(async () => {

@@ -1,9 +1,9 @@
+import { Bootstrap, Projections, projectIntoSink } from '@cardano-sdk/projection';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
-import { PoolRegistrationEntity, PoolRetirementEntity, StakePoolEntity, createSinksFactory } from '../../src';
-import { Projections, ProjectionsEvent, projectIntoSink } from '@cardano-sdk/projection';
-import { initializeDataSource } from '../connection';
+import { StakePoolEntity, TypeormStabilityWindowBuffer, createSink } from '../../src';
+import { initializeDataSource } from '../util';
 import { lastValueFrom, of, takeWhile } from 'rxjs';
 import pick from 'lodash/pick';
 
@@ -11,10 +11,9 @@ describe('sinks/stakePools', () => {
   const projections = pick(Projections.allProjections, 'stakePools');
   const data = chainSyncData(ChainSyncDataSet.WithPoolRetirement);
   let poolsRepo: Repository<StakePoolEntity>;
-  let registrationsRepo: Repository<PoolRegistrationEntity>;
-  let retirementsRepo: Repository<PoolRetirementEntity>;
   let dataSource: DataSource;
   let queryRunner: QueryRunner;
+  let buffer: TypeormStabilityWindowBuffer;
 
   const loadStakePool = async (id: Cardano.PoolId) => {
     const stakePool = await poolsRepo.findOne({
@@ -33,12 +32,7 @@ describe('sinks/stakePools', () => {
     dataSource = await initializeDataSource(projections);
     queryRunner = dataSource.createQueryRunner();
     poolsRepo = queryRunner.manager.getRepository(StakePoolEntity);
-    registrationsRepo = queryRunner.manager.getRepository(PoolRegistrationEntity);
-    retirementsRepo = queryRunner.manager.getRepository(PoolRetirementEntity);
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    registrationsRepo;
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    retirementsRepo;
+    buffer = new TypeormStabilityWindowBuffer({ allowNonSequentialBlockHeights: true, logger });
   });
 
   afterEach(async () => {
@@ -48,17 +42,21 @@ describe('sinks/stakePools', () => {
 
   const project$ = () =>
     projectIntoSink({
-      cardanoNode: data.cardanoNode,
       logger,
       projections,
-      sinksFactory: createSinksFactory({
-        allowNonSequentialBlockHeights: true,
+      sink: createSink({
+        buffer,
         dataSource$: of(dataSource),
+        logger
+      }),
+      source$: Bootstrap.fromCardanoNode({
+        buffer,
+        cardanoNode: data.cardanoNode,
         logger
       })
     });
 
-  const projectTilFirst = async (filter: (evt: ProjectionsEvent<typeof projections>) => boolean) =>
+  const projectTilFirst = async (filter: (evt: Projections.ProjectionsEvent<typeof projections>) => boolean) =>
     lastValueFrom(project$().pipe(takeWhile((evt) => !filter(evt), true)));
 
   it('typeorm loads correctly typed properties', async () => {

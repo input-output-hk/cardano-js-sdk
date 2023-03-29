@@ -1,6 +1,6 @@
 import { BlockDataEntity, BlockEntity, StakeKeyEntity } from '../src';
 import { EntityMetadataNotFoundError } from 'typeorm';
-import { initializeDataSource } from './connection';
+import { initializeDataSource } from './util';
 
 describe('createDataSource', () => {
   describe('with test configuration', () => {

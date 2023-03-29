@@ -1,7 +1,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { ChainSyncEventType } from '@cardano-sdk/core';
-import { InMemory } from '../../../src';
-import { defaultIfEmpty, firstValueFrom } from 'rxjs';
+import { GranularSinkEvent, InMemory } from '../../../src';
+import { firstValueFrom, of } from 'rxjs';
 import { stakeKeys } from '../../../src/sinks/inMemory/stakeKeys';
 
 describe('sinks/inMemory/stakeKeys', () => {
@@ -13,19 +13,16 @@ describe('sinks/inMemory/stakeKeys', () => {
       deregister: Crypto.Ed25519KeyHashHex[]
     ) => {
       await firstValueFrom(
-        stakeKeys
-          .sink({
+        stakeKeys(
+          of({
             eventType,
             stakeKeys: {
               del: eventType === ChainSyncEventType.RollForward ? deregister : register,
-              deregister: new Set(deregister),
-              insert: eventType === ChainSyncEventType.RollForward ? register : deregister,
-              register: new Set(register)
+              insert: eventType === ChainSyncEventType.RollForward ? register : deregister
             },
             store
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          } as any)
-          .pipe(defaultIfEmpty(null))
+          } as GranularSinkEvent<'stakeKeys', InMemory.WithInMemoryStore>)
+        )
       );
     };
     await sink(

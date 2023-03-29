@@ -1,5 +1,5 @@
 import { BlockEntity } from './entity/Block.entity';
-import { Projections, Sink, UnifiedProjectorEvent } from '@cardano-sdk/projection';
+import { GranularSink, Projections, UnifiedProjectorEvent } from '@cardano-sdk/projection';
 import { QueryRunner } from 'typeorm';
 import { Subject } from 'rxjs';
 import { WithNetworkInfo } from '@cardano-sdk/projection/dist/cjs/operators';
@@ -10,11 +10,10 @@ export interface WithTypeormContext {
   blockEntity: BlockEntity;
 }
 
-export interface WithTypeormSinkMetadata {
+export type TypeormSink<ProjectionId extends keyof Projections.AllProjections> = {
+  sink$: GranularSink<ProjectionId, WithTypeormContext>;
   entities: Function[];
-}
-
-export type TypeormSink<P> = Sink<P, WithTypeormContext> & WithTypeormSinkMetadata;
+};
 
 export type TypeormSinkEvent<P> = P extends Projections.Projection<infer ExtraProps>
   ? UnifiedProjectorEvent<ExtraProps & WithNetworkInfo & WithTypeormContext>

@@ -27,17 +27,17 @@ const event = (slotNo: number, eventType?: ChainSyncEventType) =>
   } as UnifiedProjectorEvent<WithNetworkInfo>);
 
 describe('InMemoryStabilityWindowBuffer', () => {
-  let buffer: InMemory.InMemoryStabilityWindowBuffer<WithNetworkInfo>;
+  let buffer: InMemory.InMemoryStabilityWindowBuffer;
 
   beforeEach(() => {
-    buffer = new InMemory.InMemoryStabilityWindowBuffer<WithNetworkInfo>();
+    buffer = new InMemory.InMemoryStabilityWindowBuffer();
   });
 
   it('emits tip$ and tail$ when adding and deleting blocks', async () => {
     const tips = firstValueFrom(buffer.tip$.pipe(take(10), toArray()));
     const tails = firstValueFrom(buffer.tail$.pipe(take(5), toArray()));
     buffer
-      .handleEvents(
+      .handleEvents()(
         from([
           event(1, ChainSyncEventType.RollForward),
           event(1, ChainSyncEventType.RollBackward),

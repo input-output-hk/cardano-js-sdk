@@ -1,7 +1,7 @@
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { InMemory } from '../../../src';
+import { GranularSinkEvent, InMemory } from '../../../src';
 import { PoolRetirement, PoolUpdate, WithCertificateSource } from '../../../src/operators';
-import { defaultIfEmpty, firstValueFrom } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 import { stakePools } from '../../../src/sinks/inMemory/stakePools';
 
 describe('sinks/inMemory/stakePools', () => {
@@ -14,8 +14,8 @@ describe('sinks/inMemory/stakePools', () => {
       retirements: PoolRetirement[]
     ) => {
       await firstValueFrom(
-        stakePools
-          .sink({
+        stakePools(
+          of({
             block: {
               header: {
                 slot: slotNo
@@ -24,9 +24,8 @@ describe('sinks/inMemory/stakePools', () => {
             eventType,
             stakePools: { retirements, updates },
             store
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          } as any)
-          .pipe(defaultIfEmpty(null))
+          } as GranularSinkEvent<'stakePools', InMemory.WithInMemoryStore>)
+        )
       );
     };
     const poolUpdateAtSlot1 = [

@@ -1,17 +1,16 @@
 import { BehaviorSubject, tap } from 'rxjs';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { StabilityWindowBuffer } from '../types';
-import { UnifiedProjectorOperator } from '../../types';
+import { UnifiedProjectorObservable } from '../../types';
 import { WithNetworkInfo } from '../../operators';
 
-export class InMemoryStabilityWindowBuffer<E extends WithNetworkInfo> implements StabilityWindowBuffer<E> {
+export class InMemoryStabilityWindowBuffer implements StabilityWindowBuffer {
   readonly #blocks: Cardano.Block[] = [];
   readonly tip$ = new BehaviorSubject<Cardano.Block | 'origin'>('origin');
   readonly tail$ = new BehaviorSubject<Cardano.Block | 'origin'>('origin');
-  readonly handleEvents: UnifiedProjectorOperator<E, E>;
 
-  constructor() {
-    this.handleEvents = (evt$) =>
+  handleEvents<E extends WithNetworkInfo>() {
+    return (evt$: UnifiedProjectorObservable<E>) =>
       evt$.pipe(
         tap(({ eventType, block, genesisParameters: { securityParameter } }) => {
           if (eventType === ChainSyncEventType.RollForward) {

@@ -24,3 +24,10 @@ export interface Freeable {
 export interface WithLogger {
   logger: Logger;
 }
+
+// https://stackoverflow.com/a/57117594
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Impossible<K extends keyof any> = {
+  [P in K]: never;
+};
+export type NoExtraProperties<T, U> = U & Impossible<Exclude<keyof U, keyof T>>;

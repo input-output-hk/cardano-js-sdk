@@ -3,12 +3,12 @@ import { In, Not, QueryRunner, Repository } from 'typeorm';
 import {
   MaxCertificatePointerIdCertificateIndex as MaxCertificatePointerIdCertIndex,
   MaxCertificatePointerIdTxIndex,
-  certificatePointerToId
+  certificatePointerToId,
+  typeormSink
 } from './util';
 import { PoolRegistrationEntity, PoolRetirementEntity, StakePoolEntity } from '../entity';
 import { Projections } from '@cardano-sdk/projection';
-import { TypeormSink, TypeormSinkEvent } from '../types';
-import { from } from 'rxjs';
+import { TypeormSinkEvent } from '../types';
 import omit from 'lodash/omit';
 
 type Event = TypeormSinkEvent<Projections.StakePoolsProjection>;
@@ -299,9 +299,9 @@ const rollBackward = async (evt: Event) => {
   await undoUpdateLatestCertificatesAndDeletePoolsWithZeroRegistrations(evt);
 };
 
-export const stakePools: TypeormSink<Projections.StakePoolsProjection> = {
+export const stakePools = typeormSink<'stakePools'>({
   entities: [StakePoolEntity, PoolRegistrationEntity, PoolRetirementEntity],
   sink(evt) {
-    return from(evt.eventType === ChainSyncEventType.RollForward ? rollForward(evt) : rollBackward(evt));
+    return evt.eventType === ChainSyncEventType.RollForward ? rollForward(evt) : rollBackward(evt);
   }
-};
+});

@@ -23,7 +23,7 @@ const blockDataSelect: FindOptionsSelect<BlockDataEntity> = {
   data: true as any
 };
 
-export interface TypeormStabilityWindowBufferProps {
+export interface TypeormStabilityWindowBufferProps extends WithLogger {
   /**
    * 100 by default
    */
@@ -34,32 +34,32 @@ export interface TypeormStabilityWindowBufferProps {
   allowNonSequentialBlockHeights?: boolean;
 }
 
-export class TypeormStabilityWindowBuffer
-  implements StabilityWindowBuffer<Operators.WithNetworkInfo & WithTypeormContext>
-{
+export class TypeormStabilityWindowBuffer implements StabilityWindowBuffer {
   #tail: Cardano.Block | 'origin';
+  #tip$: ReplaySubject<Cardano.Block | 'origin'>;
+  #tail$: ReplaySubject<Cardano.Block | 'origin'>;
+  tip$: Observable<Cardano.Block | 'origin'>;
+  tail$: Observable<Cardano.Block | 'origin'>;
   readonly #logger: Logger;
   readonly #compactEvery: number;
   readonly #allowNonSequentialBlockHeights?: boolean;
-  readonly #tip$ = new ReplaySubject<Cardano.Block | 'origin'>(1);
-  readonly #tail$ = new ReplaySubject<Cardano.Block | 'origin'>(1);
-  readonly tip$: Observable<Cardano.Block | 'origin'>;
-  readonly tail$: Observable<Cardano.Block | 'origin'>;
-  readonly handleEvents: UnifiedProjectorOperator<
-    Operators.WithNetworkInfo & WithTypeormContext,
-    Operators.WithNetworkInfo & WithTypeormContext
-  >;
 
-  constructor(
-    { allowNonSequentialBlockHeights, compactBufferEveryNBlocks = 100 }: TypeormStabilityWindowBufferProps,
-    dependencies: WithLogger
-  ) {
-    this.tip$ = this.#tip$.asObservable();
-    this.tail$ = this.#tail$.asObservable();
+  constructor({
+    allowNonSequentialBlockHeights,
+    compactBufferEveryNBlocks = 100,
+    logger
+  }: TypeormStabilityWindowBufferProps) {
+    this.start();
     this.#compactEvery = compactBufferEveryNBlocks;
     this.#allowNonSequentialBlockHeights = allowNonSequentialBlockHeights;
-    this.#logger = contextLogger(dependencies.logger, 'PgStabilityWindowBuffer');
-    this.handleEvents = (evt$) =>
+    this.#logger = contextLogger(logger, 'TypeormStabilityWindowBuffer');
+  }
+
+  handleEvents(): UnifiedProjectorOperator<
+    Operators.WithNetworkInfo & WithTypeormContext,
+    Operators.WithNetworkInfo & WithTypeormContext
+  > {
+    return (evt$) =>
       evt$.pipe(
         concatMap((evt) =>
           from(
@@ -84,6 +84,18 @@ export class TypeormStabilityWindowBuffer
     ]);
     this.#tip$.next(tip[0]?.data || 'origin');
     this.#setTail(tail[0]?.data || 'origin');
+  }
+
+  /**
+   * (Re)create tip$ and tail$ observables.
+   * Automatically called in constructor.
+   * Can be used to reuse the same buffer object after shutdown().
+   */
+  start() {
+    this.#tip$ = new ReplaySubject(1);
+    this.#tail$ = new ReplaySubject(1);
+    this.tip$ = this.#tip$.asObservable();
+    this.tail$ = this.#tail$.asObservable();
   }
 
   shutdown(): void {

@@ -1,6 +1,15 @@
 /* eslint-disable promise/always-return */
 import * as Postgres from '@cardano-sdk/projection-typeorm';
 import {
+  Bootstrap,
+  InMemory,
+  Projections,
+  Sink,
+  StabilityWindowBuffer,
+  WithBlock,
+  projectIntoSink
+} from '@cardano-sdk/projection';
+import {
   Cardano,
   ChainSyncEvent,
   ChainSyncEventType,
@@ -10,7 +19,6 @@ import {
 } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { ConnectionConfig } from '@cardano-ogmios/client';
-import { InMemory, Projections, SinksFactory, WithBlock, projectIntoSink } from '@cardano-sdk/projection';
 import { Observable, filter, firstValueFrom, lastValueFrom, of, share, take } from 'rxjs';
 import { OgmiosObservableCardanoNode } from '@cardano-sdk/ogmios';
 import { createDatabase } from 'typeorm-extension';
@@ -108,22 +116,23 @@ describe('resuming projection when intersection is not local tip', () => {
     ogmiosCardanoNode = new OgmiosObservableCardanoNode({ connectionConfig$: of(ogmiosConnectionConfig) }, { logger });
   });
 
-  const project = (cardanoNode: ObservableCardanoNode, sinksFactory: SinksFactory<typeof projections>) =>
+  const project = (cardanoNode: ObservableCardanoNode, buffer: StabilityWindowBuffer, sink: Sink<typeof projections>) =>
     projectIntoSink({
-      cardanoNode,
       logger,
       projections,
-      sinksFactory
+      sink,
+      source$: Bootstrap.fromCardanoNode({ buffer, cardanoNode, logger })
     });
 
   const testRollbackAndContinue = (
-    sinksFactory: SinksFactory<typeof projections>,
+    buffer: StabilityWindowBuffer,
+    sink: Sink<typeof projections>,
     getNumberOfLocalStakeKeys: () => Promise<number>
   ) => {
     it('rolls back local data to intersection and resumes projection from there', async () => {
       // Project some events until we find at least 1 stake key registration
       const firstEventWithKeyRegistrations = await firstValueFrom(
-        project(ogmiosCardanoNode, sinksFactory).pipe(filter((evt) => evt.stakeKeys.insert.length > 0))
+        project(ogmiosCardanoNode, buffer, sink).pipe(filter((evt) => evt.stakeKeys.insert.length > 0))
       );
       const lastEventFromOriginalSync = firstEventWithKeyRegistrations;
       const numStakeKeysBeforeFork = await getNumberOfLocalStakeKeys();
@@ -131,12 +140,12 @@ describe('resuming projection when intersection is not local tip', () => {
 
       // Simulate a fork by adding some blocks that are not on the ogmios chain
       const stubForkCardanoNode = createForkProjectionSource(ogmiosCardanoNode, lastEventFromOriginalSync);
-      await lastValueFrom(project(stubForkCardanoNode, sinksFactory).pipe(take(4)));
+      await lastValueFrom(project(stubForkCardanoNode, buffer, sink).pipe(take(4)));
       const numStakeKeysAfterFork = await getNumberOfLocalStakeKeys();
       expect(numStakeKeysAfterFork).toBeGreaterThan(numStakeKeysBeforeFork);
 
       // Continue projection from ogmios
-      const continue$ = project(ogmiosCardanoNode, sinksFactory).pipe(share());
+      const continue$ = project(ogmiosCardanoNode, buffer, sink).pipe(share());
       const rollForward$ = continue$.pipe(filter((evt) => evt.eventType === ChainSyncEventType.RollForward));
       const rolledBackKeyRegistrations$ = continue$.pipe(
         filter(
@@ -178,14 +187,13 @@ describe('resuming projection when intersection is not local tip', () => {
 
   describe('InMemory', () => {
     const store = InMemory.createStore();
-    const sinks = InMemory.createSinks(store);
-    testRollbackAndContinue(
-      () => sinks,
-      async () => store.stakeKeys.size
-    );
+    const buffer = new InMemory.InMemoryStabilityWindowBuffer();
+    const sink = InMemory.createSink(store, buffer);
+    testRollbackAndContinue(buffer, sink, async () => store.stakeKeys.size);
   });
 
   describe('typeorm', () => {
+    const buffer = new Postgres.TypeormStabilityWindowBuffer({ logger });
     const dataSource = Postgres.createDataSource({
       connectionConfig: pgConnectionConfig,
       devOptions: {
@@ -198,7 +206,8 @@ describe('resuming projection when intersection is not local tip', () => {
       },
       projections
     });
-    const sinksFactory = Postgres.createSinksFactory({
+    const sink = Postgres.createSink({
+      buffer,
       dataSource$: of(dataSource),
       logger
     });
@@ -219,6 +228,6 @@ describe('resuming projection when intersection is not local tip', () => {
     });
     afterAll(() => dataSource.destroy());
 
-    testRollbackAndContinue(sinksFactory, getNumberOfLocalStakeKeys);
+    testRollbackAndContinue(buffer, sink, getNumberOfLocalStakeKeys);
   });
 });

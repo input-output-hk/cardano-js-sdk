@@ -1,7 +1,6 @@
 import { Cardano, ChainSyncEventType, ChainSyncRollBackward } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, createTestScheduler } from '@cardano-sdk/util-dev';
-import { InMemory, Operators, StabilityWindowBuffer, UnifiedProjectorEvent } from '../../src';
-import { WithNetworkInfo } from '../../src/operators';
+import { InMemory, Operators, UnifiedProjectorEvent } from '../../src';
 import { stubBlockId } from '../util';
 
 const dataWithStakeKeyDeregistration = chainSyncData(ChainSyncDataSet.WithPoolRetirement);
@@ -29,7 +28,7 @@ const sourceRollback = (slot: number): ChainSyncRollBackward => {
 };
 
 describe('withRolledBackBlocks', () => {
-  let buffer: StabilityWindowBuffer<WithNetworkInfo>;
+  let buffer: InMemory.InMemoryStabilityWindowBuffer;
 
   beforeEach(() => {
     buffer = new InMemory.InMemoryStabilityWindowBuffer();
@@ -49,7 +48,7 @@ describe('withRolledBackBlocks', () => {
         source$.pipe(
           Operators.withRolledBackBlock(buffer),
           Operators.withNetworkInfo(dataWithStakeKeyDeregistration.cardanoNode),
-          buffer.handleEvents
+          buffer.handleEvents()
         )
       ).toBe('abcd(ef)', {
         a: { ...createEvent(ChainSyncEventType.RollForward, 0), ...dataWithStakeKeyDeregistration.networkInfo },

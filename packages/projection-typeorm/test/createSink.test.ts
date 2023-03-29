@@ -1,11 +1,11 @@
 /* eslint-disable unicorn/consistent-function-scoping */
-import { BlockDataEntity, BlockEntity, createSinks, createSinksFactory } from '../src';
+import { BlockDataEntity, BlockEntity, TypeormStabilityWindowBuffer, createSink } from '../src';
+import { Bootstrap, Projections, Sink, projectIntoSink } from '@cardano-sdk/projection';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger, patchObject } from '@cardano-sdk/util-dev';
 import { ConnectionNotFoundError, DataSource, QueryFailedError, QueryRunner } from 'typeorm';
 import {
   Observable,
-  Subject,
   combineLatest,
   defer,
   filter,
@@ -17,8 +17,7 @@ import {
   takeWhile,
   toArray
 } from 'rxjs';
-import { ProjectionsEvent, SinksFactory, projectIntoSink } from '@cardano-sdk/projection';
-import { initializeDataSource } from './connection';
+import { initializeDataSource } from './util';
 
 const { cardanoNode, networkInfo } = chainSyncData(ChainSyncDataSet.WithStakeKeyDeregistration);
 
@@ -52,28 +51,23 @@ const mockDataSource = (dataSources: DataSource[]) => {
   });
 };
 
-describe('createSinks', () => {
-  let project$: Observable<ProjectionsEvent<{}>>;
+describe('createSink', () => {
+  let project$: Observable<Projections.ProjectionsEvent<{}>>;
+  let buffer: TypeormStabilityWindowBuffer;
   let dataSource: DataSource;
   let queryRunner: QueryRunner;
-  let bufferTip$: Subject<Cardano.Block | 'origin'>;
-  let bufferTail$: Subject<Cardano.Block | 'origin'>;
 
   const getBufferSize = () => queryRunner.manager.count(BlockDataEntity);
   const getNumBlocks = () => queryRunner.manager.count(BlockEntity);
-  const recreateSubjects = () => {
-    bufferTip$ = new Subject();
-    bufferTail$ = new Subject();
-  };
   const getHeader = (tipOrTail: Cardano.Block | 'origin') => (tipOrTail as Cardano.Block).header;
 
   beforeEach(async () => {
     dataSource = await initializeDataSource({});
     queryRunner = dataSource.createQueryRunner();
-    recreateSubjects();
   });
 
   afterEach(async () => {
+    buffer.shutdown();
     await queryRunner.release();
     await dataSource.destroy();
   });
@@ -81,25 +75,33 @@ describe('createSinks', () => {
   describe('error handling', () => {
     let numChainSyncSubscriptions: number;
 
-    const project = (sinksFactory: SinksFactory<{}>) =>
+    beforeEach(() => {
+      buffer = new TypeormStabilityWindowBuffer({ logger });
+    });
+
+    const project = (sink: Sink<{}>) =>
       firstValueFrom(
         projectIntoSink({
-          cardanoNode: patchObject(cardanoNode, {
-            findIntersect: (points) =>
-              cardanoNode.findIntersect(points).pipe(
-                map((intersection) =>
-                  patchObject(intersection, {
-                    chainSync$: defer(() => {
-                      numChainSyncSubscriptions++;
-                      return intersection.chainSync$;
-                    })
-                  })
-                )
-              )
-          }),
           logger,
           projections: {},
-          sinksFactory
+          sink,
+          source$: Bootstrap.fromCardanoNode({
+            buffer,
+            cardanoNode: patchObject(cardanoNode, {
+              findIntersect: (points) =>
+                cardanoNode.findIntersect(points).pipe(
+                  map((intersection) =>
+                    patchObject(intersection, {
+                      chainSync$: defer(() => {
+                        numChainSyncSubscriptions++;
+                        return intersection.chainSync$;
+                      })
+                    })
+                  )
+                )
+            }),
+            logger
+          })
         })
       );
 
@@ -107,28 +109,32 @@ describe('createSinks', () => {
 
     it('retries connection when it fails during operation', async () => {
       const dataSource$ = mockDataSource([failingToCommitDataSource(dataSource), dataSource]);
-      const sinksFactory = jest.fn(
-        createSinksFactory({
+      const sink = jest.fn(
+        createSink({
+          buffer,
           dataSource$,
           logger
         })
       );
-      await project(sinksFactory);
+      await project(sink);
       expect(numChainSyncSubscriptions).toBe(1);
-      expect(sinksFactory).toBeCalledTimes(1);
+      // TODO: mock subscribe of returned observable and assert # of subscriptions
+      expect(sink).toBeCalledTimes(1);
     });
 
     it('retries initial connection opaquely', async () => {
       const dataSource$ = mockDataSource([failingToConnectDataSource(dataSource), dataSource]);
-      const sinksFactory = jest.fn(
-        createSinksFactory({
+      const sink = jest.fn(
+        createSink({
+          buffer,
           dataSource$,
           logger
         })
       );
-      await project(sinksFactory);
+      await project(sink);
       expect(numChainSyncSubscriptions).toBe(1);
-      expect(sinksFactory).toBeCalledTimes(1);
+      // TODO: mock subscribe of returned observable and assert # of subscriptions
+      expect(sink).toBeCalledTimes(1);
     });
   });
 
@@ -137,27 +143,34 @@ describe('createSinks', () => {
     const compactBufferEveryNBlocks = 100;
 
     beforeEach(() => {
-      const sinksFactory = () => {
-        const sinks = createSinks({
-          compactBufferEveryNBlocks,
-          dataSource$: of(dataSource),
+      buffer = new TypeormStabilityWindowBuffer({
+        allowNonSequentialBlockHeights: false,
+        compactBufferEveryNBlocks,
+        logger
+      });
+      const sink = createSink({
+        buffer,
+        dataSource$: of(dataSource),
+        logger
+      });
+      const source$ = defer(() =>
+        Bootstrap.fromCardanoNode({
+          buffer,
+          cardanoNode: {
+            ...cardanoNode,
+            genesisParameters$: of({
+              ...networkInfo.genesisParameters,
+              securityParameter
+            })
+          },
           logger
-        });
-        sinks.buffer.tip$.subscribe(bufferTip$);
-        sinks.buffer.tail$.subscribe(bufferTail$);
-        return sinks;
-      };
+        })
+      );
       project$ = projectIntoSink({
-        cardanoNode: {
-          ...cardanoNode,
-          genesisParameters$: of({
-            ...networkInfo.genesisParameters,
-            securityParameter
-          })
-        },
         logger,
         projections: {},
-        sinksFactory
+        sink,
+        source$
       });
     });
 
@@ -180,6 +193,8 @@ describe('createSinks', () => {
       // deleting last block from the buffer creates an inconsistency: resumed projection will
       // try to insert a 'block' with an already existing 'height' which has a unique constraint.
       await queryRunner.manager.getRepository(BlockDataEntity).delete(lastEvent.block.header.blockNo);
+      buffer.shutdown();
+      buffer.start();
       // ADP-2807
       await expect(firstValueFrom(project$)).rejects.toThrowError(QueryFailedError);
     });
@@ -189,7 +204,7 @@ describe('createSinks', () => {
       describe('when there are no blocks in the buffer', () => {
         it('emits "origin" for both tip and tail', async () => {
           const subscription = project$.subscribe();
-          const [tip, tail] = await firstValueFrom(combineLatest([bufferTip$, bufferTail$]));
+          const [tip, tail] = await firstValueFrom(combineLatest([buffer.tip$, buffer.tail$]));
           // subscribe to initialize the observable,
           // but don't wait for it to emit any events
           subscription.unsubscribe();
@@ -200,8 +215,8 @@ describe('createSinks', () => {
 
       describe('with 1 block in the buffer', () => {
         it('emits that block as both tip$ and tail$', async () => {
-          const lastTipAndTail = lastValueFrom(combineLatest([bufferTip$, bufferTail$]));
           await firstValueFrom(project$);
+          const lastTipAndTail = firstValueFrom(combineLatest([buffer.tip$, buffer.tail$]));
           const [tip, tail] = await lastTipAndTail;
           expect(typeof tip).toEqual('object');
           expect(tail).toEqual(tip);
@@ -210,10 +225,11 @@ describe('createSinks', () => {
 
       describe('with 3 blocks in the buffer', () => {
         it('emits tip$ for every new block, tail$ only for origin and the 1st block', async () => {
-          const tipsReady = firstValueFrom(bufferTip$.pipe(toArray()));
-          const tailsReady = firstValueFrom(bufferTail$.pipe(toArray()));
+          const tipsReady = firstValueFrom(buffer.tip$.pipe(toArray()));
+          const tailsReady = firstValueFrom(buffer.tail$.pipe(toArray()));
           await lastValueFrom(project$.pipe(take(3)));
           expect(await getBufferSize()).toEqual(3);
+          buffer.shutdown();
           const tips = await tipsReady;
           expect(tips.length).toEqual(4);
           expect(tips[0]).toEqual('origin');
@@ -227,14 +243,14 @@ describe('createSinks', () => {
       });
 
       it('rollback pops the tip$', async () => {
-        const tipsReady = firstValueFrom(bufferTip$.pipe(toArray()));
+        const tipsReady = firstValueFrom(buffer.tip$.pipe(toArray()));
         await firstValueFrom(project$.pipe(filter(({ eventType }) => eventType === ChainSyncEventType.RollBackward)));
+        buffer.shutdown();
         const tips = await tipsReady;
         expect(getHeader(tips[tips.length - 1]).blockNo).toBeLessThan(getHeader(tips[tips.length - 2]).blockNo);
       });
 
       it('clears old block_data every 100 blocks and emits new tail$', async () => {
-        const preClearTail = lastValueFrom(bufferTail$);
         await lastValueFrom(
           project$.pipe(
             // stop one block before the expected clear
@@ -247,12 +263,12 @@ describe('createSinks', () => {
             )
           )
         );
+        const preClearTail = firstValueFrom(buffer.tail$);
         const preClearBufferSize = await getBufferSize();
         const preClearNumBlocks = await getNumBlocks();
-        recreateSubjects();
-        const postClearTail = lastValueFrom(bufferTail$);
         // next event should trigger the clear
         await firstValueFrom(project$);
+        const postClearTail = firstValueFrom(buffer.tail$);
         expect(await getBufferSize()).toBeLessThan(preClearBufferSize);
         expect(await getNumBlocks()).toEqual(preClearNumBlocks + 1);
         const preClearTailHeight = getHeader(await preClearTail).blockNo;
