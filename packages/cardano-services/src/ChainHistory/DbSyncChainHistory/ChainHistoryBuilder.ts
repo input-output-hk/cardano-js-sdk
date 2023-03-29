@@ -52,22 +52,31 @@ export class ChainHistoryBuilder {
 
   public async queryTransactionInputsByIds(ids: string[], collateral = false): Promise<TxInput[]> {
     this.#logger.debug(`About to find inputs (collateral: ${collateral}) for transactions with ids:`, ids);
-    const result: QueryResult<TxInputModel> = await this.#db.query(
-      collateral ? Queries.findTxCollateralsByIds : Queries.findTxInputsByIds,
-      [ids]
-    );
+    const result: QueryResult<TxInputModel> = await this.#db.query({
+      name: `tx_${collateral ? 'collateral' : 'inputs'}_by_tx_ids`,
+      text: collateral ? Queries.findTxCollateralsByIds : Queries.findTxInputsByIds,
+      values: [ids]
+    });
     return result.rows.length > 0 ? result.rows.map(mapTxInModel) : [];
   }
 
   public async queryMultiAssetsByTxOut(txOutIds: BigInt[]): Promise<TxOutTokenMap> {
     this.#logger.debug('About to find multi assets for tx outs:', txOutIds);
-    const result: QueryResult<TxOutMultiAssetModel> = await this.#db.query(Queries.findMultiAssetByTxOut, [txOutIds]);
+    const result: QueryResult<TxOutMultiAssetModel> = await this.#db.query({
+      name: 'tx_multi_assets_by_tx_out_ids',
+      text: Queries.findMultiAssetByTxOut,
+      values: [txOutIds]
+    });
     return mapTxOutTokenMap(result.rows);
   }
 
   public async queryTransactionOutputsByIds(ids: string[]): Promise<TxOutput[]> {
     this.#logger.debug('About to find outputs for transactions with ids:', ids);
-    const result: QueryResult<TxOutputModel> = await this.#db.query(Queries.findTxOutputsByIds, [ids]);
+    const result: QueryResult<TxOutputModel> = await this.#db.query({
+      name: 'tx_outputs_by_tx_ids',
+      text: Queries.findTxOutputsByIds,
+      values: [ids]
+    });
     if (result.rows.length === 0) return [];
 
     const txOutIds = result.rows.flatMap((txOut) => BigInt(txOut.id));
@@ -77,20 +86,32 @@ export class ChainHistoryBuilder {
 
   public async queryTxMintByIds(ids: string[]): Promise<TxTokenMap> {
     this.#logger.debug('About to find tx mint for transactions with ids:', ids);
-    const result: QueryResult<MultiAssetModel> = await this.#db.query(Queries.findTxMintByIds, [ids]);
+    const result: QueryResult<MultiAssetModel> = await this.#db.query({
+      name: 'tx_mint_by_tx_ids',
+      text: Queries.findTxMintByIds,
+      values: [ids]
+    });
     return mapTxTokenMap(result.rows);
   }
 
   public async queryTxRecordIdsByTxHashes(ids: Cardano.TransactionId[]): Promise<string[]> {
     this.#logger.debug('About to find tx mint for transactions with ids:', ids);
     const byteHashes = ids.map((id) => hexStringToBuffer(id));
-    const result: QueryResult<{ id: string }> = await this.#db.query(Queries.findTxRecordIdsByTxHashes, [byteHashes]);
+    const result: QueryResult<{ id: string }> = await this.#db.query({
+      name: 'tx_record_ids_by_tx_hashes',
+      text: Queries.findTxRecordIdsByTxHashes,
+      values: [byteHashes]
+    });
     return result.rows.length > 0 ? result.rows.map(({ id }) => id) : [];
   }
 
   public async queryWithdrawalsByTxIds(ids: string[]): Promise<TransactionDataMap<Cardano.Withdrawal[]>> {
     this.#logger.debug('About to find withdrawals for transactions with ids:', ids);
-    const result: QueryResult<WithdrawalModel> = await this.#db.query(Queries.findWithdrawalsByTxIds, [ids]);
+    const result: QueryResult<WithdrawalModel> = await this.#db.query({
+      name: 'tx_withdrawals_by_tx_ids',
+      text: Queries.findWithdrawalsByTxIds,
+      values: [ids]
+    });
     const withdrawalMap: TransactionDataMap<Cardano.Withdrawal[]> = new Map();
     for (const withdrawal of result.rows) {
       const txId = withdrawal.tx_id.toString('hex') as unknown as Cardano.TransactionId;
@@ -102,7 +123,11 @@ export class ChainHistoryBuilder {
 
   public async queryRedeemersByIds(ids: string[]): Promise<TransactionDataMap<Cardano.Redeemer[]>> {
     this.#logger.debug('About to find redeemers for transactions with ids:', ids);
-    const result: QueryResult<RedeemerModel> = await this.#db.query(Queries.findRedeemersByTxIds, [ids]);
+    const result: QueryResult<RedeemerModel> = await this.#db.query({
+      name: 'tx_redeemers_by_tx_ids',
+      text: Queries.findRedeemersByTxIds,
+      values: [ids]
+    });
     const redeemerMap: TransactionDataMap<Cardano.Redeemer[]> = new Map();
     for (const redeemer of result.rows) {
       const txId = redeemer.tx_id.toString('hex') as unknown as Cardano.TransactionId;
@@ -114,18 +139,31 @@ export class ChainHistoryBuilder {
 
   public async queryCertificatesByIds(ids: string[]): Promise<TransactionDataMap<Cardano.Certificate[]>> {
     this.#logger.debug('About to find certificates for transactions with ids:', ids);
-    const poolRetireCerts: QueryResult<PoolRetireCertModel> = await this.#db.query(Queries.findPoolRetireCertsTxIds, [
-      ids
-    ]);
-    const poolRegisterCerts: QueryResult<PoolRegisterCertModel> = await this.#db.query(
-      Queries.findPoolRegisterCertsByTxIds,
-      [ids]
-    );
-    const mirCerts: QueryResult<MirCertModel> = await this.#db.query(Queries.findMirCertsByTxIds, [ids]);
-    const stakeCerts: QueryResult<StakeCertModel> = await this.#db.query(Queries.findStakeCertsByTxIds, [ids]);
-    const delegationCerts: QueryResult<DelegationCertModel> = await this.#db.query(Queries.findDelegationCertsByTxIds, [
-      ids
-    ]);
+    const poolRetireCerts: QueryResult<PoolRetireCertModel> = await this.#db.query({
+      name: 'pool_retire_certs_by_tx_ids',
+      text: Queries.findPoolRetireCertsTxIds,
+      values: [ids]
+    });
+    const poolRegisterCerts: QueryResult<PoolRegisterCertModel> = await this.#db.query({
+      name: 'pool_registration_certs_by_tx_ids',
+      text: Queries.findPoolRegisterCertsByTxIds,
+      values: [ids]
+    });
+    const mirCerts: QueryResult<MirCertModel> = await this.#db.query({
+      name: 'pool_mir_certs_by_tx_ids',
+      text: Queries.findMirCertsByTxIds,
+      values: [ids]
+    });
+    const stakeCerts: QueryResult<StakeCertModel> = await this.#db.query({
+      name: 'pool_stake_certs_by_tx_ids',
+      text: Queries.findStakeCertsByTxIds,
+      values: [ids]
+    });
+    const delegationCerts: QueryResult<DelegationCertModel> = await this.#db.query({
+      name: 'pool_delegation_certs_by_tx_ids',
+      text: Queries.findDelegationCertsByTxIds,
+      values: [ids]
+    });
 
     // There is currently no way to get GenesisKeyDelegationCertificate from db-sync
     const allCerts: WithCertType<CertificateModel>[] = [
@@ -187,16 +225,25 @@ export class ChainHistoryBuilder {
     const kind = rangeForQuery ? 'withRange' : 'withoutRange';
     const target = pagination ? 'page' : 'count';
     const q = findTxsByAddresses;
-    const composedQuery = `${q.WITH}${q[kind].WITH}${q[target].SELECT}${q[kind].FROM}${q[target].ORDER}`;
-    const composedArgs = rangeForQuery ? [addresses, rangeForQuery.lowerBound, rangeForQuery.upperBound] : [addresses];
+    const query = `${q.WITH}${q[kind].WITH}${q[target].SELECT}${q[kind].FROM}${q[target].ORDER}`;
+    const args = rangeForQuery ? [addresses, rangeForQuery.lowerBound, rangeForQuery.upperBound] : [addresses];
 
     if (pagination) {
-      const { query, args } = withPagination(composedQuery, composedArgs, pagination);
-      const result = await this.#db.query<TxIdModel>(query, args);
+      const paginated = withPagination(query, args, pagination);
+      const result = await this.#db.query<TxIdModel>({
+        name: `tx_ids_by_addresses_page${rangeForQuery ? '_with_range' : ''}`,
+        text: paginated.query,
+        values: paginated.args
+      });
+
       return result.rows.map(mapTxId);
     }
 
-    const result = await this.#db.query<CountModel>(composedQuery, composedArgs);
+    const result = await this.#db.query<CountModel>({
+      name: `tx_ids_by_addresses_count${rangeForQuery ? '_with_range' : ''}`,
+      text: query,
+      values: args
+    });
     return Number(result.rows[0].count);
   }
 }

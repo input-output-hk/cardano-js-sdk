@@ -21,7 +21,11 @@ export const createDbSyncMetadataService = (db: Pool, logger: Logger): TxMetadat
   async queryTxMetadataByRecordIds(ids: string[]): Promise<TxMetadataByHashes> {
     logger.debug('About to find metadata for transactions with ids:', ids);
 
-    const result: QueryResult<TxMetadataModel> = await db.query(Queries.findTxMetadataByTxIds, [ids]);
+    const result: QueryResult<TxMetadataModel> = await db.query({
+      name: 'tx_metadata_by_tx_ids',
+      text: Queries.findTxMetadataByTxIds,
+      values: [ids]
+    });
 
     if (result.rows.length === 0) return new Map();
     return mapTxMetadataByHashes(result.rows);

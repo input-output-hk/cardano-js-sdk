@@ -716,7 +716,7 @@ export const withPagination = (query: string, args: unknown[], pagination?: Quer
   if (pagination) {
     return {
       args: [...args, pagination.limit, pagination.startAt],
-      query: `${query} LIMIT $${++args.length} OFFSET $${++args.length}`
+      query: `${query} LIMIT $${args.length + 1} OFFSET $${args.length + 2}`
     };
   }
   return { args, query };
