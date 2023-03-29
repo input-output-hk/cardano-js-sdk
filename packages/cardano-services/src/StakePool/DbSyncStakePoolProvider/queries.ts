@@ -712,9 +712,14 @@ export const getStatusWhereClause = (
   return `(${whereClause.join(' OR ')})`;
 };
 
-export const withPagination = (query: string, pagination?: QueryStakePoolsArgs['pagination']) => {
-  if (pagination) return `${query} LIMIT ${pagination.limit} OFFSET ${pagination.startAt} `;
-  return query;
+export const withPagination = (query: string, args: unknown[], pagination?: QueryStakePoolsArgs['pagination']) => {
+  if (pagination) {
+    return {
+      args: [...args, pagination.limit, pagination.startAt],
+      query: `${query} LIMIT $${++args.length} OFFSET $${++args.length}`
+    };
+  }
+  return { args, query };
 };
 
 const orderBy = (query: string, sort: OrderByOptions[]) =>

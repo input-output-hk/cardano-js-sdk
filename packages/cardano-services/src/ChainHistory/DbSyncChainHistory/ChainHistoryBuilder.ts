@@ -187,17 +187,16 @@ export class ChainHistoryBuilder {
     const kind = rangeForQuery ? 'withRange' : 'withoutRange';
     const target = pagination ? 'page' : 'count';
     const q = findTxsByAddresses;
-    const query = `${q.WITH}${q[kind].WITH}${q[target].SELECT}${q[kind].FROM}${q[target].ORDER}`;
-    const args = rangeForQuery ? [addresses, rangeForQuery.lowerBound, rangeForQuery.upperBound] : [addresses];
+    const composedQuery = `${q.WITH}${q[kind].WITH}${q[target].SELECT}${q[kind].FROM}${q[target].ORDER}`;
+    const composedArgs = rangeForQuery ? [addresses, rangeForQuery.lowerBound, rangeForQuery.upperBound] : [addresses];
 
     if (pagination) {
-      const result = await this.#db.query<TxIdModel>(withPagination(query, pagination), args);
-
+      const { query, args } = withPagination(composedQuery, composedArgs, pagination);
+      const result = await this.#db.query<TxIdModel>(query, args);
       return result.rows.map(mapTxId);
     }
 
-    const result = await this.#db.query<CountModel>(query, args);
-
+    const result = await this.#db.query<CountModel>(composedQuery, composedArgs);
     return Number(result.rows[0].count);
   }
 }
