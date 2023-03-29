@@ -2,7 +2,7 @@
 import { BlockDataEntity, BlockEntity, TypeormStabilityWindowBuffer, createSink } from '../src';
 import { Bootstrap, Projections, Sink, projectIntoSink } from '@cardano-sdk/projection';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { ChainSyncDataSet, chainSyncData, logger, patchObject } from '@cardano-sdk/util-dev';
+import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { ConnectionNotFoundError, DataSource, QueryFailedError, QueryRunner } from 'typeorm';
 import {
   Observable,
@@ -18,6 +18,7 @@ import {
   toArray
 } from 'rxjs';
 import { initializeDataSource } from './util';
+import { patchObject } from '@cardano-sdk/util';
 
 const { cardanoNode, networkInfo } = chainSyncData(ChainSyncDataSet.WithStakeKeyDeregistration);
 

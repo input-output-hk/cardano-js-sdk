@@ -12,4 +12,3 @@ export * from './createStubUtxoProvider';
 export * from './createGenericMockServer';
 export * from './dataGeneration';
 export * from './eraSummaries';
-export * from './patchObject';
