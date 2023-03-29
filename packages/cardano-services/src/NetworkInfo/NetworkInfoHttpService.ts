@@ -2,7 +2,7 @@ import * as OpenApiValidator from 'express-openapi-validator';
 import { HttpService } from '../Http';
 import { Logger } from 'ts-log';
 import { NetworkInfoProvider } from '@cardano-sdk/core';
-import { ServiceNames } from '../Program';
+import { ServiceNames } from '../Program/programs/types';
 import { providerHandler } from '../util';
 import express from 'express';
 import path from 'path';

@@ -127,6 +127,11 @@ export const DEFAULT_POLLING_CONFIG = {
   pollInterval: 5000
 };
 
+// Adjust the number of slots to wait until a transaction is considered lost (send but not found on chain)
+// Configured to 2.5 because on preprod/mainnet, blocks produced at more than 250 slots apart are very rare (1 per epoch or less).
+// Ideally we should calculate this based on the activeSlotsCoeff and probability of a single block per epoch.
+const BLOCK_SLOT_GAP_MULTIPLIER = 2.5;
+
 const isOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx): input is OutgoingTx =>
   typeof input === 'object' && 'cbor' in input;
 const isTxCBOR = (input: Cardano.Tx | TxCBOR | OutgoingTx): input is TxCBOR => typeof input === 'string';
@@ -368,7 +373,7 @@ export class SingleAddressWallet implements ObservableWallet {
     const transactionsReemitter = createTransactionReemitter({
       genesisParameters$: this.genesisParameters$,
       logger: contextLogger(this.#logger, 'transactionsReemitter'),
-      maxInterval,
+      maxInterval: maxInterval * BLOCK_SLOT_GAP_MULTIPLIER,
       stores,
       tipSlot$: this.tip$.pipe(map((tip) => tip.slot)),
       transactions: this.transactions

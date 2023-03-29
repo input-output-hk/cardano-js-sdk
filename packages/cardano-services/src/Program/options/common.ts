@@ -1,7 +1,7 @@
 import { Command, Option } from 'commander';
 import { InvalidLoggerLevel } from '../../errors';
 import { LogLevel } from 'bunyan';
-import { Programs } from '../programs';
+import { Programs } from '../programs/types';
 import {
   SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT,
   SERVICE_DISCOVERY_TIMEOUT_DEFAULT,

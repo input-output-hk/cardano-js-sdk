@@ -8,8 +8,9 @@ import { MissingProgramOption } from '../errors';
 import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import { ProviderError, ProviderFailure, SubmitTxArgs } from '@cardano-sdk/core';
 import { RabbitMqOptionDescriptions, RabbitMqProgramOptions } from '../options';
-import { ServiceNames, TxWorkerArgs } from '../programs';
+import { ServiceNames } from '../programs/types';
 import { SrvRecord } from 'dns';
+import { TxWorkerArgs } from '../programs/txWorker';
 import { isConnectionError } from '@cardano-sdk/util';
 
 export const srvRecordToRabbitmqURL = ({ name, port }: SrvRecord) => new URL(`amqp://${name}:${port}`);
