@@ -47,7 +47,7 @@ import {
 import { EPOCH_POLL_INTERVAL_DEFAULT } from './util';
 import { HttpServer } from './Http';
 import { URL } from 'url';
-import { cacheTtlValidator } from './util/validators';
+import { dbCacheValidator } from './util/validators';
 import { withCommonOptions, withOgmiosOptions, withPostgresOptions, withRabbitMqOptions } from './Program/options/';
 import fs from 'fs';
 import onDeath from 'death';
@@ -122,7 +122,7 @@ withCommonOptions(
     new Option('--db-cache-ttl <dbCacheTtl>', ProviderServerOptionDescriptions.DbCacheTtl)
       .env('DB_CACHE_TTL')
       .default(DB_CACHE_TTL_DEFAULT)
-      .argParser(cacheTtlValidator)
+      .argParser(dbCacheValidator)
   )
   .addOption(
     new Option('--disable-db-cache <true/false>', ProviderServerOptionDescriptions.DisableDbCache)
@@ -169,7 +169,7 @@ withCommonOptions(
     )
       .env('TOKEN_METADATA_CACHE_TTL')
       .default(DEFAULT_TOKEN_METADATA_CACHE_TTL)
-      .argParser(cacheTtlValidator)
+      .argParser(dbCacheValidator)
   )
   .addOption(
     new Option(

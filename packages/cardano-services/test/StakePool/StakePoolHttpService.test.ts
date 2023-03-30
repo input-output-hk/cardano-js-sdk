@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Cardano, QueryStakePoolsArgs, SortField, StakePoolProvider } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, stakePoolHttpProvider } from '../../../cardano-services-client';
+import { DbPools, LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
 import { DbSyncEpochPollService, loadGenesisData } from '../../src/util';
 import {
   DbSyncStakePoolProvider,
@@ -15,14 +16,13 @@ import {
 } from '../../src';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { INFO, createLogger } from 'bunyan';
-import { LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { PoolInfo, PoolWith, StakePoolFixtureBuilder } from './fixtures/FixtureBuilder';
 import { REWARDS_HISTORY_LIMIT_DEFAULT } from '../../src/StakePool/DbSyncStakePoolProvider/util';
+import { clearDbPools, ingestDbData, sleep, wrapWithTransaction } from '../util';
 import { getPort } from 'get-port-please';
 import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
-import { ingestDbData, sleep, wrapWithTransaction } from '../util';
 import { logger } from '@cardano-sdk/util-dev';
 import axios from 'axios';
 
@@ -87,13 +87,21 @@ describe('StakePoolHttpService', () => {
   let poolsInfo: PoolInfo[];
 
   const epochPollInterval = 2 * 1000;
-  const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
-  const db = new Pool({
-    connectionString: process.env.POSTGRES_CONNECTION_STRING,
-    max: 1,
-    min: 1
-  });
-  const epochMonitor = new DbSyncEpochPollService(db, epochPollInterval!);
+  const cache = { db: new InMemoryCache(UNLIMITED_CACHE_TTL), healthCheck: new InMemoryCache(UNLIMITED_CACHE_TTL) };
+  const dbPools: DbPools = {
+    healthCheck: new Pool({
+      connectionString: process.env.POSTGRES_CONNECTION_STRING,
+      max: 1,
+      min: 1
+    }),
+    main: new Pool({
+      connectionString: process.env.POSTGRES_CONNECTION_STRING,
+      max: 1,
+      min: 1
+    })
+  };
+
+  const epochMonitor = new DbSyncEpochPollService(dbPools.main, epochPollInterval!);
   let reqWithFilter: QueryStakePoolsArgs;
   let reqWithMultipleFilters: QueryStakePoolsArgs;
   let filterArgs: QueryStakePoolsArgs;
@@ -103,7 +111,7 @@ describe('StakePoolHttpService', () => {
     baseUrl = `http://localhost:${port}/stake-pool`;
     config = { listen: { port } };
     clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
-    fixtureBuilder = new StakePoolFixtureBuilder(db, logger);
+    fixtureBuilder = new StakePoolFixtureBuilder(dbPools.main, logger);
     poolsInfo = await fixtureBuilder.getPools(3, { with: [PoolWith.Metadata] });
 
     reqWithFilter = {
@@ -148,14 +156,18 @@ describe('StakePoolHttpService', () => {
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('healthy state', () => {
-    const dbConnectionQuerySpy = jest.spyOn(db, 'query');
-    const clearCacheSpy = jest.spyOn(cache, 'clear');
+    const dbQuerySpy = {
+      healthCheck: jest.spyOn(dbPools.healthCheck, 'query'),
+      main: jest.spyOn(dbPools.main, 'query')
+    };
+
+    const clearCacheSpy = jest.spyOn(cache.db, 'clear');
     let genesisData: GenesisData;
     const metadataService = createHttpStakePoolMetadataService(logger);
 
     beforeAll(async () => {
       genesisData = await loadGenesisData(cardanoNodeConfigPath);
-      lastBlockNoInDb = (await db.query<LedgerTipModel>(findLedgerTip)).rows[0];
+      lastBlockNoInDb = (await dbPools.main.query<LedgerTipModel>(findLedgerTip)).rows[0];
       cardanoNode = mockCardanoNode(
         healthCheckResponseMock({
           blockNo: lastBlockNoInDb.block_no,
@@ -171,7 +183,7 @@ describe('StakePoolHttpService', () => {
       ) as unknown as OgmiosCardanoNode;
       stakePoolProvider = new DbSyncStakePoolProvider(
         { paginationPageSizeLimit: pagination.limit, useBlockfrost: false },
-        { cache, cardanoNode, db, epochMonitor, genesisData, logger, metadataService }
+        { cache, cardanoNode, dbPools, epochMonitor, genesisData, logger, metadataService }
       );
       service = new StakePoolHttpService({ logger, stakePoolProvider });
       httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
@@ -179,32 +191,34 @@ describe('StakePoolHttpService', () => {
     });
 
     afterAll(async () => {
-      await db.end();
-      cache.shutdown();
+      await clearDbPools(dbPools);
+      cache.db.shutdown();
+      cache.healthCheck.shutdown();
       jest.clearAllTimers();
     });
 
     beforeEach(async () => {
-      cache.clear();
+      cache.db.clear();
+      cache.healthCheck.clear();
       jest.clearAllMocks();
-      dbConnectionQuerySpy.mockClear();
-      clearCacheSpy.mockClear();
     });
 
     describe('with DbSyncStakePoolProvider', () => {
       beforeAll(async () => {
         stakePoolProvider = new DbSyncStakePoolProvider(
           { paginationPageSizeLimit: pagination.limit, useBlockfrost: false },
-          { cache, cardanoNode, db, epochMonitor, genesisData, logger, metadataService }
+          { cache, cardanoNode, dbPools, epochMonitor, genesisData, logger, metadataService }
         );
         service = new StakePoolHttpService({ logger, stakePoolProvider });
         httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
         await httpServer.initialize();
         await httpServer.start();
       });
+
       afterAll(async () => {
         await httpServer.shutdown();
       });
+
       describe('start', () => {
         it('should start epoch monitor once the db provider is initialized and started', async () => {
           await sleep(epochPollInterval * 2);
@@ -237,6 +251,8 @@ describe('StakePoolHttpService', () => {
 
         it('forwards the stakePoolProvider health response with provider client', async () => {
           const response = await provider.healthCheck();
+          expect(dbQuerySpy.main).toHaveBeenCalledTimes(0);
+          expect(dbQuerySpy.healthCheck).toHaveBeenCalledTimes(1);
           expect(response).toEqual(
             healthCheckResponseMock({
               blockNo: lastBlockNoInDb.block_no,
@@ -367,33 +383,33 @@ describe('StakePoolHttpService', () => {
         it('should query the DB only once when the response is cached', async () => {
           const { pageResults } = await provider.queryStakePools(filerOnePoolOptions);
           expect(pageResults.length).toBe(1);
-          expect(dbConnectionQuerySpy).toHaveBeenCalledTimes(cachedSubQueriesCount + nonCacheableSubQueriesCount);
-          dbConnectionQuerySpy.mockClear();
+          expect(dbQuerySpy.main).toHaveBeenCalledTimes(cachedSubQueriesCount + nonCacheableSubQueriesCount);
+          dbQuerySpy.main.mockClear();
           await provider.queryStakePools(filerOnePoolOptions);
-          expect(dbConnectionQuerySpy).toHaveBeenCalledTimes(nonCacheableSubQueriesCount);
-          expect(cache.keys().length).toEqual(cacheKeysCount);
+          expect(dbQuerySpy.main).toHaveBeenCalledTimes(nonCacheableSubQueriesCount);
+          expect(cache.db.keys().length).toEqual(cacheKeysCount);
         });
 
         it('should call db-sync queries again once the cache is cleared', async () => {
           await provider.queryStakePools(filerOnePoolOptions);
-          cache.clear();
-          expect(cache.keys().length).toEqual(0);
+          cache.db.clear();
+          expect(cache.db.keys().length).toEqual(0);
 
           await provider.queryStakePools(filerOnePoolOptions);
-          expect(dbConnectionQuerySpy).toBeCalledTimes((cachedSubQueriesCount + nonCacheableSubQueriesCount) * 2);
+          expect(dbQuerySpy.main).toBeCalledTimes((cachedSubQueriesCount + nonCacheableSubQueriesCount) * 2);
         });
 
         it('should not invalidate the epoch values from the cache if there is no epoch rollover', async () => {
           const currentEpochNo = await fixtureBuilder.getLasKnownEpoch();
           const response = await provider.queryStakePools(filerOnePoolOptions);
 
-          expect(cache.keys().length).toEqual(cacheKeysCount);
+          expect(cache.db.keys().length).toEqual(cacheKeysCount);
 
           await sleep(epochPollInterval);
 
           expect(await epochMonitor.getLastKnownEpoch()).toEqual(currentEpochNo);
-          expect(cache.keys().length).toEqual(cacheKeysCount);
-          expect(dbConnectionQuerySpy).toBeCalled();
+          expect(cache.db.keys().length).toEqual(cacheKeysCount);
+          expect(dbQuerySpy.main).toBeCalled();
           expect(clearCacheSpy).not.toHaveBeenCalled();
 
           const responseCached = await provider.queryStakePools(filerOnePoolOptions);
@@ -409,7 +425,7 @@ describe('StakePoolHttpService', () => {
             await provider.queryStakePools(filerOnePoolOptions);
             await sleep(epochPollInterval);
 
-            expect(cache.keys().length).toEqual(cacheKeysCount);
+            expect(cache.db.keys().length).toEqual(cacheKeysCount);
             await ingestDbData(
               dbConnection,
               'epoch',
@@ -421,8 +437,8 @@ describe('StakePoolHttpService', () => {
             expect(clearCacheSpy).toHaveBeenCalled();
 
             expect(await epochMonitor.getLastKnownEpoch()).toEqual(greaterEpoch);
-            expect(cache.keys().length).toEqual(0);
-          }, db)
+            expect(cache.db.keys().length).toEqual(0);
+          }, dbPools.main)
         );
 
         describe('pagination', () => {
@@ -484,14 +500,14 @@ describe('StakePoolHttpService', () => {
 
           it('should cache paginated response', async () => {
             const firstResponseWithPagination = await provider.queryStakePools(baseArgs);
-            expect(dbConnectionQuerySpy).toHaveBeenCalledTimes(cachedSubQueriesCount + nonCacheableSubQueriesCount);
-            dbConnectionQuerySpy.mockClear();
+            expect(dbQuerySpy.main).toHaveBeenCalledTimes(cachedSubQueriesCount + nonCacheableSubQueriesCount);
+            dbQuerySpy.main.mockClear();
             const secondResponseWithPaginationCached = await provider.queryStakePools(baseArgs);
             expect(firstResponseWithPagination.pageResults).toEqual(secondResponseWithPaginationCached.pageResults);
             expect(firstResponseWithPagination.totalResultCount).toEqual(
               secondResponseWithPaginationCached.totalResultCount
             );
-            expect(dbConnectionQuerySpy).toHaveBeenCalledTimes(nonCacheableSubQueriesCount);
+            expect(dbQuerySpy.main).toHaveBeenCalledTimes(nonCacheableSubQueriesCount);
           });
         });
 
@@ -1407,7 +1423,7 @@ describe('StakePoolHttpService', () => {
             responseConfig: { search: { metrics: { apy: false } } },
             useBlockfrost: false
           },
-          { cache, cardanoNode, db, epochMonitor, genesisData, logger, metadataService }
+          { cache, cardanoNode, dbPools, epochMonitor, genesisData, logger, metadataService }
         );
         service = new StakePoolHttpService({ logger, stakePoolProvider });
         httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });

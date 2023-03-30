@@ -1,5 +1,11 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { DB_CACHE_TTL_DEFAULT } from '../../../src/InMemoryCache';
+import {
+  DEFAULT_HEALTH_CHECK_CACHE_TTL,
+  OgmiosOptionDescriptions,
+  PostgresOptionDescriptions,
+  RabbitMqOptionDescriptions
+} from '../../../src/Program/options';
 import { EPOCH_POLL_INTERVAL_DEFAULT, listenPromise, serverClosePromise } from '../../../src/util';
 import {
   HttpServer,
@@ -12,11 +18,6 @@ import {
   loadProviderServer
 } from '../../../src';
 import { Ogmios } from '@cardano-sdk/ogmios';
-import {
-  OgmiosOptionDescriptions,
-  PostgresOptionDescriptions,
-  RabbitMqOptionDescriptions
-} from '../../../src/Program/options';
 import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { SrvRecord } from 'dns';
 import { URL } from 'url';
@@ -44,6 +45,7 @@ describe('HTTP Server', () => {
   let postgresUser: string;
   let postgresPassword: string;
   let dbCacheTtl: number;
+  let healthCheckCacheTtl: number;
   let epochPollInterval: number;
   let httpServer: HttpServer;
   let ogmiosConnection: Ogmios.Connection;
@@ -69,6 +71,7 @@ describe('HTTP Server', () => {
     rabbitmqUrl = new URL(process.env.RABBITMQ_URL!);
     rabbitmqSrvServiceName = process.env.RABBITMQ_SRV_SERVICE_NAME!;
     dbCacheTtl = DB_CACHE_TTL_DEFAULT;
+    healthCheckCacheTtl = DEFAULT_HEALTH_CHECK_CACHE_TTL;
     epochPollInterval = EPOCH_POLL_INTERVAL_DEFAULT;
   });
 
@@ -89,6 +92,7 @@ describe('HTTP Server', () => {
         cardanoNodeConfigPath,
         dbCacheTtl,
         epochPollInterval,
+        healthCheckCacheTtl,
         ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
         postgresConnectionString,
         serviceNames: [
@@ -110,6 +114,7 @@ describe('HTTP Server', () => {
           cardanoNodeConfigPath,
           dbCacheTtl,
           epochPollInterval,
+          healthCheckCacheTtl,
           ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
           postgresDb,
           postgresPassword,
@@ -133,6 +138,7 @@ describe('HTTP Server', () => {
               cardanoNodeConfigPath,
               dbCacheTtl,
               epochPollInterval,
+              healthCheckCacheTtl,
               ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
               postgresDb: missingPostgresDb,
               postgresSrvServiceName,
@@ -157,6 +163,7 @@ describe('HTTP Server', () => {
               cardanoNodeConfigPath,
               dbCacheTtl,
               epochPollInterval,
+              healthCheckCacheTtl,
               ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
               serviceNames: [ServiceNames.StakePool]
             })
@@ -176,6 +183,7 @@ describe('HTTP Server', () => {
           cardanoNodeConfigPath,
           dbCacheTtl,
           epochPollInterval,
+          healthCheckCacheTtl,
           ogmiosSrvServiceName,
           serviceDiscoveryBackoffFactor,
           serviceDiscoveryTimeout,
@@ -191,6 +199,7 @@ describe('HTTP Server', () => {
           cardanoNodeConfigPath,
           dbCacheTtl,
           epochPollInterval,
+          healthCheckCacheTtl,
           ogmiosSrvServiceName,
           ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
           serviceDiscoveryBackoffFactor,
@@ -209,6 +218,7 @@ describe('HTTP Server', () => {
               cardanoNodeConfigPath,
               dbCacheTtl,
               epochPollInterval,
+              healthCheckCacheTtl,
               serviceDiscoveryBackoffFactor,
               serviceDiscoveryTimeout,
               serviceNames: [ServiceNames.TxSubmit]
@@ -226,6 +236,7 @@ describe('HTTP Server', () => {
           cardanoNodeConfigPath,
           dbCacheTtl,
           epochPollInterval,
+          healthCheckCacheTtl,
           rabbitmqSrvServiceName,
           serviceDiscoveryBackoffFactor,
           serviceDiscoveryTimeout,
@@ -242,6 +253,7 @@ describe('HTTP Server', () => {
           cardanoNodeConfigPath,
           dbCacheTtl,
           epochPollInterval,
+          healthCheckCacheTtl,
           rabbitmqSrvServiceName,
           rabbitmqUrl,
           serviceDiscoveryBackoffFactor,
@@ -261,6 +273,7 @@ describe('HTTP Server', () => {
               cardanoNodeConfigPath,
               dbCacheTtl,
               epochPollInterval,
+              healthCheckCacheTtl,
               serviceDiscoveryBackoffFactor,
               serviceDiscoveryTimeout,
               serviceNames: [ServiceNames.TxSubmit],
@@ -283,6 +296,7 @@ describe('HTTP Server', () => {
             apiUrl,
             dbCacheTtl: 0,
             epochPollInterval: 0,
+            healthCheckCacheTtl,
             ogmiosUrl: new URL('http://localhost:1337'),
             postgresConnectionString: 'postgres',
             serviceNames: [serviceName]
@@ -314,6 +328,7 @@ describe('HTTP Server', () => {
           cardanoNodeConfigPath,
           dbCacheTtl,
           epochPollInterval,
+          healthCheckCacheTtl,
           ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
           postgresConnectionString,
           serviceNames: [ServiceNames.StakePool, ServiceNames.TxSubmit]

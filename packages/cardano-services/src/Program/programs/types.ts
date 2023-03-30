@@ -14,6 +14,7 @@ export enum Programs {
 
 /**
  * Used as mount segments, so must be URL-friendly
+ *
  */
 export enum ServiceNames {
   Asset = 'asset',
@@ -45,6 +46,7 @@ export type ProviderServerArgs = CommonProgramOptions &
     cardanoNodeConfigPath?: string;
     disableDbCache?: boolean;
     disableStakePoolMetricApy?: boolean;
+    healthCheckCacheTtl: number;
     tokenMetadataCacheTTL?: number;
     tokenMetadataServerUrl?: string;
     tokenMetadataRequestTimeout?: number;

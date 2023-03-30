@@ -47,10 +47,10 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
 
   constructor(
     { paginationPageSizeLimit }: ChainHistoryProviderProps,
-    { db, cardanoNode, metadataService, logger }: ChainHistoryProviderDependencies
+    { cache, dbPools, cardanoNode, metadataService, logger }: ChainHistoryProviderDependencies
   ) {
-    super({ cardanoNode, db, logger });
-    this.#builder = new ChainHistoryBuilder(db, logger);
+    super({ cache, cardanoNode, dbPools, logger });
+    this.#builder = new ChainHistoryBuilder(dbPools.main, logger);
     this.#metadataService = metadataService;
     this.#paginationPageSizeLimit = paginationPageSizeLimit;
   }
@@ -109,7 +109,7 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
 
   private async transactionsByIds(ids: string[]): Promise<Cardano.HydratedTx[]> {
     this.logger.debug('About to find transactions with ids:', ids);
-    const txResults: QueryResult<TxModel> = await this.db.query(Queries.findTransactionsByIds, [ids]);
+    const txResults: QueryResult<TxModel> = await this.dbPools.main.query(Queries.findTransactionsByIds, [ids]);
     if (txResults.rows.length === 0) return [];
 
     const [inputs, outputs, mints, withdrawals, redeemers, metadata, collaterals, certificates] = await Promise.all([
@@ -156,19 +156,20 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
     }
 
     this.logger.debug('About to find network tip');
-    const tipResult: QueryResult<TipModel> = await this.db.query(Queries.findTip);
+    const tipResult: QueryResult<TipModel> = await this.dbPools.main.query(Queries.findTip);
     const tip: TipModel = tipResult.rows[0];
     if (!tip) return [];
 
     const byteIds = ids.map((id) => hexStringToBuffer(id));
     this.logger.debug('About to find blocks with hashes:', byteIds);
-    const blocksResult: QueryResult<BlockModel> = await this.db.query(Queries.findBlocksByHashes, [byteIds]);
+    const blocksResult: QueryResult<BlockModel> = await this.dbPools.main.query(Queries.findBlocksByHashes, [byteIds]);
     if (blocksResult.rows.length === 0) return [];
 
     this.logger.debug('About to find blocks outputs and fees for blocks:', byteIds);
-    const outputResult: QueryResult<BlockOutputModel> = await this.db.query(Queries.findBlocksOutputByHashes, [
-      byteIds
-    ]);
+    const outputResult: QueryResult<BlockOutputModel> = await this.dbPools.main.query(
+      Queries.findBlocksOutputByHashes,
+      [byteIds]
+    );
 
     return blocksResult.rows.map((block) => {
       const blockOutput = outputResult.rows.find((output) => output.hash === block.hash) ?? {

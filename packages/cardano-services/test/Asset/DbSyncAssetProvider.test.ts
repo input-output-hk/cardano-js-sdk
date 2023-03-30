@@ -7,50 +7,64 @@ import {
   DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT,
   DbSyncAssetProvider,
   DbSyncNftMetadataService,
+  InMemoryCache,
   NftMetadataService,
-  TokenMetadataService
+  TokenMetadataService,
+  UNLIMITED_CACHE_TTL
 } from '../../src';
+import { DbPools } from '../../src/util/DbSyncProvider';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
+import { clearDbPools, sleep } from '../util';
 import { createDbSyncMetadataService } from '../../src/Metadata';
 import { logger } from '@cardano-sdk/util-dev';
 import { mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
 import { mockTokenRegistry } from './fixtures/mocks';
-import { sleep } from '../util';
 
 export const notValidAssetId = Cardano.AssetId('0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef');
 const defaultTimeout = DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT;
 
 describe('DbSyncAssetProvider', () => {
   let closeMock: () => Promise<void> = jest.fn();
-  let db: Pool;
+  let dbPools: DbPools;
   let ntfMetadataService: NftMetadataService;
   let provider: DbSyncAssetProvider;
   let serverUrl = '';
   let tokenMetadataService: TokenMetadataService;
   let cardanoNode: OgmiosCardanoNode;
   let fixtureBuilder: AssetFixtureBuilder;
+  const cache = { db: new InMemoryCache(UNLIMITED_CACHE_TTL), healthCheck: new InMemoryCache(UNLIMITED_CACHE_TTL) };
 
   beforeAll(async () => {
     ({ closeMock, serverUrl } = await mockTokenRegistry(async () => ({})));
-    db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
+    dbPools = {
+      healthCheck: new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING }),
+      main: new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING })
+    };
     cardanoNode = mockCardanoNode() as unknown as OgmiosCardanoNode;
     ntfMetadataService = new DbSyncNftMetadataService({
-      db,
+      db: dbPools.main,
       logger,
-      metadataService: createDbSyncMetadataService(db, logger)
+      metadataService: createDbSyncMetadataService(dbPools.main, logger)
     });
     tokenMetadataService = new CardanoTokenRegistry(
       { logger },
       { tokenMetadataRequestTimeout: defaultTimeout, tokenMetadataServerUrl: serverUrl }
     );
-    provider = new DbSyncAssetProvider({ cardanoNode, db, logger, ntfMetadataService, tokenMetadataService });
-    fixtureBuilder = new AssetFixtureBuilder(db, logger);
+    provider = new DbSyncAssetProvider({
+      cache,
+      cardanoNode,
+      dbPools,
+      logger,
+      ntfMetadataService,
+      tokenMetadataService
+    });
+    fixtureBuilder = new AssetFixtureBuilder(dbPools.main, logger);
   });
 
   afterAll(async () => {
     tokenMetadataService.shutdown();
-    await db.end();
+    await clearDbPools(dbPools);
     await closeMock();
   });
   it('rejects for not found assetId', async () => {
@@ -91,7 +105,14 @@ describe('DbSyncAssetProvider', () => {
       { tokenMetadataRequestTimeout: defaultTimeout, tokenMetadataServerUrl: serverUrl }
     );
 
-    provider = new DbSyncAssetProvider({ cardanoNode, db, logger, ntfMetadataService, tokenMetadataService });
+    provider = new DbSyncAssetProvider({
+      cache,
+      cardanoNode,
+      dbPools,
+      logger,
+      ntfMetadataService,
+      tokenMetadataService
+    });
 
     const assets = await fixtureBuilder.getAssets(1, { with: [AssetWith.CIP25Metadata] });
     const asset = await provider.getAsset({
@@ -115,7 +136,14 @@ describe('DbSyncAssetProvider', () => {
       { logger },
       { tokenMetadataRequestTimeout: defaultTimeout, tokenMetadataServerUrl: serverUrl }
     );
-    provider = new DbSyncAssetProvider({ cardanoNode, db, logger, ntfMetadataService, tokenMetadataService });
+    provider = new DbSyncAssetProvider({
+      cache,
+      cardanoNode,
+      dbPools,
+      logger,
+      ntfMetadataService,
+      tokenMetadataService
+    });
 
     const assets = await fixtureBuilder.getAssets(1, { with: [AssetWith.CIP25Metadata] });
     const asset = await provider.getAsset({

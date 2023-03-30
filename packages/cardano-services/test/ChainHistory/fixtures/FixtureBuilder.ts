@@ -1,9 +1,9 @@
 import * as Queries from './queries';
-import { Cardano, Range } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { DB_MAX_SAFE_INTEGER } from '../../../src/ChainHistory/DbSyncChainHistory/queries';
 import { Logger } from 'ts-log';
 import { Pool, QueryResult } from 'pg';
-import { bufferToHexString } from '@cardano-sdk/util';
+import { Range, bufferToHexString } from '@cardano-sdk/util';
 
 export enum TxWith {
   AuxiliaryData = 'auxiliaryData',

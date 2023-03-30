@@ -8,8 +8,10 @@ import {
   DbSyncUtxoProvider,
   HttpServer,
   HttpService,
+  InMemoryCache,
   ServerMetadata,
-  ServiceNames
+  ServiceNames,
+  UNLIMITED_CACHE_TTL
 } from '../../src';
 import { Cardano, Provider } from '@cardano-sdk/core';
 import { LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
@@ -59,7 +61,11 @@ describe('HttpServer', () => {
   let provider: Provider;
   let cardanoNode: OgmiosCardanoNode;
   let lastBlockNoInDb: Cardano.BlockNo;
-  const db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
+  const dbPools = {
+    healthCheck: new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING }),
+    main: new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING })
+  };
+  const cache = { db: new InMemoryCache(UNLIMITED_CACHE_TTL), healthCheck: new InMemoryCache(UNLIMITED_CACHE_TTL) };
 
   it('Is a runnable module', async () => {
     port = await getRandomPort();
@@ -73,11 +79,11 @@ describe('HttpServer', () => {
   beforeEach(async () => {
     port = await getRandomPort();
     apiUrlBase = `http://localhost:${port}`;
-    lastBlockNoInDb = Cardano.BlockNo((await db.query<LedgerTipModel>(findLedgerTip)).rows[0].block_no);
+    lastBlockNoInDb = Cardano.BlockNo((await dbPools.main.query<LedgerTipModel>(findLedgerTip)).rows[0].block_no);
     cardanoNode = mockCardanoNode(
       healthCheckResponseMock({ blockNo: lastBlockNoInDb })
     ) as unknown as OgmiosCardanoNode;
-    provider = new DbSyncUtxoProvider({ cardanoNode, db, logger });
+    provider = new DbSyncUtxoProvider({ cache, cardanoNode, dbPools, logger });
   });
 
   describe('initialize', () => {

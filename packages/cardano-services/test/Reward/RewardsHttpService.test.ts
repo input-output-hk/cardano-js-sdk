@@ -1,12 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Cardano, RewardsProvider } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, rewardsHttpProvider } from '@cardano-sdk/cardano-services-client';
-import { DbSyncRewardsProvider, HttpServer, HttpServerConfig, RewardsHttpService } from '../../src';
+import { DbPools, LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
+import {
+  DbSyncRewardsProvider,
+  HttpServer,
+  HttpServerConfig,
+  InMemoryCache,
+  RewardsHttpService,
+  UNLIMITED_CACHE_TTL
+} from '../../src';
 import { INFO, createLogger } from 'bunyan';
-import { LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { RewardsFixtureBuilder } from './fixtures/FixtureBuilder';
+import { clearDbPools } from '../util';
 import { getPort } from 'get-port-please';
 import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
 import { logger } from '@cardano-sdk/util-dev';
@@ -16,8 +24,9 @@ const APPLICATION_JSON = 'application/json';
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
 const APPLICATION_CBOR = 'application/cbor';
 const BAD_REQUEST_STRING = 'Request failed with status code 400';
+
 describe('RewardsHttpService', () => {
-  let dbConnection: Pool;
+  let dbPools: DbPools;
   let httpServer: HttpServer;
   let rewardsProvider: DbSyncRewardsProvider;
   let service: RewardsHttpService;
@@ -29,21 +38,24 @@ describe('RewardsHttpService', () => {
   let provider: RewardsProvider;
   let lastBlockNoInDb: LedgerTipModel;
   let fixtureBuilder: RewardsFixtureBuilder;
+  const cache = { db: new InMemoryCache(UNLIMITED_CACHE_TTL), healthCheck: new InMemoryCache(UNLIMITED_CACHE_TTL) };
+
   beforeAll(async () => {
     port = await getPort();
     baseUrl = `http://localhost:${port}/rewards`;
     clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
     config = { listen: { port } };
-    dbConnection = new Pool({
-      connectionString: process.env.POSTGRES_CONNECTION_STRING
-    });
-    fixtureBuilder = new RewardsFixtureBuilder(dbConnection, logger);
+    dbPools = {
+      healthCheck: new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING }),
+      main: new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING })
+    };
+    fixtureBuilder = new RewardsFixtureBuilder(dbPools.main, logger);
   });
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('healthy state', () => {
     beforeAll(async () => {
-      lastBlockNoInDb = (await dbConnection.query<LedgerTipModel>(findLedgerTip)).rows[0];
+      lastBlockNoInDb = (await dbPools.main.query<LedgerTipModel>(findLedgerTip)).rows[0];
       cardanoNode = mockCardanoNode(
         healthCheckResponseMock({
           blockNo: lastBlockNoInDb.block_no,
@@ -59,7 +71,7 @@ describe('RewardsHttpService', () => {
       ) as unknown as OgmiosCardanoNode;
       rewardsProvider = new DbSyncRewardsProvider(
         { paginationPageSizeLimit: 5 },
-        { cardanoNode, db: dbConnection, logger }
+        { cache, cardanoNode, dbPools, logger }
       );
       service = new RewardsHttpService({ logger, rewardsProvider });
       httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
@@ -68,7 +80,7 @@ describe('RewardsHttpService', () => {
       await httpServer.start();
     });
     afterAll(async () => {
-      await dbConnection.end();
+      await clearDbPools(dbPools);
       await httpServer.shutdown();
     });
 

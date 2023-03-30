@@ -4,10 +4,10 @@ import { UtxoBuilder } from './UtxoBuilder';
 
 export class DbSyncUtxoProvider extends DbSyncProvider() implements UtxoProvider {
   #builder: UtxoBuilder;
-  constructor({ db, cardanoNode, logger }: DbSyncProviderDependencies) {
-    super({ cardanoNode, db, logger });
+  constructor({ cache, dbPools, cardanoNode, logger }: DbSyncProviderDependencies) {
+    super({ cache, cardanoNode, dbPools, logger });
 
-    this.#builder = new UtxoBuilder(db, logger);
+    this.#builder = new UtxoBuilder(dbPools.main, logger);
   }
   public async utxoByAddresses({ addresses }: UtxoByAddressesArgs): Promise<Cardano.Utxo[]> {
     this.logger.debug('About to call utxoByAddress of Utxo Query Builder');

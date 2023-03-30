@@ -1,5 +1,5 @@
 import * as Queries from './queries';
-import { Cardano, PaginationArgs, Range } from '@cardano-sdk/core';
+import { Cardano, PaginationArgs } from '@cardano-sdk/core';
 import {
   CertificateModel,
   CountModel,
@@ -26,7 +26,7 @@ import {
 import { DB_MAX_SAFE_INTEGER, findTxsByAddresses } from './queries';
 import { Logger } from 'ts-log';
 import { Pool, QueryResult } from 'pg';
-import { hexStringToBuffer } from '@cardano-sdk/util';
+import { Range, hexStringToBuffer } from '@cardano-sdk/util';
 import {
   mapCertificate,
   mapRedeemer,

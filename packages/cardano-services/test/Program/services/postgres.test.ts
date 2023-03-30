@@ -1,13 +1,14 @@
 /* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable sonarjs/no-duplicate-string */
+import { DbPools, LedgerTipModel, findLedgerTip } from '../../../src/util/DbSyncProvider';
 import { DbSyncEpochPollService, EpochMonitor, loadGenesisData } from '../../../src/util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../../src/NetworkInfo';
 import { HttpServer, HttpServerConfig, createDnsResolver, getPool } from '../../../src';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../../src/InMemoryCache';
-import { LedgerTipModel, findLedgerTip } from '../../../src/util/DbSyncProvider';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { SrvRecord } from 'dns';
+import { clearDbPools } from '../../util';
 import { getPort, getRandomPort } from 'get-port-please';
 import { healthCheckResponseMock, mockCardanoNode } from '../../../../core/test/CardanoNode/mocks';
 import { logger } from '@cardano-sdk/util-dev';
@@ -26,13 +27,13 @@ jest.mock('dns', () => ({
 
 describe('Service dependency abstractions', () => {
   const APPLICATION_JSON = 'application/json';
-  const cache = new InMemoryCache(UNLIMITED_CACHE_TTL);
+  const cache = { db: new InMemoryCache(UNLIMITED_CACHE_TTL), healthCheck: new InMemoryCache(UNLIMITED_CACHE_TTL) };
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
   const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
 
   describe('Postgres-dependant service with service discovery', () => {
     let httpServer: HttpServer;
-    let db: Pool | undefined;
+    let dbPools: DbPools;
     let port: number;
     let apiUrlBase: string;
     let config: HttpServerConfig;
@@ -43,12 +44,20 @@ describe('Service dependency abstractions', () => {
     let lastBlockNoInDb: LedgerTipModel;
 
     beforeAll(async () => {
-      db = await getPool(dnsResolver, logger, {
-        postgresDb: process.env.POSTGRES_DB!,
-        postgresPassword: process.env.POSTGRES_PASSWORD!,
-        postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,
-        postgresUser: process.env.POSTGRES_USER!
-      });
+      dbPools = {
+        healthCheck: (await getPool(dnsResolver, logger, {
+          postgresDb: process.env.POSTGRES_DB!,
+          postgresPassword: process.env.POSTGRES_PASSWORD!,
+          postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,
+          postgresUser: process.env.POSTGRES_USER!
+        })) as Pool,
+        main: (await getPool(dnsResolver, logger, {
+          postgresDb: process.env.POSTGRES_DB!,
+          postgresPassword: process.env.POSTGRES_PASSWORD!,
+          postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,
+          postgresUser: process.env.POSTGRES_USER!
+        })) as Pool
+      };
     });
 
     describe('Established connection', () => {
@@ -56,8 +65,8 @@ describe('Service dependency abstractions', () => {
         port = await getPort();
         config = { listen: { port } };
         apiUrlBase = `http://localhost:${port}/network-info`;
-        epochMonitor = new DbSyncEpochPollService(db!, 10_000);
-        lastBlockNoInDb = (await db!.query<LedgerTipModel>(findLedgerTip)).rows[0];
+        epochMonitor = new DbSyncEpochPollService(dbPools.main!, 10_000);
+        lastBlockNoInDb = (await dbPools.main!.query<LedgerTipModel>(findLedgerTip)).rows[0];
         cardanoNode = mockCardanoNode(
           healthCheckResponseMock({
             blockNo: lastBlockNoInDb.block_no,
@@ -72,9 +81,14 @@ describe('Service dependency abstractions', () => {
           })
         ) as unknown as OgmiosCardanoNode;
         const genesisData = await loadGenesisData(cardanoNodeConfigPath);
-        const deps = { cache, cardanoNode, db: db!, epochMonitor, genesisData, logger };
-
-        networkInfoProvider = new DbSyncNetworkInfoProvider(deps);
+        networkInfoProvider = new DbSyncNetworkInfoProvider({
+          cache,
+          cardanoNode,
+          dbPools,
+          epochMonitor,
+          genesisData,
+          logger
+        });
         service = new NetworkInfoHttpService({ logger, networkInfoProvider });
         httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
 
@@ -83,14 +97,14 @@ describe('Service dependency abstractions', () => {
       });
 
       afterAll(async () => {
-        await db!.end();
+        await clearDbPools(dbPools);
         await httpServer.shutdown();
-        await cache.shutdown();
+        await cache.db.shutdown();
         jest.clearAllTimers();
       });
 
       it('db should be a instance of Proxy ', () => {
-        expect(types.isProxy(db!)).toEqual(true);
+        expect(types.isProxy(dbPools.main!)).toEqual(true);
       });
 
       it('forwards the db health response', async () => {
@@ -117,7 +131,7 @@ describe('Service dependency abstractions', () => {
 
   describe('Postgres-dependant service with static config', () => {
     let httpServer: HttpServer;
-    let db: Pool | undefined;
+    let dbPools: DbPools;
     let port: number;
     let apiUrlBase: string;
     let config: HttpServerConfig;
@@ -128,9 +142,14 @@ describe('Service dependency abstractions', () => {
     let lastBlockNoInDb: LedgerTipModel;
 
     beforeAll(async () => {
-      db = await getPool(dnsResolver, logger, {
-        postgresConnectionString: process.env.POSTGRES_CONNECTION_STRING
-      });
+      dbPools = {
+        healthCheck: (await getPool(dnsResolver, logger, {
+          postgresConnectionString: process.env.POSTGRES_CONNECTION_STRING
+        })) as Pool,
+        main: (await getPool(dnsResolver, logger, {
+          postgresConnectionString: process.env.POSTGRES_CONNECTION_STRING
+        })) as Pool
+      };
     });
 
     describe('Established connection', () => {
@@ -138,8 +157,8 @@ describe('Service dependency abstractions', () => {
         port = await getPort();
         config = { listen: { port } };
         apiUrlBase = `http://localhost:${port}/network-info`;
-        epochMonitor = new DbSyncEpochPollService(db!, 1000);
-        lastBlockNoInDb = (await db!.query<LedgerTipModel>(findLedgerTip)).rows[0];
+        epochMonitor = new DbSyncEpochPollService(dbPools.main!, 1000);
+        lastBlockNoInDb = (await dbPools.main!.query<LedgerTipModel>(findLedgerTip)).rows[0];
         cardanoNode = mockCardanoNode(
           healthCheckResponseMock({
             blockNo: lastBlockNoInDb.block_no,
@@ -154,7 +173,7 @@ describe('Service dependency abstractions', () => {
           })
         ) as unknown as OgmiosCardanoNode;
         const genesisData = await loadGenesisData(cardanoNodeConfigPath);
-        const deps = { cache, cardanoNode, db: db!, epochMonitor, genesisData, logger };
+        const deps = { cache, cardanoNode, dbPools, epochMonitor, genesisData, logger };
         networkInfoProvider = new DbSyncNetworkInfoProvider(deps);
         service = new NetworkInfoHttpService({ logger, networkInfoProvider });
         httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
@@ -164,14 +183,14 @@ describe('Service dependency abstractions', () => {
       });
 
       afterAll(async () => {
-        await db!.end();
+        await clearDbPools(dbPools);
         await httpServer.shutdown();
-        await cache.shutdown();
+        await cache.db.shutdown();
         jest.clearAllTimers();
       });
 
       it('db should not be instance a of Proxy ', () => {
-        expect(types.isProxy(db!)).toEqual(false);
+        expect(types.isProxy(dbPools.main!)).toEqual(false);
       });
 
       it('forwards the db health response', async () => {
