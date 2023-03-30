@@ -1,10 +1,10 @@
-import { Bootstrap, Projections, projectIntoSink } from '@cardano-sdk/projection';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
-import { StakePoolEntity, TypeormStabilityWindowBuffer, createSink } from '../../src';
+import { Projections } from '@cardano-sdk/projection';
+import { StakePoolEntity, TypeormStabilityWindowBuffer } from '../../src';
+import { createProjector, createProjectorTilFirst } from './util';
 import { initializeDataSource } from '../util';
-import { lastValueFrom, of, takeWhile } from 'rxjs';
 import pick from 'lodash/pick';
 
 describe('sinks/stakePools', () => {
@@ -14,6 +14,8 @@ describe('sinks/stakePools', () => {
   let dataSource: DataSource;
   let queryRunner: QueryRunner;
   let buffer: TypeormStabilityWindowBuffer;
+  const project = () => createProjector(dataSource, data.cardanoNode, buffer, projections);
+  const projectTilFirst = createProjectorTilFirst(project);
 
   const loadStakePool = async (id: Cardano.PoolId) => {
     const stakePool = await poolsRepo.findOne({
@@ -39,24 +41,6 @@ describe('sinks/stakePools', () => {
     await queryRunner.release();
     await dataSource.destroy();
   });
-
-  const project$ = () =>
-    Bootstrap.fromCardanoNode({
-      buffer,
-      cardanoNode: data.cardanoNode,
-      logger
-    }).pipe(
-      projectIntoSink({
-        projections,
-        sink: createSink({
-          buffer,
-          dataSource$: of(dataSource),
-          logger
-        })
-      })
-    );
-  const projectTilFirst = async (filter: (evt: Projections.ProjectionsEvent<typeof projections>) => boolean) =>
-    lastValueFrom(project$().pipe(takeWhile((evt) => !filter(evt), true)));
 
   it('typeorm loads correctly typed properties', async () => {
     const projectionEvent = await projectTilFirst((evt) => evt.stakePools.retirements.length > 0);
