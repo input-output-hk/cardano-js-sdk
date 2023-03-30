@@ -14,17 +14,17 @@ export const certificatePointerToId = ({ slot, certIndex, txIndex }: Operators.C
 export const MaxCertificatePointerIdTxIndex = 99_999;
 export const MaxCertificatePointerIdCertificateIndex = 9999;
 
-export interface TypeormSinkProps<ProjectionId extends keyof Projections.AllProjections> {
+export interface TypeormSinkProps<ProjectionId extends keyof Projections.AllProjections>
+  extends Omit<TypeormSink<ProjectionId>, 'sink$'> {
   sink: (
     evt: UnifiedProjectorEvent<CommonSinkProps<Pick<AllProjections, ProjectionId>> & WithTypeormContext>
   ) => Promise<unknown>;
-  entities: Function[];
 }
 
 export const typeormSink = <ProjectionId extends keyof Projections.AllProjections>({
-  entities,
-  sink
+  sink,
+  ...rest
 }: TypeormSinkProps<ProjectionId>): TypeormSink<ProjectionId> => ({
-  entities,
-  sink$: (evt$) => evt$.pipe(concatMap((evt) => from(sink(evt).then(() => evt))))
+  sink$: (evt$) => evt$.pipe(concatMap((evt) => from(sink(evt).then(() => evt)))),
+  ...rest
 });

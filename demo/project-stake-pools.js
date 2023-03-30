@@ -5,15 +5,14 @@ const { createDataSource, createSink, TypeormStabilityWindowBuffer } = require('
 const { OgmiosObservableCardanoNode } = require('@cardano-sdk/ogmios');
 const { from, of } = require('rxjs');
 const { createDatabase } = require('typeorm-extension');
+const pick = require('lodash/pick');
 
 const logger = {
   ...console,
   debug: () => void 0
 };
 
-const projections = {
-  stakePools: Projections.stakePools
-};
+const projections = pick(Projections.allProjections, ['stakePools', 'stakePoolMetadata']);
 
 const connectionConfig = {
   database: 'projection',

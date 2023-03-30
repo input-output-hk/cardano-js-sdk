@@ -1,10 +1,13 @@
 import 'reflect-metadata';
 import { BlockDataEntity } from './entity';
 import { BlockEntity } from './entity/Block.entity';
-import { DataSource, DataSourceOptions, DefaultNamingStrategy, NamingStrategyInterface } from 'typeorm';
+import { BossDb } from './pgBoss';
+import { DataSource, DataSourceOptions, DefaultNamingStrategy, NamingStrategyInterface, QueryRunner } from 'typeorm';
 import { Logger } from 'ts-log';
-import { supportedSinks } from './util';
+import { contextLogger, patchObject } from '@cardano-sdk/util';
+import { projectionSinks } from './util';
 import { typeormLogger } from './logger';
+import PgBoss from 'pg-boss';
 import snakeCase from 'lodash/snakeCase';
 import uniq from 'lodash/uniq';
 
@@ -85,6 +88,43 @@ const namingStrategy = new Proxy<NamingStrategyInterface>(defaultStrategy, {
   }
 });
 
+export const pgBossSchemaExists = async (queryRunner: QueryRunner) => {
+  const queryResult = await queryRunner.query(
+    "SELECT exists(select schema_name FROM information_schema.schemata WHERE schema_name = 'pgboss');"
+  );
+  return queryResult[0]?.exists === true;
+};
+
+const initializePgBoss = async (dataSource: DataSource, logger: Logger, usePgBoss: boolean, dropSchema?: boolean) => {
+  const queryRunner = dataSource.createQueryRunner('master');
+  try {
+    if (dropSchema) {
+      await queryRunner.query('DROP SCHEMA IF EXISTS pgboss CASCADE;');
+    } else if (await pgBossSchemaExists(queryRunner)) {
+      return;
+    }
+    if (!usePgBoss) {
+      return;
+    }
+    const boss = new PgBoss({
+      db: new BossDb(queryRunner)
+    });
+    await queryRunner.query('CREATE EXTENSION IF NOT EXISTS pgcrypto;');
+    await boss.start();
+    await boss.stop();
+    await queryRunner.query(`
+      ALTER TABLE pgboss.job
+        ADD COLUMN block_height INTEGER,
+        ADD CONSTRAINT job_block_height_fkey
+          FOREIGN KEY (block_height) REFERENCES public.block(height)
+          ON DELETE CASCADE;
+    `);
+    logger.info('"pgboss" schema created');
+  } finally {
+    await queryRunner.release();
+  }
+};
+
 export const createDataSource = <P extends object>({
   connectionConfig,
   devOptions,
@@ -92,11 +132,14 @@ export const createDataSource = <P extends object>({
   projections,
   logger
 }: CreateDataSourceProps<P>) => {
-  const requestedProjectionEntities = Object.entries(supportedSinks)
-    .filter(([projectionName]) => projectionName in projections)
-    .flatMap(([_, sink]) => sink.entities);
-  const entities: Function[] = uniq([BlockEntity, BlockDataEntity, ...requestedProjectionEntities]);
-  return new DataSource({
+  const requestedSinks = projectionSinks(projections);
+  const entities: Function[] = uniq([
+    BlockEntity,
+    BlockDataEntity,
+    ...requestedSinks.flatMap(([_, sink]) => sink.entities)
+  ]);
+  const usePgBoss = requestedSinks.some(([_, { extensions }]) => extensions?.pgBoss);
+  const dataSource = new DataSource({
     ...connectionConfig,
     ...devOptions,
     ...options,
@@ -105,5 +148,12 @@ export const createDataSource = <P extends object>({
     logging: true,
     namingStrategy,
     type: 'postgres'
+  });
+  return patchObject(dataSource, {
+    async initialize() {
+      await dataSource.initialize();
+      await initializePgBoss(dataSource, contextLogger(logger, 'createDataSource'), usePgBoss, devOptions?.dropSchema);
+      return dataSource;
+    }
   });
 };

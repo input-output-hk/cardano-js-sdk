@@ -21,10 +21,11 @@ import {
 } from 'rxjs';
 import { Operators, Sink } from '@cardano-sdk/projection';
 import { RetryBackoffConfig, retryBackoff } from 'backoff-rxjs';
-import { SupportedProjections, applySinks, isRecoverableTypeormError } from './util';
+import { SupportedProjections, applySinks, isRecoverableTypeormError, shouldEnablePgBossExtension } from './util';
 import { TypeormStabilityWindowBuffer } from './TypeormStabilityWindowBuffer';
 import { WithLogger } from '@cardano-sdk/util';
 import { WithTypeormContext } from './types';
+import { createPgBossExtension } from './pgBoss';
 import { finalizeWithLatest } from '@cardano-sdk/util-rxjs';
 import omit from 'lodash/omit';
 
@@ -44,7 +45,12 @@ export interface TypeormSinksProps extends WithLogger {
   reconnectionConfig?: ReconnectionConfig;
 }
 
-const TypeormContextProps: Array<keyof WithTypeormContext> = ['blockEntity', 'queryRunner', 'transactionCommitted$'];
+const TypeormContextProps: Array<keyof WithTypeormContext> = [
+  'blockEntity',
+  'queryRunner',
+  'transactionCommitted$',
+  'extensions'
+];
 
 const withQueryRunner = (dataSource: DataSource, buffer: TypeormStabilityWindowBuffer, logger: Logger) =>
   concat(
@@ -98,7 +104,20 @@ export const createSink =
           resetOnRefCountZero: () => timer(3000)
         }),
         Operators.withStaticContext(
-          dataSource$.pipe(switchMap((dataSource) => withQueryRunner(dataSource, buffer, logger)))
+          dataSource$.pipe(
+            switchMap((dataSource) => withQueryRunner(dataSource, buffer, logger)),
+            switchMap(({ queryRunner }): Observable<Pick<WithTypeormContext, 'queryRunner' | 'extensions'>> => {
+              if (shouldEnablePgBossExtension(projections)) {
+                return from(
+                  (async () => {
+                    const pgBoss = createPgBossExtension(queryRunner);
+                    return { extensions: { pgBoss }, queryRunner };
+                  })()
+                );
+              }
+              return of({ extensions: {}, queryRunner });
+            })
+          )
         ),
         // Transactions must be done sequentially
         concatMap((evt) =>
