@@ -258,6 +258,11 @@ export const findDelegationCertsByTxIds = `
 	ORDER BY tx.id ASC`;
 
 export const findTxsByAddresses = {
+  ORDER: `
+ORDER BY tx_id`,
+  SELECT: `
+SELECT
+  DISTINCT tx_id`,
   WITH: `
 WITH source AS (
   SELECT tx_id, tx_in_id FROM tx_out
@@ -269,19 +274,6 @@ combined AS (
   UNION ALL
   SELECT tx_in_id AS tx_id FROM source WHERE tx_in_id IS NOT NULL
 )`,
-  count: {
-    ORDER: '',
-    SELECT: `
-SELECT
-  COUNT(DISTINCT tx_id) AS count`
-  },
-  page: {
-    ORDER: `
-ORDER BY tx_id`,
-    SELECT: `
-SELECT
-  DISTINCT tx_id`
-  },
   withRange: {
     FROM: `
 FROM partial
@@ -295,7 +287,6 @@ partial AS (
   SELECT
     DISTINCT tx_id
   FROM combined
-  ORDER BY tx_id
 )`
   },
   withoutRange: {
