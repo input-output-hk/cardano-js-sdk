@@ -1,0 +1,29 @@
+version: '3.9'
+
+x-logging: &logging
+  logging:
+    driver: 'json-file'
+    options:
+      max-size: '200k'
+      max-file: '10'
+
+services:
+  pg-agent:
+    <<: *logging
+    build:
+      context: ../../compose/pg-agent
+    depends_on:
+      postgres:
+        condition: service_healthy
+    secrets:
+      - postgres_db
+      - postgres_password
+      - postgres_user
+
+  prometheus:
+    <<: *logging
+    image: prom/prometheus
+    ports:
+      - ${PROMETHEUS_PORT:-9090}:9090
+    volumes:
+      - ../../compose/pg-agent/prometheus.yml:/etc/prometheus/prometheus.yml
