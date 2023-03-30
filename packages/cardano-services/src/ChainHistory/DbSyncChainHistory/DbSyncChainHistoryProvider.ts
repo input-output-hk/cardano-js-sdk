@@ -109,7 +109,11 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
 
   private async transactionsByIds(ids: string[]): Promise<Cardano.HydratedTx[]> {
     this.logger.debug('About to find transactions with ids:', ids);
-    const txResults: QueryResult<TxModel> = await this.dbPools.main.query(Queries.findTransactionsByIds, [ids]);
+    const txResults: QueryResult<TxModel> = await this.dbPools.main.query({
+      name: 'transactions_by_ids',
+      text: Queries.findTransactionsByIds,
+      values: [ids]
+    });
     if (txResults.rows.length === 0) return [];
 
     const [inputs, outputs, mints, withdrawals, redeemers, metadata, collaterals, certificates] = await Promise.all([
