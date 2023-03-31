@@ -214,6 +214,7 @@ export class HttpServer extends RunnableModule {
     this.app.use(
       expressPromBundle({
         includeMethod: true,
+        includePath: true,
         promRegistry,
         ...this.#config.metrics?.options
       })
