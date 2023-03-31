@@ -140,21 +140,21 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
     switch (sortType) {
       // Add more cases as more sort types are supported
       case 'metrics':
-        return (options?: QueryStakePoolsArgs) =>
+        return (options: QueryStakePoolsArgs) =>
           this.#builder.queryPoolMetrics(hashesIds, totalStake, useBlockfrost, options);
       case 'apy':
         // HACK: If the client request sort by APY default to normal sorting.
         if (this.#responseConfig?.search?.metrics?.apy === false) {
-          return async (options?: QueryStakePoolsArgs) => {
-            if (options) options.sort = undefined;
+          return async (options: QueryStakePoolsArgs) => {
+            options.sort = undefined;
             return await this.#builder.queryPoolData(updatesIds, useBlockfrost, options);
           };
         }
 
-        return (options?: QueryStakePoolsArgs) => this.#builder.queryPoolAPY(hashesIds, this.#epochLength, options);
+        return (options: QueryStakePoolsArgs) => this.#builder.queryPoolAPY(hashesIds, this.#epochLength, options);
       case 'data':
       default:
-        return (options?: QueryStakePoolsArgs) => this.#builder.queryPoolData(updatesIds, useBlockfrost, options);
+        return (options: QueryStakePoolsArgs) => this.#builder.queryPoolData(updatesIds, useBlockfrost, options);
     }
   }
 
@@ -180,12 +180,12 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
     poolUpdates: PoolUpdate[],
     totalStake: string | null,
     useBlockfrost: boolean,
-    options?: QueryStakePoolsArgs
+    options: QueryStakePoolsArgs
   ) {
     const hashesIds = poolUpdates.map(({ id }) => id);
     const updatesIds = poolUpdates.map(({ updateId }) => updateId);
     this.logger.debug(`${hashesIds.length} pools found`);
-    const sortType = options?.sort?.field ? getStakePoolSortType(options.sort.field) : 'data';
+    const sortType = options.sort?.field ? getStakePoolSortType(options.sort.field) : 'data';
 
     const orderedResult = await this.getQueryBySortType(
       sortType,

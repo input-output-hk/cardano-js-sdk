@@ -102,11 +102,11 @@ export class StakePoolBuilder {
   public async queryPoolAPY(hashesIds: number[], epochLength: number, options?: QueryPoolsApyArgs): Promise<PoolAPY[]> {
     this.#logger.debug('About to query pools APY');
     const defaultSort: OrderByOptions[] = [{ field: 'apy', order: 'desc' }];
-    const queryWithSortAndPagination = withPagination(
-      withSort(Queries.findPoolAPY(epochLength, options?.rewardsHistoryLimit), options?.sort, defaultSort),
-      options?.pagination
-    );
-    const result: QueryResult<PoolAPYModel> = await this.#db.query(queryWithSortAndPagination, [hashesIds]);
+
+    const sorted = withSort(Queries.findPoolAPY(epochLength, options?.rewardsHistoryLimit), options?.sort, defaultSort);
+    const { query, args } = withPagination(sorted, [hashesIds], options?.pagination);
+    const result = await this.#db.query<PoolAPYModel>(query, args);
+
     return result.rows.map(mapPoolAPY);
   }
 
@@ -116,11 +116,13 @@ export class StakePoolBuilder {
       { field: 'name', order: 'asc' },
       { field: 'pool_id', order: 'asc' }
     ];
-    const queryWithSortAndPagination = withPagination(
-      withSort(useBlockfrost ? Queries.findBlockfrostPoolsData : Queries.findPoolsData, options?.sort, defaultSort),
-      options?.pagination
+    const sorted = withSort(
+      useBlockfrost ? Queries.findBlockfrostPoolsData : Queries.findPoolsData,
+      options?.sort,
+      defaultSort
     );
-    const result: QueryResult<PoolDataModel> = await this.#db.query(queryWithSortAndPagination, [updatesIds]);
+    const { query, args } = withPagination(sorted, [updatesIds], options?.pagination);
+    const result = await this.#db.query<PoolDataModel>(query, args);
     return result.rows.length > 0 ? result.rows.map(mapPoolData) : [];
   }
 
@@ -140,22 +142,17 @@ export class StakePoolBuilder {
     this.#logger.debug('About to query pool metrics');
 
     if (useBlockfrost) {
-      const queryWithSortAndPagination = withPagination(
-        withSort(Queries.findBlockfrostPoolsMetrics, options?.sort, [{ field: 'saturation', order: 'desc' }]),
-        options?.pagination
-      );
-      const result = await this.#db.query<BlockfrostPoolMetricsModel>(queryWithSortAndPagination, [hashesIds]);
+      const sorted = withSort(Queries.findBlockfrostPoolsMetrics, options?.sort, [
+        { field: 'saturation', order: 'desc' }
+      ]);
+      const { query, args } = withPagination(sorted, [hashesIds], options?.pagination);
+      const result = await this.#db.query<BlockfrostPoolMetricsModel>(query, args);
       return result.rows.map(mapBlockfrostPoolMetrics);
     }
 
-    const queryWithSortAndPagination = withPagination(
-      withSort(Queries.findPoolsMetrics, options?.sort, [{ field: 'saturation', order: 'desc' }]),
-      options?.pagination
-    );
-    const result: QueryResult<PoolMetricsModel> = await this.#db.query(queryWithSortAndPagination, [
-      hashesIds,
-      totalStake
-    ]);
+    const sorted = withSort(Queries.findPoolsMetrics, options?.sort, [{ field: 'saturation', order: 'desc' }]);
+    const { query, args } = withPagination(sorted, [hashesIds, totalStake], options?.pagination);
+    const result = await this.#db.query<PoolMetricsModel>(query, args);
     return result.rows.length > 0 ? result.rows.map(mapPoolMetrics) : [];
   }
 
@@ -334,8 +331,8 @@ export class StakePoolBuilder {
     return {
       params,
       query: `${clauses.join('')}
-WHERE
-  ${whereConditions.join(` ${_condition === 'or' ? 'OR' : 'AND'}\n  `)}`
+      WHERE
+      ${whereConditions.join(` ${_condition === 'or' ? 'OR' : 'AND'}\n  `)}`
     };
   }
 }

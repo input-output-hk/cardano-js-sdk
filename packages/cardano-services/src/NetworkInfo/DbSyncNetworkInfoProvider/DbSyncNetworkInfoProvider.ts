@@ -4,6 +4,7 @@ import {
   CardanoNodeUtil,
   EraSummary,
   NetworkInfoProvider,
+  Seconds,
   SlotEpochCalc,
   StakeSummary,
   SupplySummary,
@@ -50,6 +51,7 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) im
   #epochMonitor: EpochMonitor;
   #epochRolloverDisposer: Disposer;
   #slotEpochCalc: SlotEpochCalc;
+  #ledgerTipTtl: Seconds;
 
   constructor({ cache, cardanoNode, dbPools, epochMonitor, genesisData, logger }: NetworkInfoProviderDependencies) {
     super({ cache, cardanoNode, dbPools, logger }, 'DbSyncNetworkInfoProvider', logger);
@@ -57,14 +59,18 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) im
     this.#logger = logger;
     this.#cache = cache.db;
     this.#currentEpoch = Cardano.EpochNo(0);
+    this.#ledgerTipTtl = Seconds(0);
     this.#epochMonitor = epochMonitor;
     this.#builder = new NetworkInfoBuilder(dbPools.main, logger);
     this.#genesisData = genesisData;
   }
 
   public async ledgerTip(): Promise<Cardano.Tip> {
-    const tip = await this.#builder.queryLedgerTip();
-    const result = toLedgerTip(tip);
+    const result = await this.#cache.get(
+      NetworkInfoCacheKey.LEDGER_TIP,
+      async () => toLedgerTip(await this.#builder.queryLedgerTip()),
+      this.#ledgerTipTtl
+    );
 
     // Perform computation only on changed tip
     if (this.#currentHash !== result.hash) {
@@ -139,6 +145,7 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) im
 
   async startImpl() {
     this.#epochRolloverDisposer = this.#epochMonitor.onEpochRollover(() => this.#cache.clear());
+    this.#ledgerTipTtl = await this.#getLedgerTipTtl();
   }
 
   async shutdownImpl() {
@@ -151,5 +158,10 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) im
       this.#slotEpochCalc = memoize(createSlotEpochCalc(await this.eraSummaries()));
     }
     return this.#slotEpochCalc;
+  }
+
+  async #getLedgerTipTtl(): Promise<Seconds> {
+    const genesisParams = await this.genesisParameters();
+    return Seconds(genesisParams.slotLength / genesisParams.activeSlotsCoefficient / 20);
   }
 }

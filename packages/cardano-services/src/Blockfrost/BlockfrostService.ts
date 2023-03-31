@@ -36,7 +36,7 @@ export class BlockfrostService extends HttpService {
     super('blockfrost-cache', provider, Router(), logger);
 
     this.#api = new BlockFrostAPI({ network, projectId: blockfrostApiKey });
-    this.#builder = new BlockfrostCacheBuilder(db, logger);
+    this.#builder = new BlockfrostCacheBuilder(db, this.logger);
     this.#cacheTtl = cacheTtl;
     this.#db = db;
 
