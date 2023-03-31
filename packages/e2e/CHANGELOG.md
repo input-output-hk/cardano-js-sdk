@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.1-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.9.1-nightly.4...@cardano-sdk/e2e@0.9.1-nightly.5) (2023-03-31)
+
+### Features
+
+- adds the sql queries profiling system ([7f972fd](https://github.com/input-output-hk/cardano-js-sdk/commit/7f972fd54073082cc75d2e7b49a92277e47148c1))
+
+### Bug Fixes
+
+- circular deps check in CI ([070f5e9](https://github.com/input-output-hk/cardano-js-sdk/commit/070f5e9f199c8a3b823f80aa98b35a4df7dbe532))
+
 ## [0.9.1-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.9.1-nightly.3...@cardano-sdk/e2e@0.9.1-nightly.4) (2023-03-24)
 
 **Note:** Version bump only for package @cardano-sdk/e2e

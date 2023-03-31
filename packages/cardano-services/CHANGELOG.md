@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.11.0-nightly.4...@cardano-sdk/cardano-services@0.11.0-nightly.5) (2023-03-31)
+
+### ⚠ BREAKING CHANGES
+
+- **cardano-services:** give health checks a dedicated db pool
+
+### Features
+
+- adds the sql queries profiling system ([7f972fd](https://github.com/input-output-hk/cardano-js-sdk/commit/7f972fd54073082cc75d2e7b49a92277e47148c1))
+- **cardano-services:** cache the DB and node healthCheck results ([1583ede](https://github.com/input-output-hk/cardano-js-sdk/commit/1583edee2b78f1138430c2d3426a37153413944c))
+- **cardano-services:** give health checks a dedicated db pool ([4729889](https://github.com/input-output-hk/cardano-js-sdk/commit/4729889f4218bd5a3cebf7f0fd342800b2f033f6))
+- **cardano-services:** ledgerTip query result is now cached ([3749f59](https://github.com/input-output-hk/cardano-js-sdk/commit/3749f5925cc687451d76c0e238377fa39443784d))
+- **cardano-services:** parametrize pagination queries ([61a0d9d](https://github.com/input-output-hk/cardano-js-sdk/commit/61a0d9d7954725c2626b870f21bc04e417b4f079))
+- **cardano-services:** use prepared statements for txs by addresses queries ([5502fa9](https://github.com/input-output-hk/cardano-js-sdk/commit/5502fa95dbff61af138eb7d98772e6b26c45face))
+- metrics for sync status ([1f081f8](https://github.com/input-output-hk/cardano-js-sdk/commit/1f081f8303d705b383c5d98fdad909ffcc7e23d5))
+
+### Bug Fixes
+
+- circular deps check in CI ([070f5e9](https://github.com/input-output-hk/cardano-js-sdk/commit/070f5e9f199c8a3b823f80aa98b35a4df7dbe532))
+
 ## [0.11.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.11.0-nightly.3...@cardano-sdk/cardano-services@0.11.0-nightly.4) (2023-03-24)
 
 ### Features

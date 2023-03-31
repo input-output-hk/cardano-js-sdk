@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.11.0-nightly.4...@cardano-sdk/wallet@0.11.0-nightly.5) (2023-03-31)
+
+### Bug Fixes
+
+- circular deps check in CI ([070f5e9](https://github.com/input-output-hk/cardano-js-sdk/commit/070f5e9f199c8a3b823f80aa98b35a4df7dbe532))
+- **wallet:** adjust time to wait before resubmit ([32777a7](https://github.com/input-output-hk/cardano-js-sdk/commit/32777a7a7fe452a18c29f423b48b211e760f6051))
+
 ## [0.11.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.11.0-nightly.3...@cardano-sdk/wallet@0.11.0-nightly.4) (2023-03-24)
 
 **Note:** Version bump only for package @cardano-sdk/wallet

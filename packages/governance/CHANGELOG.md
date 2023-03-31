@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.1-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/governance@0.5.1-nightly.3...@cardano-sdk/governance@0.5.1-nightly.4) (2023-03-31)
+
+### Bug Fixes
+
+- circular deps check in CI ([070f5e9](https://github.com/input-output-hk/cardano-js-sdk/commit/070f5e9f199c8a3b823f80aa98b35a4df7dbe532))
+
 ## [0.5.1-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/governance@0.5.1-nightly.2...@cardano-sdk/governance@0.5.1-nightly.3) (2023-03-24)
 
 **Note:** Version bump only for package @cardano-sdk/governance
