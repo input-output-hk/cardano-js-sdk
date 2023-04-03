@@ -2582,6 +2582,7 @@ __metadata:
     jest-webextension-mock: ^3.7.22
     json-bigint: ^1.0.0
     jsonschema: ^1.4.1
+    k6: ^0.0.0
     lodash: ^4.17.21
     madge: ^5.0.1
     mock-browser: ^0.92.14
@@ -16773,6 +16774,13 @@ __metadata:
   version: 5.1.1
   resolution: "just-diff@npm:5.1.1"
   checksum: a6dfd778658c56c0144a22a435dd0a1cae890c4c7a973dbc1c16be0b092cfb5c8ac2d42d608d9713c3fc83683722ecb1585f67c30205f2836bfbe61022bd6999
+  languageName: node
+  linkType: hard
+
+"k6@npm:^0.0.0":
+  version: 0.0.0
+  resolution: "k6@npm:0.0.0"
+  checksum: 13a6701565b36457326c77bddafd73d9137c016088961e9ce18e78a3a48b8b155f93775b8e12d6f21e226da21d8c1dfe3e6a130cd35409bce84c247746b1cd85
   languageName: node
   linkType: hard
 
