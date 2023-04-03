@@ -59,9 +59,9 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "@cardano-sdk/core": "^0.10.0",
-    "@cardano-sdk/input-selection": "^0.9.0",
-    "@cardano-sdk/util": "^0.8.2",
+    "@cardano-sdk/core": "workspace:*",
+    "@cardano-sdk/input-selection": "workspace:*",
+    "@cardano-sdk/util": "workspace:*",
     "lodash": "^4.17.21",
     "npm": "^9.3.0",
     "ts-custom-error": "^3.2.0",
