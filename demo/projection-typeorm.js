@@ -14,6 +14,8 @@ const logger = {
 
 const projections = pick(Projections.allProjections, ['stakePools', 'stakePoolMetadata']);
 
+// #region TypeORM setup
+
 const connectionConfig = {
   database: 'projection',
   host: 'localhost',
@@ -46,6 +48,8 @@ const dataSource$ = from(
     return dataSource;
   })()
 );
+
+// #endregion
 
 const cardanoNode = new OgmiosObservableCardanoNode(
   {
