@@ -110,6 +110,7 @@ export const createUtxoTracker = (
   return {
     available$,
     setUnspendable: async (utxo) => {
+      logger.debug('setUnspendable', utxo);
       unspendableUtxoSource$.next(utxo);
     },
     shutdown: () => {

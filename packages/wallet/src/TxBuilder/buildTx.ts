@@ -18,7 +18,7 @@ import { Observable, firstValueFrom } from 'rxjs';
 import { ObservableWalletTxOutputBuilder } from './OutputBuilder';
 import { OutputValidator, RewardAccount, StakeKeyStatus, WalletUtilContext, createWalletUtil } from '../services';
 import { SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
-import { deepEquals } from '@cardano-sdk/util';
+import { contextLogger, deepEquals } from '@cardano-sdk/util';
 
 /**
  * Minimal sub-type of ObservableWallet that is used by TxBuilder.
@@ -70,10 +70,12 @@ const createSignedTx = async ({
   witness,
   signingOptions,
   auxiliaryData,
-  afterSubmitCb
+  afterSubmitCb,
+  logger
 }: FinalizeTxProps & {
   wallet: ObservableWalletTxBuilderDependencies;
   afterSubmitCb: () => void;
+  logger: Logger;
 }): Promise<SignedTx> => {
   const finalizedTx = await wallet.finalizeTx({
     auxiliaryData,
@@ -82,7 +84,11 @@ const createSignedTx = async ({
     witness
   });
   return {
-    submit: () => wallet.submitTx(finalizedTx).then(() => afterSubmitCb()),
+    submit: async () => {
+      logger.debug('submitting', finalizedTx);
+      await wallet.submitTx(finalizedTx);
+      return afterSubmitCb();
+    },
     tx: finalizedTx
   };
 };
@@ -128,7 +134,11 @@ export class ObservableWalletTxBuilder implements TxBuilder {
   }
 
   buildOutput(txOut?: PartialTxOut): OutputBuilder {
-    return new ObservableWalletTxOutputBuilder({ outputValidator: this.#outputValidator, txOut });
+    return new ObservableWalletTxOutputBuilder({
+      logger: contextLogger(this.#logger, 'outputBuilder'),
+      outputValidator: this.#outputValidator,
+      txOut
+    });
   }
 
   delegate(poolId?: Cardano.PoolId): TxBuilder {
@@ -154,6 +164,7 @@ export class ObservableWalletTxBuilder implements TxBuilder {
   async build(): Promise<MaybeValidTx> {
     try {
       if (this.isSubmitted()) throw new TxAlreadySubmittedError();
+      this.#logger.debug('Building');
       await this.#addDelegationCertificates();
       await this.#validateOutputs();
 
@@ -176,6 +187,7 @@ export class ObservableWalletTxBuilder implements TxBuilder {
   }
 
   #createValidTx(tx: InitializeTxResult): ValidTx {
+    this.#logger.debug('createValidTx', tx);
     return {
       auxiliaryData: this.auxiliaryData && { ...this.auxiliaryData },
       body: tx.body,
@@ -187,6 +199,7 @@ export class ObservableWalletTxBuilder implements TxBuilder {
         createSignedTx({
           afterSubmitCb: () => (this.#isSubmitted = true),
           auxiliaryData: this.auxiliaryData && { ...this.auxiliaryData },
+          logger: contextLogger(this.#logger, 'signedTx'),
           signingOptions: this.signingOptions && { ...this.signingOptions },
           tx,
           wallet: this.#observableWallet,
