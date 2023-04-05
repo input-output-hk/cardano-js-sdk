@@ -1,10 +1,10 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { SingleAddressWallet, buildTx, utxoEquals } from '@cardano-sdk/wallet';
 import { assertTxIsValid } from '../../../../wallet/test/util';
+import { contextLogger, isNotNil } from '@cardano-sdk/util';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import { getEnv, getWallet, walletVariables } from '../../../src';
-import { isNotNil } from '@cardano-sdk/util';
 import { walletReady } from '../../util';
 
 const env = getEnv(walletVariables);
@@ -29,8 +29,8 @@ describe('SingleAddressWallet/unspendableUtxos', () => {
     await walletReady(wallet1, coins);
     await walletReady(wallet2, coins);
 
-    const txBuilder1 = buildTx({ logger, observableWallet: wallet1 });
-    const txBuilder2 = buildTx({ logger, observableWallet: wallet2 });
+    const txBuilder1 = buildTx({ logger: contextLogger(logger, 'txBuilder1'), observableWallet: wallet1 });
+    const txBuilder2 = buildTx({ logger: contextLogger(logger, 'txBuilder2'), observableWallet: wallet2 });
 
     const address = (await firstValueFrom(wallet1.addresses$))[0].address;
 
