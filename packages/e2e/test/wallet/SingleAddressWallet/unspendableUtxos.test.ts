@@ -75,13 +75,13 @@ describe('SingleAddressWallet/unspendableUtxos', () => {
     let availableUtxo = await firstValueFrom(wallet1.utxo.available$);
 
     let totalUtxoHasUnspendable = totalUtxos.find((totalUtxoEntry) => utxoEquals([totalUtxoEntry], unspendableUtxo));
-    let avalableUtxoHasUnspendable = availableUtxo.find((availableUtxoEntry) =>
+    let availableUtxoHasUnspendable = availableUtxo.find((availableUtxoEntry) =>
       utxoEquals([availableUtxoEntry], unspendableUtxo)
     );
 
     expect(unspendableUtxo).toEqual([utxo]);
     expect(totalUtxoHasUnspendable).toBeTruthy();
-    expect(avalableUtxoHasUnspendable).toBeFalsy();
+    expect(availableUtxoHasUnspendable).toBeFalsy();
 
     // Spend the UTxO from the second wallet which uses a different store. We will transfer the whole balance
     // to force the input selection to select our UTxO
@@ -116,12 +116,12 @@ describe('SingleAddressWallet/unspendableUtxos', () => {
     availableUtxo = await firstValueFrom(wallet1.utxo.available$);
 
     totalUtxoHasUnspendable = totalUtxos.find((totalUtxoEntry) => utxoEquals([totalUtxoEntry], unspendableUtxo));
-    avalableUtxoHasUnspendable = availableUtxo.find((availableUtxoEntry) =>
+    availableUtxoHasUnspendable = availableUtxo.find((availableUtxoEntry) =>
       utxoEquals([availableUtxoEntry], unspendableUtxo)
     );
 
     expect(unspendableUtxo).toEqual([]);
     expect(totalUtxoHasUnspendable).toBeFalsy();
-    expect(avalableUtxoHasUnspendable).toBeFalsy();
+    expect(availableUtxoHasUnspendable).toBeFalsy();
   });
 });
