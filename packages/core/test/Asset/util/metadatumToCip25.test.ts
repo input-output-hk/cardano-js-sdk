@@ -9,6 +9,8 @@ describe('NftMetadata/metadatumToCip25', () => {
   const assetNameStringUtf8 = 'CIP0025-v2';
   const assetNameString = Buffer.from(assetNameStringUtf8).toString('hex');
   const policyIdString = 'b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a7';
+  const assetImageIPFS = 'ipfs://QmWS6DgF8Ma8oooBn7CtD3ChHyzzMw5NXWfnDbVFTip8af';
+  const assetImageHTTPS = 'https://tokens.cardano.org';
 
   const asset = {
     name: AssetName(assetNameString),
@@ -26,55 +28,63 @@ describe('NftMetadata/metadatumToCip25', () => {
     version: '1.0'
   };
 
-  describe('invalid metadata on optional fields', () => {
-    const assetName = 'Cardano Timeline 2022';
+  const assetName = 'Cardano Timeline 2022';
 
-    const createMetadatumWithFiles = (files: { __type: 'Map'; value: string[][] }[]) =>
-      fromSerializableObject<Cardano.MetadatumMap>({
-        __type: 'Map',
-        value: [
-          [
-            {
-              __type: 'bigint',
-              value: '721'
-            },
-            {
-              __type: 'Map',
-              value: [
-                [
-                  '41b20f83bdf559fa1580caf7960fd188e6aafacf5e81dfb089e82486',
-                  {
-                    __type: 'Map',
-                    value: [
-                      [
-                        assetName,
-                        {
-                          __type: 'Map',
-                          value: [
-                            ['era', 'ALL'],
-                            ['name', assetName],
-                            ['unit', 'none'],
-                            ['files', files],
-                            ['image', 'ipfs://QmWS6DgF8Ma8oooBn7CtD3ChHyzzMw5NXWfnDbVFTip8af'],
-                            ['edition', '2022'],
-                            ['project', 'CTimelines'],
-                            ['twitter', 'https://twitter.com/CTimelines1_io'],
-                            ['website', 'https://ctimelines1.io'],
-                            ['copyright', 'CTimelines 2021'],
-                            ['mediaType', 'image/gif'],
-                            ['collection', assetName]
-                          ]
-                        }
-                      ]
+  const validAsset = {
+    name: Cardano.AssetName('43617264616e6f2054696d656c696e652032303232'),
+    policyId: Cardano.PolicyId('41b20f83bdf559fa1580caf7960fd188e6aafacf5e81dfb089e82486')
+  };
+
+  const createMetadatumWithFiles = (
+    files: { __type: 'Map'; value: string[][] }[],
+    image: string | string[] = assetImageIPFS
+  ) =>
+    fromSerializableObject<Cardano.MetadatumMap>({
+      __type: 'Map',
+      value: [
+        [
+          {
+            __type: 'bigint',
+            value: '721'
+          },
+          {
+            __type: 'Map',
+            value: [
+              [
+                '41b20f83bdf559fa1580caf7960fd188e6aafacf5e81dfb089e82486',
+                {
+                  __type: 'Map',
+                  value: [
+                    [
+                      assetName,
+                      {
+                        __type: 'Map',
+                        value: [
+                          ['era', 'ALL'],
+                          ['name', assetName],
+                          ['unit', 'none'],
+                          ['files', files],
+                          ['image', image],
+                          ['edition', '2022'],
+                          ['project', 'CTimelines'],
+                          ['twitter', 'https://twitter.com/CTimelines1_io'],
+                          ['website', 'https://ctimelines1.io'],
+                          ['copyright', 'CTimelines 2021'],
+                          ['mediaType', 'image/gif'],
+                          ['collection', assetName]
+                        ]
+                      }
                     ]
-                  }
-                ]
+                  ]
+                }
               ]
-            }
-          ]
+            ]
+          }
         ]
-      });
+      ]
+    });
 
+  describe('invalid metadata on optional fields', () => {
     it('omits files with a missing file name', () => {
       const metadatum = createMetadatumWithFiles([
         {
@@ -93,14 +103,7 @@ describe('NftMetadata/metadatumToCip25', () => {
           ]
         }
       ]);
-      const result = metadatumToCip25(
-        {
-          name: Cardano.AssetName('43617264616e6f2054696d656c696e652032303232'), // 'Cardano Timeline 2022'
-          policyId: Cardano.PolicyId('41b20f83bdf559fa1580caf7960fd188e6aafacf5e81dfb089e82486')
-        },
-        metadatum,
-        logger
-      );
+      const result = metadatumToCip25(validAsset, metadatum, logger);
       expect(result).toBeTruthy();
       expect(result?.files).toHaveLength(1);
     });
@@ -123,14 +126,7 @@ describe('NftMetadata/metadatumToCip25', () => {
           ]
         }
       ]);
-      const result = metadatumToCip25(
-        {
-          name: Cardano.AssetName('43617264616e6f2054696d656c696e652032303232'), // 'Cardano Timeline 2022'
-          policyId: Cardano.PolicyId('41b20f83bdf559fa1580caf7960fd188e6aafacf5e81dfb089e82486')
-        },
-        metadatum,
-        logger
-      );
+      const result = metadatumToCip25(validAsset, metadatum, logger);
       expect(result).toBeTruthy();
       expect(result?.files).toHaveLength(1);
     });
@@ -153,14 +149,7 @@ describe('NftMetadata/metadatumToCip25', () => {
           ]
         }
       ]);
-      const result = metadatumToCip25(
-        {
-          name: Cardano.AssetName('43617264616e6f2054696d656c696e652032303232'), // 'Cardano Timeline 2022'
-          policyId: Cardano.PolicyId('41b20f83bdf559fa1580caf7960fd188e6aafacf5e81dfb089e82486')
-        },
-        metadatum,
-        logger
-      );
+      const result = metadatumToCip25(validAsset, metadatum, logger);
       expect(result).toBeTruthy();
       expect(result?.files).toHaveLength(1);
     });
@@ -183,6 +172,11 @@ describe('NftMetadata/metadatumToCip25', () => {
     expect(metadatumToCip25(asset, metadatum, logger)).toBeNull();
   });
 
+  it('returns null for cip25 metadatum with invalid image format', () => {
+    const metadatum = createMetadatumWithFiles([], 'http/tokens.cardano.org');
+    expect(metadatumToCip25(validAsset, metadatum, logger)).toBeNull();
+  });
+
   it('converts minimal metadata', () => {
     const metadatum: TxMetadata = new Map([
       [721n, new Map([[policyIdString, new Map([[assetNameString, minimalMetadata]])]])]
@@ -195,6 +189,57 @@ describe('NftMetadata/metadatumToCip25', () => {
       [721n, new Map([[policyIdString, new Map([[assetNameStringUtf8, minimalMetadata]])]])]
     ]);
     expect(metadatumToCip25(asset, metadatum, logger)).toEqual(minimalConvertedMetadata);
+  });
+
+  it('supports image with ipfs protocol', () => {
+    const metadatum = createMetadatumWithFiles([], assetImageIPFS);
+    const result = metadatumToCip25(validAsset, metadatum, logger);
+    expect(result?.image).toEqual([assetImageIPFS]);
+  });
+
+  it('supports image in https protocol', () => {
+    const metadatum = createMetadatumWithFiles([], assetImageHTTPS);
+    const result = metadatumToCip25(validAsset, metadatum, logger);
+    expect(result?.image).toEqual([assetImageHTTPS]);
+  });
+
+  it('supports bse64 decoded image following data URL scheme standard', () => {
+    const base64DecodedImage = [
+      'data:image/png;base64,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'
+    ];
+
+    const metadatum = createMetadatumWithFiles([], base64DecodedImage);
+    const result = metadatumToCip25(validAsset, metadatum, logger);
+    expect(result?.image).toEqual([base64DecodedImage.join('')]);
   });
 
   it('supports CIP-0025 v2', () => {
