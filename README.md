@@ -49,7 +49,8 @@ A Yarn Workspace maintaining a single version across all packages.
 #### System Requirements
 
 - [nvm](https://github.com/nvm-sh/nvm)
-- [yarn](https://classic.yarnpkg.com/lang/en/docs/install)
+- [yarn](https://yarnpkg.com/getting-started/install)
+- [Node.js](https://nodejs.org/en/download) 14 or later
 - [Docker Desktop] 3.4 or later or a Docker installation that includes Compose V2
 
 #### Clone
