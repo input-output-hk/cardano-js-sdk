@@ -1,5 +1,9 @@
 name: nightly-e2e
 
+env:
+  TL_DEPTH: ${{ fromJson(vars.TL_DEPTH) }}
+  TL_LEVEL: ${{ vars.TL_LEVEL }}
+
 on:
   workflow_dispatch:
   workflow_run:
