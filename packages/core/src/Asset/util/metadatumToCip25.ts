@@ -23,7 +23,7 @@ const asStringArray = (metadatum: Cardano.Metadatum | undefined): string[] | und
     if (result.some((str) => typeof str === 'undefined')) {
       return undefined;
     }
-    // Based on the CIP25: base64-encoded image spec
+    // Based on the CIP25: base64-encoded fields spec
     if (result[0]?.startsWith('data:')) {
       return [result.join('')];
     }
@@ -65,14 +65,7 @@ const mapFile = (metadatum: Cardano.Metadatum, assetId: Cardano.AssetId, logger:
   }
 
   const unknownTypeSrc = file.get('src');
-  const srcAsString = asString(unknownTypeSrc);
-  const src = srcAsString
-    ? Uri(srcAsString)
-    : asMetadatumArray(unknownTypeSrc)?.map((fileSrc) => {
-        const fileSrcAsString = asString(fileSrc);
-        if (!fileSrcAsString) throw new InvalidFileError('File source is with invalid format');
-        return Uri(fileSrcAsString);
-      });
+  const src = asStringArray(unknownTypeSrc)?.map((fileSrc) => Uri(fileSrc));
 
   if (!src) {
     logger.warn(missingFileFieldLogMessage('source', assetId));
