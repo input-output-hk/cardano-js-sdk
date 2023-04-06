@@ -1,6 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import { Logger } from 'ts-log';
 import {
   MaybeValidTxOut,
   OutputBuilder,
@@ -18,6 +19,8 @@ export interface OutputBuilderProps {
   outputValidator: OutputValidator;
   /** Optional partial transaction output to use for initialization. */
   txOut?: PartialTxOut;
+  /** Logger */
+  logger: Logger;
 }
 
 /** Determines if the `PartialTxOut` arg have at least an address and coins. */
@@ -49,16 +52,19 @@ export class ObservableWalletTxOutputBuilder implements OutputBuilder {
    */
   #partialOutput: PartialTxOut;
   #outputValidator: OutputValidator;
+  #logger: Logger;
 
-  constructor({ outputValidator, txOut }: OutputBuilderProps) {
+  constructor({ outputValidator, txOut, logger }: OutputBuilderProps) {
     this.#partialOutput = { ...txOut };
     this.#outputValidator = outputValidator;
+    this.#logger = logger;
   }
 
   toTxOut(): Cardano.TxOut {
     if (!isViableTxOut(this.#partialOutput)) {
       throw new OutputValidationMissingRequiredError(this.#partialOutput);
     }
+    this.#logger.debug('toTxOut result:', this.#partialOutput);
     return { ...this.#partialOutput };
   }
 

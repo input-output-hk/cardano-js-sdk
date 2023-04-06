@@ -1,5 +1,9 @@
 name: Continuous Integration - Unit Tests
 
+env:
+  TL_DEPTH: ${{ fromJson(vars.TL_DEPTH) }}
+  TL_LEVEL: ${{ vars.TL_LEVEL }}
+
 on:
   pull_request:
     branches: [ "master" ]
