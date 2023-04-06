@@ -38,6 +38,9 @@ Packages are distributed as both CommonJS and ESM modules.
   - using with `type="module"` requires `--experimental-specifier-resolution=node` flag
 - Browser via bundlers (see [example webpack config](./packages/e2e/test/web-extension/webpack.config.js))
 
+### Getting Started
+The [GETTING_STARTED](./GETTING_STARTED.md) guide provides a quick way to start experimenting.
+
 ### Testing
 
 - [@cardano-sdk/golden-test-generator](./packages/golden-test-generator)
