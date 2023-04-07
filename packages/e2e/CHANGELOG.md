@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.1-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.9.1-nightly.5...@cardano-sdk/e2e@0.9.1-nightly.6) (2023-04-07)
+
+### Features
+
+- add script to generate addreses ([7cb07ec](https://github.com/input-output-hk/cardano-js-sdk/commit/7cb07ec1b2d5a44e68d48fec33a1bd548a4acdb1))
+
 ## [0.9.1-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.9.1-nightly.4...@cardano-sdk/e2e@0.9.1-nightly.5) (2023-03-31)
 
 ### Features

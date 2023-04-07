@@ -2541,8 +2541,8 @@ __metadata:
     "@cardano-sdk/util": ^0.9.0-nightly.1
     "@cardano-sdk/util-dev": ^0.8.1-nightly.4
     "@cardano-sdk/util-rxjs": ^0.4.7-nightly.3
-    "@cardano-sdk/wallet": ^0.11.0-nightly.5
-    "@cardano-sdk/web-extension": ^0.8.3-nightly.5
+    "@cardano-sdk/wallet": ^0.11.0-nightly.6
+    "@cardano-sdk/web-extension": ^0.8.3-nightly.6
     "@dcspark/cardano-multiplatform-lib-browser": ^3.1.1
     "@emurgo/cardano-message-signing-asmjs": ^1.0.1
     "@types/bunyan": ^1.8.8
@@ -2888,7 +2888,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cardano-sdk/wallet@^0.11.0-nightly.5, @cardano-sdk/wallet@workspace:packages/wallet":
+"@cardano-sdk/wallet@^0.11.0-nightly.6, @cardano-sdk/wallet@workspace:packages/wallet":
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/wallet@workspace:packages/wallet"
   dependencies:
@@ -2930,7 +2930,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cardano-sdk/web-extension@^0.8.3-nightly.5, @cardano-sdk/web-extension@workspace:packages/web-extension":
+"@cardano-sdk/web-extension@^0.8.3-nightly.6, @cardano-sdk/web-extension@workspace:packages/web-extension":
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/web-extension@workspace:packages/web-extension"
   dependencies:
@@ -2941,7 +2941,7 @@ __metadata:
     "@cardano-sdk/util": ^0.9.0-nightly.1
     "@cardano-sdk/util-dev": ^0.8.1-nightly.4
     "@cardano-sdk/util-rxjs": ^0.4.7-nightly.3
-    "@cardano-sdk/wallet": ^0.11.0-nightly.5
+    "@cardano-sdk/wallet": ^0.11.0-nightly.6
     "@types/lodash": ^4.14.182
     "@types/uuid": ^8.3.4
     "@types/webextension-polyfill": ^0.8.0

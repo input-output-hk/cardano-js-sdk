@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.11.0-nightly.5...@cardano-sdk/wallet@0.11.0-nightly.6) (2023-04-07)
+
+### ⚠ BREAKING CHANGES
+
+- **wallet:** logger prop is now required in OutputBuilderProps
+
+### Features
+
+- **wallet:** logger prop is now required in OutputBuilderProps ([d01c1d9](https://github.com/input-output-hk/cardano-js-sdk/commit/d01c1d966ead7aceff0689b228e29a614517c1f5))
+
 ## [0.11.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.11.0-nightly.4...@cardano-sdk/wallet@0.11.0-nightly.5) (2023-03-31)
 
 ### Bug Fixes
