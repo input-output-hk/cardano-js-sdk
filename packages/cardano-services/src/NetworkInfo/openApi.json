@@ -147,33 +147,6 @@
         }
       }
     },
-    "/network-info/current-wallet-protocol-parameters": {
-      "post": {
-        "summary": "fetch current wallet protocol params",
-        "description": "Fetch current Wallet Protocol Params",
-        "operationId": "protocolParams",
-        "requestBody": {
-          "content": {
-            "application/json": {}
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "current wallet protocol params fetched",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProtocolParametersResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "invalid request"
-          }
-        }
-      }
-    },
     "/network-info/genesis-parameters": {
       "post": {
         "summary": "fetch genesis params",
@@ -205,10 +178,7 @@
   "components": {
     "schemas": {
       "Stake": {
-        "required": [
-          "active",
-          "live"
-        ],
+        "required": ["active", "live"],
         "type": "object",
         "properties": {
           "live": {
@@ -220,10 +190,7 @@
         }
       },
       "LovelaceSupply": {
-        "required": [
-          "circulating",
-          "total"
-        ],
+        "required": ["circulating", "total"],
         "type": "object",
         "properties": {
           "circulating": {
@@ -235,17 +202,11 @@
         }
       },
       "EraSummary": {
-        "required": [
-          "parameters",
-          "start"
-        ],
+        "required": ["parameters", "start"],
         "type": "object",
         "properties": {
           "parameters": {
-            "required": [
-              "epochLength",
-              "slotLength"
-            ],
+            "required": ["epochLength", "slotLength"],
             "type": "object",
             "properties": {
               "epochLength": {
@@ -259,10 +220,7 @@
             }
           },
           "start": {
-            "required": [
-              "slot",
-              "time"
-            ],
+            "required": ["slot", "time"],
             "type": "object",
             "properties": {
               "slot": {
@@ -277,10 +235,7 @@
         }
       },
       "Date": {
-        "required": [
-          "__type",
-          "value"
-        ],
+        "required": ["__type", "value"],
         "type": "object",
         "properties": {
           "value": {
@@ -288,17 +243,12 @@
           },
           "__type": {
             "type": "string",
-            "enum": [
-              "Date"
-            ]
+            "enum": ["Date"]
           }
         }
       },
       "BigInt": {
-        "required": [
-          "__type",
-          "value"
-        ],
+        "required": ["__type", "value"],
         "type": "object",
         "properties": {
           "value": {
@@ -307,19 +257,13 @@
           },
           "__type": {
             "type": "string",
-            "enum": [
-              "bigint"
-            ]
+            "enum": ["bigint"]
           }
         }
       },
       "LedgerTipResponse": {
         "type": "object",
-        "required": [
-          "blockNo",
-          "slot",
-          "hash"
-        ],
+        "required": ["blockNo", "slot", "hash"],
         "properties": {
           "blockNo": {
             "type": "number",
