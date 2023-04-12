@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.11.0-nightly.4...@cardano-sdk/core@0.11.0-nightly.5) (2023-04-12)
+
+### Bug Fixes
+
+- **core:** nft metadata files src in base64 ([b7811c7](https://github.com/input-output-hk/cardano-js-sdk/commit/b7811c736c0c3e74809b5d24a81bd620e26b6a47))
+- **core:** nft metadata images in base64 encoding format ([27876ed](https://github.com/input-output-hk/cardano-js-sdk/commit/27876ed0fcfb9eb00e9b6238081359558de967fa))
+
 ## [0.11.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.11.0-nightly.3...@cardano-sdk/core@0.11.0-nightly.4) (2023-03-31)
 
 ### Bug Fixes

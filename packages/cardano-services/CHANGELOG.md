@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.11.0-nightly.5...@cardano-sdk/cardano-services@0.11.0-nightly.6) (2023-04-12)
+
+### Features
+
+- **cardano-services:** add path metrics on server ([4b8f157](https://github.com/input-output-hk/cardano-js-sdk/commit/4b8f1572fa5615ca6fa0ff540febecaf779ea12c))
+- **ogmios:** ogmios TxSubmit client now uses a long-running ws connection ([36ee96c](https://github.com/input-output-hk/cardano-js-sdk/commit/36ee96c580f79a4f2759fa9bc87a69bf088e5ed9))
+
 ## [0.11.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.11.0-nightly.4...@cardano-sdk/cardano-services@0.11.0-nightly.5) (2023-03-31)
 
 ### ⚠ BREAKING CHANGES

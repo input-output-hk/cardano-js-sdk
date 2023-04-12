@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.11.0-nightly.5...@cardano-sdk/ogmios@0.11.0-nightly.6) (2023-04-12)
+
+### Features
+
+- **ogmios:** log successful transaction submission with info level ([a7d98f4](https://github.com/input-output-hk/cardano-js-sdk/commit/a7d98f40dbbccca8276a029a10c5e5e9d42ec76e))
+- **ogmios:** ogmios TxSubmit client now uses a long-running ws connection ([36ee96c](https://github.com/input-output-hk/cardano-js-sdk/commit/36ee96c580f79a4f2759fa9bc87a69bf088e5ed9))
+
 ## [0.11.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.11.0-nightly.4...@cardano-sdk/ogmios@0.11.0-nightly.5) (2023-03-31)
 
 ### Bug Fixes
