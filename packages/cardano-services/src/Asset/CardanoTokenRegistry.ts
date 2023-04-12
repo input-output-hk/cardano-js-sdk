@@ -2,6 +2,7 @@ import { Asset, Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/cor
 import { InMemoryCache } from '../InMemoryCache';
 import { Logger } from 'ts-log';
 import { TokenMetadataService } from './types';
+import { contextLogger } from '@cardano-sdk/util';
 import axios, { AxiosInstance } from 'axios';
 
 export const DEFAULT_TOKEN_METADATA_CACHE_TTL = 600;
@@ -26,12 +27,10 @@ interface TokenMetadataServiceRecord {
   url?: StringValue;
 }
 
-const propertiesToChange: Record<string, string> = { description: 'desc', logo: 'icon' };
+const propertiesToChange: Record<string, string> = { description: 'desc', logo: 'icon', subject: 'assetId' };
 export const toCoreTokenMetadata = (record: TokenMetadataServiceRecord) =>
   Object.fromEntries(
-    Object.entries(record)
-      .filter(([key]) => ['decimals', 'description', 'logo', 'name', 'ticker', 'url'].includes(key))
-      .map(([key, value]) => [propertiesToChange[key] || key, value.value])
+    Object.entries(record).map(([key, value]) => [propertiesToChange[key] || key, value.value || value])
   ) as Asset.TokenMetadata;
 
 const toProviderError = (error: unknown, details: string) => {
@@ -114,22 +113,22 @@ export class CardanoTokenRegistry implements TokenMetadataService {
       baseURL: defaultConfig.tokenMetadataServerUrl,
       timeout: defaultConfig.tokenMetadataRequestTimeout
     });
-    this.#logger = logger;
+    this.#logger = contextLogger(logger, 'CardanoTokenRegistry');
   }
 
   shutdown() {
     this.#cache.shutdown();
   }
 
-  async getTokenMetadata(assetIds: Cardano.AssetId[]) {
-    this.#logger.debug(`Requested asset metadata for "${assetIds}"`);
+  async getTokenMetadata(assetIds: Cardano.AssetId[]): Promise<(Asset.TokenMetadata | null)[]> {
+    this.#logger.debug(`getTokenMetadata: "${assetIds}"`);
 
     const [assetIdsToRequest, tokenMetadata] = this.getTokenMetadataFromCache(assetIds);
 
     // All metadata was taken from cache
     if (assetIdsToRequest.length === 0) return tokenMetadata;
 
-    this.#logger.debug(`Fetching asset metadata for "${assetIdsToRequest}"`);
+    this.#logger.info(`Fetching batch of ${assetIdsToRequest.length} assetIds`);
 
     try {
       const response = await this.#axiosClient.post<{ subjects: TokenMetadataServiceRecord[] }>('metadata/query', {
@@ -173,8 +172,7 @@ export class CardanoTokenRegistry implements TokenMetadataService {
 
   getTokenMetadataFromCache(assetIds: Cardano.AssetId[]) {
     const assetIdsToRequest: Cardano.AssetId[] = [];
-    // eslint-disable-next-line unicorn/no-new-array
-    const cachedTokenMetadata: (Asset.TokenMetadata | null)[] = new Array(assetIds.length).fill(null);
+    const cachedTokenMetadata = Array.from({ length: assetIds.length }).fill(null) as (Asset.TokenMetadata | null)[];
 
     for (const [i, assetId] of assetIds.entries()) {
       const cachedMetadata = this.#cache.getVal<Asset.TokenMetadata>(assetId);

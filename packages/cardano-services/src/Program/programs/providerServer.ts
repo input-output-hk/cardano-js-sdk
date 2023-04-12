@@ -34,6 +34,7 @@ export const DISABLE_DB_CACHE_DEFAULT = false;
 export const DISABLE_STAKE_POOL_METRIC_APY_DEFAULT = false;
 export const HTTP_SERVER_API_URL_DEFAULT = new URL('http://localhost:3000');
 export const PAGINATION_PAGE_SIZE_LIMIT_DEFAULT = 25;
+export const PAGINATION_PAGE_SIZE_LIMIT_ASSETS = 300;
 export const USE_BLOCKFROST_DEFAULT = false;
 export const USE_QUEUE_DEFAULT = false;
 
@@ -94,16 +95,21 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       const tokenMetadataService = args.tokenMetadataServerUrl?.startsWith('stub:')
         ? new StubTokenMetadataService()
         : new CardanoTokenRegistry({ logger }, args);
-      const assetProvider = new DbSyncAssetProvider({
-        cache: {
-          healthCheck: healthCheckCache
+      const assetProvider = new DbSyncAssetProvider(
+        {
+          paginationPageSizeLimit: Math.min(args.paginationPageSizeLimit! * 10, PAGINATION_PAGE_SIZE_LIMIT_ASSETS)
         },
-        cardanoNode,
-        dbPools,
-        logger,
-        ntfMetadataService,
-        tokenMetadataService
-      });
+        {
+          cache: {
+            healthCheck: healthCheckCache
+          },
+          cardanoNode,
+          dbPools,
+          logger,
+          ntfMetadataService,
+          tokenMetadataService
+        }
+      );
 
       return new AssetHttpService({ assetProvider, logger });
     }, ServiceNames.Asset),

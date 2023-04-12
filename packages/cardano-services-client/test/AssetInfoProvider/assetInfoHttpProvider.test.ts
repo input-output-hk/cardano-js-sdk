@@ -31,5 +31,15 @@ describe('assetInfoHttpProvider', () => {
         })
       ).resolves.toEqual({});
     });
+
+    test("getAssets doesn't throw", async () => {
+      axiosMock.onPost().replyOnce(200, {});
+      const provider = assetInfoHttpProvider(config);
+      await expect(
+        provider.getAssets({
+          assetIds: [Cardano.AssetId('f43a62fdc3965df486de8a0d32fe800963589c41b38946602a0dc53541474958')]
+        })
+      ).resolves.toEqual({});
+    });
   });
 });

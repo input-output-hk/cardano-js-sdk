@@ -11,6 +11,7 @@
   "paths": {
     "/asset/get-asset": {
       "post": {
+        "deprecated": true,
         "summary": "Get Asset Info",
         "operationId": "getAssetInfo",
         "requestBody": {
@@ -30,6 +31,54 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AssetInfo"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/asset/get-assets": {
+      "post": {
+        "summary": "Get Assets Info",
+        "operationId": "getAssetsInfo",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetAssetsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "success operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetInfoListResponse"
                 }
               }
             }
@@ -94,10 +143,19 @@
           }
         }
       },
+      "ExtraDataAssetIds": {
+        "type": "object",
+        "properties": {
+          "nftMetadata": {
+            "type": "boolean"
+          },
+          "tokenMetadata": {
+            "type": "boolean"
+          }
+        }
+      },
       "GetAssetRequest": {
-        "required": [
-          "assetId"
-        ],
+        "required": ["assetId"],
         "type": "object",
         "properties": {
           "assetId": {
@@ -106,6 +164,27 @@
           "extraData": {
             "$ref": "#/components/schemas/ExtraData"
           }
+        }
+      },
+      "GetAssetsRequest": {
+        "required": ["assetIds"],
+        "type": "object",
+        "properties": {
+          "assetIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "extraData": {
+            "$ref": "#/components/schemas/ExtraDataAssetIds"
+          }
+        }
+      },
+      "AssetInfoListResponse": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/AssetInfo"
         }
       }
     }

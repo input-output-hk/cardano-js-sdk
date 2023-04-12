@@ -1,3 +1,5 @@
+/* eslint-disable sonarjs/cognitive-complexity */
+/* eslint-disable sonarjs/no-identical-functions */
 import { AssetFixtureBuilder, AssetWith } from './fixtures/FixtureBuilder';
 import {
   AssetHttpService,
@@ -8,6 +10,7 @@ import {
   HttpServerConfig,
   InMemoryCache,
   NftMetadataService,
+  PAGINATION_PAGE_SIZE_LIMIT_ASSETS,
   TokenMetadataService,
   UNLIMITED_CACHE_TTL
 } from '../../src';
@@ -84,14 +87,17 @@ describe('AssetHttpService', () => {
       const cache = { db: new InMemoryCache(UNLIMITED_CACHE_TTL), healthCheck: new InMemoryCache(UNLIMITED_CACHE_TTL) };
 
       tokenMetadataService = new CardanoTokenRegistry({ logger }, { tokenMetadataServerUrl: serverUrl });
-      assetProvider = new DbSyncAssetProvider({
-        cache,
-        cardanoNode,
-        dbPools,
-        logger,
-        ntfMetadataService,
-        tokenMetadataService
-      });
+      assetProvider = new DbSyncAssetProvider(
+        { paginationPageSizeLimit: PAGINATION_PAGE_SIZE_LIMIT_ASSETS },
+        {
+          cache,
+          cardanoNode,
+          dbPools,
+          logger,
+          ntfMetadataService,
+          tokenMetadataService
+        }
+      );
       service = new AssetHttpService({ assetProvider, logger });
       httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
       provider = assetInfoHttpProvider(clientConfig);
@@ -147,14 +153,11 @@ describe('AssetHttpService', () => {
     });
 
     describe('/get-asset', () => {
+      const path = 'get-asset';
       it('returns a 415 coded response if the wrong content type header is used', async () => {
         expect.assertions(2);
         try {
-          await axios.post(
-            `${apiUrlBase}/get-asset`,
-            { assetId: '' },
-            { headers: { 'Content-Type': APPLICATION_CBOR } }
-          );
+          await axios.post(`${apiUrlBase}/${path}`, { assetId: '' }, { headers: { 'Content-Type': APPLICATION_CBOR } });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
           expect(error.response.status).toBe(415);
@@ -165,7 +168,7 @@ describe('AssetHttpService', () => {
       it('returns 400 coded response if the request is bad formed', async () => {
         expect.assertions(2);
         try {
-          await axios.post(`${apiUrlBase}/get-asset`, { assetId: [['test']] });
+          await axios.post(`${apiUrlBase}/${path}`, { assetId: [['test']] });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
           expect(error.response.status).toBe(400);
@@ -176,7 +179,7 @@ describe('AssetHttpService', () => {
       it('returns 404 coded response for not existing existing asset id', async () => {
         expect.assertions(1);
         try {
-          await axios.post(`${apiUrlBase}/get-asset`, {
+          await axios.post(`${apiUrlBase}/${path}`, {
             assetId: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
           });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -205,6 +208,84 @@ describe('AssetHttpService', () => {
         const { history, nftMetadata, tokenMetadata } = res;
 
         expect(history).toEqual(expectedHistory);
+        expect(nftMetadata).toEqual(assets[0].metadata);
+        expect(tokenMetadata).toBeDefined();
+      });
+    });
+
+    describe('/get-assets', () => {
+      const path = 'get-assets';
+      it('returns a 415 coded response if the wrong content type header is used', async () => {
+        expect.assertions(2);
+        try {
+          await axios.post(
+            `${apiUrlBase}/${path}`,
+            { assetIds: ['0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'] },
+            { headers: { 'Content-Type': APPLICATION_CBOR } }
+          );
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+          expect(error.response.status).toBe(415);
+          expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
+        }
+      });
+
+      it('returns 400 coded response if the request is bad formed', async () => {
+        expect.assertions(2);
+        try {
+          await axios.post(`${apiUrlBase}/${path}`, { assetId: [['test']] });
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+          expect(error.response.status).toBe(400);
+          expect(error.message).toBe(BAD_REQUEST_STRING);
+        }
+      });
+
+      it('returns 404 coded response for not existing existing asset id', async () => {
+        expect.assertions(1);
+        try {
+          await axios.post(`${apiUrlBase}/${path}`, {
+            assetIds: ['0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef']
+          });
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+          expect(error.response.status).toBe(404);
+        }
+      });
+
+      it('returns a 400 coded error if provided assetIds are greater than pagination page size limit', async () => {
+        const assets = await fixtureBuilder.getAssets(1);
+        const assetIds = Array.from({ length: PAGINATION_PAGE_SIZE_LIMIT_ASSETS + 1 }, () => assets[0].id);
+        expect.assertions(1);
+        try {
+          await axios.post(`${apiUrlBase}/${path}`, {
+            assetIds
+          });
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+          expect(error.response.status).toBe(400);
+        }
+      });
+
+      it('returns asset info for existing asset id', async () => {
+        const assets = await fixtureBuilder.getAssets(1);
+        const res = await provider.getAssets({
+          assetIds: [assets[0].id]
+        });
+
+        expect(res[0].name).toEqual(assets[0].name);
+        expect(() => Cardano.PolicyId(assets[0].policyId as unknown as string)).not.toThrow();
+        expect(() => Cardano.AssetName(assets[0].name as unknown as string)).not.toThrow();
+      });
+
+      it('returns asset info with extra data when requested', async () => {
+        const assets = await fixtureBuilder.getAssets(1, { with: [AssetWith.CIP25Metadata] });
+        const assetsResult = await provider.getAssets({
+          assetIds: [assets[0].id],
+          extraData: { nftMetadata: true, tokenMetadata: true }
+        });
+        const { nftMetadata, tokenMetadata } = assetsResult[0];
+
         expect(nftMetadata).toEqual(assets[0].metadata);
         expect(tokenMetadata).toBeDefined();
       });
