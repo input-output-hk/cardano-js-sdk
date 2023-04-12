@@ -104,7 +104,11 @@ export class DbSyncNetworkInfoProvider extends DbSyncProvider(RunnableModule) im
     const { maxLovelaceSupply } = this.#genesisData;
 
     const [circulatingSupply, totalSupply] = await Promise.all([
-      this.#cache.get(NetworkInfoCacheKey.CIRCULATING_SUPPLY, () => this.#builder.queryCirculatingSupply()),
+      this.#cache.get(
+        NetworkInfoCacheKey.CIRCULATING_SUPPLY,
+        () => this.#builder.queryCirculatingSupply(),
+        UNLIMITED_CACHE_TTL
+      ),
       this.#cache.get(
         NetworkInfoCacheKey.TOTAL_SUPPLY,
         () => this.#builder.queryTotalSupply(maxLovelaceSupply),

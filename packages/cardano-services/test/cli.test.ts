@@ -27,7 +27,8 @@ jest.setTimeout(90_000);
 const DNS_SERVER_NOT_REACHABLE_ERROR = 'querySrv ENOTFOUND';
 const CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE = 'cannot be used with option';
 const CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE = 'cannot be used with environment variable';
-const METRICS_ENDPOINT_LABEL_RESPONSE = 'http_request_duration_seconds duration histogram of http responses';
+const METRICS_ENDPOINT_LABEL_RESPONSE =
+  'http_request_duration_seconds duration histogram of http responses labeled with: status_code, method, path';
 const REQUIRES_PG_CONNECTION = 'requires the PostgreSQL Connection string or Postgres SRV service name';
 
 const exePath = path.join(__dirname, '..', 'dist', 'cjs', 'cli.js');

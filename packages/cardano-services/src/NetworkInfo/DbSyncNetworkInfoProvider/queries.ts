@@ -1,23 +1,5 @@
 export const findCirculatingSupply = `
-    WITH total_rewards AS (
-        SELECT COALESCE(SUM(amount), 0) as rewards_amount
-        FROM reward
-    ),
-    total_withdrawals AS (
-        SELECT COALESCE(SUM(amount), 0) as withdrawals_amount
-        FROM withdrawal
-    ),
-    total_utxo AS (
-        SELECT
-            SUM(tx_out.value) AS utxo_amount
-        FROM tx_out
-        LEFT JOIN tx_in 
-            ON tx_out.tx_id = tx_in.tx_out_id
-            AND tx_out.index = tx_in.tx_out_index
-        WHERE tx_in.id IS NULL    
-    )
-    SELECT CAST(utxo_amount + (rewards_amount - withdrawals_amount) AS BIGINT) as circulating_supply
-    FROM total_rewards, total_withdrawals, total_utxo
+  SELECT ( utxo + rewards ) as circulating_supply FROM ada_pots ORDER BY id DESC LIMIT 1;
 `;
 
 export const findTotalSupply = `
