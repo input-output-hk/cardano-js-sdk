@@ -11,12 +11,12 @@ import {
   ConnectionConfig,
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  TxSubmission,
-  createTxSubmissionClient
+  TxSubmission
 } from '@cardano-ogmios/client';
 import { Logger } from 'ts-log';
 import { OgmiosCardanoNode } from '../../CardanoNode';
 import { RunnableModule, contextLogger, isNotNil } from '@cardano-sdk/util';
+import { TxSubmissionClient, createTxSubmissionClient } from '../../Ogmios/TxSubmissionClient';
 import { createInteractionContextWithLogger } from '../../util';
 
 /**
@@ -25,7 +25,7 @@ import { createInteractionContextWithLogger } from '../../util';
  * @class OgmiosTxSubmitProvider
  */
 export class OgmiosTxSubmitProvider extends RunnableModule implements TxSubmitProvider {
-  #txSubmissionClient: TxSubmission.TxSubmissionClient;
+  #txSubmissionClient: TxSubmissionClient;
   #logger: Logger;
   #connectionConfig: ConnectionConfig;
 
@@ -42,9 +42,14 @@ export class OgmiosTxSubmitProvider extends RunnableModule implements TxSubmitPr
 
   public async initializeImpl(): Promise<void> {
     this.#logger.info('Initializing OgmiosTxSubmitProvider');
-    // The provider interface now includes shutdown handling
-    // We can initialize the txSubmissionClient in this scope
-    // once ADP-2370 is done and will enable switching to a long-running ws connection
+
+    this.#txSubmissionClient = await createTxSubmissionClient(
+      await createInteractionContextWithLogger(contextLogger(this.#logger, 'ogmiosTxSubmitProvider'), {
+        connection: this.#connectionConfig,
+        interactionType: 'LongRunning'
+      })
+    );
+
     this.#logger.info('OgmiosTxSubmitProvider initialized');
   }
 
@@ -63,13 +68,6 @@ export class OgmiosTxSubmitProvider extends RunnableModule implements TxSubmitPr
       throw new CardanoNodeErrors.NotInitializedError('submitTx', this.name);
     }
     try {
-      this.#txSubmissionClient = await createTxSubmissionClient(
-        await createInteractionContextWithLogger(contextLogger(this.#logger, 'ogmiosTxSubmitProvider'), {
-          connection: this.#connectionConfig,
-          // Should be updated to a long-running once ADP-2370 is done.
-          interactionType: 'OneTime'
-        })
-      );
       await this.#txSubmissionClient.submitTx(signedTransaction);
     } catch (error) {
       throw Cardano.util.asTxSubmissionError(error) || new CardanoNodeErrors.UnknownTxSubmissionError(error);
