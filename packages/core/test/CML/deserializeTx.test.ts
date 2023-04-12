@@ -34,7 +34,7 @@ describe('deserializeTx', () => {
     it('if input is not a valid transaction', () =>
       expect(() => deserializeTx('abcdef')).toThrow(
         // eslint-disable-next-line max-len
-        "Deserialization failed in Transaction because: Invalid cbor: not the right type, expected `Array' byte received `Map'."
+        'Major type mismatch, expected type 4 but got 5'
       ));
   });
 });

@@ -46,7 +46,6 @@ import {
   ScriptRef,
   TimelockExpiry,
   TimelockStart,
-  Transaction,
   TransactionBody,
   TransactionHash,
   TransactionInput,
@@ -581,16 +580,4 @@ export const witnessSet = (scope: ManagedFreeableScope, witness: Cardano.Witness
     txWitnessSet.set_plutus_data(txWitnessDatumList(scope, witness.datums));
   }
   return txWitnessSet;
-};
-
-export const tx = (scope: ManagedFreeableScope, { body, witness, auxiliaryData, isValid }: Cardano.Tx): Transaction => {
-  const txWitnessSet = witnessSet(scope, witness);
-  // Possible optimization: only convert auxiliary data once
-  const cmlTx = scope.manage(
-    Transaction.new(txBody(scope, body, auxiliaryData), txWitnessSet, txAuxiliaryData(scope, auxiliaryData))
-  );
-
-  if (typeof isValid !== 'undefined') cmlTx.set_is_valid(isValid);
-
-  return cmlTx;
 };

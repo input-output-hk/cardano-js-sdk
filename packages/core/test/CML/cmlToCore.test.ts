@@ -4,12 +4,10 @@ import { Base64Blob, HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { Cardano, cmlToCore, coreToCml } from '../../src';
 import { NativeScript } from '@dcspark/cardano-multiplatform-lib-nodejs';
 import {
-  babbageTx,
   babbageTxBody,
   babbageTxOutWithDatumHash,
   babbageTxOutWithInlineDatum,
   mintTokenMap,
-  tx,
   txBody,
   txIn,
   txInWithAddress,
@@ -147,14 +145,6 @@ describe('cmlToCore', () => {
 
   it('Babbage txBody', () => {
     expect(cmlToCore.txBody(scope.manage(coreToCml.txBody(scope, babbageTxBody)))).toEqual(babbageTxBody);
-  });
-
-  it('newTx', () => {
-    expect(cmlToCore.newTx(scope.manage(coreToCml.tx(scope, tx)))).toEqual(tx);
-  });
-
-  it('Babbage newTx', () => {
-    expect(cmlToCore.newTx(scope.manage(coreToCml.tx(scope, babbageTx)))).toEqual(babbageTx);
   });
 
   it('txWitnessBootstrap', () => {
