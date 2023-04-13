@@ -11,9 +11,9 @@ import {
 import {
   Bootstrap,
   BootstrapExtraProps,
-  Operators,
   ProjectionEvent,
-  ProjectionOperator
+  ProjectionOperator,
+  requestNext
 } from '@cardano-sdk/projection';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { ConnectionNotFoundError, DataSource, QueryFailedError, QueryRunner } from 'typeorm';
@@ -110,7 +110,7 @@ describe('withTypeormTransaction', () => {
               )
           }),
           logger
-        }).pipe(projection, Operators.requestNext())
+        }).pipe(projection, requestNext())
       );
 
     beforeEach(() => (numChainSyncSubscriptions = 0));
@@ -146,7 +146,7 @@ describe('withTypeormTransaction', () => {
           logger
         }).pipe(
           shareRetryBackoff(createProjection(of(dataSource)), { shouldRetry: isRecoverableTypeormError }),
-          Operators.requestNext()
+          requestNext()
         )
       );
     });

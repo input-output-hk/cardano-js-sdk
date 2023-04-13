@@ -1,5 +1,5 @@
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { Operators, RollForwardEvent, UnifiedExtChainSyncEvent, WithNetworkInfo } from '../../src';
+import { RollForwardEvent, UnifiedExtChainSyncEvent, WithNetworkInfo, withEpochNo } from '../../src';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 import { stubEraSummaries } from '../util';
 
@@ -18,7 +18,7 @@ describe('withEpochNo', () => {
         b: rollForwardEvent(500_000),
         c: rollForwardEvent(2_000_000)
       });
-      expectObservable(source$.pipe(Operators.withEpochNo())).toBe('abc', {
+      expectObservable(source$.pipe(withEpochNo())).toBe('abc', {
         a: {
           ...rollForwardEvent(0),
           epochNo: 0

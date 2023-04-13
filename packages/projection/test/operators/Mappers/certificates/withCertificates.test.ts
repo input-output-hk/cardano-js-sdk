@@ -1,5 +1,5 @@
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { Operators, RollForwardEvent, UnifiedExtChainSyncEvent } from '../../../src';
+import { Mappers, RollForwardEvent, UnifiedExtChainSyncEvent } from '../../../../src';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 
 const createEvent = (
@@ -39,7 +39,7 @@ describe('withCertificates', () => {
         b: createEvent(ChainSyncEventType.RollForward, Cardano.Slot(2), []),
         c: createEvent(ChainSyncEventType.RollForward, Cardano.Slot(3), certificates, Cardano.InputSource.collaterals)
       });
-      expectObservable(source$.pipe(Operators.withCertificates())).toBe('abc', {
+      expectObservable(source$.pipe(Mappers.withCertificates())).toBe('abc', {
         a: {
           ...createEvent(ChainSyncEventType.RollForward, Cardano.Slot(1), certificates),
           certificates: [

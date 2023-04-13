@@ -10,7 +10,7 @@ import {
   typeormTransactionCommit,
   withTypeormTransaction
 } from '../../src';
-import { Bootstrap, Operators } from '@cardano-sdk/projection';
+import { Bootstrap, Mappers, requestNext } from '@cardano-sdk/projection';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
@@ -30,14 +30,14 @@ describe('storeStakePools', () => {
       cardanoNode: data.cardanoNode,
       logger
     }).pipe(
-      Operators.withCertificates(),
-      Operators.withStakePools(),
+      Mappers.withCertificates(),
+      Mappers.withStakePools(),
       withTypeormTransaction({ dataSource$: of(dataSource), logger }),
       storeBlock(),
       storeStakePools(),
       buffer.storeBlockData(),
       typeormTransactionCommit(),
-      Operators.requestNext()
+      requestNext()
     );
   const projectTilFirst = createProjectorTilFirst(project);
 

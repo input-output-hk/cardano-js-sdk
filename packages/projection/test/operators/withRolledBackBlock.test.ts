@@ -1,6 +1,6 @@
 import { Cardano, ChainSyncEventType, ChainSyncRollBackward } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, createTestScheduler } from '@cardano-sdk/util-dev';
-import { InMemory, Operators, UnifiedExtChainSyncEvent } from '../../src';
+import { InMemory, UnifiedExtChainSyncEvent, withNetworkInfo, withRolledBackBlock } from '../../src';
 import { stubBlockId } from '../util';
 
 const dataWithStakeKeyDeregistration = chainSyncData(ChainSyncDataSet.WithPoolRetirement);
@@ -46,8 +46,8 @@ describe('withRolledBackBlocks', () => {
       });
       expectObservable(
         source$.pipe(
-          Operators.withRolledBackBlock(buffer),
-          Operators.withNetworkInfo(dataWithStakeKeyDeregistration.cardanoNode),
+          withRolledBackBlock(buffer),
+          withNetworkInfo(dataWithStakeKeyDeregistration.cardanoNode),
           buffer.handleEvents()
         )
       ).toBe('abcd(ef)', {

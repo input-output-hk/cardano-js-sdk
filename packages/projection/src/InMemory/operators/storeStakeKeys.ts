@@ -1,7 +1,7 @@
-import { WithStakeKeys } from '../../Operators';
+import { Mappers } from '../../operators';
 import { inMemoryStoreOperator } from './utils';
 
-export const storeStakeKeys = inMemoryStoreOperator<WithStakeKeys>(({ stakeKeys: { insert, del }, store }) => {
+export const storeStakeKeys = inMemoryStoreOperator<Mappers.WithStakeKeys>(({ stakeKeys: { insert, del }, store }) => {
   for (const stakeKey of insert) {
     store.stakeKeys.add(stakeKey);
   }

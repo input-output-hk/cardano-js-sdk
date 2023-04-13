@@ -6,7 +6,7 @@ import {
   typeormTransactionCommit,
   withTypeormTransaction
 } from '../src';
-import { Bootstrap, Operators, ProjectionEvent } from '@cardano-sdk/projection';
+import { Bootstrap, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { DataSource, QueryRunner } from 'typeorm';
@@ -65,7 +65,7 @@ describe('TypeormStabilityWindowBuffer', () => {
         storeBlock(),
         buffer.storeBlockData(),
         typeormTransactionCommit(),
-        Operators.requestNext()
+        requestNext()
       )
     );
   });

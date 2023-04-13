@@ -1,5 +1,5 @@
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { WithCertificateSource, WithStakePools } from '../../Operators';
+import { Mappers } from '../../operators';
 import { WithInMemoryStore } from '../types';
 import { inMemoryStoreOperator } from './utils';
 
@@ -11,7 +11,7 @@ const findOrCreate = ({ store: { stakePools } }: WithInMemoryStore, poolId: Card
   return stakePool;
 };
 
-export const storeStakePools = inMemoryStoreOperator<WithStakePools>((evt) => {
+export const storeStakePools = inMemoryStoreOperator<Mappers.WithStakePools>((evt) => {
   if (evt.eventType === ChainSyncEventType.RollForward) {
     for (const update of evt.stakePools.updates) {
       findOrCreate(evt, update.poolParameters.id).updates.push(update);
@@ -21,7 +21,7 @@ export const storeStakePools = inMemoryStoreOperator<WithStakePools>((evt) => {
     }
   } else {
     // Delete all updates and retirements >= current cursor.
-    const belowTip = ({ source }: WithCertificateSource) =>
+    const belowTip = ({ source }: Mappers.WithCertificateSource) =>
       evt.point !== 'origin' && source.slot < evt.block.header.slot;
     for (const [_, stakePool] of evt.store.stakePools) {
       stakePool.updates = stakePool.updates.filter(belowTip);

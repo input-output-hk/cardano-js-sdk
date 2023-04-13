@@ -14,7 +14,7 @@ import { Observable, combineLatest, concat, defer, map, mergeMap, noop, of, take
 import { ProjectionEvent, StabilityWindowBuffer, UnifiedExtChainSyncEvent } from '../types';
 import { contextLogger } from '@cardano-sdk/util';
 import { pointDescription } from '../util';
-import { withEpochBoundary, withEpochNo, withNetworkInfo, withRolledBackBlock } from '../Operators';
+import { withEpochBoundary, withEpochNo, withNetworkInfo, withRolledBackBlock } from '../operators';
 import uniq from 'lodash/uniq';
 
 const isIntersectionBlock = (block: Cardano.Block, intersection: Intersection) => {

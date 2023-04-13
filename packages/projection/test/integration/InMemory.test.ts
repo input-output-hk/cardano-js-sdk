@@ -3,10 +3,12 @@ import {
   Bootstrap,
   BootstrapExtraProps,
   InMemory,
-  Operators,
+  Mappers,
   ProjectionEvent,
   ProjectionOperator,
-  RollForwardEvent
+  RollForwardEvent,
+  requestNext,
+  withStaticContext
 } from '../../src';
 import { Cardano, CardanoNodeErrors, ChainSyncEventType, ChainSyncRollForward } from '@cardano-sdk/core';
 import { ChainSyncDataSet, StubChainSyncData, chainSyncData, logger } from '@cardano-sdk/util-dev';
@@ -15,10 +17,10 @@ import { from, lastValueFrom, of, toArray } from 'rxjs';
 const dataWithPoolRetirement = chainSyncData(ChainSyncDataSet.WithPoolRetirement);
 const dataWithStakeKeyDeregistration = chainSyncData(ChainSyncDataSet.WithStakeKeyDeregistration);
 
-const projectStakeKeys: ProjectionOperator<Operators.WithCertificates & InMemory.WithInMemoryStore> = (evt$) =>
-  evt$.pipe(Operators.withStakeKeys(), InMemory.storeStakeKeys());
-const projectStakePools: ProjectionOperator<Operators.WithCertificates & InMemory.WithInMemoryStore> = (evt$) =>
-  evt$.pipe(Operators.withStakePools(), InMemory.storeStakePools());
+const projectStakeKeys: ProjectionOperator<Mappers.WithCertificates & InMemory.WithInMemoryStore> = (evt$) =>
+  evt$.pipe(Mappers.withStakeKeys(), InMemory.storeStakeKeys());
+const projectStakePools: ProjectionOperator<Mappers.WithCertificates & InMemory.WithInMemoryStore> = (evt$) =>
+  evt$.pipe(Mappers.withStakePools(), InMemory.storeStakePools());
 
 describe('integration/InMemory', () => {
   let store: InMemory.InMemoryStore;
@@ -26,15 +28,15 @@ describe('integration/InMemory', () => {
 
   const projectAll = (
     { cardanoNode }: StubChainSyncData,
-    projection: ProjectionOperator<Operators.WithCertificates & InMemory.WithInMemoryStore>
+    projection: ProjectionOperator<Mappers.WithCertificates & InMemory.WithInMemoryStore>
   ) =>
     lastValueFrom(
       Bootstrap.fromCardanoNode({ buffer, cardanoNode, logger }).pipe(
-        Operators.withStaticContext({ store }),
-        Operators.withCertificates(),
+        withStaticContext({ store }),
+        Mappers.withCertificates(),
         projection,
         buffer.handleEvents(),
-        Operators.requestNext(),
+        requestNext(),
         toArray()
       )
     );

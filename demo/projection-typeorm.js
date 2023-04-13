@@ -1,6 +1,6 @@
 // Runtime dependency: `yarn preprod:up cardano-node-ogmios postgres` (can be any network)
 /* eslint-disable import/no-extraneous-dependencies */
-const { Bootstrap, Operators } = require('@cardano-sdk/projection');
+const { Bootstrap, Mappers, requestNext, logProjectionProgress } = require('@cardano-sdk/projection');
 const {
   createDataSource,
   withTypeormTransaction,
@@ -87,8 +87,8 @@ Bootstrap.fromCardanoNode({
   logger
 })
   .pipe(
-    Operators.withCertificates(),
-    Operators.withStakePools(),
+    Mappers.withCertificates(),
+    Mappers.withStakePools(),
     shareRetryBackoff(
       (evt$) =>
         evt$.pipe(
@@ -101,7 +101,7 @@ Bootstrap.fromCardanoNode({
         ),
       { shouldRetry: isRecoverableTypeormError }
     ),
-    Operators.requestNext(),
-    Operators.logProjectionProgress(logger)
+    requestNext(),
+    logProjectionProgress(logger)
   )
   .subscribe();

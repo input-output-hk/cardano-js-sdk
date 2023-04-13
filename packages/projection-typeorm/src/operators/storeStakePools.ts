@@ -1,18 +1,17 @@
 import { Cardano, ChainSyncEventType, EraSummary, epochSlotsCalc } from '@cardano-sdk/core';
 import { In, Not, QueryRunner, Repository } from 'typeorm';
+import { Mappers, ProjectionEvent } from '@cardano-sdk/projection';
 import {
   MaxCertificatePointerIdCertificateIndex as MaxCertificatePointerIdCertIndex,
   MaxCertificatePointerIdTxIndex,
   certificatePointerToId,
   typeormOperator
 } from './util';
-import { Operators, ProjectionEvent } from '@cardano-sdk/projection';
 import { PoolRegistrationEntity, PoolRetirementEntity, StakePoolEntity } from '../entity';
-import { WithStakePools } from '@cardano-sdk/projection/dist/cjs/Operators';
 import { WithTypeormContext } from './withTypeormTransaction';
 import omit from 'lodash/omit';
 
-type Event = ProjectionEvent<WithTypeormContext & Operators.WithStakePools>;
+type Event = ProjectionEvent<WithTypeormContext & Mappers.WithStakePools>;
 
 const insertMissingStakePools = async ({ stakePools: { updates }, queryRunner }: Event) => {
   if (updates.length === 0) return;
@@ -304,6 +303,6 @@ const rollBackward = async (evt: Event) => {
   await undoUpdateLatestCertificatesAndDeletePoolsWithZeroRegistrations(evt);
 };
 
-export const storeStakePools = typeormOperator<WithStakePools>(async (evt) => {
+export const storeStakePools = typeormOperator<Mappers.WithStakePools>(async (evt) => {
   await (evt.eventType === ChainSyncEventType.RollForward ? rollForward(evt) : rollBackward(evt));
 });

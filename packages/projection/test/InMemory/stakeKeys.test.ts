@@ -1,6 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { ChainSyncEventType } from '@cardano-sdk/core';
-import { InMemory, Operators, ProjectionEvent } from '../../src';
+import { InMemory, Mappers, ProjectionEvent } from '../../src';
 import { firstValueFrom, of } from 'rxjs';
 
 describe('InMemory.storeStakeKeys', () => {
@@ -20,7 +20,7 @@ describe('InMemory.storeStakeKeys', () => {
               insert: eventType === ChainSyncEventType.RollForward ? register : deregister
             },
             store
-          } as ProjectionEvent<InMemory.WithInMemoryStore & Operators.WithStakeKeys>)
+          } as ProjectionEvent<InMemory.WithInMemoryStore & Mappers.WithStakeKeys>)
         )
       );
     };

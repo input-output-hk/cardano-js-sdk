@@ -1,5 +1,5 @@
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { InMemory, Operators, ProjectionEvent } from '../../src';
+import { InMemory, Mappers, ProjectionEvent } from '../../src';
 import { firstValueFrom, of } from 'rxjs';
 
 describe('InMemory.storeStakePools', () => {
@@ -8,8 +8,8 @@ describe('InMemory.storeStakePools', () => {
     const project = async (
       eventType: ChainSyncEventType,
       slotNo: number,
-      updates: Operators.PoolUpdate[],
-      retirements: Operators.PoolRetirement[]
+      updates: Mappers.PoolUpdate[],
+      retirements: Mappers.PoolRetirement[]
     ) => {
       await firstValueFrom(
         InMemory.storeStakePools()(
@@ -22,7 +22,7 @@ describe('InMemory.storeStakePools', () => {
             eventType,
             stakePools: { retirements, updates },
             store
-          } as ProjectionEvent<InMemory.WithInMemoryStore & Operators.WithStakePools>)
+          } as ProjectionEvent<InMemory.WithInMemoryStore & Mappers.WithStakePools>)
         )
       );
     };
@@ -31,14 +31,14 @@ describe('InMemory.storeStakePools', () => {
         poolParameters: {
           id: Cardano.PoolId('pool1n3s8unkvmre59uzt4ned0903f9q2p8dhscw5v9eeyc0sw0m439t')
         } as Cardano.PoolParameters,
-        source: { slot: Cardano.Slot(1) } as Operators.WithCertificateSource['source']
+        source: { slot: Cardano.Slot(1) } as Mappers.WithCertificateSource['source']
       }
     ];
     const poolRetirementAtSlot2 = [
       {
         epoch: Cardano.EpochNo(123),
         poolId: Cardano.PoolId('pool1n3s8unkvmre59uzt4ned0903f9q2p8dhscw5v9eeyc0sw0m439t'),
-        source: { slot: Cardano.Slot(2) } as Operators.WithCertificateSource['source']
+        source: { slot: Cardano.Slot(2) } as Mappers.WithCertificateSource['source']
       }
     ];
     const storedStakePool = () =>

@@ -1,10 +1,10 @@
 import { ChainSyncEventType } from '@cardano-sdk/core';
-import { Operators } from '@cardano-sdk/projection';
+import { Mappers } from '@cardano-sdk/projection';
 import { STAKE_POOL_METADATA_QUEUE, StakePoolMetadataJob } from '../pgBoss';
 import { WithPgBoss } from './withTypeormTransaction';
 import { certificatePointerToId, typeormOperator } from './util';
 
-export const storeStakePoolMetadataJob = typeormOperator<Operators.WithStakePools & WithPgBoss>(
+export const storeStakePoolMetadataJob = typeormOperator<Mappers.WithStakePools & WithPgBoss>(
   async ({ eventType, stakePools, pgBoss, block: { header } }) => {
     if (eventType === ChainSyncEventType.RollBackward) {
       // Tasks are automatically deleted via block_height cascade

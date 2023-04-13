@@ -12,7 +12,7 @@ yarn preprod:up cardano-node-ogmios postgres # or preview:up/mainnet:up
 
 ### Configuration
 
-Projection can be customized by adding/removing operators and TypeORM entities, e.g. you may add those operators `withStakeKeys(), ..., storeStakeKeys()` alongside with adding a `StakeKeyEntity`.
+Projection can be customized by adding/removing operators and TypeORM entities, e.g. you may add those operators `Mappers.withStakeKeys(), ..., storeStakeKeys()` alongside with adding a `StakeKeyEntity`.
 
 ### Running the script
 

@@ -1,6 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
-import { WithBlock } from '../../types';
-import { unifiedProjectorOperator } from '../utils';
+import { WithBlock } from '../../../types';
+import { unifiedProjectorOperator } from '../../utils';
 
 export interface CertificatePointer {
   slot: Cardano.Slot;

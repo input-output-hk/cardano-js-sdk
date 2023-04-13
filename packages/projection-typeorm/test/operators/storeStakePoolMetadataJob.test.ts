@@ -9,7 +9,7 @@ import {
   typeormTransactionCommit,
   withTypeormTransaction
 } from '../../src';
-import { Bootstrap, Operators } from '@cardano-sdk/projection';
+import { Bootstrap, Mappers, requestNext } from '@cardano-sdk/projection';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { ChainSyncEventType } from '@cardano-sdk/core';
 import { QueryRunner } from 'typeorm';
@@ -36,15 +36,15 @@ describe('storeStakePoolMetadataJob', () => {
       logger
     }).pipe(
       // skipping 1st event because it's not rolled back
-      filter(({ block: { header }, requestNext }) => {
+      filter((evt) => {
         const SKIP = 32_159;
-        if (header.blockNo <= SKIP) {
-          requestNext();
+        if (evt.block.header.blockNo <= SKIP) {
+          evt.requestNext();
         }
-        return header.blockNo > SKIP;
+        return evt.block.header.blockNo > SKIP;
       }),
-      Operators.withCertificates(),
-      Operators.withStakePools(),
+      Mappers.withCertificates(),
+      Mappers.withStakePools(),
       withTypeormTransaction(
         {
           dataSource$: defer(() =>
@@ -63,7 +63,7 @@ describe('storeStakePoolMetadataJob', () => {
       storeStakePoolMetadataJob(),
       buffer.storeBlockData(),
       typeormTransactionCommit(),
-      Operators.requestNext()
+      requestNext()
     );
   const projectTilFirst = createProjectorTilFirst(project$);
   const projectTilFirstPoolUpdateWithMetadata = () =>

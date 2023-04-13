@@ -1,16 +1,15 @@
 import { ChainSyncEventType } from '@cardano-sdk/core';
-import { ExtChainSyncEvent, Operators } from '../../src';
+import { ExtChainSyncEvent, withStaticContext } from '../../src';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 
-describe('withEventContext', () => {
+describe('withStaticContext', () => {
   describe('with observable context', () => {
-    it('creates and adds context to every event', () => {
-      createTestScheduler().run(({ cold, hot, expectObservable, expectSubscriptions, flush }) => {
-        const createContext = jest.fn(() =>
-          cold('a', {
-            a: { ctx: 'a' }
-          })
-        );
+    it('adds last emitted context to every event', () => {
+      createTestScheduler().run(({ hot, expectObservable, expectSubscriptions }) => {
+        const context$ = hot('a-b', {
+          a: { ctx: 'a' },
+          b: { ctx: 'b' }
+        });
         const source$ = hot<ExtChainSyncEvent>('a--b', {
           a: {
             eventType: ChainSyncEventType.RollForward
@@ -19,27 +18,26 @@ describe('withEventContext', () => {
             eventType: ChainSyncEventType.RollBackward
           } as ExtChainSyncEvent
         });
-        expectObservable(source$.pipe(Operators.withEventContext(createContext))).toBe('a--b', {
+        expectObservable(source$.pipe(withStaticContext(context$))).toBe('a--b', {
           a: {
             ctx: 'a',
             eventType: ChainSyncEventType.RollForward
           },
           b: {
-            ctx: 'a',
+            ctx: 'b',
             eventType: ChainSyncEventType.RollBackward
           }
         });
         expectSubscriptions(source$.subscriptions).toBe('^');
-        flush();
-        expect(createContext).toBeCalledTimes(2);
+        expectSubscriptions(context$.subscriptions).toBe('^');
       });
     });
   });
 
   describe('with non-observable context', () => {
-    it('creates and adds context to every event', () => {
-      createTestScheduler().run(({ hot, expectObservable, expectSubscriptions, flush }) => {
-        const createContext = jest.fn(() => ({ ctx: 'a' }));
+    it('adds context to every event', () => {
+      createTestScheduler().run(({ hot, expectObservable, expectSubscriptions }) => {
+        const context = { ctx: 'a' };
         const source$ = hot<ExtChainSyncEvent>('a--b', {
           a: {
             eventType: ChainSyncEventType.RollForward
@@ -48,7 +46,7 @@ describe('withEventContext', () => {
             eventType: ChainSyncEventType.RollBackward
           } as ExtChainSyncEvent
         });
-        expectObservable(source$.pipe(Operators.withEventContext(createContext))).toBe('a--b', {
+        expectObservable(source$.pipe(withStaticContext(context))).toBe('a--b', {
           a: {
             ctx: 'a',
             eventType: ChainSyncEventType.RollForward
@@ -59,8 +57,6 @@ describe('withEventContext', () => {
           }
         });
         expectSubscriptions(source$.subscriptions).toBe('^');
-        flush();
-        expect(createContext).toBeCalledTimes(2);
       });
     });
   });

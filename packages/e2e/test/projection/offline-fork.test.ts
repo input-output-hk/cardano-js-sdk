@@ -4,10 +4,12 @@ import { BlockDataEntity, BlockEntity, StakeKeyEntity } from '@cardano-sdk/proje
 import {
   Bootstrap,
   InMemory,
-  Operators,
+  Mappers,
   ProjectionOperator,
   StabilityWindowBuffer,
-  WithBlock
+  WithBlock,
+  requestNext,
+  withStaticContext
 } from '@cardano-sdk/projection';
 import {
   Cardano,
@@ -75,7 +77,7 @@ const createForkProjectionSource = (
     return of({
       chainSync$: new Observable<ChainSyncEvent>((subscriber) => {
         const events = [...someEventsWithStakeKeyRegistration];
-        const requestNext = () => {
+        const next = () => {
           const nextEvt = events.shift();
           if (nextEvt) {
             const blockOffset = someEventsWithStakeKeyRegistration.length - events.length;
@@ -91,13 +93,13 @@ const createForkProjectionSource = (
                   slot
                 }
               },
-              requestNext
+              requestNext: next
             });
           } else {
             subscriber.complete();
           }
         };
-        requestNext();
+        next();
       }),
       intersection: {
         point: intersectionPoint,
@@ -117,18 +119,18 @@ describe('resuming projection when intersection is not local tip', () => {
   const project = (
     cardanoNode: ObservableCardanoNode,
     buffer: StabilityWindowBuffer,
-    into: ProjectionOperator<Operators.WithStakeKeys>
+    into: ProjectionOperator<Mappers.WithStakeKeys>
   ) =>
     Bootstrap.fromCardanoNode({ buffer, cardanoNode, logger }).pipe(
-      Operators.withCertificates(),
-      Operators.withStakeKeys(),
+      Mappers.withCertificates(),
+      Mappers.withStakeKeys(),
       into,
-      Operators.requestNext()
+      requestNext()
     );
 
   const testRollbackAndContinue = (
     buffer: StabilityWindowBuffer,
-    into: ProjectionOperator<Operators.WithStakeKeys>,
+    into: ProjectionOperator<Mappers.WithStakeKeys>,
     getNumberOfLocalStakeKeys: () => Promise<number>
   ) => {
     it('rolls back local data to intersection and resumes projection from there', async () => {
@@ -181,7 +183,7 @@ describe('resuming projection when intersection is not local tip', () => {
     const buffer = new InMemory.InMemoryStabilityWindowBuffer();
     testRollbackAndContinue(
       buffer,
-      (evt$) => evt$.pipe(Operators.withStaticContext({ store }), InMemory.storeStakeKeys(), buffer.handleEvents()),
+      (evt$) => evt$.pipe(withStaticContext({ store }), InMemory.storeStakeKeys(), buffer.handleEvents()),
       async () => store.stakeKeys.size
     );
   });

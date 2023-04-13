@@ -2,13 +2,14 @@
 import { DataSource, QueryRunner } from 'typeorm';
 import { DataSourceExtensions } from '../createDataSource';
 import { NEVER, Observable, Subject, concat, defer, from, map, mergeMap, switchMap, tap } from 'rxjs';
+import { PgBossExtension, createPgBossExtension } from '../pgBoss';
 import {
-  Operators,
   ProjectionEvent,
   UnifiedExtChainSyncObservable,
-  UnifiedExtChainSyncOperator
+  UnifiedExtChainSyncOperator,
+  withEventContext,
+  withStaticContext
 } from '@cardano-sdk/projection';
-import { PgBossExtension, createPgBossExtension } from '../pgBoss';
 import { WithLogger } from '@cardano-sdk/util';
 import { finalizeWithLatest } from '@cardano-sdk/util-rxjs';
 import omit from 'lodash/omit';
@@ -48,7 +49,7 @@ export function withTypeormTransaction<Props>(
   // eslint-disable-next-line sonarjs/cognitive-complexity
   return (evt$: UnifiedExtChainSyncObservable<Props>) =>
     evt$.pipe(
-      Operators.withStaticContext(
+      withStaticContext(
         defer(() =>
           dataSource$.pipe(
             switchMap((dataSource) =>
@@ -88,7 +89,7 @@ export function withTypeormTransaction<Props>(
           )
         )
       ),
-      Operators.withEventContext(({ queryRunner }) =>
+      withEventContext(({ queryRunner }) =>
         from(
           // - transactionCommitted$.next is called after COMMIT, it is
           //   used by TypeormStabilityWindowBuffer to emit new tip$

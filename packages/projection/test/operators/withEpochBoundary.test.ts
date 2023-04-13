@@ -1,5 +1,11 @@
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { Operators, UnifiedExtChainSyncEvent, WithEpochBoundary, WithEpochNo, WithNetworkInfo } from '../../src';
+import {
+  UnifiedExtChainSyncEvent,
+  WithEpochBoundary,
+  WithEpochNo,
+  WithNetworkInfo,
+  withEpochBoundary
+} from '../../src';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 import { stubEraSummaries } from '../util';
 
@@ -24,7 +30,7 @@ describe('withEpochBoundary', () => {
           f: createEvent(1, ChainSyncEventType.RollForward),
           g: createEvent(2, ChainSyncEventType.RollForward)
         });
-        expectObservable(source$.pipe(Operators.withEpochBoundary({ point: 'origin' }))).toBe('abcdefg', {
+        expectObservable(source$.pipe(withEpochBoundary({ point: 'origin' }))).toBe('abcdefg', {
           a: createEvent(0, ChainSyncEventType.RollForward, false),
           b: createEvent(0, ChainSyncEventType.RollForward, false),
           c: createEvent(1, ChainSyncEventType.RollForward, true),
@@ -45,7 +51,7 @@ describe('withEpochBoundary', () => {
           a: createEvent(1, ChainSyncEventType.RollForward)
         });
         expectObservable(
-          source$.pipe(Operators.withEpochBoundary({ point: { hash: '' as Cardano.BlockId, slot: Cardano.Slot(0) } }))
+          source$.pipe(withEpochBoundary({ point: { hash: '' as Cardano.BlockId, slot: Cardano.Slot(0) } }))
         ).toBe('a', {
           a: createEvent(1, ChainSyncEventType.RollForward, true)
         });

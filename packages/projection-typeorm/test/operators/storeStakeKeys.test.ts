@@ -1,6 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { DataSource, QueryRunner } from 'typeorm';
-import { Operators, ProjectionEvent } from '@cardano-sdk/projection';
+import { Mappers, ProjectionEvent } from '@cardano-sdk/projection';
 import { StakeKeyEntity } from '../../src';
 import { WithTypeormContext, storeStakeKeys } from '../../src/operators';
 import { firstValueFrom, of } from 'rxjs';
@@ -10,12 +10,12 @@ describe('storeStakeKeys', () => {
   let dataSource: DataSource;
   let queryRunner: QueryRunner;
 
-  const processEvent = (projectedStakeKeys: Pick<Operators.WithStakeKeys['stakeKeys'], 'insert' | 'del'>) =>
+  const processEvent = (projectedStakeKeys: Pick<Mappers.WithStakeKeys['stakeKeys'], 'insert' | 'del'>) =>
     firstValueFrom(
       of({
         queryRunner,
         stakeKeys: projectedStakeKeys
-      } as ProjectionEvent<Operators.WithStakeKeys & WithTypeormContext>).pipe(storeStakeKeys())
+      } as ProjectionEvent<Mappers.WithStakeKeys & WithTypeormContext>).pipe(storeStakeKeys())
     );
 
   beforeEach(async () => {
