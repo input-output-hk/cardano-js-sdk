@@ -187,7 +187,7 @@ export class SingleAddressWallet implements ObservableWallet {
   readonly addresses$: TrackerSubject<GroupedAddress[]>;
   readonly protocolParameters$: TrackerSubject<Cardano.ProtocolParameters>;
   readonly genesisParameters$: TrackerSubject<Cardano.CompactGenesis>;
-  readonly assets$: TrackerSubject<Assets>;
+  readonly assetInfo$: TrackerSubject<Assets>;
   readonly fatalError$: Subject<unknown>;
   readonly syncStatus: SyncStatus;
   readonly name: string;
@@ -421,7 +421,7 @@ export class SingleAddressWallet implements ObservableWallet {
     });
 
     this.balance = createBalanceTracker(this.protocolParameters$, this.utxo, this.delegation);
-    this.assets$ = new PersistentDocumentTrackerSubject(
+    this.assetInfo$ = new PersistentDocumentTrackerSubject(
       createAssetsTracker({
         assetProvider: this.assetProvider,
         balanceTracker: this.balance,
@@ -564,7 +564,7 @@ export class SingleAddressWallet implements ObservableWallet {
     this.keyAgent.shutdown();
     this.currentEpoch$.complete();
     this.delegation.shutdown();
-    this.assets$.complete();
+    this.assetInfo$.complete();
     this.fatalError$.complete();
     this.syncStatus.shutdown();
     this.#newTransactions.failedToSubmit$.complete();

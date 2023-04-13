@@ -154,7 +154,7 @@ describe('SingleAddressWallet.assets/nft', () => {
 
     // Wait until wallet is aware of the minted tokens.
     await firstValueFrom(
-      combineLatest([wallet.assets$, wallet.balance.utxo.total$]).pipe(
+      combineLatest([wallet.assetInfo$, wallet.balance.utxo.total$]).pipe(
         filter(
           ([assets, balance]) =>
             assets &&
@@ -181,7 +181,7 @@ describe('SingleAddressWallet.assets/nft', () => {
 
   it('supports multiple CIP-25 NFT metadata in one tx', async () => {
     const [nfts, walletAssetBalance] = await firstValueFrom(
-      combineLatest([wallet.assets$, wallet.balance.utxo.total$]).pipe(
+      combineLatest([wallet.assetInfo$, wallet.balance.utxo.total$]).pipe(
         filter(([assets, balance]) => assets.size === balance.assets?.size),
         filter(([assets]) => [...assets.values()].every((quantity) => !!quantity)),
         map(([assets, balance]) => [[...assets.values()].filter((asset) => !!asset.nftMetadata), balance.assets])
@@ -213,7 +213,7 @@ describe('SingleAddressWallet.assets/nft', () => {
 
   it('parses CIP-25 NFT metadata with files', async () => {
     const [nfts, walletAssetBalance] = await firstValueFrom(
-      combineLatest([wallet.assets$, wallet.balance.utxo.total$]).pipe(
+      combineLatest([wallet.assetInfo$, wallet.balance.utxo.total$]).pipe(
         filter(([assets, balance]) => assets.size === balance.assets?.size),
         map(([assets, balance]) => [[...assets.values()].filter((asset) => !!asset.nftMetadata), balance.assets])
       )
@@ -297,7 +297,7 @@ describe('SingleAddressWallet.assets/nft', () => {
     );
 
     const nfts = await firstValueFrom(
-      combineLatest([wallet.assets$, wallet.balance.utxo.total$]).pipe(
+      combineLatest([wallet.assetInfo$, wallet.balance.utxo.total$]).pipe(
         filter(([assets, balance]) => assets.size === balance.assets?.size),
         map(([assets]) => [...assets.values()].filter((asset) => !!asset.nftMetadata))
       )
@@ -367,7 +367,7 @@ describe('SingleAddressWallet.assets/nft', () => {
 
         // try remove the asset.nftMetadata filter
         const nfts = await firstValueFrom(
-          combineLatest([wallet.assets$, wallet.balance.utxo.total$]).pipe(
+          combineLatest([wallet.assetInfo$, wallet.balance.utxo.total$]).pipe(
             filter(([assets, balance]) => assets.size === balance.assets?.size),
             map(([assets]) => [...assets.values()].filter((asset) => !!asset.nftMetadata))
           )
