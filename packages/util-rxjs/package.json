@@ -54,6 +54,7 @@
   },
   "dependencies": {
     "@cardano-sdk/util": "^0.8.2",
+    "backoff-rxjs": "^7.0.0",
     "rxjs": "^7.4.0"
   },
   "devDependencies": {
