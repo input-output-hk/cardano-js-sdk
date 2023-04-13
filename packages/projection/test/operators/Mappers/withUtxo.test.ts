@@ -1,0 +1,188 @@
+import { Cardano } from '@cardano-sdk/core';
+import { ProjectionEvent } from '../../../src';
+import { filterProducedUtxoByAddresses, withUtxo } from '../../../src/operators/Mappers';
+import { firstValueFrom, of } from 'rxjs';
+
+describe('withUtxo', () => {
+  const validTxSource$ = of({
+    block: {
+      body: [
+        {
+          body: {
+            inputs: [
+              {
+                index: 1,
+                txId: '434342da3f66f94d929d8c7a49484e1c212c74c6213d7b938119f6e0dcb9454c'
+              },
+              {
+                index: 2,
+                txId: '434342da3f66f94d929d8c7a49484e1c212c74c6213d7b938119f6e0dcb9454c'
+              }
+            ],
+            outputs: [
+              {
+                address: Cardano.PaymentAddress('addr_test1wzlv9cslk9tcj0wpm9p5t6kajyt37ap5sc9rzkaxa9p67ys2ygypv'),
+                datumHash: '99c170cc1247e7b7971e194c7e400e219360d3991cb588e9833f77ee9edbbd06' as Cardano.DatumHash,
+                value: {
+                  assets: new Map([
+                    [
+                      Cardano.AssetId(
+                        '8f78a4388b1a3e1a1435257e9356fa0c2cc0d3a5999d63b5886c96435365636f6e6454657374746f6b656e'
+                      ),
+                      1n
+                    ],
+                    [Cardano.AssetId('8f78a4388b1a3e1a1435257e9356fa0c2cc0d3a5999d63b5886c964354657374746f6b656e'), 1n]
+                  ]),
+                  coins: 1_724_100n
+                }
+              }
+            ]
+          },
+          inputSource: Cardano.InputSource.inputs
+        },
+        {
+          body: {
+            inputs: [
+              {
+                index: 0,
+                txId: '73e26ff267b5ee32d8e413635f4f4c9547db1c2af1694faf51be20b9f508b8f6'
+              }
+            ],
+            outputs: [
+              {
+                address:
+                  'addr_test1qzrf8t56qhzcp2chrtn7deqhep0dttr3eemhnut6lth3gulj7cuplfarmnq5fyumgl0lklddvau9dhamaexykljzvpyswqt56p',
+                value: {
+                  assets: new Map(),
+                  coins: 25_485_292n
+                }
+              },
+              {
+                address: 'addr_test1vptwv4jvaqt635jvthpa29lww3vkzypm8l6vk4lv4tqfhhgajdgwf',
+                value: {
+                  assets: new Map(),
+                  coins: 74_341_815n
+                }
+              }
+            ]
+          },
+          inputSource: Cardano.InputSource.inputs
+        }
+      ]
+    }
+  } as ProjectionEvent);
+
+  const failedTxSource$ = of({
+    block: {
+      body: [
+        {
+          body: {
+            collaterals: [
+              {
+                index: 2,
+                txId: '434342da3f66f94d929d8c7a49484e1c212c74c6213d7b938119f6e0dcb9454c'
+              }
+            ],
+            inputs: [
+              {
+                index: 1,
+                txId: '434342da3f66f94d929d8c7a49484e1c212c74c6213d7b938119f6e0dcb9454c'
+              }
+            ],
+            outputs: [
+              {
+                address: Cardano.PaymentAddress('addr_test1wzlv9cslk9tcj0wpm9p5t6kajyt37ap5sc9rzkaxa9p67ys2ygypv'),
+                datumHash: '99c170cc1247e7b7971e194c7e400e219360d3991cb588e9833f77ee9edbbd06' as Cardano.DatumHash,
+                value: {
+                  assets: new Map([
+                    [
+                      Cardano.AssetId(
+                        '8f78a4388b1a3e1a1435257e9356fa0c2cc0d3a5999d63b5886c96435365636f6e6454657374746f6b656e'
+                      ),
+                      1n
+                    ],
+                    [Cardano.AssetId('8f78a4388b1a3e1a1435257e9356fa0c2cc0d3a5999d63b5886c964354657374746f6b656e'), 1n]
+                  ]),
+                  coins: 1_724_100n
+                }
+              }
+            ]
+          },
+          inputSource: Cardano.InputSource.collaterals
+        },
+        {
+          body: {
+            collateralReturn: {
+              address: 'addr_test1vptwv4jvaqt635jvthpa29lww3vkzypm8l6vk4lv4tqfhhgajdgwf',
+              value: {
+                assets: new Map(),
+                coins: 74_341_815n
+              }
+            },
+            collaterals: [
+              {
+                index: 0,
+                txId: '73e26ff267b5ee32d8e413635f4f4c9547db1c2af1694faf51be20b9f508b8f6'
+              }
+            ],
+            inputs: [
+              {
+                index: 0,
+                txId: '73e26ff267b5ee32d8e413635f4f4c9547db1c2af1694faf51be20b9f508b8f6'
+              }
+            ],
+            outputs: [
+              {
+                address:
+                  'addr_test1qzrf8t56qhzcp2chrtn7deqhep0dttr3eemhnut6lth3gulj7cuplfarmnq5fyumgl0lklddvau9dhamaexykljzvpyswqt56p',
+                value: {
+                  assets: new Map(),
+                  coins: 25_485_292n
+                }
+              }
+            ]
+          },
+          inputSource: Cardano.InputSource.collaterals
+        }
+      ]
+    }
+  } as ProjectionEvent);
+
+  it('maps all produced and consumed utxo into flat arrays', async () => {
+    const {
+      utxo: { consumed, produced }
+    } = await firstValueFrom(validTxSource$.pipe(withUtxo()));
+    expect(consumed).toHaveLength(3);
+    expect(produced).toHaveLength(3);
+  });
+
+  it('when inputSource is collateral: maps consumed/produced utxo from collateral/collateralReturn', async () => {
+    const {
+      utxo: { consumed, produced }
+    } = await firstValueFrom(failedTxSource$.pipe(withUtxo()));
+    expect(consumed).toHaveLength(2);
+    expect(produced).toHaveLength(1);
+    expect(consumed[0].index).toBe(2);
+    expect(produced[0][1].address).toBe('addr_test1vptwv4jvaqt635jvthpa29lww3vkzypm8l6vk4lv4tqfhhgajdgwf');
+  });
+
+  describe('filterProducedUtxoByAddresses', () => {
+    it('keeps only utxo produced for supplied addresses', async () => {
+      const {
+        utxo: { produced }
+      } = await firstValueFrom(
+        validTxSource$.pipe(
+          withUtxo(),
+          filterProducedUtxoByAddresses({
+            addresses: [
+              Cardano.PaymentAddress(
+                'addr_test1qzrf8t56qhzcp2chrtn7deqhep0dttr3eemhnut6lth3gulj7cuplfarmnq5fyumgl0lklddvau9dhamaexykljzvpyswqt56p'
+              )
+            ]
+          })
+        )
+      );
+      expect(produced).toHaveLength(1);
+    });
+  });
+});
