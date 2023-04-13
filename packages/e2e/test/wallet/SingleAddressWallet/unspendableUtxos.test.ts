@@ -4,8 +4,8 @@ import { assertTxIsValid } from '../../../../wallet/test/util';
 import { contextLogger, isNotNil } from '@cardano-sdk/util';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, map, take } from 'rxjs';
+import { firstValueFromTimed, walletReady } from '../../util';
 import { getEnv, getWallet, walletVariables } from '../../../src';
-import { walletReady } from '../../util';
 
 const env = getEnv(walletVariables);
 const logger = createLogger();
@@ -89,6 +89,16 @@ describe('SingleAddressWallet/unspendableUtxos', () => {
     // We must leave some ADA behind to cover for transaction fees and min ADA of change output, however; this amount
     // must be less than the collateral UTxO to guarantee that the UTxO is moved.
     totalBalance.coins -= 4_500_000n;
+
+    // Wait until wallet2 has the transaction in chain history
+    txFoundInHistory = await firstValueFromTimed(
+      wallet2.transactions.history$.pipe(
+        map((txs) => txs.find((tx) => tx.id === signedTx.tx.id)),
+        filter(isNotNil),
+        take(1)
+      ),
+      `Failed to find transaction ${signedTx.tx.id} in dest wallet history`
+    );
 
     const unsignedMoveAdaTx = await txBuilder2
       .addOutput(txBuilder2.buildOutput().address(address).value(totalBalance).toTxOut())
