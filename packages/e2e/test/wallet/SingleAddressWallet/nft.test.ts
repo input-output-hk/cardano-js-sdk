@@ -203,9 +203,9 @@ describe('SingleAddressWallet.assets/nft', () => {
         version: '1.0'
       },
       policyId,
-      // in case of repeated tests on the same network, total asset quantity is not updated due to
+      // in case of repeated tests on the same network, total asset supply is not updated due to
       // the limitation that asset info is not refreshed on wallet balance changes
-      quantity: expect.anything(),
+      supply: expect.anything(),
       tokenMetadata: null
     });
     expect(nfts.find((nft) => nft.assetId === assetIds[TOKEN_METADATA_1_INDEX])).toBeDefined();
@@ -251,7 +251,7 @@ describe('SingleAddressWallet.assets/nft', () => {
         version: '1.0'
       },
       policyId,
-      quantity: expect.anything(),
+      supply: expect.anything(),
       tokenMetadata: null
     });
   });
@@ -385,7 +385,7 @@ describe('SingleAddressWallet.assets/nft', () => {
             version: '1.0'
           },
           policyId,
-          quantity: expect.anything(),
+          supply: expect.anything(),
           tokenMetadata: null
         });
       });
