@@ -1,15 +1,15 @@
 import 'reflect-metadata';
-import { BlockDataEntity } from './entity';
-import { BlockEntity } from './entity/Block.entity';
 import { BossDb } from './pgBoss';
 import { DataSource, DataSourceOptions, DefaultNamingStrategy, NamingStrategyInterface, QueryRunner } from 'typeorm';
 import { Logger } from 'ts-log';
 import { contextLogger, patchObject } from '@cardano-sdk/util';
-import { projectionSinks } from './util';
 import { typeormLogger } from './logger';
 import PgBoss from 'pg-boss';
 import snakeCase from 'lodash/snakeCase';
-import uniq from 'lodash/uniq';
+
+export interface DataSourceExtensions {
+  pgBoss?: boolean;
+}
 
 type PostgresConnectionOptions = DataSourceOptions & { type: 'postgres' };
 
@@ -33,11 +33,12 @@ export type TypeormOptions = Pick<
   | 'migrations'
 > & {};
 
-export interface CreateDataSourceProps<P extends object> {
-  projections: P;
+export interface CreateDataSourceProps {
+  entities: Function[];
   connectionConfig: PgConnectionConfig;
   options?: TypeormOptions;
   devOptions?: TypeormDevOptions;
+  extensions?: DataSourceExtensions;
   logger: Logger;
 }
 
@@ -95,7 +96,7 @@ export const pgBossSchemaExists = async (queryRunner: QueryRunner) => {
   return queryResult[0]?.exists === true;
 };
 
-const initializePgBoss = async (dataSource: DataSource, logger: Logger, usePgBoss: boolean, dropSchema?: boolean) => {
+const initializePgBoss = async (dataSource: DataSource, logger: Logger, usePgBoss?: boolean, dropSchema?: boolean) => {
   const queryRunner = dataSource.createQueryRunner('master');
   try {
     if (dropSchema) {
@@ -125,20 +126,14 @@ const initializePgBoss = async (dataSource: DataSource, logger: Logger, usePgBos
   }
 };
 
-export const createDataSource = <P extends object>({
+export const createDataSource = ({
   connectionConfig,
   devOptions,
   options,
-  projections,
+  entities,
+  extensions,
   logger
-}: CreateDataSourceProps<P>) => {
-  const requestedSinks = projectionSinks(projections);
-  const entities: Function[] = uniq([
-    BlockEntity,
-    BlockDataEntity,
-    ...requestedSinks.flatMap(([_, sink]) => sink.entities)
-  ]);
-  const usePgBoss = requestedSinks.some(([_, { extensions }]) => extensions?.pgBoss);
+}: CreateDataSourceProps) => {
   const dataSource = new DataSource({
     ...connectionConfig,
     ...devOptions,
@@ -152,7 +147,12 @@ export const createDataSource = <P extends object>({
   return patchObject(dataSource, {
     async initialize() {
       await dataSource.initialize();
-      await initializePgBoss(dataSource, contextLogger(logger, 'createDataSource'), usePgBoss, devOptions?.dropSchema);
+      await initializePgBoss(
+        dataSource,
+        contextLogger(logger, 'createDataSource'),
+        extensions?.pgBoss,
+        devOptions?.dropSchema
+      );
       return dataSource;
     }
   });

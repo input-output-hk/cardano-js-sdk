@@ -1,5 +1,4 @@
-import { Projections } from '@cardano-sdk/projection';
-import { createDataSource } from '../src';
+import { CreateDataSourceProps, createDataSource } from '../src';
 import { createDatabase } from 'typeorm-extension';
 import { logger } from '@cardano-sdk/util-dev';
 
@@ -11,12 +10,12 @@ export const connectionConfig = {
   username: 'postgres'
 };
 
-export const initializeDataSource = async (projections: Partial<Projections.AllProjections> = {}) => {
+export const initializeDataSource = async (props: Pick<CreateDataSourceProps, 'entities' | 'extensions'>) => {
   const dataSource = createDataSource({
     connectionConfig,
     devOptions: { dropSchema: true, synchronize: true },
     logger,
-    projections
+    ...props
   });
   await createDatabase({
     options: {

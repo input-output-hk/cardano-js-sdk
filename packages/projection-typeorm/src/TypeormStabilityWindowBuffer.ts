@@ -6,15 +6,25 @@ import { FindOptionsSelect, LessThan, QueryRunner, Repository } from 'typeorm';
 import { Logger } from 'ts-log';
 import { Observable, ReplaySubject, concatMap, from, map } from 'rxjs';
 import {
-  Operators,
+  ProjectionEvent,
   RollBackwardEvent,
   RollForwardEvent,
   StabilityWindowBuffer,
-  UnifiedProjectorOperator,
-  WithBlock
+  WithBlock,
+  WithNetworkInfo
 } from '@cardano-sdk/projection';
 import { WithLogger, contextLogger } from '@cardano-sdk/util';
-import { WithTypeormContext } from './types';
+import { WithTypeormContext } from './operators';
+
+const pointEquals = (point1: 'origin' | Cardano.Block | undefined, point2: 'origin' | Cardano.Block | undefined) => {
+  if (typeof point1 !== 'object') {
+    return point1 === point2;
+  }
+  if (typeof point2 !== 'object') {
+    return false;
+  }
+  return point1.header.hash === point2.header.hash;
+};
 
 const blockDataSelect: FindOptionsSelect<BlockDataEntity> = {
   // Using 'transformers' breaks the types.
@@ -35,11 +45,12 @@ export interface TypeormStabilityWindowBufferProps extends WithLogger {
 }
 
 export class TypeormStabilityWindowBuffer implements StabilityWindowBuffer {
-  #tail: Cardano.Block | 'origin';
-  #tip$: ReplaySubject<Cardano.Block | 'origin'>;
-  #tail$: ReplaySubject<Cardano.Block | 'origin'>;
-  tip$: Observable<Cardano.Block | 'origin'>;
-  tail$: Observable<Cardano.Block | 'origin'>;
+  #tail?: Cardano.Block | 'origin';
+  #tip?: Cardano.Block | 'origin';
+  readonly #tip$: ReplaySubject<Cardano.Block | 'origin'> = new ReplaySubject(1);
+  readonly #tail$: ReplaySubject<Cardano.Block | 'origin'> = new ReplaySubject(1);
+  readonly tip$: Observable<Cardano.Block | 'origin'>;
+  readonly tail$: Observable<Cardano.Block | 'origin'>;
   readonly #logger: Logger;
   readonly #compactEvery: number;
   readonly #allowNonSequentialBlockHeights?: boolean;
@@ -49,17 +60,15 @@ export class TypeormStabilityWindowBuffer implements StabilityWindowBuffer {
     compactBufferEveryNBlocks = 100,
     logger
   }: TypeormStabilityWindowBufferProps) {
-    this.start();
     this.#compactEvery = compactBufferEveryNBlocks;
     this.#allowNonSequentialBlockHeights = allowNonSequentialBlockHeights;
     this.#logger = contextLogger(logger, 'TypeormStabilityWindowBuffer');
+    this.tip$ = this.#tip$.asObservable();
+    this.tail$ = this.#tail$.asObservable();
   }
 
-  handleEvents(): UnifiedProjectorOperator<
-    Operators.WithNetworkInfo & WithTypeormContext,
-    Operators.WithNetworkInfo & WithTypeormContext
-  > {
-    return (evt$) =>
+  storeBlockData<T extends ProjectionEvent<WithTypeormContext>>() {
+    return (evt$: Observable<T>) =>
       evt$.pipe(
         concatMap((evt) =>
           from(
@@ -82,20 +91,8 @@ export class TypeormStabilityWindowBuffer implements StabilityWindowBuffer {
       }),
       this.#findTail(repository)
     ]);
-    this.#tip$.next(tip[0]?.data || 'origin');
+    this.#setTip(tip[0]?.data || 'origin');
     this.#setTail(tail[0]?.data || 'origin');
-  }
-
-  /**
-   * (Re)create tip$ and tail$ observables.
-   * Automatically called in constructor.
-   * Can be used to reuse the same buffer object after shutdown().
-   */
-  start() {
-    this.#tip$ = new ReplaySubject(1);
-    this.#tail$ = new ReplaySubject(1);
-    this.tip$ = this.#tip$.asObservable();
-    this.tail$ = this.#tail$.asObservable();
   }
 
   shutdown(): void {
@@ -111,8 +108,8 @@ export class TypeormStabilityWindowBuffer implements StabilityWindowBuffer {
     });
   }
 
-  async #rollForward(evt: RollForwardEvent<Operators.WithNetworkInfo & WithTypeormContext>) {
-    const { eventType, transactionCommitted$, queryRunner, blockEntity, block } = evt;
+  async #rollForward(evt: RollForwardEvent<WithNetworkInfo & WithTypeormContext>) {
+    const { eventType, transactionCommitted$, queryRunner, block } = evt;
     const {
       header: { blockNo }
     } = block;
@@ -120,12 +117,14 @@ export class TypeormStabilityWindowBuffer implements StabilityWindowBuffer {
     if (eventType === ChainSyncEventType.RollForward) {
       this.#logger.debug('Add block data at height', blockNo);
       const blockData = repository.create({
-        block: blockEntity,
+        block: {
+          height: blockNo
+        },
         data: block
       });
       await Promise.all([repository.insert(blockData), this.#deleteOldBlockData(evt)]);
       transactionCommitted$.subscribe(() => {
-        this.#tip$.next(block);
+        this.#setTip(block);
         if (this.#tail === 'origin') {
           this.#setTail(block);
         }
@@ -155,7 +154,7 @@ export class TypeormStabilityWindowBuffer implements StabilityWindowBuffer {
       throw new Error('Assert: inconsistent PgStabilityWindowBuffer at rollBackward');
     }
     transactionCommitted$.subscribe(() => {
-      this.#tip$.next(prevTip?.data || 'origin');
+      this.#setTip(prevTip?.data || 'origin');
       if (!prevTip?.data) {
         this.#setTail('origin');
       }
@@ -169,7 +168,7 @@ export class TypeormStabilityWindowBuffer implements StabilityWindowBuffer {
     },
     queryRunner,
     transactionCommitted$
-  }: RollForwardEvent<Operators.WithNetworkInfo & WithTypeormContext>) {
+  }: RollForwardEvent<WithNetworkInfo & WithTypeormContext>) {
     if (blockNo < securityParameter || blockNo % this.#compactEvery !== 0) {
       return;
     }
@@ -199,7 +198,16 @@ export class TypeormStabilityWindowBuffer implements StabilityWindowBuffer {
   }
 
   #setTail(tail: Cardano.Block | 'origin') {
-    this.#tail = tail;
-    this.#tail$.next(tail);
+    if (!pointEquals(tail, this.#tail)) {
+      this.#tail = tail;
+      this.#tail$.next(tail);
+    }
+  }
+
+  #setTip(tip: Cardano.Block | 'origin') {
+    if (!pointEquals(tip, this.#tip)) {
+      this.#tip = tip;
+      this.#tip$.next(tip);
+    }
   }
 }

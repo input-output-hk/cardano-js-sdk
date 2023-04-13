@@ -4,7 +4,6 @@
 /* eslint-disable no-invalid-this */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Cardano } from '@cardano-sdk/core';
-import { PgBossExtension } from './types';
 import { QueryRunner } from 'typeorm';
 import { v4 } from 'uuid';
 import Attorney from 'pg-boss/src/attorney';
@@ -12,6 +11,14 @@ import EventEmitter from 'events';
 import PgBoss, { SendOptions } from 'pg-boss';
 
 export const STAKE_POOL_METADATA_QUEUE = 'STAKE_POOL_METADATA';
+
+export interface PgBossExtension {
+  send: <T extends object>(
+    taskName: string,
+    data: T,
+    options: { blockHeight: Cardano.BlockNo }
+  ) => Promise<string | null>;
+}
 
 export interface StakePoolMetadataJob {
   /**

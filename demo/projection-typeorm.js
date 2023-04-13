@@ -1,18 +1,45 @@
 // Runtime dependency: `yarn preprod:up cardano-node-ogmios postgres` (can be any network)
 /* eslint-disable import/no-extraneous-dependencies */
-const { Bootstrap, Projections, projectIntoSink, logProjectionProgress } = require('@cardano-sdk/projection');
-const { createDataSource, createSink, TypeormStabilityWindowBuffer } = require('@cardano-sdk/projection-typeorm');
+const { Bootstrap, Operators } = require('@cardano-sdk/projection');
+const {
+  createDataSource,
+  withTypeormTransaction,
+  typeormTransactionCommit,
+  TypeormStabilityWindowBuffer,
+  BlockDataEntity,
+  BlockEntity,
+  StakePoolEntity,
+  PoolRegistrationEntity,
+  PoolRetirementEntity,
+  storeBlock,
+  storeStakePools,
+  storeStakePoolMetadataJob,
+  isRecoverableTypeormError
+} = require('@cardano-sdk/projection-typeorm');
 const { OgmiosObservableCardanoNode } = require('@cardano-sdk/ogmios');
-const { from, of } = require('rxjs');
+const { defer, from, of } = require('rxjs');
 const { createDatabase } = require('typeorm-extension');
-const pick = require('lodash/pick');
+const { shareRetryBackoff } = require('@cardano-sdk/util-rxjs');
 
 const logger = {
   ...console,
   debug: () => void 0
 };
 
-const projections = pick(Projections.allProjections, ['stakePools', 'stakePoolMetadata']);
+const entities = [BlockDataEntity, BlockEntity, StakePoolEntity, PoolRegistrationEntity, PoolRetirementEntity];
+const extensions = {
+  pgBoss: true
+};
+
+const cardanoNode = new OgmiosObservableCardanoNode(
+  {
+    connectionConfig$: of({
+      port: 1339
+    })
+  },
+  { logger }
+);
+const buffer = new TypeormStabilityWindowBuffer({ logger });
 
 // #region TypeORM setup
 
@@ -23,44 +50,36 @@ const connectionConfig = {
   username: 'postgres'
 };
 
-const dataSource = createDataSource({
-  connectionConfig,
-  devOptions: process.argv.includes('--drop')
-    ? {
-        dropSchema: true,
-        synchronize: true
-      }
-    : undefined,
-  logger,
-  projections
-});
-
-const dataSource$ = from(
-  (async () => {
-    await createDatabase({
-      options: {
-        type: 'postgres',
-        ...connectionConfig,
-        installExtensions: true
-      }
-    });
-    await dataSource.initialize();
-    return dataSource;
-  })()
+const dataSource$ = defer(() =>
+  from(
+    (async () => {
+      const dataSource = createDataSource({
+        connectionConfig,
+        devOptions: process.argv.includes('--drop')
+          ? {
+              dropSchema: true,
+              synchronize: true
+            }
+          : undefined,
+        entities,
+        extensions,
+        logger
+      });
+      await createDatabase({
+        options: {
+          type: 'postgres',
+          ...connectionConfig,
+          installExtensions: true
+        }
+      });
+      await dataSource.initialize();
+      await buffer.initialize(dataSource.createQueryRunner());
+      return dataSource;
+    })()
+  )
 );
 
 // #endregion
-
-const cardanoNode = new OgmiosObservableCardanoNode(
-  {
-    connectionConfig$: of({
-      port: 1339
-    })
-  },
-  { logger }
-);
-
-const buffer = new TypeormStabilityWindowBuffer({ logger });
 
 Bootstrap.fromCardanoNode({
   buffer,
@@ -68,14 +87,21 @@ Bootstrap.fromCardanoNode({
   logger
 })
   .pipe(
-    projectIntoSink({
-      projections,
-      sink: createSink({
-        buffer,
-        dataSource$,
-        logger
-      })
-    }),
-    logProjectionProgress(logger)
+    Operators.withCertificates(),
+    Operators.withStakePools(),
+    shareRetryBackoff(
+      (evt$) =>
+        evt$.pipe(
+          withTypeormTransaction({ dataSource$, logger }, extensions),
+          storeBlock(),
+          buffer.storeBlockData(),
+          storeStakePools(),
+          storeStakePoolMetadataJob(),
+          typeormTransactionCommit()
+        ),
+      { shouldRetry: isRecoverableTypeormError }
+    ),
+    Operators.requestNext(),
+    Operators.logProjectionProgress(logger)
   )
   .subscribe();

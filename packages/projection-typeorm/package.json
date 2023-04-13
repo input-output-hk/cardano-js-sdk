@@ -52,8 +52,6 @@
     "@cardano-sdk/projection": "^0.5.0",
     "@cardano-sdk/util": "^0.8.2",
     "@cardano-sdk/util-rxjs": "^0.4.6",
-    "@hapi/topo": "^6.0.2",
-    "backoff-rxjs": "^7.0.0",
     "lodash": "^4.17.21",
     "pg": "^8.9.0",
     "pg-boss": "8.4.2",

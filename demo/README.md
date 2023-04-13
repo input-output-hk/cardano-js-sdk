@@ -12,7 +12,7 @@ yarn preprod:up cardano-node-ogmios postgres # or preview:up/mainnet:up
 
 ### Configuration
 
-Update `projections` variable in the [script](./projection-typeorm.js) to pick your desired set of projections. See available options in [projections/index](../packages/projection/src/projections/index.ts).
+Projection can be customized by adding/removing operators and TypeORM entities, e.g. you may add those operators `withStakeKeys(), ..., storeStakeKeys()` alongside with adding a `StakeKeyEntity`.
 
 ### Running the script
 
