@@ -4,8 +4,8 @@ import { assertTxIsValid } from '../../../../wallet/test/util';
 import { contextLogger, isNotNil } from '@cardano-sdk/util';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, map, take } from 'rxjs';
+import { firstValueFromTimed, walletReady } from '../../util';
 import { getEnv, getWallet, walletVariables } from '../../../src';
-import { walletReady } from '../../util';
 
 const env = getEnv(walletVariables);
 const logger = createLogger();
@@ -45,26 +45,24 @@ describe('SingleAddressWallet/unspendableUtxos', () => {
     await signedTx.submit();
 
     // Search chain history to see if the transaction is there.
-    let txFoundInHistory = await firstValueFrom(
+    let txFoundInHistory = await firstValueFromTimed(
       wallet1.transactions.history$.pipe(
         map((txs) => txs.find((tx) => tx.id === signedTx.tx.id)),
         filter(isNotNil),
         take(1)
-      )
+      ),
+      `Failed to find transaction ${signedTx.tx.id} in src wallet history`
     );
 
-    expect(txFoundInHistory.id).toEqual(signedTx.tx.id);
-
     // Find the UTxO in the UTxO set.
-    const utxo = await firstValueFrom(
+    const utxo = await firstValueFromTimed(
       wallet1.utxo.available$.pipe(
         map((utxos) => utxos.find((o) => o[0].txId === signedTx.tx.id && o[1].value.coins === 5_000_000n)),
         filter(isNotNil),
         take(1)
-      )
+      ),
+      `Failed to find utxo from txId ${signedTx.tx.id} with coin value 5_000_000n in src wallet`
     );
-
-    expect(utxo).toBeDefined();
 
     // Set UTxO as unspendable.
     await wallet1.utxo.setUnspendable([utxo]);
@@ -90,6 +88,16 @@ describe('SingleAddressWallet/unspendableUtxos', () => {
     // must be less than the collateral UTxO to guarantee that the UTxO is moved.
     totalBalance.coins -= 4_500_000n;
 
+    // Wait until wallet2 has the transaction in chain history
+    txFoundInHistory = await firstValueFromTimed(
+      wallet2.transactions.history$.pipe(
+        map((txs) => txs.find((tx) => tx.id === signedTx.tx.id)),
+        filter(isNotNil),
+        take(1)
+      ),
+      `Failed to find transaction ${signedTx.tx.id} in dest wallet history`
+    );
+
     const unsignedMoveAdaTx = await txBuilder2
       .addOutput(txBuilder2.buildOutput().address(address).value(totalBalance).toTxOut())
       .build();
@@ -100,12 +108,13 @@ describe('SingleAddressWallet/unspendableUtxos', () => {
     await signedMoveAdaTx.submit();
 
     // Search chain history to see if the transaction is there.
-    txFoundInHistory = await firstValueFrom(
+    txFoundInHistory = await firstValueFromTimed(
       wallet1.transactions.history$.pipe(
         map((txs) => txs.find((tx) => tx.id === signedMoveAdaTx.tx.id)),
         filter(isNotNil),
         take(1)
-      )
+      ),
+      `Failed to find second transaction ${signedMoveAdaTx.tx.id} in dest wallet history`
     );
 
     expect(txFoundInHistory.id).toEqual(signedMoveAdaTx.tx.id);
