@@ -3,14 +3,16 @@ import { AssetId, createTestScheduler, logger } from '@cardano-sdk/util-dev';
 import {
   AssetService,
   AssetsTrackerProps,
-  BalanceTracker,
   TrackedAssetProvider,
-  TransactionalTracker,
+  TransactionsTracker,
   createAssetsTracker
 } from '../../src/services';
 
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { from, lastValueFrom, of, tap } from 'rxjs';
+
+const createTxWithValues = (values: Partial<Cardano.Value>[]): Cardano.HydratedTx =>
+  ({ body: { outputs: values.map((value) => ({ value })) } } as Cardano.HydratedTx);
 
 describe('createAssetsTracker', () => {
   let assetTsla: Asset.AssetInfo;
@@ -33,25 +35,25 @@ describe('createAssetsTracker', () => {
     } as unknown as TrackedAssetProvider;
   });
 
-  it('fetches asset info for every asset in total balance', () => {
+  it('fetches asset info for every history transaction', () => {
     createTestScheduler().run(({ cold, expectObservable, flush }) => {
-      const balanceTracker = {
-        utxo: {
-          total$: cold('a-b-c', {
-            a: {} as Cardano.Value,
-            b: { assets: new Map([[AssetId.TSLA, 1n]]) } as Cardano.Value,
-            c: {
-              assets: new Map([
-                [AssetId.TSLA, 1n],
-                [AssetId.PXL, 2n]
-              ])
-            } as Cardano.Value
-          })
-        }
-      } as unknown as TransactionalTracker<BalanceTracker>;
+      const transactionsTracker: Partial<TransactionsTracker> = {
+        history$: cold('a-b-c', {
+          a: [],
+          b: [createTxWithValues([{ assets: new Map([[AssetId.TSLA, 1n]]) }])],
+          c: [
+            createTxWithValues([{ assets: new Map([[AssetId.TSLA, 1n]]) }]),
+            createTxWithValues([
+              {
+                assets: new Map([[AssetId.PXL, 2n]])
+              }
+            ])
+          ]
+        })
+      };
 
       const target$ = createAssetsTracker(
-        { assetProvider, balanceTracker, logger, retryBackoffConfig } as unknown as AssetsTrackerProps,
+        { assetProvider, logger, retryBackoffConfig, transactionsTracker } as unknown as AssetsTrackerProps,
         {
           assetService
         }
@@ -70,20 +72,21 @@ describe('createAssetsTracker', () => {
     });
   });
 
-  it('does not emit if the assets in total balance have not changed', () => {
+  it('does not emit if the assets in transaction history have not changed', () => {
     createTestScheduler().run(({ cold, expectObservable, flush }) => {
-      const balanceTracker = {
-        utxo: {
-          total$: cold('a-b-c', {
-            a: {} as Cardano.Value,
-            b: { assets: new Map([[AssetId.TSLA, 1n]]), coins: 1_000_000n } as Cardano.Value,
-            c: { assets: new Map([[AssetId.TSLA, 1n]]), coins: 2_000_000n } as Cardano.Value
-          })
-        }
-      } as unknown as TransactionalTracker<BalanceTracker>;
+      const transactionsTracker: Partial<TransactionsTracker> = {
+        history$: cold('a-b-c', {
+          a: [createTxWithValues([{}])],
+          b: [createTxWithValues([{ assets: new Map([[AssetId.TSLA, 1n]]), coins: 1_000_000n }])],
+          c: [
+            createTxWithValues([{ assets: new Map([[AssetId.TSLA, 1n]]), coins: 1_000_000n }]),
+            createTxWithValues([{ assets: new Map([[AssetId.TSLA, 1n]]), coins: 2_000_000n }])
+          ]
+        })
+      };
 
       const target$ = createAssetsTracker(
-        { assetProvider, balanceTracker, logger, retryBackoffConfig } as unknown as AssetsTrackerProps,
+        { assetProvider, logger, retryBackoffConfig, transactionsTracker } as unknown as AssetsTrackerProps,
         {
           assetService
         }
@@ -98,20 +101,27 @@ describe('createAssetsTracker', () => {
     });
   });
 
-  it('emits at least once if there are no assets found in total balance', () => {
+  it('emits at least once if there are no assets found in total history', () => {
     createTestScheduler().run(({ cold, expectObservable }) => {
-      const balanceTracker = {
-        utxo: {
-          total$: cold('a-b-c', {
-            a: { coins: 1_000_000n } as Cardano.Value,
-            b: { coins: 2_000_000n } as Cardano.Value,
-            c: { coins: 3_000_000n } as Cardano.Value
-          })
-        }
-      } as unknown as TransactionalTracker<BalanceTracker>;
+      const transactionsTracker: Partial<TransactionsTracker> = {
+        history$: cold('a-b-c', {
+          a: [createTxWithValues([{ coins: 1_000_000n }])],
+          b: [createTxWithValues([{ coins: 1_000_000n }]), createTxWithValues([{ coins: 2_000_000n }])],
+          c: [
+            createTxWithValues([{ coins: 1_000_000n }]),
+            createTxWithValues([{ coins: 2_000_000n }]),
+            createTxWithValues([{ coins: 3_000_000n }])
+          ]
+        })
+      };
 
       const target$ = createAssetsTracker(
-        { assetProvider, balanceTracker, logger, retryBackoffConfig } as unknown as AssetsTrackerProps,
+        {
+          assetProvider,
+          logger,
+          retryBackoffConfig,
+          transactionsTracker
+        } as unknown as AssetsTrackerProps,
         {
           assetService
         }
@@ -120,27 +130,23 @@ describe('createAssetsTracker', () => {
     });
   });
 
-  it('removes assets no longer available in total balance', () => {
+  it('does not remove assetInfo on transaction rollback', () => {
     createTestScheduler().run(({ cold, expectObservable, flush }) => {
-      const balanceTracker = {
-        utxo: {
-          total$: cold('a-b-c', {
-            a: {} as Cardano.Value,
-            b: {
-              assets: new Map([
-                [AssetId.TSLA, 1n],
-                [AssetId.PXL, 2n]
-              ])
-            } as Cardano.Value,
-            c: { assets: new Map([[AssetId.PXL, 2n]]) } as Cardano.Value
-          })
-        }
-      } as unknown as TransactionalTracker<BalanceTracker>;
+      const transactionsTracker: Partial<TransactionsTracker> = {
+        history$: cold('a-b-c', {
+          a: [createTxWithValues([{}])],
+          b: [
+            createTxWithValues([{ assets: new Map([[AssetId.TSLA, 1n]]) }]),
+            createTxWithValues([{ assets: new Map([[AssetId.PXL, 2n]]) }])
+          ],
+          c: [createTxWithValues([{ assets: new Map([[AssetId.PXL, 1n]]) }])]
+        })
+      };
 
       assetService = jest.fn().mockReturnValueOnce(of([assetTsla, assetPxl]));
 
       const target$ = createAssetsTracker(
-        { assetProvider, balanceTracker, logger, retryBackoffConfig } as unknown as AssetsTrackerProps,
+        { assetProvider, logger, retryBackoffConfig, transactionsTracker } as unknown as AssetsTrackerProps,
         {
           assetService
         }
@@ -151,10 +157,55 @@ describe('createAssetsTracker', () => {
           [AssetId.TSLA, assetTsla],
           [AssetId.PXL, assetPxl]
         ]),
-        c: new Map([[AssetId.PXL, assetPxl]])
+        c: new Map([
+          [AssetId.TSLA, assetTsla],
+          [AssetId.PXL, assetPxl]
+        ])
       });
       flush();
       expect(assetService).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('gets assetInfo for all outputs, skipping outputs without assets', () => {
+    createTestScheduler().run(({ cold, expectObservable, flush }) => {
+      const transactionsTracker: Partial<TransactionsTracker> = {
+        history$: cold('a-b-c', {
+          a: [createTxWithValues([{}])],
+          b: [
+            createTxWithValues([{ assets: new Map([[AssetId.TSLA, 1n]]) }, { coins: 1000n }]),
+            createTxWithValues([{ coins: 2000n }])
+          ],
+          c: [
+            createTxWithValues([{ assets: new Map([[AssetId.TSLA, 1n]]) }, { coins: 1000n }]),
+            createTxWithValues([{ coins: 2000n }]),
+            createTxWithValues([{ coins: 3000n }, { assets: new Map([[AssetId.PXL, 2n]]) }]),
+            createTxWithValues([{ coins: 4000n }])
+          ]
+        })
+      };
+
+      assetService = jest
+        .fn()
+        .mockReturnValueOnce(of([assetTsla]))
+        .mockReturnValueOnce(of([assetPxl]));
+
+      const target$ = createAssetsTracker(
+        { assetProvider, logger, retryBackoffConfig, transactionsTracker } as unknown as AssetsTrackerProps,
+        {
+          assetService
+        }
+      );
+      expectObservable(target$).toBe('a-b-c', {
+        a: new Map(),
+        b: new Map([[AssetId.TSLA, assetTsla]]),
+        c: new Map([
+          [AssetId.TSLA, assetTsla],
+          [AssetId.PXL, assetPxl]
+        ])
+      });
+      flush();
+      expect(assetService).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -169,25 +220,27 @@ describe('createAssetsTracker', () => {
       stats: {}
     } as unknown as TrackedAssetProvider;
 
-    const balanceTracker = {
-      utxo: {
-        total$: from([
-          {},
-          {
-            assets: new Map([
-              [AssetId.TSLA, 1n],
-              [AssetId.PXL, 2n]
-            ])
-          }
-        ])
-      }
+    const transactionsTracker: Partial<TransactionsTracker> = {
+      history$: from([
+        [createTxWithValues([{}])],
+        [
+          createTxWithValues([
+            {
+              assets: new Map([
+                [AssetId.TSLA, 1n],
+                [AssetId.PXL, 2n]
+              ])
+            }
+          ])
+        ]
+      ])
     };
 
     const target$ = createAssetsTracker({
       assetProvider,
-      balanceTracker,
       logger,
-      retryBackoffConfig
+      retryBackoffConfig,
+      transactionsTracker
     } as unknown as AssetsTrackerProps);
 
     const assetInfos: Map<Cardano.AssetId, Asset.AssetInfo>[] = [];

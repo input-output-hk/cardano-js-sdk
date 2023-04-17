@@ -424,10 +424,10 @@ export class SingleAddressWallet implements ObservableWallet {
     this.assetInfo$ = new PersistentDocumentTrackerSubject(
       createAssetsTracker({
         assetProvider: this.assetProvider,
-        balanceTracker: this.balance,
         logger: contextLogger(this.#logger, 'assets$'),
         onFatalError,
-        retryBackoffConfig
+        retryBackoffConfig,
+        transactionsTracker: this.transactions
       }),
       stores.assets
     );

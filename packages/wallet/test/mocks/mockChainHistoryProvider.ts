@@ -1,6 +1,6 @@
+import { AssetId, somePartialStakePools } from '@cardano-sdk/util-dev';
 import { Cardano, Paginated } from '@cardano-sdk/core';
 import { currentEpoch, ledgerTip, stakeKeyHash } from './mockData';
-import { somePartialStakePools } from '@cardano-sdk/util-dev';
 import delay from 'delay';
 
 export const getRandomTxId = () =>
@@ -128,7 +128,7 @@ export const queryTransactionsResult: Paginated<Cardano.HydratedTx> = {
             address: Cardano.PaymentAddress(
               'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'
             ),
-            value: { coins: 5_000_000n }
+            value: { assets: new Map([[AssetId.TSLA, 1n]]), coins: 5_000_000n }
           }
         ],
         validityInterval: {
