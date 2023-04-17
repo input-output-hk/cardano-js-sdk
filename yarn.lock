@@ -2590,6 +2590,7 @@ __metadata:
     ts-log: ^2.2.4
     ts-node: ^10.8.1
     ts-stopwatch: 0.0.4
+    typeorm: ^0.3.12
     typeorm-extension: ^2.5.2
     typescript: ^4.7.4
     util: ^0.12.4
