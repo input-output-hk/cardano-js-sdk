@@ -11,7 +11,12 @@ const {
   StakePoolEntity,
   PoolRegistrationEntity,
   PoolRetirementEntity,
+  OutputEntity,
+  AssetEntity,
+  TokensEntity,
   storeBlock,
+  storeAssets,
+  storeUtxo,
   storeStakePools,
   storeStakePoolMetadataJob,
   isRecoverableTypeormError
@@ -26,7 +31,16 @@ const logger = {
   debug: () => void 0
 };
 
-const entities = [BlockDataEntity, BlockEntity, StakePoolEntity, PoolRegistrationEntity, PoolRetirementEntity];
+const entities = [
+  BlockDataEntity,
+  BlockEntity,
+  StakePoolEntity,
+  PoolRegistrationEntity,
+  PoolRetirementEntity,
+  AssetEntity,
+  TokensEntity,
+  OutputEntity
+];
 const extensions = {
   pgBoss: true
 };
@@ -89,12 +103,22 @@ Bootstrap.fromCardanoNode({
   .pipe(
     Mappers.withCertificates(),
     Mappers.withStakePools(),
+    Mappers.withMint(),
+    Mappers.withUtxo(),
+    // Single-tenant example
+    // Mappers.filterProducedUtxoByAddresses({
+    //   addresses: [
+    //     'addr_test1qpgn04xka0857kh6859za75tfvlrlu2lft0yc9z87598yjezw8yvpkv977yj5va20xmd9vw5fczfl3uu4expskz8adfqpydths'
+    //   ]
+    // }),
     shareRetryBackoff(
       (evt$) =>
         evt$.pipe(
           withTypeormTransaction({ dataSource$, logger }, extensions),
           storeBlock(),
           buffer.storeBlockData(),
+          storeAssets(),
+          storeUtxo(),
           storeStakePools(),
           storeStakePoolMetadataJob(),
           typeormTransactionCommit()
