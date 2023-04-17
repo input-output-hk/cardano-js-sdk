@@ -20,7 +20,7 @@ export class OutputEntity {
   @Column(BigIntColumnOptions)
   coins?: bigint;
   @Column({ nullable: true })
-  consumedAt?: Cardano.Slot;
+  consumedAtSlot?: Cardano.Slot;
   @OneToMany(() => TokensEntity, (tokens) => tokens.output)
   tokens?: TokensEntity[];
   @Column({ length: 64, nullable: true, type: 'char' })

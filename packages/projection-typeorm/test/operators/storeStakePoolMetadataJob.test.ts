@@ -86,9 +86,7 @@ describe('storeStakePoolMetadataJob', () => {
 
   it('creates jobs referencing Block table that can be picked up by a worker', async () => {
     const { block } = await projectTilFirstPoolUpdateWithMetadata();
-    const jobQueryResult = await queryRunner.query(
-      `SELECT * FROM pgboss.job WHERE block_height=${block.header.blockNo}`
-    );
+    const jobQueryResult = await queryRunner.query(`SELECT * FROM pgboss.job WHERE block_slot=${block.header.slot}`);
     expect(jobQueryResult).toHaveLength(1);
     const boss = new PgBoss({ db: new BossDb(queryRunner) });
     await boss.start();

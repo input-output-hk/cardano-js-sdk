@@ -7,7 +7,7 @@ import { certificatePointerToId, typeormOperator } from './util';
 export const storeStakePoolMetadataJob = typeormOperator<Mappers.WithStakePools & WithPgBoss>(
   async ({ eventType, stakePools, pgBoss, block: { header } }) => {
     if (eventType === ChainSyncEventType.RollBackward) {
-      // Tasks are automatically deleted via block_height cascade
+      // Tasks are automatically deleted via slot cascade (referencing Block.slot)
       return;
     }
     const tasks = stakePools.updates
@@ -20,7 +20,7 @@ export const storeStakePoolMetadataJob = typeormOperator<Mappers.WithStakePools 
         })
       );
     for (const task of tasks) {
-      await pgBoss.send(STAKE_POOL_METADATA_QUEUE, task, { blockHeight: header.blockNo });
+      await pgBoss.send(STAKE_POOL_METADATA_QUEUE, task, { slot: header.slot });
     }
   }
 );

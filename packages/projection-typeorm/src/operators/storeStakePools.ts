@@ -39,7 +39,7 @@ const insertPoolUpdates = async ({ block: { header }, stakePools: { updates }, q
       id: certificatePointerToId(source),
       ...omit(poolParameters, ['id', 'metadataJson']),
       block: {
-        height: header.blockNo
+        slot: header.slot
       },
       marginPercent: poolParameters.margin.numerator / poolParameters.margin.denominator,
       metadataHash: poolParameters.metadataJson?.hash,
@@ -58,7 +58,7 @@ const insertPoolRetirements = async ({ stakePools: { retirements }, queryRunner,
   const poolRetirementEntities = retirements.map(({ epoch, poolId, source }) =>
     poolRetirementsRepository.create({
       block: {
-        height: header.blockNo
+        slot: header.slot
       },
       id: certificatePointerToId(source),
       retireAtEpoch: epoch,

@@ -12,7 +12,7 @@ export const storeAssets = typeormOperator<Mappers.WithMint>(
         await (storedAsset
           ? repository.increment({ id: assetId }, 'supply', quantity.toString())
           : repository.insert({
-              firstMintBlock: { height: header.blockNo },
+              firstMintBlock: { slot: header.slot },
               id: assetId,
               supply: quantity
             }));

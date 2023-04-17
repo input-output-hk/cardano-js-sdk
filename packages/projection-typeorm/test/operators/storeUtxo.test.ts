@@ -69,8 +69,8 @@ describe('storeUtxo', () => {
         producedUtxo.find((producedTxIn) => producedTxIn.txId === txIn.txId && producedTxIn.index === txIn.index)
       );
     });
-    expect(await outputRepository.count({ where: { consumedAt: IsNull() } })).toBeGreaterThan(0);
-    expect(await outputRepository.count({ where: { consumedAt: Not(IsNull()) } })).toBeGreaterThan(0);
+    expect(await outputRepository.count({ where: { consumedAtSlot: IsNull() } })).toBeGreaterThan(0);
+    expect(await outputRepository.count({ where: { consumedAtSlot: Not(IsNull()) } })).toBeGreaterThan(0);
     expect(
       await outputRepository.findOne({
         where: { outputIndex: spentEvent.utxo.produced[0][0].index, txId: spentEvent.utxo.produced[0][0].txId }
@@ -80,7 +80,7 @@ describe('storeUtxo', () => {
       ({ eventType, block }) =>
         eventType === ChainSyncEventType.RollBackward && block.header.hash === spentEvent.block.header.hash
     );
-    expect(await outputRepository.count({ where: { consumedAt: Not(IsNull()) } })).toBe(0);
+    expect(await outputRepository.count({ where: { consumedAtSlot: Not(IsNull()) } })).toBe(0);
     expect(
       await outputRepository.findOne({
         where: { outputIndex: spentEvent.utxo.produced[0][0].index, txId: spentEvent.utxo.produced[0][0].txId }

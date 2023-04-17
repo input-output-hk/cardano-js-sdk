@@ -115,9 +115,9 @@ const initializePgBoss = async (dataSource: DataSource, logger: Logger, usePgBos
     await boss.stop();
     await queryRunner.query(`
       ALTER TABLE pgboss.job
-        ADD COLUMN block_height INTEGER,
-        ADD CONSTRAINT job_block_height_fkey
-          FOREIGN KEY (block_height) REFERENCES public.block(height)
+        ADD COLUMN block_slot INTEGER,
+        ADD CONSTRAINT job_block_slot_fkey
+          FOREIGN KEY (block_slot) REFERENCES public.block(slot)
           ON DELETE CASCADE;
     `);
     logger.info('"pgboss" schema created');

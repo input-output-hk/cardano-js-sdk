@@ -13,7 +13,7 @@ export const storeBlock = typeormOperator(async (evt) => {
     await repository.insert(blockEntity);
   } else {
     await repository.delete({
-      hash: evt.block.header.hash
+      slot: evt.block.header.slot
     });
   }
 });

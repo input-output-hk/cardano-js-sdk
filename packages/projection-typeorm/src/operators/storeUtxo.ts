@@ -13,7 +13,7 @@ export const storeUtxo = typeormOperator<Mappers.WithUtxo>(
           produced.map(
             ([{ index, txId }, { scriptReference, address, value, datum, datumHash }]): OutputEntity => ({
               address,
-              block: { height: header.blockNo },
+              block: { slot: header.slot },
               coins: value.coins,
               datum,
               datumHash,
@@ -46,12 +46,12 @@ export const storeUtxo = typeormOperator<Mappers.WithUtxo>(
         }
       }
       for (const { index, txId } of consumed) {
-        await utxoRepository.update({ outputIndex: index, txId }, { consumedAt: header.slot });
+        await utxoRepository.update({ outputIndex: index, txId }, { consumedAtSlot: header.slot });
       }
     } else {
       // produced utxo will be automatically deleted via block cascade
       for (const { index, txId } of consumed) {
-        await utxoRepository.update({ outputIndex: index, txId }, { consumedAt: null });
+        await utxoRepository.update({ outputIndex: index, txId }, { consumedAtSlot: null });
       }
     }
   }

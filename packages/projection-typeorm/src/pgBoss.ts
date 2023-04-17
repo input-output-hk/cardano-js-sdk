@@ -13,11 +13,7 @@ import PgBoss, { SendOptions } from 'pg-boss';
 export const STAKE_POOL_METADATA_QUEUE = 'STAKE_POOL_METADATA';
 
 export interface PgBossExtension {
-  send: <T extends object>(
-    taskName: string,
-    data: T,
-    options: { blockHeight: Cardano.BlockNo }
-  ) => Promise<string | null>;
+  send: <T extends object>(taskName: string, data: T, options: { slot: Cardano.Slot }) => Promise<string | null>;
 }
 
 export interface StakePoolMetadataJob {
@@ -49,7 +45,7 @@ async function createJob(
   this: any,
   name: string,
   data: any,
-  options: SendOptions & { expireIn: any; keepUntil: any; blockHeight: Cardano.BlockNo },
+  options: SendOptions & { expireIn: any; keepUntil: any; slot: Cardano.Slot },
   singletonOffset = 0
 ) {
   const {
@@ -65,7 +61,7 @@ async function createJob(
     retryDelay,
     onComplete,
     // ADDED
-    blockHeight
+    slot
   } = options;
 
   const id = v4();
@@ -86,7 +82,7 @@ async function createJob(
     keepUntil, // 13
     onComplete, // 14
     // ADDED
-    blockHeight // 15
+    slot // 15
   ];
   const db = wrapper || this.manager.db;
   const result = await db.executeSql(this.insertJobCommand, values);
@@ -121,7 +117,7 @@ const states = {
   retry: 'retry'
 };
 
-// ADDED block_height column ($15)
+// ADDED 'block_slot' column ($15)
 const insertJob = (schema: string) => `
     INSERT INTO ${schema}.job (
       id,
@@ -138,7 +134,7 @@ const insertJob = (schema: string) => `
       retryBackoff,
       keepUntil,
       on_complete,
-      block_height
+      block_slot
     )
     SELECT
       id,
@@ -155,7 +151,7 @@ const insertJob = (schema: string) => `
       retryBackoff,
       keepUntil,
       on_complete,
-      block_height
+      block_slot
     FROM
     ( SELECT *,
         CASE
@@ -187,7 +183,7 @@ const insertJob = (schema: string) => `
             $12::bool as retryBackoff,
             $13::text as keepUntilValue,
             $14::boolean as on_complete,
-            $15::int as block_height
+            $15::int as block_slot
         ) j1
       ) j2
     ) j3
