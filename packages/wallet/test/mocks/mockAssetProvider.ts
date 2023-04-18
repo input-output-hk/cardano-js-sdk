@@ -18,6 +18,7 @@ export const asset = {
 
 export const mockAssetProvider = () => ({
   getAsset: jest.fn().mockResolvedValue(asset),
+  getAssets: jest.fn().mockResolvedValue([asset]),
   healthCheck: jest.fn().mockResolvedValue({ ok: true })
 });
 

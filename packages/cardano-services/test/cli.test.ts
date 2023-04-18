@@ -1618,7 +1618,7 @@ describe('CLI', () => {
 
             afterAll(async () => await closeMock());
 
-            it('exposes a HTTP server with healthy state when using CLI options', async () => {
+            it('exposes a HTTP server with healthy state when using CLI options, and /get-asset returns successfully', async () => {
               proc = withLogging(
                 fork(
                   exePath,
@@ -1641,16 +1641,16 @@ describe('CLI', () => {
               );
               await assertServiceHealthy(apiUrl, ServiceNames.Asset, lastBlock);
 
-              const res = await axios.post(`${apiUrl}/asset/get-asset`, {
+              const res = await axios.post<Asset.AssetInfo>(`${apiUrl}/asset/get-asset`, {
                 assetId: asset.id,
                 extraData: { tokenMetadata: true }
               });
 
               const { tokenMetadata } = fromSerializableObject<Asset.AssetInfo>(res.data);
-              expect(tokenMetadata).toStrictEqual({ name: asset.name });
+              expect(tokenMetadata).toStrictEqual({ assetId: asset.id, name: asset.name });
             });
 
-            it('exposes a HTTP server with healthy state when using env variables', async () => {
+            it('exposes a HTTP server with healthy state when using env variables and reaching /get-asset', async () => {
               proc = withLogging(
                 fork(exePath, ['start-provider-server'], {
                   env: {
@@ -1667,13 +1667,71 @@ describe('CLI', () => {
               );
               await assertServiceHealthy(apiUrl, ServiceNames.Asset, lastBlock);
 
-              const res = await axios.post(`${apiUrl}/asset/get-asset`, {
+              const res = await axios.post<Asset.AssetInfo>(`${apiUrl}/asset/get-asset`, {
                 assetId: asset.id,
                 extraData: { tokenMetadata: true }
               });
 
               const { tokenMetadata } = fromSerializableObject<Asset.AssetInfo>(res.data);
-              expect(tokenMetadata).toStrictEqual({ name: asset.name });
+              expect(tokenMetadata).toStrictEqual({ assetId: asset.id, name: asset.name });
+            });
+
+            it('exposes a HTTP server with healthy state when using CLI options, and /get-assets returns successfully', async () => {
+              proc = withLogging(
+                fork(
+                  exePath,
+                  [
+                    ...baseArgs,
+                    '--api-url',
+                    apiUrl,
+                    '--ogmios-url',
+                    ogmiosConnection.address.webSocket,
+                    '--postgres-connection-string',
+                    postgresConnectionString,
+                    '--token-metadata-server-url',
+                    tokenMetadataServerUrl,
+                    '--token-metadata-request-timeout',
+                    tokenMetadataRequestTimeout,
+                    ServiceNames.Asset
+                  ],
+                  { env: {}, stdio: 'pipe' }
+                )
+              );
+              await assertServiceHealthy(apiUrl, ServiceNames.Asset, lastBlock);
+
+              const res = await axios.post<Asset.AssetInfo[]>(`${apiUrl}/asset/get-assets`, {
+                assetIds: [asset.id],
+                extraData: { tokenMetadata: true }
+              });
+
+              const { tokenMetadata } = fromSerializableObject<Asset.AssetInfo>(res.data[0]);
+              expect(tokenMetadata).toStrictEqual({ assetId: asset.id, name: asset.name });
+            });
+
+            it('exposes a HTTP server with healthy state when using env variables and reaching /get-assets', async () => {
+              proc = withLogging(
+                fork(exePath, ['start-provider-server'], {
+                  env: {
+                    API_URL: apiUrl,
+                    LOGGER_MIN_SEVERITY: 'error',
+                    OGMIOS_URL: ogmiosConnection.address.webSocket,
+                    POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                    SERVICE_NAMES: ServiceNames.Asset,
+                    TOKEN_METADATA_REQUEST_TIMEOUT: tokenMetadataRequestTimeout,
+                    TOKEN_METADATA_SERVER_URL: tokenMetadataServerUrl
+                  },
+                  stdio: 'pipe'
+                })
+              );
+              await assertServiceHealthy(apiUrl, ServiceNames.Asset, lastBlock);
+
+              const res = await axios.post<Asset.AssetInfo[]>(`${apiUrl}/asset/get-assets`, {
+                assetIds: [asset.id],
+                extraData: { tokenMetadata: true }
+              });
+
+              const { tokenMetadata } = fromSerializableObject<Asset.AssetInfo>(res.data[0]);
+              expect(tokenMetadata).toStrictEqual({ assetId: asset.id, name: asset.name });
             });
 
             it('loads a stub asset metadata service when TOKEN_METADATA_SERVER_URL starts with "stub:"', async () => {
@@ -1692,7 +1750,7 @@ describe('CLI', () => {
               );
               await assertServiceHealthy(apiUrl, ServiceNames.Asset, lastBlock);
 
-              const res = await axios.post(`${apiUrl}/asset/get-asset`, {
+              const res = await axios.post<Asset.AssetInfo>(`${apiUrl}/asset/get-asset`, {
                 assetId: asset.id,
                 extraData: { tokenMetadata: true }
               });

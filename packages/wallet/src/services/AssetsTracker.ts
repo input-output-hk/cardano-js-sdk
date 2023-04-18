@@ -1,30 +1,40 @@
 import { Asset, Cardano } from '@cardano-sdk/core';
 import { BalanceTracker } from './types';
 import { Logger } from 'ts-log';
-import { Observable, combineLatest, distinctUntilChanged, map, mergeMap, of, tap } from 'rxjs';
+import { Observable, combineLatest, distinctUntilChanged, map, of, switchMap, tap } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackedAssetProvider } from './ProviderTracker';
 import { coldObservableProvider } from './util';
+import { concatAndCombineLatest } from '@cardano-sdk/util-rxjs';
 import { deepEquals } from '@cardano-sdk/util';
+import chunk from 'lodash/chunk';
 
-const isAssetInfoComplete = (assetInfo: Asset.AssetInfo): boolean =>
-  assetInfo.nftMetadata !== undefined && assetInfo.tokenMetadata !== undefined;
+const isAssetInfoComplete = (assetInfos: Asset.AssetInfo[]): boolean =>
+  assetInfos.every((assetInfo) => assetInfo.nftMetadata !== undefined && assetInfo.tokenMetadata !== undefined);
 
+const ASSET_INFO_FETCH_CHUNK_SIZE = 100;
 export const createAssetService =
   (
     assetProvider: TrackedAssetProvider,
     retryBackoffConfig: RetryBackoffConfig,
     onFatalError?: (value: unknown) => void
   ) =>
-  (assetId: Cardano.AssetId) =>
-    coldObservableProvider({
-      onFatalError,
-      pollUntil: isAssetInfoComplete,
-      provider: () =>
-        assetProvider.getAsset({ assetId, extraData: { history: false, nftMetadata: true, tokenMetadata: true } }),
-      retryBackoffConfig,
-      trigger$: of(true) // fetch only once
-    });
+  (assetIds: Cardano.AssetId[]) =>
+    concatAndCombineLatest(
+      chunk(assetIds, ASSET_INFO_FETCH_CHUNK_SIZE).map((assetIdsChunk) =>
+        coldObservableProvider({
+          onFatalError,
+          pollUntil: isAssetInfoComplete,
+          provider: () =>
+            assetProvider.getAssets({
+              assetIds: assetIdsChunk,
+              extraData: { nftMetadata: true, tokenMetadata: true }
+            }),
+          retryBackoffConfig,
+          trigger$: of(true) // fetch only once
+        })
+      )
+    ).pipe(map((arr) => arr.flat())); // concat the chunk results
 export type AssetService = ReturnType<typeof createAssetService>;
 
 export interface AssetsTrackerProps {
@@ -58,20 +68,18 @@ export const createAssetsTracker = (
         ),
         tap((assetIds) => assetIds.length === 0 && assetProvider.setStatInitialized(assetProvider.stats.getAsset$)),
         // Fetch asset metadata only for assets not already present in assetsMap
-        map((assetIds) =>
-          assetIds.map((assetId) => {
+        // Restart inner observable if assetIds change, otherwise the whole pipe will hang waiting for all assetInfos to resolve
+        switchMap((assetIds) => {
+          const assetIdsCached = assetIds.filter((assetId) => {
             const assetInfo = assetsMap.get(assetId);
-            if (assetInfo && isAssetInfoComplete(assetInfo)) {
-              return of(assetInfo);
-            }
-            logger.debug('Fetching asset data for', assetId);
-            return assetService(assetId);
-          })
-        ),
-        // If there are assets -> wait for all asset metadata fetches have a value, otherwise emit an empty array observable
-        mergeMap((assetInfos) => {
-          if (assetInfos.length === 0) return of([]);
-          return combineLatest(assetInfos);
+            return assetInfo && isAssetInfoComplete([assetInfo]);
+          });
+          const assetInfosCached = assetIdsCached.map((id) => assetsMap.get(id)!);
+          const assetInfosCached$ = of(assetInfosCached);
+          const assetIdsToFetch = assetIds.filter((x) => !assetIdsCached.includes(x));
+          const assetInfosFetched$ = assetIdsToFetch.length > 0 ? assetService(assetIdsToFetch) : of([]);
+
+          return combineLatest([assetInfosCached$, assetInfosFetched$]).pipe(map((allInfos) => allInfos.flat()));
         }),
         tap((assetInfos) => logger.debug(`Got metadata for ${assetInfos.length} assets`)),
         map((assetInfos) => new Map(assetInfos.map((assetInfo) => [assetInfo!.assetId, assetInfo!]))),

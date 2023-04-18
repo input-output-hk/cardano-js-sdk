@@ -1,7 +1,25 @@
-import { Asset, AssetProvider, Cardano, GetAssetArgs, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import {
+  Asset,
+  AssetProvider,
+  Cardano,
+  GetAssetArgs,
+  GetAssetsArgs,
+  ProviderError,
+  ProviderFailure
+} from '@cardano-sdk/core';
 import { AssetBuilder } from './AssetBuilder';
 import { DbSyncProvider, DbSyncProviderDependencies } from '../../util/DbSyncProvider';
 import { NftMetadataService, TokenMetadataService } from '../types';
+
+/**
+ * Properties that are need to create DbSyncAssetProvider
+ */
+export interface DbSyncAssetProviderProps {
+  /**
+   * Pagination page size limit used for provider methods constraint.
+   */
+  paginationPageSizeLimit: number;
+}
 
 /**
  * Dependencies that are need to create DbSyncAssetProvider
@@ -24,29 +42,19 @@ export interface DbSyncAssetProviderDependencies extends DbSyncProviderDependenc
 export class DbSyncAssetProvider extends DbSyncProvider() implements AssetProvider {
   #builder: AssetBuilder;
   #dependencies: DbSyncAssetProviderDependencies;
+  #paginationPageSizeLimit: number;
 
-  constructor(dependencies: DbSyncAssetProviderDependencies) {
+  constructor({ paginationPageSizeLimit }: DbSyncAssetProviderProps, dependencies: DbSyncAssetProviderDependencies) {
     const { cache, dbPools, cardanoNode, logger } = dependencies;
     super({ cache, cardanoNode, dbPools, logger });
 
     this.#builder = new AssetBuilder(dbPools.main, logger);
     this.#dependencies = dependencies;
+    this.#paginationPageSizeLimit = paginationPageSizeLimit;
   }
 
   async getAsset({ assetId, extraData }: GetAssetArgs) {
-    const name = Asset.util.assetNameFromAssetId(assetId);
-    const policyId = Asset.util.policyIdFromAssetId(assetId);
-    const multiAsset = await this.#builder.queryMultiAsset(policyId, name);
-
-    if (!multiAsset)
-      throw new ProviderError(ProviderFailure.NotFound, undefined, 'No entries found in multi_asset table');
-
-    const fingerprint = multiAsset.fingerprint as unknown as Cardano.AssetFingerprint;
-    const quantities = await this.#builder.queryMultiAssetQuantities(multiAsset.id);
-    const quantity = BigInt(quantities.sum);
-    const mintOrBurnCount = Number(quantities.count);
-
-    const assetInfo: Asset.AssetInfo = { assetId, fingerprint, mintOrBurnCount, name, policyId, quantity };
+    const assetInfo = await this.getAssetInfo(assetId);
 
     if (extraData?.history) await this.loadHistory(assetInfo);
     if (extraData?.nftMetadata)
@@ -67,6 +75,44 @@ export class DbSyncAssetProvider extends DbSyncProvider() implements AssetProvid
     return assetInfo;
   }
 
+  async getAssets({ assetIds, extraData }: GetAssetsArgs) {
+    if (assetIds.length > this.#paginationPageSizeLimit) {
+      throw new ProviderError(
+        ProviderFailure.BadRequest,
+        undefined,
+        `AssetIds count of ${assetIds.length} can not be greater than ${this.#paginationPageSizeLimit}`
+      );
+    }
+
+    const assetList: Asset.AssetInfo[] = [];
+    let tokenMetadataList: (Asset.TokenMetadata | null | undefined)[] = [];
+
+    if (extraData?.tokenMetadata) {
+      try {
+        tokenMetadataList = await this.#dependencies.tokenMetadataService.getTokenMetadata(assetIds);
+      } catch (error) {
+        if (error instanceof ProviderError && error.reason === ProviderFailure.Unhealthy) {
+          this.logger.error(`Failed to fetch token metadata for assets ${assetIds} due to: ${error.message}`);
+          tokenMetadataList = Array.from({ length: assetIds.length });
+        } else {
+          throw error;
+        }
+      }
+    }
+
+    for (const assetId of assetIds) {
+      const assetInfo = await this.getAssetInfo(assetId);
+
+      if (extraData?.nftMetadata)
+        assetInfo.nftMetadata = await this.#dependencies.ntfMetadataService.getNftMetadata(assetInfo);
+      if (extraData?.tokenMetadata) assetInfo.tokenMetadata = tokenMetadataList[assetIds.indexOf(assetId)];
+
+      assetList.push(assetInfo);
+    }
+
+    return assetList;
+  }
+
   private async loadHistory(assetInfo: Asset.AssetInfo) {
     assetInfo.history = (
       await this.#builder.queryMultiAssetHistory(assetInfo.policyId, assetInfo.name)
@@ -74,5 +120,21 @@ export class DbSyncAssetProvider extends DbSyncProvider() implements AssetProvid
       quantity: BigInt(quantity),
       transactionId: hash.toString('hex') as unknown as Cardano.TransactionId
     }));
+  }
+
+  private async getAssetInfo(assetId: Cardano.AssetId): Promise<Asset.AssetInfo> {
+    const name = Asset.util.assetNameFromAssetId(assetId);
+    const policyId = Asset.util.policyIdFromAssetId(assetId);
+    const multiAsset = await this.#builder.queryMultiAsset(policyId, name);
+
+    if (!multiAsset)
+      throw new ProviderError(ProviderFailure.NotFound, undefined, 'No entries found in multi_asset table');
+
+    const fingerprint = multiAsset.fingerprint as unknown as Cardano.AssetFingerprint;
+    const quantities = await this.#builder.queryMultiAssetQuantities(multiAsset.id);
+    const quantity = BigInt(quantities.sum);
+    const mintOrBurnCount = Number(quantities.count);
+
+    return { assetId, fingerprint, mintOrBurnCount, name, policyId, quantity };
   }
 }

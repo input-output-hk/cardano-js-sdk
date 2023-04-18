@@ -42,5 +42,10 @@ export class AssetHttpService extends HttpService {
       '/get-asset',
       providerHandler(assetProvider.getAsset.bind(assetProvider))(HttpService.routeHandler(logger), logger)
     );
+
+    router.post(
+      '/get-assets',
+      providerHandler(assetProvider.getAssets.bind(assetProvider))(HttpService.routeHandler(logger), logger)
+    );
   }
 }

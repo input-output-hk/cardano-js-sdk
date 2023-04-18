@@ -8,6 +8,7 @@ import { sleep } from '../util';
 
 const testDescription = 'test description';
 const testName = 'test name';
+const testSubject = 'test id';
 
 describe('CardanoTokenRegistry', () => {
   const invalidAssetId = Cardano.AssetId('0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef');
@@ -22,11 +23,12 @@ describe('CardanoTokenRegistry', () => {
           description: { value: testDescription },
           logo: { value: 'test logo' },
           name: { value: testName },
-          subject: 'test',
+          subject: testSubject,
           ticker: { value: 'test ticker' },
           url: { value: 'test url' }
         })
       ).toStrictEqual({
+        assetId: testSubject,
         decimals: 23,
         desc: testDescription,
         icon: 'test logo',
@@ -40,9 +42,9 @@ describe('CardanoTokenRegistry', () => {
         toCoreTokenMetadata({
           description: { value: testDescription },
           name: { value: testName },
-          subject: 'test'
+          subject: testSubject
         })
-      ).toStrictEqual({ desc: testDescription, name: testName }));
+      ).toStrictEqual({ assetId: testSubject, desc: testDescription, name: testName }));
   });
 
   describe('return value', () => {
@@ -70,6 +72,7 @@ describe('CardanoTokenRegistry', () => {
       expect(metadata![0]).not.toBeNull();
 
       const result = {
+        assetId: validAssetId,
         decimals: 8,
         desc: 'SingularityNET',
         icon: 'testLogo',
@@ -122,7 +125,7 @@ describe('CardanoTokenRegistry', () => {
       await closeMock();
     });
 
-    it('metadata are cached', async () => {
+    it('metadata is cached', async () => {
       const firstResult = await tokenRegistry.getTokenMetadata([validAssetId]);
       const secondResult = await tokenRegistry.getTokenMetadata([validAssetId]);
 
@@ -175,7 +178,7 @@ describe('CardanoTokenRegistry', () => {
 
     it('internal server error', async () => {
       const failedMetadata = null;
-      const succeededMetadata = { name: 'test' };
+      const succeededMetadata = { assetId: validAssetId, name: 'test' };
 
       let alreadyCalled = false;
       const record = async () => {
@@ -185,9 +188,7 @@ describe('CardanoTokenRegistry', () => {
 
         return {
           body: {
-            subjects: [
-              { name: { value: 'test' }, subject: 'f43a62fdc3965df486de8a0d32fe800963589c41b38946602a0dc53541474958' }
-            ]
+            subjects: [{ name: { value: 'test' }, subject: validAssetId }]
           }
         };
       };
@@ -216,9 +217,7 @@ describe('CardanoTokenRegistry', () => {
 
         return {
           body: {
-            subjects: [
-              { name: { value: 'test' }, subject: 'f43a62fdc3965df486de8a0d32fe800963589c41b38946602a0dc53541474958' }
-            ]
+            subjects: [{ name: { value: 'test' }, subject: validAssetId }]
           }
         };
       };

@@ -9,6 +9,7 @@ import {
   DbSyncNftMetadataService,
   InMemoryCache,
   NftMetadataService,
+  PAGINATION_PAGE_SIZE_LIMIT_ASSETS,
   TokenMetadataService,
   UNLIMITED_CACHE_TTL
 } from '../../src';
@@ -51,14 +52,17 @@ describe('DbSyncAssetProvider', () => {
       { logger },
       { tokenMetadataRequestTimeout: defaultTimeout, tokenMetadataServerUrl: serverUrl }
     );
-    provider = new DbSyncAssetProvider({
-      cache,
-      cardanoNode,
-      dbPools,
-      logger,
-      ntfMetadataService,
-      tokenMetadataService
-    });
+    provider = new DbSyncAssetProvider(
+      { paginationPageSizeLimit: PAGINATION_PAGE_SIZE_LIMIT_ASSETS },
+      {
+        cache,
+        cardanoNode,
+        dbPools,
+        logger,
+        ntfMetadataService,
+        tokenMetadataService
+      }
+    );
     fixtureBuilder = new AssetFixtureBuilder(dbPools.main, logger);
   });
 
@@ -94,6 +98,7 @@ describe('DbSyncAssetProvider', () => {
     expect(asset.history).toEqual(history);
     expect(asset.nftMetadata).toStrictEqual(assets[0].metadata);
     expect(asset.tokenMetadata).toStrictEqual({
+      assetId: '728847c7898b06f180de05c80b37d38bf77a9ea22bd1e222b8014d964e46542d66696c6573',
       desc: 'This is my second NFT',
       name: 'Bored Ape'
     });
@@ -105,14 +110,17 @@ describe('DbSyncAssetProvider', () => {
       { tokenMetadataRequestTimeout: defaultTimeout, tokenMetadataServerUrl: serverUrl }
     );
 
-    provider = new DbSyncAssetProvider({
-      cache,
-      cardanoNode,
-      dbPools,
-      logger,
-      ntfMetadataService,
-      tokenMetadataService
-    });
+    provider = new DbSyncAssetProvider(
+      { paginationPageSizeLimit: PAGINATION_PAGE_SIZE_LIMIT_ASSETS },
+      {
+        cache,
+        cardanoNode,
+        dbPools,
+        logger,
+        ntfMetadataService,
+        tokenMetadataService
+      }
+    );
 
     const assets = await fixtureBuilder.getAssets(1, { with: [AssetWith.CIP25Metadata] });
     const asset = await provider.getAsset({
@@ -136,14 +144,17 @@ describe('DbSyncAssetProvider', () => {
       { logger },
       { tokenMetadataRequestTimeout: defaultTimeout, tokenMetadataServerUrl: serverUrl }
     );
-    provider = new DbSyncAssetProvider({
-      cache,
-      cardanoNode,
-      dbPools,
-      logger,
-      ntfMetadataService,
-      tokenMetadataService
-    });
+    provider = new DbSyncAssetProvider(
+      { paginationPageSizeLimit: PAGINATION_PAGE_SIZE_LIMIT_ASSETS },
+      {
+        cache,
+        cardanoNode,
+        dbPools,
+        logger,
+        ntfMetadataService,
+        tokenMetadataService
+      }
+    );
 
     const assets = await fixtureBuilder.getAssets(1, { with: [AssetWith.CIP25Metadata] });
     const asset = await provider.getAsset({

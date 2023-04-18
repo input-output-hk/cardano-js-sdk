@@ -6,6 +6,7 @@ import { CreateHttpProviderConfig, HttpProviderConfigPaths, createHttpProvider }
  */
 const paths: HttpProviderConfigPaths<AssetProvider> = {
   getAsset: '/get-asset',
+  getAssets: '/get-assets',
   healthCheck: '/health'
 };
 
