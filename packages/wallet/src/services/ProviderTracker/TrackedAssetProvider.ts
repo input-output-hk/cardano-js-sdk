@@ -24,6 +24,7 @@ export class TrackedAssetProvider extends ProviderTracker implements AssetProvid
   readonly stats = new AssetProviderStats();
   readonly healthCheck: AssetProvider['healthCheck'];
   readonly getAsset: AssetProvider['getAsset'];
+  readonly getAssets: AssetProvider['getAssets'];
 
   constructor(assetProvider: AssetProvider) {
     super();
@@ -33,5 +34,8 @@ export class TrackedAssetProvider extends ProviderTracker implements AssetProvid
 
     this.getAsset = ({ assetId, extraData }) =>
       this.trackedCall(() => assetProvider.getAsset({ assetId, extraData }), this.stats.getAsset$);
+
+    this.getAssets = ({ assetIds, extraData }) =>
+      this.trackedCall(() => assetProvider.getAssets({ assetIds, extraData }), this.stats.getAsset$);
   }
 }

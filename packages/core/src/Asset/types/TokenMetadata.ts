@@ -1,3 +1,5 @@
+import { Cardano } from '../..';
+
 export interface TokenMetadataSizedIcon {
   /**
    * Most likely one of 16, 32, 64, 96, 128
@@ -17,6 +19,10 @@ export interface TokenMetadataSizedIcon {
  * https://github.com/cardano-foundation/CIPs/pull/137
  */
 export interface TokenMetadata {
+  /**
+   * Associated asset id (concatenated hex values of policyId + assetName)
+   */
+  assetId: Cardano.AssetId;
   /**
    * Asset name
    */

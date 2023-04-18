@@ -23,7 +23,10 @@ describe('createAssetsTracker', () => {
     const nftMetadata = { name: 'nft' } as Asset.NftMetadata;
     assetTsla = { assetId: AssetId.TSLA, nftMetadata: null, tokenMetadata: null } as Asset.AssetInfo;
     assetPxl = { assetId: AssetId.PXL, nftMetadata, tokenMetadata: null } as Asset.AssetInfo;
-    assetService = jest.fn().mockReturnValueOnce(of(assetTsla)).mockReturnValueOnce(of(assetPxl));
+    assetService = jest
+      .fn()
+      .mockReturnValueOnce(of([assetTsla]))
+      .mockReturnValueOnce(of([assetPxl]));
     assetProvider = {
       setStatInitialized: jest.fn(),
       stats: {}
@@ -134,6 +137,8 @@ describe('createAssetsTracker', () => {
         }
       } as unknown as TransactionalTracker<BalanceTracker>;
 
+      assetService = jest.fn().mockReturnValueOnce(of([assetTsla, assetPxl]));
+
       const target$ = createAssetsTracker(
         { assetProvider, balanceTracker, logger, retryBackoffConfig } as unknown as AssetsTrackerProps,
         {
@@ -149,22 +154,34 @@ describe('createAssetsTracker', () => {
         c: new Map([[AssetId.PXL, assetPxl]])
       });
       flush();
-      expect(assetService).toHaveBeenCalledTimes(2);
+      expect(assetService).toHaveBeenCalledTimes(1);
     });
   });
 
   it('polls asset info while metadata is undefined', async () => {
     assetProvider = {
-      getAsset: jest
+      getAssets: jest
         .fn()
-        .mockResolvedValueOnce({ ...assetTsla, nftMetadata: undefined })
-        .mockResolvedValueOnce({ ...assetTsla, tokenMetadata: undefined })
-        .mockResolvedValueOnce(assetTsla),
+        .mockResolvedValueOnce([{ ...assetTsla, nftMetadata: undefined }, assetPxl])
+        .mockResolvedValueOnce([{ ...assetTsla, tokenMetadata: undefined }, assetPxl])
+        .mockResolvedValueOnce([assetTsla, assetPxl]),
       setStatInitialized: jest.fn(),
       stats: {}
     } as unknown as TrackedAssetProvider;
 
-    const balanceTracker = { utxo: { total$: from([{}, { assets: new Map([[AssetId.TSLA, 1n]]) }]) } };
+    const balanceTracker = {
+      utxo: {
+        total$: from([
+          {},
+          {
+            assets: new Map([
+              [AssetId.TSLA, 1n],
+              [AssetId.PXL, 2n]
+            ])
+          }
+        ])
+      }
+    };
 
     const target$ = createAssetsTracker({
       assetProvider,
@@ -177,10 +194,19 @@ describe('createAssetsTracker', () => {
     await lastValueFrom(target$.pipe(tap((ai) => assetInfos.push(ai))));
     expect(assetInfos).toEqual([
       new Map(),
-      new Map([[AssetId.TSLA, { ...assetTsla, nftMetadata: undefined }]]),
-      new Map([[AssetId.TSLA, { ...assetTsla, tokenMetadata: undefined }]]),
-      new Map([[AssetId.TSLA, assetTsla]])
+      new Map([
+        [AssetId.TSLA, { ...assetTsla, nftMetadata: undefined }],
+        [AssetId.PXL, assetPxl]
+      ]),
+      new Map([
+        [AssetId.TSLA, { ...assetTsla, tokenMetadata: undefined }],
+        [AssetId.PXL, assetPxl]
+      ]),
+      new Map([
+        [AssetId.TSLA, assetTsla],
+        [AssetId.PXL, assetPxl]
+      ])
     ]);
-    expect(assetProvider.getAsset).toBeCalledTimes(3);
+    expect(assetProvider.getAssets).toBeCalledTimes(3);
   });
 });
