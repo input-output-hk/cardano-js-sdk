@@ -52,13 +52,14 @@
     "@cardano-sdk/projection": "^0.5.0",
     "@cardano-sdk/util": "^0.8.2",
     "@cardano-sdk/util-rxjs": "^0.4.6",
-    "backoff-rxjs": "^7.0.0",
     "lodash": "^4.17.21",
     "pg": "^8.9.0",
+    "pg-boss": "8.4.2",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.4.0",
     "ts-log": "^2.2.4",
-    "typeorm": "^0.3.12"
+    "typeorm": "^0.3.12",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@cardano-sdk/util-dev": "^0.8.0",

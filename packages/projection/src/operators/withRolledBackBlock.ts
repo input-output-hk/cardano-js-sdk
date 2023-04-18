@@ -1,15 +1,13 @@
 import { Cardano, ChainSyncEvent, ChainSyncEventType } from '@cardano-sdk/core';
+import { ExtChainSyncOperator, StabilityWindowBuffer, WithBlock } from '../types';
 import { Observable, concatMap, finalize, map, noop, of, takeWhile } from 'rxjs';
-import { ProjectorOperator, WithBlock } from '../types';
-import { StabilityWindowBuffer } from '../sinks';
-import { WithNetworkInfo } from './withNetworkInfo';
 
 /**
  * Transforms rollback event into a stream of granular rollback events, each containing a single rolled back block.
  * Intended to be used as the 1st projection operator.
  */
 export const withRolledBackBlock =
-  (buffer: StabilityWindowBuffer<WithNetworkInfo>): ProjectorOperator<{}, {}, {}, WithBlock> =>
+  (buffer: StabilityWindowBuffer): ExtChainSyncOperator<{}, {}, {}, WithBlock> =>
   (evt$: Observable<ChainSyncEvent>) =>
     evt$.pipe(
       concatMap((chainSyncEvent) => {

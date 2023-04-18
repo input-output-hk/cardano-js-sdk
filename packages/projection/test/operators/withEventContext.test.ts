@@ -1,5 +1,5 @@
 import { ChainSyncEventType } from '@cardano-sdk/core';
-import { Operators, ProjectorEvent } from '../../src';
+import { ExtChainSyncEvent, withEventContext } from '../../src';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 
 describe('withEventContext', () => {
@@ -11,15 +11,15 @@ describe('withEventContext', () => {
             a: { ctx: 'a' }
           })
         );
-        const source$ = hot<ProjectorEvent>('a--b', {
+        const source$ = hot<ExtChainSyncEvent>('a--b', {
           a: {
             eventType: ChainSyncEventType.RollForward
-          } as ProjectorEvent,
+          } as ExtChainSyncEvent,
           b: {
             eventType: ChainSyncEventType.RollBackward
-          } as ProjectorEvent
+          } as ExtChainSyncEvent
         });
-        expectObservable(source$.pipe(Operators.withEventContext(createContext))).toBe('a--b', {
+        expectObservable(source$.pipe(withEventContext(createContext))).toBe('a--b', {
           a: {
             ctx: 'a',
             eventType: ChainSyncEventType.RollForward
@@ -40,15 +40,15 @@ describe('withEventContext', () => {
     it('creates and adds context to every event', () => {
       createTestScheduler().run(({ hot, expectObservable, expectSubscriptions, flush }) => {
         const createContext = jest.fn(() => ({ ctx: 'a' }));
-        const source$ = hot<ProjectorEvent>('a--b', {
+        const source$ = hot<ExtChainSyncEvent>('a--b', {
           a: {
             eventType: ChainSyncEventType.RollForward
-          } as ProjectorEvent,
+          } as ExtChainSyncEvent,
           b: {
             eventType: ChainSyncEventType.RollBackward
-          } as ProjectorEvent
+          } as ExtChainSyncEvent
         });
-        expectObservable(source$.pipe(Operators.withEventContext(createContext))).toBe('a--b', {
+        expectObservable(source$.pipe(withEventContext(createContext))).toBe('a--b', {
           a: {
             ctx: 'a',
             eventType: ChainSyncEventType.RollForward

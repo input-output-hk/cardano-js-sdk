@@ -2101,7 +2101,7 @@
         },
         "header": {
           "blockNo": 32210,
-          "hash": "1f93d6a9c0dec3b8b082be96e4a26e0f9c8c19a92237121e516fea6b4e71702f",
+          "hash": "2f93d6a9c0dec3b8b082be96e4a26e0f9c8c19a92237121e516fea6b4e71702f",
           "slot": 878640
         },
         "issuerVk": "6ce213932a309648e6293b7309ef1bc9c8f100f7f634b1f74be68f1090eeafec",
@@ -2117,7 +2117,7 @@
       "eventType": 0,
       "tip": {
         "blockNo": 32210,
-        "hash": "1f93d6a9c0dec3b8b082be96e4a26e0f9c8c19a92237121e516fea6b4e71702f",
+        "hash": "2f93d6a9c0dec3b8b082be96e4a26e0f9c8c19a92237121e516fea6b4e71702f",
         "slot": 878640
       }
     },

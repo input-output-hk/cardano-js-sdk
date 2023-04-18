@@ -1,8 +1,6 @@
-import { Cardano, createSlotEpochCalc } from '@cardano-sdk/core';
-import { WithNetworkInfo } from './withNetworkInfo';
+import { WithEpochNo, WithNetworkInfo } from '../types';
+import { createSlotEpochCalc } from '@cardano-sdk/core';
 import { unifiedProjectorOperator } from './utils';
-
-export type WithEpochNo = { epochNo: Cardano.EpochNo };
 
 /**
  * Adds current 'epochNo' of 'block' to each event
