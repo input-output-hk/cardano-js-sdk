@@ -9,6 +9,13 @@ import { URL } from 'url';
 import { isConnectionError } from '@cardano-sdk/util';
 import fs from 'fs';
 
+const timedQuery = (pool: Pool, logger: Logger) => async (args: string | QueryConfig, values?: any) => {
+  const startTime = Date.now();
+  const result = await pool.query(args, values);
+  logger.debug(`Query\n${args}\ntook ${Date.now() - startTime} milliseconds`);
+  return result;
+};
+
 /**
  * Creates a extended Pool client :
  * - use passed srv service name in order to resolve the port
@@ -32,12 +39,12 @@ export const getPoolWithServiceDiscovery = async (
       if (prop === 'then') return;
       if (prop === 'query') {
         return (args: string | QueryConfig, values?: any) =>
-          pool.query(args, values).catch(async (error) => {
+          timedQuery(pool, logger)(args, values).catch(async (error) => {
             if (isConnectionError(error)) {
               const record = await dnsResolver(host!);
               logger.info(`DNS resolution for Postgres service, resolved with record: ${JSON.stringify(record)}`);
               pool = new Pool({ database, host: record.name, max, password, port: record.port, ssl, user });
-              return await pool.query(args, values);
+              return timedQuery(pool, logger)(args, values);
             }
             throw error;
           });
@@ -47,6 +54,8 @@ export const getPoolWithServiceDiscovery = async (
         const method = pool[prop as keyof Pool] as any;
         return method.bind(pool);
       }
+
+      return pool[prop as keyof Pool];
     }
   });
 };
@@ -59,8 +68,27 @@ export const getPool = async (
   options?: PosgresProgramOptions
 ): Promise<Pool | undefined> => {
   const ssl = options?.postgresSslCaFile ? { ca: loadSecret(options.postgresSslCaFile) } : undefined;
-  if (options?.postgresConnectionString)
-    return new Pool({ connectionString: options.postgresConnectionString, max: options.postgresPoolMax, ssl });
+
+  if (options?.postgresConnectionString) {
+    const pool = new Pool({ connectionString: options.postgresConnectionString, max: options.postgresPoolMax, ssl });
+
+    return new Proxy<Pool>({} as Pool, {
+      get(_, prop) {
+        if (prop === 'then') return;
+        if (prop === 'query') {
+          return timedQuery(pool, logger);
+        }
+        // Bind if it is a function, no intercept operations
+        if (typeof pool[prop as keyof Pool] === 'function') {
+          const method = pool[prop as keyof Pool] as any;
+          return method.bind(pool);
+        }
+
+        return pool[prop as keyof Pool];
+      }
+    });
+  }
+
   if (options?.postgresSrvServiceName && options.postgresUser && options.postgresDb && options.postgresPassword) {
     return getPoolWithServiceDiscovery(dnsResolver, logger, {
       database: options.postgresDb,

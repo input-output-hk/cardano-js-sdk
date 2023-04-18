@@ -189,10 +189,6 @@ describe('Service dependency abstractions', () => {
         jest.clearAllTimers();
       });
 
-      it('db should not be instance a of Proxy ', () => {
-        expect(types.isProxy(dbPools.main!)).toEqual(false);
-      });
-
       it('forwards the db health response', async () => {
         const res = await axios.post(`${apiUrlBase}/health`, {
           headers: { 'Content-Type': APPLICATION_JSON }
