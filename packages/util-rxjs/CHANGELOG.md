@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.7-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.4.7-nightly.3...@cardano-sdk/util-rxjs@0.4.7-nightly.4) (2023-04-18)
+
+### Features
+
+- **wallet:** concatAndCombineLatest creator function ([305f2ed](https://github.com/input-output-hk/cardano-js-sdk/commit/305f2ed0039c8f355e4b973c41392c8c601b9312))
+
 ## [0.4.7-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.4.7-nightly.2...@cardano-sdk/util-rxjs@0.4.7-nightly.3) (2023-03-31)
 
 ### Bug Fixes

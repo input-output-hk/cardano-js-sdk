@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.11.0-nightly.5...@cardano-sdk/core@0.11.0-nightly.6) (2023-04-18)
+
+### ⚠ BREAKING CHANGES
+
+- - `TokenMetadata` has new mandatory property `assetId`
+
+* `DbSyncAssetProvider` constructor requires new
+  `DbSyncAssetProviderProp` object as first positional argument
+* `createAssetsService` accepts an array of assetIds instead of a
+  single assetId
+
+### Features
+
+- support assets fetching by ids ([8ed208a](https://github.com/input-output-hk/cardano-js-sdk/commit/8ed208a7a060c6999294c1f53266d6452adb278d))
+
 ## [0.11.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.11.0-nightly.4...@cardano-sdk/core@0.11.0-nightly.5) (2023-04-12)
 
 ### Bug Fixes
