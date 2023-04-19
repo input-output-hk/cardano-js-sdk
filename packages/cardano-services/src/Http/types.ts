@@ -32,6 +32,7 @@ export type HttpServerConfig = {
   name?: string;
   meta?: ServerMetadata;
   listen: net.ListenOptions;
+  allowedOrigins?: string[];
 };
 
 export type BuildInfo = Omit<ServerMetadata, 'extra' | 'startupTime'>;

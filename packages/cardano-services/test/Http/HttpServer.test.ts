@@ -9,6 +9,7 @@ import {
   HttpServer,
   HttpService,
   InMemoryCache,
+  ORIGIN,
   ServerMetadata,
   ServiceNames,
   UNLIMITED_CACHE_TTL
@@ -22,12 +23,11 @@ import { RunnableModule, fromSerializableObject, toSerializableObject } from '@c
 import { createLogger, logger } from '@cardano-sdk/util-dev';
 import { getRandomPort } from 'get-port-please';
 import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
+import { serverStarted } from '../util';
 import axios from 'axios';
 import express from 'express';
 import net from 'net';
-import waitOn from 'wait-on';
-const headers = { [CONTENT_TYPE]: APPLICATION_JSON };
-const onHttpServer = (url: string) => waitOn({ resources: [url], validateStatus: (statusCode) => statusCode === 404 });
+
 class SomeHttpService extends HttpService {
   shouldFail?: boolean;
   constructor(
@@ -61,10 +61,12 @@ describe('HttpServer', () => {
   let provider: Provider;
   let cardanoNode: OgmiosCardanoNode;
   let lastBlockNoInDb: Cardano.BlockNo;
+
   const dbPools = {
     healthCheck: new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING }),
     main: new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING })
   };
+  const headers = { [CONTENT_TYPE]: APPLICATION_JSON };
   const cache = { db: new InMemoryCache(UNLIMITED_CACHE_TTL), healthCheck: new InMemoryCache(UNLIMITED_CACHE_TTL) };
 
   it('Is a runnable module', async () => {
@@ -102,7 +104,7 @@ describe('HttpServer', () => {
       expect(httpServer.app).toBeDefined();
       expect(cardanoNode.initialize).toHaveBeenCalledTimes(1);
       await httpServer.start();
-      await onHttpServer(apiUrlBase);
+      await serverStarted(apiUrlBase);
     });
 
     it('should not initialize the runnable dependencies if there are not any', async () => {
@@ -117,7 +119,7 @@ describe('HttpServer', () => {
       await httpServer.initialize();
       expect(cardanoNode.initialize).toHaveBeenCalledTimes(0);
       await httpServer.start();
-      await onHttpServer(apiUrlBase);
+      await serverStarted(apiUrlBase);
     });
 
     it('uses core serializableObject with body parser', async () => {
@@ -136,7 +138,7 @@ describe('HttpServer', () => {
       );
       await httpServer.initialize();
       await httpServer.start();
-      await onHttpServer(apiUrlBase);
+      await serverStarted(apiUrlBase);
       await axios.post(
         `${apiUrlBase}/${ServiceNames.StakePool}/echo`,
         JSON.stringify(toSerializableObject(expectedBody)),
@@ -164,7 +166,7 @@ describe('HttpServer', () => {
       );
       await httpServer.initialize();
       await httpServer.start();
-      await onHttpServer(apiUrlBase);
+      await serverStarted(apiUrlBase);
       await axios.post(url, JSON.stringify(toSerializableObject(expectedBody)), { headers });
       await axios.get(url, { params: expectedBody });
       expect(
@@ -300,7 +302,7 @@ describe('HttpServer', () => {
       );
       await httpServer.initialize();
       await httpServer.start();
-      await onHttpServer(apiUrlBase);
+      await serverStarted(apiUrlBase);
       const response = await axios.get(`${apiUrlBase}/${ServiceNames.StakePool}/metrics`, {
         headers,
         validateStatus: null
@@ -318,7 +320,7 @@ describe('HttpServer', () => {
       );
       await httpServer.initialize();
       await httpServer.start();
-      await onHttpServer(apiUrlBase);
+      await serverStarted(apiUrlBase);
       const res = await axios.get(`${apiUrlBase}/metrics`, { headers });
       expect(res.status).toBe(200);
       expect(typeof res.data).toBe('string');
@@ -335,7 +337,7 @@ describe('HttpServer', () => {
       );
       await httpServer.initialize();
       await httpServer.start();
-      await onHttpServer(apiUrlBase);
+      await serverStarted(apiUrlBase);
       const response = await axios.get(`${apiUrlBase}${metricsPath}`, { headers });
       expect(response.status).toBe(200);
       expect(typeof response.data).toBe('string');
@@ -351,7 +353,7 @@ describe('HttpServer', () => {
       );
       await httpServer.initialize();
       await httpServer.start();
-      await onHttpServer(apiUrlBase);
+      await serverStarted(apiUrlBase);
       const response = await axios.get(`${apiUrlBase}/metrics`, { headers });
       expect(response.status).toBe(200);
       expect(response.data.includes('healthcheck 1')).toEqual(true);
@@ -366,7 +368,7 @@ describe('HttpServer', () => {
       );
       await httpServer.initialize();
       await httpServer.start();
-      await onHttpServer(apiUrlBase);
+      await serverStarted(apiUrlBase);
       service.healthCheck = async () => Promise.resolve({ ok: false });
       const response = await axios.get(`${apiUrlBase}/metrics`, { headers });
       expect(response.status).toBe(200);
@@ -389,7 +391,6 @@ describe('HttpServer', () => {
       );
       await httpServer.initialize();
       await httpServer.start();
-      await onHttpServer(apiUrlBase);
     });
     afterEach(async () => {
       await httpServer.shutdown();
@@ -427,7 +428,7 @@ describe('HttpServer', () => {
       );
       await httpServer.initialize();
       await httpServer.start();
-      await onHttpServer(apiUrlBase);
+      await serverStarted(apiUrlBase);
       const res = await axios.post(`${apiUrlBase}/health`, {
         headers: { [CONTENT_TYPE]: 'application/json' }
       });
@@ -465,7 +466,7 @@ describe('HttpServer', () => {
       );
       await httpServer.initialize();
       await httpServer.start();
-      await onHttpServer(apiUrlBase);
+
       const res = await axios.post(`${apiUrlBase}/health`, {
         headers: { [CONTENT_TYPE]: 'application/json' }
       });
@@ -521,7 +522,7 @@ describe('HttpServer', () => {
 
       await httpServer.initialize();
       await httpServer.start();
-      await onHttpServer(apiUrlBase);
+      await serverStarted(apiUrlBase);
 
       const res = await axios.get<ServerMetadata>(`${apiUrlBase}/${metaEndpoint}`, {
         headers: { [CONTENT_TYPE]: 'application/json' }
@@ -529,6 +530,83 @@ describe('HttpServer', () => {
 
       expect(res.status).toBe(200);
       expect(res.data).toMatchObject(meta);
+    });
+  });
+
+  describe('CORS', () => {
+    const allowedOrigin = 'http://cardano.com';
+    const unknownOrigin = 'http://cardano2.com';
+
+    afterEach(async () => {
+      await httpServer.shutdown();
+    });
+
+    it('allows requests from all origins when allowed origins config is not specified', async () => {
+      httpServer = new HttpServer(
+        { allowedOrigins: undefined, listen: { host: 'localhost', port } },
+        {
+          logger,
+          runnableDependencies: [cardanoNode],
+          services: [new SomeHttpService(ServiceNames.Utxo, provider, logger)]
+        }
+      );
+
+      await httpServer.initialize();
+      await httpServer.start();
+      await serverStarted(apiUrlBase);
+
+      const res = await axios.get(`${apiUrlBase}/health`, {
+        headers: { [CONTENT_TYPE]: 'application/json' }
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.data).toBeDefined();
+    });
+
+    it('mirrors "origin" header in "access-control-allow-origin" if it matches an allowed origin', async () => {
+      httpServer = new HttpServer(
+        { allowedOrigins: [allowedOrigin], listen: { host: 'localhost', port } },
+        {
+          logger,
+          runnableDependencies: [cardanoNode],
+          services: [new SomeHttpService(ServiceNames.Utxo, provider, logger)]
+        }
+      );
+
+      await httpServer.initialize();
+      await httpServer.start();
+      await serverStarted(apiUrlBase, 404, { [ORIGIN]: allowedOrigin });
+
+      const res = await axios.get(`${apiUrlBase}/health`, {
+        headers: { [CONTENT_TYPE]: 'application/json', [ORIGIN]: allowedOrigin }
+      });
+
+      expect(res.headers['access-control-allow-origin']).toEqual(allowedOrigin);
+    });
+
+    it('rejects requests from disallowed origins', async () => {
+      httpServer = new HttpServer(
+        { allowedOrigins: [allowedOrigin], listen: { host: 'localhost', port } },
+        {
+          logger,
+          runnableDependencies: [cardanoNode],
+          services: [new SomeHttpService(ServiceNames.Utxo, provider, logger)]
+        }
+      );
+
+      await httpServer.initialize();
+      await httpServer.start();
+      await serverStarted(apiUrlBase, 404, { [ORIGIN]: allowedOrigin });
+
+      try {
+        await axios.get(`${apiUrlBase}/health`, {
+          headers: { [CONTENT_TYPE]: 'application/json', [ORIGIN]: unknownOrigin }
+        });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        expect(error.response.status).toBe(403);
+        expect(error.response.statusText).toBe('Forbidden');
+      }
     });
   });
 });

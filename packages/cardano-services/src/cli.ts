@@ -5,6 +5,7 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable unicorn/no-nested-ternary */
 import {
+  ALLOWED_ORIGINS_DEFAULT,
   AvailableNetworks,
   BLOCKFROST_WORKER_API_URL_DEFAULT,
   BlockfrostWorkerArgs,
@@ -111,6 +112,12 @@ withCommonOptions(
     )
       .env('SERVICE_NAMES')
       .argParser((names) => names.split(',') as ServiceNames[])
+  )
+  .addOption(
+    new Option('--allowed-origins <allowedOrigins>', ProviderServerOptionDescriptions.AllowedOrigins)
+      .env('ALLOWED_ORIGINS')
+      .default(ALLOWED_ORIGINS_DEFAULT)
+      .argParser((originsList) => originsList.split(',') as string[])
   )
   .addOption(
     new Option(
