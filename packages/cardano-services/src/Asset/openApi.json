@@ -126,6 +126,22 @@
           },
           "policyId": {
             "type": "string"
+          },
+          "supply": {
+            "$ref": "#/components/schemas/BigInt"
+          }
+        }
+      },
+      "BigInt": {
+        "required": ["value", "__type"],
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string"
+          },
+          "__type": {
+            "type": "string",
+            "enum": ["bigint"]
           }
         }
       },

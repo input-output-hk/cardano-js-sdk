@@ -1,14 +1,30 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { Cardano, metadatum, nativeScriptPolicyId } from '@cardano-sdk/core';
-import { FinalizeTxProps, InitializeTxProps, SingleAddressWallet } from '@cardano-sdk/wallet';
+import { Asset, Cardano, metadatum, nativeScriptPolicyId } from '@cardano-sdk/core';
+import { Assets, FinalizeTxProps, InitializeTxProps, SingleAddressWallet } from '@cardano-sdk/wallet';
 import { KeyRole, TransactionSigner, util } from '@cardano-sdk/key-management';
-import { burnTokens, createStandaloneKeyAgent, submitAndConfirm, walletReady } from '../../util';
+import { burnTokens, createStandaloneKeyAgent, firstValueFromTimed, submitAndConfirm, walletReady } from '../../util';
 import { combineLatest, filter, firstValueFrom, map } from 'rxjs';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { getEnv, getWallet, walletVariables } from '../../../src';
 
 const env = getEnv(walletVariables);
 const logger = createLogger();
+
+// Returns [assets in wallet balance, assetInfos with nftMetadata for the assets in the balance]
+const walletBalanceAssetsAndNfts = (wallet: SingleAddressWallet) =>
+  combineLatest([wallet.balance.utxo.total$, wallet.assetInfo$]).pipe(
+    filter(([balance]) => !!balance.assets),
+    map(([balance, assetInfos]): [Cardano.TokenMap, Assets] => [balance.assets!, assetInfos]),
+    // Wait until we have assetInfo for all balance assets
+    filter(([balanceAssets, assetsInfos]) =>
+      [...balanceAssets.keys()].every((balanceAssetId) => !!assetsInfos.get(balanceAssetId))
+    ),
+    // Keep only assetInfos with nftMetadata
+    map(([balanceAssets, assets]): [Cardano.TokenMap, Asset.AssetInfo[]] => [
+      balanceAssets,
+      [...assets.values()].filter((asset) => !!asset.nftMetadata)
+    ])
+  );
 
 describe('SingleAddressWallet.assets/nft', () => {
   const TOKEN_METADATA_1_INDEX = 0;
@@ -153,21 +169,7 @@ describe('SingleAddressWallet.assets/nft', () => {
     await submitAndConfirm(wallet, signedTx);
 
     // Wait until wallet is aware of the minted tokens.
-    await firstValueFrom(
-      combineLatest([wallet.assets$, wallet.balance.utxo.total$]).pipe(
-        filter(
-          ([assets, balance]) =>
-            assets &&
-            assets.size === balance.assets?.size &&
-            assetIds.every((element) => {
-              const asset = assets.get(element);
-              // asset info with metadata has loaded
-              if (asset?.tokenMetadata === undefined || asset?.nftMetadata === undefined) return false;
-              return true;
-            })
-        )
-      )
-    );
+    await firstValueFromTimed(walletBalanceAssetsAndNfts(wallet), 'Wallet does not have the minted tokens');
   });
 
   afterAll(async () => {
@@ -180,13 +182,7 @@ describe('SingleAddressWallet.assets/nft', () => {
   });
 
   it('supports multiple CIP-25 NFT metadata in one tx', async () => {
-    const [nfts, walletAssetBalance] = await firstValueFrom(
-      combineLatest([wallet.assets$, wallet.balance.utxo.total$]).pipe(
-        filter(([assets, balance]) => assets.size === balance.assets?.size),
-        filter(([assets]) => [...assets.values()].every((quantity) => !!quantity)),
-        map(([assets, balance]) => [[...assets.values()].filter((asset) => !!asset.nftMetadata), balance.assets])
-      )
-    );
+    const [walletAssetBalance, nfts] = await firstValueFromTimed(walletBalanceAssetsAndNfts(wallet));
 
     // Check balance here because asset info will not be re-fetched when balance changes due to minting and burning
     expect(walletAssetBalance?.get(assetIds[TOKEN_METADATA_2_INDEX])).toBe(1n);
@@ -203,21 +199,16 @@ describe('SingleAddressWallet.assets/nft', () => {
         version: '1.0'
       },
       policyId,
-      // in case of repeated tests on the same network, total asset quantity is not updated due to
+      // in case of repeated tests on the same network, total asset supply is not updated due to
       // the limitation that asset info is not refreshed on wallet balance changes
-      quantity: expect.anything(),
+      supply: expect.anything(),
       tokenMetadata: null
     });
     expect(nfts.find((nft) => nft.assetId === assetIds[TOKEN_METADATA_1_INDEX])).toBeDefined();
   });
 
   it('parses CIP-25 NFT metadata with files', async () => {
-    const [nfts, walletAssetBalance] = await firstValueFrom(
-      combineLatest([wallet.assets$, wallet.balance.utxo.total$]).pipe(
-        filter(([assets, balance]) => assets.size === balance.assets?.size),
-        map(([assets, balance]) => [[...assets.values()].filter((asset) => !!asset.nftMetadata), balance.assets])
-      )
-    );
+    const [walletAssetBalance, nfts] = await firstValueFromTimed(walletBalanceAssetsAndNfts(wallet));
 
     // Check balance here because asset info will not be re-fetched when balance changes due to minting and burning
     expect(walletAssetBalance?.get(assetIds[TOKEN_METADATA_1_INDEX])).toBe(1n);
@@ -251,7 +242,7 @@ describe('SingleAddressWallet.assets/nft', () => {
         version: '1.0'
       },
       policyId,
-      quantity: expect.anything(),
+      supply: expect.anything(),
       tokenMetadata: null
     });
   });
@@ -261,7 +252,7 @@ describe('SingleAddressWallet.assets/nft', () => {
     await walletReady(wallet, coins);
 
     // spend entire balance of test asset
-    const availableBalance = await firstValueFrom(wallet.balance.utxo.available$);
+    const availableBalance = await firstValueFromTimed(wallet.balance.utxo.available$);
     const assetBalance = availableBalance.assets!.get(assetIds[TOKEN_BURN_INDEX])!;
     expect(assetBalance).toBeGreaterThan(0n);
     const txProps: InitializeTxProps = {
@@ -290,20 +281,12 @@ describe('SingleAddressWallet.assets/nft', () => {
     await submitAndConfirm(wallet, signedTx);
 
     // Wait until wallet is aware of the burned token.
-    await firstValueFrom(
+    await firstValueFromTimed(
       wallet.balance.utxo.total$.pipe(
         filter(({ assets }) => (assets ? !assets.has(assetIds[TOKEN_BURN_INDEX]) : false))
-      )
+      ),
+      'Wallet balance should not have the burned asset anymore'
     );
-
-    const nfts = await firstValueFrom(
-      combineLatest([wallet.assets$, wallet.balance.utxo.total$]).pipe(
-        filter(([assets, balance]) => assets.size === balance.assets?.size),
-        map(([assets]) => [...assets.values()].filter((asset) => !!asset.nftMetadata))
-      )
-    );
-
-    expect(nfts.find((nft) => nft.assetId === assetIds[TOKEN_BURN_INDEX])).toBeUndefined();
   });
 
   describe('CIP-0025 v1 and v2', () => {
@@ -366,12 +349,7 @@ describe('SingleAddressWallet.assets/nft', () => {
         await submitAndConfirm(wallet, signedTx);
 
         // try remove the asset.nftMetadata filter
-        const nfts = await firstValueFrom(
-          combineLatest([wallet.assets$, wallet.balance.utxo.total$]).pipe(
-            filter(([assets, balance]) => assets.size === balance.assets?.size),
-            map(([assets]) => [...assets.values()].filter((asset) => !!asset.nftMetadata))
-          )
-        );
+        const [, nfts] = await firstValueFromTimed(walletBalanceAssetsAndNfts(wallet));
 
         expect(nfts.find((nft) => nft.assetId === assetId)).toMatchObject({
           assetId,
@@ -385,7 +363,7 @@ describe('SingleAddressWallet.assets/nft', () => {
             version: '1.0'
           },
           policyId,
-          quantity: expect.anything(),
+          supply: expect.anything(),
           tokenMetadata: null
         });
       });

@@ -140,7 +140,7 @@ const assertWalletProperties = async (
   expect(addresses[0].address).toEqual(address);
   expect(addresses[0].rewardAccount).toEqual(rewardAccount);
   // assets$
-  expect(await firstValueFrom(wallet.assets$)).toEqual(new Map([[AssetId.TSLA, mocks.asset]]));
+  expect(await firstValueFrom(wallet.assetInfo$)).toEqual(new Map([[AssetId.TSLA, mocks.asset]]));
   // inputAddressResolver
   expect(typeof wallet.util).toBe('object');
 };

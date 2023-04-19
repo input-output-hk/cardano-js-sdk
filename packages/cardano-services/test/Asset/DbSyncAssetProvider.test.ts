@@ -84,7 +84,7 @@ describe('DbSyncAssetProvider', () => {
       mintOrBurnCount: 1,
       name: '6d616361726f6e2d63616b65',
       policyId: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb',
-      quantity: 1n
+      supply: 1n
     });
   });
   it('returns an AssetInfo with extra data', async () => {
