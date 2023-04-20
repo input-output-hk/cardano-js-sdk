@@ -40,9 +40,9 @@ export const observableWalletProperties: RemoteApiProperties<ObservableWallet> =
   transactions: {
     history$: RemoteApiPropertyType.HotObservable,
     outgoing: {
-      confirmed$: RemoteApiPropertyType.HotObservable,
       failed$: RemoteApiPropertyType.HotObservable,
       inFlight$: RemoteApiPropertyType.HotObservable,
+      onChain$: RemoteApiPropertyType.HotObservable,
       pending$: RemoteApiPropertyType.HotObservable,
       submitting$: RemoteApiPropertyType.HotObservable
     },

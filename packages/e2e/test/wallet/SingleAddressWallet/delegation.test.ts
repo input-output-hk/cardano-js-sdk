@@ -33,10 +33,10 @@ const waitForTx = async (wallet: ObservableWallet, hash: Cardano.TransactionId) 
   await firstValueFromTimed(
     combineLatest([
       wallet.transactions.history$.pipe(filter((txs) => txs.some(({ id }) => id === hash))),
-      // test that confirmed$ works
-      wallet.transactions.outgoing.confirmed$.pipe(filter(({ id }) => id === hash))
+      // test that onChain$ works
+      wallet.transactions.outgoing.onChain$.pipe(filter(({ id }) => id === hash))
     ]),
-    'Tx not confirmed for too long',
+    'Tx not found on-chain for too long',
     TX_TIMEOUT_DEFAULT
   );
   await waitForWalletStateSettle(wallet);
@@ -138,7 +138,7 @@ describe('SingleAddressWallet/delegation', () => {
     await waitForTx(sourceWallet, signedTx.tx.id);
     const tx1ConfirmedState = await getWalletStateSnapshot(sourceWallet);
 
-    // Updates total and available balance after tx is confirmed
+    // Updates total and available balance after tx is on-chain
     expect(tx1ConfirmedState.balance.total.coins).toBe(expectedCoinsAfterTx1);
     expect(tx1ConfirmedState.balance.total).toEqual(tx1ConfirmedState.balance.available);
     expect(tx1PendingState.balance.deposit).toEqual(stakeKeyDeposit);

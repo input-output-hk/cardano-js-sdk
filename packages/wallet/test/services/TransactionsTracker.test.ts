@@ -191,7 +191,7 @@ describe('TransactionsTracker', () => {
           b: [incomingTx],
           c: [incomingTx, submittedTx]
         });
-        const confirmedSubscription = '--^--'; // regression: subscribing after submitting$ emits
+        const onChainSubscription = '--^--'; // regression: subscribing after submitting$ emits
         const transactionsTracker = createTransactionsTracker(
           {
             addresses$,
@@ -214,8 +214,8 @@ describe('TransactionsTracker', () => {
         );
         expectObservable(transactionsTracker.outgoing.submitting$).toBe('-a--|', { a: outgoingTx });
         expectObservable(transactionsTracker.outgoing.pending$).toBe('--a-|', { a: outgoingTx });
-        expectObservable(transactionsTracker.outgoing.confirmed$, confirmedSubscription).toBe('---a|', {
-          a: { confirmedAt: submittedTx.blockHeader.slot, ...outgoingTx }
+        expectObservable(transactionsTracker.outgoing.onChain$, onChainSubscription).toBe('---a|', {
+          a: { slot: submittedTx.blockHeader.slot, ...outgoingTx }
         });
         expectObservable(transactionsTracker.outgoing.inFlight$).toBe('ab-c|', {
           a: [],
@@ -271,14 +271,14 @@ describe('TransactionsTracker', () => {
           c: [{ submittedAt: tip1.slot, ...outgoingTx }],
           d: []
         });
-        expectObservable(transactionsTracker.outgoing.confirmed$).toBe('-----|');
+        expectObservable(transactionsTracker.outgoing.onChain$).toBe('-----|');
         expectObservable(transactionsTracker.outgoing.failed$, failedSubscription).toBe('---a-|', {
           a: { reason: TransactionFailure.Timeout, ...outgoingTx }
         });
       });
     });
 
-    it(`resubmitting (emitting at pending$) a tx that was already confirmed or failed does not re-add the tx to inFlight$;
+    it(`resubmitting (emitting at pending$) a tx that was already on-chain or failed does not re-add the tx to inFlight$;
         rollback of a transaction of which an output was used in a pending transaction interprets transaction as failed`, async () => {
       const tx = queryTransactionsResult.pageResults[0];
       const outgoingTx = toOutgoingTx(tx);
@@ -321,7 +321,7 @@ describe('TransactionsTracker', () => {
           c: [{ submittedAt: tip1.slot, ...outgoingTx }],
           d: []
         });
-        expectObservable(transactionsTracker.outgoing.confirmed$).toBe('-----|');
+        expectObservable(transactionsTracker.outgoing.onChain$).toBe('-----|');
       });
     });
 
@@ -362,7 +362,7 @@ describe('TransactionsTracker', () => {
         expectObservable(transactionsTracker.outgoing.submitting$).toBe('-a---|', { a: outgoingTx });
         expectObservable(transactionsTracker.outgoing.pending$).toBe('--a--|', { a: outgoingTx });
         expectObservable(transactionsTracker.outgoing.inFlight$).toBe('ab-c-|', { a: [], b: [outgoingTx], c: [] });
-        expectObservable(transactionsTracker.outgoing.confirmed$).toBe('-----|');
+        expectObservable(transactionsTracker.outgoing.onChain$).toBe('-----|');
         expectObservable(transactionsTracker.outgoing.failed$).toBe('---a-|', {
           a: { reason: TransactionFailure.Phase2Validation, ...outgoingTx }
         });
@@ -408,7 +408,7 @@ describe('TransactionsTracker', () => {
         expectObservable(transactionsTracker.outgoing.submitting$).toBe('-a--|', { a: outgoingTx });
         expectObservable(transactionsTracker.outgoing.pending$).toBe('--a-|', { a: outgoingTx });
         expectObservable(transactionsTracker.outgoing.inFlight$).toBe('ab-c|', { a: [], b: [outgoingTx], c: [] });
-        expectObservable(transactionsTracker.outgoing.confirmed$).toBe('----|');
+        expectObservable(transactionsTracker.outgoing.onChain$).toBe('----|');
         expectObservable(transactionsTracker.outgoing.failed$).toBe('-a-b|', {
           a: { reason: TransactionFailure.Timeout, ...outgoingTxReemit },
           b: { reason: TransactionFailure.FailedToSubmit, ...outgoingTx }
@@ -452,7 +452,7 @@ describe('TransactionsTracker', () => {
         expectObservable(transactionsTracker.outgoing.submitting$).toBe('-a--|', { a: outgoingTx });
         expectObservable(transactionsTracker.outgoing.pending$).toBe('--a-|', { a: outgoingTx });
         expectObservable(transactionsTracker.outgoing.inFlight$).toBe('ab-c|', { a: [], b: [outgoingTx], c: [] });
-        expectObservable(transactionsTracker.outgoing.confirmed$).toBe('----|');
+        expectObservable(transactionsTracker.outgoing.onChain$).toBe('----|');
         expectObservable(transactionsTracker.outgoing.failed$).toBe('---a|', {
           a: { reason: TransactionFailure.FailedToSubmit, ...outgoingTx }
         });
@@ -506,8 +506,8 @@ describe('TransactionsTracker', () => {
           e: [{ submittedAt: submittedAt2, ...outgoingTx }],
           f: []
         });
-        expectObservable(transactionsTracker.outgoing.confirmed$).toBe('-----a|', {
-          a: { confirmedAt: tx.blockHeader.slot, ...outgoingTx }
+        expectObservable(transactionsTracker.outgoing.onChain$).toBe('-----a|', {
+          a: { slot: tx.blockHeader.slot, ...outgoingTx }
         });
         expectObservable(transactionsTracker.outgoing.failed$).toBe('------|');
       });
@@ -558,7 +558,7 @@ describe('TransactionsTracker', () => {
         expectObservable(transactionsTracker.outgoing.failed$).toBe('-----a|', {
           a: { reason: TransactionFailure.FailedToSubmit, ...outgoingTx }
         });
-        expectObservable(transactionsTracker.outgoing.confirmed$).toBe('------|');
+        expectObservable(transactionsTracker.outgoing.onChain$).toBe('------|');
       });
     });
 
@@ -603,8 +603,8 @@ describe('TransactionsTracker', () => {
           c: [{ submittedAt, ...outgoingTx }],
           d: []
         });
-        expectObservable(transactionsTracker.outgoing.confirmed$).toBe('---a|', {
-          a: { confirmedAt: tx.blockHeader.slot, ...outgoingTx }
+        expectObservable(transactionsTracker.outgoing.onChain$).toBe('---a|', {
+          a: { slot: tx.blockHeader.slot, ...outgoingTx }
         });
         expectObservable(transactionsTracker.outgoing.failed$).toBe('----|');
       });
@@ -654,7 +654,7 @@ describe('TransactionsTracker', () => {
         );
 
         expectObservable(transactionsTracker.outgoing.pending$).toBe('|');
-        expectObservable(transactionsTracker.outgoing.confirmed$).toBe('---|');
+        expectObservable(transactionsTracker.outgoing.onChain$).toBe('---|');
         expectObservable(transactionsTracker.outgoing.failed$).toBe('---|');
 
         expectObservable(transactionsTracker.outgoing.submitting$).toBe('--b|', {
@@ -714,8 +714,8 @@ describe('TransactionsTracker', () => {
           }
         );
         expectObservable(transactionsTracker.outgoing.submitting$).toBe('----|');
-        expectObservable(transactionsTracker.outgoing.confirmed$).toBe('---a|', {
-          a: { confirmedAt: storedInFlightTx.blockHeader.slot, ...storedInFlightOutgoingTx }
+        expectObservable(transactionsTracker.outgoing.onChain$).toBe('---a|', {
+          a: { slot: storedInFlightTx.blockHeader.slot, ...storedInFlightOutgoingTx }
         });
         expectObservable(transactionsTracker.outgoing.inFlight$).toBe('ab-a|', {
           a: [],
@@ -743,7 +743,7 @@ describe('TransactionsTracker', () => {
       const incomingTx = {
         blockHeader: { blockNo: Cardano.BlockNo(1_000_000) },
         body: { validityInterval: {} },
-        // should remove storedInFlightTx from inFlight$ once confirmed
+        // should remove storedInFlightTx from inFlight$ once discovered on-chain
         id: storedInFlightTx.id
       } as Cardano.HydratedTx;
 

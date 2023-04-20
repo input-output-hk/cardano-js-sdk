@@ -1,8 +1,8 @@
 import { Assets } from '../types';
 import { Cardano, EpochRewards, EraSummary, StakeSummary, SupplySummary } from '@cardano-sdk/core';
-import { ConfirmedTx, TxInFlight } from '../services';
 import { GroupedAddress } from '@cardano-sdk/key-management';
 import { Observable } from 'rxjs';
+import { OutgoingOnChainTx, TxInFlight } from '../services';
 
 export interface Destroyable {
   destroyed: boolean;
@@ -75,7 +75,7 @@ export interface WalletStores extends Destroyable {
   unspendableUtxo: CollectionStore<Cardano.Utxo>;
   transactions: OrderedCollectionStore<Cardano.HydratedTx>;
   inFlightTransactions: DocumentStore<TxInFlight[]>;
-  volatileTransactions: DocumentStore<ConfirmedTx[]>;
+  volatileTransactions: DocumentStore<OutgoingOnChainTx[]>;
   rewardsHistory: KeyValueStore<Cardano.RewardAccount, EpochRewards[]>;
   rewardsBalances: KeyValueStore<Cardano.RewardAccount, Cardano.Lovelace>;
   stakePools: KeyValueStore<Cardano.PoolId, Cardano.StakePool>;
