@@ -3,16 +3,12 @@ export interface LastMintTxModel {
 }
 
 export interface MultiAssetModel {
+  count: string;
   fingerprint: string;
-  id: string;
+  sum: string;
 }
 
 export interface MultiAssetHistoryModel {
   hash: Buffer;
   quantity: string;
-}
-
-export interface MultiAssetQuantitiesModel {
-  count: string;
-  sum: string;
 }
