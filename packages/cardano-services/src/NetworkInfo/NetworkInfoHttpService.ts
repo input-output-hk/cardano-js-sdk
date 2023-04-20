@@ -59,13 +59,6 @@ export class NetworkInfoHttpService extends HttpService {
       )
     );
     router.post(
-      '/current-wallet-protocol-parameters',
-      providerHandler(networkInfoProvider.protocolParameters.bind(networkInfoProvider))(
-        HttpService.routeHandler(logger),
-        logger
-      )
-    );
-    router.post(
       '/genesis-parameters',
       providerHandler(networkInfoProvider.genesisParameters.bind(networkInfoProvider))(
         HttpService.routeHandler(logger),
