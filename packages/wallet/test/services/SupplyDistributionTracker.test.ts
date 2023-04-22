@@ -2,7 +2,7 @@ import { createInMemorySupplyDistributionStores } from '../../src/persistence';
 import { createSupplyDistributionTracker } from '../../src';
 import { dummyLogger } from 'ts-log';
 import { firstValueFrom, of } from 'rxjs';
-import { mockNetworkInfoProvider, networkInfo } from '../mocks';
+import { mockNetworkInfoProvider, networkInfo } from '../../../core/test/mocks';
 
 describe('SupplyDistributionTracker', () => {
   it('loads data from the provider', async () => {

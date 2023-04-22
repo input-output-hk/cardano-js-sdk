@@ -4,7 +4,7 @@ import { Cardano, NetworkInfoProvider } from '@cardano-sdk/core';
 import { CreateTxInternalsProps, createTransactionInternals } from '../../src/Transaction';
 import { SelectionConstraints } from '../../../input-selection/test/util';
 import { SelectionSkeleton, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
-import { mockNetworkInfoProvider, utxo } from '../mocks';
+import { mockNetworkInfoProvider, utxo } from '../../../core/test/mocks';
 
 const address = Cardano.PaymentAddress(
   'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'

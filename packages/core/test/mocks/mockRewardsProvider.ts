@@ -1,4 +1,4 @@
-import { Cardano, Paginated, StakePoolProvider } from '@cardano-sdk/core';
+import { Cardano, Paginated, StakePoolProvider } from '../../src';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { epochRewards, rewardAccountBalance, rewardAccountBalance2, rewardsHistory, rewardsHistory2 } from './mockData';
 import { getRandomTxId } from './mockChainHistoryProvider';

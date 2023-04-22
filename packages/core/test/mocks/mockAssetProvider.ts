@@ -1,4 +1,4 @@
-import { Asset, Cardano } from '@cardano-sdk/core';
+import { Asset, Cardano } from '../../src';
 
 export const asset = {
   assetId: Cardano.AssetId('659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41'),

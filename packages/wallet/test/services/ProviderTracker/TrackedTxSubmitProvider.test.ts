@@ -2,7 +2,7 @@ import { BehaviorSubject } from 'rxjs';
 import { CLEAN_TX_SUBMIT_STATS, ProviderFnStats, TrackedTxSubmitProvider, TxSubmitProviderStats } from '../../../src';
 import { TxSubmitProvider } from '@cardano-sdk/core';
 import { bufferToHexString } from '@cardano-sdk/util';
-import { mockTxSubmitProvider } from '../../mocks';
+import { mockTxSubmitProvider } from '../../../../core/test/mocks';
 
 describe('TrackedTxSubmitProvider', () => {
   let txSubmitProvider: TxSubmitProvider;

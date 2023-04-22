@@ -1,7 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
 import { CLEAN_FN_STATS, ProviderFnStats, RewardsProviderStats, TrackedRewardsProvider } from '../../../src';
 import { RewardsProvider } from '@cardano-sdk/core';
-import { RewardsProviderStub, mockRewardsProvider, rewardAccount } from '../../mocks';
+import { RewardsProviderStub, mockRewardsProvider, rewardAccount } from '../../../../core/test/mocks';
 
 describe('TrackedRewardsProvider', () => {
   let rewardsProvider: RewardsProviderStub;

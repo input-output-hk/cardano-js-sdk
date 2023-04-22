@@ -6,7 +6,7 @@ import { Cardano, CardanoNodeErrors } from '@cardano-sdk/core';
 
 import { of } from 'rxjs';
 
-import * as mocks from '../mocks';
+import * as mocks from '../../../core/test/mocks';
 import {
   IncompatibleWalletError,
   ObservableWallet,

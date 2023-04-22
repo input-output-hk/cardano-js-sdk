@@ -1,7 +1,7 @@
 import { AssetProvider, Cardano } from '@cardano-sdk/core';
 import { AssetProviderStats, CLEAN_FN_STATS, ProviderFnStats, TrackedAssetProvider } from '../../../src';
 import { BehaviorSubject } from 'rxjs';
-import { mockAssetProvider } from '../../mocks';
+import { mockAssetProvider } from '../../../../core/test/mocks';
 
 describe('TrackedAssetProvider', () => {
   let assetProvider: AssetProvider;

@@ -3,7 +3,7 @@ import { Cardano, ProviderError, ProviderFailure, Transaction, TxSubmitProvider 
 import { ConnectionStatus, SmartTxSubmitProvider, TipSlot } from '../../src';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { flushPromises } from '@cardano-sdk/util-dev';
-import { mockTxSubmitProvider } from '../mocks';
+import { mockTxSubmitProvider } from '../../../core/test/mocks';
 import { usingAutoFree } from '@cardano-sdk/util';
 
 describe('SmartTxSubmitProvider', () => {
