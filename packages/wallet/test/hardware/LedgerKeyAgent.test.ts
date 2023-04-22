@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
-import * as mocks from '../mocks';
+import * as mocks from '../../../core/test/mocks';
 import {
   AddressType,
   CommunicationType,

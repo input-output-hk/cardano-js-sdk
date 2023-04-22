@@ -1,7 +1,7 @@
 /* eslint-disable max-statements */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
-import * as mocks from '../mocks';
+import * as mocks from '../../../core/test/mocks';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, somePartialStakePools } from '@cardano-sdk/util-dev';
 import {
@@ -22,10 +22,10 @@ import {
   setupWallet
 } from '../../src';
 import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
-import { currentEpoch } from '../mocks';
+import { currentEpoch } from '../../../core/test/mocks';
 import { firstValueFrom } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
-import { testAsyncKeyAgent, testKeyAgent } from '../../../key-management/test/mocks';
+import { stakeKeyDerivationPath, testAsyncKeyAgent, testKeyAgent } from '../../../key-management/test/mocks';
 import flatten from 'lodash/flatten';
 
 const name = 'Test Wallet';
@@ -55,7 +55,7 @@ const createWallet = async (
         index: 0,
         networkId: Cardano.NetworkId.Testnet,
         rewardAccount,
-        stakeKeyDerivationPath: mocks.stakeKeyDerivationPath,
+        stakeKeyDerivationPath,
         type: AddressType.External
       };
       const asyncKeyAgent = await testAsyncKeyAgent(

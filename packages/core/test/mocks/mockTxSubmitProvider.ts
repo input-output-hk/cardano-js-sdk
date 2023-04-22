@@ -1,4 +1,4 @@
-import { TxSubmitProvider } from '@cardano-sdk/core';
+import { TxSubmitProvider } from '../../src';
 
 /**
  * Provider stub for testing

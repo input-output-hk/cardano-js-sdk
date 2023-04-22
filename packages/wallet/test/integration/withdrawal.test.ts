@@ -2,7 +2,7 @@ import { Cardano } from '@cardano-sdk/core';
 import { firstValueFrom, of } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 
-import * as mocks from '../mocks';
+import * as mocks from '../../../core/test/mocks';
 import { RewardAccount, SingleAddressWallet, StakeKeyStatus, TransactionFailure, buildTx } from '../../src';
 import { assertTxIsValid } from '../util';
 import { createWallet } from './util';

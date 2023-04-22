@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import * as mocks from '../mocks';
+import * as mocks from '../../../core/test/mocks';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
 import { CML, Cardano } from '@cardano-sdk/core';
 import {
@@ -15,9 +15,8 @@ import {
 } from '../../src';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { dummyLogger as logger } from 'ts-log';
-import { mockChainHistoryProvider, mockRewardsProvider, utxo as mockUtxo } from '../mocks';
 import { of } from 'rxjs';
-import { testAsyncKeyAgent } from '../../../key-management/test/mocks';
+import { stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { waitForWalletStateSettle } from '../util';
 
 describe('WalletUtil', () => {
@@ -128,15 +127,15 @@ describe('WalletUtil', () => {
       utxoProvider = mocks.mockUtxoProvider();
       const assetProvider = mocks.mockAssetProvider();
       const stakePoolProvider = createStubStakePoolProvider();
-      const rewardsProvider = mockRewardsProvider();
-      const chainHistoryProvider = mockChainHistoryProvider();
+      const rewardsProvider = mocks.mockRewardsProvider();
+      const chainHistoryProvider = mocks.mockChainHistoryProvider();
       const groupedAddress: GroupedAddress = {
         accountIndex: 0,
         address,
         index: 0,
         networkId: Cardano.NetworkId.Testnet,
         rewardAccount: mocks.rewardAccount,
-        stakeKeyDerivationPath: mocks.stakeKeyDerivationPath,
+        stakeKeyDerivationPath,
         type: AddressType.External
       };
       ({ wallet } = await setupWallet({
@@ -173,7 +172,7 @@ describe('WalletUtil', () => {
             stakeKeyHash: mocks.stakeKeyHash
           } as Cardano.StakeAddressCertificate
         ],
-        collaterals: new Set([mockUtxo[2][0]]),
+        collaterals: new Set([mocks.utxo[2][0]]),
         outputs: new Set([
           {
             address: Cardano.PaymentAddress(

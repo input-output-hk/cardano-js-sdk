@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable sonarjs/no-extra-arguments */
 /* eslint-disable unicorn/consistent-function-scoping */
-import * as mocks from '../mocks';
+import * as mocks from '../../../core/test/mocks';
 import { Cardano, Transaction } from '@cardano-sdk/core';
 import { GroupedAddress } from '@cardano-sdk/key-management';
 import {
