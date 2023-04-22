@@ -1,19 +1,13 @@
-import { Cardano, EpochRewards, Seconds } from '@cardano-sdk/core';
-import { KeyRole } from '@cardano-sdk/key-management';
+import { Cardano, EpochRewards, Seconds } from '../../src';
 
 export const rewardAccount = Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d');
 export const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
-
-export const stakeKeyDerivationPath = {
-  index: 0,
-  role: KeyRole.Stake
-};
 
 export const rewardAccountBalance = 33_333n;
 
 export const ledgerTip = {
   blockNo: Cardano.BlockNo(1_111_111),
-  hash: '10d64cc11e9b20e15b6c46aa7b1fed11246f437e62225655a30ea47bf8cc22d0',
+  hash: Cardano.BlockId('10d64cc11e9b20e15b6c46aa7b1fed11246f437e62225655a30ea47bf8cc22d0'),
   slot: Cardano.Slot(37_834_496)
 };
 
@@ -33,7 +27,7 @@ export const protocolParameters = {
   prices: { memory: 0.0577, steps: 0.000_007_21 },
   protocolVersion: { major: 5, minor: 0 },
   stakeKeyDeposit: 2_000_000
-};
+} as Cardano.ProtocolParameters;
 
 export const epochRewards = [
   {

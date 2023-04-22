@@ -13,7 +13,7 @@ import {
   mockRewardsProvider,
   mockTxSubmitProvider,
   mockUtxoProvider
-} from '../../mocks';
+} from '../../../../core/test/mocks';
 
 const createWallet = async (keyAgent: KeyAgent) => {
   const txSubmitProvider = mockTxSubmitProvider();

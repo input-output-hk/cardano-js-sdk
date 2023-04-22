@@ -19,7 +19,7 @@ import {
   mockNetworkInfoProvider,
   mockRewardsProvider,
   mockUtxoProvider
-} from '../../mocks';
+} from '../../../../core/test/mocks';
 
 const providerFnStats = {
   a: [CLEAN_FN_STATS, CLEAN_FN_STATS], // Initial state

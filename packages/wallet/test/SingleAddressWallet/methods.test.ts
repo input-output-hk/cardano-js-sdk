@@ -1,14 +1,14 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import * as mocks from '../mocks';
+import * as mocks from '../../../core/test/mocks';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { CML, Cardano, CardanoNodeErrors, ProviderError, ProviderFailure, TxCBOR } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 import { InitializeTxProps, SingleAddressWallet, setupWallet } from '../../src';
 import { firstValueFrom, skip } from 'rxjs';
-import { getPassphrase, testAsyncKeyAgent } from '../../../key-management/test/mocks';
+import { getPassphrase, stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { dummyLogger as logger } from 'ts-log';
-import { mockChainHistoryProvider, mockRewardsProvider, utxo } from '../mocks';
+import { mockChainHistoryProvider, mockRewardsProvider, utxo } from '../../../core/test/mocks';
 import { toOutgoingTx, waitForWalletStateSettle } from '../util';
 
 // We can't consistently re-serialize this specific tx due to witness.datums list format
@@ -54,7 +54,7 @@ describe('SingleAddressWallet methods', () => {
       index: 0,
       networkId: Cardano.NetworkId.Testnet,
       rewardAccount: mocks.rewardAccount,
-      stakeKeyDerivationPath: mocks.stakeKeyDerivationPath,
+      stakeKeyDerivationPath,
       type: AddressType.External
     };
     ({ wallet } = await setupWallet({

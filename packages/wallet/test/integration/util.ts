@@ -11,7 +11,7 @@ import {
   mockRewardsProvider,
   mockTxSubmitProvider,
   mockUtxoProvider
-} from '../mocks';
+} from '../../../core/test/mocks';
 import { testAsyncKeyAgent } from '../../../key-management/test/mocks';
 
 const createDefaultProviders = () => ({

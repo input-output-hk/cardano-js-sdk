@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/consistent-function-scoping */
 /* eslint-disable @typescript-eslint/no-explicit-any, sonarjs/no-duplicate-string */
 import * as Crypto from '@cardano-sdk/crypto';
-import * as mocks from '../mocks';
+import * as mocks from '../../../core/test/mocks';
 import {
   APIErrorCode,
   ApiError,
@@ -36,8 +36,8 @@ import {
   mockTxSubmitProvider,
   utxo as mockUtxo,
   utxosWithLowCoins
-} from '../mocks';
-import { testAsyncKeyAgent } from '../../../key-management/test/mocks';
+} from '../../../core/test/mocks';
+import { stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { waitForWalletStateSettle } from '../util';
 
 type TestProviders = Required<Pick<Providers, 'txSubmitProvider' | 'networkInfoProvider'>>;
@@ -532,7 +532,7 @@ describe('cip30', () => {
           index: 0,
           networkId: Cardano.NetworkId.Testnet,
           rewardAccount: mocks.rewardAccount,
-          stakeKeyDerivationPath: mocks.stakeKeyDerivationPath,
+          stakeKeyDerivationPath,
           type: AddressType.External
         };
         ({ wallet: mockWallet } = await setupWallet({

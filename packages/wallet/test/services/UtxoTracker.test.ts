@@ -6,7 +6,7 @@ import { RetryBackoffConfig } from 'backoff-rxjs';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 import { dummyCbor } from '../util';
 import { dummyLogger } from 'ts-log';
-import { utxo, utxo2 } from '../mocks';
+import { utxo, utxo2 } from '../../../core/test/mocks';
 
 describe('createUtxoTracker', () => {
   // these variables are not relevant for this test, overwriting utxoSource$
