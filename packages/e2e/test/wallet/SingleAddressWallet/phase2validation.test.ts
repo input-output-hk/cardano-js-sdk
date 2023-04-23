@@ -1,13 +1,8 @@
 import { Cardano } from '@cardano-sdk/core';
-import {
-  FinalizeTxProps,
-  InitializeTxProps,
-  SingleAddressWallet,
-  TransactionFailure,
-  buildTx
-} from '@cardano-sdk/wallet';
+import { FinalizeTxProps, InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, isNotNil } from '@cardano-sdk/util';
+import { SingleAddressWallet, TransactionFailure, buildTx } from '@cardano-sdk/wallet';
 import { assertTxIsValid } from '../../../../wallet/test/util';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, map, take } from 'rxjs';

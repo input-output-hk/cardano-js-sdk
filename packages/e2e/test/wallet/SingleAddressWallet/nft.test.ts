@@ -1,6 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { Asset, Cardano, metadatum, nativeScriptPolicyId } from '@cardano-sdk/core';
-import { Assets, FinalizeTxProps, InitializeTxProps, SingleAddressWallet } from '@cardano-sdk/wallet';
+import { Assets, SingleAddressWallet } from '@cardano-sdk/wallet';
+import { FinalizeTxProps, InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { KeyRole, TransactionSigner, util } from '@cardano-sdk/key-management';
 import { burnTokens, createStandaloneKeyAgent, firstValueFromTimed, submitAndConfirm, walletReady } from '../../util';
 import { combineLatest, filter, firstValueFrom, map } from 'rxjs';

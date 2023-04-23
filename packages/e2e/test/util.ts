@@ -29,14 +29,8 @@ import {
   networkInfoProviderFactory,
   walletVariables
 } from '../src';
-import {
-  FinalizeTxProps,
-  InitializeTxProps,
-  ObservableWallet,
-  SignedTx,
-  SingleAddressWallet,
-  buildTx
-} from '@cardano-sdk/wallet';
+import { FinalizeTxProps, InitializeTxProps, SignedTx } from '@cardano-sdk/tx-construction';
+import { ObservableWallet, SingleAddressWallet, buildTx } from '@cardano-sdk/wallet';
 import { assertTxIsValid } from '../../wallet/test/util';
 import { logger } from '@cardano-sdk/util-dev';
 import sortBy from 'lodash/sortBy';

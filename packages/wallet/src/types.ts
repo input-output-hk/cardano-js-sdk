@@ -1,55 +1,12 @@
-import * as Crypto from '@cardano-sdk/crypto';
 import { Asset, Cardano, EpochInfo, EraSummary, NetworkInfoProvider, TxCBOR } from '@cardano-sdk/core';
 import { BalanceTracker, DelegationTracker, TransactionsTracker, UtxoTracker } from './services';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
-import { GroupedAddress, SignTransactionOptions, TransactionSigner, cip8 } from '@cardano-sdk/key-management';
+import { FinalizeTxProps, InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
+import { GroupedAddress, cip8 } from '@cardano-sdk/key-management';
 import { Observable } from 'rxjs';
-import { SelectionSkeleton } from '@cardano-sdk/input-selection';
 import { Shutdown } from '@cardano-sdk/util';
 
-export interface TxProps {
-  auxiliaryData?: Cardano.AuxiliaryData;
-  witness?: {
-    datums?: Cardano.Datum[];
-    redeemers?: Cardano.Redeemer[];
-    bootstrap?: Cardano.BootstrapWitness[];
-    extraSigners?: TransactionSigner[];
-  };
-  scripts?: Cardano.Script[];
-  signingOptions?: SignTransactionOptions;
-}
-
-export interface InitializeTxProps extends TxProps {
-  outputs?: Set<Cardano.TxOut>;
-  certificates?: Cardano.Certificate[];
-  options?: {
-    validityInterval?: Cardano.ValidityInterval;
-  };
-  collaterals?: Set<Cardano.TxIn>;
-  mint?: Cardano.TokenMap;
-  scriptIntegrityHash?: Crypto.Hash32ByteBase16;
-  requiredExtraSignatures?: Crypto.Ed25519KeyHashHex[];
-}
-
-export interface FinalizeTxProps extends TxProps {
-  tx: Cardano.TxBodyWithHash;
-  isValid?: boolean;
-}
-
 export type Assets = Map<Cardano.AssetId, Asset.AssetInfo>;
-
-export interface OutputValidation {
-  minimumCoin: Cardano.Lovelace;
-  coinMissing: Cardano.Lovelace;
-  tokenBundleSizeExceedsLimit: boolean;
-}
-export type MinimumCoinQuantityPerOutput = Map<Cardano.TxOut, OutputValidation>;
-
-export interface InitializeTxPropsValidationResult {
-  minimumCoinQuantities: MinimumCoinQuantityPerOutput;
-}
-
-export type InitializeTxResult = Cardano.TxBodyWithHash & { inputSelection: SelectionSkeleton };
 
 export type SignDataProps = Omit<cip8.Cip30SignDataRequest, 'keyAgent'>;
 

@@ -25,8 +25,9 @@ import {
 } from '@cardano-sdk/core';
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence';
-import { InitializeTxProps, InitializeTxResult, SingleAddressWallet, cip30, setupWallet } from '../../src';
+import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
 import { Providers, createWallet } from './util';
+import { SingleAddressWallet, cip30, setupWallet } from '../../src';
 import { firstValueFrom, of } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
 import {

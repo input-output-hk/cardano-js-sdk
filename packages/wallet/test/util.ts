@@ -2,8 +2,9 @@
 /* eslint-disable jsdoc/require-jsdoc */
 
 import { Cardano, TxCBOR } from '@cardano-sdk/core';
-import { MaybeValidTx, MaybeValidTxOut, ObservableWallet, OutgoingTx, ValidTx, ValidTxOut } from '../src';
+import { MaybeValidTx, MaybeValidTxOut, ValidTx, ValidTxOut } from '@cardano-sdk/tx-construction';
 import { Observable, catchError, filter, firstValueFrom, throwError, timeout } from 'rxjs';
+import { ObservableWallet, OutgoingTx } from '../src';
 
 const SECOND = 1000;
 const MINUTE = 60 * SECOND;

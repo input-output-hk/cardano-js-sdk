@@ -9,20 +9,18 @@ import { of } from 'rxjs';
 import * as mocks from '../../../core/test/mocks';
 import {
   IncompatibleWalletError,
-  ObservableWallet,
   OutputBuilder,
   OutputValidation,
   OutputValidationMinimumCoinError,
   OutputValidationMissingRequiredError,
   OutputValidationTokenBundleSizeError,
   OutputValidator,
-  StakeKeyStatus,
   TxAlreadySubmittedError,
   TxBuilder,
-  TxOutputFailure,
-  buildTx
-} from '../../src';
+  TxOutputFailure
+} from '@cardano-sdk/tx-construction';
 import { KeyRole, SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
+import { ObservableWallet, buildTx } from '../../src';
 import { assertTxIsValid, assertTxOutIsValid } from '../util';
 import { createWallet } from './util';
 
@@ -391,7 +389,7 @@ describe('buildTx', () => {
             nextEpoch: undefined,
             nextNextEpoch: undefined
           },
-          keyStatus: StakeKeyStatus.Registered,
+          keyStatus: Cardano.StakeKeyStatus.Registered,
           rewardBalance: 33_333n
         }
       ]);
@@ -415,7 +413,7 @@ describe('buildTx', () => {
             nextEpoch: undefined,
             nextNextEpoch: undefined
           },
-          keyStatus: StakeKeyStatus.Unregistered,
+          keyStatus: Cardano.StakeKeyStatus.Unregistered,
           rewardBalance: 33_333n
         },
         {
@@ -425,7 +423,7 @@ describe('buildTx', () => {
             nextEpoch: undefined,
             nextNextEpoch: undefined
           },
-          keyStatus: StakeKeyStatus.Unregistered,
+          keyStatus: Cardano.StakeKeyStatus.Unregistered,
           rewardBalance: 44_444n
         }
       ]);
@@ -444,7 +442,7 @@ describe('buildTx', () => {
             nextEpoch: undefined,
             nextNextEpoch: undefined
           },
-          keyStatus: StakeKeyStatus.Registered,
+          keyStatus: Cardano.StakeKeyStatus.Registered,
           rewardBalance: 33_333n
         }
       ]);

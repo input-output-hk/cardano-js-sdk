@@ -1,7 +1,8 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { Cardano, nativeScriptPolicyId } from '@cardano-sdk/core';
-import { FinalizeTxProps, InitializeTxProps, SingleAddressWallet } from '@cardano-sdk/wallet';
+import { FinalizeTxProps, InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { KeyRole, util } from '@cardano-sdk/key-management';
+import { SingleAddressWallet } from '@cardano-sdk/wallet';
 import { burnTokens, createStandaloneKeyAgent, submitAndConfirm, walletReady } from '../../util';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom } from 'rxjs';

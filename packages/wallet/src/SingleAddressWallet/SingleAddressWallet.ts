@@ -1,13 +1,5 @@
 /* eslint-disable unicorn/no-nested-ternary */
-import {
-  AddressType,
-  AsyncKeyAgent,
-  GroupedAddress,
-  SignTransactionOptions,
-  TransactionSigner,
-  cip8,
-  util as keyManagementUtil
-} from '@cardano-sdk/key-management';
+import { AddressType, AsyncKeyAgent, GroupedAddress, cip8 } from '@cardano-sdk/key-management';
 import {
   AssetProvider,
   Cardano,
@@ -23,16 +15,7 @@ import {
   TxSubmitProvider,
   UtxoProvider
 } from '@cardano-sdk/core';
-import {
-  Assets,
-  FinalizeTxProps,
-  InitializeTxProps,
-  InitializeTxResult,
-  ObservableWallet,
-  SignDataProps,
-  SyncStatus,
-  WalletNetworkInfoProvider
-} from '../types';
+import { Assets, ObservableWallet, SignDataProps, SyncStatus, WalletNetworkInfoProvider } from '../types';
 import {
   BalanceTracker,
   ConnectionStatus,
@@ -85,14 +68,20 @@ import {
   tap
 } from 'rxjs';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
+import {
+  FinalizeTxProps,
+  InitializeTxProps,
+  InitializeTxResult,
+  TxBuilderDependencies,
+  finalizeTx,
+  initializeTx
+} from '@cardano-sdk/tx-construction';
 import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
-import { ManagedFreeableScope, Shutdown, contextLogger, deepEquals } from '@cardano-sdk/util';
-import { PrepareTx, createTxPreparer } from './prepareTx';
 import { RetryBackoffConfig } from 'backoff-rxjs';
+import { Shutdown, contextLogger, deepEquals } from '@cardano-sdk/util';
 import { TrackedUtxoProvider } from '../services/ProviderTracker/TrackedUtxoProvider';
 import { WalletStores, createInMemoryWalletStores } from '../persistence';
-import { createTransactionInternals } from '../Transaction';
 import { createTransactionReemitter } from '../services/TransactionReemitter';
 import isEqual from 'lodash/isEqual';
 
@@ -160,7 +149,6 @@ export class SingleAddressWallet implements ObservableWallet {
   #inputSelector: InputSelector;
   #logger: Logger;
   #tip$: TipTracker;
-  #prepareTx: PrepareTx;
   #newTransactions = {
     failedToSubmit$: new Subject<FailedTx>(),
     pending$: new Subject<OutgoingTx>(),
@@ -431,14 +419,11 @@ export class SingleAddressWallet implements ObservableWallet {
       }),
       stores.assets
     );
-    this.util = createWalletUtil(this);
-    this.#prepareTx = createTxPreparer({
-      logger: this.#logger,
-      signer: {
-        stubFinalizeTx: (finalizeTxProps) => from(this.finalizeTx(finalizeTxProps, true))
-      },
-      wallet: this
+    this.util = createWalletUtil({
+      protocolParameters$: this.protocolParameters$,
+      utxo: this.utxo
     });
+
     this.#logger.debug('Created');
   }
 
@@ -447,55 +432,15 @@ export class SingleAddressWallet implements ObservableWallet {
   }
 
   async initializeTx(props: InitializeTxProps): Promise<InitializeTxResult> {
-    const scope = new ManagedFreeableScope();
-    const { constraints, utxo, implicitCoin, validityInterval, changeAddress, withdrawals } = await this.#prepareTx(
-      props
-    );
-    const { selection: inputSelection } = await this.#inputSelector.select({
-      constraints,
-      implicitValue: { coin: implicitCoin, mint: props.mint },
-      outputs: props.outputs || new Set(),
-      utxo: new Set(utxo)
-    });
-    const { body, hash } = await createTransactionInternals({
-      auxiliaryData: props.auxiliaryData,
-      certificates: props.certificates,
-      changeAddress,
-      collaterals: props.collaterals,
-      inputSelection,
-      mint: props.mint,
-      requiredExtraSignatures: props.requiredExtraSignatures,
-      scriptIntegrityHash: props.scriptIntegrityHash,
-      validityInterval,
-      withdrawals
-    });
-
-    scope.dispose();
-    return { body, hash, inputSelection };
+    return initializeTx(props, this.#getTxBuilderDependencies());
   }
 
   async finalizeTx(props: FinalizeTxProps, stubSign = false): Promise<Cardano.Tx> {
-    const addresses = await firstValueFrom(this.addresses$);
-    const signatures = stubSign
-      ? await keyManagementUtil.stubSignTransaction(
-          props.tx.body,
-          addresses,
-          this.util,
-          props.witness?.extraSigners,
-          props.signingOptions
-        )
-      : await this.#getSignatures(props.tx, props.witness?.extraSigners, props.signingOptions);
-    return {
-      auxiliaryData: props.auxiliaryData,
-      body: props.tx.body,
-      id: props.tx.hash,
-      isValid: props.isValid,
-      witness: {
-        ...props.witness,
-        scripts: props.scripts,
-        signatures
-      }
-    };
+    return finalizeTx(
+      { ...props, addresses: await firstValueFrom(this.addresses$) },
+      { inputResolver: this.util, keyAgent: this.keyAgent },
+      stubSign
+    );
   }
 
   async submitTx(
@@ -575,20 +520,21 @@ export class SingleAddressWallet implements ObservableWallet {
     this.#logger.debug('Shutdown');
   }
 
-  async #getSignatures(
-    txInternals: Cardano.TxBodyWithHash,
-    extraSigners?: TransactionSigner[],
-    signingOptions?: SignTransactionOptions
-  ) {
-    const signatures: Cardano.Signatures = await this.keyAgent.signTransaction(txInternals, signingOptions);
-
-    if (extraSigners) {
-      for (const extraSigner of extraSigners) {
-        const extraSignature = await extraSigner.sign(txInternals);
-        signatures.set(extraSignature.pubKey, extraSignature.signature);
+  #getTxBuilderDependencies(): TxBuilderDependencies {
+    return {
+      inputResolver: this.util,
+      inputSelector: this.#inputSelector,
+      keyAgent: this.keyAgent,
+      logger: this.#logger,
+      txBuilderProviders: {
+        addresses: () => firstValueFrom(this.addresses$),
+        changeAddress: () => firstValueFrom(this.addresses$.pipe(map(([{ address: changeAddress }]) => changeAddress))),
+        genesisParameters: () => firstValueFrom(this.genesisParameters$),
+        protocolParameters: () => firstValueFrom(this.protocolParameters$),
+        rewardAccounts: () => firstValueFrom(this.delegation.rewardAccounts$),
+        tip: () => firstValueFrom(this.tip$),
+        utxoAvailable: () => firstValueFrom(this.utxo.available$)
       }
-    }
-
-    return signatures;
+    };
   }
 }
