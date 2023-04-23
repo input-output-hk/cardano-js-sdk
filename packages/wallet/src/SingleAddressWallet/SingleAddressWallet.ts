@@ -23,16 +23,7 @@ import {
   TxSubmitProvider,
   UtxoProvider
 } from '@cardano-sdk/core';
-import {
-  Assets,
-  FinalizeTxProps,
-  InitializeTxProps,
-  InitializeTxResult,
-  ObservableWallet,
-  SignDataProps,
-  SyncStatus,
-  WalletNetworkInfoProvider
-} from '../types';
+import { Assets, ObservableWallet, SignDataProps, SyncStatus, WalletNetworkInfoProvider } from '../types';
 import {
   BalanceTracker,
   ConnectionStatus,
@@ -85,6 +76,12 @@ import {
   tap
 } from 'rxjs';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
+import {
+  FinalizeTxProps,
+  InitializeTxProps,
+  InitializeTxResult,
+  createTransactionInternals
+} from '@cardano-sdk/tx-construction';
 import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
 import { ManagedFreeableScope, Shutdown, contextLogger, deepEquals } from '@cardano-sdk/util';
@@ -92,7 +89,6 @@ import { PrepareTx, createTxPreparer } from './prepareTx';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackedUtxoProvider } from '../services/ProviderTracker/TrackedUtxoProvider';
 import { WalletStores, createInMemoryWalletStores } from '../persistence';
-import { createTransactionInternals } from '../Transaction';
 import { createTransactionReemitter } from '../services/TransactionReemitter';
 import isEqual from 'lodash/isEqual';
 

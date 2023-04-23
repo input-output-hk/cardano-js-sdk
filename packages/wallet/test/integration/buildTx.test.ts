@@ -11,7 +11,6 @@ import {
   IncompatibleWalletError,
   ObservableWallet,
   OutputBuilder,
-  OutputValidation,
   OutputValidationMinimumCoinError,
   OutputValidationMissingRequiredError,
   OutputValidationTokenBundleSizeError,
@@ -23,6 +22,7 @@ import {
   buildTx
 } from '../../src';
 import { KeyRole, SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
+import { OutputValidation } from '@cardano-sdk/tx-construction';
 import { assertTxIsValid, assertTxOutIsValid } from '../util';
 import { createWallet } from './util';
 

@@ -11,7 +11,8 @@ import {
 } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { CML, Cardano } from '@cardano-sdk/core';
-import { InitializeTxProps, InitializeTxResult, SingleAddressWallet, setupWallet } from '../../src';
+import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
+import { SingleAddressWallet, setupWallet } from '../../src';
 import { dummyLogger as logger } from 'ts-log';
 import { mockKeyAgentDependencies } from '../../../key-management/test/mocks';
 import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';

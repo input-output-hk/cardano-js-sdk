@@ -2,8 +2,12 @@
 import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
 import { Observable, firstValueFrom } from 'rxjs';
-import { ObservableWallet, OutputValidation } from '../types';
-import { computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit } from '@cardano-sdk/tx-construction';
+import { ObservableWallet } from '../types';
+import {
+  OutputValidation,
+  computeMinimumCoinQuantity,
+  tokenBundleSizeExceedsLimit
+} from '@cardano-sdk/tx-construction';
 import { txInEquals } from './util';
 import uniqBy from 'lodash/uniqBy';
 

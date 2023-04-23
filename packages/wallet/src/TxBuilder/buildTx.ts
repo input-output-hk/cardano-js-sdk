@@ -1,6 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
-import { FinalizeTxProps, InitializeTxProps, InitializeTxResult, ObservableWallet } from '../types';
+import { FinalizeTxProps, InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
 import {
   IncompatibleWalletError,
   MaybeValidTx,
@@ -15,6 +15,7 @@ import {
 } from './types';
 import { Logger } from 'ts-log';
 import { Observable, firstValueFrom } from 'rxjs';
+import { ObservableWallet } from '../types';
 import { ObservableWalletTxOutputBuilder } from './OutputBuilder';
 import { OutputValidator, RewardAccount, StakeKeyStatus, WalletUtilContext, createWalletUtil } from '../services';
 import { SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';

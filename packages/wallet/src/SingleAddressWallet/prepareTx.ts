@@ -1,9 +1,14 @@
 import { Cardano } from '@cardano-sdk/core';
-import { FinalizeTxProps, InitializeTxProps, ObservableWallet } from '../types';
+import {
+  FinalizeTxProps,
+  InitializeTxProps,
+  createTransactionInternals,
+  defaultSelectionConstraints
+} from '@cardano-sdk/tx-construction';
 import { Logger } from 'ts-log';
 import { Observable, combineLatest, filter, firstValueFrom, lastValueFrom, map, take } from 'rxjs';
-import { createTransactionInternals, ensureValidityInterval } from '../Transaction';
-import { defaultSelectionConstraints } from '@cardano-sdk/tx-construction';
+import { ObservableWallet } from '../types';
+import { ensureValidityInterval } from '../Transaction';
 
 export interface PrepareTxDependencies {
   wallet: Pick<ObservableWallet, 'tip$' | 'protocolParameters$' | 'addresses$' | 'genesisParameters$'> & {

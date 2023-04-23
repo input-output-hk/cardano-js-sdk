@@ -10,7 +10,7 @@ import {
   OutputValidationTokenBundleSizeError,
   PartialTxOut
 } from './types';
-import { OutputValidation } from '../types';
+import { OutputValidation } from '@cardano-sdk/tx-construction';
 import { OutputValidator } from '../services';
 
 /** Properties needed to construct an {@link ObservableWalletTxOutputBuilder} */
