@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Cardano } from '@cardano-sdk/core';
 import { ChildProcess, fork } from 'child_process';
-import { InitializeTxResult, ObservableWallet } from '@cardano-sdk/wallet';
+import { InitializeTxResult } from '@cardano-sdk/tx-construction';
+import { ObservableWallet } from '@cardano-sdk/wallet';
 import { RabbitMQContainer } from '../../../cardano-services/test/TxSubmit/rabbitmq/docker';
 import { ServiceNames } from '@cardano-sdk/cardano-services';
 import { createLogger } from '@cardano-sdk/util-dev';

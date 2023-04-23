@@ -3,13 +3,13 @@ import { firstValueFrom, of } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 
 import * as mocks from '../../../core/test/mocks';
-import { RewardAccount, SingleAddressWallet, StakeKeyStatus, TransactionFailure, buildTx } from '../../src';
+import { SingleAddressWallet, TransactionFailure, buildTx } from '../../src';
 import { assertTxIsValid } from '../util';
 import { createWallet } from './util';
 
 describe('integration/withdrawal', () => {
   let wallet: SingleAddressWallet;
-  let rewardAccounts: RewardAccount[];
+  let rewardAccounts: Cardano.RewardAccountInfo[];
 
   beforeEach(async () => {
     ({ wallet } = await createWallet());
@@ -21,7 +21,7 @@ describe('integration/withdrawal', () => {
           nextEpoch: undefined,
           nextNextEpoch: undefined
         },
-        keyStatus: StakeKeyStatus.Registered,
+        keyStatus: Cardano.StakeKeyStatus.Registered,
         rewardBalance: 33_333n
       },
       {
@@ -31,7 +31,7 @@ describe('integration/withdrawal', () => {
           nextEpoch: undefined,
           nextNextEpoch: undefined
         },
-        keyStatus: StakeKeyStatus.Unregistered,
+        keyStatus: Cardano.StakeKeyStatus.Unregistered,
         rewardBalance: 44_444n
       }
     ];

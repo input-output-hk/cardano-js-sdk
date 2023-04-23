@@ -1,4 +1,3 @@
-export * as Transaction from './Transaction';
 export * from './SingleAddressWallet';
 export * from './types';
 export * from './services';

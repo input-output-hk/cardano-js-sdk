@@ -1,7 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
-
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { Logger } from 'ts-log';
+
 import {
   MaybeValidTxOut,
   OutputBuilder,
@@ -10,10 +10,9 @@ import {
   OutputValidationTokenBundleSizeError,
   PartialTxOut
 } from './types';
-import { OutputValidation } from '../types';
-import { OutputValidator } from '../services';
+import { OutputValidation, OutputValidator } from '../output-validation';
 
-/** Properties needed to construct an {@link ObservableWalletTxOutputBuilder} */
+/** Properties needed to construct a {@link TxOutputBuilder} */
 export interface OutputBuilderProps {
   /** This validator is normally created and passed as an arg here by the {@link TxBuilder.buildOutput} method */
   outputValidator: OutputValidator;
@@ -23,7 +22,7 @@ export interface OutputBuilderProps {
   logger: Logger;
 }
 
-/** Determines if the `PartialTxOut` arg have at least an address and coins. */
+/** Determines if the `PartialTxOut` arg has at least an address and coins. */
 const isViableTxOut = (txOut: PartialTxOut): txOut is Cardano.TxOut => !!(txOut?.address && txOut?.value?.coins);
 
 /**
@@ -43,11 +42,11 @@ const toOutputValidationError = (
 };
 
 /**
- * `OutputBuilder` implementation based on the minimal wallet type: {@link ObservableWalletTxBuilderDependencies}.
+ * `OutputBuilder` implementation based on {@link OutputValidator}.
  */
-export class ObservableWalletTxOutputBuilder implements OutputBuilder {
+export class TxOutputBuilder implements OutputBuilder {
   /**
-   * Transaction output that is updated by `ObservableWalletTxOutputBuilder` methods.
+   * Transaction output that is updated by `TxOutputBuilder` methods.
    * Every method call recreates the `partialOutput`, thus updating it immutably.
    */
   #partialOutput: PartialTxOut;

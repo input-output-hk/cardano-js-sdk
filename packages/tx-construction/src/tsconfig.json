@@ -11,7 +11,13 @@
       "path": "../../core/src"
     },
     {
+      "path": "../../crypto/src"
+    },
+    {
       "path": "../../input-selection/src"
+    },
+    {
+      "path": "../../key-management/src"
     }
   ]
 }
