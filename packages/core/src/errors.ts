@@ -4,6 +4,7 @@ import { CustomError } from 'ts-custom-error';
 export enum ProviderFailure {
   NotFound = 'NOT_FOUND',
   Unknown = 'UNKNOWN',
+  Forbidden = 'FORBIDDEN',
   InvalidResponse = 'INVALID_RESPONSE',
   NotImplemented = 'NOT_IMPLEMENTED',
   Unhealthy = 'UNHEALTHY',
@@ -14,6 +15,7 @@ export enum ProviderFailure {
 
 export const providerFailureToStatusCodeMap: { [key in ProviderFailure]: number } = {
   [ProviderFailure.BadRequest]: 400,
+  [ProviderFailure.Forbidden]: 403,
   [ProviderFailure.NotFound]: 404,
   [ProviderFailure.Unhealthy]: 500,
   [ProviderFailure.Unknown]: 500,

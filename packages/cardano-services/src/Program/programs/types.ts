@@ -29,6 +29,7 @@ export enum ServiceNames {
 export enum ProviderServerOptionDescriptions {
   CardanoNodeConfigPath = 'Cardano node config path',
   DbCacheTtl = 'Cache TTL in seconds between 60 and 172800 (two days), an option for database related operations',
+  AllowedOrigins = 'List of allowed CORS origins separated by comma',
   DisableDbCache = 'Disable DB cache',
   DisableStakePoolMetricApy = 'Omit this metric for improved query performance',
   EpochPollInterval = 'Epoch poll interval',
@@ -43,6 +44,7 @@ export type ProviderServerArgs = CommonProgramOptions &
   PosgresProgramOptions &
   OgmiosProgramOptions &
   RabbitMqProgramOptions & {
+    allowedOrigins?: string[];
     cardanoNodeConfigPath?: string;
     disableDbCache?: boolean;
     disableStakePoolMetricApy?: boolean;

@@ -10,14 +10,22 @@ import waitOn from 'wait-on';
 type WrappedAsyncTestFunction = (db: Pool) => Promise<any>;
 type AsyncTestFunction = () => Promise<any>;
 
-export const serverReady = (apiUrl: string, statusCodeMatch = 404): Promise<void> =>
+/**
+ * Consider the server started when the base API url returns 404 status code
+ *
+ * @param apiUrl server base url
+ * @param statusCodeMatch expected status code to validate with
+ * @param headers headers needed in case of CORS enabled
+ */
+export const serverStarted = (apiUrl: string, statusCodeMatch = 404, headers?: Record<string, any>): Promise<void> =>
   waitOn({
+    headers,
     resources: [apiUrl],
     validateStatus: (status: number) => status === statusCodeMatch
   });
 
 export const ogmiosServerReady = (connection: Ogmios.Connection): Promise<void> =>
-  serverReady(connection.address.http, 405);
+  serverStarted(connection.address.http, 405);
 
 export const createHealthyMockOgmiosServer = (submitTxHook?: () => void) =>
   createMockOgmiosServer({

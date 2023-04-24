@@ -11,7 +11,12 @@ import { Ogmios } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { RabbitMQContainer } from './TxSubmit/rabbitmq/docker';
 import { ServerMetadata, ServiceNames } from '../src';
-import { createHealthyMockOgmiosServer, createUnhealthyMockOgmiosServer, ogmiosServerReady, serverReady } from './util';
+import {
+  createHealthyMockOgmiosServer,
+  createUnhealthyMockOgmiosServer,
+  ogmiosServerReady,
+  serverStarted
+} from './util';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { fromSerializableObject } from '@cardano-sdk/util';
 import { getRandomPort } from 'get-port-please';
@@ -44,7 +49,7 @@ const assertServiceHealthy = async (
     withTip?: boolean;
   }
 ) => {
-  await serverReady(apiUrl);
+  await serverStarted(apiUrl);
   const headers = { 'Content-Type': 'application/json' };
   const res = await axios.post(`${apiUrl}/${serviceName}/health`, { headers });
   const { unhealthy, usedQueue, withTip } = { withTip: true, ...options };
@@ -65,9 +70,22 @@ const assertServiceHealthy = async (
   else expect(res.data).toEqual(healthCheckResponse);
 };
 
+const assertServerWithCORSHeaders = async (apiUrl: string, origin: string) => {
+  expect.assertions(2);
+  const headers = { 'Content-Type': 'application/json', Origin: origin };
+  await serverStarted(apiUrl, 404, headers);
+  try {
+    const res = await axios.get(`${apiUrl}/health`, { headers });
+    expect(res.headers['access-control-allow-origin']).toEqual(origin);
+    expect(res.data).toBeDefined();
+  } catch (error) {
+    expect((error as AxiosError).response!.status).toBe(403);
+  }
+};
+
 const assertMetricsEndpoint = async (apiUrl: string, assertFound: boolean) => {
   expect.assertions(1);
-  await serverReady(apiUrl);
+  await serverStarted(apiUrl);
   const headers = { 'Content-Type': 'application/json' };
   try {
     const res = await axios.get(`${apiUrl}/metrics`, { headers });
@@ -79,7 +97,7 @@ const assertMetricsEndpoint = async (apiUrl: string, assertFound: boolean) => {
 
 const assertMetaEndpoint = async (apiUrl: string, dataMatch: any) => {
   expect.assertions(1);
-  await serverReady(apiUrl);
+  await serverStarted(apiUrl);
   const headers = { 'Content-Type': 'application/json' };
   try {
     const res = await axios.get(`${apiUrl}/meta`, { headers });
@@ -91,7 +109,7 @@ const assertMetaEndpoint = async (apiUrl: string, dataMatch: any) => {
 
 const assertStakePoolApyInResponse = async (apiUrl: string, assertFound: boolean) => {
   expect.assertions(1);
-  await serverReady(apiUrl);
+  await serverStarted(apiUrl);
   const headers = { 'Content-Type': 'application/json' };
   const res = await axios.post(`${apiUrl}/stake-pool/search`, { headers, pagination: { limit: 1, startAt: 0 } });
   const apy = res.data.pageResults[0].metrics.apy;
@@ -377,6 +395,54 @@ describe('CLI', () => {
             );
 
             await assertMetricsEndpoint(apiUrl, false);
+          });
+
+          describe('exposes a HTTP server with CORS header configuration', () => {
+            const allowedOrigin = 'http://cardano.com';
+
+            it('using CLI options', async () => {
+              proc = withLogging(
+                fork(
+                  exePath,
+                  [
+                    ...baseArgs,
+                    '--api-url',
+                    apiUrl,
+                    '--allowed-origins',
+                    allowedOrigin,
+                    '--postgres-connection-string',
+                    postgresConnectionString,
+                    '--ogmios-url',
+                    ogmiosConnection.address.webSocket,
+                    '--db-cache-ttl',
+                    dbCacheTtl,
+                    ServiceNames.Asset
+                  ],
+                  { env: {}, stdio: 'pipe' }
+                )
+              );
+
+              await assertServerWithCORSHeaders(apiUrl, allowedOrigin);
+            });
+
+            it('using env variables', async () => {
+              proc = withLogging(
+                fork(exePath, ['start-provider-server'], {
+                  env: {
+                    ALLOWED_ORIGINS: allowedOrigin,
+                    API_URL: apiUrl,
+                    DB_CACHE_TTL: dbCacheTtl,
+                    LOGGER_MIN_SEVERITY: 'error',
+                    OGMIOS_URL: ogmiosConnection.address.webSocket,
+                    POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                    SERVICE_NAMES: ServiceNames.Asset
+                  },
+                  stdio: 'pipe'
+                })
+              );
+
+              await assertServerWithCORSHeaders(apiUrl, allowedOrigin);
+            });
           });
 
           describe('exposes a HTTP server with /meta endpoint', () => {

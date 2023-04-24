@@ -68,7 +68,7 @@ WORKDIR /app/packages/cardano-services
 COPY packages/cardano-services/config/network/${NETWORK} /config/
 EXPOSE 3000
 HEALTHCHECK --interval=15s --timeout=15s \
-  CMD curl --fail --silent http://0.0.0.0:3000/health | jq '.ok' | awk '{ if ($0 == "true") exit 0; else exit 1}'
+  CMD curl --fail --silent -H 'Origin: http://0.0.0.0:3000' http://0.0.0.0:3000/health | jq '.ok' | awk '{ if ($0 == "true") exit 0; else exit 1}'
 CMD ["node", "dist/cjs/cli.js", "start-provider-server"]
 
 FROM cardano-services as worker
