@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.9.0-nightly.1...@cardano-sdk/util@0.9.0-nightly.2) (2023-04-24)
+
+### ⚠ BREAKING CHANGES
+
+- hoist patchObject from util-dev to util package
+- simplify projection Sink to be an operator
+
+### Code Refactoring
+
+- hoist patchObject from util-dev to util package ([bea7e03](https://github.com/input-output-hk/cardano-js-sdk/commit/bea7e035ebdcd7241b6f3cc8feb5fbcfdb90fa46))
+- simplify projection Sink to be an operator ([d9c6826](https://github.com/input-output-hk/cardano-js-sdk/commit/d9c68265d63300d26eb73ca93f5ee8be7ff51a12))
+
 ## [0.9.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.9.0-nightly.0...@cardano-sdk/util@0.9.0-nightly.1) (2023-03-31)
 
 ### Bug Fixes

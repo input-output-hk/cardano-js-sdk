@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.9.1-nightly.8...@cardano-sdk/e2e@0.10.0-nightly.0) (2023-04-24)
+
+### ⚠ BREAKING CHANGES
+
+- - renamed `TransactionsTracker.outgoing.confirmed$` to `onChain$`
+
+* renamed `TransactionReemitterProps.transactions.outgoing.confirmed$` to `onChain$`
+* renamed web-extension `observableWalletProperties.transactions.outgoing.confirmed$`
+  to `onChain$`
+* rename ConfirmedTx to OutgoingOnChainTx
+* renamed OutgoingOnChainTx.confirmedAt to `slot`
+
+- **wallet:** `AssetsTrackerProps.balanceTracker` was replaced
+  by `transactionsTracker`
+- rename ObservableWallet assets$ to assetInfo$
+- rename AssetInfo 'quantity' to 'supply'
+- remove one layer of projection abstraction
+- **projection:** convert projectIntoSink into rxjs operator
+- simplify projection Sink to be an operator
+
+### Features
+
+- **wallet:** emit historical data on assetInfo$ ([12cac96](https://github.com/input-output-hk/cardano-js-sdk/commit/12cac96852a2591dd27727296d6c3b3fda4e0c56))
+
+### Code Refactoring
+
+- **projection:** convert projectIntoSink into rxjs operator ([490ca1b](https://github.com/input-output-hk/cardano-js-sdk/commit/490ca1b7f0f92e4fa84179ba3fb265ee68dee735))
+- remove one layer of projection abstraction ([6a0eca9](https://github.com/input-output-hk/cardano-js-sdk/commit/6a0eca92d1b6507e7143bfb5a93974b59757d5c5))
+- rename AssetInfo 'quantity' to 'supply' ([6e28df4](https://github.com/input-output-hk/cardano-js-sdk/commit/6e28df412797974b8ce6f6deb0c3346ff5938a05))
+- rename confirmed$ to onChain$ ([0de59dd](https://github.com/input-output-hk/cardano-js-sdk/commit/0de59dd335d065a85a4467bb501b041d889311b5))
+- rename ObservableWallet assets$ to assetInfo$ ([d6b759c](https://github.com/input-output-hk/cardano-js-sdk/commit/d6b759cd2d8db12313a166259277a2c79149e5f9))
+- simplify projection Sink to be an operator ([d9c6826](https://github.com/input-output-hk/cardano-js-sdk/commit/d9c68265d63300d26eb73ca93f5ee8be7ff51a12))
+
 ## [0.9.1-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.9.1-nightly.7...@cardano-sdk/e2e@0.9.1-nightly.8) (2023-04-18)
 
 **Note:** Version bump only for package @cardano-sdk/e2e

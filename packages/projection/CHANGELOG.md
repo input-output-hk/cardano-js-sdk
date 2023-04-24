@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.6.0-nightly.4...@cardano-sdk/projection@0.6.0-nightly.5) (2023-04-24)
+
+### ⚠ BREAKING CHANGES
+
+- remove one layer of projection abstraction
+- **projection:** convert projectIntoSink into rxjs operator
+- simplify projection Sink to be an operator
+
+### Features
+
+- **projection:** add stakePoolMetadata and stakePoolMetrics projection types ([ae85933](https://github.com/input-output-hk/cardano-js-sdk/commit/ae859332a959d1966c0b5eba19cc8f86f88e94b8))
+- **projection:** add withMint mapper ([8986bfc](https://github.com/input-output-hk/cardano-js-sdk/commit/8986bfcd732842198681b1e292162f6182786a25))
+- **projection:** add withUtxo and filterProducedUtxoByAddresses mappers ([bf3ea27](https://github.com/input-output-hk/cardano-js-sdk/commit/bf3ea27cfc9a3a0a0e55059a5a70f2daade8fcc2))
+
+### Code Refactoring
+
+- **projection:** convert projectIntoSink into rxjs operator ([490ca1b](https://github.com/input-output-hk/cardano-js-sdk/commit/490ca1b7f0f92e4fa84179ba3fb265ee68dee735))
+- remove one layer of projection abstraction ([6a0eca9](https://github.com/input-output-hk/cardano-js-sdk/commit/6a0eca92d1b6507e7143bfb5a93974b59757d5c5))
+- simplify projection Sink to be an operator ([d9c6826](https://github.com/input-output-hk/cardano-js-sdk/commit/d9c68265d63300d26eb73ca93f5ee8be7ff51a12))
+
 ## [0.6.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.6.0-nightly.3...@cardano-sdk/projection@0.6.0-nightly.4) (2023-04-18)
 
 **Note:** Version bump only for package @cardano-sdk/projection

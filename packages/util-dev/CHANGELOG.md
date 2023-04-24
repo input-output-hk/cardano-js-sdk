@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.8.1-nightly.6...@cardano-sdk/util-dev@0.9.0-nightly.0) (2023-04-24)
+
+### ⚠ BREAKING CHANGES
+
+- hoist patchObject from util-dev to util package
+
+### Features
+
+- **util-dev:** add new chainSync dataset (WithMint) ([1a22f8a](https://github.com/input-output-hk/cardano-js-sdk/commit/1a22f8af04210968d2a4680334e3a82636846835))
+
+### Bug Fixes
+
+- **util-dev:** change hash of replayed block after rollback ([3d8c558](https://github.com/input-output-hk/cardano-js-sdk/commit/3d8c5583fb631c30bb9a933c8a401254e3a8aa4b))
+
+### Code Refactoring
+
+- hoist patchObject from util-dev to util package ([bea7e03](https://github.com/input-output-hk/cardano-js-sdk/commit/bea7e035ebdcd7241b6f3cc8feb5fbcfdb90fa46))
+
 ## [0.8.1-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.8.1-nightly.5...@cardano-sdk/util-dev@0.8.1-nightly.6) (2023-04-18)
 
 **Note:** Version bump only for package @cardano-sdk/util-dev

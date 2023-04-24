@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.0-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.11.0-nightly.7...@cardano-sdk/cardano-services@0.11.0-nightly.8) (2023-04-24)
+
+### ⚠ BREAKING CHANGES
+
+- rename AssetInfo 'quantity' to 'supply'
+- **cardano-services:** remove obsolete NetworkInfo openApi path
+  /network-info/current-wallet-protocol-parameters.
+
+### Features
+
+- add CORS headers config in provider server ([25010cf](https://github.com/input-output-hk/cardano-js-sdk/commit/25010cf752bf31c46268e8ea31f78b00583f9032))
+- **cardano-services:** log all queries with execution time ([3876b7f](https://github.com/input-output-hk/cardano-js-sdk/commit/3876b7fb17e583410cf2038bb752fee48b7b148d))
+- **cardano-services:** optimizes get assets queries ([7aebf26](https://github.com/input-output-hk/cardano-js-sdk/commit/7aebf269ecbec142be0b076fb0a7b37d8e733432))
+
+### Bug Fixes
+
+- **cardano-services:** remove duplicate protocolParams operation id ([de22def](https://github.com/input-output-hk/cardano-js-sdk/commit/de22defa8934ece76818745b9230b76acfc65a38))
+
+### Code Refactoring
+
+- rename AssetInfo 'quantity' to 'supply' ([6e28df4](https://github.com/input-output-hk/cardano-js-sdk/commit/6e28df412797974b8ce6f6deb0c3346ff5938a05))
+
 ## [0.11.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.11.0-nightly.6...@cardano-sdk/cardano-services@0.11.0-nightly.7) (2023-04-18)
 
 ### ⚠ BREAKING CHANGES

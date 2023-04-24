@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.7-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.4.7-nightly.4...@cardano-sdk/util-rxjs@0.4.7-nightly.5) (2023-04-24)
+
+### Features
+
+- **util-rxjs:** add shareRetryBackoff operator ([b0f5eb5](https://github.com/input-output-hk/cardano-js-sdk/commit/b0f5eb5fe06c26eb7eece263017f11fb151b9101))
+
 ## [0.4.7-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.4.7-nightly.3...@cardano-sdk/util-rxjs@0.4.7-nightly.4) (2023-04-18)
 
 ### Features

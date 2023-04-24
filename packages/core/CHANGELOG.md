@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.11.0-nightly.6...@cardano-sdk/core@0.11.0-nightly.7) (2023-04-24)
+
+### ⚠ BREAKING CHANGES
+
+- rename AssetInfo 'quantity' to 'supply'
+
+### Features
+
+- add CORS headers config in provider server ([25010cf](https://github.com/input-output-hk/cardano-js-sdk/commit/25010cf752bf31c46268e8ea31f78b00583f9032))
+
+### Code Refactoring
+
+- rename AssetInfo 'quantity' to 'supply' ([6e28df4](https://github.com/input-output-hk/cardano-js-sdk/commit/6e28df412797974b8ce6f6deb0c3346ff5938a05))
+
 ## [0.11.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.11.0-nightly.5...@cardano-sdk/core@0.11.0-nightly.6) (2023-04-18)
 
 ### ⚠ BREAKING CHANGES

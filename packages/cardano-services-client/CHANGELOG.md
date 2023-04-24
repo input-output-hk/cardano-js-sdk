@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.9.0-nightly.0...@cardano-sdk/cardano-services-client@0.9.0-nightly.1) (2023-04-24)
+
+### ⚠ BREAKING CHANGES
+
+- rename AssetInfo 'quantity' to 'supply'
+
+### Code Refactoring
+
+- rename AssetInfo 'quantity' to 'supply' ([6e28df4](https://github.com/input-output-hk/cardano-js-sdk/commit/6e28df412797974b8ce6f6deb0c3346ff5938a05))
+
 ## [0.9.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.8.1-nightly.5...@cardano-sdk/cardano-services-client@0.9.0-nightly.0) (2023-04-18)
 
 ### ⚠ BREAKING CHANGES

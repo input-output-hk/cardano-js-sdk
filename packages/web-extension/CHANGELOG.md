@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.8.3-nightly.8...@cardano-sdk/web-extension@0.9.0-nightly.0) (2023-04-24)
+
+### ⚠ BREAKING CHANGES
+
+- - renamed `TransactionsTracker.outgoing.confirmed$` to `onChain$`
+
+* renamed `TransactionReemitterProps.transactions.outgoing.confirmed$` to `onChain$`
+* renamed web-extension `observableWalletProperties.transactions.outgoing.confirmed$`
+  to `onChain$`
+* rename ConfirmedTx to OutgoingOnChainTx
+* renamed OutgoingOnChainTx.confirmedAt to `slot`
+
+- rename ObservableWallet assets$ to assetInfo$
+
+### Code Refactoring
+
+- rename confirmed$ to onChain$ ([0de59dd](https://github.com/input-output-hk/cardano-js-sdk/commit/0de59dd335d065a85a4467bb501b041d889311b5))
+- rename ObservableWallet assets$ to assetInfo$ ([d6b759c](https://github.com/input-output-hk/cardano-js-sdk/commit/d6b759cd2d8db12313a166259277a2c79149e5f9))
+
 ## [0.8.3-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.8.3-nightly.7...@cardano-sdk/web-extension@0.8.3-nightly.8) (2023-04-18)
 
 **Note:** Version bump only for package @cardano-sdk/web-extension

@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.0-nightly.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.11.0-nightly.8...@cardano-sdk/wallet@0.11.0-nightly.9) (2023-04-24)
+
+### ⚠ BREAKING CHANGES
+
+- - renamed `TransactionsTracker.outgoing.confirmed$` to `onChain$`
+
+* renamed `TransactionReemitterProps.transactions.outgoing.confirmed$` to `onChain$`
+* renamed web-extension `observableWalletProperties.transactions.outgoing.confirmed$`
+  to `onChain$`
+* rename ConfirmedTx to OutgoingOnChainTx
+* renamed OutgoingOnChainTx.confirmedAt to `slot`
+
+- **wallet:** `AssetsTrackerProps.balanceTracker` was replaced
+  by `transactionsTracker`
+- rename ObservableWallet assets$ to assetInfo$
+- rename AssetInfo 'quantity' to 'supply'
+
+### Features
+
+- **wallet:** emit historical data on assetInfo$ ([12cac96](https://github.com/input-output-hk/cardano-js-sdk/commit/12cac96852a2591dd27727296d6c3b3fda4e0c56))
+
+### Code Refactoring
+
+- rename AssetInfo 'quantity' to 'supply' ([6e28df4](https://github.com/input-output-hk/cardano-js-sdk/commit/6e28df412797974b8ce6f6deb0c3346ff5938a05))
+- rename confirmed$ to onChain$ ([0de59dd](https://github.com/input-output-hk/cardano-js-sdk/commit/0de59dd335d065a85a4467bb501b041d889311b5))
+- rename ObservableWallet assets$ to assetInfo$ ([d6b759c](https://github.com/input-output-hk/cardano-js-sdk/commit/d6b759cd2d8db12313a166259277a2c79149e5f9))
+
 ## [0.11.0-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.11.0-nightly.7...@cardano-sdk/wallet@0.11.0-nightly.8) (2023-04-18)
 
 ### ⚠ BREAKING CHANGES

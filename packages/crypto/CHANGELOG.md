@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.4-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/crypto@0.1.4-nightly.3...@cardano-sdk/crypto@0.1.4-nightly.4) (2023-04-24)
+
+**Note:** Version bump only for package @cardano-sdk/crypto
+
 ## [0.1.4-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/crypto@0.1.4-nightly.2...@cardano-sdk/crypto@0.1.4-nightly.3) (2023-03-31)
 
 ### Bug Fixes
