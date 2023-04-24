@@ -37,11 +37,7 @@ export class HttpServer extends RunnableModule {
       this.#dependencies.services.map((service) =>
         service
           .healthCheck()
-          .then((details) => {
-            const { ok } = details;
-
-            return { ...(ok ? { details } : undefined), name: service.name, ok };
-          })
+          .then((details) => ({ ...details, name: service.name }))
           .catch((error) => {
             this.logger.error(error);
             return { name: service.name, ok: false };
