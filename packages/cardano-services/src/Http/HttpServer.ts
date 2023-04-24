@@ -213,6 +213,7 @@ export class HttpServer extends RunnableModule {
     });
     this.app.use(
       expressPromBundle({
+        buckets: [0.003, 0.03, 0.1, 0.3, 1.5, 3, 5, 8, 12, 20, 30],
         includeMethod: true,
         includePath: true,
         promRegistry,
