@@ -1,5 +1,5 @@
 import { DockerUtil } from '@cardano-sdk/util-dev';
-import { connectionConfig } from '../connection';
+import { connectionConfig } from '../util';
 
 module.exports = async () => {
   await DockerUtil.setupPostgresContainer(

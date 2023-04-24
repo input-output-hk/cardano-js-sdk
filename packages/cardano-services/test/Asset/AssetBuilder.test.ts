@@ -45,8 +45,9 @@ describe('AssetBuilder', () => {
       expect(() => Cardano.AssetFingerprint(ma.fingerprint)).not.toThrow();
       expect(ma.fingerprint).toEqual(Cardano.AssetFingerprint.fromParts(assets[0].policyId, assets[0].name));
       expect(ma).toMatchShapeOf({
+        count: '123',
         fingerprint: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65',
-        id: '590675'
+        sum: '42'
       });
     });
     test('return undefined when not found', async () => {
@@ -67,17 +68,6 @@ describe('AssetBuilder', () => {
     test('return empty array when not found', async () => {
       const result = await builder.queryMultiAssetHistory(notValidPolicyId, notValidAssetName);
       expect(result).toStrictEqual([]);
-    });
-  });
-
-  describe('queryMultiAssetQuantities', () => {
-    test('query multi_asset', async () => {
-      const result = await builder.queryMultiAssetQuantities('1');
-      expect(result).toMatchShapeOf({ count: '1', sum: '1' });
-    });
-    test('return the record with empty data when not found', async () => {
-      const result = await builder.queryMultiAssetQuantities('9999999');
-      expect(result).toMatchShapeOf({ count: '0', sum: null });
     });
   });
 });

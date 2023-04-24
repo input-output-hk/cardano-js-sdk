@@ -1,4 +1,4 @@
-import { ProjectorOperator } from '../../types';
+import { ExtChainSyncOperator } from '../../types';
 
 /**
  * Wrap an operator to easily infer extra props of source observable
@@ -10,7 +10,7 @@ export const inferProjectorEventType =
     ExtraRollForwardPropsOut,
     ExtraRollBackwardPropsOut
   >(
-    operator: ProjectorOperator<
+    operator: ExtChainSyncOperator<
       OperatorExtraRollForwardPropsIn,
       OperatorExtraRollBackwardPropsIn,
       ExtraRollForwardPropsOut,
@@ -20,7 +20,7 @@ export const inferProjectorEventType =
   <
     SourceExtraRollForwardPropsIn extends OperatorExtraRollForwardPropsIn,
     SourceExtraRollBackwardPropsIn extends OperatorExtraRollBackwardPropsIn
-  >(): ProjectorOperator<
+  >(): ExtChainSyncOperator<
     SourceExtraRollForwardPropsIn,
     SourceExtraRollBackwardPropsIn,
     ExtraRollForwardPropsOut,

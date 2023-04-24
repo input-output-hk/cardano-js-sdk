@@ -1,8 +1,8 @@
-import { ChainSyncEventType, Intersection } from '@cardano-sdk/core';
+import { Cardano, ChainSyncEventType, Intersection } from '@cardano-sdk/core';
 import { GeneratorMetadata } from '../Content';
 import { Logger } from 'ts-log';
 import { Ogmios, ogmiosToCore } from '@cardano-sdk/ogmios';
-import type { SerializedChainSyncEvent } from '@cardano-sdk/util-dev';
+import { SerializedChainSyncEvent, generateRandomHexString } from '@cardano-sdk/util-dev';
 
 type CardanoMetadata = Pick<GeneratorMetadata['metadata'], 'cardano'>;
 
@@ -13,6 +13,7 @@ export type GetChainSyncEventsResponse = {
 
 type RequestedBlocks = { [blockHeight: number]: Ogmios.Schema.Block };
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 const blocksWithRollbacks = (blockHeights: number[], requestedBlocks: RequestedBlocks): SerializedChainSyncEvent[] => {
   const result: SerializedChainSyncEvent[] = [];
   for (const blockHeight of blockHeights) {
@@ -20,21 +21,39 @@ const blocksWithRollbacks = (blockHeights: number[], requestedBlocks: RequestedB
       const requestedBlock = requestedBlocks[blockHeight];
       if (!requestedBlock) throw new Error(`Block not found: ${blockHeight}`);
       const block = ogmiosToCore.block(requestedBlock);
-      block && result.push({ block, eventType: ChainSyncEventType.RollForward, tip: block.header });
+      if (!block) continue;
+      if (
+        result.some(
+          (existingBlock) =>
+            existingBlock.eventType === ChainSyncEventType.RollForward &&
+            existingBlock.block.header.hash === block?.header.hash
+        )
+      ) {
+        // Replaying a block after rollback should have a different hash
+        block.header.hash = generateRandomHexString(block.header.hash.length) as Cardano.BlockId;
+      }
+      result.push({ block, eventType: ChainSyncEventType.RollForward, tip: block.header });
     } else {
       const blockNo = -blockHeight;
-      const requestedBlock = requestedBlocks[blockNo];
+      // Find last added RollForward block that matches requested block height
+      let requestedBlock: Cardano.Block | undefined;
+      for (let i = result.length - 1; i >= 0; i--) {
+        const evt = result[i];
+        if (evt.eventType === ChainSyncEventType.RollForward && evt.block.header.blockNo === blockNo) {
+          requestedBlock = evt.block;
+          break;
+        }
+      }
       if (!requestedBlock) throw new Error(`Cannot rollback to a non-requested block: ${blockHeight}`);
-      const header = ogmiosToCore.blockHeader(requestedBlock);
-      header &&
-        result.push({
-          eventType: ChainSyncEventType.RollBackward,
-          point: {
-            hash: header.hash,
-            slot: header.slot
-          },
-          tip: header
-        });
+
+      result.push({
+        eventType: ChainSyncEventType.RollBackward,
+        point: {
+          hash: requestedBlock.header.hash,
+          slot: requestedBlock.header.slot
+        },
+        tip: requestedBlock.header
+      });
     }
   }
   return result;

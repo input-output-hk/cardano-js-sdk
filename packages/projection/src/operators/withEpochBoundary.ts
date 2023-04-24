@@ -1,10 +1,7 @@
+import { ExtChainSyncOperator, WithEpochBoundary, WithEpochNo, WithNetworkInfo } from '../types';
 import { Intersection, createSlotEpochCalc } from '@cardano-sdk/core';
-import { ProjectorOperator } from '../types';
-import { WithEpochNo } from './withEpochNo';
-import { WithNetworkInfo } from './withNetworkInfo';
 import { map, pairwise, startWith } from 'rxjs';
 
-export type WithEpochBoundary = { crossEpochBoundary: boolean };
 type PropsIn = WithEpochNo & WithNetworkInfo;
 
 /**
@@ -16,7 +13,7 @@ type PropsIn = WithEpochNo & WithNetworkInfo;
 export const withEpochBoundary =
   <ExtraRollForwardPropsIn extends PropsIn, ExtraRollBackwardPropsIn extends PropsIn>(
     intersection: Pick<Intersection, 'point'>
-  ): ProjectorOperator<ExtraRollForwardPropsIn, ExtraRollBackwardPropsIn, WithEpochBoundary, WithEpochBoundary> =>
+  ): ExtChainSyncOperator<ExtraRollForwardPropsIn, ExtraRollBackwardPropsIn, WithEpochBoundary, WithEpochBoundary> =>
   (evt$) =>
     evt$.pipe(
       startWith(null),

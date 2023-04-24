@@ -11,7 +11,7 @@ export class BlockDataEntity {
   blockHeight?: number;
 
   @OneToOne(() => BlockEntity, DeleteCascadeRelationOptions)
-  @JoinColumn()
+  @JoinColumn({ referencedColumnName: 'height' })
   block?: BlockEntity;
 
   @Column({ transformer: [serializableObj, json, stringBytea], type: 'bytea' })

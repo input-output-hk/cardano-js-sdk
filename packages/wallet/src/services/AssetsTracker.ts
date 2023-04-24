@@ -1,13 +1,14 @@
 import { Asset, Cardano } from '@cardano-sdk/core';
-import { BalanceTracker } from './types';
 import { Logger } from 'ts-log';
 import { Observable, combineLatest, distinctUntilChanged, map, of, switchMap, tap } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackedAssetProvider } from './ProviderTracker';
+import { TransactionsTracker } from './types';
 import { coldObservableProvider } from './util';
 import { concatAndCombineLatest } from '@cardano-sdk/util-rxjs';
 import { deepEquals } from '@cardano-sdk/util';
 import chunk from 'lodash/chunk';
+import uniq from 'lodash/uniq';
 
 const isAssetInfoComplete = (assetInfos: Asset.AssetInfo[]): boolean =>
   assetInfos.every((assetInfo) => assetInfo.nftMetadata !== undefined && assetInfo.tokenMetadata !== undefined);
@@ -38,7 +39,7 @@ export const createAssetService =
 export type AssetService = ReturnType<typeof createAssetService>;
 
 export interface AssetsTrackerProps {
-  balanceTracker: BalanceTracker;
+  transactionsTracker: TransactionsTracker;
   assetProvider: TrackedAssetProvider;
   retryBackoffConfig: RetryBackoffConfig;
   logger: Logger;
@@ -50,19 +51,25 @@ interface AssetsTrackerInternals {
 }
 
 export const createAssetsTracker = (
-  { assetProvider, balanceTracker, retryBackoffConfig, logger, onFatalError }: AssetsTrackerProps,
+  { assetProvider, transactionsTracker: { history$ }, retryBackoffConfig, logger, onFatalError }: AssetsTrackerProps,
   { assetService = createAssetService(assetProvider, retryBackoffConfig, onFatalError) }: AssetsTrackerInternals = {}
 ) =>
   new Observable<Map<Cardano.AssetId, Asset.AssetInfo>>((subscriber) => {
     let assetsMap = new Map<Cardano.AssetId, Asset.AssetInfo>();
-    const sub = balanceTracker.utxo.total$
+    const sub = history$
       .pipe(
-        map(({ assets }) => [...(assets?.keys() || [])]),
+        map((historyTxs) =>
+          uniq(
+            historyTxs.flatMap(({ body: { outputs } }) =>
+              outputs.flatMap(({ value: { assets } }) => (assets ? [...assets.keys()] : []))
+            )
+          )
+        ),
         distinctUntilChanged(deepEquals), // It optimizes to not process duplicate emissions of the assets
         tap((assetIds) =>
           logger.debug(
             assetIds.length > 0
-              ? `Balance total assets: ${assetIds.length}`
+              ? `Historical total assets: ${assetIds.length}`
               : 'Setting assetProvider stats as initialized'
           )
         ),
@@ -70,13 +77,11 @@ export const createAssetsTracker = (
         // Fetch asset metadata only for assets not already present in assetsMap
         // Restart inner observable if assetIds change, otherwise the whole pipe will hang waiting for all assetInfos to resolve
         switchMap((assetIds) => {
-          const assetIdsCached = assetIds.filter((assetId) => {
+          const assetIdsToFetch = assetIds.filter((assetId) => {
             const assetInfo = assetsMap.get(assetId);
-            return assetInfo && isAssetInfoComplete([assetInfo]);
+            return !assetInfo || !isAssetInfoComplete([assetInfo]);
           });
-          const assetInfosCached = assetIdsCached.map((id) => assetsMap.get(id)!);
-          const assetInfosCached$ = of(assetInfosCached);
-          const assetIdsToFetch = assetIds.filter((x) => !assetIdsCached.includes(x));
+          const assetInfosCached$ = of([...assetsMap.values()]);
           const assetInfosFetched$ = assetIdsToFetch.length > 0 ? assetService(assetIdsToFetch) : of([]);
 
           return combineLatest([assetInfosCached$, assetInfosFetched$]).pipe(map((allInfos) => allInfos.flat()));

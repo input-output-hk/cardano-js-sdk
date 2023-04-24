@@ -89,7 +89,7 @@ export const createDelegationTracker = ({
     rewardsHistoryProvider = createRewardsHistoryProvider(rewardsTracker, retryBackoffConfig),
     rewardsProvider = createRewardsProvider(
       epoch$,
-      transactionsTracker.outgoing.confirmed$,
+      transactionsTracker.outgoing.onChain$,
       rewardsTracker,
       retryBackoffConfig,
       onFatalError

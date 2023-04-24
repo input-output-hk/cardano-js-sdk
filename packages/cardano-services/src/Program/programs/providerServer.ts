@@ -30,6 +30,7 @@ import { getOgmiosCardanoNode, getOgmiosTxSubmitProvider, getPool, getRabbitMqTx
 import { isNotNil } from '@cardano-sdk/util';
 import memoize from 'lodash/memoize';
 
+export const ALLOWED_ORIGINS_DEFAULT = false;
 export const DISABLE_DB_CACHE_DEFAULT = false;
 export const DISABLE_STAKE_POOL_METRIC_APY_DEFAULT = false;
 export const HTTP_SERVER_API_URL_DEFAULT = new URL('http://localhost:3000');
@@ -248,6 +249,7 @@ export const loadProviderServer = async (
     }
   }
   const config: HttpServerConfig = {
+    allowedOrigins: args.allowedOrigins,
     listen: getListen(args.apiUrl),
     meta: { ...args.buildInfo, startupTime: Date.now() }
   };

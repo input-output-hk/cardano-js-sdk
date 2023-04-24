@@ -12,7 +12,7 @@ export const asset = {
   name: Cardano.AssetName('54534c41'),
   nftMetadata: null,
   policyId: Cardano.PolicyId('7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373'),
-  quantity: 1000n,
+  supply: 1000n,
   tokenMetadata: null
 } as Asset.AssetInfo;
 

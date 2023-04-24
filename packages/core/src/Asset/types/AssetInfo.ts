@@ -16,7 +16,7 @@ export interface AssetInfo {
   policyId: PolicyId;
   name: AssetName;
   fingerprint: AssetFingerprint;
-  quantity: bigint;
+  supply: bigint;
   mintOrBurnCount: number;
   /**
    * Sorted by slot

@@ -4,5 +4,7 @@ export * from './withRolledBackBlock';
 export * from './withEpochNo';
 export * from './withEpochBoundary';
 export * from './withNetworkInfo';
-export * from './certificates';
+export * as Mappers from './Mappers';
+export * from './logProjectionProgress';
+export * from './requestNext';
 export * from './utils';

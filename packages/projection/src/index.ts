@@ -1,5 +1,4 @@
-export * as Operators from './operators';
-export * as Projections from './projections';
-export * from './sinks';
-export * from './projectIntoSink';
+export * as InMemory from './InMemory';
+export * as Bootstrap from './Bootstrap';
+export * from './operators';
 export * from './types';

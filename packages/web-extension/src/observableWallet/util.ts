@@ -5,7 +5,7 @@ export const observableWalletChannel = (walletName: string) => `${walletName}$`;
 
 export const observableWalletProperties: RemoteApiProperties<ObservableWallet> = {
   addresses$: RemoteApiPropertyType.HotObservable,
-  assets$: RemoteApiPropertyType.HotObservable,
+  assetInfo$: RemoteApiPropertyType.HotObservable,
   balance: {
     rewardAccounts: {
       deposit$: RemoteApiPropertyType.HotObservable,
@@ -40,9 +40,9 @@ export const observableWalletProperties: RemoteApiProperties<ObservableWallet> =
   transactions: {
     history$: RemoteApiPropertyType.HotObservable,
     outgoing: {
-      confirmed$: RemoteApiPropertyType.HotObservable,
       failed$: RemoteApiPropertyType.HotObservable,
       inFlight$: RemoteApiPropertyType.HotObservable,
+      onChain$: RemoteApiPropertyType.HotObservable,
       pending$: RemoteApiPropertyType.HotObservable,
       submitting$: RemoteApiPropertyType.HotObservable
     },

@@ -57,8 +57,8 @@ export interface FailedTx extends OutgoingTx {
   error?: CardanoNodeErrors.TxSubmissionError;
 }
 
-export interface ConfirmedTx extends OutgoingTx {
-  confirmedAt: Cardano.PartialBlockHeader['slot'];
+export interface OutgoingOnChainTx extends OutgoingTx {
+  slot: Cardano.PartialBlockHeader['slot'];
 }
 
 export interface TxInFlight extends OutgoingTx {
@@ -73,7 +73,7 @@ export interface TransactionsTracker {
     readonly submitting$: Observable<OutgoingTx>;
     readonly pending$: Observable<OutgoingTx>;
     readonly failed$: Observable<FailedTx>;
-    readonly confirmed$: Observable<ConfirmedTx>;
+    readonly onChain$: Observable<OutgoingOnChainTx>;
   };
 }
 

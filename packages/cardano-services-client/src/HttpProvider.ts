@@ -2,11 +2,12 @@
 import { Logger } from 'ts-log';
 import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
-import axios, { AxiosAdapter, AxiosRequestConfig } from 'axios';
+import axios, { AxiosAdapter, AxiosRequestConfig, AxiosResponseTransformer } from 'axios';
 
 const isEmptyResponse = (response: any) => response === '';
 
 export type HttpProviderConfigPaths<T> = { [methodName in keyof T]: string };
+type ResponseTransformers<T> = { [K in keyof T]?: AxiosResponseTransformer };
 
 export interface HttpProviderConfig<T> {
   /**
@@ -41,6 +42,11 @@ export interface HttpProviderConfig<T> {
    * Logger strategy.
    */
   logger: Logger;
+
+  /**
+   * Transform responses
+   */
+  responseTransformers?: ResponseTransformers<T>;
 }
 
 /**
@@ -65,7 +71,8 @@ export const createHttpProvider = <T extends object>({
   mapError,
   paths,
   adapter,
-  logger
+  logger,
+  responseTransformers
 }: HttpProviderConfig<T>): T =>
   new Proxy<T>({} as T, {
     // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -73,6 +80,8 @@ export const createHttpProvider = <T extends object>({
       if (prop === 'then') return;
       const method = prop as keyof T;
       const path = paths[method];
+      const transformResponse =
+        responseTransformers && responseTransformers[method] ? responseTransformers[method]! : (v: unknown) => v;
       if (!path)
         throw new ProviderError(ProviderFailure.NotImplemented, `HttpProvider missing path for '${prop.toString()}'`);
       return async (...args: any[]) => {
@@ -97,7 +106,9 @@ export const createHttpProvider = <T extends object>({
           });
           axiosInstance.interceptors.response.use((value) => ({
             ...value,
-            data: fromSerializableObject(value.data, { getErrorPrototype: () => ProviderError.prototype })
+            data: transformResponse(
+              fromSerializableObject(value.data, { getErrorPrototype: () => ProviderError.prototype })
+            )
           }));
           const response = (await axiosInstance.request(req)).data;
           return !isEmptyResponse(response) ? response : undefined;

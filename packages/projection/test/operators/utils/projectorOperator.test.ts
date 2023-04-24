@@ -1,21 +1,21 @@
 import { ChainSyncEventType } from '@cardano-sdk/core';
-import { Operators, ProjectorEvent } from '../../../src';
+import { ExtChainSyncEvent, ProjectorEventHandlers, projectorOperator } from '../../../src';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 import { of } from 'rxjs';
 
 describe('projectorOperator', () => {
   // eslint-disable-next-line unicorn/consistent-function-scoping
-  const testProjectorOperator = (handlers: Operators.ProjectorEventHandlers<unknown, unknown>) => {
+  const testProjectorOperator = (handlers: ProjectorEventHandlers<unknown, unknown>) => {
     createTestScheduler().run(({ hot, expectObservable, expectSubscriptions }) => {
-      const source$ = hot<ProjectorEvent>('ab', {
+      const source$ = hot<ExtChainSyncEvent>('ab', {
         a: {
           eventType: ChainSyncEventType.RollForward
-        } as ProjectorEvent,
+        } as ExtChainSyncEvent,
         b: {
           eventType: ChainSyncEventType.RollBackward
-        } as ProjectorEvent
+        } as ExtChainSyncEvent
       });
-      expectObservable(source$.pipe(Operators.projectorOperator(handlers)())).toBe('ab', {
+      expectObservable(source$.pipe(projectorOperator(handlers)())).toBe('ab', {
         a: {
           eventType: ChainSyncEventType.RollForward,
           someProp: true

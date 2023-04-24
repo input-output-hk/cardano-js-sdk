@@ -131,10 +131,9 @@ export class DbSyncAssetProvider extends DbSyncProvider() implements AssetProvid
       throw new ProviderError(ProviderFailure.NotFound, undefined, 'No entries found in multi_asset table');
 
     const fingerprint = multiAsset.fingerprint as unknown as Cardano.AssetFingerprint;
-    const quantities = await this.#builder.queryMultiAssetQuantities(multiAsset.id);
-    const quantity = BigInt(quantities.sum);
-    const mintOrBurnCount = Number(quantities.count);
+    const supply = BigInt(multiAsset.sum);
+    const mintOrBurnCount = Number(multiAsset.count);
 
-    return { assetId, fingerprint, mintOrBurnCount, name, policyId, quantity };
+    return { assetId, fingerprint, mintOrBurnCount, name, policyId, supply };
   }
 }

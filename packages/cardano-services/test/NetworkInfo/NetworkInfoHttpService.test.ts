@@ -372,28 +372,6 @@ describe('NetworkInfoHttpService', () => {
       });
     });
 
-    describe('/current-wallet-protocol-parameters', () => {
-      describe('with Http Server', () => {
-        it('returns a 200 coded response with a well formed HTTP request', async () => {
-          expect((await axios.post(`${baseUrl}/current-wallet-protocol-parameters`, {})).status).toEqual(200);
-        });
-
-        it('returns a 415 coded response if the wrong content type header is used', async () => {
-          expect.assertions(2);
-          try {
-            await axios.post(
-              `${baseUrl}/current-wallet-protocol-parameters`,
-              {},
-              { headers: { 'Content-Type': APPLICATION_CBOR } }
-            );
-          } catch (error: any) {
-            expect(error.response.status).toBe(415);
-            expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
-          }
-        });
-      });
-    });
-
     describe('/genesis-parameters', () => {
       describe('with Http Server', () => {
         it('returns a 200 coded response with a well formed HTTP request', async () => {

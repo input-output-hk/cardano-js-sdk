@@ -1,21 +1,19 @@
+/* eslint-disable sonarjs/cognitive-complexity */
 import * as OpenApiValidator from 'express-openapi-validator';
+import { APPLICATION_JSON, CONTENT_TYPE, corsOptions } from './util';
 import { DB_BLOCKS_BEHIND_TOLERANCE, listenPromise, serverClosePromise } from '../util';
 import { Gauge, Registry } from 'prom-client';
 import { HttpServerConfig, ServiceHealth, ServicesHealthCheckResponse } from './types';
 import { HttpService } from './HttpService';
 import { Logger } from 'ts-log';
-import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { ProviderError, ProviderFailure, providerFailureToStatusCodeMap } from '@cardano-sdk/core';
 import { RunnableModule, contextLogger, fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 import express from 'express';
 import expressPromBundle from 'express-prom-bundle';
 import http from 'http';
 import path from 'path';
-
-export const CONTENT_TYPE = 'Content-Type';
-export const APPLICATION_JSON = 'application/json';
-
-export const getListen = (url: URL) => ({ host: url.hostname, port: url ? Number.parseInt(url.port) : undefined });
 
 export interface HttpServerDependencies {
   services: HttpService[];
@@ -62,6 +60,11 @@ export class HttpServer extends RunnableModule {
 
   protected async initializeImpl(): Promise<void> {
     this.app = express();
+
+    if (this.#config.allowedOrigins) {
+      this.app.use(cors(corsOptions(new Set(this.#config.allowedOrigins))));
+    }
+
     this.app.use(
       bodyParser.json({
         limit: this.#config?.bodyParser?.limit || '500kB',
@@ -111,7 +114,11 @@ export class HttpServer extends RunnableModule {
     );
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.app.use((err: any, _req: express.Request, res: express.Response, _n: express.NextFunction) => {
-      HttpServer.sendJSON(res, new ProviderError(ProviderFailure.Unhealthy, err), err.status || 500);
+      if (err instanceof ProviderError) {
+        HttpServer.sendJSON(res, err, providerFailureToStatusCodeMap[err.reason]);
+      } else {
+        HttpServer.sendJSON(res, new ProviderError(ProviderFailure.Unhealthy, err), err.status || 500);
+      }
     });
 
     const apiSpec = path.join(__dirname, 'openApi.json');
@@ -213,6 +220,7 @@ export class HttpServer extends RunnableModule {
     });
     this.app.use(
       expressPromBundle({
+        buckets: [0.003, 0.03, 0.1, 0.3, 0.75, 1.5, 3, 5, 8, 12, 20, 30],
         includeMethod: true,
         includePath: true,
         promRegistry,

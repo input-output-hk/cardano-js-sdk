@@ -43,7 +43,7 @@ describe('SingleAddressWallet/txChaining', () => {
 
     const finalizedTx2 = await wallet.finalizeTx({ tx: tx2 });
 
-    // 1st tx must also be confirmed because the 2nd one uses output from the 1st one
+    // 1st tx must also be on-chain because the 2nd one uses output from the 1st one
     await submitAndConfirm(wallet, finalizedTx2);
   });
 });
