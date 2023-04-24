@@ -153,7 +153,7 @@ describe('SingleAddressWallet rollback', () => {
 
     stores.volatileTransactions.set([
       {
-        confirmedAt: rollBackTx.blockHeader.slot,
+        slot: rollBackTx.blockHeader.slot,
         ...toOutgoingTx(tx)
       }
     ]);

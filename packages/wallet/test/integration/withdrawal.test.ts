@@ -98,7 +98,7 @@ describe('integration/withdrawal', () => {
 
     expect(tx.body.withdrawals).toEqual([{ quantity: availableRewards, stakeAddress: rewardAccount }]);
 
-    const confirmedSubscription = wallet.transactions.outgoing.confirmed$.subscribe(({ id }) => {
+    const onChainSubscription = wallet.transactions.outgoing.onChain$.subscribe(({ id }) => {
       if (id === tx.id) {
         // Transaction successful
       }
@@ -118,7 +118,7 @@ describe('integration/withdrawal', () => {
     }
 
     // Cleanup
-    confirmedSubscription.unsubscribe();
+    onChainSubscription.unsubscribe();
     failedSubscription.unsubscribe();
     wallet.shutdown();
   });

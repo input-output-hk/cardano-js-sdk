@@ -15,14 +15,21 @@ import {
   withLatestFrom
 } from 'rxjs';
 
-import { ConfirmedTx, FailedTx, Milliseconds, OutgoingTx, TransactionFailure, TransactionsTracker } from './types';
+import {
+  FailedTx,
+  Milliseconds,
+  OutgoingOnChainTx,
+  OutgoingTx,
+  TransactionFailure,
+  TransactionsTracker
+} from './types';
 import { WalletStores } from '../persistence';
 import { isNotNil } from '@cardano-sdk/util';
 import pick from 'lodash/pick';
 
 export interface TransactionReemitterProps {
   transactions: Pick<TransactionsTracker, 'rollback$'> & {
-    outgoing: Pick<TransactionsTracker['outgoing'], 'confirmed$' | 'submitting$' | 'inFlight$'>;
+    outgoing: Pick<TransactionsTracker['outgoing'], 'onChain$' | 'submitting$' | 'inFlight$'>;
   };
   stores: Pick<WalletStores, 'inFlightTransactions' | 'volatileTransactions'>;
   tipSlot$: Observable<Cardano.Slot>;
@@ -30,8 +37,8 @@ export interface TransactionReemitterProps {
     Pick<Cardano.CompactGenesis, 'securityParameter' | 'activeSlotsCoefficient' | 'slotLength'>
   >;
   /**
-   * It is possible that a transaction is rolled back before it is confirmed by showing up in transaction history.
-   * This option can be used to re-emit (and then attempt to re-submit) a transaction if it takes too long to confirm.
+   * It is possible that a transaction is rolled back before it is found on chain.
+   * This option can be used to re-emit (and then attempt to re-submit) a transaction if it takes too long to show up on chain.
    */
   maxInterval: Milliseconds;
   logger: Logger;
@@ -44,14 +51,14 @@ export interface TransactionReemiter {
 
 enum txSource {
   store,
-  confirmed,
+  onChain,
   submitting
 }
 
 export const createTransactionReemitter = ({
   transactions: {
     rollback$,
-    outgoing: { confirmed$, submitting$, inFlight$ }
+    outgoing: { onChain$, submitting$, inFlight$ }
   },
   stores,
   tipSlot$,
@@ -65,7 +72,7 @@ export const createTransactionReemitter = ({
       mergeMap((txs) => from(txs)),
       map((tx) => ({ source: txSource.store, tx } as const))
     ),
-    confirmed$.pipe(map((tx) => ({ confirmed: tx, source: txSource.confirmed } as const))),
+    onChain$.pipe(map((tx) => ({ onChain: tx, source: txSource.onChain } as const))),
     submitting$.pipe(map((tx) => ({ source: txSource.submitting, tx } as const)))
   ).pipe(
     mergeMap((vt) =>
@@ -95,31 +102,29 @@ export const createTransactionReemitter = ({
           stores.volatileTransactions.set(volatiles);
           break;
         }
-        case txSource.confirmed: {
+        case txSource.onChain: {
           const oldestAcceptedSlot =
-            vt.confirmed.confirmedAt > stabilityWindowSlotsCount
-              ? vt.confirmed.confirmedAt - stabilityWindowSlotsCount
-              : 0;
+            vt.onChain.slot > stabilityWindowSlotsCount ? vt.onChain.slot - stabilityWindowSlotsCount : 0;
           // Remove transactions considered stable
           logger.debug(`Removing stable transactions (slot <= ${oldestAcceptedSlot}), from volatiles`);
-          logger.debug(`Adding new volatile transaction ${vt.confirmed.id}`);
-          volatiles = [...volatiles.filter(({ confirmedAt }) => confirmedAt > oldestAcceptedSlot), vt.confirmed];
+          logger.debug(`Adding new volatile transaction ${vt.onChain.id}`);
+          volatiles = [...volatiles.filter(({ slot }) => slot > oldestAcceptedSlot), vt.onChain];
           stores.volatileTransactions.set(volatiles);
           break;
         }
       }
       return volatiles;
-    }, [] as ConfirmedTx[])
+    }, [] as OutgoingOnChainTx[])
   );
 
   const rollbacks$ = rollback$.pipe(
     filter((tx) => !Cardano.util.isPhase2ValidationErrTx(tx)),
     withLatestFrom(volatileTransactions$),
     map(([tx, volatiles]) => {
-      // Get the confirmed Tx transaction to be retried
+      // Get the onChain Tx transaction to be retried
       const reemitTx = volatiles.find((txVolatile) => txVolatile.id === tx.id);
       if (!reemitTx) {
-        logger.error(`Could not find confirmed transaction with id ${tx.id} that was rolled back`);
+        logger.error(`Could not find onChain transaction with id ${tx.id} that was rolled back`);
         return;
       }
       return reemitTx!;

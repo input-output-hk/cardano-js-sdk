@@ -3,8 +3,10 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable sonarjs/no-duplicate-string */
 import { Cardano, RewardsProvider, StakePoolProvider } from '@cardano-sdk/core';
+import { EMPTY, Observable, firstValueFrom, of } from 'rxjs';
+import { InMemoryStakePoolsStore, KeyValueStore } from '../../../src/persistence';
 import {
-  ConfirmedTx,
+  OutgoingOnChainTx,
   PAGE_SIZE,
   StakeKeyStatus,
   TrackedStakePoolProvider,
@@ -17,8 +19,6 @@ import {
   fetchRewardsTrigger$,
   getStakePoolIdAtEpoch
 } from '../../../src';
-import { EMPTY, Observable, firstValueFrom, of } from 'rxjs';
-import { InMemoryStakePoolsStore, KeyValueStore } from '../../../src/persistence';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxWithEpoch } from '../../../src/services/DelegationTracker/types';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
@@ -190,7 +190,7 @@ describe('RewardAccounts', () => {
   describe('addressRewards', () => {
     it(`emits reward account balance for every reward account,
     starting with stored values and following up with provider, subtracting withdrawals in-flight
-    and awaiting for rewards update after transaction is confirmed`, () => {
+    and awaiting for rewards update after transaction is discovered on-chain`, () => {
       createTestScheduler().run(({ cold, hot, expectObservable }) => {
         const acc1Balance1 = 10_000_000n;
         const acc1Balance2 = 9_000_000n;
@@ -198,7 +198,7 @@ describe('RewardAccounts', () => {
         const storedBalances = [7_000_000n, 6_000_000n];
         const acc1PendingWithdrawalQty = 1_000_000n;
         // 'aaa' in the end is to ensure that it's awaiting for rewards update
-        // even if more (unrelated) transactions get confirmed
+        // even if more (unrelated) transactions get discovered on-chain
         const transactionsInFlight$ = hot<TxInFlight[]>('a-b--a--b-aaa', {
           a: [],
           b: [{
@@ -287,7 +287,7 @@ describe('RewardAccounts', () => {
     it('emits every epoch and after making a transaction with withdrawals', () => {
       const rewardAccount = Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27');
       createTestScheduler().run(({ cold, expectObservable }) => {
-        const confirmedTx1: ConfirmedTx = {
+        const onChainTx1: OutgoingOnChainTx = {
           body: {
             withdrawals: [{
               quantity: 3n,
@@ -295,19 +295,19 @@ describe('RewardAccounts', () => {
             }]
           } as Cardano.TxBody,
           cbor: dummyCbor,
-          confirmedAt: Cardano.Slot(1),
-          id: txId1
+          id: txId1,
+          slot: Cardano.Slot(1)
         };
-        const confirmedTx2: ConfirmedTx = {
+        const onChainTx2: OutgoingOnChainTx = {
           body: { withdrawals: [{ quantity: 5n, stakeAddress: rewardAccount }] } as Cardano.TxBody,
           cbor: dummyCbor,
-          confirmedAt: Cardano.Slot(2),
-          id: txId2
+          id: txId2,
+          slot: Cardano.Slot(2)
         };
         const epoch$ = cold(      'a-b--', { a: Cardano.EpochNo(100), b: Cardano.EpochNo(101) });
         const txConfirmed$ = cold('-a--b', {
-          a: confirmedTx1,
-          b: confirmedTx2
+          a: onChainTx1,
+          b: onChainTx2
         });
         const target$ = fetchRewardsTrigger$(epoch$, txConfirmed$, rewardAccount);
         expectObservable(target$).toBe('a-b-c', {
@@ -321,7 +321,7 @@ describe('RewardAccounts', () => {
     const rewardsProvider = null as unknown as RewardsProvider; // not used in this test
     const config = null as unknown as RetryBackoffConfig; // not used in this test
     const epoch$ = null as unknown as Observable<Cardano.EpochNo>; // not used in this test
-    const txConfirmed$ = EMPTY as Observable<ConfirmedTx>;
+    const onChainTx$ = EMPTY as Observable<OutgoingOnChainTx>;
     createTestScheduler().run(({ cold, expectObservable, flush }) => {
       coldObservableProviderMock
         .mockReturnValueOnce(
@@ -338,7 +338,7 @@ describe('RewardAccounts', () => {
         );
       const target$ = createRewardsProvider(
         epoch$,
-        txConfirmed$,
+        onChainTx$,
         rewardsProvider,
         config
       )(twoRewardAccounts);

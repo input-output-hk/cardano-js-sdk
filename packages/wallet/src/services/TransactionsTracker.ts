@@ -1,5 +1,4 @@
 import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
-import { ConfirmedTx, FailedTx, OutgoingTx, TransactionFailure, TransactionsTracker, TxInFlight } from './types';
 import { DocumentStore, OrderedCollectionStore } from '../persistence';
 import {
   EMPTY,
@@ -29,6 +28,7 @@ import {
   tap,
   withLatestFrom
 } from 'rxjs';
+import { FailedTx, OutgoingOnChainTx, OutgoingTx, TransactionFailure, TransactionsTracker, TxInFlight } from './types';
 import { Logger } from 'ts-log';
 import { Range, Shutdown, contextLogger } from '@cardano-sdk/util';
 import { RetryBackoffConfig } from 'backoff-rxjs';
@@ -242,12 +242,12 @@ export const createTransactionsTracker = (
     (tx) => Cardano.util.isPhase2ValidationErrTx(tx)
   );
 
-  const txConfirmed$ = (evt: OutgoingTx): Observable<ConfirmedTx> =>
+  const txOnChain$ = (evt: OutgoingTx): Observable<OutgoingOnChainTx> =>
     onChainNewTxSuccess$.pipe(
       filter((historyTx) => historyTx.id === evt.id),
       take(1),
-      map((historyTx) => ({ ...evt, confirmedAt: historyTx.blockHeader.slot })),
-      tap(({ confirmedAt }) => logger.debug(`Transaction ${evt.id} is confirmed in slot ${confirmedAt}`))
+      map((historyTx) => ({ ...evt, slot: historyTx.blockHeader.slot })),
+      tap(({ slot }) => logger.debug(`Transaction ${evt.id} is on-chain in slot ${slot}`))
     );
 
   const submittingOrPreviouslySubmitted$ = merge<TxInFlight[]>(
@@ -296,7 +296,7 @@ export const createTransactionsTracker = (
                     map(() => ({ reason: TransactionFailure.Timeout, ...tx }))
                   )
                 : NEVER
-            ).pipe(take(1), takeUntil(txConfirmed$(tx)));
+            ).pipe(take(1), takeUntil(txOnChain$(tx)));
           })
         )
       ),
@@ -324,7 +324,7 @@ export const createTransactionsTracker = (
         group$.pipe(
           // Only keep 1 (latest) inner observable per tx id.
           switchMap((tx) => {
-            const done$ = race(txConfirmed$(tx), txFailed$(tx)).pipe(
+            const done$ = race(txOnChain$(tx), txFailed$(tx)).pipe(
               map(() => ({ op: 'remove' as const, tx })),
               share()
             );
@@ -369,25 +369,25 @@ export const createTransactionsTracker = (
     )
   );
 
-  const confirmed$ = new Subject<ConfirmedTx>();
-  const confirmedSubscription = submittingOrPreviouslySubmitted$
-    .pipe(mergeMap((group$) => group$.pipe(switchMap((tx) => txConfirmed$(tx).pipe(takeUntil(txFailed$(tx)))))))
-    .subscribe(confirmed$);
+  const onChain$ = new Subject<OutgoingOnChainTx>();
+  const onChainSubscription = submittingOrPreviouslySubmitted$
+    .pipe(mergeMap((group$) => group$.pipe(switchMap((tx) => txOnChain$(tx).pipe(takeUntil(txFailed$(tx)))))))
+    .subscribe(onChain$);
 
   return {
     history$: historicalTransactions$,
     outgoing: {
-      confirmed$,
       failed$,
       inFlight$,
+      onChain$,
       pending$,
       submitting$
     },
     rollback$,
     shutdown: () => {
       inFlight$.complete();
-      confirmedSubscription.unsubscribe();
-      confirmed$.complete();
+      onChainSubscription.unsubscribe();
+      onChain$.complete();
       failedSubscription.unsubscribe();
       failed$.complete();
       logger.debug('Shutdown');

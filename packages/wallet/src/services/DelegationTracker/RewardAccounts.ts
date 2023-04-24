@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/no-nested-ternary */
 import { BigIntMath, deepEquals, isNotNil } from '@cardano-sdk/util';
 import { Cardano, RewardsProvider, StakePoolProvider } from '@cardano-sdk/core';
-import { ConfirmedTx, Delegatee, RewardAccount, StakeKeyStatus, TxInFlight } from '../types';
+import { Delegatee, OutgoingOnChainTx, RewardAccount, StakeKeyStatus, TxInFlight } from '../types';
 import {
   EMPTY,
   Observable,
@@ -93,13 +93,13 @@ const getWithdrawalQuantity = (
 
 export const fetchRewardsTrigger$ = (
   epoch$: Observable<Cardano.EpochNo>,
-  txConfirmed$: Observable<ConfirmedTx>,
+  txOnChain$: Observable<OutgoingOnChainTx>,
   rewardAccount: Cardano.RewardAccount
 ) =>
   merge(
     // Reload every epoch and after every tx that has withdrawals for this reward account
     epoch$,
-    txConfirmed$.pipe(
+    txOnChain$.pipe(
       map(({ body: { withdrawals } }) => getWithdrawalQuantity(withdrawals, rewardAccount)),
       filter((withdrawalQty) => withdrawalQty > 0n)
     )
@@ -108,7 +108,7 @@ export const fetchRewardsTrigger$ = (
 export const createRewardsProvider =
   (
     epoch$: Observable<Cardano.EpochNo>,
-    txConfirmed$: Observable<ConfirmedTx>,
+    txOnChain$: Observable<OutgoingOnChainTx>,
     rewardsProvider: RewardsProvider,
     retryBackoffConfig: RetryBackoffConfig,
     onFatalError?: (value: unknown) => void
@@ -121,7 +121,7 @@ export const createRewardsProvider =
           onFatalError,
           provider: () => rewardsProvider.rewardAccountBalance({ rewardAccount }),
           retryBackoffConfig,
-          trigger$: fetchRewardsTrigger$(epoch$, txConfirmed$, rewardAccount)
+          trigger$: fetchRewardsTrigger$(epoch$, txOnChain$, rewardAccount)
         })
       )
     );

@@ -1,7 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import {
-  ConfirmedTx,
   FailedTx,
+  OutgoingOnChainTx,
   OutgoingTx,
   TransactionFailure,
   TransactionReemitterProps,
@@ -18,7 +18,7 @@ import omit from 'lodash/omit';
 describe('TransactionReemiter', () => {
   const maxInterval = 2000;
   let stores: TransactionReemitterProps['stores'];
-  let volatileTransactions: ConfirmedTx[];
+  let volatileTransactions: OutgoingOnChainTx[];
   let outgoingTransactions: OutgoingTx[];
   let logger: Logger;
 
@@ -34,29 +34,29 @@ describe('TransactionReemiter', () => {
       {
         body: { validityInterval: { invalidHereafter: Cardano.Slot(1000) } },
         cbor: dummyCbor,
-        confirmedAt: Cardano.Slot(100),
-        id: Cardano.TransactionId('6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad')
+        id: Cardano.TransactionId('6804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad'),
+        slot: Cardano.Slot(100)
       },
       {
         body: { validityInterval: { invalidHereafter: Cardano.Slot(1000) } },
         cbor: dummyCbor,
-        confirmedAt: Cardano.Slot(200),
-        id: Cardano.TransactionId('7804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad')
+        id: Cardano.TransactionId('7804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad'),
+        slot: Cardano.Slot(200)
       },
       {
         body: { validityInterval: { invalidHereafter: Cardano.Slot(1000) } },
         cbor: dummyCbor,
-        confirmedAt: Cardano.Slot(300),
-        id: Cardano.TransactionId('8804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad')
+        id: Cardano.TransactionId('8804edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad'),
+        slot: Cardano.Slot(300)
       },
       {
         body: { validityInterval: { invalidHereafter: Cardano.Slot(1000) } },
         cbor: dummyCbor,
-        confirmedAt: Cardano.Slot(400),
-        id: Cardano.TransactionId('9904edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad')
+        id: Cardano.TransactionId('9904edf9712d2b619edb6ac86861fe93a730693183a262b165fcc1ba1bc99cad'),
+        slot: Cardano.Slot(400)
       }
-    ] as ConfirmedTx[];
-    outgoingTransactions = volatileTransactions.map((tx) => omit(tx, 'confirmedAt'));
+    ] as OutgoingOnChainTx[];
+    outgoingTransactions = volatileTransactions.map((tx) => omit(tx, 'slot'));
   });
 
   it('Stored volatile transactions are fetched on init', () => {
@@ -65,7 +65,7 @@ describe('TransactionReemiter', () => {
       stores.volatileTransactions.get = jest.fn(() => cold('a|', { a: [storeTransaction] }));
       const tipSlot$ = hot<Cardano.Slot>('-|');
       const genesisParameters$ = cold<Cardano.CompactGenesis>('-|');
-      const confirmed$ = cold<ConfirmedTx>('-|');
+      const onChain$ = cold<OutgoingOnChainTx>('-|');
       const rollback$ = cold<Cardano.HydratedTx>('-|');
       const submitting$ = cold<OutgoingTx>('-|');
       const inFlight$ = cold<TxInFlight[]>('-|');
@@ -77,8 +77,8 @@ describe('TransactionReemiter', () => {
         tipSlot$,
         transactions: {
           outgoing: {
-            confirmed$,
             inFlight$,
+            onChain$,
             submitting$
           },
           rollback$
@@ -90,13 +90,16 @@ describe('TransactionReemiter', () => {
     expect(stores.volatileTransactions.set).not.toHaveBeenCalledTimes(1); // already in store
   });
 
-  it('Merges stored transactions with confirmed transactions and adds them all to store', () => {
+  it('Merges stored transactions with onChain transactions and adds them all to store', () => {
     const storeTransaction = volatileTransactions[0];
     createTestScheduler().run(({ hot, cold, expectObservable }) => {
       stores.volatileTransactions.get = jest.fn(() => cold('a|', { a: [storeTransaction] }));
       const tipSlot$ = hot<Cardano.Slot>('----|');
       const genesisParameters$ = cold<Cardano.CompactGenesis>('a---|', { a: genesisParameters });
-      const confirmed$ = cold<ConfirmedTx>('-b-c|', { b: volatileTransactions[1], c: volatileTransactions[2] });
+      const onChain$ = cold<OutgoingOnChainTx>('-b-c|', {
+        b: volatileTransactions[1],
+        c: volatileTransactions[2]
+      });
       const rollback$ = cold<Cardano.HydratedTx>('----|');
       const submitting$ = cold<OutgoingTx>('----|');
       const inFlight$ = cold<TxInFlight[]>('-|');
@@ -108,8 +111,8 @@ describe('TransactionReemiter', () => {
         tipSlot$,
         transactions: {
           outgoing: {
-            confirmed$,
             inFlight$,
+            onChain$,
             submitting$
           },
           rollback$
@@ -127,7 +130,7 @@ describe('TransactionReemiter', () => {
       stores.volatileTransactions.get = jest.fn(() => cold('a|', { a: storeTransaction }));
       const tipSlot$ = hot<Cardano.Slot>('--|');
       const genesisParameters$ = cold<Cardano.CompactGenesis>('a-|', { a: genesisParameters });
-      const confirmed$ = cold<ConfirmedTx>('--|');
+      const onChain$ = cold<OutgoingOnChainTx>('--|');
       const rollback$ = cold<Cardano.HydratedTx>('--|');
       const submitting$ = cold<OutgoingTx>('-b|', { b: outgoingTransactions[0] });
       const inFlight$ = cold<TxInFlight[]>('-|');
@@ -139,8 +142,8 @@ describe('TransactionReemiter', () => {
         tipSlot$,
         transactions: {
           outgoing: {
-            confirmed$,
             inFlight$,
+            onChain$,
             submitting$
           },
           rollback$
@@ -159,7 +162,7 @@ describe('TransactionReemiter', () => {
       const genesisParameters$ = cold<Cardano.CompactGenesis>('a--|', {
         a: { ...genesisParameters, activeSlotsCoefficient: 33 }
       });
-      const confirmed$ = cold<ConfirmedTx>('abc|', {
+      const onChain$ = cold<OutgoingOnChainTx>('abc|', {
         a: volatileSlot100,
         b: volatileSlot200,
         c: volatileSlot300
@@ -175,8 +178,8 @@ describe('TransactionReemiter', () => {
         tipSlot$,
         transactions: {
           outgoing: {
-            confirmed$,
             inFlight$,
+            onChain$,
             submitting$
           },
           rollback$
@@ -212,7 +215,7 @@ describe('TransactionReemiter', () => {
     createTestScheduler().run(({ hot, cold, expectObservable }) => {
       const tipSlot$ = hot<Cardano.Slot>('x--------|', { x: Cardano.Slot(LAST_TIP_SLOT) });
       const genesisParameters$ = cold<Cardano.CompactGenesis>('a--------|', { a: genesisParameters });
-      const confirmed$ = cold<ConfirmedTx>('a-b-c-d--|', {
+      const onChain$ = cold<OutgoingOnChainTx>('a-b-c-d--|', {
         a: volatileA,
         b: volatileB,
         c: volatileC,
@@ -234,8 +237,8 @@ describe('TransactionReemiter', () => {
         tipSlot$,
         transactions: {
           outgoing: {
-            confirmed$,
             inFlight$,
+            onChain$,
             submitting$
           },
           rollback$
@@ -260,7 +263,7 @@ describe('TransactionReemiter', () => {
     createTestScheduler().run(({ hot, cold, expectObservable }) => {
       const tipSlot$ = hot<Cardano.Slot>('x--|', { x: Cardano.Slot(300) });
       const genesisParameters$ = cold<Cardano.CompactGenesis>('a--|', { a: genesisParameters });
-      const confirmed$ = cold<ConfirmedTx>('ab-|', {
+      const onChain$ = cold<OutgoingOnChainTx>('ab-|', {
         a: volatileA,
         b: volatileB
       });
@@ -275,8 +278,8 @@ describe('TransactionReemiter', () => {
         tipSlot$,
         transactions: {
           outgoing: {
-            confirmed$,
             inFlight$,
+            onChain$,
             submitting$
           },
           rollback$
@@ -284,7 +287,7 @@ describe('TransactionReemiter', () => {
       });
       expectObservable(transactionReemiter.reemit$).toBe('---|');
     });
-    expect(logger.error).toHaveBeenCalledWith(expect.stringContaining('Could not find confirmed transaction'));
+    expect(logger.error).toHaveBeenCalledWith(expect.stringContaining('Could not find onChain transaction'));
   });
 
   it('Emits unconfirmed submission transactions from stores.inFlightTransactions', () => {
@@ -302,7 +305,7 @@ describe('TransactionReemiter', () => {
       );
       const tipSlot$ = hot<Cardano.Slot>('-|');
       const genesisParameters$ = cold<Cardano.CompactGenesis>('-|');
-      const confirmed$ = cold<ConfirmedTx>('-|');
+      const onChain$ = cold<OutgoingOnChainTx>('-|');
       const rollback$ = cold<Cardano.HydratedTx>('-|');
       const submitting$ = cold<OutgoingTx>('-|');
       const inFlight$ = cold<TxInFlight[]>('-|');
@@ -314,8 +317,8 @@ describe('TransactionReemiter', () => {
         tipSlot$,
         transactions: {
           outgoing: {
-            confirmed$,
             inFlight$,
+            onChain$,
             submitting$
           },
           rollback$
@@ -332,7 +335,7 @@ describe('TransactionReemiter', () => {
       const tip = 123;
       const tipSlot$ = hot<Cardano.Slot>('-a|', { a: Cardano.Slot(tip) });
       const genesisParameters$ = hot('a|', { a: genesisParameters });
-      const confirmed$ = cold<ConfirmedTx>('-|');
+      const onChain$ = cold<OutgoingOnChainTx>('-|');
       const rollback$ = cold<Cardano.HydratedTx>('-|');
       const submitting$ = cold<OutgoingTx>('-|');
       const inFlight$ = cold<TxInFlight[]>('a|', {
@@ -352,8 +355,8 @@ describe('TransactionReemiter', () => {
         tipSlot$,
         transactions: {
           outgoing: {
-            confirmed$,
             inFlight$,
+            onChain$,
             submitting$
           },
           rollback$
@@ -368,7 +371,7 @@ describe('TransactionReemiter', () => {
       const tip = 123;
       const tipSlot$ = hot<Cardano.Slot>('-a--|', { a: Cardano.Slot(tip) });
       const genesisParameters$ = cold('a-b|', { a: genesisParameters, b: genesisParameters });
-      const confirmed$ = cold<ConfirmedTx>('-|');
+      const onChain$ = cold<OutgoingOnChainTx>('-|');
       const rollback$ = cold<Cardano.HydratedTx>('-|');
       const submitting$ = cold<OutgoingTx>('-|');
       const inFlight$ = cold<TxInFlight[]>('a|', {
@@ -388,8 +391,8 @@ describe('TransactionReemiter', () => {
         tipSlot$,
         transactions: {
           outgoing: {
-            confirmed$,
             inFlight$,
+            onChain$,
             submitting$
           },
           rollback$

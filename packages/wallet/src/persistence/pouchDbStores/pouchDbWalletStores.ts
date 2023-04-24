@@ -1,9 +1,9 @@
 import { Assets } from '../../types';
 import { Cardano, EpochRewards, EraSummary } from '@cardano-sdk/core';
-import { ConfirmedTx, TxInFlight } from '../../services';
 import { CreatePouchDbStoresDependencies } from './types';
 import { EMPTY, combineLatest, map } from 'rxjs';
 import { GroupedAddress } from '@cardano-sdk/key-management';
+import { OutgoingOnChainTx, TxInFlight } from '../../services';
 import { PouchDbCollectionStore } from './PouchDbCollectionStore';
 import { PouchDbDocumentStore } from './PouchDbDocumentStore';
 import { PouchDbKeyValueStore } from './PouchDbKeyValueStore';
@@ -17,7 +17,7 @@ export class PouchDbEraSummariesStore extends PouchDbDocumentStore<EraSummary[]>
 export class PouchDbAssetsStore extends PouchDbDocumentStore<Assets> {}
 export class PouchDbAddressesStore extends PouchDbDocumentStore<GroupedAddress[]> {}
 export class PouchDbInFlightTransactionsStore extends PouchDbDocumentStore<TxInFlight[]> {}
-export class PouchDbVolatileTransactionsStore extends PouchDbDocumentStore<ConfirmedTx[]> {}
+export class PouchDbVolatileTransactionsStore extends PouchDbDocumentStore<OutgoingOnChainTx[]> {}
 
 export class PouchDbTransactionsStore extends PouchDbCollectionStore<Cardano.HydratedTx> {}
 export class PouchDbUtxoStore extends PouchDbCollectionStore<Cardano.Utxo> {}
