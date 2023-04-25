@@ -1,9 +1,9 @@
 import { BehaviorSubject, Observable, filter, lastValueFrom } from 'rxjs';
 import { Logger } from 'ts-log';
+import { MessengerDependencies, MinimalRuntime, exposeApi } from '../messaging';
 import { ObservableWallet, storage } from '@cardano-sdk/wallet';
 import { Shutdown, isNotNil } from '@cardano-sdk/util';
-
-import { MessengerDependencies, MinimalRuntime, exposeApi } from '../messaging';
+import { Storage } from 'webextension-polyfill';
 import {
   StoresFactory,
   WalletFactory,
@@ -18,6 +18,7 @@ import { walletChannel } from './util';
 export interface WalletManagerDependencies {
   walletFactory: WalletFactory;
   storesFactory: StoresFactory;
+  managerStorage: Storage.StorageArea;
 }
 
 /**
@@ -38,13 +39,17 @@ export class WalletManagerWorker implements WalletManagerApi {
   #storesFactory: StoresFactory;
   #logger: Logger;
   #runtime: MinimalRuntime;
+  #managerStorageKey: string;
+  #managerStorage: Storage.StorageArea;
 
   constructor(
     { walletName }: WalletManagerProps,
-    { walletFactory, storesFactory, logger, runtime }: MessengerDependencies & WalletManagerDependencies
+    { walletFactory, storesFactory, logger, runtime, managerStorage }: MessengerDependencies & WalletManagerDependencies
   ) {
     this.activeWallet$ = this.#api$.pipe(filter(isNotNil));
     this.#walletFactory = walletFactory;
+    this.#managerStorageKey = `${walletName}-activate`;
+    this.#managerStorage = managerStorage;
     this.#storesFactory = storesFactory;
     this.#logger = logger;
     this.#runtime = runtime;
@@ -56,6 +61,15 @@ export class WalletManagerWorker implements WalletManagerApi {
       },
       { logger, runtime }
     );
+  }
+
+  /**
+   * `activate` the wallet with props of last activated wallet (load from `managerStorage`)
+   */
+  async initialize() {
+    const { [this.#managerStorageKey]: lastActivateProps } = await this.#managerStorage.get(this.#managerStorageKey);
+    if (!lastActivateProps) return;
+    return this.activate(lastActivateProps);
   }
 
   async activate(props: WalletManagerActivateProps): Promise<void> {
@@ -75,7 +89,12 @@ export class WalletManagerWorker implements WalletManagerApi {
     const stores = this.#getStores(this.#activeWalletId);
 
     // Wallet factory is responsible for creating the wallet and the providers based on cardanoServicesUrl
-    const wallet = await this.#walletFactory.create(props, { keyAgent, stores });
+    const [wallet] = await Promise.all([
+      this.#walletFactory.create(props, { keyAgent, stores }),
+      this.#managerStorage.set({
+        [this.#managerStorageKey]: props
+      })
+    ]);
     this.#api$.next(wallet);
   }
 
