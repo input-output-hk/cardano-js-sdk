@@ -9,12 +9,18 @@ import {
 } from '@cardano-sdk/web-extension';
 
 import { AsyncKeyAgent } from '@cardano-sdk/key-management';
+import { storage as WebExtensionStorage, runtime } from 'webextension-polyfill';
 import { env, logger } from '../util';
+import { from, merge, of } from 'rxjs';
 import { getWallet } from '../../../../src';
-import { of } from 'rxjs';
-import { runtime } from 'webextension-polyfill';
 import { storage } from '@cardano-sdk/wallet';
+import { toEmpty } from '@cardano-sdk/util-rxjs';
 import { walletName } from '../const';
+
+export interface WalletFactoryDependencies {
+  keyAgent: AsyncKeyAgent;
+  stores: storage.WalletStores;
+}
 
 /**
  * {@link WalletManagerActivateProps.provider} could be used to pass the necessary information
@@ -22,10 +28,7 @@ import { walletName } from '../const';
  * Please check its documentation for examples.
  */
 const walletFactory: WalletFactory = {
-  create: async (
-    props: WalletManagerActivateProps,
-    { keyAgent, stores }: { keyAgent: AsyncKeyAgent; stores: storage.WalletStores }
-  ) =>
+  create: async (props: WalletManagerActivateProps, { keyAgent, stores }: WalletFactoryDependencies) =>
     (
       await getWallet({
         env,
@@ -42,10 +45,13 @@ const storesFactory: StoresFactory = {
 };
 
 export const wallet$ = (() => {
-  const walletManager = new WalletManagerWorker({ walletName }, { logger, runtime, storesFactory, walletFactory });
+  const walletManager = new WalletManagerWorker(
+    { walletName },
+    { logger, managerStorage: WebExtensionStorage.local, runtime, storesFactory, walletFactory }
+  );
   exposeApi(
     { api$: of(walletManager), baseChannel: walletManagerChannel(walletName), properties: walletManagerProperties },
     { logger, runtime }
   );
-  return walletManager.activeWallet$;
+  return merge(walletManager.activeWallet$, from(walletManager.initialize()).pipe(toEmpty));
 })();
