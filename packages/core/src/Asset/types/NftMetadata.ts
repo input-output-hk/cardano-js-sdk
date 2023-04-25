@@ -38,9 +38,9 @@ export const MediaType = (mediaType: string) => {
  * https://cips.cardano.org/cips/cip25/
  */
 export interface NftMetadataFile {
-  name: string;
+  name?: string;
   mediaType: MediaType;
-  src: Uri[];
+  src: Uri;
   otherProperties?: Map<string, Metadatum>;
 }
 
@@ -49,10 +49,10 @@ export interface NftMetadataFile {
  */
 export interface NftMetadata {
   name: string;
-  image: Uri[];
+  image: Uri;
   version: string;
   mediaType?: ImageMediaType;
   files?: NftMetadataFile[];
-  description?: string[];
+  description?: string;
   otherProperties?: Map<string, Metadatum>;
 }

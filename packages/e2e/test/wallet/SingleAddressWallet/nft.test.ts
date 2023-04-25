@@ -117,12 +117,12 @@ describe('SingleAddressWallet.assets/nft', () => {
             {
               mediaType: 'video/mp4',
               name: 'some name',
-              src: ['file://some_video_file']
+              src: 'ipfs://Qmb78QQ4RXxKQrteRn4X3WaMXXfmi2BU2dLjfWxuJoF2N5'
             },
             {
               mediaType: 'audio/mpeg',
               name: 'some name',
-              src: ['file://some_audio_file', 'file://another_audio_file']
+              src: ['ipfs://Qmb78QQ4RXxKQrteRn4X3WaMXXfmi2', 'BU2dLjfWxuJoF2Ny']
             }
           ],
           id: '1',
@@ -193,7 +193,7 @@ describe('SingleAddressWallet.assets/nft', () => {
       mintOrBurnCount: expect.anything(),
       name: assetNames[TOKEN_METADATA_2_INDEX],
       nftMetadata: {
-        image: ['ipfs://some_hash1'],
+        image: 'ipfs://some_hash1',
         name: 'One',
         otherProperties: new Map([['version', '1.0']]),
         version: '1.0'
@@ -219,20 +219,20 @@ describe('SingleAddressWallet.assets/nft', () => {
       mintOrBurnCount: expect.anything(),
       name: assetNames[TOKEN_METADATA_1_INDEX],
       nftMetadata: {
-        description: ['NFT with different types of files'],
+        description: 'NFT with different types of files',
         files: [
           {
             mediaType: 'video/mp4',
             name: 'some name',
-            src: ['file://some_video_file']
+            src: 'ipfs://Qmb78QQ4RXxKQrteRn4X3WaMXXfmi2BU2dLjfWxuJoF2N5'
           },
           {
             mediaType: 'audio/mpeg',
             name: 'some name',
-            src: ['file://some_audio_file', 'file://another_audio_file']
+            src: 'ipfs://Qmb78QQ4RXxKQrteRn4X3WaMXXfmi2BU2dLjfWxuJoF2Ny'
           }
         ],
-        image: ['ipfs://somehash'],
+        image: 'ipfs://somehash',
         mediaType: 'image/png',
         name: 'NFT with files',
         otherProperties: new Map([
@@ -240,7 +240,7 @@ describe('SingleAddressWallet.assets/nft', () => {
           ['version', '1.0']
         ]),
         version: '1.0'
-      },
+      } as Asset.NftMetadata,
       policyId,
       supply: expect.anything(),
       tokenMetadata: null
@@ -357,7 +357,7 @@ describe('SingleAddressWallet.assets/nft', () => {
           mintOrBurnCount: expect.anything(),
           name: assetNameHex,
           nftMetadata: {
-            image: ['ipfs://some_hash1'],
+            image: 'ipfs://some_hash1',
             name: assetName,
             otherProperties: new Map([['version', '1.0']]),
             version: '1.0'
