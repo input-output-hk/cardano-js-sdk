@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { EMPTY, firstValueFrom } from 'rxjs';
-import { ObservableWallet } from '@cardano-sdk/wallet';
-import { logger } from '@cardano-sdk/util-dev';
-
+import { EMPTY, TimeoutError, firstValueFrom, timeout } from 'rxjs';
 import { MinimalRuntime, consumeRemoteApi, exposeApi } from '../../src/messaging';
+import { ObservableWallet } from '@cardano-sdk/wallet';
+import { Storage } from 'webextension-polyfill';
 import { WalletFactory, WalletManagerWorker, keyAgentChannel } from '../../src';
+import { logger } from '@cardano-sdk/util-dev';
+import pick from 'lodash/pick';
 
 jest.mock('../../src/messaging', () => {
   const originalModule = jest.requireActual('../../src/messaging');
@@ -16,6 +17,23 @@ jest.mock('../../src/messaging', () => {
   };
 });
 
+const createInMemoryStorage = () => {
+  const store: Record<string, any> = {};
+  return {
+    get: async (keyOrKeys) =>
+      typeof keyOrKeys === 'object'
+        ? Array.isArray(keyOrKeys)
+          ? pick(store, keyOrKeys)
+          : { ...keyOrKeys, ...store }
+        : keyOrKeys
+        ? pick(store, keyOrKeys)
+        : {},
+    set: async (items) => {
+      Object.assign(store, items);
+    }
+  } as Storage.StorageArea;
+};
+
 const expectWalletChannelClosed = () => {
   const hostSubscription = exposeApi({} as any, {} as any);
   expect(hostSubscription.shutdown).toHaveBeenCalled();
@@ -26,6 +44,7 @@ describe('WalletManagerWorker', () => {
   const walletId =
     // eslint-disable-next-line max-len
     '0-2-da7b4795b11a79116eb5232c83d2c862';
+  let managerStorage: Storage.StorageArea;
   let walletManager: WalletManagerWorker;
   let walletFactoryCreate: jest.Mock;
   let mockWallet: ObservableWallet;
@@ -40,18 +59,13 @@ describe('WalletManagerWorker', () => {
     expect(mockWallet.shutdown).toHaveBeenCalled();
   };
 
-  beforeEach(() => {
-    mockWallet = {
-      shutdown: jest.fn()
-    } as unknown as ObservableWallet;
-
-    walletFactoryCreate = jest.fn().mockResolvedValue(mockWallet);
+  const createWalletManager = () => {
     const walletFactory: WalletFactory = { create: walletFactoryCreate };
-
-    walletManager = new WalletManagerWorker(
+    return new WalletManagerWorker(
       { walletName: 'ccvault' },
       {
         logger,
+        managerStorage,
         runtime,
         storesFactory: {
           create: jest.fn().mockReturnValueOnce(mockStoreA).mockReturnValueOnce(mockStoreB)
@@ -59,6 +73,16 @@ describe('WalletManagerWorker', () => {
         walletFactory
       }
     );
+  };
+
+  beforeEach(() => {
+    mockWallet = {
+      shutdown: jest.fn()
+    } as unknown as ObservableWallet;
+
+    walletFactoryCreate = jest.fn().mockResolvedValue(mockWallet);
+    managerStorage = createInMemoryStorage();
+    walletManager = createWalletManager();
   });
 
   afterEach(() => {
@@ -124,6 +148,22 @@ describe('WalletManagerWorker', () => {
     it('destroys store on destroy active wallet', async () => {
       await walletManager.destroy();
       expect(mockStoreA.destroy).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('initialize', () => {
+    it('does nothing before wallet is activated for the 1st time', async () => {
+      await walletManager.initialize();
+      await expect(firstValueFrom(walletManager.activeWallet$.pipe(timeout({ first: 50 })))).rejects.toThrowError(
+        TimeoutError
+      );
+    });
+
+    it('activates last activated wallet', async () => {
+      await walletManager.activate({ observableWalletName, walletId });
+      const recreatedWalletManager = createWalletManager();
+      await recreatedWalletManager.initialize();
+      expect(await firstValueFrom(recreatedWalletManager.activeWallet$)).toBeTruthy();
     });
   });
 

@@ -23,7 +23,7 @@ describe('NftMetadata/metadatumToCip25', () => {
   ]);
 
   const minimalConvertedMetadata = {
-    image: ['ipfs://image'],
+    image: 'ipfs://image',
     name: 'test nft',
     version: '1.0'
   };
@@ -85,29 +85,6 @@ describe('NftMetadata/metadatumToCip25', () => {
     });
 
   describe('invalid metadata on optional fields', () => {
-    it('omits files with a missing file name', () => {
-      const metadatum = createMetadatumWithFiles([
-        {
-          __type: 'Map',
-          value: [
-            ['src', 'ipfs://QmTcKWh95A5fTx1Bbw158cowWysvqLCWTgR9UBiEKD9cuf'],
-            ['mediaType', 'image/png']
-          ]
-        },
-        {
-          __type: 'Map',
-          value: [
-            ['src', 'ipfs://QmTcKWh95A5fTx1Bbw158cowWysvqLCWTgR9UBiEKD9cu8'],
-            ['mediaType', 'image/png'],
-            ['name', 'BRAVO']
-          ]
-        }
-      ]);
-      const result = metadatumToCip25(validAsset, metadatum, logger);
-      expect(result).toBeTruthy();
-      expect(result?.files).toHaveLength(1);
-    });
-
     it('omits files with a missing file media type', () => {
       const metadatum = createMetadatumWithFiles([
         {
@@ -177,6 +154,29 @@ describe('NftMetadata/metadatumToCip25', () => {
     expect(metadatumToCip25(validAsset, metadatum, logger)).toBeNull();
   });
 
+  it('returns metadata files with a missing file name', () => {
+    const metadatum = createMetadatumWithFiles([
+      {
+        __type: 'Map',
+        value: [
+          ['src', 'ipfs://QmTcKWh95A5fTx1Bbw158cowWysvqLCWTgR9UBiEKD9cuf'],
+          ['mediaType', 'image/png']
+        ]
+      },
+      {
+        __type: 'Map',
+        value: [
+          ['src', 'ipfs://QmTcKWh95A5fTx1Bbw158cowWysvqLCWTgR9UBiEKD9cu8'],
+          ['mediaType', 'image/png'],
+          ['name', 'BRAVO']
+        ]
+      }
+    ]);
+    const result = metadatumToCip25(validAsset, metadatum, logger);
+    expect(result).toBeTruthy();
+    expect(result?.files).toHaveLength(2);
+  });
+
   it('converts minimal metadata', () => {
     const metadatum: TxMetadata = new Map([
       [721n, new Map([[policyIdString, new Map([[assetNameString, minimalMetadata]])]])]
@@ -191,16 +191,25 @@ describe('NftMetadata/metadatumToCip25', () => {
     expect(metadatumToCip25(asset, metadatum, logger)).toEqual(minimalConvertedMetadata);
   });
 
-  it('supports image with ipfs protocol', () => {
+  it('supports image with ipfs protocol as string', () => {
+    const metadatum = createMetadatumWithFiles(
+      [],
+      ['ipfs://bafybeihtdkq3ntfcewytdaimnrslpxsatsg47e3bqlsgi', '3jkax65pypymi']
+    );
+    const result = metadatumToCip25(validAsset, metadatum, logger);
+    expect(result?.image).toEqual('ipfs://bafybeihtdkq3ntfcewytdaimnrslpxsatsg47e3bqlsgi3jkax65pypymi');
+  });
+
+  it('supports image with ipfs protocol as array', () => {
     const metadatum = createMetadatumWithFiles([], assetImageIPFS);
     const result = metadatumToCip25(validAsset, metadatum, logger);
-    expect(result?.image).toEqual([assetImageIPFS]);
+    expect(result?.image).toEqual(assetImageIPFS);
   });
 
   it('supports image in https protocol', () => {
     const metadatum = createMetadatumWithFiles([], assetImageHTTPS);
     const result = metadatumToCip25(validAsset, metadatum, logger);
-    expect(result?.image).toEqual([assetImageHTTPS]);
+    expect(result?.image).toEqual(assetImageHTTPS);
   });
 
   it('supports bse64 decoded image following data URL scheme standard', () => {
@@ -239,7 +248,7 @@ describe('NftMetadata/metadatumToCip25', () => {
 
     const metadatum = createMetadatumWithFiles([], base64DecodedImage);
     const result = metadatumToCip25(validAsset, metadatum, logger);
-    expect(result?.image).toEqual([base64DecodedImage.join('')]);
+    expect(result?.image).toEqual(base64DecodedImage.join(''));
   });
 
   it('supports CIP-0025 v2', () => {
@@ -297,7 +306,7 @@ describe('NftMetadata/metadatumToCip25', () => {
     ]);
     expect(metadatumToCip25(asset, metadatum, logger)).toEqual({
       ...minimalConvertedMetadata,
-      description: ['description'],
+      description: 'description',
       mediaType: 'image/png',
       otherProperties: new Map([['extraProp', 'extra']])
     });
@@ -410,14 +419,14 @@ describe('NftMetadata/metadatumToCip25', () => {
     expect(metadatumToCip25(asset, metadatum, logger)).toEqual({
       ...minimalConvertedMetadata,
       files: [
-        { mediaType: 'image/jpg', name: 'file1', src: ['https://file1.location'] },
+        { mediaType: 'image/jpg', name: 'file1', src: 'https://file1.location' },
         {
           mediaType: 'image/png',
           name: 'file2',
           otherProperties: new Map([['extraProp', 'extra']]),
-          src: ['ipfs://file2.location']
+          src: 'ipfs://file2.location'
         },
-        { mediaType: 'image/jpg', name: 'file3', src: [base64FileSrc.join('')] }
+        { mediaType: 'image/jpg', name: 'file3', src: base64FileSrc.join('') }
       ]
     });
   });
