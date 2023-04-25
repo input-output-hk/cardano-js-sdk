@@ -17,22 +17,15 @@ const asString = (obj: unknown): string | undefined => {
   }
 };
 
-const asStringArray = (metadatum: Cardano.Metadatum | undefined): string[] | undefined => {
+const metadatumToString = (metadatum: Cardano.Metadatum | undefined): string | undefined => {
   if (Array.isArray(metadatum)) {
     const result = metadatum.map(asString);
     if (result.some((str) => typeof str === 'undefined')) {
       return undefined;
     }
-    // Based on the CIP25: base64-encoded fields spec
-    if (result[0]?.startsWith('data:')) {
-      return [result.join('')];
-    }
-    return result as string[];
+    return result.join('');
   }
-  const str = asString(metadatum);
-  if (str) {
-    return [str];
-  }
+  return asString(metadatum);
 };
 
 const mapOtherProperties = (metadata: Cardano.MetadatumMap, primaryProperties: string[]) => {
@@ -44,31 +37,21 @@ const mapOtherProperties = (metadata: Cardano.MetadatumMap, primaryProperties: s
   }, new Map<string, Cardano.Metadatum>());
 };
 
-const toArray = <T>(value: T | T[]): T[] => (Array.isArray(value) ? value : [value]);
-
-const missingFileFieldLogMessage = (fieldType: string, assetId: Cardano.AssetId) =>
-  `Omitting cip25 metadata file: missing "${fieldType}". AssetId: ${assetId}`;
+const missingFieldLogMessage = (fieldType: string, assetId: Cardano.AssetId, rootLevel: boolean) =>
+  `Omitting cip25 ${rootLevel ? 'root' : 'file'} metadata: missing "${fieldType}". AssetId: ${assetId}`;
 
 const mapFile = (metadatum: Cardano.Metadatum, assetId: Cardano.AssetId, logger: Logger): NftMetadataFile | null => {
   const file = asMetadatumMap(metadatum);
   if (!file) throw new InvalidFileError();
-
+  const name = asString(file.get('name'));
   const mediaType = asString(file.get('mediaType'));
   if (!mediaType) {
-    logger.warn(missingFileFieldLogMessage('mediaType', assetId));
+    logger.warn(missingFieldLogMessage('mediaType', assetId, false));
     return null;
   }
-  const name = asString(file.get('name'));
-  if (!name) {
-    logger.warn(missingFileFieldLogMessage('name', assetId));
-    return null;
-  }
-
-  const unknownTypeSrc = file.get('src');
-  const src = asStringArray(unknownTypeSrc)?.map((fileSrc) => Uri(fileSrc));
-
+  const src = metadatumToString(file.get('src'));
   if (!src) {
-    logger.warn(missingFileFieldLogMessage('source', assetId));
+    logger.warn(missingFieldLogMessage('source', assetId, false));
     return null;
   }
 
@@ -76,7 +59,7 @@ const mapFile = (metadatum: Cardano.Metadatum, assetId: Cardano.AssetId, logger:
     mediaType: MediaType(mediaType),
     name,
     otherProperties: mapOtherProperties(file, ['mediaType', 'name', 'src']),
-    src: toArray(src)
+    src: Uri(src)
   };
 };
 
@@ -136,20 +119,20 @@ export const metadatumToCip25 = (
   const assetMetadata = getAssetMetadata(policy, asset.name);
   if (!assetMetadata) return null;
   const name = asString(assetMetadata.get('name'));
-  const image = asStringArray(assetMetadata.get('image'));
+  const image = metadatumToString(assetMetadata.get('image'));
+  const assetId = assetIdFromPolicyAndName(asset.policyId, asset.name);
   if (!name || !image) {
-    logger.warn('Invalid CIP-25 metadata', assetMetadata);
+    logger.warn(missingFieldLogMessage(!name ? 'name' : 'image', assetId, true));
     return null;
   }
   const mediaType = asString(assetMetadata.get('mediaType'));
   const files = asMetadatumArray(assetMetadata.get('files'));
-  const assetId = assetIdFromPolicyAndName(asset.policyId, asset.name);
 
   try {
     return {
-      description: asStringArray(assetMetadata.get('description')),
+      description: metadatumToString(assetMetadata.get('description')),
       files: files?.map((file) => mapFile(file, assetId, logger)).filter(isNotNil),
-      image: image.map((img) => Uri(img)),
+      image: Uri(image),
       mediaType: mediaType ? ImageMediaType(mediaType) : undefined,
       name,
       otherProperties: mapOtherProperties(assetMetadata, ['name', 'image', 'mediaType', 'description', 'files']),
