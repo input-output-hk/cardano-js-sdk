@@ -3,6 +3,7 @@
 import { Logger } from 'ts-log';
 import { MethodRequest, ResponseMessage } from './types';
 import { isRequestMessage } from './util';
+import { toSerializableObject } from '@cardano-sdk/util';
 
 export type AnyApi = any;
 
@@ -23,9 +24,16 @@ export const runContentScriptMessageProxy = (apis: AnyApi[], logger: Logger) => 
     const apiFunction = apis.find((api: any) => typeof api[data.request.method] === 'function')?.[data.request.method];
     if (!apiFunction) return;
 
+    let response;
+    try {
+      response = await apiFunction(...data.request.args);
+    } catch (error) {
+      response = error;
+    }
+
     const responseMessage: ResponseMessage = {
       messageId: data.messageId,
-      response: await apiFunction(...data.request.args)
+      response: toSerializableObject(response)
     };
 
     window.postMessage(responseMessage, source.origin);
