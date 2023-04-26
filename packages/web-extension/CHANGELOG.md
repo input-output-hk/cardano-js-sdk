@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.9.0-nightly.0...@cardano-sdk/web-extension@0.9.0-nightly.1) (2023-04-26)
+
+### ⚠ BREAKING CHANGES
+
+- **web-extension:** WalletManagerWorker now requires an extra dependency: managerStorage
+
+### Features
+
+- **web-extension:** store and restore last activated wallet props ([1f78d87](https://github.com/input-output-hk/cardano-js-sdk/commit/1f78d87c438c630bf4ee835a387449c667cde319))
+
+### Bug Fixes
+
+- **web-extension:** proxy error responses ([3c20399](https://github.com/input-output-hk/cardano-js-sdk/commit/3c203993faca3916f34626267885aaaec357d0e8))
+
 ## [0.9.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.8.3-nightly.8...@cardano-sdk/web-extension@0.9.0-nightly.0) (2023-04-24)
 
 ### ⚠ BREAKING CHANGES
