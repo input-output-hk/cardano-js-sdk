@@ -1,23 +1,27 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
-import { FinalizeTxProps, InitializeTxProps, InitializeTxResult, OutputValidator } from '@cardano-sdk/tx-construction';
 import {
+  FinalizeTxProps,
   IncompatibleWalletError,
+  InitializeTxProps,
+  InitializeTxResult,
   MaybeValidTx,
   OutputBuilder,
+  OutputValidator,
   PartialTxOut,
   SignedTx,
   TxAlreadySubmittedError,
   TxBodyValidationError,
   TxBuilder,
   TxOutValidationError,
-  ValidTx
-} from './types';
+  TxOutputBuilder,
+  ValidTx,
+  createOutputValidator
+} from '@cardano-sdk/tx-construction';
 import { Logger } from 'ts-log';
 import { Observable, firstValueFrom } from 'rxjs';
 import { ObservableWallet } from '../types';
-import { ObservableWalletTxOutputBuilder } from './OutputBuilder';
-import { RewardAccount, StakeKeyStatus, WalletUtilContext, createWalletUtil } from '../services';
+import { RewardAccount, StakeKeyStatus, WalletUtilContext } from '../services';
 import { SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
 import { contextLogger, deepEquals } from '@cardano-sdk/util';
 
@@ -111,7 +115,11 @@ export class ObservableWalletTxBuilder implements TxBuilder {
   #logger: Logger;
   #isSubmitted = false; // Do not allow building if a transaction built by this builder was already submitted
 
-  constructor({ observableWallet, outputValidator = createWalletUtil(observableWallet), logger }: BuildTxProps) {
+  constructor({
+    observableWallet,
+    outputValidator = createOutputValidator({ protocolParameters$: observableWallet.protocolParameters$ }),
+    logger
+  }: BuildTxProps) {
     this.#observableWallet = observableWallet;
     this.#outputValidator = outputValidator;
     this.#logger = logger;
@@ -135,7 +143,7 @@ export class ObservableWalletTxBuilder implements TxBuilder {
   }
 
   buildOutput(txOut?: PartialTxOut): OutputBuilder {
-    return new ObservableWalletTxOutputBuilder({
+    return new TxOutputBuilder({
       logger: contextLogger(this.#logger, 'outputBuilder'),
       outputValidator: this.#outputValidator,
       txOut

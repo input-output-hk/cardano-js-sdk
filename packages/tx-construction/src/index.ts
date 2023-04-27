@@ -2,4 +2,5 @@ export * from './createTransactionInternals';
 export * from './fees';
 export * from './input-selection';
 export * from './output-validation';
+export * from './tx-builder';
 export * from './types';

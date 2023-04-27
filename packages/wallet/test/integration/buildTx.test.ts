@@ -9,19 +9,18 @@ import { of } from 'rxjs';
 import * as mocks from '../../../core/test/mocks';
 import {
   IncompatibleWalletError,
-  ObservableWallet,
   OutputBuilder,
+  OutputValidation,
   OutputValidationMinimumCoinError,
   OutputValidationMissingRequiredError,
   OutputValidationTokenBundleSizeError,
-  StakeKeyStatus,
+  OutputValidator,
   TxAlreadySubmittedError,
   TxBuilder,
-  TxOutputFailure,
-  buildTx
-} from '../../src';
+  TxOutputFailure
+} from '@cardano-sdk/tx-construction';
 import { KeyRole, SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
-import { OutputValidation, OutputValidator } from '@cardano-sdk/tx-construction';
+import { ObservableWallet, StakeKeyStatus, buildTx } from '../../src';
 import { assertTxIsValid, assertTxOutIsValid } from '../util';
 import { createWallet } from './util';
 
