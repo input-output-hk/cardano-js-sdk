@@ -51,7 +51,6 @@
     "prepack": "yarn build"
   },
   "devDependencies": {
-    "@cardano-sdk/util-dev": "^0.8.0",
     "@types/lodash": "^4.14.182",
     "eslint": "^7.32.0",
     "jest": "^28.1.3",
