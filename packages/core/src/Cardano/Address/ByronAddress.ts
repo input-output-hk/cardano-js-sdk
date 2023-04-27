@@ -1,9 +1,9 @@
 /* eslint-disable no-bitwise */
 import { Address, AddressProps, AddressType } from './Address';
+import { CborReader, CborReaderState, CborTag, CborWriter } from '../../Serialization';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 import { crc32 } from '@foxglove/crc';
-import Cbor from 'borc';
 
 /**
  * Byron address attributes (both optional). The network tag is present only on test networks and contains an
@@ -148,17 +148,46 @@ export class ByronAddress {
    * @param props The address properties.
    */
   static packParts(props: AddressProps): Uint8Array {
-    const addressAttributes = new Map();
-
     const { root, attrs, type } = props.byronAddressContent!;
+    let mapSize = 0;
 
-    if (attrs.derivationPath) addressAttributes.set(1, Cbor.encode(Buffer.from(attrs.derivationPath, 'hex')));
-    if (attrs.magic) addressAttributes.set(2, Cbor.encode(attrs.magic));
+    if (attrs.derivationPath) ++mapSize;
+    if (attrs.magic) ++mapSize;
 
-    const addressData = [Buffer.from(root, 'hex'), addressAttributes, type];
-    const addressDataEncoded = Cbor.encode(addressData);
+    const writer = new CborWriter();
 
-    return Cbor.encode([new Cbor.Tagged(24, addressDataEncoded), crc32(addressDataEncoded)]);
+    writer.writeStartArray(3);
+    writer.writeByteString(Buffer.from(root, 'hex'));
+    writer.writeStartMap(mapSize);
+
+    if (attrs.derivationPath) {
+      // The path must be stored pre-encoded as CBOR.
+      const encodedPathCbor = new CborWriter().writeByteString(Buffer.from(attrs.derivationPath, 'hex')).encode();
+
+      writer.writeInt(1);
+      writer.writeByteString(encodedPathCbor);
+    }
+
+    if (attrs.magic) {
+      // The magic must be stored pre-encoded as CBOR.
+      const encodedMagicCbor = new CborWriter().writeInt(attrs.magic).encode();
+
+      writer.writeInt(2);
+      writer.writeByteString(encodedMagicCbor);
+    }
+
+    writer.writeInt(type);
+
+    const addressDataEncoded = Buffer.from(writer.encodeAsHex(), 'hex');
+
+    writer.reset();
+
+    writer.writeStartArray(2);
+    writer.writeTag(CborTag.EncodedCborDataItem);
+    writer.writeByteString(addressDataEncoded);
+    writer.writeInt(crc32(addressDataEncoded));
+
+    return writer.encode();
   }
 
   /**
@@ -168,32 +197,54 @@ export class ByronAddress {
    * @param data The serialized address data.
    */
   static unpackParts(type: number, data: Uint8Array): Address {
-    // Strip the 24 CBOR data tags (the "[0].value" part)
-    const addressAsBuffer = Cbor.decode(data);
-    const addressDataEncoded = addressAsBuffer[0].value;
-    const addressContent = Cbor.decode(addressDataEncoded);
+    let reader = new CborReader(HexBlob.fromBytes(data));
 
-    const checksum = addressAsBuffer[1];
+    reader.readStartArray();
+    reader.readTag();
 
-    if (checksum !== crc32(addressDataEncoded))
+    const addressDataEncoded = reader.readByteString();
+
+    if (Number(reader.readInt()) !== crc32(addressDataEncoded))
       throw new InvalidArgumentError('data', 'Invalid Byron raw data. Checksum doesnt match.');
 
-    const root = Hash28ByteBase16(Buffer.from(addressContent[0]).toString('hex'));
-    let attributes = addressContent[1];
+    reader = new CborReader(HexBlob.fromBytes(addressDataEncoded));
 
-    // cbor decoder decodes empty map as empty object, so we re-cast it to Map(0)
-    if (!(attributes instanceof Map)) {
-      attributes = new Map();
+    reader.readStartArray();
+
+    const root = Hash28ByteBase16(Buffer.from(reader.readByteString()).toString('hex'));
+
+    reader.readStartMap();
+    let magic;
+    let derivationPath;
+
+    while (reader.peekState() !== CborReaderState.EndMap) {
+      const key = reader.readInt();
+
+      // We need to use a new reader here, because this part of the payload is double encoded.
+      switch (key) {
+        case 1n: {
+          const cborBytes = reader.readByteString();
+          derivationPath = HexBlob.fromBytes(new CborReader(HexBlob.fromBytes(cborBytes)).readByteString());
+          break;
+        }
+        case 2n: {
+          const cborBytes = reader.readByteString();
+          magic = Number(new CborReader(HexBlob.fromBytes(cborBytes)).readInt());
+          break;
+        }
+      }
     }
 
-    const derivationPath = attributes.has(1)
-      ? HexBlob(Buffer.from(Cbor.decode(attributes.get(1))).toString('hex'))
-      : undefined;
-    const magic = attributes.has(2) ? Cbor.decode(attributes.get(2)) : undefined;
-    const byronAddressType = addressContent[2] as ByronAddressType;
+    reader.readEndMap();
+
+    const byronAddressType = Number(reader.readInt()) as ByronAddressType;
 
     return new Address({
-      byronAddressContent: { attrs: { derivationPath, magic }, root, type: byronAddressType },
+      byronAddressContent: {
+        attrs: { derivationPath, magic },
+        root,
+        type: byronAddressType
+      },
       type
     });
   }

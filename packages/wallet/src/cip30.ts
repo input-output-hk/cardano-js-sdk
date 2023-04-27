@@ -13,7 +13,7 @@ import {
   TxSignErrorCode,
   WalletApi
 } from '@cardano-sdk/dapp-connector';
-import { CML, Cardano, TxCBOR, cmlToCore, coreToCml } from '@cardano-sdk/core';
+import { CML, Cardano, Transaction, TxCBOR, cmlToCore, coreToCml } from '@cardano-sdk/core';
 import { HexBlob, ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
 import { Observable, firstValueFrom } from 'rxjs';
@@ -282,11 +282,12 @@ export const createWalletApi = (
   signTx: async (tx: Cbor, partialSign?: Boolean): Promise<Cbor> => {
     const scope = new ManagedFreeableScope();
     logger.debug('signTx');
-    const txDecoded = scope.manage(CML.Transaction.from_bytes(Buffer.from(tx, 'hex')));
+    const txDecoded = scope.manage(Transaction.fromCbor(HexBlob(tx)));
+
     const hash = Cardano.TransactionId(
       Buffer.from(scope.manage(CML.hash_transaction(scope.manage(txDecoded.body()))).to_bytes()).toString('hex')
     );
-    const coreTx = cmlToCore.newTx(txDecoded);
+    const coreTx = txDecoded.toCore();
     const shouldProceed = await confirmationCallback({
       data: coreTx,
       type: Cip30ConfirmationCallbackType.SignTx

@@ -1,5 +1,5 @@
 import { BehaviorSubject, EMPTY, of } from 'rxjs';
-import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider, coreToCml, util } from '@cardano-sdk/core';
+import { Cardano, ProviderError, ProviderFailure, Transaction, TxSubmitProvider } from '@cardano-sdk/core';
 import { ConnectionStatus, SmartTxSubmitProvider, TipSlot } from '../../src';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { flushPromises } from '@cardano-sdk/util-dev';
@@ -36,21 +36,21 @@ describe('SmartTxSubmitProvider', () => {
       witness: { signatures: new Map() }
     };
     const validityInterval = { invalidBefore: Cardano.Slot(5), invalidHereafter: Cardano.Slot(10) };
-    const txWithoutValidityIntervalHex = util.bytesToHex(
-      usingAutoFree((scope) => coreToCml.tx(scope, txWithoutValidityInterval).to_bytes())
+    const txWithoutValidityIntervalHex = usingAutoFree((scope) =>
+      scope.manage(Transaction.fromCore(scope, txWithoutValidityInterval)).toCbor()
     );
-    const txWithValidityIntervalHex = util.bytesToHex(
-      usingAutoFree((scope) =>
-        coreToCml
-          .tx(scope, {
+    const txWithValidityIntervalHex = usingAutoFree((scope) =>
+      scope
+        .manage(
+          Transaction.fromCore(scope, {
             ...txWithoutValidityInterval,
             body: {
               ...txWithoutValidityInterval.body,
               validityInterval
             }
           })
-          .to_bytes()
-      )
+        )
+        .toCbor()
     );
 
     describe('all preconditions are met', () => {

@@ -1,9 +1,8 @@
 /* eslint-disable prettier/prettier */
 import { BigNum } from '@dcspark/cardano-multiplatform-lib-nodejs';
-import { CML } from './CML';
 import { HexBlob, ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
+import { Transaction } from '../Serialization';
 import { Tx, TxBody } from '../Cardano';
-import { newTx } from './cmlToCore';
 
 export const MAX_U64 = 18_446_744_073_709_551_615n;
 
@@ -28,14 +27,13 @@ export const bytewiseEquals = (obj1: CslObject, obj2: CslObject) => {
 };
 
 export const deserializeTx = ((txBody: Buffer | Uint8Array | string) => usingAutoFree((scope) => {
-    const buffer =
-      txBody instanceof Buffer
-        ? txBody
-        : (txBody instanceof Uint8Array
-          ? Buffer.from(txBody)
-          : Buffer.from(HexBlob(txBody), 'hex'));
+  const hex =
+    txBody instanceof Buffer
+      ? txBody.toString('hex')
+      : (txBody instanceof Uint8Array
+        ? Buffer.from(txBody).toString('hex')
+        : txBody);
 
-    const txDecoded = scope.manage(CML.Transaction.from_bytes(buffer));
-
-    return newTx(txDecoded);
-  })) as (txBody: HexBlob | Buffer | Uint8Array | string) => Tx<TxBody>;
+  const transaction = scope.manage(Transaction.fromCbor(HexBlob(hex)));
+  return transaction.toCore();
+})) as (txBody: HexBlob | Buffer | Uint8Array | string) => Tx<TxBody>;

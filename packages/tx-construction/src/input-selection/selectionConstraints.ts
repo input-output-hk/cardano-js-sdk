@@ -1,4 +1,4 @@
-import { CML, Cardano, InvalidProtocolParametersError, cmlUtil, coreToCml } from '@cardano-sdk/core';
+import { CML, Cardano, InvalidProtocolParametersError, Transaction, cmlUtil, coreToCml } from '@cardano-sdk/core';
 import {
   ComputeMinimumCoinQuantity,
   ComputeSelectionLimit,
@@ -53,7 +53,7 @@ export const tokenBundleSizeExceedsLimit =
     });
   };
 
-const getTxSize = (tx: CML.Transaction) => tx.to_bytes().length;
+const getTxSize = (tx: Transaction) => Buffer.from(tx.toCbor(), 'hex').length;
 
 /**
  * This constraint implementation is not intended to used by selection algorithms
@@ -67,7 +67,7 @@ export const computeSelectionLimit =
   (selectionSkeleton) =>
     usingAutoFree(async (scope) => {
       const tx = await buildTx(selectionSkeleton);
-      const txSize = getTxSize(coreToCml.tx(scope, tx));
+      const txSize = getTxSize(scope.manage(Transaction.fromCore(scope, tx)));
       if (txSize <= maxTxSize) {
         return selectionSkeleton.inputs.size;
       }

@@ -6,8 +6,8 @@ import {
   ProviderError,
   ProviderFailure,
   SubmitTxArgs,
-  TxSubmitProvider,
-  cmlUtil
+  TxBodyCBOR,
+  TxSubmitProvider
 } from '@cardano-sdk/core';
 import { Channel, Connection, connect } from 'amqplib';
 import { TX_SUBMISSION_QUEUE, getErrorPrototype, waitForPending } from './utils';
@@ -162,8 +162,7 @@ export class RabbitMqTxSubmitProvider implements TxSubmitProvider {
       };
 
       try {
-        txId = cmlUtil.deserializeTx(signedTransaction).id;
-
+        txId = Cardano.TransactionId.fromTxBodyCbor(TxBodyCBOR.fromTxCBOR(signedTransaction));
         this.#dependencies.logger.info(`${moduleName}: queuing tx id: ${txId}`);
 
         // Actually send the message

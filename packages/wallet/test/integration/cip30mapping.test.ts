@@ -11,7 +11,7 @@ import {
   WalletApi
 } from '@cardano-sdk/dapp-connector';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
-import { CML, Cardano, CardanoNodeErrors, TxCBOR, cmlToCore, coreToCml } from '@cardano-sdk/core';
+import { CML, Cardano, CardanoNodeErrors, Transaction, TxCBOR, cmlToCore } from '@cardano-sdk/core';
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence';
 import { InitializeTxProps, InitializeTxResult, SingleAddressWallet, cip30, setupWallet } from '../../src';
@@ -269,7 +269,7 @@ describe('cip30', () => {
       test('api.signTx', async () => {
         const txInternals = await wallet.initializeTx(simpleTxProps);
         const finalizedTx = await wallet.finalizeTx({ tx: txInternals });
-        const hexTx = Buffer.from(coreToCml.tx(scope, finalizedTx).to_bytes()).toString('hex');
+        const hexTx = scope.manage(Transaction.fromCore(scope, finalizedTx)).toCbor();
 
         const cip30witnessSet = await api.signTx(hexTx);
         const signatures = Buffer.from(cip30witnessSet, 'hex');
@@ -291,8 +291,8 @@ describe('cip30', () => {
         beforeEach(async () => {
           const txInternals = await wallet.initializeTx(simpleTxProps);
           finalizedTx = await wallet.finalizeTx({ tx: txInternals });
-          txBytes = coreToCml.tx(scope, finalizedTx).to_bytes();
-          hexTx = Buffer.from(txBytes).toString('hex');
+          hexTx = scope.manage(Transaction.fromCore(scope, finalizedTx)).toCbor();
+          txBytes = Buffer.from(hexTx, 'hex');
         });
 
         it('resolves with transaction id when submitting a valid transaction', async () => {
@@ -360,7 +360,7 @@ describe('cip30', () => {
         beforeAll(async () => {
           const txInternals = await wallet.initializeTx(simpleTxProps);
           const finalizedTx = await wallet.finalizeTx({ tx: txInternals });
-          hexTx = Buffer.from(coreToCml.tx(scope, finalizedTx).to_bytes()).toString('hex');
+          hexTx = scope.manage(Transaction.fromCore(scope, finalizedTx)).toCbor();
         });
 
         test('resolves true', async () => {
@@ -387,8 +387,7 @@ describe('cip30', () => {
         beforeAll(async () => {
           txInternals = await wallet.initializeTx(simpleTxProps);
           finalizedTx = await wallet.finalizeTx({ tx: txInternals });
-
-          cmlTx = Buffer.from(coreToCml.tx(scope, finalizedTx).to_bytes()).toString('hex');
+          cmlTx = scope.manage(Transaction.fromCore(scope, finalizedTx)).toCbor();
         });
 
         test('resolves true', async () => {
