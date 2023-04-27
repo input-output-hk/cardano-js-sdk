@@ -37,6 +37,10 @@ export function withTypeormTransaction<Props>(
   dependencies: WithTypeormTransactionDependencies,
   extensions: { pgBoss: true }
 ): UnifiedExtChainSyncOperator<Props, Props & WithTypeormContext & WithPgBoss>;
+export function withTypeormTransaction<Props>(
+  dependencies: WithTypeormTransactionDependencies,
+  extensions: DataSourceExtensions
+): UnifiedExtChainSyncOperator<Props, Props & WithTypeormContext>;
 /**
  * Start a PostgreSQL transaction for each event.
  *

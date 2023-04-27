@@ -3,10 +3,16 @@
 import { DnsResolver } from '../utils';
 import { Logger } from 'ts-log';
 import { MissingCardanoNodeOption } from '../errors';
-import { OgmiosCardanoNode, OgmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmios';
+import {
+  OgmiosCardanoNode,
+  OgmiosObservableCardanoNode,
+  OgmiosTxSubmitProvider,
+  urlToConnectionConfig
+} from '@cardano-sdk/ogmios';
 import { OgmiosOptionDescriptions, OgmiosProgramOptions } from '../options';
 import { RunnableModule, isConnectionError } from '@cardano-sdk/util';
 import { SubmitTxArgs } from '@cardano-sdk/core';
+import { defer, from, of } from 'rxjs';
 
 const isCardanoNodeOperation = (prop: string | symbol): prop is 'eraSummaries' | 'systemStart' | 'stakeDistribution' =>
   ['eraSummaries', 'systemStart', 'stakeDistribution'].includes(prop as string);
@@ -163,6 +169,25 @@ export const ogmiosCardanoNodeWithDiscovery = async (
   return Object.setPrototypeOf(cardanoNodeProxy, RunnableModule.prototype);
 };
 
+/**
+ * Creates an ObservableOgmiosCardanoNode instance :
+ * - use passed srv service name in order to resolve the port
+ * - all other operations are bind to pool object without modifications
+ *
+ * @returns ObservableOgmiosCardanoNode instance
+ */
+export const ogmiosObservableCardanoNodeWithDiscovery = (
+  dnsResolver: DnsResolver,
+  logger: Logger,
+  serviceName: string
+): OgmiosObservableCardanoNode =>
+  new OgmiosObservableCardanoNode(
+    {
+      connectionConfig$: defer(() => from(dnsResolver(serviceName).then(({ name, port }) => ({ host: name, port }))))
+    },
+    { logger }
+  );
+
 export const getOgmiosCardanoNode = async (
   dnsResolver: DnsResolver,
   logger: Logger,
@@ -171,5 +196,20 @@ export const getOgmiosCardanoNode = async (
   if (options?.ogmiosSrvServiceName)
     return ogmiosCardanoNodeWithDiscovery(dnsResolver, logger, options.ogmiosSrvServiceName);
   if (options?.ogmiosUrl) return new OgmiosCardanoNode(urlToConnectionConfig(options.ogmiosUrl), logger);
+  throw new MissingCardanoNodeOption([OgmiosOptionDescriptions.Url, OgmiosOptionDescriptions.SrvServiceName]);
+};
+
+export const getOgmiosObservableCardanoNode = (
+  dnsResolver: DnsResolver,
+  logger: Logger,
+  options?: OgmiosProgramOptions
+): OgmiosObservableCardanoNode => {
+  if (options?.ogmiosSrvServiceName)
+    return ogmiosObservableCardanoNodeWithDiscovery(dnsResolver, logger, options.ogmiosSrvServiceName);
+  if (options?.ogmiosUrl)
+    return new OgmiosObservableCardanoNode(
+      { connectionConfig$: of(urlToConnectionConfig(options.ogmiosUrl)) },
+      { logger }
+    );
   throw new MissingCardanoNodeOption([OgmiosOptionDescriptions.Url, OgmiosOptionDescriptions.SrvServiceName]);
 };

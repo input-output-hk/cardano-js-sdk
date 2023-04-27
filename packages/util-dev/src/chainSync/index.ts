@@ -124,7 +124,8 @@ export const chainSyncData = memoize((dataSet: ChainSyncDataSet) => {
         intersection
       });
     },
-    genesisParameters$: of(compactGenesis)
+    genesisParameters$: of(compactGenesis),
+    healthCheck$: new Observable()
   };
   return {
     allEvents,

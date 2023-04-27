@@ -106,7 +106,8 @@ const createForkProjectionSource = (
         tip: someEventsWithStakeKeyRegistration[someEventsWithStakeKeyRegistration.length - 1].tip
       }
     });
-  }
+  },
+  healthCheck$: new Observable()
 });
 
 describe('resuming projection when intersection is not local tip', () => {

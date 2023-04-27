@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/consistent-function-scoping */
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable sonarjs/no-duplicate-string */
@@ -9,8 +10,8 @@ import { ChildProcess, fork } from 'child_process';
 import { LedgerTipModel, findLedgerTip } from '../src/util/DbSyncProvider';
 import { Ogmios } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
+import { ProjectionName, ServerMetadata, ServiceNames } from '../src';
 import { RabbitMQContainer } from './TxSubmit/rabbitmq/docker';
-import { ServerMetadata, ServiceNames } from '../src';
 import {
   createHealthyMockOgmiosServer,
   createUnhealthyMockOgmiosServer,
@@ -2006,6 +2007,175 @@ describe('CLI', () => {
             );
           });
         });
+      });
+    });
+  });
+
+  describe('start-projector', () => {
+    let apiUrl: string;
+    let proc: ChildProcess;
+
+    const assertServerAlive = async () => {
+      await serverStarted(apiUrl);
+      const headers = { 'Content-Type': 'application/json' };
+      const res = await axios.post(`${apiUrl}/health`, { headers });
+      expect(res.status).toBe(200);
+      expect(res.data.ok).toBe(false);
+    };
+
+    beforeAll(async () => {
+      const port = await getRandomPort();
+      apiUrl = `http://localhost:${port}`;
+    });
+
+    afterEach((done) => {
+      if (proc?.kill()) proc.on('close', () => done());
+      else done();
+    });
+
+    describe('with cli arguments', () => {
+      let commonArgs: string[];
+      const startProjector = (extraArgs: string[]) => {
+        proc = withLogging(fork(exePath, [...commonArgs, ...extraArgs], { env: {}, stdio: 'pipe' }));
+      };
+
+      beforeEach(() => {
+        commonArgs = ['start-projector', '--logger-min-severity', 'error', '--dry-run', 'true', '--api-url', apiUrl];
+      });
+
+      describe('with predefined ogmios url and postgres connection string', () => {
+        test('with a single projection', async () => {
+          startProjector([
+            '--ogmios-url',
+            'ws://localhost:1234',
+            '--postgres-connection-string',
+            'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
+            ProjectionName.UTXO
+          ]);
+          await assertServerAlive();
+        });
+
+        test('with multiple projections as a last argument', async () => {
+          startProjector([
+            '--ogmios-url',
+            'ws://localhost:1234',
+            '--postgres-connection-string',
+            'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
+            `${ProjectionName.UTXO},${ProjectionName.StakePool}`
+          ]);
+          await assertServerAlive();
+        });
+
+        test('with multiple projections as --projection-names argument', async () => {
+          startProjector([
+            '--projection-names',
+            `${ProjectionName.UTXO},${ProjectionName.StakePool}`,
+            '--ogmios-url',
+            'ws://localhost:1234',
+            '--postgres-connection-string',
+            'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection'
+          ]);
+          await assertServerAlive();
+        });
+
+        it('accepts --drop-schema true', async () => {
+          startProjector([
+            '--ogmios-url',
+            'ws://localhost:1234',
+            '--postgres-connection-string',
+            'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
+            '--drop-schema',
+            'true',
+            ProjectionName.UTXO
+          ]);
+          await assertServerAlive();
+        });
+      });
+
+      it('can be started in SRV discovery mode', async () => {
+        startProjector([
+          '--postgres-db',
+          'dbname',
+          '--postgres-password',
+          'password',
+          '--postgres-srv-service-name',
+          'postgres.projection.com',
+          '--postgres-user',
+          'username',
+          '--ogmios-srv-service-name',
+          'ogmios.projection.com',
+          '--service-discovery-timeout',
+          '1000',
+          ProjectionName.UTXO
+        ]);
+        await assertServerAlive();
+      });
+    });
+
+    describe('with environment variables', () => {
+      let commonEnv: any;
+      const startProjector = <T extends {}>(extraEnv: T, extraArgs: string[] = []) => {
+        proc = withLogging(
+          fork(exePath, ['start-projector', ...extraArgs], {
+            env: {
+              ...commonEnv,
+              ...extraEnv
+            },
+            stdio: 'pipe'
+          })
+        );
+      };
+
+      beforeEach(() => {
+        commonEnv = { API_URL: apiUrl, DRY_RUN: 'true', LOGGER_MIN_SEVERITY: 'error' };
+      });
+
+      describe('with predefined ogmios url and postgres connection string', () => {
+        test('with a single projection', async () => {
+          startProjector(
+            {
+              OGMIOS_URL: 'ws://localhost:1234',
+              POSTGRES_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection'
+            },
+            [ProjectionName.UTXO]
+          );
+          await assertServerAlive();
+        });
+
+        test('with multiple projections as a last argument', async () => {
+          startProjector(
+            {
+              OGMIOS_URL: 'ws://localhost:1234',
+              POSTGRES_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection'
+            },
+            [`${ProjectionName.UTXO},${ProjectionName.StakePool}`]
+          );
+          await assertServerAlive();
+        });
+
+        test('with multiple projections as --projection-names argument', async () => {
+          startProjector({
+            OGMIOS_URL: 'ws://localhost:1234',
+            POSTGRES_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
+            PROJECTION_NAMES: `${ProjectionName.UTXO},${ProjectionName.StakePool}`
+          });
+          await assertServerAlive();
+        });
+      });
+
+      it('can be started in SRV discovery mode', async () => {
+        startProjector(
+          {
+            OGMIOS_SRV_SERVICE_NAME: 'ogmios.projection.com',
+            POSTGRES_DB: 'dbname',
+            POSTGRES_PASSWORD: 'password',
+            POSTGRES_SRV_SERVICE_NAME: 'postgres.projection.com',
+            POSTGRES_USER: 'username',
+            SERVICE_DISCOVERY_TIMEOUT: '1000'
+          },
+          [ProjectionName.UTXO]
+        );
+        await assertServerAlive();
       });
     });
   });

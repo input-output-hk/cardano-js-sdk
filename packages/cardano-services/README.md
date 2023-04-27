@@ -129,9 +129,27 @@ RABBITMQ_SRV_SERVICE_NAME=some-domain-for-rabbitmq \
 ./dist/cjs/cli.js start-worker
 ```
 
+**`start-projector` using CLI options with Ogmios and PostgreSQL running on localhost:**
+
+```bash
+./dist/cjs/cli.js \
+  start-projector \
+    --ogmios-url 'ws://localhost:1339' \
+    --postgres-connection-string 'postgresql://postgres:doNoUseThisSecret!@localhost/projection' \
+    stake-pool,stake-pool-metadata-job
+```
+
 ## Development
 
-See the [development documentation]
+### Generating Projector Schema Migrations
+
+1. Start local projection dependencies (e.g. `yarn preprod:up cardano-node-ogmios postgres`).
+1. Initialize base schema by running `start-projector` with **all** projections enabled. *Hint: you can use `git` to checkout a previous commit if you already updated entities and skipped this step*
+2. Create new entities (or update existing ones).
+3. Include any new entities in `entities` object at `src/Projection/prepareTypeormProjection.ts`.
+4. Run `yarn generate-migration`
+5. Inspect the generated migration and add a static `entity` property. *Hint: you may need to split generated migration into multiple migrations manually if it affects more than 1 entity*
+6. Export the new migration(s) from `migrations` array at `src/Projections/migrations/index.ts`
 
 ## Tests
 
@@ -141,7 +159,6 @@ See [code coverage report]
 [cardano node]: https://github.com/input-output-hk/cardano-node
 [cli]: ./src/cli.ts
 [code coverage report]: https://input-output-hk.github.io/cardano-js-sdk/coverage/cardano-services
-[development documentation]: https://github.com/input-output-hk/cardano-js-sdk/tree/master/packages/cardano-services/src#readme
 [install and build]: ../../README.md#install-and-build
 [ogmios]: https://ogmios.dev/
 [postgresql]: https://www.postgresql.org/

@@ -439,12 +439,10 @@ describe('HttpServer', () => {
         ok: true,
         services: [
           {
-            details: { ok: true },
             name: ServiceNames.StakePool,
             ok: true
           },
           {
-            details: { ok: true },
             name: ServiceNames.NetworkInfo,
             ok: true
           }
@@ -479,7 +477,6 @@ describe('HttpServer', () => {
         ok: false,
         services: [
           {
-            details: { ok: true },
             name: ServiceNames.StakePool,
             ok: true
           },

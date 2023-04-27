@@ -1,6 +1,8 @@
-import { InteractionContext } from '@cardano-ogmios/client';
+import { Cardano } from '@cardano-sdk/core';
+import { HEALTH_RESPONSE_BODY } from './mocks/util';
+import { InteractionContext, ServerHealth } from '@cardano-ogmios/client';
 import { Logger } from 'ts-log';
-import { createInteractionContextWithLogger } from '../src';
+import { createInteractionContextWithLogger, ogmiosServerHealthToHealthCheckResponse } from '../src';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { createMockOgmiosServer, listenPromise, serverClosePromise } from './mocks/mockOgmiosServer';
 import { getRandomPort } from 'get-port-please';
@@ -78,6 +80,31 @@ describe('util', () => {
       it('invokes the onUnexpectedClose callback if the socket is closed unexpectedly', async () => {
         await closeWithCode(interactionContext.socket, 1001);
         expect(onUnexpectedClose).toHaveBeenCalledTimes(1);
+      });
+    });
+    describe('ogmiosServerHealthToHealthCheckResponse', () => {
+      // The upstream type is missing some properties, so just casting for now
+      const serverHealth = HEALTH_RESPONSE_BODY as ServerHealth;
+
+      it('reports as healthy if sync percentage is greater than 0.99', async () => {
+        const networkSynchronization = 0.991;
+        expect(ogmiosServerHealthToHealthCheckResponse({ ...serverHealth, networkSynchronization })).toEqual({
+          localNode: {
+            ledgerTip: serverHealth.lastKnownTip,
+            networkSync: Cardano.Percent(networkSynchronization)
+          },
+          ok: true
+        });
+      });
+
+      it('reports as unhealthy if sync percentage is equal to 0.99', async () => {
+        const networkSynchronization = 0.99;
+        expect(ogmiosServerHealthToHealthCheckResponse({ ...serverHealth, networkSynchronization }).ok).toBe(false);
+      });
+
+      it('reports as unhealthy if sync percentage is less than 0.99', async () => {
+        const networkSynchronization = 0.98;
+        expect(ogmiosServerHealthToHealthCheckResponse({ ...serverHealth, networkSynchronization }).ok).toBe(false);
       });
     });
   });

@@ -22,17 +22,21 @@ const databaseConfigs = {
   }
 };
 
-const setupDBData = async (databaseConfig: DatabaseConfig, user: string, container: DockerUtil.Docker.Container) => {
-  const { database, snapshot, fixture } = databaseConfig;
-
+const createDatabase = async (container: DockerUtil.Docker.Container, user: string, database: string) => {
   const create = await DockerUtil.containerExec(container, [
     'bash',
     '-c',
     `psql -U ${user} -c "CREATE DATABASE ${database}"`
   ]);
-
   if (create.length !== 1 || !create[0].match('CREATE DATABASE'))
     throw new Error(`Error while creating the DB ${JSON.stringify(create)}`);
+  await DockerUtil.ensureDatabaseExistence(container, user, database);
+};
+
+const setupDBData = async (databaseConfig: DatabaseConfig, user: string, container: DockerUtil.Docker.Container) => {
+  const { database, snapshot, fixture } = databaseConfig;
+
+  await createDatabase(container, user, database);
 
   if (snapshot) {
     await container.putArchive(path.join(__dirname, `${database}-db-snapshot.tar`), {
@@ -60,8 +64,6 @@ const setupDBData = async (databaseConfig: DatabaseConfig, user: string, contain
       `cat ${CONTAINER_TEMP_DIR}/${database}-fixture-data.sql | psql -U ${user} ${database}`
     ]);
   }
-
-  await DockerUtil.ensureDatabaseExistence(container, user, database);
 };
 
 module.exports = async () => {
@@ -77,6 +79,7 @@ module.exports = async () => {
 
   const pgContainer = await DockerUtil.setupPostgresContainer(user, password, port || '5432');
   await setupDBData(databaseConfigs.localnetwork, user, pgContainer);
+  await createDatabase(pgContainer, user, 'projection');
 
   const container = new RabbitMQContainer();
 

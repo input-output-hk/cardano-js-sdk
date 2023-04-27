@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
+import { CardanoNodeErrors, Milliseconds } from '@cardano-sdk/core';
 import { Connection, createConnectionObject } from '@cardano-ogmios/client';
-import { Milliseconds } from '@cardano-sdk/core';
 import {
   MockOgmiosServerConfig,
   createMockOgmiosServer,
@@ -10,7 +10,7 @@ import {
   waitForWsClientsDisconnect
 } from '../mocks/mockOgmiosServer';
 import { OgmiosObservableCardanoNode } from '../../src';
-import { combineLatest, firstValueFrom, mergeMap, of, take, toArray } from 'rxjs';
+import { combineLatest, delay as delayEmission, firstValueFrom, mergeMap, of, take, toArray } from 'rxjs';
 import { getRandomPort } from 'get-port-please';
 import { logger } from '@cardano-sdk/util-dev';
 import delay from 'delay';
@@ -127,5 +127,77 @@ describe('ObservableOgmiosCardanoNode', () => {
     expect(epochLength1).toEqual(mockGenesisConfig.epochLength);
     expect(epochLength2).toEqual(mockGenesisConfig.epochLength + 1);
     await serverClosePromise(server);
+  });
+  describe('healthCheck', () => {
+    it('is ok if node is close to the network tip', async () => {
+      const server = await startMockOgmiosServer(connection.port, {
+        healthCheck: { response: { networkSynchronization: 0.999, success: true } }
+      });
+      const node = new OgmiosObservableCardanoNode({ connectionConfig$: of(connection) }, { logger });
+      const res = await firstValueFrom(node.healthCheck$);
+      expect(res.ok).toBe(true);
+      await serverClosePromise(server);
+    });
+    it('simultaneous healthChecks share a single health request to ogmios', async () => {
+      const server = await startMockOgmiosServer(connection.port, {
+        healthCheck: { response: { networkSynchronization: 0.999, success: true } }
+      });
+      const node = new OgmiosObservableCardanoNode({ connectionConfig$: of(connection) }, { logger });
+      const [res1, res2] = await firstValueFrom(combineLatest([node.healthCheck$, node.healthCheck$]));
+      expect(res1.ok).toBe(true);
+      expect(res1).toEqual(res2);
+      expect(server.invocations.health).toBe(1);
+      await serverClosePromise(server);
+    });
+    it('is not ok if node is not close to the network tip', async () => {
+      const server = await startMockOgmiosServer(connection.port, {
+        healthCheck: { response: { networkSynchronization: 0.8, success: true } }
+      });
+      const node = new OgmiosObservableCardanoNode({ connectionConfig$: of(connection) }, { logger });
+      const res = await firstValueFrom(node.healthCheck$);
+      expect(res.ok).toBe(false);
+      await serverClosePromise(server);
+    });
+    it('is not ok when ogmios responds with an unknown result', async () => {
+      const server = await startMockOgmiosServer(connection.port, {
+        healthCheck: {
+          response: { failWith: new CardanoNodeErrors.CardanoClientErrors.UnknownResultError(''), success: false }
+        }
+      });
+      const node = new OgmiosObservableCardanoNode({ connectionConfig$: of(connection) }, { logger });
+      const res = await firstValueFrom(node.healthCheck$);
+      expect(res.ok).toBe(false);
+      await serverClosePromise(server);
+    });
+    it('is not ok when connection is refused', async () => {
+      const node = new OgmiosObservableCardanoNode({ connectionConfig$: of(connection) }, { logger });
+      // Server is not started
+      const result = await firstValueFrom(node.healthCheck$);
+      expect(result.ok).toBe(false);
+    });
+    it('is ok when connectionConfig$ emits within "healthCheckTimeout" duration', async () => {
+      const server = await startMockOgmiosServer(connection.port, {
+        healthCheck: { response: { networkSynchronization: 0.999, success: true } }
+      });
+      const node = new OgmiosObservableCardanoNode(
+        { connectionConfig$: of(connection).pipe(delayEmission(25)), healthCheckTimeout: Milliseconds(50) },
+        { logger }
+      );
+      const result = await firstValueFrom(node.healthCheck$);
+      expect(result.ok).toBe(true);
+      await serverClosePromise(server);
+    });
+    it('is not ok when connectionConfig$ takes longer than "healthCheckTimeout" to emit', async () => {
+      const server = await startMockOgmiosServer(connection.port, {
+        healthCheck: { response: { networkSynchronization: 0.999, success: true } }
+      });
+      const node = new OgmiosObservableCardanoNode(
+        { connectionConfig$: of(connection).pipe(delayEmission(50)), healthCheckTimeout: Milliseconds(25) },
+        { logger }
+      );
+      const result = await firstValueFrom(node.healthCheck$);
+      expect(result.ok).toBe(false);
+      await serverClosePromise(server);
+    });
   });
 });

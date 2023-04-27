@@ -9,7 +9,8 @@ import { RabbitMqProgramOptions } from '../options/rabbitMq';
 export enum Programs {
   BlockfrostWorker = 'Blockfrost worker',
   ProviderServer = 'Provider server',
-  RabbitmqWorker = 'RabbitMQ worker'
+  RabbitmqWorker = 'RabbitMQ worker',
+  Projector = 'Projector'
 }
 
 /**
@@ -24,6 +25,11 @@ export enum ServiceNames {
   Utxo = 'utxo',
   ChainHistory = 'chain-history',
   Rewards = 'rewards'
+}
+
+export enum ProjectorOptionDescriptions {
+  DropSchema = 'Drop and recreate database schema to project from origin',
+  DryRun = 'Initialize the projection, but do not start it'
 }
 
 export enum ProviderServerOptionDescriptions {

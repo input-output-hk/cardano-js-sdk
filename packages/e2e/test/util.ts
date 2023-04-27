@@ -114,7 +114,7 @@ export const txConfirmed = (
   { id }: Pick<Cardano.Tx, 'id'>,
   numConfirmations = 3
 ) =>
-  firstValueFrom(
+  firstValueFromTimed(
     merge(
       history$.pipe(
         switchMap((txs) => {
@@ -135,7 +135,9 @@ export const txConfirmed = (
             : EMPTY
         )
       )
-    )
+    ),
+    `Tx confirmation timeout: ${id}`,
+    SYNC_TIMEOUT_DEFAULT / 5
   );
 
 const submit = (wallet: ObservableWallet, tx: Cardano.Tx | SignedTx) =>

@@ -4,7 +4,7 @@ set -eo pipefail
 SCRIPT_DIR="$(dirname "$(readlink -fm "$0")")"
 PACKAGES_DIR="$(dirname "$(dirname "$(dirname "${SCRIPT_DIR}")")")"
 WORKSPACE_ROOT="$(dirname "${PACKAGES_DIR}")"
-SECRETS_DIR="$PACKAGES_DIR"/cardano-services/placeholder-secrets
+SECRETS_DIR="$WORKSPACE_ROOT"/compose/placeholder-secrets
 
 yarn --cwd "$PACKAGES_DIR"/e2e local-network:down
 yarn --cwd "$PACKAGES_DIR"/e2e local-network:up -d --build
