@@ -453,7 +453,7 @@ export const txMetadata = (auxiliaryMetadata?: CML.GeneralTransactionMetadata): 
   usingAutoFree((scope) => {
     if (!auxiliaryMetadata) return;
     const auxiliaryMetadataMap: Cardano.TxMetadata = new Map();
-    const metadataKeys = auxiliaryMetadata.keys();
+    const metadataKeys = scope.manage(auxiliaryMetadata.keys());
     for (let i = 0; i < metadataKeys.len(); i++) {
       const key = scope.manage(metadataKeys.get(i));
       const transactionMetadatum = scope.manage(auxiliaryMetadata.get(key));
