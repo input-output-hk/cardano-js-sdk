@@ -6,14 +6,16 @@ import { Cardano, Transaction } from '@cardano-sdk/core';
 import { GroupedAddress } from '@cardano-sdk/key-management';
 import {
   ObservableWallet,
-  OutputValidator,
-  ProtocolParametersRequiredByOutputValidator,
   RewardAccount,
   SingleAddressWallet,
   StakeKeyStatus,
-  coldObservableProvider,
-  createOutputValidator
+  coldObservableProvider
 } from '../../src';
+import {
+  OutputValidator,
+  ProtocolParametersRequiredByOutputValidator,
+  createOutputValidator
+} from '@cardano-sdk/tx-construction';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { dummyLogger as logger } from 'ts-log';

@@ -1,26 +1,11 @@
 /* eslint-disable no-bitwise */
-import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
 import { Observable, firstValueFrom } from 'rxjs';
 import { ObservableWallet } from '../types';
-import {
-  OutputValidation,
-  computeMinimumCoinQuantity,
-  tokenBundleSizeExceedsLimit
-} from '@cardano-sdk/tx-construction';
+import { OutputValidatorContext, createOutputValidator } from '@cardano-sdk/tx-construction';
 import { txInEquals } from './util';
 import uniqBy from 'lodash/uniqBy';
 
-export type ProtocolParametersRequiredByOutputValidator = Pick<
-  Cardano.ProtocolParameters,
-  'coinsPerUtxoByte' | 'maxValueSize'
->;
-export interface OutputValidatorContext {
-  /**
-   * Subscribed on every OutputValidator call
-   */
-  protocolParameters$: Observable<ProtocolParametersRequiredByOutputValidator>;
-}
 export interface InputResolverContext {
   utxo: {
     /**
@@ -30,86 +15,6 @@ export interface InputResolverContext {
   };
 }
 export type WalletUtilContext = OutputValidatorContext & InputResolverContext;
-
-export interface OutputValidator {
-  /**
-   * Assumes that value will be used with an output that has:
-   * - no datum
-   * - grouped address (Shelley era+)
-   *
-   * @returns Validates that token bundle size is within limits and computes minimum coin quantity
-   */
-  validateValue(output: Cardano.Value): Promise<OutputValidation>;
-  /**
-   * Assumes that values will be used with outputs that have:
-   * - no datum
-   * - grouped address (Shelley era+)
-   *
-   * @returns For every value, validates that token bundle size is within limits and computes minimum coin quantity
-   */
-  validateValues(outputs: Iterable<Cardano.Value>): Promise<Map<Cardano.Value, OutputValidation>>;
-  /**
-   * @returns Validates that token bundle size is within limits and computes minimum coin quantity
-   */
-  validateOutput(output: Cardano.TxOut): Promise<OutputValidation>;
-  /**
-   * @returns For every output, validates that token bundle size is within limits and computes minimum coin quantity
-   */
-  validateOutputs(outputs: Iterable<Cardano.TxOut>): Promise<Map<Cardano.TxOut, OutputValidation>>;
-}
-
-export const createOutputValidator = ({ protocolParameters$ }: OutputValidatorContext): OutputValidator => {
-  const validateValue = async (
-    value: Cardano.Value,
-    protocolParameters?: ProtocolParametersRequiredByOutputValidator
-  ): Promise<OutputValidation> => {
-    const { coinsPerUtxoByte, maxValueSize } = protocolParameters || (await firstValueFrom(protocolParameters$));
-    const stubMaxSizeAddress = Cardano.PaymentAddress(
-      'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9'
-    );
-    const stubTxOut: Cardano.TxOut = { address: stubMaxSizeAddress, value };
-    const minimumCoin = BigInt(computeMinimumCoinQuantity(coinsPerUtxoByte)(stubTxOut));
-    return {
-      coinMissing: BigIntMath.max([minimumCoin - value.coins, 0n])!,
-      minimumCoin,
-      tokenBundleSizeExceedsLimit: tokenBundleSizeExceedsLimit(maxValueSize)(value.assets)
-    };
-  };
-  const validateValues = async (values: Iterable<Cardano.Value>) => {
-    const protocolParameters = await firstValueFrom(protocolParameters$);
-    const validations = new Map<Cardano.Value, OutputValidation>();
-    for (const value of values) {
-      validations.set(value, await validateValue(value, protocolParameters));
-    }
-    return validations;
-  };
-  const validateOutput = async (
-    output: Cardano.TxOut,
-    protocolParameters?: ProtocolParametersRequiredByOutputValidator
-  ) => {
-    const { coinsPerUtxoByte, maxValueSize } = protocolParameters || (await firstValueFrom(protocolParameters$));
-    const minimumCoin = BigInt(computeMinimumCoinQuantity(coinsPerUtxoByte)(output));
-    return {
-      coinMissing: BigIntMath.max([minimumCoin - output.value.coins, 0n])!,
-      minimumCoin,
-      tokenBundleSizeExceedsLimit: tokenBundleSizeExceedsLimit(maxValueSize)(output.value.assets)
-    };
-  };
-
-  return {
-    validateOutput,
-    async validateOutputs(outputs: Iterable<Cardano.TxOut>): Promise<Map<Cardano.TxOut, OutputValidation>> {
-      const protocolParameters = await firstValueFrom(protocolParameters$);
-      const validations = new Map<Cardano.TxOut, OutputValidation>();
-      for (const output of outputs) {
-        validations.set(output, await validateOutput(output, protocolParameters));
-      }
-      return validations;
-    },
-    validateValue,
-    validateValues
-  };
-};
 
 export const createInputResolver = ({ utxo }: InputResolverContext): Cardano.InputResolver => ({
   async resolveInput(input: Cardano.TxIn) {
