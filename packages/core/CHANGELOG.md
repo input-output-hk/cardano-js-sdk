@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.1-patch.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.11.0-nightly.5...@cardano-sdk/core@0.11.1-patch.0) (2023-04-27)
+
+### Bug Fixes
+
+- tx metadata memory leak ([c9f8e67](https://github.com/input-output-hk/cardano-js-sdk/commit/c9f8e67561f5720b95b3c19f71a3e7de4e2d77db))
+
 ## [0.11.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.11.0-nightly.4...@cardano-sdk/core@0.11.0-nightly.5) (2023-04-12)
 
 ### Bug Fixes
