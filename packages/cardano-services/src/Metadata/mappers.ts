@@ -8,7 +8,9 @@ export const mapTxMetadata = (metadataModel: Pick<TxMetadataModel, 'bytes' | 'ke
 
     if (bytes && key) {
       const biKey = BigInt(key);
-      const metadata = usingAutoFree((_) => cmlToCore.txMetadata(CML.GeneralTransactionMetadata.from_bytes(bytes)));
+      const metadata = usingAutoFree((scope) =>
+        cmlToCore.txMetadata(scope.manage(CML.GeneralTransactionMetadata.from_bytes(bytes)))
+      );
 
       if (metadata) {
         const datum = metadata.get(biKey);
