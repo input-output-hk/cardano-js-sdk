@@ -1,13 +1,5 @@
 /* eslint-disable unicorn/no-nested-ternary */
-import {
-  AddressType,
-  AsyncKeyAgent,
-  GroupedAddress,
-  SignTransactionOptions,
-  TransactionSigner,
-  cip8,
-  util as keyManagementUtil
-} from '@cardano-sdk/key-management';
+import { AddressType, AsyncKeyAgent, GroupedAddress, cip8 } from '@cardano-sdk/key-management';
 import {
   AssetProvider,
   Cardano,
@@ -80,7 +72,8 @@ import {
   FinalizeTxProps,
   InitializeTxProps,
   InitializeTxResult,
-  createTransactionInternals
+  createTransactionInternals,
+  finalizeTx
 } from '@cardano-sdk/tx-construction';
 import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
@@ -471,27 +464,11 @@ export class SingleAddressWallet implements ObservableWallet {
   }
 
   async finalizeTx(props: FinalizeTxProps, stubSign = false): Promise<Cardano.Tx> {
-    const addresses = await firstValueFrom(this.addresses$);
-    const signatures = stubSign
-      ? await keyManagementUtil.stubSignTransaction(
-          props.tx.body,
-          addresses,
-          this.util,
-          props.witness?.extraSigners,
-          props.signingOptions
-        )
-      : await this.#getSignatures(props.tx, props.witness?.extraSigners, props.signingOptions);
-    return {
-      auxiliaryData: props.auxiliaryData,
-      body: props.tx.body,
-      id: props.tx.hash,
-      isValid: props.isValid,
-      witness: {
-        ...props.witness,
-        scripts: props.scripts,
-        signatures
-      }
-    };
+    return finalizeTx(
+      props,
+      { addresses$: this.addresses$, inputResolver: this.util, keyAgent: this.keyAgent },
+      stubSign
+    );
   }
 
   async submitTx(
@@ -569,22 +546,5 @@ export class SingleAddressWallet implements ObservableWallet {
     this.#reemitSubscriptions.unsubscribe();
     this.#failedFromReemitter$.complete();
     this.#logger.debug('Shutdown');
-  }
-
-  async #getSignatures(
-    txInternals: Cardano.TxBodyWithHash,
-    extraSigners?: TransactionSigner[],
-    signingOptions?: SignTransactionOptions
-  ) {
-    const signatures: Cardano.Signatures = await this.keyAgent.signTransaction(txInternals, signingOptions);
-
-    if (extraSigners) {
-      for (const extraSigner of extraSigners) {
-        const extraSignature = await extraSigner.sign(txInternals);
-        signatures.set(extraSignature.pubKey, extraSignature.signature);
-      }
-    }
-
-    return signatures;
   }
 }

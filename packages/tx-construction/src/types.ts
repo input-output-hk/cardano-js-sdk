@@ -1,11 +1,17 @@
 import * as Crypto from '@cardano-sdk/crypto';
+import { AsyncKeyAgent, SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import { SelectionSkeleton } from '@cardano-sdk/input-selection';
-import { SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
 
 import { MinimumCoinQuantityPerOutput } from './output-validation';
 
 export type InitializeTxResult = Cardano.TxBodyWithHash & { inputSelection: SelectionSkeleton };
+
+
+export interface TxBuilderDependencies {
+  inputResolver: Cardano.InputResolver;
+  keyAgent: AsyncKeyAgent;
+}
 
 export interface TxProps {
   auxiliaryData?: Cardano.AuxiliaryData;
@@ -35,6 +41,8 @@ export interface FinalizeTxProps extends TxProps {
   tx: Cardano.TxBodyWithHash;
   isValid?: boolean;
 }
+
+export type FinalizeTxDependencies = Pick<TxBuilderDependencies, 'inputResolver' | 'keyAgent'>;
 
 export interface InitializeTxPropsValidationResult {
   minimumCoinQuantities: MinimumCoinQuantityPerOutput;
