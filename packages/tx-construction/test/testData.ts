@@ -74,6 +74,7 @@ export const txOut: Cardano.TxOut = {
 };
 
 export const txBody: Cardano.TxBody = {
+  auxiliaryDataHash: Crypto.Hash32ByteBase16('2ceb364d93225b4a0f004a0975a13eb50c3cc6348474b4fe9121f8dc72ca0cfa'),
   certificates: [
     {
       __typename: Cardano.CertificateType.PoolRetirement,
@@ -129,22 +130,20 @@ export const signature =
   'bdea87fca1b4b4df8a9b8fb4183c0fab2f8261eb6c5e4bc42c800bb9c8918755bdea87fca1b4b4df8a9b8fb4183c0fab2f8261eb6c5e4bc42c800bb9c8918755';
 export const tx: Cardano.Tx = {
   auxiliaryData: {
-    body: {
-      blob: new Map<bigint, Cardano.Metadatum>([
-        [1n, 1234n],
-        [2n, 'str'],
-        [3n, [1234n, 'str']],
-        [4n, new Uint8Array(Buffer.from('bytes'))],
-        [
-          5n,
-          new Map<Cardano.Metadatum, Cardano.Metadatum>([
-            ['strkey', 123n],
-            [['listkey'], 'strvalue']
-          ])
-        ],
-        [6n, -7n]
-      ])
-    }
+    blob: new Map<bigint, Cardano.Metadatum>([
+      [1n, 1234n],
+      [2n, 'str'],
+      [3n, [1234n, 'str']],
+      [4n, new Uint8Array(Buffer.from('bytes'))],
+      [
+        5n,
+        new Map<Cardano.Metadatum, Cardano.Metadatum>([
+          ['strkey', 123n],
+          [['listkey'], 'strvalue']
+        ])
+      ],
+      [6n, -7n]
+    ])
   },
   body: txBody,
   id: Cardano.TransactionId('8d2feeab1087e0aa4ad06e878c5269eaa2edcef5264bcc97542a28c189b2cbc5'),

@@ -364,7 +364,7 @@ describe('chain history mappers', () => {
       });
       expect(result).toEqual<Cardano.HydratedTx>({
         ...expected,
-        auxiliaryData: { body: { blob: metadata } },
+        auxiliaryData: { blob: metadata },
         body: { ...expected.body, certificates, collaterals: inputs, mint: assets, withdrawals },
         witness: { ...expected.witness, redeemers }
       });

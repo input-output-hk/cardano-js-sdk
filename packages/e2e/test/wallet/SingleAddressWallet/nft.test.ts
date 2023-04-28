@@ -135,9 +135,7 @@ describe('SingleAddressWallet.assets/nft', () => {
     });
 
     const auxiliaryData = {
-      body: {
-        blob: new Map([[721n, txMetadatum]])
-      }
+      blob: new Map([[721n, txMetadatum]])
     };
 
     const txProps: InitializeTxProps = {
@@ -317,7 +315,7 @@ describe('SingleAddressWallet.assets/nft', () => {
           ]
         ]);
 
-        const auxiliaryData = { body: { blob: new Map([[721n, txDataMetadatum]]) } };
+        const auxiliaryData = { blob: new Map([[721n, txDataMetadatum]]) };
 
         const txProps: InitializeTxProps = {
           auxiliaryData,

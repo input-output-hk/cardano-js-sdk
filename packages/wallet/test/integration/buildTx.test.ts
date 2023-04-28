@@ -93,13 +93,13 @@ describe('buildTx', () => {
       const initialAuxiliaryData = txBuilder.auxiliaryData;
       txBuilder.setMetadata(metadata);
       assertObjectRefsAreDifferent(txBuilder.auxiliaryData, initialAuxiliaryData);
-      expect(txBuilder.auxiliaryData?.body.blob).toEqual(metadata);
+      expect(txBuilder.auxiliaryData?.blob).toEqual(metadata);
     });
 
     it('can unset metadata by using empty map', () => {
       metadata = new Map();
       txBuilder.setMetadata(metadata);
-      expect(txBuilder.auxiliaryData?.body.blob?.entries.length).toBe(0);
+      expect(txBuilder.auxiliaryData?.blob?.entries.length).toBe(0);
     });
 
     it('can add metadata, sign and read it back', async () => {
@@ -107,10 +107,10 @@ describe('buildTx', () => {
       assertTxIsValid(tx);
 
       // ValidTxBody contains metadata
-      expect(tx.auxiliaryData?.body.blob).toEqual(metadata);
+      expect(tx.auxiliaryData?.blob).toEqual(metadata);
 
       const signedTx = await tx.sign();
-      expect(signedTx.tx.auxiliaryData?.body.blob).toEqual(metadata);
+      expect(signedTx.tx.auxiliaryData?.blob).toEqual(metadata);
     });
   });
 

@@ -290,7 +290,7 @@ export const mintInspector =
     // was built by this client the script will be present in the witness set, however, if this transaction was
     // queried from a remote repository that doesn't fetch the witness data of the transaction we can still check
     // if the script is present in the auxiliary data.
-    const scripts = [...(tx.auxiliaryData?.body?.scripts || []), ...(tx.witness?.scripts || [])];
+    const scripts = [...(tx.auxiliaryData?.scripts || []), ...(tx.witness?.scripts || [])];
 
     for (const script of scripts) {
       switch (script.__type) {
@@ -338,7 +338,7 @@ export const assetsBurnedInspector: AssetsMintedInspector = mintInspector((quant
  *
  * @param {HydratedTx} tx transaction to inspect.
  */
-export const metadataInspector: MetadataInspector = (tx) => tx.auxiliaryData?.body?.blob ?? new Map();
+export const metadataInspector: MetadataInspector = (tx) => tx.auxiliaryData?.blob ?? new Map();
 
 /**
  * Returns a function to convert lower level transaction data to a higher level object, using the provided inspectors.
