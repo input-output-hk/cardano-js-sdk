@@ -480,5 +480,5 @@ export const txAuxiliaryData = (auxiliaryData?: CML.AuxiliaryData): Cardano.Auxi
 
 export const utxo = (cslUtxos: CML.TransactionUnspentOutput[]) =>
   usingAutoFree((scope) =>
-    cslUtxos.map((cslUtxo) => [txIn(scope.manage(cslUtxo.input())), txOut(scope.manage(cslUtxo.output()))])
+    cslUtxos.map((cslUtxo) => [txIn(scope.manage(cslUtxo.input())), txOut(scope.manage(cslUtxo.output()))] as const)
   );
