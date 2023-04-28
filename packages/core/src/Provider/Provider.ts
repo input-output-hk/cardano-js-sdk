@@ -11,6 +11,7 @@ export type HealthCheckResponse = {
     networkSync?: Percent;
   };
   projectedTip?: Cardano.Tip;
+  reason?: string;
 };
 
 export interface ProviderDependencies {

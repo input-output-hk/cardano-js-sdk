@@ -7,6 +7,7 @@ export * from './Program';
 export * from './Rewards';
 export * from './StakePool';
 export * from './TxSubmit';
+export * from './Projection';
 export * from './Utxo';
 export * from './types';
 export * as errors from './errors';

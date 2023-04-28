@@ -275,14 +275,18 @@ export const txBody = (body: CML.TransactionBody): Cardano.TxBody =>
     const cslReferenceInputs = scope.manage(body.reference_inputs());
     const cslCollateralReturn = scope.manage(body.collateral_return());
     const cslTotalCollateral = scope.manage(body.total_collateral());
+    const cslAuxiliaryDataHash = scope.manage(body.auxiliary_data_hash());
+    const cslNetworkId = scope.manage(body.network_id());
 
     return {
+      auxiliaryDataHash: cslAuxiliaryDataHash ? Crypto.Hash32ByteBase16(cslAuxiliaryDataHash.to_hex()) : undefined,
       certificates: txCertificates(scope.manage(body.certs())),
       collateralReturn: cslCollateralReturn ? txOut(cslCollateralReturn) : undefined,
       collaterals: cslCollaterals && txInputs(cslCollaterals),
       fee: BigInt(scope.manage(body.fee()).to_str()),
       inputs: txInputs(scope.manage(body.inputs())),
       mint: txMint(scope.manage(body.multiassets())),
+      networkId: cslNetworkId ? cslNetworkId.kind() : undefined,
       outputs: txOutputs(scope.manage(body.outputs())),
       referenceInputs: cslReferenceInputs ? txInputs(cslReferenceInputs) : undefined,
       requiredExtraSignatures: txRequiredExtraSignatures(scope.manage(body.required_signers())),
@@ -453,7 +457,7 @@ export const txMetadata = (auxiliaryMetadata?: CML.GeneralTransactionMetadata): 
   usingAutoFree((scope) => {
     if (!auxiliaryMetadata) return;
     const auxiliaryMetadataMap: Cardano.TxMetadata = new Map();
-    const metadataKeys = auxiliaryMetadata.keys();
+    const metadataKeys = scope.manage(auxiliaryMetadata.keys());
     for (let i = 0; i < metadataKeys.len(); i++) {
       const key = scope.manage(metadataKeys.get(i));
       const transactionMetadatum = scope.manage(auxiliaryMetadata.get(key));
@@ -468,34 +472,13 @@ export const txMetadata = (auxiliaryMetadata?: CML.GeneralTransactionMetadata): 
 export const txAuxiliaryData = (auxiliaryData?: CML.AuxiliaryData): Cardano.AuxiliaryData | undefined =>
   usingAutoFree((scope) => {
     if (!auxiliaryData) return;
-    // TODO: create hash
     const auxiliaryMetadata = scope.manage(auxiliaryData.metadata());
     return {
-      body: {
-        blob: txMetadata(auxiliaryMetadata)
-      }
+      blob: txMetadata(auxiliaryMetadata)
     };
   });
 
 export const utxo = (cslUtxos: CML.TransactionUnspentOutput[]) =>
   usingAutoFree((scope) =>
-    cslUtxos.map((cslUtxo) => [txIn(scope.manage(cslUtxo.input())), txOut(scope.manage(cslUtxo.output()))])
+    cslUtxos.map((cslUtxo) => [txIn(scope.manage(cslUtxo.input())), txOut(scope.manage(cslUtxo.output()))] as const)
   );
-
-export const newTx = (cslTx: CML.Transaction): Cardano.Tx =>
-  usingAutoFree((scope) => {
-    const transactionHash = Cardano.TransactionId.fromHexBlob(
-      bytesToHex(scope.manage(CML.hash_transaction(scope.manage(cslTx.body()))).to_bytes())
-    );
-    const auxiliary_data = scope.manage(cslTx.auxiliary_data());
-
-    const witnessSet = scope.manage(cslTx.witness_set());
-
-    return {
-      auxiliaryData: txAuxiliaryData(auxiliary_data),
-      body: txBody(scope.manage(cslTx.body())),
-      id: transactionHash,
-      isValid: cslTx.is_valid(),
-      witness: txWitnessSet(witnessSet)
-    };
-  });

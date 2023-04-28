@@ -5,72 +5,70 @@ Object {
   "body": Array [
     Object {
       "auxiliaryData": Object {
-        "body": Object {
-          "blob": Map {
-            2n => Map {
-              "list" => Array [
-                Map {
-                  "int" => 9798604473814314674n,
-                },
-                Map {
-                  "bytes" => "7a43",
-                },
-              ],
-            },
+        "blob": Map {
+          2n => Map {
+            "list" => Array [
+              Map {
+                "int" => 9798604473814314674n,
+              },
+              Map {
+                "bytes" => "7a43",
+              },
+            ],
           },
-          "scripts": Array [
-            Object {
-              "__type": "native",
-              "keyHash": "b5ae663aaea8e500157bdf4baafd6f5ba0ce5759f7cd4101fc132f54",
-              "kind": 0,
-            },
-            Object {
-              "__type": "native",
-              "keyHash": "a646474b8f5431261506b6c273d307c7569a4eb6c96b42dd4a29520a",
-              "kind": 0,
-            },
-            Object {
-              "__type": "native",
-              "kind": 1,
-              "scripts": Array [
-                Object {
-                  "__type": "native",
-                  "kind": 2,
-                  "scripts": Array [],
-                },
-                Object {
-                  "__type": "native",
-                  "keyHash": "58e1b65718531b42494610c506cef10ff031fa817a8ff75c0ab180e7",
-                  "kind": 0,
-                },
-                Object {
-                  "__type": "native",
-                  "kind": 2,
-                  "scripts": Array [
-                    Object {
-                      "__type": "native",
-                      "kind": 5,
-                      "slot": 15272,
-                    },
-                  ],
-                },
-                Object {
-                  "__type": "native",
-                  "kind": 4,
-                  "slot": 44521,
-                },
-                Object {
-                  "__type": "native",
-                  "kind": 4,
-                  "slot": 91998,
-                },
-              ],
-            },
-          ],
         },
-        "hash": "ee155ace9c40292074cb6aff8c9ccdd273c81648ff1149ef36bcea6ebb8a3e25",
+        "scripts": Array [
+          Object {
+            "__type": "native",
+            "keyHash": "b5ae663aaea8e500157bdf4baafd6f5ba0ce5759f7cd4101fc132f54",
+            "kind": 0,
+          },
+          Object {
+            "__type": "native",
+            "keyHash": "a646474b8f5431261506b6c273d307c7569a4eb6c96b42dd4a29520a",
+            "kind": 0,
+          },
+          Object {
+            "__type": "native",
+            "kind": 1,
+            "scripts": Array [
+              Object {
+                "__type": "native",
+                "kind": 2,
+                "scripts": Array [],
+              },
+              Object {
+                "__type": "native",
+                "keyHash": "58e1b65718531b42494610c506cef10ff031fa817a8ff75c0ab180e7",
+                "kind": 0,
+              },
+              Object {
+                "__type": "native",
+                "kind": 2,
+                "scripts": Array [
+                  Object {
+                    "__type": "native",
+                    "kind": 5,
+                    "slot": 15272,
+                  },
+                ],
+              },
+              Object {
+                "__type": "native",
+                "kind": 4,
+                "slot": 44521,
+              },
+              Object {
+                "__type": "native",
+                "kind": 4,
+                "slot": 91998,
+              },
+            ],
+          },
+        ],
       },
       "body": Object {
+        "auxiliaryDataHash": "ee155ace9c40292074cb6aff8c9ccdd273c81648ff1149ef36bcea6ebb8a3e25",
         "certificates": Array [],
         "collaterals": undefined,
         "fee": 724n,
@@ -155,72 +153,70 @@ Object {
   "body": Array [
     Object {
       "auxiliaryData": Object {
-        "body": Object {
-          "blob": Map {
-            674n => Map {
-              "map" => Array [
-                Map {
-                  "k" => Map {
-                    "string" => "msg",
-                  },
-                  "v" => Map {
-                    "list" => Array [
-                      Map {
-                        "string" => "Auto-Loop-Transaction #338666 by ATADA",
-                      },
-                      Map {
-                        "string" => "",
-                      },
-                      Map {
-                        "string" => "Live Epoch 16, we have 061h 17m 32s left until the next one",
-                      },
-                      Map {
-                        "string" => "It's Montag - 22 August 2022 - 12:42:28 in Austria",
-                      },
-                      Map {
-                        "string" => "",
-                      },
-                      Map {
-                        "string" => "📈 The current ADA Price on Kraken is: $0.451502 / ADA",
-                      },
-                      Map {
-                        "string" => "",
-                      },
-                      Map {
-                        "string" => "A random Zen-Quote for you: 🙏",
-                      },
-                      Map {
-                        "string" => "There are three classes of people: those who see. Those who see",
-                      },
-                      Map {
-                        "string" => "when they are shown. Those who do not see. - Leonardo da Vinci",
-                      },
-                      Map {
-                        "string" => "",
-                      },
-                      Map {
-                        "string" => "Node-Revision: 950c4e222086fed5ca53564e642434ce9307b0b9",
-                      },
-                      Map {
-                        "string" => "",
-                      },
-                      Map {
-                        "string" => "PreProd-Chain is awesome, have some fun! 😍",
-                      },
-                      Map {
-                        "string" => " Best regards, Martin :-)",
-                      },
-                    ],
-                  },
+        "blob": Map {
+          674n => Map {
+            "map" => Array [
+              Map {
+                "k" => Map {
+                  "string" => "msg",
                 },
-              ],
-            },
+                "v" => Map {
+                  "list" => Array [
+                    Map {
+                      "string" => "Auto-Loop-Transaction #338666 by ATADA",
+                    },
+                    Map {
+                      "string" => "",
+                    },
+                    Map {
+                      "string" => "Live Epoch 16, we have 061h 17m 32s left until the next one",
+                    },
+                    Map {
+                      "string" => "It's Montag - 22 August 2022 - 12:42:28 in Austria",
+                    },
+                    Map {
+                      "string" => "",
+                    },
+                    Map {
+                      "string" => "📈 The current ADA Price on Kraken is: $0.451502 / ADA",
+                    },
+                    Map {
+                      "string" => "",
+                    },
+                    Map {
+                      "string" => "A random Zen-Quote for you: 🙏",
+                    },
+                    Map {
+                      "string" => "There are three classes of people: those who see. Those who see",
+                    },
+                    Map {
+                      "string" => "when they are shown. Those who do not see. - Leonardo da Vinci",
+                    },
+                    Map {
+                      "string" => "",
+                    },
+                    Map {
+                      "string" => "Node-Revision: 950c4e222086fed5ca53564e642434ce9307b0b9",
+                    },
+                    Map {
+                      "string" => "",
+                    },
+                    Map {
+                      "string" => "PreProd-Chain is awesome, have some fun! 😍",
+                    },
+                    Map {
+                      "string" => " Best regards, Martin :-)",
+                    },
+                  ],
+                },
+              },
+            ],
           },
-          "scripts": Array [],
         },
-        "hash": "0ad6d4a6e10182157142994b2cce2aebee9406e3e2be31bfb1574ed2409a71dc",
+        "scripts": Array [],
       },
       "body": Object {
+        "auxiliaryDataHash": "0ad6d4a6e10182157142994b2cce2aebee9406e3e2be31bfb1574ed2409a71dc",
         "certificates": Array [
           Object {
             "__typename": "StakeDelegationCertificate",
@@ -319,23 +315,21 @@ Object {
   "body": Array [
     Object {
       "auxiliaryData": Object {
-        "body": Object {
-          "blob": Map {
-            2n => Map {
-              "string" => "",
-            },
+        "blob": Map {
+          2n => Map {
+            "string" => "",
           },
-          "scripts": Array [
-            Object {
-              "__type": "native",
-              "kind": 4,
-              "slot": 63725,
-            },
-          ],
         },
-        "hash": "bb30a42c1e62f0afda5f0a4e8a562f7a13a24cea00ee81917b86b89e801314aa",
+        "scripts": Array [
+          Object {
+            "__type": "native",
+            "kind": 4,
+            "slot": 63725,
+          },
+        ],
       },
       "body": Object {
+        "auxiliaryDataHash": "bb30a42c1e62f0afda5f0a4e8a562f7a13a24cea00ee81917b86b89e801314aa",
         "certificates": Array [
           Object {
             "__typename": "MirCertificate",
@@ -515,6 +509,7 @@ Object {
     Object {
       "auxiliaryData": undefined,
       "body": Object {
+        "auxiliaryDataHash": undefined,
         "certificates": Array [
           Object {
             "__typename": "StakeKeyRegistrationCertificate",
@@ -617,20 +612,18 @@ Object {
     },
     Object {
       "auxiliaryData": Object {
-        "body": Object {
-          "blob": Map {
-            1n => Map {
-              "int" => -16613019303347710699n,
-            },
-            2n => Map {
-              "bytes" => "6573",
-            },
+        "blob": Map {
+          1n => Map {
+            "int" => -16613019303347710699n,
           },
-          "scripts": Array [],
+          2n => Map {
+            "bytes" => "6573",
+          },
         },
-        "hash": "ae85d245a3d00bfde01f59f3c4fe0b4bfae1cb37e9cf91929eadcea4985711de",
+        "scripts": Array [],
       },
       "body": Object {
+        "auxiliaryDataHash": "ae85d245a3d00bfde01f59f3c4fe0b4bfae1cb37e9cf91929eadcea4985711de",
         "certificates": Array [
           Object {
             "__typename": "PoolRegistrationCertificate",

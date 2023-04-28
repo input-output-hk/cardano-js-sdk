@@ -11,7 +11,7 @@ const isAtTheTipOrHigher = (header: Cardano.PartialBlockHeader, tip: TipOrOrigin
 };
 
 export const logProjectionProgress =
-  <T extends UnifiedExtChainSyncEvent<{}>>(baseLogger: Logger) =>
+  <T extends Omit<UnifiedExtChainSyncEvent<{}>, 'requestNext'>>(baseLogger: Logger) =>
   (evt$: Observable<T>) =>
     defer(() => {
       const logger = contextLogger(baseLogger, 'Projector');

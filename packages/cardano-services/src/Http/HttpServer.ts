@@ -17,7 +17,7 @@ import path from 'path';
 
 export interface HttpServerDependencies {
   services: HttpService[];
-  runnableDependencies: RunnableModule[];
+  runnableDependencies?: RunnableModule[];
   logger: Logger;
 }
 
@@ -37,11 +37,7 @@ export class HttpServer extends RunnableModule {
       this.#dependencies.services.map((service) =>
         service
           .healthCheck()
-          .then((details) => {
-            const { ok } = details;
-
-            return { ...(ok ? { details } : undefined), name: service.name, ok };
-          })
+          .then((details) => ({ ...details, name: service.name }))
           .catch((error) => {
             this.logger.error(error);
             return { name: service.name, ok: false };
@@ -82,7 +78,9 @@ export class HttpServer extends RunnableModule {
       next();
     });
 
-    for (const dependency of this.#dependencies.runnableDependencies) await dependency.initialize();
+    if (this.#dependencies.runnableDependencies) {
+      for (const dependency of this.#dependencies.runnableDependencies) await dependency.initialize();
+    }
 
     for (const service of this.#dependencies.services) {
       await service.initialize();
@@ -150,7 +148,9 @@ export class HttpServer extends RunnableModule {
   }
 
   protected async startImpl(): Promise<void> {
-    for (const dependency of this.#dependencies.runnableDependencies) await dependency.start();
+    if (this.#dependencies.runnableDependencies) {
+      for (const dependency of this.#dependencies.runnableDependencies) await dependency.start();
+    }
     for (const service of this.#dependencies.services) await service.start();
     this.server = await listenPromise(this.app, this.#config.listen);
   }
@@ -159,7 +159,9 @@ export class HttpServer extends RunnableModule {
     this.#healthGauge?.set(0);
 
     for (const service of this.#dependencies.services) await service.shutdown();
-    for (const dependency of this.#dependencies.runnableDependencies) await dependency.shutdown();
+    if (this.#dependencies.runnableDependencies) {
+      for (const dependency of this.#dependencies.runnableDependencies) await dependency.shutdown();
+    }
 
     return serverClosePromise(this.server);
   }

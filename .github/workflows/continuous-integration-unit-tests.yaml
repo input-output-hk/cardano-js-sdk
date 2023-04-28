@@ -40,3 +40,5 @@ jobs:
       run: |
         yarn test:build:verify
         yarn test --forceExit
+      env:
+        NODE_OPTIONS: "--max_old_space_size=4096"

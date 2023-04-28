@@ -8,16 +8,13 @@ import {
   babbageTxOutWithInlineDatum,
   invalidBabbageTxOut,
   script,
-  signature,
-  tx,
   txBody,
   txIn,
   txInWithAddress,
   txOut,
   txOutWithDatum,
   valueCoinOnly,
-  valueWithAssets,
-  vkey
+  valueWithAssets
 } from './testData';
 import { parseAssetId } from '../../src/CML/coreToCml';
 
@@ -219,18 +216,7 @@ describe('coreToCml', () => {
       babbageTxBody.collateralReturn!.address.toString()
     );
   });
-  it('tx', () => {
-    const cmlTx = coreToCml.tx(scope, tx);
-    expect(cmlTx.body()).toBeInstanceOf(CML.TransactionBody);
-    const witnessSet = scope.manage(cmlTx.witness_set());
-    const vKeys = scope.manage(witnessSet.vkeys());
-    const witness = scope.manage(vKeys!.get(0)!);
-    const witnessSignature = scope.manage(witness.signature());
-    const vKey = scope.manage(witness.vkey());
-    const vKeyPublicKey = scope.manage(vKey.public_key());
-    expect(Buffer.from(vKeyPublicKey.as_bytes()).toString('hex')).toBe(vkey);
-    expect(witnessSignature.to_hex()).toBe(signature);
-  });
+
   it('nativeScript', () => {
     const baseScript = coreToCml.nativeScript(scope, script);
     // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
@@ -270,7 +256,7 @@ describe('coreToCml', () => {
       // eslint-disable-next-line unicorn/consistent-function-scoping, @typescript-eslint/no-explicit-any
       const convertMetadatum = (metadatum: any) => {
         const label = 123n;
-        const auxiliaryData = coreToCml.txAuxiliaryData(scope, { body: { blob: new Map([[label, metadatum]]) } });
+        const auxiliaryData = coreToCml.txAuxiliaryData(scope, { blob: new Map([[label, metadatum]]) });
         const metadata = scope.manage(auxiliaryData?.metadata());
         return scope.manage(metadata?.get(scope.manage(BigNum.from_str(label.toString()))));
       };

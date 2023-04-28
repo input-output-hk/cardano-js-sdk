@@ -37,6 +37,7 @@ export const createTransactionInternals = async ({
       });
     }
     const body: Cardano.TxBody = {
+      auxiliaryDataHash: auxiliaryData ? Cardano.computeAuxiliaryDataHash(auxiliaryData) : undefined,
       certificates,
       fee: inputSelection.fee,
       inputs: [...inputSelection.inputs].map(([txIn]) => txIn),
@@ -48,7 +49,7 @@ export const createTransactionInternals = async ({
       withdrawals
     };
     if (collaterals) body.collaterals = [...collaterals];
-    const cslBody = coreToCml.txBody(scope, body, auxiliaryData);
+    const cslBody = coreToCml.txBody(scope, body);
 
     return {
       body,

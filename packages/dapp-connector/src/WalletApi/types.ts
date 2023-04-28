@@ -55,7 +55,7 @@ export type GetNetworkId = () => Promise<Cardano.NetworkId>;
  * @throws ApiError
  * @throws PaginateError
  */
-export type GetUtxos = (amount?: Cbor, paginate?: Paginate) => Promise<Cbor[] | undefined>;
+export type GetUtxos = (amount?: Cbor, paginate?: Paginate) => Promise<Cbor[] | null>;
 
 /**
  * @returns a list of one or more UTxOs (unspent transaction outputs) controlled by the wallet

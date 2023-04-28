@@ -147,7 +147,7 @@ export class ObservableWalletTxBuilder implements TxBuilder {
   }
 
   setMetadata(metadata: Cardano.TxMetadata): TxBuilder {
-    this.auxiliaryData = { ...this.auxiliaryData, body: { ...this.auxiliaryData?.body, blob: new Map(metadata) } };
+    this.auxiliaryData = { ...this.auxiliaryData, blob: new Map(metadata) };
     return this;
   }
 
@@ -167,6 +167,9 @@ export class ObservableWalletTxBuilder implements TxBuilder {
       this.#logger.debug('Building');
       await this.#addDelegationCertificates();
       await this.#validateOutputs();
+
+      if (this.auxiliaryData)
+        this.partialTxBody.auxiliaryDataHash = Cardano.computeAuxiliaryDataHash(this.auxiliaryData);
 
       const tx = await this.#observableWallet.initializeTx({
         auxiliaryData: this.auxiliaryData,

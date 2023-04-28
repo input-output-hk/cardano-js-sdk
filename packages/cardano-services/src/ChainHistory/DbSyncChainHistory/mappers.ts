@@ -175,9 +175,7 @@ export const mapTxAlonzo = (
   auxiliaryData:
     metadata && metadata.size > 0
       ? {
-          body: {
-            blob: metadata
-          }
+          blob: metadata
         }
       : undefined,
   blockHeader: {

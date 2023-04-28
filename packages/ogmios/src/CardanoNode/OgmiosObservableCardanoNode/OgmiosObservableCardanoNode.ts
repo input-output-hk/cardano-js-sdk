@@ -3,17 +3,36 @@ import {
   Cardano,
   CardanoNodeErrors,
   EraSummary,
+  HealthCheckResponse,
+  Milliseconds,
   ObservableCardanoNode,
   ObservableChainSync,
   PointOrOrigin
 } from '@cardano-sdk/core';
+import {
+  ConnectionConfig,
+  createConnectionObject,
+  createStateQueryClient,
+  getServerHealth
+} from '@cardano-ogmios/client';
 import { InteractionContextProps, createObservableInteractionContext } from './createObservableInteractionContext';
 import { Intersection, findIntersect } from '@cardano-ogmios/client/dist/ChainSync';
 import { Logger } from 'ts-log';
-import { Observable, distinctUntilChanged, from, shareReplay, switchMap } from 'rxjs';
+import {
+  Observable,
+  catchError,
+  distinctUntilChanged,
+  from,
+  map,
+  of,
+  shareReplay,
+  switchMap,
+  throwError,
+  timeout
+} from 'rxjs';
 import { WithLogger, contextLogger } from '@cardano-sdk/util';
 import { createObservableChainSyncClient } from './createObservableChainSyncClient';
-import { createStateQueryClient } from '@cardano-ogmios/client';
+import { ogmiosServerHealthToHealthCheckResponse } from '../../util';
 import { ogmiosToCorePointOrOrigin, ogmiosToCoreTipOrOrigin, pointOrOriginToOgmios } from './util';
 import { queryEraSummaries, queryGenesisParameters } from '../queries';
 import isEqual from 'lodash/isEqual';
@@ -23,16 +42,25 @@ const ogmiosToCoreIntersection = (intersection: Intersection) => ({
   tip: ogmiosToCoreTipOrOrigin(intersection.tip)
 });
 
-export type OgmiosObservableCardanoNodeProps = Omit<InteractionContextProps, 'interactionType'>;
+const DEFAULT_HEALTH_CHECK_TIMEOUT = 2000;
+export type OgmiosObservableCardanoNodeProps = Omit<InteractionContextProps, 'interactionType'> & {
+  /**
+   * Default: 2000ms
+   */
+  healthCheckTimeout?: Milliseconds;
+};
 
 export class OgmiosObservableCardanoNode implements ObservableCardanoNode {
+  readonly #connectionConfig$: Observable<ConnectionConfig>;
   readonly #logger: Logger;
   readonly #interactionContext$;
 
   readonly eraSummaries$: Observable<EraSummary[]>;
   readonly genesisParameters$: Observable<Cardano.CompactGenesis>;
+  readonly healthCheck$: Observable<HealthCheckResponse>;
 
   constructor(props: OgmiosObservableCardanoNodeProps, { logger }: WithLogger) {
+    this.#connectionConfig$ = props.connectionConfig$;
     this.#logger = contextLogger(logger, 'ObservableOgmiosCardanoNode');
     this.#interactionContext$ = createObservableInteractionContext(
       {
@@ -43,13 +71,29 @@ export class OgmiosObservableCardanoNode implements ObservableCardanoNode {
     ).pipe(shareReplay({ bufferSize: 1, refCount: true }));
     const stateQueryClient$ = this.#interactionContext$.pipe(
       switchMap((interactionContext) => from(createStateQueryClient(interactionContext))),
-      distinctUntilChanged(isEqual),
+      distinctUntilChanged((a, b) => isEqual(a, b)),
       shareReplay({ bufferSize: 1, refCount: true })
     );
     this.eraSummaries$ = stateQueryClient$.pipe(switchMap((client) => from(queryEraSummaries(client, this.#logger))));
     this.genesisParameters$ = stateQueryClient$.pipe(
       switchMap((client) => from(queryGenesisParameters(client, this.#logger))),
       distinctUntilChanged(isEqual),
+      shareReplay({ bufferSize: 1, refCount: true })
+    );
+    this.healthCheck$ = this.#connectionConfig$.pipe(
+      switchMap((connectionConfig) => from(getServerHealth({ connection: createConnectionObject(connectionConfig) }))),
+      map(ogmiosServerHealthToHealthCheckResponse),
+      timeout({
+        first: props.healthCheckTimeout || DEFAULT_HEALTH_CHECK_TIMEOUT,
+        with: () => {
+          logger.error('healthCheck$ didnt emit within healthCheckTimeout');
+          return throwError(() => new CardanoNodeErrors.CardanoClientErrors.ConnectionError());
+        }
+      }),
+      catchError((error) => {
+        this.#logger.error(error);
+        return of({ ok: false });
+      }),
       shareReplay({ bufferSize: 1, refCount: true })
     );
   }

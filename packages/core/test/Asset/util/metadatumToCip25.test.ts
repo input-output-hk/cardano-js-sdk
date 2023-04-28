@@ -1,9 +1,11 @@
 import { AssetInfo } from '../../../src/Asset';
 import { AssetName, Metadatum, PolicyId, TxMetadata } from '../../../src/Cardano';
 import { Cardano } from '../../../src';
+import { dummyLogger } from 'ts-log';
 import { fromSerializableObject } from '@cardano-sdk/util';
-import { logger } from '@cardano-sdk/util-dev';
 import { metadatumToCip25 } from '../../../src/Asset/util';
+
+const logger = dummyLogger;
 
 describe('NftMetadata/metadatumToCip25', () => {
   const assetNameStringUtf8 = 'CIP0025-v2';

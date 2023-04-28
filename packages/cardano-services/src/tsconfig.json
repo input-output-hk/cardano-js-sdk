@@ -8,13 +8,25 @@
       "path": "../../core/src"
     },
     {
+      "path": "../../crypto/src"
+    },
+    {
       "path": "../../ogmios/src"
+    },
+    {
+      "path": "../../projection/src"
+    },
+    {
+      "path": "../../projection-typeorm/src"
     },
     {
       "path": "../../crypto/src"
     },
     {
       "path": "../../util/src"
-    }
+    },
+    {
+      "path": "../../util-rxjs/src"
+    },
   ]
 }

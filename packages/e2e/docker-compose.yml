@@ -75,13 +75,5 @@ services:
     volumes:
       - ./local-network/config/network:/config
 
-secrets:
-  postgres_db:
-    file: ./local-network/placeholder-secrets/postgres_db
-  postgres_password:
-    file: ./local-network/placeholder-secrets/postgres_password
-  postgres_user:
-    file: ./local-network/placeholder-secrets/postgres_user
-
 volumes:
   wallet-db:

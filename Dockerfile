@@ -35,18 +35,25 @@ RUN yarn workspaces focus --all --production
 
 FROM ubuntu-nodejs as cardano-services
 COPY --from=cardano-services-production-deps /app/node_modules /app/node_modules
-COPY --from=cardano-services-builder /app/packages/cardano-services/dist /app/packages/cardano-services/dist
 COPY --from=cardano-services-production-deps /app/packages/cardano-services/node_modules /app/packages/cardano-services/node_modules
+COPY --from=cardano-services-production-deps /app/packages/projection-typeorm/node_modules /app/packages/projection-typeorm/node_modules
 COPY --from=cardano-services-builder /app/scripts /app/scripts
+COPY --from=cardano-services-builder /app/packages/cardano-services/dist /app/packages/cardano-services/dist
 COPY --from=cardano-services-builder /app/packages/cardano-services/package.json /app/packages/cardano-services/package.json
 COPY --from=cardano-services-builder /app/packages/core/dist /app/packages/core/dist
 COPY --from=cardano-services-builder /app/packages/core/package.json /app/packages/core/package.json
-COPY --from=cardano-services-builder /app/packages/ogmios/dist /app/packages/ogmios/dist
-COPY --from=cardano-services-builder /app/packages/ogmios/package.json /app/packages/ogmios/package.json
-COPY --from=cardano-services-builder /app/packages/util/dist /app/packages/util/dist
-COPY --from=cardano-services-builder /app/packages/util/package.json /app/packages/util/package.json
 COPY --from=cardano-services-builder /app/packages/crypto/dist /app/packages/crypto/dist
 COPY --from=cardano-services-builder /app/packages/crypto/package.json /app/packages/crypto/package.json
+COPY --from=cardano-services-builder /app/packages/ogmios/dist /app/packages/ogmios/dist
+COPY --from=cardano-services-builder /app/packages/ogmios/package.json /app/packages/ogmios/package.json
+COPY --from=cardano-services-builder /app/packages/projection/dist /app/packages/projection/dist
+COPY --from=cardano-services-builder /app/packages/projection/package.json /app/packages/projection/package.json
+COPY --from=cardano-services-builder /app/packages/projection-typeorm/dist /app/packages/projection-typeorm/dist
+COPY --from=cardano-services-builder /app/packages/projection-typeorm/package.json /app/packages/projection-typeorm/package.json
+COPY --from=cardano-services-builder /app/packages/util/dist /app/packages/util/dist
+COPY --from=cardano-services-builder /app/packages/util/package.json /app/packages/util/package.json
+COPY --from=cardano-services-builder /app/packages/util-rxjs/dist /app/packages/util-rxjs/dist
+COPY --from=cardano-services-builder /app/packages/util-rxjs/package.json /app/packages/util-rxjs/package.json
 
 FROM cardano-services as provider-server
 ARG NETWORK=mainnet
@@ -86,3 +93,17 @@ ENV \
   POSTGRES_USER_FILE=/run/secrets/postgres_user
 WORKDIR /app/packages/cardano-services
 CMD ["node", "dist/cjs/cli.js", "start-blockfrost-worker"]
+
+FROM cardano-services as projector
+RUN apt-get install postgresql-client -y
+ENV \
+  API_URL="http://0.0.0.0:3002" \
+  POSTGRES_DB_FILE=/run/secrets/postgres_db_projection \
+  POSTGRES_HOST=postgres \
+  POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password \
+  POSTGRES_PORT=5432 \
+  POSTGRES_USER_FILE=/run/secrets/postgres_user
+WORKDIR /
+COPY compose/projector/init.* ./
+RUN chmod 755 init.sh
+CMD ["./init.sh"]

@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import { CONNECTION_ERROR_EVENT, TX_SUBMISSION_QUEUE, serializeError, waitForPending } from './utils';
+import { Cardano, ProviderError, ProviderFailure, TxBodyCBOR, TxCBOR } from '@cardano-sdk/core';
 import { Channel, Connection, Message, connect } from 'amqplib';
 import { EventEmitter } from 'events';
 import { Logger } from 'ts-log';
 import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
-import { ProviderError, ProviderFailure, cmlUtil } from '@cardano-sdk/core';
 import { bufferToHexString } from '@cardano-sdk/util';
 
 const moduleName = 'TxSubmitWorker';
@@ -291,14 +291,14 @@ export class TxSubmitWorker extends EventEmitter {
 
     try {
       const { content } = message;
-      const txBody = new Uint8Array(content);
+      const signedTransaction = bufferToHexString(content);
 
       // Register the handling of current transaction
-      txId = cmlUtil.deserializeTx(txBody).id;
+      txId = Cardano.TransactionId.fromTxBodyCbor(TxBodyCBOR.fromTxCBOR(TxCBOR(signedTransaction)));
 
       this.#dependencies.logger.info(`${moduleName}: submitting tx #${counter} id: ${txId}`);
       this.#dependencies.logger.debug(`${moduleName}: tx #${counter} dump:`, [content.toString('hex')]);
-      await this.#dependencies.txSubmitProvider.submitTx({ signedTransaction: bufferToHexString(Buffer.from(txBody)) });
+      await this.#dependencies.txSubmitProvider.submitTx({ signedTransaction });
 
       this.#dependencies.logger.debug(`${moduleName}: ACKing RabbitMQ message #${counter}`);
       this.#channel?.ack(message);

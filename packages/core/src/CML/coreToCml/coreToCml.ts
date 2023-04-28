@@ -6,6 +6,7 @@ import {
   AssetName,
   Assets,
   AuxiliaryData,
+  AuxiliaryDataHash,
   BigNum,
   BootstrapWitness,
   BootstrapWitnesses,
@@ -46,7 +47,6 @@ import {
   ScriptRef,
   TimelockExpiry,
   TimelockStart,
-  Transaction,
   TransactionBody,
   TransactionHash,
   TransactionInput,
@@ -60,12 +60,11 @@ import {
   Vkey,
   Vkeywitness,
   Vkeywitnesses,
-  Withdrawals,
-  hash_auxiliary_data
+  Withdrawals
 } from '@dcspark/cardano-multiplatform-lib-nodejs';
+import { AssetId, NetworkId, RedeemerPurpose } from '../../Cardano';
 
 import * as certificate from './certificate';
-import { AssetId, RedeemerPurpose } from '../../Cardano';
 import { CML } from '../CML';
 import { ManagedFreeableScope } from '@cardano-sdk/util';
 import { SerializationError, SerializationFailure } from '../../errors';
@@ -369,7 +368,7 @@ export const txAuxiliaryData = (
   if (!auxiliaryData) return;
   const result = scope.manage(AuxiliaryData.new());
 
-  const { blob, scripts } = auxiliaryData.body;
+  const { blob, scripts } = auxiliaryData;
   if (blob) {
     result.set_metadata(txMetadata(scope, blob));
   }
@@ -423,16 +422,18 @@ export const txBody = (
     validityInterval,
     certificates,
     withdrawals,
+    auxiliaryDataHash,
     mint,
     collaterals,
     requiredExtraSignatures,
     scriptIntegrityHash,
     totalCollateral,
     collateralReturn,
-    referenceInputs
-  }: Cardano.TxBody,
-  auxiliaryData?: Cardano.AuxiliaryData
-): TransactionBody => {
+    referenceInputs,
+    networkId
+  }: Cardano.TxBody
+): // eslint-disable-next-line sonarjs/cognitive-complexity
+TransactionBody => {
   const cslOutputs = scope.manage(TransactionOutputs.new());
   for (const output of outputs) {
     cslOutputs.add(txOut(scope, output));
@@ -474,6 +475,17 @@ export const txBody = (
   if (scriptIntegrityHash) {
     cslBody.set_script_data_hash(scope.manage(ScriptDataHash.from_bytes(Buffer.from(scriptIntegrityHash, 'hex'))));
   }
+
+  if (auxiliaryDataHash) {
+    cslBody.set_auxiliary_data_hash(scope.manage(AuxiliaryDataHash.from_hex(auxiliaryDataHash)));
+  }
+
+  if (networkId) {
+    const id =
+      networkId === NetworkId.Mainnet ? scope.manage(CML.NetworkId.mainnet()) : scope.manage(CML.NetworkId.testnet());
+    cslBody.set_network_id(id);
+  }
+
   if (certificates?.length) {
     const certs = scope.manage(Certificates.new());
     for (const cert of certificates) {
@@ -483,10 +495,6 @@ export const txBody = (
   }
   if (withdrawals?.length) {
     cslBody.set_withdrawals(txWithdrawals(scope, withdrawals));
-  }
-  const cslAuxiliaryData = txAuxiliaryData(scope, auxiliaryData);
-  if (cslAuxiliaryData) {
-    cslBody.set_auxiliary_data_hash(scope.manage(hash_auxiliary_data(cslAuxiliaryData)));
   }
 
   return cslBody;
@@ -581,16 +589,4 @@ export const witnessSet = (scope: ManagedFreeableScope, witness: Cardano.Witness
     txWitnessSet.set_plutus_data(txWitnessDatumList(scope, witness.datums));
   }
   return txWitnessSet;
-};
-
-export const tx = (scope: ManagedFreeableScope, { body, witness, auxiliaryData, isValid }: Cardano.Tx): Transaction => {
-  const txWitnessSet = witnessSet(scope, witness);
-  // Possible optimization: only convert auxiliary data once
-  const cmlTx = scope.manage(
-    Transaction.new(txBody(scope, body, auxiliaryData), txWitnessSet, txAuxiliaryData(scope, auxiliaryData))
-  );
-
-  if (typeof isValid !== 'undefined') cmlTx.set_is_valid(isValid);
-
-  return cmlTx;
 };
