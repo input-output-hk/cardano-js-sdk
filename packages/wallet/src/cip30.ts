@@ -15,6 +15,7 @@ import {
 } from '@cardano-sdk/dapp-connector';
 import { CML, Cardano, Transaction, TxCBOR, cmlToCore, coreToCml } from '@cardano-sdk/core';
 import { HexBlob, ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
+import { InputSelectionError, InputSelectionFailure } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
 import { Observable, firstValueFrom } from 'rxjs';
 import { ObservableWallet } from './types';
@@ -222,7 +223,7 @@ export const createWalletApi = (
       return [cardanoAddressToCbor(address)];
     }
   },
-  getUtxos: async (amount?: Cbor, paginate?: Paginate): Promise<Cbor[] | undefined> => {
+  getUtxos: async (amount?: Cbor, paginate?: Paginate): Promise<Cbor[] | null> => {
     const scope = new ManagedFreeableScope();
     const wallet = await firstValueFrom(wallet$);
     let utxos = await firstValueFrom(wallet.utxo.available$);
@@ -243,11 +244,14 @@ export const createWalletApi = (
 
         utxos = [...inputSelection.inputs];
       } catch (error) {
+        if (error instanceof InputSelectionError && error.failure === InputSelectionFailure.UtxoBalanceInsufficient) {
+          return null;
+        }
         logger.debug(error);
         const message = formatUnknownError(error);
 
         scope.dispose();
-        throw new ApiError(APIErrorCode.Refused, message);
+        throw new ApiError(APIErrorCode.InternalError, message);
       }
     } else if (paginate) {
       utxos = utxos.slice(paginate.page * paginate.limit, paginate.page * paginate.limit + paginate.limit);

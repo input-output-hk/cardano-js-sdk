@@ -11,12 +11,21 @@ import {
   WalletApi
 } from '@cardano-sdk/dapp-connector';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
-import { CML, Cardano, CardanoNodeErrors, Transaction, TxCBOR, cmlToCore } from '@cardano-sdk/core';
+import {
+  Asset,
+  CML,
+  Cardano,
+  CardanoNodeErrors,
+  Transaction,
+  TxCBOR,
+  cmlToCore,
+  coalesceValueQuantities
+} from '@cardano-sdk/core';
+import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence';
 import { InitializeTxProps, InitializeTxResult, SingleAddressWallet, cip30, setupWallet } from '../../src';
 import { Providers, createWallet } from './util';
-import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { firstValueFrom, of } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
 import {
@@ -129,13 +138,58 @@ describe('cip30', () => {
         expect(cip30NetworkId).toEqual(Cardano.NetworkId.Testnet);
       });
 
-      test('api.getUtxos', async () => {
-        const utxos = await api.getUtxos();
-        expect(() =>
-          cmlToCore.utxo(
-            utxos!.map((utxo) => scope.manage(CML.TransactionUnspentOutput.from_bytes(Buffer.from(utxo, 'hex'))))
-          )
-        ).not.toThrow();
+      describe('api.getUtxos', () => {
+        it('returns all utxo without arguments', async () => {
+          const utxos = await api.getUtxos();
+          expect(utxos?.length).toBe((await firstValueFrom(wallet.utxo.available$)).length);
+          expect(() =>
+            cmlToCore.utxo(
+              utxos!.map((utxo) => scope.manage(CML.TransactionUnspentOutput.from_bytes(Buffer.from(utxo, 'hex'))))
+            )
+          ).not.toThrow();
+        });
+
+        describe('"amount" argument', () => {
+          // eslint-disable-next-line unicorn/consistent-function-scoping
+          const getUtxoFiltered = async (coins: Cardano.Lovelace, tslaQuantity: bigint) => {
+            const minTokensAssetId = AssetId.TSLA;
+            const filterAmountValue = scope.manage(CML.Value.new(scope.manage(CML.BigNum.from_str(coins.toString()))));
+            const multiAsset = scope.manage(CML.MultiAsset.new());
+            const assets = scope.manage(CML.Assets.new());
+            assets.insert(
+              scope.manage(CML.AssetName.new(Buffer.from(Asset.util.assetNameFromAssetId(minTokensAssetId), 'hex'))),
+              scope.manage(CML.BigNum.from_str(tslaQuantity.toString()))
+            );
+            multiAsset.insert(
+              scope.manage(CML.ScriptHash.from_hex(Asset.util.policyIdFromAssetId(minTokensAssetId))),
+              assets
+            );
+            filterAmountValue.set_multiasset(multiAsset);
+            const utxoCbor = await api.getUtxos(Buffer.from(filterAmountValue.to_bytes()).toString('hex'));
+            if (!utxoCbor) return null;
+            return cmlToCore.utxo(
+              utxoCbor.map((cbor) => scope.manage(CML.TransactionUnspentOutput.from_bytes(Buffer.from(cbor, 'hex'))))
+            );
+          };
+
+          it('returns just enough utxo to cover the amount', async () => {
+            const minCoinsAmount = 1000n;
+            const minTokensAmount = 20n;
+            const utxo = await getUtxoFiltered(minCoinsAmount, minTokensAmount);
+            expect(utxo?.length).toBeLessThan((await firstValueFrom(wallet.utxo.available$)).length);
+            const totalQuantities = coalesceValueQuantities(utxo!.map(([_, txOut]) => txOut.value));
+            expect(totalQuantities.coins).toBeGreaterThan(minCoinsAmount);
+            expect(totalQuantities.assets?.get(AssetId.TSLA)).toBeGreaterThan(minTokensAmount);
+          });
+
+          it('returns null when it has insufficient coins balance to cover the requested amount', async () => {
+            expect(await getUtxoFiltered(99_999_999_999_999_999n, 1n)).toBeNull();
+          });
+
+          it('returns null when it has insufficient tokens balance to cover the requested amount', async () => {
+            expect(await getUtxoFiltered(1n, 99_999_999_999_999_999n)).toBeNull();
+          });
+        });
       });
 
       describe('api.getCollateral', () => {
