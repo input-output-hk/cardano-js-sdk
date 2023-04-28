@@ -256,7 +256,7 @@ describe('coreToCml', () => {
       // eslint-disable-next-line unicorn/consistent-function-scoping, @typescript-eslint/no-explicit-any
       const convertMetadatum = (metadatum: any) => {
         const label = 123n;
-        const auxiliaryData = coreToCml.txAuxiliaryData(scope, { body: { blob: new Map([[label, metadatum]]) } });
+        const auxiliaryData = coreToCml.txAuxiliaryData(scope, { blob: new Map([[label, metadatum]]) });
         const metadata = scope.manage(auxiliaryData?.metadata());
         return scope.manage(metadata?.get(scope.manage(BigNum.from_str(label.toString()))));
       };

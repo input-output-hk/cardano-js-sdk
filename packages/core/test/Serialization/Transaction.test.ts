@@ -40,9 +40,9 @@ describe('Transaction', () => {
   it('correctly converts from a Babbage Core transaction', () => {
     const scope = new ManagedFreeableScope();
     const tx = Transaction.fromCore(scope, babbageTx);
+
     expect(tx.toCore()).toEqual(babbageTx);
   });
-
   it('calling free several times doesnt throw an error', () => {
     const tx = Transaction.fromCbor(HexBlob(TX));
     expect(() => tx.free()).not.toThrow();
@@ -59,7 +59,6 @@ describe('Transaction', () => {
 
     // Perform a round trip serialization.
     const tx2 = Transaction.fromCbor(tx.toCbor());
-
     expect(tx2.isValid()).toEqual(false);
   });
 

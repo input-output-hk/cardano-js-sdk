@@ -48,6 +48,6 @@ describe('SingleAddressWallet/metadata', () => {
         filter(isNotNil)
       )
     );
-    expect(loadedTx.auxiliaryData?.body.blob).toEqual(metadata);
+    expect(loadedTx.auxiliaryData?.blob).toEqual(metadata);
   });
 });

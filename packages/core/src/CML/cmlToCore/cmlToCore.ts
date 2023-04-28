@@ -275,14 +275,18 @@ export const txBody = (body: CML.TransactionBody): Cardano.TxBody =>
     const cslReferenceInputs = scope.manage(body.reference_inputs());
     const cslCollateralReturn = scope.manage(body.collateral_return());
     const cslTotalCollateral = scope.manage(body.total_collateral());
+    const cslAuxiliaryDataHash = scope.manage(body.auxiliary_data_hash());
+    const cslNetworkId = scope.manage(body.network_id());
 
     return {
+      auxiliaryDataHash: cslAuxiliaryDataHash ? Crypto.Hash32ByteBase16(cslAuxiliaryDataHash.to_hex()) : undefined,
       certificates: txCertificates(scope.manage(body.certs())),
       collateralReturn: cslCollateralReturn ? txOut(cslCollateralReturn) : undefined,
       collaterals: cslCollaterals && txInputs(cslCollaterals),
       fee: BigInt(scope.manage(body.fee()).to_str()),
       inputs: txInputs(scope.manage(body.inputs())),
       mint: txMint(scope.manage(body.multiassets())),
+      networkId: cslNetworkId ? cslNetworkId.kind() : undefined,
       outputs: txOutputs(scope.manage(body.outputs())),
       referenceInputs: cslReferenceInputs ? txInputs(cslReferenceInputs) : undefined,
       requiredExtraSignatures: txRequiredExtraSignatures(scope.manage(body.required_signers())),
@@ -468,12 +472,9 @@ export const txMetadata = (auxiliaryMetadata?: CML.GeneralTransactionMetadata): 
 export const txAuxiliaryData = (auxiliaryData?: CML.AuxiliaryData): Cardano.AuxiliaryData | undefined =>
   usingAutoFree((scope) => {
     if (!auxiliaryData) return;
-    // TODO: create hash
     const auxiliaryMetadata = scope.manage(auxiliaryData.metadata());
     return {
-      body: {
-        blob: txMetadata(auxiliaryMetadata)
-      }
+      blob: txMetadata(auxiliaryMetadata)
     };
   });
 

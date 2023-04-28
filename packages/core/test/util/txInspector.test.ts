@@ -190,10 +190,8 @@ describe('txInspector', () => {
   };
 
   const auxiliaryData = {
-    body: {
-      blob: txMetadatum,
-      scripts: [mockScript2]
-    }
+    blob: txMetadatum,
+    scripts: [mockScript2]
   };
 
   const buildMockTx = (

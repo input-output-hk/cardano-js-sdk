@@ -153,7 +153,7 @@ export class Transaction {
 
     const transaction = scope.manage(
       new Transaction(
-        CoreToCml.txBody(scope, tx.body, tx.auxiliaryData),
+        CoreToCml.txBody(scope, tx.body),
         txWitnessSet,
         CoreToCml.txAuxiliaryData(scope, tx.auxiliaryData)
       )

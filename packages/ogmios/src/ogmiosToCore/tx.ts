@@ -227,20 +227,22 @@ const mapRedeemer = (key: string, redeemer: Schema.Redeemer): Cardano.Redeemer =
   };
 };
 
-const mapAuxiliaryData = (data: Schema.AuxiliaryData | null): Cardano.AuxiliaryData | undefined => {
-  if (data === null) return undefined;
+const mapAuxiliaryData = (
+  data: Schema.AuxiliaryData | null
+): { auxiliaryData: Cardano.AuxiliaryData | undefined; auxiliaryDataHash: Crypto.Hash32ByteBase16 | undefined } => {
+  if (data === null) return { auxiliaryData: undefined, auxiliaryDataHash: undefined };
 
-  return {
-    body: {
-      blob: data.body.blob
-        ? new Map(
-            Object.entries(data.body.blob).map(([key, value]) => [BigInt(key), ProviderUtil.jsonToMetadatum(value)])
-          )
-        : undefined,
-      scripts: data.body.scripts ? data.body.scripts.map(mapScript) : undefined
-    },
-    hash: Crypto.Hash32ByteBase16(data.hash)
+  const auxiliaryData = {
+    blob: data.body.blob
+      ? new Map(
+          Object.entries(data.body.blob).map(([key, value]) => [BigInt(key), ProviderUtil.jsonToMetadatum(value)])
+        )
+      : undefined,
+    scripts: data.body.scripts ? data.body.scripts.map(mapScript) : undefined
   };
+  const auxiliaryDataHash = Crypto.Hash32ByteBase16(data.hash);
+
+  return { auxiliaryData, auxiliaryDataHash };
 };
 
 const mapTxIn = (txIn: Schema.TxIn): Cardano.TxIn => ({
@@ -291,48 +293,52 @@ const mapValidityInterval = ({
   invalidHereafter: invalidHereafter ? Cardano.Slot(invalidHereafter) : undefined
 });
 
-const mapCommonTx = (tx: CommonBlock['body'][0], kind: BlockKind): Cardano.OnChainTx => ({
-  auxiliaryData: mapAuxiliaryData(tx.metadata),
-  body: {
-    certificates: tx.body.certificates.map(mapCertificate),
-    collaterals: isAlonzoOrAbove(kind) ? (tx as Schema.TxAlonzo).body.collaterals.map(mapTxIn) : undefined,
-    fee: tx.body.fee,
-    inputs: tx.body.inputs.map(mapTxIn),
-    mint: isMaryOrAbove(kind) ? mapMint(tx as Schema.TxMary) : undefined,
-    outputs: tx.body.outputs.map(mapTxOut),
-    requiredExtraSignatures: isAlonzoOrAbove(kind)
-      ? (tx as Schema.TxAlonzo).body.requiredExtraSignatures.map(Crypto.Ed25519KeyHashHex)
-      : undefined,
-    scriptIntegrityHash: isAlonzoOrAbove(kind) ? mapScriptIntegrityHash(tx as Schema.TxAlonzo) : undefined,
-    validityInterval: isShelleyTx(kind)
-      ? undefined
-      : mapValidityInterval((tx as Schema.TxAlonzo).body.validityInterval),
-    withdrawals: Object.entries(tx.body.withdrawals).map(([key, value]) => ({
-      quantity: value,
-      stakeAddress: Cardano.RewardAccount(key)
-    }))
-  },
-  id: Cardano.TransactionId(tx.id),
-  inputSource: isAlonzoOrAbove(kind)
-    ? Cardano.InputSource[(tx as Schema.TxAlonzo).inputSource]
-    : Cardano.InputSource.inputs,
-  witness: {
-    bootstrap: tx.witness.bootstrap.map(mapBootstrapWitness),
-    datums: isAlonzoOrAbove(kind)
-      ? Object.values((tx as Schema.TxAlonzo).witness.datums).map((d) => HexBlob(d))
-      : undefined,
-    redeemers: isAlonzoOrAbove(kind)
-      ? Object.entries((tx as Schema.TxAlonzo).witness.redeemers).map(([key, value]) => mapRedeemer(key, value))
-      : undefined,
-    scripts: [...Object.values(tx.witness.scripts).map(mapScript)],
-    signatures: new Map(
-      Object.entries(tx.witness.signatures).map(([key, value]) => [
-        Crypto.Ed25519PublicKeyHex(key),
-        Crypto.Ed25519SignatureHex(HexBlob.fromBase64(value))
-      ])
-    )
-  }
-});
+const mapCommonTx = (tx: CommonBlock['body'][0], kind: BlockKind): Cardano.OnChainTx => {
+  const { auxiliaryData, auxiliaryDataHash } = mapAuxiliaryData(tx.metadata);
+  return {
+    auxiliaryData,
+    body: {
+      auxiliaryDataHash,
+      certificates: tx.body.certificates.map(mapCertificate),
+      collaterals: isAlonzoOrAbove(kind) ? (tx as Schema.TxAlonzo).body.collaterals.map(mapTxIn) : undefined,
+      fee: tx.body.fee,
+      inputs: tx.body.inputs.map(mapTxIn),
+      mint: isMaryOrAbove(kind) ? mapMint(tx as Schema.TxMary) : undefined,
+      outputs: tx.body.outputs.map(mapTxOut),
+      requiredExtraSignatures: isAlonzoOrAbove(kind)
+        ? (tx as Schema.TxAlonzo).body.requiredExtraSignatures.map(Crypto.Ed25519KeyHashHex)
+        : undefined,
+      scriptIntegrityHash: isAlonzoOrAbove(kind) ? mapScriptIntegrityHash(tx as Schema.TxAlonzo) : undefined,
+      validityInterval: isShelleyTx(kind)
+        ? undefined
+        : mapValidityInterval((tx as Schema.TxAlonzo).body.validityInterval),
+      withdrawals: Object.entries(tx.body.withdrawals).map(([key, value]) => ({
+        quantity: value,
+        stakeAddress: Cardano.RewardAccount(key)
+      }))
+    },
+    id: Cardano.TransactionId(tx.id),
+    inputSource: isAlonzoOrAbove(kind)
+      ? Cardano.InputSource[(tx as Schema.TxAlonzo).inputSource]
+      : Cardano.InputSource.inputs,
+    witness: {
+      bootstrap: tx.witness.bootstrap.map(mapBootstrapWitness),
+      datums: isAlonzoOrAbove(kind)
+        ? Object.values((tx as Schema.TxAlonzo).witness.datums).map((d) => HexBlob(d))
+        : undefined,
+      redeemers: isAlonzoOrAbove(kind)
+        ? Object.entries((tx as Schema.TxAlonzo).witness.redeemers).map(([key, value]) => mapRedeemer(key, value))
+        : undefined,
+      scripts: [...Object.values(tx.witness.scripts).map(mapScript)],
+      signatures: new Map(
+        Object.entries(tx.witness.signatures).map(([key, value]) => [
+          Crypto.Ed25519PublicKeyHex(key),
+          Crypto.Ed25519SignatureHex(HexBlob.fromBase64(value))
+        ])
+      )
+    }
+  };
+};
 
 export const mapCommonBlockBody = ({ body }: CommonBlock, kind: BlockKind): Cardano.Block['body'] =>
   body.map((blockBody) => mapCommonTx(blockBody, kind));

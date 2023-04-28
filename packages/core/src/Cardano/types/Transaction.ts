@@ -7,6 +7,7 @@ import { Datum, Script } from './Script';
 import { ExUnits, ValidityInterval } from './ProtocolParameters';
 import { HydratedTxIn, TxIn, TxOut } from './Utxo';
 import { Lovelace, TokenMap } from './Value';
+import { NetworkId } from '../ChainId';
 import { PartialBlockHeader } from './Block';
 import { RewardAccount } from '../Address';
 import { TxBodyCBOR } from '../../CBOR/TxBodyCBOR';
@@ -49,6 +50,8 @@ export interface HydratedTxBody {
   mint?: TokenMap;
   scriptIntegrityHash?: Crypto.Hash32ByteBase16;
   requiredExtraSignatures?: Crypto.Ed25519KeyHashHex[];
+  networkId?: NetworkId;
+  auxiliaryDataHash?: Crypto.Hash32ByteBase16;
 
   /**
    * The total collateral field lets users write transactions whose collateral is evident by just looking at the

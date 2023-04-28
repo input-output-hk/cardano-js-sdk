@@ -35,9 +35,7 @@ export const txIn: Cardano.HydratedTxIn = {
 
 export const base = {
   auxiliaryData: {
-    body: {
-      blob: new Map()
-    }
+    blob: new Map()
   },
   blockHeader: {
     blockNo: Cardano.BlockNo(3_157_934),
