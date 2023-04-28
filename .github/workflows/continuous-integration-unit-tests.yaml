@@ -1,8 +1,8 @@
 name: Continuous Integration - Unit Tests
 
 env:
-  TL_DEPTH: ${{ fromJson(vars.TL_DEPTH) }}
-  TL_LEVEL: ${{ vars.TL_LEVEL }}
+  TL_DEPTH: ${{ github.event.pull_request.head.repo.fork && '0' || fromJson(vars.TL_DEPTH) }}
+  TL_LEVEL: ${{ github.event.pull_request.head.repo.fork && 'info' || vars.TL_LEVEL }}
 
 on:
   pull_request:
