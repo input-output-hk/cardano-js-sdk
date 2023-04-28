@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/consistent-function-scoping */
 /* eslint-disable @typescript-eslint/no-explicit-any, sonarjs/no-duplicate-string */
 import * as Crypto from '@cardano-sdk/crypto';
 import * as mocks from '../mocks';
@@ -6,6 +7,7 @@ import {
   ApiError,
   DataSignError,
   DataSignErrorCode,
+  Paginate,
   TxSendError,
   TxSignError,
   WalletApi
@@ -34,7 +36,6 @@ import {
   mockRewardsProvider,
   mockTxSubmitProvider,
   utxo as mockUtxo,
-  utxo as mockedUtxo,
   utxosWithLowCoins
 } from '../mocks';
 import { testAsyncKeyAgent } from '../../../key-management/test/mocks';
@@ -86,7 +87,7 @@ describe('cip30', () => {
           })
       );
       // CREATE A WALLET
-      ({ wallet, api, confirmationCallback } = await createWalletAndApiWithStores([mockedUtxo[2]], providers, false));
+      ({ wallet, api, confirmationCallback } = await createWalletAndApiWithStores([mockUtxo[2]], providers, false));
     });
 
     afterEach(() => {
@@ -113,6 +114,7 @@ describe('cip30', () => {
     });
   });
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('with default mock data', () => {
     let scope: ManagedFreeableScope;
     let providers: TestProviders;
@@ -124,7 +126,7 @@ describe('cip30', () => {
         networkInfoProvider: mockNetworkInfoProvider(),
         txSubmitProvider: mockTxSubmitProvider()
       };
-      ({ wallet, api, confirmationCallback } = await createWalletAndApiWithStores([mockedUtxo[4]], providers));
+      ({ wallet, api, confirmationCallback } = await createWalletAndApiWithStores([mockUtxo[4]], providers));
     });
 
     afterAll(() => {
@@ -149,23 +151,23 @@ describe('cip30', () => {
           ).not.toThrow();
         });
 
-        describe('"amount" argument', () => {
-          // eslint-disable-next-line unicorn/consistent-function-scoping
-          const getUtxoFiltered = async (coins: Cardano.Lovelace, tslaQuantity: bigint) => {
-            const minTokensAssetId = AssetId.TSLA;
+        describe('with "amount" argument', () => {
+          const getUtxoFiltered = async (coins: Cardano.Lovelace, tslaQuantity?: bigint, paginate?: Paginate) => {
             const filterAmountValue = scope.manage(CML.Value.new(scope.manage(CML.BigNum.from_str(coins.toString()))));
-            const multiAsset = scope.manage(CML.MultiAsset.new());
-            const assets = scope.manage(CML.Assets.new());
-            assets.insert(
-              scope.manage(CML.AssetName.new(Buffer.from(Asset.util.assetNameFromAssetId(minTokensAssetId), 'hex'))),
-              scope.manage(CML.BigNum.from_str(tslaQuantity.toString()))
-            );
-            multiAsset.insert(
-              scope.manage(CML.ScriptHash.from_hex(Asset.util.policyIdFromAssetId(minTokensAssetId))),
-              assets
-            );
-            filterAmountValue.set_multiasset(multiAsset);
-            const utxoCbor = await api.getUtxos(Buffer.from(filterAmountValue.to_bytes()).toString('hex'));
+            if (tslaQuantity) {
+              const multiAsset = scope.manage(CML.MultiAsset.new());
+              const assets = scope.manage(CML.Assets.new());
+              assets.insert(
+                scope.manage(CML.AssetName.new(Buffer.from(Asset.util.assetNameFromAssetId(AssetId.TSLA), 'hex'))),
+                scope.manage(CML.BigNum.from_str(tslaQuantity.toString()))
+              );
+              multiAsset.insert(
+                scope.manage(CML.ScriptHash.from_hex(Asset.util.policyIdFromAssetId(AssetId.TSLA))),
+                assets
+              );
+              filterAmountValue.set_multiasset(multiAsset);
+            }
+            const utxoCbor = await api.getUtxos(Buffer.from(filterAmountValue.to_bytes()).toString('hex'), paginate);
             if (!utxoCbor) return null;
             return cmlToCore.utxo(
               utxoCbor.map((cbor) => scope.manage(CML.TransactionUnspentOutput.from_bytes(Buffer.from(cbor, 'hex'))))
@@ -183,11 +185,58 @@ describe('cip30', () => {
           });
 
           it('returns null when it has insufficient coins balance to cover the requested amount', async () => {
-            expect(await getUtxoFiltered(99_999_999_999_999_999n, 1n)).toBeNull();
+            expect(await getUtxoFiltered(99_999_999_999_999_999n)).toBeNull();
           });
 
           it('returns null when it has insufficient tokens balance to cover the requested amount', async () => {
             expect(await getUtxoFiltered(1n, 99_999_999_999_999_999n)).toBeNull();
+          });
+
+          describe('with "paginate" argument', () => {
+            it('when requested coins amount can be resolved, returns utxo in pages', async () => {
+              const requestedCoins = 4_033_605_597n;
+              const pageSize = 1;
+              let page = 0;
+              const utxo: (readonly [Cardano.TxIn, Cardano.TxOut])[] = [];
+              do {
+                const utxoChunk = await getUtxoFiltered(requestedCoins, 1n, { limit: pageSize, page: page++ });
+                expect(utxoChunk).toHaveLength(pageSize);
+                if (!utxoChunk) {
+                  throw new Error('Not enough utxo');
+                }
+                utxo.push(...utxoChunk);
+              } while (coalesceValueQuantities(utxo.map(([_, { value }]) => value)).coins < requestedCoins);
+              // pagination had more than 1 page
+              expect(utxo.length).toBeGreaterThan(pageSize);
+            });
+
+            it('when requested tokens amount can be resolved, returns utxo in pages', async () => {
+              const requestedTokens = 20n;
+              const pageSize = 1;
+              let page = 0;
+              const utxo: (readonly [Cardano.TxIn, Cardano.TxOut])[] = [];
+              do {
+                const utxoChunk = await getUtxoFiltered(1n, requestedTokens, { limit: pageSize, page: page++ });
+                expect(utxoChunk).toHaveLength(pageSize);
+                if (!utxoChunk) {
+                  throw new Error('Not enough utxo');
+                }
+                utxo.push(...utxoChunk);
+              } while (
+                (coalesceValueQuantities(utxo.map(([_, { value }]) => value)).assets?.get(AssetId.TSLA) || 0n) <
+                requestedTokens
+              );
+              // pagination had more than 1 page
+              expect(utxo.length).toBeGreaterThan(pageSize);
+            });
+
+            it('when requested coins amount cannot be resolved, returns null', async () => {
+              expect(await getUtxoFiltered(99_999_999_999_999_999n, 1n, { limit: 1, page: 0 })).toBeNull();
+            });
+
+            it('when requested tokens amount cannot be resolved, returns null', async () => {
+              expect(await getUtxoFiltered(1n, 99_999_999_999_999_999n, { limit: 1, page: 0 })).toBeNull();
+            });
           });
         });
       });
@@ -213,7 +262,7 @@ describe('cip30', () => {
           ({ wallet: wallet3, api: api3 } = await createWalletAndApiWithStores([]));
 
           // CREATE A WALLET WITH UTXOS WITH ASSETS
-          ({ wallet: wallet4, api: api4 } = await createWalletAndApiWithStores([mockedUtxo[1], mockedUtxo[2]]));
+          ({ wallet: wallet4, api: api4 } = await createWalletAndApiWithStores([mockUtxo[1], mockUtxo[2]]));
         });
 
         afterAll(() => {

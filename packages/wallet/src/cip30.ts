@@ -13,7 +13,7 @@ import {
   TxSignErrorCode,
   WalletApi
 } from '@cardano-sdk/dapp-connector';
-import { CML, Cardano, Transaction, TxCBOR, cmlToCore, coreToCml } from '@cardano-sdk/core';
+import { CML, Cardano, Transaction, TxCBOR, cmlToCore, coalesceValueQuantities, coreToCml } from '@cardano-sdk/core';
 import { HexBlob, ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
 import { InputSelectionError, InputSelectionFailure } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
@@ -94,6 +94,70 @@ const cardanoAddressToCbor = (address: Cardano.PaymentAddress | Cardano.RewardAc
 };
 
 const formatUnknownError = (error: unknown): string => (error as Error)?.message || 'Unknown error';
+
+const parseValueCbor = (scope: ManagedFreeableScope, value: Cbor) => {
+  try {
+    return scope.manage(CML.Value.from_bytes(Buffer.from(value, 'hex')));
+  } catch {
+    throw new ApiError(APIErrorCode.InvalidRequest, 'could not parse Value');
+  }
+};
+
+const dumbSelection = (utxos: Cardano.Utxo[], target: Cardano.Value) => {
+  const selectedUtxos: Cardano.Utxo[] = [];
+  const filterAmountAssets = [...(target.assets?.entries() || [])];
+  let foundEnough = false;
+  for (const utxo of utxos) {
+    selectedUtxos.push(utxo);
+    const selectedValue = coalesceValueQuantities(selectedUtxos.map(([_, { value }]) => value));
+    foundEnough =
+      selectedValue.coins >= target.coins &&
+      filterAmountAssets.every(
+        ([assetId, requestedQuantity]) => (selectedValue.assets?.get(assetId) || 0n) >= requestedQuantity
+      );
+    if (foundEnough) {
+      break;
+    }
+  }
+  if (!foundEnough) {
+    return null;
+  }
+  return selectedUtxos;
+};
+
+const walletSelection = async (target: Cardano.Value, wallet: ObservableWallet) => {
+  try {
+    /**
+     * Getting UTxOs to meet a required amount is a complex operation,
+     * which is handled by input selection capabilities. By initializing
+     * a transaction we're able to utilise the internal configuration and
+     * algorithm to make this selection, using a wallet address to
+     * satisfy the interface only.
+     */
+    const addresses = await firstValueFrom(wallet.addresses$);
+    const { inputSelection } = await wallet.initializeTx({
+      outputs: new Set([{ address: addresses[0].address, value: target }])
+    });
+
+    return [...inputSelection.inputs];
+  } catch (error) {
+    if (error instanceof InputSelectionError && error.failure === InputSelectionFailure.UtxoBalanceInsufficient) {
+      return null;
+    }
+    const message = formatUnknownError(error);
+
+    throw new ApiError(APIErrorCode.InternalError, message);
+  }
+};
+
+/**
+ * Select utxo via either default wallet's default input selection algorithm,
+ * or 'dumb selection', which should preserve the order of utxos for pagination.
+ */
+const selectUtxo = async (wallet: ObservableWallet, filterAmount: Cardano.Value, useDumbSelection: boolean) =>
+  useDumbSelection
+    ? dumbSelection(await firstValueFrom(wallet.utxo.available$), filterAmount)
+    : await walletSelection(filterAmount, wallet);
 
 export const createWalletApi = (
   wallet$: Observable<ObservableWallet>,
@@ -225,40 +289,21 @@ export const createWalletApi = (
   },
   getUtxos: async (amount?: Cbor, paginate?: Paginate): Promise<Cbor[] | null> => {
     const scope = new ManagedFreeableScope();
-    const wallet = await firstValueFrom(wallet$);
-    let utxos = await firstValueFrom(wallet.utxo.available$);
-    if (amount) {
-      try {
-        const filterAmount = scope.manage(CML.Value.from_bytes(Buffer.from(amount, 'hex')));
-        /**
-         * Getting UTxOs to meet a required amount is a complex operation,
-         * which is handled by input selection capabilities. By initializing
-         * a transaction we're able to utilise the internal configuration and
-         * algorithm to make this selection, using a wallet address to
-         * satisfy the interface only.
-         */
-        const addresses = await firstValueFrom(wallet.addresses$);
-        const { inputSelection } = await wallet.initializeTx({
-          outputs: new Set([{ address: addresses[0].address, value: cmlToCore.value(filterAmount) }])
-        });
-
-        utxos = [...inputSelection.inputs];
-      } catch (error) {
-        if (error instanceof InputSelectionError && error.failure === InputSelectionFailure.UtxoBalanceInsufficient) {
-          return null;
-        }
-        logger.debug(error);
-        const message = formatUnknownError(error);
-
-        scope.dispose();
-        throw new ApiError(APIErrorCode.InternalError, message);
+    try {
+      const wallet = await firstValueFrom(wallet$);
+      let utxos = amount
+        ? await selectUtxo(wallet, cmlToCore.value(parseValueCbor(scope, amount)), !!paginate)
+        : await firstValueFrom(wallet.utxo.available$);
+      if (!utxos) return null;
+      if (paginate) {
+        utxos = utxos.slice(paginate.page * paginate.limit, paginate.page * paginate.limit + paginate.limit);
       }
-    } else if (paginate) {
-      utxos = utxos.slice(paginate.page * paginate.limit, paginate.page * paginate.limit + paginate.limit);
+      const cbor = coreToCml.utxo(scope, utxos).map(cslToCbor);
+      scope.dispose();
+      return cbor;
+    } finally {
+      scope.dispose();
     }
-    const cbor = coreToCml.utxo(scope, utxos).map(cslToCbor);
-    scope.dispose();
-    return cbor;
   },
   signData: async (addr: Cardano.PaymentAddress | Bytes, payload: Bytes): Promise<Cip30DataSignature> => {
     logger.debug('signData');
