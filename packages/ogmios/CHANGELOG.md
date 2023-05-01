@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.0-nightly.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.11.0-nightly.9...@cardano-sdk/ogmios@0.11.0-nightly.10) (2023-05-01)
+
+### ⚠ BREAKING CHANGES
+
+- - auxiliaryDataHash is now included in the TxBody core type.
+
+* networkId is now included in the TxBody core type.
+* auxiliaryData no longer contains the optional hash field.
+* auxiliaryData no longer contains the optional body field.
+
+### Features
+
+- add healthCheck$ to ObservableCardanoNode ([df35035](https://github.com/input-output-hk/cardano-js-sdk/commit/df3503597832939e6dc9c7ec953d24b3d709c723))
+- transaction body core type now includes the auxiliaryDataHash and networkId fields ([8b92b01](https://github.com/input-output-hk/cardano-js-sdk/commit/8b92b0190083a2b956ae1e188121414428f6663b))
+
 ## [0.11.0-nightly.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.11.0-nightly.8...@cardano-sdk/ogmios@0.11.0-nightly.9) (2023-04-26)
 
 **Note:** Version bump only for package @cardano-sdk/ogmios

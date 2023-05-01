@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.6.0-nightly.6...@cardano-sdk/projection@0.6.0-nightly.7) (2023-05-01)
+
+### Features
+
+- **cardano-services:** add projector service ([5a5b281](https://github.com/input-output-hk/cardano-js-sdk/commit/5a5b281690283995b9a20c61c337c621b919fb3c))
+
 ## [0.6.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.6.0-nightly.5...@cardano-sdk/projection@0.6.0-nightly.6) (2023-04-26)
 
 **Note:** Version bump only for package @cardano-sdk/projection

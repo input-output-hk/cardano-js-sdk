@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.0-nightly.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.11.0-nightly.8...@cardano-sdk/core@0.11.0-nightly.9) (2023-05-01)
+
+### ⚠ BREAKING CHANGES
+
+- - auxiliaryDataHash is now included in the TxBody core type.
+
+* networkId is now included in the TxBody core type.
+* auxiliaryData no longer contains the optional hash field.
+* auxiliaryData no longer contains the optional body field.
+
+### Features
+
+- add healthCheck$ to ObservableCardanoNode ([df35035](https://github.com/input-output-hk/cardano-js-sdk/commit/df3503597832939e6dc9c7ec953d24b3d709c723))
+- added new Transaction class that can convert between CBOR and the Core Tx type ([cc9a80c](https://github.com/input-output-hk/cardano-js-sdk/commit/cc9a80c17f1c0f46124b0c04c597a7ff96e517d3))
+- **core:** add optional 'reason' property to HealthCheckResponse ([985448c](https://github.com/input-output-hk/cardano-js-sdk/commit/985448c30d85b767588c7524ddeb147c27320608))
+- **core:** replaced borc library with a native typescript implementation of the CBOR format ([39b6ceb](https://github.com/input-output-hk/cardano-js-sdk/commit/39b6ceb718fed0ea1827933e983e10080083ca9f))
+- transaction body core type now includes the auxiliaryDataHash and networkId fields ([8b92b01](https://github.com/input-output-hk/cardano-js-sdk/commit/8b92b0190083a2b956ae1e188121414428f6663b))
+
+### Bug Fixes
+
+- **core:** correct cmlToCore.utxo return type (tuple) ([495a22e](https://github.com/input-output-hk/cardano-js-sdk/commit/495a22e471eb3d8412a056e1901089e9bfdd7977))
+- tx metadata memory leak ([a5dc8ec](https://github.com/input-output-hk/cardano-js-sdk/commit/a5dc8ec4b18dc7170a58a217dd69a65b6189e1f1))
+
 ## [0.11.0-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.11.0-nightly.7...@cardano-sdk/core@0.11.0-nightly.8) (2023-04-26)
 
 ### ⚠ BREAKING CHANGES

@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.8.1-nightly.8...@cardano-sdk/dapp-connector@0.9.0-nightly.0) (2023-05-01)
+
+### ⚠ BREAKING CHANGES
+
+- update WalletApi.getUtxos return type from `undefined` to `null`
+
+### Bug Fixes
+
+- cip30 getUtxos(amount) now returns `null` when wallet has insufficient balance ([9b550eb](https://github.com/input-output-hk/cardano-js-sdk/commit/9b550eb4e9ef4f7a1432defb155bebe4b2ec2c34))
+
 ## [0.8.1-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.8.1-nightly.7...@cardano-sdk/dapp-connector@0.8.1-nightly.8) (2023-04-26)
 
 **Note:** Version bump only for package @cardano-sdk/dapp-connector

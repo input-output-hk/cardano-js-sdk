@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.2.0-nightly.6...@cardano-sdk/projection-typeorm@0.2.0-nightly.7) (2023-05-01)
+
+### Features
+
+- **projection-typeorm:** improve withTypeormTransaction overload types ([1b74c16](https://github.com/input-output-hk/cardano-js-sdk/commit/1b74c1623244edf9a797abbf4bbbcba6dce6c253))
+
 ## [0.2.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.2.0-nightly.5...@cardano-sdk/projection-typeorm@0.2.0-nightly.6) (2023-04-26)
 
 **Note:** Version bump only for package @cardano-sdk/projection-typeorm

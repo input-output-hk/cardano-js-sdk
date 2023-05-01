@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.9.0-nightly.1...@cardano-sdk/util-dev@0.9.0-nightly.2) (2023-05-01)
+
+### Features
+
+- add healthCheck$ to ObservableCardanoNode ([df35035](https://github.com/input-output-hk/cardano-js-sdk/commit/df3503597832939e6dc9c7ec953d24b3d709c723))
+
 ## [0.9.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.9.0-nightly.0...@cardano-sdk/util-dev@0.9.0-nightly.1) (2023-04-26)
 
 **Note:** Version bump only for package @cardano-sdk/util-dev
