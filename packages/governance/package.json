@@ -59,10 +59,10 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "@cardano-sdk/core": "^0.10.0",
-    "@cardano-sdk/crypto": "^0.1.3",
-    "@cardano-sdk/key-management": "^0.5.0",
-    "@cardano-sdk/util": "^0.8.2"
+    "@cardano-sdk/core": "workspace:~",
+    "@cardano-sdk/crypto": "workspace:~",
+    "@cardano-sdk/key-management": "workspace:~",
+    "@cardano-sdk/util": "workspace:~"
   },
   "files": [
     "dist/*",

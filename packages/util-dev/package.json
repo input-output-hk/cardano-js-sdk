@@ -65,8 +65,8 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "@cardano-sdk/core": "^0.10.0",
-    "@cardano-sdk/util": "^0.8.2",
+    "@cardano-sdk/core": "workspace:~",
+    "@cardano-sdk/util": "workspace:~",
     "@types/dockerode": "^3.3.8",
     "delay": "^5.0.0",
     "dockerode": "^3.3.1",

@@ -78,7 +78,7 @@
     }
   },
   "dependencies": {
-    "@cardano-sdk/util": "^0.8.2",
+    "@cardano-sdk/util": "workspace:~",
     "blake2b": "^2.1.4",
     "bn.js": "^5.2.1",
     "i": "^0.3.7",
