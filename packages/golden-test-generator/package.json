@@ -59,10 +59,10 @@
     "coverage": "shx echo No coverage report for this package"
   },
   "dependencies": {
-    "@cardano-sdk/core": "^0.11.0",
-    "@cardano-sdk/ogmios": "^0.11.0",
-    "@cardano-sdk/util": "^0.9.0",
-    "@cardano-sdk/util-dev": "^0.9.0",
+    "@cardano-sdk/core": "workspace:~",
+    "@cardano-sdk/ogmios": "workspace:~",
+    "@cardano-sdk/util": "workspace:~",
+    "@cardano-sdk/util-dev": "workspace:~",
     "bunyan": "^1.8.15",
     "chalk": "^4.1.1",
     "clear": "^0.1.0",
