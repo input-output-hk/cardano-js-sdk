@@ -1,8 +1,10 @@
 {
+  "$schema": "node_modules/@lerna-lite/cli/schemas/lerna-schema.json",
   "packages": [
     "packages/*"
   ],
   "tagVersionPrefix": "",
+  "npmClient": "yarn",
   "command": {
     "version": {
       "includeMergedTags": true,
