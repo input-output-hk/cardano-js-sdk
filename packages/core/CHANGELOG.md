@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.11.0-nightly.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.11.0-nightly.8...@cardano-sdk/core@0.11.0-nightly.9) (2023-05-01)
+## [0.11.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.10.0...@cardano-sdk/core@0.11.0) (2023-05-02)
 
 ### ⚠ BREAKING CHANGES
 
@@ -13,51 +13,13 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * auxiliaryData no longer contains the optional hash field.
 * auxiliaryData no longer contains the optional body field.
 
-### Features
-
-- add healthCheck$ to ObservableCardanoNode ([df35035](https://github.com/input-output-hk/cardano-js-sdk/commit/df3503597832939e6dc9c7ec953d24b3d709c723))
-- added new Transaction class that can convert between CBOR and the Core Tx type ([cc9a80c](https://github.com/input-output-hk/cardano-js-sdk/commit/cc9a80c17f1c0f46124b0c04c597a7ff96e517d3))
-- **core:** add optional 'reason' property to HealthCheckResponse ([985448c](https://github.com/input-output-hk/cardano-js-sdk/commit/985448c30d85b767588c7524ddeb147c27320608))
-- **core:** replaced borc library with a native typescript implementation of the CBOR format ([39b6ceb](https://github.com/input-output-hk/cardano-js-sdk/commit/39b6ceb718fed0ea1827933e983e10080083ca9f))
-- transaction body core type now includes the auxiliaryDataHash and networkId fields ([8b92b01](https://github.com/input-output-hk/cardano-js-sdk/commit/8b92b0190083a2b956ae1e188121414428f6663b))
-
-### Bug Fixes
-
-- **core:** correct cmlToCore.utxo return type (tuple) ([495a22e](https://github.com/input-output-hk/cardano-js-sdk/commit/495a22e471eb3d8412a056e1901089e9bfdd7977))
-- tx metadata memory leak ([a5dc8ec](https://github.com/input-output-hk/cardano-js-sdk/commit/a5dc8ec4b18dc7170a58a217dd69a65b6189e1f1))
-
-## [0.11.0-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.11.0-nightly.7...@cardano-sdk/core@0.11.0-nightly.8) (2023-04-26)
-
-### ⚠ BREAKING CHANGES
-
 - **core:** - NFT metadata image is type 'Uri'
 
 * NFT metadata description is type 'string'
 * NFT metadata file src is type 'Uri'
 * NFT metadata file name is optional
 
-### Bug Fixes
-
-- **core:** invalid NFT model and CIP-25 validation ([0d9b77a](https://github.com/input-output-hk/cardano-js-sdk/commit/0d9b77ae1851e5ea1386c94e9e32e3fbdfeed201))
-
-## [0.11.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.11.0-nightly.6...@cardano-sdk/core@0.11.0-nightly.7) (2023-04-24)
-
-### ⚠ BREAKING CHANGES
-
 - rename AssetInfo 'quantity' to 'supply'
-
-### Features
-
-- add CORS headers config in provider server ([25010cf](https://github.com/input-output-hk/cardano-js-sdk/commit/25010cf752bf31c46268e8ea31f78b00583f9032))
-
-### Code Refactoring
-
-- rename AssetInfo 'quantity' to 'supply' ([6e28df4](https://github.com/input-output-hk/cardano-js-sdk/commit/6e28df412797974b8ce6f6deb0c3346ff5938a05))
-
-## [0.11.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.11.0-nightly.5...@cardano-sdk/core@0.11.0-nightly.6) (2023-04-18)
-
-### ⚠ BREAKING CHANGES
-
 - - `TokenMetadata` has new mandatory property `assetId`
 
 * `DbSyncAssetProvider` constructor requires new
@@ -65,62 +27,37 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * `createAssetsService` accepts an array of assetIds instead of a
   single assetId
 
-### Features
-
-- support assets fetching by ids ([8ed208a](https://github.com/input-output-hk/cardano-js-sdk/commit/8ed208a7a060c6999294c1f53266d6452adb278d))
-
-## [0.11.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.11.0-nightly.4...@cardano-sdk/core@0.11.0-nightly.5) (2023-04-12)
-
-### Bug Fixes
-
-- **core:** nft metadata files src in base64 ([b7811c7](https://github.com/input-output-hk/cardano-js-sdk/commit/b7811c736c0c3e74809b5d24a81bd620e26b6a47))
-- **core:** nft metadata images in base64 encoding format ([27876ed](https://github.com/input-output-hk/cardano-js-sdk/commit/27876ed0fcfb9eb00e9b6238081359558de967fa))
-
-## [0.11.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.11.0-nightly.3...@cardano-sdk/core@0.11.0-nightly.4) (2023-03-31)
-
-### Bug Fixes
-
-- circular deps check in CI ([070f5e9](https://github.com/input-output-hk/cardano-js-sdk/commit/070f5e9f199c8a3b823f80aa98b35a4df7dbe532))
-
-## [0.11.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.11.0-nightly.2...@cardano-sdk/core@0.11.0-nightly.3) (2023-03-24)
-
-### ⚠ BREAKING CHANGES
-
 - - stack property of returned errors was removed
-
-### Code Refactoring
-
-- the TxSubmit endpoint no longer adds the stack trace when returning domain errors ([f018f30](https://github.com/input-output-hk/cardano-js-sdk/commit/f018f30caea1c9cf764a419431ac642b98733bb9))
-
-## [0.11.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.11.0-nightly.1...@cardano-sdk/core@0.11.0-nightly.2) (2023-03-22)
-
-### Features
-
-- **cardano-services:** metadata fetching logic ([3647598](https://github.com/input-output-hk/cardano-js-sdk/commit/36475984368426f50323322da622f0af4c5d046b))
-- **core:** add createEpochSlotsCalc that computes 1st and last slot # of the epoch ([266b951](https://github.com/input-output-hk/cardano-js-sdk/commit/266b951f23a898ad226f82c491138660094149b6))
-
-## [0.11.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.11.0-nightly.0...@cardano-sdk/core@0.11.0-nightly.1) (2023-03-16)
-
-### ⚠ BREAKING CHANGES
-
 - **core:** - parseAssetId was moved from util.assetId.ts to coreToCml.ts
 
 * createAssetId was moved from util.assetId.ts to cmlToCore.ts
 
+### Features
+
+- add CORS headers config in provider server ([25010cf](https://github.com/input-output-hk/cardano-js-sdk/commit/25010cf752bf31c46268e8ea31f78b00583f9032))
+- add healthCheck$ to ObservableCardanoNode ([df35035](https://github.com/input-output-hk/cardano-js-sdk/commit/df3503597832939e6dc9c7ec953d24b3d709c723))
+- added new Transaction class that can convert between CBOR and the Core Tx type ([cc9a80c](https://github.com/input-output-hk/cardano-js-sdk/commit/cc9a80c17f1c0f46124b0c04c597a7ff96e517d3))
+- **cardano-services:** metadata fetching logic ([3647598](https://github.com/input-output-hk/cardano-js-sdk/commit/36475984368426f50323322da622f0af4c5d046b))
+- **core:** add createEpochSlotsCalc that computes 1st and last slot # of the epoch ([266b951](https://github.com/input-output-hk/cardano-js-sdk/commit/266b951f23a898ad226f82c491138660094149b6))
+- **core:** add optional 'reason' property to HealthCheckResponse ([985448c](https://github.com/input-output-hk/cardano-js-sdk/commit/985448c30d85b767588c7524ddeb147c27320608))
+- **core:** replaced borc library with a native typescript implementation of the CBOR format ([39b6ceb](https://github.com/input-output-hk/cardano-js-sdk/commit/39b6ceb718fed0ea1827933e983e10080083ca9f))
+- support assets fetching by ids ([8ed208a](https://github.com/input-output-hk/cardano-js-sdk/commit/8ed208a7a060c6999294c1f53266d6452adb278d))
+- transaction body core type now includes the auxiliaryDataHash and networkId fields ([8b92b01](https://github.com/input-output-hk/cardano-js-sdk/commit/8b92b0190083a2b956ae1e188121414428f6663b))
+
+### Bug Fixes
+
+- circular deps check in CI ([070f5e9](https://github.com/input-output-hk/cardano-js-sdk/commit/070f5e9f199c8a3b823f80aa98b35a4df7dbe532))
+- **core:** correct cmlToCore.utxo return type (tuple) ([495a22e](https://github.com/input-output-hk/cardano-js-sdk/commit/495a22e471eb3d8412a056e1901089e9bfdd7977))
+- **core:** invalid NFT model and CIP-25 validation ([0d9b77a](https://github.com/input-output-hk/cardano-js-sdk/commit/0d9b77ae1851e5ea1386c94e9e32e3fbdfeed201))
+- **core:** nft metadata files src in base64 ([b7811c7](https://github.com/input-output-hk/cardano-js-sdk/commit/b7811c736c0c3e74809b5d24a81bd620e26b6a47))
+- **core:** nft metadata images in base64 encoding format ([27876ed](https://github.com/input-output-hk/cardano-js-sdk/commit/27876ed0fcfb9eb00e9b6238081359558de967fa))
+- tx metadata memory leak ([a5dc8ec](https://github.com/input-output-hk/cardano-js-sdk/commit/a5dc8ec4b18dc7170a58a217dd69a65b6189e1f1))
+
 ### Code Refactoring
 
 - **core:** move parseAssetId and createAssetId from util.assetId to coreToCml and cmlToCore ([d649e02](https://github.com/input-output-hk/cardano-js-sdk/commit/d649e023ab98598ff093afcb3b36d052969335bb))
-
-## [0.11.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.10.0...@cardano-sdk/core@0.11.0-nightly.0) (2023-03-14)
-
-### ⚠ BREAKING CHANGES
-
-- Alonzo transaction outputs will now contain a datumHash field, carrying the datum hash digest. However, they will also contain a datum field with the exact same value for backward compatibility reason. In Babbage however, transaction outputs will carry either datum or datumHash depending on the case; and datum will only contain inline datums.
-
-### Features
-
-- added new babbage era types in Transactions and Outputs ([917b2a4](https://github.com/input-output-hk/cardano-js-sdk/commit/917b2a43319ecedf8cd8ef72fbcdecc04e010d8e))
-- dbSyncUtxoProvider now returns the new Babbage fields in the UTXO when present ([ad8184b](https://github.com/input-output-hk/cardano-js-sdk/commit/ad8184bcf9bae92a386c36175f4a773637faf8eb))
+- rename AssetInfo 'quantity' to 'supply' ([6e28df4](https://github.com/input-output-hk/cardano-js-sdk/commit/6e28df412797974b8ce6f6deb0c3346ff5938a05))
+- the TxSubmit endpoint no longer adds the stack trace when returning domain errors ([f018f30](https://github.com/input-output-hk/cardano-js-sdk/commit/f018f30caea1c9cf764a419431ac642b98733bb9))
 
 ## [0.10.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.9.0...@cardano-sdk/core@0.10.0) (2023-03-13)
 

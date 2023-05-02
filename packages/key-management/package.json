@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/key-management",
-  "version": "0.5.1-nightly.9",
+  "version": "0.5.1",
   "description": "Key management types and utilities for Cardano",
   "engines": {
     "node": ">=14.20.1"
@@ -60,10 +60,10 @@
   },
   "dependencies": {
     "@cardano-foundation/ledgerjs-hw-app-cardano": "^6.0.0",
-    "@cardano-sdk/core": "^0.11.0-nightly.9",
-    "@cardano-sdk/crypto": "^0.1.4-nightly.4",
-    "@cardano-sdk/dapp-connector": "^0.9.0-nightly.0",
-    "@cardano-sdk/util": "^0.9.0-nightly.3",
+    "@cardano-sdk/core": "^0.11.0",
+    "@cardano-sdk/crypto": "^0.1.4",
+    "@cardano-sdk/dapp-connector": "^0.9.0",
+    "@cardano-sdk/util": "^0.9.0",
     "@emurgo/cardano-message-signing-nodejs": "^1.0.1",
     "@ledgerhq/hw-transport": "^6.28.1",
     "@ledgerhq/hw-transport-node-hid-noevents": "^6.27.12",

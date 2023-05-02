@@ -3,53 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.7.2-nightly.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.7.2-nightly.9...@cardano-sdk/golden-test-generator@0.7.2-nightly.10) (2023-05-01)
-
-**Note:** Version bump only for package @cardano-sdk/golden-test-generator
-
-## [0.7.2-nightly.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.7.2-nightly.8...@cardano-sdk/golden-test-generator@0.7.2-nightly.9) (2023-04-26)
-
-**Note:** Version bump only for package @cardano-sdk/golden-test-generator
-
-## [0.7.2-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.7.2-nightly.7...@cardano-sdk/golden-test-generator@0.7.2-nightly.8) (2023-04-24)
-
-### Bug Fixes
-
-- **golden-test-generator:** blocks replayed after rollback must have different hash ([db811e1](https://github.com/input-output-hk/cardano-js-sdk/commit/db811e1082ed3c760b39f70e9fbd77d9f473aa31))
-
-## [0.7.2-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.7.2-nightly.6...@cardano-sdk/golden-test-generator@0.7.2-nightly.7) (2023-04-18)
-
-**Note:** Version bump only for package @cardano-sdk/golden-test-generator
-
-## [0.7.2-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.7.2-nightly.5...@cardano-sdk/golden-test-generator@0.7.2-nightly.6) (2023-04-12)
-
-**Note:** Version bump only for package @cardano-sdk/golden-test-generator
-
-## [0.7.2-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.7.2-nightly.4...@cardano-sdk/golden-test-generator@0.7.2-nightly.5) (2023-03-31)
+## [0.7.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.7.1...@cardano-sdk/golden-test-generator@0.7.2) (2023-05-02)
 
 ### Bug Fixes
 
 - circular deps check in CI ([070f5e9](https://github.com/input-output-hk/cardano-js-sdk/commit/070f5e9f199c8a3b823f80aa98b35a4df7dbe532))
-
-## [0.7.2-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.7.2-nightly.3...@cardano-sdk/golden-test-generator@0.7.2-nightly.4) (2023-03-24)
-
-**Note:** Version bump only for package @cardano-sdk/golden-test-generator
-
-## [0.7.2-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.7.2-nightly.2...@cardano-sdk/golden-test-generator@0.7.2-nightly.3) (2023-03-22)
-
-**Note:** Version bump only for package @cardano-sdk/golden-test-generator
-
-## [0.7.2-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.7.2-nightly.1...@cardano-sdk/golden-test-generator@0.7.2-nightly.2) (2023-03-20)
-
-**Note:** Version bump only for package @cardano-sdk/golden-test-generator
-
-## [0.7.2-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.7.2-nightly.0...@cardano-sdk/golden-test-generator@0.7.2-nightly.1) (2023-03-16)
-
-**Note:** Version bump only for package @cardano-sdk/golden-test-generator
-
-## [0.7.2-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.7.1...@cardano-sdk/golden-test-generator@0.7.2-nightly.0) (2023-03-14)
-
-**Note:** Version bump only for package @cardano-sdk/golden-test-generator
+- **golden-test-generator:** blocks replayed after rollback must have different hash ([db811e1](https://github.com/input-output-hk/cardano-js-sdk/commit/db811e1082ed3c760b39f70e9fbd77d9f473aa31))
 
 ## [0.7.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.7.0...@cardano-sdk/golden-test-generator@0.7.1) (2023-03-13)
 

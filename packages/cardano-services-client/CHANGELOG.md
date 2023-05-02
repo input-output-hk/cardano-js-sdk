@@ -3,28 +3,11 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.9.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.9.0-nightly.2...@cardano-sdk/cardano-services-client@0.9.0-nightly.3) (2023-05-01)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-## [0.9.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.9.0-nightly.1...@cardano-sdk/cardano-services-client@0.9.0-nightly.2) (2023-04-26)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-## [0.9.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.9.0-nightly.0...@cardano-sdk/cardano-services-client@0.9.0-nightly.1) (2023-04-24)
+## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.8.0...@cardano-sdk/cardano-services-client@0.9.0) (2023-05-02)
 
 ### ⚠ BREAKING CHANGES
 
 - rename AssetInfo 'quantity' to 'supply'
-
-### Code Refactoring
-
-- rename AssetInfo 'quantity' to 'supply' ([6e28df4](https://github.com/input-output-hk/cardano-js-sdk/commit/6e28df412797974b8ce6f6deb0c3346ff5938a05))
-
-## [0.9.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.8.1-nightly.5...@cardano-sdk/cardano-services-client@0.9.0-nightly.0) (2023-04-18)
-
-### ⚠ BREAKING CHANGES
-
 - - `TokenMetadata` has new mandatory property `assetId`
 
 * `DbSyncAssetProvider` constructor requires new
@@ -36,31 +19,13 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 - support assets fetching by ids ([8ed208a](https://github.com/input-output-hk/cardano-js-sdk/commit/8ed208a7a060c6999294c1f53266d6452adb278d))
 
-## [0.8.1-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.8.1-nightly.4...@cardano-sdk/cardano-services-client@0.8.1-nightly.5) (2023-04-12)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-## [0.8.1-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.8.1-nightly.3...@cardano-sdk/cardano-services-client@0.8.1-nightly.4) (2023-03-31)
-
 ### Bug Fixes
 
 - circular deps check in CI ([070f5e9](https://github.com/input-output-hk/cardano-js-sdk/commit/070f5e9f199c8a3b823f80aa98b35a4df7dbe532))
 
-## [0.8.1-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.8.1-nightly.2...@cardano-sdk/cardano-services-client@0.8.1-nightly.3) (2023-03-24)
+### Code Refactoring
 
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-## [0.8.1-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.8.1-nightly.1...@cardano-sdk/cardano-services-client@0.8.1-nightly.2) (2023-03-22)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-## [0.8.1-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.8.1-nightly.0...@cardano-sdk/cardano-services-client@0.8.1-nightly.1) (2023-03-16)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
-
-## [0.8.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.8.0...@cardano-sdk/cardano-services-client@0.8.1-nightly.0) (2023-03-14)
-
-**Note:** Version bump only for package @cardano-sdk/cardano-services-client
+- rename AssetInfo 'quantity' to 'supply' ([6e28df4](https://github.com/input-output-hk/cardano-js-sdk/commit/6e28df412797974b8ce6f6deb0c3346ff5938a05))
 
 ## [0.8.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.7.2...@cardano-sdk/cardano-services-client@0.8.0) (2023-03-13)
 

@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.11.0-nightly.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.11.0-nightly.10...@cardano-sdk/wallet@0.11.0-nightly.11) (2023-05-01)
+## [0.11.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.10.0...@cardano-sdk/wallet@0.11.0) (2023-05-02)
 
 ### ⚠ BREAKING CHANGES
 
@@ -13,24 +13,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * networkId is now included in the TxBody core type.
 * auxiliaryData no longer contains the optional hash field.
 * auxiliaryData no longer contains the optional body field.
-
-### Features
-
-- added new Transaction class that can convert between CBOR and the Core Tx type ([cc9a80c](https://github.com/input-output-hk/cardano-js-sdk/commit/cc9a80c17f1c0f46124b0c04c597a7ff96e517d3))
-- transaction body core type now includes the auxiliaryDataHash and networkId fields ([8b92b01](https://github.com/input-output-hk/cardano-js-sdk/commit/8b92b0190083a2b956ae1e188121414428f6663b))
-
-### Bug Fixes
-
-- cip30 getUtxos(amount) now returns `null` when wallet has insufficient balance ([9b550eb](https://github.com/input-output-hk/cardano-js-sdk/commit/9b550eb4e9ef4f7a1432defb155bebe4b2ec2c34))
-- **wallet:** add support for cip30 getUtxos 'paginate' when 'amount' is also specified ([13694fe](https://github.com/input-output-hk/cardano-js-sdk/commit/13694fe258eefa0f7262a84048b05accc153e6ad))
-
-## [0.11.0-nightly.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.11.0-nightly.9...@cardano-sdk/wallet@0.11.0-nightly.10) (2023-04-26)
-
-**Note:** Version bump only for package @cardano-sdk/wallet
-
-## [0.11.0-nightly.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.11.0-nightly.8...@cardano-sdk/wallet@0.11.0-nightly.9) (2023-04-24)
-
-### ⚠ BREAKING CHANGES
 
 - - renamed `TransactionsTracker.outgoing.confirmed$` to `onChain$`
 
@@ -44,21 +26,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
   by `transactionsTracker`
 - rename ObservableWallet assets$ to assetInfo$
 - rename AssetInfo 'quantity' to 'supply'
-
-### Features
-
-- **wallet:** emit historical data on assetInfo$ ([12cac96](https://github.com/input-output-hk/cardano-js-sdk/commit/12cac96852a2591dd27727296d6c3b3fda4e0c56))
-
-### Code Refactoring
-
-- rename AssetInfo 'quantity' to 'supply' ([6e28df4](https://github.com/input-output-hk/cardano-js-sdk/commit/6e28df412797974b8ce6f6deb0c3346ff5938a05))
-- rename confirmed$ to onChain$ ([0de59dd](https://github.com/input-output-hk/cardano-js-sdk/commit/0de59dd335d065a85a4467bb501b041d889311b5))
-- rename ObservableWallet assets$ to assetInfo$ ([d6b759c](https://github.com/input-output-hk/cardano-js-sdk/commit/d6b759cd2d8db12313a166259277a2c79149e5f9))
-
-## [0.11.0-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.11.0-nightly.7...@cardano-sdk/wallet@0.11.0-nightly.8) (2023-04-18)
-
-### ⚠ BREAKING CHANGES
-
 - - `TokenMetadata` has new mandatory property `assetId`
 
 * `DbSyncAssetProvider` constructor requires new
@@ -66,56 +33,28 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * `createAssetsService` accepts an array of assetIds instead of a
   single assetId
 
-### Features
-
-- support assets fetching by ids ([8ed208a](https://github.com/input-output-hk/cardano-js-sdk/commit/8ed208a7a060c6999294c1f53266d6452adb278d))
-
-## [0.11.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.11.0-nightly.6...@cardano-sdk/wallet@0.11.0-nightly.7) (2023-04-12)
-
-**Note:** Version bump only for package @cardano-sdk/wallet
-
-## [0.11.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.11.0-nightly.5...@cardano-sdk/wallet@0.11.0-nightly.6) (2023-04-07)
-
-### ⚠ BREAKING CHANGES
-
 - **wallet:** logger prop is now required in OutputBuilderProps
 
 ### Features
 
+- added new Transaction class that can convert between CBOR and the Core Tx type ([cc9a80c](https://github.com/input-output-hk/cardano-js-sdk/commit/cc9a80c17f1c0f46124b0c04c597a7ff96e517d3))
+- support assets fetching by ids ([8ed208a](https://github.com/input-output-hk/cardano-js-sdk/commit/8ed208a7a060c6999294c1f53266d6452adb278d))
+- transaction body core type now includes the auxiliaryDataHash and networkId fields ([8b92b01](https://github.com/input-output-hk/cardano-js-sdk/commit/8b92b0190083a2b956ae1e188121414428f6663b))
+- **wallet:** emit historical data on assetInfo$ ([12cac96](https://github.com/input-output-hk/cardano-js-sdk/commit/12cac96852a2591dd27727296d6c3b3fda4e0c56))
 - **wallet:** logger prop is now required in OutputBuilderProps ([d01c1d9](https://github.com/input-output-hk/cardano-js-sdk/commit/d01c1d966ead7aceff0689b228e29a614517c1f5))
-
-## [0.11.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.11.0-nightly.4...@cardano-sdk/wallet@0.11.0-nightly.5) (2023-03-31)
 
 ### Bug Fixes
 
+- cip30 getUtxos(amount) now returns `null` when wallet has insufficient balance ([9b550eb](https://github.com/input-output-hk/cardano-js-sdk/commit/9b550eb4e9ef4f7a1432defb155bebe4b2ec2c34))
 - circular deps check in CI ([070f5e9](https://github.com/input-output-hk/cardano-js-sdk/commit/070f5e9f199c8a3b823f80aa98b35a4df7dbe532))
+- **wallet:** add support for cip30 getUtxos 'paginate' when 'amount' is also specified ([13694fe](https://github.com/input-output-hk/cardano-js-sdk/commit/13694fe258eefa0f7262a84048b05accc153e6ad))
 - **wallet:** adjust time to wait before resubmit ([32777a7](https://github.com/input-output-hk/cardano-js-sdk/commit/32777a7a7fe452a18c29f423b48b211e760f6051))
 
-## [0.11.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.11.0-nightly.3...@cardano-sdk/wallet@0.11.0-nightly.4) (2023-03-24)
+### Code Refactoring
 
-**Note:** Version bump only for package @cardano-sdk/wallet
-
-## [0.11.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.11.0-nightly.2...@cardano-sdk/wallet@0.11.0-nightly.3) (2023-03-22)
-
-**Note:** Version bump only for package @cardano-sdk/wallet
-
-## [0.11.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.11.0-nightly.1...@cardano-sdk/wallet@0.11.0-nightly.2) (2023-03-20)
-
-**Note:** Version bump only for package @cardano-sdk/wallet
-
-## [0.11.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.11.0-nightly.0...@cardano-sdk/wallet@0.11.0-nightly.1) (2023-03-16)
-
-**Note:** Version bump only for package @cardano-sdk/wallet
-
-## [0.11.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.10.0...@cardano-sdk/wallet@0.11.0-nightly.0) (2023-03-14)
-
-### ⚠ BREAKING CHANGES
-
-- Alonzo transaction outputs will now contain a datumHash field, carrying the datum hash digest. However, they will also contain a datum field with the exact same value for backward compatibility reason. In Babbage however, transaction outputs will carry either datum or datumHash depending on the case; and datum will only contain inline datums.
-
-### Features
-
-- added new babbage era types in Transactions and Outputs ([917b2a4](https://github.com/input-output-hk/cardano-js-sdk/commit/917b2a43319ecedf8cd8ef72fbcdecc04e010d8e))
+- rename AssetInfo 'quantity' to 'supply' ([6e28df4](https://github.com/input-output-hk/cardano-js-sdk/commit/6e28df412797974b8ce6f6deb0c3346ff5938a05))
+- rename confirmed$ to onChain$ ([0de59dd](https://github.com/input-output-hk/cardano-js-sdk/commit/0de59dd335d065a85a4467bb501b041d889311b5))
+- rename ObservableWallet assets$ to assetInfo$ ([d6b759c](https://github.com/input-output-hk/cardano-js-sdk/commit/d6b759cd2d8db12313a166259277a2c79149e5f9))
 
 ## [0.10.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.9.0...@cardano-sdk/wallet@0.10.0) (2023-03-13)
 

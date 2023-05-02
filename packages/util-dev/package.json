@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/util-dev",
-  "version": "0.9.0-nightly.2",
+  "version": "0.9.0",
   "description": "Utilities for tests in other packages",
   "engines": {
     "node": ">=14.20.1"
@@ -14,8 +14,8 @@
     }
   },
   "browser": {
-    "./dist/esm/docker.js": false,
-    "./dist/cjs/docker.js": false
+    "./dist/cjs/docker.js": false,
+    "./dist/esm/docker.js": false
   },
   "repository": "https://github.com/input-output-hk/cardano-js-sdk",
   "publishConfig": {
@@ -69,8 +69,8 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "@cardano-sdk/core": "^0.11.0-nightly.9",
-    "@cardano-sdk/util": "^0.9.0-nightly.3",
+    "@cardano-sdk/core": "^0.11.0",
+    "@cardano-sdk/util": "^0.9.0",
     "@types/dockerode": "^3.3.8",
     "delay": "^5.0.0",
     "dockerode": "^3.3.1",

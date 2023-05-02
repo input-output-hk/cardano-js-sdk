@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.11.0-nightly.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.11.0-nightly.9...@cardano-sdk/ogmios@0.11.0-nightly.10) (2023-05-01)
+## [0.11.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.10.0...@cardano-sdk/ogmios@0.11.0) (2023-05-02)
 
 ### ⚠ BREAKING CHANGES
 
@@ -16,58 +16,13 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 ### Features
 
 - add healthCheck$ to ObservableCardanoNode ([df35035](https://github.com/input-output-hk/cardano-js-sdk/commit/df3503597832939e6dc9c7ec953d24b3d709c723))
-- transaction body core type now includes the auxiliaryDataHash and networkId fields ([8b92b01](https://github.com/input-output-hk/cardano-js-sdk/commit/8b92b0190083a2b956ae1e188121414428f6663b))
-
-## [0.11.0-nightly.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.11.0-nightly.8...@cardano-sdk/ogmios@0.11.0-nightly.9) (2023-04-26)
-
-**Note:** Version bump only for package @cardano-sdk/ogmios
-
-## [0.11.0-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.11.0-nightly.7...@cardano-sdk/ogmios@0.11.0-nightly.8) (2023-04-24)
-
-**Note:** Version bump only for package @cardano-sdk/ogmios
-
-## [0.11.0-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.11.0-nightly.6...@cardano-sdk/ogmios@0.11.0-nightly.7) (2023-04-18)
-
-**Note:** Version bump only for package @cardano-sdk/ogmios
-
-## [0.11.0-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.11.0-nightly.5...@cardano-sdk/ogmios@0.11.0-nightly.6) (2023-04-12)
-
-### Features
-
 - **ogmios:** log successful transaction submission with info level ([a7d98f4](https://github.com/input-output-hk/cardano-js-sdk/commit/a7d98f40dbbccca8276a029a10c5e5e9d42ec76e))
 - **ogmios:** ogmios TxSubmit client now uses a long-running ws connection ([36ee96c](https://github.com/input-output-hk/cardano-js-sdk/commit/36ee96c580f79a4f2759fa9bc87a69bf088e5ed9))
-
-## [0.11.0-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.11.0-nightly.4...@cardano-sdk/ogmios@0.11.0-nightly.5) (2023-03-31)
+- transaction body core type now includes the auxiliaryDataHash and networkId fields ([8b92b01](https://github.com/input-output-hk/cardano-js-sdk/commit/8b92b0190083a2b956ae1e188121414428f6663b))
 
 ### Bug Fixes
 
 - circular deps check in CI ([070f5e9](https://github.com/input-output-hk/cardano-js-sdk/commit/070f5e9f199c8a3b823f80aa98b35a4df7dbe532))
-
-## [0.11.0-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.11.0-nightly.3...@cardano-sdk/ogmios@0.11.0-nightly.4) (2023-03-24)
-
-**Note:** Version bump only for package @cardano-sdk/ogmios
-
-## [0.11.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.11.0-nightly.2...@cardano-sdk/ogmios@0.11.0-nightly.3) (2023-03-22)
-
-**Note:** Version bump only for package @cardano-sdk/ogmios
-
-## [0.11.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.11.0-nightly.1...@cardano-sdk/ogmios@0.11.0-nightly.2) (2023-03-20)
-
-**Note:** Version bump only for package @cardano-sdk/ogmios
-
-## [0.11.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.11.0-nightly.0...@cardano-sdk/ogmios@0.11.0-nightly.1) (2023-03-16)
-
-**Note:** Version bump only for package @cardano-sdk/ogmios
-
-## [0.11.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.10.0...@cardano-sdk/ogmios@0.11.0-nightly.0) (2023-03-14)
-
-### ⚠ BREAKING CHANGES
-
-- Alonzo transaction outputs will now contain a datumHash field, carrying the datum hash digest. However, they will also contain a datum field with the exact same value for backward compatibility reason. In Babbage however, transaction outputs will carry either datum or datumHash depending on the case; and datum will only contain inline datums.
-
-### Features
-
-- added new babbage era types in Transactions and Outputs ([917b2a4](https://github.com/input-output-hk/cardano-js-sdk/commit/917b2a43319ecedf8cd8ef72fbcdecc04e010d8e))
 
 ## [0.10.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.9.0...@cardano-sdk/ogmios@0.10.0) (2023-03-13)
 

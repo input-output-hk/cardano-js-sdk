@@ -3,49 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.9.0-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.9.0-nightly.2...@cardano-sdk/util@0.9.0-nightly.3) (2023-05-01)
-
-**Note:** Version bump only for package @cardano-sdk/util
-
-## [0.9.0-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.9.0-nightly.1...@cardano-sdk/util@0.9.0-nightly.2) (2023-04-24)
+## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.8.2...@cardano-sdk/util@0.9.0) (2023-05-02)
 
 ### ⚠ BREAKING CHANGES
 
 - hoist patchObject from util-dev to util package
 - simplify projection Sink to be an operator
-
-### Code Refactoring
-
-- hoist patchObject from util-dev to util package ([bea7e03](https://github.com/input-output-hk/cardano-js-sdk/commit/bea7e035ebdcd7241b6f3cc8feb5fbcfdb90fa46))
-- simplify projection Sink to be an operator ([d9c6826](https://github.com/input-output-hk/cardano-js-sdk/commit/d9c68265d63300d26eb73ca93f5ee8be7ff51a12))
-
-## [0.9.0-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.9.0-nightly.0...@cardano-sdk/util@0.9.0-nightly.1) (2023-03-31)
-
-### Bug Fixes
-
-- circular deps check in CI ([070f5e9](https://github.com/input-output-hk/cardano-js-sdk/commit/070f5e9f199c8a3b823f80aa98b35a4df7dbe532))
-
-## [0.9.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.8.3-nightly.1...@cardano-sdk/util@0.9.0-nightly.0) (2023-03-24)
-
-### ⚠ BREAKING CHANGES
-
 - - stack property of returned errors was removed
 
 ### Features
 
 - **util:** adds an util to resolve all promises contained within an object ([db58ad4](https://github.com/input-output-hk/cardano-js-sdk/commit/db58ad4fca9ba9257375bd20e43c74a6b2a8cf39))
 
+### Bug Fixes
+
+- circular deps check in CI ([070f5e9](https://github.com/input-output-hk/cardano-js-sdk/commit/070f5e9f199c8a3b823f80aa98b35a4df7dbe532))
+
 ### Code Refactoring
 
+- hoist patchObject from util-dev to util package ([bea7e03](https://github.com/input-output-hk/cardano-js-sdk/commit/bea7e035ebdcd7241b6f3cc8feb5fbcfdb90fa46))
+- simplify projection Sink to be an operator ([d9c6826](https://github.com/input-output-hk/cardano-js-sdk/commit/d9c68265d63300d26eb73ca93f5ee8be7ff51a12))
 - the TxSubmit endpoint no longer adds the stack trace when returning domain errors ([f018f30](https://github.com/input-output-hk/cardano-js-sdk/commit/f018f30caea1c9cf764a419431ac642b98733bb9))
-
-## [0.8.3-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.8.3-nightly.0...@cardano-sdk/util@0.8.3-nightly.1) (2023-03-22)
-
-**Note:** Version bump only for package @cardano-sdk/util
-
-## [0.8.3-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.8.2...@cardano-sdk/util@0.8.3-nightly.0) (2023-03-14)
-
-**Note:** Version bump only for package @cardano-sdk/util
 
 ## [0.8.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.8.1...@cardano-sdk/util@0.8.2) (2023-03-13)
 

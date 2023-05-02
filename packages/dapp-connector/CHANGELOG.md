@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.9.0-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.8.1-nightly.8...@cardano-sdk/dapp-connector@0.9.0-nightly.0) (2023-05-01)
+## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.8.0...@cardano-sdk/dapp-connector@0.9.0) (2023-05-02)
 
 ### ⚠ BREAKING CHANGES
 
@@ -12,44 +12,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 ### Bug Fixes
 
 - cip30 getUtxos(amount) now returns `null` when wallet has insufficient balance ([9b550eb](https://github.com/input-output-hk/cardano-js-sdk/commit/9b550eb4e9ef4f7a1432defb155bebe4b2ec2c34))
-
-## [0.8.1-nightly.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.8.1-nightly.7...@cardano-sdk/dapp-connector@0.8.1-nightly.8) (2023-04-26)
-
-**Note:** Version bump only for package @cardano-sdk/dapp-connector
-
-## [0.8.1-nightly.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.8.1-nightly.6...@cardano-sdk/dapp-connector@0.8.1-nightly.7) (2023-04-24)
-
-**Note:** Version bump only for package @cardano-sdk/dapp-connector
-
-## [0.8.1-nightly.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.8.1-nightly.5...@cardano-sdk/dapp-connector@0.8.1-nightly.6) (2023-04-18)
-
-**Note:** Version bump only for package @cardano-sdk/dapp-connector
-
-## [0.8.1-nightly.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.8.1-nightly.4...@cardano-sdk/dapp-connector@0.8.1-nightly.5) (2023-04-12)
-
-**Note:** Version bump only for package @cardano-sdk/dapp-connector
-
-## [0.8.1-nightly.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.8.1-nightly.3...@cardano-sdk/dapp-connector@0.8.1-nightly.4) (2023-03-31)
-
-### Bug Fixes
-
 - circular deps check in CI ([070f5e9](https://github.com/input-output-hk/cardano-js-sdk/commit/070f5e9f199c8a3b823f80aa98b35a4df7dbe532))
-
-## [0.8.1-nightly.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.8.1-nightly.2...@cardano-sdk/dapp-connector@0.8.1-nightly.3) (2023-03-24)
-
-**Note:** Version bump only for package @cardano-sdk/dapp-connector
-
-## [0.8.1-nightly.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.8.1-nightly.1...@cardano-sdk/dapp-connector@0.8.1-nightly.2) (2023-03-22)
-
-**Note:** Version bump only for package @cardano-sdk/dapp-connector
-
-## [0.8.1-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.8.1-nightly.0...@cardano-sdk/dapp-connector@0.8.1-nightly.1) (2023-03-16)
-
-**Note:** Version bump only for package @cardano-sdk/dapp-connector
-
-## [0.8.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.8.0...@cardano-sdk/dapp-connector@0.8.1-nightly.0) (2023-03-14)
-
-**Note:** Version bump only for package @cardano-sdk/dapp-connector
 
 ## [0.8.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.7.1...@cardano-sdk/dapp-connector@0.8.0) (2023-03-13)
 
