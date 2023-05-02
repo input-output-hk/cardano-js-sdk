@@ -16,3 +16,6 @@ lerna-debug.log
 # created by nix
 result
 source
+
+# cerated by direnv
+.direnv
