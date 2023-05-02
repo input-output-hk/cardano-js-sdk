@@ -14,6 +14,7 @@
         self,
         nixpkgs,
         devshell,
+        yarnpnp2nix,
         ...
       }:
         with nixpkgs.legacyPackages;
@@ -36,10 +37,12 @@
               name = "Hello My Friend";
               imports = [checkMod];
               commands = [
-                # {
-                #   package = cocogitto;
-                #   name = "cog";
-                # }
+                {
+                  package = nodejs;
+                }
+                {
+                  package = yarnpnp2nix.packages.yarn-plugin;
+                }
               ];
             };
           };

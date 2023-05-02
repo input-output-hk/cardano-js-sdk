@@ -68,7 +68,44 @@
       "inputs": {
         "incl": "incl",
         "nixpkgs": "nixpkgs",
-        "nosys": "nosys"
+        "nosys": "nosys",
+        "yarnpnp2nix": "yarnpnp2nix"
+      }
+    },
+    "utils": {
+      "locked": {
+        "lastModified": 1667077288,
+        "narHash": "sha256-bdC8sFNDpT0HK74u9fUkpbf1MEzVYJ+ka7NXCdgBoaA=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "6ee9ebb6b1ee695d2cacc4faa053a7b9baa76817",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "yarnpnp2nix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "utils": "utils"
+      },
+      "locked": {
+        "lastModified": 1680088652,
+        "narHash": "sha256-xOCiFJcFI6mJ3zYLMqfDYyiO96fiE532o5lg3yR6TWM=",
+        "owner": "madjam002",
+        "repo": "yarnpnp2nix",
+        "rev": "b25d8ca973d93a452c4ddef6d494efb9fcfff9b5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "madjam002",
+        "repo": "yarnpnp2nix",
+        "type": "github"
       }
     }
   },

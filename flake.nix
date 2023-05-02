@@ -2,17 +2,26 @@
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
   inputs.nosys.url = "github:divnix/nosys";
   inputs.incl.url = "github:divnix/incl";
+  inputs.yarnpnp2nix = {
+    url = "github:madjam002/yarnpnp2nix";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
 
   outputs = inputs @ {nosys, ...}:
     nosys inputs ({
       nixpkgs,
+      yarnpnp2nix,
       incl,
       ...
     }: let
       pkgs = nixpkgs.legacyPackages;
+      env = yarnpnp2nix.lib.mkYarnPackagesFromManifest {
+        yarnManifest = import ./yarn-manifest.nix;
+      };
       inherit (pkgs) lib fetchurl callPackage writeShellApplication python3;
       inherit (builtins) match concatStringsSep elemAt replaceStrings;
     in {
+      inherit env;
       packages.default = let
         chromedriverBin = fetchurl {
           url = "https://chromedriver.storage.googleapis.com/102.0.5005.61/chromedriver_linux64.zip";
@@ -31,14 +40,6 @@
         ];
         project = callPackage ./yarn-project.nix {} {inherit src;};
 
-        replaceLine = regex: replacement: s: let
-          m = match "(.*\n)${regex}(\n.*)" s;
-        in
-          concatStringsSep "" [
-            (elemAt m 0)
-            replacement
-            (elemAt m 1)
-          ];
         production-deps = project.overrideAttrs (oldAttrs: {
           name = "cardano-sdk-production-deps";
           configurePhase =
