@@ -14,8 +14,8 @@
     }
   },
   "browser": {
-    "./dist/esm/docker.js": false,
-    "./dist/cjs/docker.js": false
+    "./dist/cjs/docker.js": false,
+    "./dist/esm/docker.js": false
   },
   "repository": "https://github.com/input-output-hk/cardano-js-sdk",
   "publishConfig": {
