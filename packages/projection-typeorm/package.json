@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "description": "Project Chain Sync events into PostgreSQL via TypeORM",
   "engines": {
-    "node": "^14"
+    "node": ">=14.20.1"
   },
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
