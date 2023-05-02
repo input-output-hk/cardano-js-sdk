@@ -82,7 +82,7 @@
 
           cp -r ${production-deps}/libexec/$sourceRoot/node_modules $out/libexec/$sourceRoot/node_modules
           cp -r scripts $out/libexec/$sourceRoot/scripts
-          for p in cardano-services core ogmios util crypto; do
+          for p in cardano-services core ogmios util crypto projection projection-typeorm util-rxjs; do
             mkdir -p $out/libexec/$sourceRoot/packages/$p
             cp -r packages/$p/dist $out/libexec/$sourceRoot/packages/$p/dist
             cp -r packages/$p/package.json $out/libexec/$sourceRoot/packages/$p/package.json
