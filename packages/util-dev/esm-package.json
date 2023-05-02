@@ -1,0 +1,7 @@
+{
+  "type": "module",
+  "sideEffects": false,
+  "browser": {
+    "./docker.js": false
+  }
+}
