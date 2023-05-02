@@ -1,7 +1,7 @@
 import { Logger } from 'ts-log';
-import { createStubLogger } from '@cardano-sdk/util-dev';
 
 import { contextLogger } from '../src';
+import { createStubLogger } from './util';
 
 const SOME_MODULE = 'some-module';
 const SOME_FUNCTION_NAME = 'some-function-name';

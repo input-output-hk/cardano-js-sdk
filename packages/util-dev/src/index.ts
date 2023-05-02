@@ -6,7 +6,6 @@ export * from './chainSync';
 export * from './TestLogger';
 export * from './util';
 export * from './createStubStakePoolProvider';
-export * from './stubLogger';
 export * from './testScheduler';
 export * from './createStubUtxoProvider';
 export * from './createGenericMockServer';

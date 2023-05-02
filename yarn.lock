@@ -2950,7 +2950,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/util@workspace:packages/util"
   dependencies:
-    "@cardano-sdk/util-dev": ^0.9.0
     "@types/lodash": ^4.14.182
     bech32: ^2.0.0
     eslint: ^7.32.0
