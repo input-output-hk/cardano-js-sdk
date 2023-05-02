@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.8.0...@cardano-sdk/util-dev@0.9.0) (2023-05-02)
+
+### ⚠ BREAKING CHANGES
+
+- hoist patchObject from util-dev to util package
+
+### Features
+
+- add healthCheck$ to ObservableCardanoNode ([df35035](https://github.com/input-output-hk/cardano-js-sdk/commit/df3503597832939e6dc9c7ec953d24b3d709c723))
+- expose configurable request timeout ([cea5379](https://github.com/input-output-hk/cardano-js-sdk/commit/cea5379e77afda47c2b10f5f9ad66695637f5a01))
+- **util-dev:** add new chainSync dataset (WithMint) ([1a22f8a](https://github.com/input-output-hk/cardano-js-sdk/commit/1a22f8af04210968d2a4680334e3a82636846835))
+- **util-dev:** update retirement chain sync dataset ([4ae30a7](https://github.com/input-output-hk/cardano-js-sdk/commit/4ae30a79426cb4726fa2c7eb2955a5aa4c8aac95))
+
+### Bug Fixes
+
+- circular deps check in CI ([070f5e9](https://github.com/input-output-hk/cardano-js-sdk/commit/070f5e9f199c8a3b823f80aa98b35a4df7dbe532))
+- **util-dev:** change hash of replayed block after rollback ([3d8c558](https://github.com/input-output-hk/cardano-js-sdk/commit/3d8c5583fb631c30bb9a933c8a401254e3a8aa4b))
+- **util-dev:** transform chainSyncData with fromSerializableObject ([91d6b92](https://github.com/input-output-hk/cardano-js-sdk/commit/91d6b9221a1f9531150a615a68511e6178c891b6))
+
+### Code Refactoring
+
+- hoist patchObject from util-dev to util package ([bea7e03](https://github.com/input-output-hk/cardano-js-sdk/commit/bea7e035ebdcd7241b6f3cc8feb5fbcfdb90fa46))
+
 ## [0.8.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.7.1...@cardano-sdk/util-dev@0.8.0) (2023-03-13)
 
 ### ⚠ BREAKING CHANGES

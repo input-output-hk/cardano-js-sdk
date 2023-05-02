@@ -3,6 +3,35 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.8.2...@cardano-sdk/web-extension@0.9.0) (2023-05-02)
+
+### ⚠ BREAKING CHANGES
+
+- **web-extension:** WalletManagerWorker now requires an extra dependency: managerStorage
+- - renamed `TransactionsTracker.outgoing.confirmed$` to `onChain$`
+
+* renamed `TransactionReemitterProps.transactions.outgoing.confirmed$` to `onChain$`
+* renamed web-extension `observableWalletProperties.transactions.outgoing.confirmed$`
+  to `onChain$`
+* rename ConfirmedTx to OutgoingOnChainTx
+* renamed OutgoingOnChainTx.confirmedAt to `slot`
+
+- rename ObservableWallet assets$ to assetInfo$
+
+### Features
+
+- **web-extension:** store and restore last activated wallet props ([1f78d87](https://github.com/input-output-hk/cardano-js-sdk/commit/1f78d87c438c630bf4ee835a387449c667cde319))
+
+### Bug Fixes
+
+- circular deps check in CI ([070f5e9](https://github.com/input-output-hk/cardano-js-sdk/commit/070f5e9f199c8a3b823f80aa98b35a4df7dbe532))
+- **web-extension:** proxy error responses ([3c20399](https://github.com/input-output-hk/cardano-js-sdk/commit/3c203993faca3916f34626267885aaaec357d0e8))
+
+### Code Refactoring
+
+- rename confirmed$ to onChain$ ([0de59dd](https://github.com/input-output-hk/cardano-js-sdk/commit/0de59dd335d065a85a4467bb501b041d889311b5))
+- rename ObservableWallet assets$ to assetInfo$ ([d6b759c](https://github.com/input-output-hk/cardano-js-sdk/commit/d6b759cd2d8db12313a166259277a2c79149e5f9))
+
 ## [0.8.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.8.1...@cardano-sdk/web-extension@0.8.2) (2023-03-13)
 
 **Note:** Version bump only for package @cardano-sdk/web-extension

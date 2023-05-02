@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.10.0...@cardano-sdk/ogmios@0.11.0) (2023-05-02)
+
+### ⚠ BREAKING CHANGES
+
+- - auxiliaryDataHash is now included in the TxBody core type.
+
+* networkId is now included in the TxBody core type.
+* auxiliaryData no longer contains the optional hash field.
+* auxiliaryData no longer contains the optional body field.
+
+### Features
+
+- add healthCheck$ to ObservableCardanoNode ([df35035](https://github.com/input-output-hk/cardano-js-sdk/commit/df3503597832939e6dc9c7ec953d24b3d709c723))
+- **ogmios:** log successful transaction submission with info level ([a7d98f4](https://github.com/input-output-hk/cardano-js-sdk/commit/a7d98f40dbbccca8276a029a10c5e5e9d42ec76e))
+- **ogmios:** ogmios TxSubmit client now uses a long-running ws connection ([36ee96c](https://github.com/input-output-hk/cardano-js-sdk/commit/36ee96c580f79a4f2759fa9bc87a69bf088e5ed9))
+- transaction body core type now includes the auxiliaryDataHash and networkId fields ([8b92b01](https://github.com/input-output-hk/cardano-js-sdk/commit/8b92b0190083a2b956ae1e188121414428f6663b))
+
+### Bug Fixes
+
+- circular deps check in CI ([070f5e9](https://github.com/input-output-hk/cardano-js-sdk/commit/070f5e9f199c8a3b823f80aa98b35a4df7dbe532))
+
 ## [0.10.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.9.0...@cardano-sdk/ogmios@0.10.0) (2023-03-13)
 
 ### ⚠ BREAKING CHANGES

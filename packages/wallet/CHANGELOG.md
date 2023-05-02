@@ -3,6 +3,59 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.10.0...@cardano-sdk/wallet@0.11.0) (2023-05-02)
+
+### ⚠ BREAKING CHANGES
+
+- update WalletApi.getUtxos return type from `undefined` to `null`
+- - auxiliaryDataHash is now included in the TxBody core type.
+
+* networkId is now included in the TxBody core type.
+* auxiliaryData no longer contains the optional hash field.
+* auxiliaryData no longer contains the optional body field.
+
+- - renamed `TransactionsTracker.outgoing.confirmed$` to `onChain$`
+
+* renamed `TransactionReemitterProps.transactions.outgoing.confirmed$` to `onChain$`
+* renamed web-extension `observableWalletProperties.transactions.outgoing.confirmed$`
+  to `onChain$`
+* rename ConfirmedTx to OutgoingOnChainTx
+* renamed OutgoingOnChainTx.confirmedAt to `slot`
+
+- **wallet:** `AssetsTrackerProps.balanceTracker` was replaced
+  by `transactionsTracker`
+- rename ObservableWallet assets$ to assetInfo$
+- rename AssetInfo 'quantity' to 'supply'
+- - `TokenMetadata` has new mandatory property `assetId`
+
+* `DbSyncAssetProvider` constructor requires new
+  `DbSyncAssetProviderProp` object as first positional argument
+* `createAssetsService` accepts an array of assetIds instead of a
+  single assetId
+
+- **wallet:** logger prop is now required in OutputBuilderProps
+
+### Features
+
+- added new Transaction class that can convert between CBOR and the Core Tx type ([cc9a80c](https://github.com/input-output-hk/cardano-js-sdk/commit/cc9a80c17f1c0f46124b0c04c597a7ff96e517d3))
+- support assets fetching by ids ([8ed208a](https://github.com/input-output-hk/cardano-js-sdk/commit/8ed208a7a060c6999294c1f53266d6452adb278d))
+- transaction body core type now includes the auxiliaryDataHash and networkId fields ([8b92b01](https://github.com/input-output-hk/cardano-js-sdk/commit/8b92b0190083a2b956ae1e188121414428f6663b))
+- **wallet:** emit historical data on assetInfo$ ([12cac96](https://github.com/input-output-hk/cardano-js-sdk/commit/12cac96852a2591dd27727296d6c3b3fda4e0c56))
+- **wallet:** logger prop is now required in OutputBuilderProps ([d01c1d9](https://github.com/input-output-hk/cardano-js-sdk/commit/d01c1d966ead7aceff0689b228e29a614517c1f5))
+
+### Bug Fixes
+
+- cip30 getUtxos(amount) now returns `null` when wallet has insufficient balance ([9b550eb](https://github.com/input-output-hk/cardano-js-sdk/commit/9b550eb4e9ef4f7a1432defb155bebe4b2ec2c34))
+- circular deps check in CI ([070f5e9](https://github.com/input-output-hk/cardano-js-sdk/commit/070f5e9f199c8a3b823f80aa98b35a4df7dbe532))
+- **wallet:** add support for cip30 getUtxos 'paginate' when 'amount' is also specified ([13694fe](https://github.com/input-output-hk/cardano-js-sdk/commit/13694fe258eefa0f7262a84048b05accc153e6ad))
+- **wallet:** adjust time to wait before resubmit ([32777a7](https://github.com/input-output-hk/cardano-js-sdk/commit/32777a7a7fe452a18c29f423b48b211e760f6051))
+
+### Code Refactoring
+
+- rename AssetInfo 'quantity' to 'supply' ([6e28df4](https://github.com/input-output-hk/cardano-js-sdk/commit/6e28df412797974b8ce6f6deb0c3346ff5938a05))
+- rename confirmed$ to onChain$ ([0de59dd](https://github.com/input-output-hk/cardano-js-sdk/commit/0de59dd335d065a85a4467bb501b041d889311b5))
+- rename ObservableWallet assets$ to assetInfo$ ([d6b759c](https://github.com/input-output-hk/cardano-js-sdk/commit/d6b759cd2d8db12313a166259277a2c79149e5f9))
+
 ## [0.10.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.9.0...@cardano-sdk/wallet@0.10.0) (2023-03-13)
 
 ### ⚠ BREAKING CHANGES

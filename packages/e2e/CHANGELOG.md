@@ -3,6 +3,63 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.9.0...@cardano-sdk/e2e@0.10.0) (2023-05-02)
+
+### ⚠ BREAKING CHANGES
+
+- - auxiliaryDataHash is now included in the TxBody core type.
+
+* networkId is now included in the TxBody core type.
+* auxiliaryData no longer contains the optional hash field.
+* auxiliaryData no longer contains the optional body field.
+
+- **core:** - NFT metadata image is type 'Uri'
+
+* NFT metadata description is type 'string'
+* NFT metadata file src is type 'Uri'
+* NFT metadata file name is optional
+
+- **web-extension:** WalletManagerWorker now requires an extra dependency: managerStorage
+- - renamed `TransactionsTracker.outgoing.confirmed$` to `onChain$`
+
+* renamed `TransactionReemitterProps.transactions.outgoing.confirmed$` to `onChain$`
+* renamed web-extension `observableWalletProperties.transactions.outgoing.confirmed$`
+  to `onChain$`
+* rename ConfirmedTx to OutgoingOnChainTx
+* renamed OutgoingOnChainTx.confirmedAt to `slot`
+
+- **wallet:** `AssetsTrackerProps.balanceTracker` was replaced
+  by `transactionsTracker`
+- rename ObservableWallet assets$ to assetInfo$
+- rename AssetInfo 'quantity' to 'supply'
+- remove one layer of projection abstraction
+- **projection:** convert projectIntoSink into rxjs operator
+- simplify projection Sink to be an operator
+
+### Features
+
+- add healthCheck$ to ObservableCardanoNode ([df35035](https://github.com/input-output-hk/cardano-js-sdk/commit/df3503597832939e6dc9c7ec953d24b3d709c723))
+- add script to generate addreses ([7cb07ec](https://github.com/input-output-hk/cardano-js-sdk/commit/7cb07ec1b2d5a44e68d48fec33a1bd548a4acdb1))
+- adds the sql queries profiling system ([7f972fd](https://github.com/input-output-hk/cardano-js-sdk/commit/7f972fd54073082cc75d2e7b49a92277e47148c1))
+- **cardano-services:** add projector service ([5a5b281](https://github.com/input-output-hk/cardano-js-sdk/commit/5a5b281690283995b9a20c61c337c621b919fb3c))
+- transaction body core type now includes the auxiliaryDataHash and networkId fields ([8b92b01](https://github.com/input-output-hk/cardano-js-sdk/commit/8b92b0190083a2b956ae1e188121414428f6663b))
+- **wallet:** emit historical data on assetInfo$ ([12cac96](https://github.com/input-output-hk/cardano-js-sdk/commit/12cac96852a2591dd27727296d6c3b3fda4e0c56))
+- **web-extension:** store and restore last activated wallet props ([1f78d87](https://github.com/input-output-hk/cardano-js-sdk/commit/1f78d87c438c630bf4ee835a387449c667cde319))
+
+### Bug Fixes
+
+- circular deps check in CI ([070f5e9](https://github.com/input-output-hk/cardano-js-sdk/commit/070f5e9f199c8a3b823f80aa98b35a4df7dbe532))
+- **core:** invalid NFT model and CIP-25 validation ([0d9b77a](https://github.com/input-output-hk/cardano-js-sdk/commit/0d9b77ae1851e5ea1386c94e9e32e3fbdfeed201))
+
+### Code Refactoring
+
+- **projection:** convert projectIntoSink into rxjs operator ([490ca1b](https://github.com/input-output-hk/cardano-js-sdk/commit/490ca1b7f0f92e4fa84179ba3fb265ee68dee735))
+- remove one layer of projection abstraction ([6a0eca9](https://github.com/input-output-hk/cardano-js-sdk/commit/6a0eca92d1b6507e7143bfb5a93974b59757d5c5))
+- rename AssetInfo 'quantity' to 'supply' ([6e28df4](https://github.com/input-output-hk/cardano-js-sdk/commit/6e28df412797974b8ce6f6deb0c3346ff5938a05))
+- rename confirmed$ to onChain$ ([0de59dd](https://github.com/input-output-hk/cardano-js-sdk/commit/0de59dd335d065a85a4467bb501b041d889311b5))
+- rename ObservableWallet assets$ to assetInfo$ ([d6b759c](https://github.com/input-output-hk/cardano-js-sdk/commit/d6b759cd2d8db12313a166259277a2c79149e5f9))
+- simplify projection Sink to be an operator ([d9c6826](https://github.com/input-output-hk/cardano-js-sdk/commit/d9c68265d63300d26eb73ca93f5ee8be7ff51a12))
+
 ## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.8.0...@cardano-sdk/e2e@0.9.0) (2023-03-13)
 
 ### ⚠ BREAKING CHANGES

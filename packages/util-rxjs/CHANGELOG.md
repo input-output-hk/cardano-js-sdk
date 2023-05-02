@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.4.6...@cardano-sdk/util-rxjs@0.4.7) (2023-05-02)
+
+### Features
+
+- **util-rxjs:** add shareRetryBackoff operator ([b0f5eb5](https://github.com/input-output-hk/cardano-js-sdk/commit/b0f5eb5fe06c26eb7eece263017f11fb151b9101))
+- **wallet:** concatAndCombineLatest creator function ([305f2ed](https://github.com/input-output-hk/cardano-js-sdk/commit/305f2ed0039c8f355e4b973c41392c8c601b9312))
+
+### Bug Fixes
+
+- circular deps check in CI ([070f5e9](https://github.com/input-output-hk/cardano-js-sdk/commit/070f5e9f199c8a3b823f80aa98b35a4df7dbe532))
+
 ## [0.4.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.4.5...@cardano-sdk/util-rxjs@0.4.6) (2023-03-13)
 
 ### Features

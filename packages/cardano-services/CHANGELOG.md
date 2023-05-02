@@ -3,6 +3,67 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.10.0...@cardano-sdk/cardano-services@0.11.0) (2023-05-02)
+
+### ⚠ BREAKING CHANGES
+
+- - auxiliaryDataHash is now included in the TxBody core type.
+
+* networkId is now included in the TxBody core type.
+* auxiliaryData no longer contains the optional hash field.
+* auxiliaryData no longer contains the optional body field.
+
+- **cardano-services:** do not omit additional data from unhealthy health responses
+- rename AssetInfo 'quantity' to 'supply'
+- **cardano-services:** remove obsolete NetworkInfo openApi path
+  /network-info/current-wallet-protocol-parameters.
+- - `TokenMetadata` has new mandatory property `assetId`
+
+* `DbSyncAssetProvider` constructor requires new
+  `DbSyncAssetProviderProp` object as first positional argument
+* `createAssetsService` accepts an array of assetIds instead of a
+  single assetId
+
+- **cardano-services:** give health checks a dedicated db pool
+
+### Features
+
+- add CORS headers config in provider server ([25010cf](https://github.com/input-output-hk/cardano-js-sdk/commit/25010cf752bf31c46268e8ea31f78b00583f9032))
+- added new Transaction class that can convert between CBOR and the Core Tx type ([cc9a80c](https://github.com/input-output-hk/cardano-js-sdk/commit/cc9a80c17f1c0f46124b0c04c597a7ff96e517d3))
+- adds the sql queries profiling system ([7f972fd](https://github.com/input-output-hk/cardano-js-sdk/commit/7f972fd54073082cc75d2e7b49a92277e47148c1))
+- **cardano-services:** add path metrics on server ([4b8f157](https://github.com/input-output-hk/cardano-js-sdk/commit/4b8f1572fa5615ca6fa0ff540febecaf779ea12c))
+- **cardano-services:** add projector service ([5a5b281](https://github.com/input-output-hk/cardano-js-sdk/commit/5a5b281690283995b9a20c61c337c621b919fb3c))
+- **cardano-services:** cache the DB and node healthCheck results ([1583ede](https://github.com/input-output-hk/cardano-js-sdk/commit/1583edee2b78f1138430c2d3426a37153413944c))
+- **cardano-services:** changes stake pool search provider to not repeat on going queries ([8162246](https://github.com/input-output-hk/cardano-js-sdk/commit/8162246c80713443cf0047035c2bfbb123f6d855))
+- **cardano-services:** configurable pgpool size ([3eb3250](https://github.com/input-output-hk/cardano-js-sdk/commit/3eb325017696441a068590abff2d627b038e8b31))
+- **cardano-services:** do not omit additional data from unhealthy health responses ([5d83da2](https://github.com/input-output-hk/cardano-js-sdk/commit/5d83da288519bd5944e234267f02e8f9d3cd5114))
+- **cardano-services:** give health checks a dedicated db pool ([4729889](https://github.com/input-output-hk/cardano-js-sdk/commit/4729889f4218bd5a3cebf7f0fd342800b2f033f6))
+- **cardano-services:** ledgerTip query result is now cached ([3749f59](https://github.com/input-output-hk/cardano-js-sdk/commit/3749f5925cc687451d76c0e238377fa39443784d))
+- **cardano-services:** log all queries with execution time ([3876b7f](https://github.com/input-output-hk/cardano-js-sdk/commit/3876b7fb17e583410cf2038bb752fee48b7b148d))
+- **cardano-services:** metadata fetching logic ([3647598](https://github.com/input-output-hk/cardano-js-sdk/commit/36475984368426f50323322da622f0af4c5d046b))
+- **cardano-services:** optimizes get assets queries ([7aebf26](https://github.com/input-output-hk/cardano-js-sdk/commit/7aebf269ecbec142be0b076fb0a7b37d8e733432))
+- **cardano-services:** optimizes the query to get the ledger tip ([a81b013](https://github.com/input-output-hk/cardano-js-sdk/commit/a81b01366a4a914e4a58986c61f02d7c2fb2c7c1))
+- **cardano-services:** parametrize pagination queries ([61a0d9d](https://github.com/input-output-hk/cardano-js-sdk/commit/61a0d9d7954725c2626b870f21bc04e417b4f079))
+- **cardano-services:** use prepared statements for txs by addresses queries ([5502fa9](https://github.com/input-output-hk/cardano-js-sdk/commit/5502fa95dbff61af138eb7d98772e6b26c45face))
+- expose configurable request timeout ([cea5379](https://github.com/input-output-hk/cardano-js-sdk/commit/cea5379e77afda47c2b10f5f9ad66695637f5a01))
+- metrics for sync status ([1f081f8](https://github.com/input-output-hk/cardano-js-sdk/commit/1f081f8303d705b383c5d98fdad909ffcc7e23d5))
+- **ogmios:** ogmios TxSubmit client now uses a long-running ws connection ([36ee96c](https://github.com/input-output-hk/cardano-js-sdk/commit/36ee96c580f79a4f2759fa9bc87a69bf088e5ed9))
+- support assets fetching by ids ([8ed208a](https://github.com/input-output-hk/cardano-js-sdk/commit/8ed208a7a060c6999294c1f53266d6452adb278d))
+- transaction body core type now includes the auxiliaryDataHash and networkId fields ([8b92b01](https://github.com/input-output-hk/cardano-js-sdk/commit/8b92b0190083a2b956ae1e188121414428f6663b))
+
+### Bug Fixes
+
+- **cardano-service:** fixes a log called method ([4d57718](https://github.com/input-output-hk/cardano-js-sdk/commit/4d5771884a2c67217b8e79d9081b06e7180bc608))
+- **cardano-services:** explicitly process.exit(1) on unhandledRejections ([aeb0520](https://github.com/input-output-hk/cardano-js-sdk/commit/aeb0520b77d23d5d877fff667321f8d3deac21e2))
+- **cardano-services:** remove duplicate protocolParams operation id ([de22def](https://github.com/input-output-hk/cardano-js-sdk/commit/de22defa8934ece76818745b9230b76acfc65a38))
+- **cardano-services:** stake-pool APY sorted search no longer returns error if APY is disabled ([f81d6c0](https://github.com/input-output-hk/cardano-js-sdk/commit/f81d6c00cdd715db037bb05ce58b03d571742910))
+- circular deps check in CI ([070f5e9](https://github.com/input-output-hk/cardano-js-sdk/commit/070f5e9f199c8a3b823f80aa98b35a4df7dbe532))
+- tx metadata memory leak ([a5dc8ec](https://github.com/input-output-hk/cardano-js-sdk/commit/a5dc8ec4b18dc7170a58a217dd69a65b6189e1f1))
+
+### Code Refactoring
+
+- rename AssetInfo 'quantity' to 'supply' ([6e28df4](https://github.com/input-output-hk/cardano-js-sdk/commit/6e28df412797974b8ce6f6deb0c3346ff5938a05))
+
 ## [0.10.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.9.0...@cardano-sdk/cardano-services@0.10.0) (2023-03-13)
 
 ### ⚠ BREAKING CHANGES

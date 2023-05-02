@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.5.0...@cardano-sdk/key-management@0.5.1) (2023-05-02)
+
+### Bug Fixes
+
+- circular deps check in CI ([070f5e9](https://github.com/input-output-hk/cardano-js-sdk/commit/070f5e9f199c8a3b823f80aa98b35a4df7dbe532))
+
 ## [0.5.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.4.1...@cardano-sdk/key-management@0.5.0) (2023-03-13)
 
 ### ⚠ BREAKING CHANGES

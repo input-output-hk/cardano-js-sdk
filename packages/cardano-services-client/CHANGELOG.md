@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.8.0...@cardano-sdk/cardano-services-client@0.9.0) (2023-05-02)
+
+### ⚠ BREAKING CHANGES
+
+- rename AssetInfo 'quantity' to 'supply'
+- - `TokenMetadata` has new mandatory property `assetId`
+
+* `DbSyncAssetProvider` constructor requires new
+  `DbSyncAssetProviderProp` object as first positional argument
+* `createAssetsService` accepts an array of assetIds instead of a
+  single assetId
+
+### Features
+
+- support assets fetching by ids ([8ed208a](https://github.com/input-output-hk/cardano-js-sdk/commit/8ed208a7a060c6999294c1f53266d6452adb278d))
+
+### Bug Fixes
+
+- circular deps check in CI ([070f5e9](https://github.com/input-output-hk/cardano-js-sdk/commit/070f5e9f199c8a3b823f80aa98b35a4df7dbe532))
+
+### Code Refactoring
+
+- rename AssetInfo 'quantity' to 'supply' ([6e28df4](https://github.com/input-output-hk/cardano-js-sdk/commit/6e28df412797974b8ce6f6deb0c3346ff5938a05))
+
 ## [0.8.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.7.2...@cardano-sdk/cardano-services-client@0.8.0) (2023-03-13)
 
 ### ⚠ BREAKING CHANGES
