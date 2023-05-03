@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.11.0...@cardano-sdk/cardano-services@0.11.1) (2023-05-03)
+
+### Bug Fixes
+
+- **cardano-services:** token metadata core mapping ([20d7950](https://github.com/input-output-hk/cardano-js-sdk/commit/20d7950b663468bbb3ed4f265e91ce592091459a))
+
 ## [0.11.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.10.0...@cardano-sdk/cardano-services@0.11.0) (2023-05-02)
 
 ### ⚠ BREAKING CHANGES
