@@ -1,7 +1,8 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { CML, Cardano } from '@cardano-sdk/core';
-import { CommunicationType, KeyAgent, LedgerKeyAgent, restoreKeyAgent, util } from '@cardano-sdk/key-management';
-import { ObservableWallet, SingleAddressWallet, setupWallet } from '../../src';
+import { CommunicationType, KeyAgent, util } from '@cardano-sdk/key-management';
+import { LedgerKeyAgent } from '@cardano-sdk/hardware-ledger';
+import { ObservableWallet, SingleAddressWallet, restoreKeyAgent, setupWallet } from '../../src';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { firstValueFrom } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';

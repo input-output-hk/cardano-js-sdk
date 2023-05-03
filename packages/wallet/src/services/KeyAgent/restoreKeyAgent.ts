@@ -4,20 +4,20 @@ import { Cardano } from '@cardano-sdk/core';
 import {
   GetPassphrase,
   GroupedAddress,
+  InMemoryKeyAgent,
   KeyAgent,
   KeyAgentDependencies,
   KeyAgentType,
   SerializableInMemoryKeyAgentData,
   SerializableKeyAgentData,
   SerializableLedgerKeyAgentData,
-  SerializableTrezorKeyAgentData
-} from './types';
-import { InMemoryKeyAgent } from './InMemoryKeyAgent';
-import { InvalidSerializableDataError } from './errors';
-import { LedgerKeyAgent } from './LedgerKeyAgent';
+  SerializableTrezorKeyAgentData,
+  TrezorKeyAgent,
+  errors,
+  util
+} from '@cardano-sdk/key-management';
+import { LedgerKeyAgent } from '@cardano-sdk/hardware-ledger';
 import { Logger } from 'ts-log';
-import { STAKE_KEY_DERIVATION_PATH } from './util';
-import { TrezorKeyAgent } from './TrezorKeyAgent';
 
 // TODO: use this type as 2nd parameter of restoreKeyAgent
 export interface RestoreInMemoryKeyAgentProps {
@@ -47,7 +47,7 @@ const migrateSerializableData = <T extends SerializableKeyAgentData>(data: any, 
     })(),
   knownAddresses: data.knownAddresses.map((address: GroupedAddress) => ({
     ...address,
-    stakeKeyDerivationPath: address.stakeKeyDerivationPath || STAKE_KEY_DERIVATION_PATH
+    stakeKeyDerivationPath: address.stakeKeyDerivationPath || util.STAKE_KEY_DERIVATION_PATH
   }))
 });
 
@@ -84,12 +84,12 @@ export async function restoreKeyAgent<T extends SerializableKeyAgentData>(
   switch (data.__typename) {
     case KeyAgentType.InMemory: {
       if (!data.encryptedRootPrivateKeyBytes || data.encryptedRootPrivateKeyBytes.length !== 156) {
-        throw new InvalidSerializableDataError(
+        throw new errors.InvalidSerializableDataError(
           'Expected encrypted root private key in "agentData" for InMemoryKeyAgent"'
         );
       }
       if (!getPassphrase) {
-        throw new InvalidSerializableDataError(
+        throw new errors.InvalidSerializableDataError(
           'Expected "getPassphrase" in RestoreKeyAgentProps for InMemoryKeyAgent"'
         );
       }
@@ -102,7 +102,7 @@ export async function restoreKeyAgent<T extends SerializableKeyAgentData>(
       return new TrezorKeyAgent(data, dependencies);
     }
     default:
-      throw new InvalidSerializableDataError(
+      throw new errors.InvalidSerializableDataError(
         // @ts-ignore
         `Restoring key agent of __typename '${data.__typename}' is not implemented`
       );

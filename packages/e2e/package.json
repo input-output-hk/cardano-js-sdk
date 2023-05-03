@@ -97,6 +97,7 @@
     "@cardano-sdk/cardano-services-client": "^0.9.0",
     "@cardano-sdk/core": "^0.11.0",
     "@cardano-sdk/crypto": "^0.1.4",
+    "@cardano-sdk/hardware-ledger": "^0.1.0",
     "@cardano-sdk/key-management": "^0.5.1",
     "@cardano-sdk/ogmios": "^0.11.0",
     "@cardano-sdk/util": "^0.9.0",

@@ -38,6 +38,9 @@
     },
     {
       "path": "../../ogmios/src"
+    },
+    {
+      "path": "../../hardware-ledger/src"
     }
   ]
 }
