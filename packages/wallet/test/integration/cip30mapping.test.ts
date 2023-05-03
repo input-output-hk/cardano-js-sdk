@@ -13,8 +13,8 @@ import {
   WalletApi
 } from '@cardano-sdk/dapp-connector';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
+import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import {
-  Asset,
   CML,
   Cardano,
   CardanoNodeErrors,
@@ -23,7 +23,6 @@ import {
   cmlToCore,
   coalesceValueQuantities
 } from '@cardano-sdk/core';
-import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence';
 import { InitializeTxProps, InitializeTxResult, SingleAddressWallet, cip30, setupWallet } from '../../src';
@@ -158,11 +157,11 @@ describe('cip30', () => {
               const multiAsset = scope.manage(CML.MultiAsset.new());
               const assets = scope.manage(CML.Assets.new());
               assets.insert(
-                scope.manage(CML.AssetName.new(Buffer.from(Asset.util.assetNameFromAssetId(AssetId.TSLA), 'hex'))),
+                scope.manage(CML.AssetName.new(Buffer.from(Cardano.AssetId.getAssetName(AssetId.TSLA), 'hex'))),
                 scope.manage(CML.BigNum.from_str(tslaQuantity.toString()))
               );
               multiAsset.insert(
-                scope.manage(CML.ScriptHash.from_hex(Asset.util.policyIdFromAssetId(AssetId.TSLA))),
+                scope.manage(CML.ScriptHash.from_hex(Cardano.AssetId.getPolicyId(AssetId.TSLA))),
                 assets
               );
               filterAmountValue.set_multiasset(multiAsset);
