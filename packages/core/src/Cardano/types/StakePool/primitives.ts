@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import * as BaseEncoding from '@scure/base';
 import * as Crypto from '@cardano-sdk/crypto';
 import { HexBlob, OpaqueString, typedBech32, typedHex } from '@cardano-sdk/util';
+
+const MAX_BECH32_LENGTH_LIMIT = 1023;
 
 /**
  * pool operator verification key hash as bech32 string or a genesis pool ID
@@ -36,3 +39,13 @@ export const PoolIdHex = (value: string): PoolIdHex => Crypto.Hash28ByteBase16(v
  */
 export type VrfVkHex = OpaqueString<'VrfVkHex'>;
 export const VrfVkHex = (target: string): VrfVkHex => typedHex(target, 64);
+
+/**
+ * Converts a pool id into its key hash.
+ *
+ * @param poolId The pool id to be converted.
+ */
+PoolId.toKeyHash = (poolId: PoolId): Crypto.Ed25519KeyHashHex => {
+  const { words } = BaseEncoding.bech32.decode(poolId, MAX_BECH32_LENGTH_LIMIT);
+  return Crypto.Ed25519KeyHashHex(HexBlob.fromBytes(BaseEncoding.bech32.fromWords(words)));
+};
