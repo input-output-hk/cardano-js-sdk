@@ -22,15 +22,18 @@ interface TokenMetadataServiceRecord {
   description?: StringValue;
   logo?: StringValue;
   name?: StringValue;
-  subject?: string;
+  subject: string;
   ticker?: StringValue;
   url?: StringValue;
 }
 
 const propertiesToChange: Record<string, string> = { description: 'desc', logo: 'icon', subject: 'assetId' };
-export const toCoreTokenMetadata = (record: TokenMetadataServiceRecord) =>
+export const toCoreTokenMetadata = (record: TokenMetadataServiceRecord): Asset.TokenMetadata =>
   Object.fromEntries(
-    Object.entries(record).map(([key, value]) => [propertiesToChange[key] || key, value.value || value])
+    Object.entries(record).map(([key, value]) => [
+      propertiesToChange[key] || key,
+      typeof value === 'string' ? value : value.value
+    ])
   ) as Asset.TokenMetadata;
 
 const toProviderError = (error: unknown, details: string) => {
