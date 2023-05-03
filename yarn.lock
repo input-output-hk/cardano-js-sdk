@@ -2463,7 +2463,31 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cardano-sdk/crypto@^0.1.4, @cardano-sdk/crypto@workspace:packages/crypto":
+"@cardano-sdk/core@npm:^0.10.0":
+  version: 0.10.0
+  resolution: "@cardano-sdk/core@npm:0.10.0"
+  dependencies:
+    "@cardano-ogmios/client": 5.6.0
+    "@cardano-ogmios/schema": 5.6.0
+    "@cardano-sdk/crypto": ^0.1.3
+    "@cardano-sdk/util": ^0.8.2
+    "@dcspark/cardano-multiplatform-lib-nodejs": ^3.1.1
+    "@foxglove/crc": ^0.0.3
+    "@scure/base": ^1.1.1
+    borc: ^3.0.0
+    lodash: ^4.17.21
+    ts-custom-error: ^3.2.0
+    ts-log: ^2.2.4
+  peerDependencies:
+    rxjs: ^7.4.0
+  peerDependenciesMeta:
+    rxjs:
+      optional: true
+  checksum: 46c8772b6203bd23f1f4057f6cf01d7bbbb782b19e06203e73c7a3c95d66c71d86a9f237aa15069d12a4c850b95984257ea10e2d7452f592a07ba8625e3b486e
+  languageName: node
+  linkType: hard
+
+"@cardano-sdk/crypto@^0.1.3, @cardano-sdk/crypto@^0.1.4, @cardano-sdk/crypto@workspace:packages/crypto":
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/crypto@workspace:packages/crypto"
   dependencies:
@@ -2541,6 +2565,7 @@ __metadata:
     "@cardano-sdk/core": ^0.11.0
     "@cardano-sdk/crypto": ^0.1.4
     "@cardano-sdk/dapp-connector": ^0.9.0
+    "@cardano-sdk/hardware-ledger": ^0.1.0
     "@cardano-sdk/key-management": ^0.5.1
     "@cardano-sdk/ogmios": ^0.11.0
     "@cardano-sdk/projection": ^0.6.0
@@ -2667,7 +2692,34 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cardano-sdk/input-selection@^0.9.1, @cardano-sdk/input-selection@workspace:packages/input-selection":
+"@cardano-sdk/hardware-ledger@^0.1.0, @cardano-sdk/hardware-ledger@workspace:packages/hardware-ledger":
+  version: 0.0.0-use.local
+  resolution: "@cardano-sdk/hardware-ledger@workspace:packages/hardware-ledger"
+  dependencies:
+    "@cardano-foundation/ledgerjs-hw-app-cardano": ^6.0.0
+    "@cardano-sdk/core": ^0.11.0
+    "@cardano-sdk/crypto": ^0.1.4
+    "@cardano-sdk/key-management": ^0.5.1
+    "@cardano-sdk/tx-construction": ^0.3.0
+    "@cardano-sdk/util": ^0.9.0
+    "@cardano-sdk/util-dev": ^0.9.0
+    "@ledgerhq/hw-transport": ^6.28.1
+    "@ledgerhq/hw-transport-node-hid-noevents": ^6.27.12
+    "@ledgerhq/hw-transport-webhid": ^6.27.12
+    "@types/lodash": ^4.14.182
+    eslint: ^7.32.0
+    jest: ^28.1.3
+    madge: ^5.0.1
+    npm-run-all: ^4.1.5
+    shx: ^0.3.3
+    ts-custom-error: ^3.2.0
+    ts-jest: ^28.0.7
+    ts-log: 2.2.4
+    typescript: ^4.7.4
+  languageName: unknown
+  linkType: soft
+
+"@cardano-sdk/input-selection@^0.9.0, @cardano-sdk/input-selection@^0.9.1, @cardano-sdk/input-selection@workspace:packages/input-selection":
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/input-selection@workspace:packages/input-selection"
   dependencies:
@@ -2697,10 +2749,8 @@ __metadata:
     "@cardano-sdk/crypto": ^0.1.4
     "@cardano-sdk/dapp-connector": ^0.9.0
     "@cardano-sdk/util": ^0.9.0
+    "@cardano-sdk/util-dev": ^0.9.0
     "@emurgo/cardano-message-signing-nodejs": ^1.0.1
-    "@ledgerhq/hw-transport": ^6.28.1
-    "@ledgerhq/hw-transport-node-hid-noevents": ^6.27.12
-    "@ledgerhq/hw-transport-webhid": ^6.27.12
     "@types/lodash": ^4.14.182
     "@types/pbkdf2": ^3.1.0
     bip39: ^3.0.4
@@ -2830,6 +2880,21 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@cardano-sdk/tx-construction@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "@cardano-sdk/tx-construction@npm:0.3.0"
+  dependencies:
+    "@cardano-sdk/core": ^0.10.0
+    "@cardano-sdk/input-selection": ^0.9.0
+    "@cardano-sdk/util": ^0.8.2
+    lodash: ^4.17.21
+    npm: ^9.3.0
+    ts-custom-error: ^3.2.0
+    ts-log: ^2.2.4
+  checksum: abea6e27384d155f9d3a576f237f67a3341b2486032357fe9b5276d95a58a128f5b4eabe50a3f86ac0a16bfc1ca8b243a0379384f4696abfa1e0e114eb2a8253
+  languageName: node
+  linkType: hard
+
 "@cardano-sdk/util-dev@^0.9.0, @cardano-sdk/util-dev@workspace:packages/util-dev":
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/util-dev@workspace:packages/util-dev"
@@ -2897,6 +2962,20 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@cardano-sdk/util@npm:^0.8.2":
+  version: 0.8.2
+  resolution: "@cardano-sdk/util@npm:0.8.2"
+  dependencies:
+    bech32: ^2.0.0
+    lodash: ^4.17.21
+    serialize-error: ^8
+    ts-custom-error: ^3.2.0
+    ts-log: ^2.2.4
+    type-fest: ^2.19.0
+  checksum: 4895dbf85009b3398e059ab4cc0c236c02443a9d4160d3a696d7e6eb4574c7c301cc0b8a1ca5a46328ac6bbb5719e3acd6e0ca88b8b85e1c54c4b1d37deb1ec7
+  languageName: node
+  linkType: hard
+
 "@cardano-sdk/wallet@^0.11.0, @cardano-sdk/wallet@workspace:packages/wallet":
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/wallet@workspace:packages/wallet"
@@ -2906,6 +2985,7 @@ __metadata:
     "@cardano-sdk/core": ^0.11.0
     "@cardano-sdk/crypto": ^0.1.4
     "@cardano-sdk/dapp-connector": ^0.9.0
+    "@cardano-sdk/hardware-ledger": ^0.1.0
     "@cardano-sdk/input-selection": ^0.9.1
     "@cardano-sdk/key-management": ^0.5.1
     "@cardano-sdk/ogmios": ^0.11.0
@@ -5831,6 +5911,13 @@ __metadata:
   version: 3.1.0
   resolution: "@socket.io/component-emitter@npm:3.1.0"
   checksum: db069d95425b419de1514dffe945cc439795f6a8ef5b9465715acf5b8b50798e2c91b8719cbf5434b3fe7de179d6cdcd503c277b7871cb3dd03febb69bdd50fa
+  languageName: node
+  linkType: hard
+
+"@sovpro/delimited-stream@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@sovpro/delimited-stream@npm:1.1.0"
+  checksum: e78fc97a8509c07b55483df2253137de07b10f14db15d230526a6dd95c86e99d8f54c7af8697806bd16522eec2c50e44e5b4e0294bed80da833a2185f17f3ab6
   languageName: node
   linkType: hard
 
@@ -9205,6 +9292,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"borc@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "borc@npm:3.0.0"
+  dependencies:
+    bignumber.js: ^9.0.0
+    buffer: ^6.0.3
+    commander: ^2.15.0
+    ieee754: ^1.1.13
+    iso-url: ^1.1.5
+    json-text-sequence: ~0.3.0
+    readable-stream: ^3.6.0
+  bin:
+    cbor2comment: bin/cbor2comment.js
+    cbor2diag: bin/cbor2diag.js
+    cbor2json: bin/cbor2json.js
+    json2cbor: bin/json2cbor.js
+  checksum: 23e39557ed952a2e6e984cfc6277e714a3077c96202604a1a404149b656766ba1d3351d4a585b0f27126964fcd14aa95ff7acee83bfe947b863bd306b84876c2
+  languageName: node
+  linkType: hard
+
 "bottleneck@npm:^2.19.5":
   version: 2.19.5
   resolution: "bottleneck@npm:2.19.5"
@@ -10478,7 +10585,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"commander@npm:^2.16.0, commander@npm:^2.20.0, commander@npm:^2.20.3, commander@npm:^2.8.1":
+"commander@npm:^2.15.0, commander@npm:^2.16.0, commander@npm:^2.20.0, commander@npm:^2.20.3, commander@npm:^2.8.1":
   version: 2.20.3
   resolution: "commander@npm:2.20.3"
   checksum: ab8c07884e42c3a8dbc5dd9592c606176c7eb5c1ca5ff274bcf907039b2c41de3626f684ea75ccf4d361ba004bbaff1f577d5384c155f3871e456bdf27becf9e
@@ -15726,6 +15833,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"iso-url@npm:^1.1.5":
+  version: 1.2.1
+  resolution: "iso-url@npm:1.2.1"
+  checksum: 1af98c4ed6a39598407fd8c3c13e997c978985f477af2be3390d2aa3e422b4b5992ffbb0dac68656b165c71850fff748ac1309d29d4f2a728707d76bf0f98557
+  languageName: node
+  linkType: hard
+
 "isobject@npm:^3.0.1":
   version: 3.0.1
   resolution: "isobject@npm:3.0.1"
@@ -16656,6 +16770,15 @@ __metadata:
   version: 5.0.1
   resolution: "json-stringify-safe@npm:5.0.1"
   checksum: 48ec0adad5280b8a96bb93f4563aa1667fd7a36334f79149abd42446d0989f2ddc58274b479f4819f1f00617957e6344c886c55d05a4e15ebb4ab931e4a6a8ee
+  languageName: node
+  linkType: hard
+
+"json-text-sequence@npm:~0.3.0":
+  version: 0.3.0
+  resolution: "json-text-sequence@npm:0.3.0"
+  dependencies:
+    "@sovpro/delimited-stream": ^1.1.0
+  checksum: e5dc050aadd626938514363399cf14c409f878628914922c5d470530c3f3473d6b0e16a10338dd7d863aab0291bb0e5e15d71526d14733c22e30cba771b03297
   languageName: node
   linkType: hard
 

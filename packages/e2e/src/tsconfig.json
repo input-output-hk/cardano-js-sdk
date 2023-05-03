@@ -30,6 +30,9 @@
     },
     {
       "path": "../../wallet/src"
+    },
+    {
+      "path": "../../hardware-ledger/src"
     }
   ]
 }

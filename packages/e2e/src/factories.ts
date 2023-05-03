@@ -17,7 +17,6 @@ import {
   CommunicationType,
   InMemoryKeyAgent,
   KeyAgentDependencies,
-  LedgerKeyAgent,
   TrezorKeyAgent,
   util
 } from '@cardano-sdk/key-management';
@@ -31,6 +30,7 @@ import {
   setupWallet,
   storage
 } from '@cardano-sdk/wallet';
+import { LedgerKeyAgent } from '@cardano-sdk/hardware-ledger';
 import { Logger } from 'ts-log';
 import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import {
