@@ -19,7 +19,7 @@ describe('CardanoTokenRegistry', () => {
     it('complete attributes', () =>
       expect(
         toCoreTokenMetadata({
-          decimals: { value: 23 },
+          decimals: { value: 0 },
           description: { value: testDescription },
           logo: { value: 'test logo' },
           name: { value: testName },
@@ -29,7 +29,7 @@ describe('CardanoTokenRegistry', () => {
         })
       ).toStrictEqual({
         assetId: testSubject,
-        decimals: 23,
+        decimals: 0,
         desc: testDescription,
         icon: 'test logo',
         name: testName,
