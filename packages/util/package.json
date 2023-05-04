@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/util",
-  "version": "0.9.0",
+  "version": "0.9.1-nightly.0",
   "description": "General, not cardano-specific utils",
   "engines": {
     "node": ">=14.20.1"
@@ -53,7 +53,7 @@
     "test:debug": "DEBUG=true yarn test"
   },
   "devDependencies": {
-    "@cardano-sdk/util-dev": "^0.9.0",
+    "@cardano-sdk/util-dev": "^0.9.1-nightly.0",
     "@types/lodash": "^4.14.182",
     "eslint": "^7.32.0",
     "jest": "^28.1.3",
