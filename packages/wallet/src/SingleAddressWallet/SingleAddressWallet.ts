@@ -72,14 +72,15 @@ import {
   FinalizeTxProps,
   InitializeTxProps,
   InitializeTxResult,
-  createTransactionInternals,
-  finalizeTx
+  TxBuilder,
+  TxBuilderDependencies,
+  finalizeTx,
+  initializeTx
 } from '@cardano-sdk/tx-construction';
 import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
-import { ManagedFreeableScope, Shutdown, contextLogger, deepEquals } from '@cardano-sdk/util';
-import { PrepareTx, createTxPreparer } from './prepareTx';
 import { RetryBackoffConfig } from 'backoff-rxjs';
+import { Shutdown, contextLogger, deepEquals } from '@cardano-sdk/util';
 import { TrackedUtxoProvider } from '../services/ProviderTracker/TrackedUtxoProvider';
 import { WalletStores, createInMemoryWalletStores } from '../persistence';
 import { createTransactionReemitter } from '../services/TransactionReemitter';
@@ -149,7 +150,6 @@ export class SingleAddressWallet implements ObservableWallet {
   #inputSelector: InputSelector;
   #logger: Logger;
   #tip$: TipTracker;
-  #prepareTx: PrepareTx;
   #newTransactions = {
     failedToSubmit$: new Subject<FailedTx>(),
     pending$: new Subject<OutgoingTx>(),
@@ -420,14 +420,11 @@ export class SingleAddressWallet implements ObservableWallet {
       }),
       stores.assets
     );
-    this.util = createWalletUtil(this);
-    this.#prepareTx = createTxPreparer({
-      logger: this.#logger,
-      signer: {
-        stubFinalizeTx: (finalizeTxProps) => from(this.finalizeTx(finalizeTxProps, true))
-      },
-      wallet: this
+    this.util = createWalletUtil({
+      protocolParameters$: this.protocolParameters$,
+      utxo: this.utxo
     });
+
     this.#logger.debug('Created');
   }
 
@@ -436,37 +433,13 @@ export class SingleAddressWallet implements ObservableWallet {
   }
 
   async initializeTx(props: InitializeTxProps): Promise<InitializeTxResult> {
-    const scope = new ManagedFreeableScope();
-    const { constraints, utxo, implicitCoin, validityInterval, changeAddress, withdrawals } = await this.#prepareTx(
-      props
-    );
-    const { selection: inputSelection } = await this.#inputSelector.select({
-      constraints,
-      implicitValue: { coin: implicitCoin, mint: props.mint },
-      outputs: props.outputs || new Set(),
-      utxo: new Set(utxo)
-    });
-    const { body, hash } = await createTransactionInternals({
-      auxiliaryData: props.auxiliaryData,
-      certificates: props.certificates,
-      changeAddress,
-      collaterals: props.collaterals,
-      inputSelection,
-      mint: props.mint,
-      requiredExtraSignatures: props.requiredExtraSignatures,
-      scriptIntegrityHash: props.scriptIntegrityHash,
-      validityInterval,
-      withdrawals
-    });
-
-    scope.dispose();
-    return { body, hash, inputSelection };
+    return initializeTx(props, this.#getTxBuilderDependencies());
   }
 
   async finalizeTx(props: FinalizeTxProps, stubSign = false): Promise<Cardano.Tx> {
     return finalizeTx(
-      props,
-      { addresses$: this.addresses$, inputResolver: this.util, keyAgent: this.keyAgent },
+      { ...props, addresses: await firstValueFrom(this.addresses$) },
+      { inputResolver: this.util, keyAgent: this.keyAgent },
       stubSign
     );
   }
@@ -546,5 +519,23 @@ export class SingleAddressWallet implements ObservableWallet {
     this.#reemitSubscriptions.unsubscribe();
     this.#failedFromReemitter$.complete();
     this.#logger.debug('Shutdown');
+  }
+
+  #getTxBuilderDependencies(): TxBuilderDependencies {
+    return {
+      inputResolver: this.util,
+      inputSelector: this.#inputSelector,
+      keyAgent: this.keyAgent,
+      logger: this.#logger,
+      txBuilderProviders: {
+        addresses: () => firstValueFrom(this.addresses$),
+        changeAddress: () => firstValueFrom(this.addresses$.pipe(map(([{ address: changeAddress }]) => changeAddress))),
+        genesisParameters: () => firstValueFrom(this.genesisParameters$),
+        protocolParameters: () => firstValueFrom(this.protocolParameters$),
+        rewardAccounts: () => firstValueFrom(this.delegation.rewardAccounts$),
+        tip: () => firstValueFrom(this.tip$),
+        utxoAvailable: () => firstValueFrom(this.utxo.available$)
+      }
+    };
   }
 }

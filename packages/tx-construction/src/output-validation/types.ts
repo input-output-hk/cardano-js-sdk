@@ -1,5 +1,4 @@
 import { Cardano } from '@cardano-sdk/core';
-import { Observable } from 'rxjs';
 
 export type ProtocolParametersRequiredByOutputValidator = Pick<
   Cardano.ProtocolParameters,
@@ -7,9 +6,9 @@ export type ProtocolParametersRequiredByOutputValidator = Pick<
 >;
 export interface OutputValidatorContext {
   /**
-   * Subscribed on every OutputValidator call
+   * Queried on every OutputValidator call
    */
-  protocolParameters$: Observable<ProtocolParametersRequiredByOutputValidator>;
+  protocolParameters: () => Promise<ProtocolParametersRequiredByOutputValidator>;
 }
 
 export interface OutputValidation {

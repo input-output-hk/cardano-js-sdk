@@ -1,15 +1,29 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AsyncKeyAgent, SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
+import { AsyncKeyAgent, GroupedAddress, SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
-import { SelectionSkeleton } from '@cardano-sdk/input-selection';
+import { InputSelector, SelectionSkeleton } from '@cardano-sdk/input-selection';
+import { Logger } from 'ts-log';
 
 import { MinimumCoinQuantityPerOutput } from './output-validation';
 
 export type InitializeTxResult = Cardano.TxBodyWithHash & { inputSelection: SelectionSkeleton };
 
+export interface TxBuilderProviders {
+  tip: () => Promise<Cardano.Tip>;
+  protocolParameters: () => Promise<Cardano.ProtocolParameters>;
+  addresses: () => Promise<GroupedAddress[]>;
+  changeAddress: () => Promise<Cardano.PaymentAddress>;
+  genesisParameters: () => Promise<Cardano.CompactGenesis>;
+  rewardAccounts: () => Promise<Omit<Cardano.RewardAccountInfo, 'delegatee'>[]>;
+  utxoAvailable: () => Promise<Cardano.Utxo[]>;
+}
+
 export interface TxBuilderDependencies {
+  inputSelector?: InputSelector;
   inputResolver: Cardano.InputResolver;
   keyAgent: AsyncKeyAgent;
+  txBuilderProviders: TxBuilderProviders;
+  logger: Logger;
 }
 
 export interface TxProps {

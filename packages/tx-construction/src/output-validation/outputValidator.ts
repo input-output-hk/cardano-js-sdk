@@ -1,6 +1,5 @@
 import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
-import { firstValueFrom } from 'rxjs';
 
 import {
   OutputValidation,
@@ -10,12 +9,14 @@ import {
 } from './types';
 import { computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit } from '../input-selection';
 
-export const createOutputValidator = ({ protocolParameters$ }: OutputValidatorContext): OutputValidator => {
+export const createOutputValidator = ({
+  protocolParameters: protocolParametersGetter
+}: OutputValidatorContext): OutputValidator => {
   const validateValue = async (
     value: Cardano.Value,
     protocolParameters?: ProtocolParametersRequiredByOutputValidator
   ): Promise<OutputValidation> => {
-    const { coinsPerUtxoByte, maxValueSize } = protocolParameters || (await firstValueFrom(protocolParameters$));
+    const { coinsPerUtxoByte, maxValueSize } = protocolParameters || (await protocolParametersGetter());
     const stubMaxSizeAddress = Cardano.PaymentAddress(
       'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9'
     );
@@ -28,7 +29,7 @@ export const createOutputValidator = ({ protocolParameters$ }: OutputValidatorCo
     };
   };
   const validateValues = async (values: Iterable<Cardano.Value>) => {
-    const protocolParameters = await firstValueFrom(protocolParameters$);
+    const protocolParameters = await protocolParametersGetter();
     const validations = new Map<Cardano.Value, OutputValidation>();
     for (const value of values) {
       validations.set(value, await validateValue(value, protocolParameters));
@@ -39,7 +40,7 @@ export const createOutputValidator = ({ protocolParameters$ }: OutputValidatorCo
     output: Cardano.TxOut,
     protocolParameters?: ProtocolParametersRequiredByOutputValidator
   ) => {
-    const { coinsPerUtxoByte, maxValueSize } = protocolParameters || (await firstValueFrom(protocolParameters$));
+    const { coinsPerUtxoByte, maxValueSize } = protocolParameters || (await protocolParametersGetter());
     const minimumCoin = BigInt(computeMinimumCoinQuantity(coinsPerUtxoByte)(output));
     return {
       coinMissing: BigIntMath.max([minimumCoin - output.value.coins, 0n])!,
@@ -51,7 +52,7 @@ export const createOutputValidator = ({ protocolParameters$ }: OutputValidatorCo
   return {
     validateOutput,
     async validateOutputs(outputs: Iterable<Cardano.TxOut>): Promise<Map<Cardano.TxOut, OutputValidation>> {
-      const protocolParameters = await firstValueFrom(protocolParameters$);
+      const protocolParameters = await protocolParametersGetter();
       const validations = new Map<Cardano.TxOut, OutputValidation>();
       for (const output of outputs) {
         validations.set(output, await validateOutput(output, protocolParameters));

@@ -1,14 +1,13 @@
 import { Cardano } from '@cardano-sdk/core';
-import { of } from 'rxjs';
 
-import { OutputValidator, ProtocolParametersRequiredByOutputValidator, createOutputValidator } from '../../src';
+import { OutputValidator, createOutputValidator } from '../../src';
 
 describe('createOutputValidator', () => {
   let validator: OutputValidator;
 
   beforeAll(() => {
     validator = createOutputValidator({
-      protocolParameters$: of<ProtocolParametersRequiredByOutputValidator>({
+      protocolParameters: async () => ({
         coinsPerUtxoByte: 4310,
         maxValueSize: 90
       })

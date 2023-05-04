@@ -4,13 +4,7 @@
 import * as mocks from '../../../core/test/mocks';
 import { Cardano, Transaction } from '@cardano-sdk/core';
 import { GroupedAddress } from '@cardano-sdk/key-management';
-import {
-  ObservableWallet,
-  RewardAccount,
-  SingleAddressWallet,
-  StakeKeyStatus,
-  coldObservableProvider
-} from '../../src';
+import { ObservableWallet, SingleAddressWallet, coldObservableProvider } from '../../src';
 import {
   OutputValidator,
   ProtocolParametersRequiredByOutputValidator,
@@ -18,8 +12,8 @@ import {
 } from '@cardano-sdk/tx-construction';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
+import { firstValueFrom, of, timer } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
-import { of, timer } from 'rxjs';
 import { testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { usingAutoFree } from '@cardano-sdk/util';
 
@@ -145,17 +139,19 @@ describe('CustomObservableWallet', () => {
       it('can utilize SingleAddressWallet', () => {
         const wallet: SingleAddressWallet = {} as SingleAddressWallet;
         // this compiles
-        outputValidator = createOutputValidator(wallet);
+        outputValidator = createOutputValidator({
+          protocolParameters: () => firstValueFrom(wallet.protocolParameters$)
+        });
         outputValidator;
       });
 
       it('can provide an implementation that utilize SDK utils, but doesnt depend on full ObservableWallet', () => {
-        const protocolParameters$ = of<ProtocolParametersRequiredByOutputValidator>({
+        const protocolParameters: ProtocolParametersRequiredByOutputValidator = {
           coinsPerUtxoByte: 34_482,
           maxValueSize: 5000
-        });
+        };
         // this compiles
-        outputValidator = createOutputValidator({ protocolParameters$ });
+        outputValidator = createOutputValidator({ protocolParameters: async () => protocolParameters });
       });
 
       it('can provide custom implementation', () => {

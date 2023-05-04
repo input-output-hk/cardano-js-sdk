@@ -2,7 +2,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Observable, firstValueFrom } from 'rxjs';
 import { ObservableWallet } from '../types';
-import { OutputValidatorContext, createOutputValidator } from '@cardano-sdk/tx-construction';
+import { ProtocolParametersRequiredByOutputValidator, createOutputValidator } from '@cardano-sdk/tx-construction';
 import { txInEquals } from './util';
 import uniqBy from 'lodash/uniqBy';
 
@@ -14,7 +14,13 @@ export interface InputResolverContext {
     available$: Observable<Cardano.Utxo[]>;
   };
 }
-export type WalletUtilContext = OutputValidatorContext & InputResolverContext;
+
+export interface WalletOutputValidatorContext {
+  /* Subscribed on every OutputValidator call */
+  protocolParameters$: Observable<ProtocolParametersRequiredByOutputValidator>;
+}
+
+export type WalletUtilContext = WalletOutputValidatorContext & InputResolverContext;
 
 export const createInputResolver = ({ utxo }: InputResolverContext): Cardano.InputResolver => ({
   async resolveInput(input: Cardano.TxIn) {
@@ -29,7 +35,7 @@ export const createInputResolver = ({ utxo }: InputResolverContext): Cardano.Inp
  * @returns common wallet utility functions that are aware of wallet state and computes useful things
  */
 export const createWalletUtil = (context: WalletUtilContext) => ({
-  ...createOutputValidator(context),
+  ...createOutputValidator({ protocolParameters: () => firstValueFrom(context.protocolParameters$) }),
   ...createInputResolver(context)
 });
 

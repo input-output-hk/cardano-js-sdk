@@ -119,7 +119,9 @@ export class ObservableWalletTxBuilder implements TxBuilder {
 
   constructor({
     observableWallet,
-    outputValidator = createOutputValidator({ protocolParameters$: observableWallet.protocolParameters$ }),
+    outputValidator = createOutputValidator({
+      protocolParameters: () => firstValueFrom(observableWallet.protocolParameters$)
+    }),
     logger
   }: BuildTxProps) {
     this.#observableWallet = observableWallet;
