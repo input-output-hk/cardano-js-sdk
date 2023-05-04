@@ -2,7 +2,7 @@ import { Cardano } from '@cardano-sdk/core';
 import { FinalizeTxProps, InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, isNotNil } from '@cardano-sdk/util';
-import { SingleAddressWallet, TransactionFailure, buildTx } from '@cardano-sdk/wallet';
+import { SingleAddressWallet, TransactionFailure } from '@cardano-sdk/wallet';
 import { assertTxIsValid } from '../../../../wallet/test/util';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, map, take } from 'rxjs';
@@ -20,7 +20,7 @@ const logger = createLogger();
 const createCollateral = async (
   wallet: SingleAddressWallet
 ): Promise<{ collateralInput: Cardano.TxIn; collateralCoinValue: bigint }> => {
-  const txBuilder = buildTx({ logger, observableWallet: wallet });
+  const txBuilder = await wallet.createTxBuilder();
 
   const address = (await firstValueFrom(wallet.addresses$))[0].address;
 
@@ -32,12 +32,12 @@ const createCollateral = async (
   assertTxIsValid(unsignedTx);
 
   const signedTx = await unsignedTx.sign();
-  await signedTx.submit();
+  await wallet.submitTx(signedTx);
 
   // Wait for transaction to be on chain.
   await firstValueFrom(
     wallet.transactions.history$.pipe(
-      map((txs) => txs.find((tx) => tx.id === signedTx.tx.id)),
+      map((txs) => txs.find((tx) => tx.id === signedTx.id)),
       filter(isNotNil),
       take(1)
     )
@@ -46,7 +46,7 @@ const createCollateral = async (
   // Find the collateral UTxO in the UTxO set.
   const utxo = await firstValueFrom(
     wallet.utxo.available$.pipe(
-      map((utxos) => utxos.find((o) => o[0].txId === signedTx.tx.id && o[1].value.coins === 5_000_000n)),
+      map((utxos) => utxos.find((o) => o[0].txId === signedTx.id && o[1].value.coins === 5_000_000n)),
       filter(isNotNil),
       take(1)
     )

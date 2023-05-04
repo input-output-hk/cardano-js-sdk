@@ -1,5 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
-import { SingleAddressWallet, buildTx, createWalletUtil } from '@cardano-sdk/wallet';
+import { SingleAddressWallet, createWalletUtil } from '@cardano-sdk/wallet';
 import { filter, firstValueFrom, map } from 'rxjs';
 import { getEnv, getWallet, walletVariables } from '../../../src';
 import { isNotNil } from '@cardano-sdk/util';
@@ -29,7 +29,9 @@ describe('SingleAddressWallet/metadata', () => {
     // Make sure the wallet has sufficient funds to run this test
     await walletReady(wallet, minimumCoin);
 
-    const builtTx = await buildTx({ logger, observableWallet: wallet })
+    const builtTx = await (
+      await wallet.createTxBuilder()
+    )
       .addOutput({ address: ownAddress, value: { coins: minimumCoin } })
       .setMetadata(metadata)
       .build();
@@ -39,8 +41,8 @@ describe('SingleAddressWallet/metadata', () => {
     }
 
     const signedTx = await builtTx.sign();
-    const outgoingTx = signedTx.tx;
-    await signedTx.submit();
+    const outgoingTx = signedTx;
+    await wallet.submitTx(signedTx);
 
     const loadedTx = await firstValueFrom(
       wallet.transactions.history$.pipe(

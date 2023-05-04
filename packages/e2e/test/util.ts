@@ -30,7 +30,7 @@ import {
   walletVariables
 } from '../src';
 import { FinalizeTxProps, InitializeTxProps, SignedTx } from '@cardano-sdk/tx-construction';
-import { ObservableWallet, SingleAddressWallet, buildTx } from '@cardano-sdk/wallet';
+import { ObservableWallet, SingleAddressWallet } from '@cardano-sdk/wallet';
 import { assertTxIsValid } from '../../wallet/test/util';
 import { logger } from '@cardano-sdk/util-dev';
 import sortBy from 'lodash/sortBy';
@@ -134,9 +134,8 @@ export const txConfirmed = (
     SYNC_TIMEOUT_DEFAULT / 5
   );
 
-const submit = (wallet: ObservableWallet, tx: Cardano.Tx | SignedTx) =>
-  'submit' in tx ? tx.submit() : wallet.submitTx(tx);
-const confirm = (wallet: ObservableWallet, tx: Cardano.Tx | SignedTx) => txConfirmed(wallet, 'tx' in tx ? tx.tx : tx);
+const submit = (wallet: ObservableWallet, tx: Cardano.Tx) => wallet.submitTx(tx);
+const confirm = (wallet: ObservableWallet, tx: Cardano.Tx) => txConfirmed(wallet, tx);
 export const submitAndConfirm = (wallet: ObservableWallet, tx: Cardano.Tx | SignedTx) =>
   Promise.all([submit(wallet, tx), confirm(wallet, tx)]);
 
@@ -181,14 +180,14 @@ export const transferCoins = async ({ fromWallet, toWallet, coins }: TransferCoi
 
   // Act
   // Send 50 tADA to second wallet.
-  const txBuilder = buildTx({ logger, observableWallet: fromWallet });
+  const txBuilder = await fromWallet.createTxBuilder();
   const txOut = txBuilder.buildOutput().address(receivingAddress).coin(coins).toTxOut();
   const unsignedTx = await txBuilder.addOutput(txOut).build();
   assertTxIsValid(unsignedTx);
   const signedTx = await unsignedTx.sign();
 
   // Wait until wallet two is aware of the funds.
-  await Promise.all([submit(fromWallet, signedTx), txConfirmed(toWallet, signedTx.tx)]);
+  await Promise.all([fromWallet.submitTx(signedTx), txConfirmed(toWallet, signedTx)]);
 };
 
 export const waitForEpoch = (wallet: Pick<ObservableWallet, 'currentEpoch$'>, waitForEpochNo: number) => {

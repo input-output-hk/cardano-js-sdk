@@ -1,4 +1,4 @@
-import { SingleAddressWallet, buildTx } from '@cardano-sdk/wallet';
+import { SingleAddressWallet } from '@cardano-sdk/wallet';
 import { assertTxIsValid } from '../../../../wallet/test/util';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import { getEnv, getWallet, walletVariables } from '../../../src';
@@ -32,27 +32,27 @@ describe('SingleAddressWallet/txChainHistory', () => {
     logger.info(`Address ${sendingAddress} will send ${tAdaToSend} lovelace to address ${receivingAddress}.`);
 
     // Send 10 tADA to the same wallet.
-    const txBuilder = buildTx({ logger, observableWallet: wallet });
+    const txBuilder = await wallet.createTxBuilder();
     const txOutput = txBuilder.buildOutput().address(receivingAddress).coin(tAdaToSend).toTxOut();
     const unsignedTx = await txBuilder.addOutput(txOutput).build();
 
     assertTxIsValid(unsignedTx);
 
     const signedTx = await unsignedTx.sign();
-    await signedTx.submit();
+    await wallet.submitTx(signedTx);
 
     logger.info(
-      `Submitted transaction id: ${signedTx.tx.id}, inputs: ${JSON.stringify(
-        signedTx.tx.body.inputs.map((txIn) => [txIn.txId, txIn.index])
+      `Submitted transaction id: ${signedTx.id}, inputs: ${JSON.stringify(
+        signedTx.body.inputs.map((txIn) => [txIn.txId, txIn.index])
       )} and outputs:${JSON.stringify(
-        signedTx.tx.body.outputs.map((txOut) => [txOut.address, Number.parseInt(txOut.value.coins.toString())])
+        signedTx.body.outputs.map((txOut) => [txOut.address, Number.parseInt(txOut.value.coins.toString())])
       )}.`
     );
 
     // Search chain history to see if the transaction is there.
     const txFoundInHistory = await firstValueFrom(
       wallet.transactions.history$.pipe(
-        map((txs) => txs.find((tx) => tx.id === signedTx.tx.id)),
+        map((txs) => txs.find((tx) => tx.id === signedTx.id)),
         filter(isNotNil),
         take(1)
       )
@@ -62,7 +62,7 @@ describe('SingleAddressWallet/txChainHistory', () => {
 
     // Assert
     expect(txFoundInHistory).toBeDefined();
-    expect(txFoundInHistory.id).toEqual(signedTx.tx.id);
-    expect(normalizeTxBody(txFoundInHistory.body)).toEqual(normalizeTxBody(signedTx.tx.body));
+    expect(txFoundInHistory.id).toEqual(signedTx.id);
+    expect(normalizeTxBody(txFoundInHistory.body)).toEqual(normalizeTxBody(signedTx.body));
   });
 });

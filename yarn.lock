@@ -2464,7 +2464,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cardano-sdk/crypto@^0.1.4, @cardano-sdk/crypto@workspace:packages/crypto":
+"@cardano-sdk/crypto@^0.1.4, @cardano-sdk/crypto@workspace:^, @cardano-sdk/crypto@workspace:packages/crypto":
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/crypto@workspace:packages/crypto"
   dependencies:
@@ -2546,6 +2546,7 @@ __metadata:
     "@cardano-sdk/ogmios": ^0.11.0
     "@cardano-sdk/projection": ^0.6.0
     "@cardano-sdk/projection-typeorm": ^0.2.0
+    "@cardano-sdk/tx-construction": "workspace:^"
     "@cardano-sdk/util": ^0.9.0
     "@cardano-sdk/util-dev": ^0.9.0
     "@cardano-sdk/util-rxjs": ^0.4.7
@@ -2689,7 +2690,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cardano-sdk/key-management@^0.5.1, @cardano-sdk/key-management@workspace:packages/key-management":
+"@cardano-sdk/key-management@^0.5.1, @cardano-sdk/key-management@workspace:^, @cardano-sdk/key-management@workspace:packages/key-management":
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/key-management@workspace:packages/key-management"
   dependencies:
@@ -2807,13 +2808,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cardano-sdk/tx-construction@^0.4.0, @cardano-sdk/tx-construction@workspace:packages/tx-construction":
+"@cardano-sdk/tx-construction@^0.4.0, @cardano-sdk/tx-construction@workspace:^, @cardano-sdk/tx-construction@workspace:packages/tx-construction":
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/tx-construction@workspace:packages/tx-construction"
   dependencies:
     "@cardano-sdk/core": ^0.11.0
-    "@cardano-sdk/crypto": ^0.1.4
+    "@cardano-sdk/crypto": "workspace:^"
     "@cardano-sdk/input-selection": ^0.9.1
+    "@cardano-sdk/key-management": "workspace:^"
     "@cardano-sdk/util": ^0.9.0
     "@cardano-sdk/util-dev": ^0.9.0
     "@types/lodash": ^4.14.182

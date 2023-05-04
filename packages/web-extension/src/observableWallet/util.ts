@@ -17,6 +17,7 @@ export const observableWalletProperties: RemoteApiProperties<ObservableWallet> =
       unspendable$: RemoteApiPropertyType.HotObservable
     }
   },
+  createTxBuilder: RemoteApiPropertyType.MethodReturningPromise,
   currentEpoch$: RemoteApiPropertyType.HotObservable,
   delegation: {
     rewardAccounts$: RemoteApiPropertyType.HotObservable,

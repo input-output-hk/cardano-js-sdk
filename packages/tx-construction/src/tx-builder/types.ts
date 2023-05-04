@@ -35,23 +35,13 @@ export class OutputValidationTokenBundleSizeError extends CustomError {
   }
 }
 
-export class TxAlreadySubmittedError extends CustomError {
-  public constructor() {
-    super('TxBuilder instance cannot be reused after a transaction is submitted');
-  }
-}
-
-export class IncompatibleWalletError extends CustomError {}
+export class RewardAccountMissingError extends CustomError {}
 
 export type TxOutValidationError =
   | OutputValidationMissingRequiredError
   | OutputValidationMinimumCoinError
   | OutputValidationTokenBundleSizeError;
-export type TxBodyValidationError =
-  | TxOutValidationError
-  | InputSelectionError
-  | IncompatibleWalletError
-  | TxAlreadySubmittedError;
+export type TxBodyValidationError = TxOutValidationError | InputSelectionError | RewardAccountMissingError;
 
 export type Valid<TValid> = TValid & {
   isValid: true;
@@ -71,8 +61,8 @@ export type InvalidTxOut = Invalid<TxOutValidationError>;
 export type MaybeValidTxOut = ValidTxOut | InvalidTxOut;
 
 /**
- * Helps build transaction outputs from it's constituent parts.
- * Usage examples are in the unit/integration tests from `builtTx.test.ts`.
+ * Helps build transaction outputs from its constituent parts.
+ * Usage examples are in the unit/integration tests from `TxBuilder.test.ts`.
  */
 export interface OutputBuilder {
   /**
@@ -114,14 +104,7 @@ export interface OutputBuilder {
   build(): Promise<MaybeValidTxOut>;
 }
 
-export interface SignedTx {
-  readonly tx: Cardano.Tx;
-  /**
-   * Once the transaction is successfully submitted, calls to the same txBuilder {@link TxBuilder.build} method
-   * will fail with {@link TxAlreadySubmittedError} exception.
-   */
-  submit(): Promise<void>;
-}
+export type SignedTx = Cardano.Tx;
 
 /** Transaction body built with {@link TxBuilder.build}. */
 export interface ValidTxBody {
@@ -196,18 +179,9 @@ export interface TxBuilder {
    * @returns {Promise<MaybeValidTx>}
    * - In case it is a {@link ValidTx}, it can be used to sign and submit the transaction.
    *   This is a snapshot of transaction. Further changes done via TxBuilder, will not update this snapshot.
-   *   Once a transaction is successfully submitted, the TxBuilder cannot be reused.
-   * - In case of it is an `InvalidTx`, it embeds a TxBodyValidationError with more details.
-   * - `InvalidTx` embeds a {@link TxAlreadySubmittedError} error if a transaction built by this TxBuilder
-   *   was already successfully submitted.
+   * - In case it is an `InvalidTx`, it embeds a TxBodyValidationError with more details.
    */
   build(): Promise<MaybeValidTx>;
-
-  /**
-   * @returns true if a transaction built with this `TxBuilder` was already successfully submitted.
-   *          In this case, the TxBuilder cannot be reused to build other transactions.
-   */
-  isSubmitted(): boolean;
 
   // TODO:
   // - setMint

@@ -1,35 +1,34 @@
 /* eslint-disable func-style */
 /* eslint-disable jsdoc/require-jsdoc */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AssetId, logger, somePartialStakePools } from '@cardano-sdk/util-dev';
-import { Cardano, CardanoNodeErrors } from '@cardano-sdk/core';
+import { AssetId, somePartialStakePools } from '@cardano-sdk/util-dev';
+import { Cardano } from '@cardano-sdk/core';
 
 import { of } from 'rxjs';
 
 import * as mocks from '../../../core/test/mocks';
 import {
-  IncompatibleWalletError,
+  GenericTxBuilder,
   OutputBuilder,
   OutputValidation,
   OutputValidationMinimumCoinError,
   OutputValidationMissingRequiredError,
   OutputValidationTokenBundleSizeError,
   OutputValidator,
-  StakeKeyStatus,
-  TxAlreadySubmittedError,
+  RewardAccountMissingError,
   TxBuilder,
   TxOutputFailure
-} from '@cardano-sdk/tx-construction';
+} from '../..';
 import { KeyRole, SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
-import { ObservableWallet, buildTx } from '../../src';
-import { assertTxIsValid, assertTxOutIsValid } from '../util';
-import { createWallet } from './util';
+import { ObservableWallet, SingleAddressWallet } from '../../../wallet/src';
+import { assertTxIsValid, assertTxOutIsValid } from '../../../wallet/test/util';
+import { createWallet } from '../../../wallet/test/integration/util';
 
 function assertObjectRefsAreDifferent(obj1: unknown, obj2: unknown): void {
   expect(obj1).not.toBe(obj2);
 }
 
-describe('buildTx', () => {
+describe('GenericTxBuilder', () => {
   let observableWallet: ObservableWallet;
   let txBuilder: TxBuilder;
   let output: Cardano.TxOut;
@@ -39,7 +38,7 @@ describe('buildTx', () => {
     ({ wallet: observableWallet } = await createWallet());
     output = mocks.utxo[0][1];
     output2 = mocks.utxo[1][1];
-    txBuilder = buildTx({ logger, observableWallet });
+    txBuilder = await observableWallet.createTxBuilder();
   });
 
   afterEach(() => observableWallet.shutdown());
@@ -109,7 +108,7 @@ describe('buildTx', () => {
       expect(tx.auxiliaryData?.blob).toEqual(metadata);
 
       const signedTx = await tx.sign();
-      expect(signedTx.tx.auxiliaryData?.blob).toEqual(metadata);
+      expect(signedTx.auxiliaryData?.blob).toEqual(metadata);
     });
   });
 
@@ -146,7 +145,7 @@ describe('buildTx', () => {
       expect(tx.extraSigners).toEqual(signers);
 
       const signedTx = await tx.sign();
-      expect(signedTx.tx.witness.signatures.get(pubKey)).toEqual(signature);
+      expect(signedTx.witness.signatures.get(pubKey)).toEqual(signature);
     });
   });
 
@@ -168,20 +167,6 @@ describe('buildTx', () => {
       txBuilder.setSigningOptions(signingOptions);
       txBuilder.setSigningOptions({});
       expect(txBuilder.signingOptions?.additionalKeyPaths).toBeFalsy();
-    });
-
-    it('uses signingOptions to finalize transaction when submitting', async () => {
-      const origFinalizeTx = observableWallet.finalizeTx;
-      observableWallet.finalizeTx = jest.fn(origFinalizeTx);
-
-      const tx = await txBuilder.addOutput(mocks.utxo[0][1]).setSigningOptions(signingOptions).build();
-      assertTxIsValid(tx);
-
-      // ValidTxBody contains signingOptions
-      expect(tx.signingOptions).toEqual(signingOptions);
-
-      await (await tx.sign()).submit();
-      expect(observableWallet.finalizeTx).toHaveBeenLastCalledWith(expect.objectContaining({ signingOptions }));
     });
   });
 
@@ -371,12 +356,13 @@ describe('buildTx', () => {
       expect(delegationCert.poolId).toBe(poolIdOther);
     });
 
-    it('throws IncompatibleWallet error if no reward accounts were found', async () => {
+    it('throws RewardAccountMissingError error if no reward accounts were found', async () => {
       observableWallet.delegation.rewardAccounts$ = of([]);
-      const txBuilt = await txBuilder.delegate(poolId).build();
+      const txBuilder2 = await observableWallet.createTxBuilder();
+      const txBuilt = await txBuilder2.delegate(poolId).build();
       if (!txBuilt.isValid) {
         expect(txBuilt.errors?.length).toBe(1);
-        expect(txBuilt.errors[0] instanceof IncompatibleWalletError).toBeTruthy();
+        expect(txBuilt.errors[0] instanceof RewardAccountMissingError).toBeTruthy();
       }
       expect.assertions(2);
     });
@@ -390,11 +376,12 @@ describe('buildTx', () => {
             nextEpoch: undefined,
             nextNextEpoch: undefined
           },
-          keyStatus: StakeKeyStatus.Registered,
+          keyStatus: Cardano.StakeKeyStatus.Registered,
           rewardBalance: 33_333n
         }
       ]);
-      const txDelegate = await txBuilder.delegate(poolId).build();
+      const txBuilder2 = await observableWallet.createTxBuilder();
+      const txDelegate = await txBuilder2.delegate(poolId).build();
       assertTxIsValid(txDelegate);
       expect(txDelegate.body.certificates?.length).toBe(1);
       const [delegationCert] = txDelegate.body.certificates!;
@@ -414,7 +401,7 @@ describe('buildTx', () => {
             nextEpoch: undefined,
             nextNextEpoch: undefined
           },
-          keyStatus: StakeKeyStatus.Unregistered,
+          keyStatus: Cardano.StakeKeyStatus.Unregistered,
           rewardBalance: 33_333n
         },
         {
@@ -424,12 +411,12 @@ describe('buildTx', () => {
             nextEpoch: undefined,
             nextNextEpoch: undefined
           },
-          keyStatus: StakeKeyStatus.Unregistered,
+          keyStatus: Cardano.StakeKeyStatus.Unregistered,
           rewardBalance: 44_444n
         }
       ]);
-
-      const txDelegate = await txBuilder.delegate(poolId).build();
+      const txBuilder2 = await observableWallet.createTxBuilder();
+      const txDelegate = await txBuilder2.delegate(poolId).build();
       assertTxIsValid(txDelegate);
       expect(txDelegate.body.certificates?.length).toBe(4);
     });
@@ -443,11 +430,12 @@ describe('buildTx', () => {
             nextEpoch: undefined,
             nextNextEpoch: undefined
           },
-          keyStatus: StakeKeyStatus.Registered,
+          keyStatus: Cardano.StakeKeyStatus.Registered,
           rewardBalance: 33_333n
         }
       ]);
-      const txDeregister = await txBuilder.delegate().build();
+      const txBuilder2 = await observableWallet.createTxBuilder();
+      const txDeregister = await txBuilder2.delegate().build();
       assertTxIsValid(txDeregister);
       expect(txDeregister.body.certificates?.length).toBe(1);
       const [deregisterCert] = txDeregister.body.certificates!;
@@ -458,38 +446,6 @@ describe('buildTx', () => {
       const txDeregister = await txBuilder.delegate().build();
       assertTxIsValid(txDeregister);
       expect(txDeregister.body.certificates?.length).toBeFalsy();
-    });
-  });
-
-  describe('after sign and submit', () => {
-    beforeEach(async () => {
-      const tx = await txBuilder.addOutput(mocks.utxo[0][1]).build();
-      assertTxIsValid(tx);
-      await (await tx.sign()).submit();
-    });
-
-    it('cannot rebuild', async () => {
-      expect(txBuilder.isSubmitted()).toBeTruthy();
-      const tx = await txBuilder.build();
-      expect(tx.isValid).toBeFalsy();
-      if (!tx.isValid) {
-        expect(tx.errors[0] instanceof TxAlreadySubmittedError).toBeTruthy();
-      }
-    });
-
-    it('can rebuild when submit is not successful', async () => {
-      const txBuilder2 = buildTx({ logger, observableWallet });
-      observableWallet.submitTx = jest.fn().mockRejectedValue(null);
-      const tx = await txBuilder2.addOutput(mocks.utxo[1][1]).build();
-      assertTxIsValid(tx);
-
-      // submit fails
-      await expect((await tx.sign()).submit()).rejects.toBe(null);
-      expect(txBuilder2.isSubmitted()).toBeFalsy();
-
-      // can rebuild because submit was not successful
-      const tx2 = await txBuilder2.build();
-      assertTxIsValid(tx2);
     });
   });
 
@@ -516,7 +472,9 @@ describe('buildTx', () => {
         validateValue: jest.fn(),
         validateValues: jest.fn()
       };
-      const builder = buildTx({ logger, observableWallet, outputValidator: mockValidator }).addOutput(output);
+      const singleAddrWallet = observableWallet as SingleAddressWallet;
+      const builder = new GenericTxBuilder(singleAddrWallet.getTxBuilderDependencies(), mockValidator);
+      builder.addOutput(output);
       const tx = await builder.addOutput(builder.buildOutput(output2).toTxOut()).build();
 
       expect(tx.isValid).toBeFalsy();
@@ -536,38 +494,14 @@ describe('buildTx', () => {
         expect(error2.txOut).toEqual(output2);
       }
     });
-
-    it('rejects if error is encountered during transaction finalization', async () => {
-      const signError = new Error('oh no, signing error');
-
-      const builtTx = await buildTx({ logger, observableWallet }).addOutput(output).build();
-      assertTxIsValid(builtTx);
-
-      observableWallet.finalizeTx = jest.fn().mockRejectedValue(signError);
-
-      await expect(builtTx.sign()).rejects.toBe(signError);
-    });
-
-    it('rejects if error is encountered during submission', async () => {
-      const submitErr = new CardanoNodeErrors.TxSubmissionErrors.AlreadyDelegatingError({
-        alreadyDelegating: 'that is just terrible'
-      });
-      observableWallet.submitTx = jest.fn().mockRejectedValue(submitErr);
-
-      const builtTx = await buildTx({ logger, observableWallet }).addOutput(output).build();
-      assertTxIsValid(builtTx);
-      const signedTx = await builtTx.sign();
-      await expect(signedTx.submit()).rejects.toBe(submitErr);
-    });
   });
 
-  it('can be used to build, sign and submit a tx', async () => {
-    const tx = await buildTx({ logger, observableWallet }).addOutput(mocks.utxo[0][1]).build();
+  it('can be used to build and sign a tx', async () => {
+    const tx = await (await observableWallet.createTxBuilder()).addOutput(mocks.utxo[0][1]).build();
     if (tx.isValid) {
       expect(tx.inputSelection).toBeTruthy();
       const signedTx = await tx.sign();
-      expect(signedTx.tx.id).toEqual(tx.hash);
-      await signedTx.submit();
+      expect(signedTx.id).toEqual(tx.hash);
     } else {
       expect(tx.errors.length).toBeGreaterThan(0);
       throw new Error('Invalid tx');

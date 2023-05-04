@@ -1,60 +1,25 @@
 import * as Crypto from '@cardano-sdk/crypto';
+import { AsyncKeyAgent, GroupedAddress, SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
+import { Logger } from 'ts-log';
+import { contextLogger, deepEquals } from '@cardano-sdk/util';
+
+import { FinalizeTxProps, InitializeTxResult, TxBuilderDependencies } from '../types';
 import {
-  FinalizeTxProps,
-  IncompatibleWalletError,
-  InitializeTxProps,
-  InitializeTxResult,
   MaybeValidTx,
   OutputBuilder,
-  OutputValidator,
   PartialTxOut,
-  RewardAccount,
+  RewardAccountMissingError,
   SignedTx,
-  StakeKeyStatus,
-  TxAlreadySubmittedError,
   TxBodyValidationError,
   TxBuilder,
   TxOutValidationError,
-  TxOutputBuilder,
-  ValidTx,
-  createOutputValidator
-} from '@cardano-sdk/tx-construction';
-import { Logger } from 'ts-log';
-import { Observable, firstValueFrom } from 'rxjs';
-import { ObservableWallet } from '../types';
-import { SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
-import { WalletUtilContext } from '../services';
-import { contextLogger, deepEquals } from '@cardano-sdk/util';
-
-/**
- * Minimal sub-type of ObservableWallet that is used by TxBuilder.
- */
-export type ObservableWalletTxBuilderDependencies = Pick<ObservableWallet, 'submitTx'> & {
-  delegation: { rewardAccounts$: Observable<Pick<RewardAccount, 'address' | 'keyStatus'>[]> };
-} & {
-  initializeTx: (
-    props: Pick<InitializeTxProps, 'auxiliaryData' | 'outputs' | 'signingOptions' | 'certificates' | 'witness'>
-  ) => ReturnType<ObservableWallet['initializeTx']>;
-} & {
-  finalizeTx: (
-    props: Pick<FinalizeTxProps, 'auxiliaryData' | 'tx' | 'signingOptions' | 'witness'>
-  ) => ReturnType<ObservableWallet['finalizeTx']>;
-} & WalletUtilContext;
-
-/**
- * Properties needed by {@link buildTx} to build a {@link ObservableWalletTxBuilder} TxBuilder
- *
- * - {@link BuildTxProps.observableWallet} minimal ObservableWallet needed to do actions like {@link ObservableWalletTxBuilder.build},
- *   {@link ObservableWalletTxBuilder.delegate} etc.
- * - {@link BuildTxProps.outputValidator} optional custom output validator util.
- *   Uses {@link createWalletUtil} by default.
- */
-export interface BuildTxProps {
-  observableWallet: ObservableWalletTxBuilderDependencies;
-  outputValidator?: OutputValidator;
-  logger: Logger;
-}
+  ValidTx
+} from './types';
+import { OutputValidator, createOutputValidator } from '../output-validation';
+import { TxOutputBuilder } from './OutputBuilder';
+import { finalizeTx } from './finalizeTx';
+import { initializeTx } from './initializeTx';
 
 interface Delegate {
   type: 'delegate';
@@ -67,70 +32,52 @@ interface KeyDeregistration {
 type DelegateConfig = Delegate | KeyDeregistration;
 
 /**
- * Transactions built with {@link ObservableWalletTxBuilder.build} method, use this method to sign the transaction.
+ * Transactions built with {@link GenericTxBuilder.build} method, use this method to sign the transaction.
  *
- * @returns Promise with `SignedTx` object that has a {@link SignedTx.submit} method that submits the transaction.
+ * @returns Promise with `SignedTx`.
  */
 const createSignedTx = async ({
-  wallet,
   tx,
   witness,
   signingOptions,
   auxiliaryData,
-  afterSubmitCb,
-  logger
+  inputResolver,
+  keyAgent,
+  addresses
 }: FinalizeTxProps & {
-  wallet: ObservableWalletTxBuilderDependencies;
-  afterSubmitCb: () => void;
-  logger: Logger;
-}): Promise<SignedTx> => {
-  const finalizedTx = await wallet.finalizeTx({
-    auxiliaryData,
-    signingOptions,
-    tx,
-    witness
-  });
-  return {
-    submit: async () => {
-      logger.debug('submitting', finalizedTx);
-      await wallet.submitTx(finalizedTx);
-      return afterSubmitCb();
+  inputResolver: Cardano.InputResolver;
+  keyAgent: AsyncKeyAgent;
+  addresses: GroupedAddress[];
+}): Promise<SignedTx> =>
+  await finalizeTx(
+    {
+      addresses,
+      auxiliaryData,
+      signingOptions,
+      tx,
+      witness
     },
-    tx: finalizedTx
-  };
-};
+    { inputResolver, keyAgent }
+  );
 
-/**
- * `TxBuilder` concrete implementation, based on `ObservableWalletTxBuilderDependencies`.
- * It relies on `ObservableWalletTxBuilderDependencies` for building, signing, sending, etc.
- * Usage examples are in the unit/integration tests from `builtTx.test.ts`.
- */
-export class ObservableWalletTxBuilder implements TxBuilder {
+export class GenericTxBuilder implements TxBuilder {
   partialTxBody: Partial<Cardano.TxBody> = {};
   auxiliaryData?: Cardano.AuxiliaryData;
   extraSigners?: TransactionSigner[];
   signingOptions?: SignTransactionOptions;
 
-  #observableWallet: ObservableWalletTxBuilderDependencies;
+  #dependencies: TxBuilderDependencies;
   #outputValidator: OutputValidator;
   #delegateConfig: DelegateConfig;
   #logger: Logger;
-  #isSubmitted = false; // Do not allow building if a transaction built by this builder was already submitted
 
-  constructor({
-    observableWallet,
-    outputValidator = createOutputValidator({
-      protocolParameters: () => firstValueFrom(observableWallet.protocolParameters$)
-    }),
-    logger
-  }: BuildTxProps) {
-    this.#observableWallet = observableWallet;
+  constructor(
+    dependencies: TxBuilderDependencies,
+    outputValidator = createOutputValidator({ protocolParameters: dependencies.txBuilderProviders.protocolParameters })
+  ) {
     this.#outputValidator = outputValidator;
-    this.#logger = logger;
-  }
-
-  isSubmitted(): boolean {
-    return this.#isSubmitted;
+    this.#dependencies = dependencies;
+    this.#logger = dependencies.logger;
   }
 
   addOutput(txOut: Cardano.TxOut): TxBuilder {
@@ -176,7 +123,6 @@ export class ObservableWalletTxBuilder implements TxBuilder {
 
   async build(): Promise<MaybeValidTx> {
     try {
-      if (this.isSubmitted()) throw new TxAlreadySubmittedError();
       this.#logger.debug('Building');
       await this.#addDelegationCertificates();
       await this.#validateOutputs();
@@ -184,13 +130,16 @@ export class ObservableWalletTxBuilder implements TxBuilder {
       if (this.auxiliaryData)
         this.partialTxBody.auxiliaryDataHash = Cardano.computeAuxiliaryDataHash(this.auxiliaryData);
 
-      const tx = await this.#observableWallet.initializeTx({
-        auxiliaryData: this.auxiliaryData,
-        certificates: this.partialTxBody.certificates,
-        outputs: new Set(this.partialTxBody.outputs || []),
-        signingOptions: this.signingOptions,
-        witness: { extraSigners: this.extraSigners }
-      });
+      const tx = await initializeTx(
+        {
+          auxiliaryData: this.auxiliaryData,
+          certificates: this.partialTxBody.certificates,
+          outputs: new Set(this.partialTxBody.outputs || []),
+          signingOptions: this.signingOptions,
+          witness: { extraSigners: this.extraSigners }
+        },
+        this.#dependencies
+      );
       return this.#createValidTx(tx);
     } catch (error) {
       const errors = Array.isArray(error) ? (error as TxBodyValidationError[]) : [error as TxBodyValidationError];
@@ -211,14 +160,14 @@ export class ObservableWalletTxBuilder implements TxBuilder {
       hash: tx.hash,
       inputSelection: tx.inputSelection,
       isValid: true,
-      sign: () =>
+      sign: async () =>
         createSignedTx({
-          afterSubmitCb: () => (this.#isSubmitted = true),
+          addresses: await this.#dependencies.txBuilderProviders.addresses(),
           auxiliaryData: this.auxiliaryData && { ...this.auxiliaryData },
-          logger: contextLogger(this.#logger, 'signedTx'),
+          inputResolver: this.#dependencies.inputResolver,
+          keyAgent: this.#dependencies.keyAgent,
           signingOptions: this.signingOptions && { ...this.signingOptions },
           tx,
-          wallet: this.#observableWallet,
           witness: { extraSigners: this.extraSigners && [...this.extraSigners] }
         }),
       signingOptions: this.signingOptions && { ...this.signingOptions }
@@ -242,11 +191,11 @@ export class ObservableWalletTxBuilder implements TxBuilder {
       return Promise.resolve();
     }
 
-    const rewardAccounts = await firstValueFrom(this.#observableWallet.delegation.rewardAccounts$);
+    const rewardAccounts = await this.#dependencies.txBuilderProviders.rewardAccounts();
 
     if (!rewardAccounts?.length) {
       // This shouldn't happen
-      throw new IncompatibleWalletError();
+      throw new RewardAccountMissingError();
     }
 
     // Discard previous delegation and prepare for new one
@@ -256,7 +205,7 @@ export class ObservableWalletTxBuilder implements TxBuilder {
       const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount.address);
       if (this.#delegateConfig.type === 'deregister') {
         // Deregister scenario
-        if (rewardAccount.keyStatus === StakeKeyStatus.Unregistered) {
+        if (rewardAccount.keyStatus === Cardano.StakeKeyStatus.Unregistered) {
           this.#logger.warn(
             'Skipping stake key deregister. Stake key not registered.',
             rewardAccount.address,
@@ -270,7 +219,7 @@ export class ObservableWalletTxBuilder implements TxBuilder {
         }
       } else if (this.#delegateConfig.type === 'delegate') {
         // Register and delegate scenario
-        if (rewardAccount.keyStatus !== StakeKeyStatus.Unregistered) {
+        if (rewardAccount.keyStatus !== Cardano.StakeKeyStatus.Unregistered) {
           this.#logger.debug(
             'Skipping stake key register. Stake key already registered',
             rewardAccount.address,
@@ -284,7 +233,7 @@ export class ObservableWalletTxBuilder implements TxBuilder {
         }
 
         this.partialTxBody.certificates!.push(
-          ObservableWalletTxBuilder.#createDelegationCert(this.#delegateConfig.poolId, stakeKeyHash)
+          GenericTxBuilder.#createDelegationCert(this.#delegateConfig.poolId, stakeKeyHash)
         );
       }
     }
@@ -301,11 +250,3 @@ export class ObservableWalletTxBuilder implements TxBuilder {
     };
   }
 }
-
-/**
- * Factory function to create an {@link ObservableWalletTxBuilder}.
- *
- * `ObservableWallet.buildTx()` would be nice, but it adds quite a lot of complexity
- * to web-extension messaging, so it will be separate util like this one for MVP.
- */
-export const buildTx = (props: BuildTxProps): TxBuilder => new ObservableWalletTxBuilder(props);

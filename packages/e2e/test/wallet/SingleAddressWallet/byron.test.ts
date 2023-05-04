@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { Cardano } from '@cardano-sdk/core';
-import { SingleAddressWallet, buildTx } from '@cardano-sdk/wallet';
+import { SingleAddressWallet } from '@cardano-sdk/wallet';
 import { assertTxIsValid } from '../../../../wallet/test/util';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, map, take } from 'rxjs';
@@ -26,7 +26,7 @@ describe('SingleAddressWallet/byron', () => {
   it('can transfer tADA to a byron address', async () => {
     await walletReady(wallet);
 
-    const txBuilder = buildTx({ logger, observableWallet: wallet });
+    const txBuilder = await wallet.createTxBuilder();
 
     const txOutput = txBuilder
       .buildOutput()
@@ -39,12 +39,12 @@ describe('SingleAddressWallet/byron', () => {
     assertTxIsValid(unsignedTx);
 
     const signedTx = await unsignedTx.sign();
-    await signedTx.submit();
+    await wallet.submitTx(signedTx);
 
     // Search chain history to see if the transaction is there.
     const txFoundInHistory = await firstValueFrom(
       wallet.transactions.history$.pipe(
-        map((txs) => txs.find((tx) => tx.id === signedTx.tx.id)),
+        map((txs) => txs.find((tx) => tx.id === signedTx.id)),
         filter(isNotNil),
         take(1)
       )
@@ -52,7 +52,7 @@ describe('SingleAddressWallet/byron', () => {
 
     // Assert
     expect(txFoundInHistory).toBeDefined();
-    expect(txFoundInHistory.id).toEqual(signedTx.tx.id);
-    expect(normalizeTxBody(txFoundInHistory.body)).toEqual(normalizeTxBody(signedTx.tx.body));
+    expect(txFoundInHistory.id).toEqual(signedTx.id);
+    expect(normalizeTxBody(txFoundInHistory.body)).toEqual(normalizeTxBody(signedTx.body));
   });
 });

@@ -3,7 +3,10 @@ import { roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 
 import { Cardano } from '@cardano-sdk/core';
 import { InitializeTxProps, InitializeTxResult, TxBuilderDependencies } from '../types';
-import { createTransactionInternals, defaultSelectionConstraints, ensureValidityInterval, finalizeTx } from '../';
+import { createTransactionInternals } from '../createTransactionInternals';
+import { defaultSelectionConstraints } from '../input-selection';
+import { ensureValidityInterval } from '../ensureValidityInterval';
+import { finalizeTx } from './finalizeTx';
 
 export const initializeTx = async (
   props: InitializeTxProps,
