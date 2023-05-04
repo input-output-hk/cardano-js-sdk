@@ -9,7 +9,9 @@ import {
   OutputBuilder,
   OutputValidator,
   PartialTxOut,
+  RewardAccount,
   SignedTx,
+  StakeKeyStatus,
   TxAlreadySubmittedError,
   TxBodyValidationError,
   TxBuilder,
@@ -21,8 +23,8 @@ import {
 import { Logger } from 'ts-log';
 import { Observable, firstValueFrom } from 'rxjs';
 import { ObservableWallet } from '../types';
-import { RewardAccount, StakeKeyStatus, WalletUtilContext } from '../services';
 import { SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
+import { WalletUtilContext } from '../services';
 import { contextLogger, deepEquals } from '@cardano-sdk/util';
 
 /**

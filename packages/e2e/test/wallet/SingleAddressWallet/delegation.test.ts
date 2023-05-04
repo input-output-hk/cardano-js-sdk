@@ -1,7 +1,7 @@
 /* eslint-disable max-statements */
 import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
-import { ObservableWallet, StakeKeyStatus, buildTx } from '@cardano-sdk/wallet';
+import { ObservableWallet, buildTx } from '@cardano-sdk/wallet';
 import { TX_TIMEOUT_DEFAULT, TestWallet, getEnv, getWallet, walletVariables } from '../../../src';
 import { assertTxIsValid } from '../../../../wallet/test/util';
 import { combineLatest, filter, firstValueFrom } from 'rxjs';
@@ -22,7 +22,7 @@ const getWalletStateSnapshot = async (wallet: ObservableWallet) => {
   return {
     balance: { available: balanceAvailable, deposit, total: balanceTotal },
     epoch: epoch.epochNo,
-    isStakeKeyRegistered: rewardAccount.keyStatus === StakeKeyStatus.Registered,
+    isStakeKeyRegistered: rewardAccount.keyStatus === Cardano.StakeKeyStatus.Registered,
     rewardAccount,
     rewardsBalance,
     utxo: { available: utxoTotal, total: utxoAvailable }

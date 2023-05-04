@@ -1,4 +1,4 @@
-import { BalanceTracker, DelegationTracker, StakeKeyStatus, TransactionalObservables } from './types';
+import { BalanceTracker, DelegationTracker, TransactionalObservables } from './types';
 import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
 
 import { Observable, combineLatest, distinctUntilChanged, map } from 'rxjs';
@@ -16,7 +16,7 @@ const computeDepositCoin = (
     distinctUntilChanged()
   );
 
-const numRewardAccountsWithKeyStatus = (delegationTracker: DelegationTracker, keyStatuses: StakeKeyStatus[]) =>
+const numRewardAccountsWithKeyStatus = (delegationTracker: DelegationTracker, keyStatuses: Cardano.StakeKeyStatus[]) =>
   delegationTracker.rewardAccounts$.pipe(
     map((accounts) => accounts.filter((account) => keyStatuses.includes(account.keyStatus)).length)
   );
@@ -30,7 +30,10 @@ export const createBalanceTracker = (
     // 'Unregistering' balance will be reflected in utxo
     deposit$: computeDepositCoin(
       protocolParameters$,
-      numRewardAccountsWithKeyStatus(delegationTracker, [StakeKeyStatus.Registered, StakeKeyStatus.Registering])
+      numRewardAccountsWithKeyStatus(delegationTracker, [
+        Cardano.StakeKeyStatus.Registered,
+        Cardano.StakeKeyStatus.Registering
+      ])
     ),
     rewards$: delegationTracker.rewardAccounts$.pipe(
       map((accounts) => accounts.reduce((sum, { rewardBalance }) => sum + rewardBalance, 0n)),

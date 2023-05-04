@@ -7,7 +7,6 @@ import { MinimumCoinQuantityPerOutput } from './output-validation';
 
 export type InitializeTxResult = Cardano.TxBodyWithHash & { inputSelection: SelectionSkeleton };
 
-
 export interface TxBuilderDependencies {
   inputResolver: Cardano.InputResolver;
   keyAgent: AsyncKeyAgent;

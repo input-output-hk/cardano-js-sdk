@@ -1,7 +1,6 @@
 /* eslint-disable unicorn/no-nested-ternary */
 import { BigIntMath, deepEquals, isNotNil } from '@cardano-sdk/util';
 import { Cardano, RewardsProvider, StakePoolProvider } from '@cardano-sdk/core';
-import { Delegatee, OutgoingOnChainTx, RewardAccount, StakeKeyStatus, TxInFlight } from '../types';
 import {
   EMPTY,
   Observable,
@@ -19,6 +18,7 @@ import {
   tap
 } from 'rxjs';
 import { KeyValueStore } from '../../persistence';
+import { OutgoingOnChainTx, TxInFlight } from '../types';
 import { PAGE_SIZE } from '../TransactionsTracker';
 import {
   RegAndDeregCertificateTypes,
@@ -157,12 +157,12 @@ const getAccountsKeyStatus =
         address
       );
       return isRegistering
-        ? StakeKeyStatus.Registering
+        ? Cardano.StakeKeyStatus.Registering
         : isUnregistering
-        ? StakeKeyStatus.Unregistering
+        ? Cardano.StakeKeyStatus.Unregistering
         : isRegistered
-        ? StakeKeyStatus.Registered
-        : StakeKeyStatus.Unregistered;
+        ? Cardano.StakeKeyStatus.Registered
+        : Cardano.StakeKeyStatus.Unregistered;
     });
   };
 
@@ -207,7 +207,7 @@ export const createDelegateeTracker = (
   stakePoolProvider: ObservableStakePoolProvider,
   epoch$: Observable<Cardano.EpochNo>,
   certificates$: Observable<TransactionsCertificates>
-): Observable<Delegatee | undefined> =>
+): Observable<Cardano.Delegatee | undefined> =>
   combineLatest([certificates$, epoch$]).pipe(
     switchMap(([transactions, lastEpoch]) => {
       const stakePoolIds = [
@@ -291,9 +291,13 @@ export const addressRewards = (
 
 export const toRewardAccounts =
   (addresses: Cardano.RewardAccount[]) =>
-  ([statuses, delegatees, rewards]: [StakeKeyStatus[], (Delegatee | undefined)[], Cardano.Lovelace[]]) =>
+  ([statuses, delegatees, rewards]: [
+    Cardano.StakeKeyStatus[],
+    (Cardano.Delegatee | undefined)[],
+    Cardano.Lovelace[]
+  ]) =>
     addresses.map(
-      (address, i): RewardAccount => ({
+      (address, i): Cardano.RewardAccountInfo => ({
         address,
         delegatee: delegatees[i],
         keyStatus: statuses[i],

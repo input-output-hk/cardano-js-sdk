@@ -77,10 +77,10 @@ describe('CustomObservableWallet', () => {
       // and another endpoint to get wallet's total reward accounts deposit
       const getAvailableRewardAccountsDeposit: () => Promise<Cardano.Lovelace> = async () => 200_000n;
       // and another endpoint to get wallet's reward accounts info (such as stake pool delegated to)
-      const getRewardAccountsDelegation: () => Promise<RewardAccount[]> = async () => [
+      const getRewardAccountsDelegation: () => Promise<Cardano.RewardAccountInfo[]> = async () => [
         {
           address: Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr'),
-          keyStatus: StakeKeyStatus.Unregistering,
+          keyStatus: Cardano.StakeKeyStatus.Unregistering,
           rewardBalance: 5000n
         }
       ];

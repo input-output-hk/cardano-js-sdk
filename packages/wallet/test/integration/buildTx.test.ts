@@ -15,12 +15,13 @@ import {
   OutputValidationMissingRequiredError,
   OutputValidationTokenBundleSizeError,
   OutputValidator,
+  StakeKeyStatus,
   TxAlreadySubmittedError,
   TxBuilder,
   TxOutputFailure
 } from '@cardano-sdk/tx-construction';
 import { KeyRole, SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
-import { ObservableWallet, StakeKeyStatus, buildTx } from '../../src';
+import { ObservableWallet, buildTx } from '../../src';
 import { assertTxIsValid, assertTxOutIsValid } from '../util';
 import { createWallet } from './util';
 
