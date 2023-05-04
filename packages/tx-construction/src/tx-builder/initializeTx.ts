@@ -1,9 +1,13 @@
-import { ManagedFreeableScope } from '@cardano-sdk/util';
 import { roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 
 import { Cardano } from '@cardano-sdk/core';
-import { InitializeTxProps, InitializeTxResult, TxBuilderDependencies } from '../types';
-import { createTransactionInternals, defaultSelectionConstraints, ensureValidityInterval, finalizeTx } from '../';
+import { InitializeTxProps, InitializeTxResult } from '../types';
+import { TxBuilderDependencies } from './types';
+import { createTransactionInternals } from '../createTransactionInternals';
+import { defaultSelectionConstraints } from '../input-selection';
+import { ensureValidityInterval } from '../ensureValidityInterval';
+import { finalizeTx } from './finalizeTx';
+import { firstValueFrom } from 'rxjs';
 
 export const initializeTx = async (
   props: InitializeTxProps,
@@ -15,14 +19,12 @@ export const initializeTx = async (
     logger
   }: TxBuilderDependencies
 ): Promise<InitializeTxResult> => {
-  const scope = new ManagedFreeableScope();
-
   const [tip, genesisParameters, protocolParameters, addresses, changeAddress, rewardAccounts, utxo] =
     await Promise.all([
       txBuilderProviders.tip(),
       txBuilderProviders.genesisParameters(),
       txBuilderProviders.protocolParameters(),
-      txBuilderProviders.addresses(),
+      firstValueFrom(keyAgent.knownAddresses$),
       txBuilderProviders.changeAddress(),
       txBuilderProviders.rewardAccounts(),
       txBuilderProviders.utxoAvailable()
@@ -41,7 +43,7 @@ export const initializeTx = async (
       if (withdrawals.length > 0) {
         logger.debug('Adding rewards withdrawal in the transaction', withdrawals);
       }
-      const txInternals = await createTransactionInternals({
+      const unsignedTx = await createTransactionInternals({
         auxiliaryData: props.auxiliaryData,
         certificates: props.certificates,
         changeAddress,
@@ -54,18 +56,18 @@ export const initializeTx = async (
         ...(withdrawals.length > 0 ? { withdrawals } : {})
       });
 
-      return await finalizeTx(
+      const { tx } = await finalizeTx(
+        unsignedTx,
         {
-          addresses,
           auxiliaryData: props.auxiliaryData,
-          scripts: props.scripts,
+          ownAddresses: addresses,
           signingOptions: props.signingOptions,
-          tx: txInternals,
           witness: props.witness
         },
         { inputResolver, keyAgent },
         true
       );
+      return tx;
     },
     protocolParameters
   });
@@ -94,6 +96,5 @@ export const initializeTx = async (
     ...(withdrawals.length > 0 ? { withdrawals } : {})
   });
 
-  scope.dispose();
   return { body, hash, inputSelection };
 };

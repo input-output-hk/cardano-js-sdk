@@ -3,7 +3,6 @@ import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { Logger } from 'ts-log';
 
 import {
-  MaybeValidTxOut,
   OutputBuilder,
   OutputValidationMinimumCoinError,
   OutputValidationMissingRequiredError,
@@ -12,10 +11,12 @@ import {
 } from './types';
 import { OutputValidation, OutputValidator } from '../output-validation';
 
+export type OutputBuilderValidator = Pick<OutputValidator, 'validateOutput'>;
+
 /** Properties needed to construct a {@link TxOutputBuilder} */
 export interface OutputBuilderProps {
   /** This validator is normally created and passed as an arg here by the {@link TxBuilder.buildOutput} method */
-  outputValidator: OutputValidator;
+  outputValidator: OutputBuilderValidator;
   /** Optional partial transaction output to use for initialization. */
   txOut?: PartialTxOut;
   /** Logger */
@@ -50,7 +51,7 @@ export class TxOutputBuilder implements OutputBuilder {
    * Every method call recreates the `partialOutput`, thus updating it immutably.
    */
   #partialOutput: PartialTxOut;
-  #outputValidator: OutputValidator;
+  #outputValidator: OutputBuilderValidator;
   #logger: Logger;
 
   constructor({ outputValidator, txOut, logger }: OutputBuilderProps) {
@@ -59,12 +60,25 @@ export class TxOutputBuilder implements OutputBuilder {
     this.#logger = logger;
   }
 
+  /**
+   * Create transaction output snapshot, as it was configured until the point of calling this method.
+   *
+   * @returns {Cardano.TxOut} transaction output snapshot.
+   *  - It can be used in {@link TxBuilder.addOutput}.
+   *  - It will be validated once {@link TxBuilder.build} method is called.
+   * @throws OutputValidationMissingRequiredError {@link OutputValidationMissingRequiredError} if
+   * the mandatory fields 'address' or 'coins' are missing
+   */
   toTxOut(): Cardano.TxOut {
     if (!isViableTxOut(this.#partialOutput)) {
       throw new OutputValidationMissingRequiredError(this.#partialOutput);
     }
     this.#logger.debug('toTxOut result:', this.#partialOutput);
     return { ...this.#partialOutput };
+  }
+
+  async inspect(): Promise<PartialTxOut> {
+    return this.#partialOutput;
   }
 
   value(value: Cardano.Value): OutputBuilder {
@@ -102,22 +116,14 @@ export class TxOutputBuilder implements OutputBuilder {
     return this;
   }
 
-  async build(): Promise<MaybeValidTxOut> {
-    let txOut: Cardano.TxOut;
-    try {
-      txOut = this.toTxOut();
-    } catch (error) {
-      return Promise.resolve({
-        errors: [error as OutputValidationMissingRequiredError],
-        isValid: false
-      });
-    }
+  async build(): Promise<Cardano.TxOut> {
+    const txOut = this.toTxOut();
 
     const outputValidation = toOutputValidationError(txOut, await this.#outputValidator.validateOutput(txOut));
     if (outputValidation) {
-      return { errors: [outputValidation], isValid: false };
+      throw outputValidation;
     }
 
-    return { isValid: true, txOut };
+    return txOut;
   }
 }
