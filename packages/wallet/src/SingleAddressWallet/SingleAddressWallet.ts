@@ -15,7 +15,14 @@ import {
   TxSubmitProvider,
   UtxoProvider
 } from '@cardano-sdk/core';
-import { Assets, ObservableWallet, SignDataProps, SyncStatus, WalletNetworkInfoProvider } from '../types';
+import {
+  Assets,
+  FinalizeTxProps,
+  ObservableWallet,
+  SignDataProps,
+  SyncStatus,
+  WalletNetworkInfoProvider
+} from '../types';
 import {
   BalanceTracker,
   ConnectionStatus,
@@ -55,6 +62,7 @@ import { BehaviorObservable, TrackerSubject } from '@cardano-sdk/util-rxjs';
 import {
   BehaviorSubject,
   EMPTY,
+  Observable,
   Subject,
   Subscription,
   catchError,
@@ -65,11 +73,12 @@ import {
   from,
   map,
   mergeMap,
+  switchMap,
   tap
 } from 'rxjs';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import {
-  FinalizeTxProps,
+  GenericTxBuilder,
   InitializeTxProps,
   InitializeTxResult,
   TxBuilderDependencies,
@@ -432,15 +441,21 @@ export class SingleAddressWallet implements ObservableWallet {
   }
 
   async initializeTx(props: InitializeTxProps): Promise<InitializeTxResult> {
-    return initializeTx(props, this.#getTxBuilderDependencies());
+    return initializeTx(props, this.getTxBuilderDependencies());
   }
 
-  async finalizeTx(props: FinalizeTxProps, stubSign = false): Promise<Cardano.Tx> {
-    return finalizeTx(
-      { ...props, addresses: await firstValueFrom(this.addresses$) },
+  async finalizeTx({ tx, ...rest }: FinalizeTxProps, stubSign = false): Promise<Cardano.Tx> {
+    const { tx: signedTx } = await finalizeTx(
+      tx,
+      { ...rest, ownAddresses: await firstValueFrom(this.addresses$) },
       { inputResolver: this.util, keyAgent: this.keyAgent },
       stubSign
     );
+    return signedTx;
+  }
+
+  createTxBuilder() {
+    return new GenericTxBuilder(this.getTxBuilderDependencies());
   }
 
   async submitTx(
@@ -520,21 +535,35 @@ export class SingleAddressWallet implements ObservableWallet {
     this.#logger.debug('Shutdown');
   }
 
-  #getTxBuilderDependencies(): TxBuilderDependencies {
+  /**
+   * Utility function that creates the TxBuilderDependencies based on the SingleAddressWallet observables.
+   * All dependencies will wait until the wallet is settled before emitting.
+   */
+  getTxBuilderDependencies(): TxBuilderDependencies {
     return {
       inputResolver: this.util,
       inputSelector: this.#inputSelector,
       keyAgent: this.keyAgent,
       logger: this.#logger,
+      outputValidator: this.util,
       txBuilderProviders: {
-        addresses: () => firstValueFrom(this.addresses$),
-        changeAddress: () => firstValueFrom(this.addresses$.pipe(map(([{ address: changeAddress }]) => changeAddress))),
-        genesisParameters: () => firstValueFrom(this.genesisParameters$),
-        protocolParameters: () => firstValueFrom(this.protocolParameters$),
-        rewardAccounts: () => firstValueFrom(this.delegation.rewardAccounts$),
-        tip: () => firstValueFrom(this.tip$),
-        utxoAvailable: () => firstValueFrom(this.utxo.available$)
+        changeAddress: () =>
+          this.#firstValueFromSettled(this.addresses$.pipe(map(([{ address: changeAddress }]) => changeAddress))),
+        genesisParameters: () => this.#firstValueFromSettled(this.genesisParameters$),
+        protocolParameters: () => this.#firstValueFromSettled(this.protocolParameters$),
+        rewardAccounts: () => this.#firstValueFromSettled(this.delegation.rewardAccounts$),
+        tip: () => this.#firstValueFromSettled(this.tip$),
+        utxoAvailable: () => this.#firstValueFromSettled(this.utxo.available$)
       }
     };
+  }
+
+  #firstValueFromSettled<T>(o$: Observable<T>): Promise<T> {
+    return firstValueFrom(
+      this.syncStatus.isSettled$.pipe(
+        filter((isSettled) => isSettled),
+        switchMap(() => o$)
+      )
+    );
   }
 }

@@ -207,8 +207,7 @@ describe('LedgerKeyAgent', () => {
           }
         ]),
         scriptIntegrityHash: scriptDataHash,
-        scripts: [script],
-        witness: { redeemers: [scriptRedeemer] }
+        witness: { redeemers: [scriptRedeemer], scripts: [script] }
       };
 
       const unsignedTx = await wallet.initializeTx(txProps);

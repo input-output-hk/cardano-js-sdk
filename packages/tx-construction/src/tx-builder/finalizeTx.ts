@@ -1,13 +1,11 @@
 import {
   AsyncKeyAgent,
-  GroupedAddress,
   SignTransactionOptions,
   TransactionSigner,
   util as keyManagementUtil
 } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
-
-import { FinalizeTxDependencies, FinalizeTxProps } from '../types';
+import { FinalizeTxDependencies, SignedTx, TxContext } from './types';
 
 const getSignatures = async (
   keyAgent: AsyncKeyAgent,
@@ -28,28 +26,31 @@ const getSignatures = async (
 };
 
 export const finalizeTx = async (
-  props: FinalizeTxProps & { addresses: GroupedAddress[] },
+  tx: Cardano.TxBodyWithHash,
+  { ownAddresses, witness, signingOptions, auxiliaryData, isValid }: TxContext,
   { inputResolver, keyAgent }: FinalizeTxDependencies,
   stubSign = false
-): Promise<Cardano.Tx> => {
+): Promise<SignedTx> => {
   const signatures = stubSign
     ? await keyManagementUtil.stubSignTransaction(
-        props.tx.body,
-        props.addresses,
+        tx.body,
+        ownAddresses,
         inputResolver,
-        props.witness?.extraSigners,
-        props.signingOptions
+        witness?.extraSigners,
+        signingOptions
       )
-    : await getSignatures(keyAgent, props.tx, props.witness?.extraSigners, props.signingOptions);
+    : await getSignatures(keyAgent, tx, witness?.extraSigners, signingOptions);
+
   return {
-    auxiliaryData: props.auxiliaryData,
-    body: props.tx.body,
-    id: props.tx.hash,
-    isValid: props.isValid,
-    witness: {
-      ...props.witness,
-      scripts: props.scripts,
-      signatures
+    tx: {
+      auxiliaryData,
+      body: tx.body,
+      id: tx.hash,
+      isValid,
+      witness: {
+        ...witness,
+        signatures: new Map([...signatures.entries(), ...(witness?.signatures?.entries() || [])])
+      }
     }
   };
 };
