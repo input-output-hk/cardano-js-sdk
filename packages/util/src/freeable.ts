@@ -1,4 +1,5 @@
 import { Freeable } from './types';
+import { isPromise } from './isPromise';
 
 /**
  * A scope to ease the management of objects that require manual resource management.
@@ -38,10 +39,6 @@ export class ManagedFreeableScope {
     this.#disposed = true;
   }
 }
-
-const isPromise = (obj: unknown): obj is Promise<unknown> =>
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  typeof obj === 'object' && typeof (obj as any).then === 'function';
 
 class AutoFree<TReturn> {
   #scope: ManagedFreeableScope;
