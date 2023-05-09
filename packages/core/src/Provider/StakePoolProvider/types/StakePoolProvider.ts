@@ -54,6 +54,7 @@ export interface QueryStakePoolsArgs {
 
 export interface StakePoolStats {
   qty: {
+    activating: number;
     active: number;
     retired: number;
     retiring: number;

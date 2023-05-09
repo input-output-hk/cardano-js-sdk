@@ -70,6 +70,7 @@ export const stakePoolsPaginated: Paginated<Cardano.StakePool> = {
 
 const stakePoolStatsMock = {
   qty: {
+    activating: 0,
     active: 5,
     retired: 5,
     retiring: 5

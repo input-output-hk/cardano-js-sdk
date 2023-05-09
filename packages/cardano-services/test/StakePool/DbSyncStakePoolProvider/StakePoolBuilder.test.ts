@@ -283,7 +283,7 @@ describe('StakePoolBuilder', () => {
     it('returns active, retired and retiring pools count', async () => {
       const result = await builder.queryPoolStats();
       expect(result.qty).toBeDefined();
-      expect(result).toMatchShapeOf({ qty: { active: 0, retired: 0, retiring: 0 } });
+      expect(result).toMatchShapeOf({ qty: { activating: 0, active: 0, retired: 0, retiring: 0 } });
     });
   });
   describe('queryPoolAPY', () => {

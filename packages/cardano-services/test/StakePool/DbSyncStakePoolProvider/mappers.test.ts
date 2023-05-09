@@ -347,7 +347,7 @@ describe('mappers', () => {
 
   it('mapPoolStats', () => {
     expect(mapPoolStats({ active: '20', retired: '0', retiring: '1' })).toEqual<StakePoolStats>({
-      qty: { active: 20, retired: 0, retiring: 1 }
+      qty: { activating: 0, active: 20, retired: 0, retiring: 1 }
     });
   });
 

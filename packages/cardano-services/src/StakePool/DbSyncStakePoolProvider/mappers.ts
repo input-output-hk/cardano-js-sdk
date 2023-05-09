@@ -269,7 +269,13 @@ export const mapBlockfrostPoolMetrics = (poolMetricsModel: BlockfrostPoolMetrics
 };
 
 export const mapPoolStats = (poolStats: StakePoolStatsModel): StakePoolStats => ({
-  qty: { active: Number(poolStats.active), retired: Number(poolStats.retired), retiring: Number(poolStats.retiring) }
+  qty: {
+    // There is no need of resolving this for db-sync provider, will be deprecated soon with the optimized postgres one
+    activating: 0,
+    active: Number(poolStats.active),
+    retired: Number(poolStats.retired),
+    retiring: Number(poolStats.retiring)
+  }
 });
 
 export const mapPoolAPY = (poolAPYModel: PoolAPYModel): PoolAPY => ({
