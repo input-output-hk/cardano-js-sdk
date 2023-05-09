@@ -62,14 +62,6 @@ describe('StakePoolBuilder', () => {
       expect(registrations[0]).toMatchShapeOf(DataMocks.Pool.registration);
     });
   });
-  describe('queryPoolRewards', () => {
-    it('queryPoolRewards', async () => {
-      const epochRewards = await builder.queryPoolRewards(hashIds, epochLength);
-
-      expect(epochRewards.filter(({ epochReward: { epoch } }) => epoch === Cardano.EpochNo(12))).toHaveLength(3);
-      expect(epochRewards[0]).toMatchShapeOf(DataMocks.Pool.epochReward);
-    });
-  });
   describe('queryPoolRelays', () => {
     it('queryPoolRelays', async () => {
       const relays = await builder.queryPoolRelays(updateIds);

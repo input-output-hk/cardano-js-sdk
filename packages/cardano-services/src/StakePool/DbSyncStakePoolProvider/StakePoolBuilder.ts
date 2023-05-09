@@ -2,7 +2,6 @@
 import {
   BlockfrostPoolMetricsModel,
   EpochModel,
-  EpochRewardModel,
   OrderByOptions,
   OwnerAddressModel,
   PoolAPY,
@@ -31,7 +30,6 @@ import {
   mapAddressOwner,
   mapBlockfrostPoolMetrics,
   mapEpoch,
-  mapEpochReward,
   mapPoolAPY,
   mapPoolData,
   mapPoolMetrics,
@@ -87,16 +85,6 @@ export class StakePoolBuilder {
     this.#logger.debug('About to query pool owners');
     const result: QueryResult<OwnerAddressModel> = await this.#db.query(Queries.findPoolsOwners, [updatesIds]);
     return result.rows.length > 0 ? result.rows.map(mapAddressOwner) : [];
-  }
-
-  public async queryPoolRewards(hashesIds: number[], epochLength: number, limit?: number) {
-    this.#logger.debug('About to query pool rewards');
-
-    const result = await this.#db.query<EpochRewardModel>(Queries.findPoolEpochRewards(epochLength, limit), [
-      hashesIds
-    ]);
-
-    return result.rows.map(mapEpochReward);
   }
 
   public async queryPoolAPY(hashesIds: number[], epochLength: number, options?: QueryPoolsApyArgs): Promise<PoolAPY[]> {

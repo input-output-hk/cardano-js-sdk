@@ -19,7 +19,6 @@ import { INFO, createLogger } from 'bunyan';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { PoolInfo, PoolWith, StakePoolFixtureBuilder } from './fixtures/FixtureBuilder';
-import { REWARDS_HISTORY_LIMIT_DEFAULT } from '../../src/StakePool/DbSyncStakePoolProvider/util';
 import { clearDbPools, ingestDbData, sleep, wrapWithTransaction } from '../util';
 import { getPort } from 'get-port-please';
 import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
@@ -271,8 +270,8 @@ describe('StakePoolHttpService', () => {
 
       describe('/search', () => {
         const url = '/search';
-        const cachedSubQueriesCount = 9;
-        const cacheKeysCount = 6;
+        const cachedSubQueriesCount = 8;
+        const cacheKeysCount = 5;
         const nonCacheableSubQueriesCount = 1; // getLastEpoch
         const filerOnePoolOptions: QueryStakePoolsArgs = {
           filters: { identifier: { values: [{ ticker: 'SP1$' }] } },
@@ -442,9 +441,7 @@ describe('StakePoolHttpService', () => {
         );
 
         describe('pagination', () => {
-          const historyLimitDefault = REWARDS_HISTORY_LIMIT_DEFAULT;
           const baseArgs = { pagination: { limit: 2, startAt: 0 } };
-          const argsWithHistoryLimit = { ...baseArgs, rewardsHistoryLimit: 5 };
 
           it('should paginate response', async () => {
             const paginatedResponse = await provider.queryStakePools(baseArgs);
@@ -462,40 +459,6 @@ describe('StakePoolHttpService', () => {
 
             const paginatedResponseCached = await provider.queryStakePools(reqWithPagination);
             expect(paginatedResponse.pageResults).toEqual(paginatedResponseCached.pageResults);
-          });
-
-          it('should paginate rewards response', async () => {
-            const resWithoutRewardsHistoryLimit = await provider.queryStakePools(baseArgs);
-            const resWithRewardsHistoryLimit = await provider.queryStakePools(argsWithHistoryLimit);
-
-            expect(resWithoutRewardsHistoryLimit.pageResults[0].epochRewards).toHaveLength(historyLimitDefault);
-            expect(resWithRewardsHistoryLimit.pageResults[0].epochRewards).toHaveLength(
-              argsWithHistoryLimit.rewardsHistoryLimit
-            );
-
-            const resWithoutRewardsHistoryLimitCached = await provider.queryStakePools(baseArgs);
-            const resWithRewardsHistoryLimitCached = await provider.queryStakePools(argsWithHistoryLimit);
-
-            expect(resWithoutRewardsHistoryLimit.pageResults).toEqual(resWithoutRewardsHistoryLimitCached.pageResults);
-            expect(resWithRewardsHistoryLimit.pageResults).toEqual(resWithRewardsHistoryLimitCached.pageResults);
-          });
-
-          it('should paginate rewards response with or condition', async () => {
-            const reqWithoutRewardsHistory: QueryStakePoolsArgs = { ...baseArgs, filters: { _condition: 'or' } };
-
-            const resWithRewardsHistoryLimit = await provider.queryStakePools(argsWithHistoryLimit);
-            const resWithoutRewardsHistoryLimit = await provider.queryStakePools(reqWithoutRewardsHistory);
-
-            expect(resWithoutRewardsHistoryLimit.pageResults[0].epochRewards).toHaveLength(historyLimitDefault);
-            expect(resWithRewardsHistoryLimit.pageResults[0].epochRewards).toHaveLength(
-              argsWithHistoryLimit.rewardsHistoryLimit
-            );
-
-            const resWithoutRewardsHistoryLimitCached = await provider.queryStakePools(reqWithoutRewardsHistory);
-            expect(resWithoutRewardsHistoryLimit.pageResults).toEqual(resWithoutRewardsHistoryLimitCached.pageResults);
-
-            const resWithRewardsHistoryLimitCached = await provider.queryStakePools(argsWithHistoryLimit);
-            expect(resWithRewardsHistoryLimit.pageResults).toEqual(resWithRewardsHistoryLimitCached.pageResults);
           });
 
           it('should cache paginated response', async () => {
@@ -1372,11 +1335,6 @@ describe('StakePoolHttpService', () => {
           const limitThreeResponse = await provider.queryStakePools({ pagination, rewardsHistoryLimit: 3 });
           const limitFiveResponse = await provider.queryStakePools({ pagination, rewardsHistoryLimit: 5 });
           expect(limitThreeResponse.pageResults[0].metrics.apy).not.toBe(limitFiveResponse.pageResults[0].metrics.apy);
-        });
-
-        it('rewardsHistoryLimit defaults to 3 correctly', async () => {
-          const response = await provider.queryStakePools({ pagination });
-          expect(response.pageResults[0].epochRewards).toHaveLength(3);
         });
       });
 

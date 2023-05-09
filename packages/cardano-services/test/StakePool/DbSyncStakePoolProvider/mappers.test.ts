@@ -4,7 +4,6 @@ import {
   calcNodeMetricsValues,
   mapAddressOwner,
   mapEpoch,
-  mapEpochReward,
   mapPoolAPY,
   mapPoolData,
   mapPoolMetrics,
@@ -83,16 +82,6 @@ describe('mappers', () => {
     update_id,
     vrf_key_hash: Buffer.from(vrfKeyHash, 'hex')
   };
-  const epochRewardModel = {
-    active_stake: '10000000',
-    epoch_length: '10000000',
-    epoch_no: 2,
-    hash_id: 1,
-    leader_rewards: '200000',
-    member_rewards: '300000',
-    member_roi: 0.000_000_05,
-    pledge: '1000000'
-  };
   const poolMetricsModel = {
     active_stake: '100000000',
     active_stake_percentage: 0.5,
@@ -169,20 +158,6 @@ describe('mappers', () => {
       hashId: Number(addressOwnerModel.hash_id)
     });
   });
-  it('mapEpochReward', () => {
-    expect(mapEpochReward(epochRewardModel)).toEqual({
-      epochReward: {
-        activeStake: BigInt(epochRewardModel.active_stake),
-        epoch: epochRewardModel.epoch_no,
-        epochLength: Number(epochRewardModel.epoch_length),
-        leaderRewards: BigInt(epochRewardModel.leader_rewards),
-        memberROI: epochRewardModel.member_roi,
-        memberRewards: BigInt(epochRewardModel.member_rewards),
-        pledge: BigInt(epochRewardModel.pledge)
-      },
-      hashId: Number(epochRewardModel.hash_id)
-    });
-  });
   it('mapPoolMetrics', () => {
     expect(mapPoolMetrics(poolMetricsModel)).toEqual({
       hashId: Number(poolMetricsModel.pool_hash_id),
@@ -228,13 +203,11 @@ describe('mappers', () => {
     const poolRegistrations = [mapPoolRegistration(poolRegistrationModel)];
     const poolRelays = [mapRelay(poolRelayByAddress)];
     const poolRetirements = [mapPoolRetirement(poolRetirementModel)];
-    const poolRewards = [mapEpochReward(epochRewardModel)];
     const partialMetrics = [mapPoolMetrics(poolMetricsModel)];
     const poolAPYs = [mapPoolAPY(poolAPYModel)];
     const poolMetrics = calcNodeMetricsValues(partialMetrics[0].metrics, poolAPYs[0].apy);
-    const stakePool = {
+    const stakePool: Cardano.StakePool = {
       cost: poolDatas[0].cost,
-      epochRewards: poolRewards.map((r) => r.epochReward),
       hexId: poolDatas[0].hexId,
       id: poolDatas[0].id,
       margin: { denominator: 10_000, numerator: 1 },
@@ -246,10 +219,6 @@ describe('mappers', () => {
       relays: poolRelays.map((r) => r.relay),
       rewardAccount: poolDatas[0].rewardAccount,
       status: Cardano.StakePoolStatus.Retiring,
-      transactions: {
-        registration: poolRegistrations.map((r) => r.transactionId),
-        retirement: poolRetirements.map((r) => r.transactionId)
-      },
       vrf: poolDatas[0].vrfKeyHash
     } as Cardano.StakePool;
     const totalCount = 1;
@@ -266,7 +235,6 @@ describe('mappers', () => {
           poolRegistrations,
           poolRelays,
           poolRetirements,
-          poolRewards,
           totalCount
         })
       ).toStrictEqual({
@@ -288,7 +256,6 @@ describe('mappers', () => {
           poolRegistrations,
           poolRelays,
           poolRetirements,
-          poolRewards,
           totalCount
         })
       ).toStrictEqual({
@@ -305,11 +272,7 @@ describe('mappers', () => {
       ];
       const stakePoolActivating = {
         ...stakePool,
-        status: Cardano.StakePoolStatus.Activating,
-        transactions: {
-          registration: poolRegistrations.map((r) => r.transactionId),
-          retirement: _retirements.map((r) => r.transactionId)
-        }
+        status: Cardano.StakePoolStatus.Activating
       };
 
       expect(
@@ -322,7 +285,6 @@ describe('mappers', () => {
           poolRegistrations,
           poolRelays,
           poolRetirements: _retirements,
-          poolRewards,
           totalCount
         })
       ).toEqual({
@@ -339,11 +301,7 @@ describe('mappers', () => {
       ];
       const stakePoolActive = {
         ...stakePool,
-        status: Cardano.StakePoolStatus.Active,
-        transactions: {
-          registration: poolRegistrations.map((r) => r.transactionId),
-          retirement: _retirements.map((r) => r.transactionId)
-        }
+        status: Cardano.StakePoolStatus.Active
       };
 
       expect(
@@ -356,7 +314,6 @@ describe('mappers', () => {
           poolRegistrations,
           poolRelays,
           poolRetirements: _retirements,
-          poolRewards,
           totalCount
         })
       ).toEqual({
@@ -379,7 +336,6 @@ describe('mappers', () => {
           poolRegistrations,
           poolRelays,
           poolRetirements,
-          poolRewards,
           totalCount
         })
       ).toStrictEqual({

@@ -212,12 +212,6 @@ describe('StakePoolCompare', () => {
 
     it('rewardAccount', () => expect(poolOne.rewardAccount).toBe(poolTwo.rewardAccount));
 
-    describe('transactions', () => {
-      it('registration', () => expect(poolOne.transactions.registration).toEqual(poolTwo.transactions.registration));
-
-      it('retirement', () => expect(poolOne.transactions.retirement).toEqual(poolTwo.transactions.retirement));
-    });
-
     // a known problem on db-sync implementation makes this test to fail on the given preprod pools
     if (!poolsExcludeStatus.has(id)) it('status', () => expect(poolOne.status).toBe(poolTwo.status));
     else it('status', () => expect(poolOne.status).not.toBe(poolTwo.status));

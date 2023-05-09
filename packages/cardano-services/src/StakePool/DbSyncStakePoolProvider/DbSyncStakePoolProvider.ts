@@ -28,7 +28,7 @@ import {
   queryCacheKey
 } from './util';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../InMemoryCache';
-import { PromiseOrValue, RunnableModule, isNotNil, resolveObjectValues } from '@cardano-sdk/util';
+import { PromiseOrValue, RunnableModule, resolveObjectValues } from '@cardano-sdk/util';
 import { StakePoolBuilder } from './StakePoolBuilder';
 import { StakePoolMetadataService } from '../types';
 import { toStakePoolResults } from './mappers';
@@ -336,12 +336,6 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
               this.#builder.queryPoolAPY(hashesIds, this.#epochLength, { rewardsHistoryLimit })
             );
     }
-    // Get stake pools rewards cached
-    const poolRewards = await this.#cache.get(
-      queryCacheKey(StakePoolsSubQuery.REWARDS, orderedResultHashIds, options),
-      () => this.#builder.queryPoolRewards(orderedResultHashIds, this.#epochLength, rewardsHistoryLimit),
-      UNLIMITED_CACHE_TTL
-    );
     // Create lookup table with pool ids: (hashId:updateId)
     const hashIdsMap = Object.fromEntries(
       orderedResultHashIds.map((hashId, idx) => [hashId, orderedResultUpdateIds[idx]])
@@ -376,7 +370,6 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
         poolRegistrations,
         poolRelays,
         poolRetirements,
-        poolRewards: poolRewards.filter(isNotNil),
         totalCount
       });
     };

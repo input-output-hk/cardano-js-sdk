@@ -223,58 +223,6 @@
           },
           "status": {
             "$ref": "#/components/schemas/StakePoolStatus"
-          },
-          "transactions": {
-            "$ref": "#/components/schemas/StakePoolTransactions"
-          },
-          "epochRewards": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/EpochRewards"
-            }
-          }
-        }
-      },
-      "EpochRewards": {
-        "type": "object",
-        "properties": {
-          "activeStake": {
-            "$ref": "#/components/schemas/BigInt"
-          },
-          "epoch": {
-            "type": "number"
-          },
-          "epochLength": {
-            "type": "number"
-          },
-          "leaderRewards": {
-            "$ref": "#/components/schemas/BigInt"
-          },
-          "memberROI": {
-            "type": "number"
-          },
-          "memberRewards": {
-            "$ref": "#/components/schemas/BigInt"
-          },
-          "pledge": {
-            "$ref": "#/components/schemas/BigInt"
-          }
-        }
-      },
-      "StakePoolTransactions": {
-        "type": "object",
-        "properties": {
-          "registration": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "retirement": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
           }
         }
       },
