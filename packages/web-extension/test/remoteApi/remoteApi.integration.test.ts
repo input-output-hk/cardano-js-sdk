@@ -1,6 +1,9 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable unicorn/consistent-function-scoping */
 import {
   ChannelName,
+  Destructor,
+  FinalizationRegistryDestructor,
   Messenger,
   MinimalPort,
   PortMessage,
@@ -20,6 +23,7 @@ import {
   map,
   of,
   race,
+  shareReplay,
   tap,
   throwError,
   timer,
@@ -29,6 +33,13 @@ import { dummyLogger } from 'ts-log';
 import memoize from 'lodash/memoize';
 
 const logger = dummyLogger;
+
+class StubDestructor implements Destructor {
+  callbacks: (() => void)[] = [];
+  onGarbageCollected(_: object, __: unknown, callback: () => void): void {
+    this.callbacks.push(callback);
+  }
+}
 
 const createSubjects = memoize((_channelName: ChannelName) => ({
   consumerMessage$: new Subject(),
@@ -68,29 +79,42 @@ const createMessenger = (channel: ChannelName, isHost: boolean): TestMessenger =
       derivedMessengers.push(messenger);
       return messenger;
     },
+    isShutdown: false,
     message$: local$.pipe(
-      map((data): PortMessage => ({ data, port: { postMessage: (message) => postMessage(message).subscribe() } }))
+      map((data): PortMessage => ({ data, port: { postMessage: (message) => postMessage(message).subscribe() } })),
+      shareReplay({ bufferSize: 1, refCount: true })
     ),
     postMessage,
     shutdown() {
+      this.isShutdown = true;
       for (const messenger of derivedMessengers) {
         messenger.shutdown();
       }
       local$.complete();
-      remote$.complete();
       connect$.complete();
     }
   };
 };
 
 const addOne = async (arg: bigint) => arg + 1n;
-const setUp = (someNumbers$: Observable<bigint> = of(0n), nestedSomeNumbers$ = of(0n)) => {
-  const baseChannel = 'base-channel';
+interface SetUpProps {
+  someNumbers$?: Observable<bigint>;
+  nestedSomeNumbers$?: Observable<bigint>;
+  destructor?: Destructor;
+}
+const baseChannel = 'base-channel';
+const setUp = ({
+  destructor = new FinalizationRegistryDestructor(logger),
+  someNumbers$ = of(0n),
+  nestedSomeNumbers$ = of(0n)
+}: SetUpProps = {}) => {
   const api = {
     addOne,
     addOneTransformedToAddTwo: addOne,
+    factory: () => ({ addOne }),
     nested: {
       addOneNoZero: addOne,
+      factory: () => ({ addOne }),
       nestedSomeNumbers$
     },
     nestedNonExposed: {
@@ -116,6 +140,12 @@ const setUp = (someNumbers$: Observable<bigint> = of(0n), nestedSomeNumbers$ = o
         })
       }
     },
+    factory: {
+      apiProperties: {
+        addOne: RemoteApiPropertyType.MethodReturningPromise
+      },
+      propType: RemoteApiPropertyType.ApiFactory
+    },
     nested: {
       addOneNoZero: {
         propType: RemoteApiPropertyType.MethodReturningPromise,
@@ -126,6 +156,12 @@ const setUp = (someNumbers$: Observable<bigint> = of(0n), nestedSomeNumbers$ = o
             }
           }
         }
+      },
+      factory: {
+        apiProperties: {
+          addOne: RemoteApiPropertyType.MethodReturningPromise
+        },
+        propType: RemoteApiPropertyType.ApiFactory
       },
       nestedSomeNumbers$: RemoteApiPropertyType.HotObservable
     },
@@ -153,7 +189,7 @@ const setUp = (someNumbers$: Observable<bigint> = of(0n), nestedSomeNumbers$ = o
         nonExposedObservable$: RemoteApiPropertyType.HotObservable
       }
     },
-    { logger, messenger: createMessenger(baseChannel, false) }
+    { destructor, logger, messenger: createMessenger(baseChannel, false) }
   );
 
   jest.spyOn(api.nonExposedObservable$, 'subscribe');
@@ -188,8 +224,10 @@ describe('remoteApi integration', () => {
     otherApi = {
       addOne,
       addOneTransformedToAddTwo: addOne,
+      factory: () => ({ addOne }),
       nested: {
         addOneNoZero: addOne,
+        factory: () => ({ addOne }),
         nestedSomeNumbers$: nestedOtherSomeNumbers$
       },
       nestedNonExposed: {
@@ -297,7 +335,7 @@ describe('remoteApi integration', () => {
     beforeEach(() => {
       someNumbersSource$ = new Subject();
       nestedSomeNumbersSource$ = new Subject();
-      sut = setUp(someNumbersSource$, nestedSomeNumbersSource$);
+      sut = setUp({ nestedSomeNumbers$: nestedSomeNumbersSource$, someNumbers$: someNumbersSource$ });
       sut.emitInitial();
     });
 
@@ -445,7 +483,7 @@ describe('remoteApi integration', () => {
             sut.api$.next(otherApi);
             someNumbersSource$.next(0n); // ignored because source has changed
             someOtherNumbersSource$.next(1n);
-            setTimeout(() => sut.hostMessenger.shutdown());
+            setTimeout(() => sut.cleanup());
             expect(await emitted).toEqual([1n]);
             done();
           }, 1);
@@ -473,5 +511,74 @@ describe('remoteApi integration', () => {
         });
       });
     });
+  });
+
+  describe('factory', () => {
+    let destructor: StubDestructor;
+
+    beforeEach(() => {
+      destructor = new StubDestructor();
+      sut = setUp({ destructor });
+      sut.emitInitial();
+    });
+
+    afterEach(() => {
+      sut.cleanup();
+      createSubjects.cache.clear!();
+    });
+
+    it('accessing property returns the same function object', () => {
+      expect(sut.consumer.factory).toBe(sut.consumer.factory);
+      expect(sut.consumer.nested.factory).toBe(sut.consumer.nested.factory);
+    });
+
+    const testFactory = (
+      factoryName: string,
+      getFactory: (consumer: typeof sut.consumer) => typeof consumer.factory
+    ) => {
+      describe(factoryName, () => {
+        it('accessing property returns the same function object', () => {
+          expect(getFactory(sut.consumer)).toBe(getFactory(sut.consumer));
+        });
+
+        it('calling method on returned remote api calls remote method and resolves the result', async () => {
+          const api = getFactory(sut.consumer)();
+          expect(await api.addOne(2n)).toBe(3n);
+        });
+
+        it('garbage collected consumed api shuts down the messengers', (done) => {
+          const areFactoryMessengersShutdown = () => {
+            // This is likely to break on lodash update
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const [_, subjects] = Object.entries((createSubjects.cache as any).__data__.string.__data__).find(([key]) =>
+              key.includes('-factory')
+            )!;
+            const { consumerMessage$, hostMessage$ } = subjects as ReturnType<typeof createSubjects>;
+            return !consumerMessage$.observed && !hostMessage$.observed;
+          };
+          // Create and consume a new remote api through another API's factory method
+          // eslint-disable-next-line promise/always-return
+          void Promise.resolve(getFactory(sut.consumer)()).then(() => {
+            expect(destructor.callbacks).toHaveLength(1);
+            setTimeout(() => {
+              expect(areFactoryMessengersShutdown()).toBe(false);
+              // Emulate GC freeing the object returned by the factory method (consume side)
+              destructor.callbacks[0]();
+              setTimeout(() => {
+                expect(areFactoryMessengersShutdown()).toBe(true);
+                // eslint-disable-next-line promise/no-callback-in-promise
+                done();
+              }, 1);
+            }, 1);
+          });
+        });
+
+        // Don't know how to test this
+        it.todo('garbage collected consumed api enables remote object to be garbage collected');
+      });
+    };
+
+    testFactory('top-level property', (consumer) => consumer.factory);
+    testFactory('nested property', (consumer) => consumer.nested.factory);
   });
 });

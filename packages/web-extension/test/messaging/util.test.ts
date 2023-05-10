@@ -1,11 +1,11 @@
 import {
+  CompletionMessage,
   EmitMessage,
   MethodRequest,
-  ObservableCompletionMessage,
   RequestMessage,
   ResponseMessage,
+  isCompletionMessage,
   isEmitMessage,
-  isObservableCompletionMessage,
   isRequest,
   isRequestMessage,
   isResponseMessage,
@@ -47,14 +47,12 @@ describe('messaging/util', () => {
   });
   describe('isObservableCompletionMessage', () => {
     it('returns true for objects matching SubscriptionMessage type', () => {
-      expect(
-        isObservableCompletionMessage({ messageId: 'messageId', subscribe: false } as ObservableCompletionMessage)
-      ).toBe(true);
+      expect(isCompletionMessage({ messageId: 'messageId', subscribe: false } as CompletionMessage)).toBe(true);
     });
     it('returns false for objects not matching SubscriptionMessage type', () => {
-      expect(isObservableCompletionMessage(null)).toBe(false);
-      expect(isObservableCompletionMessage({ messageId: 'messageId' })).toBe(false);
-      expect(isObservableCompletionMessage({ subscribe: true })).toBe(false);
+      expect(isCompletionMessage(null)).toBe(false);
+      expect(isCompletionMessage({ messageId: 'messageId' })).toBe(false);
+      expect(isCompletionMessage({ subscribe: true })).toBe(false);
     });
   });
   describe('isEmitMessage', () => {
