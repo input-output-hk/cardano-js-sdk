@@ -43,9 +43,9 @@ export interface QueryStakePoolsArgs {
     status?: Cardano.StakePoolStatus[];
   };
   /**
-   * Will fetch stake pool reward history up to 3 epochs back if not specified
+   * Used for APY metric computation. It will take 3 epochs back if not specified
    */
-  rewardsHistoryLimit?: number;
+  apyEpochsBackLimit?: number;
   /**
    * Will return all stake pools matching the query if not specified
    */

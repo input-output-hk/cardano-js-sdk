@@ -136,7 +136,7 @@
           "filters": {
             "$ref": "#/components/schemas/SearchStakePoolRequest_filters"
           },
-          "rewardsHistoryLimit": {
+          "apyEpochsBackLimit": {
             "type": "number",
             "example": 10
           },

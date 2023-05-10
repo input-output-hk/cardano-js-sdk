@@ -1331,9 +1331,9 @@ describe('StakePoolHttpService', () => {
           });
         });
 
-        it('rewardsHistoryLimit is correctly honored', async () => {
-          const limitThreeResponse = await provider.queryStakePools({ pagination, rewardsHistoryLimit: 3 });
-          const limitFiveResponse = await provider.queryStakePools({ pagination, rewardsHistoryLimit: 5 });
+        it('apyEpochsBackLimit is correctly honored', async () => {
+          const limitThreeResponse = await provider.queryStakePools({ apyEpochsBackLimit: 3, pagination });
+          const limitFiveResponse = await provider.queryStakePools({ apyEpochsBackLimit: 5, pagination });
           expect(limitThreeResponse.pageResults[0].metrics.apy).not.toBe(limitFiveResponse.pageResults[0].metrics.apy);
         });
       });

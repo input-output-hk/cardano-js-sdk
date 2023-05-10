@@ -100,7 +100,7 @@ describe('StakePoolCompare', () => {
 
   // Fetch all stake pools with all reward history and organize in a StakePoolRecord
   const fetchAll = async (provider: StakePoolProvider) =>
-    Object.fromEntries((await fetchAllPools(provider, { rewardsHistoryLimit: 1_000_000 })).map((_) => [_.id, _]));
+    Object.fromEntries((await fetchAllPools(provider, { apyEpochsBackLimit: 1_000_000 })).map((_) => [_.id, _]));
 
   const startServer = async (args: string[]) => {
     const port = await getRandomPort();

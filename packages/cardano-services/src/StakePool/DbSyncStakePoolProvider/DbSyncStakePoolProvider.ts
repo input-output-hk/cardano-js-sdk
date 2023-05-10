@@ -1,4 +1,12 @@
 import {
+  APY_EPOCHS_BACK_LIMIT_DEFAULT,
+  IDS_NAMESPACE,
+  StakePoolsSubQuery,
+  emptyPoolsExtraInfo,
+  getStakePoolSortType,
+  queryCacheKey
+} from './util';
+import {
   Cardano,
   Paginated,
   ProviderError,
@@ -19,14 +27,6 @@ import {
 } from './types';
 import { DbSyncProvider, DbSyncProviderDependencies, Disposer, EpochMonitor } from '../../util';
 import { GenesisData } from '../../types';
-import {
-  IDS_NAMESPACE,
-  REWARDS_HISTORY_LIMIT_DEFAULT,
-  StakePoolsSubQuery,
-  emptyPoolsExtraInfo,
-  getStakePoolSortType,
-  queryCacheKey
-} from './util';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../InMemoryCache';
 import { PromiseOrValue, RunnableModule, resolveObjectValues } from '@cardano-sdk/util';
 import { StakePoolBuilder } from './StakePoolBuilder';
@@ -270,7 +270,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
   }
 
   public async queryStakePools(options: QueryStakePoolsArgs): Promise<Paginated<Cardano.StakePool>> {
-    const { filters, pagination, rewardsHistoryLimit = REWARDS_HISTORY_LIMIT_DEFAULT } = options;
+    const { filters, pagination, apyEpochsBackLimit = APY_EPOCHS_BACK_LIMIT_DEFAULT } = options;
     const useBlockfrost = this.#useBlockfrost;
 
     if (pagination.limit > this.#paginationPageSizeLimit) {
@@ -332,7 +332,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
         sortType === 'apy'
           ? (orderedResult as PoolAPY[])
           : await this.#cache.get(queryCacheKey(StakePoolsSubQuery.APY, hashesIds, options), () =>
-              this.#builder.queryPoolAPY(hashesIds, this.#epochLength, { rewardsHistoryLimit })
+              this.#builder.queryPoolAPY(hashesIds, this.#epochLength, { apyEpochsBackLimit })
             );
     }
     // Create lookup table with pool ids: (hashId:updateId)
@@ -340,7 +340,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
       orderedResultHashIds.map((hashId, idx) => [hashId, orderedResultUpdateIds[idx]])
     );
     // Create a lookup table with cached pools: (hashId:Cardano.StakePool)
-    const rewardsHistoryKey = JSON.stringify(rewardsHistoryLimit);
+    const rewardsHistoryKey = JSON.stringify(apyEpochsBackLimit);
     const cachedPromises = Object.fromEntries(
       orderedResultHashIds.map((hashId) => [
         hashId,

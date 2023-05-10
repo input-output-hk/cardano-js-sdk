@@ -91,7 +91,7 @@ export class StakePoolBuilder {
     this.#logger.debug('About to query pools APY');
     const defaultSort: OrderByOptions[] = [{ field: 'apy', order: 'desc' }];
 
-    const sorted = withSort(Queries.findPoolAPY(epochLength, options?.rewardsHistoryLimit), options?.sort, defaultSort);
+    const sorted = withSort(Queries.findPoolAPY(epochLength, options?.apyEpochsBackLimit), options?.sort, defaultSort);
     const { query, args } = withPagination(sorted, [hashesIds], options?.pagination);
     const result = await this.#db.query<PoolAPYModel>(query, args);
 
