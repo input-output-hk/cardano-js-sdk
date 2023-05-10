@@ -110,7 +110,6 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
 
     this.#builder = new StakePoolBuilder(dbPools.main, logger);
     this.#cache = cache.db;
-    this.#epochLength = genesisData.epochLength * 1000;
     // epochLength can change, so it should come from EraSummaries instead of from CompactGenesis.
     // Then we would need to look up the length of the specific epoch based on slot number.
     // However it would add a lot of complexity to the queries, so for now we use this simple approach.
