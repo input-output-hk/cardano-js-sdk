@@ -1,7 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
 import { SingleAddressWallet } from '@cardano-sdk/wallet';
 import { TestWallet, getEnv, getWallet, walletVariables } from '../../src';
-import { assertTxIsValid, waitForWalletStateSettle } from '../../../wallet/test/util';
 import { firstValueFrom } from 'rxjs';
 import {
   getTxConfirmationEpoch,
@@ -12,6 +11,7 @@ import {
   waitForEpoch
 } from '../util';
 import { logger } from '@cardano-sdk/util-dev';
+import { waitForWalletStateSettle } from '../../../wallet/test/util';
 
 const env = getEnv(walletVariables);
 
@@ -67,9 +67,7 @@ describe('delegation rewards', () => {
 
     const submitDelegationTx = async () => {
       logger.info(`Creating delegation tx at epoch #${(await firstValueFrom(wallet1.currentEpoch$)).epochNo}`);
-      const tx = await (await wallet1.createTxBuilder()).delegate(poolId).build();
-      assertTxIsValid(tx);
-      const signedTx = await tx.sign();
+      const signedTx = await wallet1.createTxBuilder().delegate(poolId).build().sign();
       await wallet1.submitTx(signedTx);
       const { epochNo } = await firstValueFrom(wallet1.currentEpoch$);
       logger.info(`Delegation tx ${signedTx.id} submitted at epoch #${epochNo}`);
@@ -84,11 +82,9 @@ describe('delegation rewards', () => {
       const [{ address: receivingAddress }] = await firstValueFrom(wallet2.addresses$);
 
       for (let i = 0; i < 100; i++) {
-        const txBuilder = await wallet1.createTxBuilder();
+        const txBuilder = wallet1.createTxBuilder();
         const txOut = txBuilder.buildOutput().address(receivingAddress).coin(tAdaToSend).toTxOut();
-        const tx = await txBuilder.addOutput(txOut).build();
-        assertTxIsValid(tx);
-        const signedTx = await tx.sign();
+        const signedTx = await txBuilder.addOutput(txOut).build().sign();
         await wallet1.submitTx(signedTx);
       }
     };
@@ -96,10 +92,9 @@ describe('delegation rewards', () => {
     const buildSpendRewardTx = async () => {
       const tAdaToSend = 5_000_000n;
       const [{ address: receivingAddress }] = await firstValueFrom(wallet2.addresses$);
-      const txBuilder = await wallet1.createTxBuilder();
+      const txBuilder = wallet1.createTxBuilder();
       const txOut = txBuilder.buildOutput().address(receivingAddress).coin(tAdaToSend).toTxOut();
       const tx = await txBuilder.addOutput(txOut).build();
-      assertTxIsValid(tx);
       logger.debug('Body of tx before sign');
       logger.info(tx.body);
       const signedTx = await tx.sign();

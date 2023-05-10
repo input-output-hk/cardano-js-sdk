@@ -3,7 +3,6 @@ import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { Logger } from 'ts-log';
 
 import {
-  MaybeValidTxOut,
   OutputBuilder,
   OutputValidationMinimumCoinError,
   OutputValidationMissingRequiredError,
@@ -102,22 +101,14 @@ export class TxOutputBuilder implements OutputBuilder {
     return this;
   }
 
-  async build(): Promise<MaybeValidTxOut> {
-    let txOut: Cardano.TxOut;
-    try {
-      txOut = this.toTxOut();
-    } catch (error) {
-      return Promise.resolve({
-        errors: [error as OutputValidationMissingRequiredError],
-        isValid: false
-      });
-    }
+  async build(): Promise<Cardano.TxOut> {
+    const txOut = this.toTxOut();
 
     const outputValidation = toOutputValidationError(txOut, await this.#outputValidator.validateOutput(txOut));
     if (outputValidation) {
-      return { errors: [outputValidation], isValid: false };
+      throw outputValidation;
     }
 
-    return { isValid: true, txOut };
+    return txOut;
   }
 }

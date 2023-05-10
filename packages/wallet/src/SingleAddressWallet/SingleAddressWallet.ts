@@ -447,7 +447,7 @@ export class SingleAddressWallet implements ObservableWallet {
     );
   }
 
-  async createTxBuilder(): Promise<TxBuilder> {
+  createTxBuilder(): TxBuilder {
     return new GenericTxBuilder(this.getTxBuilderDependencies(), this.util);
   }
 

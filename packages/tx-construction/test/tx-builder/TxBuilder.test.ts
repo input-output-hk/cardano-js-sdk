@@ -16,12 +16,13 @@ import {
   OutputValidationTokenBundleSizeError,
   OutputValidator,
   RewardAccountMissingError,
+  TxBodyValidationError,
   TxBuilder,
+  TxOutValidationError,
   TxOutputFailure
 } from '../..';
 import { KeyRole, SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
 import { ObservableWallet, SingleAddressWallet } from '../../../wallet/src';
-import { assertTxIsValid, assertTxOutIsValid } from '../../../wallet/test/util';
 import { createWallet } from '../../../wallet/test/integration/util';
 
 function assertObjectRefsAreDifferent(obj1: unknown, obj2: unknown): void {
@@ -38,7 +39,7 @@ describe('GenericTxBuilder', () => {
     ({ wallet: observableWallet } = await createWallet());
     output = mocks.utxo[0][1];
     output2 = mocks.utxo[1][1];
-    txBuilder = await observableWallet.createTxBuilder();
+    txBuilder = observableWallet.createTxBuilder();
   });
 
   afterEach(() => observableWallet.shutdown());
@@ -102,7 +103,6 @@ describe('GenericTxBuilder', () => {
 
     it('can add metadata, sign and read it back', async () => {
       const tx = await txBuilder.addOutput(mocks.utxo[0][1]).setMetadata(metadata).build();
-      assertTxIsValid(tx);
 
       // ValidTxBody contains metadata
       expect(tx.auxiliaryData?.blob).toEqual(metadata);
@@ -139,7 +139,6 @@ describe('GenericTxBuilder', () => {
 
     it('can set extraSigners, sign and read it back', async () => {
       const tx = await txBuilder.addOutput(mocks.utxo[0][1]).setExtraSigners(signers).build();
-      assertTxIsValid(tx);
 
       // ValidTxBody contains extraSigners
       expect(tx.extraSigners).toEqual(signers);
@@ -259,12 +258,10 @@ describe('GenericTxBuilder', () => {
         .asset(assetId, assetQuantity)
         .build();
 
-      assertTxOutIsValid(builtOutput);
-      expect(builtOutput.txOut).toEqual<Cardano.TxOut>({ address, value: { assets, coins: output1Coin } });
+      expect(builtOutput).toEqual<Cardano.TxOut>({ address, value: { assets, coins: output1Coin } });
 
       const builtOutputFromOther = await txBuilder.buildOutput(output2Base).assets(assets).datum(datumHash).build();
-      assertTxOutIsValid(builtOutputFromOther);
-      expect(builtOutputFromOther.txOut).toEqual<Cardano.TxOut>({
+      expect(builtOutputFromOther).toEqual<Cardano.TxOut>({
         datumHash,
         ...output2Base,
         value: { ...output2Base.value, assets }
@@ -273,26 +270,32 @@ describe('GenericTxBuilder', () => {
 
     describe('can build and validate', () => {
       it('missing coin field', async () => {
-        const builtOutput = await txBuilder.buildOutput().address(address).build();
-        const [error] = (!builtOutput.isValid && builtOutput.errors) || [];
-        expect(
-          error instanceof OutputValidationMissingRequiredError &&
-            error.message === TxOutputFailure.MissingRequiredFields
-        ).toBeTruthy();
+        try {
+          await txBuilder.buildOutput().address(address).build();
+        } catch (error) {
+          const err = error as TxOutValidationError;
+          expect(
+            err instanceof OutputValidationMissingRequiredError && err.message === TxOutputFailure.MissingRequiredFields
+          ).toBeTruthy();
+        }
+
+        expect.assertions(1);
       });
 
       it('missing address field', async () => {
-        const builtOutput = await txBuilder.buildOutput().coin(output1Coin).build();
-        const [error] = (!builtOutput.isValid && builtOutput.errors) || [];
-        expect(
-          error instanceof OutputValidationMissingRequiredError &&
-            error.message === TxOutputFailure.MissingRequiredFields
-        ).toBeTruthy();
+        try {
+          await txBuilder.buildOutput().coin(output1Coin).build();
+        } catch (error) {
+          const err = error as TxOutValidationError;
+          expect(
+            err instanceof OutputValidationMissingRequiredError && err.message === TxOutputFailure.MissingRequiredFields
+          ).toBeTruthy();
+        }
+        expect.assertions(1);
       });
 
       it('legit output with valid with address and coin', async () => {
-        const builtOutput = await txBuilder.buildOutput().address(address).coin(output1Coin).build();
-        assertTxOutIsValid(builtOutput);
+        await expect(txBuilder.buildOutput().address(address).coin(output1Coin).build()).resolves.toBeTruthy();
       });
     });
 
@@ -325,17 +328,13 @@ describe('GenericTxBuilder', () => {
     it('certificates are added to tx.body on build', async () => {
       const address = Cardano.PaymentAddress('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg');
       txBuilder.delegate(poolId);
-      const maybeValidTxOut = await txBuilder.buildOutput().address(address).coin(10_000_000n).build();
-      assertTxOutIsValid(maybeValidTxOut);
-      const txBuilt = await txBuilder.addOutput(maybeValidTxOut.txOut).build();
-
-      assertTxIsValid(txBuilt);
+      const txOut = await txBuilder.buildOutput().address(address).coin(10_000_000n).build();
+      const txBuilt = await txBuilder.addOutput(txOut).build();
       expect(txBuilt.body.certificates?.length).toBe(2);
     });
 
     it('adds both stake key and delegation certificates when stake key was not registered', async () => {
       const txDelegate = await txBuilder.delegate(poolId).build();
-      assertTxIsValid(txDelegate);
       const [stakeKeyCert, delegationCert] = txDelegate.body.certificates!;
       expect(stakeKeyCert.__typename).toBe(Cardano.CertificateType.StakeKeyRegistration);
 
@@ -343,14 +342,13 @@ describe('GenericTxBuilder', () => {
         expect(delegationCert.poolId).toBe(poolId);
       }
 
-      expect.assertions(3);
+      expect.assertions(2);
     });
 
     it('delegate again removes previous certificates', async () => {
       await txBuilder.delegate(poolId).build();
       const poolIdOther = somePartialStakePools[1].id;
       const secondDelegation = await txBuilder.delegate(poolIdOther).build();
-      assertTxIsValid(secondDelegation);
       expect(secondDelegation.body.certificates?.length).toBe(2);
       const delegationCert = secondDelegation.body.certificates![1] as Cardano.StakeDelegationCertificate;
       expect(delegationCert.poolId).toBe(poolIdOther);
@@ -358,11 +356,14 @@ describe('GenericTxBuilder', () => {
 
     it('throws RewardAccountMissingError error if no reward accounts were found', async () => {
       observableWallet.delegation.rewardAccounts$ = of([]);
-      const txBuilder2 = await observableWallet.createTxBuilder();
-      const txBuilt = await txBuilder2.delegate(poolId).build();
-      if (!txBuilt.isValid) {
-        expect(txBuilt.errors?.length).toBe(1);
-        expect(txBuilt.errors[0] instanceof RewardAccountMissingError).toBeTruthy();
+      const txBuilder2 = observableWallet.createTxBuilder();
+
+      try {
+        await txBuilder2.delegate(poolId).build();
+      } catch (error) {
+        const buildErrors = error as TxBodyValidationError[];
+        expect(buildErrors?.length).toBe(1);
+        expect(buildErrors[0] instanceof RewardAccountMissingError).toBeTruthy();
       }
       expect.assertions(2);
     });
@@ -380,16 +381,15 @@ describe('GenericTxBuilder', () => {
           rewardBalance: 33_333n
         }
       ]);
-      const txBuilder2 = await observableWallet.createTxBuilder();
+      const txBuilder2 = observableWallet.createTxBuilder();
       const txDelegate = await txBuilder2.delegate(poolId).build();
-      assertTxIsValid(txDelegate);
       expect(txDelegate.body.certificates?.length).toBe(1);
       const [delegationCert] = txDelegate.body.certificates!;
       if (delegationCert.__typename === Cardano.CertificateType.StakeDelegation) {
         expect(delegationCert.poolId).toBe(poolId);
       }
 
-      expect.assertions(3);
+      expect.assertions(2);
     });
 
     it('adds multiple certificates when handling multiple reward accounts', async () => {
@@ -415,9 +415,8 @@ describe('GenericTxBuilder', () => {
           rewardBalance: 44_444n
         }
       ]);
-      const txBuilder2 = await observableWallet.createTxBuilder();
+      const txBuilder2 = observableWallet.createTxBuilder();
       const txDelegate = await txBuilder2.delegate(poolId).build();
-      assertTxIsValid(txDelegate);
       expect(txDelegate.body.certificates?.length).toBe(4);
     });
 
@@ -434,9 +433,8 @@ describe('GenericTxBuilder', () => {
           rewardBalance: 33_333n
         }
       ]);
-      const txBuilder2 = await observableWallet.createTxBuilder();
+      const txBuilder2 = observableWallet.createTxBuilder();
       const txDeregister = await txBuilder2.delegate().build();
-      assertTxIsValid(txDeregister);
       expect(txDeregister.body.certificates?.length).toBe(1);
       const [deregisterCert] = txDeregister.body.certificates!;
       expect(deregisterCert.__typename).toBe(Cardano.CertificateType.StakeKeyDeregistration);
@@ -444,7 +442,6 @@ describe('GenericTxBuilder', () => {
 
     it('undefined poolId does NOT add certificate if not registered', async () => {
       const txDeregister = await txBuilder.delegate().build();
-      assertTxIsValid(txDeregister);
       expect(txDeregister.body.certificates?.length).toBeFalsy();
     });
   });
@@ -475,45 +472,44 @@ describe('GenericTxBuilder', () => {
       const singleAddrWallet = observableWallet as SingleAddressWallet;
       const builder = new GenericTxBuilder(singleAddrWallet.getTxBuilderDependencies(), mockValidator);
       builder.addOutput(output);
-      const tx = await builder.addOutput(builder.buildOutput(output2).toTxOut()).build();
+      try {
+        await builder.addOutput(builder.buildOutput(output2).toTxOut()).build();
+      } catch (error) {
+        const buildErrors = error as TxBodyValidationError[];
+        expect(buildErrors?.length).toBeTruthy();
 
-      expect(tx.isValid).toBeFalsy();
-      const [error1, error2] = (!tx.isValid && tx.errors) || [];
+        const [error1, error2] = buildErrors;
 
-      expect(error1 instanceof OutputValidationMinimumCoinError).toBeTruthy();
-      if (error1 instanceof OutputValidationMinimumCoinError) {
-        expect(error1.message === TxOutputFailure.MinimumCoin);
-        expect(error1.outputValidation).toEqual(coinMissingValidation);
-        expect(error1.txOut).toEqual(output);
+        expect(error1 instanceof OutputValidationMinimumCoinError).toBeTruthy();
+        if (error1 instanceof OutputValidationMinimumCoinError) {
+          expect(error1.message).toEqual(TxOutputFailure.MinimumCoin);
+          expect(error1.outputValidation).toEqual(coinMissingValidation);
+          expect(error1.txOut).toEqual(output);
+        }
+
+        expect(error2 instanceof OutputValidationTokenBundleSizeError).toBeTruthy();
+        if (error2 instanceof OutputValidationTokenBundleSizeError) {
+          expect(error2.message).toEqual(TxOutputFailure.TokenBundleSizeExceedsLimit);
+          expect(error2.outputValidation).toEqual(bundleSizeValidation);
+          expect(error2.txOut).toEqual(output2);
+        }
       }
-
-      expect(error2 instanceof OutputValidationTokenBundleSizeError).toBeTruthy();
-      if (error2 instanceof OutputValidationTokenBundleSizeError) {
-        expect(error2.message === TxOutputFailure.TokenBundleSizeExceedsLimit);
-        expect(error2.outputValidation).toEqual(bundleSizeValidation);
-        expect(error2.txOut).toEqual(output2);
-      }
+      expect.assertions(9);
     });
   });
 
   it('can be used to build and sign a tx', async () => {
-    const tx = await (await observableWallet.createTxBuilder()).addOutput(mocks.utxo[0][1]).build();
-    if (tx.isValid) {
-      expect(tx.inputSelection).toBeTruthy();
-      const signedTx = await tx.sign();
-      expect(signedTx.id).toEqual(tx.hash);
-    } else {
-      expect(tx.errors.length).toBeGreaterThan(0);
-      throw new Error('Invalid tx');
-    }
+    const builder = observableWallet.createTxBuilder();
+    const txO = builder.addOutput(mocks.utxo[0][1]);
+    const tx = await txO.build();
+    expect(tx.inputSelection).toBeTruthy();
+    const signedTx = await tx.sign();
+    expect(signedTx.id).toEqual(tx.hash);
   });
 
   it('can build transactions that are not modified by subsequent builder changes', async () => {
     const builtTxSnapshot1 = await txBuilder.addOutput(mocks.utxo[0][1]).build();
-    assertTxIsValid(builtTxSnapshot1);
-
-    const builtTxSnapshot2 = await txBuilder.addOutput(mocks.utxo[1][1]).build();
-    assertTxIsValid(builtTxSnapshot2);
+    await txBuilder.addOutput(mocks.utxo[1][1]).build();
 
     // First built output was not affected by second build() call
     const outputWithoutChange = builtTxSnapshot1.body.outputs[0];

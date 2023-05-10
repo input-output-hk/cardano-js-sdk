@@ -1,5 +1,4 @@
 import { SingleAddressWallet } from '@cardano-sdk/wallet';
-import { assertTxIsValid } from '../../../../wallet/test/util';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import { getEnv, getWallet, walletVariables } from '../../../src';
 import { isNotNil } from '@cardano-sdk/util';
@@ -32,13 +31,9 @@ describe('SingleAddressWallet/txChainHistory', () => {
     logger.info(`Address ${sendingAddress} will send ${tAdaToSend} lovelace to address ${receivingAddress}.`);
 
     // Send 10 tADA to the same wallet.
-    const txBuilder = await wallet.createTxBuilder();
+    const txBuilder = wallet.createTxBuilder();
     const txOutput = txBuilder.buildOutput().address(receivingAddress).coin(tAdaToSend).toTxOut();
-    const unsignedTx = await txBuilder.addOutput(txOutput).build();
-
-    assertTxIsValid(unsignedTx);
-
-    const signedTx = await unsignedTx.sign();
+    const signedTx = await txBuilder.addOutput(txOutput).build().sign();
     await wallet.submitTx(signedTx);
 
     logger.info(

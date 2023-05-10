@@ -72,7 +72,7 @@ export interface ObservableWallet {
   /**
    * Create a TxBuilder from this wallet
    */
-  createTxBuilder(): Promise<TxBuilder>;
+  createTxBuilder(): TxBuilder;
 
   shutdown(): void;
 }

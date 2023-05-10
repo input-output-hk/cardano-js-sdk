@@ -29,18 +29,13 @@ describe('SingleAddressWallet/metadata', () => {
     // Make sure the wallet has sufficient funds to run this test
     await walletReady(wallet, minimumCoin);
 
-    const builtTx = await (
-      await wallet.createTxBuilder()
-    )
+    const signedTx = await wallet
+      .createTxBuilder()
       .addOutput({ address: ownAddress, value: { coins: minimumCoin } })
       .setMetadata(metadata)
-      .build();
+      .build()
+      .sign();
 
-    if (!builtTx.isValid) {
-      throw new Error('Invalid tx');
-    }
-
-    const signedTx = await builtTx.sign();
     const outgoingTx = signedTx;
     await wallet.submitTx(signedTx);
 

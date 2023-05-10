@@ -1,6 +1,5 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { SingleAddressWallet, utxoEquals } from '@cardano-sdk/wallet';
-import { assertTxIsValid } from '../../../../wallet/test/util';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import { firstValueFromTimed, walletReady } from '../../util';
@@ -29,19 +28,15 @@ describe('SingleAddressWallet/unspendableUtxos', () => {
     await walletReady(wallet1, coins);
     await walletReady(wallet2, coins);
 
-    const txBuilder1 = await wallet1.createTxBuilder();
-    const txBuilder2 = await wallet2.createTxBuilder();
+    const txBuilder1 = wallet1.createTxBuilder();
+    const txBuilder2 = wallet2.createTxBuilder();
 
     const address = (await firstValueFrom(wallet1.addresses$))[0].address;
 
     // Create a new UTxO to be use as collateral.
     const txOutput = txBuilder1.buildOutput().address(address).coin(5_000_000n).toTxOut();
 
-    const unsignedTx = await txBuilder1.addOutput(txOutput).build();
-
-    assertTxIsValid(unsignedTx);
-
-    const signedTx = await unsignedTx.sign();
+    const signedTx = await txBuilder1.addOutput(txOutput).build().sign();
     await wallet1.submitTx(signedTx);
 
     // Search chain history to see if the transaction is there.
@@ -98,13 +93,10 @@ describe('SingleAddressWallet/unspendableUtxos', () => {
       `Failed to find transaction ${signedTx.id} in dest wallet history`
     );
 
-    const unsignedMoveAdaTx = await txBuilder2
+    const signedMoveAdaTx = await txBuilder2
       .addOutput(txBuilder2.buildOutput().address(address).value(totalBalance).toTxOut())
-      .build();
-
-    assertTxIsValid(unsignedMoveAdaTx);
-
-    const signedMoveAdaTx = await unsignedMoveAdaTx.sign();
+      .build()
+      .sign();
     await wallet2.submitTx(signedMoveAdaTx);
 
     // Search chain history to see if the transaction is there.

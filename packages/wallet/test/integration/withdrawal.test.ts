@@ -3,7 +3,6 @@ import { firstValueFrom, of } from 'rxjs';
 
 import * as mocks from '../../../core/test/mocks';
 import { SingleAddressWallet, TransactionFailure } from '../../src';
-import { assertTxIsValid } from '../util';
 import { createWallet } from './util';
 
 describe('integration/withdrawal', () => {
@@ -45,9 +44,8 @@ describe('integration/withdrawal', () => {
     rewardAccounts[0].rewardBalance = 0n;
     wallet.delegation.rewardAccounts$ = of([rewardAccounts[0]]);
 
-    const txBuilder = await wallet.createTxBuilder();
+    const txBuilder = wallet.createTxBuilder();
     const tx = await txBuilder.addOutput(mocks.utxo[0][1]).build();
-    assertTxIsValid(tx);
 
     expect(tx.body.withdrawals).toBeUndefined();
   });
@@ -57,9 +55,8 @@ describe('integration/withdrawal', () => {
     rewardAccounts[0].rewardBalance = 0n;
     wallet.delegation.rewardAccounts$ = of(rewardAccounts);
 
-    const txBuilder = await wallet.createTxBuilder();
+    const txBuilder = wallet.createTxBuilder();
     const tx = await txBuilder.addOutput(mocks.utxo[0][1]).build();
-    assertTxIsValid(tx);
 
     const withdrawWithReward: Cardano.Withdrawal = {
       quantity: rewardAccounts[1].rewardBalance,
@@ -70,9 +67,8 @@ describe('integration/withdrawal', () => {
 
   it('can withdraw from multiple accounts in the same transaction', async () => {
     wallet.delegation.rewardAccounts$ = of(rewardAccounts);
-    const txBuilder = await wallet.createTxBuilder();
+    const txBuilder = wallet.createTxBuilder();
     const tx = await txBuilder.addOutput(mocks.utxo[0][1]).build();
-    assertTxIsValid(tx);
 
     const withdrawals: Cardano.Withdrawal[] = rewardAccounts.map(
       ({ rewardBalance: quantity, address: stakeAddress }) => ({ quantity, stakeAddress })

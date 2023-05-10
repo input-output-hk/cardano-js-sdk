@@ -3,7 +3,6 @@ import { FinalizeTxProps, InitializeTxProps } from '@cardano-sdk/tx-construction
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, isNotNil } from '@cardano-sdk/util';
 import { SingleAddressWallet, TransactionFailure } from '@cardano-sdk/wallet';
-import { assertTxIsValid } from '../../../../wallet/test/util';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import { firstValueFromTimed, walletReady } from '../../util';
@@ -20,18 +19,14 @@ const logger = createLogger();
 const createCollateral = async (
   wallet: SingleAddressWallet
 ): Promise<{ collateralInput: Cardano.TxIn; collateralCoinValue: bigint }> => {
-  const txBuilder = await wallet.createTxBuilder();
+  const txBuilder = wallet.createTxBuilder();
 
   const address = (await firstValueFrom(wallet.addresses$))[0].address;
 
   // Create a new UTxO to be use as collateral.
   const txOutput = txBuilder.buildOutput().address(address).coin(5_000_000n).toTxOut();
 
-  const unsignedTx = await txBuilder.addOutput(txOutput).build();
-
-  assertTxIsValid(unsignedTx);
-
-  const signedTx = await unsignedTx.sign();
+  const signedTx = await txBuilder.addOutput(txOutput).build().sign();
   await wallet.submitTx(signedTx);
 
   // Wait for transaction to be on chain.

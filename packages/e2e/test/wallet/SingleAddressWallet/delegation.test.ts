@@ -3,7 +3,6 @@ import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
 import { ObservableWallet } from '@cardano-sdk/wallet';
 import { TX_TIMEOUT_DEFAULT, TestWallet, getEnv, getWallet, walletVariables } from '../../../src';
-import { assertTxIsValid } from '../../../../wallet/test/util';
 import { combineLatest, filter, firstValueFrom } from 'rxjs';
 import { firstValueFromTimed, waitForWalletStateSettle, walletReady } from '../../util';
 import { logger } from '@cardano-sdk/util-dev';
@@ -102,16 +101,14 @@ describe('SingleAddressWallet/delegation', () => {
     // Make a 1st tx with key registration (if not already registered) and stake delegation
     // Also send some coin to another wallet
     const destAddresses = (await firstValueFrom(destWallet.addresses$))[0].address;
-    const txBuilder = await sourceWallet.createTxBuilder();
+    const txBuilder = sourceWallet.createTxBuilder();
 
     const tx = await txBuilder
       .addOutput(txBuilder.buildOutput().address(destAddresses).coin(tx1OutputCoins).toTxOut())
       .delegate(poolId)
-      .build();
-    assertTxIsValid(tx);
-
-    const signedTx = await tx.sign();
-    await sourceWallet.submitTx(signedTx);
+      .build()
+      .sign();
+    await sourceWallet.submitTx(tx);
 
     // Test it locks available balance after tx is submitted
     await firstValueFromTimed(
@@ -135,7 +132,7 @@ describe('SingleAddressWallet/delegation', () => {
     expect(tx1PendingState.balance.available.coins).toEqual(expectedCoinsAfterTx1);
     expect(tx1PendingState.balance.deposit).toEqual(stakeKeyDeposit);
 
-    await waitForTx(sourceWallet, signedTx.id);
+    await waitForTx(sourceWallet, tx.id);
     const tx1ConfirmedState = await getWalletStateSnapshot(sourceWallet);
 
     // Updates total and available balance after tx is on-chain
@@ -158,9 +155,7 @@ describe('SingleAddressWallet/delegation', () => {
     }
 
     // Make a 2nd tx with key de-registration
-    const txDeregister = await (await sourceWallet.createTxBuilder()).delegate().build();
-    assertTxIsValid(txDeregister);
-    const txDeregisterSigned = await txDeregister.sign();
+    const txDeregisterSigned = await sourceWallet.createTxBuilder().delegate().build().sign();
     await sourceWallet.submitTx(txDeregisterSigned);
     await waitForTx(sourceWallet, txDeregisterSigned.id);
     const tx2ConfirmedState = await getWalletStateSnapshot(sourceWallet);

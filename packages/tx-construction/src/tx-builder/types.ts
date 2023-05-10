@@ -43,23 +43,6 @@ export type TxOutValidationError =
   | OutputValidationTokenBundleSizeError;
 export type TxBodyValidationError = TxOutValidationError | InputSelectionError | RewardAccountMissingError;
 
-export type Valid<TValid> = TValid & {
-  isValid: true;
-};
-
-export interface Invalid<TError> {
-  isValid: false;
-  errors: TError[];
-}
-
-export interface ValidTxOutData {
-  readonly txOut: Cardano.TxOut;
-}
-
-export type ValidTxOut = Valid<ValidTxOutData>;
-export type InvalidTxOut = Invalid<TxOutValidationError>;
-export type MaybeValidTxOut = ValidTxOut | InvalidTxOut;
-
 /**
  * Helps build transaction outputs from its constituent parts.
  * Usage examples are in the unit/integration tests from `TxBuilder.test.ts`.
@@ -98,16 +81,16 @@ export interface OutputBuilder {
   /**
    * Checks if the transaction output is complete and valid
    *
-   * @returns {Promise<MaybeValidTxOut>} When it is a `ValidTxOut` it can be used as input in `TxBuilder.addOutput()`.
-   * In case of it is an `InvalidTxOut`, it embeds a TxOutValidationError with more details
+   * @returns {Promise<Cardano.TxOut>} Promise<Cardano.TxOut> which can be used as input in `TxBuilder.addOutput()`.
+   * @throws {TxOutValidationError} TxOutValidationError
    */
-  build(): Promise<MaybeValidTxOut>;
+  build(): Promise<Cardano.TxOut>;
 }
 
 export type SignedTx = Cardano.Tx;
 
 /** Transaction body built with {@link TxBuilder.build}. */
-export interface ValidTxBody {
+export interface UnsignedTx {
   readonly body: Cardano.TxBody;
   readonly auxiliaryData?: Cardano.AuxiliaryData;
   readonly extraSigners?: TransactionSigner[];
@@ -118,9 +101,18 @@ export interface ValidTxBody {
   sign(): Promise<SignedTx>;
 }
 
-export type ValidTx = Valid<ValidTxBody>;
-export type InvalidTx = Invalid<TxBodyValidationError>;
-export type MaybeValidTx = ValidTx | InvalidTx;
+/**
+ * Extended promise for unsigned transactions that allows chaining build() with sign(), without
+ * awaiting for the build() operation.
+ * `const unsignedTx = await txBuilder.build().sign();`
+ * At the same time it allows awaiting for build() in case signing is not desired immediately.
+ * `const signedTx = await txBuilder.build();`
+ * UnsignedTxPromise must also lazy executed, in the sense that the code will be executed only after the Promise is
+ * awaited, as opposed to normal Promise behavior where the code is executed when creating the Promise.
+ */
+export interface UnsignedTxPromise extends Promise<UnsignedTx> {
+  sign(): Promise<SignedTx>;
+}
 
 export interface TxBuilder {
   /**
@@ -171,17 +163,17 @@ export interface TxBuilder {
   setSigningOptions(options: SignTransactionOptions): TxBuilder;
 
   /**
-   * Builds a `ValidTxBody` based on partialTxBody.
+   * Builds an {@link UnsignedTx} based on partialTxBody.
    * All positive balance found in reward accounts is included in the transaction withdrawal.
    * Performs multiple validations to make sure the transaction body is correct.
-   * In case validations fail, it creates a `TxBodyValidationError` instead of `ValidTxBody`.
    *
-   * @returns {Promise<MaybeValidTx>}
-   * - In case it is a {@link ValidTx}, it can be used to sign and submit the transaction.
-   *   This is a snapshot of transaction. Further changes done via TxBuilder, will not update this snapshot.
-   * - In case it is an `InvalidTx`, it embeds a TxBodyValidationError with more details.
+   * @returns {UnsignedTxPromise}
+   * - Can be used to build and sign directly: `const signedTx = await txBuilder.build().sign()`, or do the steps
+   *   separately at a later time: `const unsignedTx = await txBuilder.build(); const signedTx = await unsignedTx.sign()`
+   * - This is a snapshot of transaction. Further changes done via TxBuilder, will not update this snapshot.
+   * @throws {TxBodyValidationError[]} TxBodyValidationError[]
    */
-  build(): Promise<MaybeValidTx>;
+  build(): UnsignedTxPromise;
 
   // TODO:
   // - setMint

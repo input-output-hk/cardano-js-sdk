@@ -1,7 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { Cardano } from '@cardano-sdk/core';
 import { SingleAddressWallet } from '@cardano-sdk/wallet';
-import { assertTxIsValid } from '../../../../wallet/test/util';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import { getEnv, walletVariables } from '../../../src/environment';
@@ -26,7 +25,7 @@ describe('SingleAddressWallet/byron', () => {
   it('can transfer tADA to a byron address', async () => {
     await walletReady(wallet);
 
-    const txBuilder = await wallet.createTxBuilder();
+    const txBuilder = wallet.createTxBuilder();
 
     const txOutput = txBuilder
       .buildOutput()
@@ -34,11 +33,7 @@ describe('SingleAddressWallet/byron', () => {
       .coin(3_000_000n)
       .toTxOut();
 
-    const unsignedTx = await txBuilder.addOutput(txOutput).build();
-
-    assertTxIsValid(unsignedTx);
-
-    const signedTx = await unsignedTx.sign();
+    const signedTx = await txBuilder.addOutput(txOutput).build().sign();
     await wallet.submitTx(signedTx);
 
     // Search chain history to see if the transaction is there.
