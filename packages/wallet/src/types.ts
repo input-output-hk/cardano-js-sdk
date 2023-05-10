@@ -60,9 +60,11 @@ export interface ObservableWallet {
 
   getName(): Promise<string>;
   /**
+   * @deprecated Use `createTxBuilder()` instead.
    * @throws InputSelectionError
    */
   initializeTx(props: InitializeTxProps): Promise<InitializeTxResult>;
+  /** @deprecated Use `createTxBuilder()` instead. */
   finalizeTx(props: FinalizeTxProps): Promise<Cardano.Tx>;
   /**
    * @throws Cip30DataSignError
