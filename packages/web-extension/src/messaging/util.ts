@@ -2,18 +2,28 @@
 import {
   AnyMessage,
   ChannelName,
+  CompletionMessage,
+  Destructor,
   EmitMessage,
+  FactoryCall,
+  FactoryCallMessage,
   InternalMsg,
   MethodRequest,
-  ObservableCompletionMessage,
   RequestMessage,
   ResponseMessage
 } from './types';
+import { Logger } from 'ts-log';
 import { Runtime } from 'webextension-polyfill';
 import { v4 as uuidv4 } from 'uuid';
 
-export const isRequest = (message: any): message is MethodRequest =>
+const isRequestLike = (message: any): message is MethodRequest & Partial<Record<string, unknown>> =>
   typeof message === 'object' && message !== null && Array.isArray(message.args) && typeof message.method === 'string';
+
+export const isRequest = (message: any): message is MethodRequest =>
+  isRequestLike(message) && typeof message.channel === 'undefined';
+
+export const isFactoryCall = (message: any): message is FactoryCall =>
+  isRequestLike(message) && typeof message.channel === 'string';
 
 const looksLikeMessage = (message: any): message is AnyMessage & Record<string, unknown> =>
   typeof message === 'object' && message !== null && typeof message.messageId === 'string';
@@ -21,10 +31,13 @@ const looksLikeMessage = (message: any): message is AnyMessage & Record<string, 
 export const isRequestMessage = (message: any): message is RequestMessage =>
   looksLikeMessage(message) && isRequest(message.request);
 
+export const isFactoryCallMessage = (message: any): message is FactoryCallMessage =>
+  looksLikeMessage(message) && isFactoryCall(message.factoryCall);
+
 export const isResponseMessage = (message: any): message is ResponseMessage =>
   looksLikeMessage(message) && message.hasOwnProperty('response');
 
-export const isObservableCompletionMessage = (message: any): message is ObservableCompletionMessage =>
+export const isCompletionMessage = (message: any): message is CompletionMessage =>
   looksLikeMessage(message) && typeof message.subscribe === 'boolean';
 
 export const isEmitMessage = (message: any): message is EmitMessage =>
@@ -49,3 +62,28 @@ export const disabledApiMsg: InternalMsg = {
 };
 export const isNotDisabledApiMsg = (msg: unknown) =>
   !isInternalMsg(msg) || msg.remoteApiInternalMsg !== disabledApiMsg.remoteApiInternalMsg;
+
+export class FinalizationRegistryDestructor implements Destructor {
+  readonly #registry: FinalizationRegistry<unknown>;
+  readonly #logger: Logger;
+  readonly callbacks: Map<unknown, () => void> = new Map();
+
+  constructor(logger: Logger) {
+    this.#registry = new FinalizationRegistry((heldValue) => this.#callback(heldValue));
+    this.#logger = logger;
+  }
+
+  #callback(heldValue: unknown) {
+    const callback = this.callbacks.get(heldValue);
+    if (!callback) {
+      return this.#logger.error('heldValue not found in FinalizationRegistryDestructor');
+    }
+    this.callbacks.delete(heldValue);
+    callback();
+  }
+
+  onGarbageCollected(obj: object, objectId: unknown, callback: () => void) {
+    this.callbacks.set(objectId, callback);
+    this.#registry.register(obj, objectId);
+  }
+}

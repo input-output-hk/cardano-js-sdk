@@ -15,4 +15,5 @@ export * from './RunnableModule';
 export * from './opaqueTypes';
 export * from './environment';
 export * from './patchObject';
+export * from './isPromise';
 export { PromiseOrValue, resolveObjectValues } from './util';

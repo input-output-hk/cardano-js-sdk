@@ -1,5 +1,13 @@
 import { EMPTY, Observable, Subject, map } from 'rxjs';
-import { Messenger, PortMessage, RemoteApiPropertyType, RequestMessage, exposeMessengerApi } from '../../src/messaging';
+import {
+  FactoryCallMessage,
+  Messenger,
+  PortMessage,
+  RemoteApiProperties,
+  RemoteApiPropertyType,
+  RequestMessage,
+  exposeMessengerApi
+} from '../../src/messaging';
 import { dummyLogger } from 'ts-log';
 
 const logger = dummyLogger;
@@ -9,7 +17,13 @@ enum ApiObjectType {
   nested = 'nested'
 }
 
-type SimpleApi = { someNumbers$: Observable<number>; somePromiseMethod: () => Promise<number> };
+type SimpleApi = {
+  someNumbers$: Observable<number>;
+  somePromiseMethod: () => Promise<number>;
+  someFactory: () => {
+    somePromiseMethod: () => Promise<number>;
+  };
+};
 
 const setUp = (mode: ApiObjectType) => {
   const incomingMsg$ = new Subject<PortMessage<unknown>>();
@@ -18,6 +32,7 @@ const setUp = (mode: ApiObjectType) => {
     channel: 'mockMessenger-someNumbers$',
     connect$: new Subject(),
     deriveChannel: jest.fn(),
+    isShutdown: false,
     message$: new Subject(),
     postMessage: jest.fn().mockImplementation(() => EMPTY),
     shutdown: jest.fn()
@@ -26,6 +41,7 @@ const setUp = (mode: ApiObjectType) => {
     channel: 'mockMessenger',
     connect$: new Subject(),
     deriveChannel: jest.fn().mockImplementation(() => observablePropMessenger),
+    isShutdown: false,
     message$: incomingMsg$.asObservable(),
     postMessage: jest.fn().mockImplementation(() => EMPTY),
     shutdown: jest.fn()
@@ -34,12 +50,19 @@ const setUp = (mode: ApiObjectType) => {
     channel: 'mockMessengerOuter',
     connect$: new Subject(),
     deriveChannel: jest.fn().mockImplementation(() => mockMessenger),
+    isShutdown: false,
     message$: new Subject(),
     postMessage: jest.fn().mockImplementation(() => EMPTY),
     shutdown: jest.fn()
   };
 
-  const properties = {
+  const properties: RemoteApiProperties<SimpleApi> = {
+    someFactory: {
+      apiProperties: {
+        somePromiseMethod: RemoteApiPropertyType.MethodReturningPromise
+      },
+      propType: RemoteApiPropertyType.ApiFactory
+    },
     someNumbers$: RemoteApiPropertyType.HotObservable,
     somePromiseMethod: RemoteApiPropertyType.MethodReturningPromise
   };
@@ -48,10 +71,21 @@ const setUp = (mode: ApiObjectType) => {
   const someNumbers$ = new Subject<number>();
   const someNumbers2$ = new Subject<number>();
 
-  const api = [
-    { obj: { someNumbers$, somePromiseMethod: jest.fn().mockResolvedValue(5) }, sourceNumbers$: someNumbers$ },
+  const api: { obj: SimpleApi; sourceNumbers$: Subject<number> }[] = [
     {
-      obj: { someNumbers$: someNumbers2$, somePromiseMethod: jest.fn().mockResolvedValue(55) },
+      obj: {
+        someFactory: jest.fn().mockReturnValue({ somePromiseMethod: jest.fn().mockResolvedValue(6) }),
+        someNumbers$,
+        somePromiseMethod: jest.fn().mockResolvedValue(5)
+      },
+      sourceNumbers$: someNumbers$
+    },
+    {
+      obj: {
+        someFactory: jest.fn().mockReturnValueOnce({ somePromiseMethod: jest.fn().mockResolvedValue(9) }),
+        someNumbers$: someNumbers2$,
+        somePromiseMethod: jest.fn().mockResolvedValue(55)
+      },
       sourceNumbers$: someNumbers2$
     }
   ];
@@ -166,6 +200,36 @@ describe('remoteApi', () => {
       it('null api unsubscribes observable channels', () => {
         sut.apiSource$.next(null);
         expect(sut.api[0].sourceNumbers$.observed).toBe(false);
+      });
+    });
+
+    describe('ApiFactory', () => {
+      it('each factory call exposes a new api object', (done) => {
+        const activate1: FactoryCallMessage = {
+          factoryCall: {
+            args: [],
+            channel: 'channel1',
+            method: 'someFactory'
+          },
+          messageId: 'call1'
+        };
+        const activate2: FactoryCallMessage = {
+          factoryCall: {
+            args: [],
+            channel: 'channel2',
+            method: 'someFactory'
+          },
+          messageId: 'call2'
+        };
+        sut.apiSource$.next(sut.api[0].obj);
+        sut.incomingMsg$.next({ data: activate1, port: { postMessage } });
+        sut.incomingMsg$.next({ data: activate2, port: { postMessage } });
+        setTimeout(() => {
+          expect(sut.api[0].obj.someFactory).toHaveBeenCalledTimes(2);
+          // once for base api and 2 factory calls
+          expect(sut.mockMessenger.deriveChannel).toHaveBeenCalledTimes(3);
+          done();
+        });
       });
     });
 

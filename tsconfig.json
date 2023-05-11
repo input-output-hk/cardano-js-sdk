@@ -2,7 +2,7 @@
   "compilerOptions": {
     "composite": true,
     "module": "commonjs",
-    "target": "es2020",
+    "target": "es2021",
     "esModuleInterop": true,
     "moduleResolution": "node",
     "declaration": true,

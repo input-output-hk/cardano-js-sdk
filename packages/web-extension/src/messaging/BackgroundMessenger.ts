@@ -101,6 +101,7 @@ export const generalizeBackgroundMessenger = (channel: ChannelName, messenger: B
   deriveChannel(path) {
     return generalizeBackgroundMessenger(deriveChannelName(channel, path), messenger);
   },
+  isShutdown: false,
   message$: messenger.getChannel(channel).message$,
   /**
    * @throws RxJS EmptyError if messenger is shutdown
@@ -121,5 +122,6 @@ export const generalizeBackgroundMessenger = (channel: ChannelName, messenger: B
 
   shutdown() {
     messenger.shutdownChannel(channel);
+    this.isShutdown = true;
   }
 });
