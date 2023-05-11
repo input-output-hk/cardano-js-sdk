@@ -160,10 +160,17 @@ export interface KeyAgent {
    * @throws AuthenticationError
    */
   derivePublicKey(derivationPath: AccountKeyDerivationPath): Promise<Crypto.Ed25519PublicKeyHex>;
+
   /**
-   * @throws AuthenticationError
+   * Derives an address from the given payment key and stake key derivation path.
+   *
+   * @param paymentKeyDerivationPath The payment key derivation path.
+   * @param stakeKeyDerivationIndex The stake key index. This field is optional. If not provided it defaults to index 0.
    */
-  deriveAddress(derivationPath: AccountAddressDerivationPath): Promise<GroupedAddress>;
+  deriveAddress(
+    paymentKeyDerivationPath: AccountAddressDerivationPath,
+    stakeKeyDerivationIndex: number
+  ): Promise<GroupedAddress>;
   /**
    * @throws AuthenticationError
    */

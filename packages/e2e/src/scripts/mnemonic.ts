@@ -26,10 +26,13 @@ import { localNetworkChainId } from '../util';
     }
   );
 
-  const derivedAddress = await keyAgentFromMnemonic.deriveAddress({
-    index: 0,
-    type: AddressType.External
-  });
+  const derivedAddress = await keyAgentFromMnemonic.deriveAddress(
+    {
+      index: 0,
+      type: AddressType.External
+    },
+    0
+  );
 
   console.log('');
   console.log(`  Mnemonic:   ${mnemonic}`);

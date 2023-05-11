@@ -37,7 +37,7 @@ describe('cip36', () => {
 
     it('can create cip36 voting registration metadata', async () => {
       // Just ensuring we have some address. SingleAddressWallet already does this internally.
-      await walletKeyAgent.deriveAddress({ index: 0, type: AddressType.External });
+      await walletKeyAgent.deriveAddress({ index: 0, type: AddressType.External }, 0);
       const paymentAddress = walletKeyAgent.knownAddresses[0].address;
       // InMemoryKeyAgent uses this derivation path for stake key.
       const stakeKey = await walletKeyAgent.derivePublicKey(util.STAKE_KEY_DERIVATION_PATH);
