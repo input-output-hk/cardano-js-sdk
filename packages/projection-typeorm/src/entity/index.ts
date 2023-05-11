@@ -8,3 +8,4 @@ export * from './PoolMetadata.entity';
 export * from './Asset.entity';
 export * from './Tokens.entity';
 export * from './Output.entity';
+export * from './Handle.entity';

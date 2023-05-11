@@ -5,4 +5,5 @@ export * from './withTypeormTransaction';
 export * from './storeBlock';
 export * from './storeAssets';
 export * from './storeUtxo';
+export * from './storeHandles';
 export * from './util';

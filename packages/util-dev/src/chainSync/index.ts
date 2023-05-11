@@ -90,7 +90,8 @@ const intersect = (events: ChainSyncData['body'], points: PointOrOrigin[]) => {
 export enum ChainSyncDataSet {
   WithPoolRetirement = 'with-pool-retirement.json',
   WithStakeKeyDeregistration = 'with-stake-key-deregistration.json',
-  WithMint = 'with-mint.json'
+  WithMint = 'with-mint.json',
+  WithHandle = 'with-handle.json'
 }
 
 export const chainSyncData = memoize((dataSet: ChainSyncDataSet) => {

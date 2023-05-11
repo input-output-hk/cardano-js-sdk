@@ -1,4 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
+import { FilterByPolicyIds } from './types';
 import { ProjectionOperator } from '../../types';
 import { map } from 'rxjs';
 import { unifiedProjectorOperator } from '../utils';
@@ -44,3 +45,10 @@ export const filterProducedUtxoByAddresses =
         utxo: { ...evt.utxo, produced: evt.utxo.produced.filter(([_, { address }]) => addresses.includes(address)) }
       }))
     );
+
+export const filterProducedUtxoByAssetPolicyId =
+  <PropsIn extends WithUtxo>({ policyIds: _policyIds }: FilterByPolicyIds): ProjectionOperator<PropsIn> =>
+  // TODO
+  // eslint-disable-next-line unicorn/consistent-function-scoping
+  (evt$) =>
+    evt$;
