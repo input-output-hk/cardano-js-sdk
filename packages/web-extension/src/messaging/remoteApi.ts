@@ -1,15 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   BindRequestHandlerOptions,
+  CompletionMessage,
+  ConsumeMessengerApiDependencies,
   ConsumeRemoteApiOptions,
   EmitMessage,
   ExposableRemoteApi,
   ExposeApiProps,
+  FactoryCallMessage,
   MessengerApiDependencies,
   MethodRequest,
   MethodRequestOptions,
-  ObservableCompletionMessage,
+  RemoteApiFactory,
   RemoteApiMethod,
+  RemoteApiProperties,
   RemoteApiPropertyType,
   RequestMessage,
   ResponseMessage
@@ -20,9 +24,12 @@ import {
   EmptyError,
   NEVER,
   Observable,
+  Subscription,
+  TeardownLogic,
   concat,
   filter,
   firstValueFrom,
+  from,
   isObservable,
   map,
   merge,
@@ -33,14 +40,21 @@ import {
   takeUntil,
   tap
 } from 'rxjs';
-import { GetErrorPrototype, Shutdown, fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
+import {
+  GetErrorPrototype,
+  Shutdown,
+  fromSerializableObject,
+  isPromise,
+  toSerializableObject
+} from '@cardano-sdk/util';
 import { NotImplementedError } from '@cardano-sdk/core';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
 import {
   disabledApiMsg,
+  isCompletionMessage,
   isEmitMessage,
+  isFactoryCallMessage,
   isNotDisabledApiMsg,
-  isObservableCompletionMessage,
   isRequestMessage,
   isResponseMessage,
   newMessageId
@@ -92,12 +106,66 @@ const consumeMethod =
     return result;
   };
 
+interface ConsumeFactoryProps<T> {
+  method: string;
+  apiProperties: RemoteApiProperties<T>;
+  getErrorPrototype: GetErrorPrototype | undefined;
+}
+
+let factoryChannelNo = 0;
+const consumeFactory =
+  <T>(
+    { method, apiProperties, getErrorPrototype }: ConsumeFactoryProps<T>,
+    { logger, messenger, destructor }: ConsumeMessengerApiDependencies
+  ) =>
+  (...args: unknown[]) => {
+    const channel = `${method}-${factoryChannelNo++}`;
+    const postSubscription = messenger
+      .postMessage({
+        factoryCall: { args: toSerializableObject(args), channel, method },
+        messageId: newMessageId()
+      } as FactoryCallMessage)
+      .subscribe();
+    const apiMessenger = messenger.deriveChannel(channel);
+    // eslint-disable-next-line no-use-before-define
+    const api = consumeMessengerRemoteApi(
+      {
+        getErrorPrototype,
+        properties: apiProperties
+      },
+      {
+        destructor,
+        logger,
+        messenger: apiMessenger
+      }
+    );
+    destructor.onGarbageCollected(api, factoryChannelNo, () => {
+      if (apiMessenger.isShutdown) {
+        return;
+      }
+      apiMessenger
+        .postMessage({
+          messageId: newMessageId(),
+          subscribe: false
+        } as CompletionMessage)
+        .subscribe(() => {
+          postSubscription.unsubscribe();
+          apiMessenger.shutdown();
+        });
+    });
+
+    // Since it returns synchronously, we can't catch potential errors.
+    // If factory method throws on the remote side, it might be a good idea to "brick" the returned api object:
+    // immediately reject on all method calls and error on observable subscriptions,
+    return api;
+  };
+
 /**
  * Creates a proxy to a remote api object
  */
 export const consumeMessengerRemoteApi = <T extends object>(
   { properties, getErrorPrototype }: ConsumeRemoteApiOptions<T>,
-  { logger, messenger }: MessengerApiDependencies
+  { logger, messenger, destructor }: ConsumeMessengerApiDependencies
 ): T & Shutdown =>
   new Proxy<T & Shutdown>(
     {
@@ -110,17 +178,24 @@ export const consumeMessengerRemoteApi = <T extends object>(
         const propName = prop.toString();
         if (typeof propMetadata === 'object') {
           if ('propType' in propMetadata) {
-            if (propMetadata.propType === RemoteApiPropertyType.MethodReturningPromise) {
-              return (receiver[prop] = consumeMethod(
-                { getErrorPrototype, options: propMetadata.requestOptions, propName },
-                { logger, messenger }
-              ));
+            switch (propMetadata.propType) {
+              case RemoteApiPropertyType.MethodReturningPromise: {
+                return (receiver[prop] = consumeMethod(
+                  { getErrorPrototype, options: propMetadata.requestOptions, propName },
+                  { logger, messenger }
+                ));
+              }
+              case RemoteApiPropertyType.ApiFactory: {
+                return (receiver[prop] = consumeFactory(
+                  { apiProperties: propMetadata.apiProperties, getErrorPrototype, method: propName },
+                  { destructor, logger, messenger }
+                ));
+              }
             }
-            throw new NotImplementedError('Only MethodReturningPromise prop type can be specified as object');
           } else {
             return (receiver[prop] = consumeMessengerRemoteApi(
               { getErrorPrototype, properties: propMetadata as any },
-              { logger, messenger: messenger.deriveChannel(propName) }
+              { destructor, logger, messenger: messenger.deriveChannel(propName) }
             ));
           }
         } else if (propMetadata === RemoteApiPropertyType.MethodReturningPromise) {
@@ -129,7 +204,7 @@ export const consumeMessengerRemoteApi = <T extends object>(
           const observableMessenger = messenger.deriveChannel(propName);
           const messageData$ = observableMessenger.message$.pipe(map(({ data }) => fromSerializableObject(data)));
           const unsubscribe$ = messageData$.pipe(
-            filter(isObservableCompletionMessage),
+            filter(isCompletionMessage),
             filter(({ subscribe }) => !subscribe),
             tap(({ error }) => {
               if (error) throw error;
@@ -178,15 +253,25 @@ export const bindMessengerRequestHandler = <Response>(
   };
 };
 
+const isObject = (prop: unknown) => typeof prop === 'object' && prop !== null;
+
+const hasPropType = (prop: unknown, propType: RemoteApiPropertyType) =>
+  isObject(prop) && (prop as any).propType === propType;
+
+const hasAnyPropType = (prop: unknown) => isObject(prop) && typeof (prop as any).propType === 'number';
+
 const isRemoteApiMethod = (prop: unknown): prop is RemoteApiMethod =>
-  typeof prop === 'object' && prop !== null && 'propType' in prop;
+  hasPropType(prop, RemoteApiPropertyType.MethodReturningPromise);
+
+const isRemoteApiFactory = (prop: unknown): prop is RemoteApiFactory<unknown> =>
+  hasPropType(prop, RemoteApiPropertyType.ApiFactory);
 
 export const bindNestedObjChannels = <API extends object>(
   { api$, properties }: ExposeApiProps<API>,
   { messenger, logger }: MessengerApiDependencies
 ): Shutdown => {
   const subscriptions = Object.entries(properties)
-    .filter(([_, type]) => typeof type === 'object' && !isRemoteApiMethod(type))
+    .filter(([_, type]) => typeof type === 'object' && !hasAnyPropType(type))
     .map(([prop]) =>
       // eslint-disable-next-line no-use-before-define
       exposeMessengerApi(
@@ -210,6 +295,69 @@ export const bindNestedObjChannels = <API extends object>(
       for (const subscription of subscriptions) {
         subscription.shutdown();
       }
+    }
+  };
+};
+
+export const bindFactoryMethods = <API extends object>(
+  { api$, properties }: ExposeApiProps<API>,
+  { messenger, logger }: MessengerApiDependencies
+): Shutdown => {
+  const subscription = messenger.message$.subscribe(async ({ data }) => {
+    if (!isFactoryCallMessage(data)) return;
+    const propertyDefinition = (properties as any)[data.factoryCall.method];
+    if (!isRemoteApiFactory(propertyDefinition)) {
+      logger.warn(`Invalid or missing property definition for api factory method '${data.factoryCall.method}'`);
+      return;
+    }
+    try {
+      const args = fromSerializableObject<MethodRequest>(data.factoryCall.args);
+      const { method, channel } = data.factoryCall;
+      const factoryMessenger = messenger.deriveChannel(channel);
+      // eslint-disable-next-line no-use-before-define
+      const api = exposeMessengerApi(
+        {
+          api$: api$.pipe(
+            switchMap((baseApi) => {
+              if (!baseApi) return NEVER;
+              const apiMethod = (baseApi as any)[method];
+              if (typeof apiMethod !== 'function') {
+                logger.warn('No api method', method);
+                return EMPTY;
+              }
+              const returnedApi = apiMethod.apply(baseApi, args);
+              if (isPromise(returnedApi)) {
+                return from(returnedApi);
+              }
+              return of(returnedApi);
+            })
+          ),
+          properties: propertyDefinition.apiProperties
+        },
+        {
+          logger,
+          messenger: factoryMessenger
+        }
+      );
+      let completeSubscription: Subscription | null = null;
+      const teardown: TeardownLogic = () => {
+        completeSubscription?.unsubscribe();
+        api.shutdown();
+      };
+      completeSubscription = factoryMessenger.message$.subscribe((msg) => {
+        if (isCompletionMessage(msg.data)) {
+          subscription.remove(teardown);
+          teardown();
+        }
+      });
+      subscription.add(teardown);
+    } catch (error) {
+      logger.debug('[bindFactoryMethods] error exposing api', data, error);
+    }
+  });
+  return {
+    shutdown: () => {
+      subscription.unsubscribe();
     }
   };
 };
@@ -241,7 +389,7 @@ export const bindObservableChannels = <API extends object>(
           port.postMessage(toSerializableObject({ emit: observable$.value, messageId: newMessageId() } as EmitMessage));
         }
       });
-      const broadcastMessage = (message: Partial<ObservableCompletionMessage | EmitMessage>) =>
+      const broadcastMessage = (message: Partial<CompletionMessage | EmitMessage>) =>
         observableMessenger
           .postMessage({
             messageId: newMessageId(),
@@ -291,15 +439,14 @@ export const exposeMessengerApi = <API extends object>(
   const apiTracker$ = new TrackerSubject(concat(api$, NEVER));
   const observableChannelsSubscription = bindObservableChannels({ api$: apiTracker$, properties }, dependencies);
   const nestedObjChannelsSubscription = bindNestedObjChannels({ api$: apiTracker$, properties }, dependencies);
+  const factoryMethodsSubscription = bindFactoryMethods({ api$: apiTracker$, properties }, dependencies);
   const methodHandlerSubscription = bindMessengerRequestHandler(
     {
       handler: async (originalRequest, sender) => {
         const property = properties[originalRequest.method as keyof ExposableRemoteApi<API>];
         if (
           typeof property === 'undefined' ||
-          (property !== RemoteApiPropertyType.MethodReturningPromise &&
-            isRemoteApiMethod(property) &&
-            property.propType !== RemoteApiPropertyType.MethodReturningPromise)
+          (property !== RemoteApiPropertyType.MethodReturningPromise && !isRemoteApiMethod(property))
         ) {
           throw new Error(`Attempted to call a method that was not explicitly exposed: ${originalRequest.method}`);
         }
@@ -324,6 +471,7 @@ export const exposeMessengerApi = <API extends object>(
     shutdown: () => {
       apiTracker$.complete();
       nestedObjChannelsSubscription.shutdown();
+      factoryMethodsSubscription.shutdown();
       observableChannelsSubscription.shutdown();
       methodHandlerSubscription.shutdown();
       dependencies.messenger.shutdown();

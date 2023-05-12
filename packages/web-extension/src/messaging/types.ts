@@ -18,7 +18,7 @@ export interface ResponseMessage<T = unknown> extends AnyMessage {
   response: T;
 }
 
-export interface ObservableCompletionMessage extends AnyMessage {
+export interface CompletionMessage extends AnyMessage {
   subscribe: false;
   error?: Error;
 }
@@ -33,6 +33,14 @@ export type SendMethodRequestMessage = <Response = unknown>(msg: MethodRequest) 
  * Corresponds to underlying port name
  */
 export type ChannelName = string;
+
+export interface FactoryCall<Method extends string = string> extends MethodRequest<Method> {
+  channel: ChannelName;
+}
+
+export interface FactoryCallMessage<Method extends string = string> extends AnyMessage {
+  factoryCall: FactoryCall<Method>;
+}
 
 export type MinimalEvent<Callback extends (...args: any[]) => any> = Pick<
   Events.Event<Callback>,
@@ -89,7 +97,12 @@ export enum RemoteApiPropertyType {
    * - shares a single underlying subscription for all connections
    * - replays 1 last emitted value upon connection
    */
-  HotObservable
+  HotObservable,
+  /**
+   * Method that returns a new remote api object (synchronously).
+   * Should only be used for methods that cannot throw.
+   */
+  ApiFactory
 }
 
 export interface MethodRequestOptions {
@@ -102,13 +115,27 @@ export interface RemoteApiMethod {
   requestOptions: MethodRequestOptions;
 }
 
-export type RemoteApiProperty = RemoteApiPropertyType | RemoteApiMethod;
+export interface ApiFactoryOptions {
+  baseChannel: ChannelName;
+}
+
+export interface RemoteApiFactory<T> {
+  propType: RemoteApiPropertyType.ApiFactory;
+  // eslint-disable-next-line no-use-before-define
+  apiProperties: T extends (...args: any) => any ? RemoteApiProperties<ReturnType<T>> : never;
+}
+
+export type RemoteApiProperty<T> =
+  | RemoteApiPropertyType.HotObservable
+  | RemoteApiPropertyType.MethodReturningPromise
+  | RemoteApiMethod
+  | RemoteApiFactory<T>;
 
 export type ExposableRemoteApi<T> = Omit<T, 'shutdown'>;
 
 export type RemoteApiProperties<T> = {
   [key in keyof ExposableRemoteApi<T>]:
-    | RemoteApiProperty
+    | RemoteApiProperty<T[key]>
     | Omit<RemoteApiProperties<T[key]>, 'propType' | 'requestOptions'>;
 };
 
@@ -127,12 +154,21 @@ export interface Messenger extends Shutdown {
   connect$: Observable<MinimalPort>;
   postMessage(message: unknown): Observable<void>;
   message$: Observable<PortMessage>;
+  isShutdown: boolean;
   deriveChannel(path: string): Messenger;
 }
 
 export interface MessengerApiDependencies {
   messenger: Messenger;
   logger: Logger;
+}
+
+export interface Destructor {
+  onGarbageCollected(obj: object, objectId: unknown, callback: () => void): void;
+}
+
+export interface ConsumeMessengerApiDependencies extends MessengerApiDependencies {
+  destructor: Destructor;
 }
 
 export type InternalMsgType = 'apiObjDisabled';

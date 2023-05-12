@@ -1,5 +1,6 @@
 import { BackgroundMessenger, createBackgroundMessenger, generalizeBackgroundMessenger } from './BackgroundMessenger';
 import { ChannelName, ConsumeRemoteApiOptions, ExposeApiProps, MessengerDependencies } from './types';
+import { FinalizationRegistryDestructor } from './util';
 import { consumeMessengerRemoteApi, exposeMessengerApi } from './remoteApi';
 import { createNonBackgroundMessenger } from './NonBackgroundMessenger';
 
@@ -47,6 +48,7 @@ const _nonBackgroundConsumeRemoteApi = <T extends object>(
   dependencies: MessengerDependencies
 ) =>
   consumeMessengerRemoteApi(props, {
+    destructor: new FinalizationRegistryDestructor(dependencies.logger),
     messenger: createNonBackgroundMessenger(props, dependencies),
     ...dependencies
   });
@@ -58,7 +60,11 @@ const _backgroundConsumeRemoteApi: ConsumeApi = <T extends object>(
   dependencies: MessengerDependencies
 ) => {
   const messenger = generalizeBackgroundMessenger(props.baseChannel, getBackgroundMessenger(dependencies));
-  return consumeMessengerRemoteApi(props, { messenger, ...dependencies });
+  return consumeMessengerRemoteApi(props, {
+    destructor: new FinalizationRegistryDestructor(dependencies.logger),
+    messenger,
+    ...dependencies
+  });
 };
 
 /**

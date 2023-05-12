@@ -79,6 +79,9 @@ export const createNonBackgroundMessenger = (
       derivedMessengers.add(messenger);
       return messenger;
     },
+    get isShutdown() {
+      return isDestroyed;
+    },
     message$,
     /**
      * @throws RxJS EmptyError if client is shutdown
@@ -104,7 +107,7 @@ export const createNonBackgroundMessenger = (
         derivedMessengers.delete(messenger);
       }
       port$.complete();
-      logger.warn(`[NonBackgroundMessenger(${channel})] shutdown`);
+      logger.debug(`[NonBackgroundMessenger(${channel})] shutdown`);
     }
   };
 };
