@@ -227,7 +227,7 @@ export const consumeMessengerRemoteApi = <T extends object>(
 
 export const bindMessengerRequestHandler = <Response>(
   { handler }: BindRequestHandlerOptions<Response>,
-  { logger, messenger: { message$ } }: MessengerApiDependencies
+  { logger, messenger: { message$, postMessage } }: MessengerApiDependencies
 ): Shutdown => {
   const subscription = message$.subscribe(async ({ data, port }) => {
     if (!isRequestMessage(data)) return;
@@ -245,8 +245,7 @@ export const bindMessengerRequestHandler = <Response>(
       response: toSerializableObject(response)
     };
 
-    // TODO: can this throw if port is closed?
-    port.postMessage(responseMessage);
+    postMessage(responseMessage).subscribe();
   });
   return {
     shutdown: () => subscription.unsubscribe()
@@ -364,7 +363,7 @@ export const bindFactoryMethods = <API extends object>(
 
 export const bindObservableChannels = <API extends object>(
   { api$, properties }: ExposeApiProps<API>,
-  { messenger }: MessengerApiDependencies
+  { messenger, logger }: MessengerApiDependencies
 ): Shutdown => {
   const subscriptions = Object.entries(properties)
     .filter(([, propType]) => propType === RemoteApiPropertyType.HotObservable)
@@ -386,7 +385,13 @@ export const bindObservableChannels = <API extends object>(
       const observableMessenger = messenger.deriveChannel(observableProperty);
       const connectSubscription = observableMessenger.connect$.subscribe((port) => {
         if (observable$.value !== null) {
-          port.postMessage(toSerializableObject({ emit: observable$.value, messageId: newMessageId() } as EmitMessage));
+          try {
+            port.postMessage(
+              toSerializableObject({ emit: observable$.value, messageId: newMessageId() } as EmitMessage)
+            );
+          } catch (error) {
+            logger.warn('Failed to emit initial value, port immediatelly disconnected?', error);
+          }
         }
       });
       const broadcastMessage = (message: Partial<CompletionMessage | EmitMessage>) =>

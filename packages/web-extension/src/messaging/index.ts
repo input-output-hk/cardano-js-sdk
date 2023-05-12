@@ -25,7 +25,11 @@ const _backgroundExposeApi = <T extends object>(
   props: ExposeApiProps<T> & BaseChannel,
   dependencies: MessengerDependencies
 ) => {
-  const messenger = generalizeBackgroundMessenger(props.baseChannel, getBackgroundMessenger(dependencies));
+  const messenger = generalizeBackgroundMessenger(
+    props.baseChannel,
+    getBackgroundMessenger(dependencies),
+    dependencies.logger
+  );
   return exposeMessengerApi(props, {
     messenger,
     ...dependencies
@@ -59,7 +63,11 @@ const _backgroundConsumeRemoteApi: ConsumeApi = <T extends object>(
   props: ConsumeRemoteApiOptions<T> & BaseChannel,
   dependencies: MessengerDependencies
 ) => {
-  const messenger = generalizeBackgroundMessenger(props.baseChannel, getBackgroundMessenger(dependencies));
+  const messenger = generalizeBackgroundMessenger(
+    props.baseChannel,
+    getBackgroundMessenger(dependencies),
+    dependencies.logger
+  );
   return consumeMessengerRemoteApi(props, {
     destructor: new FinalizationRegistryDestructor(dependencies.logger),
     messenger,

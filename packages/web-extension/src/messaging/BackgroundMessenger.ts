@@ -1,8 +1,23 @@
 // only tested in ../e2e tests
-import { BehaviorSubject, ReplaySubject, Subject, bufferCount, filter, first, from, map, mergeMap, tap } from 'rxjs';
+import {
+  BehaviorSubject,
+  EmptyError,
+  ReplaySubject,
+  Subject,
+  bufferCount,
+  catchError,
+  filter,
+  first,
+  from,
+  map,
+  mergeMap,
+  of,
+  tap
+} from 'rxjs';
 import { ChannelName, Messenger, MessengerDependencies, MessengerPort, PortMessage } from './types';
 import { Logger } from 'ts-log';
 import { deriveChannelName } from './util';
+import { retryBackoff } from 'backoff-rxjs';
 
 interface Channel {
   message$: Subject<PortMessage>;
@@ -89,7 +104,11 @@ export interface BackgroundMessengerApiDependencies {
   logger: Logger;
 }
 
-export const generalizeBackgroundMessenger = (channel: ChannelName, messenger: BackgroundMessenger): Messenger => ({
+export const generalizeBackgroundMessenger = (
+  channel: ChannelName,
+  messenger: BackgroundMessenger,
+  logger: Logger
+): Messenger => ({
   channel,
   connect$: messenger.getChannel(channel).ports$.pipe(
     bufferCount(2, 1),
@@ -99,7 +118,7 @@ export const generalizeBackgroundMessenger = (channel: ChannelName, messenger: B
     })
   ),
   deriveChannel(path) {
-    return generalizeBackgroundMessenger(deriveChannelName(channel, path), messenger);
+    return generalizeBackgroundMessenger(deriveChannelName(channel, path), messenger, logger);
   },
   isShutdown: false,
   message$: messenger.getChannel(channel).message$,
@@ -116,7 +135,16 @@ export const generalizeBackgroundMessenger = (channel: ChannelName, messenger: B
       tap((ports) => {
         for (const port of ports) port.postMessage(message);
       }),
-      map(() => void 0)
+      retryBackoff({
+        initialInterval: 10,
+        maxInterval: 1000,
+        shouldRetry: (err) => !(err instanceof EmptyError)
+      }),
+      map(() => void 0),
+      catchError(() => {
+        logger.warn("Couldn't postMessage: messenger shutdown");
+        return of(void 0);
+      })
     );
   },
 
