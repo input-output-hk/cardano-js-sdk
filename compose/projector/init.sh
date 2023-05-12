@@ -17,6 +17,7 @@ USER=`cat /run/secrets/postgres_user`
 # changes between versions of the SDK.
 
 psql "postgresql://${USER}:${PASSWORD}@postgres/" -c "CREATE DATABASE projection"
+psql "postgresql://${USER}:${PASSWORD}@postgres/" -c "CREATE DATABASE projection_test"
 
 _term() {
   kill $CHILD
