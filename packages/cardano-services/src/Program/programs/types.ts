@@ -45,6 +45,7 @@ export enum ProviderServerOptionDescriptions {
   EpochPollInterval = 'Epoch poll interval',
   TokenMetadataCacheTtl = 'Token Metadata API cache TTL in minutes',
   TokenMetadataServerUrl = 'Token Metadata API server URL',
+  UseTypeOrmStakePoolProvider = 'Enables the TypeORM Stake Pool Provider',
   UseBlockfrost = 'Enables Blockfrost cached data DB',
   UseQueue = 'Enables RabbitMQ',
   PaginationPageSizeLimit = 'Pagination page size limit shared across all providers'
@@ -66,6 +67,7 @@ export type ProviderServerArgs = CommonProgramOptions &
     dbCacheTtl: number;
     useBlockfrost?: boolean;
     useQueue?: boolean;
+    useTypeormStakePoolProvider?: boolean;
     paginationPageSizeLimit?: number;
     serviceNames: ServiceNames[];
   };

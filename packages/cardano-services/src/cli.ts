@@ -33,6 +33,7 @@ import {
   TxWorkerOptionDescriptions,
   USE_BLOCKFROST_DEFAULT,
   USE_QUEUE_DEFAULT,
+  USE_TYPEORM_STAKE_POOL_PROVIDER_DEFAULT,
   availableNetworks,
   connectionStringFromArgs,
   loadAndStartTxWorker,
@@ -261,6 +262,21 @@ withCommonOptions(
       .env('TOKEN_METADATA_REQUEST_TIMEOUT')
       .default(DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT)
       .argParser((interval) => Number.parseInt(interval, 10))
+  )
+  .addOption(
+    new Option(
+      '--use-typeorm-stake-pool-provider <true/false>',
+      ProviderServerOptionDescriptions.UseTypeOrmStakePoolProvider
+    )
+      .env('USE_TYPEORM_STAKE_POOL_PROVIDER')
+      .default(USE_TYPEORM_STAKE_POOL_PROVIDER_DEFAULT)
+      .argParser((useTypeormStakePoolProvider) =>
+        stringOptionToBoolean(
+          useTypeormStakePoolProvider,
+          Programs.ProviderServer,
+          ProviderServerOptionDescriptions.UseTypeOrmStakePoolProvider
+        )
+      )
   )
   .addOption(
     new Option('--use-blockfrost <true/false>', ProviderServerOptionDescriptions.UseBlockfrost)

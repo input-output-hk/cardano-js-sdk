@@ -4,6 +4,7 @@ import { Cardano, QueryStakePoolsArgs, SortField, StakePoolProvider } from '@car
 import { CreateHttpProviderConfig, stakePoolHttpProvider } from '../../../cardano-services-client';
 import { DbPools, LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
 import { DbSyncEpochPollService, loadGenesisData } from '../../src/util';
+import { DbSyncStakePoolFixtureBuilder, PoolInfo, PoolWith } from './fixtures/FixtureBuilder';
 import {
   DbSyncStakePoolProvider,
   GenesisData,
@@ -18,7 +19,6 @@ import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { INFO, createLogger } from 'bunyan';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
-import { PoolInfo, PoolWith, StakePoolFixtureBuilder } from './fixtures/FixtureBuilder';
 import { clearDbPools, ingestDbData, sleep, wrapWithTransaction } from '../util';
 import { getPort } from 'get-port-please';
 import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
@@ -82,7 +82,7 @@ describe('StakePoolHttpService', () => {
   let provider: StakePoolProvider;
   let cardanoNode: OgmiosCardanoNode;
   let lastBlockNoInDb: LedgerTipModel;
-  let fixtureBuilder: StakePoolFixtureBuilder;
+  let fixtureBuilder: DbSyncStakePoolFixtureBuilder;
   let poolsInfo: PoolInfo[];
 
   const epochPollInterval = 2 * 1000;
@@ -110,7 +110,7 @@ describe('StakePoolHttpService', () => {
     baseUrl = `http://localhost:${port}/stake-pool`;
     config = { listen: { port } };
     clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
-    fixtureBuilder = new StakePoolFixtureBuilder(dbPools.main, logger);
+    fixtureBuilder = new DbSyncStakePoolFixtureBuilder(dbPools.main, logger);
     poolsInfo = await fixtureBuilder.getPools(3, { with: [PoolWith.Metadata] });
 
     reqWithFilter = {

@@ -2,9 +2,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Cardano, QueryStakePoolsArgs } from '@cardano-sdk/core';
 import { DataMocks } from '../../data-mocks';
+import { DbSyncStakePoolFixtureBuilder, PoolInfo, PoolWith } from '../fixtures/FixtureBuilder';
 import { PAGINATION_PAGE_SIZE_LIMIT_DEFAULT, StakePoolBuilder } from '../../../src';
 import { Pool } from 'pg';
-import { PoolInfo, PoolWith, StakePoolFixtureBuilder } from '../fixtures/FixtureBuilder';
 import { logger } from '@cardano-sdk/util-dev';
 
 describe('StakePoolBuilder', () => {
@@ -14,14 +14,14 @@ describe('StakePoolBuilder', () => {
   const pagination = { limit: PAGINATION_PAGE_SIZE_LIMIT_DEFAULT, startAt: 0 };
   const builder = new StakePoolBuilder(dbConnection, logger);
   const epochLength = 432_000_000;
-  let fixtureBuilder: StakePoolFixtureBuilder;
+  let fixtureBuilder: DbSyncStakePoolFixtureBuilder;
   let poolsInfo: PoolInfo[];
   let hashIds: number[];
   let updateIds: number[];
   let filters: QueryStakePoolsArgs['filters'];
 
   beforeAll(async () => {
-    fixtureBuilder = new StakePoolFixtureBuilder(dbConnection, logger);
+    fixtureBuilder = new DbSyncStakePoolFixtureBuilder(dbConnection, logger);
     poolsInfo = await fixtureBuilder.getPools(3, { with: [PoolWith.Metadata] });
     hashIds = poolsInfo.map((info) => info.hashId);
     updateIds = poolsInfo.map((info) => info.updateId);

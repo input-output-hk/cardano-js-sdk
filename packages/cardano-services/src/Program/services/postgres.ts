@@ -1,7 +1,7 @@
 /* eslint-disable promise/no-nesting */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable unicorn/no-nested-ternary */
-import { ConnectionNames, PosgresProgramOptions, getPostgresOption } from '../options';
+import { ConnectionNames, PosgresProgramOptions, getPostgresOption } from '../options/postgres';
 import { DnsResolver } from '../utils';
 import { InvalidProgramOption, MissingProgramOption } from '../errors';
 import { Logger } from 'ts-log';

@@ -2,15 +2,19 @@ import { Cardano, Provider } from '../../..';
 import { Paginated, PaginationArgs } from '../../types/Pagination';
 import { SortFields } from '../util';
 
-type FilterCondition = 'and' | 'or';
-type SortOrder = 'asc' | 'desc';
+export type FilterCondition = 'and' | 'or';
+export type SortOrder = 'asc' | 'desc';
 
 export type SortField = typeof SortFields[number];
 
-interface StakePoolSortOptions {
+export interface StakePoolSortOptions {
   order: SortOrder;
   field: SortField;
 }
+
+export type FilterIdentifiers = Partial<
+  Pick<Cardano.PoolParameters, 'id'> & Pick<Cardano.StakePoolMetadata, 'name' | 'ticker'>
+>;
 
 export interface MultipleChoiceSearchFilter<T> {
   /**
@@ -36,9 +40,7 @@ export interface QueryStakePoolsArgs {
     /**
      * Will return results for partial matches
      */
-    identifier?: MultipleChoiceSearchFilter<
-      Partial<Pick<Cardano.PoolParameters, 'id'> & Pick<Cardano.StakePoolMetadata, 'name' | 'ticker'>>
-    >;
+    identifier?: MultipleChoiceSearchFilter<FilterIdentifiers>;
     pledgeMet?: boolean;
     status?: Cardano.StakePoolStatus[];
   };
