@@ -180,7 +180,7 @@ export const transferCoins = async ({ fromWallet, toWallet, coins }: TransferCoi
   // Act
   // Send 50 tADA to second wallet.
   const txBuilder = fromWallet.createTxBuilder();
-  const txOut = txBuilder.buildOutput().address(receivingAddress).coin(coins).toTxOut();
+  const txOut = await txBuilder.buildOutput().address(receivingAddress).coin(coins).build();
   const signedTx = await txBuilder.addOutput(txOut).build().sign();
 
   // Wait until wallet two is aware of the funds.

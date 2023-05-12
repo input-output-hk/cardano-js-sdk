@@ -24,7 +24,7 @@ const createCollateral = async (
   const address = (await firstValueFrom(wallet.addresses$))[0].address;
 
   // Create a new UTxO to be use as collateral.
-  const txOutput = txBuilder.buildOutput().address(address).coin(5_000_000n).toTxOut();
+  const txOutput = await txBuilder.buildOutput().address(address).coin(5_000_000n).build();
 
   const signedTx = await txBuilder.addOutput(txOutput).build().sign();
   await wallet.submitTx(signedTx);

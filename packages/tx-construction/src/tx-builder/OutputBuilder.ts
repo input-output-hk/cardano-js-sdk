@@ -58,12 +58,25 @@ export class TxOutputBuilder implements OutputBuilder {
     this.#logger = logger;
   }
 
+  /**
+   * Create transaction output snapshot, as it was configured until the point of calling this method.
+   *
+   * @returns {Cardano.TxOut} transaction output snapshot.
+   *  - It can be used in {@link TxBuilder.addOutput}.
+   *  - It will be validated once {@link TxBuilder.build} method is called.
+   * @throws OutputValidationMissingRequiredError {@link OutputValidationMissingRequiredError} if
+   * the mandatory fields 'address' or 'coins' are missing
+   */
   toTxOut(): Cardano.TxOut {
     if (!isViableTxOut(this.#partialOutput)) {
       throw new OutputValidationMissingRequiredError(this.#partialOutput);
     }
     this.#logger.debug('toTxOut result:', this.#partialOutput);
     return { ...this.#partialOutput };
+  }
+
+  async inspect(): Promise<PartialTxOut> {
+    return this.#partialOutput;
   }
 
   value(value: Cardano.Value): OutputBuilder {

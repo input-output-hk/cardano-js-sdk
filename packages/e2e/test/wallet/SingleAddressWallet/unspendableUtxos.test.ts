@@ -34,7 +34,7 @@ describe('SingleAddressWallet/unspendableUtxos', () => {
     const address = (await firstValueFrom(wallet1.addresses$))[0].address;
 
     // Create a new UTxO to be use as collateral.
-    const txOutput = txBuilder1.buildOutput().address(address).coin(5_000_000n).toTxOut();
+    const txOutput = await txBuilder1.buildOutput().address(address).coin(5_000_000n).build();
 
     const signedTx = await txBuilder1.addOutput(txOutput).build().sign();
     await wallet1.submitTx(signedTx);
@@ -94,7 +94,7 @@ describe('SingleAddressWallet/unspendableUtxos', () => {
     );
 
     const signedMoveAdaTx = await txBuilder2
-      .addOutput(txBuilder2.buildOutput().address(address).value(totalBalance).toTxOut())
+      .addOutput(await txBuilder2.buildOutput().address(address).value(totalBalance).build())
       .build()
       .sign();
     await wallet2.submitTx(signedMoveAdaTx);

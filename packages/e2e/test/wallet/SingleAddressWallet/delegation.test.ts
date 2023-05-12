@@ -104,7 +104,7 @@ describe('SingleAddressWallet/delegation', () => {
     const txBuilder = sourceWallet.createTxBuilder();
 
     const tx = await txBuilder
-      .addOutput(txBuilder.buildOutput().address(destAddresses).coin(tx1OutputCoins).toTxOut())
+      .addOutput(await txBuilder.buildOutput().address(destAddresses).coin(tx1OutputCoins).build())
       .delegate(poolId)
       .build()
       .sign();

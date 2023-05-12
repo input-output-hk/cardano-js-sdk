@@ -49,15 +49,9 @@ export type TxBodyValidationError = TxOutValidationError | InputSelectionError |
  */
 export interface OutputBuilder {
   /**
-   * Create transaction output snapshot, as it was configured until the point of calling this method.
-   *
-   * @returns {Cardano.TxOut} transaction output snapshot.
-   *  - It can be used in {@link TxBuilder.addOutput}.
-   *  - It will be validated once {@link TxBuilder.build} method is called.
-   * @throws OutputValidationMissingRequiredError {@link OutputValidationMissingRequiredError} if
-   * the mandatory fields 'address' or 'coins' are missing
+   * @returns a partial output that has properties set by calling other TxBuilder methods. Does not validate the output.
    */
-  toTxOut(): Cardano.TxOut;
+  inspect(): Promise<PartialTxOut>;
   /** Sets transaction output `value` field. Preexisting `value` is overwritten. */
   value(value: Cardano.Value): OutputBuilder;
   /** Sets transaction output value `coins` field. */
@@ -114,22 +108,24 @@ export interface UnsignedTxPromise extends Promise<UnsignedTx> {
   sign(): Promise<SignedTx>;
 }
 
-export interface TxBuilder {
+export interface PartialTx {
   /**
-   * Transaction body that is updated by `TxBuilder` methods.
-   * It should not be updated directly, but this is not restricted to allow experimental HydratedTxBody changes that are not
-   * yet available in the TxBuilder interface.
-   * Every method call recreates the partialTxBody, thus updating it immutably.
+   * Transaction body that is updated by {@link TxBuilder} methods.
    */
-  partialTxBody: Partial<Cardano.TxBody>;
+  body: Partial<Cardano.TxBody>;
   /**
    * TxMetadata to be added in the transaction auxiliary data body blob, after {@link TxBuilder.build}.
    * Configured using {@link TxBuilder.setMetadata} method.
-   * It should not be updated directly, but this is not restricted to allow experimental HydratedTxBody changes that are not.
    */
   auxiliaryData?: Cardano.AuxiliaryData;
   extraSigners?: TransactionSigner[];
   signingOptions?: SignTransactionOptions;
+}
+export interface TxBuilder {
+  /**
+   * @returns a partial transaction that has properties set by calling other TxBuilder methods. Does not validate the transaction.
+   */
+  inspect(): Promise<PartialTx>;
 
   /** @param txOut transaction output to add to {@link partialTxBody} outputs. */
   addOutput(txOut: Cardano.TxOut): TxBuilder;

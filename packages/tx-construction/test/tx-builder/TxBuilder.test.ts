@@ -9,7 +9,6 @@ import { of } from 'rxjs';
 import * as mocks from '../../../core/test/mocks';
 import {
   GenericTxBuilder,
-  OutputBuilder,
   OutputValidation,
   OutputValidationMinimumCoinError,
   OutputValidationMissingRequiredError,
@@ -17,12 +16,12 @@ import {
   OutputValidator,
   RewardAccountMissingError,
   TxBodyValidationError,
-  TxBuilder,
   TxOutValidationError,
+  TxOutputBuilder,
   TxOutputFailure
 } from '../..';
 import { KeyRole, SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
-import { ObservableWallet, SingleAddressWallet } from '../../../wallet/src';
+import { SingleAddressWallet } from '../../../wallet/src';
 import { createWallet } from '../../../wallet/test/integration/util';
 
 function assertObjectRefsAreDifferent(obj1: unknown, obj2: unknown): void {
@@ -30,8 +29,8 @@ function assertObjectRefsAreDifferent(obj1: unknown, obj2: unknown): void {
 }
 
 describe('GenericTxBuilder', () => {
-  let observableWallet: ObservableWallet;
-  let txBuilder: TxBuilder;
+  let observableWallet: SingleAddressWallet;
+  let txBuilder: GenericTxBuilder;
   let output: Cardano.TxOut;
   let output2: Cardano.TxOut;
 
@@ -169,8 +168,16 @@ describe('GenericTxBuilder', () => {
     });
   });
 
+  describe('inspect', () => {
+    it('resolves with transaction properties that were previously set', async () => {
+      const partialTx = await txBuilder.addOutput(output).setMetadata(new Map()).inspect();
+      expect(partialTx.body.outputs).toHaveLength(1);
+      expect(partialTx.auxiliaryData).not.toBeUndefined();
+    });
+  });
+
   describe('buildOutput', () => {
-    let outputBuilder: OutputBuilder;
+    let outputBuilder: TxOutputBuilder;
     let assetId: Cardano.AssetId;
     let assetQuantity: bigint;
     let assets: Cardano.TokenMap;
@@ -188,16 +195,16 @@ describe('GenericTxBuilder', () => {
       output1Coin = 10_000_000n;
       output2Base = mocks.utxo[0][1];
 
-      outputBuilder = txBuilder.buildOutput().address(address).coin(output1Coin);
+      outputBuilder = txBuilder.buildOutput().address(address).coin(output1Coin) as TxOutputBuilder;
     });
 
     it('can create OutputBuilder without initial output', () => {
       expect(outputBuilder.toTxOut()).toBeTruthy();
     });
 
-    it('can create OutputBuilder starting from an existing output', () => {
+    it('can create OutputBuilder starting from an existing output', async () => {
       const outputBuilderFromExisting = txBuilder.buildOutput(output);
-      expect(outputBuilderFromExisting.toTxOut()).toEqual(output);
+      expect(await outputBuilderFromExisting.build()).toEqual(output);
     });
 
     it('can set output value, overwriting preexisting value', () => {
@@ -209,6 +216,14 @@ describe('GenericTxBuilder', () => {
       const outValueOther = { coins: output1Coin + 100n };
       outputBuilder.value(outValueOther);
       expect(outputBuilder.toTxOut().value).toEqual(outValueOther);
+    });
+
+    describe('inspect', () => {
+      it('resolves with transaction properties that were previously set', async () => {
+        const partialTxOut = await txBuilder.buildOutput().asset(assetId, 123n).inspect();
+        expect(partialTxOut.value?.assets).not.toBeUndefined();
+        expect(partialTxOut.value?.coins).toBeUndefined();
+      });
     });
 
     it('can set coin value', () => {
@@ -300,20 +315,20 @@ describe('GenericTxBuilder', () => {
     });
 
     describe('can validate required output fields', () => {
-      it('missing coin field', () => {
-        expect(() => txBuilder.buildOutput().address(address).toTxOut()).toThrowError(
+      it('missing coin field', async () => {
+        await expect(txBuilder.buildOutput().address(address).build()).rejects.toThrowError(
           OutputValidationMissingRequiredError
         );
       });
 
-      it('missing address field', () => {
-        expect(() => txBuilder.buildOutput().coin(output1Coin).toTxOut()).toThrowError(
+      it('missing address field', async () => {
+        await expect(txBuilder.buildOutput().coin(output1Coin).build()).rejects.toThrowError(
           OutputValidationMissingRequiredError
         );
       });
 
       it('legit output with valid with address and coin', async () => {
-        expect(() => txBuilder.buildOutput().address(address).coin(output1Coin).toTxOut()).not.toThrow();
+        await expect(txBuilder.buildOutput().address(address).coin(output1Coin).build()).resolves.not.toThrow();
       });
     });
   });
@@ -473,7 +488,7 @@ describe('GenericTxBuilder', () => {
       const builder = new GenericTxBuilder(singleAddrWallet.getTxBuilderDependencies(), mockValidator);
       builder.addOutput(output);
       try {
-        await builder.addOutput(builder.buildOutput(output2).toTxOut()).build();
+        await builder.addOutput(output2).build();
       } catch (error) {
         const buildErrors = error as TxBodyValidationError[];
         expect(buildErrors?.length).toBeTruthy();

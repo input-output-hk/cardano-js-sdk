@@ -7,6 +7,7 @@ import { contextLogger, deepEquals } from '@cardano-sdk/util';
 import { FinalizeTxProps, InitializeTxResult, TxBuilderDependencies } from '../types';
 import {
   OutputBuilder,
+  PartialTx,
   PartialTxOut,
   RewardAccountMissingError,
   SignedTx,
@@ -106,6 +107,15 @@ export class GenericTxBuilder implements TxBuilder {
     this.#outputValidator = outputValidator;
     this.#dependencies = dependencies;
     this.#logger = dependencies.logger;
+  }
+
+  async inspect(): Promise<PartialTx> {
+    return {
+      auxiliaryData: this.auxiliaryData,
+      body: this.partialTxBody,
+      extraSigners: this.extraSigners,
+      signingOptions: this.signingOptions
+    };
   }
 
   addOutput(txOut: Cardano.TxOut): TxBuilder {

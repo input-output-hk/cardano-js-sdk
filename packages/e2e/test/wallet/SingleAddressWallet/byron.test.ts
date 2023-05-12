@@ -27,11 +27,11 @@ describe('SingleAddressWallet/byron', () => {
 
     const txBuilder = wallet.createTxBuilder();
 
-    const txOutput = txBuilder
+    const txOutput = await txBuilder
       .buildOutput()
       .address(Cardano.PaymentAddress('5oP9ib6ym3Xc2XrPGC6S7AaJeHYBCmLjt98bnjKR58xXDhSDgLHr8tht3apMDXf2Mg'))
       .coin(3_000_000n)
-      .toTxOut();
+      .build();
 
     const signedTx = await txBuilder.addOutput(txOutput).build().sign();
     await wallet.submitTx(signedTx);
