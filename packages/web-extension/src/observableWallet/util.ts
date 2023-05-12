@@ -55,20 +55,20 @@ export const txBuilderProperties: RemoteApiProperties<TxBuilder> = {
     getApiProperties: () => txBuilderProperties,
     propType: RemoteApiPropertyType.ApiFactory
   },
+  extraSigners: {
+    getApiProperties: () => txBuilderProperties,
+    propType: RemoteApiPropertyType.ApiFactory
+  },
   inspect: RemoteApiPropertyType.MethodReturningPromise,
+  metadata: {
+    getApiProperties: () => txBuilderProperties,
+    propType: RemoteApiPropertyType.ApiFactory
+  },
   removeOutput: {
     getApiProperties: () => txBuilderProperties,
     propType: RemoteApiPropertyType.ApiFactory
   },
-  setExtraSigners: {
-    getApiProperties: () => txBuilderProperties,
-    propType: RemoteApiPropertyType.ApiFactory
-  },
-  setMetadata: {
-    getApiProperties: () => txBuilderProperties,
-    propType: RemoteApiPropertyType.ApiFactory
-  },
-  setSigningOptions: {
+  signingOptions: {
     getApiProperties: () => txBuilderProperties,
     propType: RemoteApiPropertyType.ApiFactory
   }

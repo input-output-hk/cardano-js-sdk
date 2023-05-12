@@ -32,7 +32,7 @@ describe('SingleAddressWallet/metadata', () => {
     const signedTx = await wallet
       .createTxBuilder()
       .addOutput({ address: ownAddress, value: { coins: minimumCoin } })
-      .setMetadata(metadata)
+      .metadata(metadata)
       .build()
       .sign();
 

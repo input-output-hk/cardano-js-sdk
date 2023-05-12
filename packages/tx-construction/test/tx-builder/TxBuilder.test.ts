@@ -83,25 +83,25 @@ describe('GenericTxBuilder', () => {
     });
   });
 
-  describe('setMetadata', () => {
+  describe('metadata', () => {
     let metadata: Cardano.TxMetadata;
 
     it('can add metadata without mutating auxiliaryData', () => {
       metadata = new Map([[123n, '1234']]);
-      const initialAuxiliaryData = txBuilder.auxiliaryData;
-      txBuilder.setMetadata(metadata);
-      assertObjectRefsAreDifferent(txBuilder.auxiliaryData, initialAuxiliaryData);
-      expect(txBuilder.auxiliaryData?.blob).toEqual(metadata);
+      const initialAuxiliaryData = txBuilder.partialAuxiliaryData;
+      txBuilder.metadata(metadata);
+      assertObjectRefsAreDifferent(txBuilder.partialAuxiliaryData, initialAuxiliaryData);
+      expect(txBuilder.partialAuxiliaryData?.blob).toEqual(metadata);
     });
 
     it('can unset metadata by using empty map', () => {
       metadata = new Map();
-      txBuilder.setMetadata(metadata);
-      expect(txBuilder.auxiliaryData?.blob?.entries.length).toBe(0);
+      txBuilder.metadata(metadata);
+      expect(txBuilder.partialAuxiliaryData?.blob?.entries.length).toBe(0);
     });
 
     it('can add metadata, sign and read it back', async () => {
-      const tx = await txBuilder.addOutput(mocks.utxo[0][1]).setMetadata(metadata).build();
+      const tx = await txBuilder.addOutput(mocks.utxo[0][1]).metadata(metadata).build();
 
       // ValidTxBody contains metadata
       expect(tx.auxiliaryData?.blob).toEqual(metadata);
@@ -111,7 +111,7 @@ describe('GenericTxBuilder', () => {
     });
   });
 
-  describe('setExtraSigners', () => {
+  describe('extraSigners', () => {
     let signers: TransactionSigner[];
     const pubKey = Crypto.Ed25519PublicKeyHex('6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed3f9f55d39');
     const signature = Crypto.Ed25519SignatureHex(
@@ -125,19 +125,19 @@ describe('GenericTxBuilder', () => {
 
     it('can setExtraSigners without mutating extraSigners', () => {
       const initialSigners = txBuilder.extraSigners;
-      txBuilder.setExtraSigners(signers);
-      assertObjectRefsAreDifferent(txBuilder.extraSigners, initialSigners);
-      expect(txBuilder.extraSigners).toEqual(signers);
+      txBuilder.extraSigners(signers);
+      assertObjectRefsAreDifferent(txBuilder.partialExtraSigners, initialSigners);
+      expect(txBuilder.partialExtraSigners).toEqual(signers);
     });
 
     it('can unset extraSigners by using empty array', () => {
-      txBuilder.setExtraSigners(signers);
-      txBuilder.setExtraSigners([]);
-      expect(txBuilder.extraSigners?.length).toBe(0);
+      txBuilder.extraSigners(signers);
+      txBuilder.extraSigners([]);
+      expect(txBuilder.partialExtraSigners?.length).toBe(0);
     });
 
     it('can set extraSigners, sign and read it back', async () => {
-      const tx = await txBuilder.addOutput(mocks.utxo[0][1]).setExtraSigners(signers).build();
+      const tx = await txBuilder.addOutput(mocks.utxo[0][1]).extraSigners(signers).build();
 
       // ValidTxBody contains extraSigners
       expect(tx.extraSigners).toEqual(signers);
@@ -147,7 +147,7 @@ describe('GenericTxBuilder', () => {
     });
   });
 
-  describe('setSigningOptions', () => {
+  describe('signingOptions', () => {
     let signingOptions: SignTransactionOptions;
 
     beforeEach(() => {
@@ -155,22 +155,22 @@ describe('GenericTxBuilder', () => {
     });
 
     it('can setSigningOptions without mutating signingOptions', () => {
-      const initialSigningOptions = txBuilder.signingOptions;
-      txBuilder.setSigningOptions(signingOptions);
-      assertObjectRefsAreDifferent(txBuilder.signingOptions, initialSigningOptions);
-      expect(txBuilder.signingOptions).toEqual(signingOptions);
+      const initialSigningOptions = txBuilder.partialSigningOptions;
+      txBuilder.signingOptions(signingOptions);
+      assertObjectRefsAreDifferent(txBuilder.partialSigningOptions, initialSigningOptions);
+      expect(txBuilder.partialSigningOptions).toEqual(signingOptions);
     });
 
     it('can unset signingOptions by using empty object', () => {
-      txBuilder.setSigningOptions(signingOptions);
-      txBuilder.setSigningOptions({});
-      expect(txBuilder.signingOptions?.additionalKeyPaths).toBeFalsy();
+      txBuilder.signingOptions(signingOptions);
+      txBuilder.signingOptions({});
+      expect(txBuilder.partialSigningOptions?.additionalKeyPaths).toBeFalsy();
     });
   });
 
   describe('inspect', () => {
     it('resolves with transaction properties that were previously set', async () => {
-      const partialTx = await txBuilder.addOutput(output).setMetadata(new Map()).inspect();
+      const partialTx = await txBuilder.addOutput(output).metadata(new Map()).inspect();
       expect(partialTx.body.outputs).toHaveLength(1);
       expect(partialTx.auxiliaryData).not.toBeUndefined();
     });

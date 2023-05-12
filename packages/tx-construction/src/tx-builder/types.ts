@@ -115,7 +115,7 @@ export interface PartialTx {
   body: Partial<Cardano.TxBody>;
   /**
    * TxMetadata to be added in the transaction auxiliary data body blob, after {@link TxBuilder.build}.
-   * Configured using {@link TxBuilder.setMetadata} method.
+   * Configured using {@link TxBuilder.metadata} method.
    */
   auxiliaryData?: Cardano.AuxiliaryData;
   extraSigners?: TransactionSigner[];
@@ -152,11 +152,11 @@ export interface TxBuilder {
    */
   delegate(poolId?: Cardano.PoolId): TxBuilder;
   /** Sets TxMetadata in {@link auxiliaryData} */
-  setMetadata(metadata: Cardano.TxMetadata): TxBuilder;
+  metadata(metadata: Cardano.TxMetadata): TxBuilder;
   /** Sets extra signers in {@link extraSigners} */
-  setExtraSigners(signers: TransactionSigner[]): TxBuilder;
+  extraSigners(signers: TransactionSigner[]): TxBuilder;
   /** Sets signing options in {@link signingOptions} */
-  setSigningOptions(options: SignTransactionOptions): TxBuilder;
+  signingOptions(options: SignTransactionOptions): TxBuilder;
 
   /**
    * Builds an {@link UnsignedTx} based on partialTxBody.

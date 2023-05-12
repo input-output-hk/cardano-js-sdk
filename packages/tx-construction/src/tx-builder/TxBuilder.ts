@@ -91,9 +91,9 @@ const createSignedTx = async ({
 
 export class GenericTxBuilder implements TxBuilder {
   partialTxBody: Partial<Cardano.TxBody> = {};
-  auxiliaryData?: Cardano.AuxiliaryData;
-  extraSigners?: TransactionSigner[];
-  signingOptions?: SignTransactionOptions;
+  partialAuxiliaryData?: Cardano.AuxiliaryData;
+  partialExtraSigners?: TransactionSigner[];
+  partialSigningOptions?: SignTransactionOptions;
 
   #dependencies: TxBuilderDependencies;
   #outputValidator: OutputValidator;
@@ -111,10 +111,10 @@ export class GenericTxBuilder implements TxBuilder {
 
   async inspect(): Promise<PartialTx> {
     return {
-      auxiliaryData: this.auxiliaryData,
+      auxiliaryData: this.partialAuxiliaryData,
       body: this.partialTxBody,
-      extraSigners: this.extraSigners,
-      signingOptions: this.signingOptions
+      extraSigners: this.partialExtraSigners,
+      signingOptions: this.partialSigningOptions
     };
   }
 
@@ -144,18 +144,18 @@ export class GenericTxBuilder implements TxBuilder {
     return this;
   }
 
-  setMetadata(metadata: Cardano.TxMetadata): TxBuilder {
-    this.auxiliaryData = { ...this.auxiliaryData, blob: new Map(metadata) };
+  metadata(metadata: Cardano.TxMetadata): TxBuilder {
+    this.partialAuxiliaryData = { ...this.partialAuxiliaryData, blob: new Map(metadata) };
     return this;
   }
 
-  setExtraSigners(signers: TransactionSigner[]): TxBuilder {
-    this.extraSigners = [...signers];
+  extraSigners(signers: TransactionSigner[]): TxBuilder {
+    this.partialExtraSigners = [...signers];
     return this;
   }
 
-  setSigningOptions(options: SignTransactionOptions): TxBuilder {
-    this.signingOptions = { ...options };
+  signingOptions(options: SignTransactionOptions): TxBuilder {
+    this.partialSigningOptions = { ...options };
     return this;
   }
 
@@ -165,17 +165,17 @@ export class GenericTxBuilder implements TxBuilder {
       return this.#addDelegationCertificates()
         .then(() => this.#validateOutputs())
         .then(() => {
-          if (this.auxiliaryData) {
-            this.partialTxBody.auxiliaryDataHash = Cardano.computeAuxiliaryDataHash(this.auxiliaryData);
+          if (this.partialAuxiliaryData) {
+            this.partialTxBody.auxiliaryDataHash = Cardano.computeAuxiliaryDataHash(this.partialAuxiliaryData);
           }
 
           return initializeTx(
             {
-              auxiliaryData: this.auxiliaryData,
+              auxiliaryData: this.partialAuxiliaryData,
               certificates: this.partialTxBody.certificates,
               outputs: new Set(this.partialTxBody.outputs || []),
-              signingOptions: this.signingOptions,
-              witness: { extraSigners: this.extraSigners }
+              signingOptions: this.partialSigningOptions,
+              witness: { extraSigners: this.partialExtraSigners }
             },
             this.#dependencies
           );
@@ -192,22 +192,22 @@ export class GenericTxBuilder implements TxBuilder {
   #createValidTx(tx: InitializeTxResult): UnsignedTx {
     this.#logger.debug('createValidTx', tx);
     return {
-      auxiliaryData: this.auxiliaryData && { ...this.auxiliaryData },
+      auxiliaryData: this.partialAuxiliaryData && { ...this.partialAuxiliaryData },
       body: tx.body,
-      extraSigners: this.extraSigners && [...this.extraSigners],
+      extraSigners: this.partialExtraSigners && [...this.partialExtraSigners],
       hash: tx.hash,
       inputSelection: tx.inputSelection,
       sign: async () =>
         createSignedTx({
           addresses: await this.#dependencies.txBuilderProviders.addresses(),
-          auxiliaryData: this.auxiliaryData && { ...this.auxiliaryData },
+          auxiliaryData: this.partialAuxiliaryData && { ...this.partialAuxiliaryData },
           inputResolver: this.#dependencies.inputResolver,
           keyAgent: this.#dependencies.keyAgent,
-          signingOptions: this.signingOptions && { ...this.signingOptions },
+          signingOptions: this.partialSigningOptions && { ...this.partialSigningOptions },
           tx,
-          witness: { extraSigners: this.extraSigners && [...this.extraSigners] }
+          witness: { extraSigners: this.partialExtraSigners && [...this.partialExtraSigners] }
         }),
-      signingOptions: this.signingOptions && { ...this.signingOptions }
+      signingOptions: this.partialSigningOptions && { ...this.partialSigningOptions }
     };
   }
 
