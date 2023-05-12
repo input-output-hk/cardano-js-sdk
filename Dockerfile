@@ -95,7 +95,7 @@ WORKDIR /app/packages/cardano-services
 CMD ["node", "dist/cjs/cli.js", "start-blockfrost-worker"]
 
 FROM cardano-services as projector
-RUN apt-get install postgresql-client -y
+RUN apt-get update && apt-get install -y --no-install-recommends jq postgresql-client
 ENV \
   API_URL="http://0.0.0.0:3002" \
   POSTGRES_DB_FILE=/run/secrets/postgres_db_projection \
