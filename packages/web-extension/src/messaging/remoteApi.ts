@@ -187,7 +187,7 @@ export const consumeMessengerRemoteApi = <T extends object>(
               }
               case RemoteApiPropertyType.ApiFactory: {
                 return (receiver[prop] = consumeFactory(
-                  { apiProperties: propMetadata.apiProperties, getErrorPrototype, method: propName },
+                  { apiProperties: propMetadata.getApiProperties(), getErrorPrototype, method: propName },
                   { destructor, logger, messenger }
                 ));
               }
@@ -331,7 +331,7 @@ export const bindFactoryMethods = <API extends object>(
               return of(returnedApi);
             })
           ),
-          properties: propertyDefinition.apiProperties
+          properties: propertyDefinition.getApiProperties()
         },
         {
           logger,

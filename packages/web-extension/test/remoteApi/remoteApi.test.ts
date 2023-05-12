@@ -58,9 +58,9 @@ const setUp = (mode: ApiObjectType) => {
 
   const properties: RemoteApiProperties<SimpleApi> = {
     someFactory: {
-      apiProperties: {
+      getApiProperties: () => ({
         somePromiseMethod: RemoteApiPropertyType.MethodReturningPromise
-      },
+      }),
       propType: RemoteApiPropertyType.ApiFactory
     },
     someNumbers$: RemoteApiPropertyType.HotObservable,
