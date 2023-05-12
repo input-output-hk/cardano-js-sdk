@@ -67,7 +67,7 @@ export abstract class PouchDbStore<T extends {}> {
           try {
             await this.db.put(pouchDbDoc, { force: true });
           } catch (error) {
-            this.logger.error(`PouchDbStore(${this.dbName}): failed to forcePut`, pouchDbDoc, error);
+            this.logger.warn(`PouchDbStore(${this.dbName}): failed to forcePut`, pouchDbDoc, error);
           }
         })
         .catch(() => void 0))
