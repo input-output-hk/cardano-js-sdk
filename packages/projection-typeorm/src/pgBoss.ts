@@ -13,7 +13,11 @@ import PgBoss, { SendOptions } from 'pg-boss';
 export const STAKE_POOL_METADATA_QUEUE = 'STAKE_POOL_METADATA';
 
 export interface PgBossExtension {
-  send: <T extends object>(taskName: string, data: T, options: { slot: Cardano.Slot }) => Promise<string | null>;
+  send: <T extends object>(
+    taskName: string,
+    data: T,
+    options: SendOptions & { slot: Cardano.Slot }
+  ) => Promise<string | null>;
 }
 
 export interface StakePoolMetadataJob {
