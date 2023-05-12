@@ -7,7 +7,8 @@ export enum StakePoolMetadataServiceFailure {
   InvalidExtendedMetadataFormat = 'INVALID_EXTENDED_METADATA_FORMAT',
   InvalidExtendedMetadataSignature = 'INVALID_EXTENDED_METADATA_SIGNATURE',
   InvalidStakePoolHash = 'INVALID_STAKE_POOL_HASH',
-  InvalidMetadata = 'INVALID_METADATA'
+  InvalidMetadata = 'INVALID_METADATA',
+  Unknown = 'UNKNOWN_ERROR'
 }
 
 export class StakePoolMetadataServiceError<InnerError = unknown> extends ComposableError<InnerError> {

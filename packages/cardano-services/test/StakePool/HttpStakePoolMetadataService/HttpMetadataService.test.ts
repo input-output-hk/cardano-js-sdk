@@ -55,18 +55,18 @@ describe('StakePoolMetadataService', () => {
   describe('getStakePoolMetadata', () => {
     it('fetch stake pool JSON metadata without extended data', async () => {
       ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(async () => ({
-        body: mainExtMetadataMock,
+        body: mainExtMetadataMock(),
         code: 200
       })));
 
       const result = await metadataService.getStakePoolMetadata(
-        '0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8' as Hash32ByteBase16,
+        'da21f08d630cdebf39a808bace2a04eea5c2151e45d5de51fdfe8f485a5d7726' as Hash32ByteBase16,
         `${serverUrl}/metadata`
       );
 
       expect(result).toEqual({
         errors: [],
-        metadata: { ...mainExtMetadataMock }
+        metadata: { ...mainExtMetadataMock() }
       });
     });
 
