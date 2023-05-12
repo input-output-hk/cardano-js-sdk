@@ -84,6 +84,7 @@ services:
       cardano-node-ogmios:
         condition: service_healthy
     environment:
+      - DROP_SCHEMA=${DROP_PROJECTOR_SCHEMA:-false}
       - OGMIOS_URL=ws://cardano-node-ogmios:1337
     healthcheck:
       test:

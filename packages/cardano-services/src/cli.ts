@@ -114,6 +114,7 @@ withCommonOptions(
   .addOption(
     new Option('--drop-schema <true/false>', ProjectorOptionDescriptions.DropSchema)
       .default(false)
+      .env('DROP_SCHEMA')
       .argParser((dropSchema) =>
         stringOptionToBoolean(dropSchema, Programs.Projector, ProjectorOptionDescriptions.DropSchema)
       )
