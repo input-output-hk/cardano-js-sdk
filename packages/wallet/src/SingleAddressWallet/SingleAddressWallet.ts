@@ -75,7 +75,6 @@ import {
   GenericTxBuilder,
   InitializeTxProps,
   InitializeTxResult,
-  TxBuilder,
   TxBuilderDependencies,
   finalizeTx,
   initializeTx
@@ -447,7 +446,7 @@ export class SingleAddressWallet implements ObservableWallet {
     );
   }
 
-  createTxBuilder(): TxBuilder {
+  createTxBuilder() {
     return new GenericTxBuilder(this.getTxBuilderDependencies(), this.util);
   }
 
