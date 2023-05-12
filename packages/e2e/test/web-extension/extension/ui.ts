@@ -1,6 +1,5 @@
 /* eslint-disable no-use-before-define */
 import { BackgroundServices, UserPromptService, adaPriceProperties, env, logger } from './util';
-import { Cardano } from '@cardano-sdk/core';
 import {
   RemoteApiPropertyType,
   WalletManagerUi,
@@ -146,14 +145,13 @@ document.querySelector('#destroyWallet')!.addEventListener('click', async () => 
 
 document.querySelector('#buildAndSignTx')!.addEventListener('click', async () => {
   const [{ address: ownAddress }] = await firstValueFrom(wallet.addresses$);
-  const tx = await wallet.initializeTx({
-    outputs: new Set<Cardano.TxOut>([
-      {
-        address: ownAddress,
-        value: { coins: 2_000_000n }
-      }
-    ])
-  });
-  const signedTx = await wallet.finalizeTx({ tx });
+  const signedTx = await wallet
+    .createTxBuilder()
+    .addOutput({
+      address: ownAddress,
+      value: { coins: 2_000_000n }
+    })
+    .build()
+    .sign();
   setSignature(signedTx.witness.signatures.values().next().value);
 });

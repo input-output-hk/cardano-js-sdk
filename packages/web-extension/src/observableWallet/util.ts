@@ -1,7 +1,78 @@
 import { ObservableWallet } from '@cardano-sdk/wallet';
+import { OutputBuilder, TxBuilder } from '@cardano-sdk/tx-construction';
 import { RemoteApiProperties, RemoteApiPropertyType } from '../messaging';
 
 export const observableWalletChannel = (walletName: string) => `${walletName}$`;
+
+export const outputBuilderProperties: RemoteApiProperties<OutputBuilder> = {
+  address: {
+    getApiProperties: () => outputBuilderProperties,
+    propType: RemoteApiPropertyType.ApiFactory
+  },
+  asset: {
+    getApiProperties: () => outputBuilderProperties,
+    propType: RemoteApiPropertyType.ApiFactory
+  },
+  assets: {
+    getApiProperties: () => outputBuilderProperties,
+    propType: RemoteApiPropertyType.ApiFactory
+  },
+  build: RemoteApiPropertyType.MethodReturningPromise,
+  coin: {
+    getApiProperties: () => outputBuilderProperties,
+    propType: RemoteApiPropertyType.ApiFactory
+  },
+  datum: {
+    getApiProperties: () => outputBuilderProperties,
+    propType: RemoteApiPropertyType.ApiFactory
+  },
+  inspect: RemoteApiPropertyType.MethodReturningPromise,
+  value: {
+    getApiProperties: () => outputBuilderProperties,
+    propType: RemoteApiPropertyType.ApiFactory
+  }
+};
+
+export const txBuilderProperties: RemoteApiProperties<TxBuilder> = {
+  addOutput: {
+    getApiProperties: () => txBuilderProperties,
+    propType: RemoteApiPropertyType.ApiFactory
+  },
+  build: {
+    getApiProperties: () => ({
+      catch: RemoteApiPropertyType.MethodReturningPromise,
+      finally: RemoteApiPropertyType.MethodReturningPromise,
+      sign: RemoteApiPropertyType.MethodReturningPromise,
+      then: RemoteApiPropertyType.MethodReturningPromise
+    }),
+    propType: RemoteApiPropertyType.ApiFactory
+  },
+  buildOutput: {
+    getApiProperties: () => outputBuilderProperties,
+    propType: RemoteApiPropertyType.ApiFactory
+  },
+  delegate: {
+    getApiProperties: () => txBuilderProperties,
+    propType: RemoteApiPropertyType.ApiFactory
+  },
+  inspect: RemoteApiPropertyType.MethodReturningPromise,
+  removeOutput: {
+    getApiProperties: () => txBuilderProperties,
+    propType: RemoteApiPropertyType.ApiFactory
+  },
+  setExtraSigners: {
+    getApiProperties: () => txBuilderProperties,
+    propType: RemoteApiPropertyType.ApiFactory
+  },
+  setMetadata: {
+    getApiProperties: () => txBuilderProperties,
+    propType: RemoteApiPropertyType.ApiFactory
+  },
+  setSigningOptions: {
+    getApiProperties: () => txBuilderProperties,
+    propType: RemoteApiPropertyType.ApiFactory
+  }
+};
 
 export const observableWalletProperties: RemoteApiProperties<ObservableWallet> = {
   addresses$: RemoteApiPropertyType.HotObservable,
@@ -17,7 +88,10 @@ export const observableWalletProperties: RemoteApiProperties<ObservableWallet> =
       unspendable$: RemoteApiPropertyType.HotObservable
     }
   },
-  createTxBuilder: RemoteApiPropertyType.ApiFactory,
+  createTxBuilder: {
+    getApiProperties: () => txBuilderProperties,
+    propType: RemoteApiPropertyType.ApiFactory
+  },
   currentEpoch$: RemoteApiPropertyType.HotObservable,
   delegation: {
     rewardAccounts$: RemoteApiPropertyType.HotObservable,

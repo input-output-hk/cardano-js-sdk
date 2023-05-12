@@ -2951,6 +2951,7 @@ __metadata:
     "@cardano-sdk/crypto": ^0.1.4
     "@cardano-sdk/dapp-connector": ^0.9.0
     "@cardano-sdk/key-management": ^0.5.1
+    "@cardano-sdk/tx-construction": ^0.4.0
     "@cardano-sdk/util": ^0.9.0
     "@cardano-sdk/util-dev": ^0.9.0
     "@cardano-sdk/util-rxjs": ^0.4.7
