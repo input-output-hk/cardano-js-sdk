@@ -133,21 +133,16 @@ withCommonOptions(
       .env('PROJECTION_NAMES')
       .argParser(projectionNameParser)
   )
-  .action(async (projectionNames: ProjectionName[], args: { apiUrl: URL } & ProjectorArgs) => {
-    const projector = await loadProjector({
-      ...args,
-      postgresConnectionString: connectionStringFromArgs(args),
-      // Setting the projection names via env variable takes preference over command line argument
-      projectionNames: args.projectionNames ? args.projectionNames : projectionNames
-    });
-    await projector.initialize();
-    await projector.start();
-
-    onDeath(async () => {
-      await projector.shutdown();
-      process.exit(1);
-    });
-  });
+  .action(async (projectionNames: ProjectionName[], args: { apiUrl: URL } & ProjectorArgs) =>
+    runServer('projector', () =>
+      loadProjector({
+        ...args,
+        postgresConnectionString: connectionStringFromArgs(args),
+        // Setting the projection names via env variable takes preference over command line argument
+        projectionNames: args.projectionNames ? args.projectionNames : projectionNames
+      })
+    )
+  );
 
 withCommonOptions(
   withOgmiosOptions(
