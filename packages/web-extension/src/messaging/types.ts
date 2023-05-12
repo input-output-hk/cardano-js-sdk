@@ -53,6 +53,9 @@ export interface MessengerPort {
   onDisconnect: MinimalEvent<(port: MessengerPort) => void>;
   onMessage: MinimalEvent<(data: unknown, port: MessengerPort) => void>;
   disconnect(): void;
+  /**
+   * @throws an Error if the port is closed
+   */
   postMessage(message: any): void;
 }
 
