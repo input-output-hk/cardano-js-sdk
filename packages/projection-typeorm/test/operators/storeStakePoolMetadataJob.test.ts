@@ -1,7 +1,6 @@
 import {
   BlockDataEntity,
   BlockEntity,
-  BossDb,
   STAKE_POOL_METADATA_QUEUE,
   TypeormStabilityWindowBuffer,
   storeBlock,
@@ -13,11 +12,10 @@ import { Bootstrap, Mappers, requestNext } from '@cardano-sdk/projection';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { ChainSyncEventType } from '@cardano-sdk/core';
 import { QueryRunner } from 'typeorm';
-import { StakePoolMetadataJob } from '../../src/pgBoss';
+import { StakePoolMetadataJob, createPgBoss } from '../../src/pgBoss';
 import { createProjectorTilFirst } from './util';
 import { defer, filter, from } from 'rxjs';
 import { initializeDataSource } from '../util';
-import PgBoss from 'pg-boss';
 
 const testPromise = () => {
   let resolvePromise: Function;
@@ -88,7 +86,7 @@ describe('storeStakePoolMetadataJob', () => {
     const { block } = await projectTilFirstPoolUpdateWithMetadata();
     const jobQueryResult = await queryRunner.query(`SELECT * FROM pgboss.job WHERE block_slot=${block.header.slot}`);
     expect(jobQueryResult).toHaveLength(1);
-    const boss = new PgBoss({ db: new BossDb(queryRunner) });
+    const boss = createPgBoss(queryRunner, logger);
     await boss.start();
     const [jobComplete, resolveJobComplete] = testPromise();
     void boss.work<StakePoolMetadataJob, boolean>(STAKE_POOL_METADATA_QUEUE, async ({ data }) => {
@@ -102,7 +100,7 @@ describe('storeStakePoolMetadataJob', () => {
 
   it('rollbacks do not brick the worker', async () => {
     const { block } = await projectTilFirstPoolUpdateWithMetadata();
-    const boss = new PgBoss({ db: new BossDb(queryRunner) });
+    const boss = createPgBoss(queryRunner, logger);
     await boss.start();
     const [rollbackComplete, resolveRollbackComplete] = testPromise();
     const [job1Complete, resolveJob1Complete] = testPromise();

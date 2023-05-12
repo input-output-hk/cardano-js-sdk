@@ -4,13 +4,14 @@
 /* eslint-disable no-invalid-this */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Cardano } from '@cardano-sdk/core';
-import { QueryRunner } from 'typeorm';
+import { DataSource, QueryRunner } from 'typeorm';
+import { Logger } from 'ts-log';
+import { contextLogger } from '@cardano-sdk/util';
 import { v4 } from 'uuid';
 import Attorney from 'pg-boss/src/attorney';
-import EventEmitter from 'events';
 import PgBoss, { SendOptions } from 'pg-boss';
 
-export const STAKE_POOL_METADATA_QUEUE = 'STAKE_POOL_METADATA';
+export const STAKE_POOL_METADATA_QUEUE = 'pool-metadata';
 
 export interface PgBossExtension {
   send: <T extends object>(
@@ -29,21 +30,51 @@ export interface StakePoolMetadataJob {
   metadataJson: NonNullable<Cardano.StakePool['metadataJson']>;
 }
 
-export class BossDb extends EventEmitter {
-  opened = true;
-  #queryRunner: QueryRunner;
-
-  constructor(queryRunner: QueryRunner) {
-    super();
-    this.#queryRunner = queryRunner;
-  }
+class BossDb {
+  constructor(private queryRunner: QueryRunner | null, private logger: Logger, private dataSource?: DataSource) {}
 
   async executeSql(text: string, values: unknown[]) {
-    return this.#queryRunner
-      .query(text, values, true)
-      .then(({ records, affected }) => ({ rowCount: affected || 0, rows: records }));
+    this.logger.debug(text, values);
+
+    const queryRunner = this.dataSource ? this.dataSource.createQueryRunner() : this.queryRunner;
+
+    if (!queryRunner) throw new Error('Provide a queryRunner or a dataSource');
+
+    const { records, affected } = await queryRunner.query(text, values, true);
+
+    if (this.dataSource) await queryRunner.release();
+
+    return { rowCount: affected || 0, rows: records };
   }
 }
+
+/**
+ * Creates a new `PgBoss` object, listens to its error handler and sets up logging.
+ *
+ * The caller has the responsibility to call asynchronous methods `start()` and `stop()`
+ * against the returned `PgBoss` instance.
+ *
+ * Use `queryRunner` when the `PgBoss` instance is required for a one shot operation and needs to use a specific
+ * `QueryRunner` (ex. inside a TRANSACTION).
+ *
+ * Use `dataSource` for long lasting `PgBoss` instances, so they can create new `QueryRunner`s on demand.
+ *
+ * If `dataSource` is provided, takes precedence on `queryRunner`
+ *
+ * @param queryRunner the specific `QueryRunner`
+ * @param logger the logger instance
+ * @param dataSource the `DataSource` used to create new `QueryRunner`s on demand.
+ * @returns the newly constructed pg-boss object
+ */
+export const createPgBoss = (queryRunner: QueryRunner | null, logger: Logger, dataSource?: DataSource) => {
+  logger = contextLogger(logger, 'pg-boss');
+
+  const pgBoss = new PgBoss({ db: new BossDb(queryRunner, logger, dataSource) });
+
+  pgBoss.on('error', (error) => logger.error(error));
+
+  return pgBoss;
+};
 
 async function createJob(
   this: any,
@@ -200,8 +231,8 @@ async function send(this: any, ...args: any[]) {
   return await this.createJob(name, data, options);
 }
 
-export const createPgBossExtension = (queryRunner: QueryRunner): PgBossExtension => {
-  const boss = new PgBoss({ db: new BossDb(queryRunner) });
+export const createPgBossExtension = (queryRunner: QueryRunner, logger: Logger): PgBossExtension => {
+  const boss = createPgBoss(queryRunner, logger);
   (boss as any).insertJobCommand = insertJob('pgboss');
   (boss as any).send = send;
   (boss as any).createJob = createJob;

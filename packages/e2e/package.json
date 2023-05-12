@@ -30,6 +30,7 @@
     "test:local-network": "jest -c jest.config.js --forceExit --selectProjects local-network --runInBand --verbose",
     "test:projection": "jest -c jest.config.js --forceExit --selectProjects projection --runInBand --verbose",
     "test:ogmios": "jest -c jest.config.js --forceExit --selectProjects ogmios --runInBand --verbose",
+    "test:pg-boss": "jest -c jest.config.js --forceExit --selectProjects pg-boss --runInBand --verbose",
     "test:providers": "jest -c jest.config.js --forceExit --selectProjects providers --runInBand --verbose",
     "test:wallet": "jest -c jest.config.js --forceExit --selectProjects wallet --runInBand --verbose",
     "test:wallet-real-ada": "jest -c jest.config.js --forceExit --selectProjects wallet-real-ada --runInBand --verbose",

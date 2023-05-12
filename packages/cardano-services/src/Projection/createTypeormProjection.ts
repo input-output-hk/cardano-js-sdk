@@ -35,7 +35,7 @@ const applyStores =
   (evt$: Observable<T>) =>
     evt$.pipe.apply(evt$, selectedStores as any) as Observable<T>;
 
-const createProjectionDataSource = ({
+export const createObservableDataSource = ({
   connectionConfig$,
   logger,
   buffer,
@@ -88,7 +88,7 @@ export const createTypeormProjection = ({
   buffer
 }: CreateTypeormProjectionProps) => {
   const { mappers, entities, stores, extensions } = prepareTypeormProjection({ buffer, projections });
-  const dataSource$ = createProjectionDataSource({
+  const dataSource$ = createObservableDataSource({
     buffer,
     connectionConfig$,
     devOptions,
