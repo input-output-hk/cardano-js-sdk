@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.1-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.9.1-nightly.0...@cardano-sdk/web-extension@0.9.1-nightly.1) (2023-05-13)
+
+### Features
+
+- **web-extension:** add RemoteApiPropertyType.ApiFactory ([eacad41](https://github.com/input-output-hk/cardano-js-sdk/commit/eacad41b5b8570ca4e5d0cc4178c4b5740569a4c))
+
 ## [0.9.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.9.0...@cardano-sdk/web-extension@0.9.1-nightly.0) (2023-05-04)
 
 **Note:** Version bump only for package @cardano-sdk/web-extension

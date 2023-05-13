@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.1-nightly.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.9.1-nightly.0...@cardano-sdk/util@0.9.1-nightly.1) (2023-05-13)
+
+### Features
+
+- **util:** export isPromise util ([cc0b3b0](https://github.com/input-output-hk/cardano-js-sdk/commit/cc0b3b0e10ef4eaf763bea085976669f8be72ed5))
+
 ## [0.9.1-nightly.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.9.0...@cardano-sdk/util@0.9.1-nightly.0) (2023-05-04)
 
 **Note:** Version bump only for package @cardano-sdk/util
