@@ -1,7 +1,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { CML, Cardano } from '@cardano-sdk/core';
-import { CommunicationType, KeyAgent, TrezorKeyAgent, restoreKeyAgent, util } from '@cardano-sdk/key-management';
-import { ObservableWallet, SingleAddressWallet, setupWallet } from '../../src';
+import { CommunicationType, KeyAgent, TrezorKeyAgent, util } from '@cardano-sdk/key-management';
+import { ObservableWallet, SingleAddressWallet, restoreKeyAgent, setupWallet } from '../../../src';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { firstValueFrom } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
@@ -12,7 +12,7 @@ import {
   mockRewardsProvider,
   mockTxSubmitProvider,
   mockUtxoProvider
-} from '../mocks';
+} from '../../mocks';
 
 const createWallet = async (keyAgent: KeyAgent) => {
   const txSubmitProvider = mockTxSubmitProvider();

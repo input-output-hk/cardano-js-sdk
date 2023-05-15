@@ -24,6 +24,32 @@ const createFingerprint = (policyId: string, assetName: string): string =>
 
 describe('Cardano/types/Asset', () => {
   describe('AssetId', () => {
+    describe('getPolicyId', () => {
+      it('can get the policy ID component from the asset id', () => {
+        const asstId = AssetId('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed');
+
+        expect(AssetId.getPolicyId(asstId)).toEqual('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea');
+      });
+    });
+
+    describe('getAssetName', () => {
+      it('can get the asset name component from the asset id', () => {
+        const asstId = AssetId('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed');
+
+        expect(AssetId.getAssetName(asstId)).toEqual('4172b2ed');
+      });
+    });
+
+    describe('fromParts', () => {
+      it('can get the asset name component from the asset id', () => {
+        const asstId = AssetId('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed');
+
+        expect(
+          AssetId.fromParts(PolicyId('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea'), AssetName('4172b2ed'))
+        ).toEqual(asstId);
+      });
+    });
+
     it('accepts a valid asset id and is implemented using util.assetIsHexString', () => {
       expect(() => AssetId('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed')).not.toThrow();
       expect(assertIsHexString).toBeCalledWith('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5ea4172b2ed');

@@ -68,11 +68,10 @@ import * as certificate from './certificate';
 import { CML } from '../CML';
 import { ManagedFreeableScope } from '@cardano-sdk/util';
 import { SerializationError, SerializationFailure } from '../../errors';
-import { assetNameFromAssetId, policyIdFromAssetId } from '../../Asset/util';
 
 export const parseAssetId = (assetId: AssetId) => {
-  const policyId = policyIdFromAssetId(assetId);
-  const assetName = assetNameFromAssetId(assetId);
+  const policyId = AssetId.getPolicyId(assetId);
+  const assetName = AssetId.getAssetName(assetId);
   return {
     assetName: CML.AssetName.new(Buffer.from(assetName, 'hex')),
     scriptHash: CML.ScriptHash.from_bytes(Buffer.from(policyId, 'hex'))
@@ -88,7 +87,7 @@ export const tokenMap = (scope: ManagedFreeableScope, map: Cardano.TokenMap) => 
     scope.manage(assetName);
     scope.manage(scriptHash);
 
-    const policyId = policyIdFromAssetId(assetId);
+    const policyId = AssetId.getPolicyId(assetId);
     const amount = scope.manage(BigNum.from_str(map.get(assetId)!.toString()));
     if (!policyMap.has(policyId)) {
       policyMap.set(policyId, { assetsMap: new Map([[assetName, amount]]), scriptHash });
@@ -313,8 +312,8 @@ export const txMint = (scope: ManagedFreeableScope, mint: Cardano.TokenMap) => {
   const cslMint = scope.manage(Mint.new());
   const mintMap = new Map<Cardano.PolicyId, [ScriptHash, MintAssets]>();
   for (const [assetId, quantity] of mint.entries()) {
-    const policyId = policyIdFromAssetId(assetId);
-    const assetName = assetNameFromAssetId(assetId);
+    const policyId = AssetId.getPolicyId(assetId);
+    const assetName = AssetId.getAssetName(assetId);
     let [scriptHash, mintAssets] = mintMap.get(policyId) || [];
     if (!scriptHash || !mintAssets) {
       scriptHash = scope.manage(ScriptHash.from_bytes(Buffer.from(policyId, 'hex')));

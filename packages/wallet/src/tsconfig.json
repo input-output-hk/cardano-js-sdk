@@ -27,6 +27,9 @@
     },
     {
       "path": "../../tx-construction/src"
+    },
+    {
+      "path": "../../hardware-ledger/src"
     }
   ]
 }

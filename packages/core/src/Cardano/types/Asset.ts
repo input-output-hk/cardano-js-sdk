@@ -35,6 +35,10 @@ export const AssetId = (value: string): AssetId => {
 export type PolicyId = OpaqueString<'PolicyId'>;
 export const PolicyId = (value: string): PolicyId => Crypto.Hash28ByteBase16(value) as unknown as PolicyId;
 
+AssetId.getPolicyId = (id: AssetId) => PolicyId(id.slice(0, 56));
+AssetId.getAssetName = (id: AssetId) => AssetName(id.slice(56));
+AssetId.fromParts = (policyId: PolicyId, assetName: AssetName): AssetId => AssetId(policyId + assetName);
+
 /**
  * Fingerprint of a native asset for human comparison
  * See CIP-0014
