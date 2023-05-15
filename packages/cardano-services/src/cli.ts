@@ -48,10 +48,19 @@ import {
 } from './Asset';
 import { EPOCH_POLL_INTERVAL_DEFAULT } from './util';
 import { HttpServer } from './Http';
+import {
+  PARALLEL_JOBS_DEFAULT,
+  PG_BOSS_WORKER_API_URL_DEFAULT,
+  PgBossWorkerArgs,
+  PgBossWorkerOptionDescriptions,
+  loadPgBossWorker
+} from './Program/programs/pgBossWorker';
 import { PROJECTOR_API_URL_DEFAULT, ProjectorArgs, loadProjector } from './Program/programs/projector';
+import { PgBossQueue } from './PgBoss/types';
 import { ProjectionName } from './Projection';
 import { URL } from 'url';
 import { dbCacheValidator } from './util/validators';
+import { isValidQueue } from './PgBoss/util';
 import { withCommonOptions, withOgmiosOptions, withPostgresOptions, withRabbitMqOptions } from './Program/options/';
 import fs from 'fs';
 import onDeath from 'death';
@@ -114,6 +123,7 @@ withCommonOptions(
   .addOption(
     new Option('--drop-schema <true/false>', ProjectorOptionDescriptions.DropSchema)
       .default(false)
+      .env('DROP_SCHEMA')
       .argParser((dropSchema) =>
         stringOptionToBoolean(dropSchema, Programs.Projector, ProjectorOptionDescriptions.DropSchema)
       )
@@ -132,21 +142,16 @@ withCommonOptions(
       .env('PROJECTION_NAMES')
       .argParser(projectionNameParser)
   )
-  .action(async (projectionNames: ProjectionName[], args: { apiUrl: URL } & ProjectorArgs) => {
-    const projector = await loadProjector({
-      ...args,
-      postgresConnectionString: connectionStringFromArgs(args),
-      // Setting the projection names via env variable takes preference over command line argument
-      projectionNames: args.projectionNames ? args.projectionNames : projectionNames
-    });
-    await projector.initialize();
-    await projector.start();
-
-    onDeath(async () => {
-      await projector.shutdown();
-      process.exit(1);
-    });
-  });
+  .action(async (projectionNames: ProjectionName[], args: { apiUrl: URL } & ProjectorArgs) =>
+    runServer('projector', () =>
+      loadProjector({
+        ...args,
+        postgresConnectionString: connectionStringFromArgs(args),
+        // Setting the projection names via env variable takes preference over command line argument
+        projectionNames: args.projectionNames ? args.projectionNames : projectionNames
+      })
+    )
+  );
 
 withCommonOptions(
   withOgmiosOptions(
@@ -381,6 +386,34 @@ withCommonOptions(
   .action(async (args: BlockfrostWorkerArgs) =>
     runServer('Blockfrost worker', () =>
       loadBlockfrostWorker({ ...args, postgresConnectionString: connectionStringFromArgs(args) })
+    )
+  );
+
+withCommonOptions(
+  withPostgresOptions(program.command('start-pg-boss-worker').description('Start the pg-boss worker')),
+  { apiUrl: PG_BOSS_WORKER_API_URL_DEFAULT }
+)
+  .addOption(
+    new Option('--parallel-jobs <parallelJobs>', PgBossWorkerOptionDescriptions.ParallelJobs)
+      .env('PARALLEL_JOBS')
+      .default(PARALLEL_JOBS_DEFAULT)
+      .argParser((parallelJobs) => Number.parseInt(parallelJobs, 10))
+  )
+  .addOption(
+    new Option('--queues <queues>', PgBossWorkerOptionDescriptions.Queues)
+      .env('QUEUES')
+      .argParser((queues) => {
+        const queuesArray = queues.split(',') as PgBossQueue[];
+
+        for (const queue of queuesArray) if (!isValidQueue(queue)) throw new Error(`Unknown queue name: '${queue}'`);
+
+        return queuesArray;
+      })
+      .makeOptionMandatory()
+  )
+  .action(async (args: PgBossWorkerArgs) =>
+    runServer('pg-boss worker', () =>
+      loadPgBossWorker({ ...args, postgresConnectionString: connectionStringFromArgs(args) })
     )
   );
 

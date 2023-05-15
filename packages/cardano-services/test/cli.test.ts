@@ -2283,6 +2283,51 @@ describe('CLI', () => {
     });
   });
 
+  describe('start-pg-boss-worker', () => {
+    const commonArgs = ['start-pg-boss-worker', '--logger-min-severity', 'info'];
+    let proc: ChildProcess;
+
+    afterEach((done) => {
+      if (proc?.kill()) proc.on('close', () => done());
+      else done();
+    });
+
+    // Tests without any assertion fail if they get timeout
+    it('exits with code 1 without queues', (done) => {
+      expect.assertions(2);
+      proc = withLogging(fork(exePath, commonArgs, { env: {}, stdio: 'pipe' }), true);
+      proc.stderr!.on('data', (data) =>
+        expect(data.toString()).toMatch("required option '--queues <queues>' not specified")
+      );
+      proc.on('exit', (code) => {
+        expect(code).toBe(1);
+        done();
+      });
+    });
+
+    it('exits with code 1 with a wrong queue', (done) => {
+      expect.assertions(2);
+      proc = withLogging(fork(exePath, [...commonArgs, '--queues', 'abc'], { env: {}, stdio: 'pipe' }), true);
+      proc.stderr!.on('data', (data) => expect(data.toString()).toMatch("Error: Unknown queue name: 'abc'"));
+      proc.on('exit', (code) => {
+        expect(code).toBe(1);
+        done();
+      });
+    });
+
+    it('exits with code 1 without a valid connection string', (done) => {
+      expect.assertions(2);
+      proc = withLogging(fork(exePath, [...commonArgs, '--queues', 'pool-metadata'], { env: {}, stdio: 'pipe' }), true);
+      proc.stderr!.on('data', (data) =>
+        expect(data.toString()).toMatch('projector requires the postgresConnectionString')
+      );
+      proc.on('exit', (code) => {
+        expect(code).toBe(1);
+        done();
+      });
+    });
+  });
+
   describe('start-worker', () => {
     let commonArgs: string[];
     let commonArgsWithServiceDiscovery: string[];

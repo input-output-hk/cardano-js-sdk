@@ -63,7 +63,7 @@ export function withTypeormTransaction<Props>(
                     const queryRunner = dataSource.createQueryRunner('master');
                     await queryRunner.connect();
                     if (extensions?.pgBoss) {
-                      const pgBoss = createPgBossExtension(queryRunner);
+                      const pgBoss = createPgBossExtension(queryRunner, logger);
                       return { pgBoss, queryRunner };
                     }
                     return { queryRunner };

@@ -20,7 +20,11 @@ export const storeStakePoolMetadataJob = typeormOperator<Mappers.WithStakePools 
         })
       );
     for (const task of tasks) {
-      await pgBoss.send(STAKE_POOL_METADATA_QUEUE, task, { slot: header.slot });
+      await pgBoss.send(STAKE_POOL_METADATA_QUEUE, task, {
+        retryDelay: 6 * 3600, // 6 hours
+        retryLimit: 1_000_000, // retry forever
+        slot: header.slot
+      });
     }
   }
 );

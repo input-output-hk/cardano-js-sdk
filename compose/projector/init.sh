@@ -16,11 +16,8 @@ USER=`cat /run/secrets/postgres_user`
 # The custom approach adopted doesn't requires any actions by the user and allows
 # changes between versions of the SDK.
 
-# This is not a 'real' while loop: the fail of init.sql should be caused by the lack
-# of the database, which is created inside the loop; next check should succeed.
-while ! psql "postgresql://${USER}:${PASSWORD}@postgres/${DB}" -f init.sql ; do
-  psql "postgresql://${USER}:${PASSWORD}@postgres/" -c "CREATE DATABASE projection"
-done
+psql "postgresql://${USER}:${PASSWORD}@postgres/" -c "CREATE DATABASE projection"
+psql "postgresql://${USER}:${PASSWORD}@postgres/" -c "CREATE DATABASE projection_test"
 
 _term() {
   kill $CHILD
