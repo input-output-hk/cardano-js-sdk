@@ -1,8 +1,8 @@
 import { Datum, DatumHash, Script } from './Script';
+import { Handle } from '../../CardanoNode/types/AdaHandle';
 import { PaymentAddress } from './../Address';
 import { TransactionId } from './Transaction';
 import { Value } from './Value';
-
 export interface TxIn {
   txId: TransactionId;
   index: number;
@@ -39,6 +39,7 @@ export interface TxOut {
    * which contained the script.
    */
   scriptReference?: Script;
+  handle?: Handle;
 }
 
 export type Utxo = [HydratedTxIn, TxOut];

@@ -1,4 +1,4 @@
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, Handle, KoraLabsHandleProvider } from '@cardano-sdk/core';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { Logger } from 'ts-log';
 
@@ -21,6 +21,8 @@ export interface OutputBuilderProps {
   txOut?: PartialTxOut;
   /** Logger */
   logger: Logger;
+  /** Koralabs Handle Provider for ADAHandle */
+  handleProvider?: KoraLabsHandleProvider;
 }
 
 /** Determines if the `PartialTxOut` arg has at least an address and coins. */
@@ -53,11 +55,13 @@ export class TxOutputBuilder implements OutputBuilder {
   #partialOutput: PartialTxOut;
   #outputValidator: OutputBuilderValidator;
   #logger: Logger;
+  #handleProvider?: KoraLabsHandleProvider;
 
-  constructor({ outputValidator, txOut, logger }: OutputBuilderProps) {
+  constructor({ outputValidator, txOut, logger, handleProvider }: OutputBuilderProps) {
     this.#partialOutput = { ...txOut };
     this.#outputValidator = outputValidator;
     this.#logger = logger;
+    this.#handleProvider = handleProvider;
   }
 
   /**
@@ -116,12 +120,31 @@ export class TxOutputBuilder implements OutputBuilder {
     return this;
   }
 
+  handle(_output: Handle): OutputBuilder {
+    // this.#handleProvider
+    //   .resolveHandles({ handles: [output] })
+    //   .then(() => {
+    //     this.#partialOutput = { ...this.#partialOutput, handle: output };
+
+    //     return this;
+    //   })
+    //   .catch((error) => {
+    //     throw new Error(error);
+    //   });
+    return this;
+  }
+
   async build(): Promise<Cardano.TxOut> {
     const txOut = this.toTxOut();
 
     const outputValidation = toOutputValidationError(txOut, await this.#outputValidator.validateOutput(txOut));
     if (outputValidation) {
       throw outputValidation;
+    }
+
+    if (this.#partialOutput.handle) {
+      // eslint-disable-next-line no-console
+      this.#logger.debug('ADA handle:', this.#partialOutput.handle);
     }
 
     return txOut;
