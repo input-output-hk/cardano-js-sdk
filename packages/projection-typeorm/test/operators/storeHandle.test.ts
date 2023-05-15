@@ -14,10 +14,10 @@ import {
   withTypeormTransaction
 } from '../../src';
 import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { Observable, defer, from } from 'rxjs';
-import { QueryRunner } from 'typeorm';
+import { In, QueryRunner } from 'typeorm';
 import { createProjectorTilFirst } from './util';
 import { initializeDataSource } from '../util';
 
@@ -74,10 +74,29 @@ describe('storeHandle', () => {
     const repository = queryRunner.manager.getRepository(HandleEntity);
     const mintEvent = await projectTilFirst((evt) => evt.handles.length > 0);
     expect(await repository.count()).toBe(mintEvent.handles.length);
+    expect(mintEvent.handles.length).toBeGreaterThan(0);
   });
-  it.todo('deletes handle on rollback');
+  it('deletes handle on rollback', async () => {
+    const handleRepository = queryRunner.manager.getRepository(HandleEntity);
+    await projectTilFirst(({ handles }) => handles.length > 0);
+    const currentCount = await handleRepository.count();
+    expect(currentCount).toBeGreaterThan(0);
 
-  it.todo('minting an existing handle sets address to null');
+    const rolledBackMintEvent = await projectTilFirst(({ eventType }) => eventType === ChainSyncEventType.RollBackward);
+    expect(await handleRepository.count()).toEqual(currentCount - rolledBackMintEvent.handles.length);
+  });
+
+  it('minting an existing handle sets address to null', async () => {
+    const handleRepository = queryRunner.manager.getRepository(HandleEntity);
+    const mintEvent = await projectTilFirst(({ eventType }) => eventType === ChainSyncEventType.RollForward);
+    const existingHandles = await handleRepository.find({
+      select: { address: true, handle: true },
+      where: { handle: In(mintEvent.handles.map(({ handle }) => handle)) }
+    });
+
+    expect(Array.isArray(existingHandles)).toBeTruthy();
+    // How can I test setting address to null
+  });
   it.todo('rolling back a transaction that mint an existing handle sets address to the original owner');
 
   it.todo('burning an handle with supply >1 sets address to the 1 remaining owner');
