@@ -13,7 +13,6 @@ import {
 import { Cardano } from '@cardano-sdk/core';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
-import { STAKE_KEY_DERIVATION_PATH } from './util';
 
 export abstract class KeyAgentBase implements KeyAgent {
   readonly #serializableData: SerializableKeyAgentData;
@@ -58,8 +57,22 @@ export abstract class KeyAgentBase implements KeyAgent {
   /**
    * See https://github.com/cardano-foundation/CIPs/tree/master/CIP-1852#specification
    */
-  async deriveAddress({ index, type }: AccountAddressDerivationPath): Promise<GroupedAddress> {
-    const knownAddress = this.knownAddresses.find((addr) => addr.type === type && addr.index === index);
+  async deriveAddress(
+    { index, type }: AccountAddressDerivationPath,
+    stakeKeyDerivationIndex: number
+  ): Promise<GroupedAddress> {
+    const stakeKeyDerivationPath = {
+      index: stakeKeyDerivationIndex,
+      role: KeyRole.Stake
+    };
+
+    const knownAddress = this.knownAddresses.find(
+      (addr) =>
+        addr.type === type &&
+        addr.index === index &&
+        addr.stakeKeyDerivationPath?.index === stakeKeyDerivationPath.index
+    );
+
     if (knownAddress) return knownAddress;
     const derivedPublicPaymentKey = await this.derivePublicKey({
       index,
@@ -68,8 +81,7 @@ export abstract class KeyAgentBase implements KeyAgent {
 
     const derivedPublicPaymentKeyHash = await this.#bip32Ed25519.getPubKeyHash(derivedPublicPaymentKey);
 
-    // Possible optimization: memoize/cache stakeKeyCredential, because it's always the same
-    const publicStakeKey = await this.derivePublicKey(STAKE_KEY_DERIVATION_PATH);
+    const publicStakeKey = await this.derivePublicKey(stakeKeyDerivationPath);
     const publicStakeKeyHash = await this.#bip32Ed25519.getPubKeyHash(publicStakeKey);
 
     const stakeCredential = { hash: Hash28ByteBase16(publicStakeKeyHash), type: Cardano.CredentialType.KeyHash };
@@ -88,7 +100,7 @@ export abstract class KeyAgentBase implements KeyAgent {
       index,
       networkId: this.chainId.networkId,
       rewardAccount: Cardano.RewardAccount(rewardAccount.toBech32()),
-      stakeKeyDerivationPath: STAKE_KEY_DERIVATION_PATH,
+      stakeKeyDerivationPath,
       type
     };
 

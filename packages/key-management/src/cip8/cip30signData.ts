@@ -51,14 +51,24 @@ const getAddressBytes = (signWith: Cardano.PaymentAddress | Cardano.RewardAccoun
 
 const getDerivationPath = async (signWith: Cardano.PaymentAddress | Cardano.RewardAccount, keyAgent: AsyncKeyAgent) => {
   const isRewardAccount = signWith.startsWith('stake');
-  if (isRewardAccount) {
-    return STAKE_KEY_DERIVATION_PATH;
-  }
+
   const knownAddresses = await firstValueFrom(keyAgent.knownAddresses$);
+
+  if (isRewardAccount) {
+    const knownRewardAddress = knownAddresses.find(({ rewardAccount }) => rewardAccount === signWith);
+
+    if (!knownRewardAddress)
+      throw new Cip30DataSignError(Cip30DataSignErrorCode.ProofGeneration, 'Unknown reward address');
+
+    return knownRewardAddress.stakeKeyDerivationPath || STAKE_KEY_DERIVATION_PATH;
+  }
+
   const knownAddress = knownAddresses.find(({ address }) => address === signWith);
+
   if (!knownAddress) {
     throw new Cip30DataSignError(Cip30DataSignErrorCode.ProofGeneration, 'Unknown address');
   }
+
   return { index: knownAddress.index, role: knownAddress.type as number as KeyRole };
 };
 

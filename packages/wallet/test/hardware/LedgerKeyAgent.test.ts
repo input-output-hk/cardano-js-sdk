@@ -34,7 +34,10 @@ describe('LedgerKeyAgent', () => {
           dependencies
         ),
       createWallet: async (ledgerKeyAgent) => {
-        const { address, rewardAccount } = await ledgerKeyAgent.deriveAddress({ index: 0, type: AddressType.External });
+        const { address, rewardAccount } = await ledgerKeyAgent.deriveAddress(
+          { index: 0, type: AddressType.External },
+          0
+        );
         const assetProvider = mocks.mockAssetProvider();
         const stakePoolProvider = createStubStakePoolProvider();
         const networkInfoProvider = mocks.mockNetworkInfoProvider();

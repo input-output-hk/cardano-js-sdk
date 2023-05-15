@@ -260,7 +260,7 @@ export class SingleAddressWallet implements ObservableWallet {
               if (addresses.length === 0) {
                 this.#logger.debug('No addresses available; deriving one');
                 void keyAgent
-                  .deriveAddress({ index: 0, type: AddressType.External })
+                  .deriveAddress({ index: 0, type: AddressType.External }, 0)
                   .catch(() => this.#logger.error('Failed to derive address'));
               }
             }
