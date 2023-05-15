@@ -13,7 +13,7 @@ describe('AssetBuilder', () => {
   let fixtureBuilder: AssetFixtureBuilder;
 
   beforeAll(async () => {
-    db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
+    db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING_DB_SYNC });
     builder = new AssetBuilder(db, logger);
     fixtureBuilder = new AssetFixtureBuilder(db, logger);
   });

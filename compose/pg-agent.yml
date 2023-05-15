@@ -16,7 +16,7 @@ services:
       postgres:
         condition: service_healthy
     secrets:
-      - postgres_db
+      - postgres_db_db_sync
       - postgres_password
       - postgres_user
 

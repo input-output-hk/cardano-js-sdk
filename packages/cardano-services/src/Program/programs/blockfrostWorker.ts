@@ -29,7 +29,7 @@ export enum BlockfrostWorkerOptionDescriptions {
 }
 
 export type BlockfrostWorkerArgs = CommonProgramOptions &
-  PosgresProgramOptions &
+  PosgresProgramOptions<'DbSync'> &
   BlockfrostWorkerConfig & { blockfrostApiFile?: string };
 
 export interface LoadBlockfrostWorkerDependencies {

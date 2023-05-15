@@ -10,7 +10,7 @@ describe('createDbSyncMetadataService', () => {
   let fixtureBuilder: MetadataFixtureBuilder;
   beforeAll(() => {
     dbConnection = new Pool({
-      connectionString: process.env.POSTGRES_CONNECTION_STRING
+      connectionString: process.env.POSTGRES_CONNECTION_STRING_DB_SYNC
     });
     service = createDbSyncMetadataService(dbConnection, logger);
     fixtureBuilder = new MetadataFixtureBuilder(dbConnection, logger);

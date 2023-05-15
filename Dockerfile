@@ -65,11 +65,11 @@ ENV \
   API_URL="http://0.0.0.0:3000" \
   CARDANO_NODE_CONFIG_PATH=/config/cardano-node/config.json \
   NETWORK=${NETWORK} \
-  POSTGRES_DB_FILE=/run/secrets/postgres_db \
-  POSTGRES_HOST=postgres \
-  POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password \
-  POSTGRES_PORT=5432 \
-  POSTGRES_USER_FILE=/run/secrets/postgres_user \
+  POSTGRES_DB_FILE_DB_SYNC=/run/secrets/postgres_db_db_sync \
+  POSTGRES_HOST_DB_SYNC=postgres \
+  POSTGRES_PASSWORD_FILE_DB_SYNC=/run/secrets/postgres_password \
+  POSTGRES_PORT_DB_SYNC=5432 \
+  POSTGRES_USER_FILE_DB_SYNC=/run/secrets/postgres_user \
   SERVICE_NAMES=asset,chain-history,network-info,rewards,stake-pool,tx-submit,utxo
 WORKDIR /app/packages/cardano-services
 COPY packages/cardano-services/config/network/${NETWORK} /config/
@@ -86,22 +86,27 @@ FROM cardano-services as blockfrost-worker
 ENV \
   API_URL="http://0.0.0.0:3000" \
   BLOCKFROST_API_FILE=/run/secrets/blockfrost_key \
-  POSTGRES_DB_FILE=/run/secrets/postgres_db \
-  POSTGRES_HOST=postgres \
-  POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password \
-  POSTGRES_PORT=5432 \
-  POSTGRES_USER_FILE=/run/secrets/postgres_user
+  POSTGRES_DB_FILE_DB_SYNC=/run/secrets/postgres_db_db_sync \
+  POSTGRES_HOST_DB_SYNC=postgres \
+  POSTGRES_PASSWORD_FILE_DB_SYNC=/run/secrets/postgres_password \
+  POSTGRES_PORT_DB_SYNC=5432 \
+  POSTGRES_USER_FILE_DB_SYNC=/run/secrets/postgres_user
 WORKDIR /app/packages/cardano-services
 CMD ["node", "dist/cjs/cli.js", "start-blockfrost-worker"]
 
 FROM cardano-services as pg-boss-worker
 ENV \
   API_URL="http://0.0.0.0:3003" \
-  POSTGRES_DB_FILE=/run/secrets/postgres_db_projection \
-  POSTGRES_HOST=postgres \
-  POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password \
-  POSTGRES_PORT=5432 \
-  POSTGRES_USER_FILE=/run/secrets/postgres_user
+  POSTGRES_DB_FILE_DB_SYNC=/run/secrets/postgres_db_db_sync \
+  POSTGRES_HOST_DB_SYNC=postgres \
+  POSTGRES_PASSWORD_FILE_DB_SYNC=/run/secrets/postgres_password \
+  POSTGRES_PORT_DB_SYNC=5432 \
+  POSTGRES_USER_FILE_DB_SYNC=/run/secrets/postgres_user \
+  POSTGRES_DB_FILE_STAKE_POOL=/run/secrets/postgres_db_stake_pool \
+  POSTGRES_HOST_STAKE_POOL=postgres \
+  POSTGRES_PASSWORD_FILE_STAKE_POOL=/run/secrets/postgres_password \
+  POSTGRES_PORT_STAKE_POOL=5432 \
+  POSTGRES_USER_FILE_STAKE_POOL=/run/secrets/postgres_user
 WORKDIR /app/packages/cardano-services
 CMD ["node", "dist/cjs/cli.js", "start-pg-boss-worker"]
 
@@ -109,11 +114,11 @@ FROM cardano-services as projector
 RUN apt-get update && apt-get install -y --no-install-recommends jq postgresql-client
 ENV \
   API_URL="http://0.0.0.0:3002" \
-  POSTGRES_DB_FILE=/run/secrets/postgres_db_projection \
-  POSTGRES_HOST=postgres \
-  POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password \
-  POSTGRES_PORT=5432 \
-  POSTGRES_USER_FILE=/run/secrets/postgres_user
+  POSTGRES_DB_FILE_STAKE_POOL=/run/secrets/postgres_db_stake_pool \
+  POSTGRES_HOST_STAKE_POOL=postgres \
+  POSTGRES_PASSWORD_FILE_STAKE_POOL=/run/secrets/postgres_password \
+  POSTGRES_PORT_STAKE_POOL=5432 \
+  POSTGRES_USER_FILE_STAKE_POOL=/run/secrets/postgres_user
 WORKDIR /
 COPY compose/projector/init.* ./
 RUN chmod 755 init.sh

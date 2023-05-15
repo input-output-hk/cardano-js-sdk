@@ -41,7 +41,7 @@ services:
     restart: on-failure
     secrets:
       - blockfrost_key
-      - postgres_db
+      - postgres_db_db_sync
       - postgres_password
       - postgres_user
 

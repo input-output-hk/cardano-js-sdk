@@ -151,7 +151,7 @@ describe('interactions with ogmios server', () => {
       dbCacheTtl: DB_CACHE_TTL_DEFAULT,
       epochPollInterval: util.EPOCH_POLL_INTERVAL_DEFAULT,
       ogmiosSrvServiceName: 'localhost',
-      postgresConnectionString: env.DB_SYNC_CONNECTION_STRING,
+      postgresConnectionStringDbSync: env.DB_SYNC_CONNECTION_STRING,
       serviceNames: [ServiceNames.NetworkInfo]
     } as ProviderServerArgs;
 

@@ -41,12 +41,12 @@ describe('NetworkInfoHttpService', () => {
   const cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
   const dbPools: DbPools = {
     healthCheck: new Pool({
-      connectionString: process.env.POSTGRES_CONNECTION_STRING,
+      connectionString: process.env.POSTGRES_CONNECTION_STRING_DB_SYNC,
       max: 1,
       min: 1
     }),
     main: new Pool({
-      connectionString: process.env.POSTGRES_CONNECTION_STRING,
+      connectionString: process.env.POSTGRES_CONNECTION_STRING_DB_SYNC,
       max: 1,
       min: 1
     })

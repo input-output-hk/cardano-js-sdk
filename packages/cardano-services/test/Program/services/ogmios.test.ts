@@ -31,7 +31,7 @@ import http from 'http';
 jest.mock('dns', () => ({
   promises: {
     resolveSrv: async (serviceName: string): Promise<SrvRecord[]> => {
-      if (serviceName === process.env.POSTGRES_SRV_SERVICE_NAME)
+      if (serviceName === process.env.POSTGRES_SRV_SERVICE_NAME_DB_SYNC)
         return [{ name: 'localhost', port: 5433, priority: 6, weight: 5 }];
       if (serviceName === process.env.OGMIOS_SRV_SERVICE_NAME)
         return [{ name: 'localhost', port: 1337, priority: 6, weight: 5 }];
@@ -53,16 +53,16 @@ describe('Service dependency abstractions', () => {
   beforeAll(async () => {
     dbPools = {
       healthCheck: (await getPool(dnsResolver, logger, {
-        postgresDb: process.env.POSTGRES_DB!,
-        postgresPassword: process.env.POSTGRES_PASSWORD!,
-        postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,
-        postgresUser: process.env.POSTGRES_USER!
+        postgresDbDbSync: process.env.POSTGRES_DB_DB_SYNC!,
+        postgresPasswordDbSync: process.env.POSTGRES_PASSWORD_DB_SYNC!,
+        postgresSrvServiceNameDbSync: process.env.POSTGRES_SRV_SERVICE_NAME_DB_SYNC!,
+        postgresUserDbSync: process.env.POSTGRES_USER_DB_SYNC!
       })) as Pool,
       main: (await getPool(dnsResolver, logger, {
-        postgresDb: process.env.POSTGRES_DB!,
-        postgresPassword: process.env.POSTGRES_PASSWORD!,
-        postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,
-        postgresUser: process.env.POSTGRES_USER!
+        postgresDbDbSync: process.env.POSTGRES_DB_DB_SYNC!,
+        postgresPasswordDbSync: process.env.POSTGRES_PASSWORD_DB_SYNC!,
+        postgresSrvServiceNameDbSync: process.env.POSTGRES_SRV_SERVICE_NAME_DB_SYNC!,
+        postgresUserDbSync: process.env.POSTGRES_USER_DB_SYNC!
       })) as Pool
     };
 

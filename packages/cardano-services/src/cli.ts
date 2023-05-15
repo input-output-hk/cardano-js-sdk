@@ -113,12 +113,11 @@ withCommonOptions(
           '[projectionNames...]',
           `List of projections to start: ${Object.values(ProjectionName).toString()}`,
           projectionNameParser
-        )
+        ),
+      'StakePool'
     )
   ),
-  {
-    apiUrl: PROJECTOR_API_URL_DEFAULT
-  }
+  { apiUrl: PROJECTOR_API_URL_DEFAULT }
 )
   .addOption(
     new Option('--drop-schema <true/false>', ProjectorOptionDescriptions.DropSchema)
@@ -146,7 +145,7 @@ withCommonOptions(
     runServer('projector', () =>
       loadProjector({
         ...args,
-        postgresConnectionString: connectionStringFromArgs(args),
+        postgresConnectionStringStakePool: connectionStringFromArgs(args, 'StakePool'),
         // Setting the projection names via env variable takes preference over command line argument
         projectionNames: args.projectionNames ? args.projectionNames : projectionNames
       })
@@ -161,12 +160,11 @@ withCommonOptions(
           .command('start-provider-server')
           .description('Start the Provider Server')
           .argument('[serviceNames...]', `List of services to attach: ${Object.values(ServiceNames).toString()}`)
-      )
+      ),
+      'DbSync'
     )
   ),
-  {
-    apiUrl: PROVIDER_SERVER_API_URL_DEFAULT
-  }
+  { apiUrl: PROVIDER_SERVER_API_URL_DEFAULT }
 )
   .addOption(
     new Option(
@@ -279,7 +277,7 @@ withCommonOptions(
     runServer('Provider server', () =>
       loadProviderServer({
         ...args,
-        postgresConnectionString: connectionStringFromArgs(args),
+        postgresConnectionStringDbSync: connectionStringFromArgs(args, 'DbSync'),
         // Setting the service names via env variable takes preference over command line argument
         serviceNames: args.serviceNames ? args.serviceNames : serviceNames
       })
@@ -288,9 +286,7 @@ withCommonOptions(
 
 withCommonOptions(
   withOgmiosOptions(withRabbitMqOptions(program.command('start-worker').description('Start RabbitMQ worker'))),
-  {
-    apiUrl: TX_WORKER_API_URL_DEFAULT
-  }
+  { apiUrl: TX_WORKER_API_URL_DEFAULT }
 )
   .addOption(
     new Option('--parallel <true/false>', TxWorkerOptionDescriptions.Parallel)
@@ -323,10 +319,8 @@ withCommonOptions(
   });
 
 withCommonOptions(
-  withPostgresOptions(program.command('start-blockfrost-worker').description('Start the Blockfrost worker')),
-  {
-    apiUrl: BLOCKFROST_WORKER_API_URL_DEFAULT
-  }
+  withPostgresOptions(program.command('start-blockfrost-worker').description('Start the Blockfrost worker'), 'DbSync'),
+  { apiUrl: BLOCKFROST_WORKER_API_URL_DEFAULT }
 )
   .addOption(
     new Option('--blockfrost-api-file <blockfrostApiFile>', BlockfrostWorkerOptionDescriptions.BlockfrostApiFile)
@@ -385,12 +379,15 @@ withCommonOptions(
   )
   .action(async (args: BlockfrostWorkerArgs) =>
     runServer('Blockfrost worker', () =>
-      loadBlockfrostWorker({ ...args, postgresConnectionString: connectionStringFromArgs(args) })
+      loadBlockfrostWorker({ ...args, postgresConnectionStringDbSync: connectionStringFromArgs(args, 'DbSync') })
     )
   );
 
 withCommonOptions(
-  withPostgresOptions(program.command('start-pg-boss-worker').description('Start the pg-boss worker')),
+  withPostgresOptions(
+    withPostgresOptions(program.command('start-pg-boss-worker').description('Start the pg-boss worker'), 'StakePool'),
+    'DbSync'
+  ),
   { apiUrl: PG_BOSS_WORKER_API_URL_DEFAULT }
 )
   .addOption(
@@ -413,7 +410,11 @@ withCommonOptions(
   )
   .action(async (args: PgBossWorkerArgs) =>
     runServer('pg-boss worker', () =>
-      loadPgBossWorker({ ...args, postgresConnectionString: connectionStringFromArgs(args) })
+      loadPgBossWorker({
+        ...args,
+        postgresConnectionStringDbSync: connectionStringFromArgs(args, 'DbSync'),
+        postgresConnectionStringStakePool: connectionStringFromArgs(args, 'StakePool')
+      })
     )
   );
 

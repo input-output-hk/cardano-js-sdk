@@ -20,8 +20,8 @@ const ogmiosConnectionConfig = ((): ConnectionConfig => {
 })();
 
 const pgConnectionConfig = ((): Postgres.PgConnectionConfig => {
-  const { PROJECTION_TEST_PG_CONNECTION_STRING } = getEnv(['PROJECTION_TEST_PG_CONNECTION_STRING']);
-  const withoutProtocol = PROJECTION_TEST_PG_CONNECTION_STRING.split('://')[1];
+  const { STAKE_POOL_TEST_CONNECTION_STRING } = getEnv(['STAKE_POOL_TEST_CONNECTION_STRING']);
+  const withoutProtocol = STAKE_POOL_TEST_CONNECTION_STRING.split('://')[1];
   const [credentials, hostPortDb] = withoutProtocol.split('@');
   const [username, password] = credentials.split(':');
   const [hostPort, database] = hostPortDb.split('/');

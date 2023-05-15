@@ -71,7 +71,7 @@ describe('StakePoolCompare', () => {
     'true',
     '--cardano-node-config-path',
     path.join('..', 'cardano-services', 'config', 'network', env.NETWORK, 'cardano-node', 'config.json'),
-    '--postgres-connection-string',
+    '--postgres-connection-string-db-sync',
     env.DB_SYNC_CONNECTION_STRING,
     '--api-url'
   ];

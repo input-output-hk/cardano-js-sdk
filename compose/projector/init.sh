@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DB=`cat /run/secrets/postgres_db_projection`
+DB=`cat /run/secrets/postgres_db_stake_pool`
 PASSWORD=`cat /run/secrets/postgres_password`
 USER=`cat /run/secrets/postgres_user`
 
@@ -16,8 +16,8 @@ USER=`cat /run/secrets/postgres_user`
 # The custom approach adopted doesn't requires any actions by the user and allows
 # changes between versions of the SDK.
 
-psql "postgresql://${USER}:${PASSWORD}@postgres/" -c "CREATE DATABASE projection"
-psql "postgresql://${USER}:${PASSWORD}@postgres/" -c "CREATE DATABASE projection_test"
+psql "postgresql://${USER}:${PASSWORD}@postgres/" -c "CREATE DATABASE ${DB}"
+psql "postgresql://${USER}:${PASSWORD}@postgres/" -c "CREATE DATABASE ${DB}_test"
 
 _term() {
   kill $CHILD

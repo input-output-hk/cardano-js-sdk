@@ -90,12 +90,12 @@ describe('StakePoolHttpService', () => {
   const cache = { db: new InMemoryCache(UNLIMITED_CACHE_TTL), healthCheck: new InMemoryCache(UNLIMITED_CACHE_TTL) };
   const dbPools: DbPools = {
     healthCheck: new Pool({
-      connectionString: process.env.POSTGRES_CONNECTION_STRING,
+      connectionString: process.env.POSTGRES_CONNECTION_STRING_DB_SYNC,
       max: 1,
       min: 1
     }),
     main: new Pool({
-      connectionString: process.env.POSTGRES_CONNECTION_STRING,
+      connectionString: process.env.POSTGRES_CONNECTION_STRING_DB_SYNC,
       max: 1,
       min: 1
     })

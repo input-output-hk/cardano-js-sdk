@@ -1,11 +1,12 @@
-import { CommonProgramOptions, PosgresProgramOptions } from '../options';
+import { CommonProgramOptions, PosgresProgramOptions, PostgresOptionDescriptions } from '../options';
 import { HttpServer } from '../../Http/HttpServer';
 import { Logger } from 'ts-log';
+import { MissingProgramOption } from '../errors';
 import { PgBossHttpService, PgBossServiceConfig, PgBossServiceDependencies } from '../services/pgboss';
 import { SrvRecord } from 'dns';
 import { createDnsResolver } from '../utils';
 import { createLogger } from 'bunyan';
-import { getConnectionConfig } from '../services/postgres';
+import { getConnectionConfig, getPool } from '../services/postgres';
 import { getListen } from '../../Http/util';
 
 export const PARALLEL_JOBS_DEFAULT = 10;
@@ -16,7 +17,10 @@ export enum PgBossWorkerOptionDescriptions {
   Queues = 'Comma separated queue names'
 }
 
-export type PgBossWorkerArgs = CommonProgramOptions & PosgresProgramOptions & PgBossServiceConfig;
+export type PgBossWorkerArgs = CommonProgramOptions &
+  PosgresProgramOptions<'DbSync'> &
+  PosgresProgramOptions<'StakePool'> &
+  PgBossServiceConfig;
 
 export interface LoadPgBossWorkerDependencies {
   dnsResolver?: (serviceName: string) => Promise<SrvRecord>;
@@ -50,7 +54,10 @@ export const loadPgBossWorker = async (args: PgBossWorkerArgs, deps: LoadPgBossW
       { factor: args.serviceDiscoveryBackoffFactor, maxRetryTime: args.serviceDiscoveryTimeout },
       logger
     );
-  const connectionConfig$ = getConnectionConfig(dnsResolver, args);
+  const connectionConfig$ = getConnectionConfig(dnsResolver, pgBossWorker, args);
+  const db = await getPool(dnsResolver, logger, args);
 
-  return new PgBossWorkerHttpServer(args, { connectionConfig$, logger });
+  if (!db) throw new MissingProgramOption(pgBossWorker, PostgresOptionDescriptions.ConnectionString);
+
+  return new PgBossWorkerHttpServer(args, { connectionConfig$, db, logger });
 };

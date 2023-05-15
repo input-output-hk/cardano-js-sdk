@@ -11,7 +11,7 @@ describe('NetworkInfoBuilder', () => {
 
   beforeAll(async () => {
     dbConnection = new Pool({
-      connectionString: process.env.POSTGRES_CONNECTION_STRING
+      connectionString: process.env.POSTGRES_CONNECTION_STRING_DB_SYNC
     });
     builder = new NetworkInfoBuilder(dbConnection, logger);
     fixtureBuilder = new NetworkInfoFixtureBuilder(dbConnection, logger);

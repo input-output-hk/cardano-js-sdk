@@ -15,7 +15,7 @@ yarn --cwd "$PACKAGES_DIR"/e2e test:local-network register-pool.test.ts
 echo 'Stop writing data'
 docker compose -p local-network-e2e stop cardano-db-sync
 echo 'Creating snapshot...'
-docker compose -p local-network-e2e exec -it postgres /bin/bash -c "pg_dump --username $(cat "$SECRETS_DIR"/postgres_user) $(cat "$SECRETS_DIR"/postgres_db)" > "$SCRIPT_DIR"/localnetwork.bak
+docker compose -p local-network-e2e exec -it postgres /bin/bash -c "pg_dump --username $(cat "$SECRETS_DIR"/postgres_user) $(cat "$SECRETS_DIR"/postgres_db_db_sync)" > "$SCRIPT_DIR"/localnetwork.bak
 cd "$SCRIPT_DIR" && tar -cvf localnetwork-db-snapshot.tar localnetwork.bak
 rm localnetwork.bak
 echo 'Snapshot created.'
