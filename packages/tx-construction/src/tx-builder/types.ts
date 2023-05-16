@@ -1,4 +1,4 @@
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, Handle } from '@cardano-sdk/core';
 import { CustomError } from 'ts-custom-error';
 
 import { InputSelectionError, SelectionSkeleton } from '@cardano-sdk/input-selection';
@@ -8,7 +8,10 @@ import { OutputValidation } from '../output-validation';
 import { SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
 
 export type PartialTxOut = Partial<
-  Pick<Cardano.TxOut, 'address' | 'datumHash' | 'datum' | 'scriptReference'> & { value: Partial<Cardano.Value> }
+  Pick<Cardano.TxOut, 'address' | 'datumHash' | 'datum' | 'scriptReference'> & {
+    value: Partial<Cardano.Value>;
+    handle: Handle;
+  }
 >;
 
 export enum TxOutputFailure {
@@ -79,6 +82,7 @@ export interface OutputBuilder {
    * @throws {TxOutValidationError} TxOutValidationError
    */
   build(): Promise<Cardano.TxOut>;
+  handle(output: string): OutputBuilder;
 }
 
 export type SignedTx = Cardano.Tx;

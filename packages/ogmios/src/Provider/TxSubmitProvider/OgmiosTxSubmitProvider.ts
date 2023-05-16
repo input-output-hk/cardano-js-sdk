@@ -63,11 +63,12 @@ export class OgmiosTxSubmitProvider extends RunnableModule implements TxSubmitPr
     }
   }
 
-  async submitTx({ signedTransaction }: SubmitTxArgs): Promise<void> {
+  async submitTx({ signedTransaction, validateHandles }: SubmitTxArgs): Promise<void> {
     if (this.state !== 'running') {
       throw new CardanoNodeErrors.NotInitializedError('submitTx', this.name);
     }
     try {
+      // Do we call validateHandles here before submitting the Tx?
       const id = await this.#txSubmissionClient.submitTx(signedTransaction);
       this.#logger.info(`Submitted ${id}`);
     } catch (error) {
