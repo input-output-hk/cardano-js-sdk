@@ -1,6 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
 import {
+  AddressDiscovery,
+  DEFAULT_POLLING_CONFIG,
+  HDSequentialDiscovery,
+  Milliseconds,
+  ObservableWallet,
+  PollingConfig,
+  SingleAddressDiscovery,
+  SingleAddressWallet,
+  setupWallet,
+  storage
+} from '@cardano-sdk/wallet';
+import {
   AssetProvider,
   CML,
   Cardano,
@@ -21,15 +33,6 @@ import {
   util
 } from '@cardano-sdk/key-management';
 import { CardanoWalletFaucetProvider, FaucetProvider } from './FaucetProvider';
-import {
-  DEFAULT_POLLING_CONFIG,
-  Milliseconds,
-  ObservableWallet,
-  PollingConfig,
-  SingleAddressWallet,
-  setupWallet,
-  storage
-} from '@cardano-sdk/wallet';
 import { LedgerKeyAgent } from '@cardano-sdk/hardware-ledger';
 import { Logger } from 'ts-log';
 import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
@@ -69,6 +72,15 @@ export const txSubmitProviderFactory = new ProviderFactory<TxSubmitProvider>();
 export const utxoProviderFactory = new ProviderFactory<UtxoProvider>();
 export const stakePoolProviderFactory = new ProviderFactory<StakePoolProvider>();
 export const bip32Ed25519Factory = new ProviderFactory<Crypto.Bip32Ed25519>();
+export const addressDiscoveryFactory = new ProviderFactory<AddressDiscovery>();
+
+// Address Discovery strategies
+
+addressDiscoveryFactory.register('SingleAddressDiscovery', async () => new SingleAddressDiscovery());
+addressDiscoveryFactory.register(
+  'HDSequentialDiscovery',
+  async ({ chainHistoryProvider }) => new HDSequentialDiscovery(chainHistoryProvider, 20, 5)
+);
 
 // bip32Ed25519
 
@@ -286,6 +298,17 @@ const patchInitializeTxToRespectEpochBoundary = <T extends ObservableWallet>(
 export const getWallet = async (props: GetWalletProps) => {
   const { env, idx, logger, name, polling, stores, customKeyParams, keyAgent } = props;
   const providers = {
+    addressDiscovery: await addressDiscoveryFactory.create(
+      env.ADDRESS_DISCOVERY,
+      {
+        chainHistoryProvider: await chainHistoryProviderFactory.create(
+          env.CHAIN_HISTORY_PROVIDER,
+          env.CHAIN_HISTORY_PROVIDER_PARAMS,
+          logger
+        )
+      },
+      logger
+    ),
     assetProvider: await assetProviderFactory.create(env.ASSET_PROVIDER, env.ASSET_PROVIDER_PARAMS, logger),
     chainHistoryProvider: await chainHistoryProviderFactory.create(
       env.CHAIN_HISTORY_PROVIDER,

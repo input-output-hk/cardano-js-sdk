@@ -1,34 +1,12 @@
 /* eslint-disable unicorn/no-nested-ternary */
-import { AddressType, AsyncKeyAgent, GroupedAddress, cip8 } from '@cardano-sdk/key-management';
 import {
-  AssetProvider,
-  Cardano,
-  CardanoNodeErrors,
-  ChainHistoryProvider,
-  EpochInfo,
-  EraSummary,
-  ProviderError,
-  RewardsProvider,
-  StakePoolProvider,
-  TxBodyCBOR,
-  TxCBOR,
-  TxSubmitProvider,
-  UtxoProvider
-} from '@cardano-sdk/core';
-import {
-  Assets,
-  FinalizeTxProps,
-  ObservableWallet,
-  SignDataProps,
-  SyncStatus,
-  WalletNetworkInfoProvider
-} from '../types';
-import {
+  AddressDiscovery,
   BalanceTracker,
   ConnectionStatus,
   ConnectionStatusTracker,
   DelegationTracker,
   FailedTx,
+  HDSequentialDiscovery,
   OutgoingTx,
   PersistentDocumentTrackerSubject,
   PollingConfig,
@@ -58,6 +36,30 @@ import {
   distinctEraSummaries,
   groupedAddressesEquals
 } from '../services';
+import {
+  AssetProvider,
+  Cardano,
+  CardanoNodeErrors,
+  ChainHistoryProvider,
+  EpochInfo,
+  EraSummary,
+  ProviderError,
+  RewardsProvider,
+  StakePoolProvider,
+  TxBodyCBOR,
+  TxCBOR,
+  TxSubmitProvider,
+  UtxoProvider
+} from '@cardano-sdk/core';
+import {
+  Assets,
+  FinalizeTxProps,
+  ObservableWallet,
+  SignDataProps,
+  SyncStatus,
+  WalletNetworkInfoProvider
+} from '../types';
+import { AsyncKeyAgent, GroupedAddress, cip8 } from '@cardano-sdk/key-management';
 import { BehaviorObservable, TrackerSubject } from '@cardano-sdk/util-rxjs';
 import {
   BehaviorSubject,
@@ -113,6 +115,7 @@ export interface SingleAddressWalletDependencies {
   readonly stores?: WalletStores;
   readonly logger: Logger;
   readonly connectionStatusTracker$?: ConnectionStatusTracker;
+  readonly addressDiscovery?: AddressDiscovery;
 }
 
 export interface SubmitTxOptions {
@@ -124,6 +127,8 @@ export const DEFAULT_POLLING_CONFIG = {
   maxIntervalMultiplier: 20,
   pollInterval: 5000
 };
+
+export const DEFAULT_LOOK_AHEAD_SEARCH = 20;
 
 // Adjust the number of slots to wait until a transaction is considered lost (send but not found on chain)
 // Configured to 2.5 because on preprod/mainnet, blocks produced at more than 250 slots apart are very rare (1 per epoch or less).
@@ -166,6 +171,7 @@ export class SingleAddressWallet implements ObservableWallet {
   #reemitSubscriptions: Subscription;
   #failedFromReemitter$: Subject<FailedTx>;
   #trackedTxSubmitProvider: TrackedTxSubmitProvider;
+  #addressDiscovery: AddressDiscovery;
 
   readonly keyAgent: AsyncKeyAgent;
   readonly currentEpoch$: TrackerSubject<EpochInfo>;
@@ -217,11 +223,13 @@ export class SingleAddressWallet implements ObservableWallet {
       logger,
       inputSelector = roundRobinRandomImprove(),
       stores = createInMemoryWalletStores(),
-      connectionStatusTracker$ = createSimpleConnectionStatusTracker()
+      connectionStatusTracker$ = createSimpleConnectionStatusTracker(),
+      addressDiscovery = new HDSequentialDiscovery(chainHistoryProvider, DEFAULT_LOOK_AHEAD_SEARCH)
     }: SingleAddressWalletDependencies
   ) {
     this.#logger = contextLogger(logger, name);
 
+    this.#addressDiscovery = addressDiscovery;
     this.#inputSelector = inputSelector;
     this.#trackedTxSubmitProvider = new TrackedTxSubmitProvider(txSubmitProvider);
 
@@ -246,27 +254,6 @@ export class SingleAddressWallet implements ObservableWallet {
     );
 
     this.keyAgent = keyAgent;
-    this.addresses$ = new TrackerSubject<GroupedAddress[]>(
-      concat(
-        stores.addresses.get(),
-        keyAgent.knownAddresses$.pipe(
-          distinctUntilChanged(groupedAddressesEquals),
-          tap(
-            // derive an address if none available
-            (addresses) => {
-              if (addresses.length === 0) {
-                this.#logger.debug('No addresses available; deriving one');
-                void keyAgent
-                  .deriveAddress({ index: 0, type: AddressType.External }, 0)
-                  .catch(() => this.#logger.error('Failed to derive address'));
-              }
-            }
-          ),
-          filter((addresses) => addresses.length > 0),
-          tap(stores.addresses.set.bind(stores.addresses))
-        )
-      )
-    );
 
     this.fatalError$ = new Subject();
 
@@ -277,6 +264,35 @@ export class SingleAddressWallet implements ObservableWallet {
       tap((status) => (status === ConnectionStatus.up ? 'Connection UP' : 'Connection DOWN')),
       filter((status) => status === ConnectionStatus.down)
     );
+
+    this.addresses$ = new TrackerSubject<GroupedAddress[]>(
+      concat(
+        stores.addresses.get(),
+        keyAgent.knownAddresses$.pipe(
+          distinctUntilChanged(groupedAddressesEquals),
+          tap(
+            // derive addresses if none available
+            (addresses) => {
+              if (addresses.length === 0) {
+                this.#logger.debug('No addresses available; initiating address discovery process');
+
+                firstValueFrom(
+                  coldObservableProvider({
+                    cancel$,
+                    onFatalError,
+                    provider: () => this.#addressDiscovery.discover(keyAgent),
+                    retryBackoffConfig
+                  })
+                ).catch(() => this.#logger.error('Failed to complete the address discovery process'));
+              }
+            }
+          ),
+          filter((addresses) => addresses.length > 0),
+          tap(stores.addresses.set.bind(stores.addresses))
+        )
+      )
+    );
+
     this.#tip$ = this.tip$ = new TipTracker({
       connectionStatus$: connectionStatusTracker$,
       logger: contextLogger(this.#logger, 'tip$'),

@@ -1,7 +1,8 @@
 import { Cardano } from '@cardano-sdk/core';
+import { firstValueFrom, of } from 'rxjs';
+
 import { SingleAddressWallet, TransactionFailure } from '../../src';
 import { createWallet } from './util';
-import { firstValueFrom, of } from 'rxjs';
 import { mockProviders as mocks } from '@cardano-sdk/util-dev';
 
 describe('integration/withdrawal', () => {
@@ -77,12 +78,12 @@ describe('integration/withdrawal', () => {
 
   it('can submit transaction', async () => {
     const availableRewards = await firstValueFrom(wallet.balance.rewardAccounts.rewards$);
-    const rewardAccount = (await firstValueFrom(wallet.addresses$))[0].rewardAccount;
+    const accounts = (await firstValueFrom(wallet.addresses$)).map((address) => address.rewardAccount);
     const txInternals = await wallet.initializeTx({
       certificates: [
         {
           __typename: Cardano.CertificateType.StakeKeyDeregistration,
-          stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+          stakeKeyHash: Cardano.RewardAccount.toHash(accounts[0])
         }
       ],
       outputs: new Set() // In a real transaction you would probably want to have some outputs
@@ -90,7 +91,12 @@ describe('integration/withdrawal', () => {
     expect(typeof txInternals.body.fee).toBe('bigint');
     const tx = await wallet.finalizeTx({ tx: txInternals });
 
-    expect(tx.body.withdrawals).toEqual([{ quantity: availableRewards, stakeAddress: rewardAccount }]);
+    const expectedRewards = accounts.map((rewardAccount) => ({
+      quantity: availableRewards / BigInt(accounts.length),
+      stakeAddress: rewardAccount
+    }));
+
+    expect(tx.body.withdrawals).toEqual(expectedRewards);
 
     const onChainSubscription = wallet.transactions.outgoing.onChain$.subscribe(({ id }) => {
       if (id === tx.id) {

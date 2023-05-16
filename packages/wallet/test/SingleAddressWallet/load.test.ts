@@ -2,7 +2,16 @@
 /* eslint-disable max-statements */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
+import {
+  AddressDiscovery,
+  ConnectionStatus,
+  ConnectionStatusTracker,
+  ObservableWallet,
+  PollingConfig,
+  SingleAddressWallet,
+  setupWallet
+} from '../../src';
+import { AddressType, AsyncKeyAgent, GroupedAddress } from '@cardano-sdk/key-management';
 import {
   AssetId,
   createStubStakePoolProvider,
@@ -20,18 +29,11 @@ import {
   UtxoProvider,
   coalesceValueQuantities
 } from '@cardano-sdk/core';
-import {
-  ConnectionStatus,
-  ConnectionStatusTracker,
-  ObservableWallet,
-  PollingConfig,
-  SingleAddressWallet,
-  setupWallet
-} from '../../src';
 import { InvalidStringError } from '@cardano-sdk/util';
 import { ReplaySubject, firstValueFrom } from 'rxjs';
 import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
 import { dummyLogger as logger } from 'ts-log';
+import { prepareMockKeyAgentWithData } from '../services/addressDiscovery/mockData';
 import { stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { waitForWalletStateSettle } from '../util';
 import delay from 'delay';
@@ -51,7 +53,36 @@ interface Providers {
   connectionStatusTracker$?: ConnectionStatusTracker;
 }
 
-const createWallet = async (stores: WalletStores, providers: Providers, pollingConfig?: PollingConfig) => {
+export class MockAddressDiscovery implements AddressDiscovery {
+  readonly #addresses: Array<GroupedAddress>;
+  readonly #resolveAfterAttempts: number;
+  #currentAttempt = 0;
+
+  constructor(addresses: Array<GroupedAddress>, resolveAfterAttempts: number) {
+    this.#addresses = addresses;
+    this.#resolveAfterAttempts = resolveAfterAttempts;
+  }
+
+  public async discover(keyAgent: AsyncKeyAgent): Promise<GroupedAddress[]> {
+    if (this.#currentAttempt <= this.#resolveAfterAttempts) {
+      ++this.#currentAttempt;
+      throw new Error('An error occurred during the discovery process.');
+    }
+
+    await keyAgent.setKnownAddresses(this.#addresses);
+    return this.#addresses;
+  }
+}
+
+type CreateWalletProps = {
+  stores: WalletStores;
+  providers: Providers;
+  addressDiscovery?: AddressDiscovery;
+  asyncKeyAgent?: AsyncKeyAgent;
+  pollingConfig?: PollingConfig;
+};
+
+const createWallet = async (props: CreateWalletProps) => {
   const { wallet } = await setupWallet({
     bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
     createKeyAgent: async (dependencies) => {
@@ -64,20 +95,24 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
         stakeKeyDerivationPath,
         type: AddressType.External
       };
+
+      if (props.asyncKeyAgent) return props.asyncKeyAgent;
+
       const asyncKeyAgent = await testAsyncKeyAgent([groupedAddress], dependencies);
       asyncKeyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
       return asyncKeyAgent;
     },
     createWallet: async (keyAgent) => {
       const { rewardsProvider, utxoProvider, chainHistoryProvider, networkInfoProvider, connectionStatusTracker$ } =
-        providers;
+        props.providers;
       const txSubmitProvider = mocks.mockTxSubmitProvider();
       const assetProvider = mocks.mockAssetProvider();
       const stakePoolProvider = createStubStakePoolProvider();
 
       return new SingleAddressWallet(
-        { name, polling: pollingConfig },
+        { name, polling: props.pollingConfig },
         {
+          addressDiscovery: props?.addressDiscovery,
           assetProvider,
           chainHistoryProvider,
           connectionStatusTracker$,
@@ -86,7 +121,7 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
           networkInfoProvider,
           rewardsProvider,
           stakePoolProvider,
-          stores,
+          stores: props.stores,
           txSubmitProvider,
           utxoProvider
         }
@@ -237,19 +272,25 @@ const getAssetsFromUtxos = (utxos: Cardano.Utxo[]) => {
 describe('SingleAddressWallet load', () => {
   it('loads all properties from provider, stores them and restores on subsequent load, fetches new data', async () => {
     const stores = createInMemoryWalletStores();
-    const wallet1 = await createWallet(stores, {
-      chainHistoryProvider: mocks.mockChainHistoryProvider(),
-      networkInfoProvider: mocks.mockNetworkInfoProvider(),
-      rewardsProvider: mocks.mockRewardsProvider(),
-      utxoProvider: mocks.mockUtxoProvider()
+    const wallet1 = await createWallet({
+      providers: {
+        chainHistoryProvider: mocks.mockChainHistoryProvider(),
+        networkInfoProvider: mocks.mockNetworkInfoProvider(),
+        rewardsProvider: mocks.mockRewardsProvider(),
+        utxoProvider: mocks.mockUtxoProvider()
+      },
+      stores
     });
     await assertWalletProperties(wallet1, somePartialStakePools[0].id);
     wallet1.shutdown();
-    const wallet2 = await createWallet(stores, {
-      chainHistoryProvider: mocks.mockChainHistoryProvider2(100),
-      networkInfoProvider: mocks.mockNetworkInfoProvider2(100),
-      rewardsProvider: mocks.mockRewardsProvider2(100),
-      utxoProvider: mocks.mockUtxoProvider2(100)
+    const wallet2 = await createWallet({
+      providers: {
+        chainHistoryProvider: mocks.mockChainHistoryProvider2(100),
+        networkInfoProvider: mocks.mockNetworkInfoProvider2(100),
+        rewardsProvider: mocks.mockRewardsProvider2(100),
+        utxoProvider: mocks.mockUtxoProvider2(100)
+      },
+      stores
     });
     await assertWalletProperties(wallet2, somePartialStakePools[0].id);
     await waitForWalletStateSettle(wallet2);
@@ -268,11 +309,14 @@ describe('SingleAddressWallet load', () => {
       pageResults: txsWithNoCertificates,
       totalResultCount: 1
     });
-    const wallet = await createWallet(stores, {
-      chainHistoryProvider,
-      networkInfoProvider,
-      rewardsProvider,
-      utxoProvider
+    const wallet = await createWallet({
+      providers: {
+        chainHistoryProvider,
+        networkInfoProvider,
+        rewardsProvider,
+        utxoProvider
+      },
+      stores
     });
     // eslint-disable-next-line unicorn/no-useless-undefined
     await assertWalletProperties(wallet, undefined, []);
@@ -315,17 +359,17 @@ describe('SingleAddressWallet load', () => {
           })
       );
     const connectionStatusTracker$ = new ReplaySubject<ConnectionStatus>(1);
-    const wallet = await createWallet(
-      stores,
-      {
+    const wallet = await createWallet({
+      pollingConfig: { interval: ONCE_SETTLED_FETCH_AFTER, maxInterval: AUTO_TRIGGER_AFTER },
+      providers: {
         chainHistoryProvider,
         connectionStatusTracker$,
         networkInfoProvider,
         rewardsProvider,
         utxoProvider
       },
-      { interval: ONCE_SETTLED_FETCH_AFTER, maxInterval: AUTO_TRIGGER_AFTER }
-    );
+      stores
+    });
 
     // Initial fetch when wallet is instantiated
     expect(networkInfoProvider.ledgerTip).toHaveBeenCalledTimes(0);
@@ -364,11 +408,14 @@ describe('SingleAddressWallet creates big UTXO', () => {
     const utxoSet = generateUtxos(30, 10);
     const totalAssets = getAssetsFromUtxos(utxoSet);
 
-    const wallet = await createWallet(stores, {
-      chainHistoryProvider: mocks.mockChainHistoryProvider(),
-      networkInfoProvider: mocks.mockNetworkInfoProvider(),
-      rewardsProvider: mocks.mockRewardsProvider(),
-      utxoProvider: mocks.mockUtxoProvider({ utxoSet })
+    const wallet = await createWallet({
+      providers: {
+        chainHistoryProvider: mocks.mockChainHistoryProvider(),
+        networkInfoProvider: mocks.mockNetworkInfoProvider(),
+        rewardsProvider: mocks.mockRewardsProvider(),
+        utxoProvider: mocks.mockUtxoProvider({ utxoSet })
+      },
+      stores
     });
 
     const txProps = {
@@ -398,20 +445,56 @@ describe('SingleAddressWallet creates big UTXO', () => {
   });
 });
 
+describe('SingleAddressWallet.AddressDiscovery', () => {
+  it('SingleAddressWallet address discovery recovers from errors', async () => {
+    const stores = createInMemoryWalletStores();
+    const testValue = {
+      accountIndex: 0,
+      address,
+      index: 0,
+      networkId: Cardano.NetworkId.Testnet,
+      rewardAccount,
+      stakeKeyDerivationPath,
+      type: AddressType.External
+    };
+
+    const utxoSet = generateUtxos(30, 10);
+
+    const wallet = await createWallet({
+      addressDiscovery: new MockAddressDiscovery([testValue], 2),
+      asyncKeyAgent: prepareMockKeyAgentWithData(),
+      providers: {
+        chainHistoryProvider: mocks.mockChainHistoryProvider(),
+        networkInfoProvider: mocks.mockNetworkInfoProvider(),
+        rewardsProvider: mocks.mockRewardsProvider(),
+        utxoProvider: mocks.mockUtxoProvider({ utxoSet })
+      },
+      stores
+    });
+
+    await expect(firstValueFrom(wallet.addresses$)).resolves.toEqual([testValue]);
+
+    wallet.shutdown();
+  });
+});
+
 describe('SingleAddressWallet.fatalError$', () => {
   it('emits non retryable errors', async () => {
     const stores = createInMemoryWalletStores();
     const tipHandler = jest.fn();
     const utxoSet = generateUtxos(30, 10);
 
-    const wallet = await createWallet(stores, {
-      chainHistoryProvider: mocks.mockChainHistoryProvider(),
-      networkInfoProvider: {
-        ...mocks.mockNetworkInfoProvider(),
-        ledgerTip: jest.fn().mockRejectedValue(new InvalidStringError('Test invalid string error'))
+    const wallet = await createWallet({
+      providers: {
+        chainHistoryProvider: mocks.mockChainHistoryProvider(),
+        networkInfoProvider: {
+          ...mocks.mockNetworkInfoProvider(),
+          ledgerTip: jest.fn().mockRejectedValue(new InvalidStringError('Test invalid string error'))
+        },
+        rewardsProvider: mocks.mockRewardsProvider(),
+        utxoProvider: mocks.mockUtxoProvider({ utxoSet })
       },
-      rewardsProvider: mocks.mockRewardsProvider(),
-      utxoProvider: mocks.mockUtxoProvider({ utxoSet })
+      stores
     });
 
     // wallet.fatalError$ must be observed till the beginning of time
@@ -431,14 +514,17 @@ describe('SingleAddressWallet.fatalError$', () => {
     const testValue = { test: 'value' };
     const utxoSet = generateUtxos(30, 10);
 
-    const wallet = await createWallet(stores, {
-      chainHistoryProvider: mocks.mockChainHistoryProvider(),
-      networkInfoProvider: {
-        ...mocks.mockNetworkInfoProvider(),
-        ledgerTip: jest.fn().mockResolvedValue(testValue)
+    const wallet = await createWallet({
+      providers: {
+        chainHistoryProvider: mocks.mockChainHistoryProvider(),
+        networkInfoProvider: {
+          ...mocks.mockNetworkInfoProvider(),
+          ledgerTip: jest.fn().mockResolvedValue(testValue)
+        },
+        rewardsProvider: mocks.mockRewardsProvider(),
+        utxoProvider: mocks.mockUtxoProvider({ utxoSet })
       },
-      rewardsProvider: mocks.mockRewardsProvider(),
-      utxoProvider: mocks.mockUtxoProvider({ utxoSet })
+      stores
     });
 
     await expect(firstValueFrom(wallet.tip$)).resolves.toBe(testValue);

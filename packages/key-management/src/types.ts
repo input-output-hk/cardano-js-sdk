@@ -142,8 +142,10 @@ export interface KeyAgent {
   get accountIndex(): number;
   get serializableData(): SerializableKeyAgentData;
   get knownAddresses(): GroupedAddress[];
+  set knownAddresses(addresses: GroupedAddress[]);
   get extendedAccountPublicKey(): Crypto.Bip32PublicKeyHex;
   get bip32Ed25519(): Crypto.Bip32Ed25519;
+
   /**
    * @throws AuthenticationError
    */
@@ -162,10 +164,12 @@ export interface KeyAgent {
    *
    * @param paymentKeyDerivationPath The payment key derivation path.
    * @param stakeKeyDerivationIndex The stake key index. This field is optional. If not provided it defaults to index 0.
+   * @param pure If set to true, the key agent will derive a new address without mutating its internal state.
    */
   deriveAddress(
     paymentKeyDerivationPath: AccountAddressDerivationPath,
-    stakeKeyDerivationIndex: number
+    stakeKeyDerivationIndex: number,
+    pure?: boolean
   ): Promise<GroupedAddress>;
   /**
    * @throws AuthenticationError
@@ -178,6 +182,7 @@ export type AsyncKeyAgent = Pick<KeyAgent, 'deriveAddress' | 'derivePublicKey' |
   getChainId(): Promise<Cardano.ChainId>;
   getBip32Ed25519(): Promise<Crypto.Bip32Ed25519>;
   getExtendedAccountPublicKey(): Promise<Crypto.Bip32PublicKeyHex>;
+  setKnownAddresses(addresses: GroupedAddress[]): Promise<void>;
 } & Shutdown;
 
 /**

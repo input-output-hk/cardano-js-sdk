@@ -10,6 +10,7 @@ export const keyAgentProperties: RemoteApiProperties<AsyncKeyAgent> = {
   getChainId: RemoteApiPropertyType.MethodReturningPromise,
   getExtendedAccountPublicKey: RemoteApiPropertyType.MethodReturningPromise,
   knownAddresses$: RemoteApiPropertyType.HotObservable,
+  setKnownAddresses: RemoteApiPropertyType.MethodReturningPromise,
   signBlob: RemoteApiPropertyType.MethodReturningPromise,
   signTransaction: RemoteApiPropertyType.MethodReturningPromise
 };

@@ -164,25 +164,31 @@ export const queryTransactionsResult2: Paginated<Cardano.HydratedTx> = {
 };
 
 const queryTransactions = ({ rewardAccount }: { rewardAccount?: Cardano.RewardAccount } = {}) =>
-  jest.fn().mockResolvedValueOnce({
-    ...queryTransactionsResult,
-    pageResults: rewardAccount
-      ? queryTransactionsResult.pageResults.map((tx) => ({
-          ...tx,
-          body: {
-            ...tx.body,
-            certificates: tx.body.certificates?.map((certificate) =>
-              'stakeKeyHash' in certificate
-                ? {
-                    ...certificate,
-                    stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
-                  }
-                : certificate
-            )
-          }
-        }))
-      : queryTransactionsResult.pageResults
-  });
+  jest
+    .fn()
+    .mockResolvedValueOnce({
+      ...queryTransactionsResult,
+      pageResults: rewardAccount
+        ? queryTransactionsResult.pageResults.map((tx) => ({
+            ...tx,
+            body: {
+              ...tx.body,
+              certificates: tx.body.certificates?.map((certificate) =>
+                'stakeKeyHash' in certificate
+                  ? {
+                      ...certificate,
+                      stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+                    }
+                  : certificate
+              )
+            }
+          }))
+        : queryTransactionsResult.pageResults
+    })
+    .mockResolvedValue({
+      pageResults: queryTransactionsResult.pageResults,
+      totalResultCount: 0 // Returning total result count 0 after the first result will make the address discovery stop
+    });
 
 export const blocksByHashes = [{ epoch: Cardano.EpochNo(currentEpoch.number - 3) } as Cardano.ExtendedBlockInfo];
 
