@@ -1,5 +1,7 @@
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, Handle } from '@cardano-sdk/core';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+// FIX Import path
+import { KoraLabsHandleProvider } from '@cardano-sdk/wallet/src/services/HandleProvider';
 import { Logger } from 'ts-log';
 
 import {
@@ -21,6 +23,8 @@ export interface OutputBuilderProps {
   txOut?: PartialTxOut;
   /** Logger */
   logger: Logger;
+
+  handleProvider: KoraLabsHandleProvider;
 }
 
 /** Determines if the `PartialTxOut` arg has at least an address and coins. */
@@ -53,11 +57,13 @@ export class TxOutputBuilder implements OutputBuilder {
   #partialOutput: PartialTxOut;
   #outputValidator: OutputBuilderValidator;
   #logger: Logger;
+  #handleProvider: KoraLabsHandleProvider;
 
-  constructor({ outputValidator, txOut, logger }: OutputBuilderProps) {
+  constructor({ outputValidator, txOut, logger, handleProvider }: OutputBuilderProps) {
     this.#partialOutput = { ...txOut };
     this.#outputValidator = outputValidator;
     this.#logger = logger;
+    this.#handleProvider = handleProvider;
   }
 
   /**
@@ -116,12 +122,33 @@ export class TxOutputBuilder implements OutputBuilder {
     return this;
   }
 
+  // make it take an output that has type AdaHandle
+  handle(output: Handle): OutputBuilder {
+    // output/handle: $AdaHandle
+    this.#handleProvider
+      .resolveHandles({ handles: [output] })
+      .then(() => {
+        this.#partialOutput = { ...this.#partialOutput, handle: output };
+
+        return this;
+      })
+      .catch((error) => {
+        throw new Error(error);
+      });
+    return this;
+  }
+
   async build(): Promise<Cardano.TxOut> {
     const txOut = this.toTxOut();
 
     const outputValidation = toOutputValidationError(txOut, await this.#outputValidator.validateOutput(txOut));
     if (outputValidation) {
       throw outputValidation;
+    }
+
+    if (this.#partialOutput.handle) {
+      // eslint-disable-next-line no-console
+      console.log('ADA handle:', this.#partialOutput.handle);
     }
 
     return txOut;

@@ -256,6 +256,18 @@ describe('GenericTxBuilder', () => {
       expect(outputBuilder.toTxOut().value).toEqual(outValueOther);
     });
 
+    it('can search for an ADA handle when given an output', async () => {
+      output1Coin = 1234n;
+      address = Cardano.PaymentAddress(
+        'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
+      );
+
+      const outputValue = await txBuilder.buildOutput().handle('$AdaHandle').coin(output1Coin).build();
+
+      expect(outputValue.address).toBe('addr....');
+      expect(outputValue.handle).toBe('$somehandle');
+    });
+
     describe('inspect', () => {
       it('resolves with transaction properties that were previously set', async () => {
         const partialTxOut = await txBuilder.buildOutput().asset(assetId, 123n).inspect();
