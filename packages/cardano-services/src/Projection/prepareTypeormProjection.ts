@@ -92,7 +92,7 @@ const entityInterDependencies: Partial<Record<EntityName, EntityName[]>> = {
   output: ['block'],
   poolRegistration: ['block'],
   poolRetirement: ['block'],
-  stakePool: ['block'],
+  stakePool: ['block', 'poolRegistration', 'poolRetirement', 'poolMetadata'],
   tokens: ['asset']
 };
 
