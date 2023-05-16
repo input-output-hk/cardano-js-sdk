@@ -961,7 +961,7 @@ export const txToTrezor = async ({
   let ttl;
   const cslTTL = cslTxBody.ttl();
   if (cslTTL) {
-    ttl = cslTTL.toString();
+    ttl = cslTTL.to_str();
   }
 
   const validityIntervalStart = cslTxBody.validity_start_interval()?.to_str();
