@@ -38,6 +38,9 @@ Packages are distributed as both CommonJS and ESM modules.
   - using with `type="module"` requires `--experimental-specifier-resolution=node` flag
 - Browser via bundlers (see [example webpack config](./packages/e2e/test/web-extension/webpack.config.js))
 
+### Getting Started
+The [GETTING_STARTED](./GETTING_STARTED.md) guide provides a quick way to start experimenting.
+
 ### Testing
 
 - [@cardano-sdk/golden-test-generator](./packages/golden-test-generator)
@@ -49,7 +52,8 @@ A Yarn Workspace maintaining a single version across all packages.
 #### System Requirements
 
 - [nvm](https://github.com/nvm-sh/nvm)
-- [yarn](https://classic.yarnpkg.com/lang/en/docs/install)
+- [yarn](https://yarnpkg.com/getting-started/install)
+- [Node.js](https://nodejs.org/en/download) 14 or later
 - [Docker Desktop] 3.4 or later or a Docker installation that includes Compose V2
 
 #### Clone
