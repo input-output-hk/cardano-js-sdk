@@ -96,6 +96,7 @@ export const observableWalletProperties: RemoteApiProperties<ObservableWallet> =
   },
   currentEpoch$: RemoteApiPropertyType.HotObservable,
   delegation: {
+    distribution$: RemoteApiPropertyType.HotObservable,
     rewardAccounts$: RemoteApiPropertyType.HotObservable,
     rewardsHistory$: RemoteApiPropertyType.HotObservable
   },
