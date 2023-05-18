@@ -1,7 +1,5 @@
-import { Cardano, Handle } from '@cardano-sdk/core';
+import { Cardano, Handle, KoraLabsHandleProvider } from '@cardano-sdk/core';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
-// FIX Import path
-import { KoraLabsHandleProvider } from '@cardano-sdk/wallet/src/services/HandleProvider';
 import { Logger } from 'ts-log';
 
 import {
@@ -21,7 +19,7 @@ export interface OutputBuilderProps {
   txOut?: PartialTxOut;
   /** Logger */
   logger: Logger;
-
+  /** Koralabs Handle Provider for ADAHandle */
   handleProvider: KoraLabsHandleProvider;
 }
 

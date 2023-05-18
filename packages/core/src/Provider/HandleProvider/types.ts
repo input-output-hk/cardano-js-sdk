@@ -1,5 +1,5 @@
 import { ByronAddress, EnterpriseAddress, PaymentAddress, PointerAddress } from '../../Cardano/Address';
-import { Point } from './ObservableCardanoNode';
+import { Point } from '../..';
 
 export type Handle = string;
 

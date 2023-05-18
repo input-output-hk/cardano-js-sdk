@@ -1,4 +1,5 @@
-import { Cardano, HandleInfo } from '@cardano-sdk/core';
+import { Cardano } from '../..';
+import { HandleInfo } from './types';
 import { IHandle } from '@koralabs/handles-public-api-interfaces';
 
 export const toHandleInfo = ({ apiResponse, tip }: { apiResponse: IHandle; tip: Cardano.Tip }): HandleInfo => ({

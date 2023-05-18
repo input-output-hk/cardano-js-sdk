@@ -1,14 +1,7 @@
-import {
-  HandleInfo,
-  HandleProvider,
-  HealthCheckResponse,
-  NetworkInfoProvider,
-  ProviderError,
-  ProviderFailure,
-  ResolveHandlesArgs
-} from '@cardano-sdk/core';
+import { HandleInfo, HandleProvider, ResolveHandlesArgs } from './types';
+import { HealthCheckResponse, NetworkInfoProvider, ProviderError, ProviderFailure } from '../..';
 import { IHandle } from '@koralabs/handles-public-api-interfaces';
-import { toHandleInfo } from './util/ada-handle';
+import { toHandleInfo } from './utils';
 import axios, { AxiosInstance } from 'axios';
 
 export interface KoraLabsHandleProviderDeps {
@@ -36,7 +29,6 @@ export class KoraLabsHandleProvider implements HandleProvider {
       return response.map(({ data: apiResponse }) => toHandleInfo({ apiResponse, tip }));
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        // add a specific error?
         throw new ProviderError(ProviderFailure.Unhealthy, error, `Failed to resolve handles due to: ${error.message}`);
       }
       throw error;
@@ -51,3 +43,5 @@ export class KoraLabsHandleProvider implements HandleProvider {
     }
   }
 }
+
+export { HandleInfo, Handle } from './types';
