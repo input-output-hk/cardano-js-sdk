@@ -6,7 +6,7 @@ import {
   WalletNetworkInfoProvider,
   WalletNetworkInfoProviderStats
 } from '../../../src';
-import { mockNetworkInfoProvider } from '../../mocks';
+import { mockNetworkInfoProvider } from '../../../../core/test/mocks';
 
 describe('TrackedNetworkInfoProvider', () => {
   let networkInfoProvider: WalletNetworkInfoProvider;

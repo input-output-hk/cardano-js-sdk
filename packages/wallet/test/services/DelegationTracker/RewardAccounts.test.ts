@@ -8,7 +8,6 @@ import { InMemoryStakePoolsStore, KeyValueStore } from '../../../src/persistence
 import {
   OutgoingOnChainTx,
   PAGE_SIZE,
-  StakeKeyStatus,
   TrackedStakePoolProvider,
   TxInFlight,
   addressKeyStatuses,
@@ -22,7 +21,7 @@ import {
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxWithEpoch } from '../../../src/services/DelegationTracker/types';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
-import { currentEpoch, generateStakePools, mockStakePoolsProvider } from '../../mocks';
+import { currentEpoch, generateStakePools, mockStakePoolsProvider } from '../../../../core/test/mocks';
 import { dummyCbor } from '../../util';
 
 jest.mock('../../../src/services/util/coldObservableProvider', () => {
@@ -179,10 +178,10 @@ describe('RewardAccounts', () => {
       });
       const tracker$ = addressKeyStatuses([rewardAccount], transactions$, transactionsInFlight$);
       expectObservable(tracker$).toBe('abcda', {
-        a: [StakeKeyStatus.Unregistered],
-        b: [StakeKeyStatus.Registering],
-        c: [StakeKeyStatus.Registered],
-        d: [StakeKeyStatus.Unregistering]
+        a: [Cardano.StakeKeyStatus.Unregistered],
+        b: [Cardano.StakeKeyStatus.Registering],
+        c: [Cardano.StakeKeyStatus.Registered],
+        d: [Cardano.StakeKeyStatus.Unregistering]
       });
     });
   });

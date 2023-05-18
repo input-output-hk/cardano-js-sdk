@@ -2,8 +2,8 @@
 /* eslint-disable jsdoc/require-jsdoc */
 
 import { Cardano, TxCBOR } from '@cardano-sdk/core';
-import { MaybeValidTx, MaybeValidTxOut, ObservableWallet, OutgoingTx, ValidTx, ValidTxOut } from '../src';
 import { Observable, catchError, filter, firstValueFrom, throwError, timeout } from 'rxjs';
+import { ObservableWallet, OutgoingTx } from '../src';
 
 const SECOND = 1000;
 const MINUTE = 60 * SECOND;
@@ -29,14 +29,6 @@ export const waitForWalletStateSettle = (wallet: ObservableWallet) =>
     'Took too long to load',
     SYNC_TIMEOUT
   );
-
-export function assertTxIsValid(tx: MaybeValidTx): asserts tx is ValidTx {
-  expect(tx.isValid).toBe(true);
-}
-
-export function assertTxOutIsValid(txOut: MaybeValidTxOut): asserts txOut is ValidTxOut {
-  expect(txOut.isValid).toBe(true);
-}
 
 export const toOutgoingTx = (tx: Cardano.Tx): OutgoingTx => ({
   body: tx.body,

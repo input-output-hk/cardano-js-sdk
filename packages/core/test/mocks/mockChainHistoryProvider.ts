@@ -1,5 +1,5 @@
 import { AssetId, somePartialStakePools } from '@cardano-sdk/util-dev';
-import { Cardano, Paginated } from '@cardano-sdk/core';
+import { Cardano, Paginated } from '../../src';
 import { currentEpoch, ledgerTip, stakeKeyHash } from './mockData';
 import delay from 'delay';
 

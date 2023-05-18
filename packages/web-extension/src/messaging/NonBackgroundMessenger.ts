@@ -1,9 +1,23 @@
 // only tested in ../e2e tests
 /* eslint-disable no-use-before-define */
-import { BehaviorSubject, Observable, ReplaySubject, debounceTime, filter, first, map, takeWhile, tap } from 'rxjs';
+import {
+  BehaviorSubject,
+  EmptyError,
+  Observable,
+  ReplaySubject,
+  catchError,
+  debounceTime,
+  filter,
+  first,
+  map,
+  of,
+  takeWhile,
+  tap
+} from 'rxjs';
 import { Messenger, MessengerDependencies, MessengerPort, PortMessage, ReconnectConfig } from './types';
 import { deriveChannelName } from './util';
 import { isNotNil } from '@cardano-sdk/util';
+import { retryBackoff } from 'backoff-rxjs';
 
 export interface NonBackgroundMessengerOptions {
   baseChannel: string;
@@ -89,9 +103,17 @@ export const createNonBackgroundMessenger = (
     postMessage(message: unknown): Observable<void> {
       return connect$.pipe(
         first(),
-        // TODO: find if this can throw
         tap((port) => port.postMessage(message)),
-        map(() => void 0)
+        retryBackoff({
+          initialInterval: 10,
+          maxInterval: 1000,
+          shouldRetry: (err) => !(err instanceof EmptyError)
+        }),
+        map(() => void 0),
+        catchError(() => {
+          logger.warn("Couldn't postMessage: messenger shutdown");
+          return of(void 0);
+        })
       );
     },
 

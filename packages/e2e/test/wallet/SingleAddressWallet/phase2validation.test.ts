@@ -1,14 +1,8 @@
 import { Cardano } from '@cardano-sdk/core';
-import {
-  FinalizeTxProps,
-  InitializeTxProps,
-  SingleAddressWallet,
-  TransactionFailure,
-  buildTx
-} from '@cardano-sdk/wallet';
+import { FinalizeTxProps, SingleAddressWallet, TransactionFailure } from '@cardano-sdk/wallet';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, isNotNil } from '@cardano-sdk/util';
-import { assertTxIsValid } from '../../../../wallet/test/util';
+import { InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import { firstValueFromTimed, walletReady } from '../../util';
@@ -25,24 +19,20 @@ const logger = createLogger();
 const createCollateral = async (
   wallet: SingleAddressWallet
 ): Promise<{ collateralInput: Cardano.TxIn; collateralCoinValue: bigint }> => {
-  const txBuilder = buildTx({ logger, observableWallet: wallet });
+  const txBuilder = wallet.createTxBuilder();
 
   const address = (await firstValueFrom(wallet.addresses$))[0].address;
 
   // Create a new UTxO to be use as collateral.
-  const txOutput = txBuilder.buildOutput().address(address).coin(5_000_000n).toTxOut();
+  const txOutput = await txBuilder.buildOutput().address(address).coin(5_000_000n).build();
 
-  const unsignedTx = await txBuilder.addOutput(txOutput).build();
-
-  assertTxIsValid(unsignedTx);
-
-  const signedTx = await unsignedTx.sign();
-  await signedTx.submit();
+  const { tx: signedTx } = await txBuilder.addOutput(txOutput).build().sign();
+  await wallet.submitTx(signedTx);
 
   // Wait for transaction to be on chain.
   await firstValueFrom(
     wallet.transactions.history$.pipe(
-      map((txs) => txs.find((tx) => tx.id === signedTx.tx.id)),
+      map((txs) => txs.find((tx) => tx.id === signedTx.id)),
       filter(isNotNil),
       take(1)
     )
@@ -51,7 +41,7 @@ const createCollateral = async (
   // Find the collateral UTxO in the UTxO set.
   const utxo = await firstValueFrom(
     wallet.utxo.available$.pipe(
-      map((utxos) => utxos.find((o) => o[0].txId === signedTx.tx.id && o[1].value.coins === 5_000_000n)),
+      map((utxos) => utxos.find((o) => o[0].txId === signedTx.id && o[1].value.coins === 5_000_000n)),
       filter(isNotNil),
       take(1)
     )
@@ -128,16 +118,14 @@ describe('SingleAddressWallet/phase2validation', () => {
         }
       ]),
       scriptIntegrityHash: scriptDataHash,
-      scripts: [alwaysFailScript],
-      witness: { redeemers: [scriptRedeemer] }
+      witness: { redeemers: [scriptRedeemer], scripts: [alwaysFailScript] }
     };
 
     const unsignedTx = await wallet.initializeTx(txProps);
     const finalizeProps: FinalizeTxProps = {
       isValid: false,
-      scripts: [alwaysFailScript],
       tx: unsignedTx,
-      witness: { redeemers: [scriptRedeemer] }
+      witness: { redeemers: [scriptRedeemer], scripts: [alwaysFailScript] }
     };
 
     const signedTx = await wallet.finalizeTx(finalizeProps);

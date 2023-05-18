@@ -29,15 +29,8 @@ import {
   networkInfoProviderFactory,
   walletVariables
 } from '../src';
-import {
-  FinalizeTxProps,
-  InitializeTxProps,
-  ObservableWallet,
-  SignedTx,
-  SingleAddressWallet,
-  buildTx
-} from '@cardano-sdk/wallet';
-import { assertTxIsValid } from '../../wallet/test/util';
+import { FinalizeTxProps, ObservableWallet, SingleAddressWallet } from '@cardano-sdk/wallet';
+import { InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { logger } from '@cardano-sdk/util-dev';
 import sortBy from 'lodash/sortBy';
 
@@ -140,10 +133,9 @@ export const txConfirmed = (
     SYNC_TIMEOUT_DEFAULT / 5
   );
 
-const submit = (wallet: ObservableWallet, tx: Cardano.Tx | SignedTx) =>
-  'submit' in tx ? tx.submit() : wallet.submitTx(tx);
-const confirm = (wallet: ObservableWallet, tx: Cardano.Tx | SignedTx) => txConfirmed(wallet, 'tx' in tx ? tx.tx : tx);
-export const submitAndConfirm = (wallet: ObservableWallet, tx: Cardano.Tx | SignedTx) =>
+const submit = (wallet: ObservableWallet, tx: Cardano.Tx) => wallet.submitTx(tx);
+const confirm = (wallet: ObservableWallet, tx: Cardano.Tx) => txConfirmed(wallet, tx);
+export const submitAndConfirm = (wallet: ObservableWallet, tx: Cardano.Tx) =>
   Promise.all([submit(wallet, tx), confirm(wallet, tx)]);
 
 export type RequestCoinsProps = {
@@ -187,14 +179,12 @@ export const transferCoins = async ({ fromWallet, toWallet, coins }: TransferCoi
 
   // Act
   // Send 50 tADA to second wallet.
-  const txBuilder = buildTx({ logger, observableWallet: fromWallet });
-  const txOut = txBuilder.buildOutput().address(receivingAddress).coin(coins).toTxOut();
-  const unsignedTx = await txBuilder.addOutput(txOut).build();
-  assertTxIsValid(unsignedTx);
-  const signedTx = await unsignedTx.sign();
+  const txBuilder = fromWallet.createTxBuilder();
+  const txOut = await txBuilder.buildOutput().address(receivingAddress).coin(coins).build();
+  const { tx: signedTx } = await txBuilder.addOutput(txOut).build().sign();
 
   // Wait until wallet two is aware of the funds.
-  await Promise.all([submit(fromWallet, signedTx), txConfirmed(toWallet, signedTx.tx)]);
+  await Promise.all([fromWallet.submitTx(signedTx), txConfirmed(toWallet, signedTx)]);
 };
 
 export const waitForEpoch = (wallet: Pick<ObservableWallet, 'currentEpoch$'>, waitForEpochNo: number) => {
@@ -313,16 +303,14 @@ export const burnTokens = async ({
   const negativeTokens = new Map([...tokens].map(([assetId, value]) => [assetId, -value]));
   const txProps: InitializeTxProps = {
     mint: negativeTokens,
-    scripts,
-    witness: { extraSigners }
+    witness: { extraSigners, scripts }
   };
 
   const unsignedTx = await wallet.initializeTx(txProps);
 
   const finalizeProps: FinalizeTxProps = {
-    scripts,
     tx: unsignedTx,
-    witness: { extraSigners }
+    witness: { extraSigners, scripts }
   };
 
   const signedTx = await wallet.finalizeTx(finalizeProps);

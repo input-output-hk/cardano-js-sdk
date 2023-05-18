@@ -1,6 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { Asset, Cardano, metadatum, nativeScriptPolicyId } from '@cardano-sdk/core';
-import { Assets, FinalizeTxProps, InitializeTxProps, SingleAddressWallet } from '@cardano-sdk/wallet';
+import { Assets, FinalizeTxProps, SingleAddressWallet } from '@cardano-sdk/wallet';
+import { InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { KeyRole, TransactionSigner, util } from '@cardano-sdk/key-management';
 import { burnTokens, createStandaloneKeyAgent, firstValueFromTimed, submitAndConfirm, walletReady } from '../../util';
 import { combineLatest, filter, firstValueFrom, map } from 'rxjs';
@@ -150,17 +151,15 @@ describe('SingleAddressWallet.assets/nft', () => {
           }
         }
       ]),
-      scripts: [policyScript],
-      witness: { extraSigners: [policySigner] }
+      witness: { extraSigners: [policySigner], scripts: [policyScript] }
     };
 
     const unsignedTx = await wallet.initializeTx(txProps);
 
     const finalizeProps: FinalizeTxProps = {
       auxiliaryData,
-      scripts: [policyScript],
       tx: unsignedTx,
-      witness: { extraSigners: [policySigner] }
+      witness: { extraSigners: [policySigner], scripts: [policyScript] }
     };
 
     const signedTx = await wallet.finalizeTx(finalizeProps);
@@ -263,16 +262,14 @@ describe('SingleAddressWallet.assets/nft', () => {
           }
         }
       ]),
-      scripts: [policyScript],
-      witness: { extraSigners: [policySigner] }
+      witness: { extraSigners: [policySigner], scripts: [policyScript] }
     };
 
     const unsignedTx = await wallet.initializeTx(txProps);
 
     const finalizeProps: FinalizeTxProps = {
-      scripts: [policyScript],
       tx: unsignedTx,
-      witness: { extraSigners: [policySigner] }
+      witness: { extraSigners: [policySigner], scripts: [policyScript] }
     };
 
     const signedTx = await wallet.finalizeTx(finalizeProps);
@@ -329,17 +326,15 @@ describe('SingleAddressWallet.assets/nft', () => {
               }
             }
           ]),
-          scripts: [policyScript],
-          witness: { extraSigners: [policySigner] }
+          witness: { extraSigners: [policySigner], scripts: [policyScript] }
         };
 
         const unsignedTx = await wallet.initializeTx(txProps);
 
         const finalizeProps: FinalizeTxProps = {
           auxiliaryData,
-          scripts: [policyScript],
           tx: unsignedTx,
-          witness: { extraSigners: [policySigner] }
+          witness: { extraSigners: [policySigner], scripts: [policyScript] }
         };
 
         const signedTx = await wallet.finalizeTx(finalizeProps);

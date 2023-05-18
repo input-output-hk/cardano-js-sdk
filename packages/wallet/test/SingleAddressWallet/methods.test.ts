@@ -1,14 +1,15 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import * as mocks from '../mocks';
+import * as mocks from '../../../core/test/mocks';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
+import { BehaviorSubject, firstValueFrom, skip } from 'rxjs';
 import { CML, Cardano, CardanoNodeErrors, ProviderError, ProviderFailure, TxCBOR } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
-import { InitializeTxProps, SingleAddressWallet, setupWallet } from '../../src';
-import { firstValueFrom, skip } from 'rxjs';
-import { getPassphrase, testAsyncKeyAgent } from '../../../key-management/test/mocks';
+import { InitializeTxProps } from '@cardano-sdk/tx-construction';
+import { SingleAddressWallet, setupWallet } from '../../src';
+import { getPassphrase, stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { dummyLogger as logger } from 'ts-log';
-import { mockChainHistoryProvider, mockRewardsProvider, utxo } from '../mocks';
+import { mockChainHistoryProvider, mockRewardsProvider, utxo } from '../../../core/test/mocks';
 import { toOutgoingTx, waitForWalletStateSettle } from '../util';
 
 // We can't consistently re-serialize this specific tx due to witness.datums list format
@@ -33,6 +34,17 @@ const outputs = [
   }
 ];
 
+/** Waits `timeout` for `p` to resolve, then rejects with 'TIMEOUT' */
+const promiseTimeout = (p: Promise<unknown>, timeout = 10): Promise<unknown> => {
+  const timeoutReject = new Promise((_resolve, reject) => {
+    setTimeout(() => {
+      reject('TIMEOUT');
+    }, timeout);
+  });
+
+  return Promise.race([p, timeoutReject]);
+};
+
 describe('SingleAddressWallet methods', () => {
   const address = mocks.utxo[0][0].address!;
   let txSubmitProvider: mocks.TxSubmitProviderStub;
@@ -54,7 +66,7 @@ describe('SingleAddressWallet methods', () => {
       index: 0,
       networkId: Cardano.NetworkId.Testnet,
       rewardAccount: mocks.rewardAccount,
-      stakeKeyDerivationPath: mocks.stakeKeyDerivationPath,
+      stakeKeyDerivationPath,
       type: AddressType.External
     };
     ({ wallet } = await setupWallet({
@@ -265,6 +277,39 @@ describe('SingleAddressWallet methods', () => {
     wallet.shutdown();
     wallet.sync();
     expect(networkInfoProvider.ledgerTip).toHaveBeenCalledTimes(2);
+  });
+
+  describe('getTxBuilderDependencies', () => {
+    let isSettledMock$: BehaviorSubject<boolean>;
+
+    beforeEach(() => {
+      isSettledMock$ = new BehaviorSubject<boolean>(false);
+      wallet.syncStatus.isSettled$ = isSettledMock$;
+    });
+
+    it('txBuilder providers wait for the wallet to settle before resolving', async () => {
+      const {
+        txBuilderProviders: { changeAddress, genesisParameters, protocolParameters, rewardAccounts, tip, utxoAvailable }
+      } = wallet.getTxBuilderDependencies();
+
+      await expect(promiseTimeout(changeAddress())).rejects.toEqual('TIMEOUT');
+      await expect(promiseTimeout(genesisParameters())).rejects.toEqual('TIMEOUT');
+      await expect(promiseTimeout(protocolParameters())).rejects.toEqual('TIMEOUT');
+      await expect(promiseTimeout(rewardAccounts())).rejects.toEqual('TIMEOUT');
+      await expect(promiseTimeout(tip())).rejects.toEqual('TIMEOUT');
+      await expect(promiseTimeout(utxoAvailable())).rejects.toEqual('TIMEOUT');
+
+      isSettledMock$.next(true);
+
+      await expect(promiseTimeout(changeAddress())).resolves.toEqual(address);
+      await expect(promiseTimeout(genesisParameters())).resolves.toEqual(mocks.genesisParameters);
+      await expect(promiseTimeout(protocolParameters())).resolves.toEqual(mocks.protocolParameters);
+      await expect(promiseTimeout(rewardAccounts())).resolves.toEqual([
+        expect.objectContaining({ address: mocks.rewardAccount })
+      ]);
+      await expect(promiseTimeout(tip())).resolves.toEqual(mocks.ledgerTip);
+      await expect(promiseTimeout(utxoAvailable())).resolves.toEqual(mocks.utxo);
+    });
   });
 
   it('signData calls cip30signData', async () => {

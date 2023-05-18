@@ -53,6 +53,9 @@ export interface MessengerPort {
   onDisconnect: MinimalEvent<(port: MessengerPort) => void>;
   onMessage: MinimalEvent<(data: unknown, port: MessengerPort) => void>;
   disconnect(): void;
+  /**
+   * @throws an Error if the port is closed
+   */
   postMessage(message: any): void;
 }
 
@@ -122,7 +125,7 @@ export interface ApiFactoryOptions {
 export interface RemoteApiFactory<T> {
   propType: RemoteApiPropertyType.ApiFactory;
   // eslint-disable-next-line no-use-before-define
-  apiProperties: T extends (...args: any) => any ? RemoteApiProperties<ReturnType<T>> : never;
+  getApiProperties: () => T extends (...args: any) => any ? RemoteApiProperties<ReturnType<T>> : never;
 }
 
 export type RemoteApiProperty<T> =

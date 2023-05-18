@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import * as mocks from '../../mocks';
+import * as mocks from '../../../../core/test/mocks';
 import {
   AddressType,
   CommunicationType,
@@ -12,7 +12,7 @@ import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { CML, Cardano } from '@cardano-sdk/core';
 import { SingleAddressWallet, setupWallet } from '../../../src';
 import { dummyLogger as logger } from 'ts-log';
-import { mockKeyAgentDependencies } from '../../../../key-management/test/mocks';
+import { mockKeyAgentDependencies, stakeKeyDerivationPath } from '../../../../key-management/test/mocks';
 
 describe('TrezorKeyAgent', () => {
   let keyAgent: TrezorKeyAgent;
@@ -45,7 +45,7 @@ describe('TrezorKeyAgent', () => {
           index: 0,
           networkId: Cardano.NetworkId.Testnet,
           rewardAccount: mocks.rewardAccount,
-          stakeKeyDerivationPath: mocks.stakeKeyDerivationPath,
+          stakeKeyDerivationPath,
           type: AddressType.External
         };
         trezorKeyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);

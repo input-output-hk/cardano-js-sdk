@@ -58,9 +58,9 @@ const setUp = (mode: ApiObjectType) => {
 
   const properties: RemoteApiProperties<SimpleApi> = {
     someFactory: {
-      apiProperties: {
+      getApiProperties: () => ({
         somePromiseMethod: RemoteApiPropertyType.MethodReturningPromise
-      },
+      }),
       propType: RemoteApiPropertyType.ApiFactory
     },
     someNumbers$: RemoteApiPropertyType.HotObservable,
@@ -245,7 +245,7 @@ describe('remoteApi', () => {
 
       it('ignores requests that are not valid', () => {
         sut.incomingMsg$.next({ data: {}, port: { postMessage } });
-        expect(postMessage).not.toHaveBeenCalled();
+        expect(sut.mockMessenger.postMessage).not.toHaveBeenCalled();
       });
 
       it('mirrors requests to method returning promise only after an api object is emitted', (done) => {
@@ -255,7 +255,7 @@ describe('remoteApi', () => {
         sut.apiSource$.next(sut.api[0].obj);
         setTimeout(() => {
           expect(sut.api[0].obj.somePromiseMethod).toHaveBeenCalled();
-          expect(postMessage).toHaveBeenCalledWith(expect.objectContaining({ response: 5 }));
+          expect(sut.mockMessenger.postMessage).toHaveBeenCalledWith(expect.objectContaining({ response: 5 }));
           done();
         });
       });
@@ -265,7 +265,7 @@ describe('remoteApi', () => {
         const request: RequestMessage = { messageId: 'abc', request: { args: [], method: 'somePromiseMethod' } };
         sut.incomingMsg$.next({ data: request, port: { postMessage } });
         setTimeout(() => {
-          expect(postMessage).toHaveBeenCalledWith(expect.objectContaining({ response: 55 }));
+          expect(sut.mockMessenger.postMessage).toHaveBeenCalledWith(expect.objectContaining({ response: 55 }));
           done();
         });
       });
@@ -275,11 +275,11 @@ describe('remoteApi', () => {
         const request: RequestMessage = { messageId: 'abc', request: { args: [], method: 'somePromiseMethod' } };
         sut.incomingMsg$.next({ data: request, port: { postMessage } });
         setTimeout(() => {
-          expect(postMessage).not.toHaveBeenCalled();
+          expect(sut.mockMessenger.postMessage).not.toHaveBeenCalled();
           // After emitting a valid api, promise calls will resolve to methods from the new api
           sut.apiSource$.next(sut.api[0].obj);
           setTimeout(() => {
-            expect(postMessage).toHaveBeenCalledWith(expect.objectContaining({ response: 5 }));
+            expect(sut.mockMessenger.postMessage).toHaveBeenCalledWith(expect.objectContaining({ response: 5 }));
             done();
           });
         });

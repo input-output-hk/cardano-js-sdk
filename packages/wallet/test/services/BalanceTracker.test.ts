@@ -3,9 +3,9 @@
 /* eslint-disable space-in-parens */
 import { BehaviorObservable } from '@cardano-sdk/util-rxjs';
 import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
-import { DelegationTracker, RewardAccount, StakeKeyStatus, createBalanceTracker } from '../../src/services';
+import { DelegationTracker, createBalanceTracker } from '../../src/services';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
-import { utxo, utxo2 } from '../mocks';
+import { utxo, utxo2 } from '../../../core/test/mocks';
 
 describe('createBalanceTracker', () => {
   it('combines data from rewardsTracker & utxoTracker', () => {
@@ -16,10 +16,10 @@ describe('createBalanceTracker', () => {
       const utxoUnspendable = hot(     '-a-----', { a: utxo2 }) as unknown as BehaviorObservable<Cardano.Utxo[]>;
       const rewardAccounts$ = hot(     'a--b-cd', {
         a: [],
-        b: [{ keyStatus: StakeKeyStatus.Registering, rewardBalance: 0n }],
-        c: [{ keyStatus: StakeKeyStatus.Registered, rewardBalance: 5n }],
-        d: [{ keyStatus: StakeKeyStatus.Unregistering, rewardBalance: 5n }]
-      }) as unknown as BehaviorObservable<RewardAccount[]>;
+        b: [{ keyStatus: Cardano.StakeKeyStatus.Registering, rewardBalance: 0n }],
+        c: [{ keyStatus: Cardano.StakeKeyStatus.Registered, rewardBalance: 5n }],
+        d: [{ keyStatus: Cardano.StakeKeyStatus.Unregistering, rewardBalance: 5n }]
+      }) as unknown as BehaviorObservable<Cardano.RewardAccountInfo[]>;
       const balanceTracker = createBalanceTracker(
         protocolParameters$,
         { available$: utxoAvailable, total$: utxoTotal, unspendable$: utxoUnspendable },

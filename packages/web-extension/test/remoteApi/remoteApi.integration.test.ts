@@ -141,9 +141,9 @@ const setUp = ({
       }
     },
     factory: {
-      apiProperties: {
+      getApiProperties: () => ({
         addOne: RemoteApiPropertyType.MethodReturningPromise
-      },
+      }),
       propType: RemoteApiPropertyType.ApiFactory
     },
     nested: {
@@ -158,9 +158,9 @@ const setUp = ({
         }
       },
       factory: {
-        apiProperties: {
+        getApiProperties: () => ({
           addOne: RemoteApiPropertyType.MethodReturningPromise
-        },
+        }),
         propType: RemoteApiPropertyType.ApiFactory
       },
       nestedSomeNumbers$: RemoteApiPropertyType.HotObservable

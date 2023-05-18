@@ -7,7 +7,7 @@ import {
   generateTxAlonzo,
   mockChainHistoryProvider,
   queryTransactionsResult
-} from '../mocks';
+} from '../../../core/test/mocks';
 import {
   FailedTx,
   OutgoingTx,

@@ -1,55 +1,12 @@
-import * as Crypto from '@cardano-sdk/crypto';
 import { Asset, Cardano, EpochInfo, EraSummary, NetworkInfoProvider, TxCBOR } from '@cardano-sdk/core';
 import { BalanceTracker, DelegationTracker, TransactionsTracker, UtxoTracker } from './services';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
-import { GroupedAddress, SignTransactionOptions, TransactionSigner, cip8 } from '@cardano-sdk/key-management';
+import { GroupedAddress, cip8 } from '@cardano-sdk/key-management';
+import { InitializeTxProps, InitializeTxResult, TxBuilder, TxContext } from '@cardano-sdk/tx-construction';
 import { Observable } from 'rxjs';
-import { SelectionSkeleton } from '@cardano-sdk/input-selection';
 import { Shutdown } from '@cardano-sdk/util';
 
-export interface TxProps {
-  auxiliaryData?: Cardano.AuxiliaryData;
-  witness?: {
-    datums?: Cardano.Datum[];
-    redeemers?: Cardano.Redeemer[];
-    bootstrap?: Cardano.BootstrapWitness[];
-    extraSigners?: TransactionSigner[];
-  };
-  scripts?: Cardano.Script[];
-  signingOptions?: SignTransactionOptions;
-}
-
-export interface InitializeTxProps extends TxProps {
-  outputs?: Set<Cardano.TxOut>;
-  certificates?: Cardano.Certificate[];
-  options?: {
-    validityInterval?: Cardano.ValidityInterval;
-  };
-  collaterals?: Set<Cardano.TxIn>;
-  mint?: Cardano.TokenMap;
-  scriptIntegrityHash?: Crypto.Hash32ByteBase16;
-  requiredExtraSignatures?: Crypto.Ed25519KeyHashHex[];
-}
-
-export interface FinalizeTxProps extends TxProps {
-  tx: Cardano.TxBodyWithHash;
-  isValid?: boolean;
-}
-
 export type Assets = Map<Cardano.AssetId, Asset.AssetInfo>;
-
-export interface OutputValidation {
-  minimumCoin: Cardano.Lovelace;
-  coinMissing: Cardano.Lovelace;
-  tokenBundleSizeExceedsLimit: boolean;
-}
-export type MinimumCoinQuantityPerOutput = Map<Cardano.TxOut, OutputValidation>;
-
-export interface InitializeTxPropsValidationResult {
-  minimumCoinQuantities: MinimumCoinQuantityPerOutput;
-}
-
-export type InitializeTxResult = Cardano.TxBodyWithHash & { inputSelection: SelectionSkeleton };
 
 export type SignDataProps = Omit<cip8.Cip30SignDataRequest, 'keyAgent'>;
 
@@ -76,6 +33,10 @@ export interface SyncStatus extends Shutdown {
   isSettled$: Observable<boolean>;
 }
 
+export type FinalizeTxProps = Omit<TxContext, 'ownAddresses'> & {
+  tx: Cardano.TxBodyWithHash;
+};
+
 export interface ObservableWallet {
   readonly balance: BalanceTracker;
   readonly delegation: DelegationTracker;
@@ -99,9 +60,11 @@ export interface ObservableWallet {
 
   getName(): Promise<string>;
   /**
+   * @deprecated Use `createTxBuilder()` instead.
    * @throws InputSelectionError
    */
   initializeTx(props: InitializeTxProps): Promise<InitializeTxResult>;
+  /** @deprecated Use `createTxBuilder()` instead. */
   finalizeTx(props: FinalizeTxProps): Promise<Cardano.Tx>;
   /**
    * @throws Cip30DataSignError
@@ -111,6 +74,11 @@ export interface ObservableWallet {
    * @throws CardanoNodeErrors.TxSubmissionError
    */
   submitTx(tx: Cardano.Tx | TxCBOR): Promise<Cardano.TransactionId>;
+
+  /**
+   * Create a TxBuilder from this wallet
+   */
+  createTxBuilder(): TxBuilder;
 
   shutdown(): void;
 }

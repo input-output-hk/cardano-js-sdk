@@ -1,6 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { Cardano, nativeScriptPolicyId } from '@cardano-sdk/core';
-import { FinalizeTxProps, InitializeTxProps, SingleAddressWallet } from '@cardano-sdk/wallet';
+import { FinalizeTxProps, SingleAddressWallet } from '@cardano-sdk/wallet';
+import { InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { KeyRole, util } from '@cardano-sdk/key-management';
 import { burnTokens, createStandaloneKeyAgent, submitAndConfirm, walletReady } from '../../util';
 import { createLogger } from '@cardano-sdk/util-dev';
@@ -90,16 +91,14 @@ describe('SingleAddressWallet/multisignature', () => {
           }
         }
       ]),
-      scripts: [policyScript],
-      witness: { extraSigners: [alicePolicySigner, bobPolicySigner] }
+      witness: { extraSigners: [alicePolicySigner, bobPolicySigner], scripts: [policyScript] }
     };
 
     const unsignedTx = await wallet.initializeTx(txProps);
 
     const finalizeProps: FinalizeTxProps = {
-      scripts: [policyScript],
       tx: unsignedTx,
-      witness: { extraSigners: [alicePolicySigner, bobPolicySigner] }
+      witness: { extraSigners: [alicePolicySigner, bobPolicySigner], scripts: [policyScript] }
     };
 
     const signedTx = await wallet.finalizeTx(finalizeProps);

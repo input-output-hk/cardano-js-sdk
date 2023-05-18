@@ -1,7 +1,7 @@
 /* eslint-disable max-statements */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
-import * as mocks from '../mocks';
+import * as mocks from '../../../core/test/mocks';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
 import {
   AssetId,
@@ -30,9 +30,9 @@ import {
 import { InvalidStringError } from '@cardano-sdk/util';
 import { ReplaySubject, firstValueFrom } from 'rxjs';
 import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
-import { currentEpoch, networkInfo, queryTransactionsResult, queryTransactionsResult2 } from '../mocks';
+import { currentEpoch, networkInfo, queryTransactionsResult, queryTransactionsResult2 } from '../../../core/test/mocks';
 import { dummyLogger as logger } from 'ts-log';
-import { testAsyncKeyAgent } from '../../../key-management/test/mocks';
+import { stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { waitForWalletStateSettle } from '../util';
 import delay from 'delay';
 import flatten from 'lodash/flatten';
@@ -59,7 +59,7 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
         index: 0,
         networkId: Cardano.NetworkId.Testnet,
         rewardAccount,
-        stakeKeyDerivationPath: mocks.stakeKeyDerivationPath,
+        stakeKeyDerivationPath,
         type: AddressType.External
       };
       const asyncKeyAgent = await testAsyncKeyAgent([groupedAddress], dependencies);

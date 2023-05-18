@@ -84,32 +84,7 @@ export interface RewardsHistory {
   lifetimeRewards: Cardano.Lovelace;
 }
 
-export interface Delegatee {
-  /**
-   * Rewards at the end of current epoch will
-   * be from this stake pool
-   */
-  currentEpoch?: Cardano.StakePool;
-  nextEpoch?: Cardano.StakePool;
-  nextNextEpoch?: Cardano.StakePool;
-}
-
-export enum StakeKeyStatus {
-  Registering = 'REGISTERING',
-  Registered = 'REGISTERED',
-  Unregistering = 'UNREGISTERING',
-  Unregistered = 'UNREGISTERED'
-}
-
-export interface RewardAccount {
-  address: Cardano.RewardAccount;
-  keyStatus: StakeKeyStatus;
-  delegatee?: Delegatee;
-  rewardBalance: Cardano.Lovelace;
-  // Maybe add rewardsHistory for each reward account too
-}
-
 export interface DelegationTracker {
   rewardsHistory$: Observable<RewardsHistory>;
-  rewardAccounts$: Observable<RewardAccount[]>;
+  rewardAccounts$: Observable<Cardano.RewardAccountInfo[]>;
 }

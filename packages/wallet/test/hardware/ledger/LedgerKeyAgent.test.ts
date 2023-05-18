@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
-import * as mocks from '../../mocks';
+import * as mocks from '../../../../core/test/mocks';
 import { AddressType, CommunicationType, SerializableLedgerKeyAgentData, util } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { CML, Cardano } from '@cardano-sdk/core';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
-import { InitializeTxProps, InitializeTxResult, SingleAddressWallet, setupWallet } from '../../../src';
+import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
 import { LedgerKeyAgent, LedgerTransportType } from '@cardano-sdk/hardware-ledger';
+import { SingleAddressWallet, setupWallet } from '../../../src';
 import { dummyLogger as logger } from 'ts-log';
 import { mockKeyAgentDependencies } from '../../../../key-management/test/mocks';
 import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
@@ -206,8 +207,7 @@ describe('LedgerKeyAgent', () => {
           }
         ]),
         scriptIntegrityHash: scriptDataHash,
-        scripts: [script],
-        witness: { redeemers: [scriptRedeemer] }
+        witness: { redeemers: [scriptRedeemer], scripts: [script] }
       };
 
       const unsignedTx = await wallet.initializeTx(txProps);

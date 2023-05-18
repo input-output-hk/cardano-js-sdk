@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import * as mocks from '../mocks';
+import * as mocks from '../../../core/test/mocks';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
 import {
   CML,
@@ -15,7 +15,7 @@ import { WalletStores, createInMemoryWalletStores } from '../../src/persistence'
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
-import { testAsyncKeyAgent } from '../../../key-management/test/mocks';
+import { stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { toOutgoingTx, waitForWalletStateSettle } from '../util';
 
 const name = 'Test Wallet';
@@ -41,7 +41,7 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
         index: 0,
         networkId: Cardano.NetworkId.Testnet,
         rewardAccount,
-        stakeKeyDerivationPath: mocks.stakeKeyDerivationPath,
+        stakeKeyDerivationPath,
         type: AddressType.External
       };
       const asyncKeyAgent = await testAsyncKeyAgent([groupedAddress], dependencies);

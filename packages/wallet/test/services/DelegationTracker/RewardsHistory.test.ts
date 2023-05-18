@@ -13,7 +13,7 @@ import { createStubTxWithCertificates } from './stub-tx';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 import { dummyLogger } from 'ts-log';
 import { firstValueFrom, of } from 'rxjs';
-import { mockRewardsProvider, rewardAccount, rewardsHistory } from '../../mocks';
+import { mockRewardsProvider, rewardAccount, rewardsHistory } from '../../../../core/test/mocks';
 
 describe('RewardsHistory', () => {
   const rewardAccounts = [rewardAccount];

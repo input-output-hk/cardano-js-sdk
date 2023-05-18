@@ -1,11 +1,14 @@
 import { Cardano } from '@cardano-sdk/core';
 import { CustomError } from 'ts-custom-error';
 
-import { InputSelectionError, SelectionSkeleton } from '@cardano-sdk/input-selection';
+import { InputSelectionError, InputSelector, SelectionSkeleton } from '@cardano-sdk/input-selection';
 
+import { AsyncKeyAgent, GroupedAddress, SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
-import { OutputValidation } from '../types';
-import { SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
+import { InitializeTxWitness, TxBuilderProviders } from '../types';
+import { Logger } from 'ts-log';
+import { OutputBuilderValidator } from './OutputBuilder';
+import { OutputValidation } from '../output-validation';
 
 export type PartialTxOut = Partial<
   Pick<Cardano.TxOut, 'address' | 'datumHash' | 'datum' | 'scriptReference'> & { value: Partial<Cardano.Value> }
@@ -35,56 +38,23 @@ export class OutputValidationTokenBundleSizeError extends CustomError {
   }
 }
 
-export class TxAlreadySubmittedError extends CustomError {
-  public constructor() {
-    super('TxBuilder instance cannot be reused after a transaction is submitted');
-  }
-}
-
-export class IncompatibleWalletError extends CustomError {}
+export class RewardAccountMissingError extends CustomError {}
 
 export type TxOutValidationError =
   | OutputValidationMissingRequiredError
   | OutputValidationMinimumCoinError
   | OutputValidationTokenBundleSizeError;
-export type TxBodyValidationError =
-  | TxOutValidationError
-  | InputSelectionError
-  | IncompatibleWalletError
-  | TxAlreadySubmittedError;
-
-export type Valid<TValid> = TValid & {
-  isValid: true;
-};
-
-export interface Invalid<TError> {
-  isValid: false;
-  errors: TError[];
-}
-
-export interface ValidTxOutData {
-  readonly txOut: Cardano.TxOut;
-}
-
-export type ValidTxOut = Valid<ValidTxOutData>;
-export type InvalidTxOut = Invalid<TxOutValidationError>;
-export type MaybeValidTxOut = ValidTxOut | InvalidTxOut;
+export type TxBodyValidationError = TxOutValidationError | InputSelectionError | RewardAccountMissingError;
 
 /**
- * Helps build transaction outputs from it's constituent parts.
- * Usage examples are in the unit/integration tests from `builtTx.test.ts`.
+ * Helps build transaction outputs from its constituent parts.
+ * Usage examples are in the unit/integration tests from `TxBuilder.test.ts`.
  */
 export interface OutputBuilder {
   /**
-   * Create transaction output snapshot, as it was configured until the point of calling this method.
-   *
-   * @returns {Cardano.TxOut} transaction output snapshot.
-   *  - It can be used in {@link TxBuilder.addOutput}.
-   *  - It will be validated once {@link TxBuilder.build} method is called.
-   * @throws OutputValidationMissingRequiredError {@link OutputValidationMissingRequiredError} if
-   * the mandatory fields 'address' or 'coins' are missing
+   * @returns a partial output that has properties set by calling other TxBuilder methods. Does not validate the output.
    */
-  toTxOut(): Cardano.TxOut;
+  inspect(): Promise<PartialTxOut>;
   /** Sets transaction output `value` field. Preexisting `value` is overwritten. */
   value(value: Cardano.Value): OutputBuilder;
   /** Sets transaction output value `coins` field. */
@@ -108,53 +78,59 @@ export interface OutputBuilder {
   /**
    * Checks if the transaction output is complete and valid
    *
-   * @returns {Promise<MaybeValidTxOut>} When it is a `ValidTxOut` it can be used as input in `TxBuilder.addOutput()`.
-   * In case of it is an `InvalidTxOut`, it embeds a TxOutValidationError with more details
+   * @returns {Promise<Cardano.TxOut>} Promise<Cardano.TxOut> which can be used as input in `TxBuilder.addOutput()`.
+   * @throws {TxOutValidationError} TxOutValidationError
    */
-  build(): Promise<MaybeValidTxOut>;
+  build(): Promise<Cardano.TxOut>;
 }
+
+export interface TxContext {
+  ownAddresses: GroupedAddress[];
+  signingOptions?: SignTransactionOptions;
+  auxiliaryData?: Cardano.AuxiliaryData;
+  witness?: InitializeTxWitness;
+  isValid?: boolean;
+}
+
+export type TxInspection = Cardano.TxBodyWithHash &
+  Pick<TxContext, 'ownAddresses' | 'auxiliaryData'> & {
+    inputSelection: SelectionSkeleton;
+  };
 
 export interface SignedTx {
-  readonly tx: Cardano.Tx;
-  /**
-   * Once the transaction is successfully submitted, calls to the same txBuilder {@link TxBuilder.build} method
-   * will fail with {@link TxAlreadySubmittedError} exception.
-   */
-  submit(): Promise<void>;
+  tx: Cardano.Tx;
 }
 
-/** Transaction body built with {@link TxBuilder.build}. */
-export interface ValidTxBody {
-  readonly body: Cardano.TxBody;
-  readonly auxiliaryData?: Cardano.AuxiliaryData;
-  readonly extraSigners?: TransactionSigner[];
-  readonly signingOptions?: SignTransactionOptions;
-  readonly inputSelection: SelectionSkeleton;
-  readonly hash: Cardano.TransactionId;
-
+/**
+ * Transaction body built with {@link TxBuilder.build}
+ * `const unsignedTx = await txBuilder.build().sign();`
+ * At the same time it allows inspecting the built transaction before signing it:
+ * `const signedTx = await txBuilder.build().inspect();`
+ * Transaction is built lazily: only when inspect() or sign() is called.
+ */
+export interface UnsignedTx {
+  inspect(): Promise<TxInspection>;
   sign(): Promise<SignedTx>;
 }
 
-export type ValidTx = Valid<ValidTxBody>;
-export type InvalidTx = Invalid<TxBodyValidationError>;
-export type MaybeValidTx = ValidTx | InvalidTx;
-
-export interface TxBuilder {
+export interface PartialTx {
   /**
-   * Transaction body that is updated by `TxBuilder` methods.
-   * It should not be updated directly, but this is not restricted to allow experimental HydratedTxBody changes that are not
-   * yet available in the TxBuilder interface.
-   * Every method call recreates the partialTxBody, thus updating it immutably.
+   * Transaction body that is updated by {@link TxBuilder} methods.
    */
-  partialTxBody: Partial<Cardano.TxBody>;
+  body: Partial<Cardano.TxBody>;
   /**
    * TxMetadata to be added in the transaction auxiliary data body blob, after {@link TxBuilder.build}.
-   * Configured using {@link TxBuilder.setMetadata} method.
-   * It should not be updated directly, but this is not restricted to allow experimental HydratedTxBody changes that are not.
+   * Configured using {@link TxBuilder.metadata} method.
    */
   auxiliaryData?: Cardano.AuxiliaryData;
   extraSigners?: TransactionSigner[];
   signingOptions?: SignTransactionOptions;
+}
+export interface TxBuilder {
+  /**
+   * @returns a partial transaction that has properties set by calling other TxBuilder methods. Does not validate the transaction.
+   */
+  inspect(): Promise<PartialTx>;
 
   /** @param txOut transaction output to add to {@link partialTxBody} outputs. */
   addOutput(txOut: Cardano.TxOut): TxBuilder;
@@ -181,33 +157,30 @@ export interface TxBuilder {
    */
   delegate(poolId?: Cardano.PoolId): TxBuilder;
   /** Sets TxMetadata in {@link auxiliaryData} */
-  setMetadata(metadata: Cardano.TxMetadata): TxBuilder;
+  metadata(metadata: Cardano.TxMetadata): TxBuilder;
   /** Sets extra signers in {@link extraSigners} */
-  setExtraSigners(signers: TransactionSigner[]): TxBuilder;
+  extraSigners(signers: TransactionSigner[]): TxBuilder;
   /** Sets signing options in {@link signingOptions} */
-  setSigningOptions(options: SignTransactionOptions): TxBuilder;
+  signingOptions(options: SignTransactionOptions): TxBuilder;
 
   /**
-   * Builds a `ValidTxBody` based on partialTxBody.
+   * Create a snapshot of current transaction properties.
    * All positive balance found in reward accounts is included in the transaction withdrawal.
    * Performs multiple validations to make sure the transaction body is correct.
-   * In case validations fail, it creates a `TxBodyValidationError` instead of `ValidTxBody`.
    *
-   * @returns {Promise<MaybeValidTx>}
-   * - In case it is a {@link ValidTx}, it can be used to sign and submit the transaction.
-   *   This is a snapshot of transaction. Further changes done via TxBuilder, will not update this snapshot.
-   *   Once a transaction is successfully submitted, the TxBuilder cannot be reused.
-   * - In case of it is an `InvalidTx`, it embeds a TxBodyValidationError with more details.
-   * - `InvalidTx` embeds a {@link TxAlreadySubmittedError} error if a transaction built by this TxBuilder
-   *   was already successfully submitted.
+   * @returns {UnsignedTx}
+   * Can be used to build and sign directly: `const signedTx = await txBuilder.build().sign()`,
+   * or inspect the transaction before signing:
+   * ```
+   * const tx = await txBuilder.build();
+   * const unsignedTx = await tx.inspect();
+   * const signedTx = await tx.sign()
+   * ```
+   *
+   * This is a snapshot of transaction. Further changes done via TxBuilder, will not update this snapshot.
+   * @throws {TxBodyValidationError[]} TxBodyValidationError[]
    */
-  build(): Promise<MaybeValidTx>;
-
-  /**
-   * @returns true if a transaction built with this `TxBuilder` was already successfully submitted.
-   *          In this case, the TxBuilder cannot be reused to build other transactions.
-   */
-  isSubmitted(): boolean;
+  build(): UnsignedTx;
 
   // TODO:
   // - setMint
@@ -221,3 +194,14 @@ export interface TxBuilder {
   // - setScriptIntegrityHash(hash: Cardano.util.Hash32ByteBase16 | null);
   // - setRequiredExtraSignatures(keyHashes: Cardano.Ed25519KeyHash[]);
 }
+
+export interface TxBuilderDependencies {
+  inputSelector?: InputSelector;
+  inputResolver: Cardano.InputResolver;
+  keyAgent: AsyncKeyAgent;
+  txBuilderProviders: TxBuilderProviders;
+  logger: Logger;
+  outputValidator?: OutputBuilderValidator;
+}
+
+export type FinalizeTxDependencies = Pick<TxBuilderDependencies, 'inputResolver' | 'keyAgent'>;
