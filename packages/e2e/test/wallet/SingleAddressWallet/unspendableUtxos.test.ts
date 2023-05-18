@@ -36,7 +36,7 @@ describe('SingleAddressWallet/unspendableUtxos', () => {
     // Create a new UTxO to be use as collateral.
     const txOutput = await txBuilder1.buildOutput().address(address).coin(5_000_000n).build();
 
-    const signedTx = await txBuilder1.addOutput(txOutput).build().sign();
+    const { tx: signedTx } = await txBuilder1.addOutput(txOutput).build().sign();
     await wallet1.submitTx(signedTx);
 
     // Search chain history to see if the transaction is there.
@@ -93,7 +93,7 @@ describe('SingleAddressWallet/unspendableUtxos', () => {
       `Failed to find transaction ${signedTx.id} in dest wallet history`
     );
 
-    const signedMoveAdaTx = await txBuilder2
+    const { tx: signedMoveAdaTx } = await txBuilder2
       .addOutput(await txBuilder2.buildOutput().address(address).value(totalBalance).build())
       .build()
       .sign();

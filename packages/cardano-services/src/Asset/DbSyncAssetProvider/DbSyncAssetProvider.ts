@@ -123,8 +123,8 @@ export class DbSyncAssetProvider extends DbSyncProvider() implements AssetProvid
   }
 
   private async getAssetInfo(assetId: Cardano.AssetId): Promise<Asset.AssetInfo> {
-    const name = Asset.util.assetNameFromAssetId(assetId);
-    const policyId = Asset.util.policyIdFromAssetId(assetId);
+    const name = Cardano.AssetId.getAssetName(assetId);
+    const policyId = Cardano.AssetId.getPolicyId(assetId);
     const multiAsset = await this.#builder.queryMultiAsset(policyId, name);
 
     if (!multiAsset)

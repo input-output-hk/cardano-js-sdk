@@ -1,5 +1,6 @@
 import {
   AssetFingerprint,
+  AssetId,
   AssetName,
   Certificate,
   CertificateType,
@@ -19,9 +20,9 @@ import {
 } from '../Cardano/types';
 import { BigIntMath } from '@cardano-sdk/util';
 import { PaymentAddress, RewardAccount, inputsWithAddresses, isAddressWithin } from '../Cardano';
-import { assetNameFromAssetId, policyIdFromAssetId, removeNegativesFromTokenMap } from '../Asset/util';
 import { coalesceValueQuantities } from './coalesceValueQuantities';
 import { nativeScriptPolicyId } from './nativeScript';
+import { removeNegativesFromTokenMap } from '../Asset/util';
 import { resolveInputValue } from '../Cardano/util/resolveInputValue';
 import { subtractValueQuantities } from './subtractValueQuantities';
 type Inspector<Inspection> = (tx: HydratedTx) => Inspection;
@@ -307,7 +308,7 @@ export const mintInspector =
     }
 
     for (const [key, value] of tx.body.mint!.entries()) {
-      const [policyId, assetName] = [policyIdFromAssetId(key), assetNameFromAssetId(key)];
+      const [policyId, assetName] = [AssetId.getPolicyId(key), AssetId.getAssetName(key)];
 
       const mintedAsset: MintedAsset = {
         assetName,

@@ -1,4 +1,3 @@
-import { Asset, Cardano } from '@cardano-sdk/core';
 import { BigIntMath, HexBlob } from '@cardano-sdk/util';
 import {
   BlockModel,
@@ -20,6 +19,7 @@ import {
   WithCertType,
   WithdrawalModel
 } from './types';
+import { Cardano } from '@cardano-sdk/core';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import {
   isDelegationCertModel,
@@ -31,7 +31,7 @@ import {
 
 const addMultiAssetToTokenMap = (multiAsset: MultiAssetModel, tokenMap: Cardano.TokenMap): Cardano.TokenMap => {
   const tokens = new Map(tokenMap);
-  const assetId = Asset.util.assetIdFromPolicyAndName(
+  const assetId = Cardano.AssetId.fromParts(
     multiAsset.policy_id.toString('hex') as unknown as Cardano.PolicyId,
     multiAsset.asset_name.toString('hex') as unknown as Cardano.AssetName
   );

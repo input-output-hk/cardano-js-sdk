@@ -145,13 +145,15 @@ document.querySelector('#destroyWallet')!.addEventListener('click', async () => 
 
 document.querySelector('#buildAndSignTx')!.addEventListener('click', async () => {
   const [{ address: ownAddress }] = await firstValueFrom(wallet.addresses$);
-  const signedTx = await wallet
+  const builtTx = wallet
     .createTxBuilder()
     .addOutput({
       address: ownAddress,
       value: { coins: 2_000_000n }
     })
-    .build()
-    .sign();
+    .build();
+  const { body } = await builtTx.inspect();
+  logger.info('Built tx', body.outputs.length);
+  const { tx: signedTx } = await builtTx.sign();
   setSignature(signedTx.witness.signatures.values().next().value);
 });

@@ -1,11 +1,14 @@
 import { Cardano, Handle } from '@cardano-sdk/core';
 import { CustomError } from 'ts-custom-error';
 
-import { InputSelectionError, SelectionSkeleton } from '@cardano-sdk/input-selection';
+import { InputSelectionError, InputSelector, SelectionSkeleton } from '@cardano-sdk/input-selection';
 
+import { AsyncKeyAgent, GroupedAddress, SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import { InitializeTxWitness, TxBuilderProviders } from '../types';
+import { Logger } from 'ts-log';
+import { OutputBuilderValidator } from './OutputBuilder';
 import { OutputValidation } from '../output-validation';
-import { SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
 
 export type PartialTxOut = Partial<
   Pick<Cardano.TxOut, 'address' | 'datumHash' | 'datum' | 'scriptReference'> & {
@@ -82,33 +85,34 @@ export interface OutputBuilder {
    * @throws {TxOutValidationError} TxOutValidationError
    */
   build(): Promise<Cardano.TxOut>;
-  handle(output: string): OutputBuilder;
 }
 
-export type SignedTx = Cardano.Tx;
+export interface TxContext {
+  ownAddresses: GroupedAddress[];
+  signingOptions?: SignTransactionOptions;
+  auxiliaryData?: Cardano.AuxiliaryData;
+  witness?: InitializeTxWitness;
+  isValid?: boolean;
+}
 
-/** Transaction body built with {@link TxBuilder.build}. */
-export interface UnsignedTx {
-  readonly body: Cardano.TxBody;
-  readonly auxiliaryData?: Cardano.AuxiliaryData;
-  readonly extraSigners?: TransactionSigner[];
-  readonly signingOptions?: SignTransactionOptions;
-  readonly inputSelection: SelectionSkeleton;
-  readonly hash: Cardano.TransactionId;
+export type TxInspection = Cardano.TxBodyWithHash &
+  Pick<TxContext, 'ownAddresses' | 'auxiliaryData'> & {
+    inputSelection: SelectionSkeleton;
+  };
 
-  sign(): Promise<SignedTx>;
+export interface SignedTx {
+  tx: Cardano.Tx;
 }
 
 /**
- * Extended promise for unsigned transactions that allows chaining build() with sign(), without
- * awaiting for the build() operation.
+ * Transaction body built with {@link TxBuilder.build}
  * `const unsignedTx = await txBuilder.build().sign();`
- * At the same time it allows awaiting for build() in case signing is not desired immediately.
- * `const signedTx = await txBuilder.build();`
- * UnsignedTxPromise must also lazy executed, in the sense that the code will be executed only after the Promise is
- * awaited, as opposed to normal Promise behavior where the code is executed when creating the Promise.
+ * At the same time it allows inspecting the built transaction before signing it:
+ * `const signedTx = await txBuilder.build().inspect();`
+ * Transaction is built lazily: only when inspect() or sign() is called.
  */
-export interface UnsignedTxPromise extends Promise<UnsignedTx> {
+export interface UnsignedTx {
+  inspect(): Promise<TxInspection>;
   sign(): Promise<SignedTx>;
 }
 
@@ -163,17 +167,23 @@ export interface TxBuilder {
   signingOptions(options: SignTransactionOptions): TxBuilder;
 
   /**
-   * Builds an {@link UnsignedTx} based on partialTxBody.
+   * Create a snapshot of current transaction properties.
    * All positive balance found in reward accounts is included in the transaction withdrawal.
    * Performs multiple validations to make sure the transaction body is correct.
    *
-   * @returns {UnsignedTxPromise}
-   * - Can be used to build and sign directly: `const signedTx = await txBuilder.build().sign()`, or do the steps
-   *   separately at a later time: `const unsignedTx = await txBuilder.build(); const signedTx = await unsignedTx.sign()`
-   * - This is a snapshot of transaction. Further changes done via TxBuilder, will not update this snapshot.
+   * @returns {UnsignedTx}
+   * Can be used to build and sign directly: `const signedTx = await txBuilder.build().sign()`,
+   * or inspect the transaction before signing:
+   * ```
+   * const tx = await txBuilder.build();
+   * const unsignedTx = await tx.inspect();
+   * const signedTx = await tx.sign()
+   * ```
+   *
+   * This is a snapshot of transaction. Further changes done via TxBuilder, will not update this snapshot.
    * @throws {TxBodyValidationError[]} TxBodyValidationError[]
    */
-  build(): UnsignedTxPromise;
+  build(): UnsignedTx;
 
   // TODO:
   // - setMint
@@ -187,3 +197,14 @@ export interface TxBuilder {
   // - setScriptIntegrityHash(hash: Cardano.util.Hash32ByteBase16 | null);
   // - setRequiredExtraSignatures(keyHashes: Cardano.Ed25519KeyHash[]);
 }
+
+export interface TxBuilderDependencies {
+  inputSelector?: InputSelector;
+  inputResolver: Cardano.InputResolver;
+  keyAgent: AsyncKeyAgent;
+  txBuilderProviders: TxBuilderProviders;
+  logger: Logger;
+  outputValidator?: OutputBuilderValidator;
+}
+
+export type FinalizeTxDependencies = Pick<TxBuilderDependencies, 'inputResolver' | 'keyAgent'>;

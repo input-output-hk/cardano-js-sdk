@@ -67,7 +67,7 @@ describe('delegation rewards', () => {
 
     const submitDelegationTx = async () => {
       logger.info(`Creating delegation tx at epoch #${(await firstValueFrom(wallet1.currentEpoch$)).epochNo}`);
-      const signedTx = await wallet1.createTxBuilder().delegate(poolId).build().sign();
+      const { tx: signedTx } = await wallet1.createTxBuilder().delegate(poolId).build().sign();
       await wallet1.submitTx(signedTx);
       const { epochNo } = await firstValueFrom(wallet1.currentEpoch$);
       logger.info(`Delegation tx ${signedTx.id} submitted at epoch #${epochNo}`);
@@ -84,7 +84,7 @@ describe('delegation rewards', () => {
       for (let i = 0; i < 100; i++) {
         const txBuilder = wallet1.createTxBuilder();
         const txOut = await txBuilder.buildOutput().address(receivingAddress).coin(tAdaToSend).build();
-        const signedTx = await txBuilder.addOutput(txOut).build().sign();
+        const { tx: signedTx } = await txBuilder.addOutput(txOut).build().sign();
         await wallet1.submitTx(signedTx);
       }
     };
@@ -95,11 +95,12 @@ describe('delegation rewards', () => {
       const txBuilder = wallet1.createTxBuilder();
       const txOut = await txBuilder.buildOutput().address(receivingAddress).coin(tAdaToSend).build();
       const tx = await txBuilder.addOutput(txOut).build();
+      const { body } = await tx.inspect();
       logger.debug('Body of tx before sign');
-      logger.info(tx.body);
-      const signedTx = await tx.sign();
+      logger.debug(body);
+      const { tx: signedTx } = await tx.sign();
       logger.debug('Body of tx after sign');
-      logger.info(tx.body);
+      logger.debug(signedTx.body);
 
       return signedTx;
     };

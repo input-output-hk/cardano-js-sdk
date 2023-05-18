@@ -47,6 +47,7 @@
     "prepack": "yarn build"
   },
   "devDependencies": {
+    "@cardano-sdk/util-dev": "^0.9.0",
     "@types/lodash": "^4.14.182",
     "@types/pbkdf2": "^3.1.0",
     "eslint": "^7.32.0",
@@ -65,9 +66,6 @@
     "@cardano-sdk/dapp-connector": "^0.9.0",
     "@cardano-sdk/util": "^0.9.0",
     "@emurgo/cardano-message-signing-nodejs": "^1.0.1",
-    "@ledgerhq/hw-transport": "^6.28.1",
-    "@ledgerhq/hw-transport-node-hid-noevents": "^6.27.12",
-    "@ledgerhq/hw-transport-webhid": "^6.27.12",
     "bip39": "^3.0.4",
     "chacha": "^2.1.0",
     "get-random-values": "^2.0.0",

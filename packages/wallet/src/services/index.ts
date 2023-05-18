@@ -12,3 +12,4 @@ export * from './TipTracker';
 export * from './TransactionReemitter';
 export * from './SupplyDistributionTracker';
 export * from './SmartTxSubmitProvider';
+export * from './KeyAgent';

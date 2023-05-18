@@ -40,10 +40,8 @@ export const txBuilderProperties: RemoteApiProperties<TxBuilder> = {
   },
   build: {
     getApiProperties: () => ({
-      catch: RemoteApiPropertyType.MethodReturningPromise,
-      finally: RemoteApiPropertyType.MethodReturningPromise,
-      sign: RemoteApiPropertyType.MethodReturningPromise,
-      then: RemoteApiPropertyType.MethodReturningPromise
+      inspect: RemoteApiPropertyType.MethodReturningPromise,
+      sign: RemoteApiPropertyType.MethodReturningPromise
     }),
     propType: RemoteApiPropertyType.ApiFactory
   },

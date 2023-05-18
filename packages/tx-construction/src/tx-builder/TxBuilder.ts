@@ -1,25 +1,26 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AsyncKeyAgent, GroupedAddress, SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
-import { contextLogger, deepEquals } from '@cardano-sdk/util';
-
-import { FinalizeTxProps, InitializeTxResult, TxBuilderDependencies } from '../types';
 import {
   OutputBuilder,
   PartialTx,
   PartialTxOut,
   RewardAccountMissingError,
   SignedTx,
-  TxBodyValidationError,
   TxBuilder,
+  TxBuilderDependencies,
+  TxContext,
+  TxInspection,
   TxOutValidationError,
-  UnsignedTx,
-  UnsignedTxPromise
+  UnsignedTx
 } from './types';
-import { OutputValidator, createOutputValidator } from '../output-validation';
-import { TxOutputBuilder } from './OutputBuilder';
+import { OutputBuilderValidator, TxOutputBuilder } from './OutputBuilder';
+import { SelectionSkeleton } from '@cardano-sdk/input-selection';
+import { SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
+import { contextLogger, deepEquals } from '@cardano-sdk/util';
+import { createOutputValidator } from '../output-validation';
 import { finalizeTx } from './finalizeTx';
+import { firstValueFrom } from 'rxjs';
 import { initializeTx } from './initializeTx';
 
 interface Delegate {
@@ -32,62 +33,48 @@ interface KeyDeregistration {
 }
 type DelegateConfig = Delegate | KeyDeregistration;
 
-class GenericUnsignedTxPromise implements UnsignedTxPromise {
-  constructor(private callback: () => Promise<UnsignedTx>) {}
+type BuiltTx = { tx: Cardano.TxBodyWithHash; ctx: TxContext; inputSelection: SelectionSkeleton };
 
-  then<TResult1 = UnsignedTx, TResult2 = never>(
-    onfulfilled?: ((value: UnsignedTx) => TResult1 | PromiseLike<TResult1>) | null | undefined,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null | undefined
-  ): Promise<TResult1 | TResult2> {
-    return this.callback().then(onfulfilled, onrejected);
-  }
-
-  catch<TResult = never>(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | null | undefined
-  ): Promise<UnsignedTx | TResult> {
-    return this.callback().catch(onrejected);
-  }
-  finally(onfinally?: (() => void) | null | undefined): Promise<UnsignedTx> {
-    return this.finally(onfinally);
-  }
-  [Symbol.toStringTag]: string;
-
-  async sign(): Promise<SignedTx> {
-    const tx = await this.callback();
-    return tx.sign();
-  }
+interface Signer {
+  sign(builtTx: BuiltTx): Promise<SignedTx>;
 }
 
-/**
- * Transactions built with {@link GenericTxBuilder.build} method, use this method to sign the transaction.
- *
- * @returns Promise with `SignedTx`.
- */
-const createSignedTx = async ({
-  tx,
-  witness,
-  signingOptions,
-  auxiliaryData,
-  inputResolver,
-  keyAgent,
-  addresses
-}: FinalizeTxProps & {
-  inputResolver: Cardano.InputResolver;
-  keyAgent: AsyncKeyAgent;
-  addresses: GroupedAddress[];
-}): Promise<SignedTx> =>
-  await finalizeTx(
-    {
-      addresses,
-      auxiliaryData,
-      signingOptions,
+interface Builder {
+  build(): Promise<BuiltTx>;
+}
+
+interface LazySignerProps {
+  builder: Builder;
+  signer: Signer;
+}
+
+class LazyTxSigner implements UnsignedTx {
+  #built?: BuiltTx;
+  #signer: Signer;
+  #builder: Builder;
+
+  constructor({ builder, signer }: LazySignerProps) {
+    this.#builder = builder;
+    this.#signer = signer;
+  }
+
+  async #build() {
+    return (this.#built ||= await this.#builder.build());
+  }
+
+  async inspect(): Promise<TxInspection> {
+    const {
       tx,
-      witness
-    },
-    { inputResolver, keyAgent }
-  );
+      ctx: { ownAddresses, auxiliaryData },
+      inputSelection
+    } = await this.#build();
+    return { ...tx, auxiliaryData, inputSelection, ownAddresses };
+  }
+
+  async sign(): Promise<SignedTx> {
+    return this.#signer.sign(await this.#build());
+  }
+}
 
 export class GenericTxBuilder implements TxBuilder {
   partialTxBody: Partial<Cardano.TxBody> = {};
@@ -96,15 +83,16 @@ export class GenericTxBuilder implements TxBuilder {
   partialSigningOptions?: SignTransactionOptions;
 
   #dependencies: TxBuilderDependencies;
-  #outputValidator: OutputValidator;
+  #outputValidator: OutputBuilderValidator;
   #delegateConfig: DelegateConfig;
   #logger: Logger;
 
-  constructor(
-    dependencies: TxBuilderDependencies,
-    outputValidator = createOutputValidator({ protocolParameters: dependencies.txBuilderProviders.protocolParameters })
-  ) {
-    this.#outputValidator = outputValidator;
+  constructor(dependencies: TxBuilderDependencies) {
+    this.#outputValidator =
+      dependencies.outputValidator ||
+      createOutputValidator({
+        protocolParameters: dependencies.txBuilderProviders.protocolParameters
+      });
     this.#dependencies = dependencies;
     this.#logger = dependencies.logger;
   }
@@ -159,56 +147,56 @@ export class GenericTxBuilder implements TxBuilder {
     return this;
   }
 
-  build(): UnsignedTxPromise {
-    return new GenericUnsignedTxPromise(() => {
-      this.#logger.debug('Building');
-      return this.#addDelegationCertificates()
-        .then(() => this.#validateOutputs())
-        .then(() => {
-          if (this.partialAuxiliaryData) {
-            this.partialTxBody.auxiliaryDataHash = Cardano.computeAuxiliaryDataHash(this.partialAuxiliaryData);
+  build(): UnsignedTx {
+    return new LazyTxSigner({
+      builder: {
+        build: async () => {
+          this.#logger.debug('Building');
+          try {
+            await this.#addDelegationCertificates();
+            await this.#validateOutputs();
+            // Take a snapshot of returned properties,
+            // so that they don't change while `initializeTx` is resolving
+            const ownAddresses = await firstValueFrom(this.#dependencies.keyAgent.knownAddresses$);
+            const auxiliaryData = this.partialAuxiliaryData && { ...this.partialAuxiliaryData };
+            const extraSigners = this.partialExtraSigners && [...this.partialExtraSigners];
+            const signingOptions = this.partialSigningOptions && { ...this.partialSigningOptions };
+
+            if (this.partialAuxiliaryData) {
+              this.partialTxBody.auxiliaryDataHash = Cardano.computeAuxiliaryDataHash(this.partialAuxiliaryData);
+            }
+
+            const { body, hash, inputSelection } = await initializeTx(
+              {
+                auxiliaryData,
+                certificates: this.partialTxBody.certificates,
+                outputs: new Set(this.partialTxBody.outputs || []),
+                signingOptions,
+                witness: { extraSigners }
+              },
+              this.#dependencies
+            );
+            return {
+              ctx: {
+                auxiliaryData,
+                ownAddresses,
+                signingOptions,
+                witness: { extraSigners }
+              },
+              inputSelection,
+              tx: { body, hash }
+            };
+          } catch (error) {
+            this.#logger.debug('Transaction build error', error);
+            if (Array.isArray(error)) throw error[0];
+            throw error;
           }
-
-          return initializeTx(
-            {
-              auxiliaryData: this.partialAuxiliaryData,
-              certificates: this.partialTxBody.certificates,
-              outputs: new Set(this.partialTxBody.outputs || []),
-              signingOptions: this.partialSigningOptions,
-              witness: { extraSigners: this.partialExtraSigners }
-            },
-            this.#dependencies
-          );
-        })
-        .then((tx) => this.#createValidTx(tx))
-        .catch((error) => {
-          const errors = Array.isArray(error) ? (error as TxBodyValidationError[]) : [error as TxBodyValidationError];
-          this.#logger.debug('Build errors', errors);
-          throw errors;
-        });
+        }
+      },
+      signer: {
+        sign: ({ tx, ctx }) => finalizeTx(tx, ctx, this.#dependencies)
+      }
     });
-  }
-
-  #createValidTx(tx: InitializeTxResult): UnsignedTx {
-    this.#logger.debug('createValidTx', tx);
-    return {
-      auxiliaryData: this.partialAuxiliaryData && { ...this.partialAuxiliaryData },
-      body: tx.body,
-      extraSigners: this.partialExtraSigners && [...this.partialExtraSigners],
-      hash: tx.hash,
-      inputSelection: tx.inputSelection,
-      sign: async () =>
-        createSignedTx({
-          addresses: await this.#dependencies.txBuilderProviders.addresses(),
-          auxiliaryData: this.partialAuxiliaryData && { ...this.partialAuxiliaryData },
-          inputResolver: this.#dependencies.inputResolver,
-          keyAgent: this.#dependencies.keyAgent,
-          signingOptions: this.partialSigningOptions && { ...this.partialSigningOptions },
-          tx,
-          witness: { extraSigners: this.partialExtraSigners && [...this.partialExtraSigners] }
-        }),
-      signingOptions: this.partialSigningOptions && { ...this.partialSigningOptions }
-    };
   }
 
   /** @throws {TxOutValidationError[]} TxOutValidationError[] in case of validation errors */

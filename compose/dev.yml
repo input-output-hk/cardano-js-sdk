@@ -1,6 +1,10 @@
 version: '3.9'
 
 services:
+  pg-boss-worker:
+    volumes:
+      - ../..:/app
+
   projector:
     volumes:
       - ../..:/app

@@ -3,7 +3,6 @@ import { Cardano } from '../..';
 import { CustomError } from 'ts-custom-error';
 import { Logger } from 'ts-log';
 import { asMetadatumArray, asMetadatumMap } from '../../util/metadatum';
-import { assetIdFromPolicyAndName } from './assetId';
 import { isNotNil } from '@cardano-sdk/util';
 import difference from 'lodash/difference';
 
@@ -70,6 +69,7 @@ const mapFile = (metadatum: Cardano.Metadatum, assetId: Cardano.AssetId, logger:
  * The policyId in the `policy` Map can be encoded as per CIP-0025 v1 or v2 specifications.
  *
  * @param policy The `MetadatumMap` containing the NFT metadata for all the NFT assets
+ * @param policyId The token policy id.
  * @returns The `MetadatumMap` containing the NFT metadata for all the NFT assets with the given policyId
  */
 const getPolicyMetadata = (policy: Cardano.MetadatumMap, policyId: Cardano.PolicyId) =>
@@ -120,7 +120,7 @@ export const metadatumToCip25 = (
   if (!assetMetadata) return null;
   const name = asString(assetMetadata.get('name'));
   const image = metadatumToString(assetMetadata.get('image'));
-  const assetId = assetIdFromPolicyAndName(asset.policyId, asset.name);
+  const assetId = Cardano.AssetId.fromParts(asset.policyId, asset.name);
   if (!name || !image) {
     logger.warn(missingFieldLogMessage(!name ? 'name' : 'image', assetId, true));
     return null;

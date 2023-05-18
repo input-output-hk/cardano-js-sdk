@@ -1,8 +1,8 @@
 import { Cardano } from '@cardano-sdk/core';
-import { FinalizeTxProps, InitializeTxProps } from '@cardano-sdk/tx-construction';
+import { FinalizeTxProps, SingleAddressWallet, TransactionFailure } from '@cardano-sdk/wallet';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, isNotNil } from '@cardano-sdk/util';
-import { SingleAddressWallet, TransactionFailure } from '@cardano-sdk/wallet';
+import { InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import { firstValueFromTimed, walletReady } from '../../util';
@@ -26,7 +26,7 @@ const createCollateral = async (
   // Create a new UTxO to be use as collateral.
   const txOutput = await txBuilder.buildOutput().address(address).coin(5_000_000n).build();
 
-  const signedTx = await txBuilder.addOutput(txOutput).build().sign();
+  const { tx: signedTx } = await txBuilder.addOutput(txOutput).build().sign();
   await wallet.submitTx(signedTx);
 
   // Wait for transaction to be on chain.
@@ -118,16 +118,14 @@ describe('SingleAddressWallet/phase2validation', () => {
         }
       ]),
       scriptIntegrityHash: scriptDataHash,
-      scripts: [alwaysFailScript],
-      witness: { redeemers: [scriptRedeemer] }
+      witness: { redeemers: [scriptRedeemer], scripts: [alwaysFailScript] }
     };
 
     const unsignedTx = await wallet.initializeTx(txProps);
     const finalizeProps: FinalizeTxProps = {
       isValid: false,
-      scripts: [alwaysFailScript],
       tx: unsignedTx,
-      witness: { redeemers: [scriptRedeemer] }
+      witness: { redeemers: [scriptRedeemer], scripts: [alwaysFailScript] }
     };
 
     const signedTx = await wallet.finalizeTx(finalizeProps);

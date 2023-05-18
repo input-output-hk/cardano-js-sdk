@@ -3,8 +3,6 @@ import { Cardano } from '@cardano-sdk/core';
 import { HexBlob, Shutdown } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
 import { Observable } from 'rxjs';
-import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
-import TransportWebHID from '@ledgerhq/hw-transport-webhid';
 
 export interface SignBlobResult {
   publicKey: Crypto.Ed25519PublicKeyHex;
@@ -120,8 +118,6 @@ export type SerializableKeyAgentData =
   | SerializableLedgerKeyAgentData
   | SerializableTrezorKeyAgentData;
 
-export type LedgerTransportType = TransportWebHID | TransportNodeHid;
-
 export interface KeyPair {
   skey: Crypto.Bip32PrivateKeyHex;
   vkey: Crypto.Bip32PublicKeyHex;
@@ -160,10 +156,17 @@ export interface KeyAgent {
    * @throws AuthenticationError
    */
   derivePublicKey(derivationPath: AccountKeyDerivationPath): Promise<Crypto.Ed25519PublicKeyHex>;
+
   /**
-   * @throws AuthenticationError
+   * Derives an address from the given payment key and stake key derivation path.
+   *
+   * @param paymentKeyDerivationPath The payment key derivation path.
+   * @param stakeKeyDerivationIndex The stake key index. This field is optional. If not provided it defaults to index 0.
    */
-  deriveAddress(derivationPath: AccountAddressDerivationPath): Promise<GroupedAddress>;
+  deriveAddress(
+    paymentKeyDerivationPath: AccountAddressDerivationPath,
+    stakeKeyDerivationIndex: number
+  ): Promise<GroupedAddress>;
   /**
    * @throws AuthenticationError
    */

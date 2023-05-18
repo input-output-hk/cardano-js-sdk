@@ -33,7 +33,7 @@ describe('SingleAddressWallet/byron', () => {
       .coin(3_000_000n)
       .build();
 
-    const signedTx = await txBuilder.addOutput(txOutput).build().sign();
+    const { tx: signedTx } = await txBuilder.addOutput(txOutput).build().sign();
     await wallet.submitTx(signedTx);
 
     // Search chain history to see if the transaction is there.

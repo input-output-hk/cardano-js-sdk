@@ -29,8 +29,8 @@ import {
   networkInfoProviderFactory,
   walletVariables
 } from '../src';
-import { FinalizeTxProps, InitializeTxProps, SignedTx } from '@cardano-sdk/tx-construction';
-import { ObservableWallet, SingleAddressWallet } from '@cardano-sdk/wallet';
+import { FinalizeTxProps, ObservableWallet, SingleAddressWallet } from '@cardano-sdk/wallet';
+import { InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { logger } from '@cardano-sdk/util-dev';
 import sortBy from 'lodash/sortBy';
 
@@ -181,7 +181,7 @@ export const transferCoins = async ({ fromWallet, toWallet, coins }: TransferCoi
   // Send 50 tADA to second wallet.
   const txBuilder = fromWallet.createTxBuilder();
   const txOut = await txBuilder.buildOutput().address(receivingAddress).coin(coins).build();
-  const signedTx = await txBuilder.addOutput(txOut).build().sign();
+  const { tx: signedTx } = await txBuilder.addOutput(txOut).build().sign();
 
   // Wait until wallet two is aware of the funds.
   await Promise.all([fromWallet.submitTx(signedTx), txConfirmed(toWallet, signedTx)]);
@@ -303,16 +303,14 @@ export const burnTokens = async ({
   const negativeTokens = new Map([...tokens].map(([assetId, value]) => [assetId, -value]));
   const txProps: InitializeTxProps = {
     mint: negativeTokens,
-    scripts,
-    witness: { extraSigners }
+    witness: { extraSigners, scripts }
   };
 
   const unsignedTx = await wallet.initializeTx(txProps);
 
   const finalizeProps: FinalizeTxProps = {
-    scripts,
     tx: unsignedTx,
-    witness: { extraSigners }
+    witness: { extraSigners, scripts }
   };
 
   const signedTx = await wallet.finalizeTx(finalizeProps);

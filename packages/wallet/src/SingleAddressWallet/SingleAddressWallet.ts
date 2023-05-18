@@ -15,7 +15,14 @@ import {
   TxSubmitProvider,
   UtxoProvider
 } from '@cardano-sdk/core';
-import { Assets, ObservableWallet, SignDataProps, SyncStatus, WalletNetworkInfoProvider } from '../types';
+import {
+  Assets,
+  FinalizeTxProps,
+  ObservableWallet,
+  SignDataProps,
+  SyncStatus,
+  WalletNetworkInfoProvider
+} from '../types';
 import {
   BalanceTracker,
   ConnectionStatus,
@@ -71,7 +78,6 @@ import {
 } from 'rxjs';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import {
-  FinalizeTxProps,
   GenericTxBuilder,
   InitializeTxProps,
   InitializeTxResult,
@@ -251,7 +257,7 @@ export class SingleAddressWallet implements ObservableWallet {
               if (addresses.length === 0) {
                 this.#logger.debug('No addresses available; deriving one');
                 void keyAgent
-                  .deriveAddress({ index: 0, type: AddressType.External })
+                  .deriveAddress({ index: 0, type: AddressType.External }, 0)
                   .catch(() => this.#logger.error('Failed to derive address'));
               }
             }
@@ -438,16 +444,18 @@ export class SingleAddressWallet implements ObservableWallet {
     return initializeTx(props, this.getTxBuilderDependencies());
   }
 
-  async finalizeTx(props: FinalizeTxProps, stubSign = false): Promise<Cardano.Tx> {
-    return finalizeTx(
-      { ...props, addresses: await firstValueFrom(this.addresses$) },
+  async finalizeTx({ tx, ...rest }: FinalizeTxProps, stubSign = false): Promise<Cardano.Tx> {
+    const { tx: signedTx } = await finalizeTx(
+      tx,
+      { ...rest, ownAddresses: await firstValueFrom(this.addresses$) },
       { inputResolver: this.util, keyAgent: this.keyAgent },
       stubSign
     );
+    return signedTx;
   }
 
   createTxBuilder() {
-    return new GenericTxBuilder(this.getTxBuilderDependencies(), this.util);
+    return new GenericTxBuilder(this.getTxBuilderDependencies());
   }
 
   async submitTx(
@@ -537,8 +545,8 @@ export class SingleAddressWallet implements ObservableWallet {
       inputSelector: this.#inputSelector,
       keyAgent: this.keyAgent,
       logger: this.#logger,
+      outputValidator: this.util,
       txBuilderProviders: {
-        addresses: () => this.#firstValueFromSettled(this.addresses$),
         changeAddress: () =>
           this.#firstValueFromSettled(this.addresses$.pipe(map(([{ address: changeAddress }]) => changeAddress))),
         genesisParameters: () => this.#firstValueFromSettled(this.genesisParameters$),

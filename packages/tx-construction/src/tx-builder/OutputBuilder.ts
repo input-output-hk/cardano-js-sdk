@@ -11,16 +11,18 @@ import {
 } from './types';
 import { OutputValidation, OutputValidator } from '../output-validation';
 
+export type OutputBuilderValidator = Pick<OutputValidator, 'validateOutput'>;
+
 /** Properties needed to construct a {@link TxOutputBuilder} */
 export interface OutputBuilderProps {
   /** This validator is normally created and passed as an arg here by the {@link TxBuilder.buildOutput} method */
-  outputValidator: OutputValidator;
+  outputValidator: OutputBuilderValidator;
   /** Optional partial transaction output to use for initialization. */
   txOut?: PartialTxOut;
   /** Logger */
   logger: Logger;
   /** Koralabs Handle Provider for ADAHandle */
-  handleProvider: KoraLabsHandleProvider;
+  handleProvider?: KoraLabsHandleProvider;
 }
 
 /** Determines if the `PartialTxOut` arg has at least an address and coins. */
@@ -51,15 +53,14 @@ export class TxOutputBuilder implements OutputBuilder {
    * Every method call recreates the `partialOutput`, thus updating it immutably.
    */
   #partialOutput: PartialTxOut;
-  #outputValidator: OutputValidator;
+  #outputValidator: OutputBuilderValidator;
   #logger: Logger;
   #handleProvider: KoraLabsHandleProvider;
 
-  constructor({ outputValidator, txOut, logger, handleProvider }: OutputBuilderProps) {
+  constructor({ outputValidator, txOut, logger }: OutputBuilderProps) {
     this.#partialOutput = { ...txOut };
     this.#outputValidator = outputValidator;
     this.#logger = logger;
-    this.#handleProvider = handleProvider;
   }
 
   /**

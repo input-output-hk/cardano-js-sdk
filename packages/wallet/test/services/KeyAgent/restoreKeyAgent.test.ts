@@ -8,12 +8,12 @@ import {
   SerializableInMemoryKeyAgentData,
   SerializableLedgerKeyAgentData,
   SerializableTrezorKeyAgentData,
-  restoreKeyAgent
-} from '../src';
+  errors,
+  util
+} from '@cardano-sdk/key-management';
 import { CML, Cardano } from '@cardano-sdk/core';
-import { InvalidSerializableDataError } from '../src/errors';
-import { STAKE_KEY_DERIVATION_PATH } from '../src/util';
 import { dummyLogger } from 'ts-log';
+import { restoreKeyAgent } from '../../../src';
 
 describe('KeyManagement/restoreKeyAgent', () => {
   const dependencies: KeyAgentDependencies = {
@@ -75,7 +75,7 @@ describe('KeyManagement/restoreKeyAgent', () => {
           index: 0,
           networkId: Cardano.NetworkId.Mainnet,
           rewardAccount,
-          stakeKeyDerivationPath: STAKE_KEY_DERIVATION_PATH,
+          stakeKeyDerivationPath: util.STAKE_KEY_DERIVATION_PATH,
           type: AddressType.External
         }
       ]
@@ -92,7 +92,7 @@ describe('KeyManagement/restoreKeyAgent', () => {
       );
 
       for (const knownAddress of keyAgent.knownAddresses) {
-        expect(knownAddress.stakeKeyDerivationPath).toBe(STAKE_KEY_DERIVATION_PATH);
+        expect(knownAddress.stakeKeyDerivationPath).toBe(util.STAKE_KEY_DERIVATION_PATH);
       }
     });
 
@@ -103,7 +103,9 @@ describe('KeyManagement/restoreKeyAgent', () => {
 
     it('throws when attempting to restore key manager from valid data and no passphrase', async () => {
       await expect(() => restoreKeyAgent(inMemoryKeyAgentData, dependencies)).rejects.toThrowError(
-        new InvalidSerializableDataError('Expected "getPassphrase" in RestoreKeyAgentProps for InMemoryKeyAgent"')
+        new errors.InvalidSerializableDataError(
+          'Expected "getPassphrase" in RestoreKeyAgentProps for InMemoryKeyAgent"'
+        )
       );
     });
 
@@ -134,7 +136,7 @@ describe('KeyManagement/restoreKeyAgent', () => {
           index: 0,
           networkId: Cardano.NetworkId.Mainnet,
           rewardAccount: Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr'),
-          stakeKeyDerivationPath: STAKE_KEY_DERIVATION_PATH,
+          stakeKeyDerivationPath: util.STAKE_KEY_DERIVATION_PATH,
           type: AddressType.External
         }
       ]
@@ -164,7 +166,7 @@ describe('KeyManagement/restoreKeyAgent', () => {
           index: 0,
           networkId: Cardano.NetworkId.Mainnet,
           rewardAccount: Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr'),
-          stakeKeyDerivationPath: STAKE_KEY_DERIVATION_PATH,
+          stakeKeyDerivationPath: util.STAKE_KEY_DERIVATION_PATH,
           type: AddressType.External
         }
       ],
@@ -194,7 +196,7 @@ describe('KeyManagement/restoreKeyAgent', () => {
         dependencies
       )
     ).rejects.toThrowError(
-      new InvalidSerializableDataError("Restoring key agent of __typename 'OTHER' is not implemented")
+      new errors.InvalidSerializableDataError("Restoring key agent of __typename 'OTHER' is not implemented")
     );
   });
 });

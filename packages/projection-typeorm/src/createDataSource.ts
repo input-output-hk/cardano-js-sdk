@@ -1,10 +1,9 @@
 import 'reflect-metadata';
-import { BossDb } from './pgBoss';
 import { DataSource, DataSourceOptions, DefaultNamingStrategy, NamingStrategyInterface, QueryRunner } from 'typeorm';
 import { Logger } from 'ts-log';
 import { contextLogger, patchObject } from '@cardano-sdk/util';
+import { createPgBoss } from './pgBoss';
 import { typeormLogger } from './logger';
-import PgBoss from 'pg-boss';
 import snakeCase from 'lodash/snakeCase';
 
 export interface DataSourceExtensions {
@@ -107,9 +106,7 @@ const initializePgBoss = async (dataSource: DataSource, logger: Logger, usePgBos
     if (!usePgBoss) {
       return;
     }
-    const boss = new PgBoss({
-      db: new BossDb(queryRunner)
-    });
+    const boss = createPgBoss(queryRunner, logger);
     await queryRunner.query('CREATE EXTENSION IF NOT EXISTS pgcrypto;');
     await boss.start();
     await boss.stop();

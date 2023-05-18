@@ -289,18 +289,9 @@ describe('SingleAddressWallet methods', () => {
 
     it('txBuilder providers wait for the wallet to settle before resolving', async () => {
       const {
-        txBuilderProviders: {
-          addresses,
-          changeAddress,
-          genesisParameters,
-          protocolParameters,
-          rewardAccounts,
-          tip,
-          utxoAvailable
-        }
+        txBuilderProviders: { changeAddress, genesisParameters, protocolParameters, rewardAccounts, tip, utxoAvailable }
       } = wallet.getTxBuilderDependencies();
 
-      await expect(promiseTimeout(addresses())).rejects.toEqual('TIMEOUT');
       await expect(promiseTimeout(changeAddress())).rejects.toEqual('TIMEOUT');
       await expect(promiseTimeout(genesisParameters())).rejects.toEqual('TIMEOUT');
       await expect(promiseTimeout(protocolParameters())).rejects.toEqual('TIMEOUT');
@@ -310,7 +301,6 @@ describe('SingleAddressWallet methods', () => {
 
       isSettledMock$.next(true);
 
-      await expect(promiseTimeout(addresses())).resolves.toEqual([expect.objectContaining({ address })]);
       await expect(promiseTimeout(changeAddress())).resolves.toEqual(address);
       await expect(promiseTimeout(genesisParameters())).resolves.toEqual(mocks.genesisParameters);
       await expect(promiseTimeout(protocolParameters())).resolves.toEqual(mocks.protocolParameters);

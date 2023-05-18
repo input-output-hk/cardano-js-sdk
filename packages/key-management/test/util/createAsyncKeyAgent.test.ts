@@ -29,8 +29,8 @@ describe('createAsyncKeyAgent maps KeyAgent to AsyncKeyAgent', () => {
     expect(await asyncKeyAgent.getChainId()).toEqual(keyAgent.chainId);
   });
   it('deriveAddress/signBlob/signTransaction are unchanged', async () => {
-    await expect(asyncKeyAgent.deriveAddress(addressDerivationPath)).resolves.toEqual(
-      await keyAgent.deriveAddress(addressDerivationPath)
+    await expect(asyncKeyAgent.deriveAddress(addressDerivationPath, 0)).resolves.toEqual(
+      await keyAgent.deriveAddress(addressDerivationPath, 0)
     );
     const keyDerivationPath = { index: 0, role: 0 };
     const blob = HexBlob('abc123');
@@ -48,7 +48,7 @@ describe('createAsyncKeyAgent maps KeyAgent to AsyncKeyAgent', () => {
   });
   it('knownAddresses$ is emits initial addresses and after new address derivation', async () => {
     await expect(firstValueFrom(asyncKeyAgent.knownAddresses$)).resolves.toEqual(keyAgent.knownAddresses);
-    await asyncKeyAgent.deriveAddress(addressDerivationPath);
+    await asyncKeyAgent.deriveAddress(addressDerivationPath, 0);
     await expect(firstValueFrom(asyncKeyAgent.knownAddresses$)).resolves.toEqual(keyAgent.knownAddresses);
   });
   it('stops emitting addresses$ after shutdown', (done) => {
@@ -59,6 +59,6 @@ describe('createAsyncKeyAgent maps KeyAgent to AsyncKeyAgent', () => {
         throw new Error('Should not emit');
       }
     });
-    void asyncKeyAgent.deriveAddress(addressDerivationPath);
+    void asyncKeyAgent.deriveAddress(addressDerivationPath, 0);
   });
 });

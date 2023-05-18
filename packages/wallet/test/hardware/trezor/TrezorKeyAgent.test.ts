@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import * as mocks from '../../../core/test/mocks';
+import * as mocks from '../../../../core/test/mocks';
 import {
   AddressType,
   CommunicationType,
@@ -10,9 +10,9 @@ import {
 } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { CML, Cardano } from '@cardano-sdk/core';
-import { SingleAddressWallet, setupWallet } from '../../src';
+import { SingleAddressWallet, setupWallet } from '../../../src';
 import { dummyLogger as logger } from 'ts-log';
-import { mockKeyAgentDependencies, stakeKeyDerivationPath } from '../../../key-management/test/mocks';
+import { mockKeyAgentDependencies, stakeKeyDerivationPath } from '../../../../key-management/test/mocks';
 
 describe('TrezorKeyAgent', () => {
   let keyAgent: TrezorKeyAgent;

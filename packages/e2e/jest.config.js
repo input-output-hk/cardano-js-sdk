@@ -30,6 +30,7 @@ module.exports = {
     project('local-network'),
     project('long-running'),
     project('ogmios'),
+    project('pg-boss'),
     project('projection'),
     project('providers'),
     project('wallet'),

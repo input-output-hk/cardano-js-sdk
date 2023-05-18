@@ -33,7 +33,7 @@ describe('SingleAddressWallet/txChainHistory', () => {
     // Send 10 tADA to the same wallet.
     const txBuilder = wallet.createTxBuilder();
     const txOutput = await txBuilder.buildOutput().address(receivingAddress).coin(tAdaToSend).build();
-    const signedTx = await txBuilder.addOutput(txOutput).build().sign();
+    const { tx: signedTx } = await txBuilder.addOutput(txOutput).build().sign();
     await wallet.submitTx(signedTx);
 
     logger.info(

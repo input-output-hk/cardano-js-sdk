@@ -107,7 +107,7 @@ describe('InMemoryKeyAgent', () => {
   });
 
   test('deriveAddress', async () => {
-    const address = await keyAgent.deriveAddress({ index: 1, type: AddressType.Internal });
+    const address = await keyAgent.deriveAddress({ index: 1, type: AddressType.Internal }, 0);
     expect(address).toBeDefined();
   });
 
@@ -257,10 +257,13 @@ describe('InMemoryKeyAgent', () => {
         },
         { bip32Ed25519, inputResolver, logger: dummyLogger }
       );
-      const derivedAddress = await keyAgentFromEncryptedKey.deriveAddress({
-        index: 1,
-        type: AddressType.External
-      });
+      const derivedAddress = await keyAgentFromEncryptedKey.deriveAddress(
+        {
+          index: 1,
+          type: AddressType.External
+        },
+        0
+      );
       expect(derivedAddress.rewardAccount).toEqual(daedelusStakeAddress);
     });
 
@@ -273,10 +276,13 @@ describe('InMemoryKeyAgent', () => {
         },
         { bip32Ed25519, inputResolver, logger: dummyLogger }
       );
-      const derivedAddress = await keyAgentFromMnemonic.deriveAddress({
-        index: 1,
-        type: AddressType.External
-      });
+      const derivedAddress = await keyAgentFromMnemonic.deriveAddress(
+        {
+          index: 1,
+          type: AddressType.External
+        },
+        0
+      );
       expect(derivedAddress.rewardAccount).toEqual(daedelusStakeAddress);
     });
   });

@@ -103,7 +103,7 @@ describe('SingleAddressWallet/delegation', () => {
     const destAddresses = (await firstValueFrom(destWallet.addresses$))[0].address;
     const txBuilder = sourceWallet.createTxBuilder();
 
-    const tx = await txBuilder
+    const { tx } = await txBuilder
       .addOutput(await txBuilder.buildOutput().address(destAddresses).coin(tx1OutputCoins).build())
       .delegate(poolId)
       .build()
@@ -155,7 +155,7 @@ describe('SingleAddressWallet/delegation', () => {
     }
 
     // Make a 2nd tx with key de-registration
-    const txDeregisterSigned = await sourceWallet.createTxBuilder().delegate().build().sign();
+    const { tx: txDeregisterSigned } = await sourceWallet.createTxBuilder().delegate().build().sign();
     await sourceWallet.submitTx(txDeregisterSigned);
     await waitForTx(sourceWallet, txDeregisterSigned.id);
     const tx2ConfirmedState = await getWalletStateSnapshot(sourceWallet);

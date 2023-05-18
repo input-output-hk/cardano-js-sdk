@@ -15,7 +15,7 @@ describe('cip30signData', () => {
     const keyAgentReady = testKeyAgent();
     keyAgent = await keyAgentReady;
     asyncKeyAgent = await testAsyncKeyAgent(undefined, undefined, keyAgentReady);
-    address = await asyncKeyAgent.deriveAddress(addressDerivationPath);
+    address = await asyncKeyAgent.deriveAddress(addressDerivationPath, 0);
   });
 
   const signAndDecode = async (signWith: Cardano.PaymentAddress | Cardano.RewardAccount) => {

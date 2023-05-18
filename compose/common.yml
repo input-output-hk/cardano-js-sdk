@@ -50,6 +50,29 @@ services:
       - node-db:/db
       - node-ipc:/ipc
 
+  pg-boss-worker:
+    <<: *logging
+    build:
+      context: ../../
+      target: pg-boss-worker
+    depends_on:
+      projector:
+        condition: service_healthy
+    environment:
+      - QUEUES=${QUEUES:-pool-metadata}
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -s --fail http://localhost:3003/health']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    ports:
+      - ${PG_BOSS_PORT:-4003}:3003
+    restart: on-failure
+    secrets:
+      - postgres_db_projection
+      - postgres_password
+      - postgres_user
+
   postgres:
     <<: *logging
     command: postgres -c shared_preload_libraries=pg_stat_statements -c pg_stat_statements.track=all
@@ -81,10 +104,14 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      cardano-node-ogmios:
+        condition: service_healthy
     environment:
+      - DROP_SCHEMA=${DROP_PROJECTOR_SCHEMA:-false}
       - OGMIOS_URL=ws://cardano-node-ogmios:1337
     healthcheck:
-      test: ['CMD-SHELL', 'curl -s --fail http://localhost:3002/health']
+      test:
+        ['CMD-SHELL', 'test `curl -fs http://localhost:3002/health | jq -r ".services[0].projectedTip.blockNo"` -gt 1']
       interval: 10s
       timeout: 5s
       retries: 10

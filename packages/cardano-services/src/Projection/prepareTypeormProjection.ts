@@ -19,8 +19,6 @@ import {
 import { Mappers as Mapper } from '@cardano-sdk/projection';
 import { Sorter } from '@hapi/topo';
 
-export { DataSource } from 'typeorm';
-
 /**
  * Used as mount segments, so must be URL-friendly
  *

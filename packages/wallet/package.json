@@ -49,7 +49,8 @@
     "prepack": "yarn build",
     "test": "jest -c ./jest.config.js",
     "test:build:verify": "tsc --build ./test",
-    "test:hw": "jest ./test/hardware/* -c ./hw.jest.config.js --runInBand",
+    "test:hw:ledger": "jest ./test/hardware/ledger/* -c ./hw.jest.config.js --runInBand",
+    "test:hw:trezor": "jest ./test/hardware/trezor/* -c ./hw.jest.config.js --runInBand",
     "test:debug": "DEBUG=true yarn test",
     "test:e2e": "shx echo 'test:e2e' command not implemented yet"
   },
@@ -78,6 +79,7 @@
     "@cardano-sdk/core": "^0.11.0",
     "@cardano-sdk/crypto": "^0.1.4",
     "@cardano-sdk/dapp-connector": "^0.9.0",
+    "@cardano-sdk/hardware-ledger": "^0.1.0",
     "@cardano-sdk/input-selection": "^0.9.1",
     "@cardano-sdk/key-management": "^0.5.1",
     "@cardano-sdk/tx-construction": "^0.4.0",

@@ -29,7 +29,7 @@ describe('SingleAddressWallet/metadata', () => {
     // Make sure the wallet has sufficient funds to run this test
     await walletReady(wallet, minimumCoin);
 
-    const signedTx = await wallet
+    const { tx: signedTx } = await wallet
       .createTxBuilder()
       .addOutput({ address: ownAddress, value: { coins: minimumCoin } })
       .metadata(metadata)

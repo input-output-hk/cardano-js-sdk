@@ -7,7 +7,7 @@ export const rewardAccountBalance = 33_333n;
 
 export const ledgerTip = {
   blockNo: Cardano.BlockNo(1_111_111),
-  hash: '10d64cc11e9b20e15b6c46aa7b1fed11246f437e62225655a30ea47bf8cc22d0',
+  hash: Cardano.BlockId('10d64cc11e9b20e15b6c46aa7b1fed11246f437e62225655a30ea47bf8cc22d0'),
   slot: Cardano.Slot(37_834_496)
 };
 
@@ -27,7 +27,7 @@ export const protocolParameters = {
   prices: { memory: 0.0577, steps: 0.000_007_21 },
   protocolVersion: { major: 5, minor: 0 },
   stakeKeyDeposit: 2_000_000
-};
+} as Cardano.ProtocolParameters;
 
 export const epochRewards = [
   {

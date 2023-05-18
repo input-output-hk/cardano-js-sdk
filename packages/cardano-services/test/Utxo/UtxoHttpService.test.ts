@@ -1,5 +1,5 @@
 import { AddressWith, UtxoFixtureBuilder } from './fixtures/FixtureBuilder';
-import { Asset, Cardano, UtxoProvider } from '@cardano-sdk/core';
+import { Cardano, UtxoProvider } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, utxoHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { DataMocks } from '../data-mocks';
 import { DbPools, LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
@@ -247,7 +247,7 @@ describe('UtxoHttpService', () => {
           if (!assets) continue;
 
           for (const id of assets.keys()) {
-            if (Asset.util.assetNameFromAssetId(Cardano.AssetId(id)) === '') {
+            if (Cardano.AssetId.getAssetName(Cardano.AssetId(id)) === '') {
               txOutWithAssetThatHasNoName = output;
             }
           }

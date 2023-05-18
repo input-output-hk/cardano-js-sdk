@@ -78,10 +78,13 @@ describe('local-network/register-pool', () => {
     const poolKeyHash = await bip32Ed25519.getPubKeyHash(poolPubKey);
     const poolId = Cardano.PoolId.fromKeyHash(poolKeyHash);
     const poolRewardAccount = (
-      await poolKeyAgent.deriveAddress({
-        index: 0,
-        type: AddressType.External
-      })
+      await poolKeyAgent.deriveAddress(
+        {
+          index: 0,
+          type: AddressType.External
+        },
+        0
+      )
     ).rewardAccount;
 
     const registrationCert: Cardano.PoolRegistrationCertificate = {
@@ -160,10 +163,13 @@ describe('local-network/register-pool', () => {
     const poolKeyHash = await bip32Ed25519.getPubKeyHash(poolPubKey);
     const poolId = Cardano.PoolId.fromKeyHash(poolKeyHash);
     const poolRewardAccount = (
-      await poolKeyAgent.deriveAddress({
-        index: 0,
-        type: AddressType.External
-      })
+      await poolKeyAgent.deriveAddress(
+        {
+          index: 0,
+          type: AddressType.External
+        },
+        0
+      )
     ).rewardAccount;
 
     const registrationCert: Cardano.PoolRegistrationCertificate = {

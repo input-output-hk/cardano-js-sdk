@@ -1,22 +1,33 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AuthenticationError, HwMappingError, TransportError } from './errors';
-import { Cardano, NotImplementedError, coreToCml } from '@cardano-sdk/core';
+import { Cardano, NotImplementedError } from '@cardano-sdk/core';
 import {
   CardanoKeyConst,
   Cip1852PathLevelIndexes,
   CommunicationType,
+  KeyAgentBase,
   KeyAgentDependencies,
   KeyAgentType,
-  LedgerTransportType,
   SerializableLedgerKeyAgentData,
-  SignBlobResult
-} from './types';
-import { KeyAgentBase } from './KeyAgentBase';
+  SignBlobResult,
+  errors
+} from '@cardano-sdk/key-management';
+import { LedgerTransportType } from './types';
 import { ManagedFreeableScope } from '@cardano-sdk/util';
 import { str_to_path } from '@cardano-foundation/ledgerjs-hw-app-cardano/dist/utils/address';
-import { txToLedger } from './util';
-import LedgerConnection, { GetVersionResponse } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import { toLedgerTx } from './transformers';
+import LedgerConnection, {
+  Certificate,
+  CertificateType,
+  GetVersionResponse,
+  PoolKeyType,
+  PoolOwnerType,
+  StakeCredentialParams,
+  StakeCredentialParamsType,
+  Transaction,
+  TransactionSigningMode,
+  TxOutputDestinationType
+} from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
 import TransportWebHID from '@ledgerhq/hw-transport-webhid';
 import type LedgerTransport from '@ledgerhq/hw-transport';
@@ -44,8 +55,62 @@ export interface CreateLedgerTransportProps {
   devicePath?: string;
 }
 
-const transportTypedError = (error?: any) =>
-  new AuthenticationError('Ledger transport failed', new TransportError('Ledger transport failed', error));
+const transportTypedError = (error?: any) => new errors.TransportError('Ledger transport failed', error);
+
+const hasRegistrationOrRetirementCerts = (certificates: Certificate[] | null | undefined): boolean => {
+  if (!certificates) return false;
+
+  return (
+    certificates.some((cert) => cert.type === CertificateType.STAKE_POOL_RETIREMENT) ||
+    certificates.some((cert) => cert.type === CertificateType.STAKE_POOL_REGISTRATION)
+  );
+};
+
+const stakeCredentialCert = (cert: Certificate) =>
+  cert.type === CertificateType.STAKE_REGISTRATION ||
+  cert.type === CertificateType.STAKE_DEREGISTRATION ||
+  cert.type === CertificateType.STAKE_DELEGATION;
+
+interface StakeCredentialCertificateParams {
+  stakeCredential: StakeCredentialParams;
+}
+
+const containsOnlyScriptHashCreds = (tx: Transaction): boolean => {
+  const withdrawalsAllScriptHash = !tx.withdrawals?.some(
+    (withdrawal) => withdrawal.stakeCredential.type !== StakeCredentialParamsType.SCRIPT_HASH
+  );
+
+  if (tx.certificates) {
+    for (const cert of tx.certificates) {
+      if (!stakeCredentialCert(cert)) return false;
+
+      const certParams = cert.params as unknown as StakeCredentialCertificateParams;
+      if (certParams.stakeCredential.type !== StakeCredentialParamsType.SCRIPT_HASH) return false;
+    }
+  }
+
+  return withdrawalsAllScriptHash;
+};
+
+const isMultiSig = (tx: Transaction): boolean => {
+  const result = false;
+
+  const allThirdPartyInputs = !tx.inputs.some((input) => input.path !== null);
+  const allThirdPartyOutputs = !tx.outputs.some((out) => out.destination.type !== TxOutputDestinationType.THIRD_PARTY);
+
+  if (
+    allThirdPartyInputs &&
+    allThirdPartyOutputs &&
+    !tx.collateralInputs &&
+    !tx.requiredSigners &&
+    !hasRegistrationOrRetirementCerts(tx.certificates) &&
+    containsOnlyScriptHashCreds(tx)
+  ) {
+    return true;
+  }
+
+  return result;
+};
 
 export class LedgerKeyAgent extends KeyAgentBase {
   readonly deviceConnection?: LedgerConnection;
@@ -64,7 +129,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
     try {
       return communicationType === CommunicationType.Node ? TransportNodeHid.list() : TransportWebHID.list();
     } catch (error) {
-      throw new TransportError('Cannot fetch device list', error);
+      throw new errors.TransportError('Cannot fetch device list', error);
     }
   }
 
@@ -84,7 +149,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
         ? TransportWebHID.open(activeTransport.device)
         : TransportWebHID.request());
     } catch (error) {
-      throw new TransportError('Creating transport failed', error);
+      throw new errors.TransportError('Creating transport failed', error);
     }
   }
 
@@ -98,7 +163,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
       await deviceConnection.getVersion();
       return deviceConnection;
     } catch (error) {
-      throw new TransportError('Cannot communicate with Ledger Cardano App', error);
+      throw new errors.TransportError('Cannot communicate with Ledger Cardano App', error);
     }
   }
 
@@ -113,26 +178,26 @@ export class LedgerKeyAgent extends KeyAgentBase {
     try {
       transport = await LedgerKeyAgent.createTransport({ communicationType, devicePath });
       if (!transport || !transport.deviceModel) {
-        throw new TransportError('Missing transport');
+        throw new errors.TransportError('Missing transport');
       }
       const isSupportedLedgerModel =
         transport.deviceModel.id === 'nanoS' ||
         transport.deviceModel.id === 'nanoX' ||
         transport.deviceModel.id === 'nanoSP';
       if (!isSupportedLedgerModel) {
-        throw new TransportError(`Ledger device model: "${transport.deviceModel.id}" is not supported`);
+        throw new errors.TransportError(`Ledger device model: "${transport.deviceModel.id}" is not supported`);
       }
       return await LedgerKeyAgent.createDeviceConnection(transport);
     } catch (error: any) {
       if (error.innerError.message.includes('cannot open device with path')) {
-        throw new TransportError('Connection already established', error);
+        throw new errors.TransportError('Connection already established', error);
       }
       // If transport is established we need to close it so we can recover device from previous session
       if (transport) {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         transport.close();
       }
-      throw new TransportError('Establishing device connection failed', error);
+      throw new errors.TransportError('Establishing device connection failed', error);
     }
   }
 
@@ -176,7 +241,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
       return Crypto.Bip32PublicKeyHex(xPubHex);
     } catch (error: any) {
       if (error.code === 28_169) {
-        throw new AuthenticationError('Failed to export extended account public key', error);
+        throw new errors.AuthenticationError('Failed to export extended account public key', error);
       }
       throw transportTypedError(error);
     }
@@ -225,23 +290,71 @@ export class LedgerKeyAgent extends KeyAgentBase {
     );
   }
 
+  /**
+   * Gets the mode in which we want to sign the transaction.
+   * Ledger has certain limitations due to which it cannot sign arbitrary combination of all transaction features.
+   * The mode specifies which use-case the user want to use and triggers additional validation on `tx` field.
+   */
+  static getSigningMode(tx: Transaction): TransactionSigningMode {
+    if (tx.certificates) {
+      for (const cert of tx.certificates) {
+        // Represents pool registration from the perspective of a pool owner.
+        if (
+          cert.type === CertificateType.STAKE_POOL_REGISTRATION &&
+          cert.params.poolOwners.some((owner) => owner.type === PoolOwnerType.DEVICE_OWNED)
+        )
+          return TransactionSigningMode.POOL_REGISTRATION_AS_OWNER;
+
+        // Represents pool registration from the perspective of a pool operator.
+        if (
+          cert.type === CertificateType.STAKE_POOL_REGISTRATION &&
+          cert.params.poolKey.type === PoolKeyType.DEVICE_OWNED
+        )
+          return TransactionSigningMode.POOL_REGISTRATION_AS_OPERATOR;
+      }
+    }
+
+    // Represents a transaction that includes Plutus script evaluation (e.g. spending from a script address). We will
+    // also flag any transaction with required extra signers as a plutus transaction, since ordinary transactions requires
+    // all inputs to be provided by the wallet
+    if (tx.collateralInputs || tx.requiredSigners) {
+      return TransactionSigningMode.PLUTUS_TRANSACTION;
+    }
+
+    // Represents a transaction controlled by native scripts.
+    // Like an ordinary transaction, but stake credentials and all similar elements are given as script hashes
+    if (isMultiSig(tx)) {
+      return TransactionSigningMode.MULTISIG_TRANSACTION;
+    }
+
+    // Represents an ordinary user transaction transferring funds.
+    return TransactionSigningMode.ORDINARY_TRANSACTION;
+  }
+
+  // TODO: Allow additional key paths
   async signTransaction({ body, hash }: Cardano.TxBodyWithHash): Promise<Cardano.Signatures> {
     const scope = new ManagedFreeableScope();
     try {
-      const cslTxBody = coreToCml.txBody(scope, body);
-      const ledgerTxData = await txToLedger({
+      const ledgerTxData = await toLedgerTx(body, {
         chainId: this.chainId,
-        cslTxBody,
         inputResolver: this.inputResolver,
         knownAddresses: this.knownAddresses
       });
+
       const deviceConnection = await LedgerKeyAgent.checkDeviceConnection(
         this.#communicationType,
         this.deviceConnection
       );
-      const result = await deviceConnection.signTransaction(ledgerTxData);
+
+      const signingMode = LedgerKeyAgent.getSigningMode(ledgerTxData);
+
+      const result = await deviceConnection.signTransaction({
+        signingMode,
+        tx: ledgerTxData
+      });
+
       if (result.txHashHex !== hash) {
-        throw new HwMappingError('Ledger computed a different transaction id');
+        throw new errors.HwMappingError('Ledger computed a different transaction id');
       }
 
       return new Map<Crypto.Ed25519PublicKeyHex, Crypto.Ed25519SignatureHex>(
@@ -258,7 +371,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
       );
     } catch (error: any) {
       if (error.code === 28_169) {
-        throw new AuthenticationError('Transaction signing aborted', error);
+        throw new errors.AuthenticationError('Transaction signing aborted', error);
       }
       throw transportTypedError(error);
     } finally {
