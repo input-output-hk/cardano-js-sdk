@@ -6,4 +6,4 @@ export * from './mockAssetProvider';
 export * from './mockUtxoProvider';
 export * from './mockChainHistoryProvider';
 export * from './mockRewardsProvider';
-export * from './mockAdaHandle';
+export * from './mockHandleProvider';

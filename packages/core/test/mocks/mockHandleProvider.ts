@@ -1,6 +1,6 @@
 import { Cardano } from '../../src';
 
-export const AdaHandle = {
+export const Handle = {
   handle: 'AdaHandle',
   hasDatum: true,
   resolvedAddresses: {
