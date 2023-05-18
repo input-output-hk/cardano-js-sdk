@@ -40,7 +40,14 @@ describe('withHandles', () => {
                   address:
                     'addr_test1qzrf8t56qhzcp2chrtn7deqhep0dttr3eemhnut6lth3gulj7cuplfarmnq5fyumgl0lklddvau9dhamaexykljzvpyswqt56p',
                   value: {
-                    assets: new Map(),
+                    assets: new Map([
+                      [
+                        Cardano.AssetId(
+                          'f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a5365636f6e6454657374746f6b656e'
+                        ),
+                        3n
+                      ]
+                    ]),
                     coins: 25_485_292n
                   }
                 },
@@ -67,6 +74,15 @@ describe('withHandles', () => {
       )
     );
 
-    expect(Array.isArray(handles)).toBeTruthy();
+    expect(handles).toEqual([
+      {
+        address:
+          'addr_test1qzrf8t56qhzcp2chrtn7deqhep0dttr3eemhnut6lth3gulj7cuplfarmnq5fyumgl0lklddvau9dhamaexykljzvpyswqt56p',
+        assetId: 'f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a5365636f6e6454657374746f6b656e',
+        handle: 'SecondTesttoken',
+        policyId: 'f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a'
+      }
+    ]);
+    expect(handles).toHaveLength(1);
   });
 });

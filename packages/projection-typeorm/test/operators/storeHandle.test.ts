@@ -17,7 +17,7 @@ import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/p
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { Observable, defer, from } from 'rxjs';
-import { In, QueryRunner } from 'typeorm';
+import { QueryRunner } from 'typeorm';
 import { createProjectorTilFirst } from './util';
 import { initializeDataSource } from '../util';
 
@@ -51,7 +51,7 @@ describe('storeHandle', () => {
       Mappers.withUtxo(),
       Mappers.filterProducedUtxoByAssetPolicyId({ policyIds }),
       Mappers.withMint(),
-      Mappers.withHandles({ policyIds }),
+      Mappers.withHandles(),
       storeData,
       requestNext()
     );
@@ -76,6 +76,7 @@ describe('storeHandle', () => {
     expect(await repository.count()).toBe(mintEvent.handles.length);
     expect(mintEvent.handles.length).toBeGreaterThan(0);
   });
+
   it('deletes handle on rollback', async () => {
     const handleRepository = queryRunner.manager.getRepository(HandleEntity);
     await projectTilFirst(({ handles }) => handles.length > 0);
@@ -87,15 +88,20 @@ describe('storeHandle', () => {
   });
 
   it('minting an existing handle sets address to null', async () => {
-    const handleRepository = queryRunner.manager.getRepository(HandleEntity);
-    const mintEvent = await projectTilFirst(({ eventType }) => eventType === ChainSyncEventType.RollForward);
-    const existingHandles = await handleRepository.find({
-      select: { address: true, handle: true },
-      where: { handle: In(mintEvent.handles.map(({ handle }) => handle)) }
-    });
+    const repository = queryRunner.manager.getRepository(HandleEntity);
+    const mintEvent = await projectTilFirst(
+      ({ handles, eventType }) => eventType === ChainSyncEventType.RollForward && handles[0]?.handle === 'bob'
+    );
+    expect(mintEvent.handles.length).toBeGreaterThan(0);
 
-    expect(Array.isArray(existingHandles)).toBeTruthy();
-    // How can I test setting address to null
+    await projectTilFirst(
+      ({ handles, eventType }) => eventType === ChainSyncEventType.RollForward && handles[0]?.handle === 'bob'
+    );
+
+    expect(await repository.findOne({ where: { handle: 'bob' } })).toEqual({
+      address: null,
+      handle: 'bob'
+    });
   });
   it.todo('rolling back a transaction that mint an existing handle sets address to the original owner');
 

@@ -140,6 +140,21 @@ describe('withUtxo', () => {
                 address:
                   'addr_test1qzrf8t56qhzcp2chrtn7deqhep0dttr3eemhnut6lth3gulj7cuplfarmnq5fyumgl0lklddvau9dhamaexykljzvpyswqt56p',
                 value: {
+                  assets: new Map([
+                    [
+                      Cardano.AssetId(
+                        'f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a5365636f6e6454657374746f6b656e'
+                      ),
+                      3n
+                    ]
+                  ]),
+                  coins: 25_485_292n
+                }
+              },
+              {
+                address:
+                  'addr_test1qzrf8t56qhzcp2chrtn7deqhep0dttr3eemhnut6lth3gulj7cuplfarmnq5fyumgl0lklddvau9dhamaexykljzvpyswqt56p',
+                value: {
                   assets: new Map(),
                   coins: 25_485_292n
                 }
@@ -186,6 +201,7 @@ describe('withUtxo', () => {
           })
         )
       );
+
       expect(produced).toHaveLength(1);
     });
   });
@@ -198,10 +214,11 @@ describe('withUtxo', () => {
         validTxSource$.pipe(
           withUtxo(),
           filterProducedUtxoByAssetPolicyId({
-            policyIds: [Cardano.PolicyId('f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a')]
+            policyIds: [Cardano.PolicyId('8f78a4388b1a3e1a1435257e9356fa0c2cc0d3a5999d63b5886c9643')]
           })
         )
       );
+
       expect(produced).toHaveLength(1);
     });
   });
