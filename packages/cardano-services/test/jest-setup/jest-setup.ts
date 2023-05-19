@@ -72,14 +72,14 @@ module.exports = async () => {
     password = 'mysecretpassword',
     port
   } = parse(
-    process.env.POSTGRES_CONNECTION_STRING
-      ? process.env.POSTGRES_CONNECTION_STRING
+    process.env.POSTGRES_CONNECTION_STRING_DB_SYNC
+      ? process.env.POSTGRES_CONNECTION_STRING_DB_SYNC
       : 'postgresql://postgres:mysecretpassword@127.0.0.1:5432/cardano'
   );
 
   const pgContainer = await DockerUtil.setupPostgresContainer(user, password, port || '5432');
   await setupDBData(databaseConfigs.localnetwork, user, pgContainer);
-  await createDatabase(pgContainer, user, 'projection');
+  await createDatabase(pgContainer, user, process.env.POSTGRES_DB_STAKE_POOL!);
 
   const container = new RabbitMQContainer();
 

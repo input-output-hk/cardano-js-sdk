@@ -47,7 +47,7 @@ export enum ProviderServerOptionDescriptions {
 }
 
 export type ProviderServerArgs = CommonProgramOptions &
-  PosgresProgramOptions &
+  PosgresProgramOptions<'DbSync'> &
   OgmiosProgramOptions &
   RabbitMqProgramOptions & {
     allowedOrigins?: string[];

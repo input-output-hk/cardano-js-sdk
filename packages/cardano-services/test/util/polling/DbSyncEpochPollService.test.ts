@@ -7,7 +7,7 @@ import { logger } from '@cardano-sdk/util-dev';
 describe('DbSyncEpochPollService', () => {
   const epochPollInterval = 2 * 1000;
   const db = new Pool({
-    connectionString: process.env.POSTGRES_CONNECTION_STRING,
+    connectionString: process.env.POSTGRES_CONNECTION_STRING_DB_SYNC,
     max: 1,
     min: 1
   });

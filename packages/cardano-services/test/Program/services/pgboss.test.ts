@@ -9,8 +9,9 @@ import { DataSource } from 'typeorm';
 import { Logger } from 'ts-log';
 import { Observable, firstValueFrom } from 'rxjs';
 import { PgBossHttpService, pgBossEntities } from '../../../src/Program/services/pgboss';
+import { Pool } from 'pg';
 import { createObservableDataSource } from '../../../src';
-import { getConnectionConfig } from '../../../src/Program/services/postgres';
+import { getConnectionConfig, getPool } from '../../../src/Program/services/postgres';
 import { logger } from '@cardano-sdk/util-dev';
 
 const dnsResolver = () => Promise.resolve({ name: 'localhost', port: 5433, priority: 6, weight: 5 });
@@ -60,17 +61,22 @@ jest.mock('@cardano-sdk/projection-typeorm', () => {
 describe('PgBossHttpService', () => {
   let connectionConfig$: Observable<PgConnectionConfig>;
   let dataSource: DataSource;
+  let db: Pool;
   let service: PgBossHttpService | undefined;
 
   beforeAll(async () => {
     const args = {
-      postgresDb: process.env.POSTGRES_DB_PROJECTION!,
-      postgresPassword: process.env.POSTGRES_PASSWORD!,
-      postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,
-      postgresUser: process.env.POSTGRES_USER!
+      postgresDbDbSync: process.env.POSTGRES_DB_DB_SYNC!,
+      postgresDbStakePool: process.env.POSTGRES_DB_STAKE_POOL!,
+      postgresPasswordDbSync: process.env.POSTGRES_PASSWORD_DB_SYNC!,
+      postgresPasswordStakePool: process.env.POSTGRES_PASSWORD_DB_SYNC!,
+      postgresSrvServiceNameDbSync: process.env.POSTGRES_SRV_SERVICE_NAME_DB_SYNC!,
+      postgresSrvServiceNameStakePool: process.env.POSTGRES_SRV_SERVICE_NAME_DB_SYNC!,
+      postgresUserDbSync: process.env.POSTGRES_USER_DB_SYNC!,
+      postgresUserStakePool: process.env.POSTGRES_USER_DB_SYNC!
     };
 
-    connectionConfig$ = getConnectionConfig(dnsResolver, args);
+    connectionConfig$ = getConnectionConfig(dnsResolver, 'test', args);
     const dataSource$ = createObservableDataSource({
       connectionConfig$,
       devOptions: { dropSchema: true, synchronize: true },
@@ -79,6 +85,12 @@ describe('PgBossHttpService', () => {
       logger
     });
     dataSource = await firstValueFrom(dataSource$);
+
+    const pool = await getPool(dnsResolver, logger, args);
+
+    if (!pool) throw new Error("Can't connect to db-sync database");
+
+    db = pool;
   });
 
   afterEach(async () => {
@@ -86,7 +98,7 @@ describe('PgBossHttpService', () => {
   });
 
   it('health check is ok after start with a valid db connection', async () => {
-    service = new PgBossHttpService({ parallelJobs: 3, queues: [] }, { connectionConfig$, logger });
+    service = new PgBossHttpService({ parallelJobs: 3, queues: [] }, { connectionConfig$, db, logger });
     expect(await service.healthCheck()).toEqual({ ok: false, reason: 'PgBossHttpService not started' });
     await service.initialize();
     await service.start();
@@ -112,7 +124,7 @@ describe('PgBossHttpService', () => {
 
     service = new PgBossHttpService(
       { parallelJobs: 3, queues: [STAKE_POOL_METADATA_QUEUE] },
-      { connectionConfig$: config$, logger }
+      { connectionConfig$: config$, db, logger }
     );
     await service.initialize();
     await service.start();

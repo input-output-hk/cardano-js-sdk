@@ -26,6 +26,7 @@ import {
   tap
 } from 'rxjs';
 import { PgBossQueue } from '../../PgBoss/types';
+import { Pool } from 'pg';
 import { Router } from 'express';
 import { contextLogger } from '@cardano-sdk/util';
 import { createObservableDataSource } from '../../Projection/createTypeormProjection';
@@ -54,6 +55,7 @@ export interface PgBossServiceConfig {
 
 export interface PgBossServiceDependencies {
   connectionConfig$: Observable<PgConnectionConfig>;
+  db: Pool;
   logger: Logger;
 }
 

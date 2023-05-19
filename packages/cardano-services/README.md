@@ -51,7 +51,7 @@ _The following examples require the [install and build] steps to be completed._
   start-provider-server \
     --api-url http://localhost:6000 \
     --cardano-node-config-path ./config/network/preprod/cardano-node/config.json \
-    --postgres-connection-string postgresql://somePgUser:somePassword@localhost:5432/someDbName \
+    --postgres-connection-string-db-sync postgresql://somePgUser:somePassword@localhost:5432/someDbName \
     --ogmios-url  ws://localhost:1338 \
     asset chain-history stake-pool tx-submit network-info utxo rewards
 ```
@@ -62,7 +62,7 @@ _The following examples require the [install and build] steps to be completed._
 SERVICE_NAMES=asset,chain-history,stake-pool,tx-submit,network-info,utxo,rewards \
 API_URL=http://localhost:6000 \
 CARDANO_NODE_CONFIG_PATH=./config/network/preprod/cardano-node/config.json \
-POSTGRES_CONNECTION_STRING=postgresql://somePgUser:somePassword@localhost:5432/someDbName \
+POSTGRES_CONNECTION_STRING_DB_SYNC=postgresql://somePgUser:somePassword@localhost:5432/someDbName \
 OGMIOS_URL=ws://localhost:1338 \
 ./dist/cjs/cli.js start-provider-server
 ```
@@ -85,10 +85,10 @@ OGMIOS_URL=ws://localhost:1338 \
     --api-url http://localhost:6000 \
     --enable-metrics \
     --cardano-node-config-path ./config/network/preprod/cardano-node/config.json \
-    --postgres-srv-service-name \
-    --postgres-db someDbName \
-    --postgres-user somePgUser \
-    --postgres-password somePassword \
+    --postgres-srv-service-name-db-sync someHostName \
+    --postgres-db-db-sync someDbName \
+    --postgres-user-db-sync somePgUser \
+    --postgres-password-db-sync somePassword \
     --ogmios-srv-service-name  some-domain-for-ogmios \
     --rabbitmq-srv-service-name some-domain-for-rabbitmq \
     --use-queue \
@@ -102,10 +102,10 @@ SERVICE_NAMES=asset,chain-history,stake-pool,tx-submit,network-info,utxo,rewards
 API_URL=http://localhost:6000 \
 ENABLE_METRICS=true \
 CARDANO_NODE_CONFIG_PATH=./config/network/preprod/cardano-node/config.json \
-POSTGRES_SRV_SERVICE_NAME=some-domain-for-postgres-db
-POSTGRES_DB=someDbName \
-POSTGRES_USER=someUser \
-POSTGRES_PASSWORD=somePassword \
+POSTGRES_SRV_SERVICE_NAME_DB_SYNC=some-domain-for-postgres-db
+POSTGRES_DB_DB_SYNC=someDbName \
+POSTGRES_USER_DB_SYNC=someUser \
+POSTGRES_PASSWORD_DB_SYNC=somePassword \
 OGMIOS_SRV_SERVICE_NAME=some-domain-for-ogmios \
 RABBITMQ_SRV_SERVICE_NAME=some-domain-for-rabbitmq \
 USE_QUEUE=true \
@@ -135,7 +135,7 @@ RABBITMQ_SRV_SERVICE_NAME=some-domain-for-rabbitmq \
 ./dist/cjs/cli.js \
   start-projector \
     --ogmios-url 'ws://localhost:1339' \
-    --postgres-connection-string 'postgresql://postgres:doNoUseThisSecret!@localhost/projection' \
+    --postgres-connection-string-db-sync 'postgresql://postgres:doNoUseThisSecret!@localhost/projection' \
     stake-pool,stake-pool-metadata-job
 ```
 
@@ -144,12 +144,12 @@ RABBITMQ_SRV_SERVICE_NAME=some-domain-for-rabbitmq \
 ### Generating Projector Schema Migrations
 
 1. Start local projection dependencies (e.g. `yarn preprod:up cardano-node-ogmios postgres`).
-1. Initialize base schema by running `start-projector` with **all** projections enabled. *Hint: you can use `git` to checkout a previous commit if you already updated entities and skipped this step*
-2. Create new entities (or update existing ones).
-3. Include any new entities in `entities` object at `src/Projection/prepareTypeormProjection.ts`.
-4. Run `yarn generate-migration`
-5. Inspect the generated migration and add a static `entity` property. *Hint: you may need to split generated migration into multiple migrations manually if it affects more than 1 entity*
-6. Export the new migration(s) from `migrations` array at `src/Projections/migrations/index.ts`
+2. Initialize base schema by running `start-projector` with **all** projections enabled. _Hint: you can use `git` to checkout a previous commit if you already updated entities and skipped this step_
+3. Create new entities (or update existing ones).
+4. Include any new entities in `entities` object at `src/Projection/prepareTypeormProjection.ts`.
+5. Run `yarn generate-migration`
+6. Inspect the generated migration and add a static `entity` property. _Hint: you may need to split generated migration into multiple migrations manually if it affects more than 1 entity_
+7. Export the new migration(s) from `migrations` array at `src/Projections/migrations/index.ts`
 
 ## Tests
 

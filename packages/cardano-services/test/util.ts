@@ -88,10 +88,10 @@ export const clearDbPools = async ({ main, healthCheck }: DbPools) => {
 };
 
 export const projectorConnectionConfig = {
-  database: process.env.POSTGRES_DB_PROJECTION!,
-  host: process.env.POSTGRES_HOST!,
-  password: process.env.POSTGRES_PASSWORD!,
-  port: Number.parseInt(process.env.POSTGRES_PORT!),
-  username: process.env.POSTGRES_USER!
+  database: process.env.POSTGRES_DB_STAKE_POOLS!,
+  host: process.env.POSTGRES_HOST_DB_SYNC!,
+  password: process.env.POSTGRES_PASSWORD_DB_SYNC!,
+  port: Number.parseInt(process.env.POSTGRES_PORT_DB_SYNC!),
+  username: process.env.POSTGRES_USER_DB_SYNC!
 };
 export const projectorConnectionConfig$ = of(projectorConnectionConfig);

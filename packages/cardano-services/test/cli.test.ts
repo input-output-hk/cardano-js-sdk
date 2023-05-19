@@ -182,7 +182,7 @@ describe('CLI', () => {
 
     beforeAll(async () => {
       ({ rabbitmqUrl } = await container.load());
-      db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING });
+      db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING_DB_SYNC });
       fixtureBuilder = new AssetFixtureBuilder(db, logger);
       lastBlock = (await db!.query<LedgerTipModel>(findLedgerTip)).rows[0];
     });
@@ -235,18 +235,18 @@ describe('CLI', () => {
       beforeAll(async () => {
         ogmiosPort = await getRandomPort();
         ogmiosConnection = Ogmios.createConnectionObject({ port: ogmiosPort });
-        postgresConnectionString = process.env.POSTGRES_CONNECTION_STRING!;
+        postgresConnectionString = process.env.POSTGRES_CONNECTION_STRING_DB_SYNC!;
         cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
-        postgresSrvServiceName = process.env.POSTGRES_SRV_SERVICE_NAME!;
-        postgresDb = process.env.POSTGRES_DB!;
-        postgresDbFile = process.env.POSTGRES_DB_FILE!;
-        postgresUser = process.env.POSTGRES_USER!;
-        postgresUserFile = process.env.POSTGRES_USER_FILE!;
-        postgresPassword = process.env.POSTGRES_PASSWORD!;
-        postgresPasswordFile = process.env.POSTGRES_PASSWORD_FILE!;
-        postgresHost = process.env.POSTGRES_HOST!;
-        postgresPort = process.env.POSTGRES_PORT!;
-        postgresSslCaFile = process.env.POSTGRES_SSL_CA_FILE!;
+        postgresSrvServiceName = process.env.POSTGRES_SRV_SERVICE_NAME_DB_SYNC!;
+        postgresDb = process.env.POSTGRES_DB_DB_SYNC!;
+        postgresDbFile = process.env.POSTGRES_DB_FILE_DB_SYNC!;
+        postgresUser = process.env.POSTGRES_USER_DB_SYNC!;
+        postgresUserFile = process.env.POSTGRES_USER_FILE_DB_SYNC!;
+        postgresPassword = process.env.POSTGRES_PASSWORD_DB_SYNC!;
+        postgresPasswordFile = process.env.POSTGRES_PASSWORD_FILE_DB_SYNC!;
+        postgresHost = process.env.POSTGRES_HOST_DB_SYNC!;
+        postgresPort = process.env.POSTGRES_PORT_DB_SYNC!;
+        postgresSslCaFile = process.env.POSTGRES_SSL_CA_FILE_DB_SYNC!;
         ogmiosSrvServiceName = process.env.OGMIOS_SRV_SERVICE_NAME!;
         rabbitmqSrvServiceName = process.env.RABBITMQ_SRV_SERVICE_NAME!;
         dbCacheTtl = process.env.DB_CACHE_TTL!;
@@ -270,7 +270,7 @@ describe('CLI', () => {
                   apiUrl,
                   '--enable-metrics',
                   'true',
-                  '--postgres-connection-string',
+                  '--postgres-connection-string-db-sync',
                   postgresConnectionString,
                   '--ogmios-url',
                   ogmiosConnection.address.webSocket,
@@ -309,7 +309,7 @@ describe('CLI', () => {
                   ENABLE_METRICS: 'true',
                   LOGGER_MIN_SEVERITY: 'error',
                   OGMIOS_URL: ogmiosConnection.address.webSocket,
-                  POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                  POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
                   SERVICE_NAMES: `${ServiceNames.Asset},${ServiceNames.ChainHistory},${ServiceNames.NetworkInfo},${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.Utxo},${ServiceNames.Rewards}`
                 },
                 stdio: 'pipe'
@@ -335,7 +335,7 @@ describe('CLI', () => {
                   apiUrl,
                   '--enable-metrics',
                   'true',
-                  '--postgres-connection-string',
+                  '--postgres-connection-string-db-sync',
                   postgresConnectionString,
                   '--ogmios-url',
                   ogmiosConnection.address.webSocket,
@@ -368,7 +368,7 @@ describe('CLI', () => {
                   ENABLE_METRICS: 'true',
                   LOGGER_MIN_SEVERITY: 'error',
                   OGMIOS_URL: ogmiosConnection.address.webSocket,
-                  POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                  POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
                   SERVICE_NAMES: `${ServiceNames.Asset},${ServiceNames.ChainHistory},${ServiceNames.NetworkInfo},${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.Utxo},${ServiceNames.Rewards}`
                 },
                 stdio: 'pipe'
@@ -388,7 +388,7 @@ describe('CLI', () => {
                   ENABLE_METRICS: 'false',
                   LOGGER_MIN_SEVERITY: 'error',
                   OGMIOS_URL: ogmiosConnection.address.webSocket,
-                  POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                  POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
                   SERVICE_NAMES: `${ServiceNames.Asset},${ServiceNames.ChainHistory},${ServiceNames.NetworkInfo},${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.Utxo},${ServiceNames.Rewards}`
                 },
                 stdio: 'pipe'
@@ -411,7 +411,7 @@ describe('CLI', () => {
                     apiUrl,
                     '--allowed-origins',
                     allowedOrigin,
-                    '--postgres-connection-string',
+                    '--postgres-connection-string-db-sync',
                     postgresConnectionString,
                     '--ogmios-url',
                     ogmiosConnection.address.webSocket,
@@ -435,7 +435,7 @@ describe('CLI', () => {
                     DB_CACHE_TTL: dbCacheTtl,
                     LOGGER_MIN_SEVERITY: 'error',
                     OGMIOS_URL: ogmiosConnection.address.webSocket,
-                    POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                    POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
                     SERVICE_NAMES: ServiceNames.Asset
                   },
                   stdio: 'pipe'
@@ -471,7 +471,7 @@ describe('CLI', () => {
                     apiUrl,
                     '--build-info',
                     buildInfo,
-                    '--postgres-connection-string',
+                    '--postgres-connection-string-db-sync',
                     postgresConnectionString,
                     '--ogmios-url',
                     ogmiosConnection.address.webSocket,
@@ -498,7 +498,7 @@ describe('CLI', () => {
                     DB_CACHE_TTL: dbCacheTtl,
                     LOGGER_MIN_SEVERITY: 'error',
                     OGMIOS_URL: ogmiosConnection.address.webSocket,
-                    POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                    POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
                     SERVICE_NAMES: `${ServiceNames.Utxo}`
                   },
                   stdio: 'pipe'
@@ -518,7 +518,7 @@ describe('CLI', () => {
                     ...baseArgs,
                     '--api-url',
                     apiUrl,
-                    '--postgres-connection-string',
+                    '--postgres-connection-string-db-sync',
                     postgresConnectionString,
                     '--ogmios-url',
                     ogmiosConnection.address.webSocket,
@@ -546,7 +546,7 @@ describe('CLI', () => {
                     apiUrl,
                     '--build-info',
                     invalidBuildInfo,
-                    '--postgres-connection-string',
+                    '--postgres-connection-string-db-sync',
                     postgresConnectionString,
                     '--ogmios-url',
                     ogmiosConnection.address.webSocket,
@@ -573,7 +573,7 @@ describe('CLI', () => {
                     apiUrl,
                     '--build-info',
                     buildInfoWithWrongProp,
-                    '--postgres-connection-string',
+                    '--postgres-connection-string-db-sync',
                     postgresConnectionString,
                     '--ogmios-url',
                     ogmiosConnection.address.webSocket,
@@ -598,7 +598,7 @@ describe('CLI', () => {
                   ...baseArgs,
                   '--api-url',
                   apiUrl,
-                  '--postgres-connection-string',
+                  '--postgres-connection-string-db-sync',
                   postgresConnectionString,
                   '--ogmios-url',
                   ogmiosConnection.address.webSocket,
@@ -629,7 +629,7 @@ describe('CLI', () => {
                   ...baseArgs,
                   '--api-url',
                   apiUrl,
-                  '--postgres-connection-string',
+                  '--postgres-connection-string-db-sync',
                   postgresConnectionString,
                   '--ogmios-url',
                   ogmiosConnection.address.webSocket,
@@ -656,7 +656,7 @@ describe('CLI', () => {
                   apiUrl,
                   '--disable-stake-pool-metric-apy',
                   'true',
-                  '--postgres-connection-string',
+                  '--postgres-connection-string-db-sync',
                   postgresConnectionString,
                   '--ogmios-url',
                   ogmiosConnection.address.webSocket,
@@ -683,7 +683,7 @@ describe('CLI', () => {
                   DISABLE_STAKE_POOL_METRIC_APY: 'true',
                   LOGGER_MIN_SEVERITY: 'error',
                   OGMIOS_URL: ogmiosConnection.address.webSocket,
-                  POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                  POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
                   SERVICE_NAMES: `${ServiceNames.StakePool}`
                 },
                 stdio: 'pipe'
@@ -797,17 +797,17 @@ describe('CLI', () => {
                     apiUrl,
                     '--ogmios-url',
                     ogmiosConnection.address.webSocket,
-                    '--postgres-db',
+                    '--postgres-db-db-sync',
                     postgresDb,
-                    '--postgres-user',
+                    '--postgres-user-db-sync',
                     postgresUser,
-                    '--postgres-password',
+                    '--postgres-password-db-sync',
                     postgresPassword,
-                    '--postgres-host',
+                    '--postgres-host-db-sync',
                     postgresHost,
-                    '--postgres-pool-max',
+                    '--postgres-pool-max-db-sync',
                     '50',
-                    '--postgres-port',
+                    '--postgres-port-db-sync',
                     postgresPort,
                     ServiceNames.Utxo
                   ],
@@ -828,12 +828,12 @@ describe('CLI', () => {
                     API_URL: apiUrl,
                     LOGGER_MIN_SEVERITY: 'error',
                     OGMIOS_URL: ogmiosConnection.address.webSocket,
-                    POSTGRES_DB: postgresDb,
-                    POSTGRES_HOST: postgresHost,
-                    POSTGRES_PASSWORD: postgresPassword,
-                    POSTGRES_POOL_MAX: '50',
-                    POSTGRES_PORT: postgresPort,
-                    POSTGRES_USER: postgresUser,
+                    POSTGRES_DB_DB_SYNC: postgresDb,
+                    POSTGRES_HOST_DB_SYNC: postgresHost,
+                    POSTGRES_PASSWORD_DB_SYNC: postgresPassword,
+                    POSTGRES_POOL_MAX_DB_SYNC: '50',
+                    POSTGRES_PORT_DB_SYNC: postgresPort,
+                    POSTGRES_USER_DB_SYNC: postgresUser,
                     SERVICE_NAMES: ServiceNames.Utxo
                   },
                   stdio: 'pipe'
@@ -849,13 +849,13 @@ describe('CLI', () => {
               callCliAndAssertExit(
                 {
                   args: [
-                    '--postgres-srv-service-name',
+                    '--postgres-srv-service-name-db-sync',
                     postgresSrvServiceName,
-                    '--postgres-db',
+                    '--postgres-db-db-sync',
                     postgresDb,
-                    '--postgres-user',
+                    '--postgres-user-db-sync',
                     postgresUser,
-                    '--postgres-password',
+                    '--postgres-password-db-sync',
                     postgresPassword,
                     '--service-discovery-timeout',
                     '1000',
@@ -873,10 +873,10 @@ describe('CLI', () => {
                 {
                   dataMatchOnError: DNS_SERVER_NOT_REACHABLE_ERROR,
                   env: {
-                    POSTGRES_DB: postgresDb,
-                    POSTGRES_PASSWORD: postgresPassword,
-                    POSTGRES_SRV_SERVICE_NAME: postgresSrvServiceName,
-                    POSTGRES_USER: postgresUser,
+                    POSTGRES_DB_DB_SYNC: postgresDb,
+                    POSTGRES_PASSWORD_DB_SYNC: postgresPassword,
+                    POSTGRES_SRV_SERVICE_NAME_DB_SYNC: postgresSrvServiceName,
+                    POSTGRES_USER_DB_SYNC: postgresUser,
                     SERVICE_DISCOVERY_TIMEOUT: '1000',
                     SERVICE_NAMES: ServiceNames.Utxo
                   }
@@ -891,9 +891,9 @@ describe('CLI', () => {
               callCliAndAssertExit(
                 {
                   args: [
-                    '--postgres-connection-string',
+                    '--postgres-connection-string-db-sync',
                     postgresConnectionString,
-                    '--postgres-srv-service-name',
+                    '--postgres-srv-service-name-db-sync',
                     postgresSrvServiceName,
                     '--service-names',
                     ServiceNames.Utxo
@@ -909,8 +909,8 @@ describe('CLI', () => {
                 {
                   dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
                   env: {
-                    POSTGRES_CONNECTION_STRING: postgresConnectionString,
-                    POSTGRES_SRV_SERVICE_NAME: postgresSrvServiceName,
+                    POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
+                    POSTGRES_SRV_SERVICE_NAME_DB_SYNC: postgresSrvServiceName,
                     SERVICE_NAMES: ServiceNames.Utxo
                   }
                 },
@@ -924,9 +924,9 @@ describe('CLI', () => {
               callCliAndAssertExit(
                 {
                   args: [
-                    '--postgres-host',
+                    '--postgres-host-db-sync',
                     postgresHost,
-                    '--postgres-srv-service-name',
+                    '--postgres-srv-service-name-db-sync',
                     postgresSrvServiceName,
                     '--service-names',
                     ServiceNames.Utxo
@@ -942,8 +942,8 @@ describe('CLI', () => {
                 {
                   dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
                   env: {
-                    POSTGRES_HOST: postgresHost,
-                    POSTGRES_SRV_SERVICE_NAME: postgresSrvServiceName,
+                    POSTGRES_HOST_DB_SYNC: postgresHost,
+                    POSTGRES_SRV_SERVICE_NAME_DB_SYNC: postgresSrvServiceName,
                     SERVICE_NAMES: ServiceNames.Utxo
                   }
                 },
@@ -957,9 +957,9 @@ describe('CLI', () => {
               callCliAndAssertExit(
                 {
                   args: [
-                    '--postgres-port',
+                    '--postgres-port-db-sync',
                     postgresPort,
-                    '--postgres-srv-service-name',
+                    '--postgres-srv-service-name-db-sync',
                     postgresSrvServiceName,
                     '--service-names',
                     ServiceNames.Utxo
@@ -975,8 +975,8 @@ describe('CLI', () => {
                 {
                   dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
                   env: {
-                    POSTGRES_PORT: postgresPort,
-                    POSTGRES_SRV_SERVICE_NAME: postgresSrvServiceName,
+                    POSTGRES_PORT_DB_SYNC: postgresPort,
+                    POSTGRES_SRV_SERVICE_NAME_DB_SYNC: postgresSrvServiceName,
                     SERVICE_NAMES: ServiceNames.Utxo
                   }
                 },
@@ -990,9 +990,9 @@ describe('CLI', () => {
               callCliAndAssertExit(
                 {
                   args: [
-                    '--postgres-connection-string',
+                    '--postgres-connection-string-db-sync',
                     postgresConnectionString,
-                    '--postgres-db',
+                    '--postgres-db-db-sync',
                     postgresDb,
                     '--service-names',
                     ServiceNames.Utxo
@@ -1008,8 +1008,8 @@ describe('CLI', () => {
                 {
                   dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
                   env: {
-                    POSTGRES_CONNECTION_STRING: postgresConnectionString,
-                    POSTGRES_DB: postgresDb,
+                    POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
+                    POSTGRES_DB_DB_SYNC: postgresDb,
                     SERVICE_NAMES: ServiceNames.Utxo
                   }
                 },
@@ -1023,9 +1023,9 @@ describe('CLI', () => {
               callCliAndAssertExit(
                 {
                   args: [
-                    '--postgres-connection-string',
+                    '--postgres-connection-string-db-sync',
                     postgresConnectionString,
-                    '--postgres-db-file',
+                    '--postgres-db-file-db-sync',
                     postgresDbFile,
                     '--service-names',
                     ServiceNames.Utxo
@@ -1041,8 +1041,8 @@ describe('CLI', () => {
                 {
                   dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
                   env: {
-                    POSTGRES_CONNECTION_STRING: postgresConnectionString,
-                    POSTGRES_DB_FILE: postgresDbFile,
+                    POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
+                    POSTGRES_DB_FILE_DB_SYNC: postgresDbFile,
                     SERVICE_NAMES: ServiceNames.Utxo
                   }
                 },
@@ -1056,9 +1056,9 @@ describe('CLI', () => {
               callCliAndAssertExit(
                 {
                   args: [
-                    '--postgres-connection-string',
+                    '--postgres-connection-string-db-sync',
                     postgresConnectionString,
-                    '--postgres-user',
+                    '--postgres-user-db-sync',
                     postgresUser,
                     '--service-names',
                     ServiceNames.Utxo
@@ -1074,8 +1074,8 @@ describe('CLI', () => {
                 {
                   dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
                   env: {
-                    POSTGRES_CONNECTION_STRING: postgresConnectionString,
-                    POSTGRES_USER: postgresUser,
+                    POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
+                    POSTGRES_USER_DB_SYNC: postgresUser,
                     SERVICE_NAMES: ServiceNames.Utxo
                   }
                 },
@@ -1089,9 +1089,9 @@ describe('CLI', () => {
               callCliAndAssertExit(
                 {
                   args: [
-                    '--postgres-connection-string',
+                    '--postgres-connection-string-db-sync',
                     postgresConnectionString,
-                    '--postgres-user-file',
+                    '--postgres-user-file-db-sync',
                     postgresUserFile,
                     '--service-names',
                     ServiceNames.Utxo
@@ -1107,8 +1107,8 @@ describe('CLI', () => {
                 {
                   dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
                   env: {
-                    POSTGRES_CONNECTION_STRING: postgresConnectionString,
-                    POSTGRES_USER_FILE: postgresUserFile,
+                    POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
+                    POSTGRES_USER_FILE_DB_SYNC: postgresUserFile,
                     SERVICE_NAMES: ServiceNames.Utxo
                   }
                 },
@@ -1122,9 +1122,9 @@ describe('CLI', () => {
               callCliAndAssertExit(
                 {
                   args: [
-                    '--postgres-connection-string',
+                    '--postgres-connection-string-db-sync',
                     postgresConnectionString,
-                    '--postgres-password',
+                    '--postgres-password-db-sync',
                     postgresPassword,
                     ServiceNames.Utxo
                   ],
@@ -1139,8 +1139,8 @@ describe('CLI', () => {
                 {
                   dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
                   env: {
-                    POSTGRES_CONNECTION_STRING: postgresConnectionString,
-                    POSTGRES_PASSWORD: postgresPassword,
+                    POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
+                    POSTGRES_PASSWORD_DB_SYNC: postgresPassword,
                     SERVICE_NAMES: ServiceNames.Utxo
                   }
                 },
@@ -1154,9 +1154,9 @@ describe('CLI', () => {
               callCliAndAssertExit(
                 {
                   args: [
-                    '--postgres-connection-string',
+                    '--postgres-connection-string-db-sync',
                     postgresConnectionString,
-                    '--postgres-password-file',
+                    '--postgres-password-file-db-sync',
                     postgresPasswordFile,
                     ServiceNames.Utxo
                   ],
@@ -1171,8 +1171,8 @@ describe('CLI', () => {
                 {
                   dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
                   env: {
-                    POSTGRES_CONNECTION_STRING: postgresConnectionString,
-                    POSTGRES_PASSWORD_FILE: postgresPasswordFile,
+                    POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
+                    POSTGRES_PASSWORD_FILE_DB_SYNC: postgresPasswordFile,
                     SERVICE_NAMES: ServiceNames.Utxo
                   }
                 },
@@ -1186,9 +1186,9 @@ describe('CLI', () => {
               callCliAndAssertExit(
                 {
                   args: [
-                    '--postgres-connection-string',
+                    '--postgres-connection-string-db-sync',
                     postgresConnectionString,
-                    '--postgres-host',
+                    '--postgres-host-db-sync',
                     postgresHost,
                     ServiceNames.Utxo
                   ],
@@ -1203,8 +1203,8 @@ describe('CLI', () => {
                 {
                   dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
                   env: {
-                    POSTGRES_CONNECTION_STRING: postgresConnectionString,
-                    POSTGRES_HOST: postgresHost,
+                    POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
+                    POSTGRES_HOST_DB_SYNC: postgresHost,
                     SERVICE_NAMES: ServiceNames.Utxo
                   }
                 },
@@ -1218,9 +1218,9 @@ describe('CLI', () => {
               callCliAndAssertExit(
                 {
                   args: [
-                    '--postgres-connection-string',
+                    '--postgres-connection-string-db-sync',
                     postgresConnectionString,
-                    '--postgres-port',
+                    '--postgres-port-db-sync',
                     postgresPort,
                     ServiceNames.Utxo
                   ],
@@ -1235,8 +1235,8 @@ describe('CLI', () => {
                 {
                   dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
                   env: {
-                    POSTGRES_CONNECTION_STRING: postgresConnectionString,
-                    POSTGRES_PORT: postgresPort,
+                    POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
+                    POSTGRES_PORT_DB_SYNC: postgresPort,
                     SERVICE_NAMES: ServiceNames.Utxo
                   }
                 },
@@ -1249,7 +1249,13 @@ describe('CLI', () => {
             it('throws a CLI validation error and exits with code 1 when using CLI options', (done) => {
               callCliAndAssertExit(
                 {
-                  args: ['--postgres-db', postgresDb, '--postgres-db-file', postgresDbFile, ServiceNames.Utxo],
+                  args: [
+                    '--postgres-db-db-sync',
+                    postgresDb,
+                    '--postgres-db-file-db-sync',
+                    postgresDbFile,
+                    ServiceNames.Utxo
+                  ],
                   dataMatchOnError: CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE
                 },
                 done
@@ -1261,8 +1267,8 @@ describe('CLI', () => {
                 {
                   dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
                   env: {
-                    POSTGRES_DB: postgresDb,
-                    POSTGRES_DB_FILE: postgresDbFile,
+                    POSTGRES_DB_DB_SYNC: postgresDb,
+                    POSTGRES_DB_FILE_DB_SYNC: postgresDbFile,
                     SERVICE_NAMES: ServiceNames.Utxo
                   }
                 },
@@ -1275,7 +1281,13 @@ describe('CLI', () => {
             it('throws a CLI validation error and exits with code 1 when using CLI options', (done) => {
               callCliAndAssertExit(
                 {
-                  args: ['--postgres-user', postgresUser, '--postgres-user-file', postgresUserFile, ServiceNames.Utxo],
+                  args: [
+                    '--postgres-user-db-sync',
+                    postgresUser,
+                    '--postgres-user-file-db-sync',
+                    postgresUserFile,
+                    ServiceNames.Utxo
+                  ],
                   dataMatchOnError: CLI_CONFLICTING_OPTIONS_ERROR_MESSAGE
                 },
                 done
@@ -1287,8 +1299,8 @@ describe('CLI', () => {
                 {
                   dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
                   env: {
-                    POSTGRES_USER: postgresUser,
-                    POSTGRES_USER_FILE: postgresUserFile,
+                    POSTGRES_USER_DB_SYNC: postgresUser,
+                    POSTGRES_USER_FILE_DB_SYNC: postgresUserFile,
                     SERVICE_NAMES: ServiceNames.Utxo
                   }
                 },
@@ -1302,9 +1314,9 @@ describe('CLI', () => {
               callCliAndAssertExit(
                 {
                   args: [
-                    '--postgres-password',
+                    '--postgres-password-db-sync',
                     postgresPassword,
-                    '--postgres-password-file',
+                    '--postgres-password-file-db-sync',
                     postgresPasswordFile,
                     ServiceNames.Utxo
                   ],
@@ -1319,8 +1331,8 @@ describe('CLI', () => {
                 {
                   dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
                   env: {
-                    POSTGRES_PASSWORD: postgresPassword,
-                    POSTGRES_PASSWORD_FILE: postgresPasswordFile,
+                    POSTGRES_PASSWORD_DB_SYNC: postgresPassword,
+                    POSTGRES_PASSWORD_FILE_DB_SYNC: postgresPasswordFile,
                     SERVICE_NAMES: ServiceNames.Utxo
                   }
                 },
@@ -1334,7 +1346,7 @@ describe('CLI', () => {
           it('network-info exits with code 1 when using CLI options', (done) => {
             callCliAndAssertExit(
               {
-                args: ['--postgres-connection-string', postgresConnectionString, ServiceNames.NetworkInfo],
+                args: ['--postgres-connection-string-db-sync', postgresConnectionString, ServiceNames.NetworkInfo],
                 dataMatchOnError: 'network-info requires the Cardano node config path program option'
               },
               done
@@ -1346,7 +1358,7 @@ describe('CLI', () => {
               {
                 dataMatchOnError: 'network-info requires the Cardano node config path program option',
                 env: {
-                  POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                  POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
                   SERVICE_NAMES: ServiceNames.NetworkInfo
                 }
               },
@@ -1373,7 +1385,7 @@ describe('CLI', () => {
                     ...baseArgs,
                     '--api-url',
                     apiUrl,
-                    '--postgres-connection-string',
+                    '--postgres-connection-string-db-sync',
                     postgresConnectionString,
                     '--cardano-node-config-path',
                     cardanoNodeConfigPath,
@@ -1395,7 +1407,7 @@ describe('CLI', () => {
                     API_URL: apiUrl,
                     CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
                     LOGGER_MIN_SEVERITY: 'error',
-                    POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                    POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
                     SERVICE_NAMES: ServiceNames.NetworkInfo
                   },
                   stdio: 'pipe'
@@ -1437,13 +1449,13 @@ describe('CLI', () => {
                   args: [
                     '--cardano-node-config-path',
                     cardanoNodeConfigPath,
-                    '--postgres-srv-service-name',
+                    '--postgres-srv-service-name-db-sync',
                     postgresSrvServiceName,
-                    '--postgres-db',
+                    '--postgres-db-db-sync',
                     postgresDb,
-                    '--postgres-user',
+                    '--postgres-user-db-sync',
                     postgresUser,
-                    '--postgres-password',
+                    '--postgres-password-db-sync',
                     postgresPassword,
                     '--ogmios-srv-service-name',
                     ogmiosSrvServiceName,
@@ -1466,10 +1478,10 @@ describe('CLI', () => {
                     API_URL: apiUrl,
                     CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
                     OGMIOS_SRV_SERVICE_NAME: ogmiosSrvServiceName,
-                    POSTGRES_DB: postgresDb,
-                    POSTGRES_PASSWORD: postgresPassword,
-                    POSTGRES_SRV_SERVICE_NAME: postgresSrvServiceName,
-                    POSTGRES_USER: postgresUser,
+                    POSTGRES_DB_DB_SYNC: postgresDb,
+                    POSTGRES_PASSWORD_DB_SYNC: postgresPassword,
+                    POSTGRES_SRV_SERVICE_NAME_DB_SYNC: postgresSrvServiceName,
+                    POSTGRES_USER_DB_SYNC: postgresUser,
                     SERVICE_DISCOVERY_TIMEOUT: '1000',
                     SERVICE_NAMES: ServiceNames.NetworkInfo
                   }
@@ -1516,7 +1528,7 @@ describe('CLI', () => {
               callCliAndAssertExit(
                 {
                   args: [
-                    '--postgres-password',
+                    '--postgres-password-db-sync',
                     postgresPassword,
                     '--ogmios-url',
                     ogmiosConnection.address.webSocket,
@@ -1539,7 +1551,7 @@ describe('CLI', () => {
                     API_URL: apiUrl,
                     OGMIOS_SRV_SERVICE_NAME: ogmiosSrvServiceName,
                     OGMIOS_URL: ogmiosConnection.address.webSocket,
-                    POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                    POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
                     SERVICE_NAMES: ServiceNames.NetworkInfo
                   }
                 },
@@ -1589,11 +1601,11 @@ describe('CLI', () => {
                   args: [
                     '--ogmios-url',
                     ogmiosConnection.address.webSocket,
-                    '--postgres-connection-string',
+                    '--postgres-connection-string-db-sync',
                     postgresConnectionString,
                     '--cardano-node-config-path',
                     cardanoNodeConfigPath,
-                    '--postgres-ssl-ca-file',
+                    '--postgres-ssl-ca-file-db-sync',
                     invalidFilePath,
                     '--service-names',
                     ServiceNames.NetworkInfo
@@ -1612,8 +1624,8 @@ describe('CLI', () => {
                     API_URL: apiUrl,
                     CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
                     OGMIOS_URL: ogmiosConnection.address.webSocket,
-                    POSTGRES_CONNECTION_STRING: postgresConnectionString,
-                    POSTGRES_SSL_CA_FILE: invalidFilePath,
+                    POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
+                    POSTGRES_SSL_CA_FILE_DB_SYNC: invalidFilePath,
                     SERVICE_NAMES: ServiceNames.NetworkInfo
                   }
                 },
@@ -1627,13 +1639,13 @@ describe('CLI', () => {
               callCliAndAssertExit(
                 {
                   args: [
-                    '--postgres-connection-string',
+                    '--postgres-connection-string-db-sync',
                     postgresConnectionString,
                     '--ogmios-url',
                     ogmiosConnection.address.webSocket,
                     '--cardano-node-config-path',
                     cardanoNodeConfigPath,
-                    '--postgres-ssl-ca-file',
+                    '--postgres-ssl-ca-file-db-sync',
                     postgresSslCaFile,
                     '--service-names',
                     ServiceNames.NetworkInfo
@@ -1652,8 +1664,8 @@ describe('CLI', () => {
                     API_URL: apiUrl,
                     CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
                     OGMIOS_URL: ogmiosConnection.address.webSocket,
-                    POSTGRES_CONNECTION_STRING: postgresConnectionString,
-                    POSTGRES_SSL_CA_FILE: postgresSslCaFile,
+                    POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
+                    POSTGRES_SSL_CA_FILE_DB_SYNC: postgresSslCaFile,
                     SERVICE_NAMES: ServiceNames.NetworkInfo
                   }
                 },
@@ -1695,7 +1707,7 @@ describe('CLI', () => {
                     apiUrl,
                     '--ogmios-url',
                     ogmiosConnection.address.webSocket,
-                    '--postgres-connection-string',
+                    '--postgres-connection-string-db-sync',
                     postgresConnectionString,
                     '--token-metadata-server-url',
                     tokenMetadataServerUrl,
@@ -1724,7 +1736,7 @@ describe('CLI', () => {
                     API_URL: apiUrl,
                     LOGGER_MIN_SEVERITY: 'error',
                     OGMIOS_URL: ogmiosConnection.address.webSocket,
-                    POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                    POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
                     SERVICE_NAMES: ServiceNames.Asset,
                     TOKEN_METADATA_REQUEST_TIMEOUT: tokenMetadataRequestTimeout,
                     TOKEN_METADATA_SERVER_URL: tokenMetadataServerUrl
@@ -1753,7 +1765,7 @@ describe('CLI', () => {
                     apiUrl,
                     '--ogmios-url',
                     ogmiosConnection.address.webSocket,
-                    '--postgres-connection-string',
+                    '--postgres-connection-string-db-sync',
                     postgresConnectionString,
                     '--token-metadata-server-url',
                     tokenMetadataServerUrl,
@@ -1782,7 +1794,7 @@ describe('CLI', () => {
                     API_URL: apiUrl,
                     LOGGER_MIN_SEVERITY: 'error',
                     OGMIOS_URL: ogmiosConnection.address.webSocket,
-                    POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                    POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
                     SERVICE_NAMES: ServiceNames.Asset,
                     TOKEN_METADATA_REQUEST_TIMEOUT: tokenMetadataRequestTimeout,
                     TOKEN_METADATA_SERVER_URL: tokenMetadataServerUrl
@@ -1808,7 +1820,7 @@ describe('CLI', () => {
                     API_URL: apiUrl,
                     LOGGER_MIN_SEVERITY: 'error',
                     OGMIOS_URL: ogmiosConnection.address.webSocket,
-                    POSTGRES_CONNECTION_STRING: postgresConnectionString,
+                    POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
                     SERVICE_NAMES: ServiceNames.Asset,
                     TOKEN_METADATA_SERVER_URL: 'stub://'
                   },
@@ -1963,7 +1975,7 @@ describe('CLI', () => {
                   ...baseArgs,
                   '--api-url',
                   apiUrl,
-                  '--postgres-connection-string',
+                  '--postgres-connection-string-db-sync',
                   postgresConnectionString,
                   '--cardano-node-config-path',
                   cardanoNodeConfigPath,
@@ -2048,7 +2060,7 @@ describe('CLI', () => {
           startProjector([
             '--ogmios-url',
             'ws://localhost:1234',
-            '--postgres-connection-string',
+            '--postgres-connection-string-stake-pool',
             'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
             ProjectionName.UTXO
           ]);
@@ -2059,7 +2071,7 @@ describe('CLI', () => {
           startProjector([
             '--ogmios-url',
             'ws://localhost:1234',
-            '--postgres-connection-string',
+            '--postgres-connection-string-stake-pool',
             'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
             `${ProjectionName.UTXO},${ProjectionName.StakePool}`
           ]);
@@ -2072,7 +2084,7 @@ describe('CLI', () => {
             `${ProjectionName.UTXO},${ProjectionName.StakePool}`,
             '--ogmios-url',
             'ws://localhost:1234',
-            '--postgres-connection-string',
+            '--postgres-connection-string-stake-pool',
             'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection'
           ]);
           await assertServerAlive();
@@ -2082,7 +2094,7 @@ describe('CLI', () => {
           startProjector([
             '--ogmios-url',
             'ws://localhost:1234',
-            '--postgres-connection-string',
+            '--postgres-connection-string-stake-pool',
             'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
             '--drop-schema',
             'true',
@@ -2094,13 +2106,13 @@ describe('CLI', () => {
 
       it('can be started in SRV discovery mode', async () => {
         startProjector([
-          '--postgres-db',
+          '--postgres-db-stake-pool',
           'dbname',
-          '--postgres-password',
+          '--postgres-password-stake-pool',
           'password',
-          '--postgres-srv-service-name',
+          '--postgres-srv-service-name-stake-pool',
           'postgres.projection.com',
-          '--postgres-user',
+          '--postgres-user-stake-pool',
           'username',
           '--ogmios-srv-service-name',
           'ogmios.projection.com',
@@ -2135,7 +2147,8 @@ describe('CLI', () => {
           startProjector(
             {
               OGMIOS_URL: 'ws://localhost:1234',
-              POSTGRES_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection'
+              POSTGRES_CONNECTION_STRING_STAKE_POOL:
+                'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection'
             },
             [ProjectionName.UTXO]
           );
@@ -2146,7 +2159,8 @@ describe('CLI', () => {
           startProjector(
             {
               OGMIOS_URL: 'ws://localhost:1234',
-              POSTGRES_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection'
+              POSTGRES_CONNECTION_STRING_STAKE_POOL:
+                'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection'
             },
             [`${ProjectionName.UTXO},${ProjectionName.StakePool}`]
           );
@@ -2156,7 +2170,7 @@ describe('CLI', () => {
         test('with multiple projections as --projection-names argument', async () => {
           startProjector({
             OGMIOS_URL: 'ws://localhost:1234',
-            POSTGRES_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
+            POSTGRES_CONNECTION_STRING_STAKE_POOL: 'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
             PROJECTION_NAMES: `${ProjectionName.UTXO},${ProjectionName.StakePool}`
           });
           await assertServerAlive();
@@ -2167,10 +2181,10 @@ describe('CLI', () => {
         startProjector(
           {
             OGMIOS_SRV_SERVICE_NAME: 'ogmios.projection.com',
-            POSTGRES_DB: 'dbname',
-            POSTGRES_PASSWORD: 'password',
-            POSTGRES_SRV_SERVICE_NAME: 'postgres.projection.com',
-            POSTGRES_USER: 'username',
+            POSTGRES_DB_STAKE_POOL: 'dbname',
+            POSTGRES_PASSWORD_STAKE_POOL: 'password',
+            POSTGRES_SRV_SERVICE_NAME_STAKE_POOL: 'postgres.projection.com',
+            POSTGRES_USER_STAKE_POOL: 'username',
             SERVICE_DISCOVERY_TIMEOUT: '1000'
           },
           [ProjectionName.UTXO]
@@ -2268,8 +2282,8 @@ describe('CLI', () => {
             'abc',
             '--network',
             'mainnet',
-            '--postgres-connection-string',
-            process.env.POSTGRES_CONNECTION_STRING!,
+            '--postgres-connection-string-db-sync',
+            process.env.POSTGRES_CONNECTION_STRING_DB_SYNC!,
             '--api-url',
             `http://localhost:${port}/`
           ],
@@ -2319,7 +2333,7 @@ describe('CLI', () => {
       expect.assertions(2);
       proc = withLogging(fork(exePath, [...commonArgs, '--queues', 'pool-metadata'], { env: {}, stdio: 'pipe' }), true);
       proc.stderr!.on('data', (data) =>
-        expect(data.toString()).toMatch('projector requires the postgresConnectionString')
+        expect(data.toString()).toMatch('pg-boss-worker requires the postgresConnectionString')
       );
       proc.on('exit', (code) => {
         expect(code).toBe(1);

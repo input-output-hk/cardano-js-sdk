@@ -18,7 +18,7 @@ import axios from 'axios';
 jest.mock('dns', () => ({
   promises: {
     resolveSrv: async (serviceName: string): Promise<SrvRecord[]> => {
-      if (serviceName === process.env.POSTGRES_SRV_SERVICE_NAME)
+      if (serviceName === process.env.POSTGRES_SRV_SERVICE_NAME_DB_SYNC)
         return [{ name: 'localhost', port: 5433, priority: 6, weight: 5 }];
       return [];
     }
@@ -46,16 +46,16 @@ describe('Service dependency abstractions', () => {
     beforeAll(async () => {
       dbPools = {
         healthCheck: (await getPool(dnsResolver, logger, {
-          postgresDb: process.env.POSTGRES_DB!,
-          postgresPassword: process.env.POSTGRES_PASSWORD!,
-          postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,
-          postgresUser: process.env.POSTGRES_USER!
+          postgresDbDbSync: process.env.POSTGRES_DB_DB_SYNC!,
+          postgresPasswordDbSync: process.env.POSTGRES_PASSWORD_DB_SYNC!,
+          postgresSrvServiceNameDbSync: process.env.POSTGRES_SRV_SERVICE_NAME_DB_SYNC!,
+          postgresUserDbSync: process.env.POSTGRES_USER_DB_SYNC!
         })) as Pool,
         main: (await getPool(dnsResolver, logger, {
-          postgresDb: process.env.POSTGRES_DB!,
-          postgresPassword: process.env.POSTGRES_PASSWORD!,
-          postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,
-          postgresUser: process.env.POSTGRES_USER!
+          postgresDbDbSync: process.env.POSTGRES_DB_DB_SYNC!,
+          postgresPasswordDbSync: process.env.POSTGRES_PASSWORD_DB_SYNC!,
+          postgresSrvServiceNameDbSync: process.env.POSTGRES_SRV_SERVICE_NAME_DB_SYNC!,
+          postgresUserDbSync: process.env.POSTGRES_USER_DB_SYNC!
         })) as Pool
       };
     });
@@ -144,10 +144,10 @@ describe('Service dependency abstractions', () => {
     beforeAll(async () => {
       dbPools = {
         healthCheck: (await getPool(dnsResolver, logger, {
-          postgresConnectionString: process.env.POSTGRES_CONNECTION_STRING
+          postgresConnectionStringDbSync: process.env.POSTGRES_CONNECTION_STRING_DB_SYNC
         })) as Pool,
         main: (await getPool(dnsResolver, logger, {
-          postgresConnectionString: process.env.POSTGRES_CONNECTION_STRING
+          postgresConnectionStringDbSync: process.env.POSTGRES_CONNECTION_STRING_DB_SYNC
         })) as Pool
       };
     });
@@ -231,10 +231,10 @@ describe('Service dependency abstractions', () => {
       });
 
       provider = await getPool(dnsResolverMock, logger, {
-        postgresDb: process.env.POSTGRES_DB!,
-        postgresPassword: process.env.POSTGRES_PASSWORD!,
-        postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,
-        postgresUser: process.env.POSTGRES_USER!
+        postgresDbDbSync: process.env.POSTGRES_DB_DB_SYNC!,
+        postgresPasswordDbSync: process.env.POSTGRES_PASSWORD_DB_SYNC!,
+        postgresSrvServiceNameDbSync: process.env.POSTGRES_SRV_SERVICE_NAME_DB_SYNC!,
+        postgresUserDbSync: process.env.POSTGRES_USER_DB_SYNC!
       });
 
       const result = await provider!.query(HEALTH_CHECK_QUERY);
@@ -244,10 +244,10 @@ describe('Service dependency abstractions', () => {
 
     it('should execute a provider operation without to intercept it', async () => {
       provider = await getPool(dnsResolver, logger, {
-        postgresDb: process.env.POSTGRES_DB!,
-        postgresPassword: process.env.POSTGRES_PASSWORD!,
-        postgresSrvServiceName: process.env.POSTGRES_SRV_SERVICE_NAME!,
-        postgresUser: process.env.POSTGRES_USER!
+        postgresDbDbSync: process.env.POSTGRES_DB_DB_SYNC!,
+        postgresPasswordDbSync: process.env.POSTGRES_PASSWORD_DB_SYNC!,
+        postgresSrvServiceNameDbSync: process.env.POSTGRES_SRV_SERVICE_NAME_DB_SYNC!,
+        postgresUserDbSync: process.env.POSTGRES_USER_DB_SYNC!
       });
 
       await expect(provider!.end()).resolves.toBeUndefined();

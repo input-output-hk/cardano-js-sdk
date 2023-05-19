@@ -1,13 +1,13 @@
 /* eslint-disable promise/no-nesting */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable unicorn/no-nested-ternary */
+import { ConnectionNames, PosgresProgramOptions, getPostgresOption } from '../options';
 import { DnsResolver } from '../utils';
 import { InvalidProgramOption, MissingProgramOption } from '../errors';
 import { Logger } from 'ts-log';
 import { Observable, defer, from, of } from 'rxjs';
 import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
 import { Pool, PoolConfig, QueryConfig } from 'pg';
-import { PosgresProgramOptions } from '../options';
 import { TlsOptions } from 'tls';
 import { URL } from 'url';
 import { isConnectionError } from '@cardano-sdk/util';
@@ -82,11 +82,12 @@ const mergeTlsOptions = (
 
 export const getConnectionConfig = (
   dnsResolver: DnsResolver,
-  options?: PosgresProgramOptions
+  program: string,
+  options?: PosgresProgramOptions<'StakePool'>
 ): Observable<PgConnectionConfig> => {
-  const ssl = options?.postgresSslCaFile ? { ca: loadSecret(options.postgresSslCaFile) } : undefined;
-  if (options?.postgresConnectionString) {
-    const conn = connString.parse(options.postgresConnectionString);
+  const ssl = options?.postgresSslCaFileStakePool ? { ca: loadSecret(options.postgresSslCaFileStakePool) } : undefined;
+  if (options?.postgresConnectionStringStakePool) {
+    const conn = connString.parse(options.postgresConnectionStringStakePool);
     if (!conn.database || !conn.host) {
       throw new InvalidProgramOption('postgresConnectionString');
     }
@@ -100,24 +101,29 @@ export const getConnectionConfig = (
     });
   }
 
-  if (options?.postgresSrvServiceName && options.postgresUser && options.postgresDb && options.postgresPassword) {
+  if (
+    options?.postgresSrvServiceNameStakePool &&
+    options.postgresUserStakePool &&
+    options.postgresDbStakePool &&
+    options.postgresPasswordStakePool
+  ) {
     return defer(() =>
       from(
-        dnsResolver(options.postgresSrvServiceName!).then(
+        dnsResolver(options.postgresSrvServiceNameStakePool!).then(
           (record): PgConnectionConfig => ({
-            database: options.postgresDb,
+            database: options.postgresDbStakePool,
             host: record.name,
-            password: options.postgresPassword,
+            password: options.postgresPasswordStakePool,
             port: record.port,
             ssl,
-            username: options.postgresUser
+            username: options.postgresUserStakePool
           })
         )
       )
     );
   }
 
-  throw new MissingProgramOption('projector', [
+  throw new MissingProgramOption(program, [
     'postgresConnectionString',
     'postgresSrvServiceName',
     'postgresUser',
@@ -129,12 +135,16 @@ export const getConnectionConfig = (
 export const getPool = async (
   dnsResolver: DnsResolver,
   logger: Logger,
-  options?: PosgresProgramOptions
+  options?: PosgresProgramOptions<'DbSync'>
 ): Promise<Pool | undefined> => {
-  const ssl = options?.postgresSslCaFile ? { ca: loadSecret(options.postgresSslCaFile) } : undefined;
+  const ssl = options?.postgresSslCaFileDbSync ? { ca: loadSecret(options.postgresSslCaFileDbSync) } : undefined;
 
-  if (options?.postgresConnectionString) {
-    const pool = new Pool({ connectionString: options.postgresConnectionString, max: options.postgresPoolMax, ssl });
+  if (options?.postgresConnectionStringDbSync) {
+    const pool = new Pool({
+      connectionString: options.postgresConnectionStringDbSync,
+      max: options.postgresPoolMaxDbSync,
+      ssl
+    });
 
     return new Proxy<Pool>({} as Pool, {
       get(_, prop) {
@@ -153,14 +163,19 @@ export const getPool = async (
     });
   }
 
-  if (options?.postgresSrvServiceName && options.postgresUser && options.postgresDb && options.postgresPassword) {
+  if (
+    options?.postgresSrvServiceNameDbSync &&
+    options.postgresUserDbSync &&
+    options.postgresDbDbSync &&
+    options.postgresPasswordDbSync
+  ) {
     return getPoolWithServiceDiscovery(dnsResolver, logger, {
-      database: options.postgresDb,
-      host: options.postgresSrvServiceName,
-      max: options.postgresPoolMax,
-      password: options.postgresPassword,
+      database: options.postgresDbDbSync,
+      host: options.postgresSrvServiceNameDbSync,
+      max: options.postgresPoolMaxDbSync,
+      password: options.postgresPasswordDbSync,
       ssl,
-      user: options.postgresUser
+      user: options.postgresUserDbSync
     });
   }
   // If db connection string is not passed nor postgres srv service name
@@ -170,18 +185,36 @@ export const getPool = async (
 const getSecret = (secretFilePath?: string, secret?: string) =>
   secretFilePath ? loadSecret(secretFilePath) : secret ? secret : undefined;
 
-export const connectionStringFromArgs = (args: PosgresProgramOptions) => {
-  const dbName = getSecret(args.postgresDbFile, args.postgresDb);
-  const dbUser = getSecret(args.postgresUserFile, args.postgresUser);
-  const dbPassword = getSecret(args.postgresPasswordFile, args.postgresPassword);
+export const connectionStringFromArgs = <Suffix extends ConnectionNames>(
+  args: PosgresProgramOptions<Suffix>,
+  suffix: Suffix
+) => {
+  const dbName = getSecret(
+    getPostgresOption(suffix, 'postgresDbFile', args),
+    getPostgresOption(suffix, 'postgresDb', args)
+  );
+  const dbUser = getSecret(
+    getPostgresOption(suffix, 'postgresUserFile', args),
+    getPostgresOption(suffix, 'postgresUser', args)
+  );
+  const dbPassword = getSecret(
+    getPostgresOption(suffix, 'postgresPasswordFile', args),
+    getPostgresOption(suffix, 'postgresPassword', args)
+  );
 
   // Setting the connection string takes preference over secrets.
   // It can also remain undefined since there is no a default value. Usually used locally with static config.
-  let postgresConnectionString;
-  if (args.postgresConnectionString) {
-    postgresConnectionString = new URL(args.postgresConnectionString).toString();
-  } else if (dbName && dbPassword && dbUser && args.postgresHost && args.postgresPort) {
-    postgresConnectionString = `postgresql://${dbUser}:${dbPassword}@${args.postgresHost}:${args.postgresPort}/${dbName}`;
+  let postgresConnectionString = getPostgresOption(suffix, 'postgresConnectionString', args);
+
+  if (postgresConnectionString) {
+    postgresConnectionString = new URL(postgresConnectionString).toString();
+  } else {
+    const postgresHost = getPostgresOption(suffix, 'postgresHost', args);
+    const postgresPort = getPostgresOption(suffix, 'postgresPort', args);
+
+    if (dbName && dbPassword && dbUser && postgresHost && postgresPort)
+      postgresConnectionString = `postgresql://${dbUser}:${dbPassword}@${postgresHost}:${postgresPort}/${dbName}`;
   }
+
   return postgresConnectionString;
 };

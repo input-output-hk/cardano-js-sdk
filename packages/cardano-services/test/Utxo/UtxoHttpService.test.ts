@@ -49,10 +49,10 @@ describe('UtxoHttpService', () => {
     config = { listen: { port } };
     dbPools = {
       healthCheck: new Pool({
-        connectionString: process.env.POSTGRES_CONNECTION_STRING
+        connectionString: process.env.POSTGRES_CONNECTION_STRING_DB_SYNC
       }),
       main: new Pool({
-        connectionString: process.env.POSTGRES_CONNECTION_STRING
+        connectionString: process.env.POSTGRES_CONNECTION_STRING_DB_SYNC
       })
     };
     fixtureBuilder = new UtxoFixtureBuilder(dbPools.main, logger);

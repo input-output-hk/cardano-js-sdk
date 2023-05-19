@@ -23,14 +23,14 @@ describe('stakePoolHandler', () => {
 
   beforeAll(async () => {
     const connectionConfig = {
-      database: process.env.POSTGRES_DB_PROJECTION!,
-      host: process.env.POSTGRES_HOST!,
-      password: process.env.POSTGRES_PASSWORD!,
-      port: Number.parseInt(process.env.POSTGRES_PORT!, 10),
+      database: process.env.POSTGRES_DB_STAKE_POOL!,
+      host: process.env.POSTGRES_HOST_DB_SYNC!,
+      password: process.env.POSTGRES_PASSWORD_DB_SYNC!,
+      port: Number.parseInt(process.env.POSTGRES_PORT_DB_SYNC!, 10),
       // used by: new Pool()
-      user: process.env.POSTGRES_USER!,
+      user: process.env.POSTGRES_USER_DB_SYNC!,
       // used by: createDataSource()
-      username: process.env.POSTGRES_USER!
+      username: process.env.POSTGRES_USER_DB_SYNC!
     };
     const db = new Pool(connectionConfig);
     const entities = [BlockEntity, PoolMetadataEntity, PoolRegistrationEntity, PoolRetirementEntity, StakePoolEntity];

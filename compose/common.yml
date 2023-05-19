@@ -59,6 +59,7 @@ services:
       projector:
         condition: service_healthy
     environment:
+      - LOGGER_MIN_SEVERITY=${LOGGER_MIN_SEVERITY:-info}
       - QUEUES=${QUEUES:-pool-metadata}
     healthcheck:
       test: ['CMD-SHELL', 'curl -s --fail http://localhost:3003/health']
@@ -69,7 +70,8 @@ services:
       - ${PG_BOSS_PORT:-4003}:3003
     restart: on-failure
     secrets:
-      - postgres_db_projection
+      - postgres_db_db_sync
+      - postgres_db_stake_pool
       - postgres_password
       - postgres_user
 
@@ -78,7 +80,7 @@ services:
     command: postgres -c shared_preload_libraries=pg_stat_statements -c pg_stat_statements.track=all
     environment:
       - POSTGRES_LOGGING=true
-      - POSTGRES_DB_FILE=/run/secrets/postgres_db
+      - POSTGRES_DB_FILE=/run/secrets/postgres_db_db_sync
       - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
       - POSTGRES_USER_FILE=/run/secrets/postgres_user
     image: postgres:${POSTGRES_VERSION:-11.5-alpine}
@@ -91,7 +93,7 @@ services:
       - ${POSTGRES_PORT:-5432}:5432
     restart: on-failure
     secrets:
-      - postgres_db
+      - postgres_db_db_sync
       - postgres_password
       - postgres_user
     shm_size: '2gb'
@@ -108,6 +110,7 @@ services:
         condition: service_healthy
     environment:
       - DROP_SCHEMA=${DROP_PROJECTOR_SCHEMA:-false}
+      - LOGGER_MIN_SEVERITY=${LOGGER_MIN_SEVERITY:-info}
       - OGMIOS_URL=ws://cardano-node-ogmios:1337
     healthcheck:
       test:
@@ -119,7 +122,7 @@ services:
       - ${PROJECTOR_PORT:-4002}:3002
     restart: on-failure
     secrets:
-      - postgres_db_projection
+      - postgres_db_stake_pool
       - postgres_password
       - postgres_user
 
@@ -141,7 +144,7 @@ services:
       - EPOCH_POLL_INTERVAL=${EPOCH_POLL_INTERVAL:-500}
       - LOGGER_MIN_SEVERITY=${LOGGER_MIN_SEVERITY:-info}
       - OGMIOS_URL=ws://cardano-node-ogmios:1337
-      - POSTGRES_POOL_MAX=${POSTGRES_POOL_MAX:-10}
+      - POSTGRES_POOL_MAX_DB_SYNC=${POSTGRES_POOL_MAX:-10}
       - RABBITMQ_URL=amqp://rabbitmq:5672
       - SERVICE_NAMES=${SERVICE_NAMES:-asset,chain-history,network-info,rewards,stake-pool,tx-submit,utxo}
       - USE_BLOCKFROST=${USE_BLOCKFROST:-false}
@@ -150,7 +153,7 @@ services:
       - ${API_PORT:-4000}:3000
     restart: on-failure
     secrets:
-      - postgres_db
+      - postgres_db_db_sync
       - postgres_password
       - postgres_user
 
@@ -188,10 +191,20 @@ services:
     restart: on-failure
 
 secrets:
+  # Replicates the db-sync secret for historical reasons.
+  # When the SDK was using only one database (the db-sync one) the only secret for database name used was this one
+  # to be compliant with db-sync image naming.
+  # The upstream db-sync Docker image is missing environment variables that allow the consumer to mount into a
+  # non-standard path, so we must conform with the hard-coded secret name.
+  # As demonstrated here: https://docs.docker.com/compose/use-secrets/#advanced, we could extend the Docker image
+  # and define POSTGRES_DB_FILE as the custom path to remove this workaround.
+  # See https://github.com/input-output-hk/cardano-db-sync/blob/aed18d1be192bd58d054cdba23758b579dae9f4e/nix/docker.nix#L116
   postgres_db:
-    file: ../../compose/placeholder-secrets/postgres_db
-  postgres_db_projection:
-    file: ../../compose/placeholder-secrets/postgres_db_projection
+    file: ../../compose/placeholder-secrets/postgres_db_db_sync
+  postgres_db_db_sync:
+    file: ../../compose/placeholder-secrets/postgres_db_db_sync
+  postgres_db_stake_pool:
+    file: ../../compose/placeholder-secrets/postgres_db_stake_pool
   postgres_password:
     file: ../../compose/placeholder-secrets/postgres_password
   postgres_user:

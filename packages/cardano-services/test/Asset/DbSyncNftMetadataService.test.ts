@@ -16,7 +16,7 @@ describe('DbSyncNftMetadataService', () => {
   let fixtureBuilder: AssetFixtureBuilder;
   beforeAll(() => {
     dbConnection = new Pool({
-      connectionString: process.env.POSTGRES_CONNECTION_STRING
+      connectionString: process.env.POSTGRES_CONNECTION_STRING_DB_SYNC
     });
     const metadataService = createDbSyncMetadataService(dbConnection, logger);
     service = new DbSyncNftMetadataService({ db: dbConnection, logger, metadataService });

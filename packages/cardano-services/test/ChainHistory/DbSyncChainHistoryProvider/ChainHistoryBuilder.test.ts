@@ -38,7 +38,7 @@ describe('ChainHistoryBuilder', () => {
 
   beforeAll(async () => {
     dbConnection = new Pool({
-      connectionString: process.env.POSTGRES_CONNECTION_STRING
+      connectionString: process.env.POSTGRES_CONNECTION_STRING_DB_SYNC
     });
     builder = new ChainHistoryBuilder(dbConnection, logger);
     fixtureBuilder = new ChainHistoryFixtureBuilder(dbConnection, logger);

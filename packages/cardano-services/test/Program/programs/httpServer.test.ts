@@ -39,11 +39,11 @@ jest.mock('dns', () => ({
 describe('HTTP Server', () => {
   let apiUrl: URL;
   let cardanoNodeConfigPath: string;
-  let postgresConnectionString: string;
-  let postgresSrvServiceName: string;
-  let postgresDb: string;
-  let postgresUser: string;
-  let postgresPassword: string;
+  let postgresConnectionStringDbSync: string;
+  let postgresSrvServiceNameDbSync: string;
+  let postgresDbDbSync: string;
+  let postgresUserDbSync: string;
+  let postgresPasswordDbSync: string;
   let dbCacheTtl: number;
   let healthCheckCacheTtl: number;
   let epochPollInterval: number;
@@ -58,11 +58,11 @@ describe('HTTP Server', () => {
 
   beforeEach(async () => {
     apiUrl = new URL(`http://localhost:${await getRandomPort()}`);
-    postgresConnectionString = process.env.POSTGRES_CONNECTION_STRING!;
-    postgresSrvServiceName = process.env.POSTGRES_SRV_SERVICE_NAME!;
-    postgresDb = process.env.POSTGRES_DB!;
-    postgresUser = process.env.POSTGRES_USER!;
-    postgresPassword = process.env.POSTGRES_PASSWORD!;
+    postgresConnectionStringDbSync = process.env.POSTGRES_CONNECTION_STRING_DB_SYNC!;
+    postgresSrvServiceNameDbSync = process.env.POSTGRES_SRV_SERVICE_NAME_DB_SYNC!;
+    postgresDbDbSync = process.env.POSTGRES_DB_DB_SYNC!;
+    postgresUserDbSync = process.env.POSTGRES_USER_DB_SYNC!;
+    postgresPasswordDbSync = process.env.POSTGRES_PASSWORD_DB_SYNC!;
     cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
     ogmiosConnection = await createConnectionObjectWithRandomPort();
     ogmiosSrvServiceName = process.env.OGMIOS_SRV_SERVICE_NAME!;
@@ -94,7 +94,7 @@ describe('HTTP Server', () => {
         epochPollInterval,
         healthCheckCacheTtl,
         ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
-        postgresConnectionString,
+        postgresConnectionStringDbSync,
         serviceNames: [
           ServiceNames.StakePool,
           ServiceNames.TxSubmit,
@@ -116,10 +116,10 @@ describe('HTTP Server', () => {
           epochPollInterval,
           healthCheckCacheTtl,
           ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
-          postgresDb,
-          postgresPassword,
-          postgresSrvServiceName,
-          postgresUser,
+          postgresDbDbSync,
+          postgresPasswordDbSync,
+          postgresSrvServiceNameDbSync,
+          postgresUserDbSync,
           serviceDiscoveryBackoffFactor,
           serviceDiscoveryTimeout,
           serviceNames: [ServiceNames.StakePool]
@@ -140,9 +140,9 @@ describe('HTTP Server', () => {
               epochPollInterval,
               healthCheckCacheTtl,
               ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
-              postgresDb: missingPostgresDb,
-              postgresSrvServiceName,
-              postgresUser,
+              postgresDbDbSync: missingPostgresDb,
+              postgresSrvServiceNameDbSync,
+              postgresUserDbSync,
               serviceDiscoveryBackoffFactor,
               serviceDiscoveryTimeout,
               serviceNames: [ServiceNames.StakePool]
@@ -298,7 +298,7 @@ describe('HTTP Server', () => {
             epochPollInterval: 0,
             healthCheckCacheTtl,
             ogmiosUrl: new URL('http://localhost:1337'),
-            postgresConnectionString: 'postgres',
+            postgresConnectionStringDbSync: 'postgres',
             serviceNames: [serviceName]
           })
         ).rejects.toThrow(
@@ -330,7 +330,7 @@ describe('HTTP Server', () => {
           epochPollInterval,
           healthCheckCacheTtl,
           ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
-          postgresConnectionString,
+          postgresConnectionStringDbSync,
           serviceNames: [ServiceNames.StakePool, ServiceNames.TxSubmit]
         })
       ).not.toThrow(new ProviderError(ProviderFailure.Unhealthy));

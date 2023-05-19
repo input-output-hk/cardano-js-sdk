@@ -54,7 +54,7 @@ const expectedPoolMetadata = [
 ];
 
 describe('stake-pool-metadata', () => {
-  const key = 'PROJECTION_PG_CONNECTION_STRING';
+  const key = 'STAKE_POOL_CONNECTION_STRING';
   const connectionString = getEnv([key])[key];
   const db = new Pool({ connectionString });
 

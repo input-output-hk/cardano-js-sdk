@@ -9,7 +9,7 @@ import { logger } from '@cardano-sdk/util-dev';
 
 describe('StakePoolBuilder', () => {
   const dbConnection = new Pool({
-    connectionString: process.env.POSTGRES_CONNECTION_STRING
+    connectionString: process.env.POSTGRES_CONNECTION_STRING_DB_SYNC
   });
   const pagination = { limit: PAGINATION_PAGE_SIZE_LIMIT_DEFAULT, startAt: 0 };
   const builder = new StakePoolBuilder(dbConnection, logger);
