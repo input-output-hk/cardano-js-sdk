@@ -1,5 +1,5 @@
-import { AssetId } from '@cardano-sdk/util-dev';
-import { Cardano, UtxoProvider } from '../../src';
+import * as AssetId from '../assetId';
+import { Cardano, UtxoProvider } from '@cardano-sdk/core';
 import delay from 'delay';
 
 export const utxo: Cardano.Utxo[] = [

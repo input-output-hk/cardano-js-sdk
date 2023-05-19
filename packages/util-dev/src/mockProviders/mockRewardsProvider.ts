@@ -1,5 +1,4 @@
-import { Cardano, Paginated, StakePoolProvider } from '../../src';
-import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import { Cardano, Paginated, StakePoolProvider } from '@cardano-sdk/core';
 import { epochRewards, rewardAccountBalance, rewardAccountBalance2, rewardsHistory, rewardsHistory2 } from './mockData';
 import { getRandomTxId } from './mockChainHistoryProvider';
 import delay from 'delay';
@@ -47,7 +46,9 @@ export const generateStakePools = (qty: number): Cardano.StakePool[] =>
       ticker: 'BANDA'
     },
     metadataJson: {
-      hash: Hash32ByteBase16(getRandomTxId()),
+      // Hash type would create a dependency on 'crypto' package
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      hash: getRandomTxId() as any,
       url: 'https://git.io/JJ7wm'
     },
     metrics: {

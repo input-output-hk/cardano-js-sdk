@@ -1,9 +1,8 @@
 import { Cardano } from '@cardano-sdk/core';
-import { firstValueFrom, of } from 'rxjs';
-
-import * as mocks from '../../../core/test/mocks';
 import { SingleAddressWallet, TransactionFailure } from '../../src';
 import { createWallet } from './util';
+import { firstValueFrom, of } from 'rxjs';
+import { mockProviders as mocks } from '@cardano-sdk/util-dev';
 
 describe('integration/withdrawal', () => {
   let wallet: SingleAddressWallet;

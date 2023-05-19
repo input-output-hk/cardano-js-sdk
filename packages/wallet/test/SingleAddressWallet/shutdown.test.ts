@@ -1,9 +1,13 @@
 /* eslint-disable max-statements */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
-import * as mocks from '../../../core/test/mocks';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
-import { AssetId, createStubStakePoolProvider, somePartialStakePools } from '@cardano-sdk/util-dev';
+import {
+  AssetId,
+  createStubStakePoolProvider,
+  mockProviders as mocks,
+  somePartialStakePools
+} from '@cardano-sdk/util-dev';
 import {
   CML,
   Cardano,
@@ -22,7 +26,6 @@ import {
   setupWallet
 } from '../../src';
 import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
-import { currentEpoch } from '../../../core/test/mocks';
 import { firstValueFrom } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
 import { stakeKeyDerivationPath, testAsyncKeyAgent, testKeyAgent } from '../../../key-management/test/mocks';
@@ -120,7 +123,7 @@ const assertWalletProperties = async (
   await firstValueFrom(wallet.tip$);
   expect(wallet.tip$.value).toEqual(mocks.ledgerTip);
   // currentEpoch$
-  expect(wallet.currentEpoch$.value?.epochNo).toEqual(currentEpoch.number);
+  expect(wallet.currentEpoch$.value?.epochNo).toEqual(mocks.currentEpoch.number);
   // protocolParameters$
   await firstValueFrom(wallet.protocolParameters$);
   expect(wallet.protocolParameters$.value).toEqual(mocks.protocolParameters);

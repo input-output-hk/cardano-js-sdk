@@ -1,13 +1,13 @@
 import { BehaviorSubject } from 'rxjs';
 import { CLEAN_FN_STATS, ChainHistoryProviderStats, ProviderFnStats, TrackedChainHistoryProvider } from '../../../src';
 import { ChainHistoryProvider } from '@cardano-sdk/core';
-import { ChainHistoryProviderStub, mockChainHistoryProvider } from '../../../../core/test/mocks';
+import { mockProviders } from '@cardano-sdk/util-dev';
 
 describe('TrackedChainHistoryProvider', () => {
-  let chainHistoryProvider: ChainHistoryProviderStub;
+  let chainHistoryProvider: mockProviders.ChainHistoryProviderStub;
   let trackedChainHistoryProvider: TrackedChainHistoryProvider;
   beforeEach(() => {
-    chainHistoryProvider = mockChainHistoryProvider();
+    chainHistoryProvider = mockProviders.mockChainHistoryProvider();
     trackedChainHistoryProvider = new TrackedChainHistoryProvider(chainHistoryProvider);
   });
 
@@ -20,7 +20,7 @@ describe('TrackedChainHistoryProvider', () => {
       <T>(
         call: (chainHistoryProvider: ChainHistoryProvider) => Promise<T>,
         selectStats: (stats: ChainHistoryProviderStats) => BehaviorSubject<ProviderFnStats>,
-        selectFn: (mockChainHistoryProvider: ChainHistoryProviderStub) => jest.Mock
+        selectFn: (mockChainHistoryProvider: mockProviders.ChainHistoryProviderStub) => jest.Mock
         // eslint-disable-next-line unicorn/consistent-function-scoping
       ) =>
       async () => {

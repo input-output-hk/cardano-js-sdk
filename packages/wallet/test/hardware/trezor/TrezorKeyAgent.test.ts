@@ -1,5 +1,4 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import * as mocks from '../../../../core/test/mocks';
 import {
   AddressType,
   CommunicationType,
@@ -8,7 +7,7 @@ import {
   TrezorKeyAgent,
   util
 } from '@cardano-sdk/key-management';
-import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
+import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { CML, Cardano } from '@cardano-sdk/core';
 import { SingleAddressWallet, setupWallet } from '../../../src';
 import { dummyLogger as logger } from 'ts-log';

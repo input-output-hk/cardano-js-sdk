@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
-import * as mocks from '../../../../core/test/mocks';
 import { AddressType, CommunicationType, SerializableLedgerKeyAgentData, util } from '@cardano-sdk/key-management';
-import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
+import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { CML, Cardano } from '@cardano-sdk/core';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';

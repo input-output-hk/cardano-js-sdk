@@ -10,10 +10,11 @@ import {
   createRewardsHistoryTracker
 } from '../../../src/services';
 import { createStubTxWithCertificates } from './stub-tx';
-import { createTestScheduler } from '@cardano-sdk/util-dev';
+import { createTestScheduler, mockProviders } from '@cardano-sdk/util-dev';
 import { dummyLogger } from 'ts-log';
 import { firstValueFrom, of } from 'rxjs';
-import { mockRewardsProvider, rewardAccount, rewardsHistory } from '../../../../core/test/mocks';
+
+const { mockRewardsProvider, rewardAccount, rewardsHistory } = mockProviders;
 
 describe('RewardsHistory', () => {
   const rewardAccounts = [rewardAccount];

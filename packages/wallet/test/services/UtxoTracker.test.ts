@@ -3,10 +3,11 @@ import { InMemoryUtxoStore } from '../../src/persistence';
 import { Observable } from 'rxjs';
 import { PersistentCollectionTrackerSubject, TxInFlight, createUtxoTracker } from '../../src/services';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { createTestScheduler } from '@cardano-sdk/util-dev';
+import { createTestScheduler, mockProviders } from '@cardano-sdk/util-dev';
 import { dummyCbor } from '../util';
 import { dummyLogger } from 'ts-log';
-import { utxo, utxo2 } from '../../../core/test/mocks';
+
+const { utxo, utxo2 } = mockProviders;
 
 describe('createUtxoTracker', () => {
   // these variables are not relevant for this test, overwriting utxoSource$

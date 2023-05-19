@@ -2,17 +2,18 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { CML } from '@cardano-sdk/core';
 import { SingleAddressWallet, setupWallet } from '../../src';
 import { WalletStores } from '../../src/persistence';
-import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
+import { createStubStakePoolProvider, mockProviders } from '@cardano-sdk/util-dev';
 import { dummyLogger as logger } from 'ts-log';
-import {
+import { testAsyncKeyAgent } from '../../../key-management/test/mocks';
+
+const {
   mockAssetProvider,
   mockChainHistoryProvider,
   mockNetworkInfoProvider,
   mockRewardsProvider,
   mockTxSubmitProvider,
   mockUtxoProvider
-} from '../../../core/test/mocks';
-import { testAsyncKeyAgent } from '../../../key-management/test/mocks';
+} = mockProviders;
 
 const createDefaultProviders = () => ({
   assetProvider: mockAssetProvider(),

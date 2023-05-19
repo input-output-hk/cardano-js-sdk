@@ -6,13 +6,13 @@ import {
   WalletNetworkInfoProvider,
   WalletNetworkInfoProviderStats
 } from '../../../src';
-import { mockNetworkInfoProvider } from '../../../../core/test/mocks';
+import { mockProviders } from '@cardano-sdk/util-dev';
 
 describe('TrackedNetworkInfoProvider', () => {
   let networkInfoProvider: WalletNetworkInfoProvider;
   let trackedNetworkInfoProvider: TrackedWalletNetworkInfoProvider;
   beforeEach(() => {
-    networkInfoProvider = mockNetworkInfoProvider();
+    networkInfoProvider = mockProviders.mockNetworkInfoProvider();
     trackedNetworkInfoProvider = new TrackedWalletNetworkInfoProvider(networkInfoProvider);
   });
 

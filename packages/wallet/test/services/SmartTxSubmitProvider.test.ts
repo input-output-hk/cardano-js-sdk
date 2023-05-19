@@ -2,8 +2,7 @@ import { BehaviorSubject, EMPTY, of } from 'rxjs';
 import { Cardano, ProviderError, ProviderFailure, Transaction, TxSubmitProvider } from '@cardano-sdk/core';
 import { ConnectionStatus, SmartTxSubmitProvider, TipSlot } from '../../src';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { flushPromises } from '@cardano-sdk/util-dev';
-import { mockTxSubmitProvider } from '../../../core/test/mocks';
+import { flushPromises, mockProviders } from '@cardano-sdk/util-dev';
 import { usingAutoFree } from '@cardano-sdk/util';
 
 describe('SmartTxSubmitProvider', () => {
@@ -11,7 +10,7 @@ describe('SmartTxSubmitProvider', () => {
   let provider: SmartTxSubmitProvider;
   const retryBackoffConfig: RetryBackoffConfig = { initialInterval: 1 };
 
-  beforeEach(() => (underlyingProvider = mockTxSubmitProvider()));
+  beforeEach(() => (underlyingProvider = mockProviders.mockTxSubmitProvider()));
 
   describe('healthCheck', () => {
     it('calls underlying provider', () => {

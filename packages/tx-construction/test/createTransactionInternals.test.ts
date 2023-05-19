@@ -1,10 +1,11 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AssetId } from '@cardano-sdk/util-dev';
+import { AssetId, mockProviders } from '@cardano-sdk/util-dev';
 import { Cardano, NetworkInfoProvider } from '@cardano-sdk/core';
 import { CreateTxInternalsProps, createTransactionInternals } from '../src';
 import { SelectionConstraints } from '../../input-selection/test/util';
 import { SelectionSkeleton, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
-import { mockNetworkInfoProvider, utxo } from '../../core/test/mocks';
+
+const { mockNetworkInfoProvider, utxo } = mockProviders;
 
 const address = Cardano.PaymentAddress(
   'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'

@@ -20,9 +20,10 @@ import {
 } from '../../../src';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxWithEpoch } from '../../../src/services/DelegationTracker/types';
-import { createTestScheduler } from '@cardano-sdk/util-dev';
-import { currentEpoch, generateStakePools, mockStakePoolsProvider } from '../../../../core/test/mocks';
+import { createTestScheduler, mockProviders } from '@cardano-sdk/util-dev';
 import { dummyCbor } from '../../util';
+
+const { currentEpoch, generateStakePools, mockStakePoolsProvider } = mockProviders;
 
 jest.mock('../../../src/services/util/coldObservableProvider', () => {
   const actual = jest.requireActual('../../../src/services/util/coldObservableProvider');

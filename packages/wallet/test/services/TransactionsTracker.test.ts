@@ -3,12 +3,6 @@
 /* eslint-disable prettier/prettier */
 import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
 import {
-  ChainHistoryProviderStub,
-  generateTxAlonzo,
-  mockChainHistoryProvider,
-  queryTransactionsResult
-} from '../../../core/test/mocks';
-import {
   FailedTx,
   OutgoingTx,
   PAGE_SIZE,
@@ -20,17 +14,23 @@ import {
 import { InMemoryInFlightTransactionsStore, InMemoryTransactionsStore, WalletStores } from '../../src/persistence';
 import { NEVER, bufferCount, firstValueFrom, map, of } from 'rxjs';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { createTestScheduler } from '@cardano-sdk/util-dev';
+import { createTestScheduler, mockProviders } from '@cardano-sdk/util-dev';
 import { dummyCbor, toOutgoingTx } from '../util';
 import { dummyLogger } from 'ts-log';
 import delay from 'delay';
+
+const {
+  generateTxAlonzo,
+  mockChainHistoryProvider,
+  queryTransactionsResult
+} = mockProviders;
 
 describe('TransactionsTracker', () => {
   const logger = dummyLogger;
 
   describe('createAddressTransactionsProvider', () => {
     let store: InMemoryTransactionsStore;
-    let chainHistoryProvider: ChainHistoryProviderStub;
+    let chainHistoryProvider: mockProviders.ChainHistoryProviderStub;
     const tipBlockHeight$ = of(Cardano.BlockNo(300));
     const retryBackoffConfig = { initialInterval: 1 }; // not relevant
     const addresses = [queryTransactionsResult.pageResults[0].body.inputs[0].address!];

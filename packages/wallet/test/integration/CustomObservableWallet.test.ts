@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable sonarjs/no-extra-arguments */
 /* eslint-disable unicorn/consistent-function-scoping */
-import * as mocks from '../../../core/test/mocks';
 import { Cardano, Transaction } from '@cardano-sdk/core';
 import { GroupedAddress } from '@cardano-sdk/key-management';
 import { ObservableWallet, SingleAddressWallet, coldObservableProvider } from '../../src';
@@ -11,7 +10,7 @@ import {
   createOutputValidator
 } from '@cardano-sdk/tx-construction';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
+import { createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { firstValueFrom, of, timer } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
 import { testAsyncKeyAgent } from '../../../key-management/test/mocks';

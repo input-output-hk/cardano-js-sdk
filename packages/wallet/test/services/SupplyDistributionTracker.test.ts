@@ -2,7 +2,9 @@ import { createInMemorySupplyDistributionStores } from '../../src/persistence';
 import { createSupplyDistributionTracker } from '../../src';
 import { dummyLogger } from 'ts-log';
 import { firstValueFrom, of } from 'rxjs';
-import { mockNetworkInfoProvider, networkInfo } from '../../../core/test/mocks';
+import { mockProviders } from '@cardano-sdk/util-dev';
+
+const { mockNetworkInfoProvider, networkInfo } = mockProviders;
 
 describe('SupplyDistributionTracker', () => {
   it('loads data from the provider', async () => {

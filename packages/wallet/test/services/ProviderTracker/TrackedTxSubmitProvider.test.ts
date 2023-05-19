@@ -2,13 +2,13 @@ import { BehaviorSubject } from 'rxjs';
 import { CLEAN_TX_SUBMIT_STATS, ProviderFnStats, TrackedTxSubmitProvider, TxSubmitProviderStats } from '../../../src';
 import { TxSubmitProvider } from '@cardano-sdk/core';
 import { bufferToHexString } from '@cardano-sdk/util';
-import { mockTxSubmitProvider } from '../../../../core/test/mocks';
+import { mockProviders } from '@cardano-sdk/util-dev';
 
 describe('TrackedTxSubmitProvider', () => {
   let txSubmitProvider: TxSubmitProvider;
   let trackedTxSubmitProvider: TrackedTxSubmitProvider;
   beforeEach(() => {
-    txSubmitProvider = mockTxSubmitProvider();
+    txSubmitProvider = mockProviders.mockTxSubmitProvider();
     trackedTxSubmitProvider = new TrackedTxSubmitProvider(txSubmitProvider);
   });
 

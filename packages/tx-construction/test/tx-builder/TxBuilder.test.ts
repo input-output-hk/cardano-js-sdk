@@ -1,7 +1,6 @@
 /* eslint-disable func-style */
 /* eslint-disable jsdoc/require-jsdoc */
 import * as Crypto from '@cardano-sdk/crypto';
-import * as mocks from '../../../core/test/mocks';
 import {
   AddressType,
   InMemoryKeyAgent,
@@ -10,7 +9,7 @@ import {
   TransactionSigner,
   util
 } from '@cardano-sdk/key-management';
-import { AssetId, somePartialStakePools } from '@cardano-sdk/util-dev';
+import { AssetId, mockProviders as mocks, somePartialStakePools } from '@cardano-sdk/util-dev';
 import { CML, Cardano } from '@cardano-sdk/core';
 import {
   GenericTxBuilder,
