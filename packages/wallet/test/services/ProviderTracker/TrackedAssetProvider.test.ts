@@ -1,14 +1,14 @@
 import { AssetProvider, Cardano } from '@cardano-sdk/core';
 import { AssetProviderStats, CLEAN_FN_STATS, ProviderFnStats, TrackedAssetProvider } from '../../../src';
 import { BehaviorSubject } from 'rxjs';
-import { mockAssetProvider } from '../../../../core/test/mocks';
+import { mockProviders } from '@cardano-sdk/util-dev';
 
 describe('TrackedAssetProvider', () => {
   let assetProvider: AssetProvider;
   let trackedAssetProvider: TrackedAssetProvider;
 
   beforeEach(() => {
-    assetProvider = mockAssetProvider();
+    assetProvider = mockProviders.mockAssetProvider();
     trackedAssetProvider = new TrackedAssetProvider(assetProvider);
   });
 

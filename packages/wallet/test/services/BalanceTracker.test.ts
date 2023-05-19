@@ -4,8 +4,9 @@
 import { BehaviorObservable } from '@cardano-sdk/util-rxjs';
 import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
 import { DelegationTracker, createBalanceTracker } from '../../src/services';
-import { createTestScheduler } from '@cardano-sdk/util-dev';
-import { utxo, utxo2 } from '../../../core/test/mocks';
+import { createTestScheduler, mockProviders } from '@cardano-sdk/util-dev';
+
+const { utxo, utxo2 } = mockProviders;
 
 describe('createBalanceTracker', () => {
   it('combines data from rewardsTracker & utxoTracker', () => {

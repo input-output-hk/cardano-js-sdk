@@ -11,15 +11,16 @@ import {
   TrackedWalletNetworkInfoProvider,
   createProviderStatusTracker
 } from '../../../src';
-import { createStubStakePoolProvider, createTestScheduler } from '@cardano-sdk/util-dev';
+import { createStubStakePoolProvider, createTestScheduler, mockProviders } from '@cardano-sdk/util-dev';
 import { dummyLogger } from 'ts-log';
-import {
+
+const {
   mockAssetProvider,
   mockChainHistoryProvider,
   mockNetworkInfoProvider,
   mockRewardsProvider,
   mockUtxoProvider
-} from '../../../../core/test/mocks';
+} = mockProviders;
 
 const providerFnStats = {
   a: [CLEAN_FN_STATS, CLEAN_FN_STATS], // Initial state

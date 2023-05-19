@@ -1,6 +1,7 @@
-import { AssetId, somePartialStakePools } from '@cardano-sdk/util-dev';
-import { Cardano, Paginated } from '../../src';
+import * as AssetId from '../assetId';
+import { Cardano, Paginated } from '@cardano-sdk/core';
 import { currentEpoch, ledgerTip, stakeKeyHash } from './mockData';
+import { somePartialStakePools } from '../createStubStakePoolProvider';
 import delay from 'delay';
 
 export const getRandomTxId = () =>

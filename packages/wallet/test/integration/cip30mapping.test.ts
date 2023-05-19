@@ -1,7 +1,7 @@
+/* eslint-disable unicorn/consistent-destructuring */
 /* eslint-disable unicorn/consistent-function-scoping */
 /* eslint-disable @typescript-eslint/no-explicit-any, sonarjs/no-duplicate-string */
 import * as Crypto from '@cardano-sdk/crypto';
-import * as mocks from '../../../core/test/mocks';
 import {
   APIErrorCode,
   ApiError,
@@ -13,7 +13,7 @@ import {
   WalletApi
 } from '@cardano-sdk/dapp-connector';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
-import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
+import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import {
   CML,
   Cardano,
@@ -30,16 +30,17 @@ import { Providers, createWallet } from './util';
 import { SingleAddressWallet, cip30, setupWallet } from '../../src';
 import { firstValueFrom, of } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
-import {
+import { stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
+import { waitForWalletStateSettle } from '../util';
+
+const {
   mockChainHistoryProvider,
   mockNetworkInfoProvider,
   mockRewardsProvider,
   mockTxSubmitProvider,
-  utxo as mockUtxo,
+  utxo: mockUtxo,
   utxosWithLowCoins
-} from '../../../core/test/mocks';
-import { stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
-import { waitForWalletStateSettle } from '../util';
+} = mocks;
 
 type TestProviders = Required<Pick<Providers, 'txSubmitProvider' | 'networkInfoProvider'>>;
 

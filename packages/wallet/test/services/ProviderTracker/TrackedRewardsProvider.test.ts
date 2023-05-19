@@ -1,10 +1,12 @@
 import { BehaviorSubject } from 'rxjs';
 import { CLEAN_FN_STATS, ProviderFnStats, RewardsProviderStats, TrackedRewardsProvider } from '../../../src';
 import { RewardsProvider } from '@cardano-sdk/core';
-import { RewardsProviderStub, mockRewardsProvider, rewardAccount } from '../../../../core/test/mocks';
+import { mockProviders } from '@cardano-sdk/util-dev';
+
+const { mockRewardsProvider, rewardAccount } = mockProviders;
 
 describe('TrackedRewardsProvider', () => {
-  let rewardsProvider: RewardsProviderStub;
+  let rewardsProvider: mockProviders.RewardsProviderStub;
   let trackedRewardsProvider: TrackedRewardsProvider;
   beforeEach(() => {
     rewardsProvider = mockRewardsProvider();
@@ -16,7 +18,7 @@ describe('TrackedRewardsProvider', () => {
       <T>(
         call: (rewardsProvider: RewardsProvider) => Promise<T>,
         selectStats: (stats: RewardsProviderStats) => BehaviorSubject<ProviderFnStats>,
-        selectFn: (mockRewardsProvider: RewardsProviderStub) => jest.Mock
+        selectFn: (mockRewardsProvider: mockProviders.RewardsProviderStub) => jest.Mock
         // eslint-disable-next-line unicorn/consistent-function-scoping
       ) =>
       async () => {

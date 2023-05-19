@@ -1,5 +1,5 @@
 /* eslint-disable jsdoc/require-returns-type */
-import { Cardano } from '../../src';
+import { Cardano } from '@cardano-sdk/core';
 import { genesisParameters, ledgerTip, protocolParameters } from './mockData';
 import { networkInfo } from './mockNetworkInfoProvider';
 import delay from 'delay';

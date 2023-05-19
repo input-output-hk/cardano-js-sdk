@@ -1,5 +1,5 @@
 import { genesisParameters, ledgerTip, protocolParameters } from './mockData';
-import { testnetEraSummaries } from '@cardano-sdk/util-dev';
+import { testnetEraSummaries } from '../eraSummaries';
 
 export const networkInfo = {
   lovelaceSupply: {

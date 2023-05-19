@@ -10,10 +10,11 @@ import {
 } from '../../src';
 import { InMemoryInFlightTransactionsStore, InMemoryVolatileTransactionsStore } from '../../src/persistence';
 import { Logger, dummyLogger } from 'ts-log';
-import { createTestScheduler } from '@cardano-sdk/util-dev';
+import { createTestScheduler, mockProviders } from '@cardano-sdk/util-dev';
 import { dummyCbor } from '../util';
-import { genesisParameters } from '../../../core/test/mocks';
 import omit from 'lodash/omit';
+
+const { genesisParameters } = mockProviders;
 
 describe('TransactionReemiter', () => {
   const maxInterval = 2000;

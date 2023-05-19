@@ -2,7 +2,7 @@ import { createInMemorySupplyDistributionStores } from '../../src/persistence';
 import { createSupplyDistributionTracker } from '../../src';
 import { createWallet } from './util';
 import { dummyLogger } from 'ts-log';
-import { mockNetworkInfoProvider } from '../../../core/test/mocks';
+import { mockProviders } from '@cardano-sdk/util-dev';
 
 describe('SupplyDistributionTracker', () => {
   it('accepts an ObservableWallet as "trigger"', async () => {
@@ -12,7 +12,7 @@ describe('SupplyDistributionTracker', () => {
       { trigger$: wallet.currentEpoch$ },
       {
         logger: dummyLogger,
-        networkInfoProvider: mockNetworkInfoProvider(),
+        networkInfoProvider: mockProviders.mockNetworkInfoProvider(),
         stores: createInMemorySupplyDistributionStores()
       }
     );

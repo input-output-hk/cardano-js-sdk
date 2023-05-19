@@ -1,5 +1,4 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import * as mocks from '../../../core/test/mocks';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
 import { CML, Cardano } from '@cardano-sdk/core';
 import { ProtocolParametersRequiredByOutputValidator } from '@cardano-sdk/tx-construction';
@@ -11,7 +10,7 @@ import {
   requiresForeignSignatures,
   setupWallet
 } from '../../src';
-import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
+import { createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { dummyLogger as logger } from 'ts-log';
 import { of } from 'rxjs';
 import { stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';

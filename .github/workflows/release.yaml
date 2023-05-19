@@ -33,32 +33,22 @@ jobs:
         git_config_global: true
         git_user_signingkey: true
         git_commit_gpgsign: true
-
-    - name: Install dependencies & git fetch nightly
+      
+    - name: 💽 Install dependencies
       run: |
-        # Create a local 'nightly' branch tracking origin/nightly
-        git fetch origin nightly:nightly
-        # Install dependencies and put yarn-project.nix to staging if it has any changes
         yarn install --immutable --inline-builds --mode=skip-build
-        git checkout yarn-project.nix
+      env:
+        YARN_ENABLE_IMMUTABLE_INSTALLS: false  
+
+    - name: 🔨 Build
+      run: |
+        yarn build
 
     - name: Publish
       run: |
-        # Base on nightly branch versions
-        git merge --squash nightly
-        # Omit nighly release CHANGELOG changes
-        git restore --source master packages/*/CHANGELOG.md
-        git add .
-        # Test build to reduce chance of failure after creating a GH Release
-        yarn build
-        # Publish
-        yarn publish:release --sign-git-commit --loglevel silly
-        # Merge package.json/yarn.lock/CHANGELOG back to nightly
-        git checkout nightly
-        git merge --no-edit -s recursive -X theirs master
-        git push --set-upstream origin nightly
+        if [ $RELEASE_MODE = "stable" ]; then yarn publish:stable; else yarn publish:rc; fi
       env:
-        YARN_ENABLE_IMMUTABLE_INSTALLS: false
         NODE_AUTH_TOKEN: ${{ secrets.NPM_REGISTRY_TOKEN }}
-        # Used for making a release
+        # Used for making a GitHub Release
         GH_TOKEN: ${{ secrets.BOT_GH_TOKEN }}
+        RELEASE_MODE: ${{ vars.RELEASE_MODE }}

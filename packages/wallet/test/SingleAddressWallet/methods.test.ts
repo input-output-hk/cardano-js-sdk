@@ -1,7 +1,7 @@
+/* eslint-disable unicorn/consistent-destructuring */
 import * as Crypto from '@cardano-sdk/crypto';
-import * as mocks from '../../../core/test/mocks';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
-import { AssetId, createStubStakePoolProvider } from '@cardano-sdk/util-dev';
+import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { BehaviorSubject, firstValueFrom, skip } from 'rxjs';
 import { CML, Cardano, CardanoNodeErrors, ProviderError, ProviderFailure, TxCBOR } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
@@ -9,8 +9,9 @@ import { InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { SingleAddressWallet, setupWallet } from '../../src';
 import { getPassphrase, stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { dummyLogger as logger } from 'ts-log';
-import { mockChainHistoryProvider, mockRewardsProvider, utxo } from '../../../core/test/mocks';
 import { toOutgoingTx, waitForWalletStateSettle } from '../util';
+
+const { mockChainHistoryProvider, mockRewardsProvider, utxo } = mocks;
 
 // We can't consistently re-serialize this specific tx due to witness.datums list format
 const serializedForeignTx =
