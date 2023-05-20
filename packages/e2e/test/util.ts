@@ -29,7 +29,7 @@ import {
   networkInfoProviderFactory,
   walletVariables
 } from '../src';
-import { FinalizeTxProps, ObservableWallet, SingleAddressWallet } from '@cardano-sdk/wallet';
+import { FinalizeTxProps, ObservableWallet, PersonalWallet } from '@cardano-sdk/wallet';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { logger } from '@cardano-sdk/util-dev';
 import sortBy from 'lodash/sortBy';
@@ -223,7 +223,7 @@ export const runningAgainstLocalNetwork = async () => {
  * @param tx The **already confirmed** transaction we need to know the confirmation epoch
  * @returns The epoch when the given transaction was confirmed
  */
-export const getTxConfirmationEpoch = async (wallet: SingleAddressWallet, tx: Cardano.Tx<Cardano.TxBody>) => {
+export const getTxConfirmationEpoch = async (wallet: PersonalWallet, tx: Cardano.Tx<Cardano.TxBody>) => {
   const txs = await firstValueFrom(wallet.transactions.history$.pipe(filter((_) => _.some(({ id }) => id === tx.id))));
   const observedTx = txs.find(({ id }) => id === tx.id);
   const slotEpochCalc = createSlotEpochCalc(await firstValueFrom(wallet.eraSummaries$));
@@ -287,7 +287,7 @@ export const burnTokens = async ({
   scripts,
   policySigners: extraSigners
 }: {
-  wallet: SingleAddressWallet;
+  wallet: PersonalWallet;
   tokens?: Cardano.TokenMap;
   scripts: Cardano.Script[];
   policySigners: TransactionSigner[];

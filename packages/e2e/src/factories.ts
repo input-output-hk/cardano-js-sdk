@@ -6,9 +6,9 @@ import {
   HDSequentialDiscovery,
   Milliseconds,
   ObservableWallet,
+  PersonalWallet,
   PollingConfig,
   SingleAddressDiscovery,
-  SingleAddressWallet,
   setupWallet,
   storage
 } from '@cardano-sdk/wallet';
@@ -343,7 +343,7 @@ export const getWallet = async (props: GetWalletProps) => {
       ? () => Promise.resolve(keyAgent)
       : await keyManagementFactory.create(env.KEY_MANAGEMENT_PROVIDER, keyManagementParams, logger),
     createWallet: async (asyncKeyAgent: AsyncKeyAgent) =>
-      new SingleAddressWallet({ name, polling }, { ...providers, keyAgent: asyncKeyAgent, logger, stores }),
+      new PersonalWallet({ name, polling }, { ...providers, keyAgent: asyncKeyAgent, logger, stores }),
     logger
   });
 

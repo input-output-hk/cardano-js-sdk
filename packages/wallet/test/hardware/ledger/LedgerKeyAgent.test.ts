@@ -7,7 +7,7 @@ import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
 import { LedgerKeyAgent, LedgerTransportType } from '@cardano-sdk/hardware-ledger';
-import { SingleAddressWallet, setupWallet } from '../../../src';
+import { PersonalWallet, setupWallet } from '../../../src';
 import { dummyLogger as logger } from 'ts-log';
 import { mockKeyAgentDependencies } from '../../../../key-management/test/mocks';
 import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
@@ -15,7 +15,7 @@ import DeviceConnection from '@cardano-foundation/ledgerjs-hw-app-cardano';
 describe('LedgerKeyAgent', () => {
   let keyAgent: LedgerKeyAgent;
   let txSubmitProvider: mocks.TxSubmitProviderStub;
-  let wallet: SingleAddressWallet;
+  let wallet: PersonalWallet;
 
   beforeAll(async () => {
     txSubmitProvider = mocks.mockTxSubmitProvider();
@@ -41,7 +41,7 @@ describe('LedgerKeyAgent', () => {
         const rewardsProvider = mocks.mockRewardsProvider({ rewardAccount });
         const chainHistoryProvider = mocks.mockChainHistoryProvider({ rewardAccount });
         const asyncKeyAgent = util.createAsyncKeyAgent(ledgerKeyAgent);
-        return new SingleAddressWallet(
+        return new PersonalWallet(
           { name: 'HW Wallet' },
           {
             assetProvider,

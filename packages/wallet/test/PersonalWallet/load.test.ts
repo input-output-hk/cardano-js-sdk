@@ -7,8 +7,8 @@ import {
   ConnectionStatus,
   ConnectionStatusTracker,
   ObservableWallet,
+  PersonalWallet,
   PollingConfig,
-  SingleAddressWallet,
   setupWallet
 } from '../../src';
 import { AddressType, AsyncKeyAgent, GroupedAddress } from '@cardano-sdk/key-management';
@@ -109,7 +109,7 @@ const createWallet = async (props: CreateWalletProps) => {
       const assetProvider = mocks.mockAssetProvider();
       const stakePoolProvider = createStubStakePoolProvider();
 
-      return new SingleAddressWallet(
+      return new PersonalWallet(
         { name, polling: props.pollingConfig },
         {
           addressDiscovery: props?.addressDiscovery,
@@ -133,7 +133,7 @@ const createWallet = async (props: CreateWalletProps) => {
 };
 
 const assertWalletProperties = async (
-  wallet: SingleAddressWallet,
+  wallet: PersonalWallet,
   expectedDelegateeId: Cardano.PoolId | undefined,
   expectedRewardsHistory = flatten([...mocks.rewardsHistory.values()])
 ) => {
@@ -269,7 +269,7 @@ const getAssetsFromUtxos = (utxos: Cardano.Utxo[]) => {
   return { totalLovelace, totalTokens };
 };
 
-describe('SingleAddressWallet load', () => {
+describe('PersonalWallet load', () => {
   it('loads all properties from provider, stores them and restores on subsequent load, fetches new data', async () => {
     const stores = createInMemoryWalletStores();
     const wallet1 = await createWallet({
@@ -402,7 +402,7 @@ describe('SingleAddressWallet load', () => {
   });
 });
 
-describe('SingleAddressWallet creates big UTXO', () => {
+describe('PersonalWallet creates big UTXO', () => {
   it('creates an UTXO with 300 hundred mixed assets coming from several inputs', async () => {
     const stores = createInMemoryWalletStores();
     const utxoSet = generateUtxos(30, 10);
@@ -445,8 +445,8 @@ describe('SingleAddressWallet creates big UTXO', () => {
   });
 });
 
-describe('SingleAddressWallet.AddressDiscovery', () => {
-  it('SingleAddressWallet address discovery recovers from errors', async () => {
+describe('PersonalWallet.AddressDiscovery', () => {
+  it('PersonalWallet address discovery recovers from errors', async () => {
     const stores = createInMemoryWalletStores();
     const testValue = {
       accountIndex: 0,
@@ -478,7 +478,7 @@ describe('SingleAddressWallet.AddressDiscovery', () => {
   });
 });
 
-describe('SingleAddressWallet.fatalError$', () => {
+describe('PersonalWallet.fatalError$', () => {
   it('emits non retryable errors', async () => {
     const stores = createInMemoryWalletStores();
     const tipHandler = jest.fn();
@@ -509,7 +509,7 @@ describe('SingleAddressWallet.fatalError$', () => {
     expect(tipHandler).not.toBeCalled();
   });
 
-  it('Observables work even if SingleAddressWallet.fatalError$ is not observed', async () => {
+  it('Observables work even if PersonalWallet.fatalError$ is not observed', async () => {
     const stores = createInMemoryWalletStores();
     const testValue = { test: 'value' };
     const utxoSet = generateUtxos(30, 10);

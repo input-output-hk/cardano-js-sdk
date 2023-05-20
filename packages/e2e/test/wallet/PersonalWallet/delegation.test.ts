@@ -41,7 +41,7 @@ const waitForTx = async (wallet: ObservableWallet, hash: Cardano.TransactionId) 
   await waitForWalletStateSettle(wallet);
 };
 
-describe('SingleAddressWallet/delegation', () => {
+describe('PersonalWallet/delegation', () => {
   let wallet1: TestWallet;
   let wallet2: TestWallet;
 

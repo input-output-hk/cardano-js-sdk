@@ -96,13 +96,13 @@ import { WalletStores, createInMemoryWalletStores } from '../persistence';
 import { createTransactionReemitter } from '../services/TransactionReemitter';
 import isEqual from 'lodash/isEqual';
 
-export interface SingleAddressWalletProps {
+export interface PersonalWalletProps {
   readonly name: string;
   readonly polling?: PollingConfig;
   readonly retryBackoffConfig?: RetryBackoffConfig;
 }
 
-export interface SingleAddressWalletDependencies {
+export interface PersonalWalletDependencies {
   readonly keyAgent: AsyncKeyAgent;
   readonly txSubmitProvider: TxSubmitProvider;
   readonly stakePoolProvider: StakePoolProvider;
@@ -159,7 +159,7 @@ const processOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx): OutgoingTx 
   };
 };
 
-export class SingleAddressWallet implements ObservableWallet {
+export class PersonalWallet implements ObservableWallet {
   #inputSelector: InputSelector;
   #logger: Logger;
   #tip$: TipTracker;
@@ -210,7 +210,7 @@ export class SingleAddressWallet implements ObservableWallet {
         initialInterval: Math.min(pollInterval, 1000),
         maxInterval
       }
-    }: SingleAddressWalletProps,
+    }: PersonalWalletProps,
     {
       txSubmitProvider,
       stakePoolProvider,
@@ -225,7 +225,7 @@ export class SingleAddressWallet implements ObservableWallet {
       stores = createInMemoryWalletStores(),
       connectionStatusTracker$ = createSimpleConnectionStatusTracker(),
       addressDiscovery = new HDSequentialDiscovery(chainHistoryProvider, DEFAULT_LOOK_AHEAD_SEARCH)
-    }: SingleAddressWalletDependencies
+    }: PersonalWalletDependencies
   ) {
     this.#logger = contextLogger(logger, name);
 
@@ -552,7 +552,7 @@ export class SingleAddressWallet implements ObservableWallet {
   }
 
   /**
-   * Utility function that creates the TxBuilderDependencies based on the SingleAddressWallet observables.
+   * Utility function that creates the TxBuilderDependencies based on the PersonalWallet observables.
    * All dependencies will wait until the wallet is settled before emitting.
    */
   getTxBuilderDependencies(): TxBuilderDependencies {

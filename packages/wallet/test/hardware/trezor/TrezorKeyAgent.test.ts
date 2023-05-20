@@ -9,14 +9,14 @@ import {
 } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { CML, Cardano } from '@cardano-sdk/core';
-import { SingleAddressWallet, setupWallet } from '../../../src';
+import { PersonalWallet, setupWallet } from '../../../src';
 import { dummyLogger as logger } from 'ts-log';
 import { mockKeyAgentDependencies, stakeKeyDerivationPath } from '../../../../key-management/test/mocks';
 
 describe('TrezorKeyAgent', () => {
   let keyAgent: TrezorKeyAgent;
   let txSubmitProvider: mocks.TxSubmitProviderStub;
-  let wallet: SingleAddressWallet;
+  let wallet: PersonalWallet;
   const trezorConfig = {
     communicationType: CommunicationType.Node,
     manifest: {
@@ -59,7 +59,7 @@ describe('TrezorKeyAgent', () => {
         const chainHistoryProvider = mocks.mockChainHistoryProvider();
         const utxoProvider = mocks.mockUtxoProvider();
         const asyncKeyAgent = util.createAsyncKeyAgent(trezorKeyAgent);
-        return new SingleAddressWallet(
+        return new PersonalWallet(
           { name: 'Trezor Wallet' },
           {
             assetProvider,

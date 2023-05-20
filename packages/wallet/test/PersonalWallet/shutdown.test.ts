@@ -19,8 +19,8 @@ import {
 } from '@cardano-sdk/core';
 import {
   ConnectionStatusTracker,
+  PersonalWallet,
   PollingConfig,
-  SingleAddressWallet,
   TxSubmitProviderStats,
   WalletNetworkInfoProviderStats,
   setupWallet
@@ -77,7 +77,7 @@ const createWallet = async (
       const assetProvider = mocks.mockAssetProvider();
       const stakePoolProvider = createStubStakePoolProvider();
 
-      return new SingleAddressWallet(
+      return new PersonalWallet(
         { name, polling: pollingConfig },
         {
           assetProvider,
@@ -100,7 +100,7 @@ const createWallet = async (
 };
 
 const assertWalletProperties = async (
-  wallet: SingleAddressWallet,
+  wallet: PersonalWallet,
   expectedDelegateeId: Cardano.PoolId | undefined,
   expectedRewardsHistory = flatten([...mocks.rewardsHistory.values()])
 ) => {
@@ -149,7 +149,7 @@ const assertWalletProperties = async (
   expect(typeof wallet.util).toBe('object');
 };
 
-describe('SingleAddressWallet shutdown', () => {
+describe('PersonalWallet shutdown', () => {
   // These two properties are not reachable via the public interface of the wallet.
   let txSubmitProviderStats: any;
   let walletNetworkInfoProviderStats: any;

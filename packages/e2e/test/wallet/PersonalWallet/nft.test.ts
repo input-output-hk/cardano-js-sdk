@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { Asset, Cardano, metadatum, nativeScriptPolicyId } from '@cardano-sdk/core';
-import { Assets, FinalizeTxProps, SingleAddressWallet } from '@cardano-sdk/wallet';
+import { Assets, FinalizeTxProps, PersonalWallet } from '@cardano-sdk/wallet';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { KeyRole, TransactionSigner, util } from '@cardano-sdk/key-management';
 import { burnTokens, createStandaloneKeyAgent, firstValueFromTimed, submitAndConfirm, walletReady } from '../../util';
@@ -12,7 +12,7 @@ const env = getEnv(walletVariables);
 const logger = createLogger();
 
 // Returns [assets in wallet balance, assetInfos with nftMetadata for the assets in the balance]
-const walletBalanceAssetsAndNfts = (wallet: SingleAddressWallet) =>
+const walletBalanceAssetsAndNfts = (wallet: PersonalWallet) =>
   combineLatest([wallet.balance.utxo.total$, wallet.assetInfo$]).pipe(
     filter(([balance]) => !!balance.assets),
     map(([balance, assetInfos]): [Cardano.TokenMap, Assets] => [balance.assets!, assetInfos]),
@@ -27,12 +27,12 @@ const walletBalanceAssetsAndNfts = (wallet: SingleAddressWallet) =>
     ])
   );
 
-describe('SingleAddressWallet.assets/nft', () => {
+describe('PersonalWallet.assets/nft', () => {
   const TOKEN_METADATA_1_INDEX = 0;
   const TOKEN_METADATA_2_INDEX = 1;
   const TOKEN_BURN_INDEX = 2;
 
-  let wallet: SingleAddressWallet;
+  let wallet: PersonalWallet;
   let policySigner: TransactionSigner;
   let policyId: Cardano.PolicyId;
   let policyScript: Cardano.NativeScript;

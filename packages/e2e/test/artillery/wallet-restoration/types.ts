@@ -1,5 +1,5 @@
 import { GroupedAddress } from '@cardano-sdk/key-management';
-import { SingleAddressWallet } from '@cardano-sdk/wallet';
+import { PersonalWallet } from '@cardano-sdk/wallet';
 
 /**
  * The context variables shared between all the hooks.
@@ -7,7 +7,7 @@ import { SingleAddressWallet } from '@cardano-sdk/wallet';
 export interface WalletVars {
   walletLoads: number;
   addresses: GroupedAddress[];
-  currentWallet: SingleAddressWallet;
+  currentWallet: PersonalWallet;
 }
 
 export interface AddressesModel {

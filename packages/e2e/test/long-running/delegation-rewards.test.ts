@@ -1,5 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
-import { SingleAddressWallet } from '@cardano-sdk/wallet';
+import { PersonalWallet } from '@cardano-sdk/wallet';
 import { TestWallet, getEnv, getWallet, walletVariables } from '../../src';
 import { firstValueFrom } from 'rxjs';
 import {
@@ -17,8 +17,8 @@ const env = getEnv(walletVariables);
 
 describe('delegation rewards', () => {
   let providers: TestWallet['providers'];
-  let wallet1: SingleAddressWallet;
-  let wallet2: SingleAddressWallet;
+  let wallet1: PersonalWallet;
+  let wallet2: PersonalWallet;
 
   const initializeWallets = async () => {
     const amountFromFaucet = 100_000_000_000n;

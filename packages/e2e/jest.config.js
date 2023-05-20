@@ -37,7 +37,7 @@ module.exports = {
     {
       ...commonProjectProps,
       displayName: 'wallet-real-ada',
-      testMatch: [`<rootDir>/test/wallet/SingleAddressWallet/(${realAdaTestFileNames.join('|')}).test.ts`]
+      testMatch: [`<rootDir>/test/wallet/PersonalWallet/(${realAdaTestFileNames.join('|')}).test.ts`]
     },
     {
       ...commonProjectProps,

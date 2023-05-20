@@ -1,15 +1,15 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
 import { CML, Cardano } from '@cardano-sdk/core';
-import { ProtocolParametersRequiredByOutputValidator } from '@cardano-sdk/tx-construction';
 import {
-  SingleAddressWallet,
+  PersonalWallet,
   WalletUtilContext,
   createInputResolver,
   createLazyWalletUtil,
   requiresForeignSignatures,
   setupWallet
 } from '../../src';
+import { ProtocolParametersRequiredByOutputValidator } from '@cardano-sdk/tx-construction';
 import { createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { dummyLogger as logger } from 'ts-log';
 import { of } from 'rxjs';
@@ -72,7 +72,7 @@ describe('WalletUtil', () => {
     const address = mocks.utxo[0][0].address!;
     let txSubmitProvider: mocks.TxSubmitProviderStub;
     let networkInfoProvider: mocks.NetworkInfoProviderStub;
-    let wallet: SingleAddressWallet;
+    let wallet: PersonalWallet;
     let utxoProvider: mocks.UtxoProviderStub;
     let tx: Cardano.Tx;
 
@@ -101,7 +101,7 @@ describe('WalletUtil', () => {
           return asyncKeyAgent;
         },
         createWallet: async (keyAgent) =>
-          new SingleAddressWallet(
+          new PersonalWallet(
             { name: 'Test Wallet' },
             {
               assetProvider,

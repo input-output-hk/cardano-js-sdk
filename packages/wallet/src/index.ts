@@ -1,4 +1,4 @@
-export * from './SingleAddressWallet';
+export * from './PersonalWallet';
 export * from './types';
 export * from './services';
 export * as storage from './persistence';

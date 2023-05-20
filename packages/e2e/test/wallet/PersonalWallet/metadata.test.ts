@@ -1,5 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
-import { SingleAddressWallet, createWalletUtil } from '@cardano-sdk/wallet';
+import { PersonalWallet, createWalletUtil } from '@cardano-sdk/wallet';
 import { filter, firstValueFrom, map } from 'rxjs';
 import { getEnv, getWallet, walletVariables } from '../../../src';
 import { isNotNil } from '@cardano-sdk/util';
@@ -8,8 +8,8 @@ import { walletReady } from '../../util';
 
 const env = getEnv(walletVariables);
 
-describe('SingleAddressWallet/metadata', () => {
-  let wallet: SingleAddressWallet;
+describe('PersonalWallet/metadata', () => {
+  let wallet: PersonalWallet;
   let ownAddress: Cardano.PaymentAddress;
 
   beforeAll(async () => {

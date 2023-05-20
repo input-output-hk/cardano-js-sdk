@@ -1,12 +1,11 @@
 import { Cardano } from '@cardano-sdk/core';
-import { firstValueFrom, of } from 'rxjs';
-
-import { SingleAddressWallet, TransactionFailure } from '../../src';
+import { PersonalWallet, TransactionFailure } from '../../src';
 import { createWallet } from './util';
+import { firstValueFrom, of } from 'rxjs';
 import { mockProviders as mocks } from '@cardano-sdk/util-dev';
 
 describe('integration/withdrawal', () => {
-  let wallet: SingleAddressWallet;
+  let wallet: PersonalWallet;
   let rewardAccounts: Cardano.RewardAccountInfo[];
 
   beforeEach(async () => {

@@ -9,7 +9,7 @@ import {
   TxSubmitProvider,
   UtxoProvider
 } from '@cardano-sdk/core';
-import { ConnectionStatusTracker, PollingConfig, SingleAddressWallet, setupWallet } from '../../src';
+import { ConnectionStatusTracker, PersonalWallet, PollingConfig, setupWallet } from '../../src';
 import { WalletStores, createInMemoryWalletStores } from '../../src/persistence';
 import { createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom } from 'rxjs';
@@ -59,7 +59,7 @@ const createWallet = async (stores: WalletStores, providers: Providers, pollingC
       const assetProvider = mocks.mockAssetProvider();
       const stakePoolProvider = createStubStakePoolProvider();
 
-      return new SingleAddressWallet(
+      return new PersonalWallet(
         { name, polling: pollingConfig },
         {
           assetProvider,
@@ -116,7 +116,7 @@ const tx: Cardano.Tx = {
   }
 };
 
-describe('SingleAddressWallet rollback', () => {
+describe('PersonalWallet rollback', () => {
   it('Rollback transaction is resubmitted', async () => {
     const stores = createInMemoryWalletStores();
     const rewardsProvider = mocks.mockRewardsProvider();
