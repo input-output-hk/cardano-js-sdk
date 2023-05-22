@@ -85,6 +85,8 @@
     "@cardano-sdk/tx-construction": "workspace:~",
     "@cardano-sdk/util": "workspace:~",
     "@cardano-sdk/util-rxjs": "workspace:~",
+    "@koralabs/handles-public-api-interfaces": "1.6.6",
+    "axios": "^1.4.0",
     "backoff-rxjs": "^7.0.0",
     "delay": "^5.0.0",
     "emittery": "^0.10.0",
