@@ -94,18 +94,21 @@ describe('withHandles + filterHandlesByPolicyId', () => {
       expect.arrayContaining([
         {
           address: bobAddress,
+          amount: 1n,
           assetId: assetIdFromHandle(bobHandleOne),
           handle: bobHandleOne,
           policyId: handlePolicyId.toString()
         },
         {
           address: bobAddress,
+          amount: 1n,
           assetId: assetIdFromHandle(bobHandleTwo),
           handle: bobHandleTwo,
           policyId: handlePolicyId.toString()
         },
         {
           address: maryAddress,
+          amount: 1n,
           assetId: assetIdFromHandle(maryHandleOne),
           handle: maryHandleOne,
           policyId: handlePolicyId.toString()
@@ -113,5 +116,58 @@ describe('withHandles + filterHandlesByPolicyId', () => {
       ])
     );
     expect(handles).toHaveLength(3);
+  });
+
+  it('omits handles that are bundled in a token with a local supply greater or less than 1', async () => {
+    const bobHandle = 'bob.handle';
+    const bobHandleInvalidHigher = 'bob.handle.invalid.higher';
+    const bobHandleInvalidLower = 'bob.handle.invalid.lower';
+    const bobAddress = Cardano.PaymentAddress('addr_test1wzlv9cslk9tcj0wpm9p5t6kajyt37ap5sc9rzkaxa9p67ys2ygypv');
+    const validTxSource$ = of({
+      block: {
+        body: [
+          {
+            body: {
+              outputs: [
+                {
+                  address: bobAddress,
+                  datumHash: '99c170cc1247e7b7971e194c7e400e219360d3991cb588e9833f77ee9edbbd06' as Cardano.DatumHash,
+                  value: {
+                    assets: new Map([
+                      [assetIdFromHandle(bobHandle), 1n],
+                      [assetIdFromHandle(bobHandleInvalidHigher), 2n],
+                      [assetIdFromHandle(bobHandleInvalidLower), 0n]
+                    ]),
+                    coins: 1_724_100n
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    } as ProjectionEvent);
+
+    const { handles } = await firstValueFrom(
+      validTxSource$.pipe(
+        withHandles(),
+        filterHandlesByPolicyId({
+          policyIds: [handlePolicyId]
+        })
+      )
+    );
+
+    expect(handles).toEqual(
+      expect.arrayContaining([
+        {
+          address: bobAddress,
+          amount: 1n,
+          assetId: assetIdFromHandle(bobHandle),
+          handle: bobHandle,
+          policyId: handlePolicyId.toString()
+        }
+      ])
+    );
+    expect(handles).toHaveLength(1);
   });
 });
