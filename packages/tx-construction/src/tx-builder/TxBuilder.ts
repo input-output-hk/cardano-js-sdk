@@ -2,7 +2,6 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, HandleProvider, HandleResolution } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import {
-  OutputBuilder,
   OutputBuilderTxOut,
   PartialTx,
   PartialTxOut,
@@ -134,7 +133,7 @@ export class GenericTxBuilder implements TxBuilder {
     return this;
   }
 
-  buildOutput(txOut?: PartialTxOut): OutputBuilder {
+  buildOutput(txOut?: PartialTxOut): TxOutputBuilder {
     return new TxOutputBuilder({
       handleProvider: this.#handleProvider,
       logger: contextLogger(this.#logger, 'outputBuilder'),

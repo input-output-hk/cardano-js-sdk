@@ -93,17 +93,17 @@ export class TxOutputBuilder implements OutputBuilder {
     return this.#partialOutput;
   }
 
-  value(value: Cardano.Value): OutputBuilder {
+  value(value: Cardano.Value): TxOutputBuilder {
     this.#partialOutput = { ...this.#partialOutput, value: { ...value } };
     return this;
   }
 
-  coin(coin: Cardano.Lovelace): OutputBuilder {
+  coin(coin: Cardano.Lovelace): TxOutputBuilder {
     this.#partialOutput = { ...this.#partialOutput, value: { ...this.#partialOutput?.value, coins: coin } };
     return this;
   }
 
-  assets(assets: Cardano.TokenMap): OutputBuilder {
+  assets(assets: Cardano.TokenMap): TxOutputBuilder {
     this.#partialOutput = {
       ...this.#partialOutput,
       value: { ...this.#partialOutput?.value, assets }
@@ -111,24 +111,24 @@ export class TxOutputBuilder implements OutputBuilder {
     return this;
   }
 
-  asset(assetId: Cardano.AssetId, quantity: bigint): OutputBuilder {
+  asset(assetId: Cardano.AssetId, quantity: bigint): TxOutputBuilder {
     const assets: Cardano.TokenMap = new Map(this.#partialOutput?.value?.assets);
     quantity === 0n ? assets.delete(assetId) : assets.set(assetId, quantity);
 
     return this.assets(assets);
   }
 
-  address(address: Cardano.PaymentAddress): OutputBuilder {
+  address(address: Cardano.PaymentAddress): TxOutputBuilder {
     this.#partialOutput = { ...this.#partialOutput, address };
     return this;
   }
 
-  datum(datumHash: Hash32ByteBase16): OutputBuilder {
+  datum(datumHash: Hash32ByteBase16): TxOutputBuilder {
     this.#partialOutput = { ...this.#partialOutput, datumHash };
     return this;
   }
 
-  handle(handle: Handle): OutputBuilder {
+  handle(handle: Handle): TxOutputBuilder {
     if (!this.#handleProvider) {
       throw new InvalidConfigurationError(TxOutputFailure.MissingHandleProviderError);
     }
