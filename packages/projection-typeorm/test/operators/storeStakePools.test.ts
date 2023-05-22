@@ -1,6 +1,7 @@
 import {
   BlockDataEntity,
   BlockEntity,
+  CurrentPoolMetricsEntity,
   PoolRegistrationEntity,
   PoolRetirementEntity,
   StakePoolEntity,
@@ -56,7 +57,14 @@ describe('storeStakePools', () => {
 
   beforeEach(async () => {
     dataSource = await initializeDataSource({
-      entities: [BlockDataEntity, BlockEntity, StakePoolEntity, PoolRegistrationEntity, PoolRetirementEntity]
+      entities: [
+        BlockDataEntity,
+        BlockEntity,
+        CurrentPoolMetricsEntity,
+        PoolRegistrationEntity,
+        PoolRetirementEntity,
+        StakePoolEntity
+      ]
     });
     queryRunner = dataSource.createQueryRunner();
     poolsRepo = queryRunner.manager.getRepository(StakePoolEntity);

@@ -1,5 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Column, Entity, Index, JoinColumn, OneToMany, OneToOne, PrimaryColumn, RelationOptions } from 'typeorm';
+import { CurrentPoolMetricsEntity } from './CurrentPoolMetrics.entity';
 import { PoolRegistrationEntity } from './PoolRegistration.entity';
 import { PoolRetirementEntity } from './PoolRetirement.entity';
 
@@ -28,4 +29,7 @@ export class StakePoolEntity {
   @JoinColumn()
   @OneToOne(() => PoolRetirementEntity, OnDeleteSetNull)
   lastRetirement?: PoolRetirementEntity | null;
+
+  @OneToOne(() => CurrentPoolMetricsEntity, (metric) => metric.stakePool)
+  metrics?: CurrentPoolMetricsEntity | null;
 }

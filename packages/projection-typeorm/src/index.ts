@@ -7,7 +7,9 @@ export * from './TypeormStabilityWindowBuffer';
 export * from './isRecoverableTypeormError';
 export {
   STAKE_POOL_METADATA_QUEUE,
-  StakePoolMetadataJob as StakePoolMetadataTask,
+  STAKE_POOL_METRICS_UPDATE,
+  StakePoolMetadataJob,
+  StakePoolMetricsUpdateJob,
   createPgBoss,
   createPgBossExtension
 } from './pgBoss';

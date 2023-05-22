@@ -89,11 +89,15 @@ describe('storeStakePoolMetadataJob', () => {
     const boss = createPgBoss(queryRunner, logger);
     await boss.start();
     const [jobComplete, resolveJobComplete] = testPromise();
-    void boss.work<StakePoolMetadataJob, boolean>(STAKE_POOL_METADATA_QUEUE, async ({ data }) => {
-      expect(typeof data.metadataJson).toBe('object');
-      resolveJobComplete();
-      return true;
-    });
+    void boss.work<StakePoolMetadataJob, boolean>(
+      STAKE_POOL_METADATA_QUEUE,
+      { newJobCheckInterval: 100 },
+      async ({ data }) => {
+        expect(typeof data.metadataJson).toBe('object');
+        resolveJobComplete();
+        return true;
+      }
+    );
     await jobComplete;
     await boss.stop();
   });

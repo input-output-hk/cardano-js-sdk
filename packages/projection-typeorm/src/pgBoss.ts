@@ -12,6 +12,7 @@ import Attorney from 'pg-boss/src/attorney';
 import PgBoss, { SendOptions } from 'pg-boss';
 
 export const STAKE_POOL_METADATA_QUEUE = 'pool-metadata';
+export const STAKE_POOL_METRICS_UPDATE = 'pool-metrics';
 
 export interface PgBossExtension {
   send: <T extends object>(
@@ -19,6 +20,10 @@ export interface PgBossExtension {
     data: T,
     options: SendOptions & { slot: Cardano.Slot }
   ) => Promise<string | null>;
+}
+
+export interface StakePoolMetricsUpdateJob {
+  slot: Cardano.Slot;
 }
 
 export interface StakePoolMetadataJob {
