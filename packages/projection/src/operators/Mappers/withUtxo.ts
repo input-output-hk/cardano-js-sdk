@@ -47,7 +47,7 @@ export const filterProducedUtxoByAddresses =
     );
 
 export const filterProducedUtxoByAssetPolicyId =
-  <PropsIn extends WithUtxo>({ policyIds: _policyIds }: FilterByPolicyIds): ProjectionOperator<PropsIn> =>
+  <PropsIn extends WithUtxo>({ policyIds }: FilterByPolicyIds): ProjectionOperator<PropsIn> =>
   // eslint-disable-next-line unicorn/consistent-function-scoping
   (evt$) =>
     evt$.pipe(
@@ -57,7 +57,7 @@ export const filterProducedUtxoByAssetPolicyId =
           ...evt.utxo,
           produced: evt.utxo.produced.filter(([_, { value }]) =>
             [...(value.assets?.entries() || [])].some(([assetId]) =>
-              _policyIds.includes(Asset.util.policyIdFromAssetId(assetId))
+              policyIds.includes(Asset.util.policyIdFromAssetId(assetId))
             )
           )
         }

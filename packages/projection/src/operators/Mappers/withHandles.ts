@@ -21,13 +21,15 @@ export const withHandles = unifiedProjectorOperator<{}, WithHandles>((evt) => ({
   // map tx outputs to handles
   handles: evt.block.body.flatMap(({ body: { outputs } }) =>
     outputs.flatMap(({ address, value }) =>
-      [...(value.assets?.entries() || [])].map(([assetId, amount]): Handle & { policyId: Cardano.PolicyId } => ({
-        address,
-        amount,
-        assetId,
-        handle: Buffer.from(Asset.util.assetNameFromAssetId(assetId), 'hex').toString('utf8'),
-        policyId: Asset.util.policyIdFromAssetId(assetId)
-      }))
+      [...(value.assets?.entries() || [])].map(
+        ([assetId, amount]): Handle => ({
+          address,
+          amount,
+          assetId,
+          handle: Buffer.from(Asset.util.assetNameFromAssetId(assetId), 'hex').toString('utf8'),
+          policyId: Asset.util.policyIdFromAssetId(assetId)
+        })
+      )
     )
   )
 }));
