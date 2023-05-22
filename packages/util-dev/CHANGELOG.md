@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.9.0...@cardano-sdk/util-dev@0.10.0) (2023-05-22)
+
+### ⚠ BREAKING CHANGES
+
+* **util-dev:** remove createStubLogger util
+
+### Features
+
+* **util-dev:** add stubProviders ([6d5d99c](https://github.com/input-output-hk/cardano-js-sdk/commit/6d5d99c80894a4b126647272f490d9e2c472d818))
+* **util-dev:** remove createStubLogger util ([de06e4e](https://github.com/input-output-hk/cardano-js-sdk/commit/de06e4e46877116f7ceb1f04df920a351dd4724d))
+
 ## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.8.0...@cardano-sdk/util-dev@0.9.0) (2023-05-02)
 
 ### ⚠ BREAKING CHANGES

@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.5.1...@cardano-sdk/key-management@0.6.0) (2023-05-22)
+
+### ⚠ BREAKING CHANGES
+
+* add ledger package with transformations
+* - KeyAgentBase deriveAddress method now requires the caller to specify the skate key index
+
+### Features
+
+* add ledger package with transformations ([58f3a22](https://github.com/input-output-hk/cardano-js-sdk/commit/58f3a227d466c0083bcfe9243311ac2bca4e48df))
+* key agent now takes an additional parameter stakeKeyDerivationIndex ([cbfd3c1](https://github.com/input-output-hk/cardano-js-sdk/commit/cbfd3c1ea55de4355e38f822868b0a7b6bd3953a))
+
+### Bug Fixes
+
+* **key-management:** fixed ttl ([38ca6dd](https://github.com/input-output-hk/cardano-js-sdk/commit/38ca6ddd0524ffef9de92693e04bda19b7c53e44))
+
 ## [0.5.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.5.0...@cardano-sdk/key-management@0.5.1) (2023-05-02)
 
 ### Bug Fixes

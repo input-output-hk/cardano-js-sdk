@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.11.1...@cardano-sdk/cardano-services@0.11.2) (2023-05-22)
+
+### Features
+
+* add the the pg-boss worker ([561fd50](https://github.com/input-output-hk/cardano-js-sdk/commit/561fd508a4a96307b023b16ce6fed3ce1d7bd536))
+* added two new utility functions to extract policy id and asset name from asset id ([b4af015](https://github.com/input-output-hk/cardano-js-sdk/commit/b4af015d26b7c08c8b295ffcba6142caca49f6a8))
+* **cardano-services:** improve cli.ts arguments parsing through environment varaibles ([3177edb](https://github.com/input-output-hk/cardano-js-sdk/commit/3177edb86faeac35601d7840a386190e61b885f3))
+* **cardano-services:** reduce code complexity - add a catch-all logic for stake pool metadata fetch ([0fda043](https://github.com/input-output-hk/cardano-js-sdk/commit/0fda0431b3e051223a7f4798b9dac6f51c8488c0))
+
 ## [0.11.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.11.0...@cardano-sdk/cardano-services@0.11.1) (2023-05-03)
 
 ### Bug Fixes

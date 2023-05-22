@@ -3,6 +3,48 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.10.1...@cardano-sdk/e2e@0.11.0) (2023-05-22)
+
+### ⚠ BREAKING CHANGES
+
+* Replace ObservableWalletTxBuilder and buildTx with wallet.createTxBuilder()
+- SignedTx type no longer has submit() method.
+- TxBuilder no longer has `isSubmitted()`
+- Renamed ValidTxBody to UnsignedTx
+- Removed ValidTx, InvalidTx, MaybeValidTx
+- TxBuilder.build now returns an UnsignedTxPromise.
+- TxBuilder.build throws in case of errors instead of returning InvalidTx
+- Removed ValidTxOutData, ValidTxOut, InvalidTxOut, MaybeValidTxOut types.
+- OutputBuilder.build now returns Cardano.TxOut.
+- OutputBuilder.build throws TxOutValidationError in case of errors instead of returning InvalidTxOut
+- Replace synchronous builder properties with async inspect()
+- Rename some TxBuilder methods for consistency: align with OutputBuilder API,
+where 'setters' are not prefixed with 'set'
+- Hoist FinalizeTxProps back to 'wallet' package
+- Hoist InitializeTxProps.scripts to InitializeTxProps.witness.scripts
+- Hoist tx builder output validator arg under 'dependencies' object
+- Reject TxBuilder.build.inspect() and sign() with a single error
+* hoist createTransactionInternals to tx-construction
+- hoist outputValidator to tx-construction
+- hoist txBuilder types to tx-construction
+- rename ObservableWalletTxOutputBuilder to TxOutputBuilder
+- move Delegatee, StakeKeyStatus and RewardAccount types from wallet to tx-construction
+- removed PrepareTx, createTxPreparer and PrepareTxDependencies
+- OutputValidatorContext was renamed to WalletOutputValidatorContext
+* add ledger package with transformations
+* - KeyAgentBase deriveAddress method now requires the caller to specify the skate key index
+
+### Features
+
+* add ledger package with transformations ([58f3a22](https://github.com/input-output-hk/cardano-js-sdk/commit/58f3a227d466c0083bcfe9243311ac2bca4e48df))
+* add the the pg-boss worker ([561fd50](https://github.com/input-output-hk/cardano-js-sdk/commit/561fd508a4a96307b023b16ce6fed3ce1d7bd536))
+* generic tx-builder ([aa4a539](https://github.com/input-output-hk/cardano-js-sdk/commit/aa4a539d6a5ddd75120450e02afeeba9bed6a527))
+* key agent now takes an additional parameter stakeKeyDerivationIndex ([cbfd3c1](https://github.com/input-output-hk/cardano-js-sdk/commit/cbfd3c1ea55de4355e38f822868b0a7b6bd3953a))
+
+### Code Refactoring
+
+* move tx build utils from wallet to tx-construction ([48072ce](https://github.com/input-output-hk/cardano-js-sdk/commit/48072ce35968820b10fcf0b9ed4441f00ac6fb8b))
+
 ## [0.10.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.10.0...@cardano-sdk/e2e@0.10.1) (2023-05-03)
 
 **Note:** Version bump only for package @cardano-sdk/e2e

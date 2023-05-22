@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/governance@0.5.1...@cardano-sdk/governance@0.6.0) (2023-05-22)
+
+### ⚠ BREAKING CHANGES
+
+* - KeyAgentBase deriveAddress method now requires the caller to specify the skate key index
+
+### Features
+
+* key agent now takes an additional parameter stakeKeyDerivationIndex ([cbfd3c1](https://github.com/input-output-hk/cardano-js-sdk/commit/cbfd3c1ea55de4355e38f822868b0a7b6bd3953a))
+
 ## [0.5.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/governance@0.5.0...@cardano-sdk/governance@0.5.1) (2023-05-02)
 
 ### Bug Fixes

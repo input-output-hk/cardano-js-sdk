@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.11.0...@cardano-sdk/core@0.12.0) (2023-05-22)
+
+### ⚠ BREAKING CHANGES
+
+* hoist createTransactionInternals to tx-construction
+- hoist outputValidator to tx-construction
+- hoist txBuilder types to tx-construction
+- rename ObservableWalletTxOutputBuilder to TxOutputBuilder
+- move Delegatee, StakeKeyStatus and RewardAccount types from wallet to tx-construction
+- removed PrepareTx, createTxPreparer and PrepareTxDependencies
+- OutputValidatorContext was renamed to WalletOutputValidatorContext
+
+### Features
+
+* added two new utility functions to extract policy id and asset name from asset id ([b4af015](https://github.com/input-output-hk/cardano-js-sdk/commit/b4af015d26b7c08c8b295ffcba6142caca49f6a8))
+* **core:** added the function PoolId.toKeyHash to extract the hash from a bech32 encoded pool id ([004e5a6](https://github.com/input-output-hk/cardano-js-sdk/commit/004e5a646de9ba91caec49d59f3a73c13ae4b35b))
+* **util-dev:** add stubProviders ([6d5d99c](https://github.com/input-output-hk/cardano-js-sdk/commit/6d5d99c80894a4b126647272f490d9e2c472d818))
+
+### Code Refactoring
+
+* move tx build utils from wallet to tx-construction ([48072ce](https://github.com/input-output-hk/cardano-js-sdk/commit/48072ce35968820b10fcf0b9ed4441f00ac6fb8b))
+
 ## [0.11.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.10.0...@cardano-sdk/core@0.11.0) (2023-05-02)
 
 ### ⚠ BREAKING CHANGES

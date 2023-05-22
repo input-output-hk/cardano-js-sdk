@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.2.0...@cardano-sdk/projection-typeorm@0.2.1) (2023-05-22)
+
+### Features
+
+* add the the pg-boss worker ([561fd50](https://github.com/input-output-hk/cardano-js-sdk/commit/561fd508a4a96307b023b16ce6fed3ce1d7bd536))
+
 ## [0.2.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.1.1...@cardano-sdk/projection-typeorm@0.2.0) (2023-05-02)
 
 ### ⚠ BREAKING CHANGES

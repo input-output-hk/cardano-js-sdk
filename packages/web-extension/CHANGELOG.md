@@ -3,6 +3,42 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.9.0...@cardano-sdk/web-extension@0.10.0) (2023-05-22)
+
+### ⚠ BREAKING CHANGES
+
+* Replace ObservableWalletTxBuilder and buildTx with wallet.createTxBuilder()
+- SignedTx type no longer has submit() method.
+- TxBuilder no longer has `isSubmitted()`
+- Renamed ValidTxBody to UnsignedTx
+- Removed ValidTx, InvalidTx, MaybeValidTx
+- TxBuilder.build now returns an UnsignedTxPromise.
+- TxBuilder.build throws in case of errors instead of returning InvalidTx
+- Removed ValidTxOutData, ValidTxOut, InvalidTxOut, MaybeValidTxOut types.
+- OutputBuilder.build now returns Cardano.TxOut.
+- OutputBuilder.build throws TxOutValidationError in case of errors instead of returning InvalidTxOut
+- Replace synchronous builder properties with async inspect()
+- Rename some TxBuilder methods for consistency: align with OutputBuilder API,
+where 'setters' are not prefixed with 'set'
+- Hoist FinalizeTxProps back to 'wallet' package
+- Hoist InitializeTxProps.scripts to InitializeTxProps.witness.scripts
+- Hoist tx builder output validator arg under 'dependencies' object
+- Reject TxBuilder.build.inspect() and sign() with a single error
+* **web-extension:** convert factory apiProperties to getApiProperties
+
+### Features
+
+* generic tx-builder ([aa4a539](https://github.com/input-output-hk/cardano-js-sdk/commit/aa4a539d6a5ddd75120450e02afeeba9bed6a527))
+* **web-extension:** add RemoteApiPropertyType.ApiFactory ([eacad41](https://github.com/input-output-hk/cardano-js-sdk/commit/eacad41b5b8570ca4e5d0cc4178c4b5740569a4c))
+
+### Bug Fixes
+
+* **web-extension:** make remote api method responses more reliable ([cdd37c9](https://github.com/input-output-hk/cardano-js-sdk/commit/cdd37c9509e67a3ec95e4a20e52e71c9a2889f2c))
+
+### Code Refactoring
+
+* **web-extension:** convert factory apiProperties to getApiProperties ([8de0fad](https://github.com/input-output-hk/cardano-js-sdk/commit/8de0fad4e9a0d6a971372ff7d4a9e89974e12bcd))
+
 ## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.8.2...@cardano-sdk/web-extension@0.9.0) (2023-05-02)
 
 ### ⚠ BREAKING CHANGES
