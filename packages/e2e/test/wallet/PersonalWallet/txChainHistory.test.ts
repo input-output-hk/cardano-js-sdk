@@ -1,4 +1,4 @@
-import { SingleAddressWallet } from '@cardano-sdk/wallet';
+import { PersonalWallet } from '@cardano-sdk/wallet';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import { getEnv, getWallet, walletVariables } from '../../../src';
 import { isNotNil } from '@cardano-sdk/util';
@@ -7,8 +7,8 @@ import { normalizeTxBody, walletReady } from '../../util';
 
 const env = getEnv(walletVariables);
 
-describe('SingleAddressWallet/txChainHistory', () => {
-  let wallet: SingleAddressWallet;
+describe('PersonalWallet/txChainHistory', () => {
+  let wallet: PersonalWallet;
 
   beforeEach(async () => {
     ({ wallet } = await getWallet({ env, logger, name: 'Sending Wallet', polling: { interval: 50 } }));

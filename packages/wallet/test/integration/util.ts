@@ -1,6 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { CML } from '@cardano-sdk/core';
-import { SingleAddressWallet, setupWallet } from '../../src';
+import { PersonalWallet, setupWallet } from '../../src';
 import { WalletStores } from '../../src/persistence';
 import { createStubStakePoolProvider, mockProviders } from '@cardano-sdk/util-dev';
 import { dummyLogger as logger } from 'ts-log';
@@ -35,7 +35,7 @@ export const createWallet = async (stores?: WalletStores, providers: Providers =
     bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
     createKeyAgent: (dependencies) => testAsyncKeyAgent(undefined, dependencies),
     createWallet: async (keyAgent) =>
-      new SingleAddressWallet(
+      new PersonalWallet(
         { name: 'Test Wallet' },
         {
           ...createDefaultProviders(),

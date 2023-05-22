@@ -26,8 +26,8 @@ import {
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
+import { PersonalWallet, cip30, setupWallet } from '../../src';
 import { Providers, createWallet } from './util';
-import { SingleAddressWallet, cip30, setupWallet } from '../../src';
 import { firstValueFrom, of } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
 import { stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
@@ -56,7 +56,7 @@ const createWalletAndApiWithStores = async (utxos: Cardano.Utxo[], providers?: T
 };
 
 describe('cip30', () => {
-  let wallet: SingleAddressWallet;
+  let wallet: PersonalWallet;
   let api: WalletApi;
   let confirmationCallback: jest.Mock;
 
@@ -244,15 +244,15 @@ describe('cip30', () => {
 
       describe('api.getCollateral', () => {
         // Wallet 2
-        let wallet2: SingleAddressWallet;
+        let wallet2: PersonalWallet;
         let api2: WalletApi;
 
         // Wallet 3
-        let wallet3: SingleAddressWallet;
+        let wallet3: PersonalWallet;
         let api3: WalletApi;
 
         // Wallet 4
-        let wallet4: SingleAddressWallet;
+        let wallet4: PersonalWallet;
         let api4: WalletApi;
 
         beforeAll(async () => {
@@ -515,7 +515,7 @@ describe('cip30', () => {
       const address = mocks.utxo[0][0].address!;
       let txSubmitProvider: mocks.TxSubmitProviderStub;
       let networkInfoProvider: mocks.NetworkInfoProviderStub;
-      let mockWallet: SingleAddressWallet;
+      let mockWallet: PersonalWallet;
       let utxoProvider: mocks.UtxoProviderStub;
       let tx: Cardano.Tx;
       let mockApi: WalletApi;
@@ -545,7 +545,7 @@ describe('cip30', () => {
             return asyncKeyAgent;
           },
           createWallet: async (keyAgent) =>
-            new SingleAddressWallet(
+            new PersonalWallet(
               { name: 'Test Wallet' },
               {
                 assetProvider,

@@ -1,11 +1,11 @@
 import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
-import { SingleAddressWallet } from '../../src';
+import { PersonalWallet } from '../../src';
 import { createWallet } from './util';
 import { firstValueFrom } from 'rxjs';
 
 describe('integration/txChainingBalance', () => {
-  let wallet: SingleAddressWallet;
+  let wallet: PersonalWallet;
 
   beforeAll(async () => {
     // Using mock TxSubmitProvider which doesn't do anything and instantly resolves

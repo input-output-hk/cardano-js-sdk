@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { Cardano } from '@cardano-sdk/core';
-import { SingleAddressWallet } from '@cardano-sdk/wallet';
+import { PersonalWallet } from '@cardano-sdk/wallet';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import { getEnv, walletVariables } from '../../../src/environment';
@@ -11,8 +11,8 @@ import { normalizeTxBody, walletReady } from '../../util';
 const env = getEnv(walletVariables);
 const logger = createLogger();
 
-describe('SingleAddressWallet/byron', () => {
-  let wallet: SingleAddressWallet;
+describe('PersonalWallet/byron', () => {
+  let wallet: PersonalWallet;
 
   beforeAll(async () => {
     wallet = (await getWallet({ env, idx: 0, logger, name: 'Wallet', polling: { interval: 50 } })).wallet;

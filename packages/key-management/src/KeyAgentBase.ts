@@ -59,7 +59,8 @@ export abstract class KeyAgentBase implements KeyAgent {
    */
   async deriveAddress(
     { index, type }: AccountAddressDerivationPath,
-    stakeKeyDerivationIndex: number
+    stakeKeyDerivationIndex: number,
+    pure?: boolean
   ): Promise<GroupedAddress> {
     const stakeKeyDerivationPath = {
       index: stakeKeyDerivationIndex,
@@ -104,7 +105,8 @@ export abstract class KeyAgentBase implements KeyAgent {
       type
     };
 
-    this.knownAddresses = [...this.knownAddresses, groupedAddress];
+    if (!pure) this.knownAddresses = [...this.knownAddresses, groupedAddress];
+
     return groupedAddress;
   }
 

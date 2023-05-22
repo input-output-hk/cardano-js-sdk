@@ -6,7 +6,7 @@ import { submitAndConfirm, walletReady } from '../../util';
 
 const env = getEnv(walletVariables);
 
-describe('SingleAddressWallet/txChaining', () => {
+describe('PersonalWallet/txChaining', () => {
   let wallet: ObservableWallet;
 
   beforeAll(async () => {

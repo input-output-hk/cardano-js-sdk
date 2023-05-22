@@ -6,7 +6,7 @@ import path from 'path';
 dotenv.config({ path: path.join(__dirname, '../../../.env') });
 
 import { Logger } from 'ts-log';
-import { SingleAddressWallet, createLazyWalletUtil } from '@cardano-sdk/wallet';
+import { PersonalWallet, createLazyWalletUtil } from '@cardano-sdk/wallet';
 import { bufferCount, bufferTime, from, mergeAll, tap } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 
@@ -77,14 +77,14 @@ const getKeyAgent = async (accountIndex: number) => {
   return { keyAgent, walletUtil };
 };
 
-const createWallet = async (accountIndex: number): Promise<SingleAddressWallet> => {
+const createWallet = async (accountIndex: number): Promise<PersonalWallet> => {
   measurementUtil.addStartMarker(MeasureTarget.keyAgent, accountIndex);
   const providers = await getProviders();
   const { keyAgent, walletUtil } = await getKeyAgent(accountIndex);
   measurementUtil.addMeasureMarker(MeasureTarget.keyAgent, accountIndex);
 
   measurementUtil.addStartMarker(MeasureTarget.wallet, accountIndex);
-  const wallet = new SingleAddressWallet({ name: `Wallet ${accountIndex}` }, { ...providers, keyAgent, logger });
+  const wallet = new PersonalWallet({ name: `Wallet ${accountIndex}` }, { ...providers, keyAgent, logger });
   walletUtil.initialize(wallet);
   return wallet;
 };
@@ -105,7 +105,7 @@ const showResults = () => {
 measurementUtil.start();
 
 // Simple scheduler that distributes the requested number of calls evenly in the duration time
-getLoadTestScheduler<SingleAddressWallet>(
+getLoadTestScheduler<PersonalWallet>(
   {
     // callUnderTest must be a method returning an observable
     callUnderTest: (id) => from(initWallet(id)),

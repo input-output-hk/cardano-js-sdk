@@ -5,6 +5,10 @@ import { PersistentCollectionTrackerSubject, coldObservableProvider, txInEquals,
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxInFlight, UtxoTracker } from './types';
 import { WalletStores } from '../persistence';
+import chunk from 'lodash/chunk';
+
+// Temporarily hardcoded. Will be replaced with ChainHistoryProvider 'maxPageSize' value once ADP-2249 is implemented
+const PAGE_SIZE = 25;
 
 export interface UtxoTrackerProps {
   utxoProvider: UtxoProvider;
@@ -30,11 +34,21 @@ export const createUtxoProvider = (
   onFatalError?: (value: unknown) => void
 ) =>
   addresses$.pipe(
-    switchMap((addresses) =>
+    switchMap((paymentAddresses) =>
       coldObservableProvider({
         equals: utxoEquals,
         onFatalError,
-        provider: () => utxoProvider.utxoByAddresses({ addresses }),
+        provider: async () => {
+          let utxos = new Array<Cardano.Utxo>();
+
+          const addressesSubGroups = chunk(paymentAddresses, PAGE_SIZE);
+
+          for (const addresses of addressesSubGroups) {
+            utxos = [...utxos, ...(await utxoProvider.utxoByAddresses({ addresses }))];
+          }
+
+          return utxos;
+        },
         retryBackoffConfig,
         trigger$: tipBlockHeight$
       })

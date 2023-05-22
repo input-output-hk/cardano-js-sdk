@@ -75,6 +75,7 @@ const providerParams = makeValidator((value) => {
  * Shared across all tests
  */
 const validators = {
+  ADDRESS_DISCOVERY: str({ default: 'HDSequentialDiscovery' }),
   ARRIVAL_PHASE_DURATION_IN_SECS: num(),
   ASSET_PROVIDER: str(),
   ASSET_PROVIDER_PARAMS: providerParams(),
@@ -152,5 +153,6 @@ export const walletVariables = [
   'TX_SUBMIT_PROVIDER',
   'TX_SUBMIT_PROVIDER_PARAMS',
   'UTXO_PROVIDER',
-  'UTXO_PROVIDER_PARAMS'
+  'UTXO_PROVIDER_PARAMS',
+  'ADDRESS_DISCOVERY'
 ] as const;

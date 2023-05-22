@@ -7,7 +7,7 @@ import delay from 'delay';
 
 const env = getEnv(walletVariables);
 
-describe('SingleAddressWallet/pouchDbWalletStores', () => {
+describe('PersonalWallet/pouchDbWalletStores', () => {
   const walletName = 'DbTestWallet';
   let stores1: storage.WalletStores;
 
@@ -15,7 +15,7 @@ describe('SingleAddressWallet/pouchDbWalletStores', () => {
     stores1 = storage.createPouchDbWalletStores(walletName, { logger });
   });
 
-  it('stores and restores SingleAddressWallet, continues sync after initial load', async () => {
+  it('stores and restores PersonalWallet, continues sync after initial load', async () => {
     const wallet1 = (await getWallet({ env, logger, name: 'Test Wallet', stores: stores1 })).wallet;
 
     // wallet1 fetched all responses from wallet provider

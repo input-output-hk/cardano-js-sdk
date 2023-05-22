@@ -7,7 +7,7 @@ import { Cardano } from '@cardano-sdk/core/dist/esm';
 import { GroupedAddress, util } from '@cardano-sdk/key-management';
 import { Logger } from 'ts-log';
 import { MINUTE, StubKeyAgent, getEnv, getWallet, walletVariables } from '../../../src';
-import { SingleAddressWallet } from '@cardano-sdk/wallet';
+import { PersonalWallet } from '@cardano-sdk/wallet';
 import { logger } from '@cardano-sdk/util-dev';
 import { mapToGroupedAddress, waitForWalletStateSettle } from '../../util';
 
@@ -37,7 +37,7 @@ const range = (toNum: number) => {
   return resArr;
 };
 
-const initWallets = async (walletsNum: number, addresses: GroupedAddress[]): Promise<SingleAddressWallet[]> => {
+const initWallets = async (walletsNum: number, addresses: GroupedAddress[]): Promise<PersonalWallet[]> => {
   testLogger.info('Number of concurrent users: ', walletsNum);
   let currentAddress;
   const wallets = [];

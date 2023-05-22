@@ -1,10 +1,10 @@
-import { SingleAddressWallet } from '../../src';
+import { PersonalWallet } from '../../src';
 import { createSlotTimeCalc } from '@cardano-sdk/core';
 import { createWallet } from './util';
 import { firstValueFrom } from 'rxjs';
 
 describe('integration/transactionTime', () => {
-  let wallet: SingleAddressWallet;
+  let wallet: PersonalWallet;
 
   beforeAll(async () => {
     ({ wallet } = await createWallet());

@@ -35,6 +35,7 @@ import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
 import { coldObservableProvider, distinctBlock, transactionsEquals } from './util';
 
+import chunk from 'lodash/chunk';
 import intersectionBy from 'lodash/intersectionBy';
 import sortBy from 'lodash/sortBy';
 import unionBy from 'lodash/unionBy';
@@ -78,21 +79,27 @@ const allTransactionsByAddresses = async (
   chainHistoryProvider: ChainHistoryProvider,
   { addresses, blockRange }: { addresses: Cardano.PaymentAddress[]; blockRange: Range<Cardano.BlockNo> }
 ): Promise<Cardano.HydratedTx[]> => {
-  let startAt = 0;
+  const addressesSubGroups = chunk(addresses, PAGE_SIZE);
   let response: Cardano.HydratedTx[] = [];
-  let pageResults: Cardano.HydratedTx[] = [];
-  do {
-    pageResults = (
-      await chainHistoryProvider.transactionsByAddresses({
-        addresses,
-        blockRange,
-        pagination: { limit: PAGE_SIZE, startAt }
-      })
-    ).pageResults;
 
-    startAt += PAGE_SIZE;
-    response = [...response, ...pageResults];
-  } while (pageResults.length === PAGE_SIZE);
+  for (const addressGroup of addressesSubGroups) {
+    let startAt = 0;
+    let pageResults: Cardano.HydratedTx[] = [];
+
+    do {
+      pageResults = (
+        await chainHistoryProvider.transactionsByAddresses({
+          addresses: addressGroup,
+          blockRange,
+          pagination: { limit: PAGE_SIZE, startAt }
+        })
+      ).pageResults;
+
+      startAt += PAGE_SIZE;
+      response = [...response, ...pageResults];
+    } while (pageResults.length === PAGE_SIZE);
+  }
+
   return response;
 };
 

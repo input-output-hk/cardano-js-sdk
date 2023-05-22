@@ -1,5 +1,5 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { SingleAddressWallet, utxoEquals } from '@cardano-sdk/wallet';
+import { PersonalWallet, utxoEquals } from '@cardano-sdk/wallet';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import { firstValueFromTimed, walletReady } from '../../util';
@@ -9,9 +9,9 @@ import { isNotNil } from '@cardano-sdk/util';
 const env = getEnv(walletVariables);
 const logger = createLogger();
 
-describe('SingleAddressWallet/unspendableUtxos', () => {
-  let wallet1: SingleAddressWallet;
-  let wallet2: SingleAddressWallet;
+describe('PersonalWallet/unspendableUtxos', () => {
+  let wallet1: PersonalWallet;
+  let wallet2: PersonalWallet;
 
   afterAll(() => {
     wallet1.shutdown();

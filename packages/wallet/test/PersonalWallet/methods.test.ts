@@ -6,7 +6,7 @@ import { BehaviorSubject, firstValueFrom, skip } from 'rxjs';
 import { CML, Cardano, CardanoNodeErrors, ProviderError, ProviderFailure, TxCBOR } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
-import { SingleAddressWallet, setupWallet } from '../../src';
+import { PersonalWallet, setupWallet } from '../../src';
 import { getPassphrase, stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { dummyLogger as logger } from 'ts-log';
 import { toOutgoingTx, waitForWalletStateSettle } from '../util';
@@ -46,11 +46,11 @@ const promiseTimeout = (p: Promise<unknown>, timeout = 10): Promise<unknown> => 
   return Promise.race([p, timeoutReject]);
 };
 
-describe('SingleAddressWallet methods', () => {
+describe('PersonalWallet methods', () => {
   const address = mocks.utxo[0][0].address!;
   let txSubmitProvider: mocks.TxSubmitProviderStub;
   let networkInfoProvider: mocks.NetworkInfoProviderStub;
-  let wallet: SingleAddressWallet;
+  let wallet: PersonalWallet;
   let utxoProvider: mocks.UtxoProviderStub;
 
   beforeEach(async () => {
@@ -78,7 +78,7 @@ describe('SingleAddressWallet methods', () => {
         return asyncKeyAgent;
       },
       createWallet: async (keyAgent) =>
-        new SingleAddressWallet(
+        new PersonalWallet(
           { name: 'Test Wallet' },
           {
             assetProvider,

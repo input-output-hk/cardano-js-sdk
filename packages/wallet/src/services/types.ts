@@ -1,3 +1,4 @@
+import { AsyncKeyAgent, GroupedAddress } from '@cardano-sdk/key-management';
 import { Cardano, CardanoNodeErrors, EpochRewards, TxCBOR } from '@cardano-sdk/core';
 import { Observable } from 'rxjs';
 
@@ -33,6 +34,19 @@ export interface TransactionalTracker<T> extends TransactionalObservables<T> {
 
 export interface UtxoTracker extends TransactionalTracker<Cardano.Utxo[]> {
   setUnspendable(utxo: Cardano.Utxo[]): Promise<void>;
+}
+
+/**
+ * The AddressDiscovery interface provides a mechanism to discover addresses in Hierarchical Deterministic (HD) wallets
+ */
+export interface AddressDiscovery {
+  /**
+   * Discover used addresses in the HD wallet.
+   *
+   * @param keyAgent The key agent controlling the root key to be used to derive the addresses to be discovered.
+   * @returns A promise that will be resolved into a GroupedAddress list containing the discovered addresses.
+   */
+  discover(keyAgent: AsyncKeyAgent): Promise<GroupedAddress[]>;
 }
 
 export type Milliseconds = number;
