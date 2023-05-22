@@ -5,14 +5,20 @@ import { allEntities } from './Projection/prepareTypeormProjection';
 import { createDataSource } from '@cardano-sdk/projection-typeorm';
 export { DataSource } from 'typeorm';
 
-export const AppDataSource = createDataSource({
-  connectionConfig: {
-    database: 'projection',
-    host: 'localhost',
-    password: 'doNoUseThisSecret!',
-    port: 5432,
-    username: 'postgres'
-  },
-  entities: allEntities,
-  logger: console
-});
+export const AppDataSource = (() => {
+  const { DB_NAME, DB_PORT } = process.env;
+
+  if (!DB_NAME) throw new Error('Please specify the database name through the environment variable DB_NAME');
+
+  return createDataSource({
+    connectionConfig: {
+      database: DB_NAME,
+      host: 'localhost',
+      password: 'doNoUseThisSecret!',
+      port: DB_PORT ? Number.parseInt(DB_PORT, 10) : 5432,
+      username: 'postgres'
+    },
+    entities: allEntities,
+    logger: console
+  });
+})();

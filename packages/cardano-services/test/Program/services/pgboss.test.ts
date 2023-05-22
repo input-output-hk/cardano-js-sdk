@@ -6,10 +6,10 @@ import {
 } from '@cardano-sdk/projection-typeorm';
 import { Cardano } from '@cardano-sdk/core';
 import { DataSource } from 'typeorm';
-import { Logger } from 'ts-log';
 import { Observable, firstValueFrom } from 'rxjs';
 import { PgBossHttpService, pgBossEntities } from '../../../src/Program/services/pgboss';
 import { Pool } from 'pg';
+import { WorkerHandlerFactoryOptions } from '../../../src/PgBoss';
 import { createObservableDataSource } from '../../../src';
 import { getConnectionConfig, getPool } from '../../../src/Program/services/postgres';
 import { logger } from '@cardano-sdk/util-dev';
@@ -29,8 +29,9 @@ for (let i = 0; i < 3; ++i) {
 }
 
 jest.mock('../../../src/PgBoss/stakePoolMetadataHandler', () => ({
-  // eslint-disable-next-line @typescript-eslint/no-shadow
-  stakePoolMetadataHandlerFactory: (_: unknown, logger: Logger) => async () => {
+  stakePoolMetadataHandlerFactory: (options: WorkerHandlerFactoryOptions) => async () => {
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    const { logger } = options;
     // Wait for the "go command" for this attempt from the test
     await handlerPromises[callCounter];
     // Let the test know that pg-boss run this handler attempt
@@ -82,7 +83,8 @@ describe('PgBossHttpService', () => {
       devOptions: { dropSchema: true, synchronize: true },
       entities: pgBossEntities,
       extensions: { pgBoss: true },
-      logger
+      logger,
+      migrationsRun: false
     });
     dataSource = await firstValueFrom(dataSource$);
 
