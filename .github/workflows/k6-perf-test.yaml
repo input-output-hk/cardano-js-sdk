@@ -1,0 +1,293 @@
+name: K6 Performance Test
+on:
+  workflow_dispatch:
+
+jobs:
+
+  wallet-creation:
+    runs-on: ubuntu-latest
+    env:
+      PROVIDER_SERVER_URL: ${{ secrets.PROVIDER_SERVER_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run k6 local test
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: ./packages/e2e/test/k6/scenarios/wallet-creation.test.js
+          flags: --vus 3 --duration 10s --out json=wallet-creation-results.json
+      - name: Upload performance test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: k6-report
+          path: wallet-creation-results.json
+
+  wallet-restoration:
+    runs-on: ubuntu-latest
+    env:
+      PROVIDER_SERVER_URL: ${{ secrets.PROVIDER_SERVER_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run k6 local test
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: ./packages/e2e/test/k6/scenarios/wallet-restoration.test.js
+          flags: --vus 3 --duration 10s --out json=wallet-restoration-results.json
+      - name: Upload performance test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: k6-report
+          path: wallet-restoration-results.json
+
+  tx-submission:
+    runs-on: ubuntu-latest
+    env:
+      PROVIDER_SERVER_URL: ${{ secrets.PROVIDER_SERVER_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run k6 local test
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: ./packages/e2e/test/k6/scenarios/tx-submission.test.js
+          flags: --vus 3 --duration 10s --out json=tx-submission-results.json
+      - name: Upload performance test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: k6-report
+          path: tx-submission-results.json
+
+  asset_get-asset:
+    runs-on: ubuntu-latest
+    env:
+      PROVIDER_SERVER_URL: ${{ secrets.PROVIDER_SERVER_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run k6 local test
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: ./packages/e2e/test/k6/endpoints/asset/get-asset.test.js
+          flags: --vus 3 --duration 10s --out json=asset_get-asset-results.json
+      - name: Upload performance test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: k6-report
+          path: asset_get-asset-results.json
+
+  chain-history_blocks_by-hashes:
+    runs-on: ubuntu-latest
+    env:
+      PROVIDER_SERVER_URL: ${{ secrets.PROVIDER_SERVER_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run k6 local test
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: ./packages/e2e/test/k6/endpoints/chain-history/blocks/by-hashes.test.js
+          flags: --vus 3 --duration 10s --out json=chain-history_blocks_by-hashes-results.json
+      - name: Upload performance test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: k6-report
+          path: chain-history_blocks_by-hashes-results.json
+
+  chain-history_txs_by-addresses:
+    runs-on: ubuntu-latest
+    env:
+      PROVIDER_SERVER_URL: ${{ secrets.PROVIDER_SERVER_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run k6 local test
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: ./packages/e2e/test/k6/endpoints/chain-history/txs/by-addresses.test.js
+          flags: --vus 3 --duration 10s --out json=chain-history_txs_by-addresses-results.json
+      - name: Upload performance test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: k6-report
+          path: chain-history_txs_by-addresses-results.json
+
+  chain-history_txs_by-hashes:
+    runs-on: ubuntu-latest
+    env:
+      PROVIDER_SERVER_URL: ${{ secrets.PROVIDER_SERVER_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run k6 local test
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: ./packages/e2e/test/k6/endpoints/chain-history/txs/by-hashes.test.js
+          flags: --vus 3 --duration 10s --out json=chain-history_txs_by-hashes-results.json
+      - name: Upload performance test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: k6-report
+          path: chain-history_txs_by-hashes-results.json
+
+  network-info_era-summaries:
+    runs-on: ubuntu-latest
+    env:
+      PROVIDER_SERVER_URL: ${{ secrets.PROVIDER_SERVER_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run k6 local test
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: ./packages/e2e/test/k6/endpoints/network-info/era-summaries.test.js
+          flags: --vus 3 --duration 10s --out json=network-info_era-summaries-results.json
+      - name: Upload performance test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: k6-report
+          path: network-info_era-summaries-results.json
+
+  network-info_genesis-parameters:
+    runs-on: ubuntu-latest
+    env:
+      PROVIDER_SERVER_URL: ${{ secrets.PROVIDER_SERVER_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run k6 local test
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: ./packages/e2e/test/k6/endpoints/network-info/genesis-parameters.test.js
+          flags: --vus 3 --duration 10s --out json=network-info_genesis-parameters-results.json
+      - name: Upload performance test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: k6-report
+          path: network-info_genesis-parameters-results.json
+
+  network-info_ledger-tip:
+    runs-on: ubuntu-latest
+    env:
+      PROVIDER_SERVER_URL: ${{ secrets.PROVIDER_SERVER_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run k6 local test
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: ./packages/e2e/test/k6/endpoints/network-info/ledger-tip.test.js
+          flags: --vus 3 --duration 10s --out json=network-info_ledger-tip-results.json
+      - name: Upload performance test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: k6-report
+          path: network-info_ledger-tip-results.json
+
+  network-info_lovelace-supply:
+    runs-on: ubuntu-latest
+    env:
+      PROVIDER_SERVER_URL: ${{ secrets.PROVIDER_SERVER_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run k6 local test
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: ./packages/e2e/test/k6/endpoints/network-info/lovelace-supply.test.js
+          flags: --vus 3 --duration 10s --out json=network-info_lovelace-supply-results.json
+      - name: Upload performance test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: k6-report
+          path: network-info_lovelace-supply-results.json
+
+  network-info_protocol-parameters:
+    runs-on: ubuntu-latest
+    env:
+      PROVIDER_SERVER_URL: ${{ secrets.PROVIDER_SERVER_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run k6 local test
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: ./packages/e2e/test/k6/endpoints/network-info/protocol-parameters.test.js
+          flags: --vus 3 --duration 10s --out json=network-info_protocol-parameters-results.json
+      - name: Upload performance test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: k6-report
+          path: network-info_protocol-parameters-results.json
+
+  network-info_stake:
+    runs-on: ubuntu-latest
+    env:
+      PROVIDER_SERVER_URL: ${{ secrets.PROVIDER_SERVER_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run k6 local test
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: ./packages/e2e/test/k6/endpoints/network-info/stake.test.js
+          flags: --vus 3 --duration 10s --out json=network-info_stake-results.json
+      - name: Upload performance test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: k6-report
+          path: network-info_stake-results.json
+
+  rewards_account-balance:
+    runs-on: ubuntu-latest
+    env:
+      PROVIDER_SERVER_URL: ${{ secrets.PROVIDER_SERVER_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run k6 local test
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: ./packages/e2e/test/k6/endpoints/rewards/account-balance.test.js
+          flags: --vus 3 --duration 10s --out json=rewards_account-balance-results.json
+      - name: Upload performance test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: k6-report
+          path: rewards_account-balance-results.json
+
+  stake-pool_stats:
+    runs-on: ubuntu-latest
+    env:
+      PROVIDER_SERVER_URL: ${{ secrets.PROVIDER_SERVER_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run k6 local test
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: ./packages/e2e/test/k6/endpoints/stake-pool/stats.test.js
+          flags: --vus 3 --duration 10s --out json=stake-pool_stats-results.json
+      - name: Upload performance test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: k6-report
+          path: stake-pool_stats-results.json
+
+  utxo_stats:
+    runs-on: ubuntu-latest
+    env:
+      PROVIDER_SERVER_URL: ${{ secrets.PROVIDER_SERVER_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run k6 local test
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: ./packages/e2e/test/k6/endpoints/utxo/utxo-by-addresses.test.js
+          flags: --vus 3 --duration 10s --out json=utxo_stats-results.json
+      - name: Upload performance test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: k6-report
+          path: utxo_stats-results.json
