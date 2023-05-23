@@ -198,6 +198,7 @@ describe('PersonalWallet.assets/nft', () => {
       policyId,
       // in case of repeated tests on the same network, total asset supply is not updated due to
       // the limitation that asset info is not refreshed on wallet balance changes
+      quantity: expect.anything(),
       supply: expect.anything(),
       tokenMetadata: null
     });
@@ -356,6 +357,7 @@ describe('PersonalWallet.assets/nft', () => {
             version: '1.0'
           },
           policyId,
+          quantity: expect.anything(),
           supply: expect.anything(),
           tokenMetadata: null
         });
