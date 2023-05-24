@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.11.0...@cardano-sdk/e2e@0.12.0) (2023-05-24)
+
+### ⚠ BREAKING CHANGES
+
+* the SingleAddressWallet class was renamed to PersonalWallet
+* the single address wallet now takes an additional dependency 'AddressDiscovery'
+
+### Features
+
+* the single address wallet now takes an additional dependency 'AddressDiscovery' ([d6d7cff](https://github.com/input-output-hk/cardano-js-sdk/commit/d6d7cffe3a7089af2aff39e78c491f4e0a06c989))
+
+### Code Refactoring
+
+* the SingleAddressWallet class was renamed to PersonalWallet ([1b50183](https://github.com/input-output-hk/cardano-js-sdk/commit/1b50183ea095813b1676571d059c7774f46fb3f3))
+
 ## [0.11.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.10.1...@cardano-sdk/e2e@0.11.0) (2023-05-22)
 
 ### ⚠ BREAKING CHANGES

@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/governance@0.6.0...@cardano-sdk/governance@0.7.0) (2023-05-24)
+
+### ⚠ BREAKING CHANGES
+
+* the SingleAddressWallet class was renamed to PersonalWallet
+
+### Code Refactoring
+
+* the SingleAddressWallet class was renamed to PersonalWallet ([1b50183](https://github.com/input-output-hk/cardano-js-sdk/commit/1b50183ea095813b1676571d059c7774f46fb3f3))
+
 ## [0.6.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/governance@0.5.1...@cardano-sdk/governance@0.6.0) (2023-05-22)
 
 ### ⚠ BREAKING CHANGES
