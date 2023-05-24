@@ -129,6 +129,10 @@
           },
           "supply": {
             "$ref": "#/components/schemas/BigInt"
+          },
+          "quantity": {
+            "$ref": "#/components/schemas/BigInt",
+            "deprecated": true
           }
         }
       },

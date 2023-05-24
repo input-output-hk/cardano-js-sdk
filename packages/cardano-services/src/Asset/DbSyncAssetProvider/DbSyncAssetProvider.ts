@@ -132,8 +132,10 @@ export class DbSyncAssetProvider extends DbSyncProvider() implements AssetProvid
 
     const fingerprint = multiAsset.fingerprint as unknown as Cardano.AssetFingerprint;
     const supply = BigInt(multiAsset.sum);
+    // Backwards compatibility
+    const quantity = supply;
     const mintOrBurnCount = Number(multiAsset.count);
 
-    return { assetId, fingerprint, mintOrBurnCount, name, policyId, supply };
+    return { assetId, fingerprint, mintOrBurnCount, name, policyId, quantity, supply };
   }
 }
