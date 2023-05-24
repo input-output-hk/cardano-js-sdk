@@ -10,7 +10,7 @@ type StaticOrigin = boolean | string | RegExp | (boolean | string | RegExp)[];
 
 export const corsOptions = (allowedOrigins: Set<string>) => ({
   origin(requestOrigin: string | undefined, callback: (err: Error | null, options?: StaticOrigin) => void) {
-    if (requestOrigin && allowedOrigins.has(requestOrigin)) {
+    if (!requestOrigin || allowedOrigins.has(requestOrigin)) {
       callback(null, requestOrigin);
     } else {
       callback(new ProviderError(ProviderFailure.Forbidden, null, `Origin ${requestOrigin} not allowed by CORS`));

@@ -581,6 +581,28 @@ describe('HttpServer', () => {
       expect(res.headers['access-control-allow-origin']).toEqual(allowedOrigin);
     });
 
+    it('allows requests with no origin header', async () => {
+      httpServer = new HttpServer(
+        { allowedOrigins: [allowedOrigin], listen: { host: 'localhost', port } },
+        {
+          logger,
+          runnableDependencies: [cardanoNode],
+          services: [new SomeHttpService(ServiceNames.Utxo, provider, logger)]
+        }
+      );
+
+      await httpServer.initialize();
+      await httpServer.start();
+      await serverStarted(apiUrlBase, 404, { [ORIGIN]: allowedOrigin });
+
+      const res = await axios.get(`${apiUrlBase}/health`, {
+        headers: { [CONTENT_TYPE]: 'application/json' }
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.data).toBeDefined();
+    });
+
     it('rejects requests from disallowed origins', async () => {
       httpServer = new HttpServer(
         { allowedOrigins: [allowedOrigin], listen: { host: 'localhost', port } },
