@@ -1,4 +1,5 @@
 import { Cardano, Paginated, StakePoolProvider } from '@cardano-sdk/core';
+import { Percent } from '@cardano-sdk/util';
 import { epochRewards, rewardAccountBalance, rewardAccountBalance2, rewardsHistory, rewardsHistory2 } from './mockData';
 import { getRandomTxId } from './mockChainHistoryProvider';
 import delay from 'delay';
@@ -41,14 +42,14 @@ export const generateStakePools = (qty: number): Cardano.StakePool[] =>
       url: 'https://git.io/JJ7wm'
     },
     metrics: {
-      apy: Cardano.Percent(0),
+      apy: Percent(0),
       blocksCreated: 0,
       delegators: 1,
       livePledge: 495_463_149n,
-      saturation: Cardano.Percent(0.000_035_552_103_558_591_88),
+      saturation: Percent(0.000_035_552_103_558_591_88),
       size: {
-        active: Cardano.Percent(1),
-        live: Cardano.Percent(0)
+        active: Percent(1),
+        live: Percent(0)
       },
       stake: {
         active: 2_986_376_991n,

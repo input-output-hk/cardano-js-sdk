@@ -1,6 +1,7 @@
 import { BigIntColumnOptions, DeleteCascadeRelationOptions } from './util';
 import { Cardano } from '@cardano-sdk/core';
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import { Percent } from '@cardano-sdk/util';
 import { StakePoolEntity } from './StakePool.entity';
 import { float } from './transformers';
 
@@ -33,14 +34,14 @@ export class CurrentPoolMetricsEntity {
   livePledge?: Cardano.Lovelace;
 
   @Column({ transformer: float, type: 'numeric' })
-  liveSaturation?: Cardano.Percent;
+  liveSaturation?: Percent;
 
   @Column({ transformer: float, type: 'numeric' })
-  activeSize?: Cardano.Percent;
+  activeSize?: Percent;
 
   @Column({ transformer: float, type: 'numeric' })
-  liveSize?: Cardano.Percent;
+  liveSize?: Percent;
 
   @Column({ transformer: float, type: 'numeric' })
-  apy?: Cardano.Percent;
+  apy?: Percent;
 }

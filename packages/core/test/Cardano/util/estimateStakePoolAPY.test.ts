@@ -1,10 +1,11 @@
 import { Cardano } from '../../../src';
+import { Percent } from '@cardano-sdk/util';
 
 describe('estimateStakePoolAPY', () => {
   const rewards = {
     activeStake: 10_365_739_303_707n,
     epochLength: 432_000_000,
-    memberROI: Cardano.Percent(0.000_829_950_248_854_788),
+    memberROI: Percent(0.000_829_950_248_854_788),
     memberRewards: 8_579_404_603n,
     pledge: 28_487_625_262n
   } as Cardano.StakePoolEpochRewards;
