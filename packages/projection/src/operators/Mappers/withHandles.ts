@@ -35,13 +35,11 @@ export const withHandles = unifiedProjectorOperator<{}, WithHandles>((evt) => ({
 }));
 
 export const filterHandlesByPolicyId =
-  <PropsIn extends WithHandles>({
-    policyIds: _policyIds
-  }: FilterByPolicyIds): ProjectionOperator<PropsIn, WithHandles> =>
+  <PropsIn extends WithHandles>({ policyIds }: FilterByPolicyIds): ProjectionOperator<PropsIn, WithHandles> =>
   (evt$) =>
     evt$.pipe(
       map((evt) => ({
         ...evt,
-        handles: evt.handles.filter(({ policyId, amount }) => _policyIds.includes(policyId) && amount === 1n)
+        handles: evt.handles.filter(({ policyId, amount }) => policyIds.includes(policyId) && amount === 1n)
       }))
     );

@@ -1,40 +1,69 @@
 import { ChainSyncEventType } from '@cardano-sdk/core';
 import { HandleEntity } from '../entity';
-import { In } from 'typeorm';
+import { In, QueryRunner, Repository } from 'typeorm';
 import { Mappers } from '@cardano-sdk/projection';
 import { typeormOperator } from './util';
 
+type HandleEventParams = {
+  handles: Mappers.Handle[];
+  mint: Mappers.Mint[];
+  queryRunner: QueryRunner;
+};
+
+const getExistingHandles = async (
+  handleRepository: Repository<HandleEntity>,
+  handles: Mappers.Handle[]
+): Promise<Set<string | undefined>> => {
+  const existingHandles = await handleRepository.find({
+    select: { handle: true },
+    where: { handle: In(handles.map((handle) => handle.handle)) }
+  });
+  return new Set(existingHandles.map(({ handle }) => handle));
+};
+
+const rollForward = async ({ mint, handles, queryRunner }: HandleEventParams) => {
+  const handleRepository = queryRunner.manager.getRepository(HandleEntity);
+  const existingHandlesSet = await getExistingHandles(handleRepository, handles);
+
+  for (const _ of mint) {
+    await Promise.all(
+      handles.map(({ handle, address, assetId: _assetId }) =>
+        existingHandlesSet.has(handle)
+          ? handleRepository.update({ handle }, { address: null })
+          : handleRepository.insert({
+              address,
+              asset: _assetId,
+              handle
+            })
+      )
+    );
+  }
+};
+
+const rollBackward = async ({ handles, queryRunner }: HandleEventParams) => {
+  const handleRepository = queryRunner.manager.getRepository(HandleEntity);
+  const existingHandlesSet = await getExistingHandles(handleRepository, handles);
+
+  for (const { assetId, handle } of handles) {
+    if (existingHandlesSet.has(handle)) {
+      const ownerAddress = await queryRunner.query(`
+        SELECT o.address FROM tokens t JOIN output o ON o.id = t.output_id WHERE o.consumed_at_slot IS NULL AND t.asset_id = ${assetId}
+    `);
+      await handleRepository.update({ handle }, { address: ownerAddress[0].address });
+    } else {
+      await handleRepository.delete({ handle });
+    }
+  }
+};
+
 export const storeHandles = typeormOperator<Mappers.WithHandles & Mappers.WithMint>(
   async ({ mint, handles, queryRunner, eventType }) => {
+    const handleEventParams = { handles, mint, queryRunner };
+
     try {
-      if (handles.length === 0) return;
-
-      const handleRepository = queryRunner.manager.getRepository(HandleEntity);
-      const existingHandles = await handleRepository.find({
-        select: { handle: true },
-        where: { handle: In(handles.map((handle) => handle.handle)) }
-      });
-      const existingHandlesSet = new Set(existingHandles.map(({ handle }) => handle));
-
-      if (eventType === ChainSyncEventType.RollForward) {
-        for (const { assetId } of mint) {
-          if (assetId) {
-            await Promise.all(
-              handles.map(({ handle, address, assetId: _assetId }) =>
-                existingHandlesSet.has(handle)
-                  ? handleRepository.update({ handle }, { address: null })
-                  : handleRepository.insert({
-                      address,
-                      asset: _assetId,
-                      handle
-                    })
-              )
-            );
-          }
-        }
-      } else {
-        await Promise.all(handles.map(({ handle }) => handleRepository.delete({ handle })));
-      }
+      eventType === ChainSyncEventType.RollForward
+        ? await rollForward(handleEventParams)
+        : await rollBackward(handleEventParams);
     } catch (error) {
       throw new Error((error as Error).message);
     }

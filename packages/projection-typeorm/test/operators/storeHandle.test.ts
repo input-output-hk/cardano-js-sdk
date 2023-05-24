@@ -1,3 +1,4 @@
+// import { filterHandlesByPolicyId } from '@cardano-sdk/projection/dist/cjs/operators/Mappers';
 import {
   AssetEntity,
   BlockDataEntity,
@@ -20,6 +21,9 @@ import { Observable, defer, from } from 'rxjs';
 import { QueryRunner } from 'typeorm';
 import { createProjectorTilFirst } from './util';
 import { initializeDataSource } from '../util';
+
+const hasLessThanZeroQuantity = (mints: Mappers.Mint[]) =>
+  mints.map(({ quantity }) => quantity).some((quantity) => quantity < BigInt(0));
 
 describe('storeHandle', () => {
   const stubEvents = chainSyncData(ChainSyncDataSet.WithHandle);
@@ -52,6 +56,7 @@ describe('storeHandle', () => {
       Mappers.filterProducedUtxoByAssetPolicyId({ policyIds }),
       Mappers.withMint(),
       Mappers.withHandles(),
+      Mappers.filterHandlesByPolicyId({ policyIds }),
       storeData,
       requestNext()
     );
@@ -79,12 +84,12 @@ describe('storeHandle', () => {
 
   it('deletes handle on rollback', async () => {
     const handleRepository = queryRunner.manager.getRepository(HandleEntity);
-    await projectTilFirst(({ handles }) => handles.length > 0);
-    const currentCount = await handleRepository.count();
-    expect(currentCount).toBeGreaterThan(0);
-
-    const rolledBackMintEvent = await projectTilFirst(({ eventType }) => eventType === ChainSyncEventType.RollBackward);
-    expect(await handleRepository.count()).toEqual(currentCount - rolledBackMintEvent.handles.length);
+    const initialCount = await handleRepository.count();
+    expect(initialCount).toEqual(0);
+    const mintEvent = await projectTilFirst(({ handles }) => handles.length > 0);
+    expect(await handleRepository.count()).toEqual(initialCount + mintEvent.handles.length);
+    await projectTilFirst(({ eventType }) => eventType === ChainSyncEventType.RollBackward);
+    expect(await handleRepository.count()).toEqual(initialCount);
   });
 
   it('minting an existing handle sets address to null', async () => {
@@ -92,7 +97,7 @@ describe('storeHandle', () => {
     const mintEvent = await projectTilFirst(
       ({ handles, eventType }) => eventType === ChainSyncEventType.RollForward && handles[0]?.handle === 'bob'
     );
-    expect(mintEvent.handles.length).toBeGreaterThan(0);
+    expect(mintEvent.handles.length).toBe(1);
 
     await projectTilFirst(
       ({ handles, eventType }) => eventType === ChainSyncEventType.RollForward && handles[0]?.handle === 'bob'
@@ -103,8 +108,31 @@ describe('storeHandle', () => {
       handle: 'bob'
     });
   });
-  it.todo('rolling back a transaction that mint an existing handle sets address to the original owner');
 
-  it.todo('burning an handle with supply >1 sets address to the 1 remaining owner');
+  it('rolling back a transaction that mint an existing handle sets address to the original owner', async () => {
+    const repository = queryRunner.manager.getRepository(HandleEntity);
+    const mintEvent = await projectTilFirst(
+      ({ handles, eventType }) => eventType === ChainSyncEventType.RollForward && handles[0]?.handle === 'bob'
+    );
+    expect(mintEvent.handles.length).toBe(1);
+
+    await projectTilFirst(
+      ({ handles, eventType }) => eventType === ChainSyncEventType.RollBackward && handles[0]?.handle === 'bob'
+    );
+
+    expect(await repository.findOne({ where: { handle: 'bob' } })).toEqual({
+      address:
+        'addr_test1qzrljm7nskakjydxlr450ktsj08zuw6aktvgfkmmyw9semrkrezryq3ydtmkg0e7e2jvzg443h0ffzfwd09wpcxy2fuql9tk0g',
+      handle: 'bob'
+    });
+  });
+
+  it('burning a handle with supply >1 sets address to the 1 remaining owner', async () => {
+    const mintEvent1 = await projectTilFirst(
+      ({ eventType, mint }) => eventType === ChainSyncEventType.RollForward && hasLessThanZeroQuantity(mint)
+    );
+
+    expect(mintEvent1.handles.length).toBeGreaterThan(0);
+  });
   it.todo('rolling back a transaction that burned a handle with supply >1 sets address to null');
 });
