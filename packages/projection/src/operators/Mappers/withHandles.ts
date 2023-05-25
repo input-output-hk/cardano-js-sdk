@@ -1,8 +1,8 @@
 import { Asset, Cardano } from '@cardano-sdk/core';
 import { FilterByPolicyIds } from './types';
 import { ProjectionOperator } from '../../types';
+import { isNotNil } from '@cardano-sdk/util';
 import { map } from 'rxjs';
-import { unifiedProjectorOperator } from '../utils';
 
 export interface Handle {
   amount: bigint;
@@ -16,30 +16,28 @@ export interface WithHandles {
   handles: Handle[];
 }
 
-export const withHandles = unifiedProjectorOperator<{}, WithHandles>((evt) => ({
-  ...evt,
-  // map tx outputs to handles
-  handles: evt.block.body.flatMap(({ body: { outputs } }) =>
-    outputs.flatMap(({ address, value }) =>
-      [...(value.assets?.entries() || [])].map(
-        ([assetId, amount]): Handle => ({
-          address,
-          amount,
-          assetId,
-          handle: Buffer.from(Asset.util.assetNameFromAssetId(assetId), 'hex').toString('utf8'),
-          policyId: Asset.util.policyIdFromAssetId(assetId)
-        })
-      )
-    )
-  )
-}));
-
-export const filterHandlesByPolicyId =
-  <PropsIn extends WithHandles>({ policyIds }: FilterByPolicyIds): ProjectionOperator<PropsIn, WithHandles> =>
+export const withHandles =
+  <PropsIn>({ policyIds }: FilterByPolicyIds): ProjectionOperator<PropsIn, WithHandles> =>
   (evt$) =>
     evt$.pipe(
       map((evt) => ({
         ...evt,
-        handles: evt.handles.filter(({ policyId, amount }) => policyIds.includes(policyId) && amount === 1n)
+        handles: evt.block.body
+          .flatMap(({ body: { outputs } }) =>
+            outputs.flatMap(({ address, value }) =>
+              [...(value.assets?.entries() || [])].map(([assetId, amount]): Handle | null => {
+                const policyId = Asset.util.policyIdFromAssetId(assetId);
+                if (!policyIds.includes(policyId)) return null;
+                return {
+                  address,
+                  amount,
+                  assetId,
+                  handle: Buffer.from(Asset.util.assetNameFromAssetId(assetId), 'hex').toString('utf8'),
+                  policyId
+                };
+              })
+            )
+          )
+          .filter(isNotNil)
       }))
     );

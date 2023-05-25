@@ -55,8 +55,7 @@ describe('storeHandle', () => {
       Mappers.withUtxo(),
       Mappers.filterProducedUtxoByAssetPolicyId({ policyIds }),
       Mappers.withMint(),
-      Mappers.withHandles(),
-      Mappers.filterHandlesByPolicyId({ policyIds }),
+      Mappers.withHandles({ policyIds }),
       storeData,
       requestNext()
     );

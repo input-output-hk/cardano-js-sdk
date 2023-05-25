@@ -1,8 +1,8 @@
 import { Asset, Cardano } from '@cardano-sdk/core';
 import { Buffer } from 'buffer';
 import { ProjectionEvent } from '../../../src';
-import { filterHandlesByPolicyId, withHandles } from '../../../src/operators/Mappers';
 import { firstValueFrom, of } from 'rxjs';
+import { withHandles } from '../../../src/operators/Mappers';
 
 const assetIdFromNameLabelAndPolicyId = (assetName: string, policyId: Cardano.PolicyId): Cardano.AssetId =>
   Asset.util.assetIdFromPolicyAndName(policyId, Cardano.AssetName(Buffer.from(assetName).toString('hex')));
@@ -10,7 +10,7 @@ const assetIdFromNameLabelAndPolicyId = (assetName: string, policyId: Cardano.Po
 const handlePolicyId = Cardano.PolicyId('f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a');
 const assetIdFromHandle = (handle: string) => assetIdFromNameLabelAndPolicyId(handle, handlePolicyId);
 
-describe('withHandles + filterHandlesByPolicyId', () => {
+describe('withHandles', () => {
   it('maps and filters assets, from outputs, containing handles matching the given policy ID to an array of objects', async () => {
     const bobHandleOne = 'bob.handle.one';
     const bobHandleTwo = 'bob.handle.two';
@@ -83,8 +83,7 @@ describe('withHandles + filterHandlesByPolicyId', () => {
 
     const { handles } = await firstValueFrom(
       validTxSource$.pipe(
-        withHandles(),
-        filterHandlesByPolicyId({
+        withHandles({
           policyIds: [handlePolicyId]
         })
       )
@@ -116,58 +115,5 @@ describe('withHandles + filterHandlesByPolicyId', () => {
       ])
     );
     expect(handles).toHaveLength(3);
-  });
-
-  it('omits handles that are bundled in a token with a local supply greater or less than 1', async () => {
-    const bobHandle = 'bob.handle';
-    const bobHandleInvalidHigher = 'bob.handle.invalid.higher';
-    const bobHandleInvalidLower = 'bob.handle.invalid.lower';
-    const bobAddress = Cardano.PaymentAddress('addr_test1wzlv9cslk9tcj0wpm9p5t6kajyt37ap5sc9rzkaxa9p67ys2ygypv');
-    const validTxSource$ = of({
-      block: {
-        body: [
-          {
-            body: {
-              outputs: [
-                {
-                  address: bobAddress,
-                  datumHash: '99c170cc1247e7b7971e194c7e400e219360d3991cb588e9833f77ee9edbbd06' as Cardano.DatumHash,
-                  value: {
-                    assets: new Map([
-                      [assetIdFromHandle(bobHandle), 1n],
-                      [assetIdFromHandle(bobHandleInvalidHigher), 2n],
-                      [assetIdFromHandle(bobHandleInvalidLower), 0n]
-                    ]),
-                    coins: 1_724_100n
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      }
-    } as ProjectionEvent);
-
-    const { handles } = await firstValueFrom(
-      validTxSource$.pipe(
-        withHandles(),
-        filterHandlesByPolicyId({
-          policyIds: [handlePolicyId]
-        })
-      )
-    );
-
-    expect(handles).toEqual(
-      expect.arrayContaining([
-        {
-          address: bobAddress,
-          amount: 1n,
-          assetId: assetIdFromHandle(bobHandle),
-          handle: bobHandle,
-          policyId: handlePolicyId.toString()
-        }
-      ])
-    );
-    expect(handles).toHaveLength(1);
   });
 });
