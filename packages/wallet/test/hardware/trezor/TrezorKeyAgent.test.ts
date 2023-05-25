@@ -10,6 +10,7 @@ import {
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { CML, Cardano } from '@cardano-sdk/core';
 import { PersonalWallet, setupWallet } from '../../../src';
+// import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
 import { dummyLogger as logger } from 'ts-log';
 import { mockKeyAgentDependencies, stakeKeyDerivationPath } from '../../../../key-management/test/mocks';
 

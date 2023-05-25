@@ -2,6 +2,7 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { CML, Cardano } from '@cardano-sdk/core';
 import { CommunicationType, KeyAgent, TrezorKeyAgent, util } from '@cardano-sdk/key-management';
 import { ObservableWallet, PersonalWallet, restoreKeyAgent, setupWallet } from '../../../src';
+// import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
 import { createStubStakePoolProvider, mockProviders } from '@cardano-sdk/util-dev';
 import { firstValueFrom } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';

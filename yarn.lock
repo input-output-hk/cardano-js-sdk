@@ -2699,7 +2699,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cardano-sdk/hardware-trezor@workspace:packages/hardware-trezor":
+"@cardano-sdk/hardware-trezor@workspace:packages/hardware-trezor, @cardano-sdk/hardware-trezor@workspace:~":
   version: 0.0.0-use.local
   resolution: "@cardano-sdk/hardware-trezor@workspace:packages/hardware-trezor"
   dependencies:
@@ -2960,6 +2960,7 @@ __metadata:
     "@cardano-sdk/crypto": "workspace:~"
     "@cardano-sdk/dapp-connector": "workspace:~"
     "@cardano-sdk/hardware-ledger": "workspace:~"
+    "@cardano-sdk/hardware-trezor": "workspace:~"
     "@cardano-sdk/input-selection": "workspace:~"
     "@cardano-sdk/key-management": "workspace:~"
     "@cardano-sdk/ogmios": "workspace:~"

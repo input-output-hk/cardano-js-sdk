@@ -80,6 +80,7 @@
     "@cardano-sdk/crypto": "workspace:~",
     "@cardano-sdk/dapp-connector": "workspace:~",
     "@cardano-sdk/hardware-ledger": "workspace:~",
+    "@cardano-sdk/hardware-trezor": "workspace:~",
     "@cardano-sdk/input-selection": "workspace:~",
     "@cardano-sdk/key-management": "workspace:~",
     "@cardano-sdk/tx-construction": "workspace:~",
