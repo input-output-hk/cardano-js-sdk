@@ -1,4 +1,4 @@
-import { ChainSyncEventType } from '@cardano-sdk/core';
+import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { HandleEntity } from '../entity';
 import { In, QueryRunner, Repository } from 'typeorm';
 import { Mappers } from '@cardano-sdk/projection';
@@ -8,6 +8,8 @@ type HandleEventParams = {
   handles: Mappers.Handle[];
   mint: Mappers.Mint[];
   queryRunner: QueryRunner;
+  block: Cardano.Block;
+  producedUtxo: any[];
 };
 
 const getExistingHandles = async (
@@ -21,19 +23,24 @@ const getExistingHandles = async (
   return new Set(existingHandles.map(({ handle }) => handle));
 };
 
-const rollForward = async ({ mint, handles, queryRunner }: HandleEventParams) => {
+const rollForward = async ({ mint, handles, queryRunner, block: { header }, producedUtxo }: HandleEventParams) => {
   const handleRepository = queryRunner.manager.getRepository(HandleEntity);
   const existingHandlesSet = await getExistingHandles(handleRepository, handles);
 
   for (const _ of mint) {
     await Promise.all(
-      handles.map(({ handle, address, assetId: _assetId }) =>
+      handles.map(({ handle, address, assetId: _assetId, policyId }) =>
         existingHandlesSet.has(handle)
-          ? handleRepository.update({ handle }, { address: null })
+          ? handleRepository.update({ handle }, { cardanoAddress: null })
           : handleRepository.insert({
-              address,
               asset: _assetId,
-              handle
+              cardanoAddress: address,
+              datum: producedUtxo.find((output) => output?.address === address)?.datum,
+              handle,
+              policyId,
+              resolvedAt: {
+                slot: header.slot
+              }
             })
       )
     );
@@ -56,9 +63,9 @@ const rollBackward = async ({ handles, queryRunner }: HandleEventParams) => {
   }
 };
 
-export const storeHandles = typeormOperator<Mappers.WithHandles & Mappers.WithMint>(
-  async ({ mint, handles, queryRunner, eventType }) => {
-    const handleEventParams = { handles, mint, queryRunner };
+export const storeHandles = typeormOperator<Mappers.WithHandles & Mappers.WithMint & Mappers.WithUtxo>(
+  async ({ mint, handles, queryRunner, eventType, block, utxo }) => {
+    const handleEventParams = { block, handles, mint, producedUtxo: utxo.produced.flat(), queryRunner };
 
     try {
       eventType === ChainSyncEventType.RollForward

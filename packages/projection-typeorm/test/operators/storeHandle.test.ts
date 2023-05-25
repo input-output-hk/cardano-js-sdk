@@ -1,4 +1,3 @@
-// import { filterHandlesByPolicyId } from '@cardano-sdk/projection/dist/cjs/operators/Mappers';
 import {
   AssetEntity,
   BlockDataEntity,
@@ -103,7 +102,7 @@ describe('storeHandle', () => {
     );
 
     expect(await repository.findOne({ where: { handle: 'bob' } })).toEqual({
-      address: null,
+      cardanoAddress: null,
       handle: 'bob'
     });
   });
@@ -120,7 +119,7 @@ describe('storeHandle', () => {
     );
 
     expect(await repository.findOne({ where: { handle: 'bob' } })).toEqual({
-      address:
+      cardanoAddress:
         'addr_test1qzrljm7nskakjydxlr450ktsj08zuw6aktvgfkmmyw9semrkrezryq3ydtmkg0e7e2jvzg443h0ffzfwd09wpcxy2fuql9tk0g',
       handle: 'bob'
     });
