@@ -84,10 +84,9 @@ export class DbSyncAssetProvider extends DbSyncProvider() implements AssetProvid
       );
     }
 
-    const assetList: Asset.AssetInfo[] = [];
-    let tokenMetadataList: (Asset.TokenMetadata | null | undefined)[] = [];
+    const fetchTokenMetadataList = async () => {
+      let tokenMetadataList: (Asset.TokenMetadata | null | undefined)[] = [];
 
-    if (extraData?.tokenMetadata) {
       try {
         tokenMetadataList = await this.#dependencies.tokenMetadataService.getTokenMetadata(assetIds);
       } catch (error) {
@@ -98,19 +97,24 @@ export class DbSyncAssetProvider extends DbSyncProvider() implements AssetProvid
           throw error;
         }
       }
-    }
 
-    for (const assetId of assetIds) {
+      return tokenMetadataList;
+    };
+
+    const tokenMetadataListPromise = extraData?.tokenMetadata ? fetchTokenMetadataList() : undefined;
+
+    const getAssetInfo = async (assetId: Cardano.AssetId) => {
       const assetInfo = await this.getAssetInfo(assetId);
 
       if (extraData?.nftMetadata)
         assetInfo.nftMetadata = await this.#dependencies.ntfMetadataService.getNftMetadata(assetInfo);
-      if (extraData?.tokenMetadata) assetInfo.tokenMetadata = tokenMetadataList[assetIds.indexOf(assetId)];
+      if (tokenMetadataListPromise)
+        assetInfo.tokenMetadata = (await tokenMetadataListPromise)[assetIds.indexOf(assetId)];
 
-      assetList.push(assetInfo);
-    }
+      return assetInfo;
+    };
 
-    return assetList;
+    return Promise.all(assetIds.map((_) => getAssetInfo(_)));
   }
 
   private async loadHistory(assetInfo: Asset.AssetInfo) {
@@ -132,8 +136,10 @@ export class DbSyncAssetProvider extends DbSyncProvider() implements AssetProvid
 
     const fingerprint = multiAsset.fingerprint as unknown as Cardano.AssetFingerprint;
     const supply = BigInt(multiAsset.sum);
+    // Backwards compatibility
+    const quantity = supply;
     const mintOrBurnCount = Number(multiAsset.count);
 
-    return { assetId, fingerprint, mintOrBurnCount, name, policyId, supply };
+    return { assetId, fingerprint, mintOrBurnCount, name, policyId, quantity, supply };
   }
 }

@@ -16,6 +16,10 @@ export interface AssetInfo {
   policyId: PolicyId;
   name: AssetName;
   fingerprint: AssetFingerprint;
+  /**
+   * @deprecated Use `supply` instead
+   */
+  quantity: bigint;
   supply: bigint;
   mintOrBurnCount: number;
   /**

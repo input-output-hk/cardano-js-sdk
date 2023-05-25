@@ -2587,6 +2587,7 @@ __metadata:
     jest-webextension-mock: ^3.7.22
     json-bigint: ^1.0.0
     jsonschema: ^1.4.1
+    k6: ^0.0.0
     lodash: ^4.17.21
     madge: ^5.0.1
     mock-browser: ^0.92.14
@@ -16280,6 +16281,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"k6@npm:^0.0.0":
+  version: 0.0.0
+  resolution: "k6@npm:0.0.0"
+  checksum: 13a6701565b36457326c77bddafd73d9137c016088961e9ce18e78a3a48b8b155f93775b8e12d6f21e226da21d8c1dfe3e6a130cd35409bce84c247746b1cd85
+  languageName: node
+  linkType: hard
+
 "keypress@npm:^0.2.1":
   version: 0.2.1
   resolution: "keypress@npm:0.2.1"
@@ -22402,12 +22410,12 @@ __metadata:
   linkType: hard
 
 "socket.io-parser@npm:~4.2.0":
-  version: 4.2.1
-  resolution: "socket.io-parser@npm:4.2.1"
+  version: 4.2.3
+  resolution: "socket.io-parser@npm:4.2.3"
   dependencies:
     "@socket.io/component-emitter": ~3.1.0
     debug: ~4.3.1
-  checksum: 2582202f22538d7e6b4436991378cb4cea3b2f8219cda24923ae35afd291ab5ad6120e7d093e41738256b6c6ad10c667dd25753c2d9a2340fead04e9286f152d
+  checksum: f14030d09ccb82fa32ee68abe7ba586b8b991b16584194eb3c9e5dba8e80829f39c3b39b53ba4efb6a73e16beeaef8478020650a0c1352e0b833aa1da9af4682
   languageName: node
   linkType: hard
 

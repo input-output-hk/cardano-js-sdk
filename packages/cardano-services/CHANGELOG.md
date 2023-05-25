@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.11.2...@cardano-sdk/cardano-services@0.11.3) (2023-05-24)
+
+### Features
+
+* **cardano-services:** executes get seestes queries in parallel ([a966dd4](https://github.com/input-output-hk/cardano-js-sdk/commit/a966dd4f27d6e62f078802b07f72129f084151cb))
+
 ## [0.11.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.11.1...@cardano-sdk/cardano-services@0.11.2) (2023-05-22)
 
 ### Features
