@@ -25,6 +25,16 @@ const getExistingHandles = async (
 const convertAssetIdToHandle = (assetId: Cardano.AssetId) =>
   Buffer.from(Asset.util.assetNameFromAssetId(assetId), 'hex').toString('utf8');
 
+const getOwnerAddresses = async (queryRunner: QueryRunner, assetId: string) =>
+  queryRunner.manager
+    .createQueryBuilder('tokens', 't')
+    .innerJoinAndSelect('output', 'o', 'o.id = t.output_id')
+    .select('address')
+    .distinct()
+    .where('o.consumed_at_slot IS NULL')
+    .andWhere('t.asset_id = :assetId', { assetId })
+    .getRawMany();
+
 const rollForward = async ({ mint, handles, queryRunner, block: { header } }: HandleEventParams) => {
   const handleRepository = queryRunner.manager.getRepository(HandleEntity);
   const existingHandlesSet = await getExistingHandles(handleRepository, handles);
@@ -32,9 +42,7 @@ const rollForward = async ({ mint, handles, queryRunner, block: { header } }: Ha
   for (const { quantity, assetId } of mint) {
     if (quantity < 0) {
       // burning a handle
-      const ownerAddresses = await queryRunner.query(`
-        SELECT DISTINCT (o.address) FROM tokens t JOIN output o ON o.id = t.output_id WHERE o.consumed_at_slot IS NULL AND t.asset_id = '${assetId}'
-    `);
+      const ownerAddresses = await getOwnerAddresses(queryRunner, assetId);
       const burnedHandle = convertAssetIdToHandle(Cardano.AssetId(assetId));
       await handleRepository.update(
         { handle: burnedHandle },
@@ -62,28 +70,31 @@ const rollForward = async ({ mint, handles, queryRunner, block: { header } }: Ha
   }
 };
 
-const rollBackward = async ({ handles, queryRunner, mint }: HandleEventParams) => {
+const handleMintingRollback = async (handles: Mappers.Handle[], queryRunner: QueryRunner) => {
   const handleRepository = queryRunner.manager.getRepository(HandleEntity);
   const existingHandlesSet = await getExistingHandles(handleRepository, handles);
 
+  for (const { assetId, handle } of handles) {
+    if (existingHandlesSet.has(handle)) {
+      const ownerAddresses = await getOwnerAddresses(queryRunner, assetId);
+      await handleRepository.update(
+        { handle },
+        { cardanoAddress: ownerAddresses.length === 1 ? ownerAddresses[0].address : null }
+      );
+    } else {
+      await handleRepository.delete({ handle });
+    }
+  }
+};
+
+const rollBackward = async ({ handles, queryRunner, mint }: HandleEventParams) => {
+  const handleRepository = queryRunner.manager.getRepository(HandleEntity);
   for (const { quantity, assetId } of mint) {
     if (quantity < 0) {
       const burnedHandle = convertAssetIdToHandle(Cardano.AssetId(assetId));
       await handleRepository.update({ handle: burnedHandle }, { cardanoAddress: null });
     } else {
-      for (const { assetId: _assetId, handle } of handles) {
-        if (existingHandlesSet.has(handle)) {
-          const ownerAddresses = await queryRunner.query(`
-              SELECT DISTINCT (o.address) FROM tokens t JOIN output o ON o.id = t.output_id WHERE o.consumed_at_slot IS NULL AND t.asset_id = '${_assetId}'
-          `);
-          await handleRepository.update(
-            { handle },
-            { cardanoAddress: ownerAddresses.length === 1 ? ownerAddresses[0].address : null }
-          );
-        } else {
-          await handleRepository.delete({ handle });
-        }
-      }
+      await handleMintingRollback(handles, queryRunner);
     }
   }
 };

@@ -143,12 +143,6 @@ describe('storeHandle', () => {
     });
   });
 
-  // blockNo: 1 2 3 4 5 6 7
-  // mint at block 1 send to addr1
-  // mint at block 2 send to addr2 - expect Handle.address to be null, because there are 2 handles
-  // burn one of the handles at block 3 - expect the remaining handle to be valid.
-  //    The input of the burning tx must match the tx id of the mint transaction,
-  //    and index == the index of the output that sent the handle to the address
   it('burning a handle with supply >1 sets address to the 1 remaining owner', async () => {
     const repository = queryRunner.manager.getRepository(HandleEntity);
     const mintEvent1 = await projectTilFirst(
@@ -165,8 +159,6 @@ describe('storeHandle', () => {
     });
   });
 
-  // quite simialr to the previvous test, except that instead of burning, you roll back the 2nd mint transaction
-  // so that it never existed and only 1 transaction that minted the handle is valid
   it('rolling back a transaction that burned a handle with supply >1 sets address to null', async () => {
     const repository = queryRunner.manager.getRepository(HandleEntity);
     const mintEvent1 = await projectTilFirst(
