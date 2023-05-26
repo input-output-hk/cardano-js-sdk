@@ -48,7 +48,6 @@ export const filterProducedUtxoByAddresses =
 
 export const filterProducedUtxoByAssetPolicyId =
   <PropsIn extends WithUtxo>({ policyIds }: FilterByPolicyIds): ProjectionOperator<PropsIn> =>
-  // eslint-disable-next-line unicorn/consistent-function-scoping
   (evt$) =>
     evt$.pipe(
       map((evt) => ({

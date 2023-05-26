@@ -52,8 +52,9 @@ describe('storeHandle', () => {
       logger
     }).pipe(
       Mappers.withUtxo(),
-      Mappers.filterProducedUtxoByAssetPolicyId({ policyIds }),
       Mappers.withMint(),
+      Mappers.filterProducedUtxoByAssetPolicyId({ policyIds }),
+      Mappers.filterMintByPolicyIds({ policyIds }),
       Mappers.withHandles({ policyIds }),
       storeData,
       requestNext()
@@ -78,6 +79,14 @@ describe('storeHandle', () => {
     const mintEvent = await projectTilFirst((evt) => evt.handles.length > 0);
     expect(await repository.count()).toBe(mintEvent.handles.length);
     expect(mintEvent.handles.length).toBeGreaterThan(0);
+  });
+
+  it('when combined with filter operators, stores only relevant Output and Asset (per handle)', async () => {
+    const outputRepository = queryRunner.manager.getRepository(OutputEntity);
+    const assetRepository = queryRunner.manager.getRepository(AssetEntity);
+    const { handles } = await projectTilFirst((evt) => evt.handles.length > 0);
+    expect(await outputRepository.count()).toBe(handles.length);
+    expect(await assetRepository.count()).toBe(handles.length);
   });
 
   it('deletes handle on rollback', async () => {
