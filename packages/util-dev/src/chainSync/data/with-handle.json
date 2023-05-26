@@ -755,13 +755,6 @@
                       "__type": "bigint",
                       "value": "1"
                     }
-                  ],
-                  [
-                    "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a626f62",
-                    {
-                      "__type": "bigint",
-                      "value": "-1"
-                    }
                   ]
                 ]
               },
@@ -888,7 +881,106 @@
     },
     {
       "block": {
-        "body": [],
+        "body": [
+          {
+            "body": {
+              "certificates": [],
+              "collaterals": [],
+              "fee": {
+                "__type": "bigint",
+                "value": "192517"
+              },
+              "inputs": [
+                {
+                  "index": 1,
+                  "txId": "04e4c197613f7b752f17cc69429faa5d7ceffb3e9299a7a4891af2b85b7f87c4"
+                }
+              ],
+              "mint": {
+                "__type": "Map",
+                "value": [
+                  [
+                    "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a626f62",
+                    {
+                      "__type": "bigint",
+                      "value": "1"
+                    }
+                  ]
+                ]
+              },
+              "outputs": [
+                {
+                  "address": "addr_test1qph450j2em0kk62p7278qhs38yh722kgup3nj5eyk95ndcjstf9aru532d0m7a52dek7txeekxxr69vdcs75elqgwu0syrcdqg",
+                  "datum": {
+                    "__type": "undefined"
+                  },
+                  "datumHash": {
+                    "__type": "undefined"
+                  },
+                  "scriptReference": {
+                    "__type": "undefined"
+                  },
+                  "value": {
+                    "assets": {
+                      "__type": "Map",
+                      "value": [
+                        [
+                          "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a626f62",
+                          {
+                            "__type": "bigint",
+                            "value": "1"
+                          }
+                        ]
+                      ]
+                    },
+                    "coins": {
+                      "__type": "bigint",
+                      "value": "1444443"
+                    }
+                  }
+                }
+              ],
+              "requiredExtraSignatures": [],
+              "scriptIntegrityHash": {
+                "__type": "undefined"
+              },
+              "validityInterval": {
+                "invalidBefore": {
+                  "__type": "undefined"
+                },
+                "invalidHereafter": 13645686
+              },
+              "withdrawals": []
+            },
+            "id": "497f52b3e58e5c007f0d6914e1af64b4fc2c3266d444896520d998005d26642b",
+            "inputSource": "inputs",
+            "witness": {
+              "bootstrap": [],
+              "datums": [],
+              "redeemers": [],
+              "scripts": [
+                {
+                  "__type": "native",
+                  "keyHash": "4da965a049dfd15ed1ee19fba6e2974a0b79fc416dd1796a1f97f5e1",
+                  "kind": 0
+                }
+              ],
+              "signatures": {
+                "__type": "Map",
+                "value": [
+                  [
+                    "8cb46c3cd83bad9a5d5c368152da69ec630c5c0cdae2bccbc933635f10a95978",
+                    "130e1cdb0506f3e1d6e1e85d22abd525dce5128028d1c306dfb2ceec94db16ef550dc1f9be61918d5d40182ce7b9a5faa7a683425f90218e3820e8f5d476610c"
+                  ],
+                  [
+                    "b62a7193927f47ef703ba99a06add1ee2d4d94853a16dcd68ad0f5d9baa18530",
+                    "59842fe9d6ddaeb4fd444f981d8d4c01b8003a1e92472d2cbccbca7b24ec19ab7c36e32ec1d0376ed6a499667c7b04ba13a92805aecd84fbc04812b12ce7c702"
+                  ]
+                ]
+              }
+            }
+          }
+        ],
         "fees": {
           "__type": "bigint",
           "value": "0"
@@ -1370,15 +1462,7 @@
                   "value": {
                     "assets": {
                       "__type": "Map",
-                      "value": [
-                        [
-                          "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a626f62",
-                          {
-                            "__type": "bigint",
-                            "value": "1"
-                          }
-                        ]
-                      ]
+                      "value": []
                     },
                     "coins": {
                       "__type": "bigint",
@@ -1421,7 +1505,7 @@
               },
               "withdrawals": []
             },
-            "id": "297f52b3e58e5c007f0d6914e1af64b4fc2c3266d444896520d998005d26642b",
+            "id": "497f52b3e58e5c007f0d6914e1af64b4fc2c3266d444896520d998005d26642b",
             "inputSource": "inputs",
             "witness": {
               "bootstrap": [],
@@ -1479,12 +1563,12 @@
     {
       "eventType": 1,
       "point": {
-        "hash": "6625b89401da3c51749f89268b65fda8e416ad5c8af2d81b61f1eac0cf7eb8e5",
+        "hash": "61ce97ccf16eab2db6acf809c2d36ba153b771c5cc616adb80db8ca14aa74061",
         "slot": 13633686
       },
       "tip": {
         "blockNo": 317873,
-        "hash": "6625b89401da3c51749f89268b65fda8e416ad5c8af2d81b61f1eac0cf7eb8e5",
+        "hash": "61ce97ccf16eab2db6acf809c2d36ba153b771c5cc616adb80db8ca14aa74061",
         "slot": 13633686
       }
     }

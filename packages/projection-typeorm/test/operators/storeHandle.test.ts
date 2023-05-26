@@ -16,8 +16,8 @@ import {
 import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
-import { Observable, defer, from } from 'rxjs';
-import { QueryRunner } from 'typeorm';
+import { DataSource, QueryRunner } from 'typeorm';
+import { Observable, of } from 'rxjs';
 import { createProjectorTilFirst } from './util';
 import { initializeDataSource } from '../util';
 
@@ -28,15 +28,13 @@ describe('storeHandle', () => {
   const stubEvents = chainSyncData(ChainSyncDataSet.WithHandle);
   const policyIds = [Cardano.PolicyId('f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a')];
   let queryRunner: QueryRunner;
+  let dataSource$: Observable<DataSource>;
   let buffer: TypeormStabilityWindowBuffer;
   const entities = [BlockEntity, BlockDataEntity, AssetEntity, TokensEntity, OutputEntity, HandleEntity];
 
   const storeData = (evt$: Observable<ProjectionEvent<Mappers.WithUtxo & Mappers.WithMint & Mappers.WithHandles>>) =>
     evt$.pipe(
-      withTypeormTransaction({
-        dataSource$: defer(() => from(initializeDataSource({ entities }))),
-        logger
-      }),
+      withTypeormTransaction({ dataSource$, logger }),
       storeBlock(),
       storeAssets(),
       storeUtxo(),
@@ -64,6 +62,7 @@ describe('storeHandle', () => {
 
   beforeEach(async () => {
     const dataSource = await initializeDataSource({ entities });
+    dataSource$ = of(dataSource);
     queryRunner = dataSource.createQueryRunner();
     buffer = new TypeormStabilityWindowBuffer({ allowNonSequentialBlockHeights: true, logger });
     await buffer.initialize(queryRunner);
@@ -92,23 +91,32 @@ describe('storeHandle', () => {
   it('deletes handle on rollback', async () => {
     const handleRepository = queryRunner.manager.getRepository(HandleEntity);
     const initialCount = await handleRepository.count();
-    expect(initialCount).toEqual(0);
-    const mintEvent = await projectTilFirst(({ handles }) => handles.length > 0);
+    const mintEvent = await projectTilFirst(
+      ({ handles, eventType }) => eventType === ChainSyncEventType.RollForward && handles.length > 0
+    );
     expect(await handleRepository.count()).toEqual(initialCount + mintEvent.handles.length);
-    await projectTilFirst(({ eventType }) => eventType === ChainSyncEventType.RollBackward);
+    await projectTilFirst(
+      ({
+        eventType,
+        block: {
+          header: { hash }
+        }
+      }) => eventType === ChainSyncEventType.RollBackward && hash === mintEvent.block.header.hash
+    );
     expect(await handleRepository.count()).toEqual(initialCount);
   });
 
   it('minting an existing handle sets address to null', async () => {
     const repository = queryRunner.manager.getRepository(HandleEntity);
-    const mintEvent = await projectTilFirst(
+    const mintEvent1 = await projectTilFirst(
       ({ handles, eventType }) => eventType === ChainSyncEventType.RollForward && handles[0]?.handle === 'bob'
     );
-    expect(mintEvent.handles.length).toBe(1);
+    expect(mintEvent1.handles.length).toBe(1);
 
-    await projectTilFirst(
+    const mintEvent2 = await projectTilFirst(
       ({ handles, eventType }) => eventType === ChainSyncEventType.RollForward && handles[0]?.handle === 'bob'
     );
+    expect(mintEvent2.handles.length).toBe(1);
 
     expect(
       await repository.findOne({ select: { cardanoAddress: true, handle: true }, where: { handle: 'bob' } })
@@ -138,6 +146,12 @@ describe('storeHandle', () => {
     });
   });
 
+  // blockNo: 1 2 3 4 5 6 7
+  // mint at block 1 send to addr1
+  // mint at block 2 send to addr2 - expect Handle.address to be null, because there are 2 handles
+  // burn one of the handles at block 3 - expect the remaining handle to be valid.
+  //    The input of the burning tx must match the tx id of the mint transaction,
+  //    and index == the index of the output that sent the handle to the address
   it('burning a handle with supply >1 sets address to the 1 remaining owner', async () => {
     const mintEvent1 = await projectTilFirst(
       ({ eventType, mint }) => eventType === ChainSyncEventType.RollForward && hasLessThanZeroQuantity(mint)
@@ -145,5 +159,8 @@ describe('storeHandle', () => {
 
     expect(mintEvent1.handles.length).toBeGreaterThan(0);
   });
+
+  // quite simialr to the previvous test, except that instead of burning, you roll back the 2nd mint transaction
+  // so that it never existed and only 1 transaction that minted the handle is valid
   it.todo('rolling back a transaction that burned a handle with supply >1 sets address to null');
 });

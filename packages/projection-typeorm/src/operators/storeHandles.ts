@@ -52,10 +52,11 @@ const rollBackward = async ({ handles, queryRunner }: HandleEventParams) => {
 
   for (const { assetId, handle } of handles) {
     if (existingHandlesSet.has(handle)) {
-      const ownerAddress = await queryRunner.query(`
-        SELECT o.address FROM tokens t JOIN output o ON o.id = t.output_id WHERE o.consumed_at_slot IS NULL AND t.asset_id = ${assetId}
+      const ownerAddresses = await queryRunner.query(`
+        SELECT o.address FROM tokens t JOIN output o ON o.id = t.output_id WHERE o.consumed_at_slot IS NULL AND t.asset_id = '${assetId}'
     `);
-      await handleRepository.update({ handle }, { address: ownerAddress[0].address });
+      // TODO: if there are multiple distinct addresses, then it's an invalid handle and should be set to null
+      await handleRepository.update({ handle }, { cardanoAddress: ownerAddresses[0].address });
     } else {
       await handleRepository.delete({ handle });
     }

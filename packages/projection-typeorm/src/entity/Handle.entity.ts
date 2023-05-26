@@ -1,7 +1,7 @@
 import { AssetEntity } from './Asset.entity';
 import { BlockEntity } from './Block.entity';
 import { Cardano } from '@cardano-sdk/core';
-import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class HandleEntity {
@@ -16,7 +16,7 @@ export class HandleEntity {
   policyId?: Cardano.PolicyId;
   @Column()
   hasDatum?: boolean;
-  @OneToOne(() => BlockEntity, { onDelete: 'CASCADE' })
+  @ManyToOne(() => BlockEntity, { onDelete: 'CASCADE' })
   @JoinColumn()
   resolvedAt?: BlockEntity;
 }
