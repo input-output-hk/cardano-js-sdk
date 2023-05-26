@@ -1,5 +1,6 @@
 import { Asset, Cardano } from '@cardano-sdk/core';
 import { Buffer } from 'buffer';
+import { HexBlob } from '@cardano-sdk/util';
 import { ProjectionEvent } from '../../../src';
 import { firstValueFrom, of } from 'rxjs';
 import { withHandles } from '../../../src/operators/Mappers';
@@ -11,6 +12,34 @@ const handlePolicyId = Cardano.PolicyId('f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002e
 const assetIdFromHandle = (handle: string) => assetIdFromNameLabelAndPolicyId(handle, handlePolicyId);
 
 describe('withHandles', () => {
+  it('sets "datum" property on the handle if utxo has datum', async () => {
+    const datum = HexBlob('123abc');
+    const outputs: Cardano.TxOut[] = [
+      {
+        address: Cardano.PaymentAddress(
+          'addr_test1qretqkqqvc4dax3482tpjdazrfl8exey274m3mzch3dv8lu476aeq3kd8q8splpsswcfmv4y370e8r76rc8lnnhte49qqyjmtc'
+        ),
+        datum,
+        value: {
+          assets: new Map([[assetIdFromHandle('somehandle'), 1n]]),
+          coins: 25_485_292n
+        }
+      }
+    ];
+    const validTxSource$ = of({
+      block: { body: [{ body: { outputs } }] }
+    } as ProjectionEvent);
+    const { handles } = await firstValueFrom(
+      validTxSource$.pipe(
+        withHandles({
+          policyIds: [handlePolicyId]
+        })
+      )
+    );
+
+    expect(handles[0].datum).toEqual(datum);
+  });
+
   it('maps and filters assets, from outputs, containing handles matching the given policy ID to an array of objects', async () => {
     const bobHandleOne = 'bob.handle.one';
     const bobHandleTwo = 'bob.handle.two';
