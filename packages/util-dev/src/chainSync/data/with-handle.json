@@ -893,7 +893,7 @@
               "inputs": [
                 {
                   "index": 1,
-                  "txId": "04e4c197613f7b752f17cc69429faa5d7ceffb3e9299a7a4891af2b85b7f87c4"
+                  "txId": "24e4c197613f7b752f17cc69429faa5d7ceffb3e9299a7a4891af2b85b7f87c4"
                 }
               ],
               "mint": {
@@ -1431,8 +1431,8 @@
               },
               "inputs": [
                 {
-                  "index": 1,
-                  "txId": "04e4c197613f7b752f17cc69429faa5d7ceffb3e9299a7a4891af2b85b7f87c4"
+                  "index": 0,
+                  "txId": "497f52b3e58e5c007f0d6914e1af64b4fc2c3266d444896520d998005d26642b"
                 }
               ],
               "mint": {
@@ -1505,7 +1505,7 @@
               },
               "withdrawals": []
             },
-            "id": "497f52b3e58e5c007f0d6914e1af64b4fc2c3266d444896520d998005d26642b",
+            "id": "14e4c197613f7b752f17cc69429faa5d7ceffb3e9299a7a4891af2b85b7f87c4",
             "inputSource": "inputs",
             "witness": {
               "bootstrap": [],

@@ -21,9 +21,6 @@ import { Observable, of } from 'rxjs';
 import { createProjectorTilFirst } from './util';
 import { initializeDataSource } from '../util';
 
-const hasLessThanZeroQuantity = (mints: Mappers.Mint[]) =>
-  mints.map(({ quantity }) => quantity).some((quantity) => quantity < BigInt(0));
-
 describe('storeHandle', () => {
   const stubEvents = chainSyncData(ChainSyncDataSet.WithHandle);
   const policyIds = [Cardano.PolicyId('f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a')];
@@ -153,14 +150,34 @@ describe('storeHandle', () => {
   //    The input of the burning tx must match the tx id of the mint transaction,
   //    and index == the index of the output that sent the handle to the address
   it('burning a handle with supply >1 sets address to the 1 remaining owner', async () => {
+    const repository = queryRunner.manager.getRepository(HandleEntity);
     const mintEvent1 = await projectTilFirst(
-      ({ eventType, mint }) => eventType === ChainSyncEventType.RollForward && hasLessThanZeroQuantity(mint)
+      ({ eventType, mint }) => eventType === ChainSyncEventType.RollForward && mint[0]?.quantity === -1n
     );
+    expect(mintEvent1.handles.length).toBe(0);
 
-    expect(mintEvent1.handles.length).toBeGreaterThan(0);
+    expect(
+      await repository.findOne({ select: { cardanoAddress: true, handle: true }, where: { handle: 'bob' } })
+    ).toEqual({
+      cardanoAddress:
+        'addr_test1qzrljm7nskakjydxlr450ktsj08zuw6aktvgfkmmyw9semrkrezryq3ydtmkg0e7e2jvzg443h0ffzfwd09wpcxy2fuql9tk0g',
+      handle: 'bob'
+    });
   });
 
   // quite simialr to the previvous test, except that instead of burning, you roll back the 2nd mint transaction
   // so that it never existed and only 1 transaction that minted the handle is valid
-  it.todo('rolling back a transaction that burned a handle with supply >1 sets address to null');
+  it('rolling back a transaction that burned a handle with supply >1 sets address to null', async () => {
+    const repository = queryRunner.manager.getRepository(HandleEntity);
+    const mintEvent1 = await projectTilFirst(
+      ({ eventType, mint }) => eventType === ChainSyncEventType.RollBackward && mint[0]?.quantity === -1n
+    );
+    expect(mintEvent1.handles.length).toBe(0);
+    expect(
+      await repository.findOne({ select: { cardanoAddress: true, handle: true }, where: { handle: 'bob' } })
+    ).toEqual({
+      cardanoAddress: null,
+      handle: 'bob'
+    });
+  });
 });
