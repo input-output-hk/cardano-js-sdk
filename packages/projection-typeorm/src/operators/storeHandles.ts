@@ -35,8 +35,8 @@ const rollForward = async ({ mint, handles, queryRunner, block: { header }, prod
           : handleRepository.insert({
               asset: _assetId,
               cardanoAddress: address,
-              datum: producedUtxo.find((output) => output?.address === address)?.datum,
               handle,
+              hasDatum: !!producedUtxo.find((output) => output?.address === address)?.datum,
               policyId,
               resolvedAt: {
                 slot: header.slot

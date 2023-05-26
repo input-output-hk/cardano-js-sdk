@@ -101,7 +101,9 @@ describe('storeHandle', () => {
       ({ handles, eventType }) => eventType === ChainSyncEventType.RollForward && handles[0]?.handle === 'bob'
     );
 
-    expect(await repository.findOne({ where: { handle: 'bob' } })).toEqual({
+    expect(
+      await repository.findOne({ select: { cardanoAddress: true, handle: true }, where: { handle: 'bob' } })
+    ).toEqual({
       cardanoAddress: null,
       handle: 'bob'
     });
@@ -118,7 +120,9 @@ describe('storeHandle', () => {
       ({ handles, eventType }) => eventType === ChainSyncEventType.RollBackward && handles[0]?.handle === 'bob'
     );
 
-    expect(await repository.findOne({ where: { handle: 'bob' } })).toEqual({
+    expect(
+      await repository.findOne({ select: { cardanoAddress: true, handle: true }, where: { handle: 'bob' } })
+    ).toEqual({
       cardanoAddress:
         'addr_test1qzrljm7nskakjydxlr450ktsj08zuw6aktvgfkmmyw9semrkrezryq3ydtmkg0e7e2jvzg443h0ffzfwd09wpcxy2fuql9tk0g',
       handle: 'bob'

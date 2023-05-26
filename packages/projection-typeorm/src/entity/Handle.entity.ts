@@ -14,8 +14,8 @@ export class HandleEntity {
   asset?: AssetEntity;
   @Column()
   policyId?: Cardano.PolicyId;
-  @Column({ nullable: true })
-  datum?: Cardano.Datum;
+  @Column()
+  hasDatum?: boolean;
   @OneToOne(() => BlockEntity, { onDelete: 'CASCADE' })
   @JoinColumn()
   resolvedAt?: BlockEntity;
