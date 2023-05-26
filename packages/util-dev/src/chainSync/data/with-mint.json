@@ -472,6 +472,13 @@
                 "__type": "Map",
                 "value": [
                   [
+                    "e2bab64ca481afc5a695b7db22fd0a7df4bf930158dfa652fb337999436f696e41",
+                    {
+                      "__type": "bigint",
+                      "value": "1"
+                    }
+                  ],
+                  [
                     "e2bab64ca481afc5a695b7db22fd0a7df4bf930158dfa652fb337999436f696e42",
                     {
                       "__type": "bigint",
@@ -600,13 +607,42 @@
     {
       "eventType": 1,
       "point": {
-        "hash": "61ce97ccf16eab2db6acf809c2d36ba153b771c5cc616adb80db8ca14aa74061",
+        "hash": "05afe274a93ad6ef92257bd9fba0296f3e220773a7789ccf3777b442e2d0d5e4",
         "slot": 10682654
       },
       "tip": {
         "blockNo": 178176,
-        "hash": "61ce97ccf16eab2db6acf809c2d36ba153b771c5cc616adb80db8ca14aa74061",
+        "hash": "05afe274a93ad6ef92257bd9fba0296f3e220773a7789ccf3777b442e2d0d5e4",
         "slot": 10682654
+      }
+    },
+    {
+      "block": {
+        "body": [],
+        "fees": {
+          "__type": "bigint",
+          "value": "380678"
+        },
+        "header": {
+          "blockNo": 178177,
+          "hash": "f0c10845e7aca24399b693fcbbcf7c945d7af20c2956689086def16a079ec118",
+          "slot": 10682699
+        },
+        "issuerVk": "a9d974fd26bfaf385749113f260271430276bed6ef4dad6968535de6778471ce",
+        "previousBlock": "05afe274a93ad6ef92257bd9fba0296f3e220773a7789ccf3777b442e2d0d5e4",
+        "size": 1203,
+        "totalOutput": {
+          "__type": "bigint",
+          "value": "19496885950"
+        },
+        "txCount": 0,
+        "vrf": "vrf_vk1p8s5ysf7dgsvfrw0p0q7zczdytkxc95zsq3p9sfshk9s3z86jfdql5fdft"
+      },
+      "eventType": 0,
+      "tip": {
+        "blockNo": 178177,
+        "hash": "f0c10845e7aca24399b693fcbbcf7c945d7af20c2956689086def16a079ec118",
+        "slot": 10682699
       }
     }
   ],
