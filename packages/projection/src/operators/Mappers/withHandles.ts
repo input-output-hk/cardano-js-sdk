@@ -5,7 +5,6 @@ import { isNotNil } from '@cardano-sdk/util';
 import { map } from 'rxjs';
 
 export interface Handle {
-  amount: bigint;
   handle: string;
   address: Cardano.PaymentAddress;
   assetId: Cardano.AssetId;
@@ -25,12 +24,11 @@ export const withHandles =
         handles: evt.block.body
           .flatMap(({ body: { outputs } }) =>
             outputs.flatMap(({ address, value }) =>
-              [...(value.assets?.entries() || [])].map(([assetId, amount]): Handle | null => {
+              [...(value.assets?.entries() || [])].map(([assetId]): Handle | null => {
                 const policyId = Asset.util.policyIdFromAssetId(assetId);
                 if (!policyIds.includes(policyId)) return null;
                 return {
                   address,
-                  amount,
                   assetId,
                   handle: Buffer.from(Asset.util.assetNameFromAssetId(assetId), 'hex').toString('utf8'),
                   policyId

@@ -93,21 +93,18 @@ describe('withHandles', () => {
       expect.arrayContaining([
         {
           address: bobAddress,
-          amount: 1n,
           assetId: assetIdFromHandle(bobHandleOne),
           handle: bobHandleOne,
           policyId: handlePolicyId.toString()
         },
         {
           address: bobAddress,
-          amount: 1n,
           assetId: assetIdFromHandle(bobHandleTwo),
           handle: bobHandleTwo,
           policyId: handlePolicyId.toString()
         },
         {
           address: maryAddress,
-          amount: 1n,
           assetId: assetIdFromHandle(maryHandleOne),
           handle: maryHandleOne,
           policyId: handlePolicyId.toString()
