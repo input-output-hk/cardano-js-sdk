@@ -1,6 +1,7 @@
-import { BaseProjectionEvent, ProjectionHttpService, ProjectionName } from '../../src';
+import { BaseProjectionEvent } from '@cardano-sdk/projection';
 import { Cardano, HealthCheckResponse } from '@cardano-sdk/core';
 import { Observable } from 'rxjs';
+import { ProjectionHttpService, ProjectionName } from '../../src';
 import { dummyLogger } from 'ts-log';
 
 describe('ProjectionHttpService', () => {
