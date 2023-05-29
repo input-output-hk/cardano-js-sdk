@@ -2,6 +2,7 @@ import { Asset, Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { HandleEntity } from '../entity';
 import { In, QueryRunner, Repository } from 'typeorm';
 import { Mappers } from '@cardano-sdk/projection';
+import { WithMintedAssetSupplies } from './storeAssets';
 import { typeormOperator } from './util';
 
 type HandleEventParams = {
@@ -9,6 +10,7 @@ type HandleEventParams = {
   mint: Mappers.Mint[];
   queryRunner: QueryRunner;
   block: Cardano.Block;
+  totalSupplies: Partial<Record<Cardano.AssetId, bigint>>;
 };
 
 const getExistingHandles = async (
@@ -39,6 +41,10 @@ const rollForward = async ({ mint, handles, queryRunner, block: { header } }: Ha
   const handleRepository = queryRunner.manager.getRepository(HandleEntity);
   const existingHandlesSet = await getExistingHandles(handleRepository, handles);
 
+  // TODO: iterate over handles
+  // TODO: optimize by checking totalSupplies:
+  // - if it's exactly === 1, then just set handle address without querying anything else
+  // - if it's >1, then just set handle address to null because it's invalid (without querying anything else)
   for (const { quantity, assetId } of mint) {
     if (quantity < 0) {
       // burning a handle
@@ -70,6 +76,9 @@ const rollForward = async ({ mint, handles, queryRunner, block: { header } }: Ha
   }
 };
 
+// TODO: check totalSupplies before querying existing addresses.
+// If it's !== 1 then set to null (without making any other queries)
+// If it's === 1 then query the owner through unspent OutputEntity (like it is now)
 const handleMintingRollback = async (handles: Mappers.Handle[], queryRunner: QueryRunner) => {
   const handleRepository = queryRunner.manager.getRepository(HandleEntity);
   const existingHandlesSet = await getExistingHandles(handleRepository, handles);
@@ -99,9 +108,15 @@ const rollBackward = async ({ handles, queryRunner, mint }: HandleEventParams) =
   }
 };
 
-export const storeHandles = typeormOperator<Mappers.WithHandles & Mappers.WithMint>(
-  async ({ mint, handles, queryRunner, eventType, block }) => {
-    const handleEventParams = { block, handles, mint, queryRunner };
+export const storeHandles = typeormOperator<Mappers.WithHandles & Mappers.WithMint & WithMintedAssetSupplies>(
+  async ({ mint, handles, queryRunner, eventType, block, mintedAssetTotalSupplies }) => {
+    const handleEventParams: HandleEventParams = {
+      block,
+      handles,
+      mint,
+      queryRunner,
+      totalSupplies: mintedAssetTotalSupplies
+    };
 
     try {
       eventType === ChainSyncEventType.RollForward
