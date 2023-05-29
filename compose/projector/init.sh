@@ -26,7 +26,7 @@ _term() {
 trap _term SIGTERM
 
 cd /app/packages/cardano-services
-node dist/cjs/cli.js start-projector stake-pool,stake-pool-metadata-job &
+node dist/cjs/cli.js start-projector &
 
 CHILD=$!
 wait "$CHILD"

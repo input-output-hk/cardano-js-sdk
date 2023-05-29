@@ -139,17 +139,57 @@ RABBITMQ_SRV_SERVICE_NAME=some-domain-for-rabbitmq \
     stake-pool,stake-pool-metadata-job
 ```
 
+## Production
+
+The _Docker images_ produced by the SDK and the _docker compose infrastructures_ (_mainnet_, _preprod_ and _local-network_) it includes are ready to be used in
+production environment.
+
+**Note:** the _docker compose infrastructures_ included in the SDK are mainly used for development purposes: to use
+them in production environments, the projector service(s) must be instructed to run the _migration scripts_ rather than
+to use the `synchronize` development option from **TypeORM**. This can be achieved through environment variables:
+
+```
+SYNCHRONIZE=false yarn preprod:up
+```
+
 ## Development
+
+To speed up the development process, developers can ignore the migrations while developing or debugging changes.
+This freedom is granted by the `synchronize` development option from **TypeORM**, which is enabled by default in the
+_docker compose infrastructures_ included in the SDK.
 
 ### Generating Projector Schema Migrations
 
-1. Start local projection dependencies (e.g. `yarn preprod:up cardano-node-ogmios postgres`).
-2. Initialize base schema by running `start-projector` with **all** projections enabled. _Hint: you can use `git` to checkout a previous commit if you already updated entities and skipped this step_
-3. Create new entities (or update existing ones).
-4. Include any new entities in `entities` object at `src/Projection/prepareTypeormProjection.ts`.
-5. Run `yarn generate-migration`
-6. Inspect the generated migration and add a static `entity` property. _Hint: you may need to split generated migration into multiple migrations manually if it affects more than 1 entity_
-7. Export the new migration(s) from `migrations` array at `src/Projections/migrations/index.ts`
+In order to grant to the projection service the ability to choose which projections it needs to activate, **the
+migrations must be scoped to a single model**: if a single change has impact on more models, one migration for each
+impacted model must be generated.
+
+_Hint:_ isolating all the changes to each model in distinct commits can be so helpful for this target!
+
+For each migration, once the change is _finalized_ (all the new entities are added to the `entities` object at
+`src/Projection/prepareTypeormProjection.ts`, apart from last minor refinements the PR is approved, etc...), the
+relative migration can be generated following these steps.
+
+_Hint:_ if previous hint was followed, to checkout each commit which requires a migration to produce a _fixup_ commit
+for each of them can be an easy way to iterate over all the impacted models.
+
+1. Start a new fresh database with `DROP_PROJECTOR_SCHEMA=true SYNCHRONIZE=false yarn preprod up`
+   - **Note:** do not override `PROJECTION_NAMES` since in this scope all the projections must be loaded
+   - **Note:** this will not apply the current changes to the models into the database schema, so the currently
+     developed feature may not work properly, this is not relevant for the target of creating the migration
+   - `DROP_PROJECTOR_SCHEMA=true` is used to let the projection service to create the database schema from scratch
+   - with `SYNCHRONIZE=false` the projection service runs all migrations rather than reflecting the changes to the
+     models on the schema (through the `synchronize` development option from **TypeORM**)
+2. Run `yarn generate-migration` to produce a new migration in
+   `src/Projections/migrations` directory
+   - this compares the database schema against all the models (repeat: only one of them should be changed) and
+     generates the required migration
+3. Inspect the generated migration
+   - **Check:** if the migration has impact on more than one table, the changes was not isolated per model!
+     (the change must be reworked)
+4. Add the `static entity` property to the migration `class` (to see other migrations for reference)
+5. Rename the newly generated migration file and `class` giving them mnemonic names
+6. Export the new migration from `migrations` array at `src/Projections/migrations/index.ts`
 
 ## Tests
 

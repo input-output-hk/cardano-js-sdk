@@ -2,6 +2,7 @@ import {
   AssetEntity,
   BlockDataEntity,
   BlockEntity,
+  CurrentPoolMetricsEntity,
   DataSourceExtensions,
   OutputEntity,
   PoolMetadataEntity,
@@ -10,6 +11,7 @@ import {
   StakePoolEntity,
   TokensEntity,
   TypeormStabilityWindowBuffer,
+  createStorePoolMetricsUpdateJob,
   storeAssets,
   storeBlock,
   storeStakePoolMetadataJob,
@@ -17,6 +19,7 @@ import {
   storeUtxo
 } from '@cardano-sdk/projection-typeorm';
 import { Mappers as Mapper } from '@cardano-sdk/projection';
+import { POOLS_METRICS_INTERVAL_DEFAULT } from '../Program';
 import { Sorter } from '@hapi/topo';
 
 /**
@@ -26,6 +29,7 @@ import { Sorter } from '@hapi/topo';
 export enum ProjectionName {
   StakePool = 'stake-pool',
   StakePoolMetadataJob = 'stake-pool-metadata-job',
+  StakePoolMetricsJob = 'stake-pool-metrics-job',
   UTXO = 'utxo'
 }
 
@@ -43,9 +47,10 @@ type MapperOperators = typeof mapperOperators;
 type MapperName = keyof MapperOperators;
 type MapperOperator = MapperOperators[MapperName];
 
-const storeOperators = {
+export const storeOperators = {
   storeAssets: storeAssets(),
   storeBlock: storeBlock(),
+  storePoolMetricsUpdateJob: createStorePoolMetricsUpdateJob(POOLS_METRICS_INTERVAL_DEFAULT)(),
   storeStakePoolMetadataJob: storeStakePoolMetadataJob(),
   storeStakePools: storeStakePools(),
   storeUtxo: storeUtxo()
@@ -58,6 +63,7 @@ const entities = {
   asset: AssetEntity,
   block: BlockEntity,
   blockData: BlockDataEntity,
+  currentPoolMetrics: CurrentPoolMetricsEntity,
   output: OutputEntity,
   poolMetadata: PoolMetadataEntity,
   poolRegistration: PoolRegistrationEntity,
@@ -73,6 +79,7 @@ type Entity = Entities[EntityName];
 const storeEntities: Partial<Record<StoreName, EntityName[]>> = {
   storeAssets: ['asset'],
   storeBlock: ['block'],
+  storePoolMetricsUpdateJob: ['currentPoolMetrics'],
   storeStakePoolMetadataJob: ['block', 'poolMetadata'],
   storeStakePools: ['stakePool', 'poolRegistration', 'poolRetirement'],
   storeUtxo: ['tokens', 'output']
@@ -81,6 +88,7 @@ const storeEntities: Partial<Record<StoreName, EntityName[]>> = {
 const entityInterDependencies: Partial<Record<EntityName, EntityName[]>> = {
   asset: ['block'],
   blockData: ['block'],
+  currentPoolMetrics: ['stakePool'],
   output: ['block'],
   poolRegistration: ['block'],
   poolRetirement: ['block'],
@@ -101,6 +109,7 @@ const storeMapperDependencies: Partial<Record<StoreName, MapperName[]>> = {
 
 const storeInterDependencies: Partial<Record<StoreName, StoreName[]>> = {
   storeAssets: ['storeBlock'],
+  storePoolMetricsUpdateJob: ['storeBlock'],
   storeStakePoolMetadataJob: ['storeBlock'],
   storeStakePools: ['storeBlock'],
   storeUtxo: ['storeBlock', 'storeAssets']
@@ -109,6 +118,7 @@ const storeInterDependencies: Partial<Record<StoreName, StoreName[]>> = {
 const projectionStoreDependencies: Record<ProjectionName, StoreName[]> = {
   'stake-pool': ['storeStakePools'],
   'stake-pool-metadata-job': ['storeStakePoolMetadataJob'],
+  'stake-pool-metrics-job': ['storePoolMetricsUpdateJob'],
   utxo: ['storeUtxo']
 };
 

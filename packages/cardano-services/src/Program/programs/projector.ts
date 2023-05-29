@@ -3,9 +3,9 @@ import { CommonProgramOptions, OgmiosProgramOptions, PosgresProgramOptions } fro
 import { DnsResolver, createDnsResolver } from '../utils';
 import { HttpServer, HttpServerConfig } from '../../Http';
 import { Logger } from 'ts-log';
-import { ProjectionHttpService, ProjectionName, createTypeormProjection } from '../../Projection';
+import { ProjectionHttpService, ProjectionName, createTypeormProjection, storeOperators } from '../../Projection';
 import { SrvRecord } from 'dns';
-import { TypeormStabilityWindowBuffer } from '@cardano-sdk/projection-typeorm';
+import { TypeormStabilityWindowBuffer, createStorePoolMetricsUpdateJob } from '@cardano-sdk/projection-typeorm';
 import { URL } from 'url';
 import { UnknownServiceName } from '../errors';
 import { createLogger } from 'bunyan';
@@ -16,9 +16,11 @@ export const PROJECTOR_API_URL_DEFAULT = new URL('http://localhost:3002');
 export type ProjectorArgs = CommonProgramOptions &
   PosgresProgramOptions<'StakePool'> &
   OgmiosProgramOptions & {
-    projectionNames: ProjectionName[];
     dropSchema: boolean;
     dryRun: boolean;
+    poolsMetricsInterval: number;
+    projectionNames: ProjectionName[];
+    synchronize: boolean;
   };
 export interface LoadProjectorDependencies {
   dnsResolver?: (serviceName: string) => Promise<SrvRecord>;
@@ -33,28 +35,27 @@ interface ProjectionMapFactoryOptions {
 
 const createProjectionHttpService = async (options: ProjectionMapFactoryOptions) => {
   const { args, dnsResolver, logger } = options;
+  storeOperators.storePoolMetricsUpdateJob = createStorePoolMetricsUpdateJob(args.poolsMetricsInterval)();
   const cardanoNode = getOgmiosObservableCardanoNode(dnsResolver, logger, {
     ogmiosSrvServiceName: args.ogmiosSrvServiceName,
     ogmiosUrl: args.ogmiosUrl
   });
   const connectionConfig$ = getConnectionConfig(dnsResolver, 'projector', args);
   const buffer = new TypeormStabilityWindowBuffer({ logger });
+  const { dropSchema, dryRun, projectionNames, synchronize } = args;
   const projection$ = createTypeormProjection({
     buffer,
     connectionConfig$,
-    devOptions: args.dropSchema ? { dropSchema: true, synchronize: true } : undefined,
+    devOptions: { dropSchema, synchronize },
     logger,
     projectionSource$: Bootstrap.fromCardanoNode({
       buffer,
       cardanoNode,
       logger
     }),
-    projections: args.projectionNames
+    projections: projectionNames
   });
-  return new ProjectionHttpService(
-    { dryRun: args.dryRun, projection$, projectionNames: args.projectionNames },
-    { logger }
-  );
+  return new ProjectionHttpService({ dryRun, projection$, projectionNames }, { logger });
 };
 
 export const loadProjector = async (args: ProjectorArgs, deps: LoadProjectorDependencies = {}): Promise<HttpServer> => {

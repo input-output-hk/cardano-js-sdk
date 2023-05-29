@@ -20,6 +20,7 @@ import {
   PARALLEL_MODE_DEFAULT,
   PARALLEL_TXS_DEFAULT,
   POLLING_CYCLE_DEFAULT,
+  POOLS_METRICS_INTERVAL_DEFAULT,
   PROVIDER_SERVER_API_URL_DEFAULT,
   Programs,
   ProjectorOptionDescriptions,
@@ -56,11 +57,10 @@ import {
   loadPgBossWorker
 } from './Program/programs/pgBossWorker';
 import { PROJECTOR_API_URL_DEFAULT, ProjectorArgs, loadProjector } from './Program/programs/projector';
-import { PgBossQueue } from './PgBoss/types';
+import { PgBossQueue, isValidQueue } from './PgBoss';
 import { ProjectionName } from './Projection';
 import { URL } from 'url';
 import { dbCacheValidator } from './util/validators';
-import { isValidQueue } from './PgBoss/util';
 import { withCommonOptions, withOgmiosOptions, withPostgresOptions, withRabbitMqOptions } from './Program/options/';
 import fs from 'fs';
 import onDeath from 'death';
@@ -134,12 +134,26 @@ withCommonOptions(
       .argParser((dryRun) => stringOptionToBoolean(dryRun, Programs.Projector, ProjectorOptionDescriptions.DryRun))
   )
   .addOption(
+    new Option('--pools-metrics-interval <poolsMetricsInterval>', ProjectorOptionDescriptions.PoolsMetricsInterval)
+      .env('POOLS_METRICS_INTERVAL')
+      .default(POOLS_METRICS_INTERVAL_DEFAULT)
+      .argParser((interval) => Number.parseInt(interval, 10))
+  )
+  .addOption(
     new Option(
       '--projection-names <projectionNames>',
       `List of projections to start: ${Object.values(ProjectionName).toString()}`
     )
       .env('PROJECTION_NAMES')
       .argParser(projectionNameParser)
+  )
+  .addOption(
+    new Option('--synchronize <true/false>', ProjectorOptionDescriptions.Synchronize)
+      .default(false)
+      .env('SYNCHRONIZE')
+      .argParser((synchronize) =>
+        stringOptionToBoolean(synchronize, Programs.Projector, ProjectorOptionDescriptions.Synchronize)
+      )
   )
   .action(async (projectionNames: ProjectionName[], args: { apiUrl: URL } & ProjectorArgs) =>
     runServer('projector', () =>
@@ -395,6 +409,11 @@ withCommonOptions(
       .env('PARALLEL_JOBS')
       .default(PARALLEL_JOBS_DEFAULT)
       .argParser((parallelJobs) => Number.parseInt(parallelJobs, 10))
+  )
+  .addOption(
+    new Option('--stake-pool-provider-url <stakePoolProviderUrl>', PgBossWorkerOptionDescriptions.StakePoolProviderUrl)
+      .env('STAKE_POOL_PROVIDER_URL')
+      .argParser((url) => new URL(url).toString())
   )
   .addOption(
     new Option('--queues <queues>', PgBossWorkerOptionDescriptions.Queues)

@@ -60,7 +60,8 @@ services:
         condition: service_healthy
     environment:
       - LOGGER_MIN_SEVERITY=${LOGGER_MIN_SEVERITY:-info}
-      - QUEUES=${QUEUES:-pool-metadata}
+      - QUEUES=${QUEUES:-pool-metadata,pool-metrics}
+      - STAKE_POOL_PROVIDER_URL=http://provider-server:3000/stake-pool
     healthcheck:
       test: ['CMD-SHELL', 'curl -s --fail http://localhost:3003/health']
       interval: 10s
@@ -112,6 +113,8 @@ services:
       - DROP_SCHEMA=${DROP_PROJECTOR_SCHEMA:-false}
       - LOGGER_MIN_SEVERITY=${LOGGER_MIN_SEVERITY:-info}
       - OGMIOS_URL=ws://cardano-node-ogmios:1337
+      - PROJECTION_NAMES=${PROJECTION_NAMES:-stake-pool,stake-pool-metadata-job,stake-pool-metrics-job,utxo}
+      - SYNCHRONIZE=${SYNCHRONIZE:-true}
     healthcheck:
       test:
         ['CMD-SHELL', 'test `curl -fs http://localhost:3002/health | jq -r ".services[0].projectedTip.blockNo"` -gt 1']
