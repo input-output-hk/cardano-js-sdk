@@ -1,12 +1,10 @@
 import { Cardano } from '@cardano-sdk/core';
 import { DataSource, MoreThan } from 'typeorm';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
-import { PoolMetadataEntity, PoolRegistrationEntity, StakePoolMetadataTask } from '@cardano-sdk/projection-typeorm';
+import { PoolMetadataEntity, PoolRegistrationEntity, StakePoolMetadataJob } from '@cardano-sdk/projection-typeorm';
 import { WorkerHandlerFactory } from './types';
 import { createHttpStakePoolMetadataService } from '../StakePool';
-
-const isErrorWithConstraint = (error: unknown): error is Error & { constraint: unknown } =>
-  error instanceof Error && 'constraint' in error;
+import { isErrorWithConstraint } from './util';
 
 export const isUpdateOutdated = async (dataSource: DataSource, poolId: Cardano.PoolId, poolRegistrationId: string) => {
   const repos = dataSource.getRepository(PoolRegistrationEntity);
@@ -48,10 +46,11 @@ export const savePoolMetadata = async (args: SavePoolMetadataArguments) => {
   }
 };
 
-export const stakePoolMetadataHandlerFactory: WorkerHandlerFactory = (dataSource, logger) => {
+export const stakePoolMetadataHandlerFactory: WorkerHandlerFactory = (options) => {
+  const { dataSource, logger } = options;
   const service = createHttpStakePoolMetadataService(logger);
 
-  return async (task: StakePoolMetadataTask) => {
+  return async (task: StakePoolMetadataJob) => {
     const { metadataJson, poolId, poolRegistrationId } = task;
     const { hash, url } = metadataJson;
 

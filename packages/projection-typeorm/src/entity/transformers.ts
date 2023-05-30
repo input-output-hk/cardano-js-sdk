@@ -2,6 +2,15 @@
 import { ValueTransformer } from 'typeorm';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 
+export const float: ValueTransformer = {
+  from(data: string) {
+    return Number.parseFloat(data);
+  },
+  to(data: number) {
+    return data;
+  }
+};
+
 export const stringBytea: ValueTransformer = {
   from(bytea: Buffer) {
     return bytea.toString('utf8');

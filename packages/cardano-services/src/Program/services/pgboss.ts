@@ -1,5 +1,6 @@
 import {
   BlockEntity,
+  CurrentPoolMetricsEntity,
   PgConnectionConfig,
   PoolMetadataEntity,
   PoolRegistrationEntity,
@@ -25,12 +26,11 @@ import {
   switchMap,
   tap
 } from 'rxjs';
-import { PgBossQueue } from '../../PgBoss/types';
+import { PgBossQueue, queueHandlers } from '../../PgBoss';
 import { Pool } from 'pg';
 import { Router } from 'express';
 import { contextLogger } from '@cardano-sdk/util';
 import { createObservableDataSource } from '../../Projection/createTypeormProjection';
-import { queueHandlers } from '../../PgBoss/util';
 import { retryBackoff } from 'backoff-rxjs';
 import PgBoss from 'pg-boss';
 
@@ -38,6 +38,7 @@ import PgBoss from 'pg-boss';
  * The entities required by the job handlers
  */
 export const pgBossEntities = [
+  CurrentPoolMetricsEntity,
   BlockEntity,
   PoolMetadataEntity,
   PoolRegistrationEntity,
@@ -46,11 +47,18 @@ export const pgBossEntities = [
 ];
 
 export const createPgBossDataSource = (connectionConfig$: Observable<PgConnectionConfig>, logger: Logger) =>
-  createObservableDataSource({ connectionConfig$, entities: pgBossEntities, extensions: {}, logger });
+  createObservableDataSource({
+    connectionConfig$,
+    entities: pgBossEntities,
+    extensions: {},
+    logger,
+    migrationsRun: false
+  });
 
 export interface PgBossServiceConfig {
   parallelJobs: number;
   queues: PgBossQueue[];
+  stakePoolProviderUrl?: string;
 }
 
 export interface PgBossServiceDependencies {
@@ -62,15 +70,17 @@ export interface PgBossServiceDependencies {
 export class PgBossHttpService extends HttpService {
   #config: PgBossServiceConfig;
   #dataSource$: Observable<DataSource>;
+  #db: Pool;
   #subscription?: Subscription;
   #health: HealthCheckResponse = { ok: false, reason: 'PgBossHttpService not started' };
 
   constructor(cfg: PgBossServiceConfig, deps: PgBossServiceDependencies) {
-    const { connectionConfig$, logger } = deps;
+    const { connectionConfig$, db, logger } = deps;
 
     super('pg-boss-service', { healthCheck: async () => this.#health }, Router(), logger);
 
     this.#config = cfg;
+    this.#db = db;
     this.#dataSource$ = createPgBossDataSource(connectionConfig$, this.logger);
   }
 
@@ -105,7 +115,7 @@ export class PgBossHttpService extends HttpService {
 
         return concat(
           from(pgBoss.start()),
-          merge(...this.#config.queues.map((queue) => this.workQueue(dataSource, pgBoss, queue)))
+          merge(...this.#config.queues.map((queue) => this.workQueue(dataSource, pgBoss, queue, this.#db)))
         ).pipe(finalize(() => pgBoss.stop().catch((error) => this.logger.warn('Error stopping pgBoss', error))));
       }),
       tap(() => (this.#health = { ok: true })),
@@ -134,9 +144,14 @@ export class PgBossHttpService extends HttpService {
     );
   }
 
-  private workQueue(dataSource: DataSource, pgBoss: PgBoss, queue: PgBossQueue) {
+  private workQueue(dataSource: DataSource, pgBoss: PgBoss, queue: PgBossQueue, db: Pool) {
     const logger = contextLogger(this.logger, queue);
-    const handler = queueHandlers[queue](dataSource, logger);
+    const handler = queueHandlers[queue]({
+      dataSource,
+      db,
+      logger,
+      stakePoolProviderUrl: this.#config.stakePoolProviderUrl!
+    });
 
     return new Observable((subscriber) => {
       const workOption = {
