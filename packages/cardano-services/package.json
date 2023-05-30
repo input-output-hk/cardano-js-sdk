@@ -70,7 +70,6 @@
   },
   "devDependencies": {
     "@cardano-ogmios/client": "5.6.0",
-    "@cardano-sdk/cardano-services-client": "workspace:~",
     "@cardano-sdk/util-dev": "workspace:~",
     "@types/amqplib": "^0.8.2",
     "@types/bunyan": "^1.8.8",
@@ -100,6 +99,7 @@
   },
   "dependencies": {
     "@blockfrost/blockfrost-js": "^5.2.0",
+    "@cardano-sdk/cardano-services-client": "workspace:~",
     "@cardano-sdk/core": "workspace:~",
     "@cardano-sdk/crypto": "workspace:~",
     "@cardano-sdk/ogmios": "workspace:~",

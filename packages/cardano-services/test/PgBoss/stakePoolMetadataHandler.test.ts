@@ -1,50 +1,22 @@
-import {
-  BlockEntity,
-  PoolMetadataEntity,
-  PoolRegistrationEntity,
-  PoolRetirementEntity,
-  StakePoolEntity,
-  createDataSource
-} from '@cardano-sdk/projection-typeorm';
 import { Cardano } from '@cardano-sdk/core';
 import { DataSource } from 'typeorm';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
-import { Pool } from 'pg';
-import { isUpdateOutdated, savePoolMetadata } from '../../src/PgBoss/stakePoolMetadataHandler';
-import { logger } from '@cardano-sdk/util-dev';
+import { PoolMetadataEntity, PoolRegistrationEntity } from '@cardano-sdk/projection-typeorm';
+import { initHandlerTest, poolId } from './util';
+import { isUpdateOutdated, savePoolMetadata } from '../../src/PgBoss';
 
-describe('stakePoolHandler', () => {
-  const blockId = 'test_block';
-  const poolId = 'test_pool' as Cardano.PoolId;
+describe('stakePoolMetadataHandler', () => {
   const rewardAccount = 'test_addr';
   const vrf = 'test_vfr';
 
   let dataSource: DataSource;
 
   beforeAll(async () => {
-    const connectionConfig = {
-      database: process.env.POSTGRES_DB_STAKE_POOL!,
-      host: process.env.POSTGRES_HOST_DB_SYNC!,
-      password: process.env.POSTGRES_PASSWORD_DB_SYNC!,
-      port: Number.parseInt(process.env.POSTGRES_PORT_DB_SYNC!, 10),
-      // used by: new Pool()
-      user: process.env.POSTGRES_USER_DB_SYNC!,
-      // used by: createDataSource()
-      username: process.env.POSTGRES_USER_DB_SYNC!
-    };
-    const db = new Pool(connectionConfig);
-    const entities = [BlockEntity, PoolMetadataEntity, PoolRegistrationEntity, PoolRetirementEntity, StakePoolEntity];
+    const testData = await initHandlerTest();
+    const { block, stakePool } = testData;
+    ({ dataSource } = testData);
 
-    dataSource = createDataSource({ connectionConfig, devOptions: { synchronize: true }, entities, logger });
-
-    await db.query('CREATE EXTENSION IF NOT EXISTS pgcrypto');
-    await dataSource.initialize();
-
-    const blockRepos = dataSource.getRepository(BlockEntity);
-    const poolRepos = dataSource.getRepository(StakePoolEntity);
     const registrationRepos = dataSource.getRepository(PoolRegistrationEntity);
-    const block = { hash: blockId, height: 23, slot: 42 };
-    const stakePool = { id: poolId, status: 'active' };
     const registration1 = {
       block,
       cost: 0,
@@ -64,8 +36,6 @@ describe('stakePoolHandler', () => {
       pledge: 1_000_000
     };
 
-    await blockRepos.insert(block);
-    await poolRepos.insert(stakePool);
     await registrationRepos.insert(registration1);
     await registrationRepos.insert(registration2);
   });

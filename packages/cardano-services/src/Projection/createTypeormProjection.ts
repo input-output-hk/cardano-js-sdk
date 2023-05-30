@@ -41,9 +41,10 @@ export const createObservableDataSource = ({
   buffer,
   devOptions,
   entities,
-  extensions
+  extensions,
+  migrationsRun
 }: Omit<CreateTypeormProjectionProps, 'projections' | 'projectionSource$'> &
-  Pick<PreparedProjection, 'entities' | 'extensions'>) =>
+  Pick<PreparedProjection, 'entities' | 'extensions'> & { migrationsRun: boolean }) =>
   connectionConfig$.pipe(
     switchMap((connectionConfig) =>
       from(
@@ -57,7 +58,7 @@ export const createObservableDataSource = ({
             options: {
               installExtensions: true,
               migrations: migrations.filter(({ entity }) => entities.includes(entity as any)),
-              migrationsRun: true
+              migrationsRun: migrationsRun && !devOptions?.synchronize
             }
           });
           await dataSource.initialize();
@@ -94,7 +95,8 @@ export const createTypeormProjection = ({
     devOptions,
     entities,
     extensions,
-    logger
+    logger,
+    migrationsRun: true
   });
   return projectionSource$.pipe(
     applyMappers(mappers),

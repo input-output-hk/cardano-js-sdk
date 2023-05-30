@@ -172,6 +172,13 @@ describe('CLI', () => {
   let db: Pool;
   let fixtureBuilder: AssetFixtureBuilder;
   let lastBlock: LedgerTipModel;
+  let postgresConnectionString: string;
+  let postgresConnectionStringStakePool: string;
+
+  beforeAll(() => {
+    postgresConnectionString = process.env.POSTGRES_CONNECTION_STRING_DB_SYNC!;
+    postgresConnectionStringStakePool = process.env.POSTGRES_CONNECTION_STRING_STAKE_POOL!;
+  });
 
   describe('start-provider-server', () => {
     let apiPort: number;
@@ -214,7 +221,6 @@ describe('CLI', () => {
     });
 
     describe('cli:start-provider-server', () => {
-      let postgresConnectionString: string;
       let ogmiosPort: Ogmios.ConnectionConfig['port'];
       let ogmiosConnection: Ogmios.Connection;
       let cardanoNodeConfigPath: string;
@@ -235,7 +241,6 @@ describe('CLI', () => {
       beforeAll(async () => {
         ogmiosPort = await getRandomPort();
         ogmiosConnection = Ogmios.createConnectionObject({ port: ogmiosPort });
-        postgresConnectionString = process.env.POSTGRES_CONNECTION_STRING_DB_SYNC!;
         cardanoNodeConfigPath = process.env.CARDANO_NODE_CONFIG_PATH!;
         postgresSrvServiceName = process.env.POSTGRES_SRV_SERVICE_NAME_DB_SYNC!;
         postgresDb = process.env.POSTGRES_DB_DB_SYNC!;
@@ -2334,6 +2339,35 @@ describe('CLI', () => {
       proc = withLogging(fork(exePath, [...commonArgs, '--queues', 'pool-metadata'], { env: {}, stdio: 'pipe' }), true);
       proc.stderr!.on('data', (data) =>
         expect(data.toString()).toMatch('pg-boss-worker requires the postgresConnectionString')
+      );
+      proc.on('exit', (code) => {
+        expect(code).toBe(1);
+        done();
+      });
+    });
+
+    it('exits with code 1 with metrics queue and without a stake pool provider url', (done) => {
+      expect.assertions(2);
+      proc = withLogging(
+        fork(
+          exePath,
+          [
+            ...commonArgs,
+            '--queues',
+            'pool-metrics',
+            '--postgres-connection-string-db-sync',
+            postgresConnectionString,
+            '--postgres-connection-string-stake-pool',
+            postgresConnectionStringStakePool
+          ],
+          { env: {}, stdio: 'pipe' }
+        ),
+        true
+      );
+      proc.stderr!.on('data', (data) =>
+        expect(data.toString()).toMatch(
+          'MissingProgramOption: pool-metrics requires the Stake pool provider URL program option'
+        )
       );
       proc.on('exit', (code) => {
         expect(code).toBe(1);

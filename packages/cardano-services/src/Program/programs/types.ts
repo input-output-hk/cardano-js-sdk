@@ -27,9 +27,13 @@ export enum ServiceNames {
   Rewards = 'rewards'
 }
 
+export const POOLS_METRICS_INTERVAL_DEFAULT = 1000;
+
 export enum ProjectorOptionDescriptions {
   DropSchema = 'Drop and recreate database schema to project from origin',
-  DryRun = 'Initialize the projection, but do not start it'
+  DryRun = 'Initialize the projection, but do not start it',
+  PoolsMetricsInterval = 'Interval between two stake pools metrics jobs in number of blocks',
+  Synchronize = 'Synchronize the schema from the models'
 }
 
 export enum ProviderServerOptionDescriptions {
