@@ -33,7 +33,8 @@ export enum ProjectorOptionDescriptions {
   DropSchema = 'Drop and recreate database schema to project from origin',
   DryRun = 'Initialize the projection, but do not start it',
   PoolsMetricsInterval = 'Interval between two stake pools metrics jobs in number of blocks',
-  Synchronize = 'Synchronize the schema from the models'
+  Synchronize = 'Synchronize the schema from the models',
+  HandlePolicyIds = 'Handle policy ids'
 }
 
 export enum ProviderServerOptionDescriptions {

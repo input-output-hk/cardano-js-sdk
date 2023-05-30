@@ -4,6 +4,7 @@ import {
   BlockEntity,
   CurrentPoolMetricsEntity,
   DataSourceExtensions,
+  HandleEntity,
   OutputEntity,
   PoolMetadataEntity,
   PoolRegistrationEntity,
@@ -14,13 +15,16 @@ import {
   createStorePoolMetricsUpdateJob,
   storeAssets,
   storeBlock,
+  storeHandles,
   storeStakePoolMetadataJob,
   storeStakePools,
   storeUtxo
 } from '@cardano-sdk/projection-typeorm';
+import { Cardano } from '@cardano-sdk/core';
 import { Mappers as Mapper } from '@cardano-sdk/projection';
 import { POOLS_METRICS_INTERVAL_DEFAULT } from '../Program/programs/types';
 import { Sorter } from '@hapi/topo';
+import { passthrough } from '@cardano-sdk/util-rxjs';
 
 /**
  * Used as mount segments, so must be URL-friendly
@@ -28,28 +32,47 @@ import { Sorter } from '@hapi/topo';
  */
 export enum ProjectionName {
   StakePool = 'stake-pool',
+  Handle = 'handle',
   StakePoolMetadataJob = 'stake-pool-metadata-job',
   StakePoolMetricsJob = 'stake-pool-metrics-job',
   UTXO = 'utxo'
+}
+
+export interface ProjectionOptions {
+  handlePolicyIds?: Cardano.PolicyId[];
 }
 
 const requiredExtensions = (projectionNames: ProjectionName[]): DataSourceExtensions => ({
   pgBoss: projectionNames.includes(ProjectionName.StakePoolMetadataJob)
 });
 
-const mapperOperators = {
-  withCertificates: Mapper.withCertificates(),
-  withMint: Mapper.withMint(),
-  withStakePools: Mapper.withStakePools(),
-  withUtxo: Mapper.withUtxo()
+const createMapperOperators = (projectionNames: ProjectionName[], { handlePolicyIds }: ProjectionOptions) => {
+  const applyUtxoAndMintFilters = handlePolicyIds && !projectionNames.includes(ProjectionName.UTXO);
+  const filterUtxo = applyUtxoAndMintFilters
+    ? Mapper.filterProducedUtxoByAssetPolicyId({ policyIds: handlePolicyIds })
+    : passthrough();
+  const filterMint = applyUtxoAndMintFilters
+    ? Mapper.filterMintByPolicyIds({ policyIds: handlePolicyIds })
+    : passthrough();
+  const withHandles = handlePolicyIds ? Mapper.withHandles({ policyIds: handlePolicyIds }) : passthrough();
+  return {
+    filterMint,
+    filterUtxo,
+    withCertificates: Mapper.withCertificates(),
+    withHandles,
+    withMint: Mapper.withMint(),
+    withStakePools: Mapper.withStakePools(),
+    withUtxo: Mapper.withUtxo()
+  };
 };
-type MapperOperators = typeof mapperOperators;
+type MapperOperators = ReturnType<typeof createMapperOperators>;
 type MapperName = keyof MapperOperators;
 type MapperOperator = MapperOperators[MapperName];
 
 export const storeOperators = {
   storeAssets: storeAssets(),
   storeBlock: storeBlock(),
+  storeHandles: storeHandles(),
   storePoolMetricsUpdateJob: createStorePoolMetricsUpdateJob(POOLS_METRICS_INTERVAL_DEFAULT)(),
   storeStakePoolMetadataJob: storeStakePoolMetadataJob(),
   storeStakePools: storeStakePools(),
@@ -64,6 +87,7 @@ const entities = {
   block: BlockEntity,
   blockData: BlockDataEntity,
   currentPoolMetrics: CurrentPoolMetricsEntity,
+  handle: HandleEntity,
   output: OutputEntity,
   poolMetadata: PoolMetadataEntity,
   poolRegistration: PoolRegistrationEntity,
@@ -81,6 +105,7 @@ export const getEntities = (entityNames: EntityName[]): Entity[] => entityNames.
 const storeEntities: Partial<Record<StoreName, EntityName[]>> = {
   storeAssets: ['asset'],
   storeBlock: ['block'],
+  storeHandles: ['handle', 'asset', 'tokens', 'output'],
   storePoolMetricsUpdateJob: ['currentPoolMetrics'],
   storeStakePoolMetadataJob: ['block', 'poolMetadata'],
   storeStakePools: ['stakePool', 'poolRegistration', 'poolRetirement'],
@@ -91,6 +116,7 @@ const entityInterDependencies: Partial<Record<EntityName, EntityName[]>> = {
   asset: ['block'],
   blockData: ['block'],
   currentPoolMetrics: ['stakePool'],
+  handle: ['asset'],
   output: ['block'],
   poolRegistration: ['block'],
   poolRetirement: ['block'],
@@ -99,11 +125,15 @@ const entityInterDependencies: Partial<Record<EntityName, EntityName[]>> = {
 };
 
 const mapperInterDependencies: Partial<Record<MapperName, MapperName[]>> = {
+  filterMint: ['withMint'],
+  filterUtxo: ['withUtxo'],
+  withHandles: ['withMint', 'filterMint', 'withUtxo', 'filterUtxo'],
   withStakePools: ['withCertificates']
 };
 
 const storeMapperDependencies: Partial<Record<StoreName, MapperName[]>> = {
   storeAssets: ['withMint'],
+  storeHandles: ['withHandles'],
   storeStakePoolMetadataJob: ['withStakePools'],
   storeStakePools: ['withStakePools'],
   storeUtxo: ['withUtxo']
@@ -111,6 +141,7 @@ const storeMapperDependencies: Partial<Record<StoreName, MapperName[]>> = {
 
 const storeInterDependencies: Partial<Record<StoreName, StoreName[]>> = {
   storeAssets: ['storeBlock'],
+  storeHandles: ['storeUtxo'],
   storePoolMetricsUpdateJob: ['storeBlock'],
   storeStakePoolMetadataJob: ['storeBlock'],
   storeStakePools: ['storeBlock'],
@@ -118,20 +149,25 @@ const storeInterDependencies: Partial<Record<StoreName, StoreName[]>> = {
 };
 
 const projectionStoreDependencies: Record<ProjectionName, StoreName[]> = {
+  handle: ['storeHandles'],
   'stake-pool': ['storeStakePools'],
   'stake-pool-metadata-job': ['storeStakePoolMetadataJob'],
   'stake-pool-metrics-job': ['storePoolMetricsUpdateJob'],
   utxo: ['storeUtxo']
 };
 
-const registerMapper = (mapperName: MapperName, mapperSorter: Sorter<MapperOperator>): void => {
+const registerMapper = (
+  mapperOperators: MapperOperators,
+  mapperName: MapperName,
+  mapperSorter: Sorter<MapperOperator>
+): void => {
   const mapperOperator = mapperOperators[mapperName];
   if (mapperSorter.nodes.includes(mapperOperator)) return;
   const dependencyMappers = mapperInterDependencies[mapperName];
   mapperSorter.add(mapperOperator, { after: dependencyMappers, group: mapperName });
   if (dependencyMappers) {
     for (const dependencyMapperName of dependencyMappers) {
-      registerMapper(dependencyMapperName, mapperSorter);
+      registerMapper(mapperOperators, dependencyMapperName, mapperSorter);
     }
   }
 };
@@ -149,6 +185,7 @@ const registerEntity = (entityName: EntityName, entitySorter: Sorter<Entity>): v
 };
 
 const registerStore = (
+  mapperOperators: MapperOperators,
   storeName: StoreName,
   mapperSorter: Sorter<MapperOperator>,
   storeSorter: Sorter<StoreOperator>,
@@ -160,13 +197,13 @@ const registerStore = (
   storeSorter.add(storeOperator, { after: dependencyStores, group: storeName });
   if (dependencyStores) {
     for (const dependencyStoreName of dependencyStores) {
-      registerStore(dependencyStoreName, mapperSorter, storeSorter, entitySorter);
+      registerStore(mapperOperators, dependencyStoreName, mapperSorter, storeSorter, entitySorter);
     }
   }
   const mapperDependencies = storeMapperDependencies[storeName];
   if (mapperDependencies) {
     for (const mapperName of mapperDependencies) {
-      registerMapper(mapperName, mapperSorter);
+      registerMapper(mapperOperators, mapperName, mapperSorter);
     }
   }
   const entityDependencies = storeEntities[storeName];
@@ -189,19 +226,23 @@ const keyOf = <T extends {}>(obj: T, value: unknown): keyof T | null => {
 export interface PrepareTypeormProjectionProps {
   projections: ProjectionName[];
   buffer?: TypeormStabilityWindowBuffer;
+  options?: ProjectionOptions;
 }
 
 /**
  * Selects a required set of entities, mappers and store operators
  * based on 'projections' and presence of 'buffer':
  */
-export const prepareTypeormProjection = ({ projections, buffer }: PrepareTypeormProjectionProps) => {
+export const prepareTypeormProjection = ({ projections, buffer, options = {} }: PrepareTypeormProjectionProps) => {
   const mapperSorter = new Sorter<MapperOperator>();
   const storeSorter = new Sorter<StoreOperator>();
   const entitySorter = new Sorter<Entity>();
+
+  const mapperOperators = createMapperOperators(projections, options);
+
   for (const projection of projections) {
     for (const storeName of projectionStoreDependencies[projection]) {
-      registerStore(storeName, mapperSorter, storeSorter, entitySorter);
+      registerStore(mapperOperators, storeName, mapperSorter, storeSorter, entitySorter);
     }
   }
   const selectedEntities = entitySorter.nodes;

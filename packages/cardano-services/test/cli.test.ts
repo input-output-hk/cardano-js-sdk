@@ -2127,6 +2127,73 @@ describe('CLI', () => {
         ]);
         await assertServerAlive();
       });
+
+      test('with handle projection and handle policy ids option', async () => {
+        startProjector([
+          '--ogmios-url',
+          'ws://localhost:1234',
+          '--postgres-connection-string',
+          'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
+          '--handle-policy-ids',
+          'f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a',
+          ProjectionName.Handle
+        ]);
+        await assertServerAlive();
+      });
+
+      it('exits with code 1 with handle projection without handle policy ids option', (done) => {
+        expect.assertions(2);
+        proc = withLogging(
+          fork(
+            exePath,
+            [
+              ...commonArgs,
+              '--ogmios-url',
+              'ws://localhost:1234',
+              '--postgres-connection-string',
+              'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
+              ProjectionName.Handle
+            ],
+            { env: {}, stdio: 'pipe' }
+          ),
+          true
+        );
+        proc.stderr!.on('data', (data) =>
+          expect(data.toString()).toMatch('MissingProgramOption: handle requires the Handle policy ids program option')
+        );
+        proc.on('exit', (code) => {
+          expect(code).toBe(1);
+          done();
+        });
+      });
+
+      it('exits with code 1 with handle projection and invalid policy ids', (done) => {
+        expect.assertions(2);
+        proc = withLogging(
+          fork(
+            exePath,
+            [
+              ...commonArgs,
+              '--ogmios-url',
+              'ws://localhost:1234',
+              '--postgres-connection-string',
+              'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
+              '--handle-policy-ids',
+              'policyId',
+              ProjectionName.Handle
+            ],
+            { env: {}, stdio: 'pipe' }
+          ),
+          true
+        );
+        proc.stderr!.on('data', (data) =>
+          expect(data.toString()).toMatch("InvalidStringError: Invalid string: \"expected length '56', got 8")
+        );
+        proc.on('exit', (code) => {
+          expect(code).toBe(1);
+          done();
+        });
+      });
     });
 
     describe('with environment variables', () => {
