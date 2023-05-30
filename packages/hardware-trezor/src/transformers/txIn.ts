@@ -13,7 +13,7 @@ export const toTrezorTxIn: Transform<Cardano.TxIn, Promise<Trezor.CardanoInput>,
   context?
 ) => ({
   path: (await resolvePaymentKeyPathForTxIn(txIn, context)) ?? undefined,
-  prev_hash: Buffer.from(txIn.txId).toString('hex'),
+  prev_hash: txIn.txId,
   prev_index: txIn.index
 });
 

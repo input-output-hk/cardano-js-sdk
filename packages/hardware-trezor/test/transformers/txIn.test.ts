@@ -29,7 +29,7 @@ describe('tx-inputs', () => {
       for (const input of txIns) {
         expect(input).toEqual({
           path: knownAddressKeyPath,
-          prev_hash: Buffer.from(txIn.txId).toString('hex'),
+          prev_hash: txIn.txId,
           prev_index: txIn.index
         });
       }

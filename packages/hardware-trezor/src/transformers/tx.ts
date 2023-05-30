@@ -11,7 +11,7 @@ import { mapTxIns } from './txIn';
  * this function to the Transformer interface like in the
  * hardware-ledger package)
  */
-const ledgerTxTransformer = async (
+const trezorTxTransformer = async (
   body: Cardano.TxBody,
   context: TrezorTxTransformerContext
 ): Promise<Partial<Trezor.CardanoSignTransaction>> => ({
@@ -36,7 +36,7 @@ export const txToTrezor = async (props: TxToTrezorProps): Promise<Trezor.Cardano
   // First run the depricated trezor transformers
   ...(await depricated.txToTrezor(props)),
   // Then override them with our new implementations
-  ...(await ledgerTxTransformer(props.cardanoTxBody, {
+  ...(await trezorTxTransformer(props.cardanoTxBody, {
     chainId: props.chainId,
     inputResolver: props.inputResolver,
     knownAddresses: props.knownAddresses
