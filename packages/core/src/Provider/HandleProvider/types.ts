@@ -1,28 +1,33 @@
-import { ByronAddress, EnterpriseAddress, PaymentAddress, PointerAddress } from '../../Cardano/Address';
-import { Point } from '../..';
+import { Cardano, Point, Provider } from '../..';
 
 export type Handle = string;
 
-export type CardanoAddress = ByronAddress | PaymentAddress | EnterpriseAddress | PointerAddress;
-
-export enum HandleIssuer {
-  KoraLabs = 'KoraLabs'
-}
+/**
+ * @param policyId a hex encoded policyID
+ * @param handle a personalized string to identify a user
+ * @param hasDatum a boolean to indicated whether it contains a datum
+ * @param resolvedAddresses the addresses resolved from the handle
+ * @param resolvedAt the point at which the Handle was resolved
+ */
 export interface HandleResolution {
-  issuer: HandleIssuer;
+  policyId: Cardano.PolicyId;
   handle: Handle;
   hasDatum: boolean;
   resolvedAddresses: {
-    cardano: CardanoAddress;
+    cardano: Cardano.PaymentAddress;
   };
   resolvedAt: Point;
-  code?: number | undefined;
 }
 
 export interface ResolveHandlesArgs {
   handles: Handle[];
 }
 
-export interface HandleProvider {
+/**
+ * @param handles array
+ * @returns
+ * @param HandleResolution or null
+ */
+export interface HandleProvider extends Provider {
   resolveHandles(args: ResolveHandlesArgs): Promise<Array<HandleResolution | null>>;
 }

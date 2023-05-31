@@ -1,4 +1,4 @@
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, Handle, HandleProvider, HandleResolution } from '@cardano-sdk/core';
 import { CustomError } from 'ts-custom-error';
 
 import { InputSelectionError, InputSelector, SelectionSkeleton } from '@cardano-sdk/input-selection';
@@ -11,13 +11,30 @@ import { OutputBuilderValidator } from './OutputBuilder';
 import { OutputValidation } from '../output-validation';
 
 export type PartialTxOut = Partial<
-  Pick<Cardano.TxOut, 'address' | 'datumHash' | 'datum' | 'scriptReference'> & { value: Partial<Cardano.Value> }
+  Pick<Cardano.TxOut, 'address' | 'datumHash' | 'datum' | 'scriptReference'> & {
+    value: Partial<Cardano.Value>;
+    handle?: Handle;
+  }
 >;
 
 export enum TxOutputFailure {
   MinimumCoin = 'Minimum coin not met',
   TokenBundleSizeExceedsLimit = 'Token Bundle Exceeds Limit',
-  MissingRequiredFields = 'Mandatory fields address or coin are missing'
+  MissingRequiredFields = 'Mandatory fields address or coin are missing',
+  MissingHandleProviderError = "Missing 'HandleProvider'",
+  HandleNotFound = 'Handle not found'
+}
+
+export class InvalidConfigurationError extends CustomError {
+  public constructor(public message: string) {
+    super(message);
+  }
+}
+
+export class HandleNotFoundError extends CustomError {
+  public constructor(public txOut: PartialTxOut) {
+    super(TxOutputFailure.HandleNotFound);
+  }
 }
 
 export class OutputValidationMissingRequiredError extends CustomError {
@@ -45,6 +62,13 @@ export type TxOutValidationError =
   | OutputValidationMinimumCoinError
   | OutputValidationTokenBundleSizeError;
 export type TxBodyValidationError = TxOutValidationError | InputSelectionError | RewardAccountMissingError;
+
+/**
+ * Add handle data which is only used when building the output but doesn't
+ * appear in the final TxOut type since it's extracted before then and passed
+ * as `ctx`.
+ */
+export type OutputBuilderTxOut = Cardano.TxOut & { handle?: HandleResolution };
 
 /**
  * Helps build transaction outputs from its constituent parts.
@@ -81,7 +105,8 @@ export interface OutputBuilder {
    * @returns {Promise<Cardano.TxOut>} Promise<Cardano.TxOut> which can be used as input in `TxBuilder.addOutput()`.
    * @throws {TxOutValidationError} TxOutValidationError
    */
-  build(): Promise<Cardano.TxOut>;
+  build(): Promise<OutputBuilderTxOut>;
+  handle(handle: Handle): OutputBuilder;
 }
 
 export interface TxContext {
@@ -90,15 +115,19 @@ export interface TxContext {
   auxiliaryData?: Cardano.AuxiliaryData;
   witness?: InitializeTxWitness;
   isValid?: boolean;
+  handles?: HandleResolution[];
 }
 
 export type TxInspection = Cardano.TxBodyWithHash &
-  Pick<TxContext, 'ownAddresses' | 'auxiliaryData'> & {
+  Pick<TxContext, 'ownAddresses' | 'auxiliaryData' | 'handles'> & {
     inputSelection: SelectionSkeleton;
   };
 
 export interface SignedTx {
   tx: Cardano.Tx;
+  ctx: {
+    handles: HandleResolution[];
+  };
 }
 
 /**
@@ -202,6 +231,7 @@ export interface TxBuilderDependencies {
   txBuilderProviders: TxBuilderProviders;
   logger: Logger;
   outputValidator?: OutputBuilderValidator;
+  handleProvider?: HandleProvider;
 }
 
 export type FinalizeTxDependencies = Pick<TxBuilderDependencies, 'inputResolver' | 'keyAgent'>;

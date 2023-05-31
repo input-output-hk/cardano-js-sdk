@@ -188,9 +188,11 @@ UTXO_PROVIDER=http
 UTXO_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/utxo"}'
 STAKE_POOL_PROVIDER=stub
 STAKE_POOL_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/stake-pool"}'
+HANDLE_PROVIDER=kora-labs
+HANDLE_PROVIDER_PARAMS='{"serverUrl":"http://localhost:4000","policyId":""}'
 ```
 
-> :information_source: Notice that KEY_MANAGEMENT_PARAMS _mnemonic_ property is empty, if you leave this empty on the **local network's** e2e tests a new set of random mnemonics will be generated for you, this is the recommended way of setting up e2e tests on this network.
+> :information*source: Notice that KEY_MANAGEMENT_PARAMS \_mnemonic* property is empty, if you leave this empty on the **local network's** e2e tests a new set of random mnemonics will be generated for you, this is the recommended way of setting up e2e tests on this network.
 
 Then to run the local network tests, run:
 
@@ -244,6 +246,8 @@ ASSET_PROVIDER=http
 ASSET_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/asset"}'
 CHAIN_HISTORY_PROVIDER=http
 CHAIN_HISTORY_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/chain-history"}'
+HANDLE_PROVIDER=kora-labs
+HANDLE_PROVIDER_PARAMS='{"serverUrl":"http://localhost:4000","policyId":""}'
 NETWORK_INFO_PROVIDER=http
 NETWORK_INFO_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/network-info"}'
 REWARDS_PROVIDER=http

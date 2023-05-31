@@ -29,7 +29,7 @@ export class ProviderFactory<T> {
    *
    * @param name The name of the concrete provider implementation.
    * @param params The parameters to be passed to the concrete implementation constructor.
-   * @param logger The logger instance ot be used in the service.
+   * @param logger The logger instance to be used in the service.
    * @returns The new provider.
    * @throws if The give provider name is not registered, or the constructor parameters of
    * the providers are either missing or invalid.

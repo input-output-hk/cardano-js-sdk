@@ -1,8 +1,9 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, HandleProvider, HandleResolution } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import {
   OutputBuilder,
+  OutputBuilderTxOut,
   PartialTx,
   PartialTxOut,
   RewardAccountMissingError,
@@ -33,7 +34,11 @@ interface KeyDeregistration {
 }
 type DelegateConfig = Delegate | KeyDeregistration;
 
-type BuiltTx = { tx: Cardano.TxBodyWithHash; ctx: TxContext; inputSelection: SelectionSkeleton };
+type BuiltTx = {
+  tx: Cardano.TxBodyWithHash;
+  ctx: TxContext;
+  inputSelection: SelectionSkeleton;
+};
 
 interface Signer {
   sign(builtTx: BuiltTx): Promise<SignedTx>;
@@ -65,10 +70,10 @@ class LazyTxSigner implements UnsignedTx {
   async inspect(): Promise<TxInspection> {
     const {
       tx,
-      ctx: { ownAddresses, auxiliaryData },
+      ctx: { ownAddresses, auxiliaryData, handles },
       inputSelection
     } = await this.#build();
-    return { ...tx, auxiliaryData, inputSelection, ownAddresses };
+    return { ...tx, auxiliaryData, handles, inputSelection, ownAddresses };
   }
 
   async sign(): Promise<SignedTx> {
@@ -86,6 +91,8 @@ export class GenericTxBuilder implements TxBuilder {
   #outputValidator: OutputBuilderValidator;
   #delegateConfig: DelegateConfig;
   #logger: Logger;
+  #handleProvider?: HandleProvider;
+  #handles: HandleResolution[];
 
   constructor(dependencies: TxBuilderDependencies) {
     this.#outputValidator =
@@ -95,6 +102,8 @@ export class GenericTxBuilder implements TxBuilder {
       });
     this.#dependencies = dependencies;
     this.#logger = dependencies.logger;
+    this.#handleProvider = dependencies.handleProvider;
+    this.#handles = [];
   }
 
   async inspect(): Promise<PartialTx> {
@@ -106,12 +115,18 @@ export class GenericTxBuilder implements TxBuilder {
     };
   }
 
-  addOutput(txOut: Cardano.TxOut): TxBuilder {
+  addOutput(txOut: OutputBuilderTxOut): TxBuilder {
     this.partialTxBody = { ...this.partialTxBody, outputs: [...(this.partialTxBody.outputs || []), txOut] };
+
+    if (txOut.handle) {
+      this.#handles = [...this.#handles, txOut.handle];
+    }
+
     return this;
   }
 
-  removeOutput(txOut: Cardano.TxOut): TxBuilder {
+  removeOutput(txOut: OutputBuilderTxOut): TxBuilder {
+    this.#handles = this.#handles.filter((handle) => handle !== txOut.handle);
     this.partialTxBody = {
       ...this.partialTxBody,
       outputs: this.partialTxBody.outputs?.filter((output) => !deepEquals(output, txOut))
@@ -121,6 +136,7 @@ export class GenericTxBuilder implements TxBuilder {
 
   buildOutput(txOut?: PartialTxOut): OutputBuilder {
     return new TxOutputBuilder({
+      handleProvider: this.#handleProvider,
       logger: contextLogger(this.#logger, 'outputBuilder'),
       outputValidator: this.#outputValidator,
       txOut
@@ -170,6 +186,7 @@ export class GenericTxBuilder implements TxBuilder {
               {
                 auxiliaryData,
                 certificates: this.partialTxBody.certificates,
+                handles: this.#handles,
                 outputs: new Set(this.partialTxBody.outputs || []),
                 signingOptions,
                 witness: { extraSigners }
@@ -179,6 +196,7 @@ export class GenericTxBuilder implements TxBuilder {
             return {
               ctx: {
                 auxiliaryData,
+                handles: this.#handles,
                 ownAddresses,
                 signingOptions,
                 witness: { extraSigners }

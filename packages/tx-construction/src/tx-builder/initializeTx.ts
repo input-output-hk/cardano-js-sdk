@@ -60,6 +60,7 @@ export const initializeTx = async (
         unsignedTx,
         {
           auxiliaryData: props.auxiliaryData,
+          handles: props.handles ?? [],
           ownAddresses: addresses,
           signingOptions: props.signingOptions,
           witness: props.witness
