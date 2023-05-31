@@ -79,3 +79,5 @@ jobs:
         STAKE_POOL_PROVIDER: 'http'
         STAKE_POOL_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/stake-pool"}'
         STAKE_POOL_PROVIDER_URL: 'http://localhost:4000/stake-pool'
+        HANDLE_PROVIDER: 'kora-labs'
+        HANDLE_PROVIDER_PARAMS: '{"serverUrl":"http://localhost:4000","policyId":""}'

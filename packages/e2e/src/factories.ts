@@ -17,6 +17,7 @@ import {
   CML,
   Cardano,
   ChainHistoryProvider,
+  HandleProvider,
   NetworkInfoProvider,
   ProviderFactory,
   RewardsProvider,
@@ -33,10 +34,8 @@ import {
   util
 } from '@cardano-sdk/key-management';
 import { CardanoWalletFaucetProvider, FaucetProvider } from './FaucetProvider';
-import { LedgerKeyAgent } from '@cardano-sdk/hardware-ledger';
-import { Logger } from 'ts-log';
-import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import {
+  KoraLabsHandleProvider,
   assetInfoHttpProvider,
   chainHistoryHttpProvider,
   networkInfoHttpProvider,
@@ -45,6 +44,9 @@ import {
   txSubmitHttpProvider,
   utxoHttpProvider
 } from '@cardano-sdk/cardano-services-client';
+import { LedgerKeyAgent } from '@cardano-sdk/hardware-ledger';
+import { Logger } from 'ts-log';
+import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import { createConnectionObject } from '@cardano-ogmios/client';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom } from 'rxjs';
@@ -59,6 +61,7 @@ const customHttpFetchAdapter = isNodeJs ? undefined : require('@vespaiach/axios-
 const HTTP_PROVIDER = 'http';
 const OGMIOS_PROVIDER = 'ogmios';
 const STUB_PROVIDER = 'stub';
+const HANDLE_PROVIDER = 'kora-labs';
 const MISSING_URL_PARAM = 'Missing URL';
 
 export const faucetProviderFactory = new ProviderFactory<FaucetProvider>();
@@ -73,6 +76,7 @@ export const utxoProviderFactory = new ProviderFactory<UtxoProvider>();
 export const stakePoolProviderFactory = new ProviderFactory<StakePoolProvider>();
 export const bip32Ed25519Factory = new ProviderFactory<Crypto.Bip32Ed25519>();
 export const addressDiscoveryFactory = new ProviderFactory<AddressDiscovery>();
+export const handleProviderFactory = new ProviderFactory<HandleProvider>();
 
 // Address Discovery strategies
 
@@ -157,6 +161,17 @@ utxoProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger):
 
   return new Promise<UtxoProvider>(async (resolve) => {
     resolve(utxoHttpProvider({ adapter: customHttpFetchAdapter, baseUrl: params.baseUrl, logger }));
+  });
+});
+
+handleProviderFactory.register(HANDLE_PROVIDER, async (params: any): Promise<HandleProvider> => {
+  if (params.serverUrl === undefined) throw new Error(`${KoraLabsHandleProvider.name}: ${MISSING_URL_PARAM}`);
+
+  return new KoraLabsHandleProvider({
+    adapter: customHttpFetchAdapter,
+    networkInfoProvider: params.networkInfoProvider,
+    policyId: params.policyId,
+    serverUrl: params.serverUrl
   });
 });
 
@@ -313,6 +328,18 @@ export const getWallet = async (props: GetWalletProps) => {
     chainHistoryProvider: await chainHistoryProviderFactory.create(
       env.CHAIN_HISTORY_PROVIDER,
       env.CHAIN_HISTORY_PROVIDER_PARAMS,
+      logger
+    ),
+    handleProvider: await handleProviderFactory.create(
+      env.HANDLE_PROVIDER,
+      {
+        ...env.HANDLE_PROVIDER_PARAMS,
+        networkInfoProvider: await networkInfoProviderFactory.create(
+          env.NETWORK_INFO_PROVIDER,
+          env.NETWORK_INFO_PROVIDER_PARAMS,
+          logger
+        )
+      },
       logger
     ),
     networkInfoProvider: await networkInfoProviderFactory.create(
