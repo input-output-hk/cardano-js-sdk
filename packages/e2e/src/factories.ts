@@ -280,6 +280,7 @@ export type GetWalletProps = {
   logger: Logger;
   name: string;
   polling?: PollingConfig;
+  handlePolicyIds?: Cardano.PolicyId[];
   stores?: storage.WalletStores;
   customKeyParams?: KeyAgentFactoryProps;
   keyAgent?: AsyncKeyAgent;
@@ -311,7 +312,7 @@ const patchInitializeTxToRespectEpochBoundary = <T extends ObservableWallet>(
  * @returns an object containing the wallet and providers passed to it
  */
 export const getWallet = async (props: GetWalletProps) => {
-  const { env, idx, logger, name, polling, stores, customKeyParams, keyAgent } = props;
+  const { env, idx, logger, name, polling, handlePolicyIds, stores, customKeyParams, keyAgent } = props;
   const providers = {
     addressDiscovery: await addressDiscoveryFactory.create(
       env.ADDRESS_DISCOVERY,
@@ -370,7 +371,7 @@ export const getWallet = async (props: GetWalletProps) => {
       ? () => Promise.resolve(keyAgent)
       : await keyManagementFactory.create(env.KEY_MANAGEMENT_PROVIDER, keyManagementParams, logger),
     createWallet: async (asyncKeyAgent: AsyncKeyAgent) =>
-      new PersonalWallet({ name, polling }, { ...providers, keyAgent: asyncKeyAgent, logger, stores }),
+      new PersonalWallet({ handlePolicyIds, name, polling }, { ...providers, keyAgent: asyncKeyAgent, logger, stores }),
     logger
   });
 

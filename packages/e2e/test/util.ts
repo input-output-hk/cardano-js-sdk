@@ -315,20 +315,7 @@ export const burnTokens = async ({
 
   const signedTx = await wallet.finalizeTx(finalizeProps);
   await submitAndConfirm(wallet, signedTx);
-
-  // Wait until all assets are burned
-  await firstValueFromTimed(
-    wallet.balance.utxo.available$.pipe(
-      map(({ assets: availableAssets }) => availableAssets),
-      filter(
-        (availableAssets) =>
-          !availableAssets?.size ||
-          ![...tokens!].some(([id]) => [...availableAssets].some(([assetId]) => assetId === id))
-      )
-    ),
-    'Not all assets were burned',
-    FAST_OPERATION_TIMEOUT_DEFAULT
-  );
+  await txConfirmed(wallet, signedTx);
 };
 
 export const mapToGroupedAddress = (addrModel: AddressesModel): GroupedAddress => ({
