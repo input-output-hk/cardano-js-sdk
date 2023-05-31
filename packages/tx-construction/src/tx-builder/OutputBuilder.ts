@@ -1,13 +1,17 @@
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, Handle, HandleProvider } from '@cardano-sdk/core';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { Logger } from 'ts-log';
 
 import {
+  HandleNotFoundError,
+  InvalidConfigurationError,
   OutputBuilder,
+  OutputBuilderTxOut,
   OutputValidationMinimumCoinError,
   OutputValidationMissingRequiredError,
   OutputValidationTokenBundleSizeError,
-  PartialTxOut
+  PartialTxOut,
+  TxOutputFailure
 } from './types';
 import { OutputValidation, OutputValidator } from '../output-validation';
 
@@ -21,10 +25,13 @@ export interface OutputBuilderProps {
   txOut?: PartialTxOut;
   /** Logger */
   logger: Logger;
+  /** Handle Provider for resolving addresses */
+  handleProvider?: HandleProvider;
 }
 
 /** Determines if the `PartialTxOut` arg has at least an address and coins. */
-const isViableTxOut = (txOut: PartialTxOut): txOut is Cardano.TxOut => !!(txOut?.address && txOut?.value?.coins);
+const isViableTxOut = (txOut: PartialTxOut): txOut is Cardano.TxOut =>
+  !!((txOut?.address || txOut?.handle) && txOut?.value?.coins);
 
 /**
  * Transforms from `OutputValidation` type emitted by `OutputValidator`, to
@@ -53,11 +60,16 @@ export class TxOutputBuilder implements OutputBuilder {
   #partialOutput: PartialTxOut;
   #outputValidator: OutputBuilderValidator;
   #logger: Logger;
+  #handleProvider: HandleProvider | null = null;
 
-  constructor({ outputValidator, txOut, logger }: OutputBuilderProps) {
+  constructor({ outputValidator, txOut, logger, handleProvider }: OutputBuilderProps) {
     this.#partialOutput = { ...txOut };
     this.#outputValidator = outputValidator;
     this.#logger = logger;
+
+    if (handleProvider) {
+      this.#handleProvider = handleProvider;
+    }
   }
 
   /**
@@ -69,7 +81,7 @@ export class TxOutputBuilder implements OutputBuilder {
    * @throws OutputValidationMissingRequiredError {@link OutputValidationMissingRequiredError} if
    * the mandatory fields 'address' or 'coins' are missing
    */
-  toTxOut(): Cardano.TxOut {
+  toTxOut(): OutputBuilderTxOut {
     if (!isViableTxOut(this.#partialOutput)) {
       throw new OutputValidationMissingRequiredError(this.#partialOutput);
     }
@@ -116,12 +128,34 @@ export class TxOutputBuilder implements OutputBuilder {
     return this;
   }
 
-  async build(): Promise<Cardano.TxOut> {
+  handle(handle: Handle): OutputBuilder {
+    if (!this.#handleProvider) {
+      throw new InvalidConfigurationError(TxOutputFailure.MissingHandleProviderError);
+    }
+
+    this.#partialOutput = { ...this.#partialOutput, handle };
+    return this;
+  }
+
+  async build(): Promise<OutputBuilderTxOut> {
     const txOut = this.toTxOut();
 
     const outputValidation = toOutputValidationError(txOut, await this.#outputValidator.validateOutput(txOut));
     if (outputValidation) {
       throw outputValidation;
+    }
+
+    if (this.#partialOutput.handle && this.#handleProvider) {
+      const resolution = await this.#handleProvider.resolveHandles({ handles: [this.#partialOutput.handle] });
+
+      if (resolution[0] !== null) {
+        txOut.handle = resolution[0];
+        txOut.address = resolution[0].resolvedAddresses.cardano;
+      } else {
+        // Throw an error because the handle resolved to null so we don't have
+        // an address for the transaction.
+        throw new HandleNotFoundError(this.#partialOutput);
+      }
     }
 
     return txOut;

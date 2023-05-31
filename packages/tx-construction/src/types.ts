@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, HandleResolution } from '@cardano-sdk/core';
 import { SelectionSkeleton } from '@cardano-sdk/input-selection';
 import { SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
 
@@ -31,6 +31,7 @@ export interface InitializeTxProps {
   auxiliaryData?: Cardano.AuxiliaryData;
   witness?: InitializeTxWitness;
   signingOptions?: SignTransactionOptions;
+  handles?: HandleResolution[];
 }
 
 export interface InitializeTxPropsValidationResult {
