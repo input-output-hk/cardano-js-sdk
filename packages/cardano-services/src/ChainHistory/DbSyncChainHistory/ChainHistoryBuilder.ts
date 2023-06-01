@@ -1,8 +1,7 @@
 import * as Queries from './queries';
-import { Cardano, PaginationArgs } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import {
   CertificateModel,
-  CountModel,
   DelegationCertModel,
   MirCertModel,
   MultiAssetModel,
@@ -37,7 +36,6 @@ import {
   mapTxTokenMap,
   mapWithdrawal
 } from './mappers';
-import { withPagination } from '../../StakePool/DbSyncStakePoolProvider/queries';
 import omit from 'lodash/omit';
 import orderBy from 'lodash/orderBy';
 
@@ -195,27 +193,13 @@ export class ChainHistoryBuilder {
   }
 
   /**
-   * Gets the paginated `tx.id` or the total count of the transaction interesting the given set of addresses
+   * Gets the `tx.id` of the transactions interesting the given set of addresses
    *
-   * @param addresses the set of addresses to get transaction
+   * @param addresses the set of addresses to get transactions
    * @param blockRange optional: the block range within transactions are requested
-   * @param pagination optional: the pagination of the response
-   * @returns the paginated `tx.id` set or, if `pagination` is omitted, the total number of transactions
+   * @returns the `tx.id` array
    */
-  public queryTxIdsByAddresses(
-    addresses: Cardano.PaymentAddress[],
-    blockRange?: Range<Cardano.BlockNo>
-  ): Promise<number>;
-  public queryTxIdsByAddresses(
-    addresses: Cardano.PaymentAddress[],
-    blockRange?: Range<Cardano.BlockNo>,
-    pagination?: PaginationArgs
-  ): Promise<string[]>;
-  public async queryTxIdsByAddresses(
-    addresses: Cardano.PaymentAddress[],
-    blockRange?: Range<Cardano.BlockNo>,
-    pagination?: PaginationArgs
-  ): Promise<number | string[]> {
+  public async queryTxIdsByAddresses(addresses: Cardano.PaymentAddress[], blockRange?: Range<Cardano.BlockNo>) {
     const rangeForQuery: Range<Cardano.BlockNo> | undefined = blockRange
       ? {
           lowerBound: blockRange.lowerBound ?? (0 as Cardano.BlockNo),
@@ -223,27 +207,14 @@ export class ChainHistoryBuilder {
         }
       : undefined;
     const kind = rangeForQuery ? 'withRange' : 'withoutRange';
-    const target = pagination ? 'page' : 'count';
     const q = findTxsByAddresses;
-    const query = `${q.WITH}${q[kind].WITH}${q[target].SELECT}${q[kind].FROM}${q[target].ORDER}`;
-    const args = rangeForQuery ? [addresses, rangeForQuery.lowerBound, rangeForQuery.upperBound] : [addresses];
 
-    if (pagination) {
-      const paginated = withPagination(query, args, pagination);
-      const result = await this.#db.query<TxIdModel>({
-        name: `tx_ids_by_addresses_page${rangeForQuery ? '_with_range' : ''}`,
-        text: paginated.query,
-        values: paginated.args
-      });
-
-      return result.rows.map(mapTxId);
-    }
-
-    const result = await this.#db.query<CountModel>({
-      name: `tx_ids_by_addresses_count${rangeForQuery ? '_with_range' : ''}`,
-      text: query,
-      values: args
+    const result = await this.#db.query<TxIdModel>({
+      name: `tx_ids_by_addresses${rangeForQuery ? '_with_range' : ''}`,
+      text: `${q.WITH}${q[kind].WITH}${q.SELECT}${q[kind].FROM}${q.ORDER}`,
+      values: rangeForQuery ? [addresses, rangeForQuery.lowerBound, rangeForQuery.upperBound] : [addresses]
     });
-    return Number(result.rows[0].count);
+
+    return result.rows.map(mapTxId);
   }
 }
