@@ -1,77 +1,81 @@
 import { Cardano } from '@cardano-sdk/core';
 import { ProjectionEvent } from '../../../src';
-import { filterProducedUtxoByAddresses, withUtxo } from '../../../src/operators/Mappers';
+import {
+  filterProducedUtxoByAddresses,
+  filterProducedUtxoByAssetPolicyId,
+  withUtxo
+} from '../../../src/operators/Mappers';
 import { firstValueFrom, of } from 'rxjs';
 
-describe('withUtxo', () => {
-  const validTxSource$ = of({
-    block: {
-      body: [
-        {
-          body: {
-            inputs: [
-              {
-                index: 1,
-                txId: '434342da3f66f94d929d8c7a49484e1c212c74c6213d7b938119f6e0dcb9454c'
-              },
-              {
-                index: 2,
-                txId: '434342da3f66f94d929d8c7a49484e1c212c74c6213d7b938119f6e0dcb9454c'
+export const validTxSource$ = of({
+  block: {
+    body: [
+      {
+        body: {
+          inputs: [
+            {
+              index: 1,
+              txId: '434342da3f66f94d929d8c7a49484e1c212c74c6213d7b938119f6e0dcb9454c'
+            },
+            {
+              index: 2,
+              txId: '434342da3f66f94d929d8c7a49484e1c212c74c6213d7b938119f6e0dcb9454c'
+            }
+          ],
+          outputs: [
+            {
+              address: Cardano.PaymentAddress('addr_test1wzlv9cslk9tcj0wpm9p5t6kajyt37ap5sc9rzkaxa9p67ys2ygypv'),
+              datumHash: '99c170cc1247e7b7971e194c7e400e219360d3991cb588e9833f77ee9edbbd06' as Cardano.DatumHash,
+              value: {
+                assets: new Map([
+                  [
+                    Cardano.AssetId(
+                      '8f78a4388b1a3e1a1435257e9356fa0c2cc0d3a5999d63b5886c96435365636f6e6454657374746f6b656e'
+                    ),
+                    1n
+                  ],
+                  [Cardano.AssetId('8f78a4388b1a3e1a1435257e9356fa0c2cc0d3a5999d63b5886c964354657374746f6b656e'), 1n]
+                ]),
+                coins: 1_724_100n
               }
-            ],
-            outputs: [
-              {
-                address: Cardano.PaymentAddress('addr_test1wzlv9cslk9tcj0wpm9p5t6kajyt37ap5sc9rzkaxa9p67ys2ygypv'),
-                datumHash: '99c170cc1247e7b7971e194c7e400e219360d3991cb588e9833f77ee9edbbd06' as Cardano.DatumHash,
-                value: {
-                  assets: new Map([
-                    [
-                      Cardano.AssetId(
-                        '8f78a4388b1a3e1a1435257e9356fa0c2cc0d3a5999d63b5886c96435365636f6e6454657374746f6b656e'
-                      ),
-                      1n
-                    ],
-                    [Cardano.AssetId('8f78a4388b1a3e1a1435257e9356fa0c2cc0d3a5999d63b5886c964354657374746f6b656e'), 1n]
-                  ]),
-                  coins: 1_724_100n
-                }
-              }
-            ]
-          },
-          inputSource: Cardano.InputSource.inputs
+            }
+          ]
         },
-        {
-          body: {
-            inputs: [
-              {
-                index: 0,
-                txId: '73e26ff267b5ee32d8e413635f4f4c9547db1c2af1694faf51be20b9f508b8f6'
+        inputSource: Cardano.InputSource.inputs
+      },
+      {
+        body: {
+          inputs: [
+            {
+              index: 0,
+              txId: '73e26ff267b5ee32d8e413635f4f4c9547db1c2af1694faf51be20b9f508b8f6'
+            }
+          ],
+          outputs: [
+            {
+              address:
+                'addr_test1qzrf8t56qhzcp2chrtn7deqhep0dttr3eemhnut6lth3gulj7cuplfarmnq5fyumgl0lklddvau9dhamaexykljzvpyswqt56p',
+              value: {
+                assets: new Map(),
+                coins: 25_485_292n
               }
-            ],
-            outputs: [
-              {
-                address:
-                  'addr_test1qzrf8t56qhzcp2chrtn7deqhep0dttr3eemhnut6lth3gulj7cuplfarmnq5fyumgl0lklddvau9dhamaexykljzvpyswqt56p',
-                value: {
-                  assets: new Map(),
-                  coins: 25_485_292n
-                }
-              },
-              {
-                address: 'addr_test1vptwv4jvaqt635jvthpa29lww3vkzypm8l6vk4lv4tqfhhgajdgwf',
-                value: {
-                  assets: new Map(),
-                  coins: 74_341_815n
-                }
+            },
+            {
+              address: 'addr_test1vptwv4jvaqt635jvthpa29lww3vkzypm8l6vk4lv4tqfhhgajdgwf',
+              value: {
+                assets: new Map(),
+                coins: 74_341_815n
               }
-            ]
-          },
-          inputSource: Cardano.InputSource.inputs
-        }
-      ]
-    }
-  } as ProjectionEvent);
+            }
+          ]
+        },
+        inputSource: Cardano.InputSource.inputs
+      }
+    ]
+  }
+} as ProjectionEvent);
 
+describe('withUtxo', () => {
   const failedTxSource$ = of({
     block: {
       body: [
@@ -136,6 +140,21 @@ describe('withUtxo', () => {
                 address:
                   'addr_test1qzrf8t56qhzcp2chrtn7deqhep0dttr3eemhnut6lth3gulj7cuplfarmnq5fyumgl0lklddvau9dhamaexykljzvpyswqt56p',
                 value: {
+                  assets: new Map([
+                    [
+                      Cardano.AssetId(
+                        'f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a5365636f6e6454657374746f6b656e'
+                      ),
+                      3n
+                    ]
+                  ]),
+                  coins: 25_485_292n
+                }
+              },
+              {
+                address:
+                  'addr_test1qzrf8t56qhzcp2chrtn7deqhep0dttr3eemhnut6lth3gulj7cuplfarmnq5fyumgl0lklddvau9dhamaexykljzvpyswqt56p',
+                value: {
                   assets: new Map(),
                   coins: 25_485_292n
                 }
@@ -182,6 +201,24 @@ describe('withUtxo', () => {
           })
         )
       );
+
+      expect(produced).toHaveLength(1);
+    });
+  });
+
+  describe('filterProducedUtxoByAssetPolicyId', () => {
+    it('keeps only utxo produced based on specified policy id', async () => {
+      const {
+        utxo: { produced }
+      } = await firstValueFrom(
+        validTxSource$.pipe(
+          withUtxo(),
+          filterProducedUtxoByAssetPolicyId({
+            policyIds: [Cardano.PolicyId('8f78a4388b1a3e1a1435257e9356fa0c2cc0d3a5999d63b5886c9643')]
+          })
+        )
+      );
+
       expect(produced).toHaveLength(1);
     });
   });

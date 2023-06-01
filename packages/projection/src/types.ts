@@ -85,3 +85,8 @@ export interface StabilityWindowBuffer {
    */
   tail$: Observable<Cardano.Block | 'origin'>;
 }
+
+export type BaseProjectionEvent =
+  | Omit<RollForwardEvent<BootstrapExtraProps>, 'requestNext'>
+  | Omit<RollBackwardEvent<BootstrapExtraProps & WithBlock>, 'requestNext'>
+  | Omit<ProjectionEvent<{}>, 'requestNext'>;

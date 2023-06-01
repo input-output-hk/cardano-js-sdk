@@ -1,12 +1,10 @@
+import { BaseProjectionEvent } from '@cardano-sdk/projection';
 import { HealthCheckResponse, Milliseconds } from '@cardano-sdk/core';
 import { HttpService } from '../Http';
 import { Logger } from 'ts-log';
 import { Observable, Subscription, map, of, timeout } from 'rxjs';
-import { ProjectionEvent } from '@cardano-sdk/projection';
 import { ProjectionName } from './prepareTypeormProjection';
 import express from 'express';
-
-export type BaseProjectionEvent = Omit<ProjectionEvent, 'requestNext'>;
 
 export interface ProjectionServiceProps<T> {
   projection$: Observable<T>;
