@@ -19,7 +19,7 @@ import { Logger } from 'ts-log';
 import { MissingProgramOption, MissingServiceDependency, RunnableDependencies, UnknownServiceName } from '../errors';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
-import { PosgresProgramOptions, PostgresOptionDescriptions } from '../options/postgres';
+import { PostgresOptionDescriptions } from '../options/postgres';
 import { ProviderServerArgs, ProviderServerOptionDescriptions, ServiceNames } from './types';
 import { SrvRecord } from 'dns';
 import { TxSubmitHttpService } from '../../TxSubmit';
@@ -55,6 +55,8 @@ interface ServiceMapFactoryOptions {
   logger: Logger;
   node?: OgmiosCardanoNode;
 }
+
+const serverName = 'provider-server';
 
 const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
   const { args, pools, dnsResolver, genesisData, logger, node } = options;
@@ -109,13 +111,13 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
   const getTypeormStakePoolProvider = () => {
     const entities = getEntities([
       'block',
+      'currentPoolMetrics',
       'poolMetadata',
       'poolRegistration',
       'poolRetirement',
-      'stakePool',
-      'currentPoolMetrics'
+      'stakePool'
     ]);
-    const connectionConfig$ = getConnectionConfig(dnsResolver, 'projector', args as PosgresProgramOptions<'StakePool'>);
+    const connectionConfig$ = getConnectionConfig(dnsResolver, serverName, args);
     return new TypeormStakePoolProvider(
       { paginationPageSizeLimit: args.paginationPageSizeLimit! },
       { connectionConfig$, entities, logger }
@@ -238,7 +240,7 @@ export const loadProviderServer = async (
     deps?.logger ||
     createLogger({
       level: args.loggerMinSeverity,
-      name: 'provider-server'
+      name: serverName
     });
   const dnsResolver =
     deps?.dnsResolver ||
