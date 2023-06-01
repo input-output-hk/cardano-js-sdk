@@ -170,8 +170,8 @@ describe('StakePoolCompare', () => {
       let metricTwo: Cardano.StakePoolMetrics;
 
       beforeAll(() => {
-        metricOne = poolOne.metrics;
-        metricTwo = poolTwo.metrics;
+        metricOne = poolOne.metrics!;
+        metricTwo = poolTwo.metrics!;
       });
 
       // check apy
@@ -224,14 +224,14 @@ describe('StakePoolCompare', () => {
       const result = await fetchAllPools(providerOne, { sort: { field: 'saturation', order: 'asc' } });
 
       for (let i = 1; i < result.length; ++i)
-        expect(result[i - 1].metrics.saturation).toBeLessThanOrEqual(result[i].metrics.saturation);
+        expect(result[i - 1].metrics?.saturation).toBeLessThanOrEqual(result[i].metrics!.saturation);
     });
 
     it('by saturation desc', async () => {
       const result = await fetchAllPools(providerOne, { sort: { field: 'saturation', order: 'desc' } });
 
       for (let i = 1; i < result.length; ++i)
-        expect(result[i - 1].metrics.saturation).toBeGreaterThanOrEqual(result[i].metrics.saturation);
+        expect(result[i - 1].metrics?.saturation).toBeGreaterThanOrEqual(result[i].metrics!.saturation);
     });
   });
 
@@ -255,7 +255,7 @@ describe('StakePoolCompare', () => {
 
         statusCount[pool.status]++;
 
-        if (pool.metrics.livePledge >= pool.pledge) poolsMeetingPledge++;
+        if (pool.metrics!.livePledge >= pool.pledge) poolsMeetingPledge++;
         else {
           poolsNotMeetingPledge++;
 

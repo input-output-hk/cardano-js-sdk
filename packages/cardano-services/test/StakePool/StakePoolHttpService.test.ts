@@ -1273,19 +1273,19 @@ describe('StakePoolHttpService', () => {
             it('desc order', async () => {
               const response = await provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'apy'));
               expect(response.pageResults.length).toBeGreaterThan(0);
-              expect(response.pageResults[0].metrics.apy).toBeDefined();
+              expect(response.pageResults[0].metrics?.apy).toBeDefined();
             });
             it('asc order', async () => {
               const response = await provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'apy'));
               expect(response.pageResults.length).toBeGreaterThan(0);
-              expect(response.pageResults[0].metrics.apy).toBeDefined();
+              expect(response.pageResults[0].metrics?.apy).toBeDefined();
             });
             it('with applied filters', async () => {
               const response = await provider.queryStakePools(
                 setSortCondition(setFilterCondition(filterArgs, 'or'), 'asc', 'apy')
               );
               expect(response.pageResults.length).toBeGreaterThan(0);
-              expect(response.pageResults[0].metrics.apy).toBeDefined();
+              expect(response.pageResults[0].metrics?.apy).toBeDefined();
             });
             it('with applied pagination', async () => {
               const firstPageOptions = setSortCondition(setPagination({ pagination }, 0, 3), 'desc', 'apy');
@@ -1334,7 +1334,9 @@ describe('StakePoolHttpService', () => {
         it('apyEpochsBackLimit is correctly honored', async () => {
           const limitThreeResponse = await provider.queryStakePools({ apyEpochsBackLimit: 3, pagination });
           const limitFiveResponse = await provider.queryStakePools({ apyEpochsBackLimit: 5, pagination });
-          expect(limitThreeResponse.pageResults[0].metrics.apy).not.toBe(limitFiveResponse.pageResults[0].metrics.apy);
+          expect(limitThreeResponse.pageResults[0].metrics?.apy).not.toBe(
+            limitFiveResponse.pageResults[0].metrics?.apy
+          );
         });
       });
 
@@ -1394,25 +1396,25 @@ describe('StakePoolHttpService', () => {
       describe('/search', () => {
         it('response excludes stake pool APY metric', async () => {
           const response = await provider.queryStakePools({ pagination: { limit: 1, startAt: 0 } });
-          expect(response.pageResults[0].metrics.apy).toBeUndefined();
+          expect(response.pageResults[0].metrics?.apy).toBeUndefined();
         });
         describe('sort by APY', () => {
           it('desc order', async () => {
             const response = await provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'apy'));
             expect(response.pageResults.length).toBeGreaterThan(0);
-            expect(response.pageResults[0].metrics.apy).toBeUndefined();
+            expect(response.pageResults[0].metrics?.apy).toBeUndefined();
           });
           it('asc order', async () => {
             const response = await provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'apy'));
             expect(response.pageResults.length).toBeGreaterThan(0);
-            expect(response.pageResults[0].metrics.apy).toBeUndefined();
+            expect(response.pageResults[0].metrics?.apy).toBeUndefined();
           });
           it('with applied filters', async () => {
             const response = await provider.queryStakePools(
               setSortCondition(setFilterCondition(filterArgs, 'or'), 'asc', 'apy')
             );
             expect(response.pageResults.length).toBeGreaterThan(0);
-            expect(response.pageResults[0].metrics.apy).toBeUndefined();
+            expect(response.pageResults[0].metrics?.apy).toBeUndefined();
           });
         });
       });

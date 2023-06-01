@@ -666,16 +666,16 @@ describe('TypeormStakePoolProvider', () => {
           describe('sort by saturation', () => {
             it('desc order', async () => {
               const response = await provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'saturation'));
-              expect(response.pageResults[0].metrics.saturation).toEqual(poolsInfoWithMetrics[8].saturation);
-              expect(response.pageResults[response.pageResults.length - 1].metrics.saturation).toEqual(
+              expect(response.pageResults[0].metrics?.saturation).toEqual(poolsInfoWithMetrics[8].saturation);
+              expect(response.pageResults[response.pageResults.length - 1].metrics?.saturation).toEqual(
                 poolsInfoWithMetrics[9].saturation
               );
             });
 
             it('asc order', async () => {
               const response = await provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'saturation'));
-              expect(response.pageResults[0].metrics.saturation).toEqual(poolsInfoWithMetrics[4].saturation);
-              expect(response.pageResults[response.pageResults.length - 1].metrics.saturation).toEqual(
+              expect(response.pageResults[0].metrics?.saturation).toEqual(poolsInfoWithMetrics[4].saturation);
+              expect(response.pageResults[response.pageResults.length - 1].metrics?.saturation).toEqual(
                 poolsInfoWithMetrics[1].saturation
               );
             });
@@ -684,8 +684,8 @@ describe('TypeormStakePoolProvider', () => {
               const response = await provider.queryStakePools(
                 setSortCondition(setFilterCondition(filterArgs, 'or'), 'asc', 'saturation')
               );
-              expect(response.pageResults[0].metrics.saturation).toEqual(poolsInfoWithMetrics[4].saturation);
-              expect(response.pageResults[response.totalResultCount - 1].metrics.saturation).toEqual(
+              expect(response.pageResults[0].metrics?.saturation).toEqual(poolsInfoWithMetrics[4].saturation);
+              expect(response.pageResults[response.totalResultCount - 1].metrics?.saturation).toEqual(
                 poolsInfoWithMetrics[1].saturation
               );
             });
@@ -694,16 +694,16 @@ describe('TypeormStakePoolProvider', () => {
           describe('sort by apy', () => {
             it('desc order', async () => {
               const response = await provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'apy'));
-              expect(response.pageResults[0].metrics.apy).toEqual(poolsInfoWithMetrics[6].apy);
-              expect(response.pageResults[response.pageResults.length - 1].metrics.apy).toEqual(
+              expect(response.pageResults[0].metrics?.apy).toEqual(poolsInfoWithMetrics[6].apy);
+              expect(response.pageResults[response.pageResults.length - 1].metrics?.apy).toEqual(
                 poolsInfoWithMetrics[1].apy
               );
             });
 
             it('asc order', async () => {
               const response = await provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'apy'));
-              expect(response.pageResults[0].metrics.apy).toEqual(poolsInfoWithMetrics[2].apy);
-              expect(response.pageResults[response.pageResults.length - 1].metrics.apy).toEqual(
+              expect(response.pageResults[0].metrics?.apy).toEqual(poolsInfoWithMetrics[2].apy);
+              expect(response.pageResults[response.pageResults.length - 1].metrics?.apy).toEqual(
                 poolsInfoWithMetrics[0].apy
               );
             });
@@ -712,8 +712,8 @@ describe('TypeormStakePoolProvider', () => {
               const response = await provider.queryStakePools(
                 setSortCondition(setFilterCondition(filterArgs, 'or'), 'asc', 'apy')
               );
-              expect(response.pageResults[0].metrics.apy).toEqual(poolsInfoWithMetrics[2].apy);
-              expect(response.pageResults[response.totalResultCount - 1].metrics.apy).toEqual(
+              expect(response.pageResults[0].metrics?.apy).toEqual(poolsInfoWithMetrics[2].apy);
+              expect(response.pageResults[response.totalResultCount - 1].metrics?.apy).toEqual(
                 poolsInfoWithMetrics[0].apy
               );
             });

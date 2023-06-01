@@ -162,7 +162,7 @@ export interface StakePool extends PoolParameters {
   /**
    * Stake pool metrics
    */
-  metrics: StakePoolMetrics;
+  metrics?: StakePoolMetrics;
 
   /**
    * Stake pool status
