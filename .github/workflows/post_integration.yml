@@ -19,7 +19,7 @@ jobs:
 
       - name: 🔨 Build Docs
         env:
-          NODE_OPTIONS: "--max-old-space-size=8192"
+          NODE_OPTIONS: "--max-old-space-size=10240"
         run: |
           yarn install --immutable --inline-builds
           yarn build
