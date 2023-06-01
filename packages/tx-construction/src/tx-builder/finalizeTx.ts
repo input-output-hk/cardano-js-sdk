@@ -27,7 +27,7 @@ const getSignatures = async (
 
 export const finalizeTx = async (
   tx: Cardano.TxBodyWithHash,
-  { ownAddresses, witness, signingOptions, auxiliaryData, isValid }: TxContext,
+  { ownAddresses, witness, signingOptions, auxiliaryData, isValid, handles }: TxContext,
   { inputResolver, keyAgent }: FinalizeTxDependencies,
   stubSign = false
 ): Promise<SignedTx> => {
@@ -42,6 +42,9 @@ export const finalizeTx = async (
     : await getSignatures(keyAgent, tx, witness?.extraSigners, signingOptions);
 
   return {
+    ctx: {
+      handles: handles ?? []
+    },
     tx: {
       auxiliaryData,
       body: tx.body,

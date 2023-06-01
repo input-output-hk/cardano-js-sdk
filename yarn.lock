@@ -2340,6 +2340,7 @@ __metadata:
     "@cardano-sdk/core": "workspace:~"
     "@cardano-sdk/util": "workspace:~"
     "@cardano-sdk/util-dev": "workspace:~"
+    "@koralabs/handles-public-api-interfaces": 1.6.6
     "@types/validator": ^13.7.1
     axios: ^0.27.2
     axios-mock-adapter: ^1.20.0
@@ -2846,6 +2847,7 @@ __metadata:
     "@cardano-sdk/key-management": "workspace:~"
     "@cardano-sdk/util": "workspace:~"
     "@cardano-sdk/util-dev": "workspace:~"
+    "@cardano-sdk/wallet": "workspace:~"
     "@types/lodash": ^4.14.182
     eslint: ^7.32.0
     jest: ^28.1.3
@@ -3757,6 +3759,13 @@ __metadata:
   version: 7.1.3
   resolution: "@jsdevtools/ono@npm:7.1.3"
   checksum: 2297fcd472ba810bffe8519d2249171132844c7174f3a16634f9260761c8c78bc0428a4190b5b6d72d45673c13918ab9844d706c3ed4ef8f62ab11a2627a08ad
+  languageName: node
+  linkType: hard
+
+"@koralabs/handles-public-api-interfaces@npm:1.6.6":
+  version: 1.6.6
+  resolution: "@koralabs/handles-public-api-interfaces@npm:1.6.6"
+  checksum: 10687928187ac935089781fc616a3c10596120aed2f5be2c28852cf2d8c1b14acbb72b90243f3228ff0bc9034c99230162d48d08f5aeb657c7d4decd6c6364e2
   languageName: node
   linkType: hard
 

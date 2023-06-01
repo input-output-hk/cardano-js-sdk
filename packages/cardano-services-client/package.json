@@ -54,6 +54,7 @@
   },
   "devDependencies": {
     "@cardano-sdk/util-dev": "workspace:~",
+    "@koralabs/handles-public-api-interfaces": "1.6.6",
     "@types/validator": "^13.7.1",
     "axios-mock-adapter": "^1.20.0",
     "eslint": "^7.32.0",

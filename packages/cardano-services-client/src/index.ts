@@ -6,3 +6,4 @@ export * from './UtxoProvider';
 export * from './ChainHistoryProvider';
 export * from './NetworkInfoProvider';
 export * from './RewardsProvider';
+export * from './HandleProvider';
