@@ -1,0 +1,2211 @@
+{
+  "body": [
+    {
+      "block": {
+        "body": [
+          {
+            "auxiliaryData": {
+              "blob": {
+                "__type": "Map",
+                "value": [
+                  [
+                    {
+                      "__type": "bigint",
+                      "value": "674"
+                    },
+                    {
+                      "__type": "Map",
+                      "value": [
+                        [
+                          "map",
+                          [
+                            {
+                              "__type": "Map",
+                              "value": [
+                                [
+                                  "k",
+                                  {
+                                    "__type": "Map",
+                                    "value": [
+                                      [
+                                        "string",
+                                        "msg"
+                                      ]
+                                    ]
+                                  }
+                                ],
+                                [
+                                  "v",
+                                  {
+                                    "__type": "Map",
+                                    "value": [
+                                      [
+                                        "list",
+                                        [
+                                          {
+                                            "__type": "Map",
+                                            "value": [
+                                              [
+                                                "string",
+                                                "Auto-Loop-Transaction #590141 by ATADA"
+                                              ]
+                                            ]
+                                          },
+                                          {
+                                            "__type": "Map",
+                                            "value": [
+                                              [
+                                                "string",
+                                                ""
+                                              ]
+                                            ]
+                                          },
+                                          {
+                                            "__type": "Map",
+                                            "value": [
+                                              [
+                                                "string",
+                                                "Live Epoch 35, we have 076h 52m 47s left until the next one"
+                                              ]
+                                            ]
+                                          },
+                                          {
+                                            "__type": "Map",
+                                            "value": [
+                                              [
+                                                "string",
+                                                "It's Donnerstag - 24 November 2022 - 20:07:13 in Austria"
+                                              ]
+                                            ]
+                                          },
+                                          {
+                                            "__type": "Map",
+                                            "value": [
+                                              [
+                                                "string",
+                                                ""
+                                              ]
+                                            ]
+                                          },
+                                          {
+                                            "__type": "Map",
+                                            "value": [
+                                              [
+                                                "string",
+                                                "📈 The current ADA Price on Kraken is: $0.31513 / ADA"
+                                              ]
+                                            ]
+                                          },
+                                          {
+                                            "__type": "Map",
+                                            "value": [
+                                              [
+                                                "string",
+                                                ""
+                                              ]
+                                            ]
+                                          },
+                                          {
+                                            "__type": "Map",
+                                            "value": [
+                                              [
+                                                "string",
+                                                "A random Zen-Quote for you: 🙏"
+                                              ]
+                                            ]
+                                          },
+                                          {
+                                            "__type": "Map",
+                                            "value": [
+                                              [
+                                                "string",
+                                                "The happiest people in the world are those who feel absolutely"
+                                              ]
+                                            ]
+                                          },
+                                          {
+                                            "__type": "Map",
+                                            "value": [
+                                              [
+                                                "string",
+                                                "terrific about themselves. - Brian Tracy"
+                                              ]
+                                            ]
+                                          },
+                                          {
+                                            "__type": "Map",
+                                            "value": [
+                                              [
+                                                "string",
+                                                ""
+                                              ]
+                                            ]
+                                          },
+                                          {
+                                            "__type": "Map",
+                                            "value": [
+                                              [
+                                                "string",
+                                                "Node-Revision: 0a59910dfc02b914d6f37ece5fb861dd27ebafd6"
+                                              ]
+                                            ]
+                                          },
+                                          {
+                                            "__type": "Map",
+                                            "value": [
+                                              [
+                                                "string",
+                                                ""
+                                              ]
+                                            ]
+                                          },
+                                          {
+                                            "__type": "Map",
+                                            "value": [
+                                              [
+                                                "string",
+                                                "PreProd-Chain is awesome, have some fun! 😍"
+                                              ]
+                                            ]
+                                          },
+                                          {
+                                            "__type": "Map",
+                                            "value": [
+                                              [
+                                                "string",
+                                                " Best regards, Martin :-)"
+                                              ]
+                                            ]
+                                          }
+                                        ]
+                                      ]
+                                    ]
+                                  }
+                                ]
+                              ]
+                            }
+                          ]
+                        ]
+                      ]
+                    }
+                  ]
+                ]
+              },
+              "scripts": []
+            },
+            "body": {
+              "auxiliaryDataHash": "42d2686d222e9dd37ec948a089b06573d46c01bb7f78eb26bfadbf90d2acfba8",
+              "certificates": [],
+              "collaterals": [],
+              "fee": {
+                "__type": "bigint",
+                "value": "205673"
+              },
+              "inputs": [
+                {
+                  "index": 0,
+                  "txId": "dce266794726158cc4cc3ac9593d5802a02489906fc4f0907c1748bf603e8ef3"
+                }
+              ],
+              "mint": {
+                "__type": "Map",
+                "value": [
+                  [
+                    "34250edd1e9836f5378702fbf9416b709bc140e04f668cc3552085184154414441636f696e",
+                    {
+                      "__type": "bigint",
+                      "value": "1"
+                    }
+                  ]
+                ]
+              },
+              "outputs": [
+                {
+                  "address": "addr_test1vpfwv0ezc5g8a4mkku8hhy3y3vp92t7s3ul8g778g5yegsgalc6gc",
+                  "datum": {
+                    "__type": "undefined"
+                  },
+                  "datumHash": {
+                    "__type": "undefined"
+                  },
+                  "scriptReference": {
+                    "__type": "undefined"
+                  },
+                  "value": {
+                    "assets": {
+                      "__type": "Map",
+                      "value": [
+                        [
+                          "34250edd1e9836f5378702fbf9416b709bc140e04f668cc3552085184154414441636f696e",
+                          {
+                            "__type": "bigint",
+                            "value": "31491"
+                          }
+                        ]
+                      ]
+                    },
+                    "coins": {
+                      "__type": "bigint",
+                      "value": "4495665105"
+                    }
+                  }
+                }
+              ],
+              "requiredExtraSignatures": [],
+              "scriptIntegrityHash": {
+                "__type": "undefined"
+              },
+              "validityInterval": {
+                "invalidBefore": {
+                  "__type": "undefined"
+                },
+                "invalidHereafter": 13733632
+              },
+              "withdrawals": []
+            },
+            "id": "f092b24d674e673a8dae629e2e38ad65f8ad7725ab37c002a94e31496d321a32",
+            "inputSource": "inputs",
+            "witness": {
+              "bootstrap": [],
+              "datums": [],
+              "redeemers": [],
+              "scripts": [
+                {
+                  "__type": "native",
+                  "keyHash": "45d70e54f3b5e9c5a2b0cd417028197bd6f5fa5378c2f5eba896678d",
+                  "kind": 0
+                }
+              ],
+              "signatures": {
+                "__type": "Map",
+                "value": [
+                  [
+                    "1287e9ce9e00a603d250b557146aa0581fc4edf277a244ce39d3b2f2ced5072f",
+                    "a599b78a7279b47829fdefc26830da7e454c040bba7dde8cca968488f263d4587cfdcb2e61e6bac344c7a68ce0f01b36d8bebd1741068c9fee1ba61da06b6107"
+                  ],
+                  [
+                    "742d8af3543349b5b18f3cba28f23b2d6e465b9c136c42e1fae6b2390f565427",
+                    "f35c9ff5721a910f9f4274941bbddb736977f2312c625bacfa1b93fc0480fa8515aab8c2fd1ecfc479aab55f707a461d38188b3a5aeab5c54457dcdbf01d6a09"
+                  ]
+                ]
+              }
+            }
+          }
+        ],
+        "fees": {
+          "__type": "bigint",
+          "value": "205673"
+        },
+        "header": {
+          "blockNo": 317873,
+          "hash": "6625b89401da3c51749f89268b65fda8e416ad5c8af2d81b61f1eac0cf7eb8e5",
+          "slot": 13633686
+        },
+        "issuerVk": "9691ed9d98a5b79d5bc46c4496a6dba7e103f668f525c8349b6b92676cb3eae4",
+        "previousBlock": "0b47e0b541203ffcb996f28398a517b93e38e87bcb5ac5f12f365441256f57b8",
+        "size": 972,
+        "totalOutput": {
+          "__type": "bigint",
+          "value": "4495665105"
+        },
+        "txCount": 1,
+        "vrf": "vrf_vk1afy7gefvgc9eaek64lhunxw2velmuh4467n6a2aalah7r8q68j0s4f2sa9"
+      },
+      "eventType": 0,
+      "tip": {
+        "blockNo": 317873,
+        "hash": "6625b89401da3c51749f89268b65fda8e416ad5c8af2d81b61f1eac0cf7eb8e5",
+        "slot": 13633686
+      }
+    },
+    {
+      "block": {
+        "body": [
+          {
+            "auxiliaryData": {
+              "blob": {
+                "__type": "Map",
+                "value": [
+                  [
+                    {
+                      "__type": "bigint",
+                      "value": "721"
+                    },
+                    {
+                      "__type": "Map",
+                      "value": [
+                        [
+                          "map",
+                          [
+                            {
+                              "__type": "Map",
+                              "value": [
+                                [
+                                  "k",
+                                  {
+                                    "__type": "Map",
+                                    "value": [
+                                      [
+                                        "string",
+                                        "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a"
+                                      ]
+                                    ]
+                                  }
+                                ],
+                                [
+                                  "v",
+                                  {
+                                    "__type": "Map",
+                                    "value": [
+                                      [
+                                        "map",
+                                        [
+                                          {
+                                            "__type": "Map",
+                                            "value": [
+                                              [
+                                                "k",
+                                                {
+                                                  "__type": "Map",
+                                                  "value": [
+                                                    [
+                                                      "string",
+                                                      "bob"
+                                                    ]
+                                                  ]
+                                                }
+                                              ],
+                                              [
+                                                "v",
+                                                {
+                                                  "__type": "Map",
+                                                  "value": [
+                                                    [
+                                                      "map",
+                                                      [
+                                                        {
+                                                          "__type": "Map",
+                                                          "value": [
+                                                            [
+                                                              "k",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "name"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ],
+                                                            [
+                                                              "v",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "$bob"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ]
+                                                          ]
+                                                        },
+                                                        {
+                                                          "__type": "Map",
+                                                          "value": [
+                                                            [
+                                                              "k",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "description"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ],
+                                                            [
+                                                              "v",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "The Handle Standard"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ]
+                                                          ]
+                                                        },
+                                                        {
+                                                          "__type": "Map",
+                                                          "value": [
+                                                            [
+                                                              "k",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "website"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ],
+                                                            [
+                                                              "v",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "https://adahandle.com"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ]
+                                                          ]
+                                                        },
+                                                        {
+                                                          "__type": "Map",
+                                                          "value": [
+                                                            [
+                                                              "k",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "image"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ],
+                                                            [
+                                                              "v",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "ipfs://QmZqUk6nGqYJZzHiCGzbzqppA5qE99yNkuTSHuRQpymE1X"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ]
+                                                          ]
+                                                        },
+                                                        {
+                                                          "__type": "Map",
+                                                          "value": [
+                                                            [
+                                                              "k",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "core"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ],
+                                                            [
+                                                              "v",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "map",
+                                                                    [
+                                                                      {
+                                                                        "__type": "Map",
+                                                                        "value": [
+                                                                          [
+                                                                            "k",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "string",
+                                                                                  "og"
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ],
+                                                                          [
+                                                                            "v",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "int",
+                                                                                  {
+                                                                                    "__type": "bigint",
+                                                                                    "value": "0"
+                                                                                  }
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        ]
+                                                                      },
+                                                                      {
+                                                                        "__type": "Map",
+                                                                        "value": [
+                                                                          [
+                                                                            "k",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "string",
+                                                                                  "termsofuse"
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ],
+                                                                          [
+                                                                            "v",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "string",
+                                                                                  "https://adahandle.com/tou"
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        ]
+                                                                      },
+                                                                      {
+                                                                        "__type": "Map",
+                                                                        "value": [
+                                                                          [
+                                                                            "k",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "string",
+                                                                                  "handleEncoding"
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ],
+                                                                          [
+                                                                            "v",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "string",
+                                                                                  "utf-8"
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        ]
+                                                                      },
+                                                                      {
+                                                                        "__type": "Map",
+                                                                        "value": [
+                                                                          [
+                                                                            "k",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "string",
+                                                                                  "prefix"
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ],
+                                                                          [
+                                                                            "v",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "string",
+                                                                                  "$"
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        ]
+                                                                      },
+                                                                      {
+                                                                        "__type": "Map",
+                                                                        "value": [
+                                                                          [
+                                                                            "k",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "string",
+                                                                                  "version"
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ],
+                                                                          [
+                                                                            "v",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "int",
+                                                                                  {
+                                                                                    "__type": "bigint",
+                                                                                    "value": "0"
+                                                                                  }
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        ]
+                                                                      }
+                                                                    ]
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ]
+                                                          ]
+                                                        },
+                                                        {
+                                                          "__type": "Map",
+                                                          "value": [
+                                                            [
+                                                              "k",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "augmentations"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ],
+                                                            [
+                                                              "v",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "list",
+                                                                    []
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ]
+                                                          ]
+                                                        }
+                                                      ]
+                                                    ]
+                                                  ]
+                                                }
+                                              ]
+                                            ]
+                                          }
+                                        ]
+                                      ]
+                                    ]
+                                  }
+                                ]
+                              ]
+                            }
+                          ]
+                        ]
+                      ]
+                    }
+                  ]
+                ]
+              },
+              "scripts": []
+            },
+            "body": {
+              "auxiliaryDataHash": "9002261a963cd2e49faf5574eb98a5e550bbf1d4d0c334cac7ff611e2588e845",
+              "certificates": [],
+              "collaterals": [],
+              "fee": {
+                "__type": "bigint",
+                "value": "192517"
+              },
+              "inputs": [
+                {
+                  "index": 1,
+                  "txId": "04e4c197613f7b752f17cc69429faa5d7ceffb3e9299a7a4891af2b85b7f87c4"
+                }
+              ],
+              "mint": {
+                "__type": "Map",
+                "value": [
+                  [
+                    "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a626f62",
+                    {
+                      "__type": "bigint",
+                      "value": "1"
+                    }
+                  ]
+                ]
+              },
+              "outputs": [
+                {
+                  "address": "addr_test1qzrljm7nskakjydxlr450ktsj08zuw6aktvgfkmmyw9semrkrezryq3ydtmkg0e7e2jvzg443h0ffzfwd09wpcxy2fuql9tk0g",
+                  "datum": {
+                    "__type": "undefined"
+                  },
+                  "datumHash": {
+                    "__type": "undefined"
+                  },
+                  "scriptReference": {
+                    "__type": "undefined"
+                  },
+                  "value": {
+                    "assets": {
+                      "__type": "Map",
+                      "value": [
+                        [
+                          "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a626f62",
+                          {
+                            "__type": "bigint",
+                            "value": "1"
+                          }
+                        ]
+                      ]
+                    },
+                    "coins": {
+                      "__type": "bigint",
+                      "value": "1444443"
+                    }
+                  }
+                },
+                {
+                  "address": "addr_test1qz690wvatwqgzt5u85hfzjxa8qqzthqwtp7xq8t3wh6ttc98hqtvlesvrpvln3srklcvhu2r9z22fdhaxvh2m2pg3nuq0n8gf2",
+                  "datum": {
+                    "__type": "undefined"
+                  },
+                  "datumHash": {
+                    "__type": "undefined"
+                  },
+                  "scriptReference": {
+                    "__type": "undefined"
+                  },
+                  "value": {
+                    "assets": {
+                      "__type": "Map",
+                      "value": []
+                    },
+                    "coins": {
+                      "__type": "bigint",
+                      "value": "9966064110"
+                    }
+                  }
+                }
+              ],
+              "requiredExtraSignatures": [],
+              "scriptIntegrityHash": {
+                "__type": "undefined"
+              },
+              "validityInterval": {
+                "invalidBefore": {
+                  "__type": "undefined"
+                },
+                "invalidHereafter": 13645686
+              },
+              "withdrawals": []
+            },
+            "id": "297f52b3e58e5c007f0d6914e1af64b4fc2c3266d444896520d998005d26642b",
+            "inputSource": "inputs",
+            "witness": {
+              "bootstrap": [],
+              "datums": [],
+              "redeemers": [],
+              "scripts": [
+                {
+                  "__type": "native",
+                  "keyHash": "4da965a049dfd15ed1ee19fba6e2974a0b79fc416dd1796a1f97f5e1",
+                  "kind": 0
+                }
+              ],
+              "signatures": {
+                "__type": "Map",
+                "value": [
+                  [
+                    "8cb46c3cd83bad9a5d5c368152da69ec630c5c0cdae2bccbc933635f10a95978",
+                    "130e1cdb0506f3e1d6e1e85d22abd525dce5128028d1c306dfb2ceec94db16ef550dc1f9be61918d5d40182ce7b9a5faa7a683425f90218e3820e8f5d476610c"
+                  ],
+                  [
+                    "b62a7193927f47ef703ba99a06add1ee2d4d94853a16dcd68ad0f5d9baa18530",
+                    "59842fe9d6ddaeb4fd444f981d8d4c01b8003a1e92472d2cbccbca7b24ec19ab7c36e32ec1d0376ed6a499667c7b04ba13a92805aecd84fbc04812b12ce7c702"
+                  ]
+                ]
+              }
+            }
+          }
+        ],
+        "fees": {
+          "__type": "bigint",
+          "value": "192517"
+        },
+        "header": {
+          "blockNo": 317874,
+          "hash": "f0206b115735fd587bd64e11936ba695033ce235284cfc83afc7168e5f0b86d9",
+          "slot": 13633715
+        },
+        "issuerVk": "9691ed9d98a5b79d5bc46c4496a6dba7e103f668f525c8349b6b92676cb3eae4",
+        "previousBlock": "6625b89401da3c51749f89268b65fda8e416ad5c8af2d81b61f1eac0cf7eb8e5",
+        "size": 848,
+        "totalOutput": {
+          "__type": "bigint",
+          "value": "9967508553"
+        },
+        "txCount": 1,
+        "vrf": "vrf_vk1afy7gefvgc9eaek64lhunxw2velmuh4467n6a2aalah7r8q68j0s4f2sa9"
+      },
+      "eventType": 0,
+      "tip": {
+        "blockNo": 317874,
+        "hash": "f0206b115735fd587bd64e11936ba695033ce235284cfc83afc7168e5f0b86d9",
+        "slot": 13633715
+      }
+    },
+    {
+      "eventType": 1,
+      "point": {
+        "hash": "6625b89401da3c51749f89268b65fda8e416ad5c8af2d81b61f1eac0cf7eb8e5",
+        "slot": 13633686
+      },
+      "tip": {
+        "blockNo": 317873,
+        "hash": "6625b89401da3c51749f89268b65fda8e416ad5c8af2d81b61f1eac0cf7eb8e5",
+        "slot": 13633686
+      }
+    },
+    {
+      "block": {
+        "body": [
+          {
+            "auxiliaryData": {
+              "blob": {
+                "__type": "Map",
+                "value": [
+                  [
+                    {
+                      "__type": "bigint",
+                      "value": "721"
+                    },
+                    {
+                      "__type": "Map",
+                      "value": [
+                        [
+                          "map",
+                          [
+                            {
+                              "__type": "Map",
+                              "value": [
+                                [
+                                  "k",
+                                  {
+                                    "__type": "Map",
+                                    "value": [
+                                      [
+                                        "string",
+                                        "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a"
+                                      ]
+                                    ]
+                                  }
+                                ],
+                                [
+                                  "v",
+                                  {
+                                    "__type": "Map",
+                                    "value": [
+                                      [
+                                        "map",
+                                        [
+                                          {
+                                            "__type": "Map",
+                                            "value": [
+                                              [
+                                                "k",
+                                                {
+                                                  "__type": "Map",
+                                                  "value": [
+                                                    [
+                                                      "string",
+                                                      "bob"
+                                                    ]
+                                                  ]
+                                                }
+                                              ],
+                                              [
+                                                "v",
+                                                {
+                                                  "__type": "Map",
+                                                  "value": [
+                                                    [
+                                                      "map",
+                                                      [
+                                                        {
+                                                          "__type": "Map",
+                                                          "value": [
+                                                            [
+                                                              "k",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "name"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ],
+                                                            [
+                                                              "v",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "$bob"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ]
+                                                          ]
+                                                        },
+                                                        {
+                                                          "__type": "Map",
+                                                          "value": [
+                                                            [
+                                                              "k",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "description"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ],
+                                                            [
+                                                              "v",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "The Handle Standard"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ]
+                                                          ]
+                                                        },
+                                                        {
+                                                          "__type": "Map",
+                                                          "value": [
+                                                            [
+                                                              "k",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "website"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ],
+                                                            [
+                                                              "v",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "https://adahandle.com"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ]
+                                                          ]
+                                                        },
+                                                        {
+                                                          "__type": "Map",
+                                                          "value": [
+                                                            [
+                                                              "k",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "image"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ],
+                                                            [
+                                                              "v",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "ipfs://QmZqUk6nGqYJZzHiCGzbzqppA5qE99yNkuTSHuRQpymE1X"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ]
+                                                          ]
+                                                        },
+                                                        {
+                                                          "__type": "Map",
+                                                          "value": [
+                                                            [
+                                                              "k",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "core"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ],
+                                                            [
+                                                              "v",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "map",
+                                                                    [
+                                                                      {
+                                                                        "__type": "Map",
+                                                                        "value": [
+                                                                          [
+                                                                            "k",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "string",
+                                                                                  "og"
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ],
+                                                                          [
+                                                                            "v",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "int",
+                                                                                  {
+                                                                                    "__type": "bigint",
+                                                                                    "value": "0"
+                                                                                  }
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        ]
+                                                                      },
+                                                                      {
+                                                                        "__type": "Map",
+                                                                        "value": [
+                                                                          [
+                                                                            "k",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "string",
+                                                                                  "termsofuse"
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ],
+                                                                          [
+                                                                            "v",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "string",
+                                                                                  "https://adahandle.com/tou"
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        ]
+                                                                      },
+                                                                      {
+                                                                        "__type": "Map",
+                                                                        "value": [
+                                                                          [
+                                                                            "k",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "string",
+                                                                                  "handleEncoding"
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ],
+                                                                          [
+                                                                            "v",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "string",
+                                                                                  "utf-8"
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        ]
+                                                                      },
+                                                                      {
+                                                                        "__type": "Map",
+                                                                        "value": [
+                                                                          [
+                                                                            "k",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "string",
+                                                                                  "prefix"
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ],
+                                                                          [
+                                                                            "v",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "string",
+                                                                                  "$"
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        ]
+                                                                      },
+                                                                      {
+                                                                        "__type": "Map",
+                                                                        "value": [
+                                                                          [
+                                                                            "k",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "string",
+                                                                                  "version"
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ],
+                                                                          [
+                                                                            "v",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "int",
+                                                                                  {
+                                                                                    "__type": "bigint",
+                                                                                    "value": "0"
+                                                                                  }
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        ]
+                                                                      }
+                                                                    ]
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ]
+                                                          ]
+                                                        },
+                                                        {
+                                                          "__type": "Map",
+                                                          "value": [
+                                                            [
+                                                              "k",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "augmentations"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ],
+                                                            [
+                                                              "v",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "list",
+                                                                    []
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ]
+                                                          ]
+                                                        }
+                                                      ]
+                                                    ]
+                                                  ]
+                                                }
+                                              ]
+                                            ]
+                                          }
+                                        ]
+                                      ]
+                                    ]
+                                  }
+                                ]
+                              ]
+                            }
+                          ]
+                        ]
+                      ]
+                    }
+                  ]
+                ]
+              },
+              "scripts": []
+            },
+            "body": {
+              "auxiliaryDataHash": "9002261a963cd2e49faf5574eb98a5e550bbf1d4d0c334cac7ff611e2588e845",
+              "certificates": [],
+              "collaterals": [],
+              "fee": {
+                "__type": "bigint",
+                "value": "192517"
+              },
+              "inputs": [
+                {
+                  "index": 1,
+                  "txId": "04e4c197613f7b752f17cc69429faa5d7ceffb3e9299a7a4891af2b85b7f87c4"
+                }
+              ],
+              "mint": {
+                "__type": "Map",
+                "value": [
+                  [
+                    "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a626f62",
+                    {
+                      "__type": "bigint",
+                      "value": "1"
+                    }
+                  ]
+                ]
+              },
+              "outputs": [
+                {
+                  "address": "addr_test1qzrljm7nskakjydxlr450ktsj08zuw6aktvgfkmmyw9semrkrezryq3ydtmkg0e7e2jvzg443h0ffzfwd09wpcxy2fuql9tk0g",
+                  "datum": "abc",
+                  "datumHash": {
+                    "__type": "undefined"
+                  },
+                  "scriptReference": {
+                    "__type": "undefined"
+                  },
+                  "value": {
+                    "assets": {
+                      "__type": "Map",
+                      "value": [
+                        [
+                          "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a626f62",
+                          {
+                            "__type": "bigint",
+                            "value": "1"
+                          }
+                        ]
+                      ]
+                    },
+                    "coins": {
+                      "__type": "bigint",
+                      "value": "1444443"
+                    }
+                  }
+                },
+                {
+                  "address": "addr_test1qz690wvatwqgzt5u85hfzjxa8qqzthqwtp7xq8t3wh6ttc98hqtvlesvrpvln3srklcvhu2r9z22fdhaxvh2m2pg3nuq0n8gf2",
+                  "datum": {
+                    "__type": "undefined"
+                  },
+                  "datumHash": {
+                    "__type": "undefined"
+                  },
+                  "scriptReference": {
+                    "__type": "undefined"
+                  },
+                  "value": {
+                    "assets": {
+                      "__type": "Map",
+                      "value": []
+                    },
+                    "coins": {
+                      "__type": "bigint",
+                      "value": "9966064110"
+                    }
+                  }
+                }
+              ],
+              "requiredExtraSignatures": [],
+              "scriptIntegrityHash": {
+                "__type": "undefined"
+              },
+              "validityInterval": {
+                "invalidBefore": {
+                  "__type": "undefined"
+                },
+                "invalidHereafter": 13645686
+              },
+              "withdrawals": []
+            },
+            "id": "297f52b3e58e5c007f0d6914e1af64b4fc2c3266d444896520d998005d26642b",
+            "inputSource": "inputs",
+            "witness": {
+              "bootstrap": [],
+              "datums": [],
+              "redeemers": [],
+              "scripts": [
+                {
+                  "__type": "native",
+                  "keyHash": "4da965a049dfd15ed1ee19fba6e2974a0b79fc416dd1796a1f97f5e1",
+                  "kind": 0
+                }
+              ],
+              "signatures": {
+                "__type": "Map",
+                "value": [
+                  [
+                    "8cb46c3cd83bad9a5d5c368152da69ec630c5c0cdae2bccbc933635f10a95978",
+                    "130e1cdb0506f3e1d6e1e85d22abd525dce5128028d1c306dfb2ceec94db16ef550dc1f9be61918d5d40182ce7b9a5faa7a683425f90218e3820e8f5d476610c"
+                  ],
+                  [
+                    "b62a7193927f47ef703ba99a06add1ee2d4d94853a16dcd68ad0f5d9baa18530",
+                    "59842fe9d6ddaeb4fd444f981d8d4c01b8003a1e92472d2cbccbca7b24ec19ab7c36e32ec1d0376ed6a499667c7b04ba13a92805aecd84fbc04812b12ce7c702"
+                  ]
+                ]
+              }
+            }
+          }
+        ],
+        "fees": {
+          "__type": "bigint",
+          "value": "192517"
+        },
+        "header": {
+          "blockNo": 317874,
+          "hash": "a0206b115735fd587bd64e11936ba695033ce235284cfc83afc7168e5f0b86d9",
+          "slot": 13633715
+        },
+        "issuerVk": "9691ed9d98a5b79d5bc46c4496a6dba7e103f668f525c8349b6b92676cb3eae4",
+        "previousBlock": "6625b89401da3c51749f89268b65fda8e416ad5c8af2d81b61f1eac0cf7eb8e5",
+        "size": 848,
+        "totalOutput": {
+          "__type": "bigint",
+          "value": "9967508553"
+        },
+        "txCount": 1,
+        "vrf": "vrf_vk1afy7gefvgc9eaek64lhunxw2velmuh4467n6a2aalah7r8q68j0s4f2sa9"
+      },
+      "eventType": 0,
+      "tip": {
+        "blockNo": 317874,
+        "hash": "a0206b115735fd587bd64e11936ba695033ce235284cfc83afc7168e5f0b86d9",
+        "slot": 13633715
+      }
+    },
+    {
+      "block": {
+        "body": [
+          {
+            "body": {
+              "certificates": [],
+              "collaterals": [],
+              "fee": {
+                "__type": "bigint",
+                "value": "192517"
+              },
+              "inputs": [
+                {
+                  "index": 1,
+                  "txId": "24e4c197613f7b752f17cc69429faa5d7ceffb3e9299a7a4891af2b85b7f87c4"
+                }
+              ],
+              "mint": {
+                "__type": "Map",
+                "value": [
+                  [
+                    "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a626f62",
+                    {
+                      "__type": "bigint",
+                      "value": "1"
+                    }
+                  ]
+                ]
+              },
+              "outputs": [
+                {
+                  "address": "addr_test1qph450j2em0kk62p7278qhs38yh722kgup3nj5eyk95ndcjstf9aru532d0m7a52dek7txeekxxr69vdcs75elqgwu0syrcdqg",
+                  "datum": {
+                    "__type": "undefined"
+                  },
+                  "datumHash": {
+                    "__type": "undefined"
+                  },
+                  "scriptReference": {
+                    "__type": "undefined"
+                  },
+                  "value": {
+                    "assets": {
+                      "__type": "Map",
+                      "value": [
+                        [
+                          "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a626f62",
+                          {
+                            "__type": "bigint",
+                            "value": "1"
+                          }
+                        ]
+                      ]
+                    },
+                    "coins": {
+                      "__type": "bigint",
+                      "value": "1444443"
+                    }
+                  }
+                }
+              ],
+              "requiredExtraSignatures": [],
+              "scriptIntegrityHash": {
+                "__type": "undefined"
+              },
+              "validityInterval": {
+                "invalidBefore": {
+                  "__type": "undefined"
+                },
+                "invalidHereafter": 13645686
+              },
+              "withdrawals": []
+            },
+            "id": "497f52b3e58e5c007f0d6914e1af64b4fc2c3266d444896520d998005d26642b",
+            "inputSource": "inputs",
+            "witness": {
+              "bootstrap": [],
+              "datums": [],
+              "redeemers": [],
+              "scripts": [
+                {
+                  "__type": "native",
+                  "keyHash": "4da965a049dfd15ed1ee19fba6e2974a0b79fc416dd1796a1f97f5e1",
+                  "kind": 0
+                }
+              ],
+              "signatures": {
+                "__type": "Map",
+                "value": [
+                  [
+                    "8cb46c3cd83bad9a5d5c368152da69ec630c5c0cdae2bccbc933635f10a95978",
+                    "130e1cdb0506f3e1d6e1e85d22abd525dce5128028d1c306dfb2ceec94db16ef550dc1f9be61918d5d40182ce7b9a5faa7a683425f90218e3820e8f5d476610c"
+                  ],
+                  [
+                    "b62a7193927f47ef703ba99a06add1ee2d4d94853a16dcd68ad0f5d9baa18530",
+                    "59842fe9d6ddaeb4fd444f981d8d4c01b8003a1e92472d2cbccbca7b24ec19ab7c36e32ec1d0376ed6a499667c7b04ba13a92805aecd84fbc04812b12ce7c702"
+                  ]
+                ]
+              }
+            }
+          }
+        ],
+        "fees": {
+          "__type": "bigint",
+          "value": "0"
+        },
+        "header": {
+          "blockNo": 317875,
+          "hash": "fe47398835aa4e553a8cf166e3a2e8c7e49415ddf60ba82631b724c8744c7f85",
+          "slot": 13633721
+        },
+        "issuerVk": "9691ed9d98a5b79d5bc46c4496a6dba7e103f668f525c8349b6b92676cb3eae4",
+        "previousBlock": "f0206b115735fd587bd64e11936ba695033ce235284cfc83afc7168e5f0b86d9",
+        "size": 4,
+        "totalOutput": {
+          "__type": "bigint",
+          "value": "0"
+        },
+        "txCount": 0,
+        "vrf": "vrf_vk1afy7gefvgc9eaek64lhunxw2velmuh4467n6a2aalah7r8q68j0s4f2sa9"
+      },
+      "eventType": 0,
+      "tip": {
+        "blockNo": 317875,
+        "hash": "fe47398835aa4e553a8cf166e3a2e8c7e49415ddf60ba82631b724c8744c7f85",
+        "slot": 13633721
+      }
+    },
+    {
+      "block": {
+        "body": [
+          {
+            "auxiliaryData": {
+              "blob": {
+                "__type": "Map",
+                "value": [
+                  [
+                    {
+                      "__type": "bigint",
+                      "value": "721"
+                    },
+                    {
+                      "__type": "Map",
+                      "value": [
+                        [
+                          "map",
+                          [
+                            {
+                              "__type": "Map",
+                              "value": [
+                                [
+                                  "k",
+                                  {
+                                    "__type": "Map",
+                                    "value": [
+                                      [
+                                        "string",
+                                        "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a"
+                                      ]
+                                    ]
+                                  }
+                                ],
+                                [
+                                  "v",
+                                  {
+                                    "__type": "Map",
+                                    "value": [
+                                      [
+                                        "map",
+                                        [
+                                          {
+                                            "__type": "Map",
+                                            "value": [
+                                              [
+                                                "k",
+                                                {
+                                                  "__type": "Map",
+                                                  "value": [
+                                                    [
+                                                      "string",
+                                                      "bob"
+                                                    ]
+                                                  ]
+                                                }
+                                              ],
+                                              [
+                                                "v",
+                                                {
+                                                  "__type": "Map",
+                                                  "value": [
+                                                    [
+                                                      "map",
+                                                      [
+                                                        {
+                                                          "__type": "Map",
+                                                          "value": [
+                                                            [
+                                                              "k",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "name"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ],
+                                                            [
+                                                              "v",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "$bob"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ]
+                                                          ]
+                                                        },
+                                                        {
+                                                          "__type": "Map",
+                                                          "value": [
+                                                            [
+                                                              "k",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "description"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ],
+                                                            [
+                                                              "v",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "The Handle Standard"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ]
+                                                          ]
+                                                        },
+                                                        {
+                                                          "__type": "Map",
+                                                          "value": [
+                                                            [
+                                                              "k",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "website"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ],
+                                                            [
+                                                              "v",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "https://adahandle.com"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ]
+                                                          ]
+                                                        },
+                                                        {
+                                                          "__type": "Map",
+                                                          "value": [
+                                                            [
+                                                              "k",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "image"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ],
+                                                            [
+                                                              "v",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "ipfs://QmZqUk6nGqYJZzHiCGzbzqppA5qE99yNkuTSHuRQpymE1X"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ]
+                                                          ]
+                                                        },
+                                                        {
+                                                          "__type": "Map",
+                                                          "value": [
+                                                            [
+                                                              "k",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "core"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ],
+                                                            [
+                                                              "v",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "map",
+                                                                    [
+                                                                      {
+                                                                        "__type": "Map",
+                                                                        "value": [
+                                                                          [
+                                                                            "k",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "string",
+                                                                                  "og"
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ],
+                                                                          [
+                                                                            "v",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "int",
+                                                                                  {
+                                                                                    "__type": "bigint",
+                                                                                    "value": "0"
+                                                                                  }
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        ]
+                                                                      },
+                                                                      {
+                                                                        "__type": "Map",
+                                                                        "value": [
+                                                                          [
+                                                                            "k",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "string",
+                                                                                  "termsofuse"
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ],
+                                                                          [
+                                                                            "v",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "string",
+                                                                                  "https://adahandle.com/tou"
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        ]
+                                                                      },
+                                                                      {
+                                                                        "__type": "Map",
+                                                                        "value": [
+                                                                          [
+                                                                            "k",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "string",
+                                                                                  "handleEncoding"
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ],
+                                                                          [
+                                                                            "v",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "string",
+                                                                                  "utf-8"
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        ]
+                                                                      },
+                                                                      {
+                                                                        "__type": "Map",
+                                                                        "value": [
+                                                                          [
+                                                                            "k",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "string",
+                                                                                  "prefix"
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ],
+                                                                          [
+                                                                            "v",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "string",
+                                                                                  "$"
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        ]
+                                                                      },
+                                                                      {
+                                                                        "__type": "Map",
+                                                                        "value": [
+                                                                          [
+                                                                            "k",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "string",
+                                                                                  "version"
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ],
+                                                                          [
+                                                                            "v",
+                                                                            {
+                                                                              "__type": "Map",
+                                                                              "value": [
+                                                                                [
+                                                                                  "int",
+                                                                                  {
+                                                                                    "__type": "bigint",
+                                                                                    "value": "0"
+                                                                                  }
+                                                                                ]
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        ]
+                                                                      }
+                                                                    ]
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ]
+                                                          ]
+                                                        },
+                                                        {
+                                                          "__type": "Map",
+                                                          "value": [
+                                                            [
+                                                              "k",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "string",
+                                                                    "augmentations"
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ],
+                                                            [
+                                                              "v",
+                                                              {
+                                                                "__type": "Map",
+                                                                "value": [
+                                                                  [
+                                                                    "list",
+                                                                    []
+                                                                  ]
+                                                                ]
+                                                              }
+                                                            ]
+                                                          ]
+                                                        }
+                                                      ]
+                                                    ]
+                                                  ]
+                                                }
+                                              ]
+                                            ]
+                                          }
+                                        ]
+                                      ]
+                                    ]
+                                  }
+                                ]
+                              ]
+                            }
+                          ]
+                        ]
+                      ]
+                    }
+                  ]
+                ]
+              },
+              "scripts": []
+            },
+            "body": {
+              "auxiliaryDataHash": "8002261a963cd2e49faf5574eb98a5e550bbf1d4d0c334cac7ff611e2588e845",
+              "certificates": [],
+              "collaterals": [],
+              "fee": {
+                "__type": "bigint",
+                "value": "192517"
+              },
+              "inputs": [
+                {
+                  "index": 0,
+                  "txId": "497f52b3e58e5c007f0d6914e1af64b4fc2c3266d444896520d998005d26642b"
+                }
+              ],
+              "mint": {
+                "__type": "Map",
+                "value": [
+                  [
+                    "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a626f62",
+                    {
+                      "__type": "bigint",
+                      "value": "-1"
+                    }
+                  ]
+                ]
+              },
+              "outputs": [
+                {
+                  "address": "addr_test1qphhr294v0w0rzgk7kz4ynsp8hwt82ha6nsp8yk6h04fhzsuryus5g7pm3lq85msee5pdtqlnv2crdc83kk2tvhsefcsu2snle",
+                  "datum": {
+                    "__type": "undefined"
+                  },
+                  "datumHash": {
+                    "__type": "undefined"
+                  },
+                  "scriptReference": {
+                    "__type": "undefined"
+                  },
+                  "value": {
+                    "assets": {
+                      "__type": "Map",
+                      "value": []
+                    },
+                    "coins": {
+                      "__type": "bigint",
+                      "value": "1444443"
+                    }
+                  }
+                },
+                {
+                  "address": "addr_test1qz690wvatwqgzt5u85hfzjxa8qqzthqwtp7xq8t3wh6ttc98hqtvlesvrpvln3srklcvhu2r9z22fdhaxvh2m2pg3nuq0n8gf2",
+                  "datum": {
+                    "__type": "undefined"
+                  },
+                  "datumHash": {
+                    "__type": "undefined"
+                  },
+                  "scriptReference": {
+                    "__type": "undefined"
+                  },
+                  "value": {
+                    "assets": {
+                      "__type": "Map",
+                      "value": []
+                    },
+                    "coins": {
+                      "__type": "bigint",
+                      "value": "9966064110"
+                    }
+                  }
+                }
+              ],
+              "requiredExtraSignatures": [],
+              "scriptIntegrityHash": {
+                "__type": "undefined"
+              },
+              "validityInterval": {
+                "invalidBefore": {
+                  "__type": "undefined"
+                },
+                "invalidHereafter": 13645686
+              },
+              "withdrawals": []
+            },
+            "id": "14e4c197613f7b752f17cc69429faa5d7ceffb3e9299a7a4891af2b85b7f87c4",
+            "inputSource": "inputs",
+            "witness": {
+              "bootstrap": [],
+              "datums": [],
+              "redeemers": [],
+              "scripts": [
+                {
+                  "__type": "native",
+                  "keyHash": "4da965a049dfd15ed1ee19fba6e2974a0b79fc416dd1796a1f97f5e1",
+                  "kind": 0
+                }
+              ],
+              "signatures": {
+                "__type": "Map",
+                "value": [
+                  [
+                    "8cb46c3cd83bad9a5d5c368152da69ec630c5c0cdae2bccbc933635f10a95978",
+                    "130e1cdb0506f3e1d6e1e85d22abd525dce5128028d1c306dfb2ceec94db16ef550dc1f9be61918d5d40182ce7b9a5faa7a683425f90218e3820e8f5d476610c"
+                  ],
+                  [
+                    "b62a7193927f47ef703ba99a06add1ee2d4d94853a16dcd68ad0f5d9baa18530",
+                    "59842fe9d6ddaeb4fd444f981d8d4c01b8003a1e92472d2cbccbca7b24ec19ab7c36e32ec1d0376ed6a499667c7b04ba13a92805aecd84fbc04812b12ce7c702"
+                  ]
+                ]
+              }
+            }
+          }
+        ],
+        "fees": {
+          "__type": "bigint",
+          "value": "192517"
+        },
+        "header": {
+          "blockNo": 317877,
+          "hash": "d5206b115733cf587bd64e11936ba695011ce235284cfc83afc7168e5f0b74ab",
+          "slot": 13633724
+        },
+        "issuerVk": "9691ed9d98a5b79d5bc46c4496a6dba7e103f668f525c8349b6b92676cb3eae4",
+        "previousBlock": "fe47398835aa4e553a8cf166e3a2e8c7e49415ddf60ba82631b724c8744c7f85",
+        "size": 848,
+        "totalOutput": {
+          "__type": "bigint",
+          "value": "9967508553"
+        },
+        "txCount": 1,
+        "vrf": "vrf_vk1afy7gefvgc9eaek64lhunxw2velmuh4467n6a2aalah7r8q68j0s4f2sa9"
+      },
+      "eventType": 0,
+      "tip": {
+        "blockNo": 317877,
+        "hash": "d5206b115733cf587bd64e11936ba695011ce235284cfc83afc7168e5f0b74ab",
+        "slot": 13633724
+      }
+    },
+    {
+      "eventType": 1,
+      "point": {
+        "hash": "a0206b115735fd587bd64e11936ba695033ce235284cfc83afc7168e5f0b86d9",
+        "slot": 13633715
+      },
+      "tip": {
+        "hash": "a0206b115735fd587bd64e11936ba695033ce235284cfc83afc7168e5f0b86d9",
+        "slot": 13633715
+      }
+    }
+  ],
+  "metadata": {
+    "cardano": {
+      "compactGenesis": {
+        "systemStart": {
+          "__type": "Date",
+          "value": 1654041600000
+        },
+        "networkMagic": 1,
+        "network": "testnet",
+        "activeSlotsCoefficient": 0.05,
+        "securityParameter": 2160,
+        "epochLength": 432000,
+        "slotsPerKesPeriod": 129600,
+        "maxKesEvolutions": 62,
+        "slotLength": 1,
+        "updateQuorum": 5,
+        "maxLovelaceSupply": {
+          "__type": "bigint",
+          "value": "45000000000000000"
+        },
+        "networkId": 0
+      },
+      "intersection": {
+        "point": "origin",
+        "tip": {
+          "slot": 28124213,
+          "hash": "c7de71b6cca0f17c0200076ce18e08272315d2595b09fa62c014f2228af10a00",
+          "blockNo": 925491
+        }
+      }
+    },
+    "options": {
+      "blockHeights": "317873,317874,317875,317876,-317873"
+    },
+    "software": {
+      "commit": {
+        "hash": "463e77fde1eeb6b7f99c983a9aa206c0194748a2",
+        "tags": [
+          "@cardano-sdk/cardano-services-client@0.9.1-nightly.0",
+          "@cardano-sdk/cardano-services@0.11.1",
+          "@cardano-sdk/cardano-services@0.12.0-nightly.0",
+          "@cardano-sdk/core@0.12.0-nightly.0",
+          "@cardano-sdk/crypto@0.1.5-nightly.0",
+          "@cardano-sdk/dapp-connector@0.9.1-nightly.0",
+          "@cardano-sdk/e2e@0.10.1",
+          "@cardano-sdk/e2e@0.10.2-nightly.0",
+          "@cardano-sdk/golden-test-generator@0.7.3-nightly.0",
+          "@cardano-sdk/governance@0.5.2-nightly.0",
+          "@cardano-sdk/input-selection@0.9.2-nightly.0",
+          "@cardano-sdk/key-management@0.5.2-nightly.0",
+          "@cardano-sdk/ogmios@0.12.0-nightly.0",
+          "@cardano-sdk/projection-typeorm@0.2.1-nightly.0",
+          "@cardano-sdk/projection@0.6.1-nightly.0",
+          "@cardano-sdk/tx-construction@0.4.1-nightly.0",
+          "@cardano-sdk/util-dev@0.9.1-nightly.0",
+          "@cardano-sdk/util-rxjs@0.4.8-nightly.0",
+          "@cardano-sdk/util@0.9.1-nightly.0",
+          "@cardano-sdk/wallet@0.12.0-nightly.0",
+          "@cardano-sdk/web-extension@0.9.1-nightly.0"
+        ]
+      },
+      "name": "@cardano-sdk/golden-test-generator",
+      "version": "0.7.2"
+    }
+  }
+}

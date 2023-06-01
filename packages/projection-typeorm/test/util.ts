@@ -10,10 +10,12 @@ export const connectionConfig = {
   username: 'postgres'
 };
 
-export const initializeDataSource = async (props: Pick<CreateDataSourceProps, 'entities' | 'extensions'>) => {
+export const initializeDataSource = async (
+  props: Pick<CreateDataSourceProps, 'entities' | 'extensions' | 'devOptions'>
+) => {
   const dataSource = createDataSource({
     connectionConfig,
-    devOptions: { dropSchema: true, synchronize: true },
+    devOptions: props.devOptions || { dropSchema: true, synchronize: true },
     logger,
     ...props
   });
