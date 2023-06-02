@@ -19,6 +19,11 @@ const databaseConfigs = {
     database: 'localnetwork',
     fixture: false,
     snapshot: true
+  },
+  stakePool: {
+    database: process.env.POSTGRES_DB_STAKE_POOL!,
+    fixture: false,
+    snapshot: true
   }
 };
 
@@ -79,7 +84,7 @@ module.exports = async () => {
 
   const pgContainer = await DockerUtil.setupPostgresContainer(user, password, port || '5432');
   await setupDBData(databaseConfigs.localnetwork, user, pgContainer);
-  await createDatabase(pgContainer, user, process.env.POSTGRES_DB_STAKE_POOL!);
+  await setupDBData(databaseConfigs.stakePool, user, pgContainer);
 
   const container = new RabbitMQContainer();
 

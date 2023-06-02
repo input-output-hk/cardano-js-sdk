@@ -100,7 +100,7 @@ describe('StakePoolCompare', () => {
 
   // Fetch all stake pools with all reward history and organize in a StakePoolRecord
   const fetchAll = async (provider: StakePoolProvider) =>
-    Object.fromEntries((await fetchAllPools(provider, { rewardsHistoryLimit: 1_000_000 })).map((_) => [_.id, _]));
+    Object.fromEntries((await fetchAllPools(provider, { apyEpochsBackLimit: 1_000_000 })).map((_) => [_.id, _]));
 
   const startServer = async (args: string[]) => {
     const port = await getRandomPort();
@@ -170,8 +170,8 @@ describe('StakePoolCompare', () => {
       let metricTwo: Cardano.StakePoolMetrics;
 
       beforeAll(() => {
-        metricOne = poolOne.metrics;
-        metricTwo = poolTwo.metrics;
+        metricOne = poolOne.metrics!;
+        metricTwo = poolTwo.metrics!;
       });
 
       // check apy
@@ -212,12 +212,6 @@ describe('StakePoolCompare', () => {
 
     it('rewardAccount', () => expect(poolOne.rewardAccount).toBe(poolTwo.rewardAccount));
 
-    describe('transactions', () => {
-      it('registration', () => expect(poolOne.transactions.registration).toEqual(poolTwo.transactions.registration));
-
-      it('retirement', () => expect(poolOne.transactions.retirement).toEqual(poolTwo.transactions.retirement));
-    });
-
     // a known problem on db-sync implementation makes this test to fail on the given preprod pools
     if (!poolsExcludeStatus.has(id)) it('status', () => expect(poolOne.status).toBe(poolTwo.status));
     else it('status', () => expect(poolOne.status).not.toBe(poolTwo.status));
@@ -230,14 +224,14 @@ describe('StakePoolCompare', () => {
       const result = await fetchAllPools(providerOne, { sort: { field: 'saturation', order: 'asc' } });
 
       for (let i = 1; i < result.length; ++i)
-        expect(result[i - 1].metrics.saturation).toBeLessThanOrEqual(result[i].metrics.saturation);
+        expect(result[i - 1].metrics?.saturation).toBeLessThanOrEqual(result[i].metrics!.saturation);
     });
 
     it('by saturation desc', async () => {
       const result = await fetchAllPools(providerOne, { sort: { field: 'saturation', order: 'desc' } });
 
       for (let i = 1; i < result.length; ++i)
-        expect(result[i - 1].metrics.saturation).toBeGreaterThanOrEqual(result[i].metrics.saturation);
+        expect(result[i - 1].metrics?.saturation).toBeGreaterThanOrEqual(result[i].metrics!.saturation);
     });
   });
 
@@ -261,7 +255,7 @@ describe('StakePoolCompare', () => {
 
         statusCount[pool.status]++;
 
-        if (pool.metrics.livePledge >= pool.pledge) poolsMeetingPledge++;
+        if (pool.metrics!.livePledge >= pool.pledge) poolsMeetingPledge++;
         else {
           poolsNotMeetingPledge++;
 

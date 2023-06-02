@@ -4,14 +4,14 @@ import { AssetHttpService } from '../../Asset/AssetHttpService';
 import { CardanoNode } from '@cardano-sdk/core';
 import { CardanoTokenRegistry } from '../../Asset/CardanoTokenRegistry';
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../../ChainHistory';
-import { DbPools, DbSyncEpochPollService, loadGenesisData } from '../../util';
+import { DbPools, DbSyncEpochPollService } from '../../util';
 import { DbSyncAssetProvider } from '../../Asset/DbSyncAssetProvider';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../NetworkInfo';
 import { DbSyncNftMetadataService, StubTokenMetadataService } from '../../Asset';
 import { DbSyncRewardsProvider, RewardsHttpService } from '../../Rewards';
 import { DbSyncStakePoolProvider, StakePoolHttpService, createHttpStakePoolMetadataService } from '../../StakePool';
 import { DbSyncUtxoProvider, UtxoHttpService } from '../../Utxo';
-import { DnsResolver, createDnsResolver, serviceSetHas } from '../utils';
+import { DnsResolver, createDnsResolver, getCardanoNode, getDbPools, getGenesisData } from '../utils';
 import { GenesisData } from '../../types';
 import { HttpServer, HttpServerConfig, HttpService, getListen } from '../../Http';
 import { InMemoryCache, NoCache } from '../../InMemoryCache';
@@ -23,10 +23,12 @@ import { PostgresOptionDescriptions } from '../options/postgres';
 import { ProviderServerArgs, ProviderServerOptionDescriptions, ServiceNames } from './types';
 import { SrvRecord } from 'dns';
 import { TxSubmitHttpService } from '../../TxSubmit';
+import { TypeormStakePoolProvider } from '../../StakePool/TypeormStakePoolProvider/TypeormStakePoolProvider';
 import { URL } from 'url';
 import { createDbSyncMetadataService } from '../../Metadata';
 import { createLogger } from 'bunyan';
-import { getOgmiosCardanoNode, getOgmiosTxSubmitProvider, getPool, getRabbitMqTxSubmitProvider } from '../services';
+import { getConnectionConfig, getOgmiosTxSubmitProvider, getRabbitMqTxSubmitProvider } from '../services';
+import { getEntities } from '../../Projection/prepareTypeormProjection';
 import { isNotNil } from '@cardano-sdk/util';
 import memoize from 'lodash/memoize';
 
@@ -37,16 +39,8 @@ export const PROVIDER_SERVER_API_URL_DEFAULT = new URL('http://localhost:3000');
 export const PAGINATION_PAGE_SIZE_LIMIT_DEFAULT = 25;
 export const PAGINATION_PAGE_SIZE_LIMIT_ASSETS = 300;
 export const USE_BLOCKFROST_DEFAULT = false;
+export const USE_TYPEORM_STAKE_POOL_PROVIDER_DEFAULT = false;
 export const USE_QUEUE_DEFAULT = false;
-
-export const cardanoNodeDependantServices = new Set([
-  ServiceNames.NetworkInfo,
-  ServiceNames.StakePool,
-  ServiceNames.Utxo,
-  ServiceNames.Rewards,
-  ServiceNames.Asset,
-  ServiceNames.ChainHistory
-]);
 
 export interface LoadProviderServerDependencies {
   dnsResolver?: (serviceName: string) => Promise<SrvRecord>;
@@ -61,6 +55,8 @@ interface ServiceMapFactoryOptions {
   logger: Logger;
   node?: OgmiosCardanoNode;
 }
+
+const serverName = 'provider-server';
 
 const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
   const { args, pools, dnsResolver, genesisData, logger, node } = options;
@@ -85,6 +81,48 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
   const healthCheckCache = getCache(args.healthCheckCacheTtl);
 
   const getEpochMonitor = memoize((dbPool: Pool) => new DbSyncEpochPollService(dbPool, args.epochPollInterval!));
+
+  const getDbSyncStakePoolProvider = withDbSyncProvider((dbPools, cardanoNode) => {
+    if (!genesisData) {
+      throw new MissingProgramOption(ServiceNames.StakePool, ProviderServerOptionDescriptions.CardanoNodeConfigPath);
+    }
+
+    return new DbSyncStakePoolProvider(
+      {
+        paginationPageSizeLimit: args.paginationPageSizeLimit!,
+        responseConfig: { search: { metrics: { apy: !args.disableStakePoolMetricApy } } },
+        useBlockfrost: args.useBlockfrost!
+      },
+      {
+        cache: {
+          db: getDbCache(),
+          healthCheck: healthCheckCache
+        },
+        cardanoNode,
+        dbPools,
+        epochMonitor: getEpochMonitor(dbPools.main),
+        genesisData,
+        logger,
+        metadataService: createHttpStakePoolMetadataService(logger)
+      }
+    );
+  }, ServiceNames.StakePool);
+
+  const getTypeormStakePoolProvider = () => {
+    const entities = getEntities([
+      'block',
+      'currentPoolMetrics',
+      'poolMetadata',
+      'poolRegistration',
+      'poolRetirement',
+      'stakePool'
+    ]);
+    const connectionConfig$ = getConnectionConfig(dnsResolver, serverName, args);
+    return new TypeormStakePoolProvider(
+      { paginationPageSizeLimit: args.paginationPageSizeLimit! },
+      { connectionConfig$, entities, logger }
+    );
+  };
 
   return {
     [ServiceNames.Asset]: withDbSyncProvider(async (dbPools, cardanoNode) => {
@@ -114,30 +152,12 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
 
       return new AssetHttpService({ assetProvider, logger });
     }, ServiceNames.Asset),
-    [ServiceNames.StakePool]: withDbSyncProvider(async (dbPools, cardanoNode) => {
-      if (!genesisData)
-        throw new MissingProgramOption(ServiceNames.StakePool, ProviderServerOptionDescriptions.CardanoNodeConfigPath);
-      const stakePoolProvider = new DbSyncStakePoolProvider(
-        {
-          paginationPageSizeLimit: args.paginationPageSizeLimit!,
-          responseConfig: { search: { metrics: { apy: !args.disableStakePoolMetricApy } } },
-          useBlockfrost: args.useBlockfrost!
-        },
-        {
-          cache: {
-            db: getDbCache(),
-            healthCheck: healthCheckCache
-          },
-          cardanoNode,
-          dbPools,
-          epochMonitor: getEpochMonitor(dbPools.main),
-          genesisData,
-          logger,
-          metadataService: createHttpStakePoolMetadataService(logger)
-        }
-      );
+    [ServiceNames.StakePool]: async () => {
+      const stakePoolProvider = args.useTypeormStakePoolProvider
+        ? getTypeormStakePoolProvider()
+        : getDbSyncStakePoolProvider();
       return new StakePoolHttpService({ logger, stakePoolProvider });
-    }, ServiceNames.StakePool),
+    },
     [ServiceNames.Utxo]: withDbSyncProvider(
       async (dbPools, cardanoNode) =>
         new UtxoHttpService({
@@ -220,7 +240,7 @@ export const loadProviderServer = async (
     deps?.logger ||
     createLogger({
       level: args.loggerMinSeverity,
-      name: 'provider-server'
+      name: serverName
     });
   const dnsResolver =
     deps?.dnsResolver ||
@@ -231,14 +251,10 @@ export const loadProviderServer = async (
       },
       logger
     );
-  const pools: Partial<DbPools> = {
-    healthCheck: await getPool(dnsResolver, logger, args),
-    main: await getPool(dnsResolver, logger, args)
-  };
-  const cardanoNode = serviceSetHas(args.serviceNames, cardanoNodeDependantServices)
-    ? await getOgmiosCardanoNode(dnsResolver, logger, args)
-    : undefined;
-  const genesisData = args.cardanoNodeConfigPath ? await loadGenesisData(args.cardanoNodeConfigPath) : undefined;
+
+  const cardanoNode = await getCardanoNode(dnsResolver, logger, args);
+  const genesisData = await getGenesisData(args);
+  const pools: Partial<DbPools> = await getDbPools(dnsResolver, logger, args);
   const serviceMap = serviceMapFactory({ args, dnsResolver, genesisData, logger, node: cardanoNode, pools });
 
   for (const serviceName of args.serviceNames) {

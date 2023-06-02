@@ -260,13 +260,13 @@ describe('StakePoolProvider', () => {
       it('with pledgeMet false', async () => {
         const { pageResults } = await query({ pledgeMet: false });
 
-        for (const pool of pageResults) expect(pool.pledge > pool.metrics.livePledge).toBeTruthy();
+        for (const pool of pageResults) expect(pool.pledge > pool.metrics!.livePledge).toBeTruthy();
       });
 
       it('with pledgeMet true', async () => {
         const { pageResults } = await query({ pledgeMet: true });
 
-        for (const pool of pageResults) expect(pool.pledge <= pool.metrics.livePledge).toBeTruthy();
+        for (const pool of pageResults) expect(pool.pledge <= pool.metrics!.livePledge).toBeTruthy();
       });
 
       it('pools number = meeting pools number + not meeting pools number', async () => {

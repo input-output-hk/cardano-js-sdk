@@ -23,7 +23,7 @@ export class PoolInfo {
   updateId: number;
 }
 
-export class StakePoolFixtureBuilder {
+export class DbSyncStakePoolFixtureBuilder {
   #db: Pool;
   #logger: Logger;
 
