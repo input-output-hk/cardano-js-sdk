@@ -126,7 +126,7 @@ const consumeFactory =
         messageId: newMessageId()
       } as FactoryCallMessage)
       .subscribe();
-    const apiMessenger = messenger.deriveChannel(channel);
+    const apiMessenger = messenger.deriveChannel(channel, { detached: true });
     // eslint-disable-next-line no-use-before-define
     const api = consumeMessengerRemoteApi(
       {
@@ -312,7 +312,7 @@ export const bindFactoryMethods = <API extends object>(
     try {
       const args = fromSerializableObject<MethodRequest>(data.factoryCall.args);
       const { method, channel } = data.factoryCall;
-      const factoryMessenger = messenger.deriveChannel(channel);
+      const factoryMessenger = messenger.deriveChannel(channel, { detached: true });
       // eslint-disable-next-line no-use-before-define
       const api = exposeMessengerApi(
         {
@@ -345,11 +345,9 @@ export const bindFactoryMethods = <API extends object>(
       };
       completeSubscription = factoryMessenger.message$.subscribe((msg) => {
         if (isCompletionMessage(msg.data)) {
-          subscription.remove(teardown);
           teardown();
         }
       });
-      subscription.add(teardown);
     } catch (error) {
       logger.debug('[bindFactoryMethods] error exposing api', data, error);
     }
