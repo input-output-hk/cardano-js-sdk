@@ -4,6 +4,7 @@ import { Logger } from 'ts-log';
 import { TokenMetadataService } from './types';
 import { contextLogger } from '@cardano-sdk/util';
 import axios, { AxiosInstance } from 'axios';
+import pick from 'lodash/pick';
 
 export const DEFAULT_TOKEN_METADATA_CACHE_TTL = 600;
 export const DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT = 3 * 1000;
@@ -107,16 +108,17 @@ export class CardanoTokenRegistry implements TokenMetadataService {
     const defaultConfig: CardanoTokenRegistryConfigurationWithRequired = {
       tokenMetadataCacheTTL: DEFAULT_TOKEN_METADATA_CACHE_TTL,
       tokenMetadataRequestTimeout: DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT,
-      tokenMetadataServerUrl: DEFAULT_TOKEN_METADATA_SERVER_URL,
-      ...config
+      tokenMetadataServerUrl: DEFAULT_TOKEN_METADATA_SERVER_URL
     };
-
-    this.#cache = cache || new InMemoryCache(defaultConfig.tokenMetadataCacheTTL);
+    const configKeys = Object.keys(defaultConfig);
+    const mergedConfig = { ...defaultConfig, ...config };
+    this.#cache = cache || new InMemoryCache(mergedConfig.tokenMetadataCacheTTL);
     this.#axiosClient = axios.create({
-      baseURL: defaultConfig.tokenMetadataServerUrl,
-      timeout: defaultConfig.tokenMetadataRequestTimeout
+      baseURL: mergedConfig.tokenMetadataServerUrl,
+      timeout: mergedConfig.tokenMetadataRequestTimeout
     });
     this.#logger = contextLogger(logger, 'CardanoTokenRegistry');
+    this.#logger.info('Config:', pick(mergedConfig, configKeys));
   }
 
   shutdown() {
