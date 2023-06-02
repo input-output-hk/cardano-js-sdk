@@ -14,7 +14,14 @@ import {
   takeWhile,
   tap
 } from 'rxjs';
-import { Messenger, MessengerDependencies, MessengerPort, PortMessage, ReconnectConfig } from './types';
+import {
+  DeriveChannelOptions,
+  Messenger,
+  MessengerDependencies,
+  MessengerPort,
+  PortMessage,
+  ReconnectConfig
+} from './types';
 import { deriveChannelName } from './util';
 import { isNotNil } from '@cardano-sdk/util';
 import { retryBackoff } from 'backoff-rxjs';
@@ -82,7 +89,7 @@ export const createNonBackgroundMessenger = (
   return {
     channel,
     connect$,
-    deriveChannel(path) {
+    deriveChannel(path, { detached }: DeriveChannelOptions = {}) {
       const messenger = createNonBackgroundMessenger(
         {
           baseChannel: deriveChannelName(channel, path),
@@ -90,7 +97,9 @@ export const createNonBackgroundMessenger = (
         },
         { logger, runtime }
       );
-      derivedMessengers.add(messenger);
+      if (!detached) {
+        derivedMessengers.add(messenger);
+      }
       return messenger;
     },
     get isShutdown() {
