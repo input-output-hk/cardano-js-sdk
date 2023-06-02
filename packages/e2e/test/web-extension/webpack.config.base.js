@@ -9,7 +9,8 @@ require('dotenv').config({ path: path.join(__dirname, '../../', '.env') });
 
 module.exports = {
   baseConfig: {
-    devtool: 'inline-source-map',
+    devtool: 'source-map',
+    ignoreWarnings: [/Failed to parse source map/],
     mode: 'development',
     module: {
       // configuration regarding modules
@@ -17,6 +18,11 @@ module.exports = {
         {
           test: /docker\.js$/,
           use: 'null-loader'
+        },
+        {
+          enforce: 'pre',
+          test: /\.js$/,
+          use: ['source-map-loader']
         },
         {
           exclude: /node_modules/,
