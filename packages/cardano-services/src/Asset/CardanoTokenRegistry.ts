@@ -131,7 +131,7 @@ export class CardanoTokenRegistry implements TokenMetadataService {
     // All metadata was taken from cache
     if (assetIdsToRequest.length === 0) return tokenMetadata;
 
-    this.#logger.info(`Fetching batch of ${assetIdsToRequest.length} assetIds`);
+    this.#logger.debug(`Fetching batch of ${assetIdsToRequest.length} assetIds`);
 
     try {
       const response = await this.#axiosClient.post<{ subjects: TokenMetadataServiceRecord[] }>('metadata/query', {
