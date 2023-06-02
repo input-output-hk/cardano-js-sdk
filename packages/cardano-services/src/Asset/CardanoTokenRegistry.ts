@@ -54,7 +54,7 @@ export interface CardanoTokenRegistryConfiguration {
   tokenMetadataCacheTTL?: number;
 
   /**
-   * The Cardano Token Registry public API base URL. Default: https://tokens.cardano.org
+   * The Cardano Token Registry API base URL. Default: https://tokens.cardano.org
    */
   tokenMetadataServerUrl?: string;
 
@@ -85,7 +85,7 @@ export interface CardanoTokenRegistryDependencies {
 }
 
 /**
- * TokenMetadataService implementation using Cardano Token Registry public API
+ * TokenMetadataService implementation using Cardano Token Registry API
  */
 export class CardanoTokenRegistry implements TokenMetadataService {
   /**
