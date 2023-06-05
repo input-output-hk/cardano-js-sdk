@@ -57,10 +57,12 @@ describe('PersonalWallet methods', () => {
     txSubmitProvider = mocks.mockTxSubmitProvider();
     networkInfoProvider = mocks.mockNetworkInfoProvider();
     utxoProvider = mocks.mockUtxoProvider();
+
     const assetProvider = mocks.mockAssetProvider();
     const stakePoolProvider = createStubStakePoolProvider();
     const rewardsProvider = mockRewardsProvider();
     const chainHistoryProvider = mockChainHistoryProvider();
+    const handleProvider = mocks.mockHandleProvider();
     const groupedAddress: GroupedAddress = {
       accountIndex: 0,
       address,
@@ -83,6 +85,7 @@ describe('PersonalWallet methods', () => {
           {
             assetProvider,
             chainHistoryProvider,
+            handleProvider,
             keyAgent,
             logger,
             networkInfoProvider,
@@ -267,6 +270,24 @@ describe('PersonalWallet methods', () => {
         const txPending = firstValueFrom(wallet.transactions.outgoing.pending$);
         await expect(wallet.submitTx(tx, { mightBeAlreadySubmitted: true })).resolves.not.toThrow();
         expect(await txPending).toEqual(outgoingTx);
+      });
+
+      it('resolves on success when submitting a tx when sending coins to a handle', async () => {
+        const txBuilder = wallet.createTxBuilder();
+        const txOutput = await txBuilder.buildOutput().handle('alice').coin(1_000_000n).build();
+
+        const txOut = await txBuilder.addOutput(txOutput).build().sign();
+        const submitTxArgsMock = {
+          context: { handles: [mocks.resolvedHandle] },
+          signedTransaction: txOut.cbor
+        };
+        const txPending = firstValueFrom(wallet.transactions.outgoing.pending$);
+        await wallet.submitTx(txOut);
+
+        const txPendingResult = await txPending;
+
+        expect(txPendingResult.body.outputs[0].address).toEqual(mocks.resolvedHandle.resolvedAddresses.cardano);
+        expect(txSubmitProvider.submitTx).toHaveBeenCalledWith(submitTxArgsMock);
       });
     });
   });

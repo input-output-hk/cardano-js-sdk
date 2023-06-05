@@ -2,6 +2,7 @@ import { AsyncKeyAgent, GroupedAddress } from '@cardano-sdk/key-management';
 import { Cardano, CardanoNodeErrors, EpochRewards, TxCBOR } from '@cardano-sdk/core';
 import { Observable } from 'rxjs';
 import { Percent } from '@cardano-sdk/util';
+import { SignedTx } from '@cardano-sdk/tx-construction';
 
 export enum TransactionFailure {
   InvalidTransaction = 'INVALID_TRANSACTION',
@@ -65,6 +66,7 @@ export interface OutgoingTx {
   cbor: TxCBOR;
   body: Cardano.TxBody;
   id: Cardano.TransactionId;
+  context?: SignedTx['context'];
 }
 
 export interface FailedTx extends OutgoingTx {

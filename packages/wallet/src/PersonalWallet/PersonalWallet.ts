@@ -88,6 +88,7 @@ import {
   InitializeTxProps,
   InitializeTxResult,
   InvalidConfigurationError,
+  SignedTx,
   TxBuilderDependencies,
   finalizeTx,
   initializeTx
@@ -145,10 +146,12 @@ export const DEFAULT_LOOK_AHEAD_SEARCH = 20;
 // Ideally we should calculate this based on the activeSlotsCoeff and probability of a single block per epoch.
 const BLOCK_SLOT_GAP_MULTIPLIER = 2.5;
 
-const isOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx): input is OutgoingTx =>
+const isOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx | SignedTx): input is OutgoingTx =>
   typeof input === 'object' && 'cbor' in input;
-const isTxCBOR = (input: Cardano.Tx | TxCBOR | OutgoingTx): input is TxCBOR => typeof input === 'string';
-const processOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx): OutgoingTx => {
+const isTxCBOR = (input: Cardano.Tx | TxCBOR | OutgoingTx | SignedTx): input is TxCBOR => typeof input === 'string';
+const isSignedTx = (input: Cardano.Tx | TxCBOR | OutgoingTx | SignedTx): input is SignedTx =>
+  typeof input === 'object' && 'context' in input;
+const processOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx | SignedTx): OutgoingTx => {
   // TxCbor
   if (isTxCBOR(input)) {
     return {
@@ -156,6 +159,16 @@ const processOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx): OutgoingTx 
       cbor: input,
       // Do not re-serialize transaction body to compute transaction id
       id: Cardano.TransactionId.fromTxBodyCbor(TxBodyCBOR.fromTxCBOR(input))
+    };
+  }
+  // SignedTx
+  if (isSignedTx(input)) {
+    return {
+      body: input.tx.body,
+      cbor: input.cbor,
+      context: input.context,
+      // Do not re-serialize transaction body to compute transaction id
+      id: input.tx.id
     };
   }
   // OutgoingTx (resubmitted)
@@ -509,7 +522,7 @@ export class PersonalWallet implements ObservableWallet {
   }
 
   async submitTx(
-    input: Cardano.Tx | TxCBOR | OutgoingTx,
+    input: Cardano.Tx | TxCBOR | OutgoingTx | SignedTx,
     { mightBeAlreadySubmitted }: SubmitTxOptions = {}
   ): Promise<Cardano.TransactionId> {
     const outgoingTx = processOutgoingTx(input);
@@ -517,6 +530,7 @@ export class PersonalWallet implements ObservableWallet {
     this.#newTransactions.submitting$.next(outgoingTx);
     try {
       await this.txSubmitProvider.submitTx({
+        context: outgoingTx.context,
         signedTransaction: outgoingTx.cbor
       });
       const { slot: submittedAt } = await firstValueFrom(this.tip$);
