@@ -1,7 +1,7 @@
 import { Cardano, cmlUtil } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 import { InputSelectionParameters, InputSelector, SelectionResult } from '../types';
-import { assertIsBalanceSufficient, preProcessArgs, toValues } from './util';
+import { assertIsBalanceSufficient, preProcessArgs, toValues } from '../util';
 import { computeChangeAndAdjustForFee } from './change';
 import { roundRobinSelection } from './roundRobin';
 

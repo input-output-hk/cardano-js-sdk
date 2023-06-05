@@ -3,7 +3,7 @@ import { Asset, Cardano, cmlUtil, coalesceValueQuantities } from '@cardano-sdk/c
 import { AssetId } from '@cardano-sdk/util-dev';
 import { ImplicitValue, SelectionResult } from '../../src/types';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
-import { mintToImplicitTokens } from '../../src/RoundRobinRandomImprove/util';
+import { mintToImplicitTokens } from '../../src/util';
 import fc, { Arbitrary } from 'fast-check';
 
 const assertExtraChangeProperties = (
