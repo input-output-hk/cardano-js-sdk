@@ -10,7 +10,9 @@ const assertExtraChangeProperties = (
   { minimumCoinQuantity }: SelectionConstraints.MockSelectionConstraints,
   results: SelectionResult
 ) => {
-  for (const { coins, assets } of results.selection.change) {
+  for (const {
+    value: { coins, assets }
+  } of results.selection.change) {
     // Min UTxO coin requirement for change
     expect(coins).toBeGreaterThanOrEqual(minimumCoinQuantity);
     // No 0 quantity assets
@@ -51,7 +53,7 @@ const inputSelectionTotals = ({
     assets: Asset.util.coalesceTokenMaps([vRequestedOutputs.assets, implicitTokensSpend]),
     coins: vRequestedOutputs.coins + BigInt(implicitValue?.coin?.deposit || 0) + vFee
   };
-  const vChange = coalesceValueQuantities([...results.selection.change]);
+  const vChange = coalesceValueQuantities(results.selection.change.map((txOut) => txOut.value));
   return { vChange, vRequested, vSelected };
 };
 

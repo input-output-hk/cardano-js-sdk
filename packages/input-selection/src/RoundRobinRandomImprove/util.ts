@@ -18,6 +18,7 @@ export interface RequiredImplicitValue {
 export interface RoundRobinRandomImproveArgs {
   utxo: Cardano.Utxo[];
   outputs: Cardano.TxOut[];
+  changeAddress: Cardano.PaymentAddress;
   uniqueTxAssetIDs: Cardano.AssetId[];
   implicitValue: RequiredImplicitValue;
   random: typeof Math.random;
@@ -42,6 +43,7 @@ export const mintToImplicitTokens = (mintMap: Cardano.TokenMap = new Map()) => {
 export const preProcessArgs = (
   availableUtxo: Set<Cardano.Utxo>,
   outputSet: Set<Cardano.TxOut>,
+  changeAddress: Cardano.PaymentAddress,
   partialImplicitValue?: ImplicitValue
 ): PreProcessedArgs => {
   const outputs = [...outputSet];
@@ -58,6 +60,7 @@ export const preProcessArgs = (
   const uniqueOutputAssetIDs = uniq(outputs.flatMap(({ value: { assets } }) => [...(assets?.keys() || [])]));
   const uniqueTxAssetIDs = uniq([...uniqueOutputAssetIDs, ...mintMap.keys()]);
   return {
+    changeAddress,
     implicitValue: { implicitCoin, implicitTokens },
     outputs,
     uniqueTxAssetIDs,

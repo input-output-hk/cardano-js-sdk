@@ -6,11 +6,11 @@ import minBy from 'lodash/minBy';
 import orderBy from 'lodash/orderBy';
 import pick from 'lodash/pick';
 
-type EstimateTxFeeWithOriginalOutputs = (utxo: Cardano.Utxo[], change: Cardano.Value[]) => Promise<Cardano.Lovelace>;
-
-const stubMaxSizeAddress = Cardano.PaymentAddress(
+export const stubMaxSizeAddress = Cardano.PaymentAddress(
   'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9'
 );
+
+type EstimateTxFeeWithOriginalOutputs = (utxo: Cardano.Utxo[], change: Cardano.Value[]) => Promise<Cardano.Lovelace>;
 
 interface ChangeComputationArgs {
   utxoSelection: UtxoSelection;
