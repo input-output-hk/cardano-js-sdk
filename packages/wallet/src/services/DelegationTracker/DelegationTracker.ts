@@ -1,5 +1,6 @@
+import { AsyncKeyAgent } from '@cardano-sdk/key-management';
 import { Cardano, ChainHistoryProvider, EraSummary, SlotEpochCalc, createSlotEpochCalc } from '@cardano-sdk/core';
-import { DelegationTracker, TransactionsTracker } from '../types';
+import { DelegationTracker, TransactionsTracker, UtxoTracker } from '../types';
 import { Logger } from 'ts-log';
 import { Observable, combineLatest, map, tap } from 'rxjs';
 import {
@@ -17,6 +18,7 @@ import { TrackerSubject } from '@cardano-sdk/util-rxjs';
 import { TxWithEpoch } from './types';
 import { WalletStores } from '../../persistence';
 import { coldObservableProvider } from '../util';
+import { createDelegationDistributionTracker } from './DelegationDistributionTracker';
 import { transactionsWithCertificates } from './transactionCertificates';
 
 export const createBlockEpochProvider =
@@ -42,6 +44,8 @@ export interface DelegationTrackerProps {
   epoch$: Observable<Cardano.EpochNo>;
   transactionsTracker: TransactionsTracker;
   retryBackoffConfig: RetryBackoffConfig;
+  utxoTracker: UtxoTracker;
+  knownAddresses$: AsyncKeyAgent['knownAddresses$'];
   stores: WalletStores;
   internals?: {
     queryStakePoolsProvider?: ObservableStakePoolProvider;
@@ -67,7 +71,6 @@ export const certificateTransactionsWithEpochs = (
       transactions.map((tx) => ({ epoch: slotEpochCalc(tx.blockHeader.slot), tx }))
     )
   );
-
 export const createDelegationTracker = ({
   rewardAccountAddresses$,
   epoch$,
@@ -76,6 +79,8 @@ export const createDelegationTracker = ({
   transactionsTracker,
   eraSummaries$,
   stakePoolProvider,
+  knownAddresses$,
+  utxoTracker,
   stores,
   logger,
   onFatalError,
@@ -128,7 +133,11 @@ export const createDelegationTracker = ({
       transactionsInFlight$: transactionsTracker.outgoing.inFlight$
     })
   );
+  const distribution$ = new TrackerSubject(
+    createDelegationDistributionTracker({ knownAddresses$, rewardAccounts$, utxoTracker })
+  );
   return {
+    distribution$,
     rewardAccounts$,
     rewardsHistory$,
     shutdown: () => {

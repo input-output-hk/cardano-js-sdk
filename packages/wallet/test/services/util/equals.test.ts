@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Cardano, EpochInfo, EraSummary } from '@cardano-sdk/core';
-import { GroupedAddress } from '@cardano-sdk/key-management';
 import {
+  DelegatedStake,
   arrayEquals,
+  delegatedStakeEquals,
   epochInfoEquals,
   eraSummariesEquals,
   groupedAddressesEquals,
@@ -13,6 +14,8 @@ import {
   txEquals,
   utxoEquals
 } from '../../../src';
+import { GroupedAddress } from '@cardano-sdk/key-management';
+import { Percent } from '@cardano-sdk/util';
 
 describe('equals', () => {
   const txId1 = Cardano.TransactionId('4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6');
@@ -85,5 +88,18 @@ describe('equals', () => {
     const info2 = { epochNo: 2 } as unknown as EpochInfo;
     expect(epochInfoEquals(info1, { ...info1 })).toBe(true);
     expect(epochInfoEquals(info1, info2)).toBe(false);
+  });
+
+  test('delegatedStakeEquals compares poolId, stake and percentage changes', () => {
+    const pool1: DelegatedStake = {
+      percentage: Percent(0.45),
+      pool: { id: 'abc' },
+      stake: 100n
+    } as DelegatedStake;
+
+    expect(delegatedStakeEquals(pool1, { ...pool1 })).toBe(true);
+    expect(delegatedStakeEquals(pool1, { ...pool1, pool: { id: 'cde' } as Cardano.StakePool })).toBe(false);
+    expect(delegatedStakeEquals(pool1, { ...pool1, percentage: Percent(0.22) })).toBe(false);
+    expect(delegatedStakeEquals(pool1, { ...pool1, stake: 101n })).toBe(false);
   });
 });

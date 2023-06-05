@@ -426,6 +426,7 @@ export class PersonalWallet implements ObservableWallet {
     this.delegation = createDelegationTracker({
       epoch$,
       eraSummaries$,
+      knownAddresses$: this.keyAgent.knownAddresses$,
       logger: contextLogger(this.#logger, 'delegation'),
       onFatalError,
       retryBackoffConfig,
@@ -435,7 +436,8 @@ export class PersonalWallet implements ObservableWallet {
       rewardsTracker: this.rewardsProvider,
       stakePoolProvider: this.stakePoolProvider,
       stores,
-      transactionsTracker: this.transactions
+      transactionsTracker: this.transactions,
+      utxoTracker: this.utxo
     });
 
     this.balance = createBalanceTracker(this.protocolParameters$, this.utxo, this.delegation);

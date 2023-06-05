@@ -1,4 +1,5 @@
 import { Cardano, EpochInfo, EraSummary } from '@cardano-sdk/core';
+import { DelegatedStake } from '../types';
 import { GroupedAddress } from '@cardano-sdk/key-management';
 
 export const strictEquals = <T>(a: T, b: T) => a === b;
@@ -28,3 +29,6 @@ export const groupedAddressesEquals = (a: GroupedAddress[], b: GroupedAddress[])
   arrayEquals(a, b, groupedAddressEquals);
 
 export const epochInfoEquals = (a: EpochInfo, b: EpochInfo) => a.epochNo === b.epochNo;
+
+export const delegatedStakeEquals = (a: DelegatedStake, b: DelegatedStake) =>
+  a.pool.id === b.pool.id && a.stake === b.stake && a.percentage === b.percentage;
