@@ -20,12 +20,13 @@ export enum Programs {
  */
 export enum ServiceNames {
   Asset = 'asset',
-  StakePool = 'stake-pool',
-  NetworkInfo = 'network-info',
-  TxSubmit = 'tx-submit',
-  Utxo = 'utxo',
   ChainHistory = 'chain-history',
-  Rewards = 'rewards'
+  Handle = 'handle',
+  NetworkInfo = 'network-info',
+  Rewards = 'rewards',
+  StakePool = 'stake-pool',
+  TxSubmit = 'tx-submit',
+  Utxo = 'utxo'
 }
 
 export const POOLS_METRICS_INTERVAL_DEFAULT = 1000;

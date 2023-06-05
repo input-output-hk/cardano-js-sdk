@@ -14,6 +14,7 @@ import { DbSyncStakePoolProvider, StakePoolHttpService, createHttpStakePoolMetad
 import { DbSyncUtxoProvider, UtxoHttpService } from '../../Utxo';
 import { DnsResolver, createDnsResolver, getCardanoNode, getDbPools, getGenesisData } from '../utils';
 import { GenesisData } from '../../types';
+import { HandleHttpService, TypeOrmHandleProvider } from '../../Handle';
 import { HttpServer, HttpServerConfig, HttpService, getListen } from '../../Http';
 import { InMemoryCache, NoCache } from '../../InMemoryCache';
 import { Logger } from 'ts-log';
@@ -199,6 +200,12 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       );
       return new ChainHistoryHttpService({ chainHistoryProvider, logger });
     }, ServiceNames.ChainHistory),
+    [ServiceNames.Handle]: withTypeOrmProvider('Handle', async (connectionConfig$) => {
+      const entities = getEntities(['handle']);
+      const handleProvider = new TypeOrmHandleProvider({ connectionConfig$, entities, logger });
+
+      return new HandleHttpService({ handleProvider, logger });
+    }),
     [ServiceNames.Rewards]: withDbSyncProvider(async (dbPools, cardanoNode) => {
       const rewardsProvider = new DbSyncRewardsProvider(
         { paginationPageSizeLimit: args.paginationPageSizeLimit! },
