@@ -1,7 +1,7 @@
-import { CONTEXT_WITH_KNOWN_ADDRESSES, knownAddressKeyPath, txIn } from '../testData';
+import { contextWithKnownAddresses, knownAddressKeyPath, txIn } from '../testData';
 import { paymentKeyPathFromGroupedAddress, resolvePaymentKeyPathForTxIn } from '../../src';
 
-const address = CONTEXT_WITH_KNOWN_ADDRESSES.knownAddresses[0];
+const address = contextWithKnownAddresses.knownAddresses[0];
 
 describe('key-paths', () => {
   describe('paymentKeyPathFromGroupedAddress', () => {
@@ -11,7 +11,7 @@ describe('key-paths', () => {
   });
   describe('resolveKeyPath', () => {
     it('returns the BIP32Path for a known address', async () => {
-      expect(await resolvePaymentKeyPathForTxIn(txIn, CONTEXT_WITH_KNOWN_ADDRESSES)).toEqual(knownAddressKeyPath);
+      expect(await resolvePaymentKeyPathForTxIn(txIn, contextWithKnownAddresses)).toEqual(knownAddressKeyPath);
     });
   });
 });
