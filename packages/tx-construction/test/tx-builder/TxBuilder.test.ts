@@ -53,12 +53,13 @@ describe('GenericTxBuilder', () => {
   let txBuilderProviders: jest.Mocked<TxBuilderProviders>;
   let output: Cardano.TxOut;
   let output2: Cardano.TxOut;
+  let inputResolver: Cardano.InputResolver;
 
   beforeEach(async () => {
     output = mocks.utxo[0][1];
     output2 = mocks.utxo[1][1];
     const rewardAccount = mocks.rewardAccount;
-    const inputResolver: Cardano.InputResolver = {
+    inputResolver = {
       resolveInput: async (txIn) =>
         mocks.utxo.find(
           ([hydratedTxIn]) => txIn.txId === hydratedTxIn.txId && txIn.index === hydratedTxIn.index
@@ -470,7 +471,7 @@ describe('GenericTxBuilder', () => {
     });
 
     it('adds both stake key and delegation certificates when stake key was not registered', async () => {
-      const txDelegate = await txBuilder.delegate(poolId).build();
+      const txDelegate = txBuilder.delegate(poolId).build();
       const [stakeKeyCert, delegationCert] = (await txDelegate.inspect()).body.certificates!;
       expect(stakeKeyCert.__typename).toBe(Cardano.CertificateType.StakeKeyRegistration);
 
@@ -499,6 +500,7 @@ describe('GenericTxBuilder', () => {
       txBuilderProviders.rewardAccounts.mockResolvedValueOnce([
         {
           address: Cardano.RewardAccount('stake_test1uqu7qkgf00zwqupzqfzdq87dahwntcznklhp3x30t3ukz6gswungn'),
+          delegatee: { nextNextEpoch: { id: '' as Cardano.PoolId } },
           keyStatus: Cardano.StakeKeyStatus.Registered,
           rewardBalance: 33_333n
         }
@@ -517,11 +519,13 @@ describe('GenericTxBuilder', () => {
       txBuilderProviders.rewardAccounts.mockResolvedValueOnce([
         {
           address: Cardano.RewardAccount('stake_test1uqu7qkgf00zwqupzqfzdq87dahwntcznklhp3x30t3ukz6gswungn'),
+          delegatee: { nextNextEpoch: { id: '' as Cardano.PoolId } },
           keyStatus: Cardano.StakeKeyStatus.Unregistered,
           rewardBalance: 33_333n
         },
         {
           address: Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr'),
+          delegatee: { nextNextEpoch: { id: '' as Cardano.PoolId } },
           keyStatus: Cardano.StakeKeyStatus.Unregistered,
           rewardBalance: 44_444n
         }
@@ -534,6 +538,7 @@ describe('GenericTxBuilder', () => {
       txBuilderProviders.rewardAccounts.mockResolvedValueOnce([
         {
           address: Cardano.RewardAccount('stake_test1uqu7qkgf00zwqupzqfzdq87dahwntcznklhp3x30t3ukz6gswungn'),
+          delegatee: { nextNextEpoch: { id: '' as Cardano.PoolId } },
           keyStatus: Cardano.StakeKeyStatus.Registered,
           rewardBalance: 33_333n
         }

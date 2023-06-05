@@ -37,6 +37,14 @@ export class HandleNotFoundError extends CustomError {
   }
 }
 
+export class InsufficientRewardAccounts extends CustomError {
+  public constructor(poolIds: Cardano.PoolId[], rewardAccounts: Cardano.RewardAccount[]) {
+    const msg = `Internal error: insufficient stake keys: ${rewardAccounts.length}. Required: ${poolIds.length}.
+      Pool ids: ${poolIds.join(',')}; Reward accounts: ${rewardAccounts.length}`;
+    super(msg);
+  }
+}
+
 export class OutputValidationMissingRequiredError extends CustomError {
   public constructor(public txOut: PartialTxOut) {
     super(TxOutputFailure.MissingRequiredFields);
@@ -182,10 +190,21 @@ export interface TxBuilder {
    *   StakeKeyRegistration certificates are added in the transaction body.
    * - Stake key deregister is done by not providing the `poolId` parameter: `delegate()`.
    * - If wallet contains multiple reward accounts, it will create certificates for all of them.
+   * - It cannot be used in conjunction with {@link delegatePortfolio}
    *
    * @param poolId Pool Id to delegate to. If undefined, stake key deregistration will be done.
+   * @throws exception if used in conjunction with {@link delegatePortfolio}.
    */
   delegate(poolId?: Cardano.PoolId): TxBuilder;
+  /**
+   * Configure the transaction to include all certificates needed to delegate to the pools from the portfolio.
+   * - It cannot be used in conjunction with {@link delegate}.
+   *
+   * @param portfolio the CIP17 delegation portfolio to apply. Using `null` will deregister all stake keys,
+   *  reclaiming the deposits.
+   * @throws exception if used in conjunction with {@link delegate} call.
+   */
+  delegatePortfolio(portfolio: Pick<Cardano.Cip17DelegationPortfolio, 'pools'> | null): TxBuilder;
   /** Sets TxMetadata in {@link auxiliaryData} */
   metadata(metadata: Cardano.TxMetadata): TxBuilder;
   /** Sets extra signers in {@link extraSigners} */
