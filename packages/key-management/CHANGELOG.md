@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.7.1...@cardano-sdk/key-management@0.7.2) (2023-06-05)
+
+### Bug Fixes
+
+* **key-management:** the InMemoryKeyAgent now correctly takes into account the requiredSigners field ([2071885](https://github.com/input-output-hk/cardano-js-sdk/commit/20718855f9c00071947f927b4f5280cea9b41a43))
+
 ## [0.7.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.7.0...@cardano-sdk/key-management@0.7.1) (2023-06-01)
 
 **Note:** Version bump only for package @cardano-sdk/key-management

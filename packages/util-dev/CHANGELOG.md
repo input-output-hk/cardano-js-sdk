@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.11.1...@cardano-sdk/util-dev@0.12.0) (2023-06-05)
+
+### ⚠ BREAKING CHANGES
+
+* hoist Cardano.Percent to util package
+* - remove `epochRewards` and type `StakePoolEpochRewards`
+- remove `transactions` and type `StakePoolTransactions`
+
+### Features
+
+* add handle projection ([1d3f4ca](https://github.com/input-output-hk/cardano-js-sdk/commit/1d3f4ca3cfa3f1dfb668847de58eba4d0402d48e))
+* add missing pool stats status ([6a59a78](https://github.com/input-output-hk/cardano-js-sdk/commit/6a59a78cff0eae3d965e62d65d8612a642dce8f8))
+
+### Code Refactoring
+
+* hoist Cardano.Percent to util package ([e4da0e3](https://github.com/input-output-hk/cardano-js-sdk/commit/e4da0e3851a4bdfd503c1f195c5ba1455ea6675b))
+* remove unusable fields from StakePool core type ([a7aa17f](https://github.com/input-output-hk/cardano-js-sdk/commit/a7aa17fdd5224437555840d21f56c4660142c351))
+
 ## [0.11.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.11.0...@cardano-sdk/util-dev@0.11.1) (2023-06-01)
 
 **Note:** Version bump only for package @cardano-sdk/util-dev

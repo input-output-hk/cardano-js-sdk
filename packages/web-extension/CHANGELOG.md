@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.11.1...@cardano-sdk/web-extension@0.12.0) (2023-06-05)
+
+### ⚠ BREAKING CHANGES
+
+* **wallet:** Added new properties to DelegationTrackerProps
+
+### Features
+
+* **wallet:** delegation.portfolio$ tracker ([7488d14](https://github.com/input-output-hk/cardano-js-sdk/commit/7488d14008f7aa3d91d7513cfffaeb81e160eb18))
+
+### Bug Fixes
+
+* **web-extension:** decouple/detach objects returned by remote api factory ([a418169](https://github.com/input-output-hk/cardano-js-sdk/commit/a4181695885d4ced3519b4a73df6891c999215ef))
+
 ## [0.11.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.11.0...@cardano-sdk/web-extension@0.11.1) (2023-06-01)
 
 ### Features

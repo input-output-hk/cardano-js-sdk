@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.11.3...@cardano-sdk/ogmios@0.12.0) (2023-06-05)
+
+### ⚠ BREAKING CHANGES
+
+* hoist Cardano.Percent to util package
+
+### Code Refactoring
+
+* hoist Cardano.Percent to util package ([e4da0e3](https://github.com/input-output-hk/cardano-js-sdk/commit/e4da0e3851a4bdfd503c1f195c5ba1455ea6675b))
+
 ## [0.11.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.11.2...@cardano-sdk/ogmios@0.11.3) (2023-06-01)
 
 **Note:** Version bump only for package @cardano-sdk/ogmios

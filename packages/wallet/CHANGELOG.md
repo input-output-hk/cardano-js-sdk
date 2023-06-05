@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.14.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.13.1...@cardano-sdk/wallet@0.14.0) (2023-06-05)
+
+### ⚠ BREAKING CHANGES
+
+* **wallet:** Added new properties to DelegationTrackerProps
+
+### Features
+
+* **wallet:** delegation.portfolio$ tracker ([7488d14](https://github.com/input-output-hk/cardano-js-sdk/commit/7488d14008f7aa3d91d7513cfffaeb81e160eb18))
+* **wallet:** util to track utxo balance by address ([72f724a](https://github.com/input-output-hk/cardano-js-sdk/commit/72f724ab9c20690e385e2278896d90173e258e9d))
+
 ## [0.13.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.13.0...@cardano-sdk/wallet@0.13.1) (2023-06-01)
 
 ### Features
