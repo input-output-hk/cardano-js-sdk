@@ -2,6 +2,7 @@ import {
   BlockDataEntity,
   BlockEntity,
   CurrentPoolMetricsEntity,
+  PoolMetadataEntity,
   PoolRegistrationEntity,
   PoolRetirementEntity,
   StakePoolEntity,
@@ -63,7 +64,8 @@ describe('storeStakePools', () => {
         CurrentPoolMetricsEntity,
         PoolRegistrationEntity,
         PoolRetirementEntity,
-        StakePoolEntity
+        StakePoolEntity,
+        PoolMetadataEntity
       ]
     });
     queryRunner = dataSource.createQueryRunner();

@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/e2e",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "description": "End to end tests for the cardano-js-sdk packages.",
   "engines": {
     "node": ">=16.0"
@@ -45,7 +45,7 @@
     "test:web-extension:watch:run": "yarn test:web-extension:run --watch",
     "test:web-extension:watch": "run-s test:web-extension:build test:web-extension:watch:bg",
     "test:web-extension:watch:bg": "run-p test:web-extension:watch:build test:web-extension:watch:run",
-    "local-network:common": "docker compose -p local-network-e2e -f docker-compose.yml -f ../../compose/common.yml $FILES up",
+    "local-network:common": "USE_BLOCKFROST=false docker compose -p local-network-e2e -f docker-compose.yml -f ../../compose/common.yml $FILES up",
     "local-network:up": "FILES='' yarn local-network:common",
     "local-network:dev": "FILES='-f ../../compose/dev.yml' yarn local-network:common",
     "local-network:profile:up": "FILES='-f ../../compose/pg-agent.yml' yarn local-network:common",
@@ -165,6 +165,7 @@
     "null-loader": "^4.0.1",
     "readable-stream": "^3.6.0",
     "shx": "^0.3.3",
+    "source-map-loader": "^4.0.1",
     "ts-jest": "^28.0.7",
     "typeorm": "^0.3.15",
     "typeorm-extension": "^2.7.0",

@@ -537,10 +537,6 @@ describe('remoteApi integration', () => {
       getFactory: (consumer: typeof sut.consumer) => typeof consumer.factory
     ) => {
       describe(factoryName, () => {
-        it('accessing property returns the same function object', () => {
-          expect(getFactory(sut.consumer)).toBe(getFactory(sut.consumer));
-        });
-
         it('calling method on returned remote api calls remote method and resolves the result', async () => {
           const api = getFactory(sut.consumer)();
           expect(await api.addOne(2n)).toBe(3n);

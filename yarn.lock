@@ -2340,6 +2340,7 @@ __metadata:
     "@cardano-sdk/core": "workspace:~"
     "@cardano-sdk/util": "workspace:~"
     "@cardano-sdk/util-dev": "workspace:~"
+    "@koralabs/handles-public-api-interfaces": 1.6.6
     "@types/validator": ^13.7.1
     axios: ^0.27.2
     axios-mock-adapter: ^1.20.0
@@ -2598,6 +2599,7 @@ __metadata:
     readable-stream: ^3.6.0
     rxjs: ^7.4.0
     shx: ^0.3.3
+    source-map-loader: ^4.0.1
     ts-jest: ^28.0.7
     ts-log: ^2.2.4
     ts-node: ^10.8.1
@@ -2868,6 +2870,7 @@ __metadata:
     "@cardano-sdk/key-management": "workspace:~"
     "@cardano-sdk/util": "workspace:~"
     "@cardano-sdk/util-dev": "workspace:~"
+    "@cardano-sdk/wallet": "workspace:~"
     "@types/lodash": ^4.14.182
     eslint: ^7.32.0
     jest: ^28.1.3
@@ -3780,6 +3783,13 @@ __metadata:
   version: 7.1.3
   resolution: "@jsdevtools/ono@npm:7.1.3"
   checksum: 2297fcd472ba810bffe8519d2249171132844c7174f3a16634f9260761c8c78bc0428a4190b5b6d72d45673c13918ab9844d706c3ed4ef8f62ab11a2627a08ad
+  languageName: node
+  linkType: hard
+
+"@koralabs/handles-public-api-interfaces@npm:1.6.6":
+  version: 1.6.6
+  resolution: "@koralabs/handles-public-api-interfaces@npm:1.6.6"
+  checksum: 10687928187ac935089781fc616a3c10596120aed2f5be2c28852cf2d8c1b14acbb72b90243f3228ff0bc9034c99230162d48d08f5aeb657c7d4decd6c6364e2
   languageName: node
   linkType: hard
 
@@ -14263,7 +14273,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"iconv-lite@npm:0.6.3, iconv-lite@npm:^0.6.2":
+"iconv-lite@npm:0.6.3, iconv-lite@npm:^0.6.2, iconv-lite@npm:^0.6.3":
   version: 0.6.3
   resolution: "iconv-lite@npm:0.6.3"
   dependencies:
@@ -22503,6 +22513,19 @@ __metadata:
   version: 1.0.2
   resolution: "source-map-js@npm:1.0.2"
   checksum: c049a7fc4deb9a7e9b481ae3d424cc793cb4845daa690bc5a05d428bf41bf231ced49b4cf0c9e77f9d42fdb3d20d6187619fc586605f5eabe995a316da8d377c
+  languageName: node
+  linkType: hard
+
+"source-map-loader@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "source-map-loader@npm:4.0.1"
+  dependencies:
+    abab: ^2.0.6
+    iconv-lite: ^0.6.3
+    source-map-js: ^1.0.2
+  peerDependencies:
+    webpack: ^5.72.1
+  checksum: 4ddca8b03dc61f406effd4bffe70de4b87fef48bae6f737017b2dabcbc7d609133325be1e73838e9265331de28039111d729fcbb8bce88a6018a816bef510eb1
   languageName: node
   linkType: hard
 

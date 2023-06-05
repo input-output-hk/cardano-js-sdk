@@ -3,7 +3,6 @@ import { Lovelace } from '../Value';
 import { OpaqueNumber } from '@cardano-sdk/util';
 import { PoolIdHex } from './primitives';
 import { PoolParameters } from './PoolParameters';
-import { TransactionId } from '../Transaction';
 
 /**
  * The Percentage is a relative value that indicates the hundredth parts of any quantity.
@@ -95,21 +94,6 @@ export interface StakePoolMetrics {
 }
 
 /**
- * The list of transaction regarding this pool registration or retirement.
- */
-export interface StakePoolTransactions {
-  /**
-   * List of pool registration transactions.
-   */
-  registration: TransactionId[];
-
-  /**
-   * List of pool retirement transactions.
-   */
-  retirement: TransactionId[];
-}
-
-/**
  * Pool status.
  */
 export enum StakePoolStatus {
@@ -178,21 +162,10 @@ export interface StakePool extends PoolParameters {
   /**
    * Stake pool metrics
    */
-  metrics: StakePoolMetrics;
+  metrics?: StakePoolMetrics;
 
   /**
    * Stake pool status
    */
   status: StakePoolStatus;
-
-  /**
-   * Transactions provisioning the stake pool
-   */
-  transactions: StakePoolTransactions;
-
-  /**
-   * Stake pool rewards history per epoch.
-   * Sorted by epoch in ascending order.
-   */
-  epochRewards: StakePoolEpochRewards[];
 }

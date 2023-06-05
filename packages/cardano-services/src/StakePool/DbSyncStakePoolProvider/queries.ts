@@ -321,21 +321,6 @@ epoch_rewards AS (
     )
 )`;
 
-export const findPoolEpochRewards = (epochLength: number, limit?: number) => `
-${epochRewardsSubqueries(epochLength, limit)}
-SELECT
-  active_stake,
-  epoch_length::TEXT,
-  epoch_no,
-  hash_id,
-  leader_rewards,
-  member_rewards,
-  member_roi,
-  pledge
-FROM epoch_rewards
-ORDER BY epoch_no desc
-`;
-
 export const findPoolAPY = (epochLength: number, limit?: number) => `
 ${epochRewardsSubqueries(epochLength, limit)}
 SELECT
@@ -881,7 +866,6 @@ const Queries = {
   findLastEpoch,
   findLastEpochWithData,
   findPoolAPY,
-  findPoolEpochRewards,
   findPoolStats,
   findPools,
   findPoolsData,

@@ -1,13 +1,16 @@
-import { EMPTY, Observable, Subject, map } from 'rxjs';
 import {
+  ChannelName,
   FactoryCallMessage,
   Messenger,
+  MinimalPort,
   PortMessage,
   RemoteApiProperties,
   RemoteApiPropertyType,
   RequestMessage,
+  bindFactoryMethods,
   exposeMessengerApi
 } from '../../src/messaging';
+import { EMPTY, Observable, Subject, map, of } from 'rxjs';
 import { dummyLogger } from 'ts-log';
 
 const logger = dummyLogger;
@@ -25,6 +28,41 @@ type SimpleApi = {
   };
 };
 
+// eslint-disable-next-line no-use-before-define
+type TestMessenger = Messenger & { derivedMessengers: DerivedMessenger[] };
+type DerivedMessenger = { messenger: TestMessenger; detached?: boolean };
+const createMockMessenger = (channel: ChannelName) => {
+  const derivedMessengers = [] as Array<DerivedMessenger>;
+  const message$ = new Subject<PortMessage<unknown>>();
+  const connect$ = new Subject<MinimalPort>();
+  let isShutdown = false;
+  return {
+    channel,
+    connect$,
+    deriveChannel: jest.fn().mockImplementation((derivedChannel, { detached } = {}) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const messenger: any = createMockMessenger(`${channel}-${derivedChannel}`);
+      derivedMessengers.push({ detached, messenger });
+      return messenger;
+    }),
+    derivedMessengers,
+    get isShutdown() {
+      return isShutdown;
+    },
+    message$,
+    postMessage: jest.fn().mockImplementation(() => EMPTY),
+    shutdown: jest.fn().mockImplementation(() => {
+      isShutdown = true;
+      message$.complete();
+      connect$.complete();
+      for (const { messenger, detached } of derivedMessengers) {
+        !detached && messenger.shutdown();
+      }
+    })
+  };
+};
+
+// TODO: refactor to use createMockMessenger
 const setUp = (mode: ApiObjectType) => {
   const incomingMsg$ = new Subject<PortMessage<unknown>>();
 
@@ -203,7 +241,68 @@ describe('remoteApi', () => {
       });
     });
 
-    describe('ApiFactory', () => {
+    describe('bindFactoryMethods', () => {
+      describe('factory invocations create "detached" API objects', () => {
+        it('does not shut down returned API objects when the factory is shut down', (done) => {
+          const messenger = createMockMessenger('pingPong');
+          const factory = bindFactoryMethods(
+            {
+              api$: of({
+                pingApi: () => ({
+                  ping: async () => 'pong'
+                })
+              }),
+              properties: {
+                pingApi: {
+                  getApiProperties() {
+                    return {
+                      ping: RemoteApiPropertyType.MethodReturningPromise
+                    };
+                  },
+                  propType: RemoteApiPropertyType.ApiFactory
+                }
+              }
+            },
+            {
+              logger,
+              messenger
+            }
+          );
+          messenger.message$.next({
+            data: {
+              factoryCall: {
+                args: [],
+                channel: 'pingApi-1',
+                method: 'pingApi'
+              },
+              messageId: '1'
+            } as FactoryCallMessage,
+            port: {} as MinimalPort
+          });
+          factory.shutdown();
+          expect(messenger.derivedMessengers.length).toBe(1);
+          expect(messenger.derivedMessengers[0].detached).toBe(true);
+          expect(messenger.derivedMessengers[0].messenger.isShutdown).toBe(false);
+          expect(messenger.derivedMessengers[0].messenger.postMessage).not.toBeCalled();
+          const pingMessage$ = messenger.derivedMessengers[0].messenger.message$ as Subject<PortMessage<unknown>>;
+          pingMessage$.next({
+            data: {
+              messageId: '2',
+              request: {
+                args: [],
+                method: 'ping'
+              }
+            } as RequestMessage,
+            port: {} as MinimalPort
+          });
+          setTimeout(() => {
+            // Sends a response, verifying that it wasn't shutdown
+            expect(messenger.derivedMessengers[0].messenger.postMessage).toBeCalledTimes(1);
+            done();
+          });
+        });
+      });
+
       it('each factory call exposes a new api object', (done) => {
         const activate1: FactoryCallMessage = {
           factoryCall: {

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.5.1...@cardano-sdk/tx-construction@0.5.2) (2023-06-01)
+
+### Features
+
+* add HandleProvider interface and handle support implementation to TxBuilder ([f209095](https://github.com/input-output-hk/cardano-js-sdk/commit/f2090952c8a0512fc589674b876f3a27be403140))
+
 ## [0.5.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.5.0...@cardano-sdk/tx-construction@0.5.1) (2023-05-24)
 
 **Note:** Version bump only for package @cardano-sdk/tx-construction

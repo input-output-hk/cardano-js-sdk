@@ -57,6 +57,8 @@ export const refreshPoolMetrics = async (options: RefreshPoolMetricsOptions) => 
 
     const { metrics } = pageResults[0];
 
+    if (!metrics) return logger.warn(`No metrics found for stake pool ${id}`);
+
     await savePoolMetrics({ ...options, metrics });
   } catch (error) {
     logger.error(`Error while refreshing metrics for stake pool ${id}`, error);

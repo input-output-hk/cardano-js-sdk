@@ -189,7 +189,7 @@ describe('CLI', () => {
 
     beforeAll(async () => {
       ({ rabbitmqUrl } = await container.load());
-      db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING_DB_SYNC });
+      db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING_DB_SYNC, max: 1, min: 1 });
       fixtureBuilder = new AssetFixtureBuilder(db, logger);
       lastBlock = (await db!.query<LedgerTipModel>(findLedgerTip)).rows[0];
     });

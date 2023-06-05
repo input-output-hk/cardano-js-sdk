@@ -26,6 +26,10 @@ export const outputBuilderProperties: RemoteApiProperties<OutputBuilder> = {
     getApiProperties: () => outputBuilderProperties,
     propType: RemoteApiPropertyType.ApiFactory
   },
+  handle: {
+    getApiProperties: () => outputBuilderProperties,
+    propType: RemoteApiPropertyType.ApiFactory
+  },
   inspect: RemoteApiPropertyType.MethodReturningPromise,
   value: {
     getApiProperties: () => outputBuilderProperties,

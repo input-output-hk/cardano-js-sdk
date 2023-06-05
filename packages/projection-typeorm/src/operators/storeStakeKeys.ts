@@ -7,6 +7,6 @@ export const storeStakeKeys = typeormOperator<Mappers.WithStakeKeys>(
     const repository = queryRunner.manager.getRepository(StakeKeyEntity);
     const createAll = insert.length > 0 ? repository.insert(insert.map((hash) => ({ hash }))) : Promise.resolve();
     const deleteAll = del.length > 0 ? repository.delete(del) : Promise.resolve();
-    return Promise.all([createAll, deleteAll]);
+    await Promise.all([createAll, deleteAll]);
   }
 );

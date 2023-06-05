@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.11.3...@cardano-sdk/cardano-services@0.11.4) (2023-06-01)
+
+### Features
+
+* **cardano-services:** add stake pools metrics computation job ([3462595](https://github.com/input-output-hk/cardano-js-sdk/commit/346259540847eb5ac0b41640b37c7c9ecf114535))
+
 ## [0.11.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.11.2...@cardano-sdk/cardano-services@0.11.3) (2023-05-24)
 
 ### Features

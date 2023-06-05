@@ -13,7 +13,7 @@ export const MaxCertificatePointerIdTxIndex = 99_999;
 export const MaxCertificatePointerIdCertificateIndex = 9999;
 
 export const typeormOperator = <PropsIn = {}, PropsOut extends {} = {}>(
-  op: (evt: ProjectionEvent<WithTypeormContext & PropsIn>) => Promise<PropsOut | void>
+  op: (evt: ProjectionEvent<WithTypeormContext & PropsIn>) => Promise<{} extends PropsOut ? void : PropsOut>
 ) =>
   unifiedProjectorOperator<BootstrapExtraProps & WithTypeormContext & PropsIn, PropsOut>((evt) =>
     from(op(evt).then((result) => (typeof result === 'object' ? { ...evt, ...result } : evt)))

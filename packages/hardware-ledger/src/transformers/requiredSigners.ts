@@ -10,18 +10,18 @@ export const toRequiredSigner: Transform<
   Ledger.RequiredSigner,
   LedgerTxTransformerContext
 > = (keyHash, context) => {
-  const knowAddress = context?.knownAddresses.find((address) => {
+  const paymentCredKnownAddress = context?.knownAddresses.find((address) => {
     const paymentCredential = Cardano.Address.fromBech32(address.address)?.asBase()?.getPaymentCredential().hash;
-    const stakingCredential = Cardano.RewardAccount.toHash(address.rewardAccount);
-
-    return (
-      (paymentCredential && paymentCredential.toString() === keyHash) ||
-      (stakingCredential && stakingCredential.toString() === keyHash)
-    );
+    return paymentCredential && paymentCredential.toString() === keyHash;
   });
 
-  const paymentPath = knowAddress ? paymentKeyPathFromGroupedAddress(knowAddress) : null;
-  const stakingPath = knowAddress ? stakeKeyPathFromGroupedAddress(knowAddress) : null;
+  const stakeCredKnownAddress = context?.knownAddresses.find((address) => {
+    const stakingCredential = Cardano.RewardAccount.toHash(address.rewardAccount);
+    return stakingCredential && stakingCredential.toString() === keyHash;
+  });
+
+  const paymentPath = paymentCredKnownAddress ? paymentKeyPathFromGroupedAddress(paymentCredKnownAddress) : null;
+  const stakingPath = stakeCredKnownAddress ? stakeKeyPathFromGroupedAddress(stakeCredKnownAddress) : null;
 
   if (paymentPath) {
     return {

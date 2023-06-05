@@ -62,22 +62,6 @@ export interface EpochModel {
   optimal_pool_count?: number;
 }
 
-export interface EpochReward {
-  hashId: number;
-  epochReward: Cardano.StakePoolEpochRewards;
-}
-
-export interface EpochRewardModel {
-  active_stake: string;
-  epoch_no: number;
-  epoch_length: string;
-  hash_id: number;
-  leader_rewards: string;
-  member_rewards: string;
-  member_roi: number;
-  pledge: string;
-}
-
 export interface OwnerAddressModel {
   address: string;
   hash_id: string;
