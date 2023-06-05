@@ -1,10 +1,10 @@
-import { CONTEXT_WITHOUT_KNOWN_ADDRESSES, CONTEXT_WITH_KNOWN_ADDRESSES, knownAddressKeyPath, txIn } from '../testData';
+import { contextWithKnownAddresses, contextWithoutKnownAddresses, knownAddressKeyPath, txIn } from '../testData';
 import { mapTxIns, toTrezorTxIn } from '../../src';
 
 describe('tx-inputs', () => {
   describe('toTrezorTxIn', () => {
     it('maps a simple tx input from an unknown third party address', async () => {
-      const trezorTxIn = await toTrezorTxIn(txIn, CONTEXT_WITHOUT_KNOWN_ADDRESSES);
+      const trezorTxIn = await toTrezorTxIn(txIn, contextWithoutKnownAddresses);
       expect(trezorTxIn).toEqual({
         path: undefined,
         prev_hash: Buffer.from(txIn.txId).toString('hex'),
@@ -12,7 +12,7 @@ describe('tx-inputs', () => {
       });
     });
     it('maps a simple tx input from a known address', async () => {
-      const trezorTxIn = await toTrezorTxIn(txIn, CONTEXT_WITH_KNOWN_ADDRESSES);
+      const trezorTxIn = await toTrezorTxIn(txIn, contextWithKnownAddresses);
       expect(trezorTxIn).toEqual({
         path: knownAddressKeyPath,
         prev_hash: Buffer.from(txIn.txId).toString('hex'),

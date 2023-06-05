@@ -1,4 +1,5 @@
 /* eslint-disable sonarjs/no-duplicate-string */
+import * as Crypto from '@cardano-sdk/crypto';
 import { AccountKeyDerivationPath, AddressType, GroupedAddress, KeyRole, util } from '../../src';
 import { Cardano } from '@cardano-sdk/core';
 import { txOut } from '../../../tx-construction/test/testData';
@@ -306,6 +307,48 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
       {
         index: 0,
         role: KeyRole.External
+      }
+    ]);
+  });
+
+  it('returns the derivation path of a known payment credential key hash present in the requiredSigners field', async () => {
+    const paymentAddress = Cardano.PaymentAddress(
+      'addr1qxdtr6wjx3kr7jlrvrfzhrh8w44qx9krcxhvu3e79zr7497tpmpxjfyhk3vwg6qjezjmlg5nr5dzm9j6nxyns28vsy8stu5lh6'
+    );
+    const paymentHash = Crypto.Ed25519KeyHashHex('9ab1e9d2346c3f4be360d22b8ee7756a0316c3c1aece473e2887ea97');
+
+    const txBody = {
+      inputs: [{}, {}, {}],
+      requiredExtraSignatures: [paymentHash]
+    } as Cardano.TxBody;
+    const knownAddresses = [
+      createGroupedAddress(paymentAddress, ownRewardAccount, AddressType.External, 100, stakeKeyPath)
+    ];
+
+    const resolveInput = jest.fn().mockReturnValueOnce(null);
+    expect(await util.ownSignatureKeyPaths(txBody, knownAddresses, { resolveInput })).toEqual([
+      {
+        index: 100,
+        role: KeyRole.External
+      }
+    ]);
+  });
+
+  it('returns the derivation path of a known stake credential key hash present in the requiredSigners field', async () => {
+    const rewardAccount = Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
+    const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
+
+    const txBody = {
+      inputs: [{}, {}, {}],
+      requiredExtraSignatures: [stakeKeyHash]
+    } as Cardano.TxBody;
+    const knownAddresses = [createGroupedAddress(address1, rewardAccount, AddressType.External, 0, stakeKeyPath)];
+    const resolveInput = jest.fn().mockReturnValue(null);
+
+    expect(await util.ownSignatureKeyPaths(txBody, knownAddresses, { resolveInput })).toEqual([
+      {
+        index: 0,
+        role: KeyRole.Stake
       }
     ]);
   });

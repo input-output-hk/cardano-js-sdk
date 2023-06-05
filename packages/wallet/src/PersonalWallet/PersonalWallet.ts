@@ -43,6 +43,7 @@ import {
   ChainHistoryProvider,
   EpochInfo,
   EraSummary,
+  HandleProvider,
   ProviderError,
   RewardsProvider,
   StakePoolProvider,
@@ -107,6 +108,7 @@ export interface PersonalWalletDependencies {
   readonly txSubmitProvider: TxSubmitProvider;
   readonly stakePoolProvider: StakePoolProvider;
   readonly assetProvider: AssetProvider;
+  readonly handleProvider?: HandleProvider;
   readonly networkInfoProvider: WalletNetworkInfoProvider;
   readonly utxoProvider: UtxoProvider;
   readonly chainHistoryProvider: ChainHistoryProvider;
@@ -196,6 +198,7 @@ export class PersonalWallet implements ObservableWallet {
   readonly name: string;
   readonly util: WalletUtil;
   readonly rewardsProvider: TrackedRewardsProvider;
+  readonly handleProvider?: HandleProvider;
 
   // eslint-disable-next-line max-statements
   constructor(
@@ -216,6 +219,7 @@ export class PersonalWallet implements ObservableWallet {
       stakePoolProvider,
       keyAgent,
       assetProvider,
+      handleProvider,
       networkInfoProvider,
       utxoProvider,
       chainHistoryProvider,
@@ -237,6 +241,7 @@ export class PersonalWallet implements ObservableWallet {
     this.networkInfoProvider = new TrackedWalletNetworkInfoProvider(networkInfoProvider);
     this.stakePoolProvider = new TrackedStakePoolProvider(stakePoolProvider);
     this.assetProvider = new TrackedAssetProvider(assetProvider);
+    this.handleProvider = handleProvider;
     this.chainHistoryProvider = new TrackedChainHistoryProvider(chainHistoryProvider);
     this.rewardsProvider = new TrackedRewardsProvider(rewardsProvider);
 
@@ -557,6 +562,7 @@ export class PersonalWallet implements ObservableWallet {
    */
   getTxBuilderDependencies(): TxBuilderDependencies {
     return {
+      handleProvider: this.handleProvider,
       inputResolver: this.util,
       inputSelector: this.#inputSelector,
       keyAgent: this.keyAgent,

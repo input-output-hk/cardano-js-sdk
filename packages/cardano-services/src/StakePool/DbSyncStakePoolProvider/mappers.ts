@@ -4,8 +4,6 @@ import {
   BlockfrostPoolMetricsModel,
   Epoch,
   EpochModel,
-  EpochReward,
-  EpochRewardModel,
   HashIdStakePoolMap,
   OwnerAddressModel,
   PoolAPY,
@@ -36,7 +34,7 @@ const getPoolStatus = (
   lastPoolRegistration: PoolRegistration,
   lastEpoch: number,
   lastPoolRetirement?: PoolRetirement
-) => {
+): Cardano.StakePoolStatus => {
   if (lastPoolRetirement === undefined || lastPoolRetirement.retiringEpoch <= lastPoolRegistration.activeEpochNo) {
     if (lastPoolRegistration.activeEpochNo > lastEpoch) return Cardano.StakePoolStatus.Activating;
     return Cardano.StakePoolStatus.Active;
@@ -51,7 +49,6 @@ interface ToCoreStakePoolInput {
   poolRegistrations: PoolRegistration[];
   poolRelays: PoolRelay[];
   poolRetirements: PoolRetirement[];
-  poolRewards: EpochReward[];
   lastEpochNo: Cardano.EpochNo;
   poolMetrics: PoolMetrics[];
   totalCount: number;
@@ -89,7 +86,6 @@ export const toStakePoolResults = (
     poolRegistrations,
     poolRelays,
     poolRetirements,
-    poolRewards,
     lastEpochNo,
     poolMetrics,
     totalCount,
@@ -106,16 +102,12 @@ export const toStakePoolResults = (
           const poolData = poolDatas.find((data) => data.hashId === hashId);
           if (!poolData) return;
 
-          const epochRewards = poolRewards
-            .filter((r) => r.hashId === poolData.hashId)
-            .map((reward) => reward.epochReward);
-
           // Get the cached value if given hash id persist in the in-memory cache
-          if (fromCache[hashId]) return { ...fromCache[hashId], epochRewards } as Cardano.StakePool;
+          if (fromCache[hashId]) return fromCache[hashId];
 
           const apy = poolAPYs.find((pool) => pool.hashId === hashId)?.apy;
-          const registrations = poolRegistrations.filter((r) => r.hashId === poolData.hashId);
-          const retirements = poolRetirements.filter((r) => r.hashId === poolData.hashId);
+          const registration = poolRegistrations.find((r) => r.hashId === poolData.hashId);
+          const retirement = poolRetirements.find((r) => r.hashId === poolData.hashId);
           const poolMetric = (poolMetrics as BlockfrostPoolMetrics[]).find(
             (metric) => metric.hashId === poolData.hashId
           );
@@ -126,7 +118,6 @@ export const toStakePoolResults = (
           }
           const coreStakePool: Cardano.StakePool = {
             cost: poolData.cost,
-            epochRewards,
             hexId: poolData.hexId,
             id: poolData.id,
             margin: poolData.margin,
@@ -138,20 +129,12 @@ export const toStakePoolResults = (
               ? {
                   owners: poolMetric?.owners || [],
                   rewardAccount: poolMetric?.rewardAccount || ('' as Cardano.RewardAccount),
-                  status: poolMetric?.status || Cardano.StakePoolStatus.Retired,
-                  transactions: {
-                    registration: poolMetric?.registration || [],
-                    retirement: poolMetric?.retirement || []
-                  }
+                  status: poolMetric?.status || Cardano.StakePoolStatus.Retired
                 }
               : {
                   owners: poolOwners.filter((o) => o.hashId === poolData.hashId).map((o) => o.address),
                   rewardAccount: poolData.rewardAccount,
-                  status: getPoolStatus(registrations[0], lastEpochNo, retirements[0]),
-                  transactions: {
-                    registration: registrations.map((r) => r.transactionId),
-                    retirement: retirements.map((r) => r.transactionId)
-                  }
+                  status: getPoolStatus(registration!, lastEpochNo, retirement)
                 })
           };
           if (poolData.metadata) coreStakePool.metadata = poolData.metadata;
@@ -241,19 +224,6 @@ export const mapEpoch = ({ no, optimal_pool_count }: EpochModel): Epoch => ({
   optimalPoolCount: optimal_pool_count
 });
 
-export const mapEpochReward = (epochRewardModel: EpochRewardModel): EpochReward => ({
-  epochReward: {
-    activeStake: BigInt(epochRewardModel.active_stake),
-    epoch: Cardano.EpochNo(epochRewardModel.epoch_no),
-    epochLength: Number(epochRewardModel.epoch_length),
-    leaderRewards: BigInt(epochRewardModel.leader_rewards),
-    memberROI: Cardano.Percent(epochRewardModel.member_roi),
-    memberRewards: BigInt(epochRewardModel.member_rewards),
-    pledge: BigInt(epochRewardModel.pledge)
-  },
-  hashId: Number(epochRewardModel.hash_id)
-});
-
 export const mapAddressOwner = (ownerAddressModel: OwnerAddressModel): PoolOwner => ({
   address: ownerAddressModel.address as unknown as Cardano.RewardAccount,
   hashId: Number(ownerAddressModel.hash_id)
@@ -299,7 +269,13 @@ export const mapBlockfrostPoolMetrics = (poolMetricsModel: BlockfrostPoolMetrics
 };
 
 export const mapPoolStats = (poolStats: StakePoolStatsModel): StakePoolStats => ({
-  qty: { active: Number(poolStats.active), retired: Number(poolStats.retired), retiring: Number(poolStats.retiring) }
+  qty: {
+    // There is no need of resolving this for db-sync provider, will be deprecated soon with the optimized postgres one
+    activating: 0,
+    active: Number(poolStats.active),
+    retired: Number(poolStats.retired),
+    retiring: Number(poolStats.retiring)
+  }
 });
 
 export const mapPoolAPY = (poolAPYModel: PoolAPYModel): PoolAPY => ({

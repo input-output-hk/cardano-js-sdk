@@ -22,17 +22,6 @@ export const mockRewardsProvider2 = (delayMs: number) => {
 export const generateStakePools = (qty: number): Cardano.StakePool[] =>
   [...Array.from({ length: qty }).keys()].map(() => ({
     cost: 340_000_000n,
-    epochRewards: [
-      {
-        activeStake: 2_986_376_991n,
-        epoch: Cardano.EpochNo(205),
-        epochLength: 431_850_000,
-        leaderRewards: 1000n,
-        memberROI: Cardano.Percent(0),
-        memberRewards: 2000n,
-        pledge: 986_376_991n
-      }
-    ],
     hexId: Cardano.PoolIdHex('5d99282bbb4840380bb98c075498ed1983aee18a4a0925b9b44d93f1'),
     id: Cardano.PoolId('pool1tkvjs2amfpqrszae3sr4fx8drxp6acv2fgyjtwd5fkflzguqp96'),
     margin: {
@@ -71,10 +60,6 @@ export const generateStakePools = (qty: number): Cardano.StakePool[] =>
     relays: [],
     rewardAccount: Cardano.RewardAccount('stake_test1upx9faamuf54pm7alg4lna5l7ll08pz833rj45tgr9m2jyceasqjt'),
     status: Cardano.StakePoolStatus.Active,
-    transactions: {
-      registration: [Cardano.TransactionId(getRandomTxId())],
-      retirement: []
-    },
     vrf: Cardano.VrfVkHex(getRandomTxId())
   }));
 
@@ -85,6 +70,7 @@ export const stakePoolsPaginated: Paginated<Cardano.StakePool> = {
 
 const stakePoolStatsMock = {
   qty: {
+    activating: 0,
     active: 5,
     retired: 5,
     retiring: 5

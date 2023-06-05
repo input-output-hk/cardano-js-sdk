@@ -2,9 +2,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Cardano, QueryStakePoolsArgs } from '@cardano-sdk/core';
 import { DataMocks } from '../../data-mocks';
+import { DbSyncStakePoolFixtureBuilder, PoolInfo, PoolWith } from '../fixtures/FixtureBuilder';
 import { PAGINATION_PAGE_SIZE_LIMIT_DEFAULT, StakePoolBuilder } from '../../../src';
 import { Pool } from 'pg';
-import { PoolInfo, PoolWith, StakePoolFixtureBuilder } from '../fixtures/FixtureBuilder';
 import { logger } from '@cardano-sdk/util-dev';
 
 describe('StakePoolBuilder', () => {
@@ -14,14 +14,14 @@ describe('StakePoolBuilder', () => {
   const pagination = { limit: PAGINATION_PAGE_SIZE_LIMIT_DEFAULT, startAt: 0 };
   const builder = new StakePoolBuilder(dbConnection, logger);
   const epochLength = 432_000_000;
-  let fixtureBuilder: StakePoolFixtureBuilder;
+  let fixtureBuilder: DbSyncStakePoolFixtureBuilder;
   let poolsInfo: PoolInfo[];
   let hashIds: number[];
   let updateIds: number[];
   let filters: QueryStakePoolsArgs['filters'];
 
   beforeAll(async () => {
-    fixtureBuilder = new StakePoolFixtureBuilder(dbConnection, logger);
+    fixtureBuilder = new DbSyncStakePoolFixtureBuilder(dbConnection, logger);
     poolsInfo = await fixtureBuilder.getPools(3, { with: [PoolWith.Metadata] });
     hashIds = poolsInfo.map((info) => info.hashId);
     updateIds = poolsInfo.map((info) => info.updateId);
@@ -60,14 +60,6 @@ describe('StakePoolBuilder', () => {
       });
       expect(registrations.length).toBeGreaterThan(0);
       expect(registrations[0]).toMatchShapeOf(DataMocks.Pool.registration);
-    });
-  });
-  describe('queryPoolRewards', () => {
-    it('queryPoolRewards', async () => {
-      const epochRewards = await builder.queryPoolRewards(hashIds, epochLength);
-
-      expect(epochRewards.filter(({ epochReward: { epoch } }) => epoch === Cardano.EpochNo(12))).toHaveLength(3);
-      expect(epochRewards[0]).toMatchShapeOf(DataMocks.Pool.epochReward);
     });
   });
   describe('queryPoolRelays', () => {
@@ -291,7 +283,7 @@ describe('StakePoolBuilder', () => {
     it('returns active, retired and retiring pools count', async () => {
       const result = await builder.queryPoolStats();
       expect(result.qty).toBeDefined();
-      expect(result).toMatchShapeOf({ qty: { active: 0, retired: 0, retiring: 0 } });
+      expect(result).toMatchShapeOf({ qty: { activating: 0, active: 0, retired: 0, retiring: 0 } });
     });
   });
   describe('queryPoolAPY', () => {

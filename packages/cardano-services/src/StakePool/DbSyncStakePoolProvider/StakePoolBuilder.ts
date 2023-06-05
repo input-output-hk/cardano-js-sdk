@@ -2,7 +2,6 @@
 import {
   BlockfrostPoolMetricsModel,
   EpochModel,
-  EpochRewardModel,
   OrderByOptions,
   OwnerAddressModel,
   PoolAPY,
@@ -31,7 +30,6 @@ import {
   mapAddressOwner,
   mapBlockfrostPoolMetrics,
   mapEpoch,
-  mapEpochReward,
   mapPoolAPY,
   mapPoolData,
   mapPoolMetrics,
@@ -89,21 +87,11 @@ export class StakePoolBuilder {
     return result.rows.length > 0 ? result.rows.map(mapAddressOwner) : [];
   }
 
-  public async queryPoolRewards(hashesIds: number[], epochLength: number, limit?: number) {
-    this.#logger.debug('About to query pool rewards');
-
-    const result = await this.#db.query<EpochRewardModel>(Queries.findPoolEpochRewards(epochLength, limit), [
-      hashesIds
-    ]);
-
-    return result.rows.map(mapEpochReward);
-  }
-
   public async queryPoolAPY(hashesIds: number[], epochLength: number, options?: QueryPoolsApyArgs): Promise<PoolAPY[]> {
     this.#logger.debug('About to query pools APY');
     const defaultSort: OrderByOptions[] = [{ field: 'apy', order: 'desc' }];
 
-    const sorted = withSort(Queries.findPoolAPY(epochLength, options?.rewardsHistoryLimit), options?.sort, defaultSort);
+    const sorted = withSort(Queries.findPoolAPY(epochLength, options?.apyEpochsBackLimit), options?.sort, defaultSort);
     const { query, args } = withPagination(sorted, [hashesIds], options?.pagination);
     const result = await this.#db.query<PoolAPYModel>(query, args);
 

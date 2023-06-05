@@ -50,7 +50,7 @@ export const knownAddressKeyPath = [
   knownAddress.index
 ];
 
-export const CONTEXT_WITH_KNOWN_ADDRESSES = {
+export const contextWithKnownAddresses = {
   chainId: {
     networkId: Cardano.NetworkId.Testnet,
     networkMagic: 999
@@ -59,7 +59,7 @@ export const CONTEXT_WITH_KNOWN_ADDRESSES = {
   knownAddresses: [knownAddress]
 };
 
-export const CONTEXT_WITHOUT_KNOWN_ADDRESSES = {
+export const contextWithoutKnownAddresses = {
   chainId: {
     networkId: Cardano.NetworkId.Testnet,
     networkMagic: 999

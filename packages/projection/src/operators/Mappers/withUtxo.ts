@@ -1,4 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
+import { FilterByPolicyIds } from './types';
 import { ProjectionOperator } from '../../types';
 import { map } from 'rxjs';
 import { unifiedProjectorOperator } from '../utils';
@@ -42,5 +43,22 @@ export const filterProducedUtxoByAddresses =
       map((evt) => ({
         ...evt,
         utxo: { ...evt.utxo, produced: evt.utxo.produced.filter(([_, { address }]) => addresses.includes(address)) }
+      }))
+    );
+
+export const filterProducedUtxoByAssetPolicyId =
+  <PropsIn extends WithUtxo>({ policyIds }: FilterByPolicyIds): ProjectionOperator<PropsIn> =>
+  (evt$) =>
+    evt$.pipe(
+      map((evt) => ({
+        ...evt,
+        utxo: {
+          ...evt.utxo,
+          produced: evt.utxo.produced.filter(([_, { value }]) =>
+            [...(value.assets?.entries() || [])].some(([assetId]) =>
+              policyIds.includes(Cardano.AssetId.getPolicyId(assetId))
+            )
+          )
+        }
       }))
     );

@@ -1,7 +1,7 @@
 import * as Trezor from 'trezor-connect';
 import { Cardano } from '@cardano-sdk/core';
 import { TrezorTxTransformerContext } from '../types';
-import { util as depricated } from '@cardano-sdk/key-management';
+import { util as deprecatedUtil } from '@cardano-sdk/key-management';
 import { mapTxIns } from './txIn';
 
 /**
@@ -24,7 +24,7 @@ const trezorTxTransformer = async (
  * and adding the core Cardano.TxBody so we can pass it to our
  * override implementations.
  */
-type TxToTrezorProps = depricated.TxToTrezorProps & {
+type TxToTrezorProps = deprecatedUtil.TxToTrezorProps & {
   cardanoTxBody: Cardano.TxBody;
 };
 
@@ -33,8 +33,8 @@ type TxToTrezorProps = depricated.TxToTrezorProps & {
  * it into a trezor.CardanoSignTransaction
  */
 export const txToTrezor = async (props: TxToTrezorProps): Promise<Trezor.CardanoSignTransaction> => ({
-  // First run the depricated trezor transformers
-  ...(await depricated.txToTrezor(props)),
+  // First run the deprecated trezor transformers
+  ...(await deprecatedUtil.txToTrezor(props)),
   // Then override them with our new implementations
   ...(await trezorTxTransformer(props.cardanoTxBody, {
     chainId: props.chainId,
