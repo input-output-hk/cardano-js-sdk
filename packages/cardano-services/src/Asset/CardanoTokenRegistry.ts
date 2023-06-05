@@ -4,6 +4,7 @@ import { Logger } from 'ts-log';
 import { TokenMetadataService } from './types';
 import { contextLogger } from '@cardano-sdk/util';
 import axios, { AxiosInstance } from 'axios';
+import pick from 'lodash/pick';
 
 export const DEFAULT_TOKEN_METADATA_CACHE_TTL = 600;
 export const DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT = 3 * 1000;
@@ -54,7 +55,7 @@ export interface CardanoTokenRegistryConfiguration {
   tokenMetadataCacheTTL?: number;
 
   /**
-   * The Cardano Token Registry public API base URL. Default: https://tokens.cardano.org
+   * The Cardano Token Registry API base URL. Default: https://tokens.cardano.org
    */
   tokenMetadataServerUrl?: string;
 
@@ -85,7 +86,7 @@ export interface CardanoTokenRegistryDependencies {
 }
 
 /**
- * TokenMetadataService implementation using Cardano Token Registry public API
+ * TokenMetadataService implementation using Cardano Token Registry API
  */
 export class CardanoTokenRegistry implements TokenMetadataService {
   /**
@@ -107,16 +108,17 @@ export class CardanoTokenRegistry implements TokenMetadataService {
     const defaultConfig: CardanoTokenRegistryConfigurationWithRequired = {
       tokenMetadataCacheTTL: DEFAULT_TOKEN_METADATA_CACHE_TTL,
       tokenMetadataRequestTimeout: DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT,
-      tokenMetadataServerUrl: DEFAULT_TOKEN_METADATA_SERVER_URL,
-      ...config
+      tokenMetadataServerUrl: DEFAULT_TOKEN_METADATA_SERVER_URL
     };
-
-    this.#cache = cache || new InMemoryCache(defaultConfig.tokenMetadataCacheTTL);
+    const configKeys = Object.keys(defaultConfig);
+    const mergedConfig = { ...defaultConfig, ...config };
+    this.#cache = cache || new InMemoryCache(mergedConfig.tokenMetadataCacheTTL);
     this.#axiosClient = axios.create({
-      baseURL: defaultConfig.tokenMetadataServerUrl,
-      timeout: defaultConfig.tokenMetadataRequestTimeout
+      baseURL: mergedConfig.tokenMetadataServerUrl,
+      timeout: mergedConfig.tokenMetadataRequestTimeout
     });
     this.#logger = contextLogger(logger, 'CardanoTokenRegistry');
+    this.#logger.info('Config:', pick(mergedConfig, configKeys));
   }
 
   shutdown() {
@@ -131,7 +133,7 @@ export class CardanoTokenRegistry implements TokenMetadataService {
     // All metadata was taken from cache
     if (assetIdsToRequest.length === 0) return tokenMetadata;
 
-    this.#logger.info(`Fetching batch of ${assetIdsToRequest.length} assetIds`);
+    this.#logger.debug(`Fetching batch of ${assetIdsToRequest.length} assetIds`);
 
     try {
       const response = await this.#axiosClient.post<{ subjects: TokenMetadataServiceRecord[] }>('metadata/query', {
