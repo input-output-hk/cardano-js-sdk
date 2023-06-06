@@ -26,6 +26,7 @@ import {
   createAssetsTracker,
   createBalanceTracker,
   createDelegationTracker,
+  createHandlesTracker,
   createProviderStatusTracker,
   createSimpleConnectionStatusTracker,
   createTransactionsTracker,
@@ -55,6 +56,7 @@ import {
 import {
   Assets,
   FinalizeTxProps,
+  HandleInfo,
   ObservableWallet,
   SignDataProps,
   SyncStatus,
@@ -77,13 +79,15 @@ import {
   map,
   mergeMap,
   switchMap,
-  tap
+  tap,
+  throwError
 } from 'rxjs';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import {
   GenericTxBuilder,
   InitializeTxProps,
   InitializeTxResult,
+  InvalidConfigurationError,
   TxBuilderDependencies,
   finalizeTx,
   initializeTx
@@ -100,6 +104,10 @@ import isEqual from 'lodash/isEqual';
 export interface PersonalWalletProps {
   readonly name: string;
   readonly polling?: PollingConfig;
+  /**
+   * If set, will track and emit own handles on PersonalWallet.handles$ observable
+   */
+  readonly handlePolicyIds?: Cardano.PolicyId[];
   readonly retryBackoffConfig?: RetryBackoffConfig;
 }
 
@@ -193,6 +201,7 @@ export class PersonalWallet implements ObservableWallet {
   readonly protocolParameters$: TrackerSubject<Cardano.ProtocolParameters>;
   readonly genesisParameters$: TrackerSubject<Cardano.CompactGenesis>;
   readonly assetInfo$: TrackerSubject<Assets>;
+  readonly handles$: Observable<HandleInfo[]>;
   readonly fatalError$: Subject<unknown>;
   readonly syncStatus: SyncStatus;
   readonly name: string;
@@ -212,7 +221,8 @@ export class PersonalWallet implements ObservableWallet {
       retryBackoffConfig = {
         initialInterval: Math.min(pollInterval, 1000),
         maxInterval
-      }
+      },
+      handlePolicyIds
     }: PersonalWalletProps,
     {
       txSubmitProvider,
@@ -451,6 +461,17 @@ export class PersonalWallet implements ObservableWallet {
       }),
       stores.assets
     );
+
+    this.handles$ = handlePolicyIds?.length
+      ? createHandlesTracker({
+          assetInfo$: this.assetInfo$,
+          handlePolicyIds,
+          logger: contextLogger(this.#logger, 'handles$'),
+          tip$: this.tip$,
+          utxo$: this.utxo.total$
+        })
+      : throwError(() => new InvalidConfigurationError('Missing handlePolicyIds option in PersonalWallet'));
+
     this.util = createWalletUtil({
       protocolParameters$: this.protocolParameters$,
       utxo: this.utxo

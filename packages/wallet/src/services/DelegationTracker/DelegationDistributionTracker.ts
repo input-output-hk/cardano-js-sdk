@@ -13,8 +13,8 @@ import {
   switchMap,
   withLatestFrom
 } from 'rxjs';
-import { arrayEquals, delegatedStakeEquals } from '../util';
 import { createUtxoBalanceByAddressTracker } from '../BalanceTracker';
+import { delegatedStakeEquals, sameArrayItems } from '../util';
 import _groupBy from 'lodash/groupBy';
 import _map from 'lodash/map';
 
@@ -103,7 +103,7 @@ export const createDelegationDistributionTracker = ({
       );
       return delegatedStakes.map((pool, idx) => ({ ...pool, percentage: percentages[idx] }));
     }),
-    distinctUntilChanged((a, b) => arrayEquals(a, b, delegatedStakeEquals)),
+    distinctUntilChanged((a, b) => sameArrayItems(a, b, delegatedStakeEquals)),
     map((delegatedStakes) => new Map(delegatedStakes.map((delegation) => [delegation.pool.id, delegation])))
   );
 };

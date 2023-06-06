@@ -1,5 +1,6 @@
 import * as AssetId from '../assetId';
 import { Cardano, UtxoProvider } from '@cardano-sdk/core';
+import { handleAssetId } from './mockData';
 import delay from 'delay';
 
 export const utxo: Cardano.Utxo[] = [
@@ -106,6 +107,7 @@ export const utxo: Cardano.Utxo[] = [
         'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'
       ),
       value: {
+        assets: new Map([[handleAssetId, 1n]]),
         coins: 9_825_963n
       }
     }

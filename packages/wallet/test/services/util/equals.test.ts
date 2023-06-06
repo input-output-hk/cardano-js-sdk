@@ -2,11 +2,11 @@
 import { Cardano, EpochInfo, EraSummary } from '@cardano-sdk/core';
 import {
   DelegatedStake,
-  arrayEquals,
   delegatedStakeEquals,
   epochInfoEquals,
   eraSummariesEquals,
   groupedAddressesEquals,
+  sameArrayItems,
   shallowArrayEquals,
   strictEquals,
   tipEquals,
@@ -26,10 +26,11 @@ describe('equals', () => {
     expect(strictEquals('1', '1')).toBe(true);
   });
 
-  test('arrayEquals', () => {
-    expect(arrayEquals([], [], strictEquals)).toBe(true);
-    expect(arrayEquals(['a'], ['a', 'b'], strictEquals)).toBe(false);
-    expect(arrayEquals(['a', 'b'], ['a', 'b'], strictEquals)).toBe(true);
+  test('sameArrayItems', () => {
+    expect(sameArrayItems([], [], strictEquals)).toBe(true);
+    expect(sameArrayItems(['a'], ['a', 'b'], strictEquals)).toBe(false);
+    expect(sameArrayItems(['a', 'b'], ['a', 'b'], strictEquals)).toBe(true);
+    expect(sameArrayItems(['a', 'b'], ['b', 'a'], strictEquals)).toBe(true);
   });
 
   test('shallowArrayEquals', () => {
