@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.9.5...@cardano-sdk/input-selection@0.10.0) (2023-06-06)
+
+### ⚠ BREAKING CHANGES
+
+* input selectors now return a lis of UTXOs instead of values as change
+
+### Features
+
+* input selectors now return a lis of UTXOs instead of values as change ([954745c](https://github.com/input-output-hk/cardano-js-sdk/commit/954745c03b6a2ebdd16797917e2d85b7cb639789))
+* **input-selection:** added new greedy input selector ([4bd8de0](https://github.com/input-output-hk/cardano-js-sdk/commit/4bd8de074540c7d90e358b4086fd5e762623536c))
+
 ## [0.9.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.9.4...@cardano-sdk/input-selection@0.9.5) (2023-06-05)
 
 **Note:** Version bump only for package @cardano-sdk/input-selection

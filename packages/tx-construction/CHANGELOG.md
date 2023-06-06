@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.5.3...@cardano-sdk/tx-construction@0.6.0) (2023-06-06)
+
+### ⚠ BREAKING CHANGES
+
+* input selectors now return a lis of UTXOs instead of values as change
+
+### Features
+
+* input selectors now return a lis of UTXOs instead of values as change ([954745c](https://github.com/input-output-hk/cardano-js-sdk/commit/954745c03b6a2ebdd16797917e2d85b7cb639789))
+
 ## [0.5.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.5.2...@cardano-sdk/tx-construction@0.5.3) (2023-06-05)
 
 **Note:** Version bump only for package @cardano-sdk/tx-construction
