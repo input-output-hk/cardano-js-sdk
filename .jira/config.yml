@@ -1,0 +1,12 @@
+deployments:
+  environmentMapping:
+    development:
+      - "dev*"
+    testing:
+      - "dev*"
+    staging:
+      - "dev-perf-mainnet"
+    production:
+      - "live-preprod"
+      - "live-preview"
+      - "live-mainnet"

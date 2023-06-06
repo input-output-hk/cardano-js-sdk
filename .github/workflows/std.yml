@@ -104,6 +104,10 @@ jobs:
     permissions:
       id-token: write
       contents: read
+      deployments: write
+    environment:
+      name: dev-preview
+      url: https://backend.dev-preview.eks.lw.iog.io
     if: fromJSON(needs.discover.outputs.hits).deployments.apply != '{}'
     strategy:
       matrix:
