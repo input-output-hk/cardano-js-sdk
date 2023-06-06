@@ -235,7 +235,7 @@ export class PersonalWallet implements ObservableWallet {
       chainHistoryProvider,
       rewardsProvider,
       logger,
-      inputSelector = roundRobinRandomImprove(),
+      inputSelector,
       stores = createInMemoryWalletStores(),
       connectionStatusTracker$ = createSimpleConnectionStatusTracker(),
       addressDiscovery = new HDSequentialDiscovery(chainHistoryProvider, DEFAULT_LOOK_AHEAD_SEARCH)
@@ -244,7 +244,6 @@ export class PersonalWallet implements ObservableWallet {
     this.#logger = contextLogger(logger, name);
 
     this.#addressDiscovery = addressDiscovery;
-    this.#inputSelector = inputSelector;
     this.#trackedTxSubmitProvider = new TrackedTxSubmitProvider(txSubmitProvider);
 
     this.utxoProvider = new TrackedUtxoProvider(utxoProvider);
@@ -307,6 +306,13 @@ export class PersonalWallet implements ObservableWallet {
         )
       )
     );
+
+    this.#inputSelector = inputSelector
+      ? inputSelector
+      : roundRobinRandomImprove({
+          getChangeAddress: () =>
+            this.#firstValueFromSettled(this.addresses$.pipe(map(([{ address: changeAddress }]) => changeAddress)))
+        });
 
     this.#tip$ = this.tip$ = new TipTracker({
       connectionStatus$: connectionStatusTracker$,
@@ -592,8 +598,6 @@ export class PersonalWallet implements ObservableWallet {
       logger: this.#logger,
       outputValidator: this.util,
       txBuilderProviders: {
-        changeAddress: () =>
-          this.#firstValueFromSettled(this.addresses$.pipe(map(([{ address: changeAddress }]) => changeAddress))),
         genesisParameters: () => this.#firstValueFromSettled(this.genesisParameters$),
         protocolParameters: () => this.#firstValueFromSettled(this.protocolParameters$),
         rewardAccounts: () => this.#firstValueFromSettled(this.delegation.rewardAccounts$),

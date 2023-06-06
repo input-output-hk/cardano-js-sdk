@@ -4,7 +4,6 @@ import { SelectionResult } from '@cardano-sdk/input-selection';
 import { usingAutoFree } from '@cardano-sdk/util';
 
 export type CreateTxInternalsProps = {
-  changeAddress: Cardano.PaymentAddress;
   inputSelection: SelectionResult['selection'];
   validityInterval: Cardano.ValidityInterval;
   certificates?: Cardano.Certificate[];
@@ -18,7 +17,6 @@ export type CreateTxInternalsProps = {
 
 export const createTransactionInternals = async ({
   auxiliaryData,
-  changeAddress,
   withdrawals,
   certificates,
   validityInterval,
@@ -30,11 +28,8 @@ export const createTransactionInternals = async ({
 }: CreateTxInternalsProps): Promise<Cardano.TxBodyWithHash> =>
   usingAutoFree((scope) => {
     const outputs = [...inputSelection.outputs];
-    for (const value of inputSelection.change) {
-      outputs.push({
-        address: changeAddress,
-        value
-      });
+    for (const changeOutput of inputSelection.change) {
+      outputs.push(changeOutput);
     }
     const body: Cardano.TxBody = {
       auxiliaryDataHash: auxiliaryData ? Cardano.computeAuxiliaryDataHash(auxiliaryData) : undefined,

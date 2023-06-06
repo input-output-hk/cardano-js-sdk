@@ -57,7 +57,6 @@ describe('GenericTxBuilder', () => {
   beforeEach(async () => {
     output = mocks.utxo[0][1];
     output2 = mocks.utxo[1][1];
-    const address = mocks.utxo[0][1].address;
     const rewardAccount = mocks.rewardAccount;
     const inputResolver: Cardano.InputResolver = {
       resolveInput: async (txIn) =>
@@ -78,7 +77,6 @@ describe('GenericTxBuilder', () => {
     keyAgent.knownAddresses[0].rewardAccount = rewardAccount;
 
     txBuilderProviders = {
-      changeAddress: jest.fn().mockResolvedValue(address),
       genesisParameters: jest.fn().mockResolvedValue(mocks.genesisParameters),
       protocolParameters: jest.fn().mockResolvedValue(mocks.protocolParameters),
       rewardAccounts: jest.fn().mockResolvedValue([
