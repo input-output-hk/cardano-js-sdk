@@ -65,17 +65,13 @@ describe('PersonalWallet/multiAddress', () => {
       );
 
       addressesToBeDiscovered.push(address);
-
-      const txOutput = await txBuilder.buildOutput().address(address.address).coin(3_000_000n).build();
-      txBuilder.addOutput(txOutput);
+      txBuilder.addOutput(txBuilder.buildOutput().address(address.address).coin(3_000_000n).toTxOut());
     }
 
     // Remove duplicates
     addressesToBeDiscovered = [...new Set(addressesToBeDiscovered)];
 
-    const unsignedTx = txBuilder.build();
-
-    const { tx: signedTx } = await unsignedTx.sign();
+    const { tx: signedTx } = await txBuilder.build().sign();
 
     await wallet.submitTx(signedTx);
 
@@ -125,17 +121,17 @@ describe('PersonalWallet/multiAddress', () => {
     txBuilder = newWallet.wallet.createTxBuilder();
 
     const fundingWalletAddresses = await firstValueFromTimed(wallet.addresses$);
-    const returnAdaOutput = await txBuilder
-      .buildOutput()
-      .address(fundingWalletAddresses[0].address)
-      .coin(totalBalance.coins - 1_500_000n) // Let's leave some behind for fees.
-      .build();
 
-    txBuilder.addOutput(returnAdaOutput);
-
-    const returnAdaUnsignedTx = await txBuilder.build();
-
-    const { tx: returnAdaSignedTx } = await returnAdaUnsignedTx.sign();
+    const { tx: returnAdaSignedTx } = await txBuilder
+      .addOutput(
+        txBuilder
+          .buildOutput()
+          .address(fundingWalletAddresses[0].address)
+          .coin(totalBalance.coins - 1_500_000n) // Let's leave some behind for fees.
+          .toTxOut()
+      )
+      .build()
+      .sign();
     await newWallet.wallet.submitTx(returnAdaSignedTx);
 
     // Search chain history to see if the transaction is there.

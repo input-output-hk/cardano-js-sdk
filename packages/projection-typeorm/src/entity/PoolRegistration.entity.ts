@@ -3,6 +3,7 @@ import { BigIntColumnOptions, DeleteCascadeRelationOptions } from './util';
 import { BlockEntity } from './Block.entity';
 import { Cardano } from '@cardano-sdk/core';
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn } from 'typeorm';
+import { Percent } from '@cardano-sdk/util';
 import { PoolMetadataEntity } from './PoolMetadata.entity';
 import { StakePoolEntity } from './StakePool.entity';
 
@@ -26,7 +27,7 @@ export class PoolRegistrationEntity {
   @Column({ type: 'jsonb' })
   margin?: Cardano.Fraction;
   @Column({ type: 'float4' })
-  marginPercent?: Cardano.Percent;
+  marginPercent?: Percent;
   @Column('jsonb')
   relays?: Cardano.Relay[];
   @Column('jsonb')

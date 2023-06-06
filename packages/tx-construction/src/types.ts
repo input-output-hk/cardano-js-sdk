@@ -10,7 +10,6 @@ export type InitializeTxResult = Cardano.TxBodyWithHash & { inputSelection: Sele
 export interface TxBuilderProviders {
   tip: () => Promise<Cardano.Tip>;
   protocolParameters: () => Promise<Cardano.ProtocolParameters>;
-  changeAddress: () => Promise<Cardano.PaymentAddress>;
   genesisParameters: () => Promise<Cardano.CompactGenesis>;
   rewardAccounts: () => Promise<Omit<Cardano.RewardAccountInfo, 'delegatee'>[]>;
   utxoAvailable: () => Promise<Cardano.Utxo[]>;

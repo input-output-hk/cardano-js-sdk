@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.13.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.13.0...@cardano-sdk/e2e@0.13.1) (2023-06-06)
+
+**Note:** Version bump only for package @cardano-sdk/e2e
+
+## [0.13.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.12.1...@cardano-sdk/e2e@0.13.0) (2023-06-05)
+
+### ⚠ BREAKING CHANGES
+
+* **wallet:** Added new properties to DelegationTrackerProps
+* make stake pool metrics an optional property to handle activating pools
+* - rename `rewardsHistoryLimit` stake pool search arg to `apyEpochsBackLimit`
+* - remove `epochRewards` and type `StakePoolEpochRewards`
+- remove `transactions` and type `StakePoolTransactions`
+
+### Features
+
+* **wallet:** delegation.portfolio$ tracker ([7488d14](https://github.com/input-output-hk/cardano-js-sdk/commit/7488d14008f7aa3d91d7513cfffaeb81e160eb18))
+
+### Code Refactoring
+
+* make stake pool metrics an optional property to handle activating pools ([d33bd07](https://github.com/input-output-hk/cardano-js-sdk/commit/d33bd07ddb873ba40498a95caa860820f38ee687))
+* remove unusable fields from StakePool core type ([a7aa17f](https://github.com/input-output-hk/cardano-js-sdk/commit/a7aa17fdd5224437555840d21f56c4660142c351))
+* rename rewardsHistoryLimit ([05ccdc6](https://github.com/input-output-hk/cardano-js-sdk/commit/05ccdc6b448f98ddd09894b633521e79fbb6d9c1))
+
 ## [0.12.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.12.0...@cardano-sdk/e2e@0.12.1) (2023-06-01)
 
 ### Features

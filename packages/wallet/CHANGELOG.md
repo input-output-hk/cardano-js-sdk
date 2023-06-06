@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.15.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.14.0...@cardano-sdk/wallet@0.15.0) (2023-06-06)
+
+### ⚠ BREAKING CHANGES
+
+* **wallet:** rename arrayEquals->sameArrayItems
+* input selectors now return a lis of UTXOs instead of values as change
+
+### Features
+
+* add ObservableWallet.handles$ that emits own handles ([1c3b532](https://github.com/input-output-hk/cardano-js-sdk/commit/1c3b532c9b9f4fe48ba1555749b21faa27648c1a))
+* input selectors now return a lis of UTXOs instead of values as change ([954745c](https://github.com/input-output-hk/cardano-js-sdk/commit/954745c03b6a2ebdd16797917e2d85b7cb639789))
+
+### Code Refactoring
+
+* **wallet:** rename arrayEquals->sameArrayItems ([8a8b8b6](https://github.com/input-output-hk/cardano-js-sdk/commit/8a8b8b6db82ce6dcb0e05fd4da20d995eb9b44fa))
+
+## [0.14.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.13.1...@cardano-sdk/wallet@0.14.0) (2023-06-05)
+
+### ⚠ BREAKING CHANGES
+
+* **wallet:** Added new properties to DelegationTrackerProps
+
+### Features
+
+* **wallet:** delegation.portfolio$ tracker ([7488d14](https://github.com/input-output-hk/cardano-js-sdk/commit/7488d14008f7aa3d91d7513cfffaeb81e160eb18))
+* **wallet:** util to track utxo balance by address ([72f724a](https://github.com/input-output-hk/cardano-js-sdk/commit/72f724ab9c20690e385e2278896d90173e258e9d))
+
 ## [0.13.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.13.0...@cardano-sdk/wallet@0.13.1) (2023-06-01)
 
 ### Features

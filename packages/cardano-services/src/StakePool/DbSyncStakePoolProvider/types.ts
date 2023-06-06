@@ -1,4 +1,5 @@
 import { Cardano, Paginated, QueryStakePoolsArgs } from '@cardano-sdk/core';
+import { Percent } from '@cardano-sdk/util';
 export interface PoolUpdateModel {
   id: string; // pool hash id
   update_id: string;
@@ -130,8 +131,8 @@ export interface PoolMetrics extends CommonPoolInfo {
     livePledge: Cardano.Lovelace;
     activeStake: Cardano.Lovelace;
     liveStake: Cardano.Lovelace;
-    activeStakePercentage: Cardano.Percent;
-    saturation: Cardano.Percent;
+    activeStakePercentage: Percent;
+    saturation: Percent;
     delegators: number;
   };
 }

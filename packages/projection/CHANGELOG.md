@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.6.4...@cardano-sdk/projection@0.6.5) (2023-06-06)
+
+**Note:** Version bump only for package @cardano-sdk/projection
+
+## [0.6.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.6.3...@cardano-sdk/projection@0.6.4) (2023-06-05)
+
+### Features
+
+* add handle projection ([1d3f4ca](https://github.com/input-output-hk/cardano-js-sdk/commit/1d3f4ca3cfa3f1dfb668847de58eba4d0402d48e))
+
 ## [0.6.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.6.2...@cardano-sdk/projection@0.6.3) (2023-06-01)
 
 **Note:** Version bump only for package @cardano-sdk/projection

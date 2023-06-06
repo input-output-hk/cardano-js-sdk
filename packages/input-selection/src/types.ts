@@ -17,7 +17,8 @@ export interface SelectionSkeleton {
    *
    * From the point of view of a wallet, this represents the change to be returned to the wallet.
    */
-  change: Set<Cardano.Value>;
+  change: Array<Cardano.TxOut>;
+
   /**
    * Estimated fee for the transaction.
    * This value is included in 'change', so the actual change returned by the transaction is change-fee.

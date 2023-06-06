@@ -1,7 +1,7 @@
-import { Cardano } from '@cardano-sdk/core';
 import { HEALTH_RESPONSE_BODY } from './mocks/util';
 import { InteractionContext, ServerHealth } from '@cardano-ogmios/client';
 import { Logger } from 'ts-log';
+import { Percent } from '@cardano-sdk/util';
 import { createInteractionContextWithLogger, ogmiosServerHealthToHealthCheckResponse } from '../src';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { createMockOgmiosServer, listenPromise, serverClosePromise } from './mocks/mockOgmiosServer';
@@ -91,7 +91,7 @@ describe('util', () => {
         expect(ogmiosServerHealthToHealthCheckResponse({ ...serverHealth, networkSynchronization })).toEqual({
           localNode: {
             ledgerTip: serverHealth.lastKnownTip,
-            networkSync: Cardano.Percent(networkSynchronization)
+            networkSync: Percent(networkSynchronization)
           },
           ok: true
         });

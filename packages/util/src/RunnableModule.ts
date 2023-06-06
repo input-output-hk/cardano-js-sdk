@@ -64,7 +64,7 @@ export abstract class RunnableModule {
       throw new InvalidModuleState<RunnableModuleState>(this.name, 'start', 'initialized');
     }
     this.state = 'starting';
-    this.logger.info('Starting');
+    this.logger.info('Starting...');
   }
 
   startAfter() {
@@ -80,7 +80,7 @@ export abstract class RunnableModule {
       throw new InvalidModuleState<RunnableModuleState>(this.name, 'shutdown', 'running');
     }
     this.state = 'stopping';
-    this.logger.info('Stopping');
+    this.logger.info('Stopping...');
   }
 
   shutdownAfter() {
@@ -88,6 +88,6 @@ export abstract class RunnableModule {
       throw new InvalidModuleState<RunnableModuleState>(this.name, 'shutdown', 'stopping');
     }
     this.state = 'initialized';
-    this.logger.info('Shutdown complete...');
+    this.logger.info('Shutdown complete');
   }
 }

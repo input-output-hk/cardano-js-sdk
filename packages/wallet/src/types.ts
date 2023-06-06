@@ -1,4 +1,12 @@
-import { Asset, Cardano, EpochInfo, EraSummary, NetworkInfoProvider, TxCBOR } from '@cardano-sdk/core';
+import {
+  Asset,
+  Cardano,
+  EpochInfo,
+  EraSummary,
+  HandleResolution,
+  NetworkInfoProvider,
+  TxCBOR
+} from '@cardano-sdk/core';
 import { BalanceTracker, DelegationTracker, TransactionsTracker, UtxoTracker } from './services';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { GroupedAddress, cip8 } from '@cardano-sdk/key-management';
@@ -37,6 +45,8 @@ export type FinalizeTxProps = Omit<TxContext, 'ownAddresses'> & {
   tx: Cardano.TxBodyWithHash;
 };
 
+export type HandleInfo = HandleResolution & Asset.AssetInfo;
+
 export interface ObservableWallet {
   readonly balance: BalanceTracker;
   readonly delegation: DelegationTracker;
@@ -48,6 +58,7 @@ export interface ObservableWallet {
   readonly currentEpoch$: Observable<EpochInfo>;
   readonly protocolParameters$: Observable<Cardano.ProtocolParameters>;
   readonly addresses$: Observable<GroupedAddress[]>;
+  readonly handles$: Observable<HandleInfo[]>;
   /** All owned and historical assets */
   readonly assetInfo$: Observable<Assets>;
   /**

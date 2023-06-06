@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/cardano-services",
-  "version": "0.11.4",
+  "version": "0.12.1",
   "description": "Cardano GraphQL Services",
   "engines": {
     "node": ">=14.20.1"
@@ -19,20 +19,6 @@
     "access": "public"
   },
   "sideEffects": false,
-  "contributors": [
-    "Rhys Bartels-Waller <rhys.bartelswaller@iohk.io> (https://iohk.io)",
-    "Martynas Kazlauskas <martynas.kazlauskas@iohk.io> (https://iohk.io)",
-    "Daniele Ricci <daniele.ricci@iohk.io> (https://iohk.io)",
-    "Ivaylo Andonov <ivaylo.andonov@iohk.io> (https://iohk.io)",
-    "Mircea Hasegan <mircea.hasegan@iohk.io> (https://iohk.io)",
-    "Angel Castillo Bacigalupi <angel.castillo@iohk.io> (https://iohk.io)",
-    "Seung Eun Song <seungeun.song@iohk.io> (https://iohk.io)",
-    "Dmytro Iakymenko <dmytro.iakymenko@iohk.io> (https://iohk.io)",
-    "Tomislav Horaček <tomislav.horacek@iohk.io> (https://iohk.io)",
-    "Michael Chappell <michael.chappell@iohk.io> (https://iohk.io)",
-    "Leonel Gobbi <leonel.gobbi@globant.com> (https://www.globant.com)",
-    "Juan Cruz Vieiro <juan.vieiro@globant.com> (https://www.globant.com)"
-  ],
   "license": "Apache-2.0",
   "scripts": {
     "build:cjs": "tsc --build src && shx chmod +x ./dist/cjs/cli.js",

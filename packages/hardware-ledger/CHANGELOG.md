@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.2.3...@cardano-sdk/hardware-ledger@0.2.4) (2023-06-06)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-ledger
+
+## [0.2.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.2.2...@cardano-sdk/hardware-ledger@0.2.3) (2023-06-05)
+
+### Bug Fixes
+
+* **hardware-ledger:** stake key hashes in the requiredSigners field are now mapped correctly ([8e857ec](https://github.com/input-output-hk/cardano-js-sdk/commit/8e857ec022c03cd86e6c247d8333b68765fb0f2e))
+
 ## [0.2.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.2.1...@cardano-sdk/hardware-ledger@0.2.2) (2023-06-01)
 
 **Note:** Version bump only for package @cardano-sdk/hardware-ledger

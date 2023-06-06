@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.10.0...@cardano-sdk/util@0.11.0) (2023-06-05)
+
+### ⚠ BREAKING CHANGES
+
+* hoist Cardano.Percent to util package
+
+### Features
+
+* **util:** get percentage from parts ([d8570e1](https://github.com/input-output-hk/cardano-js-sdk/commit/d8570e17babae00cc82e94b3e624804b63b86de6))
+
+### Code Refactoring
+
+* hoist Cardano.Percent to util package ([e4da0e3](https://github.com/input-output-hk/cardano-js-sdk/commit/e4da0e3851a4bdfd503c1f195c5ba1455ea6675b))
+
 ## [0.10.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.9.0...@cardano-sdk/util@0.10.0) (2023-05-22)
 
 ### ⚠ BREAKING CHANGES

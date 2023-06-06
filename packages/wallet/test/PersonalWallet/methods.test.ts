@@ -194,7 +194,7 @@ describe('PersonalWallet methods', () => {
       expect(inputSelection.outputs.size).toBe(props.outputs!.size);
       expect(inputSelection.inputs.size).toBeGreaterThan(0);
       expect(inputSelection.fee).toBeGreaterThan(0n);
-      expect(inputSelection.change.size).toBeGreaterThan(0);
+      expect(inputSelection.change.length).toBeGreaterThan(0);
       expect(getPassphrase).not.toBeCalled();
     });
 
@@ -290,10 +290,9 @@ describe('PersonalWallet methods', () => {
 
     it('txBuilder providers wait for the wallet to settle before resolving', async () => {
       const {
-        txBuilderProviders: { changeAddress, genesisParameters, protocolParameters, rewardAccounts, tip, utxoAvailable }
+        txBuilderProviders: { genesisParameters, protocolParameters, rewardAccounts, tip, utxoAvailable }
       } = wallet.getTxBuilderDependencies();
 
-      await expect(promiseTimeout(changeAddress())).rejects.toEqual('TIMEOUT');
       await expect(promiseTimeout(genesisParameters())).rejects.toEqual('TIMEOUT');
       await expect(promiseTimeout(protocolParameters())).rejects.toEqual('TIMEOUT');
       await expect(promiseTimeout(rewardAccounts())).rejects.toEqual('TIMEOUT');
@@ -302,7 +301,6 @@ describe('PersonalWallet methods', () => {
 
       isSettledMock$.next(true);
 
-      await expect(promiseTimeout(changeAddress())).resolves.toEqual(address);
       await expect(promiseTimeout(genesisParameters())).resolves.toEqual(mocks.genesisParameters);
       await expect(promiseTimeout(protocolParameters())).resolves.toEqual(mocks.protocolParameters);
       await expect(promiseTimeout(rewardAccounts())).resolves.toEqual([
