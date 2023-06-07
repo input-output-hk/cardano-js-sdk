@@ -135,7 +135,7 @@ RABBITMQ_SRV_SERVICE_NAME=some-domain-for-rabbitmq \
 ./dist/cjs/cli.js \
   start-projector \
     --ogmios-url 'ws://localhost:1339' \
-    --postgres-connection-string-db-sync 'postgresql://postgres:doNoUseThisSecret!@localhost/projection' \
+    --postgres-connection-string 'postgresql://postgres:doNoUseThisSecret!@localhost/projection' \
     stake-pool,stake-pool-metadata-job
 ```
 

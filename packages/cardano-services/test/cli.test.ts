@@ -2065,7 +2065,7 @@ describe('CLI', () => {
           startProjector([
             '--ogmios-url',
             'ws://localhost:1234',
-            '--postgres-connection-string-stake-pool',
+            '--postgres-connection-string',
             'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
             ProjectionName.UTXO
           ]);
@@ -2076,7 +2076,7 @@ describe('CLI', () => {
           startProjector([
             '--ogmios-url',
             'ws://localhost:1234',
-            '--postgres-connection-string-stake-pool',
+            '--postgres-connection-string',
             'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
             `${ProjectionName.UTXO},${ProjectionName.StakePool}`
           ]);
@@ -2089,7 +2089,7 @@ describe('CLI', () => {
             `${ProjectionName.UTXO},${ProjectionName.StakePool}`,
             '--ogmios-url',
             'ws://localhost:1234',
-            '--postgres-connection-string-stake-pool',
+            '--postgres-connection-string',
             'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection'
           ]);
           await assertServerAlive();
@@ -2099,7 +2099,7 @@ describe('CLI', () => {
           startProjector([
             '--ogmios-url',
             'ws://localhost:1234',
-            '--postgres-connection-string-stake-pool',
+            '--postgres-connection-string',
             'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
             '--drop-schema',
             'true',
@@ -2111,13 +2111,13 @@ describe('CLI', () => {
 
       it('can be started in SRV discovery mode', async () => {
         startProjector([
-          '--postgres-db-stake-pool',
+          '--postgres-db',
           'dbname',
-          '--postgres-password-stake-pool',
+          '--postgres-password',
           'password',
-          '--postgres-srv-service-name-stake-pool',
+          '--postgres-srv-service-name',
           'postgres.projection.com',
-          '--postgres-user-stake-pool',
+          '--postgres-user',
           'username',
           '--ogmios-srv-service-name',
           'ogmios.projection.com',
@@ -2152,8 +2152,7 @@ describe('CLI', () => {
           startProjector(
             {
               OGMIOS_URL: 'ws://localhost:1234',
-              POSTGRES_CONNECTION_STRING_STAKE_POOL:
-                'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection'
+              POSTGRES_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection'
             },
             [ProjectionName.UTXO]
           );
@@ -2164,8 +2163,7 @@ describe('CLI', () => {
           startProjector(
             {
               OGMIOS_URL: 'ws://localhost:1234',
-              POSTGRES_CONNECTION_STRING_STAKE_POOL:
-                'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection'
+              POSTGRES_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection'
             },
             [`${ProjectionName.UTXO},${ProjectionName.StakePool}`]
           );
@@ -2175,7 +2173,7 @@ describe('CLI', () => {
         test('with multiple projections as --projection-names argument', async () => {
           startProjector({
             OGMIOS_URL: 'ws://localhost:1234',
-            POSTGRES_CONNECTION_STRING_STAKE_POOL: 'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
+            POSTGRES_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
             PROJECTION_NAMES: `${ProjectionName.UTXO},${ProjectionName.StakePool}`
           });
           await assertServerAlive();
@@ -2186,10 +2184,10 @@ describe('CLI', () => {
         startProjector(
           {
             OGMIOS_SRV_SERVICE_NAME: 'ogmios.projection.com',
-            POSTGRES_DB_STAKE_POOL: 'dbname',
-            POSTGRES_PASSWORD_STAKE_POOL: 'password',
-            POSTGRES_SRV_SERVICE_NAME_STAKE_POOL: 'postgres.projection.com',
-            POSTGRES_USER_STAKE_POOL: 'username',
+            POSTGRES_DB: 'dbname',
+            POSTGRES_PASSWORD: 'password',
+            POSTGRES_SRV_SERVICE_NAME: 'postgres.projection.com',
+            POSTGRES_USER: 'username',
             SERVICE_DISCOVERY_TIMEOUT: '1000'
           },
           [ProjectionName.UTXO]

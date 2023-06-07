@@ -14,7 +14,7 @@ import { getConnectionConfig, getOgmiosObservableCardanoNode } from '../services
 export const PROJECTOR_API_URL_DEFAULT = new URL('http://localhost:3002');
 
 export type ProjectorArgs = CommonProgramOptions &
-  PosgresProgramOptions<'StakePool'> &
+  PosgresProgramOptions<''> &
   OgmiosProgramOptions & {
     dropSchema: boolean;
     dryRun: boolean;
@@ -40,7 +40,7 @@ const createProjectionHttpService = async (options: ProjectionMapFactoryOptions)
     ogmiosSrvServiceName: args.ogmiosSrvServiceName,
     ogmiosUrl: args.ogmiosUrl
   });
-  const connectionConfig$ = getConnectionConfig(dnsResolver, 'projector', args);
+  const connectionConfig$ = getConnectionConfig(dnsResolver, 'projector', '', args);
   const buffer = new TypeormStabilityWindowBuffer({ logger });
   const { dropSchema, dryRun, projectionNames, synchronize } = args;
   const projection$ = createTypeormProjection({

@@ -80,14 +80,18 @@ const mergeTlsOptions = (
       }
     : ssl || !!conn.ssl;
 
-export const getConnectionConfig = (
+export const getConnectionConfig = <Suffix extends ConnectionNames>(
   dnsResolver: DnsResolver,
   program: string,
-  options?: PosgresProgramOptions<'StakePool'>
+  suffix: Suffix,
+  options?: PosgresProgramOptions<Suffix>
 ): Observable<PgConnectionConfig> => {
-  const ssl = options?.postgresSslCaFileStakePool ? { ca: loadSecret(options.postgresSslCaFileStakePool) } : undefined;
-  if (options?.postgresConnectionStringStakePool) {
-    const conn = connString.parse(options.postgresConnectionStringStakePool);
+  const postgresConnectionString = getPostgresOption(suffix, 'postgresConnectionString', options);
+  const postgresSslCaFile = getPostgresOption(suffix, 'postgresSslCaFile', options);
+  const ssl = postgresSslCaFile ? { ca: loadSecret(postgresSslCaFile) } : undefined;
+
+  if (postgresConnectionString) {
+    const conn = connString.parse(postgresConnectionString);
     if (!conn.database || !conn.host) {
       throw new InvalidProgramOption('postgresConnectionString');
     }
@@ -101,22 +105,22 @@ export const getConnectionConfig = (
     });
   }
 
-  if (
-    options?.postgresSrvServiceNameStakePool &&
-    options.postgresUserStakePool &&
-    options.postgresDbStakePool &&
-    options.postgresPasswordStakePool
-  ) {
+  const postgresDb = getPostgresOption(suffix, 'postgresDb', options);
+  const postgresPassword = getPostgresOption(suffix, 'postgresPassword', options);
+  const postgresSrvServiceName = getPostgresOption(suffix, 'postgresSrvServiceName', options);
+  const postgresUser = getPostgresOption(suffix, 'postgresUser', options);
+
+  if (postgresSrvServiceName && postgresUser && postgresDb && postgresPassword) {
     return defer(() =>
       from(
-        dnsResolver(options.postgresSrvServiceNameStakePool!).then(
+        dnsResolver(postgresSrvServiceName).then(
           (record): PgConnectionConfig => ({
-            database: options.postgresDbStakePool,
+            database: postgresDb,
             host: record.name,
-            password: options.postgresPasswordStakePool,
+            password: postgresPassword,
             port: record.port,
             ssl,
-            username: options.postgresUserStakePool
+            username: postgresUser
           })
         )
       )

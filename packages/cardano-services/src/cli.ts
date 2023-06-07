@@ -115,7 +115,7 @@ withCommonOptions(
           `List of projections to start: ${Object.values(ProjectionName).toString()}`,
           projectionNameParser
         ),
-      'StakePool'
+      ''
     )
   ),
   { apiUrl: PROJECTOR_API_URL_DEFAULT }
@@ -160,7 +160,7 @@ withCommonOptions(
     runServer('projector', () =>
       loadProjector({
         ...args,
-        postgresConnectionStringStakePool: connectionStringFromArgs(args, 'StakePool'),
+        postgresConnectionString: connectionStringFromArgs(args, ''),
         // Setting the projection names via env variable takes preference over command line argument
         projectionNames: args.projectionNames ? args.projectionNames : projectionNames
       })

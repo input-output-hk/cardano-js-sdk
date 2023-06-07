@@ -77,7 +77,7 @@ describe('PgBossHttpService', () => {
       postgresUserStakePool: process.env.POSTGRES_USER_DB_SYNC!
     };
 
-    connectionConfig$ = getConnectionConfig(dnsResolver, 'test', args);
+    connectionConfig$ = getConnectionConfig(dnsResolver, 'test', 'StakePool', args);
     const dataSource$ = createObservableDataSource({
       connectionConfig$,
       devOptions: { dropSchema: true, synchronize: true },
