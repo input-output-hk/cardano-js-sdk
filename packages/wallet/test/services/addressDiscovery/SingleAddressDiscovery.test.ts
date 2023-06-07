@@ -17,7 +17,7 @@ describe('SingleAddressDiscovery', () => {
     expect(addresses.length).toEqual(1);
     expect(addresses[0]).toEqual({
       accountIndex: 0,
-      address: 'testAddress_0_0',
+      address: 'testAddress_0_0_0',
       index: 0,
       networkId: 0,
       rewardAccount: 'testStakeAddress_0',

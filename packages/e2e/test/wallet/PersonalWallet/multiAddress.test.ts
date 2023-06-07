@@ -39,20 +39,7 @@ describe('PersonalWallet/multiAddress', () => {
 
     let txBuilder = wallet.createTxBuilder();
 
-    let addressesToBeDiscovered = new Array<GroupedAddress>();
-
-    // Let's add the 5 stake keys.
-    for (let i = 0; i < 5; ++i) {
-      addressesToBeDiscovered.push(
-        await multiAddressKeyAgent.deriveAddress(
-          {
-            index: 0,
-            type: AddressType.External
-          },
-          i
-        )
-      );
-    }
+    const addressesToBeDiscovered = new Array<GroupedAddress>();
 
     // Deposit some tADA at some generated addresses from the previously generated mnemonics.
     for (let i = 0; i < PAYMENT_ADDRESSES_TO_GENERATE; ++i) {
@@ -67,9 +54,6 @@ describe('PersonalWallet/multiAddress', () => {
       addressesToBeDiscovered.push(address);
       txBuilder.addOutput(txBuilder.buildOutput().address(address.address).coin(3_000_000n).toTxOut());
     }
-
-    // Remove duplicates
-    addressesToBeDiscovered = [...new Set(addressesToBeDiscovered)];
 
     const { tx: signedTx } = await txBuilder.build().sign();
 

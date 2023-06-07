@@ -83,7 +83,7 @@ export const handleProviderFactory = new ProviderFactory<HandleProvider>();
 addressDiscoveryFactory.register('SingleAddressDiscovery', async () => new SingleAddressDiscovery());
 addressDiscoveryFactory.register(
   'HDSequentialDiscovery',
-  async ({ chainHistoryProvider }) => new HDSequentialDiscovery(chainHistoryProvider, 20, 5)
+  async ({ chainHistoryProvider }) => new HDSequentialDiscovery(chainHistoryProvider, 20)
 );
 
 // bip32Ed25519
