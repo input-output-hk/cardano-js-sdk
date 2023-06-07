@@ -8,7 +8,6 @@ const expectedTrezorTxInWithKnownAddress = {
 };
 
 const expectedTrezorTxInWithoutKnownAddress = {
-  path: undefined,
   prev_hash: txIn.txId,
   prev_index: txIn.index
 };
