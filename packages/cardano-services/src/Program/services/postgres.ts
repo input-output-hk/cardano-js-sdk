@@ -78,7 +78,7 @@ const mergeTlsOptions = (
         ...(conn.ssl as TlsOptions),
         ca: ssl?.ca || (conn.ssl as TlsOptions).ca
       }
-    : (conn.ssl as boolean | undefined);
+    : ssl || !!conn.ssl;
 
 export const getConnectionConfig = (
   dnsResolver: DnsResolver,
