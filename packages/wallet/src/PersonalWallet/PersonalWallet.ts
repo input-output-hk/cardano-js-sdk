@@ -26,6 +26,7 @@ import {
   createAssetsTracker,
   createBalanceTracker,
   createDelegationTracker,
+  createHandlesTracker,
   createProviderStatusTracker,
   createSimpleConnectionStatusTracker,
   createTransactionsTracker,
@@ -55,6 +56,7 @@ import {
 import {
   Assets,
   FinalizeTxProps,
+  HandleInfo,
   ObservableWallet,
   SignDataProps,
   SyncStatus,
@@ -77,13 +79,15 @@ import {
   map,
   mergeMap,
   switchMap,
-  tap
+  tap,
+  throwError
 } from 'rxjs';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import {
   GenericTxBuilder,
   InitializeTxProps,
   InitializeTxResult,
+  InvalidConfigurationError,
   TxBuilderDependencies,
   finalizeTx,
   initializeTx
@@ -100,6 +104,10 @@ import isEqual from 'lodash/isEqual';
 export interface PersonalWalletProps {
   readonly name: string;
   readonly polling?: PollingConfig;
+  /**
+   * If set, will track and emit own handles on PersonalWallet.handles$ observable
+   */
+  readonly handlePolicyIds?: Cardano.PolicyId[];
   readonly retryBackoffConfig?: RetryBackoffConfig;
 }
 
@@ -193,6 +201,7 @@ export class PersonalWallet implements ObservableWallet {
   readonly protocolParameters$: TrackerSubject<Cardano.ProtocolParameters>;
   readonly genesisParameters$: TrackerSubject<Cardano.CompactGenesis>;
   readonly assetInfo$: TrackerSubject<Assets>;
+  readonly handles$: Observable<HandleInfo[]>;
   readonly fatalError$: Subject<unknown>;
   readonly syncStatus: SyncStatus;
   readonly name: string;
@@ -212,7 +221,8 @@ export class PersonalWallet implements ObservableWallet {
       retryBackoffConfig = {
         initialInterval: Math.min(pollInterval, 1000),
         maxInterval
-      }
+      },
+      handlePolicyIds
     }: PersonalWalletProps,
     {
       txSubmitProvider,
@@ -225,7 +235,7 @@ export class PersonalWallet implements ObservableWallet {
       chainHistoryProvider,
       rewardsProvider,
       logger,
-      inputSelector = roundRobinRandomImprove(),
+      inputSelector,
       stores = createInMemoryWalletStores(),
       connectionStatusTracker$ = createSimpleConnectionStatusTracker(),
       addressDiscovery = new HDSequentialDiscovery(chainHistoryProvider, DEFAULT_LOOK_AHEAD_SEARCH)
@@ -234,7 +244,6 @@ export class PersonalWallet implements ObservableWallet {
     this.#logger = contextLogger(logger, name);
 
     this.#addressDiscovery = addressDiscovery;
-    this.#inputSelector = inputSelector;
     this.#trackedTxSubmitProvider = new TrackedTxSubmitProvider(txSubmitProvider);
 
     this.utxoProvider = new TrackedUtxoProvider(utxoProvider);
@@ -297,6 +306,13 @@ export class PersonalWallet implements ObservableWallet {
         )
       )
     );
+
+    this.#inputSelector = inputSelector
+      ? inputSelector
+      : roundRobinRandomImprove({
+          getChangeAddress: () =>
+            this.#firstValueFromSettled(this.addresses$.pipe(map(([{ address: changeAddress }]) => changeAddress)))
+        });
 
     this.#tip$ = this.tip$ = new TipTracker({
       connectionStatus$: connectionStatusTracker$,
@@ -426,6 +442,7 @@ export class PersonalWallet implements ObservableWallet {
     this.delegation = createDelegationTracker({
       epoch$,
       eraSummaries$,
+      knownAddresses$: this.keyAgent.knownAddresses$,
       logger: contextLogger(this.#logger, 'delegation'),
       onFatalError,
       retryBackoffConfig,
@@ -435,7 +452,8 @@ export class PersonalWallet implements ObservableWallet {
       rewardsTracker: this.rewardsProvider,
       stakePoolProvider: this.stakePoolProvider,
       stores,
-      transactionsTracker: this.transactions
+      transactionsTracker: this.transactions,
+      utxoTracker: this.utxo
     });
 
     this.balance = createBalanceTracker(this.protocolParameters$, this.utxo, this.delegation);
@@ -449,6 +467,17 @@ export class PersonalWallet implements ObservableWallet {
       }),
       stores.assets
     );
+
+    this.handles$ = handlePolicyIds?.length
+      ? createHandlesTracker({
+          assetInfo$: this.assetInfo$,
+          handlePolicyIds,
+          logger: contextLogger(this.#logger, 'handles$'),
+          tip$: this.tip$,
+          utxo$: this.utxo.total$
+        })
+      : throwError(() => new InvalidConfigurationError('Missing handlePolicyIds option in PersonalWallet'));
+
     this.util = createWalletUtil({
       protocolParameters$: this.protocolParameters$,
       utxo: this.utxo
@@ -569,8 +598,6 @@ export class PersonalWallet implements ObservableWallet {
       logger: this.#logger,
       outputValidator: this.util,
       txBuilderProviders: {
-        changeAddress: () =>
-          this.#firstValueFromSettled(this.addresses$.pipe(map(([{ address: changeAddress }]) => changeAddress))),
         genesisParameters: () => this.#firstValueFromSettled(this.genesisParameters$),
         protocolParameters: () => this.#firstValueFromSettled(this.protocolParameters$),
         rewardAccounts: () => this.#firstValueFromSettled(this.delegation.rewardAccounts$),

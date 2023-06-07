@@ -2,6 +2,7 @@ import { BalanceTracker, DelegationTracker, TransactionalObservables } from './t
 import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
 
 import { Observable, combineLatest, distinctUntilChanged, map } from 'rxjs';
+import { utxoEquals } from './util';
 
 const mapUtxoValue = map<Cardano.Utxo[], Cardano.Value>((utxo) =>
   coalesceValueQuantities(utxo.map(([_, txOut]) => txOut.value))
@@ -44,5 +45,29 @@ export const createBalanceTracker = (
     available$: utxoTracker.available$.pipe(mapUtxoValue),
     total$: utxoTracker.total$.pipe(mapUtxoValue),
     unspendable$: utxoTracker.unspendable$.pipe(mapUtxoValue)
+  }
+});
+
+/** Returns utxos filtered by the txOut.addresses or all utxos if addresses are undefined or empty array */
+const filterUtxosByAddress = (addresses?: Cardano.PaymentAddress[]) => (utxos$: Observable<Cardano.Utxo[]>) =>
+  utxos$.pipe(map((utxos) => utxos.filter(([, txOut]) => !addresses?.length || addresses.includes(txOut.address))));
+
+/** Creates utxo balance aggregated by txOut.address. If addresses are undefined or an empty array, it creates a single balance from all utxos */
+export const createUtxoBalanceByAddressTracker = (
+  utxoTracker: TransactionalObservables<Cardano.Utxo[]>,
+  addresses?: Cardano.PaymentAddress[]
+): Pick<BalanceTracker, 'utxo'> => ({
+  utxo: {
+    available$: utxoTracker.available$.pipe(
+      filterUtxosByAddress(addresses),
+      distinctUntilChanged(utxoEquals),
+      mapUtxoValue
+    ),
+    total$: utxoTracker.total$.pipe(filterUtxosByAddress(addresses), distinctUntilChanged(utxoEquals), mapUtxoValue),
+    unspendable$: utxoTracker.unspendable$.pipe(
+      filterUtxosByAddress(addresses),
+      distinctUntilChanged(utxoEquals),
+      mapUtxoValue
+    )
   }
 });

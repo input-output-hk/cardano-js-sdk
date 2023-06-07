@@ -1,7 +1,7 @@
 import { Cardano, Paginated } from '@cardano-sdk/core';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
+import { Percent, isNotNil } from '@cardano-sdk/util';
 import { RelayModel, mapRelay } from '../DbSyncStakePoolProvider';
-import { isNotNil } from '@cardano-sdk/util';
 
 export type Margin = {
   numerator: number;
@@ -90,10 +90,10 @@ const defaultMetrics: Cardano.StakePoolMetrics = {
   blocksCreated: 0,
   delegators: 0,
   livePledge: 0n,
-  saturation: Cardano.Percent(0),
+  saturation: Percent(0),
   size: {
-    active: Cardano.Percent(0),
-    live: Cardano.Percent(0)
+    active: Percent(0),
+    live: Percent(0)
   },
   stake: {
     active: 0n,
@@ -105,14 +105,14 @@ const mapMetrics = (pool: PoolModel): Cardano.StakePoolMetrics => {
   if (pool.metrics_live_pledge === null) return defaultMetrics;
 
   return {
-    apy: pool.metrics_apy ? Cardano.Percent(Number.parseFloat(pool.metrics_apy)) : undefined,
+    apy: pool.metrics_apy ? Percent(Number.parseFloat(pool.metrics_apy)) : undefined,
     blocksCreated: pool.metrics_minted_blocks,
     delegators: pool.metrics_live_delegators,
     livePledge: BigInt(pool.metrics_live_pledge),
-    saturation: Cardano.Percent(Number.parseFloat(pool.metrics_live_saturation)),
+    saturation: Percent(Number.parseFloat(pool.metrics_live_saturation)),
     size: {
-      active: Cardano.Percent(Number.parseFloat(pool.metrics_active_size)),
-      live: Cardano.Percent(Number.parseFloat(pool.metrics_live_size))
+      active: Percent(Number.parseFloat(pool.metrics_active_size)),
+      live: Percent(Number.parseFloat(pool.metrics_live_size))
     },
     stake: {
       active: BigInt(pool.metrics_active_stake),

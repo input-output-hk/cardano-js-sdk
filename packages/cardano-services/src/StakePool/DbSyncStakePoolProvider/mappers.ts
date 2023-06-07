@@ -27,7 +27,7 @@ import {
 } from './types';
 import { Cardano, StakePoolStats } from '@cardano-sdk/core';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
-import { bufferToHexString, isNotNil } from '@cardano-sdk/util';
+import { Percent, bufferToHexString, isNotNil } from '@cardano-sdk/util';
 import Fraction from 'fraction.js';
 
 const getPoolStatus = (
@@ -65,7 +65,7 @@ export const calcNodeMetricsValues = (metrics: PoolMetrics['metrics'], apy?: num
   const isZeroStake = liveStake === 0n;
   const size: Cardano.StakePoolMetricsSize = {
     active: activeStakePercentage,
-    live: Cardano.Percent(!isZeroStake ? 1 - activeStakePercentage : 0)
+    live: Percent(!isZeroStake ? 1 - activeStakePercentage : 0)
   };
   const stake: Cardano.StakePoolMetricsStake = {
     active: activeStake,
@@ -245,12 +245,12 @@ export const mapPoolMetrics = (poolMetricsModel: PoolMetricsModel): PoolMetrics 
   hashId: Number(poolMetricsModel.pool_hash_id),
   metrics: {
     activeStake: BigInt(poolMetricsModel.active_stake),
-    activeStakePercentage: Cardano.Percent(Number(poolMetricsModel.active_stake_percentage)),
+    activeStakePercentage: Percent(Number(poolMetricsModel.active_stake_percentage)),
     blocksCreated: poolMetricsModel.blocks_created,
     delegators: poolMetricsModel.delegators,
     livePledge: BigInt(poolMetricsModel.live_pledge),
     liveStake: BigInt(poolMetricsModel.live_stake),
-    saturation: Cardano.Percent(Number.parseFloat(poolMetricsModel.saturation))
+    saturation: Percent(Number.parseFloat(poolMetricsModel.saturation))
   }
 });
 

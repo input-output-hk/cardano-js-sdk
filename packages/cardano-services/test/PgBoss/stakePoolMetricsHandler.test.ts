@@ -1,6 +1,7 @@
 import { Cardano, StakePoolProvider } from '@cardano-sdk/core';
 import { CurrentPoolMetricsEntity } from '@cardano-sdk/projection-typeorm';
 import { DataSource } from 'typeorm';
+import { Percent } from '@cardano-sdk/util';
 import { initHandlerTest, poolId } from './util';
 import { logger } from '@cardano-sdk/util-dev';
 import { savePoolMetrics } from '../../src/PgBoss';
@@ -30,8 +31,8 @@ describe('stakePoolMetricsHandler', () => {
       blocksCreated: 23,
       delegators: 15,
       livePledge: 23_000_000n,
-      saturation: Cardano.Percent(0.002),
-      size: { active: Cardano.Percent(0.0005), live: Cardano.Percent(0.0005) },
+      saturation: Percent(0.002),
+      size: { active: Percent(0.0005), live: Percent(0.0005) },
       stake: { active: 42_000_000n, live: 42_000_000n }
     };
 
