@@ -1,4 +1,4 @@
-import { Cardano, Handle, HandleProvider, HandleResolution } from '@cardano-sdk/core';
+import { Cardano, Handle, HandleProvider, HandleResolution, TxCBOR } from '@cardano-sdk/core';
 import { CustomError } from 'ts-custom-error';
 
 import { InputSelectionError, InputSelector, SelectionSkeleton } from '@cardano-sdk/input-selection';
@@ -124,8 +124,9 @@ export type TxInspection = Cardano.TxBodyWithHash &
   };
 
 export interface SignedTx {
+  cbor: TxCBOR;
   tx: Cardano.Tx;
-  ctx: {
+  context: {
     handles: HandleResolution[];
   };
 }

@@ -140,11 +140,6 @@ export class TxOutputBuilder implements OutputBuilder {
   async build(): Promise<OutputBuilderTxOut> {
     const txOut = this.toTxOut();
 
-    const outputValidation = toOutputValidationError(txOut, await this.#outputValidator.validateOutput(txOut));
-    if (outputValidation) {
-      throw outputValidation;
-    }
-
     if (this.#partialOutput.handle && this.#handleProvider) {
       const resolution = await this.#handleProvider.resolveHandles({ handles: [this.#partialOutput.handle] });
 
@@ -156,6 +151,11 @@ export class TxOutputBuilder implements OutputBuilder {
         // an address for the transaction.
         throw new HandleNotFoundError(this.#partialOutput);
       }
+    }
+
+    const outputValidation = toOutputValidationError(txOut, await this.#outputValidator.validateOutput(txOut));
+    if (outputValidation) {
+      throw outputValidation;
     }
 
     return txOut;

@@ -4,7 +4,7 @@ import {
   TransactionSigner,
   util as keyManagementUtil
 } from '@cardano-sdk/key-management';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, TxCBOR } from '@cardano-sdk/core';
 import { FinalizeTxDependencies, SignedTx, TxContext } from './types';
 
 const getSignatures = async (
@@ -41,19 +41,22 @@ export const finalizeTx = async (
       )
     : await getSignatures(keyAgent, tx, witness?.extraSigners, signingOptions);
 
+  const transaction = {
+    auxiliaryData,
+    body: tx.body,
+    id: tx.hash,
+    isValid,
+    witness: {
+      ...witness,
+      signatures: new Map([...signatures.entries(), ...(witness?.signatures?.entries() || [])])
+    }
+  };
+
   return {
-    ctx: {
+    cbor: TxCBOR.serialize(transaction),
+    context: {
       handles: handles ?? []
     },
-    tx: {
-      auxiliaryData,
-      body: tx.body,
-      id: tx.hash,
-      isValid,
-      witness: {
-        ...witness,
-        signatures: new Map([...signatures.entries(), ...(witness?.signatures?.entries() || [])])
-      }
-    }
+    tx: transaction
   };
 };

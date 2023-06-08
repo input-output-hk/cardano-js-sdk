@@ -227,8 +227,8 @@ describe('GenericTxBuilder', () => {
     });
 
     it('can set extraSigners for signing', async () => {
-      const { tx } = await txBuilder.addOutput(mocks.utxo[0][1]).extraSigners(signers).build().sign();
-      expect(tx.witness.signatures.get(pubKey)).toEqual(signature);
+      const { tx: signedTx } = await txBuilder.addOutput(mocks.utxo[0][1]).extraSigners(signers).build().sign();
+      expect(signedTx.witness.signatures.get(pubKey)).toEqual(signature);
     });
   });
 
@@ -583,8 +583,8 @@ describe('GenericTxBuilder', () => {
       .build();
     const { handles } = await tx.inspect();
     expect(handles).toEqual([resolvedHandle]);
-    const { ctx } = await tx.sign();
-    expect(ctx.handles).toEqual([resolvedHandle]);
+    const { context } = await tx.sign();
+    expect(context.handles).toEqual([resolvedHandle]);
   });
 
   it('can build transactions that are not modified by subsequent builder changes', async () => {
