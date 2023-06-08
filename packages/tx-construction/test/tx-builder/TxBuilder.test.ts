@@ -33,14 +33,14 @@ function assertObjectRefsAreDifferent(obj1: unknown, obj2: unknown): void {
 
 const resolvedHandle = {
   backgroundImage: Asset.Uri('ipfs://alice'),
-  defaultInWallet: 'alice',
   handle: 'alice',
-  hasDatum: false,
   image: Asset.Uri('ipfs://image'),
   policyId: Cardano.PolicyId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a7'),
   profilePic: Asset.Uri('ipfs://pix'),
   resolvedAddresses: {
-    cardano: Cardano.PaymentAddress('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg')
+    cardano: Cardano.PaymentAddress('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg'),
+    defaultInWallet: 'alice',
+    hasDatum: false
   },
   resolvedAt: {
     hash: Cardano.BlockId('7a48b034645f51743550bbaf81f8a14771e58856e031eb63844738ca8ad72298'),
