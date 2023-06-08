@@ -46,6 +46,15 @@ export class TypeormStakePoolFixtureBuilder {
     ]);
     const resultsQty = result.rows.length;
     if (result.rows.length === 0) {
+      this.#logger.fatal({ desiredQty, statuses, withMetadata });
+      this.#logger.fatal('stake_pool dump');
+      this.#logger.fatal((await this.#db.query('SELECT * FROM stake_pool')).rows);
+      this.#logger.fatal('pool_registration dump');
+      this.#logger.fatal((await this.#db.query('SELECT * FROM pool_registration')).rows);
+      this.#logger.fatal('pool_metadata dump');
+      this.#logger.fatal((await this.#db.query('SELECT * FROM pool_metadata')).rows);
+      this.#logger.fatal('current_pool_metrics dump');
+      this.#logger.fatal((await this.#db.query('SELECT * FROM current_pool_metrics')).rows);
       throw new Error('No pools found');
     } else if (resultsQty < desiredQty) {
       this.#logger.warn(`${desiredQty} pools desired, only ${resultsQty} results found`);
