@@ -1,6 +1,7 @@
 import { Cardano, Point, Provider } from '../..';
 
 export type Handle = string;
+export type Uri = `ipfs://${string}`; // IPFS hash
 
 /**
  * @param policyId a hex encoded policyID
@@ -17,6 +18,12 @@ export interface HandleResolution {
     cardano: Cardano.PaymentAddress;
   };
   resolvedAt: Point;
+  createdAt?: Point;
+  defaultInWallet?: Handle;
+  backgroundImage?: Uri;
+  profilePic?: Uri;
+  image?: Uri;
+  updatedAt?: Point;
 }
 
 export interface ResolveHandlesArgs {
