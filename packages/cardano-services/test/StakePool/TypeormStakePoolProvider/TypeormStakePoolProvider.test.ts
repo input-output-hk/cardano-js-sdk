@@ -9,7 +9,6 @@ import { Observable } from 'rxjs';
 import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
 import { Pool } from 'pg';
 import { PoolInfo, TypeormStakePoolFixtureBuilder } from './fitxures/TypeormFixtureBuilder';
-import { PosgresProgramOptions } from '../../../src/Program/options/postgres';
 import { StakePoolHttpService } from '../../../src/StakePool/StakePoolHttpService';
 import { TypeormStakePoolProvider, createDnsResolver, getConnectionConfig, getEntities } from '../../../src';
 import { getPort } from 'get-port-please';
@@ -90,9 +89,9 @@ describe('TypeormStakePoolProvider', () => {
     baseUrl = `http://localhost:${port}/stake-pool`;
     config = { listen: { port } };
     clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
-    connectionConfig$ = getConnectionConfig(dnsResolver, 'projector', {
+    connectionConfig$ = getConnectionConfig(dnsResolver, 'projector', 'StakePool', {
       postgresConnectionStringStakePool: process.env.POSTGRES_CONNECTION_STRING_STAKE_POOL!
-    } as PosgresProgramOptions<'StakePool'>);
+    });
     fixtureBuilder = new TypeormStakePoolFixtureBuilder(db, logger);
     poolsInfo = await fixtureBuilder.getPools(1000, ['active', 'activating', 'retired', 'retiring']);
     poolsInfoWithMeta = poolsInfo.filter((pool) => isNotNil(pool.metadataUrl));

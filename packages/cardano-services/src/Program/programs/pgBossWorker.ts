@@ -56,7 +56,7 @@ export const loadPgBossWorker = async (args: PgBossWorkerArgs, deps: LoadPgBossW
       { factor: args.serviceDiscoveryBackoffFactor, maxRetryTime: args.serviceDiscoveryTimeout },
       logger
     );
-  const connectionConfig$ = getConnectionConfig(dnsResolver, pgBossWorker, args);
+  const connectionConfig$ = getConnectionConfig(dnsResolver, pgBossWorker, 'StakePool', args);
   const db = await getPool(dnsResolver, logger, args);
 
   if (!db) throw new MissingProgramOption(pgBossWorker, PostgresOptionDescriptions.ConnectionString);

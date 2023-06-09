@@ -41,6 +41,7 @@ import {
   loadProviderServer,
   stringOptionToBoolean
 } from './Program';
+import { Cardano } from '@cardano-sdk/core';
 import { Command, Option } from 'commander';
 import { DB_CACHE_TTL_DEFAULT } from './InMemoryCache';
 import {
@@ -74,6 +75,7 @@ const packageJsonPath = fs.existsSync(copiedPackageJsonPath)
   : path.join(__dirname, '../package.json');
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 const projectionNameParser = (names: string) => names.split(',') as ProjectionName[];
+const handlePolicyIdsParser = (policyIds: string) => policyIds.split(',').map(Cardano.PolicyId);
 
 process.on('unhandledRejection', (reason) => {
   // To be handled by 'onDeath'
@@ -115,7 +117,7 @@ withCommonOptions(
           `List of projections to start: ${Object.values(ProjectionName).toString()}`,
           projectionNameParser
         ),
-      'StakePool'
+      ''
     )
   ),
   { apiUrl: PROJECTOR_API_URL_DEFAULT }
@@ -156,11 +158,16 @@ withCommonOptions(
         stringOptionToBoolean(synchronize, Programs.Projector, ProjectorOptionDescriptions.Synchronize)
       )
   )
+  .addOption(
+    new Option('--handle-policy-ids <handlePolicyIds>', ProjectorOptionDescriptions.HandlePolicyIds)
+      .env('HANDLE_POLICY_IDS')
+      .argParser(handlePolicyIdsParser)
+  )
   .action(async (projectionNames: ProjectionName[], args: { apiUrl: URL } & ProjectorArgs) =>
     runServer('projector', () =>
       loadProjector({
         ...args,
-        postgresConnectionStringStakePool: connectionStringFromArgs(args, 'StakePool'),
+        postgresConnectionString: connectionStringFromArgs(args, ''),
         // Setting the projection names via env variable takes preference over command line argument
         projectionNames: args.projectionNames ? args.projectionNames : projectionNames
       })

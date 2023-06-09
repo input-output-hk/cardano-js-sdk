@@ -12,7 +12,12 @@ import {
   typeormTransactionCommit,
   withTypeormTransaction
 } from '@cardano-sdk/projection-typeorm';
-import { PreparedProjection, ProjectionName, prepareTypeormProjection } from './prepareTypeormProjection';
+import {
+  PreparedProjection,
+  ProjectionName,
+  ProjectionOptions,
+  prepareTypeormProjection
+} from './prepareTypeormProjection';
 import { ProjectionEvent, logProjectionProgress, requestNext } from '@cardano-sdk/projection';
 import { migrations } from './migrations';
 import { shareRetryBackoff } from '@cardano-sdk/util-rxjs';
@@ -24,6 +29,7 @@ export interface CreateTypeormProjectionProps {
   connectionConfig$: Observable<PgConnectionConfig>;
   devOptions?: TypeormDevOptions;
   logger: Logger;
+  projectionOptions?: ProjectionOptions;
 }
 
 const applyMappers =
@@ -43,7 +49,7 @@ export const createObservableDataSource = ({
   entities,
   extensions,
   migrationsRun
-}: Omit<CreateTypeormProjectionProps, 'projections' | 'projectionSource$'> &
+}: Omit<CreateTypeormProjectionProps, 'projections' | 'projectionSource$' | 'projectionOptions'> &
   Pick<PreparedProjection, 'entities' | 'extensions'> & { migrationsRun: boolean }) =>
   connectionConfig$.pipe(
     switchMap((connectionConfig) =>
@@ -86,9 +92,14 @@ export const createTypeormProjection = ({
   connectionConfig$,
   logger,
   devOptions,
-  buffer
+  buffer,
+  projectionOptions
 }: CreateTypeormProjectionProps) => {
-  const { mappers, entities, stores, extensions } = prepareTypeormProjection({ buffer, projections });
+  const { mappers, entities, stores, extensions } = prepareTypeormProjection({
+    buffer,
+    options: projectionOptions,
+    projections
+  });
   const dataSource$ = createObservableDataSource({
     buffer,
     connectionConfig$,

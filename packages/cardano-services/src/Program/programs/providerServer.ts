@@ -117,7 +117,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       'poolRetirement',
       'stakePool'
     ]);
-    const connectionConfig$ = getConnectionConfig(dnsResolver, serverName, args);
+    const connectionConfig$ = getConnectionConfig(dnsResolver, serverName, 'StakePool', args);
     return new TypeormStakePoolProvider(
       { paginationPageSizeLimit: args.paginationPageSizeLimit! },
       { connectionConfig$, entities, logger }

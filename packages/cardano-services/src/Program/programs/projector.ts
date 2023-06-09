@@ -1,26 +1,29 @@
 import { Bootstrap } from '@cardano-sdk/projection';
+import { Cardano } from '@cardano-sdk/core';
 import { CommonProgramOptions, OgmiosProgramOptions, PosgresProgramOptions } from '../options';
 import { DnsResolver, createDnsResolver } from '../utils';
 import { HttpServer, HttpServerConfig } from '../../Http';
 import { Logger } from 'ts-log';
+import { MissingProgramOption, UnknownServiceName } from '../errors';
 import { ProjectionHttpService, ProjectionName, createTypeormProjection, storeOperators } from '../../Projection';
+import { ProjectorOptionDescriptions } from './types';
 import { SrvRecord } from 'dns';
 import { TypeormStabilityWindowBuffer, createStorePoolMetricsUpdateJob } from '@cardano-sdk/projection-typeorm';
 import { URL } from 'url';
-import { UnknownServiceName } from '../errors';
 import { createLogger } from 'bunyan';
 import { getConnectionConfig, getOgmiosObservableCardanoNode } from '../services';
 
 export const PROJECTOR_API_URL_DEFAULT = new URL('http://localhost:3002');
 
 export type ProjectorArgs = CommonProgramOptions &
-  PosgresProgramOptions<'StakePool'> &
+  PosgresProgramOptions<''> &
   OgmiosProgramOptions & {
     dropSchema: boolean;
     dryRun: boolean;
     poolsMetricsInterval: number;
     projectionNames: ProjectionName[];
     synchronize: boolean;
+    handlePolicyIds?: Cardano.PolicyId[];
   };
 export interface LoadProjectorDependencies {
   dnsResolver?: (serviceName: string) => Promise<SrvRecord>;
@@ -40,14 +43,17 @@ const createProjectionHttpService = async (options: ProjectionMapFactoryOptions)
     ogmiosSrvServiceName: args.ogmiosSrvServiceName,
     ogmiosUrl: args.ogmiosUrl
   });
-  const connectionConfig$ = getConnectionConfig(dnsResolver, 'projector', args);
+  const connectionConfig$ = getConnectionConfig(dnsResolver, 'projector', '', args);
   const buffer = new TypeormStabilityWindowBuffer({ logger });
-  const { dropSchema, dryRun, projectionNames, synchronize } = args;
+  const { dropSchema, dryRun, projectionNames, synchronize, handlePolicyIds } = args;
   const projection$ = createTypeormProjection({
     buffer,
     connectionConfig$,
     devOptions: { dropSchema, synchronize },
     logger,
+    projectionOptions: {
+      handlePolicyIds
+    },
     projectionSource$: Bootstrap.fromCardanoNode({
       buffer,
       cardanoNode,
@@ -63,6 +69,9 @@ export const loadProjector = async (args: ProjectorArgs, deps: LoadProjectorDepe
   for (const projectionName of args.projectionNames) {
     if (!supportedProjections.includes(projectionName)) {
       throw new UnknownServiceName(projectionName, Object.values(ProjectionName));
+    }
+    if (projectionName === ProjectionName.Handle && !args.handlePolicyIds) {
+      throw new MissingProgramOption(ProjectionName.Handle, ProjectorOptionDescriptions.HandlePolicyIds);
     }
   }
   const logger =

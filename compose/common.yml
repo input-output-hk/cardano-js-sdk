@@ -14,6 +14,14 @@ x-logging: &logging
       max-size: '400k'
       max-file: '20'
 
+x-projector: &projector
+  build:
+    context: ../../
+    target: projector
+  depends_on:
+    cardano-node-ogmios:
+      condition: service_healthy
+
 x-provider-server: &provider-server
   build:
     args:
@@ -23,16 +31,6 @@ x-provider-server: &provider-server
   depends_on:
     cardano-db-sync:
       condition: service_healthy
-  environment:
-    API_URL: http://0.0.0.0:3000
-    DB_CACHE_TTL: ${DB_CACHE_TTL:-120}
-    DISABLE_DB_CACHE: ${DISABLE_DB_CACHE:-false}
-    DISABLE_STAKE_POOL_METRIC_APY: ${DISABLE_STAKE_POOL_METRIC_APY:-false}
-    ENABLE_METRICS: ${ENABLE_METRICS:-false}
-    EPOCH_POLL_INTERVAL: ${EPOCH_POLL_INTERVAL:-500}
-    SERVICE_NAMES: ${SERVICE_NAMES:-asset,chain-history,network-info,rewards,stake-pool,tx-submit,utxo}
-    USE_BLOCKFROST: ${USE_BLOCKFROST:-false}
-    USE_QUEUE: ${USE_QUEUE:-false}
 
 x-with-postgres: &with-postgres
   depends_on:
@@ -43,7 +41,18 @@ x-with-postgres: &with-postgres
     - postgres_user
     - postgres_db
     - postgres_db_db_sync
+    - postgres_db_handle
     - postgres_db_stake_pool
+
+x-projector-environment: &projector-environment
+  API_URL: http://0.0.0.0:3000
+  DROP_SCHEMA: ${DROP_PROJECTOR_SCHEMA:-false}
+  POSTGRES_HOST: postgres
+  POSTGRES_POOL_MAX: ${POSTGRES_POOL_MAX:-10}
+  POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+  POSTGRES_PORT: 5432
+  POSTGRES_USER_FILE: /run/secrets/postgres_user
+  SYNCHRONIZE: ${SYNCHRONIZE:-true}
 
 x-provider-server-environment: &provider-server-environment
   API_URL: http://0.0.0.0:3000
@@ -121,7 +130,7 @@ services:
       context: ../../
       target: pg-boss-worker
     depends_on:
-      projector:
+      stake-pool-projector:
         condition: service_healthy
     environment:
       <<: *sdk-environment
@@ -156,28 +165,42 @@ services:
       - postgres_user
     shm_size: '2gb'
 
-  projector:
+  handle-projector:
     <<:
       - *from-sdk
       - *logging
+      - *projector
       - *with-postgres
-    build:
-      context: ../../
-      target: projector
-    depends_on:
-      cardano-node-ogmios:
-        condition: service_healthy
     environment:
-      <<: *sdk-environment
-      API_URL: http://0.0.0.0:3002
-      DROP_SCHEMA: ${DROP_PROJECTOR_SCHEMA:-false}
-      PROJECTION_NAMES: ${PROJECTION_NAMES:-stake-pool,stake-pool-metadata-job,stake-pool-metrics-job,utxo}
-      SYNCHRONIZE: ${SYNCHRONIZE:-true}
+      <<:
+        - *projector-environment
+        - *sdk-environment
+      POSTGRES_DB_FILE: /run/secrets/postgres_db_handle
+      PROJECTION_NAMES: handle
+      HANDLE_POLICY_IDS: f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a
     healthcheck:
       test:
-        ['CMD-SHELL', 'test `curl -fs http://localhost:3002/health | jq -r ".services[0].projectedTip.blockNo"` -gt 1']
+        ['CMD-SHELL', 'test `curl -fs http://localhost:3000/health | jq -r ".services[0].projectedTip.blockNo"` -gt 1']
     ports:
-      - ${PROJECTOR_PORT:-4002}:3002
+      - ${HANDLE_PROJECTOR_PORT:-4004}:3000
+
+  stake-pool-projector:
+    <<:
+      - *from-sdk
+      - *logging
+      - *projector
+      - *with-postgres
+    environment:
+      <<:
+        - *projector-environment
+        - *sdk-environment
+      POSTGRES_DB_FILE: /run/secrets/postgres_db_stake_pool
+      PROJECTION_NAMES: stake-pool,stake-pool-metadata-job,stake-pool-metrics-job
+    healthcheck:
+      test:
+        ['CMD-SHELL', 'test `curl -fs http://localhost:3000/health | jq -r ".services[0].projectedTip.blockNo"` -gt 1']
+    ports:
+      - ${STAKE_POOL_PROJECTOR_PORT:-4002}:3000
 
   provider-server:
     <<:
@@ -254,6 +277,8 @@ secrets:
     file: ../../compose/placeholder-secrets/postgres_db_db_sync
   postgres_db_db_sync:
     file: ../../compose/placeholder-secrets/postgres_db_db_sync
+  postgres_db_handle:
+    file: ../../compose/placeholder-secrets/postgres_db_handle
   postgres_db_stake_pool:
     file: ../../compose/placeholder-secrets/postgres_db_stake_pool
   postgres_password:

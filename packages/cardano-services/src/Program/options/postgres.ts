@@ -32,7 +32,7 @@ export interface BasePosgresProgramOptions {
   postgresSslCaFile?: string;
 }
 
-export type ConnectionNames = 'DbSync' | 'StakePool';
+export type ConnectionNames = 'DbSync' | 'StakePool' | '';
 
 export type PosgresProgramOptions<
   Suffix extends ConnectionNames,
@@ -46,9 +46,9 @@ export const getPostgresOption = <Suffix extends ConnectionNames, Options extend
 ) => args?.[`${option}${suffix}`] as BasePosgresProgramOptions[typeof option];
 
 export const withPostgresOptions = (command: Command, suffix: ConnectionNames) => {
-  const cliSuffix = suffix.replace(/[A-Z]/g, (_) => `-${_.toLowerCase()}`);
-  const dscSuffix = suffix.replace(/[A-Z]/g, (_) => ` ${_.toLowerCase()}`);
-  const envSuffix = suffix.replace(/[A-Z]/g, (_) => `_${_}`).replace(/[a-z]/g, (_) => _.toUpperCase());
+  const cliSuffix = suffix ? suffix.replace(/[A-Z]/g, (_) => `-${_.toLowerCase()}`) : '';
+  const dscSuffix = suffix ? suffix.replace(/[A-Z]/g, (_) => ` ${_.toLowerCase()}`) : '';
+  const envSuffix = suffix ? suffix.replace(/[A-Z]/g, (_) => `_${_}`).replace(/[a-z]/g, (_) => _.toUpperCase()) : '';
 
   const descSuffix = ` for${dscSuffix}`;
 
