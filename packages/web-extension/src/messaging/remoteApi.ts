@@ -59,6 +59,7 @@ import {
   isResponseMessage,
   newMessageId
 } from './util';
+import { v4 as uuidv4 } from 'uuid';
 
 export class RemoteApiShutdownError extends CustomError {
   constructor(channel: string) {
@@ -112,14 +113,14 @@ interface ConsumeFactoryProps<T> {
   getErrorPrototype: GetErrorPrototype | undefined;
 }
 
-let factoryChannelNo = 0;
 const consumeFactory =
   <T>(
     { method, apiProperties, getErrorPrototype }: ConsumeFactoryProps<T>,
     { logger, messenger, destructor }: ConsumeMessengerApiDependencies
   ) =>
   (...args: unknown[]) => {
-    const channel = `${method}-${factoryChannelNo++}`;
+    const factoryChannelNo = uuidv4();
+    const channel = `${method}-${factoryChannelNo}`;
     const postSubscription = messenger
       .postMessage({
         factoryCall: { args: toSerializableObject(args), channel, method },
