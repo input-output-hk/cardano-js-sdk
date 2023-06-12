@@ -113,7 +113,7 @@ describe('PersonalWallet/delegation', () => {
 
     const { tx } = await txBuilder
       .addOutput(await txBuilder.buildOutput().address(destAddresses).coin(tx1OutputCoins).build())
-      .delegate(poolId)
+      .delegatePortfolio({ pools: [{ id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolId)), weight: 1 }] })
       .build()
       .sign();
     await sourceWallet.submitTx(tx);
@@ -163,7 +163,7 @@ describe('PersonalWallet/delegation', () => {
     }
 
     // Make a 2nd tx with key de-registration
-    const { tx: txDeregisterSigned } = await sourceWallet.createTxBuilder().delegate().build().sign();
+    const { tx: txDeregisterSigned } = await sourceWallet.createTxBuilder().delegatePortfolio(null).build().sign();
     await sourceWallet.submitTx(txDeregisterSigned);
     await waitForTx(sourceWallet, txDeregisterSigned.id);
     const tx2ConfirmedState = await getWalletStateSnapshot(sourceWallet);

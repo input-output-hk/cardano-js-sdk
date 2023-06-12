@@ -63,13 +63,11 @@ export class OutputValidationTokenBundleSizeError extends CustomError {
   }
 }
 
-export class RewardAccountMissingError extends CustomError {}
-
 export type TxOutValidationError =
   | OutputValidationMissingRequiredError
   | OutputValidationMinimumCoinError
   | OutputValidationTokenBundleSizeError;
-export type TxBodyValidationError = TxOutValidationError | InputSelectionError | RewardAccountMissingError;
+export type TxBodyValidationError = TxOutValidationError | InputSelectionError;
 
 /**
  * Add handle data which is only used when building the output but doesn't
@@ -185,24 +183,20 @@ export interface TxBuilder {
    */
   buildOutput(txOut?: PartialTxOut): OutputBuilder;
   /**
-   * Configure transaction to include delegation.
-   * - On `build()`, StakeKeyDeregistration or StakeDelegation and (if needed)
-   *   StakeKeyRegistration certificates are added in the transaction body.
-   * - Stake key deregister is done by not providing the `poolId` parameter: `delegate()`.
-   * - If wallet contains multiple reward accounts, it will create certificates for all of them.
-   * - It cannot be used in conjunction with {@link delegatePortfolio}
-   *
-   * @param poolId Pool Id to delegate to. If undefined, stake key deregistration will be done.
-   * @throws exception if used in conjunction with {@link delegatePortfolio}.
-   */
-  delegate(poolId?: Cardano.PoolId): TxBuilder;
-  /**
-   * Configure the transaction to include all certificates needed to delegate to the pools from the portfolio.
-   * - It cannot be used in conjunction with {@link delegate}.
+   * Configure the transaction to include all the certificates needed to delegate to the pools from the portfolio.
+   * - Portfolio delegations that already exist will be preserved.
+   * - Delegation certificates will be sent for portfolio pools that are not already delegated.
+   *   The order in which stake keys are used is:
+   *     1. Stake keys that are delegated but shouldn't be anymore
+   *     2. Registered but not delegated stake keys.
+   *     3. Unregistered stake keys.
+   *     4. New stake keys are derived if number of pools exceeds the number of available stake keys.
+   * - Deregister stake key certificates are sent for stake keys delegated to pools that are no longer
+   *   part of the portfolio, and are not needed for re-delegation.
+   * All certificates are created on build().
    *
    * @param portfolio the CIP17 delegation portfolio to apply. Using `null` will deregister all stake keys,
    *  reclaiming the deposits.
-   * @throws exception if used in conjunction with {@link delegate} call.
    */
   delegatePortfolio(portfolio: Pick<Cardano.Cip17DelegationPortfolio, 'pools'> | null): TxBuilder;
   /** Sets TxMetadata in {@link auxiliaryData} */

@@ -53,10 +53,6 @@ export const txBuilderProperties: RemoteApiProperties<TxBuilder> = {
     getApiProperties: () => outputBuilderProperties,
     propType: RemoteApiPropertyType.ApiFactory
   },
-  delegate: {
-    getApiProperties: () => txBuilderProperties,
-    propType: RemoteApiPropertyType.ApiFactory
-  },
   delegatePortfolio: {
     getApiProperties: () => txBuilderProperties,
     propType: RemoteApiPropertyType.ApiFactory

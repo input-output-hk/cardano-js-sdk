@@ -5,7 +5,6 @@ import {
   OutputBuilderTxOut,
   PartialTx,
   PartialTxOut,
-  RewardAccountMissingError,
   SignedTx,
   TxBuilder,
   TxBuilderDependencies,
@@ -24,16 +23,6 @@ import { createOutputValidator } from '../output-validation';
 import { finalizeTx } from './finalizeTx';
 import { firstValueFrom } from 'rxjs';
 import { initializeTx } from './initializeTx';
-
-interface Delegate {
-  type: 'delegate';
-  poolId: Cardano.PoolId;
-}
-
-interface KeyDeregistration {
-  type: 'deregister';
-}
-type DelegateConfig = Delegate | KeyDeregistration;
 
 type BuiltTx = {
   tx: Cardano.TxBodyWithHash;
@@ -92,7 +81,6 @@ export class GenericTxBuilder implements TxBuilder {
 
   #dependencies: TxBuilderDependencies;
   #outputValidator: OutputBuilderValidator;
-  #delegateConfig: DelegateConfig;
   #requestedPortfolio?: TxBuilderStakePool[];
   #logger: Logger;
   #handleProvider?: HandleProvider;
@@ -147,11 +135,6 @@ export class GenericTxBuilder implements TxBuilder {
     });
   }
 
-  delegate(poolId?: Cardano.PoolId): TxBuilder {
-    this.#delegateConfig = poolId ? { poolId, type: 'delegate' } : { type: 'deregister' };
-    return this;
-  }
-
   delegatePortfolio(portfolio: Pick<Cardano.Cip17DelegationPortfolio, 'pools'> | null): TxBuilder {
     if (portfolio?.pools.length === 0) {
       throw new Error('Portfolio should define at least one delegation pool.');
@@ -184,7 +167,6 @@ export class GenericTxBuilder implements TxBuilder {
         build: async () => {
           this.#logger.debug('Building');
           try {
-            await this.#addDelegationCertificates();
             await this.#delegatePortfolio();
             await this.#validateOutputs();
             // Take a snapshot of returned properties,
@@ -246,53 +228,6 @@ export class GenericTxBuilder implements TxBuilder {
       );
       if (errors.length > 0) {
         throw errors;
-      }
-    }
-  }
-
-  async #addDelegationCertificates(): Promise<void> {
-    if (!this.#delegateConfig) {
-      // Delegation was not configured by user
-      return Promise.resolve();
-    }
-
-    const rewardAccounts = await this.#dependencies.txBuilderProviders.rewardAccounts();
-
-    if (!rewardAccounts?.length) {
-      // This shouldn't happen
-      throw new RewardAccountMissingError();
-    }
-
-    // Discard previous delegation and prepare for new one
-    this.partialTxBody = { ...this.partialTxBody, certificates: [] };
-
-    for (const rewardAccount of rewardAccounts) {
-      if (this.#delegateConfig.type === 'deregister') {
-        // Deregister scenario
-        if (rewardAccount.keyStatus === Cardano.StakeKeyStatus.Unregistered) {
-          this.#logger.warn(
-            'Skipping stake key deregister. Stake key not registered.',
-            rewardAccount.address,
-            rewardAccount.keyStatus
-          );
-        } else {
-          this.partialTxBody.certificates!.push(Cardano.createStakeKeyDeregistrationCert(rewardAccount.address));
-        }
-      } else if (this.#delegateConfig.type === 'delegate') {
-        // Register and delegate scenario
-        if (rewardAccount.keyStatus !== Cardano.StakeKeyStatus.Unregistered) {
-          this.#logger.debug(
-            'Skipping stake key register. Stake key already registered',
-            rewardAccount.address,
-            rewardAccount.keyStatus
-          );
-        } else {
-          this.partialTxBody.certificates!.push(Cardano.createStakeKeyRegistrationCert(rewardAccount.address));
-        }
-
-        this.partialTxBody.certificates!.push(
-          Cardano.createDelegationCert(rewardAccount.address, this.#delegateConfig.poolId)
-        );
       }
     }
   }

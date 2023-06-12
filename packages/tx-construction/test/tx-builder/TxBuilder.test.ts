@@ -9,7 +9,7 @@ import {
   TransactionSigner,
   util
 } from '@cardano-sdk/key-management';
-import { AssetId, mockProviders as mocks, somePartialStakePools } from '@cardano-sdk/util-dev';
+import { AssetId, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { CML, Cardano, Handle, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import {
   GenericTxBuilder,
@@ -19,7 +19,6 @@ import {
   OutputValidation,
   OutputValidationMinimumCoinError,
   OutputValidationMissingRequiredError,
-  RewardAccountMissingError,
   TxBuilderProviders,
   TxOutValidationError,
   TxOutputBuilder,
@@ -452,106 +451,6 @@ describe('GenericTxBuilder', () => {
       it('legit output with valid with address and coin', async () => {
         await expect(txBuilder.buildOutput().address(address).coin(output1Coin).build()).resolves.not.toThrow();
       });
-    });
-  });
-
-  describe('delegate', () => {
-    let poolId: Cardano.PoolId;
-
-    beforeEach(() => {
-      poolId = somePartialStakePools[0].id;
-    });
-
-    it('certificates are added to tx.body on build', async () => {
-      const address = Cardano.PaymentAddress('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg');
-      txBuilder.delegate(poolId);
-      const txOut = await txBuilder.buildOutput().address(address).coin(10_000_000n).build();
-      const txBuilt = await txBuilder.addOutput(txOut).build().inspect();
-      expect(txBuilt.body.certificates?.length).toBe(2);
-    });
-
-    it('adds both stake key and delegation certificates when stake key was not registered', async () => {
-      const txDelegate = txBuilder.delegate(poolId).build();
-      const [stakeKeyCert, delegationCert] = (await txDelegate.inspect()).body.certificates!;
-      expect(stakeKeyCert.__typename).toBe(Cardano.CertificateType.StakeKeyRegistration);
-
-      if (delegationCert.__typename === Cardano.CertificateType.StakeDelegation) {
-        expect(delegationCert.poolId).toBe(poolId);
-      }
-
-      expect.assertions(2);
-    });
-
-    it('delegate again removes previous certificates', async () => {
-      txBuilder.delegate(poolId).build();
-      const poolIdOther = somePartialStakePools[1].id;
-      const secondDelegationProps = await txBuilder.delegate(poolIdOther).build().inspect();
-      expect(secondDelegationProps.body.certificates?.length).toBe(2);
-      const delegationCert = secondDelegationProps.body.certificates![1] as Cardano.StakeDelegationCertificate;
-      expect(delegationCert.poolId).toBe(poolIdOther);
-    });
-
-    it('throws RewardAccountMissingError error if no reward accounts were found', async () => {
-      txBuilderProviders.rewardAccounts.mockResolvedValueOnce([]);
-      await expect(txBuilder.delegate(poolId).build().inspect()).rejects.toThrowError(RewardAccountMissingError);
-    });
-
-    it('adds only delegation certificate with correct poolId when stake key was already registered', async () => {
-      txBuilderProviders.rewardAccounts.mockResolvedValueOnce([
-        {
-          address: Cardano.RewardAccount('stake_test1uqu7qkgf00zwqupzqfzdq87dahwntcznklhp3x30t3ukz6gswungn'),
-          delegatee: { nextNextEpoch: { id: '' as Cardano.PoolId } },
-          keyStatus: Cardano.StakeKeyStatus.Registered,
-          rewardBalance: 33_333n
-        }
-      ]);
-      const txDelegateProps = await txBuilder.delegate(poolId).build().inspect();
-      expect(txDelegateProps.body.certificates?.length).toBe(1);
-      const [delegationCert] = txDelegateProps.body.certificates!;
-      if (delegationCert.__typename === Cardano.CertificateType.StakeDelegation) {
-        expect(delegationCert.poolId).toBe(poolId);
-      }
-
-      expect.assertions(2);
-    });
-
-    it('adds multiple certificates when handling multiple reward accounts', async () => {
-      txBuilderProviders.rewardAccounts.mockResolvedValueOnce([
-        {
-          address: Cardano.RewardAccount('stake_test1uqu7qkgf00zwqupzqfzdq87dahwntcznklhp3x30t3ukz6gswungn'),
-          delegatee: { nextNextEpoch: { id: '' as Cardano.PoolId } },
-          keyStatus: Cardano.StakeKeyStatus.Unregistered,
-          rewardBalance: 33_333n
-        },
-        {
-          address: Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr'),
-          delegatee: { nextNextEpoch: { id: '' as Cardano.PoolId } },
-          keyStatus: Cardano.StakeKeyStatus.Unregistered,
-          rewardBalance: 44_444n
-        }
-      ]);
-      const txDelegate = await txBuilder.delegate(poolId).build().inspect();
-      expect(txDelegate.body.certificates?.length).toBe(4);
-    });
-
-    it('undefined poolId adds stake key deregister certificate if already registered', async () => {
-      txBuilderProviders.rewardAccounts.mockResolvedValueOnce([
-        {
-          address: Cardano.RewardAccount('stake_test1uqu7qkgf00zwqupzqfzdq87dahwntcznklhp3x30t3ukz6gswungn'),
-          delegatee: { nextNextEpoch: { id: '' as Cardano.PoolId } },
-          keyStatus: Cardano.StakeKeyStatus.Registered,
-          rewardBalance: 33_333n
-        }
-      ]);
-      const txDeregister = await txBuilder.delegate().build().inspect();
-      expect(txDeregister.body.certificates?.length).toBe(1);
-      const [deregisterCert] = txDeregister.body.certificates!;
-      expect(deregisterCert.__typename).toBe(Cardano.CertificateType.StakeKeyDeregistration);
-    });
-
-    it('undefined poolId does NOT add certificate if not registered', async () => {
-      const txDeregister = await txBuilder.delegate().build().inspect();
-      expect(txDeregister.body.certificates?.length).toBeFalsy();
     });
   });
 
