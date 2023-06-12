@@ -10,14 +10,22 @@ import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
 import { Pool, PoolConfig, QueryConfig } from 'pg';
 import { TlsOptions } from 'tls';
 import { URL } from 'url';
-import { isConnectionError } from '@cardano-sdk/util';
+import { isConnectionError, toSerializableObject } from '@cardano-sdk/util';
 import connString from 'pg-connection-string';
 import fs from 'fs';
 
 const timedQuery = (pool: Pool, logger: Logger) => async (args: string | QueryConfig, values?: any) => {
   const startTime = Date.now();
   const result = await pool.query(args, values);
-  logger.debug(`Query\n${args}\ntook ${Date.now() - startTime} milliseconds`);
+  const query =
+    typeof args === 'string'
+      ? `${args} ${JSON.stringify(toSerializableObject(values))}\nMISSING PREPARED STATEMENT`
+      : 'text' in args && typeof args.text === 'string'
+      ? `${args.text} ${JSON.stringify(toSerializableObject(args.values))}`
+      : `${JSON.stringify(toSerializableObject({ args, values }))}\nUNEXPECTED QUERY FORMAT`;
+
+  logger.debug(`Query\n${query}\ntook ${Date.now() - startTime} milliseconds`);
+
   return result;
 };
 
