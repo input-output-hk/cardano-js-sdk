@@ -47,15 +47,11 @@ describe('tx', () => {
         ],
         mint: [
           {
-            policyIdHex: '7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373',
+            policyIdHex: '2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740',
             tokens: [
               {
-                amount: 40n,
+                amount: 20n,
                 assetNameHex: ''
-              },
-              {
-                amount: 30n,
-                assetNameHex: '504154415445'
               }
             ]
           },
@@ -69,11 +65,15 @@ describe('tx', () => {
             ]
           },
           {
-            policyIdHex: '2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740',
+            policyIdHex: '7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373',
             tokens: [
               {
-                amount: 20n,
+                amount: 40n,
                 assetNameHex: ''
+              },
+              {
+                amount: 30n,
+                assetNameHex: '504154415445'
               }
             ]
           }
@@ -96,15 +96,11 @@ describe('tx', () => {
             format: Ledger.TxOutputFormat.ARRAY_LEGACY,
             tokenBundle: [
               {
-                policyIdHex: '7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373',
+                policyIdHex: '2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740',
                 tokens: [
                   {
-                    amount: 40n,
+                    amount: 20n,
                     assetNameHex: ''
-                  },
-                  {
-                    amount: 30n,
-                    assetNameHex: '504154415445'
                   }
                 ]
               },
@@ -118,11 +114,15 @@ describe('tx', () => {
                 ]
               },
               {
-                policyIdHex: '2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740',
+                policyIdHex: '7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373',
                 tokens: [
                   {
-                    amount: 20n,
+                    amount: 40n,
                     assetNameHex: ''
+                  },
+                  {
+                    amount: 30n,
+                    assetNameHex: '504154415445'
                   }
                 ]
               }
