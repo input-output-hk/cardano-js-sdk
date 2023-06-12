@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.14.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.13.1...@cardano-sdk/e2e@0.14.0) (2023-06-12)
+
+### ⚠ BREAKING CHANGES
+
+* **wallet:** Remove obsolete 'stakeKeyIndexLimit' HDSequantialDiscovery
+constructor argument.
+
+### Features
+
+* **wallet:** discover used stake keys ([b63f709](https://github.com/input-output-hk/cardano-js-sdk/commit/b63f7098b28fc835f1f09bc7a92392bc5be7e912))
+
 ## [0.13.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.13.0...@cardano-sdk/e2e@0.13.1) (2023-06-06)
 
 **Note:** Version bump only for package @cardano-sdk/e2e

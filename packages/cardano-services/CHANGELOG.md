@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.13.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.12.1...@cardano-sdk/cardano-services@0.13.0) (2023-06-12)
+
+### ⚠ BREAKING CHANGES
+
+* **cardano-services:** rm projector postgres cli/env suffix
+
+### Features
+
+* add handle projector service ([448b2a0](https://github.com/input-output-hk/cardano-js-sdk/commit/448b2a0c0a68f6a0d634a58f717b228b43794bae))
+
+### Bug Fixes
+
+* **cardano-services:** postgres ssl option resolution ([de6168c](https://github.com/input-output-hk/cardano-js-sdk/commit/de6168ca8b0b629bf3ded6c22b3d69e0c425f952))
+
+### Code Refactoring
+
+* **cardano-services:** rm projector postgres cli/env suffix ([fe52d91](https://github.com/input-output-hk/cardano-js-sdk/commit/fe52d913c346b3ec4bc8969ae32f666bced2e588))
+
 ## [0.12.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.12.0...@cardano-sdk/cardano-services@0.12.1) (2023-06-06)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services

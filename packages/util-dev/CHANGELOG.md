@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.13.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.12.1...@cardano-sdk/util-dev@0.13.0) (2023-06-12)
+
+### ⚠ BREAKING CHANGES
+
+* SignedTx.ctx now renamed to context
+
+### Features
+
+* add context to txSubmit ([57589ec](https://github.com/input-output-hk/cardano-js-sdk/commit/57589ecd3120573a0cea7e718291454e9b6f9f3b))
+
 ## [0.12.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.12.0...@cardano-sdk/util-dev@0.12.1) (2023-06-06)
 
 ### Features

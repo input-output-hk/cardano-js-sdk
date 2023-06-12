@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.15.0...@cardano-sdk/wallet@0.16.0) (2023-06-12)
+
+### ⚠ BREAKING CHANGES
+
+* **wallet:** Remove obsolete 'stakeKeyIndexLimit' HDSequantialDiscovery
+constructor argument.
+* SignedTx.ctx now renamed to context
+
+### Features
+
+* add context to txSubmit ([57589ec](https://github.com/input-output-hk/cardano-js-sdk/commit/57589ecd3120573a0cea7e718291454e9b6f9f3b))
+* **wallet:** discover used stake keys ([b63f709](https://github.com/input-output-hk/cardano-js-sdk/commit/b63f7098b28fc835f1f09bc7a92392bc5be7e912))
+
 ## [0.15.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.14.0...@cardano-sdk/wallet@0.15.0) (2023-06-06)
 
 ### ⚠ BREAKING CHANGES
