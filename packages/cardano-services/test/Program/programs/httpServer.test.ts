@@ -18,7 +18,7 @@ import {
   loadProviderServer
 } from '../../../src';
 import { Ogmios } from '@cardano-sdk/ogmios';
-import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { ProviderError, ProviderFailure, Seconds } from '@cardano-sdk/core';
 import { SrvRecord } from 'dns';
 import { URL } from 'url';
 import {
@@ -44,8 +44,8 @@ describe('HTTP Server', () => {
   let postgresDbDbSync: string;
   let postgresUserDbSync: string;
   let postgresPasswordDbSync: string;
-  let dbCacheTtl: number;
-  let healthCheckCacheTtl: number;
+  let dbCacheTtl: Seconds;
+  let healthCheckCacheTtl: Seconds;
   let epochPollInterval: number;
   let httpServer: HttpServer;
   let ogmiosConnection: Ogmios.Connection;

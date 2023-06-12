@@ -7,13 +7,14 @@ import {
   SERVICE_DISCOVERY_TIMEOUT_DEFAULT,
   stringOptionToBoolean
 } from '../utils';
+import { Seconds } from '@cardano-sdk/core';
 import { BuildInfo as ServiceBuildInfo } from '../../Http';
 import { URL } from 'url';
 import { buildInfoValidator, cacheTtlValidator } from '../../util/validators';
 import { loggerMethodNames } from '@cardano-sdk/util';
 
 export const ENABLE_METRICS_DEFAULT = false;
-export const DEFAULT_HEALTH_CHECK_CACHE_TTL = 5;
+export const DEFAULT_HEALTH_CHECK_CACHE_TTL = Seconds(5);
 
 export enum CommonOptionDescriptions {
   ApiUrl = 'API URL',
