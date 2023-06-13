@@ -18,18 +18,12 @@ import {
   throwError,
   timeout
 } from 'rxjs';
-import {
-  FAST_OPERATION_TIMEOUT_DEFAULT,
-  SYNC_TIMEOUT_DEFAULT,
-  TestWallet,
-  faucetProviderFactory,
-  getEnv,
-  networkInfoProviderFactory,
-  walletVariables
-} from '../';
+import { FAST_OPERATION_TIMEOUT_DEFAULT, SYNC_TIMEOUT_DEFAULT } from '../defaults';
 import { FinalizeTxProps, ObservableWallet, PersonalWallet } from '@cardano-sdk/wallet';
 import { InMemoryKeyAgent, TransactionSigner } from '@cardano-sdk/key-management';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
+import { TestWallet, faucetProviderFactory, networkInfoProviderFactory } from '../factories';
+import { getEnv, walletVariables } from '../environment';
 import { logger } from '@cardano-sdk/util-dev';
 import sortBy from 'lodash/sortBy';
 
