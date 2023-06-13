@@ -101,6 +101,7 @@ import { TrackedUtxoProvider } from '../services/ProviderTracker/TrackedUtxoProv
 import { WalletStores, createInMemoryWalletStores } from '../persistence';
 import { createTransactionReemitter } from '../services/TransactionReemitter';
 import isEqual from 'lodash/isEqual';
+import uniq from 'lodash/uniq';
 
 export interface PersonalWalletProps {
   readonly name: string;
@@ -460,7 +461,7 @@ export class PersonalWallet implements ObservableWallet {
       onFatalError,
       retryBackoffConfig,
       rewardAccountAddresses$: this.addresses$.pipe(
-        map((addresses) => addresses.map((groupedAddress) => groupedAddress.rewardAccount))
+        map((addresses) => uniq(addresses.map((groupedAddress) => groupedAddress.rewardAccount)))
       ),
       rewardsTracker: this.rewardsProvider,
       stakePoolProvider: this.stakePoolProvider,

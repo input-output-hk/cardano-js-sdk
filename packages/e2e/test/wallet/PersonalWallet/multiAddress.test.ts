@@ -1,5 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { AddressType, GroupedAddress, util } from '@cardano-sdk/key-management';
+import { Cardano } from '@cardano-sdk/core';
 import { KeyAgentFactoryProps, getWallet } from '../../../src';
 import { PersonalWallet } from '@cardano-sdk/wallet';
 import { createLogger } from '@cardano-sdk/util-dev';
@@ -92,9 +93,16 @@ describe('PersonalWallet/multiAddress', () => {
 
     await walletReady(newWallet.wallet);
     const walletAddresses = await firstValueFromTimed(newWallet.wallet.addresses$);
+    const rewardAddresses = await firstValueFromTimed(newWallet.wallet.delegation.rewardAccounts$);
 
     // Let's check if all addresses has been discovered.
     expect(walletAddresses).toEqual(addressesToBeDiscovered);
+
+    // All addresses are built using the same stake key. Check that there is a single reward account
+    const expectedRewardAccount = walletAddresses[0].rewardAccount;
+    expect(rewardAddresses).toEqual([
+      expect.objectContaining<Partial<Cardano.RewardAccountInfo>>({ address: expectedRewardAccount })
+    ]);
 
     const totalBalance = await firstValueFromTimed(newWallet.wallet.balance.utxo.total$);
     const expectedAmount = PAYMENT_ADDRESSES_TO_GENERATE * Number(COINS_PER_ADDRESS);
