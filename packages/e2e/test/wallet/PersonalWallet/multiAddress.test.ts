@@ -1,10 +1,16 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { AddressType, GroupedAddress, util } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
-import { KeyAgentFactoryProps, getWallet } from '../../../src';
+import {
+  KeyAgentFactoryProps,
+  createStandaloneKeyAgent,
+  firstValueFromTimed,
+  getWallet,
+  normalizeTxBody,
+  walletReady
+} from '../../../src';
 import { PersonalWallet } from '@cardano-sdk/wallet';
 import { createLogger } from '@cardano-sdk/util-dev';
-import { createStandaloneKeyAgent, firstValueFromTimed, normalizeTxBody, walletReady } from '../../util';
 import { filter, map, take } from 'rxjs';
 import { getEnv, walletVariables } from '../../../src/environment';
 import { isNotNil } from '@cardano-sdk/util';

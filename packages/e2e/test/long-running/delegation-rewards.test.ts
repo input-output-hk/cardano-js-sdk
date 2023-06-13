@@ -1,15 +1,18 @@
 import { Cardano } from '@cardano-sdk/core';
 import { PersonalWallet } from '@cardano-sdk/wallet';
-import { TestWallet, getEnv, getWallet, walletVariables } from '../../src';
-import { firstValueFrom } from 'rxjs';
 import {
+  TestWallet,
+  getEnv,
   getTxConfirmationEpoch,
+  getWallet,
   requestCoins,
   runningAgainstLocalNetwork,
   submitAndConfirm,
   transferCoins,
-  waitForEpoch
-} from '../util';
+  waitForEpoch,
+  walletVariables
+} from '../../src';
+import { firstValueFrom } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 import { waitForWalletStateSettle } from '../../../wallet/test/util';
 

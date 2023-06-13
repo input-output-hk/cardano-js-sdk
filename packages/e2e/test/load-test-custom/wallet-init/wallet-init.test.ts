@@ -23,9 +23,9 @@ import {
   stakePoolProviderFactory,
   txSubmitProviderFactory,
   utxoProviderFactory,
+  waitForWalletStateSettle,
   walletVariables
 } from '../../../src';
-import { waitForWalletStateSettle } from '../../util';
 
 // Example call that creates 5000 wallets in 10 minutes:
 // VIRTUAL_USERS_GENERATE_DURATION=600 VIRTUAL_USERS_COUNT=5000 yarn load-test-custom:wallet-init

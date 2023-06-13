@@ -1,11 +1,10 @@
 import { AddressType } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import { DelegatedStake, PersonalWallet, createUtxoBalanceByAddressTracker } from '@cardano-sdk/wallet';
-import { MINUTE, getWallet } from '../../../src';
+import { MINUTE, firstValueFromTimed, getWallet, submitAndConfirm, walletReady } from '../../../src';
 import { Observable, filter, firstValueFrom, map, tap } from 'rxjs';
 import { Percent } from '@cardano-sdk/util';
 import { createLogger } from '@cardano-sdk/util-dev';
-import { firstValueFromTimed, submitAndConfirm, walletReady } from '../../util';
 import { getEnv, walletVariables } from '../../../src/environment';
 import delay from 'delay';
 

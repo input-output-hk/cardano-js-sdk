@@ -2,8 +2,7 @@
 import { PersonalWallet, utxoEquals } from '@cardano-sdk/wallet';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, map, take } from 'rxjs';
-import { firstValueFromTimed, walletReady } from '../../util';
-import { getEnv, getWallet, walletVariables } from '../../../src';
+import { firstValueFromTimed, getEnv, getWallet, walletReady, walletVariables } from '../../../src';
 import { isNotNil } from '@cardano-sdk/util';
 
 const env = getEnv(walletVariables);

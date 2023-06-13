@@ -4,10 +4,18 @@ import { FinalizeTxProps, PersonalWallet } from '@cardano-sdk/wallet';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { KeyRole, TransactionSigner, util } from '@cardano-sdk/key-management';
 import { Metadatum, TokenMap } from '@cardano-sdk/core/dist/cjs/Cardano';
-import { burnTokens, createStandaloneKeyAgent, submitAndConfirm, txConfirmed, walletReady } from '../../util';
+import {
+  burnTokens,
+  createStandaloneKeyAgent,
+  getEnv,
+  getWallet,
+  submitAndConfirm,
+  txConfirmed,
+  walletReady,
+  walletVariables
+} from '../../../src';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { firstValueFrom } from 'rxjs';
-import { getEnv, getWallet, walletVariables } from '../../../src';
 
 const env = getEnv(walletVariables);
 const logger = createLogger();

@@ -3,13 +3,13 @@
 import * as dotenv from 'dotenv';
 import path from 'path';
 dotenv.config({ path: path.join(__dirname, '../../../.env') });
-import { Cardano } from '@cardano-sdk/core/dist/esm';
+import { Cardano } from '@cardano-sdk/core';
 import { GroupedAddress, util } from '@cardano-sdk/key-management';
 import { Logger } from 'ts-log';
-import { MINUTE, StubKeyAgent, getEnv, getWallet, walletVariables } from '../../../src';
+import { MINUTE, StubKeyAgent, getEnv, getWallet, waitForWalletStateSettle, walletVariables } from '../../../src';
 import { PersonalWallet } from '@cardano-sdk/wallet';
 import { logger } from '@cardano-sdk/util-dev';
-import { mapToGroupedAddress, waitForWalletStateSettle } from '../../util';
+import { mapToGroupedAddress } from '../../artillery/wallet-restoration/WalletRestoration';
 
 /**
  * Env var MAX_USERS sets the maximum number of concurrent users to measure

@@ -2,9 +2,17 @@
 import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
 import { ObservableWallet } from '@cardano-sdk/wallet';
-import { TX_TIMEOUT_DEFAULT, TestWallet, getEnv, getWallet, walletVariables } from '../../../src';
+import {
+  TX_TIMEOUT_DEFAULT,
+  TestWallet,
+  firstValueFromTimed,
+  getEnv,
+  getWallet,
+  waitForWalletStateSettle,
+  walletReady,
+  walletVariables
+} from '../../../src';
 import { combineLatest, filter, firstValueFrom } from 'rxjs';
-import { firstValueFromTimed, waitForWalletStateSettle, walletReady } from '../../util';
 import { logger } from '@cardano-sdk/util-dev';
 
 const env = getEnv(walletVariables);

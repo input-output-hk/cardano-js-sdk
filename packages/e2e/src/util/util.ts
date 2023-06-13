@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
 import * as envalid from 'envalid';
-import { AddressType, GroupedAddress, InMemoryKeyAgent, TransactionSigner } from '@cardano-sdk/key-management';
-import { AddressesModel } from './artillery/wallet-restoration/types';
 import { Cardano, createSlotEpochCalc } from '@cardano-sdk/core';
 import {
   EMPTY,
@@ -28,8 +26,9 @@ import {
   getEnv,
   networkInfoProviderFactory,
   walletVariables
-} from '../src';
+} from '../';
 import { FinalizeTxProps, ObservableWallet, PersonalWallet } from '@cardano-sdk/wallet';
+import { InMemoryKeyAgent, TransactionSigner } from '@cardano-sdk/key-management';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { logger } from '@cardano-sdk/util-dev';
 import sortBy from 'lodash/sortBy';
@@ -317,12 +316,3 @@ export const burnTokens = async ({
   await submitAndConfirm(wallet, signedTx);
   await txConfirmed(wallet, signedTx);
 };
-
-export const mapToGroupedAddress = (addrModel: AddressesModel): GroupedAddress => ({
-  accountIndex: 0,
-  address: Cardano.PaymentAddress(addrModel.address),
-  index: 0,
-  networkId: addrModel.address.startsWith('addr_test') ? Cardano.NetworkId.Testnet : Cardano.NetworkId.Mainnet,
-  rewardAccount: Cardano.RewardAccount(addrModel.stake_address),
-  type: AddressType.External
-});
