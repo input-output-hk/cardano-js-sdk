@@ -73,7 +73,11 @@ describe('DbSyncAssetProvider', () => {
   });
   it('rejects for not found assetId', async () => {
     await expect(provider.getAsset({ assetId: notValidAssetId })).rejects.toThrow(
-      new ProviderError(ProviderFailure.NotFound, undefined, 'No entries found in multi_asset table')
+      new ProviderError(
+        ProviderFailure.NotFound,
+        undefined,
+        "No entries found in multi_asset table for asset '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'"
+      )
     );
   });
   it('returns an AssetInfo without extra data', async () => {
