@@ -105,7 +105,7 @@ export const invalidBabbageTxOut: Cardano.TxOut = {
   address: Cardano.PaymentAddress(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
-  datum: HexBlob('187b'),
+  datum: 123n,
   datumHash: Crypto.Hash32ByteBase16('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'),
   scriptReference: script,
   value: valueWithAssets
@@ -124,7 +124,7 @@ export const babbageTxOutWithInlineDatum: Cardano.TxOut = {
   address: Cardano.PaymentAddress(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
-  datum: HexBlob('187b'),
+  datum: 123n,
   scriptReference: script,
   value: valueWithAssets
 };
@@ -222,10 +222,14 @@ export const tx: Cardano.Tx = {
         )
       }
     ],
-    datums: [HexBlob('187b')],
+    datums: [123n],
     redeemers: [
       {
-        data: HexBlob('d86682008101'),
+        data: {
+          cbor: HexBlob('d87a9f187bff'),
+          constructor: 1n,
+          fields: { cbor: HexBlob('9f187bff'), items: [123n] }
+        },
         executionUnits: {
           memory: 3000,
           steps: 7000
@@ -234,7 +238,11 @@ export const tx: Cardano.Tx = {
         purpose: RedeemerPurpose.mint
       },
       {
-        data: HexBlob('d86682008102'),
+        data: {
+          cbor: HexBlob('d87a9f187bff'),
+          constructor: 1n,
+          fields: { cbor: HexBlob('9f187bff'), items: [123n] }
+        },
         executionUnits: {
           memory: 5000,
           steps: 2000

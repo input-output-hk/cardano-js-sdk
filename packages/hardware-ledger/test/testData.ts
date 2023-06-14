@@ -1,7 +1,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, KeyRole } from '@cardano-sdk/key-management';
 import { Base64Blob, HexBlob } from '@cardano-sdk/util';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, Serialization } from '@cardano-sdk/core';
 export const rewardAccount = Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
 export const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
 export const paymentAddress = Cardano.PaymentAddress(
@@ -134,7 +134,7 @@ export const txOutWithReferenceScript: Cardano.TxOut = {
 
 export const txOutWithReferenceScriptWithInlineDatum: Cardano.TxOut = {
   address: paymentAddress,
-  datum: HexBlob('187b'),
+  datum: 123n,
   scriptReference: {
     __type: Cardano.ScriptType.Plutus,
     bytes: HexBlob('b6dbf0b03c93afe5696f10d49e8a8304ebfac01deeb8f82f2af5836ebbc1b450'),
@@ -219,10 +219,10 @@ export const tx: Cardano.Tx = {
         )
       }
     ],
-    datums: [HexBlob('187b')],
+    datums: [123n],
     redeemers: [
       {
-        data: HexBlob('d86682008101'),
+        data: Serialization.PlutusData.fromCbor(HexBlob('d86682008101')).toCore(),
         executionUnits: {
           memory: 3000,
           steps: 7000
@@ -231,7 +231,7 @@ export const tx: Cardano.Tx = {
         purpose: Cardano.RedeemerPurpose.mint
       },
       {
-        data: HexBlob('d86682008102'),
+        data: Serialization.PlutusData.fromCbor(HexBlob('d86682008102')).toCore(),
         executionUnits: {
           memory: 5000,
           steps: 2000

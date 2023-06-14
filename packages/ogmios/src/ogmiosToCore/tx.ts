@@ -20,6 +20,7 @@ import {
   Cardano,
   NotImplementedError,
   ProviderUtil,
+  Serialization,
   SerializationError,
   SerializationFailure
 } from '@cardano-sdk/core';
@@ -220,7 +221,7 @@ const mapRedeemer = (key: string, redeemer: Schema.Redeemer): Cardano.Redeemer =
   const purposeAndIndex = key.split(':');
 
   return {
-    data: HexBlob(redeemer.redeemer),
+    data: Serialization.PlutusData.fromCbor(HexBlob(redeemer.redeemer)).toCore(),
     executionUnits: redeemer.executionUnits,
     index: Number(purposeAndIndex[1]),
     purpose: purposeAndIndex[0] as Cardano.RedeemerPurpose
@@ -252,7 +253,7 @@ const mapTxIn = (txIn: Schema.TxIn): Cardano.TxIn => ({
 
 const mapInlineDatum = (datum: Schema.TxOut['datum']) => {
   if (typeof datum !== 'string') return;
-  return HexBlob(datum);
+  return Serialization.PlutusData.fromCbor(HexBlob(datum)).toCore();
 };
 
 const mapDatumHash = (datum: Schema.TxOut['datumHash']) => {
@@ -293,6 +294,11 @@ const mapValidityInterval = ({
   invalidHereafter: invalidHereafter ? Cardano.Slot(invalidHereafter) : undefined
 });
 
+const mapWitnessDatums = ({ witness: { datums } }: Schema.TxAlonzo): Cardano.PlutusData[] =>
+  // Possible optimization: we're discarding the object keys, which are datum hashes.
+  // Might be useful to save those to not need to re-hash when projecting.
+  Object.values(datums).map((datum) => Serialization.PlutusData.fromCbor(HexBlob(datum)).toCore());
+
 const mapCommonTx = (tx: CommonBlock['body'][0], kind: BlockKind): Cardano.OnChainTx => {
   const { auxiliaryData, auxiliaryDataHash } = mapAuxiliaryData(tx.metadata);
   return {
@@ -323,9 +329,7 @@ const mapCommonTx = (tx: CommonBlock['body'][0], kind: BlockKind): Cardano.OnCha
       : Cardano.InputSource.inputs,
     witness: {
       bootstrap: tx.witness.bootstrap.map(mapBootstrapWitness),
-      datums: isAlonzoOrAbove(kind)
-        ? Object.values((tx as Schema.TxAlonzo).witness.datums).map((d) => HexBlob(d))
-        : undefined,
+      datums: isAlonzoOrAbove(kind) ? mapWitnessDatums(tx as Schema.TxAlonzo) : undefined,
       redeemers: isAlonzoOrAbove(kind)
         ? Object.entries((tx as Schema.TxAlonzo).witness.redeemers).map(([key, value]) => mapRedeemer(key, value))
         : undefined,

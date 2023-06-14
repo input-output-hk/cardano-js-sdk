@@ -73,12 +73,16 @@ export const createPouchDbWalletStores = (
            * Assuming there can never be more >=100k transactions in a block
            */
           (blockNo * 100_000 + index).toString(),
-        dbName: `${baseDbName}Transactions`
+        dbName: `${baseDbName}Transactions_v2`
       },
       logger
     ),
+    // Review: technically this could also cause a conflict when updating.
+    // However it is extremely unlikely that it would have inline datums,
+    // and renaming this store is not an option as it's being used
+    // for storing collateral settings
     unspendableUtxo: new PouchDbUtxoStore({ dbName: `${baseDbName}UnspendableUtxo` }, logger),
-    utxo: new PouchDbUtxoStore({ dbName: `${baseDbName}Utxo` }, logger),
-    volatileTransactions: new PouchDbVolatileTransactionsStore(docsDbName, 'volatileTransactions_v2', logger)
+    utxo: new PouchDbUtxoStore({ dbName: `${baseDbName}Utxo_v2` }, logger),
+    volatileTransactions: new PouchDbVolatileTransactionsStore(docsDbName, 'volatileTransactions_v3', logger)
   };
 };
