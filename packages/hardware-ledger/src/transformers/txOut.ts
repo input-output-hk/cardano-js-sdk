@@ -5,8 +5,8 @@ import { LedgerTxTransformerContext } from '../types';
 import { mapTokenMap } from './assets';
 import { paymentKeyPathFromGroupedAddress, stakeKeyPathFromGroupedAddress } from './keyPaths';
 
-const toInlineDatum: Transform<Cardano.Datum, Ledger.Datum> = (datum) => ({
-  datumHex: datum.toString(),
+const toInlineDatum: Transform<Cardano.PlutusData, Ledger.Datum> = (datum) => ({
+  datumHex: Serialization.PlutusData.fromCore(datum).toCbor(),
   type: Ledger.DatumType.INLINE
 });
 
