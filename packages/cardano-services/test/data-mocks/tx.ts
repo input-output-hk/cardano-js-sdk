@@ -138,7 +138,7 @@ export const withWithdrawals: Cardano.HydratedTx = merge(withAssets, {
 export const witnessRedeemers = {
   redeemers: [
     {
-      data: '67f33146617a5e61936081db3b2117cbf59bd2123748f58ac9678656',
+      data: {},
       executionUnits: {
         memory: 1700,
         steps: 476_468
@@ -170,7 +170,7 @@ export const output = {
 export const outputWithInlineDatum = {
   address:
     'addr_test1qpcncempf4svkpw0salztrsxzrfpr5ll323q5whw7lv94vyw0kz5rxvdaq6u6tslwfrrgz6l4n4lpcpnawn87yl9k6dsu4hhg2',
-  datum: '182a',
+  datum: 42n,
   value: {
     coins: 13_499_999_999_819_540n
   }
@@ -220,7 +220,7 @@ export const certificate = {
 };
 
 export const redeemer = {
-  data: '67f33146617a5e61936081db3b2117cbf59bd2123748f58ac9678656',
+  data: {},
   executionUnits: {
     memory: 0,
     steps: 0

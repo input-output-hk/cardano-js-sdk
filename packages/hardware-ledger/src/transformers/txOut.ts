@@ -1,12 +1,12 @@
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import { CML, Cardano, CborReader, CborReaderState, coreToCml } from '@cardano-sdk/core';
+import { CML, Cardano, CborReader, CborReaderState, PlutusData, coreToCml } from '@cardano-sdk/core';
 import { HexBlob, InvalidArgumentError, ManagedFreeableScope, Transform, usingAutoFree } from '@cardano-sdk/util';
 import { LedgerTxTransformerContext } from '../types';
 import { mapTokenMap } from './assets';
 import { paymentKeyPathFromGroupedAddress, stakeKeyPathFromGroupedAddress } from './keyPaths';
 
-const toInlineDatum: Transform<Cardano.Datum, Ledger.Datum> = (datum) => ({
-  datumHex: datum.toString(),
+const toInlineDatum: Transform<Cardano.PlutusData, Ledger.Datum> = (datum) => ({
+  datumHex: PlutusData.fromCore(datum).toCbor(),
   type: Ledger.DatumType.INLINE
 });
 

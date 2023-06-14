@@ -4,3 +4,4 @@ export * from './estimateStakePoolAPY';
 export * from './txSubmissionErrors';
 export * from './resolveInputValue';
 export * from './phase2Validation';
+export * from './isPlutusData';

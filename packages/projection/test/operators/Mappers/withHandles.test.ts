@@ -1,6 +1,5 @@
 import { Asset, Cardano } from '@cardano-sdk/core';
 import { Buffer } from 'buffer';
-import { HexBlob } from '@cardano-sdk/util';
 import { Mappers, ProjectionEvent } from '../../../src';
 import { firstValueFrom, of } from 'rxjs';
 import { mockProviders } from '@cardano-sdk/util-dev';
@@ -74,7 +73,7 @@ describe('withHandles', () => {
   };
 
   it('sets "datum" property on the handle if utxo has datum', async () => {
-    const datum = HexBlob('123abc');
+    const datum = Buffer.from('123abc', 'hex');
     const outputsWithDatum: Cardano.TxOut[] = [
       {
         address: Cardano.PaymentAddress(

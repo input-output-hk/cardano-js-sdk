@@ -1,4 +1,11 @@
-import { Cardano, SerializationError, SerializationFailure, createUtxoId, jsonToNativeScript } from '@cardano-sdk/core';
+import {
+  Cardano,
+  PlutusData,
+  SerializationError,
+  SerializationFailure,
+  createUtxoId,
+  jsonToNativeScript
+} from '@cardano-sdk/core';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob, isNotNil } from '@cardano-sdk/util';
 import { ReferenceScriptType, UtxoModel } from './types';
@@ -84,7 +91,7 @@ export const utxosToCore = (utxosModels: UtxoModel[]): Cardano.Utxo[] => {
         }
       };
       if (isNotNil(current.data_hash)) txOut.datumHash = current.data_hash as unknown as Hash32ByteBase16;
-      if (isNotNil(current.inline_datum)) txOut.datum = current.inline_datum as unknown as HexBlob;
+      if (isNotNil(current.inline_datum)) txOut.datum = PlutusData.fromCbor(HexBlob(current.inline_datum)).toCore();
       if (isNotNil(current.reference_script_type)) txOut.scriptReference = parseReferenceScript(current);
 
       if (isNotNil(current.asset_name) && current.asset_policy && current.asset_quantity) {

@@ -1,7 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
 import { CustomError } from 'ts-custom-error';
 import { FilterByPolicyIds } from './types';
-import { HexBlob } from '@cardano-sdk/util';
 import { ProjectionOperator } from '../../types';
 import { logError } from './util';
 import { map } from 'rxjs';
@@ -18,7 +17,7 @@ export interface Handle {
   latestOwnerAddress: Cardano.PaymentAddress | null;
   assetId: Cardano.AssetId;
   policyId: Cardano.PolicyId;
-  datum?: Cardano.Datum;
+  datum?: Cardano.PlutusData;
 }
 
 export interface WithHandles {
@@ -41,7 +40,7 @@ class HandleParsingError extends CustomError {
 
 const mapHandleToData = (
   assetId: Cardano.AssetId,
-  data: { datum?: HexBlob | undefined; address?: Cardano.PaymentAddress; policyId: Cardano.PolicyId }
+  data: { datum?: Cardano.PlutusData | undefined; address?: Cardano.PaymentAddress; policyId: Cardano.PolicyId }
 ) => {
   const handle = handleFromAssetId(assetId);
   if (!isValidHandle(handle)) throw new HandleParsingError(handle);

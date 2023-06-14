@@ -1,7 +1,10 @@
-import { ChainSyncEventType } from '@cardano-sdk/core';
+import { Cardano, ChainSyncEventType, PlutusData } from '@cardano-sdk/core';
 import { Mappers } from '@cardano-sdk/projection';
 import { OutputEntity, TokensEntity } from '../entity';
 import { typeormOperator } from './util';
+
+const serializeDatumIfExists = (datum: Cardano.PlutusData | undefined) =>
+  datum ? PlutusData.fromCore(datum).toCbor() : undefined;
 
 export const storeUtxo = typeormOperator<Mappers.WithUtxo>(
   async ({ utxo: { consumed, produced }, block: { header }, eventType, queryRunner }) => {
@@ -15,7 +18,7 @@ export const storeUtxo = typeormOperator<Mappers.WithUtxo>(
               address,
               block: { slot: header.slot },
               coins: value.coins,
-              datum,
+              datum: serializeDatumIfExists(datum),
               datumHash,
               outputIndex: index,
               scriptReference,
