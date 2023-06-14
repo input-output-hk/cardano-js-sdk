@@ -75,6 +75,47 @@ describe('cmlToCore', () => {
     });
   });
 
+  describe('plutusData roundtrip', () => {
+    test('bigint', () => {
+      const plutusData: Cardano.PlutusData = 123n;
+      const plutusDataWithCbor: Cardano.PlutusData = 123n;
+      expect(cmlToCore.plutusData(coreToCml.plutusData(scope, plutusData))).toEqual(plutusDataWithCbor);
+      expect(cmlToCore.plutusData(coreToCml.plutusData(scope, plutusDataWithCbor))).toEqual(plutusDataWithCbor);
+    });
+    test('list', () => {
+      const plutusData: Cardano.PlutusData = { items: [123n] };
+      const plutusDataWithCbor: Cardano.PlutusData = {
+        cbor: HexBlob('9f187bff'),
+        items: [123n]
+      };
+      expect(cmlToCore.plutusData(coreToCml.plutusData(scope, plutusData))).toEqual(plutusDataWithCbor);
+      expect(cmlToCore.plutusData(coreToCml.plutusData(scope, plutusDataWithCbor))).toEqual(plutusDataWithCbor);
+    });
+    test('map', () => {
+      const plutusData: Cardano.PlutusData = { data: new Map([[123n, 1234n]]) };
+      const plutusDataWithCbor: Cardano.PlutusData = {
+        cbor: HexBlob('a1187b1904d2'),
+        data: new Map([[123n, 1234n]])
+      };
+      expect(cmlToCore.plutusData(coreToCml.plutusData(scope, plutusData))).toEqual(plutusDataWithCbor);
+      expect(cmlToCore.plutusData(coreToCml.plutusData(scope, plutusDataWithCbor))).toEqual(plutusDataWithCbor);
+    });
+    test('constructor', () => {
+      const plutusData: Cardano.PlutusData = { constructor: 1n, fields: { items: [123n] } };
+      const plutusDataWithCbor: Cardano.PlutusData = {
+        cbor: HexBlob('d87a9f187bff'),
+        constructor: 1n,
+        fields: { cbor: HexBlob('9f187bff'), items: [123n] }
+      };
+      expect(cmlToCore.plutusData(coreToCml.plutusData(scope, plutusData))).toEqual(plutusDataWithCbor);
+      expect(cmlToCore.plutusData(coreToCml.plutusData(scope, plutusDataWithCbor))).toEqual(plutusDataWithCbor);
+    });
+    test('bytes', () => {
+      const plutusData: Cardano.PlutusData = new Uint8Array(Buffer.from('123abc', 'hex'));
+      expect(cmlToCore.plutusData(coreToCml.plutusData(scope, plutusData))).toEqual(plutusData);
+    });
+  });
+
   it('utxo', () => {
     const utxo: Cardano.Utxo[] = [[txIn as Cardano.HydratedTxIn, txOut]];
     expect(cmlToCore.utxo(coreToCml.utxo(scope, utxo))).toEqual(utxo);

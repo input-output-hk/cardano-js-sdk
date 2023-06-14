@@ -3,8 +3,8 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { AssetId, PlutusLanguageVersion, ScriptType } from '../../Cardano';
 import { Base64Blob, HexBlob, ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
 import { CML } from '../CML';
-import { ScriptKind } from '@dcspark/cardano-multiplatform-lib-nodejs';
-import { SerializationError, SerializationFailure } from '../../errors';
+import { NotImplementedError, SerializationError, SerializationFailure } from '../../errors';
+import { PlutusDataKind, ScriptKind } from '@dcspark/cardano-multiplatform-lib-nodejs';
 import { bytesToHex } from '../../util/misc';
 import { createCertificate } from './certificate';
 
@@ -182,10 +182,54 @@ export const getCoreScript = (scope: ManagedFreeableScope, script: CML.Script): 
   return coreScriptRef;
 };
 
+const mapPlutusList = (plutusList: CML.PlutusList): Cardano.PlutusList =>
+  usingAutoFree((scope) => {
+    const items: Cardano.PlutusData[] = [];
+    for (let i = 0; i < plutusList.len(); i++) {
+      const element = scope.manage(plutusList.get(i));
+      // eslint-disable-next-line no-use-before-define
+      items.push(plutusData(element));
+    }
+    return { cbor: HexBlob(Buffer.from(plutusList.to_bytes()).toString('hex')), items };
+  });
+
+export const plutusData = (data: CML.PlutusData): Cardano.PlutusData =>
+  usingAutoFree((scope) => {
+    switch (data.kind()) {
+      case PlutusDataKind.Bytes:
+        return data.as_bytes()!;
+      case PlutusDataKind.ConstrPlutusData: {
+        const constrPlutusData = scope.manage(data.as_constr_plutus_data()!);
+        return {
+          cbor: HexBlob(Buffer.from(data.to_bytes()).toString('hex')),
+          constructor: BigInt(scope.manage(constrPlutusData.alternative()).to_str()),
+          fields: mapPlutusList(scope.manage(constrPlutusData.data()))
+        } as Cardano.ConstrPlutusData;
+      }
+      case PlutusDataKind.Integer:
+        return BigInt(scope.manage(data.as_integer()!).to_str());
+      case PlutusDataKind.List:
+        return mapPlutusList(scope.manage(data.as_list()!));
+      case PlutusDataKind.Map: {
+        const cmlPlutusMap = scope.manage(data.as_map()!);
+        const coreMap = new Map<Cardano.PlutusData, Cardano.PlutusData>();
+        const cmlKeys = scope.manage(cmlPlutusMap.keys());
+        for (let i = 0; i < cmlKeys.len(); i++) {
+          const cmlKey = scope.manage(cmlKeys.get(i));
+          coreMap.set(plutusData(cmlKey), plutusData(scope.manage(cmlPlutusMap.get(cmlKey))!));
+        }
+        return { cbor: HexBlob(Buffer.from(data.to_bytes()).toString('hex')), data: coreMap } as Cardano.PlutusMap;
+      }
+      default:
+        throw new NotImplementedError(`PlutusData mapping for kind ${data.kind()}`);
+    }
+  });
+
 export const txOut = (output: CML.TransactionOutput): Cardano.TxOut =>
   usingAutoFree((scope) => {
-    const dataHashBytes = scope.manage(scope.manage(output.datum())?.as_data_hash())?.to_bytes();
-    const inlineDatum = scope.manage(scope.manage(output.datum())?.as_inline_data())?.to_bytes();
+    const cmlDatum = scope.manage(output.datum());
+    const cmlInlineDatum = scope.manage(cmlDatum?.as_inline_data());
+    const dataHashBytes = scope.manage(cmlDatum?.as_data_hash())?.to_bytes();
     const scriptRef = scope.manage(output.script_ref());
     const cmlAddress = scope.manage(output.address());
     const byronAddress = scope.manage(cmlAddress.as_byron());
@@ -193,7 +237,7 @@ export const txOut = (output: CML.TransactionOutput): Cardano.TxOut =>
 
     return {
       address: Cardano.PaymentAddress(address),
-      datum: inlineDatum ? bytesToHex(inlineDatum) : undefined,
+      datum: cmlInlineDatum ? bytesToHex(cmlInlineDatum.to_bytes()) : undefined,
       datumHash: dataHashBytes ? Crypto.Hash32ByteBase16.fromHexBlob(bytesToHex(dataHashBytes)) : undefined,
       scriptReference: scriptRef ? getCoreScript(scope, scope.manage(scriptRef.script())) : undefined,
       value: value(scope.manage(output.amount()))
@@ -333,7 +377,7 @@ export const txWitnessRedeemers = (redeemers?: CML.Redeemers): Cardano.Redeemer[
       const redeemerTagKind = scope.manage(reedeemer.tag()).kind();
 
       result.push({
-        data: HexBlob.fromBytes(scope.manage(reedeemer.data()).to_bytes()),
+        data: bytesToHex(scope.manage(reedeemer.data()).to_bytes()),
         executionUnits: {
           memory: Number(scope.manage(exUnits.mem()).to_str()),
           steps: Number(scope.manage(exUnits.steps()).to_str())
@@ -341,16 +385,6 @@ export const txWitnessRedeemers = (redeemers?: CML.Redeemers): Cardano.Redeemer[
         index: Number(scope.manage(reedeemer.index()).to_str()),
         purpose: Object.values(Cardano.RedeemerPurpose)[redeemerTagKind]
       });
-    }
-    return result;
-  });
-
-export const txWitnessDatums = (datums?: CML.PlutusList): Cardano.Datum[] | undefined =>
-  usingAutoFree((scope) => {
-    if (!datums) return;
-    const result: Cardano.Datum[] = [];
-    for (let j = 0; j < datums.len(); j++) {
-      result.push(HexBlob.fromBytes(scope.manage(datums.get(j)).to_bytes()));
     }
     return result;
   });
@@ -408,9 +442,20 @@ export const txWitnessSet = (witnessSet: CML.TransactionWitnessSet): Cardano.Wit
       }
     }
 
+    const datums = plutusDatums
+      ? (() => {
+          const result: HexBlob[] = [];
+          for (let i = 0; i < plutusDatums.len(); i++) {
+            const datum = plutusDatums.get(i);
+            result.push(bytesToHex(datum.to_bytes()));
+          }
+          return result;
+        })()
+      : undefined;
+
     return {
       bootstrap: txWitnessBootstrap(bootstraps),
-      datums: txWitnessDatums(plutusDatums),
+      datums,
       redeemers: txWitnessRedeemers(redeemers),
       scripts: txWitnessScripts(witnessSet),
       signatures: txSignatures
