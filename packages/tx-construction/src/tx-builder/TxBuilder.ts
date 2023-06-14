@@ -1,5 +1,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, HandleProvider, HandleResolution } from '@cardano-sdk/core';
+import { GreedyInputSelector, SelectionSkeleton } from '@cardano-sdk/input-selection';
+import { GroupedAddress, SignTransactionOptions, TransactionSigner, util } from '@cardano-sdk/key-management';
 import {
   InsufficientRewardAccounts,
   OutputBuilderTxOut,
@@ -16,13 +18,12 @@ import {
 import { Logger } from 'ts-log';
 import { OutputBuilderValidator, TxOutputBuilder } from './OutputBuilder';
 import { RewardAccountWithPoolId } from '../types';
-import { SelectionSkeleton } from '@cardano-sdk/input-selection';
-import { SignTransactionOptions, TransactionSigner, util } from '@cardano-sdk/key-management';
 import { contextLogger, deepEquals } from '@cardano-sdk/util';
 import { createOutputValidator } from '../output-validation';
 import { finalizeTx } from './finalizeTx';
 import { firstValueFrom } from 'rxjs';
 import { initializeTx } from './initializeTx';
+import minBy from 'lodash/minBy';
 
 type BuiltTx = {
   tx: Cardano.TxBodyWithHash;
@@ -44,6 +45,7 @@ interface LazySignerProps {
 }
 
 type TxBuilderStakePool = Omit<Cardano.Cip17Pool, 'id'> & { id: Cardano.PoolId };
+type RewardAccountsAndWeights = Map<Cardano.RewardAccount, number>;
 
 class LazyTxSigner implements UnsignedTx {
   #built?: BuiltTx;
@@ -167,17 +169,28 @@ export class GenericTxBuilder implements TxBuilder {
         build: async () => {
           this.#logger.debug('Building');
           try {
-            await this.#delegatePortfolio();
+            const rewardAccountsWithWeights = await this.#delegatePortfolio();
             await this.#validateOutputs();
             // Take a snapshot of returned properties,
             // so that they don't change while `initializeTx` is resolving
             const ownAddresses = await firstValueFrom(this.#dependencies.keyAgent.knownAddresses$);
+            const rewardAccounts = await this.#dependencies.txBuilderProviders.rewardAccounts();
             const auxiliaryData = this.partialAuxiliaryData && { ...this.partialAuxiliaryData };
             const extraSigners = this.partialExtraSigners && [...this.partialExtraSigners];
             const signingOptions = this.partialSigningOptions && { ...this.partialSigningOptions };
 
             if (this.partialAuxiliaryData) {
               this.partialTxBody.auxiliaryDataHash = Cardano.computeAuxiliaryDataHash(this.partialAuxiliaryData);
+            }
+
+            const dependencies = { ...this.#dependencies };
+            if (rewardAccounts.length > 1 && rewardAccountsWithWeights.size > 0) {
+              // Distributing balance according to weights is necessary when there are multiple reward accounts
+              // and delegating, to make sure utxos are part of the correct addresses (the ones being delegated)
+              dependencies.inputSelector = GenericTxBuilder.#createGreedyInputSelector(
+                rewardAccountsWithWeights,
+                ownAddresses
+              );
             }
 
             const { body, hash, inputSelection } = await initializeTx(
@@ -189,7 +202,7 @@ export class GenericTxBuilder implements TxBuilder {
                 signingOptions,
                 witness: { extraSigners }
               },
-              this.#dependencies
+              dependencies
             );
             return {
               ctx: {
@@ -244,24 +257,39 @@ export class GenericTxBuilder implements TxBuilder {
     return this.#dependencies.txBuilderProviders.rewardAccounts();
   }
 
-  async #delegatePortfolio(): Promise<void> {
+  async #delegatePortfolio(): Promise<RewardAccountsAndWeights> {
+    const rewardAccountsWithWeights: RewardAccountsAndWeights = new Map();
     if (!this.#requestedPortfolio) {
       // Delegation using CIP17 portfolio was not requested
-      return;
+      return rewardAccountsWithWeights;
     }
 
     // Create stake keys to match number of requested pools
     const rewardAccounts = await this.#getOrCreateRewardAccounts();
 
     // New poolIds will be allocated to un-delegated stake keys
-    const newPoolIds = this.#requestedPortfolio
+    const newPools = this.#requestedPortfolio
       .filter((cip17Pool) =>
         rewardAccounts.every((rewardAccount) => rewardAccount.delegatee?.nextNextEpoch?.id !== cip17Pool.id)
       )
-      .map(({ id }) => id)
       .reverse();
 
-    this.#logger.debug('New poolIds requested in portfolio:', newPoolIds);
+    this.#logger.debug(
+      'New poolIds requested in portfolio:',
+      newPools.map(({ id }) => id)
+    );
+
+    // Reward accounts already delegated to the correct pool. Change must be distributed accordingly
+    for (const accnt of rewardAccounts.filter(
+      (rewardAccount) =>
+        rewardAccount.keyStatus === Cardano.StakeKeyStatus.Registered &&
+        rewardAccount.delegatee?.nextNextEpoch &&
+        this.#requestedPortfolio?.some(({ id }) => id === rewardAccount.delegatee?.nextNextEpoch?.id)
+    ))
+      rewardAccountsWithWeights.set(
+        accnt.address,
+        this.#requestedPortfolio!.find(({ id }) => id === accnt.delegatee?.nextNextEpoch?.id)!.weight
+      );
 
     // Reward accounts which don't have the stake key registered or that were delegated but should not be anymore
     const availableRewardAccounts = rewardAccounts
@@ -274,23 +302,24 @@ export class GenericTxBuilder implements TxBuilder {
       .sort(GenericTxBuilder.#sortRewardAccountsDelegatedFirst)
       .reverse(); // items will be popped from this array, so we want the most suitable at the end of the array
 
-    if (newPoolIds.length > availableRewardAccounts.length) {
+    if (newPools.length > availableRewardAccounts.length) {
       throw new InsufficientRewardAccounts(
-        newPoolIds,
+        newPools.map(({ id }) => id),
         availableRewardAccounts.map(({ address }) => address)
       );
     }
 
     // Code below will pop items one by one (poolId)-(available stake key)
     const certificates: Cardano.Certificate[] = [];
-    while (newPoolIds.length > 0 && availableRewardAccounts.length > 0) {
-      const newPoolId = newPoolIds.pop()!;
+    while (newPools.length > 0 && availableRewardAccounts.length > 0) {
+      const { id: newPoolId, weight } = newPools.pop()!;
       const rewardAccount = availableRewardAccounts.pop()!;
       this.#logger.debug(`Building delegation certificate for ${newPoolId} ${rewardAccount}`);
       if (rewardAccount.keyStatus !== Cardano.StakeKeyStatus.Registered) {
         certificates.push(Cardano.createStakeKeyRegistrationCert(rewardAccount.address));
       }
       certificates.push(Cardano.createDelegationCert(rewardAccount.address, newPoolId));
+      rewardAccountsWithWeights.set(rewardAccount.address, weight);
     }
 
     // Deregister stake keys no longer needed
@@ -301,6 +330,7 @@ export class GenericTxBuilder implements TxBuilder {
       }
     }
     this.partialTxBody = { ...this.partialTxBody, certificates };
+    return rewardAccountsWithWeights;
   }
 
   /** Registered and delegated < Registered < Unregistered */
@@ -317,5 +347,36 @@ export class GenericTxBuilder implements TxBuilder {
     };
 
     return getScore(a) - getScore(b);
+  }
+
+  /**
+   * Searches the payment address with the smallest index associated to the reward accounts.
+   *
+   * @param rewardAccountsWithWeights reward account addresses and the portfolio distribution weights.
+   * @param ownAddresses addresses to search in by reward account.
+   * @returns GreedyInputSelector with the addresses and weights to use as change addresses.
+   * @throws in case some reward accounts are not associated with any of the own addresses
+   */
+  static #createGreedyInputSelector(
+    rewardAccountsWithWeights: RewardAccountsAndWeights,
+    ownAddresses: GroupedAddress[]
+  ) {
+    // select the address with smallest index for each reward account
+    const addressesAndWeights = new Map(
+      [...rewardAccountsWithWeights].map(([rewardAccount, weight]) => {
+        const address = minBy(
+          ownAddresses.filter((ownAddr) => ownAddr.rewardAccount === rewardAccount),
+          ({ index }) => index
+        );
+        if (!address) {
+          throw new Error(`Could not find any keyAgent address associated with ${rewardAccount}.`);
+        }
+        return [address.address, weight];
+      })
+    );
+
+    return new GreedyInputSelector({
+      getChangeAddresses: () => Promise.resolve(addressesAndWeights)
+    });
   }
 }

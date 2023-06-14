@@ -13,7 +13,7 @@ const POOLS_COUNT = 5;
 const distributionMessage = 'ObservableWallet.delegation.distribution$:';
 
 /** Distribute the wallet funds evenly across all its addresses */
-const distributeFunds = async (wallet: PersonalWallet) => {
+const fundWallet = async (wallet: PersonalWallet) => {
   await walletReady(wallet, 0n);
   const addresses = await firstValueFrom(wallet.addresses$);
 
@@ -37,22 +37,6 @@ const distributeFunds = async (wallet: PersonalWallet) => {
     await walletReady(wallet);
     totalCoins = (await firstValueFrom(wallet.balance.utxo.available$)).coins;
   }
-
-  const coinsPerAddress = totalCoins / BigInt(addresses.length);
-
-  const txBuilder = wallet.createTxBuilder();
-
-  logger.info(`Sending ${coinsPerAddress} to the ${addresses.length - 1} derived addresses`);
-  // The first one was generated when the wallet was created.
-  for (let i = 1; i < addresses.length; ++i) {
-    const derivedAddress = addresses[i];
-    logger.info('Funding', derivedAddress.address, coinsPerAddress);
-    logger.info(derivedAddress.rewardAccount);
-    txBuilder.addOutput(txBuilder.buildOutput().address(derivedAddress.address).coin(coinsPerAddress).toTxOut());
-  }
-
-  const { tx: signedTx } = await txBuilder.build().sign();
-  await submitAndConfirm(wallet, signedTx);
 };
 
 /** await for rewardAccounts$ to be registered, unregistered, as defined in states   */
@@ -105,10 +89,14 @@ const getPoolIds = async (wallet: PersonalWallet): Promise<Cardano.StakePool[]> 
   return Array.from({ length: POOLS_COUNT }).map((_, index) => activePools.pageResults[index]);
 };
 
-const delegateToMultiplePools = async (wallet: PersonalWallet) => {
+/** Delegate to unique POOLS_COUNT pools. Use even distribution as default. */
+const delegateToMultiplePools = async (
+  wallet: PersonalWallet,
+  weights = Array.from({ length: POOLS_COUNT }).map(() => 1)
+) => {
   const poolIds = await getPoolIds(wallet);
   const portfolio: Pick<Cardano.Cip17DelegationPortfolio, 'pools'> = {
-    pools: poolIds.map(({ hexId: id }) => ({ id, weight: 1 }))
+    pools: poolIds.map(({ hexId: id }, idx) => ({ id, weight: weights[idx] }))
   };
   logger.debug('Delegating portfolio', portfolio);
 
@@ -137,8 +125,8 @@ describe('PersonalWallet/delegationDistribution', () => {
 
   beforeAll(async () => {
     wallet = (await getWallet({ env, idx: 3, logger, name: 'Wallet', polling: { interval: 50 } })).wallet;
+    await fundWallet(wallet);
     await deregisterAllStakeKeys(wallet);
-    await distributeFunds(wallet);
   });
 
   afterAll(() => {
@@ -158,9 +146,6 @@ describe('PersonalWallet/delegationDistribution', () => {
     const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);
 
     expect(rewardAccounts.length).toBe(POOLS_COUNT);
-
-    // Redistribute the funds because delegation costs send change to the first account, messing up the uniform distribution
-    await distributeFunds(wallet);
 
     // Check that reward addresses were delegated
     await walletReady(wallet);
@@ -194,20 +179,11 @@ describe('PersonalWallet/delegationDistribution', () => {
 
     expect([...actualDelegationDistribution.values()]).toEqual(expectedDelegationDistribution);
 
-    // Send all coins to the last address. Check that stake distribution is 100 for that address and 0 for the rest
-    const { coins: totalCoins } = await firstValueFrom(wallet.balance.utxo.total$);
-    const txBuilder = wallet.createTxBuilder();
-    const { tx: txMoveFunds } = await txBuilder
-      .addOutput(
-        txBuilder
-          .buildOutput()
-          .address(walletAddresses[walletAddresses.length - 1].address)
-          .coin(totalCoins - 2_000_000n) // leave some behind for fees
-          .toTxOut()
-      )
-      .build()
-      .sign();
-    await submitAndConfirm(wallet, txMoveFunds);
+    // Delegate so that last address has all funds
+    await delegateToMultiplePools(
+      wallet,
+      Array.from({ length: POOLS_COUNT }).map((_, idx) => (POOLS_COUNT === idx + 1 ? 1 : 0))
+    );
 
     let simplifiedDelegationDistribution: Partial<DelegatedStake>[] = await firstValueFrom(
       wallet.delegation.distribution$.pipe(

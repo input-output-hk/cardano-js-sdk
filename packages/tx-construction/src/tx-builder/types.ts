@@ -183,7 +183,17 @@ export interface TxBuilder {
    */
   buildOutput(txOut?: PartialTxOut): OutputBuilder;
   /**
-   * Configure the transaction to include all the certificates needed to delegate to the pools from the portfolio.
+   * Configures the transaction to include all the certificates needed to delegate to the pools from the portfolio.
+   *
+   * IMPORTANT:
+   *  - When there are multiple reward accounts or a portfolio with multiple pools is requested, {@link GreedyInputSelector}
+   * will be used to distribute the funds according to the weights.
+   *  - Even when delegating to a single pool, the presence of
+   * multiple reward accounts implies the use of {@link GreedyInputSelector} to make sure that all funds are sent to the
+   * stake key being delegated.
+   *  - To avoid this behavior, please make sure that your wallet has a single reward account, AND you are delegating to a single pool.
+   *  - Please see documentation for {@link GreedyInputSelector} to understand the side effects.
+   *
    * - Portfolio delegations that already exist will be preserved.
    * - Delegation certificates will be sent for portfolio pools that are not already delegated.
    *   The order in which stake keys are used is:
