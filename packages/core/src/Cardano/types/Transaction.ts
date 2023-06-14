@@ -3,13 +3,14 @@ import { AuxiliaryData } from './AuxiliaryData';
 import { Base64Blob, HexBlob, OpaqueString, hexStringToBuffer, usingAutoFree } from '@cardano-sdk/util';
 import { CML } from '../../CML/CML';
 import { Certificate } from './Certificate';
-import { Datum, Script } from './Script';
 import { ExUnits, ValidityInterval } from './ProtocolParameters';
 import { HydratedTxIn, TxIn, TxOut } from './Utxo';
 import { Lovelace, TokenMap } from './Value';
 import { NetworkId } from '../ChainId';
 import { PartialBlockHeader } from './Block';
+import { PlutusData } from './PlutusData';
 import { RewardAccount } from '../Address';
+import { Script } from './Script';
 import { TxBodyCBOR } from '../../CBOR/TxBodyCBOR';
 import { bytesToHex } from '../../util/misc';
 
@@ -98,7 +99,7 @@ export enum RedeemerPurpose {
 export interface Redeemer {
   index: number;
   purpose: RedeemerPurpose;
-  data: HexBlob;
+  data: PlutusData;
   executionUnits: ExUnits;
 }
 
@@ -121,7 +122,7 @@ export type Witness = {
   signatures: Signatures;
   scripts?: Script[];
   bootstrap?: BootstrapWitness[];
-  datums?: Datum[];
+  datums?: PlutusData[];
 };
 
 export interface Tx<TBody extends TxBody = TxBody> {

@@ -1,4 +1,4 @@
-import { BigIntMath, HexBlob } from '@cardano-sdk/util';
+import { BigIntMath } from '@cardano-sdk/util';
 import {
   BlockModel,
   BlockOutputModel,
@@ -85,6 +85,7 @@ export const mapTxOut = (txOut: TxOutput): Cardano.TxOut => ({
 
 export const mapTxOutModel = (txOutModel: TxOutputModel, assets?: Cardano.TokenMap): TxOutput => ({
   address: txOutModel.address as unknown as Cardano.PaymentAddress,
+  // Inline datums are missing, but for now it's ok on ChainHistoryProvider
   datumHash: txOutModel.datum ? (txOutModel.datum.toString('hex') as unknown as Hash32ByteBase16) : undefined,
   index: txOutModel.index,
   txId: txOutModel.tx_id.toString('hex') as unknown as Cardano.TransactionId,
@@ -99,8 +100,12 @@ export const mapWithdrawal = (withdrawalModel: WithdrawalModel): Cardano.Withdra
   stakeAddress: withdrawalModel.stake_address as unknown as Cardano.RewardAccount
 });
 
+// TODO: unfortunately this is not nullable and not implemented.
+// Remove this and select the actual redeemer data from `redeemer_data` table.
+const stubRedeemerData = Buffer.from('not implemented');
+
 export const mapRedeemer = (redeemerModel: RedeemerModel): Cardano.Redeemer => ({
-  data: redeemerModel.script_hash.toString('hex') as unknown as HexBlob,
+  data: stubRedeemerData,
   executionUnits: {
     memory: Number(redeemerModel.unit_mem),
     steps: Number(redeemerModel.unit_steps)

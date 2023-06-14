@@ -1,7 +1,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { AssetId } from '../../src/Cardano';
 import { Base64Blob, HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
-import { Cardano, cmlToCore, coreToCml } from '../../src';
+import { CML, Cardano, cmlToCore, coreToCml } from '../../src';
 import { NativeScript } from '@dcspark/cardano-multiplatform-lib-nodejs';
 import {
   babbageTxBody,
@@ -17,6 +17,7 @@ import {
   valueWithAssets
 } from './testData';
 import { createAssetId } from '../../src/CML/cmlToCore';
+import { isConstrPlutusData, isPlutusBoundedBytes, isPlutusMap } from '../../src/Cardano/util';
 import { parseAssetId } from '../../src/CML/coreToCml';
 
 describe('cmlToCore', () => {
@@ -72,6 +73,78 @@ describe('cmlToCore', () => {
     it('can convert a CML.TransactionOutput with babbage fields to Core.TxOut', () => {
       expect(cmlToCore.txOut(coreToCml.txOut(scope, babbageTxOutWithInlineDatum))).toEqual(babbageTxOutWithInlineDatum);
       expect(cmlToCore.txOut(coreToCml.txOut(scope, babbageTxOutWithDatumHash))).toEqual(babbageTxOutWithDatumHash);
+    });
+
+    it('converts inline datum into a parseable format', () => {
+      // An extended cip68/222 datum (handle)
+      const nftMetadataDatum = Buffer.from(
+        'd8799faa446e616d654724736e656b363945696d6167655838697066733a2f2f7a6232726861476b726d32675143333636535a626254516d6a446433666a64343466744848344c34547441427970534b61496d65646961547970654a696d6167652f6a706567426f6700496f675f6e756d626572004672617269747946636f6d6d6f6e466c656e677468064a636861726163746572734f6c6574746572732c6e756d62657273516e756d657269635f6d6f64696669657273404776657273696f6e0101a84e7374616e646172645f696d6167655838697066733a2f2f7a6232726861476b726d32675143333636535a626254516d6a446433666a64343466744848344c34547441427970534b6146706f7274616c404864657369676e65724047736f6369616c73404676656e646f72404764656661756c7400536c6173745f7570646174655f616464726573735839003382fe4bf2249a8fb53df0b64aba1c78c95f117a7d57c59d9869b341389caccf78b5f141efbd97de910777674368d8ffedbb3fdc797028384c76616c6964617465645f6279581c4da965a049dfd15ed1ee19fba6e2974a0b79fc416dd1796a1f97f5e1ff',
+        'hex'
+      );
+      const getMapValueAsUTF8 = (map: Cardano.PlutusData, key: string): string => {
+        if (!isPlutusMap(map)) throw new Error('unexpected datum type: expected map');
+        const keys = [...map.data.keys()];
+        const mapKey = keys.find((k) => isPlutusBoundedBytes(k) && Buffer.from(k).toString('utf8') === key);
+        if (!mapKey) throw new Error('key not found');
+        const rawValue = map.data.get(mapKey)!;
+        if (!isPlutusBoundedBytes(rawValue)) throw new Error('unexpected datum type: expected bounded bytes');
+        return Buffer.from(rawValue).toString('utf8');
+      };
+      const cmlTxOut = coreToCml.txOut(scope, txOut);
+      cmlTxOut.set_datum(scope.manage(CML.Datum.new_data(scope.manage(CML.PlutusData.from_bytes(nftMetadataDatum)))));
+
+      const coreTxOut = cmlToCore.txOut(cmlTxOut);
+      if (!isConstrPlutusData(coreTxOut.datum!)) throw new Error('unexpected datum type');
+      expect(coreTxOut.datum.fields.items.length).toBe(3);
+
+      const nftMetadata = coreTxOut.datum.fields.items[0];
+      expect(getMapValueAsUTF8(nftMetadata, 'name')).toEqual('$snek69');
+
+      const handleMetadata = coreTxOut.datum.fields.items[2];
+      expect(getMapValueAsUTF8(handleMetadata, 'standard_image')).toEqual(
+        'ipfs://zb2rhaGkrm2gQC366SZbbTQmjDd3fjd44ftHH4L4TtABypSKa'
+      );
+    });
+  });
+
+  describe('plutusData roundtrip', () => {
+    test('bigint', () => {
+      const plutusData: Cardano.PlutusData = 123n;
+      const plutusDataWithCbor: Cardano.PlutusData = 123n;
+      expect(cmlToCore.plutusData(coreToCml.plutusData(scope, plutusData))).toEqual(plutusDataWithCbor);
+      expect(cmlToCore.plutusData(coreToCml.plutusData(scope, plutusDataWithCbor))).toEqual(plutusDataWithCbor);
+    });
+    test('list', () => {
+      const plutusData: Cardano.PlutusData = { items: [123n] };
+      const plutusDataWithCbor: Cardano.PlutusData = {
+        cbor: HexBlob('9f187bff'),
+        items: [123n]
+      };
+      expect(cmlToCore.plutusData(coreToCml.plutusData(scope, plutusData))).toEqual(plutusDataWithCbor);
+      expect(cmlToCore.plutusData(coreToCml.plutusData(scope, plutusDataWithCbor))).toEqual(plutusDataWithCbor);
+    });
+    test('map', () => {
+      const plutusData: Cardano.PlutusData = { data: new Map([[123n, 1234n]]) };
+      const plutusDataWithCbor: Cardano.PlutusData = {
+        cbor: HexBlob('a1187b1904d2'),
+        data: new Map([[123n, 1234n]])
+      };
+      expect(cmlToCore.plutusData(coreToCml.plutusData(scope, plutusData))).toEqual(plutusDataWithCbor);
+      expect(cmlToCore.plutusData(coreToCml.plutusData(scope, plutusDataWithCbor))).toEqual(plutusDataWithCbor);
+    });
+    test('constructor', () => {
+      const plutusData: Cardano.PlutusData = { constructor: 1n, fields: { items: [123n] } };
+      const plutusDataWithCbor: Cardano.PlutusData = {
+        cbor: HexBlob('d87a9f187bff'),
+        constructor: 1n,
+        fields: { cbor: HexBlob('9f187bff'), items: [123n] }
+      };
+      expect(cmlToCore.plutusData(coreToCml.plutusData(scope, plutusData))).toEqual(plutusDataWithCbor);
+      expect(cmlToCore.plutusData(coreToCml.plutusData(scope, plutusDataWithCbor))).toEqual(plutusDataWithCbor);
+    });
+    test('bytes', () => {
+      const plutusData: Cardano.PlutusData = new Uint8Array(Buffer.from('123abc', 'hex'));
+      expect(cmlToCore.plutusData(coreToCml.plutusData(scope, plutusData))).toEqual(plutusData);
     });
   });
 
