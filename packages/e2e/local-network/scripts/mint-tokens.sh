@@ -47,7 +47,7 @@ done
 
 cardano-cli transaction build \
   --babbage-era \
-  --change-address "$faucetAddr" \
+  --change-address "$addr" \
   --tx-in "$utxo" \
   --tx-out "$faucetAddr"+10000000+"$tokenList" \
   --mint "$tokenList" \
