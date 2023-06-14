@@ -73,11 +73,15 @@ Array [
           "witness": Object {
             "bootstrap": Array [],
             "datums": Array [
-              "40",
+              Uint8Array [],
             ],
             "redeemers": Array [
               Object {
-                "data": "434d357a",
+                "data": Uint8Array [
+                  77,
+                  53,
+                  122,
+                ],
                 "executionUnits": Object {
                   "memory": 8959327235984229000n,
                   "steps": 4473903472119932000n,
@@ -86,7 +90,78 @@ Array [
                 "purpose": "certificate",
               },
               Object {
-                "data": "9fd866821901739fd866821902dd9f2341e14478c0fcf5ff22d866821903e39f438002ab0104ffa1448858788900ff029fa040ffff",
+                "data": Object {
+                  "cbor": "9fd866821901739fd866821902dd9f2341e14478c0fcf5ff22d866821903e39f438002ab0104ffa1448858788900ff029fa040ffff",
+                  "items": Array [
+                    Object {
+                      "cbor": "d866821901739fd866821902dd9f2341e14478c0fcf5ff22d866821903e39f438002ab0104ffa1448858788900ff",
+                      "constructor": 371n,
+                      "fields": Object {
+                        "cbor": "9fd866821902dd9f2341e14478c0fcf5ff22d866821903e39f438002ab0104ffa1448858788900ff",
+                        "items": Array [
+                          Object {
+                            "cbor": "d866821902dd9f2341e14478c0fcf5ff",
+                            "constructor": 733n,
+                            "fields": Object {
+                              "cbor": "9f2341e14478c0fcf5ff",
+                              "items": Array [
+                                -4n,
+                                Uint8Array [
+                                  225,
+                                ],
+                                Uint8Array [
+                                  120,
+                                  192,
+                                  252,
+                                  245,
+                                ],
+                              ],
+                            },
+                          },
+                          -3n,
+                          Object {
+                            "cbor": "d866821903e39f438002ab0104ff",
+                            "constructor": 995n,
+                            "fields": Object {
+                              "cbor": "9f438002ab0104ff",
+                              "items": Array [
+                                Uint8Array [
+                                  128,
+                                  2,
+                                  171,
+                                ],
+                                1n,
+                                4n,
+                              ],
+                            },
+                          },
+                          Object {
+                            "cbor": "a1448858788900",
+                            "data": Map {
+                              Uint8Array [
+                                136,
+                                88,
+                                120,
+                                137,
+                              ] => 0n,
+                            },
+                          },
+                        ],
+                      },
+                    },
+                    2n,
+                    Object {
+                      "cbor": "9fa040ff",
+                      "items": Array [
+                        Object {
+                          "cbor": "a0",
+                          "data": Map {},
+                        },
+                        Uint8Array [],
+                      ],
+                    },
+                  ],
+                },
                 "executionUnits": Object {
                   "memory": 4858311980956467000n,
                   "steps": 1434644070377693400n,

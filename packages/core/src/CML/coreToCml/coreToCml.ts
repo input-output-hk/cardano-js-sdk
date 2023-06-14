@@ -27,7 +27,6 @@ import {
   NativeScript,
   NativeScripts,
   PlutusData,
-  PlutusList,
   PlutusV1Script,
   PlutusV1Scripts,
   PlutusV2Script,
@@ -67,7 +66,7 @@ import { AssetId, NetworkId, RedeemerPurpose } from '../../Cardano';
 import * as certificate from './certificate';
 import { CML } from '../CML';
 import { ManagedFreeableScope } from '@cardano-sdk/util';
-import { SerializationError, SerializationFailure } from '../../errors';
+import { NotImplementedError, SerializationError, SerializationFailure } from '../../errors';
 
 export const parseAssetId = (assetId: AssetId) => {
   const policyId = AssetId.getPolicyId(assetId);
@@ -173,6 +172,43 @@ export const nativeScript = (scope: ManagedFreeableScope, script: Cardano.Native
   return cslScript;
 };
 
+const mapPlutusList = (scope: ManagedFreeableScope, list: Cardano.PlutusData[]) => {
+  const plutusList = scope.manage(CML.PlutusList.new());
+  for (const listItem of list) {
+    // eslint-disable-next-line no-use-before-define
+    plutusList.add(plutusData(scope, listItem));
+  }
+  return plutusList;
+};
+
+export const plutusData = (scope: ManagedFreeableScope, data: Cardano.PlutusData): PlutusData => {
+  if (Cardano.util.isPlutusBoundedBytes(data)) {
+    return scope.manage(CML.PlutusData.new_bytes(data));
+  } else if (Cardano.util.isPlutusBigInt(data)) {
+    const bigint = scope.manage(CML.BigInt.from_str(data.toString()));
+    return scope.manage(CML.PlutusData.new_integer(bigint));
+  }
+
+  if (data.cbor) return scope.manage(CML.PlutusData.from_bytes(Buffer.from(data.cbor, 'hex')));
+  if (Cardano.util.isPlutusList(data)) {
+    return scope.manage(CML.PlutusData.new_list(mapPlutusList(scope, data.items)));
+  } else if (Cardano.util.isPlutusMap(data)) {
+    const plutusMap = scope.manage(CML.PlutusMap.new());
+    for (const [key, val] of data.data) {
+      scope.manage(plutusMap.insert(plutusData(scope, key), plutusData(scope, val)));
+    }
+    return scope.manage(CML.PlutusData.new_map(plutusMap));
+  } else if (Cardano.util.isConstrPlutusData(data)) {
+    const alternative = scope.manage(CML.BigNum.from_str(data.constructor.toString()));
+    const constrPlutusData = scope.manage(
+      CML.ConstrPlutusData.new(alternative, mapPlutusList(scope, data.fields.items))
+    );
+    return scope.manage(CML.PlutusData.new_constr_plutus_data(constrPlutusData));
+  }
+
+  throw new NotImplementedError('PlutusData type not implemented');
+};
+
 export const value = (scope: ManagedFreeableScope, { coins, assets }: Cardano.Value): Value => {
   const result = scope.manage(Value.new(scope.manage(BigNum.from_str(coins.toString()))));
   if (!assets) {
@@ -205,12 +241,10 @@ export const txOut = (scope: ManagedFreeableScope, core: Cardano.TxOut): Transac
     );
 
   if (core.datum) {
-    cslTxOut.set_datum(
-      scope.manage(Datum.new_data(scope.manage(PlutusData.from_bytes(Buffer.from(core.datum, 'hex')))))
-    );
-  }
-
-  if (core.datumHash) {
+    const cmlPlutusData = plutusData(scope, core.datum);
+    const cmlDatum = scope.manage(CML.Datum.new_data(cmlPlutusData));
+    cslTxOut.set_datum(cmlDatum);
+  } else if (core.datumHash) {
     cslTxOut.set_datum(
       scope.manage(Datum.new_data_hash(scope.manage(DataHash.from_bytes(Buffer.from(core.datumHash, 'hex')))))
     );
@@ -537,7 +571,7 @@ export const txWitnessRedeemers = (scope: ManagedFreeableScope, redeemers: Carda
   for (const redeemer of redeemers) {
     const tag = mapRedeemerTag(scope, redeemer.purpose);
     const index = scope.manage(BigNum.from_str(redeemer.index.toString()));
-    const data = scope.manage(PlutusData.from_bytes(Buffer.from(redeemer.data, 'hex')));
+    const data = plutusData(scope, redeemer.data);
     const units = scope.manage(
       ExUnits.new(
         scope.manage(BigNum.from_str(redeemer.executionUnits.memory.toString())),
@@ -548,14 +582,6 @@ export const txWitnessRedeemers = (scope: ManagedFreeableScope, redeemers: Carda
     witnessRedeemers.add(scope.manage(Redeemer.new(tag, index, data, units)));
   }
   return witnessRedeemers;
-};
-
-export const txWitnessDatumList = (scope: ManagedFreeableScope, datums: Cardano.Datum[]): CML.PlutusList => {
-  const plutusDatumList = scope.manage(PlutusList.new());
-  for (const datum of datums) {
-    plutusDatumList.add(scope.manage(CML.PlutusData.from_bytes(Buffer.from(datum, 'hex'))));
-  }
-  return plutusDatumList;
 };
 
 export const witnessSet = (scope: ManagedFreeableScope, witness: Cardano.Witness): TransactionWitnessSet => {
@@ -585,7 +611,7 @@ export const witnessSet = (scope: ManagedFreeableScope, witness: Cardano.Witness
     txWitnessSet.set_redeemers(txWitnessRedeemers(scope, witness.redeemers));
   }
   if (witness.datums) {
-    txWitnessSet.set_plutus_data(txWitnessDatumList(scope, witness.datums));
+    txWitnessSet.set_plutus_data(mapPlutusList(scope, witness.datums));
   }
   return txWitnessSet;
 };
