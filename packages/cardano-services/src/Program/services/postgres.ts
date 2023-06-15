@@ -10,14 +10,24 @@ import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
 import { Pool, PoolConfig, QueryConfig } from 'pg';
 import { TlsOptions } from 'tls';
 import { URL } from 'url';
-import { isConnectionError } from '@cardano-sdk/util';
+import { isConnectionError, toSerializableObject } from '@cardano-sdk/util';
 import connString from 'pg-connection-string';
 import fs from 'fs';
+
+const TIMEOUT = 60 * 1000;
 
 const timedQuery = (pool: Pool, logger: Logger) => async (args: string | QueryConfig, values?: any) => {
   const startTime = Date.now();
   const result = await pool.query(args, values);
-  logger.debug(`Query\n${args}\ntook ${Date.now() - startTime} milliseconds`);
+  const query =
+    typeof args === 'string'
+      ? `${args} ${JSON.stringify(toSerializableObject(values))}\nMISSING PREPARED STATEMENT`
+      : 'text' in args && typeof args.text === 'string'
+      ? `${args.text} ${JSON.stringify(toSerializableObject(args.values))}`
+      : `${JSON.stringify(toSerializableObject({ args, values }))}\nUNEXPECTED QUERY FORMAT`;
+
+  logger.debug(`Query\n${query}\ntook ${Date.now() - startTime} milliseconds`);
+
   return result;
 };
 
@@ -37,7 +47,17 @@ export const getPoolWithServiceDiscovery = async (
   { host, database, max, password, ssl, user }: PoolConfig
 ): Promise<Pool> => {
   const { name, port } = await dnsResolver(host!);
-  let pool = new Pool({ database, host: name, max, password, port, ssl, user });
+  let pool = new Pool({
+    connectionTimeoutMillis: TIMEOUT,
+    database,
+    host: name,
+    max,
+    password,
+    port,
+    query_timeout: TIMEOUT,
+    ssl,
+    user
+  });
 
   return new Proxy<Pool>({} as Pool, {
     get(_, prop) {
@@ -48,7 +68,17 @@ export const getPoolWithServiceDiscovery = async (
             if (isConnectionError(error)) {
               const record = await dnsResolver(host!);
               logger.info(`DNS resolution for Postgres service, resolved with record: ${JSON.stringify(record)}`);
-              pool = new Pool({ database, host: record.name, max, password, port: record.port, ssl, user });
+              pool = new Pool({
+                connectionTimeoutMillis: TIMEOUT,
+                database,
+                host: record.name,
+                max,
+                password,
+                port: record.port,
+                query_timeout: TIMEOUT,
+                ssl,
+                user
+              });
               return timedQuery(pool, logger)(args, values);
             }
             throw error;
@@ -146,7 +176,9 @@ export const getPool = async (
   if (options?.postgresConnectionStringDbSync) {
     const pool = new Pool({
       connectionString: options.postgresConnectionStringDbSync,
+      connectionTimeoutMillis: TIMEOUT,
       max: options.postgresPoolMaxDbSync,
+      query_timeout: TIMEOUT,
       ssl
     });
 

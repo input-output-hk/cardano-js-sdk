@@ -265,6 +265,12 @@ withCommonOptions(
       .argParser(dbCacheValidator)
   )
   .addOption(
+    new Option('--asset-cache-ttl <assetCacheTTL>', ProviderServerOptionDescriptions.AssetCacheTtl)
+      .env('ASSET_CACHE_TTL')
+      .default(DB_CACHE_TTL_DEFAULT)
+      .argParser(dbCacheValidator)
+  )
+  .addOption(
     new Option(
       '--token-metadata-request-timeout <tokenMetadataRequestTimeout>',
       ProviderServerOptionDescriptions.PaginationPageSizeLimit

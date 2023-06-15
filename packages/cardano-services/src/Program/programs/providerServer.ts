@@ -1,7 +1,7 @@
 /* eslint-disable complexity */
 /* eslint-disable sonarjs/cognitive-complexity */
 import { AssetHttpService } from '../../Asset/AssetHttpService';
-import { CardanoNode } from '@cardano-sdk/core';
+import { CardanoNode, Seconds } from '@cardano-sdk/core';
 import { CardanoTokenRegistry } from '../../Asset/CardanoTokenRegistry';
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../../ChainHistory';
 import { DbPools, DbSyncEpochPollService } from '../../util';
@@ -74,7 +74,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       return factory(pools as DbPools, node);
     };
 
-  const getCache = (ttl: number) => (args.disableDbCache ? new NoCache() : new InMemoryCache(ttl));
+  const getCache = (ttl: Seconds | 0) => (args.disableDbCache ? new NoCache() : new InMemoryCache(ttl));
   const getDbCache = () => getCache(args.dbCacheTtl);
 
   // Shared cache across all providers
@@ -136,6 +136,8 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
         : new CardanoTokenRegistry({ logger }, args);
       const assetProvider = new DbSyncAssetProvider(
         {
+          cacheTTL: args.assetCacheTTL,
+          disableDbCache: args.disableDbCache,
           paginationPageSizeLimit: Math.min(args.paginationPageSizeLimit! * 10, PAGINATION_PAGE_SIZE_LIMIT_ASSETS)
         },
         {
