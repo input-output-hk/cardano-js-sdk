@@ -1,5 +1,4 @@
 import { Cardano, Point, Provider } from '../..';
-import { Uri } from '../../Asset';
 
 export type Handle = string;
 
@@ -9,22 +8,15 @@ export type Handle = string;
  * @param hasDatum a boolean to indicated whether it contains a datum
  * @param resolvedAddresses the addresses resolved from the handle
  * @param resolvedAt the point at which the Handle was resolved
- * @param backgroundImage the Uri for the Handle background image
- * @param profilePic the Uri for the wallet profile picture
- * @param image the Uri for the Handle image
  */
 export interface HandleResolution {
   policyId: Cardano.PolicyId;
   handle: Handle;
+  hasDatum: boolean;
   resolvedAddresses: {
     cardano: Cardano.PaymentAddress;
-    defaultInWallet?: Handle;
-    hasDatum: boolean;
   };
   resolvedAt: Point;
-  backgroundImage?: Uri;
-  profilePic?: Uri;
-  image?: Uri;
 }
 
 export interface ResolveHandlesArgs {

@@ -9,8 +9,8 @@ import {
   TransactionSigner,
   util
 } from '@cardano-sdk/key-management';
-import { Asset, CML, Cardano, Handle, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { AssetId, mockProviders as mocks, somePartialStakePools } from '@cardano-sdk/util-dev';
+import { CML, Cardano, Handle, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import {
   GenericTxBuilder,
   HandleNotFoundError,
@@ -32,15 +32,11 @@ function assertObjectRefsAreDifferent(obj1: unknown, obj2: unknown): void {
 }
 
 const resolvedHandle = {
-  backgroundImage: Asset.Uri('ipfs://alice'),
   handle: 'alice',
-  image: Asset.Uri('ipfs://image'),
+  hasDatum: false,
   policyId: Cardano.PolicyId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a7'),
-  profilePic: Asset.Uri('ipfs://pix'),
   resolvedAddresses: {
-    cardano: Cardano.PaymentAddress('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg'),
-    defaultInWallet: 'alice',
-    hasDatum: false
+    cardano: Cardano.PaymentAddress('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg')
   },
   resolvedAt: {
     hash: Cardano.BlockId('7a48b034645f51743550bbaf81f8a14771e58856e031eb63844738ca8ad72298'),
