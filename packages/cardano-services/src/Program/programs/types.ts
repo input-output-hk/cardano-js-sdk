@@ -56,6 +56,7 @@ export enum ProviderServerOptionDescriptions {
 
 export type ProviderServerArgs = CommonProgramOptions &
   PosgresProgramOptions<'DbSync'> &
+  PosgresProgramOptions<'Handle'> &
   PosgresProgramOptions<'StakePool'> &
   OgmiosProgramOptions &
   RabbitMqProgramOptions & {
