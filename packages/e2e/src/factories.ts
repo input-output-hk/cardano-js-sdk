@@ -169,7 +169,6 @@ handleProviderFactory.register(HANDLE_PROVIDER, async (params: any): Promise<Han
 
   return new KoraLabsHandleProvider({
     adapter: customHttpFetchAdapter,
-    networkInfoProvider: params.networkInfoProvider,
     policyId: params.policyId,
     serverUrl: params.serverUrl
   });

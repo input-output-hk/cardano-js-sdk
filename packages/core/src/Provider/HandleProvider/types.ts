@@ -16,7 +16,7 @@ export interface HandleResolution {
   resolvedAddresses: {
     cardano: Cardano.PaymentAddress;
   };
-  resolvedAt: Point;
+  resolvedAt?: Point;
 }
 
 export interface ResolveHandlesArgs {

@@ -8,12 +8,10 @@ import {
   getBobHandleAPIResponse,
   getBobHandleProviderResponse
 } from '../util';
-import { mockProviders as mocks } from '@cardano-sdk/util-dev';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 
 const config = {
-  networkInfoProvider: mocks.mockNetworkInfoProvider2(100),
   policyId: Cardano.PolicyId('50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb'),
   serverUrl: 'http://some-hostname:3000'
 };
@@ -93,7 +91,6 @@ describe('KoraLabsHandleProvider', () => {
 
     test('HandleProvider should get not ok health check', async () => {
       const providerWithBadConfig = new KoraLabsHandleProvider({
-        networkInfoProvider: mocks.mockNetworkInfoProvider2(100),
         policyId: Cardano.PolicyId('50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb'),
         serverUrl: ''
       });
