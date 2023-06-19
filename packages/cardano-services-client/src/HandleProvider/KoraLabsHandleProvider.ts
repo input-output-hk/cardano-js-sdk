@@ -1,13 +1,13 @@
 import {
+  Asset,
   Cardano,
+  Handle,
   HealthCheckResponse,
   NetworkInfoProvider,
-  Point,
   ProviderError,
   ProviderFailure,
   ResolveHandlesArgs
 } from '@cardano-sdk/core';
-import { Uri } from '@cardano-sdk/core/dist/cjs/Asset';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { IHandle } from '@koralabs/handles-public-api-interfaces';
@@ -20,7 +20,6 @@ const paths = {
   handles: '/handles',
   healthCheck: '/health'
 };
-export type Handle = string;
 
 export interface KoraLabsHandleProviderDeps {
   serverUrl: string;
@@ -32,36 +31,25 @@ export interface KoraLabsHandleProviderDeps {
 export interface HandleResolution {
   policyId: Cardano.PolicyId;
   handle: Handle;
-  resolvedAddresses: {
-    cardano: Cardano.PaymentAddress;
-    hasDatum: boolean;
-    defaultForStakeKey?: Handle;
-    defaultForPaymentKey?: Handle;
-  };
-  resolvedAt: Point;
-  backgroundImage?: Uri;
-  profilePic?: Uri;
+  cardanoAddress: Cardano.PaymentAddress;
+  hasDatum: boolean;
+  defaultForStakeKey?: Handle;
+  defaultForPaymentKey?: Handle;
+  backgroundImage?: Asset.Uri;
+  profilePic?: Asset.Uri;
 }
 
 export const toHandleResolution = ({
   apiResponse,
-  tip,
   policyId
 }: {
   apiResponse: IHandle;
-  tip: Cardano.Tip;
   policyId: Cardano.PolicyId;
 }): HandleResolution => ({
+  cardanoAddress: Cardano.PaymentAddress(apiResponse.resolved_addresses.ada),
   handle: apiResponse.name,
-  policyId,
-  resolvedAddresses: {
-    cardano: Cardano.PaymentAddress(apiResponse.resolved_addresses.ada),
-    hasDatum: apiResponse.hasDatum
-  },
-  resolvedAt: {
-    hash: tip.hash,
-    slot: tip.slot
-  }
+  hasDatum: apiResponse.hasDatum,
+  policyId
 });
 
 /**
@@ -71,11 +59,9 @@ export const toHandleResolution = ({
  */
 export class KoraLabsHandleProvider {
   private axiosClient: AxiosInstance;
-  private networkInfoProvider: NetworkInfoProvider;
   policyId: Cardano.PolicyId;
 
-  constructor({ serverUrl, networkInfoProvider, adapter, policyId }: KoraLabsHandleProviderDeps) {
-    this.networkInfoProvider = networkInfoProvider;
+  constructor({ serverUrl, adapter, policyId }: KoraLabsHandleProviderDeps) {
     this.axiosClient = axios.create({
       adapter,
       baseURL: serverUrl
@@ -85,11 +71,10 @@ export class KoraLabsHandleProvider {
 
   async resolveHandles(args: ResolveHandlesArgs): Promise<Array<HandleResolution | null>> {
     try {
-      const tip = await this.networkInfoProvider.ledgerTip();
       const results = await Promise.all(
         args.handles.map((handle) => this.axiosClient.get<IHandle>(`${paths.handles}/${handle}`))
       );
-      return results.map(({ data: apiResponse }) => toHandleResolution({ apiResponse, policyId: this.policyId, tip }));
+      return results.map(({ data: apiResponse }) => toHandleResolution({ apiResponse, policyId: this.policyId }));
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.request) {
