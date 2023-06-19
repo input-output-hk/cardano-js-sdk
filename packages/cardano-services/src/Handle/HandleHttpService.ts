@@ -1,4 +1,4 @@
-import { HandleProvider } from '@cardano-sdk/core';
+import { HandleProvider, handleProviderPaths } from '@cardano-sdk/core';
 import { HttpService } from '../Http';
 import { Logger } from 'ts-log';
 import { Router } from 'express';
@@ -17,7 +17,7 @@ export class HandleHttpService extends HttpService {
     useOpenApi(__dirname, router);
 
     router.post(
-      '/resolve',
+      handleProviderPaths.resolveHandles,
       providerHandler(handleProvider.resolveHandles.bind(handleProvider))(HttpService.routeHandler(logger), logger)
     );
   }
