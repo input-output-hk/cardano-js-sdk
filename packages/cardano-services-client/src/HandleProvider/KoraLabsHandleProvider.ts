@@ -23,7 +23,7 @@ const paths = {
 
 export interface KoraLabsHandleProviderDeps {
   serverUrl: string;
-  networkInfoProvider: NetworkInfoProvider;
+  networkInfoProvider?: NetworkInfoProvider;
   adapter?: AxiosAdapter;
   policyId: Cardano.PolicyId;
 }

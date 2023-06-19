@@ -76,7 +76,7 @@ export const utxoProviderFactory = new ProviderFactory<UtxoProvider>();
 export const stakePoolProviderFactory = new ProviderFactory<StakePoolProvider>();
 export const bip32Ed25519Factory = new ProviderFactory<Crypto.Bip32Ed25519>();
 export const addressDiscoveryFactory = new ProviderFactory<AddressDiscovery>();
-export const handleProviderFactory = new ProviderFactory<HandleProvider>();
+export const handleProviderFactory = new ProviderFactory<HandleProvider | KoraLabsHandleProvider>();
 
 // Address Discovery strategies
 
@@ -164,12 +164,11 @@ utxoProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger):
   });
 });
 
-handleProviderFactory.register(HANDLE_PROVIDER, async (params: any): Promise<HandleProvider> => {
+handleProviderFactory.register(HANDLE_PROVIDER, async (params: any): Promise<KoraLabsHandleProvider> => {
   if (params.serverUrl === undefined) throw new Error(`${KoraLabsHandleProvider.name}: ${MISSING_URL_PARAM}`);
 
   return new KoraLabsHandleProvider({
     adapter: customHttpFetchAdapter,
-    networkInfoProvider: params.networkInfoProvider,
     policyId: params.policyId,
     serverUrl: params.serverUrl
   });
