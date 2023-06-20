@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.16.1...@cardano-sdk/wallet@0.16.2) (2023-06-20)
+
+### Bug Fixes
+
+* the transaction id computation now accounts for serialization round trip errors ([#771](https://github.com/input-output-hk/cardano-js-sdk/issues/771)) ([55e96c0](https://github.com/input-output-hk/cardano-js-sdk/commit/55e96c0a59d2e254476f089e4eba6cc34fbdba26))
+* **wallet:** rewardAccounts duplicates HD wallet ([93fbd73](https://github.com/input-output-hk/cardano-js-sdk/commit/93fbd73e1f7951220c8589f5ea4bdd098d903a02))
+
 ## [0.16.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.16.0...@cardano-sdk/wallet@0.16.1) (2023-06-13)
 
 ### Bug Fixes

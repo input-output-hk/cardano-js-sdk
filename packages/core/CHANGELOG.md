@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.14.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.14.0...@cardano-sdk/core@0.14.1) (2023-06-20)
+
+### Features
+
+* cip 67 utils ([f0dd945](https://github.com/input-output-hk/cardano-js-sdk/commit/f0dd9450c81fa2f5c8481647daf2b4cd104edcd9))
+* new pool delegation and stake registration factory methods added to core package ([82d95af](https://github.com/input-output-hk/cardano-js-sdk/commit/82d95af3f68eb06cb58bd2bec5209d93c2aa6c34))
+
+### Bug Fixes
+
+* the transaction id computation now accounts for serialization round trip errors ([#771](https://github.com/input-output-hk/cardano-js-sdk/issues/771)) ([55e96c0](https://github.com/input-output-hk/cardano-js-sdk/commit/55e96c0a59d2e254476f089e4eba6cc34fbdba26))
+
 ## [0.14.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.13.0...@cardano-sdk/core@0.14.0) (2023-06-12)
 
 ### ⚠ BREAKING CHANGES

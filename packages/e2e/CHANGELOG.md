@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.14.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.14.1...@cardano-sdk/e2e@0.14.2) (2023-06-20)
+
+### Features
+
+* **cardano-services:** cache asset info and nft metadata ([43fd02f](https://github.com/input-output-hk/cardano-js-sdk/commit/43fd02ffaa5fdfe1812916e9885b383931141532))
+* **e2e:** give the ability to override cardano-node log level from env vars ([5c80025](https://github.com/input-output-hk/cardano-js-sdk/commit/5c80025c1a1b0457e101b06a565ad7f2d92d7315))
+* new pool delegation and stake registration factory methods added to core package ([82d95af](https://github.com/input-output-hk/cardano-js-sdk/commit/82d95af3f68eb06cb58bd2bec5209d93c2aa6c34))
+
+### Bug Fixes
+
+* **wallet:** rewardAccounts duplicates HD wallet ([93fbd73](https://github.com/input-output-hk/cardano-js-sdk/commit/93fbd73e1f7951220c8589f5ea4bdd098d903a02))
+
 ## [0.14.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.14.0...@cardano-sdk/e2e@0.14.1) (2023-06-13)
 
 **Note:** Version bump only for package @cardano-sdk/e2e

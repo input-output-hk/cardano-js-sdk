@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.9.7...@cardano-sdk/cardano-services-client@0.9.8) (2023-06-20)
+
+### Features
+
+* **cardano-services-client:** add handle http provider ([4cc6b4a](https://github.com/input-output-hk/cardano-js-sdk/commit/4cc6b4abf523d5d0643836abfded8a9befccbf3a))
+* map out optional properties from Koralab api response ([1efd986](https://github.com/input-output-hk/cardano-js-sdk/commit/1efd9862686136fd5c106ddc56e126e8b0da8868))
+
 ## [0.9.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.9.6...@cardano-sdk/cardano-services-client@0.9.7) (2023-06-13)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services-client

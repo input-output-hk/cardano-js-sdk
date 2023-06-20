@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.13.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.13.1...@cardano-sdk/cardano-services@0.13.2) (2023-06-20)
+
+### Features
+
+* **cardano-services:** add typeorm handle provider and http handle service ([78d69ec](https://github.com/input-output-hk/cardano-js-sdk/commit/78d69ec1ae48df08cbf5bbf10406b3063bab75bb))
+* **cardano-services:** cache asset info and nft metadata ([43fd02f](https://github.com/input-output-hk/cardano-js-sdk/commit/43fd02ffaa5fdfe1812916e9885b383931141532))
+* **cardano-services:** improves get entities util to handle entities dependencies ([efc11e8](https://github.com/input-output-hk/cardano-js-sdk/commit/efc11e8a081bacb28a03fa6429f878b8b1eaa394))
+* **cardano-services:** improves the error middleware to log unknown errors ([63e58ca](https://github.com/input-output-hk/cardano-js-sdk/commit/63e58ca7c11b47c415876dac98107135243dcdfa))
+* **cardano-services:** increase details in asset not found error ([3967cb3](https://github.com/input-output-hk/cardano-js-sdk/commit/3967cb36c7bd8b54ccd59d614e63e651f6f9e5a1))
+
+### Bug Fixes
+
+* **cardano-service:** fix query text in query time log line ([8a6a5e6](https://github.com/input-output-hk/cardano-js-sdk/commit/8a6a5e639abc10164c0cb40466af500fbd3f7d4d))
+* **cardano-services:** add postgres connection timeout ([ad8388e](https://github.com/input-output-hk/cardano-js-sdk/commit/ad8388eb0b04e5a044cf6c2af28a2195497a7c09))
+
 ## [0.13.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.13.0...@cardano-sdk/cardano-services@0.13.1) (2023-06-13)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services
