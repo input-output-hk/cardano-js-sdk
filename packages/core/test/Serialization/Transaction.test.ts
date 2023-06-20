@@ -121,13 +121,19 @@ describe('Transaction', () => {
     expect(scope.manage(tx3.body()).to_bytes()).not.toEqual(scope.manage(tx.body()).to_bytes());
   });
 
-  it('can compute the right TX Id', () => {
+  it('can compute the right Tx ID', () => {
     expect(Transaction.fromCbor(HexBlob(TX)).getId()).toEqual(
       '856c8bc6ce3725188b496d62fa389f2beff2f701e6d35af39d3f3464bbce0cec'
     );
 
-    // This transaction was created with the CLI and will cause a round trip different in the body.
-    // If we can compute the right TX Id it means we are handling the round trip difference correctly.
+    // This transaction was created with the CLI and will cause a round trip difference in the body.
+    // If we can compute the right Tx ID it means we are handling the round trip difference correctly.
+    //
+    // The correct hash can be verified using the cardano-cli as follows:
+    //
+    // cardano-cli transaction txid --tx-file ./tx  <-- tx contains the CBOR of the transaction.
+    //
+    // For this particular transaction it should yield the value: '2d7f290c815e061fb7c27e91d2a898bd7b454a71c9b7a26660e2257ac31ebe32'
     expect(Transaction.fromCbor(HexBlob(CLI_TX)).getId()).toEqual(
       '2d7f290c815e061fb7c27e91d2a898bd7b454a71c9b7a26660e2257ac31ebe32'
     );
