@@ -1,15 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { HttpProviderConfigPaths, Provider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
-import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import axios, { AxiosAdapter, AxiosRequestConfig, AxiosResponseTransformer } from 'axios';
 
 const isEmptyResponse = (response: any) => response === '';
 
-export type HttpProviderConfigPaths<T> = { [methodName in keyof T]: string };
 type ResponseTransformers<T> = { [K in keyof T]?: AxiosResponseTransformer };
 
-export interface HttpProviderConfig<T> {
+export interface HttpProviderConfig<T extends Provider> {
   /**
    * Example: "http://localhost:3000"
    */
@@ -53,7 +52,10 @@ export interface HttpProviderConfig<T> {
  * The subset of parameters from HttpProviderConfig that must be set by the
  * client code.
  */
-export type CreateHttpProviderConfig<T> = Pick<HttpProviderConfig<T>, 'baseUrl' | 'adapter' | 'logger'>;
+export type CreateHttpProviderConfig<T extends Provider> = Pick<
+  HttpProviderConfig<T>,
+  'baseUrl' | 'adapter' | 'logger'
+>;
 
 /**
  * Creates a HTTP client for specified provider type, following some conventions:
@@ -65,7 +67,7 @@ export type CreateHttpProviderConfig<T> = Pick<HttpProviderConfig<T>, 'baseUrl' 
  *
  * @returns provider that fetches data over http
  */
-export const createHttpProvider = <T extends object>({
+export const createHttpProvider = <T extends Provider>({
   baseUrl,
   axiosOptions,
   mapError,

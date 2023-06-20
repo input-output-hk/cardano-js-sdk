@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable sonarjs/no-duplicate-string */
 import { HttpProviderConfig, createHttpProvider } from '../src';
-import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { Provider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { Server } from 'http';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import { getPort } from 'get-port-please';
@@ -10,7 +10,7 @@ import express, { RequestHandler } from 'express';
 
 type ComplexArg2 = { map: Map<string, Buffer> };
 type ComplexResponse = Map<bigint, Buffer>[];
-interface TestProvider {
+interface TestProvider extends Provider {
   noArgsEmptyReturn(): Promise<void>;
   complexArgsAndReturn({ arg1, arg2 }: { arg1: bigint; arg2: ComplexArg2 }): Promise<ComplexResponse>;
 }
@@ -27,6 +27,7 @@ const createStubHttpProviderServer = async (port: number, path: string, handler:
 
 const stubProviderPaths = {
   complexArgsAndReturn: '/complex',
+  healthCheck: '/health',
   noArgsEmptyReturn: '/simple'
 };
 

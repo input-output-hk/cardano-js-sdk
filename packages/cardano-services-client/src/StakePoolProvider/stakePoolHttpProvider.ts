@@ -1,5 +1,5 @@
-import { CreateHttpProviderConfig, HttpProviderConfigPaths, createHttpProvider } from '../HttpProvider';
-import { StakePoolProvider } from '@cardano-sdk/core';
+import { CreateHttpProviderConfig, createHttpProvider } from '../HttpProvider';
+import { HttpProviderConfigPaths, StakePoolProvider } from '@cardano-sdk/core';
 
 /**
  * The StakePoolProvider endpoint paths.

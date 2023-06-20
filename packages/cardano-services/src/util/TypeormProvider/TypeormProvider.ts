@@ -21,8 +21,8 @@ export abstract class TypeormProvider extends RunnableModule implements Provider
   logger: Logger;
   health: HealthCheckResponse = { ok: false, reason: 'not started' };
 
-  constructor({ connectionConfig$, logger, entities }: TypeormProviderDependencies) {
-    super('TypeormProvider', logger);
+  constructor(name: string, { connectionConfig$, logger, entities }: TypeormProviderDependencies) {
+    super(name, logger);
     this.#entities = entities;
     this.#connectionConfig$ = connectionConfig$;
   }

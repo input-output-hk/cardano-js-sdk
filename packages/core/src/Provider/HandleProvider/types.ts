@@ -1,4 +1,4 @@
-import { Cardano, Point, Provider } from '../..';
+import { Cardano, HttpProviderConfigPaths, Point, Provider } from '../..';
 
 export type Handle = string;
 
@@ -31,3 +31,8 @@ export interface ResolveHandlesArgs {
 export interface HandleProvider extends Provider {
   resolveHandles(args: ResolveHandlesArgs): Promise<Array<HandleResolution | null>>;
 }
+
+export const handleProviderPaths: HttpProviderConfigPaths<HandleProvider> = {
+  healthCheck: '/health',
+  resolveHandles: '/resolve'
+};

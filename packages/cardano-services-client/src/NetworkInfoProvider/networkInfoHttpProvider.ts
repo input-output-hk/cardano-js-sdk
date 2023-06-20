@@ -1,5 +1,5 @@
-import { CreateHttpProviderConfig, HttpProviderConfigPaths, createHttpProvider } from '../HttpProvider';
-import { NetworkInfoProvider } from '@cardano-sdk/core';
+import { CreateHttpProviderConfig, createHttpProvider } from '../HttpProvider';
+import { HttpProviderConfigPaths, NetworkInfoProvider } from '@cardano-sdk/core';
 
 /**
  * The NetworkInfoProvider endpoint paths.
