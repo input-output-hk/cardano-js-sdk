@@ -110,17 +110,6 @@ const deregisterAllStakeKeys = async (wallet: PersonalWallet): Promise<void> => 
   }
 };
 
-const createStakeKeyRegistrationCert = (rewardAccount: Cardano.RewardAccount): Cardano.Certificate => ({
-  __typename: Cardano.CertificateType.StakeKeyRegistration,
-  stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
-});
-
-const createDelegationCert = (rewardAccount: Cardano.RewardAccount, poolId: Cardano.PoolId): Cardano.Certificate => ({
-  __typename: Cardano.CertificateType.StakeDelegation,
-  poolId,
-  stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
-});
-
 const getPoolIds = async (wallet: PersonalWallet, count: number): Promise<Cardano.StakePool[]> => {
   const activePools = await wallet.stakePoolProvider.queryStakePools({
     filters: { status: [Cardano.StakePoolStatus.Active] },
@@ -134,11 +123,11 @@ const delegateToMultiplePools = async (wallet: PersonalWallet) => {
   // Delegating to multiple pools should be added in TxBuilder. Doing it manually for now.
   // Prepare stakeKey registration certificates
   const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);
-  const stakeKeyRegCertificates = rewardAccounts.map(({ address }) => createStakeKeyRegistrationCert(address));
+  const stakeKeyRegCertificates = rewardAccounts.map(({ address }) => Cardano.createStakeKeyRegistrationCert(address));
 
   const poolIds = await getPoolIds(wallet, rewardAccounts.length);
   const delegationCertificates = rewardAccounts.map(({ address }, index) =>
-    createDelegationCert(address, poolIds[index].id)
+    Cardano.createDelegationCert(address, poolIds[index].id)
   );
 
   logger.debug(
