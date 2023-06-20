@@ -1,7 +1,7 @@
 import { BehaviorSubject, NEVER, of } from 'rxjs';
 import { Cardano } from '@cardano-sdk/core';
 import { ObservableWallet } from '@cardano-sdk/wallet';
-import { insufficientFundsMessage, walletReady } from './util';
+import { insufficientFundsMessage, walletReady } from '../src';
 
 describe('util for e2e tests', () => {
   describe('walletReady', () => {

@@ -1,4 +1,3 @@
-import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, HandleProvider, HandleResolution } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import {
@@ -250,7 +249,6 @@ export class GenericTxBuilder implements TxBuilder {
     this.partialTxBody = { ...this.partialTxBody, certificates: [] };
 
     for (const rewardAccount of rewardAccounts) {
-      const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount.address);
       if (this.#delegateConfig.type === 'deregister') {
         // Deregister scenario
         if (rewardAccount.keyStatus === Cardano.StakeKeyStatus.Unregistered) {
@@ -260,10 +258,7 @@ export class GenericTxBuilder implements TxBuilder {
             rewardAccount.keyStatus
           );
         } else {
-          this.partialTxBody.certificates!.push({
-            __typename: Cardano.CertificateType.StakeKeyDeregistration,
-            stakeKeyHash
-          });
+          this.partialTxBody.certificates!.push(Cardano.createStakeKeyDeregistrationCert(rewardAccount.address));
         }
       } else if (this.#delegateConfig.type === 'delegate') {
         // Register and delegate scenario
@@ -274,27 +269,13 @@ export class GenericTxBuilder implements TxBuilder {
             rewardAccount.keyStatus
           );
         } else {
-          this.partialTxBody.certificates!.push({
-            __typename: Cardano.CertificateType.StakeKeyRegistration,
-            stakeKeyHash
-          });
+          this.partialTxBody.certificates!.push(Cardano.createStakeKeyRegistrationCert(rewardAccount.address));
         }
 
         this.partialTxBody.certificates!.push(
-          GenericTxBuilder.#createDelegationCert(this.#delegateConfig.poolId, stakeKeyHash)
+          Cardano.createDelegationCert(rewardAccount.address, this.#delegateConfig.poolId)
         );
       }
     }
-  }
-
-  static #createDelegationCert(
-    poolId: Cardano.PoolId,
-    stakeKeyHash: Crypto.Ed25519KeyHashHex
-  ): Cardano.StakeDelegationCertificate {
-    return {
-      __typename: Cardano.CertificateType.StakeDelegation,
-      poolId,
-      stakeKeyHash
-    };
   }
 }

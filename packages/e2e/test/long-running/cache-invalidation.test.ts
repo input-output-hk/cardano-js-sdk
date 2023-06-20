@@ -1,14 +1,18 @@
 /* eslint-disable max-statements */
 import { AddressType, KeyRole } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
-import { KeyAgentFactoryProps, TestWallet, getEnv, getWallet, walletVariables } from '../../src';
 import {
+  KeyAgentFactoryProps,
+  TestWallet,
+  getEnv,
   getTxConfirmationEpoch,
+  getWallet,
   submitCertificate,
   waitForEpoch,
   waitForWalletStateSettle,
-  walletReady
-} from '../util';
+  walletReady,
+  walletVariables
+} from '../../src';
 import { logger } from '@cardano-sdk/util-dev';
 
 const env = getEnv(walletVariables);

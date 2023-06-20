@@ -1,11 +1,10 @@
 import { AddressType } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import { DelegatedStake, PersonalWallet, createUtxoBalanceByAddressTracker } from '@cardano-sdk/wallet';
-import { MINUTE, getWallet } from '../../../src';
+import { MINUTE, firstValueFromTimed, getWallet, submitAndConfirm, walletReady } from '../../../src';
 import { Observable, filter, firstValueFrom, map, tap } from 'rxjs';
 import { Percent } from '@cardano-sdk/util';
 import { createLogger } from '@cardano-sdk/util-dev';
-import { firstValueFromTimed, submitAndConfirm, walletReady } from '../../util';
 import { getEnv, walletVariables } from '../../../src/environment';
 import delay from 'delay';
 
@@ -110,17 +109,6 @@ const deregisterAllStakeKeys = async (wallet: PersonalWallet): Promise<void> => 
   }
 };
 
-const createStakeKeyRegistrationCert = (rewardAccount: Cardano.RewardAccount): Cardano.Certificate => ({
-  __typename: Cardano.CertificateType.StakeKeyRegistration,
-  stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
-});
-
-const createDelegationCert = (rewardAccount: Cardano.RewardAccount, poolId: Cardano.PoolId): Cardano.Certificate => ({
-  __typename: Cardano.CertificateType.StakeDelegation,
-  poolId,
-  stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
-});
-
 const getPoolIds = async (wallet: PersonalWallet, count: number): Promise<Cardano.StakePool[]> => {
   const activePools = await wallet.stakePoolProvider.queryStakePools({
     filters: { status: [Cardano.StakePoolStatus.Active] },
@@ -134,11 +122,11 @@ const delegateToMultiplePools = async (wallet: PersonalWallet) => {
   // Delegating to multiple pools should be added in TxBuilder. Doing it manually for now.
   // Prepare stakeKey registration certificates
   const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);
-  const stakeKeyRegCertificates = rewardAccounts.map(({ address }) => createStakeKeyRegistrationCert(address));
+  const stakeKeyRegCertificates = rewardAccounts.map(({ address }) => Cardano.createStakeKeyRegistrationCert(address));
 
   const poolIds = await getPoolIds(wallet, rewardAccounts.length);
   const delegationCertificates = rewardAccounts.map(({ address }, index) =>
-    createDelegationCert(address, poolIds[index].id)
+    Cardano.createDelegationCert(address, poolIds[index].id)
   );
 
   logger.debug(

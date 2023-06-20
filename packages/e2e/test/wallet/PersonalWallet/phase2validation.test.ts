@@ -5,8 +5,7 @@ import { HexBlob, isNotNil } from '@cardano-sdk/util';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, map, take } from 'rxjs';
-import { firstValueFromTimed, walletReady } from '../../util';
-import { getEnv, getWallet, walletVariables } from '../../../src';
+import { firstValueFromTimed, getEnv, getWallet, walletReady, walletVariables } from '../../../src';
 
 const env = getEnv(walletVariables);
 const logger = createLogger();

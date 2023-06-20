@@ -3,10 +3,17 @@ import { Cardano, nativeScriptPolicyId } from '@cardano-sdk/core';
 import { FinalizeTxProps, PersonalWallet } from '@cardano-sdk/wallet';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { KeyRole, util } from '@cardano-sdk/key-management';
-import { burnTokens, createStandaloneKeyAgent, submitAndConfirm, walletReady } from '../../util';
+import {
+  burnTokens,
+  createStandaloneKeyAgent,
+  getEnv,
+  getWallet,
+  submitAndConfirm,
+  walletReady,
+  walletVariables
+} from '../../../src';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom } from 'rxjs';
-import { getEnv, getWallet, walletVariables } from '../../../src';
 
 const env = getEnv(walletVariables);
 const logger = createLogger();

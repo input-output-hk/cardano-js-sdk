@@ -3,7 +3,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
 import { CML } from '@cardano-sdk/core';
-import { localNetworkChainId } from '../util';
+import { localNetworkChainId } from '../util/localNetworkChainId';
 
 /**
  * Generates a new set of Mnemonic words and prints them to the console.
