@@ -3,7 +3,6 @@ import {
   HandleProvider,
   HandleResolution,
   HealthCheckResponse,
-  NetworkInfoProvider,
   ProviderError,
   ProviderFailure,
   ResolveHandlesArgs
@@ -23,18 +22,15 @@ const paths = {
 
 export interface KoraLabsHandleProviderDeps {
   serverUrl: string;
-  networkInfoProvider: NetworkInfoProvider;
   adapter?: AxiosAdapter;
   policyId: Cardano.PolicyId;
 }
 
 export const toHandleResolution = ({
   apiResponse,
-  tip,
   policyId
 }: {
   apiResponse: IHandle;
-  tip: Cardano.Tip;
   policyId: Cardano.PolicyId;
 }): HandleResolution => ({
   handle: apiResponse.name,
@@ -42,10 +38,6 @@ export const toHandleResolution = ({
   policyId,
   resolvedAddresses: {
     cardano: Cardano.PaymentAddress(apiResponse.resolved_addresses.ada)
-  },
-  resolvedAt: {
-    hash: tip.hash,
-    slot: tip.slot
   }
 });
 
@@ -56,11 +48,9 @@ export const toHandleResolution = ({
  */
 export class KoraLabsHandleProvider implements HandleProvider {
   private axiosClient: AxiosInstance;
-  private networkInfoProvider: NetworkInfoProvider;
   policyId: Cardano.PolicyId;
 
-  constructor({ serverUrl, networkInfoProvider, adapter, policyId }: KoraLabsHandleProviderDeps) {
-    this.networkInfoProvider = networkInfoProvider;
+  constructor({ serverUrl, adapter, policyId }: KoraLabsHandleProviderDeps) {
     this.axiosClient = axios.create({
       adapter,
       baseURL: serverUrl
@@ -70,11 +60,10 @@ export class KoraLabsHandleProvider implements HandleProvider {
 
   async resolveHandles(args: ResolveHandlesArgs): Promise<Array<HandleResolution | null>> {
     try {
-      const tip = await this.networkInfoProvider.ledgerTip();
       const results = await Promise.all(
         args.handles.map((handle) => this.axiosClient.get<IHandle>(`${paths.handles}/${handle}`))
       );
-      return results.map(({ data: apiResponse }) => toHandleResolution({ apiResponse, policyId: this.policyId, tip }));
+      return results.map(({ data: apiResponse }) => toHandleResolution({ apiResponse, policyId: this.policyId }));
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.request) {
