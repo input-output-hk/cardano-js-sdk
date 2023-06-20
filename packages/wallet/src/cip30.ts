@@ -333,9 +333,7 @@ export const createWalletApi = (
     logger.debug('signTx');
     const txDecoded = scope.manage(Transaction.fromCbor(HexBlob(tx)));
 
-    const hash = Cardano.TransactionId(
-      Buffer.from(scope.manage(CML.hash_transaction(scope.manage(txDecoded.body()))).to_bytes()).toString('hex')
-    );
+    const hash = txDecoded.getId();
     const coreTx = txDecoded.toCore();
     const shouldProceed = await confirmationCallback({
       data: coreTx,

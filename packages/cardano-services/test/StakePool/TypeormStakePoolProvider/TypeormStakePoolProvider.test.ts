@@ -74,14 +74,7 @@ describe('TypeormStakePoolProvider', () => {
   let poolsInfoWithMetrics: PoolInfo[];
 
   const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
-  const entities = getEntities([
-    'block',
-    'poolMetadata',
-    'poolRegistration',
-    'poolRetirement',
-    'stakePool',
-    'currentPoolMetrics'
-  ]);
+  const entities = getEntities(['currentPoolMetrics']);
   const db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING_STAKE_POOL, max: 1, min: 1 });
 
   beforeAll(async () => {

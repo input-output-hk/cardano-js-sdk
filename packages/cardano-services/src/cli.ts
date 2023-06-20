@@ -178,13 +178,16 @@ withCommonOptions(
   withOgmiosOptions(
     withPostgresOptions(
       withPostgresOptions(
-        withRabbitMqOptions(
-          program
-            .command('start-provider-server')
-            .description('Start the Provider Server')
-            .argument('[serviceNames...]', `List of services to attach: ${Object.values(ServiceNames).toString()}`)
+        withPostgresOptions(
+          withRabbitMqOptions(
+            program
+              .command('start-provider-server')
+              .description('Start the Provider Server')
+              .argument('[serviceNames...]', `List of services to attach: ${Object.values(ServiceNames).toString()}`)
+          ),
+          'StakePool'
         ),
-        'StakePool'
+        'Handle'
       ),
       'DbSync'
     )
@@ -324,6 +327,7 @@ withCommonOptions(
       loadProviderServer({
         ...args,
         postgresConnectionStringDbSync: connectionStringFromArgs(args, 'DbSync'),
+        postgresConnectionStringHandle: connectionStringFromArgs(args, 'Handle'),
         postgresConnectionStringStakePool: connectionStringFromArgs(args, 'StakePool'),
         // Setting the service names via env variable takes preference over command line argument
         serviceNames: args.serviceNames ? args.serviceNames : serviceNames

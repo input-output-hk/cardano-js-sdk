@@ -12,6 +12,9 @@ services:
     <<: *logging
     build:
       context: ./local-network
+    environment:
+      CARDANO_NODE_LOG_LEVEL: ${CARDANO_NODE_LOG_LEVEL:-Info}
+      CARDANO_NODE_CHAINDB_LOG_LEVEL: ${CARDANO_NODE_CHAINDB_LOG_LEVEL:-Notice}
     ports:
       - 3001:3001
     volumes:

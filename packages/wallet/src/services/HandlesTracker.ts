@@ -26,7 +26,7 @@ export interface HandlesTrackerProps {
 
 const handleInfoEquals = (a: HandleInfo, b: HandleInfo) =>
   a.assetId === b.assetId &&
-  a.resolvedAt.hash === b.resolvedAt.hash &&
+  a.resolvedAt?.hash === b.resolvedAt?.hash &&
   deepEquals(a.tokenMetadata, b.tokenMetadata) &&
   deepEquals(a.nftMetadata, b.nftMetadata);
 

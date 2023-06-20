@@ -1,5 +1,5 @@
-import { ChainHistoryProvider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
-import { CreateHttpProviderConfig, HttpProviderConfigPaths, createHttpProvider } from '../HttpProvider';
+import { ChainHistoryProvider, HttpProviderConfigPaths, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { CreateHttpProviderConfig, createHttpProvider } from '../HttpProvider';
 
 /**
  * The ChainHistoryProvider endpoint paths.

@@ -31,8 +31,8 @@ import { passthrough } from '@cardano-sdk/util-rxjs';
  *
  */
 export enum ProjectionName {
-  StakePool = 'stake-pool',
   Handle = 'handle',
+  StakePool = 'stake-pool',
   StakePoolMetadataJob = 'stake-pool-metadata-job',
   StakePoolMetricsJob = 'stake-pool-metrics-job',
   UTXO = 'utxo'
@@ -100,8 +100,6 @@ type Entities = typeof entities;
 type EntityName = keyof Entities;
 type Entity = Entities[EntityName];
 
-export const getEntities = (entityNames: EntityName[]): Entity[] => entityNames.map((name) => entities[name]);
-
 const storeEntities: Partial<Record<StoreName, EntityName[]>> = {
   storeAssets: ['asset'],
   storeBlock: ['block'],
@@ -122,6 +120,26 @@ const entityInterDependencies: Partial<Record<EntityName, EntityName[]>> = {
   poolRetirement: ['block'],
   stakePool: ['block', 'poolRegistration', 'poolRetirement', 'poolMetadata'],
   tokens: ['asset']
+};
+
+export const getEntities = (entityNames: EntityName[]): Entity[] => {
+  const resolvedNames: EntityName[] = [];
+  const resultEntities: Entity[] = [];
+
+  const scanDependencies = (names: EntityName[] | undefined) => {
+    if (!names) return;
+
+    for (const name of names)
+      if (!resolvedNames.includes(name)) {
+        resolvedNames.push(name);
+        resultEntities.push(entities[name]);
+        scanDependencies(entityInterDependencies[name]);
+      }
+  };
+
+  scanDependencies(entityNames);
+
+  return resultEntities;
 };
 
 const mapperInterDependencies: Partial<Record<MapperName, MapperName[]>> = {

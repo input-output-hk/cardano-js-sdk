@@ -113,7 +113,9 @@ $SED -i "${ROOT}/configuration.yaml" \
      -e '/ByronGenesisFile/ aAlonzoGenesisFile: genesis/shelley/genesis.alonzo.json' \
      -e 's/RequiresNoMagic/RequiresMagic/' \
      -e 's/LastKnownBlockVersion-Major: 0/LastKnownBlockVersion-Major: 6/' \
-     -e 's/LastKnownBlockVersion-Minor: 2/LastKnownBlockVersion-Minor: 0/'
+     -e 's/LastKnownBlockVersion-Minor: 2/LastKnownBlockVersion-Minor: 0/' \
+     -e "s/minSeverity: Info/minSeverity: ${CARDANO_NODE_LOG_LEVEL}/" \
+     -e "s/cardano.node.ChainDB: Notice/cardano.node.ChainDB: ${CARDANO_NODE_CHAINDB_LOG_LEVEL}/"
 
   echo "" >> "${ROOT}/configuration.yaml"
   echo "PBftSignatureThreshold: 0.6" >> "${ROOT}/configuration.yaml"

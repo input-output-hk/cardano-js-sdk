@@ -3,7 +3,6 @@ import {
   Cardano,
   Handle,
   HealthCheckResponse,
-  NetworkInfoProvider,
   ProviderError,
   ProviderFailure,
   ResolveHandlesArgs
@@ -23,7 +22,6 @@ const paths = {
 
 export interface KoraLabsHandleProviderDeps {
   serverUrl: string;
-  networkInfoProvider?: NetworkInfoProvider;
   adapter?: AxiosAdapter;
   policyId: Cardano.PolicyId;
 }

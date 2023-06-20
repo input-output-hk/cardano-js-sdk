@@ -4,6 +4,7 @@ import { AssetHttpService } from '../../Asset/AssetHttpService';
 import { CardanoNode, Seconds } from '@cardano-sdk/core';
 import { CardanoTokenRegistry } from '../../Asset/CardanoTokenRegistry';
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../../ChainHistory';
+import { ConnectionNames, PostgresOptionDescriptions, suffixType2Cli } from '../options/postgres';
 import { DbPools, DbSyncEpochPollService } from '../../util';
 import { DbSyncAssetProvider } from '../../Asset/DbSyncAssetProvider';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../NetworkInfo';
@@ -13,13 +14,15 @@ import { DbSyncStakePoolProvider, StakePoolHttpService, createHttpStakePoolMetad
 import { DbSyncUtxoProvider, UtxoHttpService } from '../../Utxo';
 import { DnsResolver, createDnsResolver, getCardanoNode, getDbPools, getGenesisData } from '../utils';
 import { GenesisData } from '../../types';
+import { HandleHttpService, TypeOrmHandleProvider } from '../../Handle';
 import { HttpServer, HttpServerConfig, HttpService, getListen } from '../../Http';
 import { InMemoryCache, NoCache } from '../../InMemoryCache';
 import { Logger } from 'ts-log';
 import { MissingProgramOption, MissingServiceDependency, RunnableDependencies, UnknownServiceName } from '../errors';
+import { Observable } from 'rxjs';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
+import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
 import { Pool } from 'pg';
-import { PostgresOptionDescriptions } from '../options/postgres';
 import { ProviderServerArgs, ProviderServerOptionDescriptions, ServiceNames } from './types';
 import { SrvRecord } from 'dns';
 import { TxSubmitHttpService } from '../../TxSubmit';
@@ -58,8 +61,11 @@ interface ServiceMapFactoryOptions {
 
 const serverName = 'provider-server';
 
+const connectionConfigs: { [k in ConnectionNames]?: Observable<PgConnectionConfig> } = {};
+
 const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
   const { args, pools, dnsResolver, genesisData, logger, node } = options;
+
   const withDbSyncProvider =
     <T>(factory: (dbPools: DbPools, cardanoNode: CardanoNode) => T, serviceName: ServiceNames) =>
     () => {
@@ -72,6 +78,16 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       if (!node) throw new MissingServiceDependency(serviceName, RunnableDependencies.CardanoNode);
 
       return factory(pools as DbPools, node);
+    };
+
+  const withTypeOrmProvider =
+    <T>(suffix: ConnectionNames, factory: (connectionConfig$: Observable<PgConnectionConfig>) => T) =>
+    () => {
+      const name = suffixType2Cli(suffix).slice(1);
+      const connectionConfig$ =
+        connectionConfigs[suffix] ?? (connectionConfigs[suffix] = getConnectionConfig(dnsResolver, name, suffix, args));
+
+      return factory(connectionConfig$);
     };
 
   const getCache = (ttl: Seconds | 0) => (args.disableDbCache ? new NoCache() : new InMemoryCache(ttl));
@@ -108,21 +124,14 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     );
   }, ServiceNames.StakePool);
 
-  const getTypeormStakePoolProvider = () => {
-    const entities = getEntities([
-      'block',
-      'currentPoolMetrics',
-      'poolMetadata',
-      'poolRegistration',
-      'poolRetirement',
-      'stakePool'
-    ]);
-    const connectionConfig$ = getConnectionConfig(dnsResolver, serverName, 'StakePool', args);
+  const getTypeormStakePoolProvider = withTypeOrmProvider('StakePool', (connectionConfig$) => {
+    const entities = getEntities(['currentPoolMetrics']);
+
     return new TypeormStakePoolProvider(
       { paginationPageSizeLimit: args.paginationPageSizeLimit! },
       { connectionConfig$, entities, logger }
     );
-  };
+  });
 
   return {
     [ServiceNames.Asset]: withDbSyncProvider(async (dbPools, cardanoNode) => {
@@ -191,6 +200,12 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       );
       return new ChainHistoryHttpService({ chainHistoryProvider, logger });
     }, ServiceNames.ChainHistory),
+    [ServiceNames.Handle]: withTypeOrmProvider('Handle', async (connectionConfig$) => {
+      const entities = getEntities(['handle']);
+      const handleProvider = new TypeOrmHandleProvider({ connectionConfig$, entities, logger });
+
+      return new HandleHttpService({ handleProvider, logger });
+    }),
     [ServiceNames.Rewards]: withDbSyncProvider(async (dbPools, cardanoNode) => {
       const rewardsProvider = new DbSyncRewardsProvider(
         { paginationPageSizeLimit: args.paginationPageSizeLimit! },

@@ -2,10 +2,10 @@
 import * as Cardano from '../Cardano';
 import * as CmlToCore from '../CML/cmlToCore';
 import * as CoreToCml from '../CML/coreToCml';
+import * as Crypto from '@cardano-sdk/crypto';
 import { CML } from '../CML/CML';
 import { CborReader, CborReaderState, CborWriter } from './CBOR';
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
-import { bytesToHex } from '../util/misc';
 
 const ALONZO_ERA_TX_FRAME_SIZE = 4;
 
@@ -30,6 +30,9 @@ export class Transaction {
   // when the object is re-serialized again to avoid changing the transaction during a round trip serialization.
   // This cache will be invalidated if any of the transaction properties changes after the object has been deserialized.
   #originalBytes: HexBlob | undefined = undefined;
+
+  // TODO: This is a temporary workaround to the round trip issue, will be properly addressed once ADP-2803 is completed.
+  #originalBodyBytes: HexBlob | undefined = undefined;
 
   /**
    * Initializes a new instance of the Transaction class.
@@ -100,7 +103,9 @@ export class Transaction {
 
     const length = reader.readStartArray();
 
-    const body = CML.TransactionBody.from_bytes(reader.readEncodedValue());
+    const bodyBytes = reader.readEncodedValue();
+    const body = CML.TransactionBody.from_bytes(bodyBytes);
+
     const witnessSet = CML.TransactionWitnessSet.from_bytes(reader.readEncodedValue());
     let isValid = true;
 
@@ -116,6 +121,7 @@ export class Transaction {
 
     tx.#isValid = isValid;
     tx.#originalBytes = cbor;
+    tx.#originalBodyBytes = HexBlob.fromBytes(bodyBytes);
 
     return tx;
   }
@@ -126,15 +132,10 @@ export class Transaction {
    * @returns The Core Tx object.
    */
   toCore(): Cardano.Tx {
-    const hash = CML.hash_transaction(this.#body);
-    const transactionHash = Cardano.TransactionId.fromHexBlob(bytesToHex(hash.to_bytes()));
-
-    hash.free();
-
     return {
       auxiliaryData: this.#auxiliaryData ? CmlToCore.txAuxiliaryData(this.#auxiliaryData) : undefined,
       body: CmlToCore.txBody(this.#body),
-      id: transactionHash,
+      id: this.getId(),
       isValid: this.#isValid,
       witness: CmlToCore.txWitnessSet(this.#witnessSet)
     };
@@ -188,6 +189,7 @@ export class Transaction {
     this.#body = body;
 
     this.#originalBytes = undefined;
+    this.#originalBodyBytes = undefined;
   }
 
   /**
@@ -273,6 +275,17 @@ export class Transaction {
     this.#auxiliaryData = auxiliaryData;
 
     this.#originalBytes = undefined;
+  }
+
+  /**
+   * Computes the transaction id for this transaction.
+   */
+  getId(): Cardano.TransactionId {
+    const hash = Crypto.blake2b(Crypto.blake2b.BYTES)
+      .update(this.#originalBodyBytes ? Buffer.from(this.#originalBodyBytes, 'hex') : this.#body.to_bytes())
+      .digest();
+
+    return Cardano.TransactionId.fromHexBlob(HexBlob.fromBytes(hash));
   }
 
   /**

@@ -1,0 +1,109 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Rewards",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/handle/resolve": {
+      "post": {
+        "summary": "Resolve handles",
+        "operationId": "handleResolve",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HandleResolutionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Resolved addresses of given handles",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HandleResolutionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HandleResolution": {
+        "nullable": true,
+        "type": "object",
+        "required": ["handle", "hasDatum", "policyId", "resolvedAddresses"],
+        "properties": {
+          "handle": {
+            "type": "string"
+          },
+          "hasDatum": {
+            "type": "boolean"
+          },
+          "policyId": {
+            "type": "string"
+          },
+          "resolvedAddresses": {
+            "type": "object",
+            "properties": {
+              "cardano": {
+                "type": "string"
+              }
+            }
+          },
+          "resolvedAt": {
+            "type": "object",
+            "required": ["hash", "slot"],
+            "properties": {
+              "hash": {
+                "type": "string"
+              },
+              "slot": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      },
+      "HandleResolutionRequest": {
+        "type": "object",
+        "required": ["handles"],
+        "properties": {
+          "handles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "HandleResolutionResponse": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/HandleResolution"
+        }
+      }
+    }
+  }
+}
