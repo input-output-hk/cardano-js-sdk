@@ -1,7 +1,7 @@
 import {
+  Asset,
   Cardano,
-  HandleProvider,
-  HandleResolution,
+  Handle,
   HealthCheckResponse,
   ProviderError,
   ProviderFailure,
@@ -26,6 +26,17 @@ export interface KoraLabsHandleProviderDeps {
   policyId: Cardano.PolicyId;
 }
 
+export interface HandleResolution {
+  policyId: Cardano.PolicyId;
+  handle: Handle;
+  cardanoAddress: Cardano.PaymentAddress;
+  hasDatum: boolean;
+  defaultForStakeKey?: Handle;
+  defaultForPaymentKey?: Handle;
+  backgroundImage?: Asset.Uri;
+  profilePic?: Asset.Uri;
+}
+
 export const toHandleResolution = ({
   apiResponse,
   policyId
@@ -33,12 +44,10 @@ export const toHandleResolution = ({
   apiResponse: IHandle;
   policyId: Cardano.PolicyId;
 }): HandleResolution => ({
+  cardanoAddress: Cardano.PaymentAddress(apiResponse.resolved_addresses.ada),
   handle: apiResponse.name,
   hasDatum: apiResponse.hasDatum,
-  policyId,
-  resolvedAddresses: {
-    cardano: Cardano.PaymentAddress(apiResponse.resolved_addresses.ada)
-  }
+  policyId
 });
 
 /**
@@ -46,7 +55,7 @@ export const toHandleResolution = ({
  *
  * @param KoraLabsHandleProviderDeps The configuration object fot the KoraLabs Handle Provider.
  */
-export class KoraLabsHandleProvider implements HandleProvider {
+export class KoraLabsHandleProvider {
   private axiosClient: AxiosInstance;
   policyId: Cardano.PolicyId;
 
@@ -80,6 +89,7 @@ export class KoraLabsHandleProvider implements HandleProvider {
       throw new ProviderError(ProviderFailure.Unknown, error, 'Failed to resolve handles');
     }
   }
+
   async healthCheck(): Promise<HealthCheckResponse> {
     try {
       await this.axiosClient.get(`${paths.healthCheck}`);

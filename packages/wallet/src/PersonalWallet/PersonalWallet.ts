@@ -103,6 +103,9 @@ import { createTransactionReemitter } from '../services/TransactionReemitter';
 import isEqual from 'lodash/isEqual';
 import uniq from 'lodash/uniq';
 
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { KoraLabsHandleProvider } from '@cardano-sdk/cardano-services-client';
+
 export interface PersonalWalletProps {
   readonly name: string;
   readonly polling?: PollingConfig;
@@ -118,7 +121,7 @@ export interface PersonalWalletDependencies {
   readonly txSubmitProvider: TxSubmitProvider;
   readonly stakePoolProvider: StakePoolProvider;
   readonly assetProvider: AssetProvider;
-  readonly handleProvider?: HandleProvider;
+  readonly handleProvider?: HandleProvider | KoraLabsHandleProvider;
   readonly networkInfoProvider: WalletNetworkInfoProvider;
   readonly utxoProvider: UtxoProvider;
   readonly chainHistoryProvider: ChainHistoryProvider;
@@ -264,7 +267,7 @@ export class PersonalWallet implements ObservableWallet {
     this.networkInfoProvider = new TrackedWalletNetworkInfoProvider(networkInfoProvider);
     this.stakePoolProvider = new TrackedStakePoolProvider(stakePoolProvider);
     this.assetProvider = new TrackedAssetProvider(assetProvider);
-    this.handleProvider = handleProvider;
+    this.handleProvider = handleProvider as HandleProvider;
     this.chainHistoryProvider = new TrackedChainHistoryProvider(chainHistoryProvider);
     this.rewardsProvider = new TrackedRewardsProvider(rewardsProvider);
 
