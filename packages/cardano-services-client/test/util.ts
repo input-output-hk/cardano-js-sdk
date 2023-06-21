@@ -24,13 +24,11 @@ export const healthCheckResponseWithState = {
 };
 
 export const getAliceHandleProviderResponse = {
-  backgroundImage: 'ipfs://zrljm7nskakjydxlr450ktsj08zuw6aktvgfkmmyw9semrkrezryq3bd',
   cardanoAddress:
     'addr_test1qqk4sr4f7vtqzd2w90d5nfu3n59jhhpawyphnek2y7er02nkrezryq3ydtmkg0e7e2jvzg443h0ffzfwd09wpcxy2fuqmcnecd',
   handle: 'alice',
   hasDatum: false,
-  policyId: Cardano.PolicyId('50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb'),
-  profilePic: 'ipfs://zrljm7nskakjydxlr450ktsj08zuw6aktvgfkmmyw9semrkrezryq3bd'
+  policyId: Cardano.PolicyId('50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb')
 };
 
 export const getBobHandleProviderResponse = {
@@ -44,7 +42,6 @@ export const getBobHandleProviderResponse = {
 };
 
 export const getAliceHandleAPIResponse = {
-  background: 'zrljm7nskakjydxlr450ktsj08zuw6aktvgfkmmyw9semrkrezryq3bd',
   characters: 'rljm7n/23455',
   created_slot_number: 33,
   default_in_wallet: 'alice_default_hndle',
@@ -57,7 +54,6 @@ export const getAliceHandleAPIResponse = {
   numeric_modifiers: '-12.9',
   og: 5,
   original_nft_image: 'c8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56feasdfasd',
-  profile_pic: 'zrljm7nskakjydxlr450ktsj08zuw6aktvgfkmmyw9semrkrezryq3bd',
   rarity: 'rare',
   resolved_addresses: {
     ada: 'addr_test1qqk4sr4f7vtqzd2w90d5nfu3n59jhhpawyphnek2y7er02nkrezryq3ydtmkg0e7e2jvzg443h0ffzfwd09wpcxy2fuqmcnecd'

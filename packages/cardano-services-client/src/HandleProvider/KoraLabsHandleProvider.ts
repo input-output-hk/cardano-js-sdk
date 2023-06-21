@@ -44,12 +44,12 @@ export const toHandleResolution = ({
   apiResponse: IHandle;
   policyId: Cardano.PolicyId;
 }): HandleResolution => ({
-  backgroundImage: Asset.Uri(`ipfs://${apiResponse.background}`),
+  backgroundImage: apiResponse.background ? Asset.Uri(`ipfs://${apiResponse.background}`) : undefined,
   cardanoAddress: Cardano.PaymentAddress(apiResponse.resolved_addresses.ada),
   handle: apiResponse.name,
   hasDatum: apiResponse.hasDatum,
   policyId,
-  profilePic: Asset.Uri(`ipfs://${apiResponse.profile_pic}`)
+  profilePic: apiResponse.profile_pic ? Asset.Uri(`ipfs://${apiResponse.profile_pic}`) : undefined
 });
 
 /**
