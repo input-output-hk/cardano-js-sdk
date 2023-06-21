@@ -68,7 +68,7 @@ describe('Ada handle', () => {
   let policyScript: Cardano.NativeScript;
   let assetIds: Cardano.AssetId[];
 
-  const assetNames = ['6861646e6c6531', '6861646e6c6532'];
+  const assetNames = ['68616e646c6531', '68616e646c6532'];
   let walletAddress: Cardano.PaymentAddress;
   const coins = 2_000_000n; // number of coins to use in each transaction
 
