@@ -43,7 +43,7 @@ describe('RewardsBuilder', () => {
     });
     it('returns RewardEpochModel when there is epochs field', async () => {
       const rewardAccWithBalance = (await fixtureBuilder.getRewardAccounts(1))[0];
-      const epochs = { lowerBound: Cardano.EpochNo(5), upperBound: Cardano.EpochNo(10) };
+      const epochs = { lowerBound: Cardano.EpochNo(2), upperBound: Cardano.EpochNo(4) };
       const result = await builder.getRewardsHistory([rewardAccWithBalance], epochs);
       expect(result.length).toBeGreaterThan(0);
       for (const reward of result) {

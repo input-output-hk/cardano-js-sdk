@@ -1057,7 +1057,9 @@ describe('StakePoolHttpService', () => {
               expect(response.pageResults).toEqual(responseCached.pageResults);
             });
             it('pledgeMet false, status retiring, and condition', async () => {
-              const retiring = await fixtureBuilder.getPools(1, { with: [PoolWith.RetiringState] });
+              const retiring = await fixtureBuilder.getPools(1, {
+                with: [PoolWith.RetiringState, PoolWith.PledgeNotMet]
+              });
               const filter: QueryStakePoolsArgs = {
                 filters: {
                   identifier: {

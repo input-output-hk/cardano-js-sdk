@@ -104,10 +104,10 @@ describe('DbSyncAssetProvider', () => {
 
     expect(asset.history).toEqual(history);
     // TODO: review test data, this is false positive right now
-    // expect(asset.nftMetadata).toBeTruthy();
+    expect(asset.nftMetadata).toBeTruthy();
     expect(asset.nftMetadata).toStrictEqual(assets[0].metadata);
     expect(asset.tokenMetadata).toStrictEqual({
-      assetId: '728847c7898b06f180de05c80b37d38bf77a9ea22bd1e222b8014d964e46542d66696c6573',
+      assetId: '17ebe33f8aeee1fe9a7277fe0dc02261531a896a8b89457895fe60294349502d303032352d7632',
       desc: 'This is my second NFT',
       name: 'Bored Ape'
     });
