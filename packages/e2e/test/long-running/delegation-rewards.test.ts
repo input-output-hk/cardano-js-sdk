@@ -70,7 +70,13 @@ describe('delegation rewards', () => {
 
     const submitDelegationTx = async () => {
       logger.info(`Creating delegation tx at epoch #${(await firstValueFrom(wallet1.currentEpoch$)).epochNo}`);
-      const { tx: signedTx } = await wallet1.createTxBuilder().delegate(poolId).build().sign();
+      const { tx: signedTx } = await wallet1
+        .createTxBuilder()
+        .delegatePortfolio({
+          pools: [{ id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolId)), weight: 1 }]
+        })
+        .build()
+        .sign();
       await wallet1.submitTx(signedTx);
       const { epochNo } = await firstValueFrom(wallet1.currentEpoch$);
       logger.info(`Delegation tx ${signedTx.id} submitted at epoch #${epochNo}`);

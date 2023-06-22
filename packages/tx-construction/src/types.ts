@@ -7,11 +7,15 @@ import { MinimumCoinQuantityPerOutput } from './output-validation';
 
 export type InitializeTxResult = Cardano.TxBodyWithHash & { inputSelection: SelectionSkeleton };
 
+export type RewardAccountWithPoolId = Omit<Cardano.RewardAccountInfo, 'delegatee'> & {
+  delegatee?: { nextNextEpoch?: { id: Cardano.PoolId } };
+};
+
 export interface TxBuilderProviders {
   tip: () => Promise<Cardano.Tip>;
   protocolParameters: () => Promise<Cardano.ProtocolParameters>;
   genesisParameters: () => Promise<Cardano.CompactGenesis>;
-  rewardAccounts: () => Promise<Omit<Cardano.RewardAccountInfo, 'delegatee'>[]>;
+  rewardAccounts: () => Promise<RewardAccountWithPoolId[]>;
   utxoAvailable: () => Promise<Cardano.Utxo[]>;
 }
 
