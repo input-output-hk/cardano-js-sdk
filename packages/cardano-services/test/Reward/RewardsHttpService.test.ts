@@ -260,8 +260,8 @@ describe('RewardsHttpService', () => {
           const rewardAccount = (await fixtureBuilder.getRewardAccounts(1))[0];
           const response = await provider.rewardsHistory({
             epochs: {
-              lowerBound: Cardano.EpochNo(5),
-              upperBound: Cardano.EpochNo(6)
+              lowerBound: Cardano.EpochNo(1),
+              upperBound: Cardano.EpochNo(2)
             },
             rewardAccounts: [rewardAccount]
           });
@@ -275,8 +275,8 @@ describe('RewardsHttpService', () => {
             highestEpoch = Math.max(highestEpoch, result.epoch);
           }
 
-          expect(lowestEpoch).toBeGreaterThanOrEqual(5);
-          expect(highestEpoch).toBeLessThanOrEqual(6);
+          expect(lowestEpoch).toBeGreaterThanOrEqual(1);
+          expect(highestEpoch).toBeLessThanOrEqual(2);
           expect(response.get(rewardAccount)![0]).toMatchShapeOf({ epoch: '0', rewards: 0n });
         });
 
@@ -284,7 +284,7 @@ describe('RewardsHttpService', () => {
           const rewardAccount = (await fixtureBuilder.getRewardAccounts(1))[0];
           const response = await provider.rewardsHistory({
             epochs: {
-              lowerBound: Cardano.EpochNo(5)
+              lowerBound: Cardano.EpochNo(1)
             },
             rewardAccounts: [rewardAccount]
           });
@@ -295,7 +295,7 @@ describe('RewardsHttpService', () => {
             lowestEpoch = Math.min(lowestEpoch, result.epoch);
           }
 
-          expect(lowestEpoch).toBeGreaterThanOrEqual(5);
+          expect(lowestEpoch).toBeGreaterThanOrEqual(1);
           expect(response.get(rewardAccount)![0]).toMatchShapeOf({ epoch: '0', rewards: 0n });
         });
 

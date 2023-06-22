@@ -429,7 +429,7 @@ describe('ChainHistoryHttpService', () => {
 
       it('includes transactions only in specified block range', async () => {
         const { addresses, blockRange, txInRangeCount } = await fixtureBuilder.getAddressesWithSomeInBlockRange(2, {
-          lowerBound: Cardano.BlockNo(200),
+          lowerBound: Cardano.BlockNo(600),
           upperBound: Cardano.BlockNo(1000)
         });
 
