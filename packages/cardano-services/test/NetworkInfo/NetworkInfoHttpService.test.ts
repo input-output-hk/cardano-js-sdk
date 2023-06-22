@@ -2,7 +2,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable sonarjs/no-identical-functions */
-import { CreateHttpProviderConfig, networkInfoHttpProvider } from '@cardano-sdk/cardano-services-client';
+import { CreateHttpProviderConfig, networkInfoHttpProvider, version } from '@cardano-sdk/cardano-services-client';
 import { DbPools, DbSyncEpochPollService, LedgerTipModel, findLedgerTip, loadGenesisData } from '../../src/util';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../src/NetworkInfo';
 import { HttpServer, HttpServerConfig } from '../../src';
@@ -51,7 +51,6 @@ describe('NetworkInfoHttpService', () => {
       min: 1
     })
   };
-
   const fixtureBuilder = new NetworkInfoFixtureBuilder(dbPools.main, logger);
   const epochMonitor = new DbSyncEpochPollService(dbPools.main, epochPollInterval!);
 
@@ -93,7 +92,7 @@ describe('NetworkInfoHttpService', () => {
       });
       service = new NetworkInfoHttpService({ logger, networkInfoProvider });
       httpServer = new HttpServer(config, { logger, runnableDependencies: [cardanoNode], services: [service] });
-      clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
+      clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }), version };
       provider = networkInfoHttpProvider(clientConfig);
 
       await httpServer.initialize();

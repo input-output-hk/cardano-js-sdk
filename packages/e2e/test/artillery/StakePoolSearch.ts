@@ -2,7 +2,7 @@ import * as envalid from 'envalid';
 import { ArtilleryContext, FunctionHook, WhileTrueHook } from './artillery';
 import { Cardano, Paginated, QueryStakePoolsArgs } from '@cardano-sdk/core';
 import { logger } from '@cardano-sdk/util-dev';
-import { stakePoolHttpProvider } from '@cardano-sdk/cardano-services-client';
+import { stakePoolHttpProvider, version } from '@cardano-sdk/cardano-services-client';
 
 /**
  * The context variables shared between all the hooks.
@@ -26,7 +26,7 @@ interface StakePoolSearchVars extends Paginated<Cardano.StakePool> {
 }
 
 const env = envalid.cleanEnv(process.env, { STAKE_POOL_PROVIDER_URL: envalid.str() });
-const provider = stakePoolHttpProvider({ baseUrl: env.STAKE_POOL_PROVIDER_URL, logger });
+const provider = stakePoolHttpProvider({ baseUrl: env.STAKE_POOL_PROVIDER_URL, logger, version });
 
 const PAGE_SIZE = 20;
 

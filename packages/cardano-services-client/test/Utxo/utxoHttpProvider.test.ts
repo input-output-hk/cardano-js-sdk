@@ -1,11 +1,11 @@
 import { Cardano } from '@cardano-sdk/core';
 import { healthCheckResponseWithState } from '../util';
 import { logger } from '@cardano-sdk/util-dev';
-import { utxoHttpProvider } from '../../src';
+import { utxoHttpProvider, version } from '../../src';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 
-const config = { baseUrl: 'http://some-hostname:3000/utxo', logger };
+const config = { baseUrl: 'http://some-hostname:3000/utxo', logger, version };
 
 describe('utxoHttpProvider', () => {
   let axiosMock: MockAdapter;
