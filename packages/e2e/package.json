@@ -146,7 +146,7 @@
     "babel-loader": "^8.2.5",
     "blake2b-no-wasm": "2.1.4",
     "buffer": "^6.0.3",
-    "chromedriver": "^112.0.0",
+    "chromedriver": "^114.0.0",
     "copy-webpack-plugin": "^10.2.4",
     "eslint": "^7.32.0",
     "events": "^3.3.0",
