@@ -5,10 +5,8 @@ import {
   getEnv,
   getTxConfirmationEpoch,
   getWallet,
-  requestCoins,
   runningAgainstLocalNetwork,
   submitAndConfirm,
-  transferCoins,
   waitForEpoch,
   walletVariables
 } from '../../src';
@@ -24,9 +22,6 @@ describe('delegation rewards', () => {
   let wallet2: PersonalWallet;
 
   const initializeWallets = async () => {
-    const amountFromFaucet = 100_000_000_000n;
-    const tAdaToSend = 50_000_000n;
-
     ({ wallet: wallet1, providers } = await getWallet({
       env,
       logger,
@@ -34,9 +29,6 @@ describe('delegation rewards', () => {
       polling: { interval: 50 }
     }));
     ({ wallet: wallet2 } = await getWallet({ env, logger, name: 'Receiving Wallet', polling: { interval: 50 } }));
-
-    await requestCoins({ coins: amountFromFaucet, wallet: wallet1 });
-    await transferCoins({ coins: tAdaToSend, fromWallet: wallet1, toWallet: wallet2 });
 
     await waitForWalletStateSettle(wallet1);
     await waitForWalletStateSettle(wallet2);
