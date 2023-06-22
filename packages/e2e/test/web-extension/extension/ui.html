@@ -27,6 +27,17 @@
   <div>Stake Address: <span id="stakeAddress">-</span></div>
   <div>Balance: <span id="balance">-</span></div>
   <div>Network-wide staked: <span id="supplyDistribution">-</span></div>
+  <div id="multiDelegation">
+    <div class="distribution">
+      <h3>Delegation distribution:</h3>
+      <ul></ul>
+    </div>
+    <div class="delegate">
+      <p>Available Pools: <span class="pools"></span></p>
+      <button>Delegate to multiple pools</button>
+      <p class="delegateTxId"></p>
+    </div>
+  </div>
   <button id="buildAndSignTx">Build & Sign TX</button>
   <div>Signature: <span id="signature">-</span></div>
   <script src="ui.js"></script>

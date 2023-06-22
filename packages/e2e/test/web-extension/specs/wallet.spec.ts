@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 import { getObservableWalletName } from '../extension/const';
 
 const switchToWalletUi = async () => {
@@ -10,6 +11,8 @@ const switchToWalletUi = async () => {
     }
   });
 };
+
+const NUM_POOLS = 3;
 
 describe('wallet', () => {
   const pWalletFound = '#root > div > p:nth-child(4)';
@@ -36,6 +39,11 @@ describe('wallet', () => {
   const dappChangeAddress = '#root > div > p:nth-child(11)';
   const dappStakingAddress = '#root > div > p:nth-child(12)';
   const dappUsedAddress = '#root > div > p:nth-child(13)';
+
+  const btnDelegate = '#multiDelegation .delegate button';
+  const spanPoolIds = '#multiDelegation .delegate .pools';
+  const liPools = '#multiDelegation .distribution li';
+  const liPercents = '#multiDelegation .distribution li .percent';
 
   // The address is filled in by the tests, which are order dependent
   let walletAddr1 = '';
@@ -115,6 +123,42 @@ describe('wallet', () => {
         await switchToWalletUi();
         await buildAndSign();
       });
+
+      it('can delegate to multiple pools', async () => {
+        (await $(btnDelegate)).click();
+
+        // There should be 3 pools available
+        await browser.waitUntil(async () => {
+          try {
+            const poolIds = await $(spanPoolIds).getText();
+            return poolIds.split(' ').length === NUM_POOLS;
+          } catch {
+            return false;
+          }
+        });
+
+        // Delegation transaction was submitted successfully
+        const txId = await $('#multiDelegation .delegateTxId').getText();
+        expect(txId).toHaveTextContaining('TxId');
+
+        // Wallet reports delegating to 3 pools
+        await browser.waitUntil(
+          async () => {
+            try {
+              const delegatedPools = await $$(liPools);
+              return delegatedPools.length === NUM_POOLS;
+            } catch {
+              return false;
+            }
+          },
+          { timeout: 30_000, timeoutMsg: 'Expected wallet.delegation.distribution to report 3 delegations' }
+        );
+
+        // Check wallet delegation distribution is applied and displayed correctly
+        const delegationPercents = await $$(liPercents).map((el) => el.getText());
+        expect(delegationPercents.map((percent) => Math.round(Number.parseFloat(percent)))).toEqual([10, 30, 60]);
+      });
+
       it('can switch to another wallet', async () => {
         // Automatically deactivates first wallet, but keeps the store available for future activation
         await $(btnActivateWallet2).click();
