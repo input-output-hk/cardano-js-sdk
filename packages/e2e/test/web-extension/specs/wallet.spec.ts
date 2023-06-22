@@ -67,12 +67,12 @@ describe('wallet', () => {
       await expect($(divAdaPrice)).toHaveText('2.99');
     });
 
-    describe('ui grants access and creates key agent', () => {
+    describe('web-extension grants access and creates key agent', () => {
       before(async () => {
         await $(btnGrantAccess).click();
         await $(btnActivateWallet1).click();
       });
-      it('ui has access to remote ObservableWallet and SupplyDistribution', async () => {
+      it('web-extension has access to remote ObservableWallet and SupplyDistribution', async () => {
         await browser.waitUntil(async () => {
           try {
             BigInt(await $(spanBalance).getText());
@@ -88,6 +88,9 @@ describe('wallet', () => {
         expect(walletStakeAddr1).toHaveTextContaining('stake');
         await expect($(activeWalletName)).toHaveText(getObservableWalletName(0));
       });
+    });
+
+    describe('dapp can use cip30 wallet api', () => {
       it('dapp has access to cip30 WalletApi', async () => {
         await browser.switchWindow('React App');
         await expect($(pNetworkId)).toHaveText('Network Id (0 = testnet; 1 = mainnet): 0');
@@ -105,7 +108,9 @@ describe('wallet', () => {
         await expect($(dappStakingAddress)).toHaveTextContaining(walletStakeAddr1);
         await expect($(dappUsedAddress)).toHaveTextContaining(walletAddr1);
       });
+    });
 
+    describe('web-extension can build transactions and use wallet manager', () => {
       it('can build and sign a transaction', async () => {
         await switchToWalletUi();
         await buildAndSign();
