@@ -4,7 +4,7 @@ import { Logger } from 'ts-log';
 import { MeasurementUtil, getEnv, getLoadTestScheduler } from '../../../src';
 import { bufferTime, from, tap } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
-import { stakePoolHttpProvider, version } from '@cardano-sdk/cardano-services-client';
+import { stakePoolHttpProvider } from '@cardano-sdk/cardano-services-client';
 
 // Example call:
 /* STAKE_POOL_PROVIDER_URL="http://mhvm:4000/stake-pool" \
@@ -14,7 +14,7 @@ import { stakePoolHttpProvider, version } from '@cardano-sdk/cardano-services-cl
 */
 
 const { STAKE_POOL_PROVIDER_URL } = envalid.cleanEnv(process.env, { STAKE_POOL_PROVIDER_URL: envalid.str() });
-const provider = stakePoolHttpProvider({ baseUrl: STAKE_POOL_PROVIDER_URL, logger, version });
+const provider = stakePoolHttpProvider({ baseUrl: STAKE_POOL_PROVIDER_URL, logger });
 const testLogger: Logger = console;
 const intermediateResultsInterval = 10_000;
 

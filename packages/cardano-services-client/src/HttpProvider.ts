@@ -2,6 +2,7 @@
 import { HttpProviderConfigPaths, Provider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
+import { version } from './version';
 import axios, { AxiosAdapter, AxiosRequestConfig, AxiosResponseTransformer } from 'axios';
 
 const isEmptyResponse = (response: any) => response === '';
@@ -9,13 +10,6 @@ const isEmptyResponse = (response: any) => response === '';
 type ResponseTransformers<T> = { [K in keyof T]?: AxiosResponseTransformer };
 
 export interface HttpProviderConfig<T extends Provider> {
-  version: {
-    /**
-     * API version compatibility declaration.
-     */
-    api: string;
-    software: string;
-  };
   /**
    * Example: "http://localhost:3000"
    */
@@ -61,7 +55,7 @@ export interface HttpProviderConfig<T extends Provider> {
  */
 export type CreateHttpProviderConfig<T extends Provider> = Pick<
   HttpProviderConfig<T>,
-  'baseUrl' | 'adapter' | 'logger' | 'version'
+  'baseUrl' | 'adapter' | 'logger'
 >;
 
 /**
@@ -81,8 +75,7 @@ export const createHttpProvider = <T extends Provider>({
   paths,
   adapter,
   logger,
-  responseTransformers,
-  version
+  responseTransformers
 }: HttpProviderConfig<T>): T =>
   new Proxy<T>({} as T, {
     // eslint-disable-next-line sonarjs/cognitive-complexity

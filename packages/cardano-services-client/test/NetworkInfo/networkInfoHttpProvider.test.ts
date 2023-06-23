@@ -1,9 +1,9 @@
 import { logger } from '@cardano-sdk/util-dev';
-import { networkInfoHttpProvider, version } from '../../src';
+import { networkInfoHttpProvider } from '../../src';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 
-const config = { baseUrl: 'http://some-hostname:3000/network', logger, version };
+const config = { baseUrl: 'http://some-hostname:3000/network', logger };
 
 describe('networkInfoHttpProvider', () => {
   let axiosMock: MockAdapter;

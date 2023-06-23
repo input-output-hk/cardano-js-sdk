@@ -4,7 +4,7 @@ import { DataSource } from 'typeorm';
 import { Logger } from 'ts-log';
 import { WorkerHandlerFactory } from './types';
 import { isErrorWithConstraint } from './util';
-import { stakePoolHttpProvider, version } from '@cardano-sdk/cardano-services-client';
+import { stakePoolHttpProvider } from '@cardano-sdk/cardano-services-client';
 
 interface RefreshPoolMetricsOptions {
   dataSource: DataSource;
@@ -67,7 +67,7 @@ export const refreshPoolMetrics = async (options: RefreshPoolMetricsOptions) => 
 
 export const stakePoolMetricsHandlerFactory: WorkerHandlerFactory = (options) => {
   const { dataSource, logger, stakePoolProviderUrl } = options;
-  const provider = stakePoolHttpProvider({ baseUrl: stakePoolProviderUrl, logger, version });
+  const provider = stakePoolHttpProvider({ baseUrl: stakePoolProviderUrl, logger });
 
   return async (data: StakePoolMetricsUpdateJob) => {
     const { slot } = data;
