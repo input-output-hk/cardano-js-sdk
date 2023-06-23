@@ -39,12 +39,15 @@ services:
       timeout: 10s
 
   cardano-node-ogmios:
+    entrypoint: [ "/tini", "-g", "--", "/scripts/cardano-node-ogmios.sh" ]
     image: cardanosolutions/cardano-node-ogmios:v${OGMIOS_VERSION:-5.6.0}_${CARDANO_NODE_VERSION:-1.35.5}
     depends_on:
       local-testnet:
         condition: service_healthy
     volumes:
       - ./local-network/config/network:/config
+      - ./local-network/scripts:/scripts
+      - sdk-ipc:/sdk-ipc
 
   cardano-db-sync:
     depends_on:
@@ -79,4 +82,10 @@ services:
       - ./local-network/config/network:/config
 
 volumes:
+  sdk-ipc:
+    driver: local
+    driver_opts:
+      device: ./local-network/sdk-ipc
+      o: bind
+      type: none
   wallet-db:

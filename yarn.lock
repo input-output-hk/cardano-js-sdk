@@ -2561,6 +2561,7 @@ __metadata:
     "@types/chalk": ^2.2.0
     "@types/convict": ^6.1.2
     "@types/delay": ^3.1.0
+    "@types/dockerode": ^3.3.8
     "@types/jest": ^28.1.2
     "@types/lodash": ^4.14.182
     "@types/ora": ^3.2.0
