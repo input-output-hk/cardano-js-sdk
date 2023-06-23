@@ -101,3 +101,9 @@ export class InvalidArgumentError extends CustomError {
     super(`Invalid argument '${argName}': ${message}`);
   }
 }
+
+export class HandleParsingError extends CustomError {
+  public constructor(handle: string, message = 'Invalid handle') {
+    super(`${message}: ${handle}`);
+  }
+}

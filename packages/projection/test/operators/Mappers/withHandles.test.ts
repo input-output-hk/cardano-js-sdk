@@ -1,14 +1,15 @@
+import { Asset, Cardano } from '@cardano-sdk/core';
 import { Buffer } from 'buffer';
-import { Cardano } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 import { Mappers, ProjectionEvent } from '../../../src';
 import { firstValueFrom, of } from 'rxjs';
+import { mockProviders } from '@cardano-sdk/util-dev';
 import { withHandles } from '../../../src/operators/Mappers';
 
 const assetIdFromNameLabelAndPolicyId = (assetName: string, policyId: Cardano.PolicyId): Cardano.AssetId =>
   Cardano.AssetId.fromParts(policyId, Cardano.AssetName(Buffer.from(assetName).toString('hex')));
 
-const handlePolicyId = Cardano.PolicyId('f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a');
+const handlePolicyId = mockProviders.handlePolicyId;
 const assetIdFromHandle = (handle: string) => assetIdFromNameLabelAndPolicyId(handle, handlePolicyId);
 
 describe('withHandles', () => {
@@ -212,6 +213,106 @@ describe('withHandles', () => {
       const { handles } = await firstValueFrom(of(evt).pipe(withHandles({ policyIds: [handlePolicyId] })));
       expect(handles.length).toBe(1);
       expect(handles[0].latestOwnerAddress).toBe(null);
+    });
+  });
+
+  describe('assets with invalid asset names', () => {
+    const invalidAssetName = Asset.AssetNameLabel.encode(Cardano.AssetName('abc'), Asset.AssetNameLabelNum.UserFT);
+    const invalidAssetId = Cardano.AssetId.fromParts(handlePolicyId, invalidAssetName);
+    const outputsWithInvalidHandles = {
+      invalidAssetName: {
+        address: 'addr_test1vptwv4jvaqt635jvthpa29lww3vkzypm8l6vk4lv4tqfhhgajdgwf',
+        value: {
+          assets: new Map([[invalidAssetId, 1n]]),
+          coins: 1n
+        }
+      },
+      oneValidAndOneInvalidAssetName: {
+        address: 'addr_test1vptwv4jvaqt635jvthpa29lww3vkzypm8l6vk4lv4tqfhhgajdgwf',
+        value: {
+          assets: new Map([
+            [invalidAssetId, 1n],
+            [assetIdFromHandle(bobHandleTwo), 1n]
+          ])
+        }
+      }
+    };
+
+    it('it returns no handles when output only contain invalid assetId', async () => {
+      const validTxSource$ = of({
+        block: {
+          body: [
+            {
+              body: {
+                outputs: [outputsWithInvalidHandles.invalidAssetName]
+              }
+            }
+          ]
+        }
+      } as ProjectionEvent<Mappers.WithMint>);
+
+      const { handles } = await firstValueFrom(
+        validTxSource$.pipe(
+          withHandles({
+            policyIds: [handlePolicyId]
+          })
+        )
+      );
+
+      expect(handles.length).toBe(0);
+    });
+
+    it('it returns only valid handles when output contains contains valid and invalid assetId', async () => {
+      const validTxSource$ = of({
+        block: {
+          body: [
+            {
+              body: {
+                outputs: [outputsWithInvalidHandles.oneValidAndOneInvalidAssetName]
+              }
+            }
+          ]
+        }
+      } as ProjectionEvent<Mappers.WithMint>);
+
+      const { handles } = await firstValueFrom(
+        validTxSource$.pipe(
+          withHandles({
+            policyIds: [handlePolicyId]
+          })
+        )
+      );
+
+      expect(handles.length).toBe(1);
+    });
+
+    it('it returns only valid handles when over multiple outputs ', async () => {
+      const validTxSource$ = of({
+        block: {
+          body: [
+            {
+              body: {
+                outputs: [outputsWithInvalidHandles.oneValidAndOneInvalidAssetName]
+              }
+            },
+            {
+              body: {
+                outputs: [outputs.oneHandleMary]
+              }
+            }
+          ]
+        }
+      } as ProjectionEvent<Mappers.WithMint>);
+
+      const { handles } = await firstValueFrom(
+        validTxSource$.pipe(
+          withHandles({
+            policyIds: [handlePolicyId]
+          })
+        )
+      );
+
+      expect(handles.length).toBe(2);
     });
   });
 });
