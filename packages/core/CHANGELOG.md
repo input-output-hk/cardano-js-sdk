@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.15.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.14.1...@cardano-sdk/core@0.15.0) (2023-06-23)
+
+### ⚠ BREAKING CHANGES
+
+* TxBuilderProviders.rewardAccounts expects RewardAccountWithPoolId type,
+  instead of Omit<RewardAccount, 'delegatee'>
+
+### Features
+
+* txBuilder delegatePortfolio ([ec0860e](https://github.com/input-output-hk/cardano-js-sdk/commit/ec0860e37835edbce3c911d6fe65c21b73683de7))
+
+### Bug Fixes
+
+* **core:** updated providerUtil ([106c1f9](https://github.com/input-output-hk/cardano-js-sdk/commit/106c1f9e8067a4876f47d63f97ab998620cf8f64))
+
 ## [0.14.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.14.0...@cardano-sdk/core@0.14.1) (2023-06-20)
 
 ### Features

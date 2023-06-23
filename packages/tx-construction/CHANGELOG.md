@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.7.2...@cardano-sdk/tx-construction@0.8.0) (2023-06-23)
+
+### ⚠ BREAKING CHANGES
+
+* txBuilder delegate is replaced by delegatePortfolio.
+* TxBuilderProviders.rewardAccounts expects RewardAccountWithPoolId type,
+  instead of Omit<RewardAccount, 'delegatee'>
+
+### Features
+
+* remove txBuilder.delegate method ([f21c93b](https://github.com/input-output-hk/cardano-js-sdk/commit/f21c93b251f1bd67f47edd488d9df47c2abf3e0c))
+* **tx-construction:** use GreedyInputSelection for multi delegation ([5462936](https://github.com/input-output-hk/cardano-js-sdk/commit/54629367b14fe26f13f9c17483bdf98c451b8d89))
+* txBuilder delegatePortfolio ([ec0860e](https://github.com/input-output-hk/cardano-js-sdk/commit/ec0860e37835edbce3c911d6fe65c21b73683de7))
+
 ## [0.7.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.7.1...@cardano-sdk/tx-construction@0.7.2) (2023-06-20)
 
 ### Features
