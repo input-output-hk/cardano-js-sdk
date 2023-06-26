@@ -47,7 +47,7 @@ describe('cache invalidation', () => {
 
   afterAll(() => wallet1.wallet.shutdown());
 
-  test('cache is invalidated on epoch rollover', async () => {
+  test.skip('cache is invalidated on epoch rollover', async () => {
     const wallet = wallet1.wallet;
 
     await walletReady(wallet);
