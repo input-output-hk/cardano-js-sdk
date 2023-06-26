@@ -53,7 +53,7 @@
       "HandleResolution": {
         "nullable": true,
         "type": "object",
-        "required": ["handle", "hasDatum", "policyId", "resolvedAddresses"],
+        "required": ["handle", "hasDatum", "policyId", "cardanoAddress"],
         "properties": {
           "handle": {
             "type": "string"
@@ -64,13 +64,8 @@
           "policyId": {
             "type": "string"
           },
-          "resolvedAddresses": {
-            "type": "object",
-            "properties": {
-              "cardano": {
-                "type": "string"
-              }
-            }
+          "cardanoAddress": {
+            "type": "string"
           },
           "resolvedAt": {
             "type": "object",

@@ -31,12 +31,10 @@ function assertObjectRefsAreDifferent(obj1: unknown, obj2: unknown): void {
 }
 
 const resolvedHandle = {
+  cardanoAddress: Cardano.PaymentAddress('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg'),
   handle: 'alice',
   hasDatum: false,
   policyId: Cardano.PolicyId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a7'),
-  resolvedAddresses: {
-    cardano: Cardano.PaymentAddress('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg')
-  },
   resolvedAt: {
     hash: Cardano.BlockId('7a48b034645f51743550bbaf81f8a14771e58856e031eb63844738ca8ad72298'),
     slot: Cardano.Slot(100)
@@ -419,7 +417,7 @@ describe('GenericTxBuilder', () => {
         const txOut = await txBuilder.buildOutput().handle('alice').coin(output1Coin).build();
 
         expect(txOut.handle).toBe(resolvedHandle);
-        expect(txOut.address).toBe(resolvedHandle.resolvedAddresses.cardano);
+        expect(txOut.address).toBe(resolvedHandle.cardanoAddress);
       });
 
       it('rejects with an error when a handle provider fails to resolve', async () => {

@@ -286,7 +286,7 @@ describe('PersonalWallet methods', () => {
 
         const txPendingResult = await txPending;
 
-        expect(txPendingResult.body.outputs[0].address).toEqual(mocks.resolvedHandle.resolvedAddresses.cardano);
+        expect(txPendingResult.body.outputs[0].address).toEqual(mocks.resolvedHandle.cardanoAddress);
         expect(txSubmitProvider.submitTx).toHaveBeenCalledWith(submitTxArgsMock);
       });
     });

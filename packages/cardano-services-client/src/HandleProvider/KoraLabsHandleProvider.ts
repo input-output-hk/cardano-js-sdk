@@ -1,7 +1,7 @@
 import {
   Asset,
   Cardano,
-  Handle,
+  HandleResolution,
   HealthCheckResponse,
   ProviderError,
   ProviderFailure,
@@ -24,17 +24,6 @@ export interface KoraLabsHandleProviderDeps {
   serverUrl: string;
   adapter?: AxiosAdapter;
   policyId: Cardano.PolicyId;
-}
-
-export interface HandleResolution {
-  policyId: Cardano.PolicyId;
-  handle: Handle;
-  cardanoAddress: Cardano.PaymentAddress;
-  hasDatum: boolean;
-  defaultForStakeKey?: Handle;
-  defaultForPaymentKey?: Handle;
-  backgroundImage?: Asset.Uri;
-  profilePic?: Asset.Uri;
 }
 
 export const toHandleResolution = ({

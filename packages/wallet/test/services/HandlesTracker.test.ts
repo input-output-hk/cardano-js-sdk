@@ -14,6 +14,7 @@ const handleOutput = utxo.find(([_, { value: { assets } }]) =>
 
 const expectedHandleInfo = {
   assetId: handleAssetId,
+  cardanoAddress: handleOutput.address,
   fingerprint: handleFingerprint,
   handle,
   hasDatum: !!handleOutput.datum,
@@ -21,9 +22,6 @@ const expectedHandleInfo = {
   name: handleAssetName,
   policyId: handlePolicyId,
   quantity: 1n,
-  resolvedAddresses: {
-    cardano: handleOutput.address
-  },
   // We consider that handle was resolved when we got the utxo,
   // as AssetInfo is just some supplementary data
   resolvedAt: ledgerTip,
