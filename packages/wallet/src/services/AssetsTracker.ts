@@ -4,8 +4,7 @@ import { Observable, combineLatest, distinctUntilChanged, map, of, switchMap, ta
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TrackedAssetProvider } from './ProviderTracker';
 import { TransactionsTracker } from './types';
-import { coldObservableProvider } from './util';
-import { concatAndCombineLatest } from '@cardano-sdk/util-rxjs';
+import { coldObservableProvider, concatAndCombineLatest } from '@cardano-sdk/util-rxjs';
 import { deepEquals } from '@cardano-sdk/util';
 import chunk from 'lodash/chunk';
 import uniq from 'lodash/uniq';

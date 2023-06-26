@@ -1,10 +1,11 @@
 import { Cardano, UtxoProvider } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { NEVER, Observable, combineLatest, concat, distinctUntilChanged, map, of, switchMap } from 'rxjs';
-import { PersistentCollectionTrackerSubject, coldObservableProvider, txInEquals, utxoEquals } from './util';
+import { PersistentCollectionTrackerSubject, txInEquals, utxoEquals } from './util';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxInFlight, UtxoTracker } from './types';
 import { WalletStores } from '../persistence';
+import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import chunk from 'lodash/chunk';
 
 // Temporarily hardcoded. Will be replaced with ChainHistoryProvider 'maxPageSize' value once ADP-2249 is implemented

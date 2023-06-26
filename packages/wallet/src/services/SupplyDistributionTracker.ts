@@ -1,9 +1,10 @@
 import { Logger } from 'ts-log';
 import { NetworkInfoProvider } from '@cardano-sdk/core';
 import { Observable } from 'rxjs';
-import { PersistentDocumentTrackerSubject, coldObservableProvider } from './util';
+import { PersistentDocumentTrackerSubject } from './util';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { SupplyDistributionStores } from '../persistence';
+import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import isEqual from 'lodash/isEqual';
 
 export type SupplyDistributionNetworkInfoProvider = Pick<NetworkInfoProvider, 'stake' | 'lovelaceSupply'>;

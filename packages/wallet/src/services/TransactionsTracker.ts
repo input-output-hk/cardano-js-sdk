@@ -32,8 +32,8 @@ import { FailedTx, OutgoingOnChainTx, OutgoingTx, TransactionFailure, Transactio
 import { Logger } from 'ts-log';
 import { Range, Shutdown, contextLogger } from '@cardano-sdk/util';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { TrackerSubject } from '@cardano-sdk/util-rxjs';
-import { coldObservableProvider, distinctBlock, transactionsEquals } from './util';
+import { TrackerSubject, coldObservableProvider } from '@cardano-sdk/util-rxjs';
+import { distinctBlock, transactionsEquals } from './util';
 
 import chunk from 'lodash/chunk';
 import intersectionBy from 'lodash/intersectionBy';

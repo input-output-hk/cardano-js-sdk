@@ -22,7 +22,6 @@ import {
   TransactionsTracker,
   UtxoTracker,
   WalletUtil,
-  coldObservableProvider,
   createAssetsTracker,
   createBalanceTracker,
   createDelegationTracker,
@@ -63,7 +62,7 @@ import {
   WalletNetworkInfoProvider
 } from '../types';
 import { AsyncKeyAgent, GroupedAddress, cip8 } from '@cardano-sdk/key-management';
-import { BehaviorObservable, TrackerSubject } from '@cardano-sdk/util-rxjs';
+import { BehaviorObservable, TrackerSubject, coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import {
   BehaviorSubject,
   EMPTY,
