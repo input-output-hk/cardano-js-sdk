@@ -4,7 +4,7 @@ const path = require('path');
 const packageJson = require('../package.json');
 const openApiSpec = require('../../cardano-services/src/Http/openApi.json');
 
-const contents = `// auto-generated using ${__filename}
+const contents = `// auto-generated using ../scripts/createVersionSource.js
 export const version = {
   api: '${openApiSpec.info.version}',
   software: '${packageJson.version}'
