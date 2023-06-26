@@ -1,9 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpProviderConfigPaths, Provider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
+import { apiVersion } from './version';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
-import { version } from './version';
 import axios, { AxiosAdapter, AxiosRequestConfig, AxiosResponseTransformer } from 'axios';
+import path from 'path';
+
+const packageJson = require(path.join(__dirname, '..', 'package.json'));
 
 const isEmptyResponse = (response: any) => response === '';
 
@@ -82,10 +85,10 @@ export const createHttpProvider = <T extends Provider>({
     get(_, prop) {
       if (prop === 'then') return;
       const method = prop as keyof T;
-      const path = paths[method];
+      const urlPath = paths[method];
       const transformResponse =
         responseTransformers && responseTransformers[method] ? responseTransformers[method]! : (v: unknown) => v;
-      if (!path)
+      if (!urlPath)
         throw new ProviderError(ProviderFailure.NotImplemented, `HttpProvider missing path for '${prop.toString()}'`);
       return async (...args: any[]) => {
         try {
@@ -94,10 +97,10 @@ export const createHttpProvider = <T extends Provider>({
             adapter,
             baseURL: baseUrl,
             data: { ...args[0] },
-            headers: { ...axiosOptions?.headers, 'Version-Api': version.api, 'Version-Software': version.software },
+            headers: { ...axiosOptions?.headers, 'Version-Api': apiVersion, 'Version-Software': packageJson.version },
             method: 'post',
             responseType: 'json',
-            url: path
+            url: urlPath
           };
           logger.debug(`Sending ${req.method} request to ${req.baseURL}${req.url} with data:`);
           logger.debug(req.data);
