@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Cardano } from '@cardano-sdk/core';
+import { CustomError } from 'ts-custom-error';
 import { FilterByPolicyIds } from './types';
-import { HandleParsingError, HexBlob } from '@cardano-sdk/util';
-import { Logger, dummyLogger } from 'ts-log';
+import { HexBlob } from '@cardano-sdk/util';
 import { ProjectionOperator } from '../../types';
+import { logError } from './util';
 import { map } from 'rxjs';
 
 export interface Handle {
@@ -28,12 +28,16 @@ export interface WithHandles {
 const handleFromAssetId = (assetId: Cardano.AssetId) =>
   Buffer.from(Cardano.AssetId.getAssetName(assetId), 'hex').toString('utf8');
 
-const logger: Logger = dummyLogger;
-
 const isValidHandle = (handle: string) => {
   const pattern = /^[\w.-]+$/;
   return pattern.test(handle);
 };
+
+class HandleParsingError extends CustomError {
+  public constructor(handle: string, message = 'Invalid handle') {
+    super(`${message}: ${handle}`);
+  }
+}
 
 const mapHandleToData = (
   assetId: Cardano.AssetId,
@@ -62,8 +66,8 @@ const getOutputHandles = (outputs: Cardano.TxOut[], policyIds: FilterByPolicyIds
       try {
         const handleData = mapHandleToData(assetId, { address, datum, policyId });
         handles[handleData.handle] = handleData;
-      } catch (error: any) {
-        logger.error(error.message);
+      } catch (error: unknown) {
+        logError(error);
       }
     }
   }
@@ -81,8 +85,8 @@ const getBurnedHandles = (mint: Cardano.TokenMap | undefined, policyIds: FilterB
       try {
         const handleData = mapHandleToData(assetId, { policyId });
         handles[handleData.handle] = handleData;
-      } catch (error: any) {
-        logger.error(error.message);
+      } catch (error: unknown) {
+        logError(error);
       }
     }
   }

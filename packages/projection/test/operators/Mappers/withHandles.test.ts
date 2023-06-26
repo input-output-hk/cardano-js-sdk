@@ -286,7 +286,7 @@ describe('withHandles', () => {
       expect(handles.length).toBe(1);
     });
 
-    it('it returns only valid handles when over multiple outputs ', async () => {
+    it('it returns only valid handles when block has multiple transactions with handle outputs ', async () => {
       const validTxSource$ = of({
         block: {
           body: [
