@@ -2203,6 +2203,30 @@ describe('CLI', () => {
         await assertServerAlive();
       });
 
+      test('with handle projection and handle policy ids file option', async () => {
+        const chunks: string[] = [];
+
+        startProjector([
+          '--ogmios-url',
+          'ws://localhost:1234',
+          '--postgres-connection-string',
+          'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
+          '--logger-min-severity',
+          'debug',
+          '--handle-policy-ids-file',
+          path.join(__dirname, 'policy_ids'),
+          ProjectionName.Handle
+        ]);
+
+        proc.stdout?.on('data', (data: Buffer) => chunks.push(data.toString('utf8')));
+
+        await assertServerAlive();
+
+        expect(chunks.join('')).toMatch(
+          'Creating projection with policyIds [\\"f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a\\"]'
+        );
+      });
+
       it('exits with code 1 with handle projection without handle policy ids option', (done) => {
         expect.assertions(2);
         proc = withLogging(
@@ -2221,7 +2245,9 @@ describe('CLI', () => {
           true
         );
         proc.stderr!.on('data', (data) =>
-          expect(data.toString()).toMatch('MissingProgramOption: handle requires the Handle policy Ids program option')
+          expect(data.toString()).toMatch(
+            'MissingProgramOption: handle requires the Handle policy Ids or Handle policy Ids file program option'
+          )
         );
         proc.on('exit', (code) => {
           expect(code).toBe(1);

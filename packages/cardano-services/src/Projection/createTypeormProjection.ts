@@ -95,6 +95,10 @@ export const createTypeormProjection = ({
   buffer,
   projectionOptions
 }: CreateTypeormProjectionProps) => {
+  const { handlePolicyIds } = { handlePolicyIds: [], ...projectionOptions };
+
+  logger.debug(`Creating projection with policyIds ${JSON.stringify(handlePolicyIds)}`);
+
   const { mappers, entities, stores, extensions } = prepareTypeormProjection({
     buffer,
     options: projectionOptions,
