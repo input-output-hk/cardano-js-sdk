@@ -15,7 +15,7 @@ import {
   UNLIMITED_CACHE_TTL
 } from '../../src';
 import { AssetProvider, Cardano } from '@cardano-sdk/core';
-import { CreateHttpProviderConfig, assetInfoHttpProvider, version } from '@cardano-sdk/cardano-services-client';
+import { CreateHttpProviderConfig, assetInfoHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { DbPools, LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
 import { INFO, createLogger } from 'bunyan';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
@@ -57,8 +57,7 @@ describe('AssetHttpService', () => {
     config = { listen: { port } };
     clientConfig = {
       baseUrl: apiUrlBase,
-      logger: createLogger({ level: INFO, name: 'unit tests' }),
-      version
+      logger: createLogger({ level: INFO, name: 'unit tests' })
     };
   });
 

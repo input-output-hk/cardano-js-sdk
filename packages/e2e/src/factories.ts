@@ -42,8 +42,7 @@ import {
   rewardsHttpProvider,
   stakePoolHttpProvider,
   txSubmitHttpProvider,
-  utxoHttpProvider,
-  version
+  utxoHttpProvider
 } from '@cardano-sdk/cardano-services-client';
 import { LedgerKeyAgent } from '@cardano-sdk/hardware-ledger';
 import { Logger } from 'ts-log';
@@ -105,8 +104,7 @@ assetProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger)
       assetInfoHttpProvider({
         adapter: customHttpFetchAdapter,
         baseUrl: params.baseUrl,
-        logger,
-        version
+        logger
       })
     );
   });
@@ -118,7 +116,7 @@ chainHistoryProviderFactory.register(
     if (params.baseUrl === undefined) throw new Error(`${chainHistoryHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
     return new Promise<ChainHistoryProvider>(async (resolve) => {
-      resolve(chainHistoryHttpProvider({ adapter: customHttpFetchAdapter, baseUrl: params.baseUrl, logger, version }));
+      resolve(chainHistoryHttpProvider({ adapter: customHttpFetchAdapter, baseUrl: params.baseUrl, logger }));
     });
   }
 );
@@ -129,7 +127,7 @@ networkInfoProviderFactory.register(
     if (params.baseUrl === undefined) throw new Error(`${networkInfoHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
     return new Promise<NetworkInfoProvider>(async (resolve) => {
-      resolve(networkInfoHttpProvider({ adapter: customHttpFetchAdapter, baseUrl: params.baseUrl, logger, version }));
+      resolve(networkInfoHttpProvider({ adapter: customHttpFetchAdapter, baseUrl: params.baseUrl, logger }));
     });
   }
 );
@@ -138,7 +136,7 @@ rewardsProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logge
   if (params.baseUrl === undefined) throw new Error(`${rewardsHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
   return new Promise<RewardsProvider>(async (resolve) => {
-    resolve(rewardsHttpProvider({ adapter: customHttpFetchAdapter, baseUrl: params.baseUrl, logger, version }));
+    resolve(rewardsHttpProvider({ adapter: customHttpFetchAdapter, baseUrl: params.baseUrl, logger }));
   });
 });
 
@@ -160,7 +158,7 @@ txSubmitProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logg
   if (params.baseUrl === undefined) throw new Error(`${txSubmitHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
   return new Promise<TxSubmitProvider>(async (resolve) => {
-    resolve(txSubmitHttpProvider({ adapter: customHttpFetchAdapter, baseUrl: params.baseUrl, logger, version }));
+    resolve(txSubmitHttpProvider({ adapter: customHttpFetchAdapter, baseUrl: params.baseUrl, logger }));
   });
 });
 
@@ -168,7 +166,7 @@ utxoProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger):
   if (params.baseUrl === undefined) throw new Error(`${utxoHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
   return new Promise<UtxoProvider>(async (resolve) => {
-    resolve(utxoHttpProvider({ adapter: customHttpFetchAdapter, baseUrl: params.baseUrl, logger, version }));
+    resolve(utxoHttpProvider({ adapter: customHttpFetchAdapter, baseUrl: params.baseUrl, logger }));
   });
 });
 
@@ -195,7 +193,7 @@ stakePoolProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Log
   if (params.baseUrl === undefined) throw new Error(`${stakePoolHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
   return new Promise<StakePoolProvider>(async (resolve) => {
-    resolve(stakePoolHttpProvider({ adapter: customHttpFetchAdapter, baseUrl: params.baseUrl, logger, version }));
+    resolve(stakePoolHttpProvider({ adapter: customHttpFetchAdapter, baseUrl: params.baseUrl, logger }));
   });
 });
 

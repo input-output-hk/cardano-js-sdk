@@ -43,7 +43,6 @@ describe('createHttpProvider', () => {
       baseUrl,
       logger,
       paths: stubProviderPaths,
-      version,
       ...config
     });
 
@@ -121,8 +120,7 @@ describe('createHttpProvider', () => {
           baseUrl: 'http://some-hostname:3000',
           logger,
           mapError: jest.fn(),
-          paths: stubProviderPaths,
-          version
+          paths: stubProviderPaths
         });
         try {
           await provider.noArgsEmptyReturn();

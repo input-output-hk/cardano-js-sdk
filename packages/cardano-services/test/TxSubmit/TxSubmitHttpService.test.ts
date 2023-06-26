@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { APPLICATION_JSON, CONTENT_TYPE, HttpServer, HttpServerConfig, TxSubmitHttpService } from '../../src';
 import { CardanoNodeErrors, ProviderError, TxSubmitProvider } from '@cardano-sdk/core';
-import { CreateHttpProviderConfig, txSubmitHttpProvider, version } from '@cardano-sdk/cardano-services-client';
+import { CreateHttpProviderConfig, txSubmitHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { FATAL, createLogger } from 'bunyan';
 import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import { bufferToHexString, fromSerializableObject } from '@cardano-sdk/util';
@@ -39,7 +39,7 @@ describe('TxSubmitHttpService', () => {
   beforeAll(async () => {
     port = await getPort();
     baseUrl = `http://localhost:${port}/tx-submit`;
-    clientConfig = { baseUrl, logger: createLogger({ level: FATAL, name: 'unit tests' }), version };
+    clientConfig = { baseUrl, logger: createLogger({ level: FATAL, name: 'unit tests' }) };
     config = { listen: { port } };
   });
 

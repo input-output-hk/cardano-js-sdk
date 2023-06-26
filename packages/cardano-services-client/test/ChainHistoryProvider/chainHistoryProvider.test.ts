@@ -1,12 +1,12 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { ProviderFailure } from '@cardano-sdk/core';
 import { axiosError, healthCheckResponseWithState } from '../util';
-import { chainHistoryHttpProvider, version } from '../../src';
+import { chainHistoryHttpProvider } from '../../src';
 import { logger } from '@cardano-sdk/util-dev';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 
-const config = { baseUrl: 'http://some-hostname:3000/history', logger, version };
+const config = { baseUrl: 'http://some-hostname:3000/history', logger };
 
 describe('chainHistoryProvider', () => {
   describe('healthCheck', () => {

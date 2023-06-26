@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Cardano, QueryStakePoolsArgs, SortField, StakePoolProvider } from '@cardano-sdk/core';
-import { CreateHttpProviderConfig, stakePoolHttpProvider, version } from '../../../cardano-services-client';
+import { CreateHttpProviderConfig, stakePoolHttpProvider } from '../../../cardano-services-client';
 import { DbPools, LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
 import { DbSyncEpochPollService, loadGenesisData } from '../../src/util';
 import { DbSyncStakePoolFixtureBuilder, PoolInfo, PoolWith } from './fixtures/FixtureBuilder';
@@ -111,8 +111,7 @@ describe('StakePoolHttpService', () => {
     config = { listen: { port } };
     clientConfig = {
       baseUrl,
-      logger: createLogger({ level: INFO, name: 'unit tests' }),
-      version
+      logger: createLogger({ level: INFO, name: 'unit tests' })
     };
     fixtureBuilder = new DbSyncStakePoolFixtureBuilder(dbPools.main, logger);
     poolsInfo = await fixtureBuilder.getPools(3, { with: [PoolWith.Metadata] });

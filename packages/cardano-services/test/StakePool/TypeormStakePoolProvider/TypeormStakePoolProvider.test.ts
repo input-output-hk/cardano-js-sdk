@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Cardano, QueryStakePoolsArgs, SortField, StakePoolProvider } from '@cardano-sdk/core';
-import { CreateHttpProviderConfig, stakePoolHttpProvider, version } from '@cardano-sdk/cardano-services-client';
+import { CreateHttpProviderConfig, stakePoolHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { HttpServer } from '../../../src/Http/HttpServer';
 import { HttpServerConfig } from '../../../src/Http/types';
 import { INFO, createLogger } from 'bunyan';
@@ -81,7 +81,7 @@ describe('TypeormStakePoolProvider', () => {
     port = await getPort();
     baseUrl = `http://localhost:${port}/stake-pool`;
     config = { listen: { port } };
-    clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }), version };
+    clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
     connectionConfig$ = getConnectionConfig(dnsResolver, 'projector', 'StakePool', {
       postgresConnectionStringStakePool: process.env.POSTGRES_CONNECTION_STRING_STAKE_POOL!
     });

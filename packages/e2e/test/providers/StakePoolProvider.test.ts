@@ -3,7 +3,7 @@
 import * as envalid from 'envalid';
 import { Cardano, QueryStakePoolsArgs, StakePoolProvider } from '@cardano-sdk/core';
 import { logger } from '@cardano-sdk/util-dev';
-import { stakePoolHttpProvider, version } from '@cardano-sdk/cardano-services-client';
+import { stakePoolHttpProvider } from '@cardano-sdk/cardano-services-client';
 
 const stringToRegExEqualsTo = (str: string) => `^${str.replace(/[$()*+.?[\\\]^{|}-]/g, '\\$&')}$`;
 
@@ -140,7 +140,7 @@ describe('StakePoolProvider', () => {
 
   beforeAll(async () => {
     const env = envalid.cleanEnv(process.env, { STAKE_POOL_PROVIDER_URL: envalid.url() });
-    const config = { baseUrl: env.STAKE_POOL_PROVIDER_URL, logger, version };
+    const config = { baseUrl: env.STAKE_POOL_PROVIDER_URL, logger };
 
     provider = stakePoolHttpProvider(config);
     pools = await fetchAllPools();

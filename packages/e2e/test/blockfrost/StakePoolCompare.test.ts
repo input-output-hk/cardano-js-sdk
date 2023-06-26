@@ -4,7 +4,7 @@ import { ChildProcess, fork } from 'child_process';
 import { WriteStream, createWriteStream } from 'fs';
 import { getRandomPort } from 'get-port-please';
 import { logger } from '@cardano-sdk/util-dev';
-import { stakePoolHttpProvider, version } from '@cardano-sdk/cardano-services-client';
+import { stakePoolHttpProvider } from '@cardano-sdk/cardano-services-client';
 import path from 'path';
 
 type StakePoolRecord = Record<string, Cardano.StakePool>;
@@ -127,7 +127,7 @@ describe('StakePoolCompare', () => {
   };
 
   const setupProvider = async (args: string[] = []) => {
-    const provider = stakePoolHttpProvider({ baseUrl: await startServer(args), logger, version });
+    const provider = stakePoolHttpProvider({ baseUrl: await startServer(args), logger });
 
     // eslint-disable-next-line no-constant-condition
     while (true) {

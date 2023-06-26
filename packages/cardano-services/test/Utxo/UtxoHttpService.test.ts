@@ -1,6 +1,6 @@
 import { AddressWith, UtxoFixtureBuilder } from './fixtures/FixtureBuilder';
 import { Cardano, UtxoProvider } from '@cardano-sdk/core';
-import { CreateHttpProviderConfig, utxoHttpProvider, version } from '@cardano-sdk/cardano-services-client';
+import { CreateHttpProviderConfig, utxoHttpProvider } from '@cardano-sdk/cardano-services-client';
 import { DataMocks } from '../data-mocks';
 import { DbPools, LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncProvider';
 import {
@@ -45,7 +45,7 @@ describe('UtxoHttpService', () => {
   beforeAll(async () => {
     port = await getPort();
     baseUrl = `http://localhost:${port}/utxo`;
-    clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }), version };
+    clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
     config = { listen: { port } };
     dbPools = {
       healthCheck: new Pool({
