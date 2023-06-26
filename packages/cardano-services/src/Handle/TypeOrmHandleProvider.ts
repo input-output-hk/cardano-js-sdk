@@ -46,7 +46,7 @@ export class TypeOrmHandleProvider extends TypeormProvider implements HandleProv
 
         const { cardanoAddress, handle, hasDatum, policyId } = entity;
 
-        return { handle, hasDatum, policyId, resolvedAddresses: { cardano: cardanoAddress }, resolvedAt };
+        return { cardanoAddress, handle, hasDatum, policyId, resolvedAt };
       };
 
       const findOptions = { select: handleSelect, where: { handle: In(handles) } };

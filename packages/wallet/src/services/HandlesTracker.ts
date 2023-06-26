@@ -61,11 +61,9 @@ export const createHandlesTracker = ({ tip$, assetInfo$, handlePolicyIds, logger
           }
           return {
             ...assetInfo,
+            cardanoAddress: txOut.address,
             handle: Buffer.from(Cardano.AssetId.getAssetName(handleAssetId), 'hex').toString('utf8'),
             hasDatum: !!txOut.datum,
-            resolvedAddresses: {
-              cardano: txOut.address
-            },
             resolvedAt: tip
           };
         })

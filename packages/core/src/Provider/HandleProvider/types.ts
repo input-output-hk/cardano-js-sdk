@@ -1,4 +1,4 @@
-import { Cardano, HttpProviderConfigPaths, Point, Provider } from '../..';
+import { Asset, Cardano, HttpProviderConfigPaths, Point, Provider } from '../..';
 
 export type Handle = string;
 
@@ -6,16 +6,18 @@ export type Handle = string;
  * @param policyId a hex encoded policyID
  * @param handle a personalized string to identify a user
  * @param hasDatum a boolean to indicated whether it contains a datum
- * @param resolvedAddresses the addresses resolved from the handle
+ * @param cardanoAddress the cardano payment address resolved from the handle
  * @param resolvedAt the point at which the Handle was resolved
  */
 export interface HandleResolution {
   policyId: Cardano.PolicyId;
   handle: Handle;
+  cardanoAddress: Cardano.PaymentAddress;
   hasDatum: boolean;
-  resolvedAddresses: {
-    cardano: Cardano.PaymentAddress;
-  };
+  defaultForStakeKey?: Handle;
+  defaultForPaymentKey?: Handle;
+  backgroundImage?: Asset.Uri;
+  profilePic?: Asset.Uri;
   resolvedAt?: Point;
 }
 

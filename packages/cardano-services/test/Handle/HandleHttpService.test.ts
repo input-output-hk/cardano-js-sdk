@@ -122,10 +122,10 @@ describe('HandleHttpService', () => {
       resolveHandles: () =>
         Promise.resolve([
           {
+            cardanoAddress: <Cardano.PaymentAddress>'test_address',
             handle: 'test',
             hasDatum: true,
             policyId: <Cardano.PolicyId>'test_policy',
-            resolvedAddresses: { cardano: <Cardano.PaymentAddress>'test_address' },
             resolvedAt: { hash: <Cardano.BlockId>'test_hash', slot: <Cardano.Slot>42 }
           }
         ])
@@ -136,10 +136,10 @@ describe('HandleHttpService', () => {
     expect({ body, status }).toEqual({
       body: [
         {
+          cardanoAddress: 'test_address',
           handle: 'test',
           hasDatum: true,
           policyId: 'test_policy',
-          resolvedAddresses: { cardano: 'test_address' },
           resolvedAt: { hash: 'test_hash', slot: 42 }
         }
       ],

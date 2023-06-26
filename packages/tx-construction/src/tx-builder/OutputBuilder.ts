@@ -145,7 +145,7 @@ export class TxOutputBuilder implements OutputBuilder {
 
       if (resolution[0] !== null) {
         txOut.handle = resolution[0];
-        txOut.address = resolution[0].resolvedAddresses.cardano;
+        txOut.address = resolution[0].cardanoAddress;
       } else {
         // Throw an error because the handle resolved to null so we don't have
         // an address for the transaction.
