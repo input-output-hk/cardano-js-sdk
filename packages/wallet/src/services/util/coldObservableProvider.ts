@@ -1,4 +1,4 @@
-import { InvalidStringError } from '@cardano-sdk/util';
+import { InvalidStringError, strictEquals } from '@cardano-sdk/util';
 import {
   NEVER,
   Observable,
@@ -15,7 +15,6 @@ import {
   throwError
 } from 'rxjs';
 import { RetryBackoffConfig, retryBackoff } from 'backoff-rxjs';
-import { strictEquals } from './equals';
 
 export interface ColdObservableProviderProps<T> {
   provider: () => Promise<T>;
