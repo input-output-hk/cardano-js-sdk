@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   CardanoNodeErrors,
+  HandleOwnerChangeError,
   HttpProviderConfigPaths,
   ProviderError,
   ProviderFailure,
@@ -61,6 +62,10 @@ export const txSubmitHttpProvider = (config: CreateHttpProviderConfig<TxSubmitPr
                   ? ProviderFailure.Unknown
                   : ProviderFailure.BadRequest;
               throw new ProviderError(failure, txSubmissionError);
+            }
+
+            if (error.name === 'HandleOwnerChangeError') {
+              Object.setPrototypeOf(error, HandleOwnerChangeError);
             }
           }
         }

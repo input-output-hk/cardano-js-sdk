@@ -16,6 +16,7 @@ import {
   DISABLE_STAKE_POOL_METRIC_APY_DEFAULT,
   DROP_SCHEMA_DEFAULT,
   DRY_RUN_DEFAULT,
+  HANDLE_PROVIDER_SERVER_URL_DEFAULT,
   PAGINATION_PAGE_SIZE_LIMIT_DEFAULT,
   PARALLEL_MODE_DEFAULT,
   PARALLEL_TXS_DEFAULT,
@@ -41,7 +42,6 @@ import {
   loadProviderServer,
   stringOptionToBoolean
 } from './Program';
-import { Cardano } from '@cardano-sdk/core';
 import { Command, Option } from 'commander';
 import { DB_CACHE_TTL_DEFAULT } from './InMemoryCache';
 import {
@@ -64,6 +64,7 @@ import { ProjectionName } from './Projection';
 import { URL } from 'url';
 import { dbCacheValidator } from './util/validators';
 import { withCommonOptions, withOgmiosOptions, withPostgresOptions, withRabbitMqOptions } from './Program/options/';
+import { withHandlePolicyIdsOptions } from './Program/options/policyIds';
 import fs from 'fs';
 import onDeath from 'death';
 import path from 'path';
@@ -75,7 +76,6 @@ const packageJsonPath = fs.existsSync(copiedPackageJsonPath)
   : path.join(__dirname, '../package.json');
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 const projectionNameParser = (names: string) => names.split(',') as ProjectionName[];
-const handlePolicyIdsParser = (policyIds: string) => policyIds.split(',').map(Cardano.PolicyId);
 
 process.on('unhandledRejection', (reason) => {
   // To be handled by 'onDeath'
@@ -109,14 +109,16 @@ const runServer = async (message: string, loadServer: () => Promise<HttpServer>)
 withCommonOptions(
   withOgmiosOptions(
     withPostgresOptions(
-      program
-        .command('start-projector')
-        .description('Start a projector')
-        .argument(
-          '[projectionNames...]',
-          `List of projections to start: ${Object.values(ProjectionName).toString()}`,
-          projectionNameParser
-        ),
+      withHandlePolicyIdsOptions(
+        program
+          .command('start-projector')
+          .description('Start a projector')
+          .argument(
+            '[projectionNames...]',
+            `List of projections to start: ${Object.values(ProjectionName).toString()}`,
+            projectionNameParser
+          )
+      ),
       ''
     )
   ),
@@ -158,11 +160,6 @@ withCommonOptions(
         stringOptionToBoolean(synchronize, Programs.Projector, ProjectorOptionDescriptions.Synchronize)
       )
   )
-  .addOption(
-    new Option('--handle-policy-ids <handlePolicyIds>', ProjectorOptionDescriptions.HandlePolicyIds)
-      .env('HANDLE_POLICY_IDS')
-      .argParser(handlePolicyIdsParser)
-  )
   .action(async (projectionNames: ProjectionName[], args: { apiUrl: URL } & ProjectorArgs) =>
     runServer('projector', () =>
       loadProjector({
@@ -180,10 +177,12 @@ withCommonOptions(
       withPostgresOptions(
         withPostgresOptions(
           withRabbitMqOptions(
-            program
-              .command('start-provider-server')
-              .description('Start the Provider Server')
-              .argument('[serviceNames...]', `List of services to attach: ${Object.values(ServiceNames).toString()}`)
+            withHandlePolicyIdsOptions(
+              program
+                .command('start-provider-server')
+                .description('Start the Provider Server')
+                .argument('[serviceNames...]', `List of services to attach: ${Object.values(ServiceNames).toString()}`)
+            )
           ),
           'StakePool'
         ),
@@ -192,7 +191,9 @@ withCommonOptions(
       'DbSync'
     )
   ),
-  { apiUrl: PROVIDER_SERVER_API_URL_DEFAULT }
+  {
+    apiUrl: PROVIDER_SERVER_API_URL_DEFAULT
+  }
 )
   .addOption(
     new Option(
@@ -322,6 +323,15 @@ withCommonOptions(
       .default(PAGINATION_PAGE_SIZE_LIMIT_DEFAULT)
       .argParser((interval) => Number.parseInt(interval, 10))
   )
+  .addOption(
+    new Option(
+      '--handle-provider-server-url <handleProviderServerUrl>',
+      ProviderServerOptionDescriptions.HandleProviderServerUrl
+    )
+      .env('HANDLE_PROVIDER_SERVER_URL')
+      .default(HANDLE_PROVIDER_SERVER_URL_DEFAULT)
+      .argParser((serverUrl: string) => serverUrl)
+  )
   .action(async (serviceNames: ServiceNames[], args: ProviderServerArgs) =>
     runServer('Provider server', () =>
       loadProviderServer({
@@ -329,7 +339,6 @@ withCommonOptions(
         postgresConnectionStringDbSync: connectionStringFromArgs(args, 'DbSync'),
         postgresConnectionStringHandle: connectionStringFromArgs(args, 'Handle'),
         postgresConnectionStringStakePool: connectionStringFromArgs(args, 'StakePool'),
-        // Setting the service names via env variable takes preference over command line argument
         serviceNames: args.serviceNames ? args.serviceNames : serviceNames
       })
     )

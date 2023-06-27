@@ -2,8 +2,12 @@
 import {
   Cardano,
   CardanoNodeErrors,
+  HandleOwnerChangeError,
+  HandleProvider,
   HealthCheckResponse,
   ProviderDependencies,
+  ProviderError,
+  ProviderFailure,
   SubmitTxArgs,
   TxSubmitProvider
 } from '@cardano-sdk/core';
@@ -28,16 +32,18 @@ export class OgmiosTxSubmitProvider extends RunnableModule implements TxSubmitPr
   #txSubmissionClient: TxSubmissionClient;
   #logger: Logger;
   #connectionConfig: ConnectionConfig;
+  #handleProvider?: HandleProvider;
 
   /**
    * @param {ConnectionConfig} connectionConfig Ogmios connection configuration
    * @param {Logger} logger object implementing the Logger abstract class
    * @throws {TxSubmission.errors}
    */
-  constructor(connectionConfig: ConnectionConfig, { logger }: ProviderDependencies) {
+  constructor(connectionConfig: ConnectionConfig, { logger }: ProviderDependencies, handleProvider?: HandleProvider) {
     super('OgmiosTxSubmitProvider', logger);
     this.#logger = contextLogger(logger, 'OgmiosTxSubmitProvider');
     this.#connectionConfig = connectionConfig;
+    this.#handleProvider = handleProvider;
   }
 
   public async initializeImpl(): Promise<void> {
@@ -63,10 +69,13 @@ export class OgmiosTxSubmitProvider extends RunnableModule implements TxSubmitPr
     }
   }
 
-  async submitTx({ signedTransaction }: SubmitTxArgs): Promise<void> {
+  async submitTx({ signedTransaction, context }: SubmitTxArgs): Promise<void> {
     if (this.state !== 'running') {
       throw new CardanoNodeErrors.NotInitializedError('submitTx', this.name);
     }
+
+    await this.throwIfHandleResolutionConflict(context);
+
     try {
       const id = await this.#txSubmissionClient.submitTx(signedTransaction);
       this.#logger.info(`Submitted ${id}`);
@@ -81,5 +90,32 @@ export class OgmiosTxSubmitProvider extends RunnableModule implements TxSubmitPr
 
   async startImpl(): Promise<void> {
     return Promise.resolve();
+  }
+
+  private async throwIfHandleResolutionConflict(context: SubmitTxArgs['context']): Promise<void> {
+    if (context?.handles && context.handles.length > 0) {
+      if (!this.#handleProvider) {
+        throw new ProviderError(
+          ProviderFailure.NotImplemented,
+          undefined,
+          'No HandleProvider was set during construction.'
+        );
+      }
+
+      const handleInfoList = await this.#handleProvider.resolveHandles({
+        handles: context.handles.map((handle) => handle.handle)
+      });
+
+      for (const [index, handleInfo] of handleInfoList.entries()) {
+        if (!handleInfo || handleInfo.cardanoAddress !== context.handles[index].cardanoAddress) {
+          const handleOwnerChangeError = new HandleOwnerChangeError(
+            context.handles[index].handle,
+            context.handles[index].cardanoAddress,
+            handleInfo ? handleInfo.cardanoAddress : null
+          );
+          throw new ProviderError(ProviderFailure.Conflict, handleOwnerChangeError);
+        }
+      }
+    }
   }
 }
