@@ -16,6 +16,7 @@ export interface HandleResolution {
   hasDatum: boolean;
   defaultForStakeKey?: Handle;
   defaultForPaymentKey?: Handle;
+  image?: Asset.Uri;
   backgroundImage?: Asset.Uri;
   profilePic?: Asset.Uri;
   resolvedAt?: Point;
