@@ -1,12 +1,15 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable sonarjs/no-duplicate-string */
-import { HttpProviderConfig, createHttpProvider, version } from '../src';
+import { HttpProviderConfig, apiVersion, createHttpProvider } from '../src';
 import { Provider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { Server } from 'http';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import { getPort } from 'get-port-please';
 import { logger } from '@cardano-sdk/util-dev';
 import express, { RequestHandler } from 'express';
+import path from 'path';
+
+const packageJson = require(path.join(__dirname, '..', 'package.json'));
 
 type ComplexArg2 = { map: Map<string, Buffer> };
 type ComplexResponse = Map<bigint, Buffer>[];
@@ -15,10 +18,10 @@ interface TestProvider extends Provider {
   complexArgsAndReturn({ arg1, arg2 }: { arg1: bigint; arg2: ComplexArg2 }): Promise<ComplexResponse>;
 }
 
-const createStubHttpProviderServer = async (port: number, path: string, handler: RequestHandler) => {
+const createStubHttpProviderServer = async (port: number, urlPath: string, handler: RequestHandler) => {
   const app = express();
   app.use(express.json());
-  app.post(path, handler);
+  app.post(urlPath, handler);
   const server = await new Promise<Server>((resolve) => {
     const result = app.listen(port, () => resolve(result));
   });
@@ -65,8 +68,8 @@ describe('createHttpProvider', () => {
     const provider = createTxSubmitProviderClient({ axiosOptions: { headers: { 'custom-header': 'header-value' } } });
     closeServer = await createStubHttpProviderServer(port, stubProviderPaths.noArgsEmptyReturn, (req, res) => {
       expect(req.headers['custom-header']).toBe('header-value');
-      expect(req.headers['Version-Api']).toEqual(version.api);
-      expect(req.headers['Version-Software']).toEqual(version.software);
+      expect(req.headers['Version-Api']).toEqual(apiVersion);
+      expect(req.headers['Version-Software']).toEqual(packageJson.version);
       res.send();
     });
     await expect(provider.noArgsEmptyReturn()).resolves;
