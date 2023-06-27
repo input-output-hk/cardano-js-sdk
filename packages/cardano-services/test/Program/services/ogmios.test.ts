@@ -514,7 +514,6 @@ describe('Service dependency abstractions', () => {
       const failMockServer = createMockOgmiosServer({
         healthCheck: { response: { networkSynchronization: 0.999, success: true } },
         stateQuery: {
-          eraSummaries: { response: { failWith: { type: 'connectionError' }, success: false } },
           systemStart: { response: { success: true } }
         }
       });
@@ -539,13 +538,15 @@ describe('Service dependency abstractions', () => {
 
       await node.initialize();
       await node.start();
+      for (const socket of failMockServer.wss.clients) {
+        socket.close();
+      }
+      await serverClosePromise(failMockServer);
       await expect(node.eraSummaries()).rejects.toBeInstanceOf(
         CardanoNodeErrors.CardanoClientErrors.UnknownResultError
       );
       expect(dnsResolverMock).toBeCalledTimes(2);
       await node.shutdown();
-
-      await serverClosePromise(failMockServer);
     });
 
     it('should execute a provider operation without to intercept it', async () => {

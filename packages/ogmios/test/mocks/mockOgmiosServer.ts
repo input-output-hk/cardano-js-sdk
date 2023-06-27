@@ -13,7 +13,7 @@ import {
 } from './types';
 import { HEALTH_RESPONSE_BODY } from './util';
 import { Milliseconds } from '@cardano-sdk/core';
-import { Schema, UnknownResultError } from '@cardano-ogmios/client';
+import { Schema } from '@cardano-ogmios/client';
 import { Server, createServer } from 'http';
 import WebSocket from 'ws';
 import delay from 'delay';
@@ -152,10 +152,6 @@ const handleQuery = async (query: string, config: MockOgmiosServerConfig, send: 
         ];
       } else if (config.stateQuery?.eraSummaries?.response.failWith?.type === 'unknownResultError') {
         result = 'unknown';
-      } else if (config.stateQuery?.eraSummaries?.response.failWith?.type === 'connectionError') {
-        // This error is never actually returned by the server,
-        // But is used by cardano-services tests
-        result = new UnknownResultError({ code: 'ECONNREFUSED' });
       } else {
         throw new Error('Unknown mock response');
       }

@@ -17,7 +17,7 @@ export type TxSubmitResponse = {
 export type EraSummariesResponse = {
   success: boolean;
   failWith?: {
-    type: 'unknownResultError' | 'connectionError';
+    type: 'unknownResultError';
   };
 };
 
