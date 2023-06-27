@@ -1,5 +1,5 @@
+import { Asset, Cardano } from '@cardano-sdk/core';
 import { Assets, HandleInfo } from '../types';
-import { Cardano } from '@cardano-sdk/core';
 import {
   EMPTY,
   Observable,
@@ -61,7 +61,7 @@ export const createHandlesTracker = ({ tip$, assetInfo$, handlePolicyIds, logger
           return {
             ...assetInfo,
             cardanoAddress: txOut.address,
-            handle: Buffer.from(Cardano.AssetId.getAssetName(handleAssetId), 'hex').toString('utf8'),
+            handle: Asset.util.getAssetNameAsText(handleAssetId),
             hasDatum: !!txOut.datum,
             resolvedAt: tip
           };
