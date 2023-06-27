@@ -1,4 +1,5 @@
 import { AddressType, AsyncKeyAgent, GroupedAddress, KeyRole } from '../types';
+import { Cardano } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { firstValueFrom } from 'rxjs';
 import uniq from 'lodash/uniq';
@@ -15,14 +16,15 @@ export interface EnsureStakeKeysParams {
 
 /**
  * Given a count, checks if enough stake keys exist and derives
- * more if needed
+ * more if needed.
+ * Returns the newly created reward accounts
  */
 export const ensureStakeKeys = async ({
   keyAgent,
   count,
   logger,
   paymentKeyIndex: index = 0
-}: EnsureStakeKeysParams): Promise<void> => {
+}: EnsureStakeKeysParams): Promise<Cardano.RewardAccount[]> => {
   const knownAddresses = await firstValueFrom(keyAgent.knownAddresses$);
   // Get current number of derived stake keys
   const stakeKeyIndices = uniq(
@@ -38,7 +40,7 @@ export const ensureStakeKeys = async ({
 
   if (countToDerive <= 0) {
     // Sufficient stake keys are already created
-    return;
+    return [];
   }
 
   logger.debug(`Stake keys requested: ${count}; got ${stakeKeyIndices.length}`);
@@ -54,4 +56,5 @@ export const ensureStakeKeys = async ({
 
   const newAddresses = await Promise.all(derivedAddresses);
   logger.debug('Derived new addresses:', newAddresses);
+  return newAddresses.map(({ rewardAccount }) => rewardAccount);
 };

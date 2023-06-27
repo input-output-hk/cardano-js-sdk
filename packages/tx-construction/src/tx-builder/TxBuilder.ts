@@ -4,6 +4,7 @@ import { GreedyInputSelector, SelectionSkeleton } from '@cardano-sdk/input-selec
 import { GroupedAddress, SignTransactionOptions, TransactionSigner, util } from '@cardano-sdk/key-management';
 import {
   InsufficientRewardAccounts,
+  OutOfSyncRewardAccounts,
   OutputBuilderTxOut,
   PartialTx,
   PartialTxOut,
@@ -18,10 +19,11 @@ import {
 import { Logger } from 'ts-log';
 import { OutputBuilderValidator, TxOutputBuilder } from './OutputBuilder';
 import { RewardAccountWithPoolId } from '../types';
+import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import { contextLogger, deepEquals } from '@cardano-sdk/util';
 import { createOutputValidator } from '../output-validation';
 import { finalizeTx } from './finalizeTx';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, lastValueFrom } from 'rxjs';
 import { initializeTx } from './initializeTx';
 import minBy from 'lodash/minBy';
 
@@ -246,15 +248,27 @@ export class GenericTxBuilder implements TxBuilder {
   }
 
   async #getOrCreateRewardAccounts(): Promise<RewardAccountWithPoolId[]> {
+    let newRewardAccounts: Cardano.RewardAccount[] = [];
     if (this.#requestedPortfolio) {
-      await util.ensureStakeKeys({
+      newRewardAccounts = await util.ensureStakeKeys({
         count: this.#requestedPortfolio.length,
         keyAgent: this.#dependencies.keyAgent,
         logger: contextLogger(this.#logger, 'getOrCreateRewardAccounts')
       });
     }
 
-    return this.#dependencies.txBuilderProviders.rewardAccounts();
+    const rewardAccounts$ = coldObservableProvider({
+      pollUntil: (rewardAccounts) =>
+        newRewardAccounts.every((newAccount) => rewardAccounts.some((acct) => acct.address === newAccount)),
+      provider: this.#dependencies.txBuilderProviders.rewardAccounts,
+      retryBackoffConfig: { initialInterval: 10, maxInterval: 100, maxRetries: 10 }
+    });
+
+    try {
+      return await lastValueFrom(rewardAccounts$);
+    } catch {
+      throw new OutOfSyncRewardAccounts(newRewardAccounts);
+    }
   }
 
   async #delegatePortfolio(): Promise<RewardAccountsAndWeights> {
