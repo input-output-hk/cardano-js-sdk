@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "@cardano-ogmios/schema": "5.6.0",
+    "@cardano-sdk/cardano-services-client": "workspace:~",
     "@cardano-sdk/util-dev": "workspace:~",
     "@types/lodash": "^4.14.182",
     "delay": "^5.0.0",

@@ -1,7 +1,7 @@
 /* eslint-disable complexity */
 /* eslint-disable sonarjs/cognitive-complexity */
 import { AssetHttpService } from '../../Asset/AssetHttpService';
-import { CardanoNode, Seconds } from '@cardano-sdk/core';
+import { Cardano, CardanoNode, Seconds } from '@cardano-sdk/core';
 import { CardanoTokenRegistry } from '../../Asset/CardanoTokenRegistry';
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../../ChainHistory';
 import { ConnectionNames, PostgresOptionDescriptions, suffixType2Cli } from '../options/postgres';
@@ -17,6 +17,7 @@ import { GenesisData } from '../../types';
 import { HandleHttpService, TypeOrmHandleProvider } from '../../Handle';
 import { HttpServer, HttpServerConfig, HttpService, getListen } from '../../Http';
 import { InMemoryCache, NoCache } from '../../InMemoryCache';
+import { KoraLabsHandleProvider } from '@cardano-sdk/cardano-services-client';
 import { Logger } from 'ts-log';
 import { MissingProgramOption, MissingServiceDependency, RunnableDependencies, UnknownServiceName } from '../errors';
 import { Observable } from 'rxjs';
@@ -44,6 +45,7 @@ export const PAGINATION_PAGE_SIZE_LIMIT_ASSETS = 300;
 export const USE_BLOCKFROST_DEFAULT = false;
 export const USE_TYPEORM_STAKE_POOL_PROVIDER_DEFAULT = false;
 export const USE_QUEUE_DEFAULT = false;
+export const HANDLE_PROVIDER_SERVER_URL_DEFAULT = '';
 
 export interface LoadProviderServerDependencies {
   dnsResolver?: (serviceName: string) => Promise<SrvRecord>;
@@ -133,6 +135,31 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     );
   });
 
+  let networkInfoProvider: DbSyncNetworkInfoProvider | undefined;
+
+  const getNetworkInfoProvider = (cardanoNode: CardanoNode, dbPools: DbPools) => {
+    if (networkInfoProvider) {
+      return networkInfoProvider;
+    }
+
+    if (!genesisData)
+      throw new MissingProgramOption(ServiceNames.NetworkInfo, ProviderServerOptionDescriptions.CardanoNodeConfigPath);
+
+    networkInfoProvider = new DbSyncNetworkInfoProvider({
+      cache: {
+        db: getDbCache(),
+        healthCheck: healthCheckCache
+      },
+      cardanoNode,
+      dbPools,
+      epochMonitor: getEpochMonitor(dbPools.main),
+      genesisData,
+      logger
+    });
+
+    return networkInfoProvider;
+  };
+
   return {
     [ServiceNames.Asset]: withDbSyncProvider(async (dbPools, cardanoNode) => {
       const ntfMetadataService = new DbSyncNftMetadataService({
@@ -220,29 +247,25 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       );
       return new RewardsHttpService({ logger, rewardsProvider });
     }, ServiceNames.Rewards),
-    [ServiceNames.NetworkInfo]: withDbSyncProvider(async (dbPools, cardanoNode) => {
-      if (!genesisData)
-        throw new MissingProgramOption(
-          ServiceNames.NetworkInfo,
-          ProviderServerOptionDescriptions.CardanoNodeConfigPath
-        );
-      const networkInfoProvider = new DbSyncNetworkInfoProvider({
-        cache: {
-          db: getDbCache(),
-          healthCheck: healthCheckCache
-        },
-        cardanoNode,
-        dbPools,
-        epochMonitor: getEpochMonitor(dbPools.main),
-        genesisData,
-        logger
-      });
-      return new NetworkInfoHttpService({ logger, networkInfoProvider });
-    }, ServiceNames.NetworkInfo),
+    [ServiceNames.NetworkInfo]: withDbSyncProvider(
+      async (dbPools, cardanoNode) =>
+        new NetworkInfoHttpService({
+          logger,
+          networkInfoProvider: getNetworkInfoProvider(cardanoNode, dbPools)
+        }),
+      ServiceNames.NetworkInfo
+    ),
     [ServiceNames.TxSubmit]: async () => {
+      const handleProvider = new KoraLabsHandleProvider({
+        // TODO: remove default value once localnet scripts updated with handlePolicyIds
+        policyId: args.handlePolicyIds
+          ? args.handlePolicyIds[0]
+          : Cardano.PolicyId('f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a'),
+        serverUrl: args.handleProviderServerUrl
+      });
       const txSubmitProvider = args.useQueue
         ? await getRabbitMqTxSubmitProvider(dnsResolver, logger, args)
-        : await getOgmiosTxSubmitProvider(dnsResolver, logger, args);
+        : await getOgmiosTxSubmitProvider(dnsResolver, logger, args, handleProvider);
       return new TxSubmitHttpService({ logger, txSubmitProvider });
     }
   };

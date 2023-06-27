@@ -1,5 +1,11 @@
 import * as OpenApiValidator from 'express-openapi-validator';
-import { Cardano, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
+import {
+  Cardano,
+  ProviderError,
+  ProviderFailure,
+  TxSubmitProvider,
+  providerFailureToStatusCodeMap
+} from '@cardano-sdk/core';
 import { HttpServer, HttpService } from '../Http';
 import { Logger } from 'ts-log';
 import { ServiceNames } from '../Program/programs/types';
@@ -46,7 +52,9 @@ export class TxSubmitHttpService extends HttpService {
           } catch {
             isHealthy = false;
           }
-
+          if (error instanceof ProviderError) {
+            return HttpServer.sendJSON(res, error, providerFailureToStatusCodeMap[error.reason]);
+          }
           if (!isHealthy) {
             return HttpServer.sendJSON(res, new ProviderError(ProviderFailure.Unhealthy, firstError), 503);
           }

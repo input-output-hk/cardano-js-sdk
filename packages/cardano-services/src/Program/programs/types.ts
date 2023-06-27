@@ -1,4 +1,5 @@
 import { CommonProgramOptions } from '../options/common';
+import { HandlePolicyIdsProgramOptions } from '../options/policyIds';
 import { Milliseconds, Seconds } from '@cardano-sdk/core';
 import { OgmiosProgramOptions } from '../options/ogmios';
 import { PosgresProgramOptions } from '../options/postgres';
@@ -35,8 +36,7 @@ export enum ProjectorOptionDescriptions {
   DropSchema = 'Drop and recreate database schema to project from origin',
   DryRun = 'Initialize the projection, but do not start it',
   PoolsMetricsInterval = 'Interval between two stake pools metrics jobs in number of blocks',
-  Synchronize = 'Synchronize the schema from the models',
-  HandlePolicyIds = 'Handle policy ids'
+  Synchronize = 'Synchronize the schema from the models'
 }
 
 export enum ProviderServerOptionDescriptions {
@@ -52,7 +52,8 @@ export enum ProviderServerOptionDescriptions {
   UseTypeOrmStakePoolProvider = 'Enables the TypeORM Stake Pool Provider',
   UseBlockfrost = 'Enables Blockfrost cached data DB',
   UseQueue = 'Enables RabbitMQ',
-  PaginationPageSizeLimit = 'Pagination page size limit shared across all providers'
+  PaginationPageSizeLimit = 'Pagination page size limit shared across all providers',
+  HandleProviderServerUrl = 'URL for the Handle provider server'
 }
 
 export type ProviderServerArgs = CommonProgramOptions &
@@ -60,6 +61,7 @@ export type ProviderServerArgs = CommonProgramOptions &
   PosgresProgramOptions<'Handle'> &
   PosgresProgramOptions<'StakePool'> &
   OgmiosProgramOptions &
+  HandlePolicyIdsProgramOptions &
   RabbitMqProgramOptions & {
     allowedOrigins?: string[];
     cardanoNodeConfigPath?: string;
@@ -77,4 +79,5 @@ export type ProviderServerArgs = CommonProgramOptions &
     useTypeormStakePoolProvider?: boolean;
     paginationPageSizeLimit?: number;
     serviceNames: ServiceNames[];
+    handleProviderServerUrl: string;
   };

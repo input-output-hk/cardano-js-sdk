@@ -167,6 +167,9 @@ const callCliAndAssertExit = (
   });
 };
 
+const HANDLE_POLICY_IDS = 'f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a';
+const HANDLE_PROVIDER_SERVER_URL = 'http://localhost:3000';
+
 describe('CLI', () => {
   const container = new RabbitMQContainer();
   let db: Pool;
@@ -283,6 +286,10 @@ describe('CLI', () => {
                   cardanoNodeConfigPath,
                   '--db-cache-ttl',
                   dbCacheTtl,
+                  '--handle-policy-ids',
+                  HANDLE_POLICY_IDS,
+                  '--handle-provider-server-url',
+                  HANDLE_PROVIDER_SERVER_URL,
                   ServiceNames.Asset,
                   ServiceNames.ChainHistory,
                   ServiceNames.NetworkInfo,
@@ -312,6 +319,8 @@ describe('CLI', () => {
                   CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
                   DB_CACHE_TTL: dbCacheTtl,
                   ENABLE_METRICS: 'true',
+                  HANDLE_POLICY_IDS,
+                  HANDLE_PROVIDER_SERVER_URL,
                   LOGGER_MIN_SEVERITY: 'error',
                   OGMIOS_URL: ogmiosConnection.address.webSocket,
                   POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
@@ -348,6 +357,10 @@ describe('CLI', () => {
                   cardanoNodeConfigPath,
                   '--db-cache-ttl',
                   dbCacheTtl,
+                  '--handle-policy-ids',
+                  HANDLE_POLICY_IDS,
+                  '--handle-provider-server-url',
+                  HANDLE_PROVIDER_SERVER_URL,
                   ServiceNames.Asset,
                   ServiceNames.ChainHistory,
                   ServiceNames.NetworkInfo,
@@ -371,6 +384,8 @@ describe('CLI', () => {
                   CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
                   DB_CACHE_TTL: dbCacheTtl,
                   ENABLE_METRICS: 'true',
+                  HANDLE_POLICY_IDS,
+                  HANDLE_PROVIDER_SERVER_URL,
                   LOGGER_MIN_SEVERITY: 'error',
                   OGMIOS_URL: ogmiosConnection.address.webSocket,
                   POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
@@ -391,6 +406,8 @@ describe('CLI', () => {
                   CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
                   DB_CACHE_TTL: dbCacheTtl,
                   ENABLE_METRICS: 'false',
+                  HANDLE_POLICY_IDS,
+                  HANDLE_PROVIDER_SERVER_URL,
                   LOGGER_MIN_SEVERITY: 'error',
                   OGMIOS_URL: ogmiosConnection.address.webSocket,
                   POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
@@ -1390,6 +1407,10 @@ describe('CLI', () => {
                     ...baseArgs,
                     '--api-url',
                     apiUrl,
+                    '--handle-policy-ids',
+                    HANDLE_POLICY_IDS,
+                    '--handle-provider-server-url',
+                    HANDLE_PROVIDER_SERVER_URL,
                     '--postgres-connection-string-db-sync',
                     postgresConnectionString,
                     '--cardano-node-config-path',
@@ -1411,6 +1432,8 @@ describe('CLI', () => {
                   env: {
                     API_URL: apiUrl,
                     CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
+                    HANDLE_POLICY_IDS,
+                    HANDLE_PROVIDER_SERVER_URL,
                     LOGGER_MIN_SEVERITY: 'error',
                     POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
                     SERVICE_NAMES: ServiceNames.NetworkInfo
@@ -1423,10 +1446,23 @@ describe('CLI', () => {
 
             it('tx-submit uses the default Ogmios configuration if not specified when using CLI options', async () => {
               proc = withLogging(
-                fork(exePath, [...baseArgs, '--api-url', apiUrl, ServiceNames.TxSubmit], {
-                  env: {},
-                  stdio: 'pipe'
-                })
+                fork(
+                  exePath,
+                  [
+                    ...baseArgs,
+                    '--api-url',
+                    apiUrl,
+                    '--handle-policy-ids',
+                    HANDLE_POLICY_IDS,
+                    '--handle-provider-server-url',
+                    HANDLE_PROVIDER_SERVER_URL,
+                    ServiceNames.TxSubmit
+                  ],
+                  {
+                    env: {},
+                    stdio: 'pipe'
+                  }
+                )
               );
               await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, { withTip: false });
             });
@@ -1436,6 +1472,8 @@ describe('CLI', () => {
                 fork(exePath, ['start-provider-server'], {
                   env: {
                     API_URL: apiUrl,
+                    HANDLE_POLICY_IDS,
+                    HANDLE_PROVIDER_SERVER_URL,
                     LOGGER_MIN_SEVERITY: 'error',
                     SERVICE_NAMES: ServiceNames.TxSubmit,
                     USE_QUEUE: 'false'
@@ -1499,6 +1537,10 @@ describe('CLI', () => {
               callCliAndAssertExit(
                 {
                   args: [
+                    '--handle-policy-ids',
+                    HANDLE_POLICY_IDS,
+                    '--handle-provider-server-url',
+                    HANDLE_PROVIDER_SERVER_URL,
                     '--ogmios-srv-service-name',
                     ogmiosSrvServiceName,
                     '--service-discovery-timeout',
@@ -1518,6 +1560,8 @@ describe('CLI', () => {
                   dataMatchOnError: DNS_SERVER_NOT_REACHABLE_ERROR,
                   env: {
                     API_URL: apiUrl,
+                    HANDLE_POLICY_IDS,
+                    HANDLE_PROVIDER_SERVER_URL,
                     OGMIOS_SRV_SERVICE_NAME: ogmiosSrvServiceName,
                     SERVICE_DISCOVERY_TIMEOUT: '1000',
                     SERVICE_NAMES: ServiceNames.TxSubmit
@@ -1568,6 +1612,10 @@ describe('CLI', () => {
               callCliAndAssertExit(
                 {
                   args: [
+                    '--handle-policy-ids',
+                    HANDLE_POLICY_IDS,
+                    '--handle-provider-server-url',
+                    HANDLE_PROVIDER_SERVER_URL,
                     '--ogmios-url',
                     ogmiosConnection.address.webSocket,
                     '--ogmios-srv-service-name',
@@ -1587,6 +1635,8 @@ describe('CLI', () => {
                   dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
                   env: {
                     API_URL: apiUrl,
+                    HANDLE_POLICY_IDS,
+                    HANDLE_PROVIDER_SERVER_URL,
                     OGMIOS_SRV_SERVICE_NAME: ogmiosSrvServiceName,
                     OGMIOS_URL: ogmiosConnection.address.webSocket,
                     SERVICE_NAMES: ServiceNames.TxSubmit
@@ -1855,6 +1905,10 @@ describe('CLI', () => {
                     ...baseArgs,
                     '--api-url',
                     apiUrl,
+                    '--handle-policy-ids',
+                    HANDLE_POLICY_IDS,
+                    '--handle-provider-server-url',
+                    HANDLE_PROVIDER_SERVER_URL,
                     '--use-queue',
                     'true',
                     '--rabbitmq-url',
@@ -1875,6 +1929,8 @@ describe('CLI', () => {
                 fork(exePath, ['start-provider-server'], {
                   env: {
                     API_URL: apiUrl,
+                    HANDLE_POLICY_IDS,
+                    HANDLE_PROVIDER_SERVER_URL,
                     LOGGER_MIN_SEVERITY: 'error',
                     RABBITMQ_URL: rabbitmqUrl.toString(),
                     SERVICE_NAMES: ServiceNames.TxSubmit,
@@ -1892,6 +1948,10 @@ describe('CLI', () => {
               callCliAndAssertExit(
                 {
                   args: [
+                    '--handle-policy-ids',
+                    HANDLE_POLICY_IDS,
+                    '--handle-provider-server-url',
+                    HANDLE_PROVIDER_SERVER_URL,
                     '--use-queue',
                     'true',
                     '--rabbitmq-srv-service-name',
@@ -1913,6 +1973,8 @@ describe('CLI', () => {
                   dataMatchOnError: DNS_SERVER_NOT_REACHABLE_ERROR,
                   env: {
                     API_URL: apiUrl,
+                    HANDLE_POLICY_IDS,
+                    HANDLE_PROVIDER_SERVER_URL,
                     RABBITMQ_SRV_SERVICE_NAME: rabbitmqSrvServiceName,
                     SERVICE_DISCOVERY_TIMEOUT: '1000',
                     SERVICE_NAMES: ServiceNames.TxSubmit,
@@ -2159,7 +2221,7 @@ describe('CLI', () => {
           true
         );
         proc.stderr!.on('data', (data) =>
-          expect(data.toString()).toMatch('MissingProgramOption: handle requires the Handle policy ids program option')
+          expect(data.toString()).toMatch('MissingProgramOption: handle requires the Handle policy Ids program option')
         );
         proc.on('exit', (code) => {
           expect(code).toBe(1);

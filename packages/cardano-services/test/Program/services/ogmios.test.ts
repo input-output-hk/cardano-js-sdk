@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable sonarjs/no-duplicate-string */
-import { CardanoNodeErrors } from '@cardano-sdk/core';
+import { Cardano, CardanoNodeErrors, ProviderError } from '@cardano-sdk/core';
 import { Connection } from '@cardano-ogmios/client';
 import { DbPools, LedgerTipModel, findLedgerTip } from '../../../src/util/DbSyncProvider';
 import { DbSyncEpochPollService, listenPromise, loadGenesisData, serverClosePromise } from '../../../src/util';
@@ -15,6 +15,7 @@ import {
   getPool
 } from '../../../src';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../../src/InMemoryCache';
+import { KoraLabsHandleProvider } from '@cardano-sdk/cardano-services-client';
 import { Ogmios, OgmiosCardanoNode, OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { SrvRecord } from 'dns';
@@ -22,11 +23,24 @@ import { bufferToHexString } from '@cardano-sdk/util';
 import { clearDbPools, createHealthyMockOgmiosServer, ogmiosServerReady } from '../../util';
 import { createMockOgmiosServer } from '../../../../ogmios/test/mocks/mockOgmiosServer';
 import { getPort, getRandomPort } from 'get-port-please';
+import { handleProviderMocks, logger } from '@cardano-sdk/util-dev';
 import { healthCheckResponseMock } from '../../../../core/test/CardanoNode/mocks';
-import { logger } from '@cardano-sdk/util-dev';
 import { types } from 'util';
 import axios from 'axios';
 import http from 'http';
+
+jest.mock('@cardano-sdk/cardano-services-client', () => ({
+  ...jest.requireActual('@cardano-sdk/cardano-services-client'),
+  KoraLabsHandleProvider: jest.fn().mockImplementation(() => ({
+    healthCheck: jest.fn(),
+    resolveHandles: jest.fn().mockResolvedValue([handleProviderMocks.getAliceHandleProviderResponse])
+  }))
+}));
+
+const handleProvider = new KoraLabsHandleProvider({
+  policyId: Cardano.PolicyId('50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb'),
+  serverUrl: 'https://localhost:3000'
+});
 
 jest.mock('dns', () => ({
   promises: {
@@ -265,6 +279,42 @@ describe('Service dependency abstractions', () => {
           expect(res.status).toBe(200);
           expect(res.data).toEqual(healthCheckResponseMock({ withTip: false }));
         });
+
+        it('verifies that the submitted transaction addresses can all correctly be resolved', async () => {
+          const provider = await getOgmiosTxSubmitProvider(
+            dnsResolver,
+            logger,
+            {
+              ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
+            },
+            handleProvider
+          );
+
+          await provider.initialize();
+          await provider.start();
+          const res = await provider.submitTx({
+            context: { handles: [handleProviderMocks.getAliceHandleProviderResponse] },
+            signedTransaction: bufferToHexString(Buffer.from(new Uint8Array([])))
+          });
+          expect(res).toBeUndefined();
+          await provider.shutdown();
+        });
+
+        it('throws a provider error if the submitted transaction does not contain addresses that can be resolved from the included context', async () => {
+          const provider = await getOgmiosTxSubmitProvider(dnsResolver, logger, {
+            ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
+          });
+          await provider.initialize();
+          await provider.start();
+
+          await expect(
+            provider.submitTx({
+              context: { handles: [handleProviderMocks.getWrongHandleProviderResponse] },
+              signedTransaction: bufferToHexString(Buffer.from(new Uint8Array([])))
+            })
+          ).rejects.toBeInstanceOf(ProviderError);
+          await provider.shutdown();
+        });
       });
 
       describe('NetworkInfoHttpService', () => {
@@ -299,7 +349,6 @@ describe('Service dependency abstractions', () => {
 
         afterAll(async () => {
           await httpServer.shutdown();
-          await serverClosePromise(ogmiosServer);
         });
 
         it('ogmiosCardanoNode should not be a instance of Proxy ', () => {

@@ -1,7 +1,9 @@
+import { Cardano, Handle } from '.';
 import { ComposableError, formatErrorMessage } from '@cardano-sdk/util';
 import { CustomError } from 'ts-custom-error';
 
 export enum ProviderFailure {
+  Conflict = 'CONFLICT',
   NotFound = 'NOT_FOUND',
   Unknown = 'UNKNOWN',
   Forbidden = 'FORBIDDEN',
@@ -17,6 +19,7 @@ export const providerFailureToStatusCodeMap: { [key in ProviderFailure]: number 
   [ProviderFailure.BadRequest]: 400,
   [ProviderFailure.Forbidden]: 403,
   [ProviderFailure.NotFound]: 404,
+  [ProviderFailure.Conflict]: 409,
   [ProviderFailure.Unhealthy]: 500,
   [ProviderFailure.Unknown]: 500,
   [ProviderFailure.InvalidResponse]: 500,
@@ -28,6 +31,16 @@ export const providerFailureToStatusCodeMap: { [key in ProviderFailure]: number 
 export class ProviderError<InnerError = unknown> extends ComposableError<InnerError> {
   constructor(public reason: ProviderFailure, innerError?: InnerError, public detail?: string) {
     super(formatErrorMessage(reason, detail), innerError);
+  }
+}
+
+export class HandleOwnerChangeError extends CustomError {
+  constructor(
+    public handle: Handle,
+    public expectedAddress: Cardano.PaymentAddress,
+    public actualAddress: Cardano.PaymentAddress | null
+  ) {
+    super(`Expected: ${expectedAddress} for handle $${handle}. Actual: ${actualAddress}`);
   }
 }
 

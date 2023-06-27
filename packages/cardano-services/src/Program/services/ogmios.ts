@@ -1,6 +1,7 @@
 /* eslint-disable promise/no-nesting */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DnsResolver } from '../utils';
+import { KoraLabsHandleProvider } from '@cardano-sdk/cardano-services-client';
 import { Logger } from 'ts-log';
 import { MissingCardanoNodeOption } from '../errors';
 import {
@@ -35,14 +36,15 @@ const recreateOgmiosTxSubmitProvider = async (
   serviceName: string,
   ogmiosTxSubmitProvider: OgmiosTxSubmitProvider,
   dnsResolver: DnsResolver,
-  logger: Logger
+  logger: Logger,
+  handleProvider?: KoraLabsHandleProvider
 ) => {
   const record = await dnsResolver(serviceName!);
   logger.info(`DNS resolution for OgmiosTxSubmitProvider, resolved with record: ${JSON.stringify(record)}`);
   await ogmiosTxSubmitProvider
     .shutdown()
     .catch((error_) => logger.warn(`OgmiosTxSubmitProvider failed to shutdown after connection error: ${error_}`));
-  return new OgmiosTxSubmitProvider({ host: record.name, port: record.port }, { logger });
+  return new OgmiosTxSubmitProvider({ host: record.name, port: record.port }, { logger }, handleProvider);
 };
 /**
  * Creates an extended TxSubmitProvider instance :
@@ -58,10 +60,11 @@ const recreateOgmiosTxSubmitProvider = async (
 export const ogmiosTxSubmitProviderWithDiscovery = async (
   dnsResolver: DnsResolver,
   logger: Logger,
-  serviceName: string
+  serviceName: string,
+  handleProvider?: KoraLabsHandleProvider
 ): Promise<OgmiosTxSubmitProvider> => {
   const { name, port } = await dnsResolver(serviceName!);
-  let ogmiosProvider = new OgmiosTxSubmitProvider({ host: name, port }, { logger });
+  let ogmiosProvider = new OgmiosTxSubmitProvider({ host: name, port }, { logger }, handleProvider);
 
   const txSubmitProviderProxy = new Proxy<OgmiosTxSubmitProvider>({} as OgmiosTxSubmitProvider, {
     get(_, prop) {
@@ -70,7 +73,13 @@ export const ogmiosTxSubmitProviderWithDiscovery = async (
         return () =>
           ogmiosProvider.initialize().catch(async (error) => {
             if (isConnectionError(error)) {
-              ogmiosProvider = await recreateOgmiosTxSubmitProvider(serviceName, ogmiosProvider, dnsResolver, logger);
+              ogmiosProvider = await recreateOgmiosTxSubmitProvider(
+                serviceName,
+                ogmiosProvider,
+                dnsResolver,
+                logger,
+                handleProvider
+              );
               return await ogmiosProvider.initialize();
             }
             throw error;
@@ -80,7 +89,13 @@ export const ogmiosTxSubmitProviderWithDiscovery = async (
         return (submitTxArgs: SubmitTxArgs) =>
           ogmiosProvider.submitTx(submitTxArgs).catch(async (error) => {
             if (isConnectionError(error)) {
-              ogmiosProvider = await recreateOgmiosTxSubmitProvider(serviceName, ogmiosProvider, dnsResolver, logger);
+              ogmiosProvider = await recreateOgmiosTxSubmitProvider(
+                serviceName,
+                ogmiosProvider,
+                dnsResolver,
+                logger,
+                handleProvider
+              );
               await ogmiosProvider.initialize();
               await ogmiosProvider.start();
               return await ogmiosProvider.submitTx(submitTxArgs);
@@ -104,11 +119,13 @@ export const ogmiosTxSubmitProviderWithDiscovery = async (
 export const getOgmiosTxSubmitProvider = async (
   dnsResolver: DnsResolver,
   logger: Logger,
-  options?: OgmiosProgramOptions
+  options?: OgmiosProgramOptions,
+  handleProvider?: KoraLabsHandleProvider
 ): Promise<OgmiosTxSubmitProvider> => {
   if (options?.ogmiosSrvServiceName)
-    return ogmiosTxSubmitProviderWithDiscovery(dnsResolver, logger, options.ogmiosSrvServiceName);
-  if (options?.ogmiosUrl) return new OgmiosTxSubmitProvider(urlToConnectionConfig(options?.ogmiosUrl), { logger });
+    return ogmiosTxSubmitProviderWithDiscovery(dnsResolver, logger, options.ogmiosSrvServiceName, handleProvider);
+  if (options?.ogmiosUrl)
+    return new OgmiosTxSubmitProvider(urlToConnectionConfig(options?.ogmiosUrl), { logger }, handleProvider);
   throw new MissingCardanoNodeOption([OgmiosOptionDescriptions.Url, OgmiosOptionDescriptions.SrvServiceName]);
 };
 

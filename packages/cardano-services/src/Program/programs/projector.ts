@@ -2,11 +2,11 @@ import { Bootstrap } from '@cardano-sdk/projection';
 import { Cardano } from '@cardano-sdk/core';
 import { CommonProgramOptions, OgmiosProgramOptions, PosgresProgramOptions } from '../options';
 import { DnsResolver, createDnsResolver } from '../utils';
+import { HandlePolicyIdsOptionDescriptions, HandlePolicyIdsProgramOptions } from '../options/policyIds';
 import { HttpServer, HttpServerConfig } from '../../Http';
 import { Logger } from 'ts-log';
 import { MissingProgramOption, UnknownServiceName } from '../errors';
 import { ProjectionHttpService, ProjectionName, createTypeormProjection, storeOperators } from '../../Projection';
-import { ProjectorOptionDescriptions } from './types';
 import { SrvRecord } from 'dns';
 import { TypeormStabilityWindowBuffer, createStorePoolMetricsUpdateJob } from '@cardano-sdk/projection-typeorm';
 import { URL } from 'url';
@@ -17,6 +17,7 @@ export const PROJECTOR_API_URL_DEFAULT = new URL('http://localhost:3002');
 
 export type ProjectorArgs = CommonProgramOptions &
   PosgresProgramOptions<''> &
+  HandlePolicyIdsProgramOptions &
   OgmiosProgramOptions & {
     dropSchema: boolean;
     dryRun: boolean;
@@ -71,7 +72,7 @@ export const loadProjector = async (args: ProjectorArgs, deps: LoadProjectorDepe
       throw new UnknownServiceName(projectionName, Object.values(ProjectionName));
     }
     if (projectionName === ProjectionName.Handle && !args.handlePolicyIds) {
-      throw new MissingProgramOption(ProjectionName.Handle, ProjectorOptionDescriptions.HandlePolicyIds);
+      throw new MissingProgramOption(ProjectionName.Handle, HandlePolicyIdsOptionDescriptions.HandlePolicyIds);
     }
   }
   const logger =
