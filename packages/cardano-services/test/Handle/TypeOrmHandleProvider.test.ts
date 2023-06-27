@@ -8,7 +8,7 @@ describe('TypeOrmHandleProvider', () => {
     const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
     const entities = getEntities(['handle']);
     const connectionConfig$ = getConnectionConfig(dnsResolver, 'test', 'Handle', {
-      postgresConnectionStringHandle: process.env.POSTGRES_CONNECTION_STRING_STAKE_POOL!
+      postgresConnectionStringHandle: process.env.POSTGRES_CONNECTION_STRING_HANDLE!
     });
 
     provider = new TypeOrmHandleProvider({ connectionConfig$, entities, logger });
@@ -28,7 +28,14 @@ describe('TypeOrmHandleProvider', () => {
       "BAD_REQUEST (Empty string handle can't be resolved)"
     ));
 
-  it.skip('resolve method correctly resolves handles', () =>
-    // TODO: complete this test with mock or fixtures
-    expect(provider.resolveHandles({ handles: ['none', 'test'] })).resolves.toBe([null, {}]));
+  it('resolve method correctly resolves handles', async () => {
+    const result = await provider.resolveHandles({ handles: ['none', 'TestHandle'] });
+
+    expect(result.length).toBe(2);
+    expect(result[0]).toBeNull();
+
+    const { handle, hasDatum } = result[1]!;
+
+    expect({ handle, hasDatum }).toEqual({ handle: 'TestHandle', hasDatum: false });
+  });
 });
