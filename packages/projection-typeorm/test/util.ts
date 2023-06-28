@@ -1,5 +1,4 @@
 import { CreateDataSourceProps, createDataSource } from '../src';
-import { createDatabase } from 'typeorm-extension';
 import { logger } from '@cardano-sdk/util-dev';
 
 export const connectionConfig = {
@@ -18,13 +17,6 @@ export const initializeDataSource = async (
     devOptions: props.devOptions || { dropSchema: true, synchronize: true },
     logger,
     ...props
-  });
-  await createDatabase({
-    options: {
-      type: 'postgres' as const,
-      ...connectionConfig,
-      installExtensions: true
-    }
   });
   await dataSource.initialize();
   return dataSource;
