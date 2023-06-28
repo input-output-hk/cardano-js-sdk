@@ -33,6 +33,7 @@ import { createDbSyncMetadataService } from '../../Metadata';
 import { createLogger } from 'bunyan';
 import { getConnectionConfig, getOgmiosTxSubmitProvider, getRabbitMqTxSubmitProvider } from '../services';
 import { getEntities } from '../../Projection/prepareTypeormProjection';
+import { handlePolicyIdsFromFile } from '../options/policyIds';
 import { isNotNil } from '@cardano-sdk/util';
 import memoize from 'lodash/memoize';
 
@@ -291,6 +292,8 @@ export const loadProviderServer = async (
       },
       logger
     );
+
+  await handlePolicyIdsFromFile(args);
 
   const cardanoNode = await getCardanoNode(dnsResolver, logger, args);
   const genesisData = await getGenesisData(args);

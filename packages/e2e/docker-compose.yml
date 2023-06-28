@@ -12,6 +12,10 @@ services:
     <<: *logging
     build:
       context: ./local-network
+    depends_on:
+      # We need the file server here in order to calculate the pool metadata hashes
+      file-server:
+        condition: service_healthy
     environment:
       CARDANO_NODE_LOG_LEVEL: ${CARDANO_NODE_LOG_LEVEL:-Info}
       CARDANO_NODE_CHAINDB_LOG_LEVEL: ${CARDANO_NODE_CHAINDB_LOG_LEVEL:-Notice}
@@ -20,10 +24,7 @@ services:
     volumes:
       - ./local-network/network-files/node-sp1/:/root/network-files/node-sp1
       - ./local-network/config:/root/config
-    depends_on:
-      # We need the file server here in order to calculate the pool metadata hashes
-      file-server:
-        condition: service_healthy
+      - sdk-ipc:/sdk-ipc
 
   file-server:
     <<: *logging
@@ -74,6 +75,12 @@ services:
       cardano-db-sync:
         condition: service_healthy
     restart: on-failure
+
+  handle-projector:
+    environment:
+      HANDLE_POLICY_IDS_FILE: /sdk-ipc/handle_policy_ids
+    volumes:
+      - sdk-ipc:/sdk-ipc
 
   provider-server:
     environment:

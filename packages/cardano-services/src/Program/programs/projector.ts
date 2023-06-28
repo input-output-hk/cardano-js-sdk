@@ -1,8 +1,11 @@
 import { Bootstrap } from '@cardano-sdk/projection';
-import { Cardano } from '@cardano-sdk/core';
 import { CommonProgramOptions, OgmiosProgramOptions, PosgresProgramOptions } from '../options';
 import { DnsResolver, createDnsResolver } from '../utils';
-import { HandlePolicyIdsOptionDescriptions, HandlePolicyIdsProgramOptions } from '../options/policyIds';
+import {
+  HandlePolicyIdsOptionDescriptions,
+  HandlePolicyIdsProgramOptions,
+  handlePolicyIdsFromFile
+} from '../options/policyIds';
 import { HttpServer, HttpServerConfig } from '../../Http';
 import { Logger } from 'ts-log';
 import { MissingProgramOption, UnknownServiceName } from '../errors';
@@ -24,7 +27,6 @@ export type ProjectorArgs = CommonProgramOptions &
     poolsMetricsInterval: number;
     projectionNames: ProjectionName[];
     synchronize: boolean;
-    handlePolicyIds?: Cardano.PolicyId[];
   };
 export interface LoadProjectorDependencies {
   dnsResolver?: (serviceName: string) => Promise<SrvRecord>;
@@ -67,39 +69,56 @@ const createProjectionHttpService = async (options: ProjectionMapFactoryOptions)
 
 export const loadProjector = async (args: ProjectorArgs, deps: LoadProjectorDependencies = {}): Promise<HttpServer> => {
   const supportedProjections = Object.values(ProjectionName);
-  for (const projectionName of args.projectionNames) {
+
+  await handlePolicyIdsFromFile(args);
+
+  const {
+    apiUrl,
+    buildInfo,
+    enableMetrics,
+    handlePolicyIds,
+    loggerMinSeverity,
+    projectionNames,
+    serviceDiscoveryBackoffFactor,
+    serviceDiscoveryTimeout
+  } = args;
+
+  for (const projectionName of projectionNames) {
     if (!supportedProjections.includes(projectionName)) {
       throw new UnknownServiceName(projectionName, Object.values(ProjectionName));
     }
-    if (projectionName === ProjectionName.Handle && !args.handlePolicyIds) {
-      throw new MissingProgramOption(ProjectionName.Handle, HandlePolicyIdsOptionDescriptions.HandlePolicyIds);
+    if (projectionName === ProjectionName.Handle && !handlePolicyIds) {
+      throw new MissingProgramOption(ProjectionName.Handle, [
+        HandlePolicyIdsOptionDescriptions.HandlePolicyIds,
+        HandlePolicyIdsOptionDescriptions.HandlePolicyIdsFile
+      ]);
     }
   }
   const logger =
     deps?.logger ||
     createLogger({
-      level: args.loggerMinSeverity,
+      level: loggerMinSeverity,
       name: 'projector'
     });
   const dnsResolver =
     deps?.dnsResolver ||
     createDnsResolver(
       {
-        factor: args.serviceDiscoveryBackoffFactor,
-        maxRetryTime: args.serviceDiscoveryTimeout
+        factor: serviceDiscoveryBackoffFactor,
+        maxRetryTime: serviceDiscoveryTimeout
       },
       logger
     );
   const service = await createProjectionHttpService({ args, dnsResolver, logger });
   const config: HttpServerConfig = {
     listen: {
-      host: args.apiUrl.hostname,
-      port: args.apiUrl ? Number.parseInt(args.apiUrl.port) : undefined
+      host: apiUrl.hostname,
+      port: apiUrl ? Number.parseInt(apiUrl.port) : undefined
     },
-    meta: { ...args.buildInfo, startupTime: Date.now() }
+    meta: { ...buildInfo, startupTime: Date.now() }
   };
-  if (args.enableMetrics) {
-    config.metrics = { enabled: args.enableMetrics };
+  if (enableMetrics) {
+    config.metrics = { enabled: enableMetrics };
   }
   return new HttpServer(config, { logger, services: [service] });
 };

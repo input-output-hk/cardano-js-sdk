@@ -25,6 +25,7 @@ cat >network-files/utxo-keys/handles-metadata.json <<EOL
 }}
 EOL
 
+echo $policyid > /sdk-ipc/handle_policy_ids
 
 addr=$(cardano-cli address build --payment-verification-key-file network-files/utxo-keys/utxo1.vkey --testnet-magic 888)
 faucetAddr="addr_test1qqen0wpmhg7fhkus45lyv4wju26cecgu6avplrnm6dgvuk6qel5hu3u3q0fht53ly97yx95hkt56j37ch07pesf6s4pqh5gd4e"
