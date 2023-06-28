@@ -67,7 +67,7 @@ export const ogmiosTxSubmitProviderWithDiscovery = async (
   let ogmiosProvider = new OgmiosTxSubmitProvider({ host: name, port }, { logger }, handleProvider);
 
   const txSubmitProviderProxy = new Proxy<OgmiosTxSubmitProvider>({} as OgmiosTxSubmitProvider, {
-    get(_, prop) {
+    get(_, prop, receiver) {
       if (prop === 'then') return;
       if (prop === 'initialize') {
         return () =>
@@ -80,7 +80,7 @@ export const ogmiosTxSubmitProviderWithDiscovery = async (
                 logger,
                 handleProvider
               );
-              return await ogmiosProvider.initialize();
+              return receiver.initialize();
             }
             throw error;
           });
@@ -96,9 +96,9 @@ export const ogmiosTxSubmitProviderWithDiscovery = async (
                 logger,
                 handleProvider
               );
-              await ogmiosProvider.initialize();
-              await ogmiosProvider.start();
-              return await ogmiosProvider.submitTx(submitTxArgs);
+              await receiver.initialize();
+              await receiver.start();
+              return await receiver.submitTx(submitTxArgs);
             }
             throw error;
           });
@@ -149,14 +149,14 @@ export const ogmiosCardanoNodeWithDiscovery = async (
   let ogmiosCardanoNode = new OgmiosCardanoNode({ host: name, port }, logger);
 
   const cardanoNodeProxy = new Proxy<OgmiosCardanoNode>({} as OgmiosCardanoNode, {
-    get(_, prop) {
+    get(_, prop, receiver) {
       if (prop === 'then') return;
       if (prop === 'initialize') {
         return () =>
           ogmiosCardanoNode.initialize().catch(async (error) => {
             if (isConnectionError(error)) {
               ogmiosCardanoNode = await recreateOgmiosCardanoNode(serviceName, ogmiosCardanoNode, dnsResolver, logger);
-              return await ogmiosCardanoNode.initialize();
+              return await receiver.initialize();
             }
             throw error;
           });
@@ -166,9 +166,9 @@ export const ogmiosCardanoNodeWithDiscovery = async (
           ogmiosCardanoNode[prop]().catch(async (error) => {
             if (isConnectionError(error)) {
               ogmiosCardanoNode = await recreateOgmiosCardanoNode(serviceName, ogmiosCardanoNode, dnsResolver, logger);
-              await ogmiosCardanoNode.initialize();
-              await ogmiosCardanoNode.start();
-              return await ogmiosCardanoNode[prop]();
+              await receiver.initialize();
+              await receiver.start();
+              return await receiver[prop]();
             }
             throw error;
           });

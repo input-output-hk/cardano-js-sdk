@@ -34,15 +34,12 @@ export const rabbitMqTxSubmitProviderWithDiscovery = async (
   let rabbitmqProvider = new RabbitMqTxSubmitProvider({ rabbitmqUrl: srvRecordToRabbitmqURL(record) }, { logger });
 
   return new Proxy<RabbitMqTxSubmitProvider>({} as RabbitMqTxSubmitProvider, {
-    get(_, prop) {
+    get(_, prop, receiver) {
       if (prop === 'then') return;
       if (prop === 'submitTx') {
         return (submitTxArgs: SubmitTxArgs) =>
           rabbitmqProvider.submitTx(submitTxArgs).catch(async (error) => {
-            if (
-              error.innerError?.reason === ProviderFailure.ConnectionFailure ||
-              isConnectionError(error.innerError.innerError)
-            ) {
+            if (isConnectionError(error)) {
               const resolvedRecord = await dnsResolver(serviceName!);
               logger.info(`DNS resolution for RabbitMQ service, resolved with record: ${JSON.stringify(record)}`);
               await rabbitmqProvider
@@ -52,7 +49,7 @@ export const rabbitMqTxSubmitProviderWithDiscovery = async (
                 { rabbitmqUrl: srvRecordToRabbitmqURL(resolvedRecord) },
                 { logger }
               );
-              return await rabbitmqProvider.submitTx(submitTxArgs);
+              return await receiver.submitTx(submitTxArgs);
             }
             throw error;
           });
