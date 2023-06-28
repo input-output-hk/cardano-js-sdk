@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.15.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.15.0...@cardano-sdk/core@0.15.1) (2023-06-28)
+
+### Features
+
+* adds cardanoAddress type in HandleResolution interface ([2ee31c9](https://github.com/input-output-hk/cardano-js-sdk/commit/2ee31c9f0b61fc5e67385128448225d2d1d85617))
+* implement verification and presubmission checks on handles in OgmiosTxProvider ([0f18042](https://github.com/input-output-hk/cardano-js-sdk/commit/0f1804287672968614e8aa6bf2f095b0e9a88b22))
+
 ## [0.15.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.14.1...@cardano-sdk/core@0.15.0) (2023-06-23)
 
 ### ⚠ BREAKING CHANGES

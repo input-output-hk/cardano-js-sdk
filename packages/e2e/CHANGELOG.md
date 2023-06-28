@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.15.0...@cardano-sdk/e2e@0.16.0) (2023-06-28)
+
+### ⚠ BREAKING CHANGES
+
+* revert inclusion of version in the HttpProvider interface
+
+### Bug Fixes
+
+* revert inclusion of version in the HttpProvider interface ([3f50013](https://github.com/input-output-hk/cardano-js-sdk/commit/3f5001367686668806bfe967d3d7b6dd5e96dccc))
+
 ## [0.15.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.14.2...@cardano-sdk/e2e@0.15.0) (2023-06-23)
 
 ### ⚠ BREAKING CHANGES

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.6.9...@cardano-sdk/projection@0.6.10) (2023-06-28)
+
+### Bug Fixes
+
+* unsupported character bug in handles projection ([4144ed2](https://github.com/input-output-hk/cardano-js-sdk/commit/4144ed2925f1c5b118c411ac5eedc3e4a62d3893))
+
 ## [0.6.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.6.8...@cardano-sdk/projection@0.6.9) (2023-06-23)
 
 **Note:** Version bump only for package @cardano-sdk/projection

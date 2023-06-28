@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.12.5...@cardano-sdk/ogmios@0.12.6) (2023-06-28)
+
+### Features
+
+* implement verification and presubmission checks on handles in OgmiosTxProvider ([0f18042](https://github.com/input-output-hk/cardano-js-sdk/commit/0f1804287672968614e8aa6bf2f095b0e9a88b22))
+
 ## [0.12.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.12.4...@cardano-sdk/ogmios@0.12.5) (2023-06-23)
 
 **Note:** Version bump only for package @cardano-sdk/ogmios

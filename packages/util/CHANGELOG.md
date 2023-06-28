@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.11.0...@cardano-sdk/util@0.12.0) (2023-06-28)
+
+### ⚠ BREAKING CHANGES
+
+* moved strictEquals, sameArrayItems, shallowArrayEquals to util package
+
+### Code Refactoring
+
+* move generic equals methods to util package ([6b5dbd3](https://github.com/input-output-hk/cardano-js-sdk/commit/6b5dbd3382eda3fb58901619438caf946a559715))
+
 ## [0.11.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.10.0...@cardano-sdk/util@0.11.0) (2023-06-05)
 
 ### ⚠ BREAKING CHANGES

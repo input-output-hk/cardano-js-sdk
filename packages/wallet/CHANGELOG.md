@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.17.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.16.3...@cardano-sdk/wallet@0.17.0) (2023-06-28)
+
+### ⚠ BREAKING CHANGES
+
+* move coldObservableProvider to util-rxjs package
+* moved strictEquals, sameArrayItems, shallowArrayEquals to util package
+
+### Features
+
+* adds cardanoAddress type in HandleResolution interface ([2ee31c9](https://github.com/input-output-hk/cardano-js-sdk/commit/2ee31c9f0b61fc5e67385128448225d2d1d85617))
+* implement verification and presubmission checks on handles in OgmiosTxProvider ([0f18042](https://github.com/input-output-hk/cardano-js-sdk/commit/0f1804287672968614e8aa6bf2f095b0e9a88b22))
+
+### Bug Fixes
+
+* **wallet:** accept tagged 'amount' in getCollateral ([dbc0a37](https://github.com/input-output-hk/cardano-js-sdk/commit/dbc0a37c1649c9b139b83605475d91e93c9e5a50))
+
+### Code Refactoring
+
+* move coldObservableProvider to util-rxjs package ([3522d0c](https://github.com/input-output-hk/cardano-js-sdk/commit/3522d0cbbde21c59e483d769cee14ffee4648972))
+* move generic equals methods to util package ([6b5dbd3](https://github.com/input-output-hk/cardano-js-sdk/commit/6b5dbd3382eda3fb58901619438caf946a559715))
+
 ## [0.16.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.16.2...@cardano-sdk/wallet@0.16.3) (2023-06-23)
 
 **Note:** Version bump only for package @cardano-sdk/wallet

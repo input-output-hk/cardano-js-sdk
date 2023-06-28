@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.14.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.13.3...@cardano-sdk/cardano-services@0.14.0) (2023-06-28)
+
+### ⚠ BREAKING CHANGES
+
+* revert inclusion of version in the HttpProvider interface
+
+### Features
+
+* adds cardanoAddress type in HandleResolution interface ([2ee31c9](https://github.com/input-output-hk/cardano-js-sdk/commit/2ee31c9f0b61fc5e67385128448225d2d1d85617))
+* **cardano-services:** make cli able to read handle policy ids from file ([ac2aa7f](https://github.com/input-output-hk/cardano-js-sdk/commit/ac2aa7f2d6106cb4fa12833c65800b63f59ca0d4))
+* implement verification and presubmission checks on handles in OgmiosTxProvider ([0f18042](https://github.com/input-output-hk/cardano-js-sdk/commit/0f1804287672968614e8aa6bf2f095b0e9a88b22))
+
+### Bug Fixes
+
+* revert inclusion of version in the HttpProvider interface ([3f50013](https://github.com/input-output-hk/cardano-js-sdk/commit/3f5001367686668806bfe967d3d7b6dd5e96dccc))
+
 ## [0.13.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.13.2...@cardano-sdk/cardano-services@0.13.3) (2023-06-23)
 
 ### Features

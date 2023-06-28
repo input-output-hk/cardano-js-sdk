@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.7.7...@cardano-sdk/key-management@0.7.8) (2023-06-28)
+
+### Bug Fixes
+
+* **tx-construction:** wait for new stakeKeys in rewardAccounts ([a74b665](https://github.com/input-output-hk/cardano-js-sdk/commit/a74b66505e19681d21d547e6418f0980b112b070))
+
 ## [0.7.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.7.6...@cardano-sdk/key-management@0.7.7) (2023-06-23)
 
 ### Features

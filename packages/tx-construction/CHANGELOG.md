@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.8.0...@cardano-sdk/tx-construction@0.8.1) (2023-06-28)
+
+### Features
+
+* adds cardanoAddress type in HandleResolution interface ([2ee31c9](https://github.com/input-output-hk/cardano-js-sdk/commit/2ee31c9f0b61fc5e67385128448225d2d1d85617))
+
+### Bug Fixes
+
+* **tx-construction:** wait for new stakeKeys in rewardAccounts ([a74b665](https://github.com/input-output-hk/cardano-js-sdk/commit/a74b66505e19681d21d547e6418f0980b112b070))
+
 ## [0.8.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.7.2...@cardano-sdk/tx-construction@0.8.0) (2023-06-23)
 
 ### ⚠ BREAKING CHANGES
