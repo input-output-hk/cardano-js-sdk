@@ -7,7 +7,7 @@ import { RetryBackoffConfig } from 'backoff-rxjs';
 import { RewardsHistory } from '../types';
 import { TrackedRewardsProvider } from '../ProviderTracker';
 import { TxWithEpoch } from './types';
-import { coldObservableProvider } from '../util';
+import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import first from 'lodash/first';
 import flatten from 'lodash/flatten';
 import groupBy from 'lodash/groupBy';

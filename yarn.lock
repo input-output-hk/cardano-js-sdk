@@ -2859,6 +2859,7 @@ __metadata:
     "@cardano-sdk/key-management": "workspace:~"
     "@cardano-sdk/util": "workspace:~"
     "@cardano-sdk/util-dev": "workspace:~"
+    "@cardano-sdk/util-rxjs": "workspace:~"
     "@cardano-sdk/wallet": "workspace:~"
     "@types/lodash": ^4.14.182
     eslint: ^7.32.0

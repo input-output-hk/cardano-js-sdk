@@ -26,9 +26,10 @@ describe('ensureStakeKeys', () => {
   });
 
   it('can derive one stake key', async () => {
-    await util.ensureStakeKeys({ count: 1, keyAgent, logger });
+    const newRewardAccounts = await util.ensureStakeKeys({ count: 1, keyAgent, logger });
     const knownAddresses = await firstValueFrom(keyAgent.knownAddresses$);
     expect(knownAddresses.length).toBe(1);
+    expect(knownAddresses.map(({ rewardAccount }) => rewardAccount)).toEqual(newRewardAccounts);
   });
 
   it('does not create more stake keys when sufficient exist', async () => {

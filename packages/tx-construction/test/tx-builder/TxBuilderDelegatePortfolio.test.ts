@@ -3,6 +3,7 @@ import { AddressType, GroupedAddress, InMemoryKeyAgent, util } from '@cardano-sd
 import { CML, Cardano } from '@cardano-sdk/core';
 import {
   GenericTxBuilder,
+  OutOfSyncRewardAccounts,
   OutputValidation,
   RewardAccountWithPoolId,
   TxBuilderProviders,
@@ -29,6 +30,12 @@ const expectGreedyInputSelectorWith = async (changeAddressesDistrib: Map<Cardano
   expect(changeAddresses).toEqual(changeAddressesDistrib);
 };
 
+const inputResolver: Cardano.InputResolver = {
+  resolveInput: async (txIn) =>
+    mocks.utxo.find(([hydratedTxIn]) => txIn.txId === hydratedTxIn.txId && txIn.index === hydratedTxIn.index)?.[1] ||
+    null
+};
+
 /**
  * Utility factory for tests to create a GenericTxBuilder with mocked dependencies
  *
@@ -37,24 +44,19 @@ const expectGreedyInputSelectorWith = async (changeAddressesDistrib: Map<Cardano
  * @param useMultiplePaymentKeys simulates 2 addresses per stake key (HD wallet). If enabled, groupedAddresses will have 2 entries per stake key.
  * @returns the txBuilder, groupedAddresses and other information useful in tests.
  */
-const createTxBuilder = async (
-  stakeKeyDelegations: { keyStatus: Cardano.StakeKeyStatus; poolId?: Cardano.PoolId }[],
-  useMultiplePaymentKeys = false
-) => {
-  const inputResolver: Cardano.InputResolver = {
-    resolveInput: async (txIn) =>
-      mocks.utxo.find(([hydratedTxIn]) => txIn.txId === hydratedTxIn.txId && txIn.index === hydratedTxIn.index)?.[1] ||
-      null
-  };
-  const keyAgent: InMemoryKeyAgent = await InMemoryKeyAgent.fromBip39MnemonicWords(
-    {
-      chainId: Cardano.ChainIds.Preprod,
-      getPassphrase: async () => Buffer.from('passphrase'),
-      mnemonicWords: util.generateMnemonicWords()
-    },
-    { bip32Ed25519: new Crypto.CmlBip32Ed25519(CML), inputResolver, logger: dummyLogger }
-  );
 
+const createTxBuilder = async ({
+  stakeKeyDelegations,
+  useMultiplePaymentKeys = false,
+  rewardAccounts,
+  keyAgent
+}: {
+  stakeKeyDelegations: { keyStatus: Cardano.StakeKeyStatus; poolId?: Cardano.PoolId }[];
+  useMultiplePaymentKeys?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  rewardAccounts?: any;
+  keyAgent: InMemoryKeyAgent;
+}) => {
   let groupedAddresses = await Promise.all(
     stakeKeyDelegations.map(async (_, idx) => keyAgent.deriveAddress({ index: 0, type: AddressType.External }, idx))
   );
@@ -70,23 +72,25 @@ const createTxBuilder = async (
   const txBuilderProviders: jest.Mocked<TxBuilderProviders> = {
     genesisParameters: jest.fn().mockResolvedValue(mocks.genesisParameters),
     protocolParameters: jest.fn().mockResolvedValue(mocks.protocolParameters),
-    rewardAccounts: jest.fn().mockImplementation(() =>
-      Promise.resolve(
-        // There can be multiple addresses with the same reward account. Extract the uniq reward accounts
-        uniqBy(keyAgent.knownAddresses, ({ rewardAccount }) => rewardAccount)
-          // Create mock stakeKey/delegation status for each reward account according to the requested stakeKeyDelegations.
-          // This would normally be done by the wallet.delegation.rewardAccounts
-          .map<RewardAccountWithPoolId>(({ rewardAccount: address }, index) => {
-            const { keyStatus, poolId } = stakeKeyDelegations[index] ?? {};
-            return {
-              address,
-              keyStatus: keyStatus ?? Cardano.StakeKeyStatus.Unregistered,
-              rewardBalance: mocks.rewardAccountBalance,
-              ...(poolId ? { delegatee: { nextNextEpoch: { id: poolId } } } : undefined)
-            };
-          })
-      )
-    ),
+    rewardAccounts:
+      rewardAccounts ||
+      jest.fn().mockImplementation(() =>
+        Promise.resolve(
+          // There can be multiple addresses with the same reward account. Extract the uniq reward accounts
+          uniqBy(keyAgent.knownAddresses, ({ rewardAccount }) => rewardAccount)
+            // Create mock stakeKey/delegation status for each reward account according to the requested stakeKeyDelegations.
+            // This would normally be done by the wallet.delegation.rewardAccounts
+            .map<RewardAccountWithPoolId>(({ rewardAccount: address }, index) => {
+              const { keyStatus, poolId } = stakeKeyDelegations[index] ?? {};
+              return {
+                address,
+                keyStatus: keyStatus ?? Cardano.StakeKeyStatus.Unregistered,
+                rewardBalance: mocks.rewardAccountBalance,
+                ...(poolId ? { delegatee: { nextNextEpoch: { id: poolId } } } : undefined)
+              };
+            })
+        )
+      ),
     tip: jest.fn().mockResolvedValue(mocks.ledgerTip),
     utxoAvailable: jest.fn().mockResolvedValue(mocks.utxo)
   };
@@ -115,12 +119,27 @@ describe('TxBuilder/delegatePortfolio', () => {
   ];
   let txBuilder: GenericTxBuilder;
   let groupedAddresses: GroupedAddress[];
+  let keyAgent: InMemoryKeyAgent;
+
+  beforeEach(async () => {
+    keyAgent = await InMemoryKeyAgent.fromBip39MnemonicWords(
+      {
+        chainId: Cardano.ChainIds.Preprod,
+        getPassphrase: async () => Buffer.from('passphrase'),
+        mnemonicWords: util.generateMnemonicWords()
+      },
+      { bip32Ed25519: new Crypto.CmlBip32Ed25519(CML), inputResolver, logger: dummyLogger }
+    );
+  });
 
   afterEach(() => jest.clearAllMocks());
 
   describe('single reward account', () => {
     beforeEach(async () => {
-      const txBuilderFactory = await createTxBuilder([{ keyStatus: Cardano.StakeKeyStatus.Unregistered }]);
+      const txBuilderFactory = await createTxBuilder({
+        keyAgent,
+        stakeKeyDelegations: [{ keyStatus: Cardano.StakeKeyStatus.Unregistered }]
+      });
       groupedAddresses = txBuilderFactory.groupedAddresses;
       txBuilder = txBuilderFactory.txBuilder;
     });
@@ -149,10 +168,14 @@ describe('TxBuilder/delegatePortfolio', () => {
 
   describe('no previous delegations, multiple addresses per stake key', () => {
     beforeEach(async () => {
-      const txBuilderFactory = await createTxBuilder(
-        [{ keyStatus: Cardano.StakeKeyStatus.Unregistered }, { keyStatus: Cardano.StakeKeyStatus.Unregistered }],
-        true
-      );
+      const txBuilderFactory = await createTxBuilder({
+        keyAgent,
+        stakeKeyDelegations: [
+          { keyStatus: Cardano.StakeKeyStatus.Unregistered },
+          { keyStatus: Cardano.StakeKeyStatus.Unregistered }
+        ],
+        useMultiplePaymentKeys: true
+      });
       groupedAddresses = txBuilderFactory.groupedAddresses;
       txBuilder = txBuilderFactory.txBuilder;
     });
@@ -222,10 +245,13 @@ describe('TxBuilder/delegatePortfolio', () => {
   describe('pre-existing multi-delegation on all stake keys', () => {
     let txBuilderProviders: jest.Mocked<TxBuilderProviders>;
     beforeEach(async () => {
-      const txBuilderFactory = await createTxBuilder([
-        { keyStatus: Cardano.StakeKeyStatus.Registered, poolId: poolIds[0] },
-        { keyStatus: Cardano.StakeKeyStatus.Registered, poolId: poolIds[1] }
-      ]);
+      const txBuilderFactory = await createTxBuilder({
+        keyAgent,
+        stakeKeyDelegations: [
+          { keyStatus: Cardano.StakeKeyStatus.Registered, poolId: poolIds[0] },
+          { keyStatus: Cardano.StakeKeyStatus.Registered, poolId: poolIds[1] }
+        ]
+      });
       groupedAddresses = txBuilderFactory.groupedAddresses;
       txBuilder = txBuilderFactory.txBuilder;
       txBuilderProviders = txBuilderFactory.txBuilderProviders;
@@ -350,10 +376,13 @@ describe('TxBuilder/delegatePortfolio', () => {
 
   describe('partial pre-existing multi-delegation', () => {
     beforeEach(async () => {
-      const txBuilderFactory = await createTxBuilder([
-        { keyStatus: Cardano.StakeKeyStatus.Registered, poolId: poolIds[0] },
-        { keyStatus: Cardano.StakeKeyStatus.Registered }
-      ]);
+      const txBuilderFactory = await createTxBuilder({
+        keyAgent,
+        stakeKeyDelegations: [
+          { keyStatus: Cardano.StakeKeyStatus.Registered, poolId: poolIds[0] },
+          { keyStatus: Cardano.StakeKeyStatus.Registered }
+        ]
+      });
       groupedAddresses = txBuilderFactory.groupedAddresses;
       txBuilder = txBuilderFactory.txBuilder;
     });
@@ -419,10 +448,13 @@ describe('TxBuilder/delegatePortfolio', () => {
     };
 
     it('uses first one when all stake keys are unregistered', async () => {
-      const txBuilderFactory = await createTxBuilder([
-        { keyStatus: Cardano.StakeKeyStatus.Unregistered },
-        { keyStatus: Cardano.StakeKeyStatus.Unregistered }
-      ]);
+      const txBuilderFactory = await createTxBuilder({
+        keyAgent,
+        stakeKeyDelegations: [
+          { keyStatus: Cardano.StakeKeyStatus.Unregistered },
+          { keyStatus: Cardano.StakeKeyStatus.Unregistered }
+        ]
+      });
       groupedAddresses = txBuilderFactory.groupedAddresses;
       txBuilder = txBuilderFactory.txBuilder;
 
@@ -436,10 +468,13 @@ describe('TxBuilder/delegatePortfolio', () => {
     });
 
     it('uses first one when all stake keys are registered', async () => {
-      const txBuilderFactory = await createTxBuilder([
-        { keyStatus: Cardano.StakeKeyStatus.Registered },
-        { keyStatus: Cardano.StakeKeyStatus.Registered }
-      ]);
+      const txBuilderFactory = await createTxBuilder({
+        keyAgent,
+        stakeKeyDelegations: [
+          { keyStatus: Cardano.StakeKeyStatus.Registered },
+          { keyStatus: Cardano.StakeKeyStatus.Registered }
+        ]
+      });
       groupedAddresses = txBuilderFactory.groupedAddresses;
       txBuilder = txBuilderFactory.txBuilder;
 
@@ -454,10 +489,13 @@ describe('TxBuilder/delegatePortfolio', () => {
     });
 
     it('uses stake keys in order when changing delegation', async () => {
-      const txBuilderFactory = await createTxBuilder([
-        { keyStatus: Cardano.StakeKeyStatus.Registered, poolId: poolIds[0] },
-        { keyStatus: Cardano.StakeKeyStatus.Registered, poolId: poolIds[1] }
-      ]);
+      const txBuilderFactory = await createTxBuilder({
+        keyAgent,
+        stakeKeyDelegations: [
+          { keyStatus: Cardano.StakeKeyStatus.Registered, poolId: poolIds[0] },
+          { keyStatus: Cardano.StakeKeyStatus.Registered, poolId: poolIds[1] }
+        ]
+      });
       groupedAddresses = txBuilderFactory.groupedAddresses;
       txBuilder = txBuilderFactory.txBuilder;
 
@@ -481,10 +519,13 @@ describe('TxBuilder/delegatePortfolio', () => {
     });
 
     it('uses registered stake keys over unregistered ones', async () => {
-      const txBuilderFactory = await createTxBuilder([
-        { keyStatus: Cardano.StakeKeyStatus.Unregistered },
-        { keyStatus: Cardano.StakeKeyStatus.Registered }
-      ]);
+      const txBuilderFactory = await createTxBuilder({
+        keyAgent,
+        stakeKeyDelegations: [
+          { keyStatus: Cardano.StakeKeyStatus.Unregistered },
+          { keyStatus: Cardano.StakeKeyStatus.Registered }
+        ]
+      });
       groupedAddresses = txBuilderFactory.groupedAddresses;
       txBuilder = txBuilderFactory.txBuilder;
 
@@ -498,10 +539,13 @@ describe('TxBuilder/delegatePortfolio', () => {
     });
 
     it('reuses delegated stake keys instead of registering new ones', async () => {
-      const txBuilderFactory = await createTxBuilder([
-        { keyStatus: Cardano.StakeKeyStatus.Registered },
-        { keyStatus: Cardano.StakeKeyStatus.Registered, poolId: poolIds[1] }
-      ]);
+      const txBuilderFactory = await createTxBuilder({
+        keyAgent,
+        stakeKeyDelegations: [
+          { keyStatus: Cardano.StakeKeyStatus.Registered },
+          { keyStatus: Cardano.StakeKeyStatus.Registered, poolId: poolIds[1] }
+        ]
+      });
       groupedAddresses = txBuilderFactory.groupedAddresses;
       txBuilder = txBuilderFactory.txBuilder;
 
@@ -513,6 +557,63 @@ describe('TxBuilder/delegatePortfolio', () => {
         Cardano.createDelegationCert(groupedAddresses[1].rewardAccount, poolIds[0]),
         Cardano.createStakeKeyDeregistrationCert(groupedAddresses[0].rewardAccount)
       ]);
+    });
+  });
+
+  describe('rewardAccount syncing', () => {
+    const normalRewardAccountsCalls = 3;
+    it('can wait for delayed key agent stake keys', async () => {
+      const rewardAccountsProvider = jest
+        .fn()
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([])
+        .mockImplementation(() =>
+          Promise.resolve(
+            keyAgent.knownAddresses.map<RewardAccountWithPoolId>(({ rewardAccount: address }) => ({
+              address,
+              keyStatus: Cardano.StakeKeyStatus.Unregistered,
+              rewardBalance: mocks.rewardAccountBalance
+            }))
+          )
+        );
+      const txBuilderFactory = await createTxBuilder({
+        keyAgent,
+        rewardAccounts: rewardAccountsProvider,
+        stakeKeyDelegations: []
+      });
+
+      txBuilder = txBuilderFactory.txBuilder;
+
+      await expect(
+        txBuilder
+          .delegatePortfolio({ pools: [{ id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[0])), weight: 1 }] })
+          .build()
+          .inspect()
+      ).resolves.toBeTruthy();
+
+      // Expect 3 retries
+      expect(rewardAccountsProvider.mock.calls.length).toBe(normalRewardAccountsCalls + 3);
+    });
+
+    it('throws if new stake keys are not part of reward accounts in a reasonable time', async () => {
+      const rewardAccountsProvider = jest.fn().mockResolvedValue([]);
+      const txBuilderFactory = await createTxBuilder({
+        keyAgent,
+        rewardAccounts: rewardAccountsProvider,
+        stakeKeyDelegations: []
+      });
+
+      txBuilder = txBuilderFactory.txBuilder;
+
+      await expect(
+        txBuilder
+          .delegatePortfolio({ pools: [{ id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[0])), weight: 1 }] })
+          .build()
+          .inspect()
+      ).rejects.toThrow(OutOfSyncRewardAccounts);
+      // Expect retries
+      expect(rewardAccountsProvider.mock.calls.length).toBeGreaterThan(normalRewardAccountsCalls);
     });
   });
 });

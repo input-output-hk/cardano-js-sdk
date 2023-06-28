@@ -12,8 +12,7 @@ import {
   withLatestFrom
 } from 'rxjs';
 import { Logger } from 'ts-log';
-import { deepEquals, isNotNil } from '@cardano-sdk/util';
-import { sameArrayItems, strictEquals } from './util';
+import { deepEquals, isNotNil, sameArrayItems, strictEquals } from '@cardano-sdk/util';
 import uniqBy from 'lodash/uniqBy';
 
 export interface HandlesTrackerProps {

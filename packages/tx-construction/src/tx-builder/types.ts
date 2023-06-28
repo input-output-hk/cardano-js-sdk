@@ -40,7 +40,15 @@ export class HandleNotFoundError extends CustomError {
 export class InsufficientRewardAccounts extends CustomError {
   public constructor(poolIds: Cardano.PoolId[], rewardAccounts: Cardano.RewardAccount[]) {
     const msg = `Internal error: insufficient stake keys: ${rewardAccounts.length}. Required: ${poolIds.length}.
-      Pool ids: ${poolIds.join(',')}; Reward accounts: ${rewardAccounts.length}`;
+    Pool ids: ${poolIds.join(',')}; Reward accounts: ${rewardAccounts.length}`;
+    super(msg);
+  }
+}
+
+/** New stake keys derived for multi-delegation were not found in the rewardAccounts provider */
+export class OutOfSyncRewardAccounts extends CustomError {
+  public constructor(rewardAccounts: Cardano.RewardAccount[]) {
+    const msg = `Timeout while waiting for reward accounts provider to contain new reward accounts: ${rewardAccounts}`;
     super(msg);
   }
 }

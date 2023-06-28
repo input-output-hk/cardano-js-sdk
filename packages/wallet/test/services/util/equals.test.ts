@@ -6,9 +6,6 @@ import {
   epochInfoEquals,
   eraSummariesEquals,
   groupedAddressesEquals,
-  sameArrayItems,
-  shallowArrayEquals,
-  strictEquals,
   tipEquals,
   transactionsEquals,
   txEquals,
@@ -20,26 +17,6 @@ import { Percent } from '@cardano-sdk/util';
 describe('equals', () => {
   const txId1 = Cardano.TransactionId('4123d70f66414cc921f6ffc29a899aafc7137a99a0fd453d6b200863ef5702d6');
   const txId2 = Cardano.TransactionId('01d7366549986d83edeea262e97b68eca3430d3bb052ed1c37d2202fd5458872');
-
-  test('strictEquals', () => {
-    expect(strictEquals('1', 1 as unknown as string)).toBe(false);
-    expect(strictEquals('1', '1')).toBe(true);
-  });
-
-  test('sameArrayItems', () => {
-    expect(sameArrayItems([], [], strictEquals)).toBe(true);
-    expect(sameArrayItems(['a'], ['a', 'b'], strictEquals)).toBe(false);
-    expect(sameArrayItems(['a', 'b'], ['a', 'b'], strictEquals)).toBe(true);
-    expect(sameArrayItems(['a', 'b'], ['b', 'a'], strictEquals)).toBe(true);
-  });
-
-  test('shallowArrayEquals', () => {
-    expect(shallowArrayEquals([], [])).toBe(true);
-    const a = { prop: 'prop' };
-    const b = { prop: 'prop' };
-    expect(shallowArrayEquals([a], [b])).toBe(false);
-    expect(shallowArrayEquals([a], [a])).toBe(true);
-  });
 
   test('txEquals', () => {
     expect(txEquals({ id: txId1 } as Cardano.HydratedTx, { id: txId2 } as Cardano.HydratedTx)).toBe(false);
