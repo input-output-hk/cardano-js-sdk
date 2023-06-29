@@ -71,11 +71,12 @@ describe('TypeormStakePoolProvider', () => {
   let filterArgs: QueryStakePoolsArgs;
   let poolsInfo: PoolInfo[];
   let poolsInfoWithMeta: PoolInfo[];
+  let poolsInfoWithMetaFiltered: PoolInfo[];
   let poolsInfoWithMetrics: PoolInfo[];
+  let poolsInfoWithMetricsFiltered: PoolInfo[];
 
   const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
   const entities = getEntities(['currentPoolMetrics']);
-  const db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING_STAKE_POOL, max: 1, min: 1 });
 
   beforeAll(async () => {
     port = await getPort();
@@ -85,10 +86,21 @@ describe('TypeormStakePoolProvider', () => {
     connectionConfig$ = getConnectionConfig(dnsResolver, 'projector', 'StakePool', {
       postgresConnectionStringStakePool: process.env.POSTGRES_CONNECTION_STRING_STAKE_POOL!
     });
-    fixtureBuilder = new TypeormStakePoolFixtureBuilder(db, logger);
+    fixtureBuilder = new TypeormStakePoolFixtureBuilder(
+      new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING_STAKE_POOL }),
+      logger
+    );
     poolsInfo = await fixtureBuilder.getPools(1000, ['active', 'activating', 'retired', 'retiring']);
     poolsInfoWithMeta = poolsInfo.filter((pool) => isNotNil(pool.metadataUrl));
     poolsInfoWithMetrics = poolsInfo.filter((pool) => isNotNil(pool.saturation));
+
+    const applyFilter = (pool: PoolInfo): boolean =>
+      pool.ticker === poolsInfoWithMeta[0].ticker ||
+      pool.name === poolsInfoWithMeta[1].name ||
+      pool.id === poolsInfoWithMeta[2].id;
+
+    poolsInfoWithMetaFiltered = poolsInfoWithMeta.filter(applyFilter);
+    poolsInfoWithMetricsFiltered = poolsInfoWithMetrics.filter(applyFilter);
 
     filterArgs = {
       filters: {
@@ -576,14 +588,16 @@ describe('TypeormStakePoolProvider', () => {
           describe('sort by name', () => {
             it('desc order', async () => {
               const response = await provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'name'));
-              expect(response.pageResults[0].metadata?.name).toEqual(poolsInfoWithMeta[1].name);
-              expect(response.pageResults[response.pageResults.length - 1].metadata?.name).toEqual(undefined);
+              const expected = [...poolsInfoWithMeta].sort((a, b) => (a.name < b.name ? 1 : -1));
+              expect(response.pageResults[0].metadata?.name).toEqual(expected[0].name);
+              expect(response.pageResults[1].metadata?.name).toEqual(expected[1].name);
             });
 
             it('asc order', async () => {
               const response = await provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'name'));
-              expect(response.pageResults[0].metadata?.name).toEqual(poolsInfoWithMeta[6].name);
-              expect(response.pageResults[response.pageResults.length - 1].metadata?.name).toEqual(undefined);
+              const expected = [...poolsInfoWithMeta].sort((a, b) => (a.name < b.name ? -1 : 1));
+              expect(response.pageResults[0].metadata?.name).toEqual(expected[0].name);
+              expect(response.pageResults[1].metadata?.name).toEqual(expected[1].name);
             });
 
             it('if sort not provided, defaults to order by name desc and then by poolId asc', async () => {
@@ -596,10 +610,9 @@ describe('TypeormStakePoolProvider', () => {
             it('with applied filters', async () => {
               const reqWithFilters = setSortCondition(setFilterCondition(filterArgs, 'or'), 'desc', 'name');
               const response = await provider.queryStakePools(reqWithFilters);
-              expect(response.pageResults[0].metadata?.name).toEqual(poolsInfoWithMeta[1].name);
-              expect(response.pageResults[response.totalResultCount - 1].metadata?.name).toEqual(
-                poolsInfoWithMeta[0].name
-              );
+              const expected = [...poolsInfoWithMetaFiltered].sort((a, b) => (a.name < b.name ? 1 : -1));
+              expect(response.pageResults[0].metadata?.name).toEqual(expected[0].name);
+              expect(response.pageResults[1].metadata?.name).toEqual(expected[1].name);
             });
 
             it('asc order with applied pagination', async () => {
@@ -636,50 +649,54 @@ describe('TypeormStakePoolProvider', () => {
           describe('sort by cost', () => {
             it('desc order', async () => {
               const response = await provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'cost'));
-              expect(response.pageResults[0].cost).toEqual(BigInt(poolsInfo[10].cost));
-              expect(response.pageResults[response.pageResults.length - 1].cost).toEqual(BigInt(poolsInfo[9].cost));
+              const expected = [...poolsInfoWithMetrics].sort((a, b) => (a.cost < b.cost ? 1 : -1));
+              expect(response.pageResults[0].cost).toEqual(BigInt(expected[0].cost));
+              expect(response.pageResults[1].cost).toEqual(BigInt(expected[1].cost));
             });
 
             it('asc order', async () => {
               const response = await provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'cost'));
-              expect(response.pageResults[0].cost).toEqual(BigInt(poolsInfo[13].cost));
-              expect(response.pageResults[response.pageResults.length - 1].cost).toEqual(BigInt(poolsInfo[0].cost));
+              const expected = [...poolsInfoWithMetrics].sort((a, b) => (a.cost < b.cost ? -1 : 1));
+              expect(response.pageResults[0].cost).toEqual(BigInt(expected[0].cost));
+              expect(response.pageResults[1].cost).toEqual(BigInt(expected[1].cost));
             });
 
             it('with applied filters', async () => {
               const response = await provider.queryStakePools(
                 setSortCondition(setFilterCondition(filterArgs, 'or'), 'asc', 'cost')
               );
-              expect(response.pageResults[0].cost).toEqual(BigInt(poolsInfo[3].cost));
-              expect(response.pageResults[response.totalResultCount - 1].cost).toEqual(BigInt(poolsInfo[0].cost));
+              const expected = [...poolsInfoWithMetricsFiltered].sort((a, b) => (a.cost < b.cost ? -1 : 1));
+              expect(response.pageResults[0].cost).toEqual(BigInt(expected[0].cost));
+              expect(response.pageResults[1].cost).toEqual(BigInt(expected[1].cost));
             });
           });
 
           describe('sort by saturation', () => {
             it('desc order', async () => {
               const response = await provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'saturation'));
-              expect(response.pageResults[0].metrics?.saturation).toEqual(poolsInfoWithMetrics[8].saturation);
-              expect(response.pageResults[response.pageResults.length - 1].metrics?.saturation).toEqual(
-                poolsInfoWithMetrics[9].saturation
-              );
+              const expected = [...poolsInfoWithMetrics]
+                .filter((_) => !Number.isNaN(_.saturation))
+                .sort((a, b) => (a.saturation < b.saturation ? 1 : -1));
+              expect(response.pageResults[0].metrics?.saturation).toEqual(expected[0].saturation);
+              expect(response.pageResults[1].metrics?.saturation).toEqual(expected[1].saturation);
             });
 
             it('asc order', async () => {
               const response = await provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'saturation'));
-              expect(response.pageResults[0].metrics?.saturation).toEqual(poolsInfoWithMetrics[4].saturation);
-              expect(response.pageResults[response.pageResults.length - 1].metrics?.saturation).toEqual(
-                poolsInfoWithMetrics[1].saturation
-              );
+              const expected = [...poolsInfoWithMetrics]
+                .filter((_) => !Number.isNaN(_.saturation))
+                .sort((a, b) => (a.saturation < b.saturation ? -1 : 1));
+              expect(response.pageResults[0].metrics?.saturation).toEqual(expected[0].saturation);
+              expect(response.pageResults[1].metrics?.saturation).toEqual(expected[1].saturation);
             });
 
             it('with applied filters', async () => {
               const response = await provider.queryStakePools(
                 setSortCondition(setFilterCondition(filterArgs, 'or'), 'asc', 'saturation')
               );
-              expect(response.pageResults[0].metrics?.saturation).toEqual(poolsInfoWithMetrics[4].saturation);
-              expect(response.pageResults[response.totalResultCount - 1].metrics?.saturation).toEqual(
-                poolsInfoWithMetrics[1].saturation
-              );
+              const expected = [...poolsInfoWithMetricsFiltered].sort((a, b) => (a.saturation < b.saturation ? -1 : 1));
+              expect(response.pageResults[0].metrics?.saturation).toEqual(expected[0].saturation);
+              expect(response.pageResults[1].metrics?.saturation).toEqual(expected[1].saturation);
             });
           });
 
