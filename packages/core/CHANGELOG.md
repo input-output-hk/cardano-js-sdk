@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.15.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.15.1...@cardano-sdk/core@0.15.2) (2023-06-29)
+
+### Features
+
+* **core:** add util to get asset name content as text from cip 67 encoded and plain asset names ([8f0facd](https://github.com/input-output-hk/cardano-js-sdk/commit/8f0facda183b71d2d52596945695c7e16f435731))
+
+### Bug Fixes
+
+* fix handle api response property names ([2ecc994](https://github.com/input-output-hk/cardano-js-sdk/commit/2ecc9940e738105e014a1451d4a5e5cd95df6277))
+
 ## [0.15.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.15.0...@cardano-sdk/core@0.15.1) (2023-06-28)
 
 ### Features

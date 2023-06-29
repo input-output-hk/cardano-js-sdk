@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.17.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.17.0...@cardano-sdk/wallet@0.17.1) (2023-06-29)
+
+### Features
+
+* **wallet:** manage cip 67 encoded asset names ([1d2abc7](https://github.com/input-output-hk/cardano-js-sdk/commit/1d2abc739b3cc619fbe3d93257bf547cd8ef1a68))
+* **wallet:** resolve handles inside PersonalWallet.handles$ with HandleProvider ([2afe254](https://github.com/input-output-hk/cardano-js-sdk/commit/2afe2540830f3d43344a34313469211e11b4a573))
+
 ## [0.17.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.16.3...@cardano-sdk/wallet@0.17.0) (2023-06-28)
 
 ### ⚠ BREAKING CHANGES

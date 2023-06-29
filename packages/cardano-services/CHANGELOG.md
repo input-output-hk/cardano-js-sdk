@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.14.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.14.0...@cardano-sdk/cardano-services@0.14.1) (2023-06-29)
+
+### Bug Fixes
+
+* **cardano-services:** don't unsubscribe from projection on health timeout ([5d7e98b](https://github.com/input-output-hk/cardano-js-sdk/commit/5d7e98b500217739a53b82ed448efec31171bc2c))
+* **cardano-services:** fix dns resolution twice in a row ([ef42389](https://github.com/input-output-hk/cardano-js-sdk/commit/ef4238990d419df50c19c25899d53044dbf2d20c))
+* **util:** add ServerNotReady to list of connection errors ([c7faf01](https://github.com/input-output-hk/cardano-js-sdk/commit/c7faf01194561b2941c42c4a74517de0a5a9f7d9))
+
 ## [0.14.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.13.3...@cardano-sdk/cardano-services@0.14.0) (2023-06-28)
 
 ### ⚠ BREAKING CHANGES
