@@ -14,6 +14,7 @@
         self,
         nixpkgs,
         devshell,
+        std,
         ...
       }:
         with nixpkgs.legacyPackages;
@@ -41,10 +42,7 @@
               name = "Cardano JS SDK Local Env";
               imports = [checkMod];
               commands = [
-                # {
-                #   package = cocogitto;
-                #   name = "cog";
-                # }
+                {package = std.std.cli.std;}
               ];
             };
           };
