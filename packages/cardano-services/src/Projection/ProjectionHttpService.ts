@@ -1,8 +1,8 @@
 import { BaseProjectionEvent } from '@cardano-sdk/projection';
+import { EMPTY, Observable, Subscription, map, merge, of, startWith, switchMap, timer } from 'rxjs';
 import { HealthCheckResponse, Milliseconds } from '@cardano-sdk/core';
 import { HttpService } from '../Http';
 import { Logger } from 'ts-log';
-import { Observable, Subscription, map, of, timeout } from 'rxjs';
 import { ProjectionName } from './prepareTypeormProjection';
 import express from 'express';
 
@@ -39,10 +39,17 @@ const toProjectionHealth = (maxFrequency: Milliseconds) => (evt$: Observable<Bas
         projectedTip: e.block.header
       };
     }),
-    timeout({
-      each: maxFrequency,
-      with: () => of<HealthCheckResponse>({ ok: false, reason: `Projection timeout (${maxFrequency}ms)` })
-    })
+    map((health) => of(health)),
+    startWith(EMPTY),
+    switchMap((health$) =>
+      merge(
+        health$,
+        // switchMap unsubscribes/cancels the timer if source emits sooner
+        timer(maxFrequency).pipe(
+          map((): HealthCheckResponse => ({ ok: false, reason: `Projection timeout (${maxFrequency}ms)` }))
+        )
+      )
+    )
   );
 
 /**

@@ -75,6 +75,7 @@ describe('projector ogmios connection', () => {
       }
 
       if (Date.now() - start > 60_000) throw new Error("The projector can't get ready");
+      await delay(1000);
     } while (projectorReady === false);
   };
 
@@ -97,7 +98,7 @@ describe('projector ogmios connection', () => {
     await checkProjector();
   });
 
-  it.skip('projector reconnects after a long delay', async () => {
+  it('projector reconnects after a long delay', async () => {
     await createPrevent();
     await killContainer(ogmiosContainer);
     await delay(120_000);
