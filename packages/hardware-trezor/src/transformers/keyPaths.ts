@@ -16,6 +16,21 @@ export const paymentKeyPathFromGroupedAddress = (address: GroupedAddress): BIP32
   address.index
 ];
 
+export const stakeKeyPathFromGroupedAddress = (address: GroupedAddress | undefined): BIP32Path | null => {
+  if (!address) return null;
+  if (address.stakeKeyDerivationPath) {
+    return [
+      util.harden(CardanoKeyConst.PURPOSE),
+      util.harden(CardanoKeyConst.COIN_TYPE),
+      util.harden(address.accountIndex),
+      address.stakeKeyDerivationPath.role,
+      address.stakeKeyDerivationPath.index
+    ];
+  }
+
+  return null;
+};
+
 /**
  * Uses the given Trezor input resolver to resolve the payment key
  * path for known addresses for given input transaction.
@@ -28,4 +43,16 @@ export const resolvePaymentKeyPathForTxIn = async (
   const txOut = await context.inputResolver.resolveInput(txIn);
   const knownAddress = context.knownAddresses.find(({ address }) => address === txOut?.address);
   return knownAddress ? paymentKeyPathFromGroupedAddress(knownAddress) : null;
+};
+
+// Resolves the stake key path for known addresses for the given reward address.
+export const resolveStakeKeyPath = (
+  rewardAddress: Cardano.RewardAddress | undefined,
+  context: TrezorTxTransformerContext
+): BIP32Path | null => {
+  if (!rewardAddress) return null;
+  const knownAddress = context.knownAddresses.find(
+    ({ rewardAccount }) => rewardAccount === rewardAddress.toAddress().toBech32()
+  );
+  return stakeKeyPathFromGroupedAddress(knownAddress);
 };

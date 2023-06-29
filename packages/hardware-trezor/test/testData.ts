@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, CardanoKeyConst, GroupedAddress, KeyRole, util } from '@cardano-sdk/key-management';
+import { AddressType, GroupedAddress, KeyRole } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 
 export const valueWithAssets = {
@@ -27,7 +27,15 @@ export const txOutToOwnedAddress: Cardano.TxOut = {
   value: valueWithAssets
 };
 
-export const rewardAccount = Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
+export const rewardKey = 'stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr';
+export const rewardScript = 'stake178phkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gtcccycj5';
+export const rewardAccount = Cardano.RewardAccount(rewardKey);
+export const rewardAddress = Cardano.Address.fromBech32(rewardAccount)?.asReward();
+export const rewardAccountWithPaymentScriptCredential = Cardano.RewardAccount(rewardScript);
+export const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
+export const stakeScriptHash = Cardano.RewardAccount.toHash(rewardAccountWithPaymentScriptCredential);
+export const knownAddressKeyPath = [2_147_485_500, 2_147_485_463, 2_147_483_648, 1, 0];
+export const knownAddressStakeKeyPath = [2_147_485_500, 2_147_485_463, 2_147_483_648, 2, 0];
 
 export const knownAddress: GroupedAddress = {
   accountIndex: 0,
@@ -41,14 +49,6 @@ export const knownAddress: GroupedAddress = {
   },
   type: AddressType.Internal
 };
-
-export const knownAddressKeyPath = [
-  util.harden(CardanoKeyConst.PURPOSE),
-  util.harden(CardanoKeyConst.COIN_TYPE),
-  util.harden(knownAddress.accountIndex),
-  knownAddress.type,
-  knownAddress.index
-];
 
 export const contextWithKnownAddresses = {
   chainId: {
@@ -66,4 +66,14 @@ export const contextWithoutKnownAddresses = {
   },
   inputResolver: { resolveInput: () => Promise.resolve(null) },
   knownAddresses: []
+};
+
+export const coreWithdrawalWithKeyHashCredential = {
+  quantity: 5n,
+  stakeAddress: rewardAccount
+};
+
+export const coreWithdrawalWithScriptHashCredential = {
+  quantity: 5n,
+  stakeAddress: rewardAccountWithPaymentScriptCredential
 };
