@@ -488,6 +488,7 @@ export class PersonalWallet implements ObservableWallet {
       ? createHandlesTracker({
           assetInfo$: this.assetInfo$,
           handlePolicyIds,
+          handleProvider: this.handleProvider,
           logger: contextLogger(this.#logger, 'handles$'),
           tip$: this.tip$,
           utxo$: this.utxo.total$

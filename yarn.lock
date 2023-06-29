@@ -2340,7 +2340,7 @@ __metadata:
     "@cardano-sdk/core": "workspace:~"
     "@cardano-sdk/util": "workspace:~"
     "@cardano-sdk/util-dev": "workspace:~"
-    "@koralabs/handles-public-api-interfaces": 1.6.6
+    "@koralabs/handles-public-api-interfaces": 2.4.3
     "@types/validator": ^13.7.1
     axios: ^0.27.2
     axios-mock-adapter: ^1.20.0
@@ -3778,10 +3778,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@koralabs/handles-public-api-interfaces@npm:1.6.6":
-  version: 1.6.6
-  resolution: "@koralabs/handles-public-api-interfaces@npm:1.6.6"
-  checksum: 10687928187ac935089781fc616a3c10596120aed2f5be2c28852cf2d8c1b14acbb72b90243f3228ff0bc9034c99230162d48d08f5aeb657c7d4decd6c6364e2
+"@koralabs/handles-public-api-interfaces@npm:2.4.3":
+  version: 2.4.3
+  resolution: "@koralabs/handles-public-api-interfaces@npm:2.4.3"
+  checksum: ef05767a38e4eec096bae9c5076939ff86329ed5d6a19c2c399625fb75d4f78dcee95f0d2dd321abd08b60fedc055b425a552f2f8facd405e04b791fcdf7bc21
   languageName: node
   linkType: hard
 

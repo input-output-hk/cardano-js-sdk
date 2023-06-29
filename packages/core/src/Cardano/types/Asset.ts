@@ -1,4 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
+import { AssetNameLabel } from '../../Asset';
 import { HexBlob, InvalidStringError, OpaqueString, assertIsHexString, typedBech32 } from '@cardano-sdk/util';
 
 export type AssetId = OpaqueString<'AssetId'>;
@@ -38,6 +39,11 @@ export const PolicyId = (value: string): PolicyId => Crypto.Hash28ByteBase16(val
 AssetId.getPolicyId = (id: AssetId) => PolicyId(id.slice(0, 56));
 AssetId.getAssetName = (id: AssetId) => AssetName(id.slice(56));
 AssetId.fromParts = (policyId: PolicyId, assetName: AssetName): AssetId => AssetId(policyId + assetName);
+AssetId.getAssetNameAsText = (id: AssetId) => {
+  const assetName = AssetId.getAssetName(id);
+  const assetNameContent = AssetNameLabel.decode(assetName)?.content;
+  return Buffer.from(assetNameContent || assetName, 'hex').toString('utf8');
+};
 
 /**
  * Fingerprint of a native asset for human comparison
