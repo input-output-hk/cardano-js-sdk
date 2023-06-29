@@ -18,7 +18,8 @@ import {
 } from './utils';
 
 import { Cardano } from '@cardano-sdk/core';
-import { PersonalWallet } from '@cardano-sdk/wallet';
+import { DynamicChangeAddressResolver, PersonalWallet } from '@cardano-sdk/wallet';
+import { roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 import { walletReady } from '../../';
 import chalk from 'chalk';
 
@@ -71,9 +72,15 @@ const monitor = new TerminalProgressMonitor();
 
     const stakeAddresses = await generateStakeAddresses(delegationWallet, config.stakeDistribution.length, monitor);
 
-    await delegateToMultiplePools(delegationWallet, stakeAddresses, monitor);
-
-    await distributeStake(delegationWallet, config.startingFunds, config.stakeDistribution, stakeAddresses, monitor);
+    const pools = await delegateToMultiplePools(delegationWallet, stakeAddresses, monitor);
+    const portfolio = await distributeStake(
+      delegationWallet,
+      config.startingFunds,
+      config.stakeDistribution,
+      stakeAddresses,
+      monitor,
+      pools
+    );
 
     monitor.startTask('Waiting for delegation to be updated on the wallet.');
     await rewardAccountStatuses(delegationWallet.delegation.rewardAccounts$, [
@@ -81,6 +88,21 @@ const monitor = new TerminalProgressMonitor();
       Cardano.StakeKeyStatus.Registered
     ]);
     monitor.endTask('Delegation updated.', TaskResult.Success);
+
+    if (config.changeAddressResolver === 'dynamic') {
+      monitor.logInfo(`Using dynamic change address resolution: Portfolio: ${JSON.stringify(portfolio)}`);
+      const selector = roundRobinRandomImprove({
+        changeAddressResolver: new DynamicChangeAddressResolver(
+          delegationWallet.addresses$,
+          delegationWallet.delegation.distribution$,
+          async () => portfolio,
+          console
+        )
+      });
+      delegationWallet.setInputSelector(selector);
+    } else {
+      monitor.logInfo('Using static change address resolution');
+    }
 
     monitor.logInfo('Setup phase ended. Starting interactions...');
 

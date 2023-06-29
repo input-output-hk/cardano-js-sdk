@@ -1,4 +1,5 @@
 {
+  "changeAddressResolver": "static",
   "startingFunds": 1000000000000,
   "stakeDistribution": [
     0.2,

@@ -23,6 +23,14 @@ convict.addFormat({
   }
 });
 
+convict.addFormat({
+  name: 'changeAddressResolver',
+  validate(val) {
+    if (val !== 'static' && val !== 'dynamic')
+      throw new TypeError('changeAddressResolver must be set to either static or dynamic');
+  }
+});
+
 export type ValueTransferConfig = {
   amount: { max: number; min: number };
   count: { max: number; min: number };
@@ -30,6 +38,11 @@ export type ValueTransferConfig = {
 };
 
 export const configLoader = convict({
+  changeAddressResolver: {
+    default: 'static',
+    doc: 'Whether to use the static or dynamic strategy to resolve change addresses.',
+    format: 'changeAddressResolver'
+  },
   iterations: {
     default: 10,
     doc: 'How many iterations will be executed before stopping the test.',
