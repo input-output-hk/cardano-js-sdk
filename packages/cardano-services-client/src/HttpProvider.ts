@@ -4,9 +4,7 @@ import { Logger } from 'ts-log';
 import { apiVersion } from './version';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import axios, { AxiosAdapter, AxiosRequestConfig, AxiosResponseTransformer } from 'axios';
-import path from 'path';
-
-const packageJson = require(path.join(__dirname, '..', 'package.json'));
+import packageJson from '../package.json';
 
 const isEmptyResponse = (response: any) => response === '';
 
