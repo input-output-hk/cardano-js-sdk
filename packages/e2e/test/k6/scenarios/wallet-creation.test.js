@@ -1,6 +1,8 @@
-import http from 'k6/http';
-import { check, sleep } from 'k6';
+/* eslint-disable no-console */
+/* eslint-disable func-style */
 import { Counter, Trend } from 'k6/metrics';
+import { check, sleep } from 'k6';
+import http from 'k6/http';
 
 /**
  * Script overall description:
@@ -22,8 +24,8 @@ import { Counter, Trend } from 'k6/metrics';
  */
 
 const RunMode = {
-    Onboard: 'Onboard',
-    Restore: 'Restore'
+  Onboard: 'Onboard',
+  Restore: 'Restore'
 };
 /** Determines run mode: Restore or Onboard */
 const RUN_MODE = RunMode.Onboard;
@@ -34,17 +36,18 @@ const RUN_MODE = RunMode.Onboard;
  */
 const SPIN_ON_NEW_WALLETS = true;
 
+// eslint-disable-next-line no-undef
 const PROVIDER_SERVER_URL = __ENV.PROVIDER_SERVER_URL;
 
 /** URL of the JSON file containing the wallets */
 const WALLET_ADDRESSES_URL =
-    RUN_MODE === RunMode.Restore
-        ? 'https://raw.githubusercontent.com/input-output-hk/cardano-js-sdk/master/packages/e2e/test/dump/addresses/mainnet.json'
-        : 'https://raw.githubusercontent.com/input-output-hk/cardano-js-sdk/master/packages/e2e/test/dump/addresses/no-history-mainnet.json';
+  RUN_MODE === RunMode.Restore
+    ? 'https://raw.githubusercontent.com/input-output-hk/cardano-js-sdk/master/packages/e2e/test/dump/addresses/mainnet.json'
+    : 'https://raw.githubusercontent.com/input-output-hk/cardano-js-sdk/master/packages/e2e/test/dump/addresses/no-history-mainnet.json';
 
 /** URL of the JSON file containing the stake pool addresses */
 const POOL_ADDRESSES_URL =
-    'https://raw.githubusercontent.com/input-output-hk/cardano-js-sdk/master/packages/e2e/test/dump/pool_addresses/mainnet.json';
+  'https://raw.githubusercontent.com/input-output-hk/cardano-js-sdk/master/packages/e2e/test/dump/pool_addresses/mainnet.json';
 
 /**
  * Define the maximum number of virtual users to simulate
@@ -66,146 +69,150 @@ const walletSyncTrend = new Trend('wallet_sync', true);
 /** Custom count statistic to measure how many wallets were successfully syncd */
 const walletSyncCount = new Counter('wallet_sync_count');
 
+/** Repetitive entpoints */
+const TIP_URL = 'network-info/ledger-tip';
+
 /** Grab the wallets json file to be used by the scenario */
 export function setup() {
-    console.log(`Running in ${RUN_MODE} mode`);
-    let res = http.batch([WALLET_ADDRESSES_URL, POOL_ADDRESSES_URL]);
-    check(res, { 'get wallets and pools files': (r) => r.every(({ status }) => status >= 200 && status < 300) });
+  console.log(`Running in ${RUN_MODE} mode`);
+  const res = http.batch([WALLET_ADDRESSES_URL, POOL_ADDRESSES_URL]);
+  check(res, { 'get wallets and pools files': (r) => r.every(({ status }) => status >= 200 && status < 300) });
 
-    const [{ body: resBodyWallets }, { body: resBodyPools }] = res;
-    const wallets = JSON.parse(resBodyWallets);
-    const walletCount = wallets ? wallets.length : 0;
-    check(walletCount, {
-        'At least one wallet is required to run the test': (count) => count > 0
-    });
-    console.log(`Wallet addresses configuration file contains ${walletCount} wallets`);
-    if (walletCount < MAX_VU) {
-        console.warn(
-            `Requested VU count: (${MAX_VU}), is greater than the available walled addresses: ${walletCount}. Some addresses will be reused`
-        );
-    }
+  const [{ body: resBodyWallets }, { body: resBodyPools }] = res;
+  const wallets = JSON.parse(resBodyWallets);
+  const walletCount = wallets ? wallets.length : 0;
+  check(walletCount, {
+    'At least one wallet is required to run the test': (count) => count > 0
+  });
+  console.log(`Wallet addresses configuration file contains ${walletCount} wallets`);
+  if (walletCount < MAX_VU) {
+    console.warn(
+      `Requested VU count: (${MAX_VU}), is greater than the available walled addresses: ${walletCount}. Some addresses will be reused`
+    );
+  }
 
-    const poolAddresses = JSON.parse(resBodyPools);
-    check(poolAddresses, {
-        'At least one stake pool address is required to run the test': (p) => p && p.length
-    });
-    return { wallets: wallets.slice(0, MAX_VU), poolAddresses };
+  const poolAddresses = JSON.parse(resBodyPools);
+  check(poolAddresses, {
+    'At least one stake pool address is required to run the test': (p) => p && p.length > 0
+  });
+  return { poolAddresses, wallets: wallets.slice(0, MAX_VU) };
 }
 
 /** Keeps track of wallets that were successfully syncd to avoid restoring twice */
 const syncedWallets = new Set();
 
-export let options = {
-    ext: {
-        loadimpact: {
-            distribution: { 'amazon:us:portland': { loadZone: 'amazon:us:portland', percent: 100 } },
-            apm: []
-        }
-    },
-    thresholds: {
-        wallet_sync_count: ['count >= ' + MAX_VU], // All wallets should have syncd
-        // Use https://k6.io/docs/using-k6/thresholds/ to set more thresholds. E.g.:
-        // wallet_sync: ['p(95)<5000'], // 95% of wallets should sync in under 5 seconds
-        wallet_sync: [{ threshold: 'p(95) < 30000', delayAbortEval: '5s' }] // We get a nice graph if we enable thresholds. See this stat on a graph
-    },
-    scenarios: {
-        SyncDifferentSizeWallets: {
-            executor: 'ramping-vus',
-            startVUs: 1,
-            stages: [
-                { duration: RAMP_UP_DURATION, target: MAX_VU },
-                { duration: STEADY_STATE_DURATION, target: MAX_VU }
-            ],
-            gracefulRampDown: '0s',
-            gracefulStop: '0s'
-        }
+export const options = {
+  ext: {
+    loadimpact: {
+      apm: [],
+      distribution: { 'amazon:us:portland': { loadZone: 'amazon:us:portland', percent: 100 } }
     }
+  },
+  scenarios: {
+    SyncDifferentSizeWallets: {
+      executor: 'ramping-vus',
+      gracefulRampDown: '0s',
+      gracefulStop: '0s',
+      stages: [
+        { duration: RAMP_UP_DURATION, target: MAX_VU },
+        { duration: STEADY_STATE_DURATION, target: MAX_VU }
+      ],
+      startVUs: 1
+    }
+  },
+  thresholds: {
+    // All wallets should have syncd
+    // Use https://k6.io/docs/using-k6/thresholds/ to set more thresholds. E.g.:
+    // wallet_sync: ['p(95)<5000'], // 95% of wallets should sync in under 5 seconds
+    wallet_sync: [{ delayAbortEval: '5s', threshold: 'p(95) < 30000' }],
+
+    wallet_sync_count: [`count >= ${MAX_VU}`] // We get a nice graph if we enable thresholds. See this stat on a graph
+  }
 };
 
 /** Util functions for sending the http post requests to cardano-sdk services */
 const cardanoHttpPost = (url, body = {}) => {
-    const options = { headers: { 'content-type': 'application/json' } };
-    return http.post(`${PROVIDER_SERVER_URL}/${url}`, JSON.stringify(body), options);
+  const opts = { headers: { 'content-type': 'application/json' } };
+  return http.post(`${PROVIDER_SERVER_URL}/${url}`, JSON.stringify(body), opts);
 };
 const txsByAddress = (address) => {
-    let startAt = 0;
-    const pageSize = 25;
-    let txCount = 0;
-    do {
-        const resp = cardanoHttpPost('chain-history/txs/by-addresses', {
-            addresses: [address],
-            blockRange: { lowerBound: { __type: 'undefined' } },
-            pagination: { limit: pageSize, startAt }
-        });
+  let startAt = 0;
+  const pageSize = 25;
+  let txCount = 0;
+  do {
+    const resp = cardanoHttpPost('chain-history/txs/by-addresses', {
+      addresses: [address],
+      blockRange: { lowerBound: { __type: 'undefined' } },
+      pagination: { limit: pageSize, startAt }
+    });
 
-        if (resp.status !== 200) {
-            // No point in trying to get the other pages.
-            // Should we log this? it will show up as if the restoration was quicker since this wallet did not fetch all the pages
-            break;
-        }
+    if (resp.status !== 200) {
+      // No point in trying to get the other pages.
+      // Should we log this? it will show up as if the restoration was quicker since this wallet did not fetch all the pages
+      break;
+    }
 
-        const { pageResults } = JSON.parse(resp.body);
-        startAt += pageSize;
-        txCount = pageResults.length;
-    } while (txCount === pageSize);
+    const { pageResults } = JSON.parse(resp.body);
+    startAt += pageSize;
+    txCount = pageResults.length;
+  } while (txCount === pageSize);
 };
 const utxosByAddresses = (address) => cardanoHttpPost('utxo/utxo-by-addresses', { addresses: [address] });
-const rewardsAccBalance = (rewardAccount) =>
-    cardanoHttpPost('rewards/account-balance', { rewardAccount: rewardAccount });
+const rewardsAccBalance = (rewardAccount) => cardanoHttpPost('rewards/account-balance', { rewardAccount });
 const stakePoolSearch = (poolAddress) =>
-    cardanoHttpPost('stake-pool/search', {
-        filters: { identifier: { values: [{ id: poolAddress }] } },
-        pagination: { limit: 1, startAt: 0 }
-    });
+  cardanoHttpPost('stake-pool/search', {
+    filters: { identifier: { values: [{ id: poolAddress }] } },
+    pagination: { limit: 1, startAt: 0 }
+  });
 
 /** Simulation of requests performed by a wallet while restoring */
 const syncWallet = ({ wallet, poolAddress }) => {
-    const startTime = Date.now();
-    const { address, stake_address: rewardAccount } = wallet;
-    cardanoHttpPost('network-info/era-summaries');
-    cardanoHttpPost('network-info/ledger-tip');
-    txsByAddress(address);
-    utxosByAddresses(address);
-    cardanoHttpPost('network-info/era-summaries');
-    cardanoHttpPost('network-info/genesis-parameters');
-    cardanoHttpPost('network-info/protocol-parameters');
-    rewardsAccBalance(rewardAccount);
-    cardanoHttpPost('network-info/ledger-tip');
-    cardanoHttpPost('network-info/lovelace-supply');
-    cardanoHttpPost('network-info/stake');
-    if (RUN_MODE === RunMode.Restore) {
-        stakePoolSearch(poolAddress);
-    }
-    cardanoHttpPost('stake-pool/stats');
+  const startTime = Date.now();
+  const { address, stake_address: rewardAccount } = wallet;
+  cardanoHttpPost('network-info/era-summaries');
+  cardanoHttpPost(TIP_URL);
+  txsByAddress(address);
+  utxosByAddresses(address);
+  cardanoHttpPost('network-info/era-summaries');
+  cardanoHttpPost('network-info/genesis-parameters');
+  cardanoHttpPost('network-info/protocol-parameters');
+  rewardsAccBalance(rewardAccount);
+  cardanoHttpPost(TIP_URL);
+  cardanoHttpPost('network-info/lovelace-supply');
+  cardanoHttpPost('network-info/stake');
+  if (RUN_MODE === RunMode.Restore) {
+    stakePoolSearch(poolAddress);
+  }
+  cardanoHttpPost('stake-pool/stats');
 
-    syncedWallets.add(wallet.address);
-    walletSyncTrend.add(Date.now() - startTime);
-    walletSyncCount.add(1);
+  syncedWallets.add(address);
+  walletSyncTrend.add(Date.now() - startTime);
+  walletSyncCount.add(1);
 };
 
 function getRandomInt(max) {
-    return Math.floor(Math.random() * max);
+  return Math.floor(Math.random() * max);
 }
 
 /**
  * Simulate keeping wallet in sync
  * For now, just polling the tip
  */
-const emulateIdleClient = () => cardanoHttpPost('network-info/ledger-tip');
+const emulateIdleClient = () => cardanoHttpPost(TIP_URL);
 
 export default function ({ wallets, poolAddresses }) {
+  // Pick a new wallet or reuse the same one?
+  // eslint-disable-next-line no-undef
+  const walletIdx = SPIN_ON_NEW_WALLETS ? getRandomInt(wallets.length) : __VU;
 
-    // Pick a new wallet or reuse the same one?
-    const walletIdx = SPIN_ON_NEW_WALLETS ? getRandomInt(wallets.length) : __VU;
+  // Get the wallet for the current virtual user
+  const wallet = wallets[walletIdx % wallets.length];
+  const poolAddress = poolAddresses[walletIdx % poolAddresses.length];
 
-    // Get the wallet for the current virtual user
-    let wallet = wallets[walletIdx % wallets.length];
-    let poolAddress = poolAddresses[walletIdx % poolAddresses.length];
-
-    if (SPIN_ON_NEW_WALLETS || !syncedWallets.has(wallet.address)) {
-        syncWallet({ wallet, poolAddress });
-    } else {
-        emulateIdleClient();
-        sleep(ITERATION_SLEEP);
-    }
+  if (SPIN_ON_NEW_WALLETS || !syncedWallets.has(wallet.address)) {
+    syncWallet({ poolAddress, wallet });
+  } else {
+    emulateIdleClient();
+    sleep(ITERATION_SLEEP);
+  }
 }
