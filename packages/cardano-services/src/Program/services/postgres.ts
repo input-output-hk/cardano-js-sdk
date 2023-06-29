@@ -60,7 +60,7 @@ export const getPoolWithServiceDiscovery = async (
   });
 
   return new Proxy<Pool>({} as Pool, {
-    get(_, prop) {
+    get(_, prop, receiver) {
       if (prop === 'then') return;
       if (prop === 'query') {
         return (args: string | QueryConfig, values?: any) =>
@@ -79,7 +79,7 @@ export const getPoolWithServiceDiscovery = async (
                 ssl,
                 user
               });
-              return timedQuery(pool, logger)(args, values);
+              return timedQuery(receiver, logger)(args, values);
             }
             throw error;
           });

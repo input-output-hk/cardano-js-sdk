@@ -75,6 +75,7 @@ describe('projector ogmios connection', () => {
       }
 
       if (Date.now() - start > 60_000) throw new Error("The projector can't get ready");
+      await delay(1000);
     } while (projectorReady === false);
   };
 
@@ -91,24 +92,13 @@ describe('projector ogmios connection', () => {
 
   afterEach(() => removePrevent());
 
-  it.skip('projector reconnects after a short delay', async () => {
+  it('projector reconnects after a short delay', async () => {
     await killContainer(ogmiosContainer);
-    await waitProjector();
-    // This throws because is not able to complete HTTP request
-    await checkProjector();
-  });
-
-  // Once the problem which prevent the original test to work is solved
-  // the original test can be un-skipped and this one can be removed
-  it('projector reconnects after a short delay - alternative', async () => {
-    await killContainer(ogmiosContainer);
-    // Add a 10" sleep as a quick workaround for HTTP connection issue
-    await delay(10_000);
     await waitProjector();
     await checkProjector();
   });
 
-  it.skip('projector reconnects after a long delay', async () => {
+  it('projector reconnects after a long delay', async () => {
     await createPrevent();
     await killContainer(ogmiosContainer);
     await delay(120_000);
@@ -123,10 +113,7 @@ describe('projector ogmios connection', () => {
     await killContainer(stakePoolProjectorContainer);
     await waitProjector(true, true);
     await removePrevent();
-    // Once the 'projector reconnects after a short delay' problem is solved
-    // also remove following line and uncomment next one
-    await waitProjector(false, true);
-    // await waitProjector();
+    await waitProjector();
     await checkProjector();
   });
 });
