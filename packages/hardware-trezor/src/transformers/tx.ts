@@ -2,6 +2,7 @@ import * as Trezor from 'trezor-connect';
 import { Cardano } from '@cardano-sdk/core';
 import { TrezorTxTransformerContext } from '../types';
 import { util as deprecatedUtil } from '@cardano-sdk/key-management';
+import { mapTxIns } from './txIn';
 import { mapWithdrawals } from './withdrawals';
 
 /**
@@ -13,10 +14,11 @@ import { mapWithdrawals } from './withdrawals';
  */
 const trezorTxTransformer = async (
   body: Cardano.TxBody,
-  _context: TrezorTxTransformerContext
+  context: TrezorTxTransformerContext
 ): Promise<Partial<Trezor.CardanoSignTransaction>> => ({
   fee: body.fee.toString(),
-  withdrawals: mapWithdrawals(body.withdrawals, _context)
+  inputs: await mapTxIns(body.inputs, context),
+  withdrawals: mapWithdrawals(body.withdrawals, context)
 });
 
 /**
