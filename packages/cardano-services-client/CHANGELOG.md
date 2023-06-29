@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.10.1...@cardano-sdk/cardano-services-client@0.10.2) (2023-06-29)
+
+### Bug Fixes
+
+* **cardano-services-client:** package.json import ([0293d14](https://github.com/input-output-hk/cardano-js-sdk/commit/0293d14d5ca2392b7c8580f6d701691324785710))
+
 ## [0.10.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.10.0...@cardano-sdk/cardano-services-client@0.10.1) (2023-06-29)
 
 ### Bug Fixes

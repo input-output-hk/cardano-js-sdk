@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.13.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.13.5...@cardano-sdk/util-dev@0.13.6) (2023-06-29)
+
+### Features
+
+* **util-dev:** add binds option to setup postgres container ([57040ca](https://github.com/input-output-hk/cardano-js-sdk/commit/57040cabca22644a6470a9e1a7d2d78adedca5c9))
+
 ## [0.13.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.13.4...@cardano-sdk/util-dev@0.13.5) (2023-06-29)
 
 **Note:** Version bump only for package @cardano-sdk/util-dev
