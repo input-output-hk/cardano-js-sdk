@@ -72,13 +72,14 @@
         buildInputs = oldAttrs.buildInputs ++ [pkgs.pkg-config pkgs.libusb1];
         # run actual build
         buildPhase = ''
-          yarn build
+          yarn workspace @cardano-sdk/cardano-services run build
         '';
         # override installPhase to only install what's necessary
         installPhase = ''
           runHook preInstall
 
           mkdir -p $out/libexec/$sourceRoot $out/bin
+          yarn workspace @cardano-sdk/cardano-services-client run build:version
 
           cp -r ${production-deps}/libexec/$sourceRoot/node_modules $out/libexec/$sourceRoot/node_modules
           cp -r scripts $out/libexec/$sourceRoot/scripts
