@@ -2,7 +2,7 @@ import * as Trezor from 'trezor-connect';
 import { Cardano } from '@cardano-sdk/core';
 import { TrezorTxTransformerContext } from '../types';
 import { util as deprecatedUtil } from '@cardano-sdk/key-management';
-import { mapTxIns } from './txIn';
+import { mapTxIns, mapTxOuts } from './';
 
 /**
  * Temporary transformer function that returns a partial
@@ -16,7 +16,8 @@ const trezorTxTransformer = async (
   context: TrezorTxTransformerContext
 ): Promise<Partial<Trezor.CardanoSignTransaction>> => ({
   fee: body.fee.toString(),
-  inputs: await mapTxIns(body.inputs, context)
+  inputs: await mapTxIns(body.inputs, context),
+  outputs: await mapTxOuts(body.outputs, context)
 });
 
 /**
