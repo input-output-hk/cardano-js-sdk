@@ -75,24 +75,6 @@ const providerParams = makeValidator((value) => {
   return validated;
 });
 
-const handleProviderParams = makeValidator((value) => {
-  const validated = baseValidator<HandleProviderParams>(value, {
-    properties: { policyId: { type: 'string' }, serverUrl: { type: 'string' } },
-    required: ['serverUrl'],
-    type: 'object'
-  });
-
-  try {
-    // eslint-disable-next-line no-new
-    new URL(validated.serverUrl);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    throw new Error(`serverUrl: ${error.message}`);
-  }
-
-  return validated;
-});
-
 /**
  * Shared across all tests
  */
@@ -105,7 +87,7 @@ const validators = {
   CHAIN_HISTORY_PROVIDER_PARAMS: providerParams(),
   DB_SYNC_CONNECTION_STRING: str({ default: undefined }),
   HANDLE_PROVIDER: str(),
-  HANDLE_PROVIDER_PARAMS: handleProviderParams(),
+  HANDLE_PROVIDER_PARAMS: providerParams(),
   KEY_MANAGEMENT_PARAMS: keyManagementParams(),
   KEY_MANAGEMENT_PROVIDER: str(),
   LOGGER_MIN_SEVERITY: str({ default: 'info' }),

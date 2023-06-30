@@ -38,6 +38,7 @@ import {
   KoraLabsHandleProvider,
   assetInfoHttpProvider,
   chainHistoryHttpProvider,
+  handleHttpProvider,
   networkInfoHttpProvider,
   rewardsHttpProvider,
   stakePoolHttpProvider,
@@ -61,7 +62,6 @@ const customHttpFetchAdapter = isNodeJs ? undefined : require('@vespaiach/axios-
 const HTTP_PROVIDER = 'http';
 const OGMIOS_PROVIDER = 'ogmios';
 const STUB_PROVIDER = 'stub';
-const HANDLE_PROVIDER = 'kora-labs';
 const MISSING_URL_PARAM = 'Missing URL';
 
 export const faucetProviderFactory = new ProviderFactory<FaucetProvider>();
@@ -170,13 +170,11 @@ utxoProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger):
   });
 });
 
-handleProviderFactory.register(HANDLE_PROVIDER, async (params: any): Promise<KoraLabsHandleProvider> => {
-  if (params.serverUrl === undefined) throw new Error(`${KoraLabsHandleProvider.name}: ${MISSING_URL_PARAM}`);
+handleProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger): Promise<HandleProvider> => {
+  if (params.baseUrl === undefined) throw new Error(`${handleHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
-  return new KoraLabsHandleProvider({
-    adapter: customHttpFetchAdapter,
-    policyId: params.policyId,
-    serverUrl: params.serverUrl
+  return new Promise<HandleProvider>(async (resolve) => {
+    resolve(handleHttpProvider({ adapter: customHttpFetchAdapter, baseUrl: params.baseUrl, logger }));
   });
 });
 
