@@ -1,4 +1,5 @@
 import { Cardano, Paginated, QueryStakePoolsArgs } from '@cardano-sdk/core';
+import { Percent } from '@cardano-sdk/util';
 export interface PoolUpdateModel {
   id: string; // pool hash id
   update_id: string;
@@ -60,22 +61,6 @@ export interface Epoch {
 export interface EpochModel {
   no: number;
   optimal_pool_count?: number;
-}
-
-export interface EpochReward {
-  hashId: number;
-  epochReward: Cardano.StakePoolEpochRewards;
-}
-
-export interface EpochRewardModel {
-  active_stake: string;
-  epoch_no: number;
-  epoch_length: string;
-  hash_id: number;
-  leader_rewards: string;
-  member_rewards: string;
-  member_roi: number;
-  pledge: string;
 }
 
 export interface OwnerAddressModel {
@@ -146,8 +131,8 @@ export interface PoolMetrics extends CommonPoolInfo {
     livePledge: Cardano.Lovelace;
     activeStake: Cardano.Lovelace;
     liveStake: Cardano.Lovelace;
-    activeStakePercentage: Cardano.Percent;
-    saturation: Cardano.Percent;
+    activeStakePercentage: Percent;
+    saturation: Percent;
     delegators: number;
   };
 }

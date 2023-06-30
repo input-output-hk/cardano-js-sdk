@@ -33,6 +33,7 @@ import {
   TxWorkerOptionDescriptions,
   USE_BLOCKFROST_DEFAULT,
   USE_QUEUE_DEFAULT,
+  USE_TYPEORM_STAKE_POOL_PROVIDER_DEFAULT,
   availableNetworks,
   connectionStringFromArgs,
   loadAndStartTxWorker,
@@ -169,11 +170,14 @@ withCommonOptions(
 withCommonOptions(
   withOgmiosOptions(
     withPostgresOptions(
-      withRabbitMqOptions(
-        program
-          .command('start-provider-server')
-          .description('Start the Provider Server')
-          .argument('[serviceNames...]', `List of services to attach: ${Object.values(ServiceNames).toString()}`)
+      withPostgresOptions(
+        withRabbitMqOptions(
+          program
+            .command('start-provider-server')
+            .description('Start the Provider Server')
+            .argument('[serviceNames...]', `List of services to attach: ${Object.values(ServiceNames).toString()}`)
+        ),
+        'StakePool'
       ),
       'DbSync'
     )
@@ -263,6 +267,21 @@ withCommonOptions(
       .argParser((interval) => Number.parseInt(interval, 10))
   )
   .addOption(
+    new Option(
+      '--use-typeorm-stake-pool-provider <true/false>',
+      ProviderServerOptionDescriptions.UseTypeOrmStakePoolProvider
+    )
+      .env('USE_TYPEORM_STAKE_POOL_PROVIDER')
+      .default(USE_TYPEORM_STAKE_POOL_PROVIDER_DEFAULT)
+      .argParser((useTypeormStakePoolProvider) =>
+        stringOptionToBoolean(
+          useTypeormStakePoolProvider,
+          Programs.ProviderServer,
+          ProviderServerOptionDescriptions.UseTypeOrmStakePoolProvider
+        )
+      )
+  )
+  .addOption(
     new Option('--use-blockfrost <true/false>', ProviderServerOptionDescriptions.UseBlockfrost)
       .env('USE_BLOCKFROST')
       .default(USE_BLOCKFROST_DEFAULT)
@@ -292,6 +311,7 @@ withCommonOptions(
       loadProviderServer({
         ...args,
         postgresConnectionStringDbSync: connectionStringFromArgs(args, 'DbSync'),
+        postgresConnectionStringStakePool: connectionStringFromArgs(args, 'StakePool'),
         // Setting the service names via env variable takes preference over command line argument
         serviceNames: args.serviceNames ? args.serviceNames : serviceNames
       })

@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.12.0...@cardano-sdk/cardano-services@0.12.1) (2023-06-06)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services
+
+## [0.12.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.11.4...@cardano-sdk/cardano-services@0.12.0) (2023-06-05)
+
+### ⚠ BREAKING CHANGES
+
+* hoist Cardano.Percent to util package
+* make stake pool metrics an optional property to handle activating pools
+* - rename `rewardsHistoryLimit` stake pool search arg to `apyEpochsBackLimit`
+* - remove `epochRewards` and type `StakePoolEpochRewards`
+- remove `transactions` and type `StakePoolTransactions`
+
+### Features
+
+* add handle projection ([1d3f4ca](https://github.com/input-output-hk/cardano-js-sdk/commit/1d3f4ca3cfa3f1dfb668847de58eba4d0402d48e))
+* add missing pool stats status ([6a59a78](https://github.com/input-output-hk/cardano-js-sdk/commit/6a59a78cff0eae3d965e62d65d8612a642dce8f8))
+* add stake pool metadata entity relation ([99a40b7](https://github.com/input-output-hk/cardano-js-sdk/commit/99a40b79a8809c472c7780bcb626451345b65958))
+* **cardano-services:** log CardanoTokenRegistry config on construction ([63c8377](https://github.com/input-output-hk/cardano-js-sdk/commit/63c83774c0487e3883b6b447e1cc7aad75222e45))
+* implement TypeormStakePoolProvider ([8afbffd](https://github.com/input-output-hk/cardano-js-sdk/commit/8afbffdadaf9566ee25e553aee7fbb0c8e0eab62))
+
+### Code Refactoring
+
+* hoist Cardano.Percent to util package ([e4da0e3](https://github.com/input-output-hk/cardano-js-sdk/commit/e4da0e3851a4bdfd503c1f195c5ba1455ea6675b))
+* make stake pool metrics an optional property to handle activating pools ([d33bd07](https://github.com/input-output-hk/cardano-js-sdk/commit/d33bd07ddb873ba40498a95caa860820f38ee687))
+* remove unusable fields from StakePool core type ([a7aa17f](https://github.com/input-output-hk/cardano-js-sdk/commit/a7aa17fdd5224437555840d21f56c4660142c351))
+* rename rewardsHistoryLimit ([05ccdc6](https://github.com/input-output-hk/cardano-js-sdk/commit/05ccdc6b448f98ddd09894b633521e79fbb6d9c1))
+
+## [0.11.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.11.3...@cardano-sdk/cardano-services@0.11.4) (2023-06-01)
+
+### Features
+
+* **cardano-services:** add stake pools metrics computation job ([3462595](https://github.com/input-output-hk/cardano-js-sdk/commit/346259540847eb5ac0b41640b37c7c9ecf114535))
+
 ## [0.11.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.11.2...@cardano-sdk/cardano-services@0.11.3) (2023-05-24)
 
 ### Features

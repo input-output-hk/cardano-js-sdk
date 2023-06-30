@@ -1,4 +1,12 @@
 import {
+  APY_EPOCHS_BACK_LIMIT_DEFAULT,
+  IDS_NAMESPACE,
+  StakePoolsSubQuery,
+  emptyPoolsExtraInfo,
+  getStakePoolSortType,
+  queryCacheKey
+} from './util';
+import {
   Cardano,
   Paginated,
   ProviderError,
@@ -19,16 +27,8 @@ import {
 } from './types';
 import { DbSyncProvider, DbSyncProviderDependencies, Disposer, EpochMonitor } from '../../util';
 import { GenesisData } from '../../types';
-import {
-  IDS_NAMESPACE,
-  REWARDS_HISTORY_LIMIT_DEFAULT,
-  StakePoolsSubQuery,
-  emptyPoolsExtraInfo,
-  getStakePoolSortType,
-  queryCacheKey
-} from './util';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../InMemoryCache';
-import { PromiseOrValue, RunnableModule, isNotNil, resolveObjectValues } from '@cardano-sdk/util';
+import { PromiseOrValue, RunnableModule, resolveObjectValues } from '@cardano-sdk/util';
 import { StakePoolBuilder } from './StakePoolBuilder';
 import { StakePoolMetadataService } from '../types';
 import { toStakePoolResults } from './mappers';
@@ -110,7 +110,6 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
 
     this.#builder = new StakePoolBuilder(dbPools.main, logger);
     this.#cache = cache.db;
-    this.#epochLength = genesisData.epochLength * 1000;
     // epochLength can change, so it should come from EraSummaries instead of from CompactGenesis.
     // Then we would need to look up the length of the specific epoch based on slot number.
     // However it would add a lot of complexity to the queries, so for now we use this simple approach.
@@ -271,7 +270,7 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
   }
 
   public async queryStakePools(options: QueryStakePoolsArgs): Promise<Paginated<Cardano.StakePool>> {
-    const { filters, pagination, rewardsHistoryLimit = REWARDS_HISTORY_LIMIT_DEFAULT } = options;
+    const { filters, pagination, apyEpochsBackLimit = APY_EPOCHS_BACK_LIMIT_DEFAULT } = options;
     const useBlockfrost = this.#useBlockfrost;
 
     if (pagination.limit > this.#paginationPageSizeLimit) {
@@ -333,21 +332,15 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
         sortType === 'apy'
           ? (orderedResult as PoolAPY[])
           : await this.#cache.get(queryCacheKey(StakePoolsSubQuery.APY, hashesIds, options), () =>
-              this.#builder.queryPoolAPY(hashesIds, this.#epochLength, { rewardsHistoryLimit })
+              this.#builder.queryPoolAPY(hashesIds, this.#epochLength, { apyEpochsBackLimit })
             );
     }
-    // Get stake pools rewards cached
-    const poolRewards = await this.#cache.get(
-      queryCacheKey(StakePoolsSubQuery.REWARDS, orderedResultHashIds, options),
-      () => this.#builder.queryPoolRewards(orderedResultHashIds, this.#epochLength, rewardsHistoryLimit),
-      UNLIMITED_CACHE_TTL
-    );
     // Create lookup table with pool ids: (hashId:updateId)
     const hashIdsMap = Object.fromEntries(
       orderedResultHashIds.map((hashId, idx) => [hashId, orderedResultUpdateIds[idx]])
     );
     // Create a lookup table with cached pools: (hashId:Cardano.StakePool)
-    const rewardsHistoryKey = JSON.stringify(rewardsHistoryLimit);
+    const rewardsHistoryKey = JSON.stringify(apyEpochsBackLimit);
     const cachedPromises = Object.fromEntries(
       orderedResultHashIds.map((hashId) => [
         hashId,
@@ -376,7 +369,6 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
         poolRegistrations,
         poolRelays,
         poolRetirements,
-        poolRewards: poolRewards.filter(isNotNil),
         totalCount
       });
     };

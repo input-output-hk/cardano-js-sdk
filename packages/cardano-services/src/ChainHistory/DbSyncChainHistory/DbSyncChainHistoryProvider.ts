@@ -85,10 +85,9 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
       } ${blockRange?.upperBound ? `and before ${upperBound}` : ''}`
     );
 
-    const [totalResultCount, ids] = await Promise.all([
-      this.#builder.queryTxIdsByAddresses(addresses, blockRange),
-      this.#builder.queryTxIdsByAddresses(addresses, blockRange, pagination)
-    ]);
+    const allIds = await this.#builder.queryTxIdsByAddresses(addresses, blockRange);
+    const totalResultCount = allIds.length;
+    const ids = allIds.splice(pagination.startAt, pagination.limit);
 
     return { pageResults: totalResultCount ? await this.transactionsByIds(ids) : [], totalResultCount };
   }

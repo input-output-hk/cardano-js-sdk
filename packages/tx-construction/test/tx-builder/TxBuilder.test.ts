@@ -10,9 +10,11 @@ import {
   util
 } from '@cardano-sdk/key-management';
 import { AssetId, mockProviders as mocks, somePartialStakePools } from '@cardano-sdk/util-dev';
-import { CML, Cardano } from '@cardano-sdk/core';
+import { CML, Cardano, Handle, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import {
   GenericTxBuilder,
+  HandleNotFoundError,
+  InvalidConfigurationError,
   OutputBuilderValidator,
   OutputValidation,
   OutputValidationMinimumCoinError,
@@ -29,9 +31,25 @@ function assertObjectRefsAreDifferent(obj1: unknown, obj2: unknown): void {
   expect(obj1).not.toBe(obj2);
 }
 
+const resolvedHandle = {
+  handle: 'alice',
+  hasDatum: false,
+  policyId: Cardano.PolicyId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a7'),
+  resolvedAddresses: {
+    cardano: Cardano.PaymentAddress('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg')
+  },
+  resolvedAt: {
+    hash: Cardano.BlockId('7a48b034645f51743550bbaf81f8a14771e58856e031eb63844738ca8ad72298'),
+    slot: Cardano.Slot(100)
+  }
+};
+
 describe('GenericTxBuilder', () => {
   let outputValidator: jest.Mocked<OutputBuilderValidator>;
   let txBuilder: GenericTxBuilder;
+  let txBuilderWithoutHandleProvider: GenericTxBuilder;
+  let txBuilderWithHandleErrors: GenericTxBuilder;
+  let txBuilderWithNullHandles: GenericTxBuilder;
   let txBuilderProviders: jest.Mocked<TxBuilderProviders>;
   let output: Cardano.TxOut;
   let output2: Cardano.TxOut;
@@ -39,7 +57,6 @@ describe('GenericTxBuilder', () => {
   beforeEach(async () => {
     output = mocks.utxo[0][1];
     output2 = mocks.utxo[1][1];
-    const address = mocks.utxo[0][1].address;
     const rewardAccount = mocks.rewardAccount;
     const inputResolver: Cardano.InputResolver = {
       resolveInput: async (txIn) =>
@@ -60,7 +77,6 @@ describe('GenericTxBuilder', () => {
     keyAgent.knownAddresses[0].rewardAccount = rewardAccount;
 
     txBuilderProviders = {
-      changeAddress: jest.fn().mockResolvedValue(address),
       genesisParameters: jest.fn().mockResolvedValue(mocks.genesisParameters),
       protocolParameters: jest.fn().mockResolvedValue(mocks.protocolParameters),
       rewardAccounts: jest.fn().mockResolvedValue([
@@ -76,12 +92,44 @@ describe('GenericTxBuilder', () => {
     outputValidator = {
       validateOutput: jest.fn().mockResolvedValue({ coinMissing: 0n } as OutputValidation)
     };
-    txBuilder = new GenericTxBuilder({
+
+    const builderParams = {
       inputResolver,
       keyAgent: util.createAsyncKeyAgent(keyAgent),
       logger: dummyLogger,
       outputValidator,
       txBuilderProviders
+    };
+
+    txBuilder = new GenericTxBuilder({
+      handleProvider: {
+        healthCheck: jest.fn(),
+        resolveHandles: async () => [resolvedHandle]
+      },
+      ...builderParams
+    });
+    txBuilderWithoutHandleProvider = new GenericTxBuilder(builderParams);
+    txBuilderWithNullHandles = new GenericTxBuilder({
+      handleProvider: {
+        healthCheck: jest.fn(),
+        resolveHandles: async () => [null]
+      },
+      ...builderParams
+    });
+    txBuilderWithHandleErrors = new GenericTxBuilder({
+      handleProvider: {
+        healthCheck: jest.fn(),
+        resolveHandles: async () => {
+          const error = new Error('not found');
+
+          throw new ProviderError(
+            ProviderFailure.NotFound,
+            error,
+            `Failed to resolve handles due to: ${error.message}`
+          );
+        }
+      },
+      ...builderParams
     });
   });
 
@@ -222,6 +270,7 @@ describe('GenericTxBuilder', () => {
     let datumHash: Crypto.Hash32ByteBase16;
     let output1Coin: bigint;
     let output2Base: Cardano.TxOut;
+    let handle: Handle;
 
     beforeEach(() => {
       assetId = Cardano.AssetId('1ec85dcee27f2d90ec1f9a1e4ce74a667dc9be8b184463223f9c960150584c');
@@ -230,6 +279,7 @@ describe('GenericTxBuilder', () => {
       address = Cardano.PaymentAddress('addr_test1vr8nl4u0u6fmtfnawx2rxfz95dy7m46t6dhzdftp2uha87syeufdg');
       datumHash = Crypto.Hash32ByteBase16('3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d');
       output1Coin = 10_000_000n;
+      handle = 'alice';
       output2Base = mocks.utxo[0][1];
 
       outputBuilder = txBuilder.buildOutput().address(address).coin(output1Coin) as TxOutputBuilder;
@@ -302,6 +352,21 @@ describe('GenericTxBuilder', () => {
       expect(outputBuilder.toTxOut().datumHash).toEqual(datumHash);
     });
 
+    it('can set handle', () => {
+      outputBuilder.handle(handle);
+      expect(outputBuilder.toTxOut().handle).toEqual(handle);
+    });
+
+    it('throws an error if attempting to set handle without a handleProvider', async () => {
+      try {
+        await txBuilderWithoutHandleProvider.buildOutput().handle(address).build();
+      } catch (error) {
+        expect(error instanceof InvalidConfigurationError).toBeTruthy();
+      }
+
+      expect.assertions(1);
+    });
+
     it('can build a valid output', async () => {
       const builtOutput = await txBuilder
         .buildOutput()
@@ -348,6 +413,25 @@ describe('GenericTxBuilder', () => {
 
       it('legit output with valid with address and coin', async () => {
         await expect(txBuilder.buildOutput().address(address).coin(output1Coin).build()).resolves.toBeTruthy();
+      });
+
+      it('resolves handle to address', async () => {
+        const txOut = await txBuilder.buildOutput().handle('alice').coin(output1Coin).build();
+
+        expect(txOut.handle).toBe(resolvedHandle);
+        expect(txOut.address).toBe(resolvedHandle.resolvedAddresses.cardano);
+      });
+
+      it('rejects with an error when a handle provider fails to resolve', async () => {
+        await expect(
+          txBuilderWithNullHandles.buildOutput().handle('alice').coin(output1Coin).build()
+        ).rejects.toThrowError(HandleNotFoundError);
+      });
+
+      it('rejects with an error when handle provider throws an error', async () => {
+        await expect(
+          txBuilderWithHandleErrors.buildOutput().handle('alice').coin(output1Coin).build()
+        ).rejects.toThrowError(ProviderError);
       });
     });
 
@@ -488,6 +572,19 @@ describe('GenericTxBuilder', () => {
     expect(txProps.inputSelection).toBeTruthy();
     const { tx: signedTx } = await tx.sign();
     expect(signedTx.id).toEqual(txProps.hash);
+  });
+
+  it('returns a context with used handles along with the signed transaction', async () => {
+    const tx = txBuilder
+      .addOutput({
+        ...mocks.utxo[0][1],
+        handle: resolvedHandle
+      })
+      .build();
+    const { handles } = await tx.inspect();
+    expect(handles).toEqual([resolvedHandle]);
+    const { ctx } = await tx.sign();
+    expect(ctx.handles).toEqual([resolvedHandle]);
   });
 
   it('can build transactions that are not modified by subsequent builder changes', async () => {

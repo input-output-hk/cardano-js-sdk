@@ -152,13 +152,20 @@ export interface ConsumeRemoteApiOptions<T> {
   getErrorPrototype?: GetErrorPrototype;
 }
 
+export interface DeriveChannelOptions {
+  /**
+   * If true, shutting down base messenger will not shut down the derived messenger
+   */
+  detached?: boolean;
+}
+
 export interface Messenger extends Shutdown {
   channel: ChannelName;
   connect$: Observable<MinimalPort>;
   postMessage(message: unknown): Observable<void>;
   message$: Observable<PortMessage>;
   isShutdown: boolean;
-  deriveChannel(path: string): Messenger;
+  deriveChannel(path: string, options?: DeriveChannelOptions): Messenger;
 }
 
 export interface MessengerApiDependencies {

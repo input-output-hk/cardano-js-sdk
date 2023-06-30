@@ -14,3 +14,4 @@ export * from './SupplyDistributionTracker';
 export * from './SmartTxSubmitProvider';
 export * from './KeyAgent';
 export * from './AddressDiscovery';
+export * from './HandlesTracker';

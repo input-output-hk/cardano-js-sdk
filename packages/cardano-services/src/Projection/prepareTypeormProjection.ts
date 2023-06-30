@@ -19,7 +19,7 @@ import {
   storeUtxo
 } from '@cardano-sdk/projection-typeorm';
 import { Mappers as Mapper } from '@cardano-sdk/projection';
-import { POOLS_METRICS_INTERVAL_DEFAULT } from '../Program';
+import { POOLS_METRICS_INTERVAL_DEFAULT } from '../Program/programs/types';
 import { Sorter } from '@hapi/topo';
 
 /**
@@ -76,6 +76,8 @@ type Entities = typeof entities;
 type EntityName = keyof Entities;
 type Entity = Entities[EntityName];
 
+export const getEntities = (entityNames: EntityName[]): Entity[] => entityNames.map((name) => entities[name]);
+
 const storeEntities: Partial<Record<StoreName, EntityName[]>> = {
   storeAssets: ['asset'],
   storeBlock: ['block'],
@@ -92,7 +94,7 @@ const entityInterDependencies: Partial<Record<EntityName, EntityName[]>> = {
   output: ['block'],
   poolRegistration: ['block'],
   poolRetirement: ['block'],
-  stakePool: ['block'],
+  stakePool: ['block', 'poolRegistration', 'poolRetirement', 'poolMetadata'],
   tokens: ['asset']
 };
 

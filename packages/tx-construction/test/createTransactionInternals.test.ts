@@ -28,7 +28,10 @@ describe('createTransactionInternals', () => {
   const createSimpleTransactionInternals = async (
     props: (inputSelection: SelectionSkeleton) => Partial<CreateTxInternalsProps> = () => ({})
   ) => {
-    const result = await roundRobinRandomImprove().select({
+    const result = await roundRobinRandomImprove({
+      getChangeAddress: async () =>
+        'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9' as Cardano.PaymentAddress
+    }).select({
       constraints: SelectionConstraints.NO_CONSTRAINTS,
       outputs: new Set(outputs),
       utxo: new Set(utxo)
@@ -36,9 +39,6 @@ describe('createTransactionInternals', () => {
     const ledgerTip = await provider.ledgerTip();
     const overrides = props(result.selection);
     return await createTransactionInternals({
-      changeAddress: Cardano.PaymentAddress(
-        'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9'
-      ),
       validityInterval: {
         invalidHereafter: Cardano.Slot(ledgerTip.slot + 3600)
       },

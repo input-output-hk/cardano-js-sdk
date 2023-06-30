@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/projection",
-  "version": "0.6.2",
+  "version": "0.6.5",
   "description": "Chain Sync event projection",
   "engines": {
     "node": ">=14.20.1"
@@ -18,15 +18,6 @@
     "access": "public"
   },
   "sideEffects": false,
-  "contributors": [
-    "Rhys Bartels-Waller <rhys.bartelswaller@iohk.io> (https://iohk.io)",
-    "Martynas Kazlauskas <martynas.kazlauskas@iohk.io> (https://iohk.io)",
-    "Daniele Ricci <daniele.ricci@iohk.io> (https://iohk.io)",
-    "Ivaylo Andonov <ivaylo.andonov@iohk.io> (https://iohk.io)",
-    "Mircea Hasegan <mircea.hasegan@iohk.io> (https://iohk.io)",
-    "Angel Castillo Bacigalupi <angel.castillo@iohk.io> (https://iohk.io)",
-    "Dmytro Iakymenko <dmytro.iakymenko@iohk.io> (https://iohk.io)"
-  ],
   "license": "Apache-2.0",
   "scripts": {
     "build:esm": "tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020",

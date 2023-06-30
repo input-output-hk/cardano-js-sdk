@@ -112,17 +112,6 @@ export const cip6ExtendedMetadata = {
 
 export const stakePoolResults = { pageResults: [], totalResultCount: 0 };
 export const stakePoolResult = {
-  epochRewards: [
-    {
-      activeStake: 13_958_004_965_545_733n,
-      epoch: 151,
-      epochLength: 112_600,
-      leaderRewards: 10n,
-      memberROI: 0.000_074_882_188_185_275_1,
-      memberRewards: 100n,
-      pledge: 958_004_965_545_733n
-    }
-  ],
   hexId: 'a3ea0e70b6d9a9a149017379301b3e98ea9e3addbdd49935aabb56f5',
   id: 'pool1504quu9kmx56zjgpwdunqxe7nr4fuwkahh2fjdd2hdt020rckh7',
   margin: { denominator: 20, numerator: 3 },
@@ -150,13 +139,6 @@ export const stakePoolResult = {
   relays: [{ __typename: 'RelayByAddress', ipv4: '127.0.0.1', ipv6: null, port: 3001 }],
   rewardAccount: 'stake_test1uqr53ts66tuhlm8f99f09ycwy2nuy7mqj5hccx72s4q5yssfl60a6',
   status: 'active',
-  transactions: {
-    registration: [
-      'c832201b86ea2b1ca6d62f0d2f9499a7716518f88cf70f06addf0213da6e0356',
-      '5368656c6c65792047656e65736973205374616b696e67205478204861736820'
-    ],
-    retirement: []
-  },
   vrf: '86be64c4d9b6db64e841c548ff4b709eb70c6715a863074581a9f11ef8b541e9'
 };
 

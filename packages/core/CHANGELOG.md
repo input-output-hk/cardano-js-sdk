@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.13.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.12.2...@cardano-sdk/core@0.13.0) (2023-06-05)
+
+### ⚠ BREAKING CHANGES
+
+* hoist Cardano.Percent to util package
+* make stake pool metrics an optional property to handle activating pools
+* - rename `rewardsHistoryLimit` stake pool search arg to `apyEpochsBackLimit`
+* - remove `epochRewards` and type `StakePoolEpochRewards`
+- remove `transactions` and type `StakePoolTransactions`
+
+### Features
+
+* add missing pool stats status ([6a59a78](https://github.com/input-output-hk/cardano-js-sdk/commit/6a59a78cff0eae3d965e62d65d8612a642dce8f8))
+* implement TypeormStakePoolProvider ([8afbffd](https://github.com/input-output-hk/cardano-js-sdk/commit/8afbffdadaf9566ee25e553aee7fbb0c8e0eab62))
+
+### Code Refactoring
+
+* hoist Cardano.Percent to util package ([e4da0e3](https://github.com/input-output-hk/cardano-js-sdk/commit/e4da0e3851a4bdfd503c1f195c5ba1455ea6675b))
+* make stake pool metrics an optional property to handle activating pools ([d33bd07](https://github.com/input-output-hk/cardano-js-sdk/commit/d33bd07ddb873ba40498a95caa860820f38ee687))
+* remove unusable fields from StakePool core type ([a7aa17f](https://github.com/input-output-hk/cardano-js-sdk/commit/a7aa17fdd5224437555840d21f56c4660142c351))
+* rename rewardsHistoryLimit ([05ccdc6](https://github.com/input-output-hk/cardano-js-sdk/commit/05ccdc6b448f98ddd09894b633521e79fbb6d9c1))
+
+## [0.12.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.12.1...@cardano-sdk/core@0.12.2) (2023-06-01)
+
+### Features
+
+* add HandleProvider interface and handle support implementation to TxBuilder ([f209095](https://github.com/input-output-hk/cardano-js-sdk/commit/f2090952c8a0512fc589674b876f3a27be403140))
+
 ## [0.12.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.12.0...@cardano-sdk/core@0.12.1) (2023-05-24)
 
 **Note:** Version bump only for package @cardano-sdk/core

@@ -1,6 +1,6 @@
 import * as Trezor from 'trezor-connect';
 import {
-  CONTEXT_WITH_KNOWN_ADDRESSES,
+  contextWithKnownAddresses,
   knownAddressKeyPath,
   knownAddressStakeKeyPath,
   txOut,
@@ -13,7 +13,7 @@ import { mapTxOuts, toTxOut } from '../../src/transformers/txOut';
 describe('txOut', () => {
   describe('mapTxOuts', () => {
     it('can map a set of transaction outputs to third party address', async () => {
-      const txOuts = mapTxOuts([txOut, txOut, txOut], CONTEXT_WITH_KNOWN_ADDRESSES);
+      const txOuts = mapTxOuts([txOut, txOut, txOut], contextWithKnownAddresses);
 
       expect(txOuts.length).toEqual(3);
 
@@ -27,7 +27,7 @@ describe('txOut', () => {
     });
 
     it('can map a set of transaction outputs with assets to third party address', async () => {
-      const txOuts = mapTxOuts([txOutWithAssets, txOutWithAssets, txOutWithAssets], CONTEXT_WITH_KNOWN_ADDRESSES);
+      const txOuts = mapTxOuts([txOutWithAssets, txOutWithAssets, txOutWithAssets], contextWithKnownAddresses);
 
       expect(txOuts.length).toEqual(3);
 
@@ -76,7 +76,7 @@ describe('txOut', () => {
     it('can map a set of transaction outputs to owned address', async () => {
       const txOuts = mapTxOuts(
         [txOutToOwnedAddress, txOutToOwnedAddress, txOutToOwnedAddress],
-        CONTEXT_WITH_KNOWN_ADDRESSES
+        contextWithKnownAddresses
       );
 
       expect(txOuts.length).toEqual(3);
@@ -96,7 +96,7 @@ describe('txOut', () => {
     it('can map a set of transaction outputs with assets to owned address', async () => {
       const txOuts = mapTxOuts(
         [txOutWithAssetsToOwnedAddress, txOutWithAssetsToOwnedAddress, txOutWithAssetsToOwnedAddress],
-        CONTEXT_WITH_KNOWN_ADDRESSES
+        contextWithKnownAddresses
       );
 
       expect(txOuts.length).toEqual(3);
@@ -149,7 +149,7 @@ describe('txOut', () => {
 
   describe('toTxOut', () => {
     it('can map a simple transaction output to third party address', async () => {
-      const out = toTxOut(txOut, CONTEXT_WITH_KNOWN_ADDRESSES);
+      const out = toTxOut(txOut, contextWithKnownAddresses);
       expect(out).toEqual({
         address:
           'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
@@ -158,7 +158,7 @@ describe('txOut', () => {
     });
 
     it('can map a simple transaction output with assets to third party address', async () => {
-      const out = toTxOut(txOutWithAssets, CONTEXT_WITH_KNOWN_ADDRESSES);
+      const out = toTxOut(txOutWithAssets, contextWithKnownAddresses);
       expect(out).toEqual({
         address:
           'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp',
@@ -200,7 +200,7 @@ describe('txOut', () => {
     });
 
     it('can map a simple transaction output to owned address', async () => {
-      const out = toTxOut(txOutToOwnedAddress, CONTEXT_WITH_KNOWN_ADDRESSES);
+      const out = toTxOut(txOutToOwnedAddress, contextWithKnownAddresses);
 
       expect(out).toEqual({
         addressParameters: {
@@ -213,7 +213,7 @@ describe('txOut', () => {
     });
 
     it('can map a simple transaction output with assets to owned address', async () => {
-      const out = toTxOut(txOutWithAssetsToOwnedAddress, CONTEXT_WITH_KNOWN_ADDRESSES);
+      const out = toTxOut(txOutWithAssetsToOwnedAddress, contextWithKnownAddresses);
 
       expect(out).toEqual({
         addressParameters: {

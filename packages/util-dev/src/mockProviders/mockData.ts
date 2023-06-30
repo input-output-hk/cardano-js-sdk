@@ -5,6 +5,15 @@ export const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
 
 export const rewardAccountBalance = 33_333n;
 
+export const handlePolicyId = Cardano.PolicyId('f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a');
+export const handle = 'bob';
+export const handleAssetId = Cardano.AssetId.fromParts(
+  handlePolicyId,
+  Cardano.AssetName(Buffer.from('bob').toString('hex'))
+);
+export const handleAssetName = Cardano.AssetName(Buffer.from(handle, 'utf8').toString('hex'));
+export const handleFingerprint = Cardano.AssetFingerprint('asset1f0azzptnr8dghzjh7egqvdjmt33e3lz5uy59th');
+
 export const ledgerTip = {
   blockNo: Cardano.BlockNo(1_111_111),
   hash: Cardano.BlockId('10d64cc11e9b20e15b6c46aa7b1fed11246f437e62225655a30ea47bf8cc22d0'),

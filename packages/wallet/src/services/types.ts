@@ -1,6 +1,7 @@
 import { AsyncKeyAgent, GroupedAddress } from '@cardano-sdk/key-management';
 import { Cardano, CardanoNodeErrors, EpochRewards, TxCBOR } from '@cardano-sdk/core';
 import { Observable } from 'rxjs';
+import { Percent } from '@cardano-sdk/util';
 
 export enum TransactionFailure {
   InvalidTransaction = 'INVALID_TRANSACTION',
@@ -98,7 +99,19 @@ export interface RewardsHistory {
   lifetimeRewards: Cardano.Lovelace;
 }
 
+/** Wallet delegated stake by pool. Multiple reward accounts could be delegated to the same pool */
+export interface DelegatedStake {
+  pool: Cardano.StakePool;
+  /** How much from the total delegated stake is delegated to this pool */
+  percentage: Percent;
+  /** Absolute stake value */
+  stake: bigint;
+  /** Reward accounts delegated to this pool */
+  rewardAccounts: Cardano.RewardAccount[];
+}
+
 export interface DelegationTracker {
   rewardsHistory$: Observable<RewardsHistory>;
   rewardAccounts$: Observable<Cardano.RewardAccountInfo[]>;
+  distribution$: Observable<Map<Cardano.PoolId, DelegatedStake>>;
 }

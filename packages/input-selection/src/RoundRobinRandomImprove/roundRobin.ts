@@ -7,7 +7,7 @@ import {
   assetQuantitySelector,
   getCoinQuantity,
   toValues
-} from './util';
+} from '../util';
 
 const improvesSelection = (
   utxoAlreadySelected: Cardano.Utxo[],

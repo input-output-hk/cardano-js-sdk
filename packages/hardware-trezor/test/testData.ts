@@ -75,7 +75,7 @@ export const knownAddress: GroupedAddress = {
 export const knownAddressKeyPath = [2_147_485_500, 2_147_485_463, 2_147_483_648, 1, 0];
 export const knownAddressStakeKeyPath = [2_147_485_500, 2_147_485_463, 2_147_483_648, 2, 0];
 
-export const CONTEXT_WITH_KNOWN_ADDRESSES = {
+export const contextWithKnownAddresses = {
   chainId: {
     networkId: Cardano.NetworkId.Testnet,
     networkMagic: 999
@@ -84,7 +84,7 @@ export const CONTEXT_WITH_KNOWN_ADDRESSES = {
   knownAddresses: [knownAddress]
 };
 
-export const CONTEXT_WITHOUT_KNOWN_ADDRESSES = {
+export const contextWithoutKnownAddresses = {
   chainId: {
     networkId: Cardano.NetworkId.Testnet,
     networkMagic: 999

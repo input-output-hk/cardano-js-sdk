@@ -26,6 +26,6 @@ export class PoolMetadataEntity {
   @ManyToOne(() => StakePoolEntity)
   stakePool?: StakePoolEntity;
   @JoinColumn()
-  @OneToOne(() => PoolRegistrationEntity, DeleteCascadeRelationOptions)
+  @OneToOne(() => PoolRegistrationEntity, (poolUpdate) => poolUpdate.metadata, DeleteCascadeRelationOptions)
   poolUpdate?: PoolRegistrationEntity;
 }

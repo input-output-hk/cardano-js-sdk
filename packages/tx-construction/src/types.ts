@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, HandleResolution } from '@cardano-sdk/core';
 import { SelectionSkeleton } from '@cardano-sdk/input-selection';
 import { SignTransactionOptions, TransactionSigner } from '@cardano-sdk/key-management';
 
@@ -10,7 +10,6 @@ export type InitializeTxResult = Cardano.TxBodyWithHash & { inputSelection: Sele
 export interface TxBuilderProviders {
   tip: () => Promise<Cardano.Tip>;
   protocolParameters: () => Promise<Cardano.ProtocolParameters>;
-  changeAddress: () => Promise<Cardano.PaymentAddress>;
   genesisParameters: () => Promise<Cardano.CompactGenesis>;
   rewardAccounts: () => Promise<Omit<Cardano.RewardAccountInfo, 'delegatee'>[]>;
   utxoAvailable: () => Promise<Cardano.Utxo[]>;
@@ -31,6 +30,7 @@ export interface InitializeTxProps {
   auxiliaryData?: Cardano.AuxiliaryData;
   witness?: InitializeTxWitness;
   signingOptions?: SignTransactionOptions;
+  handles?: HandleResolution[];
 }
 
 export interface InitializeTxPropsValidationResult {

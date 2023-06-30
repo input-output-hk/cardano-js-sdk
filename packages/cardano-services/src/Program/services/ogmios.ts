@@ -9,7 +9,7 @@ import {
   OgmiosTxSubmitProvider,
   urlToConnectionConfig
 } from '@cardano-sdk/ogmios';
-import { OgmiosOptionDescriptions, OgmiosProgramOptions } from '../options';
+import { OgmiosOptionDescriptions, OgmiosProgramOptions } from '../options/ogmios';
 import { RunnableModule, isConnectionError } from '@cardano-sdk/util';
 import { SubmitTxArgs } from '@cardano-sdk/core';
 import { defer, from, of } from 'rxjs';

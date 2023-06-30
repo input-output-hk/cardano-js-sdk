@@ -1,11 +1,23 @@
 import { Logger } from 'ts-log';
-import { Programs } from './programs';
+import { Programs, ProviderServerArgs, ServiceNames } from './programs/types';
 import { WrongOption } from './errors';
+import { getOgmiosCardanoNode } from './services/ogmios';
+import { getPool } from './services/postgres';
+import { loadGenesisData } from '../util';
 import dns, { SrvRecord } from 'dns';
 import pRetry, { FailedAttemptError } from 'p-retry';
 
 export const SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT = 1.1;
 export const SERVICE_DISCOVERY_TIMEOUT_DEFAULT = 60 * 1000;
+
+export const cardanoNodeDependantServices = new Set([
+  ServiceNames.NetworkInfo,
+  ServiceNames.StakePool,
+  ServiceNames.Utxo,
+  ServiceNames.Rewards,
+  ServiceNames.Asset,
+  ServiceNames.ChainHistory
+]);
 
 export type RetryBackoffConfig = {
   factor?: number;
@@ -48,3 +60,23 @@ export const stringOptionToBoolean = (value: string, program: Programs, option: 
   if (['1', 't', 'true'].includes(value)) return true;
   throw new WrongOption(program, option, ['false', 'true']);
 };
+
+// If typeorm provider is enabled we establish a DB connection though the TypeORM data source
+// Should be refactored when implement many typeorm providers and integrate with IOC dependency injection
+export const getDbPools = async (dnsResolver: DnsResolver, logger: Logger, args: ProviderServerArgs) =>
+  args.useTypeormStakePoolProvider
+    ? {}
+    : {
+        healthCheck: await getPool(dnsResolver, logger, args),
+        main: await getPool(dnsResolver, logger, args)
+      };
+
+export const getCardanoNode = async (dnsResolver: DnsResolver, logger: Logger, args: ProviderServerArgs) =>
+  serviceSetHas(args.serviceNames, cardanoNodeDependantServices) && !args.useTypeormStakePoolProvider
+    ? await getOgmiosCardanoNode(dnsResolver, logger, args)
+    : undefined;
+
+export const getGenesisData = async (args: ProviderServerArgs) =>
+  args.cardanoNodeConfigPath && !args.useTypeormStakePoolProvider
+    ? await loadGenesisData(args.cardanoNodeConfigPath)
+    : undefined;

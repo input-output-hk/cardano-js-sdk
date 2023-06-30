@@ -1,6 +1,7 @@
 import { Asset, Cardano } from '@cardano-sdk/core';
+import { handleAssetId, handleAssetName, handleFingerprint, handlePolicyId } from './mockData';
 
-export const asset = {
+export const asset: Asset.AssetInfo = {
   assetId: Cardano.AssetId('659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41'),
   fingerprint: Cardano.AssetFingerprint('asset1rjklcrnsdzqp65wjgrg55sy9723kw09mlgvlc3'),
   history: [
@@ -9,17 +10,32 @@ export const asset = {
       transactionId: Cardano.TransactionId('886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8')
     }
   ],
+  mintOrBurnCount: 5,
   name: Cardano.AssetName('54534c41'),
   nftMetadata: null,
   policyId: Cardano.PolicyId('7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373'),
   quantity: 1000n,
   supply: 1000n,
   tokenMetadata: null
-} as Asset.AssetInfo;
+};
+
+export const handleAssetInfo: Asset.AssetInfo = {
+  assetId: handleAssetId,
+  fingerprint: handleFingerprint,
+  mintOrBurnCount: 1,
+  name: handleAssetName,
+  policyId: handlePolicyId,
+  quantity: 1n,
+  supply: 1n
+};
 
 export const mockAssetProvider = () => ({
   getAsset: jest.fn().mockResolvedValue(asset),
-  getAssets: jest.fn().mockResolvedValue([asset]),
+  getAssets: jest
+    .fn()
+    .mockImplementation(async ({ assetIds }) =>
+      assetIds.map((assetId: Cardano.AssetId) => (assetId === handleAssetId ? handleAssetInfo : asset))
+    ),
   healthCheck: jest.fn().mockResolvedValue({ ok: true })
 });
 

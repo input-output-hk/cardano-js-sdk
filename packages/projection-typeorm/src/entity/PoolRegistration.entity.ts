@@ -2,7 +2,9 @@
 import { BigIntColumnOptions, DeleteCascadeRelationOptions } from './util';
 import { BlockEntity } from './Block.entity';
 import { Cardano } from '@cardano-sdk/core';
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn } from 'typeorm';
+import { Percent } from '@cardano-sdk/util';
+import { PoolMetadataEntity } from './PoolMetadata.entity';
 import { StakePoolEntity } from './StakePool.entity';
 
 @Entity()
@@ -25,7 +27,7 @@ export class PoolRegistrationEntity {
   @Column({ type: 'jsonb' })
   margin?: Cardano.Fraction;
   @Column({ type: 'float4' })
-  marginPercent?: Cardano.Percent;
+  marginPercent?: Percent;
   @Column('jsonb')
   relays?: Cardano.Relay[];
   @Column('jsonb')
@@ -39,6 +41,8 @@ export class PoolRegistrationEntity {
   @JoinColumn()
   @ManyToOne(() => StakePoolEntity, (stakePool) => stakePool.registrations, DeleteCascadeRelationOptions)
   stakePool?: StakePoolEntity;
+  @OneToOne(() => PoolMetadataEntity, (metadata) => metadata.poolUpdate)
+  metadata?: PoolMetadataEntity | null;
   @ManyToOne(() => BlockEntity, DeleteCascadeRelationOptions)
   @JoinColumn()
   block?: BlockEntity;

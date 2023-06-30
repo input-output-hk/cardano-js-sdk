@@ -11,24 +11,23 @@ import { firstValueFrom } from 'rxjs';
 
 export const initializeTx = async (
   props: InitializeTxProps,
-  {
-    txBuilderProviders,
-    inputSelector = roundRobinRandomImprove(),
-    inputResolver,
-    keyAgent,
-    logger
-  }: TxBuilderDependencies
+  { txBuilderProviders, inputSelector, inputResolver, keyAgent, logger }: TxBuilderDependencies
 ): Promise<InitializeTxResult> => {
-  const [tip, genesisParameters, protocolParameters, addresses, changeAddress, rewardAccounts, utxo] =
-    await Promise.all([
-      txBuilderProviders.tip(),
-      txBuilderProviders.genesisParameters(),
-      txBuilderProviders.protocolParameters(),
-      firstValueFrom(keyAgent.knownAddresses$),
-      txBuilderProviders.changeAddress(),
-      txBuilderProviders.rewardAccounts(),
-      txBuilderProviders.utxoAvailable()
-    ]);
+  const [tip, genesisParameters, protocolParameters, addresses, rewardAccounts, utxo] = await Promise.all([
+    txBuilderProviders.tip(),
+    txBuilderProviders.genesisParameters(),
+    txBuilderProviders.protocolParameters(),
+    firstValueFrom(keyAgent.knownAddresses$),
+    txBuilderProviders.rewardAccounts(),
+    txBuilderProviders.utxoAvailable()
+  ]);
+
+  inputSelector =
+    inputSelector ??
+    roundRobinRandomImprove({
+      getChangeAddress: async () => addresses[0].address
+    });
+
   const validityInterval = ensureValidityInterval(tip.slot, genesisParameters, props.options?.validityInterval);
   const withdrawals: Cardano.Withdrawal[] = rewardAccounts
     .map(({ rewardBalance: quantity, address: stakeAddress }) => ({
@@ -46,7 +45,6 @@ export const initializeTx = async (
       const unsignedTx = await createTransactionInternals({
         auxiliaryData: props.auxiliaryData,
         certificates: props.certificates,
-        changeAddress,
         collaterals: props.collaterals,
         inputSelection,
         mint: props.mint,
@@ -60,6 +58,7 @@ export const initializeTx = async (
         unsignedTx,
         {
           auxiliaryData: props.auxiliaryData,
+          handles: props.handles ?? [],
           ownAddresses: addresses,
           signingOptions: props.signingOptions,
           witness: props.witness
@@ -86,7 +85,6 @@ export const initializeTx = async (
   const { body, hash } = await createTransactionInternals({
     auxiliaryData: props.auxiliaryData,
     certificates: props.certificates,
-    changeAddress,
     collaterals: props.collaterals,
     inputSelection,
     mint: props.mint,

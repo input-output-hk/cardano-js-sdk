@@ -26,6 +26,10 @@ export const outputBuilderProperties: RemoteApiProperties<OutputBuilder> = {
     getApiProperties: () => outputBuilderProperties,
     propType: RemoteApiPropertyType.ApiFactory
   },
+  handle: {
+    getApiProperties: () => outputBuilderProperties,
+    propType: RemoteApiPropertyType.ApiFactory
+  },
   inspect: RemoteApiPropertyType.MethodReturningPromise,
   value: {
     getApiProperties: () => outputBuilderProperties,
@@ -92,6 +96,7 @@ export const observableWalletProperties: RemoteApiProperties<ObservableWallet> =
   },
   currentEpoch$: RemoteApiPropertyType.HotObservable,
   delegation: {
+    distribution$: RemoteApiPropertyType.HotObservable,
     rewardAccounts$: RemoteApiPropertyType.HotObservable,
     rewardsHistory$: RemoteApiPropertyType.HotObservable
   },
@@ -100,6 +105,7 @@ export const observableWalletProperties: RemoteApiProperties<ObservableWallet> =
   finalizeTx: RemoteApiPropertyType.MethodReturningPromise,
   genesisParameters$: RemoteApiPropertyType.HotObservable,
   getName: RemoteApiPropertyType.MethodReturningPromise,
+  handles$: RemoteApiPropertyType.HotObservable,
   initializeTx: RemoteApiPropertyType.MethodReturningPromise,
   protocolParameters$: RemoteApiPropertyType.HotObservable,
   signData: RemoteApiPropertyType.MethodReturningPromise,

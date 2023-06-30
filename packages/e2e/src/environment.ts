@@ -14,6 +14,10 @@ export interface ProviderParams {
   baseUrl: string;
 }
 
+export interface HandleProviderParams {
+  serverUrl: string;
+}
+
 const baseValidator = <T>(value: string, schema: Schema, ...dependencySchemas: Schema[]) => {
   const parsed = JSON.parse(value) as T;
   const v = new SchemaValidator();
@@ -71,6 +75,24 @@ const providerParams = makeValidator((value) => {
   return validated;
 });
 
+const handleProviderParams = makeValidator((value) => {
+  const validated = baseValidator<HandleProviderParams>(value, {
+    properties: { policyId: { type: 'string' }, serverUrl: { type: 'string' } },
+    required: ['serverUrl'],
+    type: 'object'
+  });
+
+  try {
+    // eslint-disable-next-line no-new
+    new URL(validated.serverUrl);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    throw new Error(`serverUrl: ${error.message}`);
+  }
+
+  return validated;
+});
+
 /**
  * Shared across all tests
  */
@@ -82,6 +104,8 @@ const validators = {
   CHAIN_HISTORY_PROVIDER: str(),
   CHAIN_HISTORY_PROVIDER_PARAMS: providerParams(),
   DB_SYNC_CONNECTION_STRING: str({ default: undefined }),
+  HANDLE_PROVIDER: str(),
+  HANDLE_PROVIDER_PARAMS: handleProviderParams(),
   KEY_MANAGEMENT_PARAMS: keyManagementParams(),
   KEY_MANAGEMENT_PROVIDER: str(),
   LOGGER_MIN_SEVERITY: str({ default: 'info' }),
@@ -141,6 +165,8 @@ export const walletVariables = [
   'ASSET_PROVIDER_PARAMS',
   'CHAIN_HISTORY_PROVIDER',
   'CHAIN_HISTORY_PROVIDER_PARAMS',
+  'HANDLE_PROVIDER',
+  'HANDLE_PROVIDER_PARAMS',
   'KEY_MANAGEMENT_PARAMS',
   'KEY_MANAGEMENT_PROVIDER',
   'LOGGER_MIN_SEVERITY',
