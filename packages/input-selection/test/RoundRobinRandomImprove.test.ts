@@ -1,10 +1,6 @@
-import { Cardano } from '@cardano-sdk/core';
-import { SelectionConstraints } from './util';
+import { MockChangeAddressResolver, SelectionConstraints } from './util';
 import { TxTestUtil } from '@cardano-sdk/util-dev';
 import { roundRobinRandomImprove } from '../src/RoundRobinRandomImprove';
-
-const changeAddress =
-  'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9' as Cardano.PaymentAddress;
 
 describe('RoundRobinRandomImprove', () => {
   it('Recomputes fee after selecting an extra utxo due to change not meeting minimumCoinQuantity', async () => {
@@ -27,7 +23,10 @@ describe('RoundRobinRandomImprove', () => {
      */
     const random = jest.fn().mockReturnValue(0).mockReturnValueOnce(0).mockReturnValueOnce(0.99);
 
-    const results = await roundRobinRandomImprove({ getChangeAddress: async () => changeAddress, random }).select({
+    const results = await roundRobinRandomImprove({
+      changeAddressResolver: new MockChangeAddressResolver(),
+      random
+    }).select({
       constraints: SelectionConstraints.mockConstraintsToConstraints({
         ...SelectionConstraints.MOCK_NO_CONSTRAINTS,
         minimumCoinQuantity: 900_000n,

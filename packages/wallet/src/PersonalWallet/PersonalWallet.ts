@@ -81,6 +81,12 @@ import {
   tap,
   throwError
 } from 'rxjs';
+import {
+  ChangeAddressResolver,
+  InputSelector,
+  StaticChangeAddressResolver,
+  roundRobinRandomImprove
+} from '@cardano-sdk/input-selection';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import {
   GenericTxBuilder,
@@ -92,7 +98,6 @@ import {
   finalizeTx,
   initializeTx
 } from '@cardano-sdk/tx-construction';
-import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { Shutdown, contextLogger, deepEquals } from '@cardano-sdk/util';
@@ -224,6 +229,7 @@ export class PersonalWallet implements ObservableWallet {
   readonly util: WalletUtil;
   readonly rewardsProvider: TrackedRewardsProvider;
   readonly handleProvider?: HandleProvider;
+  readonly changeAddressResolver: ChangeAddressResolver;
 
   // eslint-disable-next-line max-statements
   constructor(
@@ -326,8 +332,14 @@ export class PersonalWallet implements ObservableWallet {
     this.#inputSelector = inputSelector
       ? inputSelector
       : roundRobinRandomImprove({
-          getChangeAddress: () =>
-            this.#firstValueFromSettled(this.addresses$.pipe(map(([{ address: changeAddress }]) => changeAddress)))
+          changeAddressResolver: new StaticChangeAddressResolver(() =>
+            firstValueFrom(
+              this.syncStatus.isSettled$.pipe(
+                filter((isSettled) => isSettled),
+                switchMap(() => this.addresses$)
+              )
+            )
+          )
         });
 
     this.#tip$ = this.tip$ = new TipTracker({
@@ -600,6 +612,22 @@ export class PersonalWallet implements ObservableWallet {
     this.#reemitSubscriptions.unsubscribe();
     this.#failedFromReemitter$.complete();
     this.#logger.debug('Shutdown');
+  }
+
+  /**
+   * Sets the wallet input selector.
+   *
+   * @param selector The input selector to be used.
+   */
+  setInputSelector(selector: InputSelector) {
+    this.#inputSelector = selector;
+  }
+
+  /**
+   * Gets the wallet input selector.
+   */
+  getInputSelector() {
+    return this.#inputSelector;
   }
 
   /**
