@@ -20,6 +20,12 @@ import { firstValueFrom } from 'rxjs';
 const env = getEnv(walletVariables);
 const logger = createLogger();
 
+const toHex = (value: string) =>
+  value
+    .split('')
+    .map((s) => s.charCodeAt(0).toString(16))
+    .join('');
+
 type HandleMetadata = {
   [policyId: string]: {
     [handleName: string]: {
@@ -53,7 +59,7 @@ const createHandleMetadata = (handlePolicyId: string, handleNames: string[]): Ha
       },
       description: 'The Handle Standard',
       image: 'ipfs://some-hash',
-      name: '$handle1',
+      name: `$${key}`,
       website: 'https://cardano.org/'
     };
   }
@@ -68,7 +74,7 @@ describe('Ada handle', () => {
   let policyScript: Cardano.NativeScript;
   let assetIds: Cardano.AssetId[];
 
-  const assetNames = ['68616e646c6531', '68616e646c6532'];
+  const assetNames = ['handle1', 'handle2'];
   let walletAddress: Cardano.PaymentAddress;
   const coins = 2_000_000n; // number of coins to use in each transaction
 
@@ -172,7 +178,10 @@ describe('Ada handle', () => {
       })
     ).wallet;
     await Promise.all([walletReady(wallet, coins), walletReady(receivingWallet, 0n)]);
-    assetIds = [Cardano.AssetId(`${policyId}${assetNames[0]}`), Cardano.AssetId(`${policyId}${assetNames[1]}`)];
+    assetIds = [
+      Cardano.AssetId(`${policyId}${toHex(assetNames[0])}`),
+      Cardano.AssetId(`${policyId}${toHex(assetNames[1])}`)
+    ];
     walletAddress = (await firstValueFrom(wallet.addresses$))[0].address;
   });
 
@@ -199,7 +208,7 @@ describe('Ada handle', () => {
       [assetIds[0], 1n],
       [assetIds[1], 1n]
     ]);
-    const txMetadatum = metadatum.jsonToMetadatum(createHandleMetadata(policyId, ['handle1', 'handle2']));
+    const txMetadatum = metadatum.jsonToMetadatum(createHandleMetadata(policyId, assetNames));
     await mint(tokens, txMetadatum);
     let utxo = await firstValueFrom(wallet.balance.utxo.available$);
     let receivingUtxo = await firstValueFrom(receivingWallet.balance.utxo.available$);
@@ -210,6 +219,7 @@ describe('Ada handle', () => {
     expect(handles.length).toEqual(2);
     expect(receivingHandles.length).toEqual(0);
 
+    // send handle to another wallet
     const token = new Map([[assetIds[0], 1n]]);
     const destAddresses = (await firstValueFrom(receivingWallet.addresses$))[0].address;
     const txBuilder = wallet.createTxBuilder();
@@ -229,12 +239,23 @@ describe('Ada handle', () => {
     receivingHandles = await firstValueFrom(receivingWallet.handles$);
     expect(handles.length).toEqual(1);
     expect(receivingHandles.length).toEqual(1);
+
+    // send ada using handle
+    // const txBuilder2 = wallet.createTxBuilder();
+    // const { tx: tx2 } = await txBuilder2
+    //   .addOutput(await txBuilder.buildOutput().handle(receivingHandles[0].handle).coin(coins).build())
+    //   .build()
+    //   .sign();
+    // await wallet.submitTx(tx2);
+    // await txConfirmed(receivingWallet, tx2);
+    // const receivingUtxoAfter = await firstValueFrom(receivingWallet.balance.utxo.available$);
+    // expect(receivingUtxoAfter.coins).toEqual(receivingUtxo.coins + coins);
   });
 
   describe('double mint handling', () => {
     it('filters out double mints in separate transactions', async () => {
       const tokens: TokenMap = new Map([[assetIds[0], 1n]]);
-      const txMetadatum: Metadatum = metadatum.jsonToMetadatum(createHandleMetadata(policyId, ['handle1']));
+      const txMetadatum: Metadatum = metadatum.jsonToMetadatum(createHandleMetadata(policyId, [assetNames[0]]));
       await mint(tokens, txMetadatum);
       let handles = await firstValueFrom(wallet.handles$);
       expect(handles.length).toEqual(1);
@@ -248,7 +269,7 @@ describe('Ada handle', () => {
 
     it('filters out double mints from within the same transaction', async () => {
       const tokens = new Map([[assetIds[0], 2n]]);
-      const txMetadatum: Metadatum = metadatum.jsonToMetadatum(createHandleMetadata(policyId, ['handle1']));
+      const txMetadatum: Metadatum = metadatum.jsonToMetadatum(createHandleMetadata(policyId, [assetNames[0]]));
       await mint(tokens, txMetadatum);
       await restartWallet();
       const utxo = await firstValueFrom(wallet.balance.utxo.available$);
@@ -259,7 +280,7 @@ describe('Ada handle', () => {
 
     it('shows handle after corrective burn', async () => {
       const tokens = new Map([[assetIds[0], 2n]]);
-      const txMetadatum: Metadatum = metadatum.jsonToMetadatum(createHandleMetadata(policyId, ['handle1']));
+      const txMetadatum: Metadatum = metadatum.jsonToMetadatum(createHandleMetadata(policyId, [assetNames[0]]));
       await mint(tokens, txMetadatum);
       let utxo = await firstValueFrom(wallet.balance.utxo.available$);
       expect(utxo.assets?.values().next().value).toEqual(2n);
