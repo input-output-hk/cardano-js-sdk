@@ -1,4 +1,4 @@
-import { AddressType, CardanoKeyConst, GroupedAddress, KeyRole, util } from '@cardano-sdk/key-management';
+import { AddressType, GroupedAddress, KeyRole } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 
 export const mintTokenMap = new Map([
@@ -72,21 +72,8 @@ export const knownAddress: GroupedAddress = {
   type: AddressType.Internal
 };
 
-export const knownAddressKeyPath = [
-  util.harden(CardanoKeyConst.PURPOSE),
-  util.harden(CardanoKeyConst.COIN_TYPE),
-  util.harden(knownAddress.accountIndex),
-  knownAddress.type,
-  knownAddress.index
-];
-
-export const knownAddressStakingKeyPath = [
-  util.harden(CardanoKeyConst.PURPOSE),
-  util.harden(CardanoKeyConst.COIN_TYPE),
-  util.harden(knownAddress.accountIndex),
-  stakeKeyDerivationPath.role,
-  stakeKeyDerivationPath.index
-];
+export const knownAddressKeyPath = [2_147_485_500, 2_147_485_463, 2_147_483_648, 1, 0];
+export const knownAddressStakeKeyPath = [2_147_485_500, 2_147_485_463, 2_147_483_648, 2, 0];
 
 export const CONTEXT_WITH_KNOWN_ADDRESSES = {
   chainId: {

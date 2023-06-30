@@ -2,15 +2,13 @@ import {
   CONTEXT_WITH_KNOWN_ADDRESSES,
   knownAddress,
   knownAddressKeyPath,
-  knownAddressStakingKeyPath,
+  knownAddressStakeKeyPath,
   txIn
 } from '../testData';
-import { CardanoKeyConst } from '@cardano-sdk/key-management';
 import {
-  bip32PathToStrPath,
   paymentKeyPathFromGroupedAddress,
   resolvePaymentKeyPathForTxIn,
-  stakingKeyPathFromGroupedAddress
+  stakeKeyPathFromGroupedAddress
 } from '../../src';
 
 const address = CONTEXT_WITH_KNOWN_ADDRESSES.knownAddresses[0];
@@ -21,26 +19,14 @@ describe('key-paths', () => {
       expect(paymentKeyPathFromGroupedAddress(address)).toEqual(knownAddressKeyPath);
     });
   });
-  describe('stakingKeyPathFromGroupedAddress', () => {
+  describe('stakeKeyPathFromGroupedAddress', () => {
     it('returns null when given an undefined stakeKeyDerivationPath', async () => {
       const knownAddressClone = { ...knownAddress };
       delete knownAddressClone.stakeKeyDerivationPath;
-      expect(stakingKeyPathFromGroupedAddress(knownAddressClone)).toEqual(null);
+      expect(stakeKeyPathFromGroupedAddress(knownAddressClone)).toEqual(null);
     });
-    it('returns a hardened BIP32 payment key path', () => {
-      expect(stakingKeyPathFromGroupedAddress(address)).toEqual(knownAddressStakingKeyPath);
-    });
-  });
-  describe('bip32PathToStrPath', () => {
-    it('can stringify payment key path', () => {
-      expect(bip32PathToStrPath(knownAddressKeyPath)).toEqual(
-        `m/${CardanoKeyConst.PURPOSE}'/${CardanoKeyConst.COIN_TYPE}'/${knownAddress.accountIndex}'/${knownAddress.type}/${knownAddress.index}`
-      );
-    });
-    it('can stringify staking key path', () => {
-      expect(bip32PathToStrPath(knownAddressStakingKeyPath)).toEqual(
-        `m/${CardanoKeyConst.PURPOSE}'/${CardanoKeyConst.COIN_TYPE}'/${knownAddress.accountIndex}'/${knownAddress.stakeKeyDerivationPath?.role}/${knownAddress.stakeKeyDerivationPath?.index}`
-      );
+    it('returns a hardened BIP32 stake key path', () => {
+      expect(stakeKeyPathFromGroupedAddress(address)).toEqual(knownAddressStakeKeyPath);
     });
   });
   describe('resolveKeyPath', () => {

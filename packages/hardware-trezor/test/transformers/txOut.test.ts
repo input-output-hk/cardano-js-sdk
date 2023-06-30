@@ -1,6 +1,8 @@
 import * as Trezor from 'trezor-connect';
 import {
   CONTEXT_WITH_KNOWN_ADDRESSES,
+  knownAddressKeyPath,
+  knownAddressStakeKeyPath,
   txOut,
   txOutToOwnedAddress,
   txOutWithAssets,
@@ -83,8 +85,8 @@ describe('txOut', () => {
         expect(out).toEqual({
           addressParameters: {
             addressType: Trezor.CardanoAddressType.BASE,
-            path: "m/1852'/1815'/0'/1/0",
-            stakingPath: "m/1852'/1815'/0'/2/0"
+            path: knownAddressKeyPath,
+            stakingPath: knownAddressStakeKeyPath
           },
           amount: '10'
         });
@@ -103,8 +105,8 @@ describe('txOut', () => {
         expect(out).toEqual({
           addressParameters: {
             addressType: Trezor.CardanoAddressType.BASE,
-            path: "m/1852'/1815'/0'/1/0",
-            stakingPath: "m/1852'/1815'/0'/2/0"
+            path: knownAddressKeyPath,
+            stakingPath: knownAddressStakeKeyPath
           },
           amount: '10',
           tokenBundle: [
@@ -203,8 +205,8 @@ describe('txOut', () => {
       expect(out).toEqual({
         addressParameters: {
           addressType: Trezor.CardanoAddressType.BASE,
-          path: "m/1852'/1815'/0'/1/0",
-          stakingPath: "m/1852'/1815'/0'/2/0"
+          path: knownAddressKeyPath,
+          stakingPath: knownAddressStakeKeyPath
         },
         amount: '10'
       });
@@ -216,8 +218,8 @@ describe('txOut', () => {
       expect(out).toEqual({
         addressParameters: {
           addressType: Trezor.CardanoAddressType.BASE,
-          path: "m/1852'/1815'/0'/1/0",
-          stakingPath: "m/1852'/1815'/0'/2/0"
+          path: knownAddressKeyPath,
+          stakingPath: knownAddressStakeKeyPath
         },
         amount: '10',
         tokenBundle: [

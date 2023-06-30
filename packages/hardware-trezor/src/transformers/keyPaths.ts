@@ -16,8 +16,8 @@ export const paymentKeyPathFromGroupedAddress = (address: GroupedAddress): BIP32
   address.index
 ];
 
-export const stakingKeyPathFromGroupedAddress = (address: GroupedAddress): BIP32Path | null => {
-  if (address && address.stakeKeyDerivationPath) {
+export const stakeKeyPathFromGroupedAddress = (address: GroupedAddress): BIP32Path | null => {
+  if (address.stakeKeyDerivationPath) {
     return [
       util.harden(CardanoKeyConst.PURPOSE),
       util.harden(CardanoKeyConst.COIN_TYPE),
@@ -41,11 +41,4 @@ export const resolvePaymentKeyPathForTxIn = async (
   const txOut = await context.inputResolver.resolveInput(txIn);
   const knownAddress = context.knownAddresses.find(({ address }) => address === txOut?.address);
   return knownAddress ? paymentKeyPathFromGroupedAddress(knownAddress) : null;
-};
-
-export const bip32PathToStrPath = (bip32Path: BIP32Path): string => {
-  const purpose = bip32Path[0] - 0x80_00_00_00;
-  const coinType = bip32Path[1] - 0x80_00_00_00;
-  const accountIndex = bip32Path[2] - 0x80_00_00_00;
-  return `m/${purpose}'/${coinType}'/${accountIndex}'/${bip32Path[3]}/${bip32Path[4]}`;
 };
