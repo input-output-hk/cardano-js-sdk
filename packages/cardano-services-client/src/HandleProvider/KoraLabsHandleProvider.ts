@@ -1,6 +1,7 @@
 import {
   Asset,
   Cardano,
+  HandleProvider,
   HandleResolution,
   HealthCheckResponse,
   ProviderError,
@@ -47,7 +48,7 @@ export const toHandleResolution = ({
  *
  * @param KoraLabsHandleProviderDeps The configuration object fot the KoraLabs Handle Provider.
  */
-export class KoraLabsHandleProvider {
+export class KoraLabsHandleProvider implements HandleProvider {
   private axiosClient: AxiosInstance;
   policyId: Cardano.PolicyId;
 
