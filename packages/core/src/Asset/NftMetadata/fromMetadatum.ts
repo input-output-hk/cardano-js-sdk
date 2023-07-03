@@ -1,6 +1,7 @@
-import { AssetInfo, ImageMediaType, MediaType, NftMetadata, NftMetadataFile, Uri } from '../types';
+import { AssetInfo } from '../types';
 import { Cardano } from '../..';
 import { CustomError } from 'ts-custom-error';
+import { ImageMediaType, MediaType, NftMetadata, NftMetadataFile, Uri } from './types';
 import { Logger } from 'ts-log';
 import { asMetadatumArray, asMetadatumMap } from '../../util/metadatum';
 import { isNotNil } from '@cardano-sdk/util';
@@ -101,16 +102,16 @@ const getAssetMetadata = (policy: Cardano.MetadatumMap, assetName: Cardano.Asset
       })()
   );
 
-// TODO: consider hoisting this function together with cip25 types to core or a new cip25 package
 /**
- * @returns {NftMetadata | null} CIP-0025 NFT metadata
+ * @param asset try to parse NftMetadata for this asset
+ * @param metadata transaction metadata (see CIP-0025)
  */
-export const metadatumToCip25 = (
+export const fromMetadatum = (
   asset: Pick<AssetInfo, 'policyId' | 'name'>,
-  metadatumMap: Cardano.MetadatumMap | undefined,
+  metadata: Cardano.TxMetadata | undefined,
   logger: Logger
 ): NftMetadata | null => {
-  const cip25Metadata = metadatumMap?.get(721n);
+  const cip25Metadata = metadata?.get(721n);
   if (!cip25Metadata) return null;
   const cip25MetadatumMap = asMetadatumMap(cip25Metadata);
   if (!cip25MetadatumMap) return null;
