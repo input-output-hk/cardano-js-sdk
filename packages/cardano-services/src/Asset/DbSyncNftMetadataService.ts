@@ -39,6 +39,6 @@ export class DbSyncNftMetadataService implements NftMetadataService {
     this.#logger.debug('Querying tx metadata', lastMintedTxId);
     const metadatas = await this.#metadataService.queryTxMetadataByHashes([lastMintedTxId]);
     const metadata = metadatas.get(lastMintedTxId);
-    return Asset.util.metadatumToCip25(assetInfo, metadata, this.#logger);
+    return Asset.NftMetadata.fromMetadatum(assetInfo, metadata, this.#logger);
   }
 }
