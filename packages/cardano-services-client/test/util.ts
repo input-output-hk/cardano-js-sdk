@@ -49,14 +49,14 @@ export const getAliceHandleProviderResponse = {
 };
 
 export const getBobHandleProviderResponse = {
-  backgroundImage: 'ipfs://zrljm7nskakjydxlr450ktsj08zuw6aktvgfkmmyw9semrkrezryq3yd',
+  backgroundImage: Asset.Uri('ipfs://zrljm7nskakjydxlr450ktsj08zuw6aktvgfkmmyw9semrkrezryq3yd'),
   cardanoAddress:
     'addr_test1qzrljm7nskakjydxlr450ktsj08zuw6aktvgfkmmyw9semrkrezryq3ydtmkg0e7e2jvzg443h0ffzfwd09wpcxy2fuql9tk0g',
   handle: 'bob',
   hasDatum: false,
   image: Asset.Uri('ipfs://c8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe'),
   policyId: Cardano.PolicyId('50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb'),
-  profilePic: 'ipfs://zrljm7nskakjydxlr450ktsj08zuw6aktvgfkmmyw9semrkrezryq3yd'
+  profilePic: Asset.Uri('ipfs://zrljm7nskakjydxlr450ktsj08zuw6aktvgfkmmyw9semrkrezryq3yd1')
 };
 
 export const getAliceHandleAPIResponse: Partial<IHandle> = {
@@ -81,7 +81,7 @@ export const getAliceHandleAPIResponse: Partial<IHandle> = {
 };
 
 export const getBobHandleAPIResponse: Partial<IHandle> = {
-  bg_image: 'zrljm7nskakjydxlr450ktsj08zuw6aktvgfkmmyw9semrkrezryq3yd',
+  bg_image: 'ipfs://zrljm7nskakjydxlr450ktsj08zuw6aktvgfkmmyw9semrkrezryq3yd',
   characters: 'rljm7n/23455',
   created_slot_number: 33,
   default_in_wallet: 'bob_default_handle',
@@ -93,7 +93,7 @@ export const getBobHandleAPIResponse: Partial<IHandle> = {
   name: 'bob',
   numeric_modifiers: '-12.9',
   og_number: 5,
-  pfp_image: 'zrljm7nskakjydxlr450ktsj08zuw6aktvgfkmmyw9semrkrezryq3yd',
+  pfp_image: 'ipfs://zrljm7nskakjydxlr450ktsj08zuw6aktvgfkmmyw9semrkrezryq3yd1',
   rarity: Rarity.rare,
   resolved_addresses: {
     ada: 'addr_test1qzrljm7nskakjydxlr450ktsj08zuw6aktvgfkmmyw9semrkrezryq3ydtmkg0e7e2jvzg443h0ffzfwd09wpcxy2fuql9tk0g'
