@@ -12,10 +12,10 @@ import { mapWithdrawals, toTrezorWithdrawal } from '../../src/transformers';
 
 describe('withdrawals', () => {
   describe('mapWithdrawals', () => {
-    it('return undefined if given an undefined object as withdrawal', async () => {
-      const withdrawals: Cardano.Withdrawal[] | undefined = undefined;
+    it('returns an empty array if there are no withdrawals', async () => {
+      const withdrawals: Cardano.Withdrawal[] = [];
       const txIns = mapWithdrawals(withdrawals, contextWithKnownAddresses);
-      expect(txIns).toEqual(undefined);
+      expect(txIns).toEqual([]);
     });
 
     it('can map a a set of withdrawals', async () => {

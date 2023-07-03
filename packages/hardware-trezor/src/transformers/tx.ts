@@ -18,7 +18,7 @@ const trezorTxTransformer = async (
 ): Promise<Partial<Trezor.CardanoSignTransaction>> => ({
   fee: body.fee.toString(),
   inputs: await mapTxIns(body.inputs, context),
-  withdrawals: mapWithdrawals(body.withdrawals, context)
+  withdrawals: mapWithdrawals(body.withdrawals ?? [], context)
 });
 
 /**

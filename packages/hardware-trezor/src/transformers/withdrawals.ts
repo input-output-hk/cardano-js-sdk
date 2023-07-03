@@ -43,7 +43,6 @@ export const toTrezorWithdrawal = (
 };
 
 export const mapWithdrawals = (
-  withdrawals: Cardano.Withdrawal[] | undefined,
+  withdrawals: Cardano.Withdrawal[],
   context: TrezorTxTransformerContext
-): Trezor.CardanoWithdrawal[] | undefined =>
-  withdrawals ? withdrawals.map((coreWithdrawal) => toTrezorWithdrawal(coreWithdrawal, context)) : undefined;
+): Trezor.CardanoWithdrawal[] => withdrawals.map((coreWithdrawal) => toTrezorWithdrawal(coreWithdrawal, context));
