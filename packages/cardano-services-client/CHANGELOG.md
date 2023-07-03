@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.10.2...@cardano-sdk/cardano-services-client@0.10.3) (2023-07-03)
+
+### Bug Fixes
+
+* **cardano-services-client:** type of KoraLabsHandleProvider to be implementing HandleProvider ([96f36da](https://github.com/input-output-hk/cardano-js-sdk/commit/96f36da478a27137a3353e50eedf06e02aebda17))
+
 ## [0.10.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.10.1...@cardano-sdk/cardano-services-client@0.10.2) (2023-06-29)
 
 ### Bug Fixes
