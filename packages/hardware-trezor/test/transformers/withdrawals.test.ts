@@ -8,7 +8,7 @@ import {
   stakeKeyHash,
   stakeScriptHash
 } from '../testData';
-import { mapWithdrawals, toWithdrawal } from '../../src/transformers';
+import { mapWithdrawals, toTrezorWithdrawal } from '../../src/transformers';
 
 describe('withdrawals', () => {
   describe('mapWithdrawals', () => {
@@ -24,21 +24,17 @@ describe('withdrawals', () => {
         contextWithKnownAddresses
       );
 
-      expect(withdrawals!.length).toEqual(3);
-
-      for (const withdrawal of withdrawals!) {
-        expect(withdrawal).toEqual({
-          amount: '5',
-          path: [util.harden(CardanoKeyConst.PURPOSE), util.harden(CardanoKeyConst.COIN_TYPE), util.harden(0), 2, 0]
-        });
-      }
-      expect.assertions(4);
+      const expectedWithdrawal = {
+        amount: '5',
+        path: [util.harden(CardanoKeyConst.PURPOSE), util.harden(CardanoKeyConst.COIN_TYPE), util.harden(0), 2, 0]
+      };
+      expect(withdrawals).toEqual([expectedWithdrawal, expectedWithdrawal, expectedWithdrawal]);
     });
   });
 
-  describe('toWithdrawals', () => {
+  describe('toTrezorWithdrawals', () => {
     it('can map a withdrawal with known address', async () => {
-      const withdrawal = toWithdrawal(coreWithdrawalWithKeyHashCredential, contextWithKnownAddresses);
+      const withdrawal = toTrezorWithdrawal(coreWithdrawalWithKeyHashCredential, contextWithKnownAddresses);
       expect(withdrawal).toEqual({
         amount: '5',
         path: [util.harden(CardanoKeyConst.PURPOSE), util.harden(CardanoKeyConst.COIN_TYPE), util.harden(0), 2, 0]
@@ -46,7 +42,7 @@ describe('withdrawals', () => {
     });
 
     it('can map a withdrawal with unknown address', async () => {
-      const withdrawal = toWithdrawal(coreWithdrawalWithKeyHashCredential, contextWithoutKnownAddresses);
+      const withdrawal = toTrezorWithdrawal(coreWithdrawalWithKeyHashCredential, contextWithoutKnownAddresses);
       expect(withdrawal).toEqual({
         amount: '5',
         keyHash: stakeKeyHash
@@ -54,7 +50,7 @@ describe('withdrawals', () => {
     });
 
     it('can map a withdrawal with script credential', async () => {
-      const withdrawal = toWithdrawal(coreWithdrawalWithScriptHashCredential, contextWithoutKnownAddresses);
+      const withdrawal = toTrezorWithdrawal(coreWithdrawalWithScriptHashCredential, contextWithoutKnownAddresses);
       expect(withdrawal).toEqual({
         amount: '5',
         scriptHash: stakeScriptHash

@@ -4,7 +4,7 @@ import { InvalidArgumentError } from '@cardano-sdk/util';
 import { TrezorTxTransformerContext } from '../types';
 import { resolveStakeKeyPath } from './keyPaths';
 
-export const toWithdrawal = (
+export const toTrezorWithdrawal = (
   withdrawal: Cardano.Withdrawal,
   context: TrezorTxTransformerContext
 ): Trezor.CardanoWithdrawal => {
@@ -14,6 +14,13 @@ export const toWithdrawal = (
   if (!rewardAddress) throw new InvalidArgumentError('withdrawal', 'Invalid withdrawal stake address');
 
   let trezorWithdrawal;
+  /**
+   * The credential specifies who should control the funds or the staking rights for that address.
+   *
+   * The credential type could be:
+   * - The stake key hash or payment key hash, blake2b-224 hash digests of Ed25519 verification keys.
+   * - The script hash, blake2b-224 hash digests of serialized monetary scripts.
+   */
   if (rewardAddress.getPaymentCredential().type === Cardano.CredentialType.KeyHash) {
     const keyPath = resolveStakeKeyPath(rewardAddress, context);
     trezorWithdrawal = keyPath
@@ -39,4 +46,4 @@ export const mapWithdrawals = (
   withdrawals: Cardano.Withdrawal[] | undefined,
   context: TrezorTxTransformerContext
 ): Trezor.CardanoWithdrawal[] | undefined =>
-  withdrawals ? withdrawals.map((coreWithdrawal) => toWithdrawal(coreWithdrawal, context)) : undefined;
+  withdrawals ? withdrawals.map((coreWithdrawal) => toTrezorWithdrawal(coreWithdrawal, context)) : undefined;

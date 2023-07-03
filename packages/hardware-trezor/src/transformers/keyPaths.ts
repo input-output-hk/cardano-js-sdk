@@ -17,18 +17,14 @@ export const paymentKeyPathFromGroupedAddress = (address: GroupedAddress): BIP32
 ];
 
 export const stakeKeyPathFromGroupedAddress = (address: GroupedAddress | undefined): BIP32Path | null => {
-  if (!address) return null;
-  if (address.stakeKeyDerivationPath) {
-    return [
-      util.harden(CardanoKeyConst.PURPOSE),
-      util.harden(CardanoKeyConst.COIN_TYPE),
-      util.harden(address.accountIndex),
-      address.stakeKeyDerivationPath.role,
-      address.stakeKeyDerivationPath.index
-    ];
-  }
-
-  return null;
+  if (!address?.stakeKeyDerivationPath) return null;
+  return [
+    util.harden(CardanoKeyConst.PURPOSE),
+    util.harden(CardanoKeyConst.COIN_TYPE),
+    util.harden(address.accountIndex),
+    address.stakeKeyDerivationPath.role,
+    address.stakeKeyDerivationPath.index
+  ];
 };
 
 /**
