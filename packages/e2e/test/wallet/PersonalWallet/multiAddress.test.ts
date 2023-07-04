@@ -17,7 +17,8 @@ import { isNotNil } from '@cardano-sdk/util';
 
 const env = getEnv(walletVariables);
 const logger = createLogger();
-const PAYMENT_ADDRESSES_TO_GENERATE = 60;
+const PAYMENT_INDICES_TO_GENERATE = 30;
+const PAYMENT_ADDRESSES_TO_GENERATE = PAYMENT_INDICES_TO_GENERATE * 2; // External + Internal address for each payment derivation index
 const COINS_PER_ADDRESS = 3_000_000n;
 
 describe('PersonalWallet/multiAddress', () => {
@@ -49,17 +50,28 @@ describe('PersonalWallet/multiAddress', () => {
     const addressesToBeDiscovered = new Array<GroupedAddress>();
 
     // Deposit some tADA at some generated addresses from the previously generated mnemonics.
-    for (let i = 0; i < PAYMENT_ADDRESSES_TO_GENERATE; ++i) {
-      const address = await multiAddressKeyAgent.deriveAddress(
-        {
-          index: i,
-          type: AddressType.External
-        },
-        0
-      );
+    for (let i = 0; i < PAYMENT_INDICES_TO_GENERATE; ++i) {
+      const [addressExternal, addressInternal] = await Promise.all([
+        multiAddressKeyAgent.deriveAddress(
+          {
+            index: i,
+            type: AddressType.External
+          },
+          0
+        ),
+        multiAddressKeyAgent.deriveAddress(
+          {
+            index: i,
+            type: AddressType.Internal
+          },
+          0
+        )
+      ]);
 
-      addressesToBeDiscovered.push(address);
-      txBuilder.addOutput(txBuilder.buildOutput().address(address.address).coin(3_000_000n).toTxOut());
+      addressesToBeDiscovered.push(addressExternal, addressInternal);
+
+      txBuilder.addOutput(txBuilder.buildOutput().address(addressExternal.address).coin(3_000_000n).toTxOut());
+      txBuilder.addOutput(txBuilder.buildOutput().address(addressInternal.address).coin(3_000_000n).toTxOut());
     }
 
     const { tx: signedTx } = await txBuilder.build().sign();
