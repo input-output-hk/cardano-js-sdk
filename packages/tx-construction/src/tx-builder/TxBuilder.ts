@@ -20,10 +20,10 @@ import { Logger } from 'ts-log';
 import { OutputBuilderValidator, TxOutputBuilder } from './OutputBuilder';
 import { RewardAccountWithPoolId } from '../types';
 import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
-import { contextLogger, deepEquals } from '@cardano-sdk/util';
+import { contextLogger, deepEquals, patchObject } from '@cardano-sdk/util';
 import { createOutputValidator } from '../output-validation';
+import { filter, firstValueFrom, lastValueFrom } from 'rxjs';
 import { finalizeTx } from './finalizeTx';
-import { firstValueFrom, lastValueFrom } from 'rxjs';
 import { initializeTx } from './initializeTx';
 import minBy from 'lodash/minBy';
 
@@ -96,7 +96,12 @@ export class GenericTxBuilder implements TxBuilder {
       createOutputValidator({
         protocolParameters: dependencies.txBuilderProviders.protocolParameters
       });
-    this.#dependencies = dependencies;
+    this.#dependencies = {
+      ...dependencies,
+      keyAgent: patchObject(dependencies.keyAgent, {
+        knownAddresses$: dependencies.keyAgent.knownAddresses$.pipe(filter((addresses) => addresses.length > 0))
+      })
+    };
     this.#logger = dependencies.logger;
     this.#handleProvider = dependencies.handleProvider;
     this.#handles = [];
