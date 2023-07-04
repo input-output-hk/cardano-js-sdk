@@ -33,7 +33,7 @@ EOL
 
 currencySymbol=$(cardano-cli transaction policyid --script-file network-files/utxo-keys/minting-policy.json)
 addr=$(cardano-cli address build --payment-verification-key-file network-files/utxo-keys/utxo1.vkey --testnet-magic 888)
-faucetAddr="addr_test1qqen0wpmhg7fhkus45lyv4wju26cecgu6avplrnm6dgvuk6qel5hu3u3q0fht53ly97yx95hkt56j37ch07pesf6s4pqh5gd4e"
+destAddr="addr_test1qr0c3frkem9cqn5f73dnvqpena27k2fgqew6wct9eaka03agfwkvzr0zyq7nqvcj24zehrshx63zzdxv24x3a4tcnfeq9zwmn7"
 
 # Spend the first UTxO
 utxo=$(cardano-cli query utxo --address "$addr" --testnet-magic 888 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
@@ -49,7 +49,7 @@ cardano-cli transaction build \
   --babbage-era \
   --change-address "$addr" \
   --tx-in "$utxo" \
-  --tx-out "$faucetAddr"+10000000+"$tokenList" \
+  --tx-out "$destAddr"+10000000+"$tokenList" \
   --mint "$tokenList" \
   --mint-script-file network-files/utxo-keys/minting-policy.json \
   --testnet-magic 888 \
