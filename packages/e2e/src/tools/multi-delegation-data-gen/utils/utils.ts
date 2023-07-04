@@ -263,20 +263,27 @@ export const generateStakeAddresses = async (
  * @param stakeDistribution The stake distribution to be followed.
  * @param stakeAddresses The list of stake addresses.
  * @param monitor The progress monitor.
+ * @param pools The pools we are delegating to.
  */
 export const distributeStake = async (
   delegationWallet: PersonalWallet,
   startingFunds: number,
   stakeDistribution: Array<number>,
   stakeAddresses: Array<GroupedAddress>,
-  monitor: TerminalProgressMonitor
-) => {
+  monitor: TerminalProgressMonitor,
+  pools: Array<Cardano.StakePool>
+): Promise<Cardano.Cip17DelegationPortfolio> => {
   // TODO: Replace with delegatePortfolio once LW-6702 is merged.
   const totalWeight = stakeDistribution.reduce((sum, current) => sum + current, 0);
   const stakeDistributionSsPercent = stakeDistribution.map((value) => value / totalWeight);
   monitor.startTask(`Distribute ${startingFunds} among stake addresses [${stakeDistribution.join(', ')}].`);
 
   const txBuilder = delegationWallet.createTxBuilder();
+
+  const portfolio: Cardano.Cip17DelegationPortfolio = {
+    name: 'Portfolio',
+    pools: stakeDistributionSsPercent.map((weight, index) => ({ id: pools[index].hexId, weight }))
+  };
 
   let i = 0;
   const startingFundsMinusFee = startingFunds - 5_000_000;
@@ -291,6 +298,8 @@ export const distributeStake = async (
   await submitAndConfirm(delegationWallet, signedTx);
 
   monitor.endTask('Funds distributed', TaskResult.Success);
+
+  return portfolio;
 };
 
 /**

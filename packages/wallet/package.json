@@ -73,6 +73,7 @@
     "@cardano-sdk/util": "workspace:~",
     "@cardano-sdk/util-rxjs": "workspace:~",
     "backoff-rxjs": "^7.0.0",
+    "bignumber.js": "^9.1.1",
     "delay": "^5.0.0",
     "emittery": "^0.10.0",
     "lodash": "^4.17.21",
