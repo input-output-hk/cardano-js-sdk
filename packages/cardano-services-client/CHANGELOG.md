@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.10.3...@cardano-sdk/cardano-services-client@0.10.4) (2023-07-04)
+
+### Bug Fixes
+
+* **cardano-services-client:** background and profile image as ipfs url ([054b12f](https://github.com/input-output-hk/cardano-js-sdk/commit/054b12f6175d465ca60d3e756e924173e4a6061f))
+
 ## [0.10.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.10.2...@cardano-sdk/cardano-services-client@0.10.3) (2023-07-03)
 
 ### Bug Fixes

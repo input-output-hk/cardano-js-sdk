@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.13.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.12.1...@cardano-sdk/util@0.13.0) (2023-07-04)
+
+### ⚠ BREAKING CHANGES
+
+* added change address resolver to the round robin input selector
+
+### Features
+
+* added change address resolver to the round robin input selector ([ef654ca](https://github.com/input-output-hk/cardano-js-sdk/commit/ef654ca7a7c3217b68360e1d4bee3296e5fc4f0e))
+
 ## [0.12.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.12.0...@cardano-sdk/util@0.12.1) (2023-06-29)
 
 ### Bug Fixes
