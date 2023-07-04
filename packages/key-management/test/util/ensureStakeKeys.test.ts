@@ -73,6 +73,11 @@ describe('ensureStakeKeys', () => {
     expect(knownAddresses.length).toBe(1);
   });
 
+  it('returns all reward accounts', async () => {
+    await keyAgent.deriveAddress({ index: 0, type: AddressType.External }, 0);
+    await expect(util.ensureStakeKeys({ count: 2, keyAgent, logger })).resolves.toHaveLength(2);
+  });
+
   it('takes into account addresses with multiple stake keys and payment keys', async () => {
     await Promise.all([
       keyAgent.deriveAddress({ index: 0, type: AddressType.External }, 0),

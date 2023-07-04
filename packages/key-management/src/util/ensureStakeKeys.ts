@@ -1,8 +1,7 @@
-import { AddressType, AsyncKeyAgent, GroupedAddress, KeyRole } from '../types';
+import { AddressType, AsyncKeyAgent, KeyRole } from '../types';
 import { Cardano } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { firstValueFrom } from 'rxjs';
-import uniq from 'lodash/uniq';
 
 export interface EnsureStakeKeysParams {
   /** Key agent to use */
@@ -17,7 +16,7 @@ export interface EnsureStakeKeysParams {
 /**
  * Given a count, checks if enough stake keys exist and derives
  * more if needed.
- * Returns the newly created reward accounts
+ * Returns all reward accounts
  */
 export const ensureStakeKeys = async ({
   keyAgent,
@@ -26,35 +25,27 @@ export const ensureStakeKeys = async ({
   paymentKeyIndex: index = 0
 }: EnsureStakeKeysParams): Promise<Cardano.RewardAccount[]> => {
   const knownAddresses = await firstValueFrom(keyAgent.knownAddresses$);
-  // Get current number of derived stake keys
-  const stakeKeyIndices = uniq(
+  const stakeKeys = new Map(
     knownAddresses
       .filter(
         ({ stakeKeyDerivationPath }) =>
           stakeKeyDerivationPath?.role === KeyRole.Stake && stakeKeyDerivationPath?.index !== undefined
       )
-      .map(({ stakeKeyDerivationPath }) => stakeKeyDerivationPath!.index)
+      .map(({ rewardAccount, stakeKeyDerivationPath }) => [stakeKeyDerivationPath!.index, rewardAccount])
   );
 
-  const countToDerive = count - stakeKeyIndices.length;
-
-  if (countToDerive <= 0) {
-    // Sufficient stake keys are already created
-    return [];
-  }
-
-  logger.debug(`Stake keys requested: ${count}; got ${stakeKeyIndices.length}`);
+  logger.debug(`Stake keys requested: ${count}; got ${stakeKeys.size}`);
 
   // Need more stake keys for the portfolio
-  const derivedAddresses: Promise<GroupedAddress>[] = [];
-  for (let stakeKeyIdx = 0; derivedAddresses.length < countToDerive; stakeKeyIdx++) {
-    if (!stakeKeyIndices.includes(stakeKeyIdx)) {
-      logger.debug(`No derivation with stake key index ${stakeKeyIdx} exists. Deriving a new stake key.`);
-      derivedAddresses.push(keyAgent.deriveAddress({ index, type: AddressType.External }, stakeKeyIdx));
+  for (let stakeKeyIdx = 0; stakeKeys.size < count; stakeKeyIdx++) {
+    if (!stakeKeys.has(stakeKeyIdx)) {
+      const address = await keyAgent.deriveAddress({ index, type: AddressType.External }, stakeKeyIdx);
+      logger.debug(
+        `No derivation with stake key index ${stakeKeyIdx} exists. Derived a new stake key ${address.rewardAccount}.`
+      );
+      stakeKeys.set(stakeKeyIdx, address.rewardAccount);
     }
   }
 
-  const newAddresses = await Promise.all(derivedAddresses);
-  logger.debug('Derived new addresses:', newAddresses);
-  return newAddresses.map(({ rewardAccount }) => rewardAccount);
+  return [...stakeKeys.values()];
 };
