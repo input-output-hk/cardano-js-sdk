@@ -2587,6 +2587,8 @@ __metadata:
     convict: ^6.2.4
     copy-webpack-plugin: ^10.2.4
     delay: 5.0.0
+    dockerode: ^3.3.1
+    dockerode-utils: ^0.0.7
     dotenv: ^16.0.1
     envalid: ^7.3.1
     eslint: ^7.32.0
