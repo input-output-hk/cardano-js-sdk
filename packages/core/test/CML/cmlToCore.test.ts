@@ -94,7 +94,7 @@ describe('cmlToCore', () => {
       cmlTxOut.set_datum(scope.manage(CML.Datum.new_data(scope.manage(CML.PlutusData.from_bytes(nftMetadataDatum)))));
 
       const coreTxOut = cmlToCore.txOut(cmlTxOut);
-      if (!isConstrPlutusData(coreTxOut.datum!)) throw new Error('unexpected datum type');
+      if (!isConstrPlutusData(coreTxOut.datum)) throw new Error('unexpected datum type');
       expect(coreTxOut.datum.fields.items.length).toBe(3);
 
       const nftMetadata = coreTxOut.datum.fields.items[0];
