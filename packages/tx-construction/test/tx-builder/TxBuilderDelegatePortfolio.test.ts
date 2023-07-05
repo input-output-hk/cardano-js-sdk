@@ -563,6 +563,7 @@ describe('TxBuilder/delegatePortfolio', () => {
   describe('rewardAccount syncing', () => {
     const normalRewardAccountsCalls = 3;
     it('can wait for delayed key agent stake keys', async () => {
+      await keyAgent.deriveAddress({ index: 0, type: AddressType.External }, 0);
       const rewardAccountsProvider = jest
         .fn()
         .mockResolvedValueOnce([])
@@ -597,6 +598,7 @@ describe('TxBuilder/delegatePortfolio', () => {
     });
 
     it('throws if new stake keys are not part of reward accounts in a reasonable time', async () => {
+      await keyAgent.deriveAddress({ index: 0, type: AddressType.External }, 0);
       const rewardAccountsProvider = jest.fn().mockResolvedValue([]);
       const txBuilderFactory = await createTxBuilder({
         keyAgent,
