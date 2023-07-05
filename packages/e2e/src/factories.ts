@@ -33,7 +33,6 @@ import {
   TrezorKeyAgent,
   util
 } from '@cardano-sdk/key-management';
-import { CardanoWalletFaucetProvider, FaucetProvider } from './FaucetProvider';
 import {
   KoraLabsHandleProvider,
   assetInfoHttpProvider,
@@ -64,7 +63,6 @@ const OGMIOS_PROVIDER = 'ogmios';
 const STUB_PROVIDER = 'stub';
 const MISSING_URL_PARAM = 'Missing URL';
 
-export const faucetProviderFactory = new ProviderFactory<FaucetProvider>();
 export type CreateKeyAgent = (dependencies: KeyAgentDependencies) => Promise<AsyncKeyAgent>;
 export const keyManagementFactory = new ProviderFactory<CreateKeyAgent>();
 export const assetProviderFactory = new ProviderFactory<AssetProvider>();
@@ -89,10 +87,6 @@ addressDiscoveryFactory.register(
 // bip32Ed25519
 
 bip32Ed25519Factory.register('CML', async () => new Crypto.CmlBip32Ed25519(CML));
-
-// Faucet providers
-
-faucetProviderFactory.register('cardano-wallet', CardanoWalletFaucetProvider.create);
 
 // Asset providers
 
