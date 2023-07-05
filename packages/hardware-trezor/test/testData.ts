@@ -27,7 +27,11 @@ export const txOutToOwnedAddress: Cardano.TxOut = {
   value: valueWithAssets
 };
 
-export const rewardAccount = Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
+export const rewardKey = 'stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr';
+export const rewardAccount = Cardano.RewardAccount(rewardKey);
+export const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
+export const poolId = Cardano.PoolId('pool1ev8vy6fyj7693ergzty2t0azjvw35tvkt2vcjwpgajqs7z6u2vn');
+export const poolId2 = Cardano.PoolId('pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt');
 
 export const knownAddress: GroupedAddress = {
   accountIndex: 0,
@@ -42,6 +46,15 @@ export const knownAddress: GroupedAddress = {
   type: AddressType.Internal
 };
 
+export const knownAddressWithoutStakingPath: GroupedAddress = {
+  accountIndex: 0,
+  address: paymentAddress,
+  index: 0,
+  networkId: Cardano.NetworkId.Testnet,
+  rewardAccount,
+  type: AddressType.Internal
+};
+
 export const knownAddressKeyPath = [2_147_485_500, 2_147_485_463, 2_147_483_648, 1, 0];
 
 export const contextWithKnownAddresses = {
@@ -53,6 +66,15 @@ export const contextWithKnownAddresses = {
   knownAddresses: [knownAddress]
 };
 
+export const contextWithKnownAddressesWithoutStakingCredentials = {
+  chainId: {
+    networkId: Cardano.NetworkId.Testnet,
+    networkMagic: 999
+  },
+  inputResolver: { resolveInput: () => Promise.resolve(txOutToOwnedAddress) },
+  knownAddresses: [knownAddressWithoutStakingPath]
+};
+
 export const contextWithoutKnownAddresses = {
   chainId: {
     networkId: Cardano.NetworkId.Testnet,
@@ -61,3 +83,19 @@ export const contextWithoutKnownAddresses = {
   inputResolver: { resolveInput: () => Promise.resolve(null) },
   knownAddresses: []
 };
+
+export const stakeRegistrationCertificate = {
+  __typename: Cardano.CertificateType.StakeKeyRegistration,
+  stakeKeyHash
+} as Cardano.StakeAddressCertificate;
+
+export const stakeDeregistrationCertificate = {
+  __typename: Cardano.CertificateType.StakeKeyDeregistration,
+  stakeKeyHash
+} as Cardano.StakeAddressCertificate;
+
+export const stakeDelegationCertificate = {
+  __typename: Cardano.CertificateType.StakeDelegation,
+  poolId: poolId2,
+  stakeKeyHash
+} as Cardano.StakeDelegationCertificate;
