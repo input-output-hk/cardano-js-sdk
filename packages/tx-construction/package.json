@@ -56,7 +56,6 @@
     "@cardano-sdk/key-management": "workspace:~",
     "@cardano-sdk/util": "workspace:~",
     "@cardano-sdk/util-rxjs": "workspace:~",
-    "@cardano-sdk/wallet": "workspace:~",
     "lodash": "^4.17.21",
     "npm": "^9.3.0",
     "rxjs": "^7.4.0",
