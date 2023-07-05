@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.18.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.18.0...@cardano-sdk/wallet@0.18.1) (2023-07-05)
+
+### Bug Fixes
+
+* **wallet:** discovery should search for 1/0 too ([cdf79cb](https://github.com/input-output-hk/cardano-js-sdk/commit/cdf79cbaf8925e72e52ad859ef78a0a112729b81))
+
 ## [0.18.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.17.3...@cardano-sdk/wallet@0.18.0) (2023-07-04)
 
 ### ⚠ BREAKING CHANGES

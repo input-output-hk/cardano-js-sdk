@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.9.0...@cardano-sdk/tx-construction@0.9.1) (2023-07-05)
+
+### Bug Fixes
+
+* **tx-construction:** builder now awaits for non-empty knownAddresses$ before building the tx ([e8f4296](https://github.com/input-output-hk/cardano-js-sdk/commit/e8f42960fe020cca35b54b4d3eedc35280d28049))
+
 ## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.8.4...@cardano-sdk/tx-construction@0.9.0) (2023-07-04)
 
 ### ⚠ BREAKING CHANGES
