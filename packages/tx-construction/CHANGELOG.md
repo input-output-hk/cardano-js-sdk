@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.5-patch.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.8.4-patch.0...@cardano-sdk/tx-construction@0.8.5-patch.0) (2023-07-05)
+
+### Bug Fixes
+
+* **tx-construction:** rm redundant circular dependency on 'wallet' package ([32aee7c](https://github.com/input-output-hk/cardano-js-sdk/commit/32aee7c6e834121440b148d0f015ec6f4babdf9e))
+
 ## [0.8.4-patch.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.8.3...@cardano-sdk/tx-construction@0.8.4-patch.0) (2023-07-05)
 
 ### Bug Fixes
