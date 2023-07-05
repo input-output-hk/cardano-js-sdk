@@ -68,7 +68,7 @@ describe('PgBossHttpService', () => {
   beforeAll(async () => {
     const args = {
       postgresDbDbSync: process.env.POSTGRES_DB_DB_SYNC!,
-      postgresDbStakePool: process.env.POSTGRES_DB_STAKE_POOL!,
+      postgresDbStakePool: 'projection',
       postgresPasswordDbSync: process.env.POSTGRES_PASSWORD_DB_SYNC!,
       postgresPasswordStakePool: process.env.POSTGRES_PASSWORD_DB_SYNC!,
       postgresSrvServiceNameDbSync: process.env.POSTGRES_SRV_SERVICE_NAME_DB_SYNC!,
