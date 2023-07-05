@@ -115,7 +115,11 @@ export class HDSequentialDiscovery implements AddressDiscovery {
    * @returns A promise that will be resolved into a GroupedAddress list containing the discovered addresses.
    */
   public async discover(keyAgent: AsyncKeyAgent): Promise<GroupedAddress[]> {
-    const firstAddress = await keyAgent.deriveAddress({ index: 0, type: AddressType.External }, 0, true);
+    const firstAddresses = [await keyAgent.deriveAddress({ index: 0, type: AddressType.External }, 0, true)];
+    const firstInternalAddress = await keyAgent.deriveAddress({ index: 0, type: AddressType.Internal }, 0, true);
+    if (await addressHasTx(firstInternalAddress, this.#chainHistoryProvider)) {
+      firstAddresses.push(firstInternalAddress);
+    }
 
     const stakeKeyAddresses = await discoverAddresses(
       keyAgent,
@@ -145,7 +149,7 @@ export class HDSequentialDiscovery implements AddressDiscovery {
       })
     );
 
-    const addresses = uniqBy([firstAddress, ...stakeKeyAddresses, ...paymentKeyAddresses], 'address');
+    const addresses = uniqBy([...firstAddresses, ...stakeKeyAddresses, ...paymentKeyAddresses], 'address');
 
     // We need to make sure the addresses are sorted since the wallet assumes that the first address
     // in the list is the change address (payment cred 0 and stake cred 0).

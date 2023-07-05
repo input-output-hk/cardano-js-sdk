@@ -3,6 +3,7 @@ import { PersonalWallet, TransactionFailure } from '../../src';
 import { createWallet } from './util';
 import { firstValueFrom, of } from 'rxjs';
 import { mockProviders as mocks } from '@cardano-sdk/util-dev';
+import uniq from 'lodash/uniq';
 
 describe('integration/withdrawal', () => {
   let wallet: PersonalWallet;
@@ -77,7 +78,7 @@ describe('integration/withdrawal', () => {
 
   it('can submit transaction', async () => {
     const availableRewards = await firstValueFrom(wallet.balance.rewardAccounts.rewards$);
-    const accounts = (await firstValueFrom(wallet.addresses$)).map((address) => address.rewardAccount);
+    const accounts = uniq((await firstValueFrom(wallet.addresses$)).map((address) => address.rewardAccount));
     const txInternals = await wallet.initializeTx({
       certificates: [
         {

@@ -24,6 +24,7 @@ describe('HDSequentialDiscovery', () => {
       createMockChainHistoryProvider(
         new Map([
           [asPaymentAddress('testAddress_0_0_0'), 1],
+          [asPaymentAddress('testAddress_0_0_1'), 1],
           [asPaymentAddress('testAddress_1_0_0'), 1],
           [asPaymentAddress('testAddress_1_0_1'), 1],
           [asPaymentAddress('testAddress_2_0_0'), 1]
@@ -34,7 +35,7 @@ describe('HDSequentialDiscovery', () => {
 
     const addresses = await discovery.discover(mockKeyAgent);
 
-    expect(addresses.length).toEqual(4);
+    expect(addresses.length).toEqual(5);
     expect(addresses[0]).toEqual({
       accountIndex: 0,
       address: 'testAddress_0_0_0',
@@ -49,6 +50,18 @@ describe('HDSequentialDiscovery', () => {
     });
     expect(addresses[1]).toEqual({
       accountIndex: 0,
+      address: 'testAddress_0_0_1',
+      index: 0,
+      networkId: 0,
+      rewardAccount: 'testStakeAddress_0',
+      stakeKeyDerivationPath: {
+        index: 0,
+        role: KeyRole.Stake
+      },
+      type: AddressType.Internal
+    });
+    expect(addresses[2]).toEqual({
+      accountIndex: 0,
       address: 'testAddress_1_0_0',
       index: 1,
       networkId: 0,
@@ -59,7 +72,7 @@ describe('HDSequentialDiscovery', () => {
       },
       type: AddressType.External
     });
-    expect(addresses[2]).toEqual({
+    expect(addresses[3]).toEqual({
       accountIndex: 0,
       address: 'testAddress_1_0_1',
       index: 1,
@@ -71,7 +84,7 @@ describe('HDSequentialDiscovery', () => {
       },
       type: AddressType.Internal
     });
-    expect(addresses[3]).toEqual({
+    expect(addresses[4]).toEqual({
       accountIndex: 0,
       address: 'testAddress_2_0_0',
       index: 2,
