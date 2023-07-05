@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.11-patch.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.7.10...@cardano-sdk/key-management@0.7.11-patch.0) (2023-07-05)
+
+### ⚠ BREAKING CHANGES
+
+* **key-management:** change behavior of ensureStakeKeys to return all reward accounts
+
+### Features
+
+* **key-management:** change behavior of ensureStakeKeys to return all reward accounts ([ee0cdea](https://github.com/input-output-hk/cardano-js-sdk/commit/ee0cdea5890fb67c4a919ba627efc1d588054fd2))
+
 ## [0.7.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.7.9...@cardano-sdk/key-management@0.7.10) (2023-06-29)
 
 **Note:** Version bump only for package @cardano-sdk/key-management
