@@ -46,6 +46,7 @@ export interface NftMetadataFile {
 
 /**
  * https://cips.cardano.org/cips/cip25/
+ * https://cips.cardano.org/cips/cip68/ (label 222)
  */
 export interface NftMetadata {
   name: string;
