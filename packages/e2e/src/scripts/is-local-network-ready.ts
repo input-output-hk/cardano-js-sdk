@@ -1,8 +1,4 @@
 /* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-floating-promises */
-import * as Process from 'process';
-// This disable may not be require once https://github.com/import-js/eslint-plugin-import/pull/2543 is released.
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { Pool, QueryResult } from 'pg';
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -11,14 +7,16 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
  * Waits until the local network is ready or the wait time expires.
  */
 (async () => {
-  if (Process.env.DB_SYNC_CONNECTION_STRING === undefined) {
+  const { DB_SYNC_CONNECTION_STRING, LOCAL_NETWORK_READY_WAIT_TIME } = process.env;
+
+  if (DB_SYNC_CONNECTION_STRING === undefined) {
     console.error('The DB_SYNC_CONNECTION_STRING env variable must be defined');
     return -1;
   }
 
   const start = Date.now() / 1000;
-  const waitTime = Process.env.LOCAL_NETWORK_READY_WAIT_TIME ? Process.env.LOCAL_NETWORK_READY_WAIT_TIME : 1200;
-  const db: Pool = new Pool({ connectionString: Process.env.DB_SYNC_CONNECTION_STRING });
+  const waitTime = LOCAL_NETWORK_READY_WAIT_TIME ? Number.parseInt(LOCAL_NETWORK_READY_WAIT_TIME, 10) : 1200;
+  const db: Pool = new Pool({ connectionString: DB_SYNC_CONNECTION_STRING });
   let isReady = false;
   let currentElapsed = 0;
 
@@ -44,4 +42,4 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   console.log('Local network ready!');
-})();
+})().catch(console.log);

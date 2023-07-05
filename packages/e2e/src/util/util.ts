@@ -1,11 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
-import * as envalid from 'envalid';
 import { Cardano, createSlotEpochCalc } from '@cardano-sdk/core';
 import {
   EMPTY,
   Observable,
-  catchError,
   combineLatest,
   distinctUntilChanged,
   filter,
@@ -22,7 +20,7 @@ import { FAST_OPERATION_TIMEOUT_DEFAULT, SYNC_TIMEOUT_DEFAULT } from '../default
 import { FinalizeTxProps, ObservableWallet, PersonalWallet } from '@cardano-sdk/wallet';
 import { InMemoryKeyAgent, TransactionSigner } from '@cardano-sdk/key-management';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
-import { TestWallet, faucetProviderFactory, networkInfoProviderFactory } from '../factories';
+import { TestWallet, networkInfoProviderFactory } from '../factories';
 import { getEnv, walletVariables } from '../environment';
 import { logger } from '@cardano-sdk/util-dev';
 import sortBy from 'lodash/sortBy';
@@ -35,10 +33,7 @@ export const firstValueFromTimed = <T>(
   timeoutAfter = FAST_OPERATION_TIMEOUT_DEFAULT
 ) =>
   firstValueFrom(
-    observable$.pipe(
-      timeout(timeoutAfter),
-      catchError(() => throwError(() => new Error(timeoutMessage)))
-    )
+    observable$.pipe(timeout({ each: timeoutAfter, with: () => throwError(() => new Error(timeoutMessage)) }))
   );
 
 export const waitForWalletStateSettle = (wallet: ObservableWallet, syncTimeout: number = SYNC_TIMEOUT_DEFAULT) =>
@@ -134,28 +129,6 @@ export const submitAndConfirm = (wallet: ObservableWallet, tx: Cardano.Tx) =>
 export type RequestCoinsProps = {
   wallet: ObservableWallet;
   coins: Cardano.Lovelace;
-};
-
-export const requestCoins = async ({ coins, wallet }: RequestCoinsProps) => {
-  const [{ address }] = await firstValueFrom(wallet.addresses$);
-  logger.info(`Address ${address} will be funded with ${coins} tLovelace.`);
-
-  const { FAUCET_PROVIDER, FAUCET_PROVIDER_PARAMS } = envalid.cleanEnv(process.env, {
-    FAUCET_PROVIDER: envalid.str(),
-    FAUCET_PROVIDER_PARAMS: envalid.json({ default: {} })
-  });
-
-  const faucetProvider = await faucetProviderFactory.create(FAUCET_PROVIDER, FAUCET_PROVIDER_PARAMS, logger);
-  await faucetProvider.start();
-  const healthCheck = await faucetProvider.healthCheck();
-  if (!healthCheck.ok) throw new Error('Faucet provider could not be started.');
-  // Request coins from faucet. This will block until the transaction is in the ledger,
-  // and has the given amount of confirmation, which means the funds can be used immediately after
-  // this call.
-  // TODO: change FaucetProvider signature to accept Cardano.Lovelace
-  const requestResult = await faucetProvider.request(address, Number.parseInt(coins.toString()), 3, 30_000);
-  await txConfirmed(wallet, requestResult);
-  await faucetProvider.close();
 };
 
 export type TransferCoinsProps = {
