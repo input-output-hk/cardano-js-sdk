@@ -1,21 +1,14 @@
 import { AssetInfo } from '../types';
 import { Cardano } from '../..';
-import { CustomError } from 'ts-custom-error';
 import { ImageMediaType, MediaType, NftMetadata, NftMetadataFile, Uri } from './types';
+import { InvalidFileError } from './errors';
 import { Logger } from 'ts-log';
 import { asMetadatumArray, asMetadatumMap } from '../../util/metadatum';
+import { asString } from './util';
 import { isNotNil } from '@cardano-sdk/util';
 import difference from 'lodash/difference';
 
-class InvalidFileError extends CustomError {}
-
 const isString = (obj: unknown): obj is string => typeof obj === 'string';
-
-const asString = (obj: unknown): string | undefined => {
-  if (typeof obj === 'string') {
-    return obj;
-  }
-};
 
 const metadatumToString = (metadatum: Cardano.Metadatum | undefined): string | undefined => {
   if (Array.isArray(metadatum)) {
