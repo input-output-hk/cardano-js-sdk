@@ -5,7 +5,6 @@ import { Cardano, createSlotEpochCalc } from '@cardano-sdk/core';
 import {
   EMPTY,
   Observable,
-  catchError,
   combineLatest,
   distinctUntilChanged,
   filter,
@@ -35,10 +34,7 @@ export const firstValueFromTimed = <T>(
   timeoutAfter = FAST_OPERATION_TIMEOUT_DEFAULT
 ) =>
   firstValueFrom(
-    observable$.pipe(
-      timeout(timeoutAfter),
-      catchError(() => throwError(() => new Error(timeoutMessage)))
-    )
+    observable$.pipe(timeout({ each: timeoutAfter, with: () => throwError(() => new Error(timeoutMessage)) }))
   );
 
 export const waitForWalletStateSettle = (wallet: ObservableWallet, syncTimeout: number = SYNC_TIMEOUT_DEFAULT) =>
