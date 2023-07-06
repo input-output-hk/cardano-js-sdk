@@ -19,7 +19,7 @@ const tokenMapToAssetGroup = (tokenMap: Cardano.TokenMap): Trezor.CardanoAssetGr
     const policyId = Cardano.AssetId.getPolicyId(key);
     const assetName = Cardano.AssetId.getAssetName(key);
 
-    if (!map.has(policyId)) map.set(policyId, new Array<Trezor.CardanoToken>());
+    if (!map.has(policyId)) map.set(policyId, []);
 
     map.get(policyId)!.push({
       amount: value.toString(),
@@ -41,8 +41,5 @@ const tokenMapToAssetGroup = (tokenMap: Cardano.TokenMap): Trezor.CardanoAssetGr
   return tokenMapAssetsGroup;
 };
 
-export const mapTokenMap = (tokenMap: Cardano.TokenMap | undefined) => {
-  if (!tokenMap) return null;
-
-  return tokenMapToAssetGroup(tokenMap);
-};
+export const mapTokenMap = (tokenMap: Cardano.TokenMap | undefined) =>
+  tokenMap ? tokenMapToAssetGroup(tokenMap) : null;
