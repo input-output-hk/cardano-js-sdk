@@ -307,6 +307,18 @@ withCommonOptions(
       )
   )
   .addOption(
+    new Option('--use-kora-labs <true/false>', ProviderServerOptionDescriptions.UseKoraLabsProvider)
+      .env('USE_KORA_LABS')
+      .default(false)
+      .argParser((useKoraLabs) =>
+        stringOptionToBoolean(
+          useKoraLabs,
+          Programs.ProviderServer,
+          ProviderServerOptionDescriptions.UseKoraLabsProvider
+        )
+      )
+  )
+  .addOption(
     new Option('--use-queue <true/false>', ProviderServerOptionDescriptions.UseQueue)
       .env('USE_QUEUE')
       .default(USE_QUEUE_DEFAULT)

@@ -176,10 +176,12 @@ describe('CLI', () => {
   let fixtureBuilder: AssetFixtureBuilder;
   let lastBlock: LedgerTipModel;
   let postgresConnectionString: string;
+  let postgresConnectionStringHandle: string;
   let postgresConnectionStringStakePool: string;
 
   beforeAll(() => {
     postgresConnectionString = process.env.POSTGRES_CONNECTION_STRING_DB_SYNC!;
+    postgresConnectionStringHandle = process.env.POSTGRES_CONNECTION_STRING_HANDLE!;
     postgresConnectionStringStakePool = process.env.POSTGRES_CONNECTION_STRING_STAKE_POOL!;
   });
 
@@ -280,6 +282,8 @@ describe('CLI', () => {
                   'true',
                   '--postgres-connection-string-db-sync',
                   postgresConnectionString,
+                  '--postgres-connection-string-handle',
+                  postgresConnectionStringHandle,
                   '--ogmios-url',
                   ogmiosConnection.address.webSocket,
                   '--cardano-node-config-path',
@@ -324,6 +328,7 @@ describe('CLI', () => {
                   LOGGER_MIN_SEVERITY: 'error',
                   OGMIOS_URL: ogmiosConnection.address.webSocket,
                   POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
+                  POSTGRES_CONNECTION_STRING_HANDLE: postgresConnectionStringHandle,
                   SERVICE_NAMES: `${ServiceNames.Asset},${ServiceNames.ChainHistory},${ServiceNames.NetworkInfo},${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.Utxo},${ServiceNames.Rewards}`
                 },
                 stdio: 'pipe'
@@ -351,6 +356,8 @@ describe('CLI', () => {
                   'true',
                   '--postgres-connection-string-db-sync',
                   postgresConnectionString,
+                  '--postgres-connection-string-handle',
+                  postgresConnectionStringHandle,
                   '--ogmios-url',
                   ogmiosConnection.address.webSocket,
                   '--cardano-node-config-path',
@@ -389,6 +396,7 @@ describe('CLI', () => {
                   LOGGER_MIN_SEVERITY: 'error',
                   OGMIOS_URL: ogmiosConnection.address.webSocket,
                   POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
+                  POSTGRES_CONNECTION_STRING_HANDLE: postgresConnectionStringHandle,
                   SERVICE_NAMES: `${ServiceNames.Asset},${ServiceNames.ChainHistory},${ServiceNames.NetworkInfo},${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.Utxo},${ServiceNames.Rewards}`
                 },
                 stdio: 'pipe'
@@ -411,6 +419,7 @@ describe('CLI', () => {
                   LOGGER_MIN_SEVERITY: 'error',
                   OGMIOS_URL: ogmiosConnection.address.webSocket,
                   POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
+                  POSTGRES_CONNECTION_STRING_HANDLE: postgresConnectionStringHandle,
                   SERVICE_NAMES: `${ServiceNames.Asset},${ServiceNames.ChainHistory},${ServiceNames.NetworkInfo},${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.Utxo},${ServiceNames.Rewards}`
                 },
                 stdio: 'pipe'
@@ -1413,6 +1422,8 @@ describe('CLI', () => {
                     HANDLE_PROVIDER_SERVER_URL,
                     '--postgres-connection-string-db-sync',
                     postgresConnectionString,
+                    '--postgres-connection-string-handle',
+                    postgresConnectionStringHandle,
                     '--cardano-node-config-path',
                     cardanoNodeConfigPath,
                     ServiceNames.NetworkInfo
@@ -1452,6 +1463,8 @@ describe('CLI', () => {
                     ...baseArgs,
                     '--api-url',
                     apiUrl,
+                    '--postgres-connection-string-handle',
+                    postgresConnectionStringHandle,
                     '--handle-policy-ids',
                     HANDLE_POLICY_IDS,
                     '--handle-provider-server-url',
@@ -1475,6 +1488,7 @@ describe('CLI', () => {
                     HANDLE_POLICY_IDS,
                     HANDLE_PROVIDER_SERVER_URL,
                     LOGGER_MIN_SEVERITY: 'error',
+                    POSTGRES_CONNECTION_STRING_HANDLE: postgresConnectionStringHandle,
                     SERVICE_NAMES: ServiceNames.TxSubmit,
                     USE_QUEUE: 'false'
                   },
@@ -1537,6 +1551,8 @@ describe('CLI', () => {
               callCliAndAssertExit(
                 {
                   args: [
+                    '--postgres-connection-string-handle',
+                    postgresConnectionStringHandle,
                     '--handle-policy-ids',
                     HANDLE_POLICY_IDS,
                     '--handle-provider-server-url',
@@ -1563,6 +1579,7 @@ describe('CLI', () => {
                     HANDLE_POLICY_IDS,
                     HANDLE_PROVIDER_SERVER_URL,
                     OGMIOS_SRV_SERVICE_NAME: ogmiosSrvServiceName,
+                    POSTGRES_CONNECTION_STRING_HANDLE: postgresConnectionStringHandle,
                     SERVICE_DISCOVERY_TIMEOUT: '1000',
                     SERVICE_NAMES: ServiceNames.TxSubmit
                   }
@@ -1612,6 +1629,8 @@ describe('CLI', () => {
               callCliAndAssertExit(
                 {
                   args: [
+                    '--postgres-connection-string-handle',
+                    postgresConnectionStringHandle,
                     '--handle-policy-ids',
                     HANDLE_POLICY_IDS,
                     '--handle-provider-server-url',
@@ -1639,6 +1658,7 @@ describe('CLI', () => {
                     HANDLE_PROVIDER_SERVER_URL,
                     OGMIOS_SRV_SERVICE_NAME: ogmiosSrvServiceName,
                     OGMIOS_URL: ogmiosConnection.address.webSocket,
+                    POSTGRES_CONNECTION_STRING_HANDLE: postgresConnectionStringHandle,
                     SERVICE_NAMES: ServiceNames.TxSubmit
                   }
                 },
@@ -2044,6 +2064,8 @@ describe('CLI', () => {
                   apiUrl,
                   '--postgres-connection-string-db-sync',
                   postgresConnectionString,
+                  '--postgres-connection-string-handle',
+                  postgresConnectionStringHandle,
                   '--cardano-node-config-path',
                   cardanoNodeConfigPath,
                   '--ogmios-url',

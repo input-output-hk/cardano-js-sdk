@@ -1,7 +1,7 @@
 /* eslint-disable promise/no-nesting */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DnsResolver } from '../utils';
-import { KoraLabsHandleProvider } from '@cardano-sdk/cardano-services-client';
+import { HandleProvider, SubmitTxArgs } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { MissingCardanoNodeOption } from '../errors';
 import {
@@ -12,7 +12,6 @@ import {
 } from '@cardano-sdk/ogmios';
 import { OgmiosOptionDescriptions, OgmiosProgramOptions } from '../options/ogmios';
 import { RunnableModule, isConnectionError } from '@cardano-sdk/util';
-import { SubmitTxArgs } from '@cardano-sdk/core';
 import { defer, from, of } from 'rxjs';
 
 const isCardanoNodeOperation = (prop: string | symbol): prop is 'eraSummaries' | 'systemStart' | 'stakeDistribution' =>
@@ -37,7 +36,7 @@ const recreateOgmiosTxSubmitProvider = async (
   ogmiosTxSubmitProvider: OgmiosTxSubmitProvider,
   dnsResolver: DnsResolver,
   logger: Logger,
-  handleProvider?: KoraLabsHandleProvider
+  handleProvider?: HandleProvider
 ) => {
   const record = await dnsResolver(serviceName!);
   logger.info(`DNS resolution for OgmiosTxSubmitProvider, resolved with record: ${JSON.stringify(record)}`);
@@ -61,7 +60,7 @@ export const ogmiosTxSubmitProviderWithDiscovery = async (
   dnsResolver: DnsResolver,
   logger: Logger,
   serviceName: string,
-  handleProvider?: KoraLabsHandleProvider
+  handleProvider?: HandleProvider
 ): Promise<OgmiosTxSubmitProvider> => {
   const { name, port } = await dnsResolver(serviceName!);
   let ogmiosProvider = new OgmiosTxSubmitProvider({ host: name, port }, { logger }, handleProvider);
@@ -120,7 +119,7 @@ export const getOgmiosTxSubmitProvider = async (
   dnsResolver: DnsResolver,
   logger: Logger,
   options?: OgmiosProgramOptions,
-  handleProvider?: KoraLabsHandleProvider
+  handleProvider?: HandleProvider
 ): Promise<OgmiosTxSubmitProvider> => {
   if (options?.ogmiosSrvServiceName)
     return ogmiosTxSubmitProviderWithDiscovery(dnsResolver, logger, options.ogmiosSrvServiceName, handleProvider);
