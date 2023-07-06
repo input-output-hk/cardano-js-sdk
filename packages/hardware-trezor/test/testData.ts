@@ -36,6 +36,9 @@ export const metadataJson = {
   hash: Crypto.Hash32ByteBase16('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'),
   url: 'https://example.com'
 };
+export const auxiliaryDataHash = Crypto.Hash32ByteBase16(
+  '2ceb364d93225b4a0f004a0975a13eb50c3cc6348474b4fe9121f8dc72ca0cfa'
+);
 
 export const knownAddress: GroupedAddress = {
   accountIndex: 0,
