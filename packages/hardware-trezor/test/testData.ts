@@ -27,11 +27,15 @@ export const txOutToOwnedAddress: Cardano.TxOut = {
   value: valueWithAssets
 };
 
-export const rewardKey = 'stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr';
-export const rewardAccount = Cardano.RewardAccount(rewardKey);
+export const rewardAccount = Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
 export const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
 export const poolId = Cardano.PoolId('pool1ev8vy6fyj7693ergzty2t0azjvw35tvkt2vcjwpgajqs7z6u2vn');
 export const poolId2 = Cardano.PoolId('pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt');
+export const vrf = Cardano.VrfVkHex('8dd154228946bd12967c12bedb1cb6038b78f8b84a1760b1a788fa72a4af3db0');
+export const metadataJson = {
+  hash: Crypto.Hash32ByteBase16('0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5'),
+  url: 'https://example.com'
+};
 
 export const knownAddress: GroupedAddress = {
   accountIndex: 0,
@@ -99,3 +103,26 @@ export const stakeDelegationCertificate = {
   poolId: poolId2,
   stakeKeyHash
 } as Cardano.StakeDelegationCertificate;
+
+export const poolRegistrationCertificate = {
+  __typename: Cardano.CertificateType.PoolRegistration,
+  poolParameters: {
+    cost: 1000n,
+    id: poolId,
+    margin: { denominator: 5, numerator: 1 },
+    metadataJson,
+    owners: [rewardAccount],
+    pledge: 10_000n,
+    relays: [
+      {
+        __typename: 'RelayByAddress',
+        ipv4: '127.0.0.1',
+        port: 6000
+      },
+      { __typename: 'RelayByName', hostname: 'example.com', port: 5000 },
+      { __typename: 'RelayByNameMultihost', dnsName: 'example.com' }
+    ],
+    rewardAccount,
+    vrf
+  }
+} as Cardano.PoolRegistrationCertificate;

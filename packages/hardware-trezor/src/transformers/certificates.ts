@@ -23,6 +23,11 @@ type TrezorDelegationCertificate = {
   pool: string;
 };
 
+type TrezorPoolRegistrationCertificate = {
+  poolParameters: Trezor.CardanoPoolParameters;
+  type: Trezor.CardanoCertificateType.STAKE_POOL_REGISTRATION;
+};
+
 const getStakeAddressCertificate = (
   certificate: Cardano.StakeAddressCertificate,
   context: TrezorTxTransformerContext,
@@ -47,7 +52,7 @@ const getStakeAddressCertificate = (
   };
 };
 
-const stakeDelegationCertificate = (
+const getStakeDelegationCertificate = (
   certificate: Cardano.StakeDelegationCertificate,
   context: TrezorTxTransformerContext
 ): TrezorDelegationCertificate => {
@@ -72,6 +77,69 @@ const stakeDelegationCertificate = (
   };
 };
 
+const toPoolMetadata = (metadataJson: Cardano.PoolMetadataJson): Trezor.CardanoPoolMetadata => ({
+  hash: metadataJson.hash,
+  url: metadataJson.url
+});
+
+const getPoolOperatorKeyPath = (
+  operator: Cardano.RewardAccount,
+  context: TrezorTxTransformerContext
+): BIP32Path | null => {
+  const knownAddress = context?.knownAddresses.find((address) => address.rewardAccount === operator);
+  return stakeKeyPathFromGroupedAddress(knownAddress);
+};
+
+export const getPoolRegistrationCertificate = (
+  certificate: Cardano.PoolRegistrationCertificate,
+  context: TrezorTxTransformerContext
+): TrezorPoolRegistrationCertificate => {
+  if (!certificate.poolParameters.metadataJson)
+    throw new InvalidArgumentError('certificate', 'Missing pool registration pool metadata.');
+  return {
+    poolParameters: {
+      cost: certificate.poolParameters.cost.toString(),
+      margin: {
+        denominator: certificate.poolParameters.margin.denominator.toString(),
+        numerator: certificate.poolParameters.margin.numerator.toString()
+      },
+      metadata: toPoolMetadata(certificate.poolParameters.metadataJson),
+      owners: certificate.poolParameters.owners.map((owner) => {
+        const poolOwnerKeyPath = getPoolOperatorKeyPath(owner, context!);
+        const poolOwnerKeyHash = Cardano.RewardAccount.toHash(owner);
+        return poolOwnerKeyPath ? { stakingKeyPath: poolOwnerKeyPath } : { stakingKeyHash: poolOwnerKeyHash };
+      }),
+      pledge: certificate.poolParameters.pledge.toString(),
+      poolId: Cardano.PoolId.toKeyHash(certificate.poolParameters.id),
+      relays: certificate.poolParameters.relays.map((relay) => {
+        switch (relay.__typename) {
+          case 'RelayByAddress':
+            return {
+              ipv4Address: relay.ipv4,
+              ipv6Address: relay.ipv6,
+              port: relay.port,
+              type: Trezor.CardanoPoolRelayType.SINGLE_HOST_IP
+            };
+          case 'RelayByName':
+            return {
+              hostName: relay.hostname,
+              port: relay.port,
+              type: Trezor.CardanoPoolRelayType.SINGLE_HOST_NAME
+            };
+          case 'RelayByNameMultihost':
+            return {
+              hostName: relay.dnsName,
+              type: Trezor.CardanoPoolRelayType.MULTIPLE_HOST_NAME
+            };
+        }
+      }),
+      rewardAccount: certificate.poolParameters.rewardAccount,
+      vrfKeyHash: certificate.poolParameters.vrf
+    },
+    type: Trezor.CardanoCertificateType.STAKE_POOL_REGISTRATION
+  };
+};
+
 const toCert = (cert: Cardano.Certificate, context: TrezorTxTransformerContext) => {
   switch (cert.__typename) {
     case Cardano.CertificateType.StakeKeyRegistration:
@@ -79,7 +147,9 @@ const toCert = (cert: Cardano.Certificate, context: TrezorTxTransformerContext) 
     case Cardano.CertificateType.StakeKeyDeregistration:
       return getStakeAddressCertificate(cert, context, Trezor.CardanoCertificateType.STAKE_DEREGISTRATION);
     case Cardano.CertificateType.StakeDelegation:
-      return stakeDelegationCertificate(cert, context);
+      return getStakeDelegationCertificate(cert, context);
+    case Cardano.CertificateType.PoolRegistration:
+      return getPoolRegistrationCertificate(cert, context);
     default:
       throw new InvalidArgumentError('cert', `Certificate ${cert.__typename} not supported.`);
   }

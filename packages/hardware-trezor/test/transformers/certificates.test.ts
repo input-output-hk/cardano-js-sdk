@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 import * as Trezor from 'trezor-connect';
 import { Cardano } from '@cardano-sdk/core';
 import { CardanoKeyConst, KeyRole, util } from '@cardano-sdk/key-management';
@@ -5,6 +6,7 @@ import {
   contextWithKnownAddresses,
   contextWithKnownAddressesWithoutStakingCredentials,
   contextWithoutKnownAddresses,
+  poolRegistrationCertificate,
   stakeDelegationCertificate,
   stakeDeregistrationCertificate,
   stakeRegistrationCertificate
@@ -139,6 +141,98 @@ describe('certificates', () => {
             keyHash: 'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f',
             pool: '153806dbcd134ddee69a8c5204e38ac80448f62342f8c23cfe4b7edf',
             type: Trezor.CardanoCertificateType.STAKE_DELEGATION
+          }
+        ]);
+      });
+    });
+
+    describe('pool registration certificates', () => {
+      it('can map a pool registration certificate with known keys', async () => {
+        expect(mapCerts([poolRegistrationCertificate], contextWithKnownAddresses)).toEqual([
+          {
+            poolParameters: {
+              cost: '1000',
+              margin: {
+                denominator: '5',
+                numerator: '1'
+              },
+              metadata: {
+                hash: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5',
+                url: 'https://example.com'
+              },
+              owners: [
+                {
+                  stakingKeyPath: [
+                    util.harden(CardanoKeyConst.PURPOSE),
+                    util.harden(CardanoKeyConst.COIN_TYPE),
+                    util.harden(0),
+                    2,
+                    0
+                  ]
+                }
+              ],
+              pledge: '10000',
+              poolId: 'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f',
+              relays: [
+                {
+                  ipv4Address: '127.0.0.1',
+                  port: 6000,
+                  type: 0
+                },
+                {
+                  hostName: 'example.com',
+                  port: 5000,
+                  type: 1
+                },
+                {
+                  hostName: 'example.com',
+                  type: 2
+                }
+              ],
+              rewardAccount: 'stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr',
+              vrfKeyHash: '8dd154228946bd12967c12bedb1cb6038b78f8b84a1760b1a788fa72a4af3db0'
+            },
+            type: Trezor.CardanoCertificateType.STAKE_POOL_REGISTRATION
+          }
+        ]);
+      });
+
+      it('can map a pool registration certificate with unknown keys', async () => {
+        expect(mapCerts([poolRegistrationCertificate], contextWithoutKnownAddresses)).toEqual([
+          {
+            poolParameters: {
+              cost: '1000',
+              margin: {
+                denominator: '5',
+                numerator: '1'
+              },
+              metadata: {
+                hash: '0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5',
+                url: 'https://example.com'
+              },
+              owners: [{ stakingKeyHash: 'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f' }],
+              pledge: '10000',
+              poolId: 'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f',
+              relays: [
+                {
+                  ipv4Address: '127.0.0.1',
+                  port: 6000,
+                  type: 0
+                },
+                {
+                  hostName: 'example.com',
+                  port: 5000,
+                  type: 1
+                },
+                {
+                  hostName: 'example.com',
+                  type: 2
+                }
+              ],
+              rewardAccount: 'stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr',
+              vrfKeyHash: '8dd154228946bd12967c12bedb1cb6038b78f8b84a1760b1a788fa72a4af3db0'
+            },
+            type: Trezor.CardanoCertificateType.STAKE_POOL_REGISTRATION
           }
         ]);
       });
