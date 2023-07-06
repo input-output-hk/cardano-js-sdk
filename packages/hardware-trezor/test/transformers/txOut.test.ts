@@ -38,15 +38,11 @@ describe('txOut', () => {
           amount: '10',
           tokenBundle: [
             {
-              policyId: '7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373',
+              policyId: '2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740',
               tokenAmounts: [
                 {
-                  amount: '40',
+                  amount: '20',
                   assetNameBytes: ''
-                },
-                {
-                  amount: '30',
-                  assetNameBytes: '504154415445'
                 }
               ]
             },
@@ -60,11 +56,15 @@ describe('txOut', () => {
               ]
             },
             {
-              policyId: '2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740',
+              policyId: '7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373',
               tokenAmounts: [
                 {
-                  amount: '20',
+                  amount: '40',
                   assetNameBytes: ''
+                },
+                {
+                  amount: '30',
+                  assetNameBytes: '504154415445'
                 }
               ]
             }
@@ -111,15 +111,11 @@ describe('txOut', () => {
           amount: '10',
           tokenBundle: [
             {
-              policyId: '7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373',
+              policyId: '2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740',
               tokenAmounts: [
                 {
-                  amount: '40',
+                  amount: '20',
                   assetNameBytes: ''
-                },
-                {
-                  amount: '30',
-                  assetNameBytes: '504154415445'
                 }
               ]
             },
@@ -133,11 +129,15 @@ describe('txOut', () => {
               ]
             },
             {
-              policyId: '2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740',
+              policyId: '7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373',
               tokenAmounts: [
                 {
-                  amount: '20',
+                  amount: '40',
                   assetNameBytes: ''
+                },
+                {
+                  amount: '30',
+                  assetNameBytes: '504154415445'
                 }
               ]
             }
@@ -165,15 +165,11 @@ describe('txOut', () => {
         amount: '10',
         tokenBundle: [
           {
-            policyId: '7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373',
+            policyId: '2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740',
             tokenAmounts: [
               {
-                amount: '40',
+                amount: '20',
                 assetNameBytes: ''
-              },
-              {
-                amount: '30',
-                assetNameBytes: '504154415445'
               }
             ]
           },
@@ -187,11 +183,15 @@ describe('txOut', () => {
             ]
           },
           {
-            policyId: '2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740',
+            policyId: '7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373',
             tokenAmounts: [
               {
-                amount: '20',
+                amount: '40',
                 assetNameBytes: ''
+              },
+              {
+                amount: '30',
+                assetNameBytes: '504154415445'
               }
             ]
           }
@@ -224,15 +224,11 @@ describe('txOut', () => {
         amount: '10',
         tokenBundle: [
           {
-            policyId: '7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373',
+            policyId: '2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740',
             tokenAmounts: [
               {
-                amount: '40',
+                amount: '20',
                 assetNameBytes: ''
-              },
-              {
-                amount: '30',
-                assetNameBytes: '504154415445'
               }
             ]
           },
@@ -246,11 +242,15 @@ describe('txOut', () => {
             ]
           },
           {
-            policyId: '2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740',
+            policyId: '7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373',
             tokenAmounts: [
               {
-                amount: '20',
+                amount: '40',
                 assetNameBytes: ''
+              },
+              {
+                amount: '30',
+                assetNameBytes: '504154415445'
               }
             ]
           }
