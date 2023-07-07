@@ -16,6 +16,8 @@ import {
 } from '../../../src';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { firstValueFrom } from 'rxjs';
+import { readFile } from 'fs/promises';
+import path from 'path';
 
 const env = getEnv(walletVariables);
 const logger = createLogger();
@@ -82,7 +84,7 @@ describe('Ada handle', () => {
     wallet = (await getWallet({ env, idx: 0, logger, name: 'Handle Init Wallet', polling: { interval: 50 } })).wallet;
     await walletReady(wallet, coins);
     const derivationPath = {
-      index: 2,
+      index: 0,
       role: KeyRole.External
     };
     const keyAgent = await createStandaloneKeyAgent(
@@ -95,16 +97,15 @@ describe('Ada handle', () => {
     policySigner = new util.KeyAgentTransactionSigner(keyAgent, derivationPath);
     policyScript = {
       __type: Cardano.ScriptType.Native,
-      kind: Cardano.NativeScriptKind.RequireAllOf,
-      scripts: [
-        {
-          __type: Cardano.ScriptType.Native,
-          keyHash,
-          kind: Cardano.NativeScriptKind.RequireSignature
-        }
-      ]
+      keyHash,
+      kind: Cardano.NativeScriptKind.RequireSignature
     };
     policyId = nativeScriptPolicyId(policyScript);
+    const sdkIpc = path.join(__dirname, '..', '..', '..', 'local-network', 'sdk-ipc');
+    const handleProviderPolicyId = (await readFile(path.join(sdkIpc, 'handle_policy_ids')))
+      .toString('utf8')
+      .replace(/\s/g, '');
+    expect(policyId).toEqual(handleProviderPolicyId);
     wallet.shutdown();
   };
 
