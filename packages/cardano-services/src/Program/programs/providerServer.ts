@@ -1,7 +1,7 @@
 /* eslint-disable complexity */
 /* eslint-disable sonarjs/cognitive-complexity */
 import { AssetHttpService } from '../../Asset/AssetHttpService';
-import { Cardano, CardanoNode, Seconds } from '@cardano-sdk/core';
+import { CardanoNode, HandleProvider, Seconds } from '@cardano-sdk/core';
 import { CardanoTokenRegistry } from '../../Asset/CardanoTokenRegistry';
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../../ChainHistory';
 import { ConnectionNames, PostgresOptionDescriptions, suffixType2Cli } from '../options/postgres';
@@ -15,6 +15,7 @@ import { DbSyncUtxoProvider, UtxoHttpService } from '../../Utxo';
 import { DnsResolver, createDnsResolver, getCardanoNode, getDbPools, getGenesisData } from '../utils';
 import { GenesisData } from '../../types';
 import { HandleHttpService, TypeOrmHandleProvider } from '../../Handle';
+import { HandlePolicyIdsOptionDescriptions, handlePolicyIdsFromFile } from '../options/policyIds';
 import { HttpServer, HttpServerConfig, HttpService, getListen } from '../../Http';
 import { InMemoryCache, NoCache } from '../../InMemoryCache';
 import { KoraLabsHandleProvider } from '@cardano-sdk/cardano-services-client';
@@ -33,7 +34,6 @@ import { createDbSyncMetadataService } from '../../Metadata';
 import { createLogger } from 'bunyan';
 import { getConnectionConfig, getOgmiosTxSubmitProvider, getRabbitMqTxSubmitProvider } from '../services';
 import { getEntities } from '../../Projection/prepareTypeormProjection';
-import { handlePolicyIdsFromFile } from '../options/policyIds';
 import { isNotNil } from '@cardano-sdk/util';
 import memoize from 'lodash/memoize';
 
@@ -65,6 +65,8 @@ interface ServiceMapFactoryOptions {
 const serverName = 'provider-server';
 
 const connectionConfigs: { [k in ConnectionNames]?: Observable<PgConnectionConfig> } = {};
+
+let sharedHandleProvider: HandleProvider;
 
 const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
   const { args, pools, dnsResolver, genesisData, logger, node } = options;
@@ -161,6 +163,32 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     return networkInfoProvider;
   };
 
+  const getHandleProvider = async () => {
+    if (sharedHandleProvider) return sharedHandleProvider;
+
+    if (!args.handlePolicyIds)
+      throw new MissingProgramOption(ServiceNames.Handle, HandlePolicyIdsOptionDescriptions.HandlePolicyIds);
+
+    if (args.useKoraLabs) {
+      if (!args.handleProviderServerUrl)
+        throw new MissingProgramOption(ServiceNames.Handle, ProviderServerOptionDescriptions.HandleProviderServerUrl);
+
+      // Cardano.PolicyId('f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a')
+      sharedHandleProvider = new KoraLabsHandleProvider({
+        policyId: args.handlePolicyIds[0],
+        serverUrl: args.handleProviderServerUrl
+      });
+    } else {
+      sharedHandleProvider = await withTypeOrmProvider(
+        'Handle',
+        async (connectionConfig$) =>
+          new TypeOrmHandleProvider({ connectionConfig$, entities: getEntities(['handle']), logger })
+      )();
+    }
+
+    return sharedHandleProvider;
+  };
+
   return {
     [ServiceNames.Asset]: withDbSyncProvider(async (dbPools, cardanoNode) => {
       const ntfMetadataService = new DbSyncNftMetadataService({
@@ -228,12 +256,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       );
       return new ChainHistoryHttpService({ chainHistoryProvider, logger });
     }, ServiceNames.ChainHistory),
-    [ServiceNames.Handle]: withTypeOrmProvider('Handle', async (connectionConfig$) => {
-      const entities = getEntities(['handle']);
-      const handleProvider = new TypeOrmHandleProvider({ connectionConfig$, entities, logger });
-
-      return new HandleHttpService({ handleProvider, logger });
-    }),
+    [ServiceNames.Handle]: async () => new HandleHttpService({ handleProvider: await getHandleProvider(), logger }),
     [ServiceNames.Rewards]: withDbSyncProvider(async (dbPools, cardanoNode) => {
       const rewardsProvider = new DbSyncRewardsProvider(
         { paginationPageSizeLimit: args.paginationPageSizeLimit! },
@@ -257,16 +280,9 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       ServiceNames.NetworkInfo
     ),
     [ServiceNames.TxSubmit]: async () => {
-      const handleProvider = new KoraLabsHandleProvider({
-        // TODO: remove default value once localnet scripts updated with handlePolicyIds
-        policyId: args.handlePolicyIds
-          ? args.handlePolicyIds[0]
-          : Cardano.PolicyId('f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a'),
-        serverUrl: args.handleProviderServerUrl
-      });
       const txSubmitProvider = args.useQueue
         ? await getRabbitMqTxSubmitProvider(dnsResolver, logger, args)
-        : await getOgmiosTxSubmitProvider(dnsResolver, logger, args, handleProvider);
+        : await getOgmiosTxSubmitProvider(dnsResolver, logger, args, await getHandleProvider());
       return new TxSubmitHttpService({ logger, txSubmitProvider });
     }
   };

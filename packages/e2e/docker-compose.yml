@@ -65,9 +65,11 @@ services:
 
   provider-server:
     environment:
+      HANDLE_POLICY_IDS_FILE: /sdk-ipc/handle_policy_ids
       TOKEN_METADATA_SERVER_URL: stub://
     volumes:
       - ./local-network/config/network:/config
+      - sdk-ipc:/sdk-ipc
 
 volumes:
   sdk-ipc:

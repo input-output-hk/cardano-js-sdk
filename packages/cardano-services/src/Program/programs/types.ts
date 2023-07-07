@@ -51,6 +51,7 @@ export enum ProviderServerOptionDescriptions {
   TokenMetadataServerUrl = 'Token Metadata API server URL',
   UseTypeOrmStakePoolProvider = 'Enables the TypeORM Stake Pool Provider',
   UseBlockfrost = 'Enables Blockfrost cached data DB',
+  UseKoraLabsProvider = 'Use the KoraLabs handle provider',
   UseQueue = 'Enables RabbitMQ',
   PaginationPageSizeLimit = 'Pagination page size limit shared across all providers',
   HandleProviderServerUrl = 'URL for the Handle provider server'
@@ -75,9 +76,10 @@ export type ProviderServerArgs = CommonProgramOptions &
     epochPollInterval: number;
     dbCacheTtl: Seconds | 0;
     useBlockfrost?: boolean;
+    useKoraLabs?: boolean;
     useQueue?: boolean;
     useTypeormStakePoolProvider?: boolean;
     paginationPageSizeLimit?: number;
     serviceNames: ServiceNames[];
-    handleProviderServerUrl: string;
+    handleProviderServerUrl?: string;
   };
