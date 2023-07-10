@@ -74,7 +74,7 @@ export class AssetFixtureBuilder {
       return {
         id: Cardano.AssetId(`${hexPolicy}${hexName}`),
         metadata: json
-          ? Asset.util.metadatumToCip25(
+          ? Asset.NftMetadata.fromMetadatum(
               { name: assetName, policyId },
               new Map<bigint, Cardano.Metadatum>([[721n, ProviderUtil.jsonToMetadatum(json)]]),
               this.#logger

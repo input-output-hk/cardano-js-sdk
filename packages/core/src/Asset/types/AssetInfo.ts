@@ -1,5 +1,5 @@
 import { AssetFingerprint, AssetId, AssetName, PolicyId, TransactionId } from '../../Cardano';
-import { NftMetadata } from './NftMetadata';
+import { NftMetadata } from '../NftMetadata';
 import { TokenMetadata } from './TokenMetadata';
 
 export interface AssetMintOrBurn {
