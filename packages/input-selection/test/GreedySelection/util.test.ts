@@ -1,6 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
 import { InputSelectionError, InputSelectionFailure, splitChange } from '../../src';
-import { asAssetId, asPaymentAddress, asTokenMap } from '../util';
+import { asAssetId, asPaymentAddress, asTokenMap, getCoinValueForAddress } from '../util';
 
 describe('splitChange', () => {
   it('correctly split pure lovelace change', async () => {
@@ -19,13 +19,18 @@ describe('splitChange', () => {
       2_000_000n
     );
 
-    expect(change.length).toEqual(3);
-    expect(change[0].address).toEqual(asPaymentAddress('A'));
-    expect(change[0].value.coins).toEqual(50n);
-    expect(change[1].address).toEqual(asPaymentAddress('B'));
-    expect(change[1].value.coins).toEqual(38n);
-    expect(change[2].address).toEqual(asPaymentAddress('C'));
-    expect(change[2].value.coins).toEqual(12n);
+    expect(getCoinValueForAddress('A', change)).toEqual(50n);
+    expect(getCoinValueForAddress('B', change)).toEqual(38n);
+    expect(getCoinValueForAddress('C', change)).toEqual(12n);
+
+    expect(change).toEqual([
+      { address: 'A', value: { coins: 25n } },
+      { address: 'B', value: { coins: 19n } },
+      { address: 'B', value: { coins: 19n } },
+      { address: 'A', value: { coins: 13n } },
+      { address: 'A', value: { coins: 12n } },
+      { address: 'C', value: { coins: 12n } }
+    ]);
   });
 
   it('pushes the error to the last token', async () => {
@@ -44,13 +49,18 @@ describe('splitChange', () => {
       2_000_000n
     );
 
-    expect(change.length).toEqual(3);
-    expect(change[0].address).toEqual(asPaymentAddress('A'));
-    expect(change[0].value.coins).toEqual(34n);
-    expect(change[1].address).toEqual(asPaymentAddress('B'));
-    expect(change[1].value.coins).toEqual(34n);
-    expect(change[2].address).toEqual(asPaymentAddress('C'));
-    expect(change[2].value.coins).toEqual(32n); // Rounding error is pushed to the last entry
+    expect(getCoinValueForAddress('A', change)).toEqual(34n);
+    expect(getCoinValueForAddress('B', change)).toEqual(34n);
+    expect(getCoinValueForAddress('C', change)).toEqual(32n); // Rounding error is pushed to the last entry
+
+    expect(change).toEqual([
+      { address: 'A', value: { coins: 17n } },
+      { address: 'A', value: { coins: 17n } },
+      { address: 'B', value: { coins: 17n } },
+      { address: 'B', value: { coins: 17n } },
+      { address: 'C', value: { coins: 16n } },
+      { address: 'C', value: { coins: 16n } }
+    ]);
   });
 
   it('allocates native assets on the first output', async () => {
@@ -71,23 +81,17 @@ describe('splitChange', () => {
 
     const change = await splitChange(
       async () => changeAddressWithDistribution,
-      10_000_000n, // 10 ADA in change
+      60_000_000n, // 60 ADA in change
       assets,
       () => 10n,
       () => false,
-      2_000_000n
+      200_000n
     );
 
-    expect(change.length).toEqual(3);
-    expect(change[0].address).toEqual(asPaymentAddress('A'));
-    expect(change[0].value.coins).toEqual(3_333_334n);
+    expect(getCoinValueForAddress('A', change)).toEqual(20_000_000n);
     expect(change[0].value.assets).toEqual(assets);
-    expect(change[1].address).toEqual(asPaymentAddress('B'));
-    expect(change[1].value.coins).toEqual(3_333_334n);
-    expect(change[1].value.assets).toBeUndefined();
-    expect(change[2].address).toEqual(asPaymentAddress('C'));
-    expect(change[2].value.coins).toEqual(3_333_332n);
-    expect(change[2].value.assets).toBeUndefined();
+    expect(getCoinValueForAddress('B', change)).toEqual(20_000_000n);
+    expect(getCoinValueForAddress('C', change)).toEqual(20_000_000n);
   });
 
   it('spills over native assets to other change outputs if they dont fit', async () => {
@@ -108,16 +112,14 @@ describe('splitChange', () => {
 
     const change = await splitChange(
       async () => changeAddressWithDistribution,
-      10_000_000n, // 10 ADA in change
+      60_000_000n, // 60 ADA in change
       assets,
       () => 10n,
       (tokenBundle: Cardano.TokenMap | undefined) => tokenBundle!.size > 4, // Impose an artificial limit of four asset class per output.
-      2_000_000n
+      200_000n
     );
 
-    expect(change.length).toEqual(3);
-    expect(change[0].address).toEqual(asPaymentAddress('A'));
-    expect(change[0].value.coins).toEqual(3_333_334n);
+    expect(getCoinValueForAddress('A', change)).toEqual(20_000_000n);
     expect(change[0].value.assets).toEqual(
       asTokenMap([
         [asAssetId('2'), 1n],
@@ -126,16 +128,16 @@ describe('splitChange', () => {
         [asAssetId('5'), 500n]
       ])
     );
-    expect(change[1].address).toEqual(asPaymentAddress('B'));
-    expect(change[1].value.coins).toEqual(3_333_334n);
+
+    expect(getCoinValueForAddress('B', change)).toEqual(20_000_000n);
     expect(change[1].value.assets).toEqual(
       asTokenMap([
         [asAssetId('0'), 100n],
         [asAssetId('1'), 23n]
       ])
     );
-    expect(change[2].address).toEqual(asPaymentAddress('C'));
-    expect(change[2].value.coins).toEqual(3_333_332n);
+
+    expect(getCoinValueForAddress('C', change)).toEqual(20_000_000n);
     expect(change[2].value.assets).toBeUndefined();
   });
 

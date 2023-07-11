@@ -51,7 +51,7 @@ const testInputSelection = (name: string, getAlgorithm: () => InputSelector) => 
         // Regression
         await testInputSelectionProperties({
           createOutputs: () => [],
-          createUtxo: () => [TxTestUtil.createUnspentTxOutput({ coins: 20_999_994n })],
+          createUtxo: () => [TxTestUtil.createUnspentTxOutput({ coins: 30_999_994n })],
           getAlgorithm,
           mockConstraints: {
             ...SelectionConstraints.MOCK_NO_CONSTRAINTS,
@@ -234,7 +234,12 @@ const testInputSelection = (name: string, getAlgorithm: () => InputSelector) => 
               TxTestUtil.createUnspentTxOutput({
                 assets: new Map([
                   [AssetId.TSLA, 1000n],
-                  [AssetId.PXL, 1000n]
+                  [AssetId.PXL, 1000n],
+                  [AssetId.Unit, 1000n],
+                  [AssetId.A, 1000n],
+                  [AssetId.B, 1000n],
+                  [AssetId.C, 1000n],
+                  [AssetId.D, 1000n]
                 ]),
                 coins: 2_000_000n
               })

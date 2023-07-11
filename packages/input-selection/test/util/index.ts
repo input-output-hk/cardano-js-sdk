@@ -18,3 +18,15 @@ export class MockChangeAddressResolver implements ChangeAddressResolver {
     }));
   }
 }
+
+/**
+ * Coalesce all coin values from all outputs in the change set that belongs to the given address.
+ *
+ * @param address The address to query.
+ * @param change The change set.
+ */
+export const getCoinValueForAddress = (address: string, change: Array<Cardano.TxOut>) =>
+  change
+    .filter((out) => out.address === address)
+    .map((out) => out.value.coins)
+    .reduce((cur, prev) => cur + prev, 0n);
