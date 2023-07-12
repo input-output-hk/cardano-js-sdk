@@ -110,6 +110,8 @@ jobs:
     <<: *job
     needs: [discover, images]
     name: ${{ matrix.target.jobName }} (eu-central-1)
+    env:
+      AWS_REGION: eu-central-1
     permissions:
       id-token: write
       contents: read
@@ -138,6 +140,13 @@ jobs:
           ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
           user_name: ${{ env.DISCOVERY_USER_NAME }}
           ssh_known_hosts_entry: ${{ env.DISCOVERY_KNOWN_HOSTS_ENTRY }}
+
+      - name: Configure K8S Cluster Access
+        shell: bash
+        run: |
+          echo "Assuming role '$(aws sts get-caller-identity)' in cluster 'lace-prod-eu-central-1'."
+          aws eks update-kubeconfig --name "lace-prod-eu-central-1"
+
       - uses: divnix/std-action/run@main
         with: {ffBuildInstructions: true, remoteStore: "ssh-ng://eu.nixbuild.net"}
       
