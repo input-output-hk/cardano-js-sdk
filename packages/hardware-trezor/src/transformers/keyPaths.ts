@@ -16,6 +16,17 @@ export const paymentKeyPathFromGroupedAddress = (address: GroupedAddress): BIP32
   address.index
 ];
 
+export const stakeKeyPathFromGroupedAddress = (address: GroupedAddress): BIP32Path | null =>
+  address.stakeKeyDerivationPath
+    ? [
+        util.harden(CardanoKeyConst.PURPOSE),
+        util.harden(CardanoKeyConst.COIN_TYPE),
+        util.harden(address.accountIndex),
+        address.stakeKeyDerivationPath.role,
+        address.stakeKeyDerivationPath.index
+      ]
+    : null;
+
 /**
  * Uses the given Trezor input resolver to resolve the payment key
  * path for known addresses for given input transaction.
