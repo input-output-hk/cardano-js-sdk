@@ -58,6 +58,93 @@ const distributeAssets = (
 };
 
 /**
+ * Computes the lowest amount a change output is allowed to have during change
+ * distribution within the same stake address.
+ *
+ * @param amount The total available lovelace amount.
+ */
+const getMinUtxoAmount = (amount: bigint): bigint => {
+  // The smaller the value, the bigger the amount of UTXOs that will be present in the stake address.
+  const granularityFactor = new BigNumber(0.03);
+
+  // Computes the smallest number with the same number of tens, for example: 3_725_000, will yield 1_000_000.
+  let tens = amount.toString().length - 1;
+  let minLovelaceStr = '1';
+
+  while (tens > 0) {
+    minLovelaceStr += '0';
+    --tens;
+  }
+
+  return BigInt(new BigNumber(minLovelaceStr).multipliedBy(granularityFactor).toFixed(0, 0));
+};
+
+/**
+ * Given a change output, split it following an exponential distribution. For example
+ * 100000 will yield:
+ *
+ * [ 50000n, 25000n, 12500n, 6250n, 3125n, 3125n ]
+ *
+ * We chose an exponential distribution (n**2), because it gives the best compromise in granularity
+ * and amount of UTXOs generated. We don't want too many UTXOs as this could make the transaction exceed the max allow
+ * TX size, but at the same time we want a diverse and big enough amount of UTXOs to reasonably build any TX with a fairly
+ * small amount of inputs.
+ *
+ * Using an exponential distribution will also guarantee that the number of UTXOs generated will be more or less the same
+ * regardless of the amount of total available lovelace, for example:
+ *
+ * 10      => [ 5n,      2n,      1n,      1n,     1n             ]
+ * 100     => [ 50n,     25n,     12n,     6n,     3n,     4n     ]
+ * 1000    => [ 500n,    250n,    125n,    62n,    31n,    32n    ]
+ * 10000   => [ 5000n,   2500n,   1250n,   625n,   312n,   313n   ]
+ * 100000  => [ 50000n,  25000n,  12500n,  6250n,  3125n,  3125n  ]
+ * 1000000 => [ 500000n, 250000n, 125000n, 62500n, 31250n, 31250n ]
+ *
+ * @param output The output to be split.
+ * @param computeMinimumCoinQuantity ComputeMinimumCoinQuantity.
+ */
+const splitChangeOutput = (
+  output: Cardano.TxOut,
+  computeMinimumCoinQuantity: ComputeMinimumCoinQuantity
+): Array<Cardano.TxOut> => {
+  const amount = output.value.coins;
+  const minUtxoAdaAmount = getMinUtxoAmount(amount);
+
+  let remaining = amount;
+  let runningAmount = 0n;
+  const amounts = new Array<bigint>();
+  const divisor = new BigNumber(2);
+
+  while (remaining > minUtxoAdaAmount) {
+    const val = BigInt(new BigNumber(remaining.toString()).dividedBy(divisor).toFixed(0, 0));
+
+    const updatedRemaining = remaining - val;
+    if (
+      updatedRemaining <= minUtxoAdaAmount ||
+      updatedRemaining <=
+        computeMinimumCoinQuantity({
+          address: output.address,
+          value: { assets: output.value.assets, coins: amount - runningAmount }
+        })
+    ) {
+      amounts.push(amount - runningAmount); // Add all that remains to account for rounding errors
+      break;
+    }
+
+    runningAmount += val;
+
+    amounts.push(val);
+
+    remaining -= val;
+  }
+
+  return amounts.map((coins) => ({
+    address: output.address,
+    value: { assets: output.value.assets, coins }
+  }));
+};
+
+/**
  * Splits the change proportionally between the given addresses. This algorithm makes
  * the best effort to be as accurate as possible in distributing the amounts, however, due to rounding
  * there may be a small error in the final distribution, I.E 8 lovelace divided in three equal parts will
@@ -120,7 +207,8 @@ export const splitChange = async (
     changeOutputs[changeOutputs.length - 1].value.coins += missingAllocation;
   }
 
-  const sortedOutputs = changeOutputs.sort(sortByCoins).filter((out) => out.value.coins > 0n);
+  const splitOutputs = changeOutputs.flatMap((output) => splitChangeOutput(output, computeMinimumCoinQuantity));
+  const sortedOutputs = splitOutputs.sort(sortByCoins).filter((out) => out.value.coins > 0n);
 
   if (sortedOutputs && sortedOutputs.length > 0) sortedOutputs[0].value.assets = totalChangeAssets; // Add all assets to the 'biggest' output.
 
