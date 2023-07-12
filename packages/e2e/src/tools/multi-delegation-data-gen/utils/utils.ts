@@ -1,7 +1,6 @@
 /* eslint-disable no-console, max-statements, max-params, @typescript-eslint/no-floating-promises */
 import { ValueTransferConfig, configLoader } from './config';
 
-import { AddressType, AsyncKeyAgent, GroupedAddress, util } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import { Files, Paths } from './files';
 import {
@@ -18,34 +17,8 @@ import { Observable, filter, firstValueFrom, map } from 'rxjs';
 import { PersonalWallet } from '@cardano-sdk/wallet';
 import { TaskResult, TerminalProgressMonitor } from './terminal-progress-monitor';
 import { logger } from '@cardano-sdk/util-dev';
+import { util } from '@cardano-sdk/key-management';
 import chalk from 'chalk';
-
-/**
- * Gets grouped addresses with increasing stake key index.
- *
- * @param keyAgent The key agent to be used to generate the addresses.
- * @param addressCount Number of addresses to be generated.
- */
-export const getStakeAddresses = async (
-  keyAgent: AsyncKeyAgent,
-  addressCount: number
-): Promise<Array<GroupedAddress>> => {
-  const addresses = new Array<GroupedAddress>();
-
-  for (let i = 0; i < addressCount; ++i) {
-    const address = await keyAgent.deriveAddress(
-      {
-        index: 0,
-        type: AddressType.External
-      },
-      i
-    );
-
-    addresses.push(address);
-  }
-
-  return addresses;
-};
 
 /**
  * Gets a list of the available pool.
@@ -82,43 +55,6 @@ export const rewardAccountStatuses = async (
     `Timeout waiting for all reward accounts stake keys to be one of ${statuses.join('|')}`,
     timeout
   );
-
-/**
- * Registers and delegates reward accounts to different pools.
- */
-export const delegateToMultiplePools = async (
-  fundingWallet: PersonalWallet,
-  rewardAccounts: GroupedAddress[],
-  monitor: TerminalProgressMonitor
-) => {
-  const stakeKeyRegCertificates = rewardAccounts.map(({ rewardAccount }) =>
-    Cardano.createStakeKeyRegistrationCert(rewardAccount)
-  );
-  const poolIds = await getPoolIds(fundingWallet, rewardAccounts.length);
-  const delegationCertificates = rewardAccounts.map((account) =>
-    Cardano.createDelegationCert(account.rewardAccount, poolIds[account.stakeKeyDerivationPath!.index].id)
-  );
-
-  monitor.logInfo(
-    `Registering accounts: [${chalk.green(rewardAccounts.map(({ rewardAccount }) => rewardAccount).join(', '))}]`
-  );
-
-  monitor.startTask(
-    `Delegating to pools [${chalk.green(poolIds.map(({ id }) => id).join(', '))}] and registering ${chalk.green(
-      stakeKeyRegCertificates.length
-    )} stake keys`
-  );
-
-  const txBuilder = fundingWallet.createTxBuilder();
-
-  txBuilder.partialTxBody.certificates = [...stakeKeyRegCertificates, ...delegationCertificates];
-  const { tx } = await txBuilder.build().sign();
-  await submitAndConfirm(fundingWallet, tx);
-
-  monitor.endTask('Stake keys delegated', TaskResult.Success);
-
-  return poolIds;
-};
 
 const env = getEnv(walletVariables);
 
@@ -232,70 +168,28 @@ export const transferStartingFunds = async (
 };
 
 /**
- * Generates a list of stake addresses.
- *
- * @param delegationWallet The delegation wallets.
- * @param stakeKeyCount The number of stake keys to use in the generation of the addresses.
- * @param monitor The progress monitor.
- */
-export const generateStakeAddresses = async (
-  delegationWallet: PersonalWallet,
-  stakeKeyCount: number,
-  monitor: TerminalProgressMonitor
-) => {
-  monitor.startTask('Generating stake addresses.');
-
-  const stakeAddresses = await getStakeAddresses(delegationWallet.keyAgent, stakeKeyCount);
-
-  monitor.endTask(
-    `Stake addresses generated: [${chalk.green!(stakeAddresses.map(({ rewardAccount }) => rewardAccount).join(', '))}]`,
-    TaskResult.Success
-  );
-
-  return stakeAddresses;
-};
-
-/**
  * Distribute the stake among different addresses.
  *
  * @param delegationWallet The delegation wallets.
- * @param startingFunds The total starting funds.
  * @param stakeDistribution The stake distribution to be followed.
- * @param stakeAddresses The list of stake addresses.
  * @param monitor The progress monitor.
- * @param pools The pools we are delegating to.
  */
 export const distributeStake = async (
   delegationWallet: PersonalWallet,
-  startingFunds: number,
   stakeDistribution: Array<number>,
-  stakeAddresses: Array<GroupedAddress>,
-  monitor: TerminalProgressMonitor,
-  pools: Array<Cardano.StakePool>
+  monitor: TerminalProgressMonitor
 ): Promise<Cardano.Cip17DelegationPortfolio> => {
-  // TODO: Replace with delegatePortfolio once LW-6702 is merged.
-  const totalWeight = stakeDistribution.reduce((sum, current) => sum + current, 0);
-  const stakeDistributionSsPercent = stakeDistribution.map((value) => value / totalWeight);
-  monitor.startTask(`Distribute ${startingFunds} among stake addresses [${stakeDistribution.join(', ')}].`);
-
-  const txBuilder = delegationWallet.createTxBuilder();
+  const pools = await getPoolIds(delegationWallet, stakeDistribution.length);
 
   const portfolio: Cardano.Cip17DelegationPortfolio = {
     name: 'Portfolio',
-    pools: stakeDistributionSsPercent.map((weight, index) => ({ id: pools[index].hexId, weight }))
+    pools: pools.map((pool, index) => ({ id: pool.hexId, weight: stakeDistribution[index] }))
   };
 
-  let i = 0;
-  const startingFundsMinusFee = startingFunds - 5_000_000;
-  for (const { address } of stakeAddresses) {
-    const coinsToBeDeposited = stakeDistributionSsPercent[i] * startingFundsMinusFee;
-    txBuilder.addOutput(txBuilder.buildOutput().address(address).coin(BigInt(coinsToBeDeposited)).toTxOut());
-    ++i;
-  }
+  logger.debug('Delegating portfolio', portfolio);
 
-  const { tx: signedTx } = await txBuilder.build().sign();
-
-  await submitAndConfirm(delegationWallet, signedTx);
+  const { tx } = await delegationWallet.createTxBuilder().delegatePortfolio(portfolio).build().sign();
+  await submitAndConfirm(delegationWallet, tx);
 
   monitor.endTask('Funds distributed', TaskResult.Success);
 

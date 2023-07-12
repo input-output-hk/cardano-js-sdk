@@ -5,9 +5,7 @@ import {
   TaskResult,
   TerminalProgressMonitor,
   createDelegationWallet,
-  delegateToMultiplePools,
   distributeStake,
-  generateStakeAddresses,
   getOutputPathName,
   loadConfiguration,
   logState,
@@ -70,17 +68,7 @@ const monitor = new TerminalProgressMonitor();
 
     monitor.endTask('Delegation wallet ready.', TaskResult.Success);
 
-    const stakeAddresses = await generateStakeAddresses(delegationWallet, config.stakeDistribution.length, monitor);
-
-    const pools = await delegateToMultiplePools(delegationWallet, stakeAddresses, monitor);
-    const portfolio = await distributeStake(
-      delegationWallet,
-      config.startingFunds,
-      config.stakeDistribution,
-      stakeAddresses,
-      monitor,
-      pools
-    );
+    const portfolio = await distributeStake(delegationWallet, config.stakeDistribution, monitor);
 
     monitor.startTask('Waiting for delegation to be updated on the wallet.');
     await rewardAccountStatuses(delegationWallet.delegation.rewardAccounts$, [
