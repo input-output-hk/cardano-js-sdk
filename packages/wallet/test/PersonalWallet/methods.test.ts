@@ -1,17 +1,65 @@
-/* eslint-disable unicorn/consistent-destructuring */
+/* eslint-disable unicorn/consistent-destructuring, sonarjs/no-duplicate-string, @typescript-eslint/no-floating-promises, promise/no-nesting, promise/always-return */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
-import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
+import { AddressType, AsyncKeyAgent, GroupedAddress, SignBlobResult, util } from '@cardano-sdk/key-management';
+import {
+  AssetId,
+  createStubStakePoolProvider,
+  generateRandomHexString,
+  mockProviders as mocks
+} from '@cardano-sdk/util-dev';
 import { BehaviorSubject, firstValueFrom, skip } from 'rxjs';
 import { CML, Cardano, CardanoNodeErrors, ProviderError, ProviderFailure, TxCBOR } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
-import { InitializeTxProps } from '@cardano-sdk/tx-construction';
+import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
 import { PersonalWallet, setupWallet } from '../../src';
 import { getPassphrase, stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { dummyLogger as logger } from 'ts-log';
 import { toOutgoingTx, waitForWalletStateSettle } from '../util';
+import delay from 'delay';
 
 const { mockChainHistoryProvider, mockRewardsProvider, utxo } = mocks;
+
+class StubKeyAgent implements AsyncKeyAgent {
+  knownAddresses$ = new BehaviorSubject<GroupedAddress[]>([]);
+
+  constructor(private inputResolver: Cardano.InputResolver) {}
+
+  deriveAddress(): Promise<GroupedAddress> {
+    throw new Error('Method not implemented.');
+  }
+  derivePublicKey(): Promise<Crypto.Ed25519PublicKeyHex> {
+    throw new Error('Method not implemented.');
+  }
+  signBlob(): Promise<SignBlobResult> {
+    throw new Error('Method not implemented.');
+  }
+  async signTransaction(txInternals: Cardano.TxBodyWithHash): Promise<Cardano.Signatures> {
+    const signatures = new Map<Crypto.Ed25519PublicKeyHex, Crypto.Ed25519SignatureHex>();
+    const knownAddresses = await firstValueFrom(this.knownAddresses$);
+    for (const _ of await util.ownSignatureKeyPaths(txInternals.body, knownAddresses, this.inputResolver)) {
+      signatures.set(
+        Crypto.Ed25519PublicKeyHex(generateRandomHexString(64)),
+        Crypto.Ed25519SignatureHex(generateRandomHexString(128))
+      );
+    }
+    return signatures;
+  }
+  getChainId(): Promise<Cardano.ChainId> {
+    throw new Error('Method not implemented.');
+  }
+  getBip32Ed25519(): Promise<Crypto.Bip32Ed25519> {
+    throw new Error('Method not implemented.');
+  }
+  getExtendedAccountPublicKey(): Promise<Crypto.Bip32PublicKeyHex> {
+    throw new Error('Method not implemented.');
+  }
+  async setKnownAddresses(addresses: GroupedAddress[]): Promise<void> {
+    this.knownAddresses$.next(addresses);
+  }
+  shutdown(): void {
+    throw new Error('Method not implemented.');
+  }
+}
 
 // We can't consistently re-serialize this specific tx due to witness.datums list format
 const serializedForeignTx =
@@ -207,6 +255,115 @@ describe('PersonalWallet methods', () => {
       expect(tx.body).toBe(txInternals.body);
       expect(tx.id).toBe(txInternals.hash);
       expect(tx.witness.signatures.size).toBe(2); // spending key and stake key for withdrawal
+    });
+
+    it('finalizeTx awaits for non-empty knownAddresses$', (done) => {
+      const inputResolver: Cardano.InputResolver = {
+        resolveInput: async (txIn) =>
+          mocks.utxo.find(
+            ([hydratedTxIn]) => txIn.txId === hydratedTxIn.txId && txIn.index === hydratedTxIn.index
+          )?.[1] || null
+      };
+
+      const mockKeyAgent = new StubKeyAgent(inputResolver);
+
+      setupWallet({
+        bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
+        createKeyAgent: async () => mockKeyAgent,
+        createWallet: async (keyAgent) =>
+          new PersonalWallet(
+            { name: 'Stub Wallet' },
+            {
+              assetProvider: mocks.mockAssetProvider(),
+              chainHistoryProvider: mockChainHistoryProvider(),
+              handleProvider: mocks.mockHandleProvider(),
+              keyAgent,
+              logger,
+              networkInfoProvider: mocks.mockNetworkInfoProvider(),
+              rewardsProvider: mockRewardsProvider(),
+              stakePoolProvider: createStubStakePoolProvider(),
+              txSubmitProvider: mocks.mockTxSubmitProvider(),
+              utxoProvider: mocks.mockUtxoProvider()
+            }
+          ),
+        logger
+      })
+        .then(({ wallet: stubWallet }) => {
+          // We need to manually build the TX, since initialize waits for the wallet to settle. The bug happens because
+          // callers (I.E cip30.ts) can call finalize directly since they already have the tx built. Bypassing initialize.
+          const txInternals = {
+            body: {
+              collaterals: new Set([utxo[2][0]]),
+              fee: 194_805n,
+              inputs: [utxo[1][0]],
+              mint: new Map([
+                [AssetId.PXL, 5n],
+                [AssetId.TSLA, 20n]
+              ]),
+              outputs: new Set<Cardano.TxOut>(outputs),
+              requiredExtraSignatures: [
+                Crypto.Ed25519KeyHashHex('6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed5')
+              ],
+              scriptIntegrityHash: Crypto.Hash32ByteBase16(
+                '3e33018e8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d'
+              ),
+              validityInterval: { invalidHereafter: 37_841_696 },
+              withdrawals: [
+                {
+                  quantity: 33_333n,
+                  stakeAddress: Cardano.RewardAccount(
+                    'stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d'
+                  )
+                }
+              ]
+            },
+            hash: Cardano.TransactionId('c3690ddfe8175bcbda4c8d30ba990da057ffd39317e926a9ee24e1272f20fe9c'),
+            inputSelection: {
+              change: [
+                {
+                  address: Cardano.PaymentAddress(
+                    'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'
+                  ),
+                  value: { coins: 1_596_110n }
+                }
+              ],
+              fee: 194_805n,
+              inputs: new Set<Cardano.HydratedTxIn>(),
+              outputs: []
+            }
+          } as unknown as InitializeTxResult;
+
+          // Finalize the TX first. Should only resolve if the key agent eventually discover some addresses.
+          // eslint-disable-next-line promise/catch-or-return
+          stubWallet
+            .finalizeTx({ tx: txInternals })
+            .then((tx) => {
+              expect(tx.body).toBe(txInternals.body);
+              expect(tx.id).toBe(txInternals.hash);
+              expect(tx.witness.signatures.size).toBe(1);
+
+              // eslint-disable-next-line promise/no-callback-in-promise
+              done();
+            })
+            .catch();
+
+          Promise.all([
+            delay(1),
+            mockKeyAgent.setKnownAddresses([
+              {
+                accountIndex: 0,
+                address: mocks.utxo[0][1].address,
+                index: 0,
+                networkId: Cardano.NetworkId.Testnet,
+                rewardAccount: mocks.rewardAccount,
+                type: AddressType.External
+              }
+            ])
+          ]).catch();
+
+          return wallet;
+        })
+        .catch();
     });
 
     describe('submitTx', () => {
