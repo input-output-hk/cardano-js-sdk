@@ -278,15 +278,15 @@ export const createWalletApi = (
     return Promise.resolve([]);
   },
   getUsedAddresses: async (_paginate?: Paginate): Promise<Cbor[]> => {
-    logger.debug('getting changeAddress');
+    logger.debug('getting used addresses');
 
     const wallet = await firstValueFrom(wallet$);
-    const [{ address }] = await firstValueFrom(wallet.addresses$);
+    const addresses = await firstValueFrom(wallet.addresses$);
 
-    if (!address) {
+    if (addresses.length === 0) {
       throw new ApiError(APIErrorCode.InternalError, 'could not get used addresses');
     } else {
-      return [cardanoAddressToCbor(address)];
+      return addresses.map((groupAddresses) => cardanoAddressToCbor(groupAddresses.address));
     }
   },
   getUtxos: async (amount?: Cbor, paginate?: Paginate): Promise<Cbor[] | null> => {

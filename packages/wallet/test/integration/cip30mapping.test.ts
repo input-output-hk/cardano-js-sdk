@@ -349,8 +349,10 @@ describe('cip30', () => {
 
       test('api.getUsedAddresses', async () => {
         const cipUsedAddressess = await api.getUsedAddresses();
-        const [{ address: walletAddress }] = await firstValueFrom(wallet.addresses$);
-        expect(cipUsedAddressess.map((cipAddr) => Cardano.PaymentAddress(cipAddr))).toEqual([walletAddress]);
+        const usedAddresses = (await firstValueFrom(wallet.addresses$)).map((grouped) => grouped.address);
+
+        expect(cipUsedAddressess.length).toBeGreaterThan(1);
+        expect(cipUsedAddressess.map((cipAddr) => Cardano.PaymentAddress(cipAddr))).toEqual(usedAddresses);
       });
 
       test('api.getUnusedAddresses', async () => {
