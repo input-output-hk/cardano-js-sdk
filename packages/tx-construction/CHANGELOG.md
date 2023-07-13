@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.7-patch.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.8.7-patch.0...@cardano-sdk/tx-construction@0.8.7-patch.1) (2023-07-13)
+
+### Bug Fixes
+
+* wallet finalizeTx and CIP30 requiresForeignSignatures now wait for at least one known address ([1e503a3](https://github.com/input-output-hk/cardano-js-sdk/commit/1e503a3798720f6d4767b23f6cccf0dfa100d155))
+
 ## [0.8.7-patch.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.8.6-patch.0...@cardano-sdk/tx-construction@0.8.7-patch.0) (2023-07-05)
 
 **Note:** Version bump only for package @cardano-sdk/tx-construction
