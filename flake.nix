@@ -9,6 +9,9 @@
     nix-filter,
     flake-utils,
   }: {
+
+    internal.parseYarnLockV3 = import ./yarn3-lock-parser.nix { inherit (self) inputs; };
+
     packages.x86_64-linux.default = let
       pkgs = nixpkgs.legacyPackages.x86_64-linux;
       chromedriverBin = pkgs.fetchurl {
