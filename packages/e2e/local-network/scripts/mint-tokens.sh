@@ -23,6 +23,24 @@ while [ ! -S "$CARDANO_NODE_SOCKET_PATH" ]; do
   sleep 2
 done
 
+wait_tx_complete() {
+  utxo_to_check="$1"
+  timeout=0
+  max_timeout=10
+  while [ $timeout -lt $max_timeout ]; do
+    output=$(cardano-cli query utxo --tx-in "${utxo_to_check}" --testnet-magic 888)
+    line_count=$(echo "$output" | awk 'END {print NR}')
+    if [ $line_count -eq 2 ]; then
+      echo "Transaction completed"
+      return 0
+    fi
+    timeout=$((timeout + 1))
+    sleep 1
+  done
+  echo "Timeout: Transaction not completed in 10 sec."
+  return 1
+}
+
 echo "Create Mary-era minting policy"
 cat >network-files/utxo-keys/minting-policy.json <<EOL
 {
@@ -62,3 +80,4 @@ cardano-cli transaction sign \
   --out-file tx.signed
 
 cardano-cli transaction submit --testnet-magic 888 --tx-file tx.signed
+wait_tx_complete $utxo
