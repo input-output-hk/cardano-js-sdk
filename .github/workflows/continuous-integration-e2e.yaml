@@ -12,7 +12,7 @@ on:
     tags: [ "*.*.*" ]
 
 jobs:
-  build_and_test:
+  build_and_test_wallet:
     strategy:
       matrix:
         os: [ ubuntu-20.04 ]
@@ -55,33 +55,144 @@ jobs:
 
     - name: 🔬 Test - e2e - wallet
       run: |
+        source .github/workflow/continuous-integration-e2e.env
         yarn workspace @cardano-sdk/e2e test:wallet
-        yarn workspace @cardano-sdk/e2e test:providers
-        yarn workspace @cardano-sdk/e2e test:projection
-        yarn workspace @cardano-sdk/e2e test:pg-boss
+
+  build_and_test_providers:
+    strategy:
+      matrix:
+        os: [ ubuntu-20.04 ]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v3
+
+    - name: 🧰 Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18.12.0
+
+    - name: 🔨 Build
+      run: |
+        yarn install --immutable --inline-builds
+        yarn build
+        docker build --no-cache .
+
+    - name: 🌐 Setup local test network
+      working-directory: packages/e2e
+      run: |
+        yarn local-network:up -d
       env:
-        KEY_MANAGEMENT_PROVIDER: 'inMemory'
-        KEY_MANAGEMENT_PARAMS: '{"bip32Ed25519": "CML", "accountIndex": 0, "chainId":{"networkId": 0, "networkMagic": 888}, "passphrase":"some_passphrase","mnemonic":"vacant violin soft weird deliver render brief always monitor general maid smart jelly core drastic erode echo there clump dizzy card filter option defense"}'
-        ASSET_PROVIDER: 'http'
-        ASSET_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/asset"}'
-        CHAIN_HISTORY_PROVIDER: 'http'
-        CHAIN_HISTORY_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/chain-history"}'
+        CARDANO_NODE_CHAINDB_LOG_LEVEL: 'Warning'
+        CARDANO_NODE_LOG_LEVEL: 'Warning'
+        OGMIOS_PORT: '1340'
+        OGMIOS_URL: 'ws://cardano-node-ogmios:1340'
+        POSTGRES_PORT: '5435'
+
+    - name: Dump docker logs on failure
+      if: failure()
+      uses: jwalton/gh-docker-logs@v2
+
+    - name: Wait for some epochs
+      run: |
+        yarn workspace @cardano-sdk/e2e wait-for-network
+      env:
         DB_SYNC_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/cexplorer'
-        HANDLE_PROVIDER: 'http'
-        HANDLE_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/handle","policyId":""}'
-        KORA_LABS_HANDLE_PROVIDER: 'kora-labs'
-        KORA_LABS_HANDLE_PROVIDER_PARAMS: '{"serverUrl":"http://localhost:4000","policyId":""}'
-        STAKE_POOL_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/stake_pool'
-        STAKE_POOL_TEST_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/stake_pool_test'
-        NETWORK_INFO_PROVIDER: 'http'
-        NETWORK_INFO_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/network-info"}'
-        OGMIOS_URL: 'ws://localhost:1340/'
-        REWARDS_PROVIDER: 'http'
-        REWARDS_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/rewards"}'
-        TX_SUBMIT_PROVIDER: 'http'
-        TX_SUBMIT_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/tx-submit"}'
-        UTXO_PROVIDER: 'http'
-        UTXO_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/utxo"}'
-        STAKE_POOL_PROVIDER: 'http'
-        STAKE_POOL_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/stake-pool"}'
-        STAKE_POOL_PROVIDER_URL: 'http://localhost:4000/stake-pool'
+
+    - name: 🔬 Test - e2e - wallet
+      run: |
+        source .github/workflow/continuous-integration-e2e.env
+        yarn workspace @cardano-sdk/e2e test:providers
+
+  build_and_test_projection:
+    strategy:
+      matrix:
+        os: [ ubuntu-20.04 ]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v3
+
+    - name: 🧰 Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18.12.0
+
+    - name: 🔨 Build
+      run: |
+        yarn install --immutable --inline-builds
+        yarn build
+        docker build --no-cache .
+
+    - name: 🌐 Setup local test network
+      working-directory: packages/e2e
+      run: |
+        yarn local-network:up -d
+      env:
+        CARDANO_NODE_CHAINDB_LOG_LEVEL: 'Warning'
+        CARDANO_NODE_LOG_LEVEL: 'Warning'
+        OGMIOS_PORT: '1340'
+        OGMIOS_URL: 'ws://cardano-node-ogmios:1340'
+        POSTGRES_PORT: '5435'
+
+    - name: Dump docker logs on failure
+      if: failure()
+      uses: jwalton/gh-docker-logs@v2
+
+    - name: Wait for some epochs
+      run: |
+        yarn workspace @cardano-sdk/e2e wait-for-network
+      env:
+        DB_SYNC_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/cexplorer'
+
+    - name: 🔬 Test - e2e - wallet
+      run: |
+        source .github/workflow/continuous-integration-e2e.env
+        yarn workspace @cardano-sdk/e2e test:projection
+
+
+  build_and_test_pg_boss:
+    strategy:
+      matrix:
+        os: [ ubuntu-20.04 ]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v3
+
+    - name: 🧰 Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18.12.0
+
+    - name: 🔨 Build
+      run: |
+        yarn install --immutable --inline-builds
+        yarn build
+        docker build --no-cache .
+
+    - name: 🌐 Setup local test network
+      working-directory: packages/e2e
+      run: |
+        yarn local-network:up -d
+      env:
+        CARDANO_NODE_CHAINDB_LOG_LEVEL: 'Warning'
+        CARDANO_NODE_LOG_LEVEL: 'Warning'
+        OGMIOS_PORT: '1340'
+        OGMIOS_URL: 'ws://cardano-node-ogmios:1340'
+        POSTGRES_PORT: '5435'
+
+    - name: Dump docker logs on failure
+      if: failure()
+      uses: jwalton/gh-docker-logs@v2
+
+    - name: Wait for some epochs
+      run: |
+        yarn workspace @cardano-sdk/e2e wait-for-network
+      env:
+        DB_SYNC_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/cexplorer'
+
+    - name: 🔬 Test - e2e - wallet
+      run: |
+        source .github/workflow/continuous-integration-e2e.env
+        yarn workspace @cardano-sdk/e2e test:pg-boss
