@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.17](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.7.16...@cardano-sdk/golden-test-generator@0.7.17) (2023-07-13)
+
+**Note:** Version bump only for package @cardano-sdk/golden-test-generator
+
 ## [0.7.16](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.7.15...@cardano-sdk/golden-test-generator@0.7.16) (2023-07-04)
 
 **Note:** Version bump only for package @cardano-sdk/golden-test-generator

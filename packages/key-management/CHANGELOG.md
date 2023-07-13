@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.8.0...@cardano-sdk/key-management@0.8.1) (2023-07-13)
+
+### Bug Fixes
+
+* wallet finalizeTx and CIP30 requiresForeignSignatures now wait for at least one known address ([b5fde00](https://github.com/input-output-hk/cardano-js-sdk/commit/b5fde0038dde4082d3cd5eac3bbb8141733ec5b6))
+
 ## [0.8.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.7.11...@cardano-sdk/key-management@0.8.0) (2023-07-05)
 
 ### ⚠ BREAKING CHANGES

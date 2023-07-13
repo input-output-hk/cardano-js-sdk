@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.18.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.18.1...@cardano-sdk/wallet@0.18.2) (2023-07-13)
+
+### Bug Fixes
+
+* wallet finalizeTx and CIP30 requiresForeignSignatures now wait for at least one known address ([b5fde00](https://github.com/input-output-hk/cardano-js-sdk/commit/b5fde0038dde4082d3cd5eac3bbb8141733ec5b6))
+* **wallet:** cip30 getUsedAddresses now returns all known addresses ([18c5df9](https://github.com/input-output-hk/cardano-js-sdk/commit/18c5df9ffbe0a2cce8746d8db916e47975b2ea93))
+
 ## [0.18.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.18.0...@cardano-sdk/wallet@0.18.1) (2023-07-05)
 
 ### Bug Fixes

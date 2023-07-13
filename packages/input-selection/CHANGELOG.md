@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.11.1...@cardano-sdk/input-selection@0.11.2) (2023-07-13)
+
+### Features
+
+* **input-selection:** greedy input selection now generates more than one change output per stake id ([b3da97f](https://github.com/input-output-hk/cardano-js-sdk/commit/b3da97ffc4e39fb5074958461a54e7172f952dbd))
+
 ## [0.11.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.11.0...@cardano-sdk/input-selection@0.11.1) (2023-07-05)
 
 **Note:** Version bump only for package @cardano-sdk/input-selection

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.14.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.14.4...@cardano-sdk/cardano-services@0.14.5) (2023-07-13)
+
+### Features
+
+* **cardano-services:** add cli parameter to chose the handle provider ([0d7d423](https://github.com/input-output-hk/cardano-js-sdk/commit/0d7d4236cf054bed10fcebd3daecf63e50ba2434))
+
 ## [0.14.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.14.3...@cardano-sdk/cardano-services@0.14.4) (2023-07-04)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services
