@@ -19,7 +19,7 @@ import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { ComposableError, HexBlob } from '@cardano-sdk/util';
 import { CoseLabel } from './util';
 import { STAKE_KEY_DERIVATION_PATH } from '../util';
-import { firstValueFrom } from 'rxjs';
+import { filter, firstValueFrom } from 'rxjs';
 
 export interface Cip30SignDataRequest {
   keyAgent: AsyncKeyAgent;
@@ -52,7 +52,9 @@ const getAddressBytes = (signWith: Cardano.PaymentAddress | Cardano.RewardAccoun
 const getDerivationPath = async (signWith: Cardano.PaymentAddress | Cardano.RewardAccount, keyAgent: AsyncKeyAgent) => {
   const isRewardAccount = signWith.startsWith('stake');
 
-  const knownAddresses = await firstValueFrom(keyAgent.knownAddresses$);
+  const knownAddresses = await firstValueFrom(
+    keyAgent.knownAddresses$.pipe(filter((addresses) => addresses.length > 0))
+  );
 
   if (isRewardAccount) {
     const knownRewardAddress = knownAddresses.find(({ rewardAccount }) => rewardAccount === signWith);

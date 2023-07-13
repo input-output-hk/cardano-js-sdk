@@ -6,6 +6,7 @@ import {
 } from '@cardano-sdk/key-management';
 import { Cardano, TxCBOR } from '@cardano-sdk/core';
 import { FinalizeTxDependencies, SignedTx, TxContext } from './types';
+import { filter, firstValueFrom } from 'rxjs';
 
 const getSignatures = async (
   keyAgent: AsyncKeyAgent,
@@ -13,6 +14,8 @@ const getSignatures = async (
   extraSigners?: TransactionSigner[],
   signingOptions?: SignTransactionOptions
 ) => {
+  // Wait until the async key agent has at least one known addresses.
+  await firstValueFrom(keyAgent.knownAddresses$.pipe(filter((addresses) => addresses.length > 0)));
   const signatures: Cardano.Signatures = await keyAgent.signTransaction(txInternals, signingOptions);
 
   if (extraSigners) {
