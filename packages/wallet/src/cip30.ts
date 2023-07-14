@@ -7,6 +7,8 @@ import {
   DataSignError,
   DataSignErrorCode,
   Paginate,
+  PubDRepKey,
+  PubStakeKey,
   TxSendError,
   TxSendErrorCode,
   TxSignError,
@@ -14,12 +16,13 @@ import {
   WalletApi
 } from '@cardano-sdk/dapp-connector';
 import { CML, Cardano, Transaction, TxCBOR, cmlToCore, coalesceValueQuantities, coreToCml } from '@cardano-sdk/core';
-import { HexBlob, ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
+import { HexBlob, ManagedFreeableScope, isNotNil, usingAutoFree } from '@cardano-sdk/util';
 import { InputSelectionError, InputSelectionFailure } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
 import { Observable, firstValueFrom } from 'rxjs';
 import { ObservableWallet } from './types';
 import { requiresForeignSignatures } from './services';
+import uniqWith from 'lodash/uniqWith';
 
 export type Cip30WalletDependencies = {
   logger: Logger;
@@ -164,6 +167,25 @@ export const createWalletApi = (
   confirmationCallback: CallbackConfirmation,
   { logger }: Cip30WalletDependencies
 ): WalletApi => ({
+  getActivePubStakeKeys: async (): Promise<PubStakeKey[]> => {
+    logger.debug('getting active pub stake keys');
+    try {
+      const wallet = await firstValueFrom(wallet$);
+      const addresses = await firstValueFrom(wallet.addresses$);
+      const stakeKeyDerivationPaths = uniqWith(
+        addresses.map((addr) => addr.stakeKeyDerivationPath).filter(isNotNil),
+        (a, b) => a.index === b.index && a.role === b.role
+      );
+
+      return wallet.getStakeKeys(stakeKeyDerivationPaths);
+    } catch (error) {
+      logger.error(error);
+      if (error instanceof ApiError) {
+        throw error;
+      }
+      throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));
+    }
+  },
   getBalance: async (): Promise<Cbor> => {
     logger.debug('getting balance');
     try {
@@ -175,6 +197,7 @@ export const createWalletApi = (
       throw error;
     }
   },
+
   getChangeAddress: async (): Promise<Cbor> => {
     logger.debug('getting changeAddress');
     try {
@@ -253,6 +276,10 @@ export const createWalletApi = (
     const wallet = await firstValueFrom(wallet$);
     const genesisParameters = await firstValueFrom(wallet.genesisParameters$);
     return genesisParameters.networkId;
+  },
+  async getPubDRepKey(): Promise<PubDRepKey> {
+    const wallet = await firstValueFrom(wallet$);
+    return wallet.getPubDRepKey();
   },
   getRewardAddresses: async (): Promise<Cbor[]> => {
     logger.debug('getting reward addresses');

@@ -1,4 +1,4 @@
-import { AsyncKeyAgent, GroupedAddress, KeyAgent } from '../';
+import { AsyncKeyAgent, GroupedAddress, InMemoryKeyAgent, KeyAgent } from '../';
 import { BehaviorSubject } from 'rxjs';
 
 export const createAsyncKeyAgent = (keyAgent: KeyAgent, onShutdown?: () => void): AsyncKeyAgent => {
@@ -15,6 +15,12 @@ export const createAsyncKeyAgent = (keyAgent: KeyAgent, onShutdown?: () => void)
       return address;
     },
     derivePublicKey: keyAgent.derivePublicKey.bind(keyAgent),
+    exportRootPrivateKey() {
+      if (keyAgent instanceof InMemoryKeyAgent) {
+        return keyAgent.exportRootPrivateKey();
+      }
+      throw new Error('Unsupported with this type of key agent');
+    },
     getBip32Ed25519: () => Promise.resolve(keyAgent.bip32Ed25519),
     getChainId: () => Promise.resolve(keyAgent.chainId),
     getExtendedAccountPublicKey: () => Promise.resolve(keyAgent.extendedAccountPublicKey),

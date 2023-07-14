@@ -1,45 +1,25 @@
 {
-  "name": "@cardano-sdk/wallet",
-  "version": "0.18.1",
+  "dependencies": {
+    "@cardano-sdk/core": "workspace:~",
+    "@cardano-sdk/crypto": "workspace:~",
+    "@cardano-sdk/dapp-connector": "file:.yalc/@cardano-sdk/dapp-connector",
+    "@cardano-sdk/hardware-ledger": "workspace:~",
+    "@cardano-sdk/input-selection": "workspace:~",
+    "@cardano-sdk/key-management": "file:.yalc/@cardano-sdk/key-management",
+    "@cardano-sdk/tx-construction": "workspace:~",
+    "@cardano-sdk/util": "workspace:~",
+    "@cardano-sdk/util-rxjs": "workspace:~",
+    "backoff-rxjs": "^7.0.0",
+    "bignumber.js": "^9.1.1",
+    "delay": "^5.0.0",
+    "emittery": "^0.10.0",
+    "lodash": "^4.17.21",
+    "pouchdb": "^7.3.0",
+    "rxjs": "^7.4.0",
+    "ts-custom-error": "^3.2.0",
+    "ts-log": "^2.2.3"
+  },
   "description": "Wallet modules",
-  "engines": {
-    "node": ">=14.20.1"
-  },
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
-  "exports": {
-    ".": {
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js"
-    }
-  },
-  "repository": "https://github.com/input-output-hk/cardano-js-sdk",
-  "publishConfig": {
-    "access": "public"
-  },
-  "sideEffects": false,
-  "license": "Apache-2.0",
-  "scripts": {
-    "build:esm": "tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020",
-    "build:cjs": "tsc --build src",
-    "build": "run-s build:cjs build:esm module-fixup",
-    "circular-deps:check": "madge --circular dist/cjs",
-    "module-fixup": "shx cp ../../build/cjs-package.json ./dist/cjs/package.json && cp ../../build/esm-package.json ./dist/esm/package.json",
-    "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",
-    "cleanup:dist": "shx rm -rf dist",
-    "cleanup:nm": "shx rm -rf node_modules",
-    "cleanup": "run-s cleanup:dist cleanup:nm",
-    "coverage": "yarn test --coverage",
-    "lint": "eslint -c ../../complete.eslintrc.js \"src/**/*.ts\" \"test/**/*.ts\"",
-    "lint:fix": "yarn lint --fix",
-    "prepack": "yarn build",
-    "test": "jest -c ./jest.config.js",
-    "test:build:verify": "tsc --build ./test",
-    "test:hw:ledger": "jest ./test/hardware/ledger/* -c ./hw.jest.config.js --runInBand",
-    "test:hw:trezor": "jest ./test/hardware/trezor/* -c ./hw.jest.config.js --runInBand",
-    "test:debug": "DEBUG=true yarn test",
-    "test:e2e": "shx echo 'test:e2e' command not implemented yet"
-  },
   "devDependencies": {
     "@cardano-foundation/ledgerjs-hw-app-cardano": "^6.0.0",
     "@cardano-ogmios/client": "5.6.0",
@@ -62,30 +42,50 @@
     "wait-on": "^6.0.1",
     "webextension-polyfill": "^0.9.0"
   },
-  "dependencies": {
-    "@cardano-sdk/core": "workspace:~",
-    "@cardano-sdk/crypto": "workspace:~",
-    "@cardano-sdk/dapp-connector": "workspace:~",
-    "@cardano-sdk/hardware-ledger": "workspace:~",
-    "@cardano-sdk/input-selection": "workspace:~",
-    "@cardano-sdk/key-management": "workspace:~",
-    "@cardano-sdk/tx-construction": "workspace:~",
-    "@cardano-sdk/util": "workspace:~",
-    "@cardano-sdk/util-rxjs": "workspace:~",
-    "backoff-rxjs": "^7.0.0",
-    "bignumber.js": "^9.1.1",
-    "delay": "^5.0.0",
-    "emittery": "^0.10.0",
-    "lodash": "^4.17.21",
-    "pouchdb": "^7.3.0",
-    "rxjs": "^7.4.0",
-    "ts-custom-error": "^3.2.0",
-    "ts-log": "^2.2.3"
+  "engines": {
+    "node": ">=14.20.1"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    }
   },
   "files": [
     "dist/*",
     "!dist/tsconfig.tsbuildinfo",
     "LICENSE",
     "NOTICE"
-  ]
+  ],
+  "license": "Apache-2.0",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "name": "@cardano-sdk/wallet",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": "https://github.com/input-output-hk/cardano-js-sdk",
+  "scripts": {
+    "build": "run-s build:cjs build:esm module-fixup",
+    "build:cjs": "tsc --build src",
+    "build:esm": "tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020",
+    "circular-deps:check": "madge --circular dist/cjs",
+    "cleanup": "run-s cleanup:dist cleanup:nm",
+    "cleanup:dist": "shx rm -rf dist",
+    "cleanup:nm": "shx rm -rf node_modules",
+    "coverage": "yarn test --coverage",
+    "lint": "eslint -c ../../complete.eslintrc.js \"src/**/*.ts\" \"test/**/*.ts\"",
+    "lint:fix": "yarn lint --fix",
+    "module-fixup": "shx cp ../../build/cjs-package.json ./dist/cjs/package.json && cp ../../build/esm-package.json ./dist/esm/package.json",
+    "prepack": "yarn build",
+    "test": "jest -c ./jest.config.js",
+    "test:build:verify": "tsc --build ./test",
+    "test:debug": "DEBUG=true yarn test",
+    "test:e2e": "shx echo 'test:e2e' command not implemented yet",
+    "test:hw:ledger": "jest ./test/hardware/ledger/* -c ./hw.jest.config.js --runInBand",
+    "test:hw:trezor": "jest ./test/hardware/trezor/* -c ./hw.jest.config.js --runInBand",
+    "tscNoEmit": "shx echo typescript --noEmit command not implemented yet"
+  },
+  "sideEffects": false,
+  "version": "0.18.1"
 }

@@ -1,4 +1,5 @@
 /* eslint-disable unicorn/no-nested-ternary */
+import { AccountKeyDerivationPath, AsyncKeyAgent, GroupedAddress, cip8, util } from '@cardano-sdk/key-management';
 import {
   AddressDiscovery,
   BalanceTracker,
@@ -38,6 +39,7 @@ import {
 } from '../services';
 import {
   AssetProvider,
+  CML,
   Cardano,
   CardanoNodeErrors,
   ChainHistoryProvider,
@@ -61,7 +63,6 @@ import {
   SyncStatus,
   WalletNetworkInfoProvider
 } from '../types';
-import { AsyncKeyAgent, GroupedAddress, cip8 } from '@cardano-sdk/key-management';
 import { BehaviorObservable, TrackerSubject, coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import {
   BehaviorSubject,
@@ -100,13 +101,15 @@ import {
 } from '@cardano-sdk/tx-construction';
 import { Logger } from 'ts-log';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { Shutdown, contextLogger, deepEquals } from '@cardano-sdk/util';
+import { Shutdown, contextLogger, deepEquals, usingAutoFree } from '@cardano-sdk/util';
 import { TrackedUtxoProvider } from '../services/ProviderTracker/TrackedUtxoProvider';
 import { WalletStores, createInMemoryWalletStores } from '../persistence';
 import { createTransactionReemitter } from '../services/TransactionReemitter';
 import isEqual from 'lodash/isEqual';
 import uniq from 'lodash/uniq';
 
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { KoraLabsHandleProvider } from '@cardano-sdk/cardano-services-client';
 
@@ -629,6 +632,28 @@ export class PersonalWallet implements ObservableWallet {
    */
   getInputSelector() {
     return this.#inputSelector;
+  }
+
+  getStakeKeys(derivationPaths: AccountKeyDerivationPath[]): Promise<Ed25519PublicKeyHex[]> {
+    return Promise.all(derivationPaths.map((path) => this.keyAgent.derivePublicKey(path)));
+  }
+
+  async getPubDRepKey(): Promise<Ed25519PublicKeyHex> {
+    const rootPrivateKey = await this.keyAgent.exportRootPrivateKey();
+
+    return usingAutoFree((scope) => {
+      const bip32Key = scope.manage(CML.Bip32PrivateKey.from_bytes(Buffer.from(rootPrivateKey, 'hex')));
+      const key = bip32Key
+        .derive(util.harden(1718))
+        .derive(util.harden(1815))
+        .derive(util.harden(0))
+        .derive(0)
+        .derive(0)
+        .to_raw_key()
+        .to_public()
+        .as_bytes();
+      return Ed25519PublicKeyHex(Buffer.from(key).toString('hex'));
+    });
   }
 
   /**

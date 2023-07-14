@@ -78,7 +78,14 @@ export class Cip30Wallet {
    *
    * Errors: `ApiError`
    */
-  public async enable(): Promise<WalletApi> {
+  // TOD: Don't forget to update with the official extension params from CIP30
+  public async enable(options?: { cip: number }): Promise<WalletApi> {
+    // eslint-disable-next-line no-console
+    console.log('test', options);
+    if (options?.cip && options.cip !== 95) {
+      throw new ApiError(APIErrorCode.InternalError, 'only cip95 extension is supported at this point');
+    }
+
     if (await this.#authenticator.requestAccess()) {
       this.#logger.debug(`${location.origin} has been granted access to wallet api`);
       return this.#api;
@@ -100,5 +107,7 @@ export const WalletApiMethodNames: (keyof WalletApi)[] = [
   'getRewardAddresses',
   'signTx',
   'signData',
-  'submitTx'
+  'submitTx',
+  'getPubDRepKey',
+  'getActivePubStakeKeys'
 ];

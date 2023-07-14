@@ -1,43 +1,12 @@
 {
-  "name": "@cardano-sdk/dapp-connector",
-  "version": "0.9.10",
+  "dependencies": {
+    "@cardano-sdk/core": "workspace:~",
+    "@cardano-sdk/util": "workspace:~",
+    "ts-custom-error": "^3.2.0",
+    "ts-log": "^2.2.4",
+    "webextension-polyfill": "^0.8.0"
+  },
   "description": "TypeScript definitions for the dApp Connector standard CIP30",
-  "engines": {
-    "node": ">=14.20.1"
-  },
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
-  "exports": {
-    ".": {
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js"
-    }
-  },
-  "repository": "https://github.com/input-output-hk/cardano-js-sdk",
-  "publishConfig": {
-    "access": "public"
-  },
-  "sideEffects": false,
-  "license": "Apache-2.0",
-  "scripts": {
-    "build:esm": "tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020",
-    "build:cjs": "tsc --build src",
-    "build": "run-s build:cjs build:esm module-fixup",
-    "circular-deps:check": "madge --circular dist/cjs",
-    "module-fixup": "shx cp ../../build/cjs-package.json ./dist/cjs/package.json && cp ../../build/esm-package.json ./dist/esm/package.json",
-    "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",
-    "cleanup:dist": "shx rm -rf dist",
-    "cleanup:nm": "shx rm -rf node_modules",
-    "cleanup": "run-s cleanup:dist cleanup:nm",
-    "lint": "eslint -c ../../complete.eslintrc.js \"src/**/*.ts\" \"test/**/*.ts\"",
-    "lint:fix": "yarn lint --fix",
-    "test": "jest -c ./jest.config.js",
-    "test:build:verify": "tsc --build ./test",
-    "test:e2e": "shx echo 'test:e2e' command not implemented yet",
-    "coverage": "shx echo No coverage report for this package",
-    "prepack": "yarn build",
-    "test:debug": "DEBUG=true yarn test"
-  },
   "devDependencies": {
     "@types/webextension-polyfill": "^0.8.0",
     "eslint": "^7.32.0",
@@ -51,17 +20,48 @@
     "ts-jest": "^28.0.7",
     "typescript": "^4.7.4"
   },
-  "dependencies": {
-    "@cardano-sdk/core": "workspace:~",
-    "@cardano-sdk/util": "workspace:~",
-    "ts-custom-error": "^3.2.0",
-    "ts-log": "^2.2.4",
-    "webextension-polyfill": "^0.8.0"
+  "engines": {
+    "node": ">=14.20.1"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    }
   },
   "files": [
     "dist/*",
     "!dist/tsconfig.tsbuildinfo",
     "LICENSE",
     "NOTICE"
-  ]
+  ],
+  "license": "Apache-2.0",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "name": "@cardano-sdk/dapp-connector",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": "https://github.com/input-output-hk/cardano-js-sdk",
+  "scripts": {
+    "build": "run-s build:cjs build:esm module-fixup",
+    "build:cjs": "tsc --build src",
+    "build:esm": "tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020",
+    "circular-deps:check": "madge --circular dist/cjs",
+    "cleanup": "run-s cleanup:dist cleanup:nm",
+    "cleanup:dist": "shx rm -rf dist",
+    "cleanup:nm": "shx rm -rf node_modules",
+    "coverage": "shx echo No coverage report for this package",
+    "lint": "eslint -c ../../complete.eslintrc.js \"src/**/*.ts\" \"test/**/*.ts\"",
+    "lint:fix": "yarn lint --fix",
+    "module-fixup": "shx cp ../../build/cjs-package.json ./dist/cjs/package.json && cp ../../build/esm-package.json ./dist/esm/package.json",
+    "prepack": "yarn build",
+    "test": "jest -c ./jest.config.js",
+    "test:build:verify": "tsc --build ./test",
+    "test:debug": "DEBUG=true yarn test",
+    "test:e2e": "shx echo 'test:e2e' command not implemented yet",
+    "tscNoEmit": "shx echo typescript --noEmit command not implemented yet"
+  },
+  "sideEffects": false,
+  "version": "0.9.10"
 }

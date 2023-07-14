@@ -54,7 +54,7 @@
     "@cardano-foundation/ledgerjs-hw-app-cardano": "^6.0.0",
     "@cardano-sdk/core": "workspace:~",
     "@cardano-sdk/crypto": "workspace:~",
-    "@cardano-sdk/dapp-connector": "workspace:~",
+    "@cardano-sdk/dapp-connector": "file:.yalc/@cardano-sdk/dapp-connector",
     "@cardano-sdk/util": "workspace:~",
     "@emurgo/cardano-message-signing-nodejs": "^1.0.1",
     "bip39": "^3.0.4",
