@@ -93,7 +93,7 @@ export class OgmiosTxSubmitProvider extends RunnableModule implements TxSubmitPr
   }
 
   private async throwIfHandleResolutionConflict(context: SubmitTxArgs['context']): Promise<void> {
-    if (context?.handles && context.handles.length > 0) {
+    if (context?.handleResolutions && context.handleResolutions.length > 0) {
       if (!this.#handleProvider) {
         throw new ProviderError(
           ProviderFailure.NotImplemented,
@@ -103,14 +103,14 @@ export class OgmiosTxSubmitProvider extends RunnableModule implements TxSubmitPr
       }
 
       const handleInfoList = await this.#handleProvider.resolveHandles({
-        handles: context.handles.map((handle) => handle.handle)
+        handles: context.handleResolutions.map((hndRes) => hndRes.handle)
       });
 
       for (const [index, handleInfo] of handleInfoList.entries()) {
-        if (!handleInfo || handleInfo.cardanoAddress !== context.handles[index].cardanoAddress) {
+        if (!handleInfo || handleInfo.cardanoAddress !== context.handleResolutions[index].cardanoAddress) {
           const handleOwnerChangeError = new HandleOwnerChangeError(
-            context.handles[index].handle,
-            context.handles[index].cardanoAddress,
+            context.handleResolutions[index].handle,
+            context.handleResolutions[index].cardanoAddress,
             handleInfo ? handleInfo.cardanoAddress : null
           );
           throw new ProviderError(ProviderFailure.Conflict, handleOwnerChangeError);

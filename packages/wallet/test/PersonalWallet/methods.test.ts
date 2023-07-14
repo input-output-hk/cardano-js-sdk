@@ -484,7 +484,7 @@ describe('PersonalWallet methods', () => {
 
         const txOut = await txBuilder.addOutput(txOutput).build().sign();
         const submitTxArgsMock = {
-          context: { handles: [mocks.resolvedHandle] },
+          context: { handleResolutions: [mocks.resolvedHandle] },
           signedTransaction: txOut.cbor
         };
         const txPending = firstValueFrom(wallet.transactions.outgoing.pending$);
