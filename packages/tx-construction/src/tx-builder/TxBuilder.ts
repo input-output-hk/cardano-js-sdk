@@ -67,10 +67,10 @@ class LazyTxSigner implements UnsignedTx {
   async inspect(): Promise<TxInspection> {
     const {
       tx,
-      ctx: { ownAddresses, auxiliaryData, handles },
+      ctx: { ownAddresses, auxiliaryData, handleResolutions },
       inputSelection
     } = await this.#build();
-    return { ...tx, auxiliaryData, handles, inputSelection, ownAddresses };
+    return { ...tx, auxiliaryData, handleResolutions, inputSelection, ownAddresses };
   }
 
   async sign(): Promise<SignedTx> {
@@ -89,7 +89,7 @@ export class GenericTxBuilder implements TxBuilder {
   #requestedPortfolio?: TxBuilderStakePool[];
   #logger: Logger;
   #handleProvider?: HandleProvider;
-  #handles: HandleResolution[];
+  #handleResolutions: HandleResolution[];
 
   constructor(dependencies: TxBuilderDependencies) {
     this.#outputValidator =
@@ -105,7 +105,7 @@ export class GenericTxBuilder implements TxBuilder {
     };
     this.#logger = dependencies.logger;
     this.#handleProvider = dependencies.handleProvider;
-    this.#handles = [];
+    this.#handleResolutions = [];
   }
 
   async inspect(): Promise<PartialTx> {
@@ -118,16 +118,16 @@ export class GenericTxBuilder implements TxBuilder {
   }
 
   addOutput(txOut: OutputBuilderTxOut): TxBuilder {
-    if (txOut.handle) {
-      this.#handles = [...this.#handles, txOut.handle];
+    if (txOut.handleResolution) {
+      this.#handleResolutions = [...this.#handleResolutions, txOut.handleResolution];
     }
-    const txOutNoHandle = omit(txOut, 'handle');
+    const txOutNoHandle = omit(txOut, ['handle', 'handleResolution']);
     this.partialTxBody = { ...this.partialTxBody, outputs: [...(this.partialTxBody.outputs || []), txOutNoHandle] };
     return this;
   }
 
   removeOutput(txOut: OutputBuilderTxOut): TxBuilder {
-    this.#handles = this.#handles.filter((handle) => handle !== txOut.handle);
+    this.#handleResolutions = this.#handleResolutions.filter((hndRes) => hndRes.handle !== txOut.handle);
     this.partialTxBody = {
       ...this.partialTxBody,
       outputs: this.partialTxBody.outputs?.filter((output) => !deepEquals(output, txOut))
@@ -204,7 +204,7 @@ export class GenericTxBuilder implements TxBuilder {
               {
                 auxiliaryData,
                 certificates: this.partialTxBody.certificates,
-                handles: this.#handles,
+                handleResolutions: this.#handleResolutions,
                 outputs: new Set(this.partialTxBody.outputs || []),
                 signingOptions,
                 witness: { extraSigners }
@@ -214,7 +214,7 @@ export class GenericTxBuilder implements TxBuilder {
             return {
               ctx: {
                 auxiliaryData,
-                handles: this.#handles,
+                handleResolutions: this.#handleResolutions,
                 ownAddresses,
                 signingOptions,
                 witness: { extraSigners }
