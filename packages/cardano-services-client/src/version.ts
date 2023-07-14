@@ -7,6 +7,6 @@ export const apiVersion = {
   rewards: '1.0.0',
   root: '1.0.0',
   stakePool: '1.0.0',
-  txSubmit: '1.0.0',
+  txSubmit: '2.0.0',
   utxo: '2.0.0'
 };
