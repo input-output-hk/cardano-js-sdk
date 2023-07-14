@@ -30,6 +30,7 @@ import {
   throwError,
   timeout
 } from 'rxjs';
+import { RetryBackoffConfig, retryBackoff } from 'backoff-rxjs';
 import { WithLogger, contextLogger } from '@cardano-sdk/util';
 import { createObservableChainSyncClient } from './createObservableChainSyncClient';
 import { ogmiosServerHealthToHealthCheckResponse } from '../../util';
@@ -42,13 +43,37 @@ const ogmiosToCoreIntersection = (intersection: Intersection) => ({
   tip: ogmiosToCoreTipOrOrigin(intersection.tip)
 });
 
+export type LocalStateQueryRetryConfig = Pick<RetryBackoffConfig, 'initialInterval' | 'maxInterval'>;
+
 const DEFAULT_HEALTH_CHECK_TIMEOUT = 2000;
+const DEFAULT_LSQ_RETRY_CONFIG: LocalStateQueryRetryConfig = {
+  initialInterval: 1000,
+  maxInterval: 30_000
+};
 export type OgmiosObservableCardanoNodeProps = Omit<InteractionContextProps, 'interactionType'> & {
   /**
    * Default: 2000ms
    */
   healthCheckTimeout?: Milliseconds;
+  /**
+   * Default: {initialInterval: 1000, maxInterval: 30_000}
+   */
+  localStateQueryRetryConfig?: LocalStateQueryRetryConfig;
 };
+
+const stateQueryRetryBackoffConfig = (
+  retryConfig: LocalStateQueryRetryConfig = DEFAULT_LSQ_RETRY_CONFIG,
+  logger: Logger
+): RetryBackoffConfig => ({
+  ...retryConfig,
+  shouldRetry: (error) => {
+    if (error instanceof CardanoNodeErrors.CardanoClientErrors.QueryUnavailableInCurrentEraError) {
+      logger.info('Local state query unavailable yet, will retry...');
+      return true;
+    }
+    return false;
+  }
+});
 
 export class OgmiosObservableCardanoNode implements ObservableCardanoNode {
   readonly #connectionConfig$: Observable<ConnectionConfig>;
@@ -74,9 +99,13 @@ export class OgmiosObservableCardanoNode implements ObservableCardanoNode {
       distinctUntilChanged((a, b) => isEqual(a, b)),
       shareReplay({ bufferSize: 1, refCount: true })
     );
-    this.eraSummaries$ = stateQueryClient$.pipe(switchMap((client) => from(queryEraSummaries(client, this.#logger))));
+    this.eraSummaries$ = stateQueryClient$.pipe(
+      switchMap((client) => from(queryEraSummaries(client, this.#logger))),
+      retryBackoff(stateQueryRetryBackoffConfig(props.localStateQueryRetryConfig, logger))
+    );
     this.genesisParameters$ = stateQueryClient$.pipe(
       switchMap((client) => from(queryGenesisParameters(client, this.#logger))),
+      retryBackoff(stateQueryRetryBackoffConfig(props.localStateQueryRetryConfig, logger)),
       distinctUntilChanged(isEqual),
       shareReplay({ bufferSize: 1, refCount: true })
     );

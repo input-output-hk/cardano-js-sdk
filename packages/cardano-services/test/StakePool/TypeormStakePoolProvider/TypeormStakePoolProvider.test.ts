@@ -76,7 +76,7 @@ describe('TypeormStakePoolProvider', () => {
   let poolsInfoWithMetricsFiltered: PoolInfo[];
 
   const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
-  const entities = getEntities(['currentPoolMetrics']);
+  const entities = getEntities(['currentPoolMetrics', 'poolMetadata']);
 
   beforeAll(async () => {
     port = await getPort();
