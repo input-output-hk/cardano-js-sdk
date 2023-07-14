@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/governance",
-  "version": "0.7.12-patch.1",
+  "version": "0.7.12-patch.2",
   "description": "Governance types and utilities for Cardano",
   "engines": {
     "node": ">=14.20.1"
