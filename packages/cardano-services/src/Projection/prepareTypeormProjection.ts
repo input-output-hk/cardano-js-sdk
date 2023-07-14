@@ -104,9 +104,9 @@ const storeEntities: Partial<Record<StoreName, EntityName[]>> = {
   storeAssets: ['asset'],
   storeBlock: ['block'],
   storeHandles: ['handle', 'asset', 'tokens', 'output'],
-  storePoolMetricsUpdateJob: ['currentPoolMetrics'],
-  storeStakePoolMetadataJob: ['block', 'poolMetadata'],
-  storeStakePools: ['stakePool', 'poolRegistration', 'poolRetirement'],
+  storePoolMetricsUpdateJob: ['stakePool', 'currentPoolMetrics', 'poolMetadata'],
+  storeStakePoolMetadataJob: ['stakePool', 'currentPoolMetrics', 'poolMetadata'],
+  storeStakePools: ['stakePool', 'currentPoolMetrics', 'poolMetadata'],
   storeUtxo: ['tokens', 'output']
 };
 
@@ -116,9 +116,10 @@ const entityInterDependencies: Partial<Record<EntityName, EntityName[]>> = {
   currentPoolMetrics: ['stakePool'],
   handle: ['asset'],
   output: ['block'],
+  poolMetadata: ['stakePool'],
   poolRegistration: ['block'],
   poolRetirement: ['block'],
-  stakePool: ['block', 'poolRegistration', 'poolRetirement', 'poolMetadata'],
+  stakePool: ['block', 'poolRegistration', 'poolRetirement'],
   tokens: ['asset']
 };
 

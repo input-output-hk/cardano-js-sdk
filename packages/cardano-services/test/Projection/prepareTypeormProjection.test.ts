@@ -31,7 +31,7 @@ describe('prepareTypeormProjection', () => {
     test('stake-pool,stake-pool-metadata', () => {
       const { entities, mappers, stores } = prepare([ProjectionName.StakePool, ProjectionName.StakePoolMetadataJob]);
       expect(new Set(entities)).toEqual(
-        new Set(['block', 'stakePool', 'poolRegistration', 'poolRetirement', 'poolMetadata'])
+        new Set(['block', 'stakePool', 'poolRegistration', 'poolRetirement', 'poolMetadata', 'currentPoolMetrics'])
       );
       expect(mappers).toEqual(['withCertificates', 'withStakePools']);
       expect(stores).toEqual(['storeBlock', 'storeStakePools', 'storeStakePoolMetadataJob']);
