@@ -38,7 +38,7 @@
     "prepack": "yarn build"
   },
   "devDependencies": {
-    "@cardano-sdk/util-dev": "workspace:~",
+    "@cardano-sdk/util-dev": "workspace:*",
     "@types/lodash": "^4.14.182",
     "@types/pbkdf2": "^3.1.0",
     "eslint": "^7.32.0",
@@ -52,10 +52,10 @@
   },
   "dependencies": {
     "@cardano-foundation/ledgerjs-hw-app-cardano": "^6.0.0",
-    "@cardano-sdk/core": "workspace:~",
-    "@cardano-sdk/crypto": "workspace:~",
-    "@cardano-sdk/dapp-connector": "workspace:~",
-    "@cardano-sdk/util": "workspace:~",
+    "@cardano-sdk/core": "workspace:*",
+    "@cardano-sdk/crypto": "workspace:*",
+    "@cardano-sdk/dapp-connector": "workspace:*",
+    "@cardano-sdk/util": "workspace:*",
     "@emurgo/cardano-message-signing-nodejs": "^1.0.1",
     "bip39": "^3.0.4",
     "chacha": "^2.1.0",

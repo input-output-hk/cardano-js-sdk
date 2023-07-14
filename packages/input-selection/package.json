@@ -39,7 +39,7 @@
     "test:debug": "DEBUG=true yarn test"
   },
   "devDependencies": {
-    "@cardano-sdk/util-dev": "workspace:~",
+    "@cardano-sdk/util-dev": "workspace:*",
     "@types/lodash": "^4.14.182",
     "eslint": "^7.32.0",
     "fast-check": "^2.17.0",
@@ -52,8 +52,8 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "@cardano-sdk/core": "workspace:~",
-    "@cardano-sdk/util": "workspace:~",
+    "@cardano-sdk/core": "workspace:*",
+    "@cardano-sdk/util": "workspace:*",
     "bignumber.js": "^9.1.1",
     "lodash": "^4.17.21",
     "ts-custom-error": "^3.2.0"

@@ -39,7 +39,7 @@
     "test:debug": "DEBUG=true yarn test"
   },
   "devDependencies": {
-    "@cardano-sdk/util-dev": "workspace:~",
+    "@cardano-sdk/util-dev": "workspace:*",
     "@types/lodash": "^4.14.182",
     "@types/uuid": "^8.3.4",
     "@types/webextension-polyfill": "^0.8.0",
@@ -54,14 +54,14 @@
     "util": "^0.12.4"
   },
   "dependencies": {
-    "@cardano-sdk/core": "workspace:~",
-    "@cardano-sdk/crypto": "workspace:~",
-    "@cardano-sdk/dapp-connector": "workspace:~",
-    "@cardano-sdk/key-management": "workspace:~",
-    "@cardano-sdk/tx-construction": "workspace:~",
-    "@cardano-sdk/util": "workspace:~",
-    "@cardano-sdk/util-rxjs": "workspace:~",
-    "@cardano-sdk/wallet": "workspace:~",
+    "@cardano-sdk/core": "workspace:*",
+    "@cardano-sdk/crypto": "workspace:*",
+    "@cardano-sdk/dapp-connector": "workspace:*",
+    "@cardano-sdk/key-management": "workspace:*",
+    "@cardano-sdk/tx-construction": "workspace:*",
+    "@cardano-sdk/util": "workspace:*",
+    "@cardano-sdk/util-rxjs": "workspace:*",
+    "@cardano-sdk/wallet": "workspace:*",
     "backoff-rxjs": "^7.0.0",
     "lodash": "^4.17.21",
     "rxjs": "^7.4.0",
