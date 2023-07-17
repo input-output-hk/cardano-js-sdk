@@ -204,6 +204,7 @@ describe('Ada handle', () => {
     receivingWallet.shutdown();
   });
 
+  // eslint-disable-next-line max-statements
   it("PersonalWallet discovers it's own handles", async () => {
     const tokens = new Map([
       [assetIds[0], 1n],
@@ -242,15 +243,15 @@ describe('Ada handle', () => {
     expect(receivingHandles.length).toEqual(1);
 
     // send ada using handle
-    // const txBuilder2 = wallet.createTxBuilder();
-    // const { tx: tx2 } = await txBuilder2
-    //   .addOutput(await txBuilder.buildOutput().handle(receivingHandles[0].handle).coin(coins).build())
-    //   .build()
-    //   .sign();
-    // await wallet.submitTx(tx2);
-    // await txConfirmed(receivingWallet, tx2);
-    // const receivingUtxoAfter = await firstValueFrom(receivingWallet.balance.utxo.available$);
-    // expect(receivingUtxoAfter.coins).toEqual(receivingUtxo.coins + coins);
+    const txBuilder2 = wallet.createTxBuilder();
+    const { tx: tx2 } = await txBuilder2
+      .addOutput(await txBuilder2.buildOutput().handle(receivingHandles[0].handle).coin(coins).build())
+      .build()
+      .sign();
+    await wallet.submitTx(tx2);
+    await txConfirmed(receivingWallet, tx2);
+    const receivingUtxoAfter = await firstValueFrom(receivingWallet.balance.utxo.available$);
+    expect(receivingUtxoAfter.coins).toEqual(receivingUtxo.coins + coins);
   });
 
   describe('double mint handling', () => {

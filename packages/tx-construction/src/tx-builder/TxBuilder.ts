@@ -26,6 +26,7 @@ import { filter, firstValueFrom, lastValueFrom } from 'rxjs';
 import { finalizeTx } from './finalizeTx';
 import { initializeTx } from './initializeTx';
 import minBy from 'lodash/minBy';
+import omit from 'lodash/omit';
 
 type BuiltTx = {
   tx: Cardano.TxBodyWithHash;
@@ -117,12 +118,11 @@ export class GenericTxBuilder implements TxBuilder {
   }
 
   addOutput(txOut: OutputBuilderTxOut): TxBuilder {
-    this.partialTxBody = { ...this.partialTxBody, outputs: [...(this.partialTxBody.outputs || []), txOut] };
-
     if (txOut.handle) {
       this.#handles = [...this.#handles, txOut.handle];
     }
-
+    const txOutNoHandle = omit(txOut, 'handle');
+    this.partialTxBody = { ...this.partialTxBody, outputs: [...(this.partialTxBody.outputs || []), txOutNoHandle] };
     return this;
   }
 
