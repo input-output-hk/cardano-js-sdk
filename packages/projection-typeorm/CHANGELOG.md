@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.3.11...@cardano-sdk/projection-typeorm@0.3.12) (2023-07-17)
+
+### Bug Fixes
+
+* update type of pool registration cost and pledge to numeric ([bf86ec1](https://github.com/input-output-hk/cardano-js-sdk/commit/bf86ec1c28cc9f9f5f2c5b85b0d2d91b0d625db0))
+
 ## [0.3.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.3.10...@cardano-sdk/projection-typeorm@0.3.11) (2023-07-13)
 
 **Note:** Version bump only for package @cardano-sdk/projection-typeorm

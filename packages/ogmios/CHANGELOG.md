@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.12.11...@cardano-sdk/ogmios@0.12.12) (2023-07-17)
+
+### Bug Fixes
+
+* **ogmios:** poll systemStart and genesisConfig while it's unavailable in current era ([87f7c9c](https://github.com/input-output-hk/cardano-js-sdk/commit/87f7c9c0261d0a39d12a0b975b1df8eb2b038464))
+
 ## [0.12.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.12.10...@cardano-sdk/ogmios@0.12.11) (2023-07-13)
 
 **Note:** Version bump only for package @cardano-sdk/ogmios
