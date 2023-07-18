@@ -130,7 +130,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
   }, ServiceNames.StakePool);
 
   const getTypeormStakePoolProvider = withTypeOrmProvider('StakePool', (connectionConfig$) => {
-    const entities = getEntities(['currentPoolMetrics']);
+    const entities = getEntities(['currentPoolMetrics', 'poolMetadata']);
 
     return new TypeormStakePoolProvider(
       { paginationPageSizeLimit: args.paginationPageSizeLimit! },
