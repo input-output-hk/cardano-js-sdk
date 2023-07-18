@@ -1,19 +1,19 @@
 {
+  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+
   inputs = {
-    std.url = "github:divnix/std"; # keep minor version in lockstep with GH std-action
+    std.url = "github:divnix/std";
     # std.inputs.nixpkgs.follows = "nixpkgs";
     std.inputs.n2c.follows = "n2c";
     haumea.url = "github:nix-community/haumea/v0.2.2";
     n2c.url = "github:nlewo/nix2container";
-    n2c.inputs.nixpkgs.follows = "std/nixpkgs";
+    n2c.inputs.nixpkgs.follows = "nixpkgs";
   };
-
-  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 
   outputs = {std, ...} @ inputs:
     std.growOn {
       inherit inputs;
-      cellsFrom = ./ops;
+      cellsFrom = ./nix;
       cellBlocks = with std.blockTypes; [
         # Software Delivery Lifecycle (Packaging Layers)
         # For deeper context, please consult:

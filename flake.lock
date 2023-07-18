@@ -140,16 +140,15 @@
       "inputs": {
         "flake-utils": "flake-utils",
         "nixpkgs": [
-          "std",
           "nixpkgs"
         ]
       },
       "locked": {
-        "lastModified": 1687467666,
-        "narHash": "sha256-z9n7ATBXeDqz5a8+4HJ9fhU6KMyg7zZX0wrhLdVG7bQ=",
+        "lastModified": 1688922987,
+        "narHash": "sha256-RnQwrCD5anqWfyDAVbfFIeU+Ha6cwt5QcIwIkaGRzQw=",
         "owner": "nlewo",
         "repo": "nix2container",
-        "rev": "56e249151911e3d3928b578f5b6c01b16f55c308",
+        "rev": "ab381a7d714ebf96a83882264245dbd34f0a7ec8",
         "type": "github"
       },
       "original": {
