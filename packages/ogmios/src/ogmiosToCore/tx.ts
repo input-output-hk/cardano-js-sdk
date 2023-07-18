@@ -19,7 +19,6 @@ import { BlockKind, CommonBlock } from './types';
 import {
   Cardano,
   NotImplementedError,
-  ProviderUtil,
   Serialization,
   SerializationError,
   SerializationFailure
@@ -228,6 +227,23 @@ const mapRedeemer = (key: string, redeemer: Schema.Redeemer): Cardano.Redeemer =
   };
 };
 
+const mapMetadatum = (obj: Schema.Metadatum): Cardano.Metadatum => {
+  if ('string' in obj) {
+    return obj.string;
+  } else if ('map' in obj) {
+    return new Map(obj.map.map(({ k, v }) => [mapMetadatum(k), mapMetadatum(v)]));
+  } else if ('list' in obj) {
+    return obj.list.map(mapMetadatum);
+  } else if ('int' in obj) {
+    return obj.int;
+  } else if ('bytes' in obj) {
+    return Buffer.from(obj.bytes, 'hex');
+  }
+  throw new NotImplementedError(
+    `Unknown metadatum type: ${typeof obj === 'object' ? Object.keys(obj).join(',') : obj}`
+  );
+};
+
 const mapAuxiliaryData = (
   data: Schema.AuxiliaryData | null
 ): { auxiliaryData: Cardano.AuxiliaryData | undefined; auxiliaryDataHash: Crypto.Hash32ByteBase16 | undefined } => {
@@ -235,9 +251,7 @@ const mapAuxiliaryData = (
 
   const auxiliaryData = {
     blob: data.body.blob
-      ? new Map(
-          Object.entries(data.body.blob).map(([key, value]) => [BigInt(key), ProviderUtil.jsonToMetadatum(value)])
-        )
+      ? new Map(Object.entries(data.body.blob).map(([key, value]) => [BigInt(key), mapMetadatum(value)]))
       : undefined,
     scripts: data.body.scripts ? data.body.scripts.map(mapScript) : undefined
   };
