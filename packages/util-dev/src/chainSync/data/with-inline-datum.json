@@ -46,371 +46,72 @@
                       "__type": "Map",
                       "value": [
                         [
-                          "map",
-                          [
-                            {
-                              "__type": "Map",
-                              "value": [
-                                [
-                                  "k",
-                                  {
-                                    "__type": "Map",
-                                    "value": [
-                                      [
-                                        "string",
-                                        "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a"
-                                      ]
+                          "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a",
+                          {
+                            "__type": "Map",
+                            "value": [
+                              [
+                                "000de140736e656b3639",
+                                {
+                                  "__type": "Map",
+                                  "value": [
+                                    [
+                                      "name",
+                                      "$snek69"
+                                    ],
+                                    [
+                                      "image",
+                                      "ipfs://zb2rhaGkrm2gQC366SZbbTQmjDd3fjd44ftHH4L4TtABypSKa"
+                                    ],
+                                    [
+                                      "mediaType",
+                                      "image/jpeg"
+                                    ],
+                                    [
+                                      "og",
+                                      {
+                                        "__type": "bigint",
+                                        "value": "0"
+                                      }
+                                    ],
+                                    [
+                                      "og_number",
+                                      {
+                                        "__type": "bigint",
+                                        "value": "0"
+                                      }
+                                    ],
+                                    [
+                                      "rarity",
+                                      "common"
+                                    ],
+                                    [
+                                      "length",
+                                      {
+                                        "__type": "bigint",
+                                        "value": "6"
+                                      }
+                                    ],
+                                    [
+                                      "characters",
+                                      "letters,numbers"
+                                    ],
+                                    [
+                                      "numeric_modifiers",
+                                      ""
+                                    ],
+                                    [
+                                      "version",
+                                      {
+                                        "__type": "bigint",
+                                        "value": "1"
+                                      }
                                     ]
-                                  }
-                                ],
-                                [
-                                  "v",
-                                  {
-                                    "__type": "Map",
-                                    "value": [
-                                      [
-                                        "map",
-                                        [
-                                          {
-                                            "__type": "Map",
-                                            "value": [
-                                              [
-                                                "k",
-                                                {
-                                                  "__type": "Map",
-                                                  "value": [
-                                                    [
-                                                      "string",
-                                                      "000de140736e656b3639"
-                                                    ]
-                                                  ]
-                                                }
-                                              ],
-                                              [
-                                                "v",
-                                                {
-                                                  "__type": "Map",
-                                                  "value": [
-                                                    [
-                                                      "map",
-                                                      [
-                                                        {
-                                                          "__type": "Map",
-                                                          "value": [
-                                                            [
-                                                              "k",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "name"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ],
-                                                            [
-                                                              "v",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "$snek69"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ]
-                                                          ]
-                                                        },
-                                                        {
-                                                          "__type": "Map",
-                                                          "value": [
-                                                            [
-                                                              "k",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "image"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ],
-                                                            [
-                                                              "v",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "ipfs://zb2rhaGkrm2gQC366SZbbTQmjDd3fjd44ftHH4L4TtABypSKa"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ]
-                                                          ]
-                                                        },
-                                                        {
-                                                          "__type": "Map",
-                                                          "value": [
-                                                            [
-                                                              "k",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "mediaType"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ],
-                                                            [
-                                                              "v",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "image/jpeg"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ]
-                                                          ]
-                                                        },
-                                                        {
-                                                          "__type": "Map",
-                                                          "value": [
-                                                            [
-                                                              "k",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "og"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ],
-                                                            [
-                                                              "v",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "int",
-                                                                    {
-                                                                      "__type": "bigint",
-                                                                      "value": "0"
-                                                                    }
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ]
-                                                          ]
-                                                        },
-                                                        {
-                                                          "__type": "Map",
-                                                          "value": [
-                                                            [
-                                                              "k",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "og_number"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ],
-                                                            [
-                                                              "v",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "int",
-                                                                    {
-                                                                      "__type": "bigint",
-                                                                      "value": "0"
-                                                                    }
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ]
-                                                          ]
-                                                        },
-                                                        {
-                                                          "__type": "Map",
-                                                          "value": [
-                                                            [
-                                                              "k",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "rarity"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ],
-                                                            [
-                                                              "v",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "common"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ]
-                                                          ]
-                                                        },
-                                                        {
-                                                          "__type": "Map",
-                                                          "value": [
-                                                            [
-                                                              "k",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "length"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ],
-                                                            [
-                                                              "v",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "int",
-                                                                    {
-                                                                      "__type": "bigint",
-                                                                      "value": "6"
-                                                                    }
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ]
-                                                          ]
-                                                        },
-                                                        {
-                                                          "__type": "Map",
-                                                          "value": [
-                                                            [
-                                                              "k",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "characters"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ],
-                                                            [
-                                                              "v",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "letters,numbers"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ]
-                                                          ]
-                                                        },
-                                                        {
-                                                          "__type": "Map",
-                                                          "value": [
-                                                            [
-                                                              "k",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "numeric_modifiers"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ],
-                                                            [
-                                                              "v",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    ""
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ]
-                                                          ]
-                                                        },
-                                                        {
-                                                          "__type": "Map",
-                                                          "value": [
-                                                            [
-                                                              "k",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "version"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ],
-                                                            [
-                                                              "v",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "int",
-                                                                    {
-                                                                      "__type": "bigint",
-                                                                      "value": "1"
-                                                                    }
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ]
-                                                          ]
-                                                        }
-                                                      ]
-                                                    ]
-                                                  ]
-                                                }
-                                              ]
-                                            ]
-                                          }
-                                        ]
-                                      ]
-                                    ]
-                                  }
-                                ]
+                                  ]
+                                }
                               ]
-                            }
-                          ]
+                            ]
+                          }
                         ]
                       ]
                     }
@@ -850,371 +551,72 @@
                       "__type": "Map",
                       "value": [
                         [
-                          "map",
-                          [
-                            {
-                              "__type": "Map",
-                              "value": [
-                                [
-                                  "k",
-                                  {
-                                    "__type": "Map",
-                                    "value": [
-                                      [
-                                        "string",
-                                        "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a"
-                                      ]
+                          "f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a",
+                          {
+                            "__type": "Map",
+                            "value": [
+                              [
+                                "000de140736e656b3639",
+                                {
+                                  "__type": "Map",
+                                  "value": [
+                                    [
+                                      "name",
+                                      "$snek69"
+                                    ],
+                                    [
+                                      "image",
+                                      "ipfs://zb2rhaGkrm2gQC366SZbbTQmjDd3fjd44ftHH4L4TtABypSKa"
+                                    ],
+                                    [
+                                      "mediaType",
+                                      "image/jpeg"
+                                    ],
+                                    [
+                                      "og",
+                                      {
+                                        "__type": "bigint",
+                                        "value": "0"
+                                      }
+                                    ],
+                                    [
+                                      "og_number",
+                                      {
+                                        "__type": "bigint",
+                                        "value": "0"
+                                      }
+                                    ],
+                                    [
+                                      "rarity",
+                                      "common"
+                                    ],
+                                    [
+                                      "length",
+                                      {
+                                        "__type": "bigint",
+                                        "value": "6"
+                                      }
+                                    ],
+                                    [
+                                      "characters",
+                                      "letters,numbers"
+                                    ],
+                                    [
+                                      "numeric_modifiers",
+                                      ""
+                                    ],
+                                    [
+                                      "version",
+                                      {
+                                        "__type": "bigint",
+                                        "value": "1"
+                                      }
                                     ]
-                                  }
-                                ],
-                                [
-                                  "v",
-                                  {
-                                    "__type": "Map",
-                                    "value": [
-                                      [
-                                        "map",
-                                        [
-                                          {
-                                            "__type": "Map",
-                                            "value": [
-                                              [
-                                                "k",
-                                                {
-                                                  "__type": "Map",
-                                                  "value": [
-                                                    [
-                                                      "string",
-                                                      "000de140736e656b3639"
-                                                    ]
-                                                  ]
-                                                }
-                                              ],
-                                              [
-                                                "v",
-                                                {
-                                                  "__type": "Map",
-                                                  "value": [
-                                                    [
-                                                      "map",
-                                                      [
-                                                        {
-                                                          "__type": "Map",
-                                                          "value": [
-                                                            [
-                                                              "k",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "name"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ],
-                                                            [
-                                                              "v",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "$snek69"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ]
-                                                          ]
-                                                        },
-                                                        {
-                                                          "__type": "Map",
-                                                          "value": [
-                                                            [
-                                                              "k",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "image"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ],
-                                                            [
-                                                              "v",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "ipfs://zb2rhaGkrm2gQC366SZbbTQmjDd3fjd44ftHH4L4TtABypSKa"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ]
-                                                          ]
-                                                        },
-                                                        {
-                                                          "__type": "Map",
-                                                          "value": [
-                                                            [
-                                                              "k",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "mediaType"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ],
-                                                            [
-                                                              "v",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "image/jpeg"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ]
-                                                          ]
-                                                        },
-                                                        {
-                                                          "__type": "Map",
-                                                          "value": [
-                                                            [
-                                                              "k",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "og"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ],
-                                                            [
-                                                              "v",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "int",
-                                                                    {
-                                                                      "__type": "bigint",
-                                                                      "value": "0"
-                                                                    }
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ]
-                                                          ]
-                                                        },
-                                                        {
-                                                          "__type": "Map",
-                                                          "value": [
-                                                            [
-                                                              "k",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "og_number"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ],
-                                                            [
-                                                              "v",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "int",
-                                                                    {
-                                                                      "__type": "bigint",
-                                                                      "value": "0"
-                                                                    }
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ]
-                                                          ]
-                                                        },
-                                                        {
-                                                          "__type": "Map",
-                                                          "value": [
-                                                            [
-                                                              "k",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "rarity"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ],
-                                                            [
-                                                              "v",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "common"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ]
-                                                          ]
-                                                        },
-                                                        {
-                                                          "__type": "Map",
-                                                          "value": [
-                                                            [
-                                                              "k",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "length"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ],
-                                                            [
-                                                              "v",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "int",
-                                                                    {
-                                                                      "__type": "bigint",
-                                                                      "value": "6"
-                                                                    }
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ]
-                                                          ]
-                                                        },
-                                                        {
-                                                          "__type": "Map",
-                                                          "value": [
-                                                            [
-                                                              "k",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "characters"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ],
-                                                            [
-                                                              "v",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "letters,numbers"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ]
-                                                          ]
-                                                        },
-                                                        {
-                                                          "__type": "Map",
-                                                          "value": [
-                                                            [
-                                                              "k",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "numeric_modifiers"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ],
-                                                            [
-                                                              "v",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    ""
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ]
-                                                          ]
-                                                        },
-                                                        {
-                                                          "__type": "Map",
-                                                          "value": [
-                                                            [
-                                                              "k",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "string",
-                                                                    "version"
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ],
-                                                            [
-                                                              "v",
-                                                              {
-                                                                "__type": "Map",
-                                                                "value": [
-                                                                  [
-                                                                    "int",
-                                                                    {
-                                                                      "__type": "bigint",
-                                                                      "value": "1"
-                                                                    }
-                                                                  ]
-                                                                ]
-                                                              }
-                                                            ]
-                                                          ]
-                                                        }
-                                                      ]
-                                                    ]
-                                                  ]
-                                                }
-                                              ]
-                                            ]
-                                          }
-                                        ]
-                                      ]
-                                    ]
-                                  }
-                                ]
+                                  ]
+                                }
                               ]
-                            }
-                          ]
+                            ]
+                          }
                         ]
                       ]
                     }
