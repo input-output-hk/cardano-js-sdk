@@ -149,7 +149,7 @@ describe('OgmiosTxSubmitProvider', () => {
       await expect(
         provider.submitTx({
           context: {
-            handles: [mockHandleResolution]
+            handleResolutions: [mockHandleResolution]
           },
           signedTransaction: emptyUintArrayAsHexString
         })
@@ -172,7 +172,7 @@ describe('OgmiosTxSubmitProvider', () => {
 
       const res = await provider.submitTx({
         context: {
-          handles: [mockHandleResolution]
+          handleResolutions: [mockHandleResolution]
         },
         signedTransaction: emptyUintArrayAsHexString
       });
@@ -199,7 +199,7 @@ describe('OgmiosTxSubmitProvider', () => {
       await expect(
         provider.submitTx({
           context: {
-            handles: [mockHandleResolution]
+            handleResolutions: [mockHandleResolution]
           },
           signedTransaction: emptyUintArrayAsHexString
         })
