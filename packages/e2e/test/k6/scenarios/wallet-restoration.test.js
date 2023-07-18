@@ -107,6 +107,7 @@ export function setup() {
     console.log('HD wallet params are:', hdWalletParams);
   }
 
+  // This call will be part of the statistics. There is no way around it so far: https://github.com/grafana/k6/issues/1321
   const res = http.batch([WALLET_ADDRESSES_URL, POOL_ADDRESSES_URL]);
   check(res, { 'get wallets and pools files': (r) => r.every(({ status }) => status >= 200 && status < 300) });
 

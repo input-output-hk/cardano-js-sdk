@@ -2565,6 +2565,7 @@ __metadata:
     "@types/delay": ^3.1.0
     "@types/dockerode": ^3.3.8
     "@types/jest": ^28.1.2
+    "@types/k6": ^0.45.0
     "@types/lodash": ^4.14.182
     "@types/ora": ^3.2.0
     "@types/uuid": ^8.3.4
@@ -5791,6 +5792,13 @@ __metadata:
   version: 0.0.29
   resolution: "@types/json5@npm:0.0.29"
   checksum: e60b153664572116dfea673c5bda7778dbff150498f44f998e34b5886d8afc47f16799280e4b6e241c0472aef1bc36add771c569c68fc5125fc2ae519a3eb9ac
+  languageName: node
+  linkType: hard
+
+"@types/k6@npm:^0.45.0":
+  version: 0.45.0
+  resolution: "@types/k6@npm:0.45.0"
+  checksum: cb42e439a7af950ada2887609362d6da5b528c2dac126fc3fd524aef6c55b078131f6a80a4b618385e7a1948caf473030de1838d010d66a1c65fcaab1e603c6c
   languageName: node
   linkType: hard
 
