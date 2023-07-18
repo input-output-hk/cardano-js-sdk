@@ -1,5 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Ogmios } from '../../src';
+import { fromSerializableObject } from '@cardano-sdk/util';
 
 // Mock data extracted using ogmios chain-sync api from the preprod network
 export const mockByronBlock: Ogmios.Schema.Byron = {
@@ -691,3 +692,256 @@ export const mockBabbageBlock: Ogmios.Schema.Babbage = {
     headerHash: 'ee155ace9c40292074cb6aff8c9ccdd273c81648ff1149ef36bcea6ebb8a3e25'
   }
 };
+
+export const mockBabbageBlockWithNftMetadata = fromSerializableObject<Ogmios.Schema.Babbage>({
+  babbage: {
+    body: [
+      {
+        body: {
+          certificates: [],
+          collateralReturn: null,
+          collaterals: [],
+          fee: {
+            __type: 'bigint',
+            value: '192517'
+          },
+          inputs: [
+            {
+              index: 1,
+              txId: '04e4c197613f7b752f17cc69429faa5d7ceffb3e9299a7a4891af2b85b7f87c4'
+            }
+          ],
+          mint: {
+            assets: {
+              'f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a.626f62': {
+                __type: 'bigint',
+                value: '1'
+              }
+            },
+            coins: {
+              __type: 'bigint',
+              value: '0'
+            }
+          },
+          network: null,
+          outputs: [
+            {
+              address:
+                'addr_test1qzrljm7nskakjydxlr450ktsj08zuw6aktvgfkmmyw9semrkrezryq3ydtmkg0e7e2jvzg443h0ffzfwd09wpcxy2fuql9tk0g',
+              datum: null,
+              datumHash: null,
+              script: null,
+              value: {
+                assets: {
+                  'f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a.626f62': {
+                    __type: 'bigint',
+                    value: '1'
+                  }
+                },
+                coins: {
+                  __type: 'bigint',
+                  value: '1444443'
+                }
+              }
+            },
+            {
+              address:
+                'addr_test1qz690wvatwqgzt5u85hfzjxa8qqzthqwtp7xq8t3wh6ttc98hqtvlesvrpvln3srklcvhu2r9z22fdhaxvh2m2pg3nuq0n8gf2',
+              datum: null,
+              datumHash: null,
+              script: null,
+              value: {
+                assets: {},
+                coins: {
+                  __type: 'bigint',
+                  value: '9966064110'
+                }
+              }
+            }
+          ],
+          references: [],
+          requiredExtraSignatures: [],
+          scriptIntegrityHash: null,
+          totalCollateral: null,
+          update: null,
+          validityInterval: {
+            invalidBefore: 0,
+            invalidHereafter: 13_645_686
+          },
+          withdrawals: {}
+        },
+        id: '297f52b3e58e5c007f0d6914e1af64b4fc2c3266d444896520d998005d26642b',
+        inputSource: 'inputs',
+        metadata: {
+          body: {
+            blob: {
+              '721': {
+                map: [
+                  {
+                    k: {
+                      string: 'f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a'
+                    },
+                    v: {
+                      map: [
+                        {
+                          k: {
+                            string: 'bob'
+                          },
+                          v: {
+                            map: [
+                              {
+                                k: {
+                                  string: 'name'
+                                },
+                                v: {
+                                  string: '$bob'
+                                }
+                              },
+                              {
+                                k: {
+                                  string: 'description'
+                                },
+                                v: {
+                                  string: 'The Handle Standard'
+                                }
+                              },
+                              {
+                                k: {
+                                  string: 'website'
+                                },
+                                v: {
+                                  string: 'https://adahandle.com'
+                                }
+                              },
+                              {
+                                k: {
+                                  string: 'image'
+                                },
+                                v: {
+                                  string: 'ipfs://QmZqUk6nGqYJZzHiCGzbzqppA5qE99yNkuTSHuRQpymE1X'
+                                }
+                              },
+                              {
+                                k: {
+                                  string: 'core'
+                                },
+                                v: {
+                                  map: [
+                                    {
+                                      k: {
+                                        string: 'og'
+                                      },
+                                      v: {
+                                        int: {
+                                          __type: 'bigint',
+                                          value: '0'
+                                        }
+                                      }
+                                    },
+                                    {
+                                      k: {
+                                        string: 'termsofuse'
+                                      },
+                                      v: {
+                                        string: 'https://adahandle.com/tou'
+                                      }
+                                    },
+                                    {
+                                      k: {
+                                        string: 'handleEncoding'
+                                      },
+                                      v: {
+                                        string: 'utf-8'
+                                      }
+                                    },
+                                    {
+                                      k: {
+                                        string: 'prefix'
+                                      },
+                                      v: {
+                                        string: '$'
+                                      }
+                                    },
+                                    {
+                                      k: {
+                                        string: 'version'
+                                      },
+                                      v: {
+                                        int: {
+                                          __type: 'bigint',
+                                          value: '0'
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                k: {
+                                  string: 'augmentations'
+                                },
+                                v: {
+                                  list: []
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            scripts: []
+          },
+          hash: '9002261a963cd2e49faf5574eb98a5e550bbf1d4d0c334cac7ff611e2588e845'
+        },
+        raw: 'hKcAgYJYIATkwZdhP3t1LxfMaUKfql187/s+kpmnpIka8rhbf4fEAQGCglg5AIf5b9OFu2kRpvjrR9lwk84uO12y2ITbeyOLDOx2HkQyAiRq92Q/PsqkwSK1jd6UiS5ryuDgxFJ4ghoAFgpboVgc8P9Iu7e76dWaQPHOkOnp0P9QAuxI8jK0nKD7mqFDYm9iAYJYOQC0V7mdW4CBLpw9LpFI3TgAJdwOWHxgHXF19LXgp7gWz+YMGFn5xgO38MvxQyiUpLb9My6tqCiM+BsAAAACUgYR7gIaAALwBQMaANA3dgdYIJACJhqWPNLkn69VdOuYpeVQu/HU0MM0ysf/YR4liOhFCAAJoVgc8P9Iu7e76dWaQPHOkOnp0P9QAuxI8jK0nKD7mqFDYm9iAaIAgoJYIIy0bDzYO62aXVw2gVLaaexjDFwM2uK8y8kzY18QqVl4WEATDhzbBQbz4dbh6F0iq9Ul3OUSgCjRwwbfss7slNsW71UNwfm+YZGNXUAYLOe5pfqnpoNCX5Ahjjgg6PXUdmEMglggtipxk5J/R+9wO6maBq3R7i1NlIU6FtzWitD12bqhhTBYQFmEL+nW3a60/URPmB2NTAG4ADoekkctLLzLynsk7BmrfDbjLsHQN27WpJlmfHsEuhOpKAWuzYT7wEgSsSznxwIBgYIAWBxNqWWgSd/RXtHuGfum4pdKC3n8QW3ReWofl/Xh9aEZAtGheDhmMGZmNDhiYmI3YmJlOWQ1OWE0MGYxY2U5MGU5ZTlkMGZmNTAwMmVjNDhmMjMyYjQ5Y2EwZmI5YaFjYm9ipmRuYW1lZCRib2JrZGVzY3JpcHRpb25zVGhlIEhhbmRsZSBTdGFuZGFyZGd3ZWJzaXRldWh0dHBzOi8vYWRhaGFuZGxlLmNvbWVpbWFnZXg1aXBmczovL1FtWnFVazZuR3FZSlp6SGlDR3pienFwcEE1cUU5OXlOa3VUU0h1UlFweW1FMVhkY29yZaVib2cAanRlcm1zb2Z1c2V4GWh0dHBzOi8vYWRhaGFuZGxlLmNvbS90b3VuaGFuZGxlRW5jb2RpbmdldXRmLThmcHJlZml4YSRndmVyc2lvbgBtYXVnbWVudGF0aW9uc4A=',
+        witness: {
+          bootstrap: [],
+          datums: {},
+          redeemers: {},
+          scripts: {
+            f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a: {
+              native: '4da965a049dfd15ed1ee19fba6e2974a0b79fc416dd1796a1f97f5e1'
+            }
+          },
+          signatures: {
+            '8cb46c3cd83bad9a5d5c368152da69ec630c5c0cdae2bccbc933635f10a95978':
+              'Ew4c2wUG8+HW4ehdIqvVJdzlEoAo0cMG37LO7JTbFu9VDcH5vmGRjV1AGCznuaX6p6aDQl+QIY44IOj11HZhDA==',
+            b62a7193927f47ef703ba99a06add1ee2d4d94853a16dcd68ad0f5d9baa18530:
+              'WYQv6dbdrrT9RE+YHY1MAbgAOh6SRy0svMvKeyTsGat8NuMuwdA3btakmWZ8ewS6E6koBa7NhPvASBKxLOfHAg=='
+          }
+        }
+      }
+    ],
+    header: {
+      blockHash: '4961c3d67b35795b2edd6884482c80c3aa9cec6beb2ee7f6e9ddb7f364ee3eec',
+      blockHeight: 317_874,
+      blockSize: 848,
+      issuerVk: '9691ed9d98a5b79d5bc46c4496a6dba7e103f668f525c8349b6b92676cb3eae4',
+      issuerVrf: '6knkZSxGC57m2q/vyZnKZn++XrXXp66rvf9v4ZwaPJ8=',
+      opCert: {
+        count: 1,
+        hotVk: 'yGgscY6GcPnt0pXYsNtQ4uMr8lOXcm7vViJ9uviaJUo=',
+        kesPeriod: 60,
+        sigma: '0IAM1hEMC65KaCqHSy3llsIz6o54iXkYFX6lxHwf5o6w3AXdIftRGV2TY+Azpq9jNG2UMDvrjLv0FdT1cfJ0AQ=='
+      },
+      prevHash: '6625b89401da3c51749f89268b65fda8e416ad5c8af2d81b61f1eac0cf7eb8e5',
+      protocolVersion: {
+        major: 7,
+        minor: 0
+      },
+      signature:
+        'p5RAIKCwUymYUyL+c1cntIkYYUeJFNzoZ270Ueuhv0KgjEuY3RSBlLVR1MchrtQohfvJD3WJBpN/pOkEmuf6DVGodIUrdR/NFU4SyWjRan6oPYvrH31B/xh+L8ekhh0HmUX6B+VFQqW3wfDeXV3gbbLWSSxTxGVfUiRBKpcFZoH0pPdB0WCjdvR6TwkrZ3rmZCqcWCg+xhkTcbFgKwSTWzv5ead9Rh3S2JFDsSPML3cbuv2537fDSSMVlN1gg/m4TRR3deKThxAnCKHOyP57vFGjlakXRmr2EIv2WKiZoHUp3EO2B2Fh+/RFN5EosDndAEx4q5iqVFyOCHx6zIe41efjE2x3WfXz6HruoSzwlidI7lCbEdoYd4Fz6UypM+IkQPNuYj3cOPtDET0ae8OR+cVt7+YI4LgbmVyxCYvj9jxZhxygsK33AY7zgtKJMp7NkVQw108Pc6nwVtKy9Lq7VCiEql1Pv1MITmKZrgmpGlnl6V5IjF0rDJz0pdRBoP06DWi1zaXI9uKNWx3ZdDQRrIPc/swqYXFPO4kTQ1bECg3ijLvxyobZSqI4WuFdLE2IK9JJBXW4jJhO6CAnkjRQ+Q==',
+      slot: 13_633_715,
+      vrfInput: {
+        output: 'Yjlif/oWejOTiaoIK+xO9M5vL7Dr88m+XkrRASO9Kh75G+df45w9UKW7OwxxwnCurOU5YQRwam66XV5NU/zf7Q==',
+        proof:
+          'DjqlnCcUCKh8XHudn4mtl2NKGusLd3gydKXhfLEHaonCbI7j94bq9n4C6MqltyHk8v/tmfE5x5zEwoUIUv9okr0AMs6UEQjcaFxV7HPlDgE='
+      }
+    },
+    headerHash: 'f0206b115735fd587bd64e11936ba695033ce235284cfc83afc7168e5f0b86d9'
+  }
+});
