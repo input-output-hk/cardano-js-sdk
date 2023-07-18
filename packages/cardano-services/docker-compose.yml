@@ -49,6 +49,10 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
+  provider-server:
+    environment:
+      HANDLE_POLICY_IDS: $HANDLE_POLICY_IDS
+
 secrets:
   blockfrost_key:
     file: ./blockfrost-keys/${NETWORK:-mainnet}.key
