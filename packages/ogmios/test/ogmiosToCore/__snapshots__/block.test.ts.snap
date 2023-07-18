@@ -1,324 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ogmiosToCore block can translate from allegra block 1`] = `
+exports[`ogmiosToCore block babbage can translate from babbage block 1`] = `
 Object {
   "body": Array [
     Object {
       "auxiliaryData": Object {
         "blob": Map {
-          2n => Map {
-            "list" => Array [
-              Map {
-                "int" => 9798604473814314674n,
-              },
-              Map {
-                "bytes" => "7a43",
-              },
-            ],
-          },
-        },
-        "scripts": Array [
-          Object {
-            "__type": "native",
-            "keyHash": "b5ae663aaea8e500157bdf4baafd6f5ba0ce5759f7cd4101fc132f54",
-            "kind": 0,
-          },
-          Object {
-            "__type": "native",
-            "keyHash": "a646474b8f5431261506b6c273d307c7569a4eb6c96b42dd4a29520a",
-            "kind": 0,
-          },
-          Object {
-            "__type": "native",
-            "kind": 1,
-            "scripts": Array [
-              Object {
-                "__type": "native",
-                "kind": 2,
-                "scripts": Array [],
-              },
-              Object {
-                "__type": "native",
-                "keyHash": "58e1b65718531b42494610c506cef10ff031fa817a8ff75c0ab180e7",
-                "kind": 0,
-              },
-              Object {
-                "__type": "native",
-                "kind": 2,
-                "scripts": Array [
-                  Object {
-                    "__type": "native",
-                    "kind": 5,
-                    "slot": 15272,
-                  },
-                ],
-              },
-              Object {
-                "__type": "native",
-                "kind": 4,
-                "slot": 44521,
-              },
-              Object {
-                "__type": "native",
-                "kind": 4,
-                "slot": 91998,
-              },
-            ],
-          },
-        ],
-      },
-      "body": Object {
-        "auxiliaryDataHash": "ee155ace9c40292074cb6aff8c9ccdd273c81648ff1149ef36bcea6ebb8a3e25",
-        "certificates": Array [],
-        "collaterals": undefined,
-        "fee": 724n,
-        "inputs": Array [
-          Object {
-            "index": 2,
-            "txId": "03170a2e7597b7b7e3d84c05391d139a62b157e78786d8c082f29dcf4c111314",
-          },
-        ],
-        "mint": undefined,
-        "outputs": Array [],
-        "requiredExtraSignatures": undefined,
-        "scriptIntegrityHash": undefined,
-        "validityInterval": Object {
-          "invalidBefore": undefined,
-          "invalidHereafter": 79985,
-        },
-        "withdrawals": Array [],
-      },
-      "id": "8ba812bad0c356ec842365720acb4a4ea18f03d40b03ad1cc785426170d542f5",
-      "inputSource": "inputs",
-      "witness": Object {
-        "bootstrap": Array [
-          Object {
-            "addressAttributes": "Sn5kyQ==",
-            "chainCode": "beba7627",
-            "key": "e731d1871cc922f6dac49e3130c03fdd706c565e2c9d64c02b6e5a9a5239ba67",
-            "signature": "6f737771796d78737765796e6377626864696e7a677967686163647365616a756d756f747474796f68696275626e6374747a6e65756b67676c6d6a766975696f",
-          },
-          Object {
-            "addressAttributes": "dFA=",
-            "chainCode": undefined,
-            "key": "f0f5ffa432e7936e1f47092aa805ad34f198bd2b00bafb1950b41dc864b47874",
-            "signature": "6975736274637a77706a69617a61696f6a62796a64787364666a746979686976676a78657872776765717763666f6c6661766279626f74766579626d656b6f6c",
-          },
-          Object {
-            "addressAttributes": undefined,
-            "chainCode": "06777003",
-            "key": "501d21a038832a37d1d1cec177697adb498954e3fa4315498108c9ca48d0e51b",
-            "signature": "10f6d6cd30b46e5eee1abf97c67cf426e2376ac410945c101823f3b3b289fea4229ae524993f3755cbf3ae69949272c4613a033ab525f7d65a0fc8569f5f9578",
-          },
-          Object {
-            "addressAttributes": "Mw==",
-            "chainCode": "82",
-            "key": "b99abe31700f07caa60b1ac6f7f55f00e5c926dea06c02451a88eefe9e81a2fa",
-            "signature": "646f736e7a6a69767469656b6c6b75746662687572707762636a616c7463657769616c6a75746573616f7461617a6d7a7576707562716561757471626e6f7465",
-          },
-          Object {
-            "addressAttributes": "LA==",
-            "chainCode": "cc",
-            "key": "cfb0a988516364010755fe4b00982dd37cc678fad4fe67bbf7b8ff85af2da478",
-            "signature": "c0c3181155255a3fa7af837fd91a599a1c5434381e6a38239b2660f22bc7b37882df576c807bbd385275b56647c706b24fc9d6b520083c4f865bd4f4b6b16079",
-          },
-        ],
-        "datums": undefined,
-        "redeemers": undefined,
-        "scripts": Array [],
-        "signatures": Map {
-          "0c6be66a669a7e598d49bac208a3760f702ed2f59369f4efbf4bef3e25a99428" => "52839a987d9d301a0fe1319f2c2b47fdef94796b67400ac61752708934c4ff6378a5d0bc6803fea63f5073e9a7f830eb3f4f8631ad8e10fe63f8eb19eae3caf1",
-          "88d69c23b54b27f253aa51971458bd21b5d700a91f02fea2373bf76e69d33ac1" => "b7a3e4bbf2435b31b7546f7e2173b48a241600f2533c6214518b24f6bf8dcdd7a359ebc91ae5cee218b423b9beaa1251aec6a7fca46661823b8faec73e1eb982",
-        },
-      },
-    },
-  ],
-  "fees": 724n,
-  "header": Object {
-    "blockNo": 13,
-    "hash": "bb30a42c1e62f0afda5f0a4e8a562f7a13a24cea00ee81917b86b89e801314aa",
-    "slot": 9,
-  },
-  "issuerVk": "60337a64656bf2646f66c90ab4a546bbf3c3f5f8f00bf06fcc1d9f7d01d924f6",
-  "previousBlock": "bb30a42c1e62f0afda5f0a4e8a562f7a13a24cea00ee81917b86b89e801314aa",
-  "size": 503,
-  "totalOutput": 0n,
-  "txCount": 1,
-  "vrf": "vrf_vk1njzx6395znzy6p7ene2dqw7y77rq4zfaepyw2v6megqnuhepmfgqkg07xz",
-}
-`;
-
-exports[`ogmiosToCore block can translate from alonzo block 1`] = `
-Object {
-  "body": Array [
-    Object {
-      "auxiliaryData": Object {
-        "blob": Map {
-          674n => Map {
-            "map" => Array [
-              Map {
-                "k" => Map {
-                  "string" => "msg",
-                },
-                "v" => Map {
-                  "list" => Array [
-                    Map {
-                      "string" => "Auto-Loop-Transaction #338666 by ATADA",
-                    },
-                    Map {
-                      "string" => "",
-                    },
-                    Map {
-                      "string" => "Live Epoch 16, we have 061h 17m 32s left until the next one",
-                    },
-                    Map {
-                      "string" => "It's Montag - 22 August 2022 - 12:42:28 in Austria",
-                    },
-                    Map {
-                      "string" => "",
-                    },
-                    Map {
-                      "string" => "📈 The current ADA Price on Kraken is: $0.451502 / ADA",
-                    },
-                    Map {
-                      "string" => "",
-                    },
-                    Map {
-                      "string" => "A random Zen-Quote for you: 🙏",
-                    },
-                    Map {
-                      "string" => "There are three classes of people: those who see. Those who see",
-                    },
-                    Map {
-                      "string" => "when they are shown. Those who do not see. - Leonardo da Vinci",
-                    },
-                    Map {
-                      "string" => "",
-                    },
-                    Map {
-                      "string" => "Node-Revision: 950c4e222086fed5ca53564e642434ce9307b0b9",
-                    },
-                    Map {
-                      "string" => "",
-                    },
-                    Map {
-                      "string" => "PreProd-Chain is awesome, have some fun! 😍",
-                    },
-                    Map {
-                      "string" => " Best regards, Martin :-)",
-                    },
-                  ],
-                },
-              },
-            ],
-          },
-        },
-        "scripts": Array [],
-      },
-      "body": Object {
-        "auxiliaryDataHash": "0ad6d4a6e10182157142994b2cce2aebee9406e3e2be31bfb1574ed2409a71dc",
-        "certificates": Array [
-          Object {
-            "__typename": "StakeDelegationCertificate",
-            "poolId": "pool15erywju02scjv9gxkmp885c8catf5n4ke9459h2299fq57u9c3e",
-            "stakeKeyHash": "f2f6381fa7a3dcc144939b47dffb7dad677856dfbbee4c4b7e426049",
-          },
-          Object {
-            "__typename": "StakeKeyDeregistrationCertificate",
-            "stakeKeyHash": "f2f6381fa7a3dcc144939b47dffb7dad677856dfbbee4c4b7e426049",
-          },
-          Object {
-            "__typename": "PoolRetirementCertificate",
-            "epoch": 123,
-            "poolId": "pool15erywju02scjv9gxkmp885c8catf5n4ke9459h2299fq57u9c3e",
-          },
-          Object {
-            "__typename": "GenesisKeyDelegationCertificate",
-            "genesisDelegateHash": "e0a714319812c3f773ba04ec5d6b3ffcd5aad85006805b047b082541",
-            "genesisHash": "b16b56f5ec064be6ac3cab6035efae86b366cc3dc4a0d571603d70e5",
-            "vrfKeyHash": "95c3003a78585e0db8c9496f6deef4de0ff000994b8534cd66d4fe96bb21ddd3",
-          },
-        ],
-        "collaterals": Array [],
-        "fee": 202549n,
-        "inputs": Array [
-          Object {
-            "index": 0,
-            "txId": "1a3380c51384d151b876de02b7a4c5ca7eda7b1d1d744660aee4647516fd9a81",
-          },
-          Object {
-            "index": 1,
-            "txId": "1a3380c51384d151b876de02b7a4c5ca7eda7b1d1d744660aee4647516fd9a81",
-          },
-        ],
-        "mint": Map {},
-        "outputs": Array [
-          Object {
-            "address": "addr_test1vpfwv0ezc5g8a4mkku8hhy3y3vp92t7s3ul8g778g5yegsgalc6gc",
-            "datum": undefined,
-            "datumHash": undefined,
-            "scriptReference": undefined,
-            "value": Object {
-              "assets": Map {},
-              "coins": 999978n,
-            },
-          },
-          Object {
-            "address": "addr_test1vpfwv0ezc5g8a4mkku8hhy3y3vp92t7s3ul8g778g5yegsgalc6gc",
-            "datum": undefined,
-            "datumHash": undefined,
-            "scriptReference": undefined,
-            "value": Object {
-              "assets": Map {},
-              "coins": 8286924731n,
-            },
-          },
-        ],
-        "requiredExtraSignatures": Array [],
-        "scriptIntegrityHash": undefined,
-        "validityInterval": Object {
-          "invalidBefore": undefined,
-          "invalidHereafter": 5581748,
-        },
-        "withdrawals": Array [],
-      },
-      "id": "bb81604e09c4530ad02de6b80a0c13d82949fb307402dd0c2b447e211bdc621d",
-      "inputSource": "inputs",
-      "witness": Object {
-        "bootstrap": Array [],
-        "datums": Array [],
-        "redeemers": Array [],
-        "scripts": Array [],
-        "signatures": Map {
-          "742d8af3543349b5b18f3cba28f23b2d6e465b9c136c42e1fae6b2390f565427" => "484d0c242bc240163a1ac84568fbf870d83cfff72c2532c2acb51d12a222ba6e7b6333c88123ee6e04ca78c3c61c2d5932ea2062c59093a95fcc4c35c3413206",
-        },
-      },
-    },
-  ],
-  "fees": 202549n,
-  "header": Object {
-    "blockNo": 100000,
-    "hash": "514f8be63ef25c46bee47a90658977f815919c06222c0b480be1e29efbd72c49",
-    "slot": 5481752,
-  },
-  "issuerVk": "a9d974fd26bfaf385749113f260271430276bed6ef4dad6968535de6778471ce",
-  "previousBlock": "518a24a3fb0cc6ee1a31668a63994e4dbda70ede5ff13be494a3b4c1bb7709c8",
-  "size": 836,
-  "totalOutput": 8287924709n,
-  "txCount": 1,
-  "vrf": "vrf_vk1p8s5ysf7dgsvfrw0p0q7zczdytkxc95zsq3p9sfshk9s3z86jfdql5fdft",
-}
-`;
-
-exports[`ogmiosToCore block can translate from babbage block 1`] = `
-Object {
-  "body": Array [
-    Object {
-      "auxiliaryData": Object {
-        "blob": Map {
-          2n => Map {
-            "string" => "",
-          },
+          2n => "",
         },
         "scripts": Array [
           Object {
@@ -613,6 +301,277 @@ Object {
 }
 `;
 
+exports[`ogmiosToCore block can translate from allegra block 1`] = `
+Object {
+  "body": Array [
+    Object {
+      "auxiliaryData": Object {
+        "blob": Map {
+          2n => Array [
+            9798604473814314674n,
+            Object {
+              "data": Array [
+                122,
+                67,
+              ],
+              "type": "Buffer",
+            },
+          ],
+        },
+        "scripts": Array [
+          Object {
+            "__type": "native",
+            "keyHash": "b5ae663aaea8e500157bdf4baafd6f5ba0ce5759f7cd4101fc132f54",
+            "kind": 0,
+          },
+          Object {
+            "__type": "native",
+            "keyHash": "a646474b8f5431261506b6c273d307c7569a4eb6c96b42dd4a29520a",
+            "kind": 0,
+          },
+          Object {
+            "__type": "native",
+            "kind": 1,
+            "scripts": Array [
+              Object {
+                "__type": "native",
+                "kind": 2,
+                "scripts": Array [],
+              },
+              Object {
+                "__type": "native",
+                "keyHash": "58e1b65718531b42494610c506cef10ff031fa817a8ff75c0ab180e7",
+                "kind": 0,
+              },
+              Object {
+                "__type": "native",
+                "kind": 2,
+                "scripts": Array [
+                  Object {
+                    "__type": "native",
+                    "kind": 5,
+                    "slot": 15272,
+                  },
+                ],
+              },
+              Object {
+                "__type": "native",
+                "kind": 4,
+                "slot": 44521,
+              },
+              Object {
+                "__type": "native",
+                "kind": 4,
+                "slot": 91998,
+              },
+            ],
+          },
+        ],
+      },
+      "body": Object {
+        "auxiliaryDataHash": "ee155ace9c40292074cb6aff8c9ccdd273c81648ff1149ef36bcea6ebb8a3e25",
+        "certificates": Array [],
+        "collaterals": undefined,
+        "fee": 724n,
+        "inputs": Array [
+          Object {
+            "index": 2,
+            "txId": "03170a2e7597b7b7e3d84c05391d139a62b157e78786d8c082f29dcf4c111314",
+          },
+        ],
+        "mint": undefined,
+        "outputs": Array [],
+        "requiredExtraSignatures": undefined,
+        "scriptIntegrityHash": undefined,
+        "validityInterval": Object {
+          "invalidBefore": undefined,
+          "invalidHereafter": 79985,
+        },
+        "withdrawals": Array [],
+      },
+      "id": "8ba812bad0c356ec842365720acb4a4ea18f03d40b03ad1cc785426170d542f5",
+      "inputSource": "inputs",
+      "witness": Object {
+        "bootstrap": Array [
+          Object {
+            "addressAttributes": "Sn5kyQ==",
+            "chainCode": "beba7627",
+            "key": "e731d1871cc922f6dac49e3130c03fdd706c565e2c9d64c02b6e5a9a5239ba67",
+            "signature": "6f737771796d78737765796e6377626864696e7a677967686163647365616a756d756f747474796f68696275626e6374747a6e65756b67676c6d6a766975696f",
+          },
+          Object {
+            "addressAttributes": "dFA=",
+            "chainCode": undefined,
+            "key": "f0f5ffa432e7936e1f47092aa805ad34f198bd2b00bafb1950b41dc864b47874",
+            "signature": "6975736274637a77706a69617a61696f6a62796a64787364666a746979686976676a78657872776765717763666f6c6661766279626f74766579626d656b6f6c",
+          },
+          Object {
+            "addressAttributes": undefined,
+            "chainCode": "06777003",
+            "key": "501d21a038832a37d1d1cec177697adb498954e3fa4315498108c9ca48d0e51b",
+            "signature": "10f6d6cd30b46e5eee1abf97c67cf426e2376ac410945c101823f3b3b289fea4229ae524993f3755cbf3ae69949272c4613a033ab525f7d65a0fc8569f5f9578",
+          },
+          Object {
+            "addressAttributes": "Mw==",
+            "chainCode": "82",
+            "key": "b99abe31700f07caa60b1ac6f7f55f00e5c926dea06c02451a88eefe9e81a2fa",
+            "signature": "646f736e7a6a69767469656b6c6b75746662687572707762636a616c7463657769616c6a75746573616f7461617a6d7a7576707562716561757471626e6f7465",
+          },
+          Object {
+            "addressAttributes": "LA==",
+            "chainCode": "cc",
+            "key": "cfb0a988516364010755fe4b00982dd37cc678fad4fe67bbf7b8ff85af2da478",
+            "signature": "c0c3181155255a3fa7af837fd91a599a1c5434381e6a38239b2660f22bc7b37882df576c807bbd385275b56647c706b24fc9d6b520083c4f865bd4f4b6b16079",
+          },
+        ],
+        "datums": undefined,
+        "redeemers": undefined,
+        "scripts": Array [],
+        "signatures": Map {
+          "0c6be66a669a7e598d49bac208a3760f702ed2f59369f4efbf4bef3e25a99428" => "52839a987d9d301a0fe1319f2c2b47fdef94796b67400ac61752708934c4ff6378a5d0bc6803fea63f5073e9a7f830eb3f4f8631ad8e10fe63f8eb19eae3caf1",
+          "88d69c23b54b27f253aa51971458bd21b5d700a91f02fea2373bf76e69d33ac1" => "b7a3e4bbf2435b31b7546f7e2173b48a241600f2533c6214518b24f6bf8dcdd7a359ebc91ae5cee218b423b9beaa1251aec6a7fca46661823b8faec73e1eb982",
+        },
+      },
+    },
+  ],
+  "fees": 724n,
+  "header": Object {
+    "blockNo": 13,
+    "hash": "bb30a42c1e62f0afda5f0a4e8a562f7a13a24cea00ee81917b86b89e801314aa",
+    "slot": 9,
+  },
+  "issuerVk": "60337a64656bf2646f66c90ab4a546bbf3c3f5f8f00bf06fcc1d9f7d01d924f6",
+  "previousBlock": "bb30a42c1e62f0afda5f0a4e8a562f7a13a24cea00ee81917b86b89e801314aa",
+  "size": 503,
+  "totalOutput": 0n,
+  "txCount": 1,
+  "vrf": "vrf_vk1njzx6395znzy6p7ene2dqw7y77rq4zfaepyw2v6megqnuhepmfgqkg07xz",
+}
+`;
+
+exports[`ogmiosToCore block can translate from alonzo block 1`] = `
+Object {
+  "body": Array [
+    Object {
+      "auxiliaryData": Object {
+        "blob": Map {
+          674n => Map {
+            "msg" => Array [
+              "Auto-Loop-Transaction #338666 by ATADA",
+              "",
+              "Live Epoch 16, we have 061h 17m 32s left until the next one",
+              "It's Montag - 22 August 2022 - 12:42:28 in Austria",
+              "",
+              "📈 The current ADA Price on Kraken is: $0.451502 / ADA",
+              "",
+              "A random Zen-Quote for you: 🙏",
+              "There are three classes of people: those who see. Those who see",
+              "when they are shown. Those who do not see. - Leonardo da Vinci",
+              "",
+              "Node-Revision: 950c4e222086fed5ca53564e642434ce9307b0b9",
+              "",
+              "PreProd-Chain is awesome, have some fun! 😍",
+              " Best regards, Martin :-)",
+            ],
+          },
+        },
+        "scripts": Array [],
+      },
+      "body": Object {
+        "auxiliaryDataHash": "0ad6d4a6e10182157142994b2cce2aebee9406e3e2be31bfb1574ed2409a71dc",
+        "certificates": Array [
+          Object {
+            "__typename": "StakeDelegationCertificate",
+            "poolId": "pool15erywju02scjv9gxkmp885c8catf5n4ke9459h2299fq57u9c3e",
+            "stakeKeyHash": "f2f6381fa7a3dcc144939b47dffb7dad677856dfbbee4c4b7e426049",
+          },
+          Object {
+            "__typename": "StakeKeyDeregistrationCertificate",
+            "stakeKeyHash": "f2f6381fa7a3dcc144939b47dffb7dad677856dfbbee4c4b7e426049",
+          },
+          Object {
+            "__typename": "PoolRetirementCertificate",
+            "epoch": 123,
+            "poolId": "pool15erywju02scjv9gxkmp885c8catf5n4ke9459h2299fq57u9c3e",
+          },
+          Object {
+            "__typename": "GenesisKeyDelegationCertificate",
+            "genesisDelegateHash": "e0a714319812c3f773ba04ec5d6b3ffcd5aad85006805b047b082541",
+            "genesisHash": "b16b56f5ec064be6ac3cab6035efae86b366cc3dc4a0d571603d70e5",
+            "vrfKeyHash": "95c3003a78585e0db8c9496f6deef4de0ff000994b8534cd66d4fe96bb21ddd3",
+          },
+        ],
+        "collaterals": Array [],
+        "fee": 202549n,
+        "inputs": Array [
+          Object {
+            "index": 0,
+            "txId": "1a3380c51384d151b876de02b7a4c5ca7eda7b1d1d744660aee4647516fd9a81",
+          },
+          Object {
+            "index": 1,
+            "txId": "1a3380c51384d151b876de02b7a4c5ca7eda7b1d1d744660aee4647516fd9a81",
+          },
+        ],
+        "mint": Map {},
+        "outputs": Array [
+          Object {
+            "address": "addr_test1vpfwv0ezc5g8a4mkku8hhy3y3vp92t7s3ul8g778g5yegsgalc6gc",
+            "datum": undefined,
+            "datumHash": undefined,
+            "scriptReference": undefined,
+            "value": Object {
+              "assets": Map {},
+              "coins": 999978n,
+            },
+          },
+          Object {
+            "address": "addr_test1vpfwv0ezc5g8a4mkku8hhy3y3vp92t7s3ul8g778g5yegsgalc6gc",
+            "datum": undefined,
+            "datumHash": undefined,
+            "scriptReference": undefined,
+            "value": Object {
+              "assets": Map {},
+              "coins": 8286924731n,
+            },
+          },
+        ],
+        "requiredExtraSignatures": Array [],
+        "scriptIntegrityHash": undefined,
+        "validityInterval": Object {
+          "invalidBefore": undefined,
+          "invalidHereafter": 5581748,
+        },
+        "withdrawals": Array [],
+      },
+      "id": "bb81604e09c4530ad02de6b80a0c13d82949fb307402dd0c2b447e211bdc621d",
+      "inputSource": "inputs",
+      "witness": Object {
+        "bootstrap": Array [],
+        "datums": Array [],
+        "redeemers": Array [],
+        "scripts": Array [],
+        "signatures": Map {
+          "742d8af3543349b5b18f3cba28f23b2d6e465b9c136c42e1fae6b2390f565427" => "484d0c242bc240163a1ac84568fbf870d83cfff72c2532c2acb51d12a222ba6e7b6333c88123ee6e04ca78c3c61c2d5932ea2062c59093a95fcc4c35c3413206",
+        },
+      },
+    },
+  ],
+  "fees": 202549n,
+  "header": Object {
+    "blockNo": 100000,
+    "hash": "514f8be63ef25c46bee47a90658977f815919c06222c0b480be1e29efbd72c49",
+    "slot": 5481752,
+  },
+  "issuerVk": "a9d974fd26bfaf385749113f260271430276bed6ef4dad6968535de6778471ce",
+  "previousBlock": "518a24a3fb0cc6ee1a31668a63994e4dbda70ede5ff13be494a3b4c1bb7709c8",
+  "size": 836,
+  "totalOutput": 8287924709n,
+  "txCount": 1,
+  "vrf": "vrf_vk1p8s5ysf7dgsvfrw0p0q7zczdytkxc95zsq3p9sfshk9s3z86jfdql5fdft",
+}
+`;
+
 exports[`ogmiosToCore block can translate from byron block 1`] = `
 Object {
   "body": Array [],
@@ -741,11 +700,13 @@ Object {
     Object {
       "auxiliaryData": Object {
         "blob": Map {
-          1n => Map {
-            "int" => -16613019303347710699n,
-          },
-          2n => Map {
-            "bytes" => "6573",
+          1n => -16613019303347710699n,
+          2n => Object {
+            "data": Array [
+              101,
+              115,
+            ],
+            "type": "Buffer",
           },
         },
         "scripts": Array [],
