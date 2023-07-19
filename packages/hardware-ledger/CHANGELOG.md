@@ -43,7 +43,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Bug Fixes
 
-* correct ledger mapping canonical asset and asset group ordering ([2095877](https://github.com/input-output-hk/cardano-js-sdk/commit/20958773d2885ee3e1934363dce96b4e8cea96a7))
+- correct ledger mapping canonical asset and asset group ordering ([2095877](https://github.com/input-output-hk/cardano-js-sdk/commit/20958773d2885ee3e1934363dce96b4e8cea96a7))
 
 ## [0.2.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.2.4...@cardano-sdk/hardware-ledger@0.2.5) (2023-06-12)
 
@@ -57,7 +57,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Bug Fixes
 
-* **hardware-ledger:** stake key hashes in the requiredSigners field are now mapped correctly ([8e857ec](https://github.com/input-output-hk/cardano-js-sdk/commit/8e857ec022c03cd86e6c247d8333b68765fb0f2e))
+- **hardware-ledger:** stake key hashes in the requiredSigners field are now mapped correctly ([8e857ec](https://github.com/input-output-hk/cardano-js-sdk/commit/8e857ec022c03cd86e6c247d8333b68765fb0f2e))
 
 ## [0.2.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.2.1...@cardano-sdk/hardware-ledger@0.2.2) (2023-06-01)
 
@@ -71,8 +71,8 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### ⚠ BREAKING CHANGES
 
-* add ledger package with transformations
+- add ledger package with transformations
 
 ### Features
 
-* add ledger package with transformations ([58f3a22](https://github.com/input-output-hk/cardano-js-sdk/commit/58f3a227d466c0083bcfe9243311ac2bca4e48df))
+- add ledger package with transformations ([58f3a22](https://github.com/input-output-hk/cardano-js-sdk/commit/58f3a227d466c0083bcfe9243311ac2bca4e48df))

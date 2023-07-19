@@ -32,46 +32,46 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Bug Fixes
 
-* **cardano-services:** don't unsubscribe from projection on health timeout ([5d7e98b](https://github.com/input-output-hk/cardano-js-sdk/commit/5d7e98b500217739a53b82ed448efec31171bc2c))
-* **cardano-services:** fix dns resolution twice in a row ([ef42389](https://github.com/input-output-hk/cardano-js-sdk/commit/ef4238990d419df50c19c25899d53044dbf2d20c))
-* **util:** add ServerNotReady to list of connection errors ([c7faf01](https://github.com/input-output-hk/cardano-js-sdk/commit/c7faf01194561b2941c42c4a74517de0a5a9f7d9))
+- **cardano-services:** don't unsubscribe from projection on health timeout ([5d7e98b](https://github.com/input-output-hk/cardano-js-sdk/commit/5d7e98b500217739a53b82ed448efec31171bc2c))
+- **cardano-services:** fix dns resolution twice in a row ([ef42389](https://github.com/input-output-hk/cardano-js-sdk/commit/ef4238990d419df50c19c25899d53044dbf2d20c))
+- **util:** add ServerNotReady to list of connection errors ([c7faf01](https://github.com/input-output-hk/cardano-js-sdk/commit/c7faf01194561b2941c42c4a74517de0a5a9f7d9))
 
 ## [0.14.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.13.3...@cardano-sdk/cardano-services@0.14.0) (2023-06-28)
 
 ### ⚠ BREAKING CHANGES
 
-* revert inclusion of version in the HttpProvider interface
+- revert inclusion of version in the HttpProvider interface
 
 ### Features
 
-* adds cardanoAddress type in HandleResolution interface ([2ee31c9](https://github.com/input-output-hk/cardano-js-sdk/commit/2ee31c9f0b61fc5e67385128448225d2d1d85617))
-* **cardano-services:** make cli able to read handle policy ids from file ([ac2aa7f](https://github.com/input-output-hk/cardano-js-sdk/commit/ac2aa7f2d6106cb4fa12833c65800b63f59ca0d4))
-* implement verification and presubmission checks on handles in OgmiosTxProvider ([0f18042](https://github.com/input-output-hk/cardano-js-sdk/commit/0f1804287672968614e8aa6bf2f095b0e9a88b22))
+- adds cardanoAddress type in HandleResolution interface ([2ee31c9](https://github.com/input-output-hk/cardano-js-sdk/commit/2ee31c9f0b61fc5e67385128448225d2d1d85617))
+- **cardano-services:** make cli able to read handle policy ids from file ([ac2aa7f](https://github.com/input-output-hk/cardano-js-sdk/commit/ac2aa7f2d6106cb4fa12833c65800b63f59ca0d4))
+- implement verification and presubmission checks on handles in OgmiosTxProvider ([0f18042](https://github.com/input-output-hk/cardano-js-sdk/commit/0f1804287672968614e8aa6bf2f095b0e9a88b22))
 
 ### Bug Fixes
 
-* revert inclusion of version in the HttpProvider interface ([3f50013](https://github.com/input-output-hk/cardano-js-sdk/commit/3f5001367686668806bfe967d3d7b6dd5e96dccc))
+- revert inclusion of version in the HttpProvider interface ([3f50013](https://github.com/input-output-hk/cardano-js-sdk/commit/3f5001367686668806bfe967d3d7b6dd5e96dccc))
 
 ## [0.13.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.13.2...@cardano-sdk/cardano-services@0.13.3) (2023-06-23)
 
 ### Features
 
-* add API and software version HTTP headers ([2e9664f](https://github.com/input-output-hk/cardano-js-sdk/commit/2e9664fcaff56adcfa4f21eb2b71b2fb6a3b411d))
+- add API and software version HTTP headers ([2e9664f](https://github.com/input-output-hk/cardano-js-sdk/commit/2e9664fcaff56adcfa4f21eb2b71b2fb6a3b411d))
 
 ## [0.13.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.13.1...@cardano-sdk/cardano-services@0.13.2) (2023-06-20)
 
 ### Features
 
-* **cardano-services:** add typeorm handle provider and http handle service ([78d69ec](https://github.com/input-output-hk/cardano-js-sdk/commit/78d69ec1ae48df08cbf5bbf10406b3063bab75bb))
-* **cardano-services:** cache asset info and nft metadata ([43fd02f](https://github.com/input-output-hk/cardano-js-sdk/commit/43fd02ffaa5fdfe1812916e9885b383931141532))
-* **cardano-services:** improves get entities util to handle entities dependencies ([efc11e8](https://github.com/input-output-hk/cardano-js-sdk/commit/efc11e8a081bacb28a03fa6429f878b8b1eaa394))
-* **cardano-services:** improves the error middleware to log unknown errors ([63e58ca](https://github.com/input-output-hk/cardano-js-sdk/commit/63e58ca7c11b47c415876dac98107135243dcdfa))
-* **cardano-services:** increase details in asset not found error ([3967cb3](https://github.com/input-output-hk/cardano-js-sdk/commit/3967cb36c7bd8b54ccd59d614e63e651f6f9e5a1))
+- **cardano-services:** add typeorm handle provider and http handle service ([78d69ec](https://github.com/input-output-hk/cardano-js-sdk/commit/78d69ec1ae48df08cbf5bbf10406b3063bab75bb))
+- **cardano-services:** cache asset info and nft metadata ([43fd02f](https://github.com/input-output-hk/cardano-js-sdk/commit/43fd02ffaa5fdfe1812916e9885b383931141532))
+- **cardano-services:** improves get entities util to handle entities dependencies ([efc11e8](https://github.com/input-output-hk/cardano-js-sdk/commit/efc11e8a081bacb28a03fa6429f878b8b1eaa394))
+- **cardano-services:** improves the error middleware to log unknown errors ([63e58ca](https://github.com/input-output-hk/cardano-js-sdk/commit/63e58ca7c11b47c415876dac98107135243dcdfa))
+- **cardano-services:** increase details in asset not found error ([3967cb3](https://github.com/input-output-hk/cardano-js-sdk/commit/3967cb36c7bd8b54ccd59d614e63e651f6f9e5a1))
 
 ### Bug Fixes
 
-* **cardano-service:** fix query text in query time log line ([8a6a5e6](https://github.com/input-output-hk/cardano-js-sdk/commit/8a6a5e639abc10164c0cb40466af500fbd3f7d4d))
-* **cardano-services:** add postgres connection timeout ([ad8388e](https://github.com/input-output-hk/cardano-js-sdk/commit/ad8388eb0b04e5a044cf6c2af28a2195497a7c09))
+- **cardano-service:** fix query text in query time log line ([8a6a5e6](https://github.com/input-output-hk/cardano-js-sdk/commit/8a6a5e639abc10164c0cb40466af500fbd3f7d4d))
+- **cardano-services:** add postgres connection timeout ([ad8388e](https://github.com/input-output-hk/cardano-js-sdk/commit/ad8388eb0b04e5a044cf6c2af28a2195497a7c09))
 
 ## [0.13.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.13.0...@cardano-sdk/cardano-services@0.13.1) (2023-06-13)
 
@@ -81,19 +81,19 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### ⚠ BREAKING CHANGES
 
-* **cardano-services:** rm projector postgres cli/env suffix
+- **cardano-services:** rm projector postgres cli/env suffix
 
 ### Features
 
-* add handle projector service ([448b2a0](https://github.com/input-output-hk/cardano-js-sdk/commit/448b2a0c0a68f6a0d634a58f717b228b43794bae))
+- add handle projector service ([448b2a0](https://github.com/input-output-hk/cardano-js-sdk/commit/448b2a0c0a68f6a0d634a58f717b228b43794bae))
 
 ### Bug Fixes
 
-* **cardano-services:** postgres ssl option resolution ([de6168c](https://github.com/input-output-hk/cardano-js-sdk/commit/de6168ca8b0b629bf3ded6c22b3d69e0c425f952))
+- **cardano-services:** postgres ssl option resolution ([de6168c](https://github.com/input-output-hk/cardano-js-sdk/commit/de6168ca8b0b629bf3ded6c22b3d69e0c425f952))
 
 ### Code Refactoring
 
-* **cardano-services:** rm projector postgres cli/env suffix ([fe52d91](https://github.com/input-output-hk/cardano-js-sdk/commit/fe52d913c346b3ec4bc8969ae32f666bced2e588))
+- **cardano-services:** rm projector postgres cli/env suffix ([fe52d91](https://github.com/input-output-hk/cardano-js-sdk/commit/fe52d913c346b3ec4bc8969ae32f666bced2e588))
 
 ## [0.12.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.12.0...@cardano-sdk/cardano-services@0.12.1) (2023-06-06)
 
@@ -103,47 +103,48 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### ⚠ BREAKING CHANGES
 
-* hoist Cardano.Percent to util package
-* make stake pool metrics an optional property to handle activating pools
-* - rename `rewardsHistoryLimit` stake pool search arg to `apyEpochsBackLimit`
-* - remove `epochRewards` and type `StakePoolEpochRewards`
-- remove `transactions` and type `StakePoolTransactions`
+- hoist Cardano.Percent to util package
+- make stake pool metrics an optional property to handle activating pools
+- - rename `rewardsHistoryLimit` stake pool search arg to `apyEpochsBackLimit`
+- - remove `epochRewards` and type `StakePoolEpochRewards`
+
+* remove `transactions` and type `StakePoolTransactions`
 
 ### Features
 
-* add handle projection ([1d3f4ca](https://github.com/input-output-hk/cardano-js-sdk/commit/1d3f4ca3cfa3f1dfb668847de58eba4d0402d48e))
-* add missing pool stats status ([6a59a78](https://github.com/input-output-hk/cardano-js-sdk/commit/6a59a78cff0eae3d965e62d65d8612a642dce8f8))
-* add stake pool metadata entity relation ([99a40b7](https://github.com/input-output-hk/cardano-js-sdk/commit/99a40b79a8809c472c7780bcb626451345b65958))
-* **cardano-services:** log CardanoTokenRegistry config on construction ([63c8377](https://github.com/input-output-hk/cardano-js-sdk/commit/63c83774c0487e3883b6b447e1cc7aad75222e45))
-* implement TypeormStakePoolProvider ([8afbffd](https://github.com/input-output-hk/cardano-js-sdk/commit/8afbffdadaf9566ee25e553aee7fbb0c8e0eab62))
+- add handle projection ([1d3f4ca](https://github.com/input-output-hk/cardano-js-sdk/commit/1d3f4ca3cfa3f1dfb668847de58eba4d0402d48e))
+- add missing pool stats status ([6a59a78](https://github.com/input-output-hk/cardano-js-sdk/commit/6a59a78cff0eae3d965e62d65d8612a642dce8f8))
+- add stake pool metadata entity relation ([99a40b7](https://github.com/input-output-hk/cardano-js-sdk/commit/99a40b79a8809c472c7780bcb626451345b65958))
+- **cardano-services:** log CardanoTokenRegistry config on construction ([63c8377](https://github.com/input-output-hk/cardano-js-sdk/commit/63c83774c0487e3883b6b447e1cc7aad75222e45))
+- implement TypeormStakePoolProvider ([8afbffd](https://github.com/input-output-hk/cardano-js-sdk/commit/8afbffdadaf9566ee25e553aee7fbb0c8e0eab62))
 
 ### Code Refactoring
 
-* hoist Cardano.Percent to util package ([e4da0e3](https://github.com/input-output-hk/cardano-js-sdk/commit/e4da0e3851a4bdfd503c1f195c5ba1455ea6675b))
-* make stake pool metrics an optional property to handle activating pools ([d33bd07](https://github.com/input-output-hk/cardano-js-sdk/commit/d33bd07ddb873ba40498a95caa860820f38ee687))
-* remove unusable fields from StakePool core type ([a7aa17f](https://github.com/input-output-hk/cardano-js-sdk/commit/a7aa17fdd5224437555840d21f56c4660142c351))
-* rename rewardsHistoryLimit ([05ccdc6](https://github.com/input-output-hk/cardano-js-sdk/commit/05ccdc6b448f98ddd09894b633521e79fbb6d9c1))
+- hoist Cardano.Percent to util package ([e4da0e3](https://github.com/input-output-hk/cardano-js-sdk/commit/e4da0e3851a4bdfd503c1f195c5ba1455ea6675b))
+- make stake pool metrics an optional property to handle activating pools ([d33bd07](https://github.com/input-output-hk/cardano-js-sdk/commit/d33bd07ddb873ba40498a95caa860820f38ee687))
+- remove unusable fields from StakePool core type ([a7aa17f](https://github.com/input-output-hk/cardano-js-sdk/commit/a7aa17fdd5224437555840d21f56c4660142c351))
+- rename rewardsHistoryLimit ([05ccdc6](https://github.com/input-output-hk/cardano-js-sdk/commit/05ccdc6b448f98ddd09894b633521e79fbb6d9c1))
 
 ## [0.11.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.11.3...@cardano-sdk/cardano-services@0.11.4) (2023-06-01)
 
 ### Features
 
-* **cardano-services:** add stake pools metrics computation job ([3462595](https://github.com/input-output-hk/cardano-js-sdk/commit/346259540847eb5ac0b41640b37c7c9ecf114535))
+- **cardano-services:** add stake pools metrics computation job ([3462595](https://github.com/input-output-hk/cardano-js-sdk/commit/346259540847eb5ac0b41640b37c7c9ecf114535))
 
 ## [0.11.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.11.2...@cardano-sdk/cardano-services@0.11.3) (2023-05-24)
 
 ### Features
 
-* **cardano-services:** executes get seestes queries in parallel ([a966dd4](https://github.com/input-output-hk/cardano-js-sdk/commit/a966dd4f27d6e62f078802b07f72129f084151cb))
+- **cardano-services:** executes get seestes queries in parallel ([a966dd4](https://github.com/input-output-hk/cardano-js-sdk/commit/a966dd4f27d6e62f078802b07f72129f084151cb))
 
 ## [0.11.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.11.1...@cardano-sdk/cardano-services@0.11.2) (2023-05-22)
 
 ### Features
 
-* add the the pg-boss worker ([561fd50](https://github.com/input-output-hk/cardano-js-sdk/commit/561fd508a4a96307b023b16ce6fed3ce1d7bd536))
-* added two new utility functions to extract policy id and asset name from asset id ([b4af015](https://github.com/input-output-hk/cardano-js-sdk/commit/b4af015d26b7c08c8b295ffcba6142caca49f6a8))
-* **cardano-services:** improve cli.ts arguments parsing through environment varaibles ([3177edb](https://github.com/input-output-hk/cardano-js-sdk/commit/3177edb86faeac35601d7840a386190e61b885f3))
-* **cardano-services:** reduce code complexity - add a catch-all logic for stake pool metadata fetch ([0fda043](https://github.com/input-output-hk/cardano-js-sdk/commit/0fda0431b3e051223a7f4798b9dac6f51c8488c0))
+- add the the pg-boss worker ([561fd50](https://github.com/input-output-hk/cardano-js-sdk/commit/561fd508a4a96307b023b16ce6fed3ce1d7bd536))
+- added two new utility functions to extract policy id and asset name from asset id ([b4af015](https://github.com/input-output-hk/cardano-js-sdk/commit/b4af015d26b7c08c8b295ffcba6142caca49f6a8))
+- **cardano-services:** improve cli.ts arguments parsing through environment varaibles ([3177edb](https://github.com/input-output-hk/cardano-js-sdk/commit/3177edb86faeac35601d7840a386190e61b885f3))
+- **cardano-services:** reduce code complexity - add a catch-all logic for stake pool metadata fetch ([0fda043](https://github.com/input-output-hk/cardano-js-sdk/commit/0fda0431b3e051223a7f4798b9dac6f51c8488c0))
 
 ## [0.11.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.11.0...@cardano-sdk/cardano-services@0.11.1) (2023-05-03)
 

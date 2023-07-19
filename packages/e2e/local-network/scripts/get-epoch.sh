@@ -15,4 +15,3 @@ if [ ! -S "$CARDANO_NODE_SOCKET_PATH" ]; then
 else
   cardano-cli query tip --testnet-magic 888 | jq .epoch
 fi
-

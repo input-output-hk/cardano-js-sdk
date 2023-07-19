@@ -25,8 +25,11 @@ docker compose -p local-network-e2e stop cardano-node-ogmios
 sleep 2
 
 echo 'Creating snapshots...'
-for DB_FILE in $(cd $SECRETS_DIR ; ls postgres_db_*) ; do
-  docker compose -p local-network-e2e exec -it postgres /bin/bash -c "pg_dump --create --username $USER $(cat $SECRETS_DIR/$DB_FILE)" > $SCRIPT_DIR/snapshots/$(echo $DB_FILE | sed -e s/postgres_db_//).sql
+for DB_FILE in $(
+  cd $SECRETS_DIR
+  ls postgres_db_*
+); do
+  docker compose -p local-network-e2e exec -it postgres /bin/bash -c "pg_dump --create --username $USER $(cat $SECRETS_DIR/$DB_FILE)" >$SCRIPT_DIR/snapshots/$(echo $DB_FILE | sed -e s/postgres_db_//).sql
 done
 echo 'Snapshots created.'
 

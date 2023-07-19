@@ -23,11 +23,11 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### ⚠ BREAKING CHANGES
 
-* move coldObservableProvider to util-rxjs package
+- move coldObservableProvider to util-rxjs package
 
 ### Code Refactoring
 
-* move coldObservableProvider to util-rxjs package ([3522d0c](https://github.com/input-output-hk/cardano-js-sdk/commit/3522d0cbbde21c59e483d769cee14ffee4648972))
+- move coldObservableProvider to util-rxjs package ([3522d0c](https://github.com/input-output-hk/cardano-js-sdk/commit/3522d0cbbde21c59e483d769cee14ffee4648972))
 
 ## [0.4.16](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.4.15...@cardano-sdk/util-rxjs@0.4.16) (2023-06-23)
 

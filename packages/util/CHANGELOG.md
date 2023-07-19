@@ -7,53 +7,53 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### ⚠ BREAKING CHANGES
 
-* added change address resolver to the round robin input selector
+- added change address resolver to the round robin input selector
 
 ### Features
 
-* added change address resolver to the round robin input selector ([ef654ca](https://github.com/input-output-hk/cardano-js-sdk/commit/ef654ca7a7c3217b68360e1d4bee3296e5fc4f0e))
+- added change address resolver to the round robin input selector ([ef654ca](https://github.com/input-output-hk/cardano-js-sdk/commit/ef654ca7a7c3217b68360e1d4bee3296e5fc4f0e))
 
 ## [0.12.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.12.0...@cardano-sdk/util@0.12.1) (2023-06-29)
 
 ### Bug Fixes
 
-* **util:** add ServerNotReady to list of connection errors ([c7faf01](https://github.com/input-output-hk/cardano-js-sdk/commit/c7faf01194561b2941c42c4a74517de0a5a9f7d9))
+- **util:** add ServerNotReady to list of connection errors ([c7faf01](https://github.com/input-output-hk/cardano-js-sdk/commit/c7faf01194561b2941c42c4a74517de0a5a9f7d9))
 
 ## [0.12.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.11.0...@cardano-sdk/util@0.12.0) (2023-06-28)
 
 ### ⚠ BREAKING CHANGES
 
-* moved strictEquals, sameArrayItems, shallowArrayEquals to util package
+- moved strictEquals, sameArrayItems, shallowArrayEquals to util package
 
 ### Code Refactoring
 
-* move generic equals methods to util package ([6b5dbd3](https://github.com/input-output-hk/cardano-js-sdk/commit/6b5dbd3382eda3fb58901619438caf946a559715))
+- move generic equals methods to util package ([6b5dbd3](https://github.com/input-output-hk/cardano-js-sdk/commit/6b5dbd3382eda3fb58901619438caf946a559715))
 
 ## [0.11.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.10.0...@cardano-sdk/util@0.11.0) (2023-06-05)
 
 ### ⚠ BREAKING CHANGES
 
-* hoist Cardano.Percent to util package
+- hoist Cardano.Percent to util package
 
 ### Features
 
-* **util:** get percentage from parts ([d8570e1](https://github.com/input-output-hk/cardano-js-sdk/commit/d8570e17babae00cc82e94b3e624804b63b86de6))
+- **util:** get percentage from parts ([d8570e1](https://github.com/input-output-hk/cardano-js-sdk/commit/d8570e17babae00cc82e94b3e624804b63b86de6))
 
 ### Code Refactoring
 
-* hoist Cardano.Percent to util package ([e4da0e3](https://github.com/input-output-hk/cardano-js-sdk/commit/e4da0e3851a4bdfd503c1f195c5ba1455ea6675b))
+- hoist Cardano.Percent to util package ([e4da0e3](https://github.com/input-output-hk/cardano-js-sdk/commit/e4da0e3851a4bdfd503c1f195c5ba1455ea6675b))
 
 ## [0.10.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.9.0...@cardano-sdk/util@0.10.0) (2023-05-22)
 
 ### ⚠ BREAKING CHANGES
 
-* **util-dev:** remove createStubLogger util
+- **util-dev:** remove createStubLogger util
 
 ### Features
 
-* **util-dev:** remove createStubLogger util ([de06e4e](https://github.com/input-output-hk/cardano-js-sdk/commit/de06e4e46877116f7ceb1f04df920a351dd4724d))
-* **util:** export isPromise util ([cc0b3b0](https://github.com/input-output-hk/cardano-js-sdk/commit/cc0b3b0e10ef4eaf763bea085976669f8be72ed5))
-* **util:** transformObj util ([40f4b0d](https://github.com/input-output-hk/cardano-js-sdk/commit/40f4b0db82d2495f31da1f0d5e090858688a8115))
+- **util-dev:** remove createStubLogger util ([de06e4e](https://github.com/input-output-hk/cardano-js-sdk/commit/de06e4e46877116f7ceb1f04df920a351dd4724d))
+- **util:** export isPromise util ([cc0b3b0](https://github.com/input-output-hk/cardano-js-sdk/commit/cc0b3b0e10ef4eaf763bea085976669f8be72ed5))
+- **util:** transformObj util ([40f4b0d](https://github.com/input-output-hk/cardano-js-sdk/commit/40f4b0db82d2495f31da1f0d5e090858688a8115))
 
 ## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.8.2...@cardano-sdk/util@0.9.0) (2023-05-02)
 

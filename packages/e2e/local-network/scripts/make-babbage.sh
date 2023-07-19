@@ -16,8 +16,8 @@ source ./scripts/nodes-configuration.sh
 
 UNAME=$(uname -s) SED=
 case $UNAME in
-  Darwin )      SED="gsed";;
-  Linux )       SED="sed";;
+Darwin) SED="gsed" ;;
+Linux) SED="sed" ;;
 esac
 
 case $(uname) in
@@ -40,10 +40,12 @@ sprocket() {
 
 UNAME=$(uname -s) DATE=
 case $UNAME in
-  Darwin )      DATE="gdate";;
-  Linux )       DATE="date";;
-  MINGW64_NT* ) UNAME="Windows_NT"
-                DATE="date";;
+Darwin) DATE="gdate" ;;
+Linux) DATE="date" ;;
+MINGW64_NT*)
+  UNAME="Windows_NT"
+  DATE="date"
+  ;;
 esac
 
 NETWORK_MAGIC=888
@@ -54,13 +56,13 @@ START_TIME="$(${DATE} -d "now + 30 seconds" +%s)"
 ROOT=network-files
 
 if test -d "${ROOT}/byron-gen-command"; then
-  echo  "Existing \"${ROOT}/byron-gen-command\" directory will be deleted"
+  echo "Existing \"${ROOT}/byron-gen-command\" directory will be deleted"
   rm -rf "${ROOT}/byron-gen-command"
 fi
 
 mkdir -p "${ROOT}"
 
-cat > "${ROOT}/byron.genesis.spec.json" <<EOF
+cat >"${ROOT}/byron.genesis.spec.json" <<EOF
 {
   "heavyDelThd":     "300000000000",
   "maxBlockSize":    "2000000",
@@ -107,26 +109,26 @@ cp templates/babbage/alonzo-babbage-test-genesis.json "${ROOT}/genesis.alonzo.sp
 cp templates/babbage/byron-configuration.yaml "${ROOT}/configuration.yaml"
 
 $SED -i "${ROOT}/configuration.yaml" \
-     -e 's/Protocol: RealPBFT/Protocol: Cardano/' \
-     -e 's|GenesisFile: genesis.json|ByronGenesisFile: genesis/byron/genesis.json|' \
-     -e '/ByronGenesisFile/ aShelleyGenesisFile: genesis/shelley/genesis.json' \
-     -e '/ByronGenesisFile/ aAlonzoGenesisFile: genesis/shelley/genesis.alonzo.json' \
-     -e 's/RequiresNoMagic/RequiresMagic/' \
-     -e 's/LastKnownBlockVersion-Major: 0/LastKnownBlockVersion-Major: 6/' \
-     -e 's/LastKnownBlockVersion-Minor: 2/LastKnownBlockVersion-Minor: 0/' \
-     -e "s/minSeverity: Info/minSeverity: ${CARDANO_NODE_LOG_LEVEL}/" \
-     -e "s/cardano.node.ChainDB: Notice/cardano.node.ChainDB: ${CARDANO_NODE_CHAINDB_LOG_LEVEL}/"
+  -e 's/Protocol: RealPBFT/Protocol: Cardano/' \
+  -e 's|GenesisFile: genesis.json|ByronGenesisFile: genesis/byron/genesis.json|' \
+  -e '/ByronGenesisFile/ aShelleyGenesisFile: genesis/shelley/genesis.json' \
+  -e '/ByronGenesisFile/ aAlonzoGenesisFile: genesis/shelley/genesis.alonzo.json' \
+  -e 's/RequiresNoMagic/RequiresMagic/' \
+  -e 's/LastKnownBlockVersion-Major: 0/LastKnownBlockVersion-Major: 6/' \
+  -e 's/LastKnownBlockVersion-Minor: 2/LastKnownBlockVersion-Minor: 0/' \
+  -e "s/minSeverity: Info/minSeverity: ${CARDANO_NODE_LOG_LEVEL}/" \
+  -e "s/cardano.node.ChainDB: Notice/cardano.node.ChainDB: ${CARDANO_NODE_CHAINDB_LOG_LEVEL}/"
 
-  echo "" >> "${ROOT}/configuration.yaml"
-  echo "PBftSignatureThreshold: 0.6" >> "${ROOT}/configuration.yaml"
-  echo "" >> "${ROOT}/configuration.yaml"
+echo "" >>"${ROOT}/configuration.yaml"
+echo "PBftSignatureThreshold: 0.6" >>"${ROOT}/configuration.yaml"
+echo "" >>"${ROOT}/configuration.yaml"
 
-  echo "TestShelleyHardForkAtEpoch: 0" >> "${ROOT}/configuration.yaml"
-  echo "TestAllegraHardForkAtEpoch: 0" >> "${ROOT}/configuration.yaml"
-  echo "TestMaryHardForkAtEpoch: 0" >> "${ROOT}/configuration.yaml"
-  echo "TestAlonzoHardForkAtEpoch: 0" >> "${ROOT}/configuration.yaml"
-  echo "TestBabbageHardForkAtEpoch: 0" >> "${ROOT}/configuration.yaml"
-  echo "TestEnableDevelopmentNetworkProtocols: True" >> "${ROOT}/configuration.yaml"
+echo "TestShelleyHardForkAtEpoch: 0" >>"${ROOT}/configuration.yaml"
+echo "TestAllegraHardForkAtEpoch: 0" >>"${ROOT}/configuration.yaml"
+echo "TestMaryHardForkAtEpoch: 0" >>"${ROOT}/configuration.yaml"
+echo "TestAlonzoHardForkAtEpoch: 0" >>"${ROOT}/configuration.yaml"
+echo "TestBabbageHardForkAtEpoch: 0" >>"${ROOT}/configuration.yaml"
+echo "TestEnableDevelopmentNetworkProtocols: True" >>"${ROOT}/configuration.yaml"
 
 # Copy the cost mode
 cardano-cli genesis create-staked --genesis-dir "${ROOT}" \
@@ -153,25 +155,24 @@ mv "${ROOT}/byron-gen-command/genesis.json" "${ROOT}/genesis/byron/genesis-wrong
 mv "${ROOT}/genesis.alonzo.json" "${ROOT}/genesis/shelley/genesis.alonzo.json"
 mv "${ROOT}/genesis.json" "${ROOT}/genesis/shelley/genesis.json"
 
-jq --raw-output ".protocolConsts.protocolMagic = ${NETWORK_MAGIC}" "${ROOT}/genesis/byron/genesis-wrong.json" > "${ROOT}/genesis/byron/genesis.json"
+jq --raw-output ".protocolConsts.protocolMagic = ${NETWORK_MAGIC}" "${ROOT}/genesis/byron/genesis-wrong.json" >"${ROOT}/genesis/byron/genesis.json"
 
 rm "${ROOT}/genesis/byron/genesis-wrong.json"
 
-
 $SED -i "${ROOT}/genesis/shelley/genesis.json" \
-    -e 's/"slotLength": 1/"slotLength": 0.2/' \
-    -e 's/"activeSlotsCoeff": 5.0e-2/"activeSlotsCoeff": 0.1/' \
-    -e 's/"securityParam": 2160/"securityParam": 10/' \
-    -e 's/"epochLength": 432000/"epochLength": 1000/' \
-    -e "s/\"maxLovelaceSupply\": 0/\"maxLovelaceSupply\": ${MAX_SUPPLY}/" \
-    -e 's/"minFeeA": 1/"minFeeA": 44/' \
-    -e 's/"minFeeB": 0/"minFeeB": 155381/' \
-    -e 's/"minUTxOValue": 0/"minUTxOValue": 1000000/' \
-    -e 's/"decentralisationParam": 1.0/"decentralisationParam": 0.7/' \
-    -e 's/"major": 0/"major": 7/' \
-    -e 's/"rho": 0.0/"rho": 0.1/' \
-    -e 's/"tau": 0.0/"tau": 0.1/' \
-    -e 's/"updateQuorum": 5/"updateQuorum": 2/'
+  -e 's/"slotLength": 1/"slotLength": 0.2/' \
+  -e 's/"activeSlotsCoeff": 5.0e-2/"activeSlotsCoeff": 0.1/' \
+  -e 's/"securityParam": 2160/"securityParam": 10/' \
+  -e 's/"epochLength": 432000/"epochLength": 1000/' \
+  -e "s/\"maxLovelaceSupply\": 0/\"maxLovelaceSupply\": ${MAX_SUPPLY}/" \
+  -e 's/"minFeeA": 1/"minFeeA": 44/' \
+  -e 's/"minFeeB": 0/"minFeeB": 155381/' \
+  -e 's/"minUTxOValue": 0/"minUTxOValue": 1000000/' \
+  -e 's/"decentralisationParam": 1.0/"decentralisationParam": 0.7/' \
+  -e 's/"major": 0/"major": 7/' \
+  -e 's/"rho": 0.0/"rho": 0.1/' \
+  -e 's/"tau": 0.0/"tau": 0.1/' \
+  -e 's/"updateQuorum": 5/"updateQuorum": 2/'
 
 for NODE_ID in ${SP_NODES_ID}; do
   TARGET="${ROOT}/node-sp${NODE_ID}"
@@ -186,7 +187,7 @@ for NODE_ID in ${SP_NODES_ID}; do
   mv "${ROOT}/byron-gen-command/delegate-keys.${BYRON_KEYS_POSFIX}.key" "${TARGET}/byron-delegate.key"
   mv "${ROOT}/byron-gen-command/delegation-cert.${BYRON_KEYS_POSFIX}.json" "${TARGET}/byron-delegation.cert"
 
-  echo "${PORT}" > "${TARGET}/port"
+  echo "${PORT}" >"${TARGET}/port"
 
 done
 
@@ -194,14 +195,13 @@ done
 for ID in ${SP_NODES_ID}; do
   port="$(("$ID" + 3001))"
 
-  if [ "$ID" -ge "$(("$NUM_SP_NODES" - 1))" ] # Wrap around
-  then
+  if [ "$ID" -ge "$(("$NUM_SP_NODES" - 1))" ]; then # Wrap around
     port="$(("$port" - "$(("$NUM_SP_NODES" - 1))"))"
   fi
 
   secondPort="$(("$port" + 1))"
 
-  cat > "${ROOT}/node-sp${ID}/topology.json" <<EOF
+  cat >"${ROOT}/node-sp${ID}/topology.json" <<EOF
   {
      "Producers": [
        {
@@ -224,9 +224,9 @@ for NODE in ${SP_NODES}; do
   (
     echo "#!/usr/bin/env bash"
     echo ""
-    echo "export PATH=\$PWD/bin:\$PATH"
+    echo 'export PATH=$PWD/bin:$PATH'
     echo ""
-    echo "cardano-node run \\"
+    echo 'cardano-node run \'
     echo "  --config                          '${ROOT}/configuration.yaml' \\"
     echo "  --topology                        '${ROOT}/${NODE}/topology.json' \\"
     echo "  --database-path                   '${ROOT}/${NODE}/db' \\"
@@ -240,7 +240,7 @@ for NODE in ${SP_NODES}; do
     echo "  | tee -a '${ROOT}/${NODE}/node.log'"
     echo ""
     echo "wait"
-  ) > "${ROOT}/${NODE}.sh"
+  ) >"${ROOT}/${NODE}.sh"
 
   chmod a+x "${ROOT}/${NODE}.sh"
 
@@ -259,9 +259,9 @@ echo "Byron genesis hash: $byronGenesisHash"
 echo "Shelley genesis hash: $shelleyGenesisHash"
 echo "Alonzo genesis hash: $alonzoGenesisHash"
 
-$SED -i -E "s/ByronGenesisHash: \".*\"/ByronGenesisHash: \"${byronGenesisHash}\"/"  ${ROOT}/configuration.yaml
-$SED -i -E "s/ShelleyGenesisHash: \".*\"/ShelleyGenesisHash: \"${shelleyGenesisHash}\"/"  ${ROOT}/configuration.yaml
-$SED -i -E "s/AlonzoGenesisHash: \".*\"/AlonzoGenesisHash: \"${alonzoGenesisHash}\"/"  ${ROOT}/configuration.yaml
+$SED -i -E "s/ByronGenesisHash: \".*\"/ByronGenesisHash: \"${byronGenesisHash}\"/" ${ROOT}/configuration.yaml
+$SED -i -E "s/ShelleyGenesisHash: \".*\"/ShelleyGenesisHash: \"${shelleyGenesisHash}\"/" ${ROOT}/configuration.yaml
+$SED -i -E "s/AlonzoGenesisHash: \".*\"/AlonzoGenesisHash: \"${alonzoGenesisHash}\"/" ${ROOT}/configuration.yaml
 
 # Create config folder
 rm -rf ./config/*
@@ -293,17 +293,17 @@ cp "${ROOT}"/genesis/shelley/genesis.alonzo.json ./config/network/genesis/alonzo
 
 mkdir -p "${ROOT}/run"
 
-echo "#!/usr/bin/env bash" > "${ROOT}/run/all.sh"
-echo "" >> "${ROOT}/run/all.sh"
-echo "" >> "${ROOT}/run/all.sh"
-echo "export PATH=\$PWD/bin:\$PATH" >> "${ROOT}/run/all.sh"
-echo "" >> "${ROOT}/run/all.sh"
+echo "#!/usr/bin/env bash" >"${ROOT}/run/all.sh"
+echo "" >>"${ROOT}/run/all.sh"
+echo "" >>"${ROOT}/run/all.sh"
+echo 'export PATH=$PWD/bin:$PATH' >>"${ROOT}/run/all.sh"
+echo "" >>"${ROOT}/run/all.sh"
 
 for NODE in ${SP_NODES}; do
-  echo "$ROOT/${NODE}.sh &" >> "${ROOT}/run/all.sh"
+  echo "$ROOT/${NODE}.sh &" >>"${ROOT}/run/all.sh"
 done
-echo "" >> "${ROOT}/run/all.sh"
-echo "wait" >> "${ROOT}/run/all.sh"
+echo "" >>"${ROOT}/run/all.sh"
+echo "wait" >>"${ROOT}/run/all.sh"
 
 chmod a+x "${ROOT}/run/all.sh"
 

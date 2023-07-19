@@ -31,7 +31,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Bug Fixes
 
-* unsupported character bug in handles projection ([4144ed2](https://github.com/input-output-hk/cardano-js-sdk/commit/4144ed2925f1c5b118c411ac5eedc3e4a62d3893))
+- unsupported character bug in handles projection ([4144ed2](https://github.com/input-output-hk/cardano-js-sdk/commit/4144ed2925f1c5b118c411ac5eedc3e4a62d3893))
 
 ## [0.6.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.6.8...@cardano-sdk/projection@0.6.9) (2023-06-23)
 
@@ -49,7 +49,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Bug Fixes
 
-* **projection:** filterProducedUtxoByAssetPolicyId now also filters out other assets ([57da14b](https://github.com/input-output-hk/cardano-js-sdk/commit/57da14b4488a019e8d18b9ceac7eac7f11f92558))
+- **projection:** filterProducedUtxoByAssetPolicyId now also filters out other assets ([57da14b](https://github.com/input-output-hk/cardano-js-sdk/commit/57da14b4488a019e8d18b9ceac7eac7f11f92558))
 
 ## [0.6.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.6.4...@cardano-sdk/projection@0.6.5) (2023-06-06)
 
@@ -59,7 +59,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
-* add handle projection ([1d3f4ca](https://github.com/input-output-hk/cardano-js-sdk/commit/1d3f4ca3cfa3f1dfb668847de58eba4d0402d48e))
+- add handle projection ([1d3f4ca](https://github.com/input-output-hk/cardano-js-sdk/commit/1d3f4ca3cfa3f1dfb668847de58eba4d0402d48e))
 
 ## [0.6.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.6.2...@cardano-sdk/projection@0.6.3) (2023-06-01)
 

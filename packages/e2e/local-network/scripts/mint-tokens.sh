@@ -62,7 +62,6 @@ for i in "${!TOKENS[@]}"; do
   tokenList="${tokenList}+${AMOUNT} ${currencySymbol}.${TOKENS[i]}"
 done
 
-
 cardano-cli transaction build \
   --babbage-era \
   --change-address "$addr" \

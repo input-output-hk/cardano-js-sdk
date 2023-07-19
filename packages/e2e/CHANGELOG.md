@@ -17,7 +17,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Bug Fixes
 
-* **wallet:** discovery should search for 1/0 too ([cdf79cb](https://github.com/input-output-hk/cardano-js-sdk/commit/cdf79cbaf8925e72e52ad859ef78a0a112729b81))
+- **wallet:** discovery should search for 1/0 too ([cdf79cb](https://github.com/input-output-hk/cardano-js-sdk/commit/cdf79cbaf8925e72e52ad859ef78a0a112729b81))
 
 ## [0.16.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.16.3...@cardano-sdk/e2e@0.16.4) (2023-07-04)
 
@@ -35,45 +35,45 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Bug Fixes
 
-* **cardano-services:** don't unsubscribe from projection on health timeout ([5d7e98b](https://github.com/input-output-hk/cardano-js-sdk/commit/5d7e98b500217739a53b82ed448efec31171bc2c))
-* **util:** add ServerNotReady to list of connection errors ([c7faf01](https://github.com/input-output-hk/cardano-js-sdk/commit/c7faf01194561b2941c42c4a74517de0a5a9f7d9))
+- **cardano-services:** don't unsubscribe from projection on health timeout ([5d7e98b](https://github.com/input-output-hk/cardano-js-sdk/commit/5d7e98b500217739a53b82ed448efec31171bc2c))
+- **util:** add ServerNotReady to list of connection errors ([c7faf01](https://github.com/input-output-hk/cardano-js-sdk/commit/c7faf01194561b2941c42c4a74517de0a5a9f7d9))
 
 ## [0.16.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.15.0...@cardano-sdk/e2e@0.16.0) (2023-06-28)
 
 ### ⚠ BREAKING CHANGES
 
-* revert inclusion of version in the HttpProvider interface
+- revert inclusion of version in the HttpProvider interface
 
 ### Bug Fixes
 
-* revert inclusion of version in the HttpProvider interface ([3f50013](https://github.com/input-output-hk/cardano-js-sdk/commit/3f5001367686668806bfe967d3d7b6dd5e96dccc))
+- revert inclusion of version in the HttpProvider interface ([3f50013](https://github.com/input-output-hk/cardano-js-sdk/commit/3f5001367686668806bfe967d3d7b6dd5e96dccc))
 
 ## [0.15.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.14.2...@cardano-sdk/e2e@0.15.0) (2023-06-23)
 
 ### ⚠ BREAKING CHANGES
 
-* txBuilder delegate is replaced by delegatePortfolio.
-* TxBuilderProviders.rewardAccounts expects RewardAccountWithPoolId type,
+- txBuilder delegate is replaced by delegatePortfolio.
+- TxBuilderProviders.rewardAccounts expects RewardAccountWithPoolId type,
   instead of Omit<RewardAccount, 'delegatee'>
 
 ### Features
 
-* add API and software version HTTP headers ([2e9664f](https://github.com/input-output-hk/cardano-js-sdk/commit/2e9664fcaff56adcfa4f21eb2b71b2fb6a3b411d))
-* remove txBuilder.delegate method ([f21c93b](https://github.com/input-output-hk/cardano-js-sdk/commit/f21c93b251f1bd67f47edd488d9df47c2abf3e0c))
-* **tx-construction:** use GreedyInputSelection for multi delegation ([5462936](https://github.com/input-output-hk/cardano-js-sdk/commit/54629367b14fe26f13f9c17483bdf98c451b8d89))
-* txBuilder delegatePortfolio ([ec0860e](https://github.com/input-output-hk/cardano-js-sdk/commit/ec0860e37835edbce3c911d6fe65c21b73683de7))
+- add API and software version HTTP headers ([2e9664f](https://github.com/input-output-hk/cardano-js-sdk/commit/2e9664fcaff56adcfa4f21eb2b71b2fb6a3b411d))
+- remove txBuilder.delegate method ([f21c93b](https://github.com/input-output-hk/cardano-js-sdk/commit/f21c93b251f1bd67f47edd488d9df47c2abf3e0c))
+- **tx-construction:** use GreedyInputSelection for multi delegation ([5462936](https://github.com/input-output-hk/cardano-js-sdk/commit/54629367b14fe26f13f9c17483bdf98c451b8d89))
+- txBuilder delegatePortfolio ([ec0860e](https://github.com/input-output-hk/cardano-js-sdk/commit/ec0860e37835edbce3c911d6fe65c21b73683de7))
 
 ## [0.14.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.14.1...@cardano-sdk/e2e@0.14.2) (2023-06-20)
 
 ### Features
 
-* **cardano-services:** cache asset info and nft metadata ([43fd02f](https://github.com/input-output-hk/cardano-js-sdk/commit/43fd02ffaa5fdfe1812916e9885b383931141532))
-* **e2e:** give the ability to override cardano-node log level from env vars ([5c80025](https://github.com/input-output-hk/cardano-js-sdk/commit/5c80025c1a1b0457e101b06a565ad7f2d92d7315))
-* new pool delegation and stake registration factory methods added to core package ([82d95af](https://github.com/input-output-hk/cardano-js-sdk/commit/82d95af3f68eb06cb58bd2bec5209d93c2aa6c34))
+- **cardano-services:** cache asset info and nft metadata ([43fd02f](https://github.com/input-output-hk/cardano-js-sdk/commit/43fd02ffaa5fdfe1812916e9885b383931141532))
+- **e2e:** give the ability to override cardano-node log level from env vars ([5c80025](https://github.com/input-output-hk/cardano-js-sdk/commit/5c80025c1a1b0457e101b06a565ad7f2d92d7315))
+- new pool delegation and stake registration factory methods added to core package ([82d95af](https://github.com/input-output-hk/cardano-js-sdk/commit/82d95af3f68eb06cb58bd2bec5209d93c2aa6c34))
 
 ### Bug Fixes
 
-* **wallet:** rewardAccounts duplicates HD wallet ([93fbd73](https://github.com/input-output-hk/cardano-js-sdk/commit/93fbd73e1f7951220c8589f5ea4bdd098d903a02))
+- **wallet:** rewardAccounts duplicates HD wallet ([93fbd73](https://github.com/input-output-hk/cardano-js-sdk/commit/93fbd73e1f7951220c8589f5ea4bdd098d903a02))
 
 ## [0.14.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.14.0...@cardano-sdk/e2e@0.14.1) (2023-06-13)
 
@@ -83,12 +83,12 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### ⚠ BREAKING CHANGES
 
-* **wallet:** Remove obsolete 'stakeKeyIndexLimit' HDSequantialDiscovery
-constructor argument.
+- **wallet:** Remove obsolete 'stakeKeyIndexLimit' HDSequantialDiscovery
+  constructor argument.
 
 ### Features
 
-* **wallet:** discover used stake keys ([b63f709](https://github.com/input-output-hk/cardano-js-sdk/commit/b63f7098b28fc835f1f09bc7a92392bc5be7e912))
+- **wallet:** discover used stake keys ([b63f709](https://github.com/input-output-hk/cardano-js-sdk/commit/b63f7098b28fc835f1f09bc7a92392bc5be7e912))
 
 ## [0.13.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.13.0...@cardano-sdk/e2e@0.13.1) (2023-06-06)
 
@@ -98,84 +98,89 @@ constructor argument.
 
 ### ⚠ BREAKING CHANGES
 
-* **wallet:** Added new properties to DelegationTrackerProps
-* make stake pool metrics an optional property to handle activating pools
-* - rename `rewardsHistoryLimit` stake pool search arg to `apyEpochsBackLimit`
-* - remove `epochRewards` and type `StakePoolEpochRewards`
-- remove `transactions` and type `StakePoolTransactions`
+- **wallet:** Added new properties to DelegationTrackerProps
+- make stake pool metrics an optional property to handle activating pools
+- - rename `rewardsHistoryLimit` stake pool search arg to `apyEpochsBackLimit`
+- - remove `epochRewards` and type `StakePoolEpochRewards`
+
+* remove `transactions` and type `StakePoolTransactions`
 
 ### Features
 
-* **wallet:** delegation.portfolio$ tracker ([7488d14](https://github.com/input-output-hk/cardano-js-sdk/commit/7488d14008f7aa3d91d7513cfffaeb81e160eb18))
+- **wallet:** delegation.portfolio$ tracker ([7488d14](https://github.com/input-output-hk/cardano-js-sdk/commit/7488d14008f7aa3d91d7513cfffaeb81e160eb18))
 
 ### Code Refactoring
 
-* make stake pool metrics an optional property to handle activating pools ([d33bd07](https://github.com/input-output-hk/cardano-js-sdk/commit/d33bd07ddb873ba40498a95caa860820f38ee687))
-* remove unusable fields from StakePool core type ([a7aa17f](https://github.com/input-output-hk/cardano-js-sdk/commit/a7aa17fdd5224437555840d21f56c4660142c351))
-* rename rewardsHistoryLimit ([05ccdc6](https://github.com/input-output-hk/cardano-js-sdk/commit/05ccdc6b448f98ddd09894b633521e79fbb6d9c1))
+- make stake pool metrics an optional property to handle activating pools ([d33bd07](https://github.com/input-output-hk/cardano-js-sdk/commit/d33bd07ddb873ba40498a95caa860820f38ee687))
+- remove unusable fields from StakePool core type ([a7aa17f](https://github.com/input-output-hk/cardano-js-sdk/commit/a7aa17fdd5224437555840d21f56c4660142c351))
+- rename rewardsHistoryLimit ([05ccdc6](https://github.com/input-output-hk/cardano-js-sdk/commit/05ccdc6b448f98ddd09894b633521e79fbb6d9c1))
 
 ## [0.12.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.12.0...@cardano-sdk/e2e@0.12.1) (2023-06-01)
 
 ### Features
 
-* add HandleProvider interface and handle support implementation to TxBuilder ([f209095](https://github.com/input-output-hk/cardano-js-sdk/commit/f2090952c8a0512fc589674b876f3a27be403140))
+- add HandleProvider interface and handle support implementation to TxBuilder ([f209095](https://github.com/input-output-hk/cardano-js-sdk/commit/f2090952c8a0512fc589674b876f3a27be403140))
 
 ## [0.12.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.11.0...@cardano-sdk/e2e@0.12.0) (2023-05-24)
 
 ### ⚠ BREAKING CHANGES
 
-* the SingleAddressWallet class was renamed to PersonalWallet
-* the single address wallet now takes an additional dependency 'AddressDiscovery'
+- the SingleAddressWallet class was renamed to PersonalWallet
+- the single address wallet now takes an additional dependency 'AddressDiscovery'
 
 ### Features
 
-* the single address wallet now takes an additional dependency 'AddressDiscovery' ([d6d7cff](https://github.com/input-output-hk/cardano-js-sdk/commit/d6d7cffe3a7089af2aff39e78c491f4e0a06c989))
+- the single address wallet now takes an additional dependency 'AddressDiscovery' ([d6d7cff](https://github.com/input-output-hk/cardano-js-sdk/commit/d6d7cffe3a7089af2aff39e78c491f4e0a06c989))
 
 ### Code Refactoring
 
-* the SingleAddressWallet class was renamed to PersonalWallet ([1b50183](https://github.com/input-output-hk/cardano-js-sdk/commit/1b50183ea095813b1676571d059c7774f46fb3f3))
+- the SingleAddressWallet class was renamed to PersonalWallet ([1b50183](https://github.com/input-output-hk/cardano-js-sdk/commit/1b50183ea095813b1676571d059c7774f46fb3f3))
 
 ## [0.11.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.10.1...@cardano-sdk/e2e@0.11.0) (2023-05-22)
 
 ### ⚠ BREAKING CHANGES
 
-* Replace ObservableWalletTxBuilder and buildTx with wallet.createTxBuilder()
-- SignedTx type no longer has submit() method.
-- TxBuilder no longer has `isSubmitted()`
-- Renamed ValidTxBody to UnsignedTx
-- Removed ValidTx, InvalidTx, MaybeValidTx
-- TxBuilder.build now returns an UnsignedTxPromise.
-- TxBuilder.build throws in case of errors instead of returning InvalidTx
-- Removed ValidTxOutData, ValidTxOut, InvalidTxOut, MaybeValidTxOut types.
-- OutputBuilder.build now returns Cardano.TxOut.
-- OutputBuilder.build throws TxOutValidationError in case of errors instead of returning InvalidTxOut
-- Replace synchronous builder properties with async inspect()
-- Rename some TxBuilder methods for consistency: align with OutputBuilder API,
-where 'setters' are not prefixed with 'set'
-- Hoist FinalizeTxProps back to 'wallet' package
-- Hoist InitializeTxProps.scripts to InitializeTxProps.witness.scripts
-- Hoist tx builder output validator arg under 'dependencies' object
-- Reject TxBuilder.build.inspect() and sign() with a single error
-* hoist createTransactionInternals to tx-construction
-- hoist outputValidator to tx-construction
-- hoist txBuilder types to tx-construction
-- rename ObservableWalletTxOutputBuilder to TxOutputBuilder
-- move Delegatee, StakeKeyStatus and RewardAccount types from wallet to tx-construction
-- removed PrepareTx, createTxPreparer and PrepareTxDependencies
-- OutputValidatorContext was renamed to WalletOutputValidatorContext
-* add ledger package with transformations
-* - KeyAgentBase deriveAddress method now requires the caller to specify the skate key index
+- Replace ObservableWalletTxBuilder and buildTx with wallet.createTxBuilder()
+
+* SignedTx type no longer has submit() method.
+* TxBuilder no longer has `isSubmitted()`
+* Renamed ValidTxBody to UnsignedTx
+* Removed ValidTx, InvalidTx, MaybeValidTx
+* TxBuilder.build now returns an UnsignedTxPromise.
+* TxBuilder.build throws in case of errors instead of returning InvalidTx
+* Removed ValidTxOutData, ValidTxOut, InvalidTxOut, MaybeValidTxOut types.
+* OutputBuilder.build now returns Cardano.TxOut.
+* OutputBuilder.build throws TxOutValidationError in case of errors instead of returning InvalidTxOut
+* Replace synchronous builder properties with async inspect()
+* Rename some TxBuilder methods for consistency: align with OutputBuilder API,
+  where 'setters' are not prefixed with 'set'
+* Hoist FinalizeTxProps back to 'wallet' package
+* Hoist InitializeTxProps.scripts to InitializeTxProps.witness.scripts
+* Hoist tx builder output validator arg under 'dependencies' object
+* Reject TxBuilder.build.inspect() and sign() with a single error
+
+- hoist createTransactionInternals to tx-construction
+
+* hoist outputValidator to tx-construction
+* hoist txBuilder types to tx-construction
+* rename ObservableWalletTxOutputBuilder to TxOutputBuilder
+* move Delegatee, StakeKeyStatus and RewardAccount types from wallet to tx-construction
+* removed PrepareTx, createTxPreparer and PrepareTxDependencies
+* OutputValidatorContext was renamed to WalletOutputValidatorContext
+
+- add ledger package with transformations
+- - KeyAgentBase deriveAddress method now requires the caller to specify the skate key index
 
 ### Features
 
-* add ledger package with transformations ([58f3a22](https://github.com/input-output-hk/cardano-js-sdk/commit/58f3a227d466c0083bcfe9243311ac2bca4e48df))
-* add the the pg-boss worker ([561fd50](https://github.com/input-output-hk/cardano-js-sdk/commit/561fd508a4a96307b023b16ce6fed3ce1d7bd536))
-* generic tx-builder ([aa4a539](https://github.com/input-output-hk/cardano-js-sdk/commit/aa4a539d6a5ddd75120450e02afeeba9bed6a527))
-* key agent now takes an additional parameter stakeKeyDerivationIndex ([cbfd3c1](https://github.com/input-output-hk/cardano-js-sdk/commit/cbfd3c1ea55de4355e38f822868b0a7b6bd3953a))
+- add ledger package with transformations ([58f3a22](https://github.com/input-output-hk/cardano-js-sdk/commit/58f3a227d466c0083bcfe9243311ac2bca4e48df))
+- add the the pg-boss worker ([561fd50](https://github.com/input-output-hk/cardano-js-sdk/commit/561fd508a4a96307b023b16ce6fed3ce1d7bd536))
+- generic tx-builder ([aa4a539](https://github.com/input-output-hk/cardano-js-sdk/commit/aa4a539d6a5ddd75120450e02afeeba9bed6a527))
+- key agent now takes an additional parameter stakeKeyDerivationIndex ([cbfd3c1](https://github.com/input-output-hk/cardano-js-sdk/commit/cbfd3c1ea55de4355e38f822868b0a7b6bd3953a))
 
 ### Code Refactoring
 
-* move tx build utils from wallet to tx-construction ([48072ce](https://github.com/input-output-hk/cardano-js-sdk/commit/48072ce35968820b10fcf0b9ed4441f00ac6fb8b))
+- move tx build utils from wallet to tx-construction ([48072ce](https://github.com/input-output-hk/cardano-js-sdk/commit/48072ce35968820b10fcf0b9ed4441f00ac6fb8b))
 
 ## [0.10.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.10.0...@cardano-sdk/e2e@0.10.1) (2023-05-03)
 

@@ -13,11 +13,11 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### ⚠ BREAKING CHANGES
 
-* **key-management:** change behavior of ensureStakeKeys to return all reward accounts
+- **key-management:** change behavior of ensureStakeKeys to return all reward accounts
 
 ### Features
 
-* **key-management:** change behavior of ensureStakeKeys to return all reward accounts ([faaf9b0](https://github.com/input-output-hk/cardano-js-sdk/commit/faaf9b02eff1dd786c93d1b95b22c0aad193def3))
+- **key-management:** change behavior of ensureStakeKeys to return all reward accounts ([faaf9b0](https://github.com/input-output-hk/cardano-js-sdk/commit/faaf9b02eff1dd786c93d1b95b22c0aad193def3))
 
 ## [0.7.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.7.10...@cardano-sdk/key-management@0.7.11) (2023-07-04)
 
@@ -35,13 +35,13 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Bug Fixes
 
-* **tx-construction:** wait for new stakeKeys in rewardAccounts ([a74b665](https://github.com/input-output-hk/cardano-js-sdk/commit/a74b66505e19681d21d547e6418f0980b112b070))
+- **tx-construction:** wait for new stakeKeys in rewardAccounts ([a74b665](https://github.com/input-output-hk/cardano-js-sdk/commit/a74b66505e19681d21d547e6418f0980b112b070))
 
 ## [0.7.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.7.6...@cardano-sdk/key-management@0.7.7) (2023-06-23)
 
 ### Features
 
-* **key-agent:** util to derive stake keys ([f2691dc](https://github.com/input-output-hk/cardano-js-sdk/commit/f2691dce76b5bfe5b89369ff81af2cb9d591b4f6))
+- **key-agent:** util to derive stake keys ([f2691dc](https://github.com/input-output-hk/cardano-js-sdk/commit/f2691dce76b5bfe5b89369ff81af2cb9d591b4f6))
 
 ## [0.7.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.7.5...@cardano-sdk/key-management@0.7.6) (2023-06-20)
 
@@ -63,7 +63,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Bug Fixes
 
-* **key-management:** the InMemoryKeyAgent now correctly takes into account the requiredSigners field ([2071885](https://github.com/input-output-hk/cardano-js-sdk/commit/20718855f9c00071947f927b4f5280cea9b41a43))
+- **key-management:** the InMemoryKeyAgent now correctly takes into account the requiredSigners field ([2071885](https://github.com/input-output-hk/cardano-js-sdk/commit/20718855f9c00071947f927b4f5280cea9b41a43))
 
 ## [0.7.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.7.0...@cardano-sdk/key-management@0.7.1) (2023-06-01)
 
@@ -73,27 +73,27 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### ⚠ BREAKING CHANGES
 
-* the single address wallet now takes an additional dependency 'AddressDiscovery'
+- the single address wallet now takes an additional dependency 'AddressDiscovery'
 
 ### Features
 
-* the single address wallet now takes an additional dependency 'AddressDiscovery' ([d6d7cff](https://github.com/input-output-hk/cardano-js-sdk/commit/d6d7cffe3a7089af2aff39e78c491f4e0a06c989))
+- the single address wallet now takes an additional dependency 'AddressDiscovery' ([d6d7cff](https://github.com/input-output-hk/cardano-js-sdk/commit/d6d7cffe3a7089af2aff39e78c491f4e0a06c989))
 
 ## [0.6.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.5.1...@cardano-sdk/key-management@0.6.0) (2023-05-22)
 
 ### ⚠ BREAKING CHANGES
 
-* add ledger package with transformations
-* - KeyAgentBase deriveAddress method now requires the caller to specify the skate key index
+- add ledger package with transformations
+- - KeyAgentBase deriveAddress method now requires the caller to specify the skate key index
 
 ### Features
 
-* add ledger package with transformations ([58f3a22](https://github.com/input-output-hk/cardano-js-sdk/commit/58f3a227d466c0083bcfe9243311ac2bca4e48df))
-* key agent now takes an additional parameter stakeKeyDerivationIndex ([cbfd3c1](https://github.com/input-output-hk/cardano-js-sdk/commit/cbfd3c1ea55de4355e38f822868b0a7b6bd3953a))
+- add ledger package with transformations ([58f3a22](https://github.com/input-output-hk/cardano-js-sdk/commit/58f3a227d466c0083bcfe9243311ac2bca4e48df))
+- key agent now takes an additional parameter stakeKeyDerivationIndex ([cbfd3c1](https://github.com/input-output-hk/cardano-js-sdk/commit/cbfd3c1ea55de4355e38f822868b0a7b6bd3953a))
 
 ### Bug Fixes
 
-* **key-management:** fixed ttl ([38ca6dd](https://github.com/input-output-hk/cardano-js-sdk/commit/38ca6ddd0524ffef9de92693e04bda19b7c53e44))
+- **key-management:** fixed ttl ([38ca6dd](https://github.com/input-output-hk/cardano-js-sdk/commit/38ca6ddd0524ffef9de92693e04bda19b7c53e44))
 
 ## [0.5.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.5.0...@cardano-sdk/key-management@0.5.1) (2023-05-02)
 

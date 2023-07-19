@@ -39,14 +39,14 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### ⚠ BREAKING CHANGES
 
-* txBuilder delegate is replaced by delegatePortfolio.
-* TxBuilderProviders.rewardAccounts expects RewardAccountWithPoolId type,
+- txBuilder delegate is replaced by delegatePortfolio.
+- TxBuilderProviders.rewardAccounts expects RewardAccountWithPoolId type,
   instead of Omit<RewardAccount, 'delegatee'>
 
 ### Features
 
-* remove txBuilder.delegate method ([f21c93b](https://github.com/input-output-hk/cardano-js-sdk/commit/f21c93b251f1bd67f47edd488d9df47c2abf3e0c))
-* txBuilder delegatePortfolio ([ec0860e](https://github.com/input-output-hk/cardano-js-sdk/commit/ec0860e37835edbce3c911d6fe65c21b73683de7))
+- remove txBuilder.delegate method ([f21c93b](https://github.com/input-output-hk/cardano-js-sdk/commit/f21c93b251f1bd67f47edd488d9df47c2abf3e0c))
+- txBuilder delegatePortfolio ([ec0860e](https://github.com/input-output-hk/cardano-js-sdk/commit/ec0860e37835edbce3c911d6fe65c21b73683de7))
 
 ## [0.12.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.12.3...@cardano-sdk/web-extension@0.12.4) (2023-06-20)
 
@@ -64,73 +64,75 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
-* add ObservableWallet.handles$ that emits own handles ([1c3b532](https://github.com/input-output-hk/cardano-js-sdk/commit/1c3b532c9b9f4fe48ba1555749b21faa27648c1a))
+- add ObservableWallet.handles$ that emits own handles ([1c3b532](https://github.com/input-output-hk/cardano-js-sdk/commit/1c3b532c9b9f4fe48ba1555749b21faa27648c1a))
 
 ## [0.12.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.11.1...@cardano-sdk/web-extension@0.12.0) (2023-06-05)
 
 ### ⚠ BREAKING CHANGES
 
-* **wallet:** Added new properties to DelegationTrackerProps
+- **wallet:** Added new properties to DelegationTrackerProps
 
 ### Features
 
-* **wallet:** delegation.portfolio$ tracker ([7488d14](https://github.com/input-output-hk/cardano-js-sdk/commit/7488d14008f7aa3d91d7513cfffaeb81e160eb18))
+- **wallet:** delegation.portfolio$ tracker ([7488d14](https://github.com/input-output-hk/cardano-js-sdk/commit/7488d14008f7aa3d91d7513cfffaeb81e160eb18))
 
 ### Bug Fixes
 
-* **web-extension:** decouple/detach objects returned by remote api factory ([a418169](https://github.com/input-output-hk/cardano-js-sdk/commit/a4181695885d4ced3519b4a73df6891c999215ef))
+- **web-extension:** decouple/detach objects returned by remote api factory ([a418169](https://github.com/input-output-hk/cardano-js-sdk/commit/a4181695885d4ced3519b4a73df6891c999215ef))
 
 ## [0.11.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.11.0...@cardano-sdk/web-extension@0.11.1) (2023-06-01)
 
 ### Features
 
-* add HandleProvider interface and handle support implementation to TxBuilder ([f209095](https://github.com/input-output-hk/cardano-js-sdk/commit/f2090952c8a0512fc589674b876f3a27be403140))
+- add HandleProvider interface and handle support implementation to TxBuilder ([f209095](https://github.com/input-output-hk/cardano-js-sdk/commit/f2090952c8a0512fc589674b876f3a27be403140))
 
 ## [0.11.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.10.0...@cardano-sdk/web-extension@0.11.0) (2023-05-24)
 
 ### ⚠ BREAKING CHANGES
 
-* the single address wallet now takes an additional dependency 'AddressDiscovery'
+- the single address wallet now takes an additional dependency 'AddressDiscovery'
 
 ### Features
 
-* the single address wallet now takes an additional dependency 'AddressDiscovery' ([d6d7cff](https://github.com/input-output-hk/cardano-js-sdk/commit/d6d7cffe3a7089af2aff39e78c491f4e0a06c989))
+- the single address wallet now takes an additional dependency 'AddressDiscovery' ([d6d7cff](https://github.com/input-output-hk/cardano-js-sdk/commit/d6d7cffe3a7089af2aff39e78c491f4e0a06c989))
 
 ## [0.10.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.9.0...@cardano-sdk/web-extension@0.10.0) (2023-05-22)
 
 ### ⚠ BREAKING CHANGES
 
-* Replace ObservableWalletTxBuilder and buildTx with wallet.createTxBuilder()
-- SignedTx type no longer has submit() method.
-- TxBuilder no longer has `isSubmitted()`
-- Renamed ValidTxBody to UnsignedTx
-- Removed ValidTx, InvalidTx, MaybeValidTx
-- TxBuilder.build now returns an UnsignedTxPromise.
-- TxBuilder.build throws in case of errors instead of returning InvalidTx
-- Removed ValidTxOutData, ValidTxOut, InvalidTxOut, MaybeValidTxOut types.
-- OutputBuilder.build now returns Cardano.TxOut.
-- OutputBuilder.build throws TxOutValidationError in case of errors instead of returning InvalidTxOut
-- Replace synchronous builder properties with async inspect()
-- Rename some TxBuilder methods for consistency: align with OutputBuilder API,
-where 'setters' are not prefixed with 'set'
-- Hoist FinalizeTxProps back to 'wallet' package
-- Hoist InitializeTxProps.scripts to InitializeTxProps.witness.scripts
-- Hoist tx builder output validator arg under 'dependencies' object
-- Reject TxBuilder.build.inspect() and sign() with a single error
-* **web-extension:** convert factory apiProperties to getApiProperties
+- Replace ObservableWalletTxBuilder and buildTx with wallet.createTxBuilder()
+
+* SignedTx type no longer has submit() method.
+* TxBuilder no longer has `isSubmitted()`
+* Renamed ValidTxBody to UnsignedTx
+* Removed ValidTx, InvalidTx, MaybeValidTx
+* TxBuilder.build now returns an UnsignedTxPromise.
+* TxBuilder.build throws in case of errors instead of returning InvalidTx
+* Removed ValidTxOutData, ValidTxOut, InvalidTxOut, MaybeValidTxOut types.
+* OutputBuilder.build now returns Cardano.TxOut.
+* OutputBuilder.build throws TxOutValidationError in case of errors instead of returning InvalidTxOut
+* Replace synchronous builder properties with async inspect()
+* Rename some TxBuilder methods for consistency: align with OutputBuilder API,
+  where 'setters' are not prefixed with 'set'
+* Hoist FinalizeTxProps back to 'wallet' package
+* Hoist InitializeTxProps.scripts to InitializeTxProps.witness.scripts
+* Hoist tx builder output validator arg under 'dependencies' object
+* Reject TxBuilder.build.inspect() and sign() with a single error
+
+- **web-extension:** convert factory apiProperties to getApiProperties
 
 ### Features
 
-* generic tx-builder ([aa4a539](https://github.com/input-output-hk/cardano-js-sdk/commit/aa4a539d6a5ddd75120450e02afeeba9bed6a527))
-* **web-extension:** add RemoteApiPropertyType.ApiFactory ([eacad41](https://github.com/input-output-hk/cardano-js-sdk/commit/eacad41b5b8570ca4e5d0cc4178c4b5740569a4c))
+- generic tx-builder ([aa4a539](https://github.com/input-output-hk/cardano-js-sdk/commit/aa4a539d6a5ddd75120450e02afeeba9bed6a527))
+- **web-extension:** add RemoteApiPropertyType.ApiFactory ([eacad41](https://github.com/input-output-hk/cardano-js-sdk/commit/eacad41b5b8570ca4e5d0cc4178c4b5740569a4c))
 
 ### Bug Fixes
 
-* **web-extension:** make remote api method responses more reliable ([cdd37c9](https://github.com/input-output-hk/cardano-js-sdk/commit/cdd37c9509e67a3ec95e4a20e52e71c9a2889f2c))
+- **web-extension:** make remote api method responses more reliable ([cdd37c9](https://github.com/input-output-hk/cardano-js-sdk/commit/cdd37c9509e67a3ec95e4a20e52e71c9a2889f2c))
 
 ### Code Refactoring
 
-* **web-extension:** convert factory apiProperties to getApiProperties ([8de0fad](https://github.com/input-output-hk/cardano-js-sdk/commit/8de0fad4e9a0d6a971372ff7d4a9e89974e12bcd))
+- **web-extension:** convert factory apiProperties to getApiProperties ([8de0fad](https://github.com/input-output-hk/cardano-js-sdk/commit/8de0fad4e9a0d6a971372ff7d4a9e89974e12bcd))
 
 ## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.8.2...@cardano-sdk/web-extension@0.9.0) (2023-05-02)
 

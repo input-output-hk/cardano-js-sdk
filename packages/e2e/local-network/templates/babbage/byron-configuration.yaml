@@ -3,16 +3,15 @@
 ############### Cardano Byron Node Configuration #########
 ##########################################################
 
-
 ##### Locations #####
 
 GenesisFile: genesis.json
 
 ##### Hashes Protocol
 
-ByronGenesisHash: "576a1b4687c7668b2f1d734fecaa7ca994b597f37177606d4942d339875009d6"
-ShelleyGenesisHash: "4315428096763404ae322ce69eea7323c94dead3281cd306b5be7e80288626ce"
-AlonzoGenesisHash: "eaa32942a4f2b3028928cb47be679bb36fa128f6d7dddc04ae592d27f2818c16"
+ByronGenesisHash: '576a1b4687c7668b2f1d734fecaa7ca994b597f37177606d4942d339875009d6'
+ShelleyGenesisHash: '4315428096763404ae322ce69eea7323c94dead3281cd306b5be7e80288626ce'
+AlonzoGenesisHash: 'eaa32942a4f2b3028928cb47be679bb36fa128f6d7dddc04ae592d27f2818c16'
 
 ##### Blockfetch Protocol
 
@@ -47,7 +46,6 @@ LastKnownBlockVersion-Alt: 0
 # We do this only for Byron compatibility now.
 ApplicationName: cardano-sl
 ApplicationVersion: 1
-
 
 ##### Logging configuration #####
 
@@ -120,7 +118,7 @@ defaultBackends:
 # be specified in the defaults below or overridden on a per-scribe basis here.
 setupScribes:
   - scKind: FileSK
-    scName: "logs/testnet.log"
+    scName: 'logs/testnet.log'
     scFormat: ScText
 
   - scKind: StdoutSK
@@ -131,7 +129,7 @@ setupScribes:
 # output is sent to if it is not configured to be sent to other scribes.
 defaultScribes:
   - - FileSK
-    - "logs/testnet.log"
+    - 'logs/testnet.log'
   - - StdoutSK
     - stdout
 
@@ -139,9 +137,8 @@ defaultScribes:
 # in the setupScribes above for specific scribes.
 rotation:
   rpLogLimitBytes: 5000000
-  rpKeepFilesNum:  3
-  rpMaxAgeHours:   24
-
+  rpKeepFilesNum: 3
+  rpMaxAgeHours: 24
 
 ##### Coarse grained logging control #####
 
@@ -258,7 +255,6 @@ TraceTxOutbound: False
 # Trace TxSubmission protocol messages.
 TraceTxSubmissionProtocol: False
 
-
 ##### Fine grained logging control #####
 
 # It is also possible to have more fine grained control over filtering of
@@ -267,7 +263,6 @@ TraceTxSubmissionProtocol: False
 # much more precise control.
 
 options:
-
   # This routes metrics matching specific names to particular backends.
   # This overrides the 'defaultBackends' listed above. And note that it is
   # an override and not an extension so anything matched here will not
@@ -280,7 +275,7 @@ options:
   # type and its name, separated by "::":
   mapScribes:
     cardano.node.metrics:
-      - "FileSK::logs/testnet.log"
+      - 'FileSK::logs/testnet.log'
 
   # apply a filter on message severity on messages in a specific named context.
   # this filter is applied additionally to the global 'minSeverity' and thus

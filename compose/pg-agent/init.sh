@@ -1,8 +1,8 @@
 #!/bin/bash
 
-DB=`cat /run/secrets/postgres_db_db_sync`
-PASSWORD=`cat /run/secrets/postgres_password`
-USER=`cat /run/secrets/postgres_user`
+DB=$(cat /run/secrets/postgres_db_db_sync)
+PASSWORD=$(cat /run/secrets/postgres_password)
+USER=$(cat /run/secrets/postgres_user)
 
 URL="postgresql://${USER}:${PASSWORD}@postgres/${DB}"
 

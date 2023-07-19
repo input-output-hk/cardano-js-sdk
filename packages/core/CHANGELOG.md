@@ -11,82 +11,83 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
-* **core:** add util to get asset name content as text from cip 67 encoded and plain asset names ([8f0facd](https://github.com/input-output-hk/cardano-js-sdk/commit/8f0facda183b71d2d52596945695c7e16f435731))
+- **core:** add util to get asset name content as text from cip 67 encoded and plain asset names ([8f0facd](https://github.com/input-output-hk/cardano-js-sdk/commit/8f0facda183b71d2d52596945695c7e16f435731))
 
 ### Bug Fixes
 
-* fix handle api response property names ([2ecc994](https://github.com/input-output-hk/cardano-js-sdk/commit/2ecc9940e738105e014a1451d4a5e5cd95df6277))
+- fix handle api response property names ([2ecc994](https://github.com/input-output-hk/cardano-js-sdk/commit/2ecc9940e738105e014a1451d4a5e5cd95df6277))
 
 ## [0.15.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.15.0...@cardano-sdk/core@0.15.1) (2023-06-28)
 
 ### Features
 
-* adds cardanoAddress type in HandleResolution interface ([2ee31c9](https://github.com/input-output-hk/cardano-js-sdk/commit/2ee31c9f0b61fc5e67385128448225d2d1d85617))
-* implement verification and presubmission checks on handles in OgmiosTxProvider ([0f18042](https://github.com/input-output-hk/cardano-js-sdk/commit/0f1804287672968614e8aa6bf2f095b0e9a88b22))
+- adds cardanoAddress type in HandleResolution interface ([2ee31c9](https://github.com/input-output-hk/cardano-js-sdk/commit/2ee31c9f0b61fc5e67385128448225d2d1d85617))
+- implement verification and presubmission checks on handles in OgmiosTxProvider ([0f18042](https://github.com/input-output-hk/cardano-js-sdk/commit/0f1804287672968614e8aa6bf2f095b0e9a88b22))
 
 ## [0.15.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.14.1...@cardano-sdk/core@0.15.0) (2023-06-23)
 
 ### ⚠ BREAKING CHANGES
 
-* TxBuilderProviders.rewardAccounts expects RewardAccountWithPoolId type,
+- TxBuilderProviders.rewardAccounts expects RewardAccountWithPoolId type,
   instead of Omit<RewardAccount, 'delegatee'>
 
 ### Features
 
-* txBuilder delegatePortfolio ([ec0860e](https://github.com/input-output-hk/cardano-js-sdk/commit/ec0860e37835edbce3c911d6fe65c21b73683de7))
+- txBuilder delegatePortfolio ([ec0860e](https://github.com/input-output-hk/cardano-js-sdk/commit/ec0860e37835edbce3c911d6fe65c21b73683de7))
 
 ### Bug Fixes
 
-* **core:** updated providerUtil ([106c1f9](https://github.com/input-output-hk/cardano-js-sdk/commit/106c1f9e8067a4876f47d63f97ab998620cf8f64))
+- **core:** updated providerUtil ([106c1f9](https://github.com/input-output-hk/cardano-js-sdk/commit/106c1f9e8067a4876f47d63f97ab998620cf8f64))
 
 ## [0.14.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.14.0...@cardano-sdk/core@0.14.1) (2023-06-20)
 
 ### Features
 
-* cip 67 utils ([f0dd945](https://github.com/input-output-hk/cardano-js-sdk/commit/f0dd9450c81fa2f5c8481647daf2b4cd104edcd9))
-* new pool delegation and stake registration factory methods added to core package ([82d95af](https://github.com/input-output-hk/cardano-js-sdk/commit/82d95af3f68eb06cb58bd2bec5209d93c2aa6c34))
+- cip 67 utils ([f0dd945](https://github.com/input-output-hk/cardano-js-sdk/commit/f0dd9450c81fa2f5c8481647daf2b4cd104edcd9))
+- new pool delegation and stake registration factory methods added to core package ([82d95af](https://github.com/input-output-hk/cardano-js-sdk/commit/82d95af3f68eb06cb58bd2bec5209d93c2aa6c34))
 
 ### Bug Fixes
 
-* the transaction id computation now accounts for serialization round trip errors ([#771](https://github.com/input-output-hk/cardano-js-sdk/issues/771)) ([55e96c0](https://github.com/input-output-hk/cardano-js-sdk/commit/55e96c0a59d2e254476f089e4eba6cc34fbdba26))
+- the transaction id computation now accounts for serialization round trip errors ([#771](https://github.com/input-output-hk/cardano-js-sdk/issues/771)) ([55e96c0](https://github.com/input-output-hk/cardano-js-sdk/commit/55e96c0a59d2e254476f089e4eba6cc34fbdba26))
 
 ## [0.14.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.13.0...@cardano-sdk/core@0.14.0) (2023-06-12)
 
 ### ⚠ BREAKING CHANGES
 
-* SignedTx.ctx now renamed to context
+- SignedTx.ctx now renamed to context
 
 ### Features
 
-* add context to txSubmit ([57589ec](https://github.com/input-output-hk/cardano-js-sdk/commit/57589ecd3120573a0cea7e718291454e9b6f9f3b))
+- add context to txSubmit ([57589ec](https://github.com/input-output-hk/cardano-js-sdk/commit/57589ecd3120573a0cea7e718291454e9b6f9f3b))
 
 ## [0.13.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.12.2...@cardano-sdk/core@0.13.0) (2023-06-05)
 
 ### ⚠ BREAKING CHANGES
 
-* hoist Cardano.Percent to util package
-* make stake pool metrics an optional property to handle activating pools
-* - rename `rewardsHistoryLimit` stake pool search arg to `apyEpochsBackLimit`
-* - remove `epochRewards` and type `StakePoolEpochRewards`
-- remove `transactions` and type `StakePoolTransactions`
+- hoist Cardano.Percent to util package
+- make stake pool metrics an optional property to handle activating pools
+- - rename `rewardsHistoryLimit` stake pool search arg to `apyEpochsBackLimit`
+- - remove `epochRewards` and type `StakePoolEpochRewards`
+
+* remove `transactions` and type `StakePoolTransactions`
 
 ### Features
 
-* add missing pool stats status ([6a59a78](https://github.com/input-output-hk/cardano-js-sdk/commit/6a59a78cff0eae3d965e62d65d8612a642dce8f8))
-* implement TypeormStakePoolProvider ([8afbffd](https://github.com/input-output-hk/cardano-js-sdk/commit/8afbffdadaf9566ee25e553aee7fbb0c8e0eab62))
+- add missing pool stats status ([6a59a78](https://github.com/input-output-hk/cardano-js-sdk/commit/6a59a78cff0eae3d965e62d65d8612a642dce8f8))
+- implement TypeormStakePoolProvider ([8afbffd](https://github.com/input-output-hk/cardano-js-sdk/commit/8afbffdadaf9566ee25e553aee7fbb0c8e0eab62))
 
 ### Code Refactoring
 
-* hoist Cardano.Percent to util package ([e4da0e3](https://github.com/input-output-hk/cardano-js-sdk/commit/e4da0e3851a4bdfd503c1f195c5ba1455ea6675b))
-* make stake pool metrics an optional property to handle activating pools ([d33bd07](https://github.com/input-output-hk/cardano-js-sdk/commit/d33bd07ddb873ba40498a95caa860820f38ee687))
-* remove unusable fields from StakePool core type ([a7aa17f](https://github.com/input-output-hk/cardano-js-sdk/commit/a7aa17fdd5224437555840d21f56c4660142c351))
-* rename rewardsHistoryLimit ([05ccdc6](https://github.com/input-output-hk/cardano-js-sdk/commit/05ccdc6b448f98ddd09894b633521e79fbb6d9c1))
+- hoist Cardano.Percent to util package ([e4da0e3](https://github.com/input-output-hk/cardano-js-sdk/commit/e4da0e3851a4bdfd503c1f195c5ba1455ea6675b))
+- make stake pool metrics an optional property to handle activating pools ([d33bd07](https://github.com/input-output-hk/cardano-js-sdk/commit/d33bd07ddb873ba40498a95caa860820f38ee687))
+- remove unusable fields from StakePool core type ([a7aa17f](https://github.com/input-output-hk/cardano-js-sdk/commit/a7aa17fdd5224437555840d21f56c4660142c351))
+- rename rewardsHistoryLimit ([05ccdc6](https://github.com/input-output-hk/cardano-js-sdk/commit/05ccdc6b448f98ddd09894b633521e79fbb6d9c1))
 
 ## [0.12.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.12.1...@cardano-sdk/core@0.12.2) (2023-06-01)
 
 ### Features
 
-* add HandleProvider interface and handle support implementation to TxBuilder ([f209095](https://github.com/input-output-hk/cardano-js-sdk/commit/f2090952c8a0512fc589674b876f3a27be403140))
+- add HandleProvider interface and handle support implementation to TxBuilder ([f209095](https://github.com/input-output-hk/cardano-js-sdk/commit/f2090952c8a0512fc589674b876f3a27be403140))
 
 ## [0.12.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.12.0...@cardano-sdk/core@0.12.1) (2023-05-24)
 
@@ -96,23 +97,24 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### ⚠ BREAKING CHANGES
 
-* hoist createTransactionInternals to tx-construction
-- hoist outputValidator to tx-construction
-- hoist txBuilder types to tx-construction
-- rename ObservableWalletTxOutputBuilder to TxOutputBuilder
-- move Delegatee, StakeKeyStatus and RewardAccount types from wallet to tx-construction
-- removed PrepareTx, createTxPreparer and PrepareTxDependencies
-- OutputValidatorContext was renamed to WalletOutputValidatorContext
+- hoist createTransactionInternals to tx-construction
+
+* hoist outputValidator to tx-construction
+* hoist txBuilder types to tx-construction
+* rename ObservableWalletTxOutputBuilder to TxOutputBuilder
+* move Delegatee, StakeKeyStatus and RewardAccount types from wallet to tx-construction
+* removed PrepareTx, createTxPreparer and PrepareTxDependencies
+* OutputValidatorContext was renamed to WalletOutputValidatorContext
 
 ### Features
 
-* added two new utility functions to extract policy id and asset name from asset id ([b4af015](https://github.com/input-output-hk/cardano-js-sdk/commit/b4af015d26b7c08c8b295ffcba6142caca49f6a8))
-* **core:** added the function PoolId.toKeyHash to extract the hash from a bech32 encoded pool id ([004e5a6](https://github.com/input-output-hk/cardano-js-sdk/commit/004e5a646de9ba91caec49d59f3a73c13ae4b35b))
-* **util-dev:** add stubProviders ([6d5d99c](https://github.com/input-output-hk/cardano-js-sdk/commit/6d5d99c80894a4b126647272f490d9e2c472d818))
+- added two new utility functions to extract policy id and asset name from asset id ([b4af015](https://github.com/input-output-hk/cardano-js-sdk/commit/b4af015d26b7c08c8b295ffcba6142caca49f6a8))
+- **core:** added the function PoolId.toKeyHash to extract the hash from a bech32 encoded pool id ([004e5a6](https://github.com/input-output-hk/cardano-js-sdk/commit/004e5a646de9ba91caec49d59f3a73c13ae4b35b))
+- **util-dev:** add stubProviders ([6d5d99c](https://github.com/input-output-hk/cardano-js-sdk/commit/6d5d99c80894a4b126647272f490d9e2c472d818))
 
 ### Code Refactoring
 
-* move tx build utils from wallet to tx-construction ([48072ce](https://github.com/input-output-hk/cardano-js-sdk/commit/48072ce35968820b10fcf0b9ed4441f00ac6fb8b))
+- move tx build utils from wallet to tx-construction ([48072ce](https://github.com/input-output-hk/cardano-js-sdk/commit/48072ce35968820b10fcf0b9ed4441f00ac6fb8b))
 
 ## [0.11.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.10.0...@cardano-sdk/core@0.11.0) (2023-05-02)
 

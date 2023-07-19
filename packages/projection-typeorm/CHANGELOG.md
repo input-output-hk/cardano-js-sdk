@@ -33,7 +33,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Bug Fixes
 
-* unsupported character bug in handles projection ([4144ed2](https://github.com/input-output-hk/cardano-js-sdk/commit/4144ed2925f1c5b118c411ac5eedc3e4a62d3893))
+- unsupported character bug in handles projection ([4144ed2](https://github.com/input-output-hk/cardano-js-sdk/commit/4144ed2925f1c5b118c411ac5eedc3e4a62d3893))
 
 ## [0.3.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.3.4...@cardano-sdk/projection-typeorm@0.3.5) (2023-06-23)
 
@@ -59,22 +59,22 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### ⚠ BREAKING CHANGES
 
-* hoist Cardano.Percent to util package
+- hoist Cardano.Percent to util package
 
 ### Features
 
-* add handle projection ([1d3f4ca](https://github.com/input-output-hk/cardano-js-sdk/commit/1d3f4ca3cfa3f1dfb668847de58eba4d0402d48e))
-* add stake pool metadata entity relation ([99a40b7](https://github.com/input-output-hk/cardano-js-sdk/commit/99a40b79a8809c472c7780bcb626451345b65958))
+- add handle projection ([1d3f4ca](https://github.com/input-output-hk/cardano-js-sdk/commit/1d3f4ca3cfa3f1dfb668847de58eba4d0402d48e))
+- add stake pool metadata entity relation ([99a40b7](https://github.com/input-output-hk/cardano-js-sdk/commit/99a40b79a8809c472c7780bcb626451345b65958))
 
 ### Code Refactoring
 
-* hoist Cardano.Percent to util package ([e4da0e3](https://github.com/input-output-hk/cardano-js-sdk/commit/e4da0e3851a4bdfd503c1f195c5ba1455ea6675b))
+- hoist Cardano.Percent to util package ([e4da0e3](https://github.com/input-output-hk/cardano-js-sdk/commit/e4da0e3851a4bdfd503c1f195c5ba1455ea6675b))
 
 ## [0.2.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.2.2...@cardano-sdk/projection-typeorm@0.2.3) (2023-06-01)
 
 ### Features
 
-* **projection-typeorm:** add stake pools metrics computation job schedule ([a5f56e9](https://github.com/input-output-hk/cardano-js-sdk/commit/a5f56e9105ae2ed1fddb2a64c1c6aeef5016f51a))
+- **projection-typeorm:** add stake pools metrics computation job schedule ([a5f56e9](https://github.com/input-output-hk/cardano-js-sdk/commit/a5f56e9105ae2ed1fddb2a64c1c6aeef5016f51a))
 
 ## [0.2.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.2.1...@cardano-sdk/projection-typeorm@0.2.2) (2023-05-24)
 
@@ -84,7 +84,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
-* add the the pg-boss worker ([561fd50](https://github.com/input-output-hk/cardano-js-sdk/commit/561fd508a4a96307b023b16ce6fed3ce1d7bd536))
+- add the the pg-boss worker ([561fd50](https://github.com/input-output-hk/cardano-js-sdk/commit/561fd508a4a96307b023b16ce6fed3ce1d7bd536))
 
 ## [0.2.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.1.1...@cardano-sdk/projection-typeorm@0.2.0) (2023-05-02)
 
