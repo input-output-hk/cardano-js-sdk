@@ -28,4 +28,5 @@ source
 /.bin
 /.run
 /.cache
-/.local
+/.data
+/.config
