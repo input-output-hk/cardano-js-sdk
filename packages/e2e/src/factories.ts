@@ -210,14 +210,20 @@ keyManagementFactory.register('inMemory', async (params: any): Promise<CreateKey
 });
 
 keyManagementFactory.register('ledger', async (params: any): Promise<CreateKeyAgent> => {
+  const communicationType = params.communicationType || CommunicationType.Node;
   let deviceConnection: DeviceConnection | null | undefined;
 
   return async (dependencies) => {
+    if (deviceConnection) {
+      await deviceConnection.transport.close();
+      deviceConnection = null;
+    }
+    deviceConnection = await LedgerKeyAgent.checkDeviceConnection(communicationType);
     const ledgerKeyAgent = await LedgerKeyAgent.createWithDevice(
       {
         accountIndex: params.accountIndex,
         chainId: params.chainId,
-        communicationType: CommunicationType.Node,
+        communicationType,
         deviceConnection
       },
       dependencies
