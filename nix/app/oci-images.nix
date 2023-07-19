@@ -13,8 +13,7 @@ let
   };
 in {
   server = std.lib.ops.mkStandardOCI {
-    # TODO: set up Repo w/ registry, and test
-    name = "926093910549.dkr.ecr.us-east-1.amazonaws.com/provider-server";
+    name = "926093910549.dkr.ecr.us-east-1.amazonaws.com/cardano-services";
     operable = cell.operables.server;
     config.Env = [
       "BUILD_INFO=${BUILD_INFO}"
