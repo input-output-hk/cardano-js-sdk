@@ -158,7 +158,7 @@ export class LedgerKeyAgent extends KeyAgentBase {
    */
   static async createDeviceConnection(activeTransport: LedgerTransport): Promise<LedgerConnection> {
     try {
-      const deviceConnection = new LedgerConnection(activeTransport);
+      const deviceConnection = new (LedgerConnection as any).default(activeTransport);
       // Perform app check to see if device can respond
       await deviceConnection.getVersion();
       return deviceConnection;
@@ -189,7 +189,10 @@ export class LedgerKeyAgent extends KeyAgentBase {
       }
       return await LedgerKeyAgent.createDeviceConnection(transport);
     } catch (error: any) {
-      if (error.innerError.message.includes('cannot open device with path')) {
+      if (
+        error.innerError.message.includes('cannot open device with path') ||
+        error.innerError.message.includes('already open')
+      ) {
         throw new errors.TransportError('Connection already established', error);
       }
       // If transport is established we need to close it so we can recover device from previous session
