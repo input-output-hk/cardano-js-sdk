@@ -1,12 +1,21 @@
 let
   inherit (inputs) std;
   inherit (inputs.nixpkgs) lib;
-  # TODO: understand if CARDANO_NODE_CONFIG_PATH has appropriate defaults (depending on network)
-  # see also epic about organizing defaults in a single place
+  /*
+  Available networks at the time of writing:
+
+  $ ls packages/cardano-services/config/network/
+  mainnet  preprod  preprod_p2p  preview  preview_p2p  testnet  vasil-dev  vasil-dev_p2p  vasil-qa
+  */
+  networkConfig = inputs.self + /packages/cardano-services/config/network;
 in {
   server = std.lib.ops.mkOperable {
     package = cell.packages.server;
-    runtimeScript = "${cell.packages.server}/bin/cli";
+    # find all configuration options in: packages/cardano-services/src/cli.ts
+    runtimeScript = ''
+      ${cell.packages.server}/bin/cli --cardano-node-config-path \
+        "${networkConfig}/''${NETWORK-mainnet}/cardano-node/config.json"
+    '';
     meta.description = "A transparent (thin) wrapper around the Cardano Services CLI";
   };
 }
