@@ -16,7 +16,7 @@ describe('splitChange', () => {
       undefined,
       () => 10n,
       () => false,
-      2_000_000n
+      0n
     );
 
     expect(getCoinValueForAddress('A', change)).toEqual(50n);
@@ -46,7 +46,7 @@ describe('splitChange', () => {
       undefined,
       () => 10n,
       () => false,
-      2_000_000n
+      0n
     );
 
     expect(getCoinValueForAddress('A', change)).toEqual(34n);

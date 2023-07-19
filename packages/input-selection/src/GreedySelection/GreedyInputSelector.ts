@@ -50,7 +50,7 @@ const adjustOutputsForFee = async (
   outputs: Set<Cardano.TxOut>,
   changeOutputs: Array<Cardano.TxOut>,
   currentFee: bigint
-): Promise<{ fee: bigint; change: Array<Cardano.TxOut> }> => {
+): Promise<{ fee: bigint; change: Array<Cardano.TxOut>; feeAccountedFor: boolean }> => {
   const totalOutputs = new Set([...outputs, ...changeOutputs]);
   const fee = await constraints.computeMinimumCost({
     change: [],
@@ -59,7 +59,7 @@ const adjustOutputsForFee = async (
     outputs: totalOutputs
   });
 
-  if (fee === changeLovelace) return { change: [], fee };
+  if (fee === changeLovelace) return { change: [], fee, feeAccountedFor: true };
 
   if (changeLovelace < fee) throw new InputSelectionError(InputSelectionFailure.UtxoBalanceInsufficient);
 
@@ -78,11 +78,7 @@ const adjustOutputsForFee = async (
     }
   }
 
-  if (!feeAccountedFor) {
-    throw new InputSelectionError(InputSelectionFailure.UtxoFullyDepleted);
-  }
-
-  return { change: [...updatedOutputs], fee };
+  return { change: [...updatedOutputs], fee, feeAccountedFor };
 };
 
 /**
@@ -104,7 +100,7 @@ const splitChangeAndComputeFee = async (
   constraints: SelectionConstraints,
   getChangeAddresses: () => Promise<Map<Cardano.PaymentAddress, number>>,
   fee: bigint
-): Promise<{ fee: bigint; change: Array<Cardano.TxOut> }> => {
+): Promise<{ fee: bigint; change: Array<Cardano.TxOut>; feeAccountedFor: boolean }> => {
   const changeOutputs = await splitChange(
     getChangeAddresses,
     changeLovelace,
@@ -114,7 +110,7 @@ const splitChangeAndComputeFee = async (
     fee
   );
 
-  const adjustedChangeOutputs = await adjustOutputsForFee(
+  let adjustedChangeOutputs = await adjustOutputsForFee(
     changeLovelace,
     constraints,
     inputs,
@@ -126,7 +122,7 @@ const splitChangeAndComputeFee = async (
   // If the newly computed fee is higher than tha available balance for change,
   // but there are unallocated native assets, return the assets as change with 0n coins.
   if (adjustedChangeOutputs.fee >= changeLovelace) {
-    return {
+    const result = {
       change: [
         {
           address: stubMaxSizeAddress,
@@ -136,12 +132,18 @@ const splitChangeAndComputeFee = async (
           }
         }
       ],
-      fee: adjustedChangeOutputs.fee
+      fee: adjustedChangeOutputs.fee,
+      feeAccountedFor: true
     };
+
+    if (result.change[0].value.coins < constraints.computeMinimumCoinQuantity(result.change[0]))
+      throw new InputSelectionError(InputSelectionFailure.UtxoFullyDepleted);
+
+    return result;
   }
 
   if (fee < adjustedChangeOutputs.fee) {
-    return splitChangeAndComputeFee(
+    adjustedChangeOutputs = await splitChangeAndComputeFee(
       inputs,
       outputs,
       changeLovelace,
@@ -150,7 +152,17 @@ const splitChangeAndComputeFee = async (
       getChangeAddresses,
       adjustedChangeOutputs.fee
     );
+
+    if (adjustedChangeOutputs.change.length === 0)
+      throw new InputSelectionError(InputSelectionFailure.UtxoFullyDepleted);
   }
+
+  for (const out of adjustedChangeOutputs.change) {
+    if (out.value.coins < constraints.computeMinimumCoinQuantity(out))
+      throw new InputSelectionError(InputSelectionFailure.UtxoFullyDepleted);
+  }
+
+  if (!adjustedChangeOutputs.feeAccountedFor) throw new InputSelectionError(InputSelectionFailure.UtxoFullyDepleted);
 
   return adjustedChangeOutputs;
 };
