@@ -63,7 +63,7 @@ describe('splitChange', () => {
     ]);
   });
 
-  it('allocates native assets on the first output', async () => {
+  it('allocates native assets evenly across outputs', async () => {
     const changeAddressWithDistribution = new Map([
       [asPaymentAddress('A'), 1],
       [asPaymentAddress('B'), 1],
@@ -89,12 +89,18 @@ describe('splitChange', () => {
     );
 
     expect(getCoinValueForAddress('A', change)).toEqual(20_000_000n);
-    expect(change[0].value.assets).toEqual(assets);
     expect(getCoinValueForAddress('B', change)).toEqual(20_000_000n);
     expect(getCoinValueForAddress('C', change)).toEqual(20_000_000n);
+
+    expect(change[0].value.assets).toEqual(asTokenMap([[asAssetId('0'), 100n]]));
+    expect(change[1].value.assets).toEqual(asTokenMap([[asAssetId('1'), 23n]]));
+    expect(change[2].value.assets).toEqual(asTokenMap([[asAssetId('2'), 1n]]));
+    expect(change[3].value.assets).toEqual(asTokenMap([[asAssetId('3'), 1000n]]));
+    expect(change[4].value.assets).toEqual(asTokenMap([[asAssetId('4'), 1500n]]));
+    expect(change[5].value.assets).toEqual(asTokenMap([[asAssetId('5'), 500n]]));
   });
 
-  it('spills over native assets to other change outputs if they dont fit', async () => {
+  it('goes over all UTXOs circularly when distributing assets', async () => {
     const changeAddressWithDistribution = new Map([
       [asPaymentAddress('A'), 1],
       [asPaymentAddress('B'), 1],
@@ -114,31 +120,34 @@ describe('splitChange', () => {
       async () => changeAddressWithDistribution,
       60_000_000n, // 60 ADA in change
       assets,
-      () => 10n,
-      (tokenBundle: Cardano.TokenMap | undefined) => tokenBundle!.size > 4, // Impose an artificial limit of four asset class per output.
+      () => 19_000_000n,
+      (tokenBundle: Cardano.TokenMap | undefined) => tokenBundle!.size > 2, // Impose an artificial limit of two asset class per output.
       200_000n
     );
 
     expect(getCoinValueForAddress('A', change)).toEqual(20_000_000n);
     expect(change[0].value.assets).toEqual(
       asTokenMap([
-        [asAssetId('2'), 1n],
-        [asAssetId('3'), 1000n],
-        [asAssetId('4'), 1500n],
-        [asAssetId('5'), 500n]
+        [asAssetId('0'), 100n],
+        [asAssetId('3'), 1000n]
       ])
     );
 
     expect(getCoinValueForAddress('B', change)).toEqual(20_000_000n);
     expect(change[1].value.assets).toEqual(
       asTokenMap([
-        [asAssetId('0'), 100n],
-        [asAssetId('1'), 23n]
+        [asAssetId('1'), 23n],
+        [asAssetId('4'), 1500n]
       ])
     );
 
     expect(getCoinValueForAddress('C', change)).toEqual(20_000_000n);
-    expect(change[2].value.assets).toBeUndefined();
+    expect(change[2].value.assets).toEqual(
+      asTokenMap([
+        [asAssetId('2'), 1n],
+        [asAssetId('5'), 500n]
+      ])
+    );
   });
 
   it('throws InputSelectionError with UtxoFullyDepleted if it cant fit the native assets in the change outputs', async () => {
