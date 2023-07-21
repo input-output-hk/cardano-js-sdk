@@ -102,10 +102,12 @@ const getMinUtxoAmount = (amount: bigint): bigint => {
  *
  * @param output The output to be split.
  * @param computeMinimumCoinQuantity ComputeMinimumCoinQuantity.
+ * @param fee current expected fee.
  */
 const splitChangeOutput = (
   output: Cardano.TxOut,
-  computeMinimumCoinQuantity: ComputeMinimumCoinQuantity
+  computeMinimumCoinQuantity: ComputeMinimumCoinQuantity,
+  fee: bigint
 ): Array<Cardano.TxOut> => {
   const amount = output.value.coins;
   const minUtxoAdaAmount = getMinUtxoAmount(amount);
@@ -115,7 +117,7 @@ const splitChangeOutput = (
   const amounts = new Array<bigint>();
   const divisor = new BigNumber(2);
 
-  while (remaining > minUtxoAdaAmount) {
+  while (remaining >= minUtxoAdaAmount) {
     const val = BigInt(new BigNumber(remaining.toString()).dividedBy(divisor).toFixed(0, 0));
 
     const updatedRemaining = remaining - val;
@@ -125,7 +127,8 @@ const splitChangeOutput = (
         computeMinimumCoinQuantity({
           address: output.address,
           value: { assets: output.value.assets, coins: amount - runningAmount }
-        })
+        }) +
+          fee
     ) {
       amounts.push(amount - runningAmount); // Add all that remains to account for rounding errors
       break;
@@ -207,7 +210,7 @@ export const splitChange = async (
     changeOutputs[changeOutputs.length - 1].value.coins += missingAllocation;
   }
 
-  const splitOutputs = changeOutputs.flatMap((output) => splitChangeOutput(output, computeMinimumCoinQuantity));
+  const splitOutputs = changeOutputs.flatMap((output) => splitChangeOutput(output, computeMinimumCoinQuantity, fee));
   const sortedOutputs = splitOutputs.sort(sortByCoins).filter((out) => out.value.coins > 0n);
 
   if (sortedOutputs && sortedOutputs.length > 0) sortedOutputs[0].value.assets = totalChangeAssets; // Add all assets to the 'biggest' output.
