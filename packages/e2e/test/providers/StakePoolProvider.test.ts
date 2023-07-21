@@ -378,6 +378,87 @@ describe('StakePoolProvider', () => {
           );
         });
       });
+
+      describe('sort by live saturation', () => {
+        let filters: QueryStakePoolsArgs['filters'] = {};
+        const poolsId: Cardano.PoolId[] = [];
+
+        beforeAll(() => {
+          for (const pool of pools) if (poolsId.length < 20) poolsId.push(pool.id);
+
+          filters = { identifier: { values: poolsId.map((id) => ({ id })) } };
+        });
+        it('ascending sort by live saturation', async () => {
+          if (poolsId.length < 2)
+            return console.log(
+              "test 'ascending sort by live saturation' can't run because no suitable pools were found"
+            );
+          const { pageResults, totalResultCount } = await query(filters, { field: 'saturation', order: 'asc' });
+
+          expect(totalResultCount).toBe(poolsId.length);
+          expect(pageResults.map((p) => p.metrics!.saturation)).toStrictEqual(
+            pools
+              .filter(({ id }) => poolsId.includes(id))
+              .sort((a, b) => (a.metrics!.saturation < b.metrics!.saturation ? -1 : 1))
+              .map((p) => p.metrics?.saturation)
+          );
+        });
+        it('descending sort by live saturation', async () => {
+          if (poolsId.length < 2)
+            return console.log(
+              "test 'descending sort by live saturation' can't run because no suitable pools were found"
+            );
+          const { pageResults, totalResultCount } = await query(filters, { field: 'saturation', order: 'desc' });
+
+          expect(totalResultCount).toBe(poolsId.length);
+          expect(pageResults.map((p) => p.metrics?.saturation)).toStrictEqual(
+            pools
+              .filter(({ id }) => poolsId.includes(id))
+              .sort((a, b) => (a.metrics!.saturation > b.metrics!.saturation ? -1 : 1))
+              .map((p) => p.metrics?.saturation)
+          );
+        });
+      });
+
+      describe('sort by apy', () => {
+        let filters: QueryStakePoolsArgs['filters'] = {};
+        const poolsId: Cardano.PoolId[] = [];
+
+        beforeAll(() => {
+          for (const pool of pools) {
+            if (poolsId.length < 20 && pool.metrics?.apy !== undefined && pool.metrics?.apy > 0) {
+              poolsId.push(pool.id);
+            }
+          }
+          filters = { identifier: { values: poolsId.map((id) => ({ id })) } };
+        });
+        it('ascending sort by apy', async () => {
+          if (poolsId.length < 2)
+            return console.log("test 'ascending sort by apy' can't run because no suitable pools were found");
+          const { pageResults, totalResultCount } = await query(filters, { field: 'apy', order: 'asc' });
+
+          expect(totalResultCount).toBe(poolsId.length);
+          expect(pageResults.map((p) => p.metrics?.apy)).toStrictEqual(
+            pools
+              .filter(({ id }) => poolsId.includes(id))
+              .sort((a, b) => (a.metrics!.apy! < b.metrics!.apy! ? -1 : 1))
+              .map((p) => p.metrics?.apy)
+          );
+        });
+        it('descending sort by apy', async () => {
+          if (poolsId.length < 2)
+            return console.log("test 'descending sort by apy' can't run because no suitable pools were found");
+          const { pageResults, totalResultCount } = await query(filters, { field: 'apy', order: 'desc' });
+
+          expect(totalResultCount).toBe(poolsId.length);
+          expect(pageResults.map((p) => p.metrics?.apy)).toStrictEqual(
+            pools
+              .filter(({ id }) => poolsId.includes(id))
+              .sort((a, b) => (a.metrics!.apy! > b.metrics!.apy! ? -1 : 1))
+              .map((p) => p.metrics?.apy)
+          );
+        });
+      });
     });
   });
 });
