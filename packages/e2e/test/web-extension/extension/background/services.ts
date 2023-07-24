@@ -1,16 +1,18 @@
 // Expose any additional services to be shared with UIs
-import { BackgroundServices, adaPriceProperties, env, logger } from '../util';
+import { BackgroundServices, adaPriceProperties, disconnectPortTestObjProperties, env, logger } from '../util';
 import { Cardano } from '@cardano-sdk/core';
+import { Subject, of } from 'rxjs';
 import { adaPriceServiceChannel, walletName } from '../const';
 import { authenticator } from './authenticator';
-import { exposeApi, exposeSupplyDistributionTracker } from '@cardano-sdk/web-extension';
-import { of } from 'rxjs';
+import { consumeRemoteApi, exposeApi, exposeSupplyDistributionTracker } from '@cardano-sdk/web-extension';
 import { runtime } from 'webextension-polyfill';
 import { stakePoolProviderFactory } from '../../../../src';
 import { supplyDistributionTrackerReady } from './supplyDistributionTracker';
 
+const apiDisconnectResult$ = new Subject<string>();
 const priceService: BackgroundServices = {
   adaUsd$: of(2.99),
+  apiDisconnectResult$,
   clearAllowList: authenticator.clear.bind(authenticator),
   getPoolIds: async (count: number): Promise<Cardano.StakePool[]> => {
     const stakePoolProvider = await stakePoolProviderFactory.create(
@@ -35,6 +37,28 @@ exposeApi(
   },
   { logger, runtime }
 );
+
+// Dummy exposeApi object that closes the port as soon as it gets a message.
+// UI promise call should reject as a result of this
+// UI consumes API -> BG exposes fake API that closes port
+runtime.onConnect.addListener((port) => {
+  if (port.name === 'ui-to-bg-port-disconnect-channel') {
+    port.onMessage.addListener((_msg, p) => {
+      p.disconnect();
+    });
+  }
+});
+
+// Code below tests that a disconnected port in UI script will result in the consumed API method call promise to reject
+// BG consumes API -> UI exposes fake API that closes port
+const disconnectPortTestObj = consumeRemoteApi(
+  { baseChannel: 'bg-to-ui-port-disconnect-channel', properties: disconnectPortTestObjProperties },
+  { logger, runtime }
+);
+disconnectPortTestObj
+  .promiseMethod()
+  .then(() => apiDisconnectResult$.next('UI script port disconnect -> Promise resolves'))
+  .catch(() => apiDisconnectResult$.next('UI script port disconnect -> Promise rejects'));
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
 (async () => {

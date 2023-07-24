@@ -44,6 +44,8 @@ describe('wallet', () => {
   const spanPoolIds = '#multiDelegation .delegate .pools';
   const liPools = '#multiDelegation .distribution li';
   const liPercents = '#multiDelegation .distribution li .percent';
+  const divBgPortDisconnectStatus = '#remoteApiPortDisconnect .bgPortDisconnect';
+  const divUiPortDisconnectStatus = '#remoteApiPortDisconnect .uiPortDisconnect';
 
   // The address is filled in by the tests, which are order dependent
   let walletAddr1 = '';
@@ -69,6 +71,11 @@ describe('wallet', () => {
   describe('wallet ui opens', () => {
     before(async () => {
       await switchToWalletUi();
+    });
+
+    it('should handle remoteApi disconnects as Promise.rejects', async () => {
+      await expect($(divBgPortDisconnectStatus)).toHaveText('Background port disconnect -> Promise rejects');
+      await expect($(divUiPortDisconnectStatus)).toHaveText('UI script port disconnect -> Promise rejects');
     });
 
     it('should display ADA price, provided by background process', async () => {

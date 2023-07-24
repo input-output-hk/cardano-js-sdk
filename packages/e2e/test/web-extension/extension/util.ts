@@ -11,14 +11,25 @@ export interface UserPromptService {
 
 export interface BackgroundServices {
   adaUsd$: Observable<number>;
+  /** BG script will use this observable to send the result of consumedApi promise api call while port is disconnected by UI side */
+  apiDisconnectResult$: Observable<string>;
   clearAllowList(): Promise<void>;
   getPoolIds(count: number): Promise<Cardano.StakePool[]>;
 }
 
 export const adaPriceProperties: RemoteApiProperties<BackgroundServices> = {
   adaUsd$: RemoteApiPropertyType.HotObservable,
+  apiDisconnectResult$: RemoteApiPropertyType.HotObservable,
   clearAllowList: RemoteApiPropertyType.MethodReturningPromise,
   getPoolIds: RemoteApiPropertyType.MethodReturningPromise
+};
+
+// Dummy object to be used with remoteApi to test that promise rejects in case of disconnected port
+export interface DisconnectPortTestObj {
+  promiseMethod(): Promise<void>;
+}
+export const disconnectPortTestObjProperties: RemoteApiProperties<DisconnectPortTestObj> = {
+  promiseMethod: RemoteApiPropertyType.MethodReturningPromise
 };
 
 export const logger = console;
