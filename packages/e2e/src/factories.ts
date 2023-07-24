@@ -33,11 +33,11 @@ import {
   TrezorKeyAgent,
   util
 } from '@cardano-sdk/key-management';
-import { CardanoWalletFaucetProvider, FaucetProvider } from './FaucetProvider';
 import {
   KoraLabsHandleProvider,
   assetInfoHttpProvider,
   chainHistoryHttpProvider,
+  handleHttpProvider,
   networkInfoHttpProvider,
   rewardsHttpProvider,
   stakePoolHttpProvider,
@@ -61,10 +61,8 @@ const customHttpFetchAdapter = isNodeJs ? undefined : require('@vespaiach/axios-
 const HTTP_PROVIDER = 'http';
 const OGMIOS_PROVIDER = 'ogmios';
 const STUB_PROVIDER = 'stub';
-const HANDLE_PROVIDER = 'kora-labs';
 const MISSING_URL_PARAM = 'Missing URL';
 
-export const faucetProviderFactory = new ProviderFactory<FaucetProvider>();
 export type CreateKeyAgent = (dependencies: KeyAgentDependencies) => Promise<AsyncKeyAgent>;
 export const keyManagementFactory = new ProviderFactory<CreateKeyAgent>();
 export const assetProviderFactory = new ProviderFactory<AssetProvider>();
@@ -76,23 +74,19 @@ export const utxoProviderFactory = new ProviderFactory<UtxoProvider>();
 export const stakePoolProviderFactory = new ProviderFactory<StakePoolProvider>();
 export const bip32Ed25519Factory = new ProviderFactory<Crypto.Bip32Ed25519>();
 export const addressDiscoveryFactory = new ProviderFactory<AddressDiscovery>();
-export const handleProviderFactory = new ProviderFactory<HandleProvider>();
+export const handleProviderFactory = new ProviderFactory<HandleProvider | KoraLabsHandleProvider>();
 
 // Address Discovery strategies
 
 addressDiscoveryFactory.register('SingleAddressDiscovery', async () => new SingleAddressDiscovery());
 addressDiscoveryFactory.register(
   'HDSequentialDiscovery',
-  async ({ chainHistoryProvider }) => new HDSequentialDiscovery(chainHistoryProvider, 20, 5)
+  async ({ chainHistoryProvider }) => new HDSequentialDiscovery(chainHistoryProvider, 20)
 );
 
 // bip32Ed25519
 
 bip32Ed25519Factory.register('CML', async () => new Crypto.CmlBip32Ed25519(CML));
-
-// Faucet providers
-
-faucetProviderFactory.register('cardano-wallet', CardanoWalletFaucetProvider.create);
 
 // Asset providers
 
@@ -100,7 +94,13 @@ assetProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger)
   if (params.baseUrl === undefined) throw new Error(`${assetInfoHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
   return new Promise<AssetProvider>(async (resolve) => {
-    resolve(assetInfoHttpProvider({ adapter: customHttpFetchAdapter, baseUrl: params.baseUrl, logger }));
+    resolve(
+      assetInfoHttpProvider({
+        adapter: customHttpFetchAdapter,
+        baseUrl: params.baseUrl,
+        logger
+      })
+    );
   });
 });
 
@@ -164,14 +164,11 @@ utxoProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger):
   });
 });
 
-handleProviderFactory.register(HANDLE_PROVIDER, async (params: any): Promise<HandleProvider> => {
-  if (params.serverUrl === undefined) throw new Error(`${KoraLabsHandleProvider.name}: ${MISSING_URL_PARAM}`);
+handleProviderFactory.register(HTTP_PROVIDER, async (params: any, logger: Logger): Promise<HandleProvider> => {
+  if (params.baseUrl === undefined) throw new Error(`${handleHttpProvider.name}: ${MISSING_URL_PARAM}`);
 
-  return new KoraLabsHandleProvider({
-    adapter: customHttpFetchAdapter,
-    networkInfoProvider: params.networkInfoProvider,
-    policyId: params.policyId,
-    serverUrl: params.serverUrl
+  return new Promise<HandleProvider>(async (resolve) => {
+    resolve(handleHttpProvider({ adapter: customHttpFetchAdapter, baseUrl: params.baseUrl, logger }));
   });
 });
 
@@ -280,6 +277,7 @@ export type GetWalletProps = {
   logger: Logger;
   name: string;
   polling?: PollingConfig;
+  handlePolicyIds?: Cardano.PolicyId[];
   stores?: storage.WalletStores;
   customKeyParams?: KeyAgentFactoryProps;
   keyAgent?: AsyncKeyAgent;
@@ -311,7 +309,7 @@ const patchInitializeTxToRespectEpochBoundary = <T extends ObservableWallet>(
  * @returns an object containing the wallet and providers passed to it
  */
 export const getWallet = async (props: GetWalletProps) => {
-  const { env, idx, logger, name, polling, stores, customKeyParams, keyAgent } = props;
+  const { env, idx, logger, name, polling, handlePolicyIds, stores, customKeyParams, keyAgent } = props;
   const providers = {
     addressDiscovery: await addressDiscoveryFactory.create(
       env.ADDRESS_DISCOVERY,
@@ -370,7 +368,7 @@ export const getWallet = async (props: GetWalletProps) => {
       ? () => Promise.resolve(keyAgent)
       : await keyManagementFactory.create(env.KEY_MANAGEMENT_PROVIDER, keyManagementParams, logger),
     createWallet: async (asyncKeyAgent: AsyncKeyAgent) =>
-      new PersonalWallet({ name, polling }, { ...providers, keyAgent: asyncKeyAgent, logger, stores }),
+      new PersonalWallet({ handlePolicyIds, name, polling }, { ...providers, keyAgent: asyncKeyAgent, logger, stores }),
     logger
   });
 

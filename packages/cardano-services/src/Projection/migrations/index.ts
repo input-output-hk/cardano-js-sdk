@@ -1,8 +1,10 @@
 import { AssetTableMigration1682519108365 } from './1682519108365-asset-table';
 import { BlockDataTableMigration1682519108359 } from './1682519108359-block-data-table';
 import { BlockTableMigration1682519108358 } from './1682519108358-block-table';
+import { CostPledgeNumericMigration1689091319930 } from './1689091319930-cost-pledge-numeric';
 import { FkPoolRegistrationMigration1682519108369 } from './1682519108369-fk-pool-registration';
 import { FkPoolRetirementMigration1682519108370 } from './1682519108370-fk-pool-retirement';
+import { HandleTableMigration1686138943349 } from './1686138943349-handle-table';
 import { OutputTableMigration1682519108367 } from './1682519108367-output-table';
 import { PoolMetadataTableMigration1682519108363 } from './1682519108363-pool-metadata-table';
 import { PoolMetricsMigrations1685011799580 } from './1685011799580-stake-pool-metrics-table';
@@ -27,5 +29,7 @@ export const migrations: ProjectionMigration[] = [
   TokensTableMigration1682519108368,
   FkPoolRegistrationMigration1682519108369,
   FkPoolRetirementMigration1682519108370,
-  PoolMetricsMigrations1685011799580
+  PoolMetricsMigrations1685011799580,
+  HandleTableMigration1686138943349,
+  CostPledgeNumericMigration1689091319930
 ];

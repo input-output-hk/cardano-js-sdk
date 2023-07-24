@@ -68,7 +68,7 @@ describe('PgBossHttpService', () => {
   beforeAll(async () => {
     const args = {
       postgresDbDbSync: process.env.POSTGRES_DB_DB_SYNC!,
-      postgresDbStakePool: process.env.POSTGRES_DB_STAKE_POOL!,
+      postgresDbStakePool: 'projection',
       postgresPasswordDbSync: process.env.POSTGRES_PASSWORD_DB_SYNC!,
       postgresPasswordStakePool: process.env.POSTGRES_PASSWORD_DB_SYNC!,
       postgresSrvServiceNameDbSync: process.env.POSTGRES_SRV_SERVICE_NAME_DB_SYNC!,
@@ -77,7 +77,7 @@ describe('PgBossHttpService', () => {
       postgresUserStakePool: process.env.POSTGRES_USER_DB_SYNC!
     };
 
-    connectionConfig$ = getConnectionConfig(dnsResolver, 'test', args);
+    connectionConfig$ = getConnectionConfig(dnsResolver, 'test', 'StakePool', args);
     const dataSource$ = createObservableDataSource({
       connectionConfig$,
       devOptions: { dropSchema: true, synchronize: true },

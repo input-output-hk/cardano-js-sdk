@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.13.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.12.1...@cardano-sdk/util@0.13.0) (2023-07-04)
+
+### ⚠ BREAKING CHANGES
+
+* added change address resolver to the round robin input selector
+
+### Features
+
+* added change address resolver to the round robin input selector ([ef654ca](https://github.com/input-output-hk/cardano-js-sdk/commit/ef654ca7a7c3217b68360e1d4bee3296e5fc4f0e))
+
+## [0.12.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.12.0...@cardano-sdk/util@0.12.1) (2023-06-29)
+
+### Bug Fixes
+
+* **util:** add ServerNotReady to list of connection errors ([c7faf01](https://github.com/input-output-hk/cardano-js-sdk/commit/c7faf01194561b2941c42c4a74517de0a5a9f7d9))
+
+## [0.12.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.11.0...@cardano-sdk/util@0.12.0) (2023-06-28)
+
+### ⚠ BREAKING CHANGES
+
+* moved strictEquals, sameArrayItems, shallowArrayEquals to util package
+
+### Code Refactoring
+
+* move generic equals methods to util package ([6b5dbd3](https://github.com/input-output-hk/cardano-js-sdk/commit/6b5dbd3382eda3fb58901619438caf946a559715))
+
 ## [0.11.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.10.0...@cardano-sdk/util@0.11.0) (2023-06-05)
 
 ### ⚠ BREAKING CHANGES

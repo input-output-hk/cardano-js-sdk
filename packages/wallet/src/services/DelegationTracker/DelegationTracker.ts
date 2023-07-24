@@ -14,10 +14,9 @@ import { RetryBackoffConfig } from 'backoff-rxjs';
 import { RewardsHistoryProvider, createRewardsHistoryProvider, createRewardsHistoryTracker } from './RewardsHistory';
 import { Shutdown, contextLogger } from '@cardano-sdk/util';
 import { TrackedRewardsProvider, TrackedStakePoolProvider } from '../ProviderTracker';
-import { TrackerSubject } from '@cardano-sdk/util-rxjs';
+import { TrackerSubject, coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import { TxWithEpoch } from './types';
 import { WalletStores } from '../../persistence';
-import { coldObservableProvider } from '../util';
 import { createDelegationDistributionTracker } from './DelegationDistributionTracker';
 import { transactionsWithCertificates } from './transactionCertificates';
 

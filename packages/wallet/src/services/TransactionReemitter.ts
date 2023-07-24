@@ -170,6 +170,8 @@ export const createTransactionReemitter = ({
 
   return {
     failed$,
-    reemit$: merge(rollbackRetry$, unsubmitted$, reemitUnconfirmed$).pipe(map((tx) => pick(tx, ['cbor', 'body', 'id'])))
+    reemit$: merge(rollbackRetry$, unsubmitted$, reemitUnconfirmed$).pipe(
+      map((tx) => pick(tx, ['cbor', 'body', 'id', 'context']))
+    )
   };
 };

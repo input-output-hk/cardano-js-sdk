@@ -51,7 +51,6 @@ describe('NetworkInfoHttpService', () => {
       min: 1
     })
   };
-
   const fixtureBuilder = new NetworkInfoFixtureBuilder(dbPools.main, logger);
   const epochMonitor = new DbSyncEpochPollService(dbPools.main, epochPollInterval!);
 

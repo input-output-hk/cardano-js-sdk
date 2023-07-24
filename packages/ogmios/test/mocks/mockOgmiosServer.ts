@@ -1,7 +1,13 @@
 /* eslint-disable sonarjs/no-nested-switch */
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { EraMismatch, IntersectionFound, IntersectionNotFound, PointOrOrigin } from '@cardano-ogmios/schema';
+import {
+  EraMismatch,
+  EraSummary,
+  IntersectionFound,
+  IntersectionNotFound,
+  PointOrOrigin
+} from '@cardano-ogmios/schema';
 import {
   EraSummariesResponse,
   GenesisConfigResponse,
@@ -13,7 +19,7 @@ import {
 } from './types';
 import { HEALTH_RESPONSE_BODY } from './util';
 import { Milliseconds } from '@cardano-sdk/core';
-import { Schema, UnknownResultError } from '@cardano-ogmios/client';
+import { Schema } from '@cardano-ogmios/client';
 import { Server, createServer } from 'http';
 import WebSocket from 'ws';
 import delay from 'delay';
@@ -34,13 +40,13 @@ export interface MockOgmiosServerConfig {
   };
   stateQuery?: {
     eraSummaries?: {
-      response: EraSummariesResponse;
+      response: EraSummariesResponse | EraSummariesResponse[];
     };
     genesisConfig?: {
       response: GenesisConfigResponse | GenesisConfigResponse[];
     };
     systemStart?: {
-      response: SystemStartResponse;
+      response: SystemStartResponse | SystemStartResponse[];
     };
     stakeDistribution?: {
       response: StakeDistributionResponse;
@@ -75,6 +81,19 @@ export const mockGenesisConfig = {
   systemStart: '2022-08-09T00:00:00Z',
   updateQuorum: 5
 } as Schema.CompactGenesis;
+
+export const mockEraSummaries: EraSummary[] = [
+  {
+    end: { epoch: 74, slot: 1_598_400, time: 31_968_000 },
+    parameters: { epochLength: 21_600, safeZone: 4320, slotLength: 20 },
+    start: { epoch: 0, slot: 0, time: 0 }
+  },
+  {
+    end: { epoch: 102, slot: 13_694_400, time: 44_064_000 },
+    parameters: { epochLength: 432_000, safeZone: 129_600, slotLength: 1 },
+    start: { epoch: 74, slot: 1_598_400, time: 31_968_000 }
+  }
+];
 
 const handleFindIntersect = (args: any, config: MockOgmiosServerConfig, send: (result: unknown) => void) => {
   const response = config.findIntersect?.(args.points);
@@ -132,43 +151,34 @@ const handleSubmitTx = async (
   send(result);
 };
 
-// eslint-disable-next-line complexity, sonarjs/cognitive-complexity
+// eslint-disable-next-line complexity, sonarjs/cognitive-complexity, max-statements
 const handleQuery = async (query: string, config: MockOgmiosServerConfig, send: (result: unknown) => void) => {
   let result: any;
   switch (query) {
-    case 'eraSummaries':
-      if (config.stateQuery?.eraSummaries?.response.success) {
-        result = [
-          {
-            end: { epoch: 74, slot: 1_598_400, time: 31_968_000 },
-            parameters: { epochLength: 21_600, safeZone: 4320, slotLength: 20 },
-            start: { epoch: 0, slot: 0, time: 0 }
-          },
-          {
-            end: { epoch: 102, slot: 13_694_400, time: 44_064_000 },
-            parameters: { epochLength: 432_000, safeZone: 129_600, slotLength: 1 },
-            start: { epoch: 74, slot: 1_598_400, time: 31_968_000 }
-          }
-        ];
-      } else if (config.stateQuery?.eraSummaries?.response.failWith?.type === 'unknownResultError') {
+    case 'eraSummaries': {
+      const responseConfig = config.stateQuery?.eraSummaries?.response;
+      const response = Array.isArray(responseConfig) ? responseConfig.shift() : responseConfig;
+      if (response?.success) {
+        result = response.eraSummaries || mockEraSummaries;
+      } else if (response?.failWith?.type === 'unknownResultError') {
         result = 'unknown';
-      } else if (config.stateQuery?.eraSummaries?.response.failWith?.type === 'connectionError') {
-        // This error is never actually returned by the server,
-        // But is used by cardano-services tests
-        result = new UnknownResultError({ code: 'ECONNREFUSED' });
       } else {
         throw new Error('Unknown mock response');
       }
       break;
-    case 'systemStart':
-      if (config.stateQuery?.systemStart?.response.success) {
-        result = new Date(1_506_203_091_000);
-      } else if (config.stateQuery?.systemStart?.response.failWith?.type === 'queryUnavailableInEra') {
+    }
+    case 'systemStart': {
+      const responseConfig = config.stateQuery?.systemStart?.response;
+      const response = Array.isArray(responseConfig) ? responseConfig.shift() : responseConfig;
+      if (response?.success) {
+        result = response.systemStart || new Date(1_506_203_091_000);
+      } else if (response?.failWith?.type === 'queryUnavailableInEra') {
         result = 'QueryUnavailableInCurrentEra';
       } else {
         throw new Error('Unknown mock response');
       }
       break;
+    }
     case 'genesisConfig': {
       const responseConfig = config.stateQuery?.genesisConfig?.response;
       const response = Array.isArray(responseConfig) ? responseConfig.shift() : responseConfig;

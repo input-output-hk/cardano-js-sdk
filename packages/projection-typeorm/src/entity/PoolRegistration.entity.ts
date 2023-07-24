@@ -1,5 +1,5 @@
 /* eslint-disable brace-style */
-import { BigIntColumnOptions, DeleteCascadeRelationOptions } from './util';
+import { BigIntColumnOptions, DeleteCascadeRelationOptions, ImaginaryCoinsColumnOptions } from './util';
 import { BlockEntity } from './Block.entity';
 import { Cardano } from '@cardano-sdk/core';
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn } from 'typeorm';
@@ -17,9 +17,9 @@ export class PoolRegistrationEntity {
   id?: bigint;
   @Column()
   rewardAccount?: Cardano.RewardAccount;
-  @Column(BigIntColumnOptions)
+  @Column(ImaginaryCoinsColumnOptions)
   pledge?: bigint;
-  @Column(BigIntColumnOptions)
+  @Column(ImaginaryCoinsColumnOptions)
   cost?: bigint;
   // Review: should we store this as 'double' instead?
   // Maybe both formats? If we'll need to do computations with this

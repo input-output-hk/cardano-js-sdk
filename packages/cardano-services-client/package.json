@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/cardano-services-client",
-  "version": "0.9.5",
+  "version": "0.10.5",
   "description": "Cardano Services Client",
   "engines": {
     "node": ">=14.20.1"
@@ -22,7 +22,8 @@
   "scripts": {
     "build:esm": "tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020",
     "build:cjs": "tsc --build src",
-    "build": "run-s build:cjs build:esm module-fixup",
+    "build:version": "node ./scripts/createVersionSource.js && shx cp ./package.json ./dist/package.json",
+    "build": "yarn build:version && run-s build:cjs build:esm module-fixup",
     "module-fixup": "shx cp ../../build/cjs-package.json ./dist/cjs/package.json && cp ../../build/esm-package.json ./dist/esm/package.json",
     "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",
     "cleanup:dist": "shx rm -rf dist",
@@ -31,7 +32,7 @@
     "cleanup": "run-s cleanup:dist cleanup:nm",
     "lint": "eslint -c ../../complete.eslintrc.js \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint:fix": "yarn lint --fix",
-    "test": "jest -c ./jest.config.js",
+    "test": "yarn build:version && jest -c ./jest.config.js",
     "test:build:verify": "tsc --build ./test",
     "test:e2e": "shx echo 'test:e2e' command not implemented yet",
     "coverage": "yarn test --coverage",
@@ -40,7 +41,7 @@
   },
   "devDependencies": {
     "@cardano-sdk/util-dev": "workspace:~",
-    "@koralabs/handles-public-api-interfaces": "1.6.6",
+    "@koralabs/handles-public-api-interfaces": "2.4.3",
     "@types/validator": "^13.7.1",
     "axios-mock-adapter": "^1.20.0",
     "eslint": "^7.32.0",

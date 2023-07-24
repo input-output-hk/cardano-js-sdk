@@ -1,7 +1,6 @@
 import { CardanoNodeErrors, ProviderError, ProviderFailure } from '@cardano-sdk/core';
-import { axiosError, healthCheckResponseWithState } from '../util';
 import { bufferToHexString } from '@cardano-sdk/util';
-import { logger } from '@cardano-sdk/util-dev';
+import { handleProviderMocks, logger } from '@cardano-sdk/util-dev';
 import { txSubmitHttpProvider } from '../../src';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
@@ -34,9 +33,9 @@ describe('txSubmitHttpProvider', () => {
 
     describe('healthCheck', () => {
       it('is ok if 200 response body is { ok: true, localNode }', async () => {
-        axiosMock.onPost().replyOnce(200, healthCheckResponseWithState);
+        axiosMock.onPost().replyOnce(200, handleProviderMocks.healthCheckResponseWithState);
         const provider = txSubmitHttpProvider(config);
-        await expect(provider.healthCheck()).resolves.toEqual(healthCheckResponseWithState);
+        await expect(provider.healthCheck()).resolves.toEqual(handleProviderMocks.healthCheckResponseWithState);
       });
 
       it('is not ok if 200 response body is { ok: false }', async () => {
@@ -58,7 +57,7 @@ describe('txSubmitHttpProvider', () => {
           (bodyError: Error, providerFailure: ProviderFailure, providerErrorType: unknown) => async () => {
             try {
               axiosMock.onPost().replyOnce(() => {
-                throw axiosError(bodyError);
+                throw handleProviderMocks.axiosError(bodyError);
               });
               const provider = txSubmitHttpProvider(config);
               await provider.submitTx({ signedTransaction: emptyUintArrayAsHexString });
@@ -91,7 +90,7 @@ describe('txSubmitHttpProvider', () => {
         it('does not re-wrap UnknownTxSubmissionError', async () => {
           expect.assertions(3);
           axiosMock.onPost().replyOnce(() => {
-            throw axiosError(new CardanoNodeErrors.UnknownTxSubmissionError('Unknown error'));
+            throw handleProviderMocks.axiosError(new CardanoNodeErrors.UnknownTxSubmissionError('Unknown error'));
           });
           const provider = txSubmitHttpProvider(config);
           try {

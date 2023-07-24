@@ -10,7 +10,9 @@ const createMockAsyncKeyAgent = (knownAddresses: Array<Array<GroupedAddress>>): 
   const knownAddresses$ = new BehaviorSubject(currentKnownAddresses);
   return {
     async deriveAddress(derivationPath, stakeKeyDerivationIndex: number, pure?: boolean) {
-      const address = knownAddresses[derivationPath.index][stakeKeyDerivationIndex];
+      const address = { ...knownAddresses[derivationPath.index][stakeKeyDerivationIndex] };
+      address.type = derivationPath.type;
+      address.address = `${address.address}_${derivationPath.type}` as Cardano.PaymentAddress;
 
       if (!pure) currentKnownAddresses.push(address);
 
@@ -41,73 +43,27 @@ const createMockAsyncKeyAgent = (knownAddresses: Array<Array<GroupedAddress>>): 
 };
 
 export const prepareMockKeyAgentWithData = () => {
-  // Start with the first stake keys and payment cred 0.
-  const data = [
-    [
-      {
-        accountIndex: 0,
-        address: 'testAddress_0_0' as unknown as Cardano.PaymentAddress,
-        index: 0,
-        networkId: Cardano.NetworkId.Testnet,
-        rewardAccount: 'testStakeAddress_0' as unknown as Cardano.RewardAccount,
-        stakeKeyDerivationPath: {
-          index: 0,
-          role: KeyRole.Stake
-        },
-        type: AddressType.External
-      },
-      {
-        accountIndex: 0,
-        address: 'testAddress_0_1' as unknown as Cardano.PaymentAddress,
-        index: 0,
-        networkId: Cardano.NetworkId.Testnet,
-        rewardAccount: 'testStakeAddress_1' as unknown as Cardano.RewardAccount,
-        stakeKeyDerivationPath: {
-          index: 1,
-          role: KeyRole.Stake
-        },
-        type: AddressType.External
-      },
-      {
-        accountIndex: 0,
-        address: 'testAddress_0_2' as unknown as Cardano.PaymentAddress,
-        index: 0,
-        networkId: Cardano.NetworkId.Testnet,
-        rewardAccount: 'testStakeAddress_2' as unknown as Cardano.RewardAccount,
-        stakeKeyDerivationPath: {
-          index: 2,
-          role: KeyRole.Stake
-        },
-        type: AddressType.External
-      },
-      {
-        accountIndex: 0,
-        address: 'testAddress_0_3' as unknown as Cardano.PaymentAddress,
-        index: 0,
-        networkId: Cardano.NetworkId.Testnet,
-        rewardAccount: 'testStakeAddress_3' as unknown as Cardano.RewardAccount,
-        stakeKeyDerivationPath: {
-          index: 3,
-          role: KeyRole.Stake
-        },
-        type: AddressType.External
-      },
-      {
-        accountIndex: 0,
-        address: 'testAddress_0_4' as unknown as Cardano.PaymentAddress,
-        index: 0,
-        networkId: Cardano.NetworkId.Testnet,
-        rewardAccount: 'testStakeAddress_4' as unknown as Cardano.RewardAccount,
-        stakeKeyDerivationPath: {
-          index: 4,
-          role: KeyRole.Stake
-        },
-        type: AddressType.External
-      }
-    ]
-  ];
+  const data = new Array<Array<GroupedAddress>>();
+  const stakeKeys = new Array<GroupedAddress>();
 
-  // Add 200 payment credentials.
+  // Add 20 staking addresses credentials.
+  for (let i = 0; i < 20; ++i) {
+    stakeKeys.push({
+      accountIndex: 0,
+      address: `testAddress_0_${i}` as unknown as Cardano.PaymentAddress,
+      index: i,
+      networkId: Cardano.NetworkId.Testnet,
+      rewardAccount: `testStakeAddress_${i}` as unknown as Cardano.RewardAccount,
+      stakeKeyDerivationPath: {
+        index: i,
+        role: KeyRole.Stake
+      },
+      type: AddressType.External
+    });
+  }
+
+  data.push(stakeKeys);
+
   for (let i = 1; i < 200; ++i) {
     data.push([
       {
@@ -142,11 +98,14 @@ export const mockChainHistoryProvider: ChainHistoryProvider = {
     if (address) {
       const segments = address.split('_');
       const paymentIndex = Number(segments[1]);
+      const stakeIndex = Number(segments[2]);
       const isPaymentEven = paymentIndex % 2 === 0;
+      const isExternalAddress = Number(segments[3]) === 0;
+      const isStakingAddress = paymentIndex === 0 && stakeIndex > 0;
 
       return Promise.resolve({
         pageResults: new Array<Cardano.HydratedTx>(),
-        totalResultCount: isPaymentEven && paymentIndex < 100 ? 1 : 0
+        totalResultCount: !isStakingAddress && isExternalAddress && isPaymentEven && paymentIndex < 100 ? 1 : 0
       });
     }
 
@@ -160,6 +119,33 @@ export const mockChainHistoryProvider: ChainHistoryProvider = {
   }
 };
 
+export const createMockChainHistoryProvider = (addressesWithTx: Map<Cardano.PaymentAddress, number>) => ({
+  blocksByHashes: () => {
+    throw new Error(NOT_IMPLEMENTED);
+  },
+  healthCheck: () => {
+    throw new Error(NOT_IMPLEMENTED);
+  },
+  transactionsByAddresses: (args: TransactionsByAddressesArgs): Promise<Paginated<Cardano.HydratedTx>> => {
+    const address = args.addresses.length > 0 ? args.addresses[0] : undefined;
+
+    if (address && addressesWithTx.has(address)) {
+      return Promise.resolve({
+        pageResults: new Array<Cardano.HydratedTx>(),
+        totalResultCount: addressesWithTx.get(address)!
+      });
+    }
+
+    return Promise.resolve({
+      pageResults: new Array<Cardano.HydratedTx>(),
+      totalResultCount: 0
+    });
+  },
+  transactionsByHashes: () => {
+    throw new Error(NOT_IMPLEMENTED);
+  }
+});
+
 export const mockAlwaysFailChainHistoryProvider: ChainHistoryProvider = {
   blocksByHashes: () => {
     throw new Error(NOT_IMPLEMENTED);
@@ -170,6 +156,22 @@ export const mockAlwaysFailChainHistoryProvider: ChainHistoryProvider = {
   transactionsByAddresses: (): Promise<Paginated<Cardano.HydratedTx>> => {
     throw new Error(NOT_IMPLEMENTED);
   },
+  transactionsByHashes: () => {
+    throw new Error(NOT_IMPLEMENTED);
+  }
+};
+
+export const mockAlwaysEmptyChainHistoryProvider: ChainHistoryProvider = {
+  blocksByHashes: () => {
+    throw new Error(NOT_IMPLEMENTED);
+  },
+  healthCheck: () => {
+    throw new Error(NOT_IMPLEMENTED);
+  },
+  transactionsByAddresses: async (): Promise<Paginated<Cardano.HydratedTx>> => ({
+    pageResults: [],
+    totalResultCount: 0
+  }),
   transactionsByHashes: () => {
     throw new Error(NOT_IMPLEMENTED);
   }

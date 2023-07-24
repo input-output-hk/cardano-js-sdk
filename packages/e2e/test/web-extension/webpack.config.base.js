@@ -68,10 +68,6 @@ module.exports = {
       })
     ],
     resolve: {
-      alias: {
-        // imported by faucet provider in e2e/src, not used in web-extension
-        'cardano-wallet-js': false
-      },
       extensions: ['.ts', '.js'],
       fallback: {
         buffer: require.resolve('buffer/'),

@@ -9,9 +9,10 @@ import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { SrvRecord } from 'dns';
 import { clearDbPools } from '../../util';
-import { getPort, getRandomPort } from 'get-port-please';
+import { getPort } from 'get-port-please';
 import { healthCheckResponseMock, mockCardanoNode } from '../../../../core/test/CardanoNode/mocks';
 import { logger } from '@cardano-sdk/util-dev';
+import { mockDnsResolverFactory } from './util';
 import { types } from 'util';
 import axios from 'axios';
 
@@ -214,21 +215,13 @@ describe('Service dependency abstractions', () => {
   describe('Db pool provider with service discovery and Postgres server failover', () => {
     let provider: Pool | undefined;
     const pgPortDefault = 5433;
+    const mockDnsResolver = mockDnsResolverFactory(pgPortDefault);
 
     it('should resolve successfully if a connection error is thrown and re-connects to a new resolved record', async () => {
       const HEALTH_CHECK_QUERY = 'SELECT 1';
-      const srvRecord = { name: 'localhost', port: pgPortDefault, priority: 1, weight: 1 };
-      const failingPostgresMockPort = await getRandomPort();
-      let resolverAlreadyCalled = false;
 
-      // Initially resolves with a failing postgres port, then swap to the default one
-      const dnsResolverMock = jest.fn().mockImplementation(async () => {
-        if (!resolverAlreadyCalled) {
-          resolverAlreadyCalled = true;
-          return { ...srvRecord, port: failingPostgresMockPort };
-        }
-        return srvRecord;
-      });
+      // Resolves with a failing postgres port twice, then swap to the default one
+      const dnsResolverMock = await mockDnsResolver(2);
 
       provider = await getPool(dnsResolverMock, logger, {
         postgresDbDbSync: process.env.POSTGRES_DB_DB_SYNC!,
@@ -238,8 +231,8 @@ describe('Service dependency abstractions', () => {
       });
 
       const result = await provider!.query(HEALTH_CHECK_QUERY);
-      await expect(result.rowCount).toBeTruthy();
-      expect(dnsResolverMock).toBeCalledTimes(2);
+      expect(result.rowCount).toBeTruthy();
+      expect(dnsResolverMock).toBeCalledTimes(3);
     });
 
     it('should execute a provider operation without to intercept it', async () => {

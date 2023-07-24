@@ -2,18 +2,15 @@ import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { Cardano } from '@cardano-sdk/core';
 
 const compareAssetNameCanonically = (a: Ledger.Token, b: Ledger.Token) => {
-  if (a.assetNameHex === b.assetNameHex) {
+  if (a.assetNameHex.length === b.assetNameHex.length) {
     return a.assetNameHex > b.assetNameHex ? 1 : -1;
   } else if (a.assetNameHex.length > b.assetNameHex.length) return 1;
   return -1;
 };
 
-const comparePolicyIdCanonically = (a: Ledger.AssetGroup, b: Ledger.AssetGroup) => {
-  if (a.policyIdHex === b.policyIdHex) {
-    return a.policyIdHex > b.policyIdHex ? 1 : -1;
-  } else if (a.policyIdHex.length > b.policyIdHex.length) return 1;
-  return -1;
-};
+const comparePolicyIdCanonically = (a: Ledger.AssetGroup, b: Ledger.AssetGroup) =>
+  // PolicyId is always of the same length
+  a.policyIdHex > b.policyIdHex ? 1 : -1;
 
 const tokenMapToAssetGroup = (tokenMap: Cardano.TokenMap): Ledger.AssetGroup[] => {
   const map = new Map<string, Array<Ledger.Token>>();

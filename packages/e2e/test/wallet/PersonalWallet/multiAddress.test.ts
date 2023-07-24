@@ -1,16 +1,24 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import { AddressType, GroupedAddress, util } from '@cardano-sdk/key-management';
-import { KeyAgentFactoryProps, getWallet } from '../../../src';
+import { Cardano } from '@cardano-sdk/core';
+import {
+  KeyAgentFactoryProps,
+  createStandaloneKeyAgent,
+  firstValueFromTimed,
+  getWallet,
+  normalizeTxBody,
+  walletReady
+} from '../../../src';
 import { PersonalWallet } from '@cardano-sdk/wallet';
 import { createLogger } from '@cardano-sdk/util-dev';
-import { createStandaloneKeyAgent, firstValueFromTimed, normalizeTxBody, walletReady } from '../../util';
 import { filter, map, take } from 'rxjs';
 import { getEnv, walletVariables } from '../../../src/environment';
 import { isNotNil } from '@cardano-sdk/util';
 
 const env = getEnv(walletVariables);
 const logger = createLogger();
-const PAYMENT_ADDRESSES_TO_GENERATE = 60;
+const PAYMENT_INDICES_TO_GENERATE = 30;
+const PAYMENT_ADDRESSES_TO_GENERATE = PAYMENT_INDICES_TO_GENERATE * 2; // External + Internal address for each payment derivation index
 const COINS_PER_ADDRESS = 3_000_000n;
 
 describe('PersonalWallet/multiAddress', () => {
@@ -39,37 +47,32 @@ describe('PersonalWallet/multiAddress', () => {
 
     let txBuilder = wallet.createTxBuilder();
 
-    let addressesToBeDiscovered = new Array<GroupedAddress>();
-
-    // Let's add the 5 stake keys.
-    for (let i = 0; i < 5; ++i) {
-      addressesToBeDiscovered.push(
-        await multiAddressKeyAgent.deriveAddress(
-          {
-            index: 0,
-            type: AddressType.External
-          },
-          i
-        )
-      );
-    }
+    const addressesToBeDiscovered = new Array<GroupedAddress>();
 
     // Deposit some tADA at some generated addresses from the previously generated mnemonics.
-    for (let i = 0; i < PAYMENT_ADDRESSES_TO_GENERATE; ++i) {
-      const address = await multiAddressKeyAgent.deriveAddress(
-        {
-          index: i,
-          type: AddressType.External
-        },
-        0
-      );
+    for (let i = 0; i < PAYMENT_INDICES_TO_GENERATE; ++i) {
+      const [addressExternal, addressInternal] = await Promise.all([
+        multiAddressKeyAgent.deriveAddress(
+          {
+            index: i,
+            type: AddressType.External
+          },
+          0
+        ),
+        multiAddressKeyAgent.deriveAddress(
+          {
+            index: i,
+            type: AddressType.Internal
+          },
+          0
+        )
+      ]);
 
-      addressesToBeDiscovered.push(address);
-      txBuilder.addOutput(txBuilder.buildOutput().address(address.address).coin(3_000_000n).toTxOut());
+      addressesToBeDiscovered.push(addressExternal, addressInternal);
+
+      txBuilder.addOutput(txBuilder.buildOutput().address(addressExternal.address).coin(3_000_000n).toTxOut());
+      txBuilder.addOutput(txBuilder.buildOutput().address(addressInternal.address).coin(3_000_000n).toTxOut());
     }
-
-    // Remove duplicates
-    addressesToBeDiscovered = [...new Set(addressesToBeDiscovered)];
 
     const { tx: signedTx } = await txBuilder.build().sign();
 
@@ -108,9 +111,16 @@ describe('PersonalWallet/multiAddress', () => {
 
     await walletReady(newWallet.wallet);
     const walletAddresses = await firstValueFromTimed(newWallet.wallet.addresses$);
+    const rewardAddresses = await firstValueFromTimed(newWallet.wallet.delegation.rewardAccounts$);
 
     // Let's check if all addresses has been discovered.
     expect(walletAddresses).toEqual(addressesToBeDiscovered);
+
+    // All addresses are built using the same stake key. Check that there is a single reward account
+    const expectedRewardAccount = walletAddresses[0].rewardAccount;
+    expect(rewardAddresses).toEqual([
+      expect.objectContaining<Partial<Cardano.RewardAccountInfo>>({ address: expectedRewardAccount })
+    ]);
 
     const totalBalance = await firstValueFromTimed(newWallet.wallet.balance.utxo.total$);
     const expectedAmount = PAYMENT_ADDRESSES_TO_GENERATE * Number(COINS_PER_ADDRESS);

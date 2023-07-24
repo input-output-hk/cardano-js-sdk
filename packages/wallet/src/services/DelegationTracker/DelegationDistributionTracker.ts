@@ -1,4 +1,4 @@
-import { BigIntMath, Percent, calcPercentages } from '@cardano-sdk/util';
+import { BigIntMath, Percent, calcPercentages, sameArrayItems } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
 import { DelegatedStake } from '../types';
 import { DelegationTrackerProps } from './DelegationTracker';
@@ -14,7 +14,7 @@ import {
   withLatestFrom
 } from 'rxjs';
 import { createUtxoBalanceByAddressTracker } from '../BalanceTracker';
-import { delegatedStakeEquals, sameArrayItems } from '../util';
+import { delegatedStakeEquals } from '../util';
 import _groupBy from 'lodash/groupBy';
 import _map from 'lodash/map';
 

@@ -1,4 +1,4 @@
-import { roundRobinRandomImprove } from '@cardano-sdk/input-selection';
+import { StaticChangeAddressResolver, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 
 import { Cardano } from '@cardano-sdk/core';
 import { InitializeTxProps, InitializeTxResult } from '../types';
@@ -25,7 +25,7 @@ export const initializeTx = async (
   inputSelector =
     inputSelector ??
     roundRobinRandomImprove({
-      getChangeAddress: async () => addresses[0].address
+      changeAddressResolver: new StaticChangeAddressResolver(() => firstValueFrom(keyAgent.knownAddresses$))
     });
 
   const validityInterval = ensureValidityInterval(tip.slot, genesisParameters, props.options?.validityInterval);

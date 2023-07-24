@@ -1,17 +1,18 @@
 import { Cardano, cmlUtil } from '@cardano-sdk/core';
+import { ChangeAddressResolver } from '../ChangeAddress';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 import { InputSelectionParameters, InputSelector, SelectionResult } from '../types';
-import { assertIsBalanceSufficient, preProcessArgs, toValues } from '../util';
+import { assertIsBalanceSufficient, preProcessArgs, stubMaxSizeAddress, toValues } from '../util';
 import { computeChangeAndAdjustForFee } from './change';
 import { roundRobinSelection } from './roundRobin';
 
 interface RoundRobinRandomImproveOptions {
-  getChangeAddress: () => Promise<Cardano.PaymentAddress>;
+  changeAddressResolver: ChangeAddressResolver;
   random?: typeof Math.random;
 }
 
 export const roundRobinRandomImprove = ({
-  getChangeAddress,
+  changeAddressResolver,
   random = Math.random
 }: RoundRobinRandomImproveOptions): InputSelector => ({
   select: async ({
@@ -20,7 +21,7 @@ export const roundRobinRandomImprove = ({
     constraints: { computeMinimumCost, computeSelectionLimit, computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit },
     implicitValue: partialImplicitValue = {}
   }: InputSelectionParameters): Promise<SelectionResult> => {
-    const changeAddress = await getChangeAddress();
+    const changeAddress = stubMaxSizeAddress;
     const { utxo, outputs, uniqueTxAssetIDs, implicitValue } = preProcessArgs(
       utxoSet,
       outputSet,
@@ -63,23 +64,29 @@ export const roundRobinRandomImprove = ({
     });
 
     const inputs = new Set(result.inputs);
-    const change = result.change.map((value) => ({
-      address: changeAddress,
-      value
-    }));
 
-    if (result.inputs.length > (await computeSelectionLimit({ change, fee: result.fee, inputs, outputs: outputSet }))) {
+    const selection = {
+      change: result.change.map((value) => ({
+        address: changeAddress,
+        value
+      })),
+      fee: result.fee,
+      inputs,
+      outputs: outputSet
+    };
+
+    selection.change = await changeAddressResolver.resolve(selection);
+
+    if (
+      result.inputs.length >
+      (await computeSelectionLimit({ change: selection.change, fee: selection.fee, inputs, outputs: outputSet }))
+    ) {
       throw new InputSelectionError(InputSelectionFailure.MaximumInputCountExceeded);
     }
 
     return {
       remainingUTxO: new Set(result.remainingUTxO),
-      selection: {
-        change,
-        fee: result.fee,
-        inputs,
-        outputs: outputSet
-      }
+      selection
     };
   }
 });

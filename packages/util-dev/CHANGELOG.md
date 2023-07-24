@@ -3,6 +3,55 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.13.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.13.7...@cardano-sdk/util-dev@0.13.8) (2023-07-13)
+
+**Note:** Version bump only for package @cardano-sdk/util-dev
+
+## [0.13.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.13.6...@cardano-sdk/util-dev@0.13.7) (2023-07-04)
+
+**Note:** Version bump only for package @cardano-sdk/util-dev
+
+## [0.13.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.13.5...@cardano-sdk/util-dev@0.13.6) (2023-06-29)
+
+### Features
+
+* **util-dev:** add binds option to setup postgres container ([57040ca](https://github.com/input-output-hk/cardano-js-sdk/commit/57040cabca22644a6470a9e1a7d2d78adedca5c9))
+
+## [0.13.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.13.4...@cardano-sdk/util-dev@0.13.5) (2023-06-29)
+
+**Note:** Version bump only for package @cardano-sdk/util-dev
+
+## [0.13.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.13.3...@cardano-sdk/util-dev@0.13.4) (2023-06-28)
+
+### Features
+
+* adds cardanoAddress type in HandleResolution interface ([2ee31c9](https://github.com/input-output-hk/cardano-js-sdk/commit/2ee31c9f0b61fc5e67385128448225d2d1d85617))
+* implement verification and presubmission checks on handles in OgmiosTxProvider ([0f18042](https://github.com/input-output-hk/cardano-js-sdk/commit/0f1804287672968614e8aa6bf2f095b0e9a88b22))
+
+## [0.13.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.13.2...@cardano-sdk/util-dev@0.13.3) (2023-06-23)
+
+**Note:** Version bump only for package @cardano-sdk/util-dev
+
+## [0.13.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.13.1...@cardano-sdk/util-dev@0.13.2) (2023-06-20)
+
+**Note:** Version bump only for package @cardano-sdk/util-dev
+
+## [0.13.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.13.0...@cardano-sdk/util-dev@0.13.1) (2023-06-13)
+
+### Bug Fixes
+
+* correct ledger mapping canonical asset and asset group ordering ([2095877](https://github.com/input-output-hk/cardano-js-sdk/commit/20958773d2885ee3e1934363dce96b4e8cea96a7))
+
+## [0.13.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.12.1...@cardano-sdk/util-dev@0.13.0) (2023-06-12)
+
+### ⚠ BREAKING CHANGES
+
+* SignedTx.ctx now renamed to context
+
+### Features
+
+* add context to txSubmit ([57589ec](https://github.com/input-output-hk/cardano-js-sdk/commit/57589ecd3120573a0cea7e718291454e9b6f9f3b))
+
 ## [0.12.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.12.0...@cardano-sdk/util-dev@0.12.1) (2023-06-06)
 
 ### Features

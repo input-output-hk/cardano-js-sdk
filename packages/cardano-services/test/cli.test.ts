@@ -167,16 +167,21 @@ const callCliAndAssertExit = (
   });
 };
 
+const HANDLE_POLICY_IDS = 'f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a';
+const HANDLE_PROVIDER_SERVER_URL = 'http://localhost:3000';
+
 describe('CLI', () => {
   const container = new RabbitMQContainer();
   let db: Pool;
   let fixtureBuilder: AssetFixtureBuilder;
   let lastBlock: LedgerTipModel;
   let postgresConnectionString: string;
+  let postgresConnectionStringHandle: string;
   let postgresConnectionStringStakePool: string;
 
   beforeAll(() => {
     postgresConnectionString = process.env.POSTGRES_CONNECTION_STRING_DB_SYNC!;
+    postgresConnectionStringHandle = process.env.POSTGRES_CONNECTION_STRING_HANDLE!;
     postgresConnectionStringStakePool = process.env.POSTGRES_CONNECTION_STRING_STAKE_POOL!;
   });
 
@@ -277,12 +282,18 @@ describe('CLI', () => {
                   'true',
                   '--postgres-connection-string-db-sync',
                   postgresConnectionString,
+                  '--postgres-connection-string-handle',
+                  postgresConnectionStringHandle,
                   '--ogmios-url',
                   ogmiosConnection.address.webSocket,
                   '--cardano-node-config-path',
                   cardanoNodeConfigPath,
                   '--db-cache-ttl',
                   dbCacheTtl,
+                  '--handle-policy-ids',
+                  HANDLE_POLICY_IDS,
+                  '--handle-provider-server-url',
+                  HANDLE_PROVIDER_SERVER_URL,
                   ServiceNames.Asset,
                   ServiceNames.ChainHistory,
                   ServiceNames.NetworkInfo,
@@ -312,9 +323,12 @@ describe('CLI', () => {
                   CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
                   DB_CACHE_TTL: dbCacheTtl,
                   ENABLE_METRICS: 'true',
+                  HANDLE_POLICY_IDS,
+                  HANDLE_PROVIDER_SERVER_URL,
                   LOGGER_MIN_SEVERITY: 'error',
                   OGMIOS_URL: ogmiosConnection.address.webSocket,
                   POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
+                  POSTGRES_CONNECTION_STRING_HANDLE: postgresConnectionStringHandle,
                   SERVICE_NAMES: `${ServiceNames.Asset},${ServiceNames.ChainHistory},${ServiceNames.NetworkInfo},${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.Utxo},${ServiceNames.Rewards}`
                 },
                 stdio: 'pipe'
@@ -342,12 +356,18 @@ describe('CLI', () => {
                   'true',
                   '--postgres-connection-string-db-sync',
                   postgresConnectionString,
+                  '--postgres-connection-string-handle',
+                  postgresConnectionStringHandle,
                   '--ogmios-url',
                   ogmiosConnection.address.webSocket,
                   '--cardano-node-config-path',
                   cardanoNodeConfigPath,
                   '--db-cache-ttl',
                   dbCacheTtl,
+                  '--handle-policy-ids',
+                  HANDLE_POLICY_IDS,
+                  '--handle-provider-server-url',
+                  HANDLE_PROVIDER_SERVER_URL,
                   ServiceNames.Asset,
                   ServiceNames.ChainHistory,
                   ServiceNames.NetworkInfo,
@@ -371,9 +391,12 @@ describe('CLI', () => {
                   CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
                   DB_CACHE_TTL: dbCacheTtl,
                   ENABLE_METRICS: 'true',
+                  HANDLE_POLICY_IDS,
+                  HANDLE_PROVIDER_SERVER_URL,
                   LOGGER_MIN_SEVERITY: 'error',
                   OGMIOS_URL: ogmiosConnection.address.webSocket,
                   POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
+                  POSTGRES_CONNECTION_STRING_HANDLE: postgresConnectionStringHandle,
                   SERVICE_NAMES: `${ServiceNames.Asset},${ServiceNames.ChainHistory},${ServiceNames.NetworkInfo},${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.Utxo},${ServiceNames.Rewards}`
                 },
                 stdio: 'pipe'
@@ -391,9 +414,12 @@ describe('CLI', () => {
                   CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
                   DB_CACHE_TTL: dbCacheTtl,
                   ENABLE_METRICS: 'false',
+                  HANDLE_POLICY_IDS,
+                  HANDLE_PROVIDER_SERVER_URL,
                   LOGGER_MIN_SEVERITY: 'error',
                   OGMIOS_URL: ogmiosConnection.address.webSocket,
                   POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
+                  POSTGRES_CONNECTION_STRING_HANDLE: postgresConnectionStringHandle,
                   SERVICE_NAMES: `${ServiceNames.Asset},${ServiceNames.ChainHistory},${ServiceNames.NetworkInfo},${ServiceNames.StakePool},${ServiceNames.TxSubmit},${ServiceNames.Utxo},${ServiceNames.Rewards}`
                 },
                 stdio: 'pipe'
@@ -1390,8 +1416,14 @@ describe('CLI', () => {
                     ...baseArgs,
                     '--api-url',
                     apiUrl,
+                    '--handle-policy-ids',
+                    HANDLE_POLICY_IDS,
+                    '--handle-provider-server-url',
+                    HANDLE_PROVIDER_SERVER_URL,
                     '--postgres-connection-string-db-sync',
                     postgresConnectionString,
+                    '--postgres-connection-string-handle',
+                    postgresConnectionStringHandle,
                     '--cardano-node-config-path',
                     cardanoNodeConfigPath,
                     ServiceNames.NetworkInfo
@@ -1411,6 +1443,8 @@ describe('CLI', () => {
                   env: {
                     API_URL: apiUrl,
                     CARDANO_NODE_CONFIG_PATH: cardanoNodeConfigPath,
+                    HANDLE_POLICY_IDS,
+                    HANDLE_PROVIDER_SERVER_URL,
                     LOGGER_MIN_SEVERITY: 'error',
                     POSTGRES_CONNECTION_STRING_DB_SYNC: postgresConnectionString,
                     SERVICE_NAMES: ServiceNames.NetworkInfo
@@ -1423,10 +1457,25 @@ describe('CLI', () => {
 
             it('tx-submit uses the default Ogmios configuration if not specified when using CLI options', async () => {
               proc = withLogging(
-                fork(exePath, [...baseArgs, '--api-url', apiUrl, ServiceNames.TxSubmit], {
-                  env: {},
-                  stdio: 'pipe'
-                })
+                fork(
+                  exePath,
+                  [
+                    ...baseArgs,
+                    '--api-url',
+                    apiUrl,
+                    '--postgres-connection-string-handle',
+                    postgresConnectionStringHandle,
+                    '--handle-policy-ids',
+                    HANDLE_POLICY_IDS,
+                    '--handle-provider-server-url',
+                    HANDLE_PROVIDER_SERVER_URL,
+                    ServiceNames.TxSubmit
+                  ],
+                  {
+                    env: {},
+                    stdio: 'pipe'
+                  }
+                )
               );
               await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, { withTip: false });
             });
@@ -1436,7 +1485,10 @@ describe('CLI', () => {
                 fork(exePath, ['start-provider-server'], {
                   env: {
                     API_URL: apiUrl,
+                    HANDLE_POLICY_IDS,
+                    HANDLE_PROVIDER_SERVER_URL,
                     LOGGER_MIN_SEVERITY: 'error',
+                    POSTGRES_CONNECTION_STRING_HANDLE: postgresConnectionStringHandle,
                     SERVICE_NAMES: ServiceNames.TxSubmit,
                     USE_QUEUE: 'false'
                   },
@@ -1499,6 +1551,12 @@ describe('CLI', () => {
               callCliAndAssertExit(
                 {
                   args: [
+                    '--postgres-connection-string-handle',
+                    postgresConnectionStringHandle,
+                    '--handle-policy-ids',
+                    HANDLE_POLICY_IDS,
+                    '--handle-provider-server-url',
+                    HANDLE_PROVIDER_SERVER_URL,
                     '--ogmios-srv-service-name',
                     ogmiosSrvServiceName,
                     '--service-discovery-timeout',
@@ -1518,7 +1576,10 @@ describe('CLI', () => {
                   dataMatchOnError: DNS_SERVER_NOT_REACHABLE_ERROR,
                   env: {
                     API_URL: apiUrl,
+                    HANDLE_POLICY_IDS,
+                    HANDLE_PROVIDER_SERVER_URL,
                     OGMIOS_SRV_SERVICE_NAME: ogmiosSrvServiceName,
+                    POSTGRES_CONNECTION_STRING_HANDLE: postgresConnectionStringHandle,
                     SERVICE_DISCOVERY_TIMEOUT: '1000',
                     SERVICE_NAMES: ServiceNames.TxSubmit
                   }
@@ -1568,6 +1629,12 @@ describe('CLI', () => {
               callCliAndAssertExit(
                 {
                   args: [
+                    '--postgres-connection-string-handle',
+                    postgresConnectionStringHandle,
+                    '--handle-policy-ids',
+                    HANDLE_POLICY_IDS,
+                    '--handle-provider-server-url',
+                    HANDLE_PROVIDER_SERVER_URL,
                     '--ogmios-url',
                     ogmiosConnection.address.webSocket,
                     '--ogmios-srv-service-name',
@@ -1587,8 +1654,11 @@ describe('CLI', () => {
                   dataMatchOnError: CLI_CONFLICTING_ENV_VARS_ERROR_MESSAGE,
                   env: {
                     API_URL: apiUrl,
+                    HANDLE_POLICY_IDS,
+                    HANDLE_PROVIDER_SERVER_URL,
                     OGMIOS_SRV_SERVICE_NAME: ogmiosSrvServiceName,
                     OGMIOS_URL: ogmiosConnection.address.webSocket,
+                    POSTGRES_CONNECTION_STRING_HANDLE: postgresConnectionStringHandle,
                     SERVICE_NAMES: ServiceNames.TxSubmit
                   }
                 },
@@ -1855,6 +1925,10 @@ describe('CLI', () => {
                     ...baseArgs,
                     '--api-url',
                     apiUrl,
+                    '--handle-policy-ids',
+                    HANDLE_POLICY_IDS,
+                    '--handle-provider-server-url',
+                    HANDLE_PROVIDER_SERVER_URL,
                     '--use-queue',
                     'true',
                     '--rabbitmq-url',
@@ -1875,6 +1949,8 @@ describe('CLI', () => {
                 fork(exePath, ['start-provider-server'], {
                   env: {
                     API_URL: apiUrl,
+                    HANDLE_POLICY_IDS,
+                    HANDLE_PROVIDER_SERVER_URL,
                     LOGGER_MIN_SEVERITY: 'error',
                     RABBITMQ_URL: rabbitmqUrl.toString(),
                     SERVICE_NAMES: ServiceNames.TxSubmit,
@@ -1892,6 +1968,10 @@ describe('CLI', () => {
               callCliAndAssertExit(
                 {
                   args: [
+                    '--handle-policy-ids',
+                    HANDLE_POLICY_IDS,
+                    '--handle-provider-server-url',
+                    HANDLE_PROVIDER_SERVER_URL,
                     '--use-queue',
                     'true',
                     '--rabbitmq-srv-service-name',
@@ -1913,6 +1993,8 @@ describe('CLI', () => {
                   dataMatchOnError: DNS_SERVER_NOT_REACHABLE_ERROR,
                   env: {
                     API_URL: apiUrl,
+                    HANDLE_POLICY_IDS,
+                    HANDLE_PROVIDER_SERVER_URL,
                     RABBITMQ_SRV_SERVICE_NAME: rabbitmqSrvServiceName,
                     SERVICE_DISCOVERY_TIMEOUT: '1000',
                     SERVICE_NAMES: ServiceNames.TxSubmit,
@@ -1982,6 +2064,8 @@ describe('CLI', () => {
                   apiUrl,
                   '--postgres-connection-string-db-sync',
                   postgresConnectionString,
+                  '--postgres-connection-string-handle',
+                  postgresConnectionStringHandle,
                   '--cardano-node-config-path',
                   cardanoNodeConfigPath,
                   '--ogmios-url',
@@ -2065,7 +2149,7 @@ describe('CLI', () => {
           startProjector([
             '--ogmios-url',
             'ws://localhost:1234',
-            '--postgres-connection-string-stake-pool',
+            '--postgres-connection-string',
             'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
             ProjectionName.UTXO
           ]);
@@ -2076,7 +2160,7 @@ describe('CLI', () => {
           startProjector([
             '--ogmios-url',
             'ws://localhost:1234',
-            '--postgres-connection-string-stake-pool',
+            '--postgres-connection-string',
             'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
             `${ProjectionName.UTXO},${ProjectionName.StakePool}`
           ]);
@@ -2089,7 +2173,7 @@ describe('CLI', () => {
             `${ProjectionName.UTXO},${ProjectionName.StakePool}`,
             '--ogmios-url',
             'ws://localhost:1234',
-            '--postgres-connection-string-stake-pool',
+            '--postgres-connection-string',
             'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection'
           ]);
           await assertServerAlive();
@@ -2099,7 +2183,7 @@ describe('CLI', () => {
           startProjector([
             '--ogmios-url',
             'ws://localhost:1234',
-            '--postgres-connection-string-stake-pool',
+            '--postgres-connection-string',
             'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
             '--drop-schema',
             'true',
@@ -2111,13 +2195,13 @@ describe('CLI', () => {
 
       it('can be started in SRV discovery mode', async () => {
         startProjector([
-          '--postgres-db-stake-pool',
+          '--postgres-db',
           'dbname',
-          '--postgres-password-stake-pool',
+          '--postgres-password',
           'password',
-          '--postgres-srv-service-name-stake-pool',
+          '--postgres-srv-service-name',
           'postgres.projection.com',
-          '--postgres-user-stake-pool',
+          '--postgres-user',
           'username',
           '--ogmios-srv-service-name',
           'ogmios.projection.com',
@@ -2126,6 +2210,99 @@ describe('CLI', () => {
           ProjectionName.UTXO
         ]);
         await assertServerAlive();
+      });
+
+      test('with handle projection and handle policy ids option', async () => {
+        startProjector([
+          '--ogmios-url',
+          'ws://localhost:1234',
+          '--postgres-connection-string',
+          'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
+          '--handle-policy-ids',
+          'f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a',
+          ProjectionName.Handle
+        ]);
+        await assertServerAlive();
+      });
+
+      test('with handle projection and handle policy ids file option', async () => {
+        const chunks: string[] = [];
+
+        startProjector([
+          '--ogmios-url',
+          'ws://localhost:1234',
+          '--postgres-connection-string',
+          'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
+          '--logger-min-severity',
+          'debug',
+          '--handle-policy-ids-file',
+          path.join(__dirname, 'policy_ids'),
+          ProjectionName.Handle
+        ]);
+
+        proc.stdout?.on('data', (data: Buffer) => chunks.push(data.toString('utf8')));
+
+        await assertServerAlive();
+
+        expect(chunks.join('')).toMatch(
+          'Creating projection with policyIds [\\"f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a\\"]'
+        );
+      });
+
+      it('exits with code 1 with handle projection without handle policy ids option', (done) => {
+        expect.assertions(2);
+        proc = withLogging(
+          fork(
+            exePath,
+            [
+              ...commonArgs,
+              '--ogmios-url',
+              'ws://localhost:1234',
+              '--postgres-connection-string',
+              'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
+              ProjectionName.Handle
+            ],
+            { env: {}, stdio: 'pipe' }
+          ),
+          true
+        );
+        proc.stderr!.on('data', (data) =>
+          expect(data.toString()).toMatch(
+            'MissingProgramOption: handle requires the Handle policy Ids or Handle policy Ids file program option'
+          )
+        );
+        proc.on('exit', (code) => {
+          expect(code).toBe(1);
+          done();
+        });
+      });
+
+      it('exits with code 1 with handle projection and invalid policy ids', (done) => {
+        expect.assertions(2);
+        proc = withLogging(
+          fork(
+            exePath,
+            [
+              ...commonArgs,
+              '--ogmios-url',
+              'ws://localhost:1234',
+              '--postgres-connection-string',
+              'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
+              '--handle-policy-ids',
+              'policyId',
+              ProjectionName.Handle
+            ],
+            { env: {}, stdio: 'pipe' }
+          ),
+          true
+        );
+        proc.stderr!.on('data', (data) =>
+          expect(data.toString()).toMatch("InvalidStringError: Invalid string: \"expected length '56', got 8")
+        );
+        proc.on('exit', (code) => {
+          expect(code).toBe(1);
+          done();
+        });
       });
     });
 
@@ -2152,8 +2329,7 @@ describe('CLI', () => {
           startProjector(
             {
               OGMIOS_URL: 'ws://localhost:1234',
-              POSTGRES_CONNECTION_STRING_STAKE_POOL:
-                'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection'
+              POSTGRES_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection'
             },
             [ProjectionName.UTXO]
           );
@@ -2164,8 +2340,7 @@ describe('CLI', () => {
           startProjector(
             {
               OGMIOS_URL: 'ws://localhost:1234',
-              POSTGRES_CONNECTION_STRING_STAKE_POOL:
-                'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection'
+              POSTGRES_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection'
             },
             [`${ProjectionName.UTXO},${ProjectionName.StakePool}`]
           );
@@ -2175,7 +2350,7 @@ describe('CLI', () => {
         test('with multiple projections as --projection-names argument', async () => {
           startProjector({
             OGMIOS_URL: 'ws://localhost:1234',
-            POSTGRES_CONNECTION_STRING_STAKE_POOL: 'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
+            POSTGRES_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
             PROJECTION_NAMES: `${ProjectionName.UTXO},${ProjectionName.StakePool}`
           });
           await assertServerAlive();
@@ -2186,10 +2361,10 @@ describe('CLI', () => {
         startProjector(
           {
             OGMIOS_SRV_SERVICE_NAME: 'ogmios.projection.com',
-            POSTGRES_DB_STAKE_POOL: 'dbname',
-            POSTGRES_PASSWORD_STAKE_POOL: 'password',
-            POSTGRES_SRV_SERVICE_NAME_STAKE_POOL: 'postgres.projection.com',
-            POSTGRES_USER_STAKE_POOL: 'username',
+            POSTGRES_DB: 'dbname',
+            POSTGRES_PASSWORD: 'password',
+            POSTGRES_SRV_SERVICE_NAME: 'postgres.projection.com',
+            POSTGRES_USER: 'username',
             SERVICE_DISCOVERY_TIMEOUT: '1000'
           },
           [ProjectionName.UTXO]

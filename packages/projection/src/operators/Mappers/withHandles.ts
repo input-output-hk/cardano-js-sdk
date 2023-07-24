@@ -1,6 +1,9 @@
 import { Cardano } from '@cardano-sdk/core';
+import { CustomError } from 'ts-custom-error';
 import { FilterByPolicyIds } from './types';
+import { HexBlob } from '@cardano-sdk/util';
 import { ProjectionOperator } from '../../types';
+import { logError } from './util';
 import { map } from 'rxjs';
 
 export interface Handle {
@@ -25,6 +28,34 @@ export interface WithHandles {
 const handleFromAssetId = (assetId: Cardano.AssetId) =>
   Buffer.from(Cardano.AssetId.getAssetName(assetId), 'hex').toString('utf8');
 
+const isValidHandle = (handle: string) => {
+  const pattern = /^[\w.-]+$/;
+  return pattern.test(handle);
+};
+
+class HandleParsingError extends CustomError {
+  public constructor(handle: string, message = 'Invalid handle') {
+    super(`${message}: ${handle}`);
+  }
+}
+
+const mapHandleToData = (
+  assetId: Cardano.AssetId,
+  data: { datum?: HexBlob | undefined; address?: Cardano.PaymentAddress; policyId: Cardano.PolicyId }
+) => {
+  const handle = handleFromAssetId(assetId);
+  if (!isValidHandle(handle)) throw new HandleParsingError(handle);
+  const { datum, address, policyId } = data;
+
+  return {
+    assetId,
+    datum,
+    handle,
+    latestOwnerAddress: address || null,
+    policyId
+  };
+};
+
 const getOutputHandles = (outputs: Cardano.TxOut[], policyIds: FilterByPolicyIds['policyIds']) => {
   const handles: Record<string, Handle> = {};
   for (const { address, value, datum } of outputs) {
@@ -32,14 +63,12 @@ const getOutputHandles = (outputs: Cardano.TxOut[], policyIds: FilterByPolicyIds
     for (const [assetId] of value.assets.entries()) {
       const policyId = Cardano.AssetId.getPolicyId(assetId);
       if (!policyIds.includes(policyId)) continue;
-      const handle = handleFromAssetId(assetId);
-      handles[handle] = {
-        assetId,
-        datum,
-        handle,
-        latestOwnerAddress: address,
-        policyId
-      };
+      try {
+        const handleData = mapHandleToData(assetId, { address, datum, policyId });
+        handles[handleData.handle] = handleData;
+      } catch (error: unknown) {
+        logError(error);
+      }
     }
   }
   return handles;
@@ -53,13 +82,12 @@ const getBurnedHandles = (mint: Cardano.TokenMap | undefined, policyIds: FilterB
     if (quantity < 0n) {
       const policyId = Cardano.AssetId.getPolicyId(assetId);
       if (!policyIds.includes(policyId)) continue;
-      const handle = handleFromAssetId(assetId);
-      handles[handle] = {
-        assetId,
-        handle,
-        latestOwnerAddress: null,
-        policyId
-      };
+      try {
+        const handleData = mapHandleToData(assetId, { policyId });
+        handles[handleData.handle] = handleData;
+      } catch (error: unknown) {
+        logError(error);
+      }
     }
   }
   return handles;

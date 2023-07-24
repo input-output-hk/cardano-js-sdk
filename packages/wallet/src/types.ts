@@ -10,7 +10,7 @@ import {
 import { BalanceTracker, DelegationTracker, TransactionsTracker, UtxoTracker } from './services';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { GroupedAddress, cip8 } from '@cardano-sdk/key-management';
-import { InitializeTxProps, InitializeTxResult, TxBuilder, TxContext } from '@cardano-sdk/tx-construction';
+import { InitializeTxProps, InitializeTxResult, SignedTx, TxBuilder, TxContext } from '@cardano-sdk/tx-construction';
 import { Observable } from 'rxjs';
 import { Shutdown } from '@cardano-sdk/util';
 
@@ -84,7 +84,7 @@ export interface ObservableWallet {
   /**
    * @throws CardanoNodeErrors.TxSubmissionError
    */
-  submitTx(tx: Cardano.Tx | TxCBOR): Promise<Cardano.TransactionId>;
+  submitTx(tx: Cardano.Tx | TxCBOR | SignedTx): Promise<Cardano.TransactionId>;
 
   /**
    * Create a TxBuilder from this wallet

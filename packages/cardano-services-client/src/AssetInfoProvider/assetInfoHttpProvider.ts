@@ -1,5 +1,5 @@
-import { AssetProvider } from '@cardano-sdk/core';
-import { CreateHttpProviderConfig, HttpProviderConfigPaths, createHttpProvider } from '../HttpProvider';
+import { AssetProvider, HttpProviderConfigPaths } from '@cardano-sdk/core';
+import { CreateHttpProviderConfig, createHttpProvider } from '../HttpProvider';
 
 /**
  * The AssetProvider endpoint paths.

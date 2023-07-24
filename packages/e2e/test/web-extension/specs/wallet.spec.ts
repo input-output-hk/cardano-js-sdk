@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 import { getObservableWalletName } from '../extension/const';
 
 const switchToWalletUi = async () => {
@@ -10,6 +11,8 @@ const switchToWalletUi = async () => {
     }
   });
 };
+
+const NUM_POOLS = 3;
 
 describe('wallet', () => {
   const pWalletFound = '#root > div > p:nth-child(4)';
@@ -36,6 +39,11 @@ describe('wallet', () => {
   const dappChangeAddress = '#root > div > p:nth-child(11)';
   const dappStakingAddress = '#root > div > p:nth-child(12)';
   const dappUsedAddress = '#root > div > p:nth-child(13)';
+
+  const btnDelegate = '#multiDelegation .delegate button';
+  const spanPoolIds = '#multiDelegation .delegate .pools';
+  const liPools = '#multiDelegation .distribution li';
+  const liPercents = '#multiDelegation .distribution li .percent';
 
   // The address is filled in by the tests, which are order dependent
   let walletAddr1 = '';
@@ -67,12 +75,12 @@ describe('wallet', () => {
       await expect($(divAdaPrice)).toHaveText('2.99');
     });
 
-    describe('ui grants access and creates key agent', () => {
+    describe('web-extension grants access and creates key agent', () => {
       before(async () => {
         await $(btnGrantAccess).click();
         await $(btnActivateWallet1).click();
       });
-      it('ui has access to remote ObservableWallet and SupplyDistribution', async () => {
+      it('web-extension has access to remote ObservableWallet and SupplyDistribution', async () => {
         await browser.waitUntil(async () => {
           try {
             BigInt(await $(spanBalance).getText());
@@ -88,6 +96,9 @@ describe('wallet', () => {
         expect(walletStakeAddr1).toHaveTextContaining('stake');
         await expect($(activeWalletName)).toHaveText(getObservableWalletName(0));
       });
+    });
+
+    describe('dapp can use cip30 wallet api', () => {
       it('dapp has access to cip30 WalletApi', async () => {
         await browser.switchWindow('React App');
         await expect($(pNetworkId)).toHaveText('Network Id (0 = testnet; 1 = mainnet): 0');
@@ -105,11 +116,49 @@ describe('wallet', () => {
         await expect($(dappStakingAddress)).toHaveTextContaining(walletStakeAddr1);
         await expect($(dappUsedAddress)).toHaveTextContaining(walletAddr1);
       });
+    });
 
+    describe('web-extension can build transactions and use wallet manager', () => {
       it('can build and sign a transaction', async () => {
         await switchToWalletUi();
         await buildAndSign();
       });
+
+      it('can delegate to multiple pools', async () => {
+        (await $(btnDelegate)).click();
+
+        // There should be 3 pools available
+        await browser.waitUntil(async () => {
+          try {
+            const poolIds = await $(spanPoolIds).getText();
+            return poolIds.split(' ').length === NUM_POOLS;
+          } catch {
+            return false;
+          }
+        });
+
+        // Delegation transaction was submitted successfully
+        const txId = await $('#multiDelegation .delegateTxId').getText();
+        expect(txId).toHaveTextContaining('TxId');
+
+        // Wallet reports delegating to 3 pools
+        await browser.waitUntil(
+          async () => {
+            try {
+              const delegatedPools = await $$(liPools);
+              return delegatedPools.length === NUM_POOLS;
+            } catch {
+              return false;
+            }
+          },
+          { timeout: 30_000, timeoutMsg: 'Expected wallet.delegation.distribution to report 3 delegations' }
+        );
+
+        // Check wallet delegation distribution is applied and displayed correctly
+        const delegationPercents = await $$(liPercents).map((el) => el.getText());
+        expect(delegationPercents.map((percent) => Math.round(Number.parseFloat(percent)))).toEqual([10, 30, 60]);
+      });
+
       it('can switch to another wallet', async () => {
         // Automatically deactivates first wallet, but keeps the store available for future activation
         await $(btnActivateWallet2).click();

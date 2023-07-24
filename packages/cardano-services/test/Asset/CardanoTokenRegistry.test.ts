@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { Cardano, ProviderError, ProviderFailure, Seconds } from '@cardano-sdk/core';
 import { CardanoTokenRegistry, DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT, toCoreTokenMetadata } from '../../src/Asset';
 import { InMemoryCache, Key } from '../../src/InMemoryCache';
 import { logger } from '@cardano-sdk/util-dev';
@@ -115,7 +115,7 @@ describe('CardanoTokenRegistry', () => {
     beforeAll(async () => {
       ({ closeMock, serverUrl } = await mockTokenRegistry(async () => ({})));
       tokenRegistry = new CardanoTokenRegistry(
-        { cache: new TestInMemoryCache(60), logger },
+        { cache: new TestInMemoryCache(Seconds(60)), logger },
         { tokenMetadataServerUrl: serverUrl }
       );
     });

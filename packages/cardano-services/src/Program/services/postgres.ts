@@ -10,14 +10,24 @@ import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
 import { Pool, PoolConfig, QueryConfig } from 'pg';
 import { TlsOptions } from 'tls';
 import { URL } from 'url';
-import { isConnectionError } from '@cardano-sdk/util';
+import { isConnectionError, toSerializableObject } from '@cardano-sdk/util';
 import connString from 'pg-connection-string';
 import fs from 'fs';
+
+const TIMEOUT = 60 * 1000;
 
 const timedQuery = (pool: Pool, logger: Logger) => async (args: string | QueryConfig, values?: any) => {
   const startTime = Date.now();
   const result = await pool.query(args, values);
-  logger.debug(`Query\n${args}\ntook ${Date.now() - startTime} milliseconds`);
+  const query =
+    typeof args === 'string'
+      ? `${args} ${JSON.stringify(toSerializableObject(values))}\nMISSING PREPARED STATEMENT`
+      : 'text' in args && typeof args.text === 'string'
+      ? `${args.text} ${JSON.stringify(toSerializableObject(args.values))}`
+      : `${JSON.stringify(toSerializableObject({ args, values }))}\nUNEXPECTED QUERY FORMAT`;
+
+  logger.debug(`Query\n${query}\ntook ${Date.now() - startTime} milliseconds`);
+
   return result;
 };
 
@@ -37,10 +47,20 @@ export const getPoolWithServiceDiscovery = async (
   { host, database, max, password, ssl, user }: PoolConfig
 ): Promise<Pool> => {
   const { name, port } = await dnsResolver(host!);
-  let pool = new Pool({ database, host: name, max, password, port, ssl, user });
+  let pool = new Pool({
+    connectionTimeoutMillis: TIMEOUT,
+    database,
+    host: name,
+    max,
+    password,
+    port,
+    query_timeout: TIMEOUT,
+    ssl,
+    user
+  });
 
   return new Proxy<Pool>({} as Pool, {
-    get(_, prop) {
+    get(_, prop, receiver) {
       if (prop === 'then') return;
       if (prop === 'query') {
         return (args: string | QueryConfig, values?: any) =>
@@ -48,8 +68,18 @@ export const getPoolWithServiceDiscovery = async (
             if (isConnectionError(error)) {
               const record = await dnsResolver(host!);
               logger.info(`DNS resolution for Postgres service, resolved with record: ${JSON.stringify(record)}`);
-              pool = new Pool({ database, host: record.name, max, password, port: record.port, ssl, user });
-              return timedQuery(pool, logger)(args, values);
+              pool = new Pool({
+                connectionTimeoutMillis: TIMEOUT,
+                database,
+                host: record.name,
+                max,
+                password,
+                port: record.port,
+                query_timeout: TIMEOUT,
+                ssl,
+                user
+              });
+              return timedQuery(receiver, logger)(args, values);
             }
             throw error;
           });
@@ -78,16 +108,20 @@ const mergeTlsOptions = (
         ...(conn.ssl as TlsOptions),
         ca: ssl?.ca || (conn.ssl as TlsOptions).ca
       }
-    : (conn.ssl as boolean | undefined);
+    : ssl || !!conn.ssl;
 
-export const getConnectionConfig = (
+export const getConnectionConfig = <Suffix extends ConnectionNames>(
   dnsResolver: DnsResolver,
   program: string,
-  options?: PosgresProgramOptions<'StakePool'>
+  suffix: Suffix,
+  options?: PosgresProgramOptions<Suffix>
 ): Observable<PgConnectionConfig> => {
-  const ssl = options?.postgresSslCaFileStakePool ? { ca: loadSecret(options.postgresSslCaFileStakePool) } : undefined;
-  if (options?.postgresConnectionStringStakePool) {
-    const conn = connString.parse(options.postgresConnectionStringStakePool);
+  const postgresConnectionString = getPostgresOption(suffix, 'postgresConnectionString', options);
+  const postgresSslCaFile = getPostgresOption(suffix, 'postgresSslCaFile', options);
+  const ssl = postgresSslCaFile ? { ca: loadSecret(postgresSslCaFile) } : undefined;
+
+  if (postgresConnectionString) {
+    const conn = connString.parse(postgresConnectionString);
     if (!conn.database || !conn.host) {
       throw new InvalidProgramOption('postgresConnectionString');
     }
@@ -101,22 +135,22 @@ export const getConnectionConfig = (
     });
   }
 
-  if (
-    options?.postgresSrvServiceNameStakePool &&
-    options.postgresUserStakePool &&
-    options.postgresDbStakePool &&
-    options.postgresPasswordStakePool
-  ) {
+  const postgresDb = getPostgresOption(suffix, 'postgresDb', options);
+  const postgresPassword = getPostgresOption(suffix, 'postgresPassword', options);
+  const postgresSrvServiceName = getPostgresOption(suffix, 'postgresSrvServiceName', options);
+  const postgresUser = getPostgresOption(suffix, 'postgresUser', options);
+
+  if (postgresSrvServiceName && postgresUser && postgresDb && postgresPassword) {
     return defer(() =>
       from(
-        dnsResolver(options.postgresSrvServiceNameStakePool!).then(
+        dnsResolver(postgresSrvServiceName).then(
           (record): PgConnectionConfig => ({
-            database: options.postgresDbStakePool,
+            database: postgresDb,
             host: record.name,
-            password: options.postgresPasswordStakePool,
+            password: postgresPassword,
             port: record.port,
             ssl,
-            username: options.postgresUserStakePool
+            username: postgresUser
           })
         )
       )
@@ -142,7 +176,9 @@ export const getPool = async (
   if (options?.postgresConnectionStringDbSync) {
     const pool = new Pool({
       connectionString: options.postgresConnectionStringDbSync,
+      connectionTimeoutMillis: TIMEOUT,
       max: options.postgresPoolMaxDbSync,
+      query_timeout: TIMEOUT,
       ssl
     });
 

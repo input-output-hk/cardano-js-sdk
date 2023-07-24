@@ -2,9 +2,17 @@
 import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano } from '@cardano-sdk/core';
 import { ObservableWallet } from '@cardano-sdk/wallet';
-import { TX_TIMEOUT_DEFAULT, TestWallet, getEnv, getWallet, walletVariables } from '../../../src';
+import {
+  TX_TIMEOUT_DEFAULT,
+  TestWallet,
+  firstValueFromTimed,
+  getEnv,
+  getWallet,
+  waitForWalletStateSettle,
+  walletReady,
+  walletVariables
+} from '../../../src';
 import { combineLatest, filter, firstValueFrom } from 'rxjs';
-import { firstValueFromTimed, waitForWalletStateSettle, walletReady } from '../../util';
 import { logger } from '@cardano-sdk/util-dev';
 
 const env = getEnv(walletVariables);
@@ -105,7 +113,7 @@ describe('PersonalWallet/delegation', () => {
 
     const { tx } = await txBuilder
       .addOutput(await txBuilder.buildOutput().address(destAddresses).coin(tx1OutputCoins).build())
-      .delegate(poolId)
+      .delegatePortfolio({ pools: [{ id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolId)), weight: 1 }] })
       .build()
       .sign();
     await sourceWallet.submitTx(tx);
@@ -155,7 +163,7 @@ describe('PersonalWallet/delegation', () => {
     }
 
     // Make a 2nd tx with key de-registration
-    const { tx: txDeregisterSigned } = await sourceWallet.createTxBuilder().delegate().build().sign();
+    const { tx: txDeregisterSigned } = await sourceWallet.createTxBuilder().delegatePortfolio(null).build().sign();
     await sourceWallet.submitTx(txDeregisterSigned);
     await waitForTx(sourceWallet, txDeregisterSigned.id);
     const tx2ConfirmedState = await getWalletStateSnapshot(sourceWallet);

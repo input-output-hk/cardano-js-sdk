@@ -109,7 +109,10 @@ describe('StakePoolHttpService', () => {
     port = await getPort();
     baseUrl = `http://localhost:${port}/stake-pool`;
     config = { listen: { port } };
-    clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
+    clientConfig = {
+      baseUrl,
+      logger: createLogger({ level: INFO, name: 'unit tests' })
+    };
     fixtureBuilder = new DbSyncStakePoolFixtureBuilder(dbPools.main, logger);
     poolsInfo = await fixtureBuilder.getPools(3, { with: [PoolWith.Metadata] });
 
@@ -1057,7 +1060,9 @@ describe('StakePoolHttpService', () => {
               expect(response.pageResults).toEqual(responseCached.pageResults);
             });
             it('pledgeMet false, status retiring, and condition', async () => {
-              const retiring = await fixtureBuilder.getPools(1, { with: [PoolWith.RetiringState] });
+              const retiring = await fixtureBuilder.getPools(1, {
+                with: [PoolWith.RetiringState, PoolWith.PledgeNotMet]
+              });
               const filter: QueryStakePoolsArgs = {
                 filters: {
                   identifier: {

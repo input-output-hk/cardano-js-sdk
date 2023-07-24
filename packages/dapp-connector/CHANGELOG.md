@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.9.9...@cardano-sdk/dapp-connector@0.9.10) (2023-07-04)
+
+**Note:** Version bump only for package @cardano-sdk/dapp-connector
+
+## [0.9.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.9.8...@cardano-sdk/dapp-connector@0.9.9) (2023-06-29)
+
+**Note:** Version bump only for package @cardano-sdk/dapp-connector
+
+## [0.9.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.9.7...@cardano-sdk/dapp-connector@0.9.8) (2023-06-28)
+
+**Note:** Version bump only for package @cardano-sdk/dapp-connector
+
+## [0.9.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.9.6...@cardano-sdk/dapp-connector@0.9.7) (2023-06-23)
+
+**Note:** Version bump only for package @cardano-sdk/dapp-connector
+
+## [0.9.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.9.5...@cardano-sdk/dapp-connector@0.9.6) (2023-06-20)
+
+**Note:** Version bump only for package @cardano-sdk/dapp-connector
+
+## [0.9.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.9.4...@cardano-sdk/dapp-connector@0.9.5) (2023-06-12)
+
+**Note:** Version bump only for package @cardano-sdk/dapp-connector
+
 ## [0.9.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.9.3...@cardano-sdk/dapp-connector@0.9.4) (2023-06-05)
 
 **Note:** Version bump only for package @cardano-sdk/dapp-connector

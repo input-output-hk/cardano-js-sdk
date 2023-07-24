@@ -1,22 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-export const connectionErrorCodes = [
+const connectionErrorCodes = new Set([
   'ETIMEDOUT',
   'ECONNRESET',
   'ECONNREFUSED',
   'EPIPE',
   'ENOTFOUND',
   'ENETUNREACH',
-  'EAI_AGAIN',
-  'WebSocket is closed'
-];
+  'EAI_AGAIN'
+]);
 
-export const isConnectionError = (error: any) => {
-  if (
-    (error?.code && connectionErrorCodes.includes(error.code)) ||
-    (error?.message && connectionErrorCodes.some((err) => error.message.includes(err)))
-  ) {
+const connectionErrorNames = new Set(['WebSocketClosed', 'ServerNotReady']);
+
+export const isConnectionError = (error: any): boolean => {
+  if (!error || typeof error !== 'object') return false;
+  if ((error?.name && connectionErrorNames.has(error.name)) || (error?.code && connectionErrorCodes.has(error.code))) {
     return true;
   }
-  return false;
+  return isConnectionError(error.innerError);
 };

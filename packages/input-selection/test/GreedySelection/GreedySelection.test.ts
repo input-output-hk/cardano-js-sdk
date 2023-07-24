@@ -2,7 +2,13 @@ import { Cardano } from '@cardano-sdk/core';
 import { GreedyInputSelector } from '../../src';
 import { MOCK_NO_CONSTRAINTS, mockConstraintsToConstraints } from '../util/selectionConstraints';
 import { TxTestUtil } from '@cardano-sdk/util-dev';
-import { asAssetId, asPaymentAddress, asTokenMap, assertInputSelectionProperties } from '../util';
+import {
+  asAssetId,
+  asPaymentAddress,
+  asTokenMap,
+  assertInputSelectionProperties,
+  getCoinValueForAddress
+} from '../util';
 
 describe('GreedySelection', () => {
   it('consumes all the UTXOs in the set and returns that total amount distributed in the change minus the fee', async () => {
@@ -45,13 +51,34 @@ describe('GreedySelection', () => {
     expect(inputs).toEqual(utxo);
     expect(remainingUTxO.size).toEqual(0);
     expect(fee).toEqual(expectedFee);
-    expect(change.length).toEqual(3);
-    expect(change[0].address).toEqual(asPaymentAddress('A'));
-    expect(change[0].value.coins).toEqual(3_333_334n - expectedFee);
-    expect(change[1].address).toEqual(asPaymentAddress('B'));
-    expect(change[1].value.coins).toEqual(3_333_334n);
-    expect(change[2].address).toEqual(asPaymentAddress('C'));
-    expect(change[2].value.coins).toEqual(3_333_332n);
+
+    expect(getCoinValueForAddress('A', change)).toEqual(3_333_334n - expectedFee);
+    expect(getCoinValueForAddress('B', change)).toEqual(3_333_334n);
+    expect(getCoinValueForAddress('C', change)).toEqual(3_333_332n);
+
+    expect(change).toEqual([
+      { address: 'A', value: { assets: new Map([]), coins: 1_666_167n } },
+      { address: 'B', value: { coins: 1_666_667n } },
+      { address: 'C', value: { coins: 1_666_666n } },
+      { address: 'A', value: { coins: 833_334n } },
+      { address: 'B', value: { coins: 833_334n } },
+      { address: 'C', value: { coins: 833_333n } },
+      { address: 'A', value: { coins: 416_667n } },
+      { address: 'B', value: { coins: 416_667n } },
+      { address: 'C', value: { coins: 416_667n } },
+      { address: 'A', value: { coins: 208_333n } },
+      { address: 'B', value: { coins: 208_333n } },
+      { address: 'C', value: { coins: 208_333n } },
+      { address: 'A', value: { coins: 104_167n } },
+      { address: 'B', value: { coins: 104_167n } },
+      { address: 'C', value: { coins: 104_167n } },
+      { address: 'A', value: { coins: 52_083n } },
+      { address: 'A', value: { coins: 52_083n } },
+      { address: 'B', value: { coins: 52_083n } },
+      { address: 'B', value: { coins: 52_083n } },
+      { address: 'C', value: { coins: 52_083n } },
+      { address: 'C', value: { coins: 52_083n } }
+    ]);
 
     assertInputSelectionProperties({
       constraints,
@@ -110,17 +137,50 @@ describe('GreedySelection', () => {
     expect(inputs).toEqual(utxo);
     expect(remainingUTxO.size).toEqual(0);
     expect(fee).toEqual(expectedFee);
-    expect(change.length).toEqual(5);
-    expect(change[0].address).toEqual(asPaymentAddress('A'));
-    expect(change[0].value.coins).toEqual(3_000_000n - expectedFee);
-    expect(change[1].address).toEqual(asPaymentAddress('B'));
-    expect(change[1].value.coins).toEqual(3_000_000n);
-    expect(change[2].address).toEqual(asPaymentAddress('C'));
-    expect(change[2].value.coins).toEqual(3_000_000n);
-    expect(change[3].address).toEqual(asPaymentAddress('D'));
-    expect(change[3].value.coins).toEqual(3_000_000n);
-    expect(change[4].address).toEqual(asPaymentAddress('E'));
-    expect(change[4].value.coins).toEqual(3_000_000n);
+
+    expect(getCoinValueForAddress('A', change)).toEqual(3_000_000n - expectedFee);
+    expect(getCoinValueForAddress('B', change)).toEqual(3_000_000n);
+    expect(getCoinValueForAddress('C', change)).toEqual(3_000_000n);
+    expect(getCoinValueForAddress('D', change)).toEqual(3_000_000n);
+    expect(getCoinValueForAddress('E', change)).toEqual(3_000_000n);
+
+    expect(change).toEqual([
+      { address: 'A', value: { assets: new Map([]), coins: 1_499_500n } },
+      { address: 'B', value: { coins: 1_500_000n } },
+      { address: 'C', value: { coins: 1_500_000n } },
+      { address: 'D', value: { coins: 1_500_000n } },
+      { address: 'E', value: { coins: 1_500_000n } },
+      { address: 'A', value: { coins: 750_000n } },
+      { address: 'B', value: { coins: 750_000n } },
+      { address: 'C', value: { coins: 750_000n } },
+      { address: 'D', value: { coins: 750_000n } },
+      { address: 'E', value: { coins: 750_000n } },
+      { address: 'A', value: { coins: 375_000n } },
+      { address: 'B', value: { coins: 375_000n } },
+      { address: 'C', value: { coins: 375_000n } },
+      { address: 'D', value: { coins: 375_000n } },
+      { address: 'E', value: { coins: 375_000n } },
+      { address: 'A', value: { coins: 187_500n } },
+      { address: 'B', value: { coins: 187_500n } },
+      { address: 'C', value: { coins: 187_500n } },
+      { address: 'D', value: { coins: 187_500n } },
+      { address: 'E', value: { coins: 187_500n } },
+      { address: 'A', value: { coins: 93_750n } },
+      { address: 'B', value: { coins: 93_750n } },
+      { address: 'C', value: { coins: 93_750n } },
+      { address: 'D', value: { coins: 93_750n } },
+      { address: 'E', value: { coins: 93_750n } },
+      { address: 'A', value: { coins: 46_875n } },
+      { address: 'A', value: { coins: 46_875n } },
+      { address: 'B', value: { coins: 46_875n } },
+      { address: 'B', value: { coins: 46_875n } },
+      { address: 'C', value: { coins: 46_875n } },
+      { address: 'C', value: { coins: 46_875n } },
+      { address: 'D', value: { coins: 46_875n } },
+      { address: 'D', value: { coins: 46_875n } },
+      { address: 'E', value: { coins: 46_875n } },
+      { address: 'E', value: { coins: 46_875n } }
+    ]);
 
     assertInputSelectionProperties({
       constraints,
@@ -197,28 +257,59 @@ describe('GreedySelection', () => {
     expect(inputs).toEqual(utxo);
     expect(remainingUTxO.size).toEqual(0);
     expect(fee).toEqual(expectedFee);
-    expect(change.length).toEqual(4);
-    expect(change[0].address).toEqual(asPaymentAddress('A'));
-    expect(change[0].value.coins).toEqual(4_250_000n - expectedFee);
-    expect(change[0].value.assets).toEqual(
-      asTokenMap([
-        [asAssetId('0'), 100n],
-        [asAssetId('1'), 23n],
-        [asAssetId('2'), 1n],
-        [asAssetId('3'), 1000n],
-        [asAssetId('4'), 1500n],
-        [asAssetId('5'), 500n]
-      ])
-    );
-    expect(change[1].address).toEqual(asPaymentAddress('B'));
-    expect(change[1].value.coins).toEqual(4_250_000n);
-    expect(change[1].value.assets).toBeUndefined();
-    expect(change[2].address).toEqual(asPaymentAddress('C'));
-    expect(change[2].value.coins).toEqual(4_250_000n);
-    expect(change[2].value.assets).toBeUndefined();
-    expect(change[3].address).toEqual(asPaymentAddress('D'));
-    expect(change[3].value.coins).toEqual(4_250_000n);
-    expect(change[2].value.assets).toBeUndefined();
+
+    expect(getCoinValueForAddress('A', change)).toEqual(4_250_000n - expectedFee);
+    expect(getCoinValueForAddress('B', change)).toEqual(4_250_000n);
+    expect(getCoinValueForAddress('C', change)).toEqual(4_250_000n);
+    expect(getCoinValueForAddress('D', change)).toEqual(4_250_000n);
+
+    expect(change).toEqual([
+      {
+        address: 'A',
+        value: {
+          assets: asTokenMap([
+            [asAssetId('0'), 100n],
+            [asAssetId('1'), 23n],
+            [asAssetId('2'), 1n],
+            [asAssetId('3'), 1000n],
+            [asAssetId('4'), 1500n],
+            [asAssetId('5'), 500n]
+          ]),
+          coins: 2_124_500n
+        }
+      },
+      { address: 'B', value: { coins: 2_125_000n } },
+      { address: 'C', value: { coins: 2_125_000n } },
+      { address: 'D', value: { coins: 2_125_000n } },
+      { address: 'A', value: { coins: 1_062_500n } },
+      { address: 'B', value: { coins: 1_062_500n } },
+      { address: 'C', value: { coins: 1_062_500n } },
+      { address: 'D', value: { coins: 1_062_500n } },
+      { address: 'A', value: { coins: 531_250n } },
+      { address: 'B', value: { coins: 531_250n } },
+      { address: 'C', value: { coins: 531_250n } },
+      { address: 'D', value: { coins: 531_250n } },
+      { address: 'A', value: { coins: 265_625n } },
+      { address: 'B', value: { coins: 265_625n } },
+      { address: 'C', value: { coins: 265_625n } },
+      { address: 'D', value: { coins: 265_625n } },
+      { address: 'A', value: { coins: 132_813n } },
+      { address: 'B', value: { coins: 132_813n } },
+      { address: 'C', value: { coins: 132_813n } },
+      { address: 'D', value: { coins: 132_813n } },
+      { address: 'A', value: { coins: 66_406n } },
+      { address: 'B', value: { coins: 66_406n } },
+      { address: 'C', value: { coins: 66_406n } },
+      { address: 'D', value: { coins: 66_406n } },
+      { address: 'A', value: { coins: 33_203n } },
+      { address: 'A', value: { coins: 33_203n } },
+      { address: 'B', value: { coins: 33_203n } },
+      { address: 'B', value: { coins: 33_203n } },
+      { address: 'C', value: { coins: 33_203n } },
+      { address: 'C', value: { coins: 33_203n } },
+      { address: 'D', value: { coins: 33_203n } },
+      { address: 'D', value: { coins: 33_203n } }
+    ]);
 
     assertInputSelectionProperties({
       constraints,
@@ -295,31 +386,65 @@ describe('GreedySelection', () => {
     expect(inputs).toEqual(utxo);
     expect(remainingUTxO.size).toEqual(0);
     expect(fee).toEqual(expectedFee);
-    expect(change.length).toEqual(3);
-    expect(change[0].address).toEqual(asPaymentAddress('A'));
-    expect(change[0].value.coins).toEqual(8_500_000n - expectedFee);
-    expect(change[0].value.assets).toEqual(
-      asTokenMap([
-        [asAssetId('4'), 1500n],
-        [asAssetId('5'), 500n]
-      ])
-    );
-    expect(change[1].address).toEqual(asPaymentAddress('B'));
-    expect(change[1].value.coins).toEqual(4_250_000n);
-    expect(change[1].value.assets).toEqual(
-      asTokenMap([
-        [asAssetId('2'), 1n],
-        [asAssetId('3'), 1000n]
-      ])
-    );
-    expect(change[2].address).toEqual(asPaymentAddress('C'));
-    expect(change[2].value.coins).toEqual(4_250_000n);
-    expect(change[2].value.assets).toEqual(
-      asTokenMap([
-        [asAssetId('0'), 100n],
-        [asAssetId('1'), 23n]
-      ])
-    );
+
+    expect(getCoinValueForAddress('A', change)).toEqual(8_500_000n - expectedFee);
+    expect(getCoinValueForAddress('B', change)).toEqual(4_250_000n);
+    expect(getCoinValueForAddress('C', change)).toEqual(4_250_000n);
+
+    expect(change).toEqual([
+      {
+        address: 'A',
+        value: {
+          assets: asTokenMap([
+            [asAssetId('4'), 1500n],
+            [asAssetId('5'), 500n]
+          ]),
+          coins: 4_249_500n
+        }
+      },
+      {
+        address: 'A',
+        value: {
+          assets: asTokenMap([
+            [asAssetId('2'), 1n],
+            [asAssetId('3'), 1000n]
+          ]),
+          coins: 2_125_000n
+        }
+      },
+      {
+        address: 'B',
+        value: {
+          assets: asTokenMap([
+            [asAssetId('0'), 100n],
+            [asAssetId('1'), 23n]
+          ]),
+          coins: 2_125_000n
+        }
+      },
+      { address: 'C', value: { coins: 2_125_000n } },
+      { address: 'A', value: { coins: 1_062_500n } },
+      { address: 'B', value: { coins: 1_062_500n } },
+      { address: 'C', value: { coins: 1_062_500n } },
+      { address: 'A', value: { coins: 531_250n } },
+      { address: 'B', value: { coins: 531_250n } },
+      { address: 'C', value: { coins: 531_250n } },
+      { address: 'A', value: { coins: 265_625n } },
+      { address: 'B', value: { coins: 265_625n } },
+      { address: 'C', value: { coins: 265_625n } },
+      { address: 'A', value: { coins: 132_813n } },
+      { address: 'B', value: { coins: 132_813n } },
+      { address: 'C', value: { coins: 132_813n } },
+      { address: 'A', value: { coins: 66_406n } },
+      { address: 'B', value: { coins: 66_406n } },
+      { address: 'C', value: { coins: 66_406n } },
+      { address: 'A', value: { coins: 33_203n } },
+      { address: 'A', value: { coins: 33_203n } },
+      { address: 'B', value: { coins: 33_203n } },
+      { address: 'B', value: { coins: 33_203n } },
+      { address: 'C', value: { coins: 33_203n } },
+      { address: 'C', value: { coins: 33_203n } }
+    ]);
 
     assertInputSelectionProperties({
       constraints,
@@ -371,11 +496,28 @@ describe('GreedySelection', () => {
     expect(inputs).toEqual(utxo);
     expect(remainingUTxO.size).toEqual(0);
     expect(fee).toEqual(expectedFee);
-    expect(change.length).toEqual(2);
-    expect(change[0].address).toEqual(asPaymentAddress('A'));
-    expect(change[0].value.coins).toEqual(4_000_000n - expectedFee);
-    expect(change[1].address).toEqual(asPaymentAddress('B'));
-    expect(change[1].value.coins).toEqual(4_000_000n);
+
+    expect(getCoinValueForAddress('A', change)).toEqual(4_000_000n - expectedFee);
+    expect(getCoinValueForAddress('B', change)).toEqual(4_000_000n);
+
+    expect(change).toEqual([
+      { address: 'A', value: { assets: new Map([]), coins: 1_999_800n } },
+      { address: 'B', value: { coins: 2_000_000n } },
+      { address: 'A', value: { coins: 1_000_000n } },
+      { address: 'B', value: { coins: 1_000_000n } },
+      { address: 'A', value: { coins: 500_000n } },
+      { address: 'B', value: { coins: 500_000n } },
+      { address: 'A', value: { coins: 250_000n } },
+      { address: 'B', value: { coins: 250_000n } },
+      { address: 'A', value: { coins: 125_000n } },
+      { address: 'B', value: { coins: 125_000n } },
+      { address: 'A', value: { coins: 62_500n } },
+      { address: 'B', value: { coins: 62_500n } },
+      { address: 'A', value: { coins: 31_250n } },
+      { address: 'A', value: { coins: 31_250n } },
+      { address: 'B', value: { coins: 31_250n } },
+      { address: 'B', value: { coins: 31_250n } }
+    ]);
 
     assertInputSelectionProperties({
       constraints,
@@ -425,10 +567,17 @@ describe('GreedySelection', () => {
     expect(inputs).toEqual(utxo);
     expect(remainingUTxO.size).toEqual(0);
     expect(fee).toEqual(expectedFee);
-    expect(change.length).toEqual(1);
-    expect(change[0].address).toEqual(asPaymentAddress('A'));
-    expect(change[0].value.coins).toEqual(10_000_000n - expectedFee);
-    expect(change[0].value.assets).toEqual(asTokenMap([[asAssetId('0'), 1n]]));
+
+    expect(getCoinValueForAddress('A', change)).toEqual(10_000_000n - expectedFee);
+
+    expect(change).toEqual([
+      { address: 'A', value: { assets: asTokenMap([[asAssetId('0'), 1n]]), coins: 4_999_800n } },
+      { address: 'A', value: { coins: 2_500_000n } },
+      { address: 'A', value: { coins: 1_250_000n } },
+      { address: 'A', value: { coins: 625_000n } },
+      { address: 'A', value: { coins: 312_500n } },
+      { address: 'A', value: { coins: 312_500n } }
+    ]);
 
     assertInputSelectionProperties({
       constraints,
@@ -479,10 +628,17 @@ describe('GreedySelection', () => {
     expect(inputs).toEqual(utxo);
     expect(remainingUTxO.size).toEqual(0);
     expect(fee).toEqual(expectedFee);
-    expect(change.length).toEqual(1);
-    expect(change[0].address).toEqual(asPaymentAddress('A'));
-    expect(change[0].value.coins).toEqual(10_000_000n - expectedFee);
-    expect(change[0].value.assets).toEqual(asTokenMap([[asAssetId('0'), 500n]]));
+
+    expect(getCoinValueForAddress('A', change)).toEqual(10_000_000n - expectedFee);
+
+    expect(change).toEqual([
+      { address: 'A', value: { assets: asTokenMap([[asAssetId('0'), 500n]]), coins: 4_999_800n } },
+      { address: 'A', value: { coins: 2_500_000n } },
+      { address: 'A', value: { coins: 1_250_000n } },
+      { address: 'A', value: { coins: 625_000n } },
+      { address: 'A', value: { coins: 312_500n } },
+      { address: 'A', value: { coins: 312_500n } }
+    ]);
 
     assertInputSelectionProperties({
       constraints,

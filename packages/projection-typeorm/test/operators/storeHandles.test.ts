@@ -1,3 +1,4 @@
+import { Asset, Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import {
   AssetEntity,
   BlockDataEntity,
@@ -14,7 +15,6 @@ import {
   withTypeormTransaction
 } from '../../src';
 import { BaseProjectionEvent, Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
-import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger, mockProviders } from '@cardano-sdk/util-dev';
 import { Observable, defer, firstValueFrom, from } from 'rxjs';
 import { QueryRunner } from 'typeorm';
@@ -373,6 +373,44 @@ describe('storeHandles', () => {
         cardanoAddress: maryAddress,
         handle
       });
+    });
+
+    it('ignores assets minted under the policy with a cip67 UserFT label', async () => {
+      const mintTxId = Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000');
+      const repository = queryRunner.manager.getRepository(HandleEntity);
+      const invalidAssetName = Asset.AssetNameLabel.encode(Cardano.AssetName('ace'), Asset.AssetNameLabelNum.UserFT);
+      const invalidAssetId = Cardano.AssetId.fromParts(mockProviders.handlePolicyId, invalidAssetName);
+      const testAddress = Cardano.PaymentAddress(
+        'addr_test1qz690wvatwqgzt5u85hfzjxa8qqzthqwtp7xq8t3wh6ttc98hqtvlesvrpvln3srklcvhu2r9z22fdhaxvh2m2pg3nuq0n8gf2'
+      );
+      const newHandle = 'test_me_0001';
+
+      const source$ = createMultiTxProjectionSource([
+        {
+          body: {
+            fee: 111n,
+            inputs: [],
+            mint: new Map([[invalidAssetId, 1n]]),
+            outputs: [
+              {
+                address: testAddress,
+                value: {
+                  assets: new Map([[invalidAssetId, 1n]]),
+                  coins: 123n
+                }
+              }
+            ]
+          },
+          id: mintTxId
+        }
+      ]);
+      await firstValueFrom(source$.pipe(applyOperators()));
+      expect(
+        await repository.findOne({
+          select: { cardanoAddress: true, handle: true },
+          where: { handle: newHandle }
+        })
+      ).toEqual(null);
     });
   });
 });

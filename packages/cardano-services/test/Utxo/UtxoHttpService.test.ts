@@ -236,7 +236,7 @@ describe('UtxoHttpService', () => {
       });
 
       it('returns UTxOs containing multiple assets and one of the assets has no name', async () => {
-        const addresses = await fixtureBuilder.getAddresses(1, {
+        const addresses = await fixtureBuilder.getAddresses(2, {
           with: [AddressWith.MultiAsset, AddressWith.AssetWithoutName]
         });
         const res = await provider.utxoByAddresses({ addresses });

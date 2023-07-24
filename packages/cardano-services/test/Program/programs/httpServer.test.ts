@@ -18,7 +18,7 @@ import {
   loadProviderServer
 } from '../../../src';
 import { Ogmios } from '@cardano-sdk/ogmios';
-import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { ProviderError, ProviderFailure, Seconds } from '@cardano-sdk/core';
 import { SrvRecord } from 'dns';
 import { URL } from 'url';
 import {
@@ -40,12 +40,13 @@ describe('HTTP Server', () => {
   let apiUrl: URL;
   let cardanoNodeConfigPath: string;
   let postgresConnectionStringDbSync: string;
+  let postgresConnectionStringHandle: string;
   let postgresSrvServiceNameDbSync: string;
   let postgresDbDbSync: string;
   let postgresUserDbSync: string;
   let postgresPasswordDbSync: string;
-  let dbCacheTtl: number;
-  let healthCheckCacheTtl: number;
+  let dbCacheTtl: Seconds;
+  let healthCheckCacheTtl: Seconds;
   let epochPollInterval: number;
   let httpServer: HttpServer;
   let ogmiosConnection: Ogmios.Connection;
@@ -59,6 +60,7 @@ describe('HTTP Server', () => {
   beforeEach(async () => {
     apiUrl = new URL(`http://localhost:${await getRandomPort()}`);
     postgresConnectionStringDbSync = process.env.POSTGRES_CONNECTION_STRING_DB_SYNC!;
+    postgresConnectionStringHandle = process.env.POSTGRES_CONNECTION_STRING_HANDLE!;
     postgresSrvServiceNameDbSync = process.env.POSTGRES_SRV_SERVICE_NAME_DB_SYNC!;
     postgresDbDbSync = process.env.POSTGRES_DB_DB_SYNC!;
     postgresUserDbSync = process.env.POSTGRES_USER_DB_SYNC!;
@@ -92,9 +94,11 @@ describe('HTTP Server', () => {
         cardanoNodeConfigPath,
         dbCacheTtl,
         epochPollInterval,
+        handlePolicyIds: [],
         healthCheckCacheTtl,
         ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
         postgresConnectionStringDbSync,
+        postgresConnectionStringHandle,
         serviceNames: [
           ServiceNames.StakePool,
           ServiceNames.TxSubmit,
@@ -114,6 +118,7 @@ describe('HTTP Server', () => {
           cardanoNodeConfigPath,
           dbCacheTtl,
           epochPollInterval,
+          handlePolicyIds: [],
           healthCheckCacheTtl,
           ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
           postgresDbDbSync,
@@ -138,6 +143,7 @@ describe('HTTP Server', () => {
               cardanoNodeConfigPath,
               dbCacheTtl,
               epochPollInterval,
+              handlePolicyIds: [],
               healthCheckCacheTtl,
               ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
               postgresDbDbSync: missingPostgresDb,
@@ -163,6 +169,7 @@ describe('HTTP Server', () => {
               cardanoNodeConfigPath,
               dbCacheTtl,
               epochPollInterval,
+              handlePolicyIds: [],
               healthCheckCacheTtl,
               ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
               serviceNames: [ServiceNames.StakePool]
@@ -183,8 +190,11 @@ describe('HTTP Server', () => {
           cardanoNodeConfigPath,
           dbCacheTtl,
           epochPollInterval,
+          handlePolicyIds: [],
           healthCheckCacheTtl,
           ogmiosSrvServiceName,
+          ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+          // postgresConnectionStringDbSync,
           serviceDiscoveryBackoffFactor,
           serviceDiscoveryTimeout,
           serviceNames: [ServiceNames.TxSubmit]
@@ -199,9 +209,10 @@ describe('HTTP Server', () => {
           cardanoNodeConfigPath,
           dbCacheTtl,
           epochPollInterval,
+          handlePolicyIds: [],
           healthCheckCacheTtl,
           ogmiosSrvServiceName,
-          ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+          // postgresConnectionStringDbSync,
           serviceDiscoveryBackoffFactor,
           serviceDiscoveryTimeout,
           serviceNames: [ServiceNames.TxSubmit]
@@ -218,7 +229,9 @@ describe('HTTP Server', () => {
               cardanoNodeConfigPath,
               dbCacheTtl,
               epochPollInterval,
+              handlePolicyIds: [],
               healthCheckCacheTtl,
+              postgresConnectionStringDbSync,
               serviceDiscoveryBackoffFactor,
               serviceDiscoveryTimeout,
               serviceNames: [ServiceNames.TxSubmit]
@@ -236,7 +249,11 @@ describe('HTTP Server', () => {
           cardanoNodeConfigPath,
           dbCacheTtl,
           epochPollInterval,
+          handlePolicyIds: [],
           healthCheckCacheTtl,
+          ogmiosSrvServiceName,
+          ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+          // postgresConnectionStringDbSync,
           rabbitmqSrvServiceName,
           serviceDiscoveryBackoffFactor,
           serviceDiscoveryTimeout,
@@ -253,7 +270,11 @@ describe('HTTP Server', () => {
           cardanoNodeConfigPath,
           dbCacheTtl,
           epochPollInterval,
+          handlePolicyIds: [],
           healthCheckCacheTtl,
+          ogmiosSrvServiceName,
+          ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+          // postgresConnectionStringDbSync,
           rabbitmqSrvServiceName,
           rabbitmqUrl,
           serviceDiscoveryBackoffFactor,
@@ -273,7 +294,11 @@ describe('HTTP Server', () => {
               cardanoNodeConfigPath,
               dbCacheTtl,
               epochPollInterval,
+              handlePolicyIds: [],
               healthCheckCacheTtl,
+              ogmiosSrvServiceName,
+              ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+              // postgresConnectionStringDbSync,
               serviceDiscoveryBackoffFactor,
               serviceDiscoveryTimeout,
               serviceNames: [ServiceNames.TxSubmit],
@@ -296,6 +321,7 @@ describe('HTTP Server', () => {
             apiUrl,
             dbCacheTtl: 0,
             epochPollInterval: 0,
+            handlePolicyIds: [],
             healthCheckCacheTtl,
             ogmiosUrl: new URL('http://localhost:1337'),
             postgresConnectionStringDbSync: 'postgres',
@@ -328,6 +354,7 @@ describe('HTTP Server', () => {
           cardanoNodeConfigPath,
           dbCacheTtl,
           epochPollInterval,
+          handlePolicyIds: [],
           healthCheckCacheTtl,
           ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
           postgresConnectionStringDbSync,

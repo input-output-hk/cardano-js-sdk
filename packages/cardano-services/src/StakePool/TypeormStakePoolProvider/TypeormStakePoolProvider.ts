@@ -33,7 +33,7 @@ export class TypeormStakePoolProvider extends TypeormProvider implements StakePo
   #paginationPageSizeLimit: number;
 
   constructor({ paginationPageSizeLimit }: TypeOrmStakePoolProviderProps, deps: TypeormProviderDependencies) {
-    super(deps);
+    super('TypeormStakePoolProvider', deps);
     this.#paginationPageSizeLimit = paginationPageSizeLimit;
   }
 

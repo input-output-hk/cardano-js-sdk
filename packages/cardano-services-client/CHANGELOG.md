@@ -3,6 +3,74 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.10.4...@cardano-sdk/cardano-services-client@0.10.5) (2023-07-13)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services-client
+
+## [0.10.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.10.3...@cardano-sdk/cardano-services-client@0.10.4) (2023-07-04)
+
+### Bug Fixes
+
+* **cardano-services-client:** background and profile image as ipfs url ([054b12f](https://github.com/input-output-hk/cardano-js-sdk/commit/054b12f6175d465ca60d3e756e924173e4a6061f))
+
+## [0.10.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.10.2...@cardano-sdk/cardano-services-client@0.10.3) (2023-07-03)
+
+### Bug Fixes
+
+* **cardano-services-client:** type of KoraLabsHandleProvider to be implementing HandleProvider ([96f36da](https://github.com/input-output-hk/cardano-js-sdk/commit/96f36da478a27137a3353e50eedf06e02aebda17))
+
+## [0.10.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.10.1...@cardano-sdk/cardano-services-client@0.10.2) (2023-06-29)
+
+### Bug Fixes
+
+* **cardano-services-client:** package.json import ([0293d14](https://github.com/input-output-hk/cardano-js-sdk/commit/0293d14d5ca2392b7c8580f6d701691324785710))
+
+## [0.10.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.10.0...@cardano-sdk/cardano-services-client@0.10.1) (2023-06-29)
+
+### Bug Fixes
+
+* fix handle api response property names ([2ecc994](https://github.com/input-output-hk/cardano-js-sdk/commit/2ecc9940e738105e014a1451d4a5e5cd95df6277))
+
+## [0.10.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.9.9...@cardano-sdk/cardano-services-client@0.10.0) (2023-06-28)
+
+### ⚠ BREAKING CHANGES
+
+* revert inclusion of version in the HttpProvider interface
+
+### Features
+
+* adds cardanoAddress type in HandleResolution interface ([2ee31c9](https://github.com/input-output-hk/cardano-js-sdk/commit/2ee31c9f0b61fc5e67385128448225d2d1d85617))
+* implement verification and presubmission checks on handles in OgmiosTxProvider ([0f18042](https://github.com/input-output-hk/cardano-js-sdk/commit/0f1804287672968614e8aa6bf2f095b0e9a88b22))
+
+### Bug Fixes
+
+* revert inclusion of version in the HttpProvider interface ([3f50013](https://github.com/input-output-hk/cardano-js-sdk/commit/3f5001367686668806bfe967d3d7b6dd5e96dccc))
+
+## [0.9.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.9.8...@cardano-sdk/cardano-services-client@0.9.9) (2023-06-23)
+
+### Features
+
+* add API and software version HTTP headers ([2e9664f](https://github.com/input-output-hk/cardano-js-sdk/commit/2e9664fcaff56adcfa4f21eb2b71b2fb6a3b411d))
+
+### Bug Fixes
+
+* handle undefined state on HandleResolution ([#774](https://github.com/input-output-hk/cardano-js-sdk/issues/774)) ([5e5fee3](https://github.com/input-output-hk/cardano-js-sdk/commit/5e5fee38fceb6312e5371bf594e5422ce2dcb7bf))
+
+## [0.9.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.9.7...@cardano-sdk/cardano-services-client@0.9.8) (2023-06-20)
+
+### Features
+
+* **cardano-services-client:** add handle http provider ([4cc6b4a](https://github.com/input-output-hk/cardano-js-sdk/commit/4cc6b4abf523d5d0643836abfded8a9befccbf3a))
+* map out optional properties from Koralab api response ([1efd986](https://github.com/input-output-hk/cardano-js-sdk/commit/1efd9862686136fd5c106ddc56e126e8b0da8868))
+
+## [0.9.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.9.6...@cardano-sdk/cardano-services-client@0.9.7) (2023-06-13)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services-client
+
+## [0.9.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.9.5...@cardano-sdk/cardano-services-client@0.9.6) (2023-06-12)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services-client
+
 ## [0.9.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.9.4...@cardano-sdk/cardano-services-client@0.9.5) (2023-06-06)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services-client

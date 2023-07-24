@@ -1,5 +1,5 @@
-import { CreateHttpProviderConfig, HttpProviderConfigPaths, createHttpProvider } from '../HttpProvider';
-import { ProviderError, ProviderFailure, UtxoProvider } from '@cardano-sdk/core';
+import { CreateHttpProviderConfig, createHttpProvider } from '../HttpProvider';
+import { HttpProviderConfigPaths, ProviderError, ProviderFailure, UtxoProvider } from '@cardano-sdk/core';
 import { mapHealthCheckError } from '../mapHealthCheckError';
 
 /**

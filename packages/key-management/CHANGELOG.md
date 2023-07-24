@@ -3,6 +3,58 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.8.0...@cardano-sdk/key-management@0.8.1) (2023-07-13)
+
+### Bug Fixes
+
+* wallet finalizeTx and CIP30 requiresForeignSignatures now wait for at least one known address ([b5fde00](https://github.com/input-output-hk/cardano-js-sdk/commit/b5fde0038dde4082d3cd5eac3bbb8141733ec5b6))
+
+## [0.8.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.7.11...@cardano-sdk/key-management@0.8.0) (2023-07-05)
+
+### ⚠ BREAKING CHANGES
+
+* **key-management:** change behavior of ensureStakeKeys to return all reward accounts
+
+### Features
+
+* **key-management:** change behavior of ensureStakeKeys to return all reward accounts ([faaf9b0](https://github.com/input-output-hk/cardano-js-sdk/commit/faaf9b02eff1dd786c93d1b95b22c0aad193def3))
+
+## [0.7.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.7.10...@cardano-sdk/key-management@0.7.11) (2023-07-04)
+
+**Note:** Version bump only for package @cardano-sdk/key-management
+
+## [0.7.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.7.9...@cardano-sdk/key-management@0.7.10) (2023-06-29)
+
+**Note:** Version bump only for package @cardano-sdk/key-management
+
+## [0.7.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.7.8...@cardano-sdk/key-management@0.7.9) (2023-06-29)
+
+**Note:** Version bump only for package @cardano-sdk/key-management
+
+## [0.7.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.7.7...@cardano-sdk/key-management@0.7.8) (2023-06-28)
+
+### Bug Fixes
+
+* **tx-construction:** wait for new stakeKeys in rewardAccounts ([a74b665](https://github.com/input-output-hk/cardano-js-sdk/commit/a74b66505e19681d21d547e6418f0980b112b070))
+
+## [0.7.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.7.6...@cardano-sdk/key-management@0.7.7) (2023-06-23)
+
+### Features
+
+* **key-agent:** util to derive stake keys ([f2691dc](https://github.com/input-output-hk/cardano-js-sdk/commit/f2691dce76b5bfe5b89369ff81af2cb9d591b4f6))
+
+## [0.7.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.7.5...@cardano-sdk/key-management@0.7.6) (2023-06-20)
+
+**Note:** Version bump only for package @cardano-sdk/key-management
+
+## [0.7.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.7.4...@cardano-sdk/key-management@0.7.5) (2023-06-13)
+
+**Note:** Version bump only for package @cardano-sdk/key-management
+
+## [0.7.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.7.3...@cardano-sdk/key-management@0.7.4) (2023-06-12)
+
+**Note:** Version bump only for package @cardano-sdk/key-management
+
 ## [0.7.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.7.2...@cardano-sdk/key-management@0.7.3) (2023-06-06)
 
 **Note:** Version bump only for package @cardano-sdk/key-management

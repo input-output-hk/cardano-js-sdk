@@ -16,7 +16,7 @@ export const poolId = 'test_pool' as Cardano.PoolId;
 
 export const initHandlerTest = async () => {
   const connectionConfig = {
-    database: process.env.POSTGRES_DB_STAKE_POOL!,
+    database: 'projection',
     host: process.env.POSTGRES_HOST_DB_SYNC!,
     password: process.env.POSTGRES_PASSWORD_DB_SYNC!,
     port: Number.parseInt(process.env.POSTGRES_PORT_DB_SYNC!, 10),

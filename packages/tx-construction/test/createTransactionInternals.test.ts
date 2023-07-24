@@ -2,6 +2,7 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { AssetId, mockProviders } from '@cardano-sdk/util-dev';
 import { Cardano, NetworkInfoProvider } from '@cardano-sdk/core';
 import { CreateTxInternalsProps, createTransactionInternals } from '../src';
+import { MockChangeAddressResolver } from './tx-builder/mocks';
 import { SelectionConstraints } from '../../input-selection/test/util';
 import { SelectionSkeleton, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 
@@ -29,8 +30,7 @@ describe('createTransactionInternals', () => {
     props: (inputSelection: SelectionSkeleton) => Partial<CreateTxInternalsProps> = () => ({})
   ) => {
     const result = await roundRobinRandomImprove({
-      getChangeAddress: async () =>
-        'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9' as Cardano.PaymentAddress
+      changeAddressResolver: new MockChangeAddressResolver()
     }).select({
       constraints: SelectionConstraints.NO_CONSTRAINTS,
       outputs: new Set(outputs),

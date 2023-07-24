@@ -1,8 +1,7 @@
 import { filter, firstValueFrom } from 'rxjs';
-import { getEnv, getWallet, walletVariables } from '../../../src';
+import { getEnv, getWallet, waitForWalletStateSettle, walletReady, walletVariables } from '../../../src';
 import { logger } from '@cardano-sdk/util-dev';
 import { storage } from '@cardano-sdk/wallet';
-import { waitForWalletStateSettle, walletReady } from '../../util';
 import delay from 'delay';
 
 const env = getEnv(walletVariables);

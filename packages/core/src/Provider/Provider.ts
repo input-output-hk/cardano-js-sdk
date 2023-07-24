@@ -25,3 +25,5 @@ export interface Provider {
    */
   healthCheck(): Promise<HealthCheckResponse>;
 }
+
+export type HttpProviderConfigPaths<T extends Provider> = { [methodName in keyof T]: string };

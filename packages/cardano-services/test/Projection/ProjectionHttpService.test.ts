@@ -1,10 +1,12 @@
 import { BaseProjectionEvent } from '@cardano-sdk/projection';
-import { Cardano, HealthCheckResponse } from '@cardano-sdk/core';
+import { Cardano, HealthCheckResponse, Milliseconds } from '@cardano-sdk/core';
 import { Observable } from 'rxjs';
 import { ProjectionHttpService, ProjectionName } from '../../src';
 import { dummyLogger } from 'ts-log';
+import delay from 'delay';
 
 describe('ProjectionHttpService', () => {
+  const healthTimeout = Milliseconds(10);
   let projection$: Observable<BaseProjectionEvent>;
   let unsubscribe: jest.Mock;
   let subscriptionCallback: (evt: {
@@ -31,6 +33,7 @@ describe('ProjectionHttpService', () => {
     jest.spyOn(projection$, 'subscribe');
     service = new ProjectionHttpService(
       {
+        healthTimeout,
         projection$,
         projectionNames: [ProjectionName.UTXO]
       },
@@ -78,6 +81,17 @@ describe('ProjectionHttpService', () => {
         ok: true,
         projectedTip: { blockNo: evt.block.header.blockNo } as Cardano.PartialBlockHeader
       } as HealthCheckResponse);
+    });
+
+    it('is unhealthy after starting, when no events are projected within "healthTimeout", then healthy when it recovers', async () => {
+      await service.start();
+      const evt = { block: { header: { blockNo: 2 } }, tip: { blockNo: 2 } };
+      subscriptionCallback(evt);
+      expect((await service.healthCheck()).ok).toBe(true);
+      await delay(healthTimeout + 1);
+      expect((await service.healthCheck()).ok).toBe(false);
+      subscriptionCallback(evt);
+      expect((await service.healthCheck()).ok).toBe(true);
     });
   });
 });

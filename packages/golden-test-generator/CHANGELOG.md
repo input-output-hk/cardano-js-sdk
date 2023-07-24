@@ -3,6 +3,50 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.18](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.7.17...@cardano-sdk/golden-test-generator@0.7.18) (2023-07-17)
+
+**Note:** Version bump only for package @cardano-sdk/golden-test-generator
+
+## [0.7.17](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.7.16...@cardano-sdk/golden-test-generator@0.7.17) (2023-07-13)
+
+**Note:** Version bump only for package @cardano-sdk/golden-test-generator
+
+## [0.7.16](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.7.15...@cardano-sdk/golden-test-generator@0.7.16) (2023-07-04)
+
+**Note:** Version bump only for package @cardano-sdk/golden-test-generator
+
+## [0.7.15](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.7.14...@cardano-sdk/golden-test-generator@0.7.15) (2023-07-03)
+
+**Note:** Version bump only for package @cardano-sdk/golden-test-generator
+
+## [0.7.14](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.7.13...@cardano-sdk/golden-test-generator@0.7.14) (2023-06-29)
+
+**Note:** Version bump only for package @cardano-sdk/golden-test-generator
+
+## [0.7.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.7.12...@cardano-sdk/golden-test-generator@0.7.13) (2023-06-29)
+
+**Note:** Version bump only for package @cardano-sdk/golden-test-generator
+
+## [0.7.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.7.11...@cardano-sdk/golden-test-generator@0.7.12) (2023-06-28)
+
+**Note:** Version bump only for package @cardano-sdk/golden-test-generator
+
+## [0.7.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.7.10...@cardano-sdk/golden-test-generator@0.7.11) (2023-06-23)
+
+**Note:** Version bump only for package @cardano-sdk/golden-test-generator
+
+## [0.7.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.7.9...@cardano-sdk/golden-test-generator@0.7.10) (2023-06-20)
+
+**Note:** Version bump only for package @cardano-sdk/golden-test-generator
+
+## [0.7.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.7.8...@cardano-sdk/golden-test-generator@0.7.9) (2023-06-13)
+
+**Note:** Version bump only for package @cardano-sdk/golden-test-generator
+
+## [0.7.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.7.7...@cardano-sdk/golden-test-generator@0.7.8) (2023-06-12)
+
+**Note:** Version bump only for package @cardano-sdk/golden-test-generator
+
 ## [0.7.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/golden-test-generator@0.7.6...@cardano-sdk/golden-test-generator@0.7.7) (2023-06-06)
 
 **Note:** Version bump only for package @cardano-sdk/golden-test-generator

@@ -26,6 +26,7 @@ module.exports = {
     'import/no-extraneous-dependencies': ['error', { devDependencies: ['**/test/**/*.ts'] }],
     // eslint compains about TS enums hence disable here and enable @typescript-eslint/no-shadow
     'import/no-unresolved': 0,
+    'jsdoc/require-jsdoc': 0,
     'jsdoc/require-param': 0,
     'jsdoc/require-param-type': 0,
     'jsdoc/require-returns': 0,
@@ -48,6 +49,16 @@ module.exports = {
     quotes: ['error', 'single', { avoidEscape: true }],
     'sort-imports': ['warn', { ignoreDeclarationSort: true }],
     'sort-imports-es6-autofix/sort-imports-es6': 'warn',
+    'max-len': [
+      'warn',
+      {
+        code: 120, // Keep the existing max line length of 120
+        ignoreComments: true,
+        ignoreUrls: true,
+        ignoreStrings: true,
+        ignoreTemplateLiterals: true
+      }
+    ],
     'sort-keys-fix/sort-keys-fix': ['warn', 'asc', { natural: true }],
     'template-tag-spacing': 0,
     'unicorn/filename-case': 0,
@@ -57,16 +68,7 @@ module.exports = {
     'unicorn/no-null': 0,
     'unicorn/prefer-module': 0,
     'unicorn/prefer-node-protocol': 0,
-    'unicorn/prevent-abbreviations': 0,
-    'max-len': [
-      'warn', {
-        "code": 120, // Keep the existing max line length of 120
-        "ignoreComments": true,
-        "ignoreUrls": true,
-        "ignoreStrings": true,
-        "ignoreTemplateLiterals": true
-      }
-    ]
+    'unicorn/prevent-abbreviations': 0
   },
   settings: {
     'import/resolver': {

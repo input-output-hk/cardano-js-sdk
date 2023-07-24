@@ -1,15 +1,16 @@
 import { Cardano } from '@cardano-sdk/core';
 import { PersonalWallet } from '@cardano-sdk/wallet';
-import { TestWallet, getEnv, getWallet, walletVariables } from '../../src';
-import { firstValueFrom } from 'rxjs';
 import {
+  TestWallet,
+  getEnv,
   getTxConfirmationEpoch,
-  requestCoins,
+  getWallet,
   runningAgainstLocalNetwork,
   submitAndConfirm,
-  transferCoins,
-  waitForEpoch
-} from '../util';
+  waitForEpoch,
+  walletVariables
+} from '../../src';
+import { firstValueFrom } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 import { waitForWalletStateSettle } from '../../../wallet/test/util';
 
@@ -21,9 +22,6 @@ describe('delegation rewards', () => {
   let wallet2: PersonalWallet;
 
   const initializeWallets = async () => {
-    const amountFromFaucet = 100_000_000_000n;
-    const tAdaToSend = 50_000_000n;
-
     ({ wallet: wallet1, providers } = await getWallet({
       env,
       logger,
@@ -31,9 +29,6 @@ describe('delegation rewards', () => {
       polling: { interval: 50 }
     }));
     ({ wallet: wallet2 } = await getWallet({ env, logger, name: 'Receiving Wallet', polling: { interval: 50 } }));
-
-    await requestCoins({ coins: amountFromFaucet, wallet: wallet1 });
-    await transferCoins({ coins: tAdaToSend, fromWallet: wallet1, toWallet: wallet2 });
 
     await waitForWalletStateSettle(wallet1);
     await waitForWalletStateSettle(wallet2);
@@ -67,7 +62,13 @@ describe('delegation rewards', () => {
 
     const submitDelegationTx = async () => {
       logger.info(`Creating delegation tx at epoch #${(await firstValueFrom(wallet1.currentEpoch$)).epochNo}`);
-      const { tx: signedTx } = await wallet1.createTxBuilder().delegate(poolId).build().sign();
+      const { tx: signedTx } = await wallet1
+        .createTxBuilder()
+        .delegatePortfolio({
+          pools: [{ id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolId)), weight: 1 }]
+        })
+        .build()
+        .sign();
       await wallet1.submitTx(signedTx);
       const { epochNo } = await firstValueFrom(wallet1.currentEpoch$);
       logger.info(`Delegation tx ${signedTx.id} submitted at epoch #${epochNo}`);

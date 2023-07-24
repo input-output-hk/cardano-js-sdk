@@ -5,6 +5,7 @@ import {
   MockOgmiosServerConfig,
   createMockOgmiosServer,
   listenPromise,
+  mockEraSummaries,
   mockGenesisConfig,
   serverClosePromise,
   waitForWsClientsDisconnect
@@ -48,6 +49,57 @@ describe('ObservableOgmiosCardanoNode', () => {
 
   beforeAll(async () => {
     connection = createConnectionObject({ port: await getRandomPort() });
+  });
+
+  describe('LSQs on QueryUnavailableInCurrentEra', () => {
+    it('genesisParameters$ keeps polling until query is available', async () => {
+      const server = await startMockOgmiosServer(connection.port, {
+        stateQuery: {
+          genesisConfig: {
+            response: [
+              { failWith: { type: 'queryUnavailableInCurrentEraError' }, success: false },
+              { failWith: { type: 'queryUnavailableInCurrentEraError' }, success: false },
+              { config: mockGenesisConfig, success: true }
+            ]
+          }
+        }
+      });
+      const node = new OgmiosObservableCardanoNode(
+        { connectionConfig$: of(connection), localStateQueryRetryConfig: { initialInterval: 1 } },
+        { logger }
+      );
+      // entire object is not equal because of the difference of core types vs ogmios types
+      expect((await firstValueFrom(node.genesisParameters$)).epochLength).toEqual(mockGenesisConfig.epochLength);
+
+      await serverClosePromise(server);
+    });
+
+    it('eraSummaries$ keeps polling until query is available', async () => {
+      const systemStart = new Date();
+      const server = await startMockOgmiosServer(connection.port, {
+        stateQuery: {
+          eraSummaries: {
+            response: { eraSummaries: mockEraSummaries, success: true }
+          },
+          systemStart: {
+            response: [
+              { failWith: { type: 'queryUnavailableInEra' }, success: false },
+              { failWith: { type: 'queryUnavailableInEra' }, success: false },
+              { success: true, systemStart }
+            ]
+          }
+        }
+      });
+      const node = new OgmiosObservableCardanoNode(
+        { connectionConfig$: of(connection), localStateQueryRetryConfig: { initialInterval: 1 } },
+        { logger }
+      );
+      const eraSummaries = await firstValueFrom(node.eraSummaries$);
+      expect(eraSummaries[0].start.time).toEqual(systemStart);
+      expect(eraSummaries[0].parameters.epochLength).toEqual(mockEraSummaries[0].parameters.epochLength);
+
+      await serverClosePromise(server);
+    });
   });
 
   describe('subscribing to all observables', () => {

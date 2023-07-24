@@ -8,10 +8,6 @@ x-logging: &logging
       max-file: '20'
 
 services:
-  postgres:
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-
   cardano-node-ogmios:
     image: cardanosolutions/cardano-node-ogmios:v${OGMIOS_VERSION:-5.6.0}_${CARDANO_NODE_VERSION:-1.35.5}-${NETWORK:-mainnet}
     volumes:
@@ -44,6 +40,18 @@ services:
       - postgres_db_db_sync
       - postgres_password
       - postgres_user
+
+  handle-projector:
+    environment:
+      HANDLE_POLICY_IDS: $HANDLE_POLICY_IDS
+
+  postgres:
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  provider-server:
+    environment:
+      HANDLE_POLICY_IDS: $HANDLE_POLICY_IDS
 
 secrets:
   blockfrost_key:

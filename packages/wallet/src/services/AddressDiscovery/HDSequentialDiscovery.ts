@@ -1,12 +1,86 @@
+import { AccountAddressDerivationPath, AddressType, AsyncKeyAgent, GroupedAddress } from '@cardano-sdk/key-management';
 import { AddressDiscovery } from '../types';
-import { AddressType, AsyncKeyAgent, GroupedAddress } from '@cardano-sdk/key-management';
 import { ChainHistoryProvider } from '@cardano-sdk/core';
 import uniqBy from 'lodash/uniqBy';
 
+const STAKE_KEY_INDEX_LOOKAHEAD = 5;
+
 /**
- * By default, we support up to five stake keys in the multi delegation schema.
+ * Gets whether the given address has a transaction history.
+ *
+ * @param address The address to query.
+ * @param chainHistoryProvider The chain history provider where to fetch the history from.
  */
-const DEFAULT_STAKE_KEY_INDEX_LIMIT = 5;
+const addressHasTx = async (address: GroupedAddress, chainHistoryProvider: ChainHistoryProvider): Promise<boolean> => {
+  const txs = await chainHistoryProvider.transactionsByAddresses({
+    addresses: [address.address],
+    pagination: {
+      limit: 1,
+      startAt: 0
+    }
+  });
+
+  return txs.totalResultCount > 0;
+};
+
+/**
+ * Search for all base addresses composed with the given payment and staking credentials.
+ *
+ * @param keyAgent The key agent controlling the root key to be used to derive the addresses to be discovered.
+ * @param chainHistoryProvider The chain history provider.
+ * @param lookAheadCount Number down the derivation chain to be searched for.
+ * @param getDeriveAddressArgs Callback that retrieves the derivation path arguments.
+ * @returns A promise that will be resolved into a GroupedAddress list containing the discovered addresses.
+ */
+const discoverAddresses = async (
+  keyAgent: AsyncKeyAgent,
+  chainHistoryProvider: ChainHistoryProvider,
+  lookAheadCount: number,
+  getDeriveAddressArgs: (
+    index: number,
+    type: AddressType
+  ) => {
+    paymentKeyDerivationPath: AccountAddressDerivationPath;
+    stakeKeyDerivationIndex: number;
+  }
+): Promise<GroupedAddress[]> => {
+  let currentGap = 0;
+  let currentIndex = 0;
+  const addresses = new Array<GroupedAddress>();
+
+  while (currentGap <= lookAheadCount) {
+    const externalAddressArgs = getDeriveAddressArgs(currentIndex, AddressType.External);
+    const internalAddressArgs = getDeriveAddressArgs(currentIndex, AddressType.Internal);
+
+    const externalAddress = await keyAgent.deriveAddress(
+      externalAddressArgs.paymentKeyDerivationPath,
+      externalAddressArgs.stakeKeyDerivationIndex,
+      true
+    );
+
+    const internalAddress = await keyAgent.deriveAddress(
+      internalAddressArgs.paymentKeyDerivationPath,
+      internalAddressArgs.stakeKeyDerivationIndex,
+      true
+    );
+
+    const externalHasTx = await addressHasTx(externalAddress, chainHistoryProvider);
+    const internalHasTx = await addressHasTx(internalAddress, chainHistoryProvider);
+
+    if (externalHasTx) addresses.push(externalAddress);
+    if (internalHasTx) addresses.push(internalAddress);
+
+    if (externalHasTx || internalHasTx) {
+      currentGap = 0;
+    } else {
+      ++currentGap;
+    }
+
+    ++currentIndex;
+  }
+
+  return addresses;
+};
 
 /**
  * Provides a mechanism to discover addresses in Hierarchical Deterministic (HD) wallets
@@ -14,7 +88,7 @@ const DEFAULT_STAKE_KEY_INDEX_LIMIT = 5;
  *
  * - Derive base addresses with payment credential at index 0 and increasing stake credential until it reaches the given limit.
  * - Derives base addresses with increasing payment credential and stake credential at index 0.
- * - if no transactions are found, increase the gap count.
+ * - if no transactions are found for both internal and external address type, increase the gap count.
  * - if there are some transactions, increase the payment credential index and set the gap count to 0.
  * - if the gap count reaches the given lookAheadCount stop the discovery process.
  *
@@ -26,15 +100,9 @@ const DEFAULT_STAKE_KEY_INDEX_LIMIT = 5;
  */
 export class HDSequentialDiscovery implements AddressDiscovery {
   readonly #chainHistoryProvider: ChainHistoryProvider;
-  readonly #stakeKeyIndexLimit: number;
   readonly #lookAheadCount: number;
 
-  constructor(
-    chainHistoryProvider: ChainHistoryProvider,
-    lookAheadCount: number,
-    stakeKeyIndexLimit: number = DEFAULT_STAKE_KEY_INDEX_LIMIT
-  ) {
-    this.#stakeKeyIndexLimit = stakeKeyIndexLimit;
+  constructor(chainHistoryProvider: ChainHistoryProvider, lookAheadCount: number) {
     this.#chainHistoryProvider = chainHistoryProvider;
     this.#lookAheadCount = lookAheadCount;
   }
@@ -47,48 +115,47 @@ export class HDSequentialDiscovery implements AddressDiscovery {
    * @returns A promise that will be resolved into a GroupedAddress list containing the discovered addresses.
    */
   public async discover(keyAgent: AsyncKeyAgent): Promise<GroupedAddress[]> {
-    let currentGap = 0;
-    let currentIndex = 0;
-    const addresses = new Array<GroupedAddress>();
-
-    // Add to our known address pool, all possible stake keys combined with payment credential at index 0.
-    for (let index = 0; index < this.#stakeKeyIndexLimit; ++index) {
-      const address = await keyAgent.deriveAddress({ index: 0, type: AddressType.External }, index, true);
-      addresses.push(address);
+    const firstAddresses = [await keyAgent.deriveAddress({ index: 0, type: AddressType.External }, 0, true)];
+    const firstInternalAddress = await keyAgent.deriveAddress({ index: 0, type: AddressType.Internal }, 0, true);
+    if (await addressHasTx(firstInternalAddress, this.#chainHistoryProvider)) {
+      firstAddresses.push(firstInternalAddress);
     }
 
-    // Search for all base addresses composed with the stake key at index 0. We are assuming this is
-    // the use case with multi address wallets.
-    while (currentGap <= this.#lookAheadCount) {
-      const address = await keyAgent.deriveAddress({ index: currentIndex, type: AddressType.External }, 0, true);
+    const stakeKeyAddresses = await discoverAddresses(
+      keyAgent,
+      this.#chainHistoryProvider,
+      STAKE_KEY_INDEX_LOOKAHEAD,
+      (currentIndex, type) => ({
+        paymentKeyDerivationPath: {
+          index: 0,
+          type
+        },
+        // We are going to offset this by 1, since we already know about the first address.
+        stakeKeyDerivationIndex: currentIndex + 1
+      })
+    );
 
-      // We could fetch transactions from multiple addresses in a single query and then parse/organize the results, however, if these addresses
-      // contain huge transaction history we may get stuck retrieving all the transactions for longer than we can just query each address individually.
-      const txs = await this.#chainHistoryProvider.transactionsByAddresses({
-        addresses: [address.address],
-        pagination: {
-          limit: 1,
-          startAt: 0
-        }
-      });
+    const paymentKeyAddresses = await discoverAddresses(
+      keyAgent,
+      this.#chainHistoryProvider,
+      this.#lookAheadCount,
+      (currentIndex, type) => ({
+        paymentKeyDerivationPath: {
+          // We are going to offset this by 1, since we already know about the first address.
+          index: currentIndex + 1,
+          type
+        },
+        stakeKeyDerivationIndex: 0
+      })
+    );
 
-      if (txs.totalResultCount > 0) {
-        currentGap = 0;
-        addresses.push(address);
-      } else {
-        ++currentGap;
-      }
-
-      ++currentIndex;
-    }
-
-    const result = uniqBy(addresses, 'address');
+    const addresses = uniqBy([...firstAddresses, ...stakeKeyAddresses, ...paymentKeyAddresses], 'address');
 
     // We need to make sure the addresses are sorted since the wallet assumes that the first address
     // in the list is the change address (payment cred 0 and stake cred 0).
-    result.sort((a, b) => a.index - b.index || a.stakeKeyDerivationPath!.index - b.stakeKeyDerivationPath!.index);
-    await keyAgent.setKnownAddresses(result);
+    addresses.sort((a, b) => a.index - b.index || a.stakeKeyDerivationPath!.index - b.stakeKeyDerivationPath!.index);
+    await keyAgent.setKnownAddresses(addresses);
 
-    return result;
+    return addresses;
   }
 }

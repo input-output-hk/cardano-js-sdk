@@ -34,9 +34,10 @@ describe('DbSyncAssetProvider', () => {
   let tokenMetadataService: TokenMetadataService;
   let cardanoNode: OgmiosCardanoNode;
   let fixtureBuilder: AssetFixtureBuilder;
+  let nftMetadataSpy: jest.SpyInstance;
   const cache = { db: new InMemoryCache(UNLIMITED_CACHE_TTL), healthCheck: new InMemoryCache(UNLIMITED_CACHE_TTL) };
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     ({ closeMock, serverUrl } = await mockTokenRegistry(async () => ({})));
     dbPools = {
       healthCheck: new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING_DB_SYNC }),
@@ -48,6 +49,7 @@ describe('DbSyncAssetProvider', () => {
       logger,
       metadataService: createDbSyncMetadataService(dbPools.main, logger)
     });
+    nftMetadataSpy = jest.spyOn(ntfMetadataService, 'getNftMetadata');
     tokenMetadataService = new CardanoTokenRegistry(
       { logger },
       { tokenMetadataRequestTimeout: defaultTimeout, tokenMetadataServerUrl: serverUrl }
@@ -66,14 +68,18 @@ describe('DbSyncAssetProvider', () => {
     fixtureBuilder = new AssetFixtureBuilder(dbPools.main, logger);
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     tokenMetadataService.shutdown();
     await clearDbPools(dbPools);
     await closeMock();
   });
   it('rejects for not found assetId', async () => {
     await expect(provider.getAsset({ assetId: notValidAssetId })).rejects.toThrow(
-      new ProviderError(ProviderFailure.NotFound, undefined, 'No entries found in multi_asset table')
+      new ProviderError(
+        ProviderFailure.NotFound,
+        undefined,
+        "No entries found in multi_asset table for asset '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'"
+      )
     );
   });
   it('returns an AssetInfo without extra data', async () => {
@@ -97,12 +103,29 @@ describe('DbSyncAssetProvider', () => {
     const history = await fixtureBuilder.getHistory(assets[0].policyId, assets[0].name);
 
     expect(asset.history).toEqual(history);
+    // TODO: review test data, this is false positive right now
+    expect(asset.nftMetadata).toBeTruthy();
     expect(asset.nftMetadata).toStrictEqual(assets[0].metadata);
     expect(asset.tokenMetadata).toStrictEqual({
-      assetId: '728847c7898b06f180de05c80b37d38bf77a9ea22bd1e222b8014d964e46542d66696c6573',
+      assetId: '17ebe33f8aeee1fe9a7277fe0dc02261531a896a8b89457895fe60294349502d303032352d7632',
       desc: 'This is my second NFT',
       name: 'Bored Ape'
     });
+  });
+  it.todo('caches asset info query responses');
+  it('caches nft metadata', async () => {
+    const assets = await fixtureBuilder.getAssets(1, { with: [AssetWith.CIP25Metadata] });
+    await Promise.all([
+      provider.getAsset({
+        assetId: assets[0].id,
+        extraData: { nftMetadata: true }
+      }),
+      provider.getAssets({
+        assetIds: [assets[0].id],
+        extraData: { nftMetadata: true }
+      })
+    ]);
+    expect(nftMetadataSpy).toBeCalledTimes(1);
   });
   it('returns undefined asset token metadata if the token registry throws a server internal error', async () => {
     const { serverUrl, closeMock } = await mockTokenRegistry(async () => ({ body: {}, code: 500 }));
