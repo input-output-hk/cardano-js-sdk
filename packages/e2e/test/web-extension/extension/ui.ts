@@ -10,9 +10,15 @@ import {
 import { adaPriceServiceChannel, getObservableWalletName, userPromptServiceChannel, walletName } from './const';
 import { bip32Ed25519Factory, keyManagementFactory } from '../../../src';
 
+import { Cardano } from '@cardano-sdk/core';
 import { combineLatest, firstValueFrom, of } from 'rxjs';
 import { runtime } from 'webextension-polyfill';
 import { setupWallet } from '@cardano-sdk/wallet';
+
+const delegationConfig = {
+  count: 3,
+  distribution: [10, 30, 60]
+};
 
 const api: UserPromptService = {
   allowOrigin(origin) {
@@ -66,6 +72,30 @@ combineLatest([supplyDistribution.lovelaceSupply$, supplyDistribution.stake$]).s
     (document.querySelector('#supplyDistribution')!.textContent = `${stake.live} out of ${lovelaceSupply.total}`)
 );
 
+/** Get pools from background service and assign weights */
+const displayPoolIdsAndPreparePortfolio = async (): Promise<{ pool: Cardano.StakePool; weight: number }[]> => {
+  const pools = await backgroundServices.getPoolIds(delegationConfig.count);
+  const poolsSpan = document.querySelector('#multiDelegation .delegate .pools');
+  poolsSpan!.textContent = pools.map(({ id }) => id).join(' ');
+  return pools.map((pool, idx) => ({ pool, weight: delegationConfig.distribution[idx] }));
+};
+
+/** Build, sign and submit delegation transaction */
+const sendDelegationTx = async (portfolio: { pool: Cardano.StakePool; weight: number }[]): Promise<void> => {
+  const pools = portfolio.map(({ pool: { hexId: id }, weight }) => ({ id, weight }));
+  const txBuilder = wallet.createTxBuilder();
+
+  let msg: string;
+  try {
+    const signedTx = await txBuilder.delegatePortfolio({ pools }).build().sign();
+    const txId = await wallet.submitTx(signedTx);
+    msg = `TxId: ${txId}`;
+  } catch (error) {
+    msg = `ERROR delegating: ${JSON.stringify(error)}`;
+  }
+  document.querySelector('#multiDelegation .delegateTxId')!.textContent = msg;
+};
+
 const setAddresses = ({ address, stakeAddress }: { address: string; stakeAddress: string }): void => {
   document.querySelector('#address')!.textContent = address;
   document.querySelector('#stakeAddress')!.textContent = stakeAddress;
@@ -100,6 +130,45 @@ const deactivateWallet = async (): Promise<void> => {
   clearWalletValues();
 };
 
+/**
+ * Wallet does not have any active delegations.
+ * Show a `<p class="noDelegation">No delegation found</p>`
+ */
+const createEmptyDelegationEl = () => {
+  const emptyDistribution = document.createElement('p');
+  emptyDistribution.classList.add('noDelegation');
+  emptyDistribution.textContent = 'No delegation found';
+  return emptyDistribution;
+};
+
+/**
+ * Create a list item for a delegation
+ * `<li> <span class="poolId">thePoolId</span> <span class="percent">50</span> </li>`
+ */
+const createDelegationLi = (poolId: string, percent: string) => {
+  const delegationLi = document.createElement('li');
+  const poolIdSpan = document.createElement('span');
+  poolIdSpan.classList.add('poolId');
+  poolIdSpan.textContent = poolId;
+  const delegationPercentageSpan = document.createElement('span');
+  delegationPercentageSpan.classList.add('percent');
+  delegationPercentageSpan.textContent = percent;
+  const separatorSpan = document.createElement('span');
+  separatorSpan.textContent = ' - ';
+  delegationLi.append(poolIdSpan);
+  delegationLi.append(separatorSpan);
+  delegationLi.append(delegationPercentageSpan);
+  return delegationLi;
+};
+
+/** Remove empty delegation message or multi-delegation list items to display new data */
+const cleanupMultidelegationInfo = (multiDelegationDiv: Element) => {
+  multiDelegationDiv.querySelector('p.noDelegation')?.remove();
+  for (const delegationLi of multiDelegationDiv.querySelectorAll('ul > li')) {
+    delegationLi.remove();
+  }
+};
+
 const walletManager = new WalletManagerUi({ walletName }, { logger, runtime });
 // Wallet object does not change when wallets are activated/deactivated.
 // Instead, it's observable properties emit from the currently active wallet.
@@ -108,6 +177,19 @@ const wallet = walletManager.wallet;
 // Wallet can be subscribed can be used even before it is actually created.
 wallet.addresses$.subscribe(([{ address, rewardAccount }]) => setAddresses({ address, stakeAddress: rewardAccount }));
 wallet.balance.utxo.available$.subscribe(({ coins }) => setBalance(coins.toString()));
+wallet.delegation.distribution$.subscribe((delegationDistrib) => {
+  const multiDelegationDiv = document.querySelector('#multiDelegation .distribution');
+  cleanupMultidelegationInfo(multiDelegationDiv!);
+
+  if (delegationDistrib.size === 0) {
+    multiDelegationDiv?.appendChild(createEmptyDelegationEl());
+  } else {
+    const distributionUl = multiDelegationDiv?.querySelector('ul');
+    for (const [poolId, delegation] of delegationDistrib) {
+      distributionUl?.appendChild(createDelegationLi(poolId, (delegation.percentage * 100).toString()));
+    }
+  }
+});
 
 const createWallet = async (accountIndex: number) => {
   clearWalletValues();
@@ -142,6 +224,11 @@ document.querySelector('#activateWallet1')!.addEventListener('click', async () =
 document.querySelector('#activateWallet2')!.addEventListener('click', async () => await createWallet(1));
 document.querySelector('#deactivateWallet')!.addEventListener('click', async () => await deactivateWallet());
 document.querySelector('#destroyWallet')!.addEventListener('click', async () => await destroyWallet());
+document.querySelector('#multiDelegation .delegate button')!.addEventListener('click', async () => {
+  const poolsAndWeights = await displayPoolIdsAndPreparePortfolio();
+  // multi-delegate with 10%, 30%, 60% distribution
+  await sendDelegationTx(poolsAndWeights);
+});
 
 document.querySelector('#buildAndSignTx')!.addEventListener('click', async () => {
   const [{ address: ownAddress }] = await firstValueFrom(wallet.addresses$);

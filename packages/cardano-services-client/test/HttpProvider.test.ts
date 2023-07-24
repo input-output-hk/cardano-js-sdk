@@ -1,24 +1,27 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable sonarjs/no-duplicate-string */
-import { HttpProviderConfig, createHttpProvider } from '../src';
-import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { HttpProviderConfig, apiVersion, createHttpProvider } from '../src';
+import { Provider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { Server } from 'http';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import { getPort } from 'get-port-please';
 import { logger } from '@cardano-sdk/util-dev';
 import express, { RequestHandler } from 'express';
+import path from 'path';
+
+const packageJson = require(path.join(__dirname, '..', 'package.json'));
 
 type ComplexArg2 = { map: Map<string, Buffer> };
 type ComplexResponse = Map<bigint, Buffer>[];
-interface TestProvider {
+interface TestProvider extends Provider {
   noArgsEmptyReturn(): Promise<void>;
   complexArgsAndReturn({ arg1, arg2 }: { arg1: bigint; arg2: ComplexArg2 }): Promise<ComplexResponse>;
 }
 
-const createStubHttpProviderServer = async (port: number, path: string, handler: RequestHandler) => {
+const createStubHttpProviderServer = async (port: number, urlPath: string, handler: RequestHandler) => {
   const app = express();
   app.use(express.json());
-  app.post(path, handler);
+  app.post(urlPath, handler);
   const server = await new Promise<Server>((resolve) => {
     const result = app.listen(port, () => resolve(result));
   });
@@ -27,12 +30,14 @@ const createStubHttpProviderServer = async (port: number, path: string, handler:
 
 const stubProviderPaths = {
   complexArgsAndReturn: '/complex',
+  healthCheck: '/health',
   noArgsEmptyReturn: '/simple'
 };
 
-describe('createHttpServer', () => {
+describe('createHttpProvider', () => {
   let port: number;
   let baseUrl: string;
+  let closeServer: () => Promise<unknown>;
 
   const createTxSubmitProviderClient = (
     config: Pick<HttpProviderConfig<TestProvider>, 'axiosOptions' | 'mapError'> = {}
@@ -49,21 +54,35 @@ describe('createHttpServer', () => {
     baseUrl = `http://localhost:${port}`;
   });
 
+  afterEach(async () => {
+    if (closeServer) await closeServer();
+  });
+
   it('attempting to access unimplemented method throws ProviderError', async () => {
     const provider = createTxSubmitProviderClient();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect(() => (provider as any).doesNotExist).toThrowError(ProviderError);
   });
 
+  it('passes through axios options, merging custom header with the included provider version headers', async () => {
+    const provider = createTxSubmitProviderClient({ axiosOptions: { headers: { 'custom-header': 'header-value' } } });
+    closeServer = await createStubHttpProviderServer(port, stubProviderPaths.noArgsEmptyReturn, (req, res) => {
+      expect(req.headers['custom-header']).toBe('header-value');
+      expect(req.headers['Version-Api']).toEqual(apiVersion);
+      expect(req.headers['Version-Software']).toEqual(packageJson.version);
+      res.send();
+    });
+    await expect(provider.noArgsEmptyReturn()).resolves;
+  });
+
   describe('method with no args and void return', () => {
     it('calls http server with empty args in req body and parses the response', async () => {
       const provider = createTxSubmitProviderClient();
-      const closeServer = await createStubHttpProviderServer(port, stubProviderPaths.noArgsEmptyReturn, (req, res) => {
+      closeServer = await createStubHttpProviderServer(port, stubProviderPaths.noArgsEmptyReturn, (req, res) => {
         expect(req.body).toEqual({});
         res.send();
       });
       const response = await provider.noArgsEmptyReturn();
-      await closeServer();
       expect(response).toBe(undefined);
     });
   });
@@ -74,28 +93,13 @@ describe('createHttpServer', () => {
       const arg2: ComplexArg2 = { map: new Map([['key', Buffer.from('abc')]]) };
       const expectedResponse: ComplexResponse = [new Map([[1234n, Buffer.from('response data')]])];
       const provider = createTxSubmitProviderClient();
-      const closeServer = await createStubHttpProviderServer(
-        port,
-        stubProviderPaths.complexArgsAndReturn,
-        (req, res) => {
-          expect(fromSerializableObject(req.body)).toEqual({ arg1, arg2 });
-          res.send(toSerializableObject(expectedResponse));
-        }
-      );
+      closeServer = await createStubHttpProviderServer(port, stubProviderPaths.complexArgsAndReturn, (req, res) => {
+        expect(fromSerializableObject(req.body)).toEqual({ arg1, arg2 });
+        res.send(toSerializableObject(expectedResponse));
+      });
       const response = await provider.complexArgsAndReturn({ arg1, arg2 });
-      await closeServer();
       expect(response).toEqual(expectedResponse);
     });
-  });
-
-  it('passes through axios options', async () => {
-    const provider = createTxSubmitProviderClient({ axiosOptions: { headers: { 'custom-header': 'header-value' } } });
-    const closeServer = await createStubHttpProviderServer(port, stubProviderPaths.noArgsEmptyReturn, (req, res) => {
-      expect(req.headers['custom-header']).toBe('header-value');
-      res.send();
-    });
-    await provider.noArgsEmptyReturn();
-    await closeServer();
   });
 
   describe('errors', () => {
@@ -135,16 +139,13 @@ describe('createHttpServer', () => {
     });
 
     describe('HTTPError', () => {
-      let closeServer: Function;
       const errorJson = { message: 'error' };
 
-      beforeAll(async () => {
+      beforeEach(async () => {
         closeServer = await createStubHttpProviderServer(port, stubProviderPaths.noArgsEmptyReturn, (_, res) => {
           res.status(500).send(errorJson);
         });
       });
-
-      afterAll(() => closeServer());
 
       it('parses error json and wraps errors in ProviderError', async () => {
         const provider = createTxSubmitProviderClient();
@@ -164,7 +165,7 @@ describe('createHttpServer', () => {
         const provider = createTxSubmitProviderClient({
           mapError: () => 'result'
         });
-        expect(await provider.noArgsEmptyReturn()).toEqual('result');
+        await expect(provider.noArgsEmptyReturn()).resolves.toEqual('result');
       });
 
       it('supports custom error mapper that throws', async () => {

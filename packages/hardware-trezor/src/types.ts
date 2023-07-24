@@ -1,3 +1,4 @@
+import * as Trezor from 'trezor-connect';
 import { Cardano } from '@cardano-sdk/core';
 import { GroupedAddress } from '@cardano-sdk/key-management';
 
@@ -14,3 +15,11 @@ export type TrezorTxTransformerContext = {
   inputResolver: Cardano.InputResolver;
   knownAddresses: GroupedAddress[];
 };
+
+export type TrezorTxOutputDestination =
+  | {
+      addressParameters: Trezor.CardanoAddressParameters;
+    }
+  | {
+      address: string;
+    };

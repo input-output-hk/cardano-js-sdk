@@ -3,6 +3,52 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.15](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.2.14...@cardano-sdk/hardware-ledger@0.2.15) (2023-07-13)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-ledger
+
+## [0.2.14](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.2.13...@cardano-sdk/hardware-ledger@0.2.14) (2023-07-05)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-ledger
+
+## [0.2.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.2.12...@cardano-sdk/hardware-ledger@0.2.13) (2023-07-04)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-ledger
+
+## [0.2.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.2.11...@cardano-sdk/hardware-ledger@0.2.12) (2023-07-03)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-ledger
+
+## [0.2.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.2.10...@cardano-sdk/hardware-ledger@0.2.11) (2023-06-29)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-ledger
+
+## [0.2.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.2.9...@cardano-sdk/hardware-ledger@0.2.10) (2023-06-29)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-ledger
+
+## [0.2.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.2.8...@cardano-sdk/hardware-ledger@0.2.9) (2023-06-28)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-ledger
+
+## [0.2.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.2.7...@cardano-sdk/hardware-ledger@0.2.8) (2023-06-23)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-ledger
+
+## [0.2.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.2.6...@cardano-sdk/hardware-ledger@0.2.7) (2023-06-20)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-ledger
+
+## [0.2.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.2.5...@cardano-sdk/hardware-ledger@0.2.6) (2023-06-13)
+
+### Bug Fixes
+
+* correct ledger mapping canonical asset and asset group ordering ([2095877](https://github.com/input-output-hk/cardano-js-sdk/commit/20958773d2885ee3e1934363dce96b4e8cea96a7))
+
+## [0.2.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.2.4...@cardano-sdk/hardware-ledger@0.2.5) (2023-06-12)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-ledger
+
 ## [0.2.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.2.3...@cardano-sdk/hardware-ledger@0.2.4) (2023-06-06)
 
 **Note:** Version bump only for package @cardano-sdk/hardware-ledger

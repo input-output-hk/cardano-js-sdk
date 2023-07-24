@@ -3,6 +3,54 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.16](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.6.15...@cardano-sdk/projection@0.6.16) (2023-07-17)
+
+**Note:** Version bump only for package @cardano-sdk/projection
+
+## [0.6.15](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.6.14...@cardano-sdk/projection@0.6.15) (2023-07-13)
+
+**Note:** Version bump only for package @cardano-sdk/projection
+
+## [0.6.14](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.6.13...@cardano-sdk/projection@0.6.14) (2023-07-04)
+
+**Note:** Version bump only for package @cardano-sdk/projection
+
+## [0.6.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.6.12...@cardano-sdk/projection@0.6.13) (2023-07-03)
+
+**Note:** Version bump only for package @cardano-sdk/projection
+
+## [0.6.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.6.11...@cardano-sdk/projection@0.6.12) (2023-06-29)
+
+**Note:** Version bump only for package @cardano-sdk/projection
+
+## [0.6.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.6.10...@cardano-sdk/projection@0.6.11) (2023-06-29)
+
+**Note:** Version bump only for package @cardano-sdk/projection
+
+## [0.6.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.6.9...@cardano-sdk/projection@0.6.10) (2023-06-28)
+
+### Bug Fixes
+
+* unsupported character bug in handles projection ([4144ed2](https://github.com/input-output-hk/cardano-js-sdk/commit/4144ed2925f1c5b118c411ac5eedc3e4a62d3893))
+
+## [0.6.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.6.8...@cardano-sdk/projection@0.6.9) (2023-06-23)
+
+**Note:** Version bump only for package @cardano-sdk/projection
+
+## [0.6.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.6.7...@cardano-sdk/projection@0.6.8) (2023-06-20)
+
+**Note:** Version bump only for package @cardano-sdk/projection
+
+## [0.6.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.6.6...@cardano-sdk/projection@0.6.7) (2023-06-13)
+
+**Note:** Version bump only for package @cardano-sdk/projection
+
+## [0.6.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.6.5...@cardano-sdk/projection@0.6.6) (2023-06-12)
+
+### Bug Fixes
+
+* **projection:** filterProducedUtxoByAssetPolicyId now also filters out other assets ([57da14b](https://github.com/input-output-hk/cardano-js-sdk/commit/57da14b4488a019e8d18b9ceac7eac7f11f92558))
+
 ## [0.6.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.6.4...@cardano-sdk/projection@0.6.5) (2023-06-06)
 
 **Note:** Version bump only for package @cardano-sdk/projection

@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/ogmios",
-  "version": "0.12.1",
+  "version": "0.12.12",
   "description": "Ogmios Providers",
   "engines": {
     "node": ">=14.20.1"
@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "@cardano-ogmios/schema": "5.6.0",
+    "@cardano-sdk/cardano-services-client": "workspace:~",
     "@cardano-sdk/util-dev": "workspace:~",
     "@types/lodash": "^4.14.182",
     "delay": "^5.0.0",

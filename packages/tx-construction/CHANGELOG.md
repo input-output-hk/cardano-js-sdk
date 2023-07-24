@@ -3,6 +3,85 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.9.1...@cardano-sdk/tx-construction@0.9.2) (2023-07-13)
+
+### Bug Fixes
+
+* **tx-construction:** rm redundant circular dependency on 'wallet' package ([b048475](https://github.com/input-output-hk/cardano-js-sdk/commit/b0484758bd1e1feee9750b86e5fc777f78494e86))
+* wallet finalizeTx and CIP30 requiresForeignSignatures now wait for at least one known address ([b5fde00](https://github.com/input-output-hk/cardano-js-sdk/commit/b5fde0038dde4082d3cd5eac3bbb8141733ec5b6))
+
+## [0.9.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.9.0...@cardano-sdk/tx-construction@0.9.1) (2023-07-05)
+
+### Bug Fixes
+
+* **tx-construction:** builder now awaits for non-empty knownAddresses$ before building the tx ([e8f4296](https://github.com/input-output-hk/cardano-js-sdk/commit/e8f42960fe020cca35b54b4d3eedc35280d28049))
+
+## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.8.4...@cardano-sdk/tx-construction@0.9.0) (2023-07-04)
+
+### ⚠ BREAKING CHANGES
+
+* added change address resolver to the round robin input selector
+
+### Features
+
+* added change address resolver to the round robin input selector ([ef654ca](https://github.com/input-output-hk/cardano-js-sdk/commit/ef654ca7a7c3217b68360e1d4bee3296e5fc4f0e))
+
+## [0.8.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.8.3...@cardano-sdk/tx-construction@0.8.4) (2023-07-03)
+
+**Note:** Version bump only for package @cardano-sdk/tx-construction
+
+## [0.8.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.8.2...@cardano-sdk/tx-construction@0.8.3) (2023-06-29)
+
+**Note:** Version bump only for package @cardano-sdk/tx-construction
+
+## [0.8.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.8.1...@cardano-sdk/tx-construction@0.8.2) (2023-06-29)
+
+**Note:** Version bump only for package @cardano-sdk/tx-construction
+
+## [0.8.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.8.0...@cardano-sdk/tx-construction@0.8.1) (2023-06-28)
+
+### Features
+
+* adds cardanoAddress type in HandleResolution interface ([2ee31c9](https://github.com/input-output-hk/cardano-js-sdk/commit/2ee31c9f0b61fc5e67385128448225d2d1d85617))
+
+### Bug Fixes
+
+* **tx-construction:** wait for new stakeKeys in rewardAccounts ([a74b665](https://github.com/input-output-hk/cardano-js-sdk/commit/a74b66505e19681d21d547e6418f0980b112b070))
+
+## [0.8.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.7.2...@cardano-sdk/tx-construction@0.8.0) (2023-06-23)
+
+### ⚠ BREAKING CHANGES
+
+* txBuilder delegate is replaced by delegatePortfolio.
+* TxBuilderProviders.rewardAccounts expects RewardAccountWithPoolId type,
+  instead of Omit<RewardAccount, 'delegatee'>
+
+### Features
+
+* remove txBuilder.delegate method ([f21c93b](https://github.com/input-output-hk/cardano-js-sdk/commit/f21c93b251f1bd67f47edd488d9df47c2abf3e0c))
+* **tx-construction:** use GreedyInputSelection for multi delegation ([5462936](https://github.com/input-output-hk/cardano-js-sdk/commit/54629367b14fe26f13f9c17483bdf98c451b8d89))
+* txBuilder delegatePortfolio ([ec0860e](https://github.com/input-output-hk/cardano-js-sdk/commit/ec0860e37835edbce3c911d6fe65c21b73683de7))
+
+## [0.7.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.7.1...@cardano-sdk/tx-construction@0.7.2) (2023-06-20)
+
+### Features
+
+* new pool delegation and stake registration factory methods added to core package ([82d95af](https://github.com/input-output-hk/cardano-js-sdk/commit/82d95af3f68eb06cb58bd2bec5209d93c2aa6c34))
+
+## [0.7.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.7.0...@cardano-sdk/tx-construction@0.7.1) (2023-06-13)
+
+**Note:** Version bump only for package @cardano-sdk/tx-construction
+
+## [0.7.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.6.0...@cardano-sdk/tx-construction@0.7.0) (2023-06-12)
+
+### ⚠ BREAKING CHANGES
+
+* SignedTx.ctx now renamed to context
+
+### Features
+
+* add context to txSubmit ([57589ec](https://github.com/input-output-hk/cardano-js-sdk/commit/57589ecd3120573a0cea7e718291454e9b6f9f3b))
+
 ## [0.6.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.5.3...@cardano-sdk/tx-construction@0.6.0) (2023-06-06)
 
 ### ⚠ BREAKING CHANGES

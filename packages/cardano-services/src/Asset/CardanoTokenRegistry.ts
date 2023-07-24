@@ -1,4 +1,4 @@
-import { Asset, Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { Asset, Cardano, Milliseconds, ProviderError, ProviderFailure, Seconds } from '@cardano-sdk/core';
 import { InMemoryCache } from '../InMemoryCache';
 import { Logger } from 'ts-log';
 import { TokenMetadataService } from './types';
@@ -6,8 +6,8 @@ import { contextLogger } from '@cardano-sdk/util';
 import axios, { AxiosInstance } from 'axios';
 import pick from 'lodash/pick';
 
-export const DEFAULT_TOKEN_METADATA_CACHE_TTL = 600;
-export const DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT = 3 * 1000;
+export const DEFAULT_TOKEN_METADATA_CACHE_TTL = Seconds(10 * 60);
+export const DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT = Milliseconds(3 * 1000);
 export const DEFAULT_TOKEN_METADATA_SERVER_URL = 'https://tokens.cardano.org';
 
 interface NumberValue {
@@ -52,7 +52,7 @@ export interface CardanoTokenRegistryConfiguration {
   /**
    * The cache TTL in seconds. Default: 10 minutes.
    */
-  tokenMetadataCacheTTL?: number;
+  tokenMetadataCacheTTL?: Seconds;
 
   /**
    * The Cardano Token Registry API base URL. Default: https://tokens.cardano.org
@@ -62,11 +62,11 @@ export interface CardanoTokenRegistryConfiguration {
   /**
    * The HTTP request timeout value
    */
-  tokenMetadataRequestTimeout?: number;
+  tokenMetadataRequestTimeout?: Milliseconds;
 }
 
 interface CardanoTokenRegistryConfigurationWithRequired extends CardanoTokenRegistryConfiguration {
-  tokenMetadataCacheTTL: number;
+  tokenMetadataCacheTTL: Seconds;
   tokenMetadataServerUrl: string;
 }
 

@@ -101,3 +101,20 @@ export class InvalidArgumentError extends CustomError {
     super(`Invalid argument '${argName}': ${message}`);
   }
 }
+
+/**
+ * The error that is thrown when a method call is invalid for the object's current state.
+ *
+ * This error can be used in cases when the failure to invoke a method is caused by reasons
+ * other than invalid arguments.
+ */
+export class InvalidStateError extends CustomError {
+  /**
+   * Initializes a new instance of the InvalidStateError class.
+   *
+   * @param message The error message.
+   */
+  public constructor(message: string) {
+    super(`Invalid state': ${message}`);
+  }
+}

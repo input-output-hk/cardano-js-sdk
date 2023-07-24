@@ -55,7 +55,10 @@ describe('AssetHttpService', () => {
     port = await getPort();
     apiUrlBase = `http://localhost:${port}/asset`;
     config = { listen: { port } };
-    clientConfig = { baseUrl: apiUrlBase, logger: createLogger({ level: INFO, name: 'unit tests' }) };
+    clientConfig = {
+      baseUrl: apiUrlBase,
+      logger: createLogger({ level: INFO, name: 'unit tests' })
+    };
   });
 
   describe('healthy state', () => {

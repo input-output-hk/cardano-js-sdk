@@ -3,6 +3,63 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.15.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.15.2...@cardano-sdk/core@0.15.3) (2023-07-04)
+
+**Note:** Version bump only for package @cardano-sdk/core
+
+## [0.15.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.15.1...@cardano-sdk/core@0.15.2) (2023-06-29)
+
+### Features
+
+* **core:** add util to get asset name content as text from cip 67 encoded and plain asset names ([8f0facd](https://github.com/input-output-hk/cardano-js-sdk/commit/8f0facda183b71d2d52596945695c7e16f435731))
+
+### Bug Fixes
+
+* fix handle api response property names ([2ecc994](https://github.com/input-output-hk/cardano-js-sdk/commit/2ecc9940e738105e014a1451d4a5e5cd95df6277))
+
+## [0.15.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.15.0...@cardano-sdk/core@0.15.1) (2023-06-28)
+
+### Features
+
+* adds cardanoAddress type in HandleResolution interface ([2ee31c9](https://github.com/input-output-hk/cardano-js-sdk/commit/2ee31c9f0b61fc5e67385128448225d2d1d85617))
+* implement verification and presubmission checks on handles in OgmiosTxProvider ([0f18042](https://github.com/input-output-hk/cardano-js-sdk/commit/0f1804287672968614e8aa6bf2f095b0e9a88b22))
+
+## [0.15.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.14.1...@cardano-sdk/core@0.15.0) (2023-06-23)
+
+### ⚠ BREAKING CHANGES
+
+* TxBuilderProviders.rewardAccounts expects RewardAccountWithPoolId type,
+  instead of Omit<RewardAccount, 'delegatee'>
+
+### Features
+
+* txBuilder delegatePortfolio ([ec0860e](https://github.com/input-output-hk/cardano-js-sdk/commit/ec0860e37835edbce3c911d6fe65c21b73683de7))
+
+### Bug Fixes
+
+* **core:** updated providerUtil ([106c1f9](https://github.com/input-output-hk/cardano-js-sdk/commit/106c1f9e8067a4876f47d63f97ab998620cf8f64))
+
+## [0.14.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.14.0...@cardano-sdk/core@0.14.1) (2023-06-20)
+
+### Features
+
+* cip 67 utils ([f0dd945](https://github.com/input-output-hk/cardano-js-sdk/commit/f0dd9450c81fa2f5c8481647daf2b4cd104edcd9))
+* new pool delegation and stake registration factory methods added to core package ([82d95af](https://github.com/input-output-hk/cardano-js-sdk/commit/82d95af3f68eb06cb58bd2bec5209d93c2aa6c34))
+
+### Bug Fixes
+
+* the transaction id computation now accounts for serialization round trip errors ([#771](https://github.com/input-output-hk/cardano-js-sdk/issues/771)) ([55e96c0](https://github.com/input-output-hk/cardano-js-sdk/commit/55e96c0a59d2e254476f089e4eba6cc34fbdba26))
+
+## [0.14.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.13.0...@cardano-sdk/core@0.14.0) (2023-06-12)
+
+### ⚠ BREAKING CHANGES
+
+* SignedTx.ctx now renamed to context
+
+### Features
+
+* add context to txSubmit ([57589ec](https://github.com/input-output-hk/cardano-js-sdk/commit/57589ecd3120573a0cea7e718291454e9b6f9f3b))
+
 ## [0.13.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.12.2...@cardano-sdk/core@0.13.0) (2023-06-05)
 
 ### ⚠ BREAKING CHANGES

@@ -12,15 +12,19 @@ services:
     <<: *logging
     build:
       context: ./local-network
+    depends_on:
+      # We need the file server here in order to calculate the pool metadata hashes
+      file-server:
+        condition: service_healthy
+    environment:
+      CARDANO_NODE_LOG_LEVEL: ${CARDANO_NODE_LOG_LEVEL:-Info}
+      CARDANO_NODE_CHAINDB_LOG_LEVEL: ${CARDANO_NODE_CHAINDB_LOG_LEVEL:-Notice}
     ports:
       - 3001:3001
     volumes:
       - ./local-network/network-files/node-sp1/:/root/network-files/node-sp1
       - ./local-network/config:/root/config
-    depends_on:
-      # We need the file server here in order to calculate the pool metadata hashes
-      file-server:
-        condition: service_healthy
+      - sdk-ipc:/sdk-ipc
 
   file-server:
     <<: *logging
@@ -36,12 +40,15 @@ services:
       timeout: 10s
 
   cardano-node-ogmios:
+    entrypoint: ['/tini', '-g', '--', '/scripts/cardano-node-ogmios.sh']
     image: cardanosolutions/cardano-node-ogmios:v${OGMIOS_VERSION:-5.6.0}_${CARDANO_NODE_VERSION:-1.35.5}
     depends_on:
       local-testnet:
         condition: service_healthy
     volumes:
       - ./local-network/config/network:/config
+      - ./local-network/scripts:/scripts
+      - sdk-ipc:/sdk-ipc
 
   cardano-db-sync:
     depends_on:
@@ -50,30 +57,24 @@ services:
     volumes:
       - ./local-network/config/network:/config
 
-  cardano-wallet:
-    <<: *logging
-    image: inputoutput/cardano-wallet:2022.8.16
-    volumes:
-      - wallet-db:/wallet-db
-      - node-ipc:/ipc
-      - ./local-network/config:/config
-    ports:
-      - 8090:8090
-    entrypoint: []
-    command: bash -c "sleep 10 && ([[ $$NETWORK == \"mainnet\" ]] && $$CMD --mainnet) || ($$CMD --testnet /config/network/genesis/byron.json)"
+  handle-projector:
     environment:
-      CMD: 'cardano-wallet serve --node-socket /ipc/node.socket --database /wallet-db --listen-address 0.0.0.0'
-      NETWORK:
-    depends_on:
-      cardano-db-sync:
-        condition: service_healthy
-    restart: on-failure
+      HANDLE_POLICY_IDS_FILE: /sdk-ipc/handle_policy_ids
+    volumes:
+      - sdk-ipc:/sdk-ipc
 
   provider-server:
     environment:
+      HANDLE_POLICY_IDS_FILE: /sdk-ipc/handle_policy_ids
       TOKEN_METADATA_SERVER_URL: stub://
     volumes:
       - ./local-network/config/network:/config
+      - sdk-ipc:/sdk-ipc
 
 volumes:
-  wallet-db:
+  sdk-ipc:
+    driver: local
+    driver_opts:
+      device: ./local-network/sdk-ipc
+      o: bind
+      type: none

@@ -115,6 +115,7 @@ export class HttpServer extends RunnableModule {
       if (err instanceof ProviderError) {
         HttpServer.sendJSON(res, err, providerFailureToStatusCodeMap[err.reason]);
       } else {
+        this.logger.error(err);
         HttpServer.sendJSON(res, new ProviderError(ProviderFailure.Unhealthy, err), err.status || 500);
       }
     });

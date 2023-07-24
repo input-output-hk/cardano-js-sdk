@@ -34,7 +34,8 @@ export const validTxSource$ = of({
                     ),
                     1n
                   ],
-                  [Cardano.AssetId('8f78a4388b1a3e1a1435257e9356fa0c2cc0d3a5999d63b5886c964354657374746f6b656e'), 1n]
+                  [Cardano.AssetId('8f78a4388b1a3e1a1435257e9356fa0c2cc0d3a5999d63b5886c964354657374746f6b656e'), 1n],
+                  [Cardano.AssetId('7f78a4388b1a3e1a1435257e9356fa0c2cc0d3a5999d63b5886c964354657374746f6b656e'), 1n]
                 ]),
                 coins: 1_724_100n
               }
@@ -207,7 +208,7 @@ describe('withUtxo', () => {
   });
 
   describe('filterProducedUtxoByAssetPolicyId', () => {
-    it('keeps only utxo produced based on specified policy id', async () => {
+    it('keeps only utxo produced based on specified policy id, also filtering their value assets', async () => {
       const {
         utxo: { produced }
       } = await firstValueFrom(
@@ -220,6 +221,7 @@ describe('withUtxo', () => {
       );
 
       expect(produced).toHaveLength(1);
+      expect(produced[0][1].value.assets?.size).toBe(2);
     });
   });
 });

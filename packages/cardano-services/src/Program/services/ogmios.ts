@@ -1,6 +1,7 @@
 /* eslint-disable promise/no-nesting */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DnsResolver } from '../utils';
+import { HandleProvider, SubmitTxArgs } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { MissingCardanoNodeOption } from '../errors';
 import {
@@ -11,7 +12,6 @@ import {
 } from '@cardano-sdk/ogmios';
 import { OgmiosOptionDescriptions, OgmiosProgramOptions } from '../options/ogmios';
 import { RunnableModule, isConnectionError } from '@cardano-sdk/util';
-import { SubmitTxArgs } from '@cardano-sdk/core';
 import { defer, from, of } from 'rxjs';
 
 const isCardanoNodeOperation = (prop: string | symbol): prop is 'eraSummaries' | 'systemStart' | 'stakeDistribution' =>
@@ -35,14 +35,15 @@ const recreateOgmiosTxSubmitProvider = async (
   serviceName: string,
   ogmiosTxSubmitProvider: OgmiosTxSubmitProvider,
   dnsResolver: DnsResolver,
-  logger: Logger
+  logger: Logger,
+  handleProvider?: HandleProvider
 ) => {
   const record = await dnsResolver(serviceName!);
   logger.info(`DNS resolution for OgmiosTxSubmitProvider, resolved with record: ${JSON.stringify(record)}`);
   await ogmiosTxSubmitProvider
     .shutdown()
     .catch((error_) => logger.warn(`OgmiosTxSubmitProvider failed to shutdown after connection error: ${error_}`));
-  return new OgmiosTxSubmitProvider({ host: record.name, port: record.port }, { logger });
+  return new OgmiosTxSubmitProvider({ host: record.name, port: record.port }, { logger }, handleProvider);
 };
 /**
  * Creates an extended TxSubmitProvider instance :
@@ -58,20 +59,27 @@ const recreateOgmiosTxSubmitProvider = async (
 export const ogmiosTxSubmitProviderWithDiscovery = async (
   dnsResolver: DnsResolver,
   logger: Logger,
-  serviceName: string
+  serviceName: string,
+  handleProvider?: HandleProvider
 ): Promise<OgmiosTxSubmitProvider> => {
   const { name, port } = await dnsResolver(serviceName!);
-  let ogmiosProvider = new OgmiosTxSubmitProvider({ host: name, port }, { logger });
+  let ogmiosProvider = new OgmiosTxSubmitProvider({ host: name, port }, { logger }, handleProvider);
 
   const txSubmitProviderProxy = new Proxy<OgmiosTxSubmitProvider>({} as OgmiosTxSubmitProvider, {
-    get(_, prop) {
+    get(_, prop, receiver) {
       if (prop === 'then') return;
       if (prop === 'initialize') {
         return () =>
           ogmiosProvider.initialize().catch(async (error) => {
             if (isConnectionError(error)) {
-              ogmiosProvider = await recreateOgmiosTxSubmitProvider(serviceName, ogmiosProvider, dnsResolver, logger);
-              return await ogmiosProvider.initialize();
+              ogmiosProvider = await recreateOgmiosTxSubmitProvider(
+                serviceName,
+                ogmiosProvider,
+                dnsResolver,
+                logger,
+                handleProvider
+              );
+              return receiver.initialize();
             }
             throw error;
           });
@@ -80,10 +88,16 @@ export const ogmiosTxSubmitProviderWithDiscovery = async (
         return (submitTxArgs: SubmitTxArgs) =>
           ogmiosProvider.submitTx(submitTxArgs).catch(async (error) => {
             if (isConnectionError(error)) {
-              ogmiosProvider = await recreateOgmiosTxSubmitProvider(serviceName, ogmiosProvider, dnsResolver, logger);
-              await ogmiosProvider.initialize();
-              await ogmiosProvider.start();
-              return await ogmiosProvider.submitTx(submitTxArgs);
+              ogmiosProvider = await recreateOgmiosTxSubmitProvider(
+                serviceName,
+                ogmiosProvider,
+                dnsResolver,
+                logger,
+                handleProvider
+              );
+              await receiver.initialize();
+              await receiver.start();
+              return await receiver.submitTx(submitTxArgs);
             }
             throw error;
           });
@@ -104,11 +118,13 @@ export const ogmiosTxSubmitProviderWithDiscovery = async (
 export const getOgmiosTxSubmitProvider = async (
   dnsResolver: DnsResolver,
   logger: Logger,
-  options?: OgmiosProgramOptions
+  options?: OgmiosProgramOptions,
+  handleProvider?: HandleProvider
 ): Promise<OgmiosTxSubmitProvider> => {
   if (options?.ogmiosSrvServiceName)
-    return ogmiosTxSubmitProviderWithDiscovery(dnsResolver, logger, options.ogmiosSrvServiceName);
-  if (options?.ogmiosUrl) return new OgmiosTxSubmitProvider(urlToConnectionConfig(options?.ogmiosUrl), { logger });
+    return ogmiosTxSubmitProviderWithDiscovery(dnsResolver, logger, options.ogmiosSrvServiceName, handleProvider);
+  if (options?.ogmiosUrl)
+    return new OgmiosTxSubmitProvider(urlToConnectionConfig(options?.ogmiosUrl), { logger }, handleProvider);
   throw new MissingCardanoNodeOption([OgmiosOptionDescriptions.Url, OgmiosOptionDescriptions.SrvServiceName]);
 };
 
@@ -132,14 +148,14 @@ export const ogmiosCardanoNodeWithDiscovery = async (
   let ogmiosCardanoNode = new OgmiosCardanoNode({ host: name, port }, logger);
 
   const cardanoNodeProxy = new Proxy<OgmiosCardanoNode>({} as OgmiosCardanoNode, {
-    get(_, prop) {
+    get(_, prop, receiver) {
       if (prop === 'then') return;
       if (prop === 'initialize') {
         return () =>
           ogmiosCardanoNode.initialize().catch(async (error) => {
             if (isConnectionError(error)) {
               ogmiosCardanoNode = await recreateOgmiosCardanoNode(serviceName, ogmiosCardanoNode, dnsResolver, logger);
-              return await ogmiosCardanoNode.initialize();
+              return await receiver.initialize();
             }
             throw error;
           });
@@ -149,9 +165,9 @@ export const ogmiosCardanoNodeWithDiscovery = async (
           ogmiosCardanoNode[prop]().catch(async (error) => {
             if (isConnectionError(error)) {
               ogmiosCardanoNode = await recreateOgmiosCardanoNode(serviceName, ogmiosCardanoNode, dnsResolver, logger);
-              await ogmiosCardanoNode.initialize();
-              await ogmiosCardanoNode.start();
-              return await ogmiosCardanoNode[prop]();
+              await receiver.initialize();
+              await receiver.start();
+              return await receiver[prop]();
             }
             throw error;
           });

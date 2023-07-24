@@ -5,11 +5,15 @@ services:
     volumes:
       - ../..:/app
 
-  projector:
+  handle-projector:
     volumes:
       - ../..:/app
 
   provider-server:
+    volumes:
+      - ../..:/app
+
+  stake-pool-projector:
     volumes:
       - ../..:/app
 

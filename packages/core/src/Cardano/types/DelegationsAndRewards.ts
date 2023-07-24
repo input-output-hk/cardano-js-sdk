@@ -1,5 +1,5 @@
 import { Lovelace } from './Value';
-import { PoolId, StakePool } from './StakePool';
+import { PoolId, PoolIdHex, StakePool } from './StakePool';
 import { RewardAccount } from '../Address';
 
 export interface DelegationsAndRewards {
@@ -30,4 +30,17 @@ export interface RewardAccountInfo {
   delegatee?: Delegatee;
   rewardBalance: Lovelace;
   // Maybe add rewardsHistory for each reward account too
+}
+
+export interface Cip17Pool {
+  id: PoolIdHex;
+  weight: number;
+  name?: string;
+  ticker?: string;
+}
+export interface Cip17DelegationPortfolio {
+  name: string;
+  pools: Cip17Pool[];
+  description?: string;
+  author?: string;
 }

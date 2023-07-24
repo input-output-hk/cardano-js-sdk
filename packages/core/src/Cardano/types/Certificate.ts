@@ -62,3 +62,35 @@ export type Certificate =
   | StakeDelegationCertificate
   | MirCertificate
   | GenesisKeyDelegationCertificate;
+
+/**
+ * Creates a stake key registration certificate from a given reward account.
+ *
+ * @param rewardAccount The reward account to be registered.
+ */
+export const createStakeKeyRegistrationCert = (rewardAccount: RewardAccount): Certificate => ({
+  __typename: CertificateType.StakeKeyRegistration,
+  stakeKeyHash: RewardAccount.toHash(rewardAccount)
+});
+
+/**
+ * Creates a stake key de-registration certificate from a given reward account.
+ *
+ * @param rewardAccount The reward account to be de-registered.
+ */
+export const createStakeKeyDeregistrationCert = (rewardAccount: RewardAccount): Certificate => ({
+  __typename: CertificateType.StakeKeyDeregistration,
+  stakeKeyHash: RewardAccount.toHash(rewardAccount)
+});
+
+/**
+ * Creates a delegation certificate from a given reward account and a pool id.
+ *
+ * @param rewardAccount The reward account to be registered.
+ * @param poolId The id of the pool that we are delegating to.
+ */
+export const createDelegationCert = (rewardAccount: RewardAccount, poolId: PoolId): Certificate => ({
+  __typename: CertificateType.StakeDelegation,
+  poolId,
+  stakeKeyHash: RewardAccount.toHash(rewardAccount)
+});

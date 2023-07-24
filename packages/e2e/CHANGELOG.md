@@ -3,6 +3,93 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.16.6...@cardano-sdk/e2e@0.16.7) (2023-07-17)
+
+**Note:** Version bump only for package @cardano-sdk/e2e
+
+## [0.16.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.16.5...@cardano-sdk/e2e@0.16.6) (2023-07-13)
+
+### Features
+
+* **cardano-services:** add cli parameter to chose the handle provider ([0d7d423](https://github.com/input-output-hk/cardano-js-sdk/commit/0d7d4236cf054bed10fcebd3daecf63e50ba2434))
+
+## [0.16.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.16.4...@cardano-sdk/e2e@0.16.5) (2023-07-05)
+
+### Bug Fixes
+
+* **wallet:** discovery should search for 1/0 too ([cdf79cb](https://github.com/input-output-hk/cardano-js-sdk/commit/cdf79cbaf8925e72e52ad859ef78a0a112729b81))
+
+## [0.16.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.16.3...@cardano-sdk/e2e@0.16.4) (2023-07-04)
+
+**Note:** Version bump only for package @cardano-sdk/e2e
+
+## [0.16.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.16.2...@cardano-sdk/e2e@0.16.3) (2023-07-03)
+
+**Note:** Version bump only for package @cardano-sdk/e2e
+
+## [0.16.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.16.1...@cardano-sdk/e2e@0.16.2) (2023-06-29)
+
+**Note:** Version bump only for package @cardano-sdk/e2e
+
+## [0.16.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.16.0...@cardano-sdk/e2e@0.16.1) (2023-06-29)
+
+### Bug Fixes
+
+* **cardano-services:** don't unsubscribe from projection on health timeout ([5d7e98b](https://github.com/input-output-hk/cardano-js-sdk/commit/5d7e98b500217739a53b82ed448efec31171bc2c))
+* **util:** add ServerNotReady to list of connection errors ([c7faf01](https://github.com/input-output-hk/cardano-js-sdk/commit/c7faf01194561b2941c42c4a74517de0a5a9f7d9))
+
+## [0.16.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.15.0...@cardano-sdk/e2e@0.16.0) (2023-06-28)
+
+### ⚠ BREAKING CHANGES
+
+* revert inclusion of version in the HttpProvider interface
+
+### Bug Fixes
+
+* revert inclusion of version in the HttpProvider interface ([3f50013](https://github.com/input-output-hk/cardano-js-sdk/commit/3f5001367686668806bfe967d3d7b6dd5e96dccc))
+
+## [0.15.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.14.2...@cardano-sdk/e2e@0.15.0) (2023-06-23)
+
+### ⚠ BREAKING CHANGES
+
+* txBuilder delegate is replaced by delegatePortfolio.
+* TxBuilderProviders.rewardAccounts expects RewardAccountWithPoolId type,
+  instead of Omit<RewardAccount, 'delegatee'>
+
+### Features
+
+* add API and software version HTTP headers ([2e9664f](https://github.com/input-output-hk/cardano-js-sdk/commit/2e9664fcaff56adcfa4f21eb2b71b2fb6a3b411d))
+* remove txBuilder.delegate method ([f21c93b](https://github.com/input-output-hk/cardano-js-sdk/commit/f21c93b251f1bd67f47edd488d9df47c2abf3e0c))
+* **tx-construction:** use GreedyInputSelection for multi delegation ([5462936](https://github.com/input-output-hk/cardano-js-sdk/commit/54629367b14fe26f13f9c17483bdf98c451b8d89))
+* txBuilder delegatePortfolio ([ec0860e](https://github.com/input-output-hk/cardano-js-sdk/commit/ec0860e37835edbce3c911d6fe65c21b73683de7))
+
+## [0.14.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.14.1...@cardano-sdk/e2e@0.14.2) (2023-06-20)
+
+### Features
+
+* **cardano-services:** cache asset info and nft metadata ([43fd02f](https://github.com/input-output-hk/cardano-js-sdk/commit/43fd02ffaa5fdfe1812916e9885b383931141532))
+* **e2e:** give the ability to override cardano-node log level from env vars ([5c80025](https://github.com/input-output-hk/cardano-js-sdk/commit/5c80025c1a1b0457e101b06a565ad7f2d92d7315))
+* new pool delegation and stake registration factory methods added to core package ([82d95af](https://github.com/input-output-hk/cardano-js-sdk/commit/82d95af3f68eb06cb58bd2bec5209d93c2aa6c34))
+
+### Bug Fixes
+
+* **wallet:** rewardAccounts duplicates HD wallet ([93fbd73](https://github.com/input-output-hk/cardano-js-sdk/commit/93fbd73e1f7951220c8589f5ea4bdd098d903a02))
+
+## [0.14.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.14.0...@cardano-sdk/e2e@0.14.1) (2023-06-13)
+
+**Note:** Version bump only for package @cardano-sdk/e2e
+
+## [0.14.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.13.1...@cardano-sdk/e2e@0.14.0) (2023-06-12)
+
+### ⚠ BREAKING CHANGES
+
+* **wallet:** Remove obsolete 'stakeKeyIndexLimit' HDSequantialDiscovery
+constructor argument.
+
+### Features
+
+* **wallet:** discover used stake keys ([b63f709](https://github.com/input-output-hk/cardano-js-sdk/commit/b63f7098b28fc835f1f09bc7a92392bc5be7e912))
+
 ## [0.13.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.13.0...@cardano-sdk/e2e@0.13.1) (2023-06-06)
 
 **Note:** Version bump only for package @cardano-sdk/e2e

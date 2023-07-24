@@ -37,16 +37,20 @@ jobs:
       run: |
         yarn local-network:up -d
       env:
-        POSTGRES_PORT: '5435'
+        CARDANO_NODE_CHAINDB_LOG_LEVEL: 'Warning'
+        CARDANO_NODE_LOG_LEVEL: 'Warning'
         OGMIOS_PORT: '1340'
         OGMIOS_URL: 'ws://cardano-node-ogmios:1340'
+        POSTGRES_PORT: '5435'
+
+    - name: Dump docker logs on failure
+      if: failure()
+      uses: jwalton/gh-docker-logs@v2
 
     - name: Wait for some epochs
       run: |
         yarn workspace @cardano-sdk/e2e wait-for-network
       env:
-        FAUCET_PROVIDER: 'cardano-wallet'
-        FAUCET_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:8090/v2","mnemonic":"fire method repair aware foot tray accuse brother popular olive find account sick rocket next"}'
         DB_SYNC_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/cexplorer'
 
     - name: 🔬 Test - e2e - wallet
@@ -56,8 +60,6 @@ jobs:
         yarn workspace @cardano-sdk/e2e test:projection
         yarn workspace @cardano-sdk/e2e test:pg-boss
       env:
-        FAUCET_PROVIDER: 'cardano-wallet'
-        FAUCET_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:8090/v2","mnemonic":"fire method repair aware foot tray accuse brother popular olive find account sick rocket next"}'
         KEY_MANAGEMENT_PROVIDER: 'inMemory'
         KEY_MANAGEMENT_PARAMS: '{"bip32Ed25519": "CML", "accountIndex": 0, "chainId":{"networkId": 0, "networkMagic": 888}, "passphrase":"some_passphrase","mnemonic":"vacant violin soft weird deliver render brief always monitor general maid smart jelly core drastic erode echo there clump dizzy card filter option defense"}'
         ASSET_PROVIDER: 'http'
@@ -65,6 +67,10 @@ jobs:
         CHAIN_HISTORY_PROVIDER: 'http'
         CHAIN_HISTORY_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/chain-history"}'
         DB_SYNC_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/cexplorer'
+        HANDLE_PROVIDER: 'http'
+        HANDLE_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/handle","policyId":""}'
+        KORA_LABS_HANDLE_PROVIDER: 'kora-labs'
+        KORA_LABS_HANDLE_PROVIDER_PARAMS: '{"serverUrl":"http://localhost:4000","policyId":""}'
         STAKE_POOL_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/stake_pool'
         STAKE_POOL_TEST_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/stake_pool_test'
         NETWORK_INFO_PROVIDER: 'http'
@@ -79,5 +85,3 @@ jobs:
         STAKE_POOL_PROVIDER: 'http'
         STAKE_POOL_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/stake-pool"}'
         STAKE_POOL_PROVIDER_URL: 'http://localhost:4000/stake-pool'
-        HANDLE_PROVIDER: 'kora-labs'
-        HANDLE_PROVIDER_PARAMS: '{"serverUrl":"http://localhost:4000","policyId":""}'

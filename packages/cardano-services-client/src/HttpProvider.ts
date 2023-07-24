@@ -1,15 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { HttpProviderConfigPaths, Provider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
-import { ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { apiVersion } from './version';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
 import axios, { AxiosAdapter, AxiosRequestConfig, AxiosResponseTransformer } from 'axios';
+import packageJson from '../package.json';
 
 const isEmptyResponse = (response: any) => response === '';
 
-export type HttpProviderConfigPaths<T> = { [methodName in keyof T]: string };
 type ResponseTransformers<T> = { [K in keyof T]?: AxiosResponseTransformer };
 
-export interface HttpProviderConfig<T> {
+export interface HttpProviderConfig<T extends Provider> {
   /**
    * Example: "http://localhost:3000"
    */
@@ -53,7 +54,10 @@ export interface HttpProviderConfig<T> {
  * The subset of parameters from HttpProviderConfig that must be set by the
  * client code.
  */
-export type CreateHttpProviderConfig<T> = Pick<HttpProviderConfig<T>, 'baseUrl' | 'adapter' | 'logger'>;
+export type CreateHttpProviderConfig<T extends Provider> = Pick<
+  HttpProviderConfig<T>,
+  'baseUrl' | 'adapter' | 'logger'
+>;
 
 /**
  * Creates a HTTP client for specified provider type, following some conventions:
@@ -65,7 +69,7 @@ export type CreateHttpProviderConfig<T> = Pick<HttpProviderConfig<T>, 'baseUrl' 
  *
  * @returns provider that fetches data over http
  */
-export const createHttpProvider = <T extends object>({
+export const createHttpProvider = <T extends Provider>({
   baseUrl,
   axiosOptions,
   mapError,
@@ -79,10 +83,10 @@ export const createHttpProvider = <T extends object>({
     get(_, prop) {
       if (prop === 'then') return;
       const method = prop as keyof T;
-      const path = paths[method];
+      const urlPath = paths[method];
       const transformResponse =
         responseTransformers && responseTransformers[method] ? responseTransformers[method]! : (v: unknown) => v;
-      if (!path)
+      if (!urlPath)
         throw new ProviderError(ProviderFailure.NotImplemented, `HttpProvider missing path for '${prop.toString()}'`);
       return async (...args: any[]) => {
         try {
@@ -91,9 +95,10 @@ export const createHttpProvider = <T extends object>({
             adapter,
             baseURL: baseUrl,
             data: { ...args[0] },
+            headers: { ...axiosOptions?.headers, 'Version-Api': apiVersion, 'Version-Software': packageJson.version },
             method: 'post',
             responseType: 'json',
-            url: path
+            url: urlPath
           };
           logger.debug(`Sending ${req.method} request to ${req.baseURL}${req.url} with data:`);
           logger.debug(req.data);

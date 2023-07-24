@@ -3,10 +3,18 @@ import { Asset, Cardano, metadatum, nativeScriptPolicyId } from '@cardano-sdk/co
 import { Assets, FinalizeTxProps, PersonalWallet } from '@cardano-sdk/wallet';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
 import { KeyRole, TransactionSigner, util } from '@cardano-sdk/key-management';
-import { burnTokens, createStandaloneKeyAgent, firstValueFromTimed, submitAndConfirm, walletReady } from '../../util';
+import {
+  burnTokens,
+  createStandaloneKeyAgent,
+  firstValueFromTimed,
+  getEnv,
+  getWallet,
+  submitAndConfirm,
+  walletReady,
+  walletVariables
+} from '../../../src';
 import { combineLatest, filter, firstValueFrom, map } from 'rxjs';
 import { createLogger } from '@cardano-sdk/util-dev';
-import { getEnv, getWallet, walletVariables } from '../../../src';
 
 const env = getEnv(walletVariables);
 const logger = createLogger();

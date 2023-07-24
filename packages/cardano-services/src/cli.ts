@@ -16,6 +16,7 @@ import {
   DISABLE_STAKE_POOL_METRIC_APY_DEFAULT,
   DROP_SCHEMA_DEFAULT,
   DRY_RUN_DEFAULT,
+  HANDLE_PROVIDER_SERVER_URL_DEFAULT,
   PAGINATION_PAGE_SIZE_LIMIT_DEFAULT,
   PARALLEL_MODE_DEFAULT,
   PARALLEL_TXS_DEFAULT,
@@ -63,6 +64,7 @@ import { ProjectionName } from './Projection';
 import { URL } from 'url';
 import { dbCacheValidator } from './util/validators';
 import { withCommonOptions, withOgmiosOptions, withPostgresOptions, withRabbitMqOptions } from './Program/options/';
+import { withHandlePolicyIdsOptions } from './Program/options/policyIds';
 import fs from 'fs';
 import onDeath from 'death';
 import path from 'path';
@@ -107,15 +109,17 @@ const runServer = async (message: string, loadServer: () => Promise<HttpServer>)
 withCommonOptions(
   withOgmiosOptions(
     withPostgresOptions(
-      program
-        .command('start-projector')
-        .description('Start a projector')
-        .argument(
-          '[projectionNames...]',
-          `List of projections to start: ${Object.values(ProjectionName).toString()}`,
-          projectionNameParser
-        ),
-      'StakePool'
+      withHandlePolicyIdsOptions(
+        program
+          .command('start-projector')
+          .description('Start a projector')
+          .argument(
+            '[projectionNames...]',
+            `List of projections to start: ${Object.values(ProjectionName).toString()}`,
+            projectionNameParser
+          )
+      ),
+      ''
     )
   ),
   { apiUrl: PROJECTOR_API_URL_DEFAULT }
@@ -160,7 +164,7 @@ withCommonOptions(
     runServer('projector', () =>
       loadProjector({
         ...args,
-        postgresConnectionStringStakePool: connectionStringFromArgs(args, 'StakePool'),
+        postgresConnectionString: connectionStringFromArgs(args, ''),
         // Setting the projection names via env variable takes preference over command line argument
         projectionNames: args.projectionNames ? args.projectionNames : projectionNames
       })
@@ -171,18 +175,25 @@ withCommonOptions(
   withOgmiosOptions(
     withPostgresOptions(
       withPostgresOptions(
-        withRabbitMqOptions(
-          program
-            .command('start-provider-server')
-            .description('Start the Provider Server')
-            .argument('[serviceNames...]', `List of services to attach: ${Object.values(ServiceNames).toString()}`)
+        withPostgresOptions(
+          withRabbitMqOptions(
+            withHandlePolicyIdsOptions(
+              program
+                .command('start-provider-server')
+                .description('Start the Provider Server')
+                .argument('[serviceNames...]', `List of services to attach: ${Object.values(ServiceNames).toString()}`)
+            )
+          ),
+          'StakePool'
         ),
-        'StakePool'
+        'Handle'
       ),
       'DbSync'
     )
   ),
-  { apiUrl: PROVIDER_SERVER_API_URL_DEFAULT }
+  {
+    apiUrl: PROVIDER_SERVER_API_URL_DEFAULT
+  }
 )
   .addOption(
     new Option(
@@ -258,6 +269,12 @@ withCommonOptions(
       .argParser(dbCacheValidator)
   )
   .addOption(
+    new Option('--asset-cache-ttl <assetCacheTTL>', ProviderServerOptionDescriptions.AssetCacheTtl)
+      .env('ASSET_CACHE_TTL')
+      .default(DB_CACHE_TTL_DEFAULT)
+      .argParser(dbCacheValidator)
+  )
+  .addOption(
     new Option(
       '--token-metadata-request-timeout <tokenMetadataRequestTimeout>',
       ProviderServerOptionDescriptions.PaginationPageSizeLimit
@@ -290,6 +307,18 @@ withCommonOptions(
       )
   )
   .addOption(
+    new Option('--use-kora-labs <true/false>', ProviderServerOptionDescriptions.UseKoraLabsProvider)
+      .env('USE_KORA_LABS')
+      .default(false)
+      .argParser((useKoraLabs) =>
+        stringOptionToBoolean(
+          useKoraLabs,
+          Programs.ProviderServer,
+          ProviderServerOptionDescriptions.UseKoraLabsProvider
+        )
+      )
+  )
+  .addOption(
     new Option('--use-queue <true/false>', ProviderServerOptionDescriptions.UseQueue)
       .env('USE_QUEUE')
       .default(USE_QUEUE_DEFAULT)
@@ -306,13 +335,22 @@ withCommonOptions(
       .default(PAGINATION_PAGE_SIZE_LIMIT_DEFAULT)
       .argParser((interval) => Number.parseInt(interval, 10))
   )
+  .addOption(
+    new Option(
+      '--handle-provider-server-url <handleProviderServerUrl>',
+      ProviderServerOptionDescriptions.HandleProviderServerUrl
+    )
+      .env('HANDLE_PROVIDER_SERVER_URL')
+      .default(HANDLE_PROVIDER_SERVER_URL_DEFAULT)
+      .argParser((serverUrl: string) => serverUrl)
+  )
   .action(async (serviceNames: ServiceNames[], args: ProviderServerArgs) =>
     runServer('Provider server', () =>
       loadProviderServer({
         ...args,
         postgresConnectionStringDbSync: connectionStringFromArgs(args, 'DbSync'),
+        postgresConnectionStringHandle: connectionStringFromArgs(args, 'Handle'),
         postgresConnectionStringStakePool: connectionStringFromArgs(args, 'StakePool'),
-        // Setting the service names via env variable takes preference over command line argument
         serviceNames: args.serviceNames ? args.serviceNames : serviceNames
       })
     )

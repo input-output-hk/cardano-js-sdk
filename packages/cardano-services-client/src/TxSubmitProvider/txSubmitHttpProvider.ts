@@ -1,6 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { CardanoNodeErrors, ProviderError, ProviderFailure, TxSubmitProvider } from '@cardano-sdk/core';
-import { CreateHttpProviderConfig, HttpProviderConfigPaths, createHttpProvider } from '../HttpProvider';
+import {
+  CardanoNodeErrors,
+  HandleOwnerChangeError,
+  HttpProviderConfigPaths,
+  ProviderError,
+  ProviderFailure,
+  TxSubmitProvider
+} from '@cardano-sdk/core';
+import { CreateHttpProviderConfig, createHttpProvider } from '../HttpProvider';
 import { mapHealthCheckError } from '../mapHealthCheckError';
 
 /**
@@ -55,6 +62,10 @@ export const txSubmitHttpProvider = (config: CreateHttpProviderConfig<TxSubmitPr
                   ? ProviderFailure.Unknown
                   : ProviderFailure.BadRequest;
               throw new ProviderError(failure, txSubmissionError);
+            }
+
+            if (error.name === 'HandleOwnerChangeError') {
+              Object.setPrototypeOf(error, HandleOwnerChangeError);
             }
           }
         }

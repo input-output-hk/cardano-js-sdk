@@ -65,21 +65,7 @@ $ yarn workspace @cardano-sdk/e2e local-network:down
 
 Instead of CTRL-C, since some resources need to be clear before you can set up the environment again, if you don't stop the containers with the proper command, you may run into issues restarting it.
 
-There are two ways of obtaining tADA on this network, first we have the faucet:
-
-```javascript
-let faucetProvider = await faucetProviderFactory.create(
-  env.FAUCET_PROVIDER,
-  env.FAUCET_PROVIDER_PARAMS,
-  getLogger(env.LOGGER_MIN_SEVERITY)
-);
-
-await faucetProvider.request(address, amountFromFaucet, blockConfirmations);
-```
-
-The faucet allows you to request an arbitrary amount of tADA to a given address. The faucet will make sure the transaction is in a block before returning, which means you can access the funds immediately after.
-
-The second way is via a set of fixed wallets that are created when the network bootstraps, these wallets contain 5 million tADA each, and you can use them directly if you find the use of the faucet not convenient:
+To obtain tADA on this network there is a set of fixed wallets that are created when the network bootstraps, these wallets contain 5 million tADA each and you can use them directly:
 
 ```
 Mnemonic:   vacant violin soft weird deliver render brief always monitor general maid smart jelly core drastic erode echo there clump dizzy card filter option defense
@@ -170,8 +156,6 @@ For the local network tests to work correctly, we must configure it with the mne
 LOGGER_MIN_SEVERITY=info
 
 # Providers setup
-FAUCET_PROVIDER=cardano-wallet
-FAUCET_PROVIDER_PARAMS='{"baseUrl":"http://localhost:8090/v2","mnemonic":"fire method repair aware foot tray accuse brother popular olive find account sick rocket next"}'
 KEY_MANAGEMENT_PROVIDER=inMemory
 KEY_MANAGEMENT_PARAMS='{"accountIndex": 0, "chainId":{"networkId": 0, "networkMagic": 888}, "passphrase":"some_passphrase","mnemonic":""}'
 ASSET_PROVIDER=http
@@ -192,7 +176,7 @@ HANDLE_PROVIDER=kora-labs
 HANDLE_PROVIDER_PARAMS='{"serverUrl":"http://localhost:4000","policyId":""}'
 ```
 
-> :information*source: Notice that KEY_MANAGEMENT_PARAMS \_mnemonic* property is empty, if you leave this empty on the **local network's** e2e tests a new set of random mnemonics will be generated for you, this is the recommended way of setting up e2e tests on this network.
+> :information_source: Notice that `KEY_MANAGEMENT_PARAMS.mnemonic` property is empty, if you leave this empty on the **local network's** e2e tests a new set of random mnemonics will be generated for you, this is the recommended way of setting up e2e tests on this network.
 
 Then to run the local network tests, run:
 

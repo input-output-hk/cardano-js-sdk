@@ -1,20 +1,26 @@
 import { Bootstrap } from '@cardano-sdk/projection';
 import { CommonProgramOptions, OgmiosProgramOptions, PosgresProgramOptions } from '../options';
 import { DnsResolver, createDnsResolver } from '../utils';
+import {
+  HandlePolicyIdsOptionDescriptions,
+  HandlePolicyIdsProgramOptions,
+  handlePolicyIdsFromFile
+} from '../options/policyIds';
 import { HttpServer, HttpServerConfig } from '../../Http';
 import { Logger } from 'ts-log';
+import { MissingProgramOption, UnknownServiceName } from '../errors';
 import { ProjectionHttpService, ProjectionName, createTypeormProjection, storeOperators } from '../../Projection';
 import { SrvRecord } from 'dns';
 import { TypeormStabilityWindowBuffer, createStorePoolMetricsUpdateJob } from '@cardano-sdk/projection-typeorm';
 import { URL } from 'url';
-import { UnknownServiceName } from '../errors';
 import { createLogger } from 'bunyan';
 import { getConnectionConfig, getOgmiosObservableCardanoNode } from '../services';
 
 export const PROJECTOR_API_URL_DEFAULT = new URL('http://localhost:3002');
 
 export type ProjectorArgs = CommonProgramOptions &
-  PosgresProgramOptions<'StakePool'> &
+  PosgresProgramOptions<''> &
+  HandlePolicyIdsProgramOptions &
   OgmiosProgramOptions & {
     dropSchema: boolean;
     dryRun: boolean;
@@ -40,14 +46,17 @@ const createProjectionHttpService = async (options: ProjectionMapFactoryOptions)
     ogmiosSrvServiceName: args.ogmiosSrvServiceName,
     ogmiosUrl: args.ogmiosUrl
   });
-  const connectionConfig$ = getConnectionConfig(dnsResolver, 'projector', args);
+  const connectionConfig$ = getConnectionConfig(dnsResolver, 'projector', '', args);
   const buffer = new TypeormStabilityWindowBuffer({ logger });
-  const { dropSchema, dryRun, projectionNames, synchronize } = args;
+  const { dropSchema, dryRun, projectionNames, synchronize, handlePolicyIds } = args;
   const projection$ = createTypeormProjection({
     buffer,
     connectionConfig$,
     devOptions: { dropSchema, synchronize },
     logger,
+    projectionOptions: {
+      handlePolicyIds
+    },
     projectionSource$: Bootstrap.fromCardanoNode({
       buffer,
       cardanoNode,
@@ -60,36 +69,56 @@ const createProjectionHttpService = async (options: ProjectionMapFactoryOptions)
 
 export const loadProjector = async (args: ProjectorArgs, deps: LoadProjectorDependencies = {}): Promise<HttpServer> => {
   const supportedProjections = Object.values(ProjectionName);
-  for (const projectionName of args.projectionNames) {
+
+  await handlePolicyIdsFromFile(args);
+
+  const {
+    apiUrl,
+    buildInfo,
+    enableMetrics,
+    handlePolicyIds,
+    loggerMinSeverity,
+    projectionNames,
+    serviceDiscoveryBackoffFactor,
+    serviceDiscoveryTimeout
+  } = args;
+
+  for (const projectionName of projectionNames) {
     if (!supportedProjections.includes(projectionName)) {
       throw new UnknownServiceName(projectionName, Object.values(ProjectionName));
+    }
+    if (projectionName === ProjectionName.Handle && !handlePolicyIds) {
+      throw new MissingProgramOption(ProjectionName.Handle, [
+        HandlePolicyIdsOptionDescriptions.HandlePolicyIds,
+        HandlePolicyIdsOptionDescriptions.HandlePolicyIdsFile
+      ]);
     }
   }
   const logger =
     deps?.logger ||
     createLogger({
-      level: args.loggerMinSeverity,
+      level: loggerMinSeverity,
       name: 'projector'
     });
   const dnsResolver =
     deps?.dnsResolver ||
     createDnsResolver(
       {
-        factor: args.serviceDiscoveryBackoffFactor,
-        maxRetryTime: args.serviceDiscoveryTimeout
+        factor: serviceDiscoveryBackoffFactor,
+        maxRetryTime: serviceDiscoveryTimeout
       },
       logger
     );
   const service = await createProjectionHttpService({ args, dnsResolver, logger });
   const config: HttpServerConfig = {
     listen: {
-      host: args.apiUrl.hostname,
-      port: args.apiUrl ? Number.parseInt(args.apiUrl.port) : undefined
+      host: apiUrl.hostname,
+      port: apiUrl ? Number.parseInt(apiUrl.port) : undefined
     },
-    meta: { ...args.buildInfo, startupTime: Date.now() }
+    meta: { ...buildInfo, startupTime: Date.now() }
   };
-  if (args.enableMetrics) {
-    config.metrics = { enabled: args.enableMetrics };
+  if (enableMetrics) {
+    config.metrics = { enabled: enableMetrics };
   }
   return new HttpServer(config, { logger, services: [service] });
 };

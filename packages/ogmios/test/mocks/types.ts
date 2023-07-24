@@ -15,9 +15,10 @@ export type TxSubmitResponse = {
 };
 
 export type EraSummariesResponse = {
+  eraSummaries?: Schema.EraSummary[];
   success: boolean;
   failWith?: {
-    type: 'unknownResultError' | 'connectionError';
+    type: 'unknownResultError';
   };
 };
 
@@ -31,6 +32,7 @@ export type GenesisConfigResponse = {
 
 export type SystemStartResponse = {
   success: boolean;
+  systemStart?: Date;
   failWith?: {
     type: 'queryUnavailableInEra';
   };

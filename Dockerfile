@@ -3,9 +3,13 @@ ARG UBUNTU_VERSION=20.04
 FROM ubuntu:${UBUNTU_VERSION} as ubuntu-nodejs
 ARG NODEJS_MAJOR_VERSION=14
 ENV DEBIAN_FRONTEND=nonintercative
-RUN apt-get update && apt-get install curl -y &&\
-  curl --proto '=https' --tlsv1.2 -sSf -L https://deb.nodesource.com/setup_${NODEJS_MAJOR_VERSION}.x | bash - &&\
-  apt-get install nodejs -y
+RUN apt-get update && apt-get install curl -y
+RUN curl --proto '=https' --tlsv1.2 -sSf -L https://deb.nodesource.com/setup_${NODEJS_MAJOR_VERSION}.x | bash -
+RUN curl --proto '=https' --tlsv1.2 -sSf -L https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - &&\
+  echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" | tee /etc/apt/sources.list.d/pgdg.list
+RUN apt-get update
+RUN apt-get install nodejs -y
+RUN apt-get install -y --no-install-recommends ca-certificates jq postgresql-client
 
 FROM ubuntu-nodejs as nodejs-builder
 RUN curl --proto '=https' --tlsv1.2 -sSf -L https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - &&\
@@ -59,10 +63,6 @@ COPY --from=cardano-services-builder /app/packages/util-rxjs/package.json /app/p
 
 FROM cardano-services as provider-server
 ARG NETWORK=mainnet
-RUN curl --proto '=https' --tlsv1.2 -sSf -L https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - &&\
-  echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" | tee  /etc/apt/sources.list.d/pgdg.list &&\
-  apt-get update && apt-get install -y --no-install-recommends \
-  ca-certificates jq
 ENV \
   CARDANO_NODE_CONFIG_PATH=/config/cardano-node/config.json \
   NETWORK=${NETWORK}
@@ -94,7 +94,6 @@ WORKDIR /app/packages/cardano-services
 CMD ["node", "dist/cjs/cli.js", "start-pg-boss-worker"]
 
 FROM cardano-services as projector
-RUN apt-get update && apt-get install -y --no-install-recommends jq postgresql-client
 WORKDIR /
 COPY compose/projector/init.* ./
 RUN chmod 755 init.sh

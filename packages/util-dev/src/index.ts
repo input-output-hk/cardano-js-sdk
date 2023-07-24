@@ -12,3 +12,4 @@ export * from './createGenericMockServer';
 export * from './dataGeneration';
 export * from './eraSummaries';
 export * as mockProviders from './mockProviders';
+export * as handleProviderMocks from './handleProvider';

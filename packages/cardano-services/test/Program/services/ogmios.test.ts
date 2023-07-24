@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable sonarjs/no-duplicate-string */
-import { CardanoNodeErrors } from '@cardano-sdk/core';
+import { Cardano, CardanoNodeErrors, ProviderError } from '@cardano-sdk/core';
 import { Connection } from '@cardano-ogmios/client';
 import { DbPools, LedgerTipModel, findLedgerTip } from '../../../src/util/DbSyncProvider';
 import { DbSyncEpochPollService, listenPromise, loadGenesisData, serverClosePromise } from '../../../src/util';
@@ -15,6 +15,7 @@ import {
   getPool
 } from '../../../src';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../../src/InMemoryCache';
+import { KoraLabsHandleProvider } from '@cardano-sdk/cardano-services-client';
 import { Ogmios, OgmiosCardanoNode, OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { SrvRecord } from 'dns';
@@ -22,11 +23,25 @@ import { bufferToHexString } from '@cardano-sdk/util';
 import { clearDbPools, createHealthyMockOgmiosServer, ogmiosServerReady } from '../../util';
 import { createMockOgmiosServer } from '../../../../ogmios/test/mocks/mockOgmiosServer';
 import { getPort, getRandomPort } from 'get-port-please';
+import { handleProviderMocks, logger } from '@cardano-sdk/util-dev';
 import { healthCheckResponseMock } from '../../../../core/test/CardanoNode/mocks';
-import { logger } from '@cardano-sdk/util-dev';
+import { mockDnsResolverFactory } from './util';
 import { types } from 'util';
 import axios from 'axios';
 import http from 'http';
+
+jest.mock('@cardano-sdk/cardano-services-client', () => ({
+  ...jest.requireActual('@cardano-sdk/cardano-services-client'),
+  KoraLabsHandleProvider: jest.fn().mockImplementation(() => ({
+    healthCheck: jest.fn(),
+    resolveHandles: jest.fn().mockResolvedValue([handleProviderMocks.getAliceHandleProviderResponse])
+  }))
+}));
+
+const handleProvider = new KoraLabsHandleProvider({
+  policyId: Cardano.PolicyId('50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb'),
+  serverUrl: 'https://localhost:3000'
+});
 
 jest.mock('dns', () => ({
   promises: {
@@ -49,6 +64,9 @@ describe('Service dependency abstractions', () => {
   const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
   let lastBlockNoInDb: LedgerTipModel;
   let dbPools: DbPools;
+
+  const ogmiosPortDefault = 1337;
+  const mockDnsResolver = mockDnsResolverFactory(ogmiosPortDefault);
 
   beforeAll(async () => {
     dbPools = {
@@ -265,6 +283,42 @@ describe('Service dependency abstractions', () => {
           expect(res.status).toBe(200);
           expect(res.data).toEqual(healthCheckResponseMock({ withTip: false }));
         });
+
+        it('verifies that the submitted transaction addresses can all correctly be resolved', async () => {
+          const provider = await getOgmiosTxSubmitProvider(
+            dnsResolver,
+            logger,
+            {
+              ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
+            },
+            handleProvider
+          );
+
+          await provider.initialize();
+          await provider.start();
+          const res = await provider.submitTx({
+            context: { handles: [handleProviderMocks.getAliceHandleProviderResponse] },
+            signedTransaction: bufferToHexString(Buffer.from(new Uint8Array([])))
+          });
+          expect(res).toBeUndefined();
+          await provider.shutdown();
+        });
+
+        it('throws a provider error if the submitted transaction does not contain addresses that can be resolved from the included context', async () => {
+          const provider = await getOgmiosTxSubmitProvider(dnsResolver, logger, {
+            ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
+          });
+          await provider.initialize();
+          await provider.start();
+
+          await expect(
+            provider.submitTx({
+              context: { handles: [handleProviderMocks.getWrongHandleProviderResponse] },
+              signedTransaction: bufferToHexString(Buffer.from(new Uint8Array([])))
+            })
+          ).rejects.toBeInstanceOf(ProviderError);
+          await provider.shutdown();
+        });
       });
 
       describe('NetworkInfoHttpService', () => {
@@ -299,7 +353,6 @@ describe('Service dependency abstractions', () => {
 
         afterAll(async () => {
           await httpServer.shutdown();
-          await serverClosePromise(ogmiosServer);
         });
 
         it('ogmiosCardanoNode should not be a instance of Proxy ', () => {
@@ -330,7 +383,6 @@ describe('Service dependency abstractions', () => {
     let mockServer: http.Server;
     let connection: Connection;
     let provider: OgmiosTxSubmitProvider;
-    const ogmiosPortDefault = 1337;
 
     beforeEach(async () => {
       connection = Ogmios.createConnectionObject({ port: ogmiosPortDefault });
@@ -350,42 +402,22 @@ describe('Service dependency abstractions', () => {
     });
 
     it('should resolve DNS twice during initialization without reconnection logic with long ws connection type', async () => {
-      const srvRecord = { name: 'localhost', port: ogmiosPortDefault, priority: 1, weight: 1 };
-      const failingOgmiosMockPort = await getRandomPort();
-      let resolverAlreadyCalled = false;
-
-      // Initially resolves with a failing ogmios port, then swap to the default one
-      const dnsResolverMock = jest.fn().mockImplementation(async () => {
-        if (!resolverAlreadyCalled) {
-          resolverAlreadyCalled = true;
-          return { ...srvRecord, port: failingOgmiosMockPort };
-        }
-        return srvRecord;
-      });
+      // Resolves with a failing ogmios port twice, then swap to the default one
+      const dnsResolverMock = await mockDnsResolver(2);
 
       provider = await getOgmiosTxSubmitProvider(dnsResolverMock, logger, {
         ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
       });
 
       await expect(provider.initialize()).resolves.toBeUndefined();
-      expect(dnsResolverMock).toBeCalledTimes(2);
+      expect(dnsResolverMock).toBeCalledTimes(3);
       await provider.start();
       await provider.shutdown();
     });
 
     it('should initially fail with a connection error, then re-resolve the port and propagate the correct non-connection error to the caller', async () => {
-      const srvRecord = { name: 'localhost', port: ogmiosPortDefault, priority: 1, weight: 1 };
-      const failingOgmiosMockPort = await getRandomPort();
-      let resolverAlreadyCalled = false;
-
-      // Initially resolves with a failing ogmios port, then swap to the default one
-      const dnsResolverMock = jest.fn().mockImplementation(async () => {
-        if (!resolverAlreadyCalled) {
-          resolverAlreadyCalled = true;
-          return { ...srvRecord, port: failingOgmiosMockPort };
-        }
-        return srvRecord;
-      });
+      // Resolves with a failing ogmios port twice, then swap to the default one
+      const dnsResolverMock = await mockDnsResolver(2);
 
       provider = await getOgmiosTxSubmitProvider(dnsResolverMock, logger, {
         ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
@@ -396,7 +428,7 @@ describe('Service dependency abstractions', () => {
       await expect(
         provider.submitTx({ signedTransaction: bufferToHexString(Buffer.from(new Uint8Array([]))) })
       ).rejects.toBeInstanceOf(CardanoNodeErrors.TxSubmissionErrors.EraMismatchError);
-      expect(dnsResolverMock).toBeCalledTimes(2);
+      expect(dnsResolverMock).toBeCalledTimes(3);
       await provider.shutdown();
     });
 
@@ -413,7 +445,6 @@ describe('Service dependency abstractions', () => {
     let mockServer: http.Server;
     let connection: Connection;
     let node: OgmiosCardanoNode;
-    const ogmiosPortDefault = 1337;
 
     beforeEach(async () => {
       connection = Ogmios.createConnectionObject({ port: ogmiosPortDefault });
@@ -436,25 +467,15 @@ describe('Service dependency abstractions', () => {
     });
 
     it('should initially fail with a connection error, then re-resolve the port and initialize', async () => {
-      const srvRecord = { name: 'localhost', port: ogmiosPortDefault, priority: 1, weight: 1 };
-      const failingOgmiosMockPort = await getRandomPort();
-      let resolverAlreadyCalled = false;
-
-      // Initially resolves with a failing ogmios port, then swap to the default one
-      const dnsResolverMock = jest.fn().mockImplementation(async () => {
-        if (!resolverAlreadyCalled) {
-          resolverAlreadyCalled = true;
-          return { ...srvRecord, port: failingOgmiosMockPort };
-        }
-        return srvRecord;
-      });
+      // Resolves with a failing ogmios port twice, then swap to the default one
+      const dnsResolverMock = await mockDnsResolver(2);
 
       node = await getOgmiosCardanoNode(dnsResolverMock, logger, {
         ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
       });
 
       await expect(node.initialize()).resolves.toBeUndefined();
-      expect(dnsResolverMock).toBeCalledTimes(2);
+      expect(dnsResolverMock).toBeCalledTimes(3);
       await node.start();
       await node.shutdown();
     });
@@ -465,24 +486,14 @@ describe('Service dependency abstractions', () => {
       const failMockServer = createMockOgmiosServer({
         healthCheck: { response: { networkSynchronization: 0.999, success: true } },
         stateQuery: {
-          eraSummaries: { response: { failWith: { type: 'connectionError' }, success: false } },
           systemStart: { response: { success: true } }
         }
       });
       await listenPromise(failMockServer, failConnection);
       await ogmiosServerReady(failConnection);
 
-      const srvRecord = { name: 'localhost', port: ogmiosPortDefault, priority: 1, weight: 1 };
-      let resolverAlreadyCalled = false;
-
-      // Initially resolves with a failing ogmios port, then swap to the default one
-      const dnsResolverMock = jest.fn().mockImplementation(async () => {
-        if (!resolverAlreadyCalled) {
-          resolverAlreadyCalled = true;
-          return { ...srvRecord, port: failingOgmiosMockPort };
-        }
-        return srvRecord;
-      });
+      // Resolves with a failing ogmios port twice, then swap to the default one
+      const dnsResolverMock = await mockDnsResolver(2, failingOgmiosMockPort);
 
       node = await getOgmiosCardanoNode(dnsResolverMock, logger, {
         ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
@@ -490,13 +501,15 @@ describe('Service dependency abstractions', () => {
 
       await node.initialize();
       await node.start();
+      for (const socket of failMockServer.wss.clients) {
+        socket.close();
+      }
+      await serverClosePromise(failMockServer);
       await expect(node.eraSummaries()).rejects.toBeInstanceOf(
         CardanoNodeErrors.CardanoClientErrors.UnknownResultError
       );
-      expect(dnsResolverMock).toBeCalledTimes(2);
+      expect(dnsResolverMock).toBeCalledTimes(3);
       await node.shutdown();
-
-      await serverClosePromise(failMockServer);
     });
 
     it('should execute a provider operation without to intercept it', async () => {

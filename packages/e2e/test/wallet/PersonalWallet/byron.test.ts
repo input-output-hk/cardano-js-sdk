@@ -4,9 +4,8 @@ import { PersonalWallet } from '@cardano-sdk/wallet';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom, map, take } from 'rxjs';
 import { getEnv, walletVariables } from '../../../src/environment';
-import { getWallet } from '../../../src';
+import { getWallet, normalizeTxBody, walletReady } from '../../../src';
 import { isNotNil } from '@cardano-sdk/util';
-import { normalizeTxBody, walletReady } from '../../util';
 
 const env = getEnv(walletVariables);
 const logger = createLogger();

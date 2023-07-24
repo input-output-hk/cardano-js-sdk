@@ -279,6 +279,10 @@ describe('cip30', () => {
           );
         });
 
+        test('accepts amount as tagged integer', async () => {
+          await expect(api.getCollateral({ amount: 'c2434c4b40' })).resolves.not.toThrow();
+        });
+
         test('returns multiple UTxOs when more than 1 utxo needed to satisfy amount', async () => {
           // 1a003d0900 Represents a CML.BigNum object of 4 ADA
           const utxos = await api2.getCollateral({ amount: '1a003d0900' });
@@ -345,8 +349,10 @@ describe('cip30', () => {
 
       test('api.getUsedAddresses', async () => {
         const cipUsedAddressess = await api.getUsedAddresses();
-        const [{ address: walletAddress }] = await firstValueFrom(wallet.addresses$);
-        expect(cipUsedAddressess.map((cipAddr) => Cardano.PaymentAddress(cipAddr))).toEqual([walletAddress]);
+        const usedAddresses = (await firstValueFrom(wallet.addresses$)).map((grouped) => grouped.address);
+
+        expect(cipUsedAddressess.length).toBeGreaterThan(1);
+        expect(cipUsedAddressess.map((cipAddr) => Cardano.PaymentAddress(cipAddr))).toEqual(usedAddresses);
       });
 
       test('api.getUnusedAddresses', async () => {

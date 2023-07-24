@@ -1,15 +1,15 @@
 import { createGenericMockServer } from '@cardano-sdk/util-dev';
 
 export const tokenMetadataMockResults: Record<string, unknown> = {
+  '17ebe33f8aeee1fe9a7277fe0dc02261531a896a8b89457895fe60294349502d303032352d7632': {
+    description: { value: 'This is my second NFT' },
+    name: { value: 'Bored Ape' },
+    subject: '17ebe33f8aeee1fe9a7277fe0dc02261531a896a8b89457895fe60294349502d303032352d7632'
+  },
   '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65': {
     description: { value: 'This is my first NFT of the macaron cake' },
     name: { value: 'macaron cake token' },
     subject: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65'
-  },
-  '728847c7898b06f180de05c80b37d38bf77a9ea22bd1e222b8014d964e46542d66696c6573': {
-    description: { value: 'This is my second NFT' },
-    name: { value: 'Bored Ape' },
-    subject: '728847c7898b06f180de05c80b37d38bf77a9ea22bd1e222b8014d964e46542d66696c6573'
   },
   f43a62fdc3965df486de8a0d32fe800963589c41b38946602a0dc53541474958: {
     decimals: { value: 8 },

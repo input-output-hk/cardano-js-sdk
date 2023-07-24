@@ -22,7 +22,6 @@ import {
   TransactionsTracker,
   UtxoTracker,
   WalletUtil,
-  coldObservableProvider,
   createAssetsTracker,
   createBalanceTracker,
   createDelegationTracker,
@@ -63,7 +62,7 @@ import {
   WalletNetworkInfoProvider
 } from '../types';
 import { AsyncKeyAgent, GroupedAddress, cip8 } from '@cardano-sdk/key-management';
-import { BehaviorObservable, TrackerSubject } from '@cardano-sdk/util-rxjs';
+import { BehaviorObservable, TrackerSubject, coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import {
   BehaviorSubject,
   EMPTY,
@@ -82,17 +81,23 @@ import {
   tap,
   throwError
 } from 'rxjs';
+import {
+  ChangeAddressResolver,
+  InputSelector,
+  StaticChangeAddressResolver,
+  roundRobinRandomImprove
+} from '@cardano-sdk/input-selection';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import {
   GenericTxBuilder,
   InitializeTxProps,
   InitializeTxResult,
   InvalidConfigurationError,
+  SignedTx,
   TxBuilderDependencies,
   finalizeTx,
   initializeTx
 } from '@cardano-sdk/tx-construction';
-import { InputSelector, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { Shutdown, contextLogger, deepEquals } from '@cardano-sdk/util';
@@ -100,6 +105,10 @@ import { TrackedUtxoProvider } from '../services/ProviderTracker/TrackedUtxoProv
 import { WalletStores, createInMemoryWalletStores } from '../persistence';
 import { createTransactionReemitter } from '../services/TransactionReemitter';
 import isEqual from 'lodash/isEqual';
+import uniq from 'lodash/uniq';
+
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { KoraLabsHandleProvider } from '@cardano-sdk/cardano-services-client';
 
 export interface PersonalWalletProps {
   readonly name: string;
@@ -116,7 +125,7 @@ export interface PersonalWalletDependencies {
   readonly txSubmitProvider: TxSubmitProvider;
   readonly stakePoolProvider: StakePoolProvider;
   readonly assetProvider: AssetProvider;
-  readonly handleProvider?: HandleProvider;
+  readonly handleProvider?: HandleProvider | KoraLabsHandleProvider;
   readonly networkInfoProvider: WalletNetworkInfoProvider;
   readonly utxoProvider: UtxoProvider;
   readonly chainHistoryProvider: ChainHistoryProvider;
@@ -145,10 +154,12 @@ export const DEFAULT_LOOK_AHEAD_SEARCH = 20;
 // Ideally we should calculate this based on the activeSlotsCoeff and probability of a single block per epoch.
 const BLOCK_SLOT_GAP_MULTIPLIER = 2.5;
 
-const isOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx): input is OutgoingTx =>
+const isOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx | SignedTx): input is OutgoingTx =>
   typeof input === 'object' && 'cbor' in input;
-const isTxCBOR = (input: Cardano.Tx | TxCBOR | OutgoingTx): input is TxCBOR => typeof input === 'string';
-const processOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx): OutgoingTx => {
+const isTxCBOR = (input: Cardano.Tx | TxCBOR | OutgoingTx | SignedTx): input is TxCBOR => typeof input === 'string';
+const isSignedTx = (input: Cardano.Tx | TxCBOR | OutgoingTx | SignedTx): input is SignedTx =>
+  typeof input === 'object' && 'context' in input;
+const processOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx | SignedTx): OutgoingTx => {
   // TxCbor
   if (isTxCBOR(input)) {
     return {
@@ -156,6 +167,16 @@ const processOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx): OutgoingTx 
       cbor: input,
       // Do not re-serialize transaction body to compute transaction id
       id: Cardano.TransactionId.fromTxBodyCbor(TxBodyCBOR.fromTxCBOR(input))
+    };
+  }
+  // SignedTx
+  if (isSignedTx(input)) {
+    return {
+      body: input.tx.body,
+      cbor: input.cbor,
+      context: input.context,
+      // Do not re-serialize transaction body to compute transaction id
+      id: input.tx.id
     };
   }
   // OutgoingTx (resubmitted)
@@ -208,6 +229,7 @@ export class PersonalWallet implements ObservableWallet {
   readonly util: WalletUtil;
   readonly rewardsProvider: TrackedRewardsProvider;
   readonly handleProvider?: HandleProvider;
+  readonly changeAddressResolver: ChangeAddressResolver;
 
   // eslint-disable-next-line max-statements
   constructor(
@@ -250,7 +272,7 @@ export class PersonalWallet implements ObservableWallet {
     this.networkInfoProvider = new TrackedWalletNetworkInfoProvider(networkInfoProvider);
     this.stakePoolProvider = new TrackedStakePoolProvider(stakePoolProvider);
     this.assetProvider = new TrackedAssetProvider(assetProvider);
-    this.handleProvider = handleProvider;
+    this.handleProvider = handleProvider as HandleProvider;
     this.chainHistoryProvider = new TrackedChainHistoryProvider(chainHistoryProvider);
     this.rewardsProvider = new TrackedRewardsProvider(rewardsProvider);
 
@@ -310,8 +332,14 @@ export class PersonalWallet implements ObservableWallet {
     this.#inputSelector = inputSelector
       ? inputSelector
       : roundRobinRandomImprove({
-          getChangeAddress: () =>
-            this.#firstValueFromSettled(this.addresses$.pipe(map(([{ address: changeAddress }]) => changeAddress)))
+          changeAddressResolver: new StaticChangeAddressResolver(() =>
+            firstValueFrom(
+              this.syncStatus.isSettled$.pipe(
+                filter((isSettled) => isSettled),
+                switchMap(() => this.addresses$)
+              )
+            )
+          )
         });
 
     this.#tip$ = this.tip$ = new TipTracker({
@@ -447,7 +475,7 @@ export class PersonalWallet implements ObservableWallet {
       onFatalError,
       retryBackoffConfig,
       rewardAccountAddresses$: this.addresses$.pipe(
-        map((addresses) => addresses.map((groupedAddress) => groupedAddress.rewardAccount))
+        map((addresses) => uniq(addresses.map((groupedAddress) => groupedAddress.rewardAccount)))
       ),
       rewardsTracker: this.rewardsProvider,
       stakePoolProvider: this.stakePoolProvider,
@@ -472,6 +500,7 @@ export class PersonalWallet implements ObservableWallet {
       ? createHandlesTracker({
           assetInfo$: this.assetInfo$,
           handlePolicyIds,
+          handleProvider: this.handleProvider,
           logger: contextLogger(this.#logger, 'handles$'),
           tip$: this.tip$,
           utxo$: this.utxo.total$
@@ -509,7 +538,7 @@ export class PersonalWallet implements ObservableWallet {
   }
 
   async submitTx(
-    input: Cardano.Tx | TxCBOR | OutgoingTx,
+    input: Cardano.Tx | TxCBOR | OutgoingTx | SignedTx,
     { mightBeAlreadySubmitted }: SubmitTxOptions = {}
   ): Promise<Cardano.TransactionId> {
     const outgoingTx = processOutgoingTx(input);
@@ -517,6 +546,7 @@ export class PersonalWallet implements ObservableWallet {
     this.#newTransactions.submitting$.next(outgoingTx);
     try {
       await this.txSubmitProvider.submitTx({
+        context: outgoingTx.context,
         signedTransaction: outgoingTx.cbor
       });
       const { slot: submittedAt } = await firstValueFrom(this.tip$);
@@ -583,6 +613,22 @@ export class PersonalWallet implements ObservableWallet {
     this.#reemitSubscriptions.unsubscribe();
     this.#failedFromReemitter$.complete();
     this.#logger.debug('Shutdown');
+  }
+
+  /**
+   * Sets the wallet input selector.
+   *
+   * @param selector The input selector to be used.
+   */
+  setInputSelector(selector: InputSelector) {
+    this.#inputSelector = selector;
+  }
+
+  /**
+   * Gets the wallet input selector.
+   */
+  getInputSelector() {
+    return this.#inputSelector;
   }
 
   /**

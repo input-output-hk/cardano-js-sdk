@@ -26,6 +26,7 @@ import { createMockOgmiosServer } from '../../../../ogmios/test/mocks/mockOgmios
 import { getRandomPort } from 'get-port-please';
 import { listenPromise, serverClosePromise } from '../../../src/util';
 import { logger } from '@cardano-sdk/util-dev';
+import { mockDnsResolverFactory } from './util';
 import { ogmiosServerReady } from '../../util';
 import { txsPromise } from '../../TxSubmit/rabbitmq/utils';
 import { types } from 'util';
@@ -173,18 +174,8 @@ describe('Program/services/rabbitmq', () => {
       });
 
       it('should initially fail with a connection error, then re-resolve the port and propagate the correct non-connection error to the caller', async () => {
-        const srvRecord = { name: 'localhost', port: rabbitmqPort, priority: 1, weight: 1 };
-        const failingRabbitMqMockPort = await getRandomPort();
-        let resolverAlreadyCalled = false;
-
-        // Initially resolves with a failing rabbitmq port, then swap to the default one
-        const dnsResolverMock = jest.fn().mockImplementation(async () => {
-          if (!resolverAlreadyCalled) {
-            resolverAlreadyCalled = true;
-            return { ...srvRecord, port: failingRabbitMqMockPort };
-          }
-          return srvRecord;
-        });
+        // Resolves with a failing rabbitmq port twice, then swap to the default one
+        const dnsResolverMock = await mockDnsResolverFactory(rabbitmqPort)(2);
 
         provider = await getRabbitMqTxSubmitProvider(dnsResolverMock, logger, {
           rabbitmqSrvServiceName: process.env.RABBITMQ_SRV_SERVICE_NAME!
@@ -194,7 +185,7 @@ describe('Program/services/rabbitmq', () => {
         await expect(
           provider.submitTx({ signedTransaction: bufferToHexString(Buffer.from(txs[0].txBodyUint8Array)) })
         ).rejects.toBeInstanceOf(CardanoNodeErrors.TxSubmissionErrors.EraMismatchError);
-        expect(dnsResolverMock).toBeCalledTimes(2);
+        expect(dnsResolverMock).toBeCalledTimes(3);
       });
 
       it('should execute a provider operation without to intercept it', async () => {

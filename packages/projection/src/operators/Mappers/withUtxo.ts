@@ -54,11 +54,34 @@ export const filterProducedUtxoByAssetPolicyId =
         ...evt,
         utxo: {
           ...evt.utxo,
-          produced: evt.utxo.produced.filter(([_, { value }]) =>
-            [...(value.assets?.entries() || [])].some(([assetId]) =>
-              policyIds.includes(Cardano.AssetId.getPolicyId(assetId))
+          produced: evt.utxo.produced
+            .map(
+              ([txIn, txOut]) =>
+                [
+                  txIn,
+                  {
+                    ...txOut,
+                    value: {
+                      ...txOut.value,
+                      assets: txOut.value.assets
+                        ? new Map(
+                            [...txOut.value.assets.entries()].filter(([assetId]) =>
+                              policyIds.includes(Cardano.AssetId.getPolicyId(assetId))
+                            )
+                          )
+                        : undefined
+                    }
+                  }
+                ] as const
             )
-          )
+            .filter(
+              ([
+                _,
+                {
+                  value: { assets }
+                }
+              ]) => assets && assets.size > 0
+            )
         }
       }))
     );

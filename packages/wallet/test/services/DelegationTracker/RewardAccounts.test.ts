@@ -20,21 +20,23 @@ import {
 } from '../../../src';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TxWithEpoch } from '../../../src/services/DelegationTracker/types';
+import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import { createTestScheduler, mockProviders } from '@cardano-sdk/util-dev';
 import { dummyCbor } from '../../util';
 
 const { currentEpoch, generateStakePools, mockStakePoolsProvider } = mockProviders;
 
-jest.mock('../../../src/services/util/coldObservableProvider', () => {
-  const actual = jest.requireActual('../../../src/services/util/coldObservableProvider');
+jest.mock('@cardano-sdk/util-rxjs', () => {
+  const actual = jest.requireActual('@cardano-sdk/util-rxjs');
   return {
+    ...actual,
     coldObservableProvider: jest.fn().mockImplementation((...args) => actual.coldObservableProvider(...args))
   };
 });
-const coldObservableProviderMock: jest.Mock =
-  jest.requireMock('../../../src/services/util/coldObservableProvider').coldObservableProvider;
+
 
 describe('RewardAccounts', () => {
+  const coldObservableProviderMock = coldObservableProvider as jest.MockedFunction<typeof coldObservableProvider>;
   const txId1 = Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000');
   const txId2 = Cardano.TransactionId('295d5e0f7ee182426eaeda8c9f1c63502c72cdf4afd6e0ee0f209adf94a614e7');
   const poolId1 = Cardano.PoolId('pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh');

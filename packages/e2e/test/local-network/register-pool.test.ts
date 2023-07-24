@@ -1,8 +1,16 @@
 /* eslint-disable max-statements */
 import { Cardano } from '@cardano-sdk/core';
-import { KeyAgentFactoryProps, TestWallet, getEnv, getWallet, walletVariables } from '../../src';
+import {
+  KeyAgentFactoryProps,
+  TestWallet,
+  getEnv,
+  getWallet,
+  submitCertificate,
+  waitForWalletStateSettle,
+  walletReady,
+  walletVariables
+} from '../../src';
 import { logger } from '@cardano-sdk/util-dev';
-import { submitCertificate, waitForWalletStateSettle, walletReady } from '../util';
 
 import { AddressType, KeyRole } from '@cardano-sdk/key-management';
 import { firstValueFrom } from 'rxjs';

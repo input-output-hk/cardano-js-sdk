@@ -1,4 +1,6 @@
 import { CommonProgramOptions } from '../options/common';
+import { HandlePolicyIdsProgramOptions } from '../options/policyIds';
+import { Milliseconds, Seconds } from '@cardano-sdk/core';
 import { OgmiosProgramOptions } from '../options/ogmios';
 import { PosgresProgramOptions } from '../options/postgres';
 import { RabbitMqProgramOptions } from '../options/rabbitMq';
@@ -19,12 +21,13 @@ export enum Programs {
  */
 export enum ServiceNames {
   Asset = 'asset',
-  StakePool = 'stake-pool',
-  NetworkInfo = 'network-info',
-  TxSubmit = 'tx-submit',
-  Utxo = 'utxo',
   ChainHistory = 'chain-history',
-  Rewards = 'rewards'
+  Handle = 'handle',
+  NetworkInfo = 'network-info',
+  Rewards = 'rewards',
+  StakePool = 'stake-pool',
+  TxSubmit = 'tx-submit',
+  Utxo = 'utxo'
 }
 
 export const POOLS_METRICS_INTERVAL_DEFAULT = 1000;
@@ -43,32 +46,40 @@ export enum ProviderServerOptionDescriptions {
   DisableDbCache = 'Disable DB cache',
   DisableStakePoolMetricApy = 'Omit this metric for improved query performance',
   EpochPollInterval = 'Epoch poll interval',
-  TokenMetadataCacheTtl = 'Token Metadata API cache TTL in minutes',
+  AssetCacheTtl = 'Asset info and NFT Metadata cache TTL in seconds (600 by default)',
+  TokenMetadataCacheTtl = 'Token Metadata API cache TTL in seconds',
   TokenMetadataServerUrl = 'Token Metadata API server URL',
   UseTypeOrmStakePoolProvider = 'Enables the TypeORM Stake Pool Provider',
   UseBlockfrost = 'Enables Blockfrost cached data DB',
+  UseKoraLabsProvider = 'Use the KoraLabs handle provider',
   UseQueue = 'Enables RabbitMQ',
-  PaginationPageSizeLimit = 'Pagination page size limit shared across all providers'
+  PaginationPageSizeLimit = 'Pagination page size limit shared across all providers',
+  HandleProviderServerUrl = 'URL for the Handle provider server'
 }
 
 export type ProviderServerArgs = CommonProgramOptions &
   PosgresProgramOptions<'DbSync'> &
+  PosgresProgramOptions<'Handle'> &
   PosgresProgramOptions<'StakePool'> &
   OgmiosProgramOptions &
+  HandlePolicyIdsProgramOptions &
   RabbitMqProgramOptions & {
     allowedOrigins?: string[];
     cardanoNodeConfigPath?: string;
     disableDbCache?: boolean;
     disableStakePoolMetricApy?: boolean;
-    healthCheckCacheTtl: number;
-    tokenMetadataCacheTTL?: number;
+    healthCheckCacheTtl: Seconds;
+    assetCacheTTL?: Seconds;
+    tokenMetadataCacheTTL?: Seconds;
     tokenMetadataServerUrl?: string;
-    tokenMetadataRequestTimeout?: number;
+    tokenMetadataRequestTimeout?: Milliseconds;
     epochPollInterval: number;
-    dbCacheTtl: number;
+    dbCacheTtl: Seconds | 0;
     useBlockfrost?: boolean;
+    useKoraLabs?: boolean;
     useQueue?: boolean;
     useTypeormStakePoolProvider?: boolean;
     paginationPageSizeLimit?: number;
     serviceNames: ServiceNames[];
+    handleProviderServerUrl?: string;
   };

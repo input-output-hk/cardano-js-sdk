@@ -15,6 +15,8 @@ export const withProviderErrors = <T extends {}>(providerImplementation: T, toPr
   }, {} as any) as T;
 
 const tryParseBigIntKey = (key: string) => {
+  // skip converting hex values
+  if (key.startsWith('0x')) return key.slice(2);
   try {
     return BigInt(key);
   } catch {

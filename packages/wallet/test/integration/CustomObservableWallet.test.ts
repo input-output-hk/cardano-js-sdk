@@ -3,13 +3,14 @@
 /* eslint-disable unicorn/consistent-function-scoping */
 import { Cardano, Transaction } from '@cardano-sdk/core';
 import { GroupedAddress } from '@cardano-sdk/key-management';
-import { ObservableWallet, PersonalWallet, coldObservableProvider } from '../../src';
+import { ObservableWallet, PersonalWallet } from '../../src';
 import {
   OutputValidator,
   ProtocolParametersRequiredByOutputValidator,
   createOutputValidator
 } from '@cardano-sdk/tx-construction';
 import { RetryBackoffConfig } from 'backoff-rxjs';
+import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import { createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { firstValueFrom, of, timer } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';

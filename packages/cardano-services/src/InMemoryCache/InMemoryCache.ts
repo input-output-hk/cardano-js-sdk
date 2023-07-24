@@ -1,3 +1,4 @@
+import { Seconds } from '@cardano-sdk/core';
 import NodeCache from 'node-cache';
 
 export type Key = string | number;
@@ -12,7 +13,7 @@ export class InMemoryCache {
    * @param ttl The default time to live in seconds
    * @param cache The cache engine. It must extend NodeCache
    */
-  constructor(ttl: number, cache: NodeCache = new NodeCache()) {
+  constructor(ttl: Seconds | 0, cache: NodeCache = new NodeCache()) {
     this.#ttlDefault = ttl;
     this.#cache = cache;
   }

@@ -5,11 +5,13 @@ import {
   GetAssetArgs,
   GetAssetsArgs,
   ProviderError,
-  ProviderFailure
+  ProviderFailure,
+  Seconds
 } from '@cardano-sdk/core';
 import { AssetBuilder } from './AssetBuilder';
+import { AssetPolicyIdAndName, NftMetadataService, TokenMetadataService } from '../types';
+import { DB_CACHE_TTL_DEFAULT, InMemoryCache, NoCache } from '../../InMemoryCache';
 import { DbSyncProvider, DbSyncProviderDependencies } from '../../util/DbSyncProvider';
-import { NftMetadataService, TokenMetadataService } from '../types';
 
 /**
  * Properties that are need to create DbSyncAssetProvider
@@ -19,6 +21,14 @@ export interface DbSyncAssetProviderProps {
    * Pagination page size limit used for provider methods constraint.
    */
   paginationPageSizeLimit: number;
+  /**
+   * Cache TTL in seconds, defaults to 2 hours
+   */
+  cacheTTL?: Seconds;
+  /**
+   * Does not use in-memory cache if `true`
+   */
+  disableDbCache?: boolean;
 }
 
 /**
@@ -35,6 +45,9 @@ export interface DbSyncAssetProviderDependencies extends DbSyncProviderDependenc
   tokenMetadataService: TokenMetadataService;
 }
 
+const nftMetadataCacheKey = (assetId: Cardano.AssetId) => `nm_${assetId.toString()}`;
+const assetInfoCacheKey = (assetId: Cardano.AssetId) => `ai_${assetId.toString()}`;
+
 /**
  * AssetProvider implementation using {@link NftMetadataService}, {@link TokenMetadataService}
  * and `cardano-db-sync` database as sources
@@ -43,22 +56,26 @@ export class DbSyncAssetProvider extends DbSyncProvider() implements AssetProvid
   #builder: AssetBuilder;
   #dependencies: DbSyncAssetProviderDependencies;
   #paginationPageSizeLimit: number;
+  #cache: InMemoryCache;
 
-  constructor({ paginationPageSizeLimit }: DbSyncAssetProviderProps, dependencies: DbSyncAssetProviderDependencies) {
+  constructor(
+    { paginationPageSizeLimit, disableDbCache, cacheTTL = DB_CACHE_TTL_DEFAULT }: DbSyncAssetProviderProps,
+    dependencies: DbSyncAssetProviderDependencies
+  ) {
     const { cache, dbPools, cardanoNode, logger } = dependencies;
     super({ cache, cardanoNode, dbPools, logger });
 
     this.#builder = new AssetBuilder(dbPools.main, logger);
     this.#dependencies = dependencies;
     this.#paginationPageSizeLimit = paginationPageSizeLimit;
+    this.#cache = disableDbCache ? new NoCache() : new InMemoryCache(cacheTTL);
   }
 
   async getAsset({ assetId, extraData }: GetAssetArgs) {
-    const assetInfo = await this.getAssetInfo(assetId);
+    const assetInfo = await this.#getAssetInfo(assetId);
 
     if (extraData?.history) await this.loadHistory(assetInfo);
-    if (extraData?.nftMetadata)
-      assetInfo.nftMetadata = await this.#dependencies.ntfMetadataService.getNftMetadata(assetInfo);
+    if (extraData?.nftMetadata) assetInfo.nftMetadata = await this.#getNftMetadata(assetInfo);
     if (extraData?.tokenMetadata) {
       try {
         assetInfo.tokenMetadata = (await this.#dependencies.tokenMetadataService.getTokenMetadata([assetId]))[0];
@@ -104,10 +121,9 @@ export class DbSyncAssetProvider extends DbSyncProvider() implements AssetProvid
     const tokenMetadataListPromise = extraData?.tokenMetadata ? fetchTokenMetadataList() : undefined;
 
     const getAssetInfo = async (assetId: Cardano.AssetId) => {
-      const assetInfo = await this.getAssetInfo(assetId);
+      const assetInfo = await this.#getAssetInfo(assetId);
 
-      if (extraData?.nftMetadata)
-        assetInfo.nftMetadata = await this.#dependencies.ntfMetadataService.getNftMetadata(assetInfo);
+      if (extraData?.nftMetadata) assetInfo.nftMetadata = await this.#getNftMetadata(assetInfo);
       if (tokenMetadataListPromise)
         assetInfo.tokenMetadata = (await tokenMetadataListPromise)[assetIds.indexOf(assetId)];
 
@@ -126,20 +142,33 @@ export class DbSyncAssetProvider extends DbSyncProvider() implements AssetProvid
     }));
   }
 
-  private async getAssetInfo(assetId: Cardano.AssetId): Promise<Asset.AssetInfo> {
-    const name = Cardano.AssetId.getAssetName(assetId);
-    const policyId = Cardano.AssetId.getPolicyId(assetId);
-    const multiAsset = await this.#builder.queryMultiAsset(policyId, name);
+  async #getNftMetadata(asset: AssetPolicyIdAndName): Promise<Asset.NftMetadata | null> {
+    return this.#cache.get(
+      nftMetadataCacheKey(Cardano.AssetId.fromParts(asset.policyId, asset.name)),
+      async () => await this.#dependencies.ntfMetadataService.getNftMetadata(asset)
+    );
+  }
 
-    if (!multiAsset)
-      throw new ProviderError(ProviderFailure.NotFound, undefined, 'No entries found in multi_asset table');
+  async #getAssetInfo(assetId: Cardano.AssetId): Promise<Asset.AssetInfo> {
+    return this.#cache.get(assetInfoCacheKey(assetId), async () => {
+      const name = Cardano.AssetId.getAssetName(assetId);
+      const policyId = Cardano.AssetId.getPolicyId(assetId);
+      const multiAsset = await this.#builder.queryMultiAsset(policyId, name);
 
-    const fingerprint = multiAsset.fingerprint as unknown as Cardano.AssetFingerprint;
-    const supply = BigInt(multiAsset.sum);
-    // Backwards compatibility
-    const quantity = supply;
-    const mintOrBurnCount = Number(multiAsset.count);
+      if (!multiAsset)
+        throw new ProviderError(
+          ProviderFailure.NotFound,
+          undefined,
+          `No entries found in multi_asset table for asset '${assetId}'`
+        );
 
-    return { assetId, fingerprint, mintOrBurnCount, name, policyId, quantity, supply };
+      const fingerprint = multiAsset.fingerprint as unknown as Cardano.AssetFingerprint;
+      const supply = BigInt(multiAsset.sum);
+      // Backwards compatibility
+      const quantity = supply;
+      const mintOrBurnCount = Number(multiAsset.count);
+
+      return { assetId, fingerprint, mintOrBurnCount, name, policyId, quantity, supply };
+    });
   }
 }

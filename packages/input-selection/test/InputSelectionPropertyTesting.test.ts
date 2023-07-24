@@ -1,6 +1,6 @@
 import { AssetId, TxTestUtil } from '@cardano-sdk/util-dev';
 import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
-import { GreedyInputSelector, InputSelectionError, InputSelector } from '../src';
+import { ChangeAddressResolver, GreedyInputSelector, InputSelectionError, InputSelector, Selection } from '../src';
 import { InputSelectionFailure } from '../src/InputSelectionError';
 import {
   SelectionConstraints,
@@ -17,9 +17,18 @@ import fc from 'fast-check';
 const changeAddress =
   'addr_test1qqydn46r6mhge0kfpqmt36m6q43knzsd9ga32n96m89px3nuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qypp3m9' as Cardano.PaymentAddress;
 
+class MockChangeAddressResolver implements ChangeAddressResolver {
+  async resolve(selection: Selection) {
+    return selection.change.map((txOut) => {
+      txOut.address = changeAddress;
+      return txOut;
+    });
+  }
+}
+
 const createRoundRobinRandomImprove = () =>
   roundRobinRandomImprove({
-    getChangeAddress: async () => changeAddress
+    changeAddressResolver: new MockChangeAddressResolver()
   });
 
 const createGreedySelector = () =>
@@ -42,7 +51,7 @@ const testInputSelection = (name: string, getAlgorithm: () => InputSelector) => 
         // Regression
         await testInputSelectionProperties({
           createOutputs: () => [],
-          createUtxo: () => [TxTestUtil.createUnspentTxOutput({ coins: 20_999_994n })],
+          createUtxo: () => [TxTestUtil.createUnspentTxOutput({ coins: 30_999_994n })],
           getAlgorithm,
           mockConstraints: {
             ...SelectionConstraints.MOCK_NO_CONSTRAINTS,
@@ -225,7 +234,12 @@ const testInputSelection = (name: string, getAlgorithm: () => InputSelector) => 
               TxTestUtil.createUnspentTxOutput({
                 assets: new Map([
                   [AssetId.TSLA, 1000n],
-                  [AssetId.PXL, 1000n]
+                  [AssetId.PXL, 1000n],
+                  [AssetId.Unit, 1000n],
+                  [AssetId.A, 1000n],
+                  [AssetId.B, 1000n],
+                  [AssetId.C, 1000n],
+                  [AssetId.D, 1000n]
                 ]),
                 coins: 2_000_000n
               })
