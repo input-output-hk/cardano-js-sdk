@@ -1,5 +1,6 @@
 import {
   contextWithKnownAddresses,
+  knownAddress,
   knownAddressKeyPath,
   knownAddressStakeKeyPath,
   rewardAddress,
@@ -21,6 +22,11 @@ describe('key-paths', () => {
     });
   });
   describe('stakeKeyPathFromGroupedAddress', () => {
+    it('returns null when given an undefined stakeKeyDerivationPath', async () => {
+      const knownAddressClone = { ...knownAddress };
+      delete knownAddressClone.stakeKeyDerivationPath;
+      expect(stakeKeyPathFromGroupedAddress(knownAddressClone)).toEqual(null);
+    });
     it('returns a hardened BIP32 stake key path', () => {
       expect(stakeKeyPathFromGroupedAddress(address)).toEqual(knownAddressStakeKeyPath);
     });
