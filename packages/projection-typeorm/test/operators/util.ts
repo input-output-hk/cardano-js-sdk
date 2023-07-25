@@ -1,6 +1,15 @@
-import { BaseProjectionEvent, ProjectionEvent } from '@cardano-sdk/projection';
+import {
+  BaseProjectionEvent,
+  BootstrapExtraProps,
+  ProjectionEvent,
+  RollBackwardEvent,
+  WithBlock,
+  WithNetworkInfo
+} from '@cardano-sdk/projection';
+import { BigIntMath } from '@cardano-sdk/util';
+import { Cardano, ChainSyncEventType, Point } from '@cardano-sdk/core';
 import { Observable, lastValueFrom, takeWhile } from 'rxjs';
-import { logger } from '@cardano-sdk/util-dev';
+import { generateRandomHexString, logger } from '@cardano-sdk/util-dev';
 
 export const createProjectorTilFirst =
   <T>(project: () => Observable<T>) =>
@@ -27,3 +36,42 @@ export const createStubProjectionSource = (events: BaseProjectionEvent[]): Obser
     };
     next();
   });
+
+export const createStubBlockHeader = (blockNo: Cardano.BlockNo): Cardano.PartialBlockHeader => ({
+  blockNo,
+  hash: Cardano.BlockId(generateRandomHexString(64)),
+  slot: Cardano.Slot(blockNo * 20)
+});
+export interface CreateStubRollForwardEventProps {
+  blockBody: Cardano.OnChainTx[];
+  blockHeader: Cardano.PartialBlockHeader;
+}
+
+export const createStubRollForwardEvent = (
+  { blockBody, blockHeader }: CreateStubRollForwardEventProps,
+  { eraSummaries, genesisParameters }: WithNetworkInfo
+): BaseProjectionEvent => ({
+  block: {
+    body: blockBody,
+    header: blockHeader,
+    totalOutput: BigIntMath.sum(
+      blockBody.flatMap(({ body: { outputs } }) => outputs.flatMap(({ value: { coins } }) => coins))
+    ),
+    txCount: blockBody.length
+  },
+  crossEpochBoundary: false,
+  epochNo: Cardano.EpochNo((blockHeader.blockNo % 100) + 1),
+  eraSummaries,
+  eventType: ChainSyncEventType.RollForward,
+  genesisParameters,
+  tip: blockHeader
+});
+
+export const createRollBackwardEventFor = (
+  evt: BaseProjectionEvent,
+  rollbackPoint: Point
+): Omit<RollBackwardEvent<BootstrapExtraProps & WithBlock>, 'requestNext'> => ({
+  ...evt,
+  eventType: ChainSyncEventType.RollBackward,
+  point: rollbackPoint
+});

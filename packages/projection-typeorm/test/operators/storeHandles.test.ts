@@ -4,6 +4,7 @@ import {
   BlockDataEntity,
   BlockEntity,
   HandleEntity,
+  NftMetadataEntity,
   OutputEntity,
   TokensEntity,
   TypeormStabilityWindowBuffer,
@@ -26,7 +27,15 @@ describe('storeHandles', () => {
   const policyIds = [Cardano.PolicyId('f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a')];
   let queryRunner: QueryRunner;
   let buffer: TypeormStabilityWindowBuffer;
-  const entities = [BlockEntity, BlockDataEntity, AssetEntity, TokensEntity, OutputEntity, HandleEntity];
+  const entities = [
+    BlockEntity,
+    BlockDataEntity,
+    AssetEntity,
+    NftMetadataEntity,
+    TokensEntity,
+    OutputEntity,
+    HandleEntity
+  ];
 
   const dataSource$ = defer(() =>
     from(initializeDataSource({ devOptions: { dropSchema: false, synchronize: false }, entities }))

@@ -1,4 +1,4 @@
-import { BigIntColumnOptions, DeleteCascadeRelationOptions } from './util';
+import { BigIntColumnOptions, OnDeleteCascadeRelationOptions } from './util';
 import { Cardano } from '@cardano-sdk/core';
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 import { Percent } from '@cardano-sdk/util';
@@ -14,7 +14,7 @@ export class CurrentPoolMetricsEntity {
   @Column()
   slot: Cardano.Slot;
 
-  @OneToOne(() => StakePoolEntity, DeleteCascadeRelationOptions)
+  @OneToOne(() => StakePoolEntity, OnDeleteCascadeRelationOptions)
   @JoinColumn()
   stakePool?: StakePoolEntity;
 

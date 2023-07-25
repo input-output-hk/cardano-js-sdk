@@ -30,24 +30,29 @@ describe('withMint', () => {
     expect(mint).toEqual([
       {
         assetId: '2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740',
+        assetName: '',
         compactTxId: computeCompactTxId(10, 0),
         policyId: Cardano.PolicyId('2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740'),
         quantity: 20n
       },
       {
         assetId: '659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41',
+        assetName: '54534c41',
         compactTxId: computeCompactTxId(10, 0),
         policyId: Cardano.PolicyId('659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba82'),
         quantity: 50n
       },
       {
         assetId: '2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740',
+        assetName: '',
         compactTxId: computeCompactTxId(10, 1),
         policyId: Cardano.PolicyId('2a286ad895d091f2b3d168a6091ad2627d30a72761a5bc36eef00740'),
         quantity: 40n
       }
     ]);
   });
+
+  it.todo('adds the associated tx metadata when it exists');
 
   it('filterMintByPolicyIds keeps only assets matching the policy id', async () => {
     const { mint } = await firstValueFrom(
@@ -61,6 +66,7 @@ describe('withMint', () => {
     expect(mint).toEqual([
       {
         assetId: '659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41',
+        assetName: '54534c41',
         compactTxId: computeCompactTxId(10, 0),
         policyId: Cardano.PolicyId('659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba82'),
         quantity: 50n

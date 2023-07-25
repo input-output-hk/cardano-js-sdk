@@ -1,6 +1,6 @@
 import { Cardano } from '@cardano-sdk/core';
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { DeleteCascadeRelationOptions } from './util';
+import { OnDeleteCascadeRelationOptions } from './util';
 import { PoolRegistrationEntity } from './PoolRegistration.entity';
 import { StakePoolEntity } from './StakePool.entity';
 
@@ -26,6 +26,6 @@ export class PoolMetadataEntity {
   @ManyToOne(() => StakePoolEntity)
   stakePool?: StakePoolEntity;
   @JoinColumn()
-  @OneToOne(() => PoolRegistrationEntity, (poolUpdate) => poolUpdate.metadata, DeleteCascadeRelationOptions)
+  @OneToOne(() => PoolRegistrationEntity, (poolUpdate) => poolUpdate.metadata, OnDeleteCascadeRelationOptions)
   poolUpdate?: PoolRegistrationEntity;
 }

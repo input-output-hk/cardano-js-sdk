@@ -2,6 +2,7 @@ import {
   AssetEntity,
   BlockDataEntity,
   BlockEntity,
+  NftMetadataEntity,
   OutputEntity,
   TokensEntity,
   TypeormStabilityWindowBuffer,
@@ -23,7 +24,7 @@ describe('storeUtxo', () => {
   const stubEvents = chainSyncData(ChainSyncDataSet.WithMint);
   let queryRunner: QueryRunner;
   let buffer: TypeormStabilityWindowBuffer;
-  const entities = [BlockEntity, BlockDataEntity, AssetEntity, TokensEntity, OutputEntity];
+  const entities = [BlockEntity, BlockDataEntity, AssetEntity, NftMetadataEntity, TokensEntity, OutputEntity];
 
   const project$ = () =>
     Bootstrap.fromCardanoNode({ blocksBufferLength: 10, buffer, cardanoNode: stubEvents.cardanoNode, logger }).pipe(
