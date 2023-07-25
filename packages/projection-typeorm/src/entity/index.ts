@@ -10,3 +10,4 @@ export * from './Tokens.entity';
 export * from './Output.entity';
 export * from './CurrentPoolMetrics.entity';
 export * from './Handle.entity';
+export * from './NftMetadata.entity';
