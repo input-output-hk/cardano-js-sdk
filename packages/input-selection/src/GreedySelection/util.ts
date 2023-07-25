@@ -1,20 +1,20 @@
 /* eslint-disable func-style, max-params */
 import { BigNumber } from 'bignumber.js';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
 import { ComputeMinimumCoinQuantity, TokenBundleSizeExceedsLimit } from '../types';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
-import { addTokenMaps, isValidValue, sortByCoins, subtractTokenMaps } from '../util';
+import { addTokenMaps, isValidValue, sortByCoins } from '../util';
 
 const PERCENTAGE_TOLERANCE = 0.05;
 
 /**
- * Distribute the assets among the given outputs. The function will try to allocate all the assets in
- * the output with the biggest coin balance, if this fails, it will spill over the assets to the second output (and so on)
- * until it can distribute all assets among the outputs. If no such distribution can be found, the algorithm with fail.
+ * Distribute the assets evenly among the UTXOs. This algorithm place one native asset at each UTXO, once
+ * the UTXO list is exhausted, it starts over from the first UTXO. If at some point one of the UTXOs in the list
+ * goes over the TokenBundleSizeExceedsLimit or computeMinimumCoinQuantity, it's removed from the list of eligible
+ * UTXOs to receive native assets.
  *
- * remark: At this point we are not ready to compute the fee, which would need to be subtracted from one of this change
- * outputs, so we are going to assume a high fee for the time being (2000000 lovelace). This will guarantee that the
- * outputs will remain valid even after the fee has been subtracted from the change output.
+ * The algorithm ends when there are no more native assets to distribute, or there are no remaining UTXOs that are
+ * eligible (in which case it will throw UtxoFullyDepleted).
  *
  * @param outputs The outputs where to distribute the assets into.
  * @param computeMinimumCoinQuantity callback that computes the minimum coin quantity for the given UTXO.
@@ -30,28 +30,32 @@ const distributeAssets = (
 ): Array<Cardano.TxOut> => {
   const adjustedOutputs = [...outputs];
 
-  for (let i = 0; i < adjustedOutputs.length; ++i) {
-    const output = adjustedOutputs[i];
-    if (!isValidValue(output.value, computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit, fee)) {
-      if (i === adjustedOutputs.length - 1) {
-        throw new InputSelectionError(InputSelectionFailure.UtxoFullyDepleted);
-      }
+  if (adjustedOutputs.length === 0) return adjustedOutputs;
 
-      if (!output.value.assets || output.value.assets.size === 0) {
-        // If this output failed and doesn't contain any assets, it means there is not enough coins to cover
-        // the min ADA coin per UTXO even after moving all the assets to the other outputs.
-        throw new InputSelectionError(InputSelectionFailure.UtxoFullyDepleted);
-      }
+  const totalAssets = coalesceValueQuantities(adjustedOutputs.map((out) => out.value)).assets;
 
-      const splicedAsset = new Map([...output.value.assets!.entries()].splice(0, 1));
-      const currentOutputNewAssets = subtractTokenMaps(output.value.assets, splicedAsset);
-      const nextOutputNewAssets = addTokenMaps(adjustedOutputs[i + 1].value.assets, splicedAsset);
+  if (!totalAssets || totalAssets.size === 0) return adjustedOutputs;
 
-      output.value.assets = currentOutputNewAssets;
-      adjustedOutputs[i + 1].value.assets = nextOutputNewAssets;
+  for (const utxo of adjustedOutputs) utxo.value.assets = undefined;
 
-      return distributeAssets(adjustedOutputs, computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit, fee);
+  let i = 0;
+  const availableOutputs = adjustedOutputs;
+  while (totalAssets.size > 0) {
+    const splicedAsset = new Map([...totalAssets.entries()].splice(0, 1));
+    const currentUtxoIndex = i % availableOutputs.length;
+    const currentValue = { ...availableOutputs[currentUtxoIndex].value };
+
+    currentValue.assets = addTokenMaps(currentValue.assets, splicedAsset);
+
+    if (!isValidValue(currentValue, computeMinimumCoinQuantity, tokenBundleSizeExceedsLimit, fee)) {
+      availableOutputs.splice(currentUtxoIndex, 1);
+    } else {
+      availableOutputs[currentUtxoIndex].value = currentValue;
+      totalAssets.delete([...splicedAsset.keys()][0]);
     }
+
+    if (availableOutputs.length === 0) throw new InputSelectionError(InputSelectionFailure.UtxoFullyDepleted);
+    ++i;
   }
 
   return adjustedOutputs;
