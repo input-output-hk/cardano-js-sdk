@@ -43,6 +43,10 @@ export class TypeOrmHandleProvider extends TypeormProvider implements HandleProv
 
       const mapEntity = (entity: PartialHandleEntity | undefined): HandleResolution | null => {
         if (!entity) return null;
+        if (!entity.cardanoAddress) {
+          this.logger.warn(`${entity.handle} has no associated address, which could be the result of a double mint.`);
+          return null;
+        }
 
         const { cardanoAddress, handle, hasDatum, policyId } = entity;
 
