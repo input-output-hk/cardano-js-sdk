@@ -25,7 +25,6 @@ export class StakePoolEntity {
   @JoinColumn()
   @OneToOne(() => PoolRetirementEntity, OnDeleteSetNullRelationOptions)
   lastRetirement?: PoolRetirementEntity | null;
-
-  @OneToOne(() => CurrentPoolMetricsEntity, (metric) => metric.stakePool)
+  @OneToOne(() => CurrentPoolMetricsEntity, (metric) => metric.stakePool, OnDeleteSetNullRelationOptions)
   metrics?: CurrentPoolMetricsEntity | null;
 }

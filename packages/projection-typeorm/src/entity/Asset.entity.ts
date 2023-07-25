@@ -19,5 +19,5 @@ export class AssetEntity {
   firstMintBlock?: BlockEntity;
   @OneToOne(() => NftMetadataEntity, OnDeleteSetNullRelationOptions)
   @JoinColumn()
-  nftMetadata?: NftMetadataEntity;
+  nftMetadata?: NftMetadataEntity | null;
 }

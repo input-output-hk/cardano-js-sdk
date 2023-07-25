@@ -16,18 +16,18 @@ export class NftMetadataEntity {
   id?: number;
   @Column()
   name?: string;
-  @Column({ nullable: true })
-  description?: string;
+  @Column({ nullable: true, type: 'varchar' })
+  description?: string | null;
   @Column()
   image?: string;
-  @Column({ nullable: true })
-  mediaType?: string;
+  @Column({ nullable: true, type: 'varchar' })
+  mediaType?: string | null;
   @Column({ nullable: true, type: 'jsonb' })
-  files?: Asset.NftMetadataFile[];
-  @Column({ enum: NftMetadataType })
+  files?: Asset.NftMetadataFile[] | null;
+  @Column({ enum: NftMetadataType, type: 'enum' })
   type: NftMetadataType;
   @Column({ nullable: true, transformer: [serializableObj], type: 'jsonb' })
-  otherProperties?: Map<string, Cardano.Metadatum>;
+  otherProperties?: Map<string, Cardano.Metadatum> | null;
   @ManyToOne(() => AssetEntity, OnDeleteCascadeRelationOptions)
   @JoinColumn()
   /**
@@ -36,7 +36,7 @@ export class NftMetadataEntity {
    */
   parentAsset?: AssetEntity;
   @ManyToOne(() => AssetEntity, OnDeleteSetNullRelationOptions)
-  userTokenAsset?: AssetEntity;
+  userTokenAsset?: AssetEntity | null;
   @ManyToOne(() => BlockEntity, OnDeleteCascadeRelationOptions)
   createdAt?: BlockEntity;
 }
