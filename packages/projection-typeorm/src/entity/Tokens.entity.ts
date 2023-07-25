@@ -1,5 +1,5 @@
 import { AssetEntity } from './Asset.entity';
-import { BigIntColumnOptions, DeleteCascadeRelationOptions } from './util';
+import { BigIntColumnOptions, OnDeleteCascadeRelationOptions } from './util';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { OutputEntity } from './Output.entity';
 
@@ -8,10 +8,10 @@ export class TokensEntity {
   @PrimaryGeneratedColumn()
   id?: number;
   @JoinColumn()
-  @ManyToOne(() => AssetEntity, DeleteCascadeRelationOptions)
+  @ManyToOne(() => AssetEntity, OnDeleteCascadeRelationOptions)
   asset?: AssetEntity;
   @JoinColumn()
-  @ManyToOne(() => OutputEntity, (output) => output.tokens, DeleteCascadeRelationOptions)
+  @ManyToOne(() => OutputEntity, (output) => output.tokens, OnDeleteCascadeRelationOptions)
   output?: OutputEntity;
   @Column(BigIntColumnOptions)
   quantity?: bigint;
