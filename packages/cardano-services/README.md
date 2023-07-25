@@ -144,6 +144,15 @@ RABBITMQ_SRV_SERVICE_NAME=some-domain-for-rabbitmq \
 The _Docker images_ produced by the SDK and the _docker compose infrastructures_ (_mainnet_, _preprod_ and _local-network_) it includes are ready to be used in
 production environment.
 
+Running [cardano node] on _mainnet_ requires a minimum of 24GB RAM.
+
+- **WSL2**: add following content to `/etc/wsl.conf` file.
+
+  ```
+  [wsl2]
+  memory = 30GB
+  ```
+
 **Note:** the _docker compose infrastructures_ included in the SDK are mainly used for development purposes: to use
 them in production environments, the projector service(s) must be instructed to run the _migration scripts_ rather than
 to use the `synchronize` development option from **TypeORM**. This can be achieved through environment variables:
