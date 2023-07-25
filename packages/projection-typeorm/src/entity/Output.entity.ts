@@ -20,16 +20,16 @@ export class OutputEntity {
   outputIndex?: number;
   @Column(BigIntColumnOptions)
   coins?: bigint;
-  @Column({ nullable: true })
-  consumedAtSlot?: Cardano.Slot;
+  @Column({ nullable: true, type: 'integer' })
+  consumedAtSlot?: Cardano.Slot | null;
   @OneToMany(() => TokensEntity, (tokens) => tokens.output)
   tokens?: TokensEntity[];
   @Column({ length: 64, nullable: true, type: 'char' })
-  datumHash?: Cardano.DatumHash;
-  @Column({ nullable: true })
-  datum?: HexBlob;
+  datumHash?: Cardano.DatumHash | null;
+  @Column({ nullable: true, type: 'varchar' })
+  datum?: HexBlob | null;
   @Column({ nullable: true, type: 'jsonb' })
-  scriptReference?: Cardano.Script;
+  scriptReference?: Cardano.Script | null;
   @ManyToOne(() => BlockEntity, OnDeleteCascadeRelationOptions)
   @JoinColumn()
   block?: BlockEntity;
