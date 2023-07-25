@@ -8,3 +8,4 @@ export * from './storeUtxo';
 export * from './storeHandles';
 export * from './util';
 export * from './storePoolMetricsUpdateJob';
+export * from './storeNftMetadata';

@@ -1,5 +1,5 @@
 /* eslint-disable brace-style */
-import { BigIntColumnOptions, DeleteCascadeRelationOptions, ImaginaryCoinsColumnOptions } from './util';
+import { BigIntColumnOptions, ImaginaryCoinsColumnOptions, OnDeleteCascadeRelationOptions } from './util';
 import { BlockEntity } from './Block.entity';
 import { Cardano } from '@cardano-sdk/core';
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn } from 'typeorm';
@@ -39,11 +39,11 @@ export class PoolRegistrationEntity {
   @Column({ length: 64, nullable: true, type: 'char' })
   metadataHash?: string | null;
   @JoinColumn()
-  @ManyToOne(() => StakePoolEntity, (stakePool) => stakePool.registrations, DeleteCascadeRelationOptions)
+  @ManyToOne(() => StakePoolEntity, (stakePool) => stakePool.registrations, OnDeleteCascadeRelationOptions)
   stakePool?: StakePoolEntity;
   @OneToOne(() => PoolMetadataEntity, (metadata) => metadata.poolUpdate)
   metadata?: PoolMetadataEntity | null;
-  @ManyToOne(() => BlockEntity, DeleteCascadeRelationOptions)
+  @ManyToOne(() => BlockEntity, OnDeleteCascadeRelationOptions)
   @JoinColumn()
   block?: BlockEntity;
 }
