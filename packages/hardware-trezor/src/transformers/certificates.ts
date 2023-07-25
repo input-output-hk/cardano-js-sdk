@@ -1,6 +1,8 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import * as Trezor from 'trezor-connect';
 import { BIP32Path } from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
+import { GroupedAddress } from '@cardano-sdk/key-management';
 import { InvalidArgumentError /* , Transform*/ } from '@cardano-sdk/util';
 import { TrezorTxTransformerContext } from '../types';
 import { stakeKeyPathFromGroupedAddress } from './keyPaths';
@@ -12,14 +14,14 @@ type StakeKeyCertificateType =
 type TrezorStakeKeyCertificate = {
   type: StakeKeyCertificateType;
   path?: BIP32Path;
-  scriptHash?: string;
-  keyHash?: string;
+  scriptHash?: Crypto.Ed25519KeyHashHex;
+  keyHash?: Crypto.Ed25519KeyHashHex;
 };
 
 type TrezorDelegationCertificate = {
   type: Trezor.CardanoCertificateType.STAKE_DELEGATION;
   path?: BIP32Path;
-  scriptHash?: string;
+  scriptHash?: Crypto.Ed25519KeyHashHex;
   pool: string;
 };
 
@@ -28,24 +30,44 @@ type TrezorPoolRegistrationCertificate = {
   type: Trezor.CardanoCertificateType.STAKE_POOL_REGISTRATION;
 };
 
+type ScriptHashCertCredentials = {
+  scriptHash: Crypto.Ed25519KeyHashHex;
+};
+
+type KeyHashCertCredentials = {
+  keyHash: Crypto.Ed25519KeyHashHex;
+};
+
+type PathCertCredentials = {
+  path: BIP32Path;
+};
+
+type CertCredentialsType = ScriptHashCertCredentials | KeyHashCertCredentials | PathCertCredentials;
+
+const getCertCredentials = (
+  stakeKeyHash: Crypto.Ed25519KeyHashHex,
+  knownAddresses: GroupedAddress[] | undefined
+): CertCredentialsType => {
+  const knownAddress = knownAddresses?.find(
+    (address) => Cardano.RewardAccount.toHash(address.rewardAccount) === stakeKeyHash
+  );
+  const rewardAddress = knownAddress ? Cardano.Address.fromBech32(knownAddress.rewardAccount)?.asReward() : null;
+
+  if (rewardAddress?.getPaymentCredential().type === Cardano.CredentialType.KeyHash) {
+    const path = stakeKeyPathFromGroupedAddress(knownAddress);
+    return path ? { path } : { keyHash: stakeKeyHash };
+  }
+  return {
+    scriptHash: stakeKeyHash
+  };
+};
+
 const getStakeAddressCertificate = (
   certificate: Cardano.StakeAddressCertificate,
   context: TrezorTxTransformerContext,
   type: StakeKeyCertificateType
 ): TrezorStakeKeyCertificate => {
-  const knownAddress = context?.knownAddresses.find(
-    (address) => Cardano.RewardAccount.toHash(address.rewardAccount) === certificate.stakeKeyHash
-  );
-  const rewardAddress = knownAddress ? Cardano.Address.fromBech32(knownAddress.rewardAccount)?.asReward() : null;
-
-  let credentials;
-  if (rewardAddress?.getPaymentCredential().type === Cardano.CredentialType.KeyHash) {
-    const path = stakeKeyPathFromGroupedAddress(knownAddress);
-    credentials = path ? { path } : { keyHash: certificate.stakeKeyHash };
-  } else {
-    credentials = { scriptHash: certificate.stakeKeyHash };
-  }
-
+  const credentials = getCertCredentials(certificate.stakeKeyHash, context.knownAddresses);
   return {
     ...credentials,
     type
@@ -57,19 +79,7 @@ const getStakeDelegationCertificate = (
   context: TrezorTxTransformerContext
 ): TrezorDelegationCertificate => {
   const poolIdKeyHash = Cardano.PoolId.toKeyHash(certificate.poolId);
-  const knownAddress = context?.knownAddresses.find(
-    (address) => Cardano.RewardAccount.toHash(address.rewardAccount) === certificate.stakeKeyHash
-  );
-  const rewardAddress = knownAddress ? Cardano.Address.fromBech32(knownAddress.rewardAccount)?.asReward() : null;
-
-  let credentials;
-  if (rewardAddress?.getPaymentCredential().type === Cardano.CredentialType.KeyHash) {
-    const path = stakeKeyPathFromGroupedAddress(knownAddress);
-    credentials = path ? { path } : { keyHash: certificate.stakeKeyHash };
-  } else {
-    credentials = { scriptHash: certificate.stakeKeyHash };
-  }
-
+  const credentials = getCertCredentials(certificate.stakeKeyHash, context.knownAddresses);
   return {
     ...credentials,
     pool: poolIdKeyHash,
@@ -131,6 +141,8 @@ export const getPoolRegistrationCertificate = (
               hostName: relay.dnsName,
               type: Trezor.CardanoPoolRelayType.MULTIPLE_HOST_NAME
             };
+          default:
+            throw new InvalidArgumentError('certificate', 'Unknown relay type.');
         }
       }),
       rewardAccount: certificate.poolParameters.rewardAccount,
