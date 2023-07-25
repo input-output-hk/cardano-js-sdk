@@ -1,4 +1,4 @@
-import { BigIntColumnOptions, DeleteCascadeRelationOptions } from './util';
+import { BigIntColumnOptions, OnDeleteCascadeRelationOptions } from './util';
 import { BlockEntity } from './Block.entity';
 import { Cardano } from '@cardano-sdk/core';
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
@@ -30,7 +30,7 @@ export class OutputEntity {
   datum?: HexBlob;
   @Column({ nullable: true, type: 'jsonb' })
   scriptReference?: Cardano.Script;
-  @ManyToOne(() => BlockEntity, DeleteCascadeRelationOptions)
+  @ManyToOne(() => BlockEntity, OnDeleteCascadeRelationOptions)
   @JoinColumn()
   block?: BlockEntity;
 }

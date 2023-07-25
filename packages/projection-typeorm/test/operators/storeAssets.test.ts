@@ -2,6 +2,7 @@ import {
   AssetEntity,
   BlockDataEntity,
   BlockEntity,
+  NftMetadataEntity,
   TypeormStabilityWindowBuffer,
   storeAssets,
   storeBlock,
@@ -21,7 +22,7 @@ describe('storeAssets', () => {
   let queryRunner: QueryRunner;
   let buffer: TypeormStabilityWindowBuffer;
   let dataSource$: Observable<DataSource>;
-  const entities = [BlockEntity, BlockDataEntity, AssetEntity];
+  const entities = [BlockEntity, BlockDataEntity, AssetEntity, NftMetadataEntity];
 
   const project$ = () =>
     Bootstrap.fromCardanoNode({

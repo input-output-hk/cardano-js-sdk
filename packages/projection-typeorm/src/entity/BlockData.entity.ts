@@ -1,7 +1,7 @@
 import { BlockEntity } from './Block.entity';
 import { Cardano } from '@cardano-sdk/core';
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
-import { DeleteCascadeRelationOptions } from './util';
+import { OnDeleteCascadeRelationOptions } from './util';
 import { json, serializableObj, stringBytea } from './transformers';
 
 @Entity()
@@ -10,7 +10,7 @@ export class BlockDataEntity {
   @PrimaryColumn()
   blockHeight?: number;
 
-  @OneToOne(() => BlockEntity, DeleteCascadeRelationOptions)
+  @OneToOne(() => BlockEntity, OnDeleteCascadeRelationOptions)
   @JoinColumn({ referencedColumnName: 'height' })
   block?: BlockEntity;
 
