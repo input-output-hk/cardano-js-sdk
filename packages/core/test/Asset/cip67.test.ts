@@ -2,17 +2,17 @@ import { Asset } from '../../src';
 import { AssetName } from '../../src/Cardano';
 import { InvalidArgumentError } from '@cardano-sdk/util';
 
-const cases: [number, string][] = [
-  [0, '00000000'],
-  [1, '00001070'],
-  [23, '00017650'],
-  [99, '000632e0'],
-  [533, '00215410'],
-  [2000, '007d0550'],
-  [4567, '011d7690'],
-  [11_111, '02b670b0'],
-  [49_328, '0c0b0f40'],
-  [65_535, '0ffff240']
+const cases: [Asset.AssetNameLabel, string][] = [
+  [0 as Asset.AssetNameLabel, '00000000'],
+  [1 as Asset.AssetNameLabel, '00001070'],
+  [23 as Asset.AssetNameLabel, '00017650'],
+  [99 as Asset.AssetNameLabel, '000632e0'],
+  [533 as Asset.AssetNameLabel, '00215410'],
+  [2000 as Asset.AssetNameLabel, '007d0550'],
+  [4567 as Asset.AssetNameLabel, '011d7690'],
+  [11_111 as Asset.AssetNameLabel, '02b670b0'],
+  [49_328 as Asset.AssetNameLabel, '0c0b0f40'],
+  [65_535 as Asset.AssetNameLabel, '0ffff240']
 ];
 
 describe('Cardano.Asset.cip67', () => {
