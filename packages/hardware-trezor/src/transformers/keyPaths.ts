@@ -40,3 +40,15 @@ export const resolvePaymentKeyPathForTxIn = async (
   const knownAddress = context.knownAddresses.find(({ address }) => address === txOut?.address);
   return knownAddress ? paymentKeyPathFromGroupedAddress(knownAddress) : undefined;
 };
+
+// Resolves the stake key path for known addresses for the given reward address.
+export const resolveStakeKeyPath = (
+  rewardAddress: Cardano.RewardAddress | undefined,
+  context: TrezorTxTransformerContext
+): BIP32Path | null => {
+  if (!rewardAddress) return null;
+  const knownAddress = context.knownAddresses.find(
+    ({ rewardAccount }) => rewardAccount === rewardAddress.toAddress().toBech32()
+  );
+  return stakeKeyPathFromGroupedAddress(knownAddress);
+};

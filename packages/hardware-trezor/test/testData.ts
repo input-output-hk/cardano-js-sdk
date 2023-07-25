@@ -56,8 +56,15 @@ export const txOutToOwnedAddress: Cardano.TxOut = {
   }
 };
 
-export const rewardAccount = Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
+export const rewardKey = 'stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr';
+export const rewardScript = 'stake178phkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gtcccycj5';
+export const rewardAccount = Cardano.RewardAccount(rewardKey);
+export const rewardAddress = Cardano.Address.fromBech32(rewardAccount)?.asReward();
+export const rewardAccountWithPaymentScriptCredential = Cardano.RewardAccount(rewardScript);
 export const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
+export const stakeScriptHash = Cardano.RewardAccount.toHash(rewardAccountWithPaymentScriptCredential);
+export const knownAddressKeyPath = [2_147_485_500, 2_147_485_463, 2_147_483_648, 1, 0];
+export const knownAddressStakeKeyPath = [2_147_485_500, 2_147_485_463, 2_147_483_648, 2, 0];
 export const poolId = Cardano.PoolId('pool1ev8vy6fyj7693ergzty2t0azjvw35tvkt2vcjwpgajqs7z6u2vn');
 export const poolId2 = Cardano.PoolId('pool1z5uqdk7dzdxaae5633fqfcu2eqzy3a3rgtuvy087fdld7yws0xt');
 export const vrf = Cardano.VrfVkHex('8dd154228946bd12967c12bedb1cb6038b78f8b84a1760b1a788fa72a4af3db0');
@@ -93,9 +100,6 @@ export const knownAddressWithoutStakingPath: GroupedAddress = {
   type: AddressType.Internal
 };
 
-export const knownAddressKeyPath = [2_147_485_500, 2_147_485_463, 2_147_483_648, 1, 0];
-export const knownAddressStakeKeyPath = [2_147_485_500, 2_147_485_463, 2_147_483_648, 2, 0];
-
 export const contextWithKnownAddresses = {
   chainId: {
     networkId: Cardano.NetworkId.Testnet,
@@ -121,6 +125,16 @@ export const contextWithoutKnownAddresses = {
   },
   inputResolver: { resolveInput: () => Promise.resolve(null) },
   knownAddresses: []
+};
+
+export const coreWithdrawalWithKeyHashCredential = {
+  quantity: 5n,
+  stakeAddress: rewardAccount
+};
+
+export const coreWithdrawalWithScriptHashCredential = {
+  quantity: 5n,
+  stakeAddress: rewardAccountWithPaymentScriptCredential
 };
 
 export const stakeRegistrationCertificate = {
