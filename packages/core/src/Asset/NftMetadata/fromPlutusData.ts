@@ -110,6 +110,7 @@ const mapFiles = (files: string | Cardano.PlutusData | undefined, logger: Logger
 
 /**
  * @param plutusData CIP-0068 (label 222) datum
+ * @param parentLogger logger
  */
 export const fromPlutusData = (
   plutusData: Cardano.PlutusData | undefined,

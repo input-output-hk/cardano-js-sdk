@@ -5,17 +5,17 @@ import crc8 from './crc8';
 const ASSET_LABEL_LENGTH = 8;
 const ASSET_LABEL_BRACKET = '0';
 
-export enum AssetNameLabelNum {
-  ReferenceNFT = 100,
-  UserNFT = 222,
-  UserFT = 333,
-  UserRFT = 444
-}
-
 export type AssetNameLabel = OpaqueNumber<'AssetNameLabelNum'>;
 export const AssetNameLabel = (value: number): AssetNameLabel => value as AssetNameLabel;
 
-interface DecodedAssetName {
+export const AssetNameLabelNum = {
+  ReferenceNFT: 100 as AssetNameLabel,
+  UserFT: 333 as AssetNameLabel,
+  UserNFT: 222 as AssetNameLabel,
+  UserRFT: 444 as AssetNameLabel
+};
+
+export interface DecodedAssetName {
   label: AssetNameLabel;
   content: Cardano.AssetName;
 }
@@ -69,7 +69,7 @@ AssetNameLabel.decode = (assetName: Cardano.AssetName): DecodedAssetName | null 
   };
 };
 
-AssetNameLabel.encode = (assetName: Cardano.AssetName, labelNum: AssetNameLabelNum): Cardano.AssetName => {
+AssetNameLabel.encode = (assetName: Cardano.AssetName, labelNum: AssetNameLabel): Cardano.AssetName => {
   assertLabelNumInterval(labelNum);
   const labelNumHex = labelNum.toString(16).padStart(4, ASSET_LABEL_BRACKET);
   return Cardano.AssetName(
