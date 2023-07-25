@@ -21,7 +21,7 @@ export class PoolMetadataEntity {
   @Column()
   hash?: string;
   @Column('jsonb', { nullable: true })
-  ext?: Cardano.ExtendedStakePoolMetadata | null | undefined;
+  ext?: Cardano.ExtendedStakePoolMetadata | null;
   @JoinColumn({ referencedColumnName: 'id' })
   @ManyToOne(() => StakePoolEntity)
   stakePool?: StakePoolEntity;
