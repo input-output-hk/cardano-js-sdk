@@ -101,6 +101,7 @@ const mapFile = (file: Cardano.PlutusData, logger: Logger): NftMetadataFile | un
 };
 
 const mapFiles = (files: string | Cardano.PlutusData | undefined, logger: Logger): NftMetadataFile[] | undefined => {
+  if (!files) return;
   if (!isPlutusList(files)) {
     logger.warn('expected "files" to be a list');
     return;
