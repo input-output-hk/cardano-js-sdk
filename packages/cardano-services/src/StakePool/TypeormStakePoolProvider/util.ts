@@ -71,6 +71,7 @@ export const getSortOptions = (
 export const getFilterCondition = (condition?: FilterCondition, defaultCondition: Uppercase<FilterCondition> = 'OR') =>
   condition ? (condition.toUpperCase() as Uppercase<FilterCondition>) : defaultCondition;
 
+// eslint-disable-next-line max-statements
 export const getWhereClauseAndArgs = (filters: QueryStakePoolsArgs['filters']) => {
   if (!filters) return { args: {}, clause: '1=1' };
 
@@ -93,8 +94,22 @@ export const getWhereClauseAndArgs = (filters: QueryStakePoolsArgs['filters']) =
     }
 
     if ('id' in identifierArgs) identifierClauses.push('LOWER(pool.id) IN (:...id)');
-    if ('name' in identifierArgs) identifierClauses.push('LOWER(metadata.name) IN (:...name)');
-    if ('ticker' in identifierArgs) identifierClauses.push('LOWER(metadata.ticker) IN (:...ticker)');
+    if ('name' in identifierArgs) {
+      if (identifierArgs.name.length === 1) {
+        // exact match first then regexp
+        identifierClauses.push('(LOWER(metadata.name) IN (:...name) OR LOWER(metadata.name) ~* (:...name))');
+      } else {
+        identifierClauses.push('LOWER(metadata.name) IN (:...name)');
+      }
+    }
+    if ('ticker' in identifierArgs) {
+      if (identifierArgs.ticker.length === 1) {
+        // exact match first then regexp
+        identifierClauses.push('(LOWER(metadata.ticker) IN (:...ticker) OR LOWER(metadata.ticker) ~* (:...ticker))');
+      } else {
+        identifierClauses.push('LOWER(metadata.ticker) IN (:...ticker)');
+      }
+    }
 
     const identifierFilters = identifierClauses.join(` ${identifierCondition} `);
     clauses.push(` (${identifierFilters}) `);
