@@ -39,8 +39,8 @@ export const stakePoolSearchSelection = [
 
 export const sortSelectionMap: { [key in SortField]: string } = {
   apy: 'metrics_apy',
-  cost: 'params_cost',
-  name: 'metadata_name',
+  cost: 'params.cost',
+  name: 'metadata.name',
   saturation: 'metrics_live_saturation'
 };
 
