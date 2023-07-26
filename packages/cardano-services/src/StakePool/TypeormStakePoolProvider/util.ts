@@ -99,6 +99,13 @@ export const getWhereClauseAndArgs = (filters: QueryStakePoolsArgs['filters']) =
     const identifierFilters = identifierClauses.join(` ${identifierCondition} `);
     clauses.push(` (${identifierFilters}) `);
   }
+  if (filters.pledgeMet !== undefined && filters.pledgeMet !== null) {
+    if (filters.pledgeMet) {
+      clauses.push('params.pledge<=metrics.live_pledge');
+    } else {
+      clauses.push('params.pledge>metrics.live_pledge');
+    }
+  }
 
   return {
     args: { ...args, ...identifierArgs },
