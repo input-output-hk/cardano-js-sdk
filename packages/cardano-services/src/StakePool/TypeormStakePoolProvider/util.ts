@@ -51,14 +51,21 @@ export const stakePoolSearchTotalCount = 'count(*) over () as total_count';
 export const getSortOptions = (
   sort?: StakePoolSortOptions,
   defaultField: SortField = 'name',
-  defaultOrder: Uppercase<SortOrder> = 'ASC'
+  defaultOrder: SortOrder = 'asc'
 ) => {
-  if (sort)
+  if (!sort) {
+    sort = { field: defaultField, order: defaultOrder };
+  }
+  if (sort.field === 'name') {
     return {
-      field: sortSelectionMap[sort.field as SortField],
+      field: `lower(${sortSelectionMap[sort.field as SortField]})`,
       order: sort.order.toUpperCase() as Uppercase<SortOrder>
     };
-  return { field: defaultField, order: defaultOrder };
+  }
+  return {
+    field: sortSelectionMap[sort.field as SortField],
+    order: sort.order.toUpperCase() as Uppercase<SortOrder>
+  };
 };
 
 export const getFilterCondition = (condition?: FilterCondition, defaultCondition: Uppercase<FilterCondition> = 'OR') =>
