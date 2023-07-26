@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.11.2...@cardano-sdk/input-selection@0.11.3) (2023-07-26)
+
+### Features
+
+* **input-selection:** greedy input selection now distributes native assets evenly ([69aeefb](https://github.com/input-output-hk/cardano-js-sdk/commit/69aeefb4463c9b3722223983ce0024a1179a7c2c))
+
+### Bug Fixes
+
+* **input-selection:** greedy input selector now produces a correct selection under all conditions ([0ad8a48](https://github.com/input-output-hk/cardano-js-sdk/commit/0ad8a48a9dc42c364729a3ee2329aba6d786026e))
+
 ## [0.11.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.11.1...@cardano-sdk/input-selection@0.11.2) (2023-07-13)
 
 ### Features

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.9.2...@cardano-sdk/tx-construction@0.9.3) (2023-07-26)
+
+### Bug Fixes
+
+* **tx-construction:** removed resolved handle from addOutput in TxBuilder ([b185932](https://github.com/input-output-hk/cardano-js-sdk/commit/b185932ffb591277dafde20f05c93ee6e8674358))
+
 ## [0.9.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.9.1...@cardano-sdk/tx-construction@0.9.2) (2023-07-13)
 
 ### Bug Fixes

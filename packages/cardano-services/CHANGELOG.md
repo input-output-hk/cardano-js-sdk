@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.14.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.14.6...@cardano-sdk/cardano-services@0.14.7) (2023-07-26)
+
+### Bug Fixes
+
+* **cardano-services:** add metadata entity to typeorm stake pool provider data source ([4232194](https://github.com/input-output-hk/cardano-js-sdk/commit/4232194ed0b4a2c74e655b306ecc21ee34900a54))
+* **cardano-services:** fix docker compose to forward policy id env var to provider server ([0b8784c](https://github.com/input-output-hk/cardano-js-sdk/commit/0b8784c22bc332bfd49e8dc049e01f518c0d4df0))
+
 ## [0.14.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.14.5...@cardano-sdk/cardano-services@0.14.6) (2023-07-17)
 
 ### Bug Fixes

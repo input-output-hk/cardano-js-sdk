@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.17.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.16.7...@cardano-sdk/e2e@0.17.0) (2023-07-26)
+
+### ⚠ BREAKING CHANGES
+
+* **web-extension:** lw-7563 throw RemoteApiShutdownError on disconnect during method call
+
+### Bug Fixes
+
+* **web-extension:** lw-7563 throw RemoteApiShutdownError on disconnect during method call ([dd803c6](https://github.com/input-output-hk/cardano-js-sdk/commit/dd803c6f15a5c4e42eb05413388fef71bb7ad628))
+
 ## [0.16.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.16.6...@cardano-sdk/e2e@0.16.7) (2023-07-17)
 
 **Note:** Version bump only for package @cardano-sdk/e2e
