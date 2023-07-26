@@ -7,14 +7,23 @@ let
   $ ls packages/cardano-services/config/network/
   mainnet  preprod  preprod_p2p  preview  preview_p2p  testnet  vasil-dev  vasil-dev_p2p  vasil-qa
   */
-  networkConfig = inputs.self + /packages/cardano-services/config/network;
+  cardanoServicesPath = pkg: let
+    sourceRoot = "source";
+  in "${pkg}/libexec/${sourceRoot}/packages/cardano-services";
+  runCardanoServices = pkg: "${lib.getExe pkg.nodejs} ${cardanoServicesPath pkg}";
 in {
-  server = std.lib.ops.mkOperable {
+  server = std.lib.ops.mkOperable rec {
     package = cell.packages.server;
-    # find all configuration options in: packages/cardano-services/src/cli.ts
     runtimeScript = ''
-      ${cell.packages.server}/bin/cli --cardano-node-config-path \
-        "${networkConfig}/''${NETWORK-mainnet}/cardano-node/config.json"
+      export API_URL=''${API_URL:-http://0.0.0.0:3000}
+      export CLI="${runCardanoServices package}/dist/cjs/cli.js"
+      export CARDANO_NODE_CONFIGS_DIR="${cardanoServicesPath package}/config/network"
+
+      if [ -n "$NETWORK" ]; then
+        export CARDANO_NODE_CONFIG_PATH="$CARDANO_NODE_CONFIGS_DIR/''${NETWORK}/cardano-node/config.json"
+      fi
+
+      exec $CLI "$@"
     '';
     meta.description = "A transparent (thin) wrapper around the Cardano Services CLI";
   };
