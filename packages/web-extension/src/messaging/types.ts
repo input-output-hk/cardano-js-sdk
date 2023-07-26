@@ -159,11 +159,17 @@ export interface DeriveChannelOptions {
   detached?: boolean;
 }
 
+export interface DisconnectEvent {
+  disconnected: MinimalPort;
+  remaining: MinimalPort[];
+}
+
 export interface Messenger extends Shutdown {
   channel: ChannelName;
   connect$: Observable<MinimalPort>;
   postMessage(message: unknown): Observable<void>;
   message$: Observable<PortMessage>;
+  disconnect$: Observable<DisconnectEvent>;
   isShutdown: boolean;
   deriveChannel(path: string, options?: DeriveChannelOptions): Messenger;
 }

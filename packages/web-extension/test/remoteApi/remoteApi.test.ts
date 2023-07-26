@@ -46,6 +46,7 @@ const createMockMessenger = (channel: ChannelName) => {
       return messenger;
     }),
     derivedMessengers,
+    disconnect$: EMPTY,
     get isShutdown() {
       return isShutdown;
     },
@@ -70,6 +71,7 @@ const setUp = (mode: ApiObjectType) => {
     channel: 'mockMessenger-someNumbers$',
     connect$: new Subject(),
     deriveChannel: jest.fn(),
+    disconnect$: EMPTY,
     isShutdown: false,
     message$: new Subject(),
     postMessage: jest.fn().mockImplementation(() => EMPTY),
@@ -79,6 +81,7 @@ const setUp = (mode: ApiObjectType) => {
     channel: 'mockMessenger',
     connect$: new Subject(),
     deriveChannel: jest.fn().mockImplementation(() => observablePropMessenger),
+    disconnect$: EMPTY,
     isShutdown: false,
     message$: incomingMsg$.asObservable(),
     postMessage: jest.fn().mockImplementation(() => EMPTY),
@@ -88,6 +91,7 @@ const setUp = (mode: ApiObjectType) => {
     channel: 'mockMessengerOuter',
     connect$: new Subject(),
     deriveChannel: jest.fn().mockImplementation(() => mockMessenger),
+    disconnect$: EMPTY,
     isShutdown: false,
     message$: new Subject(),
     postMessage: jest.fn().mockImplementation(() => EMPTY),

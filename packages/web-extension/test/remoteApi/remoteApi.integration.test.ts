@@ -15,6 +15,7 @@ import {
   exposeMessengerApi
 } from '../../src/messaging';
 import {
+  EMPTY,
   EmptyError,
   Observable,
   Subject,
@@ -79,6 +80,7 @@ const createMessenger = (channel: ChannelName, isHost: boolean): TestMessenger =
       derivedMessengers.push(messenger);
       return messenger;
     },
+    disconnect$: EMPTY,
     isShutdown: false,
     message$: local$.pipe(
       map((data): PortMessage => ({ data, port: { postMessage: (message) => postMessage(message).subscribe() } })),

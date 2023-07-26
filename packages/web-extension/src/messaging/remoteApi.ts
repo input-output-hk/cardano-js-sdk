@@ -38,7 +38,8 @@ import {
   shareReplay,
   switchMap,
   takeUntil,
-  tap
+  tap,
+  throwError
 } from 'rxjs';
 import {
   GetErrorPrototype,
@@ -73,7 +74,7 @@ const consumeMethod =
       propName,
       getErrorPrototype
     }: { propName: string; getErrorPrototype?: GetErrorPrototype; options?: MethodRequestOptions },
-    { messenger: { message$, postMessage, channel } }: MessengerApiDependencies
+    { messenger: { message$, postMessage, channel, disconnect$ } }: MessengerApiDependencies
   ) =>
   async (...args: unknown[]) => {
     const requestMessage: RequestMessage = {
@@ -92,6 +93,10 @@ const consumeMethod =
           filter(isResponseMessage),
           filter(({ messageId }) => messageId === requestMessage.messageId),
           map(({ response }) => response)
+        ),
+        disconnect$.pipe(
+          filter((dc) => dc.remaining.length === 0),
+          mergeMap(() => throwError(() => new EmptyError()))
         )
       )
     ).catch((error) => {

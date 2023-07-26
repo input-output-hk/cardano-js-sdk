@@ -5,6 +5,7 @@ import {
   EmptyError,
   Observable,
   ReplaySubject,
+  Subject,
   catchError,
   debounceTime,
   filter,
@@ -16,6 +17,7 @@ import {
 } from 'rxjs';
 import {
   DeriveChannelOptions,
+  DisconnectEvent,
   Messenger,
   MessengerDependencies,
   MessengerPort,
@@ -46,6 +48,7 @@ export const createNonBackgroundMessenger = (
   let reconnectTimeout: any;
   let delay = initialDelay;
   let isDestroyed = false;
+  const disconnect$ = new Subject<DisconnectEvent>();
   const port$ = new BehaviorSubject<MessengerPort | null | 'shutdown'>(null);
   // Originally this was a 'new Subject()', but there seems to be a race between
   // - when it receives a value from 'onMessage'
@@ -73,6 +76,10 @@ export const createNonBackgroundMessenger = (
     message$.next({ data, port });
   };
   const onDisconnect = (port: MessengerPort) => {
+    disconnect$.next({
+      disconnected: port,
+      remaining: []
+    });
     logger.debug(`[NonBackgroundMessenger(${channel})] disconnected`);
     port!.onMessage.removeListener(onMessage);
     port!.onDisconnect.removeListener(onDisconnect);
@@ -102,6 +109,7 @@ export const createNonBackgroundMessenger = (
       }
       return messenger;
     },
+    disconnect$,
     get isShutdown() {
       return isDestroyed;
     },
@@ -138,6 +146,7 @@ export const createNonBackgroundMessenger = (
         derivedMessengers.delete(messenger);
       }
       port$.complete();
+      disconnect$.complete();
       logger.debug(`[NonBackgroundMessenger(${channel})] shutdown`);
     }
   };
