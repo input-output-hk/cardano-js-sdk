@@ -2,20 +2,26 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Cardano, QueryStakePoolsArgs, SortField, StakePoolProvider } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, stakePoolHttpProvider } from '@cardano-sdk/cardano-services-client';
-import { HttpServer } from '../../../src/Http/HttpServer';
-import { HttpServerConfig } from '../../../src/Http/types';
+import {
+  HttpServer,
+  HttpServerConfig,
+  StakePoolHttpService,
+  TypeormStakePoolProvider,
+  createDnsResolver,
+  getConnectionConfig,
+  getEntities
+} from '../../../src';
 import { INFO, createLogger } from 'bunyan';
 import { Observable } from 'rxjs';
 import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
 import { Pool } from 'pg';
 import { PoolInfo, TypeormStakePoolFixtureBuilder } from './fitxures/TypeormFixtureBuilder';
-import { StakePoolHttpService } from '../../../src/StakePool/StakePoolHttpService';
-import { TypeormStakePoolProvider, createDnsResolver, getConnectionConfig, getEntities } from '../../../src';
 import { getPort } from 'get-port-please';
 import { isNotNil } from '@cardano-sdk/util';
 import { logger } from '@cardano-sdk/util-dev';
 import { sleep } from '../../util';
 import axios from 'axios';
+import lowerCase from 'lodash/lowerCase';
 
 const UNSUPPORTED_MEDIA_STRING = 'Request failed with status code 415';
 const APPLICATION_CBOR = 'application/cbor';
@@ -570,47 +576,35 @@ describe('TypeormStakePoolProvider', () => {
           });
         });
 
-        // eslint-disable-next-line complexity, unicorn/consistent-function-scoping
-        const sortByNameThenByPoolIdAsc = (poolA: Cardano.StakePool, poolB: Cardano.StakePool) => {
-          if (poolA.metadata?.name && poolB.metadata?.name === '') return 1;
-          if (poolB.metadata?.name && poolA.metadata?.name === '') return -1;
-          if (poolA.metadata?.name && !poolB.metadata?.name) return -1;
-          if (!poolA.metadata?.name && poolB.metadata?.name) return 1;
-          if (poolA.metadata?.name && poolB.metadata?.name) {
-            if (poolA.metadata?.name === poolB.metadata?.name) return 0;
-            return poolA.metadata.name > poolB.metadata.name ? 1 : -1;
-          }
-
-          return poolA.id > poolB.id ? 1 : -1;
-        };
-
         describe('stake pools sort', () => {
           describe('sort by name', () => {
             it('desc order', async () => {
               const response = await provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'name'));
-              const expected = [...poolsInfoWithMeta].sort((a, b) => (a.name < b.name ? 1 : -1));
+              const expected = [...poolsInfoWithMeta].sort((a, b) => (lowerCase(a.name) < lowerCase(b.name) ? 1 : -1));
               expect(response.pageResults[0].metadata?.name).toEqual(expected[0].name);
               expect(response.pageResults[1].metadata?.name).toEqual(expected[1].name);
             });
 
             it('asc order', async () => {
               const response = await provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'name'));
-              const expected = [...poolsInfoWithMeta].sort((a, b) => (a.name < b.name ? -1 : 1));
+              const expected = [...poolsInfoWithMeta].sort((a, b) => (lowerCase(a.name) < lowerCase(b.name) ? -1 : 1));
               expect(response.pageResults[0].metadata?.name).toEqual(expected[0].name);
               expect(response.pageResults[1].metadata?.name).toEqual(expected[1].name);
             });
 
-            it('if sort not provided, defaults to order by name desc and then by poolId asc', async () => {
+            it('if sort not provided, defaults to order by name asc', async () => {
               const response = await provider.queryStakePools({ pagination });
-              const resultSortedCopy = [...response.pageResults].sort(sortByNameThenByPoolIdAsc);
-              expect(response.pageResults.length).toBeGreaterThan(0);
-              expect(response.pageResults).toEqual(resultSortedCopy);
+              const expected = [...poolsInfoWithMeta].sort((a, b) => (lowerCase(a.name) < lowerCase(b.name) ? -1 : 1));
+              expect(response.pageResults[0].metadata?.name).toEqual(expected[0].name);
+              expect(response.pageResults[1].metadata?.name).toEqual(expected[1].name);
             });
 
             it('with applied filters', async () => {
               const reqWithFilters = setSortCondition(setFilterCondition(filterArgs, 'or'), 'desc', 'name');
               const response = await provider.queryStakePools(reqWithFilters);
-              const expected = [...poolsInfoWithMetaFiltered].sort((a, b) => (a.name < b.name ? 1 : -1));
+              const expected = [...poolsInfoWithMetaFiltered].sort((a, b) =>
+                lowerCase(a.name) < lowerCase(b.name) ? 1 : -1
+              );
               expect(response.pageResults[0].metadata?.name).toEqual(expected[0].name);
               expect(response.pageResults[1].metadata?.name).toEqual(expected[1].name);
             });
