@@ -73,7 +73,7 @@ export class TypeormStakePoolProvider extends TypeormProvider implements StakePo
         .select(stakePoolSearchSelection)
         .addSelect(stakePoolSearchTotalCount)
         .where(clause, args)
-        .orderBy(field, order, nullsInSort)
+        .orderBy(field, order, !field.includes('cost') ? nullsInSort : undefined)
         .addOrderBy('pool.id', 'ASC')
         .offset(pagination.startAt)
         .limit(pagination.limit)
