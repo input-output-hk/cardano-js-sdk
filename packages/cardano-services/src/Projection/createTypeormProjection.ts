@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable prefer-spread */
+import { Cardano } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
-import { Observable, from, switchMap } from 'rxjs';
+import { Observable, from, switchMap, takeWhile } from 'rxjs';
 import {
   PgConnectionConfig,
   TypeormDevOptions,
@@ -20,7 +21,7 @@ import {
 } from './prepareTypeormProjection';
 import { ProjectionEvent, logProjectionProgress, requestNext } from '@cardano-sdk/projection';
 import { migrations } from './migrations';
-import { shareRetryBackoff } from '@cardano-sdk/util-rxjs';
+import { passthrough, shareRetryBackoff } from '@cardano-sdk/util-rxjs';
 
 export interface CreateTypeormProjectionProps {
   projections: ProjectionName[];
@@ -28,6 +29,7 @@ export interface CreateTypeormProjectionProps {
   projectionSource$: Observable<ProjectionEvent>;
   connectionConfig$: Observable<PgConnectionConfig>;
   devOptions?: TypeormDevOptions;
+  exitAtBlockNo?: Cardano.BlockNo;
   logger: Logger;
   projectionOptions?: ProjectionOptions;
 }
@@ -49,7 +51,7 @@ export const createObservableDataSource = ({
   entities,
   extensions,
   migrationsRun
-}: Omit<CreateTypeormProjectionProps, 'projections' | 'projectionSource$' | 'projectionOptions'> &
+}: Omit<CreateTypeormProjectionProps, 'exitAtBlockNo' | 'projections' | 'projectionSource$' | 'projectionOptions'> &
   Pick<PreparedProjection, 'entities' | 'extensions'> & { migrationsRun: boolean }) =>
   connectionConfig$.pipe(
     switchMap((connectionConfig) =>
@@ -92,6 +94,7 @@ export const createTypeormProjection = ({
   connectionConfig$,
   logger,
   devOptions,
+  exitAtBlockNo,
   buffer,
   projectionOptions
 }: CreateTypeormProjectionProps) => {
@@ -125,6 +128,7 @@ export const createTypeormProjection = ({
       { shouldRetry: isRecoverableTypeormError }
     ),
     requestNext(),
-    logProjectionProgress(logger)
+    logProjectionProgress(logger),
+    exitAtBlockNo ? takeWhile((event) => event.block.header.blockNo < exitAtBlockNo) : passthrough()
   );
 };
