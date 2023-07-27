@@ -14,21 +14,18 @@ import { mapAuxiliaryData, mapCerts, mapTxIns, mapTxOuts, mapWithdrawals } from 
 const trezorTxTransformer = async (
   body: Cardano.TxBody,
   context: TrezorTxTransformerContext
-): Promise<Partial<Trezor.CardanoSignTransaction>> => {
-  const certificates = mapCerts(body.certificates ?? [], context);
-  return {
-    auxiliaryData: body.auxiliaryDataHash ? mapAuxiliaryData(body.auxiliaryDataHash) : undefined,
-    certificates,
-    fee: body.fee.toString(),
-    inputs: await mapTxIns(body.inputs, context),
-    networkId: context.chainId.networkId,
-    outputs: mapTxOuts(body.outputs, context),
-    protocolMagic: context.chainId.networkMagic,
-    ttl: body.validityInterval?.invalidHereafter?.toString(),
-    validityIntervalStart: body.validityInterval?.invalidBefore?.toString(),
-    withdrawals: mapWithdrawals(body.withdrawals ?? [], context)
-  };
-};
+): Promise<Partial<Trezor.CardanoSignTransaction>> => ({
+  auxiliaryData: body.auxiliaryDataHash ? mapAuxiliaryData(body.auxiliaryDataHash) : undefined,
+  certificates: mapCerts(body.certificates ?? [], context),
+  fee: body.fee.toString(),
+  inputs: await mapTxIns(body.inputs, context),
+  networkId: context.chainId.networkId,
+  outputs: mapTxOuts(body.outputs, context),
+  protocolMagic: context.chainId.networkMagic,
+  ttl: body.validityInterval?.invalidHereafter?.toString(),
+  validityIntervalStart: body.validityInterval?.invalidBefore?.toString(),
+  withdrawals: mapWithdrawals(body.withdrawals ?? [], context)
+});
 
 /**
  * Temporary props type extending the existing TxToTrezorProps
