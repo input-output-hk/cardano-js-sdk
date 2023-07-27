@@ -136,4 +136,45 @@ describe('delegation rewards', () => {
     expect(spendRewardTx.body.withdrawals?.length).toBeGreaterThan(0);
     await submitAndConfirm(wallet1, spendRewardTx);
   });
+
+  it('can spend rewards from multiple accounts', async () => {
+    if (!(await runningAgainstLocalNetwork())) {
+      return logger.fatal(
+        "Skipping test 'will receive rewards for delegated tADA' as it should only run with a fast test network"
+      );
+    }
+
+    // This has to be done inside the test (instead of beforeAll)
+    // so that it doesn't fail when running against non-local networks
+    await initializeWallets();
+
+    const [poolId1, poolId2] = await getPoolIds(providers.stakePoolProvider, 2);
+    const signedTx = await submitDelegationTx(wallet1, [poolId1, poolId2]);
+
+    const delegationTxConfirmedAtEpoch = await getTxConfirmationEpoch(wallet1, signedTx);
+
+    logger.info(`Delegation tx confirmed at epoch #${delegationTxConfirmedAtEpoch}`);
+
+    await waitForEpoch(wallet1, delegationTxConfirmedAtEpoch + 2);
+
+    await generateTxs(wallet1, wallet2);
+    await waitForEpoch(wallet1, delegationTxConfirmedAtEpoch + 4);
+
+    // Check reward
+    await waitForWalletStateSettle(wallet1);
+    const rewardsPerAcct = await firstValueFrom(wallet1.delegation.rewardAccounts$);
+    const rewards = await firstValueFrom(wallet1.balance.rewardAccounts.rewards$);
+
+    logger.info(`Generated rewards: ${rewards} tLovelace`);
+    logger.info('Generated rewards per account:', rewardsPerAcct);
+
+    expect(rewards).toBeGreaterThan(0n);
+
+    // Spend reward
+    const spendRewardTx = await buildSpendRewardTx(wallet1, wallet2);
+    logger.info('transaction Withdrawals', spendRewardTx.body.withdrawals);
+
+    expect(spendRewardTx.body.withdrawals?.length).toBeGreaterThanOrEqual(2);
+    await submitAndConfirm(wallet1, spendRewardTx);
+  });
 });
