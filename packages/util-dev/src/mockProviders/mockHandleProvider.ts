@@ -14,6 +14,7 @@ export const resolvedHandle = {
 };
 
 export const mockHandleProvider = () => ({
+  getPolicyIds: jest.fn().mockResolvedValue([resolvedHandle.policyId]),
   healthCheck: jest.fn().mockResolvedValue({ ok: true }),
   resolveHandles: jest.fn().mockResolvedValue([resolvedHandle])
 });

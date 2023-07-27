@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable no-multi-spaces */
 /* eslint-disable space-in-parens */
-import { Asset } from '@cardano-sdk/core';
+import { Asset, Cardano } from '@cardano-sdk/core';
 import {
   HYDRATE_HANDLE_INITIAL_INTERVAL,
   HYDRATE_HANDLE_MAX_RETRIES,
@@ -16,7 +16,6 @@ import { createTestScheduler, logger, mockProviders } from '@cardano-sdk/util-de
 const {
   utxo,
   utxo2,
-  ledgerTip,
   ledgerTip2,
   handleAssetId,
   handlePolicyId,
@@ -44,23 +43,24 @@ const expectedHandleInfo: HandleInfo = {
   name: handleAssetName,
   policyId: handlePolicyId,
   quantity: 1n,
-  // We consider that handle was resolved when we got the utxo,
-  // as AssetInfo is just some supplementary data
-  resolvedAt: ledgerTip,
   supply: 1n
 };
 
 const expectedHydratedHandleInfo: HandleInfo = {
   ...expectedHandleInfo,
   backgroundImage: Asset.Uri('ipfs://Q2de4Fg56tNHy82300000001'),
-  profilePic: undefined
+  image: Asset.Uri('ipfs://Q2de4Fg56tNHy82300000002'),
+  profilePic: Asset.Uri('ipfs://Q2de4Fg56tNHy82300000003'),
+  resolvedAt: ledgerTip2
 };
 
 const hydrateHandle = (handleInfo: HandleInfo) =>
   of({
     ...handleInfo,
-    backgroundImage: expectedHydratedHandleInfo?.backgroundImage,
-    profilePic: expectedHydratedHandleInfo?.profilePic
+    backgroundImage: expectedHydratedHandleInfo.backgroundImage,
+    image: expectedHydratedHandleInfo.image,
+    profilePic: expectedHydratedHandleInfo.profilePic,
+    resolvedAt: expectedHydratedHandleInfo.resolvedAt
   }).pipe(delay(1));
 
 const exponentialBackoffDelay = (iteration: number) => Math.pow(2, iteration) * HYDRATE_HANDLE_INITIAL_INTERVAL;
@@ -78,22 +78,22 @@ describe('createHandlesTracker', () => {
   it('matches utxo$ assets to given handlePolicyIds and adds context from assetInfo$ and tip$ observables', () => {
     createTestScheduler().run(({ hot, expectObservable }) => {
       const utxo$ = hot(     '-ab-', { a: utxo, b: utxo2 });
-      const tip$ = hot(      'a-b-', { a: ledgerTip, b: ledgerTip2 });
       const assetInfo$ = hot('-a-b', {
         a: new Map(),
         b: new Map([[handleAssetId, handleAssetInfo]])
       });
+      const handlePolicyIds$ = hot('-a--', { a: [handlePolicyId] });
 
       const handles$ = createHandlesTracker({
         assetInfo$,
-        handlePolicyIds: [handlePolicyId],
+        handlePolicyIds$,
         handleProvider: {
+          getPolicyIds: async (): Promise<Cardano.PolicyId[]> => [handlePolicyId],
           healthCheck: jest.fn(),
           resolveHandles: async () => []
         },
         hydrateHandle: () => hydrateHandle,
         logger,
-        tip$,
         utxo$
       });
 
@@ -107,7 +107,6 @@ describe('createHandlesTracker', () => {
   it('filters out handles that have total supply >1', () => {
     createTestScheduler().run(({ hot, expectObservable }) => {
       const utxo$ = hot(     '-a', { a: utxo });
-      const tip$ = hot(      'a-', { a: ledgerTip });
       const assetInfo$ = hot('-a', {
         a: new Map([
           [
@@ -119,17 +118,18 @@ describe('createHandlesTracker', () => {
           ]
         ])
       });
+      const handlePolicyIds$ = hot('-a-', { a: [handlePolicyId] });
 
       const handles$ = createHandlesTracker({
         assetInfo$,
-        handlePolicyIds: [handlePolicyId],
+        handlePolicyIds$,
         handleProvider: {
+          getPolicyIds: async (): Promise<Cardano.PolicyId[]> => [handlePolicyId],
           healthCheck: jest.fn(),
           resolveHandles: async () => []
         },
         hydrateHandle: () => hydrateHandle,
         logger,
-        tip$,
         utxo$
       });
 
@@ -139,20 +139,20 @@ describe('createHandlesTracker', () => {
 
   it('does not emit duplicates with no changes', () => {
     createTestScheduler().run(({ hot, expectObservable }) => {
-      const utxo$ = hot(     '-a-', { a: utxo });
-      const tip$ = hot(      'a--', { a: ledgerTip });
-      const assetInfo$ = hot('-aa', { a: new Map([[handleAssetId, handleAssetInfo]]) });
+      const utxo$ = hot(           '-a-', { a: utxo });
+      const assetInfo$ = hot(      '-aa', { a: new Map([[handleAssetId, handleAssetInfo]]) });
+      const handlePolicyIds$ = hot('-a-', { a: [handlePolicyId] });
 
       const handles$ = createHandlesTracker({
         assetInfo$,
-        handlePolicyIds: [handlePolicyId],
+        handlePolicyIds$,
         handleProvider: {
+          getPolicyIds: async (): Promise<Cardano.PolicyId[]> => [handlePolicyId],
           healthCheck: jest.fn(),
           resolveHandles: async () => []
         },
         hydrateHandle: () => hydrateHandle,
         logger,
-        tip$,
         utxo$
       });
 
@@ -165,26 +165,25 @@ describe('createHandlesTracker', () => {
 
   it('shares a single subscription to dependency observables', () => {
     createTestScheduler().run(({ hot, expectSubscriptions }) => {
-      const utxo$ = hot('-a', { a: utxo });
-      const tip$ = hot('a-', { a: ledgerTip });
+      const utxo$ = hot(     '-a', { a: utxo });
       const assetInfo$ = hot('-a', {
         a: new Map([[handleAssetId, handleAssetInfo]])
       });
+      const handlePolicyIds$ = hot('a-', { a: [handlePolicyId] });
       const handles$ = createHandlesTracker({
         assetInfo$,
-        handlePolicyIds: [handlePolicyId],
+        handlePolicyIds$,
         handleProvider: {
+          getPolicyIds: async (): Promise<Cardano.PolicyId[]> => [handlePolicyId],
           healthCheck: jest.fn(),
           resolveHandles: async () => []
         },
         hydrateHandle: () => hydrateHandle,
         logger,
-        tip$,
         utxo$
       });
       combineLatest([handles$, handles$]).pipe(take(1)).subscribe();
       expectSubscriptions(utxo$.subscriptions).toBe('^!');
-      expectSubscriptions(tip$.subscriptions).toBe('^!');
       expectSubscriptions(assetInfo$.subscriptions).toBe('^!');
     });
   });
@@ -194,6 +193,7 @@ describe('hydrateHandleAsync', () => {
   it('successfully hydrates the handle', async () => {
     const handleInfo: HandleInfo = await hydrateHandleAsync(
       {
+        getPolicyIds: async (): Promise<Cardano.PolicyId[]> => [handlePolicyId],
         healthCheck: jest.fn(),
         resolveHandles: async () => [expectedHydratedHandleInfo]
       },
@@ -207,6 +207,7 @@ describe('hydrateHandleAsync', () => {
     await expect(
       hydrateHandleAsync(
         {
+          getPolicyIds: async (): Promise<Cardano.PolicyId[]> => [handlePolicyId],
           healthCheck: jest.fn(),
           resolveHandles: async () => {
             throw new Error('Failed to resolve handle');

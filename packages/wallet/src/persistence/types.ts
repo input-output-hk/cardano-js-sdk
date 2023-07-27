@@ -84,6 +84,7 @@ export interface WalletStores extends Destroyable {
   eraSummaries: DocumentStore<EraSummary[]>;
   assets: DocumentStore<Assets>;
   addresses: DocumentStore<GroupedAddress[]>;
+  policyIds: DocumentStore<Cardano.PolicyId[]>;
 }
 
 export interface SupplyDistributionStores extends Destroyable {

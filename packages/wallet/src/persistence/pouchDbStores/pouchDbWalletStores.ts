@@ -18,6 +18,7 @@ export class PouchDbAssetsStore extends PouchDbDocumentStore<Assets> {}
 export class PouchDbAddressesStore extends PouchDbDocumentStore<GroupedAddress[]> {}
 export class PouchDbInFlightTransactionsStore extends PouchDbDocumentStore<TxInFlight[]> {}
 export class PouchDbVolatileTransactionsStore extends PouchDbDocumentStore<OutgoingOnChainTx[]> {}
+export class PouchDbPolicyIdsStore extends PouchDbDocumentStore<Cardano.PolicyId[]> {}
 
 export class PouchDbTransactionsStore extends PouchDbCollectionStore<Cardano.HydratedTx> {}
 export class PouchDbUtxoStore extends PouchDbCollectionStore<Cardano.Utxo> {}
@@ -60,6 +61,7 @@ export const createPouchDbWalletStores = (
     eraSummaries: new PouchDbEraSummariesStore(docsDbName, 'EraSummaries', logger),
     genesisParameters: new PouchDbGenesisParametersStore(docsDbName, 'genesisParameters', logger),
     inFlightTransactions: new PouchDbInFlightTransactionsStore(docsDbName, 'transactionsInFlight_v2', logger),
+    policyIds: new PouchDbPolicyIdsStore(docsDbName, 'policyIds', logger),
     protocolParameters: new PouchDbProtocolParametersStore(docsDbName, 'protocolParameters', logger),
     rewardsBalances: new PouchDbRewardsBalancesStore(`${baseDbName}RewardsBalances`, logger),
     rewardsHistory: new PouchDbRewardsHistoryStore(`${baseDbName}RewardsHistory`, logger),

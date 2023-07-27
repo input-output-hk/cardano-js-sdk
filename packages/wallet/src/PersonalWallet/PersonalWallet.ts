@@ -1,4 +1,5 @@
 /* eslint-disable unicorn/no-nested-ternary */
+// eslint-disable-next-line import/no-extraneous-dependencies
 import {
   AddressDiscovery,
   BalanceTracker,
@@ -17,6 +18,7 @@ import {
   TrackedRewardsProvider,
   TrackedStakePoolProvider,
   TrackedTxSubmitProvider,
+  TrackedUtxoProvider,
   TrackedWalletNetworkInfoProvider,
   TransactionFailure,
   TransactionsTracker,
@@ -28,6 +30,7 @@ import {
   createHandlesTracker,
   createProviderStatusTracker,
   createSimpleConnectionStatusTracker,
+  createTransactionReemitter,
   createTransactionsTracker,
   createUtxoTracker,
   createWalletUtil,
@@ -98,25 +101,18 @@ import {
   finalizeTx,
   initializeTx
 } from '@cardano-sdk/tx-construction';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { KoraLabsHandleProvider } from '@cardano-sdk/cardano-services-client';
 import { Logger } from 'ts-log';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { Shutdown, contextLogger, deepEquals } from '@cardano-sdk/util';
-import { TrackedUtxoProvider } from '../services/ProviderTracker/TrackedUtxoProvider';
 import { WalletStores, createInMemoryWalletStores } from '../persistence';
-import { createTransactionReemitter } from '../services/TransactionReemitter';
 import isEqual from 'lodash/isEqual';
 import uniq from 'lodash/uniq';
-
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { KoraLabsHandleProvider } from '@cardano-sdk/cardano-services-client';
 
 export interface PersonalWalletProps {
   readonly name: string;
   readonly polling?: PollingConfig;
-  /**
-   * If set, will track and emit own handles on PersonalWallet.handles$ observable
-   */
-  readonly handlePolicyIds?: Cardano.PolicyId[];
   readonly retryBackoffConfig?: RetryBackoffConfig;
 }
 
@@ -222,14 +218,14 @@ export class PersonalWallet implements ObservableWallet {
   readonly protocolParameters$: TrackerSubject<Cardano.ProtocolParameters>;
   readonly genesisParameters$: TrackerSubject<Cardano.CompactGenesis>;
   readonly assetInfo$: TrackerSubject<Assets>;
-  readonly handles$: Observable<HandleInfo[]>;
   readonly fatalError$: Subject<unknown>;
   readonly syncStatus: SyncStatus;
   readonly name: string;
   readonly util: WalletUtil;
   readonly rewardsProvider: TrackedRewardsProvider;
-  readonly handleProvider?: HandleProvider;
+  readonly handleProvider: HandleProvider;
   readonly changeAddressResolver: ChangeAddressResolver;
+  handles$: Observable<HandleInfo[]>;
 
   // eslint-disable-next-line max-statements
   constructor(
@@ -243,8 +239,7 @@ export class PersonalWallet implements ObservableWallet {
       retryBackoffConfig = {
         initialInterval: Math.min(pollInterval, 1000),
         maxInterval
-      },
-      handlePolicyIds
+      }
     }: PersonalWalletProps,
     {
       txSubmitProvider,
@@ -496,16 +491,20 @@ export class PersonalWallet implements ObservableWallet {
       stores.assets
     );
 
-    this.handles$ = handlePolicyIds?.length
-      ? createHandlesTracker({
-          assetInfo$: this.assetInfo$,
-          handlePolicyIds,
-          handleProvider: this.handleProvider,
-          logger: contextLogger(this.#logger, 'handles$'),
-          tip$: this.tip$,
-          utxo$: this.utxo.total$
-        })
-      : throwError(() => new InvalidConfigurationError('Missing handlePolicyIds option in PersonalWallet'));
+    this.handles$ = this.handleProvider
+      ? this.initializeHandles(
+          new PersistentDocumentTrackerSubject(
+            coldObservableProvider({
+              cancel$,
+              equals: isEqual,
+              onFatalError,
+              provider: () => this.handleProvider.getPolicyIds(),
+              retryBackoffConfig
+            }),
+            stores.policyIds
+          )
+        )
+      : throwError(() => new InvalidConfigurationError('PersonalWallet is missing a "handleProvider"'));
 
     this.util = createWalletUtil({
       protocolParameters$: this.protocolParameters$,
@@ -531,6 +530,16 @@ export class PersonalWallet implements ObservableWallet {
       stubSign
     );
     return signedTx;
+  }
+
+  private initializeHandles(handlePolicyIds$: Observable<Cardano.PolicyId[]>): Observable<HandleInfo[]> {
+    return createHandlesTracker({
+      assetInfo$: this.assetInfo$,
+      handlePolicyIds$,
+      handleProvider: this.handleProvider,
+      logger: contextLogger(this.#logger, 'handles$'),
+      utxo$: this.utxo.total$
+    });
   }
 
   createTxBuilder() {

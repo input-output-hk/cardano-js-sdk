@@ -73,6 +73,7 @@ describe('HandleHttpService', () => {
   describe('unhealthy state', () => {
     beforeEach(() =>
       createServer({
+        getPolicyIds: () => Promise.resolve([]),
         healthCheck: () => Promise.resolve({ ok: false, reason: 'test reason' }),
         resolveHandles: () => {
           throw new ProviderError(ProviderFailure.Unhealthy, new Error('test error'), 'test details');
@@ -100,7 +101,11 @@ describe('HandleHttpService', () => {
 
   describe('healthy state', () => {
     beforeEach(() =>
-      createServer({ healthCheck: () => Promise.resolve({ ok: true }), resolveHandles: () => Promise.resolve([null]) })
+      createServer({
+        getPolicyIds: () => Promise.resolve([]),
+        healthCheck: () => Promise.resolve({ ok: true }),
+        resolveHandles: () => Promise.resolve([null])
+      })
     );
 
     it('HandleHttpService /health gives correct healthy response', async () => {
@@ -118,6 +123,7 @@ describe('HandleHttpService', () => {
 
   it('valid not empty response is openApi schema compliant', async () => {
     await createServer({
+      getPolicyIds: () => Promise.resolve([<Cardano.PolicyId>'test_policy']),
       healthCheck: () => Promise.resolve({ ok: true }),
       resolveHandles: () =>
         Promise.resolve([
@@ -149,6 +155,7 @@ describe('HandleHttpService', () => {
 
   it('converts BadRequest ProviderError into a 400 HTTP response', async () => {
     await createServer({
+      getPolicyIds: () => Promise.resolve([]),
       healthCheck: () => Promise.resolve({ ok: true }),
       resolveHandles: () => Promise.reject(emptyStringHandleResolutionRequestError())
     });

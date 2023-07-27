@@ -235,6 +235,20 @@ services:
     ports:
       - ${STAKE_POOL_API_PORT:-4010}:3000
 
+  handle-provider-server:
+    <<:
+      - *from-sdk
+      - *logging
+      - *provider-server
+      - *with-postgres
+    environment:
+      <<:
+        - *sdk-environment
+        - *provider-server-environment
+      SERVICE_NAMES: handle
+    ports:
+      - ${HANDLE_API_PORT:-4020}:3000
+
   rabbitmq:
     <<: *logging
     healthcheck:
