@@ -18,7 +18,7 @@ export class TrezorKeyAgent extends DeprecatedTrezorKeyAgent {
   /**
    * Gets the mode in which we want to sign the transaction.
    */
-  static getSigningMode(tx: Trezor.CardanoSignTransaction): Trezor.CardanoTxSigningMode {
+  static getSigningMode(tx: Omit<Trezor.CardanoSignTransaction, 'signingMode'>): Trezor.CardanoTxSigningMode {
     if (tx.certificates) {
       for (const cert of tx.certificates) {
         // Represents pool registration from the perspective of a pool owner.

@@ -19,7 +19,11 @@ const trezorTxTransformer = async (
   certificates: mapCerts(body.certificates ?? [], context),
   fee: body.fee.toString(),
   inputs: await mapTxIns(body.inputs, context),
-  outputs: await mapTxOuts(body.outputs, context),
+  networkId: context.chainId.networkId,
+  outputs: mapTxOuts(body.outputs, context),
+  protocolMagic: context.chainId.networkMagic,
+  ttl: body.validityInterval?.invalidHereafter?.toString(),
+  validityIntervalStart: body.validityInterval?.invalidBefore?.toString(),
   withdrawals: mapWithdrawals(body.withdrawals ?? [], context)
 });
 
