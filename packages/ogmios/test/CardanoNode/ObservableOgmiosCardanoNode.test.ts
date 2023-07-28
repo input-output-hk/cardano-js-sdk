@@ -19,7 +19,19 @@ import delay from 'delay';
 const defaultConfig: MockOgmiosServerConfig = {
   chainSync: {
     requestNext: {
-      responses: ['135.json']
+      responses: [
+        '135.json',
+        '135.json',
+        '135.json',
+        '135.json',
+        '135.json',
+        '135.json',
+        '135.json',
+        '135.json',
+        '135.json',
+        '135.json',
+        '135.json'
+      ]
     }
   },
   findIntersect: () => ({

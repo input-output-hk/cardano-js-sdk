@@ -6,8 +6,6 @@ import { findIntersect, requestNext as sendRequestNext } from '@cardano-ogmios/c
 import { nanoid } from 'nanoid';
 import { ogmiosToCorePointOrOrigin, ogmiosToCoreTip, ogmiosToCoreTipOrOrigin, pointOrOriginToOgmios } from './util';
 
-const RequestIdProp = 'requestId';
-
 export interface ObservableChainSyncClientProps {
   intersectionPoint: PointOrOrigin;
 }
@@ -55,6 +53,11 @@ const notifySubscriberAndParseNewCursor = (
   subscriber.error(new CardanoNodeErrors.CardanoClientErrors.UnknownResultError(response.result));
 };
 
+type Response = Schema.Ogmios['RequestNextResponse'];
+type Request = { requestId: string; response?: Response };
+
+const bufferLength = 10;
+
 export const createObservableChainSyncClient = (
   { intersectionPoint }: ObservableChainSyncClientProps,
   { interactionContext$ }: WithObservableInteractionContext
@@ -66,27 +69,47 @@ export const createObservableChainSyncClient = (
     switchMap(
       (context) =>
         new Observable<ChainSyncEvent>((subscriber) => {
-          let requestId: string;
+          const requestsBuffer: Request[] = [];
+          let subscriberReady = true;
+          let unsubscribed = false;
+
           const requestNext = () => {
-            requestId = nanoid(5);
-            sendRequestNext(context.socket, {
-              mirror: {
-                [RequestIdProp]: requestId
-              }
-            });
-          };
-          const handler = (message: string) => {
-            const response: Schema.Ogmios['RequestNextResponse'] = safeJSON.parse(message);
-            if (response.methodname === 'RequestNext') {
-              if (response.reflection?.[RequestIdProp] !== requestId) {
-                return;
-              }
-              cursor = notifySubscriberAndParseNewCursor(response, subscriber, requestNext) || cursor;
+            if (unsubscribed) return;
+
+            while (requestsBuffer.length <= bufferLength) {
+              const mirror = { requestId: nanoid(5) };
+
+              requestsBuffer.push(mirror);
+              sendRequestNext(context.socket, { mirror });
             }
+          };
+
+          const notify = () => {
+            if (unsubscribed || !subscriberReady || requestsBuffer.length === 0 || !requestsBuffer[0].response) return;
+
+            subscriberReady = false;
+            const { response } = requestsBuffer.shift()!;
+            cursor =
+              notifySubscriberAndParseNewCursor(response!, subscriber, () => {
+                subscriberReady = true;
+                notify();
+                requestNext();
+              }) || cursor;
+          };
+
+          const handler = (message: string) => {
+            const response: Response = safeJSON.parse(message);
+            const id = requestsBuffer.findIndex(({ requestId }) => requestId === response.reflection?.requestId);
+
+            if (response.methodname !== 'RequestNext' || id === -1) return;
+
+            requestsBuffer[id].response = response;
+            notify();
           };
           context.socket.on('message', handler);
           requestNext();
           return () => {
+            unsubscribed = true;
             context.socket.off('message', handler);
           };
         })
