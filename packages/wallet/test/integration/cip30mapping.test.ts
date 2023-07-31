@@ -18,7 +18,7 @@ import {
   CML,
   Cardano,
   CardanoNodeErrors,
-  Transaction,
+  Serialization,
   TxCBOR,
   cmlToCore,
   coalesceValueQuantities,
@@ -495,7 +495,7 @@ describe('cip30', () => {
       test('api.signTx', async () => {
         const txInternals = await wallet.initializeTx(simpleTxProps);
         const finalizedTx = await wallet.finalizeTx({ tx: txInternals });
-        const hexTx = scope.manage(Transaction.fromCore(scope, finalizedTx)).toCbor();
+        const hexTx = scope.manage(Serialization.Transaction.fromCore(scope, finalizedTx)).toCbor();
 
         const cip30witnessSet = await api.signTx(hexTx);
         const signatures = Buffer.from(cip30witnessSet, 'hex');
@@ -517,7 +517,7 @@ describe('cip30', () => {
         beforeEach(async () => {
           const txInternals = await wallet.initializeTx(simpleTxProps);
           finalizedTx = await wallet.finalizeTx({ tx: txInternals });
-          hexTx = scope.manage(Transaction.fromCore(scope, finalizedTx)).toCbor();
+          hexTx = scope.manage(Serialization.Transaction.fromCore(scope, finalizedTx)).toCbor();
           txBytes = Buffer.from(hexTx, 'hex');
         });
 
@@ -585,7 +585,7 @@ describe('cip30', () => {
         beforeAll(async () => {
           const txInternals = await wallet.initializeTx(simpleTxProps);
           const finalizedTx = await wallet.finalizeTx({ tx: txInternals });
-          hexTx = scope.manage(Transaction.fromCore(scope, finalizedTx)).toCbor();
+          hexTx = scope.manage(Serialization.Transaction.fromCore(scope, finalizedTx)).toCbor();
         });
 
         test('resolves true', async () => {
@@ -612,7 +612,7 @@ describe('cip30', () => {
         beforeAll(async () => {
           txInternals = await wallet.initializeTx(simpleTxProps);
           finalizedTx = await wallet.finalizeTx({ tx: txInternals });
-          cmlTx = scope.manage(Transaction.fromCore(scope, finalizedTx)).toCbor();
+          cmlTx = scope.manage(Serialization.Transaction.fromCore(scope, finalizedTx)).toCbor();
         });
 
         test('resolves true', async () => {

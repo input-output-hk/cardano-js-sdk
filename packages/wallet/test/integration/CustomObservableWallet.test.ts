@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable sonarjs/no-extra-arguments */
 /* eslint-disable unicorn/consistent-function-scoping */
-import { Cardano, Transaction } from '@cardano-sdk/core';
+import { Cardano, Serialization } from '@cardano-sdk/core';
 import { GroupedAddress } from '@cardano-sdk/key-management';
 import { ObservableWallet, PersonalWallet } from '../../src';
 import {
@@ -121,7 +121,9 @@ describe('CustomObservableWallet', () => {
         submitTx(tx: Cardano.Tx) {
           // can use utils from SDK, in this case `Transaction.fromCore`
           // if you want to submit hex-encoded tx, there is also Transaction.toCore for the reverse
-          const txBytes = usingAutoFree((scope) => scope.manage(Transaction.fromCore(scope, tx)).toCbor());
+          const txBytes = usingAutoFree((scope) =>
+            scope.manage(Serialization.Transaction.fromCore(scope, tx)).toCbor()
+          );
           return submitTxBytesHexString(txBytes);
         }
       };
