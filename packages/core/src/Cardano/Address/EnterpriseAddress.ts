@@ -35,9 +35,7 @@ export class EnterpriseAddress {
    * @param payment The payment credential.
    */
   static fromCredentials(networkId: NetworkId, payment: Credential): EnterpriseAddress {
-    let type = AddressType.EnterpriseKey;
-
-    if (payment.type === CredentialType.ScriptHash) type &= 0b0001;
+    const type = payment.type === CredentialType.ScriptHash ? AddressType.EnterpriseScript : AddressType.EnterpriseKey;
 
     return new EnterpriseAddress({
       networkId,
