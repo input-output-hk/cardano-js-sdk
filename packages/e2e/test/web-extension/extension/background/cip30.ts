@@ -8,7 +8,11 @@ import { wallet$ } from './walletManager';
 import { walletName } from '../const';
 
 // this should come from remote api
-const confirmationCallback: walletCip30.CallbackConfirmation = async () => true;
+const confirmationCallback: walletCip30.CallbackConfirmation = {
+  signData: async () => true,
+  signTx: async () => true,
+  submitTx: async () => true
+};
 
 const walletApi = walletCip30.createWalletApi(wallet$, confirmationCallback, { logger });
 cip30.initializeBackgroundScript({ walletName }, { authenticator, logger, runtime, walletApi });
