@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.14.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.14.7...@cardano-sdk/cardano-services@0.14.8) (2023-07-31)
+
+### Bug Fixes
+
+* **cardano-services:** added pledgeMet filter to TypeormStakePoolProvider ([85a4839](https://github.com/input-output-hk/cardano-js-sdk/commit/85a4839be2d57c9efe450f79fa4dd0731fd11c88))
+* **cardano-services:** added wildcard search by 'name' and 'ticker' in TypeormStakePoolProvider ([cef44ba](https://github.com/input-output-hk/cardano-js-sdk/commit/cef44baffa43de957857e3854511362434280650))
+* **cardano-services:** excluded 'cost' from nullsInSort in TypeormStakePoolProvider ([839aa5d](https://github.com/input-output-hk/cardano-js-sdk/commit/839aa5dcfcf0749e0c1da67e9d206a884d4756f1))
+* **cardano-services:** switched to case-insensitive sort by 'name' in TypeormStakePoolProvider ([738a82d](https://github.com/input-output-hk/cardano-js-sdk/commit/738a82d55d15ee1cfdcd784ba83b051176cb0179))
+* **cardano-services:** updated table names for 'cost' and 'name' in queries of TypeormStakePoolProvider ([dd3acbe](https://github.com/input-output-hk/cardano-js-sdk/commit/dd3acbe950d95889dbba54e226987d25472ce93a))
+
 ## [0.14.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.14.6...@cardano-sdk/cardano-services@0.14.7) (2023-07-26)
 
 ### Bug Fixes

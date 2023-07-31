@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.15.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.15.3...@cardano-sdk/core@0.15.4) (2023-07-31)
+
+### Features
+
+* **core:** add addressesShareAnyKey util ([8bcfcb0](https://github.com/input-output-hk/cardano-js-sdk/commit/8bcfcb0e5fdadab2c5fed0253f4644fc603a9c32))
+
+### Bug Fixes
+
+* **core:** use correct address type when building EnterpriseScript from credential ([9b647b7](https://github.com/input-output-hk/cardano-js-sdk/commit/9b647b77ddaa9364bf0aea32b3aded8661a832c9))
+
 ## [0.15.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.15.2...@cardano-sdk/core@0.15.3) (2023-07-04)
 
 **Note:** Version bump only for package @cardano-sdk/core
