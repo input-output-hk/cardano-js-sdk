@@ -1,5 +1,6 @@
 import { AsyncKeyAgent, GroupedAddress, KeyAgent } from '../';
 import { BehaviorSubject } from 'rxjs';
+import { NotImplementedError } from '@cardano-sdk/core';
 
 export const createAsyncKeyAgent = (keyAgent: KeyAgent, onShutdown?: () => void): AsyncKeyAgent => {
   const knownAddresses$ = new BehaviorSubject(keyAgent.knownAddresses);
@@ -15,6 +16,9 @@ export const createAsyncKeyAgent = (keyAgent: KeyAgent, onShutdown?: () => void)
       return address;
     },
     derivePublicKey: keyAgent.derivePublicKey.bind(keyAgent),
+    async exportRootPrivateKey() {
+      throw new NotImplementedError('Operation not supported!');
+    },
     getBip32Ed25519: () => Promise.resolve(keyAgent.bip32Ed25519),
     getChainId: () => Promise.resolve(keyAgent.chainId),
     getExtendedAccountPublicKey: () => Promise.resolve(keyAgent.extendedAccountPublicKey),

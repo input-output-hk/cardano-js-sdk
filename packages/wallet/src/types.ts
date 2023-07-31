@@ -1,3 +1,4 @@
+import { AccountKeyDerivationPath, GroupedAddress, cip8 } from '@cardano-sdk/key-management';
 import {
   Asset,
   Cardano,
@@ -9,7 +10,7 @@ import {
 } from '@cardano-sdk/core';
 import { BalanceTracker, DelegationTracker, TransactionsTracker, UtxoTracker } from './services';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
-import { GroupedAddress, cip8 } from '@cardano-sdk/key-management';
+import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
 import { InitializeTxProps, InitializeTxResult, SignedTx, TxBuilder, TxContext } from '@cardano-sdk/tx-construction';
 import { Observable } from 'rxjs';
 import { Shutdown } from '@cardano-sdk/util';
@@ -92,6 +93,10 @@ export interface ObservableWallet {
   createTxBuilder(): TxBuilder;
 
   shutdown(): void;
+
+  getStakeKeys(derivationPaths: AccountKeyDerivationPath[]): Promise<Ed25519PublicKeyHex[]>;
+
+  getPubDRepKey(): Promise<Ed25519PublicKeyHex>;
 }
 
 export type WalletNetworkInfoProvider = Pick<

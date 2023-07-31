@@ -159,6 +159,9 @@ export type SignData = (addr: Cardano.PaymentAddress | Bytes, payload: Bytes) =>
  */
 export type SubmitTx = (tx: Cbor) => Promise<string>;
 
+export type PubDRepKey = string;
+export type PubStakeKey = string;
+
 export interface WalletApi {
   getNetworkId: GetNetworkId;
 
@@ -181,6 +184,10 @@ export interface WalletApi {
   signData: SignData;
 
   submitTx: SubmitTx;
+
+  getPubDRepKey: () => Promise<PubDRepKey>;
+
+  getActivePubStakeKeys: () => Promise<PubStakeKey[]>;
 }
 
 export type WalletMethod = keyof WalletApi;

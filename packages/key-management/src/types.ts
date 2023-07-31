@@ -183,6 +183,7 @@ export type AsyncKeyAgent = Pick<KeyAgent, 'deriveAddress' | 'derivePublicKey' |
   getBip32Ed25519(): Promise<Crypto.Bip32Ed25519>;
   getExtendedAccountPublicKey(): Promise<Crypto.Bip32PublicKeyHex>;
   setKnownAddresses(addresses: GroupedAddress[]): Promise<void>;
+  exportRootPrivateKey(): Promise<Crypto.Bip32PrivateKeyHex>;
 } & Shutdown;
 
 /**
