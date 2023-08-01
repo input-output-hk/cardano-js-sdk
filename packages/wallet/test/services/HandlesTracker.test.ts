@@ -92,10 +92,9 @@ describe('createHandlesTracker', () => {
           healthCheck: jest.fn(),
           resolveHandles: async () => []
         },
-        hydrateHandle: () => hydrateHandle,
         logger,
         utxo$
-      });
+      }, { hydrateHandle: () => hydrateHandle });
 
       expectObservable(handles$).toBe('---ab', {
         a: [expectedHandleInfo],
@@ -128,10 +127,9 @@ describe('createHandlesTracker', () => {
           healthCheck: jest.fn(),
           resolveHandles: async () => []
         },
-        hydrateHandle: () => hydrateHandle,
         logger,
         utxo$
-      });
+      }, { hydrateHandle: () => hydrateHandle });
 
       expectObservable(handles$).toBe('-a', { a: [] });
     });
@@ -151,10 +149,9 @@ describe('createHandlesTracker', () => {
           healthCheck: jest.fn(),
           resolveHandles: async () => []
         },
-        hydrateHandle: () => hydrateHandle,
         logger,
         utxo$
-      });
+      }, { hydrateHandle: () => hydrateHandle });
 
       expectObservable(handles$).toBe('-ab', {
         a: [expectedHandleInfo],
@@ -178,10 +175,9 @@ describe('createHandlesTracker', () => {
           healthCheck: jest.fn(),
           resolveHandles: async () => []
         },
-        hydrateHandle: () => hydrateHandle,
         logger,
         utxo$
-      });
+      }, { hydrateHandle: () => hydrateHandle });
       combineLatest([handles$, handles$]).pipe(take(1)).subscribe();
       expectSubscriptions(utxo$.subscriptions).toBe('^!');
       expectSubscriptions(assetInfo$.subscriptions).toBe('^!');

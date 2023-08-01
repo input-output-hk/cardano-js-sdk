@@ -31,6 +31,9 @@ export interface HandlesTrackerProps {
   handlePolicyIds$: Observable<Cardano.PolicyId[]>;
   logger: Logger;
   handleProvider: HandleProvider;
+}
+
+interface HandlesTrackerInternals {
   hydrateHandle?: (
     handleProvider: HandleProvider,
     logger: Logger
@@ -96,14 +99,10 @@ export const hydrateHandles =
     );
   };
 
-export const createHandlesTracker = ({
-  assetInfo$,
-  handlePolicyIds$,
-  handleProvider,
-  hydrateHandle = hydrateHandleAsync,
-  logger,
-  utxo$
-}: HandlesTrackerProps) =>
+export const createHandlesTracker = (
+  { assetInfo$, handlePolicyIds$, handleProvider, logger, utxo$ }: HandlesTrackerProps,
+  { hydrateHandle = hydrateHandleAsync }: HandlesTrackerInternals = {}
+) =>
   combineLatest([handlePolicyIds$, utxo$, assetInfo$]).pipe(
     mergeMap(([handlePolicyIds, utxo, assets]) => {
       const filteredUtxo = utxo.flatMap(([_, txOut]) =>
