@@ -1,16 +1,17 @@
 import * as AssetId from '../assetId';
 import { Cardano, Reward, Seconds } from '@cardano-sdk/core';
+import { resolvedHandle } from './mockHandleProvider';
 
 export const rewardAccount = Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d');
 export const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
 
 export const rewardAccountBalance = 33_333n;
 
-export const handlePolicyId = Cardano.PolicyId('f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a');
-export const handle = 'bob';
+export const handlePolicyId = resolvedHandle.policyId;
+export const handle = resolvedHandle.handle;
 export const handleAssetId = Cardano.AssetId.fromParts(
   handlePolicyId,
-  Cardano.AssetName(Buffer.from('bob').toString('hex'))
+  Cardano.AssetName(Buffer.from(handle).toString('hex'))
 );
 export const handleAssetName = Cardano.AssetName(Buffer.from(handle, 'utf8').toString('hex'));
 export const handleFingerprint = Cardano.AssetFingerprint('asset1f0azzptnr8dghzjh7egqvdjmt33e3lz5uy59th');
