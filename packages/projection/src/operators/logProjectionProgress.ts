@@ -10,15 +10,63 @@ const isAtTheTipOrHigher = (header: Cardano.PartialBlockHeader, tip: TipOrOrigin
   return header.blockNo >= tip.blockNo;
 };
 
+const intervals = [1000, 10_000, 100_000] as const;
+type Intervals = typeof intervals[number];
+
+const intervalsDesc = new Map<Intervals, string>([
+  [1000, '1K'],
+  [10_000, '10K'],
+  [100_000, '100K']
+]);
+
+const logSyncLine = (params: {
+  blocksTime: Map<number, number>;
+  header: Cardano.PartialBlockHeader;
+  logger: Logger;
+  numEvt: number;
+  startedAt: number;
+  tip: Cardano.Tip;
+}) => {
+  const { blocksTime, header, logger, numEvt, startedAt, tip } = params;
+  const syncPercentage = ((header.blockNo * 100) / tip.blockNo).toFixed(2);
+  const now = Date.now();
+
+  blocksTime.set(numEvt, now);
+
+  const format = (desc: string, amount: number, since: number) => {
+    const speed = amount / (now - since);
+    return `${desc}: eta ${new Date(now + (tip.blockNo - header.blockNo) / speed)
+      .toISOString()
+      .replace(/\..*$/, '')} at ${Math.round(speed * 1000)} b/s`;
+  };
+
+  const speeds = [format('All', numEvt, startedAt)];
+
+  for (const interval of intervals) {
+    const prevTime = blocksTime.get(numEvt - interval);
+    if (prevTime) speeds.push(format(intervalsDesc.get(interval)!, interval, prevTime));
+  }
+
+  logger.info(`Initializing ${syncPercentage}% at block #${header.blockNo} ${speeds.join(' - ')}`);
+
+  const pruneOldTimes = (upTo: number) => {
+    for (const block of blocksTime.keys())
+      if (block <= upTo) blocksTime.delete(block);
+      else return;
+  };
+
+  pruneOldTimes(header.blockNo - 100_000);
+};
+
 export const logProjectionProgress =
   <T extends Omit<UnifiedExtChainSyncEvent<{}>, 'requestNext'>>(baseLogger: Logger) =>
   (evt$: Observable<T>) =>
     defer(() => {
       const logger = contextLogger(baseLogger, 'Projector');
       let numEvt = 0;
+      const blocksTime = new Map<number, number>();
       const logFrequency = 1000;
       const startedAt = Date.now();
-      let lastLogAt = startedAt;
       logger.info('Started');
       return evt$.pipe(
         tap(({ block: { header }, eventType, tip }) => {
@@ -29,21 +77,9 @@ export const logProjectionProgress =
                 eventType === ChainSyncEventType.RollForward ? 'RollForward' : 'RollBackward'
               } ${pointDescription(header)}`
             );
-          } else if (numEvt % logFrequency === 0 && tip !== 'origin') {
-            const syncPercentage = ((header.blockNo * 100) / tip.blockNo).toFixed(2);
-            const now = Date.now();
-            const currentSpeed = Math.round(logFrequency / ((now - lastLogAt) / 1000));
-            lastLogAt = now;
-            const overallSpeedPerMs = numEvt / (now - startedAt);
-            const overallSpeed = Math.round(overallSpeedPerMs * 1000);
-            const eta = new Date(now + (tip.blockNo - header.blockNo) / overallSpeedPerMs);
-            logger.info(
-              `Initializing ${syncPercentage}% at block #${
-                header.blockNo
-              }. Speed: ${currentSpeed}bps (avg ${overallSpeed}bps). ETA: ${eta.toISOString()}`
-            );
-          }
+          } else if (numEvt % logFrequency === 0 && tip !== 'origin')
+            logSyncLine({ blocksTime, header, logger, numEvt, startedAt, tip });
         }),
-        finalize(() => logger.info('Stopped'))
+        finalize(() => logger.info(`Stopped after ${Math.round((Date.now() - startedAt) / 1000)} s`))
       );
     });

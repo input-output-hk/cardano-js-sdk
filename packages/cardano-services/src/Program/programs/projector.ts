@@ -1,4 +1,5 @@
 import { Bootstrap } from '@cardano-sdk/projection';
+import { Cardano } from '@cardano-sdk/core';
 import { CommonProgramOptions, OgmiosProgramOptions, PosgresProgramOptions } from '../options';
 import { DnsResolver, createDnsResolver } from '../utils';
 import {
@@ -24,6 +25,7 @@ export type ProjectorArgs = CommonProgramOptions &
   OgmiosProgramOptions & {
     dropSchema: boolean;
     dryRun: boolean;
+    exitAtBlockNo: Cardano.BlockNo;
     poolsMetricsInterval: number;
     projectionNames: ProjectionName[];
     synchronize: boolean;
@@ -48,11 +50,12 @@ const createProjectionHttpService = async (options: ProjectionMapFactoryOptions)
   });
   const connectionConfig$ = getConnectionConfig(dnsResolver, 'projector', '', args);
   const buffer = new TypeormStabilityWindowBuffer({ logger });
-  const { dropSchema, dryRun, projectionNames, synchronize, handlePolicyIds } = args;
+  const { dropSchema, dryRun, exitAtBlockNo, projectionNames, synchronize, handlePolicyIds } = args;
   const projection$ = createTypeormProjection({
     buffer,
     connectionConfig$,
     devOptions: { dropSchema, synchronize },
+    exitAtBlockNo,
     logger,
     projectionOptions: {
       handlePolicyIds

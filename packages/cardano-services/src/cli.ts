@@ -139,6 +139,12 @@ withCommonOptions(
       .argParser((dryRun) => stringOptionToBoolean(dryRun, Programs.Projector, ProjectorOptionDescriptions.DryRun))
   )
   .addOption(
+    new Option('--exit-at-block-no <exitAtBlockNo>', ProjectorOptionDescriptions.ExitAtBlockNo)
+      .env('EXIT_AT_BLOCK_NO')
+      .default('')
+      .argParser((exitAtBlockNo) => (exitAtBlockNo ? Number.parseInt(exitAtBlockNo, 10) : 0))
+  )
+  .addOption(
     new Option('--pools-metrics-interval <poolsMetricsInterval>', ProjectorOptionDescriptions.PoolsMetricsInterval)
       .env('POOLS_METRICS_INTERVAL')
       .default(POOLS_METRICS_INTERVAL_DEFAULT)
