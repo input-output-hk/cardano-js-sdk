@@ -1,4 +1,4 @@
-import { Cardano } from '@cardano-sdk/core';
+import { Asset, Cardano } from '@cardano-sdk/core';
 import { CustomError } from 'ts-custom-error';
 import { FilterByPolicyIds } from './types';
 import { HexBlob } from '@cardano-sdk/util';
@@ -28,11 +28,6 @@ export interface WithHandles {
 const handleFromAssetId = (assetId: Cardano.AssetId) =>
   Buffer.from(Cardano.AssetId.getAssetName(assetId), 'hex').toString('utf8');
 
-const isValidHandle = (handle: string) => {
-  const pattern = /^[\w.-]+$/;
-  return pattern.test(handle);
-};
-
 class HandleParsingError extends CustomError {
   public constructor(handle: string, message = 'Invalid handle') {
     super(`${message}: ${handle}`);
@@ -44,7 +39,7 @@ const mapHandleToData = (
   data: { datum?: HexBlob | undefined; address?: Cardano.PaymentAddress; policyId: Cardano.PolicyId }
 ) => {
   const handle = handleFromAssetId(assetId);
-  if (!isValidHandle(handle)) throw new HandleParsingError(handle);
+  if (!Asset.util.isValidHandle(handle)) throw new HandleParsingError(handle);
   const { datum, address, policyId } = data;
 
   return {
