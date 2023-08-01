@@ -21,8 +21,10 @@ import {
   Transaction,
   TxCBOR,
   cmlToCore,
-  coalesceValueQuantities
+  coalesceValueQuantities,
+  coreToCml
 } from '@cardano-sdk/core';
+import { CallbackConfirmation, GetCollateralCallbackParams } from '../../src/cip30';
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
@@ -39,17 +41,40 @@ const {
   mockRewardsProvider,
   mockTxSubmitProvider,
   utxo: mockUtxo,
-  utxosWithLowCoins
+  utxosWithLowCoins,
+  utxosWithLowCoinsAndMixedAssets,
+  sortedUtxosWithLowCoins
 } = mocks;
 
 type TestProviders = Required<Pick<Providers, 'txSubmitProvider' | 'networkInfoProvider'>>;
+const mockCollateralCallback = jest.fn().mockResolvedValue([mockUtxo[3]]);
+const mockGenericCallback = jest.fn().mockResolvedValue(true);
 
-const createWalletAndApiWithStores = async (utxos: Cardano.Utxo[], providers?: TestProviders, settle = true) => {
+const createWalletAndApiWithStores = async (
+  unspendableUtxos: Cardano.Utxo[],
+  providers?: TestProviders,
+  getCollateralCallback?: (args: GetCollateralCallbackParams) => Promise<Cardano.Utxo[]>,
+  settle = true,
+  availableUtxos?: Cardano.Utxo[]
+) => {
   const unspendableUtxo = new InMemoryUnspendableUtxoStore();
-  unspendableUtxo.setAll(utxos);
-  const stores = { ...createInMemoryWalletStores(), unspendableUtxo };
+  unspendableUtxo.setAll(unspendableUtxos);
+
+  const stores = {
+    ...createInMemoryWalletStores(),
+    unspendableUtxo
+  };
   const { wallet } = await createWallet(stores, providers);
-  const confirmationCallback = jest.fn().mockResolvedValue(true);
+  if (availableUtxos) {
+    wallet.utxo.available$ = of(availableUtxos);
+  }
+  const confirmationCallback = {
+    signData: mockGenericCallback,
+    signTx: mockGenericCallback,
+    submitTx: mockGenericCallback,
+    ...(!!getCollateralCallback && { getCollateral: getCollateralCallback })
+  };
+
   const api = cip30.createWalletApi(of(wallet), confirmationCallback, { logger });
   if (settle) await waitForWalletStateSettle(wallet);
   return { api, confirmationCallback, wallet };
@@ -58,7 +83,7 @@ const createWalletAndApiWithStores = async (utxos: Cardano.Utxo[], providers?: T
 describe('cip30', () => {
   let wallet: PersonalWallet;
   let api: WalletApi;
-  let confirmationCallback: jest.Mock;
+  let confirmationCallback: CallbackConfirmation;
 
   const simpleTxProps: InitializeTxProps = {
     outputs: new Set([
@@ -88,7 +113,12 @@ describe('cip30', () => {
           })
       );
       // CREATE A WALLET
-      ({ wallet, api, confirmationCallback } = await createWalletAndApiWithStores([mockUtxo[2]], providers, false));
+      ({ wallet, api, confirmationCallback } = await createWalletAndApiWithStores(
+        [mockUtxo[2]],
+        providers,
+        undefined,
+        false
+      ));
     });
 
     afterEach(() => {
@@ -255,15 +285,54 @@ describe('cip30', () => {
         let wallet4: PersonalWallet;
         let api4: WalletApi;
 
+        // Wallet 5
+        let wallet5: PersonalWallet;
+        let api5: WalletApi;
+
+        // Wallet 6
+        let wallet6: PersonalWallet;
+        let api6: WalletApi;
+
+        // Wallet 7
+        let wallet7: PersonalWallet;
+        let api7: WalletApi;
+
         beforeAll(async () => {
-          // CREATE A WALLET WITH LOW COINS UTXOS
+          // CREATE A WALLET WITH LOW COINS UTxOs
           ({ wallet: wallet2, api: api2 } = await createWalletAndApiWithStores(utxosWithLowCoins));
 
-          // CREATE A WALLET WITH NO UTXOS
+          // CREATE A WALLET WITH NO UTxOS
           ({ wallet: wallet3, api: api3 } = await createWalletAndApiWithStores([]));
 
-          // CREATE A WALLET WITH UTXOS WITH ASSETS
+          // CREATE A WALLET WITH UTxOS WITH ASSETS
           ({ wallet: wallet4, api: api4 } = await createWalletAndApiWithStores([mockUtxo[1], mockUtxo[2]]));
+
+          // CREATE WALLET WITH CALLBACK FOR GET COLLATERAL (UNSPENDABLES DOES NOT FULFILL AMOUNT, AVAILABLE UTxOs WITH MIXED ASSETS)
+          ({ wallet: wallet5, api: api5 } = await createWalletAndApiWithStores(
+            utxosWithLowCoins,
+            providers,
+            mockCollateralCallback,
+            true,
+            utxosWithLowCoinsAndMixedAssets
+          ));
+
+          // CREATE WALLET WITH CALLBACK FOR GET COLLATERAL (NO UNSPENDABLES, AVAILABLE UTxOs WITH MIXED ASSETS)
+          ({ wallet: wallet6, api: api6 } = await createWalletAndApiWithStores(
+            [],
+            providers,
+            mockCollateralCallback,
+            true,
+            utxosWithLowCoinsAndMixedAssets
+          ));
+
+          // WALLET WITH CALLBACK FOR GET COLLATERAL (UNSPENDABLES DOES NOT FULFILL AMOUNT, NO AVAILABLE UTxOS)
+          ({ wallet: wallet7, api: api7 } = await createWalletAndApiWithStores(
+            utxosWithLowCoins,
+            providers,
+            mockCollateralCallback,
+            true,
+            []
+          ));
         });
 
         afterAll(() => {
@@ -272,11 +341,58 @@ describe('cip30', () => {
           wallet4.shutdown();
         });
 
+        beforeEach(() => {
+          mockCollateralCallback.mockClear();
+        });
+
         test('can handle an unknown error', async () => {
           // YYYY is invalid hex that will throw at serialization
           await expect(api.getCollateral({ amount: 'YYYY' })).rejects.toThrowError(
             expect.objectContaining({ code: APIErrorCode.InternalError, info: 'Unknown error' })
           );
+        });
+
+        it('executes collateral callback if provided and unspendable UTxOs do not meet amount required', async () => {
+          const collateral = await api5.getCollateral();
+          expect(mockCollateralCallback).toHaveBeenCalledWith({
+            data: {
+              amount: 5_000_000n,
+              utxos: sortedUtxosWithLowCoins
+            },
+            type: 'get_collateral'
+          });
+
+          expect(collateral).toEqual(
+            coreToCml.utxo(scope, [mockUtxo[3]]).map((csl) => Buffer.from(csl.to_bytes()).toString('hex'))
+          );
+          wallet5.shutdown();
+        });
+
+        it('executes collateral callback if provided and no unspendable UTxOs are available', async () => {
+          const collateral = await api6.getCollateral();
+          expect(mockCollateralCallback).toHaveBeenCalledWith({
+            data: {
+              amount: 5_000_000n,
+              utxos: sortedUtxosWithLowCoins
+            },
+            type: 'get_collateral'
+          });
+
+          expect(collateral).toEqual(
+            coreToCml.utxo(scope, [mockUtxo[3]]).map((csl) => Buffer.from(csl.to_bytes()).toString('hex'))
+          );
+          wallet6.shutdown();
+        });
+
+        it('does not execute collateral callback if provided with no available UTxOs', async () => {
+          await expect(api7.getCollateral()).rejects.toThrow(ApiError);
+          expect(mockCollateralCallback).not.toHaveBeenCalled();
+          wallet7.shutdown();
+        });
+
+        it('does not execute collateral callback if not provided', async () => {
+          await expect(api2.getCollateral()).rejects.toThrow(ApiError);
+          expect(mockCollateralCallback).not.toHaveBeenCalled();
         });
 
         test('accepts amount as tagged integer', async () => {
@@ -437,29 +553,28 @@ describe('cip30', () => {
         const payload = 'abc123';
 
         test('resolves true', async () => {
-          confirmationCallback.mockResolvedValueOnce(true);
+          confirmationCallback.signData = jest.fn().mockResolvedValueOnce(true);
           await expect(api.signData(wallet.addresses$.value![0].address, payload)).resolves.not.toThrow();
         });
 
         test('resolves false', async () => {
-          confirmationCallback.mockResolvedValueOnce(false);
+          confirmationCallback.signData = jest.fn().mockResolvedValueOnce(false);
           await expect(api.signData(wallet.addresses$.value![0].address, payload)).rejects.toThrowError(DataSignError);
         });
 
         test('rejects', async () => {
-          confirmationCallback.mockRejectedValue(1);
+          confirmationCallback.signData = jest.fn().mockRejectedValue(1);
           await expect(api.signData(wallet.addresses$.value![0].address, payload)).rejects.toThrowError(DataSignError);
         });
 
         test('gets the Cardano.Address equivalent of the hex address', async () => {
-          confirmationCallback.mockClear();
-          confirmationCallback.mockResolvedValueOnce(true);
+          confirmationCallback.signData = jest.fn().mockResolvedValueOnce(true);
 
           const expectedAddr = wallet.addresses$.value![0].address;
           const hexAddr = Cardano.Address.fromBech32(expectedAddr).toBytes();
 
           await api.signData(hexAddr, payload);
-          expect(confirmationCallback).toHaveBeenCalledWith(
+          expect(confirmationCallback.signData).toHaveBeenCalledWith(
             expect.objectContaining({ data: expect.objectContaining({ addr: expectedAddr }) })
           );
         });
@@ -474,17 +589,17 @@ describe('cip30', () => {
         });
 
         test('resolves true', async () => {
-          confirmationCallback.mockResolvedValueOnce(true);
+          confirmationCallback.signTx = jest.fn().mockResolvedValueOnce(true);
           await expect(api.signTx(hexTx)).resolves.not.toThrow();
         });
 
         test('resolves false', async () => {
-          confirmationCallback.mockResolvedValueOnce(false);
+          confirmationCallback.signTx = jest.fn().mockResolvedValueOnce(false);
           await expect(api.signTx(hexTx)).rejects.toThrowError(TxSignError);
         });
 
         test('rejects', async () => {
-          confirmationCallback.mockRejectedValue(1);
+          confirmationCallback.signTx = jest.fn().mockRejectedValue(1);
           await expect(api.signTx(hexTx)).rejects.toThrowError(TxSignError);
         });
       });
@@ -501,17 +616,17 @@ describe('cip30', () => {
         });
 
         test('resolves true', async () => {
-          confirmationCallback.mockResolvedValueOnce(true);
+          confirmationCallback.submitTx = jest.fn().mockResolvedValueOnce(true);
           await expect(api.submitTx(cmlTx)).resolves.toBe(finalizedTx.id);
         });
 
         test('resolves false', async () => {
-          confirmationCallback.mockResolvedValueOnce(false);
+          confirmationCallback.submitTx = jest.fn().mockResolvedValueOnce(false);
           await expect(api.submitTx(cmlTx)).rejects.toThrowError(TxSendError);
         });
 
         test('rejects', async () => {
-          confirmationCallback.mockRejectedValue(1);
+          confirmationCallback.submitTx = jest.fn().mockRejectedValue(1);
           await expect(api.submitTx(cmlTx)).rejects.toThrowError(TxSendError);
         });
       });
@@ -569,7 +684,15 @@ describe('cip30', () => {
         }));
 
         await waitForWalletStateSettle(mockWallet);
-        mockApi = cip30.createWalletApi(of(mockWallet), jest.fn().mockResolvedValue(true), { logger });
+        mockApi = cip30.createWalletApi(
+          of(mockWallet),
+          {
+            signData: jest.fn().mockResolvedValue(true),
+            signTx: jest.fn().mockResolvedValue(true),
+            submitTx: jest.fn().mockResolvedValue(true)
+          },
+          { logger }
+        );
 
         const props = {
           certificates: [

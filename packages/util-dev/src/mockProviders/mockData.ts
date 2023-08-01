@@ -1,3 +1,4 @@
+import * as AssetId from '../assetId';
 import { Cardano, EpochRewards, Seconds } from '@cardano-sdk/core';
 
 export const rewardAccount = Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d');
@@ -114,3 +115,30 @@ export const utxosWithLowCoins: Cardano.Utxo[] = [
     }
   ]
 ];
+
+export const utxosWithLowCoinsAndMixedAssets: Cardano.Utxo[] = [
+  ...utxosWithLowCoins,
+  [
+    {
+      address: Cardano.PaymentAddress(
+        'addr_test1qzs0umu0s2ammmpw0hea0w2crtcymdjvvlqngpgqy76gpfnuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475qp3y3vz'
+      ),
+      index: 3,
+      txId: Cardano.TransactionId('c7c0973c6bbf1a04a9f306da7814b4fa564db649bf48b0bd93c273bd03143547')
+    },
+    {
+      address: Cardano.PaymentAddress(
+        'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'
+      ),
+      value: {
+        assets: new Map([
+          [AssetId.PXL, 5n],
+          [AssetId.TSLA, 10n]
+        ]),
+        coins: 4_027_026_465n
+      }
+    }
+  ]
+];
+
+export const sortedUtxosWithLowCoins: Cardano.Utxo[] = [utxosWithLowCoins[1], utxosWithLowCoins[0]];
