@@ -39,6 +39,9 @@ in {
   main = mkShell {
     name = "Cardano JS SDK Local Env";
     imports = [formattingModule];
-    commands = [{package = std;}];
+    commands = with inputs.nixpkgs; [
+      {package = std;}
+      {package = yarn;}
+    ];
   };
 }
