@@ -6,8 +6,8 @@ let
     inherit (self) lastModified lastModifiedDate rev;
     shortRev = self.shortRev or "no rev";
     extra = {
+      inherit (self) narHash;
       sourceInfo = self;
-      narHash = self.narHash;
       path = self.outPath;
     };
   };

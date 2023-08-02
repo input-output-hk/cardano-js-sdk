@@ -19,14 +19,6 @@ in {
     ];
     project = nixpkgs.callPackage (self + /yarn-project.nix) {} {inherit src;};
 
-    replaceLine = regex: replacement: s: let
-      m = builtins.match "(.*\n)${regex}(\n.*)" s;
-    in
-      builtins.concatStringsSep "" [
-        (builtins.elemAt m 0)
-        replacement
-        (builtins.elemAt m 1)
-      ];
     production-deps = project.overrideAttrs (oldAttrs: {
       name = "cardano-sdk-production-deps";
       configurePhase =
