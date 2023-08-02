@@ -14,7 +14,8 @@ import {
 import { KeyAgentBase } from './KeyAgentBase';
 import { ManagedFreeableScope } from '@cardano-sdk/util';
 import { txToTrezor } from './util';
-import TrezorConnect, { Features } from 'trezor-connect';
+import TrezorConnectNode, { Features } from '@trezor/connect';
+import TrezorConnectWeb from '@trezor/connect-web';
 
 export interface TrezorKeyAgentProps extends Omit<SerializableTrezorKeyAgentData, '__typename'> {
   isTrezorInitialized?: boolean;
@@ -22,6 +23,7 @@ export interface TrezorKeyAgentProps extends Omit<SerializableTrezorKeyAgentData
 
 export interface GetTrezorXpubProps {
   accountIndex: number;
+  communicationType: CommunicationType;
 }
 
 export interface CreateTrezorKeyAgentProps {
@@ -30,17 +32,24 @@ export interface CreateTrezorKeyAgentProps {
   trezorConfig: TrezorConfig;
 }
 
+export type TrezorConnectInstanceType = typeof TrezorConnectNode | typeof TrezorConnectWeb;
+
+const getTrezorConnect = (communicationType: CommunicationType): TrezorConnectInstanceType =>
+  communicationType === CommunicationType.Node ? TrezorConnectNode : TrezorConnectWeb;
+
 const transportTypedError = (error?: any) =>
   new AuthenticationError('Trezor transport failed', new TransportError('Trezor transport failed', error));
 
 export class TrezorKeyAgent extends KeyAgentBase {
   readonly isTrezorInitialized: Promise<boolean>;
+  readonly #communicationType: CommunicationType;
 
   constructor({ isTrezorInitialized, ...serializableData }: TrezorKeyAgentProps, dependencies: KeyAgentDependencies) {
     super({ ...serializableData, __typename: KeyAgentType.Trezor }, dependencies);
     if (!isTrezorInitialized) {
       this.isTrezorInitialized = TrezorKeyAgent.initializeTrezorTransport(serializableData.trezorConfig);
     }
+    this.#communicationType = serializableData.trezorConfig.communicationType;
   }
 
   /**
@@ -52,11 +61,12 @@ export class TrezorKeyAgent extends KeyAgentBase {
     silentMode = false,
     lazyLoad = false
   }: TrezorConfig): Promise<boolean> {
+    const trezorConnect = getTrezorConnect(communicationType);
     try {
-      await TrezorConnect.init({
+      await trezorConnect.init({
         // eslint-disable-next-line max-len
         // Set to "false" (default) if you want to start communication with bridge on application start (and detect connected device right away)
-        // Set it to "true", then trezor-connect will not be initialized until you call some TrezorConnect.method()
+        // Set it to "true", then trezor-connect will not be initialized until you call some trezorConnect.method()
         // This is useful when you don't know if you are dealing with Trezor user
         lazyLoad: communicationType !== CommunicationType.Node && lazyLoad,
         // Manifest is required from Trezor Connect 7:
@@ -75,9 +85,10 @@ export class TrezorKeyAgent extends KeyAgentBase {
   /**
    * @throws AuthenticationError
    */
-  static async checkDeviceConnection(): Promise<Features> {
+  static async checkDeviceConnection(communicationType: CommunicationType): Promise<Features> {
+    const trezorConnect = getTrezorConnect(communicationType);
     try {
-      const deviceFeatures = await TrezorConnect.getFeatures();
+      const deviceFeatures = await trezorConnect.getFeatures();
       if (!deviceFeatures.success) {
         throw new TransportError('Failed to get device', deviceFeatures.payload);
       }
@@ -93,11 +104,12 @@ export class TrezorKeyAgent extends KeyAgentBase {
   /**
    * @throws AuthenticationError
    */
-  static async getXpub({ accountIndex }: GetTrezorXpubProps): Promise<Crypto.Bip32PublicKeyHex> {
+  static async getXpub({ accountIndex, communicationType }: GetTrezorXpubProps): Promise<Crypto.Bip32PublicKeyHex> {
     try {
-      await TrezorKeyAgent.checkDeviceConnection();
+      await TrezorKeyAgent.checkDeviceConnection(communicationType);
       const derivationPath = `m/${CardanoKeyConst.PURPOSE}'/${CardanoKeyConst.COIN_TYPE}'/${accountIndex}'`;
-      const extendedPublicKey = await TrezorConnect.cardanoGetPublicKey({
+      const trezorConnect = getTrezorConnect(communicationType);
+      const extendedPublicKey = await trezorConnect.cardanoGetPublicKey({
         path: derivationPath,
         showOnTrezor: true
       });
@@ -118,7 +130,10 @@ export class TrezorKeyAgent extends KeyAgentBase {
     dependencies: KeyAgentDependencies
   ) {
     const isTrezorInitialized = await TrezorKeyAgent.initializeTrezorTransport(trezorConfig);
-    const extendedAccountPublicKey = await TrezorKeyAgent.getXpub({ accountIndex });
+    const extendedAccountPublicKey = await TrezorKeyAgent.getXpub({
+      accountIndex,
+      communicationType: trezorConfig.communicationType
+    });
     return new TrezorKeyAgent(
       {
         accountIndex,
@@ -145,7 +160,8 @@ export class TrezorKeyAgent extends KeyAgentBase {
         knownAddresses: this.knownAddresses
       });
 
-      const result = await TrezorConnect.cardanoSignTransaction(trezorTxData);
+      const trezorConnect = getTrezorConnect(this.#communicationType);
+      const result = await trezorConnect.cardanoSignTransaction(trezorTxData);
       if (!result.success) {
         throw new TransportError('Failed to export extended account public key', result.payload);
       }
