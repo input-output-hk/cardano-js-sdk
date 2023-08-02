@@ -5,6 +5,7 @@ let
     treefmt
     alejandra
     shfmt
+    yq
     ;
   inherit
     (inputs.nixpkgs.nodePackages)
@@ -23,6 +24,7 @@ let
       shfmt
       prettier
       prettier-plugin-toml
+      yq
     ];
     devshell.startup.nodejs-setuphook = noDepEntry ''
       export NODE_PATH=${prettier-plugin-toml}/lib/node_modules:''${NODE_PATH-}

@@ -1,4 +1,4 @@
-# yq '. | explode(.)' std-unexploded.yml > workflows/std.yml
+# yq -y < std-unexploded.yml > workflows/std.yml
 name: CI/CD
 
 on:
