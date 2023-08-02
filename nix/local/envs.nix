@@ -6,6 +6,7 @@ let
     alejandra
     shfmt
     yq
+    git-subrepo
     ;
   inherit
     (inputs.nixpkgs.nodePackages)
@@ -25,6 +26,7 @@ let
       prettier
       prettier-plugin-toml
       yq
+      git-subrepo
     ];
     devshell.startup.nodejs-setuphook = noDepEntry ''
       export NODE_PATH=${prettier-plugin-toml}/lib/node_modules:''${NODE_PATH-}

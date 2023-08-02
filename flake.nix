@@ -21,6 +21,7 @@
       cellBlocks = with std.blockTypes; [
         # Software Delivery Lifecycle (Local Development Environment)
         (devshells "envs")
+        (runnables "jobs")
         # Software Delivery Lifecycle (Packaging Layers)
         # For deeper context, please consult:
         #   https://std.divnix.com/patterns/four-packaging-layers.html
