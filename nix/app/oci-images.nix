@@ -12,12 +12,12 @@ let
     };
   };
 in {
-  server = std.lib.ops.mkStandardOCI {
+  cardano-services = std.lib.ops.mkStandardOCI {
     name = "926093910549.dkr.ecr.us-east-1.amazonaws.com/cardano-services";
-    operable = cell.operables.server;
+    operable = cell.operables.cardano-services;
     config.Env = [
       "BUILD_INFO=${BUILD_INFO}"
     ];
-    meta.description = "Minimal Provider Server OCI Image";
+    meta.description = "Minimal Cardano Services OCI Image";
   };
 }

@@ -10,8 +10,8 @@ let
   cardanoServicesPath = pkg: "${pkg}/libexec/incl/packages/cardano-services";
   runCardanoServices = pkg: "${lib.getExe pkg.nodejs} ${cardanoServicesPath pkg}";
 in {
-  server = std.lib.ops.mkOperable rec {
-    package = cell.packages.server;
+  cardano-services = std.lib.ops.mkOperable rec {
+    package = cell.packages.cardano-services;
     runtimeScript = ''
       export API_URL=''${API_URL:-http://0.0.0.0:3000}
       export CLI="${runCardanoServices package}/dist/cjs/cli.js"

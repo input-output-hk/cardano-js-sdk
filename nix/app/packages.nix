@@ -1,7 +1,7 @@
 let
   inherit (inputs) nixpkgs std self;
 in {
-  server = let
+  cardano-services = let
     chromedriverBin = nixpkgs.fetchurl {
       url = "https://chromedriver.storage.googleapis.com/102.0.5005.61/chromedriver_linux64.zip";
       hash = "sha256-SwB82rvinNOBKT3z8odrHamtMKZZWdUY6nJKst7b9Ts=";
