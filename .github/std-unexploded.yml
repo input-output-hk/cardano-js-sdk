@@ -1,0 +1,108 @@
+# yq -y < std-unexploded.yml > workflows/std.yml
+name: STD
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - develop
+      - master
+  push:
+    branches:
+      - develop
+      - master
+
+env:
+  AWS_REGION: us-east-1
+  AWS_ROLE_ARN: arn:aws:iam::926093910549:role/lace-ci
+  # NIX_UPLOAD_CACHE: s3://lace-nix-cache?region=us-east-1
+  DISCOVERY_USER_NAME: gha-runner
+  DISCOVERY_KNOWN_HOSTS_ENTRY: "65.109.126.156 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEOVVDZydvD+diYa6A3EtA3WGw5NfN0wv7ckQxa/fX1O"
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: std-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  discover:
+    outputs:
+      hits: ${{ steps.discovery.outputs.hits }}
+    runs-on: [self-hosted, discovery]
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@main
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          # account is part of ecr url, thus part of `hits` output and needs to pass
+          mask-aws-account-id: false
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      # TODO: uncomment when nixbuild works well together with
+      #       nix daemon mode on hosted runners
+      # - uses: nixbuild/nixbuild-action@v17
+      #   with:
+      #     nixbuild_ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
+      #     generate_summary_for: job
+      - uses: divnix/std-action/discover@main
+        with: {ffBuildInstructions: true}
+        id: discovery
+
+  build: &job
+    needs: discover
+    name: ${{ matrix.target.jobName }}
+    runs-on: ubuntu-latest
+    if: fromJSON(needs.discover.outputs.hits).packages.build != '{}'
+    strategy:
+      matrix:
+        target: ${{ fromJSON(needs.discover.outputs.hits).packages.build }}
+    steps:
+      - uses: nixbuild/nix-quick-install-action@v25
+      - uses: nixbuild/nixbuild-action@v17
+        with:
+          nixbuild_ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          generate_summary_for: job
+      - uses: divnix/std-action/setup-discovery-ssh@main
+        with:
+          ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          user_name: ${{ env.DISCOVERY_USER_NAME }}
+          ssh_known_hosts_entry: ${{ env.DISCOVERY_KNOWN_HOSTS_ENTRY }}
+      - uses: divnix/std-action/run@main
+        with: {ffBuildInstructions: true}
+
+  images:
+    <<: *job
+    needs: [discover, build]
+    if: fromJSON(needs.discover.outputs.hits).oci-images.publish != '{}'
+    strategy:
+      matrix:
+        target: ${{ fromJSON(needs.discover.outputs.hits).oci-images.publish }}
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@main
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - uses: nixbuild/nix-quick-install-action@v25
+      - uses: nixbuild/nixbuild-action@v17
+        with:
+          nixbuild_ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          generate_summary_for: job
+      - uses: divnix/std-action/setup-discovery-ssh@main
+        with:
+          ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          user_name: ${{ env.DISCOVERY_USER_NAME }}
+          ssh_known_hosts_entry: ${{ env.DISCOVERY_KNOWN_HOSTS_ENTRY }}
+      - uses: divnix/std-action/run@main
+        with: {ffBuildInstructions: true}
+
