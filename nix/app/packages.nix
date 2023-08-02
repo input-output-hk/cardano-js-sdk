@@ -56,6 +56,9 @@ in {
       PYTHON = "${nixpkgs.python3}/bin/python3";
       # chromedriver wants to download the binary
       CHROMEDRIVER_FILEPATH = "${chromedriverBin}";
+      # playwright build fixes
+      PLAYWRIGHT_BROWSERS_PATH = nixpkgs.playwright-driver.browsers;
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = 1;
       # node-hid uses pkg-config to find sources
       buildInputs = oldAttrs.buildInputs ++ [nixpkgs.pkg-config nixpkgs.libusb1];
       # run actual build
