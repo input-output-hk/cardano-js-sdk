@@ -1,13 +1,17 @@
 {
-  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-
   inputs = {
-    std.url = "github:divnix/std";
-    # std.inputs.nixpkgs.follows = "nixpkgs";
-    std.inputs.n2c.follows = "n2c";
-    haumea.url = "github:nix-community/haumea/v0.2.2";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    devshell.url = "github:numtide/devshell";
+
     n2c.url = "github:nlewo/nix2container";
     n2c.inputs.nixpkgs.follows = "nixpkgs";
+
+    std = {
+      url = "github:divnix/std";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.n2c.follows = "n2c";
+      inputs.devshell.follows = "devshell";
+    };
   };
 
   outputs = {std, ...} @ inputs:
