@@ -3,7 +3,7 @@
   "version": "0.10.6",
   "description": "Cardano Services Client",
   "engines": {
-    "node": ">=14.20.1"
+    "node": ">=16.20.1"
   },
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",

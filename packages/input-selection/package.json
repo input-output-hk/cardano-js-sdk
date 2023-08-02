@@ -3,7 +3,7 @@
   "version": "0.11.4",
   "description": "TypeScript definitions for input-selection (Coin Selection Algorithms for Cardano)",
   "engines": {
-    "node": ">=14.20.1"
+    "node": ">=16.20.1"
   },
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
