@@ -42,4 +42,4 @@ const tokenMapToAssetGroup = (tokenMap: Cardano.TokenMap): Trezor.CardanoAssetGr
 };
 
 export const mapTokenMap = (tokenMap: Cardano.TokenMap | undefined) =>
-  tokenMap ? tokenMapToAssetGroup(tokenMap) : null;
+  tokenMap ? tokenMapToAssetGroup(tokenMap) : undefined;

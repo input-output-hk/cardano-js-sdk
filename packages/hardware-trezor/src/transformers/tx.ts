@@ -3,6 +3,7 @@ import { Cardano } from '@cardano-sdk/core';
 import { TrezorTxTransformerContext } from '../types';
 import { util as deprecatedUtil } from '@cardano-sdk/key-management';
 import { mapAuxiliaryData, mapCerts, mapTxIns, mapTxOuts, mapWithdrawals } from './';
+import { mapTokenMap } from './assets';
 
 /**
  * Temporary transformer function that returns a partial
@@ -19,6 +20,7 @@ const trezorTxTransformer = async (
   certificates: mapCerts(body.certificates ?? [], context),
   fee: body.fee.toString(),
   inputs: await mapTxIns(body.inputs, context),
+  mint: mapTokenMap(body.mint),
   networkId: context.chainId.networkId,
   outputs: mapTxOuts(body.outputs, context),
   protocolMagic: context.chainId.networkMagic,
