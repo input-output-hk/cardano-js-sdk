@@ -15,7 +15,7 @@ describe('withStakePools', () => {
               id: Cardano.PoolId('pool1n3s8unkvmre59uzt4ned0903f9q2p8dhscw5v9eeyc0sw0m439t')
             } as Cardano.PoolParameters
           },
-          pointer: {} as Mappers.CertificatePointer
+          pointer: {} as Cardano.Pointer
         },
         {
           certificate: {
@@ -24,7 +24,7 @@ describe('withStakePools', () => {
               id: Cardano.PoolId('pool12pq2rzx8d7ern46udp6xrn0e0jaqt9hes9gs85hstp0egvfnf9q')
             } as Cardano.PoolParameters
           },
-          pointer: {} as Mappers.CertificatePointer
+          pointer: {} as Cardano.Pointer
         },
         {
           certificate: {
@@ -34,7 +34,7 @@ describe('withStakePools', () => {
               id: Cardano.PoolId('pool12pq2rzx8d7ern46udp6xrn0e0jaqt9hes9gs85hstp0egvfnf9q')
             } as Cardano.PoolParameters
           },
-          pointer: {} as Mappers.CertificatePointer
+          pointer: {} as Cardano.Pointer
         },
         {
           certificate: {
@@ -42,7 +42,7 @@ describe('withStakePools', () => {
             epoch: Cardano.EpochNo(3),
             poolId: Cardano.PoolId('pool12pq2rzx8d7ern46udp6xrn0e0jaqt9hes9gs85hstp0egvfnf9q')
           },
-          pointer: {} as Mappers.CertificatePointer
+          pointer: {} as Cardano.Pointer
         },
         {
           certificate: {
@@ -50,7 +50,7 @@ describe('withStakePools', () => {
             epoch: Cardano.EpochNo(4),
             poolId: Cardano.PoolId('pool12pq2rzx8d7ern46udp6xrn0e0jaqt9hes9gs85hstp0egvfnf9q')
           },
-          pointer: {} as Mappers.CertificatePointer
+          pointer: {} as Cardano.Pointer
         }
       ],
       epochNo
@@ -79,7 +79,7 @@ describe('withStakePools', () => {
             epoch: Cardano.EpochNo(3),
             poolId: Cardano.PoolId('pool12pq2rzx8d7ern46udp6xrn0e0jaqt9hes9gs85hstp0egvfnf9q')
           },
-          pointer: {} as Mappers.CertificatePointer
+          pointer: {} as Cardano.Pointer
         },
         {
           certificate: {
@@ -88,7 +88,7 @@ describe('withStakePools', () => {
               id: Cardano.PoolId('pool12pq2rzx8d7ern46udp6xrn0e0jaqt9hes9gs85hstp0egvfnf9q')
             } as Cardano.PoolParameters
           },
-          pointer: {} as Mappers.CertificatePointer
+          pointer: {} as Cardano.Pointer
         }
       ],
       epochNo

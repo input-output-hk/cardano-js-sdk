@@ -94,9 +94,9 @@ const undoUpdateLatestRetirementAndRetiringStatus = async ({
   const registrationsRepository = queryRunner.manager.getRepository(PoolRegistrationEntity);
   const { firstSlot } = epochSlotsCalc(epochNo, eraSummaries);
   const epochStartId = certificatePointerToId({
-    certIndex: 0,
+    certIndex: Cardano.CertIndex(0),
     slot: firstSlot,
-    txIndex: 0
+    txIndex: Cardano.TxIndex(0)
   });
   return Promise.all(
     retirements.map(async ({ poolId }) => {
@@ -151,9 +151,9 @@ const undoUpdateLatestCertificatesAndDeletePoolsWithZeroRegistrations = (evt: Ev
 const computeCertificateIdRange = (epochNo: Cardano.EpochNo, eraSummaries: EraSummary[]) => {
   const { firstSlot, lastSlot } = epochSlotsCalc(epochNo, eraSummaries);
   const minId = certificatePointerToId({
-    certIndex: 0,
+    certIndex: Cardano.CertIndex(0),
     slot: firstSlot,
-    txIndex: 0
+    txIndex: Cardano.TxIndex(0)
   });
   const maxId = certificatePointerToId({
     certIndex: MaxCertificatePointerIdCertIndex,
