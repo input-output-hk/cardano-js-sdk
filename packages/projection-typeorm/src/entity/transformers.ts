@@ -43,7 +43,7 @@ export const parseBigInt: ValueTransformer = {
     return typeof obj === 'string' ? BigInt(obj) : obj;
   },
   to(obj: any) {
-    // Works as-is
-    return obj;
+    // It can also be a FindOperator object
+    return typeof obj === 'bigint' ? obj.toString() : obj;
   }
 };

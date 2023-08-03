@@ -12,6 +12,7 @@ import { PoolMetricsMigrations1685011799580 } from './1685011799580-stake-pool-m
 import { PoolRegistrationTableMigration1682519108360 } from './1682519108360-pool-registration-table';
 import { PoolRetirementTableMigration1682519108361 } from './1682519108361-pool-retirement-table';
 import { StakePoolTableMigration1682519108362 } from './1682519108362-stake-pool-table';
+import { TokensQuantityNumericMigrations1691042603934 } from './1691042603934-tokens-quantity-numeric';
 import { TokensTableMigration1682519108368 } from './1682519108368-tokens-table';
 
 type ProjectionMigration = Function & {
@@ -33,5 +34,6 @@ export const migrations: ProjectionMigration[] = [
   PoolMetricsMigrations1685011799580,
   HandleTableMigration1686138943349,
   CostPledgeNumericMigration1689091319930,
-  NftMetadataTableMigration1690269355640
+  NftMetadataTableMigration1690269355640,
+  TokensQuantityNumericMigrations1691042603934
 ];
