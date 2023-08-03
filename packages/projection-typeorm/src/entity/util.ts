@@ -22,12 +22,12 @@ export const BigIntColumnOptions: Pick<ColumnOptions, 'transformer' | 'type'> = 
 };
 
 /**
- * To be used for user-specified coin quantities that are not validated by the node
- * to not exceed max lovelace supply (up to unsigned 64 bit integer):
- * - pool registration cost
- * - pool registration pledge
+ * To be used for
+ * - user-specified coin quantities that are not validated by the node
+ *   to not exceed max lovelace supply
+ * - native asset quantities
  */
-export const ImaginaryCoinsColumnOptions: Pick<ColumnOptions, 'transformer' | 'type' | 'precision' | 'scale'> = {
+export const UInt64ColumnOptions: Pick<ColumnOptions, 'transformer' | 'type' | 'precision' | 'scale'> = {
   precision: 20,
   scale: 0,
   transformer: parseBigInt,
