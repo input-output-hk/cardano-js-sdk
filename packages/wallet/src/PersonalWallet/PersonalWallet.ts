@@ -634,7 +634,7 @@ export class PersonalWallet implements ObservableWallet {
     return this.#inputSelector;
   }
 
-  getStakeKeys(derivationPaths: AccountKeyDerivationPath[]): Promise<Ed25519PublicKeyHex[]> {
+  async getStakeKeys(derivationPaths: AccountKeyDerivationPath[]): Promise<Ed25519PublicKeyHex[]> {
     // eslint-disable-next-line no-console
     console.log('getStakeKeys');
     return Promise.all(derivationPaths.map((path) => this.keyAgent.derivePublicKey(path)));
