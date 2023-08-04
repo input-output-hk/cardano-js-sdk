@@ -9,3 +9,5 @@ export * from './storeHandles';
 export * from './util';
 export * from './storePoolMetricsUpdateJob';
 export * from './storeNftMetadata';
+export * from './storeAddresses';
+export * from './storeStakeKeyRegistrations';
