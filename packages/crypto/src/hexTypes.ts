@@ -64,3 +64,7 @@ export type Hash28ByteBase16 = OpaqueString<'Hash28ByteBase16'>;
  * @throws InvalidStringError
  */
 export const Hash28ByteBase16 = (value: string): Hash28ByteBase16 => typedHex<Hash28ByteBase16>(value, 56);
+/**
+ * Ed25519KeyHashHex is a 28 byte hash. This is a utility function that downcasts without validation.
+ */
+Hash28ByteBase16.fromEd25519KeyHashHex = (value: Ed25519KeyHashHex) => value as unknown as Hash28ByteBase16;
