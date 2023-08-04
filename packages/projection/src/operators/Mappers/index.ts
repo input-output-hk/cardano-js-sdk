@@ -4,3 +4,4 @@ export * from './withMint';
 export * from './withHandles';
 export * from './withNftMetadata';
 export * from './withCIP67';
+export * from './withAddresses';
