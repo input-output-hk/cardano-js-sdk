@@ -75,3 +75,26 @@ export const createRollBackwardEventFor = (
   eventType: ChainSyncEventType.RollBackward,
   point: rollbackPoint
 });
+
+export const createRollForwardEventBasedOn = (
+  evt: BaseProjectionEvent,
+  patchBlock: (block: Cardano.Block) => Cardano.Block
+): BaseProjectionEvent => {
+  const updateBlockHeader: Cardano.PartialBlockHeader = {
+    blockNo: Cardano.BlockNo(evt.block.header.blockNo + 1),
+    hash: Cardano.BlockId(generateRandomHexString(64)),
+    slot: Cardano.Slot(evt.block.header.slot + 20)
+  };
+  return {
+    block: {
+      ...patchBlock(evt.block),
+      header: updateBlockHeader
+    },
+    crossEpochBoundary: false,
+    epochNo: evt.epochNo,
+    eraSummaries: evt.eraSummaries,
+    eventType: ChainSyncEventType.RollForward,
+    genesisParameters: evt.genesisParameters,
+    tip: updateBlockHeader
+  };
+};
