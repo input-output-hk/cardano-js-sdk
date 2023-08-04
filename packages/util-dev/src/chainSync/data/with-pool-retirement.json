@@ -101,6 +101,7 @@
               "withdrawals": []
             },
             "id": "f28b40e2bf87ae513b3dbe169ef02a49b292b7f21e924e19fc2576e34712f29c",
+            "inputSource": "inputs",
             "witness": {
               "bootstrap": [],
               "datums": [],
@@ -395,6 +396,7 @@
               "withdrawals": []
             },
             "id": "ad7853c96f139df1b87a1ba1eba4c81fbaffbd0da81a7fbc308a183d0ea6e2bf",
+            "inputSource": "inputs",
             "witness": {
               "bootstrap": [],
               "datums": [],
@@ -1790,6 +1792,7 @@
               "withdrawals": []
             },
             "id": "82c4e6a33e485cbec31276cc415ee8075d60662daf002ef1f3755bb80204ac6b",
+            "inputSource": "inputs",
             "witness": {
               "bootstrap": [],
               "datums": [],
@@ -2070,6 +2073,7 @@
               "withdrawals": []
             },
             "id": "82c4e6a33e485cbec31276cc415ee8075d60662daf002ef1f3755bb80204ac6b",
+            "inputSource": "inputs",
             "witness": {
               "bootstrap": [],
               "datums": [],
@@ -2249,6 +2253,7 @@
               "withdrawals": []
             },
             "id": "ecc5a664bd2cd14b505baeb824d1f74b0dafadfc34a2af6bcb73288d43baf858",
+            "inputSource": "inputs",
             "witness": {
               "bootstrap": [],
               "datums": [],
@@ -2617,6 +2622,7 @@
               "withdrawals": []
             },
             "id": "5b72b20dfa1f887902b953bd58c21f5ec32ba69212ea028d0623391b975bba17",
+            "inputSource": "inputs",
             "witness": {
               "bootstrap": [],
               "datums": [],
@@ -2743,6 +2749,7 @@
               "withdrawals": []
             },
             "id": "73e26ff267b5ee32d8e413635f4f4c9547db1c2af1694faf51be20b9f508b8f6",
+            "inputSource": "inputs",
             "witness": {
               "bootstrap": [],
               "datums": [],
@@ -2904,6 +2911,7 @@
               "withdrawals": []
             },
             "id": "24437590bd5a1ad0da898bc19687d7a7c7476326a767e17efb86cbbb997e4eb6",
+            "inputSource": "inputs",
             "witness": {
               "bootstrap": [],
               "datums": [],
@@ -3040,6 +3048,7 @@
               "withdrawals": []
             },
             "id": "133b3489197a2dae6a208189b6d22e8a06378e549a8a2a01af382c6e9686b414",
+            "inputSource": "inputs",
             "witness": {
               "bootstrap": [],
               "datums": [],
@@ -3217,6 +3226,7 @@
               "withdrawals": []
             },
             "id": "24437590bd5a1ad0da898bc19687d7a7c7476326a767e17efb86cbbb997e4eb6",
+            "inputSource": "inputs",
             "witness": {
               "bootstrap": [],
               "datums": [],
@@ -3353,6 +3363,7 @@
               "withdrawals": []
             },
             "id": "133b3489197a2dae6a208189b6d22e8a06378e549a8a2a01af382c6e9686b414",
+            "inputSource": "inputs",
             "witness": {
               "bootstrap": [],
               "datums": [],
@@ -3715,6 +3726,7 @@
               "withdrawals": []
             },
             "id": "1469d68940ca6c1b0a002dccf000164d56c7dcbf299be6585d83ba83004c3f9c",
+            "inputSource": "inputs",
             "witness": {
               "bootstrap": [],
               "datums": [],
@@ -3886,6 +3898,7 @@
               "withdrawals": []
             },
             "id": "d6ff1d30f5bf335f4b610999ea2cb84d44c364367fc64410bdc48f926f294d6f",
+            "inputSource": "inputs",
             "witness": {
               "bootstrap": [],
               "datums": [],
