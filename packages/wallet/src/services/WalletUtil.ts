@@ -1,4 +1,5 @@
 /* eslint-disable no-bitwise */
+import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
 import { Observable, firstValueFrom } from 'rxjs';
 import { ObservableWallet } from '../types';
@@ -139,7 +140,12 @@ export const requiresForeignSignatures = async (tx: Cardano.Tx, wallet: Observab
           if (certificate.poolId === account.poolId) matchesOneAccount = true;
           break;
         case Cardano.CertificateType.MIR:
-          if (certificate.rewardAccount === account.rewardAccount) matchesOneAccount = true;
+          if (
+            certificate.kind === Cardano.MirCertificateKind.ToStakeCreds &&
+            certificate.stakeCredential!.hash ===
+              Crypto.Hash28ByteBase16(Cardano.RewardAccount.toHash(account.rewardAccount))
+          )
+            matchesOneAccount = true;
           break;
         case Cardano.CertificateType.StakeKeyRegistration:
         case Cardano.CertificateType.GenesisKeyDelegation:

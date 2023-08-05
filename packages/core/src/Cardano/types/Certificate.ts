@@ -1,8 +1,8 @@
 import * as Crypto from '@cardano-sdk/crypto';
+import { Credential, RewardAccount } from '../Address';
 import { EpochNo } from './Block';
 import { Lovelace } from './Value';
 import { PoolId, PoolParameters } from './StakePool';
-import { RewardAccount } from '../Address';
 
 export enum CertificateType {
   StakeKeyRegistration = 'StakeKeyRegistrationCertificate',
@@ -41,9 +41,15 @@ export enum MirCertificatePot {
   Treasury = 'treasury'
 }
 
+export enum MirCertificateKind {
+  ToOtherPot = 'toOtherPot',
+  ToStakeCreds = 'ToStakeCreds'
+}
+
 export interface MirCertificate {
   __typename: CertificateType.MIR;
-  rewardAccount: RewardAccount;
+  kind: MirCertificateKind;
+  stakeCredential?: Credential;
   quantity: Lovelace;
   pot: MirCertificatePot;
 }

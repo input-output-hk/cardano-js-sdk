@@ -49,7 +49,12 @@ const getStakingKeyPaths = (
           if (certificate.poolId === poolId) paths.add(account.stakeKeyDerivationPath);
           break;
         case Cardano.CertificateType.MIR:
-          if (certificate.rewardAccount === account.rewardAccount) paths.add(account.stakeKeyDerivationPath);
+          if (
+            certificate.kind === Cardano.MirCertificateKind.ToStakeCreds &&
+            certificate.stakeCredential!.hash ===
+              Crypto.Hash28ByteBase16(Cardano.RewardAccount.toHash(account.rewardAccount))
+          )
+            paths.add(account.stakeKeyDerivationPath);
           break;
         case Cardano.CertificateType.StakeKeyRegistration:
         case Cardano.CertificateType.GenesisKeyDelegation:
