@@ -4,11 +4,10 @@ import { mintTokenMap } from '../testData';
 
 describe('assets', () => {
   describe('mapTokenMap', () => {
-    it('returns null when given an undefined token map', async () => {
+    it('returns undefined when given an undefined token map', async () => {
       const tokeMap: Cardano.TokenMap | undefined = undefined;
       const trezorAssets = mapTokenMap(tokeMap);
-
-      expect(trezorAssets).toEqual(null);
+      expect(trezorAssets).toBeUndefined();
     });
 
     it('can map a valid token map to asset group', async () => {
