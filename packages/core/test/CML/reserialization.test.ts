@@ -1,5 +1,5 @@
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
-import { Transaction } from '../../src';
+import { Transaction } from '../../src/Serialization/Transaction';
 
 describe('reserialization', () => {
   let scope: ManagedFreeableScope;

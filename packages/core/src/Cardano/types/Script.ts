@@ -233,3 +233,17 @@ export interface PlutusScript {
  * Program that decides whether the transaction that spends the output is authorized to do so.
  */
 export type Script = NativeScript | PlutusScript;
+
+/**
+ * Predicate that returns true if the given core script is a native script.
+ *
+ * @param script The Script to check.
+ */
+export const isNativeScript = (script: Script): script is NativeScript => script.__type === ScriptType.Native;
+
+/**
+ * Predicate that returns true if the given core script is a plutus script.
+ *
+ * @param script The Script to check.
+ */
+export const isPlutusScript = (script: Script): script is PlutusScript => script.__type === ScriptType.Plutus;

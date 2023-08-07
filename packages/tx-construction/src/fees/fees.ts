@@ -1,4 +1,4 @@
-import { CML, Cardano, Transaction, coreToCml } from '@cardano-sdk/core';
+import { CML, Cardano, Serialization, coreToCml } from '@cardano-sdk/core';
 import { OpaqueNumber, usingAutoFree } from '@cardano-sdk/util';
 
 /**
@@ -32,7 +32,7 @@ const serializeTxOutput = (output: Cardano.TxOut) =>
  * @param tx The Tx to be serialized.
  */
 const serializeTx = (tx: Cardano.Tx) =>
-  usingAutoFree((scope) => Buffer.from(scope.manage(Transaction.fromCore(scope, tx)).toCbor(), 'hex'));
+  usingAutoFree((scope) => Buffer.from(scope.manage(Serialization.Transaction.fromCore(scope, tx)).toCbor(), 'hex'));
 
 /**
  * Gets the total transaction execution units budget from the redeemers.
