@@ -2,6 +2,7 @@ import * as Trezor from 'trezor-connect';
 import { Cardano } from '@cardano-sdk/core';
 import { TrezorTxTransformerContext } from '../types';
 import { util as deprecatedUtil } from '@cardano-sdk/key-management';
+import { mapAdditionalWitnessRequests } from './additionalWitnessRequests';
 import { mapAuxiliaryData, mapCerts, mapTxIns, mapTxOuts, mapWithdrawals } from './';
 import { mapTokenMap } from './assets';
 
@@ -15,19 +16,23 @@ import { mapTokenMap } from './assets';
 const trezorTxTransformer = async (
   body: Cardano.TxBody,
   context: TrezorTxTransformerContext
-): Promise<Partial<Trezor.CardanoSignTransaction>> => ({
-  auxiliaryData: body.auxiliaryDataHash ? mapAuxiliaryData(body.auxiliaryDataHash) : undefined,
-  certificates: mapCerts(body.certificates ?? [], context),
-  fee: body.fee.toString(),
-  inputs: await mapTxIns(body.inputs, context),
-  mint: mapTokenMap(body.mint),
-  networkId: context.chainId.networkId,
-  outputs: mapTxOuts(body.outputs, context),
-  protocolMagic: context.chainId.networkMagic,
-  ttl: body.validityInterval?.invalidHereafter?.toString(),
-  validityIntervalStart: body.validityInterval?.invalidBefore?.toString(),
-  withdrawals: mapWithdrawals(body.withdrawals ?? [], context)
-});
+): Promise<Omit<Trezor.CardanoSignTransaction, 'signingMode'>> => {
+  const inputs = await mapTxIns(body.inputs, context);
+  return {
+    additionalWitnessRequests: mapAdditionalWitnessRequests(inputs, context),
+    auxiliaryData: body.auxiliaryDataHash ? mapAuxiliaryData(body.auxiliaryDataHash) : undefined,
+    certificates: mapCerts(body.certificates ?? [], context),
+    fee: body.fee.toString(),
+    inputs,
+    mint: mapTokenMap(body.mint),
+    networkId: context.chainId.networkId,
+    outputs: mapTxOuts(body.outputs, context),
+    protocolMagic: context.chainId.networkMagic,
+    ttl: body.validityInterval?.invalidHereafter?.toString(),
+    validityIntervalStart: body.validityInterval?.invalidBefore?.toString(),
+    withdrawals: mapWithdrawals(body.withdrawals ?? [], context)
+  };
+};
 
 /**
  * Temporary props type extending the existing TxToTrezorProps
@@ -42,13 +47,9 @@ type TxToTrezorProps = deprecatedUtil.TxToTrezorProps & {
  * Takes a core transaction and context data necessary to transform
  * it into a trezor.CardanoSignTransaction
  */
-export const txToTrezor = async (props: TxToTrezorProps): Promise<Trezor.CardanoSignTransaction> => ({
-  // First run the deprecated trezor transformers
-  ...(await deprecatedUtil.txToTrezor(props)),
-  // Then override them with our new implementations
-  ...(await trezorTxTransformer(props.cardanoTxBody, {
+export const txToTrezor = (props: TxToTrezorProps): Promise<Omit<Trezor.CardanoSignTransaction, 'signingMode'>> =>
+  trezorTxTransformer(props.cardanoTxBody, {
     chainId: props.chainId,
     inputResolver: props.inputResolver,
     knownAddresses: props.knownAddresses
-  }))
-});
+  });
