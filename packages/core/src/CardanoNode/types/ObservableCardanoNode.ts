@@ -1,3 +1,4 @@
+import { bufferChainSyncEvent } from '../util/bufferChainSyncEvent';
 import type { Cardano, HealthCheckResponse } from '../..';
 import type { EraSummary } from './CardanoNode';
 import type { Observable } from 'rxjs';
@@ -19,18 +20,20 @@ export enum ChainSyncEventType {
 
 export type RequestNext = () => void;
 
-export interface ChainSyncRollForward {
-  tip: Cardano.Tip;
-  eventType: ChainSyncEventType.RollForward;
-  block: Cardano.Block;
+export interface WithRequestNext {
   requestNext: RequestNext;
 }
 
-export interface ChainSyncRollBackward {
+export interface ChainSyncRollForward extends WithRequestNext {
+  tip: Cardano.Tip;
+  eventType: ChainSyncEventType.RollForward;
+  block: Cardano.Block;
+}
+
+export interface ChainSyncRollBackward extends WithRequestNext {
   eventType: ChainSyncEventType.RollBackward;
   point: PointOrOrigin;
   tip: TipOrOrigin;
-  requestNext: RequestNext;
 }
 
 export type ChainSyncEvent = ChainSyncRollForward | ChainSyncRollBackward;
@@ -71,3 +74,5 @@ export interface ObservableCardanoNode {
    */
   findIntersect(points: PointOrOrigin[]): Observable<ObservableChainSync>;
 }
+
+export const ObservableCardanoNode = { bufferChainSyncEvent } as const;
