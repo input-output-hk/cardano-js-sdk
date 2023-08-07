@@ -53,6 +53,7 @@ const datumNftmetadata = {
 describe('withNftMetadata', () => {
   const assetId1 = Cardano.AssetId('7d878696b149b529807aa01b8e20785e0a0d470c32c13f53f08a55e344455630303032');
   const assetId2 = Cardano.AssetId('7d878696b149b529807aa01b8e20785e0a0d470c32c13f53f08a55e344455638393230');
+  const assetId3 = Cardano.AssetId('7d878696b149b529807aa01b8e20785e0a0d470c32c13f53f08a55e344455638393233');
   const otherProperties1 = new Map([
     ['Background', 'Ocean'],
     ['Body', 'Pale'],
@@ -98,6 +99,14 @@ describe('withNftMetadata', () => {
                 ])
               ],
               [
+                Buffer.from(Cardano.AssetId.getAssetName(assetId3), 'hex').toString('utf8'),
+                new Map([
+                  ['image', 'ipfs://QmWmB37VZ9uc2cVe2fG31Xqjxw5VbUu4DMLkGt9LW6z7Up'],
+                  ['mediaType', 'image/jpeg'],
+                  ['name', 'Burned']
+                ])
+              ],
+              [
                 'DEV8920',
                 new Map([
                   ...otherProperties2,
@@ -121,7 +130,8 @@ describe('withNftMetadata', () => {
           body: {
             mint: new Map([
               [assetId1, 1n],
-              [assetId2, 1n]
+              [assetId2, 1n],
+              [assetId3, -1n]
             ])
           }
         }

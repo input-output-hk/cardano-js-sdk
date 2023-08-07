@@ -30,7 +30,8 @@ const getNftMetadataFromCip67 = ({ cip67 }: WithCIP67, logger: Logger) =>
   );
 
 const getNftMetadataFromCip25 = ({ mint }: WithMint, logger: Logger) =>
-  mint.map(({ assetId, txMetadata, policyId, assetName }): ProjectedNftMetadata | null => {
+  mint.map(({ assetId, txMetadata, policyId, assetName, quantity }): ProjectedNftMetadata | null => {
+    if (quantity < 1n) return null;
     const nftMetadata = Asset.NftMetadata.fromMetadatum({ name: assetName, policyId }, txMetadata, logger);
 
     if (!nftMetadata) return null;
