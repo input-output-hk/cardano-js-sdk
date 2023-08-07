@@ -158,7 +158,7 @@ describe('bufferChainSyncEvent', () => {
     consumer.consumeTill(3);
     await sleep(10);
     producer.produceTill(16);
-    await sleep(10);
+    await sleep(20);
     consumer.consumeTill(4);
     await sleep(10);
   };

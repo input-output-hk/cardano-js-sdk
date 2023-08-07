@@ -177,11 +177,13 @@ describe('CLI', () => {
   let lastBlock: LedgerTipModel;
   let postgresConnectionString: string;
   let postgresConnectionStringHandle: string;
+  let postgresConnectionStringProjection: string;
   let postgresConnectionStringStakePool: string;
 
   beforeAll(() => {
     postgresConnectionString = process.env.POSTGRES_CONNECTION_STRING_DB_SYNC!;
     postgresConnectionStringHandle = process.env.POSTGRES_CONNECTION_STRING_HANDLE!;
+    postgresConnectionStringProjection = process.env.POSTGRES_CONNECTION_STRING_PROJECTION!;
     postgresConnectionStringStakePool = process.env.POSTGRES_CONNECTION_STRING_STAKE_POOL!;
   });
 
@@ -2176,7 +2178,7 @@ describe('CLI', () => {
             '--ogmios-url',
             'ws://localhost:1234',
             '--postgres-connection-string',
-            'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
+            postgresConnectionStringProjection,
             ProjectionName.UTXO
           ]);
           await assertServerAlive();
@@ -2187,7 +2189,7 @@ describe('CLI', () => {
             '--ogmios-url',
             'ws://localhost:1234',
             '--postgres-connection-string',
-            'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
+            postgresConnectionStringProjection,
             `${ProjectionName.UTXO},${ProjectionName.StakePool}`
           ]);
           await assertServerAlive();
@@ -2200,7 +2202,7 @@ describe('CLI', () => {
             '--ogmios-url',
             'ws://localhost:1234',
             '--postgres-connection-string',
-            'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection'
+            postgresConnectionStringProjection
           ]);
           await assertServerAlive();
         });
@@ -2210,7 +2212,7 @@ describe('CLI', () => {
             '--ogmios-url',
             'ws://localhost:1234',
             '--postgres-connection-string',
-            'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
+            postgresConnectionStringProjection,
             '--drop-schema',
             'true',
             ProjectionName.UTXO
@@ -2243,7 +2245,7 @@ describe('CLI', () => {
           '--ogmios-url',
           'ws://localhost:1234',
           '--postgres-connection-string',
-          'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
+          postgresConnectionStringProjection,
           '--handle-policy-ids',
           'f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a',
           ProjectionName.Handle
@@ -2258,7 +2260,7 @@ describe('CLI', () => {
           '--ogmios-url',
           'ws://localhost:1234',
           '--postgres-connection-string',
-          'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
+          postgresConnectionStringProjection,
           '--logger-min-severity',
           'debug',
           '--handle-policy-ids-file',
@@ -2285,7 +2287,7 @@ describe('CLI', () => {
               '--ogmios-url',
               'ws://localhost:1234',
               '--postgres-connection-string',
-              'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
+              postgresConnectionStringProjection,
               ProjectionName.Handle
             ],
             { env: {}, stdio: 'pipe' }
@@ -2313,7 +2315,7 @@ describe('CLI', () => {
               '--ogmios-url',
               'ws://localhost:1234',
               '--postgres-connection-string',
-              'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
+              postgresConnectionStringProjection,
               '--handle-policy-ids',
               'policyId',
               ProjectionName.Handle
@@ -2329,6 +2331,28 @@ describe('CLI', () => {
           expect(code).toBe(1);
           done();
         });
+      });
+
+      test('uses the configured blocks buffer length', async () => {
+        const chunks: string[] = [];
+
+        startProjector([
+          '--ogmios-url',
+          'ws://localhost:1234',
+          '--postgres-connection-string',
+          postgresConnectionStringProjection,
+          '--logger-min-severity',
+          'debug',
+          '--blocks-buffer-length',
+          '23',
+          ProjectionName.StakePool
+        ]);
+
+        proc.stdout?.on('data', (data: Buffer) => chunks.push(data.toString('utf8')));
+
+        await assertServerAlive();
+
+        expect(chunks.join('')).toMatch('Using a 23 blocks buffer');
       });
     });
 
@@ -2355,7 +2379,7 @@ describe('CLI', () => {
           startProjector(
             {
               OGMIOS_URL: 'ws://localhost:1234',
-              POSTGRES_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection'
+              POSTGRES_CONNECTION_STRING: postgresConnectionStringProjection
             },
             [ProjectionName.UTXO]
           );
@@ -2366,7 +2390,7 @@ describe('CLI', () => {
           startProjector(
             {
               OGMIOS_URL: 'ws://localhost:1234',
-              POSTGRES_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection'
+              POSTGRES_CONNECTION_STRING: postgresConnectionStringProjection
             },
             [`${ProjectionName.UTXO},${ProjectionName.StakePool}`]
           );
@@ -2376,7 +2400,7 @@ describe('CLI', () => {
         test('with multiple projections as --projection-names argument', async () => {
           startProjector({
             OGMIOS_URL: 'ws://localhost:1234',
-            POSTGRES_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@127.0.0.1:5432/projection',
+            POSTGRES_CONNECTION_STRING: postgresConnectionStringProjection,
             PROJECTION_NAMES: `${ProjectionName.UTXO},${ProjectionName.StakePool}`
           });
           await assertServerAlive();

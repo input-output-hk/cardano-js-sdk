@@ -28,30 +28,40 @@ const blocksToPoints = (blocks: Array<Cardano.Block | 'origin'>) =>
   uniq([...blocks.map((p) => (p === 'origin' ? p : p.header)), 'origin' as const]);
 
 const syncFromIntersection = ({
+  blocksBufferLength,
+  buffer,
   cardanoNode,
   chainSync: { intersection, chainSync$ },
-  logger,
-  buffer
+  logger
 }: {
-  logger: Logger;
-  cardanoNode: ObservableCardanoNode;
+  blocksBufferLength: number;
   buffer: StabilityWindowBuffer;
+  cardanoNode: ObservableCardanoNode;
   chainSync: ObservableChainSync;
+  logger: Logger;
 }) =>
   new Observable<ProjectionEvent>((observer) => {
     logger.info(`Starting ChainSync from ${pointDescription(intersection.point)}`);
     return chainSync$
-      .pipe(withRolledBackBlock(buffer), withNetworkInfo(cardanoNode), withEpochNo(), withEpochBoundary(intersection))
+      .pipe(
+        ObservableCardanoNode.bufferChainSyncEvent(blocksBufferLength),
+        withRolledBackBlock(buffer),
+        withNetworkInfo(cardanoNode),
+        withEpochNo(),
+        withEpochBoundary(intersection)
+      )
       .subscribe(observer);
   });
 
 const rollbackAndSyncFromIntersection = ({
+  blocksBufferLength,
   buffer,
   cardanoNode,
   initialChainSync,
   logger,
   tail
 }: {
+  blocksBufferLength: number;
   buffer: StabilityWindowBuffer;
   cardanoNode: ObservableCardanoNode;
   initialChainSync: ObservableChainSync;
@@ -105,7 +115,7 @@ const rollbackAndSyncFromIntersection = ({
     );
     return concat(
       rollback$,
-      defer(() => syncFromIntersection({ buffer, cardanoNode, chainSync, logger }))
+      defer(() => syncFromIntersection({ blocksBufferLength, buffer, cardanoNode, chainSync, logger }))
     ).subscribe(subscriber);
   });
 
@@ -118,13 +128,15 @@ const rollbackAndSyncFromIntersection = ({
  * @throws InvalidIntersectionError when no intersection with provided {@link StabilityWindowBuffer} is found.
  */
 export const fromCardanoNode = ({
+  blocksBufferLength,
   buffer,
-  logger: baseLogger,
-  cardanoNode
+  cardanoNode,
+  logger: baseLogger
 }: {
+  blocksBufferLength: number;
+  buffer: StabilityWindowBuffer;
   cardanoNode: ObservableCardanoNode;
   logger: Logger;
-  buffer: StabilityWindowBuffer;
 }): Observable<ProjectionEvent> => {
   const logger = contextLogger(baseLogger, 'Bootstrap');
   return combineLatest([buffer.tip$, buffer.tail$]).pipe(
@@ -152,11 +164,18 @@ export const fromCardanoNode = ({
               );
             }
             // buffer is empty, sync from origin
-            return syncFromIntersection({ buffer, cardanoNode, chainSync: initialChainSync, logger });
+            return syncFromIntersection({
+              blocksBufferLength,
+              buffer,
+              cardanoNode,
+              chainSync: initialChainSync,
+              logger
+            });
           }
           if (blocks[0] !== 'origin' && initialChainSync.intersection.point.hash !== blocks[0].header.hash) {
             // rollback to intersection, then sync from intersection
             return rollbackAndSyncFromIntersection({
+              blocksBufferLength,
               buffer,
               cardanoNode,
               initialChainSync,
@@ -165,7 +184,7 @@ export const fromCardanoNode = ({
             });
           }
           // intersection is at tip$ - no rollback, just sync from intersection
-          return syncFromIntersection({ buffer, cardanoNode, chainSync: initialChainSync, logger });
+          return syncFromIntersection({ blocksBufferLength, buffer, cardanoNode, chainSync: initialChainSync, logger });
         })
       );
     })

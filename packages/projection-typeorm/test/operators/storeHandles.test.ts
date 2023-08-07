@@ -56,11 +56,9 @@ describe('storeHandles', () => {
     );
 
   const project$ = () =>
-    Bootstrap.fromCardanoNode({
-      buffer,
-      cardanoNode: stubEvents.cardanoNode,
-      logger
-    }).pipe(applyOperators());
+    Bootstrap.fromCardanoNode({ blocksBufferLength: 10, buffer, cardanoNode: stubEvents.cardanoNode, logger }).pipe(
+      applyOperators()
+    );
 
   const projectTilFirst = createProjectorTilFirst(project$);
 

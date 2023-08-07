@@ -25,6 +25,7 @@ import { passthrough, shareRetryBackoff } from '@cardano-sdk/util-rxjs';
 
 export interface CreateTypeormProjectionProps {
   projections: ProjectionName[];
+  blocksBufferLength: number;
   buffer?: TypeormStabilityWindowBuffer;
   projectionSource$: Observable<ProjectionEvent>;
   connectionConfig$: Observable<PgConnectionConfig>;
@@ -51,7 +52,10 @@ export const createObservableDataSource = ({
   entities,
   extensions,
   migrationsRun
-}: Omit<CreateTypeormProjectionProps, 'exitAtBlockNo' | 'projections' | 'projectionSource$' | 'projectionOptions'> &
+}: Omit<
+  CreateTypeormProjectionProps,
+  'blocksBufferLength' | 'exitAtBlockNo' | 'projections' | 'projectionSource$' | 'projectionOptions'
+> &
   Pick<PreparedProjection, 'entities' | 'extensions'> & { migrationsRun: boolean }) =>
   connectionConfig$.pipe(
     switchMap((connectionConfig) =>
@@ -89,6 +93,7 @@ export const createObservableDataSource = ({
  * Dependencies of each projection are defined in ./prepareTypeormProjection.ts
  */
 export const createTypeormProjection = ({
+  blocksBufferLength,
   projections,
   projectionSource$,
   connectionConfig$,
@@ -101,6 +106,7 @@ export const createTypeormProjection = ({
   const { handlePolicyIds } = { handlePolicyIds: [], ...projectionOptions };
 
   logger.debug(`Creating projection with policyIds ${JSON.stringify(handlePolicyIds)}`);
+  logger.debug(`Using a ${blocksBufferLength} blocks buffer`);
 
   const { mappers, entities, stores, extensions } = prepareTypeormProjection({
     buffer,

@@ -95,6 +95,7 @@ describe('withTypeormTransaction', () => {
     const project = <PropsOut>(projection: ProjectionOperator<BootstrapExtraProps, PropsOut>) =>
       firstValueFrom(
         Bootstrap.fromCardanoNode({
+          blocksBufferLength: 10,
           buffer,
           cardanoNode: patchObject(cardanoNode, {
             findIntersect: (points) =>
@@ -140,11 +141,7 @@ describe('withTypeormTransaction', () => {
       });
       await buffer.initialize(queryRunner);
       project$ = defer(() =>
-        Bootstrap.fromCardanoNode({
-          buffer,
-          cardanoNode,
-          logger
-        }).pipe(
+        Bootstrap.fromCardanoNode({ blocksBufferLength: 10, buffer, cardanoNode, logger }).pipe(
           shareRetryBackoff(createProjection(of(dataSource)), { shouldRetry: isRecoverableTypeormError }),
           requestNext()
         )

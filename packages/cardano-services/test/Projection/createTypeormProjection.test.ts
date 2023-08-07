@@ -18,11 +18,13 @@ describe('createTypeormProjection', () => {
     const buffer = new TypeormStabilityWindowBuffer({ allowNonSequentialBlockHeights: true, logger });
     const projections = [ProjectionName.UTXO];
     const projection$ = createTypeormProjection({
+      blocksBufferLength: 10,
       buffer,
       connectionConfig$: projectorConnectionConfig$,
       devOptions: { dropSchema: true, synchronize: true },
       logger,
       projectionSource$: Bootstrap.fromCardanoNode({
+        blocksBufferLength: 10,
         buffer,
         cardanoNode: data.cardanoNode,
         logger

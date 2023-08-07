@@ -121,7 +121,7 @@ describe('resuming projection when intersection is not local tip', () => {
     buffer: StabilityWindowBuffer,
     into: ProjectionOperator<Mappers.WithStakeKeys>
   ) =>
-    Bootstrap.fromCardanoNode({ buffer, cardanoNode, logger }).pipe(
+    Bootstrap.fromCardanoNode({ blocksBufferLength: 10, buffer, cardanoNode, logger }).pipe(
       Mappers.withCertificates(),
       Mappers.withStakeKeys(),
       into,

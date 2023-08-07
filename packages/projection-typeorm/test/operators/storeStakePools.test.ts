@@ -27,11 +27,7 @@ describe('storeStakePools', () => {
   let queryRunner: QueryRunner;
   let buffer: TypeormStabilityWindowBuffer;
   const project = () =>
-    Bootstrap.fromCardanoNode({
-      buffer,
-      cardanoNode: data.cardanoNode,
-      logger
-    }).pipe(
+    Bootstrap.fromCardanoNode({ blocksBufferLength: 10, buffer, cardanoNode: data.cardanoNode, logger }).pipe(
       Mappers.withCertificates(),
       Mappers.withStakePools(),
       withTypeormTransaction({ dataSource$: of(dataSource), logger }),

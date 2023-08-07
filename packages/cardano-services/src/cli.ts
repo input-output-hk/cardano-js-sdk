@@ -42,6 +42,12 @@ import {
   loadProviderServer,
   stringOptionToBoolean
 } from './Program';
+import {
+  BLOCKS_BUFFER_LENGTH_DEFAULT,
+  PROJECTOR_API_URL_DEFAULT,
+  ProjectorArgs,
+  loadProjector
+} from './Program/programs/projector';
 import { Command, Option } from 'commander';
 import { DB_CACHE_TTL_DEFAULT } from './InMemoryCache';
 import {
@@ -58,7 +64,6 @@ import {
   PgBossWorkerOptionDescriptions,
   loadPgBossWorker
 } from './Program/programs/pgBossWorker';
-import { PROJECTOR_API_URL_DEFAULT, ProjectorArgs, loadProjector } from './Program/programs/projector';
 import { PgBossQueue, isValidQueue } from './PgBoss';
 import { ProjectionName } from './Projection';
 import { URL } from 'url';
@@ -124,6 +129,12 @@ withCommonOptions(
   ),
   { apiUrl: PROJECTOR_API_URL_DEFAULT }
 )
+  .addOption(
+    new Option('--blocks-buffer-length <blocksBufferLength>', ProjectorOptionDescriptions.BlocksBufferLength)
+      .default(BLOCKS_BUFFER_LENGTH_DEFAULT)
+      .env('BLOCKS_BUFFER_LENGTH')
+      .argParser((blocksBufferLength) => Number.parseInt(blocksBufferLength, 10))
+  )
   .addOption(
     new Option('--drop-schema <true/false>', ProjectorOptionDescriptions.DropSchema)
       .default(false)

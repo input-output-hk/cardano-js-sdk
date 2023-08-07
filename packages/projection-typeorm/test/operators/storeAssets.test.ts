@@ -24,11 +24,7 @@ describe('storeAssets', () => {
   const entities = [BlockEntity, BlockDataEntity, AssetEntity];
 
   const project$ = () =>
-    Bootstrap.fromCardanoNode({
-      buffer,
-      cardanoNode: stubEvents.cardanoNode,
-      logger
-    }).pipe(
+    Bootstrap.fromCardanoNode({ blocksBufferLength: 10, buffer, cardanoNode: stubEvents.cardanoNode, logger }).pipe(
       Mappers.withMint(),
       withTypeormTransaction({
         dataSource$,
