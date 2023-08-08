@@ -12,7 +12,7 @@ export const KEY_PAYMENT_CREDENTIAL: Cardano.Credential = {
   type: Cardano.CredentialType.KeyHash
 };
 
-export const KEY_STAKING_CREDENTIAL: Cardano.Credential = {
+export const KEY_STAKE_CREDENTIAL: Cardano.Credential = {
   hash: STAKE_KEY_HASH as Hash28ByteBase16,
   type: Cardano.CredentialType.KeyHash
 };

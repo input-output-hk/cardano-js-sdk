@@ -6,7 +6,7 @@ describe('Cardano/Address/BaseAddress', () => {
     const address = Cardano.BaseAddress.fromCredentials(
       Cardano.NetworkId.Mainnet,
       cip19TestVectors.KEY_PAYMENT_CREDENTIAL,
-      cip19TestVectors.KEY_STAKING_CREDENTIAL
+      cip19TestVectors.KEY_STAKE_CREDENTIAL
     );
     expect(address.toAddress().toBech32()).toEqual(cip19TestVectors.basePaymentKeyStakeKey);
   });

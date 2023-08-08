@@ -37,7 +37,7 @@ describe('wallet', () => {
   const dappBtnRun = '#bp3-tab-panel_TabsExample_1 > div > button';
   const dappSubmittedTxConfirmation = '#root > div > p:last-child';
   const dappChangeAddress = '#root > div > p:nth-child(11)';
-  const dappStakingAddress = '#root > div > p:nth-child(12)';
+  const dappStakeAddress = '#root > div > p:nth-child(12)';
   const dappUsedAddress = '#root > div > p:nth-child(13)';
 
   const btnDelegate = '#multiDelegation .delegate button';
@@ -120,7 +120,7 @@ describe('wallet', () => {
 
       it('dapp gets correct addresses from cip30 wallet api', async () => {
         await expect($(dappChangeAddress)).toHaveTextContaining(walletAddr1);
-        await expect($(dappStakingAddress)).toHaveTextContaining(walletStakeAddr1);
+        await expect($(dappStakeAddress)).toHaveTextContaining(walletStakeAddr1);
         await expect($(dappUsedAddress)).toHaveTextContaining(walletAddr1);
       });
     });

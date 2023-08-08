@@ -16,23 +16,23 @@ export const toRequiredSigner: Transform<
   });
 
   const stakeCredKnownAddress = context?.knownAddresses.find((address) => {
-    const stakingCredential = Cardano.RewardAccount.toHash(address.rewardAccount);
-    return stakingCredential && stakingCredential.toString() === keyHash;
+    const stakeCredential = Cardano.RewardAccount.toHash(address.rewardAccount);
+    return stakeCredential && stakeCredential.toString() === keyHash;
   });
 
-  const paymentPath = paymentCredKnownAddress ? paymentKeyPathFromGroupedAddress(paymentCredKnownAddress) : null;
-  const stakingPath = stakeCredKnownAddress ? stakeKeyPathFromGroupedAddress(stakeCredKnownAddress) : null;
+  const paymentKeyPath = paymentCredKnownAddress ? paymentKeyPathFromGroupedAddress(paymentCredKnownAddress) : null;
+  const stakeKeyPath = stakeCredKnownAddress ? stakeKeyPathFromGroupedAddress(stakeCredKnownAddress) : null;
 
-  if (paymentPath) {
+  if (paymentKeyPath) {
     return {
-      path: paymentPath,
+      path: paymentKeyPath,
       type: Ledger.TxRequiredSignerType.PATH
     };
   }
 
-  if (stakingPath) {
+  if (stakeKeyPath) {
     return {
-      path: stakingPath,
+      path: stakeKeyPath,
       type: Ledger.TxRequiredSignerType.PATH
     };
   }

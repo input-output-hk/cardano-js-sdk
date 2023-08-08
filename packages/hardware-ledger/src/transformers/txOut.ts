@@ -22,16 +22,16 @@ const toDestination: Transform<Cardano.TxOut, Ledger.TxOutputDestination, Ledger
   const knownAddress = context?.knownAddresses.find((address) => address.address === txOut.address);
 
   if (knownAddress) {
-    const spendingPath = paymentKeyPathFromGroupedAddress(knownAddress);
-    const stakingPath = stakeKeyPathFromGroupedAddress(knownAddress);
+    const paymentKeyPath = paymentKeyPathFromGroupedAddress(knownAddress);
+    const stakeKeyPath = stakeKeyPathFromGroupedAddress(knownAddress);
 
-    if (!stakingPath) throw new InvalidArgumentError('txOut', 'Missing staking key key path.');
+    if (!stakeKeyPath) throw new InvalidArgumentError('txOut', 'Missing stake key key path.');
 
     return {
       params: {
         params: {
-          spendingPath,
-          stakingPath
+          spendingPath: paymentKeyPath,
+          stakingPath: stakeKeyPath
         },
         type: Ledger.AddressType.BASE_PAYMENT_KEY_STAKE_KEY
       },

@@ -67,22 +67,22 @@ updatePool()
   coldKey=network-files/pools/cold"${SP_NODE_ID}".skey
   vrfKey=network-files/pools/vrf"${SP_NODE_ID}".vkey
   delegatorPaymentKey=network-files/stake-delegator-keys/payment"${SP_NODE_ID}".vkey
-  delegatorStakingKey=network-files/stake-delegator-keys/staking"${SP_NODE_ID}".vkey
+  delegatorStakeKey=network-files/stake-delegator-keys/staking"${SP_NODE_ID}".vkey
   delegatorPaymentSKey=network-files/stake-delegator-keys/payment"${SP_NODE_ID}".skey
-  delegatorStakingSKey=network-files/stake-delegator-keys/staking"${SP_NODE_ID}".skey
+  delegatorStakeSKey=network-files/stake-delegator-keys/staking"${SP_NODE_ID}".skey
 
   POOL_ID=$(cardano-cli stake-pool id --cold-verification-key-file "$coldVKey" --output-format "hex")
 
   # funding pool owner stake address
-  stakingAddr=$(cardano-cli address build --payment-verification-key-file "$genesisVKey" --stake-verification-key-file "$stakeVKey" --testnet-magic 888)
-  currentBalance=$(getAddressBalance "$stakingAddr")
+  stakeAddr=$(cardano-cli address build --payment-verification-key-file "$genesisVKey" --stake-verification-key-file "$stakeVKey" --testnet-magic 888)
+  currentBalance=$(getAddressBalance "$stakeAddr")
   utxo=$(cardano-cli query utxo --address "$genesisAddr" --testnet-magic 888 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
 
   cardano-cli transaction build \
     --babbage-era \
     --change-address "$genesisAddr" \
     --tx-in "$utxo" \
-    --tx-out "$stakingAddr"+"$POOL_OWNER_STAKE" \
+    --tx-out "$stakeAddr"+"$POOL_OWNER_STAKE" \
     --testnet-magic 888 \
     --out-file wallets-tx.raw 2>&1
 
@@ -94,11 +94,11 @@ updatePool()
 
   cardano-cli transaction submit --testnet-magic 888 --tx-file wallets-tx.signed 2>&1
 
-  updatedBalance=$(getAddressBalance "$stakingAddr")
+  updatedBalance=$(getAddressBalance "$stakeAddr")
 
   while [ "$currentBalance" -eq "$updatedBalance" ]
   do
-    updatedBalance=$(getAddressBalance "$stakingAddr")
+    updatedBalance=$(getAddressBalance "$stakeAddr")
     sleep 1
   done
 
@@ -216,12 +216,12 @@ updatePool()
   # register delegator stake address
   echo "Registering delegator stake certificate ${SP_NODE_ID}..."
 
-  paymentAddr=$(cardano-cli address build --payment-verification-key-file "$delegatorPaymentKey" --stake-verification-key-file "$delegatorStakingKey" --testnet-magic 888)
+  paymentAddr=$(cardano-cli address build --payment-verification-key-file "$delegatorPaymentKey" --stake-verification-key-file "$delegatorStakeKey" --testnet-magic 888)
   currentBalance=$(getAddressBalance "$paymentAddr")
 
   # create pool delegation certificate
   cardano-cli stake-address delegation-certificate \
-      --stake-verification-key-file "$delegatorStakingKey" \
+      --stake-verification-key-file "$delegatorStakeKey" \
       --stake-pool-id "$POOL_ID" \
       --out-file deleg.cert
 
@@ -258,7 +258,7 @@ updatePool()
   cardano-cli transaction sign \
       --tx-body-file tx.raw \
       --signing-key-file "$delegatorPaymentSKey" \
-      --signing-key-file "$delegatorStakingSKey" \
+      --signing-key-file "$delegatorStakeSKey" \
       --testnet-magic 888 \
       --out-file tx.signed
 
@@ -384,21 +384,21 @@ deregisterPool()
   coldVKey=network-files/pools/cold"${SP_NODE_ID}".vkey
   coldKey=network-files/pools/cold"${SP_NODE_ID}".skey
   delegatorPaymentKey=network-files/stake-delegator-keys/payment"${SP_NODE_ID}".vkey
-  delegatorStakingKey=network-files/stake-delegator-keys/staking"${SP_NODE_ID}".vkey
+  delegatorStakeKey=network-files/stake-delegator-keys/staking"${SP_NODE_ID}".vkey
   delegatorPaymentSKey=network-files/stake-delegator-keys/payment"${SP_NODE_ID}".skey
-  delegatorStakingSKey=network-files/stake-delegator-keys/staking"${SP_NODE_ID}".skey
+  delegatorStakeSKey=network-files/stake-delegator-keys/staking"${SP_NODE_ID}".skey
 
   # We are going to redelegate this stake to dbSync can index it properly.
   echo "Registering delegator stake certificate ${SP_NODE_ID}..."
 
-  paymentAddr=$(cardano-cli address build --payment-verification-key-file "$delegatorPaymentKey" --stake-verification-key-file "$delegatorStakingKey" --testnet-magic 888)
+  paymentAddr=$(cardano-cli address build --payment-verification-key-file "$delegatorPaymentKey" --stake-verification-key-file "$delegatorStakeKey" --testnet-magic 888)
   currentBalance=$(getAddressBalance "$paymentAddr")
 
   POOL_ID=$(cardano-cli stake-pool id --cold-verification-key-file "$coldVKey" --output-format "hex")
 
   # create pool delegation certificate
   cardano-cli stake-address delegation-certificate \
-      --stake-verification-key-file "$delegatorStakingKey" \
+      --stake-verification-key-file "$delegatorStakeKey" \
       --stake-pool-id "$POOL_ID" \
       --out-file deleg.cert
 
@@ -435,7 +435,7 @@ deregisterPool()
   cardano-cli transaction sign \
       --tx-body-file tx.raw \
       --signing-key-file "$delegatorPaymentSKey" \
-      --signing-key-file "$delegatorStakingSKey" \
+      --signing-key-file "$delegatorStakeSKey" \
       --testnet-magic 888 \
       --out-file tx.signed
 

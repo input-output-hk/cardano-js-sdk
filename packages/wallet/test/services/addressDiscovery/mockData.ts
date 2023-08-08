@@ -46,7 +46,7 @@ export const prepareMockKeyAgentWithData = () => {
   const data = new Array<Array<GroupedAddress>>();
   const stakeKeys = new Array<GroupedAddress>();
 
-  // Add 20 staking addresses credentials.
+  // Add 20 stake addresses credentials.
   for (let i = 0; i < 20; ++i) {
     stakeKeys.push({
       accountIndex: 0,
@@ -101,11 +101,11 @@ export const mockChainHistoryProvider: ChainHistoryProvider = {
       const stakeIndex = Number(segments[2]);
       const isPaymentEven = paymentIndex % 2 === 0;
       const isExternalAddress = Number(segments[3]) === 0;
-      const isStakingAddress = paymentIndex === 0 && stakeIndex > 0;
+      const isStakeAddress = paymentIndex === 0 && stakeIndex > 0;
 
       return Promise.resolve({
         pageResults: new Array<Cardano.HydratedTx>(),
-        totalResultCount: !isStakingAddress && isExternalAddress && isPaymentEven && paymentIndex < 100 ? 1 : 0
+        totalResultCount: !isStakeAddress && isExternalAddress && isPaymentEven && paymentIndex < 100 ? 1 : 0
       });
     }
 

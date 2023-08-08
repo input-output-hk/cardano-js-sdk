@@ -78,12 +78,12 @@ const getSpentFromRewardAccount = (rewardAccount: Cardano.RewardAccount, inputs:
     .filter((utxo) => {
       const address = Cardano.Address.fromString(utxo[0].address)?.asBase();
 
-      // Address may not have staking credential.
+      // Address may not have stake credential.
       if (!address) return false;
 
       return (
         (Cardano.RewardAccount.toHash(rewardAccount) as unknown as Crypto.Hash28ByteBase16) ===
-        address.getStakingCredential().hash
+        address.getStakeCredential().hash
       );
     })
     .map((utxo) => utxo[1].value.coins)
@@ -100,12 +100,12 @@ const getDepositToRewardAccount = (rewardAccount: Cardano.RewardAccount, outputs
     .filter((txOut) => {
       const address = Cardano.Address.fromString(txOut.address)?.asBase();
 
-      // Address may not have staking credential.
+      // Address may not have stake credential.
       if (!address) return false;
 
       return (
         (Cardano.RewardAccount.toHash(rewardAccount) as unknown as Crypto.Hash28ByteBase16) ===
-        address.getStakingCredential().hash
+        address.getStakeCredential().hash
       );
     })
     .map((txOut) => txOut.value.coins)

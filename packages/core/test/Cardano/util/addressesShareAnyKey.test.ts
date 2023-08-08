@@ -95,7 +95,7 @@ describe('addressesShareAnyKey', () => {
     ).toBe(true);
   });
 
-  it('returns true when addresses have the same staking credential key hash', () => {
+  it('returns true when addresses have the same stake credential key hash', () => {
     const addr1 = Cardano.BaseAddress.fromCredentials(
       Cardano.NetworkId.Mainnet,
       {
