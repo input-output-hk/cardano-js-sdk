@@ -247,7 +247,7 @@ services:
         - *provider-server-environment
       SERVICE_NAMES: handle
     ports:
-      - ${HANDLE_API_PORT:-4020}:3000
+      - ${HANDLE_API_PORT:-4011}:3000
 
   rabbitmq:
     <<: *logging
