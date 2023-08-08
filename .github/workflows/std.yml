@@ -107,5 +107,5 @@ jobs:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
       - uses: nixbuild/nix-quick-install-action@v25
-        run: echo hello world
+      - run: echo hello world
 
