@@ -21,16 +21,16 @@ clean() {
 
 getAddressBalance() {
   cardano-cli query utxo \
-      --address "$1" \
-      --testnet-magic 888 > fullUtxo.out
+    --address "$1" \
+    --testnet-magic 888 >fullUtxo.out
 
-  tail -n +3 fullUtxo.out | sort -k3 -nr > balance.out
+  tail -n +3 fullUtxo.out | sort -k3 -nr >balance.out
 
   total_balance=0
   while read -r utxo; do
-      utxo_balance=$(awk '{ print $3 }' <<< "${utxo}")
-      total_balance=$(("$total_balance"+"$utxo_balance"))
-  done < balance.out
+    utxo_balance=$(awk '{ print $3 }' <<<"${utxo}")
+    total_balance=$(("$total_balance" + "$utxo_balance"))
+  done <balance.out
 
   echo ${total_balance}
 }
@@ -72,8 +72,7 @@ cardano-cli transaction submit --testnet-magic 888 --tx-file tx-script.signed
 
 updatedBalance=$(getAddressBalance "$ALWAYS_SUCCEED_ADDR")
 
-while [ "$currentBalance" -eq "$updatedBalance" ]
-do
+while [ "$currentBalance" -eq "$updatedBalance" ]; do
   updatedBalance=$(getAddressBalance "$ALWAYS_SUCCEED_ADDR")
   sleep 1
 done
@@ -106,8 +105,7 @@ cardano-cli transaction submit --testnet-magic 888 --tx-file test-alonzo.signed
 
 updatedBalance=$(getAddressBalance "$ALWAYS_SUCCEED_ADDR")
 
-while [ "$currentBalance" -eq "$updatedBalance" ]
-do
+while [ "$currentBalance" -eq "$updatedBalance" ]; do
   updatedBalance=$(getAddressBalance "$ALWAYS_SUCCEED_ADDR")
   sleep 1
 done

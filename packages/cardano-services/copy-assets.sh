@@ -7,10 +7,10 @@
 cp ./package.json ./dist/cjs/original-package.json
 # cp ./package.json ./dist/esm/original-package.json
 
-for i in `ls ./src` ; do
+for i in $(ls ./src); do
   SRC=./src/$i/openApi.json
 
-  if [ -f $SRC ] ; then
+  if [ -f $SRC ]; then
     cp $SRC ./dist/cjs/$i/openApi.json
     # cp $SRC ./dist/esm/$i/openApi.json
   fi

@@ -1,8 +1,8 @@
 #!/bin/bash
 
-DB=`cat ${POSTGRES_DB_FILE}`
-PASSWORD=`cat ${POSTGRES_PASSWORD_FILE}`
-USER=`cat ${POSTGRES_USER_FILE}`
+DB=$(cat ${POSTGRES_DB_FILE})
+PASSWORD=$(cat ${POSTGRES_PASSWORD_FILE})
+USER=$(cat ${POSTGRES_USER_FILE})
 
 # To init a postgres container db, the initdb.d can be used.
 # Ref: "Initialization scripts" in https://hub.docker.com/_/postgres

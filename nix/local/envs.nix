@@ -5,13 +5,10 @@ let
     treefmt
     alejandra
     shfmt
+    nodejs
     yq
     git-subrepo
-    ;
-  inherit
-    (inputs.nixpkgs.nodePackages)
-    prettier
-    prettier-plugin-toml
+    yarn
     ;
   inherit (inputs.std.lib.dev) mkShell;
   inherit (inputs.std.std.cli) std;
@@ -23,14 +20,10 @@ let
     packages = [
       alejandra
       shfmt
-      prettier
-      prettier-plugin-toml
+      nodejs
       yq
       git-subrepo
     ];
-    devshell.startup.nodejs-setuphook = noDepEntry ''
-      export NODE_PATH=${prettier-plugin-toml}/lib/node_modules:''${NODE_PATH-}
-    '';
   };
 in {
   checks = mkShell {
@@ -39,6 +32,9 @@ in {
   main = mkShell {
     name = "Cardano JS SDK Local Env";
     imports = [formattingModule];
-    commands = [{package = std;}];
+    commands = [
+      {package = std;}
+      {package = yarn;}
+    ];
   };
 }
