@@ -1,23 +1,22 @@
 import * as Trezor from 'trezor-connect';
-import { CardanoKeyConst, GroupedAddress, util } from '@cardano-sdk/key-management';
+import { BIP32Path } from '@cardano-sdk/crypto';
 import { TrezorTxTransformerContext } from '../types';
 import { isNotNil } from '@cardano-sdk/util';
-import concat from 'lodash/concat';
+import { stakeKeyPathFromGroupedAddress } from './keyPaths';
+import isArray from 'lodash/isArray';
 import uniq from 'lodash/uniq';
 
-export const createRewardAccountKeyPath = (knownAddress: GroupedAddress) => [
-  util.harden(CardanoKeyConst.PURPOSE),
-  util.harden(CardanoKeyConst.COIN_TYPE),
-  util.harden(knownAddress.accountIndex),
-  util.STAKE_KEY_DERIVATION_PATH.role,
-  util.STAKE_KEY_DERIVATION_PATH.index
-];
-
 export const mapAdditionalWitnessRequests = (inputs: Trezor.CardanoInput[], context: TrezorTxTransformerContext) => {
-  const paymentKeyPaths = uniq(inputs.map((i) => i.path).filter(isNotNil));
-  const additionalWitnessPaths = concat([], paymentKeyPaths);
+  const paymentKeyPaths = uniq<BIP32Path>(
+    inputs
+      .map((i) => i.path)
+      .filter(isNotNil)
+      .filter(isArray)
+  );
+  const additionalWitnessPaths: BIP32Path[] = [...paymentKeyPaths];
   if (context.knownAddresses.length > 0) {
-    additionalWitnessPaths.push(createRewardAccountKeyPath(context.knownAddresses[0]));
+    const stakeKeyPath = stakeKeyPathFromGroupedAddress(context.knownAddresses[0]);
+    if (stakeKeyPath) additionalWitnessPaths.push(stakeKeyPath);
   }
   return additionalWitnessPaths;
 };
