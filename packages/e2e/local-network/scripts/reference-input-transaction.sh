@@ -21,38 +21,37 @@ clean() {
 
 getAddressBalance() {
   cardano-cli query utxo \
-      --address "$1" \
-      --testnet-magic 888 > fullUtxo.out
+    --address "$1" \
+    --testnet-magic 888 >fullUtxo.out
 
-  tail -n +3 fullUtxo.out | sort -k3 -nr > balance.out
+  tail -n +3 fullUtxo.out | sort -k3 -nr >balance.out
 
   total_balance=0
   while read -r utxo; do
-      utxo_balance=$(awk '{ print $3 }' <<< "${utxo}")
-      total_balance=$(("$total_balance"+"$utxo_balance"))
-  done < balance.out
+    utxo_balance=$(awk '{ print $3 }' <<<"${utxo}")
+    total_balance=$(("$total_balance" + "$utxo_balance"))
+  done <balance.out
 
   echo ${total_balance}
 }
 
 getBiggestUtxo() {
   cardano-cli query utxo \
-      --address "$1" \
-      --testnet-magic 888 > fullUtxo.out
+    --address "$1" \
+    --testnet-magic 888 >fullUtxo.out
 
-  tail -n +3 fullUtxo.out | sort -k3 -nr > balance.out
+  tail -n +3 fullUtxo.out | sort -k3 -nr >balance.out
 
   current_biggest=0
   utxo_id=''
   while read -r utxo; do
-    utxo_balance=$(awk '{ print $3 }' <<< "${utxo}")
+    utxo_balance=$(awk '{ print $3 }' <<<"${utxo}")
 
-    if [[ "$utxo_balance" -ge "$current_biggest" ]];
-    then
+    if [[ $utxo_balance -ge $current_biggest ]]; then
       current_biggest=$utxo_balance
-      utxo_id=$(awk '{printf("%s#%s", $1, $2)}' <<< "${utxo}")
+      utxo_id=$(awk '{printf("%s#%s", $1, $2)}' <<<"${utxo}")
     fi
-  done < balance.out
+  done <balance.out
 
   echo "${utxo_id} ${current_biggest}"
 }
@@ -67,7 +66,7 @@ done
 # LOCK REFERENCE UTXO
 
 genesisAddr=$(cardano-cli address build --payment-verification-key-file network-files/utxo-keys/utxo2.vkey --testnet-magic 888)
-utxo=$(awk '{printf("%s", $1)}' <<< "$(getBiggestUtxo "$genesisAddr")")
+utxo=$(awk '{printf("%s", $1)}' <<<"$(getBiggestUtxo "$genesisAddr")")
 currentBalance=$(getAddressBalance "$REFERENCE_INPUT_ADDR")
 
 echo "Locking reference UTXO..."
@@ -95,8 +94,7 @@ cardano-cli transaction submit --testnet-magic 888 --tx-file tx-script.signed
 
 updatedBalance=$(getAddressBalance "$REFERENCE_INPUT_ADDR")
 
-while [ "$currentBalance" -eq "$updatedBalance" ]
-do
+while [ "$currentBalance" -eq "$updatedBalance" ]; do
   updatedBalance=$(getAddressBalance "$REFERENCE_INPUT_ADDR")
   sleep 1
 done
@@ -105,7 +103,7 @@ echo "Locked"
 # LOCK REFERENCE SCRIPT UTXO
 
 genesisAddr=$(cardano-cli address build --payment-verification-key-file network-files/utxo-keys/utxo2.vkey --testnet-magic 888)
-utxo=$(awk '{printf("%s", $1)}' <<< "$(getBiggestUtxo "$genesisAddr")")
+utxo=$(awk '{printf("%s", $1)}' <<<"$(getBiggestUtxo "$genesisAddr")")
 currentBalance=$(getAddressBalance "$REFERENCE_SCRIPT_ADDR")
 
 echo "Locking reference script UTXO (Multisignature)..."
@@ -130,15 +128,14 @@ cardano-cli transaction submit --testnet-magic 888 --tx-file tx-script.signed
 
 updatedBalance=$(getAddressBalance "$REFERENCE_SCRIPT_ADDR")
 
-while [ "$currentBalance" -eq "$updatedBalance" ]
-do
+while [ "$currentBalance" -eq "$updatedBalance" ]; do
   updatedBalance=$(getAddressBalance "$REFERENCE_SCRIPT_ADDR")
   sleep 1
 done
 echo "Locked"
 
 genesisAddr=$(cardano-cli address build --payment-verification-key-file network-files/utxo-keys/utxo2.vkey --testnet-magic 888)
-utxo=$(awk '{printf("%s", $1)}' <<< "$(getBiggestUtxo "$genesisAddr")")
+utxo=$(awk '{printf("%s", $1)}' <<<"$(getBiggestUtxo "$genesisAddr")")
 currentBalance=$(getAddressBalance "$REFERENCE_SCRIPT_ADDR")
 
 echo "Locking reference script UTXO (Timelock)..."
@@ -163,15 +160,14 @@ cardano-cli transaction submit --testnet-magic 888 --tx-file tx-script.signed
 
 updatedBalance=$(getAddressBalance "$REFERENCE_SCRIPT_ADDR")
 
-while [ "$currentBalance" -eq "$updatedBalance" ]
-do
+while [ "$currentBalance" -eq "$updatedBalance" ]; do
   updatedBalance=$(getAddressBalance "$REFERENCE_SCRIPT_ADDR")
   sleep 1
 done
 echo "Locked"
 
 genesisAddr=$(cardano-cli address build --payment-verification-key-file network-files/utxo-keys/utxo2.vkey --testnet-magic 888)
-utxo=$(awk '{printf("%s", $1)}' <<< "$(getBiggestUtxo "$genesisAddr")")
+utxo=$(awk '{printf("%s", $1)}' <<<"$(getBiggestUtxo "$genesisAddr")")
 currentBalance=$(getAddressBalance "$REFERENCE_SCRIPT_ADDR")
 
 echo "Locking reference script UTXO (Plutus V1)..."
@@ -196,15 +192,14 @@ cardano-cli transaction submit --testnet-magic 888 --tx-file tx-script.signed
 
 updatedBalance=$(getAddressBalance "$REFERENCE_SCRIPT_ADDR")
 
-while [ "$currentBalance" -eq "$updatedBalance" ]
-do
+while [ "$currentBalance" -eq "$updatedBalance" ]; do
   updatedBalance=$(getAddressBalance "$REFERENCE_SCRIPT_ADDR")
   sleep 1
 done
 echo "Locked"
 
 genesisAddr=$(cardano-cli address build --payment-verification-key-file network-files/utxo-keys/utxo2.vkey --testnet-magic 888)
-utxo=$(awk '{printf("%s", $1)}' <<< "$(getBiggestUtxo "$genesisAddr")")
+utxo=$(awk '{printf("%s", $1)}' <<<"$(getBiggestUtxo "$genesisAddr")")
 currentBalance=$(getAddressBalance "$REFERENCE_SCRIPT_ADDR")
 
 echo "Locking reference script UTXO (Plutus V2)..."
@@ -229,8 +224,7 @@ cardano-cli transaction submit --testnet-magic 888 --tx-file tx-script.signed
 
 updatedBalance=$(getAddressBalance "$REFERENCE_SCRIPT_ADDR")
 
-while [ "$currentBalance" -eq "$updatedBalance" ]
-do
+while [ "$currentBalance" -eq "$updatedBalance" ]; do
   updatedBalance=$(getAddressBalance "$REFERENCE_SCRIPT_ADDR")
   sleep 1
 done
@@ -238,7 +232,7 @@ echo "Locked"
 
 # LOCK FUNDS IN SCRIPT
 echo "Locking funds in script..."
-utxo=$(awk '{printf("%s", $1)}' <<< "$(getBiggestUtxo "$genesisAddr")")
+utxo=$(awk '{printf("%s", $1)}' <<<"$(getBiggestUtxo "$genesisAddr")")
 currentBalance=$(getAddressBalance "$REFERENCE_INPUT_SCRIPT_ADDR")
 
 cardano-cli transaction build \
@@ -261,8 +255,7 @@ cardano-cli transaction submit --testnet-magic 888 --tx-file test-babbage.signed
 
 updatedBalance=$(getAddressBalance "$REFERENCE_INPUT_SCRIPT_ADDR")
 
-while [ "$currentBalance" -eq "$updatedBalance" ]
-do
+while [ "$currentBalance" -eq "$updatedBalance" ]; do
   updatedBalance=$(getAddressBalance "$REFERENCE_INPUT_SCRIPT_ADDR")
   sleep 1
 done
@@ -270,10 +263,10 @@ echo "Locked"
 
 # UNLOCK FUNDS
 echo "Unlocking funds from script..."
-utxo=$(awk '{printf("%s", $1)}' <<< "$(getBiggestUtxo "$genesisAddr")")
-utxoVal=$(awk '{printf("%s", $2)}' <<< "$(getBiggestUtxo "$genesisAddr")")
-referenceInputUtxo=$(awk '{printf("%s", $1)}' <<< "$(getBiggestUtxo "$REFERENCE_INPUT_ADDR")")
-scriptUtxo=$(awk '{printf("%s", $1)}' <<< "$(getBiggestUtxo "$REFERENCE_INPUT_SCRIPT_ADDR")")
+utxo=$(awk '{printf("%s", $1)}' <<<"$(getBiggestUtxo "$genesisAddr")")
+utxoVal=$(awk '{printf("%s", $2)}' <<<"$(getBiggestUtxo "$genesisAddr")")
+referenceInputUtxo=$(awk '{printf("%s", $1)}' <<<"$(getBiggestUtxo "$REFERENCE_INPUT_ADDR")")
+scriptUtxo=$(awk '{printf("%s", $1)}' <<<"$(getBiggestUtxo "$REFERENCE_INPUT_SCRIPT_ADDR")")
 currentBalance=$(getAddressBalance "$REFERENCE_INPUT_SCRIPT_ADDR")
 returnCollateralVal=$(("$utxoVal" - 1450000))
 
@@ -303,8 +296,7 @@ cardano-cli transaction submit --testnet-magic 888 --tx-file test-babbage2.signe
 
 updatedBalance=$(getAddressBalance "$REFERENCE_INPUT_SCRIPT_ADDR")
 
-while [ "$currentBalance" -eq "$updatedBalance" ]
-do
+while [ "$currentBalance" -eq "$updatedBalance" ]; do
   updatedBalance=$(getAddressBalance "$REFERENCE_INPUT_SCRIPT_ADDR")
   sleep 1
 done

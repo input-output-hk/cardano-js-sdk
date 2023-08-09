@@ -32,7 +32,7 @@ Supported OS:
 - `maxTxSize`: Maximum transaction size (default 16kB).
 - `initialFunds`: How initial ADA is distributed.
 - `epochLength`: For the epoch duration.
-  
+
 2. `templates/babbage/alonzo-babbage-test-genesis.json`
 
 - `maxTxExUnits`: Maximum ExUnits per transaction.
