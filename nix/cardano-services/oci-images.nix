@@ -20,4 +20,10 @@ in {
     ];
     meta.description = "Minimal Cardano Services OCI Image";
   };
+
+  e2e = std.lib.ops.mkStandardOCI {
+    name = "926093910549.dkr.ecr.us-east-1.amazonaws.com/cardano-services-e2e";
+    operable = cell.operables.e2e;
+    meta.description = "Cardano Services E2E tests";
+  };
 }

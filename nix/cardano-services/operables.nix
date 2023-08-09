@@ -1,6 +1,6 @@
 let
   inherit (inputs) std;
-  inherit (inputs.nixpkgs) lib;
+  inherit (inputs.nixpkgs) lib yarn;
   /*
   Available networks at the time of writing:
 
@@ -24,5 +24,14 @@ in {
       exec $CLI "$@"
     '';
     meta.description = "A transparent (thin) wrapper around the Cardano Services CLI";
+  };
+
+  e2e = std.lib.ops.mkOperable rec {
+    package = cell.packages.cardano-services;
+    runtimeScript = ''
+      cd ${cell.packages.e2e}/libexec/incl
+      exec ${lib.getExe yarn} workspace @cardano-sdk/e2e test:wallet
+    '';
+    meta.description = "Cardano Services E2E tests";
   };
 }
