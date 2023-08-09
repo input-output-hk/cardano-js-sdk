@@ -1,0 +1,4 @@
+# To apply this file locally, run: `git config blame.ignoreRevsFile .git-blame-ignore-revs`
+
+# applied treefmt for the first time
+8f4ceaae82cffe701dd0b5b8a58fefaf416ec1c8
