@@ -5,8 +5,8 @@ import { PaymentAddress } from '../Address/PaymentAddress';
 import { Pointer } from '../Address/PointerAddress';
 
 type PaymentId = { credential: Credential } | { byronRoot: Hash28ByteBase16 };
-type StakingId = { credential: Credential } | { pointer: Pointer };
-type AddressKeyIDs = { paymentId?: PaymentId; stakingId?: StakingId };
+type StakeId = { credential: Credential } | { pointer: Pointer };
+type AddressKeyIDs = { paymentId?: PaymentId; stakeId?: StakeId };
 
 /**
  * Payment ID is either
@@ -31,7 +31,7 @@ const getAddressKeyIDs = (input: Address | PaymentAddress): AddressKeyIDs => {
       const baseAddr = address.asBase()!;
       return {
         paymentId: { credential: baseAddr.getPaymentCredential() },
-        stakingId: { credential: baseAddr.getStakingCredential() }
+        stakeId: { credential: baseAddr.getStakeCredential() }
       };
     }
     case AddressType.Byron:
@@ -50,14 +50,14 @@ const getAddressKeyIDs = (input: Address | PaymentAddress): AddressKeyIDs => {
       const pointerAddr = address.asPointer()!;
       return {
         paymentId: { credential: pointerAddr.getPaymentCredential() },
-        stakingId: { pointer: pointerAddr.getStakePointer() }
+        stakeId: { pointer: pointerAddr.getStakePointer() }
       };
     }
     case AddressType.RewardKey:
     case AddressType.RewardScript: {
       const rewardAddr = address.asReward()!;
       return {
-        stakingId: { credential: rewardAddr.getPaymentCredential() }
+        stakeId: { credential: rewardAddr.getPaymentCredential() }
       };
     }
   }
@@ -74,7 +74,7 @@ const isPaymentIdPresentAndEquals = (id1: PaymentId | undefined, id2: PaymentId 
   return false;
 };
 
-const isStakingIdPresentAndEquals = (id1: StakingId | undefined, id2: StakingId | undefined) => {
+const isStakeIdPresentAndEquals = (id1: StakeId | undefined, id2: StakeId | undefined) => {
   if (!id1 || !id2) return false;
   if ('credential' in id1 && 'credential' in id2) {
     return id1.credential.hash === id2.credential.hash;
@@ -94,7 +94,6 @@ export const addressesShareAnyKey = (address1: PaymentAddress, address2: Payment
   const ids1 = getAddressKeyIDs(address1);
   const ids2 = getAddressKeyIDs(address2);
   return (
-    isPaymentIdPresentAndEquals(ids1.paymentId, ids2.paymentId) ||
-    isStakingIdPresentAndEquals(ids1.stakingId, ids2.stakingId)
+    isPaymentIdPresentAndEquals(ids1.paymentId, ids2.paymentId) || isStakeIdPresentAndEquals(ids1.stakeId, ids2.stakeId)
   );
 };

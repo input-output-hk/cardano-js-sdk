@@ -65,7 +65,7 @@ export type CertIndex = OpaqueNumber<'CertIndex'>;
 export const CertIndex = (value: number): CertIndex => value as unknown as CertIndex;
 
 /**
- * A pointer that indirectly specifies the staking key that should control the stake for the address. It references
+ * A pointer that indirectly specifies the stake key that should control the stake for the address. It references
  * a stake key by a location on the blockchain of the stake key registration certificate.
  */
 export type Pointer = {
@@ -75,7 +75,7 @@ export type Pointer = {
 };
 
 /**
- * A pointer address indirectly specifies the staking key that should control the stake for the address. It references
+ * A pointer address indirectly specifies the stake key that should control the stake for the address. It references
  * a stake key by a stake key pointer, which is a location on the blockchain of the stake key registration certificate
  * for that key.
  */
@@ -103,7 +103,7 @@ export class PointerAddress {
    *
    * @param networkId The Network identifier.
    * @param payment The payment credential.
-   * @param pointer A pointer that indirectly specifies the staking key location on chain.
+   * @param pointer A pointer that indirectly specifies the stake key location on chain.
    */
   static fromCredentials(networkId: NetworkId, payment: Credential, pointer: Pointer): PointerAddress {
     let type = AddressType.PointerKey;
@@ -126,7 +126,7 @@ export class PointerAddress {
   }
 
   /**
-   * The stake credential pointer. This pointer indirectly specifies the staking key that should control
+   * The stake credential pointer. This pointer indirectly specifies the stake key that should control
    * the stake for the address.
    */
   getStakePointer(): Pointer {

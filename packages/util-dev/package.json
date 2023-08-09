@@ -44,6 +44,7 @@
     "test:e2e": "shx echo 'test:e2e' command not implemented yet"
   },
   "devDependencies": {
+    "@cardano-sdk/crypto": "workspace:~",
     "@types/dockerode": "^3.3.8",
     "@types/jest": "^26.0.24",
     "eslint": "^7.32.0",

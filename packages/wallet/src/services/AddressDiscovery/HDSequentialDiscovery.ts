@@ -24,7 +24,7 @@ const addressHasTx = async (address: GroupedAddress, chainHistoryProvider: Chain
 };
 
 /**
- * Search for all base addresses composed with the given payment and staking credentials.
+ * Search for all base addresses composed with the given payment and stake credentials.
  *
  * @param keyAgent The key agent controlling the root key to be used to derive the addresses to be discovered.
  * @param chainHistoryProvider The chain history provider.

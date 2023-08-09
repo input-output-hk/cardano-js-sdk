@@ -5,9 +5,9 @@ import { InvalidArgumentError } from '@cardano-sdk/util';
 import { NetworkId } from '../ChainId';
 
 /**
- * A base address directly specifies the staking key that should control the stake for that address. The staking rights
- * associated with funds held in this address may be exercised by the owner of the staking key. Base addresses can be
- * used in transactions without registering the staking key in advance.
+ * A base address directly specifies the stake key that should control the stake for that address. The staking rights
+ * associated with funds held in this address may be exercised by the owner of the stake key. Base addresses can be
+ * used in transactions without registering the stake key in advance.
  *
  * The stake rights can only be exercised by registering the stake key and delegating to a stake pool. Once the stake
  * key is registered, the stake rights can be exercised for base addresses used in transactions before or after the key
@@ -37,7 +37,7 @@ export class BaseAddress {
    *
    * @param networkId The Network identifier.
    * @param payment The payment credential.
-   * @param stake The staking credential.
+   * @param stake The stake credential.
    */
   static fromCredentials(networkId: NetworkId, payment: Credential, stake: Credential): BaseAddress {
     let type = AddressType.BasePaymentKeyStakeKey;
@@ -62,9 +62,9 @@ export class BaseAddress {
   }
 
   /**
-   * Gets the payment staking part of the base address.
+   * Gets the stake credential part of the base address.
    */
-  getStakingCredential(): Credential {
+  getStakeCredential(): Credential {
     return this.#delegationPart;
   }
 
@@ -131,7 +131,7 @@ export class BaseAddress {
 
     const network = data[0] & 0b0000_1111;
     const paymentCredential = Hash28ByteBase16(Buffer.from(data.slice(1, 29)).toString('hex'));
-    const stakingCredential = Hash28ByteBase16(Buffer.from(data.slice(29, 57)).toString('hex'));
+    const stakeCredential = Hash28ByteBase16(Buffer.from(data.slice(29, 57)).toString('hex'));
 
     const delegationCredType =
       type === AddressType.BasePaymentKeyStakeScript || type === AddressType.BasePaymentScriptStakeScript
@@ -145,7 +145,7 @@ export class BaseAddress {
 
     return new Address({
       delegationPart: {
-        hash: stakingCredential,
+        hash: stakeCredential,
         type: delegationCredType
       },
       networkId: network,

@@ -15,14 +15,14 @@ describe('withStakeKeys', () => {
               __typename: Cardano.CertificateType.StakeKeyRegistration,
               stakeKeyHash: Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')
             },
-            pointer: {} as Mappers.CertificatePointer
+            pointer: {} as Cardano.Pointer
           },
           {
             certificate: {
               __typename: Cardano.CertificateType.StakeKeyDeregistration,
               stakeKeyHash: Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857c')
             },
-            pointer: {} as Mappers.CertificatePointer
+            pointer: {} as Cardano.Pointer
           }
         ],
         eventType: ChainSyncEventType.RollForward
@@ -43,14 +43,14 @@ describe('withStakeKeys', () => {
               __typename: Cardano.CertificateType.StakeKeyRegistration,
               stakeKeyHash: Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')
             },
-            pointer: {} as Mappers.CertificatePointer
+            pointer: {} as Cardano.Pointer
           },
           {
             certificate: {
               __typename: Cardano.CertificateType.StakeKeyDeregistration,
               stakeKeyHash: Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857c')
             },
-            pointer: {} as Mappers.CertificatePointer
+            pointer: {} as Cardano.Pointer
           }
         ],
         eventType: ChainSyncEventType.RollBackward
@@ -71,14 +71,14 @@ describe('withStakeKeys', () => {
               __typename: Cardano.CertificateType.StakeKeyRegistration,
               stakeKeyHash: Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')
             },
-            pointer: {} as Mappers.CertificatePointer
+            pointer: {} as Cardano.Pointer
           },
           {
             certificate: {
               __typename: Cardano.CertificateType.StakeKeyDeregistration,
               stakeKeyHash: Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')
             },
-            pointer: {} as Mappers.CertificatePointer
+            pointer: {} as Cardano.Pointer
           }
         ],
         eventType: ChainSyncEventType.RollForward
@@ -98,14 +98,14 @@ describe('withStakeKeys', () => {
               __typename: Cardano.CertificateType.StakeKeyDeregistration,
               stakeKeyHash: Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')
             },
-            pointer: {} as Mappers.CertificatePointer
+            pointer: {} as Cardano.Pointer
           },
           {
             certificate: {
               __typename: Cardano.CertificateType.StakeKeyRegistration,
               stakeKeyHash: Crypto.Ed25519KeyHashHex('3b62970858d61cf667701c1f34abef41659516b191d7d374e8b0857b')
             },
-            pointer: {} as Mappers.CertificatePointer
+            pointer: {} as Cardano.Pointer
           }
         ],
         eventType: ChainSyncEventType.RollForward

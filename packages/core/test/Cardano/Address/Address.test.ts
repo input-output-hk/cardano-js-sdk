@@ -1,4 +1,4 @@
-import * as cip19TestVectors from './Cip19TestVectors';
+import * as cip19TestVectors from '../../../../util-dev/src/Cip19TestVectors';
 import { ByronAddressType } from '../../../src/Cardano';
 import { Cardano } from '../../../src';
 
@@ -118,7 +118,7 @@ describe('Cardano/Address', () => {
     expect(address.asEnterprise()).toBeUndefined();
 
     expect(baseAddress!.getPaymentCredential()).toEqual(cip19TestVectors.KEY_PAYMENT_CREDENTIAL);
-    expect(baseAddress!.getStakingCredential()).toEqual(cip19TestVectors.KEY_STAKING_CREDENTIAL);
+    expect(baseAddress!.getStakeCredential()).toEqual(cip19TestVectors.KEY_STAKE_CREDENTIAL);
     expect(address.getNetworkId()).toBe(Cardano.NetworkId.Mainnet);
     expect(address.getType()).toBe(Cardano.AddressType.BasePaymentKeyStakeKey);
     expect(address.toBech32()).toBe(cip19TestVectors.basePaymentKeyStakeKey);
@@ -140,7 +140,7 @@ describe('Cardano/Address', () => {
     expect(address.asEnterprise()).toBeUndefined();
 
     expect(baseAddress!.getPaymentCredential()).toEqual(cip19TestVectors.KEY_PAYMENT_CREDENTIAL);
-    expect(baseAddress!.getStakingCredential()).toEqual(cip19TestVectors.KEY_STAKING_CREDENTIAL);
+    expect(baseAddress!.getStakeCredential()).toEqual(cip19TestVectors.KEY_STAKE_CREDENTIAL);
     expect(address.getNetworkId()).toBe(Cardano.NetworkId.Testnet);
     expect(address.getType()).toBe(Cardano.AddressType.BasePaymentKeyStakeKey);
     expect(address.toBech32()).toBe(cip19TestVectors.testnetBasePaymentKeyStakeKey);
@@ -164,7 +164,7 @@ describe('Cardano/Address', () => {
     expect(address.asEnterprise()).toBeUndefined();
 
     expect(baseAddress!.getPaymentCredential()).toEqual(cip19TestVectors.SCRIPT_CREDENTIAL);
-    expect(baseAddress!.getStakingCredential()).toEqual(cip19TestVectors.KEY_STAKING_CREDENTIAL);
+    expect(baseAddress!.getStakeCredential()).toEqual(cip19TestVectors.KEY_STAKE_CREDENTIAL);
     expect(address.getNetworkId()).toBe(Cardano.NetworkId.Mainnet);
     expect(address.getType()).toBe(Cardano.AddressType.BasePaymentScriptStakeKey);
     expect(address.toBech32()).toBe(cip19TestVectors.basePaymentScriptStakeKey);
@@ -186,7 +186,7 @@ describe('Cardano/Address', () => {
     expect(address.asEnterprise()).toBeUndefined();
 
     expect(baseAddress!.getPaymentCredential()).toEqual(cip19TestVectors.SCRIPT_CREDENTIAL);
-    expect(baseAddress!.getStakingCredential()).toEqual(cip19TestVectors.KEY_STAKING_CREDENTIAL);
+    expect(baseAddress!.getStakeCredential()).toEqual(cip19TestVectors.KEY_STAKE_CREDENTIAL);
     expect(address.getNetworkId()).toBe(Cardano.NetworkId.Testnet);
     expect(address.getType()).toBe(Cardano.AddressType.BasePaymentScriptStakeKey);
     expect(address.toBech32()).toBe(cip19TestVectors.testnetBasePaymentScriptStakeKey);
@@ -210,7 +210,7 @@ describe('Cardano/Address', () => {
     expect(address.asEnterprise()).toBeUndefined();
 
     expect(baseAddress!.getPaymentCredential()).toEqual(cip19TestVectors.KEY_PAYMENT_CREDENTIAL);
-    expect(baseAddress!.getStakingCredential()).toEqual(cip19TestVectors.SCRIPT_CREDENTIAL);
+    expect(baseAddress!.getStakeCredential()).toEqual(cip19TestVectors.SCRIPT_CREDENTIAL);
     expect(address.getNetworkId()).toBe(Cardano.NetworkId.Mainnet);
     expect(address.getType()).toBe(Cardano.AddressType.BasePaymentKeyStakeScript);
     expect(address.toBech32()).toBe(cip19TestVectors.basePaymentKeyStakeScript);
@@ -232,7 +232,7 @@ describe('Cardano/Address', () => {
     expect(address.asEnterprise()).toBeUndefined();
 
     expect(baseAddress!.getPaymentCredential()).toEqual(cip19TestVectors.KEY_PAYMENT_CREDENTIAL);
-    expect(baseAddress!.getStakingCredential()).toEqual(cip19TestVectors.SCRIPT_CREDENTIAL);
+    expect(baseAddress!.getStakeCredential()).toEqual(cip19TestVectors.SCRIPT_CREDENTIAL);
     expect(address.getNetworkId()).toBe(Cardano.NetworkId.Testnet);
     expect(address.getType()).toBe(Cardano.AddressType.BasePaymentKeyStakeScript);
     expect(address.toBech32()).toBe(cip19TestVectors.testnetBasePaymentKeyStakeScript);
@@ -256,7 +256,7 @@ describe('Cardano/Address', () => {
     expect(address.asEnterprise()).toBeUndefined();
 
     expect(baseAddress!.getPaymentCredential()).toEqual(cip19TestVectors.SCRIPT_CREDENTIAL);
-    expect(baseAddress!.getStakingCredential()).toEqual(cip19TestVectors.SCRIPT_CREDENTIAL);
+    expect(baseAddress!.getStakeCredential()).toEqual(cip19TestVectors.SCRIPT_CREDENTIAL);
     expect(address.getNetworkId()).toBe(Cardano.NetworkId.Mainnet);
     expect(address.getType()).toBe(Cardano.AddressType.BasePaymentScriptStakeScript);
     expect(address.toBech32()).toBe(cip19TestVectors.basePaymentScriptStakeScript);
@@ -278,7 +278,7 @@ describe('Cardano/Address', () => {
     expect(address.asEnterprise()).toBeUndefined();
 
     expect(baseAddress!.getPaymentCredential()).toEqual(cip19TestVectors.SCRIPT_CREDENTIAL);
-    expect(baseAddress!.getStakingCredential()).toEqual(cip19TestVectors.SCRIPT_CREDENTIAL);
+    expect(baseAddress!.getStakeCredential()).toEqual(cip19TestVectors.SCRIPT_CREDENTIAL);
     expect(address.getNetworkId()).toBe(Cardano.NetworkId.Testnet);
     expect(address.getType()).toBe(Cardano.AddressType.BasePaymentScriptStakeScript);
     expect(address.toBech32()).toBe(cip19TestVectors.testnetBasePaymentScriptStakeScript);
@@ -509,7 +509,7 @@ describe('Cardano/Address', () => {
     expect(address.asBase()).toBeUndefined();
     expect(address.asPointer()).toBeUndefined();
 
-    expect(reward!.getPaymentCredential()).toEqual(cip19TestVectors.KEY_STAKING_CREDENTIAL);
+    expect(reward!.getPaymentCredential()).toEqual(cip19TestVectors.KEY_STAKE_CREDENTIAL);
     expect(address.getNetworkId()).toBe(Cardano.NetworkId.Mainnet);
     expect(address.getType()).toBe(Cardano.AddressType.RewardKey);
     expect(address.toBech32()).toBe(cip19TestVectors.rewardKey);
@@ -528,7 +528,7 @@ describe('Cardano/Address', () => {
     expect(address.asBase()).toBeUndefined();
     expect(address.asPointer()).toBeUndefined();
 
-    expect(reward!.getPaymentCredential()).toEqual(cip19TestVectors.KEY_STAKING_CREDENTIAL);
+    expect(reward!.getPaymentCredential()).toEqual(cip19TestVectors.KEY_STAKE_CREDENTIAL);
     expect(address.getNetworkId()).toBe(Cardano.NetworkId.Testnet);
     expect(address.getType()).toBe(Cardano.AddressType.RewardKey);
     expect(address.toBech32()).toBe(cip19TestVectors.testnetRewardKey);

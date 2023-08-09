@@ -10,5 +10,8 @@
     {
       "path": "../../crypto/src"
     }
-  ]
+  ],
+  "include": [
+    "../../util-dev/src/Cip19TestVectors.ts",
+  ],
 }

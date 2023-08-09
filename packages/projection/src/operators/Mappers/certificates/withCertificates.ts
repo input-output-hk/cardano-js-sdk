@@ -2,14 +2,8 @@ import { Cardano } from '@cardano-sdk/core';
 import { WithBlock } from '../../../types';
 import { unifiedProjectorOperator } from '../../utils';
 
-export interface CertificatePointer {
-  slot: Cardano.Slot;
-  txIndex: number;
-  certIndex: number;
-}
-
 export interface OnChainCertificate {
-  pointer: CertificatePointer;
+  pointer: Cardano.Pointer;
   certificate: Cardano.Certificate;
 }
 
@@ -29,9 +23,9 @@ const blockCertificates = ({
       certificates.map((certificate, certIndex) => ({
         certificate,
         pointer: {
-          certIndex,
-          slot,
-          txIndex
+          certIndex: Cardano.CertIndex(certIndex),
+          slot: Cardano.Slot(slot),
+          txIndex: Cardano.TxIndex(txIndex)
         }
       }))
     );
