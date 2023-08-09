@@ -3,7 +3,7 @@
   "version": "0.17.1",
   "description": "End to end tests for the cardano-js-sdk packages.",
   "engines": {
-    "node": ">=16.0"
+    "node": ">=16.20.1"
   },
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
