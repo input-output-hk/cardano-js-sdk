@@ -1,10 +1,10 @@
 /* eslint-disable no-use-before-define */
+import * as KeyManagement from '@cardano-sdk/key-management';
 import {
   BackgroundServices,
   UserPromptService,
   adaPriceProperties,
   disconnectPortTestObjProperties,
-  env,
   logger
 } from './util';
 import {
@@ -15,9 +15,10 @@ import {
   exposeApi
 } from '@cardano-sdk/web-extension';
 import { adaPriceServiceChannel, getObservableWalletName, userPromptServiceChannel, walletName } from './const';
-import { bip32Ed25519Factory, keyManagementFactory } from '../../../src';
 
-import { Cardano } from '@cardano-sdk/core';
+import { CML, Cardano } from '@cardano-sdk/core';
+import { CmlBip32Ed25519 } from '@cardano-sdk/crypto';
+import { LedgerKeyAgent } from '@cardano-sdk/hardware-ledger';
 import { combineLatest, firstValueFrom, of } from 'rxjs';
 import { runtime } from 'webextension-polyfill';
 import { setupWallet } from '@cardano-sdk/wallet';
@@ -203,24 +204,26 @@ const createWallet = async (accountIndex: number) => {
 
   // setupWallet call is required to provide context (InputResolver) to the key agent
   const { keyAgent } = await setupWallet({
+    bip32Ed25519: new CmlBip32Ed25519(CML),
     createKeyAgent: async (dependencies) => {
-      const deviceConnection = await KeyManagement.LedgerKeyAgent.establishDeviceConnection(
-        KeyManagement.CommunicationType.Web
-      );
+      const deviceConnection = await LedgerKeyAgent.establishDeviceConnection(KeyManagement.CommunicationType.Web);
       return KeyManagement.util.createAsyncKeyAgent(
-        await KeyManagement.LedgerKeyAgent.createWithDevice(
+        await LedgerKeyAgent.createWithDevice(
           {
             accountIndex: 0,
+            chainId: {
+              networkId: 0,
+              networkMagic: 1
+            },
             communicationType: KeyManagement.CommunicationType.Web,
-            deviceConnection,
-            networkId: 0,
-            protocolMagic: 764_824_073
+            deviceConnection
           },
-          logger
+          dependencies
         )
       );
     },
-    createWallet: async () => wallet
+    createWallet: async () => wallet,
+    logger
   });
 
   await walletManager.destroy();
