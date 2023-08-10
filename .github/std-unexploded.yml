@@ -74,7 +74,7 @@ jobs:
           user_name: ${{ env.DISCOVERY_USER_NAME }}
           ssh_known_hosts_entry: ${{ env.DISCOVERY_KNOWN_HOSTS_ENTRY }}
       - uses: divnix/std-action/run@main
-        with: {ffBuildInstructions: true}
+        with: {ffBuildInstructions: true, remoteStore: "ssh-ng://eu.nixbuild.net"}
 
   images:
     <<: *job
@@ -104,5 +104,5 @@ jobs:
           user_name: ${{ env.DISCOVERY_USER_NAME }}
           ssh_known_hosts_entry: ${{ env.DISCOVERY_KNOWN_HOSTS_ENTRY }}
       - uses: divnix/std-action/run@main
-        with: {ffBuildInstructions: true}
+        with: {ffBuildInstructions: true, remoteStore: "ssh-ng://eu.nixbuild.net"}
 

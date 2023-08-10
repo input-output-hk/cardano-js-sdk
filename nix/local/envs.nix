@@ -5,7 +5,7 @@ let
     treefmt
     alejandra
     shfmt
-    yq
+    yq-go
     git-subrepo
     ;
   inherit
@@ -25,8 +25,7 @@ let
       shfmt
       prettier
       prettier-plugin-toml
-      yq
-      git-subrepo
+      yq-go
     ];
     devshell.startup.nodejs-setuphook = noDepEntry ''
       export NODE_PATH=${prettier-plugin-toml}/lib/node_modules:''${NODE_PATH-}
@@ -40,5 +39,6 @@ in {
     name = "Cardano JS SDK Local Env";
     imports = [formattingModule];
     commands = [{package = std;}];
+    packages = [git-subrepo];
   };
 }
