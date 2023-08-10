@@ -1,5 +1,5 @@
 import { Assets } from '../../types';
-import { Cardano, EpochRewards, EraSummary } from '@cardano-sdk/core';
+import { Cardano, EraSummary, Reward } from '@cardano-sdk/core';
 import { EMPTY, combineLatest, map } from 'rxjs';
 import { GroupedAddress } from '@cardano-sdk/key-management';
 import { InMemoryCollectionStore } from './InMemoryCollectionStore';
@@ -22,7 +22,7 @@ export class InMemoryTransactionsStore extends InMemoryCollectionStore<Cardano.H
 export class InMemoryUtxoStore extends InMemoryCollectionStore<Cardano.Utxo> {}
 export class InMemoryUnspendableUtxoStore extends InMemoryCollectionStore<Cardano.Utxo> {}
 
-export class InMemoryRewardsHistoryStore extends InMemoryKeyValueStore<Cardano.RewardAccount, EpochRewards[]> {}
+export class InMemoryRewardsHistoryStore extends InMemoryKeyValueStore<Cardano.RewardAccount, Reward[]> {}
 export class InMemoryStakePoolsStore extends InMemoryKeyValueStore<Cardano.PoolId, Cardano.StakePool> {}
 export class InMemoryRewardsBalancesStore extends InMemoryKeyValueStore<Cardano.RewardAccount, Cardano.Lovelace> {}
 

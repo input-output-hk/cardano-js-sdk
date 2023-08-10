@@ -1,5 +1,5 @@
 import { BigIntMath, isNotNil } from '@cardano-sdk/util';
-import { Cardano, EpochRewards, createTxInspector, signedCertificatesInspector } from '@cardano-sdk/core';
+import { Cardano, Reward, createTxInspector, signedCertificatesInspector } from '@cardano-sdk/core';
 import { KeyValueStore } from '../../persistence';
 import { Logger } from 'ts-log';
 import { Observable, concat, distinctUntilChanged, map, of, switchMap, tap } from 'rxjs';
@@ -10,14 +10,14 @@ import { TxWithEpoch } from './types';
 import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import first from 'lodash/first';
 import flatten from 'lodash/flatten';
-import groupBy from 'lodash/groupBy';
+import sortBy from 'lodash/sortBy';
 
 const DELEGATION_EPOCHS_AHEAD_COUNT = 2;
 
 export const calcFirstDelegationEpoch = (epoch: Cardano.EpochNo): number => epoch + DELEGATION_EPOCHS_AHEAD_COUNT;
 
-const sumRewards = (arrayOfRewards: EpochRewards[]) => BigIntMath.sum(arrayOfRewards.map(({ rewards }) => rewards));
-const avgReward = (arrayOfRewards: EpochRewards[]) => sumRewards(arrayOfRewards) / BigInt(arrayOfRewards.length);
+const sumRewards = (arrayOfRewards: Reward[]) => BigIntMath.sum(arrayOfRewards.map(({ rewards }) => rewards));
+const avgReward = (arrayOfRewards: Reward[]) => sumRewards(arrayOfRewards) / BigInt(arrayOfRewards.length);
 
 export const createRewardsHistoryProvider =
   (rewardsProvider: TrackedRewardsProvider, retryBackoffConfig: RetryBackoffConfig) =>
@@ -25,7 +25,7 @@ export const createRewardsHistoryProvider =
     rewardAccounts: Cardano.RewardAccount[],
     lowerBound: Cardano.EpochNo | null,
     onFatalError?: (value: unknown) => void
-  ): Observable<Map<Cardano.RewardAccount, EpochRewards[]>> => {
+  ): Observable<Map<Cardano.RewardAccount, Reward[]>> => {
     if (lowerBound) {
       return coldObservableProvider({
         onFatalError,
@@ -63,7 +63,7 @@ export const createRewardsHistoryTracker = (
   transactions$: Observable<TxWithEpoch[]>,
   rewardAccounts$: Observable<Cardano.RewardAccount[]>,
   rewardsHistoryProvider: RewardsHistoryProvider,
-  rewardsHistoryStore: KeyValueStore<Cardano.RewardAccount, EpochRewards[]>,
+  rewardsHistoryStore: KeyValueStore<Cardano.RewardAccount, Reward[]>,
   logger: Logger,
   onFatalError?: (value: unknown) => void
   // eslint-disable-next-line max-params
@@ -90,8 +90,8 @@ export const createRewardsHistoryTracker = (
     )
     .pipe(
       map((rewardsByAccount) => {
-        const allRewards = flatten([...rewardsByAccount.values()]);
-        if (allRewards.length === 0) {
+        const all = sortBy(flatten([...rewardsByAccount.values()]), 'epoch');
+        if (all.length === 0) {
           logger.debug('No rewards found');
           return {
             all: [],
@@ -100,19 +100,12 @@ export const createRewardsHistoryTracker = (
             lifetimeRewards: 0n
           } as RewardsHistory;
         }
-        const rewardsByEpoch = groupBy(allRewards, ({ epoch }) => epoch);
-        const epochs = Object.keys(rewardsByEpoch)
-          .map((epoch) => Number(epoch))
-          .sort();
-        const all = epochs.map((epoch) => ({
-          epoch: Cardano.EpochNo(epoch),
-          rewards: sumRewards(rewardsByEpoch[epoch])
-        }));
+
         const rewardsHistory: RewardsHistory = {
           all,
-          avgReward: avgReward(allRewards),
+          avgReward: avgReward(all),
           lastReward: all[all.length - 1],
-          lifetimeRewards: sumRewards(allRewards)
+          lifetimeRewards: sumRewards(all)
         };
         logger.debug(
           `Rewards between epochs ${rewardsHistory.all[0].epoch} and ${

@@ -1,4 +1,4 @@
-import { Cardano, EpochRewards } from '@cardano-sdk/core';
+import { Cardano, Reward } from '@cardano-sdk/core';
 import { healthCheckResponseWithState } from '../util';
 import { logger } from '@cardano-sdk/util-dev';
 import { rewardsHttpProvider } from '../../src';
@@ -43,7 +43,7 @@ describe('rewardsHttpProvider', () => {
     expect(response).toEqual(expectedResponse);
   });
   test('rewardsHistory doesnt throw', async () => {
-    const expectedResponse = toSerializableObject(new Map<Cardano.RewardAccount, EpochRewards[]>());
+    const expectedResponse = toSerializableObject(new Map<Cardano.RewardAccount, Reward[]>());
     axiosMock.onPost().replyOnce(200, expectedResponse);
     const provider = rewardsHttpProvider(config);
     const response = toSerializableObject(
