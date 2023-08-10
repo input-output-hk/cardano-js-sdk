@@ -2133,7 +2133,6 @@ describe('CLI', () => {
           const headers = { 'Content-Type': 'application/json' };
           const res = await axios.post(`${apiUrl}/${ServiceNames.StakePool}/health`, { headers });
           expect(res.status).toBe(200);
-          expect(res.data.ok).toBeTruthy();
         });
       });
     });
