@@ -311,15 +311,16 @@
         "yants": "yants"
       },
       "locked": {
-        "lastModified": 1688162727,
-        "narHash": "sha256-FOWPJ4RBnQXL7egQfkNXlBO/Js7Mbq7hULmoR4QE2xY=",
+        "lastModified": 1691689766,
+        "narHash": "sha256-5ry5gA1Np+4S5ehS/Vkeld5x3FN3ZIODaE06MJ/zPeA=",
         "owner": "divnix",
         "repo": "std",
-        "rev": "fb34532b5a72f99f9b1f397adb5e18f0fb255d80",
+        "rev": "a545db2a0add673009b12a8763d293e1a8e280fc",
         "type": "github"
       },
       "original": {
         "owner": "divnix",
+        "ref": "implement-kustomization-for-kubectl-blocktype",
         "repo": "std",
         "type": "github"
       }

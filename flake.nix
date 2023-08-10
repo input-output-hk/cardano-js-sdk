@@ -7,7 +7,7 @@
     n2c.inputs.nixpkgs.follows = "nixpkgs";
 
     std = {
-      url = "github:divnix/std";
+      url = "github:divnix/std/implement-kustomization-for-kubectl-blocktype";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.n2c.follows = "n2c";
       inputs.devshell.follows = "devshell";
