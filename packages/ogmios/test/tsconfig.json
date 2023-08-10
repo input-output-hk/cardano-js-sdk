@@ -3,6 +3,7 @@
   "compilerOptions": {
     "baseUrl": "."
   },
+  "include": ["./**/*.ts"],
   "references": [
     {
       "path": "../../core/src"
