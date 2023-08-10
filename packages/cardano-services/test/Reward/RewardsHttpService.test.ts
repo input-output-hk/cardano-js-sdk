@@ -246,7 +246,7 @@ describe('RewardsHttpService', () => {
             rewardAccounts: [rewardAccount]
           });
           expect(response.get(rewardAccount)!.length).toBeGreaterThan(0);
-          expect(response.get(rewardAccount)![0]).toMatchShapeOf({ epoch: '0', rewards: 0n });
+          expect(response.get(rewardAccount)![0]).toMatchShapeOf({ epoch: '0', poolId: 'pool_id', rewards: 0n });
         });
 
         it('returns no rewards address history for empty reward accounts', async () => {
@@ -277,7 +277,7 @@ describe('RewardsHttpService', () => {
 
           expect(lowestEpoch).toBeGreaterThanOrEqual(1);
           expect(highestEpoch).toBeLessThanOrEqual(2);
-          expect(response.get(rewardAccount)![0]).toMatchShapeOf({ epoch: '0', rewards: 0n });
+          expect(response.get(rewardAccount)![0]).toMatchShapeOf({ epoch: '0', poolId: 'pool_id', rewards: 0n });
         });
 
         it('returns rewards address history of the epochs filtered', async () => {
@@ -296,7 +296,7 @@ describe('RewardsHttpService', () => {
           }
 
           expect(lowestEpoch).toBeGreaterThanOrEqual(1);
-          expect(response.get(rewardAccount)![0]).toMatchShapeOf({ epoch: '0', rewards: 0n });
+          expect(response.get(rewardAccount)![0]).toMatchShapeOf({ epoch: '0', poolId: 'pool_id', rewards: 0n });
         });
 
         it('returns rewards address history some of the epochs filter', async () => {
@@ -315,7 +315,7 @@ describe('RewardsHttpService', () => {
           }
 
           expect(highestEpoch).toBeLessThanOrEqual(10);
-          expect(response.get(rewardAccount)![0]).toMatchShapeOf({ epoch: '0', rewards: 0n });
+          expect(response.get(rewardAccount)![0]).toMatchShapeOf({ epoch: '0', poolId: 'pool_id', rewards: 0n });
         });
       });
     });

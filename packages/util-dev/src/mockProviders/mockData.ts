@@ -1,5 +1,5 @@
 import * as AssetId from '../assetId';
-import { Cardano, EpochRewards, Seconds } from '@cardano-sdk/core';
+import { Cardano, Reward, Seconds } from '@cardano-sdk/core';
 
 export const rewardAccount = Cardano.RewardAccount('stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d');
 export const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
@@ -42,14 +42,16 @@ export const protocolParameters = {
 export const epochRewards = [
   {
     epoch: Cardano.EpochNo(currentEpoch.number - 3),
+    poolId: Cardano.PoolId('pool1h8yl5mkyrfmfls2x9fu9mls3ry6egnw4q6efg34xr37zc243gkf'),
     rewards: 10_000n
   },
   {
     epoch: Cardano.EpochNo(currentEpoch.number - 2),
+    poolId: Cardano.PoolId('pool1h8yl5mkyrfmfls2x9fu9mls3ry6egnw4q6efg34xr37zc243gkf'),
     rewards: 11_000n
   }
 ];
-export const rewardsHistory: Map<Cardano.RewardAccount, EpochRewards[]> = new Map([[rewardAccount, epochRewards]]);
+export const rewardsHistory: Map<Cardano.RewardAccount, Reward[]> = new Map([[rewardAccount, epochRewards]]);
 
 export const genesisParameters: Cardano.CompactGenesis = {
   activeSlotsCoefficient: 0.05,
@@ -65,12 +67,13 @@ export const genesisParameters: Cardano.CompactGenesis = {
   updateQuorum: 5
 };
 
-export const rewardsHistory2 = new Map<Cardano.RewardAccount, EpochRewards[]>([
+export const rewardsHistory2 = new Map<Cardano.RewardAccount, Reward[]>([
   [
     rewardAccount,
     [
       {
         epoch: Cardano.EpochNo(currentEpoch.number - 4),
+        poolId: Cardano.PoolId('pool1h8yl5mkyrfmfls2x9fu9mls3ry6egnw4q6efg34xr37zc243gkf'),
         rewards: 10_000n
       },
       ...epochRewards

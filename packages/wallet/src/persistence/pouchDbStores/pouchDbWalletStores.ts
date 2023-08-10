@@ -1,5 +1,5 @@
 import { Assets } from '../../types';
-import { Cardano, EpochRewards, EraSummary } from '@cardano-sdk/core';
+import { Cardano, EraSummary, Reward } from '@cardano-sdk/core';
 import { CreatePouchDbStoresDependencies } from './types';
 import { EMPTY, combineLatest, map } from 'rxjs';
 import { GroupedAddress } from '@cardano-sdk/key-management';
@@ -22,7 +22,7 @@ export class PouchDbVolatileTransactionsStore extends PouchDbDocumentStore<Outgo
 export class PouchDbTransactionsStore extends PouchDbCollectionStore<Cardano.HydratedTx> {}
 export class PouchDbUtxoStore extends PouchDbCollectionStore<Cardano.Utxo> {}
 
-export class PouchDbRewardsHistoryStore extends PouchDbKeyValueStore<Cardano.RewardAccount, EpochRewards[]> {}
+export class PouchDbRewardsHistoryStore extends PouchDbKeyValueStore<Cardano.RewardAccount, Reward[]> {}
 export class PouchDbStakePoolsStore extends PouchDbKeyValueStore<Cardano.PoolId, Cardano.StakePool> {}
 export class PouchDbRewardsBalancesStore extends PouchDbKeyValueStore<Cardano.RewardAccount, Cardano.Lovelace> {}
 
