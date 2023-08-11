@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.15.4...@cardano-sdk/core@0.16.0) (2023-08-11)
+
+### ⚠ BREAKING CHANGES
+
+* EpochRewards renamed to Reward
+- The pool the stake address was delegated to when the reward is earned is now
+included in the EpochRewards (Will be null for payments from the treasury or the reserves)
+- Reward no longer coalesce rewards from the same epoch
+* rename AddressEntity.stakingCredentialHash -> stakeCredentialHash
+- rename BaseAddress.getStakingCredential -> getStakeCredential
+* the serialization classes in Core package are now exported under the alias Serialization
+
+### Features
+
+* **core:** added plutus and native scripts serialization classes ([4ee0329](https://github.com/input-output-hk/cardano-js-sdk/commit/4ee03298e091d514bd20ab4f493f80029d4f13f5))
+* epoch rewards now includes the pool id of the pool that generated the reward ([96fd72b](https://github.com/input-output-hk/cardano-js-sdk/commit/96fd72bba7b087a74eb2080f0cc6ed7c1c2a7329))
+* **util-dev:** add cip19TestVectors ([0d3dc02](https://github.com/input-output-hk/cardano-js-sdk/commit/0d3dc021a96410655bb7c5113735868a16e20e1b))
+
+### Code Refactoring
+
+* rename/replace occurences of 'staking' with 'stake' where appropriate ([05fc4c4](https://github.com/input-output-hk/cardano-js-sdk/commit/05fc4c4d83137eb3137583ca0bb443825eac1445))
+* the serialization classes in Core package are now exported under the alias Serialization ([06f78bb](https://github.com/input-output-hk/cardano-js-sdk/commit/06f78bb98943c306572c32f5817425ef1ff6fc51))
+
 ## [0.15.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.15.3...@cardano-sdk/core@0.15.4) (2023-07-31)
 
 ### Features

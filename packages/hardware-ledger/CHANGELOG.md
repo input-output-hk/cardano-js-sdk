@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.2.17...@cardano-sdk/hardware-ledger@0.3.0) (2023-08-11)
+
+### ⚠ BREAKING CHANGES
+
+* rename AddressEntity.stakingCredentialHash -> stakeCredentialHash
+- rename BaseAddress.getStakingCredential -> getStakeCredential
+* the serialization classes in Core package are now exported under the alias Serialization
+
+### Code Refactoring
+
+* rename/replace occurences of 'staking' with 'stake' where appropriate ([05fc4c4](https://github.com/input-output-hk/cardano-js-sdk/commit/05fc4c4d83137eb3137583ca0bb443825eac1445))
+* the serialization classes in Core package are now exported under the alias Serialization ([06f78bb](https://github.com/input-output-hk/cardano-js-sdk/commit/06f78bb98943c306572c32f5817425ef1ff6fc51))
+
 ## [0.2.17](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.2.16...@cardano-sdk/hardware-ledger@0.2.17) (2023-07-31)
 
 **Note:** Version bump only for package @cardano-sdk/hardware-ledger

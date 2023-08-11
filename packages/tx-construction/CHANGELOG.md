@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.9.4...@cardano-sdk/tx-construction@0.10.0) (2023-08-11)
+
+### ⚠ BREAKING CHANGES
+
+* the serialization classes in Core package are now exported under the alias Serialization
+
+### Code Refactoring
+
+* the serialization classes in Core package are now exported under the alias Serialization ([06f78bb](https://github.com/input-output-hk/cardano-js-sdk/commit/06f78bb98943c306572c32f5817425ef1ff6fc51))
+
 ## [0.9.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.9.3...@cardano-sdk/tx-construction@0.9.4) (2023-07-31)
 
 **Note:** Version bump only for package @cardano-sdk/tx-construction

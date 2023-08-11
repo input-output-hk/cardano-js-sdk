@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.10](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/crypto@0.1.9...@cardano-sdk/crypto@0.1.10) (2023-08-11)
+
+### Features
+
+* **crypto:** add Hash28ByteBase16.fromEd25519KeyHashHex ([baf45d6](https://github.com/input-output-hk/cardano-js-sdk/commit/baf45d625c7a8eb5b484140c997f9dcb0649beea))
+
 ## [0.1.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/crypto@0.1.8...@cardano-sdk/crypto@0.1.9) (2023-07-04)
 
 **Note:** Version bump only for package @cardano-sdk/crypto

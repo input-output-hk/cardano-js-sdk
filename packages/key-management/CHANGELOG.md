@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.8.2...@cardano-sdk/key-management@0.9.0) (2023-08-11)
+
+### ⚠ BREAKING CHANGES
+
+* rename AddressEntity.stakingCredentialHash -> stakeCredentialHash
+- rename BaseAddress.getStakingCredential -> getStakeCredential
+* **key-management:** communicationType param is the required param for all TrezorKeyAgent methods.
+By defining communicationType you are able to communicate with proper trezor web or node package
+
+### Miscellaneous Chores
+
+* **key-management:** replace legacy trezor-connect package with dedicated node and web packages ([906c41e](https://github.com/input-output-hk/cardano-js-sdk/commit/906c41e0ebae6608290734d674d5aa08242adcd9))
+
+### Code Refactoring
+
+* rename/replace occurences of 'staking' with 'stake' where appropriate ([05fc4c4](https://github.com/input-output-hk/cardano-js-sdk/commit/05fc4c4d83137eb3137583ca0bb443825eac1445))
+
 ## [0.8.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.8.1...@cardano-sdk/key-management@0.8.2) (2023-07-31)
 
 **Note:** Version bump only for package @cardano-sdk/key-management

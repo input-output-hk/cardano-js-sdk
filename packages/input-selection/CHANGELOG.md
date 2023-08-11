@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.11.4...@cardano-sdk/input-selection@0.11.5) (2023-08-11)
+
+**Note:** Version bump only for package @cardano-sdk/input-selection
+
 ## [0.11.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.11.3...@cardano-sdk/input-selection@0.11.4) (2023-07-31)
 
 **Note:** Version bump only for package @cardano-sdk/input-selection

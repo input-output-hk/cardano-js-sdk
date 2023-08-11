@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.18.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.17.1...@cardano-sdk/e2e@0.18.0) (2023-08-11)
+
+### ⚠ BREAKING CHANGES
+
+* rename AddressEntity.stakingCredentialHash -> stakeCredentialHash
+- rename BaseAddress.getStakingCredential -> getStakeCredential
+* **wallet:** add optional callback for getCollateral
+
+### Features
+
+* **wallet:** add optional callback for getCollateral ([9c5ce22](https://github.com/input-output-hk/cardano-js-sdk/commit/9c5ce22da5b842c7233f6e5ee0351d6b8c98d991))
+
+### Code Refactoring
+
+* rename/replace occurences of 'staking' with 'stake' where appropriate ([05fc4c4](https://github.com/input-output-hk/cardano-js-sdk/commit/05fc4c4d83137eb3137583ca0bb443825eac1445))
+
 ## [0.17.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.17.0...@cardano-sdk/e2e@0.17.1) (2023-07-31)
 
 **Note:** Version bump only for package @cardano-sdk/e2e

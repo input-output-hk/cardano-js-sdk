@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/crypto",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Cryptographic types and functions for Cardano",
   "engines": {
     "node": ">=16.20.1"

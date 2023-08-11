@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.3.13...@cardano-sdk/projection-typeorm@0.4.0) (2023-08-11)
+
+### ⚠ BREAKING CHANGES
+
+* replace Mappers.CertificatePointer with Cardano.Pointer
+
+### Code Refactoring
+
+* replace Mappers.CertificatePointer with Cardano.Pointer ([cb7279e](https://github.com/input-output-hk/cardano-js-sdk/commit/cb7279e2a80d48ea870a625db47941f097dace34))
+
 ## [0.3.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.3.12...@cardano-sdk/projection-typeorm@0.3.13) (2023-07-31)
 
 **Note:** Version bump only for package @cardano-sdk/projection-typeorm
