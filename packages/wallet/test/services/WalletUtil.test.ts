@@ -247,9 +247,14 @@ describe('WalletUtil', () => {
       tx.body.certificates = [
         {
           __typename: Cardano.CertificateType.MIR,
+          kind: Cardano.MirCertificateKind.ToStakeCreds,
           pot: Cardano.MirCertificatePot.Treasury,
           quantity: 100n,
-          rewardAccount: Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27')
+          stakeCredential: Cardano.Address.fromString(
+            'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27'
+          )!
+            .asReward()!
+            .getPaymentCredential()
         } as Cardano.MirCertificate,
         ...tx.body.certificates!
       ];
