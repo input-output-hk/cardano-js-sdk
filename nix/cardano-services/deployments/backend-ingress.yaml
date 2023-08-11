@@ -7,7 +7,6 @@ metadata:
     alb.ingress.kubernetes.io/healthcheck-path: /health
     alb.ingress.kubernetes.io/healthcheck-timeout-seconds: "30"
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'
-    alb.ingress.kubernetes.io/load-balancer-attributes: access_logs.s3.enabled=true,access_logs.s3.bucket=alb-eu-central-1-access-logs,access_logs.s3.prefix=dev-preview-cardanojs-logs
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/wafv2-acl-arn: arn:aws:wafv2:eu-central-1:926093910549:regional/webacl/rate-limit-backend/07d554a1-0ac0-4799-9745-9ece4d409889
@@ -37,6 +36,20 @@ spec:
                 port:
                   name: http
             path: /
+            pathType: Prefix
+          - backend:
+              service:
+                name: dev-preview-cardanojs-stake-pool-provider
+                port:
+                  name: http
+            path: /stake-pool
+            pathType: Prefix
+          - backend:
+              service:
+                name: dev-preview-cardanojs-handle-provider
+                port:
+                  name: http
+            path: /handle
             pathType: Prefix
   tls:
     - hosts:

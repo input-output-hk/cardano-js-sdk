@@ -13,10 +13,42 @@ let
 in {
   dev-preview = dmerge baseline {
     meta.description = "Development Environment on the Cardano Preview Chain (Frankfurt)";
-    deployment = {
+    backend-deployment = {
       spec.template.spec.containers = dmerge.updateOn "name" [
         {
           name = "backend";
+          image = cell.oci-images.cardano-services.image.name;
+        }
+      ];
+    };
+    coingecko-proxy-deployment = {
+      spec.template.spec.containers = dmerge.updateOn "name" [
+        {
+          name = "coingecko-proxy";
+          image = cell.oci-images.cardano-services.image.name;
+        }
+      ];
+    };
+    handle-projector-deployment = {
+      spec.template.spec.containers = dmerge.updateOn "name" [
+        {
+          name = "handle-projector";
+          image = cell.oci-images.cardano-services.image.name;
+        }
+      ];
+    };
+    pgboss-deployment = {
+      spec.template.spec.containers = dmerge.updateOn "name" [
+        {
+          name = "pg-boss-worker";
+          image = cell.oci-images.cardano-services.image.name;
+        }
+      ];
+    };
+    stake-pool-projector-deployment = {
+      spec.template.spec.containers = dmerge.updateOn "name" [
+        {
+          name = "stake-pool-projector";
           image = cell.oci-images.cardano-services.image.name;
         }
       ];
