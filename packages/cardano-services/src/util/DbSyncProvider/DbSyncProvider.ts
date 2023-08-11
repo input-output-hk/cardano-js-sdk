@@ -41,6 +41,8 @@ export interface DbSyncProviderDependencies extends ProviderDependencies {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyArgs = any[];
 
+export const findLedgerTipOptions = { name: 'find_ledger_tip', text: findLedgerTip } as const;
+
 export const DbSyncProvider = <
   T extends (abstract new (...args: AnyArgs) => {}) | (new (...args: AnyArgs) => {}) = { new (): {} }
 >(
@@ -74,7 +76,7 @@ export const DbSyncProvider = <
         response.localNode = cardanoNode.localNode;
         const tip = await this.#cache.healthCheck.get(
           'db_tip',
-          async () => (await this.dbPools.healthCheck.query<LedgerTipModel>(findLedgerTip)).rows[0]
+          async () => (await this.dbPools.healthCheck.query<LedgerTipModel>(findLedgerTipOptions)).rows[0]
         );
 
         if (tip) {
