@@ -7,11 +7,11 @@ import {
   generateRandomHexString,
   mockProviders as mocks
 } from '@cardano-sdk/util-dev';
-import { BehaviorSubject, firstValueFrom, skip } from 'rxjs';
+import { BehaviorSubject, Subscription, firstValueFrom, skip } from 'rxjs';
 import { CML, Cardano, CardanoNodeErrors, ProviderError, ProviderFailure, TxCBOR } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
-import { PersonalWallet, setupWallet } from '../../src';
+import { PersonalWallet, TxInFlight, setupWallet } from '../../src';
 import { getPassphrase, stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { dummyLogger as logger } from 'ts-log';
 import { toOutgoingTx, waitForWalletStateSettle } from '../util';
@@ -383,6 +383,39 @@ describe('PersonalWallet methods', () => {
         expect(await txSubmitting).toEqual(outgoingTx);
         expect(await txPending).toEqual(outgoingTx);
         expect(await txInFlight).toEqual([outgoingTx]);
+      });
+
+      describe('is idempotent', () => {
+        let tx: Cardano.Tx;
+        let txInFlightEmissions: Array<TxInFlight[]>;
+        let txInFlightSubscription: Subscription;
+
+        beforeEach(async () => {
+          tx = await wallet.finalizeTx({ tx: await wallet.initializeTx(props) });
+          txInFlightEmissions = [];
+          txInFlightSubscription = wallet.transactions.outgoing.inFlight$.subscribe((inFlight) =>
+            txInFlightEmissions.push(inFlight)
+          );
+        });
+
+        test('when re-submitting before initial submission resolves or rejects', async () => {
+          await Promise.all([wallet.submitTx(tx), wallet.submitTx(tx)]);
+          txInFlightSubscription.unsubscribe();
+
+          expect(txSubmitProvider.submitTx).toBeCalledTimes(1);
+          // [], [submitting], [submitted]
+          expect(txInFlightEmissions).toHaveLength(3);
+        });
+
+        test('when re-submitting after initial submission resolves', async () => {
+          await wallet.submitTx(tx);
+          await wallet.submitTx(tx);
+          txInFlightSubscription.unsubscribe();
+
+          expect(txSubmitProvider.submitTx).toBeCalledTimes(1);
+          // [], [submitting], [submitted]
+          expect(txInFlightEmissions).toHaveLength(3);
+        });
       });
 
       it('resolves on success when submitting tx as a serialized hex blob, encoded as CBOR', async () => {
