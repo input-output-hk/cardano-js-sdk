@@ -203,6 +203,7 @@ export class PersonalWallet implements ObservableWallet {
   #failedFromReemitter$: Subject<FailedTx>;
   #trackedTxSubmitProvider: TrackedTxSubmitProvider;
   #addressDiscovery: AddressDiscovery;
+  #submittingPromises: Partial<Record<Cardano.TransactionId, Promise<Cardano.TransactionId>>> = {};
 
   readonly keyAgent: AsyncKeyAgent;
   readonly currentEpoch$: TrackerSubject<EpochInfo>;
@@ -537,11 +538,10 @@ export class PersonalWallet implements ObservableWallet {
     return new GenericTxBuilder(this.getTxBuilderDependencies());
   }
 
-  async submitTx(
-    input: Cardano.Tx | TxCBOR | OutgoingTx | SignedTx,
+  async #submitTx(
+    outgoingTx: OutgoingTx,
     { mightBeAlreadySubmitted }: SubmitTxOptions = {}
   ): Promise<Cardano.TransactionId> {
-    const outgoingTx = processOutgoingTx(input);
     this.#logger.debug(`Submitting transaction ${outgoingTx.id}`);
     this.#newTransactions.submitting$.next(outgoingTx);
     try {
@@ -578,6 +578,28 @@ export class PersonalWallet implements ObservableWallet {
       });
       throw error;
     }
+  }
+
+  async submitTx(
+    input: Cardano.Tx | TxCBOR | OutgoingTx | SignedTx,
+    options: SubmitTxOptions = {}
+  ): Promise<Cardano.TransactionId> {
+    const outgoingTx = processOutgoingTx(input);
+    if (this.#submittingPromises[outgoingTx.id]) {
+      return this.#submittingPromises[outgoingTx.id]!;
+    }
+    return (this.#submittingPromises[outgoingTx.id] = (async () => {
+      const inFlightTxs = await firstValueFrom(this.transactions.outgoing.inFlight$);
+      const inFlightTx = inFlightTxs.find((inFlight) => inFlight.id === outgoingTx.id);
+      try {
+        if (!inFlightTx) {
+          await this.#submitTx(outgoingTx, options);
+        }
+      } finally {
+        delete this.#submittingPromises[outgoingTx.id];
+      }
+      return outgoingTx.id;
+    })());
   }
 
   signData(props: SignDataProps): Promise<Cip30DataSignature> {
