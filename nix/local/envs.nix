@@ -7,6 +7,7 @@ let
     shfmt
     yq-go
     git-subrepo
+    yarn
     ;
   inherit
     (inputs.nixpkgs.nodePackages)
@@ -39,6 +40,9 @@ in {
     name = "Cardano JS SDK Local Env";
     imports = [formattingModule];
     commands = [{package = std;}];
-    packages = [git-subrepo];
+    packages = [
+      git-subrepo
+      yarn
+    ];
   };
 }

@@ -38,6 +38,7 @@ Packages are distributed as both CommonJS and ESM modules.
 - Browser via bundlers (see [example webpack config](./packages/e2e/test/web-extension/webpack.config.js))
 
 ### Getting Started
+
 The [GETTING_STARTED](./GETTING_STARTED.md) guide provides a quick way to start experimenting.
 
 ### Testing
@@ -56,11 +57,13 @@ A Yarn Workspace maintaining a single version across all packages.
 - [Docker Desktop] 3.4 or later or a Docker installation that includes Compose V2
 
 #### Clone
-``` bash
+
+```bash
 git clone \
   https://github.com/input-output-hk/cardano-js-sdk.git \
   && cd cardano-js-sdk
 ```
+
 #### Install and Build
 
 ```bash
@@ -143,5 +146,5 @@ yarn docs
 [workflow_post-integration]: https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/post_integration.yml
 [img_src_release]: https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/release.yaml/badge.svg
 [workflow_release]: https://github.com/input-output-hk/cardano-js-sdk/actions/workflows/release.yaml
-[Docker Desktop]: https://docs.docker.com/desktop/
+[docker desktop]: https://docs.docker.com/desktop/
 [let us know!]: https://github.com/input-output-hk/cardano-graphql/discussions/new
