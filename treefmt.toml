@@ -5,13 +5,13 @@ command = "alejandra"
 excludes = ["yarn-project.nix"]
 includes = ["*.nix"]
 
-# TODO: would this conflict or just work (tm)?
-# [formatter.prettier]
-# command = "prettier"
-# includes = ["*.md", "*.toml", "*.yaml", "*.json"]
-# options = ["--plugin", "prettier-plugin-toml", "--write"]
-#
-# [formatter.shell]
-# command = "shfmt"
-# includes = ["*.sh"]
-# options = ["-i", "2", "-s", "-w"]
+[formatter.prettier]
+command = "node_modules/.bin/prettier"
+includes = ["*.md", "*.yaml"]
+excludes = ["packages/cardano-services/config/network/*", "packages/e2e/local-network/templates/", "CHANGELOG.md"]
+options = ["--write"]
+
+[formatter.shell]
+command = "shfmt"
+includes = ["*.sh"]
+options = ["-i", "2", "-s", "-w"]
