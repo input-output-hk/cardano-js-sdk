@@ -6,7 +6,6 @@ import {
   AddressDiscovery,
   ConnectionStatus,
   ConnectionStatusTracker,
-  HandleInfo,
   ObservableWallet,
   PersonalWallet,
   PollingConfig,
@@ -25,6 +24,7 @@ import {
   CML,
   Cardano,
   ChainHistoryProvider,
+  HandleProvider,
   NetworkInfoProvider,
   RewardsProvider,
   UtxoProvider,
@@ -40,9 +40,17 @@ import { stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-manageme
 import { waitForWalletStateSettle } from '../util';
 import delay from 'delay';
 import flatten from 'lodash/flatten';
+import pick from 'lodash/pick';
 
-const { currentEpoch, networkInfo, queryTransactionsResult, queryTransactionsResult2, handleAssetId, handleAssetInfo } =
-  mocks;
+const {
+  currentEpoch,
+  networkInfo,
+  queryTransactionsResult,
+  queryTransactionsResult2,
+  handleAssetId,
+  handleAssetInfo,
+  resolvedHandle
+} = mocks;
 
 const name = 'Test Wallet';
 const address = mocks.utxo[0][0].address!;
@@ -54,6 +62,7 @@ interface Providers {
   chainHistoryProvider: ChainHistoryProvider;
   networkInfoProvider: NetworkInfoProvider;
   connectionStatusTracker$?: ConnectionStatusTracker;
+  handleProvider?: HandleProvider;
 }
 
 export class MockAddressDiscovery implements AddressDiscovery {
@@ -107,19 +116,26 @@ const createWallet = async (props: CreateWalletProps) => {
       return asyncKeyAgent;
     },
     createWallet: async (keyAgent) => {
-      const { rewardsProvider, utxoProvider, chainHistoryProvider, networkInfoProvider, connectionStatusTracker$ } =
-        props.providers;
+      const {
+        rewardsProvider,
+        utxoProvider,
+        chainHistoryProvider,
+        handleProvider,
+        networkInfoProvider,
+        connectionStatusTracker$
+      } = props.providers;
       const txSubmitProvider = mocks.mockTxSubmitProvider();
       const assetProvider = mocks.mockAssetProvider();
       const stakePoolProvider = createStubStakePoolProvider();
 
       return new PersonalWallet(
-        { handlePolicyIds: props.handlePolicyIds, name, polling: props.pollingConfig },
+        { name, polling: props.pollingConfig },
         {
           addressDiscovery: props?.addressDiscovery,
           assetProvider,
           chainHistoryProvider,
           connectionStatusTracker$,
+          handleProvider,
           keyAgent,
           logger,
           networkInfoProvider,
@@ -140,7 +156,7 @@ const assertWalletProperties = async (
   wallet: PersonalWallet,
   expectedDelegateeId: Cardano.PoolId | undefined,
   expectedRewardsHistory = flatten([...mocks.rewardsHistory.values()]),
-  expectedHandles?: Partial<HandleInfo>[]
+  expectHandles?: boolean
 ) => {
   expect(wallet.keyAgent).toBeTruthy();
   // name
@@ -189,8 +205,10 @@ const assertWalletProperties = async (
     ])
   );
   // handles$
-  await (expectedHandles
-    ? expect(firstValueFrom(wallet.handles$)).resolves.toMatchObject(expectedHandles)
+  await (expectHandles
+    ? expect(firstValueFrom(wallet.handles$)).resolves.toMatchObject([
+        pick(resolvedHandle, ['handle', 'resolvedAddress'])
+      ])
     : expect(firstValueFrom(wallet.handles$)).rejects.toThrowError(InvalidConfigurationError));
   // inputAddressResolver
   expect(typeof wallet.util).toBe('object');
@@ -301,13 +319,14 @@ describe('PersonalWallet load', () => {
       handlePolicyIds: [mocks.handlePolicyId],
       providers: {
         chainHistoryProvider: mocks.mockChainHistoryProvider2(100),
+        handleProvider: mocks.mockHandleProvider(),
         networkInfoProvider: mocks.mockNetworkInfoProvider2(100),
         rewardsProvider: mocks.mockRewardsProvider2(100),
         utxoProvider: mocks.mockUtxoProvider2(100)
       },
       stores
     });
-    await assertWalletProperties(wallet2, somePartialStakePools[0].id, undefined, [{ handle: mocks.handle }]);
+    await assertWalletProperties(wallet2, somePartialStakePools[0].id, undefined, true);
     await waitForWalletStateSettle(wallet2);
     await assertWalletProperties2(wallet2);
     wallet2.shutdown();

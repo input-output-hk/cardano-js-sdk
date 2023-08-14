@@ -9,6 +9,7 @@ import { OutgoingOnChainTx, TxInFlight } from '../../services';
 import { WalletStores } from '../types';
 
 export class InMemoryTipStore extends InMemoryDocumentStore<Cardano.Tip> {}
+export class InMemoryPolicyIdsStore extends InMemoryDocumentStore<Cardano.PolicyId[]> {}
 export class InMemoryProtocolParametersStore extends InMemoryDocumentStore<Cardano.ProtocolParameters> {}
 export class InMemoryGenesisParametersStore extends InMemoryDocumentStore<Cardano.CompactGenesis> {}
 export class InMemoryEraSummariesStore extends InMemoryDocumentStore<EraSummary[]> {}
@@ -46,7 +47,8 @@ export const createInMemoryWalletStores = (): WalletStores => ({
         this.transactions.destroy(),
         this.inFlightTransactions.destroy(),
         this.volatileTransactions.destroy(),
-        this.utxo.destroy()
+        this.utxo.destroy(),
+        this.policyIds.destroy()
       ]).pipe(map(() => void 0));
     }
     return EMPTY;
@@ -55,6 +57,7 @@ export const createInMemoryWalletStores = (): WalletStores => ({
   eraSummaries: new InMemoryEraSummariesStore(),
   genesisParameters: new InMemoryGenesisParametersStore(),
   inFlightTransactions: new InMemoryInFlightTransactionsStore(),
+  policyIds: new InMemoryPolicyIdsStore(),
   protocolParameters: new InMemoryProtocolParametersStore(),
   rewardsBalances: new InMemoryRewardsBalancesStore(),
   rewardsHistory: new InMemoryRewardsHistoryStore(),

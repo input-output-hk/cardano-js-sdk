@@ -53,6 +53,10 @@ services:
     environment:
       HANDLE_POLICY_IDS: $HANDLE_POLICY_IDS
 
+  handle-provider-server:
+    environment:
+      HANDLE_POLICY_IDS: $HANDLE_POLICY_IDS
+
 secrets:
   blockfrost_key:
     file: ./blockfrost-keys/${NETWORK:-mainnet}.key

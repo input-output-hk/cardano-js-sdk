@@ -33,9 +33,11 @@ export interface ResolveHandlesArgs {
  */
 export interface HandleProvider extends Provider {
   resolveHandles(args: ResolveHandlesArgs): Promise<Array<HandleResolution | null>>;
+  getPolicyIds(): Promise<Cardano.PolicyId[]>;
 }
 
 export const handleProviderPaths: HttpProviderConfigPaths<HandleProvider> = {
+  getPolicyIds: '/policyIds',
   healthCheck: '/health',
   resolveHandles: '/resolve'
 };

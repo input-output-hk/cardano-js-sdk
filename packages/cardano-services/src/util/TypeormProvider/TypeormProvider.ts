@@ -18,7 +18,6 @@ export abstract class TypeormProvider extends RunnableModule implements Provider
   #connectionConfig$: Observable<PgConnectionConfig>;
   #dataSource$ = new BehaviorSubject<DataSource | null>(null);
 
-  logger: Logger;
   health: HealthCheckResponse = { ok: false, reason: 'not started' };
 
   constructor(name: string, { connectionConfig$, logger, entities }: TypeormProviderDependencies) {
@@ -29,11 +28,7 @@ export abstract class TypeormProvider extends RunnableModule implements Provider
 
   #subscribeToDataSource() {
     this.#subscription = createTypeormDataSource(this.#connectionConfig$, this.#entities, this.logger)
-      .pipe(
-        tap(() => {
-          this.health = { ok: true };
-        })
-      )
+      .pipe(tap(() => (this.health = { ok: true })))
       .subscribe((dataSource) => this.#dataSource$.next(dataSource));
   }
 

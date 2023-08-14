@@ -12,7 +12,7 @@ env:
   CHAIN_HISTORY_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/chain-history"}'
   DB_SYNC_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/cexplorer'
   HANDLE_PROVIDER: 'http'
-  HANDLE_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/handle","policyId":""}'
+  HANDLE_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4011/handle"}'
   STAKE_POOL_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/stake_pool'
   STAKE_POOL_TEST_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/stake_pool_test'
   NETWORK_INFO_PROVIDER: 'http'

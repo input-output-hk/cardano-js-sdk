@@ -1,5 +1,6 @@
 import {
   HealthCheckResponse,
+  HttpProviderConfigPaths,
   Provider,
   ProviderError,
   ProviderFailure,
@@ -7,9 +8,9 @@ import {
 } from '@cardano-sdk/core';
 import { HttpServer } from './HttpServer';
 import { Logger } from 'ts-log';
-import { ProviderHandler } from '../util';
+import { ProviderHandler, providerHandler } from '../util';
 import { RunnableModule } from '@cardano-sdk/util';
-import express from 'express';
+import express, { Router } from 'express';
 
 export abstract class HttpService extends RunnableModule {
   public router: express.Router;
@@ -57,6 +58,14 @@ export abstract class HttpService extends RunnableModule {
 
   async healthCheck(): Promise<HealthCheckResponse> {
     return await this.provider.healthCheck();
+  }
+
+  attachProviderRoutes<T extends Provider>(provider: T, router: Router, paths: HttpProviderConfigPaths<T>) {
+    for (const methodName in paths) {
+      const handler = providerHandler((provider[methodName] as Function).bind(provider));
+
+      router.post(paths[methodName], handler(HttpService.routeHandler(this.logger), this.logger));
+    }
   }
 
   static routeHandler(logger: Logger): ProviderHandler {

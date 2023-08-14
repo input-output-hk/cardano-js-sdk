@@ -3,7 +3,7 @@ import { HttpService } from '../Http';
 import { Logger } from 'ts-log';
 import { Router } from 'express';
 import { ServiceNames } from '../Program/programs/types';
-import { providerHandler, useOpenApi } from '../util';
+import { useOpenApi } from '../util';
 
 export interface HandleServiceDependencies {
   handleProvider: HandleProvider;
@@ -15,10 +15,6 @@ export class HandleHttpService extends HttpService {
     super(ServiceNames.Handle, handleProvider, router, logger);
 
     useOpenApi(__dirname, router);
-
-    router.post(
-      handleProviderPaths.resolveHandles,
-      providerHandler(handleProvider.resolveHandles.bind(handleProvider))(HttpService.routeHandler(logger), logger)
-    );
+    this.attachProviderRoutes(handleProvider, router, handleProviderPaths);
   }
 }

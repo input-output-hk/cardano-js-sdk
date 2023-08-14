@@ -9,17 +9,15 @@ import {
   defer,
   distinctUntilChanged,
   from,
-  map,
   mergeMap,
   of,
   shareReplay,
   startWith,
   tap,
-  toArray,
-  withLatestFrom
+  toArray
 } from 'rxjs';
 import { Logger } from 'ts-log';
-import { deepEquals, isNotNil, sameArrayItems, strictEquals } from '@cardano-sdk/util';
+import { deepEquals, isNotNil, sameArrayItems } from '@cardano-sdk/util';
 import { passthrough } from '@cardano-sdk/util-rxjs';
 import { retryBackoff } from 'backoff-rxjs';
 import uniqBy from 'lodash/uniqBy';
@@ -30,10 +28,12 @@ export const HYDRATE_HANDLE_MAX_RETRIES = 5;
 export interface HandlesTrackerProps {
   utxo$: Observable<Cardano.Utxo[]>;
   assetInfo$: Observable<Assets>;
-  tip$: Observable<Cardano.Tip>;
-  handlePolicyIds: Cardano.PolicyId[];
+  handlePolicyIds$: Observable<Cardano.PolicyId[]>;
   logger: Logger;
   handleProvider: HandleProvider;
+}
+
+interface HandlesTrackerInternals {
   hydrateHandle?: (
     handleProvider: HandleProvider,
     logger: Logger
@@ -59,7 +59,8 @@ export const hydrateHandleAsync =
         ...handle,
         backgroundImage: resolution?.backgroundImage,
         image: resolution?.image,
-        profilePic: resolution?.profilePic
+        profilePic: resolution?.profilePic,
+        resolvedAt: resolution?.resolvedAt
       };
     } catch (error) {
       logger.error("Couldn't hydrate handle", error);
@@ -76,7 +77,7 @@ export const hydrateHandles =
         from(handles).pipe(
           concatMap((handleInfo) =>
             handleInfo.handle in hydratedHandles
-              ? of(hydratedHandles[handleInfo.handle] as HandleInfo)
+              ? of(hydratedHandles[handleInfo.handle]!)
               : defer(() => from(hydrateHandle(handleInfo))).pipe(
                   retryBackoff({
                     initialInterval: HYDRATE_HANDLE_INITIAL_INTERVAL,
@@ -98,37 +99,25 @@ export const hydrateHandles =
     );
   };
 
-export const createHandlesTracker = ({
-  tip$,
-  assetInfo$,
-  handlePolicyIds,
-  handleProvider,
-  hydrateHandle = hydrateHandleAsync,
-  logger,
-  utxo$
-}: HandlesTrackerProps) =>
-  combineLatest([
-    utxo$.pipe(
-      map((utxo) =>
-        utxo.flatMap(([_, txOut]) =>
-          uniqBy(
-            [...(txOut.value.assets?.keys() || [])]
-              .filter((assetId) => handlePolicyIds.some((policyId) => assetId.startsWith(policyId)))
-              .map((assetId) => ({
-                handleAssetId: assetId,
-                txOut
-              })),
-            ({ handleAssetId }) => handleAssetId
-          )
+export const createHandlesTracker = (
+  { assetInfo$, handlePolicyIds$, handleProvider, logger, utxo$ }: HandlesTrackerProps,
+  { hydrateHandle = hydrateHandleAsync }: HandlesTrackerInternals = {}
+) =>
+  combineLatest([handlePolicyIds$, utxo$, assetInfo$]).pipe(
+    mergeMap(([handlePolicyIds, utxo, assets]) => {
+      const filteredUtxo = utxo.flatMap(([_, txOut]) =>
+        uniqBy(
+          [...(txOut.value.assets?.keys() || [])]
+            .filter((assetId) => handlePolicyIds.some((policyId) => assetId.startsWith(policyId)))
+            .map((assetId) => ({
+              handleAssetId: assetId,
+              txOut
+            })),
+          ({ handleAssetId }) => handleAssetId
         )
-      ),
-      distinctUntilChanged((a, b) => sameArrayItems(a, b, strictEquals)),
-      withLatestFrom(tip$)
-    ),
-    assetInfo$
-  ]).pipe(
-    mergeMap(([[utxo, tip], assets]) => {
-      const handlesWithAssetInfo = utxo
+      );
+
+      const handlesWithAssetInfo = filteredUtxo
         .map(({ handleAssetId, txOut }): HandleInfo | null => {
           const assetInfo = assets.get(handleAssetId);
           if (!assetInfo) {
@@ -139,15 +128,16 @@ export const createHandlesTracker = ({
             ...assetInfo,
             cardanoAddress: txOut.address,
             handle: Cardano.AssetId.getAssetNameAsText(handleAssetId),
-            hasDatum: !!txOut.datum,
-            resolvedAt: tip
+            hasDatum: !!txOut.datum
           };
         })
         .filter(isNotNil);
-      if (utxo.length > 0 && handlesWithAssetInfo.length === 0) {
+
+      if (filteredUtxo.length > 0 && handlesWithAssetInfo.length === 0) {
         // AssetInfo is still resolving
         return EMPTY;
       }
+
       return of(
         handlesWithAssetInfo.filter(({ handle, supply }) => {
           if (supply > 1n) {
