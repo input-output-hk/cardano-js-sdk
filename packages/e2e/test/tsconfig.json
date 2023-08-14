@@ -4,6 +4,7 @@
     "baseUrl": "."
   },
   "exclude": ["./web-extension"],
+  "include": ["./**/*.ts"],
   "references": [
     {
       "path": "../src"

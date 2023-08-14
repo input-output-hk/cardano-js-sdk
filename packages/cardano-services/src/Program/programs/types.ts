@@ -33,6 +33,7 @@ export enum ServiceNames {
 export const POOLS_METRICS_INTERVAL_DEFAULT = 1000;
 
 export enum ProjectorOptionDescriptions {
+  BlocksBufferLength = 'Chain sync event (blocks) buffer length',
   DropSchema = 'Drop and recreate database schema to project from origin',
   DryRun = 'Initialize the projection, but do not start it',
   ExitAtBlockNo = 'Exit after processing this block. Intended for benchmark testing',

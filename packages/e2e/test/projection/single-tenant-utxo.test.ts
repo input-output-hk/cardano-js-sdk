@@ -100,7 +100,7 @@ describe('single-tenant utxo projection', () => {
   afterEach(async () => cleanup());
 
   const projectMultiTenant = () =>
-    Bootstrap.fromCardanoNode({ buffer, cardanoNode, logger }).pipe(
+    Bootstrap.fromCardanoNode({ blocksBufferLength: 10, buffer, cardanoNode, logger }).pipe(
       Mappers.withMint(),
       Mappers.withUtxo(),
       Postgres.withTypeormTransaction({ dataSource$: of(dataSource), logger }),
@@ -123,7 +123,7 @@ describe('single-tenant utxo projection', () => {
     );
 
   const projectSingleTenant = (addresses: Cardano.PaymentAddress[]) =>
-    Bootstrap.fromCardanoNode({ buffer, cardanoNode, logger }).pipe(
+    Bootstrap.fromCardanoNode({ blocksBufferLength: 10, buffer, cardanoNode, logger }).pipe(
       Mappers.withMint(),
       Mappers.withUtxo(),
       Mappers.filterProducedUtxoByAddresses({ addresses }),

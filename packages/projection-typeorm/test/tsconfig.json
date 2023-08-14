@@ -3,9 +3,7 @@
   "compilerOptions": {
     "baseUrl": "."
   },
-  "include": [
-    "../../golden-test-generator/src"
-  ],
+  "include": ["./**/*.ts", "../../golden-test-generator/src"],
   "references": [
     {
       "path": "../src"

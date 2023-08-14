@@ -46,6 +46,7 @@ x-with-postgres: &with-postgres
 
 x-projector-environment: &projector-environment
   API_URL: http://0.0.0.0:3000
+  BLOCKS_BUFFER_LENGTH: ${BLOCKS_BUFFER_LENGTH:-10}
   DROP_SCHEMA: ${DROP_PROJECTOR_SCHEMA:-false}
   POSTGRES_HOST: postgres
   POSTGRES_POOL_MAX: ${POSTGRES_POOL_MAX:-10}

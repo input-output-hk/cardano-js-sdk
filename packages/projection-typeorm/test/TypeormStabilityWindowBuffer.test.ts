@@ -51,6 +51,7 @@ describe('TypeormStabilityWindowBuffer', () => {
     await buffer.initialize(queryRunner);
     project$ = defer(() =>
       Bootstrap.fromCardanoNode({
+        blocksBufferLength: 10,
         buffer,
         cardanoNode: {
           ...cardanoNode,

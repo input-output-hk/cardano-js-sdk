@@ -3,9 +3,7 @@
   "compilerOptions": {
     "baseUrl": "."
   },
-  "include": [
-    "../../tx-construction/test/testData"
-  ],
+  "include": ["./**/*.ts", "../../tx-construction/test/testData"],
   "references": [
     {
       "path": "../src"

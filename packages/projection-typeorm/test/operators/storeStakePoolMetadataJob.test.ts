@@ -28,11 +28,7 @@ describe('storeStakePoolMetadataJob', () => {
   let queryRunner: QueryRunner;
   let buffer: TypeormStabilityWindowBuffer;
   const project$ = () =>
-    Bootstrap.fromCardanoNode({
-      buffer,
-      cardanoNode: stubEvents.cardanoNode,
-      logger
-    }).pipe(
+    Bootstrap.fromCardanoNode({ blocksBufferLength: 10, buffer, cardanoNode: stubEvents.cardanoNode, logger }).pipe(
       // skipping 1st event because it's not rolled back
       filter((evt) => {
         const SKIP = 32_159;
