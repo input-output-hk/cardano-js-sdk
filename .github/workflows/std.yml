@@ -38,12 +38,10 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
-      # TODO: uncomment when nixbuild works well together with
-      #       nix daemon mode on hosted runners
-      # - uses: nixbuild/nixbuild-action@v17
-      #   with:
-      #     nixbuild_ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
-      #     generate_summary_for: job
+      - uses: nixbuild/nixbuild-action@main
+        with:
+          nixbuild_ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          generate_summary_for: job
       - uses: divnix/std-action/discover@main
         with: {ffBuildInstructions: true}
         id: discovery
