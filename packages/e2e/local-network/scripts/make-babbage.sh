@@ -259,9 +259,9 @@ echo "Byron genesis hash: $byronGenesisHash"
 echo "Shelley genesis hash: $shelleyGenesisHash"
 echo "Alonzo genesis hash: $alonzoGenesisHash"
 
-$SED -i -E "s/ByronGenesisHash: \".*\"/ByronGenesisHash: \"${byronGenesisHash}\"/" ${ROOT}/configuration.yaml
-$SED -i -E "s/ShelleyGenesisHash: \".*\"/ShelleyGenesisHash: \"${shelleyGenesisHash}\"/" ${ROOT}/configuration.yaml
-$SED -i -E "s/AlonzoGenesisHash: \".*\"/AlonzoGenesisHash: \"${alonzoGenesisHash}\"/" ${ROOT}/configuration.yaml
+$SED -i -E "s/ByronGenesisHash: '.*'/ByronGenesisHash: '${byronGenesisHash}'/" ${ROOT}/configuration.yaml
+$SED -i -E "s/ShelleyGenesisHash: '.*'/ShelleyGenesisHash: '${shelleyGenesisHash}'/" ${ROOT}/configuration.yaml
+$SED -i -E "s/AlonzoGenesisHash: '.*'/AlonzoGenesisHash: '${alonzoGenesisHash}'/" ${ROOT}/configuration.yaml
 
 # Create config folder
 rm -rf ./config/*
