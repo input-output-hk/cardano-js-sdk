@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.15.0...@cardano-sdk/cardano-services@0.16.0) (2023-08-15)
+
+### ⚠ BREAKING CHANGES
+
+* add HandleProvider.getPolicyIds and utilize it in PersonalWallet also, handles$ resolvedAt is now only set via hydration (provider)
+* updated MIR certificate interface to match the CDDL specification
+
+### Features
+
+* add a buffer after reading blocks from ogmios ([0095c80](https://github.com/input-output-hk/cardano-js-sdk/commit/0095c80346fb0f5ce7bfa7fe805c6b0e79ad1a35))
+* add HandleProvider.getPolicyIds and utilize it in PersonalWallet also, handles$ resolvedAt is now only set via hydration (provider) ([af6a8d0](https://github.com/input-output-hk/cardano-js-sdk/commit/af6a8d011bbd2c218aa23e1d75bb25294fc61a27))
+* **cardano-service:** add http service method to attach all the provider routes at once ([c8c02d0](https://github.com/input-output-hk/cardano-js-sdk/commit/c8c02d09b7fb118440ccd0997d874e4fe2619d26))
+* **cardano-services:** use prepared statement for the get ledger tip query ([6d4d04b](https://github.com/input-output-hk/cardano-js-sdk/commit/6d4d04bd863e76d5f81f27cb8e8cffba5a586163))
+* updated MIR certificate interface to match the CDDL specification ([03d5079](https://github.com/input-output-hk/cardano-js-sdk/commit/03d507951ff310a4019f5ec2f1871fdad77939ee))
+
+### Bug Fixes
+
+* **cardano-services:** add get policy ids path/method to handle http service ([04c1347](https://github.com/input-output-hk/cardano-js-sdk/commit/04c1347e9a3f479e5b93b9bbb7644f3555abdd0d))
+
 ## [0.15.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.14.8...@cardano-sdk/cardano-services@0.15.0) (2023-08-11)
 
 ### ⚠ BREAKING CHANGES

@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.9.0...@cardano-sdk/key-management@0.10.0) (2023-08-15)
+
+### ⚠ BREAKING CHANGES
+
+* updated MIR certificate interface to match the CDDL specification
+
+### Features
+
+* updated MIR certificate interface to match the CDDL specification ([03d5079](https://github.com/input-output-hk/cardano-js-sdk/commit/03d507951ff310a4019f5ec2f1871fdad77939ee))
+
 ## [0.9.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.8.2...@cardano-sdk/key-management@0.9.0) (2023-08-11)
 
 ### ⚠ BREAKING CHANGES

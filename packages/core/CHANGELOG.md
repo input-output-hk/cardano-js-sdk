@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.17.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.16.0...@cardano-sdk/core@0.17.0) (2023-08-15)
+
+### ⚠ BREAKING CHANGES
+
+* add HandleProvider.getPolicyIds and utilize it in PersonalWallet also, handles$ resolvedAt is now only set via hydration (provider)
+* updated MIR certificate interface to match the CDDL specification
+
+### Features
+
+* add a buffer after reading blocks from ogmios ([0095c80](https://github.com/input-output-hk/cardano-js-sdk/commit/0095c80346fb0f5ce7bfa7fe805c6b0e79ad1a35))
+* add HandleProvider.getPolicyIds and utilize it in PersonalWallet also, handles$ resolvedAt is now only set via hydration (provider) ([af6a8d0](https://github.com/input-output-hk/cardano-js-sdk/commit/af6a8d011bbd2c218aa23e1d75bb25294fc61a27))
+* **core:** add buffer chain sync event operator ([a35555f](https://github.com/input-output-hk/cardano-js-sdk/commit/a35555f5aef42ce51b9681dde40732301cbe15b0))
+* **core:** added certificate serialization classes ([c368845](https://github.com/input-output-hk/cardano-js-sdk/commit/c36884541fe2c93ec7d701372fb596db2af9d504))
+* updated MIR certificate interface to match the CDDL specification ([03d5079](https://github.com/input-output-hk/cardano-js-sdk/commit/03d507951ff310a4019f5ec2f1871fdad77939ee))
+
 ## [0.16.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.15.4...@cardano-sdk/core@0.16.0) (2023-08-11)
 
 ### ⚠ BREAKING CHANGES

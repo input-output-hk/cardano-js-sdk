@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.18.0...@cardano-sdk/e2e@0.19.0) (2023-08-15)
+
+### ⚠ BREAKING CHANGES
+
+* add HandleProvider.getPolicyIds and utilize it in PersonalWallet also, handles$ resolvedAt is now only set via hydration (provider)
+
+### Features
+
+* add a buffer after reading blocks from ogmios ([0095c80](https://github.com/input-output-hk/cardano-js-sdk/commit/0095c80346fb0f5ce7bfa7fe805c6b0e79ad1a35))
+* add HandleProvider.getPolicyIds and utilize it in PersonalWallet also, handles$ resolvedAt is now only set via hydration (provider) ([af6a8d0](https://github.com/input-output-hk/cardano-js-sdk/commit/af6a8d011bbd2c218aa23e1d75bb25294fc61a27))
+
+### Bug Fixes
+
+* **e2e:** fix three regex to meet the new style ([164abae](https://github.com/input-output-hk/cardano-js-sdk/commit/164abae5d3d951ad8e536f0370460c28e54738d6))
+
 ## [0.18.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.17.1...@cardano-sdk/e2e@0.18.0) (2023-08-11)
 
 ### ⚠ BREAKING CHANGES

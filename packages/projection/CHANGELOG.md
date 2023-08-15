@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.7.0...@cardano-sdk/projection@0.7.1) (2023-08-15)
+
+### Features
+
+* add a buffer after reading blocks from ogmios ([0095c80](https://github.com/input-output-hk/cardano-js-sdk/commit/0095c80346fb0f5ce7bfa7fe805c6b0e79ad1a35))
+
 ## [0.7.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.6.17...@cardano-sdk/projection@0.7.0) (2023-08-11)
 
 ### ⚠ BREAKING CHANGES
