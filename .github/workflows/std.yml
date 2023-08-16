@@ -2,6 +2,7 @@
 name: STD
 on:
   workflow_dispatch:
+  workflow_call:
   pull_request:
     branches:
       - develop
@@ -10,8 +11,6 @@ on:
     branches:
       - develop
       - master
-  release:
-    types: [published]
 env:
   AWS_REGION: us-east-1
   AWS_ROLE_ARN: arn:aws:iam::926093910549:role/lace-ci
