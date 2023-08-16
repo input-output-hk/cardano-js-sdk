@@ -1,0 +1,11 @@
+name: STD-on-release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  call-std:
+    if: startsWith(github.event.release.name, '@cardano-sdk/cardano-services@')
+    steps:
+      uses: ./.github/workflows/std.yml
