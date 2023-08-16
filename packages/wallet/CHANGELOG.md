@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.20.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.20.0...@cardano-sdk/wallet@0.20.1) (2023-08-16)
+
+### Bug Fixes
+
+* **wallet:** do not prevent internal tx re-submission (broken by [#861](https://github.com/input-output-hk/cardano-js-sdk/issues/861)) ([63ce773](https://github.com/input-output-hk/cardano-js-sdk/commit/63ce77327ea0e04ca9a58c7e184ffcdac491dad1))
+
 ## [0.20.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.19.0...@cardano-sdk/wallet@0.20.0) (2023-08-15)
 
 ### ⚠ BREAKING CHANGES
