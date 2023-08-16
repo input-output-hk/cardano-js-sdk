@@ -598,10 +598,12 @@ export class PersonalWallet implements ObservableWallet {
       return this.#submittingPromises[outgoingTx.id]!;
     }
     return (this.#submittingPromises[outgoingTx.id] = (async () => {
-      const inFlightTxs = await firstValueFrom(this.transactions.outgoing.inFlight$);
-      const inFlightTx = inFlightTxs.find((inFlight) => inFlight.id === outgoingTx.id);
       try {
-        if (!inFlightTx) {
+        // Submit to provider only if it's either:
+        // - an internal re-submission. External re-submissions are ignored,
+        //   because PersonalWallet takes care of it internally.
+        // - is a new submission
+        if (options.mightBeAlreadySubmitted || !(await this.#isTxInFlight(outgoingTx.id))) {
           await this.#submitTx(outgoingTx, options);
         }
       } finally {
@@ -682,6 +684,11 @@ export class PersonalWallet implements ObservableWallet {
         utxoAvailable: () => this.#firstValueFromSettled(this.utxo.available$)
       }
     };
+  }
+
+  async #isTxInFlight(txId: Cardano.TransactionId) {
+    const inFlightTxs = await firstValueFrom(this.transactions.outgoing.inFlight$);
+    return inFlightTxs.some((inFlight) => inFlight.id === txId);
   }
 
   #firstValueFromSettled<T>(o$: Observable<T>): Promise<T> {

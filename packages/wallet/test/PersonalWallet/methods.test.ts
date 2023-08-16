@@ -367,6 +367,13 @@ describe('PersonalWallet methods', () => {
     });
 
     describe('submitTx', () => {
+      const valueNotConservedError = new ProviderError(
+        ProviderFailure.BadRequest,
+        new CardanoNodeErrors.TxSubmissionErrors.ValueNotConservedError({
+          valueNotConserved: { consumed: 2, produced: 1 }
+        })
+      );
+
       it('resolves on success', async () => {
         const tx = await wallet.finalizeTx({ tx: await wallet.initializeTx(props) });
         const outgoingTx = toOutgoingTx(tx);
@@ -442,14 +449,9 @@ describe('PersonalWallet methods', () => {
       });
 
       it('mightBeAlreadySubmitted option interprets ValueNotConservedError as success', async () => {
-        txSubmitProvider.submitTx.mockRejectedValueOnce(
-          new ProviderError(
-            ProviderFailure.BadRequest,
-            new CardanoNodeErrors.TxSubmissionErrors.ValueNotConservedError({
-              valueNotConserved: { consumed: 2, produced: 1 }
-            })
-          )
-        );
+        txSubmitProvider.submitTx
+          .mockRejectedValueOnce(valueNotConservedError)
+          .mockRejectedValueOnce(valueNotConservedError);
         const tx = await wallet.finalizeTx({ tx: await wallet.initializeTx(props) });
         const outgoingTx = toOutgoingTx(tx);
 
@@ -460,6 +462,20 @@ describe('PersonalWallet methods', () => {
         const txPending = firstValueFrom(wallet.transactions.outgoing.pending$);
         await expect(wallet.submitTx(tx, { mightBeAlreadySubmitted: true })).resolves.not.toThrow();
         expect(await txPending).toEqual(outgoingTx);
+      });
+
+      it('attempts to resubmit the tx that is already in flight', async () => {
+        const tx = await wallet.finalizeTx({ tx: await wallet.initializeTx(props) });
+
+        await wallet.submitTx(tx);
+        expect(await firstValueFrom(wallet.transactions.outgoing.inFlight$)).toHaveLength(1);
+
+        // resubmit the same tx while it's 'in flight'
+        txSubmitProvider.submitTx.mockRejectedValueOnce(valueNotConservedError);
+        await wallet.submitTx(tx, { mightBeAlreadySubmitted: true });
+
+        expect(await firstValueFrom(wallet.transactions.outgoing.inFlight$)).toHaveLength(1);
+        expect(txSubmitProvider.submitTx).toBeCalledTimes(2);
       });
 
       it('resolves on success when submitting a tx when sending coins to a handle', async () => {
