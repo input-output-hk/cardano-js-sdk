@@ -442,14 +442,13 @@ describe('PersonalWallet methods', () => {
       });
 
       it('mightBeAlreadySubmitted option interprets ValueNotConservedError as success', async () => {
-        txSubmitProvider.submitTx.mockRejectedValueOnce(
-          new ProviderError(
-            ProviderFailure.BadRequest,
-            new CardanoNodeErrors.TxSubmissionErrors.ValueNotConservedError({
-              valueNotConserved: { consumed: 2, produced: 1 }
-            })
-          )
+        const error = new ProviderError(
+          ProviderFailure.BadRequest,
+          new CardanoNodeErrors.TxSubmissionErrors.ValueNotConservedError({
+            valueNotConserved: { consumed: 2, produced: 1 }
+          })
         );
+        txSubmitProvider.submitTx.mockRejectedValueOnce(error).mockRejectedValueOnce(error);
         const tx = await wallet.finalizeTx({ tx: await wallet.initializeTx(props) });
         const outgoingTx = toOutgoingTx(tx);
 
