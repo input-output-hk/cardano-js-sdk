@@ -65,7 +65,7 @@ spec:
               value: http://dev-preview-cardano-stack-metadata.dev-preview.svc.cluster.local
             - name: USE_TYPEORM_STAKE_POOL_PROVIDER
               value: "true"
-          image: 926093910549.dkr.ecr.us-east-1.amazonaws.com/cardano-services-server:aana7a352vdaz0rs41yhfh3s85inw004
+          image: FIXME-ADD-LATEST-IMAGE-REFERENCE
           livenessProbe:
             httpGet:
               path: /health

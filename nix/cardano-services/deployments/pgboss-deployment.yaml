@@ -75,7 +75,7 @@ spec:
               value: pool-metadata,pool-metrics
             - name: STAKE_POOL_PROVIDER_URL
               value: https://dev-preview-stake-pool.dev-preview.svc.cluster.local/stake-pool
-          image: 926093910549.dkr.ecr.us-east-1.amazonaws.com/cardano-services-server:aana7a352vdaz0rs41yhfh3s85inw004
+          image: FIXME-ADD-LATEST-IMAGE-REFERENCE
           livenessProbe:
             httpGet:
               path: /health

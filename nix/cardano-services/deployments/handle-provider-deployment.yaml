@@ -63,7 +63,7 @@ spec:
               value: handle
             - name: USE_KORA_LABS
               value: "true"
-          image: 926093910549.dkr.ecr.us-east-1.amazonaws.com/cardano-services-server:aana7a352vdaz0rs41yhfh3s85inw004
+          image: FIXME-ADD-LATEST-IMAGE-REFERENCE
           livenessProbe:
             httpGet:
               path: /health

@@ -3,6 +3,9 @@ let
   inherit (inputs.std.inputs) haumea;
   inherit (inputs.std.lib.ops) readYAML;
 
+  # haumea regex matcher signature:
+  # https://nix-community.github.io/haumea/api/matchers.html#matchersregex
+  #   we disregard cursor value and haumea inputs here
   loadYaml = _: _: readYAML;
 
   baseline = with haumea.lib;
