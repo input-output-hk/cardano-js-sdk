@@ -7,6 +7,8 @@ import { providerHandler } from '../util';
 import express from 'express';
 import path from 'path';
 
+const apiSpec = path.join(__dirname, 'openApi.json');
+
 /**
  * Dependencies that are need to create AssetHttpService
  */
@@ -27,9 +29,8 @@ export interface AssetHttpServiceDependencies {
  */
 export class AssetHttpService extends HttpService {
   constructor({ assetProvider, logger }: AssetHttpServiceDependencies, router: express.Router = express.Router()) {
-    super(ServiceNames.Asset, assetProvider, router, logger);
+    super(ServiceNames.Asset, assetProvider, router, apiSpec, logger);
 
-    const apiSpec = path.join(__dirname, 'openApi.json');
     router.use(
       OpenApiValidator.middleware({
         apiSpec,

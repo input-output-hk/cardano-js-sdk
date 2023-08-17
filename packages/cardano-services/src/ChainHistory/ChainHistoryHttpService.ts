@@ -7,6 +7,8 @@ import { providerHandler } from '../util';
 import express from 'express';
 import path from 'path';
 
+const apiSpec = path.join(__dirname, 'openApi.json');
+
 export interface ChainHistoryHttpServiceDependencies {
   logger: Logger;
   chainHistoryProvider: ChainHistoryProvider;
@@ -17,9 +19,8 @@ export class ChainHistoryHttpService extends HttpService {
     { logger, chainHistoryProvider }: ChainHistoryHttpServiceDependencies,
     router: express.Router = express.Router()
   ) {
-    super(ServiceNames.ChainHistory, chainHistoryProvider, router, logger);
+    super(ServiceNames.ChainHistory, chainHistoryProvider, router, apiSpec, logger);
 
-    const apiSpec = path.join(__dirname, 'openApi.json');
     router.use(
       OpenApiValidator.middleware({
         apiSpec,

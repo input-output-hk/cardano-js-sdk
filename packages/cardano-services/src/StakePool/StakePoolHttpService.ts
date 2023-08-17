@@ -7,6 +7,8 @@ import { providerHandler } from '../util';
 import express from 'express';
 import path from 'path';
 
+const apiSpec = path.join(__dirname, 'openApi.json');
+
 export interface StakePoolServiceDependencies {
   logger: Logger;
   stakePoolProvider: StakePoolProvider;
@@ -14,9 +16,8 @@ export interface StakePoolServiceDependencies {
 
 export class StakePoolHttpService extends HttpService {
   constructor({ logger, stakePoolProvider }: StakePoolServiceDependencies, router: express.Router = express.Router()) {
-    super(ServiceNames.StakePool, stakePoolProvider, router, logger);
+    super(ServiceNames.StakePool, stakePoolProvider, router, apiSpec, logger);
 
-    const apiSpec = path.join(__dirname, 'openApi.json');
     router.use(
       OpenApiValidator.middleware({
         apiSpec,

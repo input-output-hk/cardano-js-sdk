@@ -7,6 +7,8 @@ import { providerHandler } from '../util';
 import express from 'express';
 import path from 'path';
 
+const apiSpec = path.join(__dirname, 'openApi.json');
+
 export interface UtxoServiceDependencies {
   logger: Logger;
   utxoProvider: UtxoProvider;
@@ -14,9 +16,8 @@ export interface UtxoServiceDependencies {
 
 export class UtxoHttpService extends HttpService {
   constructor({ utxoProvider, logger }: UtxoServiceDependencies, router: express.Router = express.Router()) {
-    super(ServiceNames.Utxo, utxoProvider, router, logger);
+    super(ServiceNames.Utxo, utxoProvider, router, apiSpec, logger);
 
-    const apiSpec = path.join(__dirname, 'openApi.json');
     router.use(
       OpenApiValidator.middleware({
         apiSpec,

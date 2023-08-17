@@ -7,6 +7,9 @@ import { Logger } from 'ts-log';
 import { Pool } from 'pg';
 import { Router } from 'express';
 import { setPoolMetric } from './queries';
+import path from 'path';
+
+const apiSpec = path.join(__dirname, 'openApi.json');
 
 type BlockfrostMetrics = Awaited<ReturnType<BlockFrostAPI['poolsById']>>;
 
@@ -33,7 +36,7 @@ export class BlockfrostService extends HttpService {
     const { db, logger } = deps;
     const provider: Provider = { healthCheck: () => Promise.resolve({ ok: false }) };
 
-    super('blockfrost-cache', provider, Router(), logger);
+    super('blockfrost-cache', provider, Router(), apiSpec, logger);
 
     this.#api = new BlockFrostAPI({ network, projectId: blockfrostApiKey });
     this.#builder = new BlockfrostCacheBuilder(db, this.logger);

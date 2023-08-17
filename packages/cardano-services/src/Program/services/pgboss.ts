@@ -33,6 +33,9 @@ import { contextLogger } from '@cardano-sdk/util';
 import { createObservableDataSource } from '../../Projection/createTypeormProjection';
 import { retryBackoff } from 'backoff-rxjs';
 import PgBoss from 'pg-boss';
+import path from 'path';
+
+const apiSpec = path.join(__dirname, 'openApi.json');
 
 /**
  * The entities required by the job handlers
@@ -77,7 +80,7 @@ export class PgBossHttpService extends HttpService {
   constructor(cfg: PgBossServiceConfig, deps: PgBossServiceDependencies) {
     const { connectionConfig$, db, logger } = deps;
 
-    super('pg-boss-service', { healthCheck: async () => this.#health }, Router(), logger);
+    super('pg-boss-service', { healthCheck: async () => this.#health }, Router(), apiSpec, logger);
 
     this.#config = cfg;
     this.#db = db;

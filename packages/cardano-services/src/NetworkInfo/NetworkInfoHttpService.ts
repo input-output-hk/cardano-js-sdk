@@ -7,6 +7,8 @@ import { providerHandler } from '../util';
 import express from 'express';
 import path from 'path';
 
+const apiSpec = path.join(__dirname, 'openApi.json');
+
 export interface NetworkInfoServiceDependencies {
   logger: Logger;
   networkInfoProvider: NetworkInfoProvider;
@@ -17,9 +19,8 @@ export class NetworkInfoHttpService extends HttpService {
     { networkInfoProvider, logger }: NetworkInfoServiceDependencies,
     router: express.Router = express.Router()
   ) {
-    super(ServiceNames.NetworkInfo, networkInfoProvider, router, logger);
+    super(ServiceNames.NetworkInfo, networkInfoProvider, router, apiSpec, logger);
 
-    const apiSpec = path.join(__dirname, 'openApi.json');
     router.use(
       OpenApiValidator.middleware({
         apiSpec,

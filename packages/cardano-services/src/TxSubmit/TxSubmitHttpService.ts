@@ -14,6 +14,8 @@ import bodyParser from 'body-parser';
 import express from 'express';
 import path from 'path';
 
+const apiSpec = path.join(__dirname, 'openApi.json');
+
 export interface TxSubmitHttpServiceDependencies {
   logger: Logger;
   txSubmitProvider: TxSubmitProvider;
@@ -24,10 +26,9 @@ export class TxSubmitHttpService extends HttpService {
     { logger, txSubmitProvider }: TxSubmitHttpServiceDependencies,
     router: express.Router = express.Router()
   ) {
-    super(ServiceNames.TxSubmit, txSubmitProvider, router, logger);
+    super(ServiceNames.TxSubmit, txSubmitProvider, router, apiSpec, logger);
 
     router.use(bodyParser.raw());
-    const apiSpec = path.join(__dirname, 'openApi.json');
     router.use(
       OpenApiValidator.middleware({
         apiSpec,

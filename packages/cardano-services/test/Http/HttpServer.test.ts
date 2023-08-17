@@ -24,9 +24,14 @@ import { createLogger, logger } from '@cardano-sdk/util-dev';
 import { getRandomPort } from 'get-port-please';
 import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
 import { serverStarted } from '../util';
+import { versionPathFromSpec } from '../../src/util/openApi';
 import axios from 'axios';
 import express from 'express';
 import net from 'net';
+import path from 'path';
+
+const apiSpec = path.join(__dirname, 'openApi.json');
+const versionPath = versionPathFromSpec(apiSpec);
 
 class SomeHttpService extends HttpService {
   shouldFail?: boolean;
@@ -39,7 +44,7 @@ class SomeHttpService extends HttpService {
     assertReq?: (req: express.Request) => void,
     shouldFail?: boolean
   ) {
-    super(name, provider, router, logger);
+    super(name, provider, router, apiSpec, logger);
     this.shouldFail = shouldFail;
     router.all('/echo', (req, res) => {
       logger.debug(req.body);
@@ -80,7 +85,7 @@ describe('HttpServer', () => {
 
   beforeEach(async () => {
     port = await getRandomPort();
-    apiUrlBase = `http://localhost:${port}`;
+    apiUrlBase = `http://localhost:${port}${versionPath}`;
     lastBlockNoInDb = Cardano.BlockNo((await dbPools.main.query<LedgerTipModel>(findLedgerTip)).rows[0].block_no);
     cardanoNode = mockCardanoNode(
       healthCheckResponseMock({ blockNo: lastBlockNoInDb })
@@ -174,9 +179,19 @@ describe('HttpServer', () => {
           .filter(({ level, message }) => level === 'debug' && message[0] === '[HttpServer|request]')
           .map(({ message: [, requestDetails] }) => requestDetails)
       ).toEqual([
-        { body: {}, method: 'HEAD', path: '/', query: {} },
-        { body: { bigint: 23n, check: 'ok', test: 42 }, method: 'POST', path: '/stake-pool/echo', query: {} },
-        { body: {}, method: 'GET', path: '/stake-pool/echo', query: { bigint: '23', check: 'ok', test: '42' } }
+        { body: {}, method: 'HEAD', path: versionPath, query: {} },
+        {
+          body: { bigint: 23n, check: 'ok', test: 42 },
+          method: 'POST',
+          path: path.join(versionPath, 'stake-pool', 'echo'),
+          query: {}
+        },
+        {
+          body: {},
+          method: 'GET',
+          path: path.join(versionPath, 'stake-pool', 'echo'),
+          query: { bigint: '23', check: 'ok', test: '42' }
+        }
       ]);
     });
   });

@@ -19,6 +19,9 @@ import { HttpService } from '../Http';
 import { Logger } from 'ts-log';
 import { ProjectionName } from './prepareTypeormProjection';
 import express from 'express';
+import path from 'path';
+
+const apiSpec = path.join(__dirname, 'openApi.json');
 
 export interface ProjectionServiceProps<T> {
   projection$: Observable<T>;
@@ -92,7 +95,13 @@ export class ProjectionHttpService<T extends BaseProjectionEvent> extends HttpSe
     { projection$, projectionNames, healthTimeout = Milliseconds(60_000), dryRun }: ProjectionServiceProps<T>,
     { logger, router = express.Router() }: ProjectionServiceDependencies
   ) {
-    super(`Projection(${projectionNames.join(',')})`, { healthCheck: async () => this.#health }, router, logger);
+    super(
+      `Projection(${projectionNames.join(',')})`,
+      { healthCheck: async () => this.#health },
+      router,
+      apiSpec,
+      logger
+    );
     this.#dryRun = dryRun;
     this.#projection$ = projection$;
     this.#healthTimeout = healthTimeout;

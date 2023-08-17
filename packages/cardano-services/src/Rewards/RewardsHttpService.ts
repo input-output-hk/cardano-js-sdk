@@ -7,6 +7,8 @@ import { providerHandler } from '../util';
 import express from 'express';
 import path from 'path';
 
+const apiSpec = path.join(__dirname, 'openApi.json');
+
 export interface RewardServiceDependencies {
   logger: Logger;
   rewardsProvider: RewardsProvider;
@@ -14,9 +16,8 @@ export interface RewardServiceDependencies {
 
 export class RewardsHttpService extends HttpService {
   constructor({ logger, rewardsProvider }: RewardServiceDependencies, router: express.Router = express.Router()) {
-    super(ServiceNames.Rewards, rewardsProvider, router, logger);
+    super(ServiceNames.Rewards, rewardsProvider, router, apiSpec, logger);
 
-    const apiSpec = path.join(__dirname, 'openApi.json');
     router.use(
       OpenApiValidator.middleware({
         apiSpec,

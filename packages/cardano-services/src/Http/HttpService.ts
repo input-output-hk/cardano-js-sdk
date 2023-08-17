@@ -8,7 +8,7 @@ import {
 } from '@cardano-sdk/core';
 import { HttpServer } from './HttpServer';
 import { Logger } from 'ts-log';
-import { ProviderHandler, providerHandler } from '../util';
+import { ProviderHandler, providerHandler, useOpenApi } from '../util';
 import { RunnableModule } from '@cardano-sdk/util';
 import express, { Router } from 'express';
 
@@ -16,12 +16,15 @@ export abstract class HttpService extends RunnableModule {
   public router: express.Router;
   public slug: string;
   public provider: Provider;
+  public openApiPath: string;
 
-  constructor(slug: string, provider: Provider, router: express.Router, logger: Logger) {
+  constructor(slug: string, provider: Provider, router: express.Router, openApiPath: string, logger: Logger) {
     super(slug, logger);
     this.router = router;
     this.slug = slug;
     this.provider = provider;
+
+    useOpenApi(openApiPath, router);
 
     const healthHandler = async (req: express.Request, res: express.Response) => {
       logger.debug('/health', { ip: req.ip });
