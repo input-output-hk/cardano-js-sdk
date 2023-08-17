@@ -102,7 +102,8 @@ describe('TypeormStakePoolProvider', () => {
 
     const applyFilter = (pool: PoolInfo): boolean =>
       pool.ticker === poolsInfoWithMeta[0].ticker ||
-      pool.name === poolsInfoWithMeta[1].name ||
+      // eslint-disable-next-line unicorn/prefer-regexp-test
+      !!pool.name?.toLowerCase().includes(poolsInfoWithMeta[1].name.toLowerCase()) ||
       pool.id === poolsInfoWithMeta[2].id;
 
     poolsInfoWithMetaFiltered = poolsInfoWithMeta.filter(applyFilter);
