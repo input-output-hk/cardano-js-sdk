@@ -1,5 +1,5 @@
 /* eslint-disable unicorn/no-nested-ternary */
-import { BigIntMath, deepEquals, isNotNil, shallowArrayEquals } from '@cardano-sdk/util';
+import { BigIntMath, deepEquals, isNotNil } from '@cardano-sdk/util';
 import { Cardano, RewardsProvider, StakePoolProvider } from '@cardano-sdk/core';
 import {
   EMPTY,
@@ -231,7 +231,7 @@ export const addressKeyStatuses = (
 ) =>
   combineLatest([transactions$, transactionsInFlight$]).pipe(
     map(getAccountsKeyStatus(addresses)),
-    distinctUntilChanged(shallowArrayEquals)
+    distinctUntilChanged(deepEquals)
   );
 
 export const addressDelegatees = (

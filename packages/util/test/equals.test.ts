@@ -1,4 +1,4 @@
-import { deepEquals, sameArrayItems, shallowArrayEquals, strictEquals } from '../src';
+import { deepEquals, sameArrayItems, strictEquals } from '../src';
 
 describe('equals', () => {
   test('deepEquals', () => {
@@ -18,13 +18,5 @@ describe('equals', () => {
     expect(sameArrayItems(['a'], ['a', 'b'], strictEquals)).toBe(false);
     expect(sameArrayItems(['a', 'b'], ['a', 'b'], strictEquals)).toBe(true);
     expect(sameArrayItems(['a', 'b'], ['b', 'a'], strictEquals)).toBe(true);
-  });
-
-  test('shallowArrayEquals', () => {
-    expect(shallowArrayEquals([], [])).toBe(true);
-    const a = { prop: 'prop' };
-    const b = { prop: 'prop' };
-    expect(shallowArrayEquals([a], [b])).toBe(false);
-    expect(shallowArrayEquals([a], [a])).toBe(true);
   });
 });
