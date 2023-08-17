@@ -214,6 +214,7 @@ describe('storeNftMetadata', () => {
 
   const project$ = (events: typeof withHandleEvents) =>
     Bootstrap.fromCardanoNode({
+      blocksBufferLength: 1,
       buffer,
       cardanoNode: events.cardanoNode,
       logger
