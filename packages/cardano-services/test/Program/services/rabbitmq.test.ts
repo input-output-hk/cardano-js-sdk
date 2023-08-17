@@ -27,7 +27,7 @@ import { getRandomPort } from 'get-port-please';
 import { listenPromise, serverClosePromise } from '../../../src/util';
 import { logger } from '@cardano-sdk/util-dev';
 import { mockDnsResolverFactory } from './util';
-import { ogmiosServerReady } from '../../util';
+import { ogmiosServerReady, servicesWithVersionPath as services } from '../../util';
 import { txsPromise } from '../../TxSubmit/rabbitmq/utils';
 import { types } from 'util';
 import axios from 'axios';
@@ -60,7 +60,7 @@ describe('Program/services/rabbitmq', () => {
 
     beforeAll(async () => {
       ({ rabbitmqPort, rabbitmqUrl } = await container.load());
-      apiUrl = new URL(`http://localhost:${await getRandomPort()}`);
+      apiUrl = new URL(`http://localhost:${await getRandomPort()}${services.txSubmit.versionPath}`);
       config = { listen: { port: Number.parseInt(apiUrl.port) } };
     });
 
@@ -91,7 +91,7 @@ describe('Program/services/rabbitmq', () => {
         });
 
         it('forwards the txSubmitProvider health response', async () => {
-          const res = await axios.post(`${apiUrl}tx-submit/health`, {
+          const res = await axios.post(`${apiUrl}/tx-submit/health`, {
             headers: { 'Content-Type': APPLICATION_JSON }
           });
           expect(res.status).toBe(200);
@@ -126,7 +126,7 @@ describe('Program/services/rabbitmq', () => {
         });
 
         it('forwards the txSubmitProvider health response', async () => {
-          const res = await axios.post(`${apiUrl}tx-submit/health`, {
+          const res = await axios.post(`${apiUrl}/tx-submit/health`, {
             headers: { 'Content-Type': APPLICATION_JSON }
           });
           expect(res.status).toBe(200);

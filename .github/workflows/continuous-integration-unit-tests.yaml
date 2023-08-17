@@ -30,6 +30,10 @@ jobs:
       run: |
         yarn install --immutable --inline-builds
         yarn build
+
+    - name: 🔨 Generated files
+      run: |
+        if [ ! -z "$(git status --porcelain)" ] ; then git status ; echo "The PR is missing some generated file" ; exit 1 ; fi
         yarn lint
 
     - name: 🔃 Check for circular dependencies

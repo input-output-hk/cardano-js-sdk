@@ -9,7 +9,7 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/meta": {
+    "/v1.0.0/meta": {
       "post": {
         "summary": "HTTP Server metadata POST",
         "operationId": "server-metadata-post",

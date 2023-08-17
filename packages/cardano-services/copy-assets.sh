@@ -16,5 +16,10 @@ for i in $(ls ./src); do
   fi
 done
 
+for i in Http/schema.json Program/services/openApi.json ; do
+  cp ./src/$i ./dist/cjs/$i
+  # cp ./src/$i ./dist/esm/$i
+done
+
 cp -R ./src/StakePool/HttpStakePoolMetadata/schemas ./dist/cjs/StakePool/HttpStakePoolMetadata/schemas
 # cp -R ./src/StakePool/HttpStakePoolMetadata/schemas ./dist/esm/StakePool/HttpStakePoolMetadata/schemas

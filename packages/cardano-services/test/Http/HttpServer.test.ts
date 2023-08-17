@@ -44,7 +44,7 @@ class SomeHttpService extends HttpService {
     assertReq?: (req: express.Request) => void,
     shouldFail?: boolean
   ) {
-    super(name, provider, router, apiSpec, logger);
+    super(name, provider, router, __dirname, logger);
     this.shouldFail = shouldFail;
     router.all('/echo', (req, res) => {
       logger.debug(req.body);

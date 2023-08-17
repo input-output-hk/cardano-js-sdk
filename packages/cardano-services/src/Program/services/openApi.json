@@ -9,7 +9,7 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/health": {
+    "/v1.0.0/health": {
       "$ref": "../../Http/paths.json#/Health"
     }
   }

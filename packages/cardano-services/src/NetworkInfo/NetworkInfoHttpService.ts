@@ -1,13 +1,9 @@
-import * as OpenApiValidator from 'express-openapi-validator';
 import { HttpService } from '../Http';
 import { Logger } from 'ts-log';
 import { NetworkInfoProvider } from '@cardano-sdk/core';
 import { ServiceNames } from '../Program/programs/types';
 import { providerHandler } from '../util';
 import express from 'express';
-import path from 'path';
-
-const apiSpec = path.join(__dirname, 'openApi.json');
 
 export interface NetworkInfoServiceDependencies {
   logger: Logger;
@@ -19,16 +15,7 @@ export class NetworkInfoHttpService extends HttpService {
     { networkInfoProvider, logger }: NetworkInfoServiceDependencies,
     router: express.Router = express.Router()
   ) {
-    super(ServiceNames.NetworkInfo, networkInfoProvider, router, apiSpec, logger);
-
-    router.use(
-      OpenApiValidator.middleware({
-        apiSpec,
-        ignoreUndocumented: true,
-        validateRequests: true,
-        validateResponses: true
-      })
-    );
+    super(ServiceNames.NetworkInfo, networkInfoProvider, router, __dirname, logger);
 
     router.post(
       '/stake',

@@ -8,6 +8,7 @@ import {
   TxSubmitProvider
 } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, createHttpProvider } from '../HttpProvider';
+import { apiVersion } from '../version';
 import { mapHealthCheckError } from '../mapHealthCheckError';
 
 /**
@@ -48,6 +49,7 @@ const toTxSubmissionError = (error: any): CardanoNodeErrors.TxSubmissionError | 
 export const txSubmitHttpProvider = (config: CreateHttpProviderConfig<TxSubmitProvider>): TxSubmitProvider =>
   createHttpProvider<TxSubmitProvider>({
     ...config,
+    apiVersion: apiVersion.txSubmit,
     mapError: (error: any, method) => {
       switch (method) {
         case 'healthCheck': {
@@ -72,5 +74,6 @@ export const txSubmitHttpProvider = (config: CreateHttpProviderConfig<TxSubmitPr
       }
       throw new ProviderError(ProviderFailure.Unknown, error);
     },
-    paths
+    paths,
+    serviceSlug: 'tx-submit'
   });

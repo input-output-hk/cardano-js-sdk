@@ -48,7 +48,7 @@ describe('HandleHttpService', () => {
     let res: AxiosResponse;
 
     try {
-      res = await axios.post(`http://localhost:${port}/handle/${path}`, JSON.stringify(args), {
+      res = await axios.post(`http://localhost:${port}/v1.0.0/handle/${path}`, JSON.stringify(args), {
         headers: { 'Content-Type': 'application/json' }
       });
     } catch (error) {

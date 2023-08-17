@@ -9,6 +9,7 @@ describe('openApi utils', () => {
       const {
         info: { version }
       } = require(apiSpecPath) as OpenAPIV3.Document;
+      expect(version).not.toBeUndefined();
       expect(versionPathFromSpec(apiSpecPath)).toBe(`/v${version}`);
     });
   });

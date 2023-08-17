@@ -1,5 +1,6 @@
 import { CreateHttpProviderConfig, createHttpProvider } from '../HttpProvider';
 import { HttpProviderConfigPaths, ProviderError, ProviderFailure, RewardsProvider } from '@cardano-sdk/core';
+import { apiVersion } from '../version';
 import { mapHealthCheckError } from '../mapHealthCheckError';
 
 /**
@@ -19,6 +20,7 @@ const paths: HttpProviderConfigPaths<RewardsProvider> = {
 export const rewardsHttpProvider = (config: CreateHttpProviderConfig<RewardsProvider>): RewardsProvider =>
   createHttpProvider<RewardsProvider>({
     ...config,
+    apiVersion: apiVersion.rewards,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mapError: (error: any, method) => {
       if (method === 'healthCheck') {
@@ -26,5 +28,6 @@ export const rewardsHttpProvider = (config: CreateHttpProviderConfig<RewardsProv
       }
       throw new ProviderError(ProviderFailure.Unknown, error);
     },
-    paths
+    paths,
+    serviceSlug: 'rewards'
   });

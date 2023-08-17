@@ -14,7 +14,7 @@ import { INFO, createLogger } from 'bunyan';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { RewardsFixtureBuilder } from './fixtures/FixtureBuilder';
-import { clearDbPools } from '../util';
+import { clearDbPools, servicesWithVersionPath as services } from '../util';
 import { getPort } from 'get-port-please';
 import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
 import { logger } from '@cardano-sdk/util-dev';
@@ -32,6 +32,7 @@ describe('RewardsHttpService', () => {
   let service: RewardsHttpService;
   let port: number;
   let baseUrl: string;
+  let baseUrlWithVersion: string;
   let clientConfig: CreateHttpProviderConfig<RewardsProvider>;
   let config: HttpServerConfig;
   let cardanoNode: OgmiosCardanoNode;
@@ -42,7 +43,8 @@ describe('RewardsHttpService', () => {
 
   beforeAll(async () => {
     port = await getPort();
-    baseUrl = `http://localhost:${port}/rewards`;
+    baseUrl = `http://localhost:${port}`;
+    baseUrlWithVersion = `${baseUrl}${services.rewards.versionPath}/${services.rewards.name}`;
     clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
     config = { listen: { port } };
     dbPools = {
@@ -86,7 +88,11 @@ describe('RewardsHttpService', () => {
 
     describe('/health', () => {
       it('forwards the rewardsProvider health response with HTTP request', async () => {
-        const res = await axios.post(`${baseUrl}/health`, {}, { headers: { 'Content-Type': APPLICATION_JSON } });
+        const res = await axios.post(
+          `${baseUrlWithVersion}/health`,
+          {},
+          { headers: { 'Content-Type': APPLICATION_JSON } }
+        );
         expect(res.status).toBe(200);
         expect(res.data).toEqual(
           healthCheckResponseMock({
@@ -127,7 +133,7 @@ describe('RewardsHttpService', () => {
       it('returns a 200 coded response with a well formed HTTP request', async () => {
         expect(
           (
-            await axios.post(`${baseUrl}${historyUrl}`, {
+            await axios.post(`${baseUrlWithVersion}${historyUrl}`, {
               epochs: {
                 lowerBound: 1,
                 upperBound: 14
@@ -141,7 +147,7 @@ describe('RewardsHttpService', () => {
         expect.assertions(2);
         try {
           await axios.post(
-            `${baseUrl}${historyUrl}`,
+            `${baseUrlWithVersion}${historyUrl}`,
             {
               rewardAccounts: [rewardAddress]
             },
@@ -155,7 +161,7 @@ describe('RewardsHttpService', () => {
       it('returns 400 coded response if the request is bad formed', async () => {
         expect.assertions(2);
         try {
-          await axios.post(`${baseUrl}${historyUrl}`, { field: 'value' });
+          await axios.post(`${baseUrlWithVersion}${historyUrl}`, { field: 'value' });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
           expect(error.response.status).toBe(400);
@@ -166,7 +172,7 @@ describe('RewardsHttpService', () => {
         expect.assertions(2);
         try {
           await axios.post(
-            `${baseUrl}${historyUrl}`,
+            `${baseUrlWithVersion}${historyUrl}`,
             {
               rewardAccounts: [
                 rewardAddress,
@@ -191,7 +197,7 @@ describe('RewardsHttpService', () => {
       it('returns a 200 coded response with a well formed HTTP request', async () => {
         expect(
           (
-            await axios.post(`${baseUrl}${accountBalanceUrl}`, {
+            await axios.post(`${baseUrlWithVersion}${accountBalanceUrl}`, {
               rewardAccount
             })
           ).status
@@ -201,7 +207,7 @@ describe('RewardsHttpService', () => {
         expect.assertions(2);
         try {
           await axios.post(
-            `${baseUrl}${accountBalanceUrl}`,
+            `${baseUrlWithVersion}${accountBalanceUrl}`,
             { rewardAccount },
             { headers: { 'Content-Type': APPLICATION_CBOR } }
           );
@@ -213,7 +219,7 @@ describe('RewardsHttpService', () => {
       it('returns 400 coded response if the request is bad formed', async () => {
         expect.assertions(2);
         try {
-          await axios.post(`${baseUrl}${accountBalanceUrl}`, { address: 'asd' });
+          await axios.post(`${baseUrlWithVersion}${accountBalanceUrl}`, { address: 'asd' });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
           expect(error.response.status).toBe(400);

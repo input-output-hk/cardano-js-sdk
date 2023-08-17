@@ -8,12 +8,16 @@ import { HttpService } from './HttpService';
 import { Logger } from 'ts-log';
 import { ProviderError, ProviderFailure, providerFailureToStatusCodeMap } from '@cardano-sdk/core';
 import { RunnableModule, contextLogger, fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
+import { versionPathFromSpec } from '../util/openApi';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import express from 'express';
 import expressPromBundle from 'express-prom-bundle';
 import http from 'http';
 import path from 'path';
+
+const apiSpecPath = path.join(__dirname, 'openApi.json');
+const versionPath = versionPathFromSpec(apiSpecPath);
 
 export interface HttpServerDependencies {
   services: HttpService[];
@@ -27,11 +31,13 @@ export class HttpServer extends RunnableModule {
   #config: HttpServerConfig;
   #dependencies: HttpServerDependencies;
   #healthGauge: Gauge<string>;
+
   constructor(config: HttpServerConfig, { logger, ...rest }: HttpServerDependencies) {
     super(config.name || 'HttpServer', logger);
     this.#config = config;
     this.#dependencies = { logger, ...rest };
   }
+
   async #getServicesHealth() {
     const servicesHealth: ServiceHealth[] = await Promise.all(
       this.#dependencies.services.map((service) =>
@@ -44,6 +50,7 @@ export class HttpServer extends RunnableModule {
           })
       )
     );
+
     const result = {
       ok: servicesHealth.every((service) => service.ok),
       services: servicesHealth
@@ -84,8 +91,10 @@ export class HttpServer extends RunnableModule {
 
     for (const service of this.#dependencies.services) {
       await service.initialize();
-      this.app.use(`/${service.slug}`, service.router);
-      this.logger.debug(`Using /${service.slug}`);
+      const serviceVersionPath = service.apiVersionPath();
+      const serviceBaseUrl = path.join(serviceVersionPath, service.slug);
+      this.app.use(serviceBaseUrl, service.router);
+      this.logger.info(`Using ${serviceBaseUrl}`);
     }
 
     const healthCheckHandler =
@@ -102,14 +111,6 @@ export class HttpServer extends RunnableModule {
         return HttpServer.sendJSON(res, health, statusCodeFromHealth(health));
       };
 
-    this.app.use(
-      '/health',
-      healthCheckHandler(() => 200)
-    );
-    this.app.use(
-      '/ready',
-      healthCheckHandler(({ ok }) => (ok ? 200 : 503))
-    );
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.app.use((err: any, _req: express.Request, res: express.Response, _n: express.NextFunction) => {
       if (err instanceof ProviderError) {
@@ -120,10 +121,9 @@ export class HttpServer extends RunnableModule {
       }
     });
 
-    const apiSpec = path.join(__dirname, 'openApi.json');
     this.app.use(
       OpenApiValidator.middleware({
-        apiSpec,
+        apiSpec: apiSpecPath,
         ignoreUndocumented: true,
         validateRequests: true,
         validateResponses: true
@@ -135,7 +135,14 @@ export class HttpServer extends RunnableModule {
       return HttpServer.sendJSON(res, this.#config.meta);
     };
 
-    this.app.use('/meta', serverMetadataHandler);
+    const handlers = {
+      health: healthCheckHandler(() => 200),
+      meta: serverMetadataHandler,
+      ready: healthCheckHandler(({ ok }) => (ok ? 200 : 503))
+    };
+
+    let handler: keyof typeof handlers;
+    for (handler in handlers) this.app.use(path.join(versionPath, handler), handlers[handler]);
   }
 
   static sendJSON<ResponseBody>(
@@ -227,7 +234,8 @@ export class HttpServer extends RunnableModule {
         includeMethod: true,
         includePath: true,
         promRegistry,
-        ...this.#config.metrics?.options
+        ...this.#config.metrics?.options,
+        metricsPath: path.join(versionPath, this.#config.metrics?.options?.metricsPath || '/metrics')
       })
     );
     this.logger.info(

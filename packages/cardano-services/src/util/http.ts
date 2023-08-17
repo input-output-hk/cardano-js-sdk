@@ -1,5 +1,4 @@
-import * as OpenApiValidator from 'express-openapi-validator';
-import { Application, Router } from 'express';
+import { Application } from 'express';
 import { ListenOptions } from 'net';
 import http from 'http';
 
@@ -17,9 +16,3 @@ export const serverClosePromise = (server: http.Server): Promise<void> =>
     server.once('close', resolve);
     server.close((error) => (error ? reject(error) : null));
   });
-
-export const useOpenApi = (apiSpec: string, router: Router) => {
-  router.use(
-    OpenApiValidator.middleware({ apiSpec, ignoreUndocumented: true, validateRequests: true, validateResponses: true })
-  );
-};

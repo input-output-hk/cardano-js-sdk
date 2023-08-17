@@ -16,7 +16,7 @@ import { HexBlob } from '@cardano-sdk/util';
 import { INFO, createLogger } from 'bunyan';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
-import { clearDbPools } from '../util';
+import { clearDbPools, servicesWithVersionPath as services } from '../util';
 import { getPort } from 'get-port-please';
 import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
 import { logger } from '@cardano-sdk/util-dev';
@@ -34,6 +34,7 @@ describe('UtxoHttpService', () => {
   let service: UtxoHttpService;
   let port: number;
   let baseUrl: string;
+  let baseUrlWithVersion: string;
   let clientConfig: CreateHttpProviderConfig<UtxoProvider>;
   let config: HttpServerConfig;
   let cardanoNode: OgmiosCardanoNode;
@@ -44,7 +45,8 @@ describe('UtxoHttpService', () => {
 
   beforeAll(async () => {
     port = await getPort();
-    baseUrl = `http://localhost:${port}/utxo`;
+    baseUrl = `http://localhost:${port}`;
+    baseUrlWithVersion = `${baseUrl}${services.utxo.versionPath}/${services.utxo.name}`;
     clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
     config = { listen: { port } };
     dbPools = {
@@ -89,7 +91,7 @@ describe('UtxoHttpService', () => {
 
     describe('/health', () => {
       it('forwards the utxoProvider health response with HTTP request', async () => {
-        const res = await axios.post(`${baseUrl}/health`, undefined, {
+        const res = await axios.post(`${baseUrlWithVersion}/health`, undefined, {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
@@ -130,7 +132,7 @@ describe('UtxoHttpService', () => {
       it('returns a 415 coded response if the wrong content type header is used', async () => {
         try {
           await axios.post(
-            `${baseUrl}/utxo-by-addresses`,
+            `${baseUrlWithVersion}/utxo-by-addresses`,
             { args: [[]] },
             { headers: { 'Content-Type': APPLICATION_CBOR } }
           );
@@ -143,7 +145,7 @@ describe('UtxoHttpService', () => {
 
       it('returns 400 coded respons if the request is bad formed', async () => {
         try {
-          await axios.post(`${baseUrl}/utxo-by-addresses`, { addresses: ['asd'] });
+          await axios.post(`${baseUrlWithVersion}/utxo-by-addresses`, { addresses: ['asd'] });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
           expect(error.response.status).toBe(400);
@@ -153,7 +155,7 @@ describe('UtxoHttpService', () => {
 
       it('valid request should pass OpenApi schema validations', async () => {
         const addresses = ['asd'];
-        const res = await axios.post(`${baseUrl}/utxo-by-addresses`, { addresses });
+        const res = await axios.post(`${baseUrlWithVersion}/utxo-by-addresses`, { addresses });
         expect(res.status).toEqual(200);
       });
 
