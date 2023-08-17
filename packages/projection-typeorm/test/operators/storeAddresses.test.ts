@@ -88,6 +88,7 @@ describe('storeAddresses', () => {
 
   const project$ = () =>
     Bootstrap.fromCardanoNode({
+      blocksBufferLength: 1,
       buffer,
       cardanoNode: stubEvents.cardanoNode,
       logger
