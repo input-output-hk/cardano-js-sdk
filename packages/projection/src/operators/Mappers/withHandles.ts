@@ -1,12 +1,12 @@
-import { Asset, Cardano } from '@cardano-sdk/core';
+import { Asset, Cardano, Handle } from '@cardano-sdk/core';
 import { CustomError } from 'ts-custom-error';
 import { FilterByPolicyIds } from './types';
 import { ProjectionOperator } from '../../types';
 import { logError } from './util';
 import { map } from 'rxjs';
 
-export interface Handle {
-  handle: string;
+export interface HandleOwnership {
+  handle: Handle;
   /**
    * Last effect on this handle in this block.
    * - if it's non-`null`, it means it was found in one of the transaction outputs, but it does not
@@ -21,7 +21,7 @@ export interface Handle {
 }
 
 export interface WithHandles {
-  handles: Handle[];
+  handles: HandleOwnership[];
 }
 
 const handleFromAssetId = (assetId: Cardano.AssetId) =>
@@ -51,7 +51,7 @@ const mapHandleToData = (
 };
 
 const getOutputHandles = (outputs: Cardano.TxOut[], policyIds: FilterByPolicyIds['policyIds']) => {
-  const handles: Record<string, Handle> = {};
+  const handles: Record<string, HandleOwnership> = {};
   for (const { address, value, datum } of outputs) {
     if (!value.assets) continue;
     for (const [assetId] of value.assets.entries()) {
@@ -70,7 +70,7 @@ const getOutputHandles = (outputs: Cardano.TxOut[], policyIds: FilterByPolicyIds
 
 const getBurnedHandles = (mint: Cardano.TokenMap | undefined, policyIds: FilterByPolicyIds['policyIds']) => {
   if (!mint) return;
-  const handles: Record<string, Handle> = {};
+  const handles: Record<string, HandleOwnership> = {};
   for (const [assetId, quantity] of mint.entries()) {
     // Positive quantity mint was already accounted for in 'getOutputHandles'
     if (quantity < 0n) {
@@ -98,7 +98,7 @@ export const withHandles =
             ...getOutputHandles(outputs, policyIds),
             ...getBurnedHandles(mint, policyIds)
           }),
-          {} as Record<string, Handle>
+          {} as Record<string, HandleOwnership>
         );
         return {
           ...evt,
