@@ -5,7 +5,7 @@ import { QueryRunner } from 'typeorm';
 import { WithMintedAssetSupplies } from './storeAssets';
 import { typeormOperator } from './util';
 
-type HandleWithTotalSupply = Mappers.Handle & { totalSupply: bigint };
+type HandleWithTotalSupply = Mappers.HandleOwnership & { totalSupply: bigint };
 
 type HandleEventParams = {
   handles: Array<HandleWithTotalSupply>;
@@ -86,7 +86,7 @@ const rollBackward = async ({ handles, queryRunner }: HandleEventParams) => {
 
 const withTotalSupplies = (
   queryRunner: QueryRunner,
-  handles: Mappers.Handle[],
+  handles: Mappers.HandleOwnership[],
   mintedAssetTotalSupplies: WithMintedAssetSupplies['mintedAssetTotalSupplies']
 ): Promise<HandleWithTotalSupply[]> =>
   Promise.all(
