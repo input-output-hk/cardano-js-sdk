@@ -15,14 +15,7 @@
         "operationId": "server-metadata-post",
         "responses": {
           "200": {
-            "description": "HTTP Server metadata",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServerMetadata"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Meta200"
           }
         }
       },
@@ -45,6 +38,18 @@
     }
   },
   "components": {
+    "responses": {
+      "Meta200": {
+        "description": "HTTP Server metadata",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ServerMetadata"
+            }
+          }
+        }
+      }
+    },
     "schemas": {
       "ServerMetadata": {
         "type": "object",

@@ -1,0 +1,98 @@
+{
+  "paths": {
+    "Health": {
+      "post": {
+        "summary": "Health POST",
+        "operationId": "health-post",
+        "responses": {
+          "200": {
+            "description": "HTTP Service health",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schema/Health"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Health GET",
+        "operationId": "health-get",
+        "responses": {
+          "200": {
+            "description": "HTTP Service health",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schema/Health"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schema": {
+      "BlockNo": {
+        "type": "number"
+      },
+      "DigestBlake2BBlockHeader": {
+        "type": "string"
+      },
+      "Health": {
+        "type": "object",
+        "required": ["ok"],
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "localNode": {
+            "$ref": "#/components/schema/LocalNodeResponse"
+          },
+          "projectedTip": {
+            "$ref": "#/components/schema/TipResponse"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "LocalNodeResponse": {
+        "type": "object",
+        "properties": {
+          "ledgerTip": {
+            "$ref": "#/components/schema/TipResponse"
+          },
+          "networkSync": {
+            "$ref": "#/components/schema/Percent"
+          }
+        }
+      },
+      "Percent": {
+        "type": "number"
+      },
+      "Slot": {
+        "type": "number"
+      },
+      "TipResponse": {
+        "type": "object",
+        "required": ["slot", "hash", "blockNo"],
+        "properties": {
+          "slot": {
+            "$ref": "#/components/schema/Slot"
+          },
+          "hash": {
+            "$ref": "#/components/schema/DigestBlake2BBlockHeader"
+          },
+          "blockNo": {
+            "$ref": "#/components/schema/BlockNo"
+          }
+        }
+      }
+    }
+  }
+}
