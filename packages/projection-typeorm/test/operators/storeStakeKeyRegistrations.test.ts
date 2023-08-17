@@ -37,6 +37,7 @@ describe('storeStakeKeyRegistrations', () => {
 
   const project = () =>
     Bootstrap.fromCardanoNode({
+      blocksBufferLength: 1,
       buffer,
       cardanoNode: data.cardanoNode,
       logger
