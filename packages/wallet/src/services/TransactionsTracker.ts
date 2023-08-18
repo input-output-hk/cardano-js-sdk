@@ -250,7 +250,13 @@ export const createTransactionsTracker = (
   );
 
   const txOnChain$ = (evt: OutgoingTx): Observable<OutgoingOnChainTx> =>
-    onChainNewTxSuccess$.pipe(
+    merge(
+      historicalTransactions$.pipe(
+        take(1),
+        mergeMap((txs) => from(txs))
+      ),
+      onChainNewTxSuccess$
+    ).pipe(
       filter((historyTx) => historyTx.id === evt.id),
       take(1),
       map((historyTx) => ({ ...evt, slot: historyTx.blockHeader.slot })),
