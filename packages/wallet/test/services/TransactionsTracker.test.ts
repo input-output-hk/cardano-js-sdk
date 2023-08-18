@@ -732,6 +732,61 @@ describe('TransactionsTracker', () => {
       expect(inFlightTransactionsStore.set).lastCalledWith([]);
     });
 
+    it('removes tx from inFlight$ when loading with stored in-flight transaction that is already confirmed on-chain', () => {
+      const txToBeConfirmed = queryTransactionsResult.pageResults[0];
+      const txInFlight = { submittedAt: Cardano.Slot(1), ...toOutgoingTx(txToBeConfirmed) };
+
+      createTestScheduler().run(({ hot, expectObservable }) => {
+        const storedInFlight$ = hot<TxInFlight[]>('a----|', {
+          a: [txInFlight]
+        });
+        inFlightTransactionsStore.get = jest.fn(() => storedInFlight$);
+        inFlightTransactionsStore.set = jest.fn();
+
+        const failedToSubmit$ = hot<FailedTx>('-----|');
+        const tip$ = hot<Cardano.Tip>('-----|');
+        const submitting$ = hot<OutgoingTx>('-----|');
+        const pending$ = hot<OutgoingTx>('-----|');
+        // The key of this test is that the 1st emission of transactions source already
+        // contains the transaction that we loaded from inFlightTransactionsStore
+        const transactionsSource$ = hot<Cardano.HydratedTx[]>('----a|', {
+          a: [txToBeConfirmed]
+        });
+
+        const transactionsTracker = createTransactionsTracker(
+          {
+            addresses$,
+            chainHistoryProvider,
+            inFlightTransactionsStore,
+            logger,
+            newTransactions: {
+              failedToSubmit$,
+              pending$,
+              submitting$
+            },
+            retryBackoffConfig,
+            tip$,
+            transactionsHistoryStore: transactionsStore
+          },
+          {
+            rollback$: NEVER,
+            transactionsSource$
+          }
+        );
+        expectObservable(transactionsTracker.outgoing.onChain$).toBe('----a|', {
+          a: { slot: txToBeConfirmed.blockHeader.slot, ...txInFlight }
+        });
+        expectObservable(transactionsTracker.outgoing.inFlight$).toBe('(ab)c|', {
+          // before loading from store
+          a: [],
+          // after loading from store
+          b: [txInFlight],
+          // after seeing it on-chain
+          c: []
+        });
+      });
+    });
+
     it('inFlight mixed with submitting transactions are removed from store on successful transaction', async () => {
       const outgoingTx = toOutgoingTx(queryTransactionsResult.pageResults[0]);
       const storedInFlightTx: TxInFlight = {
