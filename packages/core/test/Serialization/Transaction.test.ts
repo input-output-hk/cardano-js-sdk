@@ -1,5 +1,5 @@
-import { CML } from '../../src';
-import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
+import { CML, TxCBOR } from '../../src';
+import { ManagedFreeableScope } from '@cardano-sdk/util';
 import { Transaction } from '../../src/Serialization';
 import { babbageTx, tx as coreTx, signature, vkey } from '../CML/testData';
 
@@ -14,12 +14,12 @@ const CLI_TX =
 
 describe('Transaction', () => {
   it('round trip serializations produce the same CBOR output', () => {
-    const tx = Transaction.fromCbor(HexBlob(TX));
+    const tx = Transaction.fromCbor(TxCBOR(TX));
     expect(tx.toCbor()).toBe(TX);
   });
 
   it('correctly deserialize a CBOR transaction', () => {
-    const tx = Transaction.fromCbor(HexBlob(TX));
+    const tx = Transaction.fromCbor(TxCBOR(TX));
     expect(tx.toCore()).toEqual(babbageTx);
   });
 
@@ -47,7 +47,7 @@ describe('Transaction', () => {
     expect(tx.toCore()).toEqual(babbageTx);
   });
   it('calling free several times doesnt throw an error', () => {
-    const tx = Transaction.fromCbor(HexBlob(TX));
+    const tx = Transaction.fromCbor(TxCBOR(TX));
     expect(() => tx.free()).not.toThrow();
     expect(() => tx.free()).not.toThrow();
     expect(() => tx.free()).not.toThrow();
@@ -55,7 +55,7 @@ describe('Transaction', () => {
   });
 
   it('can set the isValid flag on the transaction', () => {
-    const tx = Transaction.fromCbor(HexBlob(TX));
+    const tx = Transaction.fromCbor(TxCBOR(TX));
     expect(tx.isValid()).toEqual(true);
 
     tx.setIsValid(false);
@@ -67,8 +67,8 @@ describe('Transaction', () => {
 
   it('can set the txBody on the transaction', () => {
     const scope = new ManagedFreeableScope();
-    const tx = Transaction.fromCbor(HexBlob(TX));
-    const tx2 = Transaction.fromCbor(HexBlob(TX2));
+    const tx = Transaction.fromCbor(TxCBOR(TX));
+    const tx2 = Transaction.fromCbor(TxCBOR(TX2));
 
     tx.setBody(scope.manage(tx2.body()));
 
@@ -80,8 +80,8 @@ describe('Transaction', () => {
 
   it('can set the witness set on the transaction', () => {
     const scope = new ManagedFreeableScope();
-    const tx = Transaction.fromCbor(HexBlob(TX));
-    const tx2 = Transaction.fromCbor(HexBlob(TX2));
+    const tx = Transaction.fromCbor(TxCBOR(TX));
+    const tx2 = Transaction.fromCbor(TxCBOR(TX2));
 
     tx.setWitnessSet(scope.manage(tx2.witnessSet()));
 
@@ -93,8 +93,8 @@ describe('Transaction', () => {
 
   it('can set the witness set on the transaction', () => {
     const scope = new ManagedFreeableScope();
-    const tx = Transaction.fromCbor(HexBlob(TX));
-    const tx2 = Transaction.fromCbor(HexBlob(TX2));
+    const tx = Transaction.fromCbor(TxCBOR(TX));
+    const tx2 = Transaction.fromCbor(TxCBOR(TX2));
 
     tx.setAuxiliaryData(scope.manage(tx2.auxiliaryData()));
 
@@ -106,10 +106,10 @@ describe('Transaction', () => {
 
   it('can perform a deep clone of the object', () => {
     const scope = new ManagedFreeableScope();
-    const referenceTx = Transaction.fromCbor(HexBlob(TX));
-    const tx = Transaction.fromCbor(HexBlob(TX));
+    const referenceTx = Transaction.fromCbor(TxCBOR(TX));
+    const tx = Transaction.fromCbor(TxCBOR(TX));
     const cloned = tx.clone();
-    const tx2 = Transaction.fromCbor(HexBlob(TX2));
+    const tx2 = Transaction.fromCbor(TxCBOR(TX2));
 
     // Change original TX object
     tx.setBody(scope.manage(tx2.body()));
@@ -122,7 +122,7 @@ describe('Transaction', () => {
   });
 
   it('can compute the right Tx ID', () => {
-    expect(Transaction.fromCbor(HexBlob(TX)).getId()).toEqual(
+    expect(Transaction.fromCbor(TxCBOR(TX)).getId()).toEqual(
       '856c8bc6ce3725188b496d62fa389f2beff2f701e6d35af39d3f3464bbce0cec'
     );
 
@@ -134,7 +134,7 @@ describe('Transaction', () => {
     // cardano-cli transaction txid --tx-file ./tx  <-- tx contains the CBOR of the transaction.
     //
     // For this particular transaction it should yield the value: '2d7f290c815e061fb7c27e91d2a898bd7b454a71c9b7a26660e2257ac31ebe32'
-    expect(Transaction.fromCbor(HexBlob(CLI_TX)).getId()).toEqual(
+    expect(Transaction.fromCbor(TxCBOR(CLI_TX)).getId()).toEqual(
       '2d7f290c815e061fb7c27e91d2a898bd7b454a71c9b7a26660e2257ac31ebe32'
     );
   });

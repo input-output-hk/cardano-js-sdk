@@ -1,12 +1,13 @@
-import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
+import { ManagedFreeableScope } from '@cardano-sdk/util';
 import { Transaction } from '../../src/Serialization/Transaction';
+import { TxCBOR } from '../../src';
 
 describe('reserialization', () => {
   let scope: ManagedFreeableScope;
 
   const testReserialization = (testName: string, originalSerialized: string) =>
     test(testName, () => {
-      const cmlTx = scope.manage(Transaction.fromCbor(HexBlob(originalSerialized)));
+      const cmlTx = scope.manage(Transaction.fromCbor(TxCBOR(originalSerialized)));
       const deserialized = cmlTx.toCore();
       const cmlTxReserialized = scope.manage(Transaction.fromCore(scope, deserialized));
       const reserialized = cmlTxReserialized.toCbor();
