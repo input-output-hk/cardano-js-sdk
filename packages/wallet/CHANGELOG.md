@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.0-patch.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.18.7-patch.0...@cardano-sdk/wallet@0.19.0-patch.0) (2023-08-18)
+
+### Bug Fixes
+
+* **wallet:** do not re-serialize tx when computing id ([d3b4708](https://github.com/input-output-hk/cardano-js-sdk/commit/d3b470864e2669f7b53619afa297a7a5e3dca6d8))
+
 ## [0.18.7-patch.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.18.6-patch.0...@cardano-sdk/wallet@0.18.7-patch.0) (2023-08-18)
 
 ### Features
