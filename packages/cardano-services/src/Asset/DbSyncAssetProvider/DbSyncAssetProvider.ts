@@ -11,7 +11,7 @@ import {
 import { AssetBuilder } from './AssetBuilder';
 import { AssetPolicyIdAndName, NftMetadataService, TokenMetadataService } from '../types';
 import { DB_CACHE_TTL_DEFAULT, InMemoryCache, NoCache } from '../../InMemoryCache';
-import { DbSyncProvider, DbSyncProviderDependencies } from '../../util/DbSyncProvider';
+import { DbSyncProvider, DbSyncProviderDependencies } from '../../util';
 
 /**
  * Properties that are need to create DbSyncAssetProvider

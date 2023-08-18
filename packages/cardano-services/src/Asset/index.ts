@@ -4,4 +4,5 @@ export * from './StubTokenMetadataService';
 export * from './DbSyncNftMetadataService';
 export * from './DbSyncAssetProvider';
 export * from './TypeOrmNftMetadataService';
+export * from './TypeormAssetProvider';
 export * from './types';
