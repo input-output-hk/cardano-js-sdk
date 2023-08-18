@@ -3,6 +3,7 @@ import { BigNum } from '@dcspark/cardano-multiplatform-lib-nodejs';
 import { HexBlob, ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
 import { Transaction } from '../Serialization';
 import { Tx, TxBody } from '../Cardano';
+import { TxCBOR } from '../CBOR';
 
 export const MAX_U64 = 18_446_744_073_709_551_615n;
 
@@ -34,6 +35,6 @@ export const deserializeTx = ((txBody: Buffer | Uint8Array | string) => usingAut
         ? Buffer.from(txBody).toString('hex')
         : txBody);
 
-  const transaction = scope.manage(Transaction.fromCbor(HexBlob(hex)));
+  const transaction = scope.manage(Transaction.fromCbor(TxCBOR(hex)));
   return transaction.toCore();
 })) as (txBody: HexBlob | Buffer | Uint8Array | string) => Tx<TxBody>;

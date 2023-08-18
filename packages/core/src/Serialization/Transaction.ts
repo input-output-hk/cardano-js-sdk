@@ -6,6 +6,7 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { CML } from '../CML/CML';
 import { CborReader, CborReaderState, CborWriter } from './CBOR';
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
+import type { TxBodyCBOR, TxCBOR } from '../CBOR';
 
 const ALONZO_ERA_TX_FRAME_SIZE = 4;
 
@@ -29,10 +30,10 @@ export class Transaction {
   // If the transaction object is constructed from a CBOR byte array, we are going to remember it and use it
   // when the object is re-serialized again to avoid changing the transaction during a round trip serialization.
   // This cache will be invalidated if any of the transaction properties changes after the object has been deserialized.
-  #originalBytes: HexBlob | undefined = undefined;
+  #originalBytes: TxCBOR | undefined = undefined;
 
   // TODO: This is a temporary workaround to the round trip issue, will be properly addressed once ADP-2803 is completed.
-  #originalBodyBytes: HexBlob | undefined = undefined;
+  #originalBodyBytes: TxBodyCBOR | undefined = undefined;
 
   /**
    * Initializes a new instance of the Transaction class.
@@ -67,7 +68,7 @@ export class Transaction {
    *
    * @returns The transaction in CBOR format.
    */
-  toCbor(): HexBlob {
+  toCbor(): TxCBOR {
     const writer = new CborWriter();
 
     if (this.#originalBytes) return this.#originalBytes;
@@ -89,7 +90,7 @@ export class Transaction {
       writer.writeNull();
     }
 
-    return writer.encodeAsHex();
+    return writer.encodeAsHex() as unknown as TxCBOR;
   }
 
   /**
@@ -98,8 +99,8 @@ export class Transaction {
    * @param cbor The CBOR encoded transaction object.
    * @returns The new transaction instance.
    */
-  static fromCbor(cbor: HexBlob): Transaction {
-    const reader = new CborReader(cbor);
+  static fromCbor(cbor: TxCBOR): Transaction {
+    const reader = new CborReader(cbor as unknown as HexBlob);
 
     const length = reader.readStartArray();
 
@@ -121,7 +122,7 @@ export class Transaction {
 
     tx.#isValid = isValid;
     tx.#originalBytes = cbor;
-    tx.#originalBodyBytes = HexBlob.fromBytes(bodyBytes);
+    tx.#originalBodyBytes = HexBlob.fromBytes(bodyBytes) as unknown as TxBodyCBOR;
 
     return tx;
   }

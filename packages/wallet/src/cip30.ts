@@ -434,7 +434,7 @@ export const createWalletApi = (
   signTx: async (tx: Cbor, partialSign?: Boolean): Promise<Cbor> => {
     const scope = new ManagedFreeableScope();
     logger.debug('signTx');
-    const txDecoded = scope.manage(Serialization.Transaction.fromCbor(HexBlob(tx)));
+    const txDecoded = scope.manage(Serialization.Transaction.fromCbor(TxCBOR(tx)));
 
     const hash = txDecoded.getId();
     const coreTx = txDecoded.toCore();
