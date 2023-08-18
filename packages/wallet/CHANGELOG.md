@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.18.7-patch.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.18.6-patch.0...@cardano-sdk/wallet@0.18.7-patch.0) (2023-08-18)
+
+### Features
+
+* **wallet:** filter out duplicate utxo ([427eb85](https://github.com/input-output-hk/cardano-js-sdk/commit/427eb85e714637150c9838964774876d2c775e11))
+
+### Bug Fixes
+
+* **wallet:** do not prevent internal tx re-submission (broken by [#861](https://github.com/input-output-hk/cardano-js-sdk/issues/861)) ([eeb27fb](https://github.com/input-output-hk/cardano-js-sdk/commit/eeb27fb06250b1f2173f2ec7db2823649bfece61))
+* **wallet:** remove tx from inFlight$ when loading by the time it's already on-chain ([fbfd6d8](https://github.com/input-output-hk/cardano-js-sdk/commit/fbfd6d87319c65192c8d9d71303e8b110b37ae08))
+
 ## [0.18.6-patch.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.18.5...@cardano-sdk/wallet@0.18.6-patch.0) (2023-08-11)
 
 ### Bug Fixes
