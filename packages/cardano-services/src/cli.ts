@@ -17,6 +17,7 @@ import {
   DROP_SCHEMA_DEFAULT,
   DRY_RUN_DEFAULT,
   HANDLE_PROVIDER_SERVER_URL_DEFAULT,
+  NFT_METADATA_PROVIDER_SERVER_URL_DEFAULT,
   PAGINATION_PAGE_SIZE_LIMIT_DEFAULT,
   PARALLEL_MODE_DEFAULT,
   PARALLEL_TXS_DEFAULT,
@@ -193,19 +194,25 @@ withCommonOptions(
     withPostgresOptions(
       withPostgresOptions(
         withPostgresOptions(
-          withRabbitMqOptions(
-            withHandlePolicyIdsOptions(
-              program
-                .command('start-provider-server')
-                .description('Start the Provider Server')
-                .argument('[serviceNames...]', `List of services to attach: ${Object.values(ServiceNames).toString()}`)
-            )
+          withPostgresOptions(
+            withRabbitMqOptions(
+              withHandlePolicyIdsOptions(
+                program
+                  .command('start-provider-server')
+                  .description('Start the Provider Server')
+                  .argument(
+                    '[serviceNames...]',
+                    `List of services to attach: ${Object.values(ServiceNames).toString()}`
+                  )
+              )
+            ),
+            'StakePool'
           ),
-          'StakePool'
+          'Handle'
         ),
-        'Handle'
+        'DbSync'
       ),
-      'DbSync'
+      'NftMetadata'
     )
   ),
   {
@@ -361,12 +368,22 @@ withCommonOptions(
       .default(HANDLE_PROVIDER_SERVER_URL_DEFAULT)
       .argParser((serverUrl: string) => serverUrl)
   )
+  .addOption(
+    new Option(
+      '--nftMetadata-provider-server-url <nftMetadataProviderServerUrl>',
+      ProviderServerOptionDescriptions.nftMetadataProviderServerUrl
+    )
+      .env('NFT_METADATA_PROVIDER_SERVER_URL')
+      .default(NFT_METADATA_PROVIDER_SERVER_URL_DEFAULT)
+      .argParser((serverUrl: string) => serverUrl)
+  )
   .action(async (serviceNames: ServiceNames[], args: ProviderServerArgs) =>
     runServer('Provider server', () =>
       loadProviderServer({
         ...args,
         postgresConnectionStringDbSync: connectionStringFromArgs(args, 'DbSync'),
         postgresConnectionStringHandle: connectionStringFromArgs(args, 'Handle'),
+        postgresConnectionStringNftMetadata: connectionStringFromArgs(args, 'NftMetadata'),
         postgresConnectionStringStakePool: connectionStringFromArgs(args, 'StakePool'),
         serviceNames: args.serviceNames ? args.serviceNames : serviceNames
       })

@@ -1,14 +1,21 @@
 /* eslint-disable complexity */
 /* eslint-disable sonarjs/cognitive-complexity */
-import { AssetHttpService } from '../../Asset/AssetHttpService';
+import {
+  AssetHttpService,
+  CardanoTokenRegistry,
+  DbSyncAssetProvider,
+  DbSyncNftMetadataService,
+  NftMetadataHttpService,
+  NftMetadataHttpServiceDependencies,
+  NftMetadataService,
+  StubTokenMetadataService,
+  TypeOrmNftMetadataService
+} from '../../Asset';
 import { CardanoNode, HandleProvider, Seconds } from '@cardano-sdk/core';
-import { CardanoTokenRegistry } from '../../Asset/CardanoTokenRegistry';
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../../ChainHistory';
 import { ConnectionNames, PostgresOptionDescriptions, suffixType2Cli } from '../options/postgres';
 import { DbPools, DbSyncEpochPollService } from '../../util';
-import { DbSyncAssetProvider } from '../../Asset/DbSyncAssetProvider';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../NetworkInfo';
-import { DbSyncNftMetadataService, StubTokenMetadataService } from '../../Asset';
 import { DbSyncRewardsProvider, RewardsHttpService } from '../../Rewards';
 import { DbSyncStakePoolProvider, StakePoolHttpService, createHttpStakePoolMetadataService } from '../../StakePool';
 import { DbSyncUtxoProvider, UtxoHttpService } from '../../Utxo';
@@ -47,6 +54,7 @@ export const USE_BLOCKFROST_DEFAULT = false;
 export const USE_TYPEORM_STAKE_POOL_PROVIDER_DEFAULT = false;
 export const USE_QUEUE_DEFAULT = false;
 export const HANDLE_PROVIDER_SERVER_URL_DEFAULT = '';
+export const NFT_METADATA_PROVIDER_SERVER_URL_DEFAULT = '';
 
 export interface LoadProviderServerDependencies {
   dnsResolver?: (serviceName: string) => Promise<SrvRecord>;
@@ -67,6 +75,7 @@ const serverName = 'provider-server';
 const connectionConfigs: { [k in ConnectionNames]?: Observable<PgConnectionConfig> } = {};
 
 let sharedHandleProvider: HandleProvider;
+let sharedNftMetadataService: NftMetadataService;
 
 const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
   const { args, pools, dnsResolver, genesisData, logger, node } = options;
@@ -189,6 +198,15 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     return sharedHandleProvider;
   };
 
+  const getNftMetadataService = async () => {
+    if (sharedNftMetadataService) return sharedNftMetadataService;
+    return withTypeOrmProvider(
+      'NftMetadata',
+      async (connectionConfig$) =>
+        new TypeOrmNftMetadataService({ connectionConfig$, entities: getEntities(['asset']), logger })
+    );
+  };
+
   return {
     [ServiceNames.Asset]: withDbSyncProvider(async (dbPools, cardanoNode) => {
       const ntfMetadataService = new DbSyncNftMetadataService({
@@ -257,6 +275,11 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       return new ChainHistoryHttpService({ chainHistoryProvider, logger });
     }, ServiceNames.ChainHistory),
     [ServiceNames.Handle]: async () => new HandleHttpService({ handleProvider: await getHandleProvider(), logger }),
+    [ServiceNames.NftMetadata]: async () =>
+      new NftMetadataHttpService(<NftMetadataHttpServiceDependencies>{
+        logger,
+        nftMetadataService: await getNftMetadataService()
+      }),
     [ServiceNames.Rewards]: withDbSyncProvider(async (dbPools, cardanoNode) => {
       const rewardsProvider = new DbSyncRewardsProvider(
         { paginationPageSizeLimit: args.paginationPageSizeLimit! },

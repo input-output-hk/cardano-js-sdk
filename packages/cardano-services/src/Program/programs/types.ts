@@ -27,7 +27,8 @@ export enum ServiceNames {
   Rewards = 'rewards',
   StakePool = 'stake-pool',
   TxSubmit = 'tx-submit',
-  Utxo = 'utxo'
+  Utxo = 'utxo',
+  NftMetadata = 'nft-metadata'
 }
 
 export const POOLS_METRICS_INTERVAL_DEFAULT = 1000;
@@ -56,13 +57,15 @@ export enum ProviderServerOptionDescriptions {
   UseKoraLabsProvider = 'Use the KoraLabs handle provider',
   UseQueue = 'Enables RabbitMQ',
   PaginationPageSizeLimit = 'Pagination page size limit shared across all providers',
-  HandleProviderServerUrl = 'URL for the Handle provider server'
+  HandleProviderServerUrl = 'URL for the Handle provider server',
+  nftMetadataProviderServerUrl = 'URL for the NFT Metadata provider server'
 }
 
 export type ProviderServerArgs = CommonProgramOptions &
   PosgresProgramOptions<'DbSync'> &
   PosgresProgramOptions<'Handle'> &
   PosgresProgramOptions<'StakePool'> &
+  PosgresProgramOptions<'NftMetadata'> &
   OgmiosProgramOptions &
   HandlePolicyIdsProgramOptions &
   RabbitMqProgramOptions & {

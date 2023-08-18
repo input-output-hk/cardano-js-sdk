@@ -169,6 +169,7 @@ const callCliAndAssertExit = (
 
 const HANDLE_POLICY_IDS = 'f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a';
 const HANDLE_PROVIDER_SERVER_URL = 'http://localhost:3000';
+const NFT_METADATA_PROVIDER_SERVER_URL = 'http://localhost:3000';
 
 describe('CLI', () => {
   const container = new RabbitMQContainer();
@@ -179,10 +180,12 @@ describe('CLI', () => {
   let postgresConnectionStringHandle: string;
   let postgresConnectionStringProjection: string;
   let postgresConnectionStringStakePool: string;
+  let postgresConnectionStringNftMetadata: string;
 
   beforeAll(() => {
     postgresConnectionString = process.env.POSTGRES_CONNECTION_STRING_DB_SYNC!;
     postgresConnectionStringHandle = process.env.POSTGRES_CONNECTION_STRING_HANDLE!;
+    postgresConnectionStringNftMetadata = process.env.POSTGRES_CONNECTION_STRING_HANDLE!;
     postgresConnectionStringProjection = process.env.POSTGRES_CONNECTION_STRING_PROJECTION!;
     postgresConnectionStringStakePool = process.env.POSTGRES_CONNECTION_STRING_STAKE_POOL!;
   });
@@ -286,6 +289,8 @@ describe('CLI', () => {
                   postgresConnectionString,
                   '--postgres-connection-string-handle',
                   postgresConnectionStringHandle,
+                  '--postgres-connection-string-nft-metadata',
+                  postgresConnectionStringNftMetadata,
                   '--ogmios-url',
                   ogmiosConnection.address.webSocket,
                   '--cardano-node-config-path',
@@ -296,6 +301,8 @@ describe('CLI', () => {
                   HANDLE_POLICY_IDS,
                   '--handle-provider-server-url',
                   HANDLE_PROVIDER_SERVER_URL,
+                  '--nft-metadata-provider-server-url',
+                  NFT_METADATA_PROVIDER_SERVER_URL,
                   ServiceNames.Asset,
                   ServiceNames.ChainHistory,
                   ServiceNames.NetworkInfo,
@@ -303,6 +310,7 @@ describe('CLI', () => {
                   ServiceNames.TxSubmit,
                   ServiceNames.Utxo,
                   ServiceNames.Rewards
+                  // ServiceNames.NftMetadata
                 ],
                 { env: {}, stdio: 'pipe' }
               )
@@ -315,6 +323,7 @@ describe('CLI', () => {
             await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, { withTip: false });
             await assertServiceHealthy(apiUrl, ServiceNames.Utxo, lastBlock);
             await assertServiceHealthy(apiUrl, ServiceNames.Rewards, lastBlock);
+            // await assertServiceHealthy(apiUrl, ServiceNames.NftMetadata, lastBlock);
           });
 
           it('exposes a HTTP server at the configured URL with all services attached when using env variables', async () => {
@@ -360,6 +369,8 @@ describe('CLI', () => {
                   postgresConnectionString,
                   '--postgres-connection-string-handle',
                   postgresConnectionStringHandle,
+                  '--postgres-connection-string-nft-metadata',
+                  postgresConnectionStringNftMetadata,
                   '--ogmios-url',
                   ogmiosConnection.address.webSocket,
                   '--cardano-node-config-path',
@@ -446,6 +457,8 @@ describe('CLI', () => {
                     allowedOrigin,
                     '--postgres-connection-string-db-sync',
                     postgresConnectionString,
+                    '--postgres-connection-string-nft-metadata',
+                    postgresConnectionStringNftMetadata,
                     '--ogmios-url',
                     ogmiosConnection.address.webSocket,
                     '--db-cache-ttl',
@@ -506,6 +519,8 @@ describe('CLI', () => {
                     buildInfo,
                     '--postgres-connection-string-db-sync',
                     postgresConnectionString,
+                    '--postgres-connection-string-nft-metadata',
+                    postgresConnectionStringNftMetadata,
                     '--ogmios-url',
                     ogmiosConnection.address.webSocket,
                     '--cardano-node-config-path',
@@ -553,6 +568,8 @@ describe('CLI', () => {
                     apiUrl,
                     '--postgres-connection-string-db-sync',
                     postgresConnectionString,
+                    '--postgres-connection-string-nft-metadata',
+                    postgresConnectionStringNftMetadata,
                     '--ogmios-url',
                     ogmiosConnection.address.webSocket,
                     '--cardano-node-config-path',
@@ -581,6 +598,8 @@ describe('CLI', () => {
                     invalidBuildInfo,
                     '--postgres-connection-string-db-sync',
                     postgresConnectionString,
+                    '--postgres-connection-string-nft-metadata',
+                    postgresConnectionStringNftMetadata,
                     '--ogmios-url',
                     ogmiosConnection.address.webSocket,
                     '--cardano-node-config-path',
@@ -608,6 +627,8 @@ describe('CLI', () => {
                     buildInfoWithWrongProp,
                     '--postgres-connection-string-db-sync',
                     postgresConnectionString,
+                    '--postgres-connection-string-nft-metadata',
+                    postgresConnectionStringNftMetadata,
                     '--ogmios-url',
                     ogmiosConnection.address.webSocket,
                     '--cardano-node-config-path',
@@ -633,6 +654,8 @@ describe('CLI', () => {
                   apiUrl,
                   '--postgres-connection-string-db-sync',
                   postgresConnectionString,
+                  '--postgres-connection-string-nft-metadata',
+                  postgresConnectionStringNftMetadata,
                   '--ogmios-url',
                   ogmiosConnection.address.webSocket,
                   '--cardano-node-config-path',
@@ -664,6 +687,8 @@ describe('CLI', () => {
                   apiUrl,
                   '--postgres-connection-string-db-sync',
                   postgresConnectionString,
+                  '--postgres-connection-string-nft-metadata',
+                  postgresConnectionStringNftMetadata,
                   '--ogmios-url',
                   ogmiosConnection.address.webSocket,
                   '--cardano-node-config-path',
@@ -691,6 +716,8 @@ describe('CLI', () => {
                   'true',
                   '--postgres-connection-string-db-sync',
                   postgresConnectionString,
+                  '--postgres-connection-string-nft-metadata',
+                  postgresConnectionStringNftMetadata,
                   '--ogmios-url',
                   ogmiosConnection.address.webSocket,
                   '--cardano-node-config-path',
