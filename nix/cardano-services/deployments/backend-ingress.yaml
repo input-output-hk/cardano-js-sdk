@@ -1,0 +1,56 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"RedirectConfig":{"Port":"443","Protocol":"HTTPS","StatusCode":"HTTP_301"},"Type":"redirect"}'
+    alb.ingress.kubernetes.io/healthcheck-interval-seconds: "60"
+    alb.ingress.kubernetes.io/healthcheck-path: /health
+    alb.ingress.kubernetes.io/healthcheck-timeout-seconds: "30"
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/wafv2-acl-arn: arn:aws:wafv2:eu-central-1:926093910549:regional/webacl/rate-limit-backend/07d554a1-0ac0-4799-9745-9ece4d409889
+    external-dns.alpha.kubernetes.io/aws-region: eu-central-1
+    external-dns.alpha.kubernetes.io/set-identifier: eu-central-1-dev-preview-backend
+  labels:
+    app: backend
+    network: preview
+    release: dev-preview-cardanojs
+  name: dev-preview-cardanojs-backend
+spec:
+  ingressClassName: alb
+  rules:
+    - host: backend.dev-preview.eks.lw.iog.io
+      http:
+        paths:
+          - backend:
+              service:
+                name: ssl-redirect
+                port:
+                  name: use-annotation
+            path: /
+            pathType: Prefix
+          - backend:
+              service:
+                name: dev-preview-cardanojs-backend
+                port:
+                  name: http
+            path: /
+            pathType: Prefix
+          - backend:
+              service:
+                name: dev-preview-cardanojs-stake-pool-provider
+                port:
+                  name: http
+            path: /stake-pool
+            pathType: Prefix
+          - backend:
+              service:
+                name: dev-preview-cardanojs-handle-provider
+                port:
+                  name: http
+            path: /handle
+            pathType: Prefix
+  tls:
+    - hosts:
+        - backend.dev-preview.eks.lw.iog.io
