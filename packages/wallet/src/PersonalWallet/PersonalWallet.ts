@@ -101,14 +101,13 @@ import {
   finalizeTx,
   initializeTx
 } from '@cardano-sdk/tx-construction';
-import { Shutdown, contextLogger, deepEquals, usingAutoFree } from '@cardano-sdk/util';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { KoraLabsHandleProvider } from '@cardano-sdk/cardano-services-client';
 import { Logger } from 'ts-log';
 import { RetryBackoffConfig } from 'backoff-rxjs';
+import { Shutdown, contextLogger, deepEquals, usingAutoFree } from '@cardano-sdk/util';
 import { WalletStores, createInMemoryWalletStores } from '../persistence';
 import isEqual from 'lodash/isEqual';
 import uniq from 'lodash/uniq';
+import type { KoraLabsHandleProvider } from '@cardano-sdk/cardano-services-client';
 
 export interface PersonalWalletProps {
   readonly name: string;
