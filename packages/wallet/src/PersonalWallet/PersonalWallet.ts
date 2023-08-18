@@ -47,7 +47,7 @@ import {
   ProviderError,
   RewardsProvider,
   StakePoolProvider,
-  TxBodyCBOR,
+  Transaction,
   TxCBOR,
   TxSubmitProvider,
   UtxoProvider
@@ -98,9 +98,9 @@ import {
   finalizeTx,
   initializeTx
 } from '@cardano-sdk/tx-construction';
+import { HexBlob, Shutdown, contextLogger, deepEquals, usingAutoFree } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { Shutdown, contextLogger, deepEquals } from '@cardano-sdk/util';
 import { TrackedUtxoProvider } from '../services/ProviderTracker/TrackedUtxoProvider';
 import { WalletStores, createInMemoryWalletStores } from '../persistence';
 import { createTransactionReemitter } from '../services/TransactionReemitter';
@@ -162,12 +162,15 @@ const isSignedTx = (input: Cardano.Tx | TxCBOR | OutgoingTx | SignedTx): input i
 const processOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx | SignedTx): OutgoingTx => {
   // TxCbor
   if (isTxCBOR(input)) {
-    return {
-      body: TxCBOR.deserialize(input).body,
-      cbor: input,
-      // Do not re-serialize transaction body to compute transaction id
-      id: Cardano.TransactionId.fromTxBodyCbor(TxBodyCBOR.fromTxCBOR(input))
-    };
+    return usingAutoFree((scope) => {
+      const tx = scope.manage(Transaction.fromCbor(input as unknown as HexBlob));
+      return {
+        body: tx.toCore().body,
+        cbor: input,
+        // Do not re-serialize transaction body to compute transaction id
+        id: tx.getId()
+      };
+    });
   }
   // SignedTx
   if (isSignedTx(input)) {
