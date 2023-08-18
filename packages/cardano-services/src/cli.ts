@@ -34,6 +34,7 @@ import {
   TxWorkerOptionDescriptions,
   USE_BLOCKFROST_DEFAULT,
   USE_QUEUE_DEFAULT,
+  USE_TYPEORM_ASSET_PROVIDER_DEFAULT,
   USE_TYPEORM_STAKE_POOL_PROVIDER_DEFAULT,
   availableNetworks,
   connectionStringFromArgs,
@@ -193,19 +194,25 @@ withCommonOptions(
     withPostgresOptions(
       withPostgresOptions(
         withPostgresOptions(
-          withRabbitMqOptions(
-            withHandlePolicyIdsOptions(
-              program
-                .command('start-provider-server')
-                .description('Start the Provider Server')
-                .argument('[serviceNames...]', `List of services to attach: ${Object.values(ServiceNames).toString()}`)
-            )
+          withPostgresOptions(
+            withRabbitMqOptions(
+              withHandlePolicyIdsOptions(
+                program
+                  .command('start-provider-server')
+                  .description('Start the Provider Server')
+                  .argument(
+                    '[serviceNames...]',
+                    `List of services to attach: ${Object.values(ServiceNames).toString()}`
+                  )
+              )
+            ),
+            'StakePool'
           ),
-          'StakePool'
+          'Handle'
         ),
-        'Handle'
+        'DbSync'
       ),
-      'DbSync'
+      'Asset'
     )
   ),
   {
@@ -360,6 +367,18 @@ withCommonOptions(
       .env('HANDLE_PROVIDER_SERVER_URL')
       .default(HANDLE_PROVIDER_SERVER_URL_DEFAULT)
       .argParser((serverUrl: string) => serverUrl)
+  )
+  .addOption(
+    new Option('--use-typeorm-asset-provider <true/false>', ProviderServerOptionDescriptions.UseTypeormAssetProvider)
+      .env('USE_TYPEORM_ASSET_PROVIDER')
+      .default(USE_TYPEORM_ASSET_PROVIDER_DEFAULT)
+      .argParser((useTypeormAssetProvider) =>
+        stringOptionToBoolean(
+          useTypeormAssetProvider,
+          Programs.ProviderServer,
+          ProviderServerOptionDescriptions.UseTypeormAssetProvider
+        )
+      )
   )
   .action(async (serviceNames: ServiceNames[], args: ProviderServerArgs) =>
     runServer('Provider server', () =>

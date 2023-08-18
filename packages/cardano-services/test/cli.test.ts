@@ -2147,7 +2147,35 @@ describe('CLI', () => {
           );
           await serverStarted(apiUrl);
           const headers = { 'Content-Type': 'application/json' };
-          const res = await axios.post(`${apiUrl}/v1.0.0/${ServiceNames.StakePool}/health`, { headers });
+          const res = await axios.post(`${apiUrl}${services.stakePool.versionPath}/${ServiceNames.StakePool}/health`, {
+            headers
+          });
+          expect(res.status).toBe(200);
+        });
+
+        it('asset provider server', async () => {
+          proc = withLogging(
+            fork(
+              exePath,
+              [
+                ...baseArgs,
+                '--api-url',
+                apiUrl,
+                '--postgres-connection-string-asset',
+                postgresConnectionStringHandle,
+                '--use-typeorm-asset-provider',
+                'true',
+                '--service-names',
+                ServiceNames.Asset
+              ],
+              { env: {}, stdio: 'pipe' }
+            )
+          );
+          await serverStarted(apiUrl);
+          const headers = { 'Content-Type': 'application/json' };
+          const res = await axios.post(`${apiUrl}${services.asset.versionPath}/${ServiceNames.Asset}/health`, {
+            headers
+          });
           expect(res.status).toBe(200);
         });
       });
