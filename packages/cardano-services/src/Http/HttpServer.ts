@@ -126,7 +126,7 @@ export class HttpServer extends RunnableModule {
         apiSpec: apiSpecPath,
         ignoreUndocumented: true,
         validateRequests: true,
-        validateResponses: true
+        validateResponses: process.env.NODE_ENV !== 'production'
       })
     );
 
