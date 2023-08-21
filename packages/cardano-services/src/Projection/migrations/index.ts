@@ -16,6 +16,7 @@ import { PoolMetadataTableMigration1682519108363 } from './1682519108363-pool-me
 import { PoolMetricsMigrations1685011799580 } from './1685011799580-stake-pool-metrics-table';
 import { PoolRegistrationTableMigration1682519108360 } from './1682519108360-pool-registration-table';
 import { PoolRetirementTableMigration1682519108361 } from './1682519108361-pool-retirement-table';
+import { PoolRewardsTableMigrations1698175956871 } from './1698175956871-pool-rewards-table';
 import { StakeKeyRegistrationsTableMigrations1690964880195 } from './1690964880195-stake-key-registrations-table';
 import { StakePoolTableMigration1682519108362 } from './1682519108362-stake-pool-table';
 import { TokensQuantityNumericMigrations1691042603934 } from './1691042603934-tokens-quantity-numeric';
@@ -47,5 +48,6 @@ export const migrations: ProjectionMigration[] = [
   HandleMetadataTableMigrations1693490983715,
   HandleDefaultMigrations1693830294136,
   PoolDelistedTableMigration1695899010515,
-  CurrentStakePollMetricsAttributesMigrations1698174358997
+  CurrentStakePollMetricsAttributesMigrations1698174358997,
+  PoolRewardsTableMigrations1698175956871
 ];

@@ -1,0 +1,48 @@
+import { BigIntColumnOptions, UInt64ColumnOptions } from './util';
+import { Cardano } from '@cardano-sdk/core';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { StakePoolEntity } from './StakePool.entity';
+
+@Entity()
+@Unique(['epochNo', 'stakePoolId'])
+export class PoolRewardsEntity {
+  @PrimaryGeneratedColumn()
+  id?: number;
+
+  @Column({ length: 56, type: 'char' })
+  stakePoolId?: Cardano.PoolId;
+
+  @ManyToOne(() => StakePoolEntity)
+  @JoinColumn()
+  stakePool?: StakePoolEntity;
+
+  @Column({ type: 'integer' })
+  epochLength?: number;
+
+  @Column()
+  epochNo?: Cardano.EpochNo;
+
+  @Column({ type: 'integer' })
+  delegators?: number;
+
+  @Column(BigIntColumnOptions)
+  pledge?: Cardano.Lovelace;
+
+  @Column(UInt64ColumnOptions)
+  activeStake?: Cardano.Lovelace;
+
+  @Column(UInt64ColumnOptions)
+  memberActiveStake?: Cardano.Lovelace;
+
+  @Column(UInt64ColumnOptions)
+  leaderRewards?: Cardano.Lovelace;
+
+  @Column(UInt64ColumnOptions)
+  memberRewards?: Cardano.Lovelace;
+
+  @Column(UInt64ColumnOptions)
+  rewards?: Cardano.Lovelace;
+
+  @Column({ type: 'integer' })
+  version?: number;
+}
