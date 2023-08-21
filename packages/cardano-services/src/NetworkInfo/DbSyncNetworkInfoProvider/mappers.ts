@@ -25,9 +25,9 @@ export const toLedgerTip = ({ block_no, slot_no, hash }: LedgerTipModel): Cardan
 });
 
 export const mapCostModels = (costs: CostModelsParamModel | null) => {
-  const models: Cardano.CostModels = [];
-  if (costs?.PlutusV1) models[Cardano.PlutusLanguageVersion.V1] = costs.PlutusV1;
-  if (costs?.PlutusV2) models[Cardano.PlutusLanguageVersion.V2] = costs.PlutusV2;
+  const models: Cardano.CostModels = new Map();
+  if (costs?.PlutusV1) models.set(Cardano.PlutusLanguageVersion.V1, costs.PlutusV1);
+  if (costs?.PlutusV2) models.set(Cardano.PlutusLanguageVersion.V2, costs.PlutusV2);
   return models;
 };
 
