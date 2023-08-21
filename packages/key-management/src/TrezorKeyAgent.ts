@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AuthenticationError, TransportError } from './errors';
+import { AuthenticationError, HwMappingError, TransportError } from './errors';
 import { Cardano, NotImplementedError, coreToCml } from '@cardano-sdk/core';
 import {
   CardanoKeyConst,
@@ -147,7 +147,7 @@ export class TrezorKeyAgent extends KeyAgentBase {
     );
   }
 
-  async signTransaction({ body }: Cardano.TxBodyWithHash): Promise<Cardano.Signatures> {
+  async signTransaction({ body, hash }: Cardano.TxBodyWithHash): Promise<Cardano.Signatures> {
     const scope = new ManagedFreeableScope();
     try {
       await this.isTrezorInitialized;
@@ -167,6 +167,11 @@ export class TrezorKeyAgent extends KeyAgentBase {
       }
 
       const signedData = result.payload;
+
+      if (signedData.hash !== hash) {
+        throw new HwMappingError('Trezor computed a different transaction id');
+      }
+
       return new Map<Crypto.Ed25519PublicKeyHex, Crypto.Ed25519SignatureHex>(
         await Promise.all(
           signedData.witnesses.map(async (witness) => {
