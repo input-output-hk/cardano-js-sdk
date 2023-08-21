@@ -5,11 +5,9 @@ on:
   workflow_call:
   pull_request:
     branches:
-      - develop
       - master
   push:
     branches:
-      - develop
       - master
 env:
   AWS_REGION: us-east-1
