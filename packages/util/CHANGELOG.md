@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.14.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.13.2...@cardano-sdk/util@0.14.0) (2023-08-21)
+
+### ⚠ BREAKING CHANGES
+
+* **util:** shallowArrayEquals was removed
+
+### Code Refactoring
+
+* **util:** removed shallowArrayEquals ([f869896](https://github.com/input-output-hk/cardano-js-sdk/commit/f869896ecd29f662b4494da48e872382b07e4e6c))
+
 ## [0.13.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.13.1...@cardano-sdk/util@0.13.2) (2023-08-15)
 
 **Note:** Version bump only for package @cardano-sdk/util

@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.21.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.20.1...@cardano-sdk/wallet@0.21.0) (2023-08-21)
+
+### ⚠ BREAKING CHANGES
+
+* update Transaction.fromTxCbor arg type to TxCBOR
+
+### Bug Fixes
+
+* **wallet:** address key statuses are now updated properly when changes are detected ([1720650](https://github.com/input-output-hk/cardano-js-sdk/commit/1720650f8438442b207d273ba838582dee022b29))
+* **wallet:** do not re-serialize tx when computing id ([4e49204](https://github.com/input-output-hk/cardano-js-sdk/commit/4e492041b76f0bb6943f5c6b134e0ae7ae6ab5cb))
+* **wallet:** remove tx from inFlight$ when loading by the time it's already on-chain ([56eb6d2](https://github.com/input-output-hk/cardano-js-sdk/commit/56eb6d21c339cf7aae0b68bfe92cd6b9f9036a6d))
+
+### Code Refactoring
+
+* update Transaction.fromTxCbor arg type to TxCBOR ([89dcfde](https://github.com/input-output-hk/cardano-js-sdk/commit/89dcfdec0f42c570d36a92a504eca493658f24e3))
+
 ## [0.20.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.20.0...@cardano-sdk/wallet@0.20.1) (2023-08-16)
 
 ### Bug Fixes

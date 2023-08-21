@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.18.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.17.0...@cardano-sdk/core@0.18.0) (2023-08-21)
+
+### ⚠ BREAKING CHANGES
+
+* update Transaction.fromTxCbor arg type to TxCBOR
+
+### Code Refactoring
+
+* update Transaction.fromTxCbor arg type to TxCBOR ([89dcfde](https://github.com/input-output-hk/cardano-js-sdk/commit/89dcfdec0f42c570d36a92a504eca493658f24e3))
+
 ## [0.17.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.16.0...@cardano-sdk/core@0.17.0) (2023-08-15)
 
 ### ⚠ BREAKING CHANGES
