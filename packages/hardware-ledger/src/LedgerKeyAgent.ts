@@ -16,7 +16,8 @@ import { LedgerTransportType } from './types';
 import { ManagedFreeableScope } from '@cardano-sdk/util';
 import { str_to_path } from '@cardano-foundation/ledgerjs-hw-app-cardano/dist/utils/address';
 import { toLedgerTx } from './transformers';
-import LedgerConnection, {
+import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
+import _LedgerConnection, {
   Certificate,
   CertificateType,
   GetVersionResponse,
@@ -28,9 +29,16 @@ import LedgerConnection, {
   TransactionSigningMode,
   TxOutputDestinationType
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
-import TransportWebHID from '@ledgerhq/hw-transport-webhid';
+import _TransportWebHID from '@ledgerhq/hw-transport-webhid';
 import type LedgerTransport from '@ledgerhq/hw-transport';
+
+const TransportWebHID = (_TransportWebHID as any).default
+  ? ((_TransportWebHID as any).default as typeof _TransportWebHID)
+  : _TransportWebHID;
+const LedgerConnection = (_LedgerConnection as any).default
+  ? ((_LedgerConnection as any).default as typeof _LedgerConnection)
+  : _LedgerConnection;
+type LedgerConnection = _LedgerConnection;
 
 export interface LedgerKeyAgentProps extends Omit<SerializableLedgerKeyAgentData, '__typename'> {
   deviceConnection?: LedgerConnection;
