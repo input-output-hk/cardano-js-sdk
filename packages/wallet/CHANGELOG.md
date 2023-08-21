@@ -3,6 +3,76 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.21.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.20.1...@cardano-sdk/wallet@0.21.0) (2023-08-21)
+
+### ⚠ BREAKING CHANGES
+
+* update Transaction.fromTxCbor arg type to TxCBOR
+
+### Bug Fixes
+
+* **wallet:** address key statuses are now updated properly when changes are detected ([1720650](https://github.com/input-output-hk/cardano-js-sdk/commit/1720650f8438442b207d273ba838582dee022b29))
+* **wallet:** do not re-serialize tx when computing id ([4e49204](https://github.com/input-output-hk/cardano-js-sdk/commit/4e492041b76f0bb6943f5c6b134e0ae7ae6ab5cb))
+* **wallet:** remove tx from inFlight$ when loading by the time it's already on-chain ([56eb6d2](https://github.com/input-output-hk/cardano-js-sdk/commit/56eb6d21c339cf7aae0b68bfe92cd6b9f9036a6d))
+
+### Code Refactoring
+
+* update Transaction.fromTxCbor arg type to TxCBOR ([89dcfde](https://github.com/input-output-hk/cardano-js-sdk/commit/89dcfdec0f42c570d36a92a504eca493658f24e3))
+
+## [0.20.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.20.0...@cardano-sdk/wallet@0.20.1) (2023-08-16)
+
+### Bug Fixes
+
+* **wallet:** do not prevent internal tx re-submission (broken by [#861](https://github.com/input-output-hk/cardano-js-sdk/issues/861)) ([63ce773](https://github.com/input-output-hk/cardano-js-sdk/commit/63ce77327ea0e04ca9a58c7e184ffcdac491dad1))
+
+## [0.20.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.19.0...@cardano-sdk/wallet@0.20.0) (2023-08-15)
+
+### ⚠ BREAKING CHANGES
+
+* add HandleProvider.getPolicyIds and utilize it in PersonalWallet also, handles$ resolvedAt is now only set via hydration (provider)
+* updated MIR certificate interface to match the CDDL specification
+
+### Features
+
+* add HandleProvider.getPolicyIds and utilize it in PersonalWallet also, handles$ resolvedAt is now only set via hydration (provider) ([af6a8d0](https://github.com/input-output-hk/cardano-js-sdk/commit/af6a8d011bbd2c218aa23e1d75bb25294fc61a27))
+* updated MIR certificate interface to match the CDDL specification ([03d5079](https://github.com/input-output-hk/cardano-js-sdk/commit/03d507951ff310a4019f5ec2f1871fdad77939ee))
+* **wallet:** filter out duplicate utxo ([47888ae](https://github.com/input-output-hk/cardano-js-sdk/commit/47888aeeb236e7ab239aa8174068148074744c1a))
+
+## [0.19.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.18.5...@cardano-sdk/wallet@0.19.0) (2023-08-11)
+
+### ⚠ BREAKING CHANGES
+
+* EpochRewards renamed to Reward
+- The pool the stake address was delegated to when the reward is earned is now
+included in the EpochRewards (Will be null for payments from the treasury or the reserves)
+- Reward no longer coalesce rewards from the same epoch
+* rename AddressEntity.stakingCredentialHash -> stakeCredentialHash
+- rename BaseAddress.getStakingCredential -> getStakeCredential
+* the serialization classes in Core package are now exported under the alias Serialization
+* **wallet:** add optional callback for getCollateral
+
+### Features
+
+* epoch rewards now includes the pool id of the pool that generated the reward ([96fd72b](https://github.com/input-output-hk/cardano-js-sdk/commit/96fd72bba7b087a74eb2080f0cc6ed7c1c2a7329))
+* **wallet:** add optional callback for getCollateral ([9c5ce22](https://github.com/input-output-hk/cardano-js-sdk/commit/9c5ce22da5b842c7233f6e5ee0351d6b8c98d991))
+
+### Bug Fixes
+
+* **wallet:** make PersonalWallet.submitTx idempotent ([babe6a5](https://github.com/input-output-hk/cardano-js-sdk/commit/babe6a5cbb834adafe90fa23714cc74822601eca))
+
+### Code Refactoring
+
+* rename/replace occurences of 'staking' with 'stake' where appropriate ([05fc4c4](https://github.com/input-output-hk/cardano-js-sdk/commit/05fc4c4d83137eb3137583ca0bb443825eac1445))
+* the serialization classes in Core package are now exported under the alias Serialization ([06f78bb](https://github.com/input-output-hk/cardano-js-sdk/commit/06f78bb98943c306572c32f5817425ef1ff6fc51))
+
+## [0.18.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.18.4...@cardano-sdk/wallet@0.18.5) (2023-07-31)
+
+**Note:** Version bump only for package @cardano-sdk/wallet
+
+## [0.18.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.18.3...@cardano-sdk/wallet@0.18.4) (2023-07-26)
+
+**Note:** Version bump only for package @cardano-sdk/wallet
+
 ## [0.18.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.18.2...@cardano-sdk/wallet@0.18.3) (2023-07-17)
 
 **Note:** Version bump only for package @cardano-sdk/wallet

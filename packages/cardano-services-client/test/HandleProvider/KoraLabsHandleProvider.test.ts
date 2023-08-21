@@ -98,4 +98,12 @@ describe('KoraLabsHandleProvider', () => {
       expect(result.ok).toEqual(false);
     });
   });
+
+  describe('get policy ids', () => {
+    test('HandleProvider should get handle policy ids', async () => {
+      const policyIds = await provider.getPolicyIds();
+      await expect(policyIds.length).toEqual(1);
+      await expect(policyIds).toEqual([config.policyId]);
+    });
+  });
 });

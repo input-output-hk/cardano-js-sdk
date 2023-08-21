@@ -31,7 +31,7 @@ describe('integration/InMemory', () => {
     projection: ProjectionOperator<Mappers.WithCertificates & InMemory.WithInMemoryStore>
   ) =>
     lastValueFrom(
-      Bootstrap.fromCardanoNode({ buffer, cardanoNode, logger }).pipe(
+      Bootstrap.fromCardanoNode({ blocksBufferLength: 10, buffer, cardanoNode, logger }).pipe(
         withStaticContext({ store }),
         Mappers.withCertificates(),
         projection,

@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.14.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.14.4...@cardano-sdk/web-extension@0.14.5) (2023-08-21)
+
+**Note:** Version bump only for package @cardano-sdk/web-extension
+
+## [0.14.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.14.3...@cardano-sdk/web-extension@0.14.4) (2023-08-16)
+
+**Note:** Version bump only for package @cardano-sdk/web-extension
+
+## [0.14.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.14.2...@cardano-sdk/web-extension@0.14.3) (2023-08-15)
+
+**Note:** Version bump only for package @cardano-sdk/web-extension
+
+## [0.14.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.14.1...@cardano-sdk/web-extension@0.14.2) (2023-08-11)
+
+**Note:** Version bump only for package @cardano-sdk/web-extension
+
+## [0.14.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.14.0...@cardano-sdk/web-extension@0.14.1) (2023-07-31)
+
+**Note:** Version bump only for package @cardano-sdk/web-extension
+
+## [0.14.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.13.8...@cardano-sdk/web-extension@0.14.0) (2023-07-26)
+
+### ⚠ BREAKING CHANGES
+
+* **web-extension:** lw-7563 throw RemoteApiShutdownError on disconnect during method call
+
+### Bug Fixes
+
+* **web-extension:** lw-7563 throw RemoteApiShutdownError on disconnect during method call ([dd803c6](https://github.com/input-output-hk/cardano-js-sdk/commit/dd803c6f15a5c4e42eb05413388fef71bb7ad628))
+
 ## [0.13.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.13.7...@cardano-sdk/web-extension@0.13.8) (2023-07-17)
 
 **Note:** Version bump only for package @cardano-sdk/web-extension

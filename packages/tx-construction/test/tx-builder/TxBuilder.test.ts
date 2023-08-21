@@ -101,6 +101,7 @@ describe('GenericTxBuilder', () => {
 
     txBuilder = new GenericTxBuilder({
       handleProvider: {
+        getPolicyIds: async () => [resolvedHandle.policyId],
         healthCheck: jest.fn(),
         resolveHandles: async () => [resolvedHandle]
       },
@@ -109,6 +110,7 @@ describe('GenericTxBuilder', () => {
     txBuilderWithoutHandleProvider = new GenericTxBuilder(builderParams);
     txBuilderWithNullHandles = new GenericTxBuilder({
       handleProvider: {
+        getPolicyIds: async () => [],
         healthCheck: jest.fn(),
         resolveHandles: async () => [null]
       },
@@ -116,6 +118,7 @@ describe('GenericTxBuilder', () => {
     });
     txBuilderWithHandleErrors = new GenericTxBuilder({
       handleProvider: {
+        getPolicyIds: async () => [],
         healthCheck: jest.fn(),
         resolveHandles: async () => {
           const error = new Error('not found');

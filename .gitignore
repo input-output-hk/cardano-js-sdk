@@ -19,3 +19,15 @@ source
 
 # IDE configs
 .idea/
+
+# direnv
+/.direnv
+
+# prj-spec dirs
+# <https://github.com/numtide/prj-spec>
+/.bin
+/.run
+/.cache
+/.data
+/.config
+/.local

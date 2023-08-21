@@ -1,4 +1,4 @@
-import * as cip19TestVectors from './Cip19TestVectors';
+import * as cip19TestVectors from '../../../../util-dev/src/Cip19TestVectors';
 import { Cardano } from '../../../src';
 
 describe('Cardano/Address/PointerAddress', () => {

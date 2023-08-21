@@ -1,0 +1,17 @@
+[formatter]
+
+[formatter.nix]
+command = "alejandra"
+excludes = ["yarn-project.nix"]
+includes = ["*.nix"]
+
+[formatter.prettier]
+command = "node_modules/.bin/prettier"
+includes = ["*.md", "*.yaml"]
+excludes = ["packages/cardano-services/config/network/*", "packages/e2e/local-network/templates/", "CHANGELOG.md"]
+options = ["--write"]
+
+[formatter.shell]
+command = "shfmt"
+includes = ["*.sh"]
+options = ["-i", "2", "-s", "-w"]

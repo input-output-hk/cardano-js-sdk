@@ -30,7 +30,7 @@ export const generateStakePools = (qty: number): Cardano.StakePool[] =>
       numerator: 27
     },
     metadata: {
-      description: 'Pool a of the banderini devtest staking pools',
+      description: 'Pool a of the banderini devtest stake pools',
       homepage: 'http://www.banderini.net',
       name: 'banderini-devtest-a',
       ticker: 'BANDA'

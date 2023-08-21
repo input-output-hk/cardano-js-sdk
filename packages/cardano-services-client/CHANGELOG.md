@@ -3,6 +3,37 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.12.0...@cardano-sdk/cardano-services-client@0.12.1) (2023-08-21)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services-client
+
+## [0.12.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.11.0...@cardano-sdk/cardano-services-client@0.12.0) (2023-08-15)
+
+### ⚠ BREAKING CHANGES
+
+* add HandleProvider.getPolicyIds and utilize it in PersonalWallet also, handles$ resolvedAt is now only set via hydration (provider)
+
+### Features
+
+* add HandleProvider.getPolicyIds and utilize it in PersonalWallet also, handles$ resolvedAt is now only set via hydration (provider) ([af6a8d0](https://github.com/input-output-hk/cardano-js-sdk/commit/af6a8d011bbd2c218aa23e1d75bb25294fc61a27))
+
+## [0.11.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.10.6...@cardano-sdk/cardano-services-client@0.11.0) (2023-08-11)
+
+### ⚠ BREAKING CHANGES
+
+* EpochRewards renamed to Reward
+- The pool the stake address was delegated to when the reward is earned is now
+included in the EpochRewards (Will be null for payments from the treasury or the reserves)
+- Reward no longer coalesce rewards from the same epoch
+
+### Features
+
+* epoch rewards now includes the pool id of the pool that generated the reward ([96fd72b](https://github.com/input-output-hk/cardano-js-sdk/commit/96fd72bba7b087a74eb2080f0cc6ed7c1c2a7329))
+
+## [0.10.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.10.5...@cardano-sdk/cardano-services-client@0.10.6) (2023-07-31)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services-client
+
 ## [0.10.5](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services-client@0.10.4...@cardano-sdk/cardano-services-client@0.10.5) (2023-07-13)
 
 **Note:** Version bump only for package @cardano-sdk/cardano-services-client

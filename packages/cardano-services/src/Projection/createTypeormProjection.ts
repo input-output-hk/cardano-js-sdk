@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable prefer-spread */
+import { Cardano } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
-import { Observable, from, switchMap } from 'rxjs';
+import { Observable, from, switchMap, takeWhile } from 'rxjs';
 import {
   PgConnectionConfig,
   TypeormDevOptions,
@@ -20,14 +21,16 @@ import {
 } from './prepareTypeormProjection';
 import { ProjectionEvent, logProjectionProgress, requestNext } from '@cardano-sdk/projection';
 import { migrations } from './migrations';
-import { shareRetryBackoff } from '@cardano-sdk/util-rxjs';
+import { passthrough, shareRetryBackoff } from '@cardano-sdk/util-rxjs';
 
 export interface CreateTypeormProjectionProps {
   projections: ProjectionName[];
+  blocksBufferLength: number;
   buffer?: TypeormStabilityWindowBuffer;
   projectionSource$: Observable<ProjectionEvent>;
   connectionConfig$: Observable<PgConnectionConfig>;
   devOptions?: TypeormDevOptions;
+  exitAtBlockNo?: Cardano.BlockNo;
   logger: Logger;
   projectionOptions?: ProjectionOptions;
 }
@@ -49,7 +52,10 @@ export const createObservableDataSource = ({
   entities,
   extensions,
   migrationsRun
-}: Omit<CreateTypeormProjectionProps, 'projections' | 'projectionSource$' | 'projectionOptions'> &
+}: Omit<
+  CreateTypeormProjectionProps,
+  'blocksBufferLength' | 'exitAtBlockNo' | 'projections' | 'projectionSource$' | 'projectionOptions'
+> &
   Pick<PreparedProjection, 'entities' | 'extensions'> & { migrationsRun: boolean }) =>
   connectionConfig$.pipe(
     switchMap((connectionConfig) =>
@@ -87,17 +93,20 @@ export const createObservableDataSource = ({
  * Dependencies of each projection are defined in ./prepareTypeormProjection.ts
  */
 export const createTypeormProjection = ({
+  blocksBufferLength,
   projections,
   projectionSource$,
   connectionConfig$,
   logger,
   devOptions,
+  exitAtBlockNo,
   buffer,
   projectionOptions
 }: CreateTypeormProjectionProps) => {
   const { handlePolicyIds } = { handlePolicyIds: [], ...projectionOptions };
 
   logger.debug(`Creating projection with policyIds ${JSON.stringify(handlePolicyIds)}`);
+  logger.debug(`Using a ${blocksBufferLength} blocks buffer`);
 
   const { mappers, entities, stores, extensions } = prepareTypeormProjection({
     buffer,
@@ -125,6 +134,7 @@ export const createTypeormProjection = ({
       { shouldRetry: isRecoverableTypeormError }
     ),
     requestNext(),
-    logProjectionProgress(logger)
+    logProjectionProgress(logger),
+    exitAtBlockNo ? takeWhile((event) => event.block.header.blockNo < exitAtBlockNo) : passthrough()
   );
 };

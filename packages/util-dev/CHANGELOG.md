@@ -3,6 +3,47 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.15.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.15.0...@cardano-sdk/util-dev@0.15.1) (2023-08-21)
+
+**Note:** Version bump only for package @cardano-sdk/util-dev
+
+## [0.15.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.14.0...@cardano-sdk/util-dev@0.15.0) (2023-08-15)
+
+### ⚠ BREAKING CHANGES
+
+* add HandleProvider.getPolicyIds and utilize it in PersonalWallet also, handles$ resolvedAt is now only set via hydration (provider)
+
+### Features
+
+* add HandleProvider.getPolicyIds and utilize it in PersonalWallet also, handles$ resolvedAt is now only set via hydration (provider) ([af6a8d0](https://github.com/input-output-hk/cardano-js-sdk/commit/af6a8d011bbd2c218aa23e1d75bb25294fc61a27))
+* **util-dev:** use handle asset in mock utxo provider ([2e06dfa](https://github.com/input-output-hk/cardano-js-sdk/commit/2e06dfa869ef47e55cff695bda6ccb33c85361dc))
+
+## [0.14.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.13.9...@cardano-sdk/util-dev@0.14.0) (2023-08-11)
+
+### ⚠ BREAKING CHANGES
+
+* EpochRewards renamed to Reward
+- The pool the stake address was delegated to when the reward is earned is now
+included in the EpochRewards (Will be null for payments from the treasury or the reserves)
+- Reward no longer coalesce rewards from the same epoch
+* rename AddressEntity.stakingCredentialHash -> stakeCredentialHash
+- rename BaseAddress.getStakingCredential -> getStakeCredential
+* **wallet:** add optional callback for getCollateral
+
+### Features
+
+* epoch rewards now includes the pool id of the pool that generated the reward ([96fd72b](https://github.com/input-output-hk/cardano-js-sdk/commit/96fd72bba7b087a74eb2080f0cc6ed7c1c2a7329))
+* **util-dev:** add cip19TestVectors ([0d3dc02](https://github.com/input-output-hk/cardano-js-sdk/commit/0d3dc021a96410655bb7c5113735868a16e20e1b))
+* **wallet:** add optional callback for getCollateral ([9c5ce22](https://github.com/input-output-hk/cardano-js-sdk/commit/9c5ce22da5b842c7233f6e5ee0351d6b8c98d991))
+
+### Code Refactoring
+
+* rename/replace occurences of 'staking' with 'stake' where appropriate ([05fc4c4](https://github.com/input-output-hk/cardano-js-sdk/commit/05fc4c4d83137eb3137583ca0bb443825eac1445))
+
+## [0.13.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.13.8...@cardano-sdk/util-dev@0.13.9) (2023-07-31)
+
+**Note:** Version bump only for package @cardano-sdk/util-dev
+
 ## [0.13.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.13.7...@cardano-sdk/util-dev@0.13.8) (2023-07-13)
 
 **Note:** Version bump only for package @cardano-sdk/util-dev

@@ -53,6 +53,11 @@ export enum CborTag {
   EncodedCborDataItem = 24,
 
   /**
+   * Tag value for Rational numbers, as defined in http://peteroupc.github.io/CBOR/rational.html.
+   */
+  RationalNumber = 30,
+
+  /**
    * Tag value for Uri strings, as defined in RFC3986.
    */
   Uri = 32,

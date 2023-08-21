@@ -240,7 +240,13 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
 
   it('returns stake key derivation path when a MIR certificate with the wallet stake key hash is present', async () => {
     const txBody = {
-      certificates: [{ __typename: Cardano.CertificateType.MIR, rewardAccount: ownRewardAccount }],
+      certificates: [
+        {
+          __typename: Cardano.CertificateType.MIR,
+          kind: Cardano.MirCertificateKind.ToStakeCreds,
+          stakeCredential: Cardano.Address.fromString(ownRewardAccount)!.asReward()!.getPaymentCredential()
+        }
+      ],
       inputs: [{}, {}, {}]
     } as Cardano.TxBody;
     const resolveInput = jest

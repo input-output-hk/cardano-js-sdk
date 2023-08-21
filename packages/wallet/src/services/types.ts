@@ -1,5 +1,5 @@
 import { AsyncKeyAgent, GroupedAddress } from '@cardano-sdk/key-management';
-import { Cardano, CardanoNodeErrors, EpochRewards, TxCBOR } from '@cardano-sdk/core';
+import { Cardano, CardanoNodeErrors, Reward, TxCBOR } from '@cardano-sdk/core';
 import { Observable } from 'rxjs';
 import { Percent } from '@cardano-sdk/util';
 import { SignedTx } from '@cardano-sdk/tx-construction';
@@ -95,8 +95,8 @@ export interface TransactionsTracker {
 }
 
 export interface RewardsHistory {
-  all: EpochRewards[];
-  lastReward: EpochRewards | null;
+  all: Reward[];
+  lastReward: Reward | null;
   avgReward: Cardano.Lovelace | null;
   lifetimeRewards: Cardano.Lovelace;
 }

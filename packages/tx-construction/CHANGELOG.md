@@ -3,6 +3,40 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.11.0...@cardano-sdk/tx-construction@0.11.1) (2023-08-21)
+
+**Note:** Version bump only for package @cardano-sdk/tx-construction
+
+## [0.11.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.10.0...@cardano-sdk/tx-construction@0.11.0) (2023-08-15)
+
+### ⚠ BREAKING CHANGES
+
+* add HandleProvider.getPolicyIds and utilize it in PersonalWallet also, handles$ resolvedAt is now only set via hydration (provider)
+
+### Features
+
+* add HandleProvider.getPolicyIds and utilize it in PersonalWallet also, handles$ resolvedAt is now only set via hydration (provider) ([af6a8d0](https://github.com/input-output-hk/cardano-js-sdk/commit/af6a8d011bbd2c218aa23e1d75bb25294fc61a27))
+
+## [0.10.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.9.4...@cardano-sdk/tx-construction@0.10.0) (2023-08-11)
+
+### ⚠ BREAKING CHANGES
+
+* the serialization classes in Core package are now exported under the alias Serialization
+
+### Code Refactoring
+
+* the serialization classes in Core package are now exported under the alias Serialization ([06f78bb](https://github.com/input-output-hk/cardano-js-sdk/commit/06f78bb98943c306572c32f5817425ef1ff6fc51))
+
+## [0.9.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.9.3...@cardano-sdk/tx-construction@0.9.4) (2023-07-31)
+
+**Note:** Version bump only for package @cardano-sdk/tx-construction
+
+## [0.9.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.9.2...@cardano-sdk/tx-construction@0.9.3) (2023-07-26)
+
+### Bug Fixes
+
+* **tx-construction:** removed resolved handle from addOutput in TxBuilder ([b185932](https://github.com/input-output-hk/cardano-js-sdk/commit/b185932ffb591277dafde20f05c93ee6e8674358))
+
 ## [0.9.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.9.1...@cardano-sdk/tx-construction@0.9.2) (2023-07-13)
 
 ### Bug Fixes

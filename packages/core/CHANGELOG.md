@@ -3,6 +3,64 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.18.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.17.0...@cardano-sdk/core@0.18.0) (2023-08-21)
+
+### ⚠ BREAKING CHANGES
+
+* update Transaction.fromTxCbor arg type to TxCBOR
+
+### Code Refactoring
+
+* update Transaction.fromTxCbor arg type to TxCBOR ([89dcfde](https://github.com/input-output-hk/cardano-js-sdk/commit/89dcfdec0f42c570d36a92a504eca493658f24e3))
+
+## [0.17.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.16.0...@cardano-sdk/core@0.17.0) (2023-08-15)
+
+### ⚠ BREAKING CHANGES
+
+* add HandleProvider.getPolicyIds and utilize it in PersonalWallet also, handles$ resolvedAt is now only set via hydration (provider)
+* updated MIR certificate interface to match the CDDL specification
+
+### Features
+
+* add a buffer after reading blocks from ogmios ([0095c80](https://github.com/input-output-hk/cardano-js-sdk/commit/0095c80346fb0f5ce7bfa7fe805c6b0e79ad1a35))
+* add HandleProvider.getPolicyIds and utilize it in PersonalWallet also, handles$ resolvedAt is now only set via hydration (provider) ([af6a8d0](https://github.com/input-output-hk/cardano-js-sdk/commit/af6a8d011bbd2c218aa23e1d75bb25294fc61a27))
+* **core:** add buffer chain sync event operator ([a35555f](https://github.com/input-output-hk/cardano-js-sdk/commit/a35555f5aef42ce51b9681dde40732301cbe15b0))
+* **core:** added certificate serialization classes ([c368845](https://github.com/input-output-hk/cardano-js-sdk/commit/c36884541fe2c93ec7d701372fb596db2af9d504))
+* updated MIR certificate interface to match the CDDL specification ([03d5079](https://github.com/input-output-hk/cardano-js-sdk/commit/03d507951ff310a4019f5ec2f1871fdad77939ee))
+
+## [0.16.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.15.4...@cardano-sdk/core@0.16.0) (2023-08-11)
+
+### ⚠ BREAKING CHANGES
+
+* EpochRewards renamed to Reward
+- The pool the stake address was delegated to when the reward is earned is now
+included in the EpochRewards (Will be null for payments from the treasury or the reserves)
+- Reward no longer coalesce rewards from the same epoch
+* rename AddressEntity.stakingCredentialHash -> stakeCredentialHash
+- rename BaseAddress.getStakingCredential -> getStakeCredential
+* the serialization classes in Core package are now exported under the alias Serialization
+
+### Features
+
+* **core:** added plutus and native scripts serialization classes ([4ee0329](https://github.com/input-output-hk/cardano-js-sdk/commit/4ee03298e091d514bd20ab4f493f80029d4f13f5))
+* epoch rewards now includes the pool id of the pool that generated the reward ([96fd72b](https://github.com/input-output-hk/cardano-js-sdk/commit/96fd72bba7b087a74eb2080f0cc6ed7c1c2a7329))
+* **util-dev:** add cip19TestVectors ([0d3dc02](https://github.com/input-output-hk/cardano-js-sdk/commit/0d3dc021a96410655bb7c5113735868a16e20e1b))
+
+### Code Refactoring
+
+* rename/replace occurences of 'staking' with 'stake' where appropriate ([05fc4c4](https://github.com/input-output-hk/cardano-js-sdk/commit/05fc4c4d83137eb3137583ca0bb443825eac1445))
+* the serialization classes in Core package are now exported under the alias Serialization ([06f78bb](https://github.com/input-output-hk/cardano-js-sdk/commit/06f78bb98943c306572c32f5817425ef1ff6fc51))
+
+## [0.15.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.15.3...@cardano-sdk/core@0.15.4) (2023-07-31)
+
+### Features
+
+* **core:** add addressesShareAnyKey util ([8bcfcb0](https://github.com/input-output-hk/cardano-js-sdk/commit/8bcfcb0e5fdadab2c5fed0253f4644fc603a9c32))
+
+### Bug Fixes
+
+* **core:** use correct address type when building EnterpriseScript from credential ([9b647b7](https://github.com/input-output-hk/cardano-js-sdk/commit/9b647b77ddaa9364bf0aea32b3aded8661a832c9))
+
 ## [0.15.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.15.2...@cardano-sdk/core@0.15.3) (2023-07-04)
 
 **Note:** Version bump only for package @cardano-sdk/core

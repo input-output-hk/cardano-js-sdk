@@ -64,7 +64,7 @@ wait_tx_complete() {
   return 1
 }
 
-echo $policyid > /sdk-ipc/handle_policy_ids
+echo $policyid >/sdk-ipc/handle_policy_ids
 destAddr="addr_test1qr0c3frkem9cqn5f73dnvqpena27k2fgqew6wct9eaka03agfwkvzr0zyq7nqvcj24zehrshx63zzdxv24x3a4tcnfeq9zwmn7"
 utxo=$(cardano-cli query utxo --address "$addr" --testnet-magic 888 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
 

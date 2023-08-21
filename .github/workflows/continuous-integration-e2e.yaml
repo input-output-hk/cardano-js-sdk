@@ -3,6 +3,29 @@ name: Continuous Integration - E2E
 env:
   TL_DEPTH: ${{ github.event.pull_request.head.repo.fork && '0' || fromJson(vars.TL_DEPTH) }}
   TL_LEVEL: ${{ github.event.pull_request.head.repo.fork && 'info' || vars.TL_LEVEL }}
+  # -----------------------------------------------------------------------------------------
+  KEY_MANAGEMENT_PROVIDER: 'inMemory'
+  KEY_MANAGEMENT_PARAMS: '{"bip32Ed25519": "CML", "accountIndex": 0, "chainId":{"networkId": 0, "networkMagic": 888}, "passphrase":"some_passphrase","mnemonic":"vacant violin soft weird deliver render brief always monitor general maid smart jelly core drastic erode echo there clump dizzy card filter option defense"}'
+  ASSET_PROVIDER: 'http'
+  ASSET_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/asset"}'
+  CHAIN_HISTORY_PROVIDER: 'http'
+  CHAIN_HISTORY_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/chain-history"}'
+  DB_SYNC_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/cexplorer'
+  HANDLE_PROVIDER: 'http'
+  HANDLE_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4011/handle"}'
+  STAKE_POOL_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/stake_pool'
+  STAKE_POOL_TEST_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/stake_pool_test'
+  NETWORK_INFO_PROVIDER: 'http'
+  NETWORK_INFO_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/network-info"}'
+  OGMIOS_URL: 'ws://localhost:1340/'
+  REWARDS_PROVIDER: 'http'
+  REWARDS_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/rewards"}'
+  TX_SUBMIT_PROVIDER: 'http'
+  TX_SUBMIT_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/tx-submit"}'
+  UTXO_PROVIDER: 'http'
+  UTXO_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/utxo"}'
+  STAKE_POOL_PROVIDER: 'http'
+  STAKE_POOL_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/stake-pool"}'
 
 on:
   pull_request:
@@ -60,28 +83,10 @@ jobs:
         yarn workspace @cardano-sdk/e2e test:projection
         yarn workspace @cardano-sdk/e2e test:pg-boss
       env:
-        KEY_MANAGEMENT_PROVIDER: 'inMemory'
-        KEY_MANAGEMENT_PARAMS: '{"bip32Ed25519": "CML", "accountIndex": 0, "chainId":{"networkId": 0, "networkMagic": 888}, "passphrase":"some_passphrase","mnemonic":"vacant violin soft weird deliver render brief always monitor general maid smart jelly core drastic erode echo there clump dizzy card filter option defense"}'
-        ASSET_PROVIDER: 'http'
-        ASSET_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/asset"}'
-        CHAIN_HISTORY_PROVIDER: 'http'
-        CHAIN_HISTORY_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/chain-history"}'
-        DB_SYNC_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/cexplorer'
-        HANDLE_PROVIDER: 'http'
-        HANDLE_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/handle","policyId":""}'
-        KORA_LABS_HANDLE_PROVIDER: 'kora-labs'
-        KORA_LABS_HANDLE_PROVIDER_PARAMS: '{"serverUrl":"http://localhost:4000","policyId":""}'
-        STAKE_POOL_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/stake_pool'
-        STAKE_POOL_TEST_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/stake_pool_test'
-        NETWORK_INFO_PROVIDER: 'http'
-        NETWORK_INFO_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/network-info"}'
-        OGMIOS_URL: 'ws://localhost:1340/'
-        REWARDS_PROVIDER: 'http'
-        REWARDS_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/rewards"}'
-        TX_SUBMIT_PROVIDER: 'http'
-        TX_SUBMIT_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/tx-submit"}'
-        UTXO_PROVIDER: 'http'
-        UTXO_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/utxo"}'
-        STAKE_POOL_PROVIDER: 'http'
-        STAKE_POOL_PROVIDER_PARAMS: '{"baseUrl":"http://localhost:4000/stake-pool"}'
         STAKE_POOL_PROVIDER_URL: 'http://localhost:4000/stake-pool'
+
+    - name: 🔬 Test - e2e - wallet - typeorm stake pool provider
+      run: |
+        yarn workspace @cardano-sdk/e2e test:providers
+      env:
+        STAKE_POOL_PROVIDER_URL: 'http://localhost:4010/stake-pool'

@@ -13,7 +13,7 @@ import {
   TxSignErrorCode,
   WalletApi
 } from '@cardano-sdk/dapp-connector';
-import { CML, Cardano, Transaction, TxCBOR, cmlToCore, coalesceValueQuantities, coreToCml } from '@cardano-sdk/core';
+import { CML, Cardano, Serialization, TxCBOR, cmlToCore, coalesceValueQuantities, coreToCml } from '@cardano-sdk/core';
 import { HexBlob, ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
 import { InputSelectionError, InputSelectionFailure } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
@@ -28,7 +28,8 @@ export type Cip30WalletDependencies = {
 export enum Cip30ConfirmationCallbackType {
   SignData = 'sign_data',
   SignTx = 'sign_tx',
-  SubmitTx = 'submit_tx'
+  SubmitTx = 'submit_tx',
+  GetCollateral = 'get_collateral'
 }
 
 export type SignDataCallbackParams = {
@@ -49,9 +50,23 @@ export type SubmitTxCallbackParams = {
   data: Cardano.Tx;
 };
 
-export type CallbackConfirmation = (
-  args: SignDataCallbackParams | SignTxCallbackParams | SubmitTxCallbackParams
-) => Promise<boolean>;
+// Optional callback
+export type GetCollateralCallbackParams = {
+  type: Cip30ConfirmationCallbackType.GetCollateral;
+  data: {
+    amount: Cardano.Lovelace;
+    utxos: Cardano.Utxo[];
+  };
+};
+
+type GetCollateralCallback = (args: GetCollateralCallbackParams) => Promise<Cardano.Utxo[]>;
+
+export type CallbackConfirmation = {
+  signData: (args: SignDataCallbackParams) => Promise<boolean>;
+  signTx: (args: SignTxCallbackParams) => Promise<boolean>;
+  submitTx: (args: SubmitTxCallbackParams) => Promise<boolean>;
+  getCollateral?: GetCollateralCallback;
+};
 
 interface CslInterface {
   to_bytes(): Uint8Array;
@@ -159,6 +174,76 @@ const selectUtxo = async (wallet: ObservableWallet, filterAmount: Cardano.Value,
     ? dumbSelection(await firstValueFrom(wallet.utxo.available$), filterAmount)
     : await walletSelection(filterAmount, wallet);
 
+/**
+ * Returns an array of UTxOs that do not contain assets
+ */
+const getUtxosWithoutAssets = (utxos: Cardano.Utxo[]): Cardano.Utxo[] => utxos.filter((utxo) => !utxo[1].value.assets);
+
+const getFilterAsBigNum = (amount: Cbor, scope: ManagedFreeableScope): CML.BigNum => {
+  try {
+    return scope.manage(CML.BigNum.from_bytes(Buffer.from(amount, 'hex')));
+  } catch {
+    return scope.manage(CML.BigNum.from_str(scope.manage(CML.BigInt.from_bytes(Buffer.from(amount, 'hex'))).to_str()));
+  }
+};
+
+const getFilterAmount = (amount: Cbor, scope: ManagedFreeableScope): CML.BigNum => {
+  try {
+    const filterAmount = getFilterAsBigNum(amount, scope);
+
+    if (filterAmount.compare(MAX_COLLATERAL_AMOUNT) > 0) {
+      throw new ApiError(APIErrorCode.InvalidRequest, 'requested amount is too big');
+    }
+    return filterAmount;
+  } catch (error) {
+    throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));
+  }
+};
+
+/**
+ * getCollateralCallback
+ *
+ * @param amount ADA collateral required in lovelaces
+ * @param availableUtxos available UTxOs
+ * @param callback Callback to execute to attempt setting new collateral
+ * @param scope The scope that will manage the CML resources.
+ * @param logger The logger instance
+ * @returns Promise<Cbor[]> or null
+ */
+const getCollateralCallback = async (
+  amount: Cardano.Lovelace,
+  availableUtxos: Cardano.Utxo[],
+  callback: GetCollateralCallback,
+  scope: ManagedFreeableScope,
+  logger: Logger
+) => {
+  const availableUtxosWithoutAssets = getUtxosWithoutAssets(availableUtxos);
+  if (availableUtxosWithoutAssets.length === 0) return null;
+  try {
+    // Send the amount and filtered available UTxOs to the callback
+    // Client can then choose to mark a UTxO set as unspendable
+    const newCollateral = await callback({
+      data: {
+        amount: BigInt(amount.toString()),
+        utxos: availableUtxosWithoutAssets
+      },
+      type: Cip30ConfirmationCallbackType.GetCollateral
+    });
+    return coreToCml.utxo(scope, newCollateral).map(cslToCbor);
+  } catch (error) {
+    logger.error(error);
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));
+  }
+};
+
+const getSortedUtxos = async (observableUtxos: Observable<Cardano.Utxo[]>): Promise<Cardano.Utxo[]> => {
+  const utxos = await firstValueFrom(observableUtxos);
+  return utxos.sort(compareUtxos);
+};
+
 export const createWalletApi = (
   wallet$: Observable<ObservableWallet>,
   confirmationCallback: CallbackConfirmation,
@@ -195,37 +280,39 @@ export const createWalletApi = (
       throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));
     }
   },
-  // eslint-disable-next-line max-statements
+  // eslint-disable-next-line max-statements, sonarjs/cognitive-complexity
   getCollateral: async ({ amount = cslToCbor(MAX_COLLATERAL_AMOUNT) }: { amount?: Cbor } = {}): Promise<
     Cbor[] | null
-    // eslint-disable-next-line sonarjs/cognitive-complexity
+    // eslint-disable-next-line sonarjs/cognitive-complexity, max-statements
   > =>
+    // eslint-disable-next-line complexity
     usingAutoFree(async (scope) => {
       logger.debug('getting collateral');
       const wallet = await firstValueFrom(wallet$);
-      let unspendables = (await firstValueFrom(wallet.utxo.unspendable$)).sort(compareUtxos);
-
-      // No available unspendable UTXO
-      if (unspendables.length === 0) return null;
+      let unspendables = await getSortedUtxos(wallet.utxo.unspendable$);
+      const available = await getSortedUtxos(wallet.utxo.available$);
+      // No available unspendable UTxO
+      if (unspendables.length === 0) {
+        if (available.length > 0 && !!confirmationCallback.getCollateral) {
+          // available UTxOs could be set as collateral based on user preference
+          return await getCollateralCallback(
+            BigInt(getFilterAmount(amount, scope).to_str()),
+            available,
+            confirmationCallback.getCollateral,
+            scope,
+            logger
+          );
+        }
+        return null;
+      }
 
       if (unspendables.some((utxo) => utxo[1].value.assets && utxo[1].value.assets.size > 0)) {
         throw new ApiError(APIErrorCode.Refused, 'unspendable UTxOs must not contain assets when used as collateral');
       }
       if (amount) {
-        try {
-          const filterAmount = (() => {
-            try {
-              return scope.manage(CML.BigNum.from_bytes(Buffer.from(amount, 'hex')));
-            } catch {
-              return scope.manage(
-                CML.BigNum.from_str(scope.manage(CML.BigInt.from_bytes(Buffer.from(amount, 'hex'))).to_str())
-              );
-            }
-          })();
-          if (filterAmount.compare(MAX_COLLATERAL_AMOUNT) > 0) {
-            throw new ApiError(APIErrorCode.InvalidRequest, 'requested amount is too big');
-          }
+        const filterAmount = getFilterAmount(amount, scope);
 
+        try {
           const utxos = [];
           let totalCoins = scope.manage(CML.BigNum.from_str('0'));
           for (const utxo of unspendables) {
@@ -235,6 +322,18 @@ export const createWalletApi = (
             if (totalCoins.compare(filterAmount) !== -1) break;
           }
           if (totalCoins.compare(filterAmount) === -1) {
+            // if no collateral available by amount in unspendables, return callback if provided to set unspendables and return in the callback
+
+            if (available.length > 0 && !!confirmationCallback.getCollateral) {
+              return await getCollateralCallback(
+                BigInt(filterAmount.to_str()),
+                available,
+                confirmationCallback.getCollateral,
+                scope,
+                logger
+              );
+            }
+
             throw new ApiError(APIErrorCode.Refused, 'not enough coins in configured collateral UTxOs');
           }
           unspendables = utxos;
@@ -312,13 +411,15 @@ export const createWalletApi = (
     const hexBlobPayload = HexBlob(payload);
     const signWith = Cardano.PaymentAddress(addr);
 
-    const shouldProceed = await confirmationCallback({
-      data: {
-        addr: signWith,
-        payload: hexBlobPayload
-      },
-      type: Cip30ConfirmationCallbackType.SignData
-    }).catch((error) => mapCallbackFailure(error, logger));
+    const shouldProceed = await confirmationCallback
+      .signData({
+        data: {
+          addr: signWith,
+          payload: hexBlobPayload
+        },
+        type: Cip30ConfirmationCallbackType.SignData
+      })
+      .catch((error) => mapCallbackFailure(error, logger));
 
     if (shouldProceed) {
       const wallet = await firstValueFrom(wallet$);
@@ -333,14 +434,16 @@ export const createWalletApi = (
   signTx: async (tx: Cbor, partialSign?: Boolean): Promise<Cbor> => {
     const scope = new ManagedFreeableScope();
     logger.debug('signTx');
-    const txDecoded = scope.manage(Transaction.fromCbor(HexBlob(tx)));
+    const txDecoded = scope.manage(Serialization.Transaction.fromCbor(TxCBOR(tx)));
 
     const hash = txDecoded.getId();
     const coreTx = txDecoded.toCore();
-    const shouldProceed = await confirmationCallback({
-      data: coreTx,
-      type: Cip30ConfirmationCallbackType.SignTx
-    }).catch((error) => mapCallbackFailure(error, logger));
+    const shouldProceed = await confirmationCallback
+      .signTx({
+        data: coreTx,
+        type: Cip30ConfirmationCallbackType.SignTx
+      })
+      .catch((error) => mapCallbackFailure(error, logger));
     if (shouldProceed) {
       const wallet = await firstValueFrom(wallet$);
       try {
@@ -387,10 +490,12 @@ export const createWalletApi = (
   submitTx: async (input: Cbor): Promise<string> => {
     logger.debug('submitting tx');
     const { cbor, tx } = processTxInput(input);
-    const shouldProceed = await confirmationCallback({
-      data: tx,
-      type: Cip30ConfirmationCallbackType.SubmitTx
-    }).catch((error) => mapCallbackFailure(error, logger));
+    const shouldProceed = await confirmationCallback
+      .submitTx({
+        data: tx,
+        type: Cip30ConfirmationCallbackType.SubmitTx
+      })
+      .catch((error) => mapCallbackFailure(error, logger));
 
     if (shouldProceed) {
       try {

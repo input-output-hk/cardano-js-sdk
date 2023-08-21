@@ -1,5 +1,5 @@
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import { CML, Cardano, CborReader, CborReaderState, coreToCml } from '@cardano-sdk/core';
+import { CML, Cardano, Serialization, coreToCml } from '@cardano-sdk/core';
 import { HexBlob, InvalidArgumentError, ManagedFreeableScope, Transform, usingAutoFree } from '@cardano-sdk/util';
 import { LedgerTxTransformerContext } from '../types';
 import { mapTokenMap } from './assets';
@@ -22,16 +22,16 @@ const toDestination: Transform<Cardano.TxOut, Ledger.TxOutputDestination, Ledger
   const knownAddress = context?.knownAddresses.find((address) => address.address === txOut.address);
 
   if (knownAddress) {
-    const spendingPath = paymentKeyPathFromGroupedAddress(knownAddress);
-    const stakingPath = stakeKeyPathFromGroupedAddress(knownAddress);
+    const paymentKeyPath = paymentKeyPathFromGroupedAddress(knownAddress);
+    const stakeKeyPath = stakeKeyPathFromGroupedAddress(knownAddress);
 
-    if (!stakingPath) throw new InvalidArgumentError('txOut', 'Missing staking key key path.');
+    if (!stakeKeyPath) throw new InvalidArgumentError('txOut', 'Missing stake key key path.');
 
     return {
       params: {
         params: {
-          spendingPath,
-          stakingPath
+          spendingPath: paymentKeyPath,
+          stakingPath: stakeKeyPath
         },
         type: Ledger.AddressType.BASE_PAYMENT_KEY_STAKE_KEY
       },
@@ -86,8 +86,8 @@ const getScriptHex = (scope: ManagedFreeableScope, cmlOut: CML.TransactionOutput
  * @param cmlOut The output to be verified.
  */
 const isBabbage = (cmlOut: CML.TransactionOutput): boolean => {
-  const reader = new CborReader(HexBlob.fromBytes(cmlOut.to_bytes()));
-  return reader.peekState() === CborReaderState.StartMap;
+  const reader = new Serialization.CborReader(HexBlob.fromBytes(cmlOut.to_bytes()));
+  return reader.peekState() === Serialization.CborReaderState.StartMap;
 };
 
 export const toTxOut: Transform<Cardano.TxOut, Ledger.TxOutput, LedgerTxTransformerContext> = (txOut, context) =>

@@ -2,7 +2,7 @@ import { Cardano } from '@cardano-sdk/core';
 
 export const resolvedHandle = {
   cardanoAddress: Cardano.PaymentAddress(
-    'addr_test1qqk4sr4f7vtqzd2w90d5nfu3n59jhhpawyphnek2y7er02nkrezryq3ydtmkg0e7e2jvzg443h0ffzfwd09wpcxy2fuqmcnecd'
+    'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'
   ),
   handle: 'alice',
   hasDatum: false,
@@ -14,6 +14,7 @@ export const resolvedHandle = {
 };
 
 export const mockHandleProvider = () => ({
+  getPolicyIds: jest.fn().mockResolvedValue([resolvedHandle.policyId]),
   healthCheck: jest.fn().mockResolvedValue({ ok: true }),
   resolveHandles: jest.fn().mockResolvedValue([resolvedHandle])
 });

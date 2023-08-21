@@ -127,14 +127,17 @@ export const mapCertificate = (
       poolParameters: null as unknown as Cardano.PoolParameters
     } as WithCertIndex<Cardano.PoolRegistrationCertificate>;
 
-  if (isMirCertModel(certModel))
+  if (isMirCertModel(certModel)) {
+    const credential = Cardano.Address.fromString(certModel.address)?.asReward()?.getPaymentCredential();
     return {
       __typename: Cardano.CertificateType.MIR,
       cert_index: certModel.cert_index,
+      kind: credential ? Cardano.MirCertificateKind.ToStakeCreds : Cardano.MirCertificateKind.ToOtherPot,
       pot: certModel.pot === 'reserve' ? Cardano.MirCertificatePot.Reserves : Cardano.MirCertificatePot.Treasury,
       quantity: BigInt(certModel.amount),
-      rewardAccount: certModel.address as unknown as Cardano.RewardAccount
+      stakeCredential: credential
     } as WithCertIndex<Cardano.MirCertificate>;
+  }
 
   if (isStakeCertModel(certModel))
     return {

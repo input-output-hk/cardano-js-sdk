@@ -2,7 +2,7 @@
 // https://github.com/Berry-Pool/nami-wallet/blob/39fb256af9547f801f57a673a5f02d0c7cef42c2/src/api/util.js#L636
 /* eslint-disable sonarjs/cognitive-complexity,  max-depth, max-statements, complexity */
 import * as ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import * as trezor from 'trezor-connect';
+import * as trezor from '@trezor/connect';
 import { BIP32Path } from '@cardano-sdk/crypto';
 import { CML, Cardano, cmlToCore } from '@cardano-sdk/core';
 import { CardanoKeyConst, GroupedAddress } from '../types';
@@ -44,7 +44,7 @@ export interface TrezorMintBundle {
 
 export interface TrezorCertificates {
   certs: trezor.CardanoCertificate[];
-  signingMode?: trezor.CardanoTxSigningMode;
+  signingMode?: trezor.PROTO.CardanoTxSigningMode;
 }
 
 const sortTokensCanonically = (tokens: trezor.CardanoToken[] | ledger.Token[]) => {
@@ -163,7 +163,7 @@ const prepareTrezorOutputs = (
       const destination = ownAddress
         ? {
             addressParameters: {
-              addressType: trezor.CardanoAddressType.BASE,
+              addressType: trezor.PROTO.CardanoAddressType.BASE,
               // eslint-disable-next-line max-len
               path: `m/${CardanoKeyConst.PURPOSE}'/${CardanoKeyConst.COIN_TYPE}'/${ownAddress.accountIndex}'/${ownAddress.type}/${ownAddress.index}`,
               // eslint-disable-next-line max-len
@@ -198,7 +198,7 @@ const prepareTrezorCertificates = (
         const stakeRegistration = scope.manage(cert.as_stake_registration());
         const credential = scope.manage(stakeRegistration?.stake_credential());
         const credentialScriptHash = scope.manage(credential?.to_scripthash());
-        certificate.type = trezor.CardanoCertificateType.STAKE_REGISTRATION;
+        certificate.type = trezor.PROTO.CardanoCertificateType.STAKE_REGISTRATION;
 
         if (credential?.kind() === 0) {
           certificate.path = rewardAccountKeyPath;
@@ -209,7 +209,7 @@ const prepareTrezorCertificates = (
         const stakeDeregistration = scope.manage(cert.as_stake_deregistration());
         const credential = scope.manage(stakeDeregistration?.stake_credential());
         const credentialScriptHash = scope.manage(credential?.to_scripthash());
-        certificate.type = trezor.CardanoCertificateType.STAKE_DEREGISTRATION;
+        certificate.type = trezor.PROTO.CardanoCertificateType.STAKE_DEREGISTRATION;
 
         if (credential?.kind() === 0) {
           certificate.path = rewardAccountKeyPath;
@@ -221,7 +221,7 @@ const prepareTrezorCertificates = (
         const delegationPoolKeyHash = scope.manage(delegation?.pool_keyhash());
         const credential = scope.manage(delegation?.stake_credential());
         const credentialScriptHash = scope.manage(credential?.to_scripthash());
-        certificate.type = trezor.CardanoCertificateType.STAKE_DELEGATION;
+        certificate.type = trezor.PROTO.CardanoCertificateType.STAKE_DELEGATION;
         if (credential?.kind() === 0) {
           certificate.path = rewardAccountKeyPath;
         } else if (credentialScriptHash) {
@@ -237,7 +237,7 @@ const prepareTrezorCertificates = (
         if (!params) {
           throw new HwMappingError('Missing pool registration pool parameters.');
         }
-        certificate.type = trezor.CardanoCertificateType.STAKE_POOL_REGISTRATION;
+        certificate.type = trezor.PROTO.CardanoCertificateType.STAKE_POOL_REGISTRATION;
         const owners = scope.manage(params?.pool_owners());
         const poolOwners = [] as trezor.CardanoPoolOwner[];
 
@@ -246,7 +246,7 @@ const prepareTrezorCertificates = (
             const owner = scope.manage(owners.get(j));
             const keyHash = Buffer.from(owner.to_bytes()).toString('hex');
             if (keyHash === rewardAccountKeyHash) {
-              signingMode = trezor.CardanoTxSigningMode.POOL_REGISTRATION_AS_OWNER;
+              signingMode = trezor.PROTO.CardanoTxSigningMode.POOL_REGISTRATION_AS_OWNER;
               poolOwners.push({
                 stakingKeyPath: rewardAccountKeyPath
               });
@@ -265,7 +265,7 @@ const prepareTrezorCertificates = (
             const relay = scope.manage(relays.get(k));
             if (relay.kind() === 0) {
               const singleHostAddr = scope.manage(relay.as_single_host_addr());
-              const type = trezor.CardanoPoolRelayType.SINGLE_HOST_IP;
+              const type = trezor.PROTO.CardanoPoolRelayType.SINGLE_HOST_IP;
               const port = singleHostAddr?.port();
               const ipv4 = scope.manage(singleHostAddr?.ipv4());
               const ipv4Address = ipv4 ? bytesToIp(ipv4?.ip()) : null;
@@ -278,7 +278,7 @@ const prepareTrezorCertificates = (
                 type
               });
             } else if (relay.kind() === 1) {
-              const type = trezor.CardanoPoolRelayType.SINGLE_HOST_NAME;
+              const type = trezor.PROTO.CardanoPoolRelayType.SINGLE_HOST_NAME;
               const singleHostName = scope.manage(relay.as_single_host_name());
               if (singleHostName) {
                 const port = singleHostName.port();
@@ -290,7 +290,7 @@ const prepareTrezorCertificates = (
                 });
               }
             } else if (relay.kind() === 2) {
-              const type = trezor.CardanoPoolRelayType.MULTIPLE_HOST_NAME;
+              const type = trezor.PROTO.CardanoPoolRelayType.MULTIPLE_HOST_NAME;
               const multiHostName = scope.manage(relay.as_multi_host_name());
               const hostName = scope.manage(multiHostName?.dns_name())?.record();
               if (hostName) {
@@ -952,7 +952,7 @@ export const txToTrezor = async ({
   if (cslCertificates) {
     trezorCertificatesData = prepareTrezorCertificates(cslCertificates, rewardAccountKeyPath, rewardAccountKeyHash);
   }
-  const signingMode = trezorCertificatesData?.signingMode || trezor.CardanoTxSigningMode.ORDINARY_TRANSACTION;
+  const signingMode = trezorCertificatesData?.signingMode || trezor.PROTO.CardanoTxSigningMode.ORDINARY_TRANSACTION;
 
   // TX - Fee
   const fee = scope.manage(cslTxBody.fee()).to_str();

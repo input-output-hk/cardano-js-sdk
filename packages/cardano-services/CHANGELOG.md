@@ -3,6 +3,60 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.16.0...@cardano-sdk/cardano-services@0.16.1) (2023-08-21)
+
+**Note:** Version bump only for package @cardano-sdk/cardano-services
+
+## [0.16.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.15.0...@cardano-sdk/cardano-services@0.16.0) (2023-08-15)
+
+### ⚠ BREAKING CHANGES
+
+* add HandleProvider.getPolicyIds and utilize it in PersonalWallet also, handles$ resolvedAt is now only set via hydration (provider)
+* updated MIR certificate interface to match the CDDL specification
+
+### Features
+
+* add a buffer after reading blocks from ogmios ([0095c80](https://github.com/input-output-hk/cardano-js-sdk/commit/0095c80346fb0f5ce7bfa7fe805c6b0e79ad1a35))
+* add HandleProvider.getPolicyIds and utilize it in PersonalWallet also, handles$ resolvedAt is now only set via hydration (provider) ([af6a8d0](https://github.com/input-output-hk/cardano-js-sdk/commit/af6a8d011bbd2c218aa23e1d75bb25294fc61a27))
+* **cardano-service:** add http service method to attach all the provider routes at once ([c8c02d0](https://github.com/input-output-hk/cardano-js-sdk/commit/c8c02d09b7fb118440ccd0997d874e4fe2619d26))
+* **cardano-services:** use prepared statement for the get ledger tip query ([6d4d04b](https://github.com/input-output-hk/cardano-js-sdk/commit/6d4d04bd863e76d5f81f27cb8e8cffba5a586163))
+* updated MIR certificate interface to match the CDDL specification ([03d5079](https://github.com/input-output-hk/cardano-js-sdk/commit/03d507951ff310a4019f5ec2f1871fdad77939ee))
+
+### Bug Fixes
+
+* **cardano-services:** add get policy ids path/method to handle http service ([04c1347](https://github.com/input-output-hk/cardano-js-sdk/commit/04c1347e9a3f479e5b93b9bbb7644f3555abdd0d))
+
+## [0.15.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.14.8...@cardano-sdk/cardano-services@0.15.0) (2023-08-11)
+
+### ⚠ BREAKING CHANGES
+
+* EpochRewards renamed to Reward
+- The pool the stake address was delegated to when the reward is earned is now
+included in the EpochRewards (Will be null for payments from the treasury or the reserves)
+- Reward no longer coalesce rewards from the same epoch
+
+### Features
+
+* **cardano-services:** add exit at block no argument to projector ([ac5b2bc](https://github.com/input-output-hk/cardano-js-sdk/commit/ac5b2bc4fedb17d695d6fa59f03d2397936b037a))
+* epoch rewards now includes the pool id of the pool that generated the reward ([96fd72b](https://github.com/input-output-hk/cardano-js-sdk/commit/96fd72bba7b087a74eb2080f0cc6ed7c1c2a7329))
+
+## [0.14.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.14.7...@cardano-sdk/cardano-services@0.14.8) (2023-07-31)
+
+### Bug Fixes
+
+* **cardano-services:** added pledgeMet filter to TypeormStakePoolProvider ([85a4839](https://github.com/input-output-hk/cardano-js-sdk/commit/85a4839be2d57c9efe450f79fa4dd0731fd11c88))
+* **cardano-services:** added wildcard search by 'name' and 'ticker' in TypeormStakePoolProvider ([cef44ba](https://github.com/input-output-hk/cardano-js-sdk/commit/cef44baffa43de957857e3854511362434280650))
+* **cardano-services:** excluded 'cost' from nullsInSort in TypeormStakePoolProvider ([839aa5d](https://github.com/input-output-hk/cardano-js-sdk/commit/839aa5dcfcf0749e0c1da67e9d206a884d4756f1))
+* **cardano-services:** switched to case-insensitive sort by 'name' in TypeormStakePoolProvider ([738a82d](https://github.com/input-output-hk/cardano-js-sdk/commit/738a82d55d15ee1cfdcd784ba83b051176cb0179))
+* **cardano-services:** updated table names for 'cost' and 'name' in queries of TypeormStakePoolProvider ([dd3acbe](https://github.com/input-output-hk/cardano-js-sdk/commit/dd3acbe950d95889dbba54e226987d25472ce93a))
+
+## [0.14.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.14.6...@cardano-sdk/cardano-services@0.14.7) (2023-07-26)
+
+### Bug Fixes
+
+* **cardano-services:** add metadata entity to typeorm stake pool provider data source ([4232194](https://github.com/input-output-hk/cardano-js-sdk/commit/4232194ed0b4a2c74e655b306ecc21ee34900a54))
+* **cardano-services:** fix docker compose to forward policy id env var to provider server ([0b8784c](https://github.com/input-output-hk/cardano-js-sdk/commit/0b8784c22bc332bfd49e8dc049e01f518c0d4df0))
+
 ## [0.14.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.14.5...@cardano-sdk/cardano-services@0.14.6) (2023-07-17)
 
 ### Bug Fixes

@@ -42,6 +42,12 @@ import {
   loadProviderServer,
   stringOptionToBoolean
 } from './Program';
+import {
+  BLOCKS_BUFFER_LENGTH_DEFAULT,
+  PROJECTOR_API_URL_DEFAULT,
+  ProjectorArgs,
+  loadProjector
+} from './Program/programs/projector';
 import { Command, Option } from 'commander';
 import { DB_CACHE_TTL_DEFAULT } from './InMemoryCache';
 import {
@@ -58,7 +64,6 @@ import {
   PgBossWorkerOptionDescriptions,
   loadPgBossWorker
 } from './Program/programs/pgBossWorker';
-import { PROJECTOR_API_URL_DEFAULT, ProjectorArgs, loadProjector } from './Program/programs/projector';
 import { PgBossQueue, isValidQueue } from './PgBoss';
 import { ProjectionName } from './Projection';
 import { URL } from 'url';
@@ -125,6 +130,12 @@ withCommonOptions(
   { apiUrl: PROJECTOR_API_URL_DEFAULT }
 )
   .addOption(
+    new Option('--blocks-buffer-length <blocksBufferLength>', ProjectorOptionDescriptions.BlocksBufferLength)
+      .default(BLOCKS_BUFFER_LENGTH_DEFAULT)
+      .env('BLOCKS_BUFFER_LENGTH')
+      .argParser((blocksBufferLength) => Number.parseInt(blocksBufferLength, 10))
+  )
+  .addOption(
     new Option('--drop-schema <true/false>', ProjectorOptionDescriptions.DropSchema)
       .default(false)
       .env('DROP_SCHEMA')
@@ -137,6 +148,12 @@ withCommonOptions(
       .env('DRY_RUN')
       .default(DRY_RUN_DEFAULT)
       .argParser((dryRun) => stringOptionToBoolean(dryRun, Programs.Projector, ProjectorOptionDescriptions.DryRun))
+  )
+  .addOption(
+    new Option('--exit-at-block-no <exitAtBlockNo>', ProjectorOptionDescriptions.ExitAtBlockNo)
+      .env('EXIT_AT_BLOCK_NO')
+      .default('')
+      .argParser((exitAtBlockNo) => (exitAtBlockNo ? Number.parseInt(exitAtBlockNo, 10) : 0))
   )
   .addOption(
     new Option('--pools-metrics-interval <poolsMetricsInterval>', ProjectorOptionDescriptions.PoolsMetricsInterval)

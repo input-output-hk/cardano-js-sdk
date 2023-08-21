@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.4.1...@cardano-sdk/projection-typeorm@0.4.2) (2023-08-21)
+
+**Note:** Version bump only for package @cardano-sdk/projection-typeorm
+
+## [0.4.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.4.0...@cardano-sdk/projection-typeorm@0.4.1) (2023-08-15)
+
+### Features
+
+* add a buffer after reading blocks from ogmios ([0095c80](https://github.com/input-output-hk/cardano-js-sdk/commit/0095c80346fb0f5ce7bfa7fe805c6b0e79ad1a35))
+
+## [0.4.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.3.13...@cardano-sdk/projection-typeorm@0.4.0) (2023-08-11)
+
+### ⚠ BREAKING CHANGES
+
+* replace Mappers.CertificatePointer with Cardano.Pointer
+
+### Code Refactoring
+
+* replace Mappers.CertificatePointer with Cardano.Pointer ([cb7279e](https://github.com/input-output-hk/cardano-js-sdk/commit/cb7279e2a80d48ea870a625db47941f097dace34))
+
+## [0.3.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.3.12...@cardano-sdk/projection-typeorm@0.3.13) (2023-07-31)
+
+**Note:** Version bump only for package @cardano-sdk/projection-typeorm
+
 ## [0.3.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection-typeorm@0.3.11...@cardano-sdk/projection-typeorm@0.3.12) (2023-07-17)
 
 ### Bug Fixes

@@ -3,6 +3,7 @@
   "compilerOptions": {
     "baseUrl": "."
   },
+  "include": ["./**/*.ts", "../../util-dev/src/Cip19TestVectors.ts"],
   "references": [
     {
       "path": "../src"

@@ -40,14 +40,17 @@ export const findRewardsHistory = (lowerBound?: number, upperBound?: number) => 
   SELECT
       SUM(r.amount) AS quantity,
       sa."view" AS address,
-      r.earned_epoch AS epoch
+      r.earned_epoch AS epoch,
+      ph."view" as pool_id
   FROM reward r
   JOIN stake_address sa ON
       sa.id = r.addr_id AND 
       sa."view" = ANY($1)
   JOIN epochs ON 
       r.earned_epoch = epochs.epoch_no
-  GROUP BY sa."view", r.earned_epoch
+  JOIN pool_hash ph ON 
+      r.pool_id = ph.id
+  GROUP BY sa."view", r.earned_epoch, ph."view"
   ORDER BY quantity ASC
 `;
 };

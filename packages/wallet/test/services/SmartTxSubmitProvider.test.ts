@@ -1,5 +1,5 @@
 import { BehaviorSubject, EMPTY, of } from 'rxjs';
-import { Cardano, ProviderError, ProviderFailure, Transaction, TxSubmitProvider } from '@cardano-sdk/core';
+import { Cardano, ProviderError, ProviderFailure, Serialization, TxSubmitProvider } from '@cardano-sdk/core';
 import { ConnectionStatus, SmartTxSubmitProvider, TipSlot } from '../../src';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { flushPromises, mockProviders } from '@cardano-sdk/util-dev';
@@ -36,12 +36,12 @@ describe('SmartTxSubmitProvider', () => {
     };
     const validityInterval = { invalidBefore: Cardano.Slot(5), invalidHereafter: Cardano.Slot(10) };
     const txWithoutValidityIntervalHex = usingAutoFree((scope) =>
-      scope.manage(Transaction.fromCore(scope, txWithoutValidityInterval)).toCbor()
+      scope.manage(Serialization.Transaction.fromCore(scope, txWithoutValidityInterval)).toCbor()
     );
     const txWithValidityIntervalHex = usingAutoFree((scope) =>
       scope
         .manage(
-          Transaction.fromCore(scope, {
+          Serialization.Transaction.fromCore(scope, {
             ...txWithoutValidityInterval,
             body: {
               ...txWithoutValidityInterval.body,

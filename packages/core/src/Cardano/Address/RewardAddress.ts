@@ -5,7 +5,7 @@ import { InvalidArgumentError } from '@cardano-sdk/util';
 import { NetworkId } from '../ChainId';
 
 /**
- * A reward address is a cryptographic hash of the public staking key of the address. Reward account addresses are used
+ * A reward address is a cryptographic hash of the public stake key of the address. Reward account addresses are used
  * to distribute rewards for participating in the proof-of-stake protocol (either directly or via delegation).
  */
 export class RewardAddress {
@@ -47,7 +47,7 @@ export class RewardAddress {
   /**
    * Gets the payment credential part of the reward address.
    *
-   * Note: by convention, the key inside reward addresses are NOT considered staking credentials,
+   * Note: by convention, the key inside reward addresses are NOT considered stake credentials,
    * pointer addresses and the chain history is required to resolve its associated credential
    */
   getPaymentCredential(): Credential {
@@ -116,7 +116,7 @@ export class RewardAddress {
 
     return new Address({
       networkId: network,
-      // Note: by convention, the key inside reward addresses are NOT considered staking credentials,
+      // Note: by convention, the key inside reward addresses are NOT considered stake credentials,
       // pointer addresses and the chain history is required to resolve its associated credential
       paymentPart: {
         hash: stakeCredential,

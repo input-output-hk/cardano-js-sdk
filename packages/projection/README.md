@@ -11,10 +11,10 @@ There are no restrictions what an operator can do - you can utilize the full pow
 All operators implemented in this package are extending the source event object with extra properties, e.g.
 
 ```ts
-  Bootstrap.fromCardanoNode({ buffer, cardanoNode, logger }).pipe(
-    Mappers.withStakeKeys(),
-    tap(({ stakeKeys }) => console.log('stakeKeys', stakeKeys)),
-    Mappers.withStakePools(),
-    tap(({ stakePools }) => console.log('stakePools', stakePools)),
-  )
+Bootstrap.fromCardanoNode({ buffer, cardanoNode, logger }).pipe(
+  Mappers.withStakeKeys(),
+  tap(({ stakeKeys }) => console.log('stakeKeys', stakeKeys)),
+  Mappers.withStakePools(),
+  tap(({ stakePools }) => console.log('stakePools', stakePools))
+);
 ```

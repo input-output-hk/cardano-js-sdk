@@ -91,4 +91,8 @@ export class KoraLabsHandleProvider implements HandleProvider {
       return { ok: false };
     }
   }
+
+  async getPolicyIds(): Promise<Cardano.PolicyId[]> {
+    return [this.policyId];
+  }
 }

@@ -39,8 +39,8 @@ export const stakePoolSearchSelection = [
 
 export const sortSelectionMap: { [key in SortField]: string } = {
   apy: 'metrics_apy',
-  cost: 'params_cost',
-  name: 'metadata_name',
+  cost: 'params.cost',
+  name: 'metadata.name',
   saturation: 'metrics_live_saturation'
 };
 
@@ -51,19 +51,27 @@ export const stakePoolSearchTotalCount = 'count(*) over () as total_count';
 export const getSortOptions = (
   sort?: StakePoolSortOptions,
   defaultField: SortField = 'name',
-  defaultOrder: Uppercase<SortOrder> = 'ASC'
+  defaultOrder: SortOrder = 'asc'
 ) => {
-  if (sort)
+  if (!sort) {
+    sort = { field: defaultField, order: defaultOrder };
+  }
+  if (sort.field === 'name') {
     return {
-      field: sortSelectionMap[sort.field as SortField],
+      field: `lower(${sortSelectionMap[sort.field as SortField]})`,
       order: sort.order.toUpperCase() as Uppercase<SortOrder>
     };
-  return { field: defaultField, order: defaultOrder };
+  }
+  return {
+    field: sortSelectionMap[sort.field as SortField],
+    order: sort.order.toUpperCase() as Uppercase<SortOrder>
+  };
 };
 
 export const getFilterCondition = (condition?: FilterCondition, defaultCondition: Uppercase<FilterCondition> = 'OR') =>
   condition ? (condition.toUpperCase() as Uppercase<FilterCondition>) : defaultCondition;
 
+// eslint-disable-next-line max-statements
 export const getWhereClauseAndArgs = (filters: QueryStakePoolsArgs['filters']) => {
   if (!filters) return { args: {}, clause: '1=1' };
 
@@ -86,11 +94,32 @@ export const getWhereClauseAndArgs = (filters: QueryStakePoolsArgs['filters']) =
     }
 
     if ('id' in identifierArgs) identifierClauses.push('LOWER(pool.id) IN (:...id)');
-    if ('name' in identifierArgs) identifierClauses.push('LOWER(metadata.name) IN (:...name)');
-    if ('ticker' in identifierArgs) identifierClauses.push('LOWER(metadata.ticker) IN (:...ticker)');
+    if ('name' in identifierArgs) {
+      if (identifierArgs.name.length === 1) {
+        // exact match first then regexp
+        identifierClauses.push('(LOWER(metadata.name) IN (:...name) OR LOWER(metadata.name) ~* (:...name))');
+      } else {
+        identifierClauses.push('LOWER(metadata.name) IN (:...name)');
+      }
+    }
+    if ('ticker' in identifierArgs) {
+      if (identifierArgs.ticker.length === 1) {
+        // exact match first then regexp
+        identifierClauses.push('(LOWER(metadata.ticker) IN (:...ticker) OR LOWER(metadata.ticker) ~* (:...ticker))');
+      } else {
+        identifierClauses.push('LOWER(metadata.ticker) IN (:...ticker)');
+      }
+    }
 
     const identifierFilters = identifierClauses.join(` ${identifierCondition} `);
     clauses.push(` (${identifierFilters}) `);
+  }
+  if (filters.pledgeMet !== undefined && filters.pledgeMet !== null) {
+    if (filters.pledgeMet) {
+      clauses.push('params.pledge<=metrics.live_pledge');
+    } else {
+      clauses.push('params.pledge>metrics.live_pledge');
+    }
   }
 
   return {

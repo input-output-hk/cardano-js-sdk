@@ -7,6 +7,7 @@ import { TxInFlight, UtxoTracker } from './types';
 import { WalletStores } from '../persistence';
 import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import chunk from 'lodash/chunk';
+import uniqWith from 'lodash/uniqWith';
 
 // Temporarily hardcoded. Will be replaced with ChainHistoryProvider 'maxPageSize' value once ADP-2249 is implemented
 const PAGE_SIZE = 25;
@@ -109,7 +110,14 @@ export const createUtxoTracker = (
             return [txIn, txOut];
           })
       )
-    ])
+    ]),
+    map((utxo) => {
+      const uniqueUtxo = uniqWith(utxo, ([a], [b]) => a.txId === b.txId && a.index === b.index);
+      if (uniqueUtxo.length !== utxo.length) {
+        logger.error('Found duplicate UTxO in', utxo);
+      }
+      return uniqueUtxo;
+    })
   );
   const available$ = combineLatest([total$, unspendableUtxoSource$]).pipe(
     // filter to utxo that are not included in in-flight transactions or unspendable

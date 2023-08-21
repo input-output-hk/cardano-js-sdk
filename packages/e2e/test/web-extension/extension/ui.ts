@@ -1,5 +1,12 @@
 /* eslint-disable no-use-before-define */
-import { BackgroundServices, UserPromptService, adaPriceProperties, env, logger } from './util';
+import {
+  BackgroundServices,
+  UserPromptService,
+  adaPriceProperties,
+  disconnectPortTestObjProperties,
+  env,
+  logger
+} from './util';
 import {
   RemoteApiPropertyType,
   WalletManagerUi,
@@ -243,4 +250,28 @@ document.querySelector('#buildAndSignTx')!.addEventListener('click', async () =>
   logger.info('Built tx', body.outputs.length);
   const { tx: signedTx } = await builtTx.sign();
   setSignature(signedTx.witness.signatures.values().next().value);
+});
+
+// Code below tests that a disconnected port in background script will result in the consumed API method call promise to reject
+// UI consumes API -> BG exposes fake API that closes port
+const disconnectPortTestObj = consumeRemoteApi(
+  { baseChannel: 'ui-to-bg-port-disconnect-channel', properties: disconnectPortTestObjProperties },
+  { logger, runtime }
+);
+
+const bgPortDisconnectPromiseDiv = document.querySelector('#remoteApiPortDisconnect .bgPortDisconnect');
+disconnectPortTestObj
+  .promiseMethod()
+  .then(() => (bgPortDisconnectPromiseDiv!.textContent = 'Background port disconnect -> Promise resolves'))
+  .catch(() => (bgPortDisconnectPromiseDiv!.textContent = 'Background port disconnect -> Promise rejects'));
+
+// Dummy exposeApi-like object that closes the port as soon as it gets a message.
+// Background promise call should reject as a result of this.
+// Using another channel (backgroundServices.apiDisconnectResult$) to get the actual result from background script.
+const uiPortDisconnectPromiseDiv = document.querySelector('#remoteApiPortDisconnect .uiPortDisconnect');
+backgroundServices.apiDisconnectResult$.subscribe((msg) => (uiPortDisconnectPromiseDiv!.textContent = msg));
+// BG consumes API -> UI exposes fake API that closes port
+const port = runtime.connect({ name: 'bg-to-ui-port-disconnect-channel' });
+port.onMessage.addListener((_msg, p) => {
+  p.disconnect();
 });

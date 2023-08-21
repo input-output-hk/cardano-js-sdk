@@ -9,6 +9,14 @@ import { dummyLogger } from 'ts-log';
 
 const { utxo, utxo2 } = mockProviders;
 
+const createStubOutputs = (numOutputs: number) =>
+  Array.from({ length: numOutputs }).map(
+    (): Cardano.TxOut => ({
+      address: Cardano.PaymentAddress('addr1vy36kffjf87vzkuyqc5g0ys3fe3pez5zvqg9r5z9q9kfrkg2cs093'),
+      value: { coins: 123n }
+    })
+  );
+
 describe('createUtxoTracker', () => {
   // these variables are not relevant for this test, overwriting utxoSource$
   let retryBackoffConfig: RetryBackoffConfig;
@@ -109,6 +117,49 @@ describe('createUtxoTracker', () => {
         b: utxoWithTx1InFlight,
         c: utxoWithTx2InFlight
       });
+    });
+  });
+
+  it('filters out duplicate utxo', () => {
+    const store = new InMemoryUtxoStore();
+    const address = utxo[0][0].address;
+    createTestScheduler().run(({ cold, expectObservable }) => {
+      const duplicateUtxo = utxo.find(([txOut]) => txOut.address === address)!;
+      const transactionsInFlight$ = cold('a', {
+        a: [
+          {
+            body: {
+              inputs: [] as Cardano.TxIn[],
+              // this output already exists in utxoSource$ emission
+              outputs: [...createStubOutputs(duplicateUtxo[0].index), duplicateUtxo[1]]
+            } as Cardano.TxBody,
+            cbor: dummyCbor,
+            id: duplicateUtxo[0].txId
+          } as TxInFlight
+        ]
+      });
+      const utxoTracker = createUtxoTracker(
+        {
+          addresses$: cold('a', { a: [address!] }),
+          logger,
+          retryBackoffConfig,
+          stores: {
+            unspendableUtxo: store,
+            utxo: store
+          },
+          tipBlockHeight$,
+          transactionsInFlight$,
+          utxoProvider
+        },
+        {
+          unspendableUtxoSource$: new PersistentCollectionTrackerSubject<Cardano.Utxo>(
+            () => cold('a', { a: [] }),
+            store
+          ),
+          utxoSource$: cold('a', { a: utxo }) as unknown as PersistentCollectionTrackerSubject<Cardano.Utxo>
+        }
+      );
+      expectObservable(utxoTracker.total$).toBe('a', { a: utxo });
     });
   });
 

@@ -38,4 +38,13 @@ describe('TypeOrmHandleProvider', () => {
 
     expect({ handle, hasDatum }).toEqual({ handle: 'TestHandle', hasDatum: false });
   });
+
+  // Test data is sourced from the test database snapshot
+  // packages/cardano-services/test/jest-setup/snapshots/handle.sql#L1257-L1260
+  it('fetches all distinct policy ids', async () => {
+    const result = await provider.getPolicyIds();
+    expect(result.length).toBeGreaterThan(0);
+    expect(typeof result[0]).toBe('string');
+    expect(result[0]).toHaveLength(56);
+  });
 });

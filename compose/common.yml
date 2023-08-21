@@ -46,6 +46,7 @@ x-with-postgres: &with-postgres
 
 x-projector-environment: &projector-environment
   API_URL: http://0.0.0.0:3000
+  BLOCKS_BUFFER_LENGTH: ${BLOCKS_BUFFER_LENGTH:-10}
   DROP_SCHEMA: ${DROP_PROJECTOR_SCHEMA:-false}
   POSTGRES_HOST: postgres
   POSTGRES_POOL_MAX: ${POSTGRES_POOL_MAX:-10}
@@ -234,6 +235,20 @@ services:
       USE_TYPEORM_STAKE_POOL_PROVIDER: true
     ports:
       - ${STAKE_POOL_API_PORT:-4010}:3000
+
+  handle-provider-server:
+    <<:
+      - *from-sdk
+      - *logging
+      - *provider-server
+      - *with-postgres
+    environment:
+      <<:
+        - *sdk-environment
+        - *provider-server-environment
+      SERVICE_NAMES: handle
+    ports:
+      - ${HANDLE_API_PORT:-4011}:3000
 
   rabbitmq:
     <<: *logging

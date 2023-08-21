@@ -1,4 +1,5 @@
 import { Bootstrap } from '@cardano-sdk/projection';
+import { Cardano } from '@cardano-sdk/core';
 import { CommonProgramOptions, OgmiosProgramOptions, PosgresProgramOptions } from '../options';
 import { DnsResolver, createDnsResolver } from '../utils';
 import {
@@ -16,14 +17,17 @@ import { URL } from 'url';
 import { createLogger } from 'bunyan';
 import { getConnectionConfig, getOgmiosObservableCardanoNode } from '../services';
 
+export const BLOCKS_BUFFER_LENGTH_DEFAULT = 10;
 export const PROJECTOR_API_URL_DEFAULT = new URL('http://localhost:3002');
 
 export type ProjectorArgs = CommonProgramOptions &
   PosgresProgramOptions<''> &
   HandlePolicyIdsProgramOptions &
   OgmiosProgramOptions & {
+    blocksBufferLength: number;
     dropSchema: boolean;
     dryRun: boolean;
+    exitAtBlockNo: Cardano.BlockNo;
     poolsMetricsInterval: number;
     projectionNames: ProjectionName[];
     synchronize: boolean;
@@ -48,16 +52,19 @@ const createProjectionHttpService = async (options: ProjectionMapFactoryOptions)
   });
   const connectionConfig$ = getConnectionConfig(dnsResolver, 'projector', '', args);
   const buffer = new TypeormStabilityWindowBuffer({ logger });
-  const { dropSchema, dryRun, projectionNames, synchronize, handlePolicyIds } = args;
+  const { blocksBufferLength, dropSchema, dryRun, exitAtBlockNo, handlePolicyIds, projectionNames, synchronize } = args;
   const projection$ = createTypeormProjection({
+    blocksBufferLength,
     buffer,
     connectionConfig$,
     devOptions: { dropSchema, synchronize },
+    exitAtBlockNo,
     logger,
     projectionOptions: {
       handlePolicyIds
     },
     projectionSource$: Bootstrap.fromCardanoNode({
+      blocksBufferLength,
       buffer,
       cardanoNode,
       logger

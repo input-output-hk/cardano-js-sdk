@@ -12,9 +12,10 @@ import {
   map,
   mergeMap,
   of,
+  pairwise,
   tap
 } from 'rxjs';
-import { ChannelName, Messenger, MessengerDependencies, MessengerPort, PortMessage } from './types';
+import { ChannelName, DisconnectEvent, Messenger, MessengerDependencies, MessengerPort, PortMessage } from './types';
 import { Logger } from 'ts-log';
 import { deriveChannelName } from './util';
 import { retryBackoff } from 'backoff-rxjs';
@@ -120,6 +121,16 @@ export const generalizeBackgroundMessenger = (
   deriveChannel(path) {
     return generalizeBackgroundMessenger(deriveChannelName(channel, path), messenger, logger);
   },
+  disconnect$: messenger.getChannel(channel).ports$.pipe(
+    pairwise(),
+    filter(([prev, current]) => prev.size > current.size),
+    map(
+      ([prev, current]): DisconnectEvent => ({
+        disconnected: [...prev].find((p) => !current.has(p))!,
+        remaining: [...current]
+      })
+    )
+  ),
   isShutdown: false,
   message$: messenger.getChannel(channel).message$,
   /**

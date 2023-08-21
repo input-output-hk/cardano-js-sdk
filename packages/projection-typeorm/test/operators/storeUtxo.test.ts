@@ -26,11 +26,7 @@ describe('storeUtxo', () => {
   const entities = [BlockEntity, BlockDataEntity, AssetEntity, TokensEntity, OutputEntity];
 
   const project$ = () =>
-    Bootstrap.fromCardanoNode({
-      buffer,
-      cardanoNode: stubEvents.cardanoNode,
-      logger
-    }).pipe(
+    Bootstrap.fromCardanoNode({ blocksBufferLength: 10, buffer, cardanoNode: stubEvents.cardanoNode, logger }).pipe(
       Mappers.withMint(),
       Mappers.withUtxo(),
       withTypeormTransaction({

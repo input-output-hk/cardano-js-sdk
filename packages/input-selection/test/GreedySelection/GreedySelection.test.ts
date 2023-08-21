@@ -191,7 +191,7 @@ describe('GreedySelection', () => {
     });
   });
 
-  it('allocates native assets to the biggest output (before fees)', async () => {
+  it('allocates native assets evenly', async () => {
     const selector = new GreedyInputSelector({
       getChangeAddresses: async () =>
         new Map([
@@ -267,22 +267,15 @@ describe('GreedySelection', () => {
       {
         address: 'A',
         value: {
-          assets: asTokenMap([
-            [asAssetId('0'), 100n],
-            [asAssetId('1'), 23n],
-            [asAssetId('2'), 1n],
-            [asAssetId('3'), 1000n],
-            [asAssetId('4'), 1500n],
-            [asAssetId('5'), 500n]
-          ]),
+          assets: asTokenMap([[asAssetId('0'), 100n]]),
           coins: 2_124_500n
         }
       },
-      { address: 'B', value: { coins: 2_125_000n } },
-      { address: 'C', value: { coins: 2_125_000n } },
-      { address: 'D', value: { coins: 2_125_000n } },
-      { address: 'A', value: { coins: 1_062_500n } },
-      { address: 'B', value: { coins: 1_062_500n } },
+      { address: 'B', value: { assets: asTokenMap([[asAssetId('1'), 23n]]), coins: 2_125_000n } },
+      { address: 'C', value: { assets: asTokenMap([[asAssetId('2'), 1n]]), coins: 2_125_000n } },
+      { address: 'D', value: { assets: asTokenMap([[asAssetId('3'), 1000n]]), coins: 2_125_000n } },
+      { address: 'A', value: { assets: asTokenMap([[asAssetId('4'), 1500n]]), coins: 1_062_500n } },
+      { address: 'B', value: { assets: asTokenMap([[asAssetId('5'), 500n]]), coins: 1_062_500n } },
       { address: 'C', value: { coins: 1_062_500n } },
       { address: 'D', value: { coins: 1_062_500n } },
       { address: 'A', value: { coins: 531_250n } },
@@ -363,12 +356,13 @@ describe('GreedySelection', () => {
       TxTestUtil.createOutput({ coins: 2_000_000n })
     ]);
 
-    const expectedFee = 500n;
+    const expectedFee = 1_000_000n;
     const implicitValue = {};
     const constraints = {
       ...MOCK_NO_CONSTRAINTS,
       maxTokenBundleSize: 2,
-      minimumCostCoefficient: 100n
+      minimumCoinQuantity: 2_000_000n,
+      minimumCostCoefficient: 200_000n
     };
 
     const results = await selector.select({
@@ -396,54 +390,30 @@ describe('GreedySelection', () => {
         address: 'A',
         value: {
           assets: asTokenMap([
-            [asAssetId('4'), 1500n],
-            [asAssetId('5'), 500n]
+            [asAssetId('0'), 100n],
+            [asAssetId('4'), 1500n]
           ]),
-          coins: 4_249_500n
+          coins: 3_250_000n
         }
       },
       {
         address: 'A',
         value: {
           assets: asTokenMap([
-            [asAssetId('2'), 1n],
-            [asAssetId('3'), 1000n]
+            [asAssetId('1'), 23n],
+            [asAssetId('5'), 500n]
           ]),
-          coins: 2_125_000n
+          coins: 4_250_000n
         }
       },
       {
         address: 'B',
         value: {
-          assets: asTokenMap([
-            [asAssetId('0'), 100n],
-            [asAssetId('1'), 23n]
-          ]),
-          coins: 2_125_000n
+          assets: asTokenMap([[asAssetId('2'), 1n]]),
+          coins: 4_250_000n
         }
       },
-      { address: 'C', value: { coins: 2_125_000n } },
-      { address: 'A', value: { coins: 1_062_500n } },
-      { address: 'B', value: { coins: 1_062_500n } },
-      { address: 'C', value: { coins: 1_062_500n } },
-      { address: 'A', value: { coins: 531_250n } },
-      { address: 'B', value: { coins: 531_250n } },
-      { address: 'C', value: { coins: 531_250n } },
-      { address: 'A', value: { coins: 265_625n } },
-      { address: 'B', value: { coins: 265_625n } },
-      { address: 'C', value: { coins: 265_625n } },
-      { address: 'A', value: { coins: 132_813n } },
-      { address: 'B', value: { coins: 132_813n } },
-      { address: 'C', value: { coins: 132_813n } },
-      { address: 'A', value: { coins: 66_406n } },
-      { address: 'B', value: { coins: 66_406n } },
-      { address: 'C', value: { coins: 66_406n } },
-      { address: 'A', value: { coins: 33_203n } },
-      { address: 'A', value: { coins: 33_203n } },
-      { address: 'B', value: { coins: 33_203n } },
-      { address: 'B', value: { coins: 33_203n } },
-      { address: 'C', value: { coins: 33_203n } },
-      { address: 'C', value: { coins: 33_203n } }
+      { address: 'C', value: { assets: asTokenMap([[asAssetId('3'), 1000n]]), coins: 4_250_000n } }
     ]);
 
     assertInputSelectionProperties({

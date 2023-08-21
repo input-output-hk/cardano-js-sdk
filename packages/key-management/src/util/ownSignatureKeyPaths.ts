@@ -14,7 +14,7 @@ import uniqWith from 'lodash/uniqWith';
  * @param txBody The transaction body.
  */
 // eslint-disable-next-line complexity
-const getStakingKeyPaths = (
+const getStakeKeyPaths = (
   groupedAddresses: GroupedAddress[],
   txBody: Cardano.TxBody
   // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -49,7 +49,12 @@ const getStakingKeyPaths = (
           if (certificate.poolId === poolId) paths.add(account.stakeKeyDerivationPath);
           break;
         case Cardano.CertificateType.MIR:
-          if (certificate.rewardAccount === account.rewardAccount) paths.add(account.stakeKeyDerivationPath);
+          if (
+            certificate.kind === Cardano.MirCertificateKind.ToStakeCreds &&
+            certificate.stakeCredential!.hash ===
+              Crypto.Hash28ByteBase16(Cardano.RewardAccount.toHash(account.rewardAccount))
+          )
+            paths.add(account.stakeKeyDerivationPath);
           break;
         case Cardano.CertificateType.StakeKeyRegistration:
         case Cardano.CertificateType.GenesisKeyDelegation:
@@ -80,13 +85,13 @@ const getRequiredSignersKeyPaths = (
   for (const keyHash of keyHashes) {
     for (const address of groupedAddresses) {
       const paymentCredential = Cardano.Address.fromBech32(address.address)?.asBase()?.getPaymentCredential().hash;
-      const stakingCredential = Cardano.RewardAccount.toHash(address.rewardAccount);
+      const stakeCredential = Cardano.RewardAccount.toHash(address.rewardAccount);
 
       if (paymentCredential && paymentCredential.toString() === keyHash) {
         paths.add({ index: address.index, role: Number(address.type) });
       }
 
-      if (stakingCredential && address.stakeKeyDerivationPath && stakingCredential.toString() === keyHash) {
+      if (stakeCredential && address.stakeKeyDerivationPath && stakeCredential.toString() === keyHash) {
         paths.add(address.stakeKeyDerivationPath);
       }
     }
@@ -96,7 +101,7 @@ const getRequiredSignersKeyPaths = (
 };
 
 /**
- * Assumes that a single staking key is used for all addresses (index=0)
+ * Assumes that a single stake key is used for all addresses (index=0)
  *
  * @returns {AccountKeyDerivationPath[]} derivation paths for keys to sign transaction with
  */
@@ -121,7 +126,7 @@ export const ownSignatureKeyPaths = async (
   return uniqWith(
     [
       ...paymentKeyPaths,
-      ...getStakingKeyPaths(knownAddresses, txBody),
+      ...getStakeKeyPaths(knownAddresses, txBody),
       ...getRequiredSignersKeyPaths(knownAddresses, txBody.requiredExtraSignatures)
     ],
     isEqual

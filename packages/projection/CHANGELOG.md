@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.7.1...@cardano-sdk/projection@0.7.2) (2023-08-21)
+
+**Note:** Version bump only for package @cardano-sdk/projection
+
+## [0.7.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.7.0...@cardano-sdk/projection@0.7.1) (2023-08-15)
+
+### Features
+
+* add a buffer after reading blocks from ogmios ([0095c80](https://github.com/input-output-hk/cardano-js-sdk/commit/0095c80346fb0f5ce7bfa7fe805c6b0e79ad1a35))
+
+## [0.7.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.6.17...@cardano-sdk/projection@0.7.0) (2023-08-11)
+
+### ⚠ BREAKING CHANGES
+
+* replace Mappers.CertificatePointer with Cardano.Pointer
+
+### Features
+
+* **projection:** add 10k and 100k moving avgs speed and eta ([53f15d4](https://github.com/input-output-hk/cardano-js-sdk/commit/53f15d4b9895d50fd0c17f5bfdbd22c717d08c94))
+
+### Code Refactoring
+
+* replace Mappers.CertificatePointer with Cardano.Pointer ([cb7279e](https://github.com/input-output-hk/cardano-js-sdk/commit/cb7279e2a80d48ea870a625db47941f097dace34))
+
+## [0.6.17](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.6.16...@cardano-sdk/projection@0.6.17) (2023-07-31)
+
+**Note:** Version bump only for package @cardano-sdk/projection
+
 ## [0.6.16](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.6.15...@cardano-sdk/projection@0.6.16) (2023-07-17)
 
 **Note:** Version bump only for package @cardano-sdk/projection

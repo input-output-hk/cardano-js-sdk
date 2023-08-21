@@ -37,13 +37,15 @@ describe('wallet', () => {
   const dappBtnRun = '#bp3-tab-panel_TabsExample_1 > div > button';
   const dappSubmittedTxConfirmation = '#root > div > p:last-child';
   const dappChangeAddress = '#root > div > p:nth-child(11)';
-  const dappStakingAddress = '#root > div > p:nth-child(12)';
+  const dappStakeAddress = '#root > div > p:nth-child(12)';
   const dappUsedAddress = '#root > div > p:nth-child(13)';
 
   const btnDelegate = '#multiDelegation .delegate button';
   const spanPoolIds = '#multiDelegation .delegate .pools';
   const liPools = '#multiDelegation .distribution li';
   const liPercents = '#multiDelegation .distribution li .percent';
+  const divBgPortDisconnectStatus = '#remoteApiPortDisconnect .bgPortDisconnect';
+  const divUiPortDisconnectStatus = '#remoteApiPortDisconnect .uiPortDisconnect';
 
   // The address is filled in by the tests, which are order dependent
   let walletAddr1 = '';
@@ -69,6 +71,11 @@ describe('wallet', () => {
   describe('wallet ui opens', () => {
     before(async () => {
       await switchToWalletUi();
+    });
+
+    it('should handle remoteApi disconnects as Promise.rejects', async () => {
+      await expect($(divBgPortDisconnectStatus)).toHaveText('Background port disconnect -> Promise rejects');
+      await expect($(divUiPortDisconnectStatus)).toHaveText('UI script port disconnect -> Promise rejects');
     });
 
     it('should display ADA price, provided by background process', async () => {
@@ -113,7 +120,7 @@ describe('wallet', () => {
 
       it('dapp gets correct addresses from cip30 wallet api', async () => {
         await expect($(dappChangeAddress)).toHaveTextContaining(walletAddr1);
-        await expect($(dappStakingAddress)).toHaveTextContaining(walletStakeAddr1);
+        await expect($(dappStakeAddress)).toHaveTextContaining(walletStakeAddr1);
         await expect($(dappUsedAddress)).toHaveTextContaining(walletAddr1);
       });
     });

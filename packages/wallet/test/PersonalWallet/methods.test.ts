@@ -7,11 +7,11 @@ import {
   generateRandomHexString,
   mockProviders as mocks
 } from '@cardano-sdk/util-dev';
-import { BehaviorSubject, firstValueFrom, skip } from 'rxjs';
+import { BehaviorSubject, Subscription, firstValueFrom, skip } from 'rxjs';
 import { CML, Cardano, CardanoNodeErrors, ProviderError, ProviderFailure, TxCBOR } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
-import { PersonalWallet, setupWallet } from '../../src';
+import { PersonalWallet, TxInFlight, setupWallet } from '../../src';
 import { getPassphrase, stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { dummyLogger as logger } from 'ts-log';
 import { toOutgoingTx, waitForWalletStateSettle } from '../util';
@@ -367,6 +367,13 @@ describe('PersonalWallet methods', () => {
     });
 
     describe('submitTx', () => {
+      const valueNotConservedError = new ProviderError(
+        ProviderFailure.BadRequest,
+        new CardanoNodeErrors.TxSubmissionErrors.ValueNotConservedError({
+          valueNotConserved: { consumed: 2, produced: 1 }
+        })
+      );
+
       it('resolves on success', async () => {
         const tx = await wallet.finalizeTx({ tx: await wallet.initializeTx(props) });
         const outgoingTx = toOutgoingTx(tx);
@@ -383,6 +390,39 @@ describe('PersonalWallet methods', () => {
         expect(await txSubmitting).toEqual(outgoingTx);
         expect(await txPending).toEqual(outgoingTx);
         expect(await txInFlight).toEqual([outgoingTx]);
+      });
+
+      describe('is idempotent', () => {
+        let tx: Cardano.Tx;
+        let txInFlightEmissions: Array<TxInFlight[]>;
+        let txInFlightSubscription: Subscription;
+
+        beforeEach(async () => {
+          tx = await wallet.finalizeTx({ tx: await wallet.initializeTx(props) });
+          txInFlightEmissions = [];
+          txInFlightSubscription = wallet.transactions.outgoing.inFlight$.subscribe((inFlight) =>
+            txInFlightEmissions.push(inFlight)
+          );
+        });
+
+        test('when re-submitting before initial submission resolves or rejects', async () => {
+          await Promise.all([wallet.submitTx(tx), wallet.submitTx(tx)]);
+          txInFlightSubscription.unsubscribe();
+
+          expect(txSubmitProvider.submitTx).toBeCalledTimes(1);
+          // [], [submitting], [submitted]
+          expect(txInFlightEmissions).toHaveLength(3);
+        });
+
+        test('when re-submitting after initial submission resolves', async () => {
+          await wallet.submitTx(tx);
+          await wallet.submitTx(tx);
+          txInFlightSubscription.unsubscribe();
+
+          expect(txSubmitProvider.submitTx).toBeCalledTimes(1);
+          // [], [submitting], [submitted]
+          expect(txInFlightEmissions).toHaveLength(3);
+        });
       });
 
       it('resolves on success when submitting tx as a serialized hex blob, encoded as CBOR', async () => {
@@ -409,14 +449,9 @@ describe('PersonalWallet methods', () => {
       });
 
       it('mightBeAlreadySubmitted option interprets ValueNotConservedError as success', async () => {
-        txSubmitProvider.submitTx.mockRejectedValueOnce(
-          new ProviderError(
-            ProviderFailure.BadRequest,
-            new CardanoNodeErrors.TxSubmissionErrors.ValueNotConservedError({
-              valueNotConserved: { consumed: 2, produced: 1 }
-            })
-          )
-        );
+        txSubmitProvider.submitTx
+          .mockRejectedValueOnce(valueNotConservedError)
+          .mockRejectedValueOnce(valueNotConservedError);
         const tx = await wallet.finalizeTx({ tx: await wallet.initializeTx(props) });
         const outgoingTx = toOutgoingTx(tx);
 
@@ -427,6 +462,29 @@ describe('PersonalWallet methods', () => {
         const txPending = firstValueFrom(wallet.transactions.outgoing.pending$);
         await expect(wallet.submitTx(tx, { mightBeAlreadySubmitted: true })).resolves.not.toThrow();
         expect(await txPending).toEqual(outgoingTx);
+      });
+
+      it('does not re-serialize the transaction to compute transaction id', async () => {
+        // This transaction produces a different ID when round-tripping serialisation
+        const cbor = TxCBOR(
+          '84a70081825820c8a0ccb785ef56a82c42faeef8b63f4c12ba0f487334de5f245974a2831b2c3601018382583900598a69f8d6d148890f0855f5e3e88f3e179e49f2deb114e654d8dfe068a5cec902cb3469645dc123b9719baac643e862e26ceda60d3b2f9b821a001226b8a1581cf0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9aa150000de1407473745f6d69675f3032313801a300581d709b85d225e2b8e71f123eecb10fae74a047021980768244202e2eecde01821a00397a9ca1581cf0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9aa150000643b07473745f6d69675f3032313801028201d818590268d8799faa446e616d654d247473745f6d69675f3032313845696d6167655838697066733a2f2f7a623272685a4150634d456938314e59753948327277525831313151526179484e43394770677075574479316e78433766496d65646961547970654a696d6167652f6a706567426f6700496f675f6e756d6265720046726172697479456261736963466c656e6774680c4a63686172616374657273576c6574746572732c6e756d626572732c7370656369616c516e756d657269635f6d6f64696669657273404776657273696f6e0101af4e7374616e646172645f696d6167655838697066733a2f2f7a623272685a4150634d456938314e59753948327277525831313151526179484e43394770677075574479316e78433766537374616e646172645f696d6167655f686173685820256e0dcb4e511b801e4e3198fc103e0a2368e8cfafb4759f0b40079a11bd21764a696d6167655f686173685820256e0dcb4e511b801e4e3198fc103e0a2368e8cfafb4759f0b40079a11bd217646706f7274616c404864657369676e65724047736f6369616c73404676656e646f72404764656661756c7400536c6173745f7570646174655f61646472657373583900598a69f8d6d148890f0855f5e3e88f3e179e49f2deb114e654d8dfe068a5cec902cb3469645dc123b9719baac643e862e26ceda60d3b2f9b4c76616c6964617465645f6279581c4da965a049dfd15ed1ee19fba6e2974a0b79fc416dd1796a1f97f5e14b7376675f76657273696f6e46312e31342e314c6167726565645f7465726d7340546d6967726174655f7369675f72657175697265640045747269616c00446e73667700ff82583900598a69f8d6d148890f0855f5e3e88f3e179e49f2deb114e654d8dfe068a5cec902cb3469645dc123b9719baac643e862e26ceda60d3b2f9b1b00000002537fa73a021a000393210758208f0c3ee1cd379bf1870ea0e875356289d3dfe05055791bf1e964a3453e27b88609a1581cf0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9aa350000643b07473745f6d69675f303231380150000de1407473745f6d69675f30323138014c7473745f6d69675f30323138200d81825820c8a0ccb785ef56a82c42faeef8b63f4c12ba0f487334de5f245974a2831b2c36000e81581c4da965a049dfd15ed1ee19fba6e2974a0b79fc416dd1796a1f97f5e1a20082825820b62a7193927f47ef703ba99a06add1ee2d4d94853a16dcd68ad0f5d9baa1853058404ab953d5ba13075945c3f0231273402e6a23f42a8ce30de105d3f87b7b6385b04280d419936c90c4711974989c8c7fd4e487fa2d601fc208eae2d2dbeb5e2f0a825820ebbec8effec947663b6b8c59c4dddd4ffbdae8ebf7791d3929437013debd64b758406cf148be50c3510f1c1f18241dd5edeee6dc4b89e3de77e95e24baf37223bb6ee88d0efd80eb4010939fddd7f133a2aabec0aba2aac45b8d92372108609e9f0a01818200581c4da965a049dfd15ed1ee19fba6e2974a0b79fc416dd1796a1f97f5e1f5a11902d1a178386630666634386262623762626539643539613430663163653930653965396430666635303032656334386632333262343963613066623961a178203030306465313430373437333734356636643639363735663330333233313338aa78046e616d65780d247473745f6d69675f303231387805696d6167657838697066733a2f2f7a623272685a4150634d456938314e59753948327277525831313151526179484e43394770677075574479316e7843376678096d6564696154797065780a696d6167652f6a70656778026f670078096f675f6e756d6265720078067261726974797805626173696378066c656e6774680c780a6368617261637465727378176c6574746572732c6e756d626572732c7370656369616c78116e756d657269635f6d6f646966696572737800780776657273696f6e01'
+        );
+        const id = await wallet.submitTx(cbor);
+        expect(id).toEqual('fdfa77aad6d9c404168d1a9ca4171b5fd6ee96cde1964824c15b61ca26c15657');
+      });
+
+      it('attempts to resubmit the tx that is already in flight', async () => {
+        const tx = await wallet.finalizeTx({ tx: await wallet.initializeTx(props) });
+
+        await wallet.submitTx(tx);
+        expect(await firstValueFrom(wallet.transactions.outgoing.inFlight$)).toHaveLength(1);
+
+        // resubmit the same tx while it's 'in flight'
+        txSubmitProvider.submitTx.mockRejectedValueOnce(valueNotConservedError);
+        await wallet.submitTx(tx, { mightBeAlreadySubmitted: true });
+
+        expect(await firstValueFrom(wallet.transactions.outgoing.inFlight$)).toHaveLength(1);
+        expect(txSubmitProvider.submitTx).toBeCalledTimes(2);
       });
 
       it('resolves on success when submitting a tx when sending coins to a handle', async () => {

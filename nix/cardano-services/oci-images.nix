@@ -1,0 +1,23 @@
+let
+  inherit (inputs) std self;
+
+  # TODO: express this as OCI labels (what they are for)
+  BUILD_INFO = builtins.toJSON {
+    inherit (self) lastModified lastModifiedDate rev;
+    shortRev = self.shortRev or "no rev";
+    extra = {
+      inherit (self) narHash;
+      sourceInfo = self;
+      path = self.outPath;
+    };
+  };
+in {
+  cardano-services = std.lib.ops.mkStandardOCI {
+    name = "926093910549.dkr.ecr.us-east-1.amazonaws.com/cardano-services";
+    operable = cell.operables.cardano-services;
+    config.Env = [
+      "BUILD_INFO=${BUILD_INFO}"
+    ];
+    meta.description = "Minimal Cardano Services OCI Image";
+  };
+}

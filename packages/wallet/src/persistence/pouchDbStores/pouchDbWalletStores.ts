@@ -1,5 +1,5 @@
 import { Assets } from '../../types';
-import { Cardano, EpochRewards, EraSummary } from '@cardano-sdk/core';
+import { Cardano, EraSummary, Reward } from '@cardano-sdk/core';
 import { CreatePouchDbStoresDependencies } from './types';
 import { EMPTY, combineLatest, map } from 'rxjs';
 import { GroupedAddress } from '@cardano-sdk/key-management';
@@ -18,11 +18,12 @@ export class PouchDbAssetsStore extends PouchDbDocumentStore<Assets> {}
 export class PouchDbAddressesStore extends PouchDbDocumentStore<GroupedAddress[]> {}
 export class PouchDbInFlightTransactionsStore extends PouchDbDocumentStore<TxInFlight[]> {}
 export class PouchDbVolatileTransactionsStore extends PouchDbDocumentStore<OutgoingOnChainTx[]> {}
+export class PouchDbPolicyIdsStore extends PouchDbDocumentStore<Cardano.PolicyId[]> {}
 
 export class PouchDbTransactionsStore extends PouchDbCollectionStore<Cardano.HydratedTx> {}
 export class PouchDbUtxoStore extends PouchDbCollectionStore<Cardano.Utxo> {}
 
-export class PouchDbRewardsHistoryStore extends PouchDbKeyValueStore<Cardano.RewardAccount, EpochRewards[]> {}
+export class PouchDbRewardsHistoryStore extends PouchDbKeyValueStore<Cardano.RewardAccount, Reward[]> {}
 export class PouchDbStakePoolsStore extends PouchDbKeyValueStore<Cardano.PoolId, Cardano.StakePool> {}
 export class PouchDbRewardsBalancesStore extends PouchDbKeyValueStore<Cardano.RewardAccount, Cardano.Lovelace> {}
 
@@ -60,6 +61,7 @@ export const createPouchDbWalletStores = (
     eraSummaries: new PouchDbEraSummariesStore(docsDbName, 'EraSummaries', logger),
     genesisParameters: new PouchDbGenesisParametersStore(docsDbName, 'genesisParameters', logger),
     inFlightTransactions: new PouchDbInFlightTransactionsStore(docsDbName, 'transactionsInFlight_v2', logger),
+    policyIds: new PouchDbPolicyIdsStore(docsDbName, 'policyIds', logger),
     protocolParameters: new PouchDbProtocolParametersStore(docsDbName, 'protocolParameters', logger),
     rewardsBalances: new PouchDbRewardsBalancesStore(`${baseDbName}RewardsBalances`, logger),
     rewardsHistory: new PouchDbRewardsHistoryStore(`${baseDbName}RewardsHistory`, logger),

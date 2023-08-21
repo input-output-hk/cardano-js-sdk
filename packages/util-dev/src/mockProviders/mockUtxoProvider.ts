@@ -1,6 +1,7 @@
 import * as AssetId from '../assetId';
 import { Cardano, UtxoProvider } from '@cardano-sdk/core';
 import { handleAssetId } from './mockData';
+import { resolvedHandle } from './mockHandleProvider';
 import delay from 'delay';
 
 export const utxo: Cardano.Utxo[] = [
@@ -106,9 +107,7 @@ export const utxo: Cardano.Utxo[] = [
       txId: Cardano.TransactionId('ea1517b8c36fea3148df9aa1f49bbee66ff59a5092331a67bd8b3c427e1d79d7')
     },
     {
-      address: Cardano.PaymentAddress(
-        'addr_test1qq585l3hyxgj3nas2v3xymd23vvartfhceme6gv98aaeg9muzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q2g7k3g'
-      ),
+      address: resolvedHandle.cardanoAddress,
       value: {
         assets: new Map([[handleAssetId, 1n]]),
         coins: 9_825_963n

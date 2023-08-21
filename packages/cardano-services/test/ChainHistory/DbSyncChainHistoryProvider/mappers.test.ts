@@ -227,16 +227,18 @@ describe('chain history mappers', () => {
       expect(reservePotResult).toEqual<WithCertIndex<Cardano.MirCertificate>>({
         __typename: Cardano.CertificateType.MIR,
         cert_index: 0,
+        kind: Cardano.MirCertificateKind.ToStakeCreds,
         pot: Cardano.MirCertificatePot.Reserves,
         quantity: 500_000n,
-        rewardAccount: Cardano.RewardAccount(stakeAddress)
+        stakeCredential: Cardano.Address.fromString(stakeAddress)!.asReward()!.getPaymentCredential()
       });
       expect(treasuryPotResult).toEqual<WithCertIndex<Cardano.MirCertificate>>({
         __typename: Cardano.CertificateType.MIR,
         cert_index: 0,
+        kind: Cardano.MirCertificateKind.ToStakeCreds,
         pot: Cardano.MirCertificatePot.Treasury,
         quantity: 500_000n,
-        rewardAccount: Cardano.RewardAccount(stakeAddress)
+        stakeCredential: Cardano.Address.fromString(stakeAddress)!.asReward()!.getPaymentCredential()
       });
     });
     test('map StakeCertModel to Cardano.StakeAddressCertificate', () => {

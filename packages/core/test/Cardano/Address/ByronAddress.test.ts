@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import * as cip19TestVectors from './Cip19TestVectors';
+import * as cip19TestVectors from '../../../../util-dev/src/Cip19TestVectors';
 import { ByronAddressType } from '../../../src/Cardano';
 import { Cardano } from '../../../src';
 import { HexBlob } from '@cardano-sdk/util';

@@ -1,9 +1,9 @@
 {
   "name": "@cardano-sdk/util-dev",
-  "version": "0.13.8",
+  "version": "0.15.1",
   "description": "Utilities for tests in other packages",
   "engines": {
-    "node": ">=14.20.1"
+    "node": ">=16.20.1"
   },
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -44,6 +44,7 @@
     "test:e2e": "shx echo 'test:e2e' command not implemented yet"
   },
   "devDependencies": {
+    "@cardano-sdk/crypto": "workspace:~",
     "@types/dockerode": "^3.3.8",
     "@types/jest": "^26.0.24",
     "eslint": "^7.32.0",
