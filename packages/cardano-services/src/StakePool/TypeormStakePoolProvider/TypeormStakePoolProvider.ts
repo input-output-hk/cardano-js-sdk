@@ -77,8 +77,8 @@ export class TypeormStakePoolProvider extends TypeormProvider implements StakePo
         .limit(pagination.limit)
         .getRawMany()
     );
-    const { pageResults, totalResultCount } = mapStakePoolsResult(rawResult);
-    return { pageResults, totalResultCount };
+
+    return mapStakePoolsResult(rawResult);
   }
 
   public async stakePoolStats(): Promise<StakePoolStats> {
@@ -93,7 +93,6 @@ export class TypeormStakePoolProvider extends TypeormProvider implements StakePo
         .getRawMany()
     );
 
-    const stats = mapPoolStats(rawResult);
-    return { qty: stats };
+    return { qty: mapPoolStats(rawResult) };
   }
 }

@@ -6,6 +6,7 @@ import {
   PoolMetadataEntity,
   PoolRegistrationEntity,
   PoolRetirementEntity,
+  PoolRewardsEntity,
   StakePoolEntity,
   createDataSource,
   createPgBoss,
@@ -46,6 +47,7 @@ export const pgBossEntities: Function[] = [
   PoolMetadataEntity,
   PoolRegistrationEntity,
   PoolRetirementEntity,
+  PoolRewardsEntity,
   StakePoolEntity
 ];
 

@@ -27,6 +27,8 @@ spec:
               value: debug
             - name: NETWORK
               value: preview
+            - name: NETWORK_INFO_PROVIDER_URL
+              value: http://dev-preview-cardanojs-backend.dev-preview.svc.cluster.local
             - name: POSTGRES_DB_DB_SYNC
               value: cardano
             - name: POSTGRES_DB_STAKE_POOL
@@ -72,7 +74,7 @@ spec:
                   key: username
                   name: stakepool-owner-user.dev-preview-dbsync-db.credentials.postgresql.acid.zalan.do
             - name: QUEUES
-              value: pool-metadata,pool-metrics
+              value: pool-delist-schedule,pool-metadata,pool-metrics,pool-rewards
             - name: STAKE_POOL_PROVIDER_URL
               value: http://dev-preview-cardanojs-backend.dev-preview.svc.cluster.local
           image: FIXME-ADD-LATEST-IMAGE-REFERENCE

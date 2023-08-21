@@ -13,6 +13,7 @@ import {
   PoolMetadataEntity,
   PoolRegistrationEntity,
   PoolRetirementEntity,
+  PoolRewardsEntity,
   StakeKeyRegistrationEntity,
   StakePoolEntity,
   TokensEntity,
@@ -25,6 +26,7 @@ import {
   storeNftMetadata,
   storeStakeKeyRegistrations,
   storeStakePoolMetadataJob,
+  storeStakePoolRewardsJob,
   storeStakePools,
   storeUtxo
 } from '@cardano-sdk/projection-typeorm';
@@ -37,13 +39,14 @@ import { passthrough } from '@cardano-sdk/util-rxjs';
 
 /** Used as mount segments, so must be URL-friendly */
 export enum ProjectionName {
+  Address = 'address',
   Asset = 'asset',
   Handle = 'handle',
   StakePool = 'stake-pool',
   StakePoolMetadataJob = 'stake-pool-metadata-job',
   StakePoolMetricsJob = 'stake-pool-metrics-job',
-  UTXO = 'utxo',
-  Address = 'address'
+  StakePoolRewardsJob = 'stake-pool-rewards-job',
+  UTXO = 'utxo'
 }
 
 export interface ProjectionOptions {
@@ -107,6 +110,7 @@ export const storeOperators = {
   )(),
   storeStakeKeyRegistrations: storeStakeKeyRegistrations(),
   storeStakePoolMetadataJob: storeStakePoolMetadataJob(),
+  storeStakePoolRewardsJob: storeStakePoolRewardsJob(),
   storeStakePools: storeStakePools(),
   storeUtxo: storeUtxo()
 };
@@ -128,6 +132,7 @@ const entities = {
   poolMetadata: PoolMetadataEntity,
   poolRegistration: PoolRegistrationEntity,
   poolRetirement: PoolRetirementEntity,
+  poolRewards: PoolRewardsEntity,
   stakeKeyRegistration: StakeKeyRegistrationEntity,
   stakePool: StakePoolEntity,
   tokens: TokensEntity
@@ -149,6 +154,7 @@ const storeEntities: Partial<Record<StoreName, EntityName[]>> = {
   // 'stake-pool' projection requires it, but `storeStakePools` does not.
   // at the time of writing there was no way to specify a direct projection->entity dependency.
   storeStakePoolMetadataJob: ['stakePool', 'currentPoolMetrics', 'poolMetadata'],
+  storeStakePoolRewardsJob: ['poolRewards', 'stakePool'],
   storeStakePools: ['stakePool', 'currentPoolMetrics', 'poolMetadata', 'poolDelisted'],
   storeUtxo: ['tokens', 'output']
 };
@@ -222,6 +228,7 @@ const storeInterDependencies: Partial<Record<StoreName, StoreName[]>> = {
   storeNftMetadata: ['storeAssets'],
   storePoolMetricsUpdateJob: ['storeBlock'],
   storeStakePoolMetadataJob: ['storeBlock'],
+  storeStakePoolRewardsJob: ['storeBlock'],
   storeStakePools: ['storeBlock'],
   storeUtxo: ['storeBlock', 'storeAssets']
 };
@@ -235,6 +242,7 @@ const projectionStoreDependencies: Record<ProjectionName, StoreName[]> = {
   'stake-pool': ['storeStakePools'],
   'stake-pool-metadata-job': ['storeStakePoolMetadataJob'],
   'stake-pool-metrics-job': ['storePoolMetricsUpdateJob'],
+  'stake-pool-rewards-job': ['storeStakePoolRewardsJob'],
   utxo: ['storeUtxo']
 };
 

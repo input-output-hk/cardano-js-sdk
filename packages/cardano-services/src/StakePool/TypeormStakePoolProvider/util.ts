@@ -1,6 +1,7 @@
 /* eslint-disable complexity */
 /* eslint-disable sonarjs/cognitive-complexity */
 import {
+  Cardano,
   FilterCondition,
   ProviderError,
   ProviderFailure,
@@ -9,6 +10,9 @@ import {
   SortOrder,
   StakePoolSortOptions
 } from '@cardano-sdk/core';
+import { Percent } from '@cardano-sdk/util';
+import { PoolRewardsEntity } from '@cardano-sdk/projection-typeorm';
+import { RosComputeParams } from '../../PgBoss';
 
 type StakePoolWhereClauseArgs = {
   name?: string[];
@@ -145,4 +149,54 @@ export const getWhereClauseAndArgs = (filters: QueryStakePoolsArgs['filters']) =
     args: { ...args, ...identifierArgs },
     clause: clauses.join(` ${condition} `)
   };
+};
+
+const millisecondsPerYear = 1000 * 3600 * 24 * 365;
+
+/**
+ * Computes the annualized ROS for a give stake pool. If `epochs` is not specified, the life time ROS
+ * of the stake pool is computed.
+ *
+ * @returns the ROS
+ */
+export const computeROS = async ({ dataSource, epochs, logger, stakePool: { id } }: RosComputeParams) => {
+  let ros = Percent(0);
+
+  logger.debug(`Going to fetch ${epochs || 'all'} epoch rewards for stake pool ${id}`);
+
+  const result = await dataSource.getRepository(PoolRewardsEntity).find({
+    order: { epochNo: 'DESC' },
+    select: {
+      activeStake: true,
+      epochLength: true,
+      epochNo: true,
+      id: true,
+      leaderRewards: true,
+      memberActiveStake: true,
+      memberRewards: true,
+      pledge: true,
+      rewards: true
+    },
+    where: { stakePool: { id } },
+    ...(epochs ? { take: epochs } : undefined)
+  });
+
+  if (result.length > 0) {
+    let period = 0;
+    let returnInPeriod = 0;
+
+    for (const epochRewards of result) {
+      const { epochLength, memberActiveStake, memberRewards } = epochRewards;
+
+      period += epochLength!;
+      returnInPeriod += memberActiveStake === 0n ? 0 : Number(memberRewards) / Number(memberActiveStake);
+    }
+
+    ros = Percent((returnInPeriod * millisecondsPerYear) / period);
+  }
+
+  logger.debug(`Stake pool ${id} ROS: ${ros}`);
+
+  // eslint-disable-next-line @typescript-eslint/no-shadow, @typescript-eslint/no-unused-vars
+  return [ros, result.map(({ id, ...rest }) => rest) as Cardano.StakePoolEpochRewards[]] as const;
 };
