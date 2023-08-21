@@ -122,7 +122,7 @@ jobs:
     environment:
       name: dev-preview
       url: https://backend.dev-preview.eks.lw.iog.io
-    if: fromJSON(needs.discover.outputs.hits).deployments.apply != '{}'
+    if: fromJSON(needs.discover.outputs.hits).deployments.apply != '{}' && github.event.pull_request.merged == true
     strategy:
       matrix:
         target: ${{ fromJSON(needs.discover.outputs.hits).deployments.apply }}
