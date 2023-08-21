@@ -41,6 +41,9 @@
     },
     {
       "path": "../../hardware-ledger/src"
+    },
+    {
+      "path": "../../hardware-trezor/src"
     }
   ]
 }

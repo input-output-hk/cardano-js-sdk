@@ -3,13 +3,13 @@ import {
   AddressType,
   CommunicationType,
   SerializableTrezorKeyAgentData,
-  TrezorKeyAgent,
   util
 } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { CML, Cardano } from '@cardano-sdk/core';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
 import { PersonalWallet, setupWallet } from '../../../src';
+import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
 import { dummyLogger as logger } from 'ts-log';
 import { mockKeyAgentDependencies } from '../../../../key-management/test/mocks';
 
