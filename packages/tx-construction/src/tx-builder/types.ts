@@ -22,7 +22,8 @@ export enum TxOutputFailure {
   TokenBundleSizeExceedsLimit = 'Token Bundle Exceeds Limit',
   MissingRequiredFields = 'Mandatory fields address or coin are missing',
   MissingHandleProviderError = "Missing 'HandleProvider'",
-  HandleNotFound = 'Handle not found'
+  HandleNotFound = 'Handle not found',
+  NegativeAssetQty = 'Negative or zero asset quantity'
 }
 
 export class InvalidConfigurationError extends CustomError {
@@ -68,6 +69,12 @@ export class OutputValidationMinimumCoinError extends CustomError {
 export class OutputValidationTokenBundleSizeError extends CustomError {
   public constructor(public txOut: PartialTxOut, public outputValidation: OutputValidation) {
     super(TxOutputFailure.TokenBundleSizeExceedsLimit);
+  }
+}
+
+export class OutputValidationNegativeAssetQtyError extends CustomError {
+  public constructor(public txOut: PartialTxOut, public outputValidation: OutputValidation) {
+    super(TxOutputFailure.NegativeAssetQty);
   }
 }
 

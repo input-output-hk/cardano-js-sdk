@@ -15,6 +15,7 @@ export interface OutputValidation {
   minimumCoin: Cardano.Lovelace;
   coinMissing: Cardano.Lovelace;
   tokenBundleSizeExceedsLimit: boolean;
+  negativeAssetQty: boolean;
 }
 
 export interface OutputValidator {
