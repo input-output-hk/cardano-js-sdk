@@ -3105,6 +3105,7 @@ __metadata:
     "@types/lodash": ^4.14.182
     delay: ^5.0.0
     eslint: ^7.32.0
+    fraction.js: 4.0.1
     ip-address: ^8.1.0
     jest: ^28.1.3
     lodash: ^4.17.21
@@ -13574,6 +13575,13 @@ __metadata:
   version: 0.2.0
   resolution: "forwarded@npm:0.2.0"
   checksum: fd27e2394d8887ebd16a66ffc889dc983fbbd797d5d3f01087c020283c0f019a7d05ee85669383d8e0d216b116d720fc0cef2f6e9b7eb9f4c90c6e0bc7fd28e6
+  languageName: node
+  linkType: hard
+
+"fraction.js@npm:4.0.1":
+  version: 4.0.1
+  resolution: "fraction.js@npm:4.0.1"
+  checksum: d863e7cbb005167d94cd9625a5013ab13003b02199a4cb95b62c301fc477d8fd29e6bd720416a1bac657f94bca50a3783c6aebf39f3467a502e502c8b6b9a7e9
   languageName: node
   linkType: hard
 

@@ -38,4 +38,19 @@ describe('UnitInterval', () => {
 
     expect(interval.toCore()).toEqual({ denominator: 5, numerator: 1 });
   });
+
+  it('can convert to a float number', () => {
+    const cbor = HexBlob('d81e820102');
+
+    const interval = UnitInterval.fromCbor(cbor);
+
+    expect(interval.toFloat()).toEqual(0.5);
+  });
+
+  it('can be created from a float number', () => {
+    const interval = UnitInterval.fromFloat(0.5)!;
+
+    expect(interval.toCore()).toEqual({ denominator: 2, numerator: 1 });
+    expect(interval.toCbor()).toEqual('d81e820102');
+  });
 });

@@ -974,7 +974,7 @@ export class CborReader {
       case CborAdditionalInfo.Additional64BitData: {
         CborReader.ensureReadCapacityInArray(data, 9);
 
-        const buffer = Buffer.from(data.slice(1));
+        const buffer = Buffer.from(data.slice(1, 9));
 
         let result = BigInt(0);
 
