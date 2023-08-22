@@ -14,9 +14,6 @@ describe('TrackedAssetProvider', () => {
 
   describe('wraps underlying provider functions, tracks # of calls/responses and resets on stats.reset()', () => {
     const assetId = Cardano.AssetId('b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e');
-    const extraData = {
-      history: false
-    };
 
     const testFunctionStats =
       <T>(
@@ -48,9 +45,9 @@ describe('TrackedAssetProvider', () => {
     test(
       'getAsset',
       testFunctionStats(
-        (provider) => provider.getAsset({ assetId, extraData }),
+        (provider) => provider.getAsset({ assetId }),
         (stats) => stats.getAsset$,
-        () => expect(assetProvider.getAsset).toBeCalledWith({ assetId, extraData })
+        () => expect(assetProvider.getAsset).toBeCalledWith({ assetId })
       )
     );
 

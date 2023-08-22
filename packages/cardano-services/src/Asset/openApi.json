@@ -118,9 +118,6 @@
           "fingerprint": {
             "type": "string"
           },
-          "mintOrBurnCount": {
-            "type": "number"
-          },
           "name": {
             "type": "string"
           },
@@ -152,9 +149,6 @@
       "ExtraData": {
         "type": "object",
         "properties": {
-          "history": {
-            "type": "boolean"
-          },
           "nftMetadata": {
             "type": "boolean"
           },
