@@ -1,4 +1,4 @@
-import * as Trezor from 'trezor-connect';
+import * as Trezor from '@trezor/connect';
 import { Cardano } from '@cardano-sdk/core';
 import { GroupedAddress } from '@cardano-sdk/key-management';
 import { InvalidArgumentError, Transform } from '@cardano-sdk/util';
@@ -25,7 +25,7 @@ const toDestination: Transform<Cardano.TxOut, TrezorTxOutputDestination, TrezorT
 
   return {
     addressParameters: {
-      addressType: Trezor.CardanoAddressType.BASE,
+      addressType: Trezor.PROTO.CardanoAddressType.BASE,
       path: paymentPath,
       stakingPath
     }

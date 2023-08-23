@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import * as Trezor from 'trezor-connect';
+import * as Trezor from '@trezor/connect';
 import { BIP32Path } from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
 import { GroupedAddress } from '@cardano-sdk/key-management';
@@ -8,8 +8,8 @@ import { TrezorTxTransformerContext } from '../types';
 import { stakeKeyPathFromGroupedAddress } from './keyPaths';
 
 type StakeKeyCertificateType =
-  | Trezor.CardanoCertificateType.STAKE_REGISTRATION
-  | Trezor.CardanoCertificateType.STAKE_DEREGISTRATION;
+  | Trezor.PROTO.CardanoCertificateType.STAKE_REGISTRATION
+  | Trezor.PROTO.CardanoCertificateType.STAKE_DEREGISTRATION;
 
 type TrezorStakeKeyCertificate = {
   type: StakeKeyCertificateType;
@@ -19,7 +19,7 @@ type TrezorStakeKeyCertificate = {
 };
 
 type TrezorDelegationCertificate = {
-  type: Trezor.CardanoCertificateType.STAKE_DELEGATION;
+  type: Trezor.PROTO.CardanoCertificateType.STAKE_DELEGATION;
   path?: BIP32Path;
   scriptHash?: Crypto.Ed25519KeyHashHex;
   pool: string;
@@ -27,7 +27,7 @@ type TrezorDelegationCertificate = {
 
 type TrezorPoolRegistrationCertificate = {
   poolParameters: Trezor.CardanoPoolParameters;
-  type: Trezor.CardanoCertificateType.STAKE_POOL_REGISTRATION;
+  type: Trezor.PROTO.CardanoCertificateType.STAKE_POOL_REGISTRATION;
 };
 
 type ScriptHashCertCredentials = {
@@ -83,7 +83,7 @@ const getStakeDelegationCertificate = (
   return {
     ...credentials,
     pool: poolIdKeyHash,
-    type: Trezor.CardanoCertificateType.STAKE_DELEGATION
+    type: Trezor.PROTO.CardanoCertificateType.STAKE_DELEGATION
   };
 };
 
@@ -128,18 +128,18 @@ export const getPoolRegistrationCertificate = (
               ipv4Address: relay.ipv4,
               ipv6Address: relay.ipv6,
               port: relay.port,
-              type: Trezor.CardanoPoolRelayType.SINGLE_HOST_IP
+              type: Trezor.PROTO.CardanoPoolRelayType.SINGLE_HOST_IP
             };
           case 'RelayByName':
             return {
               hostName: relay.hostname,
               port: relay.port,
-              type: Trezor.CardanoPoolRelayType.SINGLE_HOST_NAME
+              type: Trezor.PROTO.CardanoPoolRelayType.SINGLE_HOST_NAME
             };
           case 'RelayByNameMultihost':
             return {
               hostName: relay.dnsName,
-              type: Trezor.CardanoPoolRelayType.MULTIPLE_HOST_NAME
+              type: Trezor.PROTO.CardanoPoolRelayType.MULTIPLE_HOST_NAME
             };
           default:
             throw new InvalidArgumentError('certificate', 'Unknown relay type.');
@@ -148,16 +148,16 @@ export const getPoolRegistrationCertificate = (
       rewardAccount: certificate.poolParameters.rewardAccount,
       vrfKeyHash: certificate.poolParameters.vrf
     },
-    type: Trezor.CardanoCertificateType.STAKE_POOL_REGISTRATION
+    type: Trezor.PROTO.CardanoCertificateType.STAKE_POOL_REGISTRATION
   };
 };
 
 const toCert = (cert: Cardano.Certificate, context: TrezorTxTransformerContext) => {
   switch (cert.__typename) {
     case Cardano.CertificateType.StakeKeyRegistration:
-      return getStakeAddressCertificate(cert, context, Trezor.CardanoCertificateType.STAKE_REGISTRATION);
+      return getStakeAddressCertificate(cert, context, Trezor.PROTO.CardanoCertificateType.STAKE_REGISTRATION);
     case Cardano.CertificateType.StakeKeyDeregistration:
-      return getStakeAddressCertificate(cert, context, Trezor.CardanoCertificateType.STAKE_DEREGISTRATION);
+      return getStakeAddressCertificate(cert, context, Trezor.PROTO.CardanoCertificateType.STAKE_DEREGISTRATION);
     case Cardano.CertificateType.StakeDelegation:
       return getStakeDelegationCertificate(cert, context);
     case Cardano.CertificateType.PoolRegistration:
