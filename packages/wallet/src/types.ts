@@ -1,3 +1,4 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import {
   Asset,
   Cardano,
@@ -59,6 +60,7 @@ export interface ObservableWallet {
   readonly currentEpoch$: Observable<EpochInfo>;
   readonly protocolParameters$: Observable<Cardano.ProtocolParameters>;
   readonly addresses$: Observable<GroupedAddress[]>;
+  readonly activePublicStakeKeys$: Observable<Crypto.Ed25519PublicKeyHex[]>;
   readonly handles$: Observable<HandleInfo[]>;
   /** All owned and historical assets */
   readonly assetInfo$: Observable<Assets>;
