@@ -59,6 +59,7 @@ describe('injectGlobal', () => {
       expect(window.cardano[properties.walletName].icon).toBe(properties.icon);
       expect(Object.keys(window.cardano[properties.walletName])).toEqual([
         'apiVersion',
+        'supportedExtensions',
         'enable',
         'icon',
         'isEnabled',

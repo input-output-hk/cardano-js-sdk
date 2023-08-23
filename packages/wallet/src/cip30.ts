@@ -13,7 +13,16 @@ import {
   TxSignErrorCode,
   WalletApi
 } from '@cardano-sdk/dapp-connector';
-import { CML, Cardano, Serialization, TxCBOR, cmlToCore, coalesceValueQuantities, coreToCml } from '@cardano-sdk/core';
+import {
+  CML,
+  Cardano,
+  NotImplementedError,
+  Serialization,
+  TxCBOR,
+  cmlToCore,
+  coalesceValueQuantities,
+  coreToCml
+} from '@cardano-sdk/core';
 import { HexBlob, ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
 import { InputSelectionError, InputSelectionFailure } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
@@ -244,11 +253,11 @@ const getSortedUtxos = async (observableUtxos: Observable<Cardano.Utxo[]>): Prom
   return utxos.sort(compareUtxos);
 };
 
-export const createWalletApi = (
+const baseCip30WalletApi = (
   wallet$: Observable<ObservableWallet>,
   confirmationCallback: CallbackConfirmation,
   { logger }: Cip30WalletDependencies
-): WalletApi => ({
+) => ({
   getBalance: async (): Promise<Cbor> => {
     logger.debug('getting balance');
     try {
@@ -512,4 +521,23 @@ export const createWalletApi = (
       throw new TxSendError(TxSendErrorCode.Refused, 'transaction refused');
     }
   }
+});
+
+// TODO: implement CIP-95 methods
+const extendedCip95WalletApi = () => ({
+  getActivePubStakeKeys: async () => {
+    throw new NotImplementedError('getActivePubStakeKeys');
+  },
+  getPubDRepKey: async () => {
+    throw new NotImplementedError('getPubDRepKey');
+  }
+});
+
+export const createWalletApi = (
+  wallet$: Observable<ObservableWallet>,
+  confirmationCallback: CallbackConfirmation,
+  { logger }: Cip30WalletDependencies
+): WalletApi => ({
+  ...baseCip30WalletApi(wallet$, confirmationCallback, { logger }),
+  ...extendedCip95WalletApi()
 });

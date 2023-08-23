@@ -4,10 +4,12 @@ import { RemoteAuthenticator } from '../src';
 import { usingAutoFree } from '@cardano-sdk/util';
 
 export const api = <WalletApi>{
+  getActivePubStakeKeys: async () => ['activePubStakeKey-1', 'activePubStakeKey-2'],
   getBalance: async () => '100',
   getChangeAddress: async () => 'change-address',
   getCollateral: async () => null,
   getNetworkId: async () => 0,
+  getPubDRepKey: async () => 'getPubDRepKey',
   getRewardAddresses: async () => ['reward-address-1', 'reward-address-2'],
   getUnusedAddresses: async () => ['unused-address-1', 'unused-address-2', 'unused-address-3'],
   getUsedAddresses: async () => ['used-address-1', 'used-address-2', 'used-address-3'],
@@ -42,7 +44,7 @@ export const properties: WalletProperties = { icon: 'imagelink', walletName: 'te
 export const stubAuthenticator = () => {
   let isEnabled = false;
   return {
-    haveAccess: async () => isEnabled,
-    requestAccess: async () => (isEnabled = true)
-  } as RemoteAuthenticator;
+    haveAccess: jest.fn().mockImplementation(async () => isEnabled),
+    requestAccess: jest.fn().mockImplementation(async () => (isEnabled = true))
+  } as unknown as RemoteAuthenticator;
 };
