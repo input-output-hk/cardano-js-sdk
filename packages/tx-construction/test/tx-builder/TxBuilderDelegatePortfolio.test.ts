@@ -166,6 +166,37 @@ describe('TxBuilder/delegatePortfolio', () => {
     });
   });
 
+  describe('input selection type with multiple reward accounts and single pool delegation', () => {
+    beforeEach(async () => {
+      const txBuilderFactory = await createTxBuilder({
+        keyAgent,
+        stakeKeyDelegations: [
+          { keyStatus: Cardano.StakeKeyStatus.Registered },
+          { keyStatus: Cardano.StakeKeyStatus.Unregistered }
+        ]
+      });
+      groupedAddresses = txBuilderFactory.groupedAddresses;
+      txBuilder = txBuilderFactory.txBuilder;
+    });
+
+    it('uses roundRobinRandomImprove when only one reward account is registered', async () => {
+      await txBuilder
+        .delegatePortfolio({
+          pools: [
+            {
+              id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[0])),
+              weight: 1
+            }
+          ]
+        })
+        .build()
+        .inspect();
+
+      expect(GreedyInputSelector).not.toHaveBeenCalled();
+      expect(roundRobinRandomImprove).toHaveBeenCalled();
+    });
+  });
+
   describe('no previous delegations, multiple addresses per stake key', () => {
     beforeEach(async () => {
       const txBuilderFactory = await createTxBuilder({

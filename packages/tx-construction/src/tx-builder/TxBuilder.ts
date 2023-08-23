@@ -181,7 +181,11 @@ export class GenericTxBuilder implements TxBuilder {
             // Take a snapshot of returned properties,
             // so that they don't change while `initializeTx` is resolving
             const ownAddresses = await firstValueFrom(this.#dependencies.keyAgent.knownAddresses$);
-            const rewardAccounts = await this.#dependencies.txBuilderProviders.rewardAccounts();
+            const registeredRewardAccounts = (await this.#dependencies.txBuilderProviders.rewardAccounts()).filter(
+              (acct) =>
+                acct.keyStatus === Cardano.StakeKeyStatus.Registered ||
+                acct.keyStatus === Cardano.StakeKeyStatus.Registering
+            );
             const auxiliaryData = this.partialAuxiliaryData && { ...this.partialAuxiliaryData };
             const extraSigners = this.partialExtraSigners && [...this.partialExtraSigners];
             const signingOptions = this.partialSigningOptions && { ...this.partialSigningOptions };
@@ -191,7 +195,14 @@ export class GenericTxBuilder implements TxBuilder {
             }
 
             const dependencies = { ...this.#dependencies };
-            if (rewardAccounts.length > 1 && rewardAccountsWithWeights.size > 0) {
+            // Use greedy input selection if:
+            // 1. Multi delegating: to distribute the funds to multiple addresses.
+            // 2. Reducing the number of pools to 1, which implies we have multiple registered stake keys. This is needed
+            //    to concentrate the funds back into a single address and delegate its stake key.
+            if (
+              rewardAccountsWithWeights.size > 1 ||
+              (registeredRewardAccounts.length > 1 && rewardAccountsWithWeights.size === 1)
+            ) {
               // Distributing balance according to weights is necessary when there are multiple reward accounts
               // and delegating, to make sure utxos are part of the correct addresses (the ones being delegated)
               dependencies.inputSelector = GenericTxBuilder.#createGreedyInputSelector(

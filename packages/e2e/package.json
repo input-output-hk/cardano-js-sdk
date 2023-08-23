@@ -148,7 +148,7 @@
     "babel-loader": "^8.2.5",
     "blake2b-no-wasm": "2.1.4",
     "buffer": "^6.0.3",
-    "chromedriver": "114.0.1",
+    "chromedriver": "116.0.0",
     "copy-webpack-plugin": "^10.2.4",
     "dockerode": "^3.3.1",
     "dockerode-utils": "^0.0.7",
