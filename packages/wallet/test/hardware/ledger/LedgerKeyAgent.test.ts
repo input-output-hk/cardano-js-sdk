@@ -219,6 +219,55 @@ describe('LedgerKeyAgent', () => {
     });
   });
 
+  describe('deviceConnections persistence', () => {
+    let transportSpy: jest.SpyInstance;
+    beforeAll(async () => {
+      transportSpy = jest.spyOn(LedgerKeyAgent, 'createTransport');
+
+      if (keyAgent.deviceConnection) {
+        await keyAgent.deviceConnection.transport.close();
+        LedgerKeyAgent.deviceConnections = [];
+      }
+    });
+
+    afterEach(() => {
+      LedgerKeyAgent.deviceConnections = [];
+      transportSpy.mockClear();
+    });
+
+    it('should return an existing connection if one exists', async () => {
+      LedgerKeyAgent.deviceConnections = [];
+      const connection1 = await LedgerKeyAgent.establishDeviceConnection(CommunicationType.Node);
+      const connection2 = await LedgerKeyAgent.establishDeviceConnection(CommunicationType.Node);
+
+      expect(transportSpy).toHaveBeenCalledTimes(1);
+
+      expect(connection1).toBe(connection2);
+      await connection2.transport.close();
+    });
+
+    it('should create a new connection if none match the requested parameters', async () => {
+      LedgerKeyAgent.deviceConnections = [
+        {
+          communicationType: CommunicationType.Web,
+          deviceConnection: {} as any
+        }
+      ];
+      const connection = await LedgerKeyAgent.establishDeviceConnection(CommunicationType.Node);
+
+      expect(transportSpy).toHaveBeenCalledTimes(1);
+      await connection.transport.close();
+    });
+
+    it('should create a new connection if none are available', async () => {
+      LedgerKeyAgent.deviceConnections = [];
+      const connection = await LedgerKeyAgent.establishDeviceConnection(CommunicationType.Node);
+
+      expect(transportSpy).toHaveBeenCalledTimes(1);
+      await connection.transport.close();
+    });
+  });
+
   describe('establish, check and re-establish device connection', () => {
     let deviceConnection: DeviceConnection;
     beforeAll(async () => {
