@@ -2,10 +2,6 @@ let
   inherit (inputs) nixpkgs std self;
 in {
   cardano-services = let
-    chromedriverBin = nixpkgs.fetchurl {
-      url = "https://chromedriver.storage.googleapis.com/102.0.5005.61/chromedriver_linux64.zip";
-      hash = "sha256-SwB82rvinNOBKT3z8odrHamtMKZZWdUY6nJKst7b9Ts=";
-    };
     src = std.incl self [
       "build"
       "packages"
@@ -46,8 +42,6 @@ in {
     project.overrideAttrs (oldAttrs: {
       # A bunch of deps build binaries using node-gyp that requires Python
       PYTHON = "${nixpkgs.python3}/bin/python3";
-      # chromedriver wants to download the binary
-      CHROMEDRIVER_FILEPATH = "${chromedriverBin}";
       # playwright build fixes
       PLAYWRIGHT_BROWSERS_PATH = nixpkgs.playwright-driver.browsers;
       PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = 1;
