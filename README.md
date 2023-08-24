@@ -69,9 +69,12 @@ git clone \
 ```bash
 nvm install && \
 nvm use && \
+DETECT_CHROMEDRIVER_VERSION=true yarn global add chromedriver && \
 yarn install && \
 yarn build
 ```
+
+`chromedriver` is installed by hand as it's version should match the globally installed version of Chrome.
 
 #### Run Tests
 
