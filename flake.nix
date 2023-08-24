@@ -28,7 +28,10 @@
         (installables "packages" {ci.build = true;})
         (runnables "operables")
         (containers "oci-images" {ci.publish = true;})
-        (kubectl "deployments" {ci.apply = true;})
+        (kubectl "deployments" {
+          ci.diff = true;
+          ci.apply = true;
+        })
       ];
     };
 }
