@@ -1,4 +1,4 @@
-import * as Trezor from 'trezor-connect';
+import * as Trezor from '@trezor/connect';
 import { Cardano } from '@cardano-sdk/core';
 
 const compareAssetNameCanonically = (a: Trezor.CardanoToken, b: Trezor.CardanoToken) => {

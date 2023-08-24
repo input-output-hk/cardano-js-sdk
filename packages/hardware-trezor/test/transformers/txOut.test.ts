@@ -1,4 +1,4 @@
-import * as Trezor from 'trezor-connect';
+import * as Trezor from '@trezor/connect';
 import {
   contextWithKnownAddresses,
   knownAddressKeyPath,
@@ -84,7 +84,7 @@ describe('txOut', () => {
       for (const out of txOuts) {
         expect(out).toEqual({
           addressParameters: {
-            addressType: Trezor.CardanoAddressType.BASE,
+            addressType: Trezor.PROTO.CardanoAddressType.BASE,
             path: knownAddressKeyPath,
             stakingPath: knownAddressStakeKeyPath
           },
@@ -104,7 +104,7 @@ describe('txOut', () => {
       for (const out of txOuts) {
         expect(out).toEqual({
           addressParameters: {
-            addressType: Trezor.CardanoAddressType.BASE,
+            addressType: Trezor.PROTO.CardanoAddressType.BASE,
             path: knownAddressKeyPath,
             stakingPath: knownAddressStakeKeyPath
           },
@@ -204,7 +204,7 @@ describe('txOut', () => {
 
       expect(out).toEqual({
         addressParameters: {
-          addressType: Trezor.CardanoAddressType.BASE,
+          addressType: Trezor.PROTO.CardanoAddressType.BASE,
           path: knownAddressKeyPath,
           stakingPath: knownAddressStakeKeyPath
         },
@@ -217,7 +217,7 @@ describe('txOut', () => {
 
       expect(out).toEqual({
         addressParameters: {
-          addressType: Trezor.CardanoAddressType.BASE,
+          addressType: Trezor.PROTO.CardanoAddressType.BASE,
           path: knownAddressKeyPath,
           stakingPath: knownAddressStakeKeyPath
         },

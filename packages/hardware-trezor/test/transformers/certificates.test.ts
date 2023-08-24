@@ -1,5 +1,5 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import * as Trezor from 'trezor-connect';
+import * as Trezor from '@trezor/connect';
 import { Cardano } from '@cardano-sdk/core';
 import { CardanoKeyConst, KeyRole, util } from '@cardano-sdk/key-management';
 import {
@@ -35,7 +35,7 @@ describe('certificates', () => {
               KeyRole.Stake,
               0
             ],
-            type: Trezor.CardanoCertificateType.STAKE_REGISTRATION
+            type: Trezor.PROTO.CardanoCertificateType.STAKE_REGISTRATION
           }
         ]);
       });
@@ -52,7 +52,7 @@ describe('certificates', () => {
               KeyRole.Stake,
               0
             ],
-            type: Trezor.CardanoCertificateType.STAKE_DEREGISTRATION
+            type: Trezor.PROTO.CardanoCertificateType.STAKE_DEREGISTRATION
           }
         ]);
       });
@@ -66,7 +66,7 @@ describe('certificates', () => {
         expect(certificates).toEqual([
           {
             keyHash: 'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f',
-            type: Trezor.CardanoCertificateType.STAKE_REGISTRATION
+            type: Trezor.PROTO.CardanoCertificateType.STAKE_REGISTRATION
           }
         ]);
       });
@@ -80,7 +80,7 @@ describe('certificates', () => {
         expect(certificates).toEqual([
           {
             keyHash: 'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f',
-            type: Trezor.CardanoCertificateType.STAKE_DEREGISTRATION
+            type: Trezor.PROTO.CardanoCertificateType.STAKE_DEREGISTRATION
           }
         ]);
       });
@@ -91,7 +91,7 @@ describe('certificates', () => {
         expect(certificates).toEqual([
           {
             scriptHash: 'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f',
-            type: Trezor.CardanoCertificateType.STAKE_REGISTRATION
+            type: Trezor.PROTO.CardanoCertificateType.STAKE_REGISTRATION
           }
         ]);
       });
@@ -102,7 +102,7 @@ describe('certificates', () => {
         expect(certificates).toEqual([
           {
             scriptHash: 'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f',
-            type: Trezor.CardanoCertificateType.STAKE_DEREGISTRATION
+            type: Trezor.PROTO.CardanoCertificateType.STAKE_DEREGISTRATION
           }
         ]);
       });
@@ -116,7 +116,7 @@ describe('certificates', () => {
           {
             path: [util.harden(CardanoKeyConst.PURPOSE), util.harden(CardanoKeyConst.COIN_TYPE), util.harden(0), 2, 0],
             pool: '153806dbcd134ddee69a8c5204e38ac80448f62342f8c23cfe4b7edf',
-            type: Trezor.CardanoCertificateType.STAKE_DELEGATION
+            type: Trezor.PROTO.CardanoCertificateType.STAKE_DELEGATION
           }
         ]);
       });
@@ -128,7 +128,7 @@ describe('certificates', () => {
           {
             pool: '153806dbcd134ddee69a8c5204e38ac80448f62342f8c23cfe4b7edf',
             scriptHash: 'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f',
-            type: Trezor.CardanoCertificateType.STAKE_DELEGATION
+            type: Trezor.PROTO.CardanoCertificateType.STAKE_DELEGATION
           }
         ]);
       });
@@ -140,7 +140,7 @@ describe('certificates', () => {
           {
             keyHash: 'cb0ec2692497b458e46812c8a5bfa2931d1a2d965a99893828ec810f',
             pool: '153806dbcd134ddee69a8c5204e38ac80448f62342f8c23cfe4b7edf',
-            type: Trezor.CardanoCertificateType.STAKE_DELEGATION
+            type: Trezor.PROTO.CardanoCertificateType.STAKE_DELEGATION
           }
         ]);
       });
@@ -192,7 +192,7 @@ describe('certificates', () => {
               rewardAccount: 'stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr',
               vrfKeyHash: '8dd154228946bd12967c12bedb1cb6038b78f8b84a1760b1a788fa72a4af3db0'
             },
-            type: Trezor.CardanoCertificateType.STAKE_POOL_REGISTRATION
+            type: Trezor.PROTO.CardanoCertificateType.STAKE_POOL_REGISTRATION
           }
         ]);
       });
@@ -232,7 +232,7 @@ describe('certificates', () => {
               rewardAccount: 'stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr',
               vrfKeyHash: '8dd154228946bd12967c12bedb1cb6038b78f8b84a1760b1a788fa72a4af3db0'
             },
-            type: Trezor.CardanoCertificateType.STAKE_POOL_REGISTRATION
+            type: Trezor.PROTO.CardanoCertificateType.STAKE_POOL_REGISTRATION
           }
         ]);
       });

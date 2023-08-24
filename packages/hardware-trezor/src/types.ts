@@ -1,4 +1,4 @@
-import * as Trezor from 'trezor-connect';
+import * as Trezor from '@trezor/connect';
 import { Cardano } from '@cardano-sdk/core';
 import { GroupedAddress } from '@cardano-sdk/key-management';
 

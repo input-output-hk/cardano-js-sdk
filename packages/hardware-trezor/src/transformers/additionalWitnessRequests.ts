@@ -1,4 +1,4 @@
-import * as Trezor from 'trezor-connect';
+import * as Trezor from '@trezor/connect';
 import { BIP32Path } from '@cardano-sdk/crypto';
 import { TrezorTxTransformerContext } from '../types';
 import { isNotNil } from '@cardano-sdk/util';
