@@ -185,6 +185,11 @@ export class TrezorKeyAgent extends KeyAgentBase {
       }
 
       const signedData = result.payload;
+
+      if (signedData.hash !== tx.hash) {
+        throw new errors.HwMappingError('Trezor computed a different transaction id');
+      }
+
       return new Map<Crypto.Ed25519PublicKeyHex, Crypto.Ed25519SignatureHex>(
         await Promise.all(
           signedData.witnesses.map(async (witness) => {

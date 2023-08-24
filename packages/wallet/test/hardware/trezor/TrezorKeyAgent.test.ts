@@ -1,10 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import {
-  AddressType,
-  CommunicationType,
-  SerializableTrezorKeyAgentData,
-  util
-} from '@cardano-sdk/key-management';
+import { AddressType, CommunicationType, SerializableTrezorKeyAgentData, util } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { CML, Cardano } from '@cardano-sdk/core';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
@@ -131,7 +126,7 @@ describe('TrezorKeyAgent', () => {
       txInternals = await wallet.initializeTx(props);
     });
 
-    it('successfully signs a transaction with assets and validity interval', async () => {
+    it('successfully signs a transaction with assets', async () => {
       const signatures = await keyAgent.signTransaction({
         body: txInternals.body,
         hash: txInternals.hash
