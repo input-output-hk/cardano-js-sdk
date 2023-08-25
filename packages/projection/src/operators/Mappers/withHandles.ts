@@ -1,8 +1,9 @@
 import { Asset, Cardano, Handle } from '@cardano-sdk/core';
+import { CIP67Asset, CIP67Assets, WithCIP67 } from './withCIP67';
 import { CustomError } from 'ts-custom-error';
 import { FilterByPolicyIds } from './types';
+import { Logger, dummyLogger } from 'ts-log';
 import { ProjectionOperator } from '../../types';
-import { logError } from './util';
 import { map } from 'rxjs';
 
 export interface HandleOwnership {
@@ -24,8 +25,7 @@ export interface WithHandles {
   handles: HandleOwnership[];
 }
 
-const handleFromAssetId = (assetId: Cardano.AssetId) =>
-  Buffer.from(Cardano.AssetId.getAssetName(assetId), 'hex').toString('utf8');
+const getUtf8AssetName = (assetName: Cardano.AssetName) => Buffer.from(assetName, 'hex').toString('utf8');
 
 class HandleParsingError extends CustomError {
   public constructor(handle: string, message = 'Invalid handle') {
@@ -33,54 +33,82 @@ class HandleParsingError extends CustomError {
   }
 }
 
-const mapHandleToData = (
-  assetId: Cardano.AssetId,
-  data: { datum?: Cardano.PlutusData | undefined; address?: Cardano.PaymentAddress; policyId: Cardano.PolicyId }
-) => {
-  const handle = handleFromAssetId(assetId);
+const assetNameToUTF8Handle = (assetName: Cardano.AssetName): Handle => {
+  const handle = getUtf8AssetName(assetName);
   if (!Asset.util.isValidHandle(handle)) throw new HandleParsingError(handle);
-  const { datum, address, policyId } = data;
-
-  return {
-    assetId,
-    datum,
-    handle,
-    latestOwnerAddress: address || null,
-    policyId
-  };
+  return handle;
 };
 
-const getOutputHandles = (outputs: Cardano.TxOut[], policyIds: FilterByPolicyIds['policyIds']) => {
-  const handles: Record<string, HandleOwnership> = {};
-  for (const { address, value, datum } of outputs) {
-    if (!value.assets) continue;
-    for (const [assetId] of value.assets.entries()) {
-      const policyId = Cardano.AssetId.getPolicyId(assetId);
-      if (!policyIds.includes(policyId)) continue;
-      try {
-        const handleData = mapHandleToData(assetId, { address, datum, policyId });
+const assetIdToUTF8Handle = (assetId: Cardano.AssetId, cip67Asset: CIP67Asset | undefined) => {
+  if (cip67Asset) {
+    if (cip67Asset.decoded.label === Asset.AssetNameLabelNum.UserNFT) {
+      return getUtf8AssetName(cip67Asset.decoded.content);
+    }
+    // Ignore all but UserNFT cip67 assets
+    return null;
+  }
+  return assetNameToUTF8Handle(Cardano.AssetId.getAssetName(assetId));
+};
+
+const tryCreateHandleOwnership = (
+  assetId: Cardano.AssetId,
+  policyIds: Cardano.PolicyId[],
+  cip67Assets: CIP67Assets,
+  logger: Logger,
+  txOut?: Cardano.TxOut
+): HandleOwnership | undefined => {
+  const policyId = Cardano.AssetId.getPolicyId(assetId);
+  if (!policyIds.includes(policyId)) return;
+  try {
+    const cip67Asset = cip67Assets.byAssetId[assetId];
+    const handle = assetIdToUTF8Handle(assetId, cip67Asset);
+    if (handle) {
+      return {
+        assetId,
+        datum: txOut?.datum,
+        handle,
+        latestOwnerAddress: txOut?.address || null,
+        policyId
+      };
+    }
+  } catch (error: unknown) {
+    logger.error(error);
+  }
+};
+
+const getOutputHandles = (
+  outputs: Cardano.TxOut[],
+  policyIds: FilterByPolicyIds['policyIds'],
+  cip67Assets: CIP67Assets,
+  logger: Logger
+) => {
+  const handles: Record<Handle, HandleOwnership> = {};
+  for (const txOut of outputs) {
+    if (!txOut.value.assets) continue;
+    for (const [assetId] of txOut.value.assets.entries()) {
+      const handleData = tryCreateHandleOwnership(assetId, policyIds, cip67Assets, logger, txOut);
+      if (handleData) {
         handles[handleData.handle] = handleData;
-      } catch (error: unknown) {
-        logError(error);
       }
     }
   }
   return handles;
 };
 
-const getBurnedHandles = (mint: Cardano.TokenMap | undefined, policyIds: FilterByPolicyIds['policyIds']) => {
+const getBurnedHandles = (
+  mint: Cardano.TokenMap | undefined,
+  policyIds: FilterByPolicyIds['policyIds'],
+  cip67Assets: CIP67Assets,
+  logger: Logger
+) => {
   if (!mint) return;
-  const handles: Record<string, HandleOwnership> = {};
+  const handles: Record<Handle, HandleOwnership> = {};
   for (const [assetId, quantity] of mint.entries()) {
     // Positive quantity mint was already accounted for in 'getOutputHandles'
     if (quantity < 0n) {
-      const policyId = Cardano.AssetId.getPolicyId(assetId);
-      if (!policyIds.includes(policyId)) continue;
-      try {
-        const handleData = mapHandleToData(assetId, { policyId });
+      const handleData = tryCreateHandleOwnership(assetId, policyIds, cip67Assets, logger);
+      if (handleData) {
         handles[handleData.handle] = handleData;
-      } catch (error: unknown) {
-        logError(error);
       }
     }
   }
@@ -88,15 +116,18 @@ const getBurnedHandles = (mint: Cardano.TokenMap | undefined, policyIds: FilterB
 };
 
 export const withHandles =
-  <PropsIn>({ policyIds }: FilterByPolicyIds): ProjectionOperator<PropsIn, WithHandles> =>
+  <PropsIn extends WithCIP67>(
+    { policyIds }: FilterByPolicyIds,
+    logger: Logger = dummyLogger
+  ): ProjectionOperator<PropsIn, WithHandles> =>
   (evt$) =>
     evt$.pipe(
       map((evt) => {
         const handleMap = evt.block.body.reduce(
           (handles, { body: { outputs, mint } }) => ({
             ...handles,
-            ...getOutputHandles(outputs, policyIds),
-            ...getBurnedHandles(mint, policyIds)
+            ...getOutputHandles(outputs, policyIds, evt.cip67, logger),
+            ...getBurnedHandles(mint, policyIds, evt.cip67, logger)
           }),
           {} as Record<string, HandleOwnership>
         );

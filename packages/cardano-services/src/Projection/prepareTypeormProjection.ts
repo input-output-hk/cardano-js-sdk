@@ -175,7 +175,7 @@ const mapperInterDependencies: Partial<Record<MapperName, MapperName[]>> = {
   filterUtxo: ['withUtxo'],
   withAddresses: ['withUtxo'],
   withCIP67: ['withUtxo'],
-  withHandles: ['withMint', 'filterMint', 'withUtxo', 'filterUtxo'],
+  withHandles: ['withMint', 'filterMint', 'withUtxo', 'filterUtxo', 'withCIP67'],
   withNftMetadata: ['withCIP67', 'withMint'],
   withStakeKeyRegistrations: ['withCertificates'],
   withStakePools: ['withCertificates']
