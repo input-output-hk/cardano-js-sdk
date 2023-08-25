@@ -1,16 +1,6 @@
 /* eslint-disable max-statements */
 import { getObservableWalletName, selectors } from '../extension/const';
-
-const switchToWalletUi = async () => {
-  await browser.waitUntil(async () => {
-    try {
-      await browser.switchWindow('Test Wallet UI');
-      return true;
-    } catch {
-      return false;
-    }
-  });
-};
+import { switchToWalletUi } from './utils';
 
 const NUM_POOLS = 3;
 
