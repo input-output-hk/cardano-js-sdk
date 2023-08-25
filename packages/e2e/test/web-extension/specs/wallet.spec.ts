@@ -1,5 +1,5 @@
 /* eslint-disable max-statements */
-import { getObservableWalletName } from '../extension/const';
+import { getObservableWalletName, selectors } from '../extension/const';
 
 const switchToWalletUi = async () => {
   await browser.waitUntil(async () => {
@@ -19,20 +19,6 @@ describe('wallet', () => {
   const btnRefresh = '#root > div > button';
   const pNetworkId = '#root > div > p:nth-child(8)';
   const liFirstUtxo = '#root > div > p:nth-child(9) > li';
-  const btnGrantAccess = '#requestAccessGrant';
-  const btnActivateWallet1 = '#activateWallet1';
-  const btnActivateWallet2 = '#activateWallet2';
-  const deactivateWallet = '#deactivateWallet';
-  const destroyWallet = '#destroyWallet';
-  const spanAddress = '#address';
-  const spanStakeAddress = '#stakeAddress';
-
-  const spanBalance = '#balance';
-  const spanSupplyDistribution = '#supplyDistribution';
-  const divAdaPrice = '#adaPrice';
-  const btnSignAndBuildTx = '#buildAndSignTx';
-  const divSignature = '#signature';
-  const activeWalletName = '#observableWalletName';
 
   const dappBtnRun = '#bp3-tab-panel_TabsExample_1 > div > button';
   const dappSubmittedTxConfirmation = '#root > div > p:last-child';
@@ -40,12 +26,27 @@ describe('wallet', () => {
   const dappStakeAddress = '#root > div > p:nth-child(12)';
   const dappUsedAddress = '#root > div > p:nth-child(13)';
 
-  const btnDelegate = '#multiDelegation .delegate button';
-  const spanPoolIds = '#multiDelegation .delegate .pools';
-  const liPools = '#multiDelegation .distribution li';
-  const liPercents = '#multiDelegation .distribution li .percent';
-  const divBgPortDisconnectStatus = '#remoteApiPortDisconnect .bgPortDisconnect';
-  const divUiPortDisconnectStatus = '#remoteApiPortDisconnect .uiPortDisconnect';
+  const {
+    btnActivateWallet1,
+    btnActivateWallet2,
+    btnDelegate,
+    btnGrantAccess,
+    deactivateWallet,
+    destroyWallet,
+    spanAddress,
+    spanStakeAddress,
+    spanBalance,
+    spanSupplyDistribution,
+    divAdaPrice,
+    btnSignAndBuildTx,
+    divSignature,
+    activeWalletName,
+    spanPoolIds,
+    liPools,
+    liPercents,
+    divBgPortDisconnectStatus,
+    divUiPortDisconnectStatus
+  } = selectors;
 
   // The address is filled in by the tests, which are order dependent
   let walletAddr1 = '';
