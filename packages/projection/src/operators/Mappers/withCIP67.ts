@@ -12,11 +12,13 @@ export interface CIP67Asset {
   utxo: ProducedUtxo;
 }
 
+export interface CIP67Assets {
+  byLabel: Partial<Record<Asset.AssetNameLabel, CIP67Asset[]>>;
+  byAssetId: Partial<Record<Cardano.AssetId, CIP67Asset>>;
+}
+
 export interface WithCIP67 {
-  cip67: {
-    byLabel: Partial<Record<Asset.AssetNameLabel, CIP67Asset[]>>;
-    byAssetId: Partial<Record<Cardano.AssetId, CIP67Asset>>;
-  };
+  cip67: CIP67Assets;
 }
 
 export const withCIP67 = unifiedProjectorOperator<WithUtxo, WithCIP67>((evt) => {

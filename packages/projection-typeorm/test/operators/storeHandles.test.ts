@@ -24,7 +24,8 @@ import { initializeDataSource } from '../util';
 
 describe('storeHandles', () => {
   const stubEvents = chainSyncData(ChainSyncDataSet.WithHandle);
-  const policyIds = [Cardano.PolicyId('f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a')];
+  const policyId = Cardano.PolicyId('f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a');
+  const policyIds = [policyId];
   let queryRunner: QueryRunner;
   let buffer: TypeormStabilityWindowBuffer;
   const entities = [
@@ -59,6 +60,7 @@ describe('storeHandles', () => {
       Mappers.withMint(),
       Mappers.filterProducedUtxoByAssetPolicyId({ policyIds }),
       Mappers.filterMintByPolicyIds({ policyIds }),
+      Mappers.withCIP67(),
       Mappers.withHandles({ policyIds }),
       storeData,
       requestNext()
@@ -386,11 +388,10 @@ describe('storeHandles', () => {
       const mintTxId = Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000');
       const repository = queryRunner.manager.getRepository(HandleEntity);
       const invalidAssetName = Asset.AssetNameLabel.encode(Cardano.AssetName('ace'), Asset.AssetNameLabelNum.UserFT);
-      const invalidAssetId = Cardano.AssetId.fromParts(mockProviders.handlePolicyId, invalidAssetName);
+      const invalidAssetId = Cardano.AssetId.fromParts(policyId, invalidAssetName);
       const testAddress = Cardano.PaymentAddress(
         'addr_test1qz690wvatwqgzt5u85hfzjxa8qqzthqwtp7xq8t3wh6ttc98hqtvlesvrpvln3srklcvhu2r9z22fdhaxvh2m2pg3nuq0n8gf2'
       );
-      const newHandle = 'test_me_0001';
 
       const source$ = createMultiTxProjectionSource([
         {
@@ -411,13 +412,10 @@ describe('storeHandles', () => {
           id: mintTxId
         }
       ]);
+      const numHandles = await repository.count();
       await firstValueFrom(source$.pipe(applyOperators()));
-      expect(
-        await repository.findOne({
-          select: { cardanoAddress: true, handle: true },
-          where: { handle: newHandle }
-        })
-      ).toEqual(null);
+
+      expect(await repository.count()).toBe(numHandles);
     });
   });
 });
