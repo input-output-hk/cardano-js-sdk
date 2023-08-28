@@ -1,6 +1,14 @@
 import * as testWallet from '../testWallet';
+import {
+  ApiError,
+  Cip30EnableOptions,
+  Cip30Wallet,
+  CipMethodsMapping,
+  RemoteAuthenticator,
+  WalletApi,
+  WalletApiExtension
+} from '../../src';
 import { Cardano } from '@cardano-sdk/core';
-import { Cip30Wallet, RemoteAuthenticator, WalletApi, WalletApiMethodNames } from '../../src';
 import { dummyLogger } from 'ts-log';
 import browser from 'webextension-polyfill';
 
@@ -25,6 +33,7 @@ describe('Wallet', () => {
     expect(wallet.apiVersion).toBe('0.1.0');
     expect(typeof wallet.name).toBe('string');
     expect(wallet.name).toBe(testWallet.properties.walletName);
+    expect(wallet.supportedExtensions).toEqual<WalletApiExtension[]>([{ cip: 95 }]);
     expect(typeof wallet.isEnabled).toBe('function');
     const isEnabled = await wallet.isEnabled();
     expect(typeof isEnabled).toBe('boolean');
@@ -32,13 +41,89 @@ describe('Wallet', () => {
     expect(typeof wallet.enable).toBe('function');
   });
 
-  test('enable', async () => {
-    expect(await wallet.isEnabled()).toBe(false);
-    const api = await wallet.enable();
-    expect(typeof api).toBe('object');
-    const methods = new Set(Object.keys(api));
-    expect(methods).toEqual(new Set(WalletApiMethodNames));
-    expect(await wallet.isEnabled()).toBe(true);
+  describe('enable', () => {
+    test('no extensions', async () => {
+      expect(await wallet.isEnabled()).toBe(false);
+      const api = await wallet.enable();
+      expect(typeof api).toBe('object');
+      const methods = new Set(Object.keys(api));
+      expect(methods).toEqual(new Set([...CipMethodsMapping[30], 'experimental']));
+      expect(await wallet.isEnabled()).toBe(true);
+    });
+
+    test('with cip95 extension', async () => {
+      const api = await wallet.enable({ extensions: [{ cip: 95 }] });
+      expect(typeof api).toBe('object');
+      const methods = new Set(Object.keys(api));
+      expect(methods).toEqual(new Set([...CipMethodsMapping[30], ...CipMethodsMapping[95], 'experimental']));
+      expect(await wallet.isEnabled()).toBe(true);
+    });
+
+    test('change extensions after enabling once', async () => {
+      const cip30api = await wallet.enable();
+      const cip30methods = new Set(Object.keys(cip30api));
+      expect(cip30methods).toEqual(new Set([...CipMethodsMapping[30], 'experimental']));
+      expect(await wallet.isEnabled()).toBe(true);
+
+      const cip95api = await wallet.enable({ extensions: [{ cip: 95 }] });
+      const cip95methods = new Set(Object.keys(cip95api));
+      expect(cip95methods).toEqual(new Set([...CipMethodsMapping[30], ...CipMethodsMapping[95], 'experimental']));
+      expect(await wallet.isEnabled()).toBe(true);
+    });
+
+    test('unsupported extensions does not reject and returns cip30 methods', async () => {
+      const api = await wallet.enable({ extensions: [{ cip: 9999 }] });
+      expect(typeof api).toBe('object');
+      const methods = new Set(Object.keys(api));
+      expect(methods).toEqual(new Set([...CipMethodsMapping[30], 'experimental']));
+      expect(await wallet.isEnabled()).toBe(true);
+    });
+
+    test('empty enable options does not reject and returns cip30 methods', async () => {
+      const api = await wallet.enable({} as Cip30EnableOptions);
+      expect(typeof api).toBe('object');
+      const methods = new Set(Object.keys(api));
+      expect(methods).toEqual(new Set([...CipMethodsMapping[30], 'experimental']));
+      expect(await wallet.isEnabled()).toBe(true);
+    });
+
+    test('throws if access to wallet api is not authorized', async () => {
+      (authenticator.requestAccess as jest.Mock).mockResolvedValueOnce(false);
+      await expect(wallet.enable()).rejects.toThrow(ApiError);
+      expect(await wallet.isEnabled()).toBe(false);
+    });
+
+    test('throws on invalid extensions parameter', async () => {
+      // non-array extensions
+      await expect(wallet.enable({ extensions: {} as unknown as WalletApiExtension[] })).rejects.toThrow(ApiError);
+      await expect(wallet.enable({ extensions: 'cip30' as unknown as WalletApiExtension[] })).rejects.toThrow(ApiError);
+      await expect(wallet.enable({ extensions: 95 as unknown as WalletApiExtension[] })).rejects.toThrow(ApiError);
+      await expect(wallet.enable({ extensions: null as unknown as WalletApiExtension[] })).rejects.toThrow(ApiError);
+
+      // extensions array with non-objects or null elements
+      await expect(wallet.enable({ extensions: ['95'] as unknown as WalletApiExtension[] })).rejects.toThrow(ApiError);
+      await expect(wallet.enable({ extensions: [95] as unknown as WalletApiExtension[] })).rejects.toThrow(ApiError);
+      await expect(wallet.enable({ extensions: [undefined] as unknown as WalletApiExtension[] })).rejects.toThrow(
+        ApiError
+      );
+      await expect(wallet.enable({ extensions: [null] as unknown as WalletApiExtension[] })).rejects.toThrow(ApiError);
+
+      // extensions array with invalid cip objects
+      await expect(
+        wallet.enable({ extensions: [{ cip: 'ninety-five' }] as unknown as WalletApiExtension[] })
+      ).rejects.toThrow(ApiError);
+      await expect(
+        wallet.enable({ extensions: [{ cip: undefined }] as unknown as WalletApiExtension[] })
+      ).rejects.toThrow(ApiError);
+      await expect(wallet.enable({ extensions: [{ cip: null }] as unknown as WalletApiExtension[] })).rejects.toThrow(
+        ApiError
+      );
+      await expect(wallet.enable({ extensions: [{ notCip: 95 }] as unknown as WalletApiExtension[] })).rejects.toThrow(
+        ApiError
+      );
+
+      expect(await wallet.isEnabled()).toBe(false);
+    });
   });
 
   test('prior enabling should persist', async () => {
