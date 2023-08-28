@@ -46,7 +46,10 @@ module.exports = {
       [
         'static-server',
         {
-          folders: [{ mount: '/', path: path.join(__dirname, 'dapp/build') }]
+          folders: [
+            { mount: '/', path: path.join(__dirname, 'dapp/build') },
+            { mount: '/cip95-cardano-wallet-connector', path: path.join(__dirname, 'dapp-cip95/build') }
+          ]
         }
       ],
       'chromedriver'
