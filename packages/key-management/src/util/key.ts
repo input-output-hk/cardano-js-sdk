@@ -8,6 +8,11 @@ export const STAKE_KEY_DERIVATION_PATH: AccountKeyDerivationPath = {
   role: KeyRole.Stake
 };
 
+export const DREP_KEY_DERIVATION_PATH: AccountKeyDerivationPath = {
+  index: 0,
+  role: KeyRole.DRep
+};
+
 export const toEd25519KeyPair = async (
   bip32KeyPair: KeyPair,
   provider: Crypto.Bip32Ed25519

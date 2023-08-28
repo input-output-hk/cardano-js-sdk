@@ -32,7 +32,8 @@ export enum KeyAgentType {
 export enum KeyRole {
   External = 0,
   Internal = 1,
-  Stake = 2
+  Stake = 2,
+  DRep = 3
 }
 
 export interface AccountKeyDerivationPath {
