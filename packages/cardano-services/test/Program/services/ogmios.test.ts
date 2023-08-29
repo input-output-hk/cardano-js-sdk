@@ -20,7 +20,12 @@ import { Ogmios, OgmiosCardanoNode, OgmiosTxSubmitProvider } from '@cardano-sdk/
 import { Pool } from 'pg';
 import { SrvRecord } from 'dns';
 import { bufferToHexString } from '@cardano-sdk/util';
-import { clearDbPools, createHealthyMockOgmiosServer, ogmiosServerReady } from '../../util';
+import {
+  clearDbPools,
+  createHealthyMockOgmiosServer,
+  ogmiosServerReady,
+  servicesWithVersionPath as services
+} from '../../util';
 import { createMockOgmiosServer } from '../../../../ogmios/test/mocks/mockOgmiosServer';
 import { getPort, getRandomPort } from 'get-port-please';
 import { handleProviderMocks, logger } from '@cardano-sdk/util-dev';
@@ -116,7 +121,7 @@ describe('Service dependency abstractions', () => {
       describe('TxSubmitHttpService', () => {
         beforeAll(async () => {
           port = await getPort();
-          apiUrlBase = `http://localhost:${port}/tx-submit`;
+          apiUrlBase = `http://localhost:${port}${services.txSubmit.versionPath}/${services.txSubmit.name}`;
           config = { listen: { port } };
           txSubmitProvider = await getOgmiosTxSubmitProvider(dnsResolver, logger, {
             ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
@@ -163,7 +168,7 @@ describe('Service dependency abstractions', () => {
       describe('NetworkInfoHttpService', () => {
         beforeAll(async () => {
           port = await getPort();
-          apiUrlBase = `http://localhost:${port}/network-info`;
+          apiUrlBase = `http://localhost:${port}${services.networkInfo.versionPath}/${services.networkInfo.name}`;
           config = { listen: { port } };
           ogmiosCardanoNode = await getOgmiosCardanoNode(dnsResolver, logger, {
             ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
@@ -254,7 +259,7 @@ describe('Service dependency abstractions', () => {
       describe('TxSubmitHttpService', () => {
         beforeAll(async () => {
           port = await getPort();
-          apiUrlBase = `http://localhost:${port}/tx-submit`;
+          apiUrlBase = `http://localhost:${port}${services.txSubmit.versionPath}/${services.txSubmit.name}`;
           config = { listen: { port } };
           txSubmitProvider = await getOgmiosTxSubmitProvider(dnsResolver, logger, {
             ogmiosUrl: new URL(ogmiosConnection.address.webSocket)
@@ -324,7 +329,7 @@ describe('Service dependency abstractions', () => {
       describe('NetworkInfoHttpService', () => {
         beforeAll(async () => {
           port = await getPort();
-          apiUrlBase = `http://localhost:${port}/network-info`;
+          apiUrlBase = `http://localhost:${port}${services.networkInfo.versionPath}/${services.networkInfo.name}`;
           config = { listen: { port } };
 
           ogmiosCardanoNode = await getOgmiosCardanoNode(dnsResolver, logger, {

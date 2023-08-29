@@ -23,7 +23,11 @@ COPY packages packages
 COPY scripts scripts
 COPY .yarn .yarn
 COPY \
+  .eslintrc.js \
+  .prettierrc \
   .yarnrc.yml \
+  complete.eslintrc.js \
+  eslint.tsconfig.json \
   package.json \
   tsconfig.json \
   yarn.lock \
@@ -31,8 +35,8 @@ COPY \
   /app/
 
 FROM nodejs-builder as cardano-services-builder
-RUN yarn --immutable --inline-builds &&\
-  yarn build
+RUN yarn --immutable --inline-builds
+RUN NODE_OPTIONS=--max_old_space_size=10240 yarn build
 
 FROM nodejs-builder as cardano-services-production-deps
 RUN yarn workspaces focus --all --production

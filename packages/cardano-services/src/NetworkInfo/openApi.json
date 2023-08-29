@@ -9,7 +9,10 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/network-info/stake": {
+    "/v1.0.0/network-info/health": {
+      "$ref": "../Http/schema.json#/paths/Health"
+    },
+    "/v1.0.0/network-info/stake": {
       "post": {
         "summary": "fetch stake info",
         "description": "Fetch Stake Info",
@@ -36,7 +39,7 @@
         }
       }
     },
-    "/network-info/lovelace-supply": {
+    "/v1.0.0/network-info/lovelace-supply": {
       "post": {
         "summary": "fetch lovelace supply info",
         "description": "Fetch Lovelace Supply Info",
@@ -63,7 +66,7 @@
         }
       }
     },
-    "/network-info/era-summaries": {
+    "/v1.0.0/network-info/era-summaries": {
       "post": {
         "summary": "fetch era summaries info",
         "description": "Fetch Era Summaries Info",
@@ -93,7 +96,7 @@
         }
       }
     },
-    "/network-info/ledger-tip": {
+    "/v1.0.0/network-info/ledger-tip": {
       "post": {
         "summary": "fetch ledger tip",
         "description": "Fetch Ledger Tip",
@@ -120,7 +123,7 @@
         }
       }
     },
-    "/network-info/protocol-parameters": {
+    "/v1.0.0/network-info/protocol-parameters": {
       "post": {
         "summary": "fetch protocol params",
         "description": "Fetch Protocol Params",
@@ -147,7 +150,7 @@
         }
       }
     },
-    "/network-info/genesis-parameters": {
+    "/v1.0.0/network-info/genesis-parameters": {
       "post": {
         "summary": "fetch genesis params",
         "description": "Fetch Genesis Params",

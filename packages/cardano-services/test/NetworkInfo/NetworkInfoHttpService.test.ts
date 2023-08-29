@@ -12,7 +12,7 @@ import { NetworkInfoFixtureBuilder } from './fixtures/FixtureBuilder';
 import { NetworkInfoProvider } from '@cardano-sdk/core';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
-import { clearDbPools, ingestDbData, sleep, wrapWithTransaction } from '../util';
+import { clearDbPools, ingestDbData, servicesWithVersionPath as services, sleep, wrapWithTransaction } from '../util';
 import { getPort } from 'get-port-please';
 import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
 import { logger } from '@cardano-sdk/util-dev';
@@ -30,6 +30,7 @@ describe('NetworkInfoHttpService', () => {
   let service: NetworkInfoHttpService;
   let port: number;
   let baseUrl: string;
+  let baseUrlWithVersion: string;
   let clientConfig: CreateHttpProviderConfig<NetworkInfoProvider>;
   let config: HttpServerConfig;
   let cardanoNode: OgmiosCardanoNode;
@@ -65,7 +66,8 @@ describe('NetworkInfoHttpService', () => {
 
     beforeAll(async () => {
       port = await getPort();
-      baseUrl = `http://localhost:${port}/network-info`;
+      baseUrl = `http://localhost:${port}`;
+      baseUrlWithVersion = `${baseUrl}${services.networkInfo.versionPath}/${services.networkInfo.name}`;
       lastBlockNoInDb = (await dbPools.main.query<LedgerTipModel>(findLedgerTip)).rows[0];
       cardanoNode = mockCardanoNode(
         healthCheckResponseMock({
@@ -124,7 +126,7 @@ describe('NetworkInfoHttpService', () => {
 
     describe('/health', () => {
       it('forwards the networkInfoProvider health response with HTTP request', async () => {
-        const res = await axios.post(`${baseUrl}/health`, {
+        const res = await axios.post(`${baseUrlWithVersion}/health`, {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
@@ -166,13 +168,17 @@ describe('NetworkInfoHttpService', () => {
     describe('/era-summaries', () => {
       describe('with Http Server', () => {
         it('returns a 200 coded response with a well formed HTTP request', async () => {
-          expect((await axios.post(`${baseUrl}/era-summaries`, {})).status).toEqual(200);
+          expect((await axios.post(`${baseUrlWithVersion}/era-summaries`, {})).status).toEqual(200);
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
           expect.assertions(2);
           try {
-            await axios.post(`${baseUrl}/era-summaries`, {}, { headers: { 'Content-Type': APPLICATION_CBOR } });
+            await axios.post(
+              `${baseUrlWithVersion}/era-summaries`,
+              {},
+              { headers: { 'Content-Type': APPLICATION_CBOR } }
+            );
           } catch (error: any) {
             expect(error.response.status).toBe(415);
             expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
@@ -193,13 +199,13 @@ describe('NetworkInfoHttpService', () => {
 
       describe('with Http Server', () => {
         it('returns a 200 coded response with a well formed HTTP request', async () => {
-          expect((await axios.post(`${baseUrl}/stake`, {})).status).toEqual(200);
+          expect((await axios.post(`${baseUrlWithVersion}/stake`, {})).status).toEqual(200);
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
           expect.assertions(2);
           try {
-            await axios.post(`${baseUrl}/stake`, {}, { headers: { 'Content-Type': APPLICATION_CBOR } });
+            await axios.post(`${baseUrlWithVersion}/stake`, {}, { headers: { 'Content-Type': APPLICATION_CBOR } });
           } catch (error: any) {
             expect(error.response.status).toBe(415);
             expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
@@ -276,13 +282,17 @@ describe('NetworkInfoHttpService', () => {
 
       describe('with Http Server', () => {
         it('returns a 200 coded response with a well formed HTTP request', async () => {
-          expect((await axios.post(`${baseUrl}/lovelace-supply`, {})).status).toEqual(200);
+          expect((await axios.post(`${baseUrlWithVersion}/lovelace-supply`, {})).status).toEqual(200);
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
           expect.assertions(2);
           try {
-            await axios.post(`${baseUrl}/lovelace-supply`, {}, { headers: { 'Content-Type': APPLICATION_CBOR } });
+            await axios.post(
+              `${baseUrlWithVersion}/lovelace-supply`,
+              {},
+              { headers: { 'Content-Type': APPLICATION_CBOR } }
+            );
           } catch (error: any) {
             expect(error.response.status).toBe(415);
             expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
@@ -328,13 +338,13 @@ describe('NetworkInfoHttpService', () => {
     describe('/ledger-tip', () => {
       describe('with Http Server', () => {
         it('returns a 200 coded response with a well formed HTTP request', async () => {
-          expect((await axios.post(`${baseUrl}/ledger-tip`, {})).status).toEqual(200);
+          expect((await axios.post(`${baseUrlWithVersion}/ledger-tip`, {})).status).toEqual(200);
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
           expect.assertions(2);
           try {
-            await axios.post(`${baseUrl}/ledger-tip`, {}, { headers: { 'Content-Type': APPLICATION_CBOR } });
+            await axios.post(`${baseUrlWithVersion}/ledger-tip`, {}, { headers: { 'Content-Type': APPLICATION_CBOR } });
           } catch (error: any) {
             expect(error.response.status).toBe(415);
             expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
@@ -351,13 +361,17 @@ describe('NetworkInfoHttpService', () => {
     describe('/protocol-parameters', () => {
       describe('with Http Server', () => {
         it('returns a 200 coded response with a well formed HTTP request', async () => {
-          expect((await axios.post(`${baseUrl}/protocol-parameters`, {})).status).toEqual(200);
+          expect((await axios.post(`${baseUrlWithVersion}/protocol-parameters`, {})).status).toEqual(200);
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
           expect.assertions(2);
           try {
-            await axios.post(`${baseUrl}/protocol-parameters`, {}, { headers: { 'Content-Type': APPLICATION_CBOR } });
+            await axios.post(
+              `${baseUrlWithVersion}/protocol-parameters`,
+              {},
+              { headers: { 'Content-Type': APPLICATION_CBOR } }
+            );
           } catch (error: any) {
             expect(error.response.status).toBe(415);
             expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);
@@ -374,13 +388,17 @@ describe('NetworkInfoHttpService', () => {
     describe('/genesis-parameters', () => {
       describe('with Http Server', () => {
         it('returns a 200 coded response with a well formed HTTP request', async () => {
-          expect((await axios.post(`${baseUrl}/genesis-parameters`, {})).status).toEqual(200);
+          expect((await axios.post(`${baseUrlWithVersion}/genesis-parameters`, {})).status).toEqual(200);
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
           expect.assertions(2);
           try {
-            await axios.post(`${baseUrl}/genesis-parameters`, {}, { headers: { 'Content-Type': APPLICATION_CBOR } });
+            await axios.post(
+              `${baseUrlWithVersion}/genesis-parameters`,
+              {},
+              { headers: { 'Content-Type': APPLICATION_CBOR } }
+            );
           } catch (error: any) {
             expect(error.response.status).toBe(415);
             expect(error.message).toBe(UNSUPPORTED_MEDIA_STRING);

@@ -1,9 +1,7 @@
+import { config } from '../util';
 import { handleHttpProvider } from '../../src';
-import { logger } from '@cardano-sdk/util-dev';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
-
-const config = { baseUrl: 'http://some-hostname:3000/handle', logger };
 
 describe('handleHttpProvider', () => {
   let axiosMock: MockAdapter;

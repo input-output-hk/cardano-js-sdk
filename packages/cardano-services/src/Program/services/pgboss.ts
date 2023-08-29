@@ -77,7 +77,7 @@ export class PgBossHttpService extends HttpService {
   constructor(cfg: PgBossServiceConfig, deps: PgBossServiceDependencies) {
     const { connectionConfig$, db, logger } = deps;
 
-    super('pg-boss-service', { healthCheck: async () => this.#health }, Router(), logger);
+    super('pg-boss-service', { healthCheck: async () => this.#health }, Router(), __dirname, logger);
 
     this.#config = cfg;
     this.#db = db;

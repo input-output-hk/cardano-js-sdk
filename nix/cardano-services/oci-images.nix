@@ -19,5 +19,6 @@ in {
       "BUILD_INFO=${BUILD_INFO}"
     ];
     meta.description = "Minimal Cardano Services OCI Image";
+    meta.versions = builtins.fromJSON (builtins.readFile (self + /packages/cardano-services-client/version.json));
   };
 }

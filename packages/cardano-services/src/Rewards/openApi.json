@@ -9,7 +9,10 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/rewards/account-balance": {
+    "/v1.0.0/rewards/health": {
+      "$ref": "../Http/schema.json#/paths/Health"
+    },
+    "/v1.0.0/rewards/account-balance": {
       "post": {
         "summary": "Rewards balance search",
         "operationId": "balanceSearch",
@@ -40,7 +43,7 @@
         }
       }
     },
-    "/rewards/history": {
+    "/v1.0.0/rewards/history": {
       "post": {
         "summary": "Rewards history search",
         "operationId": "rewardsHistorySearch",

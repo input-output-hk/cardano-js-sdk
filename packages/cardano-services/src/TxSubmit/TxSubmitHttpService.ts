@@ -1,4 +1,3 @@
-import * as OpenApiValidator from 'express-openapi-validator';
 import {
   Cardano,
   ProviderError,
@@ -12,7 +11,6 @@ import { ServiceNames } from '../Program/programs/types';
 import { providerHandler } from '../util';
 import bodyParser from 'body-parser';
 import express from 'express';
-import path from 'path';
 
 export interface TxSubmitHttpServiceDependencies {
   logger: Logger;
@@ -24,18 +22,9 @@ export class TxSubmitHttpService extends HttpService {
     { logger, txSubmitProvider }: TxSubmitHttpServiceDependencies,
     router: express.Router = express.Router()
   ) {
-    super(ServiceNames.TxSubmit, txSubmitProvider, router, logger);
+    super(ServiceNames.TxSubmit, txSubmitProvider, router, __dirname, logger);
 
     router.use(bodyParser.raw());
-    const apiSpec = path.join(__dirname, 'openApi.json');
-    router.use(
-      OpenApiValidator.middleware({
-        apiSpec,
-        ignoreUndocumented: true,
-        validateRequests: true,
-        validateResponses: true
-      })
-    );
     router.post(
       '/submit',
       providerHandler(txSubmitProvider.submitTx.bind(txSubmitProvider))(async (_, _r, res, _n, handler) => {

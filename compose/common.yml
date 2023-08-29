@@ -143,9 +143,9 @@ services:
       <<: *sdk-environment
       API_URL: http://0.0.0.0:3003
       QUEUES: ${QUEUES:-pool-metadata,pool-metrics}
-      STAKE_POOL_PROVIDER_URL: http://provider-server:3000/stake-pool
+      STAKE_POOL_PROVIDER_URL: http://provider-server:3000/
     healthcheck:
-      test: ['CMD-SHELL', 'curl -s --fail http://localhost:3003/health']
+      test: ['CMD-SHELL', 'curl -s --fail http://localhost:3003/v1.0.0/health']
     ports:
       - ${PG_BOSS_PORT:-4003}:3003
 
@@ -186,7 +186,10 @@ services:
       PROJECTION_NAMES: handle
     healthcheck:
       test:
-        ['CMD-SHELL', 'test `curl -fs http://localhost:3000/health | jq -r ".services[0].projectedTip.blockNo"` -gt 1']
+        [
+          'CMD-SHELL',
+          'test `curl -fs http://localhost:3000/v1.0.0/health | jq -r ".services[0].projectedTip.blockNo"` -gt 1'
+        ]
     ports:
       - ${HANDLE_PROJECTOR_PORT:-4004}:3000
 
@@ -204,7 +207,10 @@ services:
       PROJECTION_NAMES: stake-pool,stake-pool-metadata-job,stake-pool-metrics-job
     healthcheck:
       test:
-        ['CMD-SHELL', 'test `curl -fs http://localhost:3000/health | jq -r ".services[0].projectedTip.blockNo"` -gt 1']
+        [
+          'CMD-SHELL',
+          'test `curl -fs http://localhost:3000/v1.0.0/health | jq -r ".services[0].projectedTip.blockNo"` -gt 1'
+        ]
     ports:
       - ${STAKE_POOL_PROJECTOR_PORT:-4002}:3000
 

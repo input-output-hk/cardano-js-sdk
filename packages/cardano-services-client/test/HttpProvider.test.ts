@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable sonarjs/no-duplicate-string */
-import { HttpProviderConfig, apiVersion, createHttpProvider } from '../src';
+import { HttpProviderConfig, createHttpProvider } from '../src';
 import { Provider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { Server } from 'http';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
@@ -18,10 +18,13 @@ interface TestProvider extends Provider {
   complexArgsAndReturn({ arg1, arg2 }: { arg1: bigint; arg2: ComplexArg2 }): Promise<ComplexResponse>;
 }
 
+const apiVersion = '1.0.0';
+const serviceSlug = 'test';
+
 const createStubHttpProviderServer = async (port: number, urlPath: string, handler: RequestHandler) => {
   const app = express();
   app.use(express.json());
-  app.post(urlPath, handler);
+  app.post(`/v${apiVersion}/${serviceSlug}${urlPath}`, handler);
   const server = await new Promise<Server>((resolve) => {
     const result = app.listen(port, () => resolve(result));
   });
@@ -43,9 +46,11 @@ describe('createHttpProvider', () => {
     config: Pick<HttpProviderConfig<TestProvider>, 'axiosOptions' | 'mapError'> = {}
   ) =>
     createHttpProvider<TestProvider>({
+      apiVersion,
       baseUrl,
       logger,
       paths: stubProviderPaths,
+      serviceSlug,
       ...config
     });
 
@@ -119,11 +124,13 @@ describe('createHttpProvider', () => {
       });
       it('maps EAI_AGAIN to ProviderError{ConnectionFailure}', async () => {
         const provider = createHttpProvider<TestProvider>({
+          apiVersion: '1.0.0',
           axiosOptions: {},
           baseUrl: 'http://some-hostname:3000',
           logger,
           mapError: jest.fn(),
-          paths: stubProviderPaths
+          paths: stubProviderPaths,
+          serviceSlug: 'test'
         });
         try {
           await provider.noArgsEmptyReturn();

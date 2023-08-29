@@ -20,7 +20,7 @@ import { DbPools, LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncPro
 import { INFO, createLogger } from 'bunyan';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
-import { clearDbPools } from '../util';
+import { clearDbPools, servicesWithVersionPath as services } from '../util';
 import { createDbSyncMetadataService } from '../../src/Metadata';
 import { getPort } from 'get-port-please';
 import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
@@ -35,6 +35,7 @@ const BAD_REQUEST_STRING = 'Request failed with status code 400';
 
 describe('AssetHttpService', () => {
   let apiUrlBase: string;
+  let apiUrlBaseWithVersion: string;
   let assetProvider: AssetProvider;
   let closeMock: () => Promise<void> = jest.fn();
   let config: HttpServerConfig;
@@ -53,7 +54,8 @@ describe('AssetHttpService', () => {
 
   beforeAll(async () => {
     port = await getPort();
-    apiUrlBase = `http://localhost:${port}/asset`;
+    apiUrlBase = `http://localhost:${port}`;
+    apiUrlBaseWithVersion = `${apiUrlBase}${services.asset.versionPath}/${services.asset.name}`;
     config = { listen: { port } };
     clientConfig = {
       baseUrl: apiUrlBase,
@@ -118,7 +120,7 @@ describe('AssetHttpService', () => {
 
     describe('/health', () => {
       it('forwards the assetProvider health response with HTTP request', async () => {
-        const res = await axios.post(`${apiUrlBase}/health`, undefined, {
+        const res = await axios.post(`${apiUrlBaseWithVersion}/health`, undefined, {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
@@ -160,7 +162,11 @@ describe('AssetHttpService', () => {
       it('returns a 415 coded response if the wrong content type header is used', async () => {
         expect.assertions(2);
         try {
-          await axios.post(`${apiUrlBase}/${path}`, { assetId: '' }, { headers: { 'Content-Type': APPLICATION_CBOR } });
+          await axios.post(
+            `${apiUrlBaseWithVersion}/${path}`,
+            { assetId: '' },
+            { headers: { 'Content-Type': APPLICATION_CBOR } }
+          );
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
           expect(error.response.status).toBe(415);
@@ -171,7 +177,7 @@ describe('AssetHttpService', () => {
       it('returns 400 coded response if the request is bad formed', async () => {
         expect.assertions(2);
         try {
-          await axios.post(`${apiUrlBase}/${path}`, { assetId: [['test']] });
+          await axios.post(`${apiUrlBaseWithVersion}/${path}`, { assetId: [['test']] });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
           expect(error.response.status).toBe(400);
@@ -182,7 +188,7 @@ describe('AssetHttpService', () => {
       it('returns 404 coded response for not existing existing asset id', async () => {
         expect.assertions(1);
         try {
-          await axios.post(`${apiUrlBase}/${path}`, {
+          await axios.post(`${apiUrlBaseWithVersion}/${path}`, {
             assetId: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
           });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -222,7 +228,7 @@ describe('AssetHttpService', () => {
         expect.assertions(2);
         try {
           await axios.post(
-            `${apiUrlBase}/${path}`,
+            `${apiUrlBaseWithVersion}/${path}`,
             { assetIds: ['0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'] },
             { headers: { 'Content-Type': APPLICATION_CBOR } }
           );
@@ -236,7 +242,7 @@ describe('AssetHttpService', () => {
       it('returns 400 coded response if the request is bad formed', async () => {
         expect.assertions(2);
         try {
-          await axios.post(`${apiUrlBase}/${path}`, { assetId: [['test']] });
+          await axios.post(`${apiUrlBaseWithVersion}/${path}`, { assetId: [['test']] });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
           expect(error.response.status).toBe(400);
@@ -247,7 +253,7 @@ describe('AssetHttpService', () => {
       it('returns 404 coded response for not existing existing asset id', async () => {
         expect.assertions(1);
         try {
-          await axios.post(`${apiUrlBase}/${path}`, {
+          await axios.post(`${apiUrlBaseWithVersion}/${path}`, {
             assetIds: ['0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef']
           });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -261,7 +267,7 @@ describe('AssetHttpService', () => {
         const assetIds = Array.from({ length: PAGINATION_PAGE_SIZE_LIMIT_ASSETS + 1 }, () => assets[0].id);
         expect.assertions(1);
         try {
-          await axios.post(`${apiUrlBase}/${path}`, {
+          await axios.post(`${apiUrlBaseWithVersion}/${path}`, {
             assetIds
           });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any

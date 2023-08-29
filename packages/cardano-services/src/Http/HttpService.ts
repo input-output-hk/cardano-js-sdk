@@ -1,3 +1,4 @@
+import * as OpenApiValidator from 'express-openapi-validator';
 import {
   HealthCheckResponse,
   HttpProviderConfigPaths,
@@ -10,18 +11,26 @@ import { HttpServer } from './HttpServer';
 import { Logger } from 'ts-log';
 import { ProviderHandler, providerHandler } from '../util';
 import { RunnableModule } from '@cardano-sdk/util';
+import { versionPathFromSpec } from '../util/openApi';
 import express, { Router } from 'express';
+import path from 'path';
+
+const openApiOption = { ignoreUndocumented: true, validateRequests: true, validateResponses: true };
 
 export abstract class HttpService extends RunnableModule {
   public router: express.Router;
   public slug: string;
   public provider: Provider;
+  public openApiPath: string;
 
-  constructor(slug: string, provider: Provider, router: express.Router, logger: Logger) {
+  constructor(slug: string, provider: Provider, router: express.Router, openApiPath: string, logger: Logger) {
     super(slug, logger);
     this.router = router;
     this.slug = slug;
     this.provider = provider;
+    this.openApiPath = path.join(openApiPath, 'openApi.json');
+
+    router.use(OpenApiValidator.middleware({ apiSpec: this.openApiPath, ...openApiOption }));
 
     const healthHandler = async (req: express.Request, res: express.Response) => {
       logger.debug('/health', { ip: req.ip });
@@ -58,6 +67,10 @@ export abstract class HttpService extends RunnableModule {
 
   async healthCheck(): Promise<HealthCheckResponse> {
     return await this.provider.healthCheck();
+  }
+
+  apiVersionPath(): string {
+    return versionPathFromSpec(this.openApiPath);
   }
 
   attachProviderRoutes<T extends Provider>(provider: T, router: Router, paths: HttpProviderConfigPaths<T>) {

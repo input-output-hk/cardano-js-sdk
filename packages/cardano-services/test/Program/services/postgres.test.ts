@@ -8,7 +8,7 @@ import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../../src/InMemoryCache';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { SrvRecord } from 'dns';
-import { clearDbPools } from '../../util';
+import { clearDbPools, servicesWithVersionPath as services } from '../../util';
 import { getPort } from 'get-port-please';
 import { healthCheckResponseMock, mockCardanoNode } from '../../../../core/test/CardanoNode/mocks';
 import { logger } from '@cardano-sdk/util-dev';
@@ -65,7 +65,7 @@ describe('Service dependency abstractions', () => {
       beforeAll(async () => {
         port = await getPort();
         config = { listen: { port } };
-        apiUrlBase = `http://localhost:${port}/network-info`;
+        apiUrlBase = `http://localhost:${port}${services.networkInfo.versionPath}/${services.networkInfo.name}`;
         epochMonitor = new DbSyncEpochPollService(dbPools.main!, 10_000);
         lastBlockNoInDb = (await dbPools.main!.query<LedgerTipModel>(findLedgerTip)).rows[0];
         cardanoNode = mockCardanoNode(
@@ -157,7 +157,7 @@ describe('Service dependency abstractions', () => {
       beforeAll(async () => {
         port = await getPort();
         config = { listen: { port } };
-        apiUrlBase = `http://localhost:${port}/network-info`;
+        apiUrlBase = `http://localhost:${port}${services.networkInfo.versionPath}/${services.networkInfo.name}`;
         epochMonitor = new DbSyncEpochPollService(dbPools.main!, 1000);
         lastBlockNoInDb = (await dbPools.main!.query<LedgerTipModel>(findLedgerTip)).rows[0];
         cardanoNode = mockCardanoNode(

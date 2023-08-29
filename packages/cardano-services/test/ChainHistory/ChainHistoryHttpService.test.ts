@@ -19,7 +19,7 @@ import { DbPools, LedgerTipModel, findLedgerTip } from '../../src/util/DbSyncPro
 import { HexBlob } from '@cardano-sdk/util';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
-import { clearDbPools } from '../util';
+import { clearDbPools, servicesWithVersionPath as services } from '../util';
 import { createDbSyncMetadataService } from '../../src/Metadata';
 import { getPort } from 'get-port-please';
 import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
@@ -41,6 +41,7 @@ describe('ChainHistoryHttpService', () => {
   let service: ChainHistoryHttpService;
   let port: number;
   let baseUrl: string;
+  let baseUrlWithVersion: string;
   let clientConfig: CreateHttpProviderConfig<ChainHistoryProvider>;
   let config: HttpServerConfig;
   let provider: ChainHistoryProvider;
@@ -51,7 +52,8 @@ describe('ChainHistoryHttpService', () => {
 
   beforeAll(async () => {
     port = await getPort();
-    baseUrl = `http://localhost:${port}/chain-history`;
+    baseUrl = `http://localhost:${port}`;
+    baseUrlWithVersion = `${baseUrl}${services.chainHistory.versionPath}/${services.chainHistory.name}`;
     clientConfig = { baseUrl, logger };
     config = { listen: { port } };
     dbPools = {
@@ -100,7 +102,7 @@ describe('ChainHistoryHttpService', () => {
     describe('/health', () => {
       const url = '/health';
       it('forwards the chainHistoryProvider health response with HTTP request', async () => {
-        const res = await axios.post(`${baseUrl}${url}`, undefined, {
+        const res = await axios.post(`${baseUrlWithVersion}${url}`, undefined, {
           headers: { 'Content-Type': APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
@@ -141,12 +143,16 @@ describe('ChainHistoryHttpService', () => {
       const url = '/blocks/by-hashes';
       describe('with Http Service', () => {
         it('returns a 200 coded response with a well formed HTTP request', async () => {
-          expect((await axios.post(`${baseUrl}${url}`, { ids: [] })).status).toEqual(200);
+          expect((await axios.post(`${baseUrlWithVersion}${url}`, { ids: [] })).status).toEqual(200);
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
           try {
-            await axios.post(`${baseUrl}${url}`, { ids: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
+            await axios.post(
+              `${baseUrlWithVersion}${url}`,
+              { ids: [] },
+              { headers: { 'Content-Type': APPLICATION_CBOR } }
+            );
             throw new Error('fail');
           } catch (error: any) {
             expect(error.response.status).toBe(415);
@@ -177,7 +183,7 @@ describe('ChainHistoryHttpService', () => {
       it('returns a 400 coded error if provided block ids are greater than pagination page size limit', async () => {
         try {
           await axios.post(
-            `${baseUrl}${url}`,
+            `${baseUrlWithVersion}${url}`,
             {
               ids: await fixtureBuilder.getBlockHashes(6)
             },
@@ -203,12 +209,16 @@ describe('ChainHistoryHttpService', () => {
       const url = '/txs/by-hashes';
       describe('with Http Service', () => {
         it('returns a 200 coded response with a well formed HTTP request', async () => {
-          expect((await axios.post(`${baseUrl}${url}`, { ids: [] })).status).toEqual(200);
+          expect((await axios.post(`${baseUrlWithVersion}${url}`, { ids: [] })).status).toEqual(200);
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
           try {
-            await axios.post(`${baseUrl}${url}`, { ids: [] }, { headers: { 'Content-Type': APPLICATION_CBOR } });
+            await axios.post(
+              `${baseUrlWithVersion}${url}`,
+              { ids: [] },
+              { headers: { 'Content-Type': APPLICATION_CBOR } }
+            );
             throw new Error('fail');
           } catch (error: any) {
             expect(error.response.status).toBe(415);
@@ -237,7 +247,7 @@ describe('ChainHistoryHttpService', () => {
       it('returns a 400 coded error if provided transaction ids are greater than pagination page size limit', async () => {
         try {
           await axios.post(
-            `${baseUrl}${url}`,
+            `${baseUrlWithVersion}${url}`,
             {
               ids: await fixtureBuilder.getTxHashes(6)
             },
@@ -342,14 +352,15 @@ describe('ChainHistoryHttpService', () => {
       describe('with Http Server', () => {
         it('returns a 200 coded response with a well formed HTTP request', async () => {
           expect(
-            (await axios.post(`${baseUrl}${url}`, { addresses: [], pagination: { limit: 5, startAt: 0 } })).status
+            (await axios.post(`${baseUrlWithVersion}${url}`, { addresses: [], pagination: { limit: 5, startAt: 0 } }))
+              .status
           ).toEqual(200);
         });
 
         it('returns a 415 coded response if the wrong content type header is used', async () => {
           try {
             await axios.post(
-              `${baseUrl}${url}`,
+              `${baseUrlWithVersion}${url}`,
               { addresses: [], pagination: { limit: 5, startAt: 0 } },
               { headers: { 'Content-Type': APPLICATION_CBOR } }
             );
@@ -456,7 +467,7 @@ describe('ChainHistoryHttpService', () => {
       it('returns a 400 coded error if pagination argument is not provided', async () => {
         try {
           await axios.post(
-            `${baseUrl}${url}`,
+            `${baseUrlWithVersion}${url}`,
             {
               addresses: await fixtureBuilder.getDistinctAddresses(1)
             },
@@ -471,7 +482,7 @@ describe('ChainHistoryHttpService', () => {
       it('returns a 400 coded error if provided transaction addresses are greater than pagination page size limit', async () => {
         try {
           await axios.post(
-            `${baseUrl}${url}`,
+            `${baseUrlWithVersion}${url}`,
             {
               addresses: await fixtureBuilder.getDistinctAddresses(6),
               pagination: { limit: 5, startAt: 0 }

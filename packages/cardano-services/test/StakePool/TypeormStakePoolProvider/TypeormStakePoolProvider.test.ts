@@ -19,7 +19,7 @@ import { PoolInfo, TypeormStakePoolFixtureBuilder } from './fitxures/TypeormFixt
 import { getPort } from 'get-port-please';
 import { isNotNil } from '@cardano-sdk/util';
 import { logger } from '@cardano-sdk/util-dev';
-import { sleep } from '../../util';
+import { servicesWithVersionPath as services, sleep } from '../../util';
 import axios from 'axios';
 import lowerCase from 'lodash/lowerCase';
 
@@ -69,6 +69,7 @@ describe('TypeormStakePoolProvider', () => {
   let service: StakePoolHttpService;
   let port: number;
   let baseUrl: string;
+  let baseUrlWithVersion: string;
   let clientConfig: CreateHttpProviderConfig<StakePoolProvider>;
   let config: HttpServerConfig;
   let connectionConfig$: Observable<PgConnectionConfig>;
@@ -86,7 +87,8 @@ describe('TypeormStakePoolProvider', () => {
 
   beforeAll(async () => {
     port = await getPort();
-    baseUrl = `http://localhost:${port}/stake-pool`;
+    baseUrl = `http://localhost:${port}`;
+    baseUrlWithVersion = `${baseUrl}${services.stakePool.versionPath}/${services.stakePool.name}`;
     config = { listen: { port } };
     clientConfig = { baseUrl, logger: createLogger({ level: INFO, name: 'unit tests' }) };
     connectionConfig$ = getConnectionConfig(dnsResolver, 'projector', 'StakePool', {
@@ -158,16 +160,16 @@ describe('TypeormStakePoolProvider', () => {
 
         describe('with Http Server', () => {
           it('returns a 200 coded response with a well formed HTTP request', async () => {
-            expect((await axios.post(`${baseUrl}${url}`, { pagination: { limit: 5, startAt: 0 } })).status).toEqual(
-              200
-            );
+            expect(
+              (await axios.post(`${baseUrlWithVersion}${url}`, { pagination: { limit: 5, startAt: 0 } })).status
+            ).toEqual(200);
           });
 
           it('returns a 415 coded response if the wrong content type header is used', async () => {
             expect.assertions(2);
             try {
               await axios.post(
-                `${baseUrl}${url}`,
+                `${baseUrlWithVersion}${url}`,
                 { pagination: { limit: 5, startAt: 0 } },
                 { headers: { 'Content-Type': APPLICATION_CBOR } }
               );
@@ -181,7 +183,7 @@ describe('TypeormStakePoolProvider', () => {
           it('returns a 400 coded error if pagination argument is not provided', async () => {
             expect.assertions(2);
             try {
-              await axios.post(`${baseUrl}${url}`, {}, { headers: { 'Content-Type': APPLICATION_JSON } });
+              await axios.post(`${baseUrlWithVersion}${url}`, {}, { headers: { 'Content-Type': APPLICATION_JSON } });
             } catch (error: any) {
               expect(error.response.status).toBe(400);
               expect(error.message).toBe(BAD_REQUEST);
@@ -193,7 +195,7 @@ describe('TypeormStakePoolProvider', () => {
             const pageSizeGreaterThanMaxLimit = 30;
             try {
               await axios.post(
-                `${baseUrl}${url}`,
+                `${baseUrlWithVersion}${url}`,
                 { pagination: { limit: pageSizeGreaterThanMaxLimit, startAt: 0 } },
                 { headers: { 'Content-Type': APPLICATION_JSON } }
               );
@@ -226,7 +228,7 @@ describe('TypeormStakePoolProvider', () => {
 
             try {
               await axios.post(
-                `${baseUrl}${url}`,
+                `${baseUrlWithVersion}${url}`,
                 { filters, pagination: { limit: 5, startAt: 0 } },
                 { headers: { 'Content-Type': APPLICATION_JSON } }
               );
@@ -729,12 +731,12 @@ describe('TypeormStakePoolProvider', () => {
 
         describe('with Http Server', () => {
           it('returns a 200 coded response with a well formed HTTP request', async () => {
-            expect((await axios.post(`${baseUrl}${url}`, {})).status).toEqual(200);
+            expect((await axios.post(`${baseUrlWithVersion}${url}`, {})).status).toEqual(200);
           });
 
           it('returns a 415 coded response if the wrong content type header is used', async () => {
             try {
-              await axios.post(`${baseUrl}${url}`, {}, { headers: { 'Content-Type': APPLICATION_CBOR } });
+              await axios.post(`${baseUrlWithVersion}${url}`, {}, { headers: { 'Content-Type': APPLICATION_CBOR } });
               throw new Error('fail');
             } catch (error: any) {
               expect(error.response.status).toBe(415);

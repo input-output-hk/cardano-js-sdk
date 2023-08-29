@@ -9,7 +9,10 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/handle/resolve": {
+    "/v1.0.0/handle/health": {
+      "$ref": "../Http/schema.json#/paths/Health"
+    },
+    "/v1.0.0/handle/resolve": {
       "post": {
         "summary": "Resolve handles",
         "operationId": "handleResolve",
