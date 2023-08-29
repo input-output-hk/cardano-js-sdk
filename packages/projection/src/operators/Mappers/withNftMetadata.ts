@@ -10,8 +10,15 @@ import uniqBy from 'lodash/uniqBy';
 
 export interface ProjectedNftMetadata {
   userTokenAssetId: Cardano.AssetId;
-  referenceTokenAssetId?: Cardano.AssetId;
   nftMetadata: Asset.NftMetadata;
+  /**
+   * Only present on cip68 metadata
+   */
+  referenceTokenAssetId?: Cardano.AssetId;
+  /**
+   * Only present on cip68 metadata
+   */
+  extra?: Cardano.PlutusData;
 }
 
 export interface WithNftMetadata {
@@ -21,11 +28,19 @@ export interface WithNftMetadata {
 const getNftMetadataFromCip67 = ({ cip67 }: WithCIP67, logger: Logger) =>
   (cip67.byLabel[Asset.AssetNameLabelNum.ReferenceNFT] || []).map(
     ({ decoded, assetId, policyId, utxo: [_, { datum }] }): ProjectedNftMetadata | null => {
+      if (
+        !datum ||
+        !Cardano.util.isConstrPlutusData(datum) ||
+        datum.constructor !== 0n ||
+        datum.fields.items.length < 3
+      ) {
+        return null;
+      }
       const nftMetadata = Asset.NftMetadata.fromPlutusData(datum, logger);
       if (!nftMetadata) return null;
       const userTokenAssetName = Asset.AssetNameLabel.encode(decoded.content, Asset.AssetNameLabelNum.UserNFT);
       const userTokenAssetId = Cardano.AssetId.fromParts(policyId, userTokenAssetName);
-      return { nftMetadata, referenceTokenAssetId: assetId, userTokenAssetId };
+      return { extra: datum.fields.items[2], nftMetadata, referenceTokenAssetId: assetId, userTokenAssetId };
     }
   );
 
