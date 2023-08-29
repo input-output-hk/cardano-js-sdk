@@ -16,7 +16,8 @@ import { LedgerTransportType } from './types';
 import { ManagedFreeableScope } from '@cardano-sdk/util';
 import { str_to_path } from '@cardano-foundation/ledgerjs-hw-app-cardano/dist/utils/address';
 import { toLedgerTx } from './transformers';
-import LedgerConnection, {
+import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
+import _LedgerConnection, {
   Certificate,
   CertificateType,
   GetVersionResponse,
@@ -28,9 +29,16 @@ import LedgerConnection, {
   TransactionSigningMode,
   TxOutputDestinationType
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import TransportNodeHid from '@ledgerhq/hw-transport-node-hid-noevents';
-import TransportWebHID from '@ledgerhq/hw-transport-webhid';
+import _TransportWebHID from '@ledgerhq/hw-transport-webhid';
 import type LedgerTransport from '@ledgerhq/hw-transport';
+
+const TransportWebHID = (_TransportWebHID as any).default
+  ? ((_TransportWebHID as any).default as typeof _TransportWebHID)
+  : _TransportWebHID;
+const LedgerConnection = (_LedgerConnection as any).default
+  ? ((_LedgerConnection as any).default as typeof _LedgerConnection)
+  : _LedgerConnection;
+type LedgerConnection = _LedgerConnection;
 
 export interface LedgerKeyAgentProps extends Omit<SerializableLedgerKeyAgentData, '__typename'> {
   deviceConnection?: LedgerConnection;
@@ -112,14 +120,27 @@ const isMultiSig = (tx: Transaction): boolean => {
   return result;
 };
 
+type LedgerConnectionWithCommunicationTypeAndDevicePath = {
+  deviceConnection: LedgerConnection;
+  communicationType: CommunicationType;
+  devicePath?: string;
+};
+
 export class LedgerKeyAgent extends KeyAgentBase {
   readonly deviceConnection?: LedgerConnection;
   readonly #communicationType: CommunicationType;
+  static deviceConnections: LedgerConnectionWithCommunicationTypeAndDevicePath[] = [];
 
   constructor({ deviceConnection, ...serializableData }: LedgerKeyAgentProps, dependencies: KeyAgentDependencies) {
     super({ ...serializableData, __typename: KeyAgentType.Ledger }, dependencies);
     this.deviceConnection = deviceConnection;
     this.#communicationType = serializableData.communicationType;
+  }
+
+  static findKeyAgentByCommunicationTypeAndDevicePath(communicationType: CommunicationType, devicePath?: string) {
+    return this.deviceConnections?.find(
+      (connection) => connection.communicationType === communicationType && connection.devicePath === devicePath
+    );
   }
 
   /**
@@ -173,7 +194,13 @@ export class LedgerKeyAgent extends KeyAgentBase {
   static async establishDeviceConnection(
     communicationType: CommunicationType,
     devicePath?: string
+    // eslint-disable-next-line complexity
   ): Promise<LedgerConnection> {
+    const sameConnectionByTypeAndPath = this.findKeyAgentByCommunicationTypeAndDevicePath(
+      communicationType,
+      devicePath
+    );
+    if (sameConnectionByTypeAndPath) return sameConnectionByTypeAndPath.deviceConnection;
     let transport;
     try {
       transport = await LedgerKeyAgent.createTransport({ communicationType, devicePath });
@@ -187,7 +214,13 @@ export class LedgerKeyAgent extends KeyAgentBase {
       if (!isSupportedLedgerModel) {
         throw new errors.TransportError(`Ledger device model: "${transport.deviceModel.id}" is not supported`);
       }
-      return await LedgerKeyAgent.createDeviceConnection(transport);
+      const newConnection = await LedgerKeyAgent.createDeviceConnection(transport);
+      this.deviceConnections.push({
+        communicationType,
+        deviceConnection: newConnection,
+        ...(!!devicePath && { devicePath })
+      });
+      return newConnection;
     } catch (error: any) {
       if (error.innerError.message.includes('cannot open device with path')) {
         throw new errors.TransportError('Connection already established', error);
