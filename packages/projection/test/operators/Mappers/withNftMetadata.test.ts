@@ -1,6 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { Cardano, ChainSyncEventType, ChainSyncRollForward } from '@cardano-sdk/core';
+import { Asset, Cardano, ChainSyncEventType, ChainSyncRollForward, Serialization } from '@cardano-sdk/core';
 import { ChainSyncDataSet, SerializedChainSyncEvent, chainSyncData } from '@cardano-sdk/util-dev';
+import { HexBlob } from '@cardano-sdk/util';
 import { Mappers, ProjectionEvent } from '../../../src';
 import { Observable, firstValueFrom, map, of } from 'rxjs';
 import { dummyLogger } from 'ts-log';
@@ -26,12 +27,17 @@ const removeTxMetadata =
 const isDatumInBlock = (data: Cardano.Block) =>
   data.body.some((item) => item?.body?.outputs?.some((output) => !!output?.datum));
 
-const datumNftmetadata = {
+const datumNftMetadata: Mappers.ProjectedNftMetadata = {
+  extra: Serialization.PlutusData.fromCbor(
+    HexBlob(
+      'a84e7374616e646172645f696d6167655838697066733a2f2f7a6232726861476b726d32675143333636535a626254516d6a446433666a64343466744848344c34547441427970534b6146706f7274616c404864657369676e65724047736f6369616c73404676656e646f72404764656661756c7400536c6173745f7570646174655f616464726573735839003382fe4bf2249a8fb53df0b64aba1c78c95f117a7d57c59d9869b341389caccf78b5f141efbd97de910777674368d8ffedbb3fdc797028384c76616c6964617465645f6279581c4da965a049dfd15ed1ee19fba6e2974a0b79fc416dd1796a1f97f5e1'
+    )
+  ).toCore(),
   nftMetadata: {
     description: undefined,
     files: undefined,
-    image: 'ipfs://zb2rhaGkrm2gQC366SZbbTQmjDd3fjd44ftHH4L4TtABypSKa',
-    mediaType: 'image/jpeg',
+    image: Asset.Uri('ipfs://zb2rhaGkrm2gQC366SZbbTQmjDd3fjd44ftHH4L4TtABypSKa'),
+    mediaType: Asset.ImageMediaType('image/jpeg'),
     name: '$snek69',
     otherProperties: new Map<string, string | bigint>([
       ['og', 0n],
@@ -142,29 +148,6 @@ describe('withNftMetadata', () => {
 
   const stubEvents = chainSyncData(ChainSyncDataSet.WithInlineDatum);
 
-  const someNftMetadata = new Map([
-    [
-      'f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a000de140736e656b3639',
-      {
-        description: undefined,
-        files: undefined,
-        image: 'ipfs://zb2rhaGkrm2gQC366SZbbTQmjDd3fjd44ftHH4L4TtABypSKa',
-        mediaType: 'image/jpeg',
-        name: '$snek69',
-        otherProperties: new Map<string, string | bigint>([
-          ['og', 0n],
-          ['og_number', 0n],
-          ['rarity', 'common'],
-          ['length', 6n],
-          ['characters', 'letters,numbers'],
-          ['numeric_modifiers', ''],
-          ['version', 1n]
-        ]),
-        version: '1'
-      }
-    ]
-  ]);
-
   it('finds cip25 nft metadata', async () => {
     const { nftMetadata } = await firstValueFrom(
       source$.pipe(
@@ -218,8 +201,7 @@ describe('withNftMetadata', () => {
       )
     );
 
-    expect(nftMetadata).toMatchObject(someNftMetadata);
-    expect(nftMetadata).toMatchObject([datumNftmetadata]);
+    expect(nftMetadata).toEqual([datumNftMetadata]);
   });
 
   it('finds updated cip68 nft metadata (asset was not minted in this block)', async () => {
@@ -254,7 +236,7 @@ describe('withNftMetadata', () => {
       )
     );
 
-    expect(nftMetadata).toEqual([datumNftmetadata]);
+    expect(nftMetadata).toEqual([datumNftMetadata]);
   });
 
   it('keeps a single NftMetadata per userTokenAssetId, prioritizing cip68', async () => {
@@ -263,8 +245,8 @@ describe('withNftMetadata', () => {
         event.eventType === ChainSyncEventType.RollForward && isDatumInBlock(event.block)
     ) as ChainSyncRollForward;
 
-    const policyId = Cardano.AssetId.getPolicyId(datumNftmetadata.userTokenAssetId);
-    const assetName = Cardano.AssetId.getAssetName(datumNftmetadata.userTokenAssetId);
+    const policyId = Cardano.AssetId.getPolicyId(datumNftMetadata.userTokenAssetId);
+    const assetName = Cardano.AssetId.getAssetName(datumNftMetadata.userTokenAssetId);
     const testBlockData = {
       block: {
         body: [
@@ -320,6 +302,6 @@ describe('withNftMetadata', () => {
       )
     );
 
-    expect(nftMetadata).toEqual([datumNftmetadata]);
+    expect(nftMetadata).toEqual([datumNftMetadata]);
   });
 });
