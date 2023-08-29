@@ -51,6 +51,12 @@ jobs:
       #   with:
       #     nixbuild_ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
       #     generate_summary_for: job
+
+      - name: Show commit
+        shell: bash
+        run: |
+          echo commit: ${{ github.sha }}
+
       - uses: divnix/std-action/discover@main
         with: {ffBuildInstructions: true}
         id: discovery
@@ -74,6 +80,10 @@ jobs:
           ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
           user_name: ${{ env.DISCOVERY_USER_NAME }}
           ssh_known_hosts_entry: ${{ env.DISCOVERY_KNOWN_HOSTS_ENTRY }}
+      - name: Show commit
+        shell: bash
+        run: |
+          echo commit: ${{ github.sha }}
       - uses: divnix/std-action/run@main
         with: {ffBuildInstructions: true, remoteStore: "ssh-ng://eu.nixbuild.net"}
 
@@ -104,6 +114,10 @@ jobs:
           ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
           user_name: ${{ env.DISCOVERY_USER_NAME }}
           ssh_known_hosts_entry: ${{ env.DISCOVERY_KNOWN_HOSTS_ENTRY }}
+      - name: Show commit
+        shell: bash
+        run: |
+          echo commit: ${{ github.sha }}
       - uses: divnix/std-action/run@main
         with: {ffBuildInstructions: true, remoteStore: "ssh-ng://eu.nixbuild.net"}
 
@@ -144,7 +158,10 @@ jobs:
         run: |
           echo "Assuming role '$(aws sts get-caller-identity)' in cluster 'lace-prod-eu-central-1'."
           aws eks update-kubeconfig --name "lace-prod-eu-central-1"
-
+      - name: Show commit
+        shell: bash
+        run: |
+          echo commit: ${{ github.sha }}
       - uses: divnix/std-action/run@main
         env:
           BRANCH: ${{ github.ref_type == 'branch' && github.head_ref }}
@@ -194,7 +211,10 @@ jobs:
         run: |
           echo "Assuming role '$(aws sts get-caller-identity)' in cluster 'lace-prod-eu-central-1'."
           aws eks update-kubeconfig --name "lace-prod-eu-central-1"
-
+      - name: Show commit
+        shell: bash
+        run: |
+          echo commit: ${{ github.sha }}
       - uses: divnix/std-action/run@main
         with: {ffBuildInstructions: true, remoteStore: "ssh-ng://eu.nixbuild.net"}
       
