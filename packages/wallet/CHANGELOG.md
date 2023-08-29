@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.21.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.21.0...@cardano-sdk/wallet@0.21.1) (2023-08-29)
+
+### Features
+
+* add getPubDRepKey to PersonalWallet ([a482e92](https://github.com/input-output-hk/cardano-js-sdk/commit/a482e92d7500c6b5bd0ef32438d0337649c2bb27))
+* allow extensions for CIP-30 API ([3360757](https://github.com/input-output-hk/cardano-js-sdk/commit/3360757ed1ec4dc0fcd89264341008470bd591cf))
+* **hardware-ledger:** return existing connection if available ([40527d3](https://github.com/input-output-hk/cardano-js-sdk/commit/40527d3b4da3f3c6ae6ad44963dce3048ecd5c0d))
+
 ## [0.21.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.20.1...@cardano-sdk/wallet@0.21.0) (2023-08-21)
 
 ### ⚠ BREAKING CHANGES

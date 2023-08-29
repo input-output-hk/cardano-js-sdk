@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.11.1...@cardano-sdk/tx-construction@0.11.2) (2023-08-29)
+
+### Features
+
+* **tx-construction:** negative or zero asset qty validation ([0440f4f](https://github.com/input-output-hk/cardano-js-sdk/commit/0440f4ffd0db4a6800c4da9959efc9bff1e536c2))
+
+### Bug Fixes
+
+* **tx-construction:** unneeded greedy input selection ([95e9d16](https://github.com/input-output-hk/cardano-js-sdk/commit/95e9d16be125e20c07238c3eb778c09e6795a702))
+
 ## [0.11.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.11.0...@cardano-sdk/tx-construction@0.11.1) (2023-08-21)
 
 **Note:** Version bump only for package @cardano-sdk/tx-construction

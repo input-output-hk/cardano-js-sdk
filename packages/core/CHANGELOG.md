@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.18.0...@cardano-sdk/core@0.19.0) (2023-08-29)
+
+### ⚠ BREAKING CHANGES
+
+* added protocol parameters and updated cost model core type to match CDDL specification
+
+### Features
+
+* added protocol parameters and updated cost model core type to match CDDL specification ([6576eb9](https://github.com/input-output-hk/cardano-js-sdk/commit/6576eb96566e45299da904fdedbe639e85206352))
+* **core:** added protocol parameters update serialization classes ([6440ac3](https://github.com/input-output-hk/cardano-js-sdk/commit/6440ac37a22f9224f521cf6427c022c458719478))
+
+### Bug Fixes
+
+* **core:** cbor reader now properly deseriializes arrays of unsigned 64bit ints ([d666f4e](https://github.com/input-output-hk/cardano-js-sdk/commit/d666f4e8ab254706d1a7b48bfe6e1fc327bc5f0f))
+
 ## [0.18.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.17.0...@cardano-sdk/core@0.18.0) (2023-08-21)
 
 ### ⚠ BREAKING CHANGES
