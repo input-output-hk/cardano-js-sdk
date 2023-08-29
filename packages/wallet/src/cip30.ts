@@ -523,13 +523,20 @@ const baseCip30WalletApi = (
   }
 });
 
-// TODO: implement CIP-95 methods
-const extendedCip95WalletApi = () => ({
+const extendedCip95WalletApi = (wallet$: Observable<ObservableWallet>, { logger }: Cip30WalletDependencies) => ({
+  // TODO: implement getActivePubStakeKeys
   getActivePubStakeKeys: async () => {
     throw new NotImplementedError('getActivePubStakeKeys');
   },
   getPubDRepKey: async () => {
-    throw new NotImplementedError('getPubDRepKey');
+    logger.debug('getting public DRep key');
+    try {
+      const wallet = await firstValueFrom(wallet$);
+      return await wallet.getPubDRepKey();
+    } catch (error) {
+      logger.error(error);
+      throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));
+    }
   }
 });
 
@@ -539,5 +546,5 @@ export const createWalletApi = (
   { logger }: Cip30WalletDependencies
 ): WalletApi => ({
   ...baseCip30WalletApi(wallet$, confirmationCallback, { logger }),
-  ...extendedCip95WalletApi()
+  ...extendedCip95WalletApi(wallet$, { logger })
 });
