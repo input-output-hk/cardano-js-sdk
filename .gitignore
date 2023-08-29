@@ -4,6 +4,7 @@ coverage
 node_modules
 docs
 .env
+.envrc.local
 tsconfig.tsbuildinfo
 lerna-debug.log
 .yarn/*
