@@ -64,7 +64,7 @@ import {
   SyncStatus,
   WalletNetworkInfoProvider
 } from '../types';
-import { AsyncKeyAgent, GroupedAddress, cip8 } from '@cardano-sdk/key-management';
+import { AsyncKeyAgent, GroupedAddress, cip8, util as keyManagementUtil } from '@cardano-sdk/key-management';
 import { BehaviorObservable, TrackerSubject, coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import {
   BehaviorSubject,
@@ -91,6 +91,7 @@ import {
   roundRobinRandomImprove
 } from '@cardano-sdk/input-selection';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
+import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
 import {
   GenericTxBuilder,
   InitializeTxProps,
@@ -700,5 +701,9 @@ export class PersonalWallet implements ObservableWallet {
         switchMap(() => o$)
       )
     );
+  }
+
+  async getPubDRepKey(): Promise<Ed25519PublicKeyHex> {
+    return this.keyAgent.derivePublicKey(keyManagementUtil.DREP_KEY_DERIVATION_PATH);
   }
 }

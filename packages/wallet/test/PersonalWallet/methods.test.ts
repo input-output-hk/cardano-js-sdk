@@ -551,4 +551,9 @@ describe('PersonalWallet methods', () => {
     const response = await wallet.signData({ payload: HexBlob('abc123'), signWith: address });
     expect(response).toHaveProperty('signature');
   });
+
+  it('getPubDRepKey', async () => {
+    const response = await wallet.getPubDRepKey();
+    expect(typeof response).toBe('string');
+  });
 });
