@@ -9,6 +9,7 @@ import {
   createPgBoss,
   isRecoverableTypeormError
 } from '@cardano-sdk/projection-typeorm';
+import { CommonProgramOptions, PosgresProgramOptions } from '../options';
 import { DataSource } from 'typeorm';
 import { HealthCheckResponse } from '@cardano-sdk/core';
 import { HttpService } from '../../Http/HttpService';
@@ -55,11 +56,12 @@ export const createPgBossDataSource = (connectionConfig$: Observable<PgConnectio
     migrationsRun: false
   });
 
-export interface PgBossServiceConfig {
-  parallelJobs: number;
-  queues: PgBossQueue[];
-  stakePoolProviderUrl?: string;
-}
+export type PgBossWorkerArgs = CommonProgramOptions &
+  PosgresProgramOptions<'DbSync'> &
+  PosgresProgramOptions<'StakePool'> & {
+    parallelJobs: number;
+    queues: PgBossQueue[];
+  };
 
 export interface PgBossServiceDependencies {
   connectionConfig$: Observable<PgConnectionConfig>;
@@ -68,13 +70,13 @@ export interface PgBossServiceDependencies {
 }
 
 export class PgBossHttpService extends HttpService {
-  #config: PgBossServiceConfig;
+  #config: PgBossWorkerArgs;
   #dataSource$: Observable<DataSource>;
   #db: Pool;
   #subscription?: Subscription;
   #health: HealthCheckResponse = { ok: false, reason: 'PgBossHttpService not started' };
 
-  constructor(cfg: PgBossServiceConfig, deps: PgBossServiceDependencies) {
+  constructor(cfg: PgBossWorkerArgs, deps: PgBossServiceDependencies) {
     const { connectionConfig$, db, logger } = deps;
 
     super('pg-boss-service', { healthCheck: async () => this.#health }, Router(), __dirname, logger);
@@ -150,7 +152,7 @@ export class PgBossHttpService extends HttpService {
       dataSource,
       db,
       logger,
-      stakePoolProviderUrl: this.#config.stakePoolProviderUrl!
+      ...this.#config
     });
 
     return new Observable((subscriber) => {

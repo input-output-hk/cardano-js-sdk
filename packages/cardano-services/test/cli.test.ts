@@ -2586,7 +2586,6 @@ describe('CLI', () => {
     });
 
     it('exits with code 1 with metrics queue and without a stake pool provider url', (done) => {
-      expect.assertions(2);
       proc = withLogging(
         fork(
           exePath,
@@ -2603,12 +2602,14 @@ describe('CLI', () => {
         ),
         true
       );
-      proc.stderr!.on('data', (data) =>
-        expect(data.toString()).toMatch(
-          'MissingProgramOption: pool-metrics requires the stake-pool provider URL program option'
-        )
-      );
+
+      const chunks: string[] = [];
+
+      proc.stdout!.on('data', (data: Buffer) => chunks.push(data.toString()));
       proc.on('exit', (code) => {
+        expect(chunks.join('')).toMatch(
+          'MissingProgramOption: pool-metrics requires the stake-pool provider URL program option'
+        );
         expect(code).toBe(1);
         done();
       });

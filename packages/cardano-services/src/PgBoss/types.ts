@@ -1,5 +1,6 @@
 import { DataSource } from 'typeorm';
 import { Logger } from 'ts-log';
+import { PgBossWorkerArgs } from '../Program/services/pgboss';
 import { Pool } from 'pg';
 import { STAKE_POOL_METADATA_QUEUE, STAKE_POOL_METRICS_UPDATE } from '@cardano-sdk/projection-typeorm';
 
@@ -7,12 +8,11 @@ export const workerQueues = [STAKE_POOL_METADATA_QUEUE, STAKE_POOL_METRICS_UPDAT
 
 export type PgBossQueue = typeof workerQueues[number];
 
-export interface WorkerHandlerFactoryOptions {
+export type WorkerHandlerFactoryOptions = {
   dataSource: DataSource;
   db: Pool;
   logger: Logger;
-  stakePoolProviderUrl: string;
-}
+} & PgBossWorkerArgs;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type WorkerHandler = (data: any) => Promise<void>;

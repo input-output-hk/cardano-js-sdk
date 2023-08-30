@@ -1,15 +1,8 @@
-import {
-  CommonProgramOptions,
-  PosgresProgramOptions,
-  PostgresOptionDescriptions,
-  throwMissingMissingProviderUrlOption
-} from '../options';
 import { HttpServer } from '../../Http/HttpServer';
 import { Logger } from 'ts-log';
 import { MissingProgramOption } from '../errors';
-import { PgBossHttpService, PgBossServiceConfig, PgBossServiceDependencies } from '../services/pgboss';
-import { STAKE_POOL_METRICS_UPDATE } from '@cardano-sdk/projection-typeorm';
-import { ServiceNames } from './types';
+import { PgBossHttpService, PgBossServiceDependencies, PgBossWorkerArgs } from '../services/pgboss';
+import { PostgresOptionDescriptions } from '../options';
 import { SrvRecord } from 'dns';
 import { createDnsResolver } from '../utils';
 import { createLogger } from 'bunyan';
@@ -24,11 +17,6 @@ export enum PgBossWorkerOptionDescriptions {
   Queues = 'Comma separated queue names'
 }
 
-export type PgBossWorkerArgs = CommonProgramOptions &
-  PosgresProgramOptions<'DbSync'> &
-  PosgresProgramOptions<'StakePool'> &
-  PgBossServiceConfig;
-
 export interface LoadPgBossWorkerDependencies {
   dnsResolver?: (serviceName: string) => Promise<SrvRecord>;
   logger?: Logger;
@@ -36,12 +24,8 @@ export interface LoadPgBossWorkerDependencies {
 
 const pgBossWorker = 'pg-boss-worker';
 
-export interface PgBossWorkerConfig extends PgBossServiceConfig {
-  apiUrl: URL;
-}
-
 export class PgBossWorkerHttpServer extends HttpServer {
-  constructor(cfg: PgBossWorkerConfig, deps: PgBossServiceDependencies) {
+  constructor(cfg: PgBossWorkerArgs, deps: PgBossServiceDependencies) {
     const { apiUrl } = cfg;
     const { logger } = deps;
     const pgBossService = new PgBossHttpService(cfg, deps);
@@ -65,9 +49,6 @@ export const loadPgBossWorker = async (args: PgBossWorkerArgs, deps: LoadPgBossW
   const db = await getPool(dnsResolver, logger, args);
 
   if (!db) throw new MissingProgramOption(pgBossWorker, PostgresOptionDescriptions.ConnectionString);
-
-  if (args.queues.includes(STAKE_POOL_METRICS_UPDATE) && !args.stakePoolProviderUrl)
-    throwMissingMissingProviderUrlOption(STAKE_POOL_METRICS_UPDATE, ServiceNames.StakePool);
 
   return new PgBossWorkerHttpServer(args, { connectionConfig$, db, logger });
 };

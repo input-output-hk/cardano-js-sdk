@@ -114,6 +114,5 @@ export const withCommonOptions = (command: Command, defaults: { apiUrl: URL }) =
   return command;
 };
 
-export const throwMissingMissingProviderUrlOption = (service: string, provider: ServiceNames) => {
-  throw new MissingProgramOption(service, `${provider} provider URL`);
-};
+export const missingProviderUrlOption = (service: string, provider: ServiceNames) =>
+  new MissingProgramOption(service, `${provider} provider URL`);

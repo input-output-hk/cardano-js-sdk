@@ -60,11 +60,11 @@ import { HttpServer } from './Http';
 import {
   PARALLEL_JOBS_DEFAULT,
   PG_BOSS_WORKER_API_URL_DEFAULT,
-  PgBossWorkerArgs,
   PgBossWorkerOptionDescriptions,
   loadPgBossWorker
 } from './Program/programs/pgBossWorker';
 import { PgBossQueue, isValidQueue } from './PgBoss';
+import { PgBossWorkerArgs } from './Program/services/pgboss';
 import { ProjectionName } from './Projection';
 import { URL } from 'url';
 import { dbCacheValidator } from './util/validators';
