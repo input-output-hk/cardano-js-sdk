@@ -184,7 +184,10 @@ jobs:
       name: dev-preview
       url: https://backend.dev-preview.eks.lw.iog.io
     # Boolean input should be compared with string until https://github.com/actions/runner/issues/2238 resolved
-    if: fromJSON(needs.discover.outputs.hits).deployments.apply != '{}' && github.event.pull_request.merged == 'true'
+    if: >
+      fromJSON(needs.discover.outputs.hits).deployments.apply != '{}'
+      && github.event_name == 'push'
+      && github.ref == 'refs/heads/master'
     strategy:
       matrix:
         target: ${{ fromJSON(needs.discover.outputs.hits).deployments.apply }}
