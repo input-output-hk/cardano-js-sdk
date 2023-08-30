@@ -486,11 +486,6 @@ withCommonOptions(
       .argParser((parallelJobs) => Number.parseInt(parallelJobs, 10))
   )
   .addOption(
-    new Option('--stake-pool-provider-url <stakePoolProviderUrl>', PgBossWorkerOptionDescriptions.StakePoolProviderUrl)
-      .env('STAKE_POOL_PROVIDER_URL')
-      .argParser((url) => new URL(url).toString())
-  )
-  .addOption(
     new Option('--queues <queues>', PgBossWorkerOptionDescriptions.Queues)
       .env('QUEUES')
       .argParser((queues) => {

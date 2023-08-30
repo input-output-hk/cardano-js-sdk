@@ -2605,7 +2605,7 @@ describe('CLI', () => {
       );
       proc.stderr!.on('data', (data) =>
         expect(data.toString()).toMatch(
-          'MissingProgramOption: pool-metrics requires the Stake pool provider URL program option'
+          'MissingProgramOption: pool-metrics requires the stake-pool provider URL program option'
         )
       );
       proc.on('exit', (code) => {

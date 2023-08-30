@@ -1,7 +1,8 @@
 import { Command, Option } from 'commander';
 import { InvalidLoggerLevel } from '../../errors';
 import { LogLevel } from 'bunyan';
-import { Programs } from '../programs/types';
+import { MissingProgramOption } from '../errors';
+import { Programs, ServiceNames } from '../programs/types';
 import {
   SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT,
   SERVICE_DISCOVERY_TIMEOUT_DEFAULT,
@@ -26,16 +27,16 @@ export enum CommonOptionDescriptions {
   ServiceDiscoveryTimeout = 'Timeout for service discovery attempts'
 }
 
-export interface CommonProgramOptions {
+export type CommonProgramOptions = {
   apiUrl: URL;
   buildInfo?: ServiceBuildInfo;
   enableMetrics?: boolean;
   loggerMinSeverity?: LogLevel;
   serviceDiscoveryBackoffFactor?: number;
   serviceDiscoveryTimeout?: number;
-}
+} & { [k in keyof typeof ServiceNames as `${Uncapitalize<k>}ProviderUrl`]?: string };
 
-export const withCommonOptions = (command: Command, defaults: { apiUrl: URL }) =>
+export const withCommonOptions = (command: Command, defaults: { apiUrl: URL }) => {
   command
     .addOption(
       new Option('--api-url <apiUrl>', CommonOptionDescriptions.ApiUrl)
@@ -93,3 +94,26 @@ export const withCommonOptions = (command: Command, defaults: { apiUrl: URL }) =
         .default(SERVICE_DISCOVERY_TIMEOUT_DEFAULT)
         .argParser((interval) => Number.parseInt(interval, 10))
     );
+
+  let service: keyof typeof ServiceNames;
+  for (service in ServiceNames) {
+    const cliService = service.replace(/[A-Z]/g, (_) => `-${_.toLowerCase()}`);
+    const envService = service
+      .replace(/[A-Z]/g, (_) => `_${_}`)
+      .replace(/[a-z]/g, (_) => _.toUpperCase())
+      .slice(1);
+    const typService = service.charAt(0).toLowerCase() + service.slice(1);
+
+    command.addOption(
+      new Option(`-${cliService}-provider-url <${typService}ProviderUrl>`, `${service} provider URL`)
+        .env(`${envService}_PROVIDER_URL`)
+        .argParser((url) => new URL(url).toString())
+    );
+  }
+
+  return command;
+};
+
+export const throwMissingMissingProviderUrlOption = (service: string, provider: ServiceNames) => {
+  throw new MissingProgramOption(service, `${provider} provider URL`);
+};
