@@ -131,7 +131,7 @@ jobs:
       id-token: write
       contents: read
       pull-requests: write
-    if: fromJSON(needs.discover.outputs.hits).deployments.diff != '{}'
+    if: fromJSON(needs.discover.outputs.hits).deployments.diff != '{}' && github.event_name == 'pull_request'
     strategy:
       matrix:
         target: ${{ fromJSON(needs.discover.outputs.hits).deployments.diff }}
@@ -172,7 +172,7 @@ jobs:
 
   deploy-to-eu:
     <<: *job
-    needs: [discover, diff-to-eu]
+    needs: [discover, images]
     name: ${{ matrix.target.jobName }} (eu-central-1)
     env:
       AWS_REGION: eu-central-1
@@ -184,7 +184,10 @@ jobs:
       name: dev-preview
       url: https://backend.dev-preview.eks.lw.iog.io
     # Boolean input should be compared with string until https://github.com/actions/runner/issues/2238 resolved
-    if: fromJSON(needs.discover.outputs.hits).deployments.apply != '{}' && github.event.pull_request.merged == 'true'
+    if: >
+      fromJSON(needs.discover.outputs.hits).deployments.apply != '{}'
+      && github.event_name == 'push'
+      && github.ref == 'refs/heads/master'
     strategy:
       matrix:
         target: ${{ fromJSON(needs.discover.outputs.hits).deployments.apply }}
