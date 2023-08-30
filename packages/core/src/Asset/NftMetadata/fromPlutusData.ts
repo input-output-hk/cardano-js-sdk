@@ -1,7 +1,6 @@
 import { Cardano } from '../..';
 import { ImageMediaType, MediaType, NftMetadata, NftMetadataFile, Uri } from './types';
 import { Logger } from 'ts-log';
-import { TextDecoder } from 'web-encoding';
 import { asString } from './util';
 import { contextLogger, isNotNil } from '@cardano-sdk/util';
 import {
@@ -9,34 +8,9 @@ import {
   isPlutusBigInt,
   isPlutusBoundedBytes,
   isPlutusList,
-  isPlutusMap
+  isPlutusMap,
+  tryConvertPlutusMapToUtf8Record
 } from '../../Cardano/util';
-
-const utf8Decoder = new TextDecoder('utf8', { fatal: true });
-const tryConvertPlutusDataToUtf8String = (data: Cardano.PlutusData): Cardano.PlutusData | string => {
-  if (!isPlutusBoundedBytes(data)) return data;
-  try {
-    return utf8Decoder.decode(data);
-  } catch {
-    return data;
-  }
-};
-
-const tryConvertPlutusMapToUtf8Record = (
-  map: Cardano.PlutusMap,
-  logger: Logger
-): Partial<Record<string, string | Cardano.PlutusData>> => {
-  const record: Partial<Record<string, string | Cardano.PlutusData>> = {};
-  for (const [key, value] of map.data.entries()) {
-    const keyAsStr = tryConvertPlutusDataToUtf8String(key);
-    if (typeof keyAsStr !== 'string') {
-      logger.warn('Failed to decode plutus map key', key);
-      continue;
-    }
-    record[keyAsStr] = tryConvertPlutusDataToUtf8String(value);
-  }
-  return record;
-};
 
 const tryCoerce = <T>(
   value: string | Cardano.PlutusData | undefined,
