@@ -119,7 +119,7 @@ jobs:
       id-token: write
       contents: read
       pull-requests: write
-    if: fromJSON(needs.discover.outputs.hits).deployments.diff != '{}'
+    if: fromJSON(needs.discover.outputs.hits).deployments.diff != '{}' && github.event_name == 'pull_request'
     strategy:
       matrix:
         target: ${{ fromJSON(needs.discover.outputs.hits).deployments.diff }}
@@ -156,7 +156,7 @@ jobs:
         with: {ffBuildInstructions: true, remoteStore: "ssh-ng://eu.nixbuild.net"}
   deploy-to-eu:
     runs-on: ubuntu-latest
-    needs: [discover, diff-to-eu]
+    needs: [discover, images]
     name: ${{ matrix.target.jobName }} (eu-central-1)
     env:
       AWS_REGION: eu-central-1
