@@ -2,7 +2,7 @@ import { Asset, Cardano, Handle } from '@cardano-sdk/core';
 import { CIP67Asset, CIP67Assets, WithCIP67 } from './withCIP67';
 import { CustomError } from 'ts-custom-error';
 import { FilterByPolicyIds } from './types';
-import { Logger, dummyLogger } from 'ts-log';
+import { Logger } from 'ts-log';
 import { ProjectionOperator } from '../../types';
 import { map } from 'rxjs';
 
@@ -118,7 +118,7 @@ const getBurnedHandles = (
 export const withHandles =
   <PropsIn extends WithCIP67>(
     { policyIds }: FilterByPolicyIds,
-    logger: Logger = dummyLogger
+    logger: Logger
   ): ProjectionOperator<PropsIn, WithHandles> =>
   (evt$) =>
     evt$.pipe(

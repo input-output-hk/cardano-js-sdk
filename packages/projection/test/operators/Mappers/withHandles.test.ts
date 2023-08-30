@@ -3,7 +3,7 @@ import { Buffer } from 'buffer';
 import { HexBlob } from '@cardano-sdk/util';
 import { Mappers, ProjectionEvent } from '../../../src';
 import { firstValueFrom, of } from 'rxjs';
-import { mockProviders } from '@cardano-sdk/util-dev';
+import { logger, mockProviders } from '@cardano-sdk/util-dev';
 import { withCIP67, withHandles, withUtxo } from '../../../src/operators/Mappers';
 
 type In = Mappers.WithMint & Mappers.WithCIP67 & Mappers.WithNftMetadata;
@@ -95,7 +95,7 @@ describe('withHandles', () => {
       block: { body: [{ body: { outputs: outputsWithDatum } }] },
       cip67: { byAssetId: {}, byLabel: {} }
     } as ProjectionEvent<In>);
-    const { handles } = await firstValueFrom(validTxSource$.pipe(withHandles({ policyIds: [handlePolicyId] })));
+    const { handles } = await firstValueFrom(validTxSource$.pipe(withHandles({ policyIds: [handlePolicyId] }, logger)));
 
     expect(handles[0].datum).toEqual(datum);
   });
@@ -105,7 +105,7 @@ describe('withHandles', () => {
       block: { body: [{ body: { mint: new Map([[assetIdFromHandle('bob'), -1n]]), outputs: [] as Cardano.TxOut[] } }] },
       cip67: { byAssetId: {}, byLabel: {} }
     } as ProjectionEvent<In>);
-    const { handles } = await firstValueFrom(validTxSource$.pipe(withHandles({ policyIds: [handlePolicyId] })));
+    const { handles } = await firstValueFrom(validTxSource$.pipe(withHandles({ policyIds: [handlePolicyId] }, logger)));
     expect(handles.length).toBe(1);
     expect(handles[0].latestOwnerAddress).toBeNull();
   });
@@ -129,7 +129,7 @@ describe('withHandles', () => {
       cip67: { byAssetId: {}, byLabel: {} }
     } as ProjectionEvent<In>);
 
-    const { handles } = await firstValueFrom(validTxSource$.pipe(withHandles({ policyIds: [handlePolicyId] })));
+    const { handles } = await firstValueFrom(validTxSource$.pipe(withHandles({ policyIds: [handlePolicyId] }, logger)));
 
     expect(handles).toEqual(
       expect.arrayContaining([
@@ -175,7 +175,7 @@ describe('withHandles', () => {
         } as Cardano.Block,
         cip67: { byAssetId: {}, byLabel: {} }
       } as ProjectionEvent<In>;
-      const { handles } = await firstValueFrom(of(evt).pipe(withHandles({ policyIds: [handlePolicyId] })));
+      const { handles } = await firstValueFrom(of(evt).pipe(withHandles({ policyIds: [handlePolicyId] }, logger)));
       expect(handles.length).toBe(1);
       expect(handles[0].latestOwnerAddress).toBe(bobAddress);
     });
@@ -201,7 +201,7 @@ describe('withHandles', () => {
         } as Cardano.Block,
         cip67: { byAssetId: {}, byLabel: {} }
       } as ProjectionEvent<In>;
-      const { handles } = await firstValueFrom(of(evt).pipe(withHandles({ policyIds: [handlePolicyId] })));
+      const { handles } = await firstValueFrom(of(evt).pipe(withHandles({ policyIds: [handlePolicyId] }, logger)));
       expect(handles.length).toBe(1);
       expect(handles[0].latestOwnerAddress).toBe(null);
     });
@@ -243,7 +243,9 @@ describe('withHandles', () => {
         cip67: { byAssetId: {}, byLabel: {} }
       } as ProjectionEvent<In>);
 
-      const { handles } = await firstValueFrom(validTxSource$.pipe(withHandles({ policyIds: [handlePolicyId] })));
+      const { handles } = await firstValueFrom(
+        validTxSource$.pipe(withHandles({ policyIds: [handlePolicyId] }, logger))
+      );
 
       expect(handles.length).toBe(0);
     });
@@ -262,7 +264,9 @@ describe('withHandles', () => {
         cip67: { byAssetId: {}, byLabel: {} }
       } as ProjectionEvent<In>);
 
-      const { handles } = await firstValueFrom(validTxSource$.pipe(withHandles({ policyIds: [handlePolicyId] })));
+      const { handles } = await firstValueFrom(
+        validTxSource$.pipe(withHandles({ policyIds: [handlePolicyId] }, logger))
+      );
 
       expect(handles.length).toBe(1);
     });
@@ -286,7 +290,9 @@ describe('withHandles', () => {
         cip67: { byAssetId: {}, byLabel: {} }
       } as ProjectionEvent<In>);
 
-      const { handles } = await firstValueFrom(validTxSource$.pipe(withHandles({ policyIds: [handlePolicyId] })));
+      const { handles } = await firstValueFrom(
+        validTxSource$.pipe(withHandles({ policyIds: [handlePolicyId] }, logger))
+      );
 
       expect(handles.length).toBe(2);
     });
@@ -301,7 +307,7 @@ describe('withHandles', () => {
             body: [tx],
             header: mockProviders.ledgerTip
           }
-        } as ProjectionEvent).pipe(withUtxo(), withCIP67(), withHandles({ policyIds: [handlePolicyId] }))
+        } as ProjectionEvent).pipe(withUtxo(), withCIP67(), withHandles({ policyIds: [handlePolicyId] }, logger))
       );
 
     describe('cip68', () => {

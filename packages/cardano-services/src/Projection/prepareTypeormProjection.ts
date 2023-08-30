@@ -66,7 +66,7 @@ const createMapperOperators = (
   const filterMint = applyUtxoAndMintFilters
     ? Mapper.filterMintByPolicyIds({ policyIds: handlePolicyIds })
     : passthrough();
-  const withHandles = handlePolicyIds ? Mapper.withHandles({ policyIds: handlePolicyIds }) : passthrough();
+  const withHandles = handlePolicyIds ? Mapper.withHandles({ policyIds: handlePolicyIds }, logger) : passthrough();
   return {
     filterMint,
     filterUtxo,

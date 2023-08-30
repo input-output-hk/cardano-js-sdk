@@ -61,7 +61,7 @@ describe('storeHandles', () => {
       Mappers.filterProducedUtxoByAssetPolicyId({ policyIds }),
       Mappers.filterMintByPolicyIds({ policyIds }),
       Mappers.withCIP67(),
-      Mappers.withHandles({ policyIds }),
+      Mappers.withHandles({ policyIds }, logger),
       storeData,
       requestNext()
     );
