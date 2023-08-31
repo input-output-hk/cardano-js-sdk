@@ -56,6 +56,7 @@ const name = 'Test Wallet';
 const address = mocks.utxo[0][0].address!;
 const rewardAccount = mocks.rewardAccount;
 
+const bip32Ed25519 = new Crypto.CmlBip32Ed25519(CML);
 interface Providers {
   rewardsProvider: RewardsProvider;
   utxoProvider: UtxoProvider;
@@ -97,7 +98,7 @@ type CreateWalletProps = {
 
 const createWallet = async (props: CreateWalletProps) => {
   const { wallet } = await setupWallet({
-    bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
+    bip32Ed25519,
     createKeyAgent: async (dependencies) => {
       const groupedAddress: GroupedAddress = {
         accountIndex: 0,
@@ -243,6 +244,10 @@ const assertWalletProperties2 = async (wallet: ObservableWallet) => {
   const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);
   expect(rewardAccounts).toHaveLength(1);
   expect(rewardAccounts[0].rewardBalance).toBe(mocks.rewardAccountBalance2);
+
+  // activePublicStakeKeys
+  const x = await firstValueFrom(wallet.activePublicStakeKeys$);
+  expect(x.length).toBe(1); // not testing the actual value because the key agent grouped addresses is mocked
 };
 
 /**
