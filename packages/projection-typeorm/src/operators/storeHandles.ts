@@ -107,12 +107,8 @@ export const storeHandles = typeormOperator<Mappers.WithHandles & Mappers.WithMi
       queryRunner
     };
 
-    try {
-      eventType === ChainSyncEventType.RollForward
-        ? await rollForward(handleEventParams)
-        : await rollBackward(handleEventParams);
-    } catch (error) {
-      throw new Error((error as Error).message);
-    }
+    eventType === ChainSyncEventType.RollForward
+      ? await rollForward(handleEventParams)
+      : await rollBackward(handleEventParams);
   }
 );
