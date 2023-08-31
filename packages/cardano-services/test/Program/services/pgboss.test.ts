@@ -23,7 +23,7 @@ const testPromises: Promise<void>[] = [];
 const testResolvers: (() => void)[] = [];
 let callCounter = 0;
 
-for (let i = 0; i < 3; ++i) {
+for (let i = 0; i < 4; ++i) {
   handlerPromises.push(new Promise<void>((resolve) => handlerResolvers.push(resolve)));
   testPromises.push(new Promise<void>((resolve) => testResolvers.push(resolve)));
 }
@@ -38,15 +38,24 @@ jest.mock('../../../src/PgBoss/stakePoolMetadataHandler', () => ({
     setTimeout(testResolvers[callCounter], 100);
 
     logger.info('stakePoolMetadataHandler', callCounter);
+    let err: Error;
     switch (callCounter++) {
       case 0:
         // On first attempt, throw an error to check PgBossHttpService (pg-boss) retries it
         throw new Error('test');
       case 1:
-        // On second attempt, throw a 'mocked DB error' error to check PgBossHttpService reconnect to the DB
+        // On second attempt, throw a 'mocked DB error' simulating a recoverable typeORM error
+        // to check PgBossHttpService reconnect to the DB
         throw new Error('retry');
       case 2:
-        // On third attempt, just finish with success
+        // On third attempt, throw an error simulating the pgboss locked state
+        // to check PgBossHttpService reconnect to the DB
+        err = new Error('test');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (err as any).driverError = new Error('invalid message format');
+        throw err;
+      case 3:
+        // On forth attempt, just finish with success
         break;
     }
   }
@@ -179,10 +188,31 @@ describe('PgBossHttpService', () => {
 
     expect(await collectStatus()).toEqual({ calls: 2, health: { ok: true }, subscriptions: 2 });
 
-    // Let the handler to complete with success
+    // Prepare the DB configuration observable to wait for the command in order to provide a new connection config
+    observablePromise = new Promise<void>((resolve) => (observableResolver = resolve));
+
+    // Let the handler to throw an error simulating pgboss locked state which should cause a DB reconnection
     handlerResolvers[2]();
     await testPromises[2];
 
-    expect(await collectStatus()).toEqual({ calls: 3, health: { ok: true }, subscriptions: 2 });
+    expect(await collectStatus()).toEqual({
+      calls: 3,
+      health: { ok: false, reason: 'DataBase error: reconnecting...' },
+      subscriptions: 3
+    });
+
+    // Emit a new DB configuration to make PgBossHttpService reconnect
+    observableResolver();
+
+    // Wait until PgBossHttpService reconnected
+    while (!(await service?.healthCheck())?.ok) await new Promise((resolve) => setTimeout(resolve, 5));
+
+    expect(await collectStatus()).toEqual({ calls: 3, health: { ok: true }, subscriptions: 3 });
+
+    // Let the handler to complete with success
+    handlerResolvers[3]();
+    await testPromises[3];
+
+    expect(await collectStatus()).toEqual({ calls: 4, health: { ok: true }, subscriptions: 3 });
   });
 });
