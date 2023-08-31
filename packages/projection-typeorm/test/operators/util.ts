@@ -67,9 +67,13 @@ export const createStubRollForwardEvent = (
   tip: blockHeader
 });
 
+/**
+ * @param evt event to rollback
+ * @param rollbackPoint tip is set to a random block at height 1 if not specified
+ */
 export const createRollBackwardEventFor = (
   evt: BaseProjectionEvent,
-  rollbackPoint: Point
+  rollbackPoint: Point = createStubBlockHeader(Cardano.BlockNo(1))
 ): Omit<RollBackwardEvent<BootstrapExtraProps & WithBlock>, 'requestNext'> => ({
   ...evt,
   eventType: ChainSyncEventType.RollBackward,
