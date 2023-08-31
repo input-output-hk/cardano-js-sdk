@@ -1,9 +1,9 @@
 import { Asset, Cardano, Handle } from '@cardano-sdk/core';
 import { CIP67Asset, CIP67Assets, WithCIP67 } from './withCIP67';
-import { CustomError } from 'ts-custom-error';
 import { FilterByPolicyIds } from './types';
 import { Logger } from 'ts-log';
 import { ProjectionOperator } from '../../types';
+import { assetNameToUTF8Handle } from './util';
 import { map } from 'rxjs';
 
 export interface HandleOwnership {
@@ -25,24 +25,10 @@ export interface WithHandles {
   handles: HandleOwnership[];
 }
 
-const getUtf8AssetName = (assetName: Cardano.AssetName) => Buffer.from(assetName, 'hex').toString('utf8');
-
-class HandleParsingError extends CustomError {
-  public constructor(handle: string, message = 'Invalid handle') {
-    super(`${message}: ${handle}`);
-  }
-}
-
-const assetNameToUTF8Handle = (assetName: Cardano.AssetName): Handle => {
-  const handle = getUtf8AssetName(assetName);
-  if (!Asset.util.isValidHandle(handle)) throw new HandleParsingError(handle);
-  return handle;
-};
-
 const assetIdToUTF8Handle = (assetId: Cardano.AssetId, cip67Asset: CIP67Asset | undefined) => {
   if (cip67Asset) {
     if (cip67Asset.decoded.label === Asset.AssetNameLabelNum.UserNFT) {
-      return getUtf8AssetName(cip67Asset.decoded.content);
+      return Cardano.AssetName.toUTF8(cip67Asset.decoded.content);
     }
     // Ignore all but UserNFT cip67 assets
     return null;

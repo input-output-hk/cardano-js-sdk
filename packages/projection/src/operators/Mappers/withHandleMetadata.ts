@@ -1,11 +1,11 @@
 import { Asset, Cardano, Handle } from '@cardano-sdk/core';
 import { CIP67Assets, WithCIP67 } from './withCIP67';
-import { CustomError } from 'ts-custom-error';
 import { FilterByPolicyIds } from './types';
 import { Logger } from 'ts-log';
 import { ProducedUtxo } from './withUtxo';
 import { ProjectedNftMetadata, WithNftMetadata } from './withNftMetadata';
 import { ProjectionOperator } from '../../types';
+import { assetNameToUTF8Handle } from './util';
 import { isNotNil } from '@cardano-sdk/util';
 import { map } from 'rxjs';
 
@@ -26,8 +26,6 @@ export interface HandleMetadata extends PersonalizedProperties {
 export interface WithHandleMetadata {
   handleMetadata: HandleMetadata[];
 }
-
-const getUtf8AssetName = (assetName: Cardano.AssetName) => Buffer.from(assetName, 'hex').toString('utf8');
 
 const isOgHandle = (metadata: Asset.NftMetadata | undefined) => {
   if (!metadata) return false;
@@ -64,18 +62,6 @@ const getPersonalizedProperties = (
     backgroundImage: toUri(asRecord.bg_image, logger),
     profilePicImage: toUri(asRecord.pfp_image, logger)
   };
-};
-
-class HandleParsingError extends CustomError {
-  public constructor(handle: string, message = 'Invalid handle') {
-    super(`${message}: ${handle}`);
-  }
-}
-
-const assetNameToUTF8Handle = (assetName: Cardano.AssetName): Handle => {
-  const handle = getUtf8AssetName(assetName);
-  if (!Asset.util.isValidHandle(handle)) throw new HandleParsingError(handle);
-  return handle;
 };
 
 const getHandleMetadata = (
