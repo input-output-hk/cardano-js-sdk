@@ -1,6 +1,11 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { Asset, Cardano, ChainSyncEventType, ChainSyncRollForward, Serialization } from '@cardano-sdk/core';
-import { ChainSyncDataSet, SerializedChainSyncEvent, chainSyncData } from '@cardano-sdk/util-dev';
+import { Asset, Cardano, ChainSyncEventType, ChainSyncRollForward, Serialization, util } from '@cardano-sdk/core';
+import {
+  ChainSyncDataSet,
+  SerializedChainSyncEvent,
+  chainSyncData,
+  generateRandomHexString
+} from '@cardano-sdk/util-dev';
 import { HexBlob } from '@cardano-sdk/util';
 import { Mappers, ProjectionEvent } from '../../../src';
 import { Observable, firstValueFrom, map, of } from 'rxjs';
@@ -23,6 +28,24 @@ const removeTxMetadata =
         }
       }))
     );
+
+const createNftMetadataDatum = (
+  nftMetadata: Pick<Asset.NftMetadata, 'version' | 'name' | 'image'>
+): Cardano.ConstrPlutusData => ({
+  constructor: 0n,
+  fields: {
+    items: [
+      {
+        data: new Map<Cardano.PlutusData, Cardano.PlutusData>([
+          [util.utf8ToBytes('name'), util.utf8ToBytes(nftMetadata.name)],
+          [util.utf8ToBytes('image'), util.utf8ToBytes(nftMetadata.image)]
+        ])
+      },
+      BigInt(nftMetadata.version),
+      { constructor: 0n, items: [] }
+    ]
+  }
+});
 
 const isDatumInBlock = (data: Cardano.Block) =>
   data.body.some((item) => item?.body?.outputs?.some((output) => !!output?.datum));
@@ -178,8 +201,8 @@ describe('withNftMetadata', () => {
     };
 
     expect(nftMetadata).toMatchObject([
-      { nftMetadata: result1, userTokenAssetId: assetId1 },
-      { nftMetadata: result2, userTokenAssetId: assetId2 }
+      { nftMetadata: result2, userTokenAssetId: assetId2 },
+      { nftMetadata: result1, userTokenAssetId: assetId1 }
     ]);
   });
 
@@ -239,14 +262,29 @@ describe('withNftMetadata', () => {
     expect(nftMetadata).toEqual([datumNftMetadata]);
   });
 
-  it('keeps a single NftMetadata per userTokenAssetId, prioritizing cip68', async () => {
+  it('keeps a single NftMetadata per userTokenAssetId, prioritizing last cip68 output', async () => {
     const testBlock = stubEvents.allEvents.find(
       (event: SerializedChainSyncEvent) =>
         event.eventType === ChainSyncEventType.RollForward && isDatumInBlock(event.block)
     ) as ChainSyncRollForward;
-
+    const referenceTokenAssetId = Cardano.AssetId(
+      'f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a000643b0736e656b3639'
+    );
+    const userTokenAssetId = Cardano.AssetId(
+      'f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a000de140736e656b3639'
+    );
+    const referenceTokenOutput = testBlock.block.body[0].body.outputs.find((output) =>
+      output.value.assets?.has(referenceTokenAssetId)
+    );
+    const secondNftMetadata: Asset.NftMetadata = {
+      image: Asset.Uri('https://image.com'),
+      name: 'NFT',
+      version: '1'
+    };
+    const secondNftMetadataDatum = createNftMetadataDatum(secondNftMetadata);
     const policyId = Cardano.AssetId.getPolicyId(datumNftMetadata.userTokenAssetId);
     const assetName = Cardano.AssetId.getAssetName(datumNftMetadata.userTokenAssetId);
+    const secondTxId = Cardano.TransactionId(generateRandomHexString(64));
     const testBlockData = {
       block: {
         body: [
@@ -276,13 +314,24 @@ describe('withNftMetadata', () => {
             body: {
               inputs: [] as Cardano.TxIn[],
               mint: new Map([
-                // cip68 reference token
-                ['f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a000643b0736e656b3639', 1n],
-                // cip68 user token
-                ['f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a000de140736e656b3639', 1n]
+                [referenceTokenAssetId, 1n],
+                [userTokenAssetId, 1n]
               ]),
               outputs: testBlock.block.body[0].body.outputs
             },
+            inputSource: Cardano.InputSource.inputs
+          },
+          {
+            body: {
+              inputs: [] as Cardano.TxIn[],
+              outputs: [
+                {
+                  ...referenceTokenOutput,
+                  datum: secondNftMetadataDatum
+                }
+              ]
+            },
+            id: secondTxId,
             inputSource: Cardano.InputSource.inputs
           }
         ],
@@ -302,6 +351,6 @@ describe('withNftMetadata', () => {
       )
     );
 
-    expect(nftMetadata).toEqual([datumNftMetadata]);
+    expect(nftMetadata).toMatchObject([{ nftMetadata: secondNftMetadata }]);
   });
 });
