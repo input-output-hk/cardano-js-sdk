@@ -1,4 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
+import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
 
 /**
@@ -159,7 +160,7 @@ export type SignData = (addr: Cardano.PaymentAddress | Bytes, payload: Bytes) =>
  */
 export type SubmitTx = (tx: Cbor) => Promise<string>;
 
-export interface WalletApi {
+export interface Cip30WalletApi {
   getNetworkId: GetNetworkId;
 
   getUtxos: GetUtxos;
@@ -183,4 +184,14 @@ export interface WalletApi {
   submitTx: SubmitTx;
 }
 
+export interface Cip95WalletApi {
+  getActivePubStakeKeys: () => Promise<Ed25519PublicKeyHex[]>;
+
+  getPubDRepKey: () => Promise<Ed25519PublicKeyHex>;
+}
+
+export type WalletApi = Cip30WalletApi & Cip95WalletApi;
+
 export type WalletMethod = keyof WalletApi;
+
+export type WalletApiExtension = { cip: number };

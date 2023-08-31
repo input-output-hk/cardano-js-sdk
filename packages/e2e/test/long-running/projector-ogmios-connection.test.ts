@@ -82,7 +82,7 @@ describe('projector ogmios connection', () => {
   beforeAll(() => {
     const env = envalid.cleanEnv(process.env, { STAKE_POOL_PROJECTOR_URL: envalid.url() });
 
-    stakePoolProjectorUrl = `${env.STAKE_POOL_PROJECTOR_URL}health`;
+    stakePoolProjectorUrl = `${env.STAKE_POOL_PROJECTOR_URL}v1.0.0/health`;
   });
 
   beforeEach(async () => {

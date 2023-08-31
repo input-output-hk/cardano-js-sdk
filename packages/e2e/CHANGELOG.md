@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.19.2...@cardano-sdk/e2e@0.19.3) (2023-08-29)
+
+### Features
+
+* allow extensions for CIP-30 API ([3360757](https://github.com/input-output-hk/cardano-js-sdk/commit/3360757ed1ec4dc0fcd89264341008470bd591cf))
+
+### Bug Fixes
+
+* use chromedriver that matches the environment's chrome version ([a8c8075](https://github.com/input-output-hk/cardano-js-sdk/commit/a8c8075419dea71ec5d3b1aae2deaedc750485bd))
+
 ## [0.19.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.19.1...@cardano-sdk/e2e@0.19.2) (2023-08-21)
 
 **Note:** Version bump only for package @cardano-sdk/e2e

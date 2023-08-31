@@ -1,11 +1,9 @@
-import * as OpenApiValidator from 'express-openapi-validator';
 import { ChainHistoryProvider } from '@cardano-sdk/core';
 import { HttpService } from '../Http';
 import { Logger } from 'ts-log';
 import { ServiceNames } from '../Program/programs/types';
 import { providerHandler } from '../util';
 import express from 'express';
-import path from 'path';
 
 export interface ChainHistoryHttpServiceDependencies {
   logger: Logger;
@@ -17,17 +15,7 @@ export class ChainHistoryHttpService extends HttpService {
     { logger, chainHistoryProvider }: ChainHistoryHttpServiceDependencies,
     router: express.Router = express.Router()
   ) {
-    super(ServiceNames.ChainHistory, chainHistoryProvider, router, logger);
-
-    const apiSpec = path.join(__dirname, 'openApi.json');
-    router.use(
-      OpenApiValidator.middleware({
-        apiSpec,
-        ignoreUndocumented: true,
-        validateRequests: true,
-        validateResponses: true
-      })
-    );
+    super(ServiceNames.ChainHistory, chainHistoryProvider, router, __dirname, logger);
 
     router.post(
       '/blocks/by-hashes',

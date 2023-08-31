@@ -311,11 +311,11 @@
         "yants": "yants"
       },
       "locked": {
-        "lastModified": 1692005050,
-        "narHash": "sha256-bFhmzmenx3Y/0eH1qAAZGrmFc3siz0BiAJRptdt2QIQ=",
+        "lastModified": 1692787832,
+        "narHash": "sha256-pZ9IC4uBXlzT3L3rX4uLjJFxP16IT84YklKPnM02Nuw=",
         "owner": "divnix",
         "repo": "std",
-        "rev": "7ace4d2f29cfcde11ca0bbc549ca73c893b8bd98",
+        "rev": "16edd0fc1e98c28180d845ef1011610f7b800976",
         "type": "github"
       },
       "original": {

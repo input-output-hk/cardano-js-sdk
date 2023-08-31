@@ -64,7 +64,7 @@ import {
   SyncStatus,
   WalletNetworkInfoProvider
 } from '../types';
-import { AsyncKeyAgent, GroupedAddress, cip8 } from '@cardano-sdk/key-management';
+import { AsyncKeyAgent, GroupedAddress, cip8, util as keyManagementUtil } from '@cardano-sdk/key-management';
 import { BehaviorObservable, TrackerSubject, coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import {
   BehaviorSubject,
@@ -91,6 +91,7 @@ import {
   roundRobinRandomImprove
 } from '@cardano-sdk/input-selection';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
+import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
 import {
   GenericTxBuilder,
   InitializeTxProps,
@@ -105,6 +106,7 @@ import { Logger } from 'ts-log';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { Shutdown, contextLogger, deepEquals, usingAutoFree } from '@cardano-sdk/util';
 import { WalletStores, createInMemoryWalletStores } from '../persistence';
+import { createActivePublicStakeKeysTracker } from '../services/ActiveStakePublicKeysTracker';
 import isEqual from 'lodash/isEqual';
 import uniq from 'lodash/uniq';
 import type { KoraLabsHandleProvider } from '@cardano-sdk/cardano-services-client';
@@ -228,6 +230,7 @@ export class PersonalWallet implements ObservableWallet {
   readonly rewardsProvider: TrackedRewardsProvider;
   readonly handleProvider: HandleProvider;
   readonly changeAddressResolver: ChangeAddressResolver;
+  readonly activePublicStakeKeys$: TrackerSubject<Ed25519PublicKeyHex[]>;
   handles$: Observable<HandleInfo[]>;
 
   // eslint-disable-next-line max-statements
@@ -482,6 +485,12 @@ export class PersonalWallet implements ObservableWallet {
       utxoTracker: this.utxo
     });
 
+    this.activePublicStakeKeys$ = createActivePublicStakeKeysTracker({
+      addresses$: this.addresses$,
+      keyAgent: this.keyAgent,
+      rewardAccounts$: this.delegation.rewardAccounts$
+    });
+
     this.balance = createBalanceTracker(this.protocolParameters$, this.utxo, this.delegation);
     this.assetInfo$ = new PersistentDocumentTrackerSubject(
       createAssetsTracker({
@@ -647,6 +656,7 @@ export class PersonalWallet implements ObservableWallet {
     this.#newTransactions.submitting$.complete();
     this.#reemitSubscriptions.unsubscribe();
     this.#failedFromReemitter$.complete();
+    this.activePublicStakeKeys$.complete();
     this.#logger.debug('Shutdown');
   }
 
@@ -700,5 +710,9 @@ export class PersonalWallet implements ObservableWallet {
         switchMap(() => o$)
       )
     );
+  }
+
+  async getPubDRepKey(): Promise<Ed25519PublicKeyHex> {
+    return this.keyAgent.derivePublicKey(keyManagementUtil.DREP_KEY_DERIVATION_PATH);
   }
 }

@@ -9,7 +9,10 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/chain-history/blocks/by-hashes": {
+    "/v1.0.0/chain-history/health": {
+      "$ref": "../Http/schema.json#/paths/Health"
+    },
+    "/v1.0.0/chain-history/blocks/by-hashes": {
       "post": {
         "summary": "block history by hashes",
         "operationId": "blocksByHashes",
@@ -47,7 +50,7 @@
         }
       }
     },
-    "/chain-history/txs/by-hashes": {
+    "/v1.0.0/chain-history/txs/by-hashes": {
       "post": {
         "summary": "transaction history by hashes",
         "operationId": "transactionsByHashes",
@@ -85,7 +88,7 @@
         }
       }
     },
-    "/chain-history/txs/by-addresses": {
+    "/v1.0.0/chain-history/txs/by-addresses": {
       "post": {
         "summary": "transaction history by addresses",
         "operationId": "transactionsByAddresses",

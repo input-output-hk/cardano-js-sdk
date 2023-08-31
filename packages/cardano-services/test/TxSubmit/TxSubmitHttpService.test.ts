@@ -7,6 +7,7 @@ import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import { bufferToHexString, fromSerializableObject } from '@cardano-sdk/util';
 import { getPort } from 'get-port-please';
 import { logger } from '@cardano-sdk/util-dev';
+import { servicesWithVersionPath as services } from '../util';
 import axios from 'axios';
 import cbor from 'cbor';
 
@@ -33,12 +34,14 @@ describe('TxSubmitHttpService', () => {
   let httpServer: HttpServer;
   let port: number;
   let baseUrl: string;
+  let baseUrlWithVersion: string;
   let clientConfig: CreateHttpProviderConfig<TxSubmitProvider>;
   let config: HttpServerConfig;
 
   beforeAll(async () => {
     port = await getPort();
-    baseUrl = `http://localhost:${port}/tx-submit`;
+    baseUrl = `http://localhost:${port}`;
+    baseUrlWithVersion = `${baseUrl}${services.txSubmit.versionPath}/${services.txSubmit.name}`;
     clientConfig = { baseUrl, logger: createLogger({ level: FATAL, name: 'unit tests' }) };
     config = { listen: { port } };
   });
@@ -51,7 +54,7 @@ describe('TxSubmitHttpService', () => {
     let isOk: () => boolean;
     // eslint-disable-next-line unicorn/consistent-function-scoping
     const serverHealth = async () => {
-      const response = await axios.post(`${baseUrl}/health`, {
+      const response = await axios.post(`${baseUrlWithVersion}/health`, {
         headers: { [CONTENT_TYPE]: APPLICATION_JSON }
       });
       return response.data;
@@ -82,7 +85,7 @@ describe('TxSubmitHttpService', () => {
 
       try {
         await axios.post(
-          `${baseUrl}/submit`,
+          `${baseUrlWithVersion}/submit`,
           { signedTransaction: emptyUintArrayAsHexString },
           {
             headers: { [CONTENT_TYPE]: APPLICATION_JSON }
@@ -117,7 +120,7 @@ describe('TxSubmitHttpService', () => {
 
     describe('/health', () => {
       it('forwards the txSubmitProvider health response', async () => {
-        const res = await axios.post(`${baseUrl}/health`, {
+        const res = await axios.post(`${baseUrlWithVersion}/health`, {
           headers: { [CONTENT_TYPE]: APPLICATION_JSON }
         });
         expect(res.status).toBe(200);
@@ -132,7 +135,7 @@ describe('TxSubmitHttpService', () => {
         });
         expect(
           (
-            await axios.post(`${baseUrl}/submit`, bodyTx, {
+            await axios.post(`${baseUrlWithVersion}/submit`, bodyTx, {
               headers: { [CONTENT_TYPE]: APPLICATION_JSON }
             })
           ).status
@@ -143,7 +146,7 @@ describe('TxSubmitHttpService', () => {
       it('returns a 200 coded response with a well formed HTTP request', async () => {
         expect(
           (
-            await axios.post(`${baseUrl}/submit`, bodyTx, {
+            await axios.post(`${baseUrlWithVersion}/submit`, bodyTx, {
               headers: { [CONTENT_TYPE]: APPLICATION_JSON }
             })
           ).status
@@ -154,7 +157,7 @@ describe('TxSubmitHttpService', () => {
       it('returns a 415 coded response if the wrong content type header is used', async () => {
         expect.assertions(3);
         try {
-          await axios.post(`${baseUrl}/submit`, bodyTx, {
+          await axios.post(`${baseUrlWithVersion}/submit`, bodyTx, {
             headers: { [CONTENT_TYPE]: APPLICATION_CBOR }
           });
           throw new Error('fail');
@@ -209,7 +212,7 @@ describe('TxSubmitHttpService', () => {
         expect.assertions(3);
         try {
           await axios.post(
-            `${baseUrl}/submit`,
+            `${baseUrlWithVersion}/submit`,
             { signedTransaction: emptyUintArrayAsHexString },
             {
               headers: { [CONTENT_TYPE]: APPLICATION_JSON }

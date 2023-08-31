@@ -8,7 +8,7 @@ spec:
   endpoints:
     - honorLabels: true
       interval: 60s
-      path: /metrics
+      path: /v1.0.0/metrics
       port: http
   namespaceSelector:
     any: false

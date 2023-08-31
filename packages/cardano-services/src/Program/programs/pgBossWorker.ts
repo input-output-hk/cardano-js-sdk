@@ -1,9 +1,8 @@
-import { CommonProgramOptions, PosgresProgramOptions, PostgresOptionDescriptions } from '../options';
 import { HttpServer } from '../../Http/HttpServer';
 import { Logger } from 'ts-log';
 import { MissingProgramOption } from '../errors';
-import { PgBossHttpService, PgBossServiceConfig, PgBossServiceDependencies } from '../services/pgboss';
-import { STAKE_POOL_METRICS_UPDATE } from '@cardano-sdk/projection-typeorm';
+import { PgBossHttpService, PgBossServiceDependencies, PgBossWorkerArgs } from '../services/pgboss';
+import { PostgresOptionDescriptions } from '../options';
 import { SrvRecord } from 'dns';
 import { createDnsResolver } from '../utils';
 import { createLogger } from 'bunyan';
@@ -15,14 +14,8 @@ export const PG_BOSS_WORKER_API_URL_DEFAULT = new URL('http://localhost:3003');
 
 export enum PgBossWorkerOptionDescriptions {
   ParallelJobs = 'Parallel jobs to run',
-  Queues = 'Comma separated queue names',
-  StakePoolProviderUrl = 'Stake pool provider URL'
+  Queues = 'Comma separated queue names'
 }
-
-export type PgBossWorkerArgs = CommonProgramOptions &
-  PosgresProgramOptions<'DbSync'> &
-  PosgresProgramOptions<'StakePool'> &
-  PgBossServiceConfig;
 
 export interface LoadPgBossWorkerDependencies {
   dnsResolver?: (serviceName: string) => Promise<SrvRecord>;
@@ -31,12 +24,8 @@ export interface LoadPgBossWorkerDependencies {
 
 const pgBossWorker = 'pg-boss-worker';
 
-export interface PgBossWorkerConfig extends PgBossServiceConfig {
-  apiUrl: URL;
-}
-
 export class PgBossWorkerHttpServer extends HttpServer {
-  constructor(cfg: PgBossWorkerConfig, deps: PgBossServiceDependencies) {
+  constructor(cfg: PgBossWorkerArgs, deps: PgBossServiceDependencies) {
     const { apiUrl } = cfg;
     const { logger } = deps;
     const pgBossService = new PgBossHttpService(cfg, deps);
@@ -60,9 +49,6 @@ export const loadPgBossWorker = async (args: PgBossWorkerArgs, deps: LoadPgBossW
   const db = await getPool(dnsResolver, logger, args);
 
   if (!db) throw new MissingProgramOption(pgBossWorker, PostgresOptionDescriptions.ConnectionString);
-
-  if (args.queues.includes(STAKE_POOL_METRICS_UPDATE) && !args.stakePoolProviderUrl)
-    throw new MissingProgramOption(STAKE_POOL_METRICS_UPDATE, PgBossWorkerOptionDescriptions.StakePoolProviderUrl);
 
   return new PgBossWorkerHttpServer(args, { connectionConfig$, db, logger });
 };

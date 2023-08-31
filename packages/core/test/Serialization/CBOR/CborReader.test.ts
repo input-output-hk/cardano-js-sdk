@@ -125,6 +125,29 @@ describe('CborReader', () => {
       expect(reader.peekState()).toBe(CborReaderState.Finished);
     });
 
+    it('can read fixed size array with several unsigned 64bits numbers', async () => {
+      const reader = new CborReader(HexBlob('831BCD2FB6B45D4CF7B01BCD2FB6B45D4CF7B11BCD2FB6B45D4CF7B2'));
+
+      expect(reader.peekState()).toBe(CborReaderState.StartArray);
+
+      const length = reader.readStartArray();
+
+      expect(length).toBe(3);
+
+      for (let i = 0; i < length!; ++i) {
+        expect(reader.peekState()).toBe(CborReaderState.UnsignedInteger);
+
+        const number = reader.readUInt();
+
+        expect(number).toBe(14_785_236_987_456_321_456n + BigInt(i));
+      }
+
+      expect(reader.peekState()).toBe(CborReaderState.EndArray);
+      reader.readEndArray();
+
+      expect(reader.peekState()).toBe(CborReaderState.Finished);
+    });
+
     it('can read fixed size array with mixed types', async () => {
       const reader = new CborReader(HexBlob('840120604107'));
 

@@ -1,5 +1,6 @@
 import { CreateHttpProviderConfig, createHttpProvider } from '../HttpProvider';
 import { HttpProviderConfigPaths, NetworkInfoProvider } from '@cardano-sdk/core';
+import { apiVersion } from '../version';
 
 /**
  * The NetworkInfoProvider endpoint paths.
@@ -22,5 +23,7 @@ const paths: HttpProviderConfigPaths<NetworkInfoProvider> = {
 export const networkInfoHttpProvider = (config: CreateHttpProviderConfig<NetworkInfoProvider>): NetworkInfoProvider =>
   createHttpProvider<NetworkInfoProvider>({
     ...config,
-    paths
+    apiVersion: apiVersion.networkInfo,
+    paths,
+    serviceSlug: 'network-info'
   });

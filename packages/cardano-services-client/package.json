@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/cardano-services-client",
-  "version": "0.12.1",
+  "version": "0.12.2",
   "description": "Cardano Services Client",
   "engines": {
     "node": ">=16.20.1"
@@ -22,7 +22,7 @@
   "scripts": {
     "build:esm": "tsc -p src/tsconfig.json --outDir ./dist/esm --module es2020",
     "build:cjs": "tsc --build src",
-    "build:version": "node ./scripts/createVersionSource.js && shx cp ./package.json ./dist/package.json",
+    "build:version": "node ./scripts/createVersionSource.js && yarn lint:fix && shx cp ./package.json ./dist/package.json",
     "build": "yarn build:version && run-s build:cjs build:esm module-fixup",
     "module-fixup": "shx cp ../../build/cjs-package.json ./dist/cjs/package.json && cp ../../build/esm-package.json ./dist/esm/package.json",
     "tscNoEmit": "shx echo typescript --noEmit command not implemented yet",

@@ -460,6 +460,7 @@ describe('GenericTxBuilder', () => {
       const coinMissingValidation: OutputValidation = {
         coinMissing: 1n,
         minimumCoin: 2n,
+        negativeAssetQty: false,
         tokenBundleSizeExceedsLimit: false
       };
 

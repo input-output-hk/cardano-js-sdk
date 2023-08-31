@@ -9,7 +9,10 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/asset/get-asset": {
+    "/v1.0.0/asset/health": {
+      "$ref": "../Http/schema.json#/paths/Health"
+    },
+    "/v1.0.0/asset/get-asset": {
       "post": {
         "deprecated": true,
         "summary": "Get Asset Info",
@@ -58,7 +61,7 @@
         }
       }
     },
-    "/asset/get-assets": {
+    "/v1.0.0/asset/get-assets": {
       "post": {
         "summary": "Get Assets Info",
         "operationId": "getAssetsInfo",

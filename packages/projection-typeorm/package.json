@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/projection-typeorm",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "Project Chain Sync events into PostgreSQL via TypeORM",
   "engines": {
     "node": ">=16.20.1"

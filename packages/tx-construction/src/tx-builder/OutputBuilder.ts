@@ -9,6 +9,7 @@ import {
   OutputBuilderTxOut,
   OutputValidationMinimumCoinError,
   OutputValidationMissingRequiredError,
+  OutputValidationNegativeAssetQtyError,
   OutputValidationTokenBundleSizeError,
   PartialTxOut,
   TxOutputFailure
@@ -41,6 +42,9 @@ const toOutputValidationError = (
   txOut: Cardano.TxOut,
   validation: OutputValidation
 ): OutputValidationMinimumCoinError | OutputValidationTokenBundleSizeError | undefined => {
+  if (validation.negativeAssetQty) {
+    return new OutputValidationNegativeAssetQtyError(txOut, validation);
+  }
   if (validation.coinMissing) {
     return new OutputValidationMinimumCoinError(txOut, validation);
   }

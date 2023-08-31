@@ -2,10 +2,13 @@
 import { DbPools } from '../src/util/DbSyncProvider';
 import { Ogmios } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
+import { ServiceNames } from '../src';
 import { createMockOgmiosServer } from '../../ogmios/test/mocks/mockOgmiosServer';
 import { getRandomPort } from 'get-port-please';
 import { of } from 'rxjs';
+import { versionPathFromSpec } from '../src/util/openApi';
 import axios, { AxiosRequestConfig } from 'axios';
+import path from 'path';
 import waitOn from 'wait-on';
 
 type WrappedAsyncTestFunction = (db: Pool) => Promise<any>;
@@ -95,3 +98,39 @@ export const projectorConnectionConfig = {
   username: process.env.POSTGRES_USER_DB_SYNC!
 };
 export const projectorConnectionConfig$ = of(projectorConnectionConfig);
+
+export const baseVersionPath = versionPathFromSpec(path.join(__dirname, '..', 'src', 'Http', 'openApi.json'));
+
+const versionPathForService = (serviceName: string) =>
+  versionPathFromSpec(path.join(__dirname, '..', 'src', serviceName, 'openApi.json'));
+
+export const servicesWithVersionPath = {
+  asset: {
+    name: ServiceNames.Asset,
+    versionPath: versionPathForService('Asset')
+  },
+  chainHistory: {
+    name: ServiceNames.ChainHistory,
+    versionPath: versionPathForService('ChainHistory')
+  },
+  networkInfo: {
+    name: ServiceNames.NetworkInfo,
+    versionPath: versionPathForService('NetworkInfo')
+  },
+  rewards: {
+    name: ServiceNames.Rewards,
+    versionPath: versionPathForService('Rewards')
+  },
+  stakePool: {
+    name: ServiceNames.StakePool,
+    versionPath: versionPathForService('StakePool')
+  },
+  txSubmit: {
+    name: ServiceNames.TxSubmit,
+    versionPath: versionPathForService('TxSubmit')
+  },
+  utxo: {
+    name: ServiceNames.Utxo,
+    versionPath: versionPathForService('Utxo')
+  }
+};

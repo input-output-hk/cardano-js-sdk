@@ -19,7 +19,7 @@ import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { INFO, createLogger } from 'bunyan';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
-import { clearDbPools, ingestDbData, sleep, wrapWithTransaction } from '../util';
+import { clearDbPools, ingestDbData, servicesWithVersionPath as services, sleep, wrapWithTransaction } from '../util';
 import { getPort } from 'get-port-please';
 import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
 import { logger } from '@cardano-sdk/util-dev';
@@ -77,6 +77,7 @@ describe('StakePoolHttpService', () => {
   let service: StakePoolHttpService;
   let port: number;
   let baseUrl: string;
+  let baseUrlWithVersion: string;
   let clientConfig: CreateHttpProviderConfig<StakePoolProvider>;
   let config: HttpServerConfig;
   let provider: StakePoolProvider;
@@ -107,7 +108,8 @@ describe('StakePoolHttpService', () => {
 
   beforeAll(async () => {
     port = await getPort();
-    baseUrl = `http://localhost:${port}/stake-pool`;
+    baseUrl = `http://localhost:${port}`;
+    baseUrlWithVersion = `${baseUrl}${services.stakePool.versionPath}/${services.stakePool.name}`;
     config = { listen: { port } };
     clientConfig = {
       baseUrl,
@@ -232,7 +234,7 @@ describe('StakePoolHttpService', () => {
 
       describe('/health', () => {
         it('forwards the stakePoolProvider health response with HTTP request', async () => {
-          const res = await axios.post(`${baseUrl}/health`, {
+          const res = await axios.post(`${baseUrlWithVersion}/health`, {
             headers: { 'Content-Type': APPLICATION_JSON }
           });
           expect(res.status).toBe(200);
@@ -283,16 +285,16 @@ describe('StakePoolHttpService', () => {
 
         describe('with Http Server', () => {
           it('returns a 200 coded response with a well formed HTTP request', async () => {
-            expect((await axios.post(`${baseUrl}${url}`, { pagination: { limit: 5, startAt: 0 } })).status).toEqual(
-              200
-            );
+            expect(
+              (await axios.post(`${baseUrlWithVersion}${url}`, { pagination: { limit: 5, startAt: 0 } })).status
+            ).toEqual(200);
           });
 
           it('returns a 415 coded response if the wrong content type header is used', async () => {
             expect.assertions(2);
             try {
               await axios.post(
-                `${baseUrl}${url}`,
+                `${baseUrlWithVersion}${url}`,
                 { pagination: { limit: 5, startAt: 0 } },
                 { headers: { 'Content-Type': APPLICATION_CBOR } }
               );
@@ -306,7 +308,7 @@ describe('StakePoolHttpService', () => {
           it('returns a 400 coded error if pagination argument is not provided', async () => {
             expect.assertions(2);
             try {
-              await axios.post(`${baseUrl}${url}`, {}, { headers: { 'Content-Type': APPLICATION_JSON } });
+              await axios.post(`${baseUrlWithVersion}${url}`, {}, { headers: { 'Content-Type': APPLICATION_JSON } });
             } catch (error: any) {
               expect(error.response.status).toBe(400);
               expect(error.message).toBe(BAD_REQUEST);
@@ -318,7 +320,7 @@ describe('StakePoolHttpService', () => {
             const pageSizeGreaterThanMaxLimit = 30;
             try {
               await axios.post(
-                `${baseUrl}${url}`,
+                `${baseUrlWithVersion}${url}`,
                 { pagination: { limit: pageSizeGreaterThanMaxLimit, startAt: 0 } },
                 { headers: { 'Content-Type': APPLICATION_JSON } }
               );
@@ -351,7 +353,7 @@ describe('StakePoolHttpService', () => {
 
             try {
               await axios.post(
-                `${baseUrl}${url}`,
+                `${baseUrlWithVersion}${url}`,
                 { filters, pagination: { limit: 5, startAt: 0 } },
                 { headers: { 'Content-Type': APPLICATION_JSON } }
               );
@@ -1349,12 +1351,12 @@ describe('StakePoolHttpService', () => {
         const url = '/stats';
         describe('with Http Server', () => {
           it('returns a 200 coded response with a well formed HTTP request', async () => {
-            expect((await axios.post(`${baseUrl}${url}`, {})).status).toEqual(200);
+            expect((await axios.post(`${baseUrlWithVersion}${url}`, {})).status).toEqual(200);
           });
 
           it('returns a 415 coded response if the wrong content type header is used', async () => {
             try {
-              await axios.post(`${baseUrl}${url}`, {}, { headers: { 'Content-Type': APPLICATION_CBOR } });
+              await axios.post(`${baseUrlWithVersion}${url}`, {}, { headers: { 'Content-Type': APPLICATION_CBOR } });
               throw new Error('fail');
             } catch (error: any) {
               expect(error.response.status).toBe(415);

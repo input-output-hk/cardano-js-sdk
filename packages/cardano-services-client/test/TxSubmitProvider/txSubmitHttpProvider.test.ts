@@ -1,11 +1,10 @@
 import { CardanoNodeErrors, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { bufferToHexString } from '@cardano-sdk/util';
-import { handleProviderMocks, logger } from '@cardano-sdk/util-dev';
+import { config } from '../util';
+import { handleProviderMocks } from '@cardano-sdk/util-dev';
 import { txSubmitHttpProvider } from '../../src';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
-
-const config = { baseUrl: 'http://some-hostname:3000/tx-submit', logger };
 
 const emptyUintArrayAsHexString = bufferToHexString(Buffer.from(new Uint8Array()));
 

@@ -1,3 +1,4 @@
+import * as Crypto from '@cardano-sdk/crypto';
 import {
   Asset,
   Cardano,
@@ -9,6 +10,7 @@ import {
 } from '@cardano-sdk/core';
 import { BalanceTracker, DelegationTracker, TransactionsTracker, UtxoTracker } from './services';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
+import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
 import { GroupedAddress, cip8 } from '@cardano-sdk/key-management';
 import { InitializeTxProps, InitializeTxResult, SignedTx, TxBuilder, TxContext } from '@cardano-sdk/tx-construction';
 import { Observable } from 'rxjs';
@@ -58,6 +60,7 @@ export interface ObservableWallet {
   readonly currentEpoch$: Observable<EpochInfo>;
   readonly protocolParameters$: Observable<Cardano.ProtocolParameters>;
   readonly addresses$: Observable<GroupedAddress[]>;
+  readonly activePublicStakeKeys$: Observable<Crypto.Ed25519PublicKeyHex[]>;
   readonly handles$: Observable<HandleInfo[]>;
   /** All owned and historical assets */
   readonly assetInfo$: Observable<Assets>;
@@ -70,6 +73,11 @@ export interface ObservableWallet {
   readonly syncStatus: SyncStatus;
 
   getName(): Promise<string>;
+
+  /**
+   * Returns the wallet account's public DRep Key
+   */
+  getPubDRepKey(): Promise<Ed25519PublicKeyHex>;
   /**
    * @deprecated Use `createTxBuilder()` instead.
    * @throws InputSelectionError

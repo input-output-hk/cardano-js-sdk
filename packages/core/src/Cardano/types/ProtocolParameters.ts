@@ -1,4 +1,6 @@
-import { Slot } from './Block';
+import * as Crypto from '@cardano-sdk/crypto';
+import { EpochNo, Slot } from './Block';
+import { PlutusLanguageVersion } from './Script';
 
 /* eslint-disable no-use-before-define */
 export interface ProtocolVersion {
@@ -7,13 +9,17 @@ export interface ProtocolVersion {
   patch?: number;
 }
 
-export type ModelKey = string;
+/**
+ * Cost models are a way to provide predictable pricing for script execution by specifying
+ * how much each OP costs in terms of memory and CPU steps.
+ */
+export type CostModel = Array<number>;
 
-export type CostModel = {
-  [k: ModelKey]: number;
-};
-
-export type CostModels = CostModel[];
+/**
+ * Each language version can have a different set of OP costs. CostModels is a map of
+ * plutus language version to its defined cost.
+ */
+export type CostModels = Map<PlutusLanguageVersion, CostModel>;
 
 export interface Prices {
   memory: number;
@@ -95,7 +101,20 @@ type NewProtocolParamsInBabbage = {
   coinsPerUtxoByte: number;
 };
 
+// coinsPerUtxoWord was replaced by coinsPerUtxoByte and extraEntropy was deprecated.
 type BabbageProtocolParameters = Omit<AlonzoProtocolParams, 'coinsPerUtxoWord' | 'extraEntropy'> &
   NewProtocolParamsInBabbage;
 
 export type ProtocolParameters = BabbageProtocolParameters;
+
+// Even tho extraEntropy was deprecated on babbage era, it is still present in the ProtocolParametersUpdate structure
+// since this structure is backward compatible with all eras.
+export type ProtocolParametersUpdate = Partial<ProtocolParameters & Pick<AlonzoProtocolParams, 'extraEntropy'>>;
+
+export type GenesisDelegateKeyHash = Crypto.Hash28ByteBase16;
+export type ProposedProtocolParameterUpdates = Map<GenesisDelegateKeyHash, ProtocolParametersUpdate>;
+
+export type Update = {
+  epoch: EpochNo;
+  proposedProtocolParameterUpdates: ProposedProtocolParameterUpdates;
+};

@@ -9,7 +9,10 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/stake-pool/search": {
+    "/v1.0.0/stake-pool/health": {
+      "$ref": "../Http/schema.json#/paths/Health"
+    },
+    "/v1.0.0/stake-pool/search": {
       "post": {
         "summary": "stake pool search",
         "operationId": "stakePoolSearch",
@@ -58,7 +61,7 @@
         }
       }
     },
-    "/stake-pool/stats": {
+    "/v1.0.0/stake-pool/stats": {
       "post": {
         "summary": "stake pool stats",
         "operationId": "stakePoolStats",

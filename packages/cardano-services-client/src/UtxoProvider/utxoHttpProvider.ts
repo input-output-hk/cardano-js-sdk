@@ -1,5 +1,6 @@
 import { CreateHttpProviderConfig, createHttpProvider } from '../HttpProvider';
 import { HttpProviderConfigPaths, ProviderError, ProviderFailure, UtxoProvider } from '@cardano-sdk/core';
+import { apiVersion } from '../version';
 import { mapHealthCheckError } from '../mapHealthCheckError';
 
 /**
@@ -18,6 +19,7 @@ const paths: HttpProviderConfigPaths<UtxoProvider> = {
 export const utxoHttpProvider = (config: CreateHttpProviderConfig<UtxoProvider>): UtxoProvider =>
   createHttpProvider<UtxoProvider>({
     ...config,
+    apiVersion: apiVersion.utxo,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mapError: (error: any, method) => {
       if (method === 'healthCheck') {
@@ -25,5 +27,6 @@ export const utxoHttpProvider = (config: CreateHttpProviderConfig<UtxoProvider>)
       }
       throw new ProviderError(ProviderFailure.Unknown, error);
     },
-    paths
+    paths,
+    serviceSlug: 'utxo'
   });

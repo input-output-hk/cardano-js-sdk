@@ -33,7 +33,7 @@ export class BlockfrostService extends HttpService {
     const { db, logger } = deps;
     const provider: Provider = { healthCheck: () => Promise.resolve({ ok: false }) };
 
-    super('blockfrost-cache', provider, Router(), logger);
+    super('blockfrost-cache', provider, Router(), __dirname, logger);
 
     this.#api = new BlockFrostAPI({ network, projectId: blockfrostApiKey });
     this.#builder = new BlockfrostCacheBuilder(db, this.logger);

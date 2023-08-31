@@ -1,6 +1,7 @@
 import * as Cardano from '../../Cardano';
 import { CborReader, CborTag, CborWriter } from '../CBOR';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
+import Fraction from 'fraction.js';
 
 const UNIT_INTERVAL_ARRAY_SIZE = 2;
 
@@ -25,6 +26,17 @@ export class UnitInterval {
   constructor(numerator: bigint, denominator: bigint) {
     this.#numerator = numerator;
     this.#denominator = denominator;
+  }
+
+  /**
+   * Initializes a new instance of the UnitInterval class.
+   *
+   * @param number The float number.
+   */
+  static fromFloat(number: number | undefined): UnitInterval | undefined {
+    if (number === undefined) return undefined;
+    const fraction = new Fraction(number);
+    return new UnitInterval(BigInt(fraction.n), BigInt(fraction.d));
   }
 
   /**
@@ -137,5 +149,14 @@ export class UnitInterval {
   setDenominator(denominator: bigint): void {
     this.#denominator = denominator;
     this.#originalBytes = undefined;
+  }
+
+  /**
+   * Converts this UnitInterval instance into a float.
+   *
+   * @returns The init interval as a float.
+   */
+  toFloat(): number {
+    return Number(this.#numerator) / Number(this.#denominator);
   }
 }

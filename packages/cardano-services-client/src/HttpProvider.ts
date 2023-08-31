@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpProviderConfigPaths, Provider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
-import { apiVersion } from './version';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
+import { apiVersion as staticApiVersion } from './version';
 import axios, { AxiosAdapter, AxiosRequestConfig, AxiosResponseTransformer } from 'axios';
 import packageJson from '../package.json';
 
@@ -11,6 +11,10 @@ const isEmptyResponse = (response: any) => response === '';
 type ResponseTransformers<T> = { [K in keyof T]?: AxiosResponseTransformer };
 
 export interface HttpProviderConfig<T extends Provider> {
+  /**
+   * The OpenApi version, which forms part of the URL scheme
+   */
+  apiVersion: string;
   /**
    * Example: "http://localhost:3000"
    */
@@ -48,6 +52,11 @@ export interface HttpProviderConfig<T extends Provider> {
    * Transform responses
    */
   responseTransformers?: ResponseTransformers<T>;
+
+  /**
+   * Slug used in the URL path
+   */
+  serviceSlug: string;
 }
 
 /**
@@ -70,13 +79,15 @@ export type CreateHttpProviderConfig<T extends Provider> = Pick<
  * @returns provider that fetches data over http
  */
 export const createHttpProvider = <T extends Provider>({
+  apiVersion,
   baseUrl,
   axiosOptions,
   mapError,
   paths,
   adapter,
   logger,
-  responseTransformers
+  responseTransformers,
+  serviceSlug
 }: HttpProviderConfig<T>): T =>
   new Proxy<T>({} as T, {
     // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -93,9 +104,13 @@ export const createHttpProvider = <T extends Provider>({
           const req: AxiosRequestConfig = {
             ...axiosOptions,
             adapter,
-            baseURL: baseUrl,
+            baseURL: `${baseUrl.replace(/\/$/, '')}/v${staticApiVersion.root}/${serviceSlug}`,
             data: { ...args[0] },
-            headers: { ...axiosOptions?.headers, 'Version-Api': apiVersion, 'Version-Software': packageJson.version },
+            headers: {
+              ...axiosOptions?.headers,
+              'Version-Api': JSON.stringify(apiVersion),
+              'Version-Software': packageJson.version
+            },
             method: 'post',
             responseType: 'json',
             url: urlPath

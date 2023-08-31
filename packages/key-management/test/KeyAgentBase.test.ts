@@ -128,5 +128,7 @@ describe('KeyAgentBase', () => {
     expect(typeof externalPublicKey).toBe('string');
     const stakePublicKey = await keyAgent.derivePublicKey({ index: 1, role: KeyRole.Stake });
     expect(typeof stakePublicKey).toBe('string');
+    const dRepPublicKey = await keyAgent.derivePublicKey({ index: 0, role: KeyRole.DRep });
+    expect(typeof dRepPublicKey).toBe('string');
   });
 });

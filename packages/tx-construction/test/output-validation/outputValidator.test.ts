@@ -42,4 +42,39 @@ describe('createOutputValidator', () => {
       ).tokenBundleSizeExceedsLimit
     ).toBe(true);
   });
+
+  it('validateValue validates negative asset quantity', async () => {
+    expect(
+      (
+        await validator.validateValue({
+          assets: new Map([
+            [Cardano.AssetId('b01fb3b8c3dd6b3705a5dc8bcd5a70759f70ad5d97a72005caeac3c652657675746f31333237'), 1n]
+          ]),
+          coins: 2_000_000n
+        })
+      ).negativeAssetQty
+    ).toBe(false);
+    expect(
+      (
+        await validator.validateValue({
+          assets: new Map([
+            [Cardano.AssetId('b01fb3b8c3dd6b3705a5dc8bcd5a70759f70ad5d97a72005caeac3c652657675746f31333237'), 1n],
+            [Cardano.AssetId('c01fb3b8c3dd6b3705a5dc8bcd5a70759f70ad5d97a72005caeac3c652657675746f31333237'), -2n]
+          ]),
+          coins: 2_000_000n
+        })
+      ).negativeAssetQty
+    ).toBe(true);
+    expect(
+      (
+        await validator.validateValue({
+          assets: new Map([
+            [Cardano.AssetId('b01fb3b8c3dd6b3705a5dc8bcd5a70759f70ad5d97a72005caeac3c652657675746f31333237'), 1n],
+            [Cardano.AssetId('c01fb3b8c3dd6b3705a5dc8bcd5a70759f70ad5d97a72005caeac3c652657675746f31333237'), 0n]
+          ]),
+          coins: 2_000_000n
+        })
+      ).negativeAssetQty
+    ).toBe(true);
+  });
 });

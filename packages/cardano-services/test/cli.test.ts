@@ -13,10 +13,12 @@ import { Pool } from 'pg';
 import { ProjectionName, ServerMetadata, ServiceNames } from '../src';
 import { RabbitMQContainer } from './TxSubmit/rabbitmq/docker';
 import {
+  baseVersionPath,
   createHealthyMockOgmiosServer,
   createUnhealthyMockOgmiosServer,
   ogmiosServerReady,
-  serverStarted
+  serverStarted,
+  servicesWithVersionPath as services
 } from './util';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { fromSerializableObject } from '@cardano-sdk/util';
@@ -42,7 +44,10 @@ const logger = createLogger({ env: process.env.TL_LEVEL ? process.env : { ...pro
 
 const assertServiceHealthy = async (
   apiUrl: string,
-  serviceName: ServiceNames,
+  service: {
+    name: ServiceNames;
+    versionPath: string;
+  },
   lastBlock: LedgerTipModel,
   options?: {
     unhealthy?: boolean;
@@ -52,7 +57,7 @@ const assertServiceHealthy = async (
 ) => {
   await serverStarted(apiUrl);
   const headers = { 'Content-Type': 'application/json' };
-  const res = await axios.post(`${apiUrl}/${serviceName}/health`, { headers });
+  const res = await axios.post(`${apiUrl}${service.versionPath}/${service.name}/health`, { headers });
   const { unhealthy, usedQueue, withTip } = { withTip: true, ...options };
 
   const healthCheckResponse = usedQueue
@@ -76,7 +81,7 @@ const assertServerWithCORSHeaders = async (apiUrl: string, origin: string) => {
   const headers = { 'Content-Type': 'application/json', Origin: origin };
   await serverStarted(apiUrl, 404, headers);
   try {
-    const res = await axios.get(`${apiUrl}/health`, { headers });
+    const res = await axios.get(`${apiUrl}${baseVersionPath}/health`, { headers });
     expect(res.headers['access-control-allow-origin']).toEqual(origin);
     expect(res.data).toBeDefined();
   } catch (error) {
@@ -89,7 +94,7 @@ const assertMetricsEndpoint = async (apiUrl: string, assertFound: boolean) => {
   await serverStarted(apiUrl);
   const headers = { 'Content-Type': 'application/json' };
   try {
-    const res = await axios.get(`${apiUrl}/metrics`, { headers });
+    const res = await axios.get(`${apiUrl}${baseVersionPath}/metrics`, { headers });
     expect(res.data.toString().includes(METRICS_ENDPOINT_LABEL_RESPONSE)).toEqual(assertFound);
   } catch (error) {
     expect((error as AxiosError).response?.status).toBe(404);
@@ -101,7 +106,7 @@ const assertMetaEndpoint = async (apiUrl: string, dataMatch: any) => {
   await serverStarted(apiUrl);
   const headers = { 'Content-Type': 'application/json' };
   try {
-    const res = await axios.get(`${apiUrl}/meta`, { headers });
+    const res = await axios.get(`${apiUrl}${baseVersionPath}/meta`, { headers });
     expect(res.data).toMatchShapeOf(dataMatch);
   } catch (error) {
     expect((error as AxiosError).response?.status).toBe(404);
@@ -112,7 +117,10 @@ const assertStakePoolApyInResponse = async (apiUrl: string, assertFound: boolean
   expect.assertions(1);
   await serverStarted(apiUrl);
   const headers = { 'Content-Type': 'application/json' };
-  const res = await axios.post(`${apiUrl}/stake-pool/search`, { headers, pagination: { limit: 1, startAt: 0 } });
+  const res = await axios.post(`${apiUrl}${services.stakePool.versionPath}/stake-pool/search`, {
+    headers,
+    pagination: { limit: 1, startAt: 0 }
+  });
   const apy = res.data.pageResults[0].metrics.apy;
   if (assertFound) {
     expect(typeof apy).toBe('number');
@@ -308,13 +316,13 @@ describe('CLI', () => {
               )
             );
 
-            await assertServiceHealthy(apiUrl, ServiceNames.Asset, lastBlock);
-            await assertServiceHealthy(apiUrl, ServiceNames.ChainHistory, lastBlock);
-            await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo, lastBlock);
-            await assertServiceHealthy(apiUrl, ServiceNames.StakePool, lastBlock);
-            await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, { withTip: false });
-            await assertServiceHealthy(apiUrl, ServiceNames.Utxo, lastBlock);
-            await assertServiceHealthy(apiUrl, ServiceNames.Rewards, lastBlock);
+            await assertServiceHealthy(apiUrl, services.asset, lastBlock);
+            await assertServiceHealthy(apiUrl, services.chainHistory, lastBlock);
+            await assertServiceHealthy(apiUrl, services.networkInfo, lastBlock);
+            await assertServiceHealthy(apiUrl, services.stakePool, lastBlock);
+            await assertServiceHealthy(apiUrl, services.txSubmit, lastBlock, { withTip: false });
+            await assertServiceHealthy(apiUrl, services.utxo, lastBlock);
+            await assertServiceHealthy(apiUrl, services.rewards, lastBlock);
           });
 
           it('exposes a HTTP server at the configured URL with all services attached when using env variables', async () => {
@@ -337,13 +345,13 @@ describe('CLI', () => {
               })
             );
 
-            await assertServiceHealthy(apiUrl, ServiceNames.Asset, lastBlock);
-            await assertServiceHealthy(apiUrl, ServiceNames.ChainHistory, lastBlock);
-            await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo, lastBlock);
-            await assertServiceHealthy(apiUrl, ServiceNames.StakePool, lastBlock);
-            await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, { withTip: false });
-            await assertServiceHealthy(apiUrl, ServiceNames.Utxo, lastBlock);
-            await assertServiceHealthy(apiUrl, ServiceNames.Rewards, lastBlock);
+            await assertServiceHealthy(apiUrl, services.asset, lastBlock);
+            await assertServiceHealthy(apiUrl, services.chainHistory, lastBlock);
+            await assertServiceHealthy(apiUrl, services.networkInfo, lastBlock);
+            await assertServiceHealthy(apiUrl, services.stakePool, lastBlock);
+            await assertServiceHealthy(apiUrl, services.txSubmit, lastBlock, { withTip: false });
+            await assertServiceHealthy(apiUrl, services.utxo, lastBlock);
+            await assertServiceHealthy(apiUrl, services.rewards, lastBlock);
           });
 
           it('exposes a HTTP server with /metrics endpoint using CLI options', async () => {
@@ -650,8 +658,8 @@ describe('CLI', () => {
               )
             );
 
-            await assertServiceHealthy(apiUrl, ServiceNames.Utxo, lastBlock);
-            await assertServiceHealthy(apiUrl, ServiceNames.Rewards, lastBlock);
+            await assertServiceHealthy(apiUrl, services.utxo, lastBlock);
+            await assertServiceHealthy(apiUrl, services.rewards, lastBlock);
           });
 
           it('exposes a HTTP server with /stake-pool/search endpoint that includes metrics.apy, by default', async () => {
@@ -851,7 +859,7 @@ describe('CLI', () => {
                 )
               );
 
-              await assertServiceHealthy(apiUrl, ServiceNames.Utxo, lastBlock);
+              await assertServiceHealthy(apiUrl, services.utxo, lastBlock);
             });
 
             it('exposes a HTTP server when using env variables', async () => {
@@ -873,7 +881,7 @@ describe('CLI', () => {
                 })
               );
 
-              await assertServiceHealthy(apiUrl, ServiceNames.Utxo, lastBlock);
+              await assertServiceHealthy(apiUrl, services.utxo, lastBlock);
             });
           });
 
@@ -1436,7 +1444,7 @@ describe('CLI', () => {
                   }
                 )
               );
-              await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo, lastBlock);
+              await assertServiceHealthy(apiUrl, services.networkInfo, lastBlock);
             });
 
             it('network-info uses the default Ogmios configuration if not specified using env variables', async () => {
@@ -1454,7 +1462,7 @@ describe('CLI', () => {
                   stdio: 'pipe'
                 })
               );
-              await assertServiceHealthy(apiUrl, ServiceNames.NetworkInfo, lastBlock);
+              await assertServiceHealthy(apiUrl, services.networkInfo, lastBlock);
             });
 
             it('tx-submit uses the default Ogmios configuration if not specified when using CLI options', async () => {
@@ -1479,7 +1487,7 @@ describe('CLI', () => {
                   }
                 )
               );
-              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, { withTip: false });
+              await assertServiceHealthy(apiUrl, services.txSubmit, lastBlock, { withTip: false });
             });
 
             it('tx-submit uses the default Ogmios configuration if not specified when using env variables', async () => {
@@ -1497,7 +1505,7 @@ describe('CLI', () => {
                   stdio: 'pipe'
                 })
               );
-              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, { withTip: false });
+              await assertServiceHealthy(apiUrl, services.txSubmit, lastBlock, { withTip: false });
             });
           });
 
@@ -1795,9 +1803,9 @@ describe('CLI', () => {
                   { env: {}, stdio: 'pipe' }
                 )
               );
-              await assertServiceHealthy(apiUrl, ServiceNames.Asset, lastBlock);
+              await assertServiceHealthy(apiUrl, services.asset, lastBlock);
 
-              const res = await axios.post<Asset.AssetInfo>(`${apiUrl}/asset/get-asset`, {
+              const res = await axios.post<Asset.AssetInfo>(`${apiUrl}${services.asset.versionPath}/asset/get-asset`, {
                 assetId: asset.id,
                 extraData: { tokenMetadata: true }
               });
@@ -1821,9 +1829,9 @@ describe('CLI', () => {
                   stdio: 'pipe'
                 })
               );
-              await assertServiceHealthy(apiUrl, ServiceNames.Asset, lastBlock);
+              await assertServiceHealthy(apiUrl, services.asset, lastBlock);
 
-              const res = await axios.post<Asset.AssetInfo>(`${apiUrl}/asset/get-asset`, {
+              const res = await axios.post<Asset.AssetInfo>(`${apiUrl}${services.asset.versionPath}/asset/get-asset`, {
                 assetId: asset.id,
                 extraData: { tokenMetadata: true }
               });
@@ -1853,12 +1861,15 @@ describe('CLI', () => {
                   { env: {}, stdio: 'pipe' }
                 )
               );
-              await assertServiceHealthy(apiUrl, ServiceNames.Asset, lastBlock);
+              await assertServiceHealthy(apiUrl, services.asset, lastBlock);
 
-              const res = await axios.post<Asset.AssetInfo[]>(`${apiUrl}/asset/get-assets`, {
-                assetIds: [asset.id],
-                extraData: { tokenMetadata: true }
-              });
+              const res = await axios.post<Asset.AssetInfo[]>(
+                `${apiUrl}${services.asset.versionPath}/asset/get-assets`,
+                {
+                  assetIds: [asset.id],
+                  extraData: { tokenMetadata: true }
+                }
+              );
 
               const { tokenMetadata } = fromSerializableObject<Asset.AssetInfo>(res.data[0]);
               expect(tokenMetadata).toStrictEqual({ assetId: asset.id, name: asset.name });
@@ -1879,12 +1890,15 @@ describe('CLI', () => {
                   stdio: 'pipe'
                 })
               );
-              await assertServiceHealthy(apiUrl, ServiceNames.Asset, lastBlock);
+              await assertServiceHealthy(apiUrl, services.asset, lastBlock);
 
-              const res = await axios.post<Asset.AssetInfo[]>(`${apiUrl}/asset/get-assets`, {
-                assetIds: [asset.id],
-                extraData: { tokenMetadata: true }
-              });
+              const res = await axios.post<Asset.AssetInfo[]>(
+                `${apiUrl}${services.asset.versionPath}/asset/get-assets`,
+                {
+                  assetIds: [asset.id],
+                  extraData: { tokenMetadata: true }
+                }
+              );
 
               const { tokenMetadata } = fromSerializableObject<Asset.AssetInfo>(res.data[0]);
               expect(tokenMetadata).toStrictEqual({ assetId: asset.id, name: asset.name });
@@ -1904,9 +1918,9 @@ describe('CLI', () => {
                   stdio: 'pipe'
                 })
               );
-              await assertServiceHealthy(apiUrl, ServiceNames.Asset, lastBlock);
+              await assertServiceHealthy(apiUrl, services.asset, lastBlock);
 
-              const res = await axios.post<Asset.AssetInfo>(`${apiUrl}/asset/get-asset`, {
+              const res = await axios.post<Asset.AssetInfo>(`${apiUrl}${services.asset.versionPath}/asset/get-asset`, {
                 assetId: asset.id,
                 extraData: { tokenMetadata: true }
               });
@@ -1943,7 +1957,7 @@ describe('CLI', () => {
                   }
                 )
               );
-              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, { usedQueue: true });
+              await assertServiceHealthy(apiUrl, services.txSubmit, lastBlock, { usedQueue: true });
             });
 
             it('exposes a HTTP server with healthy state when using env variables', async () => {
@@ -1961,7 +1975,7 @@ describe('CLI', () => {
                   stdio: 'pipe'
                 })
               );
-              await assertServiceHealthy(apiUrl, ServiceNames.TxSubmit, lastBlock, { usedQueue: true });
+              await assertServiceHealthy(apiUrl, services.txSubmit, lastBlock, { usedQueue: true });
             });
           });
 
@@ -2083,7 +2097,7 @@ describe('CLI', () => {
               )
             );
 
-            await assertServiceHealthy(apiUrl, ServiceNames.StakePool, lastBlock, { unhealthy: true });
+            await assertServiceHealthy(apiUrl, services.stakePool, lastBlock, { unhealthy: true });
             done();
           });
         });
@@ -2133,7 +2147,7 @@ describe('CLI', () => {
           );
           await serverStarted(apiUrl);
           const headers = { 'Content-Type': 'application/json' };
-          const res = await axios.post(`${apiUrl}/${ServiceNames.StakePool}/health`, { headers });
+          const res = await axios.post(`${apiUrl}/v1.0.0/${ServiceNames.StakePool}/health`, { headers });
           expect(res.status).toBe(200);
         });
       });
@@ -2147,7 +2161,7 @@ describe('CLI', () => {
     const assertServerAlive = async () => {
       await serverStarted(apiUrl);
       const headers = { 'Content-Type': 'application/json' };
-      const res = await axios.post(`${apiUrl}/health`, { headers });
+      const res = await axios.post(`${apiUrl}${baseVersionPath}/health`, { headers });
       expect(res.status).toBe(200);
       expect(res.data.ok).toBe(false);
     };
@@ -2572,7 +2586,6 @@ describe('CLI', () => {
     });
 
     it('exits with code 1 with metrics queue and without a stake pool provider url', (done) => {
-      expect.assertions(2);
       proc = withLogging(
         fork(
           exePath,
@@ -2589,12 +2602,14 @@ describe('CLI', () => {
         ),
         true
       );
-      proc.stderr!.on('data', (data) =>
-        expect(data.toString()).toMatch(
-          'MissingProgramOption: pool-metrics requires the Stake pool provider URL program option'
-        )
-      );
+
+      const chunks: string[] = [];
+
+      proc.stdout!.on('data', (data: Buffer) => chunks.push(data.toString()));
       proc.on('exit', (code) => {
+        expect(chunks.join('')).toMatch(
+          'MissingProgramOption: pool-metrics requires the stake-pool provider URL program option'
+        );
         expect(code).toBe(1);
         done();
       });

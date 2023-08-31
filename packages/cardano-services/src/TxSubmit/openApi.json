@@ -9,7 +9,10 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/tx-submit/submit": {
+    "/v1.0.0/tx-submit/health": {
+      "$ref": "../Http/schema.json#/paths/Health"
+    },
+    "/v1.0.0/tx-submit/submit": {
       "post": {
         "summary": "submits given transaction",
         "operationId": "submitTx",
