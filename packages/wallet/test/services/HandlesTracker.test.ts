@@ -39,7 +39,6 @@ const expectedHandleInfo: HandleInfo = {
   fingerprint: handleFingerprint,
   handle,
   hasDatum: !!handleOutput.datum,
-  mintOrBurnCount: handleAssetInfo.mintOrBurnCount,
   name: handleAssetName,
   policyId: handlePolicyId,
   quantity: 1n,

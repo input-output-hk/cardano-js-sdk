@@ -1,5 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
-import { LastMintTxModel, MultiAssetHistoryModel, MultiAssetModel } from './types';
+import { LastMintTxModel, MultiAssetModel } from './types';
 import { Logger } from 'ts-log';
 import { Pool } from 'pg';
 import Queries from './queries';
@@ -31,15 +31,5 @@ export class AssetBuilder {
       values: [Buffer.from(policyId, 'hex'), Buffer.from(name, 'hex')]
     });
     return result.rows[0];
-  }
-
-  public async queryMultiAssetHistory(policyId: Cardano.PolicyId, name: Cardano.AssetName) {
-    this.#logger.debug('About to query multi asset history', { name, policyId });
-    const result = await this.#db.query<MultiAssetHistoryModel>({
-      name: 'find_multi_asset_history',
-      text: Queries.findMultiAssetHistory,
-      values: [Buffer.from(policyId, 'hex'), Buffer.from(name, 'hex')]
-    });
-    return result.rows;
   }
 }

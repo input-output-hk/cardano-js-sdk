@@ -195,7 +195,6 @@ describe('PersonalWallet.assets/nft', () => {
     expect(nfts.find((nft) => nft.assetId === assetIds[TOKEN_METADATA_2_INDEX])).toMatchObject({
       assetId: assetIds[TOKEN_METADATA_2_INDEX],
       fingerprint: fingerprints[TOKEN_METADATA_2_INDEX],
-      mintOrBurnCount: expect.anything(),
       name: assetNames[TOKEN_METADATA_2_INDEX],
       nftMetadata: {
         image: 'ipfs://some_hash1',
@@ -222,7 +221,6 @@ describe('PersonalWallet.assets/nft', () => {
     expect(nfts.find((nft) => nft.assetId === assetIds[TOKEN_METADATA_1_INDEX])).toMatchObject({
       assetId: assetIds[TOKEN_METADATA_1_INDEX],
       fingerprint: fingerprints[TOKEN_METADATA_1_INDEX],
-      mintOrBurnCount: expect.anything(),
       name: assetNames[TOKEN_METADATA_1_INDEX],
       nftMetadata: {
         description: 'NFT with different types of files',
@@ -356,7 +354,6 @@ describe('PersonalWallet.assets/nft', () => {
         expect(nfts.find((nft) => nft.assetId === assetId)).toMatchObject({
           assetId,
           fingerprint,
-          mintOrBurnCount: expect.anything(),
           name: assetNameHex,
           nftMetadata: {
             image: 'ipfs://some_hash1',

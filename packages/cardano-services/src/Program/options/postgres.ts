@@ -32,7 +32,7 @@ export interface BasePosgresProgramOptions {
   postgresSslCaFile?: string;
 }
 
-export type ConnectionNames = 'DbSync' | 'Handle' | 'StakePool' | '';
+export type ConnectionNames = 'DbSync' | 'Handle' | 'StakePool' | 'Asset' | '';
 
 export type PosgresProgramOptions<
   Suffix extends ConnectionNames,

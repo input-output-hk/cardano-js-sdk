@@ -205,12 +205,10 @@ describe('AssetHttpService', () => {
         const assets = await fixtureBuilder.getAssets(1, { with: [AssetWith.CIP25Metadata] });
         const res = await provider.getAsset({
           assetId: assets[0].id,
-          extraData: { history: true, nftMetadata: true, tokenMetadata: true }
+          extraData: { nftMetadata: true, tokenMetadata: true }
         });
-        const expectedHistory = await fixtureBuilder.getHistory(assets[0].policyId, assets[0].name);
-        const { history, nftMetadata, tokenMetadata } = res;
+        const { nftMetadata, tokenMetadata } = res;
 
-        expect(history).toEqual(expectedHistory);
         expect(nftMetadata).toEqual(assets[0].metadata);
         expect(tokenMetadata).toBeDefined();
       });
