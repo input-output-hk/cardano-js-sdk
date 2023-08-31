@@ -10,6 +10,7 @@ export * from './Tokens.entity';
 export * from './Output.entity';
 export * from './CurrentPoolMetrics.entity';
 export * from './Handle.entity';
+export * from './HandleMetadata.entity';
 export * from './NftMetadata.entity';
 export * from './Address.entity';
 export * from './StakeKeyRegistration.entity';

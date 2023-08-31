@@ -6,6 +6,7 @@ export * from './storeBlock';
 export * from './storeAssets';
 export * from './storeUtxo';
 export * from './storeHandles';
+export * from './storeHandleMetadata';
 export * from './util';
 export * from './storePoolMetricsUpdateJob';
 export * from './storeNftMetadata';
