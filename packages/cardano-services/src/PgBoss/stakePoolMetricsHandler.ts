@@ -1,9 +1,16 @@
 import { Cardano, StakePoolProvider } from '@cardano-sdk/core';
-import { CurrentPoolMetricsEntity, StakePoolEntity, StakePoolMetricsUpdateJob } from '@cardano-sdk/projection-typeorm';
+import {
+  CurrentPoolMetricsEntity,
+  STAKE_POOL_METRICS_UPDATE,
+  StakePoolEntity,
+  StakePoolMetricsUpdateJob
+} from '@cardano-sdk/projection-typeorm';
 import { DataSource } from 'typeorm';
 import { Logger } from 'ts-log';
+import { ServiceNames } from '../Program/programs/types';
 import { WorkerHandlerFactory } from './types';
 import { isErrorWithConstraint } from './util';
+import { missingProviderUrlOption } from '../Program/options';
 import { stakePoolHttpProvider } from '@cardano-sdk/cardano-services-client';
 
 interface RefreshPoolMetricsOptions {
@@ -67,6 +74,9 @@ export const refreshPoolMetrics = async (options: RefreshPoolMetricsOptions) => 
 
 export const stakePoolMetricsHandlerFactory: WorkerHandlerFactory = (options) => {
   const { dataSource, logger, stakePoolProviderUrl } = options;
+
+  if (!stakePoolProviderUrl) throw missingProviderUrlOption(STAKE_POOL_METRICS_UPDATE, ServiceNames.StakePool);
+
   const provider = stakePoolHttpProvider({ baseUrl: stakePoolProviderUrl, logger });
 
   return async (data: StakePoolMetricsUpdateJob) => {

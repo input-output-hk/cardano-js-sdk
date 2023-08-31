@@ -100,7 +100,10 @@ describe('PgBossHttpService', () => {
   });
 
   it('health check is ok after start with a valid db connection', async () => {
-    service = new PgBossHttpService({ parallelJobs: 3, queues: [] }, { connectionConfig$, db, logger });
+    service = new PgBossHttpService(
+      { apiUrl: new URL('http://unused/'), parallelJobs: 3, queues: [] },
+      { connectionConfig$, db, logger }
+    );
     expect(await service.healthCheck()).toEqual({ ok: false, reason: 'PgBossHttpService not started' });
     await service.initialize();
     await service.start();
@@ -125,7 +128,7 @@ describe('PgBossHttpService', () => {
     });
 
     service = new PgBossHttpService(
-      { parallelJobs: 3, queues: [STAKE_POOL_METADATA_QUEUE] },
+      { apiUrl: new URL('http://unused/'), parallelJobs: 3, queues: [STAKE_POOL_METADATA_QUEUE] },
       { connectionConfig$: config$, db, logger }
     );
     await service.initialize();

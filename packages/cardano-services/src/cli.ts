@@ -60,11 +60,11 @@ import { HttpServer } from './Http';
 import {
   PARALLEL_JOBS_DEFAULT,
   PG_BOSS_WORKER_API_URL_DEFAULT,
-  PgBossWorkerArgs,
   PgBossWorkerOptionDescriptions,
   loadPgBossWorker
 } from './Program/programs/pgBossWorker';
 import { PgBossQueue, isValidQueue } from './PgBoss';
+import { PgBossWorkerArgs } from './Program/services/pgboss';
 import { ProjectionName } from './Projection';
 import { URL } from 'url';
 import { dbCacheValidator } from './util/validators';
@@ -484,11 +484,6 @@ withCommonOptions(
       .env('PARALLEL_JOBS')
       .default(PARALLEL_JOBS_DEFAULT)
       .argParser((parallelJobs) => Number.parseInt(parallelJobs, 10))
-  )
-  .addOption(
-    new Option('--stake-pool-provider-url <stakePoolProviderUrl>', PgBossWorkerOptionDescriptions.StakePoolProviderUrl)
-      .env('STAKE_POOL_PROVIDER_URL')
-      .argParser((url) => new URL(url).toString())
   )
   .addOption(
     new Option('--queues <queues>', PgBossWorkerOptionDescriptions.Queues)
