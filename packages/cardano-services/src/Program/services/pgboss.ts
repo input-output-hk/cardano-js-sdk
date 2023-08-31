@@ -69,6 +69,15 @@ export interface PgBossServiceDependencies {
   logger: Logger;
 }
 
+const hasDriverError = (error: unknown): error is { driverError: unknown } =>
+  error instanceof Object && 'driverError' in error;
+
+const isRecoverableError = (error: unknown) =>
+  isRecoverableTypeormError(error) ||
+  (hasDriverError(error) &&
+    error.driverError instanceof Error &&
+    error.driverError.message === 'invalid message format');
+
 export class PgBossHttpService extends HttpService {
   #config: PgBossWorkerArgs;
   #dataSource$: Observable<DataSource>;
@@ -128,7 +137,7 @@ export class PgBossHttpService extends HttpService {
         resetOnSuccess: true,
         // This ensures that if an error which can't be retried arrives here is handled as a FATAL error
         shouldRetry: (error: unknown) => {
-          const retry = isRecoverableTypeormError(error);
+          const retry = isRecoverableError(error);
 
           this.#health = {
             ok: false,
@@ -181,7 +190,7 @@ export class PgBossHttpService extends HttpService {
           // so the error is logged here for more insight
           logger.error(`Job ${id} got error`, error);
 
-          if (isRecoverableTypeormError(error)) {
+          if (isRecoverableError(error)) {
             logger.info('The error is recoverable: re-creating DB connection');
             // Emit the error so retryBackoff in work() can do its job
             subscriber.error(error);
