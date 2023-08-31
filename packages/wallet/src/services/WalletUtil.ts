@@ -142,8 +142,7 @@ export const requiresForeignSignatures = async (tx: Cardano.Tx, wallet: Observab
         case Cardano.CertificateType.MIR:
           if (
             certificate.kind === Cardano.MirCertificateKind.ToStakeCreds &&
-            certificate.stakeCredential!.hash ===
-              Crypto.Hash28ByteBase16(Cardano.RewardAccount.toHash(account.rewardAccount))
+            certificate.stakeCredential!.hash === Crypto.Hash28ByteBase16(account.stakeKeyHash)
           )
             matchesOneAccount = true;
           break;
