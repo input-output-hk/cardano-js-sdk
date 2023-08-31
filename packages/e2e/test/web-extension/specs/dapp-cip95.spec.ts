@@ -13,8 +13,10 @@ describe('dapp/cip95', () => {
   // Selectors below target some of the elements in the CIP-95 dapp. More selectors are needed to configure the
   // different actions that we'll test.
 
-  // const spanGetPubDrepKey = '#root > div > p:nth-child(17)';
-  // const spanGetActivePubStakeKeys = '#root > div > p:nth-child(17)';
+  const dappGetPubDrepKey = '#root > div > p:nth-child(17)';
+  const dappDrepId = '#root > div > p:nth-child(19)';
+  const dappGetActivePubStakeKeys = '#root > div > p:nth-child(20)';
+  const dappStakeKeyToStakeAddress = '#root > div > p:nth-child(24)';
 
   // const tabSubmitVoteDelegation = 'div[role="tablist"] > div[data-tab-id="1"]';
   // const tabSubmitDrepRegistration = 'div[role="tablist"] > div[data-tab-id="2"]';
@@ -41,9 +43,7 @@ describe('dapp/cip95', () => {
     await expect($(pWalletFound)).toHaveTextContaining('true');
   });
 
-  // The tests below will work only after enable returns a cip95 wallet, which has
-  // getActivePubStakeKeys and getPubDRepKey
-  describe.skip('dapp can use cip95 wallet api', () => {
+  describe('dapp can use cip95 wallet api', () => {
     before(async () => {
       await switchToWalletUi();
       await $(btnGrantAccess).click();
@@ -69,6 +69,18 @@ describe('dapp/cip95', () => {
       await expect($(dappChangeAddress)).toHaveTextContaining(walletAddr);
       await expect($(dappStakeAddress)).toHaveTextContaining(walletStakeAddr);
       await expect($(dappUsedAddress)).toHaveTextContaining(walletAddr);
+    });
+
+    it('getActivePubStakeKeys gets active public stake keys from cip95 wallet api', async () => {
+      const dappStakeKey = await $(dappGetActivePubStakeKeys).getText();
+      expect(dappStakeKey.length).toBeGreaterThan(0);
+      await expect($(dappStakeKeyToStakeAddress)).toHaveTextContaining(walletStakeAddr);
+    });
+
+    it('getPubDRepKey gets the DRep key from cip95 wallet api', async () => {
+      const dappDrepKey = await $(dappGetPubDrepKey).getText();
+      expect(dappDrepKey.length).toBeGreaterThan(0);
+      await expect($(dappDrepId)).toHaveTextContaining('drep_id');
     });
   });
 });
