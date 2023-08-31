@@ -59,7 +59,7 @@ export const withNftMetadata =
     evt$.pipe(
       map((evt) => {
         const nftMetadata = uniqBy(
-          [...getNftMetadataFromCip67(evt, logger), ...getNftMetadataFromCip25(evt, logger)].filter(isNotNil),
+          [...getNftMetadataFromCip25(evt, logger), ...getNftMetadataFromCip67(evt, logger)].reverse().filter(isNotNil),
           ({ userTokenAssetId }) => userTokenAssetId
         );
         return { ...evt, nftMetadata };
