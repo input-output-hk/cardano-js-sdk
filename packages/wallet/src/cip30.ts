@@ -13,16 +13,7 @@ import {
   TxSignErrorCode,
   WalletApi
 } from '@cardano-sdk/dapp-connector';
-import {
-  CML,
-  Cardano,
-  NotImplementedError,
-  Serialization,
-  TxCBOR,
-  cmlToCore,
-  coalesceValueQuantities,
-  coreToCml
-} from '@cardano-sdk/core';
+import { CML, Cardano, Serialization, TxCBOR, cmlToCore, coalesceValueQuantities, coreToCml } from '@cardano-sdk/core';
 import { HexBlob, ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
 import { InputSelectionError, InputSelectionFailure } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
@@ -524,9 +515,15 @@ const baseCip30WalletApi = (
 });
 
 const extendedCip95WalletApi = (wallet$: Observable<ObservableWallet>, { logger }: Cip30WalletDependencies) => ({
-  // TODO: implement getActivePubStakeKeys
   getActivePubStakeKeys: async () => {
-    throw new NotImplementedError('getActivePubStakeKeys');
+    logger.debug('getting public active stake keys');
+    try {
+      const wallet = await firstValueFrom(wallet$);
+      return firstValueFrom(wallet.activePublicStakeKeys$);
+    } catch (error) {
+      logger.error(error);
+      throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));
+    }
   },
   getPubDRepKey: async () => {
     logger.debug('getting public DRep key');
