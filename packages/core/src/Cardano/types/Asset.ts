@@ -1,6 +1,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { AssetNameLabel } from '../../Asset';
 import { HexBlob, InvalidStringError, OpaqueString, assertIsHexString, typedBech32 } from '@cardano-sdk/util';
+import { TextDecoder } from 'web-encoding';
 
 export type AssetId = OpaqueString<'AssetId'>;
 
@@ -16,6 +17,15 @@ export const AssetName = (value: string): AssetName => {
     }
   }
   return value.toLowerCase() as unknown as AssetName;
+};
+
+const utf8Decoder = new TextDecoder('utf8', { fatal: true });
+AssetName.toUTF8 = (assetName: AssetName) => {
+  try {
+    return utf8Decoder.decode(Buffer.from(assetName, 'hex'));
+  } catch (error) {
+    throw new InvalidStringError('Cannot convert AssetName to UTF8', error);
+  }
 };
 
 /**
