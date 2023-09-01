@@ -3,7 +3,7 @@ import { AuxiliaryData } from './AuxiliaryData';
 import { Base64Blob, HexBlob, OpaqueString, hexStringToBuffer, usingAutoFree } from '@cardano-sdk/util';
 import { CML } from '../../CML/CML';
 import { Certificate } from './Certificate';
-import { ExUnits, ValidityInterval } from './ProtocolParameters';
+import { ExUnits, Update, ValidityInterval } from './ProtocolParameters';
 import { HydratedTxIn, TxIn, TxOut } from './Utxo';
 import { Lovelace, TokenMap } from './Value';
 import { NetworkId } from '../ChainId';
@@ -52,6 +52,7 @@ export interface HydratedTxBody {
   scriptIntegrityHash?: Crypto.Hash32ByteBase16;
   requiredExtraSignatures?: Crypto.Ed25519KeyHashHex[];
   networkId?: NetworkId;
+  update?: Update;
   auxiliaryDataHash?: Crypto.Hash32ByteBase16;
 
   /**
