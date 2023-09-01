@@ -1,6 +1,6 @@
-import { CML, TxCBOR } from '../../src';
 import { ManagedFreeableScope } from '@cardano-sdk/util';
-import { Transaction } from '../../src/Serialization';
+import { Transaction, TransactionBody } from '../../src/Serialization';
+import { TxCBOR } from '../../src';
 import { babbageTx, tx as coreTx, signature, vkey } from '../CML/testData';
 
 const TX =
@@ -27,7 +27,7 @@ describe('Transaction', () => {
     const scope = new ManagedFreeableScope();
     const tx = Transaction.fromCore(scope, coreTx);
 
-    expect(tx.body()).toBeInstanceOf(CML.TransactionBody);
+    expect(tx.body()).toBeInstanceOf(TransactionBody);
     const witnessSet = scope.manage(tx.witnessSet());
     const vKeys = scope.manage(witnessSet.vkeys());
     const witness = scope.manage(vKeys!.get(0)!);
@@ -66,16 +66,15 @@ describe('Transaction', () => {
   });
 
   it('can set the txBody on the transaction', () => {
-    const scope = new ManagedFreeableScope();
     const tx = Transaction.fromCbor(TxCBOR(TX));
     const tx2 = Transaction.fromCbor(TxCBOR(TX2));
 
-    tx.setBody(scope.manage(tx2.body()));
+    tx.setBody(tx2.body());
 
     // Perform a round trip serialization.
     const tx3 = Transaction.fromCbor(tx.toCbor());
 
-    expect(scope.manage(tx3.body()).to_bytes()).toEqual(scope.manage(tx2.body()).to_bytes());
+    expect(tx3.body().toCbor()).toEqual(tx2.body().toCbor());
   });
 
   it('can set the witness set on the transaction', () => {
@@ -105,20 +104,19 @@ describe('Transaction', () => {
   });
 
   it('can perform a deep clone of the object', () => {
-    const scope = new ManagedFreeableScope();
     const referenceTx = Transaction.fromCbor(TxCBOR(TX));
     const tx = Transaction.fromCbor(TxCBOR(TX));
     const cloned = tx.clone();
     const tx2 = Transaction.fromCbor(TxCBOR(TX2));
 
     // Change original TX object
-    tx.setBody(scope.manage(tx2.body()));
+    tx.setBody(tx2.body());
 
     // Perform a round trip serialization on the cloned object.
     const tx3 = Transaction.fromCbor(cloned.toCbor());
 
-    expect(scope.manage(tx3.body()).to_bytes()).toEqual(scope.manage(referenceTx.body()).to_bytes());
-    expect(scope.manage(tx3.body()).to_bytes()).not.toEqual(scope.manage(tx.body()).to_bytes());
+    expect(tx3.body().toCbor()).toEqual(referenceTx.body().toCbor());
+    expect(tx3.body().toCbor()).not.toEqual(tx.body().toCbor());
   });
 
   it('can compute the right Tx ID', () => {
