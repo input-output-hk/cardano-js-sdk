@@ -3,21 +3,18 @@ kind: Deployment
 metadata:
   labels:
     app: coingecko-proxy
-    network: preview
-    release: dev-preview-cardanojs
-  name: dev-preview-cardanojs-coingecko-proxy
+
+  name: cardanojs-coingecko-proxy
 spec:
   selector:
     matchLabels:
       app: coingecko-proxy
-      network: preview
-      release: dev-preview-cardanojs
+
   template:
     metadata:
       labels:
         app: coingecko-proxy
-        network: preview
-        release: dev-preview-cardanojs
+
     spec:
       containers:
         - image: 926093910549.dkr.ecr.us-east-1.amazonaws.com/coingecko-proxy:qzydqc9866j6hchxkra7v9a70l19g35x

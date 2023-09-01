@@ -3,9 +3,8 @@ kind: Service
 metadata:
   labels:
     app: backend
-    network: preview
-    release: dev-preview-cardanojs
-  name: dev-preview-cardanojs-backend
+
+  name: cardanojs-backend
 spec:
   ports:
     - name: http
@@ -14,5 +13,3 @@ spec:
       targetPort: 3000
   selector:
     app: backend
-    network: preview
-    release: dev-preview-cardanojs

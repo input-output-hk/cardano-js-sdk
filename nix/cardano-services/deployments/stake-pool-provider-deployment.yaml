@@ -3,21 +3,18 @@ kind: Deployment
 metadata:
   labels:
     app: stake-pool-provider
-    network: preview
-    release: dev-preview-cardanojs
-  name: dev-preview-cardanojs-stake-pool-provider
+
+  name: cardanojs-stake-pool-provider
 spec:
   selector:
     matchLabels:
       app: stake-pool-provider
-      network: preview
-      release: dev-preview-cardanojs
+
   template:
     metadata:
       labels:
         app: stake-pool-provider
-        network: preview
-        release: dev-preview-cardanojs
+
     spec:
       containers:
         - args:

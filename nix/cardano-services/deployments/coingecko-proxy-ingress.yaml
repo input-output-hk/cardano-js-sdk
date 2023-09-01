@@ -11,9 +11,8 @@ metadata:
     external-dns.alpha.kubernetes.io/set-identifier: eu-central-1-dev-preview-proxy
   labels:
     app: coingecko-proxy
-    network: preview
-    release: dev-preview-cardanojs
-  name: dev-preview-cardanojs-coingecko-proxy
+
+  name: cardanojs-coingecko-proxy
 spec:
   ingressClassName: alb
   rules:
@@ -29,7 +28,7 @@ spec:
             pathType: Prefix
           - backend:
               service:
-                name: dev-preview-cardanojs-coingecko-proxy
+                name: cardanojs-coingecko-proxy
                 port:
                   name: http
             path: /

@@ -5,3 +5,6 @@ metadata:
   annotations:
     config.kubernetes.io/local-config: 'true'
 namespace: dev-preview
+namePrefix: dev-preview-
+commonLabels:
+  network: preview

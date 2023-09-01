@@ -3,21 +3,18 @@ kind: Deployment
 metadata:
   labels:
     app: handle-provider
-    network: preview
-    release: dev-preview-cardanojs
-  name: dev-preview-cardanojs-handle-provider
+
+  name: cardanojs-handle-provider
 spec:
   selector:
     matchLabels:
       app: handle-provider
-      network: preview
-      release: dev-preview-cardanojs
+
   template:
     metadata:
       labels:
         app: handle-provider
-        network: preview
-        release: dev-preview-cardanojs
+
     spec:
       containers:
         - args:

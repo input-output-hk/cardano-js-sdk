@@ -14,9 +14,8 @@ metadata:
     external-dns.alpha.kubernetes.io/set-identifier: eu-central-1-dev-preview-backend
   labels:
     app: backend
-    network: preview
-    release: dev-preview-cardanojs
-  name: dev-preview-cardanojs-backend
+
+  name: cardanojs-backend
 spec:
   ingressClassName: alb
   rules:
@@ -32,21 +31,21 @@ spec:
             pathType: Prefix
           - backend:
               service:
-                name: dev-preview-cardanojs-backend
+                name: cardanojs-backend
                 port:
                   name: http
             path: /
             pathType: Prefix
           - backend:
               service:
-                name: dev-preview-cardanojs-stake-pool-provider
+                name: cardanojs-stake-pool-provider
                 port:
                   name: http
             path: /v1.0.0/stake-pool
             pathType: Prefix
           - backend:
               service:
-                name: dev-preview-cardanojs-handle-provider
+                name: cardanojs-handle-provider
                 port:
                   name: http
             path: /v1.0.0/handle

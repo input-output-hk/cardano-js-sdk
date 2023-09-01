@@ -3,9 +3,8 @@ kind: Service
 metadata:
   labels:
     app: coingecko-proxy
-    network: preview
-    release: dev-preview-cardanojs
-  name: dev-preview-cardanojs-coingecko-proxy
+
+  name: cardanojs-coingecko-proxy
 spec:
   ports:
     - name: http
@@ -14,5 +13,3 @@ spec:
       targetPort: http
   selector:
     app: coingecko-proxy
-    network: preview
-    release: dev-preview-cardanojs

@@ -3,21 +3,18 @@ kind: Deployment
 metadata:
   labels:
     app: handle-projector
-    network: preview
-    release: dev-preview-cardanojs
-  name: dev-preview-cardanojs-handle-projector
+
+  name: cardanojs-handle-projector
 spec:
   selector:
     matchLabels:
       app: handle-projector
-      network: preview
-      release: dev-preview-cardanojs
+
   template:
     metadata:
       labels:
         app: handle-projector
-        network: preview
-        release: dev-preview-cardanojs
+
     spec:
       containers:
         - args:

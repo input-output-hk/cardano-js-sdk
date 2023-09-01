@@ -3,21 +3,18 @@ kind: Deployment
 metadata:
   labels:
     app: pg-boss-worker
-    network: preview
-    release: dev-preview-cardanojs
-  name: dev-preview-cardanojs-pg-boss-worker
+
+  name: cardanojs-pg-boss-worker
 spec:
   selector:
     matchLabels:
       app: pg-boss-worker
-      network: preview
-      release: dev-preview-cardanojs
+
   template:
     metadata:
       labels:
         app: pg-boss-worker
-        network: preview
-        release: dev-preview-cardanojs
+
     spec:
       containers:
         - args:

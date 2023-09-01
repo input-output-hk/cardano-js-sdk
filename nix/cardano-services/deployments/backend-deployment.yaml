@@ -3,22 +3,19 @@ kind: Deployment
 metadata:
   labels:
     app: backend
-    network: preview
-    release: dev-preview-cardanojs
-  name: dev-preview-cardanojs-backend
+
+  name: cardanojs-backend
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: backend
-      network: preview
-      release: dev-preview-cardanojs
+
   template:
     metadata:
       labels:
         app: backend
-        network: preview
-        release: dev-preview-cardanojs
+
     spec:
       containers:
         - args:
