@@ -54,7 +54,9 @@ const getNftMetadataFromCip25 = ({ mint }: WithMint, logger: Logger) =>
   });
 
 export const withNftMetadata =
-  ({ logger }: WithLogger): ProjectionOperator<WithMint & WithUtxo & WithCIP67, WithNftMetadata> =>
+  <PropsIn extends WithMint & WithUtxo & WithCIP67>({
+    logger
+  }: WithLogger): ProjectionOperator<PropsIn, WithNftMetadata> =>
   (evt$) =>
     evt$.pipe(
       map((evt) => {
