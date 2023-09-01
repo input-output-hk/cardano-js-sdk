@@ -6,6 +6,7 @@ import {
   CurrentPoolMetricsEntity,
   DataSourceExtensions,
   HandleEntity,
+  HandleMetadataEntity,
   NftMetadataEntity,
   OutputEntity,
   PoolMetadataEntity,
@@ -19,6 +20,7 @@ import {
   storeAddresses,
   storeAssets,
   storeBlock,
+  storeHandleMetadata,
   storeHandles,
   storeNftMetadata,
   storeStakeKeyRegistrations,
@@ -67,12 +69,16 @@ const createMapperOperators = (
     ? Mapper.filterMintByPolicyIds({ policyIds: handlePolicyIds })
     : passthrough();
   const withHandles = handlePolicyIds ? Mapper.withHandles({ policyIds: handlePolicyIds }, logger) : passthrough();
+  const withHandleMetadata = handlePolicyIds
+    ? Mapper.withHandleMetadata({ policyIds: handlePolicyIds }, logger)
+    : passthrough();
   return {
     filterMint,
     filterUtxo,
     withAddresses: Mapper.withAddresses(),
     withCIP67: Mapper.withCIP67(),
     withCertificates: Mapper.withCertificates(),
+    withHandleMetadata,
     withHandles,
     withMint: Mapper.withMint(),
     withNftMetadata: Mapper.withNftMetadata({ logger }),
@@ -89,6 +95,7 @@ export const storeOperators = {
   storeAddresses: storeAddresses(),
   storeAssets: storeAssets(),
   storeBlock: storeBlock(),
+  storeHandleMetadata: storeHandleMetadata(),
   storeHandles: storeHandles(),
   storeNftMetadata: storeNftMetadata(),
   storePoolMetricsUpdateJob: createStorePoolMetricsUpdateJob(POOLS_METRICS_INTERVAL_DEFAULT)(),
@@ -108,6 +115,7 @@ const entities = {
   blockData: BlockDataEntity,
   currentPoolMetrics: CurrentPoolMetricsEntity,
   handle: HandleEntity,
+  handleMetadata: HandleMetadataEntity,
   nftMetadata: NftMetadataEntity,
   output: OutputEntity,
   poolMetadata: PoolMetadataEntity,
@@ -126,6 +134,7 @@ const storeEntities: Partial<Record<StoreName, EntityName[]>> = {
   storeAddresses: ['address'],
   storeAssets: ['asset'],
   storeBlock: ['block'],
+  storeHandleMetadata: ['handleMetadata', 'output'],
   storeHandles: ['handle', 'asset', 'tokens', 'output'],
   storeNftMetadata: ['asset'],
   storePoolMetricsUpdateJob: ['stakePool', 'currentPoolMetrics', 'poolMetadata'],
@@ -141,7 +150,8 @@ const entityInterDependencies: Partial<Record<EntityName, EntityName[]>> = {
   blockData: ['block'],
   currentPoolMetrics: ['stakePool'],
   handle: ['asset'],
-  output: ['block'],
+  handleMetadata: ['output'],
+  output: ['block', 'tokens'],
   poolMetadata: ['stakePool'],
   poolRegistration: ['block'],
   poolRetirement: ['block'],
@@ -175,6 +185,7 @@ const mapperInterDependencies: Partial<Record<MapperName, MapperName[]>> = {
   filterUtxo: ['withUtxo'],
   withAddresses: ['withUtxo'],
   withCIP67: ['withUtxo'],
+  withHandleMetadata: ['withNftMetadata', 'withCIP67'],
   withHandles: ['withMint', 'filterMint', 'withUtxo', 'filterUtxo', 'withCIP67'],
   withNftMetadata: ['withCIP67', 'withMint'],
   withStakeKeyRegistrations: ['withCertificates'],
@@ -184,6 +195,7 @@ const mapperInterDependencies: Partial<Record<MapperName, MapperName[]>> = {
 const storeMapperDependencies: Partial<Record<StoreName, MapperName[]>> = {
   storeAddresses: ['withAddresses'],
   storeAssets: ['withMint'],
+  storeHandleMetadata: ['withHandleMetadata'],
   storeHandles: ['withHandles'],
   storeNftMetadata: ['withNftMetadata'],
   storeStakeKeyRegistrations: ['withStakeKeyRegistrations'],
@@ -195,6 +207,7 @@ const storeMapperDependencies: Partial<Record<StoreName, MapperName[]>> = {
 const storeInterDependencies: Partial<Record<StoreName, StoreName[]>> = {
   storeAddresses: ['storeStakeKeyRegistrations'],
   storeAssets: ['storeBlock'],
+  storeHandleMetadata: ['storeUtxo'],
   storeHandles: ['storeUtxo'],
   storeNftMetadata: ['storeAssets'],
   storePoolMetricsUpdateJob: ['storeBlock'],
@@ -205,7 +218,9 @@ const storeInterDependencies: Partial<Record<StoreName, StoreName[]>> = {
 
 const projectionStoreDependencies: Record<ProjectionName, StoreName[]> = {
   address: ['storeAddresses'],
-  handle: ['storeHandles', 'storeNftMetadata'],
+  // TODO: remove storeNftMetadata when TypeormAssetProvider tests
+  // are updated to use 'asset' database instead of a handle database
+  handle: ['storeHandles', 'storeHandleMetadata', 'storeNftMetadata'],
   'stake-pool': ['storeStakePools'],
   'stake-pool-metadata-job': ['storeStakePoolMetadataJob'],
   'stake-pool-metrics-job': ['storePoolMetricsUpdateJob'],
