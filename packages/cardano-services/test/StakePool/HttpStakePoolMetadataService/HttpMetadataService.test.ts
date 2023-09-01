@@ -120,8 +120,7 @@ describe('StakePoolMetadataService', () => {
             null,
             `StakePoolMetadataService failed to fetch metadata JSON from ${serverUrl} due to Request failed with status code 500`
           )
-        ],
-        metadata: { ext: undefined }
+        ]
       });
     });
 
@@ -143,8 +142,7 @@ describe('StakePoolMetadataService', () => {
             null,
             "Invalid stake pool hash. Computed '0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8', expected '0000000000000000000000000000000000000000000000000000000000000000'"
           )
-        ],
-        metadata: undefined
+        ]
       });
     });
 

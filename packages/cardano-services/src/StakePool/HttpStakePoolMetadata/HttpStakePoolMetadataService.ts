@@ -119,7 +119,7 @@ export const createHttpStakePoolMetadataService = (
       }
     }
 
-    return { errors, metadata: { ...metadata!, ext: extMetadata } };
+    return { errors, metadata: metadata ? { ...metadata, ext: extMetadata } : undefined };
   },
 
   async validateStakePoolExtendedMetadata(errors, metadata) {
