@@ -187,7 +187,7 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       sharedHandleProvider = await withTypeOrmProvider(
         'Handle',
         async (connectionConfig$) =>
-          new TypeOrmHandleProvider({ connectionConfig$, entities: getEntities(['handle']), logger })
+          new TypeOrmHandleProvider({ connectionConfig$, entities: getEntities(['handle', 'handleMetadata']), logger })
       )();
     }
 

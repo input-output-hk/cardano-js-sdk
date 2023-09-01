@@ -5,6 +5,7 @@ import { BlockTableMigration1682519108358 } from './1682519108358-block-table';
 import { CostPledgeNumericMigration1689091319930 } from './1689091319930-cost-pledge-numeric';
 import { FkPoolRegistrationMigration1682519108369 } from './1682519108369-fk-pool-registration';
 import { FkPoolRetirementMigration1682519108370 } from './1682519108370-fk-pool-retirement';
+import { HandleMetadataTableMigrations1693490983715 } from './1693490983715-handle-metadata-table';
 import { HandleTableMigration1686138943349 } from './1686138943349-handle-table';
 import { NftMetadataTableMigration1690269355640 } from './1690269355640-nft-metadata-table';
 import { OutputTableMigration1682519108367 } from './1682519108367-output-table';
@@ -39,5 +40,6 @@ export const migrations: ProjectionMigration[] = [
   NftMetadataTableMigration1690269355640,
   AddressTableMigrations1690955710125,
   StakeKeyRegistrationsTableMigrations1690964880195,
-  TokensQuantityNumericMigrations1691042603934
+  TokensQuantityNumericMigrations1691042603934,
+  HandleMetadataTableMigrations1693490983715
 ];
