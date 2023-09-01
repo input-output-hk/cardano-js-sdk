@@ -102,3 +102,16 @@ export const createRollForwardEventBasedOn = (
     tip: updateBlockHeader
   };
 };
+
+export const createStubTx = (body: Partial<Cardano.TxBody>, metadata?: Cardano.TxMetadata): Cardano.OnChainTx => ({
+  auxiliaryData: { blob: metadata },
+  body: {
+    fee: 123n,
+    inputs: [],
+    outputs: [],
+    ...body
+  },
+  id: Cardano.TransactionId(generateRandomHexString(64)),
+  inputSource: Cardano.InputSource.inputs,
+  witness: { signatures: new Map() }
+});

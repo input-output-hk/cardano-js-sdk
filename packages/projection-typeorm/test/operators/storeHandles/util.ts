@@ -1,14 +1,19 @@
 import {
+  AddressEntity,
   AssetEntity,
   BlockDataEntity,
   BlockEntity,
   HandleEntity,
+  HandleMetadataEntity,
   NftMetadataEntity,
   OutputEntity,
+  StakeKeyRegistrationEntity,
   TokensEntity,
   TypeormStabilityWindowBuffer,
+  storeAddresses,
   storeAssets,
   storeBlock,
+  storeHandleMetadata,
   storeHandles,
   storeUtxo,
   typeormTransactionCommit,
@@ -55,10 +60,13 @@ export const createMultiTxProjectionSource = (txs: Pick<Cardano.OnChainTx, 'id' 
 export const entities = [
   BlockEntity,
   BlockDataEntity,
+  AddressEntity,
   AssetEntity,
   TokensEntity,
   OutputEntity,
   HandleEntity,
+  HandleMetadataEntity,
+  StakeKeyRegistrationEntity,
   NftMetadataEntity
 ];
 
@@ -68,29 +76,41 @@ const dataSource$ = defer(() =>
 
 const storeData =
   (buffer: TypeormStabilityWindowBuffer) =>
-  (evt$: Observable<ProjectionEvent<Mappers.WithUtxo & Mappers.WithMint & Mappers.WithHandles>>) =>
+  (
+    evt$: Observable<
+      ProjectionEvent<
+        Mappers.WithUtxo & Mappers.WithMint & Mappers.WithHandles & Mappers.WithAddresses & Mappers.WithHandleMetadata
+      >
+    >
+  ) =>
     evt$.pipe(
       withTypeormTransaction({ dataSource$, logger }),
       storeBlock(),
       storeAssets(),
       storeUtxo(),
       storeHandles(),
+      storeAddresses(),
+      storeHandleMetadata(),
       buffer.storeBlockData(),
       typeormTransactionCommit()
     );
 
-// eslint-disable-next-line unicorn/consistent-function-scoping
-export const applyOperators = (buffer: TypeormStabilityWindowBuffer) => (evt$: Observable<ProjectionEvent<{}>>) =>
+const applyMappers = (evt$: Observable<ProjectionEvent<{}>>) =>
   evt$.pipe(
     Mappers.withUtxo(),
     Mappers.withMint(),
+    Mappers.withAddresses(),
     Mappers.filterProducedUtxoByAssetPolicyId({ policyIds }),
     Mappers.filterMintByPolicyIds({ policyIds }),
     Mappers.withCIP67(),
-    Mappers.withHandles({ policyIds }, logger),
-    storeData(buffer),
-    requestNext()
+    Mappers.withNftMetadata({ logger }),
+    Mappers.withHandleMetadata({ policyIds }, logger),
+    Mappers.withHandles({ policyIds }, logger)
   );
+
+// eslint-disable-next-line unicorn/consistent-function-scoping
+export const applyOperators = (buffer: TypeormStabilityWindowBuffer) => (evt$: Observable<ProjectionEvent<{}>>) =>
+  evt$.pipe(applyMappers, storeData(buffer), requestNext());
 
 export const project$ = (buffer: TypeormStabilityWindowBuffer) => () =>
   Bootstrap.fromCardanoNode({ blocksBufferLength: 10, buffer, cardanoNode: stubEvents.cardanoNode, logger }).pipe(
