@@ -26,9 +26,9 @@ spec:
             - name: ALLOWED_ORIGINS
               value: chrome-extension://gafhhkghbfjjkeiendhlofajokpaflmk,chrome-extension://efeiemlfnahiidnjglmehaihacglceia
             - name: DISABLE_STAKE_POOL_METRIC_APY
-              value: "true"
+              value: 'true'
             - name: ENABLE_METRICS
-              value: "true"
+              value: 'true'
             - name: LOGGER_MIN_SEVERITY
               value: debug
             - name: NETWORK
@@ -36,7 +36,7 @@ spec:
             - name: OGMIOS_SRV_SERVICE_NAME
               value: dev-preview-cardano-stack.dev-preview.svc.cluster.local
             - name: PAGINATION_PAGE_SIZE_LIMIT
-              value: "5500"
+              value: '5500'
             - name: POSTGRES_DB_STAKE_POOL
               value: stakepool
             - name: POSTGRES_HOST_STAKE_POOL
@@ -47,13 +47,13 @@ spec:
                   key: password
                   name: stakepool-owner-user.dev-preview-dbsync-db.credentials.postgresql.acid.zalan.do
             - name: POSTGRES_POOL_MAX_STAKE_POOL
-              value: "10"
+              value: '10'
             - name: POSTGRES_PORT_STAKE_POOL
-              value: "5432"
+              value: '5432'
             - name: POSTGRES_SSL_CA_FILE_STAKE_POOL
               value: /tls/ca.crt
             - name: POSTGRES_SSL_STAKE_POOL
-              value: "true"
+              value: 'true'
             - name: POSTGRES_USER_STAKE_POOL
               valueFrom:
                 secretKeyRef:
@@ -64,7 +64,7 @@ spec:
             - name: TOKEN_METADATA_SERVER_URL
               value: http://dev-preview-cardano-stack-metadata.dev-preview.svc.cluster.local
             - name: USE_TYPEORM_STAKE_POOL_PROVIDER
-              value: "true"
+              value: 'true'
           image: FIXME-ADD-LATEST-IMAGE-REFERENCE
           livenessProbe:
             httpGet:

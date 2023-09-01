@@ -3,9 +3,9 @@ kind: Ingress
 metadata:
   annotations:
     alb.ingress.kubernetes.io/actions.ssl-redirect: '{"RedirectConfig":{"Port":"443","Protocol":"HTTPS","StatusCode":"HTTP_301"},"Type":"redirect"}'
-    alb.ingress.kubernetes.io/healthcheck-interval-seconds: "60"
+    alb.ingress.kubernetes.io/healthcheck-interval-seconds: '60'
     alb.ingress.kubernetes.io/healthcheck-path: /v1.0.0/health
-    alb.ingress.kubernetes.io/healthcheck-timeout-seconds: "30"
+    alb.ingress.kubernetes.io/healthcheck-timeout-seconds: '30'
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
