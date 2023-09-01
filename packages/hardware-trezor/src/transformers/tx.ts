@@ -1,7 +1,7 @@
 import * as Trezor from '@trezor/connect';
 import { Cardano } from '@cardano-sdk/core';
+import { GroupedAddress } from '@cardano-sdk/key-management';
 import { TrezorTxTransformerContext } from '../types';
-import { util as deprecatedUtil } from '@cardano-sdk/key-management';
 import { mapAdditionalWitnessRequests } from './additionalWitnessRequests';
 import { mapAuxiliaryData, mapCerts, mapTxIns, mapTxOuts, mapWithdrawals } from './';
 import { mapTokenMap } from './assets';
@@ -35,21 +35,22 @@ const trezorTxTransformer = async (
 };
 
 /**
- * Temporary props type extending the existing TxToTrezorProps
- * and adding the core Cardano.TxBody so we can pass it to our
- * override implementations.
- */
-type TxToTrezorProps = deprecatedUtil.TxToTrezorProps & {
-  cardanoTxBody: Cardano.TxBody;
-};
-
-/**
  * Takes a core transaction and context data necessary to transform
  * it into a trezor.CardanoSignTransaction
  */
-export const txToTrezor = (props: TxToTrezorProps): Promise<Omit<Trezor.CardanoSignTransaction, 'signingMode'>> =>
-  trezorTxTransformer(props.cardanoTxBody, {
-    chainId: props.chainId,
-    inputResolver: props.inputResolver,
-    knownAddresses: props.knownAddresses
+export const txToTrezor = ({
+  cardanoTxBody,
+  chainId,
+  inputResolver,
+  knownAddresses
+}: {
+  chainId: Cardano.ChainId;
+  inputResolver: Cardano.InputResolver;
+  knownAddresses: GroupedAddress[];
+  cardanoTxBody: Cardano.TxBody;
+}): Promise<Omit<Trezor.CardanoSignTransaction, 'signingMode'>> =>
+  trezorTxTransformer(cardanoTxBody, {
+    chainId,
+    inputResolver,
+    knownAddresses
   });
