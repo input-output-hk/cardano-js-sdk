@@ -1,51 +1,30 @@
 /* eslint-disable max-statements */
-import { getObservableWalletName } from '../extension/const';
-
-const switchToWalletUi = async () => {
-  await browser.waitUntil(async () => {
-    try {
-      await browser.switchWindow('Test Wallet UI');
-      return true;
-    } catch {
-      return false;
-    }
-  });
-};
+import { getObservableWalletName, selectors } from '../extension/const';
+import { switchToWalletUi } from './utils';
 
 const NUM_POOLS = 3;
 
 describe('wallet', () => {
-  const pWalletFound = '#root > div > p:nth-child(4)';
-  const btnRefresh = '#root > div > button';
-  const pNetworkId = '#root > div > p:nth-child(8)';
-  const liFirstUtxo = '#root > div > p:nth-child(9) > li';
-  const btnGrantAccess = '#requestAccessGrant';
-  const btnActivateWallet1 = '#activateWallet1';
-  const btnActivateWallet2 = '#activateWallet2';
-  const deactivateWallet = '#deactivateWallet';
-  const destroyWallet = '#destroyWallet';
-  const spanAddress = '#address';
-  const spanStakeAddress = '#stakeAddress';
-
-  const spanBalance = '#balance';
-  const spanSupplyDistribution = '#supplyDistribution';
-  const divAdaPrice = '#adaPrice';
-  const btnSignAndBuildTx = '#buildAndSignTx';
-  const divSignature = '#signature';
-  const activeWalletName = '#observableWalletName';
-
-  const dappBtnRun = '#bp3-tab-panel_TabsExample_1 > div > button';
-  const dappSubmittedTxConfirmation = '#root > div > p:last-child';
-  const dappChangeAddress = '#root > div > p:nth-child(11)';
-  const dappStakeAddress = '#root > div > p:nth-child(12)';
-  const dappUsedAddress = '#root > div > p:nth-child(13)';
-
-  const btnDelegate = '#multiDelegation .delegate button';
-  const spanPoolIds = '#multiDelegation .delegate .pools';
-  const liPools = '#multiDelegation .distribution li';
-  const liPercents = '#multiDelegation .distribution li .percent';
-  const divBgPortDisconnectStatus = '#remoteApiPortDisconnect .bgPortDisconnect';
-  const divUiPortDisconnectStatus = '#remoteApiPortDisconnect .uiPortDisconnect';
+  const {
+    btnActivateWallet1,
+    btnActivateWallet2,
+    btnDelegate,
+    deactivateWallet,
+    destroyWallet,
+    spanAddress,
+    spanStakeAddress,
+    spanBalance,
+    spanSupplyDistribution,
+    divAdaPrice,
+    btnSignAndBuildTx,
+    divSignature,
+    activeWalletName,
+    spanPoolIds,
+    liPools,
+    liPercents,
+    divBgPortDisconnectStatus,
+    divUiPortDisconnectStatus
+  } = selectors;
 
   // The address is filled in by the tests, which are order dependent
   let walletAddr1 = '';
@@ -59,17 +38,16 @@ describe('wallet', () => {
     });
   };
 
-  before(async () => {
-    await browser.url('/');
+  // eslint-disable-next-line unicorn/consistent-function-scoping
+  const refreshDappWallets = async () => {
+    const btnRefresh = '#root > div > button';
     await $(btnRefresh).click();
-  });
-
-  it('dapp should detect test wallet', async () => {
-    await expect($(pWalletFound)).toHaveTextContaining('true');
-  });
+  };
 
   describe('wallet ui opens', () => {
     before(async () => {
+      await browser.url('/');
+      await refreshDappWallets(); // still needed to trigger opening the extension ui
       await switchToWalletUi();
     });
 
@@ -82,9 +60,8 @@ describe('wallet', () => {
       await expect($(divAdaPrice)).toHaveText('2.99');
     });
 
-    describe('web-extension grants access and creates key agent', () => {
+    describe('web-extension activates wallet and creates key agent', () => {
       before(async () => {
-        await $(btnGrantAccess).click();
         await $(btnActivateWallet1).click();
       });
       it('web-extension has access to remote ObservableWallet and SupplyDistribution', async () => {
@@ -105,29 +82,8 @@ describe('wallet', () => {
       });
     });
 
-    describe('dapp can use cip30 wallet api', () => {
-      it('dapp has access to cip30 WalletApi', async () => {
-        await browser.switchWindow('React App');
-        await expect($(pNetworkId)).toHaveText('Network Id (0 = testnet; 1 = mainnet): 0');
-        await browser.waitUntil($(liFirstUtxo).isExisting, { timeout: 60_000 });
-      });
-
-      it('dapp can build and send a transaction using cip30 WalletApi', async () => {
-        await browser.switchWindow('React App');
-        await $(dappBtnRun).click();
-        await expect($(dappSubmittedTxConfirmation)).toHaveTextContaining('check your wallet');
-      });
-
-      it('dapp gets correct addresses from cip30 wallet api', async () => {
-        await expect($(dappChangeAddress)).toHaveTextContaining(walletAddr1);
-        await expect($(dappStakeAddress)).toHaveTextContaining(walletStakeAddr1);
-        await expect($(dappUsedAddress)).toHaveTextContaining(walletAddr1);
-      });
-    });
-
     describe('web-extension can build transactions and use wallet manager', () => {
       it('can build and sign a transaction', async () => {
-        await switchToWalletUi();
         await buildAndSign();
       });
 

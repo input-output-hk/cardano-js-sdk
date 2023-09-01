@@ -14,7 +14,13 @@ import {
   consumeSupplyDistributionTracker,
   exposeApi
 } from '@cardano-sdk/web-extension';
-import { adaPriceServiceChannel, getObservableWalletName, userPromptServiceChannel, walletName } from './const';
+import {
+  adaPriceServiceChannel,
+  getObservableWalletName,
+  selectors,
+  userPromptServiceChannel,
+  walletName
+} from './const';
 import { bip32Ed25519Factory, keyManagementFactory } from '../../../src';
 
 import { Cardano } from '@cardano-sdk/core';
@@ -32,7 +38,7 @@ const api: UserPromptService = {
     const container = document.querySelector<HTMLDivElement>('#requestAccess')!;
     container.style.display = 'block';
     document.querySelector<HTMLSpanElement>('#requestAccessOrigin')!.textContent = origin;
-    const btnGrant = document.querySelector<HTMLButtonElement>('#requestAccessGrant')!;
+    const btnGrant = document.querySelector<HTMLButtonElement>(selectors.btnGrantAccess)!;
     const btnDeny = document.querySelector<HTMLButtonElement>('#requestAccessDeny')!;
     return new Promise((resolve) => {
       const done = async (grant: boolean) => {
@@ -66,7 +72,9 @@ const backgroundServices = consumeRemoteApi<BackgroundServices>(
   },
   { logger, runtime }
 );
-backgroundServices.adaUsd$.subscribe((price) => (document.querySelector('#adaPrice')!.textContent = price.toFixed(2)));
+backgroundServices.adaUsd$.subscribe(
+  (price) => (document.querySelector(selectors.divAdaPrice)!.textContent = price.toFixed(2))
+);
 document
   .querySelector<HTMLButtonElement>('#clearAllowList')!
   .addEventListener('click', backgroundServices.clearAllowList);
@@ -76,13 +84,15 @@ document
 const supplyDistribution = consumeSupplyDistributionTracker({ walletName }, { logger, runtime });
 combineLatest([supplyDistribution.lovelaceSupply$, supplyDistribution.stake$]).subscribe(
   ([lovelaceSupply, stake]) =>
-    (document.querySelector('#supplyDistribution')!.textContent = `${stake.live} out of ${lovelaceSupply.total}`)
+    (document.querySelector(
+      selectors.spanSupplyDistribution
+    )!.textContent = `${stake.live} out of ${lovelaceSupply.total}`)
 );
 
 /** Get pools from background service and assign weights */
 const displayPoolIdsAndPreparePortfolio = async (): Promise<{ pool: Cardano.StakePool; weight: number }[]> => {
   const pools = await backgroundServices.getPoolIds(delegationConfig.count);
-  const poolsSpan = document.querySelector('#multiDelegation .delegate .pools');
+  const poolsSpan = document.querySelector(selectors.spanPoolIds);
   poolsSpan!.textContent = pools.map(({ id }) => id).join(' ');
   return pools.map((pool, idx) => ({ pool, weight: delegationConfig.distribution[idx] }));
 };
@@ -104,20 +114,20 @@ const sendDelegationTx = async (portfolio: { pool: Cardano.StakePool; weight: nu
 };
 
 const setAddresses = ({ address, stakeAddress }: { address: string; stakeAddress: string }): void => {
-  document.querySelector('#address')!.textContent = address;
-  document.querySelector('#stakeAddress')!.textContent = stakeAddress;
+  document.querySelector(selectors.spanAddress)!.textContent = address;
+  document.querySelector(selectors.spanStakeAddress)!.textContent = stakeAddress;
 };
 
 const setBalance = (text: string): void => {
-  document.querySelector('#balance')!.textContent = text;
+  document.querySelector(selectors.spanBalance)!.textContent = text;
 };
 
 const setSignature = (text: string): void => {
-  document.querySelector('#signature')!.textContent = text;
+  document.querySelector(selectors.divSignature)!.textContent = text;
 };
 
 const setName = (text: string): void => {
-  document.querySelector('#observableWalletName')!.textContent = text;
+  document.querySelector(selectors.activeWalletName)!.textContent = text;
 };
 
 const clearWalletValues = (): void => {
@@ -227,17 +237,17 @@ const createWallet = async (accountIndex: number) => {
   setName(await wallet.getName());
 };
 
-document.querySelector('#activateWallet1')!.addEventListener('click', async () => await createWallet(0));
-document.querySelector('#activateWallet2')!.addEventListener('click', async () => await createWallet(1));
-document.querySelector('#deactivateWallet')!.addEventListener('click', async () => await deactivateWallet());
-document.querySelector('#destroyWallet')!.addEventListener('click', async () => await destroyWallet());
-document.querySelector('#multiDelegation .delegate button')!.addEventListener('click', async () => {
+document.querySelector(selectors.btnActivateWallet1)!.addEventListener('click', async () => await createWallet(0));
+document.querySelector(selectors.btnActivateWallet2)!.addEventListener('click', async () => await createWallet(1));
+document.querySelector(selectors.deactivateWallet)!.addEventListener('click', async () => await deactivateWallet());
+document.querySelector(selectors.destroyWallet)!.addEventListener('click', async () => await destroyWallet());
+document.querySelector(selectors.btnDelegate)!.addEventListener('click', async () => {
   const poolsAndWeights = await displayPoolIdsAndPreparePortfolio();
   // multi-delegate with 10%, 30%, 60% distribution
   await sendDelegationTx(poolsAndWeights);
 });
 
-document.querySelector('#buildAndSignTx')!.addEventListener('click', async () => {
+document.querySelector(selectors.btnSignAndBuildTx)!.addEventListener('click', async () => {
   const [{ address: ownAddress }] = await firstValueFrom(wallet.addresses$);
   const builtTx = wallet
     .createTxBuilder()
@@ -259,7 +269,7 @@ const disconnectPortTestObj = consumeRemoteApi(
   { logger, runtime }
 );
 
-const bgPortDisconnectPromiseDiv = document.querySelector('#remoteApiPortDisconnect .bgPortDisconnect');
+const bgPortDisconnectPromiseDiv = document.querySelector(selectors.divBgPortDisconnectStatus);
 disconnectPortTestObj
   .promiseMethod()
   .then(() => (bgPortDisconnectPromiseDiv!.textContent = 'Background port disconnect -> Promise resolves'))
@@ -268,7 +278,7 @@ disconnectPortTestObj
 // Dummy exposeApi-like object that closes the port as soon as it gets a message.
 // Background promise call should reject as a result of this.
 // Using another channel (backgroundServices.apiDisconnectResult$) to get the actual result from background script.
-const uiPortDisconnectPromiseDiv = document.querySelector('#remoteApiPortDisconnect .uiPortDisconnect');
+const uiPortDisconnectPromiseDiv = document.querySelector(selectors.divUiPortDisconnectStatus);
 backgroundServices.apiDisconnectResult$.subscribe((msg) => (uiPortDisconnectPromiseDiv!.textContent = msg));
 // BG consumes API -> UI exposes fake API that closes port
 const port = runtime.connect({ name: 'bg-to-ui-port-disconnect-channel' });
