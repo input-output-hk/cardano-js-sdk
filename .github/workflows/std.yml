@@ -154,12 +154,25 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           OWNER_AND_REPO: ${{ github.repository }}
         with: {ffBuildInstructions: true, remoteStore: "ssh-ng://eu.nixbuild.net"}
-  deploy-to-eu:
+  deployments:
+    needs: [discover]
+    name: Perpare deployment data
+    if: fromJSON(needs.discover.outputs.hits).deployments.apply != '{}'
+    steps:
+      - name: Group deployment
+        id: group
+        shell: bash
+        run: |
+          dev-preview="$(jq 'map(select(.name == \"dev-preview\"))' <<< ${{ toJSON(fromJSON(needs.discover.outputs.hits).deployments.apply) }})"
+          dev-preprod="$(jq 'map(select(.name == \"dev-preprod\"))' <<< ${{ toJSON(fromJSON(needs.discover.outputs.hits).deployments.apply) }})"
+          printf "%s\n" \
+            "dev-preview=$dev-preview" \
+            "dev-preprod=$dev-preprod" \
+              >> "$GITHUB_OUTPUT"
+  deploy-dev-preview:
     runs-on: ubuntu-latest
-    needs: [discover, images]
-    name: ${{ matrix.target.jobName }} (eu-central-1)
-    env:
-      AWS_REGION: eu-central-1
+    needs: [deployments, images]
+    name: ${{ matrix.target.jobName }}
     permissions:
       id-token: write
       contents: read
@@ -167,19 +180,20 @@ jobs:
     environment:
       name: dev-preview
       url: https://backend.dev-preview.eks.lw.iog.io
-    # Boolean input should be compared with string until https://github.com/actions/runner/issues/2238 resolved
     if: >
-      fromJSON(needs.discover.outputs.hits).deployments.apply != '{}' && github.event_name == 'push' && github.ref == 'refs/heads/master'
+      needs.deployments.steps.group.dev-preview != '[]' && github.event_name == 'push' && github.ref == 'refs/heads/master'
 
     strategy:
       matrix:
-        target: ${{ fromJSON(needs.discover.outputs.hits).deployments.apply }}
+        target: ${{ fromJSON(needs.deployments.outputs.dev-preview) }}
+        region:
+          - eu-central-1
     steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2.2.0
         with:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ${{ matrix.region }}
       - uses: nixbuild/nix-quick-install-action@v25
       - uses: nixbuild/nixbuild-action@v17
         with:
@@ -193,11 +207,57 @@ jobs:
       - name: Configure K8S Cluster Access
         shell: bash
         run: |
-          echo "Assuming role '$(aws sts get-caller-identity)' in cluster 'lace-prod-eu-central-1'."
-          aws eks update-kubeconfig --name "lace-prod-eu-central-1"
+          echo "Assuming role '$(aws sts get-caller-identity)' in cluster 'lace-prod-${{ matrix.region }}'."
+          aws eks update-kubeconfig --name "lace-prod-${{ matrix.region }}"
       - name: Show commit
         shell: bash
         run: |
           echo commit: ${{ github.sha }}
       - uses: divnix/std-action/run@main
         with: {ffBuildInstructions: true, remoteStore: "ssh-ng://eu.nixbuild.net"}
+  deploy-dev-preprod:
+    runs-on: ubuntu-latest
+    needs: [deployments, images]
+    name: ${{ matrix.target.jobName }}
+    permissions:
+      id-token: write
+      contents: read
+      deployments: write
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2.2.0
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ matrix.region }}
+      - uses: nixbuild/nix-quick-install-action@v25
+      - uses: nixbuild/nixbuild-action@v17
+        with:
+          nixbuild_ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          generate_summary_for: job
+      - uses: divnix/std-action/setup-discovery-ssh@main
+        with:
+          ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          user_name: ${{ env.DISCOVERY_USER_NAME }}
+          ssh_known_hosts_entry: ${{ env.DISCOVERY_KNOWN_HOSTS_ENTRY }}
+      - name: Configure K8S Cluster Access
+        shell: bash
+        run: |
+          echo "Assuming role '$(aws sts get-caller-identity)' in cluster 'lace-prod-${{ matrix.region }}'."
+          aws eks update-kubeconfig --name "lace-prod-${{ matrix.region }}"
+      - name: Show commit
+        shell: bash
+        run: |
+          echo commit: ${{ github.sha }}
+      - uses: divnix/std-action/run@main
+        with: {ffBuildInstructions: true, remoteStore: "ssh-ng://eu.nixbuild.net"}
+    strategy:
+      matrix:
+        target: ${{ fromJSON(needs.deployments.outputs.dev-prod) }}
+        region:
+          - eu-central-1
+    environment:
+      name: dev-preprod
+      url: https://backend.dev-preprod.eks.lw.iog.io
+    if: >
+      needs.deployments.steps.group.dev-preprod != '[]' && github.event_name == 'release'
+

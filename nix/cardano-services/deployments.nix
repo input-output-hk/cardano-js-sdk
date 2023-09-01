@@ -13,9 +13,9 @@ let
       src = ./deployments;
       loader = [(matchers.regex ''^.+\.(yaml|yml)'' loadYaml)];
     };
-in {
+in rec {
   dev-preview = dmerge baseline {
-    meta.description = "Development Environment on the Cardano Preview Chain (Frankfurt)";
+    meta.description = "Development Environment on the Cardano Preview Chain (Frankfurt) for every merge to main branch";
     backend-deployment = {
       spec.template.spec.containers = dmerge.updateOn "name" [
         {
@@ -56,5 +56,9 @@ in {
         }
       ];
     };
+  };
+
+  dev-preprod = dmerge dev-preview {
+    meta.description = "Development Environment on the Cardano Preprod Chain (Frankfurt) for every release";
   };
 }
