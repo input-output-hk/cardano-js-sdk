@@ -1,77 +1,16 @@
-import { Asset, Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import {
-  AssetEntity,
-  BlockDataEntity,
-  BlockEntity,
-  HandleEntity,
-  NftMetadataEntity,
-  OutputEntity,
-  TokensEntity,
-  TypeormStabilityWindowBuffer,
-  storeAssets,
-  storeBlock,
-  storeHandles,
-  storeUtxo,
-  typeormTransactionCommit,
-  withTypeormTransaction
-} from '../../src';
-import { BaseProjectionEvent, Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
-import { ChainSyncDataSet, chainSyncData, logger, mockProviders } from '@cardano-sdk/util-dev';
-import { Observable, defer, firstValueFrom, from } from 'rxjs';
+import { BaseProjectionEvent } from '@cardano-sdk/projection';
+import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
+import { HandleEntity, TypeormStabilityWindowBuffer } from '../../../src';
 import { QueryRunner } from 'typeorm';
-import { createProjectorTilFirst, createStubProjectionSource } from './util';
-import { initializeDataSource } from '../util';
+import { applyOperators, createMultiTxProjectionSource, entities, projectTilFirst } from './util';
+import { createStubProjectionSource } from '../util';
+import { firstValueFrom } from 'rxjs';
+import { initializeDataSource } from '../../util';
+import { logger } from '@cardano-sdk/util-dev';
 
 describe('storeHandles', () => {
-  const stubEvents = chainSyncData(ChainSyncDataSet.WithHandle);
-  const policyId = Cardano.PolicyId('f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a');
-  const policyIds = [policyId];
   let queryRunner: QueryRunner;
   let buffer: TypeormStabilityWindowBuffer;
-  const entities = [
-    BlockEntity,
-    BlockDataEntity,
-    AssetEntity,
-    NftMetadataEntity,
-    TokensEntity,
-    OutputEntity,
-    HandleEntity
-  ];
-
-  const dataSource$ = defer(() =>
-    from(initializeDataSource({ devOptions: { dropSchema: false, synchronize: false }, entities }))
-  );
-
-  const storeData = (evt$: Observable<ProjectionEvent<Mappers.WithUtxo & Mappers.WithMint & Mappers.WithHandles>>) =>
-    evt$.pipe(
-      withTypeormTransaction({ dataSource$, logger }),
-      storeBlock(),
-      storeAssets(),
-      storeUtxo(),
-      storeHandles(),
-      buffer.storeBlockData(),
-      typeormTransactionCommit()
-    );
-
-  // eslint-disable-next-line unicorn/consistent-function-scoping
-  const applyOperators = () => (evt$: Observable<ProjectionEvent<{}>>) =>
-    evt$.pipe(
-      Mappers.withUtxo(),
-      Mappers.withMint(),
-      Mappers.filterProducedUtxoByAssetPolicyId({ policyIds }),
-      Mappers.filterMintByPolicyIds({ policyIds }),
-      Mappers.withCIP67(),
-      Mappers.withHandles({ policyIds }, logger),
-      storeData,
-      requestNext()
-    );
-
-  const project$ = () =>
-    Bootstrap.fromCardanoNode({ blocksBufferLength: 10, buffer, cardanoNode: stubEvents.cardanoNode, logger }).pipe(
-      applyOperators()
-    );
-
-  const projectTilFirst = createProjectorTilFirst(project$);
 
   beforeEach(async () => {
     const dataSource = await initializeDataSource({ entities });
@@ -85,48 +24,15 @@ describe('storeHandles', () => {
     buffer.shutdown();
   });
 
-  it('inserts handle on mint', async () => {
-    const repository = queryRunner.manager.getRepository(HandleEntity);
-    const mintEvent = await projectTilFirst((evt) => evt.handles.length > 0);
-    expect(await repository.count()).toBe(mintEvent.handles.length);
-    expect(mintEvent.handles.length).toBeGreaterThan(0);
-  });
-
-  it('when combined with filter operators, stores only relevant Output and Asset (per handle)', async () => {
-    const outputRepository = queryRunner.manager.getRepository(OutputEntity);
-    const assetRepository = queryRunner.manager.getRepository(AssetEntity);
-    const { handles } = await projectTilFirst((evt) => evt.handles.length > 0);
-    expect(await outputRepository.count()).toBe(handles.length);
-    expect(await assetRepository.count()).toBe(handles.length);
-  });
-
-  it('deletes handle on rollback', async () => {
-    const handleRepository = queryRunner.manager.getRepository(HandleEntity);
-    const initialCount = await handleRepository.count();
-    const mintEvent = await projectTilFirst(
-      ({ handles, eventType }) => eventType === ChainSyncEventType.RollForward && handles.length > 0
-    );
-    expect(await handleRepository.count()).toEqual(initialCount + mintEvent.handles.length);
-    await projectTilFirst(
-      ({
-        eventType,
-        block: {
-          header: { hash }
-        }
-      }) => eventType === ChainSyncEventType.RollBackward && hash === mintEvent.block.header.hash
-    );
-    expect(await handleRepository.count()).toEqual(initialCount);
-  });
-
   it(`minting an existing handle sets address to null,
       rolling back a transaction that mint an existing handle sets address to the original owner`, async () => {
     const repository = queryRunner.manager.getRepository(HandleEntity);
-    const firstMintEvent = await projectTilFirst(
+    const firstMintEvent = await projectTilFirst(buffer)(
       ({ handles, eventType }) => eventType === ChainSyncEventType.RollForward && handles[0]?.handle === 'bob'
     );
     const firstAddress = firstMintEvent.handles[0].latestOwnerAddress;
     expect(firstMintEvent.handles.length).toBe(1);
-    const secondMintEvent = await projectTilFirst(
+    const secondMintEvent = await projectTilFirst(buffer)(
       ({ handles, eventType, mintedAssetTotalSupplies }) =>
         eventType === ChainSyncEventType.RollForward &&
         handles[0]?.handle === 'bob' &&
@@ -141,7 +47,7 @@ describe('storeHandles', () => {
     expect(secondMintEvent.handles.length).toBe(1);
     expect(secondMintEvent.handles[0].latestOwnerAddress).not.toEqual(firstAddress);
 
-    await projectTilFirst(
+    await projectTilFirst(buffer)(
       ({ block: { header }, eventType }) =>
         eventType === ChainSyncEventType.RollBackward && header.hash === secondMintEvent.block.header.hash
     );
@@ -156,7 +62,7 @@ describe('storeHandles', () => {
 
   it('burning a handle with supply >1 sets address and datum to the 1 remaining owner', async () => {
     const repository = queryRunner.manager.getRepository(HandleEntity);
-    const burnEvent = await projectTilFirst(
+    const burnEvent = await projectTilFirst(buffer)(
       ({ eventType, mint }) => eventType === ChainSyncEventType.RollForward && mint[0]?.quantity === -1n
     );
     expect(burnEvent.handles.length).toBe(1);
@@ -175,7 +81,7 @@ describe('storeHandles', () => {
 
   it('rolling back a transaction that burned a handle with supply >1 sets address to null', async () => {
     const repository = queryRunner.manager.getRepository(HandleEntity);
-    const mintEvent1 = await projectTilFirst(
+    const mintEvent1 = await projectTilFirst(buffer)(
       ({ eventType, mint }) => eventType === ChainSyncEventType.RollBackward && mint[0]?.quantity === -1n
     );
     expect(mintEvent1.handles.length).toBe(1);
@@ -189,7 +95,7 @@ describe('storeHandles', () => {
 
   it('transferring handle updates the address to the new owner, rolling back sets it to original owner', async () => {
     const repository = queryRunner.manager.getRepository(HandleEntity);
-    const mintEvt = await projectTilFirst((evt) => evt.handles.length > 0);
+    const mintEvt = await projectTilFirst(buffer)((evt) => evt.handles.length > 0);
     const newOwnerAddress = Cardano.PaymentAddress(
       'addr_test1qpfhhfy2qgls50r9u4yh0l7z67xpg0a5rrhkmvzcuqrd0znuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q9gw0lz'
     );
@@ -235,7 +141,9 @@ describe('storeHandles', () => {
       genesisParameters: mintEvt.genesisParameters,
       tip: header
     };
-    const transferEvt = await firstValueFrom(createStubProjectionSource([transferSourceEvt]).pipe(applyOperators()));
+    const transferEvt = await firstValueFrom(
+      createStubProjectionSource([transferSourceEvt]).pipe(applyOperators(buffer))
+    );
     expect(transferEvt.handles[0].handle).toEqual(mintEvt.handles[0].handle);
     expect(transferEvt.handles[0].latestOwnerAddress).toEqual(newOwnerAddress);
     const handleInDbAfterTransfer = await repository.findOneBy({ handle: transferEvt.handles[0].handle });
@@ -246,38 +154,12 @@ describe('storeHandles', () => {
       eventType: ChainSyncEventType.RollBackward,
       point: mintEvt.block.header
     };
-    await firstValueFrom(createStubProjectionSource([rollbackSourceEvt]).pipe(applyOperators()));
+    await firstValueFrom(createStubProjectionSource([rollbackSourceEvt]).pipe(applyOperators(buffer)));
     const handleInDbAfterTransferRollback = await repository.findOneBy({ handle: transferEvt.handles[0].handle });
     expect(handleInDbAfterTransferRollback?.cardanoAddress).toEqual(originalOwnerAddress);
   });
 
   describe('multiple transactions in 1 block', () => {
-    const blockHeader = {
-      blockNo: Cardano.BlockNo(317_881),
-      hash: Cardano.BlockId('0000000000000000000000000000000000000000000000000000000000000000'),
-      slot: Cardano.Slot(13_633_737)
-    };
-    const createMultiTxProjectionSource = (txs: Pick<Cardano.OnChainTx, 'id' | 'body'>[]) =>
-      createStubProjectionSource([
-        {
-          block: {
-            body: txs.map((tx) => ({
-              ...tx,
-              inputSource: Cardano.InputSource.inputs,
-              witness: { signatures: new Map() }
-            })),
-            header: blockHeader,
-            totalOutput: 123n,
-            txCount: txs.length
-          },
-          crossEpochBoundary: false,
-          epochNo: Cardano.EpochNo(31),
-          eraSummaries: [],
-          eventType: ChainSyncEventType.RollForward,
-          genesisParameters: mockProviders.genesisParameters,
-          tip: blockHeader
-        }
-      ]);
     const maryAddress = Cardano.PaymentAddress(
       'addr_test1qz690wvatwqgzt5u85hfzjxa8qqzthqwtp7xq8t3wh6ttc98hqtvlesvrpvln3srklcvhu2r9z22fdhaxvh2m2pg3nuq0n8gf2'
     );
@@ -325,7 +207,7 @@ describe('storeHandles', () => {
         }
       ]);
 
-      const mintAndTransferEvt = await firstValueFrom(source$.pipe(applyOperators()));
+      const mintAndTransferEvt = await firstValueFrom(source$.pipe(applyOperators(buffer)));
       expect(mintAndTransferEvt.handles[0].handle).toEqual(handle);
       expect(await repository.findOne({ select: { cardanoAddress: true, handle: true }, where: { handle } })).toEqual({
         cardanoAddress: bobAddress,
@@ -377,45 +259,11 @@ describe('storeHandles', () => {
           id: Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000001')
         }
       ]);
-      await firstValueFrom(source$.pipe(applyOperators()));
+      await firstValueFrom(source$.pipe(applyOperators(buffer)));
       expect(await repository.findOne({ select: { cardanoAddress: true, handle: true }, where: { handle } })).toEqual({
         cardanoAddress: maryAddress,
         handle
       });
-    });
-
-    it('ignores assets minted under the policy with a cip67 UserFT label', async () => {
-      const mintTxId = Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000');
-      const repository = queryRunner.manager.getRepository(HandleEntity);
-      const invalidAssetName = Asset.AssetNameLabel.encode(Cardano.AssetName('ace'), Asset.AssetNameLabelNum.UserFT);
-      const invalidAssetId = Cardano.AssetId.fromParts(policyId, invalidAssetName);
-      const testAddress = Cardano.PaymentAddress(
-        'addr_test1qz690wvatwqgzt5u85hfzjxa8qqzthqwtp7xq8t3wh6ttc98hqtvlesvrpvln3srklcvhu2r9z22fdhaxvh2m2pg3nuq0n8gf2'
-      );
-
-      const source$ = createMultiTxProjectionSource([
-        {
-          body: {
-            fee: 111n,
-            inputs: [],
-            mint: new Map([[invalidAssetId, 1n]]),
-            outputs: [
-              {
-                address: testAddress,
-                value: {
-                  assets: new Map([[invalidAssetId, 1n]]),
-                  coins: 123n
-                }
-              }
-            ]
-          },
-          id: mintTxId
-        }
-      ]);
-      const numHandles = await repository.count();
-      await firstValueFrom(source$.pipe(applyOperators()));
-
-      expect(await repository.count()).toBe(numHandles);
     });
   });
 });
