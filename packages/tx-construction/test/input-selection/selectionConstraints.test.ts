@@ -43,7 +43,7 @@ describe('defaultSelectionConstraints', () => {
 
   it('computeMinimumCost', async () => {
     cmlMock.Value.new.mockImplementation(cmlActual.Value.new);
-    const fee = 218_807n;
+    const fee = 218_763n;
     const buildTx = jest.fn(async () => babbageTx);
     const selectionSkeleton = {} as SelectionSkeleton;
     const constraints = defaultSelectionConstraints({

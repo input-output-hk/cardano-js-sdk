@@ -7,6 +7,7 @@ import { CML } from '../CML/CML';
 import { CborReader, CborReaderState, CborWriter } from './CBOR';
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { TransactionBody } from './TransactionBody';
+import { TransactionWitnessSet } from './TransactionWitnessSet';
 import { hexToBytes } from '../util/misc';
 import type { TxCBOR } from '../CBOR';
 
@@ -26,7 +27,7 @@ const ALONZO_ERA_TX_FRAME_SIZE = 4;
  */
 export class Transaction {
   #body: TransactionBody;
-  #witnessSet: CML.TransactionWitnessSet;
+  #witnessSet: TransactionWitnessSet;
   #auxiliaryData: CML.AuxiliaryData | undefined;
   #isValid = true;
   // If the transaction object is constructed from a CBOR byte array, we are going to remember it and use it
@@ -44,7 +45,7 @@ export class Transaction {
    * @param auxiliaryData Additional information that can be attached to a transaction to provide more context or
    * information about the transaction.
    */
-  constructor(body: TransactionBody, witnessSet: CML.TransactionWitnessSet, auxiliaryData?: CML.AuxiliaryData) {
+  constructor(body: TransactionBody, witnessSet: TransactionWitnessSet, auxiliaryData?: CML.AuxiliaryData) {
     this.#body = body;
     this.#witnessSet = witnessSet;
     this.#auxiliaryData = auxiliaryData;
@@ -57,7 +58,6 @@ export class Transaction {
    * TODO: Remove this function.
    */
   free(): void {
-    if ((this.#witnessSet as any)?.ptr !== 0) this.#witnessSet.free();
     if (this.#auxiliaryData && (this.#auxiliaryData as any)?.ptr !== 0) this.#auxiliaryData.free();
   }
 
@@ -80,7 +80,7 @@ export class Transaction {
     //   ]
     writer.writeStartArray(ALONZO_ERA_TX_FRAME_SIZE);
     writer.writeEncodedValue(hexToBytes(this.#body.toCbor()));
-    writer.writeEncodedValue(this.#witnessSet.to_bytes());
+    writer.writeEncodedValue(hexToBytes(this.#witnessSet.toCbor()));
     writer.writeBoolean(this.#isValid);
 
     if (this.#auxiliaryData) {
@@ -106,7 +106,7 @@ export class Transaction {
     const bodyBytes = reader.readEncodedValue();
     const body = TransactionBody.fromCbor(HexBlob.fromBytes(bodyBytes));
 
-    const witnessSet = CML.TransactionWitnessSet.from_bytes(reader.readEncodedValue());
+    const witnessSet = TransactionWitnessSet.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
     let isValid = true;
 
     // The isValid flag was added in Alonzo era (onwards), mary era transactions only have three fields.
@@ -136,7 +136,7 @@ export class Transaction {
       body: this.#body.toCore(),
       id: this.getId(),
       isValid: this.#isValid,
-      witness: CmlToCore.txWitnessSet(this.#witnessSet)
+      witness: this.#witnessSet.toCore()
     };
   }
 
@@ -149,12 +149,10 @@ export class Transaction {
    * TODO: The scope parameter is needed while we remove the CML objects from the implementation. Once this is done this param can be removed.
    */
   static fromCore(scope: ManagedFreeableScope, tx: Cardano.Tx) {
-    const txWitnessSet = CoreToCml.witnessSet(scope, tx.witness);
-
     const transaction = scope.manage(
       new Transaction(
         TransactionBody.fromCore(tx.body),
-        txWitnessSet,
+        TransactionWitnessSet.fromCore(tx.witness),
         CoreToCml.txAuxiliaryData(scope, tx.auxiliaryData)
       )
     );
@@ -189,13 +187,9 @@ export class Transaction {
    * execution requirements, such as Datums, Redeemers and the script itself.
    *
    * @returns A deep clone of the transaction witness set.
-   *
-   * remark: The returned TransactionWitnessSet is a clone and its life cycle must be managed by the callee.
-   * TODO: this remark is only relevant while we still have CML objects in the mix, once those are removed, remove the remark.
    */
-  witnessSet(): CML.TransactionWitnessSet {
-    const bytes = this.#witnessSet.to_bytes();
-    return CML.TransactionWitnessSet.from_bytes(bytes);
+  witnessSet(): TransactionWitnessSet {
+    return TransactionWitnessSet.fromCbor(this.#witnessSet.toCbor());
   }
 
   /**
@@ -203,11 +197,8 @@ export class Transaction {
    *
    * @param witnessSet A deep clone of the witness set in this transaction.
    */
-  setWitnessSet(witnessSet: CML.TransactionWitnessSet) {
-    if ((this.#witnessSet as any)?.ptr !== 0) this.#witnessSet.free();
-
+  setWitnessSet(witnessSet: TransactionWitnessSet) {
     this.#witnessSet = witnessSet;
-
     this.#originalBytes = undefined;
   }
 
