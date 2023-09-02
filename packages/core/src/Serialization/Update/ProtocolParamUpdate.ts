@@ -49,6 +49,7 @@ export class ProtocolParamUpdate {
 
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // protocol_param_update =
     //   { ? 0:  uint               ; minfee A
     //   , ? 1:  uint               ; minfee B

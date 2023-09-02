@@ -35,11 +35,13 @@ export class StakeRegistration {
 
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // stake_registration = (0, stake_credential)
     writer.writeStartArray(EMBEDDED_GROUP_SIZE);
 
     writer.writeInt(CertificateKind.StakeRegistration);
 
+    // CDDL
     // stake_credential =
     //   [  0, addr_keyhash
     //   // 1, scripthash

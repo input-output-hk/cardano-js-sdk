@@ -36,6 +36,7 @@ export class PoolRetirement {
 
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // pool_retirement = (4, pool_keyhash, epoch)
     writer.writeStartArray(EMBEDDED_GROUP_SIZE);
 

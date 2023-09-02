@@ -31,6 +31,7 @@ export class Costmdls {
 
     const sortedCanonically = new Map([...this.#models].sort((a, b) => (a > b ? 1 : -1)));
 
+    // CDDL
     // costmdls =
     //   { ? 0 : [ 166*166 int ] ; Plutus v1
     //   , ? 1 : [ 175*175 int ] ; Plutus v2

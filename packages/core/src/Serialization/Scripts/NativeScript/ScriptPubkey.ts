@@ -35,6 +35,7 @@ export class ScriptPubkey {
 
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // script_pubkey = (0, addr_keyhash)
     writer.writeStartArray(EMBEDDED_GROUP_SIZE);
     writer.writeInt(Cardano.NativeScriptKind.RequireSignature);

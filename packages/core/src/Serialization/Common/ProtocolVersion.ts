@@ -37,6 +37,7 @@ export class ProtocolVersion {
 
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // next_major_protocol_version = 9
     // major_protocol_version = 1..next_major_protocol_version
     // protocol_version = (major_protocol_version, uint32)

@@ -32,6 +32,7 @@ export class TransactionInput {
   toCbor(): HexBlob {
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // transaction_input = [ transaction_id : $hash32
     //                     , index : uint
     //                     ]
