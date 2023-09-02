@@ -41,6 +41,7 @@ export class Value {
   toCbor(): HexBlob {
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // value = coin / [coin, multiasset<uint>]
     const writer = new CborWriter();
 

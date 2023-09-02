@@ -40,6 +40,7 @@ export class ExUnits {
 
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // ex_units = [mem: uint, steps: uint]
     writer.writeStartArray(EX_UNITS_ARRAY_SIZE);
     writer.writeInt(this.#mem);

@@ -66,6 +66,7 @@ export class TransactionBody {
 
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // transaction_body =
     //   { 0 : set<transaction_input>    ; inputs
     //   , 1 : [* transaction_output]

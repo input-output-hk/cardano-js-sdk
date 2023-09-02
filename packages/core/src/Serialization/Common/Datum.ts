@@ -74,6 +74,7 @@ export class Datum {
 
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // datum_hash = $hash32
     // data = #6.24(bytes .cbor plutus_data)
     //

@@ -36,6 +36,7 @@ export class ProposedProtocolParameterUpdates {
 
     const sortedCanonically = new Map([...this.#proposedUpdates].sort((a, b) => (a > b ? 1 : -1)));
 
+    // CDDL
     // proposed_protocol_parameter_updates =
     //   { * genesisDelegateKeyHash => protocol_param_update }
     writer.writeStartMap(sortedCanonically.size);

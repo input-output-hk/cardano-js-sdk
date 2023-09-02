@@ -109,6 +109,7 @@ export class TransactionOutput {
     let scriptRef;
 
     if (reader.peekState() === CborReaderState.StartMap) {
+      // CDDL
       // post_alonzo_transaction_output =
       //   { 0 : address
       //   , 1 : value

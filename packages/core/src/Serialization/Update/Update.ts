@@ -37,6 +37,7 @@ export class Update {
 
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // update = [ proposed_protocol_parameter_updates
     //          , epoch
     //          ]

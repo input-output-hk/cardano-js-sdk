@@ -38,6 +38,7 @@ export class SingleHostAddr {
 
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // single_host_addr = ( 0
     //                    , port / null
     //                    , ipv4 / null

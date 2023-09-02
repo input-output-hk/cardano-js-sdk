@@ -71,6 +71,7 @@ export class Transaction {
 
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // transaction =
     //   [ transaction_body
     //   , transaction_witness_set
