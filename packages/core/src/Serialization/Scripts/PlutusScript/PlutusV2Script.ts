@@ -71,7 +71,7 @@ export class PlutusV2Script {
   toCore(): Cardano.PlutusScript {
     return {
       __type: Cardano.ScriptType.Plutus,
-      bytes: this.toCbor(),
+      bytes: this.rawBytes(),
       version: Cardano.PlutusLanguageVersion.V2
     };
   }
@@ -85,7 +85,7 @@ export class PlutusV2Script {
     if (plutusScript.version !== Cardano.PlutusLanguageVersion.V2)
       throw new InvalidArgumentError('script', 'Wrong plutus language version.');
 
-    return PlutusV2Script.fromCbor(plutusScript.bytes);
+    return new PlutusV2Script(plutusScript.bytes);
   }
 
   /**
