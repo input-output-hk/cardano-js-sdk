@@ -54,7 +54,8 @@ export const preProcessArgs = (
   const outputs = [...outputSet];
   const implicitCoin: Required<Cardano.util.ImplicitCoin> = {
     deposit: partialImplicitValue?.coin?.deposit || 0n,
-    input: partialImplicitValue?.coin?.input || 0n
+    input: partialImplicitValue?.coin?.input || 0n,
+    withdrawals: partialImplicitValue?.coin?.withdrawals || 0n
   };
   const mintMap: Cardano.TokenMap = partialImplicitValue?.mint || new Map();
   const { implicitTokensInput, implicitTokensSpend } = mintToImplicitTokens(mintMap);
