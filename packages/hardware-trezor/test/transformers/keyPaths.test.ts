@@ -6,21 +6,11 @@ import {
   rewardAddress,
   txIn
 } from '../testData';
-import {
-  paymentKeyPathFromGroupedAddress,
-  resolvePaymentKeyPathForTxIn,
-  resolveStakeKeyPath,
-  stakeKeyPathFromGroupedAddress
-} from '../../src';
+import { resolvePaymentKeyPathForTxIn, resolveStakeKeyPath, stakeKeyPathFromGroupedAddress } from '../../src';
 
 const address = contextWithKnownAddresses.knownAddresses[0];
 
 describe('key-paths', () => {
-  describe('paymentKeyPathFromGroupedAddress', () => {
-    it('returns a hardened BIP32 payment key path', () => {
-      expect(paymentKeyPathFromGroupedAddress(address)).toEqual(knownAddressKeyPath);
-    });
-  });
   describe('stakeKeyPathFromGroupedAddress', () => {
     it('returns null when given an undefined stakeKeyDerivationPath', async () => {
       const knownAddressClone = { ...knownAddress };

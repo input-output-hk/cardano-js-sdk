@@ -3,7 +3,8 @@ import { CML, Cardano, Serialization, coreToCml } from '@cardano-sdk/core';
 import { HexBlob, InvalidArgumentError, ManagedFreeableScope, Transform, usingAutoFree } from '@cardano-sdk/util';
 import { LedgerTxTransformerContext } from '../types';
 import { mapTokenMap } from './assets';
-import { paymentKeyPathFromGroupedAddress, stakeKeyPathFromGroupedAddress } from './keyPaths';
+import { stakeKeyPathFromGroupedAddress } from './keyPaths';
+import { util } from '@cardano-sdk/key-management';
 
 const toInlineDatum: Transform<Cardano.Datum, Ledger.Datum> = (datum) => ({
   datumHex: datum.toString(),
@@ -22,7 +23,7 @@ const toDestination: Transform<Cardano.TxOut, Ledger.TxOutputDestination, Ledger
   const knownAddress = context?.knownAddresses.find((address) => address.address === txOut.address);
 
   if (knownAddress) {
-    const paymentKeyPath = paymentKeyPathFromGroupedAddress(knownAddress);
+    const paymentKeyPath = util.paymentKeyPathFromGroupedAddress(knownAddress);
     const stakeKeyPath = stakeKeyPathFromGroupedAddress(knownAddress);
 
     if (!stakeKeyPath) throw new InvalidArgumentError('txOut', 'Missing stake key key path.');

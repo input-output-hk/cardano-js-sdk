@@ -3,7 +3,8 @@ import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { Cardano } from '@cardano-sdk/core';
 import { LedgerTxTransformerContext } from '../types';
 import { Transform } from '@cardano-sdk/util';
-import { paymentKeyPathFromGroupedAddress, stakeKeyPathFromGroupedAddress } from './keyPaths';
+import { stakeKeyPathFromGroupedAddress } from './keyPaths';
+import { util } from '@cardano-sdk/key-management';
 
 export const toRequiredSigner: Transform<
   Crypto.Ed25519KeyHashHex,
@@ -20,7 +21,9 @@ export const toRequiredSigner: Transform<
     return stakeCredential && stakeCredential.toString() === keyHash;
   });
 
-  const paymentKeyPath = paymentCredKnownAddress ? paymentKeyPathFromGroupedAddress(paymentCredKnownAddress) : null;
+  const paymentKeyPath = paymentCredKnownAddress
+    ? util.paymentKeyPathFromGroupedAddress(paymentCredKnownAddress)
+    : null;
   const stakeKeyPath = stakeCredKnownAddress ? stakeKeyPathFromGroupedAddress(stakeCredKnownAddress) : null;
 
   if (paymentKeyPath) {
