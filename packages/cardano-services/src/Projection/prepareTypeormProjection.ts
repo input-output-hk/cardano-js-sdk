@@ -183,11 +183,11 @@ export const getEntities = (entityNames: EntityName[]): Entity[] => {
 const mapperInterDependencies: Partial<Record<MapperName, MapperName[]>> = {
   filterMint: ['withMint'],
   filterUtxo: ['withUtxo'],
-  withAddresses: ['withUtxo'],
-  withCIP67: ['withUtxo'],
+  withAddresses: ['withUtxo', 'filterUtxo'],
+  withCIP67: ['withUtxo', 'filterUtxo'],
   withHandleMetadata: ['withNftMetadata', 'withCIP67'],
   withHandles: ['withMint', 'filterMint', 'withUtxo', 'filterUtxo', 'withCIP67'],
-  withNftMetadata: ['withCIP67', 'withMint'],
+  withNftMetadata: ['withCIP67', 'withMint', 'filterMint'],
   withStakeKeyRegistrations: ['withCertificates'],
   withStakePools: ['withCertificates']
 };
@@ -208,7 +208,7 @@ const storeInterDependencies: Partial<Record<StoreName, StoreName[]>> = {
   storeAddresses: ['storeStakeKeyRegistrations'],
   storeAssets: ['storeBlock'],
   storeHandleMetadata: ['storeUtxo'],
-  storeHandles: ['storeUtxo'],
+  storeHandles: ['storeUtxo', 'storeAddresses', 'storeHandleMetadata'],
   storeNftMetadata: ['storeAssets'],
   storePoolMetricsUpdateJob: ['storeBlock'],
   storeStakePoolMetadataJob: ['storeBlock'],
