@@ -26,6 +26,7 @@ export class Script {
   toCbor(): HexBlob {
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // script = [ 0, native_script // 1, plutus_v1_script // 2, plutus_v2_script ]
     const writer = new CborWriter();
 

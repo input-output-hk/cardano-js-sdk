@@ -49,6 +49,7 @@ export class ProtocolParamUpdate {
 
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // protocol_param_update =
     //   { ? 0:  uint               ; minfee A
     //   , ? 1:  uint               ; minfee B
@@ -907,30 +908,30 @@ export class ProtocolParamUpdate {
   #getMapSize(): number {
     let mapSize = 0;
 
-    if (this.#minFeeA) ++mapSize;
-    if (this.#minFeeB) ++mapSize;
-    if (this.#maxBlockBodySize) ++mapSize;
-    if (this.#maxTxSize) ++mapSize;
-    if (this.#maxBlockHeaderSize) ++mapSize;
-    if (this.#keyDeposit) ++mapSize;
-    if (this.#poolDeposit) ++mapSize;
-    if (this.#maxEpoch) ++mapSize;
-    if (this.#nOpt) ++mapSize;
-    if (this.#poolPledgeInfluence) ++mapSize;
-    if (this.#expansionRate) ++mapSize;
-    if (this.#treasuryGrowthRate) ++mapSize;
-    if (this.#d) ++mapSize;
-    if (this.#extraEntropy) ++mapSize;
-    if (this.#protocolVersion) ++mapSize;
-    if (this.#minPoolCost) ++mapSize;
-    if (this.#adaPerUtxoByte) ++mapSize;
-    if (this.#costModels) ++mapSize;
-    if (this.#executionCosts) ++mapSize;
-    if (this.#maxTxExUnits) ++mapSize;
-    if (this.#maxBlockExUnits) ++mapSize;
-    if (this.#maxValueSize) ++mapSize;
-    if (this.#collateralPercentage) ++mapSize;
-    if (this.#maxCollateralInputs) ++mapSize;
+    if (this.#minFeeA !== undefined) ++mapSize;
+    if (this.#minFeeB !== undefined) ++mapSize;
+    if (this.#maxBlockBodySize !== undefined) ++mapSize;
+    if (this.#maxTxSize !== undefined) ++mapSize;
+    if (this.#maxBlockHeaderSize !== undefined) ++mapSize;
+    if (this.#keyDeposit !== undefined) ++mapSize;
+    if (this.#poolDeposit !== undefined) ++mapSize;
+    if (this.#maxEpoch !== undefined) ++mapSize;
+    if (this.#nOpt !== undefined) ++mapSize;
+    if (this.#poolPledgeInfluence !== undefined) ++mapSize;
+    if (this.#expansionRate !== undefined) ++mapSize;
+    if (this.#treasuryGrowthRate !== undefined) ++mapSize;
+    if (this.#d !== undefined) ++mapSize;
+    if (this.#extraEntropy !== undefined) ++mapSize;
+    if (this.#protocolVersion !== undefined) ++mapSize;
+    if (this.#minPoolCost !== undefined) ++mapSize;
+    if (this.#adaPerUtxoByte !== undefined) ++mapSize;
+    if (this.#costModels !== undefined) ++mapSize;
+    if (this.#executionCosts !== undefined) ++mapSize;
+    if (this.#maxTxExUnits !== undefined) ++mapSize;
+    if (this.#maxBlockExUnits !== undefined) ++mapSize;
+    if (this.#maxValueSize !== undefined) ++mapSize;
+    if (this.#collateralPercentage !== undefined) ++mapSize;
+    if (this.#maxCollateralInputs !== undefined) ++mapSize;
 
     return mapSize;
   }

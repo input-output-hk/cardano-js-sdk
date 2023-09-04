@@ -42,6 +42,7 @@ export class PoolRegistration {
 
     writer.writeInt(CertificateKind.PoolRegistration);
 
+    // CDDL
     // pool_params = ( operator:       pool_keyhash
     //               , vrf_keyhash:    vrf_keyhash
     //               , pledge:         coin

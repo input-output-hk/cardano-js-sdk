@@ -34,6 +34,7 @@ export class TimelockExpiry {
 
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // invalid_hereafter = (5, uint)
     writer.writeStartArray(EMBEDDED_GROUP_SIZE);
     writer.writeInt(Cardano.NativeScriptKind.RequireTimeBefore);
