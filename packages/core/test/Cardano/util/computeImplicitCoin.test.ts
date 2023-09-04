@@ -24,5 +24,6 @@ describe('Cardano.util.computeImplicitCoin', () => {
     const coin = Cardano.util.computeImplicitCoin(protocolParameters, { certificates, withdrawals });
     expect(coin.deposit).toBe(2n + 2n);
     expect(coin.input).toBe(2n + 3n + 5n);
+    expect(coin.withdrawals).toBe(5n);
   });
 });

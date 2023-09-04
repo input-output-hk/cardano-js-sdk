@@ -7,7 +7,11 @@ import { CertificateType, HydratedTxBody, Lovelace } from '../types';
  */
 export interface ImplicitCoin {
   /**
-   * Reward withdrawals + deposit reclaims
+   * Reward withdrawals
+   */
+  withdrawals?: Lovelace;
+  /**
+   * Reward withdrawals + deposit reclaims (total return)
    */
   input?: Lovelace;
   /**
@@ -44,6 +48,7 @@ export const computeImplicitCoin = (
   );
   return {
     deposit,
-    input: withdrawalsTotal + reclaimTotal
+    input: withdrawalsTotal + reclaimTotal,
+    withdrawals: withdrawalsTotal
   };
 };
