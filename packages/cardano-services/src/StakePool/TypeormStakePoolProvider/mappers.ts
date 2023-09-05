@@ -147,5 +147,15 @@ export const mapStakePoolsResult = (rawResult: PoolModel[]): Paginated<Cardano.S
   };
 };
 
-export const mapPoolStats = (rawResult: PoolStatsModel[]): PoolStats =>
-  rawResult.reduce((acc, curr) => (acc = { ...acc, [curr.status]: Number(curr.count) }), {} as PoolStats);
+export const mapPoolStats = (rawResult: PoolStatsModel[]): PoolStats => {
+  const result = rawResult.reduce(
+    (acc, curr) => (acc = { ...acc, [curr.status]: Number(curr.count) }),
+    {} as PoolStats
+  );
+  for (const status of Object.values(Cardano.StakePoolStatus)) {
+    if (!(status in result)) {
+      result[status] = 0;
+    }
+  }
+  return result;
+};
