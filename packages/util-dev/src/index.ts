@@ -1,5 +1,4 @@
 export * as AssetId from './assetId';
-export * as CmlTestUtil from './cmlTestUtil';
 export * as TxTestUtil from './txTestUtil';
 export * as DockerUtil from './docker';
 export * from './chainSync';

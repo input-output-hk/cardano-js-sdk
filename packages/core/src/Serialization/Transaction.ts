@@ -1,11 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Cardano from '../Cardano';
-import * as CmlToCore from '../CML/cmlToCore';
-import * as CoreToCml from '../CML/coreToCml';
 import * as Crypto from '@cardano-sdk/crypto';
-import { CML } from '../CML/CML';
+import { AuxiliaryData } from './AuxiliaryData';
 import { CborReader, CborReaderState, CborWriter } from './CBOR';
-import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
+import { HexBlob } from '@cardano-sdk/util';
 import { TransactionBody } from './TransactionBody';
 import { TransactionWitnessSet } from './TransactionWitnessSet';
 import { hexToBytes } from '../util/misc';
@@ -28,7 +26,7 @@ const ALONZO_ERA_TX_FRAME_SIZE = 4;
 export class Transaction {
   #body: TransactionBody;
   #witnessSet: TransactionWitnessSet;
-  #auxiliaryData: CML.AuxiliaryData | undefined;
+  #auxiliaryData: AuxiliaryData | undefined;
   #isValid = true;
   // If the transaction object is constructed from a CBOR byte array, we are going to remember it and use it
   // when the object is re-serialized again to avoid changing the transaction during a round trip serialization.
@@ -45,20 +43,10 @@ export class Transaction {
    * @param auxiliaryData Additional information that can be attached to a transaction to provide more context or
    * information about the transaction.
    */
-  constructor(body: TransactionBody, witnessSet: TransactionWitnessSet, auxiliaryData?: CML.AuxiliaryData) {
+  constructor(body: TransactionBody, witnessSet: TransactionWitnessSet, auxiliaryData?: AuxiliaryData) {
     this.#body = body;
     this.#witnessSet = witnessSet;
     this.#auxiliaryData = auxiliaryData;
-  }
-
-  /**
-   * Frees the internal CML objects. This function will be removed once all CML classes has been replaced by our own
-   * implementation.
-   *
-   * TODO: Remove this function.
-   */
-  free(): void {
-    if (this.#auxiliaryData && (this.#auxiliaryData as any)?.ptr !== 0) this.#auxiliaryData.free();
   }
 
   /**
@@ -84,7 +72,7 @@ export class Transaction {
     writer.writeBoolean(this.#isValid);
 
     if (this.#auxiliaryData) {
-      writer.writeEncodedValue(this.#auxiliaryData.to_bytes());
+      writer.writeEncodedValue(hexToBytes(this.#auxiliaryData.toCbor()));
     } else {
       writer.writeNull();
     }
@@ -115,7 +103,8 @@ export class Transaction {
     }
 
     let auxData;
-    if (reader.peekState() !== CborReaderState.Null) auxData = CML.AuxiliaryData.from_bytes(reader.readEncodedValue());
+    if (reader.peekState() !== CborReaderState.Null)
+      auxData = AuxiliaryData.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
 
     const tx = new Transaction(body, witnessSet, auxData);
 
@@ -132,7 +121,7 @@ export class Transaction {
    */
   toCore(): Cardano.Tx {
     return {
-      auxiliaryData: this.#auxiliaryData ? CmlToCore.txAuxiliaryData(this.#auxiliaryData) : undefined,
+      auxiliaryData: this.#auxiliaryData ? this.#auxiliaryData.toCore() : undefined,
       body: this.#body.toCore(),
       id: this.getId(),
       isValid: this.#isValid,
@@ -143,18 +132,13 @@ export class Transaction {
   /**
    * Creates a transaction object from the given Core Tx object.
    *
-   * @param scope The scope that will manage the CML resources.
    * @param tx The core TX object.
-   *
-   * TODO: The scope parameter is needed while we remove the CML objects from the implementation. Once this is done this param can be removed.
    */
-  static fromCore(scope: ManagedFreeableScope, tx: Cardano.Tx) {
-    const transaction = scope.manage(
-      new Transaction(
-        TransactionBody.fromCore(tx.body),
-        TransactionWitnessSet.fromCore(tx.witness),
-        CoreToCml.txAuxiliaryData(scope, tx.auxiliaryData)
-      )
+  static fromCore(tx: Cardano.Tx) {
+    const transaction = new Transaction(
+      TransactionBody.fromCore(tx.body),
+      TransactionWitnessSet.fromCore(tx.witness),
+      tx.auxiliaryData ? AuxiliaryData.fromCore(tx.auxiliaryData) : undefined
     );
 
     if (typeof tx.isValid !== 'undefined') transaction.setIsValid(tx.isValid);
@@ -230,14 +214,10 @@ export class Transaction {
    * Gets the transaction Auxiliary data.
    *
    * @returns A clone of the transaction Auxiliary data (or undefined if the transaction doesnt have auxiliary data).
-   *
-   * remark: The returned AuxiliaryData is a clone and its life cycle must be managed by the callee.
-   * TODO: this remark is only relevant while we still have CML objects in the mix, once those are removed, remove the remark.
    */
-  auxiliaryData(): CML.AuxiliaryData | undefined {
+  auxiliaryData(): AuxiliaryData | undefined {
     if (this.#auxiliaryData) {
-      const bytes = this.#auxiliaryData.to_bytes();
-      return CML.AuxiliaryData.from_bytes(bytes);
+      return AuxiliaryData.fromCbor(this.#auxiliaryData.toCbor());
     }
 
     return undefined;
@@ -251,11 +231,8 @@ export class Transaction {
    *
    * @param auxiliaryData The auxiliary data to be set.
    */
-  setAuxiliaryData(auxiliaryData: CML.AuxiliaryData | undefined) {
-    if (this.#auxiliaryData && (this.#witnessSet as any)?.ptr !== 0) this.#auxiliaryData.free();
-
+  setAuxiliaryData(auxiliaryData: AuxiliaryData | undefined) {
     this.#auxiliaryData = auxiliaryData;
-
     this.#originalBytes = undefined;
   }
 
