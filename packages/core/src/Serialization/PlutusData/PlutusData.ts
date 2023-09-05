@@ -21,13 +21,13 @@ const MAX_BYTE_STRING_CHUNK_SIZE = 64;
  * Use this type to build any data structures that you want to be representable on-chain.
  */
 export class PlutusData {
-  private _map: PlutusMap | undefined = undefined;
-  private _list: PlutusList | undefined = undefined;
-  private _integer: bigint | undefined = undefined;
-  private _bytes: Uint8Array | undefined = undefined;
-  private _constr: ConstrPlutusData | undefined = undefined;
-  private _kind: PlutusDataKind = PlutusDataKind.ConstrPlutusData;
-  private _originalBytes: HexBlob | undefined = undefined;
+  #map: PlutusMap | undefined = undefined;
+  #list: PlutusList | undefined = undefined;
+  #integer: bigint | undefined = undefined;
+  #bytes: Uint8Array | undefined = undefined;
+  #constr: ConstrPlutusData | undefined = undefined;
+  #kind: PlutusDataKind = PlutusDataKind.ConstrPlutusData;
+  #originalBytes: HexBlob | undefined = undefined;
 
   /**
    * Serializes this PlutusData instance into its CBOR representation as a Uint8Array.
@@ -36,21 +36,21 @@ export class PlutusData {
    */
   // eslint-disable-next-line complexity
   toCbor(): HexBlob {
-    if (this._originalBytes) return this._originalBytes;
+    if (this.#originalBytes) return this.#originalBytes;
 
     let cbor: HexBlob;
 
-    switch (this._kind) {
+    switch (this.#kind) {
       case PlutusDataKind.ConstrPlutusData: {
-        cbor = this._constr!.toCbor();
+        cbor = this.#constr!.toCbor();
         break;
       }
       case PlutusDataKind.Map: {
-        cbor = this._map!.toCbor();
+        cbor = this.#map!.toCbor();
         break;
       }
       case PlutusDataKind.List: {
-        cbor = this._list!.toCbor();
+        cbor = this.#list!.toCbor();
         break;
       }
       // Note [The 64-byte limit]: See https://github.com/input-output-hk/plutus/blob/1f31e640e8a258185db01fa899da63f9018c0e85/plutus-core/plutus-core/src/PlutusCore/Data.hs#L61-L105
@@ -60,13 +60,13 @@ export class PlutusData {
       case PlutusDataKind.Bytes: {
         const writer = new CborWriter();
 
-        if (this._bytes!.length <= MAX_BYTE_STRING_CHUNK_SIZE) {
-          writer.writeByteString(this._bytes!);
+        if (this.#bytes!.length <= MAX_BYTE_STRING_CHUNK_SIZE) {
+          writer.writeByteString(this.#bytes!);
         } else {
           writer.writeEncodedValue(INDEFINITE_BYTE_STRING);
 
-          for (let i = 0; i < this._bytes!.length; i += MAX_BYTE_STRING_CHUNK_SIZE) {
-            const chunk = this._bytes!.slice(i, i + MAX_BYTE_STRING_CHUNK_SIZE);
+          for (let i = 0; i < this.#bytes!.length; i += MAX_BYTE_STRING_CHUNK_SIZE) {
+            const chunk = this.#bytes!.slice(i, i + MAX_BYTE_STRING_CHUNK_SIZE);
             writer.writeByteString(chunk);
           }
 
@@ -84,14 +84,14 @@ export class PlutusData {
         // If it fits in a Word64, then it's less than 64 bits for sure, and we can just send it off
         // as a normal integer.
         if (
-          (this._integer! >= 0 && this._integer! <= MAX_WORD64) ||
-          (this._integer! < 0 && this._integer! >= -1n - MAX_WORD64)
+          (this.#integer! >= 0 && this.#integer! <= MAX_WORD64) ||
+          (this.#integer! < 0 && this.#integer! >= -1n - MAX_WORD64)
         ) {
-          writer.writeInt(this._integer!);
+          writer.writeInt(this.#integer!);
         } else {
           // Otherwise, it would be encoded as a bignum anyway, so we manually do the bignum
           // encoding with a bytestring inside.
-          writer.writeBigInteger(this._integer!);
+          writer.writeBigInteger(this.#integer!);
         }
 
         cbor = bytesToHex(writer.encode());
@@ -126,44 +126,44 @@ export class PlutusData {
           case CborTag.UnsignedBigNum: {
             reader.readTag();
             const bytes = reader.readByteString();
-            data._integer = PlutusData.bufferToBigint(bytes);
-            data._kind = PlutusDataKind.Integer;
+            data.#integer = PlutusData.bufferToBigint(bytes);
+            data.#kind = PlutusDataKind.Integer;
             break;
           }
           case CborTag.NegativeBigNum: {
             reader.readTag();
             const bytes = reader.readByteString();
-            data._integer = PlutusData.bufferToBigint(bytes) * -1n;
-            data._kind = PlutusDataKind.Integer;
+            data.#integer = PlutusData.bufferToBigint(bytes) * -1n;
+            data.#kind = PlutusDataKind.Integer;
             break;
           }
           default: {
-            data._constr = ConstrPlutusData.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
-            data._kind = PlutusDataKind.ConstrPlutusData;
+            data.#constr = ConstrPlutusData.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
+            data.#kind = PlutusDataKind.ConstrPlutusData;
           }
         }
         break;
       }
       case CborReaderState.NegativeInteger:
       case CborReaderState.UnsignedInteger: {
-        data._integer = reader.readInt();
-        data._kind = PlutusDataKind.Integer;
+        data.#integer = reader.readInt();
+        data.#kind = PlutusDataKind.Integer;
         break;
       }
       case CborReaderState.StartIndefiniteLengthByteString:
       case CborReaderState.ByteString: {
-        data._bytes = reader.readByteString();
-        data._kind = PlutusDataKind.Bytes;
+        data.#bytes = reader.readByteString();
+        data.#kind = PlutusDataKind.Bytes;
         break;
       }
       case CborReaderState.StartArray: {
-        data._list = PlutusList.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
-        data._kind = PlutusDataKind.List;
+        data.#list = PlutusList.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
+        data.#kind = PlutusDataKind.List;
         break;
       }
       case CborReaderState.StartMap: {
-        data._map = PlutusMap.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
-        data._kind = PlutusDataKind.Map;
+        data.#map = PlutusMap.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
+        data.#kind = PlutusDataKind.Map;
         break;
       }
       default: {
@@ -171,7 +171,7 @@ export class PlutusData {
       }
     }
 
-    data._originalBytes = cbor;
+    data.#originalBytes = cbor;
 
     return data;
   }
@@ -182,11 +182,11 @@ export class PlutusData {
    * @returns The PlutusData object.
    */
   toCore(): Cardano.PlutusData {
-    switch (this._kind) {
+    switch (this.#kind) {
       case PlutusDataKind.Bytes:
-        return this._bytes!;
+        return this.#bytes!;
       case PlutusDataKind.ConstrPlutusData: {
-        const constrPlutusData = this._constr;
+        const constrPlutusData = this.#constr;
         return {
           cbor: this.toCbor(),
           constructor: constrPlutusData!.getAlternative(),
@@ -194,11 +194,11 @@ export class PlutusData {
         } as Cardano.ConstrPlutusData;
       }
       case PlutusDataKind.Integer:
-        return this._integer!;
+        return this.#integer!;
       case PlutusDataKind.List:
-        return PlutusData.mapToCorePlutusList(this._list!);
+        return PlutusData.mapToCorePlutusList(this.#list!);
       case PlutusDataKind.Map: {
-        const plutusMap = this._map!;
+        const plutusMap = this.#map!;
         const coreMap = new Map<Cardano.PlutusData, Cardano.PlutusData>();
         const keys = plutusMap.getKeys();
         for (let i = 0; i < keys.getLength(); i++) {
@@ -208,7 +208,7 @@ export class PlutusData {
         return { cbor: this.toCbor(), data: coreMap } as Cardano.PlutusMap;
       }
       default:
-        throw new NotImplementedError(`PlutusData mapping for kind ${this._kind}`); // Probably can't happen
+        throw new NotImplementedError(`PlutusData mapping for kind ${this.#kind}`); // Probably can't happen
     }
   }
 
@@ -253,8 +253,8 @@ export class PlutusData {
   static newConstrPlutusData(constrPlutusData: ConstrPlutusData): PlutusData {
     const data = new PlutusData();
 
-    data._constr = constrPlutusData;
-    data._kind = PlutusDataKind.ConstrPlutusData;
+    data.#constr = constrPlutusData;
+    data.#kind = PlutusDataKind.ConstrPlutusData;
 
     return data;
   }
@@ -268,8 +268,8 @@ export class PlutusData {
   static newMap(map: PlutusMap): PlutusData {
     const data = new PlutusData();
 
-    data._map = map;
-    data._kind = PlutusDataKind.Map;
+    data.#map = map;
+    data.#kind = PlutusDataKind.Map;
 
     return data;
   }
@@ -283,8 +283,8 @@ export class PlutusData {
   static newList(list: PlutusList): PlutusData {
     const data = new PlutusData();
 
-    data._list = list;
-    data._kind = PlutusDataKind.List;
+    data.#list = list;
+    data.#kind = PlutusDataKind.List;
 
     return data;
   }
@@ -298,8 +298,8 @@ export class PlutusData {
   static newInteger(integer: bigint): PlutusData {
     const data = new PlutusData();
 
-    data._integer = integer;
-    data._kind = PlutusDataKind.Integer;
+    data.#integer = integer;
+    data.#kind = PlutusDataKind.Integer;
 
     return data;
   }
@@ -313,8 +313,8 @@ export class PlutusData {
   static newBytes(bytes: Uint8Array): PlutusData {
     const data = new PlutusData();
 
-    data._bytes = bytes;
-    data._kind = PlutusDataKind.Bytes;
+    data.#bytes = bytes;
+    data.#kind = PlutusDataKind.Bytes;
 
     return data;
   }
@@ -325,7 +325,7 @@ export class PlutusData {
    * @returns The underlying type.
    */
   getKind(): PlutusDataKind {
-    return this._kind;
+    return this.#kind;
   }
 
   /**
@@ -334,7 +334,7 @@ export class PlutusData {
    * @returns The ConstrPlutusData instance or undefined if it can not be 'down cast'.
    */
   asConstrPlutusData(): ConstrPlutusData | undefined {
-    return this._constr;
+    return this.#constr;
   }
 
   /**
@@ -343,7 +343,7 @@ export class PlutusData {
    * @returns The PlutusMap instance or undefined if it can not be 'down cast'.
    */
   asMap(): PlutusMap | undefined {
-    return this._map;
+    return this.#map;
   }
 
   /**
@@ -352,7 +352,7 @@ export class PlutusData {
    * @returns The PlutusList instance or undefined if it can not be 'down cast'.
    */
   asList(): PlutusList | undefined {
-    return this._list;
+    return this.#list;
   }
 
   /**
@@ -361,7 +361,7 @@ export class PlutusData {
    * @returns The bigint value or undefined if it can not be 'down cast'.
    */
   asInteger(): bigint | undefined {
-    return this._integer;
+    return this.#integer;
   }
 
   /**
@@ -370,7 +370,46 @@ export class PlutusData {
    * @returns The Uint8Array or undefined if it can not be 'down cast'.
    */
   asBoundedBytes(): Uint8Array | undefined {
-    return this._bytes;
+    return this.#bytes;
+  }
+
+  /**
+   * Indicates whether some other PlutusData is "equal to" this one.
+   *
+   * @param other The other object to be compared.
+   * @returns true if objects are equals; otherwise false.
+   */
+  // eslint-disable-next-line complexity
+  equals(other: PlutusData): boolean {
+    switch (this.#kind) {
+      case PlutusDataKind.Bytes:
+        if (this.#bytes && other.#bytes) {
+          return (
+            this.#bytes!.length === other.#bytes!.length &&
+            this.#bytes!.every((value, index) => value === other.#bytes![index])
+          );
+        }
+        return false;
+      case PlutusDataKind.Integer:
+        return this.#integer === other.#integer;
+      case PlutusDataKind.ConstrPlutusData:
+        if (this.#constr && other.#constr) {
+          return this.#constr.equals(other.#constr);
+        }
+        return false;
+      case PlutusDataKind.List:
+        if (this.#list && other.#list) {
+          return this.#list.equals(other.#list);
+        }
+        return false;
+      case PlutusDataKind.Map:
+        if (this.#map && other.#map) {
+          return this.#map.equals(other.#map);
+        }
+        return false;
+      default:
+        return false;
+    }
   }
 
   /**

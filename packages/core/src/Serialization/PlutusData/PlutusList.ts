@@ -7,8 +7,8 @@ import { bytesToHex, hexToBytes } from '../../util/misc';
  * A list of plutus data.
  */
 export class PlutusList {
-  private readonly _array = new Array<PlutusData>();
-  private _useIndefiniteEncoding = true;
+  readonly #array = new Array<PlutusData>();
+  #useIndefiniteEncoding = true;
 
   /**
    * Serializes this PlutusList instance into its CBOR representation as a Uint8Array.
@@ -18,17 +18,17 @@ export class PlutusList {
   toCbor(): HexBlob {
     const writer = new CborWriter();
 
-    if (this._useIndefiniteEncoding) {
+    if (this.#useIndefiniteEncoding) {
       writer.writeStartArray();
     } else {
-      writer.writeStartArray(this._array.length);
+      writer.writeStartArray(this.#array.length);
     }
 
-    for (const elem of this._array) {
+    for (const elem of this.#array) {
       writer.writeEncodedValue(hexToBytes(elem.toCbor()));
     }
 
-    if (this._useIndefiniteEncoding) writer.writeEndArray();
+    if (this.#useIndefiniteEncoding) writer.writeEndArray();
 
     return HexBlob.fromBytes(writer.encode());
   }
@@ -45,7 +45,7 @@ export class PlutusList {
 
     const length = reader.readStartArray();
 
-    if (length === null) list._useIndefiniteEncoding = true;
+    if (length === null) list.#useIndefiniteEncoding = true;
 
     while (reader.peekState() !== CborReaderState.EndArray) {
       list.add(PlutusData.fromCbor(bytesToHex(reader.readEncodedValue())));
@@ -62,7 +62,7 @@ export class PlutusList {
    * @returns the length of the list.
    */
   getLength(): number {
-    return this._array.length;
+    return this.#array.length;
   }
 
   /**
@@ -71,7 +71,7 @@ export class PlutusList {
    * @param index The index in the list of the element to get.
    */
   get(index: number): PlutusData {
-    return this._array[index];
+    return this.#array[index];
   }
 
   /**
@@ -80,6 +80,23 @@ export class PlutusList {
    * @param elem The element to be added.
    */
   add(elem: PlutusData): void {
-    this._array.push(elem);
+    this.#array.push(elem);
+  }
+
+  /**
+   * Indicates whether some other PlutusList is "equal to" this one.
+   *
+   * @param other The other object to be compared.
+   * @returns true if objects are equals; otherwise false.
+   */
+  equals(other: PlutusList): boolean {
+    if (this.#useIndefiniteEncoding !== other.#useIndefiniteEncoding) return false;
+    if (this.#array.length !== other.#array.length) return false;
+
+    for (let i = 0; i < this.#array.length; ++i) {
+      if (!this.#array[i].equals(other.#array[i])) return false;
+    }
+
+    return true;
   }
 }
