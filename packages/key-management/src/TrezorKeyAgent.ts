@@ -1,19 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AuthenticationError, TransportError } from './errors';
-import { Cardano, NotImplementedError, coreToCml } from '@cardano-sdk/core';
+import { Cardano, NotImplementedError } from '@cardano-sdk/core';
 import {
-  CardanoKeyConst,
   CommunicationType,
   KeyAgentDependencies,
-  KeyAgentType,
   SerializableTrezorKeyAgentData,
   SignBlobResult,
   TrezorConfig
 } from './types';
 import { KeyAgentBase } from './KeyAgentBase';
-import { ManagedFreeableScope } from '@cardano-sdk/util';
-import { txToTrezor } from './util';
 import TrezorConnectNode, { Features } from '@trezor/connect';
 import TrezorConnectWeb from '@trezor/connect-web';
 
@@ -34,156 +29,28 @@ export interface CreateTrezorKeyAgentProps {
 
 export type TrezorConnectInstanceType = typeof TrezorConnectNode | typeof TrezorConnectWeb;
 
-const getTrezorConnect = (communicationType: CommunicationType): TrezorConnectInstanceType =>
-  communicationType === CommunicationType.Node ? TrezorConnectNode : TrezorConnectWeb;
-
-const transportTypedError = (error?: any) =>
-  new AuthenticationError('Trezor transport failed', new TransportError('Trezor transport failed', error));
-
 export class TrezorKeyAgent extends KeyAgentBase {
-  readonly isTrezorInitialized: Promise<boolean>;
-  readonly #communicationType: CommunicationType;
-
-  constructor({ isTrezorInitialized, ...serializableData }: TrezorKeyAgentProps, dependencies: KeyAgentDependencies) {
-    super({ ...serializableData, __typename: KeyAgentType.Trezor }, dependencies);
-    if (!isTrezorInitialized) {
-      this.isTrezorInitialized = TrezorKeyAgent.initializeTrezorTransport(serializableData.trezorConfig);
-    }
-    this.#communicationType = serializableData.trezorConfig.communicationType;
+  static async initializeTrezorTransport(__config: TrezorConfig): Promise<boolean> {
+    throw new NotImplementedError('initializeTrezorTransport');
   }
 
-  /**
-   * @throws AuthenticationError
-   */
-  static async initializeTrezorTransport({
-    manifest,
-    communicationType,
-    silentMode = false,
-    lazyLoad = false
-  }: TrezorConfig): Promise<boolean> {
-    const trezorConnect = getTrezorConnect(communicationType);
-    try {
-      await trezorConnect.init({
-        // eslint-disable-next-line max-len
-        // Set to "false" (default) if you want to start communication with bridge on application start (and detect connected device right away)
-        // Set it to "true", then trezor-connect will not be initialized until you call some trezorConnect.method()
-        // This is useful when you don't know if you are dealing with Trezor user
-        lazyLoad: communicationType !== CommunicationType.Node && lazyLoad,
-        // Manifest is required from Trezor Connect 7:
-        // https://github.com/trezor/connect/blob/develop/docs/index.md#trezor-connect-manifest
-        manifest,
-        // Show Trezor Suite popup. Disabled for node based apps
-        popup: communicationType !== CommunicationType.Node && !silentMode
-      });
-      return true;
-    } catch (error: any) {
-      if (error.code === 'Init_AlreadyInitialized') return true;
-      throw transportTypedError(error);
-    }
+  static async checkDeviceConnection(_communicationType: CommunicationType): Promise<Features> {
+    throw new NotImplementedError('checkDeviceConnection');
   }
 
-  /**
-   * @throws AuthenticationError
-   */
-  static async checkDeviceConnection(communicationType: CommunicationType): Promise<Features> {
-    const trezorConnect = getTrezorConnect(communicationType);
-    try {
-      const deviceFeatures = await trezorConnect.getFeatures();
-      if (!deviceFeatures.success) {
-        throw new TransportError('Failed to get device', deviceFeatures.payload);
-      }
-      if (deviceFeatures.payload.model !== 'T') {
-        throw new TransportError(`Trezor device model "${deviceFeatures.payload.model}" is not supported.`);
-      }
-      return deviceFeatures.payload;
-    } catch (error) {
-      throw transportTypedError(error);
-    }
+  static async getXpub(_props: GetTrezorXpubProps): Promise<Crypto.Bip32PublicKeyHex> {
+    throw new NotImplementedError('getXpub');
   }
 
-  /**
-   * @throws AuthenticationError
-   */
-  static async getXpub({ accountIndex, communicationType }: GetTrezorXpubProps): Promise<Crypto.Bip32PublicKeyHex> {
-    try {
-      await TrezorKeyAgent.checkDeviceConnection(communicationType);
-      const derivationPath = `m/${CardanoKeyConst.PURPOSE}'/${CardanoKeyConst.COIN_TYPE}'/${accountIndex}'`;
-      const trezorConnect = getTrezorConnect(communicationType);
-      const extendedPublicKey = await trezorConnect.cardanoGetPublicKey({
-        path: derivationPath,
-        showOnTrezor: true
-      });
-      if (!extendedPublicKey.success) {
-        throw new TransportError('Failed to export extended account public key', extendedPublicKey.payload);
-      }
-      return Crypto.Bip32PublicKeyHex(extendedPublicKey.payload.publicKey);
-    } catch (error: any) {
-      throw transportTypedError(error);
-    }
-  }
-
-  /**
-   * @throws AuthenticationError
-   */
   static async createWithDevice(
-    { chainId, accountIndex = 0, trezorConfig }: CreateTrezorKeyAgentProps,
-    dependencies: KeyAgentDependencies
-  ) {
-    const isTrezorInitialized = await TrezorKeyAgent.initializeTrezorTransport(trezorConfig);
-    const extendedAccountPublicKey = await TrezorKeyAgent.getXpub({
-      accountIndex,
-      communicationType: trezorConfig.communicationType
-    });
-    return new TrezorKeyAgent(
-      {
-        accountIndex,
-        chainId,
-        extendedAccountPublicKey,
-        isTrezorInitialized,
-        knownAddresses: [],
-        trezorConfig
-      },
-      dependencies
-    );
+    _props: CreateTrezorKeyAgentProps,
+    _dependencies: KeyAgentDependencies
+  ): Promise<TrezorKeyAgent> {
+    throw new NotImplementedError('createWithDevice');
   }
 
-  async signTransaction({ body }: Cardano.TxBodyWithHash): Promise<Cardano.Signatures> {
-    const scope = new ManagedFreeableScope();
-    try {
-      await this.isTrezorInitialized;
-      const cslTxBody = coreToCml.txBody(scope, body);
-      const trezorTxData = await txToTrezor({
-        accountIndex: this.accountIndex,
-        chainId: this.chainId,
-        cslTxBody,
-        inputResolver: this.inputResolver,
-        knownAddresses: this.knownAddresses
-      });
-
-      const trezorConnect = getTrezorConnect(this.#communicationType);
-      const result = await trezorConnect.cardanoSignTransaction(trezorTxData);
-      if (!result.success) {
-        throw new TransportError('Failed to export extended account public key', result.payload);
-      }
-
-      const signedData = result.payload;
-      return new Map<Crypto.Ed25519PublicKeyHex, Crypto.Ed25519SignatureHex>(
-        await Promise.all(
-          signedData.witnesses.map(async (witness) => {
-            const publicKey = Crypto.Ed25519PublicKeyHex(witness.pubKey);
-            const signature = Crypto.Ed25519SignatureHex(witness.signature);
-            return [publicKey, signature] as const;
-          })
-        )
-      );
-    } catch (error: any) {
-      if (error.innerError.code === 'Failure_ActionCancelled') {
-        throw new AuthenticationError('Transaction signing aborted', error);
-      }
-      throw transportTypedError(error);
-    } finally {
-      scope.dispose();
-    }
+  async signTransaction(_body: Cardano.TxBodyWithHash): Promise<Cardano.Signatures> {
+    throw new NotImplementedError('signTransaction');
   }
 
   async signBlob(): Promise<SignBlobResult> {
