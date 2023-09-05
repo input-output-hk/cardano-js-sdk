@@ -167,6 +167,111 @@ describe('PlutusData', () => {
 
       expect(data.toCbor()).toEqual('a10102');
     });
+
+    it('can find an element in a plutus map with key - Integer', () => {
+      const data = new Serialization.PlutusMap();
+
+      data.insert(Serialization.PlutusData.newInteger(1n), Serialization.PlutusData.newInteger(2n));
+
+      expect(data.get(Serialization.PlutusData.newInteger(1n))).toEqual(Serialization.PlutusData.newInteger(2n));
+      expect(data.get(Serialization.PlutusData.newInteger(2n))).toBeUndefined();
+    });
+
+    it('can find an element in a plutus map with key - Bytes', () => {
+      const data = new Serialization.PlutusMap();
+
+      data.insert(
+        Serialization.PlutusData.newBytes(new Uint8Array([0, 1, 2])),
+        Serialization.PlutusData.newInteger(2n)
+      );
+
+      expect(data.get(Serialization.PlutusData.newBytes(new Uint8Array([0, 1, 2])))).toEqual(
+        Serialization.PlutusData.newInteger(2n)
+      );
+
+      expect(data.get(Serialization.PlutusData.newBytes(new Uint8Array([0, 1, 2, 3])))).toBeUndefined();
+    });
+
+    it('can find an element in a plutus map with key - PlutusList', () => {
+      const data = new Serialization.PlutusMap();
+
+      const list1 = new Serialization.PlutusList();
+      list1.add(Serialization.PlutusData.newInteger(1n));
+      list1.add(Serialization.PlutusData.newInteger(2n));
+      list1.add(Serialization.PlutusData.newInteger(5n));
+
+      const list2 = new Serialization.PlutusList();
+      list2.add(Serialization.PlutusData.newInteger(1n));
+      list2.add(Serialization.PlutusData.newInteger(2n));
+      list2.add(Serialization.PlutusData.newInteger(5n));
+
+      const list3 = new Serialization.PlutusList();
+      list3.add(Serialization.PlutusData.newInteger(1n));
+      list3.add(Serialization.PlutusData.newInteger(2n));
+
+      data.insert(Serialization.PlutusData.newList(list1), Serialization.PlutusData.newInteger(2n));
+
+      expect(data.get(Serialization.PlutusData.newList(list2))).toEqual(Serialization.PlutusData.newInteger(2n));
+
+      expect(data.get(Serialization.PlutusData.newList(list3))).toBeUndefined();
+    });
+
+    it('can find an element in a plutus map with key - PlutusMap', () => {
+      const data = new Serialization.PlutusMap();
+
+      const map1 = new Serialization.PlutusMap();
+      const list1 = new Serialization.PlutusList();
+      list1.add(Serialization.PlutusData.newInteger(1n));
+      list1.add(Serialization.PlutusData.newInteger(2n));
+      list1.add(Serialization.PlutusData.newInteger(5n));
+      map1.insert(Serialization.PlutusData.newList(list1), Serialization.PlutusData.newInteger(1n));
+
+      const map2 = new Serialization.PlutusMap();
+      const list2 = new Serialization.PlutusList();
+      list2.add(Serialization.PlutusData.newInteger(1n));
+      list2.add(Serialization.PlutusData.newInteger(2n));
+      list2.add(Serialization.PlutusData.newInteger(5n));
+      map2.insert(Serialization.PlutusData.newList(list2), Serialization.PlutusData.newInteger(1n));
+
+      const map3 = new Serialization.PlutusMap();
+      const list3 = new Serialization.PlutusList();
+      list3.add(Serialization.PlutusData.newInteger(1n));
+      list3.add(Serialization.PlutusData.newInteger(2n));
+      map3.insert(Serialization.PlutusData.newList(list3), Serialization.PlutusData.newInteger(1n));
+
+      data.insert(Serialization.PlutusData.newMap(map1), Serialization.PlutusData.newInteger(1n));
+
+      expect(data.get(Serialization.PlutusData.newMap(map2))).toEqual(Serialization.PlutusData.newInteger(2n));
+      expect(data.get(Serialization.PlutusData.newMap(map3))).toBeUndefined();
+    });
+
+    it('can find an element in a plutus map with key - Constr', () => {
+      const data = new Serialization.PlutusMap();
+
+      const list1 = new Serialization.PlutusList();
+      list1.add(Serialization.PlutusData.newInteger(1n));
+      list1.add(Serialization.PlutusData.newInteger(2n));
+      list1.add(Serialization.PlutusData.newInteger(3n));
+      const constr1 = new Serialization.ConstrPlutusData(0n, list1);
+
+      const list2 = new Serialization.PlutusList();
+      list2.add(Serialization.PlutusData.newInteger(1n));
+      list2.add(Serialization.PlutusData.newInteger(2n));
+      list2.add(Serialization.PlutusData.newInteger(3n));
+      const constr2 = new Serialization.ConstrPlutusData(0n, list2);
+
+      const list3 = new Serialization.PlutusList();
+      list3.add(Serialization.PlutusData.newInteger(1n));
+      list3.add(Serialization.PlutusData.newInteger(2n));
+      const constr3 = new Serialization.ConstrPlutusData(1n, list2);
+
+      data.insert(Serialization.PlutusData.newConstrPlutusData(constr1), Serialization.PlutusData.newInteger(2n));
+
+      expect(data.get(Serialization.PlutusData.newConstrPlutusData(constr2))).toEqual(
+        Serialization.PlutusData.newInteger(2n)
+      );
+      expect(data.get(Serialization.PlutusData.newConstrPlutusData(constr3))).toBeUndefined();
+    });
   });
 
   describe('Constr', () => {
@@ -181,6 +286,92 @@ describe('PlutusData', () => {
       const data = new Serialization.ConstrPlutusData(0n, args);
 
       expect(data.toCbor()).toEqual('d8799f0102030405ff');
+    });
+  });
+
+  describe('Deep equality', () => {
+    it('Integer', () => {
+      expect(Serialization.PlutusData.newInteger(1n).equals(Serialization.PlutusData.newInteger(1n))).toBeTruthy();
+      expect(Serialization.PlutusData.newInteger(1n).equals(Serialization.PlutusData.newInteger(2n))).toBeFalsy();
+    });
+
+    it('Bytes', () => {
+      expect(
+        Serialization.PlutusData.newBytes(new Uint8Array([0, 1, 2])).equals(
+          Serialization.PlutusData.newBytes(new Uint8Array([0, 1, 2]))
+        )
+      ).toBeTruthy();
+      expect(
+        Serialization.PlutusData.newBytes(new Uint8Array([0, 1, 2])).equals(
+          Serialization.PlutusData.newBytes(new Uint8Array([0, 1]))
+        )
+      ).toBeFalsy();
+    });
+
+    it('PlutusList', () => {
+      const list1 = new Serialization.PlutusList();
+      list1.add(Serialization.PlutusData.newInteger(1n));
+      list1.add(Serialization.PlutusData.newInteger(2n));
+      list1.add(Serialization.PlutusData.newInteger(5n));
+
+      const list2 = new Serialization.PlutusList();
+      list2.add(Serialization.PlutusData.newInteger(1n));
+      list2.add(Serialization.PlutusData.newInteger(2n));
+      list2.add(Serialization.PlutusData.newInteger(5n));
+
+      const list3 = new Serialization.PlutusList();
+      list3.add(Serialization.PlutusData.newInteger(1n));
+      list3.add(Serialization.PlutusData.newInteger(2n));
+
+      expect(list1.equals(list2)).toBeTruthy();
+      expect(list1.equals(list3)).toBeFalsy();
+    });
+
+    it('PlutusMap', () => {
+      const map1 = new Serialization.PlutusMap();
+      const list1 = new Serialization.PlutusList();
+      list1.add(Serialization.PlutusData.newInteger(1n));
+      list1.add(Serialization.PlutusData.newInteger(2n));
+      list1.add(Serialization.PlutusData.newInteger(5n));
+      map1.insert(Serialization.PlutusData.newList(list1), Serialization.PlutusData.newInteger(1n));
+
+      const map2 = new Serialization.PlutusMap();
+      const list2 = new Serialization.PlutusList();
+      list2.add(Serialization.PlutusData.newInteger(1n));
+      list2.add(Serialization.PlutusData.newInteger(2n));
+      list2.add(Serialization.PlutusData.newInteger(5n));
+      map2.insert(Serialization.PlutusData.newList(list2), Serialization.PlutusData.newInteger(1n));
+
+      const map3 = new Serialization.PlutusMap();
+      const list3 = new Serialization.PlutusList();
+      list3.add(Serialization.PlutusData.newInteger(1n));
+      list3.add(Serialization.PlutusData.newInteger(2n));
+      map3.insert(Serialization.PlutusData.newList(list3), Serialization.PlutusData.newInteger(1n));
+
+      expect(map1.equals(map2)).toBeTruthy();
+      expect(map1.equals(map3)).toBeFalsy();
+    });
+
+    it('Constr', () => {
+      const list1 = new Serialization.PlutusList();
+      list1.add(Serialization.PlutusData.newInteger(1n));
+      list1.add(Serialization.PlutusData.newInteger(2n));
+      list1.add(Serialization.PlutusData.newInteger(3n));
+      const constr1 = new Serialization.ConstrPlutusData(0n, list1);
+
+      const list2 = new Serialization.PlutusList();
+      list2.add(Serialization.PlutusData.newInteger(1n));
+      list2.add(Serialization.PlutusData.newInteger(2n));
+      list2.add(Serialization.PlutusData.newInteger(3n));
+      const constr2 = new Serialization.ConstrPlutusData(0n, list2);
+
+      const list3 = new Serialization.PlutusList();
+      list3.add(Serialization.PlutusData.newInteger(1n));
+      list3.add(Serialization.PlutusData.newInteger(2n));
+      const constr3 = new Serialization.ConstrPlutusData(1n, list2);
+
+      expect(constr1.equals(constr2)).toBeTruthy();
+      expect(constr1.equals(constr3)).toBeFalsy();
     });
   });
 });

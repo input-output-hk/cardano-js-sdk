@@ -8,8 +8,8 @@ import { bytesToHex, hexToBytes } from '../../util/misc';
  * Represents a Map of Plutus data.
  */
 export class PlutusMap {
-  private readonly _map = new Map<PlutusData, PlutusData>();
-  private _useIndefiniteEncoding = false;
+  readonly #map = new Map<PlutusData, PlutusData>();
+  #useIndefiniteEncoding = false;
 
   /**
    * Serializes this PlutusMap instance into its CBOR representation as a Uint8Array.
@@ -19,18 +19,18 @@ export class PlutusMap {
   toCbor(): HexBlob {
     const writer = new CborWriter();
 
-    if (this._useIndefiniteEncoding) {
+    if (this.#useIndefiniteEncoding) {
       writer.writeStartMap();
     } else {
-      writer.writeStartMap(this._map.size);
+      writer.writeStartMap(this.#map.size);
     }
 
-    for (const [key, value] of this._map.entries()) {
+    for (const [key, value] of this.#map.entries()) {
       writer.writeEncodedValue(hexToBytes(key.toCbor()));
       writer.writeEncodedValue(hexToBytes(value.toCbor()));
     }
 
-    if (this._useIndefiniteEncoding) writer.writeEndMap();
+    if (this.#useIndefiniteEncoding) writer.writeEndMap();
 
     return HexBlob.fromBytes(writer.encode());
   }
@@ -47,7 +47,7 @@ export class PlutusMap {
 
     const size = reader.readStartMap();
 
-    if (size === null) map._useIndefiniteEncoding = true;
+    if (size === null) map.#useIndefiniteEncoding = true;
 
     while (reader.peekState() !== CborReaderState.EndMap) {
       const key = PlutusData.fromCbor(bytesToHex(reader.readEncodedValue()));
@@ -67,7 +67,7 @@ export class PlutusMap {
    * @returns the length of the map.
    */
   getLength(): number {
-    return this._map.size;
+    return this.#map.size;
   }
 
   /**
@@ -77,7 +77,7 @@ export class PlutusMap {
    * @param value The value of the element.
    */
   insert(key: PlutusData, value: PlutusData) {
-    this._map.set(key, value);
+    this.#map.set(key, value);
   }
 
   /**
@@ -88,7 +88,13 @@ export class PlutusMap {
    * if there is no element with the given key.
    */
   get(key: PlutusData): PlutusData | undefined {
-    return this._map.get(key);
+    if (!this.#map) return undefined;
+
+    const element = [...this.#map.entries()].find((entry) => entry[0].equals(key));
+
+    if (!element) return undefined;
+
+    return element[1];
   }
 
   /**
@@ -99,10 +105,31 @@ export class PlutusMap {
   getKeys(): PlutusList {
     const list = new PlutusList();
 
-    for (const elem of this._map.keys()) {
+    for (const elem of this.#map.keys()) {
       list.add(elem);
     }
 
     return list;
+  }
+
+  /**
+   * Indicates whether some other PlutusMap is "equal to" this one.
+   *
+   * @param other The other object to be compared.
+   * @returns true if objects are equals; otherwise false.
+   */
+  equals(other: PlutusMap): boolean {
+    if (this.#useIndefiniteEncoding !== other.#useIndefiniteEncoding) return false;
+    if (this.#map.size !== other.#map.size) return false;
+
+    const thisEntries = [...this.#map.entries()];
+    const otherEntries = [...other.#map.entries()];
+
+    for (let i = 0; i < this.#map.size; ++i) {
+      if (!thisEntries[i][0].equals(otherEntries[i][0])) return false;
+      if (!thisEntries[i][1].equals(otherEntries[i][1])) return false;
+    }
+
+    return true;
   }
 }

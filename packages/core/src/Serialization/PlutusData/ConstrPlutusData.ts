@@ -19,8 +19,8 @@ const ALTERNATIVE_TAG_OFFSET = 7n;
  * an unsigned integer for the actual alternative, and then the arguments in a (nested!) list.
  */
 export class ConstrPlutusData {
-  private readonly _alternative: bigint = 0n;
-  private readonly _data = new PlutusList();
+  readonly #alternative: bigint = 0n;
+  readonly #data = new PlutusList();
 
   /**
    * Initializes a new instance of the ConstrPlutusData class.
@@ -30,8 +30,8 @@ export class ConstrPlutusData {
    * @param data Gets the list of arguments of the 'Sum Type' as a 'PlutusList'.
    */
   constructor(alternative: bigint, data: PlutusList) {
-    this._alternative = alternative;
-    this._data = data;
+    this.#alternative = alternative;
+    this.#data = data;
   }
 
   /**
@@ -41,16 +41,16 @@ export class ConstrPlutusData {
    */
   toCbor(): HexBlob {
     const writer = new CborWriter();
-    const compactTag = ConstrPlutusData.alternativeToCompactCborTag(this._alternative);
+    const compactTag = ConstrPlutusData.alternativeToCompactCborTag(this.#alternative);
 
     writer.writeTag(Number(compactTag));
 
     if (compactTag !== GENERAL_FORM_TAG) {
-      writer.writeEncodedValue(hexToBytes(this._data.toCbor()));
+      writer.writeEncodedValue(hexToBytes(this.#data.toCbor()));
     } else {
       writer.writeStartArray(2);
-      writer.writeInt(this._alternative);
-      writer.writeEncodedValue(hexToBytes(this._data.toCbor()));
+      writer.writeInt(this.#alternative);
+      writer.writeEncodedValue(hexToBytes(this.#data.toCbor()));
     }
 
     return HexBlob.fromBytes(writer.encode());
@@ -93,7 +93,7 @@ export class ConstrPlutusData {
    * @returns The alternative constructor of the 'Sum Type'.
    */
   getAlternative(): bigint {
-    return this._alternative;
+    return this.#alternative;
   }
 
   /**
@@ -102,7 +102,19 @@ export class ConstrPlutusData {
    * @returns The list of arguments.
    */
   getData(): PlutusList {
-    return this._data;
+    return this.#data;
+  }
+
+  /**
+   * Indicates whether some other ConstrPlutusData is "equal to" this one.
+   *
+   * @param other The other object to be compared.
+   * @returns true if objects are equals; otherwise false.
+   */
+  equals(other: ConstrPlutusData): boolean {
+    if (this.#alternative !== other.#alternative) return false;
+
+    return this.#data.equals(other.#data);
   }
 
   // Mapping functions to and from alternative to and from CBOR tags.
