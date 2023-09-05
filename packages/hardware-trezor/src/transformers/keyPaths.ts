@@ -1,18 +1,7 @@
 import { BIP32Path } from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
-import { CardanoKeyConst, GroupedAddress, util } from '@cardano-sdk/key-management';
 import { TrezorTxTransformerContext } from '../types';
-
-export const stakeKeyPathFromGroupedAddress = (address: GroupedAddress | undefined): BIP32Path | null => {
-  if (!address?.stakeKeyDerivationPath) return null;
-  return [
-    util.harden(CardanoKeyConst.PURPOSE),
-    util.harden(CardanoKeyConst.COIN_TYPE),
-    util.harden(address.accountIndex),
-    address.stakeKeyDerivationPath.role,
-    address.stakeKeyDerivationPath.index
-  ];
-};
+import { util } from '@cardano-sdk/key-management';
 
 /**
  * Uses the given Trezor input resolver to resolve the payment key
@@ -37,5 +26,5 @@ export const resolveStakeKeyPath = (
   const knownAddress = context.knownAddresses.find(
     ({ rewardAccount }) => rewardAccount === rewardAddress.toAddress().toBech32()
   );
-  return stakeKeyPathFromGroupedAddress(knownAddress);
+  return util.stakeKeyPathFromGroupedAddress(knownAddress);
 };

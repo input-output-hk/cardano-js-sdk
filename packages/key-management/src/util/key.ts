@@ -51,3 +51,19 @@ export const paymentKeyPathFromGroupedAddress = (address: GroupedAddress): BIP32
   address.type,
   address.index
 ];
+
+/**
+ * Constructs the hardened derivation path of the staking key for the
+ * given grouped address of an HD wallet as specified in CIP 11
+ * https://cips.cardano.org/cips/cip11/
+ */
+export const stakeKeyPathFromGroupedAddress = (address: GroupedAddress | undefined): BIP32Path | null => {
+  if (!address?.stakeKeyDerivationPath) return null;
+  return [
+    harden(CardanoKeyConst.PURPOSE),
+    harden(CardanoKeyConst.COIN_TYPE),
+    harden(address.accountIndex),
+    address.stakeKeyDerivationPath.role,
+    address.stakeKeyDerivationPath.index
+  ];
+};

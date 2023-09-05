@@ -2,10 +2,9 @@ import * as Crypto from '@cardano-sdk/crypto';
 import * as Trezor from '@trezor/connect';
 import { BIP32Path } from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
-import { GroupedAddress } from '@cardano-sdk/key-management';
+import { GroupedAddress, util } from '@cardano-sdk/key-management';
 import { InvalidArgumentError /* , Transform*/ } from '@cardano-sdk/util';
 import { TrezorTxTransformerContext } from '../types';
-import { stakeKeyPathFromGroupedAddress } from './keyPaths';
 
 type StakeKeyCertificateType =
   | Trezor.PROTO.CardanoCertificateType.STAKE_REGISTRATION
@@ -54,7 +53,7 @@ const getCertCredentials = (
   const rewardAddress = knownAddress ? Cardano.Address.fromBech32(knownAddress.rewardAccount)?.asReward() : null;
 
   if (rewardAddress?.getPaymentCredential().type === Cardano.CredentialType.KeyHash) {
-    const path = stakeKeyPathFromGroupedAddress(knownAddress);
+    const path = util.stakeKeyPathFromGroupedAddress(knownAddress);
     return path ? { path } : { keyHash: stakeKeyHash };
   }
   return {
@@ -97,7 +96,7 @@ const getPoolOperatorKeyPath = (
   context: TrezorTxTransformerContext
 ): BIP32Path | null => {
   const knownAddress = context?.knownAddresses.find((address) => address.rewardAccount === operator);
-  return stakeKeyPathFromGroupedAddress(knownAddress);
+  return util.stakeKeyPathFromGroupedAddress(knownAddress);
 };
 
 export const getPoolRegistrationCertificate = (
