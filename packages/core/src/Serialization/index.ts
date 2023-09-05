@@ -7,3 +7,4 @@ export * from './Certificates';
 export * from './Update';
 export * from './TransactionBody';
 export * from './TransactionWitnessSet';
+export * from './AuxiliaryData';
