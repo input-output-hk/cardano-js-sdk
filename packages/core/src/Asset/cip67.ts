@@ -1,4 +1,4 @@
-import { Cardano } from '..';
+import * as Cardano from '../Cardano';
 import { InvalidArgumentError, OpaqueNumber } from '@cardano-sdk/util';
 import crc8 from './crc8';
 
