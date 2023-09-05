@@ -6,3 +6,4 @@ export * from './CBOR';
 export * from './Certificates';
 export * from './Update';
 export * from './TransactionBody';
+export * from './TransactionWitnessSet';

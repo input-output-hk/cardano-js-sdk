@@ -28,14 +28,13 @@ describe('Transaction', () => {
     const tx = Transaction.fromCore(scope, coreTx);
 
     expect(tx.body()).toBeInstanceOf(TransactionBody);
-    const witnessSet = scope.manage(tx.witnessSet());
-    const vKeys = scope.manage(witnessSet.vkeys());
-    const witness = scope.manage(vKeys!.get(0)!);
-    const witnessSignature = scope.manage(witness.signature());
-    const vKey = scope.manage(witness.vkey());
-    const vKeyPublicKey = scope.manage(vKey.public_key());
-    expect(Buffer.from(vKeyPublicKey.as_bytes()).toString('hex')).toBe(vkey);
-    expect(witnessSignature.to_hex()).toBe(signature);
+    const witnessSet = tx.witnessSet();
+    const vKeys = witnessSet.vkeys();
+    const witness = vKeys![0];
+    const witnessSignature = witness.signature();
+    const vKey = witness.vkey();
+    expect(vKey).toBe(vkey);
+    expect(witnessSignature).toBe(signature);
 
     expect(tx.toCore()).toEqual(coreTx);
   });
@@ -78,16 +77,15 @@ describe('Transaction', () => {
   });
 
   it('can set the witness set on the transaction', () => {
-    const scope = new ManagedFreeableScope();
     const tx = Transaction.fromCbor(TxCBOR(TX));
     const tx2 = Transaction.fromCbor(TxCBOR(TX2));
 
-    tx.setWitnessSet(scope.manage(tx2.witnessSet()));
+    tx.setWitnessSet(tx2.witnessSet());
 
     // Perform a round trip serialization.
     const tx3 = Transaction.fromCbor(tx.toCbor());
 
-    expect(scope.manage(tx3.witnessSet()).to_bytes()).toEqual(scope.manage(tx2.witnessSet()).to_bytes());
+    expect(tx3.witnessSet().toCbor()).toEqual(tx2.witnessSet().toCbor());
   });
 
   it('can set the witness set on the transaction', () => {
