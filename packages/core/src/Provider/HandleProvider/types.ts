@@ -14,8 +14,8 @@ export interface HandleResolution {
   handle: Handle;
   cardanoAddress: Cardano.PaymentAddress;
   hasDatum: boolean;
-  defaultForStakeKey?: Handle;
-  defaultForPaymentKey?: Handle;
+  defaultForStakeCredential?: Handle;
+  defaultForPaymentCredential?: Handle;
   image?: Asset.Uri;
   backgroundImage?: Asset.Uri;
   profilePic?: Asset.Uri;
