@@ -1,7 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano, coreToCml } from '@cardano-sdk/core';
+import { Cardano, Serialization } from '@cardano-sdk/core';
 import { cip36 } from '../src';
-import { usingAutoFree } from '@cardano-sdk/util';
 
 import delay from 'delay';
 
@@ -48,11 +47,7 @@ describe('cip36', () => {
         purpose: cip36.VotingPurpose.CATALYST,
         stakeKey: Crypto.Ed25519PublicKeyHex('e3cd2404c84de65f96918f18d5b445bcb933a7cda18eeded7945dd191e432369')
       });
-      expect(
-        Buffer.from(
-          usingAutoFree((scope) => coreToCml.txMetadata(scope, votingRegistrationMetadata).to_bytes())
-        ).toString('hex')
-      ).toEqual(
+      expect(Serialization.GeneralTransactionMetadata.fromCore(votingRegistrationMetadata).toCbor()).toEqual(
         'a119ef64a501818258200036ef3e1f0d3f5989e2d155ea54bdb2a72c4c456ccb959af4c94868f473f5a001025820e3cd2404c84de65f96918f18d5b445bcb933a7cda18eeded7945dd191e432369035839004777561e7d9ec112ec307572faec1aff61ff0cfed68df4cd5c847f1872b617657881e30ad17c46e4010c9cb3ebb2440653a34d32219c83e9041904d20500'
       );
       const signedCip36Metadata = await cip36.metadataBuilder.signVotingRegistration(votingRegistrationMetadata, {

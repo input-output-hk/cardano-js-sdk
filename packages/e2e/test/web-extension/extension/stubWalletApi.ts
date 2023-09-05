@@ -1,10 +1,9 @@
-import { Cardano, coreToCml } from '@cardano-sdk/core';
+import { Cardano, Serialization } from '@cardano-sdk/core';
 import { Cip30DataSignature, WalletApi } from '@cardano-sdk/dapp-connector';
 import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
-import { usingAutoFree } from '@cardano-sdk/util';
 
 const mapUtxos = (utxos: Cardano.Utxo[]) =>
-  usingAutoFree((scope) => coreToCml.utxo(scope, utxos).map((utxo) => Buffer.from(utxo.to_bytes()).toString('hex')));
+  utxos.map((utxo) => Serialization.TransactionUnspentOutput.fromCore(utxo).toCbor());
 
 export const stubWalletApi: WalletApi = {
   getActivePubStakeKeys: async () => [

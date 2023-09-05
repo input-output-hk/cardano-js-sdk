@@ -104,7 +104,7 @@ import {
 } from '@cardano-sdk/tx-construction';
 import { Logger } from 'ts-log';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { Shutdown, contextLogger, deepEquals, usingAutoFree } from '@cardano-sdk/util';
+import { Shutdown, contextLogger, deepEquals } from '@cardano-sdk/util';
 import { WalletStores, createInMemoryWalletStores } from '../persistence';
 import { createActivePublicStakeKeysTracker } from '../services/ActiveStakePublicKeysTracker';
 import isEqual from 'lodash/isEqual';
@@ -159,15 +159,13 @@ const isSignedTx = (input: Cardano.Tx | TxCBOR | OutgoingTx | SignedTx): input i
 const processOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx | SignedTx): OutgoingTx => {
   // TxCbor
   if (isTxCBOR(input)) {
-    return usingAutoFree((scope) => {
-      const tx = scope.manage(Serialization.Transaction.fromCbor(input));
-      return {
-        body: tx.toCore().body,
-        cbor: input,
-        // Do not re-serialize transaction body to compute transaction id
-        id: tx.getId()
-      };
-    });
+    const tx = Serialization.Transaction.fromCbor(input);
+    return {
+      body: tx.toCore().body,
+      cbor: input,
+      // Do not re-serialize transaction body to compute transaction id
+      id: tx.getId()
+    };
   }
   // SignedTx
   if (isSignedTx(input)) {

@@ -1,4 +1,4 @@
-import { CML, Cardano, InvalidProtocolParametersError, Serialization, cmlUtil, coreToCml } from '@cardano-sdk/core';
+import { Cardano, InvalidProtocolParametersError, Serialization } from '@cardano-sdk/core';
 import {
   ComputeMinimumCoinQuantity,
   ComputeSelectionLimit,
@@ -10,7 +10,8 @@ import {
   TokenBundleSizeExceedsLimit
 } from '@cardano-sdk/input-selection';
 import { MinFeeCoefficient, MinFeeConstant, minAdaRequired, minFee } from '../fees';
-import { usingAutoFree } from '@cardano-sdk/util';
+
+export const MAX_U64 = 18_446_744_073_709_551_615n;
 
 export type BuildTx = (selection: SelectionSkeleton) => Promise<Cardano.Tx>;
 
@@ -45,12 +46,11 @@ export const tokenBundleSizeExceedsLimit =
     if (!tokenBundle) {
       return false;
     }
-    return usingAutoFree((scope) => {
-      const value = scope.manage(CML.Value.new(cmlUtil.maxBigNum(scope)));
-      value.set_multiasset(coreToCml.tokenMap(scope, tokenBundle));
 
-      return value.to_bytes().length > maxValueSize;
-    });
+    const value = new Serialization.Value(MAX_U64);
+    value.setMultiasset(tokenBundle);
+
+    return value.toCbor().length / 2 > maxValueSize;
   };
 
 const getTxSize = (tx: Serialization.Transaction) => Buffer.from(tx.toCbor(), 'hex').length;
@@ -64,15 +64,14 @@ const getTxSize = (tx: Serialization.Transaction) => Buffer.from(tx.toCbor(), 'h
  */
 export const computeSelectionLimit =
   (maxTxSize: ProtocolParametersRequiredByInputSelection['maxTxSize'], buildTx: BuildTx): ComputeSelectionLimit =>
-  (selectionSkeleton) =>
-    usingAutoFree(async (scope) => {
-      const tx = await buildTx(selectionSkeleton);
-      const txSize = getTxSize(scope.manage(Serialization.Transaction.fromCore(scope, tx)));
-      if (txSize <= maxTxSize) {
-        return selectionSkeleton.inputs.size;
-      }
-      return selectionSkeleton.inputs.size - 1;
-    });
+  async (selectionSkeleton) => {
+    const tx = await buildTx(selectionSkeleton);
+    const txSize = getTxSize(Serialization.Transaction.fromCore(tx));
+    if (txSize <= maxTxSize) {
+      return selectionSkeleton.inputs.size;
+    }
+    return selectionSkeleton.inputs.size - 1;
+  };
 
 export const defaultSelectionConstraints = ({
   protocolParameters: { coinsPerUtxoByte, maxTxSize, maxValueSize, minFeeCoefficient, minFeeConstant, prices },

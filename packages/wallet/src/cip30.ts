@@ -13,8 +13,8 @@ import {
   TxSignErrorCode,
   WalletApi
 } from '@cardano-sdk/dapp-connector';
-import { CML, Cardano, Serialization, TxCBOR, cmlToCore, coalesceValueQuantities, coreToCml } from '@cardano-sdk/core';
-import { HexBlob, ManagedFreeableScope, usingAutoFree } from '@cardano-sdk/util';
+import { Cardano, Serialization, TxCBOR, coalesceValueQuantities } from '@cardano-sdk/core';
+import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InputSelectionError, InputSelectionFailure } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
 import { Observable, firstValueFrom } from 'rxjs';
@@ -68,10 +68,6 @@ export type CallbackConfirmation = {
   getCollateral?: GetCollateralCallback;
 };
 
-interface CslInterface {
-  to_bytes(): Uint8Array;
-}
-
 const mapCallbackFailure = (err: unknown, logger: Logger) => {
   logger.error(err);
   return false;
@@ -87,9 +83,7 @@ const processTxInput = (input: string) => {
   }
 };
 
-const MAX_COLLATERAL_AMOUNT = CML.BigNum.from_str('5000000');
-
-const cslToCbor = (csl: CslInterface) => Buffer.from(csl.to_bytes()).toString('hex');
+const MAX_COLLATERAL_AMOUNT = 5_000_000n;
 
 const compareUtxos = (utxo: Cardano.Utxo, comparedTo: Cardano.Utxo) => {
   const currentCoin = utxo[1].value.coins;
@@ -110,9 +104,9 @@ const cardanoAddressToCbor = (address: Cardano.PaymentAddress | Cardano.RewardAc
 
 const formatUnknownError = (error: unknown): string => (error as Error)?.message || 'Unknown error';
 
-const parseValueCbor = (scope: ManagedFreeableScope, value: Cbor) => {
+const parseValueCbor = (value: Cbor) => {
   try {
-    return scope.manage(CML.Value.from_bytes(Buffer.from(value, 'hex')));
+    return Serialization.Value.fromCbor(value as unknown as HexBlob);
   } catch {
     throw new ApiError(APIErrorCode.InvalidRequest, 'could not parse Value');
   }
@@ -179,19 +173,25 @@ const selectUtxo = async (wallet: ObservableWallet, filterAmount: Cardano.Value,
  */
 const getUtxosWithoutAssets = (utxos: Cardano.Utxo[]): Cardano.Utxo[] => utxos.filter((utxo) => !utxo[1].value.assets);
 
-const getFilterAsBigNum = (amount: Cbor, scope: ManagedFreeableScope): CML.BigNum => {
-  try {
-    return scope.manage(CML.BigNum.from_bytes(Buffer.from(amount, 'hex')));
-  } catch {
-    return scope.manage(CML.BigNum.from_str(scope.manage(CML.BigInt.from_bytes(Buffer.from(amount, 'hex'))).to_str()));
+const getFilterAsBigNum = (amount: Cbor): bigint => {
+  const reader = new Serialization.CborReader(HexBlob(amount));
+
+  if (
+    reader.peekState() === Serialization.CborReaderState.Tag &&
+    reader.peekTag() === Serialization.CborTag.UnsignedBigNum
+  ) {
+    reader.readTag();
+    return BigInt(`0x${HexBlob.fromBytes(reader.readByteString())}`).valueOf();
   }
+
+  return reader.readInt();
 };
 
-const getFilterAmount = (amount: Cbor, scope: ManagedFreeableScope): CML.BigNum => {
+const getFilterAmount = (amount: Cbor): bigint => {
   try {
-    const filterAmount = getFilterAsBigNum(amount, scope);
+    const filterAmount = getFilterAsBigNum(amount);
 
-    if (filterAmount.compare(MAX_COLLATERAL_AMOUNT) > 0) {
+    if (filterAmount > MAX_COLLATERAL_AMOUNT) {
       throw new ApiError(APIErrorCode.InvalidRequest, 'requested amount is too big');
     }
     return filterAmount;
@@ -206,7 +206,6 @@ const getFilterAmount = (amount: Cbor, scope: ManagedFreeableScope): CML.BigNum 
  * @param amount ADA collateral required in lovelaces
  * @param availableUtxos available UTxOs
  * @param callback Callback to execute to attempt setting new collateral
- * @param scope The scope that will manage the CML resources.
  * @param logger The logger instance
  * @returns Promise<Cbor[]> or null
  */
@@ -214,7 +213,6 @@ const getCollateralCallback = async (
   amount: Cardano.Lovelace,
   availableUtxos: Cardano.Utxo[],
   callback: GetCollateralCallback,
-  scope: ManagedFreeableScope,
   logger: Logger
 ) => {
   const availableUtxosWithoutAssets = getUtxosWithoutAssets(availableUtxos);
@@ -224,12 +222,12 @@ const getCollateralCallback = async (
     // Client can then choose to mark a UTxO set as unspendable
     const newCollateral = await callback({
       data: {
-        amount: BigInt(amount.toString()),
+        amount,
         utxos: availableUtxosWithoutAssets
       },
       type: Cip30ConfirmationCallbackType.GetCollateral
     });
-    return coreToCml.utxo(scope, newCollateral).map(cslToCbor);
+    return newCollateral.map((core) => Serialization.TransactionUnspentOutput.fromCore(core).toCbor());
   } catch (error) {
     logger.error(error);
     if (error instanceof ApiError) {
@@ -254,7 +252,7 @@ const baseCip30WalletApi = (
     try {
       const wallet = await firstValueFrom(wallet$);
       const value = await firstValueFrom(wallet.balance.utxo.available$);
-      return Buffer.from(usingAutoFree((scope) => coreToCml.value(scope, value).to_bytes())).toString('hex');
+      return Serialization.Value.fromCore(value).toCbor();
     } catch (error) {
       logger.error(error);
       throw error;
@@ -280,73 +278,66 @@ const baseCip30WalletApi = (
       throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));
     }
   },
-  // eslint-disable-next-line max-statements, sonarjs/cognitive-complexity
-  getCollateral: async ({ amount = cslToCbor(MAX_COLLATERAL_AMOUNT) }: { amount?: Cbor } = {}): Promise<
+  // eslint-disable-next-line max-statements, sonarjs/cognitive-complexity,complexity
+  getCollateral: async ({
+    amount = new Serialization.Value(MAX_COLLATERAL_AMOUNT).toCbor()
+  }: { amount?: Cbor } = {}): Promise<
     Cbor[] | null
     // eslint-disable-next-line sonarjs/cognitive-complexity, max-statements
-  > =>
-    // eslint-disable-next-line complexity
-    usingAutoFree(async (scope) => {
-      logger.debug('getting collateral');
-      const wallet = await firstValueFrom(wallet$);
-      let unspendables = await getSortedUtxos(wallet.utxo.unspendable$);
-      const available = await getSortedUtxos(wallet.utxo.available$);
-      // No available unspendable UTxO
-      if (unspendables.length === 0) {
-        if (available.length > 0 && !!confirmationCallback.getCollateral) {
-          // available UTxOs could be set as collateral based on user preference
-          return await getCollateralCallback(
-            BigInt(getFilterAmount(amount, scope).to_str()),
-            available,
-            confirmationCallback.getCollateral,
-            scope,
-            logger
-          );
+  > => {
+    logger.debug('getting collateral');
+    const wallet = await firstValueFrom(wallet$);
+    let unspendables = await getSortedUtxos(wallet.utxo.unspendable$);
+    const available = await getSortedUtxos(wallet.utxo.available$);
+    // No available unspendable UTxO
+    if (unspendables.length === 0) {
+      if (available.length > 0 && !!confirmationCallback.getCollateral) {
+        // available UTxOs could be set as collateral based on user preference
+        return await getCollateralCallback(
+          getFilterAmount(amount),
+          available,
+          confirmationCallback.getCollateral,
+          logger
+        );
+      }
+      return null;
+    }
+
+    if (unspendables.some((utxo) => utxo[1].value.assets && utxo[1].value.assets.size > 0)) {
+      throw new ApiError(APIErrorCode.Refused, 'unspendable UTxOs must not contain assets when used as collateral');
+    }
+    if (amount) {
+      const filterAmount = getFilterAmount(amount);
+
+      try {
+        const utxos = [];
+        let totalCoins = 0n;
+        for (const utxo of unspendables) {
+          const coin = utxo[1].value.coins;
+          totalCoins += coin;
+          utxos.push(utxo);
+          if (totalCoins >= filterAmount) break;
         }
-        return null;
-      }
+        if (totalCoins < filterAmount) {
+          // if no collateral available by amount in unspendables, return callback if provided to set unspendables and return in the callback
 
-      if (unspendables.some((utxo) => utxo[1].value.assets && utxo[1].value.assets.size > 0)) {
-        throw new ApiError(APIErrorCode.Refused, 'unspendable UTxOs must not contain assets when used as collateral');
-      }
-      if (amount) {
-        const filterAmount = getFilterAmount(amount, scope);
-
-        try {
-          const utxos = [];
-          let totalCoins = scope.manage(CML.BigNum.from_str('0'));
-          for (const utxo of unspendables) {
-            const coin = scope.manage(CML.BigNum.from_str(utxo[1].value.coins.toString()));
-            totalCoins = totalCoins.checked_add(coin);
-            utxos.push(utxo);
-            if (totalCoins.compare(filterAmount) !== -1) break;
+          if (available.length > 0 && !!confirmationCallback.getCollateral) {
+            return await getCollateralCallback(filterAmount, available, confirmationCallback.getCollateral, logger);
           }
-          if (totalCoins.compare(filterAmount) === -1) {
-            // if no collateral available by amount in unspendables, return callback if provided to set unspendables and return in the callback
 
-            if (available.length > 0 && !!confirmationCallback.getCollateral) {
-              return await getCollateralCallback(
-                BigInt(filterAmount.to_str()),
-                available,
-                confirmationCallback.getCollateral,
-                scope,
-                logger
-              );
-            }
-
-            throw new ApiError(APIErrorCode.Refused, 'not enough coins in configured collateral UTxOs');
-          }
-          unspendables = utxos;
-        } catch (error) {
-          logger.error(error);
-          if (error instanceof ApiError) {
-            throw error;
-          }
-          throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));
+          throw new ApiError(APIErrorCode.Refused, 'not enough coins in configured collateral UTxOs');
         }
+        unspendables = utxos;
+      } catch (error) {
+        logger.error(error);
+        if (error instanceof ApiError) {
+          throw error;
+        }
+        throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));
       }
-      return coreToCml.utxo(scope, unspendables).map(cslToCbor);
-    }),
+    }
+    return unspendables.map((core) => Serialization.TransactionUnspentOutput.fromCore(core).toCbor());
+  },
   getNetworkId: async (): Promise<Cardano.NetworkId> => {
     logger.debug('getting networkId');
     const wallet = await firstValueFrom(wallet$);
@@ -393,13 +384,13 @@ const baseCip30WalletApi = (
     try {
       const wallet = await firstValueFrom(wallet$);
       let utxos = amount
-        ? await selectUtxo(wallet, cmlToCore.value(parseValueCbor(scope, amount)), !!paginate)
+        ? await selectUtxo(wallet, parseValueCbor(amount).toCore(), !!paginate)
         : await firstValueFrom(wallet.utxo.available$);
       if (!utxos) return null;
       if (paginate) {
         utxos = utxos.slice(paginate.page * paginate.limit, paginate.page * paginate.limit + paginate.limit);
       }
-      const cbor = coreToCml.utxo(scope, utxos).map(cslToCbor);
+      const cbor = utxos.map((core) => Serialization.TransactionUnspentOutput.fromCore(core).toCbor());
       scope.dispose();
       return cbor;
     } finally {
@@ -434,7 +425,7 @@ const baseCip30WalletApi = (
   signTx: async (tx: Cbor, partialSign?: Boolean): Promise<Cbor> => {
     const scope = new ManagedFreeableScope();
     logger.debug('signTx');
-    const txDecoded = scope.manage(Serialization.Transaction.fromCbor(TxCBOR(tx)));
+    const txDecoded = Serialization.Transaction.fromCbor(TxCBOR(tx));
 
     const hash = txDecoded.getId();
     const coreTx = txDecoded.toCore();
@@ -468,8 +459,7 @@ const baseCip30WalletApi = (
           );
         }
 
-        const cslWitnessSet = scope.manage(coreToCml.witnessSet(scope, { signatures }));
-        const cbor = Buffer.from(cslWitnessSet.to_bytes()).toString('hex');
+        const cbor = Serialization.TransactionWitnessSet.fromCore({ signatures }).toCbor();
         return Promise.resolve(cbor);
       } catch (error) {
         logger.error(error);
