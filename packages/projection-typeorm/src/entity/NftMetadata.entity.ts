@@ -37,6 +37,8 @@ export class NftMetadataEntity {
   parentAsset?: AssetEntity;
   @ManyToOne(() => AssetEntity, OnDeleteSetNullRelationOptions)
   userTokenAsset?: AssetEntity | null;
+  @Column('varchar', { nullable: true })
+  userTokenAssetId?: Cardano.AssetId | null;
   @ManyToOne(() => BlockEntity, OnDeleteCascadeRelationOptions)
   createdAt?: BlockEntity;
 }
