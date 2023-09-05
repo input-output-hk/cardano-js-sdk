@@ -253,7 +253,7 @@ describe('storeNftMetadata', () => {
       const storedNftMetadata = projectedNftMetadata.find(
         (storedMetadata) => storedMetadata.userTokenAsset?.id === someNftMetadataAssetId
       );
-      expect(omit(storedNftMetadata, ['userTokenAsset', 'id'])).toEqual({
+      expect(omit(storedNftMetadata, ['userTokenAsset', 'userTokenAssetId', 'id'])).toEqual({
         description: someNftMetadata.description || null,
         files: someNftMetadata.files || null,
         image: someNftMetadata.image,
