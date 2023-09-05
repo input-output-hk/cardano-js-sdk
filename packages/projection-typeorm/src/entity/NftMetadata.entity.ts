@@ -19,7 +19,7 @@ export class NftMetadataEntity {
   @Column({ nullable: true, type: 'varchar' })
   description?: string | null;
   @Column()
-  image?: string;
+  image?: Asset.Uri;
   @Column({ nullable: true, type: 'varchar' })
   mediaType?: string | null;
   @Column({ nullable: true, type: 'jsonb' })
