@@ -1,7 +1,9 @@
 /* eslint-disable func-style */
 /* eslint-disable jsdoc/require-jsdoc */
 
+import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, TxCBOR } from '@cardano-sdk/core';
+import { HexBlob } from '@cardano-sdk/util';
 import { Observable, catchError, filter, firstValueFrom, throwError, timeout } from 'rxjs';
 import { ObservableWallet, OutgoingTx } from '../src';
 
@@ -37,3 +39,25 @@ export const toOutgoingTx = (tx: Cardano.Tx): OutgoingTx => ({
 });
 
 export const dummyCbor = TxCBOR('123');
+
+/**
+ * Construct a type 6 address for a DRepKey
+ * using an appropriate Network Tag and a hash of a public DRep Key.
+ */
+export const buildDRepIDFromDRepKey = (
+  dRepKey: Crypto.Ed25519PublicKeyHex,
+  networkId: Cardano.NetworkId = Cardano.NetworkId.Testnet,
+  addressType: Cardano.AddressType = Cardano.AddressType.EnterpriseKey
+) => {
+  const dRepKeyBytes = Buffer.from(dRepKey, 'hex');
+  const dRepIdHex = Crypto.blake2b(28).update(dRepKeyBytes).digest('hex');
+  const paymentAddress = Cardano.EnterpriseAddress.packParts({
+    networkId,
+    paymentPart: {
+      hash: Crypto.Hash28ByteBase16(dRepIdHex),
+      type: Cardano.CredentialType.KeyHash
+    },
+    type: addressType
+  });
+  return HexBlob.toTypedBech32<Cardano.DRepID>('drep', HexBlob.fromBytes(paymentAddress));
+};

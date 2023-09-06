@@ -12,9 +12,9 @@ import { CML, Cardano, CardanoNodeErrors, ProviderError, ProviderFailure, TxCBOR
 import { HexBlob } from '@cardano-sdk/util';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
 import { PersonalWallet, TxInFlight, setupWallet } from '../../src';
+import { buildDRepIDFromDRepKey, toOutgoingTx, waitForWalletStateSettle } from '../util';
 import { getPassphrase, stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { dummyLogger as logger } from 'ts-log';
-import { toOutgoingTx, waitForWalletStateSettle } from '../util';
 import delay from 'delay';
 
 const { mockChainHistoryProvider, mockRewardsProvider, utxo } = mocks;
@@ -547,9 +547,29 @@ describe('PersonalWallet methods', () => {
     });
   });
 
-  it('signData calls cip30signData', async () => {
-    const response = await wallet.signData({ payload: HexBlob('abc123'), signWith: address });
-    expect(response).toHaveProperty('signature');
+  describe('signData', () => {
+    it('calls cip30signData', async () => {
+      const response = await wallet.signData({ payload: HexBlob('abc123'), signWith: address });
+      expect(response).toHaveProperty('signature');
+    });
+
+    it('signs with bech32 DRepID', async () => {
+      const response = await wallet.signData({
+        payload: HexBlob('abc123'),
+        signWith: Cardano.DRepID('drep1vpzcgfrlgdh4fft0p0ju70czkxxkuknw0jjztl3x7aqgm9q3hqyaz')
+      });
+      expect(response).toHaveProperty('signature');
+    });
+
+    test('rejects if bech32 DRepID is not a type 6 address', async () => {
+      const dRepKey = await wallet.getPubDRepKey();
+      for (const type in Cardano.AddressType) {
+        if (!Number.isNaN(Number(type)) && Number(type) !== Cardano.AddressType.EnterpriseKey) {
+          const drepid = buildDRepIDFromDRepKey(dRepKey, 0, type as unknown as Cardano.AddressType);
+          await expect(wallet.signData({ payload: HexBlob('abc123'), signWith: drepid })).rejects.toThrow();
+        }
+      }
+    });
   });
 
   it('getPubDRepKey', async () => {
