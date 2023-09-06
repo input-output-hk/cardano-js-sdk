@@ -28,6 +28,11 @@ describe('TypeOrmHandleProvider', () => {
       "BAD_REQUEST (Empty string handle can't be resolved)"
     ));
 
+  it('throws a 404 if handle not found', async () =>
+    expect(provider.resolveHandles({ handles: ['testingHandles', '', 'test'] })).rejects.toThrow(
+      'NOT_FOUND (Handle not found)'
+    ));
+
   it('resolve method correctly resolves handles', async () => {
     const result = await provider.resolveHandles({ handles: ['none', 'TestHandle'] });
 

@@ -26,6 +26,9 @@ const handleSelect = <{ [k in HandleFields]: true }>Object.fromEntries(handleFie
 export const emptyStringHandleResolutionRequestError = () =>
   new ProviderError(ProviderFailure.BadRequest, undefined, "Empty string handle can't be resolved");
 
+export const handleResolutionNotFoundRequestError = () =>
+  new ProviderError(ProviderFailure.NotFound, undefined, 'Handle not found');
+
 export class TypeOrmHandleProvider extends TypeormProvider implements HandleProvider {
   inMemoryCache: InMemoryCache;
 
@@ -47,7 +50,7 @@ export class TypeOrmHandleProvider extends TypeormProvider implements HandleProv
       await queryRunner.release();
 
       const mapEntity = (entity: PartialHandleEntity | undefined): HandleResolution | null => {
-        if (!entity) return null;
+        if (!entity) throw handleResolutionNotFoundRequestError();
 
         const { cardanoAddress, handle, hasDatum, policyId } = entity;
 
