@@ -86,6 +86,7 @@
     "@cardano-sdk/core": "workspace:~",
     "@cardano-sdk/crypto": "workspace:~",
     "@cardano-sdk/hardware-ledger": "workspace:~",
+    "@cardano-sdk/hardware-trezor": "workspace:~",
     "@cardano-sdk/input-selection": "workspace:~",
     "@cardano-sdk/key-management": "workspace:~",
     "@cardano-sdk/ogmios": "workspace:~",

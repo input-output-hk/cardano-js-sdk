@@ -2,7 +2,7 @@ import * as Trezor from '@trezor/connect';
 import { BIP32Path } from '@cardano-sdk/crypto';
 import { TrezorTxTransformerContext } from '../types';
 import { isNotNil } from '@cardano-sdk/util';
-import { stakeKeyPathFromGroupedAddress } from './keyPaths';
+import { util } from '@cardano-sdk/key-management';
 import isArray from 'lodash/isArray';
 import uniq from 'lodash/uniq';
 
@@ -15,7 +15,7 @@ export const mapAdditionalWitnessRequests = (inputs: Trezor.CardanoInput[], cont
   );
   const additionalWitnessPaths: BIP32Path[] = [...paymentKeyPaths];
   if (context.knownAddresses.length > 0) {
-    const stakeKeyPath = stakeKeyPathFromGroupedAddress(context.knownAddresses[0]);
+    const stakeKeyPath = util.stakeKeyPathFromGroupedAddress(context.knownAddresses[0]);
     if (stakeKeyPath) additionalWitnessPaths.push(stakeKeyPath);
   }
   return additionalWitnessPaths;

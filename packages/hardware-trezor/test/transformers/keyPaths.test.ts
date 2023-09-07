@@ -1,36 +1,13 @@
 import {
   contextWithKnownAddresses,
-  knownAddress,
   knownAddressKeyPath,
   knownAddressStakeKeyPath,
   rewardAddress,
   txIn
 } from '../testData';
-import {
-  paymentKeyPathFromGroupedAddress,
-  resolvePaymentKeyPathForTxIn,
-  resolveStakeKeyPath,
-  stakeKeyPathFromGroupedAddress
-} from '../../src';
-
-const address = contextWithKnownAddresses.knownAddresses[0];
+import { resolvePaymentKeyPathForTxIn, resolveStakeKeyPath } from '../../src';
 
 describe('key-paths', () => {
-  describe('paymentKeyPathFromGroupedAddress', () => {
-    it('returns a hardened BIP32 payment key path', () => {
-      expect(paymentKeyPathFromGroupedAddress(address)).toEqual(knownAddressKeyPath);
-    });
-  });
-  describe('stakeKeyPathFromGroupedAddress', () => {
-    it('returns null when given an undefined stakeKeyDerivationPath', async () => {
-      const knownAddressClone = { ...knownAddress };
-      delete knownAddressClone.stakeKeyDerivationPath;
-      expect(stakeKeyPathFromGroupedAddress(knownAddressClone)).toEqual(null);
-    });
-    it('returns a hardened BIP32 stake key path', () => {
-      expect(stakeKeyPathFromGroupedAddress(address)).toEqual(knownAddressStakeKeyPath);
-    });
-  });
   describe('resolvePaymentKeyPathForTxIn', () => {
     it('returns the payment key path for a known address', async () => {
       expect(await resolvePaymentKeyPathForTxIn(txIn, contextWithKnownAddresses)).toEqual(knownAddressKeyPath);
