@@ -92,7 +92,7 @@ export class DbSyncAssetProvider extends DbSyncProvider() implements AssetProvid
     return assetInfo;
   }
 
-  async getAssets({ assetIds, extraData }: GetAssetsArgs) {
+  async getAssets({ assetIds, extraData, fresh }: GetAssetsArgs) {
     if (assetIds.length > this.#paginationPageSizeLimit) {
       throw new ProviderError(
         ProviderFailure.BadRequest,
@@ -123,7 +123,7 @@ export class DbSyncAssetProvider extends DbSyncProvider() implements AssetProvid
     const getAssetInfo = async (assetId: Cardano.AssetId) => {
       const assetInfo = await this.#getAssetInfo(assetId);
 
-      if (extraData?.nftMetadata) assetInfo.nftMetadata = await this.#getNftMetadata(assetInfo);
+      if (extraData?.nftMetadata) assetInfo.nftMetadata = await this.#getNftMetadata(assetInfo, fresh?.nftMetadata);
       if (tokenMetadataListPromise)
         assetInfo.tokenMetadata = (await tokenMetadataListPromise)[assetIds.indexOf(assetId)];
 
@@ -142,7 +142,8 @@ export class DbSyncAssetProvider extends DbSyncProvider() implements AssetProvid
     }));
   }
 
-  async #getNftMetadata(asset: AssetPolicyIdAndName): Promise<Asset.NftMetadata | null> {
+  async #getNftMetadata(asset: AssetPolicyIdAndName, disableCache?: boolean): Promise<Asset.NftMetadata | null> {
+    if (disableCache) return this.#dependencies.ntfMetadataService.getNftMetadata(asset);
     return this.#cache.get(
       nftMetadataCacheKey(Cardano.AssetId.fromParts(asset.policyId, asset.name)),
       async () => await this.#dependencies.ntfMetadataService.getNftMetadata(asset)

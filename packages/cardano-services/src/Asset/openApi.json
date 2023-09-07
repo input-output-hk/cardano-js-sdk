@@ -166,6 +166,14 @@
           }
         }
       },
+      "FreshOptions": {
+        "type": "object",
+        "properties": {
+          "nftMetadata": {
+            "type": "boolean"
+          }
+        }
+      },
       "ExtraDataAssetIds": {
         "type": "object",
         "properties": {
@@ -201,6 +209,9 @@
           },
           "extraData": {
             "$ref": "#/components/schemas/ExtraDataAssetIds"
+          },
+          "fresh": {
+            "$ref": "#/components/schemas/FreshOptions"
           }
         }
       },

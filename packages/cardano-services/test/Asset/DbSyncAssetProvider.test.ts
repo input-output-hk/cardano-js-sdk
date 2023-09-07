@@ -127,6 +127,19 @@ describe('DbSyncAssetProvider', () => {
     ]);
     expect(nftMetadataSpy).toBeCalledTimes(1);
   });
+  it('does not cache nft metadata when fresh.nftMetadata=true', async () => {
+    const assets = await fixtureBuilder.getAssets(1, { with: [AssetWith.CIP25Metadata] });
+    await provider.getAsset({
+      assetId: assets[0].id,
+      extraData: { nftMetadata: true }
+    });
+    await provider.getAssets({
+      assetIds: [assets[0].id],
+      extraData: { nftMetadata: true },
+      fresh: { nftMetadata: true }
+    });
+    expect(nftMetadataSpy).toBeCalledTimes(2);
+  });
   it('returns undefined asset token metadata if the token registry throws a server internal error', async () => {
     const { serverUrl, closeMock } = await mockTokenRegistry(async () => ({ body: {}, code: 500 }));
     const tokenMetadataService = new CardanoTokenRegistry(

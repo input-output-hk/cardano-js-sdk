@@ -20,9 +20,17 @@ export interface GetAssetArgs {
   extraData?: AssetExtraData;
 }
 
+export interface GetAssetsFreshOptions {
+  nftMetadata?: boolean;
+}
+
 export interface GetAssetsArgs {
   assetIds: Cardano.AssetId[];
   extraData?: AssetsExtraData;
+  /**
+   * Ask the provider to return fresh (non-cached) response
+   */
+  fresh?: GetAssetsFreshOptions;
 }
 
 export interface AssetProvider extends Provider {
