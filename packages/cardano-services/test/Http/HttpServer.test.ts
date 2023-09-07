@@ -390,6 +390,34 @@ describe('HttpServer', () => {
       expect(response.data.includes('healthcheck 0')).toEqual(true);
     });
   });
+
+  describe('live endpoint', () => {
+    afterEach(async () => {
+      await httpServer.shutdown();
+    });
+
+    it('/live endpoint returns a 200 coded response, if the server is running, for GET and POST requests', async () => {
+      httpServer = new HttpServer(
+        { listen: { host: 'localhost', port } },
+        {
+          logger,
+          runnableDependencies: [cardanoNode],
+          services: [new SomeHttpService(ServiceNames.StakePool, provider, logger)]
+        }
+      );
+
+      await httpServer.initialize();
+      await httpServer.start();
+      await serverStarted(apiUrlBase);
+
+      const resGet = await axios.get(`${apiUrlBase}/live`);
+      const resPost = await axios.post(`${apiUrlBase}/live`);
+
+      expect(resGet.status).toBe(200);
+      expect(resPost.status).toBe(200);
+    });
+  });
+
   describe('Service health check', () => {
     const shouldFail = true;
     beforeEach(async () => {

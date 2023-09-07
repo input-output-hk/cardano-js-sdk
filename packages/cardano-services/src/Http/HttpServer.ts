@@ -137,6 +137,10 @@ export class HttpServer extends RunnableModule {
 
     const handlers = {
       health: healthCheckHandler(() => 200),
+      live: async (req: express.Request, res: express.Response) => {
+        this.logger.debug('/live', { ip: req.ip });
+        return res.sendStatus(200);
+      },
       meta: serverMetadataHandler,
       ready: healthCheckHandler(({ ok }) => (ok ? 200 : 503))
     };

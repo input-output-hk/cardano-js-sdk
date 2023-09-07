@@ -9,6 +9,26 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/v1.0.0/live": {
+      "get": {
+        "summary": "HTTP Server live GET",
+        "operationId": "server-live-get",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "summary": "HTTP Server live POST",
+        "operationId": "server-live-post",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/v1.0.0/meta": {
       "post": {
         "summary": "HTTP Server metadata POST",
