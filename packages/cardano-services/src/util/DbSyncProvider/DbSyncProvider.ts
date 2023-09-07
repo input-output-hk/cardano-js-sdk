@@ -1,6 +1,6 @@
 import { Cardano, CardanoNode, HealthCheckResponse, Provider, ProviderDependencies } from '@cardano-sdk/core';
-import { DB_BLOCKS_BEHIND_TOLERANCE, DB_MAX_SAFE_INTEGER, LedgerTipModel, findLedgerTip } from './util';
 import { InMemoryCache } from '../../InMemoryCache';
+import { LedgerTipModel, findLedgerTip } from './util';
 import { Logger } from 'ts-log';
 import { Pool } from 'pg';
 
@@ -67,6 +67,9 @@ export const DbSyncProvider = <
       this.#cache = cache;
     }
 
+    /**
+     * Healthy if the tip of both the node and database can be accessed.
+     */
     public async healthCheck(): Promise<HealthCheckResponse> {
       const response: HealthCheckResponse = { ok: false };
       try {
@@ -85,10 +88,7 @@ export const DbSyncProvider = <
             hash: tip.hash.toString('hex') as unknown as Cardano.BlockId,
             slot: Cardano.Slot(Number(tip.slot_no))
           };
-          response.ok =
-            cardanoNode.ok &&
-            tip?.block_no >=
-              (cardanoNode.localNode?.ledgerTip?.blockNo ?? DB_MAX_SAFE_INTEGER) - DB_BLOCKS_BEHIND_TOLERANCE;
+          response.ok = cardanoNode.ok && !!tip?.block_no;
 
           this.logger.debug(
             `Service /health: projected block tip: ${tip.block_no},local node block tip: ${cardanoNode.localNode?.ledgerTip?.blockNo}.`
