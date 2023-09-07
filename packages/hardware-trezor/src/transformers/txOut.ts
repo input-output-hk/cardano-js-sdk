@@ -1,10 +1,9 @@
 import * as Trezor from '@trezor/connect';
 import { Cardano } from '@cardano-sdk/core';
-import { GroupedAddress } from '@cardano-sdk/key-management';
+import { GroupedAddress, util } from '@cardano-sdk/key-management';
 import { InvalidArgumentError, Transform } from '@cardano-sdk/util';
 import { TrezorTxOutputDestination, TrezorTxTransformerContext } from '../types';
 import { mapTokenMap } from './assets';
-import { paymentKeyPathFromGroupedAddress, stakeKeyPathFromGroupedAddress } from './keyPaths';
 
 const toDestination: Transform<Cardano.TxOut, TrezorTxOutputDestination, TrezorTxTransformerContext> = (
   txOut,
@@ -18,8 +17,8 @@ const toDestination: Transform<Cardano.TxOut, TrezorTxOutputDestination, TrezorT
     };
   }
 
-  const paymentPath = paymentKeyPathFromGroupedAddress(knownAddress);
-  const stakingPath = stakeKeyPathFromGroupedAddress(knownAddress);
+  const paymentPath = util.paymentKeyPathFromGroupedAddress(knownAddress);
+  const stakingPath = util.stakeKeyPathFromGroupedAddress(knownAddress);
 
   if (!stakingPath) throw new InvalidArgumentError('txOut', 'Missing staking key key path.');
 

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
 import * as Trezor from '@trezor/connect';
-import { Cardano, NotImplementedError, coreToCml } from '@cardano-sdk/core';
+import { Cardano, NotImplementedError } from '@cardano-sdk/core';
 import {
   CardanoKeyConst,
   CommunicationType,
@@ -13,7 +13,6 @@ import {
   TrezorConfig,
   errors
 } from '@cardano-sdk/key-management';
-import { ManagedFreeableScope } from '@cardano-sdk/util';
 import { txToTrezor } from './transformers/tx';
 import TrezorConnectWeb from '@trezor/connect-web';
 
@@ -160,15 +159,11 @@ export class TrezorKeyAgent extends KeyAgentBase {
   }
 
   async signTransaction(tx: Cardano.TxBodyWithHash): Promise<Cardano.Signatures> {
-    const scope = new ManagedFreeableScope();
     try {
       await this.isTrezorInitialized;
-      const cslTxBody = coreToCml.txBody(scope, tx.body);
       const trezorTxData = await txToTrezor({
-        accountIndex: this.accountIndex,
         cardanoTxBody: tx.body,
         chainId: this.chainId,
-        cslTxBody,
         inputResolver: this.inputResolver,
         knownAddresses: this.knownAddresses
       });
@@ -204,8 +199,6 @@ export class TrezorKeyAgent extends KeyAgentBase {
         throw new errors.AuthenticationError('Transaction signing aborted', error);
       }
       throw transportTypedError(error);
-    } finally {
-      scope.dispose();
     }
   }
 
