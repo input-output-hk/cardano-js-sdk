@@ -1,6 +1,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { AccountKeyDerivationPath, GroupedAddress } from '../types';
 import { Cardano } from '@cardano-sdk/core';
+import { DREP_KEY_DERIVATION_PATH } from './key';
 import { isNotNil } from '@cardano-sdk/util';
 import isEqual from 'lodash/isEqual';
 import uniq from 'lodash/uniq';
@@ -48,6 +49,12 @@ const checkStakeKeyHashCertificate = (
 ): SignatureCheck => {
   const signatureCheck: SignatureCheck = { derivationPaths: [], requiresForeignSignatures: false };
   switch (certificate.__typename) {
+    case Cardano.CertificateType.VoteDelegation:
+    case Cardano.CertificateType.StakeVoteDelegation:
+    case Cardano.CertificateType.StakeRegistrationDelegation:
+    case Cardano.CertificateType.VoteRegistrationDelegation:
+    case Cardano.CertificateType.StakeVoteRegistrationDelegation:
+    case Cardano.CertificateType.Unregistration:
     case Cardano.CertificateType.StakeKeyDeregistration:
     case Cardano.CertificateType.StakeDelegation: {
       const account = accounts.find((acct) => acct.stakeKeyHash === certificate.stakeKeyHash);
@@ -152,16 +159,8 @@ export const checkStakeCredentialCertificates = (
   return signatureCheck;
 };
 
-/**
- * Gets whether withdrawals or any certificate in the provided certificate list requires a stake key signature.
- *
- * @param groupedAddresses The known grouped addresses.
- * @param txBody The transaction body.
- */
-const getStakeCredentialKeyPaths = (groupedAddresses: GroupedAddress[], txBody: Cardano.TxBody) => {
-  let requiresForeignSignatures = false;
-  const paths: AccountKeyDerivationPath[] = [];
-  const uniqueAccounts = uniqBy(groupedAddresses, 'rewardAccount')
+const getSignersData = (groupedAddresses: GroupedAddress[]): StakeKeySignerData[] =>
+  uniqBy(groupedAddresses, 'rewardAccount')
     .map((groupedAddress) => {
       const stakeKeyHash = Cardano.RewardAccount.toHash(groupedAddress.rewardAccount);
       const poolId = Cardano.PoolId.fromKeyHash(stakeKeyHash);
@@ -174,6 +173,17 @@ const getStakeCredentialKeyPaths = (groupedAddresses: GroupedAddress[], txBody: 
     })
     .filter((acct): acct is StakeKeySignerData => acct.derivationPath !== undefined);
 
+/**
+ * Gets whether withdrawals or any certificate in the provided certificate list requires a stake key signature.
+ *
+ * @param groupedAddresses The known grouped addresses.
+ * @param txBody The transaction body.
+ */
+const getStakeCredentialKeyPaths = (groupedAddresses: GroupedAddress[], txBody: Cardano.TxBody) => {
+  let requiresForeignSignatures = false;
+  const paths: AccountKeyDerivationPath[] = [];
+  const uniqueAccounts = getSignersData(groupedAddresses);
+
   const withdrawalCheck = checkWithdrawals(txBody, uniqueAccounts);
   requiresForeignSignatures ||= withdrawalCheck.requiresForeignSignatures;
   paths.push(...withdrawalCheck.derivationPaths);
@@ -183,6 +193,67 @@ const getStakeCredentialKeyPaths = (groupedAddresses: GroupedAddress[], txBody: 
   paths.push(...stakeCredentialCertificatesCheck.derivationPaths);
 
   return { derivationPaths: new Set(paths), requiresForeignSignatures };
+};
+
+/**
+ * Depending on transaction `voting_procedures = { + voter => { + gov_action_id => voting_procedure } }`
+ * ; Constitutional Committee Hot KeyHash: 0
+ * ; Constitutional Committee Hot ScriptHash: 1
+ * ; DRep KeyHash: 2
+ * ; DRep ScriptHash: 3
+ * ; StakingPool KeyHash: 4
+ * voter =
+ *   [ 0, addr_keyhash
+ *   // 1, scripthash
+ *   // 2, addr_keyhash
+ *   // 3, scripthash
+ *   // 4, addr_keyhash
+ *   ]
+ */
+export const getVotingProcedureKeyPaths = ({
+  groupedAddresses,
+  dRepKeyHash,
+  txBody
+}: {
+  groupedAddresses: GroupedAddress[];
+  dRepKeyHash?: Crypto.Ed25519KeyHashHex;
+  txBody: Cardano.TxBody;
+}): SignatureCheck => {
+  const signatureCheck: SignatureCheck = { derivationPaths: [], requiresForeignSignatures: false };
+
+  const accounts = getSignersData(groupedAddresses);
+
+  for (const { voter } of txBody.votingProcedures || []) {
+    switch (voter.__typename) {
+      case Cardano.VoterType.dRepKeyHash: {
+        if (dRepKeyHash && voter.credential.hash === Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash)) {
+          signatureCheck.derivationPaths.push(DREP_KEY_DERIVATION_PATH);
+        } else {
+          signatureCheck.requiresForeignSignatures = true;
+        }
+        break;
+      }
+      case Cardano.VoterType.stakePoolKeyHash: {
+        const account = accounts.find(
+          (acct) => Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(acct.stakeKeyHash) === voter.credential.hash
+        );
+        if (account) {
+          signatureCheck.derivationPaths.push(account.derivationPath);
+        } else {
+          signatureCheck.requiresForeignSignatures = true;
+        }
+        break;
+      }
+      default:
+        // case Cardano.VoterType.ccHotKeyHash:
+        // case Cardano.VoterType.ccHotScriptHash:
+        // case Cardano.VoterType.dRepScriptHash:
+        signatureCheck.requiresForeignSignatures = true;
+        break;
+    }
+  }
+
+  return signatureCheck;
 };
 
 /**
@@ -218,6 +289,39 @@ const getRequiredSignersKeyPaths = (
   return paths;
 };
 
+/** Check if there are certificates that require DRep credentials and if we own them */
+export const getDRepCredentialKeyPaths = ({
+  dRepKeyHash,
+  txBody
+}: {
+  dRepKeyHash?: Crypto.Ed25519KeyHashHex;
+  txBody: Cardano.TxBody;
+}): SignatureCheck => {
+  const signature: SignatureCheck = { derivationPaths: [], requiresForeignSignatures: false };
+
+  for (const certificate of txBody.certificates || []) {
+    if (
+      certificate.__typename === Cardano.CertificateType.UnregisterDelegateRepresentative ||
+      certificate.__typename === Cardano.CertificateType.UpdateDelegateRepresentative
+      // Cardano.CertificateType.RegisterDelegateRepresentative does not require signing
+    ) {
+      if (
+        certificate.dRepCredential.type === Cardano.CredentialType.ScriptHash ||
+        !dRepKeyHash ||
+        certificate.dRepCredential.hash !== Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash)
+      ) {
+        // Scripts are foreign
+        signature.requiresForeignSignatures = true;
+      } else {
+        // There's only one drep key that the wallet owns.
+        signature.derivationPaths = [DREP_KEY_DERIVATION_PATH];
+      }
+    }
+  }
+
+  return signature;
+};
+
 /**
  * Assumes that a single stake key is used for all addresses (index=0)
  *
@@ -226,7 +330,8 @@ const getRequiredSignersKeyPaths = (
 export const ownSignatureKeyPaths = async (
   txBody: Cardano.TxBody,
   knownAddresses: GroupedAddress[],
-  inputResolver: Cardano.InputResolver
+  inputResolver: Cardano.InputResolver,
+  dRepKeyHash?: Crypto.Ed25519KeyHashHex
 ): Promise<AccountKeyDerivationPath[]> => {
   const txInputs = [...txBody.inputs, ...(txBody.collaterals ? txBody.collaterals : [])];
   const paymentKeyPaths = uniq(
@@ -241,11 +346,15 @@ export const ownSignatureKeyPaths = async (
     ).filter(isNotNil)
   ).map(({ type, index }) => ({ index, role: Number(type) }));
 
+  // TODO: add `proposal_procedure` witnesses.
+
   return uniqWith(
     [
       ...paymentKeyPaths,
       ...getStakeCredentialKeyPaths(knownAddresses, txBody).derivationPaths,
-      ...getRequiredSignersKeyPaths(knownAddresses, txBody.requiredExtraSignatures)
+      ...getDRepCredentialKeyPaths({ dRepKeyHash, txBody }).derivationPaths,
+      ...getRequiredSignersKeyPaths(knownAddresses, txBody.requiredExtraSignatures),
+      ...getVotingProcedureKeyPaths({ dRepKeyHash, groupedAddresses: knownAddresses, txBody }).derivationPaths
     ],
     isEqual
   );

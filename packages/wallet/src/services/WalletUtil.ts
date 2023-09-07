@@ -1,4 +1,5 @@
 /* eslint-disable no-bitwise */
+import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano } from '@cardano-sdk/core';
 import { util as KeyManagementUtil } from '@cardano-sdk/key-management';
 import { Observable, firstValueFrom } from 'rxjs';
@@ -84,6 +85,13 @@ const hasForeignInputs = (
   utxoSet: Cardano.Utxo[]
 ): boolean => [...inputs, ...collaterals].some((txIn) => utxoSet.every((utxo) => !txInEquals(txIn, utxo[0])));
 
+/** Wallet does not include committee certificate keys, so they cannot be signed  */
+const hasCommitteeCertificates = ({ certificates }: Cardano.TxBody) =>
+  (certificates || []).some(
+    (certificate) =>
+      certificate.__typename === Cardano.CertificateType.AuthorizeCommitteeHot ||
+      certificate.__typename === Cardano.CertificateType.ResignCommitteeCold
+  );
 /**
  * Gets whether the given TX requires signatures that can not be provided by the given wallet.
  *
@@ -106,8 +114,14 @@ export const requiresForeignSignatures = async (tx: Cardano.Tx, wallet: Observab
     })
     .filter((acct): acct is KeyManagementUtil.StakeKeySignerData => acct.derivationPath !== null);
 
+  const dRepKeyHash = (await Crypto.Ed25519PublicKey.fromHex(await wallet.getPubDRepKey()).hash()).hex();
+
   return (
     hasForeignInputs(tx, utxoSet) ||
-    KeyManagementUtil.checkStakeCredentialCertificates(uniqueAccounts, tx.body).requiresForeignSignatures
+    KeyManagementUtil.checkStakeCredentialCertificates(uniqueAccounts, tx.body).requiresForeignSignatures ||
+    KeyManagementUtil.getDRepCredentialKeyPaths({ dRepKeyHash, txBody: tx.body }).requiresForeignSignatures ||
+    KeyManagementUtil.getVotingProcedureKeyPaths({ dRepKeyHash, groupedAddresses: knownAddresses, txBody: tx.body })
+      .requiresForeignSignatures ||
+    hasCommitteeCertificates(tx.body)
   );
 };

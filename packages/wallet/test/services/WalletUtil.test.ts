@@ -81,6 +81,10 @@ describe('WalletUtil', () => {
     );
     const foreignRewardAccountHash = Cardano.RewardAccount.toHash(foreignRewardAccount);
 
+    let dRepCredential: Crypto.Ed25519PublicKeyHex;
+    let dRepKeyHash: Crypto.Hash28ByteBase16;
+    const foreignDRepKeyHash = Crypto.Hash28ByteBase16('8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d');
+
     beforeEach(async () => {
       txSubmitProvider = mocks.mockTxSubmitProvider();
       networkInfoProvider = mocks.mockNetworkInfoProvider();
@@ -144,6 +148,11 @@ describe('WalletUtil', () => {
       };
 
       tx = await wallet.finalizeTx({ tx: await wallet.initializeTx(props) });
+
+      dRepCredential = await wallet.getPubDRepKey();
+      dRepKeyHash = Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(
+        (await Crypto.Ed25519PublicKey.fromHex(dRepCredential).hash()).hex()
+      );
     });
 
     afterEach(() => {
@@ -249,6 +258,115 @@ describe('WalletUtil', () => {
         ];
         expect(await requiresForeignSignatures(tx, wallet)).toBeFalsy();
       });
+
+      it('accepts valid conway certificates', async () => {
+        tx.body.certificates = [
+          {
+            __typename: Cardano.CertificateType.Registration,
+            // using foreign intentionally because registration is not signed so it should be accepted
+            stakeKeyHash: foreignRewardAccountHash
+          } as Cardano.NewStakeAddressCertificate,
+          {
+            __typename: Cardano.CertificateType.Unregistration,
+            stakeKeyHash: mocks.stakeKeyHash
+          } as Cardano.NewStakeAddressCertificate,
+          {
+            __typename: Cardano.CertificateType.VoteDelegation,
+            stakeKeyHash: mocks.stakeKeyHash
+          } as Cardano.VoteDelegationCertificate,
+          {
+            __typename: Cardano.CertificateType.StakeVoteDelegation,
+            stakeKeyHash: mocks.stakeKeyHash
+          } as Cardano.StakeVoteDelegationCertificate,
+          {
+            __typename: Cardano.CertificateType.StakeRegistrationDelegation,
+            stakeKeyHash: mocks.stakeKeyHash
+          } as Cardano.StakeRegistrationDelegationCertificate,
+          {
+            __typename: Cardano.CertificateType.VoteRegistrationDelegation,
+            stakeKeyHash: mocks.stakeKeyHash
+          } as Cardano.VoteRegistrationDelegationCertificate,
+          {
+            __typename: Cardano.CertificateType.StakeVoteRegistrationDelegation,
+            stakeKeyHash: mocks.stakeKeyHash
+          } as Cardano.StakeVoteRegistrationDelegationCertificate,
+          ...tx.body.certificates!
+        ];
+
+        expect(await requiresForeignSignatures(tx, wallet)).toBeFalsy();
+      });
+
+      it('detects foreign VoteDelegation', async () => {
+        tx.body.certificates = [
+          {
+            __typename: Cardano.CertificateType.VoteDelegation,
+            stakeKeyHash: foreignRewardAccountHash
+          } as Cardano.VoteDelegationCertificate,
+          ...tx.body.certificates!
+        ];
+
+        expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
+      });
+
+      it('detects foreign StakeVoteDelegation', async () => {
+        tx.body.certificates = [
+          {
+            __typename: Cardano.CertificateType.StakeVoteDelegation,
+            stakeKeyHash: foreignRewardAccountHash
+          } as Cardano.StakeVoteDelegationCertificate,
+          ...tx.body.certificates!
+        ];
+
+        expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
+      });
+
+      it('detects foreign StakeRegistrationDelegation', async () => {
+        tx.body.certificates = [
+          {
+            __typename: Cardano.CertificateType.StakeRegistrationDelegation,
+            stakeKeyHash: foreignRewardAccountHash
+          } as Cardano.StakeRegistrationDelegationCertificate,
+          ...tx.body.certificates!
+        ];
+
+        expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
+      });
+
+      it('detects foreign VoteRegistrationDelegation', async () => {
+        tx.body.certificates = [
+          {
+            __typename: Cardano.CertificateType.VoteRegistrationDelegation,
+            stakeKeyHash: foreignRewardAccountHash
+          } as Cardano.VoteRegistrationDelegationCertificate,
+          ...tx.body.certificates!
+        ];
+
+        expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
+      });
+
+      it('detects foreign stake_vote_reg_deleg_cert', async () => {
+        tx.body.certificates = [
+          {
+            __typename: Cardano.CertificateType.StakeVoteRegistrationDelegation,
+            stakeKeyHash: foreignRewardAccountHash
+          } as Cardano.StakeVoteRegistrationDelegationCertificate,
+          ...tx.body.certificates!
+        ];
+
+        expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
+      });
+
+      it('detects foreign Unregistration', async () => {
+        tx.body.certificates = [
+          {
+            __typename: Cardano.CertificateType.Unregistration,
+            stakeKeyHash: foreignRewardAccountHash
+          } as Cardano.NewStakeAddressCertificate,
+          ...tx.body.certificates!
+        ];
+
+        expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
+      });
     });
 
     describe('MIR certificates', () => {
@@ -270,6 +388,18 @@ describe('WalletUtil', () => {
 
         expect(tx.body.inputs.length).toBeGreaterThanOrEqual(1);
         expect(tx.body.certificates!.length).toBe(2);
+        expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
+      });
+
+      it('detects as foreign if type is "toOtherPot"', async () => {
+        tx.body.certificates = [
+          {
+            __typename: Cardano.CertificateType.MIR,
+            kind: Cardano.MirCertificateKind.ToOtherPot
+          } as Cardano.MirCertificate,
+          ...tx.body.certificates!
+        ];
+
         expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
       });
     });
@@ -300,6 +430,150 @@ describe('WalletUtil', () => {
 
         expect(tx.body.inputs.length).toBeGreaterThanOrEqual(2);
         expect(tx.body.certificates!.length).toBe(1);
+        expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
+      });
+    });
+
+    describe('Voting procedures', () => {
+      it('accepts dRep and stakePool voters', async () => {
+        tx.body.votingProcedures = [
+          {
+            voter: {
+              __typename: Cardano.VoterType.dRepKeyHash,
+              credential: { hash: dRepKeyHash, type: Cardano.CredentialType.KeyHash }
+            },
+            votes: []
+          },
+          {
+            voter: {
+              __typename: Cardano.VoterType.stakePoolKeyHash,
+              credential: { hash: Crypto.Hash28ByteBase16(mocks.stakeKeyHash), type: Cardano.CredentialType.KeyHash }
+            },
+            votes: []
+          }
+        ];
+
+        expect(await requiresForeignSignatures(tx, wallet)).toBeFalsy();
+      });
+
+      it('detects foreign dRep voter credentials', async () => {
+        tx.body.votingProcedures = [
+          {
+            voter: {
+              __typename: Cardano.VoterType.dRepKeyHash,
+              credential: { hash: foreignDRepKeyHash, type: Cardano.CredentialType.KeyHash }
+            },
+            votes: []
+          }
+        ];
+        expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
+      });
+
+      it('detects foreign stakePool voter credentials', async () => {
+        tx.body.votingProcedures = [
+          {
+            voter: {
+              __typename: Cardano.VoterType.stakePoolKeyHash,
+              credential: {
+                hash: Crypto.Hash28ByteBase16(foreignRewardAccountHash),
+                type: Cardano.CredentialType.KeyHash
+              }
+            },
+            votes: []
+          }
+        ];
+        expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
+      });
+
+      it('constitutional committee voter is always foreign', async () => {
+        tx.body.votingProcedures = [
+          {
+            voter: {
+              __typename: Cardano.VoterType.ccHotKeyHash,
+              credential: {
+                hash: Crypto.Hash28ByteBase16(mocks.stakeKeyHash),
+                type: Cardano.CredentialType.KeyHash
+              }
+            },
+            votes: []
+          }
+        ];
+        expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
+
+        tx.body.votingProcedures = [
+          {
+            voter: {
+              __typename: Cardano.VoterType.ccHotScriptHash,
+              credential: {
+                hash: Crypto.Hash28ByteBase16(mocks.stakeKeyHash),
+                type: Cardano.CredentialType.ScriptHash
+              }
+            },
+            votes: []
+          }
+        ];
+        expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
+      });
+
+      it('scriptHash voters are always foreign', async () => {
+        tx.body.votingProcedures = [
+          {
+            voter: {
+              __typename: Cardano.VoterType.dRepScriptHash,
+              credential: {
+                hash: Crypto.Hash28ByteBase16(dRepKeyHash),
+                type: Cardano.CredentialType.ScriptHash
+              }
+            },
+            votes: []
+          }
+        ];
+        expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
+      });
+    });
+
+    describe('DRepCredential based checks', () => {
+      it('accepts valid conway certificates', async () => {
+        tx.body.certificates = [
+          {
+            __typename: Cardano.CertificateType.UnregisterDelegateRepresentative,
+            dRepCredential: { hash: dRepKeyHash, type: Cardano.CredentialType.KeyHash },
+            deposit: 0n
+          } as Cardano.UnRegisterDelegateRepresentativeCertificate,
+          {
+            __typename: Cardano.CertificateType.UpdateDelegateRepresentative,
+            anchor: null,
+            dRepCredential: { hash: dRepKeyHash, type: Cardano.CredentialType.KeyHash }
+          } as Cardano.UpdateDelegateRepresentativeCertificate,
+          ...tx.body.certificates!
+        ];
+
+        expect(await requiresForeignSignatures(tx, wallet)).toBeFalsy();
+      });
+
+      it('detects foreign unreg_drep_cert', async () => {
+        tx.body.certificates = [
+          {
+            __typename: Cardano.CertificateType.UnregisterDelegateRepresentative,
+            dRepCredential: { hash: foreignDRepKeyHash, type: Cardano.CredentialType.KeyHash },
+            deposit: 0n
+          } as Cardano.UnRegisterDelegateRepresentativeCertificate,
+          ...tx.body.certificates!
+        ];
+
+        expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
+      });
+
+      it('detects foreign update_drep_cert', async () => {
+        tx.body.certificates = [
+          {
+            __typename: Cardano.CertificateType.UpdateDelegateRepresentative,
+            anchor: null,
+            dRepCredential: { hash: foreignDRepKeyHash, type: Cardano.CredentialType.KeyHash }
+          } as Cardano.UpdateDelegateRepresentativeCertificate,
+          ...tx.body.certificates!
+        ];
+
         expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
       });
     });
