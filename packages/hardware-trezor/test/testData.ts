@@ -175,3 +175,23 @@ export const poolRegistrationCertificate = {
     vrf
   }
 } as Cardano.PoolRegistrationCertificate;
+
+export const minValidTxBody: Cardano.TxBody = {
+  fee: 10n,
+  inputs: [txIn],
+  outputs: [txOut]
+};
+
+export const txBody: Cardano.TxBody = {
+  auxiliaryDataHash,
+  certificates: [stakeDelegationCertificate],
+  fee: 10n,
+  inputs: [txIn],
+  mint: mintTokenMap,
+  outputs: [txOutWithAssets, txOutWithAssetsToOwnedAddress],
+  validityInterval: {
+    invalidBefore: Cardano.Slot(100),
+    invalidHereafter: Cardano.Slot(1000)
+  },
+  withdrawals: [coreWithdrawalWithKeyHashCredential]
+};
