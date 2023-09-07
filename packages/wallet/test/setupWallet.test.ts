@@ -1,5 +1,4 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { CML } from '@cardano-sdk/core';
 import { logger } from '@cardano-sdk/util-dev';
 import { setupWallet } from '../src';
 
@@ -7,7 +6,7 @@ jest.mock('../src/services/WalletUtil');
 const { createLazyWalletUtil } = jest.requireMock('../src/services/WalletUtil');
 
 describe('setupWallet', () => {
-  const bip32Ed25519 = new Crypto.CmlBip32Ed25519(CML);
+  const bip32Ed25519 = new Crypto.SodiumBip32Ed25519();
 
   it('initializes WalletUtil with the wallet that is then used as InputResolver for KeyAgent', async () => {
     const initialize = jest.fn();

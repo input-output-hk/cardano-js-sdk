@@ -21,7 +21,6 @@ import {
   somePartialStakePools
 } from '@cardano-sdk/util-dev';
 import {
-  CML,
   Cardano,
   ChainHistoryProvider,
   HandleProvider,
@@ -56,7 +55,7 @@ const name = 'Test Wallet';
 const address = mocks.utxo[0][0].address!;
 const rewardAccount = mocks.rewardAccount;
 
-const bip32Ed25519 = new Crypto.CmlBip32Ed25519(CML);
+const bip32Ed25519 = new Crypto.SodiumBip32Ed25519();
 interface Providers {
   rewardsProvider: RewardsProvider;
   utxoProvider: UtxoProvider;

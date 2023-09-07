@@ -9,7 +9,6 @@ import {
   somePartialStakePools
 } from '@cardano-sdk/util-dev';
 import {
-  CML,
   Cardano,
   ChainHistoryProvider,
   NetworkInfoProvider,
@@ -50,7 +49,7 @@ const createWallet = async (
   pollingConfig?: PollingConfig
 ) => {
   const { wallet } = await setupWallet({
-    bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
+    bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
     createKeyAgent: async (dependencies) => {
       const groupedAddress: GroupedAddress = {
         accountIndex: 0,

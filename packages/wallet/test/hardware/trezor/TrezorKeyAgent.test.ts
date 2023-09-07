@@ -8,7 +8,7 @@ import {
   util
 } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
-import { CML, Cardano } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { PersonalWallet, setupWallet } from '../../../src';
 import { dummyLogger as logger } from 'ts-log';
 import { mockKeyAgentDependencies, stakeKeyDerivationPath } from '../../../../key-management/test/mocks';
@@ -28,7 +28,7 @@ describe('TrezorKeyAgent', () => {
   beforeAll(async () => {
     txSubmitProvider = mocks.mockTxSubmitProvider();
     ({ keyAgent, wallet } = await setupWallet({
-      bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
+      bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
 
       createKeyAgent: async (dependencies) => {
         const trezorKeyAgent = await TrezorKeyAgent.createWithDevice(

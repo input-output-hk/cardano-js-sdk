@@ -1,7 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
 import {
-  CML,
   Cardano,
   ChainHistoryProvider,
   NetworkInfoProvider,
@@ -32,7 +31,7 @@ interface Providers {
 
 const createWallet = async (stores: WalletStores, providers: Providers, pollingConfig?: PollingConfig) => {
   const { wallet } = await setupWallet({
-    bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
+    bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
     createKeyAgent: async (dependencies) => {
       const groupedAddress: GroupedAddress = {
         accountIndex: 0,
