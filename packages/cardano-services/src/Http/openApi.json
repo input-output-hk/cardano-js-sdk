@@ -55,6 +55,32 @@
           }
         }
       }
+    },
+    "/v1.0.0/ready": {
+      "get": {
+        "summary": "HTTP Server ready GET",
+        "operationId": "server-ready-get",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "503": {
+            "description": "Service Unavailable"
+          }
+        }
+      },
+      "post": {
+        "summary": "HTTP Server ready POST",
+        "operationId": "server-ready-post",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "503": {
+            "description": "Service Unavailable"
+          }
+        }
+      }
     }
   },
   "components": {

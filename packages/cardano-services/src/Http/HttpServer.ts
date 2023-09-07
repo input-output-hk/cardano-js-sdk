@@ -97,20 +97,6 @@ export class HttpServer extends RunnableModule {
       this.logger.info(`Using ${serviceBaseUrl}`);
     }
 
-    const healthCheckHandler =
-      (statusCodeFromHealth: (health: ServicesHealthCheckResponse) => number) =>
-      async (req: express.Request, res: express.Response) => {
-        this.logger.debug('/ready', { ip: req.ip });
-        let health: ServicesHealthCheckResponse | Error['message'];
-        try {
-          health = await this.#getServicesHealth();
-        } catch (error) {
-          this.logger.error(error);
-          return HttpServer.sendJSON(res, new ProviderError(ProviderFailure.Unhealthy, error), 500);
-        }
-        return HttpServer.sendJSON(res, health, statusCodeFromHealth(health));
-      };
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.app.use((err: any, _req: express.Request, res: express.Response, _n: express.NextFunction) => {
       if (err instanceof ProviderError) {
@@ -136,13 +122,33 @@ export class HttpServer extends RunnableModule {
     };
 
     const handlers = {
-      health: healthCheckHandler(() => 200),
+      health: async (req: express.Request, res: express.Response) => {
+        this.logger.debug('/health', { ip: req.ip });
+        let health: ServicesHealthCheckResponse | Error['message'];
+        try {
+          health = await this.#getServicesHealth();
+          return HttpServer.sendJSON(res, health, 200);
+        } catch (error) {
+          this.logger.error(error);
+          return HttpServer.sendJSON(res, new ProviderError(ProviderFailure.Unhealthy, error), 500);
+        }
+      },
       live: async (req: express.Request, res: express.Response) => {
         this.logger.debug('/live', { ip: req.ip });
         return res.sendStatus(200);
       },
       meta: serverMetadataHandler,
-      ready: healthCheckHandler(({ ok }) => (ok ? 200 : 503))
+      ready: async (req: express.Request, res: express.Response) => {
+        this.logger.debug('/ready', { ip: req.ip });
+        let health: ServicesHealthCheckResponse | Error['message'];
+        try {
+          health = await this.#getServicesHealth();
+          res.sendStatus(health.ok ? 200 : 503);
+        } catch (error) {
+          this.logger.error(error);
+          res.sendStatus(500);
+        }
+      }
     };
 
     let handler: keyof typeof handlers;

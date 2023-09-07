@@ -472,9 +472,7 @@ describe('HttpServer', () => {
       await httpServer.initialize();
       await httpServer.start();
       await serverStarted(apiUrlBase);
-      const res = await axios.post(`${apiUrlBase}/health`, {
-        headers: { [CONTENT_TYPE]: 'application/json' }
-      });
+      const res = await axios.get(`${apiUrlBase}/health`);
       const readyRes = await axios.get(`${apiUrlBase}/ready`);
       expect(res.status).toBe(200);
       expect(readyRes.status).toBe(200);
