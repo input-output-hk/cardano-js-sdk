@@ -76,6 +76,11 @@ describe('WalletUtil', () => {
     let utxoProvider: mocks.UtxoProviderStub;
     let tx: Cardano.Tx;
 
+    const foreignRewardAccount = Cardano.RewardAccount(
+      'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27'
+    );
+    const foreignRewardAccountHash = Cardano.RewardAccount.toHash(foreignRewardAccount);
+
     beforeEach(async () => {
       txSubmitProvider = mocks.mockTxSubmitProvider();
       networkInfoProvider = mocks.mockNetworkInfoProvider();
@@ -152,136 +157,6 @@ describe('WalletUtil', () => {
       expect(await requiresForeignSignatures(tx, wallet)).toBeFalsy();
     });
 
-    it('returns true when at least one certificate can not be accounted for - StakeKeyDeregistration ', async () => {
-      const foreignRewardAccountHash = Cardano.RewardAccount.toHash(
-        Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27')
-      );
-
-      tx.body.certificates = [
-        {
-          __typename: Cardano.CertificateType.StakeKeyDeregistration,
-          stakeKeyHash: foreignRewardAccountHash
-        } as Cardano.StakeAddressCertificate,
-        ...tx.body.certificates!
-      ];
-
-      expect(tx.body.inputs.length).toBeGreaterThanOrEqual(1);
-      expect(tx.body.certificates!.length).toBe(2);
-      expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
-    });
-
-    it('returns true when at least one certificate can not be accounted for - StakeDelegation ', async () => {
-      const foreignRewardAccountHash = Cardano.RewardAccount.toHash(
-        Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27')
-      );
-
-      tx.body.certificates = [
-        {
-          __typename: Cardano.CertificateType.StakeDelegation,
-          poolId: Cardano.PoolId.fromKeyHash(foreignRewardAccountHash),
-          stakeKeyHash: foreignRewardAccountHash
-        } as Cardano.StakeDelegationCertificate,
-        ...tx.body.certificates!
-      ];
-
-      expect(tx.body.inputs.length).toBeGreaterThanOrEqual(1);
-      expect(tx.body.certificates!.length).toBe(2);
-      expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
-    });
-
-    it('returns true when at least one certificate can not be accounted for - PoolRegistration ', async () => {
-      const foreignRewardAccountHash = Cardano.RewardAccount.toHash(
-        Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27')
-      );
-
-      tx.body.certificates = [
-        {
-          __typename: Cardano.CertificateType.PoolRegistration,
-          poolParameters: {
-            cost: 340n,
-            id: Cardano.PoolId.fromKeyHash(foreignRewardAccountHash),
-            margin: {
-              denominator: 50,
-              numerator: 10
-            },
-            owners: [Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27')],
-            pledge: 10_000n,
-            relays: [
-              {
-                __typename: 'RelayByName',
-                hostname: 'localhost'
-              }
-            ],
-            rewardAccount: Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27'),
-            vrf: Cardano.VrfVkHex('641d042ed39c2c258d381060c1424f40ef8abfe25ef566f4cb22477c42b2a014')
-          }
-        } as Cardano.PoolRegistrationCertificate,
-        ...tx.body.certificates!
-      ];
-
-      expect(tx.body.inputs.length).toBeGreaterThanOrEqual(1);
-      expect(tx.body.certificates!.length).toBe(2);
-      expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
-    });
-
-    it('returns true when at least one certificate can not be accounted for - PoolRetirement ', async () => {
-      const foreignRewardAccountHash = Cardano.RewardAccount.toHash(
-        Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27')
-      );
-
-      tx.body.certificates = [
-        {
-          __typename: Cardano.CertificateType.PoolRetirement,
-          epoch: Cardano.EpochNo(100),
-          poolId: Cardano.PoolId.fromKeyHash(foreignRewardAccountHash)
-        } as Cardano.PoolRetirementCertificate,
-        ...tx.body.certificates!
-      ];
-
-      expect(tx.body.inputs.length).toBeGreaterThanOrEqual(1);
-      expect(tx.body.certificates!.length).toBe(2);
-      expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
-    });
-
-    it('returns true when at least one certificate can not be accounted for - MIR ', async () => {
-      tx.body.certificates = [
-        {
-          __typename: Cardano.CertificateType.MIR,
-          kind: Cardano.MirCertificateKind.ToStakeCreds,
-          pot: Cardano.MirCertificatePot.Treasury,
-          quantity: 100n,
-          stakeCredential: Cardano.Address.fromString(
-            'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27'
-          )!
-            .asReward()!
-            .getPaymentCredential()
-        } as Cardano.MirCertificate,
-        ...tx.body.certificates!
-      ];
-
-      expect(tx.body.inputs.length).toBeGreaterThanOrEqual(1);
-      expect(tx.body.certificates!.length).toBe(2);
-      expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
-    });
-
-    it('returns false when a StakeKeyRegistration certificate can not be accounted for ', async () => {
-      const foreignRewardAccountHash = Cardano.RewardAccount.toHash(
-        Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27')
-      );
-
-      tx.body.certificates = [
-        {
-          __typename: Cardano.CertificateType.StakeKeyRegistration,
-          stakeKeyHash: foreignRewardAccountHash
-        } as Cardano.StakeAddressCertificate,
-        ...tx.body.certificates!
-      ];
-
-      expect(tx.body.inputs.length).toBeGreaterThanOrEqual(1);
-      expect(tx.body.certificates!.length).toBe(2);
-      expect(await requiresForeignSignatures(tx, wallet)).toBeFalsy();
-    });
-
     it('returns false when a GenesisKeyDelegation certificate can not be accounted for ', async () => {
       tx.body.certificates = [
         {
@@ -293,37 +168,140 @@ describe('WalletUtil', () => {
         ...tx.body.certificates!
       ];
 
-      expect(tx.body.inputs.length).toBeGreaterThanOrEqual(1);
-      expect(tx.body.certificates!.length).toBe(2);
       expect(await requiresForeignSignatures(tx, wallet)).toBeFalsy();
     });
 
-    it('returns true when at least one input from collateral is not accounted for ', async () => {
-      tx.body.collaterals = [
-        {
-          index: 0,
-          txId: Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000')
-        },
-        ...tx.body.collaterals!
-      ];
+    describe('StakeCredential based check', () => {
+      it('detects foreign stakeKeyHash in StakeKeyDeregistration certificate', async () => {
+        tx.body.certificates = [
+          {
+            __typename: Cardano.CertificateType.StakeKeyDeregistration,
+            stakeKeyHash: foreignRewardAccountHash
+          } as Cardano.StakeAddressCertificate,
+          ...tx.body.certificates!
+        ];
+        expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
+      });
 
-      expect(tx.body.inputs.length).toBeGreaterThanOrEqual(1);
-      expect(tx.body.certificates!.length).toBe(1);
-      expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
+      it('detects foreign stakeKeyHash in StakeDelegation certificate', async () => {
+        tx.body.certificates = [
+          {
+            __typename: Cardano.CertificateType.StakeDelegation,
+            poolId: Cardano.PoolId.fromKeyHash(foreignRewardAccountHash),
+            stakeKeyHash: foreignRewardAccountHash
+          } as Cardano.StakeDelegationCertificate,
+          ...tx.body.certificates!
+        ];
+        expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
+      });
+
+      it('detects foreign pool owner in PoolRegistration certificate', async () => {
+        tx.body.certificates = [
+          {
+            __typename: Cardano.CertificateType.PoolRegistration,
+            poolParameters: {
+              cost: 340n,
+              id: Cardano.PoolId.fromKeyHash(foreignRewardAccountHash),
+              margin: {
+                denominator: 50,
+                numerator: 10
+              },
+              owners: [foreignRewardAccount],
+              pledge: 10_000n,
+              relays: [
+                {
+                  __typename: 'RelayByName',
+                  hostname: 'localhost'
+                }
+              ],
+              rewardAccount: Cardano.RewardAccount('stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27'),
+              vrf: Cardano.VrfVkHex('641d042ed39c2c258d381060c1424f40ef8abfe25ef566f4cb22477c42b2a014')
+            }
+          } as Cardano.PoolRegistrationCertificate,
+          ...tx.body.certificates!
+        ];
+
+        expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
+      });
+
+      it('detects foreign poolId in PoolRetirement certificate', async () => {
+        tx.body.certificates = [
+          {
+            __typename: Cardano.CertificateType.PoolRetirement,
+            epoch: Cardano.EpochNo(100),
+            poolId: Cardano.PoolId.fromKeyHash(foreignRewardAccountHash)
+          } as Cardano.PoolRetirementCertificate,
+          ...tx.body.certificates!
+        ];
+
+        expect(tx.body.inputs.length).toBeGreaterThanOrEqual(1);
+        expect(tx.body.certificates!.length).toBe(2);
+        expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
+      });
+
+      it('returns false when a StakeKeyRegistration certificate can not be accounted for', async () => {
+        tx.body.certificates = [
+          {
+            __typename: Cardano.CertificateType.StakeKeyRegistration,
+            stakeKeyHash: foreignRewardAccountHash
+          } as Cardano.StakeAddressCertificate,
+          ...tx.body.certificates!
+        ];
+        expect(await requiresForeignSignatures(tx, wallet)).toBeFalsy();
+      });
     });
 
-    it('returns true when at least one input is not accounted for ', async () => {
-      tx.body.inputs = [
-        {
-          index: 0,
-          txId: Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000')
-        },
-        ...tx.body.inputs
-      ];
+    describe('MIR certificates', () => {
+      it('returns true when at least one certificate can not be accounted for', async () => {
+        tx.body.certificates = [
+          {
+            __typename: Cardano.CertificateType.MIR,
+            kind: Cardano.MirCertificateKind.ToStakeCreds,
+            pot: Cardano.MirCertificatePot.Treasury,
+            quantity: 100n,
+            stakeCredential: Cardano.Address.fromString(
+              'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27'
+            )!
+              .asReward()!
+              .getPaymentCredential()
+          } as Cardano.MirCertificate,
+          ...tx.body.certificates!
+        ];
 
-      expect(tx.body.inputs.length).toBeGreaterThanOrEqual(2);
-      expect(tx.body.certificates!.length).toBe(1);
-      expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
+        expect(tx.body.inputs.length).toBeGreaterThanOrEqual(1);
+        expect(tx.body.certificates!.length).toBe(2);
+        expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
+      });
+    });
+
+    describe('inputs and collaterals', () => {
+      it('returns true when at least one input from collateral is not accounted for ', async () => {
+        tx.body.collaterals = [
+          {
+            index: 0,
+            txId: Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000')
+          },
+          ...tx.body.collaterals!
+        ];
+
+        expect(tx.body.inputs.length).toBeGreaterThanOrEqual(1);
+        expect(tx.body.certificates!.length).toBe(1);
+        expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
+      });
+
+      it('returns true when at least one input is not accounted for ', async () => {
+        tx.body.inputs = [
+          {
+            index: 0,
+            txId: Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000000')
+          },
+          ...tx.body.inputs
+        ];
+
+        expect(tx.body.inputs.length).toBeGreaterThanOrEqual(2);
+        expect(tx.body.certificates!.length).toBe(1);
+        expect(await requiresForeignSignatures(tx, wallet)).toBeTruthy();
+      });
     });
   });
 });
