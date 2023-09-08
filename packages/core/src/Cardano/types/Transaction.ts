@@ -8,6 +8,7 @@ import { Lovelace, TokenMap } from './Value';
 import { NetworkId } from '../ChainId';
 import { PartialBlockHeader } from './Block';
 import { PlutusData } from './PlutusData';
+import { ProposalProcedure, VotingProcedures } from './Governance';
 import { RewardAccount } from '../Address';
 import { Script } from './Script';
 import { TxBodyCBOR } from '../../CBOR/TxBodyCBOR';
@@ -74,6 +75,11 @@ export interface HydratedTxBody {
    * stored on the blockchain without the need of spending and recreating UTXOs.
    */
   referenceInputs?: HydratedTxIn[];
+
+  votingProcedures?: VotingProcedures;
+  proposalProcedures?: [ProposalProcedure];
+  treasuryValue?: Lovelace;
+  donation?: Lovelace;
 }
 
 export interface TxBody extends Omit<HydratedTxBody, 'inputs' | 'collaterals' | 'referenceInputs'> {
@@ -91,7 +97,8 @@ export enum RedeemerPurpose {
   spend = 'spend',
   mint = 'mint',
   certificate = 'certificate',
-  withdrawal = 'withdrawal'
+  withdrawal = 'withdrawal',
+  delegateRepresentative = 'representative'
 }
 
 export interface Redeemer {

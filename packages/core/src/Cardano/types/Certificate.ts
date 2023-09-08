@@ -1,4 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
+import { Anchor, DelegateRepresentative } from './Governance';
 import { Credential, RewardAccount } from '../Address';
 import { EpochNo } from './Block';
 import { Lovelace } from './Value';
@@ -10,10 +11,103 @@ export enum CertificateType {
   PoolRegistration = 'PoolRegistrationCertificate',
   PoolRetirement = 'PoolRetirementCertificate',
   StakeDelegation = 'StakeDelegationCertificate',
-  MIR = 'MirCertificate',
-  GenesisKeyDelegation = 'GenesisKeyDelegationCertificate'
+  MIR = 'MirCertificate', // deprecated in conway
+  GenesisKeyDelegation = 'GenesisKeyDelegationCertificate', // deprecated in conway
+
+  // Conway Era Certs
+  Registration = 'RegistrationCertificate', // Replaces StakeKeyRegistration in post-conway era
+  Unregistration = 'UnRegistrationCertificate', // Replaces StakeKeyDeregistration in post-conway era
+  VoteDelegation = 'VoteDelegationCertificate',
+  StakeVoteDelegation = 'StakeVoteDelegationCertificate',
+  StakeRegistrationDelegation = 'StakeRegistrationDelegateCertificate', // delegate or delegation??
+  VoteRegistrationDelegation = 'VoteRegistrationDelegateCertificate', // same as above
+  StakeVoteRegistrationDelegation = 'StakeVoteRegistrationDelegateCertificate',
+  AuthorizeCommitteeHot = 'AuthorizeCommitteeHotCertificate',
+  ResignCommitteeCold = 'ResignCommitteeColdCertificate',
+  RegisterDelegateRepresentative = 'RegisterDelegateRepresentativeCertificate',
+  UnregisterDelegateRepresentative = 'UnregisterDelegateRepresentativeCertificate',
+  UpdateDelegateRepresentative = 'UpdateDelegateRepresentativeCertificate'
 }
 
+// Conway Certificates
+export interface NewStakeAddressCertificate {
+  __typename: CertificateType.Registration | CertificateType.Unregistration;
+  stakeKeyHash: Crypto.Ed25519KeyHashHex;
+  deposit: Lovelace;
+}
+
+// Delegation
+export interface VoteDelegationCertificate {
+  __typename: CertificateType.VoteDelegation;
+  stakeKeyHash: Crypto.Ed25519KeyHashHex;
+  drep: DelegateRepresentative;
+}
+
+export interface StakeVoteDelegationCertificate {
+  __typename: CertificateType.StakeVoteDelegation;
+  stakeKeyHash: Crypto.Ed25519KeyHashHex;
+  poolId: PoolId;
+  dRep: DelegateRepresentative;
+}
+
+export interface StakeRegistrationDelegationCertificate {
+  __typename: CertificateType.StakeRegistrationDelegation;
+  stakeKeyHash: Crypto.Ed25519KeyHashHex;
+  poolId: PoolId;
+  deposit: Lovelace;
+}
+
+export interface VoteRegistrationDelegationCertificate {
+  __typename: CertificateType.VoteRegistrationDelegation;
+  stakeKeyHash: Crypto.Ed25519KeyHashHex;
+  drep: DelegateRepresentative;
+  deposit: Lovelace;
+}
+
+export interface StakeVoteRegistrationDelegationCertificate {
+  __typename: CertificateType.StakeVoteRegistrationDelegation;
+  stakeKeyHash: Crypto.Ed25519KeyHashHex;
+  poolId: PoolId;
+  drep: DelegateRepresentative;
+  deposit: Lovelace;
+}
+
+// Governance
+
+export interface AuthorizeCommitteeHotCertificate {
+  __typename: CertificateType.AuthorizeCommitteeHot;
+  coldCredential: Credential;
+  hotCredential: Credential;
+}
+
+export interface ResignCommitteeColdCertificate {
+  __typename: CertificateType.ResignCommitteeCold;
+  coldCredential: Credential;
+}
+
+export interface RegisterDelegateRepresentativeCertificate {
+  __typename: CertificateType.RegisterDelegateRepresentative;
+  dRepCredential: Credential;
+  deposit: Lovelace;
+  anchor: Anchor | null;
+}
+
+export interface UnRegisterDelegateRepresentativeCertificate {
+  __typename: CertificateType.UnregisterDelegateRepresentative;
+  dRepCredential: Credential;
+  deposit: Lovelace;
+}
+
+export interface UpdateDelegateRepresentativeCertificate {
+  __typename: CertificateType.UpdateDelegateRepresentative;
+  dRepCredential: Credential;
+  anchor: Anchor | null;
+}
+
+/**
+ * To be deprecated in the Era after conway
+ * replaced by <NewStakeAddressCertificate>
+ */
 export interface StakeAddressCertificate {
   __typename: CertificateType.StakeKeyRegistration | CertificateType.StakeKeyDeregistration;
   stakeKeyHash: Crypto.Ed25519KeyHashHex;
@@ -46,6 +140,7 @@ export enum MirCertificateKind {
   ToStakeCreds = 'ToStakeCreds'
 }
 
+/** @deprecated in conway */
 export interface MirCertificate {
   __typename: CertificateType.MIR;
   kind: MirCertificateKind;
@@ -54,6 +149,7 @@ export interface MirCertificate {
   pot: MirCertificatePot;
 }
 
+/** @deprecated in conway */
 export interface GenesisKeyDelegationCertificate {
   __typename: CertificateType.GenesisKeyDelegation;
   genesisHash: Crypto.Hash28ByteBase16;
@@ -67,7 +163,18 @@ export type Certificate =
   | PoolRetirementCertificate
   | StakeDelegationCertificate
   | MirCertificate
-  | GenesisKeyDelegationCertificate;
+  | GenesisKeyDelegationCertificate
+  | NewStakeAddressCertificate
+  | VoteDelegationCertificate
+  | StakeVoteDelegationCertificate
+  | StakeRegistrationDelegationCertificate
+  | VoteRegistrationDelegationCertificate
+  | StakeVoteRegistrationDelegationCertificate
+  | AuthorizeCommitteeHotCertificate
+  | ResignCommitteeColdCertificate
+  | RegisterDelegateRepresentativeCertificate
+  | UnRegisterDelegateRepresentativeCertificate
+  | UpdateDelegateRepresentativeCertificate;
 
 /**
  * Creates a stake key registration certificate from a given reward account.

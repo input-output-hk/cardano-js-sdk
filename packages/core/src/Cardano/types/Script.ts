@@ -203,7 +203,16 @@ export enum PlutusLanguageVersion {
    *  - Inline datums in the transaction (proposed in CIP-32)
    *  - Reference scripts in the transaction (proposed in CIP-33)
    */
-  V2 = 1
+  V2 = 1,
+
+  /**
+   * V3 was introduced in the Conway hard fork.
+   *
+   * The main changes in V3 of Plutus introduce:
+   *
+   * - The value of costmdls map at key 2 is encoded as a definite length list.
+   */
+  V3 = 2
 }
 
 /**
