@@ -6,7 +6,7 @@ const EXPECTED_SIG_NUM = 1;
 
 /** Generates a Ed25519Signature of a transaction using a key agent. */
 export class KeyAgentTransactionSigner implements TransactionSigner {
-  #keyAgent: KeyAgent;
+  #keyAgent: Pick<KeyAgent, 'signTransaction'>;
   #account: AccountKeyDerivationPath;
 
   /**
@@ -16,7 +16,7 @@ export class KeyAgentTransactionSigner implements TransactionSigner {
    * @param account The account derivation path of the key to be used to generate the signature.
    * @class
    */
-  constructor(keyAgent: KeyAgent, account: AccountKeyDerivationPath) {
+  constructor(keyAgent: Pick<KeyAgent, 'signTransaction'>, account: AccountKeyDerivationPath) {
     this.#keyAgent = keyAgent;
     this.#account = account;
   }

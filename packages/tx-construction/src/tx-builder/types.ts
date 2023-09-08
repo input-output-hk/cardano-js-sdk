@@ -15,6 +15,8 @@ import { InputSelectionError, InputSelector, SelectionSkeleton } from '@cardano-
 import { Logger } from 'ts-log';
 import { OutputBuilderValidator } from './OutputBuilder';
 import { OutputValidation } from '../output-validation';
+import { PolicyBuilder } from './PolicyBuilder';
+import { TxTokenBuilder } from './TokenBuilder';
 
 export type PartialTxOut = Partial<
   Pick<Cardano.TxOut, 'address' | 'datumHash' | 'datum' | 'scriptReference'> & {
@@ -246,6 +248,64 @@ export interface TxBuilder {
    *  reclaiming the deposits.
    */
   delegatePortfolio(portfolio: Pick<Cardano.Cip17DelegationPortfolio, 'pools'> | null): TxBuilder;
+
+  /**
+   * Create a {@link PolicyBuilder}
+   *
+   * @returns {PolicyBuilder}
+   * @throws {Error} Error if the BIP32 account is not set
+   */
+  buildPolicy(): PolicyBuilder;
+
+  /** Create a {@link TxTokenBuilder} */
+  buildToken(policyId: Cardano.PolicyId): TxTokenBuilder;
+
+  /**
+   *
+   * @param mintToken
+   * - list of tokens to mint/burn should be balanced with outputs
+   * - to mint tokens use tokenBuilder
+   *      ```
+   *      const policy = await txBuilder.buildPolicy();
+   *      const tokenBuilder = txBuilder.buildToken(await policy.getPolicyId());
+   *      ```
+   * - mint new token
+   *     ```
+   *     const tokensMint = tokenBuilder.addAsset('hello', 5n).build();
+   *     const tokensOutput = tokenBuilder.addAsset('hello', 5n).build();
+   *     ```
+   * - burn and send some tokens (wallet has ('hello', 7n), burn 1n, send 2n)
+   *     ```
+   *     const tokensMint = tokenBuilder.addAsset('hello', -1n).build();
+   *     const tokensOutput = tokenBuilder.addAsset('hello', 2n).build();
+   *     (wallet has remaining ('hello', 4n))
+   *     ```
+   * - burn all tokens (wallet has ('hello', 5n))
+   *     ```
+   *      const tokensMint = tokenBuilder.addAsset('hello', -5n).build();
+   *      (no tokens in output)
+   *     ```
+   *
+   * - then
+   * ```
+   *      const { tx } = await txBuilder
+   *  ->    .addMint(tokensMint)
+   *        .addNativeScript(await policy.getPolicyScript())
+   *        .addOutput(await txBuilder.buildOutput()
+   *              .address(walletAddress)
+   *              .coin(coins)
+   *  ->          .assets(tokensOutput)
+   *              .build())
+   *        .build()
+   *        .sign();
+   *      await wallet.submitTx(tx);
+   * ```
+   */
+  addMint(mintToken: Cardano.TokenMap): TxBuilder;
+
+  /** @param scripts */
+  addNativeScripts(scripts: Cardano.NativeScript[]): TxBuilder;
+
   /** Sets TxMetadata in {@link auxiliaryData} */
   metadata(metadata: Cardano.TxMetadata): TxBuilder;
   /** Sets extra signers in {@link extraSigners} */
@@ -286,7 +346,6 @@ export interface TxBuilder {
   setValidityInterval(validityInterval: Cardano.ValidityInterval): TxBuilder;
 
   // TODO:
-  // - setMint
   // - setMetadatum(label: bigint, metadatum: Cardano.Metadatum | null);
   // - burn
   // TODO: maybe this, or maybe datum should be added together with an output?

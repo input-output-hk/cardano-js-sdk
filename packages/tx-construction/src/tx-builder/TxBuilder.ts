@@ -28,7 +28,9 @@ import {
 import { GreedyInputSelector, SelectionSkeleton } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
 import { OutputBuilderValidator, TxOutputBuilder } from './OutputBuilder';
+import { PolicyBuilder } from './PolicyBuilder';
 import { RewardAccountWithPoolId } from '../types';
+import { TxTokenBuilder } from './TokenBuilder';
 import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import { contextLogger, deepEquals } from '@cardano-sdk/util';
 import { createOutputValidator } from '../output-validation';
@@ -95,7 +97,9 @@ export class GenericTxBuilder implements TxBuilder {
   partialTxBody: Partial<Cardano.TxBody> = {};
   partialAuxiliaryData?: Cardano.AuxiliaryData;
   partialExtraSigners?: TransactionSigner[];
+  partialNativeScripts?: Cardano.NativeScript[];
   partialSigningOptions?: SignTransactionOptions;
+  partialMint?: Cardano.TokenMap;
 
   #dependencies: TxBuilderDependencies;
   #outputValidator: OutputBuilderValidator;
@@ -155,6 +159,27 @@ export class GenericTxBuilder implements TxBuilder {
     });
   }
 
+  addMint(mintToken: Cardano.TokenMap): TxBuilder {
+    this.partialMint = new Map(
+      this.partialMint ? [...this.partialMint.entries(), ...mintToken.entries()] : [...mintToken.entries()]
+    );
+    return this;
+  }
+
+  buildToken(policyId: Cardano.PolicyId): TxTokenBuilder {
+    return new TxTokenBuilder(policyId);
+  }
+
+  buildPolicy(): PolicyBuilder {
+    if (!this.#dependencies.bip32Account) throw new Error('BIP32 account is required to build policies.');
+    return new PolicyBuilder(this.#dependencies.bip32Account);
+  }
+
+  addNativeScripts(scripts: Cardano.NativeScript[]): TxBuilder {
+    this.partialNativeScripts = this.partialNativeScripts ? [...this.partialNativeScripts, ...scripts] : scripts;
+    return this;
+  }
+
   delegateFirstStakeCredential(poolId: Cardano.PoolId | null): TxBuilder {
     this.#delegateFirstStakeCredConfig = poolId;
     return this;
@@ -162,7 +187,6 @@ export class GenericTxBuilder implements TxBuilder {
 
   delegatePortfolio(portfolio: Cardano.Cip17DelegationPortfolio | null): TxBuilder {
     if (!this.#dependencies.bip32Account) throw new Error('BIP32 account is required to delegate portfolio.');
-
     if (portfolio?.pools.length === 0) {
       throw new Error('Portfolio should define at least one delegation pool.');
     }
@@ -232,7 +256,9 @@ export class GenericTxBuilder implements TxBuilder {
                 acct.credentialStatus === Cardano.StakeCredentialStatus.Registering
             );
             const auxiliaryData = this.partialAuxiliaryData && { ...this.partialAuxiliaryData };
+            const mint = this.partialMint;
             const extraSigners = this.partialExtraSigners && [...this.partialExtraSigners];
+            const scripts = this.partialNativeScripts;
             const partialSigningOptions = this.partialSigningOptions && { ...this.partialSigningOptions, extraSigners };
 
             if (this.partialAuxiliaryData) {
@@ -275,12 +301,14 @@ export class GenericTxBuilder implements TxBuilder {
                 certificates: this.partialTxBody.certificates,
                 customizeCb: this.#customizeCb,
                 handleResolutions: this.#handleResolutions,
+                mint,
                 options: {
                   validityInterval: this.partialTxBody.validityInterval
                 },
                 outputs: new Set(this.partialTxBody.outputs || []),
                 proposalProcedures: this.partialTxBody.proposalProcedures,
-                signingOptions: partialSigningOptions
+                signingOptions: { ...partialSigningOptions, extraSigners },
+                ...(scripts ? { witness: { scripts } } : {})
               },
               dependencies
             );
@@ -293,7 +321,8 @@ export class GenericTxBuilder implements TxBuilder {
                   knownAddresses: ownAddresses,
                   txInKeyPathMap: await util.createTxInKeyPathMap(body, ownAddresses, this.#dependencies.inputResolver)
                 },
-                signingOptions: { ...partialSigningOptions, extraSigners }
+                signingOptions: { ...partialSigningOptions, extraSigners },
+                ...(scripts ? { witness: { scripts } } : {})
               },
               inputSelection,
               tx: { body, hash }

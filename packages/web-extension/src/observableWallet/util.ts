@@ -38,7 +38,15 @@ export const outputBuilderProperties: RemoteApiProperties<OutputBuilder> = {
   }
 };
 
-export const txBuilderProperties: RemoteApiProperties<Omit<TxBuilder, 'customize'>> = {
+export const txBuilderProperties: RemoteApiProperties<Omit<TxBuilder, 'customize' | 'buildToken' | 'buildPolicy'>> = {
+  addMint: {
+    getApiProperties: () => txBuilderProperties,
+    propType: RemoteApiPropertyType.ApiFactory
+  },
+  addNativeScripts: {
+    getApiProperties: () => txBuilderProperties,
+    propType: RemoteApiPropertyType.ApiFactory
+  },
   addOutput: {
     getApiProperties: () => txBuilderProperties,
     propType: RemoteApiPropertyType.ApiFactory
