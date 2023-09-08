@@ -74,7 +74,7 @@ spec:
             - name: QUEUES
               value: pool-metadata,pool-metrics
             - name: STAKE_POOL_PROVIDER_URL
-              value: https://dev-preview-cardanojs-stake-pool-provider.dev-preview.svc.cluster.local/stake-pool
+              value: https://dev-preview-cardanojs-backend.dev-preview.svc.cluster.local/stake-pool
           image: FIXME-ADD-LATEST-IMAGE-REFERENCE
           livenessProbe:
             httpGet:
