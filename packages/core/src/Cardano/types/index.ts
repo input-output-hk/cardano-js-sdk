@@ -11,3 +11,5 @@ export * from './AuxiliaryData';
 export * from './Script';
 export * from './ProtocolParameters';
 export * from './PlutusData';
+export * from './UtilityTypes';
+export * from './Governance';
