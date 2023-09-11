@@ -58,7 +58,7 @@ spec:
           image: FIXME-ADD-LATEST-IMAGE-REFERENCE
           livenessProbe:
             httpGet:
-              path: /v1.0.0/health
+              path: /v1.0.0/live
               port: 3000
             timeoutSeconds: 5
           name: handle-projector

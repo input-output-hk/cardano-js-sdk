@@ -2160,10 +2160,8 @@ describe('CLI', () => {
 
     const assertServerAlive = async () => {
       await serverStarted(apiUrl);
-      const headers = { 'Content-Type': 'application/json' };
-      const res = await axios.post(`${apiUrl}${baseVersionPath}/health`, { headers });
+      const res = await axios.get(`${apiUrl}${baseVersionPath}/live`);
       expect(res.status).toBe(200);
-      expect(res.data.ok).toBe(false);
     };
 
     beforeAll(async () => {
