@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.20.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.19.3...@cardano-sdk/e2e@0.20.0) (2023-09-12)
+
+### ⚠ BREAKING CHANGES
+
+* include API version in HTTP service URL scheme
+
+### Features
+
+* added Ed25519 EdDSA signature scheme to crypto package based on ([e97d58e](https://github.com/input-output-hk/cardano-js-sdk/commit/e97d58ed1d02feaefd90108cf683f83adba02e19))
+* include API version in HTTP service URL scheme ([3c10d33](https://github.com/input-output-hk/cardano-js-sdk/commit/3c10d33c28f172f4e9659d7bd26a5b4afbc62efc))
+* **wallet:** active public stake keys tracker support for cip95 ([3b8c73d](https://github.com/input-output-hk/cardano-js-sdk/commit/3b8c73d8ab771716da476f7869502a3ec6905c25))
+
 ## [0.19.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.19.2...@cardano-sdk/e2e@0.19.3) (2023-08-29)
 
 ### Features

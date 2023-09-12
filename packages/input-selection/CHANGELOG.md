@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.11.8...@cardano-sdk/input-selection@0.11.9) (2023-09-12)
+
+### Bug Fixes
+
+* **input-selection:** add withdrawals to Required<ImplicitCoin> definition ([13c2cb5](https://github.com/input-output-hk/cardano-js-sdk/commit/13c2cb5c64aec01aa6760911c2222973f1fb0410))
+
 ## [0.11.8](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.11.7...@cardano-sdk/input-selection@0.11.8) (2023-08-29)
 
 **Note:** Version bump only for package @cardano-sdk/input-selection

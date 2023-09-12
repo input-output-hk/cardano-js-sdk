@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.19.0...@cardano-sdk/core@0.19.1) (2023-09-12)
+
+### Features
+
+* **core:** add separate withdrawals to implicit coin ([d5dae5f](https://github.com/input-output-hk/cardano-js-sdk/commit/d5dae5f24e73bb45abdda31255840d55c9b193cf))
+
 ## [0.19.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.18.0...@cardano-sdk/core@0.19.0) (2023-08-29)
 
 ### ⚠ BREAKING CHANGES

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/crypto@0.1.12...@cardano-sdk/crypto@0.1.13) (2023-09-12)
+
+### Features
+
+* added Ed25519 EdDSA signature scheme to crypto package based on ([e97d58e](https://github.com/input-output-hk/cardano-js-sdk/commit/e97d58ed1d02feaefd90108cf683f83adba02e19))
+* **crypto:** added BIP-32 key management and derivation to crypto package ([149e731](https://github.com/input-output-hk/cardano-js-sdk/commit/149e73119aceb2acabfff9a0922edc0df7bb054b))
+* **crypto:** added libSodium based Bip32Ed25519 implementation ([47011d4](https://github.com/input-output-hk/cardano-js-sdk/commit/47011d4f4a21f91b1c566f7a6eef0b8157bfa87e))
+
 ## [0.1.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/crypto@0.1.11...@cardano-sdk/crypto@0.1.12) (2023-08-21)
 
 **Note:** Version bump only for package @cardano-sdk/crypto

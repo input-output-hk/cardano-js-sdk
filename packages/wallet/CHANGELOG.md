@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.21.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.21.1...@cardano-sdk/wallet@0.21.2) (2023-09-12)
+
+### Features
+
+* **wallet:** active public stake keys tracker support for cip95 ([3b8c73d](https://github.com/input-output-hk/cardano-js-sdk/commit/3b8c73d8ab771716da476f7869502a3ec6905c25))
+* **wallet:** implement getPubDRepKey() in cip95 api ([26cbb34](https://github.com/input-output-hk/cardano-js-sdk/commit/26cbb349d7febe1adefa635401de743b9c1f5145))
+* **wallet:** update cip30 api to use activePublicStakeKeys ([772bb7a](https://github.com/input-output-hk/cardano-js-sdk/commit/772bb7a813078579d90459a57d2e9467dd71db0b))
+
 ## [0.21.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.21.0...@cardano-sdk/wallet@0.21.1) (2023-08-29)
 
 ### Features

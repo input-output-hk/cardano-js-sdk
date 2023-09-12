@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.18.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.17.0...@cardano-sdk/cardano-services@0.18.0) (2023-09-12)
+
+### ⚠ BREAKING CHANGES
+
+* include API version in HTTP service URL scheme
+
+### Features
+
+* **cardano-services:** introduce /live endpoint on HTTP server ([d2d6c6a](https://github.com/input-output-hk/cardano-js-sdk/commit/d2d6c6a6362b68cda9bf0010c64399daf8f82a30))
+* **cardano-services:** recognizes a pgboss locked state as a recoverable error ([af53c8e](https://github.com/input-output-hk/cardano-js-sdk/commit/af53c8ed29d88023cbbb121febb81b99319c6e40))
+* **cardano-services:** versionPathFromSpec util for embedding OpenApi version in URLs ([2468c57](https://github.com/input-output-hk/cardano-js-sdk/commit/2468c5774509509e279ffcdc5cfa36c77fdfee68))
+* include API version in HTTP service URL scheme ([3c10d33](https://github.com/input-output-hk/cardano-js-sdk/commit/3c10d33c28f172f4e9659d7bd26a5b4afbc62efc))
+* only validate API responses in test and dev env ([797dfd3](https://github.com/input-output-hk/cardano-js-sdk/commit/797dfd366defc50276f3fb79e2c99ba3d1ff4b48))
+
+### Bug Fixes
+
+* **cardano-services:** improve /ready endpoint ([04b33a9](https://github.com/input-output-hk/cardano-js-sdk/commit/04b33a9434cb07d272df7514a4d95ceebaf88295))
+* **cardano-services:** missing OpenAPI models and express configuration ([db9db30](https://github.com/input-output-hk/cardano-js-sdk/commit/db9db30299b3c94227416d5ea79da27d4cd69a99))
+* **cardano-services:** stake pool metadaservice correctly return undefined ([471d272](https://github.com/input-output-hk/cardano-js-sdk/commit/471d2728d651ef0ade2cf0cac54da0d19cabfc0f))
+* **cardano-services:** stop DbSyncProvider proxying db-sync health ([88a172d](https://github.com/input-output-hk/cardano-js-sdk/commit/88a172d9b59a99060c5f16e62b366d6dbbd537cb))
+
 ## [0.17.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.16.1...@cardano-sdk/cardano-services@0.17.0) (2023-08-29)
 
 ### ⚠ BREAKING CHANGES
