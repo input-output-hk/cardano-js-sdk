@@ -34,7 +34,7 @@ describe('PersonalWallet/mint', () => {
     const walletAddress = (await firstValueFrom(wallet.addresses$))[0].address;
     const { tx: signedTx } = await txBuilder
       .addMint(tokens)
-      .addNativeScript(await policy.getPolicyScript())
+      .addNativeScripts([await policy.getPolicyScript()])
       .addOutput(await txBuilder.buildOutput().address(walletAddress).coin(coins).assets(tokens).build())
       .build()
       .sign();

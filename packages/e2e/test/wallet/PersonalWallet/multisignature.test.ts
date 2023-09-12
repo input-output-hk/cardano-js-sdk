@@ -69,7 +69,7 @@ describe('PersonalWallet/multisignature', () => {
     const { tx: signedTx } = await aliceTxBuilder
       .addMint(tokens)
       .extraSigners([bobSigner])
-      .addNativeScript(policyScript)
+      .addNativeScripts([policyScript])
       .addOutput(await aliceTxBuilder.buildOutput().address(walletAddress).coin(coins).assets(tokens).build())
       .build()
       .sign();

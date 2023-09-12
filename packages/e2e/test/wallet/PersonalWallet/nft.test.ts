@@ -113,7 +113,7 @@ describe('PersonalWallet.assets/nft', () => {
     const { tx: signedTx } = await txBuilder
       .addMint(tokens)
       .metadata(auxiliaryData)
-      .addNativeScript(policyScript)
+      .addNativeScripts([policyScript])
       .addOutput(await txBuilder.buildOutput().address(walletAddress).coin(coins).assets(tokens).build())
       .build()
       .sign();
@@ -206,7 +206,7 @@ describe('PersonalWallet.assets/nft', () => {
     const txBuilder = wallet.createTxBuilder();
     const { tx: signedTx } = await txBuilder
       .addMint(new Map([[assetIds[TOKEN_BURN_INDEX], -assetBalance]]))
-      .addNativeScript(policyScript)
+      .addNativeScripts([policyScript])
       .addOutput(await txBuilder.buildOutput().address(walletAddress).coin(coins).build())
       .build()
       .sign();
@@ -255,7 +255,7 @@ describe('PersonalWallet.assets/nft', () => {
         const { tx: signedTx } = await txBuilder
           .addMint(tokens)
           .metadata(auxiliaryData)
-          .addNativeScript(policyScript)
+          .addNativeScripts([policyScript])
           .addOutput(await txBuilder.buildOutput().address(walletAddress).coin(coins).assets(tokens).build())
           .build()
           .sign();

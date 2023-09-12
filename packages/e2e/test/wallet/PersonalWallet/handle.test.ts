@@ -95,7 +95,7 @@ describe('Ada handle', () => {
 
     const { tx } = await txBuilder
       .addMint(tokensMint)
-      .addNativeScript(await policy.getPolicyScript())
+      .addNativeScripts([await policy.getPolicyScript()])
       .metadata(auxiliaryData)
       .addOutput(await txBuilder.buildOutput().address(walletAddress).coin(coins).assets(tokensOutput).build())
       .build()
