@@ -29,64 +29,64 @@ env:
 
 on:
   pull_request:
-    branches: [ "master" ]
+    branches: ['master']
   push:
-    branches: [ "master" ]
-    tags: [ "*.*.*" ]
+    branches: ['master']
+    tags: ['*.*.*']
 
 jobs:
   build_and_test:
     strategy:
       matrix:
-        os: [ ubuntu-20.04 ]
+        os: [ubuntu-20.04]
     runs-on: ${{ matrix.os }}
     steps:
-    - name: 📥 Checkout repository
-      uses: actions/checkout@v3
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v3
 
-    - name: 🧰 Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: 18.12.0
+      - name: 🧰 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.12.0
 
-    - name: 🔨 Build
-      run: |
-        yarn install --immutable --inline-builds
-        yarn build
-        docker build --no-cache .
+      - name: 🔨 Build
+        run: |
+          yarn install --immutable --inline-builds
+          yarn build
+          docker build --no-cache .
 
-    - name: 🌐 Setup local test network
-      working-directory: packages/e2e
-      run: |
-        yarn local-network:up -d
-      env:
-        CARDANO_NODE_CHAINDB_LOG_LEVEL: 'Warning'
-        CARDANO_NODE_LOG_LEVEL: 'Warning'
-        OGMIOS_PORT: '1340'
-        OGMIOS_URL: 'ws://cardano-node-ogmios:1340'
-        POSTGRES_PORT: '5435'
+      - name: 🌐 Setup local test network
+        working-directory: packages/e2e
+        run: |
+          yarn local-network:up -d
+        env:
+          CARDANO_NODE_CHAINDB_LOG_LEVEL: 'Warning'
+          CARDANO_NODE_LOG_LEVEL: 'Warning'
+          OGMIOS_PORT: '1340'
+          OGMIOS_URL: 'ws://cardano-node-ogmios:1340'
+          POSTGRES_PORT: '5435'
 
-    - name: Dump docker logs on failure
-      if: failure()
-      uses: jwalton/gh-docker-logs@v2
+      - name: Dump docker logs on failure
+        if: failure()
+        uses: jwalton/gh-docker-logs@v2
 
-    - name: Wait for some epochs
-      run: |
-        yarn workspace @cardano-sdk/e2e wait-for-network
-      env:
-        DB_SYNC_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/cexplorer'
+      - name: Wait for some epochs
+        run: |
+          yarn workspace @cardano-sdk/e2e wait-for-network
+        env:
+          DB_SYNC_CONNECTION_STRING: 'postgresql://postgres:doNoUseThisSecret!@localhost:5435/cexplorer'
 
-    - name: 🔬 Test - e2e - wallet
-      run: |
-        yarn workspace @cardano-sdk/e2e test:wallet
-        yarn workspace @cardano-sdk/e2e test:providers
-        yarn workspace @cardano-sdk/e2e test:projection
-        yarn workspace @cardano-sdk/e2e test:pg-boss
-      env:
-        STAKE_POOL_PROVIDER_URL: 'http://localhost:4000/'
+      - name: 🔬 Test - e2e - wallet
+        run: |
+          yarn workspace @cardano-sdk/e2e test:wallet
+          yarn workspace @cardano-sdk/e2e test:providers
+          yarn workspace @cardano-sdk/e2e test:projection
+          yarn workspace @cardano-sdk/e2e test:pg-boss
+        env:
+          STAKE_POOL_PROVIDER_URL: 'http://localhost:4000/'
 
-    - name: 🔬 Test - e2e - wallet - typeorm stake pool provider
-      run: |
-        yarn workspace @cardano-sdk/e2e test:providers -t StakePoolProvider
-      env:
-        STAKE_POOL_PROVIDER_URL: 'http://localhost:4010/'
+      - name: 🔬 Test - e2e - wallet - typeorm stake pool provider
+        run: |
+          yarn workspace @cardano-sdk/e2e test:providers -t StakePoolProvider
+        env:
+          STAKE_POOL_PROVIDER_URL: 'http://localhost:4010/'
