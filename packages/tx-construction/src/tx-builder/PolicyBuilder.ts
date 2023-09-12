@@ -32,7 +32,7 @@ export class PolicyBuilder {
   }
 
   async getPolicyScript() {
-    if (!this.#policyScript) {
+    if (!this.#policyScript || this.#derivationPathUpdated) {
       this.#policyScript = await this.#getDefaultPolicyScript();
     }
     return this.#policyScript;
