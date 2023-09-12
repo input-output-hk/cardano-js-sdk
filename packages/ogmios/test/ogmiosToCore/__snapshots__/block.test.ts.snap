@@ -138,12 +138,9 @@ Object {
             "data": Object {
               "cbor": "a34160029f20a3419c204386a48244e21bd936202004a0ffa3a4435aed90040242b07a210523409f414d429b3f0440ffa09f034001ffa222234041b4d8668218da9f2341440302413eff4204e1a1d866821901939f23ffa0",
               "data": Map {
-                Object {
-                  "data": Array [
-                    96,
-                  ],
-                  "type": "Buffer",
-                } => 2n,
+                Uint8Array [
+                  96,
+                ] => 2n,
                 Object {
                   "cbor": "9f20a3419c204386a48244e21bd936202004a0ff",
                   "items": Array [
@@ -151,28 +148,19 @@ Object {
                     Object {
                       "cbor": "a3419c204386a48244e21bd9362020",
                       "data": Map {
-                        Object {
-                          "data": Array [
-                            156,
-                          ],
-                          "type": "Buffer",
-                        } => -1n,
-                        Object {
-                          "data": Array [
-                            134,
-                            164,
-                            130,
-                          ],
-                          "type": "Buffer",
-                        } => Object {
-                          "data": Array [
-                            226,
-                            27,
-                            217,
-                            54,
-                          ],
-                          "type": "Buffer",
-                        },
+                        Uint8Array [
+                          156,
+                        ] => -1n,
+                        Uint8Array [
+                          134,
+                          164,
+                          130,
+                        ] => Uint8Array [
+                          226,
+                          27,
+                          217,
+                          54,
+                        ],
                         -1n => -1n,
                       },
                     },
@@ -188,48 +176,30 @@ Object {
                     Object {
                       "cbor": "a4435aed90040242b07a21052340",
                       "data": Map {
-                        Object {
-                          "data": Array [
-                            90,
-                            237,
-                            144,
-                          ],
-                          "type": "Buffer",
-                        } => 4n,
-                        2n => Object {
-                          "data": Array [
-                            176,
-                            122,
-                          ],
-                          "type": "Buffer",
-                        },
+                        Uint8Array [
+                          90,
+                          237,
+                          144,
+                        ] => 4n,
+                        2n => Uint8Array [
+                          176,
+                          122,
+                        ],
                         -2n => 5n,
-                        -4n => Object {
-                          "data": Array [],
-                          "type": "Buffer",
-                        },
+                        -4n => Uint8Array [],
                       },
                     } => Object {
                       "cbor": "9f414d429b3f0440ff",
                       "items": Array [
-                        Object {
-                          "data": Array [
-                            77,
-                          ],
-                          "type": "Buffer",
-                        },
-                        Object {
-                          "data": Array [
-                            155,
-                            63,
-                          ],
-                          "type": "Buffer",
-                        },
+                        Uint8Array [
+                          77,
+                        ],
+                        Uint8Array [
+                          155,
+                          63,
+                        ],
                         4n,
-                        Object {
-                          "data": Array [],
-                          "type": "Buffer",
-                        },
+                        Uint8Array [],
                       ],
                     },
                     Object {
@@ -239,10 +209,7 @@ Object {
                       "cbor": "9f034001ff",
                       "items": Array [
                         3n,
-                        Object {
-                          "data": Array [],
-                          "type": "Buffer",
-                        },
+                        Uint8Array [],
                         1n,
                       ],
                     },
@@ -250,15 +217,9 @@ Object {
                       "cbor": "a222234041b4",
                       "data": Map {
                         -3n => -4n,
-                        Object {
-                          "data": Array [],
-                          "type": "Buffer",
-                        } => Object {
-                          "data": Array [
-                            180,
-                          ],
-                          "type": "Buffer",
-                        },
+                        Uint8Array [] => Uint8Array [
+                          180,
+                        ],
                       },
                     } => Object {
                       "cbor": "d8668218da9f2341440302413eff",
@@ -267,32 +228,23 @@ Object {
                         "cbor": "9f2341440302413eff",
                         "items": Array [
                           -4n,
-                          Object {
-                            "data": Array [
-                              68,
-                            ],
-                            "type": "Buffer",
-                          },
+                          Uint8Array [
+                            68,
+                          ],
                           3n,
                           2n,
-                          Object {
-                            "data": Array [
-                              62,
-                            ],
-                            "type": "Buffer",
-                          },
+                          Uint8Array [
+                            62,
+                          ],
                         ],
                       },
                     },
                   },
                 },
-                Object {
-                  "data": Array [
-                    4,
-                    225,
-                  ],
-                  "type": "Buffer",
-                } => Object {
+                Uint8Array [
+                  4,
+                  225,
+                ] => Object {
                   "cbor": "a1d866821901939f23ffa0",
                   "data": Map {
                     Object {

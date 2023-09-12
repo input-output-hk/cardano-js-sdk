@@ -73,21 +73,15 @@ Array [
           "witness": Object {
             "bootstrap": Array [],
             "datums": Array [
-              Object {
-                "data": Array [],
-                "type": "Buffer",
-              },
+              Uint8Array [],
             ],
             "redeemers": Array [
               Object {
-                "data": Object {
-                  "data": Array [
-                    77,
-                    53,
-                    122,
-                  ],
-                  "type": "Buffer",
-                },
+                "data": Uint8Array [
+                  77,
+                  53,
+                  122,
+                ],
                 "executionUnits": Object {
                   "memory": 8959327235984229000n,
                   "steps": 4473903472119932000n,
@@ -112,21 +106,15 @@ Array [
                               "cbor": "9f2341e14478c0fcf5ff",
                               "items": Array [
                                 -4n,
-                                Object {
-                                  "data": Array [
-                                    225,
-                                  ],
-                                  "type": "Buffer",
-                                },
-                                Object {
-                                  "data": Array [
-                                    120,
-                                    192,
-                                    252,
-                                    245,
-                                  ],
-                                  "type": "Buffer",
-                                },
+                                Uint8Array [
+                                  225,
+                                ],
+                                Uint8Array [
+                                  120,
+                                  192,
+                                  252,
+                                  245,
+                                ],
                               ],
                             },
                           },
@@ -137,14 +125,11 @@ Array [
                             "fields": Object {
                               "cbor": "9f438002ab0104ff",
                               "items": Array [
-                                Object {
-                                  "data": Array [
-                                    128,
-                                    2,
-                                    171,
-                                  ],
-                                  "type": "Buffer",
-                                },
+                                Uint8Array [
+                                  128,
+                                  2,
+                                  171,
+                                ],
                                 1n,
                                 4n,
                               ],
@@ -153,15 +138,12 @@ Array [
                           Object {
                             "cbor": "a1448858788900",
                             "data": Map {
-                              Object {
-                                "data": Array [
-                                  136,
-                                  88,
-                                  120,
-                                  137,
-                                ],
-                                "type": "Buffer",
-                              } => 0n,
+                              Uint8Array [
+                                136,
+                                88,
+                                120,
+                                137,
+                              ] => 0n,
                             },
                           },
                         ],
@@ -175,10 +157,7 @@ Array [
                           "cbor": "a0",
                           "data": Map {},
                         },
-                        Object {
-                          "data": Array [],
-                          "type": "Buffer",
-                        },
+                        Uint8Array [],
                       ],
                     },
                   ],
