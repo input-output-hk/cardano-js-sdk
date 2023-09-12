@@ -227,21 +227,31 @@ export interface TxBuilder {
   /**
    *
    * @param mintToken
-   * list of tokens to mint/burn should be balanced with outputs
-   * to mint tokens use tokenBuilder
+   * - list of tokens to mint/burn should be balanced with outputs
+   * - to mint tokens use tokenBuilder
+   *      ```
    *      const policy = await txBuilder.buildPolicy();
    *      const tokenBuilder = txBuilder.buildToken(await policy.getPolicyId());
-   * mint new token
+   *      ```
+   * - mint new token
+   *     ```
    *     const tokensMint = tokenBuilder.addAsset('hello', 5n).build();
    *     const tokensOutput = tokenBuilder.addAsset('hello', 5n).build();
-   * burn and send some tokens (wallet has ('hello', 7n), burn 1n, send 2n)
+   *     ```
+   * - burn and send some tokens (wallet has ('hello', 7n), burn 1n, send 2n)
+   *     ```
    *     const tokensMint = tokenBuilder.addAsset('hello', -1n).build();
    *     const tokensOutput = tokenBuilder.addAsset('hello', 2n).build();
    *     (wallet has remaining ('hello', 4n))
-   * burn all tokens (wallet has ('hello', 5n))
-   *     const tokensMint = tokenBuilder.addAsset('hello', -5n).build();
-   *     no tokens in output
-   * then
+   *     ```
+   * - burn all tokens (wallet has ('hello', 5n))
+   *     ```
+   *      const tokensMint = tokenBuilder.addAsset('hello', -5n).build();
+   *      (no tokens in output)
+   *     ```
+   *
+   * - then
+   * ```
    *      const { tx } = await txBuilder
    *  ->    .addMint(tokensMint)
    *        .addNativeScript(await policy.getPolicyScript())
@@ -253,6 +263,7 @@ export interface TxBuilder {
    *        .build()
    *        .sign();
    *      await wallet.submitTx(tx);
+   * ```
    */
   addMint(mintToken: Cardano.TokenMap): TxBuilder;
 
