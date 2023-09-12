@@ -267,8 +267,6 @@ export interface TxBuilder {
    */
   addMint(mintToken: Cardano.TokenMap): TxBuilder;
 
-  /** @param script */
-  addNativeScript(script: Cardano.NativeScript): TxBuilder;
   /** @param scripts */
   addNativeScripts(scripts: Cardano.NativeScript[]): TxBuilder;
 

@@ -161,11 +161,6 @@ export class GenericTxBuilder implements TxBuilder {
     return new PolicyBuilder(this.#dependencies.keyAgent);
   }
 
-  addNativeScript(script: Cardano.NativeScript): TxBuilder {
-    this.partialNativeScripts = this.partialNativeScripts ? [...this.partialNativeScripts, script] : [script];
-    return this;
-  }
-
   addNativeScripts(scripts: Cardano.NativeScript[]): TxBuilder {
     this.partialNativeScripts = this.partialNativeScripts ? [...this.partialNativeScripts, ...scripts] : scripts;
     return this;
