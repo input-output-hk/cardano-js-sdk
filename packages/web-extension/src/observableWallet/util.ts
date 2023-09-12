@@ -42,10 +42,6 @@ export const txBuilderProperties: RemoteApiProperties<TxBuilder> = {
     getApiProperties: () => txBuilderProperties,
     propType: RemoteApiPropertyType.ApiFactory
   },
-  addNativeScript: {
-    getApiProperties: () => txBuilderProperties,
-    propType: RemoteApiPropertyType.ApiFactory
-  },
   addNativeScripts: {
     getApiProperties: () => txBuilderProperties,
     propType: RemoteApiPropertyType.ApiFactory
