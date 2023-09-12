@@ -258,7 +258,7 @@ export class CborWriter {
    * Returns a new array containing the encoded value.
    */
   encode(): Uint8Array {
-    return this.#buffer.valueOf();
+    return new Uint8Array(this.#buffer);
   }
 
   /**
