@@ -1,26 +1,20 @@
 {
-  "LocalRoots": {
-    "groups": [
-      {
-        "localRoots": {
-          "accessPoints": [],
-          "advertise": false
-        },
-        "valency": 1
-      }
-    ]
-  },
-  "PublicRoots": [
+  "localRoots": [
     {
-      "publicRoots": {
-        "accessPoints": [
-          {
-            "address": "preprod-node.world.dev.cardano.org",
-            "port": 30000
-          }
-        ],
-        "advertise": false
-      }
+      "accessPoints": [],
+      "advertise": false,
+      "valency": 1
+    }
+  ],
+  "publicRoots": [
+    {
+      "accessPoints": [
+        {
+          "address": "preprod-node.world.dev.cardano.org",
+          "port": 30000
+        }
+      ],
+      "advertise": false
     }
   ],
   "useLedgerAfterSlot": 4642000
