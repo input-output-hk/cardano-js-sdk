@@ -7,64 +7,182 @@ import uniq from 'lodash/uniq';
 import uniqBy from 'lodash/uniqBy';
 import uniqWith from 'lodash/uniqWith';
 
-/**
- * Gets whether any certificate in the provided certificate list requires a stake key signature.
- *
- * @param groupedAddresses The known grouped addresses.
- * @param txBody The transaction body.
- */
-// eslint-disable-next-line complexity
-const getStakeKeyPaths = (
-  groupedAddresses: GroupedAddress[],
-  txBody: Cardano.TxBody
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-) => {
-  const paths: Set<AccountKeyDerivationPath> = new Set();
-  const uniqueAccounts = uniqBy(groupedAddresses, 'rewardAccount');
+export type StakeKeySignerData = {
+  poolId: Cardano.PoolId;
+  rewardAccount: Cardano.RewardAccount;
+  stakeKeyHash: Crypto.Ed25519KeyHashHex;
+  derivationPath: AccountKeyDerivationPath;
+};
 
-  for (const account of uniqueAccounts) {
-    const stakeKeyHash = Cardano.RewardAccount.toHash(account.rewardAccount);
-    const poolId = Cardano.PoolId.fromKeyHash(stakeKeyHash);
+/** Return type of functions that inspect transaction parts for signatures */
+type SignatureCheck = {
+  /** Signature derivation paths */
+  derivationPaths: AccountKeyDerivationPath[];
+  /** Whether foreign signatures (not owned by wallet) are needed */
+  requiresForeignSignatures: boolean;
+};
 
-    if (!account.stakeKeyDerivationPath) continue;
-
-    if (txBody.withdrawals?.some((withdrawal) => account.rewardAccount === withdrawal.stakeAddress))
-      paths.add(account.stakeKeyDerivationPath);
-
-    if (!txBody.certificates) continue;
-
-    for (const certificate of txBody.certificates) {
-      switch (certificate.__typename) {
-        case Cardano.CertificateType.StakeKeyDeregistration:
-        case Cardano.CertificateType.StakeDelegation:
-          if (certificate.stakeKeyHash === stakeKeyHash) paths.add(account.stakeKeyDerivationPath);
-          break;
-        case Cardano.CertificateType.PoolRegistration:
-          for (const owner of certificate.poolParameters.owners) {
-            // eslint-disable-next-line max-depth
-            if (owner === account.rewardAccount) paths.add(account.stakeKeyDerivationPath);
-          }
-          break;
-        case Cardano.CertificateType.PoolRetirement:
-          if (certificate.poolId === poolId) paths.add(account.stakeKeyDerivationPath);
-          break;
-        case Cardano.CertificateType.MIR:
-          if (
-            certificate.kind === Cardano.MirCertificateKind.ToStakeCreds &&
-            certificate.stakeCredential!.hash ===
-              Crypto.Hash28ByteBase16(Cardano.RewardAccount.toHash(account.rewardAccount))
-          )
-            paths.add(account.stakeKeyDerivationPath);
-          break;
-        case Cardano.CertificateType.StakeKeyRegistration:
-        case Cardano.CertificateType.GenesisKeyDelegation:
-        default:
-        // Nothing to do.
+/** Checks whether the transaction withdrawals contain foreign signatures and returns known derivation paths  */
+const checkWithdrawals = (
+  { withdrawals }: Pick<Cardano.TxBody, 'withdrawals'>,
+  accounts: StakeKeySignerData[]
+): SignatureCheck => {
+  const signatureCheck: SignatureCheck = { derivationPaths: [], requiresForeignSignatures: false };
+  if (withdrawals) {
+    for (const withdrawal of withdrawals) {
+      const account = accounts.find((acct) => acct.rewardAccount === withdrawal.stakeAddress);
+      if (account) {
+        signatureCheck.derivationPaths.push(account.derivationPath);
+      } else {
+        signatureCheck.requiresForeignSignatures = true;
       }
     }
   }
 
-  return paths;
+  return signatureCheck;
+};
+
+const checkStakeKeyHashCertificate = (
+  certificate: Cardano.Certificate,
+  accounts: StakeKeySignerData[]
+): SignatureCheck => {
+  const signatureCheck: SignatureCheck = { derivationPaths: [], requiresForeignSignatures: false };
+  switch (certificate.__typename) {
+    case Cardano.CertificateType.StakeKeyDeregistration:
+    case Cardano.CertificateType.StakeDelegation: {
+      const account = accounts.find((acct) => acct.stakeKeyHash === certificate.stakeKeyHash);
+      if (account) {
+        signatureCheck.derivationPaths = [account.derivationPath];
+      } else {
+        signatureCheck.requiresForeignSignatures = true;
+      }
+    }
+  }
+  return signatureCheck;
+};
+
+const checkPoolRegistrationCertificate = (
+  certificate: Cardano.Certificate,
+  accounts: StakeKeySignerData[]
+): SignatureCheck => {
+  const signatureCheck: SignatureCheck = { derivationPaths: [], requiresForeignSignatures: false };
+  if (certificate.__typename === Cardano.CertificateType.PoolRegistration) {
+    for (const owner of certificate.poolParameters.owners) {
+      const account = accounts.find((acct) => acct.rewardAccount === owner);
+      if (account) {
+        signatureCheck.derivationPaths.push(account.derivationPath);
+      } else {
+        signatureCheck.requiresForeignSignatures = true;
+      }
+    }
+  }
+  return signatureCheck;
+};
+
+const checkPoolRetirementCertificate = (
+  certificate: Cardano.Certificate,
+  accounts: StakeKeySignerData[]
+): SignatureCheck => {
+  const signatureCheck: SignatureCheck = { derivationPaths: [], requiresForeignSignatures: false };
+  if (certificate.__typename === Cardano.CertificateType.PoolRetirement) {
+    const account = accounts.find((acct) => acct.poolId === certificate.poolId);
+    if (account) {
+      signatureCheck.derivationPaths.push(account.derivationPath);
+    } else {
+      signatureCheck.requiresForeignSignatures = true;
+    }
+  }
+  return signatureCheck;
+};
+
+const checkMirCertificate = (certificate: Cardano.Certificate, accounts: StakeKeySignerData[]): SignatureCheck => {
+  const signatureCheck: SignatureCheck = { derivationPaths: [], requiresForeignSignatures: false };
+  if (certificate.__typename === Cardano.CertificateType.MIR) {
+    if (certificate.kind === Cardano.MirCertificateKind.ToStakeCreds) {
+      const account = accounts.find(
+        (acct) => Crypto.Hash28ByteBase16(acct.stakeKeyHash) === certificate.stakeCredential!.hash
+      );
+      if (account) {
+        signatureCheck.derivationPaths.push(account.derivationPath);
+      } else {
+        signatureCheck.requiresForeignSignatures = true;
+      }
+    } else {
+      signatureCheck.requiresForeignSignatures = true;
+    }
+  }
+  return signatureCheck;
+};
+
+/**
+ * Inspect certificates against own stake credentials. Determines the signature derivation paths, and wether there
+ * are certificates it cannot sign (foreign signatures).
+ */
+export const checkStakeCredentialCertificates = (
+  accounts: StakeKeySignerData[],
+  { certificates }: Pick<Cardano.TxBody, 'certificates'>
+): SignatureCheck => {
+  const signatureCheck: SignatureCheck = { derivationPaths: [], requiresForeignSignatures: false };
+
+  if (!certificates?.length) {
+    return signatureCheck;
+  }
+
+  for (const certificate of certificates) {
+    const stakeKeyHashCheck = checkStakeKeyHashCertificate(certificate, accounts);
+    signatureCheck.requiresForeignSignatures ||= stakeKeyHashCheck.requiresForeignSignatures;
+    signatureCheck.derivationPaths.push(...stakeKeyHashCheck.derivationPaths);
+
+    const poolOwnerCheck = checkPoolRegistrationCertificate(certificate, accounts);
+    signatureCheck.requiresForeignSignatures ||= poolOwnerCheck.requiresForeignSignatures;
+    signatureCheck.derivationPaths.push(...poolOwnerCheck.derivationPaths);
+
+    const poolIdCheck = checkPoolRetirementCertificate(certificate, accounts);
+    signatureCheck.requiresForeignSignatures ||= poolIdCheck.requiresForeignSignatures;
+    signatureCheck.derivationPaths.push(...poolIdCheck.derivationPaths);
+
+    const mirCheck = checkMirCertificate(certificate, accounts);
+    signatureCheck.requiresForeignSignatures ||= mirCheck.requiresForeignSignatures;
+    signatureCheck.derivationPaths.push(...mirCheck.derivationPaths);
+
+    // StakeKeyRegistration and GenesisKeyDelegation do not require signing
+  }
+
+  signatureCheck.derivationPaths = uniqWith(signatureCheck.derivationPaths, isEqual);
+  return signatureCheck;
+};
+
+/**
+ * Gets whether withdrawals or any certificate in the provided certificate list requires a stake key signature.
+ *
+ * @param groupedAddresses The known grouped addresses.
+ * @param txBody The transaction body.
+ */
+const getStakeCredentialKeyPaths = (groupedAddresses: GroupedAddress[], txBody: Cardano.TxBody) => {
+  let requiresForeignSignatures = false;
+  const paths: AccountKeyDerivationPath[] = [];
+  const uniqueAccounts = uniqBy(groupedAddresses, 'rewardAccount')
+    .map((groupedAddress) => {
+      const stakeKeyHash = Cardano.RewardAccount.toHash(groupedAddress.rewardAccount);
+      const poolId = Cardano.PoolId.fromKeyHash(stakeKeyHash);
+      return {
+        derivationPath: groupedAddress.stakeKeyDerivationPath,
+        poolId,
+        rewardAccount: groupedAddress.rewardAccount,
+        stakeKeyHash
+      };
+    })
+    .filter((acct): acct is StakeKeySignerData => acct.derivationPath !== undefined);
+
+  const withdrawalCheck = checkWithdrawals(txBody, uniqueAccounts);
+  requiresForeignSignatures ||= withdrawalCheck.requiresForeignSignatures;
+  paths.push(...withdrawalCheck.derivationPaths);
+
+  const stakeCredentialCertificatesCheck = checkStakeCredentialCertificates(uniqueAccounts, txBody);
+  requiresForeignSignatures ||= stakeCredentialCertificatesCheck.requiresForeignSignatures;
+  paths.push(...stakeCredentialCertificatesCheck.derivationPaths);
+
+  return { derivationPaths: new Set(paths), requiresForeignSignatures };
 };
 
 /**
@@ -77,8 +195,8 @@ const getStakeKeyPaths = (
 const getRequiredSignersKeyPaths = (
   groupedAddresses: GroupedAddress[],
   keyHashes?: Crypto.Ed25519KeyHashHex[]
-): Set<AccountKeyDerivationPath> => {
-  const paths: Set<AccountKeyDerivationPath> = new Set();
+): AccountKeyDerivationPath[] => {
+  const paths: AccountKeyDerivationPath[] = [];
 
   if (!keyHashes) return paths;
 
@@ -88,11 +206,11 @@ const getRequiredSignersKeyPaths = (
       const stakeCredential = Cardano.RewardAccount.toHash(address.rewardAccount);
 
       if (paymentCredential && paymentCredential.toString() === keyHash) {
-        paths.add({ index: address.index, role: Number(address.type) });
+        paths.push({ index: address.index, role: Number(address.type) });
       }
 
       if (stakeCredential && address.stakeKeyDerivationPath && stakeCredential.toString() === keyHash) {
-        paths.add(address.stakeKeyDerivationPath);
+        paths.push(address.stakeKeyDerivationPath);
       }
     }
   }
@@ -126,7 +244,7 @@ export const ownSignatureKeyPaths = async (
   return uniqWith(
     [
       ...paymentKeyPaths,
-      ...getStakeKeyPaths(knownAddresses, txBody),
+      ...getStakeCredentialKeyPaths(knownAddresses, txBody).derivationPaths,
       ...getRequiredSignersKeyPaths(knownAddresses, txBody.requiredExtraSignatures)
     ],
     isEqual
