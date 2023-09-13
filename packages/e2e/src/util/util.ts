@@ -17,9 +17,9 @@ import {
   timeout
 } from 'rxjs';
 import { FAST_OPERATION_TIMEOUT_DEFAULT, SYNC_TIMEOUT_DEFAULT } from '../defaults';
-import { FinalizeTxProps, ObservableWallet, PersonalWallet } from '@cardano-sdk/wallet';
 import { InMemoryKeyAgent, TransactionSigner } from '@cardano-sdk/key-management';
 import { InitializeTxProps } from '@cardano-sdk/tx-construction';
+import { ObservableWallet, PersonalWallet } from '@cardano-sdk/wallet';
 import { TestWallet, networkInfoProviderFactory } from '../factories';
 import { getEnv, walletVariables } from '../environment';
 import { logger } from '@cardano-sdk/util-dev';
@@ -251,35 +251,26 @@ export const burnTokens = async ({
   wallet,
   tokens,
   scripts,
-  policySigners: extraSigners
+  policySigners: extraSigners = []
 }: {
   wallet: PersonalWallet;
   tokens?: Cardano.TokenMap;
-  scripts: Cardano.Script[];
-  policySigners: TransactionSigner[];
+  scripts: Cardano.NativeScript[];
+  policySigners?: TransactionSigner[];
 }) => {
-  if (!tokens) {
-    tokens = (await firstValueFrom(wallet.balance.utxo.available$)).assets;
-  }
-
-  if (!tokens?.size) {
-    return; // nothing to burn
-  }
+  if (!tokens) tokens = (await firstValueFrom(wallet.balance.utxo.available$)).assets;
+  if (!tokens?.size) return; // nothing to burn
 
   const negativeTokens = new Map([...tokens].map(([assetId, value]) => [assetId, -value]));
-  const txProps: InitializeTxProps = {
-    mint: negativeTokens,
-    witness: { extraSigners, scripts }
-  };
-
-  const unsignedTx = await wallet.initializeTx(txProps);
-
-  const finalizeProps: FinalizeTxProps = {
-    tx: unsignedTx,
-    witness: { extraSigners, scripts }
-  };
-
-  const signedTx = await wallet.finalizeTx(finalizeProps);
-  await submitAndConfirm(wallet, signedTx);
+  const walletAddress = (await firstValueFrom(wallet.addresses$))[0].address;
+  const txBuilder = wallet.createTxBuilder();
+  const { tx: signedTx } = await txBuilder
+    .addMint(negativeTokens)
+    .addNativeScripts(scripts)
+    .extraSigners(extraSigners)
+    .addOutput(await txBuilder.buildOutput().address(walletAddress).coin(2_000_000n).build())
+    .build()
+    .sign();
+  await wallet.submitTx(signedTx);
   await txConfirmed(wallet, signedTx);
 };

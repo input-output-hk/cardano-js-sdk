@@ -1,19 +1,9 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import { Cardano, metadatum, nativeScriptPolicyId } from '@cardano-sdk/core';
-import { FinalizeTxProps, PersonalWallet } from '@cardano-sdk/wallet';
-import { InitializeTxProps } from '@cardano-sdk/tx-construction';
-import { KeyRole, TransactionSigner, util } from '@cardano-sdk/key-management';
+import { Cardano, metadatum } from '@cardano-sdk/core';
 import { Metadatum, TokenMap } from '@cardano-sdk/core/dist/cjs/Cardano';
-import {
-  burnTokens,
-  createStandaloneKeyAgent,
-  getEnv,
-  getWallet,
-  submitAndConfirm,
-  txConfirmed,
-  walletReady,
-  walletVariables
-} from '../../../src';
+import { PersonalWallet } from '@cardano-sdk/wallet';
+import { TransactionSigner, util } from '@cardano-sdk/key-management';
+import { burnTokens, getEnv, getWallet, txConfirmed, walletReady, walletVariables } from '../../../src';
 import { createLogger } from '@cardano-sdk/util-dev';
 import { firstValueFrom } from 'rxjs';
 import { readFile } from 'fs/promises';
@@ -71,10 +61,10 @@ const createHandleMetadata = (handlePolicyId: string, handleNames: string[]): Ha
 describe('Ada handle', () => {
   let wallet: PersonalWallet;
   let receivingWallet: PersonalWallet;
-  let policySigner: TransactionSigner;
   let policyId: Cardano.PolicyId;
-  let policyScript: Cardano.NativeScript;
   let assetIds: Cardano.AssetId[];
+  let scripts: Cardano.NativeScript[];
+  let issuerSigner: TransactionSigner;
 
   const assetNames = ['handle1', 'handle2'];
   let walletAddress: Cardano.PaymentAddress;
@@ -82,25 +72,9 @@ describe('Ada handle', () => {
 
   const initPolicyId = async () => {
     wallet = (await getWallet({ env, idx: 0, logger, name: 'Handle Init Wallet', polling: { interval: 50 } })).wallet;
-    await walletReady(wallet, coins);
-    const derivationPath = {
-      index: 0,
-      role: KeyRole.External
-    };
-    const keyAgent = await createStandaloneKeyAgent(
-      env.KEY_MANAGEMENT_PARAMS.mnemonic.split(' '),
-      await firstValueFrom(wallet.genesisParameters$),
-      await wallet.keyAgent.getBip32Ed25519()
-    );
-    const pubKey = await keyAgent.derivePublicKey(derivationPath);
-    const keyHash = await keyAgent.bip32Ed25519.getPubKeyHash(pubKey);
-    policySigner = new util.KeyAgentTransactionSigner(keyAgent, derivationPath);
-    policyScript = {
-      __type: Cardano.ScriptType.Native,
-      keyHash,
-      kind: Cardano.NativeScriptKind.RequireSignature
-    };
-    policyId = nativeScriptPolicyId(policyScript);
+    const txBuilder = wallet.createTxBuilder();
+    const policy = await txBuilder.buildPolicy();
+    policyId = await policy.getPolicyId();
     const sdkIpc = path.join(__dirname, '..', '..', '..', 'local-network', 'sdk-ipc');
     const handleProviderPolicyId = (await readFile(path.join(sdkIpc, 'handle_policy_ids')))
       .toString('utf8')
@@ -109,36 +83,25 @@ describe('Ada handle', () => {
     wallet.shutdown();
   };
 
-  const mint = async (tokens: Cardano.TokenMap, txMetadatum: Cardano.Metadatum) => {
-    const auxiliaryData = {
-      blob: new Map([[721n, txMetadatum]])
-    };
+  const mint = async (
+    tokensOutput: Cardano.TokenMap,
+    txMetadatum: Cardano.Metadatum,
+    tokensMint: Cardano.TokenMap = tokensOutput
+  ) => {
+    const txBuilder = wallet.createTxBuilder();
+    const policy = await txBuilder.buildPolicy();
 
-    const txProps: InitializeTxProps = {
-      auxiliaryData,
-      mint: tokens,
-      outputs: new Set([
-        {
-          address: walletAddress,
-          value: {
-            assets: tokens,
-            coins
-          }
-        }
-      ]),
-      witness: { extraSigners: [policySigner], scripts: [policyScript] }
-    };
+    const auxiliaryData = new Map([[721n, txMetadatum]]);
 
-    const unsignedTx = await wallet.initializeTx(txProps);
-
-    const finalizeProps: FinalizeTxProps = {
-      auxiliaryData,
-      tx: unsignedTx,
-      witness: { extraSigners: [policySigner], scripts: [policyScript] }
-    };
-
-    const signedTx = await wallet.finalizeTx(finalizeProps);
-    await submitAndConfirm(wallet, signedTx);
+    const { tx } = await txBuilder
+      .addMint(tokensMint)
+      .addNativeScripts([await policy.getPolicyScript()])
+      .metadata(auxiliaryData)
+      .addOutput(await txBuilder.buildOutput().address(walletAddress).coin(coins).assets(tokensOutput).build())
+      .build()
+      .sign();
+    await wallet.submitTx(tx);
+    await txConfirmed(wallet, tx);
   };
 
   const restartWallet = async () => {
@@ -168,6 +131,10 @@ describe('Ada handle', () => {
         polling: { interval: 50 }
       })
     ).wallet;
+    const txBuilder = wallet.createTxBuilder();
+    const policy = await txBuilder.buildPolicy();
+    scripts = [await policy.getPolicyScript()];
+    issuerSigner = new util.KeyAgentTransactionSigner(await wallet.keyAgent, policy.getDerivationPath());
     receivingWallet = (
       await getWallet({
         env,
@@ -187,16 +154,8 @@ describe('Ada handle', () => {
   });
 
   afterEach(async () => {
-    await burnTokens({
-      policySigners: [policySigner],
-      scripts: [policyScript],
-      wallet
-    });
-    await burnTokens({
-      policySigners: [policySigner],
-      scripts: [policyScript],
-      wallet: receivingWallet
-    });
+    await burnTokens({ scripts, wallet });
+    await burnTokens({ policySigners: [issuerSigner], scripts, wallet: receivingWallet });
   });
 
   afterAll(async () => {
@@ -230,7 +189,7 @@ describe('Ada handle', () => {
       .build()
       .sign();
     await wallet.submitTx(tx);
-    await txConfirmed(receivingWallet, tx);
+    await txConfirmed(wallet, tx);
 
     utxo = await firstValueFrom(wallet.balance.utxo.available$);
     receivingUtxo = await firstValueFrom(receivingWallet.balance.utxo.available$);
@@ -249,7 +208,7 @@ describe('Ada handle', () => {
       .build()
       .sign();
     await wallet.submitTx(tx2);
-    await txConfirmed(receivingWallet, tx2);
+    await txConfirmed(wallet, tx2);
     const receivingUtxoAfter = await firstValueFrom(receivingWallet.balance.utxo.available$);
     expect(receivingUtxoAfter.coins).toEqual(receivingUtxo.coins + coins);
   });
@@ -286,12 +245,9 @@ describe('Ada handle', () => {
       await mint(tokens, txMetadatum);
       let utxo = await firstValueFrom(wallet.balance.utxo.available$);
       expect(utxo.assets?.values().next().value).toEqual(2n);
-      await burnTokens({
-        policySigners: [policySigner],
-        scripts: [policyScript],
-        tokens: new Map([[assetIds[0], 1n]]),
-        wallet
-      });
+      const remainingToken = new Map([[assetIds[0], 1n]]);
+      const burnedToken = new Map([[assetIds[0], -1n]]);
+      await mint(remainingToken, txMetadatum, burnedToken);
       await restartWallet();
       utxo = await firstValueFrom(wallet.balance.utxo.available$);
       expect(utxo.assets?.values().next().value).toEqual(1n);

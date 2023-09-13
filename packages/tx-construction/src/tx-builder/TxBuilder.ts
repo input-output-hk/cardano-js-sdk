@@ -18,7 +18,9 @@ import {
 } from './types';
 import { Logger } from 'ts-log';
 import { OutputBuilderValidator, TxOutputBuilder } from './OutputBuilder';
+import { PolicyBuilder } from './PolicyBuilder';
 import { RewardAccountWithPoolId } from '../types';
+import { TxTokenBuilder } from './TokenBuilder';
 import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
 import { contextLogger, deepEquals, patchObject } from '@cardano-sdk/util';
 import { createOutputValidator } from '../output-validation';
@@ -82,7 +84,9 @@ export class GenericTxBuilder implements TxBuilder {
   partialTxBody: Partial<Cardano.TxBody> = {};
   partialAuxiliaryData?: Cardano.AuxiliaryData;
   partialExtraSigners?: TransactionSigner[];
+  partialNativeScripts?: Cardano.NativeScript[];
   partialSigningOptions?: SignTransactionOptions;
+  partialMint?: Cardano.TokenMap;
 
   #dependencies: TxBuilderDependencies;
   #outputValidator: OutputBuilderValidator;
@@ -144,6 +148,24 @@ export class GenericTxBuilder implements TxBuilder {
     });
   }
 
+  addMint(mintToken: Cardano.TokenMap): TxBuilder {
+    this.partialMint = this.partialMint ? new Map([...this.partialMint.entries(), ...mintToken.entries()]) : mintToken;
+    return this;
+  }
+
+  buildToken(policyId: Cardano.PolicyId): TxTokenBuilder {
+    return new TxTokenBuilder(policyId);
+  }
+
+  buildPolicy(): PolicyBuilder {
+    return new PolicyBuilder(this.#dependencies.keyAgent);
+  }
+
+  addNativeScripts(scripts: Cardano.NativeScript[]): TxBuilder {
+    this.partialNativeScripts = this.partialNativeScripts ? [...this.partialNativeScripts, ...scripts] : scripts;
+    return this;
+  }
+
   delegatePortfolio(portfolio: Pick<Cardano.Cip17DelegationPortfolio, 'pools'> | null): TxBuilder {
     if (portfolio?.pools.length === 0) {
       throw new Error('Portfolio should define at least one delegation pool.');
@@ -187,7 +209,9 @@ export class GenericTxBuilder implements TxBuilder {
                 acct.keyStatus === Cardano.StakeKeyStatus.Registering
             );
             const auxiliaryData = this.partialAuxiliaryData && { ...this.partialAuxiliaryData };
+            const mint = this.partialMint;
             const extraSigners = this.partialExtraSigners && [...this.partialExtraSigners];
+            const scripts = this.partialNativeScripts;
             const signingOptions = this.partialSigningOptions && { ...this.partialSigningOptions };
 
             if (this.partialAuxiliaryData) {
@@ -216,9 +240,10 @@ export class GenericTxBuilder implements TxBuilder {
                 auxiliaryData,
                 certificates: this.partialTxBody.certificates,
                 handles: this.#handles,
+                mint,
                 outputs: new Set(this.partialTxBody.outputs || []),
                 signingOptions,
-                witness: { extraSigners }
+                witness: { extraSigners, scripts }
               },
               dependencies
             );
@@ -228,7 +253,7 @@ export class GenericTxBuilder implements TxBuilder {
                 handles: this.#handles,
                 ownAddresses,
                 signingOptions,
-                witness: { extraSigners }
+                witness: { extraSigners, scripts }
               },
               inputSelection,
               tx: { body, hash }
