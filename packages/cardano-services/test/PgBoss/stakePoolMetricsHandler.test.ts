@@ -13,7 +13,9 @@ describe('stakePoolMetricsHandler', () => {
   const metrics: Cardano.StakePoolMetrics = {
     blocksCreated: 23,
     delegators: 15,
+    lastRos: Percent(0),
     livePledge: 23_000_000n,
+    ros: Percent(0),
     saturation: Percent(0.002),
     size: { active: Percent(0.0005), live: Percent(0.0005) },
     stake: { active: 42_000_000n, live: 42_000_000n }
@@ -79,11 +81,12 @@ describe('stakePoolMetricsHandler', () => {
     const partialExpectedRecord = {
       activeSize: 0.0005,
       activeStake: 42_000_000n,
-      apy: 0,
+      lastRos: Number.NaN,
       livePledge: 23_000_000n,
       liveSaturation: 0.002,
       liveSize: 0.0005,
       liveStake: 42_000_000n,
+      ros: Number.NaN,
       stakePoolId: 'test_pool                                               '
     };
 

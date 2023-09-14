@@ -1,6 +1,14 @@
 /* eslint-disable complexity */
 /* eslint-disable sonarjs/cognitive-complexity */
-import { FilterCondition, QueryStakePoolsArgs, SortField, SortOrder, StakePoolSortOptions } from '@cardano-sdk/core';
+import {
+  FilterCondition,
+  ProviderError,
+  ProviderFailure,
+  QueryStakePoolsArgs,
+  SortField,
+  SortOrder,
+  StakePoolSortOptions
+} from '@cardano-sdk/core';
 
 type StakePoolWhereClauseArgs = {
   name?: string[];
@@ -34,13 +42,16 @@ export const stakePoolSearchSelection = [
   'metrics.liveSize',
   'metrics.liveSaturation',
   'metrics.livePledge',
-  'metrics.apy'
+  'metrics.lastRos',
+  'metrics.ros'
 ];
 
 export const sortSelectionMap: { [key in SortField]: string } = {
   apy: 'metrics_apy',
   cost: 'params.cost',
+  lastRos: 'metrics_last_ros',
   name: 'metadata.name',
+  ros: 'metrics_ros',
   saturation: 'metrics_live_saturation'
 };
 
@@ -62,6 +73,14 @@ export const getSortOptions = (
       order: sort.order.toUpperCase() as Uppercase<SortOrder>
     };
   }
+
+  if (sort.field === 'apy')
+    throw new ProviderError(
+      ProviderFailure.NotImplemented,
+      null,
+      'TypeormStakePoolProvider do not support sort by APY'
+    );
+
   return {
     field: sortSelectionMap[sort.field as SortField],
     order: sort.order.toUpperCase() as Uppercase<SortOrder>

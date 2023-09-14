@@ -7,7 +7,7 @@ export const findStakePools = (hasMetadata = false) => `
     pr.cost, pr.margin,pr.relays, pr.owners, pr.vrf, 
     pr.metadata_url, pr.metadata_hash, pr.block_slot, 
     pm.name, pm.ticker, pm.description, pm.homepage, 
-    pm.ext, cpm.live_saturation, cpm.apy
+    pm.ext, cpm.live_saturation, cpm.last_ros, cpm.ros
     FROM public.stake_pool as sp
         LEFT JOIN pool_registration as pr ON sp.last_registration_id = pr.id
         LEFT JOIN pool_metadata as pm ON pr.id = pm.pool_update_id

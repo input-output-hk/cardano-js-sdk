@@ -735,33 +735,10 @@ describe('TypeormStakePoolProvider', () => {
             });
           });
 
-          describe('sort by apy', () => {
-            it('desc order', async () => {
-              const response = await provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'apy'));
-              expect(response.pageResults[0].metrics?.apy).toEqual(poolsInfoWithMetrics[6].apy);
-              expect(response.pageResults[response.pageResults.length - 1].metrics?.apy).toEqual(
-                poolsInfoWithMetrics[1].apy
-              );
-            });
-
-            it('asc order', async () => {
-              const response = await provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'apy'));
-              expect(response.pageResults[0].metrics?.apy).toEqual(poolsInfoWithMetrics[2].apy);
-              expect(response.pageResults[response.pageResults.length - 1].metrics?.apy).toEqual(
-                poolsInfoWithMetrics[0].apy
-              );
-            });
-
-            it('with applied filters', async () => {
-              const response = await provider.queryStakePools(
-                setSortCondition(setFilterCondition(filterArgs, 'or'), 'asc', 'apy')
-              );
-              expect(response.pageResults[0].metrics?.apy).toEqual(poolsInfoWithMetrics[2].apy);
-              expect(response.pageResults[response.totalResultCount - 1].metrics?.apy).toEqual(
-                poolsInfoWithMetrics[0].apy
-              );
-            });
-          });
+          it('sort by apy', () =>
+            expect(provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'apy'))).rejects.toThrow(
+              'TypeormStakePoolProvider do not support sort by APY'
+            ));
         });
       });
 

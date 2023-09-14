@@ -11,37 +11,40 @@ export class CurrentPoolMetricsEntity {
   @PrimaryColumn({ length: 56, type: 'char' })
   stakePoolId?: Cardano.PoolId;
 
-  @Column()
+  @Column({ nullable: true })
   slot: Cardano.Slot;
 
   @OneToOne(() => StakePoolEntity, OnDeleteCascadeRelationOptions)
   @JoinColumn()
   stakePool?: StakePoolEntity;
 
-  @Column({ type: 'integer' })
+  @Column({ nullable: true, type: 'integer' })
   mintedBlocks?: number;
 
-  @Column({ type: 'integer' })
+  @Column({ nullable: true, type: 'integer' })
   liveDelegators?: number;
 
-  @Column(BigIntColumnOptions)
+  @Column({ nullable: true, ...BigIntColumnOptions })
   activeStake?: Cardano.Lovelace;
 
-  @Column(BigIntColumnOptions)
+  @Column({ nullable: true, ...BigIntColumnOptions })
   liveStake?: Cardano.Lovelace;
 
-  @Column(BigIntColumnOptions)
+  @Column({ nullable: true, ...BigIntColumnOptions })
   livePledge?: Cardano.Lovelace;
 
-  @Column({ transformer: float, type: 'numeric' })
+  @Column({ nullable: true, transformer: float, type: 'numeric' })
   liveSaturation?: Percent;
 
-  @Column({ transformer: float, type: 'numeric' })
+  @Column({ nullable: true, transformer: float, type: 'numeric' })
   activeSize?: Percent;
 
-  @Column({ transformer: float, type: 'numeric' })
+  @Column({ nullable: true, transformer: float, type: 'numeric' })
   liveSize?: Percent;
 
-  @Column({ transformer: float, type: 'numeric' })
-  apy?: Percent;
+  @Column({ nullable: true, transformer: float, type: 'numeric' })
+  lastRos?: Percent;
+
+  @Column({ nullable: true, transformer: float, type: 'numeric' })
+  ros?: Percent;
 }
