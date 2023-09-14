@@ -20,10 +20,10 @@ import { Logger } from 'ts-log';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { RunnableModule, fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
+import { baseVersionPath, serverStarted } from '../util';
 import { createLogger, logger } from '@cardano-sdk/util-dev';
 import { getRandomPort } from 'get-port-please';
 import { healthCheckResponseMock, mockCardanoNode } from '../../../core/test/CardanoNode/mocks';
-import { serverStarted } from '../util';
 import { versionPathFromSpec } from '../../src/util/openApi';
 import axios from 'axios';
 import express from 'express';
@@ -31,8 +31,7 @@ import net from 'net';
 import path from 'path';
 
 const apiSpec = path.join(__dirname, 'openApi.json');
-const versionPath = versionPathFromSpec(apiSpec);
-
+const someServiceVersionPath = versionPathFromSpec(apiSpec);
 class SomeHttpService extends HttpService {
   shouldFail?: boolean;
   constructor(
@@ -63,6 +62,7 @@ describe('HttpServer', () => {
   let httpServer: HttpServer;
   let port: number;
   let apiUrlBase: string;
+  let serviceUrlBase: string;
   let provider: Provider;
   let cardanoNode: OgmiosCardanoNode;
   let lastBlockNoInDb: Cardano.BlockNo;
@@ -85,7 +85,8 @@ describe('HttpServer', () => {
 
   beforeEach(async () => {
     port = await getRandomPort();
-    apiUrlBase = `http://localhost:${port}${versionPath}`;
+    apiUrlBase = `http://localhost:${port}${baseVersionPath}`;
+    serviceUrlBase = `http://localhost:${port}${someServiceVersionPath}`;
     lastBlockNoInDb = Cardano.BlockNo((await dbPools.main.query<LedgerTipModel>(findLedgerTip)).rows[0].block_no);
     cardanoNode = mockCardanoNode(
       healthCheckResponseMock({ blockNo: lastBlockNoInDb })
@@ -145,7 +146,7 @@ describe('HttpServer', () => {
       await httpServer.start();
       await serverStarted(apiUrlBase);
       await axios.post(
-        `${apiUrlBase}/${ServiceNames.StakePool}/echo`,
+        `${serviceUrlBase}/${ServiceNames.StakePool}/echo`,
         JSON.stringify(toSerializableObject(expectedBody)),
         { headers }
       );
@@ -154,7 +155,7 @@ describe('HttpServer', () => {
       const testLogger = createLogger({ record: true });
       const expectedBody = { bigint: 23n, check: 'ok', test: 42 };
       const expectedQuery = { bigint: '23', check: 'ok', test: '42' };
-      const url = `${apiUrlBase}/${ServiceNames.StakePool}/echo`;
+      const url = `${serviceUrlBase}/${ServiceNames.StakePool}/echo`;
       let requestCounter = 0;
       httpServer = new HttpServer(
         { listen: { host: 'localhost', port } },
@@ -179,17 +180,17 @@ describe('HttpServer', () => {
           .filter(({ level, message }) => level === 'debug' && message[0] === '[HttpServer|request]')
           .map(({ message: [, requestDetails] }) => requestDetails)
       ).toEqual([
-        { body: {}, method: 'HEAD', path: versionPath, query: {} },
+        { body: {}, method: 'HEAD', path: baseVersionPath, query: {} },
         {
           body: { bigint: 23n, check: 'ok', test: 42 },
           method: 'POST',
-          path: path.join(versionPath, 'stake-pool', 'echo'),
+          path: path.join(someServiceVersionPath, 'stake-pool', 'echo'),
           query: {}
         },
         {
           body: {},
           method: 'GET',
-          path: path.join(versionPath, 'stake-pool', 'echo'),
+          path: path.join(someServiceVersionPath, 'stake-pool', 'echo'),
           query: { bigint: '23', check: 'ok', test: '42' }
         }
       ]);
@@ -439,14 +440,14 @@ describe('HttpServer', () => {
       await httpServer.shutdown();
     });
     it('healthy', async () => {
-      const res = await axios.post(`${apiUrlBase}/${ServiceNames.StakePool}/health`, {
+      const res = await axios.post(`${serviceUrlBase}/${ServiceNames.StakePool}/health`, {
         headers: { [CONTENT_TYPE]: 'application/json' }
       });
       expect(res.status).toBe(200);
       expect(res.data).toEqual({ ok: true });
     });
     it('not healthy', async () => {
-      const res = await axios.post(`${apiUrlBase}/${ServiceNames.NetworkInfo}/health`, {
+      const res = await axios.post(`${serviceUrlBase}/${ServiceNames.NetworkInfo}/health`, {
         headers: { [CONTENT_TYPE]: 'application/json' }
       });
       expect(res.status).toBe(200);
