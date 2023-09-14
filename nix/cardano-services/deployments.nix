@@ -24,6 +24,14 @@ in {
         }
       ];
     };
+    handle-provider-deployment = {
+      spec.template.spec.containers = dmerge.updateOn "name" [
+        {
+          name = "handle-provider";
+          image = cell.oci-images.cardano-services.image.name;
+        }
+      ];
+    };
     handle-projector-deployment = {
       spec.template.spec.containers = dmerge.updateOn "name" [
         {
