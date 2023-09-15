@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { DataSource, DataSourceOptions, DefaultNamingStrategy, NamingStrategyInterface, QueryRunner } from 'typeorm';
 import { Logger } from 'ts-log';
-import { NEVER, Observable, concat, from, share, switchMap } from 'rxjs';
+import { NEVER, Observable, concat, from, switchMap } from 'rxjs';
 import { PgBossExtension, createPgBoss, createPgBossExtension } from './pgBoss';
 import { WithLogger, contextLogger, patchObject } from '@cardano-sdk/util';
 import { finalizeWithLatest } from '@cardano-sdk/util-rxjs';
@@ -204,14 +204,14 @@ const releaseConnection =
       try {
         await connection.queryRunner.rollbackTransaction();
       } catch (error) {
-        logger.error('Failed to rollback transaction', error);
+        logger.warn('Failed to rollback transaction', error);
       }
     }
     if (!connection.queryRunner.isReleased) {
       try {
         await connection.queryRunner.release();
       } catch (error) {
-        logger.error('Failed to "release" query runner', error);
+        logger.warn('Failed to "release" query runner', error);
       }
     }
   };
@@ -230,16 +230,14 @@ const createConnection = async (dataSource: DataSource, { logger, extensions }: 
 
 export const connect =
   ({ logger, extensions }: ConnectProps) =>
-  (dataSource$: Observable<DataSource>) => {
-    const sharedSource$ = dataSource$.pipe(share());
-    return sharedSource$.pipe(
+  (dataSource$: Observable<DataSource>) =>
+    dataSource$.pipe(
       switchMap((dataSource) =>
         concat(from(createConnection(dataSource, { extensions, logger })), NEVER).pipe(
           finalizeWithLatest(releaseConnection({ logger }))
         )
       )
     );
-  };
 
 export const createObservableConnection = (props: CreateObservableDataSourceProps): Observable<TypeormConnection> =>
   createObservableDataSource(props).pipe(connect(props));

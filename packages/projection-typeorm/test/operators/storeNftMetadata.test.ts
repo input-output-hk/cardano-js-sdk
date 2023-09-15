@@ -8,6 +8,7 @@ import {
   OutputEntity,
   TokensEntity,
   TypeormStabilityWindowBuffer,
+  TypeormTipTracker,
   createObservableConnection,
   storeAssets,
   storeBlock,
@@ -22,6 +23,7 @@ import { Observable, firstValueFrom, lastValueFrom, toArray } from 'rxjs';
 import { QueryRunner, Repository } from 'typeorm';
 import { connectionConfig$, initializeDataSource } from '../util';
 import {
+  createProjectorContext,
   createProjectorTilFirst,
   createRollBackwardEventFor,
   createRollForwardEventBasedOn,
@@ -183,6 +185,7 @@ describe('storeNftMetadata', () => {
   let nftMetadataRepo: Repository<NftMetadataEntity>;
   let assetRepo: Repository<AssetEntity>;
   let buffer: TypeormStabilityWindowBuffer;
+  let tipTracker: TypeormTipTracker;
   const entities = [BlockEntity, BlockDataEntity, AssetEntity, TokensEntity, OutputEntity, NftMetadataEntity];
 
   const storeData = (
@@ -206,6 +209,7 @@ describe('storeNftMetadata', () => {
       Mappers.withCIP67(),
       Mappers.withNftMetadata({ logger: dummyLogger }),
       storeData,
+      tipTracker.trackProjectedTip(),
       requestNext()
     );
 
@@ -214,7 +218,8 @@ describe('storeNftMetadata', () => {
       blocksBufferLength: 1,
       buffer,
       cardanoNode: events.cardanoNode,
-      logger
+      logger,
+      projectedTip$: tipTracker.tip$
     }).pipe(applyOperators());
 
   const createProjectTilFirst = (events: typeof withHandleEvents) => createProjectorTilFirst(() => project$(events));
@@ -224,13 +229,11 @@ describe('storeNftMetadata', () => {
     queryRunner = dataSource.createQueryRunner();
     nftMetadataRepo = queryRunner.manager.getRepository(NftMetadataEntity);
     assetRepo = queryRunner.manager.getRepository(AssetEntity);
-    buffer = new TypeormStabilityWindowBuffer({ allowNonSequentialBlockHeights: true, logger });
-    await buffer.initialize(queryRunner);
+    ({ buffer, tipTracker } = createProjectorContext(entities));
   });
 
   afterEach(async () => {
     await queryRunner.release();
-    buffer.shutdown();
   });
 
   const testBasicNftProjectionFeatures = (

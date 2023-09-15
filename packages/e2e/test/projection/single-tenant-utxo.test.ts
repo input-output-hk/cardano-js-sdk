@@ -4,11 +4,21 @@ import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/p
 import { Cardano, ObservableCardanoNode } from '@cardano-sdk/core';
 import { ConnectionConfig } from '@cardano-ogmios/client';
 import { DataSource, QueryRunner } from 'typeorm';
-import { Observable, defer, filter, firstValueFrom, lastValueFrom, of, scan, takeWhile } from 'rxjs';
+import { Observable, filter, firstValueFrom, lastValueFrom, of, scan, takeWhile } from 'rxjs';
 import { OgmiosObservableCardanoNode } from '@cardano-sdk/ogmios';
+import { ReconnectionConfig } from '@cardano-sdk/util-rxjs';
 import { createDatabase, dropDatabase } from 'typeorm-extension';
 import { getEnv } from '../../src';
 import { logger } from '@cardano-sdk/util-dev';
+
+const entities = [
+  Postgres.BlockEntity,
+  Postgres.BlockDataEntity,
+  Postgres.AssetEntity,
+  Postgres.TokensEntity,
+  Postgres.OutputEntity,
+  Postgres.NftMetadataEntity
+];
 
 const ogmiosConnectionConfig = ((): ConnectionConfig => {
   const { OGMIOS_URL } = getEnv(['OGMIOS_URL']);
@@ -42,14 +52,7 @@ const createDataSource = () =>
       dropSchema: true,
       synchronize: true
     },
-    entities: [
-      Postgres.BlockEntity,
-      Postgres.BlockDataEntity,
-      Postgres.AssetEntity,
-      Postgres.TokensEntity,
-      Postgres.OutputEntity,
-      Postgres.NftMetadataEntity
-    ],
+    entities,
     logger,
     options: {
       installExtensions: true
@@ -74,23 +77,30 @@ const countUniqueOutputAddresses = (queryRunner: QueryRunner) =>
 
 describe('single-tenant utxo projection', () => {
   let cardanoNode: ObservableCardanoNode;
+  let connection$: Observable<Postgres.TypeormConnection>;
   let buffer: Postgres.TypeormStabilityWindowBuffer;
+  let tipTracker: Postgres.TypeormTipTracker;
   let queryRunner: QueryRunner;
   let dataSource: DataSource;
 
   const initialize = async () => {
-    buffer = new Postgres.TypeormStabilityWindowBuffer({ logger });
     await createDatabase(databaseOptions);
     dataSource = createDataSource();
     await dataSource.initialize();
     queryRunner = dataSource.createQueryRunner('slave');
-    await buffer.initialize(queryRunner);
+    connection$ = Postgres.createObservableConnection({
+      connectionConfig$: of(pgConnectionConfig),
+      entities,
+      logger
+    });
+    const reconnectionConfig: ReconnectionConfig = { initialInterval: 10 };
+    buffer = new Postgres.TypeormStabilityWindowBuffer({ connection$, logger, reconnectionConfig });
+    tipTracker = Postgres.createTypeormTipTracker({ connection$, reconnectionConfig });
   };
 
   const cleanup = async () => {
     await queryRunner.release();
     await dataSource.destroy();
-    buffer.shutdown();
   };
 
   beforeEach(async () => {
@@ -100,22 +110,9 @@ describe('single-tenant utxo projection', () => {
 
   afterEach(async () => cleanup());
 
-  const projectMultiTenant = () =>
-    Bootstrap.fromCardanoNode({ blocksBufferLength: 10, buffer, cardanoNode, logger }).pipe(
-      Mappers.withMint(),
-      Mappers.withUtxo(),
-      Postgres.withTypeormTransaction({ connection$: defer(() => of({ queryRunner })) }),
-      Postgres.storeBlock(),
-      Postgres.storeAssets(),
-      Postgres.storeUtxo(),
-      buffer.storeBlockData(),
-      Postgres.typeormTransactionCommit(),
-      requestNext()
-    );
-
   const storeUtxo = (evt$: Observable<ProjectionEvent<Mappers.WithMint & Mappers.WithUtxo>>) =>
     evt$.pipe(
-      Postgres.withTypeormTransaction({ connection$: defer(() => of({ queryRunner })) }),
+      Postgres.withTypeormTransaction({ connection$ }),
       Postgres.storeBlock(),
       Postgres.storeAssets(),
       Postgres.storeUtxo(),
@@ -123,12 +120,28 @@ describe('single-tenant utxo projection', () => {
       Postgres.typeormTransactionCommit()
     );
 
+  const projectMultiTenant = () =>
+    Bootstrap.fromCardanoNode({
+      blocksBufferLength: 10,
+      buffer,
+      cardanoNode,
+      logger,
+      projectedTip$: tipTracker.tip$
+    }).pipe(Mappers.withMint(), Mappers.withUtxo(), storeUtxo, requestNext(), tipTracker.trackProjectedTip());
+
   const projectSingleTenant = (addresses: Cardano.PaymentAddress[]) =>
-    Bootstrap.fromCardanoNode({ blocksBufferLength: 10, buffer, cardanoNode, logger }).pipe(
+    Bootstrap.fromCardanoNode({
+      blocksBufferLength: 10,
+      buffer,
+      cardanoNode,
+      logger,
+      projectedTip$: tipTracker.tip$
+    }).pipe(
       Mappers.withMint(),
       Mappers.withUtxo(),
       Mappers.filterProducedUtxoByAddresses({ addresses }),
       storeUtxo,
+      tipTracker.trackProjectedTip(),
       requestNext()
     );
 

@@ -1,6 +1,7 @@
-import { CreateDataSourceProps, createDataSource } from '../src';
+import { BlockEntity, CreateDataSourceProps, createDataSource } from '../src';
+import { Cardano } from '@cardano-sdk/core';
 import { NEVER, concat, of } from 'rxjs';
-import { logger } from '@cardano-sdk/util-dev';
+import { generateRandomHexString, logger } from '@cardano-sdk/util-dev';
 
 export const connectionConfig = {
   database: 'projection',
@@ -24,3 +25,15 @@ export const initializeDataSource = async (
   await dataSource.initialize();
   return dataSource;
 };
+
+export const createBlockHeader = (height: number): Cardano.PartialBlockHeader => ({
+  blockNo: Cardano.BlockNo(height),
+  hash: Cardano.BlockId(generateRandomHexString(64)),
+  slot: Cardano.Slot(height * 20)
+});
+
+export const createBlockEntity = (header: Cardano.PartialBlockHeader): BlockEntity => ({
+  hash: header.hash,
+  height: header.blockNo,
+  slot: header.slot
+});

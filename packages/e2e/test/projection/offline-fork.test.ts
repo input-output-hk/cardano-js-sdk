@@ -1,10 +1,10 @@
-/* eslint-disable promise/always-return */
 import * as Postgres from '@cardano-sdk/projection-typeorm';
 import { BlockDataEntity, BlockEntity, StakeKeyEntity } from '@cardano-sdk/projection-typeorm';
 import {
   Bootstrap,
   InMemory,
   Mappers,
+  ProjectionEvent,
   ProjectionOperator,
   StabilityWindowBuffer,
   WithBlock,
@@ -17,13 +17,14 @@ import {
   ChainSyncEventType,
   ChainSyncRollForward,
   ObservableCardanoNode,
-  Point
+  Point,
+  TipOrOrigin
 } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { ConnectionConfig } from '@cardano-ogmios/client';
-import { Observable, defer, filter, firstValueFrom, lastValueFrom, of, take, takeWhile, toArray } from 'rxjs';
+import { Observable, filter, firstValueFrom, lastValueFrom, map, of, take, takeWhile, toArray } from 'rxjs';
 import { OgmiosObservableCardanoNode } from '@cardano-sdk/ogmios';
-import { QueryRunner } from 'typeorm';
+import { ReconnectionConfig } from '@cardano-sdk/util-rxjs';
 import { createDatabase } from 'typeorm-extension';
 import { getEnv } from '../../src';
 
@@ -110,6 +111,14 @@ const createForkProjectionSource = (
   healthCheck$: new Observable()
 });
 
+const fakeTip = <T extends ProjectionEvent>(evt$: Observable<T>): Observable<T> =>
+  evt$.pipe(
+    map((evt) => ({
+      ...evt,
+      tip: evt.block.header
+    }))
+  );
+
 describe('resuming projection when intersection is not local tip', () => {
   let ogmiosCardanoNode: ObservableCardanoNode;
 
@@ -120,9 +129,11 @@ describe('resuming projection when intersection is not local tip', () => {
   const project = (
     cardanoNode: ObservableCardanoNode,
     buffer: StabilityWindowBuffer,
+    projectedTip$: Observable<TipOrOrigin>,
     into: ProjectionOperator<Mappers.WithStakeKeys>
   ) =>
-    Bootstrap.fromCardanoNode({ blocksBufferLength: 10, buffer, cardanoNode, logger }).pipe(
+    Bootstrap.fromCardanoNode({ blocksBufferLength: 10, buffer, cardanoNode, logger, projectedTip$ }).pipe(
+      fakeTip,
       Mappers.withCertificates(),
       Mappers.withStakeKeys(),
       into,
@@ -131,13 +142,14 @@ describe('resuming projection when intersection is not local tip', () => {
 
   const testRollbackAndContinue = (
     buffer: StabilityWindowBuffer,
+    tip$: Observable<TipOrOrigin>,
     into: ProjectionOperator<Mappers.WithStakeKeys>,
     getNumberOfLocalStakeKeys: () => Promise<number>
   ) => {
     it('rolls back local data to intersection and resumes projection from there', async () => {
       // Project some events until we find at least 1 stake key registration
       const firstEventWithKeyRegistrations = await firstValueFrom(
-        project(ogmiosCardanoNode, buffer, into).pipe(filter((evt) => evt.stakeKeys.insert.length > 0))
+        project(ogmiosCardanoNode, buffer, tip$, into).pipe(filter((evt) => evt.stakeKeys.insert.length > 0))
       );
       const lastEventFromOriginalSync = firstEventWithKeyRegistrations;
       const numStakeKeysBeforeFork = await getNumberOfLocalStakeKeys();
@@ -145,13 +157,13 @@ describe('resuming projection when intersection is not local tip', () => {
 
       // Simulate a fork by adding some blocks that are not on the ogmios chain
       const stubForkCardanoNode = createForkProjectionSource(ogmiosCardanoNode, lastEventFromOriginalSync);
-      await lastValueFrom(project(stubForkCardanoNode, buffer, into).pipe(take(4)));
+      await lastValueFrom(project(stubForkCardanoNode, buffer, tip$, into).pipe(take(4)));
       const numStakeKeysAfterFork = await getNumberOfLocalStakeKeys();
       expect(numStakeKeysAfterFork).toBeGreaterThan(numStakeKeysBeforeFork);
 
       // Continue projection from ogmios
       const eventsTilStakeKeyRollback = await firstValueFrom(
-        project(ogmiosCardanoNode, buffer, into).pipe(
+        project(ogmiosCardanoNode, buffer, tip$, into).pipe(
           takeWhile((evt) => evt.stakeKeys.del.length === 0 && evt.stakeKeys.insert.length === 0, true),
           toArray()
         )
@@ -169,7 +181,7 @@ describe('resuming projection when intersection is not local tip', () => {
 
       // Continue projection from ogmios
       const firstRollForwardEvent = await lastValueFrom(
-        project(ogmiosCardanoNode, buffer, into).pipe(
+        project(ogmiosCardanoNode, buffer, tip$, into).pipe(
           takeWhile((evt) => evt.eventType === ChainSyncEventType.RollBackward, true)
         )
       );
@@ -184,26 +196,34 @@ describe('resuming projection when intersection is not local tip', () => {
     const buffer = new InMemory.InMemoryStabilityWindowBuffer();
     testRollbackAndContinue(
       buffer,
+      buffer.tip$,
       (evt$) => evt$.pipe(withStaticContext({ store }), InMemory.storeStakeKeys(), buffer.handleEvents()),
       async () => store.stakeKeys.size
     );
   });
 
   describe('typeorm', () => {
-    const buffer = new Postgres.TypeormStabilityWindowBuffer({ logger });
+    const reconnectionConfig: ReconnectionConfig = { initialInterval: 10 };
+    const entities = [BlockEntity, BlockDataEntity, StakeKeyEntity];
+    const connection$ = Postgres.createObservableConnection({
+      connectionConfig$: of(pgConnectionConfig),
+      entities,
+      logger
+    });
+    const buffer = new Postgres.TypeormStabilityWindowBuffer({ connection$, logger, reconnectionConfig });
+    const tipTracker = Postgres.createTypeormTipTracker({ connection$, reconnectionConfig });
     const dataSource = Postgres.createDataSource({
       connectionConfig: pgConnectionConfig,
       devOptions: {
         dropSchema: true,
         synchronize: true
       },
-      entities: [BlockEntity, BlockDataEntity, StakeKeyEntity],
+      entities,
       logger,
       options: {
         installExtensions: true
       }
     });
-    let queryRunner: QueryRunner;
 
     const getNumberOfLocalStakeKeys = async () => {
       const repository = dataSource.getRepository(Postgres.StakeKeyEntity);
@@ -219,20 +239,24 @@ describe('resuming projection when intersection is not local tip', () => {
         }
       });
       await dataSource.initialize();
-      queryRunner = dataSource.createQueryRunner();
-      await buffer.initialize(queryRunner);
     });
-    afterAll(() => dataSource.destroy());
+
+    afterAll(async () => {
+      await dataSource.destroy();
+      tipTracker.shutdown();
+    });
 
     testRollbackAndContinue(
       buffer,
+      tipTracker.tip$,
       (evt$) =>
         evt$.pipe(
-          Postgres.withTypeormTransaction({ connection$: defer(() => of({ queryRunner })) }),
+          Postgres.withTypeormTransaction({ connection$ }),
           Postgres.storeBlock(),
           Postgres.storeStakeKeys(),
           buffer.storeBlockData(),
-          Postgres.typeormTransactionCommit()
+          Postgres.typeormTransactionCommit(),
+          tipTracker.trackProjectedTip()
         ),
       getNumberOfLocalStakeKeys
     );

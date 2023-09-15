@@ -74,16 +74,9 @@ export type ProjectionOperator<ExtraPropsIn, ExtraPropsOut = {}> = UnifiedExtCha
  */
 export interface StabilityWindowBuffer {
   /**
-   * Observable that emits current tip stored in stability window buffer.
-   * 'origin' when buffer is empty.
-   * Calling methods of the buffer should make this observable to emit.
+   * @returns an Observable that emits once and completes
    */
-  tip$: Observable<Cardano.Block | 'origin'>;
-  /**
-   * Observable that emits current tail (the first block) stored in stability window buffer.
-   * 'origin' when buffer is empty.
-   */
-  tail$: Observable<Cardano.Block | 'origin'>;
+  getBlock(id: Cardano.BlockId): Observable<Cardano.Block | null>;
 }
 
 export type BaseProjectionEvent =

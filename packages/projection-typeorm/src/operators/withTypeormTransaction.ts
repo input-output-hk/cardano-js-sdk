@@ -1,5 +1,5 @@
 /* eslint-disable func-style */
-import { Observable, Subject, defer, from, map, mergeMap, tap } from 'rxjs';
+import { Observable, Subject, defer, from, map, mergeMap } from 'rxjs';
 import { PgBossExtension } from '../pgBoss';
 import {
   ProjectionEvent,
@@ -18,7 +18,6 @@ export interface WithTypeormTransactionDependencies {
 
 export interface WithTypeormContext {
   queryRunner: QueryRunner;
-  transactionCommitted$: Subject<void>;
 }
 
 export interface WithPgBoss {
@@ -26,7 +25,7 @@ export interface WithPgBoss {
 }
 
 type TypeormContextProp = keyof (WithTypeormContext & WithPgBoss);
-const WithTypeormTransactionProps: Array<TypeormContextProp> = ['queryRunner', 'transactionCommitted$', 'pgBoss'];
+const WithTypeormTransactionProps: Array<TypeormContextProp> = ['queryRunner', 'pgBoss'];
 
 export function withTypeormTransaction<Props>(
   dependencies: WithTypeormTransactionDependencies & { pgBoss?: false }
@@ -74,7 +73,6 @@ export const typeormTransactionCommit =
     evt$.pipe(
       mergeMap((evt) =>
         from(evt.queryRunner.commitTransaction()).pipe(
-          tap(() => evt.transactionCommitted$.next()),
           map(() => {
             // The explicit cast is (probably) needed because typecript can't check that
             // we're not removing any properties overlapping with T

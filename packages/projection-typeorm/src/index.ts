@@ -5,6 +5,7 @@ export * from './entity';
 export * from './operators';
 export * from './TypeormStabilityWindowBuffer';
 export * from './isRecoverableTypeormError';
+export * from './createTypeormTipTracker';
 export {
   STAKE_POOL_METADATA_QUEUE,
   STAKE_POOL_METRICS_UPDATE,

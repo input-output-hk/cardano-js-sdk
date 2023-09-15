@@ -7,6 +7,7 @@ import {
   PoolRetirementEntity,
   StakePoolEntity,
   TypeormStabilityWindowBuffer,
+  TypeormTipTracker,
   createObservableConnection,
   storeBlock,
   storeStakePools,
@@ -18,7 +19,7 @@ import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { connectionConfig$, initializeDataSource } from '../util';
-import { createProjectorTilFirst } from './util';
+import { createProjectorContext, createProjectorTilFirst } from './util';
 
 describe('storeStakePools', () => {
   const data = chainSyncData(ChainSyncDataSet.WithPoolRetirement);
@@ -35,8 +36,16 @@ describe('storeStakePools', () => {
   let dataSource: DataSource;
   let queryRunner: QueryRunner;
   let buffer: TypeormStabilityWindowBuffer;
+  let tipTracker: TypeormTipTracker;
+
   const project = () =>
-    Bootstrap.fromCardanoNode({ blocksBufferLength: 10, buffer, cardanoNode: data.cardanoNode, logger }).pipe(
+    Bootstrap.fromCardanoNode({
+      blocksBufferLength: 10,
+      buffer,
+      cardanoNode: data.cardanoNode,
+      logger,
+      projectedTip$: tipTracker.tip$
+    }).pipe(
       Mappers.withCertificates(),
       Mappers.withStakePools(),
       withTypeormTransaction({ connection$: createObservableConnection({ connectionConfig$, entities, logger }) }),
@@ -44,6 +53,7 @@ describe('storeStakePools', () => {
       storeStakePools(),
       buffer.storeBlockData(),
       typeormTransactionCommit(),
+      tipTracker.trackProjectedTip(),
       requestNext()
     );
   const projectTilFirst = createProjectorTilFirst(project);
@@ -65,14 +75,12 @@ describe('storeStakePools', () => {
     dataSource = await initializeDataSource({ entities });
     queryRunner = dataSource.createQueryRunner();
     poolsRepo = queryRunner.manager.getRepository(StakePoolEntity);
-    buffer = new TypeormStabilityWindowBuffer({ allowNonSequentialBlockHeights: true, logger });
-    await buffer.initialize(queryRunner);
+    ({ buffer, tipTracker } = createProjectorContext(entities));
   });
 
   afterEach(async () => {
     await queryRunner.release();
     await dataSource.destroy();
-    buffer.shutdown();
   });
 
   it('typeorm loads correctly typed properties', async () => {

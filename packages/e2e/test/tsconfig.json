@@ -27,6 +27,9 @@
       "path": "../../util-dev/src"
     },
     {
+      "path": "../../util-rxjs/src"
+    },
+    {
       "path": "../../wallet/src"
     },
     {

@@ -1,38 +1,35 @@
 import { BaseProjectionEvent } from '@cardano-sdk/projection';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { HandleEntity, TypeormStabilityWindowBuffer } from '../../../src';
+import { HandleEntity } from '../../../src';
+import { ProjectorContext, createProjectorContext, createStubProjectionSource } from '../util';
 import { QueryRunner } from 'typeorm';
-import { applyOperators, createMultiTxProjectionSource, entities, projectTilFirst } from './util';
-import { createStubProjectionSource } from '../util';
+import { createMultiTxProjectionSource, entities, mapAndStore, projectTilFirst } from './util';
 import { firstValueFrom } from 'rxjs';
 import { initializeDataSource } from '../../util';
-import { logger } from '@cardano-sdk/util-dev';
 
 describe('storeHandles', () => {
   let queryRunner: QueryRunner;
-  let buffer: TypeormStabilityWindowBuffer;
+  let context: ProjectorContext;
 
   beforeEach(async () => {
     const dataSource = await initializeDataSource({ entities });
     queryRunner = dataSource.createQueryRunner();
-    buffer = new TypeormStabilityWindowBuffer({ allowNonSequentialBlockHeights: true, logger });
-    await buffer.initialize(queryRunner);
+    context = createProjectorContext(entities);
   });
 
   afterEach(async () => {
     await queryRunner.release();
-    buffer.shutdown();
   });
 
   it(`minting an existing handle sets address to null,
       rolling back a transaction that mint an existing handle sets address to the original owner`, async () => {
     const repository = queryRunner.manager.getRepository(HandleEntity);
-    const firstMintEvent = await projectTilFirst(buffer)(
+    const firstMintEvent = await projectTilFirst(context)(
       ({ handles, eventType }) => eventType === ChainSyncEventType.RollForward && handles[0]?.handle === 'bob'
     );
     const firstAddress = firstMintEvent.handles[0].latestOwnerAddress;
     expect(firstMintEvent.handles.length).toBe(1);
-    const secondMintEvent = await projectTilFirst(buffer)(
+    const secondMintEvent = await projectTilFirst(context)(
       ({ handles, eventType, mintedAssetTotalSupplies }) =>
         eventType === ChainSyncEventType.RollForward &&
         handles[0]?.handle === 'bob' &&
@@ -47,7 +44,7 @@ describe('storeHandles', () => {
     expect(secondMintEvent.handles.length).toBe(1);
     expect(secondMintEvent.handles[0].latestOwnerAddress).not.toEqual(firstAddress);
 
-    await projectTilFirst(buffer)(
+    await projectTilFirst(context)(
       ({ block: { header }, eventType }) =>
         eventType === ChainSyncEventType.RollBackward && header.hash === secondMintEvent.block.header.hash
     );
@@ -62,7 +59,7 @@ describe('storeHandles', () => {
 
   it('burning a handle with supply >1 sets address and datum to the 1 remaining owner', async () => {
     const repository = queryRunner.manager.getRepository(HandleEntity);
-    const burnEvent = await projectTilFirst(buffer)(
+    const burnEvent = await projectTilFirst(context)(
       ({ eventType, mint }) => eventType === ChainSyncEventType.RollForward && mint[0]?.quantity === -1n
     );
     expect(burnEvent.handles.length).toBe(1);
@@ -81,7 +78,7 @@ describe('storeHandles', () => {
 
   it('rolling back a transaction that burned a handle with supply >1 sets address to null', async () => {
     const repository = queryRunner.manager.getRepository(HandleEntity);
-    const mintEvent1 = await projectTilFirst(buffer)(
+    const mintEvent1 = await projectTilFirst(context)(
       ({ eventType, mint }) => eventType === ChainSyncEventType.RollBackward && mint[0]?.quantity === -1n
     );
     expect(mintEvent1.handles.length).toBe(1);
@@ -95,7 +92,7 @@ describe('storeHandles', () => {
 
   it('transferring handle updates the address to the new owner, rolling back sets it to original owner', async () => {
     const repository = queryRunner.manager.getRepository(HandleEntity);
-    const mintEvt = await projectTilFirst(buffer)((evt) => evt.handles.length > 0);
+    const mintEvt = await projectTilFirst(context)((evt) => evt.handles.length > 0);
     const newOwnerAddress = Cardano.PaymentAddress(
       'addr_test1qpfhhfy2qgls50r9u4yh0l7z67xpg0a5rrhkmvzcuqrd0znuzcjqw982pcftgx53fu5527z2cj2tkx2h8ux2vxsg475q9gw0lz'
     );
@@ -142,7 +139,7 @@ describe('storeHandles', () => {
       tip: header
     };
     const transferEvt = await firstValueFrom(
-      createStubProjectionSource([transferSourceEvt]).pipe(applyOperators(buffer))
+      createStubProjectionSource([transferSourceEvt]).pipe(mapAndStore(context))
     );
     expect(transferEvt.handles[0].handle).toEqual(mintEvt.handles[0].handle);
     expect(transferEvt.handles[0].latestOwnerAddress).toEqual(newOwnerAddress);
@@ -154,7 +151,7 @@ describe('storeHandles', () => {
       eventType: ChainSyncEventType.RollBackward,
       point: mintEvt.block.header
     };
-    await firstValueFrom(createStubProjectionSource([rollbackSourceEvt]).pipe(applyOperators(buffer)));
+    await firstValueFrom(createStubProjectionSource([rollbackSourceEvt]).pipe(mapAndStore(context)));
     const handleInDbAfterTransferRollback = await repository.findOneBy({ handle: transferEvt.handles[0].handle });
     expect(handleInDbAfterTransferRollback?.cardanoAddress).toEqual(originalOwnerAddress);
   });
@@ -207,7 +204,7 @@ describe('storeHandles', () => {
         }
       ]);
 
-      const mintAndTransferEvt = await firstValueFrom(source$.pipe(applyOperators(buffer)));
+      const mintAndTransferEvt = await firstValueFrom(source$.pipe(mapAndStore(context)));
       expect(mintAndTransferEvt.handles[0].handle).toEqual(handle);
       expect(await repository.findOne({ select: { cardanoAddress: true, handle: true }, where: { handle } })).toEqual({
         cardanoAddress: bobAddress,
@@ -259,7 +256,7 @@ describe('storeHandles', () => {
           id: Cardano.TransactionId('0000000000000000000000000000000000000000000000000000000000000001')
         }
       ]);
-      await firstValueFrom(source$.pipe(applyOperators(buffer)));
+      await firstValueFrom(source$.pipe(mapAndStore(context)));
       expect(await repository.findOne({ select: { cardanoAddress: true, handle: true }, where: { handle } })).toEqual({
         cardanoAddress: maryAddress,
         handle

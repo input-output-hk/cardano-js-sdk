@@ -3,14 +3,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Cardano,
-  CardanoNodeErrors,
   ChainSyncEventType,
   Intersection,
   ObservableCardanoNode,
-  ObservableChainSync
+  ObservableChainSync,
+  TipOrOrigin
 } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
-import { Observable, combineLatest, concat, defer, map, mergeMap, noop, of, take, takeWhile, tap } from 'rxjs';
+import { Observable, concat, defer, map, mergeMap, noop, of, switchMap, take, takeWhile, tap } from 'rxjs';
 import { ProjectionEvent, StabilityWindowBuffer, UnifiedExtChainSyncEvent } from '../types';
 import { contextLogger } from '@cardano-sdk/util';
 import { pointDescription } from '../util';
@@ -24,13 +24,11 @@ const isIntersectionBlock = (block: Cardano.Block, intersection: Intersection) =
   return block.header.hash === intersection.point.hash;
 };
 
-const blocksToPoints = (blocks: Array<Cardano.Block | 'origin'>) =>
-  uniq([...blocks.map((p) => (p === 'origin' ? p : p.header)), 'origin' as const]);
-
 const syncFromIntersection = ({
   blocksBufferLength,
   buffer,
   cardanoNode,
+  projectedTip$,
   chainSync: { intersection, chainSync$ },
   logger
 }: {
@@ -38,6 +36,7 @@ const syncFromIntersection = ({
   buffer: StabilityWindowBuffer;
   cardanoNode: ObservableCardanoNode;
   chainSync: ObservableChainSync;
+  projectedTip$: Observable<TipOrOrigin>;
   logger: Logger;
 }) =>
   new Observable<ProjectionEvent>((observer) => {
@@ -45,7 +44,7 @@ const syncFromIntersection = ({
     return chainSync$
       .pipe(
         ObservableCardanoNode.bufferChainSyncEvent(blocksBufferLength),
-        withRolledBackBlock(buffer),
+        withRolledBackBlock(projectedTip$, buffer),
         withNetworkInfo(cardanoNode),
         withEpochNo(),
         withEpochBoundary(intersection)
@@ -59,33 +58,38 @@ const rollbackAndSyncFromIntersection = ({
   cardanoNode,
   initialChainSync,
   logger,
-  tail
+  projectedTip$
 }: {
   blocksBufferLength: number;
   buffer: StabilityWindowBuffer;
   cardanoNode: ObservableCardanoNode;
   initialChainSync: ObservableChainSync;
   logger: Logger;
-  tail: Cardano.Block | 'origin';
+  projectedTip$: Observable<TipOrOrigin>;
 }) =>
   new Observable<ProjectionEvent>((subscriber) => {
     logger.warn('Rolling back to find intersection');
     let skipFindingNewIntersection = true;
     let chainSync = initialChainSync;
-    const rollback$ = buffer.tip$.pipe(
+    const rollback$ = projectedTip$.pipe(
       // Use the initial tip as intersection point for withEpochBoundary
       take(1),
       mergeMap((initialTip) =>
-        buffer.tip$.pipe(
-          takeWhile((block): block is Cardano.Block => block !== 'origin'),
+        projectedTip$.pipe(
+          takeWhile((tip): tip is Cardano.PartialBlockHeader => tip !== 'origin'),
+          switchMap((tip) => buffer.getBlock(tip.hash)),
           mergeMap((block): Observable<Cardano.Block> => {
+            if (!block) {
+              // TODO: replace with a ChainSyncError after reworking CardanoNodeErrors
+              throw new Error('Block not found in the buffer');
+            }
             // we already have an intersection for the 1st tip
             if (skipFindingNewIntersection) {
               skipFindingNewIntersection = false;
               return of(block);
             }
             // try to find intersection with new tip
-            return cardanoNode.findIntersect(blocksToPoints([block, tail, 'origin'])).pipe(
+            return cardanoNode.findIntersect([block.header, 'origin']).pipe(
               take(1),
               tap((newChainSync) => {
                 chainSync = newChainSync;
@@ -109,27 +113,26 @@ const rollbackAndSyncFromIntersection = ({
           ),
           withNetworkInfo(cardanoNode),
           withEpochNo(),
-          withEpochBoundary({ point: initialTip === 'origin' ? initialTip : initialTip.header })
+          withEpochBoundary({ point: initialTip })
         )
       )
     );
     return concat(
       rollback$,
-      defer(() => syncFromIntersection({ blocksBufferLength, buffer, cardanoNode, chainSync, logger }))
+      defer(() => syncFromIntersection({ blocksBufferLength, buffer, cardanoNode, chainSync, logger, projectedTip$ }))
     ).subscribe(subscriber);
   });
 
 /**
- * Finds intersection with provider StabilityWindowBuffer.
+ * Finds intersection with local projectedTip$.
  * If bootstrapping from a forked local state:
  * - Will emit RollBackward events with block from buffer tip one by one until it finds intersection.
- * - Expects buffer to emit new tip$ after processing each RollBackward event
- *
- * @throws InvalidIntersectionError when no intersection with provided {@link StabilityWindowBuffer} is found.
+ * - Expects projectedTip$ to emit after processing each RollBackward event
  */
 export const fromCardanoNode = ({
   blocksBufferLength,
   buffer,
+  projectedTip$,
   cardanoNode,
   logger: baseLogger
 }: {
@@ -137,54 +140,41 @@ export const fromCardanoNode = ({
   buffer: StabilityWindowBuffer;
   cardanoNode: ObservableCardanoNode;
   logger: Logger;
+  projectedTip$: Observable<TipOrOrigin>;
 }): Observable<ProjectionEvent> => {
   const logger = contextLogger(baseLogger, 'Bootstrap');
-  return combineLatest([buffer.tip$, buffer.tail$]).pipe(
+  return projectedTip$.pipe(
     take(1),
-    mergeMap((blocks) => {
-      const points = blocksToPoints(blocks);
-      logger.info(`Starting projector with local tip at ${pointDescription(points[0])}`);
-
+    mergeMap((tip) => {
+      logger.info(`Starting projector with local tip at ${pointDescription(tip)}`);
+      const points = uniq([tip, 'origin' as const]);
       return cardanoNode.findIntersect(points).pipe(
         take(1),
         mergeMap((initialChainSync) => {
-          if (initialChainSync.intersection.point === 'origin') {
-            if (blocks[0] !== 'origin') {
-              throw new CardanoNodeErrors.CardanoClientErrors.IntersectionNotFoundError(
-                // TODO: CardanoClientErrors are currently coupled to ogmios types.
-                // This would be cleaner if errors were mapped to use our core objects.
-                points.map((point) =>
-                  point === 'origin'
-                    ? 'origin'
-                    : {
-                        hash: point.hash,
-                        slot: point.slot
-                      }
-                )
-              );
-            }
-            // buffer is empty, sync from origin
+          if (
+            tip === 'origin' ||
+            (initialChainSync.intersection.point !== 'origin' && initialChainSync.intersection.point.hash === tip.hash)
+          ) {
+            logger.info('syncFromIntersection');
+            // either sync from origin, or start sync from local tip
             return syncFromIntersection({
               blocksBufferLength,
               buffer,
               cardanoNode,
               chainSync: initialChainSync,
-              logger
-            });
-          }
-          if (blocks[0] !== 'origin' && initialChainSync.intersection.point.hash !== blocks[0].header.hash) {
-            // rollback to intersection, then sync from intersection
-            return rollbackAndSyncFromIntersection({
-              blocksBufferLength,
-              buffer,
-              cardanoNode,
-              initialChainSync,
               logger,
-              tail: blocks[1]
+              projectedTip$
             });
           }
-          // intersection is at tip$ - no rollback, just sync from intersection
-          return syncFromIntersection({ blocksBufferLength, buffer, cardanoNode, chainSync: initialChainSync, logger });
+          // no intersection at local tip
+          return rollbackAndSyncFromIntersection({
+            blocksBufferLength,
+            buffer,
+            cardanoNode,
+            initialChainSync,
+            logger,
+            projectedTip$
+          });
         })
       );
     })
