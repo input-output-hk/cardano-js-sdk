@@ -4,13 +4,6 @@ import { handleAssetId, handleAssetName, handleFingerprint, handlePolicyId } fro
 export const asset: Asset.AssetInfo = {
   assetId: Cardano.AssetId('659f2917fb63f12b33667463ee575eeac1845bbc736b9c0bbc40ba8254534c41'),
   fingerprint: Cardano.AssetFingerprint('asset1rjklcrnsdzqp65wjgrg55sy9723kw09mlgvlc3'),
-  history: [
-    {
-      quantity: 1000n,
-      transactionId: Cardano.TransactionId('886206542d63b23a047864021fbfccf291d78e47c1e59bd4c75fbc67b248c5e8')
-    }
-  ],
-  mintOrBurnCount: 5,
   name: Cardano.AssetName('54534c41'),
   nftMetadata: null,
   policyId: Cardano.PolicyId('7eae28af2208be856f7a119668ae52a49b73725e326dc16579dcc373'),
@@ -22,7 +15,6 @@ export const asset: Asset.AssetInfo = {
 export const handleAssetInfo: Asset.AssetInfo = {
   assetId: handleAssetId,
   fingerprint: handleFingerprint,
-  mintOrBurnCount: 1,
   name: handleAssetName,
   policyId: handlePolicyId,
   quantity: 1n,

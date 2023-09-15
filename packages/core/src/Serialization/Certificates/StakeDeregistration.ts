@@ -34,11 +34,13 @@ export class StakeDeregistration {
 
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // stake_deregistration = (1, stake_credential)
     writer.writeStartArray(EMBEDDED_GROUP_SIZE);
 
     writer.writeInt(CertificateKind.StakeDeregistration);
 
+    // CDDL
     // stake_credential =
     //   [  0, addr_keyhash
     //   // 1, scripthash

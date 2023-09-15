@@ -35,19 +35,6 @@ export class AssetFixtureBuilder {
     return result.rows[0];
   }
 
-  public async getHistory(policyId: Cardano.PolicyId, name: Cardano.AssetName) {
-    this.#logger.debug('About to query multi asset history', { name, policyId });
-    const result: QueryResult<{
-      hash: Buffer;
-      quantity: string;
-    }> = await this.#db.query(Queries.findMultiAssetHistory, [Buffer.from(policyId, 'hex'), Buffer.from(name, 'hex')]);
-
-    return result.rows.map(({ hash, quantity }) => ({
-      quantity: BigInt(quantity),
-      transactionId: bufferToHexString(hash) as unknown as Cardano.TransactionId
-    }));
-  }
-
   public async getAssets(desiredQty: number, options?: { with?: AssetWith[] }): Promise<AssetData[]> {
     this.#logger.debug(`About to fetch up to ${desiredQty} assets`);
 
@@ -74,7 +61,7 @@ export class AssetFixtureBuilder {
       return {
         id: Cardano.AssetId(`${hexPolicy}${hexName}`),
         metadata: json
-          ? Asset.util.metadatumToCip25(
+          ? Asset.NftMetadata.fromMetadatum(
               { name: assetName, policyId },
               new Map<bigint, Cardano.Metadatum>([[721n, ProviderUtil.jsonToMetadatum(json)]]),
               this.#logger

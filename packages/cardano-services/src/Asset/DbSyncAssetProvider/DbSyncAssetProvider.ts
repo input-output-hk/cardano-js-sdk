@@ -11,7 +11,7 @@ import {
 import { AssetBuilder } from './AssetBuilder';
 import { AssetPolicyIdAndName, NftMetadataService, TokenMetadataService } from '../types';
 import { DB_CACHE_TTL_DEFAULT, InMemoryCache, NoCache } from '../../InMemoryCache';
-import { DbSyncProvider, DbSyncProviderDependencies } from '../../util/DbSyncProvider';
+import { DbSyncProvider, DbSyncProviderDependencies } from '../../util';
 
 /**
  * Properties that are need to create DbSyncAssetProvider
@@ -74,7 +74,6 @@ export class DbSyncAssetProvider extends DbSyncProvider() implements AssetProvid
   async getAsset({ assetId, extraData }: GetAssetArgs) {
     const assetInfo = await this.#getAssetInfo(assetId);
 
-    if (extraData?.history) await this.loadHistory(assetInfo);
     if (extraData?.nftMetadata) assetInfo.nftMetadata = await this.#getNftMetadata(assetInfo);
     if (extraData?.tokenMetadata) {
       try {
@@ -133,15 +132,6 @@ export class DbSyncAssetProvider extends DbSyncProvider() implements AssetProvid
     return Promise.all(assetIds.map((_) => getAssetInfo(_)));
   }
 
-  private async loadHistory(assetInfo: Asset.AssetInfo) {
-    assetInfo.history = (
-      await this.#builder.queryMultiAssetHistory(assetInfo.policyId, assetInfo.name)
-    ).map<Asset.AssetMintOrBurn>(({ hash, quantity }) => ({
-      quantity: BigInt(quantity),
-      transactionId: hash.toString('hex') as unknown as Cardano.TransactionId
-    }));
-  }
-
   async #getNftMetadata(asset: AssetPolicyIdAndName): Promise<Asset.NftMetadata | null> {
     return this.#cache.get(
       nftMetadataCacheKey(Cardano.AssetId.fromParts(asset.policyId, asset.name)),
@@ -166,9 +156,8 @@ export class DbSyncAssetProvider extends DbSyncProvider() implements AssetProvid
       const supply = BigInt(multiAsset.sum);
       // Backwards compatibility
       const quantity = supply;
-      const mintOrBurnCount = Number(multiAsset.count);
 
-      return { assetId, fingerprint, mintOrBurnCount, name, policyId, quantity, supply };
+      return { assetId, fingerprint, name, policyId, quantity, supply };
     });
   }
 }

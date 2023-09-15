@@ -293,14 +293,14 @@ describe('PersonalWallet methods', () => {
           // callers (I.E cip30.ts) can call finalize directly since they already have the tx built. Bypassing initialize.
           const txInternals = {
             body: {
-              collaterals: new Set([utxo[2][0]]),
+              collaterals: [utxo[2][0]],
               fee: 194_805n,
               inputs: [utxo[1][0]],
               mint: new Map([
                 [AssetId.PXL, 5n],
                 [AssetId.TSLA, 20n]
               ]),
-              outputs: new Set<Cardano.TxOut>(outputs),
+              outputs,
               requiredExtraSignatures: [
                 Crypto.Ed25519KeyHashHex('6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed5')
               ],
@@ -493,7 +493,7 @@ describe('PersonalWallet methods', () => {
 
         const txOut = await txBuilder.addOutput(txOutput).build().sign();
         const submitTxArgsMock = {
-          context: { handles: [mocks.resolvedHandle] },
+          context: { handleResolutions: [mocks.resolvedHandle] },
           signedTransaction: txOut.cbor
         };
         const txPending = firstValueFrom(wallet.transactions.outgoing.pending$);

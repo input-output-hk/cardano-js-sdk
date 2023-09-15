@@ -1,17 +1,17 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { AuxiliaryData } from './AuxiliaryData';
-import { Base64Blob, HexBlob, OpaqueString, hexStringToBuffer, usingAutoFree } from '@cardano-sdk/util';
-import { CML } from '../../CML/CML';
+import { Base64Blob, HexBlob, OpaqueString } from '@cardano-sdk/util';
 import { Certificate } from './Certificate';
-import { Datum, Script } from './Script';
-import { ExUnits, ValidityInterval } from './ProtocolParameters';
+import { ExUnits, Update, ValidityInterval } from './ProtocolParameters';
 import { HydratedTxIn, TxIn, TxOut } from './Utxo';
 import { Lovelace, TokenMap } from './Value';
 import { NetworkId } from '../ChainId';
 import { PartialBlockHeader } from './Block';
+import { PlutusData } from './PlutusData';
 import { RewardAccount } from '../Address';
+import { Script } from './Script';
 import { TxBodyCBOR } from '../../CBOR/TxBodyCBOR';
-import { bytesToHex } from '../../util/misc';
+import { bytesToHex, hexToBytes } from '../../util/misc';
 
 /**
  * transaction hash as hex string
@@ -27,11 +27,9 @@ export const TransactionId = (value: string): TransactionId =>
 TransactionId.fromHexBlob = (value: HexBlob) => Crypto.Hash32ByteBase16.fromHexBlob<TransactionId>(value);
 TransactionId.fromTxBodyCbor = (bodyCbor: TxBodyCBOR): TransactionId =>
   bytesToHex(
-    usingAutoFree((scope) =>
-      scope
-        .manage(CML.hash_transaction(scope.manage(CML.TransactionBody.from_bytes(hexStringToBuffer(bodyCbor)))))
-        .to_bytes()
-    )
+    Crypto.blake2b(Crypto.blake2b.BYTES)
+      .update(hexToBytes(bodyCbor as unknown as HexBlob))
+      .digest()
   ) as unknown as TransactionId;
 
 export interface Withdrawal {
@@ -51,6 +49,7 @@ export interface HydratedTxBody {
   scriptIntegrityHash?: Crypto.Hash32ByteBase16;
   requiredExtraSignatures?: Crypto.Ed25519KeyHashHex[];
   networkId?: NetworkId;
+  update?: Update;
   auxiliaryDataHash?: Crypto.Hash32ByteBase16;
 
   /**
@@ -98,7 +97,7 @@ export enum RedeemerPurpose {
 export interface Redeemer {
   index: number;
   purpose: RedeemerPurpose;
-  data: HexBlob;
+  data: PlutusData;
   executionUnits: ExUnits;
 }
 
@@ -121,7 +120,7 @@ export type Witness = {
   signatures: Signatures;
   scripts?: Script[];
   bootstrap?: BootstrapWitness[];
-  datums?: Datum[];
+  datums?: PlutusData[];
 };
 
 export interface Tx<TBody extends TxBody = TxBody> {

@@ -8,19 +8,6 @@ import { DefaultSelectionConstraintsProps, defaultSelectionConstraints } from '.
 import { ProtocolParametersForInputSelection, SelectionSkeleton } from '@cardano-sdk/input-selection';
 import { babbageTx, getBigBabbageTx } from '../testData';
 
-jest.mock('@dcspark/cardano-multiplatform-lib-nodejs', () => {
-  const actualCml = jest.requireActual('@dcspark/cardano-multiplatform-lib-nodejs');
-  return {
-    ...actualCml,
-    Value: {
-      new: jest.fn()
-    },
-    min_fee: jest.fn()
-  };
-});
-const cmlActual = jest.requireActual('@dcspark/cardano-multiplatform-lib-nodejs');
-const cmlMock = jest.requireMock('@dcspark/cardano-multiplatform-lib-nodejs');
-
 describe('defaultSelectionConstraints', () => {
   const protocolParameters = {
     coinsPerUtxoByte: 4310,
@@ -42,8 +29,7 @@ describe('defaultSelectionConstraints', () => {
   });
 
   it('computeMinimumCost', async () => {
-    cmlMock.Value.new.mockImplementation(cmlActual.Value.new);
-    const fee = 218_807n;
+    const fee = 218_763n;
     const buildTx = jest.fn(async () => babbageTx);
     const selectionSkeleton = {} as SelectionSkeleton;
     const constraints = defaultSelectionConstraints({
@@ -57,7 +43,6 @@ describe('defaultSelectionConstraints', () => {
   });
 
   it('computeMinimumCoinQuantity', () => {
-    cmlMock.Value.new.mockImplementation(cmlActual.Value.new);
     const assets = new Map([
       [AssetId.TSLA, 5000n],
       [AssetId.PXL, 3000n]
@@ -98,13 +83,6 @@ describe('defaultSelectionConstraints', () => {
   });
 
   describe('tokenBundleSizeExceedsLimit', () => {
-    const stubCmlValueLength = (length: number) => {
-      cmlMock.Value.new.mockReturnValue({
-        set_multiasset: jest.fn(),
-        to_bytes: () => ({ length })
-      });
-    };
-
     it('empty bundle', () => {
       const constraints = defaultSelectionConstraints({
         buildTx: jest.fn(),
@@ -114,17 +92,15 @@ describe('defaultSelectionConstraints', () => {
     });
 
     it("doesn't exceed max value size", () => {
-      stubCmlValueLength(protocolParameters.maxValueSize!);
       const constraints = defaultSelectionConstraints({
-        protocolParameters
+        protocolParameters: { ...protocolParameters, maxValueSize: 1_000_000_000 }
       } as DefaultSelectionConstraintsProps);
       expect(constraints.tokenBundleSizeExceedsLimit(new Map())).toBe(false);
     });
 
     it('exceeds max value size', () => {
-      stubCmlValueLength(protocolParameters.maxValueSize! + 1);
       const constraints = defaultSelectionConstraints({
-        protocolParameters
+        protocolParameters: { ...protocolParameters, maxValueSize: 1 }
       } as DefaultSelectionConstraintsProps);
       expect(constraints.tokenBundleSizeExceedsLimit(new Map())).toBe(true);
     });

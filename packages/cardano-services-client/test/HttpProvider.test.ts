@@ -11,8 +11,8 @@ import path from 'path';
 
 const packageJson = require(path.join(__dirname, '..', 'package.json'));
 
-type ComplexArg2 = { map: Map<string, Buffer> };
-type ComplexResponse = Map<bigint, Buffer>[];
+type ComplexArg2 = { map: Map<string, Uint8Array> };
+type ComplexResponse = Map<bigint, Uint8Array>[];
 interface TestProvider extends Provider {
   noArgsEmptyReturn(): Promise<void>;
   complexArgsAndReturn({ arg1, arg2 }: { arg1: bigint; arg2: ComplexArg2 }): Promise<ComplexResponse>;
@@ -95,8 +95,8 @@ describe('createHttpProvider', () => {
   describe('method with complex args and return', () => {
     it('serializes args and deserializes response using core serializableObject', async () => {
       const arg1 = 123n;
-      const arg2: ComplexArg2 = { map: new Map([['key', Buffer.from('abc')]]) };
-      const expectedResponse: ComplexResponse = [new Map([[1234n, Buffer.from('response data')]])];
+      const arg2: ComplexArg2 = { map: new Map([['key', new Uint8Array(Buffer.from('abc'))]]) };
+      const expectedResponse: ComplexResponse = [new Map([[1234n, new Uint8Array(Buffer.from('response data'))]])];
       const provider = createTxSubmitProviderClient();
       closeServer = await createStubHttpProviderServer(port, stubProviderPaths.complexArgsAndReturn, (req, res) => {
         expect(fromSerializableObject(req.body)).toEqual({ arg1, arg2 });

@@ -37,6 +37,7 @@ export class ScriptNOfK {
 
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // script_n_of_k = (3, n: uint, [ * native_script ])
     writer.writeStartArray(EMBEDDED_GROUP_SIZE);
     writer.writeInt(Cardano.NativeScriptKind.RequireNOf);

@@ -121,6 +121,7 @@ export class DbSyncChainHistoryProvider extends DbSyncProvider() implements Chai
       this.#builder.queryTxMintByIds(ids),
       this.#builder.queryWithdrawalsByTxIds(ids),
       this.#builder.queryRedeemersByIds(ids),
+      // Missing witness datums
       this.#metadataService.queryTxMetadataByRecordIds(ids),
       this.#builder.queryTransactionInputsByIds(ids, true),
       this.#builder.queryCertificatesByIds(ids)

@@ -89,7 +89,7 @@ export type TxBodyValidationError = TxOutValidationError | InputSelectionError;
  * appear in the final TxOut type since it's extracted before then and passed
  * as `ctx`.
  */
-export type OutputBuilderTxOut = Cardano.TxOut & { handle?: HandleResolution };
+export type OutputBuilderTxOut = Cardano.TxOut & { handle?: Handle; handleResolution?: HandleResolution };
 
 /**
  * Helps build transaction outputs from its constituent parts.
@@ -136,11 +136,11 @@ export interface TxContext {
   auxiliaryData?: Cardano.AuxiliaryData;
   witness?: InitializeTxWitness;
   isValid?: boolean;
-  handles?: HandleResolution[];
+  handleResolutions?: HandleResolution[];
 }
 
 export type TxInspection = Cardano.TxBodyWithHash &
-  Pick<TxContext, 'ownAddresses' | 'auxiliaryData' | 'handles'> & {
+  Pick<TxContext, 'ownAddresses' | 'auxiliaryData' | 'handleResolutions'> & {
     inputSelection: SelectionSkeleton;
   };
 
@@ -148,7 +148,7 @@ export interface SignedTx {
   cbor: TxCBOR;
   tx: Cardano.Tx;
   context: {
-    handles: HandleResolution[];
+    handleResolutions: HandleResolution[];
   };
 }
 

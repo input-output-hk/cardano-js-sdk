@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Cardano from '../Cardano';
-import * as CmlToCore from '../CML/cmlToCore';
-import * as CoreToCml from '../CML/coreToCml';
 import * as Crypto from '@cardano-sdk/crypto';
-import { CML } from '../CML/CML';
+import { AuxiliaryData } from './AuxiliaryData';
 import { CborReader, CborReaderState, CborWriter } from './CBOR';
-import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
-import type { TxBodyCBOR, TxCBOR } from '../CBOR';
+import { HexBlob } from '@cardano-sdk/util';
+import { TransactionBody } from './TransactionBody';
+import { TransactionWitnessSet } from './TransactionWitnessSet';
+import { hexToBytes } from '../util/misc';
+import type { TxCBOR } from '../CBOR';
 
 const ALONZO_ERA_TX_FRAME_SIZE = 4;
 
@@ -23,17 +24,14 @@ const ALONZO_ERA_TX_FRAME_SIZE = 4;
  * additional information about the transaction, such as a description or a reference to a specific product or service.
  */
 export class Transaction {
-  #body: CML.TransactionBody;
-  #witnessSet: CML.TransactionWitnessSet;
-  #auxiliaryData: CML.AuxiliaryData | undefined;
+  #body: TransactionBody;
+  #witnessSet: TransactionWitnessSet;
+  #auxiliaryData: AuxiliaryData | undefined;
   #isValid = true;
   // If the transaction object is constructed from a CBOR byte array, we are going to remember it and use it
   // when the object is re-serialized again to avoid changing the transaction during a round trip serialization.
   // This cache will be invalidated if any of the transaction properties changes after the object has been deserialized.
   #originalBytes: TxCBOR | undefined = undefined;
-
-  // TODO: This is a temporary workaround to the round trip issue, will be properly addressed once ADP-2803 is completed.
-  #originalBodyBytes: TxBodyCBOR | undefined = undefined;
 
   /**
    * Initializes a new instance of the Transaction class.
@@ -45,22 +43,10 @@ export class Transaction {
    * @param auxiliaryData Additional information that can be attached to a transaction to provide more context or
    * information about the transaction.
    */
-  constructor(body: CML.TransactionBody, witnessSet: CML.TransactionWitnessSet, auxiliaryData?: CML.AuxiliaryData) {
+  constructor(body: TransactionBody, witnessSet: TransactionWitnessSet, auxiliaryData?: AuxiliaryData) {
     this.#body = body;
     this.#witnessSet = witnessSet;
     this.#auxiliaryData = auxiliaryData;
-  }
-
-  /**
-   * Frees the internal CML objects. This function will be removed once all CML classes has been replaced by our own
-   * implementation.
-   *
-   * TODO: Remove this function.
-   */
-  free(): void {
-    if ((this.#body as any)?.ptr !== 0) this.#body.free();
-    if ((this.#witnessSet as any)?.ptr !== 0) this.#witnessSet.free();
-    if (this.#auxiliaryData && (this.#auxiliaryData as any)?.ptr !== 0) this.#auxiliaryData.free();
   }
 
   /**
@@ -73,6 +59,7 @@ export class Transaction {
 
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // transaction =
     //   [ transaction_body
     //   , transaction_witness_set
@@ -80,12 +67,12 @@ export class Transaction {
     //   , auxiliary_data / null
     //   ]
     writer.writeStartArray(ALONZO_ERA_TX_FRAME_SIZE);
-    writer.writeEncodedValue(this.#body.to_bytes());
-    writer.writeEncodedValue(this.#witnessSet.to_bytes());
+    writer.writeEncodedValue(hexToBytes(this.#body.toCbor()));
+    writer.writeEncodedValue(hexToBytes(this.#witnessSet.toCbor()));
     writer.writeBoolean(this.#isValid);
 
     if (this.#auxiliaryData) {
-      writer.writeEncodedValue(this.#auxiliaryData.to_bytes());
+      writer.writeEncodedValue(hexToBytes(this.#auxiliaryData.toCbor()));
     } else {
       writer.writeNull();
     }
@@ -105,9 +92,9 @@ export class Transaction {
     const length = reader.readStartArray();
 
     const bodyBytes = reader.readEncodedValue();
-    const body = CML.TransactionBody.from_bytes(bodyBytes);
+    const body = TransactionBody.fromCbor(HexBlob.fromBytes(bodyBytes));
 
-    const witnessSet = CML.TransactionWitnessSet.from_bytes(reader.readEncodedValue());
+    const witnessSet = TransactionWitnessSet.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
     let isValid = true;
 
     // The isValid flag was added in Alonzo era (onwards), mary era transactions only have three fields.
@@ -116,13 +103,13 @@ export class Transaction {
     }
 
     let auxData;
-    if (reader.peekState() !== CborReaderState.Null) auxData = CML.AuxiliaryData.from_bytes(reader.readEncodedValue());
+    if (reader.peekState() !== CborReaderState.Null)
+      auxData = AuxiliaryData.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
 
     const tx = new Transaction(body, witnessSet, auxData);
 
     tx.#isValid = isValid;
     tx.#originalBytes = cbor;
-    tx.#originalBodyBytes = HexBlob.fromBytes(bodyBytes) as unknown as TxBodyCBOR;
 
     return tx;
   }
@@ -134,31 +121,24 @@ export class Transaction {
    */
   toCore(): Cardano.Tx {
     return {
-      auxiliaryData: this.#auxiliaryData ? CmlToCore.txAuxiliaryData(this.#auxiliaryData) : undefined,
-      body: CmlToCore.txBody(this.#body),
+      auxiliaryData: this.#auxiliaryData ? this.#auxiliaryData.toCore() : undefined,
+      body: this.#body.toCore(),
       id: this.getId(),
       isValid: this.#isValid,
-      witness: CmlToCore.txWitnessSet(this.#witnessSet)
+      witness: this.#witnessSet.toCore()
     };
   }
 
   /**
    * Creates a transaction object from the given Core Tx object.
    *
-   * @param scope The scope that will manage the CML resources.
    * @param tx The core TX object.
-   *
-   * TODO: The scope parameter is needed while we remove the CML objects from the implementation. Once this is done this param can be removed.
    */
-  static fromCore(scope: ManagedFreeableScope, tx: Cardano.Tx) {
-    const txWitnessSet = CoreToCml.witnessSet(scope, tx.witness);
-
-    const transaction = scope.manage(
-      new Transaction(
-        CoreToCml.txBody(scope, tx.body),
-        txWitnessSet,
-        CoreToCml.txAuxiliaryData(scope, tx.auxiliaryData)
-      )
+  static fromCore(tx: Cardano.Tx) {
+    const transaction = new Transaction(
+      TransactionBody.fromCore(tx.body),
+      TransactionWitnessSet.fromCore(tx.witness),
+      tx.auxiliaryData ? AuxiliaryData.fromCore(tx.auxiliaryData) : undefined
     );
 
     if (typeof tx.isValid !== 'undefined') transaction.setIsValid(tx.isValid);
@@ -170,13 +150,9 @@ export class Transaction {
    * Data structure that contains all key elements of the transaction.
    *
    * @returns A deep clone of the transaction body.
-   *
-   * remark: The returned TransactionBody is a clone and its life cycle must be managed by the callee.
-   * TODO: this remark is only relevant while we still have CML objects in the mix, once those are removed, remove the remark.
    */
-  body(): CML.TransactionBody {
-    const bytes = this.#body.to_bytes();
-    return CML.TransactionBody.from_bytes(bytes);
+  body(): TransactionBody {
+    return TransactionBody.fromCbor(this.#body.toCbor());
   }
 
   /**
@@ -184,13 +160,9 @@ export class Transaction {
    *
    * @param body The transaction body.
    */
-  setBody(body: CML.TransactionBody) {
-    if ((this.#body as any)?.ptr !== 0) this.#body.free();
-
+  setBody(body: TransactionBody) {
     this.#body = body;
-
     this.#originalBytes = undefined;
-    this.#originalBodyBytes = undefined;
   }
 
   /**
@@ -199,13 +171,9 @@ export class Transaction {
    * execution requirements, such as Datums, Redeemers and the script itself.
    *
    * @returns A deep clone of the transaction witness set.
-   *
-   * remark: The returned TransactionWitnessSet is a clone and its life cycle must be managed by the callee.
-   * TODO: this remark is only relevant while we still have CML objects in the mix, once those are removed, remove the remark.
    */
-  witnessSet(): CML.TransactionWitnessSet {
-    const bytes = this.#witnessSet.to_bytes();
-    return CML.TransactionWitnessSet.from_bytes(bytes);
+  witnessSet(): TransactionWitnessSet {
+    return TransactionWitnessSet.fromCbor(this.#witnessSet.toCbor());
   }
 
   /**
@@ -213,11 +181,8 @@ export class Transaction {
    *
    * @param witnessSet A deep clone of the witness set in this transaction.
    */
-  setWitnessSet(witnessSet: CML.TransactionWitnessSet) {
-    if ((this.#witnessSet as any)?.ptr !== 0) this.#witnessSet.free();
-
+  setWitnessSet(witnessSet: TransactionWitnessSet) {
     this.#witnessSet = witnessSet;
-
     this.#originalBytes = undefined;
   }
 
@@ -249,14 +214,10 @@ export class Transaction {
    * Gets the transaction Auxiliary data.
    *
    * @returns A clone of the transaction Auxiliary data (or undefined if the transaction doesnt have auxiliary data).
-   *
-   * remark: The returned AuxiliaryData is a clone and its life cycle must be managed by the callee.
-   * TODO: this remark is only relevant while we still have CML objects in the mix, once those are removed, remove the remark.
    */
-  auxiliaryData(): CML.AuxiliaryData | undefined {
+  auxiliaryData(): AuxiliaryData | undefined {
     if (this.#auxiliaryData) {
-      const bytes = this.#auxiliaryData.to_bytes();
-      return CML.AuxiliaryData.from_bytes(bytes);
+      return AuxiliaryData.fromCbor(this.#auxiliaryData.toCbor());
     }
 
     return undefined;
@@ -270,11 +231,8 @@ export class Transaction {
    *
    * @param auxiliaryData The auxiliary data to be set.
    */
-  setAuxiliaryData(auxiliaryData: CML.AuxiliaryData | undefined) {
-    if (this.#auxiliaryData && (this.#witnessSet as any)?.ptr !== 0) this.#auxiliaryData.free();
-
+  setAuxiliaryData(auxiliaryData: AuxiliaryData | undefined) {
     this.#auxiliaryData = auxiliaryData;
-
     this.#originalBytes = undefined;
   }
 
@@ -282,9 +240,7 @@ export class Transaction {
    * Computes the transaction id for this transaction.
    */
   getId(): Cardano.TransactionId {
-    const hash = Crypto.blake2b(Crypto.blake2b.BYTES)
-      .update(this.#originalBodyBytes ? Buffer.from(this.#originalBodyBytes, 'hex') : this.#body.to_bytes())
-      .digest();
+    const hash = Crypto.blake2b(Crypto.blake2b.BYTES).update(hexToBytes(this.#body.toCbor())).digest();
 
     return Cardano.TransactionId.fromHexBlob(HexBlob.fromBytes(hash));
   }

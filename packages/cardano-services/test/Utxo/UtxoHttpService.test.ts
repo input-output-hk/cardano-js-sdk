@@ -11,8 +11,6 @@ import {
   UNLIMITED_CACHE_TTL,
   UtxoHttpService
 } from '../../src';
-import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
-import { HexBlob } from '@cardano-sdk/util';
 import { INFO, createLogger } from 'bunyan';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
@@ -171,12 +169,10 @@ describe('UtxoHttpService', () => {
       it('return UTxO with inline datum', async () => {
         const addresses = await fixtureBuilder.getAddresses(1, { with: [AddressWith.InlineDatum] });
         const res: Cardano.Utxo[] = await provider.utxoByAddresses({ addresses });
-        const firstTxOut = res[0][1];
 
         expect(res.length).toBeGreaterThan(0);
         expect(res[0]).toMatchShapeOf([DataMocks.Tx.input, DataMocks.Tx.outputWithInlineDatum]);
-        expect(() => HexBlob(firstTxOut.datum! as unknown as string)).not.toThrow();
-        expect(() => Hash32ByteBase16(firstTxOut.datumHash! as unknown as string)).not.toThrow();
+        expect(res[0][1].datumHash).toBeUndefined();
       });
 
       it('return UTxO with time lock reference script', async () => {

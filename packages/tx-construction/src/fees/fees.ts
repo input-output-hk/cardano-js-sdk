@@ -1,5 +1,5 @@
-import { CML, Cardano, Serialization, coreToCml } from '@cardano-sdk/core';
-import { OpaqueNumber, usingAutoFree } from '@cardano-sdk/util';
+import { Cardano, Serialization } from '@cardano-sdk/core';
+import { OpaqueNumber } from '@cardano-sdk/util';
 
 /**
  * The constant overhead of 160 bytes accounts for the transaction input and the entry in the UTxO map data
@@ -7,32 +7,33 @@ import { OpaqueNumber, usingAutoFree } from '@cardano-sdk/util';
  */
 const MIN_ADA_CONSTANT_OVERHEAD = 160;
 
-// TODO: Remove this serialization function once CBOR serialization has been added to the SDK.
 /**
  * Serializes the given BigInt to CBOR format.
  *
  * @param bigInt The BigInt to be serialized.
  */
-const serializeBigInt = (bigInt: string) =>
-  usingAutoFree((scope) => scope.manage(CML.BigNum.from_str(bigInt)).to_bytes());
+const serializeBigInt = (bigInt: string) => {
+  const writer = new Serialization.CborWriter();
 
-// TODO: Remove this serialization function once CBOR serialization has been added to the SDK.
+  writer.writeInt(BigInt(bigInt));
+
+  return writer.encode();
+};
+
 /**
  * Serializes the given Tx Output to CBOR format.
  *
- * @param output The Tx Output to be serialized.
+ * @param output The size in bytes of the serialized tx out.
  */
-const serializeTxOutput = (output: Cardano.TxOut) =>
-  usingAutoFree((scope) => coreToCml.txOut(scope, output).to_bytes());
+const serializeTxOutputSize = (output: Cardano.TxOut) =>
+  Serialization.TransactionOutput.fromCore(output).toCbor().length / 2;
 
-// TODO: Remove this serialization function once CBOR serialization has been added to the SDK.
 /**
  * Serializes the given Tx to CBOR format.
  *
  * @param tx The Tx to be serialized.
  */
-const serializeTx = (tx: Cardano.Tx) =>
-  usingAutoFree((scope) => Buffer.from(scope.manage(Serialization.Transaction.fromCore(scope, tx)).toCbor(), 'hex'));
+const serializeTx = (tx: Cardano.Tx) => Buffer.from(Serialization.Transaction.fromCore(tx).toCbor(), 'hex');
 
 /**
  * Gets the total transaction execution units budget from the redeemers.
@@ -112,7 +113,7 @@ export const minAdaRequired = (output: Cardano.TxOut, coinsPerUtxoByte: bigint):
     const sizeDiff = latestSize - oldCoinSize;
 
     const tentativeMinAda =
-      BigInt(serializeTxOutput(output).length + MIN_ADA_CONSTANT_OVERHEAD + sizeDiff) * coinsPerUtxoByte;
+      BigInt(serializeTxOutputSize(output) + MIN_ADA_CONSTANT_OVERHEAD + sizeDiff) * coinsPerUtxoByte;
 
     const newCoinSize = serializeBigInt(tentativeMinAda.toString()).length;
 
@@ -122,7 +123,7 @@ export const minAdaRequired = (output: Cardano.TxOut, coinsPerUtxoByte: bigint):
 
   const sizeChange = latestSize - oldCoinSize;
 
-  return BigInt(serializeTxOutput(output).length + MIN_ADA_CONSTANT_OVERHEAD + sizeChange) * coinsPerUtxoByte;
+  return BigInt(serializeTxOutputSize(output) + MIN_ADA_CONSTANT_OVERHEAD + sizeChange) * coinsPerUtxoByte;
 };
 
 /**

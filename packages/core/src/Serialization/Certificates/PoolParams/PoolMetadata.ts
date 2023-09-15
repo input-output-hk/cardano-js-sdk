@@ -48,6 +48,7 @@ export class PoolMetadata {
 
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // pool_metadata = [url, pool_metadata_hash]
     writer.writeStartArray(EMBEDDED_GROUP_SIZE);
     writer.writeTextString(this.#url);

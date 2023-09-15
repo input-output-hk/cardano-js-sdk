@@ -6,13 +6,13 @@
       "name": "Apache 2.0",
       "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "version": "1.0.0"
+    "version": "2.0.0"
   },
   "paths": {
-    "/v1.0.0/utxo/health": {
+    "/v2.0.0/utxo/health": {
       "$ref": "../Http/schema.json#/paths/Health"
     },
-    "/v1.0.0/utxo/utxo-by-addresses": {
+    "/v2.0.0/utxo/utxo-by-addresses": {
       "post": {
         "summary": "UTxO search",
         "operationId": "utxoSearch",
@@ -54,7 +54,9 @@
   "components": {
     "schemas": {
       "TypifiedValue": {
-        "required": ["value"],
+        "required": [
+          "value"
+        ],
         "type": "object",
         "properties": {
           "value": {
@@ -73,7 +75,9 @@
         "example": "addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w"
       },
       "Value": {
-        "required": ["coins"],
+        "required": [
+          "coins"
+        ],
         "type": "object",
         "properties": {
           "coins": {
@@ -85,7 +89,11 @@
         }
       },
       "TxIn": {
-        "required": ["address", "index", "txId"],
+        "required": [
+          "address",
+          "index",
+          "txId"
+        ],
         "type": "object",
         "properties": {
           "address": {
@@ -108,7 +116,10 @@
         ]
       },
       "TxOut": {
-        "required": ["address", "value"],
+        "required": [
+          "address",
+          "value"
+        ],
         "type": "object",
         "properties": {
           "address": {
@@ -118,7 +129,13 @@
             "$ref": "#/components/schemas/Value"
           },
           "datum": {
+            "type": "object"
+          },
+          "datumHash": {
             "type": "string"
+          },
+          "scriptReference": {
+            "type": "object"
           }
         },
         "example": [
@@ -151,14 +168,15 @@
         }
       },
       "utxo_search_body": {
-        "required": ["addresses"],
+        "required": [
+          "addresses"
+        ],
         "type": "object",
         "properties": {
           "addresses": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Address"
-
             }
           }
         }

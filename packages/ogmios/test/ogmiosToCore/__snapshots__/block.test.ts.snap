@@ -1,21 +1,322 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`ogmiosToCore block babbage can translate from babbage block 1`] = `
+Object {
+  "body": Array [
+    Object {
+      "auxiliaryData": Object {
+        "blob": Map {
+          2n => "",
+        },
+        "scripts": Array [
+          Object {
+            "__type": "native",
+            "kind": 4,
+            "slot": 63725,
+          },
+        ],
+      },
+      "body": Object {
+        "auxiliaryDataHash": "bb30a42c1e62f0afda5f0a4e8a562f7a13a24cea00ee81917b86b89e801314aa",
+        "certificates": Array [
+          Object {
+            "__typename": "MirCertificate",
+            "pot": "reserve",
+            "quantity": 712n,
+          },
+          Object {
+            "__typename": "PoolRegistrationCertificate",
+            "poolParameters": Object {
+              "cost": 290n,
+              "id": "pool1kkhxvw4w4rjsq9tmma964lt0twsvu46e7lx5zq0uzvh4ge9n0hc",
+              "margin": Object {
+                "denominator": 2,
+                "numerator": 1,
+              },
+              "metadataJson": Object {
+                "hash": "2738e2233800ab7f82bd2212a9a55f52d4851f9147f161684c63e6655bedb562",
+                "url": "https://public.bladepool.com/metadata.json",
+              },
+              "owners": Array [],
+              "pledge": 229n,
+              "relays": Array [
+                Object {
+                  "__typename": "RelayByAddress",
+                  "ipv4": "192.0.2.1",
+                  "ipv6": "2001:db8::1",
+                  "port": undefined,
+                },
+                Object {
+                  "__typename": "RelayByName",
+                  "hostname": "foo.example.com",
+                  "port": undefined,
+                },
+              ],
+              "rewardAccount": "stake_test1urs2w9p3nqfv8amnhgzwchtt8l7dt2kc2qrgqkcy0vyz2sgcp89zz",
+              "vrf": "ee155ace9c40292074cb6aff8c9ccdd273c81648ff1149ef36bcea6ebb8a3e25",
+            },
+          },
+        ],
+        "collaterals": Array [
+          Object {
+            "index": 2,
+            "txId": "0268be9dbd0446eaa217e1dec8f399249305e551d7fc1437dd84521f74aa621c",
+          },
+        ],
+        "fee": 58n,
+        "inputs": Array [],
+        "mint": Map {
+          "0d94e174732ef9aae73f395ab44507bfa983d65023c11a951f0c32e4" => -1n,
+          "1d94e174732ef9aae73f395ab44507bfa983d65023c11a951f0c32e4" => 2n,
+        },
+        "outputs": Array [
+          Object {
+            "address": "addr1vxnyv36t3a2rzfs4q6mvyu7nqlr4dxjwkmykkskafg54yzsv3uzfs",
+            "datum": undefined,
+            "datumHash": "0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5",
+            "scriptReference": Object {
+              "__type": "plutus",
+              "bytes": "46010000220011",
+              "version": 1,
+            },
+            "value": Object {
+              "assets": Map {},
+              "coins": 2n,
+            },
+          },
+          Object {
+            "address": "addr1vxnyv36t3a2rzfs4q6mvyu7nqlr4dxjwkmykkskafg54yzsv3uzfs",
+            "datum": 123n,
+            "datumHash": undefined,
+            "scriptReference": Object {
+              "__type": "plutus",
+              "bytes": "46010000220011",
+              "version": 1,
+            },
+            "value": Object {
+              "assets": Map {},
+              "coins": 3n,
+            },
+          },
+        ],
+        "requiredExtraSignatures": Array [
+          "0d94e174732ef9aae73f395ab44507bfa983d65023c11a951f0c32e4",
+          "a646474b8f5431261506b6c273d307c7569a4eb6c96b42dd4a29520a",
+        ],
+        "scriptIntegrityHash": undefined,
+        "validityInterval": Object {
+          "invalidBefore": 78202,
+          "invalidHereafter": undefined,
+        },
+        "withdrawals": Array [
+          Object {
+            "quantity": 724n,
+            "stakeAddress": "stake1uxnyv36t3a2rzfs4q6mvyu7nqlr4dxjwkmykkskafg54yzssmuy4z",
+          },
+        ],
+      },
+      "id": "c32a4a4f5a4b540d4f79730ca0c658d9a8400be2173e0ba1dc8471004c1cb0db",
+      "inputSource": "collaterals",
+      "witness": Object {
+        "bootstrap": Array [
+          Object {
+            "addressAttributes": undefined,
+            "chainCode": "4d",
+            "key": "de46fb9f52d8a229e3cedc60002564a3d23309dbf21dfaabd38485c4538419b2",
+            "signature": "3f6d08a1b7ab7818a78be8d48ea828b0e9976258a4ca38157f628fe4de1f326a4ef403c40d0348864de77259be9a5c606af20b29ebe7f6aeb594ac40177728aa",
+          },
+          Object {
+            "addressAttributes": "mQ==",
+            "chainCode": "20",
+            "key": "fc1a29ed3f0a4c1a4036298831ce117a23b6b714abba83d0a093d0839e193c39",
+            "signature": "3f1984ded5b35198bcfceaa4d5f44b26cb8e6aa59cde74e578b06f9351bdb17563162374f199980423e52dde6c8b7e42bf4ca120ddbf557241b9a59b730809fe",
+          },
+        ],
+        "datums": Array [],
+        "redeemers": Array [
+          Object {
+            "data": Object {
+              "cbor": "a34160029f20a3419c204386a48244e21bd936202004a0ffa3a4435aed90040242b07a210523409f414d429b3f0440ffa09f034001ffa222234041b4d8668218da9f2341440302413eff4204e1a1d866821901939f23ffa0",
+              "data": Map {
+                Uint8Array [
+                  96,
+                ] => 2n,
+                Object {
+                  "cbor": "9f20a3419c204386a48244e21bd936202004a0ff",
+                  "items": Array [
+                    -1n,
+                    Object {
+                      "cbor": "a3419c204386a48244e21bd9362020",
+                      "data": Map {
+                        Uint8Array [
+                          156,
+                        ] => -1n,
+                        Uint8Array [
+                          134,
+                          164,
+                          130,
+                        ] => Uint8Array [
+                          226,
+                          27,
+                          217,
+                          54,
+                        ],
+                        -1n => -1n,
+                      },
+                    },
+                    4n,
+                    Object {
+                      "cbor": "a0",
+                      "data": Map {},
+                    },
+                  ],
+                } => Object {
+                  "cbor": "a3a4435aed90040242b07a210523409f414d429b3f0440ffa09f034001ffa222234041b4d8668218da9f2341440302413eff",
+                  "data": Map {
+                    Object {
+                      "cbor": "a4435aed90040242b07a21052340",
+                      "data": Map {
+                        Uint8Array [
+                          90,
+                          237,
+                          144,
+                        ] => 4n,
+                        2n => Uint8Array [
+                          176,
+                          122,
+                        ],
+                        -2n => 5n,
+                        -4n => Uint8Array [],
+                      },
+                    } => Object {
+                      "cbor": "9f414d429b3f0440ff",
+                      "items": Array [
+                        Uint8Array [
+                          77,
+                        ],
+                        Uint8Array [
+                          155,
+                          63,
+                        ],
+                        4n,
+                        Uint8Array [],
+                      ],
+                    },
+                    Object {
+                      "cbor": "a0",
+                      "data": Map {},
+                    } => Object {
+                      "cbor": "9f034001ff",
+                      "items": Array [
+                        3n,
+                        Uint8Array [],
+                        1n,
+                      ],
+                    },
+                    Object {
+                      "cbor": "a222234041b4",
+                      "data": Map {
+                        -3n => -4n,
+                        Uint8Array [] => Uint8Array [
+                          180,
+                        ],
+                      },
+                    } => Object {
+                      "cbor": "d8668218da9f2341440302413eff",
+                      "constructor": 218n,
+                      "fields": Object {
+                        "cbor": "9f2341440302413eff",
+                        "items": Array [
+                          -4n,
+                          Uint8Array [
+                            68,
+                          ],
+                          3n,
+                          2n,
+                          Uint8Array [
+                            62,
+                          ],
+                        ],
+                      },
+                    },
+                  },
+                },
+                Uint8Array [
+                  4,
+                  225,
+                ] => Object {
+                  "cbor": "a1d866821901939f23ffa0",
+                  "data": Map {
+                    Object {
+                      "cbor": "d866821901939f23ff",
+                      "constructor": 403n,
+                      "fields": Object {
+                        "cbor": "9f23ff",
+                        "items": Array [
+                          -4n,
+                        ],
+                      },
+                    } => Object {
+                      "cbor": "a0",
+                      "data": Map {},
+                    },
+                  },
+                },
+              },
+            },
+            "executionUnits": Object {
+              "memory": 6026711518256058000,
+              "steps": 4749668747002319000,
+            },
+            "index": 0,
+            "purpose": "spend",
+          },
+        ],
+        "scripts": Array [
+          Object {
+            "__type": "plutus",
+            "bytes": "46010000220011",
+            "version": 0,
+          },
+        ],
+        "signatures": Map {
+          "679b8abd1379729475da1c530dda8dc1bf9177eceae449a0a15e4f16f45399be" => "a3e2a2c4478afe7cd734fa593ce33f06841255656dc31d3acff48884ce9478d56314dd6ba8728de417413a798ab6e87f685fb917f8300b397728f08631c16e39",
+          "238287f3ea9a746513acbee2aeb1e980d9feead29bf8157b7756437ffbe8ee5b" => "1e639773425c0cfa6376d7326500efc574d9b87afba2296a4e12157ad83176ce7300600a921bed6087600b3a118ea905746a62cfe90649ea2aa00f46142aad7b",
+        },
+      },
+    },
+  ],
+  "fees": 58n,
+  "header": Object {
+    "blockNo": 4,
+    "hash": "ee155ace9c40292074cb6aff8c9ccdd273c81648ff1149ef36bcea6ebb8a3e25",
+    "slot": 6,
+  },
+  "issuerVk": "f6cc957f17046ce6de24c81d08e9381608ed1acc083284916252f76f65643eae",
+  "previousBlock": undefined,
+  "size": 2,
+  "totalOutput": 5n,
+  "txCount": 1,
+  "vrf": "vrf_vk1mdx46ssmatqxlp4uedjxlnvepts5l6kh20m2a6mtzu0ycnsergpq6653ra",
+}
+`;
+
 exports[`ogmiosToCore block can translate from allegra block 1`] = `
 Object {
   "body": Array [
     Object {
       "auxiliaryData": Object {
         "blob": Map {
-          2n => Map {
-            "list" => Array [
-              Map {
-                "int" => 9798604473814314674n,
-              },
-              Map {
-                "bytes" => "7a43",
-              },
-            ],
-          },
+          2n => Array [
+            9798604473814314674n,
+            Object {
+              "data": Array [
+                122,
+                67,
+              ],
+              "type": "Buffer",
+            },
+          ],
         },
         "scripts": Array [
           Object {
@@ -155,61 +456,22 @@ Object {
       "auxiliaryData": Object {
         "blob": Map {
           674n => Map {
-            "map" => Array [
-              Map {
-                "k" => Map {
-                  "string" => "msg",
-                },
-                "v" => Map {
-                  "list" => Array [
-                    Map {
-                      "string" => "Auto-Loop-Transaction #338666 by ATADA",
-                    },
-                    Map {
-                      "string" => "",
-                    },
-                    Map {
-                      "string" => "Live Epoch 16, we have 061h 17m 32s left until the next one",
-                    },
-                    Map {
-                      "string" => "It's Montag - 22 August 2022 - 12:42:28 in Austria",
-                    },
-                    Map {
-                      "string" => "",
-                    },
-                    Map {
-                      "string" => "📈 The current ADA Price on Kraken is: $0.451502 / ADA",
-                    },
-                    Map {
-                      "string" => "",
-                    },
-                    Map {
-                      "string" => "A random Zen-Quote for you: 🙏",
-                    },
-                    Map {
-                      "string" => "There are three classes of people: those who see. Those who see",
-                    },
-                    Map {
-                      "string" => "when they are shown. Those who do not see. - Leonardo da Vinci",
-                    },
-                    Map {
-                      "string" => "",
-                    },
-                    Map {
-                      "string" => "Node-Revision: 950c4e222086fed5ca53564e642434ce9307b0b9",
-                    },
-                    Map {
-                      "string" => "",
-                    },
-                    Map {
-                      "string" => "PreProd-Chain is awesome, have some fun! 😍",
-                    },
-                    Map {
-                      "string" => " Best regards, Martin :-)",
-                    },
-                  ],
-                },
-              },
+            "msg" => Array [
+              "Auto-Loop-Transaction #338666 by ATADA",
+              "",
+              "Live Epoch 16, we have 061h 17m 32s left until the next one",
+              "It's Montag - 22 August 2022 - 12:42:28 in Austria",
+              "",
+              "📈 The current ADA Price on Kraken is: $0.451502 / ADA",
+              "",
+              "A random Zen-Quote for you: 🙏",
+              "There are three classes of people: those who see. Those who see",
+              "when they are shown. Those who do not see. - Leonardo da Vinci",
+              "",
+              "Node-Revision: 950c4e222086fed5ca53564e642434ce9307b0b9",
+              "",
+              "PreProd-Chain is awesome, have some fun! 😍",
+              " Best regards, Martin :-)",
             ],
           },
         },
@@ -307,181 +569,6 @@ Object {
   "totalOutput": 8287924709n,
   "txCount": 1,
   "vrf": "vrf_vk1p8s5ysf7dgsvfrw0p0q7zczdytkxc95zsq3p9sfshk9s3z86jfdql5fdft",
-}
-`;
-
-exports[`ogmiosToCore block can translate from babbage block 1`] = `
-Object {
-  "body": Array [
-    Object {
-      "auxiliaryData": Object {
-        "blob": Map {
-          2n => Map {
-            "string" => "",
-          },
-        },
-        "scripts": Array [
-          Object {
-            "__type": "native",
-            "kind": 4,
-            "slot": 63725,
-          },
-        ],
-      },
-      "body": Object {
-        "auxiliaryDataHash": "bb30a42c1e62f0afda5f0a4e8a562f7a13a24cea00ee81917b86b89e801314aa",
-        "certificates": Array [
-          Object {
-            "__typename": "MirCertificate",
-            "pot": "reserve",
-            "quantity": 712n,
-          },
-          Object {
-            "__typename": "PoolRegistrationCertificate",
-            "poolParameters": Object {
-              "cost": 290n,
-              "id": "pool1kkhxvw4w4rjsq9tmma964lt0twsvu46e7lx5zq0uzvh4ge9n0hc",
-              "margin": Object {
-                "denominator": 2,
-                "numerator": 1,
-              },
-              "metadataJson": Object {
-                "hash": "2738e2233800ab7f82bd2212a9a55f52d4851f9147f161684c63e6655bedb562",
-                "url": "https://public.bladepool.com/metadata.json",
-              },
-              "owners": Array [],
-              "pledge": 229n,
-              "relays": Array [
-                Object {
-                  "__typename": "RelayByAddress",
-                  "ipv4": "192.0.2.1",
-                  "ipv6": "2001:db8::1",
-                  "port": undefined,
-                },
-                Object {
-                  "__typename": "RelayByName",
-                  "hostname": "foo.example.com",
-                  "port": undefined,
-                },
-              ],
-              "rewardAccount": "stake_test1urs2w9p3nqfv8amnhgzwchtt8l7dt2kc2qrgqkcy0vyz2sgcp89zz",
-              "vrf": "ee155ace9c40292074cb6aff8c9ccdd273c81648ff1149ef36bcea6ebb8a3e25",
-            },
-          },
-        ],
-        "collaterals": Array [
-          Object {
-            "index": 2,
-            "txId": "0268be9dbd0446eaa217e1dec8f399249305e551d7fc1437dd84521f74aa621c",
-          },
-        ],
-        "fee": 58n,
-        "inputs": Array [],
-        "mint": Map {
-          "0d94e174732ef9aae73f395ab44507bfa983d65023c11a951f0c32e4" => -1n,
-          "1d94e174732ef9aae73f395ab44507bfa983d65023c11a951f0c32e4" => 2n,
-        },
-        "outputs": Array [
-          Object {
-            "address": "addr1vxnyv36t3a2rzfs4q6mvyu7nqlr4dxjwkmykkskafg54yzsv3uzfs",
-            "datum": undefined,
-            "datumHash": "0f3abbc8fc19c2e61bab6059bf8a466e6e754833a08a62a6c56fe0e78f19d9d5",
-            "scriptReference": Object {
-              "__type": "plutus",
-              "bytes": "46010000220011",
-              "version": 1,
-            },
-            "value": Object {
-              "assets": Map {},
-              "coins": 2n,
-            },
-          },
-          Object {
-            "address": "addr1vxnyv36t3a2rzfs4q6mvyu7nqlr4dxjwkmykkskafg54yzsv3uzfs",
-            "datum": "187b",
-            "datumHash": undefined,
-            "scriptReference": Object {
-              "__type": "plutus",
-              "bytes": "46010000220011",
-              "version": 1,
-            },
-            "value": Object {
-              "assets": Map {},
-              "coins": 3n,
-            },
-          },
-        ],
-        "requiredExtraSignatures": Array [
-          "0d94e174732ef9aae73f395ab44507bfa983d65023c11a951f0c32e4",
-          "a646474b8f5431261506b6c273d307c7569a4eb6c96b42dd4a29520a",
-        ],
-        "scriptIntegrityHash": undefined,
-        "validityInterval": Object {
-          "invalidBefore": 78202,
-          "invalidHereafter": undefined,
-        },
-        "withdrawals": Array [
-          Object {
-            "quantity": 724n,
-            "stakeAddress": "stake1uxnyv36t3a2rzfs4q6mvyu7nqlr4dxjwkmykkskafg54yzssmuy4z",
-          },
-        ],
-      },
-      "id": "c32a4a4f5a4b540d4f79730ca0c658d9a8400be2173e0ba1dc8471004c1cb0db",
-      "inputSource": "collaterals",
-      "witness": Object {
-        "bootstrap": Array [
-          Object {
-            "addressAttributes": undefined,
-            "chainCode": "4d",
-            "key": "de46fb9f52d8a229e3cedc60002564a3d23309dbf21dfaabd38485c4538419b2",
-            "signature": "3f6d08a1b7ab7818a78be8d48ea828b0e9976258a4ca38157f628fe4de1f326a4ef403c40d0348864de77259be9a5c606af20b29ebe7f6aeb594ac40177728aa",
-          },
-          Object {
-            "addressAttributes": "mQ==",
-            "chainCode": "20",
-            "key": "fc1a29ed3f0a4c1a4036298831ce117a23b6b714abba83d0a093d0839e193c39",
-            "signature": "3f1984ded5b35198bcfceaa4d5f44b26cb8e6aa59cde74e578b06f9351bdb17563162374f199980423e52dde6c8b7e42bf4ca120ddbf557241b9a59b730809fe",
-          },
-        ],
-        "datums": Array [],
-        "redeemers": Array [
-          Object {
-            "data": "a34160029f20a3419c204386a48244e21bd936202004a0ffa3a4435aed90040242b07a210523409f414d429b3f0440ffa09f034001ffa222234041b4d8668218da9f2341440302413eff4204e1a1d866821901939f23ffa0",
-            "executionUnits": Object {
-              "memory": 6026711518256058000,
-              "steps": 4749668747002319000,
-            },
-            "index": 0,
-            "purpose": "spend",
-          },
-        ],
-        "scripts": Array [
-          Object {
-            "__type": "plutus",
-            "bytes": "46010000220011",
-            "version": 0,
-          },
-        ],
-        "signatures": Map {
-          "679b8abd1379729475da1c530dda8dc1bf9177eceae449a0a15e4f16f45399be" => "a3e2a2c4478afe7cd734fa593ce33f06841255656dc31d3acff48884ce9478d56314dd6ba8728de417413a798ab6e87f685fb917f8300b397728f08631c16e39",
-          "238287f3ea9a746513acbee2aeb1e980d9feead29bf8157b7756437ffbe8ee5b" => "1e639773425c0cfa6376d7326500efc574d9b87afba2296a4e12157ad83176ce7300600a921bed6087600b3a118ea905746a62cfe90649ea2aa00f46142aad7b",
-        },
-      },
-    },
-  ],
-  "fees": 58n,
-  "header": Object {
-    "blockNo": 4,
-    "hash": "ee155ace9c40292074cb6aff8c9ccdd273c81648ff1149ef36bcea6ebb8a3e25",
-    "slot": 6,
-  },
-  "issuerVk": "f6cc957f17046ce6de24c81d08e9381608ed1acc083284916252f76f65643eae",
-  "previousBlock": undefined,
-  "size": 2,
-  "totalOutput": 5n,
-  "txCount": 1,
-  "vrf": "vrf_vk1mdx46ssmatqxlp4uedjxlnvepts5l6kh20m2a6mtzu0ycnsergpq6653ra",
 }
 `;
 
@@ -613,11 +700,13 @@ Object {
     Object {
       "auxiliaryData": Object {
         "blob": Map {
-          1n => Map {
-            "int" => -16613019303347710699n,
-          },
-          2n => Map {
-            "bytes" => "6573",
+          1n => -16613019303347710699n,
+          2n => Object {
+            "data": Array [
+              101,
+              115,
+            ],
+            "type": "Buffer",
           },
         },
         "scripts": Array [],

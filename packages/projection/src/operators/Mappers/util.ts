@@ -1,4 +1,5 @@
-import { Logger, dummyLogger } from 'ts-log';
+import { Asset, Cardano, Handle } from '@cardano-sdk/core';
+import { InvalidStringError } from '@cardano-sdk/util';
 
 /**
  * Up to 100k transactions per block.
@@ -6,8 +7,8 @@ import { Logger, dummyLogger } from 'ts-log';
  */
 export const computeCompactTxId = (blockHeight: number, txIndex: number) => blockHeight * 100_000 + txIndex;
 
-export const logError = (error: unknown) => {
-  const logger: Logger = dummyLogger;
-  const message = error instanceof Error ? error.message : `Internal error: ${error}`;
-  logger.error(message);
+export const assetNameToUTF8Handle = (assetName: Cardano.AssetName): Handle => {
+  const handle = Cardano.AssetName.toUTF8(assetName);
+  if (!Asset.util.isValidHandle(handle)) throw new InvalidStringError(`Invalid handle ${handle}`);
+  return handle;
 };

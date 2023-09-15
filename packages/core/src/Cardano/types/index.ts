@@ -10,3 +10,4 @@ export * from './Asset';
 export * from './AuxiliaryData';
 export * from './Script';
 export * from './ProtocolParameters';
+export * from './PlutusData';

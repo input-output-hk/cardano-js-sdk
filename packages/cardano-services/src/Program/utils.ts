@@ -64,7 +64,7 @@ export const stringOptionToBoolean = (value: string, program: Programs, option: 
 // If typeorm provider is enabled we establish a DB connection though the TypeORM data source
 // Should be refactored when implement many typeorm providers and integrate with IOC dependency injection
 export const getDbPools = async (dnsResolver: DnsResolver, logger: Logger, args: ProviderServerArgs) =>
-  args.useTypeormStakePoolProvider
+  args.useTypeormStakePoolProvider || args.useTypeormAssetProvider
     ? {}
     : {
         healthCheck: await getPool(dnsResolver, logger, args),
@@ -72,11 +72,13 @@ export const getDbPools = async (dnsResolver: DnsResolver, logger: Logger, args:
       };
 
 export const getCardanoNode = async (dnsResolver: DnsResolver, logger: Logger, args: ProviderServerArgs) =>
-  serviceSetHas(args.serviceNames, cardanoNodeDependantServices) && !args.useTypeormStakePoolProvider
+  serviceSetHas(args.serviceNames, cardanoNodeDependantServices) &&
+  !args.useTypeormStakePoolProvider &&
+  !args.useTypeormAssetProvider
     ? await getOgmiosCardanoNode(dnsResolver, logger, args)
     : undefined;
 
 export const getGenesisData = async (args: ProviderServerArgs) =>
-  args.cardanoNodeConfigPath && !args.useTypeormStakePoolProvider
+  args.cardanoNodeConfigPath && !args.useTypeormStakePoolProvider && !args.useTypeormAssetProvider
     ? await loadGenesisData(args.cardanoNodeConfigPath)
     : undefined;

@@ -1,80 +1,27 @@
 import { Asset, Cardano } from '@cardano-sdk/core';
 import { Buffer } from 'buffer';
-import { HexBlob } from '@cardano-sdk/util';
 import { Mappers, ProjectionEvent } from '../../../src';
+import {
+  assetIdFromHandle,
+  bobAddress,
+  bobHandleOne,
+  bobHandleTwo,
+  handleOutputs,
+  handlePolicyId,
+  maryAddress,
+  maryHandleOne,
+  referenceNftOutput,
+  userNftOutput
+} from './handleUtil';
 import { firstValueFrom, of } from 'rxjs';
-import { mockProviders } from '@cardano-sdk/util-dev';
-import { withHandles } from '../../../src/operators/Mappers';
+import { logger, mockProviders } from '@cardano-sdk/util-dev';
+import { withCIP67, withHandles, withUtxo } from '../../../src/operators/Mappers';
 
-const assetIdFromNameLabelAndPolicyId = (assetName: string, policyId: Cardano.PolicyId): Cardano.AssetId =>
-  Cardano.AssetId.fromParts(policyId, Cardano.AssetName(Buffer.from(assetName).toString('hex')));
-
-const handlePolicyId = mockProviders.handlePolicyId;
-const assetIdFromHandle = (handle: string) => assetIdFromNameLabelAndPolicyId(handle, handlePolicyId);
+type In = Mappers.WithMint & Mappers.WithCIP67 & Mappers.WithNftMetadata;
 
 describe('withHandles', () => {
-  const bobAddress = Cardano.PaymentAddress('addr_test1wzlv9cslk9tcj0wpm9p5t6kajyt37ap5sc9rzkaxa9p67ys2ygypv');
-  const maryAddress = Cardano.PaymentAddress(
-    'addr_test1qretqkqqvc4dax3482tpjdazrfl8exey274m3mzch3dv8lu476aeq3kd8q8splpsswcfmv4y370e8r76rc8lnnhte49qqyjmtc'
-  );
-  const bobHandleOne = 'bob.handle.one';
-  const bobHandleTwo = 'bob.handle.two';
-  const maryHandleOne = 'mary.handle.one';
-  const outputs = {
-    maryHandleToBob: {
-      address: bobAddress,
-      value: {
-        assets: new Map([[assetIdFromHandle(maryHandleOne), 1n]]),
-        coins: 25_485_292n
-      }
-    },
-    noHandlesCoinsOnly: {
-      address: 'addr_test1vptwv4jvaqt635jvthpa29lww3vkzypm8l6vk4lv4tqfhhgajdgwf',
-      value: {
-        coins: 74_341_815n
-      }
-    },
-    noHandlesEmptyAssets: {
-      address: 'addr_test1vptwv4jvaqt635jvthpa29lww3vkzypm8l6vk4lv4tqfhhgajdgwf',
-      value: {
-        assets: new Map(),
-        coins: 74_341_815n
-      }
-    },
-    noHandlesOtherAsset: {
-      address: 'addr_test1vptwv4jvaqt635jvthpa29lww3vkzypm8l6vk4lv4tqfhhgajdgwf',
-      value: {
-        assets: new Map([
-          [
-            Cardano.AssetId('8f78a4388b1a3e1a1435257e9356fa0c2cc0d3a5999d63b5886c96435365636f6e6454657374746f6b656e'),
-            3n
-          ]
-        ]),
-        coins: 74_341_815n
-      }
-    },
-    oneHandleMary: {
-      address: maryAddress,
-      value: {
-        assets: new Map([[assetIdFromHandle(maryHandleOne), 1n]]),
-        coins: 25_485_292n
-      }
-    },
-    twoHandlesBob: {
-      address: bobAddress,
-      datumHash: '99c170cc1247e7b7971e194c7e400e219360d3991cb588e9833f77ee9edbbd06' as Cardano.DatumHash,
-      value: {
-        assets: new Map([
-          [assetIdFromHandle(bobHandleOne), 1n],
-          [assetIdFromHandle(bobHandleTwo), 1n]
-        ]),
-        coins: 1_724_100n
-      }
-    }
-  };
-
   it('sets "datum" property on the handle if utxo has datum', async () => {
-    const datum = HexBlob('123abc');
+    const datum = Buffer.from('123abc', 'hex');
     const outputsWithDatum: Cardano.TxOut[] = [
       {
         address: Cardano.PaymentAddress(
@@ -88,30 +35,20 @@ describe('withHandles', () => {
       }
     ];
     const validTxSource$ = of({
-      block: { body: [{ body: { outputs: outputsWithDatum } }] }
-    } as ProjectionEvent<Mappers.WithMint>);
-    const { handles } = await firstValueFrom(
-      validTxSource$.pipe(
-        withHandles({
-          policyIds: [handlePolicyId]
-        })
-      )
-    );
+      block: { body: [{ body: { outputs: outputsWithDatum } }] },
+      cip67: { byAssetId: {}, byLabel: {} }
+    } as ProjectionEvent<In>);
+    const { handles } = await firstValueFrom(validTxSource$.pipe(withHandles({ policyIds: [handlePolicyId] }, logger)));
 
     expect(handles[0].datum).toEqual(datum);
   });
 
   it('includes a handle with "null" address, when transaction burns a handle', async () => {
     const validTxSource$ = of({
-      block: { body: [{ body: { mint: new Map([[assetIdFromHandle('bob'), -1n]]), outputs: [] as Cardano.TxOut[] } }] }
-    } as ProjectionEvent<Mappers.WithMint>);
-    const { handles } = await firstValueFrom(
-      validTxSource$.pipe(
-        withHandles({
-          policyIds: [handlePolicyId]
-        })
-      )
-    );
+      block: { body: [{ body: { mint: new Map([[assetIdFromHandle('bob'), -1n]]), outputs: [] as Cardano.TxOut[] } }] },
+      cip67: { byAssetId: {}, byLabel: {} }
+    } as ProjectionEvent<In>);
+    const { handles } = await firstValueFrom(validTxSource$.pipe(withHandles({ policyIds: [handlePolicyId] }, logger)));
     expect(handles.length).toBe(1);
     expect(handles[0].latestOwnerAddress).toBeNull();
   });
@@ -122,25 +59,24 @@ describe('withHandles', () => {
         body: [
           {
             body: {
-              outputs: [outputs.twoHandlesBob, outputs.noHandlesOtherAsset]
+              outputs: [handleOutputs.twoHandlesBob, handleOutputs.noHandlesOtherAsset]
             }
           },
           {
             body: {
-              outputs: [outputs.oneHandleMary, outputs.noHandlesEmptyAssets, outputs.noHandlesCoinsOnly]
+              outputs: [
+                handleOutputs.oneHandleMary,
+                handleOutputs.noHandlesEmptyAssets,
+                handleOutputs.noHandlesCoinsOnly
+              ]
             }
           }
         ]
-      }
-    } as ProjectionEvent<Mappers.WithMint>);
+      },
+      cip67: { byAssetId: {}, byLabel: {} }
+    } as ProjectionEvent<In>);
 
-    const { handles } = await firstValueFrom(
-      validTxSource$.pipe(
-        withHandles({
-          policyIds: [handlePolicyId]
-        })
-      )
-    );
+    const { handles } = await firstValueFrom(validTxSource$.pipe(withHandles({ policyIds: [handlePolicyId] }, logger)));
 
     expect(handles).toEqual(
       expect.arrayContaining([
@@ -177,15 +113,16 @@ describe('withHandles', () => {
             {
               body: {
                 mint: new Map([[assetIdFromHandle(maryHandleOne), 1n]]),
-                outputs: [outputs.oneHandleMary]
+                outputs: [handleOutputs.oneHandleMary]
               } as Cardano.TxBody
             } as Cardano.OnChainTx,
-            { body: { outputs: [outputs.maryHandleToBob] } as Cardano.TxBody } as Cardano.OnChainTx
+            { body: { outputs: [handleOutputs.maryHandleToBob] } as Cardano.TxBody } as Cardano.OnChainTx
           ],
           header: { blockNo } as Cardano.PartialBlockHeader
-        } as Cardano.Block
-      } as ProjectionEvent<Mappers.WithMint>;
-      const { handles } = await firstValueFrom(of(evt).pipe(withHandles({ policyIds: [handlePolicyId] })));
+        } as Cardano.Block,
+        cip67: { byAssetId: {}, byLabel: {} }
+      } as ProjectionEvent<In>;
+      const { handles } = await firstValueFrom(of(evt).pipe(withHandles({ policyIds: [handlePolicyId] }, logger)));
       expect(handles.length).toBe(1);
       expect(handles[0].latestOwnerAddress).toBe(bobAddress);
     });
@@ -197,7 +134,7 @@ describe('withHandles', () => {
             {
               body: {
                 mint: new Map([[assetIdFromHandle(maryHandleOne), 1n]]),
-                outputs: [outputs.oneHandleMary]
+                outputs: [handleOutputs.oneHandleMary]
               } as Cardano.TxBody
             } as Cardano.OnChainTx,
             {
@@ -208,9 +145,10 @@ describe('withHandles', () => {
             } as Cardano.OnChainTx
           ],
           header: { blockNo } as Cardano.PartialBlockHeader
-        } as Cardano.Block
-      } as ProjectionEvent<Mappers.WithMint>;
-      const { handles } = await firstValueFrom(of(evt).pipe(withHandles({ policyIds: [handlePolicyId] })));
+        } as Cardano.Block,
+        cip67: { byAssetId: {}, byLabel: {} }
+      } as ProjectionEvent<In>;
+      const { handles } = await firstValueFrom(of(evt).pipe(withHandles({ policyIds: [handlePolicyId] }, logger)));
       expect(handles.length).toBe(1);
       expect(handles[0].latestOwnerAddress).toBe(null);
     });
@@ -248,15 +186,12 @@ describe('withHandles', () => {
               }
             }
           ]
-        }
-      } as ProjectionEvent<Mappers.WithMint>);
+        },
+        cip67: { byAssetId: {}, byLabel: {} }
+      } as ProjectionEvent<In>);
 
       const { handles } = await firstValueFrom(
-        validTxSource$.pipe(
-          withHandles({
-            policyIds: [handlePolicyId]
-          })
-        )
+        validTxSource$.pipe(withHandles({ policyIds: [handlePolicyId] }, logger))
       );
 
       expect(handles.length).toBe(0);
@@ -272,15 +207,12 @@ describe('withHandles', () => {
               }
             }
           ]
-        }
-      } as ProjectionEvent<Mappers.WithMint>);
+        },
+        cip67: { byAssetId: {}, byLabel: {} }
+      } as ProjectionEvent<In>);
 
       const { handles } = await firstValueFrom(
-        validTxSource$.pipe(
-          withHandles({
-            policyIds: [handlePolicyId]
-          })
-        )
+        validTxSource$.pipe(withHandles({ policyIds: [handlePolicyId] }, logger))
       );
 
       expect(handles.length).toBe(1);
@@ -297,22 +229,63 @@ describe('withHandles', () => {
             },
             {
               body: {
-                outputs: [outputs.oneHandleMary]
+                outputs: [handleOutputs.oneHandleMary]
               }
             }
           ]
-        }
-      } as ProjectionEvent<Mappers.WithMint>);
+        },
+        cip67: { byAssetId: {}, byLabel: {} }
+      } as ProjectionEvent<In>);
 
       const { handles } = await firstValueFrom(
-        validTxSource$.pipe(
-          withHandles({
-            policyIds: [handlePolicyId]
-          })
-        )
+        validTxSource$.pipe(withHandles({ policyIds: [handlePolicyId] }, logger))
       );
 
       expect(handles.length).toBe(2);
+    });
+  });
+
+  describe('cip68', () => {
+    // eslint-disable-next-line unicorn/consistent-function-scoping
+    const project = (tx: Cardano.OnChainTx) =>
+      firstValueFrom(
+        of({
+          block: {
+            body: [tx],
+            header: mockProviders.ledgerTip
+          }
+        } as ProjectionEvent).pipe(withUtxo(), withCIP67(), withHandles({ policyIds: [handlePolicyId] }, logger))
+      );
+
+    it('does not change ownership when only reference token is present', async () => {
+      const { handles } = await project({
+        body: { outputs: [referenceNftOutput] },
+        inputSource: Cardano.InputSource.inputs
+      } as Cardano.OnChainTx);
+
+      expect(handles).toHaveLength(0);
+    });
+
+    it('changes latestOwnerAddress when only user token is not present', async () => {
+      const { handles } = await project({
+        body: { outputs: [userNftOutput] },
+        inputSource: Cardano.InputSource.inputs
+      } as Cardano.OnChainTx);
+
+      expect(handles).toHaveLength(1);
+      expect(handles[0].handle).toBe(maryHandleOne);
+      expect(handles[0].latestOwnerAddress).toBe(maryAddress);
+    });
+
+    it('changes latestOwnerAddress when both reference and user tokens are present', async () => {
+      const { handles } = await project({
+        body: { outputs: [userNftOutput, referenceNftOutput] },
+        inputSource: Cardano.InputSource.inputs
+      } as Cardano.OnChainTx);
+
+      expect(handles).toHaveLength(1);
+      expect(handles[0].handle).toBe(maryHandleOne);
+      expect(handles[0].latestOwnerAddress).toBe(maryAddress);
     });
   });
 });

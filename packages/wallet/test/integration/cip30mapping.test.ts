@@ -14,16 +14,7 @@ import {
 } from '@cardano-sdk/dapp-connector';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
-import {
-  CML,
-  Cardano,
-  CardanoNodeErrors,
-  Serialization,
-  TxCBOR,
-  cmlToCore,
-  coalesceValueQuantities,
-  coreToCml
-} from '@cardano-sdk/core';
+import { CML, Cardano, CardanoNodeErrors, Serialization, TxCBOR, coalesceValueQuantities } from '@cardano-sdk/core';
 import { CallbackConfirmation, GetCollateralCallbackParams } from '../../src/cip30';
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence';
@@ -177,33 +168,22 @@ describe('cip30', () => {
           const utxos = await api.getUtxos();
           expect(utxos?.length).toBe((await firstValueFrom(wallet.utxo.available$)).length);
           expect(() =>
-            cmlToCore.utxo(
-              utxos!.map((utxo) => scope.manage(CML.TransactionUnspentOutput.from_bytes(Buffer.from(utxo, 'hex'))))
-            )
+            utxos!.map((utxo) => Serialization.TransactionUnspentOutput.fromCbor(HexBlob(utxo)))
           ).not.toThrow();
         });
 
         describe('with "amount" argument', () => {
           const getUtxoFiltered = async (coins: Cardano.Lovelace, tslaQuantity?: bigint, paginate?: Paginate) => {
-            const filterAmountValue = scope.manage(CML.Value.new(scope.manage(CML.BigNum.from_str(coins.toString()))));
+            const filterAmountValue = new Serialization.Value(coins);
             if (tslaQuantity) {
-              const multiAsset = scope.manage(CML.MultiAsset.new());
-              const assets = scope.manage(CML.Assets.new());
-              assets.insert(
-                scope.manage(CML.AssetName.new(Buffer.from(Cardano.AssetId.getAssetName(AssetId.TSLA), 'hex'))),
-                scope.manage(CML.BigNum.from_str(tslaQuantity.toString()))
-              );
-              multiAsset.insert(
-                scope.manage(CML.ScriptHash.from_hex(Cardano.AssetId.getPolicyId(AssetId.TSLA))),
-                assets
-              );
-              filterAmountValue.set_multiasset(multiAsset);
+              const multiAsset = new Map();
+              multiAsset.set(AssetId.TSLA, tslaQuantity);
+              multiAsset.set(AssetId.TSLA, tslaQuantity);
+              filterAmountValue.setMultiasset(multiAsset);
             }
-            const utxoCbor = await api.getUtxos(Buffer.from(filterAmountValue.to_bytes()).toString('hex'), paginate);
+            const utxoCbor = await api.getUtxos(filterAmountValue.toCbor(), paginate);
             if (!utxoCbor) return null;
-            return cmlToCore.utxo(
-              utxoCbor.map((cbor) => scope.manage(CML.TransactionUnspentOutput.from_bytes(Buffer.from(cbor, 'hex'))))
-            );
+            return utxoCbor.map((utxo) => Serialization.TransactionUnspentOutput.fromCbor(HexBlob(utxo)).toCore());
           };
 
           it('returns just enough utxo to cover the amount', async () => {
@@ -346,11 +326,9 @@ describe('cip30', () => {
           mockCollateralCallback.mockClear();
         });
 
-        test('can handle an unknown error', async () => {
+        test('can handle serialization errors', async () => {
           // YYYY is invalid hex that will throw at serialization
-          await expect(api.getCollateral({ amount: 'YYYY' })).rejects.toThrowError(
-            expect.objectContaining({ code: APIErrorCode.InternalError, info: 'Unknown error' })
-          );
+          await expect(api.getCollateral({ amount: 'YYYY' })).rejects.toThrowError(ApiError);
         });
 
         it('executes collateral callback if provided and unspendable UTxOs do not meet amount required', async () => {
@@ -363,9 +341,7 @@ describe('cip30', () => {
             type: 'get_collateral'
           });
 
-          expect(collateral).toEqual(
-            coreToCml.utxo(scope, [mockUtxo[3]]).map((csl) => Buffer.from(csl.to_bytes()).toString('hex'))
-          );
+          expect(collateral).toEqual([Serialization.TransactionUnspentOutput.fromCore(mockUtxo[3]).toCbor()]);
           wallet5.shutdown();
         });
 
@@ -379,9 +355,7 @@ describe('cip30', () => {
             type: 'get_collateral'
           });
 
-          expect(collateral).toEqual(
-            coreToCml.utxo(scope, [mockUtxo[3]]).map((csl) => Buffer.from(csl.to_bytes()).toString('hex'))
-          );
+          expect(collateral).toEqual([Serialization.TransactionUnspentOutput.fromCore(mockUtxo[3]).toCbor()]);
           wallet6.shutdown();
         });
 
@@ -401,41 +375,38 @@ describe('cip30', () => {
         });
 
         test('returns multiple UTxOs when more than 1 utxo needed to satisfy amount', async () => {
-          // 1a003d0900 Represents a CML.BigNum object of 4 ADA
+          // 1a003d0900 Represents a BigNum object of 4 ADA
           const utxos = await api2.getCollateral({ amount: '1a003d0900' });
           // eslint-disable-next-line sonarjs/no-identical-functions
+
           expect(() =>
-            cmlToCore.utxo(
-              utxos!.map((utxo) => scope.manage(CML.TransactionUnspentOutput.from_bytes(Buffer.from(utxo, 'hex'))))
-            )
+            utxos!.map((utxo) => Serialization.TransactionUnspentOutput.fromCbor(HexBlob(utxo)))
           ).not.toThrow();
           expect(utxos).toHaveLength(2);
         });
 
         test('throws when there are not enough UTxOs', async () => {
-          // 1a004c4b40 Represents a CML.BigNum object of 5 ADA
+          // 1a004c4b40 Represents a BigNum object of 5 ADA
           await expect(api2.getCollateral({ amount: '1a004c4b40' })).rejects.toThrow(ApiError);
         });
 
         test('returns null when there are no "unspendable" UTxOs in the wallet', async () => {
-          // 1a003d0900 Represents a CML.BigNum object of 4 ADA
+          // 1a003d0900 Represents a BigNum object of 4 ADA
           expect(await api3.getCollateral({ amount: '1a003d0900' })).toBe(null);
           wallet3.shutdown();
         });
 
         test('throws when the given amount is greater than max amount', async () => {
-          // 1a005b8d80 Represents a CML.BigNum object of 6 ADA
+          // 1a005b8d80 Represents a BigNum object of 6 ADA
           await expect(api2.getCollateral({ amount: '1a005b8d80' })).rejects.toThrow(ApiError);
         });
 
         test('returns first UTxO when amount is 0', async () => {
-          // 00 Represents a CML.BigNum object of 0 ADA
+          // 00 Represents a BigNum object of 0 ADA
           const utxos = await api2.getCollateral({ amount: '00' });
           // eslint-disable-next-line sonarjs/no-identical-functions
           expect(() =>
-            cmlToCore.utxo(
-              utxos!.map((utxo) => scope.manage(CML.TransactionUnspentOutput.from_bytes(Buffer.from(utxo, 'hex'))))
-            )
+            utxos!.map((utxo) => Serialization.TransactionUnspentOutput.fromCbor(HexBlob(utxo)))
           ).not.toThrow();
         });
 
@@ -443,9 +414,7 @@ describe('cip30', () => {
           const utxos = await api.getCollateral();
           // eslint-disable-next-line sonarjs/no-identical-functions
           expect(() =>
-            cmlToCore.utxo(
-              utxos!.map((utxo) => scope.manage(CML.TransactionUnspentOutput.from_bytes(Buffer.from(utxo, 'hex'))))
-            )
+            utxos!.map((utxo) => Serialization.TransactionUnspentOutput.fromCbor(HexBlob(utxo)))
           ).not.toThrow();
           expect(utxos).toHaveLength(1);
         });
@@ -460,8 +429,8 @@ describe('cip30', () => {
       });
 
       test('api.getBalance', async () => {
-        const balanceCborBytes = Buffer.from(await api.getBalance(), 'hex');
-        expect(() => scope.manage(CML.Value.from_bytes(balanceCborBytes))).not.toThrow();
+        const balanceCborBytes = await api.getBalance();
+        expect(() => Serialization.Value.fromCbor(HexBlob(balanceCborBytes))).not.toThrow();
       });
 
       test('api.getUsedAddresses', async () => {
@@ -496,11 +465,10 @@ describe('cip30', () => {
       test('api.signTx', async () => {
         const txInternals = await wallet.initializeTx(simpleTxProps);
         const finalizedTx = await wallet.finalizeTx({ tx: txInternals });
-        const hexTx = scope.manage(Serialization.Transaction.fromCore(scope, finalizedTx)).toCbor();
+        const hexTx = Serialization.Transaction.fromCore(finalizedTx).toCbor();
 
         const cip30witnessSet = await api.signTx(hexTx);
-        const signatures = Buffer.from(cip30witnessSet, 'hex');
-        expect(() => scope.manage(CML.TransactionWitnessSet.from_bytes(signatures))).not.toThrow();
+        expect(() => Serialization.TransactionWitnessSet.fromCbor(HexBlob(cip30witnessSet))).not.toThrow();
       });
 
       test('api.signData', async () => {
@@ -518,7 +486,7 @@ describe('cip30', () => {
         beforeEach(async () => {
           const txInternals = await wallet.initializeTx(simpleTxProps);
           finalizedTx = await wallet.finalizeTx({ tx: txInternals });
-          hexTx = scope.manage(Serialization.Transaction.fromCore(scope, finalizedTx)).toCbor();
+          hexTx = Serialization.Transaction.fromCore(finalizedTx).toCbor();
           txBytes = Buffer.from(hexTx, 'hex');
         });
 
@@ -605,7 +573,7 @@ describe('cip30', () => {
         beforeAll(async () => {
           const txInternals = await wallet.initializeTx(simpleTxProps);
           const finalizedTx = await wallet.finalizeTx({ tx: txInternals });
-          hexTx = scope.manage(Serialization.Transaction.fromCore(scope, finalizedTx)).toCbor();
+          hexTx = Serialization.Transaction.fromCore(finalizedTx).toCbor();
         });
 
         test('resolves true', async () => {
@@ -625,29 +593,29 @@ describe('cip30', () => {
       });
 
       describe('submitTx', () => {
-        let cmlTx: string;
+        let serializedTx: string;
         let txInternals: InitializeTxResult;
         let finalizedTx: Cardano.Tx<Cardano.TxBody>;
 
         beforeAll(async () => {
           txInternals = await wallet.initializeTx(simpleTxProps);
           finalizedTx = await wallet.finalizeTx({ tx: txInternals });
-          cmlTx = scope.manage(Serialization.Transaction.fromCore(scope, finalizedTx)).toCbor();
+          serializedTx = Serialization.Transaction.fromCore(finalizedTx).toCbor();
         });
 
         test('resolves true', async () => {
           confirmationCallback.submitTx = jest.fn().mockResolvedValueOnce(true);
-          await expect(api.submitTx(cmlTx)).resolves.toBe(finalizedTx.id);
+          await expect(api.submitTx(serializedTx)).resolves.toBe(finalizedTx.id);
         });
 
         test('resolves false', async () => {
           confirmationCallback.submitTx = jest.fn().mockResolvedValueOnce(false);
-          await expect(api.submitTx(cmlTx)).rejects.toThrowError(TxSendError);
+          await expect(api.submitTx(serializedTx)).rejects.toThrowError(TxSendError);
         });
 
         test('rejects', async () => {
           confirmationCallback.submitTx = jest.fn().mockRejectedValue(1);
-          await expect(api.submitTx(cmlTx)).rejects.toThrowError(TxSendError);
+          await expect(api.submitTx(serializedTx)).rejects.toThrowError(TxSendError);
         });
       });
     });

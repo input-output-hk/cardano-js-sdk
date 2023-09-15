@@ -1,14 +1,17 @@
 /* eslint-disable complexity */
 /* eslint-disable sonarjs/cognitive-complexity */
-import { AssetHttpService } from '../../Asset/AssetHttpService';
+import {
+  AssetHttpService,
+  CardanoTokenRegistry,
+  DbSyncAssetProvider,
+  DbSyncNftMetadataService,
+  StubTokenMetadataService
+} from '../../Asset';
 import { CardanoNode, HandleProvider, Seconds } from '@cardano-sdk/core';
-import { CardanoTokenRegistry } from '../../Asset/CardanoTokenRegistry';
 import { ChainHistoryHttpService, DbSyncChainHistoryProvider } from '../../ChainHistory';
 import { ConnectionNames, PostgresOptionDescriptions, suffixType2Cli } from '../options/postgres';
 import { DbPools, DbSyncEpochPollService } from '../../util';
-import { DbSyncAssetProvider } from '../../Asset/DbSyncAssetProvider';
 import { DbSyncNetworkInfoProvider, NetworkInfoHttpService } from '../../NetworkInfo';
-import { DbSyncNftMetadataService, StubTokenMetadataService } from '../../Asset';
 import { DbSyncRewardsProvider, RewardsHttpService } from '../../Rewards';
 import { DbSyncStakePoolProvider, StakePoolHttpService, createHttpStakePoolMetadataService } from '../../StakePool';
 import { DbSyncUtxoProvider, UtxoHttpService } from '../../Utxo';
@@ -28,6 +31,7 @@ import { Pool } from 'pg';
 import { ProviderServerArgs, ProviderServerOptionDescriptions, ServiceNames } from './types';
 import { SrvRecord } from 'dns';
 import { TxSubmitHttpService } from '../../TxSubmit';
+import { TypeormAssetProvider } from '../../Asset/TypeormAssetProvider';
 import { TypeormStakePoolProvider } from '../../StakePool/TypeormStakePoolProvider/TypeormStakePoolProvider';
 import { URL } from 'url';
 import { createDbSyncMetadataService } from '../../Metadata';
@@ -47,6 +51,7 @@ export const USE_BLOCKFROST_DEFAULT = false;
 export const USE_TYPEORM_STAKE_POOL_PROVIDER_DEFAULT = false;
 export const USE_QUEUE_DEFAULT = false;
 export const HANDLE_PROVIDER_SERVER_URL_DEFAULT = '';
+export const USE_TYPEORM_ASSET_PROVIDER_DEFAULT = false;
 
 export interface LoadProviderServerDependencies {
   dnsResolver?: (serviceName: string) => Promise<SrvRecord>;
@@ -182,43 +187,63 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       sharedHandleProvider = await withTypeOrmProvider(
         'Handle',
         async (connectionConfig$) =>
-          new TypeOrmHandleProvider({ connectionConfig$, entities: getEntities(['handle']), logger })
+          new TypeOrmHandleProvider({ connectionConfig$, entities: getEntities(['handle', 'handleMetadata']), logger })
       )();
     }
 
     return sharedHandleProvider;
   };
 
-  return {
-    [ServiceNames.Asset]: withDbSyncProvider(async (dbPools, cardanoNode) => {
-      const ntfMetadataService = new DbSyncNftMetadataService({
-        db: dbPools.main,
-        logger,
-        metadataService: createDbSyncMetadataService(dbPools.main, logger)
-      });
-      const tokenMetadataService = args.tokenMetadataServerUrl?.startsWith('stub:')
-        ? new StubTokenMetadataService()
-        : new CardanoTokenRegistry({ logger }, args);
-      const assetProvider = new DbSyncAssetProvider(
-        {
-          cacheTTL: args.assetCacheTTL,
-          disableDbCache: args.disableDbCache,
-          paginationPageSizeLimit: Math.min(args.paginationPageSizeLimit! * 10, PAGINATION_PAGE_SIZE_LIMIT_ASSETS)
-        },
-        {
-          cache: {
-            healthCheck: healthCheckCache
-          },
-          cardanoNode,
-          dbPools,
-          logger,
-          ntfMetadataService,
-          tokenMetadataService
-        }
-      );
+  const getTypeormAssetProvider = withTypeOrmProvider('Asset', (connectionConfig$) => {
+    const tokenMetadataService = args.tokenMetadataServerUrl?.startsWith('stub:')
+      ? new StubTokenMetadataService()
+      : new CardanoTokenRegistry({ logger }, args);
 
+    return new TypeormAssetProvider(
+      { paginationPageSizeLimit: args.paginationPageSizeLimit! },
+      {
+        connectionConfig$,
+        entities: getEntities(['asset']),
+        logger,
+        tokenMetadataService
+      }
+    );
+  });
+
+  const getDbSyncAssetProvider = withDbSyncProvider((dbPools, cardanoNode) => {
+    const ntfMetadataService = new DbSyncNftMetadataService({
+      db: dbPools.main,
+      logger,
+      metadataService: createDbSyncMetadataService(dbPools.main, logger)
+    });
+
+    const tokenMetadataService = args.tokenMetadataServerUrl?.startsWith('stub:')
+      ? new StubTokenMetadataService()
+      : new CardanoTokenRegistry({ logger }, args);
+    return new DbSyncAssetProvider(
+      {
+        cacheTTL: args.assetCacheTTL,
+        disableDbCache: args.disableDbCache,
+        paginationPageSizeLimit: Math.min(args.paginationPageSizeLimit! * 10, PAGINATION_PAGE_SIZE_LIMIT_ASSETS)
+      },
+      {
+        cache: {
+          healthCheck: healthCheckCache
+        },
+        cardanoNode,
+        dbPools,
+        logger,
+        ntfMetadataService,
+        tokenMetadataService
+      }
+    );
+  }, ServiceNames.Asset);
+
+  return {
+    [ServiceNames.Asset]: async () => {
+      const assetProvider = args.useTypeormAssetProvider ? getTypeormAssetProvider() : getDbSyncAssetProvider();
       return new AssetHttpService({ assetProvider, logger });
-    }, ServiceNames.Asset),
+    },
     [ServiceNames.StakePool]: async () => {
       const stakePoolProvider = args.useTypeormStakePoolProvider
         ? getTypeormStakePoolProvider()

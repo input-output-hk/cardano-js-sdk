@@ -1,10 +1,14 @@
 import * as SelectionConstraints from './selectionConstraints';
-import { Asset, Cardano, cmlUtil, coalesceValueQuantities } from '@cardano-sdk/core';
+import { Asset, Cardano, coalesceValueQuantities } from '@cardano-sdk/core';
 import { AssetId } from '@cardano-sdk/util-dev';
 import { ImplicitValue, SelectionResult } from '../../src/types';
 import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelectionError';
 import { mintToImplicitTokens } from '../../src/util';
 import fc, { Arbitrary } from 'fast-check';
+
+export const MAX_U64 = 18_446_744_073_709_551_615n;
+export const MIN_I64 = -9_223_372_036_854_775_808n;
+export const MAX_I64 = 9_223_372_036_854_775_807n;
 
 const assertExtraChangeProperties = (
   { minimumCoinQuantity }: SelectionConstraints.MockSelectionConstraints,
@@ -174,8 +178,8 @@ export const generateSelectionParams = (() => {
     fc
       .array(
         fc.record<Cardano.Value>({
-          assets: fc.oneof(generateTokenMap(1n, cmlUtil.MAX_U64), fc.constant(void 0)),
-          coins: fc.bigInt(1n, cmlUtil.MAX_U64 - implicitCoin)
+          assets: fc.oneof(generateTokenMap(1n, MAX_U64), fc.constant(void 0)),
+          coins: fc.bigInt(1n, MAX_U64 - implicitCoin)
         }),
         { maxLength: 11 }
       )
@@ -183,8 +187,7 @@ export const generateSelectionParams = (() => {
         // sum of coin or any asset can't exceed MAX_U64
         const { coins, assets } = coalesceValueQuantities(values);
         return (
-          coins + implicitCoin <= cmlUtil.MAX_U64 &&
-          (!assets || [...assets.values()].every((quantity) => quantity <= cmlUtil.MAX_U64))
+          coins + implicitCoin <= MAX_U64 && (!assets || [...assets.values()].every((quantity) => quantity <= MAX_U64))
         );
       });
 
@@ -214,7 +217,7 @@ export const generateSelectionParams = (() => {
     fc.constant(void 0),
     fc.record<ImplicitValue>({
       coin: fc.oneof(fc.constant(void 0), generateImplicitCoin),
-      mint: fc.oneof(fc.constant(void 0), generateTokenMap(cmlUtil.MIN_I64, cmlUtil.MAX_I64))
+      mint: fc.oneof(fc.constant(void 0), generateTokenMap(MIN_I64, MAX_I64))
     })
   );
 

@@ -1,4 +1,4 @@
-import { HexBlob, OpaqueString, usingAutoFree } from '@cardano-sdk/util';
+import { HexBlob, OpaqueString } from '@cardano-sdk/util';
 import { Transaction } from '../Serialization';
 import type { TxCBOR } from './TxCBOR';
 
@@ -16,7 +16,4 @@ export const TxBodyCBOR = (tx: string): TxBodyCBOR => HexBlob(tx) as unknown as 
 /**
  * Extract transaction body CBOR without re-serializing
  */
-TxBodyCBOR.fromTxCBOR = (txCbor: TxCBOR) =>
-  Buffer.from(
-    usingAutoFree((scope) => scope.manage(scope.manage(Transaction.fromCbor(txCbor)).body()).to_bytes())
-  ).toString('hex') as unknown as TxBodyCBOR;
+TxBodyCBOR.fromTxCBOR = (txCbor: TxCBOR) => Transaction.fromCbor(txCbor).body().toCbor() as unknown as TxBodyCBOR;

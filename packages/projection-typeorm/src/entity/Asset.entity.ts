@@ -1,7 +1,8 @@
 import { BlockEntity } from './Block.entity';
 import { Cardano } from '@cardano-sdk/core';
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
-import { DeleteCascadeRelationOptions } from './util';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn } from 'typeorm';
+import { NftMetadataEntity } from './NftMetadata.entity';
+import { OnDeleteCascadeRelationOptions, OnDeleteSetNullRelationOptions } from './util';
 import { parseBigInt } from './transformers';
 
 @Entity()
@@ -13,7 +14,10 @@ export class AssetEntity {
     type: 'decimal'
   })
   supply?: bigint;
-  @ManyToOne(() => BlockEntity, DeleteCascadeRelationOptions)
+  @ManyToOne(() => BlockEntity, OnDeleteCascadeRelationOptions)
   @JoinColumn()
   firstMintBlock?: BlockEntity;
+  @OneToOne(() => NftMetadataEntity, OnDeleteSetNullRelationOptions)
+  @JoinColumn()
+  nftMetadata?: NftMetadataEntity | null;
 }

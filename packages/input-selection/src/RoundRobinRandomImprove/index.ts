@@ -1,10 +1,12 @@
-import { Cardano, cmlUtil } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { ChangeAddressResolver } from '../ChangeAddress';
 import { InputSelectionError, InputSelectionFailure } from '../InputSelectionError';
 import { InputSelectionParameters, InputSelector, SelectionResult } from '../types';
 import { assertIsBalanceSufficient, preProcessArgs, stubMaxSizeAddress, toValues } from '../util';
 import { computeChangeAndAdjustForFee } from './change';
 import { roundRobinSelection } from './roundRobin';
+
+export const MAX_U64 = 18_446_744_073_709_551_615n;
 
 interface RoundRobinRandomImproveOptions {
   changeAddressResolver: ChangeAddressResolver;
@@ -51,7 +53,7 @@ export const roundRobinRandomImprove = ({
                 value
               } as Cardano.TxOut)
           ),
-          fee: cmlUtil.MAX_U64,
+          fee: MAX_U64,
           inputs: new Set(utxos),
           outputs: outputSet
         }),

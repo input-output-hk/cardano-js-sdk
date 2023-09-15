@@ -1,7 +1,16 @@
-import { Datum, DatumHash, Script } from './Script';
+import * as Crypto from '@cardano-sdk/crypto';
 import { PaymentAddress } from './../Address';
+import { PlutusData } from './PlutusData';
+import { Script } from './Script';
 import { TransactionId } from './Transaction';
 import { Value } from './Value';
+
+/**
+ * Datum hash, this allows to specify a Datum without publicly revealing its value. To spend an output which specifies
+ * this type of datum, the actual Datum value must be provided and will be added to the witness set of
+ * the transaction.
+ */
+export type DatumHash = Crypto.Hash32ByteBase16;
 
 export interface TxIn {
   txId: TransactionId;
@@ -27,7 +36,7 @@ export interface TxOut {
    * The datum value can also be inlined in the output revealing the value on the blockchain at the time of output
    * creation. This way of attaching datums lets users consume this output without specifying the datum value.
    */
-  datum?: Datum;
+  datum?: PlutusData;
 
   /**
    * Reference scripts can be used to satisfy script requirements during validation, rather than requiring the spending

@@ -114,7 +114,7 @@ export const createUtxoTracker = (
     map((utxo) => {
       const uniqueUtxo = uniqWith(utxo, ([a], [b]) => a.txId === b.txId && a.index === b.index);
       if (uniqueUtxo.length !== utxo.length) {
-        logger.error('Found duplicate UTxO in', utxo);
+        logger.debug('Found duplicate UTxO in', utxo);
       }
       return uniqueUtxo;
     })
