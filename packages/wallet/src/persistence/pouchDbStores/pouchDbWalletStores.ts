@@ -26,6 +26,7 @@ export class PouchDbUtxoStore extends PouchDbCollectionStore<Cardano.Utxo> {}
 export class PouchDbRewardsHistoryStore extends PouchDbKeyValueStore<Cardano.RewardAccount, Reward[]> {}
 export class PouchDbStakePoolsStore extends PouchDbKeyValueStore<Cardano.PoolId, Cardano.StakePool> {}
 export class PouchDbRewardsBalancesStore extends PouchDbKeyValueStore<Cardano.RewardAccount, Cardano.Lovelace> {}
+export class PouchDbDelegationPortfolioStore extends PouchDbDocumentStore<Cardano.Cip17DelegationPortfolioUpdate[]> {}
 
 /**
  * @param {string} walletName used to derive underlying db names
@@ -39,6 +40,7 @@ export const createPouchDbWalletStores = (
   return {
     addresses: new PouchDbAddressesStore(docsDbName, 'addresses', logger),
     assets: new PouchDbAssetsStore(docsDbName, 'assets', logger),
+    delegationPortfolioUpdates: new PouchDbDelegationPortfolioStore(docsDbName, 'DelegationPortfolioUpdates', logger),
     destroy() {
       if (!this.destroyed) {
         // since the database of document stores is shared, destroying any document store destroys all of them

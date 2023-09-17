@@ -137,6 +137,7 @@ export interface TxContext {
   witness?: InitializeTxWitness;
   isValid?: boolean;
   handleResolutions?: HandleResolution[];
+  delegationPortfolioUpdate?: Cardano.Cip17DelegationPortfolioUpdate;
 }
 
 export type TxInspection = Cardano.TxBodyWithHash &
@@ -148,9 +149,12 @@ export interface SignedTx {
   cbor: TxCBOR;
   tx: Cardano.Tx;
   context: {
+    delegationPortfolioUpdate?: Cardano.Cip17DelegationPortfolioUpdate;
     handleResolutions: HandleResolution[];
   };
 }
+
+export type StoreDelegationPortfolioUpdate = (portfolioUpdate: Cardano.Cip17DelegationPortfolioUpdate | null) => void;
 
 /**
  * Transaction body built with {@link TxBuilder.build}
@@ -269,6 +273,7 @@ export interface TxBuilderDependencies {
   keyAgent: AsyncKeyAgent;
   txBuilderProviders: TxBuilderProviders;
   logger: Logger;
+  storeDelegationPortfolioUpdate?: StoreDelegationPortfolioUpdate;
   outputValidator?: OutputBuilderValidator;
   handleProvider?: HandleProvider;
 }

@@ -5,7 +5,9 @@ import {
   BalanceTracker,
   ConnectionStatus,
   ConnectionStatusTracker,
+  DelegatedStake,
   DelegationTracker,
+  DynamicChangeAddressResolver,
   FailedTx,
   HDSequentialDiscovery,
   OutgoingTx,
@@ -84,12 +86,7 @@ import {
   tap,
   throwError
 } from 'rxjs';
-import {
-  ChangeAddressResolver,
-  InputSelector,
-  StaticChangeAddressResolver,
-  roundRobinRandomImprove
-} from '@cardano-sdk/input-selection';
+import { ChangeAddressResolver, InputSelector, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
 import {
@@ -202,6 +199,7 @@ export class PersonalWallet implements ObservableWallet {
   #trackedTxSubmitProvider: TrackedTxSubmitProvider;
   #addressDiscovery: AddressDiscovery;
   #submittingPromises: Partial<Record<Cardano.TransactionId, Promise<Cardano.TransactionId>>> = {};
+  #stores: WalletStores;
 
   readonly keyAgent: AsyncKeyAgent;
   readonly currentEpoch$: TrackerSubject<EpochInfo>;
@@ -263,6 +261,7 @@ export class PersonalWallet implements ObservableWallet {
     }: PersonalWalletDependencies
   ) {
     this.#logger = contextLogger(logger, name);
+    this.#stores = stores;
 
     this.#addressDiscovery = addressDiscovery;
     this.#trackedTxSubmitProvider = new TrackedTxSubmitProvider(txSubmitProvider);
@@ -327,19 +326,6 @@ export class PersonalWallet implements ObservableWallet {
         )
       )
     );
-
-    this.#inputSelector = inputSelector
-      ? inputSelector
-      : roundRobinRandomImprove({
-          changeAddressResolver: new StaticChangeAddressResolver(() =>
-            firstValueFrom(
-              this.syncStatus.isSettled$.pipe(
-                filter((isSettled) => isSettled),
-                switchMap(() => this.addresses$)
-              )
-            )
-          )
-        });
 
     this.#tip$ = this.tip$ = new TipTracker({
       connectionStatus$: connectionStatusTracker$,
@@ -483,6 +469,22 @@ export class PersonalWallet implements ObservableWallet {
       utxoTracker: this.utxo
     });
 
+    // DynamicChangeAddressResolver falls back to static address resolver if delegation
+    // portfolio is not present.
+    this.#inputSelector = inputSelector
+      ? inputSelector
+      : roundRobinRandomImprove({
+          changeAddressResolver: new DynamicChangeAddressResolver(
+            this.syncStatus.isSettled$.pipe(
+              filter((isSettled) => isSettled),
+              switchMap(() => this.addresses$)
+            ),
+            this.delegation.distribution$,
+            () => this.getDelegationPortfolio(),
+            logger
+          )
+        });
+
     this.activePublicStakeKeys$ = createActivePublicStakeKeysTracker({
       addresses$: this.addresses$,
       keyAgent: this.keyAgent,
@@ -563,8 +565,9 @@ export class PersonalWallet implements ObservableWallet {
     this.#logger.debug(`Submitting transaction ${outgoingTx.id}`);
     this.#newTransactions.submitting$.next(outgoingTx);
     try {
+      const { handleResolutions } = outgoingTx.context || {};
       await this.txSubmitProvider.submitTx({
-        context: outgoingTx.context,
+        context: handleResolutions ? { handleResolutions } : undefined,
         signedTransaction: outgoingTx.cbor
       });
       const { slot: submittedAt } = await firstValueFrom(this.tip$);
@@ -608,6 +611,10 @@ export class PersonalWallet implements ObservableWallet {
     }
     return (this.#submittingPromises[outgoingTx.id] = (async () => {
       try {
+        // We only save the portfolio update if the multi delegation transaction is submitted to the network.
+        if (isSignedTx(input) && input.context.delegationPortfolioUpdate)
+          await this.#addPortfolioUpdate(input.context.delegationPortfolioUpdate);
+
         // Submit to provider only if it's either:
         // - an internal re-submission. External re-submissions are ignored,
         //   because PersonalWallet takes care of it internally.
@@ -628,6 +635,72 @@ export class PersonalWallet implements ObservableWallet {
   sync() {
     this.#tip$.sync();
   }
+
+  /**
+   * Gets the current delegation portfolio. This can be tricky, since we need to store/retrieve this portfolio from local storage,
+   * but it must match what's actually on chain, otherwise it will produce wrong results (I.E a portfolio that being displayed
+   * that doesn't match the users current delegation, or worse, a faulty balancing of change). This approach seems  like the more
+   * robust/tolerant to failure while still behaving reasonably well in all cases:
+   *
+   * We store a collection of portfolios with a timestamp (as a Cip17DelegationPortfolioUpdate object), every update just adds
+   * to the list, to pick the portfolio for re-balancing (or returning to the client) we just select the most recent portfolio
+   * that matches the current delegation of the wallet. This means that:
+   *
+   *   a.- If there is a block reorganization and the multi delegation is reverted on chain. We will fall back to the previous portfolio
+   *       which matches his current delegation.
+   *   a.- if the user is making a transaction right after the multi delegation transaction was issued, and this transaction gets picked
+   *       up first to be included. We will fall back to the previous portfolio which matches his current delegation.
+   *   b.- if the original multi delegation transaction fails (and the user was switching pools), we will fall back to the previous
+   *       portfolio which matches his current delegation (effectively rolling back the change which are no longer valid).
+   *   c.- if a transaction fails and the user keeps the same pools but different proportions, the redistribution of balance won't happen,
+   *       but at least the auto balancing algorithm will follow the user the latest delegation preferences.
+   *   d.- if the transaction succeeds then everything will work as expected.
+   *
+   * If no matching portfolio can be found for users current delegation state, this function will return a default portfolio which
+   * simply evenly distributes change to all stake addresses.
+   *
+   * If the wallet is delegating to a single pool, this function will return null.
+   */
+  async getDelegationPortfolio(): Promise<Cardano.Cip17DelegationPortfolio | null> {
+    if (!this.#stores) return null;
+
+    const delegationDistribution = [...(await firstValueFrom(this.delegation.distribution$)).values()];
+    if (delegationDistribution.length <= 1) return null;
+
+    const updates = (await firstValueFrom(this.#stores.delegationPortfolioUpdates.get())) ?? [];
+
+    const matchingEntries = updates.filter((entry) =>
+      PersonalWallet.#delegationMatchesPortfolio(entry, delegationDistribution)
+    );
+
+    if (matchingEntries.length === 0) {
+      const pools = delegationDistribution.map((stake) => ({
+        id: stake.pool.hexId,
+        weight: 1 / delegationDistribution.length
+      }));
+
+      return {
+        name: 'Default Portfolio',
+        pools
+      };
+    }
+
+    // sort ascending.
+    const sortedMatches = matchingEntries.sort((lhs, rhs) => rhs[0] - lhs[0]);
+    return sortedMatches[0][1];
+  }
+
+  /**
+   * Adds a new portfolio update.
+   *
+   * @param portfolioUpdate The portfolio update.
+   */
+  async #addPortfolioUpdate(portfolioUpdate: Cardano.Cip17DelegationPortfolioUpdate) {
+    const updates = await firstValueFrom(this.#stores.delegationPortfolioUpdates.get());
+    updates.push(portfolioUpdate);
+    this.#stores.delegationPortfolioUpdates.set(updates);
+  }
+
   shutdown() {
     this.utxo.shutdown();
     this.transactions.shutdown();
@@ -712,5 +785,22 @@ export class PersonalWallet implements ObservableWallet {
 
   async getPubDRepKey(): Promise<Ed25519PublicKeyHex> {
     return this.keyAgent.derivePublicKey(keyManagementUtil.DREP_KEY_DERIVATION_PATH);
+  }
+
+  /**
+   * Gets whether the portfolio pools matches the current stake distribution pools.
+   *
+   * @param portfolio The staking portfolio.
+   * @param distribution the distribution.
+   * @returns true if both matches, otherwise; false.
+   */
+  static #delegationMatchesPortfolio(
+    portfolio: Cardano.Cip17DelegationPortfolioUpdate,
+    distribution: DelegatedStake[]
+  ): boolean {
+    const portfolioPools = uniq(portfolio[1].pools.map((cip17Pool) => cip17Pool.id)).sort();
+    const delegationPools = uniq(distribution.map((delegatedStake) => delegatedStake.pool.hexId)).sort();
+
+    return isEqual(portfolioPools, delegationPools);
   }
 }

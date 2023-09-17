@@ -44,3 +44,6 @@ export interface Cip17DelegationPortfolio {
   description?: string;
   author?: string;
 }
+
+export type TimeStamp = number;
+export type Cip17DelegationPortfolioUpdate = [TimeStamp, Cip17DelegationPortfolio];

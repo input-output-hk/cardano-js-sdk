@@ -26,10 +26,12 @@ export class InMemoryUnspendableUtxoStore extends InMemoryCollectionStore<Cardan
 export class InMemoryRewardsHistoryStore extends InMemoryKeyValueStore<Cardano.RewardAccount, Reward[]> {}
 export class InMemoryStakePoolsStore extends InMemoryKeyValueStore<Cardano.PoolId, Cardano.StakePool> {}
 export class InMemoryRewardsBalancesStore extends InMemoryKeyValueStore<Cardano.RewardAccount, Cardano.Lovelace> {}
+export class InMemoryDelegationPortfolioStore extends InMemoryDocumentStore<Cardano.Cip17DelegationPortfolioUpdate[]> {}
 
 export const createInMemoryWalletStores = (): WalletStores => ({
   addresses: new InMemoryAddressesStore(),
   assets: new InMemoryAssetsStore(),
+  delegationPortfolioUpdates: new InMemoryDelegationPortfolioStore(),
   destroy() {
     if (!this.destroyed) {
       this.destroyed = true;

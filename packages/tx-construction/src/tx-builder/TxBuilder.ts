@@ -90,6 +90,7 @@ export class GenericTxBuilder implements TxBuilder {
   #logger: Logger;
   #handleProvider?: HandleProvider;
   #handleResolutions: HandleResolution[];
+  #delegationPortfolioUpdate?: Cardano.Cip17DelegationPortfolioUpdate;
 
   constructor(dependencies: TxBuilderDependencies) {
     this.#outputValidator =
@@ -144,7 +145,7 @@ export class GenericTxBuilder implements TxBuilder {
     });
   }
 
-  delegatePortfolio(portfolio: Pick<Cardano.Cip17DelegationPortfolio, 'pools'> | null): TxBuilder {
+  delegatePortfolio(portfolio: Cardano.Cip17DelegationPortfolio | null): TxBuilder {
     if (portfolio?.pools.length === 0) {
       throw new Error('Portfolio should define at least one delegation pool.');
     }
@@ -152,6 +153,9 @@ export class GenericTxBuilder implements TxBuilder {
       ...pool,
       id: Cardano.PoolId.fromKeyHash(pool.id as unknown as Crypto.Ed25519KeyHashHex)
     }));
+
+    if (portfolio) this.#delegationPortfolioUpdate = [Date.now().valueOf(), portfolio];
+
     return this;
   }
 
@@ -222,9 +226,11 @@ export class GenericTxBuilder implements TxBuilder {
               },
               dependencies
             );
+
             return {
               ctx: {
                 auxiliaryData,
+                delegationPortfolioUpdate: this.#delegationPortfolioUpdate,
                 handleResolutions: this.#handleResolutions,
                 ownAddresses,
                 signingOptions,

@@ -30,7 +30,15 @@ const getSignatures = async (
 
 export const finalizeTx = async (
   tx: Cardano.TxBodyWithHash,
-  { ownAddresses, witness, signingOptions, auxiliaryData, isValid, handleResolutions }: TxContext,
+  {
+    ownAddresses,
+    witness,
+    signingOptions,
+    auxiliaryData,
+    isValid,
+    handleResolutions,
+    delegationPortfolioUpdate
+  }: TxContext,
   { inputResolver, keyAgent }: FinalizeTxDependencies,
   stubSign = false
 ): Promise<SignedTx> => {
@@ -58,6 +66,7 @@ export const finalizeTx = async (
   return {
     cbor: TxCBOR.serialize(transaction),
     context: {
+      delegationPortfolioUpdate,
       handleResolutions: handleResolutions ?? []
     },
     tx: transaction

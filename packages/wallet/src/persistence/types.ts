@@ -79,6 +79,7 @@ export interface WalletStores extends Destroyable {
   rewardsHistory: KeyValueStore<Cardano.RewardAccount, Reward[]>;
   rewardsBalances: KeyValueStore<Cardano.RewardAccount, Cardano.Lovelace>;
   stakePools: KeyValueStore<Cardano.PoolId, Cardano.StakePool>;
+  delegationPortfolioUpdates: DocumentStore<Cardano.Cip17DelegationPortfolioUpdate[]>;
   protocolParameters: DocumentStore<Cardano.ProtocolParameters>;
   genesisParameters: DocumentStore<Cardano.CompactGenesis>;
   eraSummaries: DocumentStore<EraSummary[]>;

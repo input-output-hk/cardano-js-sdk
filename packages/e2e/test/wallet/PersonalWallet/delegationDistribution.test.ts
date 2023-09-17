@@ -95,7 +95,8 @@ const delegateToMultiplePools = async (
   weights = Array.from({ length: POOLS_COUNT }).map(() => 1)
 ) => {
   const poolIds = await getPoolIds(wallet);
-  const portfolio: Pick<Cardano.Cip17DelegationPortfolio, 'pools'> = {
+  const portfolio: Cardano.Cip17DelegationPortfolio = {
+    name: 'Tests Portfolio',
     pools: poolIds.map(({ hexId: id }, idx) => ({ id, weight: weights[idx] }))
   };
   logger.debug('Delegating portfolio', portfolio);
