@@ -1,12 +1,7 @@
 /* eslint-disable unicorn/consistent-destructuring, sonarjs/no-duplicate-string, @typescript-eslint/no-floating-promises, promise/no-nesting, promise/always-return */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, AsyncKeyAgent, GroupedAddress, SignBlobResult, util } from '@cardano-sdk/key-management';
-import {
-  AssetId,
-  createStubStakePoolProvider,
-  generateRandomHexString,
-  mockProviders as mocks
-} from '@cardano-sdk/util-dev';
+import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
+import { AssetId, StubKeyAgent, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { BehaviorSubject, Subscription, firstValueFrom, skip } from 'rxjs';
 import { CML, Cardano, CardanoNodeErrors, ProviderError, ProviderFailure, TxCBOR } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
@@ -18,48 +13,6 @@ import { dummyLogger as logger } from 'ts-log';
 import delay from 'delay';
 
 const { mockChainHistoryProvider, mockRewardsProvider, utxo } = mocks;
-
-class StubKeyAgent implements AsyncKeyAgent {
-  knownAddresses$ = new BehaviorSubject<GroupedAddress[]>([]);
-
-  constructor(private inputResolver: Cardano.InputResolver) {}
-
-  deriveAddress(): Promise<GroupedAddress> {
-    throw new Error('Method not implemented.');
-  }
-  derivePublicKey(): Promise<Crypto.Ed25519PublicKeyHex> {
-    throw new Error('Method not implemented.');
-  }
-  signBlob(): Promise<SignBlobResult> {
-    throw new Error('Method not implemented.');
-  }
-  async signTransaction(txInternals: Cardano.TxBodyWithHash): Promise<Cardano.Signatures> {
-    const signatures = new Map<Crypto.Ed25519PublicKeyHex, Crypto.Ed25519SignatureHex>();
-    const knownAddresses = await firstValueFrom(this.knownAddresses$);
-    for (const _ of await util.ownSignatureKeyPaths(txInternals.body, knownAddresses, this.inputResolver)) {
-      signatures.set(
-        Crypto.Ed25519PublicKeyHex(generateRandomHexString(64)),
-        Crypto.Ed25519SignatureHex(generateRandomHexString(128))
-      );
-    }
-    return signatures;
-  }
-  getChainId(): Promise<Cardano.ChainId> {
-    throw new Error('Method not implemented.');
-  }
-  getBip32Ed25519(): Promise<Crypto.Bip32Ed25519> {
-    throw new Error('Method not implemented.');
-  }
-  getExtendedAccountPublicKey(): Promise<Crypto.Bip32PublicKeyHex> {
-    throw new Error('Method not implemented.');
-  }
-  async setKnownAddresses(addresses: GroupedAddress[]): Promise<void> {
-    this.knownAddresses$.next(addresses);
-  }
-  shutdown(): void {
-    throw new Error('Method not implemented.');
-  }
-}
 
 // We can't consistently re-serialize this specific tx due to witness.datums list format
 const serializedForeignTx =
