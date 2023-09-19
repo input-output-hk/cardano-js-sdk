@@ -20,7 +20,6 @@ import {
 import { Ogmios, OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import { RabbitMQContainer } from '../../TxSubmit/rabbitmq/docker';
 import { SrvRecord } from 'dns';
-import { URL } from 'url';
 import { bufferToHexString } from '@cardano-sdk/util';
 import { createMockOgmiosServer } from '../../../../ogmios/test/mocks/mockOgmiosServer';
 import { getRandomPort } from 'get-port-please';

@@ -33,7 +33,6 @@ import { SrvRecord } from 'dns';
 import { TxSubmitHttpService } from '../../TxSubmit';
 import { TypeormAssetProvider } from '../../Asset/TypeormAssetProvider';
 import { TypeormStakePoolProvider } from '../../StakePool/TypeormStakePoolProvider/TypeormStakePoolProvider';
-import { URL } from 'url';
 import { createDbSyncMetadataService } from '../../Metadata';
 import { createLogger } from 'bunyan';
 import { getConnectionConfig, getOgmiosTxSubmitProvider, getRabbitMqTxSubmitProvider } from '../services';

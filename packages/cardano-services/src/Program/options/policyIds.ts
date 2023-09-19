@@ -1,5 +1,6 @@
 import { Cardano, NotImplementedError } from '@cardano-sdk/core';
-import { Command, Option } from 'commander';
+import { Command } from 'commander';
+import { addOptions, newOption } from './util';
 import { readFile } from 'fs/promises';
 
 const handlePolicyIdsParser = (policyIds: string) => policyIds.split(',').map(Cardano.PolicyId);
@@ -25,25 +26,23 @@ export const handlePolicyIdsFromFile = async (args: HandlePolicyIdsProgramOption
 };
 
 export const withHandlePolicyIdsOptions = (command: Command, maxPolicyIdsSupported?: number) =>
-  command
-    .addOption(
-      new Option('--handle-policy-ids <handlePolicyIds>', HandlePolicyIdsOptionDescriptions.HandlePolicyIds)
-        .env('HANDLE_POLICY_IDS')
-        .argParser((policyIds: string) => {
-          const policyIdsArray = handlePolicyIdsParser(policyIds);
+  addOptions(command, [
+    newOption(
+      '--handle-policy-ids <handlePolicyIds>',
+      HandlePolicyIdsOptionDescriptions.HandlePolicyIds,
+      'HANDLE_POLICY_IDS',
+      (policyIds: string) => {
+        const policyIdsArray = handlePolicyIdsParser(policyIds);
 
-          if (maxPolicyIdsSupported && policyIdsArray.length > maxPolicyIdsSupported) {
-            throw new NotImplementedError(`${policyIdsArray.length} policyIds are not supported`);
-          }
+        if (maxPolicyIdsSupported && policyIdsArray.length > maxPolicyIdsSupported)
+          throw new NotImplementedError(`${policyIdsArray.length} policyIds are not supported`);
 
-          return policyIdsArray;
-        })
-    )
-    .addOption(
-      new Option(
-        '--handle-policy-ids-file <handlePolicyIdsFile>',
-        HandlePolicyIdsOptionDescriptions.HandlePolicyIdsFile
-      )
-        .env('HANDLE_POLICY_IDS_FILE')
-        .conflicts('handlePolicyIds')
-    );
+        return policyIdsArray;
+      }
+    ),
+    newOption(
+      '--handle-policy-ids-file <handlePolicyIdsFile>',
+      HandlePolicyIdsOptionDescriptions.HandlePolicyIdsFile,
+      'HANDLE_POLICY_IDS_FILE'
+    ).conflicts('handlePolicyIds')
+  ]);
