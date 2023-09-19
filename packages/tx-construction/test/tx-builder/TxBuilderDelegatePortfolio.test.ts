@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, GroupedAddress, InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
 import { CML, Cardano } from '@cardano-sdk/core';
@@ -146,7 +147,10 @@ describe('TxBuilder/delegatePortfolio', () => {
 
     it('uses random improve input selector when delegating to a single pool', async () => {
       const tx = await txBuilder
-        .delegatePortfolio({ pools: [{ id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[0])), weight: 1 }] })
+        .delegatePortfolio({
+          name: 'Tests Portfolio',
+          pools: [{ id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[0])), weight: 1 }]
+        })
         .build()
         .inspect();
 
@@ -182,6 +186,7 @@ describe('TxBuilder/delegatePortfolio', () => {
     it('uses roundRobinRandomImprove when only one reward account is registered', async () => {
       await txBuilder
         .delegatePortfolio({
+          name: 'Tests Portfolio',
           pools: [
             {
               id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[0])),
@@ -225,6 +230,7 @@ describe('TxBuilder/delegatePortfolio', () => {
         output = { address: groupedAddresses[3].address, value: { coins: 10n } };
         tx = await txBuilder
           .delegatePortfolio({
+            name: 'Tests Portfolio',
             pools: [
               {
                 id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[0])),
@@ -305,6 +311,7 @@ describe('TxBuilder/delegatePortfolio', () => {
     it('does not change delegations when portfolio already satisfied, but updates distribution', async () => {
       const tx = await txBuilder
         .delegatePortfolio({
+          name: 'Tests Portfolio',
           pools: [
             {
               id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[0])),
@@ -333,6 +340,7 @@ describe('TxBuilder/delegatePortfolio', () => {
         and updates change addresses distribution`, async () => {
       const tx = await txBuilder
         .delegatePortfolio({
+          name: 'Tests Portfolio',
           pools: [
             {
               id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[2])),
@@ -365,6 +373,7 @@ describe('TxBuilder/delegatePortfolio', () => {
          and configures change addresses so funds go to the delegated address`, async () => {
       const tx = await txBuilder
         .delegatePortfolio({
+          name: 'Tests Portfolio',
           pools: [
             {
               id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[1])),
@@ -384,13 +393,14 @@ describe('TxBuilder/delegatePortfolio', () => {
     });
 
     it('portfolio with empty pools array is not a valid CIP17 portfolio', () => {
-      expect(() => txBuilder.delegatePortfolio({ pools: [] })).toThrow();
+      expect(() => txBuilder.delegatePortfolio({ name: 'Test Portfolio', pools: [] })).toThrow();
     });
 
     it('derives more stake keys when portfolio has more pools than available keys', async () => {
       const pools = poolIds.slice(0, 3);
       const tx = await txBuilder
         .delegatePortfolio({
+          name: 'Tests Portfolio',
           pools: pools.map((pool) => ({ id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(pool)), weight: 1 }))
         })
         .build()
@@ -421,6 +431,7 @@ describe('TxBuilder/delegatePortfolio', () => {
     it('portfolio is superset: adds certificates for the new delegations', async () => {
       const tx = await txBuilder
         .delegatePortfolio({
+          name: 'Tests Portfolio',
           pools: [
             {
               id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[0])),
@@ -451,6 +462,7 @@ describe('TxBuilder/delegatePortfolio', () => {
     it('changes delegation and deregisters stake keys that are not delegated', async () => {
       const tx = await txBuilder
         .delegatePortfolio({
+          name: 'Tests Portfolio',
           pools: [
             {
               id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[2])),
@@ -474,7 +486,8 @@ describe('TxBuilder/delegatePortfolio', () => {
   });
 
   describe('rewardAccount selection', () => {
-    const portfolio: Pick<Cardano.Cip17DelegationPortfolio, 'pools'> = {
+    const portfolio: Cardano.Cip17DelegationPortfolio = {
+      name: 'Tests Portfolio',
       pools: [{ id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[0])), weight: 1 }]
     };
 
@@ -535,6 +548,7 @@ describe('TxBuilder/delegatePortfolio', () => {
 
       const tx = await txBuilder
         .delegatePortfolio({
+          name: 'Tests Portfolio',
           pools: [
             { id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[2])), weight: 1 },
             { id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[3])), weight: 1 }
@@ -589,6 +603,30 @@ describe('TxBuilder/delegatePortfolio', () => {
         Cardano.createStakeKeyDeregistrationCert(groupedAddresses[0].rewardAccount)
       ]);
     });
+
+    it('attaches the portfolio as tx metadata', async () => {
+      const txBuilderFactory = await createTxBuilder({
+        keyAgent,
+        stakeKeyDelegations: [
+          { keyStatus: Cardano.StakeKeyStatus.Registered },
+          { keyStatus: Cardano.StakeKeyStatus.Registered, poolId: poolIds[1] }
+        ]
+      });
+      groupedAddresses = txBuilderFactory.groupedAddresses;
+      txBuilder = txBuilderFactory.txBuilder;
+
+      const tx = await txBuilder.delegatePortfolio(portfolio).build().inspect();
+
+      const certs = tx.body.certificates as Cardano.StakeDelegationCertificate[];
+      expect(certs.length).toBe(2);
+      expect(certs).toEqual<Cardano.Certificate[]>([
+        Cardano.createDelegationCert(groupedAddresses[1].rewardAccount, poolIds[0]),
+        Cardano.createStakeKeyDeregistrationCert(groupedAddresses[0].rewardAccount)
+      ]);
+
+      const metadata = tx.auxiliaryData!.blob!.get(Cardano.DelegationMetadataLabel);
+      expect(Cardano.cip17FromMetadatum(metadata!)).toEqual(portfolio);
+    });
   });
 
   describe('rewardAccount syncing', () => {
@@ -619,7 +657,10 @@ describe('TxBuilder/delegatePortfolio', () => {
 
       await expect(
         txBuilder
-          .delegatePortfolio({ pools: [{ id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[0])), weight: 1 }] })
+          .delegatePortfolio({
+            name: 'Test Portfolio',
+            pools: [{ id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[0])), weight: 1 }]
+          })
           .build()
           .inspect()
       ).resolves.toBeTruthy();
@@ -641,7 +682,10 @@ describe('TxBuilder/delegatePortfolio', () => {
 
       await expect(
         txBuilder
-          .delegatePortfolio({ pools: [{ id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[0])), weight: 1 }] })
+          .delegatePortfolio({
+            name: 'Test Portfolio',
+            pools: [{ id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[0])), weight: 1 }]
+          })
           .build()
           .inspect()
       ).rejects.toThrow(OutOfSyncRewardAccounts);

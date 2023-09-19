@@ -116,4 +116,5 @@ export interface DelegationTracker {
   rewardsHistory$: Observable<RewardsHistory>;
   rewardAccounts$: Observable<Cardano.RewardAccountInfo[]>;
   distribution$: Observable<Map<Cardano.PoolId, DelegatedStake>>;
+  portfolio$: Observable<Cardano.Cip17DelegationPortfolio | null>;
 }

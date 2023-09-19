@@ -21,6 +21,7 @@ const submitDelegationTx = async (wallet: PersonalWallet, pools: Cardano.PoolId[
   const { tx: signedTx } = await wallet
     .createTxBuilder()
     .delegatePortfolio({
+      name: 'Test Portfolio',
       pools: pools.map((poolId) => ({ id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolId)), weight: 1 }))
     })
     .build()

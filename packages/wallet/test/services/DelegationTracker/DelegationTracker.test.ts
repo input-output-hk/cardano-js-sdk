@@ -1,9 +1,9 @@
-import { Cardano, ChainHistoryProvider } from '@cardano-sdk/core';
+import { Cardano, ChainHistoryProvider, metadatum } from '@cardano-sdk/core';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { TransactionsTracker } from '../../../src/services';
+import { TransactionsTracker, createDelegationPortfolioTracker } from '../../../src/services';
 import { certificateTransactionsWithEpochs, createBlockEpochProvider } from '../../../src/services/DelegationTracker';
 import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
-import { createStubTxWithCertificates } from './stub-tx';
+import { createStubTxWithCertificates, createStubTxWithEpoch } from './stub-tx';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 
 jest.mock('@cardano-sdk/util-rxjs', () => {
@@ -124,6 +124,182 @@ describe('DelegationTracker', () => {
         );
         expectObservable(target$).toBe('-a', {
           a: []
+        });
+      });
+    });
+  });
+
+  describe('delegationPortfolio', () => {
+    const cip17DelegationPortfolio: Cardano.Cip17DelegationPortfolio = {
+      author: 'me',
+      name: 'My portfolio',
+      pools: [
+        {
+          id: '10000000000000000000000000000000000000000000000000000000' as Cardano.PoolIdHex,
+          weight: 1
+        },
+        {
+          id: '20000000000000000000000000000000000000000000000000000000' as Cardano.PoolIdHex,
+          weight: 1
+        }
+      ]
+    };
+
+    const cip17DelegationPortfolio2: Cardano.Cip17DelegationPortfolio = {
+      author: 'me',
+      name: 'My portfolio 2',
+      pools: [
+        {
+          id: '11000000000000000000000000000000000000000000000000000011' as Cardano.PoolIdHex,
+          weight: 1
+        }
+      ]
+    };
+
+    it('always returns the latest portfolio', () => {
+      createTestScheduler().run(({ cold, expectObservable }) => {
+        const rewardAccount = Cardano.RewardAccount('stake_test1upqykkjq3zhf4085s6n70w8cyp57dl87r0ezduv9rnnj2uqk5zmdv');
+
+        const transactions$ = cold('a-b-c-d', {
+          a: [
+            createStubTxWithEpoch(284, [
+              {
+                __typename: Cardano.CertificateType.StakeKeyRegistration,
+                stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+              }
+            ])
+          ],
+          b: [
+            createStubTxWithEpoch(284, [
+              {
+                __typename: Cardano.CertificateType.StakeKeyRegistration,
+                stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+              }
+            ]),
+            createStubTxWithEpoch(
+              285,
+              [
+                {
+                  __typename: Cardano.CertificateType.StakeKeyRegistration,
+                  stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+                }
+              ],
+              {
+                blob: new Map([[Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(cip17DelegationPortfolio)]])
+              }
+            )
+          ],
+          c: [
+            createStubTxWithEpoch(284, [
+              {
+                __typename: Cardano.CertificateType.StakeKeyRegistration,
+                stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+              }
+            ]),
+            createStubTxWithEpoch(
+              285,
+              [
+                {
+                  __typename: Cardano.CertificateType.StakeKeyRegistration,
+                  stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+                }
+              ],
+              {
+                blob: new Map([[Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(cip17DelegationPortfolio)]])
+              }
+            ),
+            createStubTxWithEpoch(286, [
+              {
+                __typename: Cardano.CertificateType.StakeKeyRegistration,
+                stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+              }
+            ])
+          ],
+          d: [
+            createStubTxWithEpoch(284, [
+              {
+                __typename: Cardano.CertificateType.StakeKeyRegistration,
+                stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+              }
+            ]),
+            createStubTxWithEpoch(
+              285,
+              [
+                {
+                  __typename: Cardano.CertificateType.StakeKeyRegistration,
+                  stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+                }
+              ],
+              {
+                blob: new Map([[Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(cip17DelegationPortfolio)]])
+              }
+            ),
+            createStubTxWithEpoch(286, [
+              {
+                __typename: Cardano.CertificateType.StakeKeyRegistration,
+                stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+              }
+            ]),
+            createStubTxWithEpoch(
+              287,
+              [
+                {
+                  __typename: Cardano.CertificateType.StakeKeyRegistration,
+                  stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+                }
+              ],
+              {
+                blob: new Map([[Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(cip17DelegationPortfolio2)]])
+              }
+            )
+          ]
+        });
+
+        const portfolio$ = createDelegationPortfolioTracker(transactions$);
+
+        expectObservable(portfolio$).toBe('a-b-c-d', {
+          a: null,
+          b: cip17DelegationPortfolio,
+          c: null,
+          d: cip17DelegationPortfolio2
+        });
+      });
+    });
+
+    it('returns null if the most recent transaction does not have the metadata', () => {
+      createTestScheduler().run(({ cold, expectObservable }) => {
+        const rewardAccount = Cardano.RewardAccount('stake_test1upqykkjq3zhf4085s6n70w8cyp57dl87r0ezduv9rnnj2uqk5zmdv');
+
+        const transactions$ = cold('a-b', {
+          a: [
+            createStubTxWithEpoch(
+              284,
+              [
+                {
+                  __typename: Cardano.CertificateType.StakeKeyRegistration,
+                  stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+                }
+              ],
+              {
+                blob: new Map([[Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(cip17DelegationPortfolio)]])
+              }
+            )
+          ],
+          b: [
+            createStubTxWithEpoch(286, [
+              {
+                __typename: Cardano.CertificateType.StakeKeyRegistration,
+                stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+              }
+            ])
+          ]
+        });
+
+        const portfolio$ = createDelegationPortfolioTracker(transactions$);
+
+        expectObservable(portfolio$).toBe('a-b', {
+          a: cip17DelegationPortfolio,
+          b: null
         });
       });
     });
