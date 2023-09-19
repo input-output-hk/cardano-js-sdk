@@ -8,6 +8,7 @@ import {
   StakeKeyRegistrationEntity,
   TokensEntity,
   TypeormStabilityWindowBuffer,
+  createObservableConnection,
   storeAddresses,
   storeAssets,
   storeBlock,
@@ -25,8 +26,9 @@ import {
   generateRandomHexString,
   logger
 } from '@cardano-sdk/util-dev';
-import { Observable, defer, firstValueFrom, from } from 'rxjs';
+import { Observable, firstValueFrom } from 'rxjs';
 import { QueryRunner, Repository } from 'typeorm';
+import { connectionConfig$, initializeDataSource } from '../util';
 import {
   createProjectorTilFirst,
   createRollForwardEventBasedOn,
@@ -34,7 +36,6 @@ import {
   createStubProjectionSource,
   createStubRollForwardEvent
 } from './util';
-import { initializeDataSource } from '../util';
 
 const isAddressWithBothCredentials = (addr: Mappers.Address) =>
   typeof addr.stakeCredential === 'string' && !!addr.paymentCredentialHash;
@@ -55,17 +56,13 @@ describe('storeAddresses', () => {
   ];
   let addressesRepo: Repository<AddressEntity>;
 
-  const dataSource$ = defer(() =>
-    from(initializeDataSource({ devOptions: { dropSchema: false, synchronize: false }, entities }))
-  );
-
   const storeData = (
     evt$: Observable<
       ProjectionEvent<Mappers.WithUtxo & Mappers.WithMint & Mappers.WithStakeKeyRegistrations & Mappers.WithAddresses>
     >
   ) =>
     evt$.pipe(
-      withTypeormTransaction({ dataSource$, logger }),
+      withTypeormTransaction({ connection$: createObservableConnection({ connectionConfig$, entities, logger }) }),
       storeBlock(),
       storeAssets(),
       storeUtxo(),

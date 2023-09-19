@@ -14,9 +14,21 @@ import { projectorConnectionConfig, projectorConnectionConfig$ } from '../util';
 describe('createTypeormProjection', () => {
   it('creates a projection to PostgreSQL based on requested projection names', async () => {
     // Setup
-    const data = chainSyncData(ChainSyncDataSet.WithMint);
-    const buffer = new TypeormStabilityWindowBuffer({ allowNonSequentialBlockHeights: true, logger });
     const projections = [ProjectionName.UTXO];
+    const buffer = new TypeormStabilityWindowBuffer({ allowNonSequentialBlockHeights: true, logger });
+    const { entities } = prepareTypeormProjection({ buffer, projections }, { logger });
+    const dataSource = createDataSource({
+      connectionConfig: projectorConnectionConfig,
+      devOptions: { dropSchema: true, synchronize: true },
+      entities,
+      logger
+    });
+    await dataSource.initialize();
+    const queryRunner = dataSource.createQueryRunner();
+    await queryRunner.connect();
+    const data = chainSyncData(ChainSyncDataSet.WithMint);
+    await buffer.initialize(queryRunner);
+
     const projection$ = createTypeormProjection({
       blocksBufferLength: 10,
       buffer,
@@ -36,11 +48,6 @@ describe('createTypeormProjection', () => {
     await lastValueFrom(projection$);
 
     // Check data in the database
-    const { entities } = prepareTypeormProjection({ buffer, projections }, { logger });
-    const dataSource = createDataSource({ connectionConfig: projectorConnectionConfig, entities, logger });
-    await dataSource.initialize();
-    const queryRunner = dataSource.createQueryRunner();
-    await queryRunner.connect();
     expect(await queryRunner.manager.count(AssetEntity)).toBeGreaterThan(0);
     expect(await queryRunner.manager.count(TokensEntity)).toBeGreaterThan(0);
     expect(await queryRunner.manager.count(OutputEntity)).toBeGreaterThan(0);

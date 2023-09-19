@@ -10,6 +10,7 @@ import {
   StakeKeyRegistrationEntity,
   TokensEntity,
   TypeormStabilityWindowBuffer,
+  createObservableConnection,
   storeAddresses,
   storeAssets,
   storeBlock,
@@ -22,9 +23,9 @@ import {
 import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger, mockProviders } from '@cardano-sdk/util-dev';
-import { Observable, defer, from } from 'rxjs';
+import { Observable } from 'rxjs';
+import { connectionConfig$ } from '../../util';
 import { createProjectorTilFirst, createStubProjectionSource } from '../util';
-import { initializeDataSource } from '../../util';
 
 export const stubEvents = chainSyncData(ChainSyncDataSet.WithHandle);
 export const policyId = Cardano.PolicyId('f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a');
@@ -70,10 +71,6 @@ export const entities = [
   NftMetadataEntity
 ];
 
-const dataSource$ = defer(() =>
-  from(initializeDataSource({ devOptions: { dropSchema: false, synchronize: false }, entities }))
-);
-
 const storeData =
   (buffer: TypeormStabilityWindowBuffer) =>
   (
@@ -84,7 +81,9 @@ const storeData =
     >
   ) =>
     evt$.pipe(
-      withTypeormTransaction({ dataSource$, logger }),
+      withTypeormTransaction({
+        connection$: createObservableConnection({ connectionConfig$, entities, logger })
+      }),
       storeBlock(),
       storeAssets(),
       storeUtxo(),

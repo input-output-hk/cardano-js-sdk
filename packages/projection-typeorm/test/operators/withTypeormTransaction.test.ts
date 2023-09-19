@@ -3,6 +3,7 @@ import {
   BlockDataEntity,
   BlockEntity,
   TypeormStabilityWindowBuffer,
+  connect,
   isRecoverableTypeormError,
   storeBlock,
   typeormTransactionCommit,
@@ -64,8 +65,7 @@ describe('withTypeormTransaction', () => {
     jest.fn((evt$: Observable<ProjectionEvent>) =>
       evt$.pipe(
         withTypeormTransaction({
-          dataSource$,
-          logger
+          connection$: dataSource$.pipe(connect({ logger }))
         }),
         storeBlock(),
         buffer.storeBlockData(),

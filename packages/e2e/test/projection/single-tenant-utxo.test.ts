@@ -4,7 +4,7 @@ import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/p
 import { Cardano, ObservableCardanoNode } from '@cardano-sdk/core';
 import { ConnectionConfig } from '@cardano-ogmios/client';
 import { DataSource, QueryRunner } from 'typeorm';
-import { Observable, filter, firstValueFrom, lastValueFrom, of, scan, takeWhile } from 'rxjs';
+import { Observable, defer, filter, firstValueFrom, lastValueFrom, of, scan, takeWhile } from 'rxjs';
 import { OgmiosObservableCardanoNode } from '@cardano-sdk/ogmios';
 import { createDatabase, dropDatabase } from 'typeorm-extension';
 import { getEnv } from '../../src';
@@ -104,7 +104,7 @@ describe('single-tenant utxo projection', () => {
     Bootstrap.fromCardanoNode({ blocksBufferLength: 10, buffer, cardanoNode, logger }).pipe(
       Mappers.withMint(),
       Mappers.withUtxo(),
-      Postgres.withTypeormTransaction({ dataSource$: of(dataSource), logger }),
+      Postgres.withTypeormTransaction({ connection$: defer(() => of({ queryRunner })) }),
       Postgres.storeBlock(),
       Postgres.storeAssets(),
       Postgres.storeUtxo(),
@@ -115,7 +115,7 @@ describe('single-tenant utxo projection', () => {
 
   const storeUtxo = (evt$: Observable<ProjectionEvent<Mappers.WithMint & Mappers.WithUtxo>>) =>
     evt$.pipe(
-      Postgres.withTypeormTransaction({ dataSource$: of(dataSource), logger }),
+      Postgres.withTypeormTransaction({ connection$: defer(() => of({ queryRunner })) }),
       Postgres.storeBlock(),
       Postgres.storeAssets(),
       Postgres.storeUtxo(),

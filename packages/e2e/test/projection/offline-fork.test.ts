@@ -21,8 +21,9 @@ import {
 } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { ConnectionConfig } from '@cardano-ogmios/client';
-import { Observable, filter, firstValueFrom, lastValueFrom, of, take, takeWhile, toArray } from 'rxjs';
+import { Observable, defer, filter, firstValueFrom, lastValueFrom, of, take, takeWhile, toArray } from 'rxjs';
 import { OgmiosObservableCardanoNode } from '@cardano-sdk/ogmios';
+import { QueryRunner } from 'typeorm';
 import { createDatabase } from 'typeorm-extension';
 import { getEnv } from '../../src';
 
@@ -202,6 +203,7 @@ describe('resuming projection when intersection is not local tip', () => {
         installExtensions: true
       }
     });
+    let queryRunner: QueryRunner;
 
     const getNumberOfLocalStakeKeys = async () => {
       const repository = dataSource.getRepository(Postgres.StakeKeyEntity);
@@ -217,7 +219,8 @@ describe('resuming projection when intersection is not local tip', () => {
         }
       });
       await dataSource.initialize();
-      await buffer.initialize(dataSource.createQueryRunner());
+      queryRunner = dataSource.createQueryRunner();
+      await buffer.initialize(queryRunner);
     });
     afterAll(() => dataSource.destroy());
 
@@ -225,7 +228,7 @@ describe('resuming projection when intersection is not local tip', () => {
       buffer,
       (evt$) =>
         evt$.pipe(
-          Postgres.withTypeormTransaction({ dataSource$: of(dataSource), logger }),
+          Postgres.withTypeormTransaction({ connection$: defer(() => of({ queryRunner })) }),
           Postgres.storeBlock(),
           Postgres.storeStakeKeys(),
           buffer.storeBlockData(),

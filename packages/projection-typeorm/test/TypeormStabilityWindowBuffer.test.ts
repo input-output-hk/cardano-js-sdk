@@ -2,6 +2,7 @@ import {
   BlockDataEntity,
   BlockEntity,
   TypeormStabilityWindowBuffer,
+  createObservableConnection,
   storeBlock,
   typeormTransactionCommit,
   withTypeormTransaction
@@ -22,11 +23,12 @@ import {
   takeWhile,
   toArray
 } from 'rxjs';
-import { initializeDataSource } from './util';
+import { connectionConfig$, initializeDataSource } from './util';
 
 const { cardanoNode, networkInfo } = chainSyncData(ChainSyncDataSet.WithStakeKeyDeregistration);
 
 describe('TypeormStabilityWindowBuffer', () => {
+  const entities = [BlockEntity, BlockDataEntity];
   const securityParameter = 50;
   const compactBufferEveryNBlocks = 100;
 
@@ -41,7 +43,7 @@ describe('TypeormStabilityWindowBuffer', () => {
   const getHeader = (tipOrTail: Cardano.Block | 'origin') => (tipOrTail as Cardano.Block).header;
 
   beforeEach(async () => {
-    dataSource = await initializeDataSource({ entities: [BlockEntity, BlockDataEntity] });
+    dataSource = await initializeDataSource({ entities });
     queryRunner = dataSource.createQueryRunner();
     buffer = new TypeormStabilityWindowBuffer({
       allowNonSequentialBlockHeights: false,
@@ -62,7 +64,7 @@ describe('TypeormStabilityWindowBuffer', () => {
         },
         logger
       }).pipe(
-        withTypeormTransaction({ dataSource$: of(dataSource), logger }),
+        withTypeormTransaction({ connection$: createObservableConnection({ connectionConfig$, entities, logger }) }),
         storeBlock(),
         buffer.storeBlockData(),
         typeormTransactionCommit(),

@@ -7,6 +7,7 @@ import {
   OutputEntity,
   TokensEntity,
   TypeormStabilityWindowBuffer,
+  createObservableConnection,
   storeAssets,
   storeBlock,
   storeHandleMetadata,
@@ -17,10 +18,10 @@ import {
 import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
 import { Cardano, ObservableCardanoNode } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
-import { Observable, defer, firstValueFrom, from } from 'rxjs';
+import { Observable, firstValueFrom } from 'rxjs';
 import { QueryRunner, Repository } from 'typeorm';
+import { connectionConfig$, initializeDataSource } from '../util';
 import { createProjectorTilFirst, createRollBackwardEventFor, createStubProjectionSource } from './util';
-import { initializeDataSource } from '../util';
 
 describe('storeHandleMetadata', () => {
   const eventsWithCip68Handle = chainSyncData(ChainSyncDataSet.WithInlineDatum);
@@ -40,15 +41,11 @@ describe('storeHandleMetadata', () => {
     HandleMetadataEntity
   ];
 
-  const dataSource$ = defer(() =>
-    from(initializeDataSource({ devOptions: { dropSchema: false, synchronize: false }, entities }))
-  );
-
   const storeData = (
     evt$: Observable<ProjectionEvent<Mappers.WithUtxo & Mappers.WithMint & Mappers.WithHandleMetadata>>
   ) =>
     evt$.pipe(
-      withTypeormTransaction({ dataSource$, logger }),
+      withTypeormTransaction({ connection$: createObservableConnection({ connectionConfig$, entities, logger }) }),
       storeBlock(),
       storeAssets(),
       storeUtxo(),

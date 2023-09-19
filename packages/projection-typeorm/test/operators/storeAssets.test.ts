@@ -4,6 +4,7 @@ import {
   BlockEntity,
   NftMetadataEntity,
   TypeormStabilityWindowBuffer,
+  createObservableConnection,
   storeAssets,
   storeBlock,
   typeormTransactionCommit,
@@ -12,24 +13,21 @@ import {
 import { Bootstrap, Mappers, requestNext } from '@cardano-sdk/projection';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
-import { DataSource, QueryRunner } from 'typeorm';
-import { Observable, of } from 'rxjs';
+import { QueryRunner } from 'typeorm';
+import { connectionConfig$, initializeDataSource } from '../util';
 import { createProjectorTilFirst } from './util';
-import { initializeDataSource } from '../util';
 
 describe('storeAssets', () => {
   const stubEvents = chainSyncData(ChainSyncDataSet.WithMint);
   let queryRunner: QueryRunner;
   let buffer: TypeormStabilityWindowBuffer;
-  let dataSource$: Observable<DataSource>;
   const entities = [BlockEntity, BlockDataEntity, AssetEntity, NftMetadataEntity];
 
   const project$ = () =>
     Bootstrap.fromCardanoNode({ blocksBufferLength: 10, buffer, cardanoNode: stubEvents.cardanoNode, logger }).pipe(
       Mappers.withMint(),
       withTypeormTransaction({
-        dataSource$,
-        logger
+        connection$: createObservableConnection({ connectionConfig$, entities, logger })
       }),
       storeBlock(),
       storeAssets(),
@@ -42,7 +40,6 @@ describe('storeAssets', () => {
 
   beforeEach(async () => {
     const dataSource = await initializeDataSource({ entities });
-    dataSource$ = of(dataSource);
     queryRunner = dataSource.createQueryRunner();
     buffer = new TypeormStabilityWindowBuffer({ allowNonSequentialBlockHeights: true, logger });
     await buffer.initialize(queryRunner);

@@ -3,6 +3,7 @@ import {
   BlockEntity,
   STAKE_POOL_METADATA_QUEUE,
   TypeormStabilityWindowBuffer,
+  createObservableConnection,
   storeBlock,
   storeStakePoolMetadataJob,
   typeormTransactionCommit,
@@ -13,9 +14,9 @@ import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { ChainSyncEventType } from '@cardano-sdk/core';
 import { QueryRunner } from 'typeorm';
 import { StakePoolMetadataJob, createPgBoss } from '../../src/pgBoss';
+import { connectionConfig, initializeDataSource } from '../util';
 import { createProjectorTilFirst } from './util';
-import { defer, filter, from } from 'rxjs';
-import { initializeDataSource } from '../util';
+import { filter, of } from 'rxjs';
 
 const testPromise = () => {
   let resolvePromise: Function;
@@ -39,20 +40,15 @@ describe('storeStakePoolMetadataJob', () => {
       }),
       Mappers.withCertificates(),
       Mappers.withStakePools(),
-      withTypeormTransaction(
-        {
-          dataSource$: defer(() =>
-            from(
-              initializeDataSource({
-                entities: [BlockEntity, BlockDataEntity],
-                extensions: { pgBoss: true }
-              })
-            )
-          ),
+      withTypeormTransaction({
+        connection$: createObservableConnection({
+          connectionConfig$: of(connectionConfig),
+          entities: [BlockEntity, BlockDataEntity],
+          extensions: { pgBoss: true },
           logger
-        },
-        { pgBoss: true }
-      ),
+        }),
+        pgBoss: true
+      }),
       storeBlock(),
       storeStakePoolMetadataJob(),
       buffer.storeBlockData(),

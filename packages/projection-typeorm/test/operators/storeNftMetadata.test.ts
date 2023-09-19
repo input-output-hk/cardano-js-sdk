@@ -8,6 +8,7 @@ import {
   OutputEntity,
   TokensEntity,
   TypeormStabilityWindowBuffer,
+  createObservableConnection,
   storeAssets,
   storeBlock,
   storeNftMetadata,
@@ -17,8 +18,9 @@ import {
 } from '../../src';
 import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
 import { ChainSyncDataSet, chainSyncData, generateRandomHexString, logger } from '@cardano-sdk/util-dev';
-import { Observable, defer, firstValueFrom, from, lastValueFrom, toArray } from 'rxjs';
+import { Observable, firstValueFrom, lastValueFrom, toArray } from 'rxjs';
 import { QueryRunner, Repository } from 'typeorm';
+import { connectionConfig$, initializeDataSource } from '../util';
 import {
   createProjectorTilFirst,
   createRollBackwardEventFor,
@@ -28,7 +30,6 @@ import {
   createStubRollForwardEvent
 } from './util';
 import { dummyLogger } from 'ts-log';
-import { initializeDataSource } from '../util';
 import omit from 'lodash/omit';
 
 const patchNftMetadataNameCip25 = (
@@ -184,15 +185,11 @@ describe('storeNftMetadata', () => {
   let buffer: TypeormStabilityWindowBuffer;
   const entities = [BlockEntity, BlockDataEntity, AssetEntity, TokensEntity, OutputEntity, NftMetadataEntity];
 
-  const dataSource$ = defer(() =>
-    from(initializeDataSource({ devOptions: { dropSchema: false, synchronize: false }, entities }))
-  );
-
   const storeData = (
     evt$: Observable<ProjectionEvent<Mappers.WithUtxo & Mappers.WithMint & Mappers.WithCIP67 & Mappers.WithNftMetadata>>
   ) =>
     evt$.pipe(
-      withTypeormTransaction({ dataSource$, logger }),
+      withTypeormTransaction({ connection$: createObservableConnection({ connectionConfig$, entities, logger }) }),
       storeBlock(),
       storeAssets(),
       storeUtxo(),

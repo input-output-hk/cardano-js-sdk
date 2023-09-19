@@ -2,13 +2,13 @@
 /* eslint-disable prefer-spread */
 import { Cardano } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
-import { Observable, from, switchMap, takeWhile } from 'rxjs';
+import { Observable, takeWhile } from 'rxjs';
 import {
   PgConnectionConfig,
   TypeormDevOptions,
   TypeormStabilityWindowBuffer,
   WithTypeormContext,
-  createDataSource,
+  createObservableConnection,
   isRecoverableTypeormError,
   typeormTransactionCommit,
   withTypeormTransaction
@@ -44,47 +44,6 @@ const applyStores =
   (evt$: Observable<T>) =>
     evt$.pipe.apply(evt$, selectedStores as any) as Observable<T>;
 
-export const createObservableDataSource = ({
-  connectionConfig$,
-  logger,
-  buffer,
-  devOptions,
-  entities,
-  extensions,
-  migrationsRun
-}: Omit<
-  CreateTypeormProjectionProps,
-  'blocksBufferLength' | 'exitAtBlockNo' | 'projections' | 'projectionSource$' | 'projectionOptions'
-> &
-  Pick<PreparedProjection, 'entities' | 'extensions'> & { migrationsRun: boolean }) =>
-  connectionConfig$.pipe(
-    switchMap((connectionConfig) =>
-      from(
-        (async () => {
-          const dataSource = createDataSource({
-            connectionConfig,
-            devOptions,
-            entities,
-            extensions,
-            logger,
-            options: {
-              installExtensions: true,
-              migrations: migrations.filter(({ entity }) => entities.includes(entity as any)),
-              migrationsRun: migrationsRun && !devOptions?.synchronize
-            }
-          });
-          await dataSource.initialize();
-          if (buffer) {
-            const queryRunner = dataSource.createQueryRunner('master');
-            await buffer.initialize(queryRunner);
-            await queryRunner.release();
-          }
-          return dataSource;
-        })()
-      )
-    )
-  );
-
 /**
  * Creates a projection observable that applies a sequence of operators
  * required to project requested `projections` into a postgres database.
@@ -116,24 +75,22 @@ export const createTypeormProjection = ({
     },
     { logger }
   );
-  const dataSource$ = createObservableDataSource({
-    buffer,
+  const connection$ = createObservableConnection({
     connectionConfig$,
     devOptions,
     entities,
     extensions,
     logger,
-    migrationsRun: true
+    options: {
+      installExtensions: true,
+      migrations: migrations.filter(({ entity }) => entities.includes(entity as any)),
+      migrationsRun: !devOptions?.synchronize
+    }
   });
   return projectionSource$.pipe(
     applyMappers(mappers),
     shareRetryBackoff(
-      (evt$) =>
-        evt$.pipe(
-          withTypeormTransaction({ dataSource$, logger }, extensions),
-          applyStores(stores),
-          typeormTransactionCommit()
-        ),
+      (evt$) => evt$.pipe(withTypeormTransaction({ connection$ }), applyStores(stores), typeormTransactionCommit()),
       { shouldRetry: isRecoverableTypeormError }
     ),
     requestNext(),

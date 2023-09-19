@@ -7,6 +7,7 @@ import {
   PoolRetirementEntity,
   StakePoolEntity,
   TypeormStabilityWindowBuffer,
+  createObservableConnection,
   storeBlock,
   storeStakePools,
   typeormTransactionCommit,
@@ -16,12 +17,20 @@ import { Bootstrap, Mappers, requestNext } from '@cardano-sdk/projection';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
+import { connectionConfig$, initializeDataSource } from '../util';
 import { createProjectorTilFirst } from './util';
-import { initializeDataSource } from '../util';
-import { of } from 'rxjs';
 
 describe('storeStakePools', () => {
   const data = chainSyncData(ChainSyncDataSet.WithPoolRetirement);
+  const entities = [
+    BlockDataEntity,
+    BlockEntity,
+    CurrentPoolMetricsEntity,
+    PoolRegistrationEntity,
+    PoolRetirementEntity,
+    StakePoolEntity,
+    PoolMetadataEntity
+  ];
   let poolsRepo: Repository<StakePoolEntity>;
   let dataSource: DataSource;
   let queryRunner: QueryRunner;
@@ -30,7 +39,7 @@ describe('storeStakePools', () => {
     Bootstrap.fromCardanoNode({ blocksBufferLength: 10, buffer, cardanoNode: data.cardanoNode, logger }).pipe(
       Mappers.withCertificates(),
       Mappers.withStakePools(),
-      withTypeormTransaction({ dataSource$: of(dataSource), logger }),
+      withTypeormTransaction({ connection$: createObservableConnection({ connectionConfig$, entities, logger }) }),
       storeBlock(),
       storeStakePools(),
       buffer.storeBlockData(),
@@ -53,17 +62,7 @@ describe('storeStakePools', () => {
   };
 
   beforeEach(async () => {
-    dataSource = await initializeDataSource({
-      entities: [
-        BlockDataEntity,
-        BlockEntity,
-        CurrentPoolMetricsEntity,
-        PoolRegistrationEntity,
-        PoolRetirementEntity,
-        StakePoolEntity,
-        PoolMetadataEntity
-      ]
-    });
+    dataSource = await initializeDataSource({ entities });
     queryRunner = dataSource.createQueryRunner();
     poolsRepo = queryRunner.manager.getRepository(StakePoolEntity);
     buffer = new TypeormStabilityWindowBuffer({ allowNonSequentialBlockHeights: true, logger });

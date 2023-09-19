@@ -1,4 +1,5 @@
 import { CreateDataSourceProps, createDataSource } from '../src';
+import { NEVER, concat, of } from 'rxjs';
 import { logger } from '@cardano-sdk/util-dev';
 
 export const connectionConfig = {
@@ -8,6 +9,8 @@ export const connectionConfig = {
   port: 5432,
   username: 'postgres'
 };
+
+export const connectionConfig$ = concat(of(connectionConfig), NEVER);
 
 export const initializeDataSource = async (
   props: Pick<CreateDataSourceProps, 'entities' | 'extensions' | 'devOptions'>

@@ -4,6 +4,7 @@ import {
   StakeKeyRegistrationEntity,
   TypeormStabilityWindowBuffer,
   certificatePointerToId,
+  createObservableConnection,
   storeBlock,
   storeStakeKeyRegistrations,
   typeormTransactionCommit,
@@ -12,12 +13,13 @@ import {
 import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
-import { Observable, firstValueFrom, of, pairwise, takeWhile } from 'rxjs';
+import { Observable, firstValueFrom, pairwise, takeWhile } from 'rxjs';
+import { connectionConfig$, initializeDataSource } from '../util';
 import { createProjectorTilFirst, createRollBackwardEventFor, createStubProjectionSource } from './util';
-import { initializeDataSource } from '../util';
 
 describe('storeStakeKeyRegistrations', () => {
   const data = chainSyncData(ChainSyncDataSet.WithPoolRetirement);
+  const entities = [BlockDataEntity, BlockEntity, StakeKeyRegistrationEntity];
   let stakeKeyRegistrationsRepo: Repository<StakeKeyRegistrationEntity>;
   let dataSource: DataSource;
   let queryRunner: QueryRunner;
@@ -27,7 +29,7 @@ describe('storeStakeKeyRegistrations', () => {
     evt$.pipe(
       Mappers.withCertificates(),
       Mappers.withStakeKeyRegistrations(),
-      withTypeormTransaction({ dataSource$: of(dataSource), logger }),
+      withTypeormTransaction({ connection$: createObservableConnection({ connectionConfig$, entities, logger }) }),
       storeBlock(),
       storeStakeKeyRegistrations(),
       buffer.storeBlockData(),
@@ -45,9 +47,7 @@ describe('storeStakeKeyRegistrations', () => {
   const projectTilFirst = createProjectorTilFirst(project);
 
   beforeEach(async () => {
-    dataSource = await initializeDataSource({
-      entities: [BlockDataEntity, BlockEntity, StakeKeyRegistrationEntity]
-    });
+    dataSource = await initializeDataSource({ entities });
     queryRunner = dataSource.createQueryRunner();
     stakeKeyRegistrationsRepo = queryRunner.manager.getRepository(StakeKeyRegistrationEntity);
     buffer = new TypeormStabilityWindowBuffer({ allowNonSequentialBlockHeights: true, logger });

@@ -6,6 +6,7 @@ import {
   OutputEntity,
   TokensEntity,
   TypeormStabilityWindowBuffer,
+  createObservableConnection,
   storeAssets,
   storeBlock,
   storeUtxo,
@@ -16,9 +17,8 @@ import { Bootstrap, Mappers, requestNext } from '@cardano-sdk/projection';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { IsNull, Not, QueryRunner } from 'typeorm';
+import { connectionConfig$, initializeDataSource } from '../util';
 import { createProjectorTilFirst } from './util';
-import { defer, from } from 'rxjs';
-import { initializeDataSource } from '../util';
 
 describe('storeUtxo', () => {
   const stubEvents = chainSyncData(ChainSyncDataSet.WithMint);
@@ -31,8 +31,7 @@ describe('storeUtxo', () => {
       Mappers.withMint(),
       Mappers.withUtxo(),
       withTypeormTransaction({
-        dataSource$: defer(() => from(initializeDataSource({ entities }))),
-        logger
+        connection$: createObservableConnection({ connectionConfig$, entities, logger })
       }),
       storeBlock(),
       storeAssets(),
