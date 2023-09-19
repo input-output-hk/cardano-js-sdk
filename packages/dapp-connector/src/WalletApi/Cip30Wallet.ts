@@ -107,9 +107,7 @@ export class Cip30Wallet {
   readonly #authenticator: RemoteAuthenticator;
 
   constructor(properties: WalletProperties, { api, authenticator, logger }: WalletDependencies) {
-    this.enable = this.enable.bind(this);
     this.icon = properties.icon;
-    this.isEnabled = this.isEnabled.bind(this);
     this.name = properties.walletName;
     this.#api = api;
     this.#logger = logger;
