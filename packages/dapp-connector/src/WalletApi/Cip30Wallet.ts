@@ -5,12 +5,15 @@ import { Logger } from 'ts-log';
 import { RemoteAuthenticator } from '../AuthenticatorApi';
 import uniq from 'lodash/uniq';
 
+type AllowedApiMethods = { allowedApiMethods: WalletMethod[]; enabledExtensions: WalletApiExtension[] };
+
 export const CipMethodsMapping: Record<number, WalletMethod[]> = {
   30: [
     'getNetworkId',
     'getUtxos',
     'getCollateral',
     'getBalance',
+    'getExtensions',
     'getUsedAddresses',
     'getUnusedAddresses',
     'getChangeAddress',
@@ -28,12 +31,16 @@ export const WalletApiMethodNames: WalletMethod[] = Object.values(CipMethodsMapp
  *
  * Only return the allowed API methods.
  */
-const wrapAndEnableApi = (walletApi: WalletApi, allowedApiMethods: WalletMethod[]): WalletApi => {
+const wrapAndEnableApi = (
+  walletApi: WalletApi,
+  { allowedApiMethods, enabledExtensions }: AllowedApiMethods
+): WalletApi => {
   const objectApi: WalletApi = {
     getActivePubStakeKeys: () => walletApi.getActivePubStakeKeys(),
     getBalance: () => walletApi.getBalance(),
     getChangeAddress: () => walletApi.getChangeAddress(),
     getCollateral: (params?: { amount?: Cbor }) => walletApi.getCollateral(params),
+    getExtensions: () => Promise.resolve(enabledExtensions),
     getNetworkId: () => walletApi.getNetworkId(),
     getPubDRepKey: () => walletApi.getPubDRepKey(),
     getRewardAddresses: () => walletApi.getRewardAddresses(),
@@ -113,11 +120,17 @@ export class Cip30Wallet {
    * Receives the array of extensions provided when `wallet.enable` was called and
    * returns a list of methods names for the CIP-30 API and supported extensions.
    */
-  #getAllowedApiMethods(extensions: WalletApiExtension[] = []): WalletMethod[] {
+  #getAllowedApiMethods(extensions: WalletApiExtension[] = []): AllowedApiMethods {
     const enabledExtensions: WalletApiExtension[] = extensions.filter((extension) =>
       this.supportedExtensions.some(({ cip }) => cip === extension.cip)
     );
-    return uniq([...CipMethodsMapping[30], ...enabledExtensions.flatMap(({ cip }) => CipMethodsMapping[cip])]);
+    return {
+      allowedApiMethods: uniq([
+        ...CipMethodsMapping[30],
+        ...enabledExtensions.flatMap(({ cip }) => CipMethodsMapping[cip])
+      ]),
+      enabledExtensions
+    };
   }
 
   #validateExtensions(extensions: WalletApiExtension[] = []): void {

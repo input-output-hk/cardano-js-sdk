@@ -11,7 +11,8 @@ import {
   TxSendErrorCode,
   TxSignError,
   TxSignErrorCode,
-  WalletApi
+  WalletApi,
+  WalletApiExtension
 } from '@cardano-sdk/dapp-connector';
 import { Cardano, Serialization, TxCBOR, coalesceValueQuantities } from '@cardano-sdk/core';
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
@@ -337,6 +338,10 @@ const baseCip30WalletApi = (
       }
     }
     return unspendables.map((core) => Serialization.TransactionUnspentOutput.fromCore(core).toCbor());
+  },
+  getExtensions: async (): Promise<WalletApiExtension[]> => {
+    logger.debug('getting enabled extensions');
+    return Promise.resolve([{ cip: 95 }]);
   },
   getNetworkId: async (): Promise<Cardano.NetworkId> => {
     logger.debug('getting networkId');

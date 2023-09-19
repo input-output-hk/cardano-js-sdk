@@ -33,6 +33,8 @@ export interface Cip30DataSignature {
   signature: CoseSign1CborHex;
 }
 
+export type WalletApiExtension = { cip: number };
+
 /**
  * Returns the network id of the currently connected account.
  * 0 is testnet and 1 is mainnet but other networks can possibly be returned by wallets.
@@ -77,6 +79,14 @@ export type GetCollateral = (params?: { amount?: Cbor }) => Promise<Cbor[] | nul
  * @throws ApiError
  */
 export type GetBalance = () => Promise<Cbor>;
+
+/**
+ * Retrieves the list of extensions enabled by the wallet.
+ * This may be influenced by the set of extensions requested in the initial enable request.
+ *
+ * @throws ApiError
+ */
+export type GetExtensions = () => Promise<WalletApiExtension[]>;
 
 /**
  * Returns a list of all used (included in some on-chain transaction) addresses controlled by the wallet.
@@ -169,6 +179,8 @@ export interface Cip30WalletApi {
 
   getCollateral: GetCollateral;
 
+  getExtensions: GetExtensions;
+
   getUsedAddresses: GetUsedAddresses;
 
   getUnusedAddresses: GetUnusedAddresses;
@@ -193,5 +205,3 @@ export interface Cip95WalletApi {
 export type WalletApi = Cip30WalletApi & Cip95WalletApi;
 
 export type WalletMethod = keyof WalletApi;
-
-export type WalletApiExtension = { cip: number };
