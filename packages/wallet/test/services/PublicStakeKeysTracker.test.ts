@@ -1,7 +1,7 @@
 import { AccountKeyDerivationPath, AsyncKeyAgent, GroupedAddress, KeyRole } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import { ObservableWallet } from '../../src';
-import { PubStakeKeyAndStatus, createPublicStakeKeysTracker } from '../../src/services/ActiveStakePublicKeysTracker';
+import { PubStakeKeyAndStatus, createPublicStakeKeysTracker } from '../../src/services/PublicStakeKeysTracker';
 import { firstValueFrom, from, lastValueFrom, of, shareReplay, toArray } from 'rxjs';
 import { mockProviders as mocks } from '@cardano-sdk/util-dev';
 

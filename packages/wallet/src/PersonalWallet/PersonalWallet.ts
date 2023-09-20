@@ -99,7 +99,7 @@ import {
   initializeTx
 } from '@cardano-sdk/tx-construction';
 import { Logger } from 'ts-log';
-import { PubStakeKeyAndStatus, createPublicStakeKeysTracker } from '../services/ActiveStakePublicKeysTracker';
+import { PubStakeKeyAndStatus, createPublicStakeKeysTracker } from '../services/PublicStakeKeysTracker';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { Shutdown, contextLogger, deepEquals } from '@cardano-sdk/util';
 import { WalletStores, createInMemoryWalletStores } from '../persistence';

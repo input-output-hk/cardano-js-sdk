@@ -13,7 +13,7 @@ import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
 import { GroupedAddress, cip8 } from '@cardano-sdk/key-management';
 import { InitializeTxProps, InitializeTxResult, SignedTx, TxBuilder, TxContext } from '@cardano-sdk/tx-construction';
 import { Observable } from 'rxjs';
-import { PubStakeKeyAndStatus } from './services/ActiveStakePublicKeysTracker';
+import { PubStakeKeyAndStatus } from './services/PublicStakeKeysTracker';
 import { Shutdown } from '@cardano-sdk/util';
 
 export type Assets = Map<Cardano.AssetId, Asset.AssetInfo>;
