@@ -145,6 +145,8 @@ describe('wallet', () => {
       it('can destroy second wallet before switching back to the first wallet', async () => {
         // Destroy also clears associated store. Store will be rebuilt during future activation of same wallet
         await $(destroyWallet).click();
+        await expect($(spanAddress)).toHaveTextContaining('-');
+
         await $(btnActivateWallet1).click();
         await expect($(spanAddress)).toHaveTextContaining(walletAddr1);
         await expect($(activeWalletName)).toHaveText(getObservableWalletName(0));
