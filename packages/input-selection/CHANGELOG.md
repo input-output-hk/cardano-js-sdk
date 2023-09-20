@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.11.9...@cardano-sdk/input-selection@0.12.0) (2023-09-20)
+
+### ⚠ BREAKING CHANGES
+
+* remove the CML serialization code from core package
+
+### Features
+
+* remove the CML serialization code from core package ([62f4252](https://github.com/input-output-hk/cardano-js-sdk/commit/62f4252b094938db05b81c928c03c1eecec2be55))
+
 ## [0.11.9](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.11.8...@cardano-sdk/input-selection@0.11.9) (2023-09-12)
 
 ### Bug Fixes

@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.10.3...@cardano-sdk/key-management@0.11.0) (2023-09-20)
+
+### ⚠ BREAKING CHANGES
+
+* remove the CML serialization code from core package
+* **key-management:** remove deprecated trezor hardware wallet implementation
+
+### Features
+
+* add support for signing data with a DRepID in CIP-95 API ([3057cce](https://github.com/input-output-hk/cardano-js-sdk/commit/3057cce6ac1585d6ae2a62a89d0417e5fb2416f4))
+* **key-management:** remove deprecated trezor hardware wallet implementation ([76bed53](https://github.com/input-output-hk/cardano-js-sdk/commit/76bed5378c1c1930f6774927ee4fe3d5ab8d1964))
+* remove the CML serialization code from core package ([62f4252](https://github.com/input-output-hk/cardano-js-sdk/commit/62f4252b094938db05b81c928c03c1eecec2be55))
+
 ## [0.10.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.10.2...@cardano-sdk/key-management@0.10.3) (2023-09-12)
 
 **Note:** Version bump only for package @cardano-sdk/key-management

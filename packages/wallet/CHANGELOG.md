@@ -3,6 +3,40 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.22.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.21.2...@cardano-sdk/wallet@0.22.0) (2023-09-20)
+
+### ⚠ BREAKING CHANGES
+
+* delegation distribution portfolio is now persisted on chain and taken into account during change distribution
+* remove the CML serialization code from core package
+* remove AssetInfo.history and AssetInfo.mintOrBurnCount
+* renamed field handle to handleResolutions
+* incompatible with previous revisions of cardano-services
+- rename utxo and transactions PouchDB stores
+- update type of Tx.witness.redeemers
+- update type of Tx.witness.datums
+- update type of TxOut.datum
+- remove Cardano.Datum type
+
+fix(cardano-services): correct chain history openApi endpoints path url to match version
+
+### Features
+
+* add getExtensions() to CIP-30 wallet API ([944e0ce](https://github.com/input-output-hk/cardano-js-sdk/commit/944e0cea55bcd8c91e1888e708e717adc7b1ea4b))
+* add support for signing data with a DRepID in CIP-95 API ([3057cce](https://github.com/input-output-hk/cardano-js-sdk/commit/3057cce6ac1585d6ae2a62a89d0417e5fb2416f4))
+* delegation distribution portfolio is now persisted on chain and taken into account during change distribution ([7573938](https://github.com/input-output-hk/cardano-js-sdk/commit/75739385ea422a0621ded87f2b72c5878e3fcf81))
+* remove the CML serialization code from core package ([62f4252](https://github.com/input-output-hk/cardano-js-sdk/commit/62f4252b094938db05b81c928c03c1eecec2be55))
+* update core types with deserialized PlutusData ([d8cc93b](https://github.com/input-output-hk/cardano-js-sdk/commit/d8cc93b520177c98224502aad39109a0cb524f3c))
+
+### Bug Fixes
+
+* **wallet:** do not track reference NFTs as handles ([3b61c93](https://github.com/input-output-hk/cardano-js-sdk/commit/3b61c931fee35aa33c1bbb424fa4b0b6ac0f6009))
+
+### Code Refactoring
+
+* remove AssetInfo.history and AssetInfo.mintOrBurnCount ([4c0a7ee](https://github.com/input-output-hk/cardano-js-sdk/commit/4c0a7ee77d9ffcf5583fc922597475c4025be17b))
+* renamed field handle to handleResolutions ([8b3296e](https://github.com/input-output-hk/cardano-js-sdk/commit/8b3296e19b27815f3a8487479a691483696cc898))
+
 ## [0.21.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.21.1...@cardano-sdk/wallet@0.21.2) (2023-09-12)
 
 ### Features

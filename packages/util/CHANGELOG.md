@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.14.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.14.0...@cardano-sdk/util@0.14.1) (2023-09-20)
+
+### Bug Fixes
+
+* **util:** deserialize bytes as Uint8Array instead of Buffer ([78460d3](https://github.com/input-output-hk/cardano-js-sdk/commit/78460d36c6c7b75815b0d5fce1303b5dde91f3b6))
+
 ## [0.14.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util@0.13.2...@cardano-sdk/util@0.14.0) (2023-08-21)
 
 ### ⚠ BREAKING CHANGES

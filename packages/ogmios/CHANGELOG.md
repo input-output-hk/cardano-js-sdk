@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.13.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.12.18...@cardano-sdk/ogmios@0.13.0) (2023-09-20)
+
+### ⚠ BREAKING CHANGES
+
+* renamed field handle to handleResolutions
+* incompatible with previous revisions of cardano-services
+- rename utxo and transactions PouchDB stores
+- update type of Tx.witness.redeemers
+- update type of Tx.witness.datums
+- update type of TxOut.datum
+- remove Cardano.Datum type
+
+fix(cardano-services): correct chain history openApi endpoints path url to match version
+
+### Features
+
+* **core:** added custom PlutusData serialization classes ([72e600c](https://github.com/input-output-hk/cardano-js-sdk/commit/72e600c9e3d9502862121a69408cff9ef4c0d8e9))
+* update core types with deserialized PlutusData ([d8cc93b](https://github.com/input-output-hk/cardano-js-sdk/commit/d8cc93b520177c98224502aad39109a0cb524f3c))
+
+### Bug Fixes
+
+* correct ogmiosToCore auxiliaryData mapping ([eb0ddc0](https://github.com/input-output-hk/cardano-js-sdk/commit/eb0ddc03048680eb91ffc1cb17683c4993a00f85))
+* **util:** deserialize bytes as Uint8Array instead of Buffer ([78460d3](https://github.com/input-output-hk/cardano-js-sdk/commit/78460d36c6c7b75815b0d5fce1303b5dde91f3b6))
+
+### Code Refactoring
+
+* renamed field handle to handleResolutions ([8b3296e](https://github.com/input-output-hk/cardano-js-sdk/commit/8b3296e19b27815f3a8487479a691483696cc898))
+
 ## [0.12.18](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.12.17...@cardano-sdk/ogmios@0.12.18) (2023-09-12)
 
 **Note:** Version bump only for package @cardano-sdk/ogmios

@@ -3,6 +3,58 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.20.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.19.1...@cardano-sdk/core@0.20.0) (2023-09-20)
+
+### ⚠ BREAKING CHANGES
+
+* delegation distribution portfolio is now persisted on chain and taken into account during change distribution
+* **core:** rename HandleResolution default props to credential
+* remove the CML serialization code from core package
+* remove AssetInfo.history and AssetInfo.mintOrBurnCount
+* renamed field handle to handleResolutions
+* hoist metadatumToCip25 to NftMetadata.fromMetadatum
+* incompatible with previous revisions of cardano-services
+- rename utxo and transactions PouchDB stores
+- update type of Tx.witness.redeemers
+- update type of Tx.witness.datums
+- update type of TxOut.datum
+- remove Cardano.Datum type
+
+fix(cardano-services): correct chain history openApi endpoints path url to match version
+
+### Features
+
+* add support for signing data with a DRepID in CIP-95 API ([3057cce](https://github.com/input-output-hk/cardano-js-sdk/commit/3057cce6ac1585d6ae2a62a89d0417e5fb2416f4))
+* added witness set serialization classes ([132599d](https://github.com/input-output-hk/cardano-js-sdk/commit/132599d104be1e601d5849b716cc503af80a9fbb))
+* **core:** add AssetName.toUTF8 util ([5f13b4f](https://github.com/input-output-hk/cardano-js-sdk/commit/5f13b4fbe1574dfd9fecf600364c331c028714e7))
+* **core:** add hexToBytes, utf8ToBytes, utf8ToHex utils ([d3da1a6](https://github.com/input-output-hk/cardano-js-sdk/commit/d3da1a6218e148926f0c0c2b184600fc303b8c82))
+* **core:** add NftMetadata.fromPlutusData mapping from cip68 datum ([64b263b](https://github.com/input-output-hk/cardano-js-sdk/commit/64b263b3875a5e3359f72c088ae57efd59ce7a2d))
+* **core:** added custom PlutusData serialization classes ([72e600c](https://github.com/input-output-hk/cardano-js-sdk/commit/72e600c9e3d9502862121a69408cff9ef4c0d8e9))
+* **core:** added native functions to convert between json and metadatum ([b0ba261](https://github.com/input-output-hk/cardano-js-sdk/commit/b0ba26141e53797bc7f61ca9e4adb8f3e996d9e2))
+* **core:** added serialization classes for tx auxiliary data ([4b49e57](https://github.com/input-output-hk/cardano-js-sdk/commit/4b49e5761f69a80f7675a22d9dee6ca96a005aa0))
+* **core:** added transaction body serialization classes ([9451a05](https://github.com/input-output-hk/cardano-js-sdk/commit/9451a052d072e20bbce1bd7a5d392f8717dd0db6))
+* **core:** added update field to the transaction body core type ([2e9c439](https://github.com/input-output-hk/cardano-js-sdk/commit/2e9c439ffe4f91588ebab5eb7abf7bf907861145))
+* **core:** export tryConvertPlutusMapToUtf8Record from Cardano.util ([645db52](https://github.com/input-output-hk/cardano-js-sdk/commit/645db529b27528affeee7db8f4c8611864ad7932))
+* **core:** plutus data map now uses deep equality when being indexed by key ([c34076c](https://github.com/input-output-hk/cardano-js-sdk/commit/c34076ca82281f0c34a4aed77cf84c3fca9f7466))
+* **core:** replaced CML TransactionBody serialization class with out own typescript native version ([0dfaeb7](https://github.com/input-output-hk/cardano-js-sdk/commit/0dfaeb72617039f76b7a428644ae3c70f60f744c))
+* delegation distribution portfolio is now persisted on chain and taken into account during change distribution ([7573938](https://github.com/input-output-hk/cardano-js-sdk/commit/75739385ea422a0621ded87f2b72c5878e3fcf81))
+* remove the CML serialization code from core package ([62f4252](https://github.com/input-output-hk/cardano-js-sdk/commit/62f4252b094938db05b81c928c03c1eecec2be55))
+* update core types with deserialized PlutusData ([d8cc93b](https://github.com/input-output-hk/cardano-js-sdk/commit/d8cc93b520177c98224502aad39109a0cb524f3c))
+
+### Bug Fixes
+
+* **core:** bytes field on core plutus script type now contains the compiled bytes instead of cbor ([15a6ba6](https://github.com/input-output-hk/cardano-js-sdk/commit/15a6ba6239d9da768b34835e4069eb2c0bff03ca))
+* **core:** do not log a warning when nft metadata files are missing ([b79419b](https://github.com/input-output-hk/cardano-js-sdk/commit/b79419bf84d2ca02a8a5e8a1b55effde01c929cd))
+* **core:** fix circular dependency on cip67 module ([67f6892](https://github.com/input-output-hk/cardano-js-sdk/commit/67f689295d51931c196c10ef84ede3e7c8a88828))
+* **core:** return consistent bytes type in Serialization ([9331d01](https://github.com/input-output-hk/cardano-js-sdk/commit/9331d01bd1ac1077ac821d59c57c35374f01cc68))
+
+### Code Refactoring
+
+* **core:** rename HandleResolution default props to credential ([877279f](https://github.com/input-output-hk/cardano-js-sdk/commit/877279fe09a57baf789ef87e03e8af61fe6bc4bc))
+* hoist metadatumToCip25 to NftMetadata.fromMetadatum ([c36d7ef](https://github.com/input-output-hk/cardano-js-sdk/commit/c36d7ef9480fe195068443a5d8d09728e9429fc5))
+* remove AssetInfo.history and AssetInfo.mintOrBurnCount ([4c0a7ee](https://github.com/input-output-hk/cardano-js-sdk/commit/4c0a7ee77d9ffcf5583fc922597475c4025be17b))
+* renamed field handle to handleResolutions ([8b3296e](https://github.com/input-output-hk/cardano-js-sdk/commit/8b3296e19b27815f3a8487479a691483696cc898))
+
 ## [0.19.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.19.0...@cardano-sdk/core@0.19.1) (2023-09-12)
 
 ### Features

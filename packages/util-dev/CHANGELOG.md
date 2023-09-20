@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.15.3...@cardano-sdk/util-dev@0.16.0) (2023-09-20)
+
+### ⚠ BREAKING CHANGES
+
+* remove the CML serialization code from core package
+* remove AssetInfo.history and AssetInfo.mintOrBurnCount
+* incompatible with previous revisions of cardano-services
+- rename utxo and transactions PouchDB stores
+- update type of Tx.witness.redeemers
+- update type of Tx.witness.datums
+- update type of TxOut.datum
+- remove Cardano.Datum type
+
+fix(cardano-services): correct chain history openApi endpoints path url to match version
+
+### Features
+
+* remove the CML serialization code from core package ([62f4252](https://github.com/input-output-hk/cardano-js-sdk/commit/62f4252b094938db05b81c928c03c1eecec2be55))
+* update core types with deserialized PlutusData ([d8cc93b](https://github.com/input-output-hk/cardano-js-sdk/commit/d8cc93b520177c98224502aad39109a0cb524f3c))
+* **util-dev:** add with-inline-datum.json chain sync data ([ff0b923](https://github.com/input-output-hk/cardano-js-sdk/commit/ff0b92363b07eb7557445fb6387fc46cc3f94e50))
+
+### Bug Fixes
+
+* correct ogmiosToCore auxiliaryData mapping ([eb0ddc0](https://github.com/input-output-hk/cardano-js-sdk/commit/eb0ddc03048680eb91ffc1cb17683c4993a00f85))
+* **util-dev:** add missing 'inputSource' prop to some chainSync datasets ([0b236c9](https://github.com/input-output-hk/cardano-js-sdk/commit/0b236c9c69c5f4c51fbffb91377c1127d5221791))
+
+### Code Refactoring
+
+* remove AssetInfo.history and AssetInfo.mintOrBurnCount ([4c0a7ee](https://github.com/input-output-hk/cardano-js-sdk/commit/4c0a7ee77d9ffcf5583fc922597475c4025be17b))
+
 ## [0.15.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.15.2...@cardano-sdk/util-dev@0.15.3) (2023-09-12)
 
 **Note:** Version bump only for package @cardano-sdk/util-dev

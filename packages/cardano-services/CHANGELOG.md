@@ -3,6 +3,52 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.18.0...@cardano-sdk/cardano-services@0.19.0) (2023-09-20)
+
+### ⚠ BREAKING CHANGES
+
+* make withHandles 'logger' argument required
+* withHandles now requires WithCIP67 props in
+* remove the CML serialization code from core package
+* remove AssetInfo.history and AssetInfo.mintOrBurnCount
+* convert tokens.quantity column to numeric
+* renamed field handle to handleResolutions
+* hoist metadatumToCip25 to NftMetadata.fromMetadatum
+* incompatible with previous revisions of cardano-services
+- rename utxo and transactions PouchDB stores
+- update type of Tx.witness.redeemers
+- update type of Tx.witness.datums
+- update type of TxOut.datum
+- remove Cardano.Datum type
+
+fix(cardano-services): correct chain history openApi endpoints path url to match version
+
+### Features
+
+* add address projection ([416e5f5](https://github.com/input-output-hk/cardano-js-sdk/commit/416e5f5edc112727d86e0905733f7f6c1c2fd4c5))
+* add NFT metadata projection ([91fe7df](https://github.com/input-output-hk/cardano-js-sdk/commit/91fe7df50a37bce2ac8cba350fafe788a8174112))
+* **cardano-services:** add HandleMetadata to handle projection ([233ed70](https://github.com/input-output-hk/cardano-js-sdk/commit/233ed70366bea72d9db223c8ce348ba72e8f64b6))
+* **cardano-services:** create typeorm nft-metadata service ([72f6c1b](https://github.com/input-output-hk/cardano-js-sdk/commit/72f6c1b7a091ed4998651e0d5c4bf9c1c0afdfa9))
+* **cardano-services:** create TypeormAssetProvider ([aaf133b](https://github.com/input-output-hk/cardano-js-sdk/commit/aaf133bb776d16dafd955345071e05e0faf599e4))
+* **cardano-services:** resolve default handle, image, pfp and bg ([9c446ac](https://github.com/input-output-hk/cardano-js-sdk/commit/9c446acea6747562b15c7d60fbe6351f872cc2af))
+* **cardano-services:** update handle projector to project 'default' columns ([903faf2](https://github.com/input-output-hk/cardano-js-sdk/commit/903faf2c51ade7fdc3f03b046660d27425a5f660))
+* remove the CML serialization code from core package ([62f4252](https://github.com/input-output-hk/cardano-js-sdk/commit/62f4252b094938db05b81c928c03c1eecec2be55))
+* update core types with deserialized PlutusData ([d8cc93b](https://github.com/input-output-hk/cardano-js-sdk/commit/d8cc93b520177c98224502aad39109a0cb524f3c))
+
+### Bug Fixes
+
+* **cardano-services:** do not return datum hash for TxOut with inline datum ([8928869](https://github.com/input-output-hk/cardano-js-sdk/commit/8928869d392799f5c5913fc2e60b0ff69964c3dd))
+* **cardano-services:** return 0 for stake pool status ([6674b77](https://github.com/input-output-hk/cardano-js-sdk/commit/6674b77e9ae6dfca1b8fff2ef4cf9c6fbd733efc))
+* convert tokens.quantity column to numeric ([31b0f0a](https://github.com/input-output-hk/cardano-js-sdk/commit/31b0f0a789ba474156fc8e6615e3b9e1ab8a4077))
+* correct cip68 handle name (without label) ([1711969](https://github.com/input-output-hk/cardano-js-sdk/commit/171196916244d0bcde83b18d509669c2c38a0d63))
+
+### Code Refactoring
+
+* hoist metadatumToCip25 to NftMetadata.fromMetadatum ([c36d7ef](https://github.com/input-output-hk/cardano-js-sdk/commit/c36d7ef9480fe195068443a5d8d09728e9429fc5))
+* make withHandles 'logger' argument required ([2267689](https://github.com/input-output-hk/cardano-js-sdk/commit/22676895735bde4399e284e60a8e4e7cf2d4a506))
+* remove AssetInfo.history and AssetInfo.mintOrBurnCount ([4c0a7ee](https://github.com/input-output-hk/cardano-js-sdk/commit/4c0a7ee77d9ffcf5583fc922597475c4025be17b))
+* renamed field handle to handleResolutions ([8b3296e](https://github.com/input-output-hk/cardano-js-sdk/commit/8b3296e19b27815f3a8487479a691483696cc898))
+
 ## [0.18.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.17.0...@cardano-sdk/cardano-services@0.18.0) (2023-09-12)
 
 ### ⚠ BREAKING CHANGES

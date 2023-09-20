@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.15.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.14.7...@cardano-sdk/web-extension@0.15.0) (2023-09-20)
+
+### ⚠ BREAKING CHANGES
+
+* delegation distribution portfolio is now persisted on chain and taken into account during change distribution
+
+### Features
+
+* delegation distribution portfolio is now persisted on chain and taken into account during change distribution ([7573938](https://github.com/input-output-hk/cardano-js-sdk/commit/75739385ea422a0621ded87f2b72c5878e3fcf81))
+
 ## [0.14.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.14.6...@cardano-sdk/web-extension@0.14.7) (2023-09-12)
 
 ### Features

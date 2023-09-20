@@ -3,6 +3,43 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.7.4...@cardano-sdk/projection@0.8.0) (2023-09-20)
+
+### ⚠ BREAKING CHANGES
+
+* make withHandles 'logger' argument required
+* withHandles now requires WithCIP67 props in
+* rename Mappers.Handle type to HandleOwnership
+* incompatible with previous revisions of cardano-services
+- rename utxo and transactions PouchDB stores
+- update type of Tx.witness.redeemers
+- update type of Tx.witness.datums
+- update type of TxOut.datum
+- remove Cardano.Datum type
+
+fix(cardano-services): correct chain history openApi endpoints path url to match version
+
+### Features
+
+* add address projection ([416e5f5](https://github.com/input-output-hk/cardano-js-sdk/commit/416e5f5edc112727d86e0905733f7f6c1c2fd4c5))
+* add NFT metadata projection ([91fe7df](https://github.com/input-output-hk/cardano-js-sdk/commit/91fe7df50a37bce2ac8cba350fafe788a8174112))
+* **projection:** add cip67.byAssetId ([060ac99](https://github.com/input-output-hk/cardano-js-sdk/commit/060ac99315ae3339d4e208f5578d587cf35a7dc2))
+* **projection:** add withHandleMetadata mapper ([9fc4722](https://github.com/input-output-hk/cardano-js-sdk/commit/9fc47227d37e00718d39fb3027e93bf419ab5644))
+* **projection:** ignore burn transactions when projecting cip25 metadata ([ab8bb29](https://github.com/input-output-hk/cardano-js-sdk/commit/ab8bb292d6a2065919d4ac9616ad501968e235d4))
+* **projection:** map 'extra' data with Mappers.withNftMetadata ([892c2eb](https://github.com/input-output-hk/cardano-js-sdk/commit/892c2eb5f955cda5d0698a1c5e493e64845ce0af))
+* update core types with deserialized PlutusData ([d8cc93b](https://github.com/input-output-hk/cardano-js-sdk/commit/d8cc93b520177c98224502aad39109a0cb524f3c))
+
+### Bug Fixes
+
+* correct cip68 handle name (without label) ([1711969](https://github.com/input-output-hk/cardano-js-sdk/commit/171196916244d0bcde83b18d509669c2c38a0d63))
+* **projection:** infer incoming event type for withNftMetadata ([53cd873](https://github.com/input-output-hk/cardano-js-sdk/commit/53cd8739d94a4bbc8d856b046c7ce8db700a6561))
+* **projection:** keep latest nft metadata ([3f8242a](https://github.com/input-output-hk/cardano-js-sdk/commit/3f8242a52d26775958a89517287dacbd4cae06f2))
+
+### Code Refactoring
+
+* make withHandles 'logger' argument required ([2267689](https://github.com/input-output-hk/cardano-js-sdk/commit/22676895735bde4399e284e60a8e4e7cf2d4a506))
+* rename Mappers.Handle type to HandleOwnership ([4cb2f55](https://github.com/input-output-hk/cardano-js-sdk/commit/4cb2f551bc7c9ab883a3088a41c047dad866be92))
+
 ## [0.7.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.7.3...@cardano-sdk/projection@0.7.4) (2023-09-12)
 
 **Note:** Version bump only for package @cardano-sdk/projection

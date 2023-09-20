@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.11.3...@cardano-sdk/tx-construction@0.12.0) (2023-09-20)
+
+### ⚠ BREAKING CHANGES
+
+* delegation distribution portfolio is now persisted on chain and taken into account during change distribution
+* remove the CML serialization code from core package
+* renamed field handle to handleResolutions
+* incompatible with previous revisions of cardano-services
+- rename utxo and transactions PouchDB stores
+- update type of Tx.witness.redeemers
+- update type of Tx.witness.datums
+- update type of TxOut.datum
+- remove Cardano.Datum type
+
+fix(cardano-services): correct chain history openApi endpoints path url to match version
+
+### Features
+
+* added witness set serialization classes ([132599d](https://github.com/input-output-hk/cardano-js-sdk/commit/132599d104be1e601d5849b716cc503af80a9fbb))
+* delegation distribution portfolio is now persisted on chain and taken into account during change distribution ([7573938](https://github.com/input-output-hk/cardano-js-sdk/commit/75739385ea422a0621ded87f2b72c5878e3fcf81))
+* remove the CML serialization code from core package ([62f4252](https://github.com/input-output-hk/cardano-js-sdk/commit/62f4252b094938db05b81c928c03c1eecec2be55))
+* update core types with deserialized PlutusData ([d8cc93b](https://github.com/input-output-hk/cardano-js-sdk/commit/d8cc93b520177c98224502aad39109a0cb524f3c))
+
+### Code Refactoring
+
+* renamed field handle to handleResolutions ([8b3296e](https://github.com/input-output-hk/cardano-js-sdk/commit/8b3296e19b27815f3a8487479a691483696cc898))
+
 ## [0.11.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.11.2...@cardano-sdk/tx-construction@0.11.3) (2023-09-12)
 
 **Note:** Version bump only for package @cardano-sdk/tx-construction
