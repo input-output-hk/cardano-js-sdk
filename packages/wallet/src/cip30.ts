@@ -35,7 +35,7 @@ export enum Cip30ConfirmationCallbackType {
 export type SignDataCallbackParams = {
   type: Cip30ConfirmationCallbackType.SignData;
   data: {
-    addr: Cardano.PaymentAddress;
+    addr: Cardano.PaymentAddress | Cardano.DRepID;
     payload: HexBlob;
   };
 };
@@ -397,10 +397,13 @@ const baseCip30WalletApi = (
       scope.dispose();
     }
   },
-  signData: async (addr: Cardano.PaymentAddress | Bytes, payload: Bytes): Promise<Cip30DataSignature> => {
+  signData: async (
+    addr: Cardano.PaymentAddress | Cardano.DRepID | Bytes,
+    payload: Bytes
+  ): Promise<Cip30DataSignature> => {
     logger.debug('signData');
     const hexBlobPayload = HexBlob(payload);
-    const signWith = Cardano.PaymentAddress(addr);
+    const signWith = Cardano.DRepID.isValid(addr) ? Cardano.DRepID(addr) : Cardano.PaymentAddress(addr);
 
     const shouldProceed = await confirmationCallback
       .signData({

@@ -24,6 +24,7 @@ import {
 import { bip32Ed25519Factory, keyManagementFactory } from '../../../src';
 
 import { Cardano } from '@cardano-sdk/core';
+import { HexBlob } from '@cardano-sdk/util';
 import { combineLatest, firstValueFrom, of } from 'rxjs';
 import { runtime } from 'webextension-polyfill';
 import { setupWallet } from '@cardano-sdk/wallet';
@@ -111,6 +112,23 @@ const sendDelegationTx = async (portfolio: { pool: Cardano.StakePool; weight: nu
     msg = `ERROR delegating: ${JSON.stringify(error)}`;
   }
   document.querySelector('#multiDelegation .delegateTxId')!.textContent = msg;
+};
+
+const signDataWithDRepID = async (): Promise<void> => {
+  let msg: string;
+  const dRepId = 'drep1vpzcgfrlgdh4fft0p0ju70czkxxkuknw0jjztl3x7aqgm9q3hqyaz';
+  try {
+    const signature = await wallet.signData({
+      payload: HexBlob('abc123'),
+      signWith: Cardano.PaymentAddress(dRepId)
+    });
+    msg = JSON.stringify(signature);
+  } catch (error) {
+    msg = `ERROR signing data with DRepID: ${JSON.stringify(error)}`;
+  }
+
+  // Set text with signature or error
+  document.querySelector(selectors.divDataSignature)!.textContent = msg;
 };
 
 const setAddresses = ({ address, stakeAddress }: { address: string; stakeAddress: string }): void => {
@@ -261,6 +279,10 @@ document.querySelector(selectors.btnSignAndBuildTx)!.addEventListener('click', a
   const { tx: signedTx } = await builtTx.sign();
   setSignature(signedTx.witness.signatures.values().next().value);
 });
+
+document
+  .querySelector(selectors.btnSignDataWithDRepId)!
+  .addEventListener('click', async () => await signDataWithDRepID());
 
 // Code below tests that a disconnected port in background script will result in the consumed API method call promise to reject
 // UI consumes API -> BG exposes fake API that closes port

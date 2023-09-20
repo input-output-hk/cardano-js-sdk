@@ -80,7 +80,7 @@ describe('dapp/cip95', () => {
     it('getPubDRepKey gets the DRep key from cip95 wallet api', async () => {
       const dappDrepKey = await $(dappGetPubDrepKey).getText();
       expect(dappDrepKey.length).toBeGreaterThan(0);
-      await expect($(dappDrepId)).toHaveTextContaining('drep_id');
+      await expect($(dappDrepId)).toHaveTextContaining('drep');
     });
   });
 });

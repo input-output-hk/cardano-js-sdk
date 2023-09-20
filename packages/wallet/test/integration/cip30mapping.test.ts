@@ -21,10 +21,10 @@ import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
 import { PersonalWallet, cip30, setupWallet } from '../../src';
 import { Providers, createWallet } from './util';
+import { buildDRepIDFromDRepKey, waitForWalletStateSettle } from '../util';
 import { firstValueFrom, of } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
 import { stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
-import { waitForWalletStateSettle } from '../util';
 
 const {
   mockChainHistoryProvider,
@@ -471,11 +471,32 @@ describe('cip30', () => {
         expect(() => Serialization.TransactionWitnessSet.fromCbor(HexBlob(cip30witnessSet))).not.toThrow();
       });
 
-      test('api.signData', async () => {
-        const [{ address }] = await firstValueFrom(wallet.addresses$);
-        const cip30dataSignature = await api.signData(address, HexBlob('abc123'));
-        expect(typeof cip30dataSignature.key).toBe('string');
-        expect(typeof cip30dataSignature.signature).toBe('string');
+      describe('api.signData', () => {
+        test('sign with address', async () => {
+          const [{ address }] = await firstValueFrom(wallet.addresses$);
+          const cip30dataSignature = await api.signData(address, HexBlob('abc123'));
+          expect(typeof cip30dataSignature.key).toBe('string');
+          expect(typeof cip30dataSignature.signature).toBe('string');
+        });
+
+        test('sign with bech32 DRepID', async () => {
+          const dRepKey = await api.getPubDRepKey();
+          const drepid = buildDRepIDFromDRepKey(dRepKey);
+
+          const cip95dataSignature = await api.signData(drepid, HexBlob('abc123'));
+          expect(typeof cip95dataSignature.key).toBe('string');
+          expect(typeof cip95dataSignature.signature).toBe('string');
+        });
+
+        test('rejects if bech32 DRepID is not a type 6 address', async () => {
+          const dRepKey = await api.getPubDRepKey();
+          for (const type in Cardano.AddressType) {
+            if (!Number.isNaN(Number(type)) && Number(type) !== Cardano.AddressType.EnterpriseKey) {
+              const drepid = buildDRepIDFromDRepKey(dRepKey, 0, type as unknown as Cardano.AddressType);
+              await expect(api.signData(drepid, HexBlob('abc123'))).rejects.toThrow();
+            }
+          }
+        });
       });
 
       describe('api.submitTx', () => {

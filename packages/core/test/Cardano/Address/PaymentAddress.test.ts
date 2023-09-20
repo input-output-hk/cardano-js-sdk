@@ -55,6 +55,12 @@ describe('PaymentAddress', () => {
     ).toThrowError(InvalidStringError);
   });
 
+  it('PaymentAddress() throws an error when passing a DRepID', () => {
+    expect(() => Cardano.PaymentAddress('drep1vpzcgfrlgdh4fft0p0ju70czkxxkuknw0jjztl3x7aqgm9q3hqyaz')).toThrowError(
+      InvalidStringError
+    );
+  });
+
   describe('addressNetworkId', () => {
     it('parses testnet address', () => {
       expect(
@@ -95,6 +101,18 @@ describe('PaymentAddress', () => {
             'DdzFFzCqrht4PWfBGtmrQz4x1GkZHYLVGbK7aaBkjWxujxzz3L5GxCgPiTsks5RjUr3yX9KvwKjNJBt7ZzPCmS3fUQrGeRvo9Y1YBQKQ'
           )
         )
+      ).toBe(Cardano.NetworkId.Mainnet);
+    });
+
+    it('parses testnet DRepID', () => {
+      expect(
+        Cardano.addressNetworkId(Cardano.DRepID('drep1vpzcgfrlgdh4fft0p0ju70czkxxkuknw0jjztl3x7aqgm9q3hqyaz'))
+      ).toBe(Cardano.NetworkId.Testnet);
+    });
+
+    it('parses mainnet DRepID', () => {
+      expect(
+        Cardano.addressNetworkId(Cardano.DRepID('drep1v9gkc6jge96t40w46592tahq94n2rzhdhk2puvtz3dsfzys04jeym'))
       ).toBe(Cardano.NetworkId.Mainnet);
     });
   });
