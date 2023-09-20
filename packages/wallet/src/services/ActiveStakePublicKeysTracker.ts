@@ -1,68 +1,62 @@
-import { AsyncKeyAgent, GroupedAddress } from '@cardano-sdk/key-management';
+import { AccountKeyDerivationPath, AsyncKeyAgent, GroupedAddress } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
-import {
-  Observable,
-  OperatorFunction,
-  distinctUntilChanged,
-  filter,
-  from,
-  map,
-  mergeMap,
-  switchMap,
-  toArray
-} from 'rxjs';
+import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
+import { Observable, defaultIfEmpty, distinctUntilChanged, forkJoin, from, map, mergeMap, switchMap } from 'rxjs';
 import { TrackerSubject } from '@cardano-sdk/util-rxjs';
-import { deepEquals, isNotNil } from '@cardano-sdk/util';
+import { deepEquals } from '@cardano-sdk/util';
 
-export interface ActivePubStakeKeysProps {
+export interface CreatePubStakeKeysTrackerProps {
   addresses$: Observable<GroupedAddress[]>;
   rewardAccounts$: Observable<Cardano.RewardAccountInfo[]>;
   keyAgent: AsyncKeyAgent;
 }
 
-const registeredRewardAccounts: OperatorFunction<Cardano.RewardAccountInfo[], Cardano.RewardAccount[]> = (
-  source$: Observable<Cardano.RewardAccountInfo[]>
-) =>
-  source$.pipe(
-    map((accts: Cardano.RewardAccountInfo[]) =>
-      accts
-        .filter(
-          (acct) =>
-            acct.keyStatus === Cardano.StakeKeyStatus.Registered ||
-            acct.keyStatus === Cardano.StakeKeyStatus.Registering
-        )
-        .map(({ address }) => address)
-    )
-  );
+export interface PubStakeKeyAndStatus {
+  keyStatus: Cardano.StakeKeyStatus;
+  publicStakeKey: Ed25519PublicKeyHex;
+}
 
-const stakeKeyDerivationPaths =
-  (addresses$: Observable<GroupedAddress[]>) => (source$: Observable<Cardano.RewardAccount[]>) =>
+type StakeKeyDerivationPathAndStatus = {
+  keyStatus: Cardano.StakeKeyStatus;
+  stakeKeyDerivationPath: AccountKeyDerivationPath;
+};
+
+const withStakeKeyDerivationPaths =
+  (addresses$: Observable<GroupedAddress[]>) => (source$: Observable<Cardano.RewardAccountInfo[]>) =>
     source$.pipe(
-      switchMap((rewardAcctAddresses) =>
+      switchMap((rewardAccounts) =>
         addresses$.pipe(
           // Get stakeKeyDerivationPath of each reward account
           map((groupedAddresses) =>
-            rewardAcctAddresses.map(
-              (rewardAddr) =>
-                groupedAddresses.find((groupedAddr) => groupedAddr.rewardAccount === rewardAddr)?.stakeKeyDerivationPath
-            )
-          ),
-          mergeMap((derivationPaths) => from(derivationPaths).pipe(filter(isNotNil), toArray()))
+            rewardAccounts
+              .map(({ keyStatus, address }) => ({
+                keyStatus,
+                stakeKeyDerivationPath: groupedAddresses.find((groupedAddr) => groupedAddr.rewardAccount === address)
+                  ?.stakeKeyDerivationPath
+              }))
+              .filter((v): v is StakeKeyDerivationPathAndStatus => !!v.stakeKeyDerivationPath)
+          )
         )
       )
     );
 
-export const createActivePublicStakeKeysTracker = ({
+export const createPublicStakeKeysTracker = ({
   addresses$,
   rewardAccounts$,
   keyAgent
-}: ActivePubStakeKeysProps) =>
+}: CreatePubStakeKeysTrackerProps) =>
   new TrackerSubject(
     rewardAccounts$.pipe(
-      registeredRewardAccounts,
-      stakeKeyDerivationPaths(addresses$),
-      map((derivationPaths) => derivationPaths.map((derivationPath) => keyAgent.derivePublicKey(derivationPath))),
-      mergeMap((publicKeyPromises) => from(Promise.all(publicKeyPromises))),
+      withStakeKeyDerivationPaths(addresses$),
+      mergeMap((derivationPathsAndStatus) =>
+        forkJoin(
+          derivationPathsAndStatus.map(({ stakeKeyDerivationPath, keyStatus }) =>
+            from(keyAgent.derivePublicKey(stakeKeyDerivationPath)).pipe(
+              map((publicStakeKey) => ({ keyStatus, publicStakeKey }))
+            )
+          )
+        ).pipe(defaultIfEmpty([]))
+      ),
       distinctUntilChanged(deepEquals)
     )
   );

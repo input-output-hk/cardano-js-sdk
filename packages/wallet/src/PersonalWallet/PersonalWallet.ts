@@ -99,10 +99,10 @@ import {
   initializeTx
 } from '@cardano-sdk/tx-construction';
 import { Logger } from 'ts-log';
+import { PubStakeKeyAndStatus, createPublicStakeKeysTracker } from '../services/ActiveStakePublicKeysTracker';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { Shutdown, contextLogger, deepEquals } from '@cardano-sdk/util';
 import { WalletStores, createInMemoryWalletStores } from '../persistence';
-import { createActivePublicStakeKeysTracker } from '../services/ActiveStakePublicKeysTracker';
 import isEqual from 'lodash/isEqual';
 import uniq from 'lodash/uniq';
 import type { KoraLabsHandleProvider } from '@cardano-sdk/cardano-services-client';
@@ -224,7 +224,7 @@ export class PersonalWallet implements ObservableWallet {
   readonly rewardsProvider: TrackedRewardsProvider;
   readonly handleProvider: HandleProvider;
   readonly changeAddressResolver: ChangeAddressResolver;
-  readonly activePublicStakeKeys$: TrackerSubject<Ed25519PublicKeyHex[]>;
+  readonly publicStakeKeys$: TrackerSubject<PubStakeKeyAndStatus[]>;
   handles$: Observable<HandleInfo[]>;
 
   // eslint-disable-next-line max-statements
@@ -480,7 +480,7 @@ export class PersonalWallet implements ObservableWallet {
           )
         });
 
-    this.activePublicStakeKeys$ = createActivePublicStakeKeysTracker({
+    this.publicStakeKeys$ = createPublicStakeKeysTracker({
       addresses$: this.addresses$,
       keyAgent: this.keyAgent,
       rewardAccounts$: this.delegation.rewardAccounts$
@@ -651,7 +651,7 @@ export class PersonalWallet implements ObservableWallet {
     this.#newTransactions.submitting$.complete();
     this.#reemitSubscriptions.unsubscribe();
     this.#failedFromReemitter$.complete();
-    this.activePublicStakeKeys$.complete();
+    this.publicStakeKeys$.complete();
     this.#logger.debug('Shutdown');
   }
 

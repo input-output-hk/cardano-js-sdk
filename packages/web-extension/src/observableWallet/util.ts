@@ -77,7 +77,6 @@ export const txBuilderProperties: RemoteApiProperties<TxBuilder> = {
 };
 
 export const observableWalletProperties: RemoteApiProperties<ObservableWallet> = {
-  activePublicStakeKeys$: RemoteApiPropertyType.HotObservable,
   addresses$: RemoteApiPropertyType.HotObservable,
   assetInfo$: RemoteApiPropertyType.HotObservable,
   balance: {
@@ -111,6 +110,7 @@ export const observableWalletProperties: RemoteApiProperties<ObservableWallet> =
   handles$: RemoteApiPropertyType.HotObservable,
   initializeTx: RemoteApiPropertyType.MethodReturningPromise,
   protocolParameters$: RemoteApiPropertyType.HotObservable,
+  publicStakeKeys$: RemoteApiPropertyType.HotObservable,
   signData: RemoteApiPropertyType.MethodReturningPromise,
   submitTx: RemoteApiPropertyType.MethodReturningPromise,
   syncStatus: {

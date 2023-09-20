@@ -1,4 +1,3 @@
-import * as Crypto from '@cardano-sdk/crypto';
 import {
   Asset,
   Cardano,
@@ -14,6 +13,7 @@ import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
 import { GroupedAddress, cip8 } from '@cardano-sdk/key-management';
 import { InitializeTxProps, InitializeTxResult, SignedTx, TxBuilder, TxContext } from '@cardano-sdk/tx-construction';
 import { Observable } from 'rxjs';
+import { PubStakeKeyAndStatus } from './services/ActiveStakePublicKeysTracker';
 import { Shutdown } from '@cardano-sdk/util';
 
 export type Assets = Map<Cardano.AssetId, Asset.AssetInfo>;
@@ -60,7 +60,7 @@ export interface ObservableWallet {
   readonly currentEpoch$: Observable<EpochInfo>;
   readonly protocolParameters$: Observable<Cardano.ProtocolParameters>;
   readonly addresses$: Observable<GroupedAddress[]>;
-  readonly activePublicStakeKeys$: Observable<Crypto.Ed25519PublicKeyHex[]>;
+  readonly publicStakeKeys$: Observable<PubStakeKeyAndStatus[]>;
   readonly handles$: Observable<HandleInfo[]>;
   /** All owned and historical assets */
   readonly assetInfo$: Observable<Assets>;
