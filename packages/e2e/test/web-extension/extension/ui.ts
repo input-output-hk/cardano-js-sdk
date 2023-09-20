@@ -120,7 +120,7 @@ const signDataWithDRepID = async (): Promise<void> => {
   try {
     const signature = await wallet.signData({
       payload: HexBlob('abc123'),
-      signWith: Cardano.PaymentAddress(dRepId)
+      signWith: Cardano.DRepID(dRepId)
     });
     msg = JSON.stringify(signature);
   } catch (error) {
