@@ -10,6 +10,9 @@ describe('dapp/cip95', () => {
   const pNetworkId = '#root > div > p:nth-child(14)';
   const liFirstUtxo = '#root > div > p:nth-child(15) > li';
 
+  const liSupportedExtensions = '#root > div > p:nth-child(11) > ul > li';
+  const liGetExtensions = '#root > div > p:nth-child(20) > ul > li';
+
   // Selectors below target some of the elements in the CIP-95 dapp. More selectors are needed to configure the
   // different actions that we'll test.
 
@@ -79,6 +82,11 @@ describe('dapp/cip95', () => {
       const dappDrepKey = await $(dappGetPubDrepKey).getText();
       expect(dappDrepKey.length).toBeGreaterThan(0);
       await expect($(dappDrepId)).toHaveTextContaining('drep');
+    });
+
+    it('supportedExtensions and getExtensions both return cip95', async () => {
+      await expect($(liSupportedExtensions)).toHaveTextContaining('95');
+      await expect($(liGetExtensions)).toHaveTextContaining('95');
     });
   });
 });
