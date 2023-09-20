@@ -6,9 +6,6 @@ const mapUtxos = (utxos: Cardano.Utxo[]) =>
   utxos.map((utxo) => Serialization.TransactionUnspentOutput.fromCore(utxo).toCbor());
 
 export const stubWalletApi: WalletApi = {
-  getActivePubStakeKeys: async () => [
-    Ed25519PublicKeyHex('deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01')
-  ],
   getBalance: async () => '100',
   getChangeAddress: async () =>
     'addr_test1qra788mu4sg8kwd93ns9nfdh3k4ufxwg4xhz2r3n064tzfgxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6cy45x',
@@ -32,7 +29,11 @@ export const stubWalletApi: WalletApi = {
   getExtensions: async () => [{ cip: 95 }],
   getNetworkId: async () => 0,
   getPubDRepKey: async () => Ed25519PublicKeyHex('deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01'),
+  getRegisteredPubStakeKeys: async () => [
+    Ed25519PublicKeyHex('deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01')
+  ],
   getRewardAddresses: async () => ['stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27'],
+  getUnregisteredPubStakeKeys: async () => [],
   getUnusedAddresses: async () => [],
   getUsedAddresses: async () => [
     'addr_test1qra788mu4sg8kwd93ns9nfdh3k4ufxwg4xhz2r3n064tzfgxu2hyfhlkwuxupa9d5085eunq2qywy7hvmvej456flkns6cy45x'
