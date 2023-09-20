@@ -57,12 +57,14 @@ describe('injectGlobal', () => {
       expect(window.cardano[properties.walletName].name).toBe(properties.walletName);
       expect(typeof window.cardano[properties.walletName].apiVersion).toBe('string');
       expect(window.cardano[properties.walletName].icon).toBe(properties.icon);
+      expect(window.cardano[properties.walletName].isEnabled).toBeDefined();
+      expect(typeof window.cardano[properties.walletName].isEnabled).toBe('function');
+      expect(window.cardano[properties.walletName].enable).toBeDefined();
+      expect(typeof window.cardano[properties.walletName].enable).toBe('function');
       expect(Object.keys(window.cardano[properties.walletName])).toEqual([
         'apiVersion',
         'supportedExtensions',
-        'enable',
         'icon',
-        'isEnabled',
         'name'
       ]);
       expect(window.cardano['another-obj']).toBe(anotherObj);

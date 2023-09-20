@@ -29,6 +29,7 @@ export const stubWalletApi: WalletApi = {
         }
       ]
     ]),
+  getExtensions: async () => [{ cip: 95 }],
   getNetworkId: async () => 0,
   getPubDRepKey: async () => Ed25519PublicKeyHex('deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01'),
   getRewardAddresses: async () => ['stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27'],

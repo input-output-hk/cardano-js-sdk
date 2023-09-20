@@ -8,6 +8,7 @@ export const api = <WalletApi>{
   getBalance: async () => '100',
   getChangeAddress: async () => 'change-address',
   getCollateral: async () => null,
+  getExtensions: async () => [{ cip: 95 }],
   getNetworkId: async () => 0,
   getPubDRepKey: async () => 'getPubDRepKey' as Ed25519PublicKeyHex,
   getRewardAddresses: async () => ['reward-address-1', 'reward-address-2'],

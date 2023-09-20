@@ -555,6 +555,11 @@ describe('cip30', () => {
           expect.assertions(3);
         });
       });
+
+      test('api.getExtensions', async () => {
+        const extensions = await api.getExtensions();
+        expect(extensions).toEqual([{ cip: 95 }]);
+      });
     });
 
     describe('confirmation callbacks', () => {

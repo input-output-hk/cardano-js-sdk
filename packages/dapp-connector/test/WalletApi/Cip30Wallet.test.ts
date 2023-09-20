@@ -49,6 +49,7 @@ describe('Wallet', () => {
       const methods = new Set(Object.keys(api));
       expect(methods).toEqual(new Set([...CipMethodsMapping[30], 'experimental']));
       expect(await wallet.isEnabled()).toBe(true);
+      expect(await api.getExtensions()).toEqual([]);
     });
 
     test('with cip95 extension', async () => {
@@ -57,6 +58,7 @@ describe('Wallet', () => {
       const methods = new Set(Object.keys(api));
       expect(methods).toEqual(new Set([...CipMethodsMapping[30], ...CipMethodsMapping[95], 'experimental']));
       expect(await wallet.isEnabled()).toBe(true);
+      expect(await api.getExtensions()).toEqual([{ cip: 95 }]);
     });
 
     test('change extensions after enabling once', async () => {
@@ -64,11 +66,13 @@ describe('Wallet', () => {
       const cip30methods = new Set(Object.keys(cip30api));
       expect(cip30methods).toEqual(new Set([...CipMethodsMapping[30], 'experimental']));
       expect(await wallet.isEnabled()).toBe(true);
+      expect(await cip30api.getExtensions()).toEqual([]);
 
       const cip95api = await wallet.enable({ extensions: [{ cip: 95 }] });
       const cip95methods = new Set(Object.keys(cip95api));
       expect(cip95methods).toEqual(new Set([...CipMethodsMapping[30], ...CipMethodsMapping[95], 'experimental']));
       expect(await wallet.isEnabled()).toBe(true);
+      expect(await cip95api.getExtensions()).toEqual([{ cip: 95 }]);
     });
 
     test('unsupported extensions does not reject and returns cip30 methods', async () => {
@@ -77,6 +81,7 @@ describe('Wallet', () => {
       const methods = new Set(Object.keys(api));
       expect(methods).toEqual(new Set([...CipMethodsMapping[30], 'experimental']));
       expect(await wallet.isEnabled()).toBe(true);
+      expect(await api.getExtensions()).toEqual([]);
     });
 
     test('empty enable options does not reject and returns cip30 methods', async () => {
@@ -85,6 +90,7 @@ describe('Wallet', () => {
       const methods = new Set(Object.keys(api));
       expect(methods).toEqual(new Set([...CipMethodsMapping[30], 'experimental']));
       expect(await wallet.isEnabled()).toBe(true);
+      expect(await api.getExtensions()).toEqual([]);
     });
 
     test('throws if access to wallet api is not authorized', async () => {
@@ -233,6 +239,14 @@ describe('Wallet', () => {
 
       const txId = await api.submitTx('tx');
       expect(txId).toEqual('transactionId');
+    });
+
+    test('getExtensions', async () => {
+      expect(api.getExtensions).toBeDefined();
+      expect(typeof api.getExtensions).toBe('function');
+
+      const extensions = await api.getExtensions();
+      expect(extensions).toEqual([]);
     });
   });
 });
