@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano, HandleProvider, HandleResolution } from '@cardano-sdk/core';
+import { Cardano, HandleProvider, HandleResolution, metadatum } from '@cardano-sdk/core';
 import { GreedyInputSelector, SelectionSkeleton } from '@cardano-sdk/input-selection';
 import { GroupedAddress, SignTransactionOptions, TransactionSigner, util } from '@cardano-sdk/key-management';
 import {
@@ -144,7 +144,7 @@ export class GenericTxBuilder implements TxBuilder {
     });
   }
 
-  delegatePortfolio(portfolio: Pick<Cardano.Cip17DelegationPortfolio, 'pools'> | null): TxBuilder {
+  delegatePortfolio(portfolio: Cardano.Cip17DelegationPortfolio | null): TxBuilder {
     if (portfolio?.pools.length === 0) {
       throw new Error('Portfolio should define at least one delegation pool.');
     }
@@ -152,6 +152,23 @@ export class GenericTxBuilder implements TxBuilder {
       ...pool,
       id: Cardano.PoolId.fromKeyHash(pool.id as unknown as Crypto.Ed25519KeyHashHex)
     }));
+
+    if (portfolio) {
+      if (this.partialAuxiliaryData?.blob) {
+        this.partialAuxiliaryData.blob.set(
+          Cardano.DelegationMetadataLabel,
+          metadatum.jsonToMetadatum(Cardano.portfolioMetadataFromCip17(portfolio))
+        );
+      } else {
+        this.partialAuxiliaryData = {
+          ...this.partialAuxiliaryData,
+          blob: new Map([
+            [Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(Cardano.portfolioMetadataFromCip17(portfolio))]
+          ])
+        };
+      }
+    }
+
     return this;
   }
 

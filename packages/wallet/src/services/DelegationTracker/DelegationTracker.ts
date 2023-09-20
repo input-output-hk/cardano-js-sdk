@@ -70,6 +70,23 @@ export const certificateTransactionsWithEpochs = (
       transactions.map((tx) => ({ epoch: slotEpochCalc(tx.blockHeader.slot), tx }))
     )
   );
+
+export const createDelegationPortfolioTracker = (delegationTransactions: Observable<TxWithEpoch[]>) =>
+  delegationTransactions.pipe(
+    map((transactionsWithEpochs) => {
+      const txSorted = transactionsWithEpochs.sort((lhs, rhs) => lhs.epoch - rhs.epoch);
+      const latestDelegation = txSorted.pop();
+      if (!latestDelegation || !latestDelegation.tx.auxiliaryData || !latestDelegation.tx.auxiliaryData.blob)
+        return null;
+
+      const portfolio = latestDelegation.tx.auxiliaryData.blob.get(Cardano.DelegationMetadataLabel);
+
+      if (!portfolio) return null;
+
+      return Cardano.cip17FromMetadatum(portfolio);
+    })
+  );
+
 export const createDelegationTracker = ({
   rewardAccountAddresses$,
   epoch$,
@@ -111,6 +128,7 @@ export const createDelegationTracker = ({
       Cardano.CertificateType.StakeKeyDeregistration
     ]
   ).pipe(tap((transactionsWithEpochs) => logger.debug(`Found ${transactionsWithEpochs.length} staking transactions`)));
+
   const rewardsHistory$ = new TrackerSubject(
     createRewardsHistoryTracker(
       transactions$,
@@ -121,6 +139,9 @@ export const createDelegationTracker = ({
       onFatalError
     )
   );
+
+  const portfolio$ = new TrackerSubject(createDelegationPortfolioTracker(transactions$));
+
   const rewardAccounts$ = new TrackerSubject(
     createRewardAccountsTracker({
       balancesStore: stores.rewardsBalances,
@@ -137,11 +158,13 @@ export const createDelegationTracker = ({
   );
   return {
     distribution$,
+    portfolio$,
     rewardAccounts$,
     rewardsHistory$,
     shutdown: () => {
       rewardAccounts$.complete();
       rewardsHistory$.complete();
+      portfolio$.complete();
       logger.debug('Shutdown');
     }
   };

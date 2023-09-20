@@ -6,6 +6,7 @@ import {
   ConnectionStatus,
   ConnectionStatusTracker,
   DelegationTracker,
+  DynamicChangeAddressResolver,
   FailedTx,
   HDSequentialDiscovery,
   OutgoingTx,
@@ -84,12 +85,7 @@ import {
   tap,
   throwError
 } from 'rxjs';
-import {
-  ChangeAddressResolver,
-  InputSelector,
-  StaticChangeAddressResolver,
-  roundRobinRandomImprove
-} from '@cardano-sdk/input-selection';
+import { ChangeAddressResolver, InputSelector, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
 import {
@@ -328,19 +324,6 @@ export class PersonalWallet implements ObservableWallet {
       )
     );
 
-    this.#inputSelector = inputSelector
-      ? inputSelector
-      : roundRobinRandomImprove({
-          changeAddressResolver: new StaticChangeAddressResolver(() =>
-            firstValueFrom(
-              this.syncStatus.isSettled$.pipe(
-                filter((isSettled) => isSettled),
-                switchMap(() => this.addresses$)
-              )
-            )
-          )
-        });
-
     this.#tip$ = this.tip$ = new TipTracker({
       connectionStatus$: connectionStatusTracker$,
       logger: contextLogger(this.#logger, 'tip$'),
@@ -482,6 +465,20 @@ export class PersonalWallet implements ObservableWallet {
       transactionsTracker: this.transactions,
       utxoTracker: this.utxo
     });
+
+    this.#inputSelector = inputSelector
+      ? inputSelector
+      : roundRobinRandomImprove({
+          changeAddressResolver: new DynamicChangeAddressResolver(
+            this.syncStatus.isSettled$.pipe(
+              filter((isSettled) => isSettled),
+              switchMap(() => this.addresses$)
+            ),
+            this.delegation.distribution$,
+            () => firstValueFrom(this.delegation.portfolio$),
+            logger
+          )
+        });
 
     this.activePublicStakeKeys$ = createActivePublicStakeKeysTracker({
       addresses$: this.addresses$,
