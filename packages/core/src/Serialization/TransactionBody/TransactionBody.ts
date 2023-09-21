@@ -4,10 +4,12 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader, CborReaderState, CborWriter } from '../CBOR';
 import { Certificate } from '../Certificates';
 import { HexBlob } from '@cardano-sdk/util';
+import { ProposalProcedure } from './ProposalProcedure';
 import { SerializationError, SerializationFailure } from '../../errors';
 import { TransactionInput } from './TransactionInput';
 import { TransactionOutput } from './TransactionOutput';
 import { Update } from '../Update';
+import { VotingProcedures } from './VotingProcedures';
 import { multiAssetsToTokenMap, sortCanonically, tokenMapToMultiAsset } from './Utils';
 
 /**
@@ -34,6 +36,10 @@ export class TransactionBody {
   #collateralReturn: TransactionOutput | undefined;
   #totalCollateral: Cardano.Lovelace | undefined;
   #referenceInputs: Array<TransactionInput> | undefined;
+  #votingProcedures: VotingProcedures | undefined;
+  #proposalProcedures: Array<ProposalProcedure> | undefined;
+  #currentTreasuryValue: Cardano.Lovelace | undefined;
+  #donation: Cardano.Lovelace | undefined;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -68,23 +74,26 @@ export class TransactionBody {
 
     // CDDL
     // transaction_body =
-    //   { 0 : set<transaction_input>    ; inputs
+    //   { 0 : set<transaction_input>             ; inputs
     //   , 1 : [* transaction_output]
-    //   , 2 : coin                      ; fee
-    //   , ? 3 : uint                    ; time to live
-    //   , ? 4 : [* certificate]
+    //   , 2 : coin                               ; fee
+    //   , ? 3 : uint                             ; time to live
+    //   , ? 4 : [+ certificate]
     //   , ? 5 : withdrawals
-    //   , ? 6 : update
     //   , ? 7 : auxiliary_data_hash
-    //   , ? 8 : uint                    ; validity interval start
+    //   , ? 8 : uint                             ; validity interval start
     //   , ? 9 : mint
     //   , ? 11 : script_data_hash
-    //   , ? 13 : set<transaction_input> ; collateral inputs
+    //   , ? 13 : nonempty_set<transaction_input> ; collateral inputs
     //   , ? 14 : required_signers
     //   , ? 15 : network_id
-    //   , ? 16 : transaction_output     ; collateral return; New
-    //   , ? 17 : coin                   ; total collateral; New
-    //   , ? 18 : set<transaction_input> ; reference inputs; New
+    //   , ? 16 : transaction_output              ; collateral return
+    //   , ? 17 : coin                            ; total collateral
+    //   , ? 18 : nonempty_set<transaction_input> ; reference inputs
+    //   , ? 19 : voting_procedures               ; New; Voting procedures
+    //   , ? 20 : [+ proposal_procedure]          ; New; Proposal procedures
+    //   , ? 21 : coin                            ; New; current treasury value
+    //   , ? 22 : positive_coin                   ; New; donation
     //   }
     writer.writeStartMap(this.#getMapSize());
 
@@ -226,6 +235,30 @@ export class TransactionBody {
       for (const input of this.#referenceInputs) {
         writer.writeEncodedValue(Buffer.from(input.toCbor(), 'hex'));
       }
+    }
+
+    if (this.#votingProcedures) {
+      writer.writeInt(19n);
+      writer.writeEncodedValue(Buffer.from(this.#votingProcedures.toCbor(), 'hex'));
+    }
+
+    if (this.#proposalProcedures && this.#proposalProcedures.length > 0) {
+      writer.writeInt(20n);
+      writer.writeStartArray(this.#proposalProcedures.length);
+
+      for (const procedure of this.#proposalProcedures) {
+        writer.writeEncodedValue(Buffer.from(procedure.toCbor(), 'hex'));
+      }
+    }
+
+    if (this.#currentTreasuryValue) {
+      writer.writeInt(21n);
+      writer.writeInt(this.#currentTreasuryValue);
+    }
+
+    if (this.#donation) {
+      writer.writeInt(22n);
+      writer.writeInt(this.#donation);
     }
 
     return writer.encodeAsHex();
@@ -383,6 +416,25 @@ export class TransactionBody {
 
           reader.readEndArray();
           break;
+        case 19n:
+          body.setVotingProcedures(VotingProcedures.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
+          break;
+        case 20n:
+          body.setProposalProcedures(new Array<ProposalProcedure>());
+          reader.readStartArray();
+
+          while (reader.peekState() !== CborReaderState.EndArray) {
+            body.proposalProcedures()!.push(ProposalProcedure.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
+          }
+
+          reader.readEndArray();
+          break;
+        case 21n:
+          body.setCurrentTreasuryValue(reader.readInt());
+          break;
+        case 22n:
+          body.setDonation(reader.readInt());
+          break;
       }
     }
 
@@ -404,15 +456,20 @@ export class TransactionBody {
       certificates: this.#certs ? this.#certs.map((cert) => cert.toCore()) : undefined,
       collateralReturn: this.#collateralReturn?.toCore(),
       collaterals: this.#collateral ? this.#collateral.map((input) => input.toCore()) : undefined,
+      donation: this.#donation,
       fee: this.#fee,
       inputs: this.#inputs.map((input) => input.toCore()),
       mint: this.#mint,
       networkId: this.#networkId,
       outputs: this.#outputs.map((output) => output.toCore()),
+      proposalProcedures: this.#proposalProcedures
+        ? this.#proposalProcedures.map((input) => input.toCore())
+        : undefined,
       referenceInputs: this.#referenceInputs ? this.#referenceInputs.map((input) => input.toCore()) : undefined,
       requiredExtraSignatures: this.#requiredSigners,
       scriptIntegrityHash: this.#scriptDataHash,
       totalCollateral: this.#totalCollateral,
+      treasuryValue: this.#currentTreasuryValue,
       update: this.#update ? this.#update.toCore() : undefined,
       validityInterval:
         this.#ttl || this.#validityStartInterval
@@ -421,6 +478,7 @@ export class TransactionBody {
               invalidHereafter: this.#ttl ? this.#ttl : undefined
             }
           : undefined,
+      votingProcedures: this.#votingProcedures ? this.#votingProcedures.toCore() : undefined,
       withdrawals: this.#withdrawals
         ? [...this.#withdrawals].map(([stakeAddress, quantity]) => ({ quantity, stakeAddress }))
         : undefined
@@ -480,6 +538,15 @@ export class TransactionBody {
         body.withdrawals()!.set(coreWithdrawal.stakeAddress, coreWithdrawal.quantity);
       }
     }
+
+    if (coreTransactionBody.donation) body.setDonation(coreTransactionBody.donation);
+    if (coreTransactionBody.treasuryValue) body.setCurrentTreasuryValue(coreTransactionBody.treasuryValue);
+    if (coreTransactionBody.votingProcedures)
+      body.setVotingProcedures(VotingProcedures.fromCore(coreTransactionBody.votingProcedures));
+    if (coreTransactionBody.proposalProcedures)
+      body.setProposalProcedures(
+        coreTransactionBody.proposalProcedures.map((core) => ProposalProcedure.fromCore(core))
+      );
 
     return body;
   }
@@ -836,6 +903,82 @@ export class TransactionBody {
   }
 
   /**
+   * Sets the voting procedures of this transaction.
+   *
+   * @param votingProcedures the voting procedures.
+   */
+  setVotingProcedures(votingProcedures: VotingProcedures): void {
+    this.#votingProcedures = votingProcedures;
+    this.#originalBytes = undefined;
+  }
+
+  /**
+   * Gets the voting procedures of this transaction.
+   *
+   * @returns the voting procedures.
+   */
+  votingProcedures(): VotingProcedures | undefined {
+    return this.#votingProcedures;
+  }
+
+  /**
+   * Sets the proposal procedures of this transaction.
+   *
+   * @param proposalProcedure the proposal procedures.
+   */
+  setProposalProcedures(proposalProcedure: Array<ProposalProcedure>): void {
+    this.#proposalProcedures = proposalProcedure;
+    this.#originalBytes = undefined;
+  }
+
+  /**
+   * Gets the proposal procedures of this transaction.
+   *
+   * @returns the proposal procedures.
+   */
+  proposalProcedures(): Array<ProposalProcedure> | undefined {
+    return this.#proposalProcedures;
+  }
+
+  /**
+   * Sets the current treasury value of this transaction.
+   *
+   * @param currentTreasuryValue the current treasury value.
+   */
+  setCurrentTreasuryValue(currentTreasuryValue: Cardano.Lovelace): void {
+    this.#currentTreasuryValue = currentTreasuryValue;
+    this.#originalBytes = undefined;
+  }
+
+  /**
+   * Gets the current treasury value of this transaction.
+   *
+   * @returns the current treasury value.
+   */
+  currentTreasuryValue(): Cardano.Lovelace | undefined {
+    return this.#currentTreasuryValue;
+  }
+
+  /**
+   * Sets the current treasury donation of this transaction.
+   *
+   * @param donation The treasury donation.
+   */
+  setDonation(donation: Cardano.Lovelace): void {
+    this.#donation = donation;
+    this.#originalBytes = undefined;
+  }
+
+  /**
+   * Gets the current treasury donation of this transaction.
+   *
+   * @returns The treasury donation.
+   */
+  donation(): Cardano.Lovelace | undefined {
+    return this.#donation;
+  }
+
+  /**
    * Gets the size of the serialized map.
    *
    * @private
@@ -860,6 +1003,10 @@ export class TransactionBody {
     if (this.#collateralReturn !== undefined) ++mapSize;
     if (this.#totalCollateral !== undefined) ++mapSize;
     if (this.#referenceInputs !== undefined && this.#referenceInputs.length > 0) ++mapSize;
+    if (this.#votingProcedures !== undefined) ++mapSize;
+    if (this.#proposalProcedures !== undefined && this.#proposalProcedures.length > 0) ++mapSize;
+    if (this.#currentTreasuryValue !== undefined) ++mapSize;
+    if (this.#donation !== undefined) ++mapSize;
 
     return mapSize;
   }

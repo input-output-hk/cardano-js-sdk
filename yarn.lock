@@ -3219,6 +3219,7 @@ __metadata:
     "@cardano-sdk/web-extension": "workspace:~"
     "@dcspark/cardano-multiplatform-lib-browser": ^3.1.1
     "@emurgo/cardano-message-signing-asmjs": ^1.0.1
+    "@emurgo/cardano-serialization-lib-nodejs": 12.0.0-alpha.6
     "@types/bunyan": ^1.8.8
     "@types/chalk": ^2.2.0
     "@types/convict": ^6.1.2
@@ -3921,6 +3922,13 @@ __metadata:
   version: 1.0.1
   resolution: "@emurgo/cardano-message-signing-nodejs@npm:1.0.1"
   checksum: 0849d3cc4dc3d33072afeaa44c7316f62d2cde1e2f7449cf24ac8b2a65a89ff17f301572c89a6890433054098084a57c01013c4a37d956ef7bc33bce90fc048f
+  languageName: node
+  linkType: hard
+
+"@emurgo/cardano-serialization-lib-nodejs@npm:12.0.0-alpha.6":
+  version: 12.0.0-alpha.6
+  resolution: "@emurgo/cardano-serialization-lib-nodejs@npm:12.0.0-alpha.6"
+  checksum: cdfac69232ac29f9650effa5a515d4d7b00480a08b395f27f765a1466a6ac40ee807470a77dcd32a8438519e37b61ef03e469f1df3dd2a360ab02eb75fd6af96
   languageName: node
   linkType: hard
 

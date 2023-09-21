@@ -3,7 +3,7 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { CborReader, CborWriter } from '../CBOR';
 import { HexBlob, InvalidStateError } from '@cardano-sdk/util';
 import { NativeScript } from './NativeScript';
-import { PlutusV1Script, PlutusV2Script } from './PlutusScript';
+import { PlutusV1Script, PlutusV2Script, PlutusV3Script } from './PlutusScript';
 import { ScriptLanguage } from './ScriptLanguage';
 
 const SCRIPT_SUBGROUP = 2;
@@ -15,6 +15,7 @@ export class Script {
   #nativeScript: NativeScript | undefined;
   #plutusV1: PlutusV1Script | undefined;
   #plutusV2: PlutusV2Script | undefined;
+  #plutusV3: PlutusV3Script | undefined;
   #language: ScriptLanguage;
   #originalBytes: HexBlob | undefined = undefined;
 
@@ -27,7 +28,7 @@ export class Script {
     if (this.#originalBytes) return this.#originalBytes;
 
     // CDDL
-    // script = [ 0, native_script // 1, plutus_v1_script // 2, plutus_v2_script ]
+    // script = [ 0, native_script // 1, plutus_v1_script // 2, plutus_v2_script // 3, plutus_v3_script ]
     const writer = new CborWriter();
 
     let cbor;
@@ -41,6 +42,9 @@ export class Script {
         break;
       case ScriptLanguage.PlutusV2:
         cbor = this.#plutusV2!.toCbor();
+        break;
+      case ScriptLanguage.PlutusV3:
+        cbor = this.#plutusV3!.toCbor();
         break;
       default:
         throw new InvalidStateError(`Unexpected language value: ${this.#language}`);
@@ -79,6 +83,9 @@ export class Script {
       case ScriptLanguage.PlutusV2:
         script = Script.newPlutusV2Script(PlutusV2Script.fromCbor(innerScript));
         break;
+      case ScriptLanguage.PlutusV3:
+        script = Script.newPlutusV3Script(PlutusV3Script.fromCbor(innerScript));
+        break;
       default:
         throw new InvalidStateError(`Unexpected language value: ${language}`);
     }
@@ -106,6 +113,9 @@ export class Script {
       case ScriptLanguage.PlutusV2:
         core = this.#plutusV2!.toCore();
         break;
+      case ScriptLanguage.PlutusV3:
+        core = this.#plutusV3!.toCore();
+        break;
       default:
         throw new InvalidStateError(`Unexpected language: ${this.#language}`);
     }
@@ -130,6 +140,9 @@ export class Script {
           break;
         case Cardano.PlutusLanguageVersion.V2:
           script = Script.newPlutusV2Script(PlutusV2Script.fromCore(coreScript));
+          break;
+        case Cardano.PlutusLanguageVersion.V3:
+          script = Script.newPlutusV3Script(PlutusV3Script.fromCore(coreScript));
           break;
         default:
           throw new InvalidStateError('Unexpected Plutus language version'); // Shouldn't happen.
@@ -191,6 +204,20 @@ export class Script {
   }
 
   /**
+   * Gets a Script from a PlutusV3 instance.
+   *
+   * @param plutusV3Script The PlutusV3Script instance to 'cast' to Script.
+   */
+  static newPlutusV3Script(plutusV3Script: PlutusV3Script): Script {
+    const script = new Script();
+
+    script.#plutusV3 = plutusV3Script;
+    script.#language = ScriptLanguage.PlutusV3;
+
+    return script;
+  }
+
+  /**
    * Gets a NativeScript from a Script instance.
    *
    * @returns a NativeScript if the script can be down cast, otherwise, undefined.
@@ -218,6 +245,15 @@ export class Script {
   }
 
   /**
+   * Gets a PlutusV3Script from a Script instance.
+   *
+   * @returns a PlutusV3Script if the script can be down cast, otherwise, undefined.
+   */
+  asPlutusV3(): PlutusV3Script | undefined {
+    return this.#plutusV3;
+  }
+
+  /**
    * Computes the script hash of this script.
    *
    * @returns the script hash.
@@ -233,6 +269,9 @@ export class Script {
         break;
       case ScriptLanguage.PlutusV2:
         hash = this.#plutusV2!.hash();
+        break;
+      case ScriptLanguage.PlutusV3:
+        hash = this.#plutusV3!.hash();
         break;
       default:
         throw new InvalidStateError(`Unexpected script language ${this.#language}`); // Shouldn't happen.

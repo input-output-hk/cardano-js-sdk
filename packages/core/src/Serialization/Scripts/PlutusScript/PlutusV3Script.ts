@@ -9,17 +9,17 @@ const HASH_LENGTH_IN_BYTES = 28;
  * Plutus' scripts are pieces of code that implement pure functions with True or False outputs. These functions take
  * several inputs such as Datum, Redeemer and the transaction context to decide whether an output can be spent or not.
  *
- * V2 was introduced in the Vasil hard fork.
+ * V3 was introduced in the Conway hard fork.
  *
- * The main changes in V2 of Plutus were to the interface to scripts. The ScriptContext was extended
+ * The main changes in V3 of Plutus were to the interface to scripts. The ScriptContext was extended
  * to include the following information:
  *
- *  - The full “redeemers” structure, which contains all the redeemers used in the transaction
- *  - Reference inputs in the transaction (proposed in CIP-31)
- *  - Inline datums in the transaction (proposed in CIP-32)
- *  - Reference scripts in the transaction (proposed in CIP-33)
+ *  - A Map with all the votes that were included in the transaction.
+ *  - A list with Proposals that will be turned into GovernanceActions, that everyone can vote on
+ *  - Optional amount for the current treasury. If included it will be checked to be equal the current amount in the treasury.
+ *  - Optional amount for donating to the current treasury. If included, specified amount will go into the treasury.
  */
-export class PlutusV2Script {
+export class PlutusV3Script {
   #compiledByteCode: HexBlob;
   #originalBytes: HexBlob | undefined = undefined;
 
@@ -27,16 +27,16 @@ export class PlutusV2Script {
    * Creates a new Plutus script from the RAW bytes of the compiled script.
    *
    * This does NOT include any CBOR encoding around these bytes (e.g. from "cborBytes" in cardano-cli)
-   * If you're creating this from those you should use PlutusV2Script.fromCbor() instead.
+   * If you're creating this from those you should use PlutusV3Script.fromCbor() instead.
    */
   constructor(compiledByteCode: HexBlob) {
     this.#compiledByteCode = compiledByteCode;
   }
 
   /**
-   * Serializes a PlutusV2Script into CBOR format.
+   * Serializes a PlutusV3Script into CBOR format.
    *
-   * @returns The PlutusV2Script in CBOR format.
+   * @returns The PlutusV3Script in CBOR format.
    */
   toCbor(): HexBlob {
     if (this.#originalBytes) return this.#originalBytes;
@@ -47,17 +47,17 @@ export class PlutusV2Script {
   }
 
   /**
-   * Deserializes the PlutusV2Script from a CBOR byte array.
+   * Deserializes the PlutusV3Script from a CBOR byte array.
    *
-   * @param cbor The CBOR encoded PlutusV2Script object.
-   * @returns The new PlutusV2Script instance.
+   * @param cbor The CBOR encoded PlutusV3Script object.
+   * @returns The new PlutusV3Script instance.
    */
-  static fromCbor(cbor: HexBlob): PlutusV2Script {
+  static fromCbor(cbor: HexBlob): PlutusV3Script {
     const reader = new CborReader(cbor);
 
     const bytes = reader.readByteString();
 
-    const script = new PlutusV2Script(HexBlob.fromBytes(bytes));
+    const script = new PlutusV3Script(HexBlob.fromBytes(bytes));
     script.#originalBytes = cbor;
 
     return script;
@@ -72,31 +72,31 @@ export class PlutusV2Script {
     return {
       __type: Cardano.ScriptType.Plutus,
       bytes: this.rawBytes(),
-      version: Cardano.PlutusLanguageVersion.V2
+      version: Cardano.PlutusLanguageVersion.V3
     };
   }
 
   /**
-   * Creates a PlutusV2Script object from the given Core PlutusScript object.
+   * Creates a PlutusV3Script object from the given Core PlutusScript object.
    *
    * @param plutusScript The core PlutusScript object.
    */
-  static fromCore(plutusScript: Cardano.PlutusScript): PlutusV2Script {
-    if (plutusScript.version !== Cardano.PlutusLanguageVersion.V2)
+  static fromCore(plutusScript: Cardano.PlutusScript): PlutusV3Script {
+    if (plutusScript.version !== Cardano.PlutusLanguageVersion.V3)
       throw new InvalidArgumentError('script', 'Wrong plutus language version.');
 
-    return new PlutusV2Script(plutusScript.bytes);
+    return new PlutusV3Script(plutusScript.bytes);
   }
 
   /**
-   * Computes the script hash of this Plutus V2 script.
+   * Computes the script hash of this Plutus V3 script.
    *
    * @returns the script hash.
    */
   hash(): Crypto.Hash28ByteBase16 {
     // To compute a script hash, note that you must prepend a tag to the bytes of
-    // the script before hashing. The tags in the Babbage era for PlutusV2 is "\x02"
-    const bytes = `02${this.rawBytes()}`;
+    // the script before hashing. The tags in the Conway era for PlutusV3 is "\x03"
+    const bytes = `03${this.rawBytes()}`;
 
     const hash = Crypto.blake2b(HASH_LENGTH_IN_BYTES).update(Buffer.from(bytes, 'hex')).digest();
 
@@ -106,7 +106,7 @@ export class PlutusV2Script {
   /**
    * Gets the raw bytes of this compiled Plutus script.
    *
-   * If you need "cborBytes" for cardano-cli use PlutusV2Script::toCbor() instead.
+   * If you need "cborBytes" for cardano-cli use PlutusV3Script::toCbor() instead.
    *
    * @returns The raw bytes of the compiled plutus script
    */

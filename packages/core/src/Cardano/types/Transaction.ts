@@ -77,7 +77,7 @@ export interface HydratedTxBody {
   referenceInputs?: HydratedTxIn[];
 
   votingProcedures?: VotingProcedures;
-  proposalProcedures?: [ProposalProcedure];
+  proposalProcedures?: ProposalProcedure[];
   treasuryValue?: Lovelace;
   donation?: Lovelace;
 }

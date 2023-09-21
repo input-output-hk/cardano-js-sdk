@@ -1,19 +1,12 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Credential, CredentialType, RewardAccount } from '../Address';
-import { EpochNo, Fraction } from '.';
+import { EpochNo, Fraction, ProtocolVersion, TransactionId } from '.';
 import { Lovelace } from './Value';
 import { ProtocolParametersUpdate } from './ProtocolParameters';
 
-/**
- * Datum hash, this allows to specify a Datum without publicly revealing its value. To spend an output which specifies
- * this type of datum, the actual Datum value must be provided and will be added to the witness set of
- * the transaction.
- */
-export type DataHash = Crypto.Hash32ByteBase16;
-
 export type Anchor = {
   url: string;
-  dataHash: DataHash;
+  dataHash: Crypto.Hash32ByteBase16;
 };
 
 // Actions
@@ -28,7 +21,7 @@ export enum GovernanceActionType {
 }
 
 export type GovernanceActionId = {
-  id: Crypto.Hash32ByteBase16;
+  id: TransactionId;
   actionIndex: number;
 };
 
@@ -38,13 +31,13 @@ export type CommitteeMember = {
 };
 
 export type Committee = {
-  members: [CommitteeMember];
+  members: Array<CommitteeMember>;
   quorumThreshold: Fraction;
 };
 
 export type Constitution = {
   anchor: Anchor;
-  scriptHash: DataHash | null;
+  scriptHash: Crypto.Hash28ByteBase16 | null;
 };
 
 export type ParameterChangeAction = {
@@ -56,7 +49,7 @@ export type ParameterChangeAction = {
 export type HardForkInitiationAction = {
   __typename: GovernanceActionType.hard_fork_initiation_action;
   governanceActionId: GovernanceActionId | null;
-  protocolVersion: ProtocolParametersUpdate['protocolVersion'];
+  protocolVersion: ProtocolVersion;
 };
 
 export type TreasuryWithdrawalsAction = {
@@ -75,8 +68,9 @@ export type NoConfidence = {
 export type UpdateCommittee = {
   __typename: GovernanceActionType.update_committee;
   governanceActionId: GovernanceActionId | null;
-  committeeColdCredentials: Set<Credential>;
-  committee: Committee;
+  membersToBeRemoved: Set<Credential>;
+  membersToBeAdded: Set<CommitteeMember>;
+  newQuorumThreshold: Fraction;
 };
 
 export type NewConstitution = {
@@ -87,7 +81,6 @@ export type NewConstitution = {
 
 export type InfoAction = {
   __typename: GovernanceActionType.info_action;
-  message: string;
 };
 
 export type GovernanceAction =
@@ -165,7 +158,13 @@ export type Voter =
   | DrepScriptHashVoter
   | StakePoolKeyHashVoter;
 
-export type VotingProcedures = Map<Voter, Map<GovernanceAction, VotingProcedure>>;
+export type VotingProcedures = Array<{
+  voter: Voter;
+  votes: Array<{
+    actionId: GovernanceActionId;
+    votingProcedure: VotingProcedure;
+  }>;
+}>;
 
 export type ProposalProcedure = {
   deposit: Lovelace;
