@@ -1,6 +1,0 @@
-bin
-node.sock
-db
-logs
-*.log
-sockets
