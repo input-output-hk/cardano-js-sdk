@@ -10,12 +10,12 @@
     {
       "accessPoints": [
         {
-          "address": "preview-node.world.dev.cardano.org",
-          "port": 30002
+          "address": "sanchonet-node.world.dev.cardano.org",
+          "port": 30004
         }
       ],
       "advertise": false
     }
   ],
-  "useLedgerAfterSlot": 322000
+  "useLedgerAfterSlot": 7167392
 }
