@@ -9,7 +9,13 @@ x-logging: &logging
 
 services:
   cardano-node-ogmios:
-    image: cardanosolutions/cardano-node-ogmios:v${OGMIOS_VERSION:-5.6.0}_${CARDANO_NODE_VERSION:-1.35.5}-${NETWORK:-mainnet}
+    build:
+      args:
+        CARDANO_NODE_VERSION: ${CARDANO_NODE_VERSION:-1.35.5}
+        NETWORK: ${NETWORK:-mainnet}
+        OGMIOS_VERSION: ${OGMIOS_VERSION:-v5.6.0}
+      context: ../../compose/ogmios
+      target: cardano-node-ogmios
     volumes:
       - ./config/network/${NETWORK:-mainnet}:/config
 
