@@ -1,10 +1,10 @@
-export const HEALTH_RESPONSE_BODY = {
-  connectionStatus: 'connected',
-  currentEpoch: 192,
-  currentEra: 'Alonzo',
+import { ServerHealth } from '@cardano-ogmios/client';
+
+export const HEALTH_RESPONSE_BODY: ServerHealth = {
+  currentEra: 'alonzo',
   lastKnownTip: {
-    blockNo: 100,
-    hash: '9ef43ab6e234fcf90d103413096c7da752da2f45b15e1259f43d476afd12932c',
+    height: 100,
+    id: '9ef43ab6e234fcf90d103413096c7da752da2f45b15e1259f43d476afd12932c',
     slot: 52_819_355
   },
   lastTipUpdate: '2022-03-13T16:22:51.423778138Z',
@@ -25,7 +25,8 @@ export const HEALTH_RESPONSE_BODY = {
     totalMessages: 0,
     totalUnrouted: 0
   },
+  network: 'preprod',
   networkSynchronization: 1,
-  slotInEpoch: 244_955,
-  startTime: '2022-03-13T16:18:59.932519677Z'
+  startTime: '2022-03-13T16:18:59.932519677Z',
+  version: '1'
 };

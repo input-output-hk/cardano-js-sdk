@@ -27,7 +27,7 @@ export interface InteractionContextProps {
    * 'OneTime' will close the connectino (and complete the interaction context observable)
    * after the 1st usage of emitted interaction context.
    */
-  interactionType: InteractionType;
+  interactionType: InteractionType; // REVIEW: Deprecate this? InteractionType is not used anymore in ogmios
   /**
    * Retry backoff configuration for
    * re-subscribing to connectionConfig$ on connection error.
@@ -45,7 +45,7 @@ export interface InteractionContextProps {
  * @throws errors with CardanoNodeErrors.ConnectionError when `reconnectionConfig.maxAttempts` is reached.
  */
 export const createObservableInteractionContext = (
-  { connectionConfig$, interactionType, reconnectionConfig = defaultReconnectionConfig }: InteractionContextProps,
+  { connectionConfig$, reconnectionConfig = defaultReconnectionConfig }: InteractionContextProps,
   dependencies: WithLogger
 ) =>
   connectionConfig$.pipe(
@@ -75,8 +75,7 @@ export const createObservableInteractionContext = (
               }
             },
             {
-              connection,
-              interactionType
+              connection
             }
           )
             .then((interactionContext) => {

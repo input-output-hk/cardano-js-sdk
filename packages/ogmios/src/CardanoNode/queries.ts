@@ -1,6 +1,7 @@
 import { CardanoNodeErrors, CardanoNodeUtil } from '@cardano-sdk/core';
+
+import { LedgerStateQuery } from '@cardano-ogmios/client';
 import { Logger } from 'ts-log';
-import { StateQueryClient } from '@cardano-ogmios/client/dist/StateQuery';
 import { eraSummary, genesis } from '../ogmiosToCore';
 
 const wrapError = async <T>(query: () => Promise<T>) => {
@@ -11,16 +12,19 @@ const wrapError = async <T>(query: () => Promise<T>) => {
   }
 };
 
-export const queryEraSummaries = (client: StateQueryClient, logger: Logger) =>
+export const queryEraSummaries = (client: LedgerStateQuery.LedgerStateQueryClient, logger: Logger) =>
   wrapError(async () => {
     logger.info('Querying era summaries');
-    const systemStart = await client.systemStart();
+    const systemStart = new Date((await client.eraStart()).time);
     const eraSummaries = await client.eraSummaries();
     return eraSummaries.map((era) => eraSummary(era, systemStart));
   });
 
-export const queryGenesisParameters = (client: StateQueryClient, logger: Logger) =>
+export const queryGenesisParameters = (client: LedgerStateQuery.LedgerStateQueryClient, logger: Logger) =>
   wrapError(async () => {
     logger.info('Querying genesis parameters');
-    return genesis(await client.genesisConfig());
+    // REVIEW: The queryNetwork/genesis local-state-query now expects one era as argument (either 'byron', 'shelley' or 'alonzo')
+    // to retrieve the corresponding genesis configuration.
+    // 'shelley' genesis maps best to the compact genesis we're using
+    return genesis(await client.genesisConfiguration('shelley'));
   });

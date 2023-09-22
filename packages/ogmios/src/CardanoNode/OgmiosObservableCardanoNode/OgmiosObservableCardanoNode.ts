@@ -10,13 +10,13 @@ import {
   PointOrOrigin
 } from '@cardano-sdk/core';
 import {
+  ChainSynchronization,
   ConnectionConfig,
   createConnectionObject,
-  createStateQueryClient,
+  createLedgerStateQueryClient,
   getServerHealth
 } from '@cardano-ogmios/client';
 import { InteractionContextProps, createObservableInteractionContext } from './createObservableInteractionContext';
-import { Intersection, findIntersect } from '@cardano-ogmios/client/dist/ChainSync';
 import { Logger } from 'ts-log';
 import {
   Observable,
@@ -38,8 +38,8 @@ import { ogmiosToCorePointOrOrigin, ogmiosToCoreTipOrOrigin, pointOrOriginToOgmi
 import { queryEraSummaries, queryGenesisParameters } from '../queries';
 import isEqual from 'lodash/isEqual';
 
-const ogmiosToCoreIntersection = (intersection: Intersection) => ({
-  point: ogmiosToCorePointOrOrigin(intersection.point),
+const ogmiosToCoreIntersection = (intersection: ChainSynchronization.Intersection) => ({
+  point: ogmiosToCorePointOrOrigin(intersection.intersection),
   tip: ogmiosToCoreTipOrOrigin(intersection.tip)
 });
 
@@ -95,7 +95,7 @@ export class OgmiosObservableCardanoNode implements ObservableCardanoNode {
       { logger: this.#logger }
     ).pipe(shareReplay({ bufferSize: 1, refCount: true }));
     const stateQueryClient$ = this.#interactionContext$.pipe(
-      switchMap((interactionContext) => from(createStateQueryClient(interactionContext))),
+      switchMap((interactionContext) => from(createLedgerStateQueryClient(interactionContext))),
       distinctUntilChanged((a, b) => isEqual(a, b)),
       shareReplay({ bufferSize: 1, refCount: true })
     );
@@ -141,7 +141,7 @@ export class OgmiosObservableCardanoNode implements ObservableCardanoNode {
           new Observable<ObservableChainSync>((subscriber) => {
             // eslint-disable-next-line promise/always-return
             if (subscriber.closed) return;
-            void findIntersect(interactionContext, points.map(pointOrOriginToOgmios))
+            void ChainSynchronization.findIntersection(interactionContext, points.map(pointOrOriginToOgmios))
               // eslint-disable-next-line promise/always-return
               .then((ogmiosIntersection) => {
                 const intersection = ogmiosToCoreIntersection(ogmiosIntersection);

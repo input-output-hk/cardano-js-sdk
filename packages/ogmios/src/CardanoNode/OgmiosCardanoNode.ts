@@ -9,9 +9,9 @@ import {
 } from '@cardano-sdk/core';
 import {
   ConnectionConfig,
-  StateQuery,
+  LedgerStateQuery,
   createConnectionObject,
-  createStateQueryClient,
+  createLedgerStateQueryClient,
   getServerHealth
 } from '@cardano-ogmios/client';
 import { Logger } from 'ts-log';
@@ -25,7 +25,7 @@ import { queryEraSummaries } from './queries';
  * @class OgmiosCardanoNode
  */
 export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
-  #stateQueryClient: StateQuery.StateQueryClient;
+  #stateQueryClient: LedgerStateQuery.LedgerStateQueryClient;
   #logger: Logger;
   #connectionConfig: ConnectionConfig;
 
@@ -37,7 +37,7 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
 
   public async initializeImpl(): Promise<void> {
     this.#logger.info('Initializing CardanoNode');
-    this.#stateQueryClient = await createStateQueryClient(
+    this.#stateQueryClient = await createLedgerStateQueryClient(
       await createInteractionContextWithLogger(this.#logger, { connection: this.#connectionConfig })
     );
     this.#logger.info('CardanoNode initialized');
@@ -61,7 +61,7 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
     }
     try {
       this.#logger.info('Getting system start');
-      return await this.#stateQueryClient.systemStart();
+      return new Date((await this.#stateQueryClient.eraStart()).time);
     } catch (error) {
       throw CardanoNodeUtil.asCardanoNodeError(error) || new CardanoNodeErrors.UnknownCardanoNodeError(error);
     }
@@ -74,7 +74,7 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
     try {
       this.#logger.info('Getting stake distribution');
       const map = new Map();
-      for (const [key, value] of Object.entries(await this.#stateQueryClient.stakeDistribution())) {
+      for (const [key, value] of Object.entries(await this.#stateQueryClient.liveStakeDistribution())) {
         const splitStake = value.stake.split('/');
         map.set(Cardano.PoolId(key), {
           ...value,

@@ -13,6 +13,7 @@ import {
 } from '@cardano-sdk/core';
 import {
   ConnectionConfig,
+  TransactionSubmission,
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   TxSubmission
@@ -20,7 +21,6 @@ import {
 import { Logger } from 'ts-log';
 import { OgmiosCardanoNode } from '../../CardanoNode';
 import { RunnableModule, contextLogger, isNotNil } from '@cardano-sdk/util';
-import { TxSubmissionClient, createTxSubmissionClient } from '../../Ogmios/TxSubmissionClient';
 import { createInteractionContextWithLogger } from '../../util';
 
 /**
@@ -29,7 +29,7 @@ import { createInteractionContextWithLogger } from '../../util';
  * @class OgmiosTxSubmitProvider
  */
 export class OgmiosTxSubmitProvider extends RunnableModule implements TxSubmitProvider {
-  #txSubmissionClient: TxSubmissionClient;
+  #txSubmissionClient: TransactionSubmission.TransactionSubmissionClient;
   #logger: Logger;
   #connectionConfig: ConnectionConfig;
   #handleProvider?: HandleProvider;
@@ -49,7 +49,7 @@ export class OgmiosTxSubmitProvider extends RunnableModule implements TxSubmitPr
   public async initializeImpl(): Promise<void> {
     this.#logger.info('Initializing OgmiosTxSubmitProvider');
 
-    this.#txSubmissionClient = await createTxSubmissionClient(
+    this.#txSubmissionClient = await TransactionSubmission.createTransactionSubmissionClient(
       await createInteractionContextWithLogger(contextLogger(this.#logger, 'ogmiosTxSubmitProvider'), {
         connection: this.#connectionConfig,
         interactionType: 'LongRunning'
@@ -77,7 +77,7 @@ export class OgmiosTxSubmitProvider extends RunnableModule implements TxSubmitPr
     await this.throwIfHandleResolutionConflict(context);
 
     try {
-      const id = await this.#txSubmissionClient.submitTx(signedTransaction);
+      const id = await this.#txSubmissionClient.submitTransaction(signedTransaction);
       this.#logger.info(`Submitted ${id}`);
     } catch (error) {
       throw Cardano.util.asTxSubmissionError(error) || new CardanoNodeErrors.UnknownTxSubmissionError(error);

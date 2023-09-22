@@ -4,7 +4,7 @@ import { Schema } from '@cardano-ogmios/client';
 export const eraSummary = (ogmiosEraSummary: Schema.EraSummary, systemStart: Date): EraSummary => ({
   parameters: {
     epochLength: ogmiosEraSummary.parameters.epochLength,
-    slotLength: Seconds.toMilliseconds(Seconds(ogmiosEraSummary.parameters.slotLength))
+    slotLength: Seconds.toMilliseconds(Seconds(ogmiosEraSummary.parameters.slotLength.seconds))
   },
   start: {
     slot: ogmiosEraSummary.start.slot,

@@ -6,7 +6,7 @@ describe('ogmiosToCore', () => {
   describe('eraSummary', () => {
     const eraSummary: Schema.EraSummary = {
       end: { epoch: 102, slot: 13_694_400, time: 44_064_000 },
-      parameters: { epochLength: 432_000, safeZone: 129_600, slotLength: 1 },
+      parameters: { epochLength: 432_000, safeZone: 129_600, slotLength: { seconds: 1 } },
       start: { epoch: 74, slot: 1_598_400, time: 31_968_000 }
     };
     it('maps ogmios EraSummary to core EraSummary', () => {
