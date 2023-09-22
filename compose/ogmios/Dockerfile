@@ -30,19 +30,20 @@ RUN echo >/app/default.nix $'\n\
     nodeFlake = builtins.getFlake "github:input-output-hk/cardano-node/'"${CARDANO_NODE_VERSION}"$'";\n\
     system = "'"$([ "$TARGETPLATFORM" = "linux/arm64" ] && echo "aarch64-linux" || echo "x86_64-linux")"$'";\n\
     inherit (nodeFlake.legacyPackages.${system}) haskell-nix;\n\
+    ogmiosSrc = nodeFlake.inputs.nixpkgs.legacyPackages.${system}.runCommand "ogmios-src" {} (\n\
+      "cp -r ${./ogmios-src} $out && chmod -R +w $out "\n\
+      + " && find $out -name cabal.project.freeze -delete -o -name package.yaml -delete "\n\
+      + " && grep -RF -- -external-libsodium-vrf $out | cut -d: -f1 | sort --uniq | xargs -n1 -- sed -r s/-external-libsodium-vrf//g -i"\n\
+    );\n\
     project = haskell-nix.project {\n\
       compiler-nix-name = "ghc8107";\n\
       projectFileName = "cabal.project";\n\
       inputMap = { "https://input-output-hk.github.io/cardano-haskell-packages" = nodeFlake.inputs.CHaP; };\n\
-      src = haskell-nix.haskellLib.cleanSourceWith {\n\
-        name = "ogmios-src";\n\
-        src = ./ogmios-src;\n\
-        subDir = "server";\n\
-        filter = path: type: baseNameOf path != "package.yaml";\n\
-      };\n\
+      src = ogmiosSrc + "/server";\n\
       modules = [ ({ lib, pkgs, ... }: {\n\
         packages.cardano-crypto-praos.components.library.pkgconfig = lib.mkForce [ [ pkgs.libsodium-vrf ] ];\n\
-        packages.cardano-crypto-class.components.library.pkgconfig = lib.mkForce [ [ pkgs.libsodium-vrf pkgs.secp256k1 pkgs.libblst ] ];\n\
+        packages.cardano-crypto-class.components.library.pkgconfig = lib.mkForce [ ([ pkgs.libsodium-vrf pkgs.secp256k1 ]\n\
+          ++ (if pkgs ? libblst then [pkgs.libblst] else [])) ];\n\
       }) ];\n\
     };\n\
   in {\n\
