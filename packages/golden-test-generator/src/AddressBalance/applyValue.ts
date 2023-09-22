@@ -17,24 +17,23 @@ export const applyValue = (
 ): Ogmios.Schema.Value => {
   // This is a workaround. coins is typed as a bigint,
   // but it's sometimes being parsed from the raw response as a number.
-  const valueCoins: bigint = typeof value.coins === 'bigint' ? value.coins : BigInt(value.coins);
-  const balanceCoins: bigint = typeof balance.coins === 'bigint' ? balance.coins : BigInt(balance.coins);
+  const valueCoins: bigint = typeof value.ada.lovelace === 'bigint' ? value.ada.lovelace : BigInt(value.ada.lovelace);
+  const balanceCoins: bigint =
+    typeof balance.ada.lovelace === 'bigint' ? balance.ada.lovelace : BigInt(balance.ada.lovelace);
   const coins = balanceCoins + (spending ? -BigIntMath.abs(valueCoins) : valueCoins);
   throwIfNegative(coins);
-  const balanceToApply: Ogmios.Schema.Value = { coins };
-  if (balance.assets !== undefined || value.assets !== undefined) {
-    balanceToApply.assets = { ...balance.assets } ?? {};
-  }
-  const assets = Object.entries(value.assets ?? {});
-  if (assets.length > 0) {
-    for (const [assetId, qty] of assets) {
-      balanceToApply.assets![assetId] =
-        balance.assets![assetId] !== undefined
-          ? balance.assets![assetId] + (spending ? -BigIntMath.abs(qty) : qty)
-          : spending
-          ? -BigIntMath.abs(qty)
-          : qty;
-      throwIfNegative(balanceToApply.assets![assetId]);
+  const balanceToApply: Ogmios.Schema.Value = { ...balance, ada: { lovelace: coins } };
+  const assets = Object.entries(value ?? {}).filter(([policyId]) => policyId !== 'ada');
+
+  for (const [policyId, asset] of assets) {
+    for (const [assetName, qty] of Object.entries(asset)) {
+      const assetQty = spending ? -BigIntMath.abs(qty) : qty;
+      const balanceQty = balance[policyId]?.[assetName];
+      balanceToApply[policyId] = {
+        ...balanceToApply[policyId],
+        [assetName]: balanceQty !== undefined ? balanceQty + assetQty : assetQty
+      };
+      throwIfNegative(balanceToApply[policyId]?.[assetName]);
     }
   }
 

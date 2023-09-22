@@ -6,36 +6,36 @@ describe('AddressBalance', () => {
     beforeEach(() => {
       balances = {
         ab: {
-          coins: 100n
+          ada: { lovelace: 100n }
         },
         cd: {
-          assets: {
-            12: 10n
-          },
-          coins: 400n
+          ada: { lovelace: 400n },
+          policyId: {
+            assetName: 10n
+          }
         },
         ef: {
-          assets: {
-            12: 10n,
-            34: 20n
-          },
-          coins: 500n
+          ada: { lovelace: 500n },
+          policyId: {
+            assetName1: 10n,
+            assetName2: 20n
+          }
         }
       };
     });
     describe('values containing only coins', () => {
       const address = 'ab';
       it('adds the coins balance', () => {
-        expect(applyValue(balances[address], { coins: 50n })).toEqual({ coins: 150n });
+        expect(applyValue(balances[address], { ada: { lovelace: 50n } })).toEqual({ ada: { lovelace: 150n } });
       });
       it('subtracts the coins balance when spending', () => {
-        expect(applyValue(balances[address], { coins: 50n }, true)).toEqual({ coins: 50n });
+        expect(applyValue(balances[address], { ada: { lovelace: 50n } }, true)).toEqual({ ada: { lovelace: 50n } });
       });
       it('returns the same balance if coins is 0', () => {
-        expect(applyValue(balances[address], { coins: 0n })).toEqual({ coins: 100n });
+        expect(applyValue(balances[address], { ada: { lovelace: 0n } })).toEqual({ ada: { lovelace: 100n } });
       });
       it('returns the same balance if coins is 0 when spending', () => {
-        expect(applyValue(balances[address], { coins: 0n }, true)).toEqual({ coins: 100n });
+        expect(applyValue(balances[address], { ada: { lovelace: 0n } }, true)).toEqual({ ada: { lovelace: 100n } });
       });
     });
     describe('values containing an asset', () => {
@@ -43,29 +43,29 @@ describe('AddressBalance', () => {
       it('adds the coins and asset balance', () => {
         expect(
           applyValue(balances[address], {
-            assets: {
-              12: 10n
-            },
-            coins: 50n
+            ada: { lovelace: 50n },
+            policyId: {
+              assetName: 10n
+            }
           })
-        ).toEqual({ assets: { 12: 20n }, coins: 450n });
+        ).toEqual({ ada: { lovelace: 450n }, policyId: { assetName: 20n } });
       });
       it('subtracts the coins and asset balance when spending', () => {
-        expect(applyValue(balances[address], { assets: { 12: 9n }, coins: 50n }, true)).toEqual({
-          assets: { 12: 1n },
-          coins: 350n
+        expect(applyValue(balances[address], { ada: { lovelace: 50n }, policyId: { assetName: 9n } }, true)).toEqual({
+          ada: { lovelace: 350n },
+          policyId: { assetName: 1n }
         });
       });
       it('returns the same balance if coins and asset is 0', () => {
-        expect(applyValue(balances[address], { assets: { 12: 0n }, coins: 0n })).toEqual({
-          assets: { 12: 10n },
-          coins: 400n
+        expect(applyValue(balances[address], { ada: { lovelace: 0n }, policyId: { assetName: 0n } })).toEqual({
+          ada: { lovelace: 400n },
+          policyId: { assetName: 10n }
         });
       });
       it('returns the same balance if coins and asset is 0 when spending', () => {
-        expect(applyValue(balances[address], { assets: { 12: 0n }, coins: 0n }, true)).toEqual({
-          assets: { 12: 10n },
-          coins: 400n
+        expect(applyValue(balances[address], { ada: { lovelace: 0n }, policyId: { assetName: 0n } }, true)).toEqual({
+          ada: { lovelace: 400n },
+          policyId: { assetName: 10n }
         });
       });
     });
@@ -74,18 +74,18 @@ describe('AddressBalance', () => {
       it('adds the coins and assets balance', () => {
         expect(
           applyValue(balances[address], {
-            assets: {
-              12: 10n,
-              34: 55n
-            },
-            coins: 50n
+            ada: { lovelace: 50n },
+            policyId: {
+              assetName1: 10n,
+              assetName2: 55n
+            }
           })
         ).toEqual({
-          assets: {
-            12: 20n,
-            34: 75n
-          },
-          coins: 550n
+          ada: { lovelace: 550n },
+          policyId: {
+            assetName1: 20n,
+            assetName2: 75n
+          }
         });
       });
       it('subtracts the coins and asset balances when spending', () => {
@@ -93,37 +93,37 @@ describe('AddressBalance', () => {
           applyValue(
             balances[address],
             {
-              assets: {
-                12: 9n,
-                34: 15n
-              },
-              coins: 50n
+              ada: { lovelace: 50n },
+              policyId: {
+                assetName1: 9n,
+                assetName2: 15n
+              }
             },
             true
           )
         ).toEqual({
-          assets: {
-            12: 1n,
-            34: 5n
-          },
-          coins: 450n
+          ada: { lovelace: 450n },
+          policyId: {
+            assetName1: 1n,
+            assetName2: 5n
+          }
         });
       });
       it('adds new assets to the address balance', () => {
         expect(
           applyValue(balances[address], {
-            assets: {
+            ada: { lovelace: 1n },
+            policyId: {
               new: 100n
-            },
-            coins: 1n
+            }
           })
         ).toEqual({
-          assets: {
-            12: 10n,
-            34: 20n,
+          ada: { lovelace: 501n },
+          policyId: {
+            assetName1: 10n,
+            assetName2: 20n,
             new: 100n
-          },
-          coins: 501n
+          }
         });
       });
     });
@@ -132,23 +132,23 @@ describe('AddressBalance', () => {
       it('adds the coins', () => {
         expect(
           applyValue(balances[address], {
-            coins: 50n
+            ada: { lovelace: 50n }
           })
         ).toEqual({
-          assets: {
-            12: 10n,
-            34: 20n
-          },
-          coins: 550n
+          ada: { lovelace: 550n },
+          policyId: {
+            assetName1: 10n,
+            assetName2: 20n
+          }
         });
       });
       it('subtracts the coins', () => {
-        expect(applyValue(balances[address], { coins: 50n }, true)).toEqual({
-          assets: {
-            12: 10n,
-            34: 20n
-          },
-          coins: 450n
+        expect(applyValue(balances[address], { ada: { lovelace: 50n } }, true)).toEqual({
+          ada: { lovelace: 450n },
+          policyId: {
+            assetName1: 10n,
+            assetName2: 20n
+          }
         });
       });
     });
@@ -159,7 +159,7 @@ describe('AddressBalance', () => {
           applyValue(
             balances[address],
             {
-              coins: 500n
+              ada: { lovelace: 500n }
             },
             true
           )
@@ -170,10 +170,10 @@ describe('AddressBalance', () => {
           applyValue(
             balances[address],
             {
-              assets: {
-                12: 20n
-              },
-              coins: 1n
+              ada: { lovelace: 1n },
+              policyId: {
+                assetName1: 20n
+              }
             },
             true
           )
