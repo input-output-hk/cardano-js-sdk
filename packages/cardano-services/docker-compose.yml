@@ -12,13 +12,6 @@ x-sdk-environment: &sdk-environment
 
 services:
   cardano-node-ogmios:
-    build:
-      args:
-        CARDANO_NODE_VERSION: ${CARDANO_NODE_VERSION:-1.35.5}
-        NETWORK: ${NETWORK:-mainnet}
-        OGMIOS_VERSION: ${OGMIOS_VERSION:-v5.6.0}
-      context: ../../compose/ogmios
-      target: cardano-node-ogmios
     volumes:
       - ./config/network/${NETWORK:-mainnet}:/config
 
