@@ -273,14 +273,24 @@ mkdir -p ./config/network/genesis/
 cp ./templates/babbage/db-sync-config.json ./config/network/cardano-db-sync/config.json
 cp ./templates/babbage/node-config.json ./config/network/cardano-node/config.json
 
-$SED -i -E "s/\"ByronGenesisHash\": \".*\"/\"ByronGenesisHash\": \"${byronGenesisHash}\"/" ./config/network/cardano-node/config.json
-$SED -i -E "s/\"ShelleyGenesisHash\": \".*\"/\"ShelleyGenesisHash\": \"${shelleyGenesisHash}\"/" ./config/network/cardano-node/config.json
-$SED -i -E "s/\"AlonzoGenesisHash\": \".*\"/\"AlonzoGenesisHash\": \"${alonzoGenesisHash}\"/" ./config/network/cardano-node/config.json
+###############################
+# NOTE: We can't use -i to do inline replacement because this breaks due to permission errors on MacOS when creating the temp output file in this case, giving Root permissions to Docker is also not 
+# a valid working option for MacOS.
+# https://forums.docker.com/t/sed-couldnt-open-temporary-file-xyz-permission-denied-when-using-virtiofs/125473
+###############################
+
+$SED -E "s/\"ByronGenesisHash\": \".*\"/\"ByronGenesisHash\": \"${byronGenesisHash}\"/" ./config/network/cardano-node/config.json > ./config/network/cardano-node/config.json.tmp
+mv ./config/network/cardano-node/config.json.tmp ./config/network/cardano-node/config.json
+$SED -E "s/\"ShelleyGenesisHash\": \".*\"/\"ShelleyGenesisHash\": \"${shelleyGenesisHash}\"/" ./config/network/cardano-node/config.json > ./config/network/cardano-node/config.json.tmp
+mv ./config/network/cardano-node/config.json.tmp ./config/network/cardano-node/config.json
+$SED -E "s/\"AlonzoGenesisHash\": \".*\"/\"AlonzoGenesisHash\": \"${alonzoGenesisHash}\"/" ./config/network/cardano-node/config.json > ./config/network/cardano-node/config.json.tmp
+mv ./config/network/cardano-node/config.json.tmp ./config/network/cardano-node/config.json
 
 cp ./templates/babbage/topology.json ./config/network/cardano-node/topology.json
 # docker hostname in topology.json isn't working, so need to specify ip of local network
 CONTAINER_IP=$(hostname -I | xargs)
-$SED -i "s/172.17.0.1/$CONTAINER_IP/g" ./config/network/cardano-node/topology.json
+$SED "s/172.17.0.1/$CONTAINER_IP/g" ./config/network/cardano-node/topology.json > ./config/network/cardano-node/topology.json.tmp
+mv ./config/network/cardano-node/topology.json.tmp ./config/network/cardano-node/topology.json
 
 cp "${ROOT}"/genesis/byron/genesis.json ./config/network/cardano-node/genesis/byron.json
 cp "${ROOT}"/genesis/byron/genesis.json ./config/network/genesis/byron.json
