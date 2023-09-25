@@ -3,9 +3,9 @@ import {
   ApiError,
   Cip30EnableOptions,
   Cip30Wallet,
+  Cip30WalletApiWithPossibleExtensions,
   CipMethodsMapping,
   RemoteAuthenticator,
-  WalletApi,
   WalletApiExtension
 } from '../../src';
 import { Cardano } from '@cardano-sdk/core';
@@ -56,7 +56,9 @@ describe('Wallet', () => {
       const api = await wallet.enable({ extensions: [{ cip: 95 }] });
       expect(typeof api).toBe('object');
       const methods = new Set(Object.keys(api));
-      expect(methods).toEqual(new Set([...CipMethodsMapping[30], ...CipMethodsMapping[95], 'experimental']));
+      expect(methods).toEqual(new Set([...CipMethodsMapping[30], 'cip95', 'experimental']));
+      const cip95Methods = new Set(Object.keys(api.cip95!));
+      expect(cip95Methods).toEqual(new Set(CipMethodsMapping[95]));
       expect(await wallet.isEnabled()).toBe(true);
       expect(await api.getExtensions()).toEqual([{ cip: 95 }]);
     });
@@ -70,7 +72,9 @@ describe('Wallet', () => {
 
       const cip95api = await wallet.enable({ extensions: [{ cip: 95 }] });
       const cip95methods = new Set(Object.keys(cip95api));
-      expect(cip95methods).toEqual(new Set([...CipMethodsMapping[30], ...CipMethodsMapping[95], 'experimental']));
+      expect(cip95methods).toEqual(new Set([...CipMethodsMapping[30], 'cip95', 'experimental']));
+      const cip95InnerMethods = new Set(Object.keys(cip95api.cip95!));
+      expect(cip95InnerMethods).toEqual(new Set(CipMethodsMapping[95]));
       expect(await wallet.isEnabled()).toBe(true);
       expect(await cip95api.getExtensions()).toEqual([{ cip: 95 }]);
     });
@@ -143,7 +147,7 @@ describe('Wallet', () => {
   });
 
   describe('api', () => {
-    let api: WalletApi;
+    let api: Cip30WalletApiWithPossibleExtensions;
 
     beforeAll(async () => {
       api = await wallet.enable();
