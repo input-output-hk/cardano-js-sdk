@@ -81,4 +81,5 @@ EXPOSE 1337/tcp 3000/tcp 12788/tcp 12798/tcp
 HEALTHCHECK --interval=10s --timeout=5s --retries=1 CMD /bin/ogmios health-check
 STOPSIGNAL SIGINT
 COPY --from=haskell-builder /app/ogmios-src/scripts/cardano-node-ogmios.sh cardano-node-ogmios.sh
+RUN ln -s /sbin/tini /tini
 ENTRYPOINT ["tini", "-g", "--", "/root/cardano-node-ogmios.sh" ]
