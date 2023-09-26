@@ -4,7 +4,7 @@
   "private": true,
   "description": "An SDK for interacting with the Cardano blockchain",
   "engines": {
-    "node": ">=14.20.1"
+    "node": ">=16.20.2"
   },
   "workspaces": [
     "packages/*"

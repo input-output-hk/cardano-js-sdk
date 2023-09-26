@@ -3,7 +3,7 @@
   "version": "0.1.14",
   "description": "Cryptographic types and functions for Cardano. Warning: The libsodium crypto provider has not yet been audited. Use at this stage is at own risk",
   "engines": {
-    "node": ">=16.20.1"
+    "node": ">=16.20.2"
   },
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
