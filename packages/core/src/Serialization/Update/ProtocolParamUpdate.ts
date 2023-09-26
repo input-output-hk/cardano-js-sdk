@@ -1,10 +1,12 @@
-/* eslint-disable sonarjs/cognitive-complexity, complexity */
+/* eslint-disable sonarjs/cognitive-complexity, complexity, sonarjs/max-switch-cases, max-statements */
 import * as Cardano from '../../Cardano';
 import { CborReader, CborReaderState, CborWriter } from '../CBOR';
 import { Costmdls } from './Costmdls';
+import { DrepVotingThresholds } from './DrepVotingThresholds';
 import { ExUnitPrices } from './ExUnitPrices';
 import { ExUnits, ProtocolVersion, UnitInterval } from '../Common';
 import { HexBlob } from '@cardano-sdk/util';
+import { PoolVotingThresholds } from './PoolVotingThresholds';
 
 /**
  * The ProtocolParamUpdate structure in Cardano is used to propose changes to
@@ -36,6 +38,14 @@ export class ProtocolParamUpdate {
   #maxValueSize: number | undefined;
   #collateralPercentage: number | undefined;
   #maxCollateralInputs: number | undefined;
+  #poolVotingThresholds: PoolVotingThresholds | undefined;
+  #drepVotingThresholds: DrepVotingThresholds | undefined;
+  #minCommitteeSize: number | undefined;
+  #committeeTermLimit: number | undefined;
+  #governanceActionValidityPeriod: number | undefined;
+  #governanceActionDeposit: number | undefined;
+  #drepDeposit: number | undefined;
+  #drepInactivityPeriod: number | undefined;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -51,28 +61,35 @@ export class ProtocolParamUpdate {
 
     // CDDL
     // protocol_param_update =
-    //   { ? 0:  uint               ; minfee A
-    //   , ? 1:  uint               ; minfee B
-    //   , ? 2:  uint               ; max block body size
-    //   , ? 3:  uint               ; max transaction size
-    //   , ? 4:  uint               ; max block header size
-    //   , ? 5:  coin               ; key deposit
-    //   , ? 6:  coin               ; pool deposit
-    //   , ? 7: epoch               ; maximum epoch
-    //   , ? 8: uint                ; n_opt: desired number of stake pools
-    //   , ? 9: rational            ; pool pledge influence
-    //   , ? 10: unit_interval      ; expansion rate
-    //   , ? 11: unit_interval      ; treasury growth rate
-    //   , ? 14: [protocol_version] ; protocol version
-    //   , ? 16: coin               ; min pool cost
-    //   , ? 17: coin               ; ada per utxo byte
-    //   , ? 18: costmdls           ; cost models for script languages
-    //   , ? 19: ex_unit_prices     ; execution costs
-    //   , ? 20: ex_units           ; max tx ex units
-    //   , ? 21: ex_units           ; max block ex units
-    //   , ? 22: uint               ; max value size
-    //   , ? 23: uint               ; collateral percentage
-    //   , ? 24: uint               ; max collateral inputs
+    //   { ? 0:  uint                   ; minfee A
+    //   , ? 1:  uint                   ; minfee B
+    //   , ? 2:  uint                   ; max block body size
+    //   , ? 3:  uint                   ; max transaction size
+    //   , ? 4:  uint                   ; max block header size
+    //   , ? 5:  coin                   ; key deposit
+    //   , ? 6:  coin                   ; pool deposit
+    //   , ? 7: epoch                   ; maximum epoch
+    //   , ? 8: uint                    ; n_opt: desired number of stake pools
+    //   , ? 9: rational                ; pool pledge influence
+    //   , ? 10: unit_interval          ; expansion rate
+    //   , ? 11: unit_interval          ; treasury growth rate
+    //   , ? 16: coin                   ; min pool cost
+    //   , ? 17: coin                   ; ada per utxo byte
+    //   , ? 18: costmdls               ; cost models for script languages
+    //   , ? 19: ex_unit_prices         ; execution costs
+    //   , ? 20: ex_units               ; max tx ex units
+    //   , ? 21: ex_units               ; max block ex units
+    //   , ? 22: uint                   ; max value size
+    //   , ? 23: uint                   ; collateral percentage
+    //   , ? 24: uint                   ; max collateral inputs
+    //   , ? 25: pool_voting_thresholds ; pool voting thresholds
+    //   , ? 26: drep_voting_thresholds ; DRep voting thresholds
+    //   , ? 27: uint                   ; min committee size
+    //   , ? 28: uint                   ; committee term limit
+    //   , ? 29: epoch                  ; governance action validity period
+    //   , ? 30: coin                   ; governance action deposit
+    //   , ? 31: coin                   ; DRep deposit
+    //   , ? 32: epoch                  ; DRep inactivity period
     //   }
     writer.writeStartMap(this.#getMapSize());
 
@@ -198,6 +215,45 @@ export class ProtocolParamUpdate {
       writer.writeInt(this.#maxCollateralInputs);
     }
 
+    if (this.#poolVotingThresholds) {
+      writer.writeInt(25n);
+      writer.writeEncodedValue(Buffer.from(this.#poolVotingThresholds.toCbor(), 'hex'));
+    }
+
+    if (this.#drepVotingThresholds) {
+      writer.writeInt(26n);
+      writer.writeEncodedValue(Buffer.from(this.#drepVotingThresholds.toCbor(), 'hex'));
+    }
+
+    if (this.#minCommitteeSize) {
+      writer.writeInt(27n);
+      writer.writeInt(this.#minCommitteeSize);
+    }
+
+    if (this.#committeeTermLimit) {
+      writer.writeInt(28n);
+      writer.writeInt(this.#committeeTermLimit);
+    }
+
+    if (this.#governanceActionValidityPeriod) {
+      writer.writeInt(29n);
+      writer.writeInt(this.#governanceActionValidityPeriod);
+    }
+
+    if (this.#governanceActionDeposit) {
+      writer.writeInt(30n);
+      writer.writeInt(this.#governanceActionDeposit);
+    }
+
+    if (this.#drepDeposit) {
+      writer.writeInt(31n);
+      writer.writeInt(this.#drepDeposit);
+    }
+
+    if (this.#drepInactivityPeriod) {
+      writer.writeInt(32n);
+      writer.writeInt(this.#drepInactivityPeriod);
+    }
     return writer.encodeAsHex();
   }
 
@@ -293,6 +349,30 @@ export class ProtocolParamUpdate {
         case 24n:
           params.#maxCollateralInputs = Number(reader.readInt());
           break;
+        case 25n:
+          params.#poolVotingThresholds = PoolVotingThresholds.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
+          break;
+        case 26n:
+          params.#drepVotingThresholds = DrepVotingThresholds.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
+          break;
+        case 27n:
+          params.#minCommitteeSize = Number(reader.readInt());
+          break;
+        case 28n:
+          params.#committeeTermLimit = Number(reader.readInt());
+          break;
+        case 29n:
+          params.#governanceActionValidityPeriod = Number(reader.readInt());
+          break;
+        case 30n:
+          params.#governanceActionDeposit = Number(reader.readInt());
+          break;
+        case 31n:
+          params.#drepDeposit = Number(reader.readInt());
+          break;
+        case 32n:
+          params.#drepInactivityPeriod = Number(reader.readInt());
+          break;
       }
     }
 
@@ -304,18 +384,26 @@ export class ProtocolParamUpdate {
   }
 
   /**
-   * Creates a Core CostModels object from the current ProtocolParamUpdate object.
+   * Creates a Core ProtocolParamUpdate object from the current ProtocolParamUpdate object.
    *
-   * @returns The Core CostModels object.
+   * @returns The Core ProtocolParamUpdate object.
    */
   toCore(): Cardano.ProtocolParametersUpdate {
     return {
       coinsPerUtxoByte: this.#adaPerUtxoByte ? Number(this.#adaPerUtxoByte) : undefined,
       collateralPercentage: this.#collateralPercentage,
+      committeeTermLimit: this.#committeeTermLimit,
       costModels: this.#costModels?.toCore(),
+      dRepDeposit: this.#drepDeposit,
+      dRepInactivityPeriod: this.#drepInactivityPeriod ? Cardano.EpochNo(this.#drepInactivityPeriod) : undefined,
+      dRepVotingThresholds: this.#drepVotingThresholds?.toCore(),
       decentralizationParameter: this.#d ? this.#d.toFloat().toString() : undefined,
       desiredNumberOfPools: this.#nOpt,
       extraEntropy: this.#extraEntropy,
+      governanceActionDeposit: this.#governanceActionDeposit,
+      governanceActionValidityPeriod: this.#governanceActionValidityPeriod
+        ? Cardano.EpochNo(this.#governanceActionValidityPeriod)
+        : undefined,
       maxBlockBodySize: this.#maxBlockBodySize,
       maxBlockHeaderSize: this.#maxBlockHeaderSize,
       maxCollateralInputs: this.#maxCollateralInputs,
@@ -323,6 +411,7 @@ export class ProtocolParamUpdate {
       maxExecutionUnitsPerTransaction: this.#maxTxExUnits?.toCore(),
       maxTxSize: this.#maxTxSize ? Number(this.#maxTxSize) : undefined,
       maxValueSize: this.#maxValueSize,
+      minCommitteeSize: this.#minCommitteeSize,
       minFeeCoefficient: this.#minFeeA ? Number(this.#minFeeA) : undefined,
       minFeeConstant: this.#minFeeB ? Number(this.#minFeeB) : undefined,
       minPoolCost: this.#minPoolCost ? Number(this.#minPoolCost) : undefined,
@@ -330,6 +419,7 @@ export class ProtocolParamUpdate {
       poolDeposit: this.#poolDeposit ? Number(this.#poolDeposit) : undefined,
       poolInfluence: this.#poolPledgeInfluence ? this.#poolPledgeInfluence.toFloat().toString() : undefined,
       poolRetirementEpochBound: this.#maxEpoch,
+      poolVotingThresholds: this.#poolVotingThresholds?.toCore(),
       prices: this.#executionCosts?.toCore(),
       protocolVersion: this.#protocolVersion?.toCore(),
       stakeKeyDeposit: this.#keyDeposit ? Number(this.#keyDeposit) : undefined,
@@ -338,7 +428,7 @@ export class ProtocolParamUpdate {
   }
 
   /**
-   * Creates a ProtocolParamUpdate object from the given Core CostModels object.
+   * Creates a ProtocolParamUpdate object from the given Core ProtocolParamUpdate object.
    *
    * @param parametersUpdate core parametersUpdate object.
    */
@@ -375,6 +465,18 @@ export class ProtocolParamUpdate {
       ? ExUnits.fromCore(parametersUpdate.maxExecutionUnitsPerBlock)
       : undefined;
     params.#adaPerUtxoByte = parametersUpdate.coinsPerUtxoByte ? BigInt(parametersUpdate.coinsPerUtxoByte) : undefined;
+    params.#poolVotingThresholds = parametersUpdate.poolVotingThresholds
+      ? PoolVotingThresholds.fromCore(parametersUpdate.poolVotingThresholds)
+      : undefined;
+    params.#drepVotingThresholds = parametersUpdate.dRepVotingThresholds
+      ? DrepVotingThresholds.fromCore(parametersUpdate.dRepVotingThresholds)
+      : undefined;
+    params.#minCommitteeSize = parametersUpdate.minCommitteeSize;
+    params.#committeeTermLimit = parametersUpdate.committeeTermLimit;
+    params.#governanceActionValidityPeriod = parametersUpdate.governanceActionValidityPeriod;
+    params.#governanceActionDeposit = parametersUpdate.governanceActionDeposit;
+    params.#drepDeposit = parametersUpdate.dRepDeposit;
+    params.#drepInactivityPeriod = parametersUpdate.dRepInactivityPeriod;
 
     return params;
   }
@@ -900,6 +1002,173 @@ export class ProtocolParamUpdate {
     return this.#maxCollateralInputs;
   }
 
+  // Conway
+
+  /**
+   * Sets the SPO vote thresholds which must be met as a percentage of the stake held by all stake pools to enact
+   * the different governance actions that must be ratified by them.
+   *
+   * @param pooVotingThresholds The vote thresholds.
+   */
+  setPoolVotingThresholds(pooVotingThresholds: PoolVotingThresholds) {
+    this.#poolVotingThresholds = pooVotingThresholds;
+    this.#originalBytes = undefined;
+  }
+
+  /**
+   * Gets the SPO vote thresholds which must be met as a percentage of the stake held by all stake pools to enact
+   * the different governance actions that must be ratified by them.
+   *
+   * @returns The vote thresholds.
+   */
+  poolVotingThresholds(): PoolVotingThresholds | undefined {
+    return this.#poolVotingThresholds;
+  }
+
+  /**
+   * Sets the DRep vote thresholds that must be met as a percentage of active voting stake to enact
+   * the different governance actions that must be ratified by them.
+   *
+   * @param drepVotingThresholds The vote thresholds.
+   */
+  setDrepVotingThresholds(drepVotingThresholds: DrepVotingThresholds) {
+    this.#drepVotingThresholds = drepVotingThresholds;
+    this.#originalBytes = undefined;
+  }
+
+  /**
+   * Gets the DRep vote thresholds that must be met as a percentage of active voting stake to enact
+   * the different governance actions that must be ratified by them.
+   *
+   * @returns The vote thresholds.
+   */
+  drepVotingThresholds(): DrepVotingThresholds | undefined {
+    return this.#drepVotingThresholds;
+  }
+
+  /**
+   * Unlike the Shelley governance design, the size of the constitutional committee is not fixed and can
+   * be any non-negative number. It may be changed whenever a new committee is elected ("New constitutional committee and/or threshold").
+   *
+   * @param minCommitteeSize The minimal size of the committee.
+   */
+  setMinCommitteeSize(minCommitteeSize: number) {
+    this.#minCommitteeSize = minCommitteeSize;
+    this.#originalBytes = undefined;
+  }
+
+  /**
+   * Gets the minimal size of the constitutional committee.
+   *
+   * @returns The minimal size of the committee.
+   */
+  minCommitteeSize(): number | undefined {
+    return this.#minCommitteeSize;
+  }
+
+  /**
+   * Sets the constitutional committee term limit. Per-member terms allow for a rotation scheme,
+   * such as a third of the committee expiring every year. Expired members can no longer vote.
+   * Member can also willingly resign early, which will be marked on-chain as an expired member.
+   *
+   * @param committeeTermLimit The maximum term limit.
+   */
+  setCommitteeTermLimit(committeeTermLimit: number) {
+    this.#committeeTermLimit = committeeTermLimit;
+    this.#originalBytes = undefined;
+  }
+
+  /**
+   * Gets the constitutional committee term limit.
+   *
+   * @returns The constitutional committee term limit.
+   */
+  committeeTermLimit(): number | undefined {
+    return this.#committeeTermLimit;
+  }
+
+  /**
+   * Sets the governance action validity period. Governance actions must be ratified before a
+   * specific epoch boundary or ir will expire.
+   *
+   * @param governanceActionValidityPeriod The governance action validity period.
+   */
+  setGovernanceActionValidityPeriod(governanceActionValidityPeriod: number) {
+    this.#governanceActionValidityPeriod = governanceActionValidityPeriod;
+    this.#originalBytes = undefined;
+  }
+
+  /**
+   * Gets the governance action validity period. Governance actions must be ratified before a
+   * specific epoch boundary or ir will expire.
+   *
+   * @returns The governance action validity period.
+   */
+  governanceActionValidityPeriod(): number | undefined {
+    return this.#governanceActionValidityPeriod;
+  }
+
+  /**
+   * Sets the governance action deposit amount.
+   *
+   * @param governanceActionDeposit The deposit amount.
+   */
+  setGovernanceActionDeposit(governanceActionDeposit: number) {
+    this.#governanceActionDeposit = governanceActionDeposit;
+    this.#originalBytes = undefined;
+  }
+
+  /**
+   * Gets the governance action deposit amount.
+   *
+   * @returns The deposit amount.
+   */
+  governanceActionDeposit(): number | undefined {
+    return this.#governanceActionDeposit;
+  }
+
+  /**
+   * Sets the DRep deposit amount.
+   *
+   * @param drepDeposit The deposit amount.
+   */
+  setDrepDeposit(drepDeposit: number) {
+    this.#drepDeposit = drepDeposit;
+    this.#originalBytes = undefined;
+  }
+
+  /**
+   * Gets the DRep deposit amount.
+   *
+   * @returns The deposit amount.
+   */
+  drepDeposit(): number | undefined {
+    return this.#drepDeposit;
+  }
+
+  /**
+   * Sets the DRep inactivity period. DReps need to vote regularly to still be considered active.
+   * Specifically, if a DRep does not submit any votes for drepInactivityPeriod-many epochs, the DRep
+   * is considered inactive. Inactive DReps do not count towards the active voting stake anymore. The reason
+   * for marking DReps as inactive is so that DReps who stop participating but still have stake delegated
+   * to them do not eventually leave the system in a state where no governance action can pass.
+   *
+   * @param drepInactivityPeriod the DRep inactivity period.
+   */
+  setDrepInactivityPeriod(drepInactivityPeriod: number) {
+    this.#drepInactivityPeriod = drepInactivityPeriod;
+    this.#originalBytes = undefined;
+  }
+
+  /**
+   * Gets the DRep inactivity period.
+   *
+   * @returns the DRep inactivity period.
+   */
+  drepInactivityPeriod(): number | undefined {
+    return this.#drepInactivityPeriod;
+  }
+
   /**
    * Gets the size of the serialized map.
    *
@@ -932,6 +1201,14 @@ export class ProtocolParamUpdate {
     if (this.#maxValueSize !== undefined) ++mapSize;
     if (this.#collateralPercentage !== undefined) ++mapSize;
     if (this.#maxCollateralInputs !== undefined) ++mapSize;
+    if (this.#poolVotingThresholds !== undefined) ++mapSize;
+    if (this.#drepVotingThresholds !== undefined) ++mapSize;
+    if (this.#minCommitteeSize !== undefined) ++mapSize;
+    if (this.#committeeTermLimit !== undefined) ++mapSize;
+    if (this.#governanceActionValidityPeriod !== undefined) ++mapSize;
+    if (this.#governanceActionDeposit !== undefined) ++mapSize;
+    if (this.#drepDeposit !== undefined) ++mapSize;
+    if (this.#drepInactivityPeriod !== undefined) ++mapSize;
 
     return mapSize;
   }
