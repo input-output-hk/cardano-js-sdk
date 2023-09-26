@@ -40,7 +40,7 @@ export interface NewStakeAddressCertificate {
 export interface VoteDelegationCertificate {
   __typename: CertificateType.VoteDelegation;
   stakeKeyHash: Crypto.Ed25519KeyHashHex;
-  drep: DelegateRepresentative;
+  dRep: DelegateRepresentative;
 }
 
 export interface StakeVoteDelegationCertificate {
@@ -60,7 +60,7 @@ export interface StakeRegistrationDelegationCertificate {
 export interface VoteRegistrationDelegationCertificate {
   __typename: CertificateType.VoteRegistrationDelegation;
   stakeKeyHash: Crypto.Ed25519KeyHashHex;
-  drep: DelegateRepresentative;
+  dRep: DelegateRepresentative;
   deposit: Lovelace;
 }
 
@@ -68,7 +68,7 @@ export interface StakeVoteRegistrationDelegationCertificate {
   __typename: CertificateType.StakeVoteRegistrationDelegation;
   stakeKeyHash: Crypto.Ed25519KeyHashHex;
   poolId: PoolId;
-  drep: DelegateRepresentative;
+  dRep: DelegateRepresentative;
   deposit: Lovelace;
 }
 
