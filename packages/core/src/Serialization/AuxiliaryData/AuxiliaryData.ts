@@ -1,9 +1,9 @@
-/* eslint-disable complexity,max-statements,sonarjs/cognitive-complexity */
+/* eslint-disable complexity,max-statements,sonarjs/cognitive-complexity, unicorn/prefer-switch */
 import * as Cardano from '../../Cardano';
 import { CborReader, CborReaderState, CborWriter } from '../CBOR';
 import { GeneralTransactionMetadata } from './TransactionMetadata/GeneralTransactionMetadata';
 import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
-import { NativeScript, PlutusV1Script, PlutusV2Script } from '../Scripts';
+import { NativeScript, PlutusV1Script, PlutusV2Script, PlutusV3Script } from '../Scripts';
 import { SerializationError, SerializationFailure } from '../../errors';
 import { hexToBytes } from '../../util/misc';
 
@@ -17,6 +17,7 @@ type CddlScripts = {
   native: Array<NativeScript> | undefined;
   plutusV1: Array<PlutusV1Script> | undefined;
   plutusV2: Array<PlutusV2Script> | undefined;
+  plutusV3: Array<PlutusV3Script> | undefined;
 };
 
 /**
@@ -30,6 +31,7 @@ export class AuxiliaryData {
   #nativeScripts: Array<NativeScript> | undefined;
   #plutusV1Scripts: Array<PlutusV1Script> | undefined;
   #plutusV2Scripts: Array<PlutusV2Script> | undefined;
+  #plutusV3Scripts: Array<PlutusV3Script> | undefined;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -50,6 +52,7 @@ export class AuxiliaryData {
     //       , ? 1 => [ * native_script ]
     //       , ? 2 => [ * plutus_v1_script ]
     //       , ? 3 => [ * plutus_v2_script ]
+    //       , ? 4 => [ * plutus_v3_script ]
     //       })
     const writer = new CborWriter();
 
@@ -105,6 +108,14 @@ export class AuxiliaryData {
           writer.writeEncodedValue(hexToBytes(script.toCbor()));
         }
       }
+
+      if (this.#plutusV3Scripts && this.#plutusV3Scripts.length > 0) {
+        writer.writeInt(4n);
+        writer.writeStartArray(this.#plutusV3Scripts.length);
+        for (const script of this.#plutusV3Scripts) {
+          writer.writeEncodedValue(hexToBytes(script.toCbor()));
+        }
+      }
     }
 
     return writer.encodeAsHex();
@@ -129,6 +140,7 @@ export class AuxiliaryData {
     //     , ? 1 => [ * native_script ]
     //     , ? 2 => [ * plutus_v1_script ]
     //     , ? 3 => [ * plutus_v2_script ]
+    //     , ? 4 => [ * plutus_v3_script ]
     //     })
     if (peekState === CborReaderState.StartMap) {
       auxData.#metadata = GeneralTransactionMetadata.fromCbor(HexBlob.fromBytes(reader.readEncodedValue()));
@@ -170,6 +182,15 @@ export class AuxiliaryData {
             reader.readStartArray();
             while (reader.peekState() !== CborReaderState.EndArray) {
               auxData.plutusV2Scripts()!.push(PlutusV2Script.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
+            }
+            reader.readEndArray();
+            break;
+          }
+          case 4n: {
+            auxData.setPlutusV3Scripts(new Array<PlutusV3Script>());
+            reader.readStartArray();
+            while (reader.peekState() !== CborReaderState.EndArray) {
+              auxData.plutusV3Scripts()!.push(PlutusV3Script.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
             }
             reader.readEndArray();
             break;
@@ -232,6 +253,7 @@ export class AuxiliaryData {
       if (scripts.native) result.setNativeScripts(scripts.native);
       if (scripts.plutusV1) result.setPlutusV1Scripts(scripts.plutusV1);
       if (scripts.plutusV2) result.setPlutusV2Scripts(scripts.plutusV2);
+      if (scripts.plutusV3) result.setPlutusV3Scripts(scripts.plutusV3);
     }
 
     return result;
@@ -318,6 +340,25 @@ export class AuxiliaryData {
   }
 
   /**
+   * Gets the set of plutus v3 scripts present in the auxiliary data.
+   *
+   * @returns The set of plutus v3 scripts.
+   */
+  plutusV3Scripts(): Array<PlutusV3Script> | undefined {
+    return this.#plutusV3Scripts;
+  }
+
+  /**
+   * Sets the set of v3 scripts present in the auxiliary data.
+   *
+   * @param plutusV3Scripts The set of v3 scripts.
+   */
+  setPlutusV3Scripts(plutusV3Scripts: Array<PlutusV3Script>) {
+    this.#plutusV3Scripts = plutusV3Scripts;
+    this.#originalBytes = undefined;
+  }
+
+  /**
    * Gets the size of the serialized map.
    *
    * @private
@@ -329,6 +370,7 @@ export class AuxiliaryData {
     if (this.#nativeScripts !== undefined && this.#nativeScripts.length > 0) ++mapSize;
     if (this.#plutusV1Scripts !== undefined && this.#plutusV1Scripts.length > 0) ++mapSize;
     if (this.#plutusV2Scripts !== undefined && this.#plutusV2Scripts.length > 0) ++mapSize;
+    if (this.#plutusV3Scripts !== undefined && this.#plutusV3Scripts.length > 0) ++mapSize;
 
     return mapSize;
   }
@@ -342,9 +384,10 @@ export class AuxiliaryData {
   #getCoreScripts(): Array<Cardano.Script> {
     const plutusV1 = this.#plutusV1Scripts ? this.#plutusV1Scripts.map((script) => script.toCore()) : [];
     const plutusV2 = this.#plutusV2Scripts ? this.#plutusV2Scripts.map((script) => script.toCore()) : [];
+    const plutusV3 = this.#plutusV3Scripts ? this.#plutusV3Scripts.map((script) => script.toCore()) : [];
     const native = this.#nativeScripts ? this.#nativeScripts.map((script) => script.toCore()) : [];
 
-    return [...plutusV1, ...plutusV2, ...native];
+    return [...plutusV1, ...plutusV2, ...plutusV3, ...native];
   }
 
   /**
@@ -354,7 +397,7 @@ export class AuxiliaryData {
    * @private
    */
   static #getCddlScripts(scripts: Array<Cardano.Script>): CddlScripts {
-    const result: CddlScripts = { native: undefined, plutusV1: undefined, plutusV2: undefined };
+    const result: CddlScripts = { native: undefined, plutusV1: undefined, plutusV2: undefined, plutusV3: undefined };
 
     for (const script of scripts) {
       switch (script.__type) {
@@ -372,6 +415,10 @@ export class AuxiliaryData {
             if (!result.plutusV2) result.plutusV2 = new Array<PlutusV2Script>();
 
             result.plutusV2.push(PlutusV2Script.fromCore(script));
+          } else if (script.version === Cardano.PlutusLanguageVersion.V3) {
+            if (!result.plutusV3) result.plutusV3 = new Array<PlutusV3Script>();
+
+            result.plutusV3.push(PlutusV3Script.fromCore(script));
           }
           break;
         default:

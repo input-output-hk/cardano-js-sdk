@@ -89,13 +89,13 @@ export class PlutusV2Script {
   }
 
   /**
-   * Computes the script hash of this Plutus V1 script.
+   * Computes the script hash of this Plutus V2 script.
    *
    * @returns the script hash.
    */
   hash(): Crypto.Hash28ByteBase16 {
     // To compute a script hash, note that you must prepend a tag to the bytes of
-    // the script before hashing. The tags in the Babbage era for PlutusV1 is "\x02"
+    // the script before hashing. The tags in the Babbage era for PlutusV2 is "\x02"
     const bytes = `02${this.rawBytes()}`;
 
     const hash = Crypto.blake2b(HASH_LENGTH_IN_BYTES).update(Buffer.from(bytes, 'hex')).digest();

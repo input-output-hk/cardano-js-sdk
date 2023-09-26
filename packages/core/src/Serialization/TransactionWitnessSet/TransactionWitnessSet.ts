@@ -1,10 +1,9 @@
-/* eslint-disable sonarjs/cognitive-complexity, complexity, max-statements */
-
+/* eslint-disable sonarjs/cognitive-complexity, complexity, max-statements, unicorn/prefer-switch */
 import * as Cardano from '../../Cardano';
 import { BootstrapWitness } from './BootstrapWitness';
 import { CborReader, CborReaderState, CborWriter } from '../CBOR';
 import { HexBlob } from '@cardano-sdk/util';
-import { NativeScript, PlutusV1Script, PlutusV2Script } from '../Scripts';
+import { NativeScript, PlutusV1Script, PlutusV2Script, PlutusV3Script } from '../Scripts';
 import { PlutusData } from '../PlutusData/PlutusData';
 import { Redeemer } from './Redeemer';
 import { SerializationError, SerializationFailure } from '../../errors';
@@ -18,6 +17,7 @@ type CddlScripts = {
   native: Array<NativeScript> | undefined;
   plutusV1: Array<PlutusV1Script> | undefined;
   plutusV2: Array<PlutusV2Script> | undefined;
+  plutusV3: Array<PlutusV3Script> | undefined;
 };
 
 /**
@@ -36,6 +36,7 @@ export class TransactionWitnessSet {
   #plutusData: Array<PlutusData> | undefined;
   #redeemers: Array<Redeemer> | undefined;
   #plutusV2Scripts: Array<PlutusV2Script> | undefined;
+  #plutusV3Scripts: Array<PlutusV3Script> | undefined;
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -56,7 +57,8 @@ export class TransactionWitnessSet {
     //   , ? 3: [* plutus_v1_script ]
     //   , ? 4: [* plutus_data ]
     //   , ? 5: [* redeemer ]
-    //   , ? 6: [* plutus_v2_script ] ; New
+    //   , ? 6: [* plutus_v2_script ]
+    //   , ? 7: [* plutus_v3_script ]
     //   }
     writer.writeStartMap(this.#getMapSize());
 
@@ -123,6 +125,15 @@ export class TransactionWitnessSet {
       writer.writeStartArray(this.#plutusV2Scripts.length);
 
       for (const script of this.#plutusV2Scripts) {
+        writer.writeEncodedValue(Buffer.from(script.toCbor(), 'hex'));
+      }
+    }
+
+    if (this.#plutusV3Scripts && this.#plutusV3Scripts.length > 0) {
+      writer.writeInt(7n);
+      writer.writeStartArray(this.#plutusV3Scripts.length);
+
+      for (const script of this.#plutusV3Scripts) {
         writer.writeEncodedValue(Buffer.from(script.toCbor(), 'hex'));
       }
     }
@@ -217,6 +228,16 @@ export class TransactionWitnessSet {
 
           reader.readEndArray();
           break;
+        case 7n:
+          witness.setPlutusV3Scripts(new Array<PlutusV3Script>());
+          reader.readStartArray();
+
+          while (reader.peekState() !== CborReaderState.EndArray) {
+            witness.plutusV3Scripts()!.push(PlutusV3Script.fromCbor(HexBlob.fromBytes(reader.readEncodedValue())));
+          }
+
+          reader.readEndArray();
+          break;
       }
     }
 
@@ -261,6 +282,7 @@ export class TransactionWitnessSet {
       if (scripts.native) witness.setNativeScripts(scripts.native);
       if (scripts.plutusV1) witness.setPlutusV1Scripts(scripts.plutusV1);
       if (scripts.plutusV2) witness.setPlutusV2Scripts(scripts.plutusV2);
+      if (scripts.plutusV3) witness.setPlutusV3Scripts(scripts.plutusV3);
     }
 
     if (coreWitness.redeemers) {
@@ -414,6 +436,25 @@ export class TransactionWitnessSet {
   }
 
   /**
+   * Sets the set of plutus v3 scripts required by this transaction.
+   *
+   * @param plutusV3Scripts The set of plutus v3 scripts.
+   */
+  setPlutusV3Scripts(plutusV3Scripts: Array<PlutusV3Script>) {
+    this.#plutusV3Scripts = plutusV3Scripts;
+    this.#originalBytes = undefined;
+  }
+
+  /**
+   * Gets the set of plutus v3 scripts required by this transaction.
+   *
+   * @returns The set of plutus v3 scripts.
+   */
+  plutusV3Scripts(): Array<PlutusV3Script> | undefined {
+    return this.#plutusV3Scripts;
+  }
+
+  /**
    * Gets all the scripts present in this witness as Core scripts.
    *
    * @returns The list of scripts.
@@ -422,9 +463,10 @@ export class TransactionWitnessSet {
   #getCoreScripts(): Array<Cardano.Script> {
     const plutusV1 = this.#plutusV1Scripts ? this.#plutusV1Scripts.map((script) => script.toCore()) : [];
     const plutusV2 = this.#plutusV2Scripts ? this.#plutusV2Scripts.map((script) => script.toCore()) : [];
+    const plutusV3 = this.#plutusV3Scripts ? this.#plutusV3Scripts.map((script) => script.toCore()) : [];
     const native = this.#nativeScripts ? this.#nativeScripts.map((script) => script.toCore()) : [];
 
-    return [...plutusV1, ...plutusV2, ...native];
+    return [...plutusV1, ...plutusV2, ...plutusV3, ...native];
   }
 
   /**
@@ -434,7 +476,7 @@ export class TransactionWitnessSet {
    * @private
    */
   static #getCddlScripts(scripts: Array<Cardano.Script>): CddlScripts {
-    const result: CddlScripts = { native: undefined, plutusV1: undefined, plutusV2: undefined };
+    const result: CddlScripts = { native: undefined, plutusV1: undefined, plutusV2: undefined, plutusV3: undefined };
 
     for (const script of scripts) {
       switch (script.__type) {
@@ -452,6 +494,10 @@ export class TransactionWitnessSet {
             if (!result.plutusV2) result.plutusV2 = new Array<PlutusV2Script>();
 
             result.plutusV2.push(PlutusV2Script.fromCore(script));
+          } else if (script.version === Cardano.PlutusLanguageVersion.V3) {
+            if (!result.plutusV3) result.plutusV3 = new Array<PlutusV3Script>();
+
+            result.plutusV3.push(PlutusV3Script.fromCore(script));
           }
           break;
         default:
@@ -477,6 +523,7 @@ export class TransactionWitnessSet {
     if (this.#plutusData !== undefined && this.#plutusData.length > 0) ++mapSize;
     if (this.#redeemers !== undefined && this.#redeemers.length > 0) ++mapSize;
     if (this.#plutusV2Scripts !== undefined && this.#plutusV2Scripts.length > 0) ++mapSize;
+    if (this.#plutusV3Scripts !== undefined && this.#plutusV3Scripts.length > 0) ++mapSize;
 
     return mapSize;
   }
