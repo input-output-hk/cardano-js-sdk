@@ -3,6 +3,7 @@ import { InvalidArgumentError, InvalidStateError } from '@cardano-sdk/util';
 
 const PLUTUS_V1_COST_MODEL_OP_COUNT = 166;
 const PLUTUS_V2_COST_MODEL_OP_COUNT = 175;
+const PLUTUS_V3_COST_MODEL_OP_COUNT = 179;
 
 /**
  * The execution of plutus scripts consumes resources. To make sure that these
@@ -43,6 +44,13 @@ export class CostModel {
             `Cost model for PlutusV2 language should have ${PLUTUS_V2_COST_MODEL_OP_COUNT} operations, but got ${costs.length}.`
           );
         break;
+      case Cardano.PlutusLanguageVersion.V3:
+        if (costs.length !== PLUTUS_V3_COST_MODEL_OP_COUNT)
+          throw new InvalidArgumentError(
+            'costs',
+            `Cost model for PlutusV3 language should have ${PLUTUS_V3_COST_MODEL_OP_COUNT} operations, but got ${costs.length}.`
+          );
+        break;
       default:
         throw new InvalidStateError('Invalid plutus language version.');
     }
@@ -64,6 +72,15 @@ export class CostModel {
    */
   static newPlutusV2(costs: Array<number>): CostModel {
     return new CostModel(Cardano.PlutusLanguageVersion.V2, costs);
+  }
+
+  /**
+   * Creates a new Plutus V3 cost model.
+   *
+   * @param costs An array containing the costs for all operations.
+   */
+  static newPlutusV3(costs: Array<number>): CostModel {
+    return new CostModel(Cardano.PlutusLanguageVersion.V3, costs);
   }
 
   /**
@@ -131,6 +148,9 @@ export class CostModel {
         break;
       case Cardano.PlutusLanguageVersion.V2:
         isValid = operation >= 0 && operation < PLUTUS_V2_COST_MODEL_OP_COUNT;
+        break;
+      case Cardano.PlutusLanguageVersion.V3:
+        isValid = operation >= 0 && operation < PLUTUS_V3_COST_MODEL_OP_COUNT;
         break;
       default:
         throw new InvalidStateError('Invalid plutus language version.');
