@@ -33,7 +33,7 @@ A suite of TypeScript packages suitable for both Node.js and browser-based devel
 
 Packages are distributed as both CommonJS and ESM modules.
 
-- Node.js >=14.20.1
+- Node.js >=16.20.2
   - using with `type="module"` requires `--experimental-specifier-resolution=node` flag
 - Browser via bundlers (see [example webpack config](./packages/e2e/test/web-extension/webpack.config.js))
 
@@ -53,7 +53,7 @@ A Yarn Workspace maintaining a single version across all packages.
 
 - [nvm](https://github.com/nvm-sh/nvm)
 - [yarn](https://yarnpkg.com/getting-started/install)
-- [Node.js](https://nodejs.org/en/download) 14 or later
+- [Node.js](https://nodejs.org/en/download) 16 or later
 - [Docker Desktop] 3.4 or later or a Docker installation that includes Compose V2
 
 #### Clone
