@@ -20,7 +20,6 @@ import {
 import { Ogmios } from '@cardano-sdk/ogmios';
 import { ProviderError, ProviderFailure, Seconds } from '@cardano-sdk/core';
 import { SrvRecord } from 'dns';
-import { URL } from 'url';
 import {
   createConnectionObjectWithRandomPort,
   createHealthyMockOgmiosServer,

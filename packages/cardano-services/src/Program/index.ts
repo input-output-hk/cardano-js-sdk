@@ -1,4 +1,5 @@
 export * from './errors';
-export * from './programs/';
+export * from './options';
+export * from './programs';
 export * from './utils';
 export * from './services';

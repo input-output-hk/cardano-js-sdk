@@ -1,13 +1,10 @@
 #!/usr/bin/env node
 
-/* eslint-disable no-console */
-/* eslint-disable complexity */
-/* eslint-disable sonarjs/cognitive-complexity */
-/* eslint-disable unicorn/no-nested-ternary */
 import {
   ALLOWED_ORIGINS_DEFAULT,
   AvailableNetworks,
   BLOCKFROST_WORKER_API_URL_DEFAULT,
+  BLOCKS_BUFFER_LENGTH_DEFAULT,
   BlockfrostWorkerArgs,
   BlockfrostWorkerOptionDescriptions,
   CACHE_TTL_DEFAULT,
@@ -18,12 +15,18 @@ import {
   DRY_RUN_DEFAULT,
   HANDLE_PROVIDER_SERVER_URL_DEFAULT,
   PAGINATION_PAGE_SIZE_LIMIT_DEFAULT,
+  PARALLEL_JOBS_DEFAULT,
   PARALLEL_MODE_DEFAULT,
   PARALLEL_TXS_DEFAULT,
+  PG_BOSS_WORKER_API_URL_DEFAULT,
   POLLING_CYCLE_DEFAULT,
   POOLS_METRICS_INTERVAL_DEFAULT,
+  PROJECTOR_API_URL_DEFAULT,
   PROVIDER_SERVER_API_URL_DEFAULT,
+  PgBossWorkerArgs,
+  PgBossWorkerOptionDescriptions,
   Programs,
+  ProjectorArgs,
   ProjectorOptionDescriptions,
   ProviderServerArgs,
   ProviderServerOptionDescriptions,
@@ -36,20 +39,23 @@ import {
   USE_QUEUE_DEFAULT,
   USE_TYPEORM_ASSET_PROVIDER_DEFAULT,
   USE_TYPEORM_STAKE_POOL_PROVIDER_DEFAULT,
+  addOptions,
   availableNetworks,
   connectionStringFromArgs,
   loadAndStartTxWorker,
   loadBlockfrostWorker,
+  loadPgBossWorker,
+  loadProjector,
   loadProviderServer,
-  stringOptionToBoolean
+  newOption,
+  stringOptionToBoolean,
+  withCommonOptions,
+  withHandlePolicyIdsOptions,
+  withOgmiosOptions,
+  withPostgresOptions,
+  withRabbitMqOptions
 } from './Program';
-import {
-  BLOCKS_BUFFER_LENGTH_DEFAULT,
-  PROJECTOR_API_URL_DEFAULT,
-  ProjectorArgs,
-  loadProjector
-} from './Program/programs/projector';
-import { Command, Option } from 'commander';
+import { Command } from 'commander';
 import { DB_CACHE_TTL_DEFAULT } from './InMemoryCache';
 import {
   DEFAULT_TOKEN_METADATA_CACHE_TTL,
@@ -58,19 +64,9 @@ import {
 } from './Asset';
 import { EPOCH_POLL_INTERVAL_DEFAULT } from './util';
 import { HttpServer } from './Http';
-import {
-  PARALLEL_JOBS_DEFAULT,
-  PG_BOSS_WORKER_API_URL_DEFAULT,
-  PgBossWorkerOptionDescriptions,
-  loadPgBossWorker
-} from './Program/programs/pgBossWorker';
 import { PgBossQueue, isValidQueue } from './PgBoss';
-import { PgBossWorkerArgs } from './Program/services/pgboss';
 import { ProjectionName } from './Projection';
-import { URL } from 'url';
 import { dbCacheValidator } from './util/validators';
-import { withCommonOptions, withOgmiosOptions, withPostgresOptions, withRabbitMqOptions } from './Program/options/';
-import { withHandlePolicyIdsOptions } from './Program/options/policyIds';
 import fs from 'fs';
 import onDeath from 'death';
 import path from 'path';
@@ -88,7 +84,7 @@ process.on('unhandledRejection', (reason) => {
   throw reason;
 });
 
-console.log('Cardano Services CLI');
+process.stdout.write('Cardano Services CLI\n');
 
 const program = new Command('cardano-services');
 
@@ -96,7 +92,7 @@ program.version(packageJson.version);
 
 const runServer = async (message: string, loadServer: () => Promise<HttpServer>) => {
   try {
-    console.log(message);
+    process.stdout.write(`${message}\n`);
     const server = await loadServer();
 
     await server.initialize();
@@ -107,424 +103,363 @@ const runServer = async (message: string, loadServer: () => Promise<HttpServer>)
       process.exit(1);
     });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error(error);
     process.exit(1);
   }
 };
 
-withCommonOptions(
-  withOgmiosOptions(
-    withPostgresOptions(
-      withHandlePolicyIdsOptions(
-        program
-          .command('start-projector')
-          .description('Start a projector')
-          .argument(
-            '[projectionNames...]',
-            `List of projections to start: ${Object.values(ProjectionName).toString()}`,
-            projectionNameParser
-          )
-      ),
-      ''
-    )
-  ),
-  { apiUrl: PROJECTOR_API_URL_DEFAULT }
-)
-  .addOption(
-    new Option('--blocks-buffer-length <blocksBufferLength>', ProjectorOptionDescriptions.BlocksBufferLength)
-      .default(BLOCKS_BUFFER_LENGTH_DEFAULT)
-      .env('BLOCKS_BUFFER_LENGTH')
-      .argParser((blocksBufferLength) => Number.parseInt(blocksBufferLength, 10))
-  )
-  .addOption(
-    new Option('--drop-schema <true/false>', ProjectorOptionDescriptions.DropSchema)
-      .default(false)
-      .env('DROP_SCHEMA')
-      .argParser((dropSchema) =>
-        stringOptionToBoolean(dropSchema, Programs.Projector, ProjectorOptionDescriptions.DropSchema)
-      )
-  )
-  .addOption(
-    new Option('--dry-run <true/false>', BlockfrostWorkerOptionDescriptions.DryRun)
-      .env('DRY_RUN')
-      .default(DRY_RUN_DEFAULT)
-      .argParser((dryRun) => stringOptionToBoolean(dryRun, Programs.Projector, ProjectorOptionDescriptions.DryRun))
-  )
-  .addOption(
-    new Option('--exit-at-block-no <exitAtBlockNo>', ProjectorOptionDescriptions.ExitAtBlockNo)
-      .env('EXIT_AT_BLOCK_NO')
-      .default('')
-      .argParser((exitAtBlockNo) => (exitAtBlockNo ? Number.parseInt(exitAtBlockNo, 10) : 0))
-  )
-  .addOption(
-    new Option('--pools-metrics-interval <poolsMetricsInterval>', ProjectorOptionDescriptions.PoolsMetricsInterval)
-      .env('POOLS_METRICS_INTERVAL')
-      .default(POOLS_METRICS_INTERVAL_DEFAULT)
-      .argParser((interval) => Number.parseInt(interval, 10))
-  )
-  .addOption(
-    new Option(
-      '--projection-names <projectionNames>',
-      `List of projections to start: ${Object.values(ProjectionName).toString()}`
-    )
-      .env('PROJECTION_NAMES')
-      .argParser(projectionNameParser)
-  )
-  .addOption(
-    new Option('--synchronize <true/false>', ProjectorOptionDescriptions.Synchronize)
-      .default(false)
-      .env('SYNCHRONIZE')
-      .argParser((synchronize) =>
-        stringOptionToBoolean(synchronize, Programs.Projector, ProjectorOptionDescriptions.Synchronize)
-      )
-  )
-  .action(async (projectionNames: ProjectionName[], args: { apiUrl: URL } & ProjectorArgs) =>
-    runServer('projector', () =>
-      loadProjector({
-        ...args,
-        postgresConnectionString: connectionStringFromArgs(args, ''),
-        // Setting the projection names via env variable takes preference over command line argument
-        projectionNames: args.projectionNames ? args.projectionNames : projectionNames
-      })
-    )
+const projector = program
+  .command('start-projector')
+  .description('Start a projector')
+  .argument(
+    '[projectionNames...]',
+    `List of projections to start: ${Object.values(ProjectionName).toString()}`,
+    projectionNameParser
   );
+const projectorWithArgs = withOgmiosOptions(withPostgresOptions(withHandlePolicyIdsOptions(projector), ['']));
 
-withCommonOptions(
-  withOgmiosOptions(
-    withPostgresOptions(
-      withPostgresOptions(
-        withPostgresOptions(
-          withPostgresOptions(
-            withRabbitMqOptions(
-              withHandlePolicyIdsOptions(
-                program
-                  .command('start-provider-server')
-                  .description('Start the Provider Server')
-                  .argument(
-                    '[serviceNames...]',
-                    `List of services to attach: ${Object.values(ServiceNames).toString()}`
-                  )
-              )
-            ),
-            'StakePool'
-          ),
-          'Handle'
-        ),
-        'DbSync'
-      ),
-      'Asset'
-    )
+addOptions(withCommonOptions(projectorWithArgs, PROJECTOR_API_URL_DEFAULT), [
+  newOption(
+    '--blocks-buffer-length <blocksBufferLength>',
+    ProjectorOptionDescriptions.BlocksBufferLength,
+    'BLOCKS_BUFFER_LENGTH',
+    (blocksBufferLength) => Number.parseInt(blocksBufferLength, 10),
+    BLOCKS_BUFFER_LENGTH_DEFAULT
   ),
-  {
-    apiUrl: PROVIDER_SERVER_API_URL_DEFAULT
-  }
-)
-  .addOption(
-    new Option(
-      '--service-names <serviceNames>',
-      `List of services to attach: ${Object.values(ServiceNames).toString()}`
-    )
-      .env('SERVICE_NAMES')
-      .argParser((names) => names.split(',') as ServiceNames[])
+  newOption(
+    '--drop-schema <true/false>',
+    ProjectorOptionDescriptions.DropSchema,
+    'DROP_SCHEMA',
+    (dropSchema) => stringOptionToBoolean(dropSchema, Programs.Projector, ProjectorOptionDescriptions.DropSchema),
+    false
+  ),
+  newOption(
+    '--dry-run <true/false>',
+    BlockfrostWorkerOptionDescriptions.DryRun,
+    'DRY_RUN',
+    (dryRun) => stringOptionToBoolean(dryRun, Programs.Projector, ProjectorOptionDescriptions.DryRun),
+    DRY_RUN_DEFAULT
+  ),
+  newOption(
+    '--exit-at-block-no <exitAtBlockNo>',
+    ProjectorOptionDescriptions.ExitAtBlockNo,
+    'EXIT_AT_BLOCK_NO',
+    (exitAtBlockNo) => (exitAtBlockNo ? Number.parseInt(exitAtBlockNo, 10) : 0),
+    ''
+  ),
+  newOption(
+    '--pools-metrics-interval <poolsMetricsInterval>',
+    ProjectorOptionDescriptions.PoolsMetricsInterval,
+    'POOLS_METRICS_INTERVAL',
+    (interval) => Number.parseInt(interval, 10),
+    POOLS_METRICS_INTERVAL_DEFAULT
+  ),
+  newOption(
+    '--projection-names <projectionNames>',
+    `List of projections to start: ${Object.values(ProjectionName).toString()}`,
+    'PROJECTION_NAMES',
+    projectionNameParser
+  ),
+  newOption(
+    '--synchronize <true/false>',
+    ProjectorOptionDescriptions.Synchronize,
+    'SYNCHRONIZE',
+    (synchronize) => stringOptionToBoolean(synchronize, Programs.Projector, ProjectorOptionDescriptions.Synchronize),
+    false
   )
-  .addOption(
-    new Option('--allowed-origins <allowedOrigins>', ProviderServerOptionDescriptions.AllowedOrigins)
-      .env('ALLOWED_ORIGINS')
-      .default(ALLOWED_ORIGINS_DEFAULT)
-      .argParser((originsList) => originsList.split(',') as string[])
+]).action(async (projectionNames: ProjectionName[], args: { apiUrl: URL } & ProjectorArgs) =>
+  runServer('projector', () =>
+    loadProjector({
+      ...args,
+      postgresConnectionString: connectionStringFromArgs(args, ''),
+      // Setting the projection names via env variable takes preference over command line argument
+      projectionNames: args.projectionNames ? args.projectionNames : projectionNames
+    })
   )
-  .addOption(
-    new Option(
-      '--cardano-node-config-path <cardanoNodeConfigPath>',
-      ProviderServerOptionDescriptions.CardanoNodeConfigPath
-    ).env('CARDANO_NODE_CONFIG_PATH')
-  )
-  .addOption(
-    new Option('--db-cache-ttl <dbCacheTtl>', ProviderServerOptionDescriptions.DbCacheTtl)
-      .env('DB_CACHE_TTL')
-      .default(DB_CACHE_TTL_DEFAULT)
-      .argParser(dbCacheValidator)
-  )
-  .addOption(
-    new Option('--disable-db-cache <true/false>', ProviderServerOptionDescriptions.DisableDbCache)
-      .env('DISABLE_DB_CACHE')
-      .default(DISABLE_DB_CACHE_DEFAULT)
-      .argParser((disableDbCache) =>
-        stringOptionToBoolean(disableDbCache, Programs.ProviderServer, ProviderServerOptionDescriptions.DisableDbCache)
-      )
-  )
-  .addOption(
-    new Option(
-      '--disable-stake-pool-metric-apy <true/false>',
-      ProviderServerOptionDescriptions.DisableStakePoolMetricApy
-    )
-      .env('DISABLE_STAKE_POOL_METRIC_APY')
-      .default(DISABLE_STAKE_POOL_METRIC_APY_DEFAULT)
-      .argParser((disableStakePoolMetricApy) =>
-        stringOptionToBoolean(
-          disableStakePoolMetricApy,
-          Programs.ProviderServer,
-          ProviderServerOptionDescriptions.DisableStakePoolMetricApy
-        )
-      )
-  )
-  .addOption(
-    new Option('--epoch-poll-interval <epochPollInterval>', ProviderServerOptionDescriptions.EpochPollInterval)
-      .env('EPOCH_POLL_INTERVAL')
-      .default(EPOCH_POLL_INTERVAL_DEFAULT)
-      .argParser((interval) => Number.parseInt(interval, 10))
-  )
-  .addOption(
-    new Option(
-      '--token-metadata-server-url <tokenMetadataServerUrl>',
-      ProviderServerOptionDescriptions.TokenMetadataServerUrl
-    )
-      .env('TOKEN_METADATA_SERVER_URL')
-      .default(DEFAULT_TOKEN_METADATA_SERVER_URL)
-      .argParser((url) => new URL(url).toString())
-  )
-  .addOption(
-    new Option(
-      '--token-metadata-cache-ttl <tokenMetadataCacheTTL>',
-      ProviderServerOptionDescriptions.TokenMetadataCacheTtl
-    )
-      .env('TOKEN_METADATA_CACHE_TTL')
-      .default(DEFAULT_TOKEN_METADATA_CACHE_TTL)
-      .argParser(dbCacheValidator)
-  )
-  .addOption(
-    new Option('--asset-cache-ttl <assetCacheTTL>', ProviderServerOptionDescriptions.AssetCacheTtl)
-      .env('ASSET_CACHE_TTL')
-      .default(DB_CACHE_TTL_DEFAULT)
-      .argParser(dbCacheValidator)
-  )
-  .addOption(
-    new Option(
-      '--token-metadata-request-timeout <tokenMetadataRequestTimeout>',
-      ProviderServerOptionDescriptions.PaginationPageSizeLimit
-    )
-      .env('TOKEN_METADATA_REQUEST_TIMEOUT')
-      .default(DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT)
-      .argParser((interval) => Number.parseInt(interval, 10))
-  )
-  .addOption(
-    new Option(
-      '--use-typeorm-stake-pool-provider <true/false>',
-      ProviderServerOptionDescriptions.UseTypeOrmStakePoolProvider
-    )
-      .env('USE_TYPEORM_STAKE_POOL_PROVIDER')
-      .default(USE_TYPEORM_STAKE_POOL_PROVIDER_DEFAULT)
-      .argParser((useTypeormStakePoolProvider) =>
-        stringOptionToBoolean(
-          useTypeormStakePoolProvider,
-          Programs.ProviderServer,
-          ProviderServerOptionDescriptions.UseTypeOrmStakePoolProvider
-        )
-      )
-  )
-  .addOption(
-    new Option('--use-blockfrost <true/false>', ProviderServerOptionDescriptions.UseBlockfrost)
-      .env('USE_BLOCKFROST')
-      .default(USE_BLOCKFROST_DEFAULT)
-      .argParser((useBlockfrost) =>
-        stringOptionToBoolean(useBlockfrost, Programs.ProviderServer, ProviderServerOptionDescriptions.UseBlockfrost)
-      )
-  )
-  .addOption(
-    new Option('--use-kora-labs <true/false>', ProviderServerOptionDescriptions.UseKoraLabsProvider)
-      .env('USE_KORA_LABS')
-      .default(false)
-      .argParser((useKoraLabs) =>
-        stringOptionToBoolean(
-          useKoraLabs,
-          Programs.ProviderServer,
-          ProviderServerOptionDescriptions.UseKoraLabsProvider
-        )
-      )
-  )
-  .addOption(
-    new Option('--use-queue <true/false>', ProviderServerOptionDescriptions.UseQueue)
-      .env('USE_QUEUE')
-      .default(USE_QUEUE_DEFAULT)
-      .argParser((useQueue) =>
-        stringOptionToBoolean(useQueue, Programs.ProviderServer, ProviderServerOptionDescriptions.UseQueue)
-      )
-  )
-  .addOption(
-    new Option(
-      '--pagination-page-size-limit <paginationPageSizeLimit>',
-      ProviderServerOptionDescriptions.PaginationPageSizeLimit
-    )
-      .env('PAGINATION_PAGE_SIZE_LIMIT')
-      .default(PAGINATION_PAGE_SIZE_LIMIT_DEFAULT)
-      .argParser((interval) => Number.parseInt(interval, 10))
-  )
-  .addOption(
-    new Option(
-      '--handle-provider-server-url <handleProviderServerUrl>',
-      ProviderServerOptionDescriptions.HandleProviderServerUrl
-    )
-      .env('HANDLE_PROVIDER_SERVER_URL')
-      .default(HANDLE_PROVIDER_SERVER_URL_DEFAULT)
-      .argParser((serverUrl: string) => serverUrl)
-  )
-  .addOption(
-    new Option('--use-typeorm-asset-provider <true/false>', ProviderServerOptionDescriptions.UseTypeormAssetProvider)
-      .env('USE_TYPEORM_ASSET_PROVIDER')
-      .default(USE_TYPEORM_ASSET_PROVIDER_DEFAULT)
-      .argParser((useTypeormAssetProvider) =>
-        stringOptionToBoolean(
-          useTypeormAssetProvider,
-          Programs.ProviderServer,
-          ProviderServerOptionDescriptions.UseTypeormAssetProvider
-        )
-      )
-  )
-  .action(async (serviceNames: ServiceNames[], args: ProviderServerArgs) =>
-    runServer('Provider server', () =>
-      loadProviderServer({
-        ...args,
-        postgresConnectionStringDbSync: connectionStringFromArgs(args, 'DbSync'),
-        postgresConnectionStringHandle: connectionStringFromArgs(args, 'Handle'),
-        postgresConnectionStringStakePool: connectionStringFromArgs(args, 'StakePool'),
-        serviceNames: args.serviceNames ? args.serviceNames : serviceNames
-      })
-    )
-  );
+);
 
-withCommonOptions(
-  withOgmiosOptions(withRabbitMqOptions(program.command('start-worker').description('Start RabbitMQ worker'))),
-  { apiUrl: TX_WORKER_API_URL_DEFAULT }
-)
-  .addOption(
-    new Option('--parallel <true/false>', TxWorkerOptionDescriptions.Parallel)
-      .env('PARALLEL')
-      .default(PARALLEL_MODE_DEFAULT)
-      .argParser((parallel) =>
-        stringOptionToBoolean(parallel, Programs.RabbitmqWorker, TxWorkerOptionDescriptions.Parallel)
-      )
+const providerServer = program
+  .command('start-provider-server')
+  .description('Start the Provider Server')
+  .argument('[serviceNames...]', `List of services to attach: ${Object.values(ServiceNames).toString()}`);
+const providerServerWithPostgres = withPostgresOptions(providerServer, ['Asset', 'DbSync', 'Handle', 'StakePool']);
+const providerServerWithCommon = withCommonOptions(providerServerWithPostgres, PROVIDER_SERVER_API_URL_DEFAULT);
+
+addOptions(withOgmiosOptions(withRabbitMqOptions(withHandlePolicyIdsOptions(providerServerWithCommon))), [
+  newOption(
+    '--service-names <serviceNames>',
+    `List of services to attach: ${Object.values(ServiceNames).toString()}`,
+    'SERVICE_NAMES',
+    (names) => names.split(',') as ServiceNames[]
+  ),
+  newOption(
+    '--allowed-origins <allowedOrigins>',
+    ProviderServerOptionDescriptions.AllowedOrigins,
+    'ALLOWED_ORIGINS',
+    (originsList) => originsList.split(',') as string[],
+    ALLOWED_ORIGINS_DEFAULT
+  ),
+  newOption(
+    '--cardano-node-config-path <cardanoNodeConfigPath>',
+    ProviderServerOptionDescriptions.CardanoNodeConfigPath,
+    'CARDANO_NODE_CONFIG_PATH'
+  ),
+  newOption(
+    '--db-cache-ttl <dbCacheTtl>',
+    ProviderServerOptionDescriptions.DbCacheTtl,
+    'DB_CACHE_TTL',
+    dbCacheValidator,
+    DB_CACHE_TTL_DEFAULT
+  ),
+  newOption(
+    '--disable-db-cache <true/false>',
+    ProviderServerOptionDescriptions.DisableDbCache,
+    'DISABLE_DB_CACHE',
+    (disableDbCache) =>
+      stringOptionToBoolean(disableDbCache, Programs.ProviderServer, ProviderServerOptionDescriptions.DisableDbCache),
+    DISABLE_DB_CACHE_DEFAULT
+  ),
+  newOption(
+    '--disable-stake-pool-metric-apy <true/false>',
+    ProviderServerOptionDescriptions.DisableStakePoolMetricApy,
+    'DISABLE_STAKE_POOL_METRIC_APY',
+    (disableApy) =>
+      stringOptionToBoolean(
+        disableApy,
+        Programs.ProviderServer,
+        ProviderServerOptionDescriptions.DisableStakePoolMetricApy
+      ),
+    DISABLE_STAKE_POOL_METRIC_APY_DEFAULT
+  ),
+  newOption(
+    '--epoch-poll-interval <epochPollInterval>',
+    ProviderServerOptionDescriptions.EpochPollInterval,
+    'EPOCH_POLL_INTERVAL',
+    (interval) => Number.parseInt(interval, 10),
+    EPOCH_POLL_INTERVAL_DEFAULT
+  ),
+  newOption(
+    '--token-metadata-server-url <tokenMetadataServerUrl>',
+    ProviderServerOptionDescriptions.TokenMetadataServerUrl,
+    'TOKEN_METADATA_SERVER_URL',
+    (url) => new URL(url).toString(),
+    DEFAULT_TOKEN_METADATA_SERVER_URL
+  ),
+  newOption(
+    '--token-metadata-cache-ttl <tokenMetadataCacheTTL>',
+    ProviderServerOptionDescriptions.TokenMetadataCacheTtl,
+    'TOKEN_METADATA_CACHE_TTL',
+    dbCacheValidator,
+    DEFAULT_TOKEN_METADATA_CACHE_TTL
+  ),
+  newOption(
+    '--asset-cache-ttl <assetCacheTTL>',
+    ProviderServerOptionDescriptions.AssetCacheTtl,
+    'ASSET_CACHE_TTL',
+    dbCacheValidator,
+    DB_CACHE_TTL_DEFAULT
+  ),
+  newOption(
+    '--token-metadata-request-timeout <tokenMetadataRequestTimeout>',
+    ProviderServerOptionDescriptions.PaginationPageSizeLimit,
+    'TOKEN_METADATA_REQUEST_TIMEOUT',
+    (interval) => Number.parseInt(interval, 10),
+    DEFAULT_TOKEN_METADATA_REQUEST_TIMEOUT
+  ),
+  newOption(
+    '--use-typeorm-stake-pool-provider <true/false>',
+    ProviderServerOptionDescriptions.UseTypeOrmStakePoolProvider,
+    'USE_TYPEORM_STAKE_POOL_PROVIDER',
+    (useTypeormStakePoolProvider) =>
+      stringOptionToBoolean(
+        useTypeormStakePoolProvider,
+        Programs.ProviderServer,
+        ProviderServerOptionDescriptions.UseTypeOrmStakePoolProvider
+      ),
+    USE_TYPEORM_STAKE_POOL_PROVIDER_DEFAULT
+  ),
+  newOption(
+    '--use-blockfrost <true/false>',
+    ProviderServerOptionDescriptions.UseBlockfrost,
+    'USE_BLOCKFROST',
+    (useBlockfrost) =>
+      stringOptionToBoolean(useBlockfrost, Programs.ProviderServer, ProviderServerOptionDescriptions.UseBlockfrost),
+    USE_BLOCKFROST_DEFAULT
+  ),
+  newOption(
+    '--use-kora-labs <true/false>',
+    ProviderServerOptionDescriptions.UseKoraLabsProvider,
+    'USE_KORA_LABS',
+    (useKoraLabs) =>
+      stringOptionToBoolean(useKoraLabs, Programs.ProviderServer, ProviderServerOptionDescriptions.UseKoraLabsProvider),
+    false
+  ),
+  newOption(
+    '--use-queue <true/false>',
+    ProviderServerOptionDescriptions.UseQueue,
+    'USE_QUEUE',
+    (useQueue) => stringOptionToBoolean(useQueue, Programs.ProviderServer, ProviderServerOptionDescriptions.UseQueue),
+    USE_QUEUE_DEFAULT
+  ),
+  newOption(
+    '--pagination-page-size-limit <paginationPageSizeLimit>',
+    ProviderServerOptionDescriptions.PaginationPageSizeLimit,
+    'PAGINATION_PAGE_SIZE_LIMIT',
+    (interval) => Number.parseInt(interval, 10),
+    PAGINATION_PAGE_SIZE_LIMIT_DEFAULT
+  ),
+  newOption(
+    '--handle-provider-server-url <handleProviderServerUrl>',
+    ProviderServerOptionDescriptions.HandleProviderServerUrl,
+    'HANDLE_PROVIDER_SERVER_URL',
+    (serverUrl: string) => serverUrl,
+    HANDLE_PROVIDER_SERVER_URL_DEFAULT
+  ),
+  newOption(
+    '--use-typeorm-asset-provider <true/false>',
+    ProviderServerOptionDescriptions.UseTypeormAssetProvider,
+    'USE_TYPEORM_ASSET_PROVIDER',
+    (useTypeormAssetProvider) =>
+      stringOptionToBoolean(
+        useTypeormAssetProvider,
+        Programs.ProviderServer,
+        ProviderServerOptionDescriptions.UseTypeormAssetProvider
+      ),
+    USE_TYPEORM_ASSET_PROVIDER_DEFAULT
   )
-  .addOption(
-    new Option('--parallel-txs <parallelTxs>', TxWorkerOptionDescriptions.ParallelTxs)
-      .env('PARALLEL_TXS')
-      .default(PARALLEL_TXS_DEFAULT)
-      .argParser((parallelTxs) => Number.parseInt(parallelTxs, 10))
+]).action(async (serviceNames: ServiceNames[], args: ProviderServerArgs) =>
+  runServer('Provider server', () =>
+    loadProviderServer({
+      ...args,
+      postgresConnectionStringDbSync: connectionStringFromArgs(args, 'DbSync'),
+      postgresConnectionStringHandle: connectionStringFromArgs(args, 'Handle'),
+      postgresConnectionStringStakePool: connectionStringFromArgs(args, 'StakePool'),
+      serviceNames: args.serviceNames ? args.serviceNames : serviceNames
+    })
   )
-  .addOption(
-    new Option('--polling-cycle <pollingCycle>', TxWorkerOptionDescriptions.PollingCycle)
-      .env('POLLING_CYCLE')
-      .default(POLLING_CYCLE_DEFAULT)
-      .argParser((pollingCycle) => Number.parseInt(pollingCycle, 10))
+);
+
+const rabbitMQ = program.command('start-worker').description('Start RabbitMQ worker');
+
+addOptions(withCommonOptions(withOgmiosOptions(withRabbitMqOptions(rabbitMQ)), TX_WORKER_API_URL_DEFAULT), [
+  newOption(
+    '--parallel <true/false>',
+    TxWorkerOptionDescriptions.Parallel,
+    'PARALLEL',
+    (parallel) => stringOptionToBoolean(parallel, Programs.RabbitmqWorker, TxWorkerOptionDescriptions.Parallel),
+    PARALLEL_MODE_DEFAULT
+  ),
+  newOption(
+    '--parallel-txs <parallelTxs>',
+    TxWorkerOptionDescriptions.ParallelTxs,
+    'PARALLEL_TXS',
+    (parallelTxs) => Number.parseInt(parallelTxs, 10),
+    PARALLEL_TXS_DEFAULT
+  ),
+  newOption(
+    '--polling-cycle <pollingCycle>',
+    TxWorkerOptionDescriptions.PollingCycle,
+    'POLLING_CYCLE',
+    (pollingCycle) => Number.parseInt(pollingCycle, 10),
+    POLLING_CYCLE_DEFAULT
   )
-  .action(async (args: TxWorkerArgs) => {
-    // eslint-disable-next-line no-console
-    console.log(`RabbitMQ transactions worker: ${args.parallel ? 'parallel' : 'serial'} mode`);
-    const txWorker = await loadAndStartTxWorker(args);
-    onDeath(async () => {
-      await txWorker.shutdown();
-      process.exit(1);
-    });
+]).action(async (args: TxWorkerArgs) => {
+  process.stdout.write(`RabbitMQ transactions worker: ${args.parallel ? 'parallel' : 'serial'} mode\n`);
+  const txWorker = await loadAndStartTxWorker(args);
+  onDeath(async () => {
+    await txWorker.shutdown();
+    process.exit(1);
   });
+});
 
-withCommonOptions(
-  withPostgresOptions(program.command('start-blockfrost-worker').description('Start the Blockfrost worker'), 'DbSync'),
-  { apiUrl: BLOCKFROST_WORKER_API_URL_DEFAULT }
-)
-  .addOption(
-    new Option('--blockfrost-api-file <blockfrostApiFile>', BlockfrostWorkerOptionDescriptions.BlockfrostApiFile)
-      .env('BLOCKFROST_API_FILE')
-      .conflicts('blockfrostApiKey')
-  )
-  .addOption(
-    new Option('--blockfrost-api-key <blockfrostApiKey>', BlockfrostWorkerOptionDescriptions.BlockfrostApiKey).env(
-      'BLOCKFROST_API_KEY'
-    )
-  )
-  .addOption(
-    new Option('--cache-ttl <cacheTtl>', BlockfrostWorkerOptionDescriptions.CacheTTL)
-      .env('CACHE_TTL')
-      .default(CACHE_TTL_DEFAULT)
-      .argParser((interval) => Number.parseInt(interval, 10))
-  )
-  .addOption(
-    new Option('--create-schema <true/false>', BlockfrostWorkerOptionDescriptions.CreateSchema)
-      .env('CREATE_SCHEMA')
-      .default(CREATE_SCHEMA_DEFAULT)
-      .argParser((createSchema) =>
-        stringOptionToBoolean(createSchema, Programs.BlockfrostWorker, BlockfrostWorkerOptionDescriptions.CreateSchema)
-      )
-  )
-  .addOption(
-    new Option('--drop-schema <true/false>', BlockfrostWorkerOptionDescriptions.DropSchema)
-      .env('DROP_SCHEMA')
-      .default(DROP_SCHEMA_DEFAULT)
-      .argParser((dropSchema) =>
-        stringOptionToBoolean(dropSchema, Programs.BlockfrostWorker, BlockfrostWorkerOptionDescriptions.DropSchema)
-      )
-  )
-  .addOption(
-    new Option('--dry-run <true/false>', BlockfrostWorkerOptionDescriptions.DryRun)
-      .env('DRY_RUN')
-      .default(DRY_RUN_DEFAULT)
-      .argParser((dryRun) =>
-        stringOptionToBoolean(dryRun, Programs.BlockfrostWorker, BlockfrostWorkerOptionDescriptions.DryRun)
-      )
-  )
-  .addOption(
-    new Option('--network <network>', BlockfrostWorkerOptionDescriptions.Network)
-      .env('NETWORK')
-      .argParser((network) => {
-        if (availableNetworks.includes(network as AvailableNetworks)) return network;
+const blockfrost = program.command('start-blockfrost-worker').description('Start the Blockfrost worker');
 
-        throw new Error(`Unknown network: ${network}`);
-      })
-  )
-  .addOption(
-    new Option('--scan-interval <scanInterval>', BlockfrostWorkerOptionDescriptions.ScanInterval)
-      .env('SCAN_INTERVAL')
-      .default(SCAN_INTERVAL_DEFAULT)
-      .argParser((interval) => Number.parseInt(interval, 10))
-  )
-  .action(async (args: BlockfrostWorkerArgs) =>
-    runServer('Blockfrost worker', () =>
-      loadBlockfrostWorker({ ...args, postgresConnectionStringDbSync: connectionStringFromArgs(args, 'DbSync') })
-    )
-  );
-
-withCommonOptions(
-  withPostgresOptions(
-    withPostgresOptions(program.command('start-pg-boss-worker').description('Start the pg-boss worker'), 'StakePool'),
-    'DbSync'
+addOptions(withCommonOptions(withPostgresOptions(blockfrost, ['DbSync']), BLOCKFROST_WORKER_API_URL_DEFAULT), [
+  newOption(
+    '--blockfrost-api-file <blockfrostApiFile>',
+    BlockfrostWorkerOptionDescriptions.BlockfrostApiFile,
+    'BLOCKFROST_API_FILE'
+  ).conflicts('blockfrostApiKey'),
+  newOption(
+    '--blockfrost-api-key <blockfrostApiKey>',
+    BlockfrostWorkerOptionDescriptions.BlockfrostApiKey,
+    'BLOCKFROST_API_KEY'
   ),
-  { apiUrl: PG_BOSS_WORKER_API_URL_DEFAULT }
-)
-  .addOption(
-    new Option('--parallel-jobs <parallelJobs>', PgBossWorkerOptionDescriptions.ParallelJobs)
-      .env('PARALLEL_JOBS')
-      .default(PARALLEL_JOBS_DEFAULT)
-      .argParser((parallelJobs) => Number.parseInt(parallelJobs, 10))
-  )
-  .addOption(
-    new Option('--queues <queues>', PgBossWorkerOptionDescriptions.Queues)
-      .env('QUEUES')
-      .argParser((queues) => {
-        const queuesArray = queues.split(',') as PgBossQueue[];
+  newOption(
+    '--cache-ttl <cacheTtl>',
+    BlockfrostWorkerOptionDescriptions.CacheTTL,
+    'CACHE_TTL',
+    (interval) => Number.parseInt(interval, 10),
+    CACHE_TTL_DEFAULT
+  ),
+  newOption(
+    '--create-schema <true/false>',
+    BlockfrostWorkerOptionDescriptions.CreateSchema,
+    'CREATE_SCHEMA',
+    (createSchema) =>
+      stringOptionToBoolean(createSchema, Programs.BlockfrostWorker, BlockfrostWorkerOptionDescriptions.CreateSchema),
+    CREATE_SCHEMA_DEFAULT
+  ),
+  newOption(
+    '--drop-schema <true/false>',
+    BlockfrostWorkerOptionDescriptions.DropSchema,
+    'DROP_SCHEMA',
+    (dropSchema) =>
+      stringOptionToBoolean(dropSchema, Programs.BlockfrostWorker, BlockfrostWorkerOptionDescriptions.DropSchema),
+    DROP_SCHEMA_DEFAULT
+  ),
+  newOption(
+    '--dry-run <true/false>',
+    BlockfrostWorkerOptionDescriptions.DryRun,
+    'DRY_RUN',
+    (dryRun) => stringOptionToBoolean(dryRun, Programs.BlockfrostWorker, BlockfrostWorkerOptionDescriptions.DryRun),
+    DRY_RUN_DEFAULT
+  ),
+  newOption('--network <network>', BlockfrostWorkerOptionDescriptions.Network, 'NETWORK', (network) => {
+    if (availableNetworks.includes(network as AvailableNetworks)) return network;
 
-        for (const queue of queuesArray) if (!isValidQueue(queue)) throw new Error(`Unknown queue name: '${queue}'`);
-
-        return queuesArray;
-      })
-      .makeOptionMandatory()
+    throw new Error(`Unknown network: ${network}`);
+  }),
+  newOption(
+    '--scan-interval <scanInterval>',
+    BlockfrostWorkerOptionDescriptions.ScanInterval,
+    'SCAN_INTERVAL',
+    (interval) => Number.parseInt(interval, 10),
+    SCAN_INTERVAL_DEFAULT
   )
-  .action(async (args: PgBossWorkerArgs) =>
-    runServer('pg-boss worker', () =>
-      loadPgBossWorker({
-        ...args,
-        postgresConnectionStringDbSync: connectionStringFromArgs(args, 'DbSync'),
-        postgresConnectionStringStakePool: connectionStringFromArgs(args, 'StakePool')
-      })
-    )
-  );
+]).action(async (args: BlockfrostWorkerArgs) =>
+  runServer('Blockfrost worker', () =>
+    loadBlockfrostWorker({ ...args, postgresConnectionStringDbSync: connectionStringFromArgs(args, 'DbSync') })
+  )
+);
+
+const pgBoss = program.command('start-pg-boss-worker').description('Start the pg-boss worker');
+
+addOptions(withCommonOptions(withPostgresOptions(pgBoss, ['DbSync', 'StakePool']), PG_BOSS_WORKER_API_URL_DEFAULT), [
+  newOption(
+    '--parallel-jobs <parallelJobs>',
+    PgBossWorkerOptionDescriptions.ParallelJobs,
+    'PARALLEL_JOBS',
+    (parallelJobs) => Number.parseInt(parallelJobs, 10),
+    PARALLEL_JOBS_DEFAULT
+  ),
+  newOption('--queues <queues>', PgBossWorkerOptionDescriptions.Queues, 'QUEUES', (queues) => {
+    const queuesArray = queues.split(',') as PgBossQueue[];
+
+    for (const queue of queuesArray) if (!isValidQueue(queue)) throw new Error(`Unknown queue name: '${queue}'`);
+
+    return queuesArray;
+  }).makeOptionMandatory()
+]).action(async (args: PgBossWorkerArgs) =>
+  runServer('pg-boss worker', () =>
+    loadPgBossWorker({
+      ...args,
+      postgresConnectionStringDbSync: connectionStringFromArgs(args, 'DbSync'),
+      postgresConnectionStringStakePool: connectionStringFromArgs(args, 'StakePool')
+    })
+  )
+);
 
 if (process.argv.slice(2).length === 0) {
   program.outputHelp();

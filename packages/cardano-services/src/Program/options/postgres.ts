@@ -1,4 +1,5 @@
-import { Command, Option } from 'commander';
+import { Command } from 'commander';
+import { addOptions, newOption } from './util';
 import { existingFileValidator } from '../../util/validators';
 
 export enum PostgresOptionDescriptions {
@@ -47,20 +48,20 @@ export const getPostgresOption = <Suffix extends ConnectionNames, Options extend
 
 export const suffixType2Cli = (suffix: ConnectionNames) => suffix.replace(/[A-Z]/g, (_) => `-${_.toLowerCase()}`);
 
-export const withPostgresOptions = (command: Command, suffix: ConnectionNames) => {
-  const cliSuffix = suffix ? suffixType2Cli(suffix) : '';
-  const dscSuffix = suffix ? suffix.replace(/[A-Z]/g, (_) => ` ${_.toLowerCase()}`) : '';
-  const envSuffix = suffix ? suffix.replace(/[A-Z]/g, (_) => `_${_}`).replace(/[a-z]/g, (_) => _.toUpperCase()) : '';
+export const withPostgresOptions = (command: Command, suffixes: ConnectionNames[]) => {
+  for (const suffix of suffixes) {
+    const cliSuffix = suffix ? suffixType2Cli(suffix) : '';
+    const dscSuffix = suffix ? suffix.replace(/[A-Z]/g, (_) => ` ${_.toLowerCase()}`) : '';
+    const envSuffix = suffix ? suffix.replace(/[A-Z]/g, (_) => `_${_}`).replace(/[a-z]/g, (_) => _.toUpperCase()) : '';
 
-  const descSuffix = ` for${dscSuffix}`;
+    const descSuffix = ` for${dscSuffix}`;
 
-  return command
-    .addOption(
-      new Option(
+    addOptions(command, [
+      newOption(
         `--postgres-connection-string${cliSuffix} <postgresConnectionString${suffix}>`,
-        PostgresOptionDescriptions.ConnectionString + descSuffix
+        PostgresOptionDescriptions.ConnectionString + descSuffix,
+        `POSTGRES_CONNECTION_STRING${envSuffix}`
       )
-        .env(`POSTGRES_CONNECTION_STRING${envSuffix}`)
         .conflicts(`postgresSrvServiceName${suffix}`)
         .conflicts(`postgresDb${suffix}`)
         .conflicts(`postgresDbFile${suffix}`)
@@ -69,83 +70,70 @@ export const withPostgresOptions = (command: Command, suffix: ConnectionNames) =
         .conflicts(`postgresPassword${suffix}`)
         .conflicts(`postgresPasswordFile${suffix}`)
         .conflicts(`postgresHost${suffix}`)
-        .conflicts(`postgresPort${suffix}`)
-    )
-    .addOption(
-      new Option(
+        .conflicts(`postgresPort${suffix}`),
+      newOption(
         `--postgres-srv-service-name${cliSuffix} <postgresSrvServiceName${suffix}>`,
-        PostgresOptionDescriptions.SrvServiceName + descSuffix
+        PostgresOptionDescriptions.SrvServiceName + descSuffix,
+        `POSTGRES_SRV_SERVICE_NAME${envSuffix}`
       )
-        .env(`POSTGRES_SRV_SERVICE_NAME${envSuffix}`)
         .conflicts(`postgresHost${suffix}`)
-        .conflicts(`postgresPort${suffix}`)
-    )
-    .addOption(
-      new Option(`--postgres-db${cliSuffix} <postgresDb${suffix}>`, PostgresOptionDescriptions.Db + descSuffix)
-        .env(`POSTGRES_DB${envSuffix}`)
-        .conflicts(`postgresDbFile${suffix}`)
-    )
-    .addOption(
-      new Option(
+        .conflicts(`postgresPort${suffix}`),
+      newOption(
+        `--postgres-db${cliSuffix} <postgresDb${suffix}>`,
+        PostgresOptionDescriptions.Db + descSuffix,
+        `POSTGRES_DB${envSuffix}`
+      ).conflicts(`postgresDbFile${suffix}`),
+      newOption(
         `--postgres-db-file${cliSuffix} <postgresDbFile${suffix}>`,
-        PostgresOptionDescriptions.DbFile + descSuffix
-      )
-        .env(`POSTGRES_DB_FILE${envSuffix}`)
-        .argParser(existingFileValidator)
-    )
-    .addOption(
-      new Option(`--postgres-user${cliSuffix} <postgresUser${suffix}>`, PostgresOptionDescriptions.User + descSuffix)
-        .env(`POSTGRES_USER${envSuffix}`)
-        .conflicts(`postgresUserFile${suffix}`)
-    )
-    .addOption(
-      new Option(
+        PostgresOptionDescriptions.DbFile + descSuffix,
+        `POSTGRES_DB_FILE${envSuffix}`,
+        existingFileValidator
+      ),
+      newOption(
+        `--postgres-user${cliSuffix} <postgresUser${suffix}>`,
+        PostgresOptionDescriptions.User + descSuffix,
+        `POSTGRES_USER${envSuffix}`
+      ).conflicts(`postgresUserFile${suffix}`),
+      newOption(
         `--postgres-user-file${cliSuffix} <postgresUserFile${suffix}>`,
-        PostgresOptionDescriptions.UserFile + descSuffix
-      )
-        .env(`POSTGRES_USER_FILE${envSuffix}`)
-        .argParser(existingFileValidator)
-    )
-    .addOption(
-      new Option(
+        PostgresOptionDescriptions.UserFile + descSuffix,
+        `POSTGRES_USER_FILE${envSuffix}`,
+        existingFileValidator
+      ),
+      newOption(
         `--postgres-password${cliSuffix} <postgresPassword${suffix}>`,
-        PostgresOptionDescriptions.Password + descSuffix
-      )
-        .env(`POSTGRES_PASSWORD${envSuffix}`)
-        .conflicts(`postgresPasswordFile${suffix}`)
-    )
-    .addOption(
-      new Option(
+        PostgresOptionDescriptions.Password + descSuffix,
+        `POSTGRES_PASSWORD${envSuffix}`
+      ).conflicts(`postgresPasswordFile${suffix}`),
+      newOption(
         `--postgres-password-file${cliSuffix} <postgresPasswordFile${suffix}>`,
-        PostgresOptionDescriptions.PasswordFile + descSuffix
-      )
-        .env(`POSTGRES_PASSWORD_FILE${envSuffix}`)
-        .argParser(existingFileValidator)
-    )
-    .addOption(
-      new Option(
+        PostgresOptionDescriptions.PasswordFile + descSuffix,
+        `POSTGRES_PASSWORD_FILE${envSuffix}`,
+        existingFileValidator
+      ),
+      newOption(
         `--postgres-host${cliSuffix} <postgresHost${suffix}>`,
-        PostgresOptionDescriptions.Host + descSuffix
-      ).env(`POSTGRES_HOST${envSuffix}`)
-    )
-    .addOption(
-      new Option(
+        PostgresOptionDescriptions.Host + descSuffix,
+        `POSTGRES_HOST${envSuffix}`
+      ),
+      newOption(
         `--postgres-pool-max${cliSuffix} <postgresPoolMax${suffix}>`,
-        PostgresOptionDescriptions.PoolMax + descSuffix
-      )
-        .env(`POSTGRES_POOL_MAX${envSuffix}`)
-        .argParser((max) => Number.parseInt(max, 10))
-    )
-    .addOption(
-      new Option(
+        PostgresOptionDescriptions.PoolMax + descSuffix,
+        `POSTGRES_POOL_MAX${envSuffix}`,
+        (max) => Number.parseInt(max, 10)
+      ),
+      newOption(
         `--postgres-port${cliSuffix} <postgresPort${suffix}>`,
-        PostgresOptionDescriptions.Port + descSuffix
-      ).env(`POSTGRES_PORT${envSuffix}`)
-    )
-    .addOption(
-      new Option(
+        PostgresOptionDescriptions.Port + descSuffix,
+        `POSTGRES_PORT${envSuffix}`
+      ),
+      newOption(
         `--postgres-ssl-ca-file${cliSuffix} <postgresSslCaFile${suffix}>`,
-        PostgresOptionDescriptions.SslCaFile + descSuffix
-      ).env(`POSTGRES_SSL_CA_FILE${envSuffix}`)
-    );
+        PostgresOptionDescriptions.SslCaFile + descSuffix,
+        `POSTGRES_SSL_CA_FILE${envSuffix}`
+      )
+    ]);
+  }
+
+  return command;
 };
