@@ -1,4 +1,10 @@
-import { CommonProgramOptions, OgmiosProgramOptions, PosgresProgramOptions, RabbitMqProgramOptions } from '../options';
+import {
+  CommonProgramOptions,
+  OgmiosProgramOptions,
+  PosgresProgramOptions,
+  RabbitMqProgramOptions,
+  StakePoolMetadataProgramOptions
+} from '../options';
 import { HandlePolicyIdsProgramOptions } from '../options/policyIds';
 import { Milliseconds, Seconds } from '@cardano-sdk/core';
 
@@ -63,7 +69,8 @@ export type ProviderServerArgs = CommonProgramOptions &
   PosgresProgramOptions<'StakePool'> &
   OgmiosProgramOptions &
   HandlePolicyIdsProgramOptions &
-  RabbitMqProgramOptions & {
+  RabbitMqProgramOptions &
+  StakePoolMetadataProgramOptions & {
     allowedOrigins?: string[];
     cardanoNodeConfigPath?: string;
     disableDbCache?: boolean;

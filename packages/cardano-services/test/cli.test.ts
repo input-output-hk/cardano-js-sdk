@@ -2640,6 +2640,37 @@ describe('CLI', () => {
         done();
       });
     });
+
+    it('exits with code 1 with an invalid SMASH_URL when metadata-fetch-mode=smash', (done) => {
+      expect.assertions(2);
+      proc = withLogging(
+        fork(
+          exePath,
+          [
+            ...commonArgs,
+            '--queues',
+            'pool-metadata',
+            '--postgres-connection-string-db-sync',
+            postgresConnectionString,
+            '--postgres-connection-string-stake-pool',
+            postgresConnectionStringStakePool,
+            '--stake-pool-provider-url',
+            'http://localhost:4000/stake-pool',
+            '--metadata-fetch-mode',
+            'smash',
+            '--smash-url',
+            'invalid-url'
+          ],
+          { env: {}, stdio: 'pipe' }
+        ),
+        true
+      );
+      proc.stderr!.on('data', (data) => expect(data.toString()).toContain('[ERR_INVALID_URL]'));
+      proc.on('exit', (code) => {
+        expect(code).toBe(1);
+        done();
+      });
+    });
   });
 
   describe('start-worker', () => {

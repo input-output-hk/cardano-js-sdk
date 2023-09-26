@@ -64,13 +64,10 @@ describe('StakePoolMetadataService', () => {
         `${serverUrl}/metadata`
       );
 
-      expect(result).toEqual({
-        errors: [],
-        metadata: { ...mainExtMetadataMock() }
-      });
+      expect(result).toEqual(mainExtMetadataMock());
     });
 
-    it('fetch stake pool JSON metadata with extended metadata', async () => {
+    it('fetch stake pool JSON metadata and extended metadata', async () => {
       let metadata: any;
 
       // First fetch returns the metadata, second fetch return the extended metadata.
@@ -94,15 +91,18 @@ describe('StakePoolMetadataService', () => {
         .update(Buffer.from(JSON.stringify(metadata), 'ascii'))
         .digest('hex');
 
-      const result = await metadataService.getStakePoolMetadata(
+      const resultMetadata = await metadataService.getStakePoolMetadata(
         metadataHash as Hash32ByteBase16,
         `${serverUrl}/metadata`
       );
 
-      expect(result).toEqual({
-        errors: [],
-        metadata: { ...metadata, ext: DataMocks.Pool.adaPoolExtendedMetadata }
-      });
+      expect(resultMetadata).toEqual(metadata);
+
+      const resultExtendedMetadata = await metadataService.getValidateStakePoolExtendedMetadata(
+        resultMetadata as Cardano.StakePoolMetadata
+      );
+
+      expect(resultExtendedMetadata).toEqual(DataMocks.Pool.adaPoolExtendedMetadata);
     });
 
     it('returns StakePoolMetadataServiceError with FailedToFetchMetadata error code when it gets resource not found server error', async () => {
@@ -113,15 +113,13 @@ describe('StakePoolMetadataService', () => {
         serverUrl
       );
 
-      expect(result).toEqual({
-        errors: [
-          new StakePoolMetadataServiceError(
-            StakePoolMetadataServiceFailure.FailedToFetchMetadata,
-            null,
-            `StakePoolMetadataService failed to fetch metadata JSON from ${serverUrl} due to Request failed with status code 500`
-          )
-        ]
-      });
+      expect(result).toEqual(
+        new StakePoolMetadataServiceError(
+          StakePoolMetadataServiceFailure.FailedToFetchMetadata,
+          null,
+          `StakePoolMetadataService failed to fetch metadata JSON from ${serverUrl} due to Request failed with status code 500`
+        )
+      );
     });
 
     it('returns StakePoolMetadataServiceError with InvalidStakePoolHash error code when the hash doesnt match', async () => {
@@ -135,44 +133,35 @@ describe('StakePoolMetadataService', () => {
         `${serverUrl}/metadata`
       );
 
-      expect(result).toEqual({
-        errors: [
-          new StakePoolMetadataServiceError(
-            StakePoolMetadataServiceFailure.InvalidStakePoolHash,
-            null,
-            "Invalid stake pool hash. Computed '0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8', expected '0000000000000000000000000000000000000000000000000000000000000000'"
-          )
-        ]
-      });
+      expect(result).toEqual(
+        new StakePoolMetadataServiceError(
+          StakePoolMetadataServiceFailure.InvalidStakePoolHash,
+          null,
+          "Invalid stake pool hash. Computed '0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8', expected '0000000000000000000000000000000000000000000000000000000000000000'"
+        )
+      );
     });
 
     it('returns StakePoolMetadataServiceError with InvalidMetadata error code when metadata has extDataUrl but is missing extSigUrl', async () => {
-      const metadata = { ...mainExtMetadataMock, extDataUrl: UNFETCHABLE };
+      const metadata = { ...mainExtMetadataMock(), extDataUrl: UNFETCHABLE };
       ({ closeMock, serverUrl } = await mockPoolExtMetadataServer(async () => ({
         body: metadata,
         code: 200
       })));
 
-      const result = await metadataService.getStakePoolMetadata(
-        '71782c81f1e90c08e3f9083db36c9966362ac08356bf10cbd50bb91eabf19135' as Hash32ByteBase16,
-        `${serverUrl}/metadata`
+      const result = await metadataService.getValidateStakePoolExtendedMetadata(metadata);
+      expect(result).toEqual(
+        new StakePoolMetadataServiceError(
+          StakePoolMetadataServiceFailure.InvalidMetadata,
+          null,
+          'Missing ext signature or public key'
+        )
       );
-
-      expect(result).toEqual({
-        errors: [
-          new StakePoolMetadataServiceError(
-            StakePoolMetadataServiceFailure.InvalidMetadata,
-            null,
-            'Missing ext signature or public key'
-          )
-        ],
-        metadata
-      });
     });
 
     it('returns StakePoolMetadataServiceError with InvalidMetadata error code when metadata has extDataUrl and extSigUrl but is missing extVkey', async () => {
       const metadata = {
-        ...mainExtMetadataMock,
+        ...mainExtMetadataMock(),
         extDataUrl: UNFETCHABLE,
         extSigUrl: UNFETCHABLE
       };
@@ -181,21 +170,15 @@ describe('StakePoolMetadataService', () => {
         code: 200
       })));
 
-      const result = await metadataService.getStakePoolMetadata(
-        'bc8b5da244f49515e97c874e9830b709faaef18ef32ce63cd0b6a8af15e4b01b' as Hash32ByteBase16,
-        `${serverUrl}/metadata`
-      );
+      const result = await metadataService.getValidateStakePoolExtendedMetadata(metadata);
 
-      expect(result).toEqual({
-        errors: [
-          new StakePoolMetadataServiceError(
-            StakePoolMetadataServiceFailure.InvalidMetadata,
-            null,
-            'Missing ext signature or public key'
-          )
-        ],
-        metadata
-      });
+      expect(result).toEqual(
+        new StakePoolMetadataServiceError(
+          StakePoolMetadataServiceFailure.InvalidMetadata,
+          null,
+          'Missing ext signature or public key'
+        )
+      );
     });
 
     it('returns StakePoolMetadataServiceError with FailedToFetchExtendedSignature error code when it cant fetch the signature', async () => {
@@ -217,25 +200,15 @@ describe('StakePoolMetadataService', () => {
         extVkey: '00000000000000000000000000000000'
       };
 
-      const metadataHash = Crypto.blake2b(Crypto.blake2b.BYTES)
-        .update(Buffer.from(JSON.stringify(metadata), 'ascii'))
-        .digest('hex');
+      const result = await metadataService.getValidateStakePoolExtendedMetadata(metadata);
 
-      const result = await metadataService.getStakePoolMetadata(
-        metadataHash as Hash32ByteBase16,
-        `${serverUrl}/metadata`
+      expect(result).toEqual(
+        new StakePoolMetadataServiceError(
+          StakePoolMetadataServiceFailure.FailedToFetchExtendedSignature,
+          null,
+          `StakePoolMetadataService failed to fetch extended signature from ${metadata.extSigUrl} due to connection error`
+        )
       );
-
-      expect(result).toEqual({
-        errors: [
-          new StakePoolMetadataServiceError(
-            StakePoolMetadataServiceFailure.FailedToFetchExtendedSignature,
-            null,
-            `StakePoolMetadataService failed to fetch extended signature from ${metadata.extSigUrl} due to connection error`
-          )
-        ],
-        metadata
-      });
     });
 
     it('returns StakePoolMetadataServiceError with InvalidExtendedMetadataSignature error code when the signature is invalid', async () => {
@@ -277,21 +250,22 @@ describe('StakePoolMetadataService', () => {
         .update(Buffer.from(JSON.stringify(metadata), 'ascii'))
         .digest('hex');
 
-      const result = await metadataService.getStakePoolMetadata(
+      const metadataResult = await metadataService.getStakePoolMetadata(
         metadataHash as Hash32ByteBase16,
         `${serverUrl}/metadata`
       );
 
-      expect(result).toEqual({
-        errors: [
-          new StakePoolMetadataServiceError(
-            StakePoolMetadataServiceFailure.InvalidExtendedMetadataSignature,
-            null,
-            'Invalid extended metadata signature'
-          )
-        ],
-        metadata
-      });
+      const result2 = await metadataService.getValidateStakePoolExtendedMetadata(
+        metadataResult as Cardano.StakePoolMetadata
+      );
+
+      expect(result2).toEqual(
+        new StakePoolMetadataServiceError(
+          StakePoolMetadataServiceFailure.InvalidExtendedMetadataSignature,
+          null,
+          'Invalid extended metadata signature'
+        )
+      );
     });
   });
 

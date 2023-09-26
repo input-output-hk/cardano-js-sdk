@@ -117,6 +117,22 @@ services:
       - node-ipc:/node-ipc
       - ../../packages/e2e/local-network/scripts:/scripts
 
+  cardano-smash:
+    <<:
+      - *logging
+      - *with-postgres
+    depends_on:
+      cardano-db-sync:
+        condition: service_healthy
+    build:
+      context: ../../
+      dockerfile: compose/smash/Dockerfile
+    ports:
+      - ${SMASH_PORT:-3100}:3100
+    restart: on-failure
+    healthcheck:
+      test: [ 'CMD-SHELL', 'curl -s --fail http://localhost:3100/api/v1/status' ]
+
   cardano-node-ogmios:
     <<: *logging
     healthcheck:
@@ -139,11 +155,15 @@ services:
     depends_on:
       stake-pool-projector:
         condition: service_healthy
+      cardano-smash:
+        condition: service_healthy
     environment:
       <<: *sdk-environment
       API_URL: http://0.0.0.0:3003
       QUEUES: ${QUEUES:-pool-metadata,pool-metrics}
       STAKE_POOL_PROVIDER_URL: http://provider-server:3000/
+      METADATA_FETCH_MODE: ${METADATA_FETCH_MODE:-direct}
+      SMASH_URL: ${SMASH_URL:-http://cardano-smash:3100/api/v1}
     healthcheck:
       test: ['CMD-SHELL', 'curl -s --fail http://localhost:3003/v1.0.0/health']
     ports:

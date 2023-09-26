@@ -4,7 +4,7 @@
 /* eslint-disable max-depth */
 
 import * as Crypto from '@cardano-sdk/crypto';
-import { CML, Cardano } from '@cardano-sdk/core';
+import { CML } from '@cardano-sdk/core';
 import { CustomError } from 'ts-custom-error';
 import { HexBlob } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
@@ -62,12 +62,7 @@ export const createHttpStakePoolMetadataService = (
       throw error;
     }
   },
-
   async getStakePoolMetadata(hash, url) {
-    const errors: CustomError[] = [];
-    let metadata: Cardano.StakePoolMetadata | undefined;
-    let extMetadata: Cardano.ExtendedStakePoolMetadata | undefined;
-
     try {
       logger.debug(`About to fetch stake pool metadata JSON from ${url}`);
 
@@ -79,105 +74,91 @@ export const createHttpStakePoolMetadataService = (
 
       // Verify base hashes
       if (metadataHash !== hash) {
-        return {
-          errors: [
-            new StakePoolMetadataServiceError(
-              StakePoolMetadataServiceFailure.InvalidStakePoolHash,
-              null,
-              `Invalid stake pool hash. Computed '${metadataHash}', expected '${hash}'`
-            )
-          ],
-          metadata
-        };
+        return new StakePoolMetadataServiceError(
+          StakePoolMetadataServiceFailure.InvalidStakePoolHash,
+          null,
+          `Invalid stake pool hash. Computed '${metadataHash}', expected '${hash}'`
+        );
       }
 
       // Transform fetched metadata from bytes array to JSON
-      metadata = JSON.parse(data.toString());
-
-      extMetadata = await this.validateStakePoolExtendedMetadata(errors, metadata);
+      return JSON.parse(data.toString());
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        errors.push(
-          new StakePoolMetadataServiceError(
-            StakePoolMetadataServiceFailure.FailedToFetchMetadata,
-            error.toJSON(),
-            `${SERVICE_NAME} failed to fetch metadata JSON from ${url} due to ${error.message}`
-          )
+        return new StakePoolMetadataServiceError(
+          StakePoolMetadataServiceFailure.FailedToFetchMetadata,
+          error.toJSON(),
+          `${SERVICE_NAME} failed to fetch metadata JSON from ${url} due to ${error.message}`
         );
       } else if (error instanceof StakePoolMetadataServiceError) {
-        errors.push(error);
-      } else {
-        errors.push(
-          new StakePoolMetadataServiceError(
-            StakePoolMetadataServiceFailure.Unknown,
-            JSON.stringify(error),
-            `${SERVICE_NAME} failed to fetch metadata JSON from ${url} due to ${
-              error instanceof Error ? error.message : 'unknown error'
-            }`
-          )
-        );
+        return error;
       }
+      return new StakePoolMetadataServiceError(
+        StakePoolMetadataServiceFailure.Unknown,
+        JSON.stringify(error),
+        `${SERVICE_NAME} failed to fetch metadata JSON from ${url} due to ${
+          error instanceof Error ? error.message : 'unknown error'
+        }`
+      );
     }
-
-    return { errors, metadata: metadata ? { ...metadata, ext: extMetadata } : undefined };
   },
-
-  async validateStakePoolExtendedMetadata(errors, metadata) {
+  async getValidateStakePoolExtendedMetadata(metadata) {
     if (!metadata?.extDataUrl && !metadata?.extended) return;
 
     // Validate CIP-6 ext metadata fields
     if (metadata.extDataUrl && (!metadata.extSigUrl || !metadata.extVkey)) {
-      errors.push(
-        new StakePoolMetadataServiceError(
-          StakePoolMetadataServiceFailure.InvalidMetadata,
-          null,
-          'Missing ext signature or public key'
-        )
+      return new StakePoolMetadataServiceError(
+        StakePoolMetadataServiceFailure.InvalidMetadata,
+        null,
+        'Missing ext signature or public key'
       );
-
-      return;
     }
 
     // Fetch extended metadata (supports both cip-6 and ada pools formats already)
-    let extMetadata: Cardano.ExtendedStakePoolMetadata | undefined = await this.getStakePoolExtendedMetadata(metadata);
+    try {
+      const extMetadata = await this.getStakePoolExtendedMetadata(metadata);
 
-    // In case of CIP-6 standard -> perform signature verification
-    if (metadata.extDataUrl && metadata.extSigUrl && metadata.extVkey) {
-      // Based on the CIP-6, we have `extSigUrl` (A URL with the extended metadata signature), so we need to make another HTTP request to get the actual signature
-      try {
-        const signature = (await axiosClient.get<Crypto.Ed25519SignatureHex>(metadata.extSigUrl)).data;
-        const message = HexBlob.fromBytes(Buffer.from(JSON.stringify(extMetadata)));
-        const publicKey = Crypto.Ed25519PublicKeyHex(metadata.extVkey);
-        const bip32Ed25519 = new Crypto.CmlBip32Ed25519(CML);
+      // In case of CIP-6 standard -> perform signature verification
+      if (metadata.extDataUrl && metadata.extSigUrl && metadata.extVkey) {
+        // Based on the CIP-6, we have `extSigUrl` (A URL with the extended metadata signature), so we need to make another HTTP request to get the actual signature
+        try {
+          const signature = (await axiosClient.get<Crypto.Ed25519SignatureHex>(metadata.extSigUrl)).data;
+          const message = HexBlob.fromBytes(Buffer.from(JSON.stringify(extMetadata)));
+          const publicKey = Crypto.Ed25519PublicKeyHex(metadata.extVkey);
+          const bip32Ed25519 = new Crypto.CmlBip32Ed25519(CML);
 
-        // Verify the signature
-        const isSignatureValid = await bip32Ed25519.verify(signature, message, publicKey);
+          // Verify the signature
+          const isSignatureValid = await bip32Ed25519.verify(signature, message, publicKey);
 
-        // If not valid -> omit extended metadata from response and add specific error
-        if (!isSignatureValid) {
-          extMetadata = undefined;
-          errors.push(
-            new StakePoolMetadataServiceError(
+          // If not valid -> omit extended metadata from response and add specific error
+          if (!isSignatureValid) {
+            return new StakePoolMetadataServiceError(
               StakePoolMetadataServiceFailure.InvalidExtendedMetadataSignature,
               null,
               'Invalid extended metadata signature'
-            )
-          );
-        }
+            );
+          }
 
-        // If signature url failed -> omit extended metadata from response and add specific error
-      } catch (error) {
-        extMetadata = undefined;
-        errors.push(
-          new StakePoolMetadataServiceError(
+          // If signature url failed -> omit extended metadata from response and add specific error
+        } catch (error) {
+          return new StakePoolMetadataServiceError(
             StakePoolMetadataServiceFailure.FailedToFetchExtendedSignature,
             error,
             `${SERVICE_NAME} failed to fetch extended signature from ${metadata.extSigUrl} due to connection error`
-          )
-        );
+          );
+        }
       }
-    }
 
-    return extMetadata;
+      return extMetadata;
+    } catch (error) {
+      if (error instanceof CustomError) return error;
+      return new StakePoolMetadataServiceError(
+        StakePoolMetadataServiceFailure.Unknown,
+        JSON.stringify(error),
+        `${SERVICE_NAME} failed to get extended metadata due to ${
+          error instanceof Error ? error.message : 'unknown error'
+        }`
+      );
+    }
   }
 });

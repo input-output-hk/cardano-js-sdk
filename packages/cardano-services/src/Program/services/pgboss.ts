@@ -30,6 +30,7 @@ import {
 import { PgBossQueue, queueHandlers } from '../../PgBoss';
 import { Pool } from 'pg';
 import { Router } from 'express';
+import { StakePoolMetadataProgramOptions } from '../options/stakePoolMetadata';
 import { contextLogger } from '@cardano-sdk/util';
 import { createObservableDataSource } from '../../Projection/createTypeormProjection';
 import { retryBackoff } from 'backoff-rxjs';
@@ -57,6 +58,7 @@ export const createPgBossDataSource = (connectionConfig$: Observable<PgConnectio
   });
 
 export type PgBossWorkerArgs = CommonProgramOptions &
+  StakePoolMetadataProgramOptions &
   PosgresProgramOptions<'DbSync'> &
   PosgresProgramOptions<'StakePool'> & {
     parallelJobs: number;
