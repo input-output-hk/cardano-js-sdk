@@ -53,7 +53,8 @@ import {
   withHandlePolicyIdsOptions,
   withOgmiosOptions,
   withPostgresOptions,
-  withRabbitMqOptions
+  withRabbitMqOptions,
+  withStakePoolMetadataOptions
 } from './Program';
 import { Command } from 'commander';
 import { DB_CACHE_TTL_DEFAULT } from './InMemoryCache';
@@ -436,22 +437,28 @@ addOptions(withCommonOptions(withPostgresOptions(blockfrost, ['DbSync']), BLOCKF
 
 const pgBoss = program.command('start-pg-boss-worker').description('Start the pg-boss worker');
 
-addOptions(withCommonOptions(withPostgresOptions(pgBoss, ['DbSync', 'StakePool']), PG_BOSS_WORKER_API_URL_DEFAULT), [
-  newOption(
-    '--parallel-jobs <parallelJobs>',
-    PgBossWorkerOptionDescriptions.ParallelJobs,
-    'PARALLEL_JOBS',
-    (parallelJobs) => Number.parseInt(parallelJobs, 10),
-    PARALLEL_JOBS_DEFAULT
+addOptions(
+  withCommonOptions(
+    withStakePoolMetadataOptions(withPostgresOptions(pgBoss, ['DbSync', 'StakePool'])),
+    PG_BOSS_WORKER_API_URL_DEFAULT
   ),
-  newOption('--queues <queues>', PgBossWorkerOptionDescriptions.Queues, 'QUEUES', (queues) => {
-    const queuesArray = queues.split(',') as PgBossQueue[];
+  [
+    newOption(
+      '--parallel-jobs <parallelJobs>',
+      PgBossWorkerOptionDescriptions.ParallelJobs,
+      'PARALLEL_JOBS',
+      (parallelJobs) => Number.parseInt(parallelJobs, 10),
+      PARALLEL_JOBS_DEFAULT
+    ),
+    newOption('--queues <queues>', PgBossWorkerOptionDescriptions.Queues, 'QUEUES', (queues) => {
+      const queuesArray = queues.split(',') as PgBossQueue[];
 
-    for (const queue of queuesArray) if (!isValidQueue(queue)) throw new Error(`Unknown queue name: '${queue}'`);
+      for (const queue of queuesArray) if (!isValidQueue(queue)) throw new Error(`Unknown queue name: '${queue}'`);
 
-    return queuesArray;
-  }).makeOptionMandatory()
-]).action(async (args: PgBossWorkerArgs) =>
+      return queuesArray;
+    }).makeOptionMandatory()
+  ]
+).action(async (args: PgBossWorkerArgs) =>
   runServer('pg-boss worker', () =>
     loadPgBossWorker({
       ...args,

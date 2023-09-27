@@ -4,7 +4,8 @@ import {
   DEFAULT_HEALTH_CHECK_CACHE_TTL,
   OgmiosOptionDescriptions,
   PostgresOptionDescriptions,
-  RabbitMqOptionDescriptions
+  RabbitMqOptionDescriptions,
+  StakePoolMetadataFetchMode
 } from '../../../src/Program/options';
 import { EPOCH_POLL_INTERVAL_DEFAULT, listenPromise, serverClosePromise } from '../../../src/util';
 import {
@@ -95,6 +96,7 @@ describe('HTTP Server', () => {
         epochPollInterval,
         handlePolicyIds: [],
         healthCheckCacheTtl,
+        metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
         ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
         postgresConnectionStringDbSync,
         postgresConnectionStringHandle,
@@ -119,6 +121,7 @@ describe('HTTP Server', () => {
           epochPollInterval,
           handlePolicyIds: [],
           healthCheckCacheTtl,
+          metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
           ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
           postgresDbDbSync,
           postgresPasswordDbSync,
@@ -144,6 +147,7 @@ describe('HTTP Server', () => {
               epochPollInterval,
               handlePolicyIds: [],
               healthCheckCacheTtl,
+              metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
               ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
               postgresDbDbSync: missingPostgresDb,
               postgresSrvServiceNameDbSync,
@@ -170,6 +174,7 @@ describe('HTTP Server', () => {
               epochPollInterval,
               handlePolicyIds: [],
               healthCheckCacheTtl,
+              metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
               ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
               serviceNames: [ServiceNames.StakePool]
             })
@@ -191,6 +196,7 @@ describe('HTTP Server', () => {
           epochPollInterval,
           handlePolicyIds: [],
           healthCheckCacheTtl,
+          metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
           ogmiosSrvServiceName,
           ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
           // postgresConnectionStringDbSync,
@@ -210,6 +216,7 @@ describe('HTTP Server', () => {
           epochPollInterval,
           handlePolicyIds: [],
           healthCheckCacheTtl,
+          metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
           ogmiosSrvServiceName,
           // postgresConnectionStringDbSync,
           serviceDiscoveryBackoffFactor,
@@ -230,6 +237,7 @@ describe('HTTP Server', () => {
               epochPollInterval,
               handlePolicyIds: [],
               healthCheckCacheTtl,
+              metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
               postgresConnectionStringDbSync,
               serviceDiscoveryBackoffFactor,
               serviceDiscoveryTimeout,
@@ -250,7 +258,9 @@ describe('HTTP Server', () => {
           epochPollInterval,
           handlePolicyIds: [],
           healthCheckCacheTtl,
+          metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
           ogmiosSrvServiceName,
+
           ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
           // postgresConnectionStringDbSync,
           rabbitmqSrvServiceName,
@@ -271,7 +281,9 @@ describe('HTTP Server', () => {
           epochPollInterval,
           handlePolicyIds: [],
           healthCheckCacheTtl,
+          metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
           ogmiosSrvServiceName,
+
           ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
           // postgresConnectionStringDbSync,
           rabbitmqSrvServiceName,
@@ -295,7 +307,9 @@ describe('HTTP Server', () => {
               epochPollInterval,
               handlePolicyIds: [],
               healthCheckCacheTtl,
+              metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
               ogmiosSrvServiceName,
+
               ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
               // postgresConnectionStringDbSync,
               serviceDiscoveryBackoffFactor,
@@ -322,6 +336,7 @@ describe('HTTP Server', () => {
             epochPollInterval: 0,
             handlePolicyIds: [],
             healthCheckCacheTtl,
+            metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
             ogmiosUrl: new URL('http://localhost:1337'),
             postgresConnectionStringDbSync: 'postgres',
             serviceNames: [serviceName]
@@ -355,6 +370,7 @@ describe('HTTP Server', () => {
           epochPollInterval,
           handlePolicyIds: [],
           healthCheckCacheTtl,
+          metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
           ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
           postgresConnectionStringDbSync,
           serviceNames: [ServiceNames.StakePool, ServiceNames.TxSubmit]
