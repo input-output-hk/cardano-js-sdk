@@ -95,7 +95,7 @@ describe('InMemoryKeyAgent', () => {
       body,
       hash: Cardano.TransactionId('8561258e210352fba2ac0488afed67b3427a27ccf1d41ec030c98a8199bc22ec')
     });
-    expect(ownSignatureKeyPaths).toBeCalledWith(body, keyAgent.knownAddresses, inputResolver);
+    expect(ownSignatureKeyPaths).toBeCalledWith(body, keyAgent.knownAddresses, inputResolver, expect.anything());
     expect(witnessSet.size).toBe(2);
     expect(typeof [...witnessSet.values()][0]).toBe('string');
   });

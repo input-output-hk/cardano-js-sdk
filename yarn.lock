@@ -3406,7 +3406,6 @@ __metadata:
     "@cardano-sdk/crypto": "workspace:~"
     "@cardano-sdk/dapp-connector": "workspace:~"
     "@cardano-sdk/util": "workspace:~"
-    "@cardano-sdk/util-dev": "workspace:~"
     "@emurgo/cardano-message-signing-nodejs": ^1.0.1
     "@trezor/connect": 9.0.11
     "@trezor/connect-web": 9.0.11
@@ -3548,6 +3547,7 @@ __metadata:
   dependencies:
     "@cardano-sdk/core": "workspace:~"
     "@cardano-sdk/crypto": "workspace:~"
+    "@cardano-sdk/key-management": "workspace:~"
     "@cardano-sdk/util": "workspace:~"
     "@types/dockerode": ^3.3.8
     "@types/jest": ^26.0.24

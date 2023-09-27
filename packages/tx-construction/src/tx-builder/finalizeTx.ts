@@ -35,13 +35,14 @@ export const finalizeTx = async (
   stubSign = false
 ): Promise<SignedTx> => {
   const signatures = stubSign
-    ? await keyManagementUtil.stubSignTransaction(
-        tx.body,
-        ownAddresses,
+    ? await keyManagementUtil.stubSignTransaction({
+        dRepPublicKey: await keyAgent.derivePublicKey(keyManagementUtil.DREP_KEY_DERIVATION_PATH),
+        extraSigners: witness?.extraSigners,
         inputResolver,
-        witness?.extraSigners,
-        signingOptions
-      )
+        knownAddresses: ownAddresses,
+        signTransactionOptions: signingOptions,
+        txBody: tx.body
+      })
     : await getSignatures(keyAgent, tx, witness?.extraSigners, signingOptions);
 
   const transaction = {

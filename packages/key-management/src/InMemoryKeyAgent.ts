@@ -12,9 +12,8 @@ import {
   SignTransactionOptions
 } from './types';
 import { Cardano } from '@cardano-sdk/core';
-import { HexBlob } from '@cardano-sdk/util';
-import { KeyAgentBase } from './KeyAgentBase';
 import {
+  DREP_KEY_DERIVATION_PATH,
   deriveAccountPrivateKey,
   harden,
   joinMnemonicWords,
@@ -22,6 +21,8 @@ import {
   ownSignatureKeyPaths,
   validateMnemonic
 } from './util';
+import { HexBlob } from '@cardano-sdk/util';
+import { KeyAgentBase } from './KeyAgentBase';
 import { emip3decrypt, emip3encrypt } from './emip3';
 import uniqBy from 'lodash/uniqBy';
 
@@ -125,7 +126,10 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
   ): Promise<Cardano.Signatures> {
     // Possible optimization is casting strings to OpaqueString types directly and skipping validation
     const blob = HexBlob(hash);
-    const derivationPaths = await ownSignatureKeyPaths(body, this.knownAddresses, this.inputResolver);
+    const dRepKeyHash = (
+      await Crypto.Ed25519PublicKey.fromHex(await this.derivePublicKey(DREP_KEY_DERIVATION_PATH)).hash()
+    ).hex();
+    const derivationPaths = await ownSignatureKeyPaths(body, this.knownAddresses, this.inputResolver, dRepKeyHash);
     const keyPaths = uniqBy([...derivationPaths, ...additionalKeyPaths], ({ role, index }) => `${role}.${index}`);
     // TODO:
     // if (keyPaths.length === 0) {
