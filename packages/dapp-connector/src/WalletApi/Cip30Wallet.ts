@@ -22,7 +22,7 @@ export const CipMethodsMapping: Record<number, WalletMethod[]> = {
     'signData',
     'submitTx'
   ],
-  95: ['getActivePubStakeKeys', 'getPubDRepKey']
+  95: ['getRegisteredPubStakeKeys', 'getUnregisteredPubStakeKeys', 'getPubDRepKey']
 };
 export const WalletApiMethodNames: WalletMethod[] = Object.values(CipMethodsMapping).flat();
 
@@ -36,14 +36,15 @@ const wrapAndEnableApi = (
   { allowedApiMethods, enabledExtensions }: AllowedApiMethods
 ): WalletApi => {
   const objectApi: WalletApi = {
-    getActivePubStakeKeys: () => walletApi.getActivePubStakeKeys(),
     getBalance: () => walletApi.getBalance(),
     getChangeAddress: () => walletApi.getChangeAddress(),
     getCollateral: (params?: { amount?: Cbor }) => walletApi.getCollateral(params),
     getExtensions: () => Promise.resolve(enabledExtensions),
     getNetworkId: () => walletApi.getNetworkId(),
     getPubDRepKey: () => walletApi.getPubDRepKey(),
+    getRegisteredPubStakeKeys: () => walletApi.getRegisteredPubStakeKeys(),
     getRewardAddresses: () => walletApi.getRewardAddresses(),
+    getUnregisteredPubStakeKeys: () => walletApi.getUnregisteredPubStakeKeys(),
     getUnusedAddresses: () => walletApi.getUnusedAddresses(),
     getUsedAddresses: (paginate?: Paginate) => walletApi.getUsedAddresses(paginate),
     getUtxos: (amount?: Cbor, paginate?: Paginate) => walletApi.getUtxos(amount, paginate),

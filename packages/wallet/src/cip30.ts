@@ -18,7 +18,7 @@ import { Cardano, Serialization, TxCBOR, coalesceValueQuantities } from '@cardan
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InputSelectionError, InputSelectionFailure } from '@cardano-sdk/input-selection';
 import { Logger } from 'ts-log';
-import { Observable, firstValueFrom } from 'rxjs';
+import { Observable, firstValueFrom, map } from 'rxjs';
 import { ObservableWallet } from './types';
 import { requiresForeignSignatures } from './services';
 
@@ -512,22 +512,51 @@ const baseCip30WalletApi = (
   }
 });
 
+const getPubStakeKeys = async (
+  wallet$: Observable<ObservableWallet>,
+  filter: Cardano.StakeKeyStatus.Registered | Cardano.StakeKeyStatus.Unregistered
+) => {
+  const wallet = await firstValueFrom(wallet$);
+  return firstValueFrom(
+    wallet.publicStakeKeys$.pipe(
+      map((keys) =>
+        keys.filter(({ keyStatus }) => {
+          const status =
+            keyStatus === Cardano.StakeKeyStatus.Registered || keyStatus === Cardano.StakeKeyStatus.Registering
+              ? Cardano.StakeKeyStatus.Registered
+              : Cardano.StakeKeyStatus.Unregistered;
+          return filter === status;
+        })
+      ),
+      map((keys) => keys.map(({ publicStakeKey }) => publicStakeKey))
+    )
+  );
+};
+
 const extendedCip95WalletApi = (wallet$: Observable<ObservableWallet>, { logger }: Cip30WalletDependencies) => ({
-  getActivePubStakeKeys: async () => {
-    logger.debug('getting public active stake keys');
-    try {
-      const wallet = await firstValueFrom(wallet$);
-      return firstValueFrom(wallet.activePublicStakeKeys$);
-    } catch (error) {
-      logger.error(error);
-      throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));
-    }
-  },
   getPubDRepKey: async () => {
     logger.debug('getting public DRep key');
     try {
       const wallet = await firstValueFrom(wallet$);
       return await wallet.getPubDRepKey();
+    } catch (error) {
+      logger.error(error);
+      throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));
+    }
+  },
+  getRegisteredPubStakeKeys: async () => {
+    logger.debug('getting registered public stake keys');
+    try {
+      return await getPubStakeKeys(wallet$, Cardano.StakeKeyStatus.Registered);
+    } catch (error) {
+      logger.error(error);
+      throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));
+    }
+  },
+  getUnregisteredPubStakeKeys: async () => {
+    logger.debug('getting unregistered public stake keys');
+    try {
+      return await getPubStakeKeys(wallet$, Cardano.StakeKeyStatus.Unregistered);
     } catch (error) {
       logger.error(error);
       throw new ApiError(APIErrorCode.InternalError, formatUnknownError(error));

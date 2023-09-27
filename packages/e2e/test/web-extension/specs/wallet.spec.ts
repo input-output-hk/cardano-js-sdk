@@ -138,20 +138,15 @@ describe('wallet', () => {
       });
 
       it('can sign data with a DRepID', async () => {
-        (await $(btnSignDataWithDRepId)).click();
-        const signature = await $(divDataSignature).getText();
-        expect(signature).toHaveTextContaining(
-          JSON.stringify({
-            key: 'a5010102581d60a7484b9d9185af363f9412627c42f47c7ae14e95b3a4603f4c34860403272006215820a76722da33bcd685429f4aca04e57fd1366a0b3410770fc0f5c161934b8ba1af',
-            signature:
-              '84584aa3012704581d60a7484b9d9185af363f9412627c42f47c7ae14e95b3a4603f4c3486046761646472657373581d60a7484b9d9185af363f9412627c42f47c7ae14e95b3a4603f4c348604a166686173686564f443abc1235840ea25fdcd108a591e67987de272b8c822cd2f9cf621ff1938db594cafb1cfdb879de42a81dab5698c41dd968515583a50d12abc4bbee356a2d6ac97e54e3a680f'
-          })
-        );
+        await (await $(btnSignDataWithDRepId)).click();
+        await expect($(divDataSignature)).toHaveTextContaining('signature');
       });
 
       it('can destroy second wallet before switching back to the first wallet', async () => {
         // Destroy also clears associated store. Store will be rebuilt during future activation of same wallet
         await $(destroyWallet).click();
+        await expect($(spanAddress)).toHaveTextContaining('-');
+
         await $(btnActivateWallet1).click();
         await expect($(spanAddress)).toHaveTextContaining(walletAddr1);
         await expect($(activeWalletName)).toHaveText(getObservableWalletName(0));

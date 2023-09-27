@@ -244,8 +244,8 @@ const assertWalletProperties2 = async (wallet: ObservableWallet) => {
   expect(rewardAccounts).toHaveLength(1);
   expect(rewardAccounts[0].rewardBalance).toBe(mocks.rewardAccountBalance2);
 
-  // activePublicStakeKeys
-  const x = await firstValueFrom(wallet.activePublicStakeKeys$);
+  // PublicStakeKeys
+  const x = await firstValueFrom(wallet.publicStakeKeys$);
   expect(x.length).toBe(1); // not testing the actual value because the key agent grouped addresses is mocked
 };
 

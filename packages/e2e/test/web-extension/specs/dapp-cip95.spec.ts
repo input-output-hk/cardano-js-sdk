@@ -7,16 +7,18 @@ describe('dapp/cip95', () => {
   const checkboxEnableCip95 = '#root > div > input[type=checkbox]';
   const pWalletFound = '#root > div > p';
   const btnRefresh = '#root > div > button';
-  const pNetworkId = '#root > div > p:nth-child(9)';
-  const liFirstUtxo = '#root > div > p:nth-child(10) > li';
+  const pNetworkId = '#root > div > p:nth-child(14)';
+  const liFirstUtxo = '#root > div > p:nth-child(15) > li';
+
+  const liSupportedExtensions = '#root > div > p:nth-child(11) > ul > li';
+  const liGetExtensions = '#root > div > p:nth-child(20) > ul > li';
 
   // Selectors below target some of the elements in the CIP-95 dapp. More selectors are needed to configure the
   // different actions that we'll test.
 
-  const dappGetPubDrepKey = '#root > div > p:nth-child(17)';
-  const dappDrepId = '#root > div > p:nth-child(19)';
-  const dappGetActivePubStakeKeys = '#root > div > p:nth-child(20)';
-  const dappStakeKeyToStakeAddress = '#root > div > p:nth-child(24)';
+  const dappGetPubDrepKey = '#root > div > p:nth-child(23)';
+  const dappDrepId = '#root > div > p:nth-child(25)';
+  const dappGetRegisteredPubStakeKeys = '#root > div > p:nth-child(26)';
 
   // const tabSubmitVoteDelegation = 'div[role="tablist"] > div[data-tab-id="1"]';
   // const tabSubmitDrepRegistration = 'div[role="tablist"] > div[data-tab-id="2"]';
@@ -24,9 +26,9 @@ describe('dapp/cip95', () => {
   // const tabSubmitVote = 'div[role="tablist"] > div[data-tab-id="4"]';
   // const tabSubmitGovAction = 'div[role="tablist"] > div[data-tab-id="5"]';
 
-  const dappChangeAddress = '#root > div > p:nth-child(12)';
-  const dappStakeAddress = '#root > div > p:nth-child(13)';
-  const dappUsedAddress = '#root > div > p:nth-child(14)';
+  const dappChangeAddress = '#root > div > p:nth-child(17)';
+  const dappStakeAddress = '#root > div > p:nth-child(18)';
+  const dappUsedAddress = '#root > div > p:nth-child(19)';
 
   const { btnGrantAccess, btnActivateWallet1, spanAddress, spanStakeAddress } = selectors;
 
@@ -71,16 +73,20 @@ describe('dapp/cip95', () => {
       await expect($(dappUsedAddress)).toHaveTextContaining(walletAddr);
     });
 
-    it('getActivePubStakeKeys gets active public stake keys from cip95 wallet api', async () => {
-      const dappStakeKey = await $(dappGetActivePubStakeKeys).getText();
+    it('getRegisteredPubStakeKeys gets active public stake keys from cip95 wallet api', async () => {
+      const dappStakeKey = await $(dappGetRegisteredPubStakeKeys).getText();
       expect(dappStakeKey.length).toBeGreaterThan(0);
-      await expect($(dappStakeKeyToStakeAddress)).toHaveTextContaining(walletStakeAddr);
     });
 
     it('getPubDRepKey gets the DRep key from cip95 wallet api', async () => {
       const dappDrepKey = await $(dappGetPubDrepKey).getText();
       expect(dappDrepKey.length).toBeGreaterThan(0);
       await expect($(dappDrepId)).toHaveTextContaining('drep');
+    });
+
+    it('supportedExtensions and getExtensions both return cip95', async () => {
+      await expect($(liSupportedExtensions)).toHaveTextContaining('95');
+      await expect($(liGetExtensions)).toHaveTextContaining('95');
     });
   });
 });

@@ -4,14 +4,17 @@ import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
 import { RemoteAuthenticator } from '../src';
 
 export const api = <WalletApi>{
-  getActivePubStakeKeys: async () => ['activePubStakeKey-1', 'activePubStakeKey-2'] as Ed25519PublicKeyHex[],
   getBalance: async () => '100',
   getChangeAddress: async () => 'change-address',
   getCollateral: async () => null,
   getExtensions: async () => [{ cip: 95 }],
   getNetworkId: async () => 0,
   getPubDRepKey: async () => 'getPubDRepKey' as Ed25519PublicKeyHex,
+  getRegisteredPubStakeKeys: async () =>
+    ['registeredPubStakeKey-1', 'registeredPubStakeKey-2'] as Ed25519PublicKeyHex[],
   getRewardAddresses: async () => ['reward-address-1', 'reward-address-2'],
+  getUnregisteredPubStakeKeys: async () =>
+    ['unRegisteredPubStakeKey-1', 'unRegisteredPubStakeKey-2'] as Ed25519PublicKeyHex[],
   getUnusedAddresses: async () => ['unused-address-1', 'unused-address-2', 'unused-address-3'],
   getUsedAddresses: async () => ['used-address-1', 'used-address-2', 'used-address-3'],
   getUtxos: async (_amount) => [

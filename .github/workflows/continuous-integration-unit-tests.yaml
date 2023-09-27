@@ -29,6 +29,8 @@ jobs:
         run: |
           yarn install --immutable --inline-builds
           yarn build
+        env:
+          NODE_OPTIONS: '--max_old_space_size=8192'
 
       - name: 🔨 Generated files
         run: |

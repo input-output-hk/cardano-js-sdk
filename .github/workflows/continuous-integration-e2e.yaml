@@ -53,6 +53,8 @@ jobs:
           yarn install --immutable --inline-builds
           yarn build
           docker build --no-cache .
+        env:
+          NODE_OPTIONS: '--max_old_space_size=8192'
 
       - name: 🌐 Setup local test network
         working-directory: packages/e2e

@@ -200,7 +200,8 @@ export interface Cip30WalletApi {
 }
 
 export interface Cip95WalletApi {
-  getActivePubStakeKeys: () => Promise<Ed25519PublicKeyHex[]>;
+  getRegisteredPubStakeKeys: () => Promise<Ed25519PublicKeyHex[]>;
+  getUnregisteredPubStakeKeys: () => Promise<Ed25519PublicKeyHex[]>;
 
   getPubDRepKey: () => Promise<Ed25519PublicKeyHex>;
 }
