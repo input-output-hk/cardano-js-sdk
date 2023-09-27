@@ -14,16 +14,17 @@ mkdir -p \
   network/$CARDANO_NETWORK/cardano-db-sync
 
 SOURCE_TOPOLOGY=$(wget -qO- $CARDANO_CONFIG_URL/$CARDANO_NETWORK/topology.json)
-NODE_CONFIG=$(wget -qO- $CARDANO_CONFIG_URL/$CARDANO_NETWORK/config.json | jq '.ByronGenesisFile = "../genesis/byron.json" | .ShelleyGenesisFile = "../genesis/shelley.json" | .AlonzoGenesisFile = "../genesis/alonzo.json"')
+NODE_CONFIG=$(wget -qO- $CARDANO_CONFIG_URL/$CARDANO_NETWORK/config.json | jq '.ByronGenesisFile = "../genesis/byron.json" | .ShelleyGenesisFile = "../genesis/shelley.json" | .AlonzoGenesisFile = "../genesis/alonzo.json" | .ConwayGenesisFile = "../genesis/conway.json"')
 DB_SYNC_CONFIG=$(wget -qO- $CARDANO_CONFIG_URL/$CARDANO_NETWORK/db-sync-config.json | jq '.NodeConfigFile = "../cardano-node/config.json"')
 
 wget -q $CARDANO_CONFIG_URL/$CARDANO_NETWORK/byron-genesis.json -O network/$CARDANO_NETWORK/genesis/byron.json
 wget -q $CARDANO_CONFIG_URL/$CARDANO_NETWORK/shelley-genesis.json -O network/$CARDANO_NETWORK/genesis/shelley.json
 wget -q $CARDANO_CONFIG_URL/$CARDANO_NETWORK/alonzo-genesis.json -O network/$CARDANO_NETWORK/genesis/alonzo.json
+wget -q $CARDANO_CONFIG_URL/$CARDANO_NETWORK/conway-genesis.json -O network/$CARDANO_NETWORK/genesis/conway.json
 
-if [ $(echo $SOURCE_TOPOLOGY | jq 'has("PublicRoots")') = true ];
+if [ $(echo $SOURCE_TOPOLOGY | jq 'has("publicRoots")') = true ];
 then
-  ACCESS_POINT=$(echo $SOURCE_TOPOLOGY | jq '.PublicRoots[0].publicRoots.accessPoints[0]')
+  ACCESS_POINT=$(echo $SOURCE_TOPOLOGY | jq '.publicRoots[0].accessPoints[0]')
 
   # Add separate p2p config
   mkdir -p \
@@ -34,6 +35,7 @@ then
   wget -q $CARDANO_CONFIG_URL/$CARDANO_NETWORK/byron-genesis.json -O network/${CARDANO_NETWORK}_p2p/genesis/byron.json
   wget -q $CARDANO_CONFIG_URL/$CARDANO_NETWORK/shelley-genesis.json -O network/${CARDANO_NETWORK}_p2p/genesis/shelley.json
   wget -q $CARDANO_CONFIG_URL/$CARDANO_NETWORK/alonzo-genesis.json -O network/${CARDANO_NETWORK}_p2p/genesis/alonzo.json
+  wget -q $CARDANO_CONFIG_URL/$CARDANO_NETWORK/conway-genesis.json -O network/${CARDANO_NETWORK}_p2p/genesis/conway.json
 
   echo $SOURCE_TOPOLOGY | jq '.' > network/${CARDANO_NETWORK}_p2p/cardano-node/topology.json
   echo $NODE_CONFIG | jq '.' > network/${CARDANO_NETWORK}_p2p/cardano-node/config.json
@@ -50,5 +52,3 @@ else
   echo $NODE_CONFIG | jq '.' > network/$CARDANO_NETWORK/cardano-node/config.json
   echo $DB_SYNC_CONFIG | jq '.' > network/$CARDANO_NETWORK/cardano-db-sync/config.json
 fi
-
-
