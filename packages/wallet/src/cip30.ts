@@ -4,6 +4,7 @@ import {
   Bytes,
   Cbor,
   Cip30DataSignature,
+  Cip95WalletApi,
   DataSignError,
   DataSignErrorCode,
   Paginate,
@@ -533,7 +534,10 @@ const getPubStakeKeys = async (
   );
 };
 
-const extendedCip95WalletApi = (wallet$: Observable<ObservableWallet>, { logger }: Cip30WalletDependencies) => ({
+const extendedCip95WalletApi = (
+  wallet$: Observable<ObservableWallet>,
+  { logger }: Cip30WalletDependencies
+): Cip95WalletApi => ({
   getPubDRepKey: async () => {
     logger.debug('getting public DRep key');
     try {

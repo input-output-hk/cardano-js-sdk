@@ -197,15 +197,22 @@ export interface Cip30WalletApi {
   signData: SignData;
 
   submitTx: SubmitTx;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  experimental?: any;
 }
 
 export interface Cip95WalletApi {
   getRegisteredPubStakeKeys: () => Promise<Ed25519PublicKeyHex[]>;
   getUnregisteredPubStakeKeys: () => Promise<Ed25519PublicKeyHex[]>;
-
   getPubDRepKey: () => Promise<Ed25519PublicKeyHex>;
 }
 
 export type WalletApi = Cip30WalletApi & Cip95WalletApi;
-
 export type WalletMethod = keyof WalletApi;
+
+export interface CipExtensionApis {
+  cip95: Cip95WalletApi;
+}
+
+export type Cip30WalletApiWithPossibleExtensions = Cip30WalletApi & Partial<CipExtensionApis>;

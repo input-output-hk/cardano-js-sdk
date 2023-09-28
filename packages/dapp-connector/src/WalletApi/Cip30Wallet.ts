@@ -1,11 +1,17 @@
 import { APIErrorCode, ApiError } from '../errors';
-import { Bytes, Cbor, Paginate, WalletApi, WalletApiExtension, WalletMethod } from './types';
+import {
+  Bytes,
+  Cbor,
+  Cip30WalletApiWithPossibleExtensions,
+  CipExtensionApis,
+  Paginate,
+  WalletApi,
+  WalletApiExtension,
+  WalletMethod
+} from './types';
 import { Cardano } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { RemoteAuthenticator } from '../AuthenticatorApi';
-import uniq from 'lodash/uniq';
-
-type AllowedApiMethods = { allowedApiMethods: WalletMethod[]; enabledExtensions: WalletApiExtension[] };
 
 export const CipMethodsMapping: Record<number, WalletMethod[]> = {
   30: [
@@ -33,18 +39,19 @@ export const WalletApiMethodNames: WalletMethod[] = Object.values(CipMethodsMapp
  */
 const wrapAndEnableApi = (
   walletApi: WalletApi,
-  { allowedApiMethods, enabledExtensions }: AllowedApiMethods
-): WalletApi => {
-  const objectApi: WalletApi = {
+  enabledExtensions?: WalletApiExtension[]
+): Cip30WalletApiWithPossibleExtensions => {
+  const baseApi: Cip30WalletApiWithPossibleExtensions = {
+    // Add experimental.getCollateral to CIP-30 API
+    experimental: {
+      getCollateral: (params?: { amount?: Cbor }) => walletApi.getCollateral(params)
+    },
     getBalance: () => walletApi.getBalance(),
     getChangeAddress: () => walletApi.getChangeAddress(),
     getCollateral: (params?: { amount?: Cbor }) => walletApi.getCollateral(params),
-    getExtensions: () => Promise.resolve(enabledExtensions),
+    getExtensions: () => Promise.resolve(enabledExtensions || []),
     getNetworkId: () => walletApi.getNetworkId(),
-    getPubDRepKey: () => walletApi.getPubDRepKey(),
-    getRegisteredPubStakeKeys: () => walletApi.getRegisteredPubStakeKeys(),
     getRewardAddresses: () => walletApi.getRewardAddresses(),
-    getUnregisteredPubStakeKeys: () => walletApi.getUnregisteredPubStakeKeys(),
     getUnusedAddresses: () => walletApi.getUnusedAddresses(),
     getUsedAddresses: (paginate?: Paginate) => walletApi.getUsedAddresses(paginate),
     getUtxos: (amount?: Cbor, paginate?: Paginate) => walletApi.getUtxos(amount, paginate),
@@ -53,18 +60,24 @@ const wrapAndEnableApi = (
     submitTx: (tx: Cbor) => walletApi.submitTx(tx)
   };
 
-  const enabledApi = Object.fromEntries(
-    Object.entries(objectApi).filter(([methodName, _]) => allowedApiMethods.includes(methodName as WalletMethod))
-  );
+  const additionalCipApis: CipExtensionApis = {
+    cip95: {
+      getPubDRepKey: () => walletApi.getPubDRepKey(),
+      getRegisteredPubStakeKeys: () => walletApi.getRegisteredPubStakeKeys(),
+      getUnregisteredPubStakeKeys: () => walletApi.getUnregisteredPubStakeKeys()
+    }
+  };
 
-  // Add experimental.getCollateral to CIP-30 API
-  if (allowedApiMethods.includes('getCollateral')) {
-    enabledApi.experimental = {
-      getCollateral: (params?: { amount?: Cbor }) => walletApi.getCollateral(params)
-    };
+  if (enabledExtensions) {
+    for (const extension of enabledExtensions) {
+      const cipName = `cip${extension.cip}` as keyof CipExtensionApis;
+      if (additionalCipApis[cipName]) {
+        baseApi[cipName] = additionalCipApis[cipName];
+      }
+    }
   }
 
-  return enabledApi as WalletApi;
+  return baseApi;
 };
 
 /**
@@ -115,23 +128,6 @@ export class Cip30Wallet {
     this.#authenticator = authenticator;
   }
 
-  /**
-   * Receives the array of extensions provided when `wallet.enable` was called and
-   * returns a list of methods names for the CIP-30 API and supported extensions.
-   */
-  #getAllowedApiMethods(extensions: WalletApiExtension[] = []): AllowedApiMethods {
-    const enabledExtensions: WalletApiExtension[] = extensions.filter((extension) =>
-      this.supportedExtensions.some(({ cip }) => cip === extension.cip)
-    );
-    return {
-      allowedApiMethods: uniq([
-        ...CipMethodsMapping[30],
-        ...enabledExtensions.flatMap(({ cip }) => CipMethodsMapping[cip])
-      ]),
-      enabledExtensions
-    };
-  }
-
   #validateExtensions(extensions: WalletApiExtension[] = []): void {
     if (
       !Array.isArray(extensions) ||
@@ -173,12 +169,15 @@ export class Cip30Wallet {
    *
    * Errors: `ApiError`
    */
-  public async enable(options?: Cip30EnableOptions): Promise<WalletApi> {
+  public async enable(options?: Cip30EnableOptions): Promise<Cip30WalletApiWithPossibleExtensions> {
     this.#validateExtensions(options?.extensions);
 
     if (await this.#authenticator.requestAccess()) {
       this.#logger.debug(`${location.origin} has been granted access to wallet api`);
-      return wrapAndEnableApi(this.#api, this.#getAllowedApiMethods(options?.extensions));
+      const extensions = options?.extensions?.filter(({ cip: requestedCip }) =>
+        this.supportedExtensions.some(({ cip: supportedCip }) => supportedCip === requestedCip)
+      );
+      return wrapAndEnableApi(this.#api, extensions);
     }
     this.#logger.debug(`${location.origin} not authorized to access wallet api`);
     throw new ApiError(APIErrorCode.Refused, 'wallet not authorized.');
