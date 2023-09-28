@@ -48,14 +48,14 @@ CREATE SCHEMA pgboss;
 ALTER SCHEMA pgboss OWNER TO postgres;
 
 --
--- Name: pgcrypto; Type: EXTENSION; Schema: -; Owner: 
+-- Name: pgcrypto; Type: EXTENSION; Schema: -; Owner:
 --
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
@@ -344,6 +344,18 @@ ALTER TABLE public.stake_pool OWNER TO postgres;
 
 ALTER TABLE ONLY public.pool_metadata ALTER COLUMN id SET DEFAULT nextval('public.pool_metadata_id_seq'::regclass);
 
+--
+-- Name: pool_delisted; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pool_delisted
+(
+
+    stake_pool_id character(56)           NOT NULL,
+    CONSTRAINT PK_pool_delisted_stake_pool_id PRIMARY KEY ("stake_pool_id")
+);
+
+ALTER TABLE public.pool_delisted OWNER TO postgres;
 
 --
 -- Data for Name: archive; Type: TABLE DATA; Schema: pgboss; Owner: postgres

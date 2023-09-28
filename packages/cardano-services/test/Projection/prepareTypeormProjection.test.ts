@@ -23,7 +23,8 @@ describe('prepareTypeormProjection', () => {
           'poolRegistration',
           'poolRetirement',
           'poolMetadata',
-          'currentPoolMetrics'
+          'currentPoolMetrics',
+          'poolDelisted'
         ])
       );
       expect(mappers).toEqual(['withCertificates', 'withStakePools']);

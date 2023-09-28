@@ -83,7 +83,7 @@ describe('TypeormStakePoolProvider', () => {
   let poolsInfoWithMetricsFiltered: PoolInfo[];
 
   const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
-  const entities = getEntities(['currentPoolMetrics', 'poolMetadata']);
+  const entities = getEntities(['currentPoolMetrics', 'poolMetadata', 'poolDelisted']);
 
   beforeAll(async () => {
     port = await getPort();
@@ -254,6 +254,27 @@ describe('TypeormStakePoolProvider', () => {
             },
             pagination
           };
+          const response = await provider.queryStakePools(options);
+
+          expect(() => Cardano.PoolId(poolsInfo[0].id as unknown as string)).not.toThrow();
+          expect(() => Cardano.PoolIdHex(response.pageResults[0].hexId as unknown as string)).not.toThrow();
+          expect(() => Cardano.VrfVkHex(response.pageResults[0].vrf as unknown as string)).not.toThrow();
+
+          expect(response.pageResults).toHaveLength(2);
+          expect(response.totalResultCount).toEqual(2);
+        });
+
+        it('response is an array of stake pools excluding delisted pool', async () => {
+          const options: QueryStakePoolsArgs = {
+            filters: {
+              identifier: {
+                _condition: 'or',
+                values: [{ id: poolsInfo[0].id }, { id: poolsInfo[1].id }]
+              }
+            },
+            pagination
+          };
+
           const response = await provider.queryStakePools(options);
 
           expect(() => Cardano.PoolId(poolsInfo[0].id as unknown as string)).not.toThrow();
