@@ -6,9 +6,11 @@ on:
   pull_request:
     branches:
       - master
+      - conway-era
   push:
     branches:
       - master
+      - conway-era
 env:
   AWS_REGION: us-east-1
   AWS_ROLE_ARN: arn:aws:iam::926093910549:role/lace-ci
