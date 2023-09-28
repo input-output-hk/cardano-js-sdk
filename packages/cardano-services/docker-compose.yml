@@ -7,9 +7,11 @@ x-logging: &logging
       max-size: '400k'
       max-file: '20'
 
+x-sdk-environment: &sdk-environment
+  HANDLE_POLICY_IDS: ${HANDLE_POLICY_IDS:-f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a}
+
 services:
   cardano-node-ogmios:
-    image: cardanosolutions/cardano-node-ogmios:v${OGMIOS_VERSION:-5.6.0}_${CARDANO_NODE_VERSION:-1.35.5}-${NETWORK:-mainnet}
     volumes:
       - ./config/network/${NETWORK:-mainnet}:/config
 
@@ -43,7 +45,7 @@ services:
 
   handle-projector:
     environment:
-      HANDLE_POLICY_IDS: $HANDLE_POLICY_IDS
+      <<: *sdk-environment
 
   postgres:
     volumes:
@@ -51,11 +53,11 @@ services:
 
   provider-server:
     environment:
-      HANDLE_POLICY_IDS: $HANDLE_POLICY_IDS
+      <<: *sdk-environment
 
   handle-provider-server:
     environment:
-      HANDLE_POLICY_IDS: $HANDLE_POLICY_IDS
+      <<: *sdk-environment
 
 secrets:
   blockfrost_key:

@@ -5,5 +5,5 @@ This repository holds the latest configurations for various core Cardano compone
 ---
 
 <p align="center">
-  <a href='https://github.com/cardanosolutions/ogmios/actions?query=workflow%3A"Continuous Integration"'><img src="https://img.shields.io/github/workflow/status/input-output-hk/cardano-configurations/Refresh%20Configurations?label=CRON%20JOB&style=for-the-badge"/></a>
+  <a href='https://github.com/input-output-hk/cardano-configurations/actions/workflows/refresh-configurations.yaml'><img src="https://img.shields.io/github/actions/workflow/status/input-output-hk/cardano-configurations/refresh-configurations.yaml?label=CRON%20JOB&style=for-the-badge"/></a>
 </p>

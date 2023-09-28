@@ -4,7 +4,7 @@ import Docker from 'dockerode';
 export { Docker };
 export { containerExec } from 'dockerode-utils';
 
-const CONTAINER_IMAGE = 'postgres:11.5-alpine';
+const CONTAINER_IMAGE = 'postgres:12.16-alpine';
 const CONTAINER_NAME = 'cardano-test';
 
 export const removePostgresContainer = async (): Promise<void> => {
