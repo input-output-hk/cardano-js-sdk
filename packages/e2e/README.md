@@ -255,34 +255,7 @@ $ yarn workspace @cardano-sdk/e2e test:wallet
 
 ## Web Extensions
 
-The web-extension end-to-end tests are slightly different from the rest as they emulate user interaction with a browser instance. There is only one key difference between running the web-extension end-to-end tests and the rest, and that is the location of the .env file; for the web-extension end-to-end tests, the .env file must be located within the packages/e2e/web-extension directory, this is an example of the environment file you need to run the tests:
-
-```
-# Logger
-LOGGER_MIN_SEVERITY=debug
-
-# Providers setup
-ASSET_PROVIDER=http
-ASSET_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/asset"}'
-CHAIN_HISTORY_PROVIDER=http
-CHAIN_HISTORY_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/chain-history"}'
-NETWORK_INFO_PROVIDER=http
-NETWORK_INFO_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/network-info"}'
-REWARDS_PROVIDER=http
-REWARDS_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/rewards"}'
-TX_SUBMIT_PROVIDER=http
-TX_SUBMIT_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/tx-submit"}'
-UTXO_PROVIDER=http
-UTXO_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/utxo"}'
-STAKE_POOL_PROVIDER=stub
-STAKE_POOL_PROVIDER_PARAMS='{"baseUrl":"http://localhost:4000/stake-pool"}'
-
-# Test Environment
-NETWORK_ID=0
-MNEMONIC_WORDS="vacant violin soft weird deliver render brief always monitor general maid smart jelly core drastic erode echo there clump dizzy card filter option defense"
-```
-
-Then to run the web-extension tests run:
+The web-extension end-to-end tests are slightly different from the rest as they emulate user interaction with a browser instance.
 
 ```bash
 $ yarn workspace @cardano-sdk/e2e test:web-extension
