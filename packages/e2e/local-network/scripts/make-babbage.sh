@@ -11,6 +11,8 @@ root_path="$(cd "$here/.." && pwd)"
 cd "$root_path"
 
 export PATH=$PWD/bin:$PATH
+export CARDANO_NODE_CHAINDB_LOG_LEVEL="warning"
+export CARDANO_NODE_LOG_LEVEL="warning"
 
 source ./scripts/nodes-configuration.sh
 
@@ -176,13 +178,13 @@ $SED -i "${ROOT}/genesis/shelley/genesis.json" \
 
 for NODE_ID in ${SP_NODES_ID}; do
   TARGET="${ROOT}/node-sp${NODE_ID}"
-  PORT="$(("$NODE_ID" + 3000))"
+  PORT=$((NODE_ID + 3000))
 
   mv "${ROOT}/pools/vrf${NODE_ID}.skey" "${TARGET}/vrf.skey"
   mv "${ROOT}/pools/opcert${NODE_ID}.cert" "${TARGET}/opcert.cert"
   mv "${ROOT}/pools/kes${NODE_ID}.skey" "${TARGET}/kes.skey"
 
-  BYRON_KEYS_POSFIX=$(seq -f '%03.f' $(("$NODE_ID" - 1)) $(("$NODE_ID" - 1)))
+  BYRON_KEYS_POSFIX=$(seq -f '%03.f' $((NODE_ID - 1)) $((NODE_ID - 1)))
   #Byron related
   mv "${ROOT}/byron-gen-command/delegate-keys.${BYRON_KEYS_POSFIX}.key" "${TARGET}/byron-delegate.key"
   mv "${ROOT}/byron-gen-command/delegation-cert.${BYRON_KEYS_POSFIX}.json" "${TARGET}/byron-delegation.cert"

@@ -20,7 +20,7 @@ Supported OS:
 
 1. Run `./scripts/install.sh` to install necessary binaries.
 2. Run `./scripts/make-babbage.sh` to create all the keys, certificates and genesis files.
-3. Run `./scrips/start.sh` to start the nodes.
+3. Run `./scripts/start.sh` to start the nodes.
 4. Run `export CARDANO_NODE_SOCKET_PATH=$PWD/network-files/node-sp1/node.sock` for `cardano-cli` to work.
 5. (Optional) Run `export PATH=$PATH:$PWD/bin` so you can use `cardano-cli` instead of `./bin/cardano-cli`.
 6. Check the network: `./bin/cardano-cli query tip --testnet-magic 888`
