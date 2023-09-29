@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.22.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.21.0...@cardano-sdk/e2e@0.22.0) (2023-09-29)
+
+### ⚠ BREAKING CHANGES
+
+* **cardano-services:** StakePoolHttpService interface changed
+* - replace `ObservableWallet.activePublicStakeKeys$` with
+`publicStakeKeys$` that emits `PubStakeKeyAndStatus[]`
+
+### Features
+
+* **cardano-services:** added optional metadata fetch feature from SMASH server ([54a4f5e](https://github.com/input-output-hk/cardano-js-sdk/commit/54a4f5e7eab08f7c06802782e2da62d1406bdf1b))
+* cip-95 update calls to get public stake keys ([b1039b4](https://github.com/input-output-hk/cardano-js-sdk/commit/b1039b4b32e74075c1833eb1d0bdaac06368e9b8))
+
 ## [0.21.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.20.0...@cardano-sdk/e2e@0.21.0) (2023-09-20)
 
 ### ⚠ BREAKING CHANGES

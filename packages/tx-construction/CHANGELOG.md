@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.13.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.12.0...@cardano-sdk/tx-construction@0.13.0) (2023-09-29)
+
+### ⚠ BREAKING CHANGES
+
+* - key-management `stubSignTransaction` positional args were replaced by named args,
+as defined in `StubSignTransactionProps`.
+A new `dRepPublicKey` named arg is part of `StubSignTransactionProps`
+
+### Features
+
+* update for Conway transaction fields ([c32513b](https://github.com/input-output-hk/cardano-js-sdk/commit/c32513bb89d0318dba35227c3509204166a209b2))
+
 ## [0.12.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/tx-construction@0.11.3...@cardano-sdk/tx-construction@0.12.0) (2023-09-20)
 
 ### ⚠ BREAKING CHANGES

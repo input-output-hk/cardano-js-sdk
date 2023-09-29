@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.15.0...@cardano-sdk/web-extension@0.16.0) (2023-09-29)
+
+### ⚠ BREAKING CHANGES
+
+* - replace `ObservableWallet.activePublicStakeKeys$` with
+`publicStakeKeys$` that emits `PubStakeKeyAndStatus[]`
+
+### Features
+
+* cip-95 update calls to get public stake keys ([b1039b4](https://github.com/input-output-hk/cardano-js-sdk/commit/b1039b4b32e74075c1833eb1d0bdaac06368e9b8))
+
 ## [0.15.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.14.7...@cardano-sdk/web-extension@0.15.0) (2023-09-20)
 
 ### ⚠ BREAKING CHANGES

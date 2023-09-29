@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.20.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.19.0...@cardano-sdk/cardano-services@0.20.0) (2023-09-29)
+
+### ⚠ BREAKING CHANGES
+
+* **cardano-services:** StakePoolHttpService interface changed
+
+### Features
+
+* **cardano-services:** added optional metadata fetch feature from SMASH server ([54a4f5e](https://github.com/input-output-hk/cardano-js-sdk/commit/54a4f5e7eab08f7c06802782e2da62d1406bdf1b))
+
 ## [0.19.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.18.0...@cardano-sdk/cardano-services@0.19.0) (2023-09-20)
 
 ### ⚠ BREAKING CHANGES
