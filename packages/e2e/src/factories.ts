@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import * as CML from '@dcspark/cardano-multiplatform-lib-nodejs';
 import * as Crypto from '@cardano-sdk/crypto';
 import {
   AddressDiscovery,
@@ -14,7 +15,6 @@ import {
 } from '@cardano-sdk/wallet';
 import {
   AssetProvider,
-  CML,
   Cardano,
   ChainHistoryProvider,
   HandleProvider,

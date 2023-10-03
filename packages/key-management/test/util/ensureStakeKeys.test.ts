@@ -1,6 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, AsyncKeyAgent, InMemoryKeyAgent, util } from '../../src';
-import { CML, Cardano } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { Logger, dummyLogger } from 'ts-log';
 import { firstValueFrom } from 'rxjs';
 
@@ -20,7 +20,7 @@ describe('ensureStakeKeys', () => {
           getPassphrase,
           mnemonicWords
         },
-        { bip32Ed25519: new Crypto.CmlBip32Ed25519(CML), inputResolver, logger: dummyLogger }
+        { bip32Ed25519: new Crypto.SodiumBip32Ed25519(), inputResolver, logger: dummyLogger }
       )
     );
   });

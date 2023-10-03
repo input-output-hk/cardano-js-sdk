@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, GroupedAddress, InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
-import { CML, Cardano } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import {
   GenericTxBuilder,
   OutOfSyncRewardAccounts,
@@ -129,7 +129,7 @@ describe('TxBuilder/delegatePortfolio', () => {
         getPassphrase: async () => Buffer.from('passphrase'),
         mnemonicWords: util.generateMnemonicWords()
       },
-      { bip32Ed25519: new Crypto.CmlBip32Ed25519(CML), inputResolver, logger: dummyLogger }
+      { bip32Ed25519: new Crypto.SodiumBip32Ed25519(), inputResolver, logger: dummyLogger }
     );
   });
 

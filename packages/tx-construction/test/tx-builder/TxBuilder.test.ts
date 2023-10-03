@@ -10,7 +10,7 @@ import {
   util
 } from '@cardano-sdk/key-management';
 import { AssetId, mockProviders as mocks } from '@cardano-sdk/util-dev';
-import { CML, Cardano, Handle, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { Cardano, Handle, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import {
   GenericTxBuilder,
   HandleNotFoundError,
@@ -68,7 +68,7 @@ describe('GenericTxBuilder', () => {
         getPassphrase: async () => Buffer.from('passphrase'),
         mnemonicWords: util.generateMnemonicWords()
       },
-      { bip32Ed25519: new Crypto.CmlBip32Ed25519(CML), inputResolver, logger: dummyLogger }
+      { bip32Ed25519: new Crypto.SodiumBip32Ed25519(), inputResolver, logger: dummyLogger }
     );
     await keyAgent.deriveAddress({ index: 0, type: AddressType.External }, 0);
     keyAgent.knownAddresses[0].address = mocks.utxo[0][1].address;

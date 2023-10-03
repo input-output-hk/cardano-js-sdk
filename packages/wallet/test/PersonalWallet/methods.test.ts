@@ -3,7 +3,7 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, AsyncKeyAgent, GroupedAddress } from '@cardano-sdk/key-management';
 import { AssetId, StubKeyAgent, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { BehaviorSubject, Subscription, firstValueFrom, skip } from 'rxjs';
-import { CML, Cardano, CardanoNodeErrors, ProviderError, ProviderFailure, TxCBOR } from '@cardano-sdk/core';
+import { Cardano, CardanoNodeErrors, ProviderError, ProviderFailure, TxCBOR } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
 import { PersonalWallet, TxInFlight, setupWallet } from '../../src';
@@ -73,7 +73,7 @@ describe('PersonalWallet methods', () => {
       type: AddressType.External
     };
     ({ wallet } = await setupWallet({
-      bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
+      bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
       createKeyAgent: async (dependencies) => {
         const asyncKeyAgent = await testAsyncKeyAgent([groupedAddress], dependencies);
         asyncKeyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
@@ -220,7 +220,7 @@ describe('PersonalWallet methods', () => {
       const mockKeyAgent = new StubKeyAgent(inputResolver);
 
       setupWallet({
-        bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
+        bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
         createKeyAgent: async () => mockKeyAgent,
         createWallet: async (keyAgent) =>
           new PersonalWallet(
@@ -532,7 +532,7 @@ describe('PersonalWallet methods', () => {
   it('will retry deriving pubDrepKey if one does not exist', async () => {
     let walletKeyAgent: AsyncKeyAgent;
     ({ wallet, keyAgent: walletKeyAgent } = await setupWallet({
-      bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
+      bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
       createKeyAgent: async (dependencies) => {
         const asyncKeyAgent = await testAsyncKeyAgent([], dependencies);
         asyncKeyAgent.derivePublicKey = jest.fn().mockRejectedValueOnce('error').mockResolvedValue('string');
