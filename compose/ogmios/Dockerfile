@@ -63,7 +63,11 @@ ARG CARDANO_CONFIG_VERSION
 RUN git clone https://github.com/input-output-hk/cardano-configurations.git /app/cardano-configurations &&\
   cd /app/cardano-configurations &&\
   git fetch --all --tags &&\
-  git checkout ${CARDANO_CONFIG_VERSION}
+  git checkout ${CARDANO_CONFIG_VERSION} &&\
+  # Note: remove this when a valid preprod conway genesis is available
+  cp -f ./network/sanchonet/genesis/conway.json ./network/preprod/genesis/ &&\
+  cat ./network/preprod/genesis/conway.json
+RUN sed -r 's/("ConwayGenesisHash":\s*")[^"]+/\15145f03e6bf046fa81c91c408719a99848a33d4b35f29f1b5f1fada7f24e6664/g' -i /app/cardano-configurations/network/preprod/cardano-node/config.json
 
 FROM --platform=${TARGETPLATFORM} alpine:3.18 as cardano-node-ogmios
 RUN apk update && apk add bash tini && rm -rf /var/cache/apk/*
@@ -74,12 +78,14 @@ ARG NETWORK
 LABEL name=cardano-node-ogmios
 LABEL description="A Cardano node, side-by-side with its JSON WebSocket bridge."
 COPY --from=haskell-builder /app/cardano-configurations/network/${NETWORK} /config
+RUN ls /config && cat /config/genesis/conway.json
 RUN mkdir -p /ipc
 WORKDIR /root
 # Ogmios, cardano-node, ekg, prometheus
 EXPOSE 1337/tcp 3000/tcp 12788/tcp 12798/tcp
 HEALTHCHECK --interval=10s --timeout=5s --retries=1 CMD /bin/ogmios health-check
 STOPSIGNAL SIGINT
-COPY --from=haskell-builder /app/ogmios-src/scripts/cardano-node-ogmios.sh cardano-node-ogmios.sh
+COPY ./cardano-node-ogmios.sh cardano-node-ogmios.sh
+RUN ["chmod", "+x", "/root/cardano-node-ogmios.sh"]
 RUN ln -s /sbin/tini /tini
 ENTRYPOINT ["tini", "-g", "--", "/root/cardano-node-ogmios.sh" ]
