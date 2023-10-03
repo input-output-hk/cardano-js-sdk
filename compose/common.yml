@@ -137,9 +137,10 @@ services:
     <<: *logging
     build:
       args:
-        CARDANO_NODE_VERSION: ${CARDANO_NODE_VERSION:-1.35.5}
+        CARDANO_NODE_VERSION: ${CARDANO_NODE_VERSION:-8.1.2}
         NETWORK: ${NETWORK:-mainnet}
-        OGMIOS_VERSION: ${OGMIOS_VERSION:-v5.6.0}
+        OGMIOS_VERSION: ${OGMIOS_VERSION:-v6.0.0-rc2}
+        CARDANO_CONFIG_VERSION: ${CARDANO_CONFIG_VERSION:-8a403bb2fdb23d17a25fcc14141395918b0e5be0}
       context: ../../compose/ogmios
       target: cardano-node-ogmios
     healthcheck:

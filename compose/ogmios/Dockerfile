@@ -63,7 +63,10 @@ ARG CARDANO_CONFIG_VERSION
 RUN git clone https://github.com/input-output-hk/cardano-configurations.git /app/cardano-configurations &&\
   cd /app/cardano-configurations &&\
   git fetch --all --tags &&\
-  git checkout ${CARDANO_CONFIG_VERSION}
+  git checkout ${CARDANO_CONFIG_VERSION} &&\
+  # Note: remove this when a valid preprod conway genesis is available
+  cp -f ./network/sanchonet/genesis/conway.json ./network/preprod/genesis/ &&\
+  cat ./network/preprod/genesis/conway.json
 
 FROM --platform=${TARGETPLATFORM} alpine:3.18 as cardano-node-ogmios
 RUN apk update && apk add bash tini && rm -rf /var/cache/apk/*
@@ -74,6 +77,7 @@ ARG NETWORK
 LABEL name=cardano-node-ogmios
 LABEL description="A Cardano node, side-by-side with its JSON WebSocket bridge."
 COPY --from=haskell-builder /app/cardano-configurations/network/${NETWORK} /config
+RUN ls /config && cat /config/genesis/conway.json
 RUN mkdir -p /ipc
 WORKDIR /root
 # Ogmios, cardano-node, ekg, prometheus
