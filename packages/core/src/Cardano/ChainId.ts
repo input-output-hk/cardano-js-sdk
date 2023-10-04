@@ -23,6 +23,7 @@ export enum NetworkMagics {
   Mainnet = 764_824_073,
   Preprod = 1,
   Preview = 2,
+  Sanchonet = 4,
   /**
    * Legacy public testnet
    */
@@ -56,5 +57,9 @@ export const ChainIds = {
   Preview: {
     networkId: NetworkId.Testnet,
     networkMagic: NetworkMagics.Preview
+  },
+  Sanchonet: {
+    networkId: NetworkId.Testnet,
+    networkMagic: NetworkMagics.Sanchonet
   }
 };
