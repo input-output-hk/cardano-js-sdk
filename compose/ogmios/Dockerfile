@@ -67,6 +67,7 @@ RUN git clone https://github.com/input-output-hk/cardano-configurations.git /app
   # Note: remove this when a valid preprod conway genesis is available
   cp -f ./network/sanchonet/genesis/conway.json ./network/preprod/genesis/ &&\
   cat ./network/preprod/genesis/conway.json
+RUN sed -r 's/("ConwayGenesisHash":\s*")[^"]+/\15145f03e6bf046fa81c91c408719a99848a33d4b35f29f1b5f1fada7f24e6664/g' -i /app/cardano-configurations/network/preprod/cardano-node/config.json
 
 FROM --platform=${TARGETPLATFORM} alpine:3.18 as cardano-node-ogmios
 RUN apk update && apk add bash tini && rm -rf /var/cache/apk/*
