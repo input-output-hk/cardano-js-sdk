@@ -35,13 +35,13 @@ on:
 
 jobs:
   build_and_test:
-    strategy:
-      matrix:
-        os: [ubuntu-20.04]
-    runs-on: ${{ matrix.os }}
+    runs-on: [self-hosted]
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v3
+
+      - name: 📥 Adjust permissions
+        run: chmod -R g+rX,o+rX .
 
       - name: 🧰 Setup Node.js
         uses: actions/setup-node@v3
