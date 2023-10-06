@@ -100,13 +100,18 @@ const applyMappers = (evt$: Observable<ProjectionEvent<{}>>) =>
     Mappers.withUtxo(),
     Mappers.withMint(),
     Mappers.withAddresses(),
+    Mappers.filterProducedUtxoByAssetsPresence(),
     Mappers.filterProducedUtxoByAssetPolicyId({ policyIds }),
     Mappers.filterMintByPolicyIds({ policyIds }),
     Mappers.withCIP67(),
     Mappers.withNftMetadata({ logger }),
     Mappers.withHandleMetadata({ policyIds }, logger),
     Mappers.withHandles({ policyIds }, logger)
-  );
+  ) as Observable<
+    ProjectionEvent<
+      Mappers.WithUtxo & Mappers.WithMint & Mappers.WithHandles & Mappers.WithAddresses & Mappers.WithHandleMetadata
+    >
+  >;
 
 // eslint-disable-next-line unicorn/consistent-function-scoping
 export const applyOperators = (buffer: TypeormStabilityWindowBuffer) => (evt$: Observable<ProjectionEvent<{}>>) =>

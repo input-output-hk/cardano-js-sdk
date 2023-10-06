@@ -3,6 +3,7 @@ import { ProjectionEvent } from '../../../src';
 import {
   filterProducedUtxoByAddresses,
   filterProducedUtxoByAssetPolicyId,
+  filterProducedUtxoByAssetsPresence,
   withUtxo
 } from '../../../src/operators/Mappers';
 import { firstValueFrom, of } from 'rxjs';
@@ -57,7 +58,16 @@ export const validTxSource$ = of({
               address:
                 'addr_test1qzrf8t56qhzcp2chrtn7deqhep0dttr3eemhnut6lth3gulj7cuplfarmnq5fyumgl0lklddvau9dhamaexykljzvpyswqt56p',
               value: {
-                assets: new Map(),
+                assets: new Map([
+                  [
+                    Cardano.AssetId(
+                      '8f78a4388b1a3e1a1435257e9356fa0c2cc0d3a5999d63b5886c96435365636f6e6454657374746f6b656e'
+                    ),
+                    1n
+                  ],
+                  [Cardano.AssetId('8f78a4388b1a3e1a1435257e9356fa0c2cc0d3a5999d63b5886c964354657374746f6b656e'), 1n],
+                  [Cardano.AssetId('7f78a4388b1a3e1a1435257e9356fa0c2cc0d3a5999d63b5886c964354657374746f6b656e'), 1n]
+                ]),
                 coins: 25_485_292n
               }
             },
@@ -207,6 +217,22 @@ describe('withUtxo', () => {
     });
   });
 
+  describe('filterProducedUtxoByAssetsPresence', () => {
+    it('keeps only utxo produced for supplied addresses that contain assets', async () => {
+      const {
+        utxo: { produced }
+      } = await firstValueFrom(validTxSource$.pipe(withUtxo(), filterProducedUtxoByAssetsPresence()));
+
+      const utxosWithAssets = produced.filter(([_key, { value }]) => value.assets && value.assets.size > 0);
+
+      expect(utxosWithAssets.length).toBe(produced.length);
+
+      for (const [_key, { value }] of utxosWithAssets) {
+        expect(value.assets?.size).toBeGreaterThan(0);
+      }
+    });
+  });
+
   describe('filterProducedUtxoByAssetPolicyId', () => {
     it('keeps only utxo produced based on specified policy id, also filtering their value assets', async () => {
       const {
@@ -220,7 +246,7 @@ describe('withUtxo', () => {
         )
       );
 
-      expect(produced).toHaveLength(1);
+      expect(produced).toHaveLength(2);
       expect(produced[0][1].value.assets?.size).toBe(2);
     });
   });

@@ -48,6 +48,20 @@ export const filterProducedUtxoByAddresses =
       }))
     );
 
+export const filterProducedUtxoByAssetsPresence =
+  <PropsIn extends WithUtxo>(): ProjectionOperator<PropsIn> =>
+  // eslint-disable-next-line unicorn/consistent-function-scoping
+  (evt$) =>
+    evt$.pipe(
+      map((evt) => ({
+        ...evt,
+        utxo: {
+          ...evt.utxo,
+          produced: evt.utxo.produced.filter(([_, { value }]) => value.assets && value.assets.size > 0)
+        }
+      }))
+    );
+
 export const filterProducedUtxoByAssetPolicyId =
   <PropsIn extends WithUtxo>({ policyIds }: FilterByPolicyIds): ProjectionOperator<PropsIn> =>
   (evt$) =>
