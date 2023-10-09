@@ -256,6 +256,90 @@ describe('DynamicChangeAddressResolver', () => {
     ]);
   });
 
+  it('doesnt throw if there are entries with 0% in the portfolio, ', async () => {
+    const changeAddressResolver = new DynamicChangeAddressResolver(
+      knownAddresses$,
+      createMockDelegateTracker(
+        new Map<Cardano.PoolId, DelegatedStake>([
+          [
+            poolId1,
+            {
+              percentage: Percent(0),
+              pool: pool1,
+              rewardAccounts: [rewardAccount_1],
+              stake: 0n
+            }
+          ],
+          [
+            poolId2,
+            {
+              percentage: Percent(0),
+              pool: pool2,
+              rewardAccounts: [rewardAccount_2],
+              stake: 0n
+            }
+          ],
+          [
+            poolId3,
+            {
+              percentage: Percent(0),
+              pool: pool3,
+              rewardAccounts: [rewardAccount_3],
+              stake: 0n
+            }
+          ]
+        ])
+      ).distribution$,
+      () =>
+        Promise.resolve({
+          name: 'Portfolio',
+          pools: [
+            {
+              id: pool1.hexId,
+              weight: 0
+            },
+            {
+              id: pool2.hexId,
+              weight: 0
+            },
+            {
+              id: pool3.hexId,
+              weight: 1
+            }
+          ]
+        }),
+      logger
+    );
+
+    const selection = {
+      change: [
+        {
+          address: '_' as Cardano.PaymentAddress,
+          value: { coins: 10n }
+        },
+        {
+          address: '_' as Cardano.PaymentAddress,
+          value: { coins: 10n }
+        },
+        {
+          address: '_' as Cardano.PaymentAddress,
+          value: { coins: 10n }
+        }
+      ],
+      fee: 0n,
+      inputs: new Set<Cardano.Utxo>(),
+      outputs: new Set<Cardano.TxOut>()
+    };
+
+    const updatedChange = await changeAddressResolver.resolve(selection);
+
+    expect(updatedChange).toEqual([
+      { address: address_0_3, value: { coins: 10n } },
+      { address: address_0_3, value: { coins: 10n } },
+      { address: address_0_3, value: { coins: 10n } }
+    ]);
+  });
+
   it('throws InvalidStateError if the there are no known addresses', async () => {
     const changeAddressResolver = new DynamicChangeAddressResolver(
       emptyKnownAddresses$,

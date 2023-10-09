@@ -71,19 +71,50 @@ export const certificateTransactionsWithEpochs = (
     )
   );
 
-export const createDelegationPortfolioTracker = (delegationTransactions: Observable<TxWithEpoch[]>) =>
-  delegationTransactions.pipe(
-    map((transactionsWithEpochs) => {
-      const txSorted = transactionsWithEpochs.sort((lhs, rhs) => lhs.epoch - rhs.epoch);
-      const latestDelegation = txSorted.pop();
-      if (!latestDelegation || !latestDelegation.tx.auxiliaryData || !latestDelegation.tx.auxiliaryData.blob)
-        return null;
+const hasDelegationCert = (certificates: Array<Cardano.Certificate> | undefined): boolean => {
+  if (!certificates || certificates.length === 0) return false;
 
-      const portfolio = latestDelegation.tx.auxiliaryData.blob.get(Cardano.DelegationMetadataLabel);
+  return certificates.some((cert) => {
+    let hasCert = false;
 
-      if (!portfolio) return null;
+    switch (cert.__typename) {
+      case Cardano.CertificateType.StakeDelegation:
+      case Cardano.CertificateType.StakeKeyRegistration:
+      case Cardano.CertificateType.StakeKeyDeregistration:
+        hasCert = true;
+        break;
+      default:
+        hasCert = false;
+    }
 
-      return Cardano.cip17FromMetadatum(portfolio);
+    return hasCert;
+  });
+};
+
+export const createDelegationPortfolioTracker = (transactions: Observable<Cardano.HydratedTx[]>) =>
+  transactions.pipe(
+    map((hydratedTxs) => {
+      const sortedTransactions = [...hydratedTxs].reverse();
+
+      let result = null;
+      for (const sorted of sortedTransactions) {
+        const portfolio = sorted.auxiliaryData?.blob?.get(Cardano.DelegationMetadataLabel);
+        const altersDelegationState = hasDelegationCert(sorted.body.certificates);
+
+        if (!portfolio && !altersDelegationState) continue;
+
+        if (altersDelegationState && !portfolio) {
+          result = null;
+          break;
+        }
+
+        if (portfolio) {
+          result = Cardano.cip17FromMetadatum(portfolio);
+          break;
+        }
+      }
+
+      return result;
     })
   );
 
@@ -140,7 +171,7 @@ export const createDelegationTracker = ({
     )
   );
 
-  const portfolio$ = new TrackerSubject(createDelegationPortfolioTracker(transactions$));
+  const portfolio$ = new TrackerSubject(createDelegationPortfolioTracker(transactionsTracker.history$));
 
   const rewardAccounts$ = new TrackerSubject(
     createRewardAccountsTracker({

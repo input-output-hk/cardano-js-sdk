@@ -34,3 +34,18 @@ export const createStubTxWithEpoch = (
       }
     } as Cardano.HydratedTx
   } as TxWithEpoch);
+
+export const createStubTxWithSlot = (
+  slot: number,
+  certificates?: Cardano.Certificate[],
+  auxData?: Cardano.AuxiliaryData
+) =>
+  ({
+    auxiliaryData: auxData,
+    blockHeader: {
+      slot: Cardano.Slot(slot)
+    },
+    body: {
+      certificates: certificates?.map((cert) => ({ ...cert }))
+    }
+  } as Cardano.HydratedTx);

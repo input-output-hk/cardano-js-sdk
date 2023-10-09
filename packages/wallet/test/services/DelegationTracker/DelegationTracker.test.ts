@@ -3,7 +3,7 @@ import { RetryBackoffConfig } from 'backoff-rxjs';
 import { TransactionsTracker, createDelegationPortfolioTracker } from '../../../src/services';
 import { certificateTransactionsWithEpochs, createBlockEpochProvider } from '../../../src/services/DelegationTracker';
 import { coldObservableProvider } from '@cardano-sdk/util-rxjs';
-import { createStubTxWithCertificates, createStubTxWithEpoch } from './stub-tx';
+import { createStubTxWithCertificates, createStubTxWithSlot } from './stub-tx';
 import { createTestScheduler } from '@cardano-sdk/util-dev';
 
 jest.mock('@cardano-sdk/util-rxjs', () => {
@@ -145,6 +145,21 @@ describe('DelegationTracker', () => {
       ]
     };
 
+    const cip17DelegationPortfolioChangeWeights: Cardano.Cip17DelegationPortfolio = {
+      author: 'me',
+      name: 'My portfolio with different weights',
+      pools: [
+        {
+          id: '10000000000000000000000000000000000000000000000000000000' as Cardano.PoolIdHex,
+          weight: 2
+        },
+        {
+          id: '20000000000000000000000000000000000000000000000000000000' as Cardano.PoolIdHex,
+          weight: 1
+        }
+      ]
+    };
+
     const cip17DelegationPortfolio2: Cardano.Cip17DelegationPortfolio = {
       author: 'me',
       name: 'My portfolio 2',
@@ -162,7 +177,7 @@ describe('DelegationTracker', () => {
 
         const transactions$ = cold('a-b-c-d', {
           a: [
-            createStubTxWithEpoch(284, [
+            createStubTxWithSlot(284, [
               {
                 __typename: Cardano.CertificateType.StakeKeyRegistration,
                 stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
@@ -170,13 +185,13 @@ describe('DelegationTracker', () => {
             ])
           ],
           b: [
-            createStubTxWithEpoch(284, [
+            createStubTxWithSlot(284, [
               {
                 __typename: Cardano.CertificateType.StakeKeyRegistration,
                 stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
               }
             ]),
-            createStubTxWithEpoch(
+            createStubTxWithSlot(
               285,
               [
                 {
@@ -190,13 +205,13 @@ describe('DelegationTracker', () => {
             )
           ],
           c: [
-            createStubTxWithEpoch(284, [
+            createStubTxWithSlot(284, [
               {
                 __typename: Cardano.CertificateType.StakeKeyRegistration,
                 stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
               }
             ]),
-            createStubTxWithEpoch(
+            createStubTxWithSlot(
               285,
               [
                 {
@@ -208,7 +223,7 @@ describe('DelegationTracker', () => {
                 blob: new Map([[Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(cip17DelegationPortfolio)]])
               }
             ),
-            createStubTxWithEpoch(286, [
+            createStubTxWithSlot(286, [
               {
                 __typename: Cardano.CertificateType.StakeKeyRegistration,
                 stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
@@ -216,13 +231,13 @@ describe('DelegationTracker', () => {
             ])
           ],
           d: [
-            createStubTxWithEpoch(284, [
+            createStubTxWithSlot(284, [
               {
                 __typename: Cardano.CertificateType.StakeKeyRegistration,
                 stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
               }
             ]),
-            createStubTxWithEpoch(
+            createStubTxWithSlot(
               285,
               [
                 {
@@ -234,13 +249,13 @@ describe('DelegationTracker', () => {
                 blob: new Map([[Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(cip17DelegationPortfolio)]])
               }
             ),
-            createStubTxWithEpoch(286, [
+            createStubTxWithSlot(286, [
               {
                 __typename: Cardano.CertificateType.StakeKeyRegistration,
                 stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
               }
             ]),
-            createStubTxWithEpoch(
+            createStubTxWithSlot(
               287,
               [
                 {
@@ -272,7 +287,7 @@ describe('DelegationTracker', () => {
 
         const transactions$ = cold('a-b', {
           a: [
-            createStubTxWithEpoch(
+            createStubTxWithSlot(
               284,
               [
                 {
@@ -286,7 +301,7 @@ describe('DelegationTracker', () => {
             )
           ],
           b: [
-            createStubTxWithEpoch(286, [
+            createStubTxWithSlot(286, [
               {
                 __typename: Cardano.CertificateType.StakeKeyRegistration,
                 stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
@@ -300,6 +315,43 @@ describe('DelegationTracker', () => {
         expectObservable(portfolio$).toBe('a-b', {
           a: cip17DelegationPortfolio,
           b: null
+        });
+      });
+    });
+
+    it('returns the updated portfolio if the most recent transaction only updates percentages', () => {
+      createTestScheduler().run(({ cold, expectObservable }) => {
+        const rewardAccount = Cardano.RewardAccount('stake_test1upqykkjq3zhf4085s6n70w8cyp57dl87r0ezduv9rnnj2uqk5zmdv');
+
+        const transactions$ = cold('a-b', {
+          a: [
+            createStubTxWithSlot(
+              284,
+              [
+                {
+                  __typename: Cardano.CertificateType.StakeKeyRegistration,
+                  stakeKeyHash: Cardano.RewardAccount.toHash(rewardAccount)
+                }
+              ],
+              {
+                blob: new Map([[Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(cip17DelegationPortfolio)]])
+              }
+            )
+          ],
+          b: [
+            createStubTxWithSlot(289, undefined, {
+              blob: new Map([
+                [Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(cip17DelegationPortfolioChangeWeights)]
+              ])
+            })
+          ]
+        });
+
+        const portfolio$ = createDelegationPortfolioTracker(transactions$);
+
+        expectObservable(portfolio$).toBe('a-b', {
+          a: cip17DelegationPortfolio,
+          b: cip17DelegationPortfolioChangeWeights
         });
       });
     });
