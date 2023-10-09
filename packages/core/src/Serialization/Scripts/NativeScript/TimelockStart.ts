@@ -34,6 +34,7 @@ export class TimelockStart {
 
     const writer = new CborWriter();
 
+    // CDDL
     // invalid_before = (4, uint)
     writer.writeStartArray(EMBEDDED_GROUP_SIZE);
     writer.writeInt(Cardano.NativeScriptKind.RequireTimeAfter);

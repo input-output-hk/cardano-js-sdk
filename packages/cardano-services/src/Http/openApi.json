@@ -9,6 +9,26 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/v1.0.0/live": {
+      "get": {
+        "summary": "HTTP Server live GET",
+        "operationId": "server-live-get",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "summary": "HTTP Server live POST",
+        "operationId": "server-live-post",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/v1.0.0/meta": {
       "post": {
         "summary": "HTTP Server metadata POST",
@@ -32,6 +52,32 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/v1.0.0/ready": {
+      "get": {
+        "summary": "HTTP Server ready GET",
+        "operationId": "server-ready-get",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "503": {
+            "description": "Service Unavailable"
+          }
+        }
+      },
+      "post": {
+        "summary": "HTTP Server ready POST",
+        "operationId": "server-ready-post",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "503": {
+            "description": "Service Unavailable"
           }
         }
       }

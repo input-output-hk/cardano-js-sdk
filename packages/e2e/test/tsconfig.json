@@ -3,8 +3,13 @@
   "compilerOptions": {
     "baseUrl": "."
   },
-  "exclude": ["./web-extension"],
-  "include": ["./**/*.ts"],
+  "exclude": [
+    "./web-extension"
+  ],
+  "include": [
+    "./**/*.ts",
+    "../src/util/handle-util.ts"
+  ],
   "references": [
     {
       "path": "../src"

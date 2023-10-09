@@ -1,5 +1,5 @@
+import * as BaseEncoding from '@scure/base';
 import * as Crypto from '@cardano-sdk/crypto';
-import { CML } from '../../CML/CML';
 import { InvalidStringError, OpaqueNumber, OpaqueString, typedBech32 } from '@cardano-sdk/util';
 import { Lovelace } from './Value';
 import { OnChainTx } from './Transaction';
@@ -87,8 +87,10 @@ export const SlotLeader = (value: string): SlotLeader => {
  * @param value is a Base64 string
  * @returns Bech32 encoded vrf_vk
  */
-export const VrfVkBech32FromBase64 = (value: string) =>
-  VrfVkBech32(CML.VRFVKey.from_bytes(Buffer.from(value, 'base64')).to_bech32('vrf_vk'));
+export const VrfVkBech32FromBase64 = (value: string) => {
+  const words = BaseEncoding.bech32.toWords(Buffer.from(value, 'base64'));
+  return VrfVkBech32(BaseEncoding.bech32.encode('vrf_vk', words, 1023));
+};
 
 /** Minimal Block type meant as a base for the more complete version `Block`  */
 // TODO: optionals (except previousBlock) are there because they are not calculated for Byron yet.

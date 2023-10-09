@@ -1,6 +1,6 @@
-import { HexBlob, OpaqueString, usingAutoFree } from '@cardano-sdk/util';
+import { HexBlob, OpaqueString } from '@cardano-sdk/util';
 import { Transaction } from '../Serialization';
-import { cmlUtil } from '../CML';
+import { Tx, TxBody } from '../Cardano';
 import type { Cardano } from '..';
 
 /**
@@ -14,13 +14,24 @@ export type TxCBOR = OpaqueString<'TxCbor'>;
  */
 export const TxCBOR = (tx: string): TxCBOR => HexBlob(tx) as unknown as TxCBOR;
 
+export const deserializeTx = ((txBody: Buffer | Uint8Array | string) => {
+  const hex =
+    txBody instanceof Buffer
+      ? txBody.toString('hex')
+      : txBody instanceof Uint8Array
+      ? Buffer.from(txBody).toString('hex')
+      : txBody;
+
+  const transaction = Transaction.fromCbor(TxCBOR(hex));
+  return transaction.toCore();
+}) as (txBody: HexBlob | Buffer | Uint8Array | string) => Tx<TxBody>;
+
 /**
  * Serialize transaction to hex-encoded CBOR
  */
-TxCBOR.serialize = (tx: Cardano.Tx): TxCBOR =>
-  usingAutoFree((scope) => scope.manage(Transaction.fromCore(scope, tx)).toCbor()) as unknown as TxCBOR;
+TxCBOR.serialize = (tx: Cardano.Tx): TxCBOR => Transaction.fromCore(tx).toCbor() as unknown as TxCBOR;
 
 /**
  * Deserialize transaction from hex-encoded CBOR
  */
-TxCBOR.deserialize = (tx: TxCBOR): Cardano.Tx => cmlUtil.deserializeTx(tx);
+TxCBOR.deserialize = (tx: TxCBOR): Cardano.Tx => deserializeTx(tx);

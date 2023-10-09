@@ -38,6 +38,7 @@ export class MultiHostName {
 
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // multi_host_name = ( 2
     //                    , dns_name ; A SRV DNS record
     //                    )

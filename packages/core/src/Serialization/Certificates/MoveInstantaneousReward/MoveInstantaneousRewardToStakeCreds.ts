@@ -35,6 +35,7 @@ export class MoveInstantaneousRewardToStakeCreds {
 
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // move_instantaneous_reward = [ 0 / 1, coin ]
     writer.writeStartArray(EMBEDDED_GROUP_SIZE);
     writer.writeInt(this.#pot === Cardano.MirCertificatePot.Reserves ? 0 : 1);
@@ -44,6 +45,7 @@ export class MoveInstantaneousRewardToStakeCreds {
     writer.writeStartMap(sortedCanonically.size);
 
     for (const [key, value] of sortedCanonically) {
+      // CDDL
       // encode key
       //
       // stake_credential =
@@ -54,7 +56,6 @@ export class MoveInstantaneousRewardToStakeCreds {
       writer.writeInt(key.type);
       writer.writeByteString(Buffer.from(key.hash, 'hex'));
 
-      // encode value
       writer.writeInt(value);
     }
 

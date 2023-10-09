@@ -1,5 +1,5 @@
 import { AssetFingerprint, AssetId, AssetName, PolicyId, TransactionId } from '../../Cardano';
-import { NftMetadata } from './NftMetadata';
+import { NftMetadata } from '../NftMetadata';
 import { TokenMetadata } from './TokenMetadata';
 
 export interface AssetMintOrBurn {
@@ -21,11 +21,6 @@ export interface AssetInfo {
    */
   quantity: bigint;
   supply: bigint;
-  mintOrBurnCount: number;
-  /**
-   * Sorted by slot
-   */
-  history?: AssetMintOrBurn[];
   /**
    * CIP-0035. `undefined` if not loaded, `null` if no metadata found
    */

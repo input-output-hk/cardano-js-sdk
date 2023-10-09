@@ -6,13 +6,13 @@
       "name": "Apache 2.0",
       "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "version": "1.0.0"
+    "version": "2.0.0"
   },
   "paths": {
-    "/v1.0.0/tx-submit/health": {
+    "/v2.0.0/tx-submit/health": {
       "$ref": "../Http/schema.json#/paths/Health"
     },
-    "/v1.0.0/tx-submit/submit": {
+    "/v2.0.0/tx-submit/submit": {
       "post": {
         "summary": "submits given transaction",
         "operationId": "submitTx",

@@ -1,13 +1,9 @@
 import { Cardano } from '@cardano-sdk/core';
-import { Column, Entity, Index, JoinColumn, OneToMany, OneToOne, PrimaryColumn, RelationOptions } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
 import { CurrentPoolMetricsEntity } from './CurrentPoolMetrics.entity';
+import { OnDeleteSetNullRelationOptions } from './util';
 import { PoolRegistrationEntity } from './PoolRegistration.entity';
 import { PoolRetirementEntity } from './PoolRetirement.entity';
-
-const OnDeleteSetNull: RelationOptions = {
-  nullable: true,
-  onDelete: 'SET NULL'
-};
 
 @Entity()
 export class StakePoolEntity {
@@ -24,12 +20,11 @@ export class StakePoolEntity {
   @OneToMany(() => PoolRetirementEntity, (retirement) => retirement.stakePool)
   retirements?: PoolRetirementEntity[];
   @JoinColumn()
-  @OneToOne(() => PoolRegistrationEntity, OnDeleteSetNull)
+  @OneToOne(() => PoolRegistrationEntity, OnDeleteSetNullRelationOptions)
   lastRegistration?: PoolRegistrationEntity | null;
   @JoinColumn()
-  @OneToOne(() => PoolRetirementEntity, OnDeleteSetNull)
+  @OneToOne(() => PoolRetirementEntity, OnDeleteSetNullRelationOptions)
   lastRetirement?: PoolRetirementEntity | null;
-
-  @OneToOne(() => CurrentPoolMetricsEntity, (metric) => metric.stakePool)
+  @OneToOne(() => CurrentPoolMetricsEntity, (metric) => metric.stakePool, OnDeleteSetNullRelationOptions)
   metrics?: CurrentPoolMetricsEntity | null;
 }

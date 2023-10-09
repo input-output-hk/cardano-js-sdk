@@ -1,9 +1,9 @@
 {
   "name": "@cardano-sdk/util",
-  "version": "0.14.0",
+  "version": "0.14.2",
   "description": "General, not cardano-specific utils",
   "engines": {
-    "node": ">=16.20.1"
+    "node": ">=16.20.2"
   },
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",

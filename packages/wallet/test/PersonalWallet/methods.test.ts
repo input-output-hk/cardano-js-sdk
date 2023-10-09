@@ -1,65 +1,18 @@
 /* eslint-disable unicorn/consistent-destructuring, sonarjs/no-duplicate-string, @typescript-eslint/no-floating-promises, promise/no-nesting, promise/always-return */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, AsyncKeyAgent, GroupedAddress, SignBlobResult, util } from '@cardano-sdk/key-management';
-import {
-  AssetId,
-  createStubStakePoolProvider,
-  generateRandomHexString,
-  mockProviders as mocks
-} from '@cardano-sdk/util-dev';
+import { AddressType, AsyncKeyAgent, GroupedAddress } from '@cardano-sdk/key-management';
+import { AssetId, StubKeyAgent, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { BehaviorSubject, Subscription, firstValueFrom, skip } from 'rxjs';
 import { CML, Cardano, CardanoNodeErrors, ProviderError, ProviderFailure, TxCBOR } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
 import { PersonalWallet, TxInFlight, setupWallet } from '../../src';
+import { buildDRepIDFromDRepKey, toOutgoingTx, waitForWalletStateSettle } from '../util';
 import { getPassphrase, stakeKeyDerivationPath, testAsyncKeyAgent } from '../../../key-management/test/mocks';
 import { dummyLogger as logger } from 'ts-log';
-import { toOutgoingTx, waitForWalletStateSettle } from '../util';
 import delay from 'delay';
 
 const { mockChainHistoryProvider, mockRewardsProvider, utxo } = mocks;
-
-class StubKeyAgent implements AsyncKeyAgent {
-  knownAddresses$ = new BehaviorSubject<GroupedAddress[]>([]);
-
-  constructor(private inputResolver: Cardano.InputResolver) {}
-
-  deriveAddress(): Promise<GroupedAddress> {
-    throw new Error('Method not implemented.');
-  }
-  derivePublicKey(): Promise<Crypto.Ed25519PublicKeyHex> {
-    throw new Error('Method not implemented.');
-  }
-  signBlob(): Promise<SignBlobResult> {
-    throw new Error('Method not implemented.');
-  }
-  async signTransaction(txInternals: Cardano.TxBodyWithHash): Promise<Cardano.Signatures> {
-    const signatures = new Map<Crypto.Ed25519PublicKeyHex, Crypto.Ed25519SignatureHex>();
-    const knownAddresses = await firstValueFrom(this.knownAddresses$);
-    for (const _ of await util.ownSignatureKeyPaths(txInternals.body, knownAddresses, this.inputResolver)) {
-      signatures.set(
-        Crypto.Ed25519PublicKeyHex(generateRandomHexString(64)),
-        Crypto.Ed25519SignatureHex(generateRandomHexString(128))
-      );
-    }
-    return signatures;
-  }
-  getChainId(): Promise<Cardano.ChainId> {
-    throw new Error('Method not implemented.');
-  }
-  getBip32Ed25519(): Promise<Crypto.Bip32Ed25519> {
-    throw new Error('Method not implemented.');
-  }
-  getExtendedAccountPublicKey(): Promise<Crypto.Bip32PublicKeyHex> {
-    throw new Error('Method not implemented.');
-  }
-  async setKnownAddresses(addresses: GroupedAddress[]): Promise<void> {
-    this.knownAddresses$.next(addresses);
-  }
-  shutdown(): void {
-    throw new Error('Method not implemented.');
-  }
-}
 
 // We can't consistently re-serialize this specific tx due to witness.datums list format
 const serializedForeignTx =
@@ -100,7 +53,6 @@ describe('PersonalWallet methods', () => {
   let networkInfoProvider: mocks.NetworkInfoProviderStub;
   let wallet: PersonalWallet;
   let utxoProvider: mocks.UtxoProviderStub;
-
   beforeEach(async () => {
     txSubmitProvider = mocks.mockTxSubmitProvider();
     networkInfoProvider = mocks.mockNetworkInfoProvider();
@@ -293,14 +245,14 @@ describe('PersonalWallet methods', () => {
           // callers (I.E cip30.ts) can call finalize directly since they already have the tx built. Bypassing initialize.
           const txInternals = {
             body: {
-              collaterals: new Set([utxo[2][0]]),
+              collaterals: [utxo[2][0]],
               fee: 194_805n,
               inputs: [utxo[1][0]],
               mint: new Map([
                 [AssetId.PXL, 5n],
                 [AssetId.TSLA, 20n]
               ]),
-              outputs: new Set<Cardano.TxOut>(outputs),
+              outputs,
               requiredExtraSignatures: [
                 Crypto.Ed25519KeyHashHex('6199186adb51974690d7247d2646097d2c62763b767b528816fb7ed5')
               ],
@@ -493,7 +445,7 @@ describe('PersonalWallet methods', () => {
 
         const txOut = await txBuilder.addOutput(txOutput).build().sign();
         const submitTxArgsMock = {
-          context: { handles: [mocks.resolvedHandle] },
+          context: { handleResolutions: [mocks.resolvedHandle] },
           signedTransaction: txOut.cbor
         };
         const txPending = firstValueFrom(wallet.transactions.outgoing.pending$);
@@ -547,13 +499,69 @@ describe('PersonalWallet methods', () => {
     });
   });
 
-  it('signData calls cip30signData', async () => {
-    const response = await wallet.signData({ payload: HexBlob('abc123'), signWith: address });
-    expect(response).toHaveProperty('signature');
+  describe('signData', () => {
+    it('calls cip30signData', async () => {
+      const response = await wallet.signData({ payload: HexBlob('abc123'), signWith: address });
+      expect(response).toHaveProperty('signature');
+    });
+
+    it('signs with bech32 DRepID', async () => {
+      const response = await wallet.signData({
+        payload: HexBlob('abc123'),
+        signWith: Cardano.DRepID('drep1vpzcgfrlgdh4fft0p0ju70czkxxkuknw0jjztl3x7aqgm9q3hqyaz')
+      });
+      expect(response).toHaveProperty('signature');
+    });
+
+    test('rejects if bech32 DRepID is not a type 6 address', async () => {
+      const dRepKey = await wallet.getPubDRepKey();
+      for (const type in Cardano.AddressType) {
+        if (!Number.isNaN(Number(type)) && Number(type) !== Cardano.AddressType.EnterpriseKey) {
+          const drepid = buildDRepIDFromDRepKey(dRepKey, 0, type as unknown as Cardano.AddressType);
+          await expect(wallet.signData({ payload: HexBlob('abc123'), signWith: drepid })).rejects.toThrow();
+        }
+      }
+    });
   });
 
   it('getPubDRepKey', async () => {
     const response = await wallet.getPubDRepKey();
     expect(typeof response).toBe('string');
+  });
+
+  it('will retry deriving pubDrepKey if one does not exist', async () => {
+    let walletKeyAgent: AsyncKeyAgent;
+    ({ wallet, keyAgent: walletKeyAgent } = await setupWallet({
+      bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
+      createKeyAgent: async (dependencies) => {
+        const asyncKeyAgent = await testAsyncKeyAgent([], dependencies);
+        asyncKeyAgent.derivePublicKey = jest.fn().mockRejectedValueOnce('error').mockResolvedValue('string');
+        return asyncKeyAgent;
+      },
+      createWallet: async (keyAgent) =>
+        new PersonalWallet(
+          { name: 'Test Wallet' },
+          {
+            assetProvider: mocks.mockAssetProvider(),
+            chainHistoryProvider: mockChainHistoryProvider(),
+            keyAgent,
+            logger,
+            networkInfoProvider: mocks.mockNetworkInfoProvider(),
+            rewardsProvider: mockRewardsProvider(),
+            stakePoolProvider: mocks.mockStakePoolsProvider(),
+            txSubmitProvider: mocks.mockTxSubmitProvider(),
+            utxoProvider: mocks.mockUtxoProvider()
+          }
+        ),
+      logger
+    }));
+    await waitForWalletStateSettle(wallet);
+
+    const response = await wallet.getPubDRepKey();
+    expect(typeof response).toBe('string');
+    expect(walletKeyAgent.derivePublicKey).toHaveBeenCalledTimes(3);
+
+    wallet.shutdown();
+    walletKeyAgent.shutdown();
   });
 });

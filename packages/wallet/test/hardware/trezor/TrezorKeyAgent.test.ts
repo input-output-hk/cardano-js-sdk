@@ -1,7 +1,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, CommunicationType, SerializableTrezorKeyAgentData, util } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
-import { CML, Cardano } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
 import { PersonalWallet, setupWallet } from '../../../src';
 import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
@@ -23,7 +23,8 @@ describe('TrezorKeyAgent', () => {
   beforeAll(async () => {
     txSubmitProvider = mocks.mockTxSubmitProvider();
     ({ keyAgent, wallet } = await setupWallet({
-      bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
+      bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
+
       createKeyAgent: async (dependencies) =>
         await TrezorKeyAgent.createWithDevice(
           {

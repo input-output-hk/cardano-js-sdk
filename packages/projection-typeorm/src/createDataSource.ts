@@ -71,6 +71,9 @@ const namingOverrides: Partial<NamingStrategyInterface> = {
   },
   tableName(targetName, userSpecifiedName) {
     return userSpecifiedName || toTableName(snakeCase(targetName));
+  },
+  uniqueConstraintName(tableName, columnNames) {
+    return `UQ_${toTableName(tableName)}_${columnNames.join('_')}}`;
   }
 };
 

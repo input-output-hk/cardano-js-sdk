@@ -267,7 +267,7 @@ const distributeChange = (changeOutputs: Array<Cardano.TxOut>, prefilledBuckets:
  * @param distribution the distribution.
  * @returns true if both matches, otherwise; false.
  */
-const delegationMatchesPortfolio = (
+export const delegationMatchesPortfolio = (
   portfolio: Cardano.Cip17DelegationPortfolio,
   distribution: DelegatedStake[]
 ): boolean => {
@@ -316,27 +316,14 @@ export class DynamicChangeAddressResolver implements ChangeAddressResolver {
    */
   async resolve(selection: Selection): Promise<Array<Cardano.TxOut>> {
     const delegationDistribution = [...(await firstValueFrom(this.#delegationDistribution)).values()];
-    const portfolio = await this.#getDelegationPortfolio();
+    let portfolio = await this.#getDelegationPortfolio();
     const addresses = await firstValueFrom(this.#addresses$);
     let updatedChange = [...selection.change];
 
     if (addresses.length === 0) throw new InvalidStateError('The wallet has no known addresses.');
 
-    // If no portfolio is found, assign all change to the first address.
-    if (!portfolio) {
-      updatedChange = updatedChange.map((txOut) => {
-        txOut.address = addresses[0].address;
-        return txOut;
-      });
-
-      return updatedChange;
-    }
-
-    // If the portfolio doesn't match the current delegation (same pools), this strategy won't work, we can't guess
-    // where to put the balance, we will fall back to delegating to the first address and log a warning.
-    if (!delegationMatchesPortfolio(portfolio, delegationDistribution)) {
-      this.#logger.warn('The portfolio doesnt match current wallet delegation.');
-
+    // If the wallet is not delegating to any pool, fall back to giving all change to the first derived address.
+    if (delegationDistribution.length === 0) {
       updatedChange = updatedChange.map((txOut) => {
         txOut.address = addresses[0].address;
         return txOut;
@@ -365,6 +352,20 @@ export class DynamicChangeAddressResolver implements ChangeAddressResolver {
       });
 
       return updatedChange;
+    }
+
+    // If the portfolio doesn't match the current delegation (same pools), this strategy won't work, we can't guess
+    // where to put the balance, we will fall back to even distribution and log a warning.
+    if (!portfolio || !delegationMatchesPortfolio(portfolio, delegationDistribution)) {
+      this.#logger.warn('The portfolio doesnt match current wallet delegation.');
+      this.#logger.warn(`Portfolio: ${portfolio}`);
+
+      const pools = delegationDistribution.map((stake) => ({
+        id: stake.pool.hexId,
+        weight: 1 / delegationDistribution.length
+      }));
+
+      portfolio = { name: 'Default Portfolio', pools };
     }
 
     const buckets = createBuckets(selection, delegationDistribution, portfolio, addresses);

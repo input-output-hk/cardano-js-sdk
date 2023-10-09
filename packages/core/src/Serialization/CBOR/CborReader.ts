@@ -28,7 +28,7 @@ type StackFrame = {
  * A stateful, forward-only reader for Concise Binary Object Representation (CBOR) encoded data.
  */
 export class CborReader {
-  #data: Uint8Array;
+  readonly #data: Uint8Array;
   #offset = 0;
   #nestedItems: Array<StackFrame> = new Array<StackFrame>();
   #isTagContext = false;
@@ -41,7 +41,7 @@ export class CborReader {
    * @param data The CBOR encoded data to read.
    */
   constructor(data: HexBlob) {
-    this.#data = Buffer.from(data, 'hex').valueOf();
+    this.#data = new Uint8Array(Buffer.from(data, 'hex'));
     this.#currentFrame = {
       currentKeyOffset: null,
       frameOffset: 0,
@@ -922,7 +922,7 @@ export class CborReader {
 
     encodingLength = i + 1; // include the break byte
 
-    return { encodingLength, val: concat.valueOf() };
+    return { encodingLength, val: new Uint8Array(concat) };
   }
 
   /**

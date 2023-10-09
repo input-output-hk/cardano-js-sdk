@@ -1,8 +1,14 @@
 import { Cardano } from '@cardano-sdk/core';
+import { TxWithEpoch } from '../../../src/services/DelegationTracker/types';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const createStubTxWithCertificates = (certificates?: Cardano.Certificate[], commonCertProps?: any) =>
+export const createStubTxWithCertificates = (
+  certificates?: Cardano.Certificate[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  commonCertProps?: any,
+  auxData?: Cardano.AuxiliaryData
+) =>
   ({
+    auxiliaryData: auxData,
     blockHeader: {
       slot: Cardano.Slot(37_834_496)
     },
@@ -10,3 +16,21 @@ export const createStubTxWithCertificates = (certificates?: Cardano.Certificate[
       certificates: certificates?.map((cert) => ({ ...cert, ...commonCertProps }))
     }
   } as Cardano.HydratedTx);
+
+export const createStubTxWithEpoch = (
+  epoch: number,
+  certificates?: Cardano.Certificate[],
+  auxData?: Cardano.AuxiliaryData
+) =>
+  ({
+    epoch: Cardano.EpochNo(epoch),
+    tx: {
+      auxiliaryData: auxData,
+      blockHeader: {
+        slot: Cardano.Slot(37_834_496)
+      },
+      body: {
+        certificates: certificates?.map((cert) => ({ ...cert }))
+      }
+    } as Cardano.HydratedTx
+  } as TxWithEpoch);

@@ -36,6 +36,7 @@ export class ExUnitPrices {
 
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // ex_unit_prices =
     //   [ mem_price: unit_interval, step_price: unit_interval ]
     writer.writeStartArray(EX_UNITS_PRICES_ARRAY_SIZE);

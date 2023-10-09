@@ -7,21 +7,12 @@ import {
   ProviderFailure,
   ResolveHandlesArgs
 } from '@cardano-sdk/core';
-import { HandleEntity } from '@cardano-sdk/projection-typeorm';
+import { HandleEntity, HandleMetadataEntity, NftMetadataEntity } from '@cardano-sdk/projection-typeorm';
 import { In } from 'typeorm';
 import { InMemoryCache } from '../InMemoryCache';
 import { TypeormProvider, TypeormProviderDependencies } from '../util/TypeormProvider';
 
 export type TypeOrmHandleProviderDependencies = TypeormProviderDependencies;
-
-const handleFields = ['cardanoAddress', 'handle', 'hasDatum', 'policyId'] as const;
-
-type HandleFields = typeof handleFields[number];
-type PartialHandleEntity = {
-  [k in HandleFields]: Required<HandleEntity>[k];
-};
-
-const handleSelect = <{ [k in HandleFields]: true }>Object.fromEntries(handleFields.map((_) => [_, true]));
 
 export const emptyStringHandleResolutionRequestError = () =>
   new ProviderError(ProviderFailure.BadRequest, undefined, "Empty string handle can't be resolved");
@@ -46,18 +37,58 @@ export class TypeOrmHandleProvider extends TypeormProvider implements HandleProv
 
       await queryRunner.release();
 
-      const mapEntity = (entity: PartialHandleEntity | undefined): HandleResolution | null => {
+      const mapEntity = async (entity: HandleEntity | undefined): Promise<HandleResolution | null> => {
         if (!entity) return null;
+        if (!entity.cardanoAddress) {
+          this.logger.warn(`${entity.handle} has no associated address, which could be the result of a double mint.`);
+          return null;
+        }
 
-        const { cardanoAddress, handle, hasDatum, policyId } = entity;
+        const {
+          cardanoAddress,
+          handle,
+          hasDatum,
+          policyId,
+          defaultForPaymentCredential,
+          defaultForStakeCredential,
+          asset
+        } = entity;
 
-        return { cardanoAddress, handle, hasDatum, policyId, resolvedAt };
+        const nftMetadataRepo = dataSource.getRepository(NftMetadataEntity);
+        const handleMetadataRepo = dataSource.getRepository(HandleMetadataEntity);
+        const [nftMetadataEntity, handleMetadataEntity] = await Promise.all([
+          nftMetadataRepo.findOne({
+            order: { id: 'DESC' },
+            select: { id: true, image: true },
+            where: { userTokenAssetId: asset!.id }
+          }),
+          handleMetadataRepo.findOne({
+            order: { id: 'DESC' },
+            select: { backgroundImage: true, id: true, profilePicImage: true },
+            where: { handle }
+          })
+        ]);
+
+        return {
+          backgroundImage: handleMetadataEntity?.backgroundImage || undefined,
+          cardanoAddress,
+          defaultForPaymentCredential: defaultForPaymentCredential || undefined,
+          defaultForStakeCredential: defaultForStakeCredential || undefined,
+          handle: handle!,
+          hasDatum: !!hasDatum,
+          image: nftMetadataEntity?.image,
+          policyId: policyId!,
+          profilePic: handleMetadataEntity?.profilePicImage || undefined,
+          resolvedAt
+        };
       };
 
-      const findOptions = { select: handleSelect, where: { handle: In(handles) } };
-      const entities = await dataSource.getRepository<PartialHandleEntity>(HandleEntity).find(findOptions);
+      const entities = await dataSource.getRepository(HandleEntity).find({
+        loadRelationIds: { disableMixedMap: true },
+        where: { handle: In(handles) }
+      });
 
-      return handles.map((handle) => mapEntity(entities.find((entity) => entity.handle === handle)));
+      return Promise.all(handles.map((handle) => mapEntity(entities.find((entity) => entity.handle === handle))));
     });
   }
 

@@ -11,13 +11,14 @@ import {
   errors,
   util
 } from '@cardano-sdk/key-management';
-import { CML, Cardano } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
+
 import { dummyLogger } from 'ts-log';
 import { restoreKeyAgent } from '../../../src';
 
 describe('KeyManagement/restoreKeyAgent', () => {
   const dependencies: KeyAgentDependencies = {
-    bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
+    bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
     inputResolver: { resolveInput: jest.fn() },
     logger: dummyLogger
   };

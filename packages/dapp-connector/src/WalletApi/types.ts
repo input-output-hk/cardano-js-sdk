@@ -33,6 +33,8 @@ export interface Cip30DataSignature {
   signature: CoseSign1CborHex;
 }
 
+export type WalletApiExtension = { cip: number };
+
 /**
  * Returns the network id of the currently connected account.
  * 0 is testnet and 1 is mainnet but other networks can possibly be returned by wallets.
@@ -77,6 +79,14 @@ export type GetCollateral = (params?: { amount?: Cbor }) => Promise<Cbor[] | nul
  * @throws ApiError
  */
 export type GetBalance = () => Promise<Cbor>;
+
+/**
+ * Retrieves the list of extensions enabled by the wallet.
+ * This may be influenced by the set of extensions requested in the initial enable request.
+ *
+ * @throws ApiError
+ */
+export type GetExtensions = () => Promise<WalletApiExtension[]>;
 
 /**
  * Returns a list of all used (included in some on-chain transaction) addresses controlled by the wallet.
@@ -145,7 +155,10 @@ export type SignTx = (tx: Cbor, partialSign?: Boolean) => Promise<Cbor>;
  * @throws ApiError
  * @throws DataSignError
  */
-export type SignData = (addr: Cardano.PaymentAddress | Bytes, payload: Bytes) => Promise<Cip30DataSignature>;
+export type SignData = (
+  addr: Cardano.PaymentAddress | Cardano.DRepID | Bytes,
+  payload: Bytes
+) => Promise<Cip30DataSignature>;
 
 /**
  * As wallets should already have this ability, we allow dApps to request that a transaction be sent through it.
@@ -169,6 +182,8 @@ export interface Cip30WalletApi {
 
   getCollateral: GetCollateral;
 
+  getExtensions: GetExtensions;
+
   getUsedAddresses: GetUsedAddresses;
 
   getUnusedAddresses: GetUnusedAddresses;
@@ -182,16 +197,22 @@ export interface Cip30WalletApi {
   signData: SignData;
 
   submitTx: SubmitTx;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  experimental?: any;
 }
 
 export interface Cip95WalletApi {
-  getActivePubStakeKeys: () => Promise<Ed25519PublicKeyHex[]>;
-
+  getRegisteredPubStakeKeys: () => Promise<Ed25519PublicKeyHex[]>;
+  getUnregisteredPubStakeKeys: () => Promise<Ed25519PublicKeyHex[]>;
   getPubDRepKey: () => Promise<Ed25519PublicKeyHex>;
 }
 
 export type WalletApi = Cip30WalletApi & Cip95WalletApi;
-
 export type WalletMethod = keyof WalletApi;
 
-export type WalletApiExtension = { cip: number };
+export interface CipExtensionApis {
+  cip95: Cip95WalletApi;
+}
+
+export type Cip30WalletApiWithPossibleExtensions = Cip30WalletApi & Partial<CipExtensionApis>;

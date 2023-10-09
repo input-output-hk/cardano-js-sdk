@@ -15,7 +15,6 @@ import { createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sd
 import { firstValueFrom, of, timer } from 'rxjs';
 import { dummyLogger as logger } from 'ts-log';
 import { testAsyncKeyAgent } from '../../../key-management/test/mocks';
-import { usingAutoFree } from '@cardano-sdk/util';
 
 describe('CustomObservableWallet', () => {
   describe('can create an application-specific subset of ObservableWallet interface', () => {
@@ -121,9 +120,7 @@ describe('CustomObservableWallet', () => {
         submitTx(tx: Cardano.Tx) {
           // can use utils from SDK, in this case `Transaction.fromCore`
           // if you want to submit hex-encoded tx, there is also Transaction.toCore for the reverse
-          const txBytes = usingAutoFree((scope) =>
-            scope.manage(Serialization.Transaction.fromCore(scope, tx)).toCbor()
-          );
+          const txBytes = Serialization.Transaction.fromCore(tx).toCbor();
           return submitTxBytesHexString(txBytes);
         }
       };

@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.10.0...@cardano-sdk/dapp-connector@0.11.0) (2023-09-29)
+
+### ⚠ BREAKING CHANGES
+
+* - replace `ObservableWallet.activePublicStakeKeys$` with
+`publicStakeKeys$` that emits `PubStakeKeyAndStatus[]`
+
+### Features
+
+* cip-95 update calls to get public stake keys ([b1039b4](https://github.com/input-output-hk/cardano-js-sdk/commit/b1039b4b32e74075c1833eb1d0bdaac06368e9b8))
+* **dapp-connector:** use namespaced extensions api ([823ad6f](https://github.com/input-output-hk/cardano-js-sdk/commit/823ad6f7b9a19124cb23fe24022039a747ae40b2))
+
+## [0.10.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.9.16...@cardano-sdk/dapp-connector@0.10.0) (2023-09-20)
+
+### ⚠ BREAKING CHANGES
+
+* remove the CML serialization code from core package
+
+### Features
+
+* add getExtensions() to CIP-30 wallet API ([944e0ce](https://github.com/input-output-hk/cardano-js-sdk/commit/944e0cea55bcd8c91e1888e708e717adc7b1ea4b))
+* add support for signing data with a DRepID in CIP-95 API ([3057cce](https://github.com/input-output-hk/cardano-js-sdk/commit/3057cce6ac1585d6ae2a62a89d0417e5fb2416f4))
+* remove the CML serialization code from core package ([62f4252](https://github.com/input-output-hk/cardano-js-sdk/commit/62f4252b094938db05b81c928c03c1eecec2be55))
+
+### Bug Fixes
+
+* **dapp-connector:** remove unnecessary bindings for CIP-30 initial API methods ([c786042](https://github.com/input-output-hk/cardano-js-sdk/commit/c786042862b1577f409fbab8b83b8b8a05a2d1bc))
+
+## [0.9.16](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.9.15...@cardano-sdk/dapp-connector@0.9.16) (2023-09-12)
+
+**Note:** Version bump only for package @cardano-sdk/dapp-connector
+
 ## [0.9.15](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/dapp-connector@0.9.14...@cardano-sdk/dapp-connector@0.9.15) (2023-08-29)
 
 ### Features

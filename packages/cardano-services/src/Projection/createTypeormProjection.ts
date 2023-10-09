@@ -108,11 +108,14 @@ export const createTypeormProjection = ({
   logger.debug(`Creating projection with policyIds ${JSON.stringify(handlePolicyIds)}`);
   logger.debug(`Using a ${blocksBufferLength} blocks buffer`);
 
-  const { mappers, entities, stores, extensions } = prepareTypeormProjection({
-    buffer,
-    options: projectionOptions,
-    projections
-  });
+  const { mappers, entities, stores, extensions } = prepareTypeormProjection(
+    {
+      buffer,
+      options: projectionOptions,
+      projections
+    },
+    { logger }
+  );
   const dataSource$ = createObservableDataSource({
     buffer,
     connectionConfig$,

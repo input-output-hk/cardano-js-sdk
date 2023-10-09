@@ -9,7 +9,6 @@ import { Observable, defer, from, of } from 'rxjs';
 import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
 import { Pool, PoolConfig, QueryConfig } from 'pg';
 import { TlsOptions } from 'tls';
-import { URL } from 'url';
 import { isConnectionError, toSerializableObject } from '@cardano-sdk/util';
 import connString from 'pg-connection-string';
 import fs from 'fs';

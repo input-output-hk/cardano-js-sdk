@@ -72,6 +72,7 @@ export class PoolParams {
 
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // pool_params = ( operator:       pool_keyhash
     //               , vrf_keyhash:    vrf_keyhash
     //               , pledge:         coin

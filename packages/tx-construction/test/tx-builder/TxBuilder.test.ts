@@ -419,7 +419,7 @@ describe('GenericTxBuilder', () => {
       it('resolves handle to address', async () => {
         const txOut = await txBuilder.buildOutput().handle('alice').coin(output1Coin).build();
 
-        expect(txOut.handle).toBe(resolvedHandle);
+        expect(txOut.handle).toBe(resolvedHandle.handle);
         expect(txOut.address).toBe(resolvedHandle.cardanoAddress);
       });
 
@@ -484,13 +484,13 @@ describe('GenericTxBuilder', () => {
     const tx = txBuilder
       .addOutput({
         ...mocks.utxo[0][1],
-        handle: resolvedHandle
+        handleResolution: resolvedHandle
       })
       .build();
-    const { handles } = await tx.inspect();
-    expect(handles).toEqual([resolvedHandle]);
+    const { handleResolutions } = await tx.inspect();
+    expect(handleResolutions).toEqual([resolvedHandle]);
     const { context } = await tx.sign();
-    expect(context.handles).toEqual([resolvedHandle]);
+    expect(context.handleResolutions).toEqual([resolvedHandle]);
   });
 
   it('can build transactions that are not modified by subsequent builder changes', async () => {

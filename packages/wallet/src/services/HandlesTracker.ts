@@ -1,5 +1,5 @@
+import { Asset, Cardano, Handle, HandleProvider } from '@cardano-sdk/core';
 import { Assets, HandleInfo } from '../types';
-import { Cardano, Handle, HandleProvider } from '@cardano-sdk/core';
 import {
   EMPTY,
   Observable,
@@ -108,7 +108,16 @@ export const createHandlesTracker = (
       const filteredUtxo = utxo.flatMap(([_, txOut]) =>
         uniqBy(
           [...(txOut.value.assets?.keys() || [])]
-            .filter((assetId) => handlePolicyIds.some((policyId) => assetId.startsWith(policyId)))
+            .filter((assetId) => {
+              const matchPolicyId = handlePolicyIds.some((policyId) => assetId.startsWith(policyId));
+              if (!matchPolicyId) {
+                return false;
+              }
+
+              const assetName = Cardano.AssetId.getAssetName(assetId);
+              const decoded = Asset.AssetNameLabel.decode(assetName);
+              return !decoded || decoded.label === Asset.AssetNameLabelNum.UserNFT;
+            })
             .map((assetId) => ({
               handleAssetId: assetId,
               txOut

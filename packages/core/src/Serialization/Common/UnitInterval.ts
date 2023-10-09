@@ -49,6 +49,7 @@ export class UnitInterval {
 
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     //  d8 1e      ---- Tag 30
     //     82      ---- Array length 2
     //        01   ---- 1

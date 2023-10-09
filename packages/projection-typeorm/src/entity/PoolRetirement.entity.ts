@@ -1,4 +1,4 @@
-import { BigIntColumnOptions, DeleteCascadeRelationOptions } from './util';
+import { BigIntColumnOptions, OnDeleteCascadeRelationOptions } from './util';
 import { BlockEntity } from './Block.entity';
 import { Cardano } from '@cardano-sdk/core';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
@@ -14,10 +14,10 @@ export class PoolRetirementEntity {
   id?: bigint;
   @Column()
   retireAtEpoch?: Cardano.EpochNo;
-  @ManyToOne(() => StakePoolEntity, (stakePool) => stakePool.retirements, DeleteCascadeRelationOptions)
+  @ManyToOne(() => StakePoolEntity, (stakePool) => stakePool.retirements, OnDeleteCascadeRelationOptions)
   @JoinColumn()
   stakePool?: StakePoolEntity;
-  @ManyToOne(() => BlockEntity, DeleteCascadeRelationOptions)
+  @ManyToOne(() => BlockEntity, OnDeleteCascadeRelationOptions)
   @JoinColumn()
   block?: BlockEntity;
 }

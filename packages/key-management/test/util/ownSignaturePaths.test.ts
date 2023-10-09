@@ -38,7 +38,16 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
   const ownStakeKeyHash = Cardano.RewardAccount.toHash(ownRewardAccount);
   const otherStakeKeyHash = Cardano.RewardAccount.toHash(otherRewardAccount);
 
+  let dRepPublicKey: Crypto.Ed25519PublicKeyHex;
+  let dRepKeyHash: Crypto.Ed25519KeyHashHex;
+  const foreignDRepKeyHash = Crypto.Hash28ByteBase16('8293d319ef5b3ac72366dd28006bd315b715f7e7cfcbd3004129b80d');
+
   const knownAddress1 = createGroupedAddress(address1, ownRewardAccount, AddressType.External, 0, stakeKeyPath);
+
+  beforeEach(async () => {
+    dRepPublicKey = Crypto.Ed25519PublicKeyHex('deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01');
+    dRepKeyHash = (await Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash()).hex();
+  });
 
   it('returns distinct derivation paths required to sign the transaction', async () => {
     const txBody = {
@@ -265,17 +274,69 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
     ]);
   });
 
-  // eslint-disable-next-line max-len
-  it('does not return stake key derivation path when no certificate with wallet stake key hash is present', async () => {
+  it('does not return derivation paths when all certificates and voting procedures are foreign', async () => {
     const txBody = {
-      certificates: [{ __typename: Cardano.CertificateType.StakeKeyRegistration, stakeKeyHash: otherStakeKeyHash }],
-      inputs: [{}, {}, {}]
+      certificates: [
+        { __typename: Cardano.CertificateType.StakeKeyRegistration, stakeKeyHash: otherStakeKeyHash },
+        { __typename: Cardano.CertificateType.VoteDelegation, stakeKeyHash: otherStakeKeyHash },
+        { __typename: Cardano.CertificateType.StakeVoteDelegation, stakeKeyHash: otherStakeKeyHash },
+        {
+          __typename: Cardano.CertificateType.StakeRegistrationDelegation,
+          stakeKeyHash: otherStakeKeyHash
+        },
+        {
+          __typename: Cardano.CertificateType.VoteRegistrationDelegation,
+          stakeKeyHash: otherStakeKeyHash
+        },
+        {
+          __typename: Cardano.CertificateType.StakeVoteRegistrationDelegation,
+          stakeKeyHash: otherStakeKeyHash
+        },
+        { __typename: Cardano.CertificateType.Unregistration, otherStakeKeyHash },
+        {
+          __typename: Cardano.CertificateType.UnregisterDelegateRepresentative,
+          dRepCredential: {
+            hash: foreignDRepKeyHash,
+            type: Cardano.CredentialType.KeyHash
+          },
+          deposit: 0n
+        } as Cardano.UnRegisterDelegateRepresentativeCertificate,
+        {
+          __typename: Cardano.CertificateType.UpdateDelegateRepresentative,
+          dRepCredential: {
+            hash: foreignDRepKeyHash,
+            type: Cardano.CredentialType.KeyHash
+          }
+        } as Cardano.UpdateDelegateRepresentativeCertificate
+      ],
+      fee: 0n,
+      inputs: [{}, {}, {}] as Cardano.TxIn[],
+      outputs: [],
+      votingProcedures: [
+        {
+          voter: {
+            __typename: Cardano.VoterType.dRepKeyHash,
+            credential: { hash: foreignDRepKeyHash, type: Cardano.CredentialType.KeyHash }
+          },
+          votes: []
+        },
+        {
+          voter: {
+            __typename: Cardano.VoterType.stakePoolKeyHash,
+            credential: {
+              hash: Crypto.Hash28ByteBase16(otherStakeKeyHash),
+              type: Cardano.CredentialType.KeyHash
+            }
+          },
+          votes: []
+        }
+      ]
     } as Cardano.TxBody;
     const resolveInput = jest
       .fn()
       .mockReturnValueOnce({ ...txOut, address: address1 })
       .mockReturnValueOnce(address1);
-    expect(await util.ownSignatureKeyPaths(txBody, [knownAddress1], { resolveInput })).toEqual([
+    expect(await util.ownSignatureKeyPaths(txBody, [knownAddress1], { resolveInput }, dRepKeyHash)).toEqual([
       {
         index: 0,
         role: KeyRole.External
@@ -357,5 +418,209 @@ describe('KeyManagement.util.ownSignaturePaths', () => {
         role: KeyRole.Stake
       }
     ]);
+  });
+
+  describe('Stake key derivation path', () => {
+    const rewardAccounts = [
+      'stake_test1uqfu74w3wh4gfzu8m6e7j987h4lq9r3t7ef5gaw497uu85qsqfy27',
+      'stake_test1up7pvfq8zn4quy45r2g572290p9vf99mr9tn7r9xrgy2l2qdsf58d',
+      'stake_test1uqrw9tjymlm8wrwq7jk68n6v7fs9qz8z0tkdkve26dylmfc2ux2hj',
+      'stake_test1uzwd0ng8pw7vvhm4k3s28azx9c6ytug60uh35jvztgg03rge58jf8',
+      'stake_test1urpklgzqsh9yqz8pkyuxcw9dlszpe5flnxjtl55epla6ftqktdyfz',
+      'stake_test1upqykkjq3zhf4085s6n70w8cyp57dl87r0ezduv9rnnj2uqk5zmdv'
+    ]
+      .map((acct) => ({ account: Cardano.RewardAccount(acct) }))
+      .map(({ account }) => ({ account, stakeKeyHash: Cardano.RewardAccount.toHash(account) }));
+
+    // Using multiple stake keys with one payment key to have separate derivation paths per each certificate
+    const knownAddresses = rewardAccounts.map(({ account }, index) =>
+      createGroupedAddress(address1, account, AddressType.External, 0, { index, role: KeyRole.Stake })
+    );
+
+    it('is returned for certificates with the wallet stake key hash', async () => {
+      const txBody = {
+        certificates: [
+          { __typename: Cardano.CertificateType.VoteDelegation, stakeKeyHash: rewardAccounts[0].stakeKeyHash },
+          { __typename: Cardano.CertificateType.StakeVoteDelegation, stakeKeyHash: rewardAccounts[1].stakeKeyHash },
+          {
+            __typename: Cardano.CertificateType.StakeRegistrationDelegation,
+            stakeKeyHash: rewardAccounts[2].stakeKeyHash
+          },
+          {
+            __typename: Cardano.CertificateType.VoteRegistrationDelegation,
+            stakeKeyHash: rewardAccounts[3].stakeKeyHash
+          },
+          {
+            __typename: Cardano.CertificateType.StakeVoteRegistrationDelegation,
+            stakeKeyHash: rewardAccounts[4].stakeKeyHash
+          },
+          { __typename: Cardano.CertificateType.Unregistration, stakeKeyHash: rewardAccounts[5].stakeKeyHash }
+        ],
+        inputs: [{}, {}, {}]
+      } as Cardano.TxBody;
+      const resolveInput = jest
+        .fn()
+        .mockReturnValueOnce({ ...txOut, address: address1 })
+        .mockReturnValueOnce(address1);
+      expect(await util.ownSignatureKeyPaths(txBody, knownAddresses, { resolveInput })).toEqual([
+        { index: 0, role: KeyRole.External },
+        { index: 0, role: KeyRole.Stake },
+        { index: 1, role: KeyRole.Stake },
+        { index: 2, role: KeyRole.Stake },
+        { index: 3, role: KeyRole.Stake },
+        { index: 4, role: KeyRole.Stake },
+        { index: 5, role: KeyRole.Stake }
+      ]);
+    });
+
+    it('duplicates are removed when multiple certificates use the wallet stake key hash', async () => {
+      const txBody = {
+        certificates: [
+          { __typename: Cardano.CertificateType.VoteDelegation, stakeKeyHash: rewardAccounts[0].stakeKeyHash },
+          { __typename: Cardano.CertificateType.StakeVoteDelegation, stakeKeyHash: rewardAccounts[0].stakeKeyHash }
+        ],
+        inputs: [{}, {}, {}]
+      } as Cardano.TxBody;
+      const resolveInput = jest
+        .fn()
+        .mockReturnValueOnce({ ...txOut, address: address1 })
+        .mockReturnValueOnce(address1);
+      expect(await util.ownSignatureKeyPaths(txBody, knownAddresses, { resolveInput })).toEqual([
+        { index: 0, role: KeyRole.External },
+        { index: 0, role: KeyRole.Stake }
+      ]);
+    });
+
+    it('is returned for StakePool voter in voting procedures', async () => {
+      const txBody = {
+        fee: 0n,
+        inputs: [{}, {}, {}] as Cardano.TxIn[],
+        outputs: [],
+        votingProcedures: [
+          {
+            voter: {
+              __typename: Cardano.VoterType.stakePoolKeyHash,
+              credential: {
+                hash: Crypto.Hash28ByteBase16(rewardAccounts[3].stakeKeyHash),
+                type: Cardano.CredentialType.KeyHash
+              }
+            },
+            votes: []
+          }
+        ]
+      } as Cardano.TxBody;
+
+      const resolveInput = jest
+        .fn()
+        .mockReturnValueOnce({ ...txOut, address: address1 })
+        .mockReturnValueOnce(address1);
+      expect(await util.ownSignatureKeyPaths(txBody, knownAddresses, { resolveInput })).toEqual([
+        { index: 0, role: KeyRole.External },
+        { index: 3, role: KeyRole.Stake }
+      ]);
+    });
+  });
+
+  describe('DRep key derivation path', () => {
+    beforeEach(async () => {
+      dRepPublicKey = Crypto.Ed25519PublicKeyHex('deeb8f82f2af5836ebbc1b450b6dbf0b03c93afe5696f10d49e8a8304ebfac01');
+      dRepKeyHash = (await Crypto.Ed25519PublicKey.fromHex(dRepPublicKey).hash()).hex();
+    });
+
+    it('is returned for UnregisterDelegateRepresentative certificate with the wallet dRep key hash', async () => {
+      const txBody = {
+        certificates: [
+          {
+            __typename: Cardano.CertificateType.UnregisterDelegateRepresentative,
+            dRepCredential: {
+              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash),
+              type: Cardano.CredentialType.KeyHash
+            },
+            deposit: 0n
+          } as Cardano.UnRegisterDelegateRepresentativeCertificate
+        ],
+        inputs: [{}, {}, {}]
+      } as Cardano.TxBody;
+      const resolveInput = jest
+        .fn()
+        .mockReturnValueOnce({ ...txOut, address: address1 })
+        .mockReturnValueOnce(address1);
+      expect(await util.ownSignatureKeyPaths(txBody, [knownAddress1], { resolveInput }, dRepKeyHash)).toEqual([
+        { index: 0, role: KeyRole.External },
+        { index: 0, role: KeyRole.DRep }
+      ]);
+    });
+
+    it('is returned for UpdateDelegateRepresentative certificate with the wallet dRep key hash', async () => {
+      const txBody = {
+        certificates: [
+          {
+            __typename: Cardano.CertificateType.UpdateDelegateRepresentative,
+            dRepCredential: {
+              hash: Crypto.Hash28ByteBase16.fromEd25519KeyHashHex(dRepKeyHash),
+              type: Cardano.CredentialType.KeyHash
+            }
+          } as Cardano.UpdateDelegateRepresentativeCertificate
+        ],
+        inputs: [{}, {}, {}]
+      } as Cardano.TxBody;
+      const resolveInput = jest
+        .fn()
+        .mockReturnValueOnce({ ...txOut, address: address1 })
+        .mockReturnValueOnce(address1);
+      expect(await util.ownSignatureKeyPaths(txBody, [knownAddress1], { resolveInput }, dRepKeyHash)).toEqual([
+        { index: 0, role: KeyRole.External },
+        { index: 0, role: KeyRole.DRep }
+      ]);
+    });
+
+    it('is not returned with a DrepRegistration certificate', async () => {
+      const txBody = {
+        certificates: [
+          {
+            __typename: Cardano.CertificateType.RegisterDelegateRepresentative,
+            dRepCredential: {
+              hash: foreignDRepKeyHash,
+              type: Cardano.CredentialType.KeyHash
+            },
+            deposit: 0n
+          } as Cardano.RegisterDelegateRepresentativeCertificate
+        ],
+        inputs: [{}, {}, {}]
+      } as Cardano.TxBody;
+      const resolveInput = jest
+        .fn()
+        .mockReturnValueOnce({ ...txOut, address: address1 })
+        .mockReturnValueOnce(address1);
+      expect(await util.ownSignatureKeyPaths(txBody, [knownAddress1], { resolveInput }, dRepKeyHash)).toEqual([
+        { index: 0, role: KeyRole.External }
+      ]);
+    });
+
+    it('is returned for DRep voter in voting procedures', async () => {
+      const txBody = {
+        fee: 0n,
+        inputs: [{}, {}, {}] as Cardano.TxIn[],
+        outputs: [],
+        votingProcedures: [
+          {
+            voter: {
+              __typename: Cardano.VoterType.dRepKeyHash,
+              credential: { hash: Crypto.Hash28ByteBase16(dRepKeyHash), type: Cardano.CredentialType.KeyHash }
+            },
+            votes: []
+          }
+        ]
+      } as Cardano.TxBody;
+
+      const resolveInput = jest
+        .fn()
+        .mockReturnValueOnce({ ...txOut, address: address1 })
+        .mockReturnValueOnce(address1);
+      expect(await util.ownSignatureKeyPaths(txBody, [knownAddress1], { resolveInput }, dRepKeyHash)).toEqual([
+        { index: 0, role: KeyRole.External },
+        { index: 0, role: KeyRole.DRep }
+      ]);
+    });
   });
 });

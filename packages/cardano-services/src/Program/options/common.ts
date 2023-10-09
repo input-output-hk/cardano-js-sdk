@@ -1,4 +1,4 @@
-import { Command, Option } from 'commander';
+import { Command } from 'commander';
 import { InvalidLoggerLevel } from '../../errors';
 import { LogLevel } from 'bunyan';
 import { MissingProgramOption } from '../errors';
@@ -10,14 +10,14 @@ import {
 } from '../utils';
 import { Seconds } from '@cardano-sdk/core';
 import { BuildInfo as ServiceBuildInfo } from '../../Http';
-import { URL } from 'url';
+import { addOptions, newOption } from './util';
 import { buildInfoValidator, cacheTtlValidator } from '../../util/validators';
 import { loggerMethodNames } from '@cardano-sdk/util';
 
 export const ENABLE_METRICS_DEFAULT = false;
 export const DEFAULT_HEALTH_CHECK_CACHE_TTL = Seconds(5);
 
-export enum CommonOptionDescriptions {
+enum Descriptions {
   ApiUrl = 'API URL',
   BuildInfo = 'Service build info',
   LoggerMinSeverity = 'Log level',
@@ -36,64 +36,49 @@ export type CommonProgramOptions = {
   serviceDiscoveryTimeout?: number;
 } & { [k in keyof typeof ServiceNames as `${Uncapitalize<k>}ProviderUrl`]?: string };
 
-export const withCommonOptions = (command: Command, defaults: { apiUrl: URL }) => {
-  command
-    .addOption(
-      new Option('--api-url <apiUrl>', CommonOptionDescriptions.ApiUrl)
-        .env('API_URL')
-        .default(defaults.apiUrl)
-        .argParser((url) => new URL(url))
+export const withCommonOptions = (command: Command, apiUrl: URL) => {
+  addOptions(command, [
+    newOption('--api-url <apiUrl>', Descriptions.ApiUrl, 'API_URL', (url) => new URL(url), apiUrl),
+    newOption('--build-info <buildInfo>', Descriptions.BuildInfo, 'BUILD_INFO', buildInfoValidator),
+    newOption(
+      '--enable-metrics <true/false>',
+      Descriptions.EnableMetrics,
+      'ENABLE_METRICS',
+      (enableMetrics) => stringOptionToBoolean(enableMetrics, Programs.ProviderServer, Descriptions.EnableMetrics),
+      ENABLE_METRICS_DEFAULT
+    ),
+    newOption(
+      '--health-check-cache-ttl <healthCheckCacheTTL>',
+      Descriptions.HealthCheckCacheTtl,
+      'HEALTH_CHECK_CACHE_TTL',
+      (ttl: string) => cacheTtlValidator(ttl, { lowerBound: 1, upperBound: 120 }, Descriptions.HealthCheckCacheTtl),
+      DEFAULT_HEALTH_CHECK_CACHE_TTL
+    ),
+    newOption(
+      '--logger-min-severity <level>',
+      Descriptions.LoggerMinSeverity,
+      'LOGGER_MIN_SEVERITY',
+      (level) => {
+        if (!loggerMethodNames.includes(level)) throw new InvalidLoggerLevel(level);
+        return level;
+      },
+      'info'
+    ),
+    newOption(
+      '--service-discovery-backoff-factor <serviceDiscoveryBackoffFactor>',
+      Descriptions.ServiceDiscoveryBackoffFactor,
+      'SERVICE_DISCOVERY_BACKOFF_FACTOR',
+      (factor) => Number.parseFloat(factor),
+      SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT
+    ),
+    newOption(
+      '--service-discovery-timeout <serviceDiscoveryTimeout>',
+      Descriptions.ServiceDiscoveryTimeout,
+      'SERVICE_DISCOVERY_TIMEOUT',
+      (interval) => Number.parseInt(interval, 10),
+      SERVICE_DISCOVERY_TIMEOUT_DEFAULT
     )
-    .addOption(
-      new Option('--build-info <buildInfo>', CommonOptionDescriptions.BuildInfo)
-        .env('BUILD_INFO')
-        .argParser(buildInfoValidator)
-    )
-    .addOption(
-      new Option('--enable-metrics <true/false>', CommonOptionDescriptions.EnableMetrics)
-        .env('ENABLE_METRICS')
-        .default(ENABLE_METRICS_DEFAULT)
-        .argParser((enableMetrics) =>
-          stringOptionToBoolean(enableMetrics, Programs.ProviderServer, CommonOptionDescriptions.EnableMetrics)
-        )
-    )
-    .addOption(
-      new Option('--health-check-cache-ttl <healthCheckCacheTTL>', CommonOptionDescriptions.HealthCheckCacheTtl)
-        .env('HEALTH_CHECK_CACHE_TTL')
-        .default(DEFAULT_HEALTH_CHECK_CACHE_TTL)
-        .argParser((ttl: string) =>
-          cacheTtlValidator(ttl, { lowerBound: 1, upperBound: 120 }, CommonOptionDescriptions.HealthCheckCacheTtl)
-        )
-    )
-    .addOption(
-      new Option('--logger-min-severity <level>', CommonOptionDescriptions.LoggerMinSeverity)
-        .env('LOGGER_MIN_SEVERITY')
-        .default('info')
-        .argParser((level) => {
-          if (!loggerMethodNames.includes(level)) {
-            throw new InvalidLoggerLevel(level);
-          }
-          return level;
-        })
-    )
-    .addOption(
-      new Option(
-        '--service-discovery-backoff-factor <serviceDiscoveryBackoffFactor>',
-        CommonOptionDescriptions.ServiceDiscoveryBackoffFactor
-      )
-        .env('SERVICE_DISCOVERY_BACKOFF_FACTOR')
-        .default(SERVICE_DISCOVERY_BACKOFF_FACTOR_DEFAULT)
-        .argParser((factor) => Number.parseFloat(factor))
-    )
-    .addOption(
-      new Option(
-        '--service-discovery-timeout <serviceDiscoveryTimeout>',
-        CommonOptionDescriptions.ServiceDiscoveryTimeout
-      )
-        .env('SERVICE_DISCOVERY_TIMEOUT')
-        .default(SERVICE_DISCOVERY_TIMEOUT_DEFAULT)
-        .argParser((interval) => Number.parseInt(interval, 10))
-    );
+  ]);
 
   let service: keyof typeof ServiceNames;
   for (service in ServiceNames) {
@@ -105,9 +90,12 @@ export const withCommonOptions = (command: Command, defaults: { apiUrl: URL }) =
     const typService = service.charAt(0).toLowerCase() + service.slice(1);
 
     command.addOption(
-      new Option(`-${cliService}-provider-url <${typService}ProviderUrl>`, `${service} provider URL`)
-        .env(`${envService}_PROVIDER_URL`)
-        .argParser((url) => new URL(url).toString())
+      newOption(
+        `-${cliService}-provider-url <${typService}ProviderUrl>`,
+        `${service} provider URL`,
+        `${envService}_PROVIDER_URL`,
+        (url) => new URL(url).toString()
+      )
     );
   }
 

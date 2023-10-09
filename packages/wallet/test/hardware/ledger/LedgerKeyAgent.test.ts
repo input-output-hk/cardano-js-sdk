@@ -2,7 +2,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, CommunicationType, SerializableLedgerKeyAgentData, util } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
-import { CML, Cardano } from '@cardano-sdk/core';
+import { CML, Cardano, Serialization } from '@cardano-sdk/core';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
@@ -161,7 +161,7 @@ describe('LedgerKeyAgent', () => {
       const policyId = Cardano.PolicyId('38299ce86f8cbef9ebeecc2e94370cb49196d60c93797fffb71d3932');
       const scriptRedeemer: Cardano.Redeemer = {
         // CBOR for Void redeemer.
-        data: HexBlob('d8799fff'),
+        data: Serialization.PlutusData.fromCbor(HexBlob('d8799fff')).toCore(),
         executionUnits: {
           memory: 13_421_562,
           steps: 9_818_438_928

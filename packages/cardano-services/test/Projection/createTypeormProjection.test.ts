@@ -36,7 +36,7 @@ describe('createTypeormProjection', () => {
     await lastValueFrom(projection$);
 
     // Check data in the database
-    const { entities } = prepareTypeormProjection({ buffer, projections });
+    const { entities } = prepareTypeormProjection({ buffer, projections }, { logger });
     const dataSource = createDataSource({ connectionConfig: projectorConnectionConfig, entities, logger });
     await dataSource.initialize();
     const queryRunner = dataSource.createQueryRunner();

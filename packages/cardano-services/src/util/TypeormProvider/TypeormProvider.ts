@@ -1,10 +1,8 @@
-import { BehaviorSubject, Observable, Subscription, filter, firstValueFrom, tap } from 'rxjs';
-import { DataSource } from 'typeorm';
 import { HealthCheckResponse, Provider } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
+import { Observable, skip } from 'rxjs';
 import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
-import { RunnableModule, isNotNil } from '@cardano-sdk/util';
-import { createTypeormDataSource } from './util';
+import { TypeormService } from '../TypeormService';
 
 export interface TypeormProviderDependencies {
   logger: Logger;
@@ -12,61 +10,18 @@ export interface TypeormProviderDependencies {
   connectionConfig$: Observable<PgConnectionConfig>;
 }
 
-export abstract class TypeormProvider extends RunnableModule implements Provider {
-  #entities: Function[];
-  #subscription: Subscription | undefined;
-  #connectionConfig$: Observable<PgConnectionConfig>;
-  #dataSource$ = new BehaviorSubject<DataSource | null>(null);
-
+export abstract class TypeormProvider extends TypeormService implements Provider {
   health: HealthCheckResponse = { ok: false, reason: 'not started' };
 
   constructor(name: string, { connectionConfig$, logger, entities }: TypeormProviderDependencies) {
-    super(name, logger);
-    this.#entities = entities;
-    this.#connectionConfig$ = connectionConfig$;
-  }
-
-  #subscribeToDataSource() {
-    this.#subscription = createTypeormDataSource(this.#connectionConfig$, this.#entities, this.logger)
-      .pipe(tap(() => (this.health = { ok: true })))
-      .subscribe((dataSource) => this.#dataSource$.next(dataSource));
-  }
-
-  #reset() {
-    this.#subscription?.unsubscribe();
-    this.#subscription = undefined;
-    this.#dataSource$.value !== null && this.#dataSource$.next(null);
-  }
-
-  onError(_: unknown) {
-    this.#reset();
-    this.health = { ok: false, reason: 'Provider error' };
-    this.#subscribeToDataSource();
-  }
-
-  async withDataSource<T>(callback: (dataSource: DataSource) => Promise<T>): Promise<T> {
-    try {
-      return await callback(await firstValueFrom(this.#dataSource$.pipe(filter(isNotNil))));
-    } catch (error) {
-      this.onError(error);
-      throw error;
-    }
+    super(name, { connectionConfig$, entities, logger });
+    // We skip 1 to omit the initial null value of the subject
+    this.dataSource$.pipe(skip(1)).subscribe((dataSource) => {
+      this.health = dataSource ? { ok: true } : { ok: false, reason: 'Provider error' };
+    });
   }
 
   async healthCheck(): Promise<HealthCheckResponse> {
     return this.health;
-  }
-
-  async initializeImpl() {
-    return Promise.resolve();
-  }
-
-  async startImpl() {
-    this.#subscribeToDataSource();
-  }
-
-  async shutdownImpl() {
-    this.#reset();
-    this.#dataSource$.complete();
   }
 }

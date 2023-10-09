@@ -31,9 +31,11 @@ export class Costmdls {
 
     const sortedCanonically = new Map([...this.#models].sort((a, b) => (a > b ? 1 : -1)));
 
+    // CDDL
     // costmdls =
-    //   { ? 0 : [ 166*166 int ] ; Plutus v1
-    //   , ? 1 : [ 175*175 int ] ; Plutus v2
+    //   { ? 0 : [ 166* int ] ; Plutus v1, only 166 integers are used, but more are accepted (and ignored)
+    //     ? 1 : [ 175* int ] ; Plutus v2, only 175 integers are used, but more are accepted (and ignored)
+    //   , ? 2 : [ 179* int ] ; Plutus v3, only 179 integers are used, but more are accepted (and ignored)
     //   }
     writer.writeStartMap(sortedCanonically.size);
 
@@ -201,8 +203,9 @@ export class Costmdls {
           break;
         }
         case Cardano.PlutusLanguageVersion.V2:
-          // For PlutusV2 (language id 1), the language view is the following:
-          //    * the value of costmdls map at key 1 is encoded as a definite length list.
+        case Cardano.PlutusLanguageVersion.V3:
+          // For PlutusV2&V3 (language id 1&2), the language view is the following:
+          //    * the value of costmdls map is encoded as a definite length list.
           encodedLanguageViews.writeInt(key);
           encodedLanguageViews.writeStartArray(value.costs().length);
           for (const cost of value.costs()) {

@@ -6,43 +6,46 @@ env:
 
 on:
   pull_request:
-    branches: [ "master" ]
   push:
-    branches: [ "master" ]
-    tags: [ "*.*.*" ]
+    branches: ['master']
+    tags: ['*.*.*']
 
 jobs:
   build_and_test:
     strategy:
       matrix:
-        os: [ ubuntu-20.04 ]
+        os: [ubuntu-20.04]
     runs-on: ${{ matrix.os }}
     steps:
-    - name: 📥 Checkout repository
-      uses: actions/checkout@v3
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v3
 
-    - name: 🧰 Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: 18.12.0
+      - name: 🧰 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.12.0
 
-    - name: 🔨 Build
-      run: |
-        yarn install --immutable --inline-builds
-        yarn build
+      - name: 🔨 Build
+        run: |
+          yarn install --immutable --inline-builds
+          yarn build
+        env:
+          NODE_OPTIONS: '--max_old_space_size=8192'
 
-    - name: 🔨 Generated files
-      run: |
-        if [ ! -z "$(git status --porcelain)" ] ; then git status ; echo "The PR is missing some generated file" ; exit 1 ; fi
-        yarn lint
+      - name: 🔨 Generated files
+        run: |
+          if [ ! -z "$(git status --porcelain)" ] ; then git status ; echo "The PR is missing some generated file" ; exit 1 ; fi
+          yarn lint
+        env:
+          NODE_OPTIONS: '--max_old_space_size=8192'
 
-    - name: 🔃 Check for circular dependencies
-      run: |
-        yarn circular-deps:check
+      - name: 🔃 Check for circular dependencies
+        run: |
+          yarn circular-deps:check
 
-    - name: 🔬 Test
-      run: |
-        yarn test:build:verify
-        yarn test --forceExit
-      env:
-        NODE_OPTIONS: "--max_old_space_size=8192"
+      - name: 🔬 Test
+        run: |
+          yarn test:build:verify
+          yarn test --forceExit
+        env:
+          NODE_OPTIONS: '--max_old_space_size=8192'

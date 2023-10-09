@@ -95,14 +95,15 @@ const delegateToMultiplePools = async (
   weights = Array.from({ length: POOLS_COUNT }).map(() => 1)
 ) => {
   const poolIds = await getPoolIds(wallet);
-  const portfolio: Pick<Cardano.Cip17DelegationPortfolio, 'pools'> = {
+  const portfolio: Cardano.Cip17DelegationPortfolio = {
+    name: 'Test Portfolio',
     pools: poolIds.map(({ hexId: id }, idx) => ({ id, weight: weights[idx] }))
   };
   logger.debug('Delegating portfolio', portfolio);
 
   const { tx } = await wallet.createTxBuilder().delegatePortfolio(portfolio).build().sign();
   await submitAndConfirm(wallet, tx);
-  return poolIds;
+  return { poolIds, portfolio };
 };
 
 const delegateAllToSinglePool = async (wallet: PersonalWallet): Promise<void> => {
@@ -138,10 +139,12 @@ describe('PersonalWallet/delegationDistribution', () => {
 
     // No stake distribution initially
     const delegationDistribution = await firstValueFrom(wallet.delegation.distribution$);
+    const delegationPortfolio = await firstValueFrom(wallet.delegation.portfolio$);
     logger.info('Empty delegation distribution initially');
     expect(delegationDistribution).toEqual(new Map());
+    expect(delegationPortfolio).toEqual(null);
 
-    const poolIds = await delegateToMultiplePools(wallet);
+    const { poolIds, portfolio } = await delegateToMultiplePools(wallet);
     const walletAddresses = await firstValueFromTimed(wallet.addresses$);
     const rewardAccounts = await firstValueFrom(wallet.delegation.rewardAccounts$);
 
@@ -173,11 +176,13 @@ describe('PersonalWallet/delegationDistribution', () => {
       stake: perAddrBalance[index]
     }));
     const actualDelegationDistribution = await firstValueFrom(wallet.delegation.distribution$);
+    const actualPortfolio = await firstValueFrom(wallet.delegation.portfolio$);
 
     logger.info('Funds were distributed evenly across the addresses.');
     logger.info(distributionMessage, actualDelegationDistribution);
 
     expect([...actualDelegationDistribution.values()]).toEqual(expectedDelegationDistribution);
+    expect(portfolio).toEqual(actualPortfolio);
 
     // Delegate so that last address has all funds
     await delegateToMultiplePools(
@@ -229,6 +234,7 @@ describe('PersonalWallet/delegationDistribution', () => {
         )
       )
     );
+
     expect(simplifiedDelegationDistribution).toEqual([
       {
         id: poolIds[0].id,
@@ -237,5 +243,10 @@ describe('PersonalWallet/delegationDistribution', () => {
         rewardAccounts: rewardAccounts.map(({ address }) => address)
       }
     ]);
+
+    // The simplified portfolio transaction doesn't send a portfolio but rather simply delegates all funds to one pool manually.
+    // This emulates the case where a user syncs its seeds phrases into another wallet and delegates to a single pool (without attaching metadata),
+    // this action undoes the portfolio, we should get null here.
+    expect(await firstValueFrom(wallet.delegation.portfolio$)).toBe(null);
   });
 });

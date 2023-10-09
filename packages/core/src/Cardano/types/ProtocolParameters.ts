@@ -1,5 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { EpochNo, Slot } from './Block';
+import { Fraction } from '.';
 import { PlutusLanguageVersion } from './Script';
 
 /* eslint-disable no-use-before-define */
@@ -105,7 +106,37 @@ type NewProtocolParamsInBabbage = {
 type BabbageProtocolParameters = Omit<AlonzoProtocolParams, 'coinsPerUtxoWord' | 'extraEntropy'> &
   NewProtocolParamsInBabbage;
 
-export type ProtocolParameters = BabbageProtocolParameters;
+// Voting thresholds
+export interface PoolVotingThresholds {
+  motionNoConfidence: Fraction;
+  committeeNormal: Fraction;
+  commiteeNoConfidence: Fraction;
+  hardForkInitiation: Fraction;
+}
+
+export interface DelegateRepresentativeThresholds extends PoolVotingThresholds {
+  updateConstitution: Fraction;
+  ppNetworkGroup: Fraction;
+  ppEconomicGroup: Fraction;
+  ppTechnicalGroup: Fraction;
+  ppGovernanceGroup: Fraction;
+  treasuryWithdrawal: Fraction;
+}
+
+type NewProtocolParamsInConway = {
+  poolVotingThresholds: PoolVotingThresholds;
+  dRepVotingThresholds: DelegateRepresentativeThresholds;
+  minCommitteeSize: number;
+  committeeTermLimit: number;
+  governanceActionValidityPeriod: EpochNo;
+  governanceActionDeposit: number;
+  dRepDeposit: number;
+  dRepInactivityPeriod: EpochNo;
+};
+
+type ConwayProtocolParameters = BabbageProtocolParameters & NewProtocolParamsInConway;
+
+export type ProtocolParameters = ConwayProtocolParameters;
 
 // Even tho extraEntropy was deprecated on babbage era, it is still present in the ProtocolParametersUpdate structure
 // since this structure is backward compatible with all eras.

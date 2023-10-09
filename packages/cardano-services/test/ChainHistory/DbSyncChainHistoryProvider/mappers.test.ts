@@ -26,7 +26,6 @@ import {
 } from '../../../src/ChainHistory/DbSyncChainHistory/types';
 import { Cardano } from '@cardano-sdk/core';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
-import { HexBlob } from '@cardano-sdk/util';
 
 const blockHash = '7a48b034645f51743550bbaf81f8a14771e58856e031eb63844738ca8ad72298';
 const poolId = 'pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh';
@@ -291,7 +290,7 @@ describe('chain history mappers', () => {
     test('map RedeemerModel to Cardano.Redeemer', () => {
       const result = mappers.mapRedeemer(redeemerModel);
       expect(result).toEqual<Cardano.Redeemer>({
-        data: HexBlob(hash28ByteBase16),
+        data: Buffer.from('not implemented'),
         executionUnits: {
           memory: 2000,
           steps: 5000
@@ -310,7 +309,7 @@ describe('chain history mappers', () => {
     ];
     const redeemers: Cardano.Redeemer[] = [
       {
-        data: HexBlob(hash28ByteBase16),
+        data: Buffer.from('not implemented'),
         executionUnits: { memory: 1, steps: 2 },
         index: 1,
         purpose: Cardano.RedeemerPurpose.spend

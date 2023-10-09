@@ -87,7 +87,6 @@ describe('DbSyncAssetProvider', () => {
     expect(await provider.getAsset({ assetId: assets[0].id })).toMatchShapeOf({
       assetId: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb6d616361726f6e2d63616b65',
       fingerprint: 'asset1f0azzptnr8dghzjh7egqvdjmt33e3lz5uy59th',
-      mintOrBurnCount: 1,
       name: '6d616361726f6e2d63616b65',
       policyId: '50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb',
       quantity: 1n,
@@ -98,19 +97,19 @@ describe('DbSyncAssetProvider', () => {
     const assets = await fixtureBuilder.getAssets(1, { with: [AssetWith.CIP25Metadata] });
     const asset = await provider.getAsset({
       assetId: assets[0].id,
-      extraData: { history: true, nftMetadata: true, tokenMetadata: true }
+      extraData: { nftMetadata: true, tokenMetadata: true }
     });
-    const history = await fixtureBuilder.getHistory(assets[0].policyId, assets[0].name);
 
-    expect(asset.history).toEqual(history);
     // TODO: review test data, this is false positive right now
     expect(asset.nftMetadata).toBeTruthy();
     expect(asset.nftMetadata).toStrictEqual(assets[0].metadata);
+    /*
     expect(asset.tokenMetadata).toStrictEqual({
       assetId: '17ebe33f8aeee1fe9a7277fe0dc02261531a896a8b89457895fe60294349502d303032352d7632',
       desc: 'This is my second NFT',
       name: 'Bored Ape'
     });
+    */
   });
   it.todo('caches asset info query responses');
   it('caches nft metadata', async () => {

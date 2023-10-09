@@ -37,11 +37,13 @@ export class StakeDelegation {
 
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // stake_delegation = (2, stake_credential, pool_keyhash)
     writer.writeStartArray(EMBEDDED_GROUP_SIZE);
 
     writer.writeInt(CertificateKind.StakeDelegation);
 
+    // CDDL
     // stake_credential =
     //   [  0, addr_keyhash
     //   // 1, scripthash

@@ -1,1 +1,1 @@
-export * from './bytesToHex';
+export * from './encoding';

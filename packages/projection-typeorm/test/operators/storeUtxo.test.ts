@@ -2,6 +2,7 @@ import {
   AssetEntity,
   BlockDataEntity,
   BlockEntity,
+  NftMetadataEntity,
   OutputEntity,
   TokensEntity,
   TypeormStabilityWindowBuffer,
@@ -23,7 +24,7 @@ describe('storeUtxo', () => {
   const stubEvents = chainSyncData(ChainSyncDataSet.WithMint);
   let queryRunner: QueryRunner;
   let buffer: TypeormStabilityWindowBuffer;
-  const entities = [BlockEntity, BlockDataEntity, AssetEntity, TokensEntity, OutputEntity];
+  const entities = [BlockEntity, BlockDataEntity, AssetEntity, NftMetadataEntity, TokensEntity, OutputEntity];
 
   const project$ = () =>
     Bootstrap.fromCardanoNode({ blocksBufferLength: 10, buffer, cardanoNode: stubEvents.cardanoNode, logger }).pipe(
@@ -53,6 +54,12 @@ describe('storeUtxo', () => {
   afterEach(async () => {
     await queryRunner.release();
     buffer.shutdown();
+  });
+
+  it('hydrates event object with storedProducedUtxo map', async () => {
+    const evt = await projectTilFirst(({ utxo }) => utxo.produced.length > 0);
+    expect(evt.storedProducedUtxo.size).toEqual(evt.utxo.produced.length);
+    expect(evt.storedProducedUtxo.get(evt.utxo.produced[0])).toBeTruthy();
   });
 
   it('inserts outputs, deletes when block is rolled back, updates output "consumed" column when spent', async () => {

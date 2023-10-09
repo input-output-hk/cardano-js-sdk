@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.15.0...@cardano-sdk/web-extension@0.16.0) (2023-09-29)
+
+### ⚠ BREAKING CHANGES
+
+* - replace `ObservableWallet.activePublicStakeKeys$` with
+`publicStakeKeys$` that emits `PubStakeKeyAndStatus[]`
+
+### Features
+
+* cip-95 update calls to get public stake keys ([b1039b4](https://github.com/input-output-hk/cardano-js-sdk/commit/b1039b4b32e74075c1833eb1d0bdaac06368e9b8))
+
+## [0.15.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.14.7...@cardano-sdk/web-extension@0.15.0) (2023-09-20)
+
+### ⚠ BREAKING CHANGES
+
+* delegation distribution portfolio is now persisted on chain and taken into account during change distribution
+
+### Features
+
+* delegation distribution portfolio is now persisted on chain and taken into account during change distribution ([7573938](https://github.com/input-output-hk/cardano-js-sdk/commit/75739385ea422a0621ded87f2b72c5878e3fcf81))
+
+## [0.14.7](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.14.6...@cardano-sdk/web-extension@0.14.7) (2023-09-12)
+
+### Features
+
+* **wallet:** active public stake keys tracker support for cip95 ([3b8c73d](https://github.com/input-output-hk/cardano-js-sdk/commit/3b8c73d8ab771716da476f7869502a3ec6905c25))
+
 ## [0.14.6](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/web-extension@0.14.5...@cardano-sdk/web-extension@0.14.6) (2023-08-29)
 
 ### Features

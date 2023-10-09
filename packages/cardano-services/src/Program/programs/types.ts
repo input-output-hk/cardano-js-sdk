@@ -1,9 +1,12 @@
-import { CommonProgramOptions } from '../options/common';
+import {
+  CommonProgramOptions,
+  OgmiosProgramOptions,
+  PosgresProgramOptions,
+  RabbitMqProgramOptions,
+  StakePoolMetadataProgramOptions
+} from '../options';
 import { HandlePolicyIdsProgramOptions } from '../options/policyIds';
 import { Milliseconds, Seconds } from '@cardano-sdk/core';
-import { OgmiosProgramOptions } from '../options/ogmios';
-import { PosgresProgramOptions } from '../options/postgres';
-import { RabbitMqProgramOptions } from '../options/rabbitMq';
 
 /**
  * cardano-services programs
@@ -56,7 +59,8 @@ export enum ProviderServerOptionDescriptions {
   UseKoraLabsProvider = 'Use the KoraLabs handle provider',
   UseQueue = 'Enables RabbitMQ',
   PaginationPageSizeLimit = 'Pagination page size limit shared across all providers',
-  HandleProviderServerUrl = 'URL for the Handle provider server'
+  HandleProviderServerUrl = 'URL for the Handle provider server',
+  UseTypeormAssetProvider = 'Use the TypeORM Asset Provider (default is db-sync)'
 }
 
 export type ProviderServerArgs = CommonProgramOptions &
@@ -65,7 +69,8 @@ export type ProviderServerArgs = CommonProgramOptions &
   PosgresProgramOptions<'StakePool'> &
   OgmiosProgramOptions &
   HandlePolicyIdsProgramOptions &
-  RabbitMqProgramOptions & {
+  RabbitMqProgramOptions &
+  StakePoolMetadataProgramOptions & {
     allowedOrigins?: string[];
     cardanoNodeConfigPath?: string;
     disableDbCache?: boolean;
@@ -79,6 +84,7 @@ export type ProviderServerArgs = CommonProgramOptions &
     dbCacheTtl: Seconds | 0;
     useBlockfrost?: boolean;
     useKoraLabs?: boolean;
+    useTypeormAssetProvider?: boolean;
     useQueue?: boolean;
     useTypeormStakePoolProvider?: boolean;
     paginationPageSizeLimit?: number;

@@ -1,9 +1,9 @@
 {
   "name": "@cardano-sdk/key-management",
-  "version": "0.10.2",
+  "version": "0.12.0",
   "description": "Key management types and utilities for Cardano",
   "engines": {
-    "node": ">=16.20.1"
+    "node": ">=16.20.2"
   },
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -38,7 +38,6 @@
     "prepack": "yarn build"
   },
   "devDependencies": {
-    "@cardano-sdk/util-dev": "workspace:~",
     "@types/lodash": "^4.14.182",
     "@types/pbkdf2": "^3.1.0",
     "eslint": "^7.32.0",

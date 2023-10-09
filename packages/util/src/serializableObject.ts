@@ -104,7 +104,7 @@ const fromSerializableObjectUnknown = (obj: unknown, options: FromSerializableOb
       case 'bigint':
         return BigInt(docAsAny.value);
       case 'Buffer':
-        return Buffer.from(docAsAny.value, 'hex');
+        return new Uint8Array(Buffer.from(docAsAny.value, 'hex'));
       case 'Date':
         return new Date(docAsAny.value);
       case 'Set':

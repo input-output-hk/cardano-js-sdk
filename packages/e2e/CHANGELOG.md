@@ -3,6 +3,61 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.22.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.21.0...@cardano-sdk/e2e@0.22.0) (2023-09-29)
+
+### ⚠ BREAKING CHANGES
+
+* **cardano-services:** StakePoolHttpService interface changed
+* - replace `ObservableWallet.activePublicStakeKeys$` with
+`publicStakeKeys$` that emits `PubStakeKeyAndStatus[]`
+
+### Features
+
+* **cardano-services:** added optional metadata fetch feature from SMASH server ([54a4f5e](https://github.com/input-output-hk/cardano-js-sdk/commit/54a4f5e7eab08f7c06802782e2da62d1406bdf1b))
+* cip-95 update calls to get public stake keys ([b1039b4](https://github.com/input-output-hk/cardano-js-sdk/commit/b1039b4b32e74075c1833eb1d0bdaac06368e9b8))
+
+## [0.21.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.20.0...@cardano-sdk/e2e@0.21.0) (2023-09-20)
+
+### ⚠ BREAKING CHANGES
+
+* delegation distribution portfolio is now persisted on chain and taken into account during change distribution
+* remove the CML serialization code from core package
+* remove AssetInfo.history and AssetInfo.mintOrBurnCount
+* incompatible with previous revisions of cardano-services
+- rename utxo and transactions PouchDB stores
+- update type of Tx.witness.redeemers
+- update type of Tx.witness.datums
+- update type of TxOut.datum
+- remove Cardano.Datum type
+
+fix(cardano-services): correct chain history openApi endpoints path url to match version
+
+### Features
+
+* add getExtensions() to CIP-30 wallet API ([944e0ce](https://github.com/input-output-hk/cardano-js-sdk/commit/944e0cea55bcd8c91e1888e708e717adc7b1ea4b))
+* add NFT metadata projection ([91fe7df](https://github.com/input-output-hk/cardano-js-sdk/commit/91fe7df50a37bce2ac8cba350fafe788a8174112))
+* add support for signing data with a DRepID in CIP-95 API ([3057cce](https://github.com/input-output-hk/cardano-js-sdk/commit/3057cce6ac1585d6ae2a62a89d0417e5fb2416f4))
+* delegation distribution portfolio is now persisted on chain and taken into account during change distribution ([7573938](https://github.com/input-output-hk/cardano-js-sdk/commit/75739385ea422a0621ded87f2b72c5878e3fcf81))
+* **e2e:** hoist handle minting utils to src ([e49f3fd](https://github.com/input-output-hk/cardano-js-sdk/commit/e49f3fd28b29ff398acb4e2386124e25a570918a))
+* remove the CML serialization code from core package ([62f4252](https://github.com/input-output-hk/cardano-js-sdk/commit/62f4252b094938db05b81c928c03c1eecec2be55))
+* update core types with deserialized PlutusData ([d8cc93b](https://github.com/input-output-hk/cardano-js-sdk/commit/d8cc93b520177c98224502aad39109a0cb524f3c))
+
+### Code Refactoring
+
+* remove AssetInfo.history and AssetInfo.mintOrBurnCount ([4c0a7ee](https://github.com/input-output-hk/cardano-js-sdk/commit/4c0a7ee77d9ffcf5583fc922597475c4025be17b))
+
+## [0.20.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.19.3...@cardano-sdk/e2e@0.20.0) (2023-09-12)
+
+### ⚠ BREAKING CHANGES
+
+* include API version in HTTP service URL scheme
+
+### Features
+
+* added Ed25519 EdDSA signature scheme to crypto package based on ([e97d58e](https://github.com/input-output-hk/cardano-js-sdk/commit/e97d58ed1d02feaefd90108cf683f83adba02e19))
+* include API version in HTTP service URL scheme ([3c10d33](https://github.com/input-output-hk/cardano-js-sdk/commit/3c10d33c28f172f4e9659d7bd26a5b4afbc62efc))
+* **wallet:** active public stake keys tracker support for cip95 ([3b8c73d](https://github.com/input-output-hk/cardano-js-sdk/commit/3b8c73d8ab771716da476f7869502a3ec6905c25))
+
 ## [0.19.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.19.2...@cardano-sdk/e2e@0.19.3) (2023-08-29)
 
 ### Features

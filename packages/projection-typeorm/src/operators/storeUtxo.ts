@@ -1,12 +1,21 @@
-import { ChainSyncEventType } from '@cardano-sdk/core';
+import { Cardano, ChainSyncEventType, Serialization } from '@cardano-sdk/core';
 import { Mappers } from '@cardano-sdk/projection';
+import { ObjectLiteral } from 'typeorm';
 import { OutputEntity, TokensEntity } from '../entity';
 import { typeormOperator } from './util';
 
-export const storeUtxo = typeormOperator<Mappers.WithUtxo>(
+const serializeDatumIfExists = (datum: Cardano.PlutusData | undefined) =>
+  datum ? Serialization.PlutusData.fromCore(datum).toCbor() : undefined;
+
+export interface WithStoredProducedUtxo {
+  storedProducedUtxo: Map<Mappers.ProducedUtxo, ObjectLiteral>;
+}
+
+export const storeUtxo = typeormOperator<Mappers.WithUtxo, WithStoredProducedUtxo>(
   async ({ utxo: { consumed, produced }, block: { header }, eventType, queryRunner }) => {
     const utxoRepository = queryRunner.manager.getRepository(OutputEntity);
     const tokensRepository = queryRunner.manager.getRepository(TokensEntity);
+    const storedProducedUtxo = new Map<Mappers.ProducedUtxo, ObjectLiteral>();
     if (eventType === ChainSyncEventType.RollForward) {
       if (produced.length > 0) {
         const { identifiers } = await utxoRepository.insert(
@@ -15,7 +24,7 @@ export const storeUtxo = typeormOperator<Mappers.WithUtxo>(
               address,
               block: { slot: header.slot },
               coins: value.coins,
-              datum,
+              datum: serializeDatumIfExists(datum),
               datumHash,
               outputIndex: index,
               scriptReference,
@@ -23,6 +32,9 @@ export const storeUtxo = typeormOperator<Mappers.WithUtxo>(
             })
           )
         );
+        for (const [idx, identifier] of identifiers.entries()) {
+          storedProducedUtxo.set(produced[idx], identifier);
+        }
         const tokens = produced.flatMap(
           (
             [
@@ -54,5 +66,7 @@ export const storeUtxo = typeormOperator<Mappers.WithUtxo>(
         await utxoRepository.update({ outputIndex: index, txId }, { consumedAtSlot: null });
       }
     }
+
+    return { storedProducedUtxo };
   }
 );

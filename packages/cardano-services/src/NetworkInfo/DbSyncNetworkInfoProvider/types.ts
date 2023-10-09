@@ -23,6 +23,7 @@ export interface EpochModel {
 export interface CostModelsParamModel {
   PlutusV1?: Cardano.CostModel;
   PlutusV2?: Cardano.CostModel;
+  PlutusV3?: Cardano.CostModel;
 }
 
 export interface ProtocolParamsModel {
@@ -53,4 +54,12 @@ export interface ProtocolParamsModel {
   max_block_ex_steps: string;
   max_epoch: number;
   costs: CostModelsParamModel | null;
+  pool_voting_thresholds: Cardano.PoolVotingThresholds;
+  drep_voting_thresholds: Cardano.DelegateRepresentativeThresholds;
+  min_committee_size: number;
+  committee_term_limit: number;
+  governance_action_validity_period: number;
+  governance_action_deposit: number;
+  drep_deposit: number;
+  drep_inactivity_period: number;
 }

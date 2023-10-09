@@ -48,6 +48,7 @@ export class GenesisKeyDelegation {
 
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // genesis_key_delegation = (5, genesishash, genesis_delegate_hash, vrf_keyhash)
     writer.writeStartArray(EMBEDDED_GROUP_SIZE);
 

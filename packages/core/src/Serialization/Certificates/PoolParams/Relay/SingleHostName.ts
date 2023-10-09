@@ -42,6 +42,7 @@ export class SingleHostName {
 
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // single_host_name = ( 1
     //                    , port / null
     //                    , dns_name ; An A or AAAA DNS record

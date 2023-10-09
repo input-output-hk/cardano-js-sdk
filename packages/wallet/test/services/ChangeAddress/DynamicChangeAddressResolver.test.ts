@@ -1,5 +1,5 @@
 import { Cardano } from '@cardano-sdk/core';
-import { DelegatedStake, DynamicChangeAddressResolver } from '../../../src';
+import { DelegatedStake, DynamicChangeAddressResolver, delegationMatchesPortfolio } from '../../../src';
 import { InvalidStateError, Percent } from '@cardano-sdk/util';
 import {
   address_0_0,
@@ -22,14 +22,88 @@ import {
   poolId2,
   poolId3,
   poolId4,
+  rewardAccount_0,
   rewardAccount_1,
   rewardAccount_2,
   rewardAccount_3
 } from './testData';
 import { logger } from '@cardano-sdk/util-dev';
 
+describe('delegationMatchesPortfolio', () => {
+  const poolIds: Cardano.PoolId[] = [
+    Cardano.PoolId('pool1zuevzm3xlrhmwjw87ec38mzs02tlkwec9wxpgafcaykmwg7efhh'),
+    Cardano.PoolId('pool1t9xlrjyk76c96jltaspgwcnulq6pdkmhnge8xgza8ku7qvpsy9r'),
+    Cardano.PoolId('pool1la4ghj4w4f8p4yk4qmx0qvqmzv6592ee9rs0vgla5w6lc2nc8w5')
+  ];
+
+  const delegation1: DelegatedStake[] = [
+    {
+      pool: {
+        hexId: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[0])),
+        status: Cardano.StakePoolStatus.Active
+      }
+    } as unknown as DelegatedStake,
+    {
+      pool: {
+        hexId: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[1])),
+        status: Cardano.StakePoolStatus.Active
+      },
+      rewardAccounts: []
+    } as unknown as DelegatedStake,
+    {
+      pool: {
+        hexId: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[2])),
+        status: Cardano.StakePoolStatus.Active
+      },
+      rewardAccounts: []
+    } as unknown as DelegatedStake
+  ];
+
+  const delegation2: DelegatedStake[] = [
+    {
+      pool: {
+        hexId: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[0])),
+        status: Cardano.StakePoolStatus.Active
+      }
+    } as unknown as DelegatedStake,
+    {
+      pool: {
+        hexId: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[1])),
+        status: Cardano.StakePoolStatus.Active
+      },
+      rewardAccounts: []
+    } as unknown as DelegatedStake
+  ];
+
+  const portfolio = {
+    name: 'Portfolio',
+    pools: [
+      {
+        id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[0])),
+        weight: 1
+      },
+      {
+        id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[1])),
+        weight: 1
+      },
+      {
+        id: Cardano.PoolIdHex(Cardano.PoolId.toKeyHash(poolIds[2])),
+        weight: 1
+      }
+    ]
+  };
+
+  it('returns true if portfolio matches current delegation', () => {
+    expect(delegationMatchesPortfolio(portfolio, delegation1)).toBeTruthy();
+  });
+
+  it('returns false if portfolio doesnt matches current delegation', () => {
+    expect(delegationMatchesPortfolio(portfolio, delegation2)).toBeFalsy();
+  });
+});
+
 describe('DynamicChangeAddressResolver', () => {
-  it('resolves to the first address in the knownAddresses if no portfolio is given', async () => {
+  it('assigns ownership of all change outputs to the address containing the stake credential, if delegating to one pool', async () => {
     const changeAddressResolver = new DynamicChangeAddressResolver(
       knownAddresses$,
       createMockDelegateTracker(
@@ -39,7 +113,7 @@ describe('DynamicChangeAddressResolver', () => {
             {
               percentage: Percent(0),
               pool: pool1,
-              rewardAccounts: [],
+              rewardAccounts: [rewardAccount_3],
               stake: 0n
             }
           ]
@@ -57,11 +131,11 @@ describe('DynamicChangeAddressResolver', () => {
         },
         {
           address: '_' as Cardano.PaymentAddress,
-          value: { coins: 20n }
+          value: { coins: 10n }
         },
         {
           address: '_' as Cardano.PaymentAddress,
-          value: { coins: 30n }
+          value: { coins: 10n }
         }
       ],
       fee: 0n,
@@ -70,10 +144,115 @@ describe('DynamicChangeAddressResolver', () => {
     };
 
     const updatedChange = await changeAddressResolver.resolve(selection);
+
+    expect(updatedChange).toEqual([
+      { address: address_0_3, value: { coins: 10n } },
+      { address: address_0_3, value: { coins: 10n } },
+      { address: address_0_3, value: { coins: 10n } }
+    ]);
+  });
+
+  it('adds all change outputs at payment_stake address 0 if the wallet is currently not delegating to any pool', async () => {
+    const changeAddressResolver = new DynamicChangeAddressResolver(
+      knownAddresses$,
+      createMockDelegateTracker(new Map<Cardano.PoolId, DelegatedStake>([])).distribution$,
+      getNullDelegationPortfolio,
+      logger
+    );
+
+    const selection = {
+      change: [
+        {
+          address: '_' as Cardano.PaymentAddress,
+          value: { coins: 10n }
+        },
+        {
+          address: '_' as Cardano.PaymentAddress,
+          value: { coins: 10n }
+        },
+        {
+          address: '_' as Cardano.PaymentAddress,
+          value: { coins: 10n }
+        }
+      ],
+      fee: 0n,
+      inputs: new Set<Cardano.Utxo>(),
+      outputs: new Set<Cardano.TxOut>()
+    };
+
+    const updatedChange = await changeAddressResolver.resolve(selection);
+
     expect(updatedChange).toEqual([
       { address: address_0_0, value: { coins: 10n } },
-      { address: address_0_0, value: { coins: 20n } },
-      { address: address_0_0, value: { coins: 30n } }
+      { address: address_0_0, value: { coins: 10n } },
+      { address: address_0_0, value: { coins: 10n } }
+    ]);
+  });
+
+  it('distributes change equally between the currently delegated addresses if no portfolio is given, ', async () => {
+    const changeAddressResolver = new DynamicChangeAddressResolver(
+      knownAddresses$,
+      createMockDelegateTracker(
+        new Map<Cardano.PoolId, DelegatedStake>([
+          [
+            poolId1,
+            {
+              percentage: Percent(0),
+              pool: pool1,
+              rewardAccounts: [rewardAccount_1],
+              stake: 0n
+            }
+          ],
+          [
+            poolId2,
+            {
+              percentage: Percent(0),
+              pool: pool2,
+              rewardAccounts: [rewardAccount_2],
+              stake: 0n
+            }
+          ],
+          [
+            poolId3,
+            {
+              percentage: Percent(0),
+              pool: pool2,
+              rewardAccounts: [rewardAccount_3],
+              stake: 0n
+            }
+          ]
+        ])
+      ).distribution$,
+      getNullDelegationPortfolio,
+      logger
+    );
+
+    const selection = {
+      change: [
+        {
+          address: '_' as Cardano.PaymentAddress,
+          value: { coins: 10n }
+        },
+        {
+          address: '_' as Cardano.PaymentAddress,
+          value: { coins: 10n }
+        },
+        {
+          address: '_' as Cardano.PaymentAddress,
+          value: { coins: 10n }
+        }
+      ],
+      fee: 0n,
+      inputs: new Set<Cardano.Utxo>(),
+      outputs: new Set<Cardano.TxOut>()
+    };
+
+    const updatedChange = await changeAddressResolver.resolve(selection);
+
+    expect(updatedChange).toEqual([
+      { address: address_0_3, value: { coins: 10n } },
+      { address: address_0_2, value: { coins: 10n } },
+      { address: address_0_1, value: { coins: 10n } }
     ]);
   });
 
@@ -122,7 +301,7 @@ describe('DynamicChangeAddressResolver', () => {
     );
   });
 
-  it('resolves to the first address in the knownAddresses if portfolio doesnt match current delegation', async () => {
+  it('distributes change equally between the currently delegated addresses if portfolio doesnt match current delegation', async () => {
     const changeAddressResolver = new DynamicChangeAddressResolver(
       knownAddresses$,
       createMockDelegateTracker(
@@ -132,7 +311,7 @@ describe('DynamicChangeAddressResolver', () => {
             {
               percentage: Percent(0),
               pool: pool1,
-              rewardAccounts: [],
+              rewardAccounts: [rewardAccount_0],
               stake: 0n
             }
           ],
@@ -141,7 +320,7 @@ describe('DynamicChangeAddressResolver', () => {
             {
               percentage: Percent(0),
               pool: pool2,
-              rewardAccounts: [],
+              rewardAccounts: [rewardAccount_1],
               stake: 0n
             }
           ]
@@ -165,6 +344,10 @@ describe('DynamicChangeAddressResolver', () => {
         {
           address: '_' as Cardano.PaymentAddress,
           value: { coins: 10n }
+        },
+        {
+          address: '_' as Cardano.PaymentAddress,
+          value: { coins: 10n }
         }
       ],
       fee: 0n,
@@ -173,7 +356,10 @@ describe('DynamicChangeAddressResolver', () => {
     };
 
     const updatedChange = await changeAddressResolver.resolve(selection);
-    expect(updatedChange).toEqual([{ address: address_0_0, value: { coins: 10n } }]);
+    expect(updatedChange).toEqual([
+      { address: address_0_1, value: { coins: 10n } },
+      { address: address_0_0, value: { coins: 10n } }
+    ]);
   });
 
   it('delegates to a single reward account', async () => {

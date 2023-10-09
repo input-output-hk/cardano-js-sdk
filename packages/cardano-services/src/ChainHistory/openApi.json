@@ -6,13 +6,13 @@
       "name": "Apache 2.0",
       "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "version": "1.0.0"
+    "version": "2.0.0"
   },
   "paths": {
-    "/v1.0.0/chain-history/health": {
+    "/v2.0.0/chain-history/health": {
       "$ref": "../Http/schema.json#/paths/Health"
     },
-    "/v1.0.0/chain-history/blocks/by-hashes": {
+    "/v2.0.0/chain-history/blocks/by-hashes": {
       "post": {
         "summary": "block history by hashes",
         "operationId": "blocksByHashes",
@@ -50,7 +50,7 @@
         }
       }
     },
-    "/v1.0.0/chain-history/txs/by-hashes": {
+    "/v2.0.0/chain-history/txs/by-hashes": {
       "post": {
         "summary": "transaction history by hashes",
         "operationId": "transactionsByHashes",
@@ -88,7 +88,7 @@
         }
       }
     },
-    "/v1.0.0/chain-history/txs/by-addresses": {
+    "/v2.0.0/chain-history/txs/by-addresses": {
       "post": {
         "summary": "transaction history by addresses",
         "operationId": "transactionsByAddresses",
@@ -365,7 +365,7 @@
             ]
           },
           "data": {
-            "type": "string"
+            "type": "object"
           }
         }
       },

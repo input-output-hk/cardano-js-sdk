@@ -9,9 +9,9 @@ import { DataSource } from 'typeorm';
 import { Observable, firstValueFrom } from 'rxjs';
 import { PgBossHttpService, pgBossEntities } from '../../../src/Program/services/pgboss';
 import { Pool } from 'pg';
+import { StakePoolMetadataFetchMode } from '../../../src/Program/options';
 import { WorkerHandlerFactoryOptions } from '../../../src/PgBoss';
-import { createObservableDataSource } from '../../../src';
-import { getConnectionConfig, getPool } from '../../../src/Program/services/postgres';
+import { createObservableDataSource, getConnectionConfig, getPool } from '../../../src';
 import { logger } from '@cardano-sdk/util-dev';
 
 const dnsResolver = () => Promise.resolve({ name: 'localhost', port: 5433, priority: 6, weight: 5 });
@@ -110,7 +110,13 @@ describe('PgBossHttpService', () => {
 
   it('health check is ok after start with a valid db connection', async () => {
     service = new PgBossHttpService(
-      { apiUrl: new URL('http://unused/'), parallelJobs: 3, queues: [] },
+      {
+        apiUrl: new URL('http://unused/'),
+        metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
+        parallelJobs: 3,
+        queues: []
+      },
+
       { connectionConfig$, db, logger }
     );
     expect(await service.healthCheck()).toEqual({ ok: false, reason: 'PgBossHttpService not started' });
@@ -137,7 +143,12 @@ describe('PgBossHttpService', () => {
     });
 
     service = new PgBossHttpService(
-      { apiUrl: new URL('http://unused/'), parallelJobs: 3, queues: [STAKE_POOL_METADATA_QUEUE] },
+      {
+        apiUrl: new URL('http://unused/'),
+        metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
+        parallelJobs: 3,
+        queues: [STAKE_POOL_METADATA_QUEUE]
+      },
       { connectionConfig$: config$, db, logger }
     );
     await service.initialize();

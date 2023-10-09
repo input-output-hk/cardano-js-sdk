@@ -1,4 +1,5 @@
 import { Address, AddressType } from './Address';
+import { DRepID } from './DRepID';
 import {
   HexBlob,
   InvalidStringError,
@@ -37,7 +38,7 @@ const isRewardAccount = (address: string) => {
  */
 export const PaymentAddress = (value: string): PaymentAddress => {
   if (Address.isValid(value)) {
-    if (isRewardAccount(value)) {
+    if (isRewardAccount(value) || DRepID.isValid(value)) {
       throw new InvalidStringError(value, 'Address type can only be used for payment addresses');
     }
     return value as unknown as PaymentAddress;
@@ -87,7 +88,7 @@ export interface InputResolver {
  * @param address The address to get the network id from.
  * @returns The network ID.
  */
-export const addressNetworkId = (address: RewardAccount | PaymentAddress): NetworkId => {
+export const addressNetworkId = (address: RewardAccount | PaymentAddress | DRepID): NetworkId => {
   const addr = Address.fromString(address);
   return addr!.getNetworkId();
 };

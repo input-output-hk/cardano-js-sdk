@@ -4,9 +4,11 @@ import { ProjectionOperator } from '../../types';
 import { map } from 'rxjs';
 import { unifiedProjectorOperator } from '../utils';
 
+export type ProducedUtxo = [Cardano.TxIn, Cardano.TxOut];
+
 export interface WithUtxo {
   utxo: {
-    produced: Array<[Cardano.TxIn, Cardano.TxOut]>;
+    produced: Array<ProducedUtxo>;
     /**
      * Refers to `compactUtxoId` of a previously produced utxo
      */

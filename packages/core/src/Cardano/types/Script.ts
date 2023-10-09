@@ -203,21 +203,17 @@ export enum PlutusLanguageVersion {
    *  - Inline datums in the transaction (proposed in CIP-32)
    *  - Reference scripts in the transaction (proposed in CIP-33)
    */
-  V2 = 1
+  V2 = 1,
+
+  /**
+   * V3 was introduced in the Conway hard fork.
+   *
+   * The main changes in V3 of Plutus introduce:
+   *
+   * - The value of costmdls map at key 2 is encoded as a definite length list.
+   */
+  V3 = 2
 }
-
-/**
- * Datum hash, this allows to specify a Datum without publicly revealing its value. To spend an output which specifies
- * this type of datum, the actual Datum value must be provided and will be added to the witness set of
- * the transaction.
- */
-export type DatumHash = Crypto.Hash32ByteBase16;
-
-/**
- * The datum is a piece of information that can be associated with a UTXO and is used to carry script state information
- * such as its owner or the timing details (which define when the UTXO can be spent)
- */
-export type Datum = HexBlob;
 
 /**
  * Plutus scripts are pieces of code that implement pure functions with True or False outputs. These functions take

@@ -1,5 +1,5 @@
 import * as Crypto from '@cardano-sdk/crypto';
-import { Cardano, HandleProvider, HandleResolution } from '@cardano-sdk/core';
+import { Cardano, HandleProvider, HandleResolution, metadatum } from '@cardano-sdk/core';
 import { GreedyInputSelector, SelectionSkeleton } from '@cardano-sdk/input-selection';
 import { GroupedAddress, SignTransactionOptions, TransactionSigner, util } from '@cardano-sdk/key-management';
 import {
@@ -67,10 +67,10 @@ class LazyTxSigner implements UnsignedTx {
   async inspect(): Promise<TxInspection> {
     const {
       tx,
-      ctx: { ownAddresses, auxiliaryData, handles },
+      ctx: { ownAddresses, auxiliaryData, handleResolutions },
       inputSelection
     } = await this.#build();
-    return { ...tx, auxiliaryData, handles, inputSelection, ownAddresses };
+    return { ...tx, auxiliaryData, handleResolutions, inputSelection, ownAddresses };
   }
 
   async sign(): Promise<SignedTx> {
@@ -89,7 +89,7 @@ export class GenericTxBuilder implements TxBuilder {
   #requestedPortfolio?: TxBuilderStakePool[];
   #logger: Logger;
   #handleProvider?: HandleProvider;
-  #handles: HandleResolution[];
+  #handleResolutions: HandleResolution[];
 
   constructor(dependencies: TxBuilderDependencies) {
     this.#outputValidator =
@@ -105,7 +105,7 @@ export class GenericTxBuilder implements TxBuilder {
     };
     this.#logger = dependencies.logger;
     this.#handleProvider = dependencies.handleProvider;
-    this.#handles = [];
+    this.#handleResolutions = [];
   }
 
   async inspect(): Promise<PartialTx> {
@@ -118,16 +118,16 @@ export class GenericTxBuilder implements TxBuilder {
   }
 
   addOutput(txOut: OutputBuilderTxOut): TxBuilder {
-    if (txOut.handle) {
-      this.#handles = [...this.#handles, txOut.handle];
+    if (txOut.handleResolution) {
+      this.#handleResolutions = [...this.#handleResolutions, txOut.handleResolution];
     }
-    const txOutNoHandle = omit(txOut, 'handle');
+    const txOutNoHandle = omit(txOut, ['handle', 'handleResolution']);
     this.partialTxBody = { ...this.partialTxBody, outputs: [...(this.partialTxBody.outputs || []), txOutNoHandle] };
     return this;
   }
 
   removeOutput(txOut: OutputBuilderTxOut): TxBuilder {
-    this.#handles = this.#handles.filter((handle) => handle !== txOut.handle);
+    this.#handleResolutions = this.#handleResolutions.filter((hndRes) => hndRes.handle !== txOut.handle);
     this.partialTxBody = {
       ...this.partialTxBody,
       outputs: this.partialTxBody.outputs?.filter((output) => !deepEquals(output, txOut))
@@ -144,7 +144,7 @@ export class GenericTxBuilder implements TxBuilder {
     });
   }
 
-  delegatePortfolio(portfolio: Pick<Cardano.Cip17DelegationPortfolio, 'pools'> | null): TxBuilder {
+  delegatePortfolio(portfolio: Cardano.Cip17DelegationPortfolio | null): TxBuilder {
     if (portfolio?.pools.length === 0) {
       throw new Error('Portfolio should define at least one delegation pool.');
     }
@@ -152,6 +152,23 @@ export class GenericTxBuilder implements TxBuilder {
       ...pool,
       id: Cardano.PoolId.fromKeyHash(pool.id as unknown as Crypto.Ed25519KeyHashHex)
     }));
+
+    if (portfolio) {
+      if (this.partialAuxiliaryData?.blob) {
+        this.partialAuxiliaryData.blob.set(
+          Cardano.DelegationMetadataLabel,
+          metadatum.jsonToMetadatum(Cardano.portfolioMetadataFromCip17(portfolio))
+        );
+      } else {
+        this.partialAuxiliaryData = {
+          ...this.partialAuxiliaryData,
+          blob: new Map([
+            [Cardano.DelegationMetadataLabel, metadatum.jsonToMetadatum(Cardano.portfolioMetadataFromCip17(portfolio))]
+          ])
+        };
+      }
+    }
+
     return this;
   }
 
@@ -215,7 +232,7 @@ export class GenericTxBuilder implements TxBuilder {
               {
                 auxiliaryData,
                 certificates: this.partialTxBody.certificates,
-                handles: this.#handles,
+                handleResolutions: this.#handleResolutions,
                 outputs: new Set(this.partialTxBody.outputs || []),
                 signingOptions,
                 witness: { extraSigners }
@@ -225,7 +242,7 @@ export class GenericTxBuilder implements TxBuilder {
             return {
               ctx: {
                 auxiliaryData,
-                handles: this.#handles,
+                handleResolutions: this.#handleResolutions,
                 ownAddresses,
                 signingOptions,
                 witness: { extraSigners }

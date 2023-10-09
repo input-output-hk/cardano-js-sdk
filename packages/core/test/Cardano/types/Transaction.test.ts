@@ -1,7 +1,7 @@
 import { Cardano, TxBodyCBOR, TxCBOR } from '../../../';
 import { Ed25519SignatureHex } from '@cardano-sdk/crypto';
 import { HexBlob, InvalidStringError } from '@cardano-sdk/util';
-import { babbageTx } from '../../CML/testData';
+import { babbageTx } from '../../CBOR/testData';
 
 describe('Cardano/types/Transaction', () => {
   describe('TransactionId', () => {

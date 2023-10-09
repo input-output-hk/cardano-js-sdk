@@ -33,6 +33,7 @@ export class ScriptAll {
 
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // script_all = (1, [ * native_script ])
     writer.writeStartArray(EMBEDDED_GROUP_SIZE);
     writer.writeInt(Cardano.NativeScriptKind.RequireAllOf);

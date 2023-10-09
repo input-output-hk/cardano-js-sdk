@@ -1,4 +1,6 @@
+/* eslint-disable complexity */
 import * as Cardano from '../../Cardano';
+import { AuthCommitteeHot } from './AuthCommitteeHot';
 import { CborReader } from '../CBOR';
 import { CertificateKind } from './CertificateKind';
 import { GenesisKeyDelegation } from './GenesisKeyDelegation';
@@ -6,9 +8,20 @@ import { HexBlob, InvalidStateError } from '@cardano-sdk/util';
 import { MoveInstantaneousReward } from './MoveInstantaneousReward';
 import { PoolRegistration } from './PoolRegistration';
 import { PoolRetirement } from './PoolRetirement';
+import { RegisterDelegateRepresentative } from './RegisterDelegateRepresentative';
+import { Registration } from './Registration';
+import { ResignCommitteeCold } from './ResignCommitteeCold';
 import { StakeDelegation } from './StakeDelegation';
 import { StakeDeregistration } from './StakeDeregistration';
 import { StakeRegistration } from './StakeRegistration';
+import { StakeRegistrationDelegation } from './StakeRegistrationDelegation';
+import { StakeVoteDelegation } from './StakeVoteDelegation';
+import { StakeVoteRegistrationDelegation } from './StakeVoteRegistrationDelegation';
+import { UnregisterDelegateRepresentative } from './UnregisterDelegateRepresentative';
+import { Unregistration } from './Unregistration';
+import { UpdateDelegateRepresentative } from './UpdateDelegateRepresentative';
+import { VoteDelegation } from './VoteDelegation';
+import { VoteRegistrationDelegation } from './VoteRegistrationDelegation';
 
 /**
  * Certificates are a means to encode various essential operations related to stake
@@ -25,6 +38,19 @@ export class Certificate {
   #stakeDelegation: StakeDelegation;
   #stakeDeregistration: StakeDeregistration;
   #stakeRegistration: StakeRegistration;
+  #registration: Registration;
+  #unregistration: Unregistration;
+  #voteDelegation: VoteDelegation;
+  #stakeVoteDelegation: StakeVoteDelegation;
+  #stakeRegistrationDelegation: StakeRegistrationDelegation;
+  #voteRegistrationDelegation: VoteRegistrationDelegation;
+  #stakeVoteRegistrationDelegation: StakeVoteRegistrationDelegation;
+  #authCommitteeHot: AuthCommitteeHot;
+  #resignCommitteeCold: ResignCommitteeCold;
+  #drepRegistration: RegisterDelegateRepresentative;
+  #drepUnregistration: UnregisterDelegateRepresentative;
+  #updateDrep: UpdateDelegateRepresentative;
+
   #originalBytes: HexBlob | undefined = undefined;
 
   /**
@@ -58,6 +84,42 @@ export class Certificate {
         break;
       case CertificateKind.GenesisKeyDelegation:
         cbor = this.#genesisKeyDelegation!.toCbor();
+        break;
+      case CertificateKind.Registration:
+        cbor = this.#registration!.toCbor();
+        break;
+      case CertificateKind.Unregistration:
+        cbor = this.#unregistration!.toCbor();
+        break;
+      case CertificateKind.VoteDelegation:
+        cbor = this.#voteDelegation!.toCbor();
+        break;
+      case CertificateKind.StakeVoteDelegation:
+        cbor = this.#stakeVoteDelegation!.toCbor();
+        break;
+      case CertificateKind.StakeRegistrationDelegation:
+        cbor = this.#stakeRegistrationDelegation!.toCbor();
+        break;
+      case CertificateKind.VoteRegistrationDelegation:
+        cbor = this.#voteRegistrationDelegation!.toCbor();
+        break;
+      case CertificateKind.StakeVoteRegistrationDelegation:
+        cbor = this.#stakeVoteRegistrationDelegation!.toCbor();
+        break;
+      case CertificateKind.AuthCommitteeHot:
+        cbor = this.#authCommitteeHot!.toCbor();
+        break;
+      case CertificateKind.ResignCommitteeCold:
+        cbor = this.#resignCommitteeCold!.toCbor();
+        break;
+      case CertificateKind.DrepRegistration:
+        cbor = this.#drepRegistration!.toCbor();
+        break;
+      case CertificateKind.DrepUnregistration:
+        cbor = this.#drepUnregistration!.toCbor();
+        break;
+      case CertificateKind.UpdateDrep:
+        cbor = this.#updateDrep!.toCbor();
         break;
       default:
         throw new InvalidStateError(`Unexpected kind value: ${this.#kind}`);
@@ -102,6 +164,46 @@ export class Certificate {
       case CertificateKind.GenesisKeyDelegation:
         certificate = Certificate.newGenesisKeyDelegation(GenesisKeyDelegation.fromCbor(cbor));
         break;
+      case CertificateKind.Registration:
+        certificate = Certificate.newRegistrationCert(Registration.fromCbor(cbor));
+        break;
+      case CertificateKind.Unregistration:
+        certificate = Certificate.newUnregistrationCert(Unregistration.fromCbor(cbor));
+        break;
+      case CertificateKind.VoteDelegation:
+        certificate = Certificate.newVoteDelegationCert(VoteDelegation.fromCbor(cbor));
+        break;
+      case CertificateKind.StakeVoteDelegation:
+        certificate = Certificate.newStakeDelegation(StakeDelegation.fromCbor(cbor));
+        break;
+      case CertificateKind.StakeRegistrationDelegation:
+        certificate = Certificate.newStakeRegistrationDelegationCert(StakeRegistrationDelegation.fromCbor(cbor));
+        break;
+      case CertificateKind.VoteRegistrationDelegation:
+        certificate = Certificate.newVoteRegistrationDelegationCert(VoteRegistrationDelegation.fromCbor(cbor));
+        break;
+      case CertificateKind.StakeVoteRegistrationDelegation:
+        certificate = Certificate.newStakeVoteRegistrationDelegationCert(
+          StakeVoteRegistrationDelegation.fromCbor(cbor)
+        );
+        break;
+      case CertificateKind.AuthCommitteeHot:
+        certificate = Certificate.newAuthCommitteeHotCert(AuthCommitteeHot.fromCbor(cbor));
+        break;
+      case CertificateKind.ResignCommitteeCold:
+        certificate = Certificate.newResignCommitteeColdCert(ResignCommitteeCold.fromCbor(cbor));
+        break;
+      case CertificateKind.DrepRegistration:
+        certificate = Certificate.newRegisterDelegateRepresentativeCert(RegisterDelegateRepresentative.fromCbor(cbor));
+        break;
+      case CertificateKind.DrepUnregistration:
+        certificate = Certificate.newUnregisterDelegateRepresentativeCert(
+          UnregisterDelegateRepresentative.fromCbor(cbor)
+        );
+        break;
+      case CertificateKind.UpdateDrep:
+        certificate = Certificate.newUpdateDelegateRepresentativeCert(UpdateDelegateRepresentative.fromCbor(cbor));
+        break;
       default:
         throw new InvalidStateError(`Unexpected kind value: ${kind}`);
     }
@@ -141,6 +243,42 @@ export class Certificate {
       case CertificateKind.GenesisKeyDelegation:
         core = this.#genesisKeyDelegation!.toCore();
         break;
+      case CertificateKind.Registration:
+        core = this.#registration!.toCore();
+        break;
+      case CertificateKind.Unregistration:
+        core = this.#unregistration!.toCore();
+        break;
+      case CertificateKind.VoteDelegation:
+        core = this.#voteDelegation!.toCore();
+        break;
+      case CertificateKind.StakeVoteDelegation:
+        core = this.#stakeVoteDelegation!.toCore();
+        break;
+      case CertificateKind.StakeRegistrationDelegation:
+        core = this.#stakeRegistrationDelegation!.toCore();
+        break;
+      case CertificateKind.VoteRegistrationDelegation:
+        core = this.#voteRegistrationDelegation!.toCore();
+        break;
+      case CertificateKind.StakeVoteRegistrationDelegation:
+        core = this.#stakeVoteRegistrationDelegation!.toCore();
+        break;
+      case CertificateKind.AuthCommitteeHot:
+        core = this.#authCommitteeHot!.toCore();
+        break;
+      case CertificateKind.ResignCommitteeCold:
+        core = this.#resignCommitteeCold!.toCore();
+        break;
+      case CertificateKind.DrepRegistration:
+        core = this.#drepRegistration!.toCore();
+        break;
+      case CertificateKind.DrepUnregistration:
+        core = this.#drepUnregistration!.toCore();
+        break;
+      case CertificateKind.UpdateDrep:
+        core = this.#updateDrep!.toCore();
+        break;
       default:
         throw new InvalidStateError(`Unexpected kind value: ${this.#kind}`);
     }
@@ -177,6 +315,46 @@ export class Certificate {
         break;
       case Cardano.CertificateType.GenesisKeyDelegation:
         cert = Certificate.newGenesisKeyDelegation(GenesisKeyDelegation.fromCore(certificate));
+        break;
+      case Cardano.CertificateType.Registration:
+        cert = Certificate.newRegistrationCert(Registration.fromCore(certificate));
+        break;
+      case Cardano.CertificateType.Unregistration:
+        cert = Certificate.newUnregistrationCert(Unregistration.fromCore(certificate));
+        break;
+      case Cardano.CertificateType.VoteDelegation:
+        cert = Certificate.newVoteDelegationCert(VoteDelegation.fromCore(certificate));
+        break;
+      case Cardano.CertificateType.StakeVoteDelegation:
+        cert = Certificate.newStakeVoteDelegationCert(StakeVoteDelegation.fromCore(certificate));
+        break;
+      case Cardano.CertificateType.StakeRegistrationDelegation:
+        cert = Certificate.newStakeRegistrationDelegationCert(StakeRegistrationDelegation.fromCore(certificate));
+        break;
+      case Cardano.CertificateType.VoteRegistrationDelegation:
+        cert = Certificate.newVoteRegistrationDelegationCert(VoteRegistrationDelegation.fromCore(certificate));
+        break;
+      case Cardano.CertificateType.StakeVoteRegistrationDelegation:
+        cert = Certificate.newStakeVoteRegistrationDelegationCert(
+          StakeVoteRegistrationDelegation.fromCore(certificate)
+        );
+        break;
+      case Cardano.CertificateType.AuthorizeCommitteeHot:
+        cert = Certificate.newAuthCommitteeHotCert(AuthCommitteeHot.fromCore(certificate));
+        break;
+      case Cardano.CertificateType.ResignCommitteeCold:
+        cert = Certificate.newResignCommitteeColdCert(ResignCommitteeCold.fromCore(certificate));
+        break;
+      case Cardano.CertificateType.RegisterDelegateRepresentative:
+        cert = Certificate.newRegisterDelegateRepresentativeCert(RegisterDelegateRepresentative.fromCore(certificate));
+        break;
+      case Cardano.CertificateType.UnregisterDelegateRepresentative:
+        cert = Certificate.newUnregisterDelegateRepresentativeCert(
+          UnregisterDelegateRepresentative.fromCore(certificate)
+        );
+        break;
+      case Cardano.CertificateType.UpdateDelegateRepresentative:
+        cert = Certificate.newUpdateDelegateRepresentativeCert(UpdateDelegateRepresentative.fromCore(certificate));
         break;
       default:
         throw new InvalidStateError('Unexpected certificate type');
@@ -277,6 +455,164 @@ export class Certificate {
   }
 
   /**
+   * Gets a Certificate from a Registration instance.
+   *
+   * @param registration The Registration instance to 'cast' to Certificate.
+   */
+  static newRegistrationCert(registration: Registration): Certificate {
+    const cert = new Certificate();
+    cert.#registration = registration;
+    cert.#kind = CertificateKind.Registration;
+
+    return cert;
+  }
+
+  /**
+   * Gets a Certificate from a Unregistration instance.
+   *
+   * @param unregistration The Unregistration instance to 'cast' to Certificate.
+   */
+  static newUnregistrationCert(unregistration: Unregistration): Certificate {
+    const cert = new Certificate();
+    cert.#unregistration = unregistration;
+    cert.#kind = CertificateKind.Unregistration;
+
+    return cert;
+  }
+
+  /**
+   * Gets a Certificate from a VoteDelegation instance.
+   *
+   * @param voteDelegation The VoteDelegation instance to 'cast' to Certificate.
+   */
+  static newVoteDelegationCert(voteDelegation: VoteDelegation): Certificate {
+    const cert = new Certificate();
+    cert.#voteDelegation = voteDelegation;
+    cert.#kind = CertificateKind.VoteDelegation;
+
+    return cert;
+  }
+
+  /**
+   * Gets a Certificate from a StakeVoteDelegation instance.
+   *
+   * @param stakeVoteDelegation The StakeVoteDelegation instance to 'cast' to Certificate.
+   */
+  static newStakeVoteDelegationCert(stakeVoteDelegation: StakeVoteDelegation): Certificate {
+    const cert = new Certificate();
+    cert.#stakeVoteDelegation = stakeVoteDelegation;
+    cert.#kind = CertificateKind.StakeVoteDelegation;
+
+    return cert;
+  }
+
+  /**
+   * Gets a Certificate from a StakeRegistrationDelegation instance.
+   *
+   * @param stakeRegistrationDelegation The StakeRegistrationDelegation instance to 'cast' to Certificate.
+   */
+  static newStakeRegistrationDelegationCert(stakeRegistrationDelegation: StakeRegistrationDelegation): Certificate {
+    const cert = new Certificate();
+    cert.#stakeRegistrationDelegation = stakeRegistrationDelegation;
+    cert.#kind = CertificateKind.StakeRegistrationDelegation;
+
+    return cert;
+  }
+
+  /**
+   * Gets a Certificate from a VoteRegistrationDelegation instance.
+   *
+   * @param voteRegistrationDelegation The VoteRegistrationDelegation instance to 'cast' to Certificate.
+   */
+  static newVoteRegistrationDelegationCert(voteRegistrationDelegation: VoteRegistrationDelegation): Certificate {
+    const cert = new Certificate();
+    cert.#voteRegistrationDelegation = voteRegistrationDelegation;
+    cert.#kind = CertificateKind.VoteRegistrationDelegation;
+
+    return cert;
+  }
+
+  /**
+   * Gets a Certificate from a StakeVoteRegistrationDelegation instance.
+   *
+   * @param stakeVoteRegistrationDelegation The StakeVoteRegistrationDelegation instance to 'cast' to Certificate.
+   */
+  static newStakeVoteRegistrationDelegationCert(
+    stakeVoteRegistrationDelegation: StakeVoteRegistrationDelegation
+  ): Certificate {
+    const cert = new Certificate();
+    cert.#stakeVoteRegistrationDelegation = stakeVoteRegistrationDelegation;
+    cert.#kind = CertificateKind.StakeVoteRegistrationDelegation;
+
+    return cert;
+  }
+
+  /**
+   * Gets a Certificate from a AuthCommitteeHot instance.
+   *
+   * @param authCommitteeHot The AuthCommitteeHot instance to 'cast' to Certificate.
+   */
+  static newAuthCommitteeHotCert(authCommitteeHot: AuthCommitteeHot): Certificate {
+    const cert = new Certificate();
+    cert.#authCommitteeHot = authCommitteeHot;
+    cert.#kind = CertificateKind.AuthCommitteeHot;
+
+    return cert;
+  }
+
+  /**
+   * Gets a Certificate from a ResignCommitteeCold instance.
+   *
+   * @param resignCommitteeCold The ResignCommitteeCold instance to 'cast' to Certificate.
+   */
+  static newResignCommitteeColdCert(resignCommitteeCold: ResignCommitteeCold): Certificate {
+    const cert = new Certificate();
+    cert.#resignCommitteeCold = resignCommitteeCold;
+    cert.#kind = CertificateKind.ResignCommitteeCold;
+
+    return cert;
+  }
+
+  /**
+   * Gets a Certificate from a RegisterDelegateRepresentative instance.
+   *
+   * @param drepRegistration The RegisterDelegateRepresentative instance to 'cast' to Certificate.
+   */
+  static newRegisterDelegateRepresentativeCert(drepRegistration: RegisterDelegateRepresentative): Certificate {
+    const cert = new Certificate();
+    cert.#drepRegistration = drepRegistration;
+    cert.#kind = CertificateKind.DrepRegistration;
+
+    return cert;
+  }
+
+  /**
+   * Gets a Certificate from a UnregisterDelegateRepresentative instance.
+   *
+   * @param drepUnregistration The UnregisterDelegateRepresentative instance to 'cast' to Certificate.
+   */
+  static newUnregisterDelegateRepresentativeCert(drepUnregistration: UnregisterDelegateRepresentative): Certificate {
+    const cert = new Certificate();
+    cert.#drepUnregistration = drepUnregistration;
+    cert.#kind = CertificateKind.DrepUnregistration;
+
+    return cert;
+  }
+
+  /**
+   * Gets a Certificate from a UpdateDelegateRepresentative instance.
+   *
+   * @param updateDrep The UpdateDelegateRepresentative instance to 'cast' to Certificate.
+   */
+  static newUpdateDelegateRepresentativeCert(updateDrep: UpdateDelegateRepresentative): Certificate {
+    const cert = new Certificate();
+    cert.#updateDrep = updateDrep;
+    cert.#kind = CertificateKind.UpdateDrep;
+
+    return cert;
+  }
+
+  /**
    * Gets the certificate kind.
    *
    * @returns The certificate kind.
@@ -346,5 +682,113 @@ export class Certificate {
    */
   asMoveInstantaneousRewardsCert(): MoveInstantaneousReward | undefined {
     return this.#moveInstantaneousReward;
+  }
+
+  /**
+   * Gets a Registration from a Certificate instance.
+   *
+   * @returns a Registration if the certificate can be down cast, otherwise, undefined.
+   */
+  asRegistrationCert(): Registration | undefined {
+    return this.#registration;
+  }
+
+  /**
+   * Gets a Unregistration from a Certificate instance.
+   *
+   * @returns a Unregistration if the certificate can be down cast, otherwise, undefined.
+   */
+  asUnregistrationCert(): Unregistration | undefined {
+    return this.#unregistration;
+  }
+
+  /**
+   * Gets a VoteDelegation from a Certificate instance.
+   *
+   * @returns a VoteDelegation if the certificate can be down cast, otherwise, undefined.
+   */
+  asVoteDelegationCert(): VoteDelegation | undefined {
+    return this.#voteDelegation;
+  }
+
+  /**
+   * Gets a StakeVoteDelegation from a Certificate instance.
+   *
+   * @returns a StakeVoteDelegation if the certificate can be down cast, otherwise, undefined.
+   */
+  asStakeVoteDelegationCert(): StakeVoteDelegation | undefined {
+    return this.#stakeVoteDelegation;
+  }
+
+  /**
+   * Gets a StakeRegistrationDelegation from a Certificate instance.
+   *
+   * @returns a StakeRegistrationDelegation if the certificate can be down cast, otherwise, undefined.
+   */
+  asStakeRegistrationDelegationCert(): StakeRegistrationDelegation | undefined {
+    return this.#stakeRegistrationDelegation;
+  }
+
+  /**
+   * Gets a VoteRegistrationDelegation from a Certificate instance.
+   *
+   * @returns a VoteRegistrationDelegation if the certificate can be down cast, otherwise, undefined.
+   */
+  asVoteRegistrationDelegationCert(): VoteRegistrationDelegation | undefined {
+    return this.#voteRegistrationDelegation;
+  }
+
+  /**
+   * Gets a StakeVoteRegistrationDelegation from a Certificate instance.
+   *
+   * @returns a StakeVoteRegistrationDelegation if the certificate can be down cast, otherwise, undefined.
+   */
+  asStakeVoteRegistrationDelegationCert(): StakeVoteRegistrationDelegation | undefined {
+    return this.#stakeVoteRegistrationDelegation;
+  }
+
+  /**
+   * Gets a AuthCommitteeHot from a Certificate instance.
+   *
+   * @returns a AuthCommitteeHot if the certificate can be down cast, otherwise, undefined.
+   */
+  asAuthCommitteeHotCert(): AuthCommitteeHot | undefined {
+    return this.#authCommitteeHot;
+  }
+
+  /**
+   * Gets a ResignCommitteeCold from a Certificate instance.
+   *
+   * @returns a ResignCommitteeCold if the certificate can be down cast, otherwise, undefined.
+   */
+  asResignCommitteeColdCert(): ResignCommitteeCold | undefined {
+    return this.#resignCommitteeCold;
+  }
+
+  /**
+   * Gets a RegisterDelegateRepresentative from a Certificate instance.
+   *
+   * @returns a RegisterDelegateRepresentative if the certificate can be down cast, otherwise, undefined.
+   */
+  asRegisterDelegateRepresentativeCert(): RegisterDelegateRepresentative | undefined {
+    return this.#drepRegistration;
+  }
+
+  /**
+   * Gets a UnregisterDelegateRepresentative from a Certificate instance.
+   *
+   * @returns a UnregisterDelegateRepresentative if the certificate can be down cast, otherwise, undefined.
+   */
+  asUnregisterDelegateRepresentativeCert(): UnregisterDelegateRepresentative | undefined {
+    return this.#drepUnregistration;
+  }
+
+  /**
+   * Gets a UpdateDelegateRepresentative from a Certificate instance.
+   *
+   * @returns a UpdateDelegateRepresentative if the certificate can be down cast, otherwise, undefined.
+   */
+  asUpdateDelegateRepresentativeCert(): UpdateDelegateRepresentative | undefined {
+    return this.#updateDrep;
   }
 }

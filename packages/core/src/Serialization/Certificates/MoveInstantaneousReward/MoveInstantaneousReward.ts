@@ -45,6 +45,7 @@ export class MoveInstantaneousReward {
         throw new InvalidStateError(`Unexpected kind value: ${this.#kind}`);
     }
 
+    // CDDL
     // move_instantaneous_rewards_cert = (6, move_instantaneous_reward)
     const writer = new CborWriter();
 

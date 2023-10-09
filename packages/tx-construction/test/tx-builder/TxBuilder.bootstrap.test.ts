@@ -1,54 +1,10 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, AsyncKeyAgent, GroupedAddress, SignBlobResult, util } from '@cardano-sdk/key-management';
-import { BehaviorSubject, firstValueFrom } from 'rxjs';
+import { AddressType } from '@cardano-sdk/key-management';
 import { Cardano } from '@cardano-sdk/core';
 import { GenericTxBuilder, OutputValidation } from '../../src';
+import { StubKeyAgent, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { dummyLogger } from 'ts-log';
-import { generateRandomHexString, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import delay from 'delay';
-
-class StubKeyAgent implements AsyncKeyAgent {
-  knownAddresses$ = new BehaviorSubject<GroupedAddress[]>([]);
-
-  constructor(private inputResolver: Cardano.InputResolver) {}
-
-  deriveAddress(): Promise<GroupedAddress> {
-    throw new Error('Method not implemented.');
-  }
-  derivePublicKey(): Promise<Crypto.Ed25519PublicKeyHex> {
-    throw new Error('Method not implemented.');
-  }
-  signBlob(): Promise<SignBlobResult> {
-    throw new Error('Method not implemented.');
-  }
-  async signTransaction(txInternals: Cardano.TxBodyWithHash): Promise<Cardano.Signatures> {
-    const signatures = new Map<Crypto.Ed25519PublicKeyHex, Crypto.Ed25519SignatureHex>();
-    const knownAddresses = await firstValueFrom(this.knownAddresses$);
-    for (const _ of await util.ownSignatureKeyPaths(txInternals.body, knownAddresses, this.inputResolver)) {
-      signatures.set(
-        Crypto.Ed25519PublicKeyHex(generateRandomHexString(64)),
-        Crypto.Ed25519SignatureHex(generateRandomHexString(128))
-      );
-    }
-    return signatures;
-  }
-  getChainId(): Promise<Cardano.ChainId> {
-    throw new Error('Method not implemented.');
-  }
-  getBip32Ed25519(): Promise<Crypto.Bip32Ed25519> {
-    throw new Error('Method not implemented.');
-  }
-  getExtendedAccountPublicKey(): Promise<Crypto.Bip32PublicKeyHex> {
-    throw new Error('Method not implemented.');
-  }
-  async setKnownAddresses(addresses: GroupedAddress[]): Promise<void> {
-    this.knownAddresses$.next(addresses);
-  }
-  shutdown(): void {
-    throw new Error('Method not implemented.');
-  }
-}
 
 describe('TxBuilder bootstrap', () => {
   it('awaits for non-empty knownAddresses$', async () => {

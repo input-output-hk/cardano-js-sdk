@@ -32,7 +32,7 @@ describe('serializableObject', () => {
   it('supports types that are used in SDK, but not natively supported in JSON', () => {
     const obj = {
       bigint: 123n,
-      buffer: Buffer.from('data'),
+      buffer: new Uint8Array(Buffer.from('data')),
       date: new Date(),
       error: new Error('error obj'),
       map: new Map([['key', 1n]]),

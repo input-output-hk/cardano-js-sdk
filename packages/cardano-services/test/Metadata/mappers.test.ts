@@ -1,9 +1,9 @@
 import { Buffer } from 'buffer';
-import { Cardano, cmlToCore, coreToCml, metadatum } from '@cardano-sdk/core';
+import { Cardano, Serialization, metadatum, util } from '@cardano-sdk/core';
 import { TxMetadataModel, mapTxMetadata } from '../../src/Metadata';
-import { usingAutoFree } from '@cardano-sdk/util';
 
-const toBytes = (data: Cardano.Metadatum) => usingAutoFree((scope) => coreToCml.txMetadatum(scope, data).to_bytes());
+const toBytes = (data: Cardano.Metadatum) =>
+  util.hexToBytes(Serialization.TransactionMetadatum.fromCore(data).toCbor());
 
 describe('mapTxMetadata', () => {
   it('maps TxMetadataModel to Cardano.TxMetadata', () => {
@@ -51,15 +51,5 @@ describe('mapTxMetadata', () => {
 
   it('throws if key cannot be parse to bigint', () => {
     expect(() => mapTxMetadata([{ bytes: toBytes('test'), key: 'bad' }])).toThrow();
-  });
-
-  it.skip('uses cmlToCore.txMetadatum to map bytes', () => {
-    const bytes = toBytes(new Map([[127n, 'test']]));
-    const spy = jest.spyOn(cmlToCore, 'txMetadatum');
-    spy.mockReset();
-
-    mapTxMetadata([{ bytes, key: '127' }]);
-    expect(spy).toBeCalledTimes(1);
-    expect(spy).toBeCalledWith(bytes);
   });
 });

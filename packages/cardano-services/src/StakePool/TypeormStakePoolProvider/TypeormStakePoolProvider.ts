@@ -10,7 +10,7 @@ import {
 import { DataSource } from 'typeorm';
 import { PoolModel, PoolStatsModel, mapPoolStats, mapStakePoolsResult } from './mappers';
 import { StakePoolEntity } from '@cardano-sdk/projection-typeorm';
-import { TypeormProvider, TypeormProviderDependencies } from '../../util/TypeormProvider';
+import { TypeormProvider, TypeormProviderDependencies } from '../../util';
 import {
   getSortOptions,
   getWhereClauseAndArgs,

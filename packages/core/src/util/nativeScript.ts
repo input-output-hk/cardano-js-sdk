@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Cardano from '../Cardano';
 import * as Crypto from '@cardano-sdk/crypto';
-import * as toCml from '../CML/coreToCml';
+import { NativeScript } from '../Serialization';
 import { SerializationError, SerializationFailure } from '../';
-import { usingAutoFree } from '@cardano-sdk/util';
 
 /**
  * Gets the policy id of the given native script.
@@ -12,10 +11,7 @@ import { usingAutoFree } from '@cardano-sdk/util';
  * @returns the policy Id.
  */
 export const nativeScriptPolicyId = (script: Cardano.NativeScript): Cardano.PolicyId =>
-  usingAutoFree((scope) => {
-    const managedScript = toCml.nativeScript(scope, script);
-    return Cardano.PolicyId(Buffer.from(scope.manage(managedScript.hash()).to_bytes()).toString('hex'));
-  });
+  Cardano.PolicyId(NativeScript.fromCore(script).hash());
 
 /**
  * Converts a json representation of a native script into a NativeScript.

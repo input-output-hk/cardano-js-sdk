@@ -8,8 +8,10 @@ import { unifiedProjectorOperator } from '../utils';
 export interface Mint {
   assetId: Cardano.AssetId;
   policyId: Cardano.PolicyId;
+  assetName: Cardano.AssetName;
   quantity: bigint;
   compactTxId: number;
+  txMetadata?: Cardano.TxMetadata;
 }
 
 export interface WithMint {
@@ -18,13 +20,15 @@ export interface WithMint {
 
 export const withMint = unifiedProjectorOperator<{}, WithMint>((evt) => ({
   ...evt,
-  mint: evt.block.body.flatMap(({ body: { mint } }, txIndex) =>
+  mint: evt.block.body.flatMap(({ body: { mint }, auxiliaryData }, txIndex) =>
     [...(mint?.entries() || [])].map(
       ([assetId, quantity]): Mint => ({
         assetId,
+        assetName: Cardano.AssetId.getAssetName(assetId),
         compactTxId: computeCompactTxId(evt.block.header.blockNo, txIndex),
         policyId: Cardano.AssetId.getPolicyId(assetId),
-        quantity
+        quantity,
+        txMetadata: auxiliaryData?.blob
       })
     )
   )

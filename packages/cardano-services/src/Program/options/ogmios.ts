@@ -1,6 +1,6 @@
-import { Command, Option } from 'commander';
+import { Command } from 'commander';
 import { Ogmios } from '@cardano-sdk/ogmios';
-import { URL } from 'url';
+import { addOptions, newOption } from './util';
 
 const OGMIOS_URL_DEFAULT = (() => {
   const connection = Ogmios.createConnectionObject();
@@ -18,16 +18,17 @@ export interface OgmiosProgramOptions {
 }
 
 export const withOgmiosOptions = (command: Command) =>
-  command
-    .addOption(
-      new Option('--ogmios-srv-service-name <ogmiosSrvServiceName>', OgmiosOptionDescriptions.SrvServiceName).env(
-        'OGMIOS_SRV_SERVICE_NAME'
-      )
-    )
-    .addOption(
-      new Option('--ogmios-url <ogmiosUrl>', OgmiosOptionDescriptions.Url)
-        .env('OGMIOS_URL')
-        .default(new URL(OGMIOS_URL_DEFAULT))
-        .conflicts('ogmiosSrvServiceName')
-        .argParser((url) => new URL(url))
-    );
+  addOptions(command, [
+    newOption(
+      '--ogmios-srv-service-name <ogmiosSrvServiceName>',
+      OgmiosOptionDescriptions.SrvServiceName,
+      'OGMIOS_SRV_SERVICE_NAME'
+    ),
+    newOption(
+      '--ogmios-url <ogmiosUrl>',
+      OgmiosOptionDescriptions.Url,
+      'OGMIOS_URL',
+      (url) => new URL(url),
+      new URL(OGMIOS_URL_DEFAULT)
+    ).conflicts('ogmiosSrvServiceName')
+  ]);

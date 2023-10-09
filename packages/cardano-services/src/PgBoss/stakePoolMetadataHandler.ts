@@ -1,7 +1,9 @@
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, NotImplementedError, ProviderError, ProviderFailure } from '@cardano-sdk/core';
+import { CustomError } from 'ts-custom-error';
 import { DataSource, MoreThan } from 'typeorm';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { PoolMetadataEntity, PoolRegistrationEntity, StakePoolMetadataJob } from '@cardano-sdk/projection-typeorm';
+import { StakePoolMetadataFetchMode, checkProgramOptions } from '../Program/options';
 import { WorkerHandlerFactory } from './types';
 import { createHttpStakePoolMetadataService } from '../StakePool';
 import { isErrorWithConstraint } from './util';
@@ -46,9 +48,45 @@ export const savePoolMetadata = async (args: SavePoolMetadataArguments) => {
   }
 };
 
+export const getUrlToFetch = (
+  metadataFetchMode: StakePoolMetadataFetchMode,
+  smashUrl: string | undefined,
+  directUrl: string,
+  poolRegistrationId: string,
+  metadataHash: string
+) => {
+  if (metadataFetchMode === StakePoolMetadataFetchMode.SMASH) {
+    return `${smashUrl}/metadata/${poolRegistrationId}/${metadataHash}`;
+  } else if (metadataFetchMode === StakePoolMetadataFetchMode.DIRECT) {
+    return directUrl;
+  }
+
+  throw new NotImplementedError(
+    `There is no implementation to handle the fetch mode (--metadata-fetch-mode): ${metadataFetchMode}`
+  );
+};
+
+export const attachExtendedMetadata = (
+  metadataWithoutExt: Cardano.StakePoolMetadata,
+  extMetadata: Cardano.ExtendedStakePoolMetadata | CustomError | undefined
+): Cardano.StakePoolMetadata => {
+  if (extMetadata instanceof CustomError) {
+    const error = extMetadata;
+
+    if (error instanceof ProviderError && error.reason === ProviderFailure.NotFound) {
+      return { ...metadataWithoutExt!, ext: null };
+    }
+    return metadataWithoutExt;
+  } else if (extMetadata === undefined) {
+    return metadataWithoutExt;
+  }
+  return { ...metadataWithoutExt!, ext: extMetadata };
+};
 export const stakePoolMetadataHandlerFactory: WorkerHandlerFactory = (options) => {
-  const { dataSource, logger } = options;
+  const { dataSource, logger, metadataFetchMode, smashUrl } = options;
   const service = createHttpStakePoolMetadataService(logger);
+
+  checkProgramOptions(metadataFetchMode, smashUrl);
 
   return async (task: StakePoolMetadataJob) => {
     const { metadataJson, poolId, poolRegistrationId } = task;
@@ -63,24 +101,54 @@ export const stakePoolMetadataHandlerFactory: WorkerHandlerFactory = (options) =
       return;
     }
 
-    logger.info('Resolving stake pool metadata...', { poolId, poolRegistrationId });
+    const urlToFetch: string = getUrlToFetch(metadataFetchMode, smashUrl, url, poolId, hash);
 
-    const { errors, metadata } = await service.getStakePoolMetadata(hash, url);
+    logger.info('Resolving stake pool metadata...', { metadataFetchMode, poolId, poolRegistrationId });
 
-    logger.info('Stake pool metadata resolved', { errors, metadata, poolId, poolRegistrationId });
+    const metadataResponse: Cardano.StakePoolMetadata | CustomError = await service.getStakePoolMetadata(
+      hash,
+      urlToFetch
+    );
 
-    // In case there is some error in fetching extended metadata and the root metadata is populated,
-    // we need to save the latter anyway
-    if (metadata) {
-      logger.info('Saving stake pool metadata...');
+    if (metadataResponse instanceof CustomError) {
+      logger.info('Stake pool metadata NOT resolved with errors', {
+        metadataResponse,
+        poolId,
+        poolRegistrationId,
+        url
+      });
+      // In case of errors the handler throws in order to let pg-boss to retry the job.
+      logger.info('StakePoolMetadataJob failed to fetch stake pool metadata.');
+      throw metadataResponse;
+    } else {
+      const metadataWithoutExt: Cardano.StakePoolMetadata = metadataResponse;
+
+      logger.info('Stake pool metadata resolved successfully', { metadataWithoutExt, poolId, poolRegistrationId, url });
+
+      logger.info('Resolving extended stake pool metadata...', { metadataFetchMode, poolId, poolRegistrationId });
+
+      const extendedMetadata = await service.getValidateStakePoolExtendedMetadata(metadataWithoutExt);
+
+      logger.info('Stake pool extended metadata resolved', {
+        extendedMetadata,
+        metadataFetchMode,
+        poolId,
+        poolRegistrationId
+      });
+
+      const metadata: Cardano.StakePoolMetadata = attachExtendedMetadata(metadataWithoutExt, extendedMetadata);
+
       await savePoolMetadata({ dataSource, hash, metadata, poolId, poolRegistrationId });
+
       logger.info('Stake pool metadata saved');
+
+      if (extendedMetadata instanceof CustomError) {
+        logger.info('StakePoolMetadataJob failed to fetch extended stake pool metadata.');
+        throw extendedMetadata;
+      }
     }
-
-    // TODO: Store the error in a dedicated table
-    // Ref: LW-6409
-
-    // In case of errors the handler throws in order to let pg-boss to retry the job.
-    if (errors?.length) throw errors[0];
   };
+
+  // TODO: Store the error in a dedicated table
+  // Ref: LW-6409
 };

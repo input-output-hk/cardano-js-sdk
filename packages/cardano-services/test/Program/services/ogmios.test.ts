@@ -302,7 +302,7 @@ describe('Service dependency abstractions', () => {
           await provider.initialize();
           await provider.start();
           const res = await provider.submitTx({
-            context: { handles: [handleProviderMocks.getAliceHandleProviderResponse] },
+            context: { handleResolutions: [handleProviderMocks.getAliceHandleProviderResponse] },
             signedTransaction: bufferToHexString(Buffer.from(new Uint8Array([])))
           });
           expect(res).toBeUndefined();
@@ -318,7 +318,7 @@ describe('Service dependency abstractions', () => {
 
           await expect(
             provider.submitTx({
-              context: { handles: [handleProviderMocks.getWrongHandleProviderResponse] },
+              context: { handleResolutions: [handleProviderMocks.getWrongHandleProviderResponse] },
               signedTransaction: bufferToHexString(Buffer.from(new Uint8Array([])))
             })
           ).rejects.toBeInstanceOf(ProviderError);

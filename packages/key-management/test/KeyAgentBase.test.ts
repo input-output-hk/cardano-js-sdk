@@ -8,11 +8,11 @@ import {
   KeyRole,
   SerializableInMemoryKeyAgentData
 } from '../src';
-import { CML, Cardano } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { dummyLogger } from 'ts-log';
 
 const ACCOUNT_INDEX = 1;
-const bip32Ed25519 = new Crypto.CmlBip32Ed25519(CML);
+const bip32Ed25519 = new Crypto.SodiumBip32Ed25519();
 
 class MockKeyAgent extends KeyAgentBase {
   constructor(data: SerializableInMemoryKeyAgentData) {

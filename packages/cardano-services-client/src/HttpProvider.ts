@@ -2,7 +2,6 @@
 import { HttpProviderConfigPaths, Provider, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { fromSerializableObject, toSerializableObject } from '@cardano-sdk/util';
-import { apiVersion as staticApiVersion } from './version';
 import axios, { AxiosAdapter, AxiosRequestConfig, AxiosResponseTransformer } from 'axios';
 import packageJson from '../package.json';
 
@@ -104,7 +103,7 @@ export const createHttpProvider = <T extends Provider>({
           const req: AxiosRequestConfig = {
             ...axiosOptions,
             adapter,
-            baseURL: `${baseUrl.replace(/\/$/, '')}/v${staticApiVersion.root}/${serviceSlug}`,
+            baseURL: `${baseUrl.replace(/\/$/, '')}/v${apiVersion}/${serviceSlug}`,
             data: { ...args[0] },
             headers: {
               ...axiosOptions?.headers,

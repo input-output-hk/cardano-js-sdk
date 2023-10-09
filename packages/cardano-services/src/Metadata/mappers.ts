@@ -1,6 +1,6 @@
-import { CML, Cardano, cmlToCore } from '@cardano-sdk/core';
+import { Cardano, Serialization } from '@cardano-sdk/core';
+import { HexBlob } from '@cardano-sdk/util';
 import { TxMetadataModel } from './types';
-import { usingAutoFree } from '@cardano-sdk/util';
 
 export const mapTxMetadata = (metadataModel: Pick<TxMetadataModel, 'bytes' | 'key'>[]): Cardano.TxMetadata =>
   metadataModel.reduce((map, metadatum) => {
@@ -8,9 +8,7 @@ export const mapTxMetadata = (metadataModel: Pick<TxMetadataModel, 'bytes' | 'ke
 
     if (bytes && key) {
       const biKey = BigInt(key);
-      const metadata = usingAutoFree((scope) =>
-        cmlToCore.txMetadata(scope.manage(CML.GeneralTransactionMetadata.from_bytes(bytes)))
-      );
+      const metadata = Serialization.GeneralTransactionMetadata.fromCbor(HexBlob.fromBytes(bytes)).toCore();
 
       if (metadata) {
         const datum = metadata.get(biKey);

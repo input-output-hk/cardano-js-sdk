@@ -6,6 +6,7 @@ import {
   ConnectionStatus,
   ConnectionStatusTracker,
   DelegationTracker,
+  DynamicChangeAddressResolver,
   FailedTx,
   HDSequentialDiscovery,
   OutgoingTx,
@@ -84,12 +85,7 @@ import {
   tap,
   throwError
 } from 'rxjs';
-import {
-  ChangeAddressResolver,
-  InputSelector,
-  StaticChangeAddressResolver,
-  roundRobinRandomImprove
-} from '@cardano-sdk/input-selection';
+import { ChangeAddressResolver, InputSelector, roundRobinRandomImprove } from '@cardano-sdk/input-selection';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
 import {
@@ -103,10 +99,10 @@ import {
   initializeTx
 } from '@cardano-sdk/tx-construction';
 import { Logger } from 'ts-log';
+import { PubStakeKeyAndStatus, createPublicStakeKeysTracker } from '../services/PublicStakeKeysTracker';
 import { RetryBackoffConfig } from 'backoff-rxjs';
-import { Shutdown, contextLogger, deepEquals, usingAutoFree } from '@cardano-sdk/util';
+import { Shutdown, contextLogger, deepEquals } from '@cardano-sdk/util';
 import { WalletStores, createInMemoryWalletStores } from '../persistence';
-import { createActivePublicStakeKeysTracker } from '../services/ActiveStakePublicKeysTracker';
 import isEqual from 'lodash/isEqual';
 import uniq from 'lodash/uniq';
 import type { KoraLabsHandleProvider } from '@cardano-sdk/cardano-services-client';
@@ -159,15 +155,13 @@ const isSignedTx = (input: Cardano.Tx | TxCBOR | OutgoingTx | SignedTx): input i
 const processOutgoingTx = (input: Cardano.Tx | TxCBOR | OutgoingTx | SignedTx): OutgoingTx => {
   // TxCbor
   if (isTxCBOR(input)) {
-    return usingAutoFree((scope) => {
-      const tx = scope.manage(Serialization.Transaction.fromCbor(input));
-      return {
-        body: tx.toCore().body,
-        cbor: input,
-        // Do not re-serialize transaction body to compute transaction id
-        id: tx.getId()
-      };
-    });
+    const tx = Serialization.Transaction.fromCbor(input);
+    return {
+      body: tx.toCore().body,
+      cbor: input,
+      // Do not re-serialize transaction body to compute transaction id
+      id: tx.getId()
+    };
   }
   // SignedTx
   if (isSignedTx(input)) {
@@ -230,7 +224,8 @@ export class PersonalWallet implements ObservableWallet {
   readonly rewardsProvider: TrackedRewardsProvider;
   readonly handleProvider: HandleProvider;
   readonly changeAddressResolver: ChangeAddressResolver;
-  readonly activePublicStakeKeys$: TrackerSubject<Ed25519PublicKeyHex[]>;
+  readonly publicStakeKeys$: TrackerSubject<PubStakeKeyAndStatus[]>;
+  private drepPubKey: Ed25519PublicKeyHex;
   handles$: Observable<HandleInfo[]>;
 
   // eslint-disable-next-line max-statements
@@ -276,7 +271,6 @@ export class PersonalWallet implements ObservableWallet {
     this.handleProvider = handleProvider as HandleProvider;
     this.chainHistoryProvider = new TrackedChainHistoryProvider(chainHistoryProvider);
     this.rewardsProvider = new TrackedRewardsProvider(rewardsProvider);
-
     this.syncStatus = createProviderStatusTracker(
       {
         assetProvider: this.assetProvider,
@@ -329,19 +323,6 @@ export class PersonalWallet implements ObservableWallet {
         )
       )
     );
-
-    this.#inputSelector = inputSelector
-      ? inputSelector
-      : roundRobinRandomImprove({
-          changeAddressResolver: new StaticChangeAddressResolver(() =>
-            firstValueFrom(
-              this.syncStatus.isSettled$.pipe(
-                filter((isSettled) => isSettled),
-                switchMap(() => this.addresses$)
-              )
-            )
-          )
-        });
 
     this.#tip$ = this.tip$ = new TipTracker({
       connectionStatus$: connectionStatusTracker$,
@@ -485,7 +466,21 @@ export class PersonalWallet implements ObservableWallet {
       utxoTracker: this.utxo
     });
 
-    this.activePublicStakeKeys$ = createActivePublicStakeKeysTracker({
+    this.#inputSelector = inputSelector
+      ? inputSelector
+      : roundRobinRandomImprove({
+          changeAddressResolver: new DynamicChangeAddressResolver(
+            this.syncStatus.isSettled$.pipe(
+              filter((isSettled) => isSettled),
+              switchMap(() => this.addresses$)
+            ),
+            this.delegation.distribution$,
+            () => firstValueFrom(this.delegation.portfolio$),
+            logger
+          )
+        });
+
+    this.publicStakeKeys$ = createPublicStakeKeysTracker({
       addresses$: this.addresses$,
       keyAgent: this.keyAgent,
       rewardAccounts$: this.delegation.rewardAccounts$
@@ -522,6 +517,8 @@ export class PersonalWallet implements ObservableWallet {
       protocolParameters$: this.protocolParameters$,
       utxo: this.utxo
     });
+
+    this.getPubDRepKey().catch(() => void 0);
 
     this.#logger.debug('Created');
   }
@@ -656,7 +653,7 @@ export class PersonalWallet implements ObservableWallet {
     this.#newTransactions.submitting$.complete();
     this.#reemitSubscriptions.unsubscribe();
     this.#failedFromReemitter$.complete();
-    this.activePublicStakeKeys$.complete();
+    this.publicStakeKeys$.complete();
     this.#logger.debug('Shutdown');
   }
 
@@ -713,6 +710,14 @@ export class PersonalWallet implements ObservableWallet {
   }
 
   async getPubDRepKey(): Promise<Ed25519PublicKeyHex> {
-    return this.keyAgent.derivePublicKey(keyManagementUtil.DREP_KEY_DERIVATION_PATH);
+    if (!this.drepPubKey) {
+      try {
+        this.drepPubKey = await this.keyAgent.derivePublicKey(keyManagementUtil.DREP_KEY_DERIVATION_PATH);
+      } catch (error) {
+        this.#logger.error(error);
+        throw error;
+      }
+    }
+    return Promise.resolve(this.drepPubKey);
   }
 }

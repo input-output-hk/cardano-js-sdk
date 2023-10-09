@@ -6,7 +6,7 @@ type SerializedTransaction = Cardano.util.HexBlob;
 
 export interface SubmitTxArgs {
   signedTransaction: SerializedTransaction;
-  context?: { handles: HandleResolution[] };
+  context?: { handleResolutions: HandleResolution[] };
 }
 
 export interface TxSubmitProvider extends Provider {

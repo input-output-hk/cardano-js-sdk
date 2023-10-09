@@ -18,8 +18,12 @@ lerna-debug.log
 result
 source
 
+# created by macOS
+.DS_Store
+
 # IDE configs
 .idea/
+.vscode/
 
 # direnv
 /.direnv

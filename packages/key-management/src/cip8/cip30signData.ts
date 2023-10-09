@@ -18,12 +18,12 @@ import { Cardano, util } from '@cardano-sdk/core';
 import { Cip30DataSignature } from '@cardano-sdk/dapp-connector';
 import { ComposableError, HexBlob } from '@cardano-sdk/util';
 import { CoseLabel } from './util';
-import { STAKE_KEY_DERIVATION_PATH } from '../util';
+import { DREP_KEY_DERIVATION_PATH, STAKE_KEY_DERIVATION_PATH } from '../util';
 import { filter, firstValueFrom } from 'rxjs';
 
 export interface Cip30SignDataRequest {
   keyAgent: AsyncKeyAgent;
-  signWith: Cardano.PaymentAddress | Cardano.RewardAccount;
+  signWith: Cardano.PaymentAddress | Cardano.RewardAccount | Cardano.DRepID;
   payload: HexBlob;
 }
 
@@ -39,7 +39,7 @@ export class Cip30DataSignError<InnerError = unknown> extends ComposableError<In
   }
 }
 
-const getAddressBytes = (signWith: Cardano.PaymentAddress | Cardano.RewardAccount) => {
+const getAddressBytes = (signWith: Cardano.PaymentAddress | Cardano.RewardAccount | Cardano.DRepID) => {
   const address = Cardano.Address.fromString(signWith);
 
   if (!address) {
@@ -49,7 +49,14 @@ const getAddressBytes = (signWith: Cardano.PaymentAddress | Cardano.RewardAccoun
   return Buffer.from(address.toBytes(), 'hex');
 };
 
-const getDerivationPath = async (signWith: Cardano.PaymentAddress | Cardano.RewardAccount, keyAgent: AsyncKeyAgent) => {
+const getDerivationPath = async (
+  signWith: Cardano.PaymentAddress | Cardano.RewardAccount | Cardano.DRepID,
+  keyAgent: AsyncKeyAgent
+) => {
+  if (Cardano.DRepID.isValid(signWith)) {
+    return DREP_KEY_DERIVATION_PATH;
+  }
+
   const isRewardAccount = signWith.startsWith('stake');
 
   const knownAddresses = await firstValueFrom(
@@ -114,6 +121,9 @@ export const cip30signData = async ({
   signWith,
   payload
 }: Cip30SignDataRequest): Promise<Cip30DataSignature> => {
+  if (Cardano.DRepID.isValid(signWith) && !Cardano.DRepID.canSign(signWith)) {
+    throw new Cip30DataSignError(Cip30DataSignErrorCode.AddressNotPK, 'Invalid address');
+  }
   const addressBytes = getAddressBytes(signWith);
   const derivationPath = await getDerivationPath(signWith, keyAgent);
 

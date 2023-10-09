@@ -1,8 +1,6 @@
-import { CML } from '../CML/CML';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { InvalidArgumentError } from '@cardano-sdk/util';
 import { Metadatum, MetadatumMap } from '../Cardano/types/AuxiliaryData';
-import { txMetadatum as txMetadatumToCML } from '../CML/coreToCml/coreToCml';
-import { txMetadatum as txMetadatumToCore } from '../CML/cmlToCore/cmlToCore';
-import { usingAutoFree } from '@cardano-sdk/util';
 
 /**
  * @returns {MetadatumMap | null} null if Metadatum is not MetadatumMap
@@ -30,9 +28,40 @@ export const asMetadatumArray = (metadatum: Metadatum | undefined): Metadatum[] 
  * @param json The json object to be converted.
  * @returns The metadatum.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const jsonToMetadatum = (json: any): Metadatum =>
-  txMetadatumToCore(CML.encode_json_str_to_metadatum(JSON.stringify(json), CML.MetadataJsonSchema.NoConversions));
+export const jsonToMetadatum = (json: any): Metadatum => {
+  if (json === null) throw new InvalidArgumentError('json', 'JSON value can not be null');
+  switch (typeof json) {
+    case 'boolean':
+    case 'undefined':
+      throw new InvalidArgumentError('json', `JSON value can not be ${typeof json}`);
+    case 'number':
+    case 'bigint': {
+      return BigInt(json);
+    }
+    case 'string':
+      return String(json);
+    default: {
+      if (Array.isArray(json)) {
+        const array = [];
+        for (const metadataItem of json) {
+          array.push(jsonToMetadatum(metadataItem));
+        }
+        return array;
+      } else if (ArrayBuffer.isView(json)) {
+        return new Uint8Array(json.buffer);
+      }
+
+      const metadataMap = new Map<Metadatum, Metadatum>();
+
+      for (const key in json) {
+        const val = json[key];
+        metadataMap.set(jsonToMetadatum(key), jsonToMetadatum(val));
+      }
+
+      return metadataMap;
+    }
+  }
+};
 
 /**
  * Converts any Metadatum object to json.
@@ -40,10 +69,36 @@ export const jsonToMetadatum = (json: any): Metadatum =>
  * @param metadatum The metadatum to be converted to json.
  * @returns The json object.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const metadatumToJson = (metadatum: Metadatum): any =>
-  usingAutoFree((scope) =>
-    JSON.parse(
-      CML.decode_metadatum_to_json_str(txMetadatumToCML(scope, metadatum), CML.MetadataJsonSchema.NoConversions)
-    )
-  );
+export const metadatumToJson = (metadatum: Metadatum): any => {
+  if (metadatum === null) throw new InvalidArgumentError('data', 'Metadatum value can not be null');
+
+  switch (typeof metadatum) {
+    case 'boolean':
+    case 'undefined':
+    case 'number':
+      throw new InvalidArgumentError('metadatum', `Metadatum value can not be ${typeof metadatum}`);
+    case 'bigint': {
+      return metadatum;
+    }
+    case 'string':
+      return metadatum;
+    default: {
+      if (Array.isArray(metadatum)) {
+        const array = [];
+        for (const metadataItem of metadatum) {
+          array.push(metadatumToJson(metadataItem));
+        }
+        return array;
+      } else if (ArrayBuffer.isView(metadatum)) {
+        return new Uint8Array(metadatum);
+      }
+      const object: Object = {};
+
+      for (const [key, value] of metadatum.entries()) {
+        object[metadatumToJson(key) as keyof Object] = metadatumToJson(value);
+      }
+
+      return object;
+    }
+  }
+};

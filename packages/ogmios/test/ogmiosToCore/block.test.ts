@@ -5,6 +5,7 @@ import {
   mockAllegraBlock,
   mockAlonzoBlock,
   mockBabbageBlock,
+  mockBabbageBlockWithNftMetadata,
   mockByronBlock,
   mockMaryBlock,
   mockShelleyBlock
@@ -49,8 +50,24 @@ describe('ogmiosToCore', () => {
       expect(ogmiosToCore.block(mockAlonzoBlock)).toMatchSnapshot();
     });
 
-    it('can translate from babbage block', () => {
-      expect(ogmiosToCore.block(mockBabbageBlock)).toMatchSnapshot();
+    describe('babbage', () => {
+      it('can translate from babbage block', () => {
+        expect(ogmiosToCore.block(mockBabbageBlock)).toMatchSnapshot();
+      });
+
+      it('converts auxiliary data maps correctly', () => {
+        const coreBlock = ogmiosToCore.block(mockBabbageBlockWithNftMetadata);
+        const metadata = coreBlock!.body[0].auxiliaryData!.blob!;
+        const nftMetadatum = metadata.get(721n) as Cardano.MetadatumMap;
+        const policyIdMetadatum = nftMetadatum.get(
+          'f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a'
+        ) as Cardano.MetadatumMap;
+        const tokenMetadatum = policyIdMetadatum.get('bob') as Cardano.MetadatumMap;
+        expect(tokenMetadatum.get('name')).toBe('$bob');
+        const core = tokenMetadatum.get('core') as Cardano.MetadatumMap;
+        expect(core.get('og')).toBe(0n);
+        expect(Array.isArray(tokenMetadatum.get('augmentations'))).toBe(true);
+      });
     });
   });
 });

@@ -1,5 +1,5 @@
-import { Command, Option } from 'commander';
-import { URL } from 'url';
+import { Command } from 'commander';
+import { addOptions, newOption } from './util';
 
 const RABBITMQ_URL_DEFAULT = 'amqp://localhost:5672';
 
@@ -14,16 +14,17 @@ export interface RabbitMqProgramOptions {
 }
 
 export const withRabbitMqOptions = (command: Command) =>
-  command
-    .addOption(
-      new Option('--rabbitmq-srv-service-name <rabbitmqSrvServiceName>', RabbitMqOptionDescriptions.SrvServiceName).env(
-        'RABBITMQ_SRV_SERVICE_NAME'
-      )
-    )
-    .addOption(
-      new Option('--rabbitmq-url <rabbitmqUrl>', RabbitMqOptionDescriptions.Url)
-        .env('RABBITMQ_URL')
-        .default(new URL(RABBITMQ_URL_DEFAULT))
-        .conflicts('rabbitmqSrvServiceName')
-        .argParser((url) => new URL(url))
-    );
+  addOptions(command, [
+    newOption(
+      '--rabbitmq-srv-service-name <rabbitmqSrvServiceName>',
+      RabbitMqOptionDescriptions.SrvServiceName,
+      'RABBITMQ_SRV_SERVICE_NAME'
+    ),
+    newOption(
+      '--rabbitmq-url <rabbitmqUrl>',
+      RabbitMqOptionDescriptions.Url,
+      'RABBITMQ_URL',
+      (url) => new URL(url),
+      new URL(RABBITMQ_URL_DEFAULT)
+    ).conflicts('rabbitmqSrvServiceName')
+  ]);

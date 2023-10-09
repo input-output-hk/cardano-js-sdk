@@ -33,6 +33,7 @@ export class MoveInstantaneousRewardToOtherPot {
 
     if (this.#originalBytes) return this.#originalBytes;
 
+    // CDDL
     // move_instantaneous_reward = [ 0 / 1, coin ]
     writer.writeStartArray(EMBEDDED_GROUP_SIZE);
     writer.writeInt(this.#pot === Cardano.MirCertificatePot.Reserves ? 0 : 1);

@@ -47,7 +47,8 @@ const createDataSource = () =>
       Postgres.BlockDataEntity,
       Postgres.AssetEntity,
       Postgres.TokensEntity,
-      Postgres.OutputEntity
+      Postgres.OutputEntity,
+      Postgres.NftMetadataEntity
     ],
     logger,
     options: {

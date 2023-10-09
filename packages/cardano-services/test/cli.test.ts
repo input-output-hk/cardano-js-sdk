@@ -2147,7 +2147,35 @@ describe('CLI', () => {
           );
           await serverStarted(apiUrl);
           const headers = { 'Content-Type': 'application/json' };
-          const res = await axios.post(`${apiUrl}/v1.0.0/${ServiceNames.StakePool}/health`, { headers });
+          const res = await axios.post(`${apiUrl}${services.stakePool.versionPath}/${ServiceNames.StakePool}/health`, {
+            headers
+          });
+          expect(res.status).toBe(200);
+        });
+
+        it('asset provider server', async () => {
+          proc = withLogging(
+            fork(
+              exePath,
+              [
+                ...baseArgs,
+                '--api-url',
+                apiUrl,
+                '--postgres-connection-string-asset',
+                postgresConnectionStringHandle,
+                '--use-typeorm-asset-provider',
+                'true',
+                '--service-names',
+                ServiceNames.Asset
+              ],
+              { env: {}, stdio: 'pipe' }
+            )
+          );
+          await serverStarted(apiUrl);
+          const headers = { 'Content-Type': 'application/json' };
+          const res = await axios.post(`${apiUrl}${services.asset.versionPath}/${ServiceNames.Asset}/health`, {
+            headers
+          });
           expect(res.status).toBe(200);
         });
       });
@@ -2160,10 +2188,8 @@ describe('CLI', () => {
 
     const assertServerAlive = async () => {
       await serverStarted(apiUrl);
-      const headers = { 'Content-Type': 'application/json' };
-      const res = await axios.post(`${apiUrl}${baseVersionPath}/health`, { headers });
+      const res = await axios.get(`${apiUrl}${baseVersionPath}/live`);
       expect(res.status).toBe(200);
-      expect(res.data.ok).toBe(false);
     };
 
     beforeAll(async () => {
@@ -2610,6 +2636,37 @@ describe('CLI', () => {
         expect(chunks.join('')).toMatch(
           'MissingProgramOption: pool-metrics requires the stake-pool provider URL program option'
         );
+        expect(code).toBe(1);
+        done();
+      });
+    });
+
+    it('exits with code 1 with an invalid SMASH_URL when metadata-fetch-mode=smash', (done) => {
+      expect.assertions(2);
+      proc = withLogging(
+        fork(
+          exePath,
+          [
+            ...commonArgs,
+            '--queues',
+            'pool-metadata',
+            '--postgres-connection-string-db-sync',
+            postgresConnectionString,
+            '--postgres-connection-string-stake-pool',
+            postgresConnectionStringStakePool,
+            '--stake-pool-provider-url',
+            'http://localhost:4000/stake-pool',
+            '--metadata-fetch-mode',
+            'smash',
+            '--smash-url',
+            'invalid-url'
+          ],
+          { env: {}, stdio: 'pipe' }
+        ),
+        true
+      );
+      proc.stderr!.on('data', (data) => expect(data.toString()).toContain('[ERR_INVALID_URL]'));
+      proc.on('exit', (code) => {
         expect(code).toBe(1);
         done();
       });

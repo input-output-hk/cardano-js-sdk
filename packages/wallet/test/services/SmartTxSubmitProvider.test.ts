@@ -3,7 +3,6 @@ import { Cardano, ProviderError, ProviderFailure, Serialization, TxSubmitProvide
 import { ConnectionStatus, SmartTxSubmitProvider, TipSlot } from '../../src';
 import { RetryBackoffConfig } from 'backoff-rxjs';
 import { flushPromises, mockProviders } from '@cardano-sdk/util-dev';
-import { usingAutoFree } from '@cardano-sdk/util';
 
 describe('SmartTxSubmitProvider', () => {
   let underlyingProvider: jest.Mocked<TxSubmitProvider>;
@@ -35,22 +34,15 @@ describe('SmartTxSubmitProvider', () => {
       witness: { signatures: new Map() }
     };
     const validityInterval = { invalidBefore: Cardano.Slot(5), invalidHereafter: Cardano.Slot(10) };
-    const txWithoutValidityIntervalHex = usingAutoFree((scope) =>
-      scope.manage(Serialization.Transaction.fromCore(scope, txWithoutValidityInterval)).toCbor()
-    );
-    const txWithValidityIntervalHex = usingAutoFree((scope) =>
-      scope
-        .manage(
-          Serialization.Transaction.fromCore(scope, {
-            ...txWithoutValidityInterval,
-            body: {
-              ...txWithoutValidityInterval.body,
-              validityInterval
-            }
-          })
-        )
-        .toCbor()
-    );
+    const txWithoutValidityIntervalHex = Serialization.Transaction.fromCore(txWithoutValidityInterval).toCbor();
+
+    const txWithValidityIntervalHex = Serialization.Transaction.fromCore({
+      ...txWithoutValidityInterval,
+      body: {
+        ...txWithoutValidityInterval.body,
+        validityInterval
+      }
+    }).toCbor();
 
     describe('all preconditions are met', () => {
       beforeEach(() => {

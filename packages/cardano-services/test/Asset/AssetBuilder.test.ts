@@ -55,19 +55,4 @@ describe('AssetBuilder', () => {
       expect(result).toBeUndefined();
     });
   });
-
-  describe('queryMultiAssetHistory', () => {
-    test('query multi_asset transactions history', async () => {
-      const assets = await fixtureBuilder.getAssets(1);
-      const history = await fixtureBuilder.getHistory(assets[0].policyId, assets[0].name);
-      const result = await builder.queryMultiAssetHistory(assets[0].policyId, assets[0].name);
-      expect(result[0].quantity).toEqual(history[0].quantity.toString());
-      expect(result[0].hash).toEqual(Buffer.from(history[0].transactionId, 'hex'));
-    });
-
-    test('return empty array when not found', async () => {
-      const result = await builder.queryMultiAssetHistory(notValidPolicyId, notValidAssetName);
-      expect(result).toStrictEqual([]);
-    });
-  });
 });

@@ -21,7 +21,6 @@ import {
   somePartialStakePools
 } from '@cardano-sdk/util-dev';
 import {
-  CML,
   Cardano,
   ChainHistoryProvider,
   HandleProvider,
@@ -56,7 +55,7 @@ const name = 'Test Wallet';
 const address = mocks.utxo[0][0].address!;
 const rewardAccount = mocks.rewardAccount;
 
-const bip32Ed25519 = new Crypto.CmlBip32Ed25519(CML);
+const bip32Ed25519 = new Crypto.SodiumBip32Ed25519();
 interface Providers {
   rewardsProvider: RewardsProvider;
   utxoProvider: UtxoProvider;
@@ -245,8 +244,8 @@ const assertWalletProperties2 = async (wallet: ObservableWallet) => {
   expect(rewardAccounts).toHaveLength(1);
   expect(rewardAccounts[0].rewardBalance).toBe(mocks.rewardAccountBalance2);
 
-  // activePublicStakeKeys
-  const x = await firstValueFrom(wallet.activePublicStakeKeys$);
+  // PublicStakeKeys
+  const x = await firstValueFrom(wallet.publicStakeKeys$);
   expect(x.length).toBe(1); // not testing the actual value because the key agent grouped addresses is mocked
 };
 

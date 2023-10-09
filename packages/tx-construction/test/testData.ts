@@ -1,6 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { Base64Blob, HexBlob } from '@cardano-sdk/util';
-import { Cardano } from '@cardano-sdk/core';
+import { Cardano, Serialization } from '@cardano-sdk/core';
 import { generateRandomHexString } from '@cardano-sdk/util-dev';
 export const rewardAccount = Cardano.RewardAccount('stake1u89sasnfyjtmgk8ydqfv3fdl52f36x3djedfnzfc9rkgzrcss5vgr');
 export const stakeKeyHash = Cardano.RewardAccount.toHash(rewardAccount);
@@ -162,10 +162,10 @@ export const tx: Cardano.Tx = {
         )
       }
     ],
-    datums: [HexBlob('187b')],
+    datums: [123n],
     redeemers: [
       {
-        data: HexBlob('d86682008101'),
+        data: Serialization.PlutusData.fromCbor(HexBlob('d86682008101')).toCore(),
         executionUnits: {
           memory: 3000,
           steps: 7000
@@ -174,7 +174,7 @@ export const tx: Cardano.Tx = {
         purpose: Cardano.RedeemerPurpose.mint
       },
       {
-        data: HexBlob('d86682008102'),
+        data: Serialization.PlutusData.fromCbor(HexBlob('d86682008102')).toCore(),
         executionUnits: {
           memory: 5000,
           steps: 2000
@@ -445,7 +445,7 @@ export const twoPolicyOne0CharAssetDatum = {
   address: Cardano.PaymentAddress(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
-  datum: HexBlob('187b'),
+  datum: 123n,
   value: {
     assets: new Map([
       [Cardano.AssetId('ab8370c97ae17eb69a8c97f733888f7485b60fd820c69211c8bbeb56'), 1n],
@@ -461,7 +461,7 @@ export const twoPolicyOne0CharAssetDatumAndScriptReference = {
   address: Cardano.PaymentAddress(
     'addr_test1qz2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3uqxgjqnnj83ws8lhrn648jjxtwq2ytjqp'
   ),
-  datum: HexBlob('187b'),
+  datum: 123n,
   scriptReference: script,
   value: {
     assets: new Map([

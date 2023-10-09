@@ -18,6 +18,7 @@ yarn --cwd "$WORKSPACE_ROOT" build
 yarn --cwd "$PACKAGES_DIR"/e2e wait-for-network
 yarn --cwd "$PACKAGES_DIR"/e2e test:wallet
 yarn --cwd "$PACKAGES_DIR"/e2e test:long-running delegation-rewards.test.ts
+TL_LEVEL="${TL_LEVEL:=info}" node "$SCRIPT_DIR/mint-handles.js"
 yarn --cwd "$PACKAGES_DIR"/e2e test:local-network register-pool.test.ts
 
 echo 'Stop providing data to projectors'

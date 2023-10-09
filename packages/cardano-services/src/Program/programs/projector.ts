@@ -13,7 +13,6 @@ import { MissingProgramOption, UnknownServiceName } from '../errors';
 import { ProjectionHttpService, ProjectionName, createTypeormProjection, storeOperators } from '../../Projection';
 import { SrvRecord } from 'dns';
 import { TypeormStabilityWindowBuffer, createStorePoolMetricsUpdateJob } from '@cardano-sdk/projection-typeorm';
-import { URL } from 'url';
 import { createLogger } from 'bunyan';
 import { getConnectionConfig, getOgmiosObservableCardanoNode } from '../services';
 

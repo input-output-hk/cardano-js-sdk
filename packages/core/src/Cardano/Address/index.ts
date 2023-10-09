@@ -1,6 +1,7 @@
 export * from './Address';
 export * from './BaseAddress';
 export * from './ByronAddress';
+export * from './DRepID';
 export * from './EnterpriseAddress';
 export * from './PaymentAddress';
 export * from './PointerAddress';

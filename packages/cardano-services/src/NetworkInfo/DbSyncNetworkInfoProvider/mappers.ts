@@ -28,6 +28,7 @@ export const mapCostModels = (costs: CostModelsParamModel | null) => {
   const models: Cardano.CostModels = new Map();
   if (costs?.PlutusV1) models.set(Cardano.PlutusLanguageVersion.V1, costs.PlutusV1);
   if (costs?.PlutusV2) models.set(Cardano.PlutusLanguageVersion.V2, costs.PlutusV2);
+  if (costs?.PlutusV3) models.set(Cardano.PlutusLanguageVersion.V3, costs.PlutusV3);
   return models;
 };
 
@@ -58,13 +59,27 @@ export const toProtocolParams = ({
   max_block_ex_mem,
   max_block_ex_steps,
   max_epoch,
-  costs
+  costs,
+  pool_voting_thresholds,
+  drep_voting_thresholds,
+  min_committee_size,
+  committee_term_limit,
+  governance_action_validity_period,
+  governance_action_deposit,
+  drep_deposit,
+  drep_inactivity_period
 }: ProtocolParamsModel): Cardano.ProtocolParameters => ({
   coinsPerUtxoByte: Number(coins_per_utxo_size),
   collateralPercentage: collateral_percent,
+  committeeTermLimit: Number(committee_term_limit),
   costModels: mapCostModels(costs),
+  dRepDeposit: Number(drep_deposit),
+  dRepInactivityPeriod: Cardano.EpochNo(drep_inactivity_period),
+  dRepVotingThresholds: drep_voting_thresholds,
   decentralizationParameter: String(decentralisation),
   desiredNumberOfPools: optimal_pool_count,
+  governanceActionDeposit: governance_action_deposit,
+  governanceActionValidityPeriod: Cardano.EpochNo(governance_action_validity_period),
   maxBlockBodySize: max_block_size,
   maxBlockHeaderSize: max_bh_size,
   maxCollateralInputs: max_collateral_inputs,
@@ -78,6 +93,7 @@ export const toProtocolParams = ({
   },
   maxTxSize: max_tx_size,
   maxValueSize: Number(max_val_size),
+  minCommitteeSize: Number(min_committee_size),
   minFeeCoefficient: min_fee_a,
   minFeeConstant: min_fee_b,
   minPoolCost: Number(min_pool_cost),
@@ -85,6 +101,7 @@ export const toProtocolParams = ({
   poolDeposit: Number(pool_deposit),
   poolInfluence: String(influence),
   poolRetirementEpochBound: max_epoch,
+  poolVotingThresholds: pool_voting_thresholds,
   prices: {
     memory: price_mem,
     steps: price_step

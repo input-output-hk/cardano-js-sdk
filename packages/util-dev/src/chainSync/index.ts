@@ -91,7 +91,8 @@ export enum ChainSyncDataSet {
   WithPoolRetirement = 'with-pool-retirement.json',
   WithStakeKeyDeregistration = 'with-stake-key-deregistration.json',
   WithMint = 'with-mint.json',
-  WithHandle = 'with-handle.json'
+  WithHandle = 'with-handle.json',
+  WithInlineDatum = 'with-inline-datum.json'
 }
 
 export const chainSyncData = memoize((dataSet: ChainSyncDataSet) => {

@@ -169,3 +169,4 @@ const testBip32Ed25519 = (name: string, bip32Ed25519: Crypto.Bip32Ed25519) => {
 };
 
 testBip32Ed25519('CmlBip32Ed25519', new Crypto.CmlBip32Ed25519(CML));
+testBip32Ed25519('SodiumBip32Ed25519', new Crypto.SodiumBip32Ed25519());

@@ -39,7 +39,6 @@ const expectedHandleInfo: HandleInfo = {
   fingerprint: handleFingerprint,
   handle,
   hasDatum: !!handleOutput.datum,
-  mintOrBurnCount: handleAssetInfo.mintOrBurnCount,
   name: handleAssetName,
   policyId: handlePolicyId,
   quantity: 1n,
@@ -73,6 +72,11 @@ const retrySyntax = (retries: number) =>
     .join('');
 
 const failedToHydrateError = () => throwError('error');
+
+const handleReferenceTokenAssetId = Cardano.AssetId.fromParts(
+  handlePolicyId,
+  Asset.AssetNameLabel.encode(handleAssetName, Asset.AssetNameLabelNum.ReferenceNFT)
+);
 
 describe('createHandlesTracker', () => {
   it('matches utxo$ assets to given handlePolicyIds and adds context from assetInfo$ and tip$ observables', () => {
@@ -113,6 +117,46 @@ describe('createHandlesTracker', () => {
             {
               ...handleAssetInfo,
               supply: 2n
+            }
+          ]
+        ])
+      });
+      const handlePolicyIds$ = hot('-a-', { a: [handlePolicyId] });
+
+      const handles$ = createHandlesTracker({
+        assetInfo$,
+        handlePolicyIds$,
+        handleProvider: {
+          getPolicyIds: async (): Promise<Cardano.PolicyId[]> => [handlePolicyId],
+          healthCheck: jest.fn(),
+          resolveHandles: async () => []
+        },
+        logger,
+        utxo$
+      }, { hydrateHandle: () => hydrateHandle });
+
+      expectObservable(handles$).toBe('-a', { a: [] });
+    });
+  });
+
+  it('filters out cip68 reference tokens', () => {
+    createTestScheduler().run(({ hot, expectObservable }) => {
+      const utxo$ = hot('-a', { a: [[utxo[0][0], {
+          address: utxo[0][1].address,
+          value: {
+            assets: new Map([
+              [handleReferenceTokenAssetId, 1n]
+            ]),
+            coins: 9_825_963n
+          }
+        }
+      ] as Cardano.Utxo] });
+      const assetInfo$ = hot('-a', {
+        a: new Map([
+          [
+            handleReferenceTokenAssetId, {
+              ...handleAssetInfo,
+              supply: 1n
             }
           ]
         ])

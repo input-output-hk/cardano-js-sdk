@@ -1,7 +1,7 @@
 ARG UBUNTU_VERSION=20.04
 
 FROM ubuntu:${UBUNTU_VERSION} as ubuntu-nodejs
-ARG NODEJS_MAJOR_VERSION=14
+ARG NODEJS_MAJOR_VERSION=18
 ENV DEBIAN_FRONTEND=nonintercative
 RUN apt-get update && apt-get install curl -y
 RUN curl --proto '=https' --tlsv1.2 -sSf -L https://deb.nodesource.com/setup_${NODEJS_MAJOR_VERSION}.x | bash -

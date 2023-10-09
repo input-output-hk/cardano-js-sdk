@@ -1,6 +1,6 @@
 import { AssetFingerprint, AssetId, AssetName, PolicyId } from '../../../src/Cardano';
 import { Hash28ByteBase16 } from '@cardano-sdk/crypto';
-import { assertIsHexString, typedBech32 } from '@cardano-sdk/util';
+import { InvalidStringError, assertIsHexString, typedBech32 } from '@cardano-sdk/util';
 
 jest.mock('@cardano-sdk/util', () => {
   const actual = jest.requireActual('@cardano-sdk/util');
@@ -102,6 +102,15 @@ describe('Cardano/types/Asset', () => {
 
     it('does not accept a hex string > 64 chars', () => {
       expect(() => AssetName('0dbe461fb5f981c0d01615332b8666340eb1a692b3034f46bcb5f5e0dbe461abc')).toThrow();
+    });
+
+    describe('fromUTF8', () => {
+      it('decodes hex string (bytes) to utf8 string', () => {
+        expect(AssetName.toUTF8(AssetName('737472'))).toEqual('str');
+      });
+      it('throws InvalidStringError when it cannot be decoded to utf8', () => {
+        expect(() => AssetName.toUTF8(AssetName('e8'))).toThrowError(InvalidStringError);
+      });
     });
   });
 

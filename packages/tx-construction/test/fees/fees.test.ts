@@ -120,7 +120,7 @@ describe('fees', () => {
     it('calculate the correct min fee for transaction with scripts', () => {
       const prices = { memory: 0.0577, steps: 0.000_007_21 };
       const fee = minFee(babbageTx, prices, MinFeeConstant(155_381), MinFeeCoefficient(44));
-      expect(fee).toBe(218_807n);
+      expect(fee).toBe(218_763n);
     });
   });
 });

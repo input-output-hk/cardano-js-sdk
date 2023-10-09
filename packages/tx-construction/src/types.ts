@@ -34,7 +34,7 @@ export interface InitializeTxProps {
   auxiliaryData?: Cardano.AuxiliaryData;
   witness?: InitializeTxWitness;
   signingOptions?: SignTransactionOptions;
-  handles?: HandleResolution[];
+  handleResolutions?: HandleResolution[];
 }
 
 export interface InitializeTxPropsValidationResult {
