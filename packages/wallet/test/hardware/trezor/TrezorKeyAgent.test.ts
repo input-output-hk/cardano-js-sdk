@@ -33,7 +33,7 @@ describe('TrezorKeyAgent', () => {
       createKeyAgent: async (dependencies) => {
         const trezorKeyAgent = await TrezorKeyAgent.createWithDevice(
           {
-            chainId: Cardano.ChainIds.LegacyTestnet,
+            chainId: Cardano.ChainIds.Preprod,
             trezorConfig
           },
           dependencies
@@ -84,7 +84,7 @@ describe('TrezorKeyAgent', () => {
     const trezorKeyAgentWithRandomIndex = await TrezorKeyAgent.createWithDevice(
       {
         accountIndex: 5,
-        chainId: Cardano.ChainIds.LegacyTestnet,
+        chainId: Cardano.ChainIds.Preprod,
         trezorConfig
       },
       mockKeyAgentDependencies()
@@ -99,7 +99,7 @@ describe('TrezorKeyAgent', () => {
   });
 
   test('chainId', () => {
-    expect(keyAgent.chainId).toBe(Cardano.ChainIds.LegacyTestnet);
+    expect(keyAgent.chainId).toBe(Cardano.ChainIds.Preprod);
   });
 
   test('accountIndex', () => {

@@ -51,7 +51,7 @@ describe('LedgerKeyAgent+PersonalWallet', () => {
       createKeyAgent: (dependencies) =>
         LedgerKeyAgent.createWithDevice(
           {
-            chainId: Cardano.ChainIds.LegacyTestnet,
+            chainId: Cardano.ChainIds.Preprod,
             communicationType: CommunicationType.Node
           },
           dependencies

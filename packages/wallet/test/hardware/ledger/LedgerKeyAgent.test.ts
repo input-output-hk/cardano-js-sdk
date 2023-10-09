@@ -24,7 +24,7 @@ describe('LedgerKeyAgent', () => {
       createKeyAgent: async (dependencies) =>
         await LedgerKeyAgent.createWithDevice(
           {
-            chainId: Cardano.ChainIds.LegacyTestnet,
+            chainId: Cardano.ChainIds.Preprod,
             communicationType: CommunicationType.Node
           },
           dependencies
@@ -66,7 +66,7 @@ describe('LedgerKeyAgent', () => {
     const ledgerKeyAgentWithRandomIndex = await LedgerKeyAgent.createWithDevice(
       {
         accountIndex: 5,
-        chainId: Cardano.ChainIds.LegacyTestnet,
+        chainId: Cardano.ChainIds.Preprod,
         communicationType: CommunicationType.Node,
         deviceConnection: keyAgent.deviceConnection
       },
@@ -82,7 +82,7 @@ describe('LedgerKeyAgent', () => {
   });
 
   test('chainId', () => {
-    expect(keyAgent.chainId).toBe(Cardano.ChainIds.LegacyTestnet);
+    expect(keyAgent.chainId).toBe(Cardano.ChainIds.Preprod);
   });
 
   test('accountIndex', () => {
