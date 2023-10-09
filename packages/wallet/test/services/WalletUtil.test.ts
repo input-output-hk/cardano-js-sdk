@@ -1,6 +1,6 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
-import { CML, Cardano } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import {
   PersonalWallet,
   WalletUtilContext,
@@ -103,7 +103,7 @@ describe('WalletUtil', () => {
         type: AddressType.External
       };
       ({ wallet } = await setupWallet({
-        bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
+        bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
         createKeyAgent: async (dependencies) => {
           const asyncKeyAgent = await testAsyncKeyAgent([groupedAddress], dependencies);
           asyncKeyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);

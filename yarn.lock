@@ -3099,7 +3099,6 @@ __metadata:
     "@cardano-ogmios/schema": 5.6.0
     "@cardano-sdk/crypto": "workspace:~"
     "@cardano-sdk/util": "workspace:~"
-    "@dcspark/cardano-multiplatform-lib-nodejs": ^3.1.1
     "@foxglove/crc": ^0.0.3
     "@scure/base": ^1.1.1
     "@types/lodash": ^4.14.182
@@ -3217,6 +3216,7 @@ __metadata:
     "@cardano-sdk/wallet": "workspace:~"
     "@cardano-sdk/web-extension": "workspace:~"
     "@dcspark/cardano-multiplatform-lib-browser": ^3.1.1
+    "@dcspark/cardano-multiplatform-lib-nodejs": ^3.1.1
     "@emurgo/cardano-message-signing-asmjs": ^1.0.1
     "@types/bunyan": ^1.8.8
     "@types/chalk": ^2.2.0

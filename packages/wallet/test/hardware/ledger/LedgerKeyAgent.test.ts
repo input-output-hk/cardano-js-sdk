@@ -2,7 +2,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, CommunicationType, SerializableLedgerKeyAgentData, util } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
-import { CML, Cardano, Serialization } from '@cardano-sdk/core';
+import { Cardano, Serialization } from '@cardano-sdk/core';
 import { Hash32ByteBase16 } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
@@ -20,7 +20,7 @@ describe('LedgerKeyAgent', () => {
   beforeAll(async () => {
     txSubmitProvider = mocks.mockTxSubmitProvider();
     ({ keyAgent, wallet } = await setupWallet({
-      bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
+      bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
       createKeyAgent: async (dependencies) =>
         await LedgerKeyAgent.createWithDevice(
           {

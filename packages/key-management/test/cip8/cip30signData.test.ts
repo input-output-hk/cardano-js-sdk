@@ -1,7 +1,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, AsyncKeyAgent, GroupedAddress, KeyAgent, KeyRole, cip8 } from '../../src';
-import { CML, Cardano, util } from '@cardano-sdk/core';
 import { COSEKey, COSESign1, SigStructure } from '@emurgo/cardano-message-signing-nodejs';
+import { Cardano, util } from '@cardano-sdk/core';
 import { CoseLabel } from '../../src/cip8/util';
 import { HexBlob } from '@cardano-sdk/util';
 import { testAsyncKeyAgent, testKeyAgent } from '../mocks';
@@ -11,7 +11,7 @@ describe('cip30signData', () => {
   let keyAgent: KeyAgent;
   let asyncKeyAgent: AsyncKeyAgent;
   let address: GroupedAddress;
-  const cryptoProvider = new Crypto.CmlBip32Ed25519(CML);
+  const cryptoProvider = new Crypto.SodiumBip32Ed25519();
 
   beforeAll(async () => {
     const keyAgentReady = testKeyAgent();

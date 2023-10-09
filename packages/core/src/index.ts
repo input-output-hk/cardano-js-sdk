@@ -1,7 +1,3 @@
-import * as CML from '@dcspark/cardano-multiplatform-lib-nodejs';
-export * as CML from '@dcspark/cardano-multiplatform-lib-nodejs';
-export type CardanoMultiplatformLib = typeof CML;
-
 export * as Asset from './Asset';
 export * as Cardano from './Cardano';
 export * from './Provider';
