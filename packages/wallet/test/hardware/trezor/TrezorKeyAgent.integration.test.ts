@@ -49,7 +49,7 @@ describe('TrezorKeyAgent+PersonalWallet', () => {
       createKeyAgent: (dependencies) =>
         TrezorKeyAgent.createWithDevice(
           {
-            chainId: Cardano.ChainIds.LegacyTestnet,
+            chainId: Cardano.ChainIds.Preprod,
             trezorConfig: {
               communicationType: CommunicationType.Node,
               manifest: {
