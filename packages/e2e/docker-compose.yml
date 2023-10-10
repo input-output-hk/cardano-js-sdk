@@ -79,6 +79,13 @@ services:
       - ./local-network/config/network:/config
       - sdk-ipc:/sdk-ipc
 
+  asset-provider-server:
+    environment:
+      HANDLE_POLICY_IDS_FILE: /sdk-ipc/handle_policy_ids
+    volumes:
+      - ./local-network/config/network:/config
+      - sdk-ipc:/sdk-ipc
+
 volumes:
   sdk-ipc:
     driver: local
