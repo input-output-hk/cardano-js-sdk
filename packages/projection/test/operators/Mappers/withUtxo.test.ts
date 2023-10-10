@@ -81,6 +81,34 @@ export const validTxSource$ = of({
           ]
         },
         inputSource: Cardano.InputSource.inputs
+      },
+      {
+        body: {
+          inputs: [
+            {
+              index: 0,
+              txId: '73e26ff267b5ee32d8e413635f4f4c9547db1c2af1694faf51be20b9f508b8f6'
+            }
+          ],
+          outputs: [
+            {
+              address:
+                'addr_test1qzrf8t56qhzcp2chrtn7deqhep0dttr3eemhnut6lth3gulj7cuplfarmnq5fyumgl0lklddvau9dhamaexykljzvpyswqt56p',
+              value: {
+                assets: new Map(),
+                coins: 25_485_292n
+              }
+            },
+            {
+              address: 'addr_test1vptwv4jvaqt635jvthpa29lww3vkzypm8l6vk4lv4tqfhhgajdgwf',
+              value: {
+                assets: new Map(),
+                coins: 74_341_815n
+              }
+            }
+          ]
+        },
+        inputSource: Cardano.InputSource.inputs
       }
     ]
   }
@@ -182,8 +210,8 @@ describe('withUtxo', () => {
     const {
       utxo: { consumed, produced }
     } = await firstValueFrom(validTxSource$.pipe(withUtxo()));
-    expect(consumed).toHaveLength(3);
-    expect(produced).toHaveLength(3);
+    expect(consumed).toHaveLength(4);
+    expect(produced).toHaveLength(5);
   });
 
   it('when inputSource is collateral: maps consumed/produced utxo from collateral/collateralReturn', async () => {
@@ -213,12 +241,12 @@ describe('withUtxo', () => {
         )
       );
 
-      expect(produced).toHaveLength(1);
+      expect(produced).toHaveLength(2);
     });
   });
 
   describe('filterProducedUtxoByAssetsPresence', () => {
-    it('keeps only utxo produced for supplied addresses that contain assets', async () => {
+    it('keeps only utxo produced that contain any assets', async () => {
       const {
         utxo: { produced }
       } = await firstValueFrom(validTxSource$.pipe(withUtxo(), filterProducedUtxoByAssetsPresence()));
