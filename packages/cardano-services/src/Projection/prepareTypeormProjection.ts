@@ -40,6 +40,7 @@ import { passthrough } from '@cardano-sdk/util-rxjs';
  *
  */
 export enum ProjectionName {
+  Asset = 'asset',
   Handle = 'handle',
   StakePool = 'stake-pool',
   StakePoolMetadataJob = 'stake-pool-metadata-job',
@@ -65,6 +66,10 @@ const createMapperOperators = (
   const filterUtxo = applyUtxoAndMintFilters
     ? Mapper.filterProducedUtxoByAssetPolicyId({ policyIds: handlePolicyIds })
     : passthrough();
+  const filterProducedUtxoByAssetsPresence =
+    projectionNames.includes(ProjectionName.Asset) && !projectionNames.includes(ProjectionName.UTXO)
+      ? Mapper.filterProducedUtxoByAssetsPresence()
+      : passthrough();
   const filterMint = applyUtxoAndMintFilters
     ? Mapper.filterMintByPolicyIds({ policyIds: handlePolicyIds })
     : passthrough();
@@ -74,6 +79,7 @@ const createMapperOperators = (
     : passthrough();
   return {
     filterMint,
+    filterProducedUtxoByAssetsPresence,
     filterUtxo,
     withAddresses: Mapper.withAddresses(),
     withCIP67: Mapper.withCIP67(),
@@ -218,6 +224,7 @@ const storeInterDependencies: Partial<Record<StoreName, StoreName[]>> = {
 
 const projectionStoreDependencies: Record<ProjectionName, StoreName[]> = {
   address: ['storeAddresses'],
+  asset: ['storeAssets'],
   // TODO: remove storeNftMetadata when TypeormAssetProvider tests
   // are updated to use 'asset' database instead of a handle database
   handle: ['storeHandles', 'storeHandleMetadata', 'storeNftMetadata'],
