@@ -144,11 +144,18 @@ export interface Tx<TBody extends TxBody = TxBody> {
   isValid?: boolean;
 }
 
-export interface OnChainTx<TBody extends TxBody = TxBody> extends Omit<Tx<TBody>, 'isValid'> {
+interface TxWithInputSource<TBody extends TxBody = TxBody> extends Omit<Tx<TBody>, 'isValid'> {
   inputSource: InputSource;
 }
 
-export interface HydratedTx extends OnChainTx<HydratedTxBody> {
+// https://github.com/input-output-hk/cardano-js-sdk/pull/927#discussion_r1352081210
+export interface OnChainTx<TBody extends TxBody = TxBody>
+  extends Omit<TxWithInputSource<TBody>, 'witness' | 'auxiliaryData'> {
+  witness: Omit<Witness, 'scripts'>;
+  auxiliaryData?: Omit<AuxiliaryData, 'scripts'>;
+}
+
+export interface HydratedTx extends TxWithInputSource<HydratedTxBody> {
   index: number;
   blockHeader: PartialBlockHeader;
   body: HydratedTxBody;

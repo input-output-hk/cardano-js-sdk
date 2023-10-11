@@ -240,7 +240,10 @@ const mapMetadata = (ogmiosMetadata: Schema.MetadataLabels[0]): Cardano.Metadatu
 
 const mapAuxiliaryData = (
   data: Transaction['metadata']
-): { auxiliaryData: Cardano.AuxiliaryData | undefined; auxiliaryDataHash: Crypto.Hash32ByteBase16 | undefined } => {
+): {
+  auxiliaryData: Omit<Cardano.AuxiliaryData, 'scripts'> | undefined;
+  auxiliaryDataHash: Crypto.Hash32ByteBase16 | undefined;
+} => {
   if (!data) return { auxiliaryData: undefined, auxiliaryDataHash: undefined };
 
   const auxiliaryData = {
@@ -249,7 +252,8 @@ const mapAuxiliaryData = (
       : undefined
     // Extra scripts have been moved to the scripts field and merged with witness scripts.
     // https://github.com/CardanoSolutions/ogmios/blob/master/architectural-decisions/accepted/017-api-version-6-major-rewrite.md#transaction
-    // TODO: deprecate 'scripts' from auxiliaryData
+    // Removed 'auxiliaryData.scripts' from `OnChainTx`
+    // https://github.com/input-output-hk/cardano-js-sdk/pull/927#discussion_r1352081210
     // scripts: undefined
   };
   const auxiliaryDataHash = Crypto.Hash32ByteBase16(data.hash);
@@ -351,7 +355,9 @@ const mapCommonTx = (tx: Schema.Transaction): Cardano.OnChainTx => {
         .map(mapBootstrapWitness),
       ...(tx.datums && { datums: mapWitnessDatums({ datums: tx.datums }) }),
       ...(tx.redeemers && { redeemers: Object.entries(tx.redeemers).map(([key, value]) => mapRedeemer(key, value)) }),
-      ...(tx.scripts && { scripts: [...Object.values(tx.scripts).map(mapScript)] }),
+      // Removed `witness.scripts` from `OnChainTx`
+      // https://github.com/input-output-hk/cardano-js-sdk/pull/927#discussion_r1352081210
+      // ...(tx.scripts && { scripts: [...Object.values(tx.scripts).map(mapScript)] }),
       signatures: new Map(
         tx.signatories
           .filter((signatory) => !signatory.addressAttributes && !signatory.chainCode)
