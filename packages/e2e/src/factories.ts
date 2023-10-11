@@ -30,7 +30,6 @@ import {
   CommunicationType,
   InMemoryKeyAgent,
   KeyAgentDependencies,
-  TrezorKeyAgent,
   util
 } from '@cardano-sdk/key-management';
 import {
@@ -47,6 +46,7 @@ import {
 import { LedgerKeyAgent } from '@cardano-sdk/hardware-ledger';
 import { Logger } from 'ts-log';
 import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
+import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
 import { createConnectionObject } from '@cardano-ogmios/client';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom } from 'rxjs';

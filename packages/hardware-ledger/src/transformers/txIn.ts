@@ -2,7 +2,7 @@ import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { Cardano } from '@cardano-sdk/core';
 import { LedgerTxTransformerContext } from '../types';
 import { Transform } from '@cardano-sdk/util';
-import { paymentKeyPathFromGroupedAddress } from './keyPaths';
+import { util } from '@cardano-sdk/key-management';
 
 const resolveKeyPath = async (
   txIn: Cardano.TxIn,
@@ -16,7 +16,7 @@ const resolveKeyPath = async (
     const knownAddress = context.knownAddresses.find(({ address }) => address === txOut.address);
 
     if (knownAddress) {
-      paymentKeyPath = paymentKeyPathFromGroupedAddress(knownAddress);
+      paymentKeyPath = util.paymentKeyPathFromGroupedAddress(knownAddress);
     }
   }
 
