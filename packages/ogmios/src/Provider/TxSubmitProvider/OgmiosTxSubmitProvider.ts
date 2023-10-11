@@ -52,8 +52,7 @@ export class OgmiosTxSubmitProvider extends RunnableModule implements TxSubmitPr
 
     this.#txSubmissionClient = await TransactionSubmission.createTransactionSubmissionClient(
       await createInteractionContextWithLogger(contextLogger(this.#logger, 'ogmiosTxSubmitProvider'), {
-        connection: this.#connectionConfig,
-        interactionType: 'LongRunning'
+        connection: this.#connectionConfig
       })
     );
 

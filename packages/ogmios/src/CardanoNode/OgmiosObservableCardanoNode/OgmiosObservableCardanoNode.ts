@@ -99,8 +99,7 @@ export class OgmiosObservableCardanoNode implements ObservableCardanoNode {
     this.#logger = contextLogger(logger, 'ObservableOgmiosCardanoNode');
     this.#interactionContext$ = createObservableInteractionContext(
       {
-        ...props,
-        interactionType: 'LongRunning'
+        ...props
       },
       { logger: this.#logger }
     ).pipe(shareReplay({ bufferSize: 1, refCount: true }));
