@@ -1,11 +1,5 @@
 import { Cardano, HealthCheckResponse } from '@cardano-sdk/core';
-import {
-  ConnectionConfig,
-  InteractionContext,
-  InteractionType,
-  ServerHealth,
-  createInteractionContext
-} from '@cardano-ogmios/client';
+import { ConnectionConfig, InteractionContext, ServerHealth, createInteractionContext } from '@cardano-ogmios/client';
 import { Logger } from 'ts-log';
 import { Percent } from '@cardano-sdk/util';
 
@@ -23,7 +17,6 @@ export const urlToConnectionConfig = (connectionURL?: URL): ConnectionConfig => 
 
 type CreateInteractionContextOptions = {
   connection?: ConnectionConfig;
-  interactionType?: InteractionType;
 };
 
 /**

@@ -1,9 +1,4 @@
-import {
-  ConnectionConfig,
-  InteractionContext,
-  InteractionType,
-  createInteractionContext
-} from '@cardano-ogmios/client';
+import { ConnectionConfig, InteractionContext, createInteractionContext } from '@cardano-ogmios/client';
 import { GeneralCardanoNodeError, GeneralCardanoNodeErrorCode } from '@cardano-sdk/core';
 import { Observable, switchMap } from 'rxjs';
 import { RetryBackoffConfig, retryBackoff } from 'backoff-rxjs';
@@ -23,12 +18,6 @@ export interface InteractionContextProps {
    * close an existing connection and open a new one.
    */
   connectionConfig$: Observable<ConnectionConfig>;
-  /**
-   * 'LongRunning' will keep the connection open until unsubscribed.
-   * 'OneTime' will close the connectino (and complete the interaction context observable)
-   * after the 1st usage of emitted interaction context.
-   */
-  interactionType: InteractionType; // REVIEW: Deprecate this? InteractionType is not used anymore in ogmios
   /**
    * Retry backoff configuration for
    * re-subscribing to connectionConfig$ on connection error.
