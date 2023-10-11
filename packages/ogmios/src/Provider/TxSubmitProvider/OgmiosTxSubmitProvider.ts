@@ -1,7 +1,14 @@
 /* eslint-disable no-console */
 import {
-  Cardano,
-  CardanoNodeErrors,
+  ConnectionConfig,
+  TransactionSubmission,
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  TxSubmission
+} from '@cardano-ogmios/client';
+import {
+  GeneralCardanoNodeError,
+  GeneralCardanoNodeErrorCode,
   HandleOwnerChangeError,
   HandleProvider,
   HealthCheckResponse,
@@ -11,17 +18,11 @@ import {
   SubmitTxArgs,
   TxSubmitProvider
 } from '@cardano-sdk/core';
-import {
-  ConnectionConfig,
-  TransactionSubmission,
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  TxSubmission
-} from '@cardano-ogmios/client';
 import { Logger } from 'ts-log';
 import { OgmiosCardanoNode } from '../../CardanoNode';
 import { RunnableModule, contextLogger, isNotNil } from '@cardano-sdk/util';
 import { createInteractionContextWithLogger } from '../../util';
+import { withCoreCardanoNodeError } from '../../CardanoNode/queries';
 
 /**
  * Connect to an [Ogmios](https://ogmios.dev/) instance
@@ -71,17 +72,18 @@ export class OgmiosTxSubmitProvider extends RunnableModule implements TxSubmitPr
 
   async submitTx({ signedTransaction, context }: SubmitTxArgs): Promise<void> {
     if (this.state !== 'running') {
-      throw new CardanoNodeErrors.NotInitializedError('submitTx', this.name);
+      throw new GeneralCardanoNodeError(
+        GeneralCardanoNodeErrorCode.ServerNotReady,
+        null,
+        'OgmiosTxSubmitProvider not started'
+      );
     }
 
     await this.throwIfHandleResolutionConflict(context);
-
-    try {
+    return withCoreCardanoNodeError(async () => {
       const id = await this.#txSubmissionClient.submitTransaction(signedTransaction);
       this.#logger.info(`Submitted ${id}`);
-    } catch (error) {
-      throw Cardano.util.asTxSubmissionError(error) || new CardanoNodeErrors.UnknownTxSubmissionError(error);
-    }
+    });
   }
 
   async healthCheck(): Promise<HealthCheckResponse> {

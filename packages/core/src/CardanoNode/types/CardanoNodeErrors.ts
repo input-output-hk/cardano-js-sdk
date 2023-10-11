@@ -1,132 +1,108 @@
-import {
-  AcquirePointNotOnChainError,
-  AcquirePointTooOldError,
-  EraMismatchError,
-  IntersectionNotFoundError,
-  QueryUnavailableInCurrentEraError,
-  ServerNotReady,
-  TipIsOriginError,
-  TxSubmission,
-  UnknownResultError,
-  WebSocketClosed
-} from '@cardano-ogmios/client';
-import { ComposableError } from '@cardano-sdk/util';
+import * as Cardano from '../../Cardano';
 import { CustomError } from 'ts-custom-error';
 
-export class NotInitializedError extends CustomError {
-  constructor(methodName: string, moduleName: string) {
-    super(`${methodName} cannot be called until ${moduleName} is initialized`);
+export enum GeneralCardanoNodeErrorCode {
+  ServerNotReady = 503,
+  Unknown = 500,
+  ConnectionFailure = -1
+}
+
+export enum ChainSyncErrorCode {
+  IntersectionNotFound = 1000,
+  IntersectionInterleaved = 1001
+}
+
+export enum StateQueryErrorCode {
+  AcquireLedgerStateFailure = 2000,
+  EraMismatch = 2001,
+  UnavailableInCurrentEra = 2002,
+  AcquiredExpired = 2003
+}
+
+export enum TxSubmissionErrorCode {
+  EraMismatch = 3005,
+  InvalidSignatories = 3100,
+  MissingSignatories = 3101,
+  MissingScripts = 3102,
+  FailingNativeScript = 3103,
+  ExtraneousScripts = 3104,
+  MissingMetadataHash = 3105,
+  MissingMetadata = 3106,
+  MetadataHashMismatch = 3107,
+  InvalidMetadata = 3108,
+  MissingRedeemers = 3109,
+  ExtraneousRedeemers = 3110,
+  MissingDatums = 3111,
+  ExtraneousDatums = 3112,
+  ScriptIntegrityHashMismatch = 3113,
+  OrphanScriptInputs = 3114,
+  MissingCostModels = 3115,
+  MalformedScripts = 3116,
+  UnknownOutputReferences = 3117,
+  OutsideOfValidityInterval = 3118,
+  TransactionTooLarge = 3119,
+  ValueTooLarge = 3120,
+  EmptyInputSet = 3121,
+  TransactionFeeTooSmall = 3122,
+  ValueNotConserved = 3123,
+  NetworkMismatch = 3124,
+  InsufficientlyFundedOutputs = 3125,
+  BootstrapAttributesTooLarge = 3126,
+  MintingOrBurningAda = 3127,
+  InsufficientCollateral = 3128,
+  CollateralLockedByScript = 3129,
+  UnforeseeableSlot = 3130,
+  TooManyCollateralInputs = 3131,
+  MissingCollateralInputs = 3132,
+  NonAdaCollateral = 3133,
+  ExecutionUnitsTooLarge = 3134,
+  TotalCollateralMismatch = 3135,
+  SpendsMismatch = 3136,
+  UnauthorizedVote = 3137,
+  UnknownGovernanceProposal = 3138,
+  InvalidProtocolParametersUpdate = 3139,
+  UnknownStakePool = 3140,
+  IncompleteWithdrawals = 3141,
+  RetirementTooLate = 3142,
+  StakePoolCostTooLow = 3143,
+  MetadataHashTooLarge = 3144,
+  CredentialAlreadyRegistered = 3145,
+  UnknownCredential = 3146,
+  NonEmptyRewardAccount = 3147,
+  InvalidGenesisDelegation = 3148,
+  InvalidMIRTransfer = 3149,
+  FailureUnrecognizedCertificateType = 3998,
+  InternalLedgerTypeConversionError = 3999,
+  DeserialisationFailure = -32_602
+}
+
+export abstract class CardanoNodeError<Code extends number, Data = unknown> extends CustomError {
+  code: Code;
+  data: Data;
+
+  /**
+   *
+   */
+  constructor(code: Code, data: Data, message: string) {
+    super(message);
+    this.code = code;
+    this.data = data;
   }
 }
 
-// CardanoNode related errors
-export class UnknownCardanoNodeError<InnerError = unknown> extends ComposableError<InnerError> {
-  constructor(innerError: InnerError) {
-    super('Unknown CardanoNode error', innerError);
-  }
-}
+export class GeneralCardanoNodeError<Data = unknown> extends CardanoNodeError<GeneralCardanoNodeErrorCode, Data> {}
+export class ChainSyncError<Data = unknown> extends CardanoNodeError<ChainSyncErrorCode, Data> {}
+export class TxSubmissionError<Data = unknown> extends CardanoNodeError<TxSubmissionErrorCode, Data> {}
+export class StateQueryError<Data = unknown> extends CardanoNodeError<StateQueryErrorCode, Data> {}
 
-export const CardanoClientErrors = {
-  AcquirePointNotOnChainError,
-  AcquirePointTooOldError,
-  ConnectionError: WebSocketClosed,
-  EraMismatchError,
-  IntersectionNotFoundError,
-  QueryUnavailableInCurrentEraError,
-  ServerNotReady,
-  TipIsOriginError,
-  UnknownResultError
+export type OutsideOfValidityIntervalData = {
+  validityInterval: Cardano.ValidityInterval;
+  currentSlot: Cardano.Slot;
 };
-
-type CardanoClientErrorName = keyof typeof CardanoClientErrors;
-type CardanoClientErrorClass = typeof CardanoClientErrors[CardanoClientErrorName];
-
-// TxSubmission related errors
-export class UnknownTxSubmissionError<InnerError = unknown> extends ComposableError<InnerError> {
-  constructor(innerError: InnerError) {
-    super('Unknown submission error', innerError);
-  }
-}
-
-const ogmiosSubmissionErrors = TxSubmission.submissionErrors.errors;
-
-export const TxSubmissionErrors = {
-  AddressAttributesTooLargeError: ogmiosSubmissionErrors.AddressAttributesTooLarge.Error,
-  AlreadyDelegatingError: ogmiosSubmissionErrors.AlreadyDelegating.Error,
-  BadInputsError: ogmiosSubmissionErrors.BadInputs.Error,
-  CollateralHasNonAdaAssetsError: ogmiosSubmissionErrors.CollateralHasNonAdaAssets.Error,
-  CollateralIsScriptError: ogmiosSubmissionErrors.CollateralIsScript.Error,
-  CollateralTooSmallError: ogmiosSubmissionErrors.CollateralTooSmall.Error,
-  CollectErrorsError: ogmiosSubmissionErrors.CollectErrors.Error,
-  DelegateNotRegisteredError: ogmiosSubmissionErrors.DelegateNotRegistered.Error,
-  DuplicateGenesisVrfError: ogmiosSubmissionErrors.DuplicateGenesisVrf.Error,
-  EraMismatchError: ogmiosSubmissionErrors.EraMismatch.Error,
-  ExecutionUnitsTooLargeError: ogmiosSubmissionErrors.ExecutionUnitsTooLarge.Error,
-  ExpiredUtxoError: ogmiosSubmissionErrors.ExpiredUtxo.Error,
-  ExtraDataMismatchError: ogmiosSubmissionErrors.ExtraDataMismatch.Error,
-  ExtraRedeemersError: ogmiosSubmissionErrors.ExtraRedeemers.Error,
-  ExtraScriptWitnessesError: ogmiosSubmissionErrors.ExtraScriptWitnesses.Error,
-  FeeTooSmallError: ogmiosSubmissionErrors.FeeTooSmall.Error,
-  InsufficientFundsForMirError: ogmiosSubmissionErrors.InsufficientFundsForMir.Error,
-  InsufficientGenesisSignaturesError: ogmiosSubmissionErrors.InsufficientGenesisSignatures.Error,
-  InvalidMetadataError: ogmiosSubmissionErrors.InvalidMetadata.Error,
-  InvalidWitnessesError: ogmiosSubmissionErrors.InvalidWitnesses.Error,
-  MalformedReferenceScriptsError: ogmiosSubmissionErrors.MalformedReferenceScripts.Error,
-  MalformedScriptWitnessesError: ogmiosSubmissionErrors.MalformedScriptWitnesses.Error,
-  MirNegativeTransferError: ogmiosSubmissionErrors.MirNegativeTransfer.Error,
-  MirNegativeTransferNotCurrentlyAllowedError: ogmiosSubmissionErrors.MirNegativeTransferNotCurrentlyAllowed.Error,
-  MirProducesNegativeUpdateError: ogmiosSubmissionErrors.MirProducesNegativeUpdate.Error,
-  MirTransferNotCurrentlyAllowedError: ogmiosSubmissionErrors.MirTransferNotCurrentlyAllowed.Error,
-  MissingAtLeastOneInputUtxoError: ogmiosSubmissionErrors.MissingAtLeastOneInputUtxo.Error,
-  MissingCollateralInputsError: ogmiosSubmissionErrors.MissingCollateralInputs.Error,
-  MissingDatumHashesForInputsError: ogmiosSubmissionErrors.MissingDatumHashesForInputs.Error,
-  MissingRequiredDatumsError: ogmiosSubmissionErrors.MissingRequiredDatums.Error,
-  MissingRequiredRedeemersError: ogmiosSubmissionErrors.MissingRequiredRedeemers.Error,
-  MissingRequiredSignaturesError: ogmiosSubmissionErrors.MissingRequiredSignatures.Error,
-  MissingScriptWitnessesError: ogmiosSubmissionErrors.MissingScriptWitnesses.Error,
-  MissingTxMetadataError: ogmiosSubmissionErrors.MissingTxMetadata.Error,
-  MissingTxMetadataHashError: ogmiosSubmissionErrors.MissingTxMetadataHash.Error,
-  MissingVkWitnessesError: ogmiosSubmissionErrors.MissingVkWitnesses.Error,
-  NetworkMismatchError: ogmiosSubmissionErrors.NetworkMismatch.Error,
-  NonGenesisVotersError: ogmiosSubmissionErrors.NonGenesisVoters.Error,
-  OutputTooSmallError: ogmiosSubmissionErrors.OutputTooSmall.Error,
-  OutsideForecastError: ogmiosSubmissionErrors.OutsideForecast.Error,
-  OutsideOfValidityIntervalError: ogmiosSubmissionErrors.OutsideOfValidityInterval.Error,
-  PoolCostTooSmallError: ogmiosSubmissionErrors.PoolCostTooSmall.Error,
-  PoolMetadataHashTooBigError: ogmiosSubmissionErrors.PoolMetadataHashTooBig.Error,
-  ProtocolVersionCannotFollowError: ogmiosSubmissionErrors.ProtocolVersionCannotFollow.Error,
-  RewardAccountNotEmptyError: ogmiosSubmissionErrors.RewardAccountNotEmpty.Error,
-  RewardAccountNotExistingError: ogmiosSubmissionErrors.RewardAccountNotExisting.Error,
-  ScriptWitnessNotValidatingError: ogmiosSubmissionErrors.ScriptWitnessNotValidating.Error,
-  StakeKeyAlreadyRegisteredError: ogmiosSubmissionErrors.StakeKeyAlreadyRegistered.Error,
-  StakeKeyNotRegisteredError: ogmiosSubmissionErrors.StakeKeyNotRegistered.Error,
-  StakePoolNotRegisteredError: ogmiosSubmissionErrors.StakePoolNotRegistered.Error,
-  TooLateForMirError: ogmiosSubmissionErrors.TooLateForMir.Error,
-  TooManyAssetsInOutputError: ogmiosSubmissionErrors.TooManyAssetsInOutput.Error,
-  TooManyCollateralInputsError: ogmiosSubmissionErrors.TooManyCollateralInputs.Error,
-  TotalCollateralMismatchError: ogmiosSubmissionErrors.TotalCollateralMismatch.Error,
-  TriesToForgeAdaError: ogmiosSubmissionErrors.TriesToForgeAda.Error,
-  TxMetadataHashMismatchError: ogmiosSubmissionErrors.TxMetadataHashMismatch.Error,
-  TxTooLargeError: ogmiosSubmissionErrors.TxTooLarge.Error,
-  UnknownGenesisKeyError: ogmiosSubmissionErrors.UnknownGenesisKey.Error,
-  UnknownOrIncompleteWithdrawalsError: ogmiosSubmissionErrors.UnknownOrIncompleteWithdrawals.Error,
-  UnspendableDatumsError: ogmiosSubmissionErrors.UnspendableDatums.Error,
-  UnspendableScriptInputsError: ogmiosSubmissionErrors.UnspendableScriptInputs.Error,
-  UpdateWrongEpochError: ogmiosSubmissionErrors.UpdateWrongEpoch.Error,
-  ValidationTagMismatchError: ogmiosSubmissionErrors.ValidationTagMismatch.Error,
-  ValueNotConservedError: ogmiosSubmissionErrors.ValueNotConserved.Error,
-  WrongCertificateTypeError: ogmiosSubmissionErrors.WrongCertificateType.Error,
-  WrongPoolCertificateError: ogmiosSubmissionErrors.WrongPoolCertificate.Error,
-  WrongRetirementEpochError: ogmiosSubmissionErrors.WrongRetirementEpoch.Error
+export type ValueNotConservedData = {
+  consumed: Cardano.Value;
+  produced: Cardano.Value;
 };
-
-type TxSubmissionErrorName = keyof typeof TxSubmissionErrors;
-type TxSubmissionErrorClass = typeof TxSubmissionErrors[TxSubmissionErrorName];
-
-export type TxSubmissionError = InstanceType<TxSubmissionErrorClass> | UnknownTxSubmissionError;
-
-export type CardanoNodeError =
-  | InstanceType<CardanoClientErrorClass>
-  | UnknownCardanoNodeError
-  | NotInitializedError
-  | TxSubmissionError;
+export type IncompleteWithdrawalsData = {
+  withdrawals: Cardano.Withdrawal[];
+};

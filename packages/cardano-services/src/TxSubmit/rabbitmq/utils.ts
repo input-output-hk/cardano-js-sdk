@@ -1,6 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { CardanoNodeErrors } from '@cardano-sdk/core';
-import { Ogmios } from '@cardano-sdk/ogmios';
+import {
+  CardanoNodeUtil,
+  ChainSyncError,
+  GeneralCardanoNodeError,
+  StateQueryError,
+  TxSubmissionError
+} from '@cardano-sdk/core';
 import { toSerializableObject } from '@cardano-sdk/util';
 
 export const TX_SUBMISSION_QUEUE = 'cardano-tx-submit';
@@ -13,17 +18,18 @@ export const TX_SUBMISSION_QUEUE = 'cardano-tx-submit';
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getErrorPrototype = (error: unknown) => {
-  if (typeof error === 'object') {
-    const rawError = error as CardanoNodeErrors.TxSubmissionError;
-
-    if (typeof rawError.name === 'string' && typeof rawError.message === 'string') {
-      const txSubmissionErrorName = rawError.name as keyof typeof CardanoNodeErrors.TxSubmissionErrors;
-      const ErrorClass = CardanoNodeErrors.TxSubmissionErrors[txSubmissionErrorName];
-
-      if (ErrorClass) return ErrorClass.prototype;
-    }
+  if (CardanoNodeUtil.asGeneralCardanoNodeError(error)) {
+    return GeneralCardanoNodeError.prototype;
   }
-
+  if (CardanoNodeUtil.asTxSubmissionError(error)) {
+    return TxSubmissionError.prototype;
+  }
+  if (CardanoNodeUtil.asStateQueryError(error)) {
+    return StateQueryError.prototype;
+  }
+  if (CardanoNodeUtil.asChainSyncError(error)) {
+    return ChainSyncError.prototype;
+  }
   return Error.prototype;
 };
 
@@ -37,11 +43,13 @@ export const serializeError = (err: unknown) => {
 
   const serializableError = toSerializableObject(err);
 
-  if (err instanceof CardanoNodeErrors.TxSubmissionErrors.OutsideOfValidityIntervalError) {
-    const details = JSON.parse(err.message) as Ogmios.Schema.OutsideOfValidityInterval['outsideOfValidityInterval'];
-
-    if (details.interval.invalidBefore && details.currentSlot <= details.interval.invalidBefore) isRetryable = true;
+  if (CardanoNodeUtil.isOutsideOfValidityIntervalError(err)) {
+    const details = err.data;
+    if (details.validityInterval.invalidBefore && details.currentSlot <= details.validityInterval.invalidBefore)
+      isRetryable = true;
   }
+
+  // TODO: connection errors are also retryable
 
   return { isRetryable, serializableError };
 };

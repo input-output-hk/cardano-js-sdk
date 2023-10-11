@@ -1,4 +1,11 @@
-import { CardanoNodeErrors, ChainSyncEvent, ChainSyncEventType, PointOrOrigin, RequestNext } from '@cardano-sdk/core';
+import {
+  ChainSyncEvent,
+  ChainSyncEventType,
+  GeneralCardanoNodeError,
+  GeneralCardanoNodeErrorCode,
+  PointOrOrigin,
+  RequestNext
+} from '@cardano-sdk/core';
 import { ChainSynchronization, InteractionContext, Schema, safeJSON } from '@cardano-ogmios/client';
 import { Observable, Subscriber, from, switchMap } from 'rxjs';
 import { block as blockToCore } from '../../ogmiosToCore';
@@ -47,7 +54,13 @@ const notifySubscriberAndParseNewCursor = (
       slot: coreBlock.header.slot
     };
   }
-  subscriber.error(new CardanoNodeErrors.CardanoClientErrors.UnknownResultError(response.result));
+  subscriber.error(
+    new GeneralCardanoNodeError(
+      GeneralCardanoNodeErrorCode.Unknown,
+      response.result,
+      'Unrecognized chain sync event direction'
+    )
+  );
 };
 
 const isResponseId = (id: unknown): id is { [RequestIdProp]: string } =>

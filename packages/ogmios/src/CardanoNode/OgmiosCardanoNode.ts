@@ -1,9 +1,9 @@
 import {
   Cardano,
   CardanoNode,
-  CardanoNodeErrors,
-  CardanoNodeUtil,
   EraSummary,
+  GeneralCardanoNodeError,
+  GeneralCardanoNodeErrorCode,
   HealthCheckResponse,
   StakeDistribution
 } from '@cardano-sdk/core';
@@ -17,7 +17,7 @@ import {
 import { Logger } from 'ts-log';
 import { RunnableModule, contextLogger } from '@cardano-sdk/util';
 import { createInteractionContextWithLogger, ogmiosServerHealthToHealthCheckResponse } from '../util';
-import { queryEraSummaries } from './queries';
+import { queryEraSummaries, withCoreCardanoNodeError } from './queries';
 
 /**
  * Access cardano-node APIs via Ogmios
@@ -49,30 +49,20 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
   }
 
   public async eraSummaries(): Promise<EraSummary[]> {
-    if (this.state !== 'running') {
-      throw new CardanoNodeErrors.NotInitializedError('eraSummaries', this.name);
-    }
+    this.#assertIsRunning();
     return queryEraSummaries(this.#stateQueryClient, this.#logger);
   }
 
   public async systemStart(): Promise<Date> {
-    if (this.state !== 'running') {
-      throw new CardanoNodeErrors.NotInitializedError('systemStart', this.name);
-    }
-    try {
-      this.#logger.info('Getting system start');
-      return new Date((await this.#stateQueryClient.eraStart()).time);
-    } catch (error) {
-      throw CardanoNodeUtil.asCardanoNodeError(error) || new CardanoNodeErrors.UnknownCardanoNodeError(error);
-    }
+    this.#assertIsRunning();
+    this.#logger.info('Getting system start');
+    return withCoreCardanoNodeError(async () => this.#stateQueryClient.networkStartTime());
   }
 
   public async stakeDistribution(): Promise<StakeDistribution> {
-    if (this.state !== 'running') {
-      throw new CardanoNodeErrors.NotInitializedError('stakeDistribution', this.name);
-    }
-    try {
-      this.#logger.info('Getting stake distribution');
+    this.#assertIsRunning();
+    this.#logger.info('Getting stake distribution');
+    return withCoreCardanoNodeError(async () => {
       const map = new Map();
       for (const [key, value] of Object.entries(await this.#stateQueryClient.liveStakeDistribution())) {
         const splitStake = value.stake.split('/');
@@ -82,9 +72,7 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
         });
       }
       return map;
-    } catch (error) {
-      throw CardanoNodeUtil.asCardanoNodeError(error) || new CardanoNodeErrors.UnknownCardanoNodeError(error);
-    }
+    });
   }
 
   healthCheck(): Promise<HealthCheckResponse> {
@@ -107,5 +95,15 @@ export class OgmiosCardanoNode extends RunnableModule implements CardanoNode {
 
   async startImpl(): Promise<void> {
     return Promise.resolve();
+  }
+
+  #assertIsRunning() {
+    if (this.state !== 'running') {
+      throw new GeneralCardanoNodeError(
+        GeneralCardanoNodeErrorCode.ServerNotReady,
+        null,
+        'OgmiosCardanoNode is not running'
+      );
+    }
   }
 }

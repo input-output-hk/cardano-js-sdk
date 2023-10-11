@@ -3,7 +3,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Cardano,
-  CardanoNodeErrors,
+  ChainSyncError,
+  ChainSyncErrorCode,
   ChainSyncEventType,
   Intersection,
   ObservableCardanoNode,
@@ -150,18 +151,7 @@ export const fromCardanoNode = ({
         mergeMap((initialChainSync) => {
           if (initialChainSync.intersection.point === 'origin') {
             if (blocks[0] !== 'origin') {
-              throw new CardanoNodeErrors.CardanoClientErrors.IntersectionNotFoundError(
-                // TODO: CardanoClientErrors are currently coupled to ogmios types.
-                // This would be cleaner if errors were mapped to use our core objects.
-                points.map((point) =>
-                  point === 'origin'
-                    ? 'origin'
-                    : {
-                        hash: point.hash,
-                        slot: point.slot
-                      }
-                )
-              );
+              throw new ChainSyncError(ChainSyncErrorCode.IntersectionNotFound, points, 'Intersection not found');
             }
             // buffer is empty, sync from origin
             return syncFromIntersection({

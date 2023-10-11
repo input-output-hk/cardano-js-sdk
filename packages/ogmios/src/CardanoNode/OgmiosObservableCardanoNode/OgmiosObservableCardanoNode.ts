@@ -1,13 +1,17 @@
 // Tested in packages/e2e/test/projection
 import {
   Cardano,
-  CardanoNodeErrors,
+  CardanoNodeError,
+  CardanoNodeUtil,
   EraSummary,
+  GeneralCardanoNodeError,
+  GeneralCardanoNodeErrorCode,
   HealthCheckResponse,
   Milliseconds,
   ObservableCardanoNode,
   ObservableChainSync,
-  PointOrOrigin
+  PointOrOrigin,
+  StateQueryErrorCode
 } from '@cardano-sdk/core';
 import {
   ChainSynchronization,
@@ -61,13 +65,19 @@ export type OgmiosObservableCardanoNodeProps = Omit<InteractionContextProps, 'in
   localStateQueryRetryConfig?: LocalStateQueryRetryConfig;
 };
 
+const retryableStateQueryErrors = new Set<number>([
+  GeneralCardanoNodeErrorCode.ServerNotReady,
+  StateQueryErrorCode.UnavailableInCurrentEra,
+  GeneralCardanoNodeErrorCode.ConnectionFailure
+]);
+
 const stateQueryRetryBackoffConfig = (
   retryConfig: LocalStateQueryRetryConfig = DEFAULT_LSQ_RETRY_CONFIG,
   logger: Logger
 ): RetryBackoffConfig => ({
   ...retryConfig,
   shouldRetry: (error) => {
-    if (error instanceof CardanoNodeErrors.CardanoClientErrors.QueryUnavailableInCurrentEraError) {
+    if (retryableStateQueryErrors.has(CardanoNodeUtil.asCardanoNodeError(error)?.code)) {
       logger.info('Local state query unavailable yet, will retry...');
       return true;
     }
@@ -116,7 +126,14 @@ export class OgmiosObservableCardanoNode implements ObservableCardanoNode {
         first: props.healthCheckTimeout || DEFAULT_HEALTH_CHECK_TIMEOUT,
         with: () => {
           logger.error('healthCheck$ didnt emit within healthCheckTimeout');
-          return throwError(() => new CardanoNodeErrors.CardanoClientErrors.ConnectionError());
+          return throwError(
+            () =>
+              new GeneralCardanoNodeError(
+                GeneralCardanoNodeErrorCode.ConnectionFailure,
+                null,
+                'Healthcheck request timeout'
+              )
+          );
         }
       }),
       catchError((error) => {
@@ -155,7 +172,7 @@ export class OgmiosObservableCardanoNode implements ObservableCardanoNode {
               })
               .catch((error) => {
                 this.#logger.error('"findIntersect" failed', error);
-                if (error instanceof CardanoNodeErrors.CardanoClientErrors.ConnectionError) {
+                if (error instanceof CardanoNodeError && error.code === GeneralCardanoNodeErrorCode.ConnectionFailure) {
                   // interactionContext$ will reconnect and trigger a retry
                   return;
                 }
