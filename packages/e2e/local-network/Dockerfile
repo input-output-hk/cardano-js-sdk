@@ -24,9 +24,9 @@ HEALTHCHECK --interval=5s --timeout=1s --retries=200 --start-period=100ms \
   CMD /root/scripts/get-epoch.sh | awk '{ if ($0 >= "3") exit 0; else exit 1}'
 
 STOPSIGNAL SIGINT
-COPY --from=builder /build/bin ./bin
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static /tini
 RUN chmod +x /tini
 
 COPY . .
+COPY --from=builder /build/bin ./bin
 ENTRYPOINT ["/tini", "-g", "--", "/root/scripts/start.sh" ]
