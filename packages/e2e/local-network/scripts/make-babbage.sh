@@ -276,15 +276,18 @@ cp ./templates/babbage/db-sync-config.json ./config/network/cardano-db-sync/conf
 cp ./templates/babbage/node-config.json ./config/network/cardano-node/config.json
 
 ###############################
-# NOTE: We can't use -i to do inline replacement because this breaks due to permission errors on MacOS when creating the temp output file in this case, giving Root permissions to Docker is also not 
-# a valid working option for MacOS.
+# Use a temporary file to make the changes and copy them back to where we want
+# the change to be, as we can't use -i to do inline replacement because this breaks 
+# due to permission errors on MacOS.
 # https://forums.docker.com/t/sed-couldnt-open-temporary-file-xyz-permission-denied-when-using-virtiofs/125473
 ###############################
 
 $SED -E "s/\"ByronGenesisHash\": \".*\"/\"ByronGenesisHash\": \"${byronGenesisHash}\"/" ./config/network/cardano-node/config.json > ./config/network/cardano-node/config.json.tmp
 mv ./config/network/cardano-node/config.json.tmp ./config/network/cardano-node/config.json
+
 $SED -E "s/\"ShelleyGenesisHash\": \".*\"/\"ShelleyGenesisHash\": \"${shelleyGenesisHash}\"/" ./config/network/cardano-node/config.json > ./config/network/cardano-node/config.json.tmp
 mv ./config/network/cardano-node/config.json.tmp ./config/network/cardano-node/config.json
+
 $SED -E "s/\"AlonzoGenesisHash\": \".*\"/\"AlonzoGenesisHash\": \"${alonzoGenesisHash}\"/" ./config/network/cardano-node/config.json > ./config/network/cardano-node/config.json.tmp
 mv ./config/network/cardano-node/config.json.tmp ./config/network/cardano-node/config.json
 
