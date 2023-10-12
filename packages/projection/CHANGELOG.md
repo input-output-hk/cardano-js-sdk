@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.8.2...@cardano-sdk/projection@0.8.3) (2023-10-12)
+
+### Features
+
+* **projection:** add helper to especifically store UTXO's with assets ([ca95728](https://github.com/input-output-hk/cardano-js-sdk/commit/ca95728ac54e31e13588eb94e235ffba75781a84))
+
 ## [0.8.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/projection@0.8.1...@cardano-sdk/projection@0.8.2) (2023-10-09)
 
 **Note:** Version bump only for package @cardano-sdk/projection

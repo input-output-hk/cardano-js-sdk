@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.21.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.21.0...@cardano-sdk/cardano-services@0.21.1) (2023-10-12)
+
+### Features
+
+* **cardano-services:** add Asset projection to prepareTypeOrmProjection ([129dd35](https://github.com/input-output-hk/cardano-js-sdk/commit/129dd353d3831850b451f2ba75d7cd33d0a0d09b))
+
 ## [0.21.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.20.0...@cardano-sdk/cardano-services@0.21.0) (2023-10-09)
 
 ### ⚠ BREAKING CHANGES
