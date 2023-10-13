@@ -48,7 +48,7 @@
     "preview:up": "NETWORK=preview yarn compose:up",
     "preview:down": "NETWORK=preview yarn compose:down",
     "sanchonet:dev": "FILES='-f ../../compose/dev.yml -f dev.yml' yarn sanchonet:up",
-    "sanchonet:up": "NETWORK=sanchonet OGMIOS_PORT=${OGMIOS_PORT:-1341} CARDANO_NODE_VERSION=8.4.0-pre CARDANO_DB_SYNC_VERSION=sancho-1-1-0 yarn compose:up provider-server cardano-db-sync cardano-node-ogmios postgres",
+    "sanchonet:up": "NETWORK=sanchonet OGMIOS_PORT=${OGMIOS_PORT:-1341} CARDANO_NODE_VERSION=8.5.0-pre CARDANO_DB_SYNC_VERSION=sancho-2-0-0 yarn compose:up provider-server cardano-db-sync cardano-node-ogmios postgres",
     "sanchonet:down": "NETWORK=sanchonet yarn compose:down",
     "test": "jest --runInBand -c ./jest.config.js",
     "test:build:verify": "tsc --build ./test",
