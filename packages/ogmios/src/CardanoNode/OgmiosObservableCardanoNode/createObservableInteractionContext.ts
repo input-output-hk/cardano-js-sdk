@@ -6,10 +6,9 @@ import {
   createInteractionContext
 } from '@cardano-ogmios/client';
 import { Observable, switchMap } from 'rxjs';
-import { RetryBackoffConfig, retryBackoff } from 'backoff-rxjs';
 import { WithLogger, contextLogger, isConnectionError } from '@cardano-sdk/util';
-
-export type ReconnectionConfig = Omit<RetryBackoffConfig, 'shouldRetry'>;
+import { retryBackoff } from 'backoff-rxjs';
+import type { ReconnectionConfig } from '@cardano-sdk/util-rxjs';
 
 const defaultReconnectionConfig: ReconnectionConfig = { initialInterval: 10, maxInterval: 5000 };
 

@@ -8,6 +8,9 @@
       "path": "../../core/src"
     },
     {
+      "path": "../../util-rxjs/src"
+    },
+    {
       "path": "../../crypto/src"
     }
   ]
