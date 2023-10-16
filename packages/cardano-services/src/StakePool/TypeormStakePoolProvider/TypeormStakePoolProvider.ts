@@ -8,8 +8,8 @@ import {
   StakePoolStats
 } from '@cardano-sdk/core';
 import { DataSource } from 'typeorm';
+import { PoolDelistedEntity, StakePoolEntity } from '@cardano-sdk/projection-typeorm';
 import { PoolModel, PoolStatsModel, mapPoolStats, mapStakePoolsResult } from './mappers';
-import { StakePoolEntity } from '@cardano-sdk/projection-typeorm';
 import { TypeormProvider, TypeormProviderDependencies } from '../../util';
 import {
   getSortOptions,
@@ -66,16 +66,17 @@ export class TypeormStakePoolProvider extends TypeormProvider implements StakePo
         .leftJoinAndSelect('pool.metrics', 'metrics')
         .leftJoinAndSelect('pool.lastRegistration', 'params')
         .leftJoinAndSelect('params.metadata', 'metadata')
+        .leftJoin(PoolDelistedEntity, 'delist', 'delist.stakePoolId = pool.id')
         .select(stakePoolSearchSelection)
         .addSelect(stakePoolSearchTotalCount)
         .where(clause, args)
+        .andWhere('delist.stakePoolId IS NULL')
         .orderBy(field, order, !field.includes('cost') ? nullsInSort : undefined)
         .addOrderBy('pool.id', 'ASC')
         .offset(pagination.startAt)
         .limit(pagination.limit)
         .getRawMany()
     );
-
     const { pageResults, totalResultCount } = mapStakePoolsResult(rawResult);
     return { pageResults, totalResultCount };
   }

@@ -67,6 +67,7 @@
     "@types/lodash": "^4.14.182",
     "@types/pg": "^8.6.5",
     "@types/wait-on": "^5.3.1",
+    "axios-mock-adapter": "^1.20.0",
     "cbor": "^8.1.0",
     "delay": "^5.0.0",
     "dockerode": "^3.3.1",

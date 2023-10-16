@@ -1,6 +1,7 @@
 import {
   BlockEntity,
   CurrentPoolMetricsEntity,
+  PoolDelistedEntity,
   PoolMetadataEntity,
   PoolRegistrationEntity,
   PoolRetirementEntity,
@@ -32,7 +33,8 @@ export const initHandlerTest = async () => {
     PoolMetadataEntity,
     PoolRegistrationEntity,
     PoolRetirementEntity,
-    StakePoolEntity
+    StakePoolEntity,
+    PoolDelistedEntity
   ];
 
   const dataSource = createDataSource({

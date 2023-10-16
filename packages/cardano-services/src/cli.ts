@@ -68,6 +68,7 @@ import { HttpServer } from './Http';
 import { PgBossQueue, isValidQueue } from './PgBoss';
 import { ProjectionName } from './Projection';
 import { dbCacheValidator } from './util/validators';
+import { readScheduleConfig } from './util/schedule';
 import fs from 'fs';
 import onDeath from 'death';
 import path from 'path';
@@ -457,7 +458,17 @@ addOptions(
       for (const queue of queuesArray) if (!isValidQueue(queue)) throw new Error(`Unknown queue name: '${queue}'`);
 
       return queuesArray;
-    }).makeOptionMandatory()
+    }).makeOptionMandatory(),
+    newOption(
+      '--schedules <schedules>',
+      PgBossWorkerOptionDescriptions.Queues,
+      'SCHEDULES',
+      (schedules) => {
+        if (!fs.existsSync(schedules)) throw new Error(`File does not exist: ${schedules}`);
+        return readScheduleConfig(schedules);
+      },
+      []
+    )
   ]
 ).action(async (args: PgBossWorkerArgs) =>
   runServer('pg-boss worker', () =>

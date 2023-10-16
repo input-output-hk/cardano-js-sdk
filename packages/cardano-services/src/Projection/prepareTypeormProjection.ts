@@ -143,6 +143,8 @@ const storeEntities: Partial<Record<StoreName, EntityName[]>> = {
   storeNftMetadata: ['asset'],
   storePoolMetricsUpdateJob: ['stakePool', 'currentPoolMetrics', 'poolMetadata'],
   storeStakeKeyRegistrations: ['block', 'stakeKeyRegistration'],
+  // 'stake-pool' projection requires it, but `storeStakePools` does not.
+  // at the time of writing there was no way to specify a direct projection->entity dependency.
   storeStakePoolMetadataJob: ['stakePool', 'currentPoolMetrics', 'poolMetadata'],
   storeStakePools: ['stakePool', 'currentPoolMetrics', 'poolMetadata', 'poolDelisted'],
   storeUtxo: ['tokens', 'output']

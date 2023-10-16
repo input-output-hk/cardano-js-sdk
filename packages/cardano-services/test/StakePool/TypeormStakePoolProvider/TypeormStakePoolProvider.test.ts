@@ -16,10 +16,10 @@ import { Observable } from 'rxjs';
 import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
 import { Pool } from 'pg';
 import { PoolInfo, TypeormStakePoolFixtureBuilder } from './fitxures/TypeormFixtureBuilder';
+import { emptyDbData, ingestDbData, servicesWithVersionPath as services, sleep } from '../../util';
 import { getPort } from 'get-port-please';
 import { isNotNil } from '@cardano-sdk/util';
 import { logger } from '@cardano-sdk/util-dev';
-import { servicesWithVersionPath as services, sleep } from '../../util';
 import axios from 'axios';
 import lowerCase from 'lodash/lowerCase';
 
@@ -84,6 +84,8 @@ describe('TypeormStakePoolProvider', () => {
 
   const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
   const entities = getEntities(['currentPoolMetrics', 'poolMetadata', 'poolDelisted']);
+  const delisted_id = Cardano.PoolId('pool1vj30jr7wn83dzn928qk6fx34h3d3f3cesr47j5ymeumf65wdw9x');
+  const db = new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING_STAKE_POOL });
 
   beforeAll(async () => {
     port = await getPort();
@@ -94,10 +96,12 @@ describe('TypeormStakePoolProvider', () => {
     connectionConfig$ = getConnectionConfig(dnsResolver, 'projector', 'StakePool', {
       postgresConnectionStringStakePool: process.env.POSTGRES_CONNECTION_STRING_STAKE_POOL!
     });
-    fixtureBuilder = new TypeormStakePoolFixtureBuilder(
-      new Pool({ connectionString: process.env.POSTGRES_CONNECTION_STRING_STAKE_POOL }),
-      logger
-    );
+
+    // data prep
+    // ingesting delist before building the fixture
+    await ingestDbData(db, 'pool_delisted', ['stake_pool_id'], [delisted_id]);
+
+    fixtureBuilder = new TypeormStakePoolFixtureBuilder(db, logger);
     poolsInfo = await fixtureBuilder.getPools(1000, ['active', 'activating', 'retired', 'retiring']);
     poolsInfoWithMeta = poolsInfo.filter((pool) => isNotNil(pool.metadataUrl));
     poolsInfoWithMetrics = poolsInfo.filter((pool) => isNotNil(pool.saturation));
@@ -128,6 +132,12 @@ describe('TypeormStakePoolProvider', () => {
 
     poolsInfoWithMetaFiltered = poolsInfoWithMeta.filter(applyFilter);
     poolsInfoWithMetricsFiltered = poolsInfoWithMetrics.filter(applyFilter);
+  });
+
+  afterAll(async () => {
+    // data cleanse
+    await emptyDbData(db, 'pool_delisted');
+    await db.end();
   });
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -244,12 +254,12 @@ describe('TypeormStakePoolProvider', () => {
           });
         });
 
-        it('response is an array of stake pools', async () => {
+        it('response is an array of stake pools excluding delisted pool', async () => {
           const options: QueryStakePoolsArgs = {
             filters: {
               identifier: {
                 _condition: 'or',
-                values: [{ id: poolsInfo[0].id }, { id: poolsInfo[1].id }]
+                values: [{ id: poolsInfo[0].id }, { id: poolsInfo[1].id }, { id: delisted_id }]
               }
             },
             pagination
@@ -264,7 +274,7 @@ describe('TypeormStakePoolProvider', () => {
           expect(response.totalResultCount).toEqual(2);
         });
 
-        it('response is an array of stake pools excluding delisted pool', async () => {
+        it('response is an array of stake pools', async () => {
           const options: QueryStakePoolsArgs = {
             filters: {
               identifier: {

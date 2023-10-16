@@ -3042,6 +3042,7 @@ __metadata:
     "@types/wait-on": ^5.3.1
     amqplib: ^0.10.0
     axios: ^0.27.2
+    axios-mock-adapter: ^1.20.0
     backoff-rxjs: ^7.0.0
     bignumber.js: ^9.1.0
     body-parser: ^1.19.2

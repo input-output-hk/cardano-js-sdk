@@ -164,7 +164,7 @@ services:
     environment:
       <<: *sdk-environment
       API_URL: http://0.0.0.0:3003
-      QUEUES: ${QUEUES:-pool-metadata,pool-metrics}
+      QUEUES: ${QUEUES:-pool-metadata,pool-metrics,pool-delist-schedule}
       STAKE_POOL_PROVIDER_URL: http://provider-server:3000/
       METADATA_FETCH_MODE: ${METADATA_FETCH_MODE:-direct}
       SMASH_URL: ${SMASH_URL:-http://cardano-smash:3100/api/v1}
