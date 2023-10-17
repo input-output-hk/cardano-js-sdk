@@ -10,7 +10,4 @@ else
   COMPOSE_FILE="docker-compose.yml"
 fi
 
-echo $COMPOSE_FILE
-echo "FILES HERE" $FILES
-
 docker compose -p local-network-e2e -f "$COMPOSE_FILE" -f ../../compose/common.yml $FILES up

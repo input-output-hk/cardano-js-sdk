@@ -11,7 +11,7 @@ root_path="$(cd "$here/.." && pwd)"
 cd "$root_path"
 
 export PATH=$PWD/bin:$PATH
-export CARDANO_NODE_CHAINDB_LOG_LEVEL="Warning"
+export CARDANO_NODE_CHAINDB_LOG_LEVEL=${CARDANO_NODE_CHAINDB_LOG_LEVEL:-Warning}
 export CARDANO_NODE_LOG_LEVEL="Warning"
 
 source ./scripts/nodes-configuration.sh
