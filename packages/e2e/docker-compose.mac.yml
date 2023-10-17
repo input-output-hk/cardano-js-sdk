@@ -83,6 +83,6 @@ volumes:
   sdk-ipc:
     driver: local
     driver_opts:
-      device: ./local-network/app/sdk-ipc
+      device: ./local-network/sdk-ipc
       o: bind
       type: none
