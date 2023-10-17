@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Crypto from '@cardano-sdk/crypto';
 import * as Trezor from '@trezor/connect';
+import * as TrezorWeb from '@trezor/connect-web';
 import { Cardano, NotImplementedError } from '@cardano-sdk/core';
 import {
   CardanoKeyConst,
@@ -14,9 +15,9 @@ import {
   errors
 } from '@cardano-sdk/key-management';
 import { txToTrezor } from './transformers/tx';
-import TrezorConnectWeb from '@trezor/connect-web';
 
 const TrezorConnectNode = Trezor.default;
+const TrezorConnectWeb = TrezorWeb.default;
 
 const transportTypedError = (error?: any) =>
   new errors.AuthenticationError(
