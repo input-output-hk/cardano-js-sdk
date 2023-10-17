@@ -186,8 +186,8 @@ for NODE_ID in ${SP_NODES_ID}; do
 
   BYRON_KEYS_POSFIX=$(seq -f '%03.f' $((NODE_ID - 1)) $((NODE_ID - 1)))
   #Byron related
-  mv "${ROOT}/byron-gen-command/delegate-keys.${BYRON_KEYS_POSFIX}.key" "${TARGET}/byron-delegate.key"
-  mv "${ROOT}/byron-gen-command/delegation-cert.${BYRON_KEYS_POSFIX}.json" "${TARGET}/byron-delegation.cert"
+  cp "${ROOT}/byron-gen-command/delegate-keys.${BYRON_KEYS_POSFIX}.key" "${TARGET}/byron-delegate.key"
+  cp "${ROOT}/byron-gen-command/delegation-cert.${BYRON_KEYS_POSFIX}.json" "${TARGET}/byron-delegation.cert"
 
   echo "${PORT}" >"${TARGET}/port"
 
