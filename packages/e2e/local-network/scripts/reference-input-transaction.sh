@@ -74,8 +74,7 @@ cardano-cli query protocol-parameters \
   --testnet-magic 888 \
   --out-file pparams.json
 
-cardano-cli transaction build \
-  --babbage-era \
+cardano-cli conway transaction build \
   --testnet-magic 888 \
   --change-address "$genesisAddr" \
   --tx-in "$utxo" \
@@ -108,8 +107,7 @@ currentBalance=$(getAddressBalance "$REFERENCE_SCRIPT_ADDR")
 
 echo "Locking reference script UTXO (Multisignature)..."
 
-cardano-cli transaction build \
-  --babbage-era \
+cardano-cli conway transaction build \
   --testnet-magic 888 \
   --change-address "$genesisAddr" \
   --tx-in "$utxo" \
@@ -140,8 +138,7 @@ currentBalance=$(getAddressBalance "$REFERENCE_SCRIPT_ADDR")
 
 echo "Locking reference script UTXO (Timelock)..."
 
-cardano-cli transaction build \
-  --babbage-era \
+cardano-cli conway transaction build \
   --testnet-magic 888 \
   --change-address "$genesisAddr" \
   --tx-in "$utxo" \
@@ -172,8 +169,7 @@ currentBalance=$(getAddressBalance "$REFERENCE_SCRIPT_ADDR")
 
 echo "Locking reference script UTXO (Plutus V1)..."
 
-cardano-cli transaction build \
-  --babbage-era \
+cardano-cli conway transaction build \
   --testnet-magic 888 \
   --change-address "$genesisAddr" \
   --tx-in "$utxo" \
@@ -204,8 +200,7 @@ currentBalance=$(getAddressBalance "$REFERENCE_SCRIPT_ADDR")
 
 echo "Locking reference script UTXO (Plutus V2)..."
 
-cardano-cli transaction build \
-  --babbage-era \
+cardano-cli conway transaction build \
   --testnet-magic 888 \
   --change-address "$genesisAddr" \
   --tx-in "$utxo" \
@@ -235,8 +230,7 @@ echo "Locking funds in script..."
 utxo=$(awk '{printf("%s", $1)}' <<<"$(getBiggestUtxo "$genesisAddr")")
 currentBalance=$(getAddressBalance "$REFERENCE_INPUT_SCRIPT_ADDR")
 
-cardano-cli transaction build \
-  --babbage-era \
+cardano-cli conway transaction build \
   --testnet-magic 888 \
   --tx-in "$utxo" \
   --tx-out "$REFERENCE_INPUT_SCRIPT_ADDR"+"$AMOUNT" \
@@ -270,8 +264,7 @@ scriptUtxo=$(awk '{printf("%s", $1)}' <<<"$(getBiggestUtxo "$REFERENCE_INPUT_SCR
 currentBalance=$(getAddressBalance "$REFERENCE_INPUT_SCRIPT_ADDR")
 returnCollateralVal=$(("$utxoVal" - 1450000))
 
-cardano-cli transaction build \
-  --babbage-era \
+cardano-cli conway transaction build \
   --testnet-magic 888 \
   --tx-in-collateral "$utxo" \
   --tx-in "$utxo" \

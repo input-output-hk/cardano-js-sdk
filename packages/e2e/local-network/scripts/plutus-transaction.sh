@@ -48,18 +48,12 @@ currentBalance=$(getAddressBalance "$ALWAYS_SUCCEED_ADDR")
 
 # LOCK FUNDS
 
-cardano-cli query protocol-parameters \
-  --testnet-magic 888 \
-  --out-file pparams.json
-
-cardano-cli transaction build \
-  --babbage-era \
+cardano-cli conway transaction build \
   --testnet-magic 888 \
   --change-address "$genesisAddr" \
   --tx-in "$utxo" \
   --tx-out "$ALWAYS_SUCCEED_ADDR"+"$AMOUNT" \
   --tx-out-datum-hash "$SCRIPT_DATUM_HASH" \
-  --protocol-params-file pparams.json \
   --out-file tx-script.build
 
 cardano-cli transaction sign \
@@ -83,8 +77,7 @@ utxo=$(cardano-cli query utxo --address "$genesisAddr" --testnet-magic 888 | awk
 scriptUtxo=$(cardano-cli query utxo --address "$ALWAYS_SUCCEED_ADDR" --testnet-magic 888 | awk 'NR == 3 {printf("%s#%s", $1, $2)}')
 currentBalance=$(getAddressBalance "$ALWAYS_SUCCEED_ADDR")
 
-cardano-cli transaction build \
-  --babbage-era \
+cardano-cli conway transaction build \
   --testnet-magic 888 \
   --tx-in "$scriptUtxo" \
   --tx-in-script-file scripts/contracts/alwayssucceeds.plutus \
@@ -92,7 +85,6 @@ cardano-cli transaction build \
   --tx-in-redeemer-value "$SCRIPT_DATUM_VALUE" \
   --tx-in-collateral "$utxo" \
   --change-address "$genesisAddr" \
-  --protocol-params-file pparams.json \
   --out-file test-alonzo.tx
 
 cardano-cli transaction sign \

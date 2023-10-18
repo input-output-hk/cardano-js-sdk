@@ -12,6 +12,7 @@ GenesisFile: genesis.json
 ByronGenesisHash: '576a1b4687c7668b2f1d734fecaa7ca994b597f37177606d4942d339875009d6'
 ShelleyGenesisHash: '4315428096763404ae322ce69eea7323c94dead3281cd306b5be7e80288626ce'
 AlonzoGenesisHash: 'eaa32942a4f2b3028928cb47be679bb36fa128f6d7dddc04ae592d27f2818c16'
+ConwayGenesisHash: 'eaa32942a4f2b3028928cb47be679bb36fa128f6d7dddc04ae592d27f2818c16'
 
 ##### Blockfetch Protocol
 

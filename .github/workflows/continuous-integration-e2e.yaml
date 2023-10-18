@@ -30,18 +30,18 @@ env:
 on:
   pull_request:
   push:
-    branches: ['master']
+    branches: ['master', 'conway-era']
     tags: ['*.*.*']
 
 jobs:
   build_and_test:
-    runs-on: [self-hosted]
+    strategy:
+      matrix:
+        os: [ubuntu-20.04]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v3
-
-      - name: 📥 Adjust permissions
-        run: chmod -R g+rX,o+rX .
 
       - name: 🧰 Setup Node.js
         uses: actions/setup-node@v3

@@ -16,7 +16,7 @@ clean() {
 }
 trap clean EXIT
 
-VERSION="1.35.4"
+VERSION="8.6.0"
 
 rm -rf bin
 mkdir -p bin
@@ -24,10 +24,10 @@ mkdir -p bin
 echo "Download binaries from IOG build"
 case $(uname) in
 Darwin)
-  wget -O bin.tar.gz https://update-cardano-mainnet.iohk.io/cardano-node-releases/cardano-node-${VERSION}-macos.tar.gz
+  wget -O bin.tar.gz https://github.com/input-output-hk/cardano-node/releases/download/${VERSION}-pre/cardano-node-${VERSION}-macos.tar.gz
   ;;
 Linux)
-  wget -O bin.tar.gz https://update-cardano-mainnet.iohk.io/cardano-node-releases/cardano-node-${VERSION}-linux.tar.gz
+  wget -O bin.tar.gz https://github.com/input-output-hk/cardano-node/releases/download/${VERSION}-pre/cardano-node-${VERSION}-linux.tar.gz
   ;;
 esac
 

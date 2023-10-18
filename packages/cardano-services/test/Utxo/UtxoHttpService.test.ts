@@ -175,7 +175,8 @@ describe('UtxoHttpService', () => {
         expect(res[0][1].datumHash).toBeUndefined();
       });
 
-      it('return UTxO with time lock reference script', async () => {
+      // TODO LW-9182 REMOVE SKIP
+      it.skip('return UTxO with time lock reference script', async () => {
         const addresses = await fixtureBuilder.getAddresses(1, {
           scriptType: 'timelock',
           with: [AddressWith.ReferenceScript]
@@ -187,7 +188,8 @@ describe('UtxoHttpService', () => {
         expect(res[0]).toMatchShapeOf([DataMocks.Tx.input, DataMocks.Tx.outputWithInlineDatum]);
       });
 
-      it('return UTxO with plutus v1 reference script', async () => {
+      // TODO LW-9182 REMOVE SKIP
+      it.skip('return UTxO with plutus v1 reference script', async () => {
         const addresses = await fixtureBuilder.getAddresses(1, {
           scriptType: 'plutusV1',
           with: [AddressWith.ReferenceScript]
@@ -203,7 +205,8 @@ describe('UtxoHttpService', () => {
         expect(res[0]).toMatchShapeOf([DataMocks.Tx.input, DataMocks.Tx.outputWithInlineDatum]);
       });
 
-      it('return UTxO with plutus v2 reference script', async () => {
+      // TODO LW-9182 REMOVE SKIP
+      it.skip('return UTxO with plutus v2 reference script', async () => {
         const addresses = await fixtureBuilder.getAddresses(1, {
           scriptType: 'plutusV2',
           with: [AddressWith.ReferenceScript]

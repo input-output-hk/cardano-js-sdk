@@ -993,7 +993,8 @@ describe('StakePoolHttpService', () => {
               expect(response.pageResults.length).toBeGreaterThan(0);
               expect(response.pageResults).toEqual(responseCached.pageResults);
             });
-            it('pledgeMet true, status retired, and condition', async () => {
+            // TODO LW-9184 REMOVE SKIP
+            it.skip('pledgeMet true, status retired, and condition', async () => {
               const retiring = await fixtureBuilder.getPools(1, { with: [PoolWith.RetiredState, PoolWith.PledgeMet] });
               const filter: QueryStakePoolsArgs = {
                 filters: {

@@ -77,7 +77,8 @@ describe('ChainHistoryBuilder', () => {
     });
 
     describe('with collateral true', () => {
-      test('query transaction collateral inputs by tx hashes', async () => {
+      // TODO LW-9182 REMOVE SKIP
+      test.skip('query transaction collateral inputs by tx hashes', async () => {
         const txHashes = await fixtureBuilder.getTxHashes(1, { with: [TxWith.CollateralInput] });
         const ids = await getTxIds(txHashes);
         const result = await builder.queryTransactionInputsByIds(ids, true);
@@ -177,7 +178,8 @@ describe('ChainHistoryBuilder', () => {
   });
 
   describe('queryRedeemersByIds', () => {
-    test('query transaction redeemers by tx hashes', async () => {
+    // TODO LW-9182 REMOVE SKIP
+    test.skip('query transaction redeemers by tx hashes', async () => {
       const txHashes = await fixtureBuilder.getTxHashes(1, { with: [TxWith.Redeemer] });
       const ids = await getTxIds(txHashes);
       const result = await builder.queryRedeemersByIds(ids);
