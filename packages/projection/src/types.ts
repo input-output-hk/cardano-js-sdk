@@ -55,6 +55,20 @@ export type WithEpochBoundary = { crossEpochBoundary: boolean };
 
 export type BootstrapExtraProps = WithNetworkInfo & WithEpochNo & WithEpochBoundary;
 
+/**
+ * All projections start by obtaining a source/producer, which is an `Observable<ProjectionEvent<{}>>`.
+ * These events are very similar to Chain Sync events, but there are some important differences:
+ *
+ * 1. Block format is compatible with types from `@cardano-sdk/core` package.
+ * 2. Events include some additional properties: `{eraSumaries, genesisParameters, epochNo, crossEpochBoundary}`.
+ * 3. `RollBackward` events include block data (instead of just specifying the rollback point),
+ *    and are emitted once for **each** rolled back block.
+ *
+ * #### ExtraProps (Generic Parameter)
+ *
+ * Source observable can be piped through a series of RxJS operators, which may add some properties to the event.
+ * In an nutshell, `type ProjectionEvent<T> = ProjectionEvent<{}> & T`.
+ */
 export type ProjectionEvent<ExtraProps = {}> = UnifiedExtChainSyncEvent<BootstrapExtraProps & ExtraProps>;
 
 export type ProjectionOperator<ExtraPropsIn, ExtraPropsOut = {}> = UnifiedExtChainSyncOperator<
@@ -63,7 +77,7 @@ export type ProjectionOperator<ExtraPropsIn, ExtraPropsOut = {}> = UnifiedExtCha
 >;
 
 /**
- * Keeps track of blocks within stability window (computed as numSlots=3k/f).
+ * Keeps track of blocks within stability window (computed as numSlots=3k/f, or k blocks).
  *
  * With current mainnet protocol parameters (Dec 2022),
  * it can be up to 2160 ("securityParam"/"k") blocks,
