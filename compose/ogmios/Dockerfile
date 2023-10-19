@@ -16,6 +16,7 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then \
     armSubstituterKey="loony-tools:pr9m4BkM/5/eSTZlkQyRt57Jz7OMBxNSUiMC4FkcNfk=" ;\
   fi && curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix/tag/v0.11.0 | sh -s -- install linux \
   --extra-conf "sandbox = false" \
+  --extra-conf "filter-syscalls = false" \
   --extra-conf "substituters = https://cache.nixos.org https://cache.iog.io ${armSubstituter}" \
   --extra-conf "trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ= ${armSubstituterKey}" \
   --init none --no-confirm
