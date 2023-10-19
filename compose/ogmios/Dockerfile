@@ -33,6 +33,7 @@ RUN echo >/app/default.nix $'\n\
       url = "https://github.com/CardanoSolutions/ogmios.git";\n\
       rev = "'"${OGMIOS_VERSION}"$'";\n\
       fetchSubmodules = true;\n\
+      leaveDotGit = true;\n\
     }).drvAttrs ["outputHashAlgo" "outputHashMode" "outputHash"] // { __noChroot = true; });\n\
     # Note: some versions don’t link statically for AArch64, let’s use dynamically linked bundles:\n\
     nix-bundle-exe = import (fetchTarball "https://github.com/3noch/nix-bundle-exe/archive/3522ae68aa4188f4366ed96b41a5881d6a88af97.zip") { inherit pkgs; };\n\
@@ -54,6 +55,7 @@ RUN echo >/app/default.nix $'\n\
       + " && find $out -name cabal.project.freeze -delete -o -name package.yaml -delete "\n\
       + " && grep -RF -- -external-libsodium-vrf $out | cut -d: -f1 | sort --uniq | xargs -n1 -- sed -r s/-external-libsodium-vrf//g -i"\n\
     );\n\
+    ogmiosRev = __head (__split "\\t" (__unsafeDiscardStringContext (__readFile "${ogmiosSrc}/.git/info/refs")));\n\
     project = haskell-nix.project {\n\
       compiler-nix-name = "ghc8107";\n\
       projectFileName = "cabal.project";\n\
@@ -63,6 +65,7 @@ RUN echo >/app/default.nix $'\n\
         packages.cardano-crypto-praos.components.library.pkgconfig = lib.mkForce [ [ pkgs.libsodium-vrf ] ];\n\
         packages.cardano-crypto-class.components.library.pkgconfig = lib.mkForce [ ([ pkgs.libsodium-vrf pkgs.secp256k1 ]\n\
           ++ (if pkgs ? libblst then [pkgs.libblst] else [])) ];\n\
+        packages.ogmios.components.library.preConfigure = "export GIT_SHA=${ogmiosRev}\\n";\n\
       }) ];\n\
     };\n\
   in\n\
