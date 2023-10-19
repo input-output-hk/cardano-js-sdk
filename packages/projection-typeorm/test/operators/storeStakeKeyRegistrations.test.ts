@@ -3,7 +3,9 @@ import {
   BlockEntity,
   StakeKeyRegistrationEntity,
   TypeormStabilityWindowBuffer,
+  TypeormTipTracker,
   certificatePointerToId,
+  createObservableConnection,
   storeBlock,
   storeStakeKeyRegistrations,
   typeormTransactionCommit,
@@ -12,26 +14,34 @@ import {
 import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
-import { Observable, firstValueFrom, of, pairwise, takeWhile } from 'rxjs';
-import { createProjectorTilFirst, createRollBackwardEventFor, createStubProjectionSource } from './util';
-import { initializeDataSource } from '../util';
+import { Observable, firstValueFrom, pairwise, takeWhile } from 'rxjs';
+import { connectionConfig$, initializeDataSource } from '../util';
+import {
+  createProjectorContext,
+  createProjectorTilFirst,
+  createRollBackwardEventFor,
+  createStubProjectionSource
+} from './util';
 
 describe('storeStakeKeyRegistrations', () => {
   const data = chainSyncData(ChainSyncDataSet.WithPoolRetirement);
+  const entities = [BlockDataEntity, BlockEntity, StakeKeyRegistrationEntity];
   let stakeKeyRegistrationsRepo: Repository<StakeKeyRegistrationEntity>;
   let dataSource: DataSource;
   let queryRunner: QueryRunner;
   let buffer: TypeormStabilityWindowBuffer;
+  let tipTracker: TypeormTipTracker;
 
   const applyOperators = (evt$: Observable<ProjectionEvent<{}>>) =>
     evt$.pipe(
       Mappers.withCertificates(),
       Mappers.withStakeKeyRegistrations(),
-      withTypeormTransaction({ dataSource$: of(dataSource), logger }),
+      withTypeormTransaction({ connection$: createObservableConnection({ connectionConfig$, entities, logger }) }),
       storeBlock(),
       storeStakeKeyRegistrations(),
       buffer.storeBlockData(),
       typeormTransactionCommit(),
+      tipTracker.trackProjectedTip(),
       requestNext()
     );
 
@@ -40,24 +50,21 @@ describe('storeStakeKeyRegistrations', () => {
       blocksBufferLength: 1,
       buffer,
       cardanoNode: data.cardanoNode,
-      logger
+      logger,
+      projectedTip$: tipTracker.tip$
     }).pipe(applyOperators);
   const projectTilFirst = createProjectorTilFirst(project);
 
   beforeEach(async () => {
-    dataSource = await initializeDataSource({
-      entities: [BlockDataEntity, BlockEntity, StakeKeyRegistrationEntity]
-    });
+    dataSource = await initializeDataSource({ entities });
     queryRunner = dataSource.createQueryRunner();
     stakeKeyRegistrationsRepo = queryRunner.manager.getRepository(StakeKeyRegistrationEntity);
-    buffer = new TypeormStabilityWindowBuffer({ allowNonSequentialBlockHeights: true, logger });
-    await buffer.initialize(queryRunner);
+    ({ buffer, tipTracker } = createProjectorContext(entities));
   });
 
   afterEach(async () => {
     await queryRunner.release();
     await dataSource.destroy();
-    buffer.shutdown();
   });
 
   it('inserts and deletes stake key registrations', async () => {

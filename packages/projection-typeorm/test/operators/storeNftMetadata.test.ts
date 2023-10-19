@@ -8,6 +8,8 @@ import {
   OutputEntity,
   TokensEntity,
   TypeormStabilityWindowBuffer,
+  TypeormTipTracker,
+  createObservableConnection,
   storeAssets,
   storeBlock,
   storeNftMetadata,
@@ -17,9 +19,11 @@ import {
 } from '../../src';
 import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
 import { ChainSyncDataSet, chainSyncData, generateRandomHexString, logger } from '@cardano-sdk/util-dev';
-import { Observable, defer, firstValueFrom, from, lastValueFrom, toArray } from 'rxjs';
+import { Observable, firstValueFrom, lastValueFrom, toArray } from 'rxjs';
 import { QueryRunner, Repository } from 'typeorm';
+import { connectionConfig$, initializeDataSource } from '../util';
 import {
+  createProjectorContext,
   createProjectorTilFirst,
   createRollBackwardEventFor,
   createRollForwardEventBasedOn,
@@ -28,7 +32,6 @@ import {
   createStubRollForwardEvent
 } from './util';
 import { dummyLogger } from 'ts-log';
-import { initializeDataSource } from '../util';
 import omit from 'lodash/omit';
 
 const patchNftMetadataNameCip25 = (
@@ -182,17 +185,14 @@ describe('storeNftMetadata', () => {
   let nftMetadataRepo: Repository<NftMetadataEntity>;
   let assetRepo: Repository<AssetEntity>;
   let buffer: TypeormStabilityWindowBuffer;
+  let tipTracker: TypeormTipTracker;
   const entities = [BlockEntity, BlockDataEntity, AssetEntity, TokensEntity, OutputEntity, NftMetadataEntity];
-
-  const dataSource$ = defer(() =>
-    from(initializeDataSource({ devOptions: { dropSchema: false, synchronize: false }, entities }))
-  );
 
   const storeData = (
     evt$: Observable<ProjectionEvent<Mappers.WithUtxo & Mappers.WithMint & Mappers.WithCIP67 & Mappers.WithNftMetadata>>
   ) =>
     evt$.pipe(
-      withTypeormTransaction({ dataSource$, logger }),
+      withTypeormTransaction({ connection$: createObservableConnection({ connectionConfig$, entities, logger }) }),
       storeBlock(),
       storeAssets(),
       storeUtxo(),
@@ -209,6 +209,7 @@ describe('storeNftMetadata', () => {
       Mappers.withCIP67(),
       Mappers.withNftMetadata({ logger: dummyLogger }),
       storeData,
+      tipTracker.trackProjectedTip(),
       requestNext()
     );
 
@@ -217,7 +218,8 @@ describe('storeNftMetadata', () => {
       blocksBufferLength: 1,
       buffer,
       cardanoNode: events.cardanoNode,
-      logger
+      logger,
+      projectedTip$: tipTracker.tip$
     }).pipe(applyOperators());
 
   const createProjectTilFirst = (events: typeof withHandleEvents) => createProjectorTilFirst(() => project$(events));
@@ -227,13 +229,11 @@ describe('storeNftMetadata', () => {
     queryRunner = dataSource.createQueryRunner();
     nftMetadataRepo = queryRunner.manager.getRepository(NftMetadataEntity);
     assetRepo = queryRunner.manager.getRepository(AssetEntity);
-    buffer = new TypeormStabilityWindowBuffer({ allowNonSequentialBlockHeights: true, logger });
-    await buffer.initialize(queryRunner);
+    ({ buffer, tipTracker } = createProjectorContext(entities));
   });
 
   afterEach(async () => {
     await queryRunner.release();
-    buffer.shutdown();
   });
 
   const testBasicNftProjectionFeatures = (

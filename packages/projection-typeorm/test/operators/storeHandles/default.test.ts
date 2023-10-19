@@ -1,45 +1,42 @@
-/* eslint-disable unicorn/consistent-function-scoping */
-import {
-  AddressEntity,
-  AssetEntity,
-  BlockEntity,
-  HandleEntity,
-  HandleMetadataEntity,
-  TypeormStabilityWindowBuffer
-} from '../../../src';
+import { AddressEntity, AssetEntity, BlockEntity, HandleEntity, HandleMetadataEntity } from '../../../src';
 import { Cardano, Handle, util } from '@cardano-sdk/core';
 import {
   DefaultHandleParamsQueryResponse,
   queryHandlesByAddressCredentials,
   sortHandles
 } from '../../../src/operators/storeHandles';
+import {
+  ProjectorContext,
+  createProjectorContext,
+  createStubBlockHeader,
+  createStubProjectionSource,
+  createStubRollForwardEvent,
+  createStubTx
+} from '../util';
 import { QueryRunner, Repository } from 'typeorm';
-import { applyOperators, entities, policyId, projectTilFirst, stubEvents } from './util';
-import { cip19TestVectors, generateRandomHexString, logger } from '@cardano-sdk/util-dev';
-import { createStubBlockHeader, createStubProjectionSource, createStubRollForwardEvent, createStubTx } from '../util';
+import { cip19TestVectors, generateRandomHexString } from '@cardano-sdk/util-dev';
+import { entities, mapAndStore, policyId, projectTilFirst, stubEvents } from './util';
 import { firstValueFrom } from 'rxjs';
 import { initializeDataSource } from '../../util';
 
 describe('storeHandles', () => {
   let queryRunner: QueryRunner;
-  let buffer: TypeormStabilityWindowBuffer;
+  let context: ProjectorContext;
   let handleRepository: Repository<HandleEntity>;
 
   beforeEach(async () => {
     const dataSource = await initializeDataSource({ entities });
     queryRunner = dataSource.createQueryRunner();
-    buffer = new TypeormStabilityWindowBuffer({ allowNonSequentialBlockHeights: true, logger });
-    await buffer.initialize(queryRunner);
+    context = createProjectorContext(entities);
     handleRepository = queryRunner.manager.getRepository(HandleEntity);
   });
 
   afterEach(async () => {
     await queryRunner.release();
-    buffer.shutdown();
   });
 
   const mintFirstHandle = async () => {
-    const firstHandleEvent = await projectTilFirst(buffer)((evt) => evt.handles.length > 0);
+    const firstHandleEvent = await projectTilFirst(context)((evt) => evt.handles.length > 0);
     const firstHandle = firstHandleEvent.handles[0];
     const firstHandleStored = await handleRepository.findOneOrFail({ where: { handle: firstHandle.handle } })!;
     return { firstHandle, firstHandleEvent, firstHandleStored };
@@ -104,7 +101,7 @@ describe('storeHandles', () => {
       stubEvents.networkInfo
     );
 
-    const event = await firstValueFrom(createStubProjectionSource([createOgHandle]).pipe(applyOperators(buffer)));
+    const event = await firstValueFrom(createStubProjectionSource([createOgHandle]).pipe(mapAndStore(context)));
     const handleOwnership = event.handles[0];
     const storedHandle = await handleRepository.findOneOrFail({ where: { handle: handleOwnership.handle } })!;
     return { event, handleOwnership, storedHandle };

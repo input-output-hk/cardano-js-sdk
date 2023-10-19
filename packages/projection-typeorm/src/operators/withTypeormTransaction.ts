@@ -1,8 +1,6 @@
 /* eslint-disable func-style */
-import { DataSource, QueryRunner } from 'typeorm';
-import { DataSourceExtensions } from '../createDataSource';
-import { NEVER, Observable, Subject, concat, defer, from, map, mergeMap, switchMap, tap } from 'rxjs';
-import { PgBossExtension, createPgBossExtension } from '../pgBoss';
+import { Observable, Subject, defer, from, map, mergeMap } from 'rxjs';
+import { PgBossExtension } from '../pgBoss';
 import {
   ProjectionEvent,
   UnifiedExtChainSyncObservable,
@@ -10,17 +8,16 @@ import {
   withEventContext,
   withStaticContext
 } from '@cardano-sdk/projection';
-import { WithLogger } from '@cardano-sdk/util';
-import { finalizeWithLatest } from '@cardano-sdk/util-rxjs';
+import { QueryRunner } from 'typeorm';
+import { TypeormConnection } from '../createDataSource';
 import omit from 'lodash/omit';
 
-export interface WithTypeormTransactionDependencies extends WithLogger {
-  dataSource$: Observable<DataSource>;
+export interface WithTypeormTransactionDependencies {
+  connection$: Observable<TypeormConnection>;
 }
 
 export interface WithTypeormContext {
   queryRunner: QueryRunner;
-  transactionCommitted$: Subject<void>;
 }
 
 export interface WithPgBoss {
@@ -28,71 +25,31 @@ export interface WithPgBoss {
 }
 
 type TypeormContextProp = keyof (WithTypeormContext & WithPgBoss);
-const WithTypeormTransactionProps: Array<TypeormContextProp> = ['queryRunner', 'transactionCommitted$', 'pgBoss'];
+const WithTypeormTransactionProps: Array<TypeormContextProp> = ['queryRunner', 'pgBoss'];
 
 export function withTypeormTransaction<Props>(
-  dependencies: WithTypeormTransactionDependencies
+  dependencies: WithTypeormTransactionDependencies & { pgBoss?: false }
 ): UnifiedExtChainSyncOperator<Props, Props & WithTypeormContext>;
+
 export function withTypeormTransaction<Props>(
-  dependencies: WithTypeormTransactionDependencies,
-  extensions: { pgBoss: true }
+  dependencies: WithTypeormTransactionDependencies & { pgBoss: true }
 ): UnifiedExtChainSyncOperator<Props, Props & WithTypeormContext & WithPgBoss>;
-export function withTypeormTransaction<Props>(
-  dependencies: WithTypeormTransactionDependencies,
-  extensions: DataSourceExtensions
-): UnifiedExtChainSyncOperator<Props, Props & WithTypeormContext>;
+
 /**
  * Start a PostgreSQL transaction for each event.
  *
  * {pgBoss: true} also adds {@link WithPgBoss} context.
  */
-export function withTypeormTransaction<Props>(
-  { dataSource$, logger }: WithTypeormTransactionDependencies,
-  extensions?: DataSourceExtensions
-): UnifiedExtChainSyncOperator<Props, Props & WithTypeormContext & Partial<WithPgBoss>> {
+export function withTypeormTransaction<Props>({
+  connection$
+}: WithTypeormTransactionDependencies & { pgBoss?: boolean }): UnifiedExtChainSyncOperator<
+  Props,
+  Props & WithTypeormContext & Partial<WithPgBoss>
+> {
   // eslint-disable-next-line sonarjs/cognitive-complexity
   return (evt$: UnifiedExtChainSyncObservable<Props>) =>
     evt$.pipe(
-      withStaticContext(
-        defer(() =>
-          dataSource$.pipe(
-            switchMap((dataSource) =>
-              concat(
-                from(
-                  (async () => {
-                    const queryRunner = dataSource.createQueryRunner('master');
-                    await queryRunner.connect();
-                    if (extensions?.pgBoss) {
-                      const pgBoss = createPgBossExtension(queryRunner, logger);
-                      return { pgBoss, queryRunner };
-                    }
-                    return { queryRunner };
-                  })()
-                ),
-                NEVER
-              ).pipe(
-                finalizeWithLatest(async (evt) => {
-                  if (!evt) return;
-                  if (evt.queryRunner.isTransactionActive) {
-                    try {
-                      await evt.queryRunner.rollbackTransaction();
-                    } catch (error) {
-                      logger.error('Failed to rollback transaction', error);
-                    }
-                  }
-                  if (!evt.queryRunner.isReleased) {
-                    try {
-                      await evt.queryRunner.release();
-                    } catch (error) {
-                      logger.error('Failed to "release" query runner', error);
-                    }
-                  }
-                })
-              )
-            )
-          )
-        )
-      ),
+      withStaticContext(defer(() => connection$)),
       withEventContext(({ queryRunner }) =>
         from(
           // - transactionCommitted$.next is called after COMMIT, it is
@@ -116,7 +73,6 @@ export const typeormTransactionCommit =
     evt$.pipe(
       mergeMap((evt) =>
         from(evt.queryRunner.commitTransaction()).pipe(
-          tap(() => evt.transactionCommitted$.next()),
           map(() => {
             // The explicit cast is (probably) needed because typecript can't check that
             // we're not removing any properties overlapping with T

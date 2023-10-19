@@ -7,6 +7,8 @@ import {
   OutputEntity,
   TokensEntity,
   TypeormStabilityWindowBuffer,
+  TypeormTipTracker,
+  createObservableConnection,
   storeAssets,
   storeBlock,
   storeHandleMetadata,
@@ -17,10 +19,15 @@ import {
 import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
 import { Cardano, ObservableCardanoNode } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
-import { Observable, defer, firstValueFrom, from } from 'rxjs';
+import { Observable, firstValueFrom } from 'rxjs';
 import { QueryRunner, Repository } from 'typeorm';
-import { createProjectorTilFirst, createRollBackwardEventFor, createStubProjectionSource } from './util';
-import { initializeDataSource } from '../util';
+import { connectionConfig$, initializeDataSource } from '../util';
+import {
+  createProjectorContext,
+  createProjectorTilFirst,
+  createRollBackwardEventFor,
+  createStubProjectionSource
+} from './util';
 
 describe('storeHandleMetadata', () => {
   const eventsWithCip68Handle = chainSyncData(ChainSyncDataSet.WithInlineDatum);
@@ -30,6 +37,7 @@ describe('storeHandleMetadata', () => {
 
   let queryRunner: QueryRunner;
   let buffer: TypeormStabilityWindowBuffer;
+  let tipTracker: TypeormTipTracker;
   const entities = [
     BlockEntity,
     BlockDataEntity,
@@ -40,15 +48,11 @@ describe('storeHandleMetadata', () => {
     HandleMetadataEntity
   ];
 
-  const dataSource$ = defer(() =>
-    from(initializeDataSource({ devOptions: { dropSchema: false, synchronize: false }, entities }))
-  );
-
   const storeData = (
     evt$: Observable<ProjectionEvent<Mappers.WithUtxo & Mappers.WithMint & Mappers.WithHandleMetadata>>
   ) =>
     evt$.pipe(
-      withTypeormTransaction({ dataSource$, logger }),
+      withTypeormTransaction({ connection$: createObservableConnection({ connectionConfig$, entities, logger }) }),
       storeBlock(),
       storeAssets(),
       storeUtxo(),
@@ -66,11 +70,18 @@ describe('storeHandleMetadata', () => {
       Mappers.withNftMetadata({ logger }),
       Mappers.withHandleMetadata({ policyIds }, logger),
       storeData,
+      tipTracker.trackProjectedTip(),
       requestNext()
     );
 
   const project$ = (cardanoNode: ObservableCardanoNode) => () =>
-    Bootstrap.fromCardanoNode({ blocksBufferLength: 1, buffer, cardanoNode, logger }).pipe(applyOperators());
+    Bootstrap.fromCardanoNode({
+      blocksBufferLength: 1,
+      buffer,
+      cardanoNode,
+      logger,
+      projectedTip$: tipTracker.tip$
+    }).pipe(applyOperators());
 
   const projectTilFirst = (cardanoNode: ObservableCardanoNode) => createProjectorTilFirst(project$(cardanoNode));
   let repository: Repository<HandleMetadataEntity>;
@@ -78,14 +89,12 @@ describe('storeHandleMetadata', () => {
   beforeEach(async () => {
     const dataSource = await initializeDataSource({ entities });
     queryRunner = dataSource.createQueryRunner();
-    buffer = new TypeormStabilityWindowBuffer({ allowNonSequentialBlockHeights: true, logger });
+    ({ buffer, tipTracker } = createProjectorContext(entities));
     repository = queryRunner.manager.getRepository(HandleMetadataEntity);
-    await buffer.initialize(queryRunner);
   });
 
   afterEach(async () => {
     await queryRunner.release();
-    buffer.shutdown();
   });
 
   const testRollForwardAndBackward = async (

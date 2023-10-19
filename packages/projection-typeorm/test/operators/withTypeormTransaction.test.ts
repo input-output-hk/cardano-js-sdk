@@ -3,6 +3,8 @@ import {
   BlockDataEntity,
   BlockEntity,
   TypeormStabilityWindowBuffer,
+  TypeormTipTracker,
+  connect,
   isRecoverableTypeormError,
   storeBlock,
   typeormTransactionCommit,
@@ -17,7 +19,8 @@ import {
 } from '@cardano-sdk/projection';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { ConnectionNotFoundError, DataSource, QueryFailedError, QueryRunner } from 'typeorm';
-import { Observable, defer, firstValueFrom, lastValueFrom, map, of, take } from 'rxjs';
+import { Observable, defer, firstValueFrom, lastValueFrom, map, of, take, toArray } from 'rxjs';
+import { createProjectorContext } from './util';
 import { initializeDataSource } from '../util';
 import { patchObject } from '@cardano-sdk/util';
 import { shareRetryBackoff } from '@cardano-sdk/util-rxjs';
@@ -55,8 +58,10 @@ const mockDataSource = (dataSources: DataSource[]) => {
 };
 
 describe('withTypeormTransaction', () => {
+  const entities = [BlockEntity, BlockDataEntity];
   let project$: Observable<Omit<ProjectionEvent, 'requestNext'>>;
   let buffer: TypeormStabilityWindowBuffer;
+  let tipTracker: TypeormTipTracker;
   let dataSource: DataSource;
   let queryRunner: QueryRunner;
 
@@ -64,22 +69,21 @@ describe('withTypeormTransaction', () => {
     jest.fn((evt$: Observable<ProjectionEvent>) =>
       evt$.pipe(
         withTypeormTransaction({
-          dataSource$,
-          logger
+          connection$: dataSource$.pipe(connect({ logger }))
         }),
         storeBlock(),
         buffer.storeBlockData(),
-        typeormTransactionCommit()
+        typeormTransactionCommit(),
+        tipTracker.trackProjectedTip()
       )
     );
 
   beforeEach(async () => {
-    dataSource = await initializeDataSource({ entities: [BlockEntity, BlockDataEntity] });
+    dataSource = await initializeDataSource({ entities });
     queryRunner = dataSource.createQueryRunner();
   });
 
   afterEach(async () => {
-    buffer.shutdown();
     await queryRunner.release();
     await dataSource.destroy();
   });
@@ -88,8 +92,7 @@ describe('withTypeormTransaction', () => {
     let numChainSyncSubscriptions: number;
 
     beforeEach(async () => {
-      buffer = new TypeormStabilityWindowBuffer({ logger });
-      await buffer.initialize(queryRunner);
+      ({ buffer, tipTracker } = createProjectorContext(entities));
     });
 
     const project = <PropsOut>(projection: ProjectionOperator<BootstrapExtraProps, PropsOut>) =>
@@ -110,7 +113,8 @@ describe('withTypeormTransaction', () => {
                 )
               )
           }),
-          logger
+          logger,
+          projectedTip$: tipTracker.tip$
         }).pipe(projection, requestNext())
       );
 
@@ -135,13 +139,15 @@ describe('withTypeormTransaction', () => {
 
   describe('with a successful database connection', () => {
     beforeEach(async () => {
-      buffer = new TypeormStabilityWindowBuffer({
-        allowNonSequentialBlockHeights: false,
-        logger
-      });
-      await buffer.initialize(queryRunner);
+      ({ buffer, tipTracker } = createProjectorContext(entities));
       project$ = defer(() =>
-        Bootstrap.fromCardanoNode({ blocksBufferLength: 10, buffer, cardanoNode, logger }).pipe(
+        Bootstrap.fromCardanoNode({
+          blocksBufferLength: 10,
+          buffer,
+          cardanoNode,
+          logger,
+          projectedTip$: tipTracker.tip$
+        }).pipe(
           shareRetryBackoff(createProjection(of(dataSource)), { shouldRetry: isRecoverableTypeormError }),
           requestNext()
         )
@@ -163,11 +169,10 @@ describe('withTypeormTransaction', () => {
     });
 
     it('does not retry unrecoverable errors', async () => {
-      const lastEvent = await lastValueFrom(project$.pipe(take(2)));
-      // deleting last block from the buffer creates an inconsistency: resumed projection will
+      const [previousTip] = await lastValueFrom(project$.pipe(take(2), toArray()));
+      // setting local tip to tip-1 creates an inconsistency: resumed projection will
       // try to insert a 'block' with an already existing 'height' which has a unique constraint.
-      await queryRunner.manager.getRepository(BlockDataEntity).delete(lastEvent.block.header.blockNo);
-      await buffer.initialize(queryRunner);
+      await firstValueFrom(tipTracker.trackProjectedTip()(of(previousTip)));
       // ADP-2807
       await expect(firstValueFrom(project$)).rejects.toThrowError(QueryFailedError);
     });

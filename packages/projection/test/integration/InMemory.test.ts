@@ -10,9 +10,9 @@ import {
   requestNext,
   withStaticContext
 } from '../../src';
-import { Cardano, CardanoNodeErrors, ChainSyncEventType, ChainSyncRollForward } from '@cardano-sdk/core';
+import { Cardano, ChainSyncEventType, ChainSyncRollForward } from '@cardano-sdk/core';
 import { ChainSyncDataSet, StubChainSyncData, chainSyncData, logger } from '@cardano-sdk/util-dev';
-import { from, lastValueFrom, of, toArray } from 'rxjs';
+import { from, lastValueFrom, of, take, toArray } from 'rxjs';
 
 const dataWithPoolRetirement = chainSyncData(ChainSyncDataSet.WithPoolRetirement);
 const dataWithStakeKeyDeregistration = chainSyncData(ChainSyncDataSet.WithStakeKeyDeregistration);
@@ -26,20 +26,22 @@ describe('integration/InMemory', () => {
   let store: InMemory.InMemoryStore;
   let buffer: InMemory.InMemoryStabilityWindowBuffer;
 
-  const projectAll = (
+  const project = (
     { cardanoNode }: StubChainSyncData,
     projection: ProjectionOperator<Mappers.WithCertificates & InMemory.WithInMemoryStore>
   ) =>
-    lastValueFrom(
-      Bootstrap.fromCardanoNode({ blocksBufferLength: 10, buffer, cardanoNode, logger }).pipe(
-        withStaticContext({ store }),
-        Mappers.withCertificates(),
-        projection,
-        buffer.handleEvents(),
-        requestNext(),
-        toArray()
-      )
-    );
+    Bootstrap.fromCardanoNode({
+      blocksBufferLength: 10,
+      buffer,
+      cardanoNode,
+      logger,
+      projectedTip$: buffer.tip$
+    }).pipe(withStaticContext({ store }), Mappers.withCertificates(), projection, buffer.handleEvents(), requestNext());
+
+  const projectAll = (
+    data: StubChainSyncData,
+    projection: ProjectionOperator<Mappers.WithCertificates & InMemory.WithInMemoryStore>
+  ) => lastValueFrom(project(data, projection).pipe(toArray()));
 
   beforeEach(() => {
     store = { stakeKeys: new Set(), stakePools: new Map() };
@@ -139,19 +141,22 @@ describe('integration/InMemory', () => {
         ])
       )
       .subscribe();
-    const [firstBlock] = await projectAll(dataWithStakeKeyDeregistration, projectStakeKeys);
-    expect(firstBlock.block.header.blockNo).toBe(22_622);
-    expect(firstBlock.crossEpochBoundary).toBe(false);
+    const [firstEvent, secondEvent] = await projectAll(dataWithStakeKeyDeregistration, projectStakeKeys);
+    expect(firstEvent.block.header.blockNo).toBe(22_622);
+    expect(firstEvent.crossEpochBoundary).toBe(false);
+    expect(firstEvent.eventType).toBe(ChainSyncEventType.RollBackward);
+    expect(secondEvent.eventType).toBe(ChainSyncEventType.RollForward);
     expect(store.stakeKeys.size).toBe(1);
   });
 
-  it('errors with a buffer from another network', async () => {
+  it('rolls back all the way to origin when no intersection is found', async () => {
     buffer
       .handleEvents()(
         // No intersection, both block hashes are not present in the dataset
         from([
           {
             block: {
+              body: [] as Cardano.OnChainTx[],
               header: {
                 blockNo: Cardano.BlockNo(22_621),
                 hash: Cardano.BlockId('c75e9fdb8c24caf2e8d10d1a066c1157572c4ce769378d6708ff2e0aa87ba2de'),
@@ -163,6 +168,7 @@ describe('integration/InMemory', () => {
           } as RollForwardEvent<BootstrapExtraProps>,
           {
             block: {
+              body: [] as Cardano.OnChainTx[],
               header: {
                 blockNo: Cardano.BlockNo(22_622),
                 hash: Cardano.BlockId('c75e9fdb8c24caf2e8d10d1a066c1157572c4ce769378d6708ff2e0aa87ba2df'),
@@ -175,8 +181,13 @@ describe('integration/InMemory', () => {
         ])
       )
       .subscribe();
-    await expect(projectAll(dataWithStakeKeyDeregistration, projectStakeKeys)).rejects.toThrowError(
-      CardanoNodeErrors.CardanoClientErrors.IntersectionNotFoundError
+    const events = await lastValueFrom(
+      project(dataWithStakeKeyDeregistration, projectStakeKeys).pipe(take(3), toArray())
     );
+    expect(events.map((evt) => evt.eventType)).toEqual([
+      ChainSyncEventType.RollBackward,
+      ChainSyncEventType.RollBackward,
+      ChainSyncEventType.RollForward
+    ]);
   });
 });

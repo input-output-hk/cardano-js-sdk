@@ -1,5 +1,7 @@
-import { CreateDataSourceProps, createDataSource } from '../src';
-import { logger } from '@cardano-sdk/util-dev';
+import { BlockEntity, CreateDataSourceProps, createDataSource } from '../src';
+import { Cardano } from '@cardano-sdk/core';
+import { NEVER, concat, of } from 'rxjs';
+import { generateRandomHexString, logger } from '@cardano-sdk/util-dev';
 
 export const connectionConfig = {
   database: 'projection',
@@ -8,6 +10,8 @@ export const connectionConfig = {
   port: 5432,
   username: 'postgres'
 };
+
+export const connectionConfig$ = concat(of(connectionConfig), NEVER);
 
 export const initializeDataSource = async (
   props: Pick<CreateDataSourceProps, 'entities' | 'extensions' | 'devOptions'>
@@ -21,3 +25,15 @@ export const initializeDataSource = async (
   await dataSource.initialize();
   return dataSource;
 };
+
+export const createBlockHeader = (height: number): Cardano.PartialBlockHeader => ({
+  blockNo: Cardano.BlockNo(height),
+  hash: Cardano.BlockId(generateRandomHexString(64)),
+  slot: Cardano.Slot(height * 20)
+});
+
+export const createBlockEntity = (header: Cardano.PartialBlockHeader): BlockEntity => ({
+  hash: header.hash,
+  height: header.blockNo,
+  slot: header.slot
+});

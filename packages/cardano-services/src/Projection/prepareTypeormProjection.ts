@@ -15,7 +15,6 @@ import {
   StakeKeyRegistrationEntity,
   StakePoolEntity,
   TokensEntity,
-  TypeormStabilityWindowBuffer,
   createStorePoolMetricsUpdateJob,
   storeAddresses,
   storeAssets,
@@ -139,7 +138,7 @@ type Entity = Entities[EntityName];
 const storeEntities: Partial<Record<StoreName, EntityName[]>> = {
   storeAddresses: ['address'],
   storeAssets: ['asset'],
-  storeBlock: ['block'],
+  storeBlock: ['block', 'blockData'],
   storeHandleMetadata: ['handleMetadata', 'output'],
   storeHandles: ['handle', 'asset', 'tokens', 'output'],
   storeNftMetadata: ['asset'],
@@ -303,7 +302,6 @@ const keyOf = <T extends {}>(obj: T, value: unknown): keyof T | null => {
 
 export interface PrepareTypeormProjectionProps {
   projections: ProjectionName[];
-  buffer?: TypeormStabilityWindowBuffer;
   options?: ProjectionOptions;
 }
 
@@ -312,7 +310,7 @@ export interface PrepareTypeormProjectionProps {
  * based on 'projections' and presence of 'buffer':
  */
 export const prepareTypeormProjection = (
-  { projections, buffer, options = {} }: PrepareTypeormProjectionProps,
+  { projections, options = {} }: PrepareTypeormProjectionProps,
   dependencies: WithLogger
 ) => {
   const mapperSorter = new Sorter<MapperOperator>();
@@ -329,10 +327,6 @@ export const prepareTypeormProjection = (
   const selectedEntities = entitySorter.nodes;
   const selectedMappers = mapperSorter.nodes;
   const selectedStores = storeSorter.nodes;
-  if (buffer) {
-    selectedEntities.push(BlockDataEntity);
-    selectedStores.push(buffer.storeBlockData());
-  }
   const extensions = requiredExtensions(projections);
   return {
     __debug: {

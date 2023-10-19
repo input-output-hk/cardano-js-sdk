@@ -2,6 +2,7 @@ import {
   BlockEntity,
   PgConnectionConfig,
   STAKE_POOL_METADATA_QUEUE,
+  createDataSource,
   createPgBossExtension
 } from '@cardano-sdk/projection-typeorm';
 import { Cardano } from '@cardano-sdk/core';
@@ -11,7 +12,7 @@ import { PgBossHttpService, pgBossEntities } from '../../../src/Program/services
 import { Pool } from 'pg';
 import { StakePoolMetadataFetchMode } from '../../../src/Program/options';
 import { WorkerHandlerFactoryOptions } from '../../../src/PgBoss';
-import { createObservableDataSource, getConnectionConfig, getPool } from '../../../src';
+import { getConnectionConfig, getPool } from '../../../src/Program/services/postgres';
 import { logger } from '@cardano-sdk/util-dev';
 
 const dnsResolver = () => Promise.resolve({ name: 'localhost', port: 5433, priority: 6, weight: 5 });
@@ -70,6 +71,7 @@ jest.mock('@cardano-sdk/projection-typeorm', () => {
 
 describe('PgBossHttpService', () => {
   let connectionConfig$: Observable<PgConnectionConfig>;
+  let connectionConfig: PgConnectionConfig;
   let dataSource: DataSource;
   let db: Pool;
   let service: PgBossHttpService | undefined;
@@ -87,15 +89,7 @@ describe('PgBossHttpService', () => {
     };
 
     connectionConfig$ = getConnectionConfig(dnsResolver, 'test', 'StakePool', args);
-    const dataSource$ = createObservableDataSource({
-      connectionConfig$,
-      devOptions: { dropSchema: true, synchronize: true },
-      entities: pgBossEntities,
-      extensions: { pgBoss: true },
-      logger,
-      migrationsRun: false
-    });
-    dataSource = await firstValueFrom(dataSource$);
+    connectionConfig = await firstValueFrom(connectionConfig$);
 
     const pool = await getPool(dnsResolver, logger, args);
 
@@ -104,8 +98,20 @@ describe('PgBossHttpService', () => {
     db = pool;
   });
 
+  beforeEach(async () => {
+    dataSource = createDataSource({
+      connectionConfig,
+      devOptions: { dropSchema: true, synchronize: true },
+      entities: pgBossEntities,
+      extensions: { pgBoss: true },
+      logger
+    });
+    await dataSource.initialize();
+  });
+
   afterEach(async () => {
     await service?.shutdown();
+    await dataSource.destroy().catch(() => void 0);
   });
 
   it('health check is ok after start with a valid db connection', async () => {
@@ -116,7 +122,6 @@ describe('PgBossHttpService', () => {
         parallelJobs: 3,
         queues: []
       },
-
       { connectionConfig$, db, logger }
     );
     expect(await service.healthCheck()).toEqual({ ok: false, reason: 'PgBossHttpService not started' });
@@ -132,7 +137,6 @@ describe('PgBossHttpService', () => {
     let observableResolver = () => {};
     let subscriptions = 0;
 
-    const connectionConfig = await firstValueFrom(connectionConfig$);
     const config$ = new Observable<PgConnectionConfig>((subscriber) => {
       subscriptions++;
 
@@ -155,6 +159,8 @@ describe('PgBossHttpService', () => {
     await service.start();
 
     // Insert test block with slot 1
+    const queryRunner = dataSource.createQueryRunner();
+    await queryRunner.connect();
     const blockRepos = dataSource.getRepository(BlockEntity);
     const block = { hash: 'test', height: 1, slot: 1 };
     await blockRepos.insert(block);
@@ -165,7 +171,6 @@ describe('PgBossHttpService', () => {
     expect(await collectStatus()).toEqual({ calls: 0, health: { ok: true }, subscriptions: 1 });
 
     // Schedule a job
-    const queryRunner = dataSource.createQueryRunner();
     const pgboss = createPgBossExtension(queryRunner, logger);
     await pgboss.send(STAKE_POOL_METADATA_QUEUE, {}, { retryDelay: 1, retryLimit: 100, slot: Cardano.Slot(1) });
     await queryRunner.release();
@@ -225,5 +230,7 @@ describe('PgBossHttpService', () => {
     await testPromises[3];
 
     expect(await collectStatus()).toEqual({ calls: 4, health: { ok: true }, subscriptions: 3 });
+
+    await dataSource.destroy();
   });
 });

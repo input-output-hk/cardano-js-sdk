@@ -2,36 +2,16 @@
 /* eslint-disable brace-style */
 import { BlockDataEntity } from './entity';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { FindOptionsSelect, LessThan, QueryRunner, Repository } from 'typeorm';
+import { LessThan, QueryRunner } from 'typeorm';
 import { Logger } from 'ts-log';
-import { Observable, ReplaySubject, concatMap, from, map } from 'rxjs';
-import {
-  ProjectionEvent,
-  RollBackwardEvent,
-  RollForwardEvent,
-  StabilityWindowBuffer,
-  WithBlock,
-  WithNetworkInfo
-} from '@cardano-sdk/projection';
+import { Observable, catchError, concatMap, from, map, of, switchMap, take } from 'rxjs';
+import { ProjectionEvent, RollForwardEvent, StabilityWindowBuffer, WithNetworkInfo } from '@cardano-sdk/projection';
+import { ReconnectionConfig } from '@cardano-sdk/util-rxjs';
+import { RetryBackoffConfig, retryBackoff } from 'backoff-rxjs';
+import { TypeormConnection } from './createDataSource';
 import { WithLogger, contextLogger } from '@cardano-sdk/util';
 import { WithTypeormContext } from './operators';
-
-const pointEquals = (point1: 'origin' | Cardano.Block | undefined, point2: 'origin' | Cardano.Block | undefined) => {
-  if (typeof point1 !== 'object') {
-    return point1 === point2;
-  }
-  if (typeof point2 !== 'object') {
-    return false;
-  }
-  return point1.header.hash === point2.header.hash;
-};
-
-const blockDataSelect: FindOptionsSelect<BlockDataEntity> = {
-  // Using 'transformers' breaks the types.
-  // Types seem to expect model to have fields that match database types:
-  // If it's an 'object', it will recursively apply FindOptionsSelect.
-  data: true as any
-};
+import { isRecoverableTypeormError } from './isRecoverableTypeormError';
 
 export interface TypeormStabilityWindowBufferProps extends WithLogger {
   /**
@@ -39,77 +19,76 @@ export interface TypeormStabilityWindowBufferProps extends WithLogger {
    */
   compactBufferEveryNBlocks?: number;
   /**
-   * Useful for testing with cherry-picked blocks
+   * Used for getBlock, which is called at the time of bootstrap or rollback
    */
-  allowNonSequentialBlockHeights?: boolean;
+  connection$: Observable<TypeormConnection>;
+  /**
+   * Retry strategy for getBlock. Buffer will re-subscribe to connection$ on each retry.
+   */
+  reconnectionConfig: ReconnectionConfig;
 }
 
 export class TypeormStabilityWindowBuffer implements StabilityWindowBuffer {
-  #tail?: Cardano.Block | 'origin';
-  #tip?: Cardano.Block | 'origin';
-  readonly #tip$: ReplaySubject<Cardano.Block | 'origin'> = new ReplaySubject(1);
-  readonly #tail$: ReplaySubject<Cardano.Block | 'origin'> = new ReplaySubject(1);
-  readonly tip$: Observable<Cardano.Block | 'origin'>;
-  readonly tail$: Observable<Cardano.Block | 'origin'>;
+  readonly #queryRunner$: Observable<QueryRunner>;
+  readonly #retryBackoffConfig: RetryBackoffConfig;
   readonly #logger: Logger;
   readonly #compactEvery: number;
-  readonly #allowNonSequentialBlockHeights?: boolean;
 
   constructor({
-    allowNonSequentialBlockHeights,
     compactBufferEveryNBlocks = 100,
-    logger
+    connection$,
+    logger,
+    reconnectionConfig
   }: TypeormStabilityWindowBufferProps) {
     this.#compactEvery = compactBufferEveryNBlocks;
-    this.#allowNonSequentialBlockHeights = allowNonSequentialBlockHeights;
     this.#logger = contextLogger(logger, 'TypeormStabilityWindowBuffer');
-    this.tip$ = this.#tip$.asObservable();
-    this.tail$ = this.#tail$.asObservable();
+    this.#queryRunner$ = connection$.pipe(map(({ queryRunner }) => queryRunner));
+    this.#retryBackoffConfig = {
+      ...reconnectionConfig,
+      shouldRetry: isRecoverableTypeormError
+    };
+  }
+
+  getBlock(id: Cardano.BlockId): Observable<Cardano.Block | null> {
+    this.#logger.debug('getBlock', id);
+    return this.#queryRunner$.pipe(
+      switchMap((queryRunner) => {
+        this.#logger.debug('getBlock query runner');
+        const repository = queryRunner.manager.getRepository(BlockDataEntity);
+        return from(
+          (async () => {
+            const blockDataEntity = await repository.findOne({ where: { block: { hash: id } } });
+            this.#logger.debug('getBlock found', blockDataEntity);
+            return blockDataEntity?.data || null;
+          })()
+        );
+      }),
+      take(1),
+      catchError((err) => {
+        this.#logger.error(err);
+        throw err;
+      }),
+      retryBackoff(this.#retryBackoffConfig)
+    );
   }
 
   storeBlockData<T extends ProjectionEvent<WithTypeormContext>>() {
     return (evt$: Observable<T>) =>
       evt$.pipe(
-        concatMap((evt) =>
-          from(
-            evt.eventType === ChainSyncEventType.RollForward ? this.#rollForward(evt) : this.#rollBackward(evt)
-          ).pipe(map(() => evt))
-        )
+        concatMap((evt) => {
+          if (
+            evt.eventType === ChainSyncEventType.RollForward &&
+            evt.block.header.blockNo >= evt.tip.blockNo - evt.genesisParameters.securityParameter
+          ) {
+            return from(this.#rollForward(evt)).pipe(map(() => evt));
+          }
+          return of(evt);
+        })
       );
   }
 
-  async initialize(queryRunner: QueryRunner): Promise<void> {
-    const repository = queryRunner.manager.getRepository(BlockDataEntity);
-    const [tip, tail] = await Promise.all([
-      // findOne fails without `where:`, so using find().
-      // It makes 2 queries so is not very efficient,
-      // but it should be fine for `initialize`.
-      repository.find({
-        order: { blockHeight: 'DESC' },
-        select: blockDataSelect,
-        take: 1
-      }),
-      this.#findTail(repository)
-    ]);
-    this.#setTip(tip[0]?.data || 'origin');
-    this.#setTail(tail[0]?.data || 'origin');
-  }
-
-  shutdown(): void {
-    this.#tip$.complete();
-    this.#tail$.complete();
-  }
-
-  async #findTail(repository: Repository<BlockDataEntity>) {
-    return repository.find({
-      order: { blockHeight: 'ASC' },
-      select: blockDataSelect,
-      take: 1
-    });
-  }
-
   async #rollForward(evt: RollForwardEvent<WithNetworkInfo & WithTypeormContext>) {
-    const { eventType, transactionCommitted$, queryRunner, block } = evt;
+    const { eventType, queryRunner, block } = evt;
     const {
       header: { blockNo }
     } = block;
@@ -123,42 +102,7 @@ export class TypeormStabilityWindowBuffer implements StabilityWindowBuffer {
         data: block
       });
       await Promise.all([repository.insert(blockData), this.#deleteOldBlockData(evt)]);
-      transactionCommitted$.subscribe(() => {
-        this.#setTip(block);
-        if (this.#tail === 'origin') {
-          this.#setTail(block);
-        }
-      });
     }
-  }
-
-  async #rollBackward({
-    transactionCommitted$,
-    queryRunner,
-    block: {
-      header: { blockNo }
-    }
-  }: RollBackwardEvent<WithBlock & WithTypeormContext>) {
-    const repository = queryRunner.manager.getRepository(BlockDataEntity);
-    // No need to delete rolled back block here, as it should cascade when the block entity gets deleted
-    const prevTip = await repository.findOne({
-      order: {
-        blockHeight: 'DESC'
-      },
-      select: blockDataSelect,
-      where: {
-        blockHeight: LessThan(blockNo)
-      }
-    });
-    if (!this.#allowNonSequentialBlockHeights && prevTip?.data && blockNo !== prevTip?.data.header.blockNo + 1) {
-      throw new Error('Assert: inconsistent PgStabilityWindowBuffer at rollBackward');
-    }
-    transactionCommitted$.subscribe(() => {
-      this.#setTip(prevTip?.data || 'origin');
-      if (!prevTip?.data) {
-        this.#setTail('origin');
-      }
-    });
   }
 
   async #deleteOldBlockData({
@@ -166,48 +110,15 @@ export class TypeormStabilityWindowBuffer implements StabilityWindowBuffer {
     block: {
       header: { blockNo }
     },
-    queryRunner,
-    transactionCommitted$
+    queryRunner
   }: RollForwardEvent<WithNetworkInfo & WithTypeormContext>) {
-    if (blockNo < securityParameter || blockNo % this.#compactEvery !== 0) {
+    if (blockNo % this.#compactEvery !== 0) {
       return;
     }
     const repository = queryRunner.manager.getRepository(BlockDataEntity);
     const nextTailBlockHeight = blockNo - securityParameter;
-    let [nextTailEntity] = await Promise.all([
-      repository.findOne({
-        select: {
-          data: true as any
-        },
-        where: {
-          blockHeight: nextTailBlockHeight
-        }
-      }),
-      repository.delete({
-        blockHeight: LessThan(nextTailBlockHeight)
-      })
-    ]);
-    if (!nextTailEntity) {
-      if (this.#allowNonSequentialBlockHeights) {
-        [nextTailEntity] = await this.#findTail(repository);
-      } else {
-        throw new Error('Assert: inconsistent PgStabilityWindowBuffer at #deleteOldBlockData');
-      }
-    }
-    transactionCommitted$.subscribe(() => this.#setTail(nextTailEntity!.data!));
-  }
-
-  #setTail(tail: Cardano.Block | 'origin') {
-    if (!pointEquals(tail, this.#tail)) {
-      this.#tail = tail;
-      this.#tail$.next(tail);
-    }
-  }
-
-  #setTip(tip: Cardano.Block | 'origin') {
-    if (!pointEquals(tip, this.#tip)) {
-      this.#tip = tip;
-      this.#tip$.next(tip);
-    }
+    await repository.delete({
+      blockHeight: LessThan(nextTailBlockHeight)
+    });
   }
 }
