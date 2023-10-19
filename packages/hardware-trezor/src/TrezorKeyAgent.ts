@@ -11,7 +11,8 @@ import {
   SerializableTrezorKeyAgentData,
   SignBlobResult,
   TrezorConfig,
-  errors
+  errors,
+  util
 } from '@cardano-sdk/key-management';
 import { txToTrezor } from './transformers/tx';
 import TrezorConnectWeb from '@trezor/connect-web';
@@ -175,6 +176,13 @@ export class TrezorKeyAgent extends KeyAgentBase {
         ...trezorTxData,
         signingMode
       });
+
+      const expectedPublicKeys = await Promise.all(
+        (
+          await util.ownSignatureKeyPaths(tx.body, this.knownAddresses, this.inputResolver)
+        ).map((derivationPath) => this.derivePublicKey(derivationPath))
+      );
+
       if (!result.success) {
         throw new errors.TransportError('Failed to export extended account public key', result.payload);
       }
@@ -187,11 +195,13 @@ export class TrezorKeyAgent extends KeyAgentBase {
 
       return new Map<Crypto.Ed25519PublicKeyHex, Crypto.Ed25519SignatureHex>(
         await Promise.all(
-          signedData.witnesses.map(async (witness) => {
-            const publicKey = Crypto.Ed25519PublicKeyHex(witness.pubKey);
-            const signature = Crypto.Ed25519SignatureHex(witness.signature);
-            return [publicKey, signature] as const;
-          })
+          signedData.witnesses
+            .filter((witness) => expectedPublicKeys.includes(Crypto.Ed25519PublicKeyHex(witness.pubKey)))
+            .map(async (witness) => {
+              const publicKey = Crypto.Ed25519PublicKeyHex(witness.pubKey);
+              const signature = Crypto.Ed25519SignatureHex(witness.signature);
+              return [publicKey, signature] as const;
+            })
         )
       );
     } catch (error: any) {
