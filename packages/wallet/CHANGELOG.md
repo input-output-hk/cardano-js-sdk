@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.25.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.25.0...@cardano-sdk/wallet@0.25.1) (2023-10-19)
+
+### Features
+
+* **util-dev:** add createStubObservable util ([f7621d7](https://github.com/input-output-hk/cardano-js-sdk/commit/f7621d7f03b398b584e1f0fb63838dfb39ff0b68))
+
 ## [0.25.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.24.0...@cardano-sdk/wallet@0.25.0) (2023-10-12)
 
 ### ⚠ BREAKING CHANGES

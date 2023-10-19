@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.22.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.21.1...@cardano-sdk/cardano-services@0.22.0) (2023-10-19)
+
+### ⚠ BREAKING CHANGES
+
+* simplify StabilityWindowBuffer interface to just 'getBlock'
+- Bootstrap.fromCardanoNode now requires Tip observable parameter
+
+### Features
+
+* do not write to stability window buffer til volatile ([b2244ea](https://github.com/input-output-hk/cardano-js-sdk/commit/b2244eac56352961c36ef9e80038aead47ee9e52))
+
 ## [0.21.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.21.0...@cardano-sdk/cardano-services@0.21.1) (2023-10-12)
 
 ### Features

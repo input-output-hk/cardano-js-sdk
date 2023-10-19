@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.14.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.13.3...@cardano-sdk/ogmios@0.14.0) (2023-10-19)
+
+### ⚠ BREAKING CHANGES
+
+* hoist ReconnectionConfig type from ogmios to util-rxjs
+
+### Code Refactoring
+
+* hoist ReconnectionConfig type from ogmios to util-rxjs ([704b5d6](https://github.com/input-output-hk/cardano-js-sdk/commit/704b5d6c82e6290c5f08800311d36d1b5d7a1eeb))
+
 ## [0.13.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/ogmios@0.13.2...@cardano-sdk/ogmios@0.13.3) (2023-10-12)
 
 **Note:** Version bump only for package @cardano-sdk/ogmios
