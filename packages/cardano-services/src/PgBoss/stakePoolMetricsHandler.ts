@@ -5,7 +5,7 @@ import {
   StakePoolEntity,
   StakePoolMetricsUpdateJob
 } from '@cardano-sdk/projection-typeorm';
-import { DataSource } from 'typeorm';
+import { DataSource, LessThan } from 'typeorm';
 import { Logger } from 'ts-log';
 import { ServiceNames } from '../Program/programs/types';
 import { WorkerHandlerFactory } from './types';
@@ -72,6 +72,14 @@ export const refreshPoolMetrics = async (options: RefreshPoolMetricsOptions) => 
   }
 };
 
+export const getPoolIdsToUpdate = async (dataSource: DataSource, outdatedSlot?: Cardano.Slot) =>
+  outdatedSlot
+    ? await dataSource.getRepository(StakePoolEntity).find({
+        select: { id: true },
+        where: [{ metrics: { slot: LessThan(outdatedSlot) } }, { metrics: undefined }]
+      })
+    : await dataSource.getRepository(StakePoolEntity).find({ select: { id: true } });
+
 export const stakePoolMetricsHandlerFactory: WorkerHandlerFactory = (options) => {
   const { dataSource, logger, stakePoolProviderUrl } = options;
 
@@ -80,12 +88,12 @@ export const stakePoolMetricsHandlerFactory: WorkerHandlerFactory = (options) =>
   const provider = stakePoolHttpProvider({ baseUrl: stakePoolProviderUrl, logger });
 
   return async (data: StakePoolMetricsUpdateJob) => {
-    const { slot } = data;
+    const { slot, outdatedSlot } = data;
 
-    logger.info('Starting stake pools metrics job');
-
-    const pools = await dataSource.getRepository(StakePoolEntity).find({ select: { id: true } });
-
+    logger.info(
+      `Starting stake pools metrics job for slot ${slot}, updating ${outdatedSlot ? 'only outdated' : 'all'}`
+    );
+    const pools = await getPoolIdsToUpdate(dataSource, outdatedSlot);
     for (const { id } of pools) await refreshPoolMetrics({ dataSource, id: id!, logger, provider, slot });
   };
 };

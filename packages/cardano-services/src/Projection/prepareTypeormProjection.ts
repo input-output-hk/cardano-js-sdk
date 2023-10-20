@@ -29,7 +29,7 @@ import {
 } from '@cardano-sdk/projection-typeorm';
 import { Cardano } from '@cardano-sdk/core';
 import { Mappers as Mapper } from '@cardano-sdk/projection';
-import { POOLS_METRICS_INTERVAL_DEFAULT } from '../Program/programs/types';
+import { POOLS_METRICS_INTERVAL_DEFAULT, POOLS_METRICS_OUTDATED_INTERVAL_DEFAULT } from '../Program/programs/types';
 import { Sorter } from '@hapi/topo';
 import { WithLogger } from '@cardano-sdk/util';
 import { passthrough } from '@cardano-sdk/util-rxjs';
@@ -100,7 +100,10 @@ export const storeOperators = {
   storeHandleMetadata: storeHandleMetadata(),
   storeHandles: storeHandles(),
   storeNftMetadata: storeNftMetadata(),
-  storePoolMetricsUpdateJob: createStorePoolMetricsUpdateJob(POOLS_METRICS_INTERVAL_DEFAULT)(),
+  storePoolMetricsUpdateJob: createStorePoolMetricsUpdateJob(
+    POOLS_METRICS_INTERVAL_DEFAULT,
+    POOLS_METRICS_OUTDATED_INTERVAL_DEFAULT
+  )(),
   storeStakeKeyRegistrations: storeStakeKeyRegistrations(),
   storeStakePoolMetadataJob: storeStakePoolMetadataJob(),
   storeStakePools: storeStakePools(),

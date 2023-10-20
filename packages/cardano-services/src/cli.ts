@@ -21,6 +21,7 @@ import {
   PG_BOSS_WORKER_API_URL_DEFAULT,
   POLLING_CYCLE_DEFAULT,
   POOLS_METRICS_INTERVAL_DEFAULT,
+  POOLS_METRICS_OUTDATED_INTERVAL_DEFAULT,
   PROJECTOR_API_URL_DEFAULT,
   PROVIDER_SERVER_API_URL_DEFAULT,
   PgBossWorkerArgs,
@@ -155,6 +156,13 @@ addOptions(withCommonOptions(projectorWithArgs, PROJECTOR_API_URL_DEFAULT), [
     'POOLS_METRICS_INTERVAL',
     (interval) => Number.parseInt(interval, 10),
     POOLS_METRICS_INTERVAL_DEFAULT
+  ),
+  newOption(
+    '--pools-metrics-outdated-interval <poolsMetricsOutdatedInterval>',
+    ProjectorOptionDescriptions.PoolsMetricsOutdatedInterval,
+    'POOLS_METRICS_OUTDATED_INTERVAL',
+    (interval) => Number.parseInt(interval, 10),
+    POOLS_METRICS_OUTDATED_INTERVAL_DEFAULT
   ),
   newOption(
     '--projection-names <projectionNames>',

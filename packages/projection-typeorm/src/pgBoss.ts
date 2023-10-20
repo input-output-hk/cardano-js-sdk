@@ -24,6 +24,7 @@ export interface PgBossExtension {
 
 export interface StakePoolMetricsUpdateJob {
   slot: Cardano.Slot;
+  outdatedSlot?: Cardano.Slot;
 }
 
 export interface StakePoolMetadataJob {

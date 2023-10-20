@@ -12,7 +12,7 @@ import { Pool } from 'pg';
 import { logger } from '@cardano-sdk/util-dev';
 
 export const blockId = 'test_block';
-export const poolId = 'test_pool' as Cardano.PoolId;
+export const poolId = 'test_pool'.padEnd(56, ' ') as Cardano.PoolId;
 
 export const initHandlerTest = async () => {
   const connectionConfig = {

@@ -29,13 +29,15 @@ export enum ServiceNames {
 }
 
 export const POOLS_METRICS_INTERVAL_DEFAULT = 1000;
+export const POOLS_METRICS_OUTDATED_INTERVAL_DEFAULT = 100;
 
 export enum ProjectorOptionDescriptions {
   BlocksBufferLength = 'Chain sync event (blocks) buffer length',
   DropSchema = 'Drop and recreate database schema to project from origin',
   DryRun = 'Initialize the projection, but do not start it',
   ExitAtBlockNo = 'Exit after processing this block. Intended for benchmark testing',
-  PoolsMetricsInterval = 'Interval between two stake pools metrics jobs in number of blocks',
+  PoolsMetricsInterval = 'Interval in number of blocks between two stake pools metrics jobs to update all metrics',
+  PoolsMetricsOutdatedInterval = 'Interval in number of blocks between two stake pools metrics jobs to update only outdated metrics',
   Synchronize = 'Synchronize the schema from the models'
 }
 
