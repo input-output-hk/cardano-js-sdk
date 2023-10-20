@@ -3,9 +3,7 @@ import { InvalidArgumentError } from '@cardano-sdk/util';
 
 export const ED25519_SIGNATURE_LENGTH = 64;
 
-/**
- * Ed25519 cryptographic digital signature.
- */
+/** Ed25519 cryptographic digital signature. */
 export class Ed25519Signature {
   readonly #signature: Uint8Array;
 
@@ -41,16 +39,12 @@ export class Ed25519Signature {
     return Ed25519Signature.fromBytes(Buffer.from(signature, 'hex'));
   }
 
-  /**
-   * Gets the Ed25519Signature as a byte array.
-   */
+  /** Gets the Ed25519Signature as a byte array. */
   bytes(): Uint8Array {
     return this.#signature;
   }
 
-  /**
-   * Gets the Ed25519Signature as a hex string.
-   */
+  /** Gets the Ed25519Signature as a hex string. */
   hex(): Ed25519SignatureHex {
     return Ed25519SignatureHex(Buffer.from(this.#signature).toString('hex'));
   }

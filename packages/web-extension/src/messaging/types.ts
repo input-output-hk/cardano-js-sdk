@@ -29,9 +29,7 @@ export interface EmitMessage extends AnyMessage {
 
 export type SendMethodRequestMessage = <Response = unknown>(msg: MethodRequest) => Promise<Response>;
 
-/**
- * Corresponds to underlying port name
- */
+/** Corresponds to underlying port name */
 export type ChannelName = string;
 
 export interface FactoryCall<Method extends string = string> extends MethodRequest<Method> {
@@ -101,10 +99,7 @@ export enum RemoteApiPropertyType {
    * - replays 1 last emitted value upon connection
    */
   HotObservable,
-  /**
-   * Method that returns a new remote api object (synchronously).
-   * Should only be used for methods that cannot throw.
-   */
+  /** Method that returns a new remote api object (synchronously). Should only be used for methods that cannot throw. */
   ApiFactory
 }
 
@@ -153,9 +148,7 @@ export interface ConsumeRemoteApiOptions<T> {
 }
 
 export interface DeriveChannelOptions {
-  /**
-   * If true, shutting down base messenger will not shut down the derived messenger
-   */
+  /** If true, shutting down base messenger will not shut down the derived messenger */
   detached?: boolean;
 }
 

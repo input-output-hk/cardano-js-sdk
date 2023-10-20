@@ -6,9 +6,7 @@ const EMBEDDED_GROUP_SIZE = 3;
 const SINGLE_HOST_NAME_RELAY_ID = 1;
 const MAX_DNS_SIZE_STR_LENGTH = 64;
 
-/**
- * This relay points to a single host via a DNS (pointing to an A or AAAA DNS record) name and a given port.
- */
+/** This relay points to a single host via a DNS (pointing to an A or AAAA DNS record) name and a given port. */
 export class SingleHostName {
   #port: number | undefined;
   #dnsName: string;

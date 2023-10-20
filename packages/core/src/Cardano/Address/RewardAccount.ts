@@ -4,10 +4,7 @@ import { NetworkId } from '../ChainId';
 import { OpaqueString, typedBech32 } from '@cardano-sdk/util';
 import { RewardAddress } from './RewardAddress';
 
-/**
- * mainnet or testnet stake address as bech32 string,
- * consisting of network tag and stake credential
- */
+/** mainnet or testnet stake address as bech32 string, consisting of network tag and stake credential */
 export type RewardAccount = OpaqueString<'RewardAccount'>;
 
 /**

@@ -8,15 +8,7 @@ type PaymentId = { credential: Credential } | { byronRoot: Hash28ByteBase16 };
 type StakeId = { credential: Credential } | { pointer: Pointer };
 type AddressKeyIDs = { paymentId?: PaymentId; stakeId?: StakeId };
 
-/**
- * Payment ID is either
- * - payment credential
- * - Byron address root hash
- *
- * Stake ID is either
- * - stake credential
- * - pointer
- */
+/** Payment ID is either - payment credential - Byron address root hash Stake ID is either - stake credential - pointer */
 // eslint-disable-next-line complexity
 const getAddressKeyIDs = (input: Address | PaymentAddress): AddressKeyIDs => {
   const address = typeof input === 'string' ? Address.fromString(input) : input;

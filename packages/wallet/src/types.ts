@@ -74,9 +74,7 @@ export interface ObservableWallet {
 
   getName(): Promise<string>;
 
-  /**
-   * Returns the wallet account's public DRep Key
-   */
+  /** Returns the wallet account's public DRep Key */
   getPubDRepKey(): Promise<Ed25519PublicKeyHex>;
   /**
    * @deprecated Use `createTxBuilder()` instead.
@@ -94,9 +92,7 @@ export interface ObservableWallet {
    */
   submitTx(tx: Cardano.Tx | TxCBOR | SignedTx): Promise<Cardano.TransactionId>;
 
-  /**
-   * Create a TxBuilder from this wallet
-   */
+  /** Create a TxBuilder from this wallet */
   createTxBuilder(): TxBuilder;
 
   shutdown(): void;

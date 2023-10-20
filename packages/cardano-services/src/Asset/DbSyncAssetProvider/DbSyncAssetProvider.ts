@@ -13,35 +13,21 @@ import { AssetPolicyIdAndName, NftMetadataService, TokenMetadataService } from '
 import { DB_CACHE_TTL_DEFAULT, InMemoryCache, NoCache } from '../../InMemoryCache';
 import { DbSyncProvider, DbSyncProviderDependencies } from '../../util';
 
-/**
- * Properties that are need to create DbSyncAssetProvider
- */
+/** Properties that are need to create DbSyncAssetProvider */
 export interface DbSyncAssetProviderProps {
-  /**
-   * Pagination page size limit used for provider methods constraint.
-   */
+  /** Pagination page size limit used for provider methods constraint. */
   paginationPageSizeLimit: number;
-  /**
-   * Cache TTL in seconds, defaults to 2 hours
-   */
+  /** Cache TTL in seconds, defaults to 2 hours */
   cacheTTL?: Seconds;
-  /**
-   * Does not use in-memory cache if `true`
-   */
+  /** Does not use in-memory cache if `true` */
   disableDbCache?: boolean;
 }
 
-/**
- * Dependencies that are need to create DbSyncAssetProvider
- */
+/** Dependencies that are need to create DbSyncAssetProvider */
 export interface DbSyncAssetProviderDependencies extends DbSyncProviderDependencies {
-  /**
-   * The NftMetadataService to retrieve Asset.NftMetadata.
-   */
+  /** The NftMetadataService to retrieve Asset.NftMetadata. */
   ntfMetadataService: NftMetadataService;
-  /**
-   * The TokenMetadataService to retrieve Asset.TokenMetadata.
-   */
+  /** The TokenMetadataService to retrieve Asset.TokenMetadata. */
   tokenMetadataService: TokenMetadataService;
 }
 

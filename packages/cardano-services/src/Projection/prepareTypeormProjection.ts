@@ -34,10 +34,7 @@ import { Sorter } from '@hapi/topo';
 import { WithLogger } from '@cardano-sdk/util';
 import { passthrough } from '@cardano-sdk/util-rxjs';
 
-/**
- * Used as mount segments, so must be URL-friendly
- *
- */
+/** Used as mount segments, so must be URL-friendly */
 export enum ProjectionName {
   Asset = 'asset',
   Handle = 'handle',
@@ -305,10 +302,7 @@ export interface PrepareTypeormProjectionProps {
   options?: ProjectionOptions;
 }
 
-/**
- * Selects a required set of entities, mappers and store operators
- * based on 'projections' and presence of 'buffer':
- */
+/** Selects a required set of entities, mappers and store operators based on 'projections' and presence of 'buffer': */
 export const prepareTypeormProjection = (
   { projections, options = {} }: PrepareTypeormProjectionProps,
   dependencies: WithLogger

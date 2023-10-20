@@ -14,38 +14,23 @@ export enum PlutusMapEncoding {
 }
 
 export type PlutusList = {
-  /**
-   * This may be set when deserializing a datum.
-   * Useful for round-trip reserialization.
-   */
+  /** This may be set when deserializing a datum. Useful for round-trip reserialization. */
   cbor?: HexBlob;
-  /**
-   * This property provides granular control of how it should be serialized.
-   * Useful when constructing a new datum.
-   */
+  /** This property provides granular control of how it should be serialized. Useful when constructing a new datum. */
   encoding?: PlutusListEncoding;
   items: PlutusData[];
 };
 
 export type PlutusMap = {
-  /**
-   * This may be set when deserializing a datum.
-   * Useful for round-trip reserialization.
-   */
+  /** This may be set when deserializing a datum. Useful for round-trip reserialization. */
   cbor?: HexBlob;
-  /**
-   * This property provides granular control of how it should be serialized.
-   * Useful when constructing a new datum.
-   */
+  /** This property provides granular control of how it should be serialized. Useful when constructing a new datum. */
   encoding?: PlutusMapEncoding;
   data: Map<PlutusData, PlutusData>;
 };
 
 export type ConstrPlutusData = {
-  /**
-   * This may be set when deserializing a datum.
-   * Useful for round-trip reserialization.
-   */
+  /** This may be set when deserializing a datum. Useful for round-trip reserialization. */
   cbor?: HexBlob;
   constructor: bigint;
   fields: PlutusList;

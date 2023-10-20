@@ -9,10 +9,7 @@ import { StakePoolEntity } from './StakePool.entity';
 
 @Entity()
 export class PoolRegistrationEntity {
-  /**
-   * Computed from certificate pointer.
-   * Can be used to sort pool updates.
-   */
+  /** Computed from certificate pointer. Can be used to sort pool updates. */
   @PrimaryColumn(BigIntColumnOptions)
   id?: bigint;
   @Column()

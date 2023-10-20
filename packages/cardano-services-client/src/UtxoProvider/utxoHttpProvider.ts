@@ -3,9 +3,7 @@ import { HttpProviderConfigPaths, ProviderError, ProviderFailure, UtxoProvider }
 import { apiVersion } from '../version';
 import { mapHealthCheckError } from '../mapHealthCheckError';
 
-/**
- * The UtxoProvider endpoint paths.
- */
+/** The UtxoProvider endpoint paths. */
 const paths: HttpProviderConfigPaths<UtxoProvider> = {
   healthCheck: '/health',
   utxoByAddresses: '/utxo-by-addresses'

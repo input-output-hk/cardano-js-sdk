@@ -75,9 +75,7 @@ const providerParams = makeValidator((value) => {
   return validated;
 });
 
-/**
- * Shared across all tests
- */
+/** Shared across all tests */
 const validators = {
   ADDRESS_DISCOVERY: str({ default: 'HDSequentialDiscovery' }),
   ARRIVAL_PHASE_DURATION_IN_SECS: num(),
@@ -139,9 +137,7 @@ export const getEnv = <V extends readonly Validator[]>(
     [v in V[number]]: Validators[v] extends ValidatorSpec<infer T> ? T : never;
   };
 
-/**
- * Collection of all the configuration variables required by `getWallet`
- */
+/** Collection of all the configuration variables required by `getWallet` */
 export const walletVariables = [
   'ASSET_PROVIDER',
   'ASSET_PROVIDER_PARAMS',

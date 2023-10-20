@@ -20,23 +20,15 @@ import { hexStringToBuffer } from '@cardano-sdk/util';
 import { mapBlock, mapTxAlonzo, mapTxIn, mapTxOut } from './mappers';
 import orderBy from 'lodash/orderBy';
 
-/**
- * Properties that are need to create DbSyncChainHistoryProvider
- */
+/** Properties that are need to create DbSyncChainHistoryProvider */
 export interface ChainHistoryProviderProps {
-  /**
-   * Pagination page size limit used for provider methods constraint.
-   */
+  /** Pagination page size limit used for provider methods constraint. */
   paginationPageSizeLimit: number;
 }
 
-/**
- * Dependencies that are need to create DbSyncChainHistoryProvider
- */
+/** Dependencies that are need to create DbSyncChainHistoryProvider */
 export interface ChainHistoryProviderDependencies extends DbSyncProviderDependencies {
-  /**
-   * The TxMetadataService to retrieve transactions metadata by hashes.
-   */
+  /** The TxMetadataService to retrieve transactions metadata by hashes. */
   metadataService: TxMetadataService;
 }
 

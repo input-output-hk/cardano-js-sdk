@@ -39,9 +39,7 @@ export interface ChainSyncRollBackward extends WithRequestNext {
 export type ChainSyncEvent = ChainSyncRollForward | ChainSyncRollBackward;
 
 export interface ObservableChainSync {
-  /**
-   * Observable that can be used to subscribe to Chain Sync events from `intersection`.
-   */
+  /** Observable that can be used to subscribe to Chain Sync events from `intersection`. */
   chainSync$: Observable<ChainSyncEvent>;
   intersection: Intersection;
 }

@@ -170,9 +170,7 @@ const selectUtxo = async (wallet: ObservableWallet, filterAmount: Cardano.Value,
     ? dumbSelection(await firstValueFrom(wallet.utxo.available$), filterAmount)
     : await walletSelection(filterAmount, wallet);
 
-/**
- * Returns an array of UTxOs that do not contain assets
- */
+/** Returns an array of UTxOs that do not contain assets */
 const getUtxosWithoutAssets = (utxos: Cardano.Utxo[]): Cardano.Utxo[] => utxos.filter((utxo) => !utxo[1].value.assets);
 
 const getFilterAsBigNum = (amount: Cbor): bigint => {

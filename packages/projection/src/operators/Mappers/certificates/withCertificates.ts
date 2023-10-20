@@ -30,9 +30,7 @@ const blockCertificates = ({
       }))
     );
 
-/**
- * Map ChainSyncEvents to a flat array of certificates.
- */
+/** Map ChainSyncEvents to a flat array of certificates. */
 export const withCertificates = unifiedProjectorOperator<{}, WithCertificates>((evt) => ({
   ...evt,
   certificates: blockCertificates(evt)

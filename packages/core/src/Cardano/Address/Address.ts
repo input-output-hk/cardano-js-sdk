@@ -72,9 +72,7 @@ export enum CredentialType {
   ScriptHash = 1
 }
 
-/**
- * The credential specifies who should control the funds or the staking rights for that address.
- */
+/** The credential specifies who should control the funds or the staking rights for that address. */
 export type Credential = {
   type: CredentialType;
   hash: Hash28ByteBase16;
@@ -89,20 +87,12 @@ export type AddressHeader = {
   networkId: NetworkId;
 };
 
-/**
- * Address object initialization properties.
- */
+/** Address object initialization properties. */
 export type AddressProps = {
-  /**
-   * Specify the type of the address. There are currently 8 types of Shelley addresses and 1 for Byron addresses.
-   */
+  /** Specify the type of the address. There are currently 8 types of Shelley addresses and 1 for Byron addresses. */
   type: AddressType;
 
-  /**
-   * Network identifier (taken from the second half of the header (bits [3;0])).
-   *
-   * Note: not present in Bryon addresses.
-   */
+  /** Network identifier (taken from the second half of the header (bits [3;0])). Note: not present in Bryon addresses. */
   networkId?: NetworkId;
 
   /**
@@ -135,15 +125,11 @@ export type AddressProps = {
    */
   delegationPart?: Credential;
 
-  /**
-   * Byron addresses content (kept for backward compatibility with Byron addresses).
-   */
+  /** Byron addresses content (kept for backward compatibility with Byron addresses). */
   byronAddressContent?: ByronAddressContent;
 };
 
-/**
- * The addresses are a blake2b-256 hash of the relevant verifying/public keys concatenated with some metadata.
- */
+/** The addresses are a blake2b-256 hash of the relevant verifying/public keys concatenated with some metadata. */
 export class Address {
   readonly #props: AddressProps;
 
@@ -202,9 +188,7 @@ export class Address {
     return address;
   }
 
-  /**
-   * Gets the byte array representation of this address.
-   */
+  /** Gets the byte array representation of this address. */
   // eslint-disable-next-line complexity
   toBytes(): HexBlob {
     let cborData;
@@ -242,9 +226,7 @@ export class Address {
     return HexBlob.fromBytes(cborData);
   }
 
-  /**
-   * Gets an address instance from a valid Base58 encoded address.
-   */
+  /** Gets an address instance from a valid Base58 encoded address. */
   static fromBase58(base58Address: string) {
     return Address.fromBytes(HexBlob.fromBytes(BaseEncoding.base58.decode(base58Address)));
   }
@@ -314,11 +296,7 @@ export class Address {
     return null;
   }
 
-  /**
-   * Checks whether the given bech32 string is valid.
-   *
-   * Note: bech32-encoded Byron addresses will also pass validation here
-   */
+  /** Checks whether the given bech32 string is valid. Note: bech32-encoded Byron addresses will also pass validation here */
   static isValidBech32(bech32: string): boolean {
     try {
       Address.fromBech32(bech32);
@@ -356,51 +334,37 @@ export class Address {
     return Address.isValidBech32(address) || Address.isValidByron(address);
   }
 
-  /**
-   * Gets this Address instance as a ByronAddress (undefined if Address is not a valid ByronAddress).
-   */
+  /** Gets this Address instance as a ByronAddress (undefined if Address is not a valid ByronAddress). */
   asByron(): ByronAddress | undefined {
     return ByronAddress.fromAddress(this);
   }
 
-  /**
-   * Gets this Address instance as a RewardAddress (undefined if Address is not a valid RewardAddress).
-   */
+  /** Gets this Address instance as a RewardAddress (undefined if Address is not a valid RewardAddress). */
   asReward(): RewardAddress | undefined {
     return RewardAddress.fromAddress(this);
   }
 
-  /**
-   * Gets this Address instance as a PointerAddress (undefined if Address is not a valid PointerAddress).
-   */
+  /** Gets this Address instance as a PointerAddress (undefined if Address is not a valid PointerAddress). */
   asPointer(): PointerAddress | undefined {
     return PointerAddress.fromAddress(this);
   }
 
-  /**
-   * Gets this Address instance as a EnterpriseAddress (undefined if Address is not a valid EnterpriseAddress).
-   */
+  /** Gets this Address instance as a EnterpriseAddress (undefined if Address is not a valid EnterpriseAddress). */
   asEnterprise(): EnterpriseAddress | undefined {
     return EnterpriseAddress.fromAddress(this);
   }
 
-  /**
-   * Gets this Address instance as a BaseAddress (undefined if Address is not a valid BaseAddress).
-   */
+  /** Gets this Address instance as a BaseAddress (undefined if Address is not a valid BaseAddress). */
   asBase(): BaseAddress | undefined {
     return BaseAddress.fromAddress(this);
   }
 
-  /**
-   * Gets the address type.
-   */
+  /** Gets the address type. */
   getType(): AddressType {
     return this.#props.type;
   }
 
-  /**
-   * Gets the address network id.
-   */
+  /** Gets the address network id. */
   getNetworkId(): NetworkId {
     if (this.#props.type === AddressType.Byron) {
       // Byron addresses do not encode the network identifier, however, they include an optional attribute
@@ -414,16 +378,12 @@ export class Address {
     return this.#props.networkId!;
   }
 
-  /**
-   * Gets the address properties.
-   */
+  /** Gets the address properties. */
   getProps(): AddressProps {
     return this.#props;
   }
 
-  /**
-   * Gets the address bech32 prefix.
-   */
+  /** Gets the address bech32 prefix. */
   // eslint-disable-next-line complexity
   private static getBech32Prefix(type: AddressType, networkId: NetworkId): string {
     let prefix = '';
@@ -453,7 +413,5 @@ export class Address {
   }
 }
 
-/**
- * Validate input as a Cardano Address from all Cardano eras and networks
- */
+/** Validate input as a Cardano Address from all Cardano eras and networks */
 export const isAddress = (input: string): boolean => Address.isValid(input);

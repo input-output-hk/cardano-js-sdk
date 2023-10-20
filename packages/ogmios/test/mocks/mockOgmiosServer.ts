@@ -52,15 +52,11 @@ export interface MockOgmiosServerConfig {
       response: StakeDistributionResponse;
     };
   };
-  /**
-   * Also used for chainSync.start
-   */
+  /** Also used for chainSync.start */
   findIntersect?: (points: PointOrOrigin[]) => IntersectionFound | IntersectionNotFound;
   chainSync?: {
     requestNext: {
-      /**
-       * Filenames of test vectors
-       */
+      /** Filenames of test vectors */
       responses: string[];
     };
   };

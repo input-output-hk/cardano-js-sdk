@@ -165,9 +165,7 @@ export interface UnsignedTx {
 }
 
 export interface PartialTx {
-  /**
-   * Transaction body that is updated by {@link TxBuilder} methods.
-   */
+  /** Transaction body that is updated by {@link TxBuilder} methods. */
   body: Partial<Cardano.TxBody>;
   /**
    * TxMetadata to be added in the transaction auxiliary data body blob, after {@link TxBuilder.build}.

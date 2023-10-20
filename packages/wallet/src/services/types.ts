@@ -15,9 +15,7 @@ export enum TransactionFailure {
 
 export interface TransactionalObservables<T> {
   total$: Observable<T>;
-  /**
-   * total - unspendable
-   */
+  /** total - unspendable */
   available$: Observable<T>;
   unspendable$: Observable<T>;
 }
@@ -38,9 +36,7 @@ export interface UtxoTracker extends TransactionalTracker<Cardano.Utxo[]> {
   setUnspendable(utxo: Cardano.Utxo[]): Promise<void>;
 }
 
-/**
- * The AddressDiscovery interface provides a mechanism to discover addresses in Hierarchical Deterministic (HD) wallets
- */
+/** The AddressDiscovery interface provides a mechanism to discover addresses in Hierarchical Deterministic (HD) wallets */
 export interface AddressDiscovery {
   /**
    * Discover used addresses in the HD wallet.
@@ -55,9 +51,7 @@ export type Milliseconds = number;
 
 export interface PollingConfig {
   readonly interval?: Milliseconds;
-  /**
-   * Max timeout for exponential backoff on errors
-   */
+  /** Max timeout for exponential backoff on errors */
   readonly maxInterval?: Milliseconds;
   readonly consideredOutOfSyncAfter?: Milliseconds;
 }

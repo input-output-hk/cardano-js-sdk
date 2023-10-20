@@ -171,9 +171,7 @@ const generateTokenMap = (minQuantity: bigint, maxQuantity: bigint) =>
  * @returns {Arbitrary} fast-check arbitrary that generates valid sets of UTxO and outputs for input selection.
  */
 export const generateSelectionParams = (() => {
-  /**
-   * Generate random amount of coin and assets.
-   */
+  /** Generate random amount of coin and assets. */
   const arrayOfCoinAndAssets = (implicitCoin = 0n) =>
     fc
       .array(

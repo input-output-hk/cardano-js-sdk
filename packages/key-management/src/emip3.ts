@@ -17,9 +17,7 @@ export const createPbkdf2Key = async (passphrase: Uint8Array, salt: Uint8Array |
     })
   );
 
-/**
- * https://github.com/Emurgo/EmIPs/blob/master/specs/emip-003.md
- */
+/** https://github.com/Emurgo/EmIPs/blob/master/specs/emip-003.md */
 export const emip3encrypt = async (data: Uint8Array, passphrase: Uint8Array): Promise<Uint8Array> => {
   const salt = new Uint8Array(SALT_LENGTH);
   getRandomValues(salt);
@@ -34,9 +32,7 @@ export const emip3encrypt = async (data: Uint8Array, passphrase: Uint8Array): Pr
   return Buffer.concat([salt, nonce, tag, head, final]);
 };
 
-/**
- * https://github.com/Emurgo/EmIPs/blob/master/specs/emip-003.md
- */
+/** https://github.com/Emurgo/EmIPs/blob/master/specs/emip-003.md */
 export const emip3decrypt = async (encrypted: Uint8Array, passphrase: Uint8Array): Promise<Uint8Array> => {
   const salt = encrypted.slice(0, SALT_LENGTH);
   const nonce = encrypted.slice(SALT_LENGTH, SALT_LENGTH + NONCE_LENGTH);

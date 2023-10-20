@@ -1,18 +1,12 @@
 import { Agent, IncomingMessage } from 'http';
 import { Agent as HttpsAgent } from 'https';
 
-/**
- * Artillery context
- */
+/** Artillery context */
 export interface ArtilleryContext<T> {
-  /**
-   * The unique Id of the virtual user
-   */
+  /** The unique Id of the virtual user */
   _uid: string;
 
-  /**
-   * The variables of the virtual user session
-   */
+  /** The variables of the virtual user session */
   vars: T;
 }
 
@@ -32,89 +26,54 @@ interface ArtilleryEventEmitter extends EventEmitter {
   removeListener<Event extends keyof ArtilleryEvents>(event: Event, listener: ArtilleryEvents[Event]): this;
 }
 
-/**
- * Parameters of an Artillery request
- */
+/** Parameters of an Artillery request */
 export interface Params {
-  /**
-   * Name of the afterResponse hook
-   */
+  /** Name of the afterResponse hook */
   afterResponse?: string;
 
-  /**
-   * The agent used to for the request
-   */
+  /** The agent used to for the request */
   agent?: { http: Agent; https: HttpsAgent };
 
-  /**
-   * Name of the beforeRequest hook
-   */
+  /** Name of the beforeRequest hook */
   beforeRequest?: string;
 
-  /**
-   * The variables to capture from the response
-   */
+  /** The variables to capture from the response */
   capture: { as: string; json: string }[];
 
-  /**
-   * Unknown
-   */
+  /** Unknown */
   decompress?: boolean;
 
-  /**
-   * Not yet tested in IOG
-   */
+  /** Not yet tested in IOG */
   followRedirect?: boolean;
 
-  /**
-   * Not yet tested in IOG
-   */
+  /** Not yet tested in IOG */
   followAllRedirects?: boolean;
 
-  /**
-   * The HTTP headers of the request
-   */
+  /** The HTTP headers of the request */
   headers?: Record<string, string>;
 
-  /**
-   * Unknown
-   */
+  /** Unknown */
   https?: unknown;
 
-  /**
-   * The json body for POST. Its value is the raw configured one in beforeRequest
-   * and the evaluated one in afterResponse
-   */
+  /** The json body for POST. Its value is the raw configured one in beforeRequest and the evaluated one in afterResponse */
   json?: unknown;
 
-  /**
-   * Unknown
-   */
+  /** Unknown */
   match?: unknown[];
 
-  /**
-   * The HTTP method of the request
-   */
+  /** The HTTP method of the request */
   method: 'DELETE' | 'GET' | 'POST' | 'PUT';
 
-  /**
-   * Unknown
-   */
+  /** Unknown */
   retry: number;
 
-  /**
-   * Unknown
-   */
+  /** Unknown */
   throwHttpErrors?: boolean;
 
-  /**
-   * The time out of the request in ms
-   */
+  /** The time out of the request in ms */
   timeout: number;
 
-  /**
-   * URL of the request
-   */
+  /** URL of the request */
   url: string;
 }
 

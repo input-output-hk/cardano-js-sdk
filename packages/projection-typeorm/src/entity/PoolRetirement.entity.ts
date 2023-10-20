@@ -6,10 +6,7 @@ import { StakePoolEntity } from './StakePool.entity';
 
 @Entity()
 export class PoolRetirementEntity {
-  /**
-   * Computed from certificate pointer.
-   * Can be used to sort pool retirements.
-   */
+  /** Computed from certificate pointer. Can be used to sort pool retirements. */
   @PrimaryColumn(BigIntColumnOptions)
   id?: bigint;
   @Column()

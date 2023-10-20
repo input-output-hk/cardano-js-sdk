@@ -14,17 +14,11 @@ import { WithTypeormContext } from './operators';
 import { isRecoverableTypeormError } from './isRecoverableTypeormError';
 
 export interface TypeormStabilityWindowBufferProps extends WithLogger {
-  /**
-   * 100 by default
-   */
+  /** 100 by default */
   compactBufferEveryNBlocks?: number;
-  /**
-   * Used for getBlock, which is called at the time of bootstrap or rollback
-   */
+  /** Used for getBlock, which is called at the time of bootstrap or rollback */
   connection$: Observable<TypeormConnection>;
-  /**
-   * Retry strategy for getBlock. Buffer will re-subscribe to connection$ on each retry.
-   */
+  /** Retry strategy for getBlock. Buffer will re-subscribe to connection$ on each retry. */
   reconnectionConfig: ReconnectionConfig;
 }
 

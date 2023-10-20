@@ -1,16 +1,12 @@
 import { Logger } from 'ts-log';
 
-/**
- * ProviderFactory method interface.
- */
+/** ProviderFactory method interface. */
 export interface ProviderFactoryMethod<T> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (params: any, logger: Logger): Promise<T>;
 }
 
-/**
- * Generic provider factory.
- */
+/** Generic provider factory. */
 export class ProviderFactory<T> {
   #providers: Map<string, ProviderFactoryMethod<T>> = new Map<string, ProviderFactoryMethod<T>>();
 

@@ -18,9 +18,7 @@ export interface ProjectorEventHandlers<
   ) => MaybeObservable<RollBackwardEvent<ExtraRollBackwardPropsOut>>;
 }
 
-/**
- * Convenience utility to create an operator with separate 'rollForward' and 'rollBackward' handlers
- */
+/** Convenience utility to create an operator with separate 'rollForward' and 'rollBackward' handlers */
 export const projectorOperator = <
   ExtraRollForwardPropsIn,
   ExtraRollBackwardPropsIn,

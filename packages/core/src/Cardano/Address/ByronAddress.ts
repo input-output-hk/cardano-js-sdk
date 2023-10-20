@@ -19,9 +19,7 @@ export type ByronAttributes = {
    */
   derivationPath?: HexBlob;
 
-  /**
-   * Protocol magic (if not 0, then it's a testnet).
-   */
+  /** Protocol magic (if not 0, then it's a testnet). */
   magic?: number;
 };
 
@@ -65,9 +63,7 @@ export type ByronAddressContent = {
   type: ByronAddressType;
 };
 
-/**
- * Legacy Byron addresses.
- */
+/** Legacy Byron addresses. */
 export class ByronAddress {
   readonly #type: AddressType;
   readonly #content: ByronAddressContent;
@@ -101,30 +97,22 @@ export class ByronAddress {
     });
   }
 
-  /**
-   * Gets the attributes of the address (derivation path and network magic).
-   */
+  /** Gets the attributes of the address (derivation path and network magic). */
   getAttributes(): ByronAttributes {
     return this.#content.attrs;
   }
 
-  /**
-   * Gets the root hash of the attributes and credentials.
-   */
+  /** Gets the root hash of the attributes and credentials. */
   getRoot(): Hash28ByteBase16 {
     return this.#content.root;
   }
 
-  /**
-   * Gets the Byron address type.
-   */
+  /** Gets the Byron address type. */
   getByronAddressType(): ByronAddressType {
     return this.#content.type;
   }
 
-  /**
-   * Converts from ByronAddress instance to Address.
-   */
+  /** Converts from ByronAddress instance to Address. */
   toAddress(): Address {
     return new Address({
       byronAddressContent: this.#content,

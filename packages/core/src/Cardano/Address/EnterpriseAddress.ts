@@ -44,16 +44,12 @@ export class EnterpriseAddress {
     });
   }
 
-  /**
-   * Gets the payment credential part of the enterprise address.
-   */
+  /** Gets the payment credential part of the enterprise address. */
   getPaymentCredential(): Credential {
     return this.#paymentPart;
   }
 
-  /**
-   * Converts from EnterpriseAddress instance to Address.
-   */
+  /** Converts from EnterpriseAddress instance to Address. */
   toAddress(): Address {
     return new Address({
       networkId: this.#networkId,

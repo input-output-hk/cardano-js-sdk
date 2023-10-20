@@ -6,14 +6,10 @@
  * In addition, two pre-defined DRep options are available: `Abstain` and `No Confidence`.
  */
 export enum DRepKind {
-  /**
-   * A DRep identified by a stake key hash.
-   */
+  /** A DRep identified by a stake key hash. */
   KeyHash = 0,
 
-  /**
-   * A DRep identified by a script hash.
-   */
+  /** A DRep identified by a script hash. */
   ScriptHash = 1,
 
   /**

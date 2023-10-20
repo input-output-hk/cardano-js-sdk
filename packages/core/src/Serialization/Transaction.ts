@@ -236,18 +236,14 @@ export class Transaction {
     this.#originalBytes = undefined;
   }
 
-  /**
-   * Computes the transaction id for this transaction.
-   */
+  /** Computes the transaction id for this transaction. */
   getId(): Cardano.TransactionId {
     const hash = Crypto.blake2b(Crypto.blake2b.BYTES).update(hexToBytes(this.#body.toCbor())).digest();
 
     return Cardano.TransactionId.fromHexBlob(HexBlob.fromBytes(hash));
   }
 
-  /**
-   * Performs a deep clone of the transaction object.
-   */
+  /** Performs a deep clone of the transaction object. */
   clone(): Transaction {
     const bytes = this.toCbor();
     return Transaction.fromCbor(bytes);

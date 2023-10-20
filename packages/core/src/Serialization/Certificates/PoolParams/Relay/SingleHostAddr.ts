@@ -6,9 +6,7 @@ import { byteArrayToIPv6String, byteArrayToIpV4String, ipV4StringToByteArray, ip
 const EMBEDDED_GROUP_SIZE = 4;
 const SINGLE_HOST_ADDR_RELAY_ID = 0;
 
-/**
- * This relay points to a single host via its ipv4/ipv6 address and a given port.
- */
+/** This relay points to a single host via its ipv4/ipv6 address and a given port. */
 export class SingleHostAddr {
   #port: number | undefined;
   #ipV4: string | undefined;

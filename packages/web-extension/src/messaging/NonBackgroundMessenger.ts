@@ -33,10 +33,7 @@ export interface NonBackgroundMessengerOptions {
   reconnectConfig?: ReconnectConfig;
 }
 
-/**
- * Creates and maintains a long-running connection to background process.
- * Attempts to reconnect the port on disconnects.
- */
+/** Creates and maintains a long-running connection to background process. Attempts to reconnect the port on disconnects. */
 export const createNonBackgroundMessenger = (
   {
     baseChannel: channel,

@@ -9,9 +9,7 @@ export type ProducedUtxo = [Cardano.TxIn, Cardano.TxOut];
 export interface WithUtxo {
   utxo: {
     produced: Array<ProducedUtxo>;
-    /**
-     * Refers to `compactUtxoId` of a previously produced utxo
-     */
+    /** Refers to `compactUtxoId` of a previously produced utxo */
     consumed: Cardano.TxIn[];
   };
 }

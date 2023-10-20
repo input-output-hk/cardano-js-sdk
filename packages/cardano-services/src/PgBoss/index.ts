@@ -8,9 +8,7 @@ export * from './stakePoolMetricsHandler';
 export * from './types';
 export * from './util';
 
-/**
- * Defines the handler for each pg-boss queue
- */
+/** Defines the handler for each pg-boss queue */
 export const queueHandlers: Record<PgBossQueue, WorkerHandlerFactory> = {
   [STAKE_POOL_METADATA_QUEUE]: stakePoolMetadataHandlerFactory,
   [STAKE_POOL_METRICS_UPDATE]: stakePoolMetricsHandlerFactory

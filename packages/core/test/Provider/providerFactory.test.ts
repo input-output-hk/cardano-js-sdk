@@ -4,13 +4,9 @@ import { dummyLogger } from 'ts-log';
 
 // Mock providers.
 
-/**
- * Mock provider A.
- */
+/** Mock provider A. */
 class MockProviderA implements Provider {
-  /**
-   * Dummy health check method.
-   */
+  /** Dummy health check method. */
   healthCheck(): Promise<HealthCheckResponse> {
     return new Promise<HealthCheckResponse>(async (resolve) => {
       resolve({ ok: true });
@@ -29,13 +25,9 @@ class MockProviderA implements Provider {
   }
 }
 
-/**
- * Mock provider B.
- */
+/** Mock provider B. */
 class MockProviderB implements Provider {
-  /**
-   * Dummy health check method.
-   */
+  /** Dummy health check method. */
   healthCheck(): Promise<HealthCheckResponse> {
     return new Promise<HealthCheckResponse>(async (resolve) => {
       resolve({ ok: false });

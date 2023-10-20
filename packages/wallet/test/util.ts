@@ -40,10 +40,7 @@ export const toOutgoingTx = (tx: Cardano.Tx): OutgoingTx => ({
 
 export const dummyCbor = TxCBOR('123');
 
-/**
- * Construct a type 6 address for a DRepKey
- * using an appropriate Network Tag and a hash of a public DRep Key.
- */
+/** Construct a type 6 address for a DRepKey using an appropriate Network Tag and a hash of a public DRep Key. */
 export const buildDRepIDFromDRepKey = (
   dRepKey: Crypto.Ed25519PublicKeyHex,
   networkId: Cardano.NetworkId = Cardano.NetworkId.Testnet,

@@ -21,9 +21,7 @@ import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
 
 // TODO: use this type as 2nd parameter of restoreKeyAgent
 export interface RestoreInMemoryKeyAgentProps {
-  /**
-   * Required for InMemoryKeyAgent
-   */
+  /** Required for InMemoryKeyAgent */
   getPassphrase?: GetPassphrase;
 }
 

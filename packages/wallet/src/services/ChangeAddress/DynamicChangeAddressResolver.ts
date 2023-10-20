@@ -281,14 +281,10 @@ export const delegationMatchesPortfolio = (
   return isEqual(portfolioPools, delegationPools);
 };
 
-/**
- * Gets the current delegation portfolio.
- */
+/** Gets the current delegation portfolio. */
 export type GetDelegationPortfolio = () => Promise<Cardano.Cip17DelegationPortfolio | null>;
 
-/**
- * Resolves the address to be used for change.
- */
+/** Resolves the address to be used for change. */
 export class DynamicChangeAddressResolver implements ChangeAddressResolver {
   readonly #getDelegationPortfolio: GetDelegationPortfolio;
   readonly #delegationDistribution: DelegationTracker['distribution$'];
@@ -315,9 +311,7 @@ export class DynamicChangeAddressResolver implements ChangeAddressResolver {
     this.#logger = logger;
   }
 
-  /**
-   * Resolve the change addresses for change outputs that better maintains the desired stake distribution.
-   */
+  /** Resolve the change addresses for change outputs that better maintains the desired stake distribution. */
   async resolve(selection: Selection): Promise<Array<Cardano.TxOut>> {
     const delegationDistribution = [...(await firstValueFrom(this.#delegationDistribution)).values()];
     let portfolio = await this.#getDelegationPortfolio();

@@ -26,9 +26,7 @@ const BUF_NAN = Buffer.from('ffc00000', 'hex');
 const BUF_INF_NEG = Buffer.from('fff0000000000000', 'hex');
 const BUF_INF_POS = Buffer.from('7ff0000000000000', 'hex');
 
-/**
- * A simple writer for Concise Binary Object Representation (CBOR) encoded data.
- */
+/** A simple writer for Concise Binary Object Representation (CBOR) encoded data. */
 export class CborWriter {
   #buffer = Buffer.from([]);
 
@@ -118,9 +116,7 @@ export class CborWriter {
     return this;
   }
 
-  /**
-   * Writes the end of an array (major type 4).
-   */
+  /** Writes the end of an array (major type 4). */
   writeEndArray(): CborWriter {
     this.#pushUInt8(CborInitialByte.IndefiniteLengthBreakByte);
 
@@ -142,9 +138,7 @@ export class CborWriter {
     return this;
   }
 
-  /**
-   * Writes the end of a map (major type 5).
-   */
+  /** Writes the end of a map (major type 5). */
   // eslint-disable-next-line sonarjs/no-identical-functions
   writeEndMap(): CborWriter {
     this.#pushUInt8(CborInitialByte.IndefiniteLengthBreakByte);
@@ -218,18 +212,14 @@ export class CborWriter {
     return this;
   }
 
-  /**
-   * Writes a null value (major type 7).
-   */
+  /** Writes a null value (major type 7). */
   writeNull(): CborWriter {
     this.#pushUInt8(NULL);
 
     return this;
   }
 
-  /**
-   * Writes an undefined value.
-   */
+  /** Writes an undefined value. */
   writeUndefined(): CborWriter {
     this.#pushUInt8(UNDEFINED);
 
@@ -247,23 +237,17 @@ export class CborWriter {
     return this;
   }
 
-  /**
-   * Returns a new array containing the encoded value encoded as a hex string.
-   */
+  /** Returns a new array containing the encoded value encoded as a hex string. */
   encodeAsHex(): HexBlob {
     return this.#buffer.toString('hex') as unknown as HexBlob;
   }
 
-  /**
-   * Returns a new array containing the encoded value.
-   */
+  /** Returns a new array containing the encoded value. */
   encode(): Uint8Array {
     return new Uint8Array(this.#buffer);
   }
 
-  /**
-   * Resets the writer to have no data.
-   */
+  /** Resets the writer to have no data. */
   reset() {
     this.#buffer = Buffer.from([]);
   }

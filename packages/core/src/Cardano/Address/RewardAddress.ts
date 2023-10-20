@@ -54,9 +54,7 @@ export class RewardAddress {
     return this.#paymentPart;
   }
 
-  /**
-   * Converts from RewardAddress instance to Address.
-   */
+  /** Converts from RewardAddress instance to Address. */
   // eslint-disable-next-line sonarjs/no-identical-functions
   toAddress(): Address {
     return new Address({

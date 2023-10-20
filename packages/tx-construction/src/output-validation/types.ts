@@ -5,9 +5,7 @@ export type ProtocolParametersRequiredByOutputValidator = Pick<
   'coinsPerUtxoByte' | 'maxValueSize'
 >;
 export interface OutputValidatorContext {
-  /**
-   * Queried on every OutputValidator call
-   */
+  /** Queried on every OutputValidator call */
   protocolParameters: () => Promise<ProtocolParametersRequiredByOutputValidator>;
 }
 

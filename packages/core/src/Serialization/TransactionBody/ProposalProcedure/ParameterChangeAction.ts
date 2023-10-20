@@ -8,10 +8,7 @@ import { hexToBytes } from '../../../util/misc';
 
 const EMBEDDED_GROUP_SIZE = 3;
 
-/**
- * Updates one or more updatable protocol parameters,
- * excluding changes to major protocol versions (i.e., "hard forks").
- */
+/** Updates one or more updatable protocol parameters, excluding changes to major protocol versions (i.e., "hard forks"). */
 export class ParameterChangeAction {
   #protocolParamUpdate: ProtocolParamUpdate;
   #govActionId: GovernanceActionId | undefined;

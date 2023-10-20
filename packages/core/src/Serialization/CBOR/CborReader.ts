@@ -13,9 +13,7 @@ import { decodeHalf } from './Half';
 // Constants
 const UNEXPECTED_END_OF_BUFFER_MSG = 'Unexpected end of buffer';
 
-/**
- * The stack frame to keep track of nested item data.
- */
+/** The stack frame to keep track of nested item data. */
 type StackFrame = {
   type: CborMajorType | null;
   frameOffset: number;
@@ -24,9 +22,7 @@ type StackFrame = {
   currentKeyOffset: number | null;
 };
 
-/**
- * A stateful, forward-only reader for Concise Binary Object Representation (CBOR) encoded data.
- */
+/** A stateful, forward-only reader for Concise Binary Object Representation (CBOR) encoded data. */
 export class CborReader {
   readonly #data: Uint8Array;
   #offset = 0;
@@ -70,10 +66,7 @@ export class CborReader {
     return this.#data.length - this.#offset;
   }
 
-  /**
-   * Skips the next CBOR data item and advance the reader. For indefinite length encodings
-   * this includes the break byte.
-   */
+  /** Skips the next CBOR data item and advance the reader. For indefinite length encodings this includes the break byte. */
   skipValue(): void {
     this.readEncodedValue();
   }
@@ -97,9 +90,7 @@ export class CborReader {
     return this.#data.slice(initialOffset, this.#offset);
   }
 
-  /**
-   * Reads the next data item as the start of an array (major type 4).
-   */
+  /** Reads the next data item as the start of an array (major type 4). */
   readStartArray(): number | null {
     const header: CborInitialByte = this.#peekInitialByte(CborMajorType.Array);
 
@@ -117,9 +108,7 @@ export class CborReader {
     return length;
   }
 
-  /**
-   * Reads the end of an array (major type 4).
-   */
+  /** Reads the end of an array (major type 4). */
   readEndArray() {
     if (this.#currentFrame.definiteLength === undefined) {
       this.#validateNextByteIsBreakByte();
@@ -277,9 +266,7 @@ export class CborReader {
     return length;
   }
 
-  /**
-   * Reads the end of a map (major type 5).
-   */
+  /** Reads the end of a map (major type 5). */
   readEndMap(): void {
     if (this.#currentFrame.definiteLength === undefined) {
       this.#validateNextByteIsBreakByte();
@@ -315,9 +302,7 @@ export class CborReader {
     return result;
   }
 
-  /**
-   * Reads the next data item as a null value (major type 7).
-   */
+  /** Reads the next data item as a null value (major type 7). */
   readNull(): void {
     const header: CborInitialByte = this.#peekInitialByte(CborMajorType.Simple);
 
@@ -329,9 +314,7 @@ export class CborReader {
     this.#advanceDataItemCounters();
   }
 
-  /**
-   * Reads the next data item as the start of an indefinite-length byte string (major type 2).
-   */
+  /** Reads the next data item as the start of an indefinite-length byte string (major type 2). */
   readStartIndefiniteLengthByteString() {
     const header: CborInitialByte = this.#peekInitialByte(CborMajorType.ByteString);
 
@@ -342,9 +325,7 @@ export class CborReader {
     this.#pushDataItem(CborMajorType.ByteString);
   }
 
-  /**
-   * Ends reading an indefinite-length byte string (major type 2).
-   */
+  /** Ends reading an indefinite-length byte string (major type 2). */
   readEndIndefiniteLengthByteString() {
     this.#validateNextByteIsBreakByte();
     this.#popDataItem(CborMajorType.ByteString);
@@ -405,9 +386,7 @@ export class CborReader {
     return buffer.slice(bytesRead, bytesRead + length);
   }
 
-  /**
-   * Reads the next data item as the start of an indefinite-length UTF-8 text string (major type 3).
-   */
+  /** Reads the next data item as the start of an indefinite-length UTF-8 text string (major type 3). */
   readStartIndefiniteLengthTextString() {
     const header: CborInitialByte = this.#peekInitialByte(CborMajorType.Utf8String);
 
@@ -418,9 +397,7 @@ export class CborReader {
     this.#pushDataItem(CborMajorType.Utf8String);
   }
 
-  /**
-   * Ends reading an indefinite-length UTF-8 text string (major type 3).
-   */
+  /** Ends reading an indefinite-length UTF-8 text string (major type 3). */
   readEndIndefiniteLengthTextString() {
     this.#validateNextByteIsBreakByte();
     this.#popDataItem(CborMajorType.Utf8String);
@@ -573,9 +550,7 @@ export class CborReader {
     return header;
   }
 
-  /**
-   * Checks whether the next initial byte is a break byte.
-   */
+  /** Checks whether the next initial byte is a break byte. */
   #validateNextByteIsBreakByte() {
     const result = this.#peekInitialByte();
 
@@ -658,9 +633,7 @@ export class CborReader {
     return this.#data.slice(this.#offset);
   }
 
-  /**
-   * Advances the data item counters.
-   */
+  /** Advances the data item counters. */
   #advanceDataItemCounters() {
     ++this.#currentFrame.itemsRead;
     this.#isTagContext = false;

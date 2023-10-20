@@ -1,6 +1,4 @@
-/**
- * Query distinct addresses from db associated with users who are staking.
- */
+/** Query distinct addresses from db associated with users who are staking. */
 export const findAddressesWithRegisteredStakeKey = `
     SELECT COUNT(*) AS tx_count, address, sa.view as stake_address
     FROM tx_out 

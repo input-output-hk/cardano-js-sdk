@@ -32,9 +32,7 @@ export abstract class PouchDbStore<T extends {}> {
     );
   }
 
-  /**
-   * Might all destroy other stores, if the underlying PouchDb database is shared.
-   */
+  /** Might all destroy other stores, if the underlying PouchDb database is shared. */
   destroy(): Observable<void> {
     if (!this.destroyed) {
       this.destroyed = true;

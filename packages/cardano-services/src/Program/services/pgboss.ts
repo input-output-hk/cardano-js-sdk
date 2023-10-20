@@ -36,9 +36,7 @@ import { contextLogger } from '@cardano-sdk/util';
 import { retryBackoff } from 'backoff-rxjs';
 import PgBoss from 'pg-boss';
 
-/**
- * The entities required by the job handlers
- */
+/** The entities required by the job handlers */
 export const pgBossEntities: Function[] = [
   CurrentPoolMetricsEntity,
   BlockEntity,

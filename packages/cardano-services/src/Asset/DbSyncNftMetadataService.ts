@@ -5,18 +5,14 @@ import { Logger } from 'ts-log';
 import { Pool } from 'pg';
 import { TxMetadataService } from '../Metadata';
 
-/**
- * Dependencies that are need to create DbSyncNftMetadataService
- */
+/** Dependencies that are need to create DbSyncNftMetadataService */
 export interface DbSyncNftMetadataServiceDependencies {
   metadataService: TxMetadataService;
   db: Pool;
   logger: Logger;
 }
 
-/**
- * NftMetadataService implementation using cardano-db-sync database as a source
- */
+/** NftMetadataService implementation using cardano-db-sync database as a source */
 export class DbSyncNftMetadataService implements NftMetadataService {
   #builder: AssetBuilder;
   #logger: Logger;

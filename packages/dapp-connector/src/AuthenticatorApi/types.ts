@@ -1,10 +1,6 @@
 export type Origin = string;
 
-/**
- * Resolve true to authorise access to the WalletAPI, or resolve false to deny.
- *
- * Errors: `ApiError`
- */
+/** Resolve true to authorise access to the WalletAPI, or resolve false to deny. Errors: `ApiError` */
 export type RequestAccess = (origin: Origin) => Promise<boolean>;
 export type RevokeAccess = RequestAccess;
 export type HaveAccess = RequestAccess;

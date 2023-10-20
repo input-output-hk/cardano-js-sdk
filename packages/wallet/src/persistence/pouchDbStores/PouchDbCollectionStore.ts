@@ -12,10 +12,7 @@ export interface PouchDbCollectionStoreProps<T> {
   computeDocId?: ComputePouchDbDocId<T>;
 }
 
-/**
- * PouchDB database that implements CollectionStore.
- * Supports sorting by custom document _id
- */
+/** PouchDB database that implements CollectionStore. Supports sorting by custom document _id */
 export class PouchDbCollectionStore<T extends {}> extends PouchDbStore<T> implements CollectionStore<T> {
   readonly #computeDocId: ComputePouchDbDocId<T> | undefined;
 

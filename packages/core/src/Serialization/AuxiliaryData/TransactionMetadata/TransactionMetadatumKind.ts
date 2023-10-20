@@ -1,29 +1,17 @@
-/**
- * The transaction metadatum type kind.
- */
+/** The transaction metadatum type kind. */
 export enum TransactionMetadatumKind {
-  /**
-   * A map of TransactionMetadatum as both key and values.
-   */
+  /** A map of TransactionMetadatum as both key and values. */
   Map,
 
-  /**
-   * A list of TransactionMetadatum.
-   */
+  /** A list of TransactionMetadatum. */
   List,
 
-  /**
-   * An integer.
-   */
+  /** An integer. */
   Integer,
 
-  /**
-   * Bounded bytes.
-   */
+  /** Bounded bytes. */
   Bytes,
 
-  /**
-   * A text string.
-   */
+  /** A text string. */
   Text
 }

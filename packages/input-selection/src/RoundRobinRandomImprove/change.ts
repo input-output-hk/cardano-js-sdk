@@ -193,10 +193,7 @@ const computeRequestedAssetChangeBundles = (
   return bundles;
 };
 
-/**
- * Picks one UTxO from remaining set and puts it to the selected set.
- * Precondition: utxoRemaining.length > 0
- */
+/** Picks one UTxO from remaining set and puts it to the selected set. Precondition: utxoRemaining.length > 0 */
 const pickExtraRandomUtxo = (
   { utxoRemaining, utxoSelected }: UtxoSelection,
   random: typeof Math.random

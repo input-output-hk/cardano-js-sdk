@@ -20,9 +20,7 @@ export class StakePoolProviderStats {
   }
 }
 
-/**
- * Wraps a StakePoolProvider, tracking # of calls of each function
- */
+/** Wraps a StakePoolProvider, tracking # of calls of each function */
 export class TrackedStakePoolProvider extends ProviderTracker implements StakePoolProvider {
   readonly stats = new StakePoolProviderStats();
   readonly healthCheck: StakePoolProvider['healthCheck'];

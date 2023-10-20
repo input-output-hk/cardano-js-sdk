@@ -145,9 +145,7 @@ export class InMemoryKeyAgent extends KeyAgentBase implements KeyAgent {
     );
   }
 
-  /**
-   * Based on root private key
-   */
+  /** Based on root private key */
   async exportExtendedKeyPair(derivationPath: number[]): Promise<KeyPair> {
     const rootPrivateKey = await this.exportRootPrivateKey();
     const hardenedIndices = derivationPath.map((index: number) => harden(index));

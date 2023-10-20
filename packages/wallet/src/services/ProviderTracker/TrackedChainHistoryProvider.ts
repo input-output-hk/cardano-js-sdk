@@ -23,9 +23,7 @@ export class ChainHistoryProviderStats {
   }
 }
 
-/**
- * Wraps a ChainHistoryProvider, tracking # of calls of each function
- */
+/** Wraps a ChainHistoryProvider, tracking # of calls of each function */
 export class TrackedChainHistoryProvider extends ProviderTracker implements ChainHistoryProvider {
   readonly stats = new ChainHistoryProviderStats();
   readonly healthCheck: ChainHistoryProvider['healthCheck'];

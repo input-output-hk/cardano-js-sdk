@@ -63,9 +63,7 @@ export interface KeyValueStore<K, V> extends Omit<CollectionStore<KeyValueCollec
    * - When at least one document is missing or the store is destroyed: completes without emitting.
    */
   getValues(keys: K[]): Observable<V[]>;
-  /**
-   * Store the document. Should never throw.
-   */
+  /** Store the document. Should never throw. */
   setValue(key: K, value: V): Observable<void>;
 }
 

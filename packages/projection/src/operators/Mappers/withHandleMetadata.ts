@@ -9,9 +9,7 @@ import { assetNameToUTF8Handle } from './util';
 import { isNotNil } from '@cardano-sdk/util';
 import { map } from 'rxjs';
 
-/**
- * Only present for cip68/personalized handles
- */
+/** Only present for cip68/personalized handles */
 interface PersonalizedProperties {
   profilePicImage?: Asset.Uri;
   backgroundImage?: Asset.Uri;

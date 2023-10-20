@@ -2,9 +2,7 @@ import chalk from 'chalk';
 import cliSpinners from 'cli-spinners';
 import ora from 'ora';
 
-/**
- * The task result.
- */
+/** The task result. */
 export enum TaskResult {
   Success = 0,
   Fail = 1,
@@ -13,9 +11,7 @@ export enum TaskResult {
   None = 4
 }
 
-/**
- * Tracks progress of tasks in the terminal.
- */
+/** Tracks progress of tasks in the terminal. */
 export class TerminalProgressMonitor {
   #currentTask: ora.Ora | null = null;
 

@@ -10,22 +10,13 @@ const isEmptyResponse = (response: any) => response === '';
 type ResponseTransformers<T> = { [K in keyof T]?: AxiosResponseTransformer };
 
 export interface HttpProviderConfig<T extends Provider> {
-  /**
-   * The OpenApi version, which forms part of the URL scheme
-   */
+  /** The OpenApi version, which forms part of the URL scheme */
   apiVersion: string;
-  /**
-   * Example: "http://localhost:3000"
-   */
+  /** Example: "http://localhost:3000" */
   baseUrl: string;
-  /**
-   * A mapping between provider method names and url paths.
-   * Paths have to use /leadingSlash
-   */
+  /** A mapping between provider method names and url paths. Paths have to use /leadingSlash */
   paths: HttpProviderConfigPaths<T>;
-  /**
-   * Additional request options passed to axios
-   */
+  /** Additional request options passed to axios */
   axiosOptions?: AxiosRequestConfig;
   /**
    * Custom error handling: Either:
@@ -37,31 +28,20 @@ export interface HttpProviderConfig<T extends Provider> {
    */
   mapError?: (error: unknown, method: keyof T) => unknown;
 
-  /**
-   * This adapter that allows to you to modify the way Axios make requests.
-   */
+  /** This adapter that allows to you to modify the way Axios make requests. */
   adapter?: AxiosAdapter;
 
-  /**
-   * Logger strategy.
-   */
+  /** Logger strategy. */
   logger: Logger;
 
-  /**
-   * Transform responses
-   */
+  /** Transform responses */
   responseTransformers?: ResponseTransformers<T>;
 
-  /**
-   * Slug used in the URL path
-   */
+  /** Slug used in the URL path */
   serviceSlug: string;
 }
 
-/**
- * The subset of parameters from HttpProviderConfig that must be set by the
- * client code.
- */
+/** The subset of parameters from HttpProviderConfig that must be set by the client code. */
 export type CreateHttpProviderConfig<T extends Provider> = Pick<
   HttpProviderConfig<T>,
   'baseUrl' | 'adapter' | 'logger'

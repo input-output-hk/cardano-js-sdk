@@ -13,9 +13,7 @@ import path from 'path';
 const CONTAINER_IMAGE = 'rabbitmq:3.10-management';
 const CONTAINER_NAME = 'cardano-rabbitmq-test';
 
-/**
- * Class to handle RabbitMQ Docker Containers
- */
+/** Class to handle RabbitMQ Docker Containers */
 export class RabbitMQContainer {
   #adminPort = 0;
   #containerName: string;
@@ -34,10 +32,7 @@ export class RabbitMQContainer {
     };
   }
 
-  /**
-   * Starts a new container with the given name,
-   * eventually stops any other running container with the same name
-   */
+  /** Starts a new container with the given name, eventually stops any other running container with the same name */
   async start() {
     this.#adminPort = await getRandomPort();
     this.#serverPort = await getRandomPort();
@@ -79,9 +74,7 @@ export class RabbitMQContainer {
     return ret;
   }
 
-  /**
-   * Stops the container with the given name
-   */
+  /** Stops the container with the given name */
   async stop() {
     const docker = new Docker();
     const container = docker.getContainer(this.#containerName);
@@ -103,9 +96,7 @@ export class RabbitMQContainer {
     }
   }
 
-  /**
-   * Removes all the queues from the server
-   */
+  /** Removes all the queues from the server */
   async removeQueues() {
     const { adminUrl, rabbitmqUrl } = this.getPublicProperties();
     const queues = await axios.get(`${adminUrl}api/queues/`);
@@ -136,9 +127,7 @@ export class RabbitMQContainer {
     );
   }
 
-  /**
-   * Loads container data. See save() methods for details.
-   */
+  /** Loads container data. See save() methods for details. */
   async load() {
     const file = await readFile(path.join(__dirname, 'containers', `${this.#containerName}.json`));
     const { adminPort, serverPort } = JSON.parse(file.toString()) as { adminPort: number; serverPort: number };

@@ -284,10 +284,7 @@ export type GetWalletProps = {
   keyAgent?: AsyncKeyAgent;
 };
 
-/**
- * Delays initializing tx when nearing the epoch boundary.
- * Relies on system clock being accurate.
- */
+/** Delays initializing tx when nearing the epoch boundary. Relies on system clock being accurate. */
 const patchInitializeTxToRespectEpochBoundary = <T extends ObservableWallet>(
   wallet: T,
   maxPollInterval: Milliseconds

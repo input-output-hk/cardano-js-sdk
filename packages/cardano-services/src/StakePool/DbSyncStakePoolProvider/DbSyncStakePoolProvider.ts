@@ -34,18 +34,12 @@ import { StakePoolMetadataService } from '../types';
 import { toStakePoolResults } from './mappers';
 import merge from 'lodash/merge';
 
-/**
- * Properties that are need to create DbSyncStakePoolProvider
- */
+/** Properties that are need to create DbSyncStakePoolProvider */
 export interface StakePoolProviderProps {
-  /**
-   * Pagination page size limit used for provider methods constraint.
-   */
+  /** Pagination page size limit used for provider methods constraint. */
   paginationPageSizeLimit: number;
 
-  /**
-   * Configure the response optional fields
-   */
+  /** Configure the response optional fields */
   responseConfig?: {
     search?: {
       metrics?: {
@@ -54,36 +48,24 @@ export interface StakePoolProviderProps {
     };
   };
 
-  /**
-   * Enables Blockfrost hybrid cache.
-   */
+  /** Enables Blockfrost hybrid cache. */
   useBlockfrost: boolean;
 }
 
-/**
- * Dependencies that are need to create DbSyncStakePoolProvider
- */
+/** Dependencies that are need to create DbSyncStakePoolProvider */
 export interface StakePoolProviderDependencies extends DbSyncProviderDependencies {
-  /**
-   *The in memory cache engine.
-   */
+  /** The in memory cache engine. */
   cache: DbSyncProviderDependencies['cache'] & {
     db: InMemoryCache;
   };
 
-  /**
-   * Monitor the epoch rollover through db polling.
-   */
+  /** Monitor the epoch rollover through db polling. */
   epochMonitor: EpochMonitor;
 
-  /**
-   * The genesis data loaded from the genesis file.
-   */
+  /** The genesis data loaded from the genesis file. */
   genesisData: GenesisData;
 
-  /**
-   * The Stake Pool extended metadata service.
-   */
+  /** The Stake Pool extended metadata service. */
   metadataService: StakePoolMetadataService;
 }
 

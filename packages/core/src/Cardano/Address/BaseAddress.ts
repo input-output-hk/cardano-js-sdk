@@ -54,23 +54,17 @@ export class BaseAddress {
     });
   }
 
-  /**
-   * Gets the payment credential part of the base address.
-   */
+  /** Gets the payment credential part of the base address. */
   getPaymentCredential(): Credential {
     return this.#paymentPart;
   }
 
-  /**
-   * Gets the stake credential part of the base address.
-   */
+  /** Gets the stake credential part of the base address. */
   getStakeCredential(): Credential {
     return this.#delegationPart;
   }
 
-  /**
-   * Converts from BaseAddress instance to Address.
-   */
+  /** Converts from BaseAddress instance to Address. */
   toAddress(): Address {
     return new Address({
       delegationPart: this.#delegationPart,

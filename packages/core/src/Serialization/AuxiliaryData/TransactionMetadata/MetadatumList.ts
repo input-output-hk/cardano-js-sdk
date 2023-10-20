@@ -3,9 +3,7 @@ import { HexBlob } from '@cardano-sdk/util';
 import { TransactionMetadatum } from './TransactionMetadatum';
 import { bytesToHex, hexToBytes } from '../../../util/misc';
 
-/**
- * A list of metadatum.
- */
+/** A list of metadatum. */
 export class MetadatumList {
   readonly #array = new Array<TransactionMetadatum>();
   #useIndefiniteEncoding = false;

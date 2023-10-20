@@ -12,64 +12,34 @@ export interface PoolMetadataJson {
   url: string;
 }
 
-/**
- * 32 byte ed25519 verification key as bech32 string with 'poolmd_vk' prefix.
- */
+/** 32 byte ed25519 verification key as bech32 string with 'poolmd_vk' prefix. */
 export type PoolMdVk = OpaqueString<'PoolMdVk'>;
 export const PoolMdVk = (target: string): PoolMdVk => typedBech32(target, 'poolmd_vk', 52);
 
-/**
- * https://github.com/cardano-foundation/CIPs/blob/master/CIP-0006/README.md
- */
+/** https://github.com/cardano-foundation/CIPs/blob/master/CIP-0006/README.md */
 export interface Cip6MetadataFields {
-  /**
-   * A URL for extended metadata
-   * 128 Characters Maximum, must be a valid URL
-   */
+  /** A URL for extended metadata 128 Characters Maximum, must be a valid URL */
   extDataUrl?: string;
-  /**
-   * A URL with the extended metadata signature
-   * 128 Characters Maximum, must be a valid URL
-   */
+  /** A URL with the extended metadata signature 128 Characters Maximum, must be a valid URL */
   extSigUrl?: string;
-  /**
-   * the public Key for verification
-   * optional, 68 Characters
-   */
+  /** the public Key for verification optional, 68 Characters */
   extVkey?: PoolMdVk;
 }
 
-/**
- * https://raw.githubusercontent.com/cardanians/adapools.org/master/example-meta.json
- */
+/** https://raw.githubusercontent.com/cardanians/adapools.org/master/example-meta.json */
 export interface APMetadataFields {
-  /**
-   * A URL for extended metadata
-   * 128 Characters Maximum, must be a valid URL
-   */
+  /** A URL for extended metadata 128 Characters Maximum, must be a valid URL */
   extended?: string;
 }
 
 export interface StakePoolMainMetadataFields {
-  /**
-   * Pool ticker. uppercase
-   * 5 Characters Maximum, Uppercase letters and numbers
-   */
+  /** Pool ticker. uppercase 5 Characters Maximum, Uppercase letters and numbers */
   ticker: string;
-  /**
-   * A name for the pool
-   * 50 Characters Maximum
-   */
+  /** A name for the pool 50 Characters Maximum */
   name: string;
-  /**
-   * Text that describes the pool
-   * 50 Characters Maximum
-   */
+  /** Text that describes the pool 50 Characters Maximum */
   description: string;
-  /**
-   * A website URL for the pool
-   * 64 Characters Maximum, must be a valid URL
-   */
+  /** A website URL for the pool 64 Characters Maximum, must be a valid URL */
   homepage: string;
 }
 
@@ -93,29 +63,17 @@ export type StakePoolMetadata = Cip6MetadataFields &
 export interface PoolParameters {
   id: PoolId;
   rewardAccount: RewardAccount;
-  /**
-   * Declared pledge quantity.
-   */
+  /** Declared pledge quantity. */
   pledge: Lovelace;
-  /**
-   * Fixed stake pool running cost
-   */
+  /** Fixed stake pool running cost */
   cost: Lovelace;
-  /**
-   * Stake pool margin percentage
-   */
+  /** Stake pool margin percentage */
   margin: Fraction;
-  /**
-   * Metadata location and hash
-   */
+  /** Metadata location and hash */
   metadataJson?: PoolMetadataJson;
-  /**
-   * Metadata content
-   */
+  /** Metadata content */
   metadata?: StakePoolMetadata;
-  /**
-   * Stake pool relays
-   */
+  /** Stake pool relays */
   relays: Relay[];
 
   owners: RewardAccount[];

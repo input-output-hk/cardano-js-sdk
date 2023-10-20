@@ -166,9 +166,7 @@ const consumeFactory =
     return api;
   };
 
-/**
- * Creates a proxy to a remote api object
- */
+/** Creates a proxy to a remote api object */
 export const consumeMessengerRemoteApi = <T extends object>(
   { properties, getErrorPrototype }: ConsumeRemoteApiOptions<T>,
   { logger, messenger, destructor }: ConsumeMessengerApiDependencies

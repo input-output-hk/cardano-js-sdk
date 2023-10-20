@@ -6,9 +6,7 @@ const EMBEDDED_GROUP_SIZE = 2;
 const MULTI_HOST_NAME_RELAY_ID = 2;
 const MAX_DNS_SIZE_STR_LENGTH = 64;
 
-/**
- * This relay points to a multi host name via a DNS (A SRV DNS record) name.
- */
+/** This relay points to a multi host name via a DNS (A SRV DNS record) name. */
 export class MultiHostName {
   #dnsName: string;
   #originalBytes: HexBlob | undefined = undefined;

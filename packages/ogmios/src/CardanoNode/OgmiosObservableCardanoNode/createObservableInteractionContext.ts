@@ -27,10 +27,7 @@ export interface InteractionContextProps {
    * after the 1st usage of emitted interaction context.
    */
   interactionType: InteractionType;
-  /**
-   * Retry backoff configuration for
-   * re-subscribing to connectionConfig$ on connection error.
-   */
+  /** Retry backoff configuration for re-subscribing to connectionConfig$ on connection error. */
   reconnectionConfig?: ReconnectionConfig;
 }
 

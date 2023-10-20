@@ -2,9 +2,7 @@ import { Cardano } from '@cardano-sdk/core';
 import { Ed25519PublicKeyHex } from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
 
-/**
- * A hex-encoded string of the corresponding bytes.
- */
+/** A hex-encoded string of the corresponding bytes. */
 export type Bytes = string;
 
 /**
@@ -21,9 +19,7 @@ export type Cbor = string;
  */
 export type Paginate = { page: number; limit: number };
 
-/**
- * DataSignature type as described in CIP-0030.
- */
+/** DataSignature type as described in CIP-0030. */
 
 type CoseSign1CborHex = HexBlob;
 type CoseKeyCborHex = HexBlob;

@@ -13,11 +13,7 @@ export interface EnsureStakeKeysParams {
   logger: Logger;
 }
 
-/**
- * Given a count, checks if enough stake keys exist and derives
- * more if needed.
- * Returns all reward accounts
- */
+/** Given a count, checks if enough stake keys exist and derives more if needed. Returns all reward accounts */
 export const ensureStakeKeys = async ({
   keyAgent,
   count,

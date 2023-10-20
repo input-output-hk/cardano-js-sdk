@@ -16,13 +16,9 @@ export class HandleEntity {
   @Column()
   hasDatum?: boolean;
   @Column('varchar', { nullable: true })
-  /**
-   * `null` when cardanoAddress === `null`, or owned by enterprise/byron address
-   */
+  /** `null` when cardanoAddress === `null`, or owned by enterprise/byron address */
   defaultForStakeCredential?: Handle | null;
   @Column('varchar', { nullable: true })
-  /**
-   * `null` when cardanoAddress === `null`
-   */
+  /** `null` when cardanoAddress === `null` */
   defaultForPaymentCredential?: Handle | null;
 }

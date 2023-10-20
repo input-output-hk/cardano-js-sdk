@@ -1,73 +1,43 @@
-/**
- * Edwards 25519 test vector.
- */
+/** Edwards 25519 test vector. */
 export interface Ed25519TestVector {
-  /**
-   * The secret key in hexadecimal representation.
-   */
+  /** The secret key in hexadecimal representation. */
   secretKey: string;
-  /**
-   * The public key in hexadecimal representation.
-   */
+  /** The public key in hexadecimal representation. */
   publicKey: string;
 
-  /**
-   * The Blake2b hash of the public key.
-   */
+  /** The Blake2b hash of the public key. */
   publicKeyHash: string;
 
-  /**
-   * The message to be signed in hexadecimal representation.
-   */
+  /** The message to be signed in hexadecimal representation. */
   message: string;
-  /**
-   * The signature in hexadecimal representation.
-   */
+  /** The signature in hexadecimal representation. */
   signature: string;
 }
 
-/**
- * BIP-32 Ed25519 test vector.
- */
+/** BIP-32 Ed25519 test vector. */
 export interface Bip32Ed25519TestVector {
-  /**
-   * The BIP39 entropy generated from a set of mnemonic words.
-   */
+  /** The BIP39 entropy generated from a set of mnemonic words. */
   bip39Entropy: string;
 
-  /**
-   * Root BIP32 root private key.
-   */
+  /** Root BIP32 root private key. */
   rootKey: string;
 
-  /**
-   * Root BIP32 root public key.
-   */
+  /** Root BIP32 root public key. */
   publicKey: string;
 
-  /**
-   * The BIP32 derived chlid private key.
-   */
+  /** The BIP32 derived chlid private key. */
   childPrivateKey: string;
 
-  /**
-   * The BIP32 derived child public key.
-   */
+  /** The BIP32 derived child public key. */
   childPublicKey: string;
 
-  /**
-   * The 2-factor authentication password.
-   */
+  /** The 2-factor authentication password. */
   password: string;
 
-  /**
-   * The BIP32 index chain that derived the extended keys.
-   */
+  /** The BIP32 index chain that derived the extended keys. */
   derivationPath: number[];
 
-  /**
-   * The Edwards 25519 extended vector.
-   */
+  /** The Edwards 25519 extended vector. */
   ed25519eVector: Ed25519TestVector;
 }
 

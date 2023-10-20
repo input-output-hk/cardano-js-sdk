@@ -30,10 +30,7 @@ export enum CertificateKind {
    */
   PoolRegistration = 3,
 
-  /**
-   * This certificate is used to retire a stake pool. It includes an epoch number
-   * indicating when the pool will be retired.
-   */
+  /** This certificate is used to retire a stake pool. It includes an epoch number indicating when the pool will be retired. */
   PoolRetirement = 4,
 
   /**
@@ -42,9 +39,7 @@ export enum CertificateKind {
    */
   GenesisKeyDelegation = 5,
 
-  /**
-   * Certificate used to facilitate an instantaneous transfer of rewards within the system.
-   */
+  /** Certificate used to facilitate an instantaneous transfer of rewards within the system. */
   MoveInstantaneousRewards = 6,
 
   /**
@@ -71,10 +66,7 @@ export enum CertificateKind {
    */
   Unregistration = 8,
 
-  /**
-   * This certificate is used when an individual wants to delegate their voting
-   * rights to any other DRep.
-   */
+  /** This certificate is used when an individual wants to delegate their voting rights to any other DRep. */
   VoteDelegation = 9,
 
   /**
@@ -84,14 +76,10 @@ export enum CertificateKind {
    */
   StakeVoteDelegation = 10,
 
-  /**
-   * This certificate Register the stake key and delegate with a single certificate to a stake pool.
-   */
+  /** This certificate Register the stake key and delegate with a single certificate to a stake pool. */
   StakeRegistrationDelegation = 11,
 
-  /**
-   * This certificate Register the stake key and delegate with a single certificate to a DRep.
-   */
+  /** This certificate Register the stake key and delegate with a single certificate to a DRep. */
   VoteRegistrationDelegation = 12,
 
   /**
@@ -101,15 +89,10 @@ export enum CertificateKind {
    */
   StakeVoteRegistrationDelegation = 13,
 
-  /**
-   * This certificate registers the Hot and Cold credentials of a committee member.
-   */
+  /** This certificate registers the Hot and Cold credentials of a committee member. */
   AuthCommitteeHot = 14,
 
-  /**
-   * This certificate is used then a committee member wants to resign early
-   * (will be marked on-chain as an expired member).
-   */
+  /** This certificate is used then a committee member wants to resign early (will be marked on-chain as an expired member). */
   ResignCommitteeCold = 15,
 
   /**
@@ -130,8 +113,6 @@ export enum CertificateKind {
    */
   DrepUnregistration = 17,
 
-  /**
-   * Updates the DRep anchored metadata.
-   */
+  /** Updates the DRep anchored metadata. */
   UpdateDrep = 18
 }

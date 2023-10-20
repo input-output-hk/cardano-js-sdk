@@ -5,9 +5,7 @@ import { MultiHostName } from './MultiHostName';
 import { SingleHostAddr } from './SingleHostAddr';
 import { SingleHostName } from './SingleHostName';
 
-/**
- * The relay kind.
- */
+/** The relay kind. */
 export enum RelayKind {
   SingleHostAddress = 0,
   SingleHostDnsName = 1,

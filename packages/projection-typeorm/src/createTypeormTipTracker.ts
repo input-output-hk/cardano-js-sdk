@@ -9,9 +9,7 @@ import { isRecoverableTypeormError } from './isRecoverableTypeormError';
 
 export interface CreateTypeormTipTrackerProps {
   connection$: Observable<TypeormConnection>;
-  /**
-   * Retry strategy for tip query. Tracker will re-subscribe to connection$ on each retry.
-   */
+  /** Retry strategy for tip query. Tracker will re-subscribe to connection$ on each retry. */
   reconnectionConfig: ReconnectionConfig;
 }
 

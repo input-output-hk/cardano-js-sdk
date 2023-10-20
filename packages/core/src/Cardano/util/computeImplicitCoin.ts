@@ -2,27 +2,17 @@ import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano } from '../..';
 import { CertificateType, HydratedTxBody, Lovelace } from '../types';
 
-/**
- * Implicit coin quantities used in the transaction
- */
+/** Implicit coin quantities used in the transaction */
 export interface ImplicitCoin {
-  /**
-   * Reward withdrawals
-   */
+  /** Reward withdrawals */
   withdrawals?: Lovelace;
-  /**
-   * Reward withdrawals + deposit reclaims (total return)
-   */
+  /** Reward withdrawals + deposit reclaims (total return) */
   input?: Lovelace;
-  /**
-   * Delegation registration deposit
-   */
+  /** Delegation registration deposit */
   deposit?: Lovelace;
 }
 
-/**
- * Implementation is the same as in CSL.get_implicit_input() and CSL.get_deposit().
- */
+/** Implementation is the same as in CSL.get_implicit_input() and CSL.get_deposit(). */
 export const computeImplicitCoin = (
   { stakeKeyDeposit, poolDeposit }: Pick<Cardano.ProtocolParameters, 'stakeKeyDeposit' | 'poolDeposit'>,
   { certificates, withdrawals }: Pick<HydratedTxBody, 'certificates' | 'withdrawals'>

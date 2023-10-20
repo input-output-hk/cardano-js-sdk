@@ -80,14 +80,10 @@ const wrapAndEnableApi = (
   return baseApi;
 };
 
-/**
- * CIP30 API version
- */
+/** CIP30 API version */
 export type ApiVersion = string;
 
-/**
- * Unique identifier, used to inject into the cardano namespace
- */
+/** Unique identifier, used to inject into the cardano namespace */
 export type WalletName = string;
 
 /**
@@ -107,9 +103,7 @@ export type WalletDependencies = {
 
 export type Cip30EnableOptions = { extensions: WalletApiExtension[] };
 
-/**
- * CIP-30 wallet that is injected to page
- */
+/** CIP-30 wallet that is injected to page */
 export class Cip30Wallet {
   readonly apiVersion: ApiVersion = '0.1.0';
   readonly name: WalletName;

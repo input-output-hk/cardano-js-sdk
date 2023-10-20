@@ -53,9 +53,7 @@ const toOutputValidationError = (
   }
 };
 
-/**
- * `OutputBuilder` implementation based on {@link OutputValidator}.
- */
+/** `OutputBuilder` implementation based on {@link OutputValidator}. */
 export class TxOutputBuilder implements OutputBuilder {
   /**
    * Transaction output that is updated by `TxOutputBuilder` methods.
