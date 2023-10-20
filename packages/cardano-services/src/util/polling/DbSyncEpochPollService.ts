@@ -6,22 +6,16 @@ import { findLastEpoch } from './queries';
 
 export const EPOCH_POLL_INTERVAL_DEFAULT = 10_000;
 
-/**
- * Class to handle epoch rollover through db polling
- */
+/** Class to handle epoch rollover through db polling */
 export class DbSyncEpochPollService implements EpochMonitor {
   #timeoutId?: ReturnType<typeof setInterval>;
   #callbacks: Function[];
   #currentEpoch: Promise<Cardano.EpochNo | null>;
 
-  /**
-   * Db connection
-   */
+  /** Db connection */
   #db: Pool;
 
-  /**
-   * Polling interval in ms
-   */
+  /** Polling interval in ms */
   #interval: number;
 
   /**
@@ -57,9 +51,7 @@ export class DbSyncEpochPollService implements EpochMonitor {
     return Cardano.EpochNo(result.rows[0].no);
   }
 
-  /**
-   * Starts the poll execution
-   */
+  /** Starts the poll execution */
   #start() {
     if (this.#timeoutId) return;
 
@@ -67,16 +59,12 @@ export class DbSyncEpochPollService implements EpochMonitor {
     this.#timeoutId = setInterval(() => this.#executePoll(), this.#interval);
   }
 
-  /**
-   * Shutdown the poll execution
-   */
+  /** Shutdown the poll execution */
   #shutdown() {
     if (this.#timeoutId) clearInterval(this.#timeoutId);
   }
 
-  /**
-   * Epoch Rollover event - subscription-based mechanism to manage starting and stopping of epoch poll service
-   */
+  /** Epoch Rollover event - subscription-based mechanism to manage starting and stopping of epoch poll service */
   onEpochRollover(cb: Function) {
     this.#callbacks.push(cb);
     if (this.#callbacks.length === 1) this.#start();
@@ -86,9 +74,7 @@ export class DbSyncEpochPollService implements EpochMonitor {
     };
   }
 
-  /**
-   * Get last known epoch
-   */
+  /** Get last known epoch */
   getLastKnownEpoch() {
     return this.#currentEpoch;
   }

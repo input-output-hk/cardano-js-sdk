@@ -16,9 +16,7 @@ export interface EraSummary {
   };
 }
 
-/**
- * Map of the live stake distribution, indexed by PoolId
- */
+/** Map of the live stake distribution, indexed by PoolId */
 export type StakeDistribution = Map<
   PoolId,
   {

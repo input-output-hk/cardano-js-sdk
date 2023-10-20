@@ -1,8 +1,6 @@
 import { ExtChainSyncOperator } from '../../types';
 
-/**
- * Wrap an operator to easily infer extra props of source observable
- */
+/** Wrap an operator to easily infer extra props of source observable */
 export const inferProjectorEventType =
   <
     OperatorExtraRollForwardPropsIn,

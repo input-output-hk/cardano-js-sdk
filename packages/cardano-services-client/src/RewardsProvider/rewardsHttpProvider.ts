@@ -3,9 +3,7 @@ import { HttpProviderConfigPaths, ProviderError, ProviderFailure, RewardsProvide
 import { apiVersion } from '../version';
 import { mapHealthCheckError } from '../mapHealthCheckError';
 
-/**
- * The RewardsProvider endpoint paths.
- */
+/** The RewardsProvider endpoint paths. */
 const paths: HttpProviderConfigPaths<RewardsProvider> = {
   healthCheck: '/health',
   rewardAccountBalance: '/account-balance',

@@ -11,20 +11,14 @@ export class AddressEntity {
   type?: Cardano.AddressType;
   @Column('char', { length: 56, nullable: true })
   @Index()
-  /**
-   * Applicable only for base/grouped, enterprise and pointer addresses
-   */
+  /** Applicable only for base/grouped, enterprise and pointer addresses */
   paymentCredentialHash?: Hash28ByteBase16 | null;
   @Column('char', { length: 56, nullable: true })
   @Index()
-  /**
-   * Applicable only for base/grouped and pointer addresses
-   */
+  /** Applicable only for base/grouped and pointer addresses */
   stakeCredentialHash?: Hash28ByteBase16 | null;
   @ManyToOne(() => StakeKeyRegistrationEntity, { nullable: true, onDelete: 'CASCADE' })
   @JoinColumn()
-  /**
-   * Applicable only for pointer addresses
-   */
+  /** Applicable only for pointer addresses */
   registration?: StakeKeyRegistrationEntity | null;
 }

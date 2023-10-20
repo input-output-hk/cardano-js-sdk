@@ -14,9 +14,7 @@ export enum StakePoolMetadataFetchMode {
    * Use metadata available from the provided data by the projection. Projection reads its data directly from the certificate.
    */
   DIRECT = 'direct',
-  /**
-   * Use configured SMASH server to fetch stake pool metadata.
-   */
+  /** Use configured SMASH server to fetch stake pool metadata. */
   SMASH = 'smash'
 }
 

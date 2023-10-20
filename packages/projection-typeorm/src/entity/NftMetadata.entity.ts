@@ -30,10 +30,7 @@ export class NftMetadataEntity {
   otherProperties?: Map<string, Cardano.Metadatum> | null;
   @ManyToOne(() => AssetEntity, OnDeleteCascadeRelationOptions)
   @JoinColumn()
-  /**
-   * Same as userTokenAsset for cip25
-   * Reference NFT for cip68
-   */
+  /** Same as userTokenAsset for cip25 Reference NFT for cip68 */
   parentAsset?: AssetEntity;
   @ManyToOne(() => AssetEntity, OnDeleteSetNullRelationOptions)
   userTokenAsset?: AssetEntity | null;

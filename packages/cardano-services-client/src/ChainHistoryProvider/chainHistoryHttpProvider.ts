@@ -2,9 +2,7 @@ import { ChainHistoryProvider, HttpProviderConfigPaths, ProviderError, ProviderF
 import { CreateHttpProviderConfig, createHttpProvider } from '../HttpProvider';
 import { apiVersion } from '../version';
 
-/**
- * The ChainHistoryProvider endpoint paths.
- */
+/** The ChainHistoryProvider endpoint paths. */
 const paths: HttpProviderConfigPaths<ChainHistoryProvider> = {
   blocksByHashes: '/blocks/by-hashes',
   healthCheck: '/health',

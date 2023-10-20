@@ -140,9 +140,7 @@ export class TrezorKeyAgent extends KeyAgentBase {
     );
   }
 
-  /**
-   * Gets the mode in which we want to sign the transaction.
-   */
+  /** Gets the mode in which we want to sign the transaction. */
   static getSigningMode(tx: Omit<Trezor.CardanoSignTransaction, 'signingMode'>): Trezor.PROTO.CardanoTxSigningMode {
     if (tx.certificates) {
       for (const cert of tx.certificates) {

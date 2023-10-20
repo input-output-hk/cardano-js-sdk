@@ -4,37 +4,23 @@ import { LedgerTipModel, findLedgerTip } from './util';
 import { Logger } from 'ts-log';
 import { Pool } from 'pg';
 
-/**
- * Dedicated DB pools
- */
+/** Dedicated DB pools */
 export interface DbPools {
-  /**
-   * Main operational db pool
-   */
+  /** Main operational db pool */
   main: Pool;
-  /**
-   * Secondary health check db pool
-   */
+  /** Secondary health check db pool */
   healthCheck: Pool;
 }
 
-/**
- * Properties that are need to create DbSyncProvider
- */
+/** Properties that are need to create DbSyncProvider */
 export interface DbSyncProviderDependencies extends ProviderDependencies {
-  /**
-   * Cache engines. Default: InMemoryCache with HealthCheck.cacheTTL as default TTL
-   */
+  /** Cache engines. Default: InMemoryCache with HealthCheck.cacheTTL as default TTL */
   cache: {
     healthCheck: InMemoryCache;
   };
-  /**
-   * DB pools
-   */
+  /** DB pools */
   dbPools: DbPools;
-  /**
-   * Ogmios Cardano Node provider
-   */
+  /** Ogmios Cardano Node provider */
   cardanoNode: CardanoNode;
 }
 
@@ -67,9 +53,7 @@ export const DbSyncProvider = <
       this.#cache = cache;
     }
 
-    /**
-     * Healthy if the tip of both the node and database can be accessed.
-     */
+    /** Healthy if the tip of both the node and database can be accessed. */
     public async healthCheck(): Promise<HealthCheckResponse> {
       const response: HealthCheckResponse = { ok: false };
       try {

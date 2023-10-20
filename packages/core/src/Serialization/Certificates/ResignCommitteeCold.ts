@@ -6,10 +6,7 @@ import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 
 const EMBEDDED_GROUP_SIZE = 2;
 
-/**
- * This certificate is used then a committee member wants to resign early
- * (will be marked on-chain as an expired member).
- */
+/** This certificate is used then a committee member wants to resign early (will be marked on-chain as an expired member). */
 export class ResignCommitteeCold {
   #committeeColdCred: Cardano.Credential;
   #originalBytes: HexBlob | undefined = undefined;

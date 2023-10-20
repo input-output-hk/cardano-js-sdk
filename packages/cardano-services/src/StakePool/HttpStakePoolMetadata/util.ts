@@ -26,16 +26,12 @@ export const getExtMetadataUrl = (metadata: Cardano.StakePoolMetadata) => metada
 export const getSchemaFormat = (value: Cardano.StakePoolMetadata): ExtMetadataFormat =>
   isNotNil(value.extDataUrl) ? ExtMetadataFormat.CIP6 : ExtMetadataFormat.AdaPools;
 
-/**
- * Loads JSON schema based on extended metadata format
- */
+/** Loads JSON schema based on extended metadata format */
 export const loadJsonSchema = (format: ExtMetadataFormat): JSON => {
   const schemaPath = path.join(__dirname, 'schemas', `${format}.json`);
   return JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
 };
 
-/**
- * Type guard to determine if the consumed ext metadata response is in CIP-6 format
- */
+/** Type guard to determine if the consumed ext metadata response is in CIP-6 format */
 export const isCip6Format = (response: StakePoolExtMetadataResponse): response is Cip6ExtMetadataResponse =>
   isNotNil(response.pool) || isNotNil(response.serial);

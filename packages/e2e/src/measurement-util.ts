@@ -28,10 +28,7 @@ export type MeasurementResults<T extends string> = Record<T, MeasurementData>;
 export class MeasurementUtil<T extends string> {
   #performanceObserver: PerformanceObserver;
 
-  /**
-   * Starts observing performance measurements.
-   * Must be called before adding markers.
-   */
+  /** Starts observing performance measurements. Must be called before adding markers. */
   start(): void {
     this.#performanceObserver = new PerformanceObserver(() => {
       /* just an empty callback because we don't want to do anything when markers are added */

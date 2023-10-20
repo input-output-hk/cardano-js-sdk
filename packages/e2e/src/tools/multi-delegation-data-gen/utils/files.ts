@@ -6,9 +6,7 @@ export enum Paths {
   WalletUtxos = 'utxos'
 }
 
-/**
- * Functions to create/delete and read/write files and folders.
- */
+/** Functions to create/delete and read/write files and folders. */
 export const Files = {
   /**
    * This method is intended to concatenate individual strings into a single string that represents a file path.

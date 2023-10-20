@@ -7,9 +7,7 @@ import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 
 const EMBEDDED_GROUP_SIZE = 2;
 
-/**
- * This certificate registers the Hot and Cold credentials of a committee member.
- */
+/** This certificate registers the Hot and Cold credentials of a committee member. */
 export class AuthCommitteeHot {
   #committeeColdCred: Cardano.Credential;
   #committeeHotCred: Cardano.Credential;

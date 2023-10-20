@@ -7,9 +7,7 @@ export type UnifiedEventHandler<PropsIn, PropsOut> = (
   evt: RollForwardEvent<PropsIn> | RollBackwardEvent<PropsIn & WithBlock>
 ) => MaybeObservable<RollForwardEvent<PropsOut> | RollBackwardEvent<PropsOut & WithBlock>>;
 
-/**
- * Convenience utility to create an operator that works the same with both RollForward and RollBackward events.
- */
+/** Convenience utility to create an operator that works the same with both RollForward and RollBackward events. */
 export const unifiedProjectorOperator = <PropsIn, PropsOut = PropsIn>(
   handler: UnifiedEventHandler<PropsIn, PropsOut>
 ) =>

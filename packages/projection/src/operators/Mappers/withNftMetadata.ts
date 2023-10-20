@@ -11,13 +11,9 @@ import uniqBy from 'lodash/uniqBy';
 export interface ProjectedNftMetadata {
   userTokenAssetId: Cardano.AssetId;
   nftMetadata: Asset.NftMetadata;
-  /**
-   * Only present on cip68 metadata
-   */
+  /** Only present on cip68 metadata */
   referenceTokenAssetId?: Cardano.AssetId;
-  /**
-   * Only present on cip68 metadata
-   */
+  /** Only present on cip68 metadata */
   extra?: Cardano.PlutusData;
 }
 

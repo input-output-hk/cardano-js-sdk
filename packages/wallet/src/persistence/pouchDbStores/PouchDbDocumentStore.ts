@@ -5,9 +5,7 @@ import { Logger } from 'ts-log';
 import { PouchDbStore } from './PouchDbStore';
 import { sanitizePouchDbDoc } from './util';
 
-/**
- * PouchDB implementation that uses a shared db for multiple PouchDbDocumentStores
- */
+/** PouchDB implementation that uses a shared db for multiple PouchDbDocumentStores */
 export class PouchDbDocumentStore<T extends {}> extends PouchDbStore<T> implements DocumentStore<T> {
   readonly #docId: string;
 

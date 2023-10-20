@@ -34,10 +34,7 @@ const trezorTxTransformer = async (
   };
 };
 
-/**
- * Takes a core transaction and context data necessary to transform
- * it into a trezor.CardanoSignTransaction
- */
+/** Takes a core transaction and context data necessary to transform it into a trezor.CardanoSignTransaction */
 export const txToTrezor = ({
   cardanoTxBody,
   chainId,

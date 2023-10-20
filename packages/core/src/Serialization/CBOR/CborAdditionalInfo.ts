@@ -1,6 +1,4 @@
-/**
- * Represents the 5-bit additional information included in a CBOR initial byte.
- */
+/** Represents the 5-bit additional information included in a CBOR initial byte. */
 export enum CborAdditionalInfo {
   AdditionalFalse = 20,
   AdditionalTrue = 21,

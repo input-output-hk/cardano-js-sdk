@@ -3,17 +3,13 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { HexBlob } from '@cardano-sdk/util';
 import { Slot } from './Block';
 
-/**
- * Plutus script type.
- */
+/** Plutus script type. */
 export enum ScriptType {
   Native = 'native',
   Plutus = 'plutus'
 }
 
-/**
- * native script kind.
- */
+/** native script kind. */
 export enum NativeScriptKind {
   RequireSignature = 0,
   RequireAllOf = 1,
@@ -31,19 +27,13 @@ export enum NativeScriptKind {
  * key hash.
  */
 export interface RequireSignatureScript {
-  /**
-   * Script type.
-   */
+  /** Script type. */
   __type: ScriptType.Native;
 
-  /**
-   * The hash of a verification key.
-   */
+  /** The hash of a verification key. */
   keyHash: Crypto.Ed25519KeyHashHex;
 
-  /**
-   * The native script kind.
-   */
+  /** The native script kind. */
   kind: NativeScriptKind.RequireSignature;
 }
 
@@ -53,19 +43,13 @@ export interface RequireSignatureScript {
  * If the list of sub-scripts is empty, this script evaluates to true.
  */
 export interface RequireAllOfScript {
-  /**
-   * Script type.
-   */
+  /** Script type. */
   __type: ScriptType.Native;
 
-  /**
-   * The list of sub-scripts.
-   */
+  /** The list of sub-scripts. */
   scripts: NativeScript[];
 
-  /**
-   * The native script kind.
-   */
+  /** The native script kind. */
   kind: NativeScriptKind.RequireAllOf;
 }
 
@@ -76,44 +60,28 @@ export interface RequireAllOfScript {
  * If the list of sub-scripts is empty, this script evaluates to false.
  */
 export interface RequireAnyOfScript {
-  /**
-   * Script type.
-   */
+  /** Script type. */
   __type: ScriptType.Native;
 
-  /**
-   * The list of sub-scripts.
-   */
+  /** The list of sub-scripts. */
   scripts: NativeScript[];
 
-  /**
-   * The native script kind.
-   */
+  /** The native script kind. */
   kind: NativeScriptKind.RequireAnyOf;
 }
 
-/**
- * This script evaluates to true if at least M (required field) of the sub-scripts evaluate to true.
- */
+/** This script evaluates to true if at least M (required field) of the sub-scripts evaluate to true. */
 export interface RequireAtLeastScript {
-  /**
-   * Script type.
-   */
+  /** Script type. */
   __type: ScriptType.Native;
 
-  /**
-   * The number of sub-scripts that must evaluate to true for this script to evaluate to true.
-   */
+  /** The number of sub-scripts that must evaluate to true for this script to evaluate to true. */
   required: number;
 
-  /**
-   * The list of sub-scripts.
-   */
+  /** The list of sub-scripts. */
   scripts: NativeScript[];
 
-  /**
-   * The native script kind.
-   */
+  /** The native script kind. */
   kind: NativeScriptKind.RequireNOf;
 }
 
@@ -125,19 +93,13 @@ export interface RequireAtLeastScript {
  * (strictly) less than slot number X.
  */
 export interface RequireTimeBeforeScript {
-  /**
-   * Script type.
-   */
+  /** Script type. */
   __type: ScriptType.Native;
 
-  /**
-   * The slot number specifying the upper bound of the validity interval.
-   */
+  /** The slot number specifying the upper bound of the validity interval. */
   slot: Slot;
 
-  /**
-   * The native script kind.
-   */
+  /** The native script kind. */
   kind: NativeScriptKind.RequireTimeBefore;
 }
 
@@ -149,19 +111,13 @@ export interface RequireTimeBeforeScript {
  * is greater than or equal to slot number X.
  */
 export interface RequireTimeAfterScript {
-  /**
-   * Script type.
-   */
+  /** Script type. */
   __type: ScriptType.Native;
 
-  /**
-   * The slot number specifying the lower bound of the validity interval.
-   */
+  /** The slot number specifying the lower bound of the validity interval. */
   slot: Slot;
 
-  /**
-   * The native script kind.
-   */
+  /** The native script kind. */
   kind: NativeScriptKind.RequireTimeAfter;
 }
 
@@ -187,9 +143,7 @@ export type NativeScript =
  * is generally no requirement that they be similar or compatible in any way.
  */
 export enum PlutusLanguageVersion {
-  /**
-   * V1 was the initial version of Plutus, introduced in the Alonzo hard fork.
-   */
+  /** V1 was the initial version of Plutus, introduced in the Alonzo hard fork. */
   V1 = 0,
 
   /**
@@ -225,9 +179,7 @@ export interface PlutusScript {
   version: PlutusLanguageVersion;
 }
 
-/**
- * Program that decides whether the transaction that spends the output is authorized to do so.
- */
+/** Program that decides whether the transaction that spends the output is authorized to do so. */
 export type Script = NativeScript | PlutusScript;
 
 /**

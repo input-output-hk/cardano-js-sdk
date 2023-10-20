@@ -10,10 +10,7 @@ export interface DelegationsAndRewards {
 }
 
 export interface Delegatee {
-  /**
-   * Rewards at the end of current epoch will
-   * be from this stake pool
-   */
+  /** Rewards at the end of current epoch will be from this stake pool */
   currentEpoch?: StakePool;
   nextEpoch?: StakePool;
   nextNextEpoch?: StakePool;

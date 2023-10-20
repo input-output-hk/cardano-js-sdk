@@ -3,9 +3,7 @@ import { HexBlob } from '@cardano-sdk/util';
 import { PlutusData } from './PlutusData';
 import { bytesToHex, hexToBytes } from '../../util/misc';
 
-/**
- * A list of plutus data.
- */
+/** A list of plutus data. */
 export class PlutusList {
   readonly #array = new Array<PlutusData>();
   #useIndefiniteEncoding = true;

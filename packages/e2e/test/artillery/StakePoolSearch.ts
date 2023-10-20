@@ -9,19 +9,13 @@ import { stakePoolHttpProvider } from '@cardano-sdk/cardano-services-client';
  * Hooks must record here the state of the session of current artillery virtual user
  */
 interface StakePoolSearchVars extends Paginated<Cardano.StakePool> {
-  /**
-   * The arguments used for the query; to repeat the same query, but next page, on next iteration
-   */
+  /** The arguments used for the query; to repeat the same query, but next page, on next iteration */
   args: QueryStakePoolsArgs;
 
-  /**
-   * `performQuery()` stores here if it gets an error from the query to let `moreResults()` knows when exit on error
-   */
+  /** `performQuery()` stores here if it gets an error from the query to let `moreResults()` knows when exit on error */
   gotError?: boolean;
 
-  /**
-   * The result of the health check performed at the beginning of virtual user session
-   */
+  /** The result of the health check performed at the beginning of virtual user session */
   healthCheckResult: boolean;
 }
 
@@ -30,15 +24,10 @@ const provider = stakePoolHttpProvider({ baseUrl: env.STAKE_POOL_PROVIDER_URL, l
 
 const PAGE_SIZE = 20;
 
-/**
- * The set of pools id found while getting results
- */
+/** The set of pools id found while getting results */
 const poolIds: Cardano.PoolId[] = [];
 
-/**
- * The artillery uid of the first artillery virtual user.
- * Used to track time of first request to measure cache efficiency
- */
+/** The artillery uid of the first artillery virtual user. Used to track time of first request to measure cache efficiency */
 let firstUser = '';
 
 /**

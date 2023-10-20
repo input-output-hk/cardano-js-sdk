@@ -4,13 +4,9 @@ import { PoolIdHex } from './primitives';
  * by using YYYYMMDDxx (xx each day start by 01 and is incremented on each update
  */
 export type SerialNumber = number;
-/**
- * Stake pool location
- */
+/** Stake pool location */
 export type DeclaredPoolLocation = string;
-/**
- * the current operative status
- */
+/** the current operative status */
 export enum ExtendedPoolStatus {
   Active = 'active',
   Retired = 'retired',
@@ -18,114 +14,60 @@ export enum ExtendedPoolStatus {
   Experimental = 'experimental',
   Private = 'private'
 }
-/**
- * the pools preferred communication channel
- */
+/** the pools preferred communication channel */
 export type PrimaryContactPreference = string;
-/**
- * valid email contact address
- */
+/** valid email contact address */
 export type EmailAddress = string;
-/**
- * a user or page name
- */
+/** a user or page name */
 export type FacebookAccount = string;
-/**
- * a github account
- */
+/** a github account */
 export type GithubAccount = string;
-/**
- * RSS feed URL
- */
+/** RSS feed URL */
 export type RSSFeed = string;
-/**
- * a telegram account
- */
+/** a telegram account */
 export type TelegramAccount = string;
-/**
- * a twitter account
- */
+/** a twitter account */
 export type TwitterAccount = string;
-/**
- * a youtube account or channel name
- */
+/** a youtube account or channel name */
 export type YoutubeAccount = string;
-/**
- * a discord account or channel name
- */
+/** a discord account or channel name */
 export type DiscordAccount = string;
-/**
- * a twitch account
- */
+/** a twitch account */
 export type TwitchAccount = string;
-/**
- * PNG image with exact 64x64 pixel size
- */
+/** PNG image with exact 64x64 pixel size */
 export type PoolIconInPNGFileFormat64X64Px = string;
-/**
- * PNG image (should have less than 250 kByte of file size)
- */
+/** PNG image (should have less than 250 kByte of file size) */
 export type PoolLogoInPNGFileFormat = string;
-/**
- * (should have less tha 250 kByte of file size)
- */
+/** (should have less tha 250 kByte of file size) */
 export type PoolLogoInSVGFileFormat = string;
-/**
- * RGB color code.
- */
+/** RGB color code. */
 export type PoolPrimaryColor = string;
-/**
- * RGB color code.
- */
+/** RGB color code. */
 export type PoolSecondaryColor = string;
-/**
- * The ITN pool's owner public key
- */
+/** The ITN pool's owner public key */
 export type TheITNPoolOwnerPublicKey = string;
-/**
- * The witness's secret generated key
- */
+/** The witness's secret generated key */
 export type TheSecretKeyGeneratedWitness = string;
-/**
- * Stake Pool about info
- */
+/** Stake Pool about info */
 export type MeAboutInfo = string;
-/**
- * Stake Pool server info
- */
+/** Stake Pool server info */
 export type ServerAboutInfo = string;
-/**
- * Stake Pool company about info
- */
+/** Stake Pool company about info */
 export type CompanyAboutInfo = string;
-/**
- * Stake Pool company name
- */
+/** Stake Pool company name */
 export type CompanyName = string;
-/**
- * Stake Pool company address
- */
+/** Stake Pool company address */
 export type CompanyAddress = string;
-/**
- * Stake Pool company city
- */
+/** Stake Pool company city */
 export type CompanyCity = string;
-/**
- * Stake Pool company country
- */
+/** Stake Pool company country */
 export type CompanyCountry = string;
-/**
- * Stake Pool company id
- */
+/** Stake Pool company id */
 export type CompanyId = string;
-/**
- * Stake Pool company VAT id
- */
+/** Stake Pool company VAT id */
 export type CompanyVatId = string;
 
-/**
- * Optional contact information.
- */
+/** Optional contact information. */
 export interface PoolContactData {
   primary?: PrimaryContactPreference;
   email?: EmailAddress;
@@ -140,9 +82,7 @@ export interface PoolContactData {
   [k: string]: unknown;
 }
 
-/**
- * Media file URLs and colors
- */
+/** Media file URLs and colors */
 export interface ThePoolsMediaAssets {
   icon_png_64x64?: PoolIconInPNGFileFormat64X64Px;
   logo_png?: PoolLogoInPNGFileFormat;
@@ -152,18 +92,14 @@ export interface ThePoolsMediaAssets {
   [k: string]: unknown;
 }
 
-/**
- * A proof of ownership for an established ITN pool brand.
- */
+/** A proof of ownership for an established ITN pool brand. */
 export interface ITNVerification {
   owner?: TheITNPoolOwnerPublicKey;
   witness?: TheSecretKeyGeneratedWitness;
   [k: string]: unknown;
 }
 
-/**
- * Optional company information.
- */
+/** Optional company information. */
 export interface PoolCompanyInfo {
   name?: CompanyName;
   addr?: CompanyAddress;
@@ -174,9 +110,7 @@ export interface PoolCompanyInfo {
   [k: string]: unknown;
 }
 
-/**
- * Optional about information.
- */
+/** Optional about information. */
 export interface PoolAboutInfo {
   me?: MeAboutInfo;
   server?: ServerAboutInfo;
@@ -184,9 +118,7 @@ export interface PoolAboutInfo {
   [k: string]: unknown;
 }
 
-/**
- * pool related metadata
- */
+/** pool related metadata */
 export interface ExtendedStakePoolMetadataFields {
   id?: PoolIdHex;
   location?: DeclaredPoolLocation;
@@ -199,9 +131,7 @@ export interface ExtendedStakePoolMetadataFields {
   [k: string]: unknown;
 }
 
-/**
- * additional information for Cardano Stake Pools
- */
+/** additional information for Cardano Stake Pools */
 export interface ExtendedStakePoolMetadata {
   serial?: SerialNumber;
   pool: ExtendedStakePoolMetadataFields;

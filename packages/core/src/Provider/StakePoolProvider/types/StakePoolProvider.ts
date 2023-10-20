@@ -17,40 +17,26 @@ export type FilterIdentifiers = Partial<
 >;
 
 export interface MultipleChoiceSearchFilter<T> {
-  /**
-   * Defaults to 'or'
-   */
+  /** Defaults to 'or' */
   _condition?: FilterCondition;
   values: T[];
 }
 
 export interface QueryStakePoolsArgs {
-  /**
-   * Will return all stake pools sorted by name ascending if not specified
-   */
+  /** Will return all stake pools sorted by name ascending if not specified */
   sort?: StakePoolSortOptions;
-  /**
-   * Will fetch all stake pools if not specified
-   */
+  /** Will fetch all stake pools if not specified */
   filters?: {
-    /**
-     * Defaults to 'and'
-     */
+    /** Defaults to 'and' */
     _condition?: FilterCondition;
-    /**
-     * Will return results for partial matches
-     */
+    /** Will return results for partial matches */
     identifier?: MultipleChoiceSearchFilter<FilterIdentifiers>;
     pledgeMet?: boolean;
     status?: Cardano.StakePoolStatus[];
   };
-  /**
-   * Used for APY metric computation. It will take 3 epochs back if not specified
-   */
+  /** Used for APY metric computation. It will take 3 epochs back if not specified */
   apyEpochsBackLimit?: number;
-  /**
-   * Will return all stake pools matching the query if not specified
-   */
+  /** Will return all stake pools matching the query if not specified */
   pagination: PaginationArgs;
 }
 

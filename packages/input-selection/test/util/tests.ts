@@ -5,38 +5,24 @@ import { InputSelectionError, InputSelectionFailure } from '../../src/InputSelec
 import { assertInputSelectionProperties } from './properties';
 
 export interface InputSelectionPropertiesTestParams {
-  /**
-   * Test subject (Input Selection algorithm under test)
-   */
+  /** Test subject (Input Selection algorithm under test) */
   getAlgorithm: () => InputSelector;
-  /**
-   * Available UTxO
-   */
+  /** Available UTxO */
   createUtxo: () => Cardano.Utxo[];
-  /**
-   * Transaction outputs
-   */
+  /** Transaction outputs */
   createOutputs: () => Cardano.TxOut[];
-  /**
-   * Transaction outputs
-   */
+  /** Transaction outputs */
   implicitValue?: ImplicitValue;
-  /**
-   * Input selection constraints passed to the algorithm.
-   */
+  /** Input selection constraints passed to the algorithm. */
   mockConstraints: SelectionConstraints.MockSelectionConstraints;
 }
 
 export interface InputSelectionFailureModeTestParams extends InputSelectionPropertiesTestParams {
-  /**
-   * Error that should be thrown
-   */
+  /** Error that should be thrown */
   expectedError: InputSelectionFailure;
 }
 
-/**
- * Run input selection and assert that implementation throws error of specific failure.
- */
+/** Run input selection and assert that implementation throws error of specific failure. */
 export const testInputSelectionFailureMode = async ({
   getAlgorithm,
   createUtxo,
@@ -58,9 +44,7 @@ export const testInputSelectionFailureMode = async ({
   ).rejects.toThrowError(new InputSelectionError(expectedError));
 };
 
-/**
- * Run input selection and assert properties
- */
+/** Run input selection and assert properties */
 export const testInputSelectionProperties = async ({
   getAlgorithm,
   createUtxo,

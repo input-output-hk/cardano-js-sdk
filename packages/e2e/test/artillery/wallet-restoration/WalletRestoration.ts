@@ -79,9 +79,7 @@ export const getAddresses: FunctionHook<WalletVars> = async ({ vars }, _, done) 
   done();
 };
 
-/**
- * The current index of found addresses list
- */
+/** The current index of found addresses list */
 let index = 0;
 
 export const walletRestoration: FunctionHook<WalletVars> = async ({ vars, _uid }, ee, done) => {

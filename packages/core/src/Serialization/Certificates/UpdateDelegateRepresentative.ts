@@ -9,9 +9,7 @@ import { hexToBytes } from '../../util/misc';
 
 const EMBEDDED_GROUP_SIZE = 2;
 
-/**
- * Updates the DRep anchored metadata.
- */
+/** Updates the DRep anchored metadata. */
 export class UpdateDelegateRepresentative {
   #drepCredential: Cardano.Credential;
   #anchor: Anchor | undefined;

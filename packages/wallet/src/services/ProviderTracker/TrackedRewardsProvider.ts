@@ -20,9 +20,7 @@ export class RewardsProviderStats {
   }
 }
 
-/**
- * Wraps a RewardsProvider, tracking # of calls of each function
- */
+/** Wraps a RewardsProvider, tracking # of calls of each function */
 export class TrackedRewardsProvider extends ProviderTracker implements RewardsProvider {
   readonly stats = new RewardsProviderStats();
   readonly healthCheck: RewardsProvider['healthCheck'];

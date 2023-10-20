@@ -10,19 +10,13 @@ const logLevelLabels = ['', 'TRACE  ', 'DEBUG  ', 'INFO   ', 'WARNING', 'ERROR  
 type LogLevel = keyof typeof logLevels;
 type LoggerEntry = [LogLevel, number];
 
-/**
- * The base log function
- */
+/** The base log function */
 export type LogFunction = (...args: unknown[]) => void;
 
-/**
- * Recorder messages is an Array of Objects of this type
- */
+/** Recorder messages is an Array of Objects of this type */
 export type LoggedMessage = { level: LogLevel; message: unknown[] };
 
-/**
- * The base logger object
- */
+/** The base logger object */
 export type Logger = { [l in LogLevel]: LogFunction };
 
 /**
@@ -33,23 +27,15 @@ export type TestLogger = Logger & { messages: LoggedMessage[]; reset: () => void
 
 type TestStream = { columns?: number; isTTY?: boolean; write: Function };
 
-/**
- * Options for createLogger
- */
+/** Options for createLogger */
 export interface TestLoggerOptions {
-  /**
-   * The environment variables to use. Default: process.env - Used to test TestLogger
-   */
+  /** The environment variables to use. Default: process.env - Used to test TestLogger */
   env?: NodeJS.ProcessEnv;
 
-  /**
-   * If true, the logger will records all the logged values. - Default: false
-   */
+  /** If true, the logger will records all the logged values. - Default: false */
   record?: boolean;
 
-  /**
-   * The stream to write logs. Default: process.stdout - Used to test TestLogger
-   */
+  /** The stream to write logs. Default: process.stdout - Used to test TestLogger */
   stream?: TestStream;
 }
 
@@ -134,7 +120,5 @@ export const createLogger = (options: TestLoggerOptions = {}) => {
   return <TestLogger>{ messages, reset, ...logger };
 };
 
-/**
- * The default logger
- */
+/** The default logger */
 export const logger = createLogger();

@@ -9,9 +9,7 @@ import { hexToBytes } from '../../util/misc';
 
 const EMBEDDED_GROUP_SIZE = 2;
 
-/**
- * This certificate Register the stake key and delegate with a single certificate to a DRep.
- */
+/** This certificate Register the stake key and delegate with a single certificate to a DRep. */
 export class VoteRegistrationDelegation {
   #credential: Cardano.Credential;
   #dRep: DRep;

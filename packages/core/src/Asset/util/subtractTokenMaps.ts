@@ -1,9 +1,7 @@
 import { TokenMap } from '../../Cardano';
 import { isNotNil } from '@cardano-sdk/util';
 
-/**
- * Subtract asset quantities in order
- */
+/** Subtract asset quantities in order */
 export const subtractTokenMaps = (assets: (TokenMap | undefined)[]): TokenMap | undefined => {
   if (assets.length <= 0 || !isNotNil(assets[0])) return undefined;
   const result: TokenMap = new Map(assets[0]);

@@ -219,9 +219,7 @@ export class Voter {
     });
   }
 
-  /**
-   * Gets the voter kind.
-   */
+  /** Gets the voter kind. */
   kind(): VoterKind {
     return this.#kind;
   }

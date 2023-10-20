@@ -8,9 +8,7 @@ import { ScriptLanguage } from './ScriptLanguage';
 
 const SCRIPT_SUBGROUP = 2;
 
-/**
- * Program that decides whether the transaction that spends the output is authorized to do so.
- */
+/** Program that decides whether the transaction that spends the output is authorized to do so. */
 export class Script {
   #nativeScript: NativeScript | undefined;
   #plutusV1: PlutusV1Script | undefined;

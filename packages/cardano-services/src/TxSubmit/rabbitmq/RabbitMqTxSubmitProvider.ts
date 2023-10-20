@@ -15,32 +15,22 @@ import { fromSerializableObject, hexStringToBuffer } from '@cardano-sdk/util';
 
 const moduleName = 'RabbitMqTxSubmitProvider';
 
-/**
- * Configuration options parameters for the RabbitMqTxSubmitProvider
- */
+/** Configuration options parameters for the RabbitMqTxSubmitProvider */
 export interface RabbitMqTxSubmitProviderConfig {
-  /**
-   * The RabbitMQ connection URL
-   */
+  /** The RabbitMQ connection URL */
   rabbitmqUrl: URL;
 }
 
-/**
- * Connect to a [RabbitMQ](https://www.rabbitmq.com/) instance
- */
+/** Connect to a [RabbitMQ](https://www.rabbitmq.com/) instance */
 export class RabbitMqTxSubmitProvider implements TxSubmitProvider {
   #channel?: Channel;
   #connection?: Connection;
   #queueWasCreated = false;
 
-  /**
-   * The configuration options
-   */
+  /** The configuration options */
   #config: RabbitMqTxSubmitProviderConfig;
 
-  /**
-   *  The dependency objects
-   */
+  /** The dependency objects */
   #dependencies: ProviderDependencies;
 
   /**
@@ -52,9 +42,7 @@ export class RabbitMqTxSubmitProvider implements TxSubmitProvider {
     this.#dependencies = dependencies;
   }
 
-  /**
-   * Connects to the RabbitMQ server and create the channel
-   */
+  /** Connects to the RabbitMQ server and create the channel */
   async #connectAndCreateChannel() {
     if (this.#connection) return;
 
@@ -100,9 +88,7 @@ export class RabbitMqTxSubmitProvider implements TxSubmitProvider {
     }
   }
 
-  /**
-   * Closes the connection to RabbitMQ and (for internal purposes) it resets the state as well
-   */
+  /** Closes the connection to RabbitMQ and (for internal purposes) it resets the state as well */
   async close() {
     // Wait for pending operations before closing
     await waitForPending(this.#channel);

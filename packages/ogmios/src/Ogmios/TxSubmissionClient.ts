@@ -4,9 +4,7 @@ import { WebSocket } from '@cardano-ogmios/client/dist/IsomorphicWebSocket';
 import { baseRequest } from '@cardano-ogmios/client/dist/Request';
 import { nanoid } from 'nanoid';
 
-/**
- * See also {@link createTxSubmissionClient} for creating a client.
- */
+/** See also {@link createTxSubmissionClient} for creating a client. */
 export interface TxSubmissionClient {
   context: InteractionContext;
   submitTx: (bytes: string) => Promise<TxId>;
@@ -50,9 +48,7 @@ const waitForResponse =
     }
   };
 
-/**
- * Create a client for submitting signed transactions to underlying Cardano chain.
- */
+/** Create a client for submitting signed transactions to underlying Cardano chain. */
 export const createTxSubmissionClient = async (context: InteractionContext): Promise<TxSubmissionClient> =>
   Promise.resolve({
     context,

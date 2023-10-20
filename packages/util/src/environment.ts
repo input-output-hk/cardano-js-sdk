@@ -1,6 +1,4 @@
-/**
- * Node.js environment configurations.
- */
+/** Node.js environment configurations. */
 export enum Environment {
   /**
    * Production environment.
@@ -10,9 +8,7 @@ export enum Environment {
    */
   Production = 'production',
 
-  /**
-   * Development environment.
-   */
+  /** Development environment. */
   Development = 'development'
 }
 

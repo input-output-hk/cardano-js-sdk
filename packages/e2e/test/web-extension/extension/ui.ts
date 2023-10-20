@@ -165,10 +165,7 @@ const deactivateWallet = async (): Promise<void> => {
   clearWalletValues();
 };
 
-/**
- * Wallet does not have any active delegations.
- * Show a `<p class="noDelegation">No delegation found</p>`
- */
+/** Wallet does not have any active delegations. Show a `<p class="noDelegation">No delegation found</p>` */
 const createEmptyDelegationEl = () => {
   const emptyDistribution = document.createElement('p');
   emptyDistribution.classList.add('noDelegation');
@@ -176,10 +173,7 @@ const createEmptyDelegationEl = () => {
   return emptyDistribution;
 };
 
-/**
- * Create a list item for a delegation
- * `<li> <span class="poolId">thePoolId</span> <span class="percent">50</span> </li>`
- */
+/** Create a list item for a delegation `<li> <span class="poolId">thePoolId</span> <span class="percent">50</span> </li>` */
 const createDelegationLi = (poolId: string, percent: string) => {
   const delegationLi = document.createElement('li');
   const poolIdSpan = document.createElement('span');

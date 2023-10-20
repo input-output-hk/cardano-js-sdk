@@ -23,10 +23,7 @@ import express from 'express';
 export interface ProjectionServiceProps<T> {
   projection$: Observable<T>;
   projectionNames: ProjectionName[];
-  /**
-   * Service will report unhealthy if it didn't project a block in `healthTimeout` ms.
-   * 60_000 by default.
-   */
+  /** Service will report unhealthy if it didn't project a block in `healthTimeout` ms. 60_000 by default. */
   healthTimeout?: Milliseconds;
   dryRun?: boolean;
 }

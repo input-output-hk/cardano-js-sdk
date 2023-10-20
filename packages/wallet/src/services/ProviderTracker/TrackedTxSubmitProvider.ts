@@ -19,9 +19,7 @@ export class TxSubmitProviderStats {
   }
 }
 
-/**
- * Wraps a TxSubmitProvider, tracking # of calls of each function
- */
+/** Wraps a TxSubmitProvider, tracking # of calls of each function */
 export class TrackedTxSubmitProvider extends ProviderTracker implements TxSubmitProvider {
   readonly stats = new TxSubmitProviderStats();
   readonly healthCheck: TxSubmitProvider['healthCheck'];

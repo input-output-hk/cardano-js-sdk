@@ -52,15 +52,11 @@ const variableLengthDecode = (array: Buffer): { value: number; bytesRead: number
   return { bytesRead, value };
 };
 
-/**
- * A transaction index (within a slot).
- */
+/** A transaction index (within a slot). */
 export type TxIndex = OpaqueNumber<'TxIndex'>;
 export const TxIndex = (value: number): TxIndex => value as unknown as TxIndex;
 
-/**
- * A (delegation) certificate index (within a transaction).
- */
+/** A (delegation) certificate index (within a transaction). */
 export type CertIndex = OpaqueNumber<'CertIndex'>;
 export const CertIndex = (value: number): CertIndex => value as unknown as CertIndex;
 
@@ -118,9 +114,7 @@ export class PointerAddress {
     });
   }
 
-  /**
-   * Gets the payment credential part of the pointer address.
-   */
+  /** Gets the payment credential part of the pointer address. */
   getPaymentCredential(): Credential {
     return this.#paymentPart;
   }
@@ -133,9 +127,7 @@ export class PointerAddress {
     return this.#pointer;
   }
 
-  /**
-   * Converts from PointerAddress instance to Address.
-   */
+  /** Converts from PointerAddress instance to Address. */
   toAddress(): Address {
     return new Address({
       networkId: this.#networkId,

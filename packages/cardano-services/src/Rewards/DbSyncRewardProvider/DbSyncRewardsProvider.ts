@@ -9,13 +9,9 @@ import {
 import { RewardsBuilder } from './RewardsBuilder';
 import { rewardsToCore } from './mappers';
 
-/**
- * Properties that are need to create DbSyncRewardsProvider
- */
+/** Properties that are need to create DbSyncRewardsProvider */
 export interface RewardsProviderProps {
-  /**
-   * Pagination page size limit used for provider methods constraint.
-   */
+  /** Pagination page size limit used for provider methods constraint. */
   paginationPageSizeLimit: number;
 }
 

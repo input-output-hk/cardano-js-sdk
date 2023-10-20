@@ -15,9 +15,7 @@ export interface ProviderFnStats {
 
 export const CLEAN_FN_STATS: ProviderFnStats = { numCalls: 0, numFailures: 0, numResponses: 0 };
 
-/**
- * Wraps a Provider, tracking # of calls of each function
- */
+/** Wraps a Provider, tracking # of calls of each function */
 export abstract class ProviderTracker {
   protected async trackedCall<T>(call: () => Promise<T>, tracker: BehaviorSubject<ProviderFnStats>) {
     tracker.next({ ...tracker.value, numCalls: tracker.value.numCalls + 1 });

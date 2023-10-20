@@ -10,9 +10,7 @@ import { SerializationError, SerializationFailure } from '../../errors';
 import { VkeyWitness } from './VkeyWitness';
 import uniqWith from 'lodash/uniqWith';
 
-/**
- * This type represents the segregated CDDL scripts.
- */
+/** This type represents the segregated CDDL scripts. */
 type CddlScripts = {
   native: Array<NativeScript> | undefined;
   plutusV1: Array<PlutusV1Script> | undefined;

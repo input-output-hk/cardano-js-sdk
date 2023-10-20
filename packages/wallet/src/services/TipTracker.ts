@@ -28,9 +28,7 @@ export interface TipTrackerProps {
   syncStatus: SyncStatus;
   connectionStatus$: Observable<ConnectionStatus>;
   store: DocumentStore<Cardano.Tip>;
-  /**
-   * Once
-   */
+  /** Once */
   minPollInterval: Milliseconds;
   maxPollInterval: Milliseconds;
   logger: Logger;

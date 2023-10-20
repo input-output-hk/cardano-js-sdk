@@ -12,10 +12,7 @@ export type ProviderHandler<Args = any, ResponseBody = any, Handler extends (...
   handler: Handler
 ) => void;
 
-/**
- * Parse provider method arguments, as sent by createHttpClient<T>.
- * Arguments themselves are not validated.
- */
+/** Parse provider method arguments, as sent by createHttpClient<T>. Arguments themselves are not validated. */
 export const providerHandler =
   <Handler extends (...args: any) => any>(handlerFn: Handler) =>
   <Args = Parameters<Handler>, ResponseBody = Awaited<ReturnType<Handler>>>(

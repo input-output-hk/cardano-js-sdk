@@ -3,9 +3,7 @@ import { Pool, QueryResult } from 'pg';
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-/**
- * Waits until the local network is ready or the wait time expires.
- */
+/** Waits until the local network is ready or the wait time expires. */
 (async () => {
   const { DB_SYNC_CONNECTION_STRING, LOCAL_NETWORK_READY_WAIT_TIME } = process.env;
 

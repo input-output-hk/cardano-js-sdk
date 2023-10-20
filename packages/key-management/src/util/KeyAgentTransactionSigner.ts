@@ -4,9 +4,7 @@ import { ProofGenerationError } from '../errors';
 
 const EXPECTED_SIG_NUM = 1;
 
-/**
- * Generates a Ed25519Signature of a transaction using a key agent.
- */
+/** Generates a Ed25519Signature of a transaction using a key agent. */
 export class KeyAgentTransactionSigner implements TransactionSigner {
   #keyAgent: KeyAgent;
   #account: AccountKeyDerivationPath;

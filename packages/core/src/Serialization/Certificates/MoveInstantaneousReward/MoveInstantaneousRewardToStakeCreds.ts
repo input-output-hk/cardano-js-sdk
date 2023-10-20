@@ -5,10 +5,7 @@ import { HexBlob, InvalidArgumentError, InvalidStateError } from '@cardano-sdk/u
 
 const EMBEDDED_GROUP_SIZE = 2;
 
-/**
- * Creates a move instantaneous rewards certificate that transfers funds
- * to the given set of reward accounts.
- */
+/** Creates a move instantaneous rewards certificate that transfers funds to the given set of reward accounts. */
 export class MoveInstantaneousRewardToStakeCreds {
   #pot: Cardano.MirCertificatePot;
   #credentials: Map<Cardano.Credential, Cardano.Lovelace>;

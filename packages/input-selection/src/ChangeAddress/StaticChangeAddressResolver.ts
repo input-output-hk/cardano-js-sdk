@@ -5,9 +5,7 @@ import { InvalidStateError } from '@cardano-sdk/util';
 
 export type GetAddresses = () => Promise<GroupedAddress[]>;
 
-/**
- * Default change address resolver.
- */
+/** Default change address resolver. */
 export class StaticChangeAddressResolver implements ChangeAddressResolver {
   readonly #getAddresses: GetAddresses;
 
@@ -20,9 +18,7 @@ export class StaticChangeAddressResolver implements ChangeAddressResolver {
     this.#getAddresses = getAddresses;
   }
 
-  /**
-   * Always resolves to the same address.
-   */
+  /** Always resolves to the same address. */
   async resolve(selection: Selection): Promise<Array<Cardano.TxOut>> {
     const groupedAddresses = await this.#getAddresses();
 

@@ -13,9 +13,7 @@ const DATUM_ARRAY_SIZE = 2;
  */
 const isDatumHash = (datum: unknown): datum is Cardano.DatumHash => datum !== null && typeof datum === 'string';
 
-/**
- * Represents different ways of associating a Datum with a UTxO in a transaction.
- */
+/** Represents different ways of associating a Datum with a UTxO in a transaction. */
 export enum DatumKind {
   /**
    * Instead of including the full Datum directly within the transaction, it's possible to

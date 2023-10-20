@@ -7,9 +7,7 @@ import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 
 const EMBEDDED_GROUP_SIZE = 2;
 
-/**
- * This certificate Register the stake key and delegate with a single certificate to a stake pool.
- */
+/** This certificate Register the stake key and delegate with a single certificate to a stake pool. */
 export class StakeRegistrationDelegation {
   #credential: Cardano.Credential;
   #poolKeyHash: Crypto.Ed25519KeyHashHex;

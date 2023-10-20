@@ -8,9 +8,7 @@ export interface SelectionSkeleton {
    * that has been selected from the wallet in order to cover the total payment value.
    */
   inputs: Set<Cardano.Utxo>;
-  /**
-   * Set of payments to be made to recipient addresses.
-   */
+  /** Set of payments to be made to recipient addresses. */
   outputs: Set<Cardano.TxOut>;
   /**
    * A set of change values. Does not account for fee.
@@ -67,37 +65,22 @@ export interface SelectionConstraints {
   computeSelectionLimit: ComputeSelectionLimit;
 }
 
-/**
- * Implicit input or spent value
- */
+/** Implicit input or spent value */
 export interface ImplicitValue {
-  /**
-   * Implicit coin quantities used in the transaction
-   */
+  /** Implicit coin quantities used in the transaction */
   coin?: Cardano.util.ImplicitCoin;
-  /**
-   * Positive quantity = mint (implicit input)
-   * Negative quantity = burn (implicit spend)
-   */
+  /** Positive quantity = mint (implicit input) Negative quantity = burn (implicit spend) */
   mint?: Cardano.TokenMap;
 }
 
 export interface InputSelectionParameters {
-  /**
-   * The set of inputs available for selection.
-   */
+  /** The set of inputs available for selection. */
   utxo: Set<Cardano.Utxo>;
-  /**
-   * The set of outputs requested for payment.
-   */
+  /** The set of outputs requested for payment. */
   outputs: Set<Cardano.TxOut>;
-  /**
-   * Input selection constraints
-   */
+  /** Input selection constraints */
   constraints: SelectionConstraints;
-  /**
-   * Implicit input or spent value
-   */
+  /** Implicit input or spent value */
   implicitValue?: ImplicitValue;
 }
 

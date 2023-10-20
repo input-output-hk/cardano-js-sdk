@@ -1,10 +1,7 @@
 import { Freeable } from './types';
 import { isPromise } from './isPromise';
 
-/**
- * A scope to ease the management of objects that require manual resource management.
- *
- */
+/** A scope to ease the management of objects that require manual resource management. */
 export class ManagedFreeableScope {
   #scopeStack: Freeable[] = [];
   #disposed = false;
@@ -23,9 +20,7 @@ export class ManagedFreeableScope {
     return freeable;
   }
 
-  /**
-   * Once the freeable objects being managed are no longer being accessed, call this method.
-   */
+  /** Once the freeable objects being managed are no longer being accessed, call this method. */
   public dispose(): void {
     if (this.#disposed) return;
     for (const resource of this.#scopeStack) {
@@ -73,8 +68,6 @@ class AutoFree<TReturn> {
   }
 }
 
-/**
- * A wrapper function to setup and dispose of a ManagedFreeableScope at the end of the callback execution.
- */
+/** A wrapper function to setup and dispose of a ManagedFreeableScope at the end of the callback execution. */
 export const usingAutoFree = <TReturn>(cb: (scope: ManagedFreeableScope) => TReturn) =>
   new AutoFree<TReturn>(cb).execute();

@@ -16,9 +16,7 @@ export enum NetworkId {
  */
 export type NetworkMagic = number;
 
-/**
- * Common Cardano NetworkMagics
- */
+/** Common Cardano NetworkMagics */
 export enum NetworkMagics {
   Mainnet = 764_824_073,
   Preprod = 1,
@@ -26,17 +24,13 @@ export enum NetworkMagics {
   Sanchonet = 4
 }
 
-/**
- * Tuple of values designed to uniquely identify a network in the Cardano blockchain.
- */
+/** Tuple of values designed to uniquely identify a network in the Cardano blockchain. */
 export interface ChainId {
   networkId: NetworkId;
   networkMagic: NetworkMagic;
 }
 
-/**
- * Common Cardano ChainIds
- */
+/** Common Cardano ChainIds */
 export const ChainIds = {
   Mainnet: {
     networkId: NetworkId.Mainnet,

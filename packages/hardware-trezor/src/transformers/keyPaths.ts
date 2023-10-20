@@ -3,10 +3,7 @@ import { Cardano } from '@cardano-sdk/core';
 import { TrezorTxTransformerContext } from '../types';
 import { util } from '@cardano-sdk/key-management';
 
-/**
- * Uses the given Trezor input resolver to resolve the payment key
- * path for known addresses for given input transaction.
- */
+/** Uses the given Trezor input resolver to resolve the payment key path for known addresses for given input transaction. */
 export const resolvePaymentKeyPathForTxIn = async (
   txIn: Cardano.TxIn,
   context?: TrezorTxTransformerContext

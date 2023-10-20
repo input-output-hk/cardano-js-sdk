@@ -74,9 +74,7 @@ export const createBackgroundMessenger = ({ logger, runtime }: MessengerDependen
   return {
     getChannel,
 
-    /**
-     * Disconnect all existing ports and stop listening for new ones.
-     */
+    /** Disconnect all existing ports and stop listening for new ones. */
     shutdown() {
       // eslint-disable-next-line unicorn/no-useless-spread
       for (const channelName of [...channels.keys()]) {

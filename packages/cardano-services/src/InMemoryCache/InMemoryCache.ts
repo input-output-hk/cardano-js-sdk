@@ -81,16 +81,12 @@ export class InMemoryCache {
     return this.#cache.keys();
   }
 
-  /**
-   * Clear the interval timeout which is set on check period option. Default: 600
-   */
+  /** Clear the interval timeout which is set on check period option. Default: 600 */
   public shutdown() {
     this.#cache.close();
   }
 
-  /**
-   * Clear the whole data and reset the stats
-   */
+  /** Clear the whole data and reset the stats */
   public clear() {
     this.#cache.flushAll();
   }

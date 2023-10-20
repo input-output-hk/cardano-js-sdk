@@ -1,27 +1,15 @@
-/**
- * Pagination arguments
- */
+/** Pagination arguments */
 export interface PaginationArgs {
-  /**
-   * Start at
-   */
+  /** Start at */
   startAt: number;
-  /**
-   * Page size
-   */
+  /** Page size */
   limit: number;
 }
 
-/**
- * Base interface to model a query as paginated
- */
+/** Base interface to model a query as paginated */
 export interface Paginated<TQueryResult> {
-  /**
-   * Result list per page
-   */
+  /** Result list per page */
   pageResults: TQueryResult[];
-  /**
-   * Total result count
-   */
+  /** Total result count */
   totalResultCount: number;
 }

@@ -17,9 +17,7 @@ export class UtxoProviderStats {
   }
 }
 
-/**
- * Wraps a UtxoProvider, tracking # of calls of each function
- */
+/** Wraps a UtxoProvider, tracking # of calls of each function */
 export class TrackedUtxoProvider extends ProviderTracker implements UtxoProvider {
   readonly stats = new UtxoProviderStats();
   readonly healthCheck: UtxoProvider['healthCheck'];

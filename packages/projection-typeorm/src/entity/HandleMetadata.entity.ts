@@ -19,9 +19,7 @@ export class HandleMetadataEntity {
   backgroundImage?: Asset.Uri | null;
   @ManyToOne(() => OutputEntity, { nullable: true })
   @JoinColumn()
-  /**
-   * Only present for metadata associated with cip68 datum
-   */
+  /** Only present for metadata associated with cip68 datum */
   output?: OutputEntity | null;
   @Column('integer', { nullable: true })
   outputId?: number | null;

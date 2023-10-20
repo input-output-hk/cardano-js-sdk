@@ -5,20 +5,12 @@
  * script to respond appropriately.
  */
 export enum RedeemerTag {
-  /**
-   * Indicates the redeemer is for spending a UTxO.
-   */
+  /** Indicates the redeemer is for spending a UTxO. */
   Spend = 0,
-  /**
-   * Indicates the redeemer is associated with a minting action.
-   */
+  /** Indicates the redeemer is associated with a minting action. */
   Mint = 1,
-  /**
-   * Indicates the redeemer is related to a certificate action within a transaction.
-   */
+  /** Indicates the redeemer is related to a certificate action within a transaction. */
   Cert = 2,
-  /**
-   * Indicates the redeemer is for withdrawing rewards from staking.
-   */
+  /** Indicates the redeemer is for withdrawing rewards from staking. */
   Reward = 3
 }

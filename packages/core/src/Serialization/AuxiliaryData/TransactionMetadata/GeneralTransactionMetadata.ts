@@ -5,9 +5,7 @@ import { HexBlob } from '@cardano-sdk/util';
 import { TransactionMetadatum } from './TransactionMetadatum';
 import { hexToBytes } from '../../../util/misc';
 
-/**
- * General Transaction Metadata.
- */
+/** General Transaction Metadata. */
 export class GeneralTransactionMetadata {
   #metadata: Map<bigint, TransactionMetadatum>;
   #originalBytes: HexBlob | undefined = undefined;

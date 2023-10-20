@@ -24,9 +24,7 @@ describe('CustomObservableWallet', () => {
       rewardAccounts: ObservableWallet['balance']['rewardAccounts'];
     };
 
-    /**
-     * Wallet interface as used by the application
-     */
+    /** Wallet interface as used by the application */
     interface LaceObservableWallet {
       // Interface supports multi-addresses for the most part (note plural in addresses$ and delegation.rewardAccounts$)
       // Might be missing some data (e.g. balance by address):

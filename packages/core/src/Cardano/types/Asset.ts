@@ -5,9 +5,7 @@ import { TextDecoder } from 'web-encoding';
 
 export type AssetId = OpaqueString<'AssetId'>;
 
-/**
- * Hex-encoded asset name
- */
+/** Hex-encoded asset name */
 export type AssetName = OpaqueString<'AssetName'>;
 export const AssetName = (value: string): AssetName => {
   if (value.length > 0) {
@@ -40,9 +38,7 @@ export const AssetId = (value: string): AssetId => {
   return normalizedValue as unknown as AssetId;
 };
 
-/**
- * Hex-encoded policy id
- */
+/** Hex-encoded policy id */
 export type PolicyId = OpaqueString<'PolicyId'>;
 export const PolicyId = (value: string): PolicyId => Crypto.Hash28ByteBase16(value) as unknown as PolicyId;
 
@@ -55,10 +51,7 @@ AssetId.getAssetNameAsText = (id: AssetId) => {
   return Buffer.from(assetNameContent || assetName, 'hex').toString('utf8');
 };
 
-/**
- * Fingerprint of a native asset for human comparison
- * See CIP-0014
- */
+/** Fingerprint of a native asset for human comparison See CIP-0014 */
 export type AssetFingerprint = OpaqueString<'AssetFingerprint'>;
 export const AssetFingerprint = (value: string): AssetFingerprint => typedBech32(value, 'asset', 32);
 

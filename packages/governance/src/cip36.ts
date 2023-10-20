@@ -2,41 +2,29 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { Cardano, Serialization, util } from '@cardano-sdk/core';
 import { HexBlob } from '@cardano-sdk/util';
 
-/**
- * CIP-36 metadata label
- */
+/** CIP-36 metadata label */
 export enum MetadataLabel {
   DATA = 61_284,
   SIG = 61_285
 }
 
-/**
- * CIP-36 signature metadatum map key
- */
+/** CIP-36 signature metadatum map key */
 export const SIG_MAP_KEY = 1n;
 
-/**
- * CIP-36 vote key derivation path constants
- */
+/** CIP-36 vote key derivation path constants */
 export enum CIP36VoteKeyDerivationPath {
   PURPOSE = 1694,
   COIN_TYPE = 1815
 }
 
-/**
- * Voting power delegation to a specified vote key
- */
+/** Voting power delegation to a specified vote key */
 export interface VoteKeyDelegation {
   cip36VoteKey: Crypto.Ed25519PublicKeyHex;
-  /**
-   * Integer >0
-   */
+  /** Integer >0 */
   weight: number;
 }
 
-/**
- * Part of the CIP-36 transaction metadata (NOT key derivation path's `purpose`).
- */
+/** Part of the CIP-36 transaction metadata (NOT key derivation path's `purpose`). */
 export enum VotingPurpose {
   CATALYST = 0
 }
@@ -53,16 +41,12 @@ export interface BuildVotingRegistrationProps {
  * Sign blob with some key
  */
 export interface BlobSigner {
-  /**
-   * Sign blob with some key
-   */
+  /** Sign blob with some key */
   signBlob(blob: HexBlob): Promise<Crypto.Ed25519SignatureHex>;
 }
 
 export const metadataBuilder = {
-  /**
-   * Build partial CIP-36 transaction metadata (without signature).
-   */
+  /** Build partial CIP-36 transaction metadata (without signature). */
   buildVotingRegistration({
     delegations,
     stakeKey,

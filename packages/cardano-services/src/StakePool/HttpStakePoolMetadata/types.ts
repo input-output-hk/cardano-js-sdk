@@ -1,10 +1,7 @@
 import { Cardano } from '@cardano-sdk/core';
 import { CustomError } from 'ts-custom-error';
 
-/**
- * AdaPools format response types
- * Based on: https://a.adapools.org/extended-example
- */
+/** AdaPools format response types Based on: https://a.adapools.org/extended-example */
 export type PoolCompanyInfo = {
   name?: string;
   addr?: string;

@@ -13,9 +13,7 @@ export interface WithStakeKeyRegistrations {
   stakeKeyRegistrations: StakeKeyRegistration[];
 }
 
-/**
- * Collect all stake key registration certificates
- */
+/** Collect all stake key registration certificates */
 export const withStakeKeyRegistrations = unifiedProjectorOperator<WithCertificates, WithStakeKeyRegistrations>(
   (evt) => ({
     ...evt,

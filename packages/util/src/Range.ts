@@ -1,17 +1,11 @@
 import { CustomError } from 'ts-custom-error';
 
-/**
- * Base interface to model a range
- */
+/** Base interface to model a range */
 
 export interface Range<TBound> {
-  /**
-   * Inclusive
-   */
+  /** Inclusive */
   lowerBound?: TBound;
-  /**
-   * Inclusive
-   */
+  /** Inclusive */
   upperBound?: TBound;
 }
 

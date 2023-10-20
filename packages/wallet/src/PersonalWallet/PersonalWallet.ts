@@ -666,9 +666,7 @@ export class PersonalWallet implements ObservableWallet {
     this.#inputSelector = selector;
   }
 
-  /**
-   * Gets the wallet input selector.
-   */
+  /** Gets the wallet input selector. */
   getInputSelector() {
     return this.#inputSelector;
   }

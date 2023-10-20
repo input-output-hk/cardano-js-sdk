@@ -45,23 +45,15 @@ const toProviderError = (error: unknown, details: string) => {
   return new ProviderError(ProviderFailure.Unknown, error, `${message}${details}`);
 };
 
-/**
- * Configuration options for CardanoTokenRegistry
- */
+/** Configuration options for CardanoTokenRegistry */
 export interface CardanoTokenRegistryConfiguration {
-  /**
-   * The cache TTL in seconds. Default: 10 minutes.
-   */
+  /** The cache TTL in seconds. Default: 10 minutes. */
   tokenMetadataCacheTTL?: Seconds;
 
-  /**
-   * The Cardano Token Registry API base URL. Default: https://tokens.cardano.org
-   */
+  /** The Cardano Token Registry API base URL. Default: https://tokens.cardano.org */
   tokenMetadataServerUrl?: string;
 
-  /**
-   * The HTTP request timeout value
-   */
+  /** The HTTP request timeout value */
   tokenMetadataRequestTimeout?: Milliseconds;
 }
 
@@ -70,38 +62,24 @@ interface CardanoTokenRegistryConfigurationWithRequired extends CardanoTokenRegi
   tokenMetadataServerUrl: string;
 }
 
-/**
- * Dependencies that are need to create CardanoTokenRegistry
- */
+/** Dependencies that are need to create CardanoTokenRegistry */
 export interface CardanoTokenRegistryDependencies {
-  /**
-   * The cache engine. Default: InMemoryCache with CardanoTokenRegistryConfiguration.cacheTTL as default TTL
-   */
+  /** The cache engine. Default: InMemoryCache with CardanoTokenRegistryConfiguration.cacheTTL as default TTL */
   cache?: InMemoryCache;
 
-  /**
-   * The logger object
-   */
+  /** The logger object */
   logger: Logger;
 }
 
-/**
- * TokenMetadataService implementation using Cardano Token Registry API
- */
+/** TokenMetadataService implementation using Cardano Token Registry API */
 export class CardanoTokenRegistry implements TokenMetadataService {
-  /**
-   * The axios client used to retrieve metadata from API
-   */
+  /** The axios client used to retrieve metadata from API */
   #axiosClient: AxiosInstance;
 
-  /**
-   * The in memory cache engine
-   */
+  /** The in memory cache engine */
   #cache: InMemoryCache;
 
-  /**
-   * The logger object
-   */
+  /** The logger object */
   #logger: Logger;
 
   constructor({ cache, logger }: CardanoTokenRegistryDependencies, config: CardanoTokenRegistryConfiguration = {}) {

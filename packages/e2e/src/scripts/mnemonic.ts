@@ -4,9 +4,7 @@ import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, InMemoryKeyAgent, util } from '@cardano-sdk/key-management';
 import { localNetworkChainId } from '../util';
 
-/**
- * Generates a new set of Mnemonic words and prints them to the console.
- */
+/** Generates a new set of Mnemonic words and prints them to the console. */
 (async () => {
   let mnemonic = '';
   const mnemonicArray = util.generateMnemonicWords();

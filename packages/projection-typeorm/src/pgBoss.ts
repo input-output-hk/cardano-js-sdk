@@ -27,9 +27,7 @@ export interface StakePoolMetricsUpdateJob {
 }
 
 export interface StakePoolMetadataJob {
-  /**
-   * bigint
-   */
+  /** bigint */
   poolRegistrationId: string;
   poolId: Cardano.PoolId;
   metadataJson: NonNullable<Cardano.StakePool['metadataJson']>;
