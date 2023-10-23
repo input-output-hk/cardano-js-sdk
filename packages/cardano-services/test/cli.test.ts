@@ -27,6 +27,7 @@ import { healthCheckResponseMock } from '../../core/test/CardanoNode/mocks';
 import { listenPromise, serverClosePromise } from '../src/util';
 import { mockTokenRegistry } from './Asset/fixtures/mocks';
 import axios, { AxiosError } from 'axios';
+import connString from 'pg-connection-string';
 import http from 'http';
 import path from 'path';
 
@@ -2153,30 +2154,67 @@ describe('CLI', () => {
           expect(res.status).toBe(200);
         });
 
-        it('asset provider server', async () => {
-          proc = withLogging(
-            fork(
-              exePath,
-              [
-                ...baseArgs,
-                '--api-url',
-                apiUrl,
-                '--postgres-connection-string-asset',
-                postgresConnectionStringHandle,
-                '--use-typeorm-asset-provider',
-                'true',
-                '--service-names',
-                ServiceNames.Asset
-              ],
-              { env: {}, stdio: 'pipe' }
-            )
-          );
-          await serverStarted(apiUrl);
-          const headers = { 'Content-Type': 'application/json' };
-          const res = await axios.post(`${apiUrl}${services.asset.versionPath}/${ServiceNames.Asset}/health`, {
-            headers
+        describe('asset provider server', () => {
+          it('starts with connection string', async () => {
+            proc = withLogging(
+              fork(
+                exePath,
+                [
+                  ...baseArgs,
+                  '--api-url',
+                  apiUrl,
+                  '--postgres-connection-string-asset',
+                  postgresConnectionStringHandle,
+                  '--use-typeorm-asset-provider',
+                  'true',
+                  '--service-names',
+                  ServiceNames.Asset
+                ],
+                { env: {}, stdio: 'pipe' }
+              )
+            );
+            await serverStarted(apiUrl);
+            const headers = { 'Content-Type': 'application/json' };
+            const res = await axios.post(`${apiUrl}${services.asset.versionPath}/${ServiceNames.Asset}/health`, {
+              headers
+            });
+            expect(res.status).toBe(200);
           });
-          expect(res.status).toBe(200);
+
+          it('starts with granular connection parameters', async () => {
+            const conn = connString.parse(postgresConnectionStringHandle);
+            proc = withLogging(
+              fork(
+                exePath,
+                [
+                  ...baseArgs,
+                  '--api-url',
+                  apiUrl,
+                  '--postgres-host-asset',
+                  conn.host!,
+                  '--postgres-port-asset',
+                  conn.port!,
+                  '--postgres-db-asset',
+                  conn.database!,
+                  '--postgres-user-asset',
+                  conn.user!,
+                  '--postgres-password-asset',
+                  conn.password!,
+                  '--use-typeorm-asset-provider',
+                  'true',
+                  '--service-names',
+                  ServiceNames.Asset
+                ],
+                { env: {}, stdio: 'pipe' }
+              )
+            );
+            await serverStarted(apiUrl);
+            const headers = { 'Content-Type': 'application/json' };
+            const res = await axios.post(`${apiUrl}${services.asset.versionPath}/${ServiceNames.Asset}/health`, {
+              headers
+            });
+            expect(res.status).toBe(200);
+          });
         });
       });
     });

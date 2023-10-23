@@ -333,6 +333,7 @@ addOptions(withOgmiosOptions(withRabbitMqOptions(withHandlePolicyIdsOptions(prov
   runServer('Provider server', () =>
     loadProviderServer({
       ...args,
+      postgresConnectionStringAsset: connectionStringFromArgs(args, 'Asset'),
       postgresConnectionStringDbSync: connectionStringFromArgs(args, 'DbSync'),
       postgresConnectionStringHandle: connectionStringFromArgs(args, 'Handle'),
       postgresConnectionStringStakePool: connectionStringFromArgs(args, 'StakePool'),
