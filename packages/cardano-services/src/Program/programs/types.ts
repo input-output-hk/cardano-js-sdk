@@ -62,6 +62,7 @@ export type ProviderServerArgs = CommonProgramOptions &
   PosgresProgramOptions<'DbSync'> &
   PosgresProgramOptions<'Handle'> &
   PosgresProgramOptions<'StakePool'> &
+  PosgresProgramOptions<'Asset'> &
   OgmiosProgramOptions &
   HandlePolicyIdsProgramOptions &
   RabbitMqProgramOptions &
