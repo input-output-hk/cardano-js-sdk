@@ -1,22 +1,26 @@
 // Tested in packages/e2e/test/projection
 import {
   Cardano,
-  CardanoNodeErrors,
+  CardanoNodeError,
+  CardanoNodeUtil,
   EraSummary,
+  GeneralCardanoNodeError,
+  GeneralCardanoNodeErrorCode,
   HealthCheckResponse,
   Milliseconds,
   ObservableCardanoNode,
   ObservableChainSync,
-  PointOrOrigin
+  PointOrOrigin,
+  StateQueryErrorCode
 } from '@cardano-sdk/core';
 import {
+  ChainSynchronization,
   ConnectionConfig,
   createConnectionObject,
-  createStateQueryClient,
+  createLedgerStateQueryClient,
   getServerHealth
 } from '@cardano-ogmios/client';
 import { InteractionContextProps, createObservableInteractionContext } from './createObservableInteractionContext';
-import { Intersection, findIntersect } from '@cardano-ogmios/client/dist/ChainSync';
 import { Logger } from 'ts-log';
 import {
   Observable,
@@ -38,8 +42,8 @@ import { ogmiosToCorePointOrOrigin, ogmiosToCoreTipOrOrigin, pointOrOriginToOgmi
 import { queryEraSummaries, queryGenesisParameters } from '../queries';
 import isEqual from 'lodash/isEqual';
 
-const ogmiosToCoreIntersection = (intersection: Intersection) => ({
-  point: ogmiosToCorePointOrOrigin(intersection.point),
+const ogmiosToCoreIntersection = (intersection: ChainSynchronization.Intersection) => ({
+  point: ogmiosToCorePointOrOrigin(intersection.intersection),
   tip: ogmiosToCoreTipOrOrigin(intersection.tip)
 });
 
@@ -61,13 +65,19 @@ export type OgmiosObservableCardanoNodeProps = Omit<InteractionContextProps, 'in
   localStateQueryRetryConfig?: LocalStateQueryRetryConfig;
 };
 
+const retryableStateQueryErrors = new Set<number>([
+  GeneralCardanoNodeErrorCode.ServerNotReady,
+  StateQueryErrorCode.UnavailableInCurrentEra,
+  GeneralCardanoNodeErrorCode.ConnectionFailure
+]);
+
 const stateQueryRetryBackoffConfig = (
   retryConfig: LocalStateQueryRetryConfig = DEFAULT_LSQ_RETRY_CONFIG,
   logger: Logger
 ): RetryBackoffConfig => ({
   ...retryConfig,
   shouldRetry: (error) => {
-    if (error instanceof CardanoNodeErrors.CardanoClientErrors.QueryUnavailableInCurrentEraError) {
+    if (retryableStateQueryErrors.has(CardanoNodeUtil.asCardanoNodeError(error)?.code)) {
       logger.info('Local state query unavailable yet, will retry...');
       return true;
     }
@@ -89,13 +99,12 @@ export class OgmiosObservableCardanoNode implements ObservableCardanoNode {
     this.#logger = contextLogger(logger, 'ObservableOgmiosCardanoNode');
     this.#interactionContext$ = createObservableInteractionContext(
       {
-        ...props,
-        interactionType: 'LongRunning'
+        ...props
       },
       { logger: this.#logger }
     ).pipe(shareReplay({ bufferSize: 1, refCount: true }));
     const stateQueryClient$ = this.#interactionContext$.pipe(
-      switchMap((interactionContext) => from(createStateQueryClient(interactionContext))),
+      switchMap((interactionContext) => from(createLedgerStateQueryClient(interactionContext))),
       distinctUntilChanged((a, b) => isEqual(a, b)),
       shareReplay({ bufferSize: 1, refCount: true })
     );
@@ -116,7 +125,14 @@ export class OgmiosObservableCardanoNode implements ObservableCardanoNode {
         first: props.healthCheckTimeout || DEFAULT_HEALTH_CHECK_TIMEOUT,
         with: () => {
           logger.error('healthCheck$ didnt emit within healthCheckTimeout');
-          return throwError(() => new CardanoNodeErrors.CardanoClientErrors.ConnectionError());
+          return throwError(
+            () =>
+              new GeneralCardanoNodeError(
+                GeneralCardanoNodeErrorCode.ConnectionFailure,
+                null,
+                'Healthcheck request timeout'
+              )
+          );
         }
       }),
       catchError((error) => {
@@ -141,7 +157,7 @@ export class OgmiosObservableCardanoNode implements ObservableCardanoNode {
           new Observable<ObservableChainSync>((subscriber) => {
             // eslint-disable-next-line promise/always-return
             if (subscriber.closed) return;
-            void findIntersect(interactionContext, points.map(pointOrOriginToOgmios))
+            void ChainSynchronization.findIntersection(interactionContext, points.map(pointOrOriginToOgmios))
               // eslint-disable-next-line promise/always-return
               .then((ogmiosIntersection) => {
                 const intersection = ogmiosToCoreIntersection(ogmiosIntersection);
@@ -155,7 +171,7 @@ export class OgmiosObservableCardanoNode implements ObservableCardanoNode {
               })
               .catch((error) => {
                 this.#logger.error('"findIntersect" failed', error);
-                if (error instanceof CardanoNodeErrors.CardanoClientErrors.ConnectionError) {
+                if (error instanceof CardanoNodeError && error.code === GeneralCardanoNodeErrorCode.ConnectionFailure) {
                   // interactionContext$ will reconnect and trigger a retry
                   return;
                 }

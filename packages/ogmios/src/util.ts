@@ -1,10 +1,5 @@
-import {
-  ConnectionConfig,
-  InteractionContext,
-  InteractionType,
-  ServerHealth,
-  createInteractionContext
-} from '@cardano-ogmios/client';
+import { Cardano, HealthCheckResponse } from '@cardano-sdk/core';
+import { ConnectionConfig, InteractionContext, ServerHealth, createInteractionContext } from '@cardano-ogmios/client';
 import { Logger } from 'ts-log';
 import { Percent } from '@cardano-sdk/util';
 
@@ -22,7 +17,6 @@ export const urlToConnectionConfig = (connectionURL?: URL): ConnectionConfig => 
 
 type CreateInteractionContextOptions = {
   connection?: ConnectionConfig;
-  interactionType?: InteractionType;
 };
 
 /**
@@ -53,9 +47,16 @@ export const createInteractionContextWithLogger = (
     options
   );
 
-export const ogmiosServerHealthToHealthCheckResponse = ({ lastKnownTip, networkSynchronization }: ServerHealth) => ({
+export const ogmiosServerHealthToHealthCheckResponse = ({
+  lastKnownTip,
+  networkSynchronization
+}: ServerHealth): HealthCheckResponse => ({
   localNode: {
-    ledgerTip: lastKnownTip,
+    ledgerTip: {
+      blockNo: Cardano.BlockNo(lastKnownTip.height),
+      hash: Cardano.BlockId(lastKnownTip.id),
+      slot: Cardano.Slot(lastKnownTip.slot)
+    },
     networkSync: Percent(networkSynchronization)
   },
   ok: networkSynchronization > 0.99

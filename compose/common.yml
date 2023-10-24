@@ -131,17 +131,10 @@ services:
       - ${SMASH_PORT:-3100}:3100
     restart: on-failure
     healthcheck:
-      test: [ 'CMD-SHELL', 'curl -s --fail http://localhost:3100/api/v1/status' ]
+      test: ['CMD-SHELL', 'curl -s --fail http://localhost:3100/api/v1/status']
 
   cardano-node-ogmios:
     <<: *logging
-    build:
-      args:
-        CARDANO_NODE_VERSION: ${CARDANO_NODE_VERSION:-1.35.5}
-        NETWORK: ${NETWORK:-mainnet}
-        OGMIOS_VERSION: ${OGMIOS_VERSION:-v5.6.0}
-      context: ../../compose/ogmios
-      target: cardano-node-ogmios
     healthcheck:
       retries: 2000
     ports:

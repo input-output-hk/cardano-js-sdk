@@ -14,7 +14,16 @@ import {
 } from '@cardano-sdk/dapp-connector';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
-import { CML, Cardano, CardanoNodeErrors, Serialization, TxCBOR, coalesceValueQuantities } from '@cardano-sdk/core';
+import {
+  CML,
+  Cardano,
+  OutsideOfValidityIntervalData,
+  Serialization,
+  TxCBOR,
+  TxSubmissionError,
+  TxSubmissionErrorCode,
+  coalesceValueQuantities
+} from '@cardano-sdk/core';
 import { CallbackConfirmation, GetCollateralCallbackParams } from '../../src/cip30';
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence';
@@ -529,9 +538,14 @@ describe('cip30', () => {
 
         it('throws TxSendError when submission fails', async () => {
           providers.txSubmitProvider.submitTx.mockRejectedValueOnce(
-            new CardanoNodeErrors.TxSubmissionErrors.OutsideOfValidityIntervalError({
-              outsideOfValidityInterval: { currentSlot: 5, interval: { invalidBefore: 6, invalidHereafter: 7 } }
-            })
+            new TxSubmissionError(
+              TxSubmissionErrorCode.OutsideOfValidityInterval,
+              {
+                currentSlot: 5,
+                validityInterval: { invalidBefore: 6, invalidHereafter: 7 }
+              } as OutsideOfValidityIntervalData,
+              'Outside of validity interval'
+            )
           );
           await expect(api.submitTx(hexTx)).rejects.toThrowError(TxSendError);
         });

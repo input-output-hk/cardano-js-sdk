@@ -1,13 +1,9 @@
-import { CardanoNodeErrors } from '@cardano-sdk/core';
-import {
-  ConnectionConfig,
-  InteractionContext,
-  InteractionType,
-  createInteractionContext
-} from '@cardano-ogmios/client';
+import { ConnectionConfig, InteractionContext, createInteractionContext } from '@cardano-ogmios/client';
+import { GeneralCardanoNodeError, GeneralCardanoNodeErrorCode } from '@cardano-sdk/core';
 import { Observable, switchMap } from 'rxjs';
 import { RetryBackoffConfig, retryBackoff } from 'backoff-rxjs';
-import { WithLogger, contextLogger, isConnectionError } from '@cardano-sdk/util';
+import { WithLogger, contextLogger } from '@cardano-sdk/util';
+import { ogmiosToCoreError } from '../queries';
 
 export type ReconnectionConfig = Omit<RetryBackoffConfig, 'shouldRetry'>;
 
@@ -22,12 +18,6 @@ export interface InteractionContextProps {
    * close an existing connection and open a new one.
    */
   connectionConfig$: Observable<ConnectionConfig>;
-  /**
-   * 'LongRunning' will keep the connection open until unsubscribed.
-   * 'OneTime' will close the connectino (and complete the interaction context observable)
-   * after the 1st usage of emitted interaction context.
-   */
-  interactionType: InteractionType;
   /**
    * Retry backoff configuration for
    * re-subscribing to connectionConfig$ on connection error.
@@ -45,7 +35,7 @@ export interface InteractionContextProps {
  * @throws errors with CardanoNodeErrors.ConnectionError when `reconnectionConfig.maxAttempts` is reached.
  */
 export const createObservableInteractionContext = (
-  { connectionConfig$, interactionType, reconnectionConfig = defaultReconnectionConfig }: InteractionContextProps,
+  { connectionConfig$, reconnectionConfig = defaultReconnectionConfig }: InteractionContextProps,
   dependencies: WithLogger
 ) =>
   connectionConfig$.pipe(
@@ -56,11 +46,7 @@ export const createObservableInteractionContext = (
           const interactionContextReady = createInteractionContext(
             (error) => {
               logger.error(error.message);
-              subscriber.error(
-                error instanceof CardanoNodeErrors.CardanoClientErrors.ConnectionError
-                  ? error
-                  : new CardanoNodeErrors.UnknownCardanoNodeError(error)
-              );
+              subscriber.error(ogmiosToCoreError(error));
             },
             (code, reason) => {
               if (code === 1000) {
@@ -69,14 +55,13 @@ export const createObservableInteractionContext = (
               } else {
                 const message = `Websocket unexpectedly closed with code ${code}: ${reason}`;
                 logger.error(message);
-                // To be replaced with a connection error type that includes more detail
-                // like {code,reason} or at least customizable {message}
-                subscriber.error(new CardanoNodeErrors.CardanoClientErrors.ConnectionError());
+                subscriber.error(
+                  new GeneralCardanoNodeError(GeneralCardanoNodeErrorCode.ConnectionFailure, { code, reason }, message)
+                );
               }
             },
             {
-              connection,
-              interactionType
+              connection
             }
           )
             .then((interactionContext) => {
@@ -86,11 +71,7 @@ export const createObservableInteractionContext = (
             })
             .catch((error) => {
               logger.error('Failed to create', error);
-              subscriber.error(
-                isConnectionError(error)
-                  ? new CardanoNodeErrors.CardanoClientErrors.ConnectionError()
-                  : new CardanoNodeErrors.UnknownCardanoNodeError(error)
-              );
+              subscriber.error(ogmiosToCoreError(error));
               return null;
             });
           return () => {
@@ -120,6 +101,7 @@ export const createObservableInteractionContext = (
     ),
     retryBackoff({
       ...reconnectionConfig,
-      shouldRetry: (error) => error instanceof CardanoNodeErrors.CardanoClientErrors.ConnectionError
+      shouldRetry: (error) =>
+        error instanceof GeneralCardanoNodeError && error.code === GeneralCardanoNodeErrorCode.ConnectionFailure
     })
   );

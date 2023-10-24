@@ -10,7 +10,7 @@ import {
   requestNext,
   withStaticContext
 } from '../../src';
-import { Cardano, CardanoNodeErrors, ChainSyncEventType, ChainSyncRollForward } from '@cardano-sdk/core';
+import { Cardano, ChainSyncError, ChainSyncEventType, ChainSyncRollForward } from '@cardano-sdk/core';
 import { ChainSyncDataSet, StubChainSyncData, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { from, lastValueFrom, of, toArray } from 'rxjs';
 
@@ -175,8 +175,6 @@ describe('integration/InMemory', () => {
         ])
       )
       .subscribe();
-    await expect(projectAll(dataWithStakeKeyDeregistration, projectStakeKeys)).rejects.toThrowError(
-      CardanoNodeErrors.CardanoClientErrors.IntersectionNotFoundError
-    );
+    await expect(projectAll(dataWithStakeKeyDeregistration, projectStakeKeys)).rejects.toThrowError(ChainSyncError);
   });
 });
