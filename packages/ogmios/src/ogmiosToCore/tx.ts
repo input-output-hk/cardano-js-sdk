@@ -277,7 +277,10 @@ const mapDatumHash = (datum: Schema.TxOut['datumHash']) => {
 
 const mapTxOut = (txOut: Schema.TxOut): Cardano.TxOut => ({
   address: Cardano.PaymentAddress(txOut.address),
-  datum: mapInlineDatum(txOut.datum),
+  // From ogmios v5.5.0 release notes:
+  // Similarly, Alonzo transaction outputs will now contain a datumHash field, carrying the datum hash digest.
+  // However, they will also contain a datum field with the exact same value for backward compatibility reason.
+  datum: txOut.datum === txOut.datumHash ? undefined : mapInlineDatum(txOut.datum),
   datumHash: mapDatumHash(txOut.datumHash),
   scriptReference: txOut.script ? mapScript(txOut.script) : undefined,
   value: {

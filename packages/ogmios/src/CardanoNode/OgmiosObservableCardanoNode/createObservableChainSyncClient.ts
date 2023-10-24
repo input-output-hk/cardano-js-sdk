@@ -1,6 +1,8 @@
 import { CardanoNodeErrors, ChainSyncEvent, ChainSyncEventType, PointOrOrigin, RequestNext } from '@cardano-sdk/core';
 import { InteractionContext, Schema, safeJSON } from '@cardano-ogmios/client';
+import { Logger } from 'ts-log';
 import { Observable, Subscriber, from, switchMap } from 'rxjs';
+import { WithLogger, toSerializableObject } from '@cardano-sdk/util';
 import { block as blockToCore } from '../../ogmiosToCore';
 import { findIntersect, requestNext as sendRequestNext } from '@cardano-ogmios/client/dist/ChainSync';
 import { nanoid } from 'nanoid';
@@ -16,10 +18,20 @@ export interface WithObservableInteractionContext {
   interactionContext$: Observable<InteractionContext>;
 }
 
+const mapBlock = (block: Schema.Block, logger: Logger) => {
+  try {
+    return blockToCore(block);
+  } catch (error) {
+    logger.error('Failed to map block:', JSON.stringify(toSerializableObject(block)));
+    throw error;
+  }
+};
+
 const notifySubscriberAndParseNewCursor = (
   response: Schema.Ogmios['RequestNextResponse'],
   subscriber: Subscriber<ChainSyncEvent>,
-  requestNext: RequestNext
+  requestNext: RequestNext,
+  logger: Logger
 ): PointOrOrigin | undefined => {
   if ('RollBackward' in response.result) {
     const point = ogmiosToCorePointOrOrigin(response.result.RollBackward.point);
@@ -35,7 +47,7 @@ const notifySubscriberAndParseNewCursor = (
       subscriber.error(new Error('Bug: "tip" at RollForward is "origin"'));
       return;
     }
-    const coreBlock = blockToCore(response.result.RollForward.block);
+    const coreBlock = mapBlock(response.result.RollForward.block, logger);
     if (!coreBlock) {
       // Assuming it's an EBB
       requestNext();
@@ -57,7 +69,7 @@ const notifySubscriberAndParseNewCursor = (
 
 export const createObservableChainSyncClient = (
   { intersectionPoint }: ObservableChainSyncClientProps,
-  { interactionContext$ }: WithObservableInteractionContext
+  { interactionContext$, logger }: WithObservableInteractionContext & WithLogger
 ): Observable<ChainSyncEvent> => {
   let cursor = intersectionPoint;
   return interactionContext$.pipe(
@@ -81,7 +93,7 @@ export const createObservableChainSyncClient = (
               if (response.reflection?.[RequestIdProp] !== requestId) {
                 return;
               }
-              cursor = notifySubscriberAndParseNewCursor(response, subscriber, requestNext) || cursor;
+              cursor = notifySubscriberAndParseNewCursor(response, subscriber, requestNext, logger) || cursor;
             }
           };
           context.socket.on('message', handler);
