@@ -144,7 +144,7 @@ export class OgmiosObservableCardanoNode implements ObservableCardanoNode {
                 subscriber.next({
                   chainSync$: createObservableChainSyncClient(
                     { intersectionPoint: intersection.point },
-                    { interactionContext$: this.#interactionContext$ }
+                    { interactionContext$: this.#interactionContext$, logger: this.#logger }
                   ),
                   intersection
                 });

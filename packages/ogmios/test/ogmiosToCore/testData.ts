@@ -121,8 +121,8 @@ export const mockAlonzoBlock: Ogmios.Schema.Alonzo = {
             },
             {
               address: 'addr_test1vpfwv0ezc5g8a4mkku8hhy3y3vp92t7s3ul8g778g5yegsgalc6gc',
-              datum: null,
-              datumHash: null,
+              datum: 'c5dfa8c3cbd5a959829618a7b46e163078cb3f1b39f152514d0c3686d553529a',
+              datumHash: 'c5dfa8c3cbd5a959829618a7b46e163078cb3f1b39f152514d0c3686d553529a',
               value: { assets: {}, coins: 8_286_924_731n }
             }
           ],
