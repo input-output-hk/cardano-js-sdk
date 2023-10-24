@@ -4,6 +4,8 @@ import {
   BlockEntity,
   NftMetadataEntity,
   TypeormStabilityWindowBuffer,
+  TypeormTipTracker,
+  createObservableConnection,
   storeAssets,
   storeBlock,
   typeormTransactionCommit,
@@ -12,29 +14,34 @@ import {
 import { Bootstrap, Mappers, requestNext } from '@cardano-sdk/projection';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
-import { DataSource, QueryRunner } from 'typeorm';
-import { Observable, of } from 'rxjs';
-import { createProjectorTilFirst } from './util';
-import { initializeDataSource } from '../util';
+import { QueryRunner } from 'typeorm';
+import { connectionConfig$, initializeDataSource } from '../util';
+import { createProjectorContext, createProjectorTilFirst } from './util';
 
 describe('storeAssets', () => {
   const stubEvents = chainSyncData(ChainSyncDataSet.WithMint);
   let queryRunner: QueryRunner;
   let buffer: TypeormStabilityWindowBuffer;
-  let dataSource$: Observable<DataSource>;
+  let tipTracker: TypeormTipTracker;
   const entities = [BlockEntity, BlockDataEntity, AssetEntity, NftMetadataEntity];
 
   const project$ = () =>
-    Bootstrap.fromCardanoNode({ blocksBufferLength: 10, buffer, cardanoNode: stubEvents.cardanoNode, logger }).pipe(
+    Bootstrap.fromCardanoNode({
+      blocksBufferLength: 10,
+      buffer,
+      cardanoNode: stubEvents.cardanoNode,
+      logger,
+      projectedTip$: tipTracker.tip$
+    }).pipe(
       Mappers.withMint(),
       withTypeormTransaction({
-        dataSource$,
-        logger
+        connection$: createObservableConnection({ connectionConfig$, entities, logger })
       }),
       storeBlock(),
       storeAssets(),
       buffer.storeBlockData(),
       typeormTransactionCommit(),
+      tipTracker.trackProjectedTip(),
       requestNext()
     );
 
@@ -42,15 +49,13 @@ describe('storeAssets', () => {
 
   beforeEach(async () => {
     const dataSource = await initializeDataSource({ entities });
-    dataSource$ = of(dataSource);
     queryRunner = dataSource.createQueryRunner();
-    buffer = new TypeormStabilityWindowBuffer({ allowNonSequentialBlockHeights: true, logger });
-    await buffer.initialize(queryRunner);
+    ({ buffer, tipTracker } = createProjectorContext(entities));
+    tipTracker.tip$.subscribe((tip) => logger.info('NEW TIP', tip));
   });
 
   afterEach(async () => {
     await queryRunner.release();
-    buffer.shutdown();
   });
 
   it('inserts assets on mint, deletes when 1st mint block is rolled back', async () => {
@@ -94,6 +99,7 @@ describe('storeAssets', () => {
     )![0] as Cardano.AssetId;
     const totalSupplyAfterSecondMint = secondMintEvent.mintedAssetTotalSupplies[assetIdThatWasMintedTwice]!;
     expect(totalSupplyAfterSecondMint).not.toBeUndefined();
+    logger.info('Before 2nd project');
     const rollbackEvent = await projectTilFirst(
       (evt) =>
         evt.eventType === ChainSyncEventType.RollBackward && evt.block.header.hash === secondMintEvent.block.header.hash

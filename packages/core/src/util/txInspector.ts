@@ -329,14 +329,10 @@ export const mintInspector =
     return assets;
   };
 
-/**
- * Inspect the transaction and retrieves all assets minted (quantity greater than 0).
- */
+/** Inspect the transaction and retrieves all assets minted (quantity greater than 0). */
 export const assetsMintedInspector: AssetsMintedInspector = mintInspector((quantity: bigint) => quantity > 0);
 
-/**
- * Inspect the transaction and retrieves all assets burned (quantity less than 0).
- */
+/** Inspect the transaction and retrieves all assets burned (quantity less than 0). */
 export const assetsBurnedInspector: AssetsMintedInspector = mintInspector((quantity: bigint) => quantity < 0);
 
 /**

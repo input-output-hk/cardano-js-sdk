@@ -10,13 +10,9 @@ import isEqual from 'lodash/isEqual';
 export type SupplyDistributionNetworkInfoProvider = Pick<NetworkInfoProvider, 'stake' | 'lovelaceSupply'>;
 
 export interface SupplyDistributionTrackerProps {
-  /**
-   * SupplyDistribution re-fetch trigger.
-   */
+  /** SupplyDistribution re-fetch trigger. */
   trigger$: Observable<unknown>;
-  /**
-   * Failed request retry strategy
-   */
+  /** Failed request retry strategy */
   retryBackoffConfig?: RetryBackoffConfig;
   onFatalError?: (value: unknown) => void;
 }
@@ -24,9 +20,7 @@ export interface SupplyDistributionTrackerProps {
 export interface SupplyDistributionTrackerDependencies {
   logger: Logger;
   stores: SupplyDistributionStores;
-  /**
-   * Compatible with NetworkInfoProvider.
-   */
+  /** Compatible with NetworkInfoProvider. */
   networkInfoProvider: SupplyDistributionNetworkInfoProvider;
 }
 

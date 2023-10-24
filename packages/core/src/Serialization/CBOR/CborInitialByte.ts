@@ -3,9 +3,7 @@
 import { CborAdditionalInfo } from './CborAdditionalInfo';
 import { CborMajorType } from './CborMajorType';
 
-/**
- * Represents a CBOR initial byte.
- */
+/** Represents a CBOR initial byte. */
 export class CborInitialByte {
   static readonly IndefiniteLengthBreakByte = 0xff;
   static readonly AdditionalInformationMask = 0b0001_1111;

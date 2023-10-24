@@ -19,13 +19,9 @@ import {
   stakePoolSearchTotalCount
 } from './util';
 
-/**
- * Properties that are need to create DbSyncStakePoolProvider
- */
+/** Properties that are need to create DbSyncStakePoolProvider */
 export interface TypeOrmStakePoolProviderProps {
-  /**
-   * Pagination page size limit used for provider methods constraint.
-   */
+  /** Pagination page size limit used for provider methods constraint. */
   paginationPageSizeLimit: number;
 }
 

@@ -13,13 +13,9 @@ export interface UtxoModel {
   data_hash?: string;
   inline_datum?: string;
   reference_script_type?: string;
-  /**
-   * CBOR encoded plutus script data, null for other script types
-   */
+  /** CBOR encoded plutus script data, null for other script types */
   reference_script_bytes?: string;
-  /**
-   * JSON representation of the timelock and multisig script, null for other script types
-   */
+  /** JSON representation of the timelock and multisig script, null for other script types */
   reference_script_json?: any;
 }
 

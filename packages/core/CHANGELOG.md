@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.21.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.20.1...@cardano-sdk/core@0.21.0) (2023-10-09)
+
+### ⚠ BREAKING CHANGES
+
+* remove NetworkMagics.Testnet and ChainIds.LegacyTestnet
+* core package no longer exports the CML types
+
+### Features
+
+* core package no longer exports the CML types ([51545ed](https://github.com/input-output-hk/cardano-js-sdk/commit/51545ed82b4abeb795b0a50ad7d299ddb5da4a0d))
+* **core:** add sanchonet network magic ([031f070](https://github.com/input-output-hk/cardano-js-sdk/commit/031f070728e383e38785b79206d10875f946245e))
+
+### Miscellaneous Chores
+
+* remove NetworkMagics.Testnet and ChainIds.LegacyTestnet ([190dba5](https://github.com/input-output-hk/cardano-js-sdk/commit/190dba5aca213778570e16e74fb64c02a69b41a8))
+
+## [0.20.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.20.0...@cardano-sdk/core@0.20.1) (2023-09-29)
+
+### Features
+
+* **core:** upgraded serialization classes to support conway era fields ([50eed71](https://github.com/input-output-hk/cardano-js-sdk/commit/50eed7173f25a11b40ceaafa6a8f7c6c871c8948))
+
 ## [0.20.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/core@0.19.1...@cardano-sdk/core@0.20.0) (2023-09-20)
 
 ### ⚠ BREAKING CHANGES

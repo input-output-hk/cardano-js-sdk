@@ -6,54 +6,60 @@ import {
   OutputEntity,
   TokensEntity,
   TypeormStabilityWindowBuffer,
+  TypeormTipTracker,
+  createObservableConnection,
   storeAssets,
   storeBlock,
   storeUtxo,
   typeormTransactionCommit,
   withTypeormTransaction
 } from '../../src';
-import { Bootstrap, Mappers, requestNext } from '@cardano-sdk/projection';
+import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
 import { Cardano, ChainSyncEventType } from '@cardano-sdk/core';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { IsNull, Not, QueryRunner } from 'typeorm';
-import { createProjectorTilFirst } from './util';
-import { defer, from } from 'rxjs';
-import { initializeDataSource } from '../util';
+import { Observable } from 'rxjs';
+import { connectionConfig$, initializeDataSource } from '../util';
+import { createProjectorContext, createProjectorTilFirst } from './util';
 
 describe('storeUtxo', () => {
   const stubEvents = chainSyncData(ChainSyncDataSet.WithMint);
   let queryRunner: QueryRunner;
   let buffer: TypeormStabilityWindowBuffer;
+  let tipTracker: TypeormTipTracker;
   const entities = [BlockEntity, BlockDataEntity, AssetEntity, NftMetadataEntity, TokensEntity, OutputEntity];
 
-  const project$ = () =>
-    Bootstrap.fromCardanoNode({ blocksBufferLength: 10, buffer, cardanoNode: stubEvents.cardanoNode, logger }).pipe(
-      Mappers.withMint(),
-      Mappers.withUtxo(),
+  const storeData = <T extends Mappers.WithUtxo & Mappers.WithMint>(evt$: Observable<ProjectionEvent<T>>) =>
+    evt$.pipe(
       withTypeormTransaction({
-        dataSource$: defer(() => from(initializeDataSource({ entities }))),
-        logger
+        connection$: createObservableConnection({ connectionConfig$, entities, logger })
       }),
       storeBlock(),
       storeAssets(),
       storeUtxo(),
       buffer.storeBlockData(),
-      typeormTransactionCommit(),
-      requestNext()
+      typeormTransactionCommit()
     );
+
+  const project$ = () =>
+    Bootstrap.fromCardanoNode({
+      blocksBufferLength: 10,
+      buffer,
+      cardanoNode: stubEvents.cardanoNode,
+      logger,
+      projectedTip$: tipTracker.tip$
+    }).pipe(Mappers.withMint(), Mappers.withUtxo(), storeData, tipTracker.trackProjectedTip(), requestNext());
 
   const projectTilFirst = createProjectorTilFirst(project$);
 
   beforeEach(async () => {
     const dataSource = await initializeDataSource({ entities });
     queryRunner = dataSource.createQueryRunner();
-    buffer = new TypeormStabilityWindowBuffer({ allowNonSequentialBlockHeights: true, logger });
-    await buffer.initialize(queryRunner);
+    ({ buffer, tipTracker } = createProjectorContext(entities));
   });
 
   afterEach(async () => {
     await queryRunner.release();
-    buffer.shutdown();
   });
 
   it('hydrates event object with storedProducedUtxo map', async () => {

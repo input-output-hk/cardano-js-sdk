@@ -54,9 +54,7 @@ export abstract class KeyAgentBase implements KeyAgent {
     this.#bip32Ed25519 = bip32Ed25519;
   }
 
-  /**
-   * See https://github.com/cardano-foundation/CIPs/tree/master/CIP-1852#specification
-   */
+  /** See https://github.com/cardano-foundation/CIPs/tree/master/CIP-1852#specification */
   async deriveAddress(
     { index, type }: AccountAddressDerivationPath,
     stakeKeyDerivationIndex: number,

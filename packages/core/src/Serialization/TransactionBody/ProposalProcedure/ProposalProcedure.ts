@@ -15,10 +15,7 @@ import { hexToBytes } from '../../../util/misc';
 
 const PROCEDURE_ARRAY_SIZE = 4;
 
-/**
- * Governance proposal procedure for the Cardano blockchain, it supports various
- * types of governance actions.
- */
+/** Governance proposal procedure for the Cardano blockchain, it supports various types of governance actions. */
 export class ProposalProcedure {
   #parameterChangeAction: ParameterChangeAction | undefined = undefined;
   #hardForkInitiationAction: HardForkInitiationAction | undefined = undefined;

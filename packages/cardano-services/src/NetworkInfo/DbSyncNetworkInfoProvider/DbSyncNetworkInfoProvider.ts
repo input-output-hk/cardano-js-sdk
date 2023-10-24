@@ -19,25 +19,17 @@ import { RunnableModule } from '@cardano-sdk/util';
 import { toGenesisParams, toLedgerTip, toProtocolParams, toSupply } from './mappers';
 import memoize from 'lodash/memoize';
 
-/**
- * Dependencies that are need to create DbSyncNetworkInfoProvider
- */
+/** Dependencies that are need to create DbSyncNetworkInfoProvider */
 export interface NetworkInfoProviderDependencies extends DbSyncProviderDependencies {
-  /**
-   * The in memory cache engine.
-   */
+  /** The in memory cache engine. */
   cache: DbSyncProviderDependencies['cache'] & {
     db: InMemoryCache;
   };
 
-  /**
-   * Monitor the epoch rollover through db polling.
-   */
+  /** Monitor the epoch rollover through db polling. */
   epochMonitor: EpochMonitor;
 
-  /**
-   * The genesis data loaded from the genesis file.
-   */
+  /** The genesis data loaded from the genesis file. */
   genesisData: GenesisData;
 }
 

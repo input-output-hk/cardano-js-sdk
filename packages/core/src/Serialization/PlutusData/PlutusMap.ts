@@ -4,9 +4,7 @@ import { PlutusData } from './PlutusData';
 import { PlutusList } from './PlutusList';
 import { bytesToHex, hexToBytes } from '../../util/misc';
 
-/**
- * Represents a Map of Plutus data.
- */
+/** Represents a Map of Plutus data. */
 export class PlutusMap {
   readonly #map = new Map<PlutusData, PlutusData>();
   #useIndefiniteEncoding = false;

@@ -7,8 +7,8 @@ export type InMemoryStore = {
   stakePools: Map<
     Cardano.PoolId,
     {
-      updates: Mappers.PoolUpdate[];
-      retirements: Mappers.PoolRetirement[];
+      updates: Array<Mappers.PoolUpdate>;
+      retirements: Array<Mappers.PoolRetirement>;
     }
   >;
 };

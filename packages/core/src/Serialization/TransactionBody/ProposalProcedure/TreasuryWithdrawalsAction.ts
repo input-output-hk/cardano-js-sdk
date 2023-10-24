@@ -7,9 +7,7 @@ import { SerializationError, SerializationFailure } from '../../../errors';
 
 const EMBEDDED_GROUP_SIZE = 2;
 
-/**
- * Withdraws funds from the treasury.
- */
+/** Withdraws funds from the treasury. */
 export class TreasuryWithdrawalsAction {
   #withdrawals: Map<Cardano.RewardAccount, Cardano.Lovelace>;
   #originalBytes: HexBlob | undefined = undefined;

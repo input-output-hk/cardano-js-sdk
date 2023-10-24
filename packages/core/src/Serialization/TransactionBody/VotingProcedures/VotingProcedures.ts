@@ -6,9 +6,7 @@ import { Voter } from './Voter';
 import { VotingProcedure } from './VotingProcedure';
 import { hexToBytes } from '../../../util/misc';
 
-/**
- * A map of Voter + GovernanceActionId to VotingProcedure;
- */
+/** A map of Voter + GovernanceActionId to VotingProcedure; */
 export class VotingProcedures {
   #procedures: Array<{
     voter: Voter;

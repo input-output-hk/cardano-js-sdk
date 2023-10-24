@@ -5,10 +5,7 @@ import { Ed25519KeyHashHex } from '@cardano-sdk/crypto';
 
 @Entity()
 export class StakeKeyRegistrationEntity {
-  /**
-   * Computed from certificate pointer.
-   * Can be used to query by pointer using `Cardano.PointerToId` util.
-   */
+  /** Computed from certificate pointer. Can be used to query by pointer using `Cardano.PointerToId` util. */
   @PrimaryColumn(BigIntColumnOptions)
   id?: bigint;
   @Column('char', { length: 56 })

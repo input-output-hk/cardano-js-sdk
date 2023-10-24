@@ -17,9 +17,7 @@ export class AssetProviderStats {
   }
 }
 
-/**
- * Wraps a AssetProvider, tracking # of calls of each function
- */
+/** Wraps a AssetProvider, tracking # of calls of each function */
 export class TrackedAssetProvider extends ProviderTracker implements AssetProvider {
   readonly stats = new AssetProviderStats();
   readonly healthCheck: AssetProvider['healthCheck'];

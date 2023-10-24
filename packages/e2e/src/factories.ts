@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import * as CML from '@dcspark/cardano-multiplatform-lib-nodejs';
 import * as Crypto from '@cardano-sdk/crypto';
 import {
   AddressDiscovery,
@@ -14,7 +15,6 @@ import {
 } from '@cardano-sdk/wallet';
 import {
   AssetProvider,
-  CML,
   Cardano,
   ChainHistoryProvider,
   HandleProvider,
@@ -30,7 +30,6 @@ import {
   CommunicationType,
   InMemoryKeyAgent,
   KeyAgentDependencies,
-  TrezorKeyAgent,
   util
 } from '@cardano-sdk/key-management';
 import {
@@ -47,6 +46,7 @@ import {
 import { LedgerKeyAgent } from '@cardano-sdk/hardware-ledger';
 import { Logger } from 'ts-log';
 import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
+import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
 import { createConnectionObject } from '@cardano-ogmios/client';
 import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
 import { filter, firstValueFrom } from 'rxjs';
@@ -284,10 +284,7 @@ export type GetWalletProps = {
   keyAgent?: AsyncKeyAgent;
 };
 
-/**
- * Delays initializing tx when nearing the epoch boundary.
- * Relies on system clock being accurate.
- */
+/** Delays initializing tx when nearing the epoch boundary. Relies on system clock being accurate. */
 const patchInitializeTxToRespectEpochBoundary = <T extends ObservableWallet>(
   wallet: T,
   maxPollInterval: Milliseconds

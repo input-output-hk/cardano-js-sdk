@@ -3,9 +3,7 @@ import { InvalidArgumentError } from '@cardano-sdk/util';
 
 export const ED25519_PUBLIC_KEY_HASH_LENGTH = 28;
 
-/**
- * The computed cryptographic hash of an Ed25519 Key with the Blake2b hashing algorithm.
- */
+/** The computed cryptographic hash of an Ed25519 Key with the Blake2b hashing algorithm. */
 export class Ed25519KeyHash {
   readonly #hash: Uint8Array;
 
@@ -41,16 +39,12 @@ export class Ed25519KeyHash {
     return Ed25519KeyHash.fromBytes(Buffer.from(hash, 'hex'));
   }
 
-  /**
-   * Gets the Ed25519KeyHash as a byte array.
-   */
+  /** Gets the Ed25519KeyHash as a byte array. */
   bytes(): Uint8Array {
     return this.#hash;
   }
 
-  /**
-   * Gets the Ed25519KeyHash as a hex string.
-   */
+  /** Gets the Ed25519KeyHash as a hex string. */
   hex(): Ed25519KeyHashHex {
     return Ed25519KeyHashHex(Buffer.from(this.#hash).toString('hex'));
   }

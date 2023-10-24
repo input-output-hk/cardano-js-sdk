@@ -1,8 +1,10 @@
 import 'reflect-metadata';
 import { DataSource, DataSourceOptions, DefaultNamingStrategy, NamingStrategyInterface, QueryRunner } from 'typeorm';
 import { Logger } from 'ts-log';
-import { contextLogger, patchObject } from '@cardano-sdk/util';
-import { createPgBoss } from './pgBoss';
+import { NEVER, Observable, concat, from, switchMap } from 'rxjs';
+import { PgBossExtension, createPgBoss, createPgBossExtension } from './pgBoss';
+import { WithLogger, contextLogger, patchObject } from '@cardano-sdk/util';
+import { finalizeWithLatest } from '@cardano-sdk/util-rxjs';
 import { typeormLogger } from './logger';
 import snakeCase from 'lodash/snakeCase';
 
@@ -157,3 +159,85 @@ export const createDataSource = ({
     }
   });
 };
+
+export type CreateObservableDataSourceProps = Omit<CreateDataSourceProps, 'connectionConfig'> & {
+  connectionConfig$: Observable<PgConnectionConfig>;
+};
+
+export const createObservableDataSource = ({ connectionConfig$, ...rest }: CreateObservableDataSourceProps) =>
+  connectionConfig$.pipe(
+    switchMap((connectionConfig) =>
+      concat(
+        from(
+          (async () => {
+            const dataSource = createDataSource({
+              connectionConfig,
+              ...rest
+            });
+            await dataSource.initialize();
+            return dataSource;
+          })()
+        ),
+        NEVER
+      ).pipe(
+        finalizeWithLatest(async (dataSource) => {
+          try {
+            await dataSource?.destroy();
+          } catch (error) {
+            rest.logger.error('Failed to destroy data source', error);
+          }
+        })
+      )
+    )
+  );
+
+export interface TypeormConnection {
+  queryRunner: QueryRunner;
+  pgBoss?: PgBossExtension;
+}
+
+const releaseConnection =
+  ({ logger }: WithLogger) =>
+  async (connection: TypeormConnection | null) => {
+    if (!connection) return;
+    if (connection.queryRunner.isTransactionActive) {
+      try {
+        await connection.queryRunner.rollbackTransaction();
+      } catch (error) {
+        logger.warn('Failed to rollback transaction', error);
+      }
+    }
+    if (!connection.queryRunner.isReleased) {
+      try {
+        await connection.queryRunner.release();
+      } catch (error) {
+        logger.warn('Failed to "release" query runner', error);
+      }
+    }
+  };
+
+export type ConnectProps = Pick<CreateObservableDataSourceProps, 'extensions' | 'logger'>;
+
+const createConnection = async (dataSource: DataSource, { logger, extensions }: ConnectProps) => {
+  const queryRunner = dataSource.createQueryRunner('master');
+  await queryRunner.connect();
+  if (extensions?.pgBoss) {
+    const pgBoss = createPgBossExtension(queryRunner, logger);
+    return { pgBoss, queryRunner };
+  }
+  return { queryRunner };
+};
+
+export const connect =
+  ({ logger, extensions }: ConnectProps) =>
+  (dataSource$: Observable<DataSource>) =>
+    dataSource$.pipe(
+      switchMap((dataSource) =>
+        concat(from(createConnection(dataSource, { extensions, logger })), NEVER).pipe(
+          finalizeWithLatest(releaseConnection({ logger }))
+        )
+      )
+    );
+
+export const createObservableConnection = (props: CreateObservableDataSourceProps): Observable<TypeormConnection> =>
+  createObservableDataSource(props).pipe(connect(props));

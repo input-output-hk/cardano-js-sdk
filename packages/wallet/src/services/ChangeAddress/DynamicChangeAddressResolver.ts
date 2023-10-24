@@ -164,7 +164,8 @@ const createBuckets = (
 
     const percentageForPool = weightsAsPercent.get(delegated.pool.hexId);
 
-    if (!percentageForPool) throw new InvalidStateError(`Pool '${delegated.pool.id}' not found in the portfolio.`); // Shouldn't happen.
+    if (percentageForPool === undefined)
+      throw new InvalidStateError(`Pool '${delegated.pool.id}' not found in the portfolio.`); // Shouldn't happen.
 
     buckets.push({
       address: groupedAddress.address,
@@ -184,6 +185,9 @@ const createBuckets = (
  * @param bucket The bucket to compute the gap for.
  */
 const getBucketGap = (bucket: Bucket) => {
+  // We need to avoid a division by 0 here. If capacity is 0, we just return a gap of 0.
+  if (bucket.capacity === 0n) return new BigNumber('0');
+
   const capacity = new BigNumber(bucket.capacity.toString());
   const filledAmount = new BigNumber(bucket.filledAmount.toString());
 
@@ -277,14 +281,10 @@ export const delegationMatchesPortfolio = (
   return isEqual(portfolioPools, delegationPools);
 };
 
-/**
- * Gets the current delegation portfolio.
- */
+/** Gets the current delegation portfolio. */
 export type GetDelegationPortfolio = () => Promise<Cardano.Cip17DelegationPortfolio | null>;
 
-/**
- * Resolves the address to be used for change.
- */
+/** Resolves the address to be used for change. */
 export class DynamicChangeAddressResolver implements ChangeAddressResolver {
   readonly #getDelegationPortfolio: GetDelegationPortfolio;
   readonly #delegationDistribution: DelegationTracker['distribution$'];
@@ -311,9 +311,7 @@ export class DynamicChangeAddressResolver implements ChangeAddressResolver {
     this.#logger = logger;
   }
 
-  /**
-   * Resolve the change addresses for change outputs that better maintains the desired stake distribution.
-   */
+  /** Resolve the change addresses for change outputs that better maintains the desired stake distribution. */
   async resolve(selection: Selection): Promise<Array<Cardano.TxOut>> {
     const delegationDistribution = [...(await firstValueFrom(this.#delegationDistribution)).values()];
     let portfolio = await this.#getDelegationPortfolio();

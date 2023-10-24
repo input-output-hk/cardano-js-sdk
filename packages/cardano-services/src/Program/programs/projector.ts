@@ -1,4 +1,3 @@
-import { Bootstrap } from '@cardano-sdk/projection';
 import { Cardano } from '@cardano-sdk/core';
 import { CommonProgramOptions, OgmiosProgramOptions, PosgresProgramOptions } from '../options';
 import { DnsResolver, createDnsResolver } from '../utils';
@@ -12,8 +11,8 @@ import { Logger } from 'ts-log';
 import { MissingProgramOption, UnknownServiceName } from '../errors';
 import { ProjectionHttpService, ProjectionName, createTypeormProjection, storeOperators } from '../../Projection';
 import { SrvRecord } from 'dns';
-import { TypeormStabilityWindowBuffer, createStorePoolMetricsUpdateJob } from '@cardano-sdk/projection-typeorm';
 import { createLogger } from 'bunyan';
+import { createStorePoolMetricsUpdateJob } from '@cardano-sdk/projection-typeorm';
 import { getConnectionConfig, getOgmiosObservableCardanoNode } from '../services';
 
 export const BLOCKS_BUFFER_LENGTH_DEFAULT = 10;
@@ -50,11 +49,10 @@ const createProjectionHttpService = async (options: ProjectionMapFactoryOptions)
     ogmiosUrl: args.ogmiosUrl
   });
   const connectionConfig$ = getConnectionConfig(dnsResolver, 'projector', '', args);
-  const buffer = new TypeormStabilityWindowBuffer({ logger });
   const { blocksBufferLength, dropSchema, dryRun, exitAtBlockNo, handlePolicyIds, projectionNames, synchronize } = args;
   const projection$ = createTypeormProjection({
     blocksBufferLength,
-    buffer,
+    cardanoNode,
     connectionConfig$,
     devOptions: { dropSchema, synchronize },
     exitAtBlockNo,
@@ -62,12 +60,6 @@ const createProjectionHttpService = async (options: ProjectionMapFactoryOptions)
     projectionOptions: {
       handlePolicyIds
     },
-    projectionSource$: Bootstrap.fromCardanoNode({
-      blocksBufferLength,
-      buffer,
-      cardanoNode,
-      logger
-    }),
     projections: projectionNames
   });
   return new ProjectionHttpService({ dryRun, projection$, projectionNames }, { logger });

@@ -7,7 +7,9 @@ import {
   RequestNext
 } from '@cardano-sdk/core';
 import { ChainSynchronization, InteractionContext, Schema, safeJSON } from '@cardano-ogmios/client';
+import { Logger } from 'ts-log';
 import { Observable, Subscriber, from, switchMap } from 'rxjs';
+import { WithLogger, toSerializableObject } from '@cardano-sdk/util';
 import { block as blockToCore } from '../../ogmiosToCore';
 import { nanoid } from 'nanoid';
 import { ogmiosToCorePointOrOrigin, ogmiosToCoreTip, ogmiosToCoreTipOrOrigin, pointOrOriginToOgmios } from './util';
@@ -22,10 +24,20 @@ export interface WithObservableInteractionContext {
   interactionContext$: Observable<InteractionContext>;
 }
 
+const mapBlock = (block: Schema.Block, logger: Logger) => {
+  try {
+    return blockToCore(block);
+  } catch (error) {
+    logger.error('Failed to map block:', JSON.stringify(toSerializableObject(block)));
+    throw error;
+  }
+};
+
 const notifySubscriberAndParseNewCursor = (
   response: Schema.Ogmios['NextBlockResponse'],
   subscriber: Subscriber<ChainSyncEvent>,
-  requestNext: RequestNext
+  requestNext: RequestNext,
+  logger: Logger
 ): PointOrOrigin | undefined => {
   if (response.result.direction === 'backward') {
     const point = ogmiosToCorePointOrOrigin(response.result.point);
@@ -37,7 +49,7 @@ const notifySubscriberAndParseNewCursor = (
     });
     return point;
   } else if (response.result.direction === 'forward') {
-    const coreBlock = blockToCore(response.result.block);
+    const coreBlock = mapBlock(response.result.block, logger);
     if (!coreBlock) {
       // Assuming it's an EBB
       requestNext();
@@ -68,7 +80,7 @@ const isResponseId = (id: unknown): id is { [RequestIdProp]: string } =>
 
 export const createObservableChainSyncClient = (
   { intersectionPoint }: ObservableChainSyncClientProps,
-  { interactionContext$ }: WithObservableInteractionContext
+  { interactionContext$, logger }: WithObservableInteractionContext & WithLogger
 ): Observable<ChainSyncEvent> => {
   let cursor = intersectionPoint;
   return interactionContext$.pipe(
@@ -94,7 +106,7 @@ export const createObservableChainSyncClient = (
               if (!isResponseId(response.id) || requestId !== response.id[RequestIdProp]) {
                 return;
               }
-              cursor = notifySubscriberAndParseNewCursor(response, subscriber, requestNext) || cursor;
+              cursor = notifySubscriberAndParseNewCursor(response, subscriber, requestNext, logger) || cursor;
             }
           };
           context.socket.on('message', handler);

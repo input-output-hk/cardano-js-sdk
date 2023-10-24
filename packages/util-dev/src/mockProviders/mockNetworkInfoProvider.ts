@@ -16,9 +16,7 @@ export const networkInfo = {
   }
 };
 
-/**
- * Provider stub for testing
- */
+/** Provider stub for testing */
 export const mockNetworkInfoProvider = () => ({
   eraSummaries: jest.fn().mockResolvedValue(networkInfo.network.eraSummaries),
   genesisParameters: jest.fn().mockResolvedValue(genesisParameters),

@@ -3,40 +3,58 @@ ARG UBUNTU_VERSION=20.04
 FROM ubuntu:${UBUNTU_VERSION} as ubuntu-nodejs
 ARG NODEJS_MAJOR_VERSION=18
 ENV DEBIAN_FRONTEND=nonintercative
-RUN apt-get update && apt-get install curl -y
-RUN curl --proto '=https' --tlsv1.2 -sSf -L https://deb.nodesource.com/setup_${NODEJS_MAJOR_VERSION}.x | bash -
-RUN curl --proto '=https' --tlsv1.2 -sSf -L https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - &&\
-  echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" | tee /etc/apt/sources.list.d/pgdg.list
-RUN apt-get update
-RUN apt-get install nodejs -y
-RUN apt-get install -y --no-install-recommends ca-certificates jq postgresql-client
+
+RUN \
+  apt-get update &&\
+  apt-get install ca-certificates curl gnupg lsb-release -y &&\
+  mkdir -p /etc/apt/keyrings &&\
+  curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg &&\
+  echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODEJS_MAJOR_VERSION.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list &&\
+  curl --proto '=https' --tlsv1.2 -sSf -L https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - &&\
+  echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" | tee /etc/apt/sources.list.d/pgdg.list &&\
+  apt-get update &&\
+  apt-get install nodejs -y &&\
+  apt-get install -y --no-install-recommends ca-certificates jq postgresql-client
 
 FROM ubuntu-nodejs as nodejs-builder
-RUN curl --proto '=https' --tlsv1.2 -sSf -L https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - &&\
+RUN \
+  curl --proto '=https' --tlsv1.2 -sSf -L https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - &&\
   echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list &&\
-  apt-get update && apt-get install pkg-config libusb-1.0 libudev-dev gcc g++ make gnupg2 yarn -y
-RUN yarn global add node-gyp@9.0.0
-RUN mkdir -p /app/packages
+  apt-get update && apt-get install pkg-config libusb-1.0 libudev-dev gcc g++ make gnupg2 yarn -y &&\
+  yarn global add node-gyp@9.0.0
 WORKDIR /app
 COPY build build
-COPY packages packages
+COPY packages/cardano-services/package.json packages/cardano-services/package.json
+COPY packages/cardano-services-client/package.json packages/cardano-services-client/package.json
+COPY packages/core/package.json packages/core/package.json
+COPY packages/crypto/package.json packages/crypto/package.json
+COPY packages/dapp-connector/package.json packages/dapp-connector/package.json
+COPY packages/e2e/package.json packages/e2e/package.json
+COPY packages/golden-test-generator/package.json packages/golden-test-generator/package.json
+COPY packages/governance/package.json packages/governance/package.json
+COPY packages/hardware-ledger/package.json packages/hardware-ledger/package.json
+COPY packages/hardware-trezor/package.json packages/hardware-trezor/package.json
+COPY packages/input-selection/package.json packages/input-selection/package.json
+COPY packages/key-management/package.json packages/key-management/package.json
+COPY packages/ogmios/package.json packages/ogmios/package.json
+COPY packages/projection/package.json packages/projection/package.json
+COPY packages/projection-typeorm/package.json packages/projection-typeorm/package.json
+COPY packages/tx-construction/package.json packages/tx-construction/package.json
+COPY packages/util/package.json packages/util/package.json
+COPY packages/util-dev/package.json packages/util-dev/package.json
+COPY packages/util-rxjs/package.json packages/util-rxjs/package.json
+COPY packages/wallet/package.json packages/wallet/package.json
+COPY packages/web-extension/package.json packages/web-extension/package.json
 COPY scripts scripts
 COPY .yarn .yarn
-COPY \
-  .eslintrc.js \
-  .prettierrc \
-  .yarnrc.yml \
-  complete.eslintrc.js \
-  eslint.tsconfig.json \
-  package.json \
-  tsconfig.json \
-  yarn.lock \
-  yarn-project.nix \
-  /app/
+COPY .eslintrc.js .prettierrc .yarnrc.yml complete.eslintrc.js eslint.tsconfig.json package.json tsconfig.json yarn.lock yarn-project.nix ./
 
 FROM nodejs-builder as cardano-services-builder
 RUN yarn --immutable --inline-builds
-RUN NODE_OPTIONS=--max_old_space_size=10240 yarn build
+COPY packages packages
+RUN \
+  echo "export const unused = 'unused';" > packages/e2e/src/index.ts &&\
+  NODE_OPTIONS=--max_old_space_size=10240 yarn build
 
 FROM nodejs-builder as cardano-services-production-deps
 RUN yarn workspaces focus --all --production
@@ -44,7 +62,7 @@ RUN yarn workspaces focus --all --production
 FROM ubuntu-nodejs as cardano-services
 COPY --from=cardano-services-production-deps /app/node_modules /app/node_modules
 COPY --from=cardano-services-production-deps /app/packages/cardano-services/node_modules /app/packages/cardano-services/node_modules
-COPY --from=cardano-services-production-deps /app/packages/projection-typeorm/node_modules /app/packages/projection-typeorm/node_modules
+COPY --from=cardano-services-production-deps /app/packages/core/node_modules /app/packages/core/node_modules
 COPY --from=cardano-services-builder /app/scripts /app/scripts
 COPY --from=cardano-services-builder /app/packages/cardano-services/dist /app/packages/cardano-services/dist
 COPY --from=cardano-services-builder /app/packages/cardano-services/package.json /app/packages/cardano-services/package.json

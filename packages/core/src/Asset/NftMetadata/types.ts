@@ -34,9 +34,7 @@ export const MediaType = (mediaType: string) => {
   throw new InvalidStringError('Expected media type to be "*/*"');
 };
 
-/**
- * https://cips.cardano.org/cips/cip25/
- */
+/** https://cips.cardano.org/cips/cip25/ */
 export interface NftMetadataFile {
   name?: string;
   mediaType: MediaType;
@@ -44,10 +42,7 @@ export interface NftMetadataFile {
   otherProperties?: Map<string, Metadatum>;
 }
 
-/**
- * https://cips.cardano.org/cips/cip25/
- * https://cips.cardano.org/cips/cip68/ (label 222)
- */
+/** https://cips.cardano.org/cips/cip25/ https://cips.cardano.org/cips/cip68/ (label 222) */
 export interface NftMetadata {
   name: string;
   image: Uri;

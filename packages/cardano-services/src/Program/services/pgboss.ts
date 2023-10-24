@@ -6,6 +6,7 @@ import {
   PoolRegistrationEntity,
   PoolRetirementEntity,
   StakePoolEntity,
+  createDataSource,
   createPgBoss,
   isRecoverableTypeormError
 } from '@cardano-sdk/projection-typeorm';
@@ -32,14 +33,11 @@ import { Pool } from 'pg';
 import { Router } from 'express';
 import { StakePoolMetadataProgramOptions } from '../options/stakePoolMetadata';
 import { contextLogger } from '@cardano-sdk/util';
-import { createObservableDataSource } from '../../Projection/createTypeormProjection';
 import { retryBackoff } from 'backoff-rxjs';
 import PgBoss from 'pg-boss';
 
-/**
- * The entities required by the job handlers
- */
-export const pgBossEntities = [
+/** The entities required by the job handlers */
+export const pgBossEntities: Function[] = [
   CurrentPoolMetricsEntity,
   BlockEntity,
   PoolMetadataEntity,
@@ -49,13 +47,28 @@ export const pgBossEntities = [
 ];
 
 export const createPgBossDataSource = (connectionConfig$: Observable<PgConnectionConfig>, logger: Logger) =>
-  createObservableDataSource({
-    connectionConfig$,
-    entities: pgBossEntities,
-    extensions: {},
-    logger,
-    migrationsRun: false
-  });
+  // TODO: use createObservableDataSource from projection-typeorm package.
+  // A challenge in doing that is that we call subscriber.error on retryable errors in order to reconnect.
+  // Doing that with createObservableDataSource will 'destroy' the data source that's currently used,
+  // so pg-boss is then unable to update job status and it stays 'active', not available for the newly
+  // recreated worker to be picked up.
+  // TODO: this raises another question - what happens when database connection drops while working on a job?
+  // Will it stay 'active' forever, or will pg-boss eventually update it due to some sort of timeout?
+  connectionConfig$.pipe(
+    switchMap((connectionConfig) =>
+      from(
+        (async () => {
+          const dataSource = createDataSource({
+            connectionConfig,
+            entities: pgBossEntities,
+            logger
+          });
+          await dataSource.initialize();
+          return dataSource;
+        })()
+      )
+    )
+  );
 
 export type PgBossWorkerArgs = CommonProgramOptions &
   StakePoolMetadataProgramOptions &
@@ -140,6 +153,7 @@ export class PgBossHttpService extends HttpService {
         // This ensures that if an error which can't be retried arrives here is handled as a FATAL error
         shouldRetry: (error: unknown) => {
           const retry = isRecoverableError(error);
+          this.logger.debug('work() shouldRetry', retry, error);
 
           this.#health = {
             ok: false,

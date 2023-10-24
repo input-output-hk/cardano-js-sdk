@@ -40,6 +40,7 @@ x-with-postgres: &with-postgres
     - postgres_password
     - postgres_user
     - postgres_db
+    - postgres_db_asset
     - postgres_db_db_sync
     - postgres_db_handle
     - postgres_db_stake_pool
@@ -69,6 +70,7 @@ x-provider-server-environment: &provider-server-environment
 x-sdk-environment: &sdk-environment
   LOGGER_MIN_SEVERITY: ${LOGGER_MIN_SEVERITY:-info}
   OGMIOS_URL: ws://cardano-node-ogmios:1337
+  POSTGRES_DB_FILE_ASSET: /run/secrets/postgres_db_handle
   POSTGRES_DB_FILE_DB_SYNC: /run/secrets/postgres_db_db_sync
   POSTGRES_DB_FILE_HANDLE: /run/secrets/postgres_db_handle
   POSTGRES_DB_FILE_STAKE_POOL: /run/secrets/postgres_db_stake_pool
@@ -78,12 +80,14 @@ x-sdk-environment: &sdk-environment
   POSTGRES_POOL_MAX_DB_SYNC: ${POSTGRES_POOL_MAX:-10}
   POSTGRES_POOL_MAX_HANDLE: ${POSTGRES_POOL_MAX:-10}
   POSTGRES_POOL_MAX_STAKE_POOL: ${POSTGRES_POOL_MAX:-10}
+  POSTGRES_PASSWORD_FILE_ASSET: /run/secrets/postgres_password
   POSTGRES_PASSWORD_FILE_DB_SYNC: /run/secrets/postgres_password
   POSTGRES_PASSWORD_FILE_HANDLE: /run/secrets/postgres_password
   POSTGRES_PASSWORD_FILE_STAKE_POOL: /run/secrets/postgres_password
   POSTGRES_PORT_DB_SYNC: 5432
   POSTGRES_PORT_HANDLE: 5432
   POSTGRES_PORT_STAKE_POOL: 5432
+  POSTGRES_USER_FILE_ASSET: /run/secrets/postgres_user
   POSTGRES_USER_FILE_DB_SYNC: /run/secrets/postgres_user
   POSTGRES_USER_FILE_HANDLE: /run/secrets/postgres_user
   POSTGRES_USER_FILE_STAKE_POOL: /run/secrets/postgres_user
@@ -192,6 +196,27 @@ services:
       - postgres_user
     shm_size: '2gb'
 
+  asset-projector:
+    <<:
+      - *from-sdk
+      - *logging
+      - *projector
+      - *with-postgres
+    environment:
+      <<:
+        - *projector-environment
+        - *sdk-environment
+      POSTGRES_DB_FILE: /run/secrets/postgres_db_asset
+      PROJECTION_NAMES: asset
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'test `curl -fs http://localhost:3000/v1.0.0/health | jq -r ".services[0].projectedTip.blockNo"` -gt 1'
+        ]
+    ports:
+      - ${ASSET_PROJECTOR_PORT:-4006}:3000
+
   handle-projector:
     <<:
       - *from-sdk
@@ -262,6 +287,20 @@ services:
     ports:
       - ${STAKE_POOL_API_PORT:-4010}:3000
 
+  asset-provider-server:
+    <<:
+      - *from-sdk
+      - *logging
+      - *provider-server
+      - *with-postgres
+    environment:
+      <<:
+        - *sdk-environment
+        - *provider-server-environment
+      SERVICE_NAMES: asset
+    ports:
+      - ${HANDLE_API_PORT:-4014}:3000
+
   handle-provider-server:
     <<:
       - *from-sdk
@@ -321,6 +360,8 @@ secrets:
   # See https://github.com/input-output-hk/cardano-db-sync/blob/aed18d1be192bd58d054cdba23758b579dae9f4e/nix/docker.nix#L116
   postgres_db:
     file: ../../compose/placeholder-secrets/postgres_db_db_sync
+  postgres_db_asset:
+    file: ../../compose/placeholder-secrets/postgres_db_asset
   postgres_db_db_sync:
     file: ../../compose/placeholder-secrets/postgres_db_db_sync
   postgres_db_handle:

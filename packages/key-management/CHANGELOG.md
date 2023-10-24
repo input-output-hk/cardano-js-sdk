@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.14.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.13.0...@cardano-sdk/key-management@0.14.0) (2023-10-12)
+
+### ⚠ BREAKING CHANGES
+
+* the TrezorKeyAgent class was moved from `key-management` to `hardware-trezor` package
+
+### Features
+
+* add dedicated Trezor package ([2a1b075](https://github.com/input-output-hk/cardano-js-sdk/commit/2a1b0754adfd29f1ef2f820b59f91f950cddb4d9))
+
+## [0.13.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.12.0...@cardano-sdk/key-management@0.13.0) (2023-10-09)
+
+### ⚠ BREAKING CHANGES
+
+* core package no longer exports the CML types
+
+### Features
+
+* core package no longer exports the CML types ([51545ed](https://github.com/input-output-hk/cardano-js-sdk/commit/51545ed82b4abeb795b0a50ad7d299ddb5da4a0d))
+
+## [0.12.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.11.0...@cardano-sdk/key-management@0.12.0) (2023-09-29)
+
+### ⚠ BREAKING CHANGES
+
+* - key-management `stubSignTransaction` positional args were replaced by named args,
+as defined in `StubSignTransactionProps`.
+A new `dRepPublicKey` named arg is part of `StubSignTransactionProps`
+
+### Features
+
+* update for Conway transaction fields ([c32513b](https://github.com/input-output-hk/cardano-js-sdk/commit/c32513bb89d0318dba35227c3509204166a209b2))
+
 ## [0.11.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/key-management@0.10.3...@cardano-sdk/key-management@0.11.0) (2023-09-20)
 
 ### ⚠ BREAKING CHANGES

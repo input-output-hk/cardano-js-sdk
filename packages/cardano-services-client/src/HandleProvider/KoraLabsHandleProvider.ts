@@ -13,9 +13,7 @@ import {
 import { IHandle } from '@koralabs/handles-public-api-interfaces';
 import axios, { AxiosAdapter, AxiosInstance } from 'axios';
 
-/**
- * The KoraLabsHandleProvider endpoint paths.
- */
+/** The KoraLabsHandleProvider endpoint paths. */
 const paths = {
   handles: '/handles',
   healthCheck: '/health'

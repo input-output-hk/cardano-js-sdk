@@ -1,29 +1,17 @@
-/**
- * The plutus data type kind.
- */
+/** The plutus data type kind. */
 export enum PlutusDataKind {
-  /**
-   * Represents a specific constructor of a 'Sum Type' along with its arguments.
-   */
+  /** Represents a specific constructor of a 'Sum Type' along with its arguments. */
   ConstrPlutusData,
 
-  /**
-   * A map of PlutusData as both key and values.
-   */
+  /** A map of PlutusData as both key and values. */
   Map,
 
-  /**
-   * A list of PlutusData.
-   */
+  /** A list of PlutusData. */
   List,
 
-  /**
-   * An integer.
-   */
+  /** An integer. */
   Integer,
 
-  /**
-   * Bounded bytes.
-   */
+  /** Bounded bytes. */
   Bytes
 }

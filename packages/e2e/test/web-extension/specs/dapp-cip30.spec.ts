@@ -49,15 +49,15 @@ describe('dapp/cip30', () => {
       await browser.waitUntil($(liFirstUtxo).isExisting, { timeout: 60_000 });
     });
 
-    it('dapp can build and send a transaction using cip30 WalletApi', async () => {
-      await $(dappBtnRun).click();
-      await expect($(dappSubmittedTxConfirmation)).toHaveTextContaining('check your wallet');
-    });
-
     it('dapp gets correct addresses from cip30 wallet api', async () => {
       await expect($(dappChangeAddress)).toHaveTextContaining(walletAddr);
       await expect($(dappStakeAddress)).toHaveTextContaining(walletStakeAddr);
       await expect($(dappUsedAddress)).toHaveTextContaining(walletAddr);
+    });
+
+    it('dapp can build and send a transaction using cip30 WalletApi', async () => {
+      await $(dappBtnRun).click();
+      await expect($(dappSubmittedTxConfirmation)).toHaveTextContaining('check your wallet');
     });
   });
 });

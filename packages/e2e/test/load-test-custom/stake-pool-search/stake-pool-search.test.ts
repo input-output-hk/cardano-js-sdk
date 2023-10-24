@@ -39,9 +39,7 @@ enum MeasureTarget {
 
 const PAGE_SIZE = 20;
 
-/**
- * The set of pools id found while getting results
- */
+/** The set of pools id found while getting results */
 const poolIds: Cardano.PoolId[] = [];
 
 const measurement = new MeasurementUtil<MeasureTarget | string>();

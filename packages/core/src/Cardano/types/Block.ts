@@ -5,33 +5,23 @@ import { Lovelace } from './Value';
 import { OnChainTx } from './Transaction';
 import { PoolId } from './StakePool/primitives';
 
-/**
- * The block size in bytes
- */
+/** The block size in bytes */
 export type BlockSize = OpaqueNumber<'BlockSize'>;
 export const BlockSize = (value: number): BlockSize => value as unknown as BlockSize;
 
-/**
- * The block number.
- */
+/** The block number. */
 export type BlockNo = OpaqueNumber<'BlockNo'>;
 export const BlockNo = (value: number): BlockNo => value as unknown as BlockNo;
 
-/**
- * The epoch number.
- */
+/** The epoch number. */
 export type EpochNo = OpaqueNumber<'EpochNo'>;
 export const EpochNo = (value: number): EpochNo => value as unknown as EpochNo;
 
-/**
- * Smallest time period in the blockchain
- */
+/** Smallest time period in the blockchain */
 export type Slot = OpaqueNumber<'Slot'>;
 export const Slot = (value: number): Slot => value as unknown as Slot;
 
-/**
- * block hash as hex string
- */
+/** block hash as hex string */
 export type BlockId = OpaqueString<'BlockId'>;
 
 export interface PartialBlockHeader {
@@ -49,16 +39,11 @@ export type Tip = PartialBlockHeader;
  */
 export const BlockId = (value: string): BlockId => Crypto.Hash32ByteBase16(value) as unknown as BlockId;
 
-/**
- * 32 byte ed25519 verification key as bech32 string.
- */
+/** 32 byte ed25519 verification key as bech32 string. */
 export type VrfVkBech32 = OpaqueString<'VrfVkBech32'>;
 export const VrfVkBech32 = (value: string) => typedBech32<VrfVkBech32>(value, 'vrf_vk', 52);
 
-/**
- * Shelley genesis delegate
- * Either a 28 byte hex string, or 'ShelleyGenesis-[8byte-hex-string]'
- */
+/** Shelley genesis delegate Either a 28 byte hex string, or 'ShelleyGenesis-[8byte-hex-string]' */
 export type GenesisDelegate = OpaqueString<'GenesisDelegate'>;
 export const GenesisDelegate = (value: string): GenesisDelegate => {
   // eslint-disable-next-line wrap-regex

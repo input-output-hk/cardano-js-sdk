@@ -3,7 +3,6 @@ export * from './auxiliaryData';
 export * from './certificates';
 export * from './collateralOutput';
 export * from './collateralInputs';
-export * from './keyPaths';
 export * from './referenceInputs';
 export * from './requiredSigners';
 export * from './tx';

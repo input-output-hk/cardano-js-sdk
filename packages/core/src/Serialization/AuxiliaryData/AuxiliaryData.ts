@@ -10,9 +10,7 @@ import { hexToBytes } from '../../util/misc';
 export const SHELLEY_ERA_FIELDS_COUNT = 2;
 export const ALONZO_AUX_TAG = 259;
 
-/**
- * This type represents the segregated CDDL scripts.
- */
+/** This type represents the segregated CDDL scripts. */
 type CddlScripts = {
   native: Array<NativeScript> | undefined;
   plutusV1: Array<PlutusV1Script> | undefined;

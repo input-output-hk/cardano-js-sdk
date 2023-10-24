@@ -9,10 +9,7 @@ import { hexToBytes } from '../../util/misc';
 
 const EMBEDDED_GROUP_SIZE = 2;
 
-/**
- * This certificate is used when an individual wants to delegate their voting
- * rights to any other DRep.
- */
+/** This certificate is used when an individual wants to delegate their voting rights to any other DRep. */
 export class VoteDelegation {
   #credential: Cardano.Credential;
   #dRep: DRep;

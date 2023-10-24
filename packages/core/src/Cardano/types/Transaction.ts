@@ -14,9 +14,7 @@ import { Script } from './Script';
 import { TxBodyCBOR } from '../../CBOR/TxBodyCBOR';
 import { bytesToHex, hexToBytes } from '../../util/misc';
 
-/**
- * transaction hash as hex string
- */
+/** transaction hash as hex string */
 export type TransactionId = OpaqueString<'TransactionId'>;
 
 /**

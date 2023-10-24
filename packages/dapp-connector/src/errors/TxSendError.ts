@@ -1,9 +1,6 @@
 import { CustomError } from 'ts-custom-error';
 
-/**
- * - Refused - Wallet refuses to send the tx (could be rate limiting)
- * - Failure - Wallet could not send the tx
- */
+/** - Refused - Wallet refuses to send the tx (could be rate limiting) - Failure - Wallet could not send the tx */
 export enum TxSendErrorCode {
   Refused = 1,
   Failure = 2

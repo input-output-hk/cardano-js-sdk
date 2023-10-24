@@ -98,6 +98,7 @@ export const getChainSyncEvents = async (
             const header = ogmiosToCore.blockHeader(block);
             if (!header) return;
             currentBlock = header.blockNo;
+
             if (onBlock !== undefined) {
               onBlock(currentBlock);
             }

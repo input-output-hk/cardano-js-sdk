@@ -1,32 +1,22 @@
 import { OpaqueNumber } from '@cardano-sdk/util';
 
-/**
- * Milliseconds time unit.
- */
+/** Milliseconds time unit. */
 export type Milliseconds = OpaqueNumber<'Milliseconds'>;
 export const Milliseconds = (value: number): Milliseconds => value as unknown as Milliseconds;
 
-/**
- * Seconds time unit.
- */
+/** Seconds time unit. */
 export type Seconds = OpaqueNumber<'Seconds'>;
 export const Seconds = (value: number): Seconds => value as unknown as Seconds;
 
-/**
- * Minutes time unit.
- */
+/** Minutes time unit. */
 export type Minutes = OpaqueNumber<'Minutes'>;
 export const Minutes = (value: number): Minutes => value as unknown as Minutes;
 
-/**
- * Hours time unit.
- */
+/** Hours time unit. */
 export type Hours = OpaqueNumber<'Hours'>;
 export const Hours = (value: number): Hours => value as unknown as Hours;
 
-/**
- * days time unit.
- */
+/** days time unit. */
 export type Days = OpaqueNumber<'Days'>;
 export const Days = (value: number): Days => value as unknown as Days;
 
@@ -42,9 +32,7 @@ Minutes.toSeconds = (value: Minutes): Seconds => (value * 60) as unknown as Seco
 Seconds.toMilliseconds = (value: Seconds): Milliseconds => (value * 1000) as unknown as Milliseconds;
 Milliseconds.toSeconds = (value: Milliseconds): Seconds => (value / 1000) as unknown as Seconds;
 
-/**
- * Represents a time interval.
- */
+/** Represents a time interval. */
 export class TimeSpan {
   private readonly elapsed = Milliseconds(0);
 

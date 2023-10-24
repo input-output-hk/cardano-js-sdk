@@ -3,6 +3,58 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.25.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.25.0...@cardano-sdk/wallet@0.25.1) (2023-10-19)
+
+### Features
+
+* **util-dev:** add createStubObservable util ([f7621d7](https://github.com/input-output-hk/cardano-js-sdk/commit/f7621d7f03b398b584e1f0fb63838dfb39ff0b68))
+
+## [0.25.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.24.0...@cardano-sdk/wallet@0.25.0) (2023-10-12)
+
+### ⚠ BREAKING CHANGES
+
+* the TrezorKeyAgent class was moved from `key-management` to `hardware-trezor` package
+
+### Features
+
+* add dedicated Trezor package ([2a1b075](https://github.com/input-output-hk/cardano-js-sdk/commit/2a1b0754adfd29f1ef2f820b59f91f950cddb4d9))
+
+## [0.24.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.23.0...@cardano-sdk/wallet@0.24.0) (2023-10-09)
+
+### ⚠ BREAKING CHANGES
+
+* remove NetworkMagics.Testnet and ChainIds.LegacyTestnet
+* core package no longer exports the CML types
+
+### Features
+
+* core package no longer exports the CML types ([51545ed](https://github.com/input-output-hk/cardano-js-sdk/commit/51545ed82b4abeb795b0a50ad7d299ddb5da4a0d))
+
+### Bug Fixes
+
+* **wallet:** delegation tracker now searches for portfolio updates on all transactions ([f5870cb](https://github.com/input-output-hk/cardano-js-sdk/commit/f5870cb171abc7f4a0cdc9392a5ec0ef074b6b24))
+* **wallet:** dynamic change resolver no longer throws when given a portfolio with entries with zero percent ([3fdb4ad](https://github.com/input-output-hk/cardano-js-sdk/commit/3fdb4adc0b844dea2a4c6c1823a7b9578292ab77))
+
+### Miscellaneous Chores
+
+* remove NetworkMagics.Testnet and ChainIds.LegacyTestnet ([190dba5](https://github.com/input-output-hk/cardano-js-sdk/commit/190dba5aca213778570e16e74fb64c02a69b41a8))
+
+## [0.23.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.22.0...@cardano-sdk/wallet@0.23.0) (2023-09-29)
+
+### ⚠ BREAKING CHANGES
+
+* - key-management `stubSignTransaction` positional args were replaced by named args,
+as defined in `StubSignTransactionProps`.
+A new `dRepPublicKey` named arg is part of `StubSignTransactionProps`
+* - replace `ObservableWallet.activePublicStakeKeys$` with
+`publicStakeKeys$` that emits `PubStakeKeyAndStatus[]`
+
+### Features
+
+* cip-95 update calls to get public stake keys ([b1039b4](https://github.com/input-output-hk/cardano-js-sdk/commit/b1039b4b32e74075c1833eb1d0bdaac06368e9b8))
+* update for Conway transaction fields ([c32513b](https://github.com/input-output-hk/cardano-js-sdk/commit/c32513bb89d0318dba35227c3509204166a209b2))
+* **wallet:** generate public drep key on key agent creation ([56bf163](https://github.com/input-output-hk/cardano-js-sdk/commit/56bf1632428e81fa0a33df1bbef527b53274a4a3))
+
 ## [0.22.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/wallet@0.21.2...@cardano-sdk/wallet@0.22.0) (2023-09-20)
 
 ### ⚠ BREAKING CHANGES

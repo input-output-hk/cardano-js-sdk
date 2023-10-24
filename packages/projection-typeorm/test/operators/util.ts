@@ -9,7 +9,41 @@ import {
 import { BigIntMath } from '@cardano-sdk/util';
 import { Cardano, ChainSyncEventType, Point } from '@cardano-sdk/core';
 import { Observable, lastValueFrom, takeWhile } from 'rxjs';
+import { RetryBackoffConfig } from 'backoff-rxjs';
+import {
+  TypeormStabilityWindowBuffer,
+  TypeormTipTracker,
+  createObservableConnection,
+  createTypeormTipTracker
+} from '../../src';
+import { connectionConfig$ } from '../util';
 import { generateRandomHexString, logger } from '@cardano-sdk/util-dev';
+
+export interface ProjectorContext {
+  buffer: TypeormStabilityWindowBuffer;
+  tipTracker: TypeormTipTracker;
+}
+
+const retryBackoffConfig: RetryBackoffConfig = {
+  initialInterval: 10,
+  maxInterval: 100
+};
+
+export const createProjectorContext = (entities: Function[]): ProjectorContext => {
+  const connection$ = createObservableConnection({
+    connectionConfig$,
+    entities,
+    logger
+  });
+  return {
+    buffer: new TypeormStabilityWindowBuffer({
+      connection$,
+      logger,
+      reconnectionConfig: retryBackoffConfig
+    }),
+    tipTracker: createTypeormTipTracker({ connection$, reconnectionConfig: retryBackoffConfig })
+  };
+};
 
 export const createProjectorTilFirst =
   <T>(project: () => Observable<T>) =>

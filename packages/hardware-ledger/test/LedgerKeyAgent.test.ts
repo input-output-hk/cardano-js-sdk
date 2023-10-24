@@ -2,7 +2,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { Ada, InvalidDataReason } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import { CML, Cardano } from '@cardano-sdk/core';
+import { Cardano } from '@cardano-sdk/core';
 import { CardanoKeyConst, CommunicationType, util } from '@cardano-sdk/key-management';
 import { LedgerKeyAgent } from '../src';
 import { dummyLogger } from 'ts-log';
@@ -378,7 +378,7 @@ describe('LedgerKeyAgent', () => {
           knownAddresses: []
         },
         {
-          bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
+          bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
           inputResolver: {
             resolveInput: jest.fn().mockResolvedValue(null)
           },

@@ -4,7 +4,6 @@
 /* eslint-disable max-depth */
 
 import * as Crypto from '@cardano-sdk/crypto';
-import { CML } from '@cardano-sdk/core';
 import { CustomError } from 'ts-custom-error';
 import { HexBlob } from '@cardano-sdk/util';
 import { Logger } from 'ts-log';
@@ -125,7 +124,7 @@ export const createHttpStakePoolMetadataService = (
           const signature = (await axiosClient.get<Crypto.Ed25519SignatureHex>(metadata.extSigUrl)).data;
           const message = HexBlob.fromBytes(Buffer.from(JSON.stringify(extMetadata)));
           const publicKey = Crypto.Ed25519PublicKeyHex(metadata.extVkey);
-          const bip32Ed25519 = new Crypto.CmlBip32Ed25519(CML);
+          const bip32Ed25519 = new Crypto.SodiumBip32Ed25519();
 
           // Verify the signature
           const isSignatureValid = await bip32Ed25519.verify(signature, message, publicKey);

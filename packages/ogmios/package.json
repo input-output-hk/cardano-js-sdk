@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/ogmios",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "Ogmios Providers",
   "engines": {
     "node": ">=16.20.2"
@@ -41,6 +41,7 @@
     "@cardano-ogmios/schema": "6.0.0-rc4",
     "@cardano-sdk/cardano-services-client": "workspace:~",
     "@cardano-sdk/util-dev": "workspace:~",
+    "@cardano-sdk/util-rxjs": "workspace:~",
     "@types/lodash": "^4.14.182",
     "delay": "^5.0.0",
     "eslint": "^7.32.0",

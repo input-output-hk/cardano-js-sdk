@@ -5,24 +5,16 @@ import { ServiceNames } from '../Program/programs/types';
 import { providerHandler } from '../util';
 import express from 'express';
 
-/**
- * Dependencies that are need to create AssetHttpService
- */
+/** Dependencies that are need to create AssetHttpService */
 export interface AssetHttpServiceDependencies {
-  /**
-   * The asset provider to fetch data
-   */
+  /** The asset provider to fetch data */
   assetProvider: AssetProvider;
 
-  /**
-   * The logger object
-   */
+  /** The logger object */
   logger: Logger;
 }
 
-/**
- * The Asset Http Service
- */
+/** The Asset Http Service */
 export class AssetHttpService extends HttpService {
   constructor({ assetProvider, logger }: AssetHttpServiceDependencies, router: express.Router = express.Router()) {
     super(ServiceNames.Asset, assetProvider, router, __dirname, logger);

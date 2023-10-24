@@ -11,9 +11,7 @@ import { HydratedTx, HydratedTxIn, TxIn, TxOut } from '../types';
 import { NetworkId } from '../ChainId';
 import { RewardAccount } from './RewardAccount';
 
-/**
- * mainnet or testnet address (Shelley as bech32 string, Byron as base58-encoded string)
- */
+/** mainnet or testnet address (Shelley as bech32 string, Byron as base58-encoded string) */
 export type PaymentAddress = OpaqueString<'PaymentAddress'>;
 
 /**
@@ -55,9 +53,7 @@ export const PaymentAddress = (value: string): PaymentAddress => {
   return (address.getType() === AddressType.Byron ? address.toBase58() : address.toBech32()) as PaymentAddress;
 };
 
-/**
- * Checks that an object containing an address (e.g., output, input) is within a set of provided addresses
- */
+/** Checks that an object containing an address (e.g., output, input) is within a set of provided addresses */
 export const isAddressWithin =
   (addresses: PaymentAddress[]) =>
   ({ address }: { address: PaymentAddress }): boolean =>

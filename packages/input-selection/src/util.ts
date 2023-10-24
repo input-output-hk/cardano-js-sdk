@@ -79,9 +79,7 @@ const isUtxoArray = (outputsOrUtxo: Cardano.TxOut[] | Cardano.Utxo[]): outputsOr
 
 export function toValues(outputs: Cardano.TxOut[]): Cardano.Value[];
 export function toValues(utxo: Cardano.Utxo[]): Cardano.Value[];
-/**
- * Map either TxOut[] or Utxo[] to Value[]
- */
+/** Map either TxOut[] or Utxo[] to Value[] */
 export function toValues(outputsOrUtxo: Cardano.TxOut[] | Cardano.Utxo[]): Cardano.Value[] {
   if (isUtxoArray(outputsOrUtxo)) {
     return outputsOrUtxo.map(([_, { value }]) => value);

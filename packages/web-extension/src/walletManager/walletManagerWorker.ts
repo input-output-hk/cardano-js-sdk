@@ -63,9 +63,7 @@ export class WalletManagerWorker implements WalletManagerApi {
     );
   }
 
-  /**
-   * `activate` the wallet with props of last activated wallet (load from `managerStorage`)
-   */
+  /** `activate` the wallet with props of last activated wallet (load from `managerStorage`) */
   async initialize() {
     const { [this.#managerStorageKey]: lastActivateProps } = await this.#managerStorage.get(this.#managerStorageKey);
     if (!lastActivateProps) return;
@@ -102,9 +100,7 @@ export class WalletManagerWorker implements WalletManagerApi {
     this.#deactivateWallet();
   }
 
-  /**
-   * Deactivates the active wallet and closes the remote api channels.
-   */
+  /** Deactivates the active wallet and closes the remote api channels. */
   shutdown(): void {
     this.#deactivateWallet();
 

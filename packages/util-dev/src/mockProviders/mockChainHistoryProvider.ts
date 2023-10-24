@@ -198,11 +198,7 @@ const queryTransactions = ({ rewardAccount }: { rewardAccount?: Cardano.RewardAc
 
 export const blocksByHashes = [{ epoch: Cardano.EpochNo(currentEpoch.number - 3) } as Cardano.ExtendedBlockInfo];
 
-/**
- * Provider stub for testing
- *
- * returns ChainHistoryProvider-compatible object
- */
+/** Provider stub for testing returns ChainHistoryProvider-compatible object */
 export const mockChainHistoryProvider = (props: { rewardAccount?: Cardano.RewardAccount } = {}) => ({
   blocksByHashes: jest.fn().mockResolvedValue(blocksByHashes),
   healthCheck: jest.fn().mockResolvedValue({ ok: true }),

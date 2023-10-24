@@ -8,6 +8,8 @@ import {
   StakeKeyRegistrationEntity,
   TokensEntity,
   TypeormStabilityWindowBuffer,
+  TypeormTipTracker,
+  createObservableConnection,
   storeAddresses,
   storeAssets,
   storeBlock,
@@ -25,16 +27,17 @@ import {
   generateRandomHexString,
   logger
 } from '@cardano-sdk/util-dev';
-import { Observable, defer, firstValueFrom, from } from 'rxjs';
+import { Observable, firstValueFrom } from 'rxjs';
 import { QueryRunner, Repository } from 'typeorm';
+import { connectionConfig$, initializeDataSource } from '../util';
 import {
+  createProjectorContext,
   createProjectorTilFirst,
   createRollForwardEventBasedOn,
   createStubBlockHeader,
   createStubProjectionSource,
   createStubRollForwardEvent
 } from './util';
-import { initializeDataSource } from '../util';
 
 const isAddressWithBothCredentials = (addr: Mappers.Address) =>
   typeof addr.stakeCredential === 'string' && !!addr.paymentCredentialHash;
@@ -43,6 +46,7 @@ describe('storeAddresses', () => {
   const stubEvents = chainSyncData(ChainSyncDataSet.WithStakeKeyDeregistration);
   let queryRunner: QueryRunner;
   let buffer: TypeormStabilityWindowBuffer;
+  let tipTracker: TypeormTipTracker;
   const entities = [
     BlockEntity,
     BlockDataEntity,
@@ -55,17 +59,13 @@ describe('storeAddresses', () => {
   ];
   let addressesRepo: Repository<AddressEntity>;
 
-  const dataSource$ = defer(() =>
-    from(initializeDataSource({ devOptions: { dropSchema: false, synchronize: false }, entities }))
-  );
-
   const storeData = (
     evt$: Observable<
       ProjectionEvent<Mappers.WithUtxo & Mappers.WithMint & Mappers.WithStakeKeyRegistrations & Mappers.WithAddresses>
     >
   ) =>
     evt$.pipe(
-      withTypeormTransaction({ dataSource$, logger }),
+      withTypeormTransaction({ connection$: createObservableConnection({ connectionConfig$, entities, logger }) }),
       storeBlock(),
       storeAssets(),
       storeUtxo(),
@@ -83,6 +83,7 @@ describe('storeAddresses', () => {
       Mappers.withStakeKeyRegistrations(),
       Mappers.withAddresses(),
       storeData,
+      tipTracker.trackProjectedTip(),
       requestNext()
     );
 
@@ -91,7 +92,8 @@ describe('storeAddresses', () => {
       blocksBufferLength: 1,
       buffer,
       cardanoNode: stubEvents.cardanoNode,
-      logger
+      logger,
+      projectedTip$: tipTracker.tip$
     }).pipe(applyOperators);
 
   const projectTilFirst = createProjectorTilFirst(project$);
@@ -100,13 +102,11 @@ describe('storeAddresses', () => {
     const dataSource = await initializeDataSource({ entities });
     queryRunner = dataSource.createQueryRunner();
     addressesRepo = queryRunner.manager.getRepository(AddressEntity);
-    buffer = new TypeormStabilityWindowBuffer({ allowNonSequentialBlockHeights: true, logger });
-    await buffer.initialize(queryRunner);
+    ({ buffer, tipTracker } = createProjectorContext(entities));
   });
 
   afterEach(async () => {
     await queryRunner.release();
-    buffer.shutdown();
   });
 
   it('inserts addresses with their type, payment credential and stake credential', async () => {

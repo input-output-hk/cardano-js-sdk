@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.5.14...@cardano-sdk/util-rxjs@0.6.0) (2023-10-19)
+
+### ⚠ BREAKING CHANGES
+
+* hoist ReconnectionConfig type from ogmios to util-rxjs
+
+### Code Refactoring
+
+* hoist ReconnectionConfig type from ogmios to util-rxjs ([704b5d6](https://github.com/input-output-hk/cardano-js-sdk/commit/704b5d6c82e6290c5f08800311d36d1b5d7a1eeb))
+
+## [0.5.14](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.5.13...@cardano-sdk/util-rxjs@0.5.14) (2023-10-12)
+
+**Note:** Version bump only for package @cardano-sdk/util-rxjs
+
+## [0.5.13](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.5.12...@cardano-sdk/util-rxjs@0.5.13) (2023-10-09)
+
+**Note:** Version bump only for package @cardano-sdk/util-rxjs
+
+## [0.5.12](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.5.11...@cardano-sdk/util-rxjs@0.5.12) (2023-09-29)
+
+**Note:** Version bump only for package @cardano-sdk/util-rxjs
+
 ## [0.5.11](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-rxjs@0.5.10...@cardano-sdk/util-rxjs@0.5.11) (2023-09-20)
 
 **Note:** Version bump only for package @cardano-sdk/util-rxjs

@@ -12,18 +12,16 @@ import {
   SerializableKeyAgentData,
   SerializableLedgerKeyAgentData,
   SerializableTrezorKeyAgentData,
-  TrezorKeyAgent,
   errors,
   util
 } from '@cardano-sdk/key-management';
 import { LedgerKeyAgent } from '@cardano-sdk/hardware-ledger';
 import { Logger } from 'ts-log';
+import { TrezorKeyAgent } from '@cardano-sdk/hardware-trezor';
 
 // TODO: use this type as 2nd parameter of restoreKeyAgent
 export interface RestoreInMemoryKeyAgentProps {
-  /**
-   * Required for InMemoryKeyAgent
-   */
+  /** Required for InMemoryKeyAgent */
   getPassphrase?: GetPassphrase;
 }
 

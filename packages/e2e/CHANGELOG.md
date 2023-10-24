@@ -3,6 +3,51 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.25.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.24.0...@cardano-sdk/e2e@0.25.0) (2023-10-19)
+
+### ⚠ BREAKING CHANGES
+
+* simplify StabilityWindowBuffer interface to just 'getBlock'
+- Bootstrap.fromCardanoNode now requires Tip observable parameter
+
+### Features
+
+* do not write to stability window buffer til volatile ([b2244ea](https://github.com/input-output-hk/cardano-js-sdk/commit/b2244eac56352961c36ef9e80038aead47ee9e52))
+
+## [0.24.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.23.0...@cardano-sdk/e2e@0.24.0) (2023-10-12)
+
+### ⚠ BREAKING CHANGES
+
+* the TrezorKeyAgent class was moved from `key-management` to `hardware-trezor` package
+
+### Features
+
+* add dedicated Trezor package ([2a1b075](https://github.com/input-output-hk/cardano-js-sdk/commit/2a1b0754adfd29f1ef2f820b59f91f950cddb4d9))
+* adds Asset projector and provider to docker compose infrastructure ([f0cf66b](https://github.com/input-output-hk/cardano-js-sdk/commit/f0cf66b944cd4db959be9e431dfc540051d53d9e))
+
+## [0.23.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.22.0...@cardano-sdk/e2e@0.23.0) (2023-10-09)
+
+### ⚠ BREAKING CHANGES
+
+* core package no longer exports the CML types
+
+### Features
+
+* core package no longer exports the CML types ([51545ed](https://github.com/input-output-hk/cardano-js-sdk/commit/51545ed82b4abeb795b0a50ad7d299ddb5da4a0d))
+
+## [0.22.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.21.0...@cardano-sdk/e2e@0.22.0) (2023-09-29)
+
+### ⚠ BREAKING CHANGES
+
+* **cardano-services:** StakePoolHttpService interface changed
+* - replace `ObservableWallet.activePublicStakeKeys$` with
+`publicStakeKeys$` that emits `PubStakeKeyAndStatus[]`
+
+### Features
+
+* **cardano-services:** added optional metadata fetch feature from SMASH server ([54a4f5e](https://github.com/input-output-hk/cardano-js-sdk/commit/54a4f5e7eab08f7c06802782e2da62d1406bdf1b))
+* cip-95 update calls to get public stake keys ([b1039b4](https://github.com/input-output-hk/cardano-js-sdk/commit/b1039b4b32e74075c1833eb1d0bdaac06368e9b8))
+
 ## [0.21.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/e2e@0.20.0...@cardano-sdk/e2e@0.21.0) (2023-09-20)
 
 ### ⚠ BREAKING CHANGES

@@ -14,8 +14,8 @@ import {
 } from '@cardano-sdk/dapp-connector';
 import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
 import { AssetId, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
+import { CallbackConfirmation, GetCollateralCallbackParams } from '../../src/cip30';
 import {
-  CML,
   Cardano,
   OutsideOfValidityIntervalData,
   Serialization,
@@ -24,7 +24,6 @@ import {
   TxSubmissionErrorCode,
   coalesceValueQuantities
 } from '@cardano-sdk/core';
-import { CallbackConfirmation, GetCollateralCallbackParams } from '../../src/cip30';
 import { HexBlob, ManagedFreeableScope } from '@cardano-sdk/util';
 import { InMemoryUnspendableUtxoStore, createInMemoryWalletStores } from '../../src/persistence';
 import { InitializeTxProps, InitializeTxResult } from '@cardano-sdk/tx-construction';
@@ -687,7 +686,7 @@ describe('cip30', () => {
           type: AddressType.External
         };
         ({ wallet: mockWallet } = await setupWallet({
-          bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
+          bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
           createKeyAgent: async (dependencies) => {
             const asyncKeyAgent = await testAsyncKeyAgent([groupedAddress], dependencies);
             asyncKeyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);

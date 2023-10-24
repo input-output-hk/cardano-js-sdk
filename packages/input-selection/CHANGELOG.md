@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.4](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.12.3...@cardano-sdk/input-selection@0.12.4) (2023-10-19)
+
+**Note:** Version bump only for package @cardano-sdk/input-selection
+
+## [0.12.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.12.2...@cardano-sdk/input-selection@0.12.3) (2023-10-12)
+
+**Note:** Version bump only for package @cardano-sdk/input-selection
+
+## [0.12.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.12.1...@cardano-sdk/input-selection@0.12.2) (2023-10-09)
+
+**Note:** Version bump only for package @cardano-sdk/input-selection
+
+## [0.12.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.12.0...@cardano-sdk/input-selection@0.12.1) (2023-09-29)
+
+**Note:** Version bump only for package @cardano-sdk/input-selection
+
 ## [0.12.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/input-selection@0.11.9...@cardano-sdk/input-selection@0.12.0) (2023-09-20)
 
 ### ⚠ BREAKING CHANGES

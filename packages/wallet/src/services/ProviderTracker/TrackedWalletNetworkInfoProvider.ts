@@ -24,9 +24,7 @@ export class WalletNetworkInfoProviderStats {
   }
 }
 
-/**
- * Wraps a WalletNetworkInfoProvider, tracking # of calls of each function
- */
+/** Wraps a WalletNetworkInfoProvider, tracking # of calls of each function */
 export class TrackedWalletNetworkInfoProvider extends ProviderTracker implements WalletNetworkInfoProvider {
   readonly stats = new WalletNetworkInfoProviderStats();
   readonly eraSummaries: WalletNetworkInfoProvider['eraSummaries'];

@@ -12,9 +12,7 @@ import { Update } from '../Update';
 import { VotingProcedures } from './VotingProcedures';
 import { multiAssetsToTokenMap, sortCanonically, tokenMapToMultiAsset } from './Utils';
 
-/**
- * The transaction body encapsulates the core details of a transaction.
- */
+/** The transaction body encapsulates the core details of a transaction. */
 export class TransactionBody {
   // Required fields
   #inputs: Array<TransactionInput>;

@@ -27,10 +27,7 @@ export function blockingWithLatestFrom<T, O, R>(
   combinator: (...value: [T, O]) => R
 ): OperatorFunction<T, R>;
 
-/**
- * Like withLatestFrom, but waits for first emission from `dependency$`
- * in order to not lose any emissions from source.
- */
+/** Like withLatestFrom, but waits for first emission from `dependency$` in order to not lose any emissions from source. */
 export function blockingWithLatestFrom<T, R>(
   dependency$: Observable<any>,
   combinator = (a: any, b: any) => [a, b]

@@ -1,6 +1,6 @@
 {
   "name": "@cardano-sdk/e2e",
-  "version": "0.21.0",
+  "version": "0.25.0",
   "description": "End to end tests for the cardano-js-sdk packages.",
   "engines": {
     "node": ">=16.20.2"
@@ -86,6 +86,7 @@
     "@cardano-sdk/core": "workspace:~",
     "@cardano-sdk/crypto": "workspace:~",
     "@cardano-sdk/hardware-ledger": "workspace:~",
+    "@cardano-sdk/hardware-trezor": "workspace:~",
     "@cardano-sdk/input-selection": "workspace:~",
     "@cardano-sdk/key-management": "workspace:~",
     "@cardano-sdk/ogmios": "workspace:~",
@@ -94,6 +95,7 @@
     "@cardano-sdk/util-dev": "workspace:~",
     "@cardano-sdk/util-rxjs": "workspace:~",
     "@cardano-sdk/wallet": "workspace:~",
+    "@dcspark/cardano-multiplatform-lib-nodejs": "^3.1.1",
     "@vespaiach/axios-fetch-adapter": "^0.3.0",
     "axios": "^0.27.2",
     "bunyan": "^1.8.15",

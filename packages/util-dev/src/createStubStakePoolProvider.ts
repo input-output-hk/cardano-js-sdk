@@ -24,9 +24,7 @@ export const somePartialStakePools: Cardano.StakePool[] = [
   }
 ] as Cardano.StakePool[];
 
-/**
- * Good source for testnet pools: https://testnet.adatools.io/pools
- */
+/** Good source for testnet pools: https://testnet.adatools.io/pools */
 export const createStubStakePoolProvider = (
   stakePools: Cardano.StakePool[] = somePartialStakePools,
   delayMs?: number

@@ -8,9 +8,7 @@ import {
 import { HandlePolicyIdsProgramOptions } from '../options/policyIds';
 import { Milliseconds, Seconds } from '@cardano-sdk/core';
 
-/**
- * cardano-services programs
- */
+/** cardano-services programs */
 export enum Programs {
   BlockfrostWorker = 'Blockfrost worker',
   ProviderServer = 'Provider server',
@@ -18,10 +16,7 @@ export enum Programs {
   Projector = 'Projector'
 }
 
-/**
- * Used as mount segments, so must be URL-friendly
- *
- */
+/** Used as mount segments, so must be URL-friendly */
 export enum ServiceNames {
   Asset = 'asset',
   ChainHistory = 'chain-history',
@@ -67,6 +62,7 @@ export type ProviderServerArgs = CommonProgramOptions &
   PosgresProgramOptions<'DbSync'> &
   PosgresProgramOptions<'Handle'> &
   PosgresProgramOptions<'StakePool'> &
+  PosgresProgramOptions<'Asset'> &
   OgmiosProgramOptions &
   HandlePolicyIdsProgramOptions &
   RabbitMqProgramOptions &

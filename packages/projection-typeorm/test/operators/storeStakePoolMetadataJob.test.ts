@@ -3,19 +3,21 @@ import {
   BlockEntity,
   STAKE_POOL_METADATA_QUEUE,
   TypeormStabilityWindowBuffer,
+  TypeormTipTracker,
+  createObservableConnection,
   storeBlock,
   storeStakePoolMetadataJob,
   typeormTransactionCommit,
   withTypeormTransaction
 } from '../../src';
-import { Bootstrap, Mappers, requestNext } from '@cardano-sdk/projection';
+import { Bootstrap, Mappers, ProjectionEvent, requestNext } from '@cardano-sdk/projection';
 import { ChainSyncDataSet, chainSyncData, logger } from '@cardano-sdk/util-dev';
 import { ChainSyncEventType } from '@cardano-sdk/core';
+import { Observable, filter, of } from 'rxjs';
 import { QueryRunner } from 'typeorm';
 import { StakePoolMetadataJob, createPgBoss } from '../../src/pgBoss';
-import { createProjectorTilFirst } from './util';
-import { defer, filter, from } from 'rxjs';
-import { initializeDataSource } from '../util';
+import { connectionConfig, initializeDataSource } from '../util';
+import { createProjectorContext, createProjectorTilFirst } from './util';
 
 const testPromise = () => {
   let resolvePromise: Function;
@@ -25,10 +27,36 @@ const testPromise = () => {
 
 describe('storeStakePoolMetadataJob', () => {
   const stubEvents = chainSyncData(ChainSyncDataSet.WithPoolRetirement);
+  const entities = [BlockEntity, BlockDataEntity];
   let queryRunner: QueryRunner;
   let buffer: TypeormStabilityWindowBuffer;
+  let tipTracker: TypeormTipTracker;
+
+  const storeData = <T extends Mappers.WithStakePools>(evt$: Observable<ProjectionEvent<T>>) =>
+    evt$.pipe(
+      withTypeormTransaction({
+        connection$: createObservableConnection({
+          connectionConfig$: of(connectionConfig),
+          entities: [BlockEntity, BlockDataEntity],
+          extensions: { pgBoss: true },
+          logger
+        }),
+        pgBoss: true
+      }),
+      storeBlock(),
+      storeStakePoolMetadataJob(),
+      buffer.storeBlockData(),
+      typeormTransactionCommit()
+    );
+
   const project$ = () =>
-    Bootstrap.fromCardanoNode({ blocksBufferLength: 10, buffer, cardanoNode: stubEvents.cardanoNode, logger }).pipe(
+    Bootstrap.fromCardanoNode({
+      blocksBufferLength: 10,
+      buffer,
+      cardanoNode: stubEvents.cardanoNode,
+      logger,
+      projectedTip$: tipTracker.tip$
+    }).pipe(
       // skipping 1st event because it's not rolled back
       filter((evt) => {
         const SKIP = 32_159;
@@ -39,24 +67,8 @@ describe('storeStakePoolMetadataJob', () => {
       }),
       Mappers.withCertificates(),
       Mappers.withStakePools(),
-      withTypeormTransaction(
-        {
-          dataSource$: defer(() =>
-            from(
-              initializeDataSource({
-                entities: [BlockEntity, BlockDataEntity],
-                extensions: { pgBoss: true }
-              })
-            )
-          ),
-          logger
-        },
-        { pgBoss: true }
-      ),
-      storeBlock(),
-      storeStakePoolMetadataJob(),
-      buffer.storeBlockData(),
-      typeormTransactionCommit(),
+      storeData,
+      tipTracker.trackProjectedTip(),
       requestNext()
     );
   const projectTilFirst = createProjectorTilFirst(project$);
@@ -65,17 +77,15 @@ describe('storeStakePoolMetadataJob', () => {
 
   beforeEach(async () => {
     const dataSource = await initializeDataSource({
-      entities: [BlockEntity, BlockDataEntity],
+      entities,
       extensions: { pgBoss: true }
     });
     queryRunner = dataSource.createQueryRunner();
-    buffer = new TypeormStabilityWindowBuffer({ allowNonSequentialBlockHeights: true, logger });
-    await buffer.initialize(queryRunner);
+    ({ buffer, tipTracker } = createProjectorContext(entities));
   });
 
   afterEach(async () => {
     await queryRunner.release();
-    buffer.shutdown();
   });
 
   it('creates jobs referencing Block table that can be picked up by a worker', async () => {

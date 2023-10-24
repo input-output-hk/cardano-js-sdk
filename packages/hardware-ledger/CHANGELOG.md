@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.6.0...@cardano-sdk/hardware-ledger@0.6.1) (2023-10-19)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-ledger
+
+## [0.6.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.5.0...@cardano-sdk/hardware-ledger@0.6.0) (2023-10-12)
+
+### ⚠ BREAKING CHANGES
+
+* the TrezorKeyAgent class was moved from `key-management` to `hardware-trezor` package
+
+### Features
+
+* add dedicated Trezor package ([2a1b075](https://github.com/input-output-hk/cardano-js-sdk/commit/2a1b0754adfd29f1ef2f820b59f91f950cddb4d9))
+
+## [0.5.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.4.1...@cardano-sdk/hardware-ledger@0.5.0) (2023-10-09)
+
+### ⚠ BREAKING CHANGES
+
+* core package no longer exports the CML types
+
+### Features
+
+* core package no longer exports the CML types ([51545ed](https://github.com/input-output-hk/cardano-js-sdk/commit/51545ed82b4abeb795b0a50ad7d299ddb5da4a0d))
+
+## [0.4.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.4.0...@cardano-sdk/hardware-ledger@0.4.1) (2023-09-29)
+
+**Note:** Version bump only for package @cardano-sdk/hardware-ledger
+
 ## [0.4.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/hardware-ledger@0.3.4...@cardano-sdk/hardware-ledger@0.4.0) (2023-09-20)
 
 ### ⚠ BREAKING CHANGES

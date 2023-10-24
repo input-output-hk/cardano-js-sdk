@@ -9,9 +9,7 @@ export type ProducedUtxo = [Cardano.TxIn, Cardano.TxOut];
 export interface WithUtxo {
   utxo: {
     produced: Array<ProducedUtxo>;
-    /**
-     * Refers to `compactUtxoId` of a previously produced utxo
-     */
+    /** Refers to `compactUtxoId` of a previously produced utxo */
     consumed: Cardano.TxIn[];
   };
 }
@@ -45,6 +43,20 @@ export const filterProducedUtxoByAddresses =
       map((evt) => ({
         ...evt,
         utxo: { ...evt.utxo, produced: evt.utxo.produced.filter(([_, { address }]) => addresses.includes(address)) }
+      }))
+    );
+
+export const filterProducedUtxoByAssetsPresence =
+  <PropsIn extends WithUtxo>(): ProjectionOperator<PropsIn> =>
+  // eslint-disable-next-line unicorn/consistent-function-scoping
+  (evt$) =>
+    evt$.pipe(
+      map((evt) => ({
+        ...evt,
+        utxo: {
+          ...evt.utxo,
+          produced: evt.utxo.produced.filter(([_, { value }]) => value.assets && value.assets.size > 0)
+        }
       }))
     );
 

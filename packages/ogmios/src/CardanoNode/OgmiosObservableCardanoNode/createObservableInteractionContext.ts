@@ -18,10 +18,7 @@ export interface InteractionContextProps {
    * close an existing connection and open a new one.
    */
   connectionConfig$: Observable<ConnectionConfig>;
-  /**
-   * Retry backoff configuration for
-   * re-subscribing to connectionConfig$ on connection error.
-   */
+  /** Retry backoff configuration for re-subscribing to connectionConfig$ on connection error. */
   reconnectionConfig?: ReconnectionConfig;
 }
 

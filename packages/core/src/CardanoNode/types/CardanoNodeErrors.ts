@@ -89,9 +89,6 @@ export abstract class CardanoNodeError<Code extends number, Data = unknown> exte
   code: Code;
   data: Data;
 
-  /**
-   *
-   */
   constructor(code: Code, data: Data, message: string) {
     super(message);
     this.code = code;

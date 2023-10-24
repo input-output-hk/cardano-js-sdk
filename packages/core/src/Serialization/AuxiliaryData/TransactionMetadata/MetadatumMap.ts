@@ -4,9 +4,7 @@ import { MetadatumList } from './MetadatumList';
 import { TransactionMetadatum } from './TransactionMetadatum';
 import { bytesToHex, hexToBytes } from '../../../util/misc';
 
-/**
- * Represents a Map of Metadatum.
- */
+/** Represents a Map of Metadatum. */
 export class MetadatumMap {
   readonly #map = new Map<TransactionMetadatum, TransactionMetadatum>();
   #useIndefiniteEncoding = false;

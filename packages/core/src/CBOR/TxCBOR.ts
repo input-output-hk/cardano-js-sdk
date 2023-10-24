@@ -3,9 +3,7 @@ import { Transaction } from '../Serialization';
 import { Tx, TxBody } from '../Cardano';
 import type { Cardano } from '..';
 
-/**
- * Transaction serialized as CBOR, encoded as hex string
- */
+/** Transaction serialized as CBOR, encoded as hex string */
 export type TxCBOR = OpaqueString<'TxCbor'>;
 
 /**
@@ -26,12 +24,8 @@ export const deserializeTx = ((txBody: Buffer | Uint8Array | string) => {
   return transaction.toCore();
 }) as (txBody: HexBlob | Buffer | Uint8Array | string) => Tx<TxBody>;
 
-/**
- * Serialize transaction to hex-encoded CBOR
- */
+/** Serialize transaction to hex-encoded CBOR */
 TxCBOR.serialize = (tx: Cardano.Tx): TxCBOR => Transaction.fromCore(tx).toCbor() as unknown as TxCBOR;
 
-/**
- * Deserialize transaction from hex-encoded CBOR
- */
+/** Deserialize transaction from hex-encoded CBOR */
 TxCBOR.deserialize = (tx: TxCBOR): Cardano.Tx => deserializeTx(tx);

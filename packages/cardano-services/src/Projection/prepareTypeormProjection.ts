@@ -15,7 +15,6 @@ import {
   StakeKeyRegistrationEntity,
   StakePoolEntity,
   TokensEntity,
-  TypeormStabilityWindowBuffer,
   createStorePoolMetricsUpdateJob,
   storeAddresses,
   storeAssets,
@@ -35,11 +34,9 @@ import { Sorter } from '@hapi/topo';
 import { WithLogger } from '@cardano-sdk/util';
 import { passthrough } from '@cardano-sdk/util-rxjs';
 
-/**
- * Used as mount segments, so must be URL-friendly
- *
- */
+/** Used as mount segments, so must be URL-friendly */
 export enum ProjectionName {
+  Asset = 'asset',
   Handle = 'handle',
   StakePool = 'stake-pool',
   StakePoolMetadataJob = 'stake-pool-metadata-job',
@@ -65,6 +62,10 @@ const createMapperOperators = (
   const filterUtxo = applyUtxoAndMintFilters
     ? Mapper.filterProducedUtxoByAssetPolicyId({ policyIds: handlePolicyIds })
     : passthrough();
+  const filterProducedUtxoByAssetsPresence =
+    projectionNames.includes(ProjectionName.Asset) && !projectionNames.includes(ProjectionName.UTXO)
+      ? Mapper.filterProducedUtxoByAssetsPresence()
+      : passthrough();
   const filterMint = applyUtxoAndMintFilters
     ? Mapper.filterMintByPolicyIds({ policyIds: handlePolicyIds })
     : passthrough();
@@ -74,6 +75,7 @@ const createMapperOperators = (
     : passthrough();
   return {
     filterMint,
+    filterProducedUtxoByAssetsPresence,
     filterUtxo,
     withAddresses: Mapper.withAddresses(),
     withCIP67: Mapper.withCIP67(),
@@ -133,7 +135,7 @@ type Entity = Entities[EntityName];
 const storeEntities: Partial<Record<StoreName, EntityName[]>> = {
   storeAddresses: ['address'],
   storeAssets: ['asset'],
-  storeBlock: ['block'],
+  storeBlock: ['block', 'blockData'],
   storeHandleMetadata: ['handleMetadata', 'output'],
   storeHandles: ['handle', 'asset', 'tokens', 'output'],
   storeNftMetadata: ['asset'],
@@ -218,6 +220,7 @@ const storeInterDependencies: Partial<Record<StoreName, StoreName[]>> = {
 
 const projectionStoreDependencies: Record<ProjectionName, StoreName[]> = {
   address: ['storeAddresses'],
+  asset: ['storeAssets'],
   // TODO: remove storeNftMetadata when TypeormAssetProvider tests
   // are updated to use 'asset' database instead of a handle database
   handle: ['storeHandles', 'storeHandleMetadata', 'storeNftMetadata'],
@@ -296,16 +299,12 @@ const keyOf = <T extends {}>(obj: T, value: unknown): keyof T | null => {
 
 export interface PrepareTypeormProjectionProps {
   projections: ProjectionName[];
-  buffer?: TypeormStabilityWindowBuffer;
   options?: ProjectionOptions;
 }
 
-/**
- * Selects a required set of entities, mappers and store operators
- * based on 'projections' and presence of 'buffer':
- */
+/** Selects a required set of entities, mappers and store operators based on 'projections' and presence of 'buffer': */
 export const prepareTypeormProjection = (
-  { projections, buffer, options = {} }: PrepareTypeormProjectionProps,
+  { projections, options = {} }: PrepareTypeormProjectionProps,
   dependencies: WithLogger
 ) => {
   const mapperSorter = new Sorter<MapperOperator>();
@@ -322,10 +321,6 @@ export const prepareTypeormProjection = (
   const selectedEntities = entitySorter.nodes;
   const selectedMappers = mapperSorter.nodes;
   const selectedStores = storeSorter.nodes;
-  if (buffer) {
-    selectedEntities.push(BlockDataEntity);
-    selectedStores.push(buffer.storeBlockData());
-  }
   const extensions = requiredExtensions(projections);
   return {
     __debug: {

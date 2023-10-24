@@ -1,6 +1,14 @@
 version: '3.9'
 
 services:
+  asset-projector:
+    volumes:
+      - ../..:/app
+
+  asset-provider-server:
+    volumes:
+      - ../..:/app
+
   pg-boss-worker:
     volumes:
       - ../..:/app

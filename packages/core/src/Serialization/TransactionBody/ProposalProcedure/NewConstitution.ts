@@ -8,9 +8,7 @@ import { hexToBytes } from '../../../util/misc';
 
 const EMBEDDED_GROUP_SIZE = 3;
 
-/**
- * Changes or amendments the Constitution.
- */
+/** Changes or amendments the Constitution. */
 export class NewConstitution {
   #constitution: Constitution;
   #govActionId: GovernanceActionId | undefined;

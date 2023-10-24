@@ -9,46 +9,27 @@ import { bufferToHexString } from '@cardano-sdk/util';
 
 const moduleName = 'TxSubmitWorker';
 
-/**
- * Configuration options parameters for the TxSubmitWorker
- */
+/** Configuration options parameters for the TxSubmitWorker */
 export interface TxSubmitWorkerConfig {
-  /**
-   * Instructs the worker to process multiple transactions simultaneously.
-   * Default: false (serial mode)
-   */
+  /** Instructs the worker to process multiple transactions simultaneously. Default: false (serial mode) */
   parallel?: boolean;
 
-  /**
-   * The number of Tx submitted to the txSubmitProvider in parallel.
-   * Ignored in serial mode. Default: 3
-   */
+  /** The number of Tx submitted to the txSubmitProvider in parallel. Ignored in serial mode. Default: 3 */
   parallelTxs?: number;
 
-  /**
-   * The RabbitMQ polling cycle in milliseconds.
-   * Ignored in parallel mode. Default: 500
-   */
+  /** The RabbitMQ polling cycle in milliseconds. Ignored in parallel mode. Default: 500 */
   pollingCycle?: number;
 
-  /**
-   * The RabbitMQ connection URL
-   */
+  /** The RabbitMQ connection URL */
   rabbitmqUrl: URL;
 }
 
-/**
- * Dependencies for the TxSubmitWorker
- */
+/** Dependencies for the TxSubmitWorker */
 export interface TxSubmitWorkerDependencies {
-  /**
-   * The logger. Default: silent
-   */
+  /** The logger. Default: silent */
   logger: Logger;
 
-  /**
-   * The provider to use to submit tx
-   */
+  /** The provider to use to submit tx */
   txSubmitProvider: OgmiosTxSubmitProvider;
 }
 
@@ -57,44 +38,28 @@ export interface TxSubmitWorkerDependencies {
  * transactions from RabbitMQ and submit them via the TxSubmitProvider
  */
 export class TxSubmitWorker extends EventEmitter {
-  /**
-   * The RabbitMQ channel
-   */
+  /** The RabbitMQ channel */
   #channel?: Channel;
 
-  /**
-   * The configuration options
-   */
+  /** The configuration options */
   #config: TxSubmitWorkerConfig;
 
-  /**
-   * The RabbitMQ connection
-   */
+  /** The RabbitMQ connection */
   #connection?: Connection;
 
-  /**
-   * Flag to exit from the infinite loop in case of sequential tx handling
-   */
+  /** Flag to exit from the infinite loop in case of sequential tx handling */
   #continueForever = false;
 
-  /**
-   * The RabbitMQ consumerTag
-   */
+  /** The RabbitMQ consumerTag */
   #consumerTag?: string;
 
-  /**
-   * Internal messages counter
-   */
+  /** Internal messages counter */
   #counter = 0;
 
-  /**
-   *  The dependency objects
-   */
+  /** The dependency objects */
   #dependencies: TxSubmitWorkerDependencies;
 
-  /**
-   * The internal worker status
-   */
+  /** The internal worker status */
   #status: 'connected' | 'connecting' | 'error' | 'idle' = 'idle';
 
   /**
@@ -133,10 +98,7 @@ export class TxSubmitWorker extends EventEmitter {
     return this.#status;
   }
 
-  /**
-   * Emit event raised by the worker
-   *
-   */
+  /** Emit event raised by the worker */
   emitEvent(eventName: string, err?: unknown) {
     this.emit(eventName, err);
   }
@@ -200,9 +162,7 @@ export class TxSubmitWorker extends EventEmitter {
     }
     await this.stop();
   }
-  /**
-   * Stops the worker.
-   */
+  /** Stops the worker. */
   private async stop() {
     this.#dependencies.logger.info(`${moduleName} shutdown: closing RabbitMQ channel`);
 
@@ -262,9 +222,7 @@ export class TxSubmitWorker extends EventEmitter {
     if (error instanceof Error) this.#dependencies.logger.debug(`${moduleName}:`, error.stack);
   }
 
-  /**
-   * The infinite loop to perform serial tx submission
-   */
+  /** The infinite loop to perform serial tx submission */
   private async infiniteLoop() {
     this.#continueForever = true;
 
@@ -322,9 +280,7 @@ export class TxSubmitWorker extends EventEmitter {
     }
   }
 
-  /**
-   * The error handler of submitTx method
-   */
+  /** The error handler of submitTx method */
   private async submitTxErrorHandler(err: unknown, counter: number, message: Message) {
     const { isRetryable, serializableError } = serializeError(err);
 

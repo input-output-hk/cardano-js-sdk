@@ -13,9 +13,7 @@ export type PoolRetirement = Omit<Cardano.PoolRetirementCertificate, '__typename
 
 export interface WithStakePools {
   stakePools: {
-    /**
-     * One per PoolId (only the latest certificate takes effect)
-     */
+    /** One per PoolId (only the latest certificate takes effect) */
     updates: PoolUpdate[];
     /**
      * Does not include retirements that were invalidated by PoolUpdate in this same block.
@@ -25,9 +23,7 @@ export interface WithStakePools {
   };
 }
 
-/**
- * Map blocks with certificates to stake pool updates and retirements.
- */
+/** Map blocks with certificates to stake pool updates and retirements. */
 export const withStakePools = unifiedProjectorOperator<WithCertificates & WithEpochNo, WithStakePools>((evt) => {
   const updates: Record<Cardano.PoolId, PoolUpdate> = {};
   const retirements: Record<Cardano.PoolId, PoolRetirement> = {};

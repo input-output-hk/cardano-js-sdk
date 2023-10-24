@@ -1,22 +1,12 @@
-/**
- * Represents the different types of governance actions within the Cardano blockchain ecosystem.
- */
+/** Represents the different types of governance actions within the Cardano blockchain ecosystem. */
 export enum GovernanceActionKind {
-  /**
-   * Updates one or more updatable protocol parameters,
-   * excluding changes to major protocol versions (i.e., "hard forks").
-   */
+  /** Updates one or more updatable protocol parameters, excluding changes to major protocol versions (i.e., "hard forks"). */
   ParameterChange = 0,
 
-  /**
-   * Initiates a non-backwards compatible upgrade of the network.
-   * This action necessitates a preceding software update.
-   */
+  /** Initiates a non-backwards compatible upgrade of the network. This action necessitates a preceding software update. */
   HardForkInitiation = 1,
 
-  /**
-   * Withdraws funds from the treasury.
-   */
+  /** Withdraws funds from the treasury. */
   TreasuryWithdrawals = 2,
 
   /**
@@ -25,15 +15,10 @@ export enum GovernanceActionKind {
    */
   NoConfidence = 3,
 
-  /**
-   * Modifies the composition of the constitutional committee,
-   * its signature threshold, or its terms of operation.
-   */
+  /** Modifies the composition of the constitutional committee, its signature threshold, or its terms of operation. */
   UpdateCommittee = 4,
 
-  /**
-   * Changes or amendments the Constitution.
-   */
+  /** Changes or amendments the Constitution. */
   NewConstitution = 5,
 
   /**

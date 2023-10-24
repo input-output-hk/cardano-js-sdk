@@ -60,9 +60,7 @@ export class InfoAction {
     };
   }
 
-  /**
-   * Creates a InfoAction object from the given Core InfoAction object.
-   */
+  /** Creates a InfoAction object from the given Core InfoAction object. */
   static fromCore(_: Cardano.InfoAction) {
     return new InfoAction();
   }

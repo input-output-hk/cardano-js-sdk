@@ -3,6 +3,43 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.22.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.21.1...@cardano-sdk/cardano-services@0.22.0) (2023-10-19)
+
+### ⚠ BREAKING CHANGES
+
+* simplify StabilityWindowBuffer interface to just 'getBlock'
+- Bootstrap.fromCardanoNode now requires Tip observable parameter
+
+### Features
+
+* do not write to stability window buffer til volatile ([b2244ea](https://github.com/input-output-hk/cardano-js-sdk/commit/b2244eac56352961c36ef9e80038aead47ee9e52))
+
+## [0.21.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.21.0...@cardano-sdk/cardano-services@0.21.1) (2023-10-12)
+
+### Features
+
+* **cardano-services:** add Asset projection to prepareTypeOrmProjection ([129dd35](https://github.com/input-output-hk/cardano-js-sdk/commit/129dd353d3831850b451f2ba75d7cd33d0a0d09b))
+
+## [0.21.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.20.0...@cardano-sdk/cardano-services@0.21.0) (2023-10-09)
+
+### ⚠ BREAKING CHANGES
+
+* core package no longer exports the CML types
+
+### Features
+
+* core package no longer exports the CML types ([51545ed](https://github.com/input-output-hk/cardano-js-sdk/commit/51545ed82b4abeb795b0a50ad7d299ddb5da4a0d))
+
+## [0.20.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.19.0...@cardano-sdk/cardano-services@0.20.0) (2023-09-29)
+
+### ⚠ BREAKING CHANGES
+
+* **cardano-services:** StakePoolHttpService interface changed
+
+### Features
+
+* **cardano-services:** added optional metadata fetch feature from SMASH server ([54a4f5e](https://github.com/input-output-hk/cardano-js-sdk/commit/54a4f5e7eab08f7c06802782e2da62d1406bdf1b))
+
 ## [0.19.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/cardano-services@0.18.0...@cardano-sdk/cardano-services@0.19.0) (2023-09-20)
 
 ### ⚠ BREAKING CHANGES

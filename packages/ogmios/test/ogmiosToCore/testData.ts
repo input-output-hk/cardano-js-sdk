@@ -392,6 +392,8 @@ export const mockAlonzoBlock: Ogmios.Schema.Block = {
       outputs: [
         {
           address: 'addr_test1vz09v9yfxguvlp0zsnrpa3tdtm7el8xufp3m5lsm7qxzclgmzkket',
+          datum: 'c5dfa8c3cbd5a959829618a7b46e163078cb3f1b39f152514d0c3686d553529a',
+          datumHash: 'c5dfa8c3cbd5a959829618a7b46e163078cb3f1b39f152514d0c3686d553529a',
           value: {
             ada: {
               lovelace: 29_699_998_492_735_907n

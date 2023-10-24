@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.17.3](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.17.2...@cardano-sdk/util-dev@0.17.3) (2023-10-19)
+
+### Features
+
+* **util-dev:** add createStubObservable util ([f7621d7](https://github.com/input-output-hk/cardano-js-sdk/commit/f7621d7f03b398b584e1f0fb63838dfb39ff0b68))
+
+## [0.17.2](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.17.1...@cardano-sdk/util-dev@0.17.2) (2023-10-12)
+
+**Note:** Version bump only for package @cardano-sdk/util-dev
+
+## [0.17.1](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.17.0...@cardano-sdk/util-dev@0.17.1) (2023-10-09)
+
+**Note:** Version bump only for package @cardano-sdk/util-dev
+
+## [0.17.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.16.0...@cardano-sdk/util-dev@0.17.0) (2023-09-29)
+
+### ⚠ BREAKING CHANGES
+
+* - key-management `stubSignTransaction` positional args were replaced by named args,
+as defined in `StubSignTransactionProps`.
+A new `dRepPublicKey` named arg is part of `StubSignTransactionProps`
+
+### Features
+
+* update for Conway transaction fields ([c32513b](https://github.com/input-output-hk/cardano-js-sdk/commit/c32513bb89d0318dba35227c3509204166a209b2))
+
 ## [0.16.0](https://github.com/input-output-hk/cardano-js-sdk/compare/@cardano-sdk/util-dev@0.15.3...@cardano-sdk/util-dev@0.16.0) (2023-09-20)
 
 ### ⚠ BREAKING CHANGES

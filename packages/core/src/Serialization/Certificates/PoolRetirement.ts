@@ -6,10 +6,7 @@ import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 
 const EMBEDDED_GROUP_SIZE = 3;
 
-/**
- * This certificate is used to retire a stake pool. It includes an epoch number
- * indicating when the pool will be retired.
- */
+/** This certificate is used to retire a stake pool. It includes an epoch number indicating when the pool will be retired. */
 export class PoolRetirement {
   #poolKeyHash: Crypto.Ed25519KeyHashHex;
   #epoch: Cardano.EpochNo;

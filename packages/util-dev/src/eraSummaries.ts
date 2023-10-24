@@ -1,8 +1,6 @@
 import { EraSummary, Milliseconds } from '@cardano-sdk/core';
 
-/**
- * Valid at 2022-05-28
- */
+/** Valid at 2022-05-28 */
 
 export const testnetEraSummaries: EraSummary[] = [
   {

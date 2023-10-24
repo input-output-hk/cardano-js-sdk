@@ -114,10 +114,7 @@ export interface RetireCcCertificate {
   __typename: CertificateType.RetireCc;
 }
 
-/**
- * To be deprecated in the Era after conway
- * replaced by <NewStakeAddressCertificate>
- */
+/** To be deprecated in the Era after conway replaced by <NewStakeAddressCertificate> */
 export interface StakeAddressCertificate {
   __typename: CertificateType.StakeKeyRegistration | CertificateType.StakeKeyDeregistration;
   stakeKeyHash: Crypto.Ed25519KeyHashHex;

@@ -145,9 +145,7 @@ export class Bip32PrivateKey {
     return Bip32PrivateKey.fromBytes(key);
   }
 
-  /**
-   * Gets the Ed25519 raw private key. This key can be used for cryptographically signing messages.
-   */
+  /** Gets the Ed25519 raw private key. This key can be used for cryptographically signing messages. */
   toRawKey(): Ed25519PrivateKey {
     return Ed25519PrivateKey.fromExtendedBytes(this.#key.slice(0, EXTENDED_ED25519_PRIVATE_KEY_LENGTH));
   }
@@ -167,16 +165,12 @@ export class Bip32PrivateKey {
     );
   }
 
-  /**
-   * Gets the BIP-32 private key as a byte array.
-   */
+  /** Gets the BIP-32 private key as a byte array. */
   bytes(): Uint8Array {
     return this.#key;
   }
 
-  /**
-   * Gets the BIP-32 private key as a hex string.
-   */
+  /** Gets the BIP-32 private key as a hex string. */
   hex(): Bip32PrivateKeyHex {
     return Bip32PrivateKeyHex(Buffer.from(this.#key).toString('hex'));
   }

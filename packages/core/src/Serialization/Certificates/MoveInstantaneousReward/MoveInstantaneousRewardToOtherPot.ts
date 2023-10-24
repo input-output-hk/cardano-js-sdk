@@ -4,9 +4,7 @@ import { HexBlob, InvalidArgumentError } from '@cardano-sdk/util';
 
 const EMBEDDED_GROUP_SIZE = 2;
 
-/**
- * This certificate move instantaneous rewards funds between accounting pots.
- */
+/** This certificate move instantaneous rewards funds between accounting pots. */
 export class MoveInstantaneousRewardToOtherPot {
   #pot: Cardano.MirCertificatePot;
   #amount: Cardano.Lovelace;

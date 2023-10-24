@@ -1,10 +1,9 @@
 /* eslint-disable unicorn/consistent-destructuring, sonarjs/no-duplicate-string, @typescript-eslint/no-floating-promises, promise/no-nesting, promise/always-return */
 import * as Crypto from '@cardano-sdk/crypto';
-import { AddressType, GroupedAddress } from '@cardano-sdk/key-management';
+import { AddressType, AsyncKeyAgent, GroupedAddress } from '@cardano-sdk/key-management';
 import { AssetId, StubKeyAgent, createStubStakePoolProvider, mockProviders as mocks } from '@cardano-sdk/util-dev';
 import { BehaviorSubject, Subscription, firstValueFrom, skip } from 'rxjs';
 import {
-  CML,
   Cardano,
   ProviderError,
   ProviderFailure,
@@ -62,7 +61,6 @@ describe('PersonalWallet methods', () => {
   let networkInfoProvider: mocks.NetworkInfoProviderStub;
   let wallet: PersonalWallet;
   let utxoProvider: mocks.UtxoProviderStub;
-
   beforeEach(async () => {
     txSubmitProvider = mocks.mockTxSubmitProvider();
     networkInfoProvider = mocks.mockNetworkInfoProvider();
@@ -83,7 +81,7 @@ describe('PersonalWallet methods', () => {
       type: AddressType.External
     };
     ({ wallet } = await setupWallet({
-      bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
+      bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
       createKeyAgent: async (dependencies) => {
         const asyncKeyAgent = await testAsyncKeyAgent([groupedAddress], dependencies);
         asyncKeyAgent.deriveAddress = jest.fn().mockResolvedValue(groupedAddress);
@@ -230,7 +228,7 @@ describe('PersonalWallet methods', () => {
       const mockKeyAgent = new StubKeyAgent(inputResolver);
 
       setupWallet({
-        bip32Ed25519: new Crypto.CmlBip32Ed25519(CML),
+        bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
         createKeyAgent: async () => mockKeyAgent,
         createWallet: async (keyAgent) =>
           new PersonalWallet(
@@ -425,7 +423,7 @@ describe('PersonalWallet methods', () => {
         // resolves when option is provided
         const txPending = firstValueFrom(wallet.transactions.outgoing.pending$);
         await expect(wallet.submitTx(tx, { mightBeAlreadySubmitted: true })).resolves.not.toThrow();
-        await expect(txPending).resolves.toEqual(outgoingTx);
+        expect(await txPending).toEqual(outgoingTx);
       });
 
       it('does not re-serialize the transaction to compute transaction id', async () => {
@@ -539,5 +537,41 @@ describe('PersonalWallet methods', () => {
   it('getPubDRepKey', async () => {
     const response = await wallet.getPubDRepKey();
     expect(typeof response).toBe('string');
+  });
+
+  it('will retry deriving pubDrepKey if one does not exist', async () => {
+    let walletKeyAgent: AsyncKeyAgent;
+    ({ wallet, keyAgent: walletKeyAgent } = await setupWallet({
+      bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
+      createKeyAgent: async (dependencies) => {
+        const asyncKeyAgent = await testAsyncKeyAgent([], dependencies);
+        asyncKeyAgent.derivePublicKey = jest.fn().mockRejectedValueOnce('error').mockResolvedValue('string');
+        return asyncKeyAgent;
+      },
+      createWallet: async (keyAgent) =>
+        new PersonalWallet(
+          { name: 'Test Wallet' },
+          {
+            assetProvider: mocks.mockAssetProvider(),
+            chainHistoryProvider: mockChainHistoryProvider(),
+            keyAgent,
+            logger,
+            networkInfoProvider: mocks.mockNetworkInfoProvider(),
+            rewardsProvider: mockRewardsProvider(),
+            stakePoolProvider: mocks.mockStakePoolsProvider(),
+            txSubmitProvider: mocks.mockTxSubmitProvider(),
+            utxoProvider: mocks.mockUtxoProvider()
+          }
+        ),
+      logger
+    }));
+    await waitForWalletStateSettle(wallet);
+
+    const response = await wallet.getPubDRepKey();
+    expect(typeof response).toBe('string');
+    expect(walletKeyAgent.derivePublicKey).toHaveBeenCalledTimes(3);
+
+    wallet.shutdown();
+    walletKeyAgent.shutdown();
   });
 });

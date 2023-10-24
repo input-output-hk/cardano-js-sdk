@@ -8,9 +8,7 @@ import { hexToBytes } from '../../../util/misc';
 
 const EMBEDDED_GROUP_SIZE = 3;
 
-/**
- * Represents the initiation action for a hard fork in the Cardano network.
- */
+/** Represents the initiation action for a hard fork in the Cardano network. */
 export class HardForkInitiationAction {
   #protocolVersion: ProtocolVersion;
   #govActionId: GovernanceActionId | undefined;

@@ -2,7 +2,7 @@ import * as Ledger from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { Cardano } from '@cardano-sdk/core';
 import { InvalidArgumentError, Transform } from '@cardano-sdk/util';
 import { LedgerTxTransformerContext } from '../types';
-import { stakeKeyPathFromGroupedAddress } from './keyPaths';
+import { util } from '@cardano-sdk/key-management';
 
 type StakeKeyCertificateType = Ledger.CertificateType.STAKE_REGISTRATION | Ledger.CertificateType.STAKE_DEREGISTRATION;
 
@@ -23,7 +23,7 @@ const getStakeAddressCertificate = (
   );
 
   const rewardAddress = knownAddress ? Cardano.Address.fromBech32(knownAddress.rewardAccount)?.asReward() : null;
-  const path = stakeKeyPathFromGroupedAddress(knownAddress);
+  const path = util.stakeKeyPathFromGroupedAddress(knownAddress);
   const credentialType = rewardAddress
     ? rewardAddress.getPaymentCredential().type
     : Ledger.StakeCredentialParamsType.SCRIPT_HASH;
@@ -75,7 +75,7 @@ export const stakeDelegationCertificate: Transform<
     ? rewardAddress.getPaymentCredential().type
     : Ledger.StakeCredentialParamsType.SCRIPT_HASH;
 
-  const path = stakeKeyPathFromGroupedAddress(knownAddress);
+  const path = util.stakeKeyPathFromGroupedAddress(knownAddress);
 
   let credential: Ledger.StakeCredentialParams;
 
@@ -120,7 +120,7 @@ const getPoolOperatorKeyPath = (
   context: LedgerTxTransformerContext
 ): Ledger.BIP32Path | null => {
   const knownAddress = context?.knownAddresses.find((address) => address.rewardAccount === operator);
-  return stakeKeyPathFromGroupedAddress(knownAddress);
+  return util.stakeKeyPathFromGroupedAddress(knownAddress);
 };
 
 export const poolRegistrationCertificate: Transform<
@@ -227,7 +227,7 @@ const poolRetirementCertificate: Transform<
     (address) => Cardano.RewardAccount.toHash(address.rewardAccount) === poolIdKeyHash
   );
 
-  const poolKeyPath = stakeKeyPathFromGroupedAddress(knownAddress);
+  const poolKeyPath = util.stakeKeyPathFromGroupedAddress(knownAddress);
 
   if (!poolKeyPath) throw new InvalidArgumentError('certificate', 'Missing key matching pool retirement certificate.');
 

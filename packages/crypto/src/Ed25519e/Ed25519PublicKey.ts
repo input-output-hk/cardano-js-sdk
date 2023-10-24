@@ -58,25 +58,19 @@ export class Ed25519PublicKey {
     return Ed25519PublicKey.fromBytes(Buffer.from(keyMaterial, 'hex'));
   }
 
-  /**
-   * Gets the blake2 hash of the key material.
-   */
+  /** Gets the blake2 hash of the key material. */
   async hash(): Promise<Ed25519KeyHash> {
     await ready;
     const hash = crypto_generichash(ED25519_PUBLIC_KEY_HASH_LENGTH, this.#keyMaterial);
     return Ed25519KeyHash.fromBytes(hash);
   }
 
-  /**
-   * Gets the Ed25519PublicKey key material as a byte array.
-   */
+  /** Gets the Ed25519PublicKey key material as a byte array. */
   bytes(): Uint8Array {
     return this.#keyMaterial;
   }
 
-  /**
-   * Gets the Ed25519PublicKey key material as a hex string.
-   */
+  /** Gets the Ed25519PublicKey key material as a hex string. */
   hex(): Ed25519PublicKeyHex {
     return Ed25519PublicKeyHex(Buffer.from(this.#keyMaterial).toString('hex'));
   }

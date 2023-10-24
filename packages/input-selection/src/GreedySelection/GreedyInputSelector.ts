@@ -13,9 +13,7 @@ import {
 } from '../util';
 import { splitChange } from './util';
 
-/**
- * Greedy selection initialization properties.
- */
+/** Greedy selection initialization properties. */
 export interface GreedySelectorProps {
   /**
    * Callback that returns a map of addresses with their intended proportions expressed as weights.
@@ -167,10 +165,7 @@ const splitChangeAndComputeFee = async (
   return adjustedChangeOutputs;
 };
 
-/**
- * Selects all UTXOs to fulfill the amount required for the given outputs and return the remaining balance
- * as change.
- */
+/** Selects all UTXOs to fulfill the amount required for the given outputs and return the remaining balance as change. */
 export class GreedyInputSelector implements InputSelector {
   #props: GreedySelectorProps;
 

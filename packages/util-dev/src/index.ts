@@ -7,6 +7,7 @@ export * from './util';
 export * from './createStubStakePoolProvider';
 export * from './testScheduler';
 export * from './createStubUtxoProvider';
+export * from './createStubObservable';
 export * from './createGenericMockServer';
 export * from './dataGeneration';
 export * from './eraSummaries';

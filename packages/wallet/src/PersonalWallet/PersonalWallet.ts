@@ -225,6 +225,7 @@ export class PersonalWallet implements ObservableWallet {
   readonly handleProvider: HandleProvider;
   readonly changeAddressResolver: ChangeAddressResolver;
   readonly publicStakeKeys$: TrackerSubject<PubStakeKeyAndStatus[]>;
+  private drepPubKey: Ed25519PublicKeyHex;
   handles$: Observable<HandleInfo[]>;
 
   // eslint-disable-next-line max-statements
@@ -270,7 +271,6 @@ export class PersonalWallet implements ObservableWallet {
     this.handleProvider = handleProvider as HandleProvider;
     this.chainHistoryProvider = new TrackedChainHistoryProvider(chainHistoryProvider);
     this.rewardsProvider = new TrackedRewardsProvider(rewardsProvider);
-
     this.syncStatus = createProviderStatusTracker(
       {
         assetProvider: this.assetProvider,
@@ -518,6 +518,8 @@ export class PersonalWallet implements ObservableWallet {
       utxo: this.utxo
     });
 
+    this.getPubDRepKey().catch(() => void 0);
+
     this.#logger.debug('Created');
   }
 
@@ -662,9 +664,7 @@ export class PersonalWallet implements ObservableWallet {
     this.#inputSelector = selector;
   }
 
-  /**
-   * Gets the wallet input selector.
-   */
+  /** Gets the wallet input selector. */
   getInputSelector() {
     return this.#inputSelector;
   }
@@ -706,6 +706,14 @@ export class PersonalWallet implements ObservableWallet {
   }
 
   async getPubDRepKey(): Promise<Ed25519PublicKeyHex> {
-    return this.keyAgent.derivePublicKey(keyManagementUtil.DREP_KEY_DERIVATION_PATH);
+    if (!this.drepPubKey) {
+      try {
+        this.drepPubKey = await this.keyAgent.derivePublicKey(keyManagementUtil.DREP_KEY_DERIVATION_PATH);
+      } catch (error) {
+        this.#logger.error(error);
+        throw error;
+      }
+    }
+    return Promise.resolve(this.drepPubKey);
   }
 }

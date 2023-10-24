@@ -47,9 +47,7 @@ export interface Bip32Ed25519 {
    */
   getPubKeyHash(publicKey: Ed25519PublicKeyHex): Promise<Ed25519KeyHashHex>;
 
-  /**
-   * Gets the Ed25519 raw private key. This key can be used for cryptographically signing messages.
-   */
+  /** Gets the Ed25519 raw private key. This key can be used for cryptographically signing messages. */
   getRawPrivateKey(bip32PrivateKey: Bip32PrivateKeyHex): Promise<Ed25519PrivateExtendedKeyHex>;
 
   /**

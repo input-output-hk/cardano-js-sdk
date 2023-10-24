@@ -73,9 +73,7 @@ export const typedHex = <T>(value: string, length?: number): T => {
   return value as any as T;
 };
 
-/**
- * https://www.ietf.org/rfc/rfc4648.txt
- */
+/** https://www.ietf.org/rfc/rfc4648.txt */
 export type Base64Blob = OpaqueString<'Base64Blob'>;
 export const Base64Blob = (target: string): Base64Blob => {
   // eslint-disable-next-line wrap-regex

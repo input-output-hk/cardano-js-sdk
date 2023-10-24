@@ -1,7 +1,7 @@
 import * as Crypto from '@cardano-sdk/crypto';
 import { AddressType, AsyncKeyAgent, GroupedAddress, KeyRole } from '@cardano-sdk/key-management';
 import { BehaviorSubject } from 'rxjs';
-import { CML, Cardano, ChainHistoryProvider, Paginated, TransactionsByAddressesArgs } from '@cardano-sdk/core';
+import { Cardano, ChainHistoryProvider, Paginated, TransactionsByAddressesArgs } from '@cardano-sdk/core';
 
 const NOT_IMPLEMENTED = 'Not implemented';
 
@@ -19,7 +19,7 @@ const createMockAsyncKeyAgent = (knownAddresses: Array<Array<GroupedAddress>>): 
       return address;
     },
     derivePublicKey: () => Promise.resolve('00' as unknown as Crypto.Ed25519PublicKeyHex),
-    getBip32Ed25519: () => Promise.resolve(new Crypto.CmlBip32Ed25519(CML)),
+    getBip32Ed25519: () => Promise.resolve(new Crypto.SodiumBip32Ed25519()),
     getChainId: () =>
       Promise.resolve({
         networkId: 0,

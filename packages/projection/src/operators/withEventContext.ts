@@ -1,9 +1,7 @@
 import { ExtChainSyncEvent, ExtChainSyncOperator } from '../types';
 import { Observable, isObservable, map, mergeMap, of } from 'rxjs';
 
-/**
- * Extend events with custom context (created per event)
- */
+/** Extend events with custom context (created per event) */
 export const withEventContext =
   <TContext, ExtraRollForwardPropsIn, ExtraRollBackwardPropsIn>(
     createContext: (

@@ -59,17 +59,13 @@ const signExtendedDetached = (extendedKey: Uint8Array, message: Uint8Array) => {
   return Buffer.concat([r, crypto_core_ed25519_scalar_add(crypto_core_ed25519_scalar_mul(hram, scalar), nonce)]);
 };
 
-/**
- * Ed25519 private key type.
- */
+/** Ed25519 private key type. */
 export enum Ed25519PrivateKeyType {
   Normal = 'Normal',
   Extended = 'Extended'
 }
 
-/**
- * Ed25519 raw private key. This key can be used for cryptographically signing messages.
- */
+/** Ed25519 raw private key. This key can be used for cryptographically signing messages. */
 export class Ed25519PrivateKey {
   readonly #keyMaterial: Uint8Array;
   readonly __type: Ed25519PrivateKeyType;
@@ -165,16 +161,12 @@ export class Ed25519PrivateKey {
     return Ed25519PrivateKey.fromExtendedBytes(Buffer.from(keyMaterial, 'hex'));
   }
 
-  /**
-   * Gets the Ed25519PrivateKey key material as a byte array.
-   */
+  /** Gets the Ed25519PrivateKey key material as a byte array. */
   bytes(): Uint8Array {
     return this.#keyMaterial;
   }
 
-  /**
-   * Gets the Ed25519PrivateKey key material as a hex string.
-   */
+  /** Gets the Ed25519PrivateKey key material as a hex string. */
   hex(): Ed25519PrivateNormalKeyHex | Ed25519PrivateExtendedKeyHex {
     return this.__type === Ed25519PrivateKeyType.Extended
       ? Ed25519PrivateExtendedKeyHex(Buffer.from(this.#keyMaterial).toString('hex'))

@@ -87,9 +87,7 @@ export class InvalidStringError<InnerError = unknown> extends ComposableError<In
   }
 }
 
-/**
- * Represents an error that is thrown when a function is called with an invalid argument.
- */
+/** Represents an error that is thrown when a function is called with an invalid argument. */
 export class InvalidArgumentError extends CustomError {
   /**
    * Initializes a new instance of the InvalidArgumentError class.

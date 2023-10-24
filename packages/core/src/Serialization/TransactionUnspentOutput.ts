@@ -6,9 +6,7 @@ import { hexToBytes } from '../util/misc';
 
 const TRANSACTION_UNSPENT_OUTPUT_ARRAY_SIZE = 2;
 
-/**
- * Represents a unspent output (UTxO).
- */
+/** Represents a unspent output (UTxO). */
 export class TransactionUnspentOutput {
   #input: TransactionInput;
   #output: TransactionOutput;

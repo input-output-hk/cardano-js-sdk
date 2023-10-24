@@ -10,9 +10,7 @@ import uniqBy from 'lodash/uniqBy';
 
 export interface InputResolverContext {
   utxo: {
-    /**
-     * Subscribed on every InputResolver call
-     */
+    /** Subscribed on every InputResolver call */
     available$: Observable<Cardano.Utxo[]>;
   };
 }

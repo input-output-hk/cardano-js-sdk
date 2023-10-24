@@ -249,9 +249,7 @@ export const logState = async (
  */
 export const randomFromInterval = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1) + min);
 
-/**
- * Creates a folder name using a timestamp.
- */
+/** Creates a folder name using a timestamp. */
 export const getOutputPathName = () =>
   new Date().toISOString().replace(/(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}).*/, '$1_$2_$3_$4_$5_$6');
 

@@ -6,9 +6,7 @@ import { ready } from 'libsodium-wrappers-sumo';
 
 export const BIP32_ED25519_PUBLIC_KEY_LENGTH = 64;
 
-/**
- * BIP32 public key.
- */
+/** BIP32 public key. */
 export class Bip32PublicKey {
   readonly #key: Uint8Array;
 
@@ -69,16 +67,12 @@ export class Bip32PublicKey {
     return Bip32PublicKey.fromBytes(key);
   }
 
-  /**
-   * Gets the Bip32PublicKey as a byte array.
-   */
+  /** Gets the Bip32PublicKey as a byte array. */
   bytes(): Uint8Array {
     return this.#key;
   }
 
-  /**
-   * Gets the Bip32PublicKey as a hex string.
-   */
+  /** Gets the Bip32PublicKey as a hex string. */
   hex(): Bip32PublicKeyHex {
     return Bip32PublicKeyHex(Buffer.from(this.#key).toString('hex'));
   }

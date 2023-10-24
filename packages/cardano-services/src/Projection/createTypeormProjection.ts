@@ -1,14 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable prefer-spread */
-import { Cardano } from '@cardano-sdk/core';
+import { Bootstrap, ProjectionEvent, logProjectionProgress, requestNext } from '@cardano-sdk/projection';
+import { Cardano, ObservableCardanoNode } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
-import { Observable, from, switchMap, takeWhile } from 'rxjs';
+import { Observable, concat, defer, take, takeWhile } from 'rxjs';
 import {
   PgConnectionConfig,
   TypeormDevOptions,
+  TypeormOptions,
   TypeormStabilityWindowBuffer,
   WithTypeormContext,
-  createDataSource,
+  createObservableConnection,
+  createTypeormTipTracker,
   isRecoverableTypeormError,
   typeormTransactionCommit,
   withTypeormTransaction
@@ -19,19 +22,22 @@ import {
   ProjectionOptions,
   prepareTypeormProjection
 } from './prepareTypeormProjection';
-import { ProjectionEvent, logProjectionProgress, requestNext } from '@cardano-sdk/projection';
+import { ReconnectionConfig, passthrough, shareRetryBackoff, toEmpty } from '@cardano-sdk/util-rxjs';
 import { migrations } from './migrations';
-import { passthrough, shareRetryBackoff } from '@cardano-sdk/util-rxjs';
+
+const reconnectionConfig: ReconnectionConfig = {
+  initialInterval: 50,
+  maxInterval: 5000
+};
 
 export interface CreateTypeormProjectionProps {
   projections: ProjectionName[];
   blocksBufferLength: number;
-  buffer?: TypeormStabilityWindowBuffer;
-  projectionSource$: Observable<ProjectionEvent>;
   connectionConfig$: Observable<PgConnectionConfig>;
   devOptions?: TypeormDevOptions;
   exitAtBlockNo?: Cardano.BlockNo;
   logger: Logger;
+  cardanoNode: ObservableCardanoNode;
   projectionOptions?: ProjectionOptions;
 }
 
@@ -44,47 +50,6 @@ const applyStores =
   (evt$: Observable<T>) =>
     evt$.pipe.apply(evt$, selectedStores as any) as Observable<T>;
 
-export const createObservableDataSource = ({
-  connectionConfig$,
-  logger,
-  buffer,
-  devOptions,
-  entities,
-  extensions,
-  migrationsRun
-}: Omit<
-  CreateTypeormProjectionProps,
-  'blocksBufferLength' | 'exitAtBlockNo' | 'projections' | 'projectionSource$' | 'projectionOptions'
-> &
-  Pick<PreparedProjection, 'entities' | 'extensions'> & { migrationsRun: boolean }) =>
-  connectionConfig$.pipe(
-    switchMap((connectionConfig) =>
-      from(
-        (async () => {
-          const dataSource = createDataSource({
-            connectionConfig,
-            devOptions,
-            entities,
-            extensions,
-            logger,
-            options: {
-              installExtensions: true,
-              migrations: migrations.filter(({ entity }) => entities.includes(entity as any)),
-              migrationsRun: migrationsRun && !devOptions?.synchronize
-            }
-          });
-          await dataSource.initialize();
-          if (buffer) {
-            const queryRunner = dataSource.createQueryRunner('master');
-            await buffer.initialize(queryRunner);
-            await queryRunner.release();
-          }
-          return dataSource;
-        })()
-      )
-    )
-  );
-
 /**
  * Creates a projection observable that applies a sequence of operators
  * required to project requested `projections` into a postgres database.
@@ -95,12 +60,11 @@ export const createObservableDataSource = ({
 export const createTypeormProjection = ({
   blocksBufferLength,
   projections,
-  projectionSource$,
   connectionConfig$,
   logger,
-  devOptions,
+  devOptions: requestedDevOptions,
+  cardanoNode,
   exitAtBlockNo,
-  buffer,
   projectionOptions
 }: CreateTypeormProjectionProps) => {
   const { handlePolicyIds } = { handlePolicyIds: [], ...projectionOptions };
@@ -110,34 +74,65 @@ export const createTypeormProjection = ({
 
   const { mappers, entities, stores, extensions } = prepareTypeormProjection(
     {
-      buffer,
       options: projectionOptions,
       projections
     },
     { logger }
   );
-  const dataSource$ = createObservableDataSource({
-    buffer,
-    connectionConfig$,
-    devOptions,
-    entities,
-    extensions,
-    logger,
-    migrationsRun: true
+  const connect = (options?: TypeormOptions, devOptions?: TypeormDevOptions) =>
+    createObservableConnection({
+      connectionConfig$,
+      devOptions,
+      entities,
+      extensions,
+      logger,
+      options
+    });
+
+  const tipTracker = createTypeormTipTracker({
+    connection$: connect(),
+    reconnectionConfig
   });
-  return projectionSource$.pipe(
-    applyMappers(mappers),
-    shareRetryBackoff(
-      (evt$) =>
-        evt$.pipe(
-          withTypeormTransaction({ dataSource$, logger }, extensions),
-          applyStores(stores),
-          typeormTransactionCommit()
+  const buffer = new TypeormStabilityWindowBuffer({
+    connection$: connect(),
+    logger,
+    reconnectionConfig
+  });
+  const projectionSource$ = Bootstrap.fromCardanoNode({
+    blocksBufferLength,
+    buffer,
+    cardanoNode,
+    logger,
+    projectedTip$: tipTracker.tip$
+  });
+  return concat(
+    // initialize database before starting the projector
+    connect(
+      {
+        installExtensions: true,
+        migrations: migrations.filter(({ entity }) => entities.includes(entity as any)),
+        migrationsRun: !requestedDevOptions?.synchronize
+      },
+      requestedDevOptions
+    ).pipe(take(1), toEmpty),
+    defer(() =>
+      projectionSource$.pipe(
+        applyMappers(mappers),
+        shareRetryBackoff(
+          (evt$) =>
+            evt$.pipe(
+              withTypeormTransaction({ connection$: connect() }),
+              applyStores(stores),
+              buffer.storeBlockData(),
+              typeormTransactionCommit()
+            ),
+          { shouldRetry: isRecoverableTypeormError }
         ),
-      { shouldRetry: isRecoverableTypeormError }
-    ),
-    requestNext(),
-    logProjectionProgress(logger),
-    exitAtBlockNo ? takeWhile((event) => event.block.header.blockNo < exitAtBlockNo) : passthrough()
+        tipTracker.trackProjectedTip(),
+        requestNext(),
+        logProjectionProgress(logger),
+        exitAtBlockNo ? takeWhile((event) => event.block.header.blockNo < exitAtBlockNo) : passthrough()
+      )
+    )
   );
 };

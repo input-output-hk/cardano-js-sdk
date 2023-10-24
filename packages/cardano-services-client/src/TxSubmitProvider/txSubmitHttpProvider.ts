@@ -15,9 +15,7 @@ import { CreateHttpProviderConfig, createHttpProvider } from '../HttpProvider';
 import { apiVersion } from '../version';
 import { mapHealthCheckError } from '../mapHealthCheckError';
 
-/**
- * The TxSubmitProvider endpoint paths.
- */
+/** The TxSubmitProvider endpoint paths. */
 const paths: HttpProviderConfigPaths<TxSubmitProvider> = {
   healthCheck: '/health',
   submitTx: '/submit'

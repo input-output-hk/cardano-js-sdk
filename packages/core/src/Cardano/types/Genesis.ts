@@ -2,9 +2,7 @@ import { Lovelace } from './Value';
 import { NetworkId, NetworkMagic } from '../ChainId';
 import { Seconds } from '../../util';
 
-/**
- * A compact (without genesis UTxO) representation of the genesis configuration.
- */
+/** A compact (without genesis UTxO) representation of the genesis configuration. */
 export interface CompactGenesis {
   systemStart: Date;
   networkMagic: NetworkMagic;

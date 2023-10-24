@@ -2,9 +2,7 @@ import { CreateHttpProviderConfig, createHttpProvider } from '../HttpProvider';
 import { HttpProviderConfigPaths, NetworkInfoProvider } from '@cardano-sdk/core';
 import { apiVersion } from '../version';
 
-/**
- * The NetworkInfoProvider endpoint paths.
- */
+/** The NetworkInfoProvider endpoint paths. */
 const paths: HttpProviderConfigPaths<NetworkInfoProvider> = {
   eraSummaries: '/era-summaries',
   genesisParameters: '/genesis-parameters',

@@ -42,13 +42,9 @@ export interface AccountKeyDerivationPath {
 }
 /** Internal = change address & External = receipt address */
 export enum AddressType {
-  /**
-   * Change address
-   */
+  /** Change address */
   Internal = 1,
-  /**
-   * Receipt address
-   */
+  /** Receipt address */
   External = 0
 }
 
@@ -186,24 +182,16 @@ export type AsyncKeyAgent = Pick<KeyAgent, 'deriveAddress' | 'derivePublicKey' |
   setKnownAddresses(addresses: GroupedAddress[]): Promise<void>;
 } & Shutdown;
 
-/**
- * The result of the transaction signer signing operation.
- */
+/** The result of the transaction signer signing operation. */
 export type TransactionSignerResult = {
-  /**
-   * The public key matching the private key that generate the signature.
-   */
+  /** The public key matching the private key that generate the signature. */
   pubKey: Crypto.Ed25519PublicKeyHex;
 
-  /**
-   * The transaction signature.
-   */
+  /** The transaction signature. */
   signature: Crypto.Ed25519SignatureHex;
 };
 
-/**
- * Produces a Ed25519Signature of a transaction.
- */
+/** Produces a Ed25519Signature of a transaction. */
 export interface TransactionSigner {
   /**
    * Sings a transaction.

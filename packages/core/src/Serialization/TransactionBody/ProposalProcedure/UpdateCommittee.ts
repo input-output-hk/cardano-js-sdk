@@ -14,10 +14,7 @@ const CREDENTIAL_ARRAY_SIZE = 2;
 const CREDENTIAL_INDEX = 0;
 const EPOCH_INDEX = 1;
 
-/**
- * Modifies the composition of the constitutional committee,
- * its signature threshold, or its terms of operation.
- */
+/** Modifies the composition of the constitutional committee, its signature threshold, or its terms of operation. */
 export class UpdateCommittee {
   #govActionId: GovernanceActionId | undefined;
   #membersToBeRemoved: Cardano.Credential[];

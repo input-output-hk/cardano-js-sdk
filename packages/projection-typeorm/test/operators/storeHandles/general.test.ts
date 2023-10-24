@@ -1,30 +1,28 @@
 import { Asset, Cardano, ChainSyncEventType } from '@cardano-sdk/core';
-import { AssetEntity, HandleEntity, OutputEntity, TypeormStabilityWindowBuffer } from '../../../src';
+import { AssetEntity, HandleEntity, OutputEntity } from '../../../src';
+import { ProjectorContext, createProjectorContext } from '../util';
 import { QueryRunner } from 'typeorm';
-import { applyOperators, createMultiTxProjectionSource, entities, policyId, projectTilFirst } from './util';
+import { createMultiTxProjectionSource, entities, mapAndStore, policyId, projectTilFirst } from './util';
 import { firstValueFrom } from 'rxjs';
 import { initializeDataSource } from '../../util';
-import { logger } from '@cardano-sdk/util-dev';
 
 describe('storeHandles', () => {
   let queryRunner: QueryRunner;
-  let buffer: TypeormStabilityWindowBuffer;
+  let context: ProjectorContext;
 
   beforeEach(async () => {
     const dataSource = await initializeDataSource({ entities });
     queryRunner = dataSource.createQueryRunner();
-    buffer = new TypeormStabilityWindowBuffer({ allowNonSequentialBlockHeights: true, logger });
-    await buffer.initialize(queryRunner);
+    context = createProjectorContext(entities);
   });
 
   afterEach(async () => {
     await queryRunner.release();
-    buffer.shutdown();
   });
 
   it('inserts handle on mint', async () => {
     const repository = queryRunner.manager.getRepository(HandleEntity);
-    const mintEvent = await projectTilFirst(buffer)((evt) => evt.handles.length > 0);
+    const mintEvent = await projectTilFirst(context)((evt) => evt.handles.length > 0);
     expect(await repository.count()).toBe(mintEvent.handles.length);
     expect(mintEvent.handles.length).toBeGreaterThan(0);
   });
@@ -32,7 +30,7 @@ describe('storeHandles', () => {
   it('when combined with filter operators, stores only relevant Output and Asset (per handle)', async () => {
     const outputRepository = queryRunner.manager.getRepository(OutputEntity);
     const assetRepository = queryRunner.manager.getRepository(AssetEntity);
-    const { handles } = await projectTilFirst(buffer)((evt) => evt.handles.length > 0);
+    const { handles } = await projectTilFirst(context)((evt) => evt.handles.length > 0);
     expect(await outputRepository.count()).toBe(handles.length);
     expect(await assetRepository.count()).toBe(handles.length);
   });
@@ -40,11 +38,11 @@ describe('storeHandles', () => {
   it('deletes handle on rollback', async () => {
     const handleRepository = queryRunner.manager.getRepository(HandleEntity);
     const initialCount = await handleRepository.count();
-    const mintEvent = await projectTilFirst(buffer)(
+    const mintEvent = await projectTilFirst(context)(
       ({ handles, eventType }) => eventType === ChainSyncEventType.RollForward && handles.length > 0
     );
     expect(await handleRepository.count()).toEqual(initialCount + mintEvent.handles.length);
-    await projectTilFirst(buffer)(
+    await projectTilFirst(context)(
       ({
         eventType,
         block: {
@@ -84,7 +82,7 @@ describe('storeHandles', () => {
       }
     ]);
     const numHandles = await repository.count();
-    await firstValueFrom(source$.pipe(applyOperators(buffer)));
+    await firstValueFrom(source$.pipe(mapAndStore(context)));
 
     expect(await repository.count()).toBe(numHandles);
   });

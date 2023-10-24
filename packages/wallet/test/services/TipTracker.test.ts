@@ -3,16 +3,8 @@ import { ConnectionStatus, TipTracker } from '../../src/services';
 import { InMemoryDocumentStore } from '../../src/persistence';
 import { Milliseconds, SyncStatus } from '../../src';
 import { Observable, firstValueFrom, of } from 'rxjs';
-import { createTestScheduler } from '@cardano-sdk/util-dev';
+import { createStubObservable, createTestScheduler } from '@cardano-sdk/util-dev';
 import { dummyLogger } from 'ts-log';
-
-const stubObservableProvider = <T>(...calls: Observable<T>[]) => {
-  let numCall = 0;
-  return new Observable<T>((subscriber) => {
-    const sub = calls[numCall++].subscribe(subscriber);
-    return () => sub.unsubscribe();
-  });
-};
 
 const mockTips = {
   a: { hash: 'ha' },
@@ -37,7 +29,7 @@ describe('TipTracker', () => {
   it('calls the provider immediately, only emitting distinct values, with throttling', () => {
     createTestScheduler().run(({ cold, expectObservable }) => {
       const syncStatus: Partial<SyncStatus> = { isSettled$: cold('---a---bc--d|') };
-      const provider$ = stubObservableProvider<Cardano.Tip>(
+      const provider$ = createStubObservable<Cardano.Tip>(
         cold('-x|', mockTips),
         cold('--a|', mockTips),
         cold('--b|', mockTips),
@@ -85,7 +77,7 @@ describe('TipTracker', () => {
     store.set = jest.fn().mockImplementation(store.set.bind(store));
     createTestScheduler().run(({ cold, expectObservable }) => {
       const syncStatus: Partial<SyncStatus> = { isSettled$: cold('---a---b|') };
-      const provider$ = stubObservableProvider<Cardano.Tip>(
+      const provider$ = createStubObservable<Cardano.Tip>(
         cold('-y|', mockTips),
         cold('--a|', mockTips),
         cold('-ab|', mockTips)
@@ -108,7 +100,7 @@ describe('TipTracker', () => {
   it('times out trigger$ with maxPollInterval, then listens for trigger$ again', () => {
     createTestScheduler().run(({ cold, hot, expectObservable }) => {
       const syncStatus: Partial<SyncStatus> = { isSettled$: hot('10ms a|') };
-      const provider$ = stubObservableProvider<Cardano.Tip>(
+      const provider$ = createStubObservable<Cardano.Tip>(
         cold('-a|', mockTips),
         cold('-b|', mockTips),
         cold('-c|', mockTips)
@@ -135,7 +127,7 @@ describe('TipTracker', () => {
         d: ConnectionStatus.down,
         p: ConnectionStatus.up
       });
-      const provider$ = stubObservableProvider<Cardano.Tip>(cold('x|', mockTips), cold('a|', mockTips));
+      const provider$ = createStubObservable<Cardano.Tip>(cold('x|', mockTips), cold('a|', mockTips));
       const tracker$ = new TipTracker({
         connectionStatus$: connectionStatusMock$,
         logger,

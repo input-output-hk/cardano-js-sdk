@@ -122,7 +122,7 @@ describe('KeyManagement/restoreKeyAgent', () => {
     const ledgerKeyAgentData: SerializableLedgerKeyAgentData = {
       __typename: KeyAgentType.Ledger,
       accountIndex: 0,
-      chainId: Cardano.ChainIds.LegacyTestnet,
+      chainId: Cardano.ChainIds.Preprod,
       communicationType: CommunicationType.Node,
       extendedAccountPublicKey: Crypto.Bip32PublicKeyHex(
         // eslint-disable-next-line max-len
@@ -153,7 +153,7 @@ describe('KeyManagement/restoreKeyAgent', () => {
     const trezorKeyAgentData: SerializableTrezorKeyAgentData = {
       __typename: KeyAgentType.Trezor,
       accountIndex: 0,
-      chainId: Cardano.ChainIds.LegacyTestnet,
+      chainId: Cardano.ChainIds.Preprod,
       extendedAccountPublicKey: Crypto.Bip32PublicKeyHex(
         // eslint-disable-next-line max-len
         'fc5ab25e830b67c47d0a17411bf7fdabf711a597fb6cf04102734b0a2934ceaaa65ff5e7c52498d52c07b8ddfcd436fc2b4d2775e2984a49d0c79f65ceee4779'
