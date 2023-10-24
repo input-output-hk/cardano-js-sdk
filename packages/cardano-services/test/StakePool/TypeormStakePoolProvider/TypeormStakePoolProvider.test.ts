@@ -146,7 +146,7 @@ describe('TypeormStakePoolProvider', () => {
       beforeAll(async () => {
         provider = stakePoolHttpProvider(clientConfig);
         stakePoolProvider = new TypeormStakePoolProvider(
-          { paginationPageSizeLimit: pagination.limit },
+          { lastRosEpochs: 10, paginationPageSizeLimit: pagination.limit },
           { connectionConfig$, entities, logger }
         );
         service = new StakePoolHttpService({ logger, stakePoolProvider });
@@ -739,6 +739,54 @@ describe('TypeormStakePoolProvider', () => {
             expect(provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'apy'))).rejects.toThrow(
               'TypeormStakePoolProvider do not support sort by APY'
             ));
+
+          describe('sort by lastRos', () => {
+            let expectedLastRos: { max: number; min: number };
+
+            beforeAll(() => {
+              expectedLastRos = poolsInfoWithMetrics.reduce(
+                (result, current) => ({
+                  max: Math.max(result.max, current.lastRos === undefined ? 0 : current.lastRos),
+                  min: Math.min(result.min, current.lastRos === undefined ? 100 : current.lastRos)
+                }),
+                { max: 0, min: 100 }
+              );
+            });
+
+            it('desc order', async () => {
+              const response = await provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'lastRos'));
+              expect(response.pageResults[0].metrics?.lastRos).toEqual(expectedLastRos.max);
+            });
+
+            it('asc order', async () => {
+              const response = await provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'lastRos'));
+              expect(response.pageResults[0].metrics?.lastRos).toEqual(expectedLastRos.min);
+            });
+          });
+
+          describe('sort by ros', () => {
+            let expectedRos: { max: number; min: number };
+
+            beforeAll(() => {
+              expectedRos = poolsInfoWithMetrics.reduce(
+                (result, current) => ({
+                  max: Math.max(result.max, current.ros === undefined ? 0 : current.ros),
+                  min: Math.min(result.min, current.ros === undefined ? 100 : current.ros)
+                }),
+                { max: 0, min: 100 }
+              );
+            });
+
+            it('desc order', async () => {
+              const response = await provider.queryStakePools(setSortCondition({ pagination }, 'desc', 'ros'));
+              expect(response.pageResults[0].metrics?.ros).toEqual(expectedRos.max);
+            });
+
+            it('asc order', async () => {
+              const response = await provider.queryStakePools(setSortCondition({ pagination }, 'asc', 'ros'));
+              expect(response.pageResults[0].metrics?.ros).toEqual(expectedRos.min);
+            });
+          });
         });
       });
 
