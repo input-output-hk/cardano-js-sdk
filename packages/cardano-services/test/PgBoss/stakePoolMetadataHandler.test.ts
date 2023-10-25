@@ -1,4 +1,4 @@
-import * as handler from '../../src/PgBoss';
+import * as handler from '../../src/PgBoss/stakePoolMetadataHandler';
 import { Cardano, NotImplementedError, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { DataMocks } from '../data-mocks';
 import { DataSource } from 'typeorm';

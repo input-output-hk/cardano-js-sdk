@@ -3,8 +3,6 @@ import { STAKE_POOL_METADATA_QUEUE, STAKE_POOL_METRICS_UPDATE } from '@cardano-s
 import { stakePoolMetadataHandlerFactory } from './stakePoolMetadataHandler';
 import { stakePoolMetricsHandlerFactory } from './stakePoolMetricsHandler';
 
-export * from './stakePoolMetadataHandler';
-export * from './stakePoolMetricsHandler';
 export * from './types';
 export * from './util';
 
