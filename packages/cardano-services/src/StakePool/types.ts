@@ -13,6 +13,9 @@ export interface StakePoolMetadataService {
   ): Promise<Cardano.ExtendedStakePoolMetadata | CustomError | undefined>;
 }
 
+export interface SmashStakePoolDelistedService {
+  getDelistedStakePoolIds(): Promise<Array<string> | CustomError>;
+}
 export enum ExtMetadataFormat {
   CIP6 = 'cip-6',
   AdaPools = 'ada-pools'

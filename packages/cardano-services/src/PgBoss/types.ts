@@ -4,9 +4,11 @@ import { PgBossWorkerArgs } from '../Program/services/pgboss';
 import { Pool } from 'pg';
 import { STAKE_POOL_METADATA_QUEUE, STAKE_POOL_METRICS_UPDATE } from '@cardano-sdk/projection-typeorm';
 
-export const workerQueues = [STAKE_POOL_METADATA_QUEUE, STAKE_POOL_METRICS_UPDATE] as const;
-
+export const POOL_DELIST_SCHEDULE = 'pool-delist-schedule';
+export const workerQueues = [STAKE_POOL_METADATA_QUEUE, STAKE_POOL_METRICS_UPDATE, POOL_DELIST_SCHEDULE] as const;
+export const workerSchedules = [POOL_DELIST_SCHEDULE] as const;
 export type PgBossQueue = typeof workerQueues[number];
+export type PgBossSchedule = typeof workerSchedules[number];
 
 export type WorkerHandlerFactoryOptions = {
   dataSource: DataSource;

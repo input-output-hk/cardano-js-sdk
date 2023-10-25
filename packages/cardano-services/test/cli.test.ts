@@ -2709,6 +2709,37 @@ describe('CLI', () => {
         done();
       });
     });
+
+    it('exits with code 1 with an invalid SCHEDULES path', (done) => {
+      expect.assertions(2);
+      proc = withLogging(
+        fork(
+          exePath,
+          [
+            ...commonArgs,
+            '--queues',
+            'pool-metadata',
+            '--postgres-connection-string-db-sync',
+            postgresConnectionString,
+            '--postgres-connection-string-stake-pool',
+            postgresConnectionStringStakePool,
+            '--stake-pool-provider-url',
+            'http://localhost:4000/stake-pool',
+            '--schedules',
+            'does_not_exist'
+          ],
+          { env: {}, stdio: 'pipe' }
+        ),
+        true
+      );
+      proc.stderr!.on('data', (data) =>
+        expect(data.toString()).toContain('Error: File does not exist: does_not_exist')
+      );
+      proc.on('exit', (code) => {
+        expect(code).toBe(1);
+        done();
+      });
+    });
   });
 
   describe('start-worker', () => {

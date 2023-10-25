@@ -10,6 +10,7 @@ import { HandleMetadataTableMigrations1693490983715 } from './1693490983715-hand
 import { HandleTableMigration1686138943349 } from './1686138943349-handle-table';
 import { NftMetadataTableMigration1690269355640 } from './1690269355640-nft-metadata-table';
 import { OutputTableMigration1682519108367 } from './1682519108367-output-table';
+import { PoolDelistedTableMigration1695899010515 } from './1695899010515-pool-delisted-table';
 import { PoolMetadataTableMigration1682519108363 } from './1682519108363-pool-metadata-table';
 import { PoolMetricsMigrations1685011799580 } from './1685011799580-stake-pool-metrics-table';
 import { PoolRegistrationTableMigration1682519108360 } from './1682519108360-pool-registration-table';
@@ -43,5 +44,6 @@ export const migrations: ProjectionMigration[] = [
   StakeKeyRegistrationsTableMigrations1690964880195,
   TokensQuantityNumericMigrations1691042603934,
   HandleMetadataTableMigrations1693490983715,
-  HandleDefaultMigrations1693830294136
+  HandleDefaultMigrations1693830294136,
+  PoolDelistedTableMigration1695899010515
 ];

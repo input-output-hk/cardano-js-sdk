@@ -2,6 +2,7 @@ import {
   BlockEntity,
   CurrentPoolMetricsEntity,
   PgConnectionConfig,
+  PoolDelistedEntity,
   PoolMetadataEntity,
   PoolRegistrationEntity,
   PoolRetirementEntity,
@@ -28,9 +29,10 @@ import {
   switchMap,
   tap
 } from 'rxjs';
-import { PgBossQueue, queueHandlers } from '../../PgBoss';
+import { PgBossQueue, WorkerHandler, queueHandlers } from '../../PgBoss';
 import { Pool } from 'pg';
 import { Router } from 'express';
+import { ScheduleConfig } from '../../util/schedule';
 import { StakePoolMetadataProgramOptions } from '../options/stakePoolMetadata';
 import { contextLogger } from '@cardano-sdk/util';
 import { retryBackoff } from 'backoff-rxjs';
@@ -40,6 +42,7 @@ import PgBoss from 'pg-boss';
 export const pgBossEntities: Function[] = [
   CurrentPoolMetricsEntity,
   BlockEntity,
+  PoolDelistedEntity,
   PoolMetadataEntity,
   PoolRegistrationEntity,
   PoolRetirementEntity,
@@ -76,6 +79,7 @@ export type PgBossWorkerArgs = CommonProgramOptions &
   PosgresProgramOptions<'StakePool'> & {
     parallelJobs: number;
     queues: PgBossQueue[];
+    schedules: Array<ScheduleConfig>;
   };
 
 export interface PgBossServiceDependencies {
@@ -141,7 +145,10 @@ export class PgBossHttpService extends HttpService {
 
         return concat(
           from(pgBoss.start()),
-          merge(...this.#config.queues.map((queue) => this.workQueue(dataSource, pgBoss, queue, this.#db)))
+          merge(
+            ...this.#config.queues.map((queue) => this.createQueue(dataSource, pgBoss, queue, this.#db)),
+            ...this.#config.schedules.map((schedule) => this.createSchedule(dataSource, pgBoss, schedule, this.#db))
+          )
         ).pipe(finalize(() => pgBoss.stop().catch((error) => this.logger.warn('Error stopping pgBoss', error))));
       }),
       tap(() => (this.#health = { ok: true })),
@@ -171,7 +178,7 @@ export class PgBossHttpService extends HttpService {
     );
   }
 
-  private workQueue(dataSource: DataSource, pgBoss: PgBoss, queue: PgBossQueue, db: Pool) {
+  private createQueue(dataSource: DataSource, pgBoss: PgBoss, queue: PgBossQueue, db: Pool) {
     const logger = contextLogger(this.logger, queue);
     const handler = queueHandlers[queue]({
       dataSource,
@@ -180,6 +187,11 @@ export class PgBossHttpService extends HttpService {
       ...this.#config
     });
 
+    logger.info('Creating worker');
+    return this.workQueue(handler, logger, pgBoss, queue);
+  }
+
+  private workQueue(handler: WorkerHandler, logger: Logger, pgBoss: PgBoss, queue: PgBossQueue) {
     return new Observable((subscriber) => {
       const workOption = {
         teamConcurrency: this.#config.parallelJobs,
@@ -217,9 +229,27 @@ export class PgBossHttpService extends HttpService {
       };
 
       pgBoss.work(queue, workOption, baseHandler).catch((error: unknown) => {
-        logger.error(`Error while starting worker for queue '${queue}'`, error);
+        logger.error(`Error while starting worker for '${queue}'`, error);
         subscriber.error(error);
       });
+    });
+  }
+
+  private createSchedule(
+    _dataSource: DataSource,
+    pgBoss: PgBoss,
+    schedule: ScheduleConfig,
+    _db: Pool
+  ): Observable<unknown> {
+    const { queue, cron, data, scheduleOptions } = schedule;
+    const logger = contextLogger(this.logger, queue);
+
+    return new Observable((subscriber) => {
+      pgBoss.schedule(queue, cron, data, scheduleOptions).catch((error: unknown) => {
+        logger.error('Error while scheduling', error);
+        subscriber.error(error);
+      });
+      logger.info('Schedule created');
     });
   }
 }

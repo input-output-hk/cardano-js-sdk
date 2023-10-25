@@ -9,6 +9,7 @@ import {
   HandleMetadataEntity,
   NftMetadataEntity,
   OutputEntity,
+  PoolDelistedEntity,
   PoolMetadataEntity,
   PoolRegistrationEntity,
   PoolRetirementEntity,
@@ -123,6 +124,7 @@ const entities = {
   handleMetadata: HandleMetadataEntity,
   nftMetadata: NftMetadataEntity,
   output: OutputEntity,
+  poolDelisted: PoolDelistedEntity,
   poolMetadata: PoolMetadataEntity,
   poolRegistration: PoolRegistrationEntity,
   poolRetirement: PoolRetirementEntity,
@@ -144,8 +146,10 @@ const storeEntities: Partial<Record<StoreName, EntityName[]>> = {
   storeNftMetadata: ['asset'],
   storePoolMetricsUpdateJob: ['stakePool', 'currentPoolMetrics', 'poolMetadata'],
   storeStakeKeyRegistrations: ['block', 'stakeKeyRegistration'],
+  // 'stake-pool' projection requires it, but `storeStakePools` does not.
+  // at the time of writing there was no way to specify a direct projection->entity dependency.
   storeStakePoolMetadataJob: ['stakePool', 'currentPoolMetrics', 'poolMetadata'],
-  storeStakePools: ['stakePool', 'currentPoolMetrics', 'poolMetadata'],
+  storeStakePools: ['stakePool', 'currentPoolMetrics', 'poolMetadata', 'poolDelisted'],
   storeUtxo: ['tokens', 'output']
 };
 
@@ -157,6 +161,7 @@ const entityInterDependencies: Partial<Record<EntityName, EntityName[]>> = {
   handle: ['asset'],
   handleMetadata: ['output'],
   output: ['block', 'tokens'],
+  poolDelisted: ['stakePool'],
   poolMetadata: ['stakePool'],
   poolRegistration: ['block'],
   poolRetirement: ['block'],

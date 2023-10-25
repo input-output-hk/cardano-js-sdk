@@ -5,6 +5,7 @@ export * from './StakePool.entity';
 export * from './PoolRetirement.entity';
 export * from './PoolRegistration.entity';
 export * from './PoolMetadata.entity';
+export * from './PoolDelisted.entity';
 export * from './Asset.entity';
 export * from './Tokens.entity';
 export * from './Output.entity';

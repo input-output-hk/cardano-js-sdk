@@ -61,13 +61,22 @@ export const doServerRequest =
 export const ingestDbData = async (db: Pool, tableName: string, columns: string[], values: any[]) => {
   const columnsPlaceholder = columns.toString();
   const valuesPlaceholder = Array.from({ length: values.length }, (_, i) => `$${i + 1}`).toString();
-  const sqlString = `INSERT INTO ${tableName} (${columnsPlaceholder}) VALUES (${valuesPlaceholder});`;
+  const sqlString = `INSERT INTO ${tableName} (${columnsPlaceholder})
+                     VALUES (${valuesPlaceholder});`;
 
   await db.query(sqlString, values);
 };
 
 export const deleteDbData = async (db: Pool, tableName: string, field: string, value: any) => {
-  const sqlString = `DELETE FROM ${tableName} WHERE ${field} = ${value};`;
+  const sqlString = `DELETE
+                     FROM ${tableName}
+                     WHERE ${field} = ${value};`;
+
+  await db.query(sqlString);
+};
+
+export const emptyDbData = async (db: Pool, tableName: string) => {
+  const sqlString = `TRUNCATE ${tableName}`;
 
   await db.query(sqlString);
 };

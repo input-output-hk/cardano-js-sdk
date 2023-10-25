@@ -1,0 +1,32 @@
+{
+  "schedules": {
+    "sharedScheduleOptions": {
+      "sharedOption1": "sharedOption1",
+      "pgBossOption2": "overriden"
+    },
+    "list": [
+      {
+        "queue": "test-schedule1",
+        "cron": "0 * * * *",
+        "data": {
+          "exampleData": "exampleData"
+        },
+        "scheduleOptions": {
+          "pgBossOption1": "pgBossOption1",
+          "pgBossOption2": "pgBossOption2"
+        }
+      },
+      {
+        "queue": "test-schedule2",
+        "cron": "0 * * * *",
+        "data": {
+          "exampleData": "exampleData"
+        },
+        "scheduleOptions": {
+          "pgBossOption1": "pgBossOption1",
+          "pgBossOption2": "pgBossOption2"
+        }
+      }
+    ]
+  }
+}
