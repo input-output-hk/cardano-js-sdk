@@ -3,6 +3,8 @@
 # This funds a set of fixed addresses to be used during testing.
 set -euo pipefail
 
+source $(dirname $0)/common.sh
+
 here="$(cd "$(dirname "$0")" >/dev/null 2>&1 && pwd)"
 root="$(cd "$here/.." && pwd)"
 cd "$root"
@@ -23,23 +25,6 @@ while [ ! -S "$CARDANO_NODE_SOCKET_PATH" ]; do
   sleep 2
 done
 
-wait_tx_complete() {
-  utxo_to_check="$1"
-  timeout=0
-  max_timeout=10
-  while [ $timeout -lt $max_timeout ]; do
-    output=$(cardano-cli query utxo --tx-in "${utxo_to_check}" --testnet-magic 888)
-    line_count=$(echo "$output" | awk 'END {print NR}')
-    if [ $line_count -eq 2 ]; then
-      echo "Transaction completed"
-      return 0
-    fi
-    timeout=$((timeout + 1))
-    sleep 1
-  done
-  echo "Timeout: Transaction not completed in 10 sec."
-  return 1
-}
 genesisAddr=$(cardano-cli address build --payment-verification-key-file network-files/utxo-keys/utxo3.vkey --testnet-magic 888)
 
 walletAddr1="addr_test1qpw0djgj0x59ngrjvqthn7enhvruxnsavsw5th63la3mjel3tkc974sr23jmlzgq5zda4gtv8k9cy38756r9y3qgmkqqjz6aa7"
