@@ -14,11 +14,7 @@ export const findTotalSupply = `
 export const findActiveStake = `
     SELECT CAST(COALESCE(SUM(amount), 0) AS BIGINT) as active_stake
     FROM epoch_stake
-    WHERE epoch_stake.epoch_no = (
-    SELECT no FROM epoch
-        ORDER BY no DESC
-        LIMIT 1
-    )
+    WHERE epoch_stake.epoch_no = (SELECT MAX(no) FROM epoch) - 1
 `;
 
 export const findLatestCompleteEpoch = `
