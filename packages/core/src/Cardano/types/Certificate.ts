@@ -83,6 +83,7 @@ export interface AuthorizeCommitteeHotCertificate {
 export interface ResignCommitteeColdCertificate {
   __typename: CertificateType.ResignCommitteeCold;
   coldCredential: Credential;
+  anchor: Anchor | null;
 }
 
 export interface RegisterDelegateRepresentativeCertificate {

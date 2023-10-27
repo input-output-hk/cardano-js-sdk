@@ -79,14 +79,10 @@ export class RegisterDelegateRepresentative {
    */
   static fromCbor(cbor: HexBlob): RegisterDelegateRepresentative {
     const reader = new CborReader(cbor);
-
     const length = reader.readStartArray();
 
     if (length !== 4)
-      throw new InvalidArgumentError(
-        'cbor',
-        `Expected an array of ${EMBEDDED_GROUP_SIZE} elements, but got an array of ${length} elements`
-      );
+      throw new InvalidArgumentError('cbor', `Expected an array of 4 elements, but got an array of ${length} elements`);
 
     const kind = Number(reader.readInt());
 
