@@ -8,10 +8,13 @@ import {
   StakePoolStats
 } from '@cardano-sdk/core';
 import { DataSource } from 'typeorm';
+import { MissingProgramOption } from '../../Program/errors';
 import { PoolDelistedEntity, StakePoolEntity } from '@cardano-sdk/projection-typeorm';
-import { PoolModel, PoolStatsModel, mapPoolStats, mapStakePoolsResult } from './mappers';
+import { PoolStatsModel, mapPoolStats, mapStakePoolsResult } from './mappers';
+import { ServiceNames } from '../../Program/programs/types';
 import { TypeormProvider, TypeormProviderDependencies } from '../../util';
 import {
+  computeROS,
   getSortOptions,
   getWhereClauseAndArgs,
   nullsInSort,
@@ -21,20 +24,35 @@ import {
 
 /** Properties that are need to create DbSyncStakePoolProvider */
 export interface TypeOrmStakePoolProviderProps {
+  /** Number of epochs over which lastRos is computed */
+  lastRosEpochs?: number;
+
   /** Pagination page size limit used for provider methods constraint. */
   paginationPageSizeLimit: number;
 }
 
 export class TypeormStakePoolProvider extends TypeormProvider implements StakePoolProvider {
+  #lastRosEpochs: number;
   #paginationPageSizeLimit: number;
 
-  constructor({ paginationPageSizeLimit }: TypeOrmStakePoolProviderProps, deps: TypeormProviderDependencies) {
+  constructor(config: TypeOrmStakePoolProviderProps, deps: TypeormProviderDependencies) {
+    const { lastRosEpochs, paginationPageSizeLimit } = config;
+
     super('TypeormStakePoolProvider', deps);
     this.#paginationPageSizeLimit = paginationPageSizeLimit;
+
+    // Introduced following code repetition as the correct form is source of a circular-deps:check failure.
+    // Solving it would require an invasive refactoring action, probably better to defer it.
+    // if (!lastRosEpochs) throw new MissingProgramOption(STAKE_POOL_REWARDS, Descriptions.LastRosEpochs);
+    if (!lastRosEpochs)
+      throw new MissingProgramOption(ServiceNames.StakePool, 'Number of epochs over which lastRos is computed');
+
+    this.#lastRosEpochs = lastRosEpochs;
   }
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   public async queryStakePools(options: QueryStakePoolsArgs): Promise<Paginated<Cardano.StakePool>> {
-    const { filters, pagination, sort } = options;
+    const { epochRewards, epochsLength, filters, pagination, sort } = options;
 
     if (pagination.limit > this.#paginationPageSizeLimit) {
       throw new ProviderError(
@@ -59,8 +77,8 @@ export class TypeormStakePoolProvider extends TypeormProvider implements StakePo
     const { clause, args } = getWhereClauseAndArgs(filters);
     const { field, order } = getSortOptions(sort);
 
-    const rawResult = await this.withDataSource<PoolModel[]>((dataSource: DataSource) =>
-      dataSource
+    return this.withDataSource<Paginated<Cardano.StakePool>>(async (dataSource: DataSource) => {
+      const rawResult = await dataSource
         .createQueryBuilder()
         .from(StakePoolEntity, 'pool')
         .leftJoinAndSelect('pool.metrics', 'metrics')
@@ -75,10 +93,25 @@ export class TypeormStakePoolProvider extends TypeormProvider implements StakePo
         .addOrderBy('pool.id', 'ASC')
         .offset(pagination.startAt)
         .limit(pagination.limit)
-        .getRawMany()
-    );
-    const { pageResults, totalResultCount } = mapStakePoolsResult(rawResult);
-    return { pageResults, totalResultCount };
+        .getRawMany();
+
+      const result = mapStakePoolsResult(rawResult);
+      const requestedNotStdLength = epochsLength !== undefined && epochsLength !== this.#lastRosEpochs;
+
+      if (epochRewards || requestedNotStdLength) {
+        const epochs = epochsLength || this.#lastRosEpochs;
+
+        for (const pool of result.pageResults) {
+          const { id, metrics } = pool;
+          const [ros, history] = await computeROS({ dataSource, epochs, logger: this.logger, stakePool: { id } });
+
+          if (epochRewards) pool.rewardHistory = history;
+          if (requestedNotStdLength && metrics) metrics.lastRos = ros;
+        }
+      }
+
+      return result;
+    });
   }
 
   public async stakePoolStats(): Promise<StakePoolStats> {
@@ -93,7 +126,6 @@ export class TypeormStakePoolProvider extends TypeormProvider implements StakePo
         .getRawMany()
     );
 
-    const stats = mapPoolStats(rawResult);
-    return { qty: stats };
+    return { qty: mapPoolStats(rawResult) };
   }
 }

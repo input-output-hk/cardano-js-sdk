@@ -17,7 +17,7 @@ describe('estimateStakePoolAPY', () => {
   it('provided a single history data point => returns compounded annualized APY %', () => {
     const apy = Cardano.util.estimateStakePoolAPY([rewards]);
     const epochLengthInDays = rewards.epochLength / 1000 / 60 / 60 / 24;
-    expect(apy).toBeCloseTo((rewards.memberROI * 365) / epochLengthInDays);
+    expect(apy).toBeCloseTo((rewards.memberROI! * 365) / epochLengthInDays);
     expect(apy).toBeLessThan(0.1);
   });
 

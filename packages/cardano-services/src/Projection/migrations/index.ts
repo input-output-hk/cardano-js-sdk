@@ -3,6 +3,7 @@ import { AssetTableMigration1682519108365 } from './1682519108365-asset-table';
 import { BlockDataTableMigration1682519108359 } from './1682519108359-block-data-table';
 import { BlockTableMigration1682519108358 } from './1682519108358-block-table';
 import { CostPledgeNumericMigration1689091319930 } from './1689091319930-cost-pledge-numeric';
+import { CurrentStakePollMetricsAttributesMigrations1698174358997 } from './1698174358997-current-pool-metrics-attributes';
 import { FkPoolRegistrationMigration1682519108369 } from './1682519108369-fk-pool-registration';
 import { FkPoolRetirementMigration1682519108370 } from './1682519108370-fk-pool-retirement';
 import { HandleDefaultMigrations1693830294136 } from './1693830294136-handle-default-columns';
@@ -15,6 +16,7 @@ import { PoolMetadataTableMigration1682519108363 } from './1682519108363-pool-me
 import { PoolMetricsMigrations1685011799580 } from './1685011799580-stake-pool-metrics-table';
 import { PoolRegistrationTableMigration1682519108360 } from './1682519108360-pool-registration-table';
 import { PoolRetirementTableMigration1682519108361 } from './1682519108361-pool-retirement-table';
+import { PoolRewardsTableMigrations1698175956871 } from './1698175956871-pool-rewards-table';
 import { StakeKeyRegistrationsTableMigrations1690964880195 } from './1690964880195-stake-key-registrations-table';
 import { StakePoolTableMigration1682519108362 } from './1682519108362-stake-pool-table';
 import { TokensQuantityNumericMigrations1691042603934 } from './1691042603934-tokens-quantity-numeric';
@@ -45,5 +47,7 @@ export const migrations: ProjectionMigration[] = [
   TokensQuantityNumericMigrations1691042603934,
   HandleMetadataTableMigrations1693490983715,
   HandleDefaultMigrations1693830294136,
-  PoolDelistedTableMigration1695899010515
+  PoolDelistedTableMigration1695899010515,
+  CurrentStakePollMetricsAttributesMigrations1698174358997,
+  PoolRewardsTableMigrations1698175956871
 ];

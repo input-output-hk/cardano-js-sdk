@@ -1,7 +1,7 @@
 import { CustomError } from 'ts-custom-error';
 import { MissingProgramOption } from '../Program/errors/MissingProgramOption';
-import { POOL_DELIST_SCHEDULE, WorkerHandlerFactory } from './types';
-import { PoolDelistedEntity } from '@cardano-sdk/projection-typeorm';
+import { POOL_DELIST_SCHEDULE, PoolDelistedEntity } from '@cardano-sdk/projection-typeorm';
+import { WorkerHandlerFactory } from './types';
 import { createSmashStakePoolDelistedService } from '../StakePool/HttpStakePoolMetadata/SmashStakePoolDelistedService';
 
 const createService = (smashUrl: string | undefined) => {

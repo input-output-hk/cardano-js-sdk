@@ -133,6 +133,12 @@ export class DbSyncStakePoolProvider extends DbSyncProvider(RunnableModule) impl
         }
 
         return (options: QueryStakePoolsArgs) => this.#builder.queryPoolAPY(hashesIds, this.#epochLength, options);
+      case 'ros':
+        throw new ProviderError(
+          ProviderFailure.NotImplemented,
+          null,
+          'DbSyncStakePoolProvider do not support sort by ROS'
+        );
       case 'data':
       default:
         return (options: QueryStakePoolsArgs) => this.#builder.queryPoolData(updatesIds, useBlockfrost, options);

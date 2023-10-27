@@ -1,6 +1,18 @@
 /* eslint-disable complexity */
 /* eslint-disable sonarjs/cognitive-complexity */
-import { FilterCondition, QueryStakePoolsArgs, SortField, SortOrder, StakePoolSortOptions } from '@cardano-sdk/core';
+import {
+  Cardano,
+  FilterCondition,
+  ProviderError,
+  ProviderFailure,
+  QueryStakePoolsArgs,
+  SortField,
+  SortOrder,
+  StakePoolSortOptions
+} from '@cardano-sdk/core';
+import { Percent } from '@cardano-sdk/util';
+import { PoolRewardsEntity } from '@cardano-sdk/projection-typeorm';
+import { RosComputeParams } from '../../PgBoss';
 
 type StakePoolWhereClauseArgs = {
   name?: string[];
@@ -34,13 +46,16 @@ export const stakePoolSearchSelection = [
   'metrics.liveSize',
   'metrics.liveSaturation',
   'metrics.livePledge',
-  'metrics.apy'
+  'metrics.lastRos',
+  'metrics.ros'
 ];
 
 export const sortSelectionMap: { [key in SortField]: string } = {
   apy: 'metrics_apy',
   cost: 'params.cost',
+  lastRos: 'metrics_last_ros',
   name: 'metadata.name',
+  ros: 'metrics_ros',
   saturation: 'metrics_live_saturation'
 };
 
@@ -62,6 +77,14 @@ export const getSortOptions = (
       order: sort.order.toUpperCase() as Uppercase<SortOrder>
     };
   }
+
+  if (sort.field === 'apy')
+    throw new ProviderError(
+      ProviderFailure.NotImplemented,
+      null,
+      'TypeormStakePoolProvider do not support sort by APY'
+    );
+
   return {
     field: sortSelectionMap[sort.field as SortField],
     order: sort.order.toUpperCase() as Uppercase<SortOrder>
@@ -126,4 +149,54 @@ export const getWhereClauseAndArgs = (filters: QueryStakePoolsArgs['filters']) =
     args: { ...args, ...identifierArgs },
     clause: clauses.join(` ${condition} `)
   };
+};
+
+const millisecondsPerYear = 1000 * 3600 * 24 * 365;
+
+/**
+ * Computes the annualized ROS for a give stake pool. If `epochs` is not specified, the life time ROS
+ * of the stake pool is computed.
+ *
+ * @returns the ROS
+ */
+export const computeROS = async ({ dataSource, epochs, logger, stakePool: { id } }: RosComputeParams) => {
+  let ros = Percent(0);
+
+  logger.debug(`Going to fetch ${epochs || 'all'} epoch rewards for stake pool ${id}`);
+
+  const result = await dataSource.getRepository(PoolRewardsEntity).find({
+    order: { epochNo: 'DESC' },
+    select: {
+      activeStake: true,
+      epochLength: true,
+      epochNo: true,
+      id: true,
+      leaderRewards: true,
+      memberActiveStake: true,
+      memberRewards: true,
+      pledge: true,
+      rewards: true
+    },
+    where: { stakePool: { id } },
+    ...(epochs ? { take: epochs } : undefined)
+  });
+
+  if (result.length > 0) {
+    let period = 0;
+    let returnInPeriod = 0;
+
+    for (const epochRewards of result) {
+      const { epochLength, memberActiveStake, memberRewards } = epochRewards;
+
+      period += epochLength!;
+      returnInPeriod += memberActiveStake === 0n ? 0 : Number(memberRewards) / Number(memberActiveStake);
+    }
+
+    ros = Percent((returnInPeriod * millisecondsPerYear) / period);
+  }
+
+  logger.debug(`Stake pool ${id} ROS: ${ros}`);
+
+  // eslint-disable-next-line @typescript-eslint/no-shadow, @typescript-eslint/no-unused-vars
+  return [ros, result.map(({ id, ...rest }) => rest) as Cardano.StakePoolEpochRewards[]] as const;
 };

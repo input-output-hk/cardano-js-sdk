@@ -134,6 +134,8 @@ export interface PoolMetrics extends CommonPoolInfo {
     activeStakePercentage: Percent;
     saturation: Percent;
     delegators: number;
+    lastRos: Percent;
+    ros: Percent;
   };
 }
 
@@ -160,7 +162,7 @@ export interface PoolAPY extends CommonPoolInfo {
   apy: number;
 }
 
-export type PoolSortType = 'data' | 'metrics' | 'apy';
+export type PoolSortType = 'apy' | 'data' | 'metrics' | 'ros';
 export interface OrderByOptions {
   field: string;
   order: 'asc' | 'desc';

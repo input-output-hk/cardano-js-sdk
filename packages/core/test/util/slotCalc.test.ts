@@ -69,31 +69,36 @@ describe('slotCalc utils', () => {
   describe('epochStartCalc', () => {
     describe('preprod', () => {
       it('correctly computes 1st slot of the 0th epoch', () => {
-        const { firstSlot, lastSlot } = epochSlotsCalc(Cardano.EpochNo(0), preprodEraSummaries);
+        const { eraSummary, firstSlot, lastSlot } = epochSlotsCalc(Cardano.EpochNo(0), preprodEraSummaries);
+        expect(eraSummary).toBe(preprodEraSummaries[0]);
         expect(firstSlot).toBe(0);
         expect(lastSlot).toBe(21_599);
       });
 
       it('correctly computes 1st slot of some Byron epoch', () => {
-        const { firstSlot, lastSlot } = epochSlotsCalc(Cardano.EpochNo(2), preprodEraSummaries);
+        const { eraSummary, firstSlot, lastSlot } = epochSlotsCalc(Cardano.EpochNo(2), preprodEraSummaries);
+        expect(eraSummary).toBe(preprodEraSummaries[0]);
         expect(firstSlot).toBe(43_200);
         expect(lastSlot).toBe(64_799);
       });
 
       it('correctly computes 1st slot of last Byron epoch', () => {
-        const { firstSlot, lastSlot } = epochSlotsCalc(Cardano.EpochNo(3), preprodEraSummaries);
+        const { eraSummary, firstSlot, lastSlot } = epochSlotsCalc(Cardano.EpochNo(3), preprodEraSummaries);
+        expect(eraSummary).toBe(preprodEraSummaries[0]);
         expect(firstSlot).toBe(64_800);
         expect(lastSlot).toBe(86_399);
       });
 
       it('correctly computes 1st slot of first Shelley epoch', () => {
-        const { firstSlot, lastSlot } = epochSlotsCalc(Cardano.EpochNo(4), preprodEraSummaries);
+        const { eraSummary, firstSlot, lastSlot } = epochSlotsCalc(Cardano.EpochNo(4), preprodEraSummaries);
+        expect(eraSummary).toBe(preprodEraSummaries[1]);
         expect(firstSlot).toBe(86_400);
         expect(lastSlot).toBe(518_399);
       });
 
       it('correctly computes 1st slot of some epoch in the middle of era summaries', () => {
-        const { firstSlot, lastSlot } = epochSlotsCalc(Cardano.EpochNo(5), preprodEraSummaries);
+        const { eraSummary, firstSlot, lastSlot } = epochSlotsCalc(Cardano.EpochNo(5), preprodEraSummaries);
+        expect(eraSummary).toBe(preprodEraSummaries[2]);
         expect(firstSlot).toBe(518_400);
         expect(lastSlot).toBe(950_399);
       });
@@ -102,7 +107,8 @@ describe('slotCalc utils', () => {
         const epoch = Cardano.EpochNo(20);
         const expectedFirstSlot = Cardano.Slot(6_998_400);
         const expectedLastSlot = Cardano.Slot(7_430_399);
-        const { firstSlot, lastSlot } = epochSlotsCalc(epoch, preprodEraSummaries);
+        const { eraSummary, firstSlot, lastSlot } = epochSlotsCalc(epoch, preprodEraSummaries);
+        expect(eraSummary).toBe(preprodEraSummaries[5]);
         expect(firstSlot).toBe(expectedFirstSlot);
         expect(lastSlot).toBe(expectedLastSlot);
         const epochSlotCalc = createSlotEpochCalc(preprodEraSummaries);

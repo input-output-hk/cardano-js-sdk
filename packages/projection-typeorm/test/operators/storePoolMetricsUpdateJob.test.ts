@@ -1,3 +1,4 @@
+import { ChainSyncEventType } from '@cardano-sdk/core';
 import { OperatorFunction, of } from 'rxjs';
 import { STAKE_POOL_METRICS_UPDATE, createStorePoolMetricsUpdateJob } from '../../src';
 
@@ -9,7 +10,7 @@ const testPromise = () => {
 
 const createEvent = (send: jest.Mock<Promise<void>, []>, blockNo: number, tipSlot?: number) => ({
   block: { header: { blockNo, slot: blockNo * 10 } },
-  eventType: 0,
+  eventType: ChainSyncEventType.RollForward,
   pgBoss: { send },
   tip: { slot: tipSlot ?? blockNo * 10 }
 });

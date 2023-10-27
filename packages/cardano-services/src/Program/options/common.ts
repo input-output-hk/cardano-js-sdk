@@ -16,10 +16,12 @@ import { loggerMethodNames } from '@cardano-sdk/util';
 
 export const ENABLE_METRICS_DEFAULT = false;
 export const DEFAULT_HEALTH_CHECK_CACHE_TTL = Seconds(5);
+export const LAST_ROS_EPOCHS_DEFAULT = 10;
 
 enum Descriptions {
   ApiUrl = 'API URL',
   BuildInfo = 'Service build info',
+  LastRosEpochs = 'Number of epochs over which lastRos is computed',
   LoggerMinSeverity = 'Log level',
   HealthCheckCacheTtl = 'Health check cache TTL in seconds between 1 and 10',
   EnableMetrics = 'Enable Prometheus Metrics',
@@ -31,6 +33,7 @@ export type CommonProgramOptions = {
   apiUrl: URL;
   buildInfo?: ServiceBuildInfo;
   enableMetrics?: boolean;
+  lastRosEpochs?: number;
   loggerMinSeverity?: LogLevel;
   serviceDiscoveryBackoffFactor?: number;
   serviceDiscoveryTimeout?: number;
@@ -53,6 +56,13 @@ export const withCommonOptions = (command: Command, apiUrl: URL) => {
       'HEALTH_CHECK_CACHE_TTL',
       (ttl: string) => cacheTtlValidator(ttl, { lowerBound: 1, upperBound: 120 }, Descriptions.HealthCheckCacheTtl),
       DEFAULT_HEALTH_CHECK_CACHE_TTL
+    ),
+    newOption(
+      '--last-ros-epochs <lastRosEpochs>',
+      Descriptions.LastRosEpochs,
+      'LAST_ROS_EPOCHS',
+      (lastRosEpochs) => Number.parseInt(lastRosEpochs, 10),
+      LAST_ROS_EPOCHS_DEFAULT
     ),
     newOption(
       '--logger-min-severity <level>',

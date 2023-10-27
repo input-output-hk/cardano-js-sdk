@@ -166,8 +166,10 @@ describe('mappers', () => {
         activeStakePercentage: Number(poolMetricsModel.active_stake_percentage),
         blocksCreated: poolMetricsModel.blocks_created,
         delegators: poolMetricsModel.delegators,
+        lastRos: 0,
         livePledge: BigInt(poolMetricsModel.live_pledge),
         liveStake: BigInt(poolMetricsModel.live_stake),
+        ros: 0,
         saturation: Number.parseFloat(poolMetricsModel.saturation)
       }
     });
@@ -185,7 +187,9 @@ describe('mappers', () => {
       apy: 0.015,
       blocksCreated: 20,
       delegators: 88,
+      lastRos: 0,
       livePledge: 99_999n,
+      ros: 0,
       saturation: 0.000_000_8,
       size: {
         active: 0.5,

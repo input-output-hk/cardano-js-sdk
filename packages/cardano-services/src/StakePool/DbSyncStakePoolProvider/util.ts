@@ -4,7 +4,8 @@ import {
   ProviderFailure,
   isPoolAPYSortField,
   isPoolDataSortField,
-  isPoolMetricsSortField
+  isPoolMetricsSortField,
+  isPoolROSSortField
 } from '@cardano-sdk/core';
 import BigNumber from 'bignumber.js';
 
@@ -14,7 +15,8 @@ export const getStakePoolSortType = (field: string): PoolSortType => {
   if (isPoolDataSortField(field)) return 'data';
   if (isPoolMetricsSortField(field)) return 'metrics';
   if (isPoolAPYSortField(field)) return 'apy';
-  throw new ProviderError(ProviderFailure.Unknown, null, 'Invalid sort field');
+  if (isPoolROSSortField(field)) return 'ros';
+  throw new ProviderError(ProviderFailure.Unknown, null, `Invalid sort field "${field}"`);
 };
 
 export const QUERIES_NAMESPACE = 'StakePoolQueries';

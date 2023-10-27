@@ -27,7 +27,6 @@ export const savePoolMetrics = async (options: RefreshPoolMetricsOptions & { met
   const entity = {
     activeSize: metrics.size.active,
     activeStake: metrics.stake.active,
-    apy: metrics.apy || 0,
     id,
     liveDelegators: metrics.delegators,
     livePledge: metrics.livePledge,
