@@ -1,10 +1,12 @@
 import { CustomError } from 'ts-custom-error';
+import { toSerializableObject } from './serializableObject';
 
 export const formatErrorMessage = (reason: string, detail?: string) => reason + (detail ? ` (${detail})` : '');
 
 interface ErrorLike {
   message: string;
   stack: string;
+  data?: unknown;
 }
 
 interface WithInnerError {
@@ -64,6 +66,10 @@ export class ComposableError<InnerError = unknown> extends CustomError {
       [firstLineOfInnerErrorStack, ...innerErrorStack] = innerError.stack.split(ComposableError.stackDelimiter);
 
       message = `${message} due to\n ${firstLineOfInnerErrorStack}`;
+
+      if (innerError.data) {
+        innerError.data = toSerializableObject(innerError.data);
+      }
     }
 
     if (typeof innerError === 'string') message = `${message} due to\n ${innerError}`;
