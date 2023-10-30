@@ -172,7 +172,13 @@ describe('TxSubmitHttpService', () => {
 
   describe('healthy but failing submission', () => {
     describe('/submit', () => {
-      const stubErrors = [new TxSubmissionError(TxSubmissionErrorCode.EmptyInputSet, null, 'Bad inputs')];
+      const stubErrors = [
+        new TxSubmissionError(
+          TxSubmissionErrorCode.NonEmptyRewardAccount,
+          { nonEmptyRewardAccountBalance: { lovelace: 10n } },
+          'Bad inputs'
+        )
+      ];
 
       beforeAll(async () => {
         txSubmitProvider = txSubmitProviderMock(
