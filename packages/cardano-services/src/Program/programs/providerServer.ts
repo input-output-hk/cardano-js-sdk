@@ -24,18 +24,18 @@ import { InMemoryCache, NoCache } from '../../InMemoryCache';
 import { KoraLabsHandleProvider } from '@cardano-sdk/cardano-services-client';
 import { Logger } from 'ts-log';
 import { MissingProgramOption, MissingServiceDependency, RunnableDependencies, UnknownServiceName } from '../errors';
+import { NodeTxSubmitProvider, TxSubmitHttpService } from '../../TxSubmit';
 import { Observable } from 'rxjs';
 import { OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { PgConnectionConfig } from '@cardano-sdk/projection-typeorm';
 import { Pool } from 'pg';
 import { ProviderServerArgs, ProviderServerOptionDescriptions, ServiceNames } from './types';
 import { SrvRecord } from 'dns';
-import { TxSubmitHttpService } from '../../TxSubmit';
 import { TypeormAssetProvider } from '../../Asset/TypeormAssetProvider';
 import { TypeormStakePoolProvider } from '../../StakePool/TypeormStakePoolProvider/TypeormStakePoolProvider';
 import { createDbSyncMetadataService } from '../../Metadata';
 import { createLogger } from 'bunyan';
-import { getConnectionConfig, getOgmiosTxSubmitProvider, getRabbitMqTxSubmitProvider } from '../services';
+import { getConnectionConfig, getOgmiosObservableCardanoNode, getRabbitMqTxSubmitProvider } from '../services';
 import { getEntities } from '../../Projection/prepareTypeormProjection';
 import { isNotNil } from '@cardano-sdk/util';
 import memoize from 'lodash/memoize';
@@ -306,7 +306,11 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     [ServiceNames.TxSubmit]: async () => {
       const txSubmitProvider = args.useQueue
         ? await getRabbitMqTxSubmitProvider(dnsResolver, logger, args)
-        : await getOgmiosTxSubmitProvider(dnsResolver, logger, args, await getHandleProvider());
+        : new NodeTxSubmitProvider({
+            cardanoNode: getOgmiosObservableCardanoNode(dnsResolver, logger, args),
+            handleProvider: await getHandleProvider(),
+            logger
+          });
       return new TxSubmitHttpService({ logger, txSubmitProvider });
     }
   };

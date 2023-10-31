@@ -1,15 +1,9 @@
 /* eslint-disable promise/no-nesting */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DnsResolver } from '../utils';
-import { HandleProvider, SubmitTxArgs } from '@cardano-sdk/core';
 import { Logger } from 'ts-log';
 import { MissingCardanoNodeOption } from '../errors';
-import {
-  OgmiosCardanoNode,
-  OgmiosObservableCardanoNode,
-  OgmiosTxSubmitProvider,
-  urlToConnectionConfig
-} from '@cardano-sdk/ogmios';
+import { OgmiosCardanoNode, OgmiosObservableCardanoNode, urlToConnectionConfig } from '@cardano-sdk/ogmios';
 import { OgmiosOptionDescriptions, OgmiosProgramOptions } from '../options/ogmios';
 import { RunnableModule, isConnectionError } from '@cardano-sdk/util';
 import { defer, from, of } from 'rxjs';
@@ -29,103 +23,6 @@ const recreateOgmiosCardanoNode = async (
     .shutdown?.()
     .catch((error_) => logger.warn(`Ogmios cardano node failed to shutdown after connection error: ${error_}`));
   return new OgmiosCardanoNode({ host: record.name, port: record.port }, logger);
-};
-
-const recreateOgmiosTxSubmitProvider = async (
-  serviceName: string,
-  ogmiosTxSubmitProvider: OgmiosTxSubmitProvider,
-  dnsResolver: DnsResolver,
-  logger: Logger,
-  handleProvider?: HandleProvider
-) => {
-  const record = await dnsResolver(serviceName!);
-  logger.info(`DNS resolution for OgmiosTxSubmitProvider, resolved with record: ${JSON.stringify(record)}`);
-  await ogmiosTxSubmitProvider
-    .shutdown()
-    .catch((error_) => logger.warn(`OgmiosTxSubmitProvider failed to shutdown after connection error: ${error_}`));
-  return new OgmiosTxSubmitProvider({ host: record.name, port: record.port }, { logger }, handleProvider);
-};
-/**
- * Creates an extended TxSubmitProvider instance :
- * - use passed srv service name in order to resolve the port
- * - make dealing with fail-overs (re-resolving the port) opaque
- * - use exponential backoff retry internally with default timeout and factor
- * - intercept 'initialize' operation and handle connection errors on initialization
- * - intercept 'submitTx' operation and handle connection errors runtime
- * - all other operations are bind to pool object without modifications
- *
- * @returns TxSubmitProvider instance
- */
-export const ogmiosTxSubmitProviderWithDiscovery = async (
-  dnsResolver: DnsResolver,
-  logger: Logger,
-  serviceName: string,
-  handleProvider?: HandleProvider
-): Promise<OgmiosTxSubmitProvider> => {
-  const { name, port } = await dnsResolver(serviceName!);
-  let ogmiosProvider = new OgmiosTxSubmitProvider({ host: name, port }, { logger }, handleProvider);
-
-  const txSubmitProviderProxy = new Proxy<OgmiosTxSubmitProvider>({} as OgmiosTxSubmitProvider, {
-    get(_, prop, receiver) {
-      if (prop === 'then') return;
-      if (prop === 'initialize') {
-        return () =>
-          ogmiosProvider.initialize().catch(async (error) => {
-            if (isConnectionError(error)) {
-              ogmiosProvider = await recreateOgmiosTxSubmitProvider(
-                serviceName,
-                ogmiosProvider,
-                dnsResolver,
-                logger,
-                handleProvider
-              );
-              return receiver.initialize();
-            }
-            throw error;
-          });
-      }
-      if (prop === 'submitTx') {
-        return (submitTxArgs: SubmitTxArgs) =>
-          ogmiosProvider.submitTx(submitTxArgs).catch(async (error) => {
-            if (isConnectionError(error)) {
-              ogmiosProvider = await recreateOgmiosTxSubmitProvider(
-                serviceName,
-                ogmiosProvider,
-                dnsResolver,
-                logger,
-                handleProvider
-              );
-              await receiver.initialize();
-              await receiver.start();
-              return await receiver.submitTx(submitTxArgs);
-            }
-            throw error;
-          });
-      }
-      // Bind if it is a function, no intercept operations
-      if (typeof ogmiosProvider[prop as keyof OgmiosTxSubmitProvider] === 'function') {
-        const method = ogmiosProvider[prop as keyof OgmiosTxSubmitProvider] as any;
-        return method.bind(ogmiosProvider);
-      }
-
-      return ogmiosProvider[prop as keyof OgmiosTxSubmitProvider];
-    }
-  });
-
-  return Object.setPrototypeOf(txSubmitProviderProxy, RunnableModule.prototype);
-};
-
-export const getOgmiosTxSubmitProvider = async (
-  dnsResolver: DnsResolver,
-  logger: Logger,
-  options?: OgmiosProgramOptions,
-  handleProvider?: HandleProvider
-): Promise<OgmiosTxSubmitProvider> => {
-  if (options?.ogmiosSrvServiceName)
-    return ogmiosTxSubmitProviderWithDiscovery(dnsResolver, logger, options.ogmiosSrvServiceName, handleProvider);
-  if (options?.ogmiosUrl)
-    return new OgmiosTxSubmitProvider(urlToConnectionConfig(options?.ogmiosUrl), { logger }, handleProvider);
-  throw new MissingCardanoNodeOption([OgmiosOptionDescriptions.Url, OgmiosOptionDescriptions.SrvServiceName]);
 };
 
 /**

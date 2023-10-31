@@ -1,6 +1,5 @@
 import { BAD_CONNECTION_URL, txsPromise } from './utils';
-import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
-import { ProviderError } from '@cardano-sdk/core';
+import { ProviderError, TxSubmitProvider } from '@cardano-sdk/core';
 import { RabbitMQContainer } from './docker';
 import { RabbitMqTxSubmitProvider, TxSubmitWorker } from '../../../src';
 import { logger } from '@cardano-sdk/util-dev';
@@ -70,11 +69,8 @@ describe('RabbitMqTxSubmitProvider', () => {
           logger,
           txSubmitProvider: {
             healthCheck: async () => ({ ok: true }),
-            initialize: () => Promise.resolve(),
-            shutdown: () => Promise.resolve(),
-            start: () => Promise.resolve(),
             submitTx: () => Promise.resolve()
-          } as unknown as OgmiosTxSubmitProvider
+          } as TxSubmitProvider
         }
       );
 

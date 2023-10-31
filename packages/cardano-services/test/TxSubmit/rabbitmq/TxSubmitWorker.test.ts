@@ -1,35 +1,33 @@
 import { BAD_CONNECTION_URL, txsPromise } from './utils';
-import { OgmiosTxSubmitProvider, urlToConnectionConfig } from '@cardano-sdk/ogmios';
-import { ProviderError, TxSubmissionError } from '@cardano-sdk/core';
+import { ProviderError, TxSubmissionError, TxSubmitProvider } from '@cardano-sdk/core';
 import { RabbitMQContainer } from './docker';
 import { RabbitMqTxSubmitProvider, TxSubmitWorker } from '../../../src';
 import { TestLogger, createLogger } from '@cardano-sdk/util-dev';
-import { getRandomPort } from 'get-port-please';
 import http from 'http';
 
 // TODO: refactor this to not use an underlying OgmiosTxSubmitProvider,
-// but a mock provider instead
+// but a mock provider instead.
+// Also, make sure that underlying tx submit provider that's being used
+// when running the cli program is initialized properly
 describe.skip('TxSubmitWorker', () => {
   const container = new RabbitMQContainer();
 
   let logger: TestLogger;
   let mock: http.Server | undefined;
-  let port: number;
   let rabbitmqUrl: URL;
-  let txSubmitProvider: OgmiosTxSubmitProvider;
+  let txSubmitProvider: TxSubmitProvider;
   let worker: TxSubmitWorker | undefined;
 
   beforeAll(async () => {
     ({ rabbitmqUrl } = await container.load());
-    port = await getRandomPort();
   });
 
   beforeEach(async () => {
     await container.removeQueues();
     logger = createLogger({ record: true });
-    txSubmitProvider = new OgmiosTxSubmitProvider(urlToConnectionConfig(new URL(`http://localhost:${port}/`)), {
-      logger
-    });
+    // txSubmitProvider = new TxSubmitProvider(urlToConnectionConfig(new URL(`http://localhost:${port}/`)), {
+    //   logger
+    // });
   });
 
   afterEach(async () => {

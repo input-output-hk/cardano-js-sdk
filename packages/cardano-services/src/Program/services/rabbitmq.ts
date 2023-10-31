@@ -5,8 +5,7 @@ import { CONNECTION_ERROR_EVENT, RabbitMqTxSubmitProvider, TxSubmitWorker } from
 import { DnsResolver } from '../utils';
 import { Logger } from 'ts-log';
 import { MissingProgramOption } from '../errors';
-import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
-import { ProviderError, ProviderFailure, SubmitTxArgs } from '@cardano-sdk/core';
+import { ProviderError, ProviderFailure, SubmitTxArgs, TxSubmitProvider } from '@cardano-sdk/core';
 import { RabbitMqOptionDescriptions, RabbitMqProgramOptions } from '../options';
 import { ServiceNames } from '../programs/types';
 import { SrvRecord } from 'dns';
@@ -85,18 +84,13 @@ type WorkerFactory = () => Promise<TxSubmitWorker>;
  * Create a worker factory with service discovery
  *
  * @param {DnsResolver} dnsResolver used for DNS resolution
- * @param {OgmiosTxSubmitProvider} txSubmitProvider tx submit provider
+ * @param {TxSubmitProvider} txSubmitProvider tx submit provider
  * @param {Logger} logger common logger
  * @param {TxWorkerArgs} args needed for tx worker initialization
  * @returns {WorkerFactory} WorkerFactory with service discovery, returning a 'TxSubmitWorker' instance
  */
 export const createWorkerFactoryWithDiscovery =
-  (
-    dnsResolver: DnsResolver,
-    txSubmitProvider: OgmiosTxSubmitProvider,
-    logger: Logger,
-    args: TxWorkerArgs
-  ): WorkerFactory =>
+  (dnsResolver: DnsResolver, txSubmitProvider: TxSubmitProvider, logger: Logger, args: TxWorkerArgs): WorkerFactory =>
   async () => {
     const record = await dnsResolver(args.rabbitmqSrvServiceName!);
     return new TxSubmitWorker({ ...args, rabbitmqUrl: srvRecordToRabbitmqURL(record) }, { logger, txSubmitProvider });
@@ -148,14 +142,14 @@ export const startTxSubmitWorkerWithDiscovery = async (
  * Create and return a running worker instance with static service config or service discovery
  *
  * @param {DnsResolver} dnsResolver used for DNS resolution
- * @param {OgmiosTxSubmitProvider} txSubmitProvider tx submit provider
+ * @param {TxSubmitProvider} txSubmitProvider tx submit provider
  * @param {Logger} logger common logger
  * @param {TxWorkerArgs} args needed for tx worker initialization * @returns {RunningTxSubmitWorker} RunningTxSubmitWorker instance
  * @throws {MissingProgramOption} error if neither URL nor service name is provided
  */
 export const getRunningTxSubmitWorker = async (
   dnsResolver: DnsResolver,
-  txSubmitProvider: OgmiosTxSubmitProvider,
+  txSubmitProvider: TxSubmitProvider,
   logger: Logger,
   args?: TxWorkerArgs
 ): Promise<RunningTxSubmitWorker> => {

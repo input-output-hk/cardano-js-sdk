@@ -1,9 +1,9 @@
 import { CommonProgramOptions, OgmiosProgramOptions, RabbitMqProgramOptions } from '../options';
 import { Logger } from 'ts-log';
-import { TxSubmitWorkerConfig } from '../../TxSubmit';
+import { NodeTxSubmitProvider, TxSubmitWorkerConfig } from '../../TxSubmit';
 import { createDnsResolver } from '../utils';
 import { createLogger } from 'bunyan';
-import { getOgmiosTxSubmitProvider, getRunningTxSubmitWorker } from '../services';
+import { getOgmiosObservableCardanoNode, getRunningTxSubmitWorker } from '../services';
 
 export const TX_WORKER_API_URL_DEFAULT = new URL('http://localhost:3001');
 export const PARALLEL_MODE_DEFAULT = false;
@@ -33,6 +33,11 @@ export const loadAndStartTxWorker = async (args: TxWorkerArgs, logger?: Logger) 
     },
     logger
   );
-  const txSubmitProvider = await getOgmiosTxSubmitProvider(dnsResolver, logger, args);
+  const txSubmitProvider = new NodeTxSubmitProvider({
+    cardanoNode: getOgmiosObservableCardanoNode(dnsResolver, logger, args),
+    // TODO: worker should utilize a handle provider
+    // handleProvider: await getHandleProvider(),
+    logger
+  });
   return await getRunningTxSubmitWorker(dnsResolver, txSubmitProvider, logger, args);
 };

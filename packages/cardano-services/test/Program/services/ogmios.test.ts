@@ -1,6 +1,5 @@
 /* eslint-disable sonarjs/no-identical-functions */
 /* eslint-disable sonarjs/no-duplicate-string */
-import { Cardano, ProviderError, TxSubmissionError } from '@cardano-sdk/core';
 import { Connection } from '@cardano-ogmios/client';
 import { DbPools, LedgerTipModel, findLedgerTip } from '../../../src/util/DbSyncProvider';
 import { DbSyncEpochPollService, listenPromise, loadGenesisData, serverClosePromise } from '../../../src/util';
@@ -11,14 +10,13 @@ import {
   TxSubmitHttpService,
   createDnsResolver,
   getOgmiosCardanoNode,
-  getOgmiosTxSubmitProvider,
   getPool
 } from '../../../src';
 import { InMemoryCache, UNLIMITED_CACHE_TTL } from '../../../src/InMemoryCache';
-import { KoraLabsHandleProvider } from '@cardano-sdk/cardano-services-client';
-import { Ogmios, OgmiosCardanoNode, OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
+import { Ogmios, OgmiosCardanoNode } from '@cardano-sdk/ogmios';
 import { Pool } from 'pg';
 import { SrvRecord } from 'dns';
+import { TxSubmissionError, TxSubmitProvider } from '@cardano-sdk/core';
 import { bufferToHexString } from '@cardano-sdk/util';
 import { clearDbPools, servicesWithVersionPath as services } from '../../util';
 import { getPort, getRandomPort } from 'get-port-please';
@@ -37,10 +35,11 @@ jest.mock('@cardano-sdk/cardano-services-client', () => ({
   }))
 }));
 
-const handleProvider = new KoraLabsHandleProvider({
-  policyId: Cardano.PolicyId('50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb'),
-  serverUrl: 'https://localhost:3000'
-});
+// TODO: use a mock handle provider
+// const handleProvider = new KoraLabsHandleProvider({
+//   policyId: Cardano.PolicyId('50fdcdbfa3154db86a87e4b5697ae30d272e0bbcfa8122efd3e301cb'),
+//   serverUrl: 'https://localhost:3000'
+// });
 
 jest.mock('dns', () => ({
   promises: {
@@ -96,7 +95,7 @@ describe.skip('Service dependency abstractions', () => {
     let apiUrlBase: string;
     let ogmiosServer: http.Server;
     let ogmiosConnection: Connection;
-    let txSubmitProvider: OgmiosTxSubmitProvider;
+    let txSubmitProvider: TxSubmitProvider;
     let ogmiosCardanoNode: OgmiosCardanoNode;
     let httpServer: HttpServer;
     let port: number;
@@ -119,9 +118,9 @@ describe.skip('Service dependency abstractions', () => {
           port = await getPort();
           apiUrlBase = `http://localhost:${port}${services.txSubmit.versionPath}/${services.txSubmit.name}`;
           config = { listen: { port } };
-          txSubmitProvider = await getOgmiosTxSubmitProvider(dnsResolver, logger, {
-            ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
-          });
+          // txSubmitProvider = await getOgmiosTxSubmitProvider(dnsResolver, logger, {
+          //   ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
+          // });
           httpServer = new HttpServer(config, {
             logger,
             runnableDependencies: [],
@@ -135,8 +134,8 @@ describe.skip('Service dependency abstractions', () => {
           await httpServer.shutdown();
         });
 
-        it('txSubmitProvider state should be running when http server has started', () => {
-          expect(txSubmitProvider.state).toEqual('running');
+        it.skip('txSubmitProvider state should be running when http server has started', () => {
+          // expect(txSubmitProvider.state).toEqual('running');
         });
 
         it('txSubmitProvider should be instance of a Proxy ', () => {
@@ -233,7 +232,7 @@ describe.skip('Service dependency abstractions', () => {
     let apiUrlBase: string;
     let ogmiosServer: http.Server;
     let ogmiosConnection: Connection;
-    let txSubmitProvider: OgmiosTxSubmitProvider;
+    let txSubmitProvider: TxSubmitProvider;
     let ogmiosCardanoNode: OgmiosCardanoNode;
     let httpServer: HttpServer;
     let port: number;
@@ -257,9 +256,9 @@ describe.skip('Service dependency abstractions', () => {
           port = await getPort();
           apiUrlBase = `http://localhost:${port}${services.txSubmit.versionPath}/${services.txSubmit.name}`;
           config = { listen: { port } };
-          txSubmitProvider = await getOgmiosTxSubmitProvider(dnsResolver, logger, {
-            ogmiosUrl: new URL(ogmiosConnection.address.webSocket)
-          });
+          // txSubmitProvider = await getOgmiosTxSubmitProvider(dnsResolver, logger, {
+          //   ogmiosUrl: new URL(ogmiosConnection.address.webSocket)
+          // });
           httpServer = new HttpServer(config, {
             logger,
             runnableDependencies: [],
@@ -285,40 +284,38 @@ describe.skip('Service dependency abstractions', () => {
           expect(res.data).toEqual(healthCheckResponseMock({ withTip: false }));
         });
 
-        it('verifies that the submitted transaction addresses can all correctly be resolved', async () => {
-          const provider = await getOgmiosTxSubmitProvider(
-            dnsResolver,
-            logger,
-            {
-              ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
-            },
-            handleProvider
-          );
-
-          await provider.initialize();
-          await provider.start();
-          const res = await provider.submitTx({
-            context: { handleResolutions: [handleProviderMocks.getAliceHandleProviderResponse] },
-            signedTransaction: bufferToHexString(Buffer.from(new Uint8Array([])))
-          });
-          expect(res).toBeUndefined();
-          await provider.shutdown();
+        it.skip('verifies that the submitted transaction addresses can all correctly be resolved', async () => {
+          // const provider = await getOgmiosTxSubmitProvider(
+          //   dnsResolver,
+          //   logger,
+          //   {
+          //     ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
+          //   },
+          //   handleProvider
+          // );
+          // await provider.initialize();
+          // await provider.start();
+          // const res = await provider.submitTx({
+          //   context: { handleResolutions: [handleProviderMocks.getAliceHandleProviderResponse] },
+          //   signedTransaction: bufferToHexString(Buffer.from(new Uint8Array([])))
+          // });
+          // expect(res).toBeUndefined();
+          // await provider.shutdown();
         });
 
-        it('throws a provider error if the submitted transaction does not contain addresses that can be resolved from the included context', async () => {
-          const provider = await getOgmiosTxSubmitProvider(dnsResolver, logger, {
-            ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
-          });
-          await provider.initialize();
-          await provider.start();
-
-          await expect(
-            provider.submitTx({
-              context: { handleResolutions: [handleProviderMocks.getWrongHandleProviderResponse] },
-              signedTransaction: bufferToHexString(Buffer.from(new Uint8Array([])))
-            })
-          ).rejects.toBeInstanceOf(ProviderError);
-          await provider.shutdown();
+        it.skip('throws a provider error if the submitted transaction does not contain addresses that can be resolved from the included context', async () => {
+          // const provider = await getOgmiosTxSubmitProvider(dnsResolver, logger, {
+          //   ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
+          // });
+          // await provider.initialize();
+          // await provider.start();
+          // await expect(
+          //   provider.submitTx({
+          //     context: { handleResolutions: [handleProviderMocks.getWrongHandleProviderResponse] },
+          //     signedTransaction: bufferToHexString(Buffer.from(new Uint8Array([])))
+          //   })
+          // ).rejects.toBeInstanceOf(ProviderError);
+          // await provider.shutdown();
         });
       });
 
@@ -383,7 +380,7 @@ describe.skip('Service dependency abstractions', () => {
   describe('TxSubmitProvider with service discovery and Ogmios server failover', () => {
     let mockServer: http.Server;
     let connection: Connection;
-    let provider: OgmiosTxSubmitProvider;
+    let provider: TxSubmitProvider;
 
     beforeEach(async () => {
       connection = Ogmios.createConnectionObject({ port: ogmiosPortDefault });
@@ -402,41 +399,41 @@ describe.skip('Service dependency abstractions', () => {
       }
     });
 
-    it('should resolve DNS twice during initialization without reconnection logic with long ws connection type', async () => {
+    it.skip('should resolve DNS twice during initialization without reconnection logic with long ws connection type', async () => {
       // Resolves with a failing ogmios port twice, then swap to the default one
       const dnsResolverMock = await mockDnsResolver(2);
 
-      provider = await getOgmiosTxSubmitProvider(dnsResolverMock, logger, {
-        ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
-      });
+      // provider = await getOgmiosTxSubmitProvider(dnsResolverMock, logger, {
+      //   ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
+      // });
 
-      await expect(provider.initialize()).resolves.toBeUndefined();
+      // await expect(provider.initialize()).resolves.toBeUndefined();
       expect(dnsResolverMock).toBeCalledTimes(3);
-      await provider.start();
-      await provider.shutdown();
+      // await provider.start();
+      // await provider.shutdown();
     });
 
-    it('should initially fail with a connection error, then re-resolve the port and propagate the correct non-connection error to the caller', async () => {
+    it.skip('should initially fail with a connection error, then re-resolve the port and propagate the correct non-connection error to the caller', async () => {
       // Resolves with a failing ogmios port twice, then swap to the default one
       const dnsResolverMock = await mockDnsResolver(2);
 
-      provider = await getOgmiosTxSubmitProvider(dnsResolverMock, logger, {
-        ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
-      });
+      // provider = await getOgmiosTxSubmitProvider(dnsResolverMock, logger, {
+      //   ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
+      // });
 
-      await provider.initialize();
-      await provider.start();
+      // await provider.initialize();
+      // await provider.start();
       await expect(
         provider.submitTx({ signedTransaction: bufferToHexString(Buffer.from(new Uint8Array([]))) })
       ).rejects.toBeInstanceOf(TxSubmissionError);
       expect(dnsResolverMock).toBeCalledTimes(3);
-      await provider.shutdown();
+      // await provider.shutdown();
     });
 
-    it('should execute a provider operation without to intercept it', async () => {
-      provider = await getOgmiosTxSubmitProvider(dnsResolver, logger, {
-        ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
-      });
+    it.skip('should execute a provider operation without to intercept it', async () => {
+      // provider = await getOgmiosTxSubmitProvider(dnsResolver, logger, {
+      //   ogmiosSrvServiceName: process.env.OGMIOS_SRV_SERVICE_NAME
+      // });
 
       await expect(provider.healthCheck()).resolves.toEqual(healthCheckResponseMock({ withTip: false }));
     });
