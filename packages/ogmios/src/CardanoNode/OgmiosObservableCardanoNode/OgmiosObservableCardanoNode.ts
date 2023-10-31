@@ -11,11 +11,13 @@ import {
   ObservableCardanoNode,
   ObservableChainSync,
   PointOrOrigin,
-  StateQueryErrorCode
+  StateQueryErrorCode,
+  TxCBOR
 } from '@cardano-sdk/core';
 import {
   ChainSynchronization,
   ConnectionConfig,
+  TransactionSubmission,
   createConnectionObject,
   createLedgerStateQueryClient,
   getServerHealth
@@ -31,6 +33,7 @@ import {
   of,
   shareReplay,
   switchMap,
+  take,
   throwError,
   timeout
 } from 'rxjs';
@@ -39,7 +42,7 @@ import { WithLogger, contextLogger } from '@cardano-sdk/util';
 import { createObservableChainSyncClient } from './createObservableChainSyncClient';
 import { ogmiosServerHealthToHealthCheckResponse } from '../../util';
 import { ogmiosToCorePointOrOrigin, ogmiosToCoreTipOrOrigin, pointOrOriginToOgmios } from './util';
-import { queryEraSummaries, queryGenesisParameters } from '../queries';
+import { queryEraSummaries, queryGenesisParameters, withCoreCardanoNodeError } from '../queries';
 import isEqual from 'lodash/isEqual';
 
 const ogmiosToCoreIntersection = (intersection: ChainSynchronization.Intersection) => ({
@@ -48,9 +51,11 @@ const ogmiosToCoreIntersection = (intersection: ChainSynchronization.Intersectio
 });
 
 export type LocalStateQueryRetryConfig = Pick<RetryBackoffConfig, 'initialInterval' | 'maxInterval'>;
+export type SubmitTxRetryConfig = Pick<RetryBackoffConfig, 'initialInterval' | 'maxInterval' | 'maxRetries'>;
 
-const DEFAULT_HEALTH_CHECK_TIMEOUT = 2000;
-const DEFAULT_LSQ_RETRY_CONFIG: LocalStateQueryRetryConfig = {
+const DEFAULT_HEALTH_CHECK_TIMEOUT = Milliseconds(2000);
+const DEFAULT_SUBMIT_MAX_RETRIES = 5;
+const DEFAULT_RETRY_CONFIG: LocalStateQueryRetryConfig = {
   initialInterval: 1000,
   maxInterval: 30_000
 };
@@ -59,16 +64,22 @@ export type OgmiosObservableCardanoNodeProps = InteractionContextProps & {
   healthCheckTimeout?: Milliseconds;
   /** Default: {initialInterval: 1000, maxInterval: 30_000} */
   localStateQueryRetryConfig?: LocalStateQueryRetryConfig;
+  /** Default: {initialInterval: 1000, maxInterval: 30_000, maxRetries: 5} */
+  submitTxQueryRetryConfig?: SubmitTxRetryConfig;
 };
 
-const retryableStateQueryErrors = new Set<number>([
+const retryableCardanoNodeErrors = new Set<number>([
   GeneralCardanoNodeErrorCode.ServerNotReady,
-  StateQueryErrorCode.UnavailableInCurrentEra,
   GeneralCardanoNodeErrorCode.ConnectionFailure
 ]);
 
+const retryableStateQueryErrors = new Set<number>([
+  ...retryableCardanoNodeErrors,
+  StateQueryErrorCode.UnavailableInCurrentEra
+]);
+
 const stateQueryRetryBackoffConfig = (
-  retryConfig: LocalStateQueryRetryConfig = DEFAULT_LSQ_RETRY_CONFIG,
+  retryConfig: LocalStateQueryRetryConfig = DEFAULT_RETRY_CONFIG,
   logger: Logger
 ): RetryBackoffConfig => ({
   ...retryConfig,
@@ -81,8 +92,24 @@ const stateQueryRetryBackoffConfig = (
   }
 });
 
+const submitTxRetryBackoffConfig = (
+  retryConfig: SubmitTxRetryConfig = DEFAULT_RETRY_CONFIG,
+  logger: Logger
+): RetryBackoffConfig => ({
+  ...retryConfig,
+  maxRetries: retryConfig.maxRetries || DEFAULT_SUBMIT_MAX_RETRIES,
+  shouldRetry: (error) => {
+    if (retryableStateQueryErrors.has(CardanoNodeUtil.asCardanoNodeError(error)?.code)) {
+      logger.warn('Failed to submitTx, will retry', error);
+      return true;
+    }
+    return false;
+  }
+});
+
 export class OgmiosObservableCardanoNode implements ObservableCardanoNode {
   readonly #connectionConfig$: Observable<ConnectionConfig>;
+  readonly #submitTxRetryBackoffConfig: RetryBackoffConfig;
   readonly #logger: Logger;
   readonly #interactionContext$;
 
@@ -93,6 +120,7 @@ export class OgmiosObservableCardanoNode implements ObservableCardanoNode {
   constructor(props: OgmiosObservableCardanoNodeProps, { logger }: WithLogger) {
     this.#connectionConfig$ = props.connectionConfig$;
     this.#logger = contextLogger(logger, 'ObservableOgmiosCardanoNode');
+    this.#submitTxRetryBackoffConfig = submitTxRetryBackoffConfig(props.submitTxQueryRetryConfig, logger);
     this.#interactionContext$ = createObservableInteractionContext(
       {
         ...props
@@ -175,6 +203,20 @@ export class OgmiosObservableCardanoNode implements ObservableCardanoNode {
               });
           })
       )
+    );
+  }
+
+  submitTx(tx: TxCBOR): Observable<Cardano.TransactionId> {
+    return this.#interactionContext$.pipe(
+      switchMap((context) =>
+        from(
+          withCoreCardanoNodeError(() =>
+            TransactionSubmission.submitTransaction(context, tx)
+          ) as Promise<Cardano.TransactionId>
+        )
+      ),
+      retryBackoff(this.#submitTxRetryBackoffConfig),
+      take(1)
     );
   }
 }

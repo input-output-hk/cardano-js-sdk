@@ -1,6 +1,7 @@
 import {
   ChainSynchronization,
   InteractionContext,
+  TransactionSubmission,
   createInteractionContext,
   createLedgerStateQueryClient,
   getServerHealth
@@ -13,6 +14,7 @@ export type MockedLedgerStateQueryClient = jest.Mocked<LedgerStateQueryClient>;
 export type MockCreateLedgerStateQuery = jest.MockedFunction<typeof createLedgerStateQueryClient>;
 export type MockGetServerHealth = jest.MockedFunction<typeof getServerHealth>;
 export type MockedChainSynchronization = jest.Mocked<typeof ChainSynchronization>;
+export type MockedTransactionSubmission = jest.Mocked<typeof TransactionSubmission>;
 export type MockCreateInteractionContext = jest.MockedFunction<typeof createInteractionContext>;
 
 export const ogmiosEraSummaries: EraSummary[] = [
