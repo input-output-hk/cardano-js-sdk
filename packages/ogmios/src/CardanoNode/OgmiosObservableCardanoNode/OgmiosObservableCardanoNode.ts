@@ -54,7 +54,7 @@ const DEFAULT_LSQ_RETRY_CONFIG: LocalStateQueryRetryConfig = {
   initialInterval: 1000,
   maxInterval: 30_000
 };
-export type OgmiosObservableCardanoNodeProps = Omit<InteractionContextProps, 'interactionType'> & {
+export type OgmiosObservableCardanoNodeProps = InteractionContextProps & {
   /** Default: 2000ms */
   healthCheckTimeout?: Milliseconds;
   /** Default: {initialInterval: 1000, maxInterval: 30_000} */

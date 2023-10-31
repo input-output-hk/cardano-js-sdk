@@ -78,7 +78,6 @@ export const ogmiosToCoreError = (error: any) => {
 export const withCoreCardanoNodeError = async <T>(operation: () => Promise<T>) => {
   try {
     return await operation();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error) {
     throw ogmiosToCoreError(error);
   }
