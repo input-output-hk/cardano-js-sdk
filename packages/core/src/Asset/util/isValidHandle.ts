@@ -1,4 +1,4 @@
 export const isValidHandle = (handle: string) => {
-  const pattern = /^[\w.-]+$/;
+  const pattern = /^[\w.@\-]+$/;
   return pattern.test(handle);
 };
