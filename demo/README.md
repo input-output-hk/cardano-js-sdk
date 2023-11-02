@@ -7,7 +7,7 @@ An example of [projection](../packages/projection/) into PostgreSQL database ([p
 ```sh
 cd /path/to/cardano-js-sdk/ # monorepo root
 yarn && yarn build
-yarn preprod:up cardano-node-ogmios postgres # or preview:up/mainnet:up
+yarn preprod:up cardano-node ogmios postgres # or preview:up/mainnet:up
 ```
 
 ### Configuration

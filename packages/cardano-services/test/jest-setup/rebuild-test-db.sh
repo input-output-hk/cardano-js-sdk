@@ -22,7 +22,7 @@ TL_LEVEL="${TL_LEVEL:=info}" node "$SCRIPT_DIR/mint-handles.js"
 yarn --cwd "$PACKAGES_DIR"/e2e test:local-network register-pool.test.ts
 
 echo 'Stop providing data to projectors'
-docker compose -p local-network-e2e stop cardano-node-ogmios
+docker compose -p local-network-e2e stop cardano-node ogmios
 sleep 2
 
 echo 'Creating snapshots...'

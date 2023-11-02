@@ -16,7 +16,7 @@ echo "
 
 export NETWORK="preprod"
 # Init only the minimum services needed for getting started
-SERVICES="postgres cardano-node-ogmios cardano-db-sync provider-server"
+SERVICES="postgres cardano-node ogmios cardano-db-sync provider-server"
 
 # Check for the correct number of arguments
 if [ "$#" -ne 1 ]; then

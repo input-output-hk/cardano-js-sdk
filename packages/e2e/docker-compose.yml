@@ -39,12 +39,19 @@ services:
       test: ['CMD-SHELL', 'wget -O /dev/null http://localhost || exit 1']
       timeout: 10s
 
-  cardano-node-ogmios:
-    entrypoint: ['/tini', '-g', '--', '/scripts/cardano-node-ogmios.sh']
-    image: cardanosolutions/cardano-node-ogmios:v${OGMIOS_VERSION:-5.6.0}_${CARDANO_NODE_VERSION:-1.35.5}
+  cardano-node:
     depends_on:
       local-testnet:
         condition: service_healthy
+    volumes:
+      - ./local-network/config/network/cardano-node:/config
+      - ./local-network/config/network/genesis:/genesis
+
+  ogmios:
+    depends_on:
+      local-testnet:
+        condition: service_healthy
+    entrypoint: ['bin/sh', '/scripts/ogmios-start.sh']
     volumes:
       - ./local-network/config/network:/config
       - ./local-network/scripts:/scripts
