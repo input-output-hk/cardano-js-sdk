@@ -41,7 +41,7 @@ services:
 
   cardano-node-ogmios:
     entrypoint: ['/tini', '-g', '--', '/scripts/cardano-node-ogmios.sh']
-    image: cardanosolutions/cardano-node-ogmios:v${OGMIOS_VERSION:-6.0.0-rc4}_${CARDANO_NODE_VERSION:-8.5.0-pre}
+    image: cardanosolutions/cardano-node-ogmios:v${OGMIOS_VERSION:-6.0.0-rc4}_${CARDANO_NODE_VERSION:-8.6.0-pre}
     depends_on:
       local-testnet:
         condition: service_healthy
