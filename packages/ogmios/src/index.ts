@@ -1,4 +1,3 @@
-export * from './Provider';
 export * from './CardanoNode';
 export { urlToConnectionConfig } from './util';
 export * as ogmiosToCore from './ogmiosToCore';

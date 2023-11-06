@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import { CONNECTION_ERROR_EVENT, TX_SUBMISSION_QUEUE, serializeError, waitForPending } from './utils';
-import { Cardano, ProviderError, ProviderFailure, TxBodyCBOR, TxCBOR } from '@cardano-sdk/core';
+import { Cardano, ProviderError, ProviderFailure, TxBodyCBOR, TxCBOR, TxSubmitProvider } from '@cardano-sdk/core';
 import { Channel, Connection, Message, connect } from 'amqplib';
 import { EventEmitter } from 'events';
 import { Logger } from 'ts-log';
-import { OgmiosTxSubmitProvider } from '@cardano-sdk/ogmios';
 import { bufferToHexString } from '@cardano-sdk/util';
 
 const moduleName = 'TxSubmitWorker';
@@ -30,7 +29,7 @@ export interface TxSubmitWorkerDependencies {
   logger: Logger;
 
   /** The provider to use to submit tx */
-  txSubmitProvider: OgmiosTxSubmitProvider;
+  txSubmitProvider: TxSubmitProvider;
 }
 
 /**
@@ -111,11 +110,6 @@ export class TxSubmitWorker extends EventEmitter {
    * https://amqp-node.github.io/amqplib/channel_api.html#model_events
    */
   async start() {
-    if (this.#dependencies.txSubmitProvider.state === null) {
-      this.#dependencies.logger.info(`${moduleName} init: initialize and start tx submission provider`);
-      await this.#dependencies.txSubmitProvider.initialize();
-      await this.#dependencies.txSubmitProvider.start();
-    }
     this.#dependencies.logger.info(`${moduleName} init: checking tx submission provider health status`);
 
     const health = await this.#dependencies.txSubmitProvider.healthCheck();
@@ -156,10 +150,6 @@ export class TxSubmitWorker extends EventEmitter {
   }
 
   async shutdown() {
-    if (this.#dependencies.txSubmitProvider.state === 'running') {
-      this.#dependencies.logger.info(`${moduleName} shutdown: shutdown tx submission provider`);
-      await this.#dependencies.txSubmitProvider.shutdown();
-    }
     await this.stop();
   }
   /** Stops the worker. */
