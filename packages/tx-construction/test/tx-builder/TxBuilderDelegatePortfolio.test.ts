@@ -281,6 +281,8 @@ describe('TxBuilder/delegatePortfolio', () => {
 
   describe('pre-existing multi-delegation on all stake keys', () => {
     let txBuilderProviders: jest.Mocked<TxBuilderProviders>;
+    let nonDelegatingWalletTxBuilder: GenericTxBuilder;
+
     beforeEach(async () => {
       const txBuilderFactory = await createTxBuilder({
         keyAgent,
@@ -292,9 +294,26 @@ describe('TxBuilder/delegatePortfolio', () => {
       groupedAddresses = txBuilderFactory.groupedAddresses;
       txBuilder = txBuilderFactory.txBuilder;
       txBuilderProviders = txBuilderFactory.txBuilderProviders;
+
+      nonDelegatingWalletTxBuilder = (
+        await createTxBuilder({
+          keyAgent,
+          stakeKeyDelegations: [
+            { keyStatus: Cardano.StakeKeyStatus.Unregistered, poolId: poolIds[0] },
+            { keyStatus: Cardano.StakeKeyStatus.Unregistered, poolId: poolIds[1] }
+          ]
+        })
+      ).txBuilder;
     });
 
-    it('null portfolio de-registers all stake keys, and uses random improve input selector', async () => {
+    it('does nothing and uses random improve input selector when the wallet is not delegating and delegatePortfolio is given a null portfolio', async () => {
+      const tx = await nonDelegatingWalletTxBuilder.delegatePortfolio(null).build().inspect();
+      expect(tx.body.certificates?.length).toBe(0);
+      expect(GreedyInputSelector).not.toHaveBeenCalled();
+      expect(roundRobinRandomImprove).toHaveBeenCalled();
+    });
+
+    it('de-registers all stake keys and uses greedy selector when wallet is delegating and delegatePortfolio is given a null portfolio', async () => {
       const tx = await txBuilder.delegatePortfolio(null).build().inspect();
       expect(tx.body.certificates?.length).toBe(2);
       expect(tx.body.certificates).toContainEqual(
@@ -304,8 +323,11 @@ describe('TxBuilder/delegatePortfolio', () => {
         Cardano.createStakeKeyDeregistrationCert(groupedAddresses[1].rewardAccount)
       );
 
-      expect(GreedyInputSelector).not.toHaveBeenCalled();
-      expect(roundRobinRandomImprove).toHaveBeenCalled();
+      expect(GreedyInputSelector).toHaveBeenCalled();
+      expect(roundRobinRandomImprove).not.toHaveBeenCalled();
+
+      // All outputs go back to first address.
+      expect(tx.body.outputs.every((output) => output.address === groupedAddresses[0].address)).toBeTruthy();
     });
 
     it('does not change delegations when portfolio already satisfied, but updates distribution', async () => {
