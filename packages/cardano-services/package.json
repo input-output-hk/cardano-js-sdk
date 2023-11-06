@@ -58,7 +58,7 @@
     "tscNoEmit": "shx echo typescript --noEmit command not implemented yet"
   },
   "devDependencies": {
-    "@cardano-ogmios/client": "6.0.0-rc4",
+    "@cardano-ogmios/client": "6.0.0-rc5",
     "@cardano-sdk/util-dev": "workspace:~",
     "@types/amqplib": "^0.8.2",
     "@types/bunyan": "^1.8.8",
