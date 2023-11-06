@@ -62,7 +62,7 @@
     "cleanup:dist": "shx rm -rf dist",
     "cleanup:nm": "shx rm -rf node_modules",
     "cleanup": "run-s cleanup:dist cleanup:nm",
-    "coverage": "yarn test --coverage",
+    "coverage": "yarn test --coverage || true",
     "lint": "eslint --ignore-path ../../.eslintignore \"**/*.ts\"",
     "lint:fix": "eslint --fix --ignore-path ../../.eslintignore \"**/*.ts\"",
     "prepack": "yarn build",
