@@ -80,6 +80,7 @@ export enum TxSubmissionErrorCode {
   ConflictingCommitteeUpdate = 3156,
   InvalidCommitteeUpdate = 3157,
   TreasuryWithdrawalMismatch = 3158,
+  InvalidOrMissingPreviousProposal = 3159,
   FailureUnrecognizedCertificateType = 3998,
   InternalLedgerTypeConversionError = 3999,
   DeserialisationFailure = -32_602

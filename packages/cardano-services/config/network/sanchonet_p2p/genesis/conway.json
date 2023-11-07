@@ -18,11 +18,11 @@
     "dvtTreasuryWithdrawal": 0.51
   },
   "committeeMinSize": 0,
-  "committeeMaxTermLength": 60,
-  "govActionLifetime": 14,
-  "govActionDeposit": 0,
-  "dRepDeposit": 0,
-  "dRepActivity": 0,
+  "committeeMaxTermLength": 200,
+  "govActionLifetime": 10,
+  "govActionDeposit": 1000000000,
+  "dRepDeposit": 2000000,
+  "dRepActivity": 20,
   "constitution": {
     "anchor": {
       "url": "",
