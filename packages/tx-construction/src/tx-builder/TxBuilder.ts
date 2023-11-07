@@ -1,7 +1,14 @@
+/* eslint-disable complexity */
 import * as Crypto from '@cardano-sdk/crypto';
+import {
+  AddressType,
+  GroupedAddress,
+  SignTransactionOptions,
+  TransactionSigner,
+  util
+} from '@cardano-sdk/key-management';
 import { Cardano, HandleProvider, HandleResolution, metadatum } from '@cardano-sdk/core';
 import { GreedyInputSelector, SelectionSkeleton } from '@cardano-sdk/input-selection';
-import { GroupedAddress, SignTransactionOptions, TransactionSigner, util } from '@cardano-sdk/key-management';
 import {
   InsufficientRewardAccounts,
   OutOfSyncRewardAccounts,
@@ -214,12 +221,23 @@ export class GenericTxBuilder implements TxBuilder {
             const dependencies = { ...this.#dependencies };
             // Use greedy input selection if:
             // 1. Multi delegating: to distribute the funds to multiple addresses.
-            // 2. Reducing the number of pools to 1, which implies we have multiple registered stake keys. This is needed
+            // 2. Reducing the number of pools to 1 or 0, which implies we have multiple registered stake keys. This is needed
             //    to concentrate the funds back into a single address and delegate its stake key.
             if (
               rewardAccountsWithWeights.size > 1 ||
-              (registeredRewardAccounts.length > 1 && rewardAccountsWithWeights.size === 1)
+              (registeredRewardAccounts.length > 1 && rewardAccountsWithWeights.size <= 1)
             ) {
+              // If the wallet is currently delegating to several pools, and all delegations are being removed,
+              // then the funds will be concentrated back into a single address.
+              if (rewardAccountsWithWeights.size === 0) {
+                const firstAddress = await this.#dependencies.keyAgent.deriveAddress(
+                  { index: 0, type: AddressType.External },
+                  0
+                );
+
+                rewardAccountsWithWeights.set(firstAddress.rewardAccount, 1);
+              }
+
               // Distributing balance according to weights is necessary when there are multiple reward accounts
               // and delegating, to make sure utxos are part of the correct addresses (the ones being delegated)
               dependencies.inputSelector = GenericTxBuilder.#createGreedyInputSelector(
