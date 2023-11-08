@@ -1,6 +1,15 @@
 import { CustomError } from 'ts-custom-error';
 import { FromSerializableObjectOptions, fromSerializableObject, toSerializableObject } from '../src';
 
+export class ErrorWithData extends CustomError {
+  innerError: { data: unknown };
+
+  constructor(data: unknown, message: string) {
+    super(message);
+    this.innerError = { data };
+  }
+}
+
 const serializeAndDeserialize = (obj: unknown, deserializeOptions?: FromSerializableObjectOptions) =>
   fromSerializableObject(JSON.parse(JSON.stringify(toSerializableObject(obj))), deserializeOptions);
 
@@ -44,6 +53,20 @@ describe('serializableObject', () => {
 
   it('supports custom error types', () => {
     const err = new CustomError('msg');
+    const deserialized = serializeAndDeserialize(err, { getErrorPrototype: () => CustomError.prototype });
+    expect(deserialized).toEqual(err);
+    expect(deserialized).toBeInstanceOf(CustomError);
+  });
+
+  it('supports error types with string data', () => {
+    const err = new ErrorWithData('some-data', 'msg');
+    const deserialized = serializeAndDeserialize(err, { getErrorPrototype: () => CustomError.prototype });
+    expect(deserialized).toEqual(err);
+    expect(deserialized).toBeInstanceOf(CustomError);
+  });
+
+  it('supports error types with object data', () => {
+    const err = new ErrorWithData({ bigIntProp: 15n }, 'msg');
     const deserialized = serializeAndDeserialize(err, { getErrorPrototype: () => CustomError.prototype });
     expect(deserialized).toEqual(err);
     expect(deserialized).toBeInstanceOf(CustomError);
