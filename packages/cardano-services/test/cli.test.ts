@@ -188,12 +188,14 @@ describe('CLI', () => {
   let postgresConnectionStringHandle: string;
   let postgresConnectionStringProjection: string;
   let postgresConnectionStringStakePool: string;
+  let postgresConnectionStringAsset: string;
 
   beforeAll(() => {
     postgresConnectionString = process.env.POSTGRES_CONNECTION_STRING_DB_SYNC!;
     postgresConnectionStringHandle = process.env.POSTGRES_CONNECTION_STRING_HANDLE!;
     postgresConnectionStringProjection = process.env.POSTGRES_CONNECTION_STRING_PROJECTION!;
     postgresConnectionStringStakePool = process.env.POSTGRES_CONNECTION_STRING_STAKE_POOL!;
+    postgresConnectionStringAsset = process.env.POSTGRES_CONNECTION_STRING_ASSET!;
   });
 
   describe('start-provider-server', () => {
@@ -2158,7 +2160,7 @@ describe('CLI', () => {
           let conn: ReturnType<typeof connString.parse>;
 
           beforeEach(() => {
-            conn = connString.parse(postgresConnectionStringHandle);
+            conn = connString.parse(postgresConnectionStringAsset);
           });
 
           describe('with cli arguments', () => {
@@ -2171,7 +2173,7 @@ describe('CLI', () => {
                     '--api-url',
                     apiUrl,
                     '--postgres-connection-string-asset',
-                    postgresConnectionStringHandle,
+                    postgresConnectionStringAsset,
                     '--use-typeorm-asset-provider',
                     'true',
                     '--service-names',
