@@ -2,9 +2,11 @@
   "ByronGenesisFile": "genesis/byron.json",
   "ShelleyGenesisFile": "genesis/shelley.json",
   "AlonzoGenesisFile": "genesis/alonzo.json",
+  "ConwayGenesisFile": "genesis/conway.json",
   "ByronGenesisHash": "a300c7ae1b124f53a80d86c6e43ff28c8d0369d7aa5512d5a3328a668b0e15e8",
   "ShelleyGenesisHash": "6baf33f913dffe311033bd7a7199060cb421234bf12cb99ef448bfd4fe47e305",
   "AlonzoGenesisHash": "eaa32942a4f2b3028928cb47be679bb36fa128f6d7dddc04ae592d27f2818c16",
+  "ConwayGenesisHash": "89dd23dc6a020afa0c7521fe52fe14e38d494129933a3604154a3acfa4ac16e4",
   "MaxConcurrencyBulkSync": 1,
   "MaxConcurrencyDeadline": 2,
   "Protocol": "Cardano",
@@ -109,5 +111,5 @@
   "TestMaryHardForkAtEpoch": 0,
   "TestAlonzoHardForkAtEpoch": 0,
   "TestBabbageHardForkAtEpoch": 0,
-  "TestEnableDevelopmentNetworkProtocols": true
+  "ExperimentalProtocolsEnabled": true
 }

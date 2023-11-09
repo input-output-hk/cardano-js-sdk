@@ -128,7 +128,7 @@ echo "TestAllegraHardForkAtEpoch: 0" >>"${ROOT}/configuration.yaml"
 echo "TestMaryHardForkAtEpoch: 0" >>"${ROOT}/configuration.yaml"
 echo "TestAlonzoHardForkAtEpoch: 0" >>"${ROOT}/configuration.yaml"
 echo "TestBabbageHardForkAtEpoch: 0" >>"${ROOT}/configuration.yaml"
-echo "TestEnableDevelopmentNetworkProtocols: True" >>"${ROOT}/configuration.yaml"
+echo "ExperimentalProtocolsEnabled: True" >>"${ROOT}/configuration.yaml"
 
 # Copy the cost mode
 cardano-cli genesis create-staked --genesis-dir "${ROOT}" \

@@ -44,7 +44,7 @@ then
   # Transform defaults to disable p2p
   jq -nj --argjson address $(echo $ACCESS_POINT | jq '.address') --argjson port $(echo $ACCESS_POINT | jq '.port') '{"Producers": [{"addr": $address, "port": $port, "valency": 1 }]}' > network/$CARDANO_NETWORK/cardano-node/topology.json
   # See https://github.com/input-output-hk/cardano-node/blob/0681cdeb07d81b3b088a6c14e703d03751c3d25d/cardano-node/src/Cardano/Node/Tracing/Tracers/Startup.hs#L366
-  echo $NODE_CONFIG | jq '.EnableP2P = false | del(.TestEnableDevelopmentNetworkProtocols)'> network/$CARDANO_NETWORK/cardano-node/config.json
+  echo $NODE_CONFIG | jq '.EnableP2P = false | del(.ExperimentalProtocolsEnabled)'> network/$CARDANO_NETWORK/cardano-node/config.json
   echo $DB_SYNC_CONFIG | jq '.' > network/$CARDANO_NETWORK/cardano-db-sync/config.json
 else
   # Source config doesn't have p2p enabled, so no further transformation required
