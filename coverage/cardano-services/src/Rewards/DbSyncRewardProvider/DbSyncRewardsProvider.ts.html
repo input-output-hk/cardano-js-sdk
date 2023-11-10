@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">94.11% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>14/14</span>
+                <span class='fraction'>16/17</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">33.33% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>1/2</span>
+                <span class='fraction'>1/3</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">94.11% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>14/14</span>
+                <span class='fraction'>16/17</span>
             </div>
         
             
@@ -90,21 +90,61 @@
 <a name='L25'></a><a href='#L25'>25</a>
 <a name='L26'></a><a href='#L26'>26</a>
 <a name='L27'></a><a href='#L27'>27</a>
-<a name='L28'></a><a href='#L28'>28</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">26x</span>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">36x</span>
+<span class="cline-any cline-yes">36x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">26x</span>
-<span class="cline-any cline-yes">26x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">26x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">36x</span>
+<span class="cline-any cline-yes">36x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">36x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -117,29 +157,49 @@
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { DbSyncProvider } from '../../DbSyncProvider';
-import { Logger } from 'ts-log';
-import { Pool } from 'pg';
-import { RewardAccountBalanceArgs, RewardsHistoryArgs, RewardsProvider } from '@cardano-sdk/core';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { DbSyncProvider, DbSyncProviderDependencies } from '../../util/DbSyncProvider';
+import {
+  ProviderError,
+  ProviderFailure,
+  RewardAccountBalanceArgs,
+  RewardsHistoryArgs,
+  RewardsProvider
+} from '@cardano-sdk/core';
 import { RewardsBuilder } from './RewardsBuilder';
 import { rewardsToCore } from './mappers';
 &nbsp;
-export class DbSyncRewardsProvider extends DbSyncProvider implements RewardsProvider {
-  #builder: RewardsBuilder;
-  #logger: Logger;
+/** Properties that are need to create DbSyncRewardsProvider */
+export interface RewardsProviderProps {
+  /** Pagination page size limit used for provider methods constraint. */
+  paginationPageSizeLimit: number;
+}
 &nbsp;
-  constructor(db: Pool, logger: Logger) {
-    super(db);
-    this.#builder = new RewardsBuilder(db, logger);
-    this.#logger = logger;
+export class DbSyncRewardsProvider extends DbSyncProvider() implements RewardsProvider {
+  #builder: RewardsBuilder;
+  #paginationPageSizeLimit: number;
+&nbsp;
+  constructor(
+    { paginationPageSizeLimit }: RewardsProviderProps,
+    { cache, dbPools, cardanoNode, logger }: DbSyncProviderDependencies
+  ) {
+    super({ cache, cardanoNode, dbPools, logger });
+    this.#builder = new RewardsBuilder(dbPools.main, logger);
+    this.#paginationPageSizeLimit = paginationPageSizeLimit;
   }
 &nbsp;
   public async rewardsHistory({ rewardAccounts, epochs }: RewardsHistoryArgs) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (rewardAccounts.length &gt; this.#paginationPageSizeLimit) {
+<span class="cstat-no" title="statement not covered" >      throw new ProviderError(</span>
+        ProviderFailure.BadRequest,
+        undefined,
+        `Reward accounts count of ${rewardAccounts.length} can not be greater than ${this.#paginationPageSizeLimit}`
+      );
+    }
     const rewards = await this.#builder.getRewardsHistory(rewardAccounts, epochs);
     return rewardsToCore(rewards);
   }
   public async rewardAccountBalance({ rewardAccount }: RewardAccountBalanceArgs) {
-    this.#logger.debug(`About to get balance of reward account ${rewardAccount.toString()}`);
+    this.logger.debug(`About to get balance of reward account ${rewardAccount}`);
     const balance = await this.#builder.getAccountBalance(rewardAccount);
     return BigInt(balance?.balance || <span class="branch-1 cbranch-no" title="branch not covered" >'0')</span>;
   }
@@ -151,7 +211,7 @@ export class DbSyncRewardsProvider extends DbSyncProvider implements RewardsProv
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Mon Sep 12 2022 12:06:20 GMT+0000 (Coordinated Universal Time)
+                at 2023-11-10T13:12:10.356Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

@@ -25,28 +25,28 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>11/11</span>
+                <span class='fraction'>7/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>4/4</span>
-            </div>
-        
-            
-            <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
-                <span class="quiet">Functions</span>
                 <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>11/11</span>
+                <span class='fraction'>7/7</span>
             </div>
         
             
@@ -166,18 +166,30 @@
 <a name='L101'></a><a href='#L101'>101</a>
 <a name='L102'></a><a href='#L102'>102</a>
 <a name='L103'></a><a href='#L103'>103</a>
-<a name='L104'></a><a href='#L104'>104</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">35x</span>
-<span class="cline-any cline-yes">35x</span>
-<span class="cline-any cline-yes">35x</span>
-<span class="cline-any cline-yes">35x</span>
-<span class="cline-any cline-yes">35x</span>
-<span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">40x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -250,11 +262,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">35x</span>
-<span class="cline-any cline-yes">35x</span>
-<span class="cline-any cline-yes">35x</span>
-<span class="cline-any cline-yes">35x</span>
-<span class="cline-any cline-yes">35x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -269,22 +276,39 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Cardano, EpochRewards } from '@cardano-sdk/core';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { AsyncKeyAgent, GroupedAddress } from '@cardano-sdk/key-management';
+import { Cardano, CardanoNodeErrors, Reward, TxCBOR } from '@cardano-sdk/core';
 import { Observable } from 'rxjs';
+import { Percent } from '@cardano-sdk/util';
+import { SignedTx } from '@cardano-sdk/tx-construction';
 &nbsp;
 export enum TransactionFailure {
   InvalidTransaction = 'INVALID_TRANSACTION',
   FailedToSubmit = 'FAILED_TO_SUBMIT',
   Unknown = 'UNKNOWN',
   CannotTrack = 'CANNOT_TRACK',
-  Timeout = 'TIMEOUT'
+  Timeout = 'TIMEOUT',
+  Phase2Validation = 'PHASE_2_VALIDATION'
 }
 &nbsp;
 export interface TransactionalObservables&lt;T&gt; {
   total$: Observable&lt;T&gt;;
-  /**
-   * total - unspendable
-   */
+  /** total - unspendable */
   available$: Observable&lt;T&gt;;
   unspendable$: Observable&lt;T&gt;;
 }
@@ -302,75 +326,84 @@ export interface TransactionalTracker&lt;T&gt; extends TransactionalObservables&
 }
 &nbsp;
 export interface UtxoTracker extends TransactionalTracker&lt;Cardano.Utxo[]&gt; {
-  setUnspendable(utxo: Cardano.Utxo[]): void;
+  setUnspendable(utxo: Cardano.Utxo[]): Promise&lt;void&gt;;
+}
+&nbsp;
+/** The AddressDiscovery interface provides a mechanism to discover addresses in Hierarchical Deterministic (HD) wallets */
+export interface AddressDiscovery {
+  /**
+   * Discover used addresses in the HD wallet.
+   *
+   * @param keyAgent The key agent controlling the root key to be used to derive the addresses to be discovered.
+   * @returns A promise that will be resolved into a GroupedAddress list containing the discovered addresses.
+   */
+  discover(keyAgent: AsyncKeyAgent): Promise&lt;GroupedAddress[]&gt;;
 }
 &nbsp;
 export type Milliseconds = number;
 &nbsp;
 export interface PollingConfig {
   readonly interval?: Milliseconds;
-  /**
-   * Max timeout for exponential backoff on errors
-   */
+  /** Max timeout for exponential backoff on errors */
   readonly maxInterval?: Milliseconds;
   readonly consideredOutOfSyncAfter?: Milliseconds;
 }
 &nbsp;
-export interface FailedTx {
-  tx: Cardano.NewTxAlonzo;
-  reason: TransactionFailure;
-  error?: Cardano.TxSubmissionError;
+export interface OutgoingTx {
+  cbor: TxCBOR;
+  body: Cardano.TxBody;
+  id: Cardano.TransactionId;
+  context?: SignedTx['context'];
 }
 &nbsp;
-export type NewTxAlonzoWithSlot = Cardano.NewTxAlonzo &amp; { slot: Cardano.PartialBlockHeader['slot'] };
+export interface FailedTx extends OutgoingTx {
+  reason: TransactionFailure;
+  error?: CardanoNodeErrors.TxSubmissionError;
+}
+&nbsp;
+export interface OutgoingOnChainTx extends OutgoingTx {
+  slot: Cardano.PartialBlockHeader['slot'];
+}
+&nbsp;
+export interface TxInFlight extends OutgoingTx {
+  submittedAt?: Cardano.PartialBlockHeader['slot'];
+}
 &nbsp;
 export interface TransactionsTracker {
-  readonly history$: Observable&lt;Cardano.TxAlonzo[]&gt;;
-  readonly rollback$: Observable&lt;Cardano.TxAlonzo&gt;;
+  readonly history$: Observable&lt;Cardano.HydratedTx[]&gt;;
+  readonly rollback$: Observable&lt;Cardano.HydratedTx&gt;;
   readonly outgoing: {
-    readonly inFlight$: Observable&lt;Cardano.NewTxAlonzo[]&gt;;
-    readonly submitting$: Observable&lt;Cardano.NewTxAlonzo&gt;;
-    readonly pending$: Observable&lt;Cardano.NewTxAlonzo&gt;;
+    readonly inFlight$: Observable&lt;TxInFlight[]&gt;;
+    readonly submitting$: Observable&lt;OutgoingTx&gt;;
+    readonly pending$: Observable&lt;OutgoingTx&gt;;
     readonly failed$: Observable&lt;FailedTx&gt;;
-    readonly confirmed$: Observable&lt;NewTxAlonzoWithSlot&gt;;
+    readonly onChain$: Observable&lt;OutgoingOnChainTx&gt;;
   };
 }
 &nbsp;
 export interface RewardsHistory {
-  all: EpochRewards[];
-  lastReward: EpochRewards | null;
+  all: Reward[];
+  lastReward: Reward | null;
   avgReward: Cardano.Lovelace | null;
   lifetimeRewards: Cardano.Lovelace;
 }
 &nbsp;
-export interface Delegatee {
-  /**
-   * Rewards at the end of current epoch will
-   * be from this stake pool
-   */
-  currentEpoch?: Cardano.StakePool;
-  nextEpoch?: Cardano.StakePool;
-  nextNextEpoch?: Cardano.StakePool;
-}
-&nbsp;
-export enum StakeKeyStatus {
-  Registering = 'REGISTERING',
-  Registered = 'REGISTERED',
-  Unregistering = 'UNREGISTERING',
-  Unregistered = 'UNREGISTERED'
-}
-&nbsp;
-export interface RewardAccount {
-  address: Cardano.RewardAccount;
-  keyStatus: StakeKeyStatus;
-  delegatee?: Delegatee;
-  rewardBalance: Cardano.Lovelace;
-  // Maybe add rewardsHistory for each reward account too
+/** Wallet delegated stake by pool. Multiple reward accounts could be delegated to the same pool */
+export interface DelegatedStake {
+  pool: Cardano.StakePool;
+  /** How much from the total delegated stake is delegated to this pool */
+  percentage: Percent;
+  /** Absolute stake value */
+  stake: bigint;
+  /** Reward accounts delegated to this pool */
+  rewardAccounts: Cardano.RewardAccount[];
 }
 &nbsp;
 export interface DelegationTracker {
   rewardsHistory$: Observable&lt;RewardsHistory&gt;;
-  rewardAccounts$: Observable&lt;RewardAccount[]&gt;;
+  rewardAccounts$: Observable&lt;Cardano.RewardAccountInfo[]&gt;;
+  distribution$: Observable&lt;Map&lt;Cardano.PoolId, DelegatedStake&gt;&gt;;
+  portfolio$: Observable&lt;Cardano.Cip17DelegationPortfolio | null&gt;;
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -379,7 +412,7 @@ export interface DelegationTracker {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Mon Sep 12 2022 12:09:32 GMT+0000 (Coordinated Universal Time)
+                at 2023-11-10T13:20:06.645Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

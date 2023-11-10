@@ -109,27 +109,22 @@
 <a name='L44'></a><a href='#L44'>44</a>
 <a name='L45'></a><a href='#L45'>45</a>
 <a name='L46'></a><a href='#L46'>46</a>
-<a name='L47'></a><a href='#L47'>47</a>
-<a name='L48'></a><a href='#L48'>48</a>
-<a name='L49'></a><a href='#L49'>49</a>
-<a name='L50'></a><a href='#L50'>50</a>
-<a name='L51'></a><a href='#L51'>51</a>
-<a name='L52'></a><a href='#L52'>52</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">34x</span>
-<span class="cline-any cline-yes">34x</span>
+<a name='L47'></a><a href='#L47'>47</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">40x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">34x</span>
-<span class="cline-any cline-yes">75x</span>
-<span class="cline-any cline-yes">75x</span>
-<span class="cline-any cline-yes">75x</span>
-<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">94x</span>
+<span class="cline-any cline-yes">94x</span>
+<span class="cline-any cline-yes">94x</span>
+<span class="cline-any cline-yes">94x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">68x</span>
-<span class="cline-any cline-yes">68x</span>
-<span class="cline-any cline-yes">68x</span>
-<span class="cline-any cline-yes">68x</span>
+<span class="cline-any cline-yes">82x</span>
+<span class="cline-any cline-yes">82x</span>
+<span class="cline-any cline-yes">82x</span>
+<span class="cline-any cline-yes">82x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -141,28 +136,23 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">34x</span>
-<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">94x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">75x</span>
-<span class="cline-any cline-yes">75x</span>
+<span class="cline-any cline-yes">94x</span>
+<span class="cline-any cline-yes">94x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">135x</span>
-<span class="cline-any cline-yes">75x</span>
-<span class="cline-any cline-yes">75x</span>
-<span class="cline-any cline-yes">68x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">75x</span>
-<span class="cline-any cline-yes">68x</span>
+<span class="cline-any cline-yes">171x</span>
+<span class="cline-any cline-yes">94x</span>
+<span class="cline-any cline-yes">94x</span>
+<span class="cline-any cline-yes">85x</span>
+<span class="cline-any cline-yes">94x</span>
+<span class="cline-any cline-yes">85x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/* eslint-disable brace-style */
@@ -172,33 +162,31 @@ import { WalletNetworkInfoProvider } from '../../types';
 &nbsp;
 export class WalletNetworkInfoProviderStats {
   readonly eraSummaries$ = new BehaviorSubject&lt;ProviderFnStats&gt;(CLEAN_FN_STATS);
-  readonly currentWalletProtocolParameters$ = new BehaviorSubject&lt;ProviderFnStats&gt;(CLEAN_FN_STATS);
+  readonly protocolParameters$ = new BehaviorSubject&lt;ProviderFnStats&gt;(CLEAN_FN_STATS);
   readonly genesisParameters$ = new BehaviorSubject&lt;ProviderFnStats&gt;(CLEAN_FN_STATS);
   readonly ledgerTip$ = new BehaviorSubject&lt;ProviderFnStats&gt;(CLEAN_FN_STATS);
 &nbsp;
   shutdown() {
     this.eraSummaries$.complete();
-    this.currentWalletProtocolParameters$.complete();
+    this.protocolParameters$.complete();
     this.genesisParameters$.complete();
     this.ledgerTip$.complete();
   }
 &nbsp;
   reset() {
     this.eraSummaries$.next(CLEAN_FN_STATS);
-    this.currentWalletProtocolParameters$.next(CLEAN_FN_STATS);
+    this.protocolParameters$.next(CLEAN_FN_STATS);
     this.genesisParameters$.next(CLEAN_FN_STATS);
     this.ledgerTip$.next(CLEAN_FN_STATS);
   }
 }
 &nbsp;
-/**
- * Wraps a WalletNetworkInfoProvider, tracking # of calls of each function
- */
+/** Wraps a WalletNetworkInfoProvider, tracking # of calls of each function */
 export class TrackedWalletNetworkInfoProvider extends ProviderTracker implements WalletNetworkInfoProvider {
   readonly stats = new WalletNetworkInfoProviderStats();
   readonly eraSummaries: WalletNetworkInfoProvider['eraSummaries'];
   readonly ledgerTip: WalletNetworkInfoProvider['ledgerTip'];
-  readonly currentWalletProtocolParameters: WalletNetworkInfoProvider['currentWalletProtocolParameters'];
+  readonly protocolParameters: WalletNetworkInfoProvider['protocolParameters'];
   readonly genesisParameters: WalletNetworkInfoProvider['genesisParameters'];
 &nbsp;
   constructor(networkInfoProvider: WalletNetworkInfoProvider) {
@@ -207,11 +195,8 @@ export class TrackedWalletNetworkInfoProvider extends ProviderTracker implements
 &nbsp;
     this.eraSummaries = () =&gt; this.trackedCall(networkInfoProvider.eraSummaries, this.stats.eraSummaries$);
     this.ledgerTip = () =&gt; this.trackedCall(networkInfoProvider.ledgerTip, this.stats.ledgerTip$);
-    this.currentWalletProtocolParameters = () =&gt;
-      this.trackedCall(
-        networkInfoProvider.currentWalletProtocolParameters,
-        this.stats.currentWalletProtocolParameters$
-      );
+    this.protocolParameters = () =&gt;
+      this.trackedCall(networkInfoProvider.protocolParameters, this.stats.protocolParameters$);
     this.genesisParameters = () =&gt;
       this.trackedCall(networkInfoProvider.genesisParameters, this.stats.genesisParameters$);
   }
@@ -223,7 +208,7 @@ export class TrackedWalletNetworkInfoProvider extends ProviderTracker implements
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Mon Sep 12 2022 12:09:32 GMT+0000 (Coordinated Universal Time)
+                at 2023-11-10T13:20:06.645Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

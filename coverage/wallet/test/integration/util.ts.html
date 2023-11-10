@@ -25,28 +25,28 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>17/17</span>
+                <span class='fraction'>13/13</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/0</span>
+                <span class='fraction'>1/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>3/3</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>16/16</span>
+                <span class='fraction'>11/11</span>
             </div>
         
             
@@ -105,11 +105,18 @@
 <a name='L40'></a><a href='#L40'>40</a>
 <a name='L41'></a><a href='#L41'>41</a>
 <a name='L42'></a><a href='#L42'>42</a>
-<a name='L43'></a><a href='#L43'>43</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">6x</span>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -117,20 +124,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">50x</span>
-<span class="cline-any cline-yes">50x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">50x</span>
-<span class="cline-any cline-yes">50x</span>
-<span class="cline-any cline-yes">50x</span>
-<span class="cline-any cline-yes">50x</span>
-<span class="cline-any cline-yes">50x</span>
-<span class="cline-any cline-yes">50x</span>
-<span class="cline-any cline-yes">50x</span>
-<span class="cline-any cline-yes">50x</span>
+<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -145,49 +142,70 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { SingleAddressWallet, setupWallet } from '../../src';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import * as Crypto from '@cardano-sdk/crypto';
+import { PersonalWallet, setupWallet } from '../../src';
 import { WalletStores } from '../../src/persistence';
-import { createStubStakePoolProvider } from '@cardano-sdk/util-dev';
+import { createStubStakePoolProvider, mockProviders } from '@cardano-sdk/util-dev';
 import { dummyLogger as logger } from 'ts-log';
-import {
+import { testAsyncKeyAgent } from '../../../key-management/test/mocks';
+&nbsp;
+const {
   mockAssetProvider,
   mockChainHistoryProvider,
   mockNetworkInfoProvider,
   mockRewardsProvider,
   mockTxSubmitProvider,
   mockUtxoProvider
-} from '../mocks';
-import { testAsyncKeyAgent } from '../../../key-management/test/mocks';
+} = mockProviders;
 &nbsp;
-export const createWallet = async (stores?: WalletStores) =&gt;
-  setupWallet({
+const createDefaultProviders = () =&gt; ({
+  assetProvider: mockAssetProvider(),
+  chainHistoryProvider: mockChainHistoryProvider(),
+  networkInfoProvider: mockNetworkInfoProvider(),
+  rewardsProvider: mockRewardsProvider(),
+  stakePoolProvider: createStubStakePoolProvider(),
+  txSubmitProvider: mockTxSubmitProvider(),
+  utxoProvider: mockUtxoProvider()
+});
+&nbsp;
+type RequiredProviders = ReturnType&lt;typeof createDefaultProviders&gt;;
+export type Providers = {
+  [k in keyof RequiredProviders]?: RequiredProviders[k];
+};
+&nbsp;
+export const createWallet = async (stores?: WalletStores, providers: Providers = {}) =&gt;
+  await setupWallet({
+    bip32Ed25519: new Crypto.SodiumBip32Ed25519(),
     createKeyAgent: (dependencies) =&gt; testAsyncKeyAgent(undefined, dependencies),
-    createWallet: async (keyAgent) =&gt; {
-      const txSubmitProvider = mockTxSubmitProvider();
-      const stakePoolProvider = createStubStakePoolProvider();
-      const networkInfoProvider = mockNetworkInfoProvider();
-      const assetProvider = mockAssetProvider();
-      const utxoProvider = mockUtxoProvider();
-      const chainHistoryProvider = mockChainHistoryProvider();
-      const rewardsProvider = mockRewardsProvider();
-      return new SingleAddressWallet(
+    createWallet: async (keyAgent) =&gt;
+      new PersonalWallet(
         { name: 'Test Wallet' },
         {
-          assetProvider,
-          chainHistoryProvider,
+          ...createDefaultProviders(),
+          ...providers,
           keyAgent,
           logger,
-          networkInfoProvider,
-          rewardsProvider,
-          stakePoolProvider,
-          stores,
-          txSubmitProvider,
-          utxoProvider
+          stores
         }
-      );
-    }
+      ),
+    logger
   });
 &nbsp;</pre></td></tr></table></pre>
 
@@ -196,7 +214,7 @@ export const createWallet = async (stores?: WalletStores) =&gt;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Mon Sep 12 2022 12:09:32 GMT+0000 (Coordinated Universal Time)
+                at 2023-11-10T13:20:06.645Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

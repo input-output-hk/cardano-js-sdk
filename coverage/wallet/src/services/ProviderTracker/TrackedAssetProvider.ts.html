@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>19/19</span>
+                <span class='fraction'>22/22</span>
             </div>
         
             
@@ -39,14 +39,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>8/8</span>
+                <span class='fraction'>10/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>16/16</span>
+                <span class='fraction'>18/18</span>
             </div>
         
             
@@ -100,17 +100,19 @@
 <a name='L35'></a><a href='#L35'>35</a>
 <a name='L36'></a><a href='#L36'>36</a>
 <a name='L37'></a><a href='#L37'>37</a>
-<a name='L38'></a><a href='#L38'>38</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">34x</span>
-<span class="cline-any cline-yes">34x</span>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">40x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">34x</span>
-<span class="cline-any cline-yes">73x</span>
-<span class="cline-any cline-yes">73x</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">92x</span>
+<span class="cline-any cline-yes">92x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">68x</span>
-<span class="cline-any cline-yes">68x</span>
+<span class="cline-any cline-yes">82x</span>
+<span class="cline-any cline-yes">82x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -120,21 +122,23 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">34x</span>
-<span class="cline-any cline-yes">73x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">92x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">73x</span>
-<span class="cline-any cline-yes">73x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">73x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">73x</span>
-<span class="cline-any cline-yes">139x</span>
+<span class="cline-any cline-yes">92x</span>
+<span class="cline-any cline-yes">92x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">92x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">92x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">92x</span>
+<span class="cline-any cline-yes">87x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { AssetProvider } from '@cardano-sdk/core';
@@ -156,13 +160,12 @@ export class AssetProviderStats {
   }
 }
 &nbsp;
-/**
- * Wraps a AssetProvider, tracking # of calls of each function
- */
+/** Wraps a AssetProvider, tracking # of calls of each function */
 export class TrackedAssetProvider extends ProviderTracker implements AssetProvider {
   readonly stats = new AssetProviderStats();
   readonly healthCheck: AssetProvider['healthCheck'];
   readonly getAsset: AssetProvider['getAsset'];
+  readonly getAssets: AssetProvider['getAssets'];
 &nbsp;
   constructor(assetProvider: AssetProvider) {
     super();
@@ -172,6 +175,9 @@ export class TrackedAssetProvider extends ProviderTracker implements AssetProvid
 &nbsp;
     this.getAsset = ({ assetId, extraData }) =&gt;
       this.trackedCall(() =&gt; assetProvider.getAsset({ assetId, extraData }), this.stats.getAsset$);
+&nbsp;
+    this.getAssets = ({ assetIds, extraData }) =&gt;
+      this.trackedCall(() =&gt; assetProvider.getAssets({ assetIds, extraData }), this.stats.getAsset$);
   }
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -181,7 +187,7 @@ export class TrackedAssetProvider extends ProviderTracker implements AssetProvid
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Mon Sep 12 2022 12:09:32 GMT+0000 (Coordinated Universal Time)
+                at 2023-11-10T13:20:06.645Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

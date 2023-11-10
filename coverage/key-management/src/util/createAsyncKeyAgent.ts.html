@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">76.47% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>11/11</span>
+                <span class='fraction'>13/17</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>1/1</span>
-            </div>
-        
-            
-            <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
-                <span class="quiet">Functions</span>
                 <span class='fraction'>3/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">57.14% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>4/7</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">75% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>10/10</span>
+                <span class='fraction'>12/16</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line medium'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -86,47 +86,77 @@
 <a name='L21'></a><a href='#L21'>21</a>
 <a name='L22'></a><a href='#L22'>22</a>
 <a name='L23'></a><a href='#L23'>23</a>
-<a name='L24'></a><a href='#L24'>24</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8x</span>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">24x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">24x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">24x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { AsyncKeyAgent, KeyAgent } from '../';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { AsyncKeyAgent, GroupedAddress, KeyAgent } from '../';
 import { BehaviorSubject } from 'rxjs';
 &nbsp;
-export const createAsyncKeyAgent = (keyAgent: KeyAgent): AsyncKeyAgent =&gt; {
+export const createAsyncKeyAgent = (keyAgent: KeyAgent, onShutdown?: () =&gt; void): AsyncKeyAgent =&gt; {
   const knownAddresses$ = new BehaviorSubject(keyAgent.knownAddresses);
   return {
-    async deriveAddress(derivationPath) {
+    async deriveAddress(derivationPath, stakeKeyDerivationIndex: number, pure?: boolean) {
       const numAddresses = keyAgent.knownAddresses.length;
-      const address = await keyAgent.deriveAddress(derivationPath);
-      if (keyAgent.knownAddresses.length &gt; numAddresses) {
+      const address = await keyAgent.deriveAddress(derivationPath, stakeKeyDerivationIndex, pure);
+&nbsp;
+      if (keyAgent.knownAddresses.length &gt; numAddresses &amp;&amp; !pure) {
         knownAddresses$.next(keyAgent.knownAddresses);
       }
+&nbsp;
       return address;
     },
     derivePublicKey: keyAgent.derivePublicKey.bind(keyAgent),
+    getBip32Ed25519: <span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >Promise.resolve(keyAgent.bip32Ed25519),</span>
+    getChainId: () =&gt; Promise.resolve(keyAgent.chainId),
+    getExtendedAccountPublicKey: <span class="fstat-no" title="function not covered" >() =</span>&gt; <span class="cstat-no" title="statement not covered" >Promise.resolve(keyAgent.extendedAccountPublicKey),</span>
     knownAddresses$,
+    setKnownAddresses: <span class="fstat-no" title="function not covered" >async </span>(addresses: GroupedAddress[]): Promise&lt;void&gt; =&gt; {
+<span class="cstat-no" title="statement not covered" >      keyAgent.knownAddresses = addresses;</span>
+<span class="cstat-no" title="statement not covered" >      knownAddresses$.next(keyAgent.knownAddresses);</span>
+    },
     shutdown() {
       knownAddresses$.complete();
+      onShutdown?.();
     },
     signBlob: keyAgent.signBlob.bind(keyAgent),
     signTransaction: keyAgent.signTransaction.bind(keyAgent)
@@ -139,7 +169,7 @@ export const createAsyncKeyAgent = (keyAgent: KeyAgent): AsyncKeyAgent =&gt; {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Mon Sep 12 2022 12:07:57 GMT+0000 (Coordinated Universal Time)
+                at 2023-11-10T13:15:27.479Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

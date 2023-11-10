@@ -25,28 +25,28 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>39/39</span>
+                <span class='fraction'>32/32</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>4/4</span>
+                <span class='fraction'>5/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>16/16</span>
+                <span class='fraction'>12/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>16/16</span>
+                <span class='fraction'>15/15</span>
             </div>
         
             
@@ -91,68 +91,62 @@
 <a name='L26'></a><a href='#L26'>26</a>
 <a name='L27'></a><a href='#L27'>27</a>
 <a name='L28'></a><a href='#L28'>28</a>
-<a name='L29'></a><a href='#L29'>29</a>
-<a name='L30'></a><a href='#L30'>30</a>
-<a name='L31'></a><a href='#L31'>31</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L29'></a><a href='#L29'>29</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">38x</span>
+<span class="cline-any cline-yes">44x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">38x</span>
-<span class="cline-any cline-yes">100x</span>
+<span class="cline-any cline-yes">44x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">38x</span>
+<span class="cline-any cline-yes">44x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">38x</span>
+<span class="cline-any cline-yes">44x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">38x</span>
+<span class="cline-any cline-yes">4960x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">38x</span>
+<span class="cline-any cline-yes">44x</span>
+<span class="cline-any cline-yes">796x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">316x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">38x</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">38x</span>
+<span class="cline-any cline-yes">44x</span>
 <span class="cline-any cline-yes">14x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">38x</span>
+<span class="cline-any cline-yes">44x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">38x</span>
-<span class="cline-any cline-yes">53x</span>
+<span class="cline-any cline-yes">44x</span>
+<span class="cline-any cline-yes">19x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">38x</span>
+<span class="cline-any cline-yes">44x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">44x</span>
+<span class="cline-any cline-yes">37x</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Cardano, EpochInfo, EraSummary } from '@cardano-sdk/core';
+import { DelegatedStake } from '../types';
 import { GroupedAddress } from '@cardano-sdk/key-management';
-&nbsp;
-export const strictEquals = &lt;T&gt;(a: T, b: T) =&gt; a === b;
-&nbsp;
-export const arrayEquals = &lt;T&gt;(arrayA: T[], arrayB: T[], itemEquals: (a: T, b: T) =&gt; boolean) =&gt;
-  arrayA.length === arrayB.length &amp;&amp; arrayA.every((a) =&gt; arrayB.some((b) =&gt; itemEquals(a, b)));
-&nbsp;
-export const shallowArrayEquals = &lt;T&gt;(a: T[], b: T[]) =&gt; arrayEquals(a, b, strictEquals);
+import { sameArrayItems } from '@cardano-sdk/util';
 &nbsp;
 export const tipEquals = (a: Cardano.Tip, b: Cardano.Tip) =&gt; a.hash === b.hash;
 &nbsp;
-export const txEquals = (a: Cardano.TxAlonzo, b: Cardano.TxAlonzo) =&gt; a.id === b.id;
+export const txEquals = (a: Cardano.HydratedTx, b: Cardano.HydratedTx) =&gt; a.id === b.id;
 &nbsp;
-export const transactionsEquals = (a: Cardano.TxAlonzo[], b: Cardano.TxAlonzo[]) =&gt; arrayEquals(a, b, txEquals);
+export const transactionsEquals = (a: Cardano.HydratedTx[], b: Cardano.HydratedTx[]) =&gt; sameArrayItems(a, b, txEquals);
 &nbsp;
-export const txInEquals = (a: Cardano.NewTxIn, b: Cardano.NewTxIn) =&gt; a.txId === b.txId &amp;&amp; a.index === b.index;
+export const txInEquals = (a: Cardano.TxIn, b: Cardano.TxIn) =&gt; a.txId === b.txId &amp;&amp; a.index === b.index;
 &nbsp;
 export const utxoEquals = (a: Cardano.Utxo[], b: Cardano.Utxo[]) =&gt;
-  arrayEquals(a, b, ([aTxIn], [bTxIn]) =&gt; txInEquals(aTxIn, bTxIn));
+  sameArrayItems(a, b, ([aTxIn], [bTxIn]) =&gt; txInEquals(aTxIn, bTxIn));
 &nbsp;
 export const eraSummariesEquals = (a: EraSummary[], b: EraSummary[]) =&gt;
-  arrayEquals(a, b, (es1, es2) =&gt; es1.start.slot === es2.start.slot);
+  sameArrayItems(a, b, (es1, es2) =&gt; es1.start.slot === es2.start.slot);
 &nbsp;
 const groupedAddressEquals = (a: GroupedAddress, b: GroupedAddress) =&gt; a.address === b.address;
 &nbsp;
 export const groupedAddressesEquals = (a: GroupedAddress[], b: GroupedAddress[]) =&gt;
-  arrayEquals(a, b, groupedAddressEquals);
+  sameArrayItems(a, b, groupedAddressEquals);
 &nbsp;
 export const epochInfoEquals = (a: EpochInfo, b: EpochInfo) =&gt; a.epochNo === b.epochNo;
+&nbsp;
+export const delegatedStakeEquals = (a: DelegatedStake, b: DelegatedStake) =&gt;
+  a.pool.id === b.pool.id &amp;&amp; a.stake === b.stake &amp;&amp; a.percentage === b.percentage;
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -160,7 +154,7 @@ export const epochInfoEquals = (a: EpochInfo, b: EpochInfo) =&gt; a.epochNo === 
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Mon Sep 12 2022 12:09:32 GMT+0000 (Coordinated Universal Time)
+                at 2023-11-10T13:20:06.645Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
