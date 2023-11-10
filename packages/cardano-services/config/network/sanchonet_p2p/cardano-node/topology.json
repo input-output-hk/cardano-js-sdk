@@ -10,12 +10,12 @@
     {
       "accessPoints": [
         {
-          "address": "preprod-node.play.dev.cardano.org",
+          "address": "sanchonet-node.play.dev.cardano.org",
           "port": 3001
         }
       ],
       "advertise": false
     }
   ],
-  "useLedgerAfterSlot": 42855241
+  "useLedgerAfterSlot": 12268800
 }
