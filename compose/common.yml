@@ -64,8 +64,10 @@ x-provider-server-environment: &provider-server-environment
   ENABLE_METRICS: ${ENABLE_METRICS:-false}
   EPOCH_POLL_INTERVAL: ${EPOCH_POLL_INTERVAL:-500}
   SERVICE_NAMES: ${SERVICE_NAMES:-asset,chain-history,handle,network-info,rewards,stake-pool,tx-submit,utxo}
+  SUBMIT_API_URL: ${SUBMIT_API_URL:-http://cardano-submit-api:8090/}
   USE_BLOCKFROST: ${USE_BLOCKFROST:-false}
   USE_QUEUE: ${USE_QUEUE:-false}
+  USE_SUBMIT_API: ${USE_SUBMIT_API:-true}
 
 x-sdk-environment: &sdk-environment
   LOGGER_MIN_SEVERITY: ${LOGGER_MIN_SEVERITY:-info}
@@ -147,6 +149,18 @@ services:
     restart: on-failure
     volumes:
       - node-db:/db
+      - node-ipc:/ipc
+
+  cardano-submit-api:
+    command: --config /config/cardano-submit-api/config.json --listen-address 0.0.0.0 --socket-path /ipc/node.socket $SUBMIT_API_ARGS
+    depends_on:
+      cardano-node-ogmios:
+        condition: service_healthy
+    image: inputoutput/cardano-submit-api:${CARDANO_NODE_VERSION:-1.35.5}
+    ports:
+      - 8090:8090
+    restart: on-failure
+    volumes:
       - node-ipc:/ipc
 
   pg-boss-worker:
