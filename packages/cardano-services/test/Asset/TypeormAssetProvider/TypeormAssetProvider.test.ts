@@ -31,8 +31,8 @@ describe('TypeormAssetProvider', () => {
   beforeEach(async () => {
     const dnsResolver = createDnsResolver({ factor: 1.1, maxRetryTime: 1000 }, logger);
     const entities = getEntities(['asset']);
-    connectionConfig$ = getConnectionConfig(dnsResolver, 'test', 'Handle', {
-      postgresConnectionStringHandle: process.env.POSTGRES_CONNECTION_STRING_HANDLE!
+    connectionConfig$ = getConnectionConfig(dnsResolver, 'test', 'Asset', {
+      postgresConnectionStringAsset: process.env.POSTGRES_CONNECTION_STRING_ASSET!
     });
     tokenMetadataService = {
       getTokenMetadata: jest.fn().mockResolvedValue([tokenMetadata]),

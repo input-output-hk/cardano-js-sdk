@@ -41,6 +41,7 @@ describe('HTTP Server', () => {
   let cardanoNodeConfigPath: string;
   let postgresConnectionStringDbSync: string;
   let postgresConnectionStringHandle: string;
+  let postgresConnectionStringAsset: string;
   let postgresSrvServiceNameDbSync: string;
   let postgresDbDbSync: string;
   let postgresUserDbSync: string;
@@ -61,6 +62,7 @@ describe('HTTP Server', () => {
     apiUrl = new URL(`http://localhost:${await getRandomPort()}`);
     postgresConnectionStringDbSync = process.env.POSTGRES_CONNECTION_STRING_DB_SYNC!;
     postgresConnectionStringHandle = process.env.POSTGRES_CONNECTION_STRING_HANDLE!;
+    postgresConnectionStringAsset = process.env.POSTGRES_CONNECTION_STRING_ASSET!;
     postgresSrvServiceNameDbSync = process.env.POSTGRES_SRV_SERVICE_NAME_DB_SYNC!;
     postgresDbDbSync = process.env.POSTGRES_DB_DB_SYNC!;
     postgresUserDbSync = process.env.POSTGRES_USER_DB_SYNC!;
@@ -98,6 +100,7 @@ describe('HTTP Server', () => {
         healthCheckCacheTtl,
         metadataFetchMode: StakePoolMetadataFetchMode.DIRECT,
         ogmiosUrl: new URL(ogmiosConnection.address.webSocket),
+        postgresConnectionStringAsset,
         postgresConnectionStringDbSync,
         postgresConnectionStringHandle,
         serviceNames: [

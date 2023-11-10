@@ -235,7 +235,7 @@ const storeInterDependencies: Partial<Record<StoreName, StoreName[]>> = {
 
 const projectionStoreDependencies: Record<ProjectionName, StoreName[]> = {
   address: ['storeAddresses'],
-  asset: ['storeAssets'],
+  asset: ['storeAssets', 'storeNftMetadata'],
   // TODO: remove storeNftMetadata when TypeormAssetProvider tests
   // are updated to use 'asset' database instead of a handle database
   handle: ['storeHandles', 'storeHandleMetadata', 'storeNftMetadata'],
