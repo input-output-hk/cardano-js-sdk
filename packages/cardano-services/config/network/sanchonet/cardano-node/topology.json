@@ -1,7 +1,7 @@
 {
   "Producers": [
     {
-      "addr": "preprod-node.play.dev.cardano.org",
+      "addr": "sanchonet-node.play.dev.cardano.org",
       "port": 3001,
       "valency": 1
     }
