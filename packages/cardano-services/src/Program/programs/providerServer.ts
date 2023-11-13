@@ -21,7 +21,7 @@ import { HandleHttpService, TypeOrmHandleProvider } from '../../Handle';
 import { HandlePolicyIdsOptionDescriptions, handlePolicyIdsFromFile } from '../options/policyIds';
 import { HttpServer, HttpServerConfig, HttpService, getListen } from '../../Http';
 import { InMemoryCache, NoCache } from '../../InMemoryCache';
-import { KoraLabsHandleProvider } from '@cardano-sdk/cardano-services-client';
+import { KoraLabsHandleProvider, TxSubmitApiProvider } from '@cardano-sdk/cardano-services-client';
 import { Logger } from 'ts-log';
 import { MissingProgramOption, MissingServiceDependency, RunnableDependencies, UnknownServiceName } from '../errors';
 import { Observable } from 'rxjs';
@@ -194,6 +194,15 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
     return sharedHandleProvider;
   };
 
+  const getSubmitApiProvider = () => {
+    const { submitApiUrl } = args;
+
+    if (!submitApiUrl)
+      throw new MissingProgramOption(ServiceNames.TxSubmit, ProviderServerOptionDescriptions.SubmitApiUrl);
+
+    return new TxSubmitApiProvider(submitApiUrl, logger);
+  };
+
   const getTypeormAssetProvider = withTypeOrmProvider('Asset', (connectionConfig$) => {
     const tokenMetadataService = args.tokenMetadataServerUrl?.startsWith('stub:')
       ? new StubTokenMetadataService()
@@ -305,7 +314,9 @@ const serviceMapFactory = (options: ServiceMapFactoryOptions) => {
       ServiceNames.NetworkInfo
     ),
     [ServiceNames.TxSubmit]: async () => {
-      const txSubmitProvider = args.useQueue
+      const txSubmitProvider = args.useSubmitApi
+        ? getSubmitApiProvider()
+        : args.useQueue
         ? await getRabbitMqTxSubmitProvider(dnsResolver, logger, args)
         : await getOgmiosTxSubmitProvider(dnsResolver, logger, args, await getHandleProvider());
       return new TxSubmitHttpService({ logger, txSubmitProvider });
