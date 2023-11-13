@@ -1,7 +1,7 @@
 import * as Trezor from '@trezor/connect';
 import { Cardano, Serialization } from '@cardano-sdk/core';
 import { GroupedAddress, util } from '@cardano-sdk/key-management';
-import { InvalidArgumentError, Transform /* HexBlob*/ } from '@cardano-sdk/util';
+import { InvalidArgumentError, Transform } from '@cardano-sdk/util';
 import { TrezorTxOutputDestination, TrezorTxTransformerContext } from '../types';
 import { mapTokenMap } from './assets';
 
