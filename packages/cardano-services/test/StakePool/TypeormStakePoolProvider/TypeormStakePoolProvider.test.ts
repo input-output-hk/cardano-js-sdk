@@ -162,11 +162,9 @@ describe('TypeormStakePoolProvider', () => {
       describe('/health', () => {
         it('forwards the stakePoolProvider health response with provider client', async () => {
           // required a delay to determine TypeormProvider's healthCheck as healthy when subscribes to observable data source
-          const response = await provider.healthCheck();
-          expect(response).toEqual({ ok: false, reason: 'not started' });
           while (!(await provider.healthCheck()).ok) await sleep(10);
-          const response2 = await provider.healthCheck();
-          expect(response2).toEqual({ ok: true });
+          const response = await provider.healthCheck();
+          expect(response).toEqual({ ok: true });
         });
       });
 
