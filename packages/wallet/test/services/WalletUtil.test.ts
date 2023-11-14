@@ -263,8 +263,7 @@ describe('WalletUtil', () => {
         tx.body.certificates = [
           {
             __typename: Cardano.CertificateType.Registration,
-            // using foreign intentionally because registration is not signed so it should be accepted
-            stakeKeyHash: foreignRewardAccountHash
+            stakeKeyHash: mocks.stakeKeyHash
           } as Cardano.NewStakeAddressCertificate,
           {
             __typename: Cardano.CertificateType.Unregistration,

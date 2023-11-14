@@ -23,6 +23,12 @@ const defaultGetErrorPrototype: GetErrorPrototype = () => Error.prototype;
 const defaultTransformKey: TransformKey = (key) => key;
 const defaultTransformationTypeKey = '__type';
 
+const hasInnerError = (error: unknown): error is { innerError: unknown } =>
+  error !== null && typeof error === 'object' && 'innerError' in (error as never);
+
+const innerErrorHasData = (innerError: unknown): innerError is { data: unknown } =>
+  typeof innerError === 'object' && innerError !== null && 'data' in innerError;
+
 export const toSerializableObject = (obj: unknown, options: ToSerializableObjectOptions = {}): unknown => {
   if (PLAIN_TYPES.has(typeof obj)) return obj;
   const { transformationTypeKey = defaultTransformationTypeKey, serializeKey = defaultTransformKey } = options;
@@ -41,7 +47,11 @@ export const toSerializableObject = (obj: unknown, options: ToSerializableObject
       const value = Buffer.from(arr).toString('hex');
       return { [transformationTypeKey]: 'Buffer', value };
     }
+
     if (obj instanceof Error) {
+      if (hasInnerError(obj) && innerErrorHasData(obj.innerError)) {
+        obj.innerError.data = toSerializableObject(obj.innerError.data);
+      }
       return {
         [transformationTypeKey]: 'Error',
         value: serializeError(obj)
