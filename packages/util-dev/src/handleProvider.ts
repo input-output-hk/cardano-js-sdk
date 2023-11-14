@@ -2,9 +2,9 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { Cardano, ProviderError, ProviderFailure } from '@cardano-sdk/core';
 import { toSerializableObject } from '@cardano-sdk/util';
 
-export const axiosError = (bodyError = new Error('error')) => {
+export const axiosError = (bodyError: Error | null = new Error('error'), reason = ProviderFailure.BadRequest) => {
   const response = {
-    data: toSerializableObject(new ProviderError(ProviderFailure.BadRequest, bodyError))
+    data: toSerializableObject(new ProviderError(reason, bodyError))
   } as AxiosResponse;
   const error = new AxiosError(undefined, undefined, undefined, undefined, response);
   Object.defineProperty(error, 'response', { value: response });

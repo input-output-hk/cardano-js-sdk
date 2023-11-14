@@ -28,6 +28,12 @@ export const providerFailureToStatusCodeMap: { [key in ProviderFailure]: number 
   [ProviderFailure.ServerUnavailable]: 500
 };
 
+const isProviderFailure = (reason: string): reason is ProviderFailure =>
+  Object.values(ProviderFailure).includes(reason as ProviderFailure);
+
+export const reasonToProviderFailure = (reason: string): ProviderFailure =>
+  isProviderFailure(reason) ? reason : ProviderFailure.Unknown;
+
 export class ProviderError<InnerError = unknown> extends ComposableError<InnerError> {
   constructor(public reason: ProviderFailure, innerError?: InnerError, public detail?: string) {
     super(formatErrorMessage(reason, detail), innerError);
