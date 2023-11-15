@@ -60,10 +60,16 @@ describe('txSubmitHttpProvider', () => {
 
       describe('errors', () => {
         const testError =
-          (bodyError: Error, providerFailure: ProviderFailure, providerErrorType: unknown) => async () => {
+          (
+            bodyError: Error | null,
+            providerFailure: ProviderFailure,
+            providerErrorType: unknown,
+            reason?: ProviderFailure
+          ) =>
+          async () => {
             try {
               axiosMock.onPost().replyOnce(() => {
-                throw handleProviderMocks.axiosError(bodyError);
+                throw handleProviderMocks.axiosError(bodyError, reason);
               });
               const provider = txSubmitHttpProvider(config);
               await provider.submitTx({ signedTransaction: emptyUintArrayAsHexString });
@@ -90,6 +96,16 @@ describe('txSubmitHttpProvider', () => {
         it(
           'maps unrecognized errors to UnknownTxSubmissionError',
           testError(new Error('Unknown error'), ProviderFailure.Unknown, GeneralCardanoNodeError)
+        );
+
+        it(
+          'uses reason to determine ProviderFailure type when innerError is missing',
+          testError(null, ProviderFailure.BadRequest, ProviderError)
+        );
+
+        it(
+          'non-providerError reason is mapped to ProviderFailure.Unknown when innerError is missing',
+          testError(null, ProviderFailure.Unknown, ProviderError, 'invalidReason' as ProviderFailure)
         );
 
         it('does not re-wrap UnknownTxSubmissionError', async () => {

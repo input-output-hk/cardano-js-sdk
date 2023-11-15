@@ -9,7 +9,8 @@ import {
   ProviderFailure,
   TxSubmissionError,
   TxSubmissionErrorCode,
-  TxSubmitProvider
+  TxSubmitProvider,
+  reasonToProviderFailure
 } from '@cardano-sdk/core';
 import { CreateHttpProviderConfig, createHttpProvider } from '../HttpProvider';
 import { apiVersion } from '../version';
@@ -77,6 +78,7 @@ export const txSubmitHttpProvider = (config: CreateHttpProviderConfig<TxSubmitPr
         }
         case 'submitTx': {
           if (typeof error === 'object' && typeof error.innerError === 'object') {
+            // Ogmios errors have inner error. Parse that to get the real error
             const txSubmissionError = toTxSubmissionError(error.innerError);
             if (txSubmissionError) {
               throw new ProviderError(codeToProviderFailure(txSubmissionError.code), txSubmissionError);
@@ -85,6 +87,10 @@ export const txSubmitHttpProvider = (config: CreateHttpProviderConfig<TxSubmitPr
             if (error.name === 'HandleOwnerChangeError') {
               Object.setPrototypeOf(error, HandleOwnerChangeError);
             }
+          }
+          // No inner error. Use the outer reason to determine the error type.
+          if (error.reason && typeof error.reason === 'string') {
+            throw new ProviderError(reasonToProviderFailure(error.reason), error);
           }
         }
       }
