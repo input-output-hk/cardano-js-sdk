@@ -250,6 +250,12 @@ addOptions(withOgmiosOptions(withRabbitMqOptions(withHandlePolicyIdsOptions(prov
     EPOCH_POLL_INTERVAL_DEFAULT
   ),
   newOption(
+    '--submit-api-url <submitApiUrl>',
+    ProviderServerOptionDescriptions.SubmitApiUrl,
+    'SUBMIT_API_URL',
+    (url) => new URL(url)
+  ),
+  newOption(
     '--token-metadata-server-url <tokenMetadataServerUrl>',
     ProviderServerOptionDescriptions.TokenMetadataServerUrl,
     'TOKEN_METADATA_SERVER_URL',
@@ -325,6 +331,13 @@ addOptions(withOgmiosOptions(withRabbitMqOptions(withHandlePolicyIdsOptions(prov
     'HANDLE_PROVIDER_SERVER_URL',
     (serverUrl: string) => serverUrl,
     HANDLE_PROVIDER_SERVER_URL_DEFAULT
+  ),
+  newOption(
+    '--use-submit-api <true/false>',
+    ProviderServerOptionDescriptions.UseSubmitApi,
+    'USE_SUBMIT_API',
+    (value) => stringOptionToBoolean(value, Programs.ProviderServer, ProviderServerOptionDescriptions.UseSubmitApi),
+    false
   ),
   newOption(
     '--use-typeorm-asset-provider <true/false>',

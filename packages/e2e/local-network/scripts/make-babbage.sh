@@ -266,12 +266,13 @@ $SED -i -E "s/AlonzoGenesisHash: '.*'/AlonzoGenesisHash: '${alonzoGenesisHash}'/
 # Create config folder
 rm -rf ./config/*
 mkdir -p ./config/network/cardano-db-sync/
-mkdir -p ./config/network/cardano-db-sync/
 mkdir -p ./config/network/cardano-node/genesis/
+mkdir -p ./config/network/cardano-submit-api/
 mkdir -p ./config/network/genesis/
 
 cp ./templates/babbage/db-sync-config.json ./config/network/cardano-db-sync/config.json
 cp ./templates/babbage/node-config.json ./config/network/cardano-node/config.json
+cp ./templates/babbage/submit-api-config.json ./config/network/cardano-submit-api/config.json
 
 $SED -i -E "s/\"ByronGenesisHash\": \".*\"/\"ByronGenesisHash\": \"${byronGenesisHash}\"/" ./config/network/cardano-node/config.json
 $SED -i -E "s/\"ShelleyGenesisHash\": \".*\"/\"ShelleyGenesisHash\": \"${shelleyGenesisHash}\"/" ./config/network/cardano-node/config.json
